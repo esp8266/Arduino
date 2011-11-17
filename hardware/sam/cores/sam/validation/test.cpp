@@ -76,6 +76,6 @@ void loop( void )
   delay( 1000 ) ;              // wait for a second
 
   Serial.write( '-' ) ;   // send a char
-  Serial.write( "test1\n" ) ;   // send a string
-  Serial.write( "test2" ) ;   // send another string
+//  Serial.write( "test1\n" ) ;   // send a string
+//  Serial.write( "test2" ) ;   // send another string
 }

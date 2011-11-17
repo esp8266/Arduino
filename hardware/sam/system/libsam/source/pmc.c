@@ -83,9 +83,9 @@ extern void PMC_EnablePeripheral( uint32_t dwId )
         }
     }
 #elif (defined _SAM3N_) || (defined _SAM3U_)
-    if ( (PMC->PMC_PCSR & ((uint32_t)1 << dwId)) != ((uint32_t)1 << dwId) )
+    if ( (PMC->PMC_PCSR0 & ((uint32_t)1 << dwId)) != ((uint32_t)1 << dwId) )
     {
-        PMC->PMC_PCER = 1 << dwId ;
+        PMC->PMC_PCER0 = 1 << dwId ;
     }
 #else
     #error "The specified chip is not supported."
@@ -121,9 +121,9 @@ extern void PMC_DisablePeripheral( uint32_t dwId )
         }
     }
 #elif (defined _SAM3N_) || (defined _SAM3U_)
-    if ( (PMC->PMC_PCSR & ((uint32_t)1 << dwId)) == ((uint32_t)1 << dwId) )
+    if ( (PMC->PMC_PCSR0 & ((uint32_t)1 << dwId)) == ((uint32_t)1 << dwId) )
     {
-        PMC->PMC_PCDR = 1 << dwId ;
+        PMC->PMC_PCDR0 = 1 << dwId ;
     }
 #else
     #error "The specified chip is not supported."
@@ -169,7 +169,7 @@ extern uint32_t PMC_IsPeripheralEnabled( uint32_t dwId )
         }
     }
 #elif (defined _SAM3N_) || (defined _SAM3U_)
-    if ( (PMC->PMC_PCSR & ((uint32_t)1 << dwId)) )
+    if ( (PMC->PMC_PCSR0 & ((uint32_t)1 << dwId)) )
     {
         return 0 ;
     }

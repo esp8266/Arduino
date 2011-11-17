@@ -58,7 +58,6 @@
 #define REG_PMC_PCDR1           (0x400E0704U) /**< \brief (PMC) Peripheral Clock Disable Register 1 */
 #define REG_PMC_PCSR1           (0x400E0708U) /**< \brief (PMC) Peripheral Clock Status Register 1 */
 #define REG_PMC_PCR             (0x400E070CU) /**< \brief (PMC) Peripheral Control Register */
-#define REG_PMC_OCR             (0x400E0710U) /**< \brief (PMC) Oscillator Calibration Register */
 #else
 #define REG_PMC_SCER   (*(WoReg*)0x400E0600U) /**< \brief (PMC) System Clock Enable Register */
 #define REG_PMC_SCDR   (*(WoReg*)0x400E0604U) /**< \brief (PMC) System Clock Disable Register */
@@ -86,7 +85,6 @@
 #define REG_PMC_PCDR1  (*(WoReg*)0x400E0704U) /**< \brief (PMC) Peripheral Clock Disable Register 1 */
 #define REG_PMC_PCSR1  (*(RoReg*)0x400E0708U) /**< \brief (PMC) Peripheral Clock Status Register 1 */
 #define REG_PMC_PCR    (*(RwReg*)0x400E070CU) /**< \brief (PMC) Peripheral Control Register */
-#define REG_PMC_OCR    (*(RwReg*)0x400E0710U) /**< \brief (PMC) Oscillator Calibration Register */
 #endif /* __ASSEMBLY__ */
 
 #endif /* _SAM3XA_PMC_INSTANCE_ */

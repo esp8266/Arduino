@@ -36,16 +36,16 @@ extern uint32_t SystemCoreClock;	/* System Clock Frequency (Core Clock) */
  */
 void SystemInit(void);
 
-/** 
- * Initialize the flash and watchdog setting .
- */
-void set_flash_and_watchdog(void);
-
 /**
  * @brief Updates the SystemCoreClock with current core Clock 
  * retrieved from cpu registers.
  */
 void SystemCoreClockUpdate(void);
+
+/** 
+ * Initialize flash and watchdog.
+ */
+void system_init_flash_and_watchdog(uint32_t dw_clk);
 
 /* @cond 0 */
 /**INDENT-OFF**/

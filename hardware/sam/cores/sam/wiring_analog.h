@@ -50,7 +50,9 @@ extern void analogWrite( uint32_t ulPin, uint32_t ulValue ) ;
 /*
  * \brief Reads the value from the specified analog pin.
  *
- * \param ulValue
+ * \param ulPin
+ *
+ * \return Read value from selected pin, if no error.
  */
 extern uint32_t analogRead( uint32_t ulPin ) ;
 

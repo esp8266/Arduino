@@ -53,13 +53,15 @@ extern void loop( void ) ;
 //
 // These perform slightly better as macros compared to inline functions
 //
-#define digitalPinToPort( ulPin )    ( g_APinDescription[ulPin]->pPort )
-#define digitalPinToBitMask( ulPin ) ( g_APinDescription[ulPin]->dwPin )
+#define digitalPinToPort( ulPin )    ( g_APinDescription[ulPin].pPort )
+#define digitalPinToBitMask( ulPin ) ( g_APinDescription[ulPin].dwPin )
+/*
 #define digitalPinToTimer( P )   (  )
 #define analogInPinToBit( P )    ( P )
 #define portOutputRegister( P )  (  )
 #define portInputRegister( P )   (  )
 #define portModeRegister( P )    (  )
+*/
 
 //#define NOT_A_PIN 0  // defined in pio.h/EPioType
 #define NOT_A_PORT           0

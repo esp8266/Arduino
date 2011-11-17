@@ -15,11 +15,6 @@
 #include "../exceptions.h"
 #include "sam3.h"
 
-/* Stack Configuration */
-#define STACK_SIZE       0x900	   /** Stack size (in DWords) */
-__attribute__ ((aligned(8), section(".stack")))
-uint32_t pdwStack[STACK_SIZE];
-
 /* Initialize segments */
 extern uint32_t _sfixed;
 extern uint32_t _efixed;
@@ -28,6 +23,8 @@ extern uint32_t _srelocate;
 extern uint32_t _erelocate;
 extern uint32_t _szero;
 extern uint32_t _ezero;
+extern uint32_t _sstack;
+extern uint32_t _estack;
 
 /** \cond DOXYGEN_SHOULD_SKIP_THIS */
 int main(void);
@@ -40,7 +37,7 @@ __attribute__ ((section(".vectors")))
 IntFunc exception_table[] = {
 
 	/* Configure Initial Stack Pointer, using linker-generated symbols */
-	(IntFunc) (&pdwStack[STACK_SIZE - 1]),
+	(IntFunc) (&_estack),
 	Reset_Handler,
 
 	NMI_Handler,

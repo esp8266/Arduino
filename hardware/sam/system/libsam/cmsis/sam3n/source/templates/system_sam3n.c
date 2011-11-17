@@ -28,11 +28,11 @@ extern "C" {
 
 /* Clock settings (48MHz) */
 #define SYS_BOARD_OSCOUNT   (CKGR_MOR_MOSCXTST(0x8))
-#define SYS_BOARD_PLLR		(CKGR_PLLR_STUCKTO1 \
-							| CKGR_PLLR_MUL(0x3) \
-							| CKGR_PLLR_PLLCOUNT(0x3f) \
-							| CKGR_PLLR_DIV(0x1))
-#define SYS_BOARD_MCKR      (PMC_MCKR_PRES_CLK | PMC_MCKR_CSS_PLL_CLK)
+#define SYS_BOARD_PLLAR		(CKGR_PLLAR_ONE \
+							| CKGR_PLLAR_MULA(0x3) \
+							| CKGR_PLLAR_PLLACOUNT(0x3f) \
+							| CKGR_PLLAR_DIVA(0x1))
+#define SYS_BOARD_MCKR      (PMC_MCKR_PRES_CLK_1 | PMC_MCKR_CSS_PLLA_CLK)
 
 /* Clock Definitions */
 #define SYS_FREQ_XTAL_32K      	(32768UL)		/* External 32K crystal frequency */
@@ -77,8 +77,8 @@ void SystemInit(void)
 	}
 
 	/* Initialize PLL */
-	PMC->CKGR_PLLR = SYS_BOARD_PLLR;
-	while (!(PMC->PMC_SR & PMC_SR_LOCK)) {
+	PMC->CKGR_PLLAR = SYS_BOARD_PLLAR;
+	while (!(PMC->PMC_SR & PMC_SR_LOCKA)) {
 	}
 
 	/* Switch to main clock */
@@ -93,28 +93,6 @@ void SystemInit(void)
 	}
 
 	SystemCoreClock = CHIP_FREQ_CPU_MAX;
-}
-
-/** 
- * Initialize the flash and watchdog setting .
- */
-void set_flash_and_watchdog(void)
-{
-	/* Set FWS for Embedded Flash Access according operating frequency*/
-	if(SystemCoreClock < SYS_FREQ_FWS_0){
-		EFC->EEFC_FMR = EEFC_FMR_FWS(0);
-	}else if(SystemCoreClock < SYS_FREQ_FWS_1){
-		EFC->EEFC_FMR = EEFC_FMR_FWS(1);
-	}else if(SystemCoreClock < SYS_FREQ_FWS_2){
-		EFC->EEFC_FMR = EEFC_FMR_FWS(2);
-	}else{
-		EFC->EEFC_FMR = EEFC_FMR_FWS(3);
-	}	
-	
-#ifndef CONFIG_KEEP_WATCHDOG_AFTER_INIT 
-	/*Disable the watchdog */
-	WDT->WDT_MR = WDT_MR_WDDIS;
-#endif
 }
 
 void SystemCoreClockUpdate(void)
@@ -135,12 +113,12 @@ void SystemCoreClockUpdate(void)
 			SystemCoreClock = CHIP_FREQ_MAINCK_RC_4MHZ;
 
 			switch (PMC->CKGR_MOR & CKGR_MOR_MOSCRCF_Msk) {
-			case CKGR_MOR_MOSCRCF_4MHz:
+			case CKGR_MOR_MOSCRCF_4_MHz:
 				break;
-			case CKGR_MOR_MOSCRCF_8MHz:
+			case CKGR_MOR_MOSCRCF_8_MHz:
 				SystemCoreClock *= 2U;
 				break;
-			case CKGR_MOR_MOSCRCF_12MHz:
+			case CKGR_MOR_MOSCRCF_12_MHz:
 				SystemCoreClock *= 3U;
 				break;
 			default:
@@ -148,29 +126,29 @@ void SystemCoreClockUpdate(void)
 			}
 		}
 		break;
-	case PMC_MCKR_CSS_PLL_CLK:	/* PLL clock */
+	case PMC_MCKR_CSS_PLLA_CLK:	/* PLLA clock */
 		if (PMC->CKGR_MOR & CKGR_MOR_MOSCSEL) {
 			SystemCoreClock = SYS_FREQ_XTAL_XTAL12M;
 		} else {
 			SystemCoreClock = CHIP_FREQ_MAINCK_RC_4MHZ;
 
 			switch (PMC->CKGR_MOR & CKGR_MOR_MOSCRCF_Msk) {
-			case CKGR_MOR_MOSCRCF_4MHz:
+			case CKGR_MOR_MOSCRCF_4_MHz:
 				break;
-			case CKGR_MOR_MOSCRCF_8MHz:
+			case CKGR_MOR_MOSCRCF_8_MHz:
 				SystemCoreClock *= 2U;
 				break;
-			case CKGR_MOR_MOSCRCF_12MHz:
+			case CKGR_MOR_MOSCRCF_12_MHz:
 				SystemCoreClock *= 3U;
 				break;
 			default:
 				break;
 			}
 		}
-		SystemCoreClock *= ((((PMC->CKGR_PLLR) & CKGR_PLLR_MUL_Msk) >> 
-			                         CKGR_PLLR_MUL_Pos) + 1U);
-		SystemCoreClock /= ((((PMC->CKGR_PLLR) & CKGR_PLLR_DIV_Msk) >> 
-			                         CKGR_PLLR_DIV_Pos));
+		SystemCoreClock *= ((((PMC->CKGR_PLLAR) & CKGR_PLLAR_MULA_Msk) >> 
+			                         CKGR_PLLAR_MULA_Pos) + 1U);
+		SystemCoreClock /= ((((PMC->CKGR_PLLAR) & CKGR_PLLAR_DIVA_Msk) >> 
+			                         CKGR_PLLAR_DIVA_Pos));
 		break;
 	}
 
@@ -180,6 +158,28 @@ void SystemCoreClockUpdate(void)
 		SystemCoreClock >>= ((PMC->PMC_MCKR & PMC_MCKR_PRES_Msk) >> 
 			                           PMC_MCKR_PRES_Pos);
 	}
+}
+
+/** 
+ * Initialize flash and watchdog.
+ */
+void system_init_flash_and_watchdog(uint32_t dw_clk)
+{
+	/* Set FWS for embedded Flash access according to operating frequency */
+	if (dw_clk < SYS_FREQ_FWS_0) {
+		EFC->EEFC_FMR = EEFC_FMR_FWS(0);
+	} else if (dw_clk < SYS_FREQ_FWS_1) {
+		EFC->EEFC_FMR = EEFC_FMR_FWS(1);
+	} else if (dw_clk < SYS_FREQ_FWS_2) {
+		EFC->EEFC_FMR = EEFC_FMR_FWS(2);
+	} else {
+		EFC->EEFC_FMR = EEFC_FMR_FWS(3);
+	}
+	
+#ifndef CONFIG_KEEP_WATCHDOG_AFTER_INIT 
+	/* Disable the watchdog */
+	WDT->WDT_MR = WDT_MR_WDDIS;
+#endif
 }
 
 /* @cond 0 */

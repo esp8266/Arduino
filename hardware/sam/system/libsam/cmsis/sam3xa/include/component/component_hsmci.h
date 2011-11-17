@@ -81,9 +81,6 @@ typedef struct {
 #define HSMCI_MR_WRPROOF (0x1u << 12) /**< \brief (HSMCI_MR)  */
 #define HSMCI_MR_FBYTE (0x1u << 13) /**< \brief (HSMCI_MR) Force Byte Transfer */
 #define HSMCI_MR_PADV (0x1u << 14) /**< \brief (HSMCI_MR) Padding Value */
-#define HSMCI_MR_BLKLEN_Pos 16
-#define HSMCI_MR_BLKLEN_Msk (0xffffu << HSMCI_MR_BLKLEN_Pos) /**< \brief (HSMCI_MR) Data Block Length */
-#define HSMCI_MR_BLKLEN(value) ((HSMCI_MR_BLKLEN_Msk & ((value) << HSMCI_MR_BLKLEN_Pos)))
 /* -------- HSMCI_DTOR : (HSMCI Offset: 0x08) Data Timeout Register -------- */
 #define HSMCI_DTOR_DTOCYC_Pos 0
 #define HSMCI_DTOR_DTOCYC_Msk (0xfu << HSMCI_DTOR_DTOCYC_Pos) /**< \brief (HSMCI_DTOR) Data Timeout Cycle Number */

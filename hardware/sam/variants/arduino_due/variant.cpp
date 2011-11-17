@@ -348,6 +348,38 @@ extern void init( void )
   // Initialize Serial port UART, common to all SAM3 variants
   PIO_Configure( g_APinDescription[PINS_UART].pPort, g_APinDescription[PINS_UART].ulPinType,
                  g_APinDescription[PINS_UART].ulPin, g_APinDescription[PINS_UART].ulPinConfiguration ) ;
+
+  // Initialize 10bit Analog Controller
+  /* Enable peripheral clock.*/
+  PMC_EnablePeripheral( ID_ADC ) ;
+  
+  /* Initialize ADC. */
+  /*  startup = 8:    512 periods of ADCClock
+   * for prescal = 4
+   *     prescal: ADCClock = MCK / ( (PRESCAL+1) * 2 ) => 64MHz / ((4+1)*2) = 6.4MHz
+   *     ADC clock = 6.4 MHz
+   */
+  adc_init( ADC, SystemCoreClock, 6400000, 10 ) ;
+  adc_configure_timing( ADC, 1200 ) ;
+  adc_configure_trigger( ADC, ADC_TRIG_SW ) ;	
+  adc_disable_interrupt( ADC, 0xFFFFFFFF ) ; /* Disable all adc interrupt. */	
+  adc_disable_channel( ADC, ADC_ALL_CHANNEL ) ;
+
+  // Initialize 12bit Analog Controller
+  /* Enable peripheral clock.*/
+  PMC_EnablePeripheral( ID_ADC12B ) ;
+  
+  /* Initialize ADC12. */
+  /*  startup = 8:    512 periods of ADCClock
+   * for prescal = 4
+   *     prescal: ADCClock = MCK / ( (PRESCAL+1) * 2 ) => 64MHz / ((4+1)*2) = 6.4MHz
+   *     ADC clock = 6.4 MHz
+   */
+  adc12_init( ADC12B, SystemCoreClock, 6400000, 10, 1200 ) ;
+  adc12_configure_timing( ADC12B, 1200 ) ;
+  adc12_configure_trigger( ADC12B, ADC_TRIG_SW ) ;	
+  adc12_disable_interrupt( ADC12B, 0xFFFFFFFF ) ; /* Disable all adc interrupt. */
+  adc12_disable_channel( ADC12B, ADC_ALL_CHANNEL ) ;
 }
 #ifdef __cplusplus
 }

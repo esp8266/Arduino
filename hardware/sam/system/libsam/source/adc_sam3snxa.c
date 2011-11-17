@@ -38,7 +38,7 @@
  *
  *******************************************************************************/
 
-#include "adc.h"
+#include "../chip.h"
 
 /// @cond 0
 /**INDENT-OFF**/
@@ -49,6 +49,7 @@ extern "C" {
 /// @endcond
 
 #if SAM3S || SAM3N || SAM3XA
+
 /**
  * \brief Initializes the given ADC with the specified ADC clock and startup time.
  *
@@ -81,7 +82,6 @@ uint32_t adc_init(Adc *p_adc, uint32_t ul_mck, uint32_t ul_adc_clock, uint8_t uc
     p_adc->ADC_MR |= ADC_MR_PRESCAL( ul_prescal ) | ( (uc_startup<<ADC_MR_STARTUP_Pos) & ADC_MR_STARTUP_Msk);
     return 0;	
 }
-#endif
 
 /**
  * \brief Configures conversion resolution.
@@ -90,14 +90,11 @@ uint32_t adc_init(Adc *p_adc, uint32_t ul_mck, uint32_t ul_adc_clock, uint8_t uc
  * \param resolution  ADC resolution.
  *
  */
- #if SAM3S || SAM3N || SAM3XA
 void adc_set_resolution(Adc *p_adc, adc_resolution_t resolution)
 {
     p_adc->ADC_MR |= (resolution<<4) & ADC_MR_LOWRES;
 }
-#endif
  
-#if SAM3S || SAM3N || SAM3XA
 /**
  * \brief Configures conversion trigger and free run mode.
  *
@@ -111,9 +108,7 @@ void adc_configure_trigger(Adc *p_adc, adc_trigger_t trigger, uint8_t uc_freerun
 {
     p_adc->ADC_MR |=  trigger | ((uc_freerun<<7) & ADC_MR_FREERUN);
 }
-#endif
 
-#if SAM3S || SAM3N || SAM3XA
 /**
  * \brief Configures ADC power saving mode.
  *
@@ -128,9 +123,7 @@ void adc_configure_power_save(Adc *p_adc, uint8_t uc_sleep, uint8_t uc_fwup)
 {
     p_adc->ADC_MR |= ( ((uc_sleep<<5) & ADC_MR_SLEEP) | ((uc_fwup<<6) & ADC_MR_FWUP) );
 }
-#endif
 
-#if SAM3S || SAM3N || SAM3XA
 /**
  * \brief Configures conversion sequence.
  *
@@ -151,7 +144,7 @@ void adc_configure_sequence(Adc *p_adc, adc_channel_num_t ch_list[], uint8_t uc_
     }
     else
     {
-        for(uc_counter=0;uc_counter < 8;uc_counter++)
+      for(uc_counter=0;uc_counter < 8;uc_counter++)
 	  {
 	        p_adc->ADC_SEQR1 |= ch_list[uc_counter] << (4*uc_counter);
 	  }
@@ -161,7 +154,6 @@ void adc_configure_sequence(Adc *p_adc, adc_channel_num_t ch_list[], uint8_t uc_
 	  }	
     }
 }
-#endif
 
 #if SAM3S ||  SAM3XA
 /**
@@ -221,7 +213,6 @@ void adc_disable_anch( Adc *pAdc )
 }
 #endif
 
-#if SAM3S || SAM3N || SAM3XA
 /**
  * \brief Starts analog-to-digital conversion.
  *
@@ -235,9 +226,7 @@ void adc_start(Adc *p_adc)
 {
     p_adc->ADC_CR = ADC_CR_START;
 }
-#endif
 
-#if SAM3S || SAM3N || SAM3XA
 /**
  * \brief Stop analog-to-digital conversion.
  * \param p_adc  Pointer to an ADC instance.
@@ -247,9 +236,7 @@ void adc_stop(Adc *p_adc)
 {
     p_adc->ADC_CR = ADC_CR_SWRST;
 }
-#endif
 
-#if SAM3S || SAM3N || SAM3XA
 /**
  * \brief Enables the specified ADC channel.
  *
@@ -261,9 +248,7 @@ void adc_enable_channel(Adc *p_adc, adc_channel_num_t adc_ch)
 {
     p_adc->ADC_CHER = 1 << adc_ch;
 }
-#endif
 
-#if SAM3S || SAM3N || SAM3XA
 /**
  * \brief Disables the specified ADC channel.
  *
@@ -275,9 +260,7 @@ void adc_disable_channel(Adc *p_adc, adc_channel_num_t adc_ch)
 {
     p_adc->ADC_CHDR = 1 << adc_ch;
 }
-#endif
 
-#if SAM3S || SAM3N || SAM3XA
 /**
  * \brief Reads the ADC channel status.
  *
@@ -291,9 +274,7 @@ uint32_t adc_get_status(Adc *p_adc, adc_channel_num_t adc_ch)
 {
     return p_adc->ADC_CHSR & (1 << adc_ch);
 }
-#endif
 
-#if SAM3S || SAM3N || SAM3XA
 /**
  * \brief Reads the ADC result data of the specified channel.
  *
@@ -313,9 +294,7 @@ uint32_t adc_get_value(Adc *p_adc, adc_channel_num_t adc_ch)
 
     return dwData ;
 }
-#endif
 
-#if SAM3S || SAM3N || SAM3XA
 /**
  * \brief Reads the last ADC result data.
  *
@@ -327,9 +306,7 @@ uint32_t adc_get_latest_value(Adc *p_adc)
 {
     return p_adc->ADC_LCDR;
 }
-#endif
 
-#if SAM3S || SAM3N || SAM3XA
 /**
  * \brief Enables TAG option so that the number of the last converted channel can be indicated.
  *
@@ -340,9 +317,7 @@ void adc_enable_tag(Adc *p_adc)
 {
     p_adc->ADC_EMR |= ADC_EMR_TAG;
 }
-#endif
 
-#if SAM3S || SAM3N || SAM3XA
 /**
  * \brief Disables TAG option.
  *
@@ -353,9 +328,7 @@ void adc_disable_tag(Adc *p_adc)
 {
     p_adc->ADC_EMR &= ~ADC_EMR_TAG;
 }
-#endif
 
-#if SAM3S || SAM3N || SAM3XA
 /**
  * \brief Indicates the last converted channel.
  *
@@ -369,9 +342,7 @@ adc_channel_num_t adc_get_tag(Adc *p_adc)
 {
     return  (p_adc->ADC_LCDR & ADC_LCDR_CHNB_Msk) >> ADC_LCDR_CHNB_Pos;
 }
-#endif
 
-#if SAM3S || SAM3N || SAM3XA
 /**
  * \brief Enables conversion sequencer.
  *
@@ -382,9 +353,7 @@ void adc_start_sequencer(Adc *p_adc)
 {
     p_adc->ADC_MR |= ADC_MR_USEQ;
 }
-#endif
 
-#if SAM3S || SAM3N || SAM3XA
 /**
  * \brief Disables conversion sequencer.
  *
@@ -395,9 +364,7 @@ void adc_stop_sequencer(Adc *p_adc)
 {
     p_adc->ADC_MR &= ~ADC_MR_USEQ; 
 }
-#endif
 
-#if SAM3S || SAM3N || SAM3XA
 /**
  * \brief Configures comparsion mode.
  *
@@ -410,9 +377,7 @@ void adc_set_comparison_mode(Adc *p_adc, uint8_t uc_mode)
     p_adc->ADC_EMR &= (uint32_t)~(ADC_EMR_CMPMODE_Msk);
     p_adc->ADC_EMR |= (uc_mode & ADC_EMR_CMPMODE_Msk);
 }
-#endif
 
-#if SAM3S || SAM3N || SAM3XA
 /**
  * \brief get comparsion mode.
  *
@@ -425,9 +390,7 @@ uint32_t adc_get_comparison_mode(Adc *p_adc)
 {
     return p_adc->ADC_EMR & ADC_EMR_CMPMODE_Msk;
 }
-#endif
 
-#if SAM3S || SAM3N || SAM3XA
 /**
  * \brief Configures ADC compare window.
  *
@@ -440,9 +403,7 @@ void adc_set_comparsion_window(Adc *p_adc, uint16_t us_low_threshold, uint16_t u
 {
     p_adc->ADC_CWR = ADC_CWR_LOWTHRES(us_low_threshold) | ADC_CWR_HIGHTHRES(us_high_threshold);
 }
-#endif
 
-#if SAM3S || SAM3N || SAM3XA
 /**
  * \brief Configures comparison selected channel.
  *
@@ -463,7 +424,6 @@ void adc_set_comparison_channel(Adc *p_adc, adc_channel_num_t channel)
         p_adc->ADC_EMR |= ADC_EMR_CMPALL;
     }
 }
-#endif
 
 #if SAM3S || SAM3XA
 /**
@@ -477,9 +437,7 @@ void adc_set_comparison_channel(Adc *p_adc, adc_channel_num_t channel)
 {
     p_adc->ADC_COR |= 0x01u << (16+ channel);
 }
-#endif
 
-#if SAM3S || SAM3XA
 /**
  * \brief Disables differential input for the specified channel.
  *
@@ -494,9 +452,7 @@ void adc_disable_differential_input(Adc *p_adc, adc_channel_num_t channel)
     p_adc->ADC_COR &= 0xfffeffffu << channel;
     p_adc->ADC_COR |= ul_temp;	
 }
-#endif
 
-#if SAM3S || SAM3XA
 /**
  * \brief Enables analog signal offset for the specified channel.
  *
@@ -508,9 +464,7 @@ void adc_enable_input_offset(Adc *p_adc, adc_channel_num_t channel)
 {
     p_adc->ADC_COR |= 0x01u <<  channel;
 }
-#endif
 
-#if SAM3S || SAM3XA
 /**
  * \brief Disables analog signal offset for the specified channel.
  *
@@ -525,9 +479,7 @@ void adc_disable_input_offset(Adc *p_adc, adc_channel_num_t channel)
     p_adc->ADC_COR &= (0xfffffffeu << channel);
     p_adc->ADC_COR |= ul_temp;	
 }
-#endif
 
-#if SAM3S || SAM3XA
 /**
  * \brief Configures input gain for the specified channel.
  *
@@ -540,9 +492,9 @@ void adc_set_input_gain(Adc *p_adc, adc_channel_num_t channel, adc_gainvalue_t g
 {
     p_adc->ADC_CGR |= (0x03u << (2*channel)) & (gain << (2*channel));
 }
-#endif
+#endif /* SAM3S || SAM3XA */
 
-#if  SAM3S8 || SAM3SD8
+#if SAM3S8 || SAM3SD8
 /**
  * \brief set adc auto calibration mode.
  *
@@ -553,9 +505,8 @@ void adc_set_calibmode(Adc *p_adc)
 {
     p_adc->ADC_CR |= ADC_CR_AUTOCAL;
 }
-#endif
+#endif /* SAM3S8 || SAM3SD8 */
 
-#if SAM3S ||  SAM3N || SAM3XA
 /**
  * \brief Returns the actual ADC clock.
  *
@@ -574,9 +525,7 @@ uint32_t adc_get_actual_adc_clock(Adc *p_adc, uint32_t  ul_mck)
     ul_adcfreq = ul_mck / ((ul_prescal+1)*2); 
     return ul_adcfreq;	
 }
-#endif
 
-#if SAM3S || SAM3N || SAM3XA
 /**
  * \brief Enables ADC interrupt(s).
  *
@@ -588,9 +537,7 @@ void adc_enable_interrupt(Adc *p_adc, uint32_t ul_source)
 {
     p_adc->ADC_IER = ul_source;
 }
-#endif
 
-#if SAM3S || SAM3N || SAM3XA
 /**
  * \brief Disables ADC interrupt(s).
  *
@@ -603,9 +550,6 @@ void adc_disable_interrupt(Adc *p_adc, uint32_t ul_source)
     p_adc->ADC_IDR = ul_source;
 }
 
-#endif
-
-#if SAM3S || SAM3N || SAM3XA
 /**
  * \brief Reads ADC interrupt status.
  *
@@ -618,9 +562,6 @@ uint32_t adc_get_interrupt_status(Adc *p_adc)
     return p_adc->ADC_ISR ;
 }
 
-#endif
-
-#if SAM3S || SAM3N || SAM3XA
 /** \brief Read ADC interrupt mask.
  *
  *  \param p_uart pointer to a UART instance.
@@ -631,9 +572,7 @@ uint32_t adc_get_interrupt_mask(Adc *p_adc)
 {
 	return p_adc->ADC_IMR;
 }
-#endif
 
-#if SAM3S || SAM3N || SAM3XA
 /**
  * \brief Reads overrun status.
  *
@@ -645,7 +584,6 @@ uint32_t adc_check_ovr(Adc *p_adc,adc_channel_num_t adc_ch)
 {
     return p_adc->ADC_OVER & (0x01u << adc_ch);
 }
-#endif
 
 #if SAM3S || SAM3XA
 /**
@@ -689,7 +627,6 @@ void adc_disable_ts(Adc *p_adc)
 }
 #endif
 
-#if SAM3S || SAM3N || SAM3XA
 /**
  * \brief Enables or disables write protection of ADC registers.
  *
@@ -700,9 +637,7 @@ void adc_set_writeprotect(Adc *p_adc, uint32_t ul_enable)
 {
     p_adc->ADC_WPMR |= ADC_WPMR_WPKEY(ul_enable);
 }
-#endif
 
-#if SAM3S || SAM3N || SAM3XA
 /**
  * \brief Indicates write protect status.
  *
@@ -714,9 +649,7 @@ uint32_t adc_get_writeprotect_status(Adc *p_adc)
 {
     return p_adc->ADC_WPSR & ADC_WPSR_WPVS;
 }
-#endif
 
-#if SAM3S || SAM3N || SAM3XA
 /**
  * \brief calcul_startup
  */
@@ -760,6 +693,7 @@ static uint32_t calcul_startup( uint32_t ul_startup )
     return ul_startup_value;
 }
 
+#if 0
 /**
  * \brief Checks ADC configurations.
  *
@@ -789,7 +723,7 @@ void adc_check(Adc* p_adc, uint32_t ul_mck)
     ul_startup = (( p_adc->ADC_MR & ADC_MR_STARTUP_Msk) >> ADC_MR_STARTUP_Pos);
     if( !(p_adc->ADC_MR & ADC_MR_SLEEP_SLEEP) )
     {
-        /* 40µs */
+        /* 40ms */
         if( ADC_STARTUP_NORM * ul_adcfreq / 1000000 > calcul_startup(ul_startup) )
         {
             printf("Startup time too small: %d, programmed: %d\r\n", (int)(ADC_STARTUP_NORM * ul_adcfreq / 1000000), (int)calcul_startup(ul_startup));
@@ -803,7 +737,7 @@ void adc_check(Adc* p_adc, uint32_t ul_mck)
         }
         if( !(p_adc->ADC_MR & ADC_MR_FWUP_ON) )
         {
-            /* Sleep 40µs */
+            /* Sleep 40ms */
             if( ADC_STARTUP_NORM * ul_adcfreq / 1000000 > calcul_startup(ul_startup) )
             {
                 printf("Startup time too small: %d, programmed: %d\r\n", (int)(ADC_STARTUP_NORM * ul_adcfreq / 1000000), (int)(calcul_startup(ul_startup)));
@@ -813,7 +747,7 @@ void adc_check(Adc* p_adc, uint32_t ul_mck)
         {
             if( p_adc->ADC_MR & ADC_MR_FWUP_ON )
             {
-                /* Fast Wake Up Sleep Mode: 12µs */
+                /* Fast Wake Up Sleep Mode: 12ms */
                 if( ADC_STARTUP_FAST * ul_adcfreq / 1000000 > calcul_startup(ul_startup) )
                 {
                     printf("Startup time too small: %d, programmed: %d\r\n", (int)(ADC_STARTUP_NORM * ul_adcfreq / 1000000), (int)(calcul_startup(ul_startup)));
@@ -822,7 +756,7 @@ void adc_check(Adc* p_adc, uint32_t ul_mck)
         }
     }
 }
-#endif
+#endif /* 0 */
 
 /**
  * \brief Gets PDC registers base address.
@@ -831,19 +765,18 @@ void adc_check(Adc* p_adc, uint32_t ul_mck)
  *
  * \retval PDC registers base for PDC driver to access.
  */
-#if SAM3S || SAM3N || SAM3XA
 Pdc *adc_get_pdc_base(Adc *p_adc)
 {
     return PDC_ADC;
 }
-#endif
+
 /// @cond 0
 /**INDENT-OFF**/
 #ifdef __cplusplus
 }
-#endif
+#endif // SAM3S || SAM3N || SAM3XA
 /**INDENT-ON**/
 /// @endcond
 
-//#endif /* #ifndef _SAM_ADC_ */
+#endif /* SAM3S || SAM3N || SAM3XA */
 
