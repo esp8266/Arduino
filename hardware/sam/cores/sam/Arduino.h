@@ -24,13 +24,13 @@
 #include <string.h>
 #include <math.h>
 
-#include "libsam/chip.h"
 #include "binary.h"
 
 #ifdef __cplusplus
 extern "C"{
 #endif // __cplusplus
 
+#include "libsam/chip.h"
 #include "wiring_constants.h"
 
 #define clockCyclesPerMicrosecond() ( SystemCoreClock / 1000000L )
@@ -85,7 +85,7 @@ typedef enum _EExt_Interrupts
 typedef void (*voidFuncPtr)( void ) ;
 
 /* Define attribute */
-#if defined   ( __CC_ARM   ) /* Keil µVision 4 */
+#if defined   ( __CC_ARM   ) /* Keil ï¿½Vision 4 */
     #define WEAK (__attribute__ ((weak)))
 #elif defined ( __ICCARM__ ) /* IAR Ewarm 5.41+ */
     #define WEAK __weak
