@@ -180,7 +180,28 @@ leonardo.build.variant=leonardo
 
 ##############################################################
 
-mini.name=Arduino Mini
+mini328.name=Arduino Mini w/ ATmega328
+
+mini328.upload.protocol=stk500
+mini328.upload.maximum_size=28672
+mini328.upload.speed=115200
+
+mini328.bootloader.low_fuses=0xff
+mini328.bootloader.high_fuses=0xd8
+mini328.bootloader.extended_fuses=0x05
+mini328.bootloader.path=bt
+mini328.bootloader.file=ATmegaBOOT_168_atmega328.hex
+mini328.bootloader.unlock_bits=0x3F
+mini328.bootloader.lock_bits=0x0F
+
+mini328.build.mcu=atmega328p
+mini328.build.f_cpu=16000000L
+mini328.build.core=arduino
+mini328.build.variant=eightanaloginputs
+
+##############################################################
+
+mini.name=Arduino Mini w/ ATmega168
 
 mini.upload.protocol=arduino
 mini.upload.maximum_size=14336
