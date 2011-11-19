@@ -73,11 +73,11 @@ class Stream : public Print
 
   float parseFloat();               // float version of parseInt
 
-  int readBytes( char *buffer, size_t length); // read chars from stream into buffer
+  size_t readBytes( char *buffer, size_t length); // read chars from stream into buffer
   // terminates if length characters have been read or timeout (see setTimeout)
   // returns the number of characters placed in the buffer (0 means no valid data found)
 
-  int readBytesUntil( char terminator, char *buffer, size_t length); // as readBytes with terminator character
+  size_t readBytesUntil( char terminator, char *buffer, size_t length); // as readBytes with terminator character
   // terminates if length characters have been read, timeout, or if the terminator character  detected
   // returns the number of characters placed in the buffer (0 means no valid data found)
 
