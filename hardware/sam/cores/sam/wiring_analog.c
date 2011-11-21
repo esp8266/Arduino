@@ -62,7 +62,7 @@ uint32_t analogRead( uint32_t ulPin )
       // Read the value
       ulValue=adc_get_value( ADC, ulChannel ) ;
 
-      // Enable the corresponding channel
+      // Disable the corresponding channel
       adc_disable_channel( ADC, ulChannel ) ;
 
       // Stop the ADC
@@ -93,7 +93,7 @@ uint32_t analogRead( uint32_t ulPin )
       // Stop the ADC12B
 //      adc12_stop( ADC12B ) ; // never do adc12_stop() else we have to reconfigure the ADC12B each time
 
-      // Enable the corresponding channel
+      // Disable the corresponding channel
       adc12_disable_channel( ADC12B, ulChannel-ADC8 ) ;
     break ;
 
