@@ -40,11 +40,14 @@ MEMORY
 {
 	flash0 (W!RX) : ORIGIN = 0x00080000, LENGTH = 0x00020000 /* Flash0, 128K */
 	flash1 (W!RX) : ORIGIN = 0x00100000, LENGTH = 0x00020000 /* Flash1, 128K */
-	sram0  (W!RX) : ORIGIN = 0x20000100, LENGTH = 0x00007F00 /* Sram0, 32K */
+	sram0  (W!RX) : ORIGIN = 0x20000000, LENGTH = 0x00008000 /* Sram0, 32K */
 	sram1  (W!RX) : ORIGIN = 0x20080000, LENGTH = 0x00004000 /* Sram1, 16K */
 	rom (rx)    : ORIGIN = ORIGIN(flash1)-LENGTH(flash0), LENGTH = LENGTH(flash0)+LENGTH(flash1) /* Flash, 256K */
-	ram (rwx)   : ORIGIN = ORIGIN( sram1)-LENGTH( sram0), LENGTH = LENGTH( sram0)+LENGTH( sram1) /* sram, 64K */
+	ram (rwx)   : ORIGIN = ORIGIN( sram1)-LENGTH( sram0), LENGTH = LENGTH( sram0)+LENGTH( sram1) /* sram, 48K */
 }
+
+/* The stack size used by the application. NOTE: you need to adjust  */
+STACK_SIZE = 0x2000;
 
 /* Section Definitions */ 
 SECTIONS 
@@ -136,7 +139,10 @@ SECTIONS
     .stack (NOLOAD):
     {
         . = ALIGN(8);
-        *(.stack .stack.*)
+         _sstack = .;
+        . = . + STACK_SIZE;
+        . = ALIGN(8);
+        _estack = .;
     } > sram1
 
     . = ALIGN(4); 

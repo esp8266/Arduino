@@ -194,7 +194,25 @@ extern void adc_disable_channel( Adc *p_adc, adc_channel_num_t adc_ch ) ;
  * \retval 1 means the specified channel is enabled.
  *         0 means the specified channel is disabled.
  */
-extern uint32_t adc_get_status(Adc *p_adc, adc_channel_num_t adc_ch);
+extern uint32_t adc_get_channel_status(Adc *p_adc, adc_channel_num_t adc_ch);
+
+/**
+ * \brief Reads the ADC status.
+ *
+ * \param p_adc  Pointer to an ADC instance.
+ *
+ * \retval ADC status register content.
+ */
+extern uint32_t adc_get_status(Adc *p_adc);
+
+/**
+ * \brief Reads the ADC overrun status.
+ *
+ * \param p_adc  Pointer to an ADC instance.
+ *
+ * \retval ADC ovverrun status register content.
+ */
+extern uint32_t adc_get_overrun_status(Adc *p_adc);
 
 /**
  * \brief Reads the ADC result data of the specified channel.

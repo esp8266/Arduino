@@ -33,15 +33,12 @@ void analogReference( eAnalogReference ulMode )
 
 uint32_t analogRead( uint32_t ulPin )
 {
-  uint32_t ulValue ;
+  uint32_t ulValue=0 ;
   uint32_t ulChannel ;
 
   ulChannel=g_APinDescription[ulPin].ulAnalogChannel ;
 
-#if defined sam3u_ek
-#elif defined sam3s_ek
-#elif defined arduino_due
-
+#if defined SAM3U4E
   switch ( ulChannel )
   {
     // Handling ADC 10 bits channels
@@ -53,10 +50,23 @@ uint32_t analogRead( uint32_t ulPin )
     case ADC5 :
     case ADC6 :
     case ADC7 :
+      // Enable the corresponding channel
       adc_enable_channel( ADC, ulChannel ) ;
+
+      // Start the ADC
       adc_start( ADC ) ;
-      adc_get_value( ADC, ulChannel ) ;
-      adc_stop( ADC ) ;
+
+      // Wait for end of conversion
+      while ( adc_get_status( ADC ) & (1<<ulChannel) ) == 0 ) ;
+
+      // Read the value
+      ulValue=adc_get_value( ADC, ulChannel ) ;
+
+      // Enable the corresponding channel
+      adc_disable_channel( ADC, ulChannel ) ;
+
+      // Stop the ADC
+//      adc_stop( ADC ) ; // never do adc_stop() else we have to reconfigure the ADC each time
     break ;
 
     // Handling ADC 12 bits channels
@@ -68,19 +78,31 @@ uint32_t analogRead( uint32_t ulPin )
     case ADC13 :
     case ADC14 :
     case ADC15 :
+      // Enable the corresponding channel
       adc12_enable_channel( ADC12B, ulChannel-ADC8 ) ;
+
+      // Start the ADC12B
       adc12_start( ADC12B ) ;
-      adc12_get_value( ADC12B, ulChannel-ADC8 ) ;
-      adc12_stop( ADC12B ) ;
+
+      // Wait for end of conversion
+      while ( adc12_get_status( ADC12B ) & (1<<(ulChannel-ADC8)) ) == 0 ) ;
+
+      // Read the value
+      ulValue=adc12_get_value( ADC12B, ulChannel-ADC8 ) ;
+
+      // Stop the ADC12B
+//      adc12_stop( ADC12B ) ; // never do adc12_stop() else we have to reconfigure the ADC12B each time
+
+      // Enable the corresponding channel
+      adc12_disable_channel( ADC12B, ulChannel-ADC8 ) ;
     break ;
 
     // Compiler could yell because we don't handle DAC pins
     default :
+      ulValue=0 ;
     break ;
   }
 #endif
-
-
 
 	return ulValue ;
 }
@@ -99,7 +121,7 @@ void analogWrite( uint32_t ulPin, uint32_t ulValue )
 	}
 	else
   {
-    if ( ulValue == 255)
+    if ( ulValue == 255 )
     {
       digitalWrite( ulPin, HIGH ) ;
     }

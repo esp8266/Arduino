@@ -179,9 +179,21 @@ void adc12_disable_channel(Adc12b *p_adc, adc_channel_num_t adc_ch)
  * \retval 1 means the specified channel is enabled.
  *         0 means the specified channel is disabled.
  */
-uint32_t adc12_get_status(Adc12b *p_adc, adc_channel_num_t adc_ch)
+uint32_t adc12_get_channel_status(Adc12b *p_adc, adc_channel_num_t adc_ch)
 {
     return p_adc->ADC12B_CHSR & (1 << adc_ch);
+}
+
+/**
+ * \brief Reads the ADC status.
+ *
+ * \param p_adc  Pointer to an ADC instance.
+ *
+ * \retval ADC status register content.
+ */
+uint32_t adc12_get_status(Adc12b *p_adc)
+{
+    return p_adc->ADC12B_SR;
 }
 
 /**
