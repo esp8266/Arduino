@@ -18,7 +18,6 @@
 
 #include "Platform.h"
 #include "USBAPI.h"
-#include <avr/wdt.h>
 
 #if defined(USBCON)
 #ifdef CDC_ENABLED

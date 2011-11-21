@@ -3,10 +3,6 @@
 #define __PLATFORM_H__
 
 #include <inttypes.h>
-#include <avr/pgmspace.h>
-#include <avr/eeprom.h>
-#include <avr/interrupt.h>
-#include <util/delay.h>
 
 typedef unsigned char u8;
 typedef unsigned short u16;
