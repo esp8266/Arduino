@@ -1,8 +1,8 @@
 /**************************************************************************//**
  * @file     core_cm3.h
  * @brief    CMSIS Cortex-M3 Core Peripheral Access Layer Header File
- * @version  V2.10
- * @date     19. July 2011
+ * @version  V2.11
+ * @date     08. September 2011
  *
  * @note
  * Copyright (C) 2009-2011 ARM Limited. All rights reserved.
@@ -97,8 +97,8 @@
 
 #endif
 
-/*!< __FPU_USED to be checked prior to making use of FPU specific registers and functions */
-#define __FPU_USED       0
+
+#define __FPU_USED       0 /*!< __FPU_USED to be checked prior to making use of FPU specific registers and functions */
 
 #if defined ( __CC_ARM )
   #if defined __TARGET_FPU_VFP
@@ -376,8 +376,16 @@ typedef struct
 #define SCB_ICSR_VECTACTIVE_Msk            (0x1FFUL << SCB_ICSR_VECTACTIVE_Pos)           /*!< SCB ICSR: VECTACTIVE Mask */
 
 /* SCB Vector Table Offset Register Definitions */
+#if (__CM3_REV < 0x0201)                   /* core r2p1 */
+#define SCB_VTOR_TBLBASE_Pos               29                                             /*!< SCB VTOR: TBLBASE Position */
+#define SCB_VTOR_TBLBASE_Msk               (1UL << SCB_VTOR_TBLBASE_Pos)                  /*!< SCB VTOR: TBLBASE Mask */
+
+#define SCB_VTOR_TBLOFF_Pos                 7                                             /*!< SCB VTOR: TBLOFF Position */
+#define SCB_VTOR_TBLOFF_Msk                (0x3FFFFFUL << SCB_VTOR_TBLOFF_Pos)            /*!< SCB VTOR: TBLOFF Mask */
+#else
 #define SCB_VTOR_TBLOFF_Pos                 7                                             /*!< SCB VTOR: TBLOFF Position */
 #define SCB_VTOR_TBLOFF_Msk                (0x1FFFFFFUL << SCB_VTOR_TBLOFF_Pos)           /*!< SCB VTOR: TBLOFF Mask */
+#endif
 
 /* SCB Application Interrupt and Reset Control Register Definitions */
 #define SCB_AIRCR_VECTKEY_Pos              16                                             /*!< SCB AIRCR: VECTKEY Position */
