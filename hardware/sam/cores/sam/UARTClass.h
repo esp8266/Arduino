@@ -25,7 +25,6 @@ class UARTClass : public HardwareSerial
 {
   protected:
     RingBuffer *_rx_buffer ;
-    RingBuffer *_tx_buffer ;
 
   protected:
     Uart* _pUart ;
@@ -33,7 +32,7 @@ class UARTClass : public HardwareSerial
     uint32_t _dwId ;
 
   public:
-    UARTClass( Uart* pUart, IRQn_Type dwIrq, uint32_t dwId, RingBuffer* pRx_buffer, RingBuffer* pTx_buffer ) ;
+    UARTClass( Uart* pUart, IRQn_Type dwIrq, uint32_t dwId, RingBuffer* pRx_buffer ) ;
 
     void begin( const uint32_t dwBaudRate ) ;
     void end( void ) ;

@@ -265,23 +265,14 @@ extern const PinDescription g_APinDescription[]=
  * UART objects
  */
 RingBuffer rx_buffer1 ;
-RingBuffer tx_buffer1 ;
 
-UARTClass Serial( UART, UART_IRQn, ID_UART, &rx_buffer1, &tx_buffer1 ) ;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+UARTClass Serial( UART, UART_IRQn, ID_UART, &rx_buffer1 ) ;
 
 // IT handlers
-extern void UART_IrqHandler( void )
+void UART_IrqHandler(void)
 {
   Serial.IrqHandler() ;
 }
-
-#ifdef __cplusplus
-}
-#endif
 
 // ----------------------------------------------------------------------------
 /*
