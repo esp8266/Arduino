@@ -26,21 +26,25 @@ extern "C" {
 
 eAnalogReference analog_reference = AR_DEFAULT;
 
-void analogReference(eAnalogReference ulMode) {
+void analogReference(eAnalogReference ulMode)
+{
 	analog_reference = ulMode;
 }
 
-uint32_t analogRead(uint32_t ulPin) {
+uint32_t analogRead(uint32_t ulPin)
+{
 	uint32_t ulValue = 0;
 	uint32_t ulChannel;
 
 	if (ulPin < A0)
+  {
 		ulPin += A0;
+  }
 
-	ulChannel = g_APinDescription[ulPin].ulAnalogChannel;
+	ulChannel = g_APinDescription[ulPin].ulADCChannelNumber ;
 
 #if defined __SAM3U4E__
-	switch ( ulChannel )
+	switch ( g_APinDescription[ulPin].ulAnalogChannel )
 	{
 		// Handling ADC 10 bits channels
 		case ADC0 :
@@ -51,23 +55,23 @@ uint32_t analogRead(uint32_t ulPin) {
 		case ADC5 :
 		case ADC6 :
 		case ADC7 :
-		// Enable the corresponding channel
-		adc_enable_channel( ADC, ulChannel );
+      // Enable the corresponding channel
+      adc_enable_channel( ADC, ulChannel );
 
-		// Start the ADC
-		adc_start( ADC );
+      // Start the ADC
+      adc_start( ADC );
 
-		// Wait for end of conversion
-		while ((adc_get_status(ADC) & (1<<ulChannel)) == 0);
+      // Wait for end of conversion
+      while ((adc_get_status(ADC) & (1<<ulChannel)) == 0);
 
-		// Read the value
-		ulValue=adc_get_value( ADC, ulChannel );
+      // Read the value
+      ulValue=adc_get_value( ADC, ulChannel );
 
-		// Disable the corresponding channel
-		adc_disable_channel( ADC, ulChannel );
+      // Disable the corresponding channel
+      adc_disable_channel( ADC, ulChannel );
 
-		// Stop the ADC
-		//      adc_stop( ADC ) ; // never do adc_stop() else we have to reconfigure the ADC each time
+      // Stop the ADC
+      //      adc_stop( ADC ) ; // never do adc_stop() else we have to reconfigure the ADC each time
 		break;
 
 		// Handling ADC 12 bits channels
@@ -79,28 +83,28 @@ uint32_t analogRead(uint32_t ulPin) {
 		case ADC13 :
 		case ADC14 :
 		case ADC15 :
-		// Enable the corresponding channel
-		adc12_enable_channel( ADC12B, ulChannel-ADC8 );
+      // Enable the corresponding channel
+      adc12_enable_channel( ADC12B, ulChannel );
 
-		// Start the ADC12B
-		adc12_start( ADC12B );
+      // Start the ADC12B
+      adc12_start( ADC12B );
 
-		// Wait for end of conversion
-		while ((adc12_get_status(ADC12B) & (1<<(ulChannel-ADC8))) == 0);
+      // Wait for end of conversion
+      while ((adc12_get_status(ADC12B) & (1<<(ulChannel))) == 0);
 
-		// Read the value
-		ulValue=adc12_get_value( ADC12B, ulChannel-ADC8 );
+      // Read the value
+      ulValue=adc12_get_value( ADC12B, ulChannel );
 
-		// Stop the ADC12B
-		//      adc12_stop( ADC12B ) ; // never do adc12_stop() else we have to reconfigure the ADC12B each time
+      // Stop the ADC12B
+      //      adc12_stop( ADC12B ) ; // never do adc12_stop() else we have to reconfigure the ADC12B each time
 
-		// Disable the corresponding channel
-		adc12_disable_channel( ADC12B, ulChannel-ADC8 );
+      // Disable the corresponding channel
+      adc12_disable_channel( ADC12B, ulChannel );
 		break;
 
 		// Compiler could yell because we don't handle DAC pins
 		default :
-		ulValue=0;
+      ulValue=0;
 		break;
 	}
 #endif
@@ -112,24 +116,46 @@ uint32_t analogRead(uint32_t ulPin) {
 // hardware support.  These are defined in the appropriate
 // pins_*.c file.  For the rest of the pins, we default
 // to digital output.
-void analogWrite(uint32_t ulPin, uint32_t ulValue) {
+void analogWrite(uint32_t ulPin, uint32_t ulValue)
+{
 	pinMode(ulPin, OUTPUT);
 
-	if (ulValue == 0) {
+	if (ulValue == 0)
+  {
 		digitalWrite(ulPin, LOW);
-	} else if (ulValue == 255) {
-		digitalWrite(ulPin, HIGH);
-	} else if ((g_APinDescription[ulPin].ulPinAttribute && PIN_ATTR_PWM)
-			== PIN_ATTR_PWM) {
-		// Setup PWM for this pin
-	} else if ((g_APinDescription[ulPin].ulPinAttribute && PIN_ATTR_TIMER)
-			== PIN_ATTR_TIMER) {
-		// Setup Timer for this pin
-	} else if (ulValue < 128) {
-		digitalWrite(ulPin, LOW);
-	} else {
-		digitalWrite(ulPin, HIGH);
 	}
+  else
+  {
+    if (ulValue == 255)
+    {
+      digitalWrite(ulPin, HIGH);
+    }
+    else
+    {
+      if ((g_APinDescription[ulPin].ulPinAttribute && PIN_ATTR_PWM)	== PIN_ATTR_PWM)
+      {
+        // Setup PWM for this pin
+      }
+      else
+      {
+        if ((g_APinDescription[ulPin].ulPinAttribute && PIN_ATTR_TIMER)	== PIN_ATTR_TIMER)
+        {
+          // Setup Timer for this pin
+        }
+        else
+        {
+          if (ulValue < 128)
+          {
+            digitalWrite(ulPin, LOW);
+          }
+          else
+          {
+            digitalWrite(ulPin, HIGH);
+          }
+        }
+      }
+    }
+  }
 }
 
 #ifdef __cplusplus

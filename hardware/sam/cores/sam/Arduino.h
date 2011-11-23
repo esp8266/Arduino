@@ -115,6 +115,7 @@ typedef enum _EAnalogChannel
   DAC1
 } EAnalogChannel ;
 
+#define ADC_CHANNEL_NUMBER_NONE 0xffffffff
 /**
  * Pin Attributes to be OR-ed
  */
@@ -133,7 +134,8 @@ typedef struct _PinDescription
   EPioType ulPinType ;
   uint32_t ulPinConfiguration ;
   uint32_t ulPinAttribute ;
-  EAnalogChannel ulAnalogChannel ;
+  EAnalogChannel ulAnalogChannel ; /* Describe which Analog pin is linked to a MCU pin */
+  EAnalogChannel ulADCChannelNumber ; /* We use the same enum than for ADC pins to describe the ADC channel in use on this pin */
 } PinDescription ;
 
 /* Pins table to be instanciated into variant.cpp */
