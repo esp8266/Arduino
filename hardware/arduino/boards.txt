@@ -189,8 +189,8 @@ mini328.upload.speed=115200
 mini328.bootloader.low_fuses=0xff
 mini328.bootloader.high_fuses=0xd8
 mini328.bootloader.extended_fuses=0x05
-mini328.bootloader.path=bt
-mini328.bootloader.file=ATmegaBOOT_168_atmega328.hex
+mini328.bootloader.path=optiboot
+mini328.bootloader.file=optiboot_atmega328-Mini.hex
 mini328.bootloader.unlock_bits=0x3F
 mini328.bootloader.lock_bits=0x0F
 
