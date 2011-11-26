@@ -1,3 +1,134 @@
+ARDUINO 1.0
+
+[environment]
+
+* The file extension for sketches has changed from .pde to .ino, to avoid
+  conflicts with the Processing software ("ino" are the last three letters
+  in "Arduino").
+
+* There are a new set of toolbar icons, including a checkmark icon to
+  verify (compile) a sketch and an arrow for upload. The serial monitor
+  icon has moved to the right of the toolbar. Also, shift-clicking the
+  upload icon now uploads using a programmer (selected in the Tools menu).
+  You can still enable verbose output in the preferences dialog. (Icons
+  were designed by Nicholas Zambetti.)
+
+* There’s a new color scheme and about image for the IDE (by ToDo.to.it).
+
+* The name of the currently selected board and serial port are now shown
+  at the bottom of the editor. (Code from Wiring.)
+
+* A progress bar is displayed during compilation and upload. (from Wiring.)
+
+[core / libraries]
+
+* Serial transmission is now asynchronous - that is, calls to
+  Serial.print(), etc. add data to an outgoing buffer which is transmitted
+  in the background. Also, the Serial.flush() command has been repurposed
+  to wait for outgoing data to be transmitted, rather than dropping
+  received incoming data.
+
+* The behavior of Serial.print() on a byte has been changed to align it
+  with the other numeric data types. In particular, it will now print
+  the digits of its argument as separate ASCII digits (e.g. '1', '2', '3')
+  rather than a single byte. The BYTE keyword has been removed. To send a
+  single byte of data, use Serial.write() (which is present in Arduino 0022
+  as well).
+
+* The Serial class (as well as other classes inheriting from Stream, like
+  EthernetClient, SoftwareSerial, Wire and more) now contains functions
+  for parsing incoming data, based on the TextFinder library by Michael
+  Margolis. They include find() and findUntil() to search for data,
+  parseInt() and parseFloat() for converting incoming characters into
+  numeric values, and readBytes() and readBytesUntil() for reading
+  multiple bytes into a buffer. They use a timeout that can be set with the
+  new setTimeout().
+
+* The SoftwareSerial class has been reimplemented, using the code originally
+  written for the NewSoftSerial library by Mikal Hart. This allows for
+  multiple simultaneous instances, although only one can receive at a time.
+
+* Support has been added for printing strings stored in flash (program
+  memory) rather than RAM. Wrap double-quoted strings in F() to indicate
+  that they should be stored in flash, e.g. Serial.print(F("hello world")).
+
+* The String class has been reimplemented as well, by Paul Stoffregen. This
+  new version is more memory-efficient and robust. Some functions which
+  previously returned new string instances (e.g. trim() and toUpperCase())
+  have been changed to instead modify strings in place.
+
+* Support for DHCP and DNS has been added to the Ethernet library, thanks
+  to integration by Adrian McEwen. Most classes in the Ethernet library
+  have been renamed to add a "Ethernet" prefix and avoid conflicts with
+  other networking libraries. In particular, "Client" is now
+  "EthernetClient", "Server" is "EthernetServer", and "UDP" is
+  "EthernetUDP". A new IPAddress class makes it easier to manipulate
+  those values.
+
+* The UDP API has been changed to be more similar to other libraries.
+  Outgoing packets are now constructed using calls to the standard write(),
+  print(), and println() functions – bracketed by beginPacket() and
+  endPacket(). The parsePacket() function checks for and parses an
+  incoming packet, which can then be read using available(), read(), and
+  peek(). The remoteIP() and remotePort() functions provide information
+  about the packet’s origin. (Again, thanks to Adrian McEwen for the
+  implementation.)
+
+* The Wire library has also been modified to use the standard read() and
+  write() functions instead of send() and receive(). You can also use
+  print() and println() for outgoing data.
+
+* The SD library now supports multiple simultaneous open files. It also
+  provides the isDirectory(), openNextFile(), and rewindDirectory()
+  functions for iterating through all the files in a directory. (Thanks
+  to Limor Fried.)
+
+[boards / firmwares]
+
+* Added the Arduino Mini w/ ATmega328.
+
+* Added Windows drivers (.inf files) and 16U2 firmware (.hex files) for
+  the rev. 3 boards (Uno, Mega, and Mega ADK).  
+
+[internals]
+
+* The WProgram.h file, which provides declarations for the Arduino API,
+  has been renamed to Arduino.h. To create a library that will work in
+  both Arduino 0022 and Arduino 1.0, you can use an #ifdef that checks
+  for the ARDUINO constant, which was 22 and is now 100.  For example:
+
+  #if defined(ARDUINO) && ARDUINO >= 100
+  #include "Arduino.h"
+  #else
+  #include "WProgram.h"
+  #endif
+
+* The write(), print(), and println() functions in Stream now return a
+  size_t (instead of void). This indicates the number of bytes actually
+  written by the function. Any classes that inherit from Stream will need
+  to change accordingly. Additionally the write(str) function has been
+  given a concrete implementation – it calls write(buf, len) - so
+  sub-classes don't need to (and shouldn't) implement it.
+
+* There are new abstract base-classes for Client, Server, and UDP to
+  provide portability across networking libraries.
+
+* The pin definitions for the Arduino boards (i.e. the mappings from pin
+  numbers to port register / bit pairs) is now stored in a sub-folder of
+  a new variants/ folder in the hardware folder. The variant to use for
+  a given board is specified by the BOARD.build.variant preference in the
+  boards.txt file.
+
+* The new, variant-specific pins_arduino.h files now provides additional
+  macros with information about the characteristics of the board (e.g.
+  the locations of the SPI and TWI pins, and the number of digital and
+  analog pins).
+
+* The avrdude included with the Mac and Windows versions of the Arduino
+  software has been upgraded to avrdude 5.11 (from an Arduino-specific
+  version of avrdude 5.4). The software now uses the "arduino" programmer
+  type in place of "stk500v1" for uploading to most Arduino boards.
+
 ARDUINO 0022 - 2010.12.24
 
 [core / libraries]
