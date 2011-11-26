@@ -248,6 +248,7 @@
     <copy todir="macosx/working_dir">
       <fileset dir="macosx/work">
         <exclude name="**/ArduinoTestSuite/**" />
+        <exclude name="**/CodeSourcery_arm/**" />
       </fileset>
     </copy>
 
@@ -262,10 +263,20 @@
       <fileset dir="macosx/working_dir/Arduino.app/Contents/Resources/Java/hardware/tools/avr/libexec/gcc/avr/4.3.2/" includes="**/cc1*" />
     </chmod>
 
+    <!-- Unzip over the copied codesourcery to replace permissions -->
+    <exec executable="unzip">
+      <arg value="-q" />
+      <arg value="-n" />
+      <arg value="-d" />
+      <arg value="macosx/working_dir/Arduino.app/Contents/Resources/Java/hardware/tools" />
+      <arg value="macosx/dist/CodeSourcery_arm.zip" />
+    </exec>
+
     <!-- Pause briefly for the OS to catch up with the DMG changes. 
 	 This prevents "hdiutil: couldn't eject "disk3" - Resource busy"
 	 errors when ejecting the disk in the next step.
          You may need to set this value higher for your system. -->
+    <exec executable="sync" />
     <sleep seconds="3" />
     
     <exec executable="hdiutil">
