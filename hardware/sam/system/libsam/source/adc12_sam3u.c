@@ -64,7 +64,6 @@ extern "C" {
  */
 uint32_t adc12_init(Adc12b *p_adc, uint32_t ul_mck, uint32_t ul_adc_clock, uint32_t ul_startuptime, uint32_t ul_offmode_startuptime)
 {
-    uint32_t ul_prescal,ul_startup,ul_offmode;
     p_adc->ADC12B_CR = ADC12B_CR_SWRST;	
 	
      /* Reset Mode Register */
@@ -76,11 +75,17 @@ uint32_t adc12_init(Adc12b *p_adc, uint32_t ul_mck, uint32_t ul_adc_clock, uint3
     p_adc->ADC12B_RNCR = 0;
     p_adc->ADC12B_TCR = 0;
     p_adc->ADC12B_TNCR = 0;		
-    ul_prescal = ul_mck/(2 * ul_adc_clock) - 1;
-    ul_startup = ((ul_adc_clock/1000000) * ul_startuptime / 8) - 1;
-    ul_offmode = ((ul_adc_clock/1000000) * ul_offmode_startuptime / 8) - 1;	
-    p_adc->ADC12B_MR |= ADC12B_MR_PRESCAL( ul_prescal ) | ( (ul_startup<<ADC12B_MR_STARTUP_Pos) & ADC12B_MR_STARTUP_Msk);
-    p_adc->ADC12B_EMR |=  (ul_offmode<<16) & (0xffu << 16);	
+    uint32_t prescal = ul_mck/(2 * ul_adc_clock) - 1;
+    // check for rounding errors
+    if ( (ul_mck/((prescal+1)*2)) > ul_adc_clock ) {
+    	prescal++;
+    	ul_adc_clock = ul_mck/((prescal+1)*2);
+    }
+    uint32_t startup = ((ul_adc_clock/1000000) * ul_startuptime / 8) - 1;
+    p_adc->ADC12B_MR |= ADC12B_MR_PRESCAL(prescal) | ADC12B_MR_STARTUP(startup);
+
+    uint32_t offmode = ((ul_adc_clock/1000000) * ul_offmode_startuptime / 8) - 1;
+    p_adc->ADC12B_EMR |= ADC12B_EMR_OFF_MODE_STARTUP_TIME(offmode);
     return 0;	
 }
 /**

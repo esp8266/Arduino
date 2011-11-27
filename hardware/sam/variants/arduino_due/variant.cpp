@@ -350,8 +350,8 @@ extern void init( void )
    *     prescal: ADCClock = MCK / ( (PRESCAL+1) * 2 ) => 64MHz / ((4+1)*2) = 6.4MHz
    *     ADC clock = 6.4 MHz
    */
-  adc_init( ADC, SystemCoreClock, 6400000, 10 ) ;
-  adc_configure_timing( ADC, 1200 ) ;
+  adc_init( ADC, SystemCoreClock, ADC_FREQ_MAX, ADC_STARTUP ) ;
+  adc_configure_timing( ADC, 15 ) ;
   adc_configure_trigger( ADC, ADC_TRIG_SW ) ;	
   adc_disable_interrupt( ADC, 0xFFFFFFFF ) ; /* Disable all adc interrupt. */	
   adc_disable_channel( ADC, ADC_ALL_CHANNEL ) ;
@@ -366,8 +366,8 @@ extern void init( void )
    *     prescal: ADCClock = MCK / ( (PRESCAL+1) * 2 ) => 64MHz / ((4+1)*2) = 6.4MHz
    *     ADC clock = 6.4 MHz
    */
-  adc12_init( ADC12B, SystemCoreClock, 6400000, 10, 1200 ) ;
-  adc12_configure_timing( ADC12B, 1200 ) ;
+  adc12_init( ADC12B, SystemCoreClock, ADC12_FREQ_MAX, ADC12_STARTUP_FAST, 1 ) ;
+  adc12_configure_timing( ADC12B, 15 ) ;
   adc12_configure_trigger( ADC12B, ADC_TRIG_SW ) ;	
   adc12_disable_interrupt( ADC12B, 0xFFFFFFFF ) ; /* Disable all adc interrupt. */
   adc12_disable_channel( ADC12B, ADC_ALL_CHANNEL ) ;

@@ -64,7 +64,6 @@ extern "C" {
  */
 uint32_t adc_init(Adc *p_adc, uint32_t ul_mck, uint32_t ul_adc_clock, uint32_t ul_startuptime)
 {
-    uint32_t ul_prescal,ul_startup;
     p_adc->ADC_CR = ADC_CR_SWRST;
 	
     /* Reset Mode Register */
@@ -76,9 +75,14 @@ uint32_t adc_init(Adc *p_adc, uint32_t ul_mck, uint32_t ul_adc_clock, uint32_t u
     p_adc->ADC_RNCR = 0;
     p_adc->ADC_TCR = 0;
     p_adc->ADC_TNCR = 0;		
-    ul_prescal = ul_mck/(2 * ul_adc_clock) - 1;
-    ul_startup = ((ul_adc_clock/1000000) * ul_startuptime / 8) - 1;
-    p_adc->ADC_MR |= ADC_MR_PRESCAL( ul_prescal ) | ( (ul_startup<<ADC_MR_STARTUP_Pos) & ADC_MR_STARTUP_Msk);
+    uint32_t prescal = ul_mck/(2 * ul_adc_clock) - 1;
+    // check for rounding errors
+    if ( (ul_mck/((prescal+1)*2)) > ul_adc_clock ) {
+    	prescal++;
+    	ul_adc_clock = ul_mck/((prescal+1)*2);
+    }
+    uint32_t startup = ((ul_adc_clock/1000000) * ul_startuptime / 8) - 1;
+    p_adc->ADC_MR |= ADC_MR_PRESCAL(prescal) | ADC_MR_STARTUP(startup);
     return 0;	
 }
 

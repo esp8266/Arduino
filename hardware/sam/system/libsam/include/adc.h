@@ -43,11 +43,14 @@
 
 #include "../chip.h"
 
-#define ADC_FREQ_MAX   20000000
-#define ADC_FREQ_MIN    1000000
+#define ADC_FREQ_MAX      5000000
+#define ADC_STARTUP            20
 
-#define ADC_STARTUP_NORM     40
-#define ADC_STARTUP_FAST     12
+#define ADC12_FREQ_MAX   20000000
+#define ADC12_FREQ_MIN    1000000
+
+#define ADC12_STARTUP_NORM     40
+#define ADC12_STARTUP_FAST     12
 
 /* Definitions for ADC resolution */
 typedef enum _adc_resolution_t {
