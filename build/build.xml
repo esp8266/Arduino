@@ -217,7 +217,37 @@
     <exec executable="macosx/work/Arduino.app/Contents/MacOS/JavaApplicationStub" spawn="true"/>
   </target>
 
-  <target name="macosx-dist" if="macosx" depends="macosx-build" description="Create a .dmg of the Mac OS X version">
+  <target name="macosx-dist" if="macosx" depends="macosx-build" description="Create a downloadable .zip for the Mac OS X version">
+    <!-- The ant copy command does not preserve permissions. -->
+    <chmod file="macosx/work/Arduino.app/Contents/MacOS/JavaApplicationStub" perm="+x" />
+    <chmod perm="+x">
+      <fileset dir="macosx/work/Arduino.app/Contents/Resources/Java/hardware/tools/avr/bin" includes="**/*" />
+      <fileset dir="macosx/work/Arduino.app/Contents/Resources/Java/hardware/tools/avr/avr/bin" includes="**/*" />
+      <fileset dir="macosx/work/Arduino.app/Contents/Resources/Java/hardware/tools/avr/avr-3/bin" includes="**/*" />
+      <fileset dir="macosx/work/Arduino.app/Contents/Resources/Java/hardware/tools/avr/avr-4/bin" includes="**/*" />
+      <fileset dir="macosx/work/Arduino.app/Contents/Resources/Java/hardware/tools/avr/libexec/gcc/avr/3.4.6/" includes="**/cc1*" />
+      <fileset dir="macosx/work/Arduino.app/Contents/Resources/Java/hardware/tools/avr/libexec/gcc/avr/4.3.2/" includes="**/cc1*" />
+    </chmod>
+
+    <replace file="macosx/work/Arduino.app/Contents/Info.plist"
+             token="VERSION" value="${version}" />
+    <replace file="macosx/work/Arduino.app/Contents/Info.plist"
+             token="REVISION" value="${revision}" />
+    
+    <exec executable="ditto" dir="macosx/work">
+      <arg line="-c -k -rsrc . ../arduino-${version}-macosx.zip" />
+    </exec>
+
+    <echo>
+      =======================================================
+      Arduino for Mac OS X was built. Grab the image from   
+      
+      macosx/arduino-${version}-macosx.zip
+      =======================================================
+    </echo>
+  </target>
+
+  <target name="macosx-dist-old" if="macosx" depends="macosx-build" description="Create a .dmg of the Mac OS X version">
     <!-- now build the dmg -->
     <gunzip src="macosx/template.dmg.gz" dest="macosx/working.dmg" />
     
@@ -270,7 +300,6 @@
       =======================================================
     </echo>
   </target>
-
   
   <!-- - - - - - - - -->
   <!-- Linux         -->
@@ -352,7 +381,7 @@
     <tar compression="gzip" basedir="linux/work" 
 	 destfile="linux/arduino-${version}.tgz" />
 -->
-    <tar compression="gzip" destfile="linux/arduino-${version}.tgz">
+    <tar compression="gzip" destfile="linux/arduino-${version}-linux.tgz">
       <tarfileset dir="linux/work" 
 		  prefix="arduino-${version}" 
 		  excludes="arduino, 
@@ -368,7 +397,7 @@
       =======================================================
       Arduino for Linux was built. Grab the archive from   
       
-      build/linux/arduino-${version}.tgz
+      build/linux/arduino-${version}-linux.tgz
       =======================================================
     </echo>
   </target>
@@ -477,12 +506,12 @@
 	 excludes="java/**" />
     -->
 
-    <zip destfile="windows/arduino-${version}.zip">
+    <zip destfile="windows/arduino-${version}-windows.zip">
       <zipfileset dir="windows/work" 
 		  prefix="arduino-${version}" />
     </zip>
 
-    <zip destfile="windows/arduino-${version}-expert.zip">
+    <zip destfile="windows/arduino-${version}-windows-expert.zip">
       <zipfileset dir="windows/work" 
 		  prefix="arduino-${version}" 
 		  excludes="java/**" />
@@ -492,8 +521,8 @@
       =======================================================
       Arduino for Windows was built. Grab the archive from   
       
-      windows/arduino-${version}.zip
-      windows/arduino-${version}-expert.zip
+      windows/arduino-${version}-windows.zip
+      windows/arduino-${version}-windows-expert.zip
       =======================================================
     </echo>
   </target>
