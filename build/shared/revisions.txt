@@ -1,4 +1,4 @@
-ARDUINO 1.0
+ARDUINO 1.0 - 2011.11.30
 
 [environment]
 
@@ -128,6 +128,12 @@ ARDUINO 1.0
   software has been upgraded to avrdude 5.11 (from an Arduino-specific
   version of avrdude 5.4). The software now uses the "arduino" programmer
   type in place of "stk500v1" for uploading to most Arduino boards.
+
+ARDUINO 0023 - 2011.11.09
+
+* Added .inf files for R3 boards.
+* Updated to optiboot 4.4.
+* Included combined firmwares for ATmega16U2.
 
 ARDUINO 0022 - 2010.12.24
 
