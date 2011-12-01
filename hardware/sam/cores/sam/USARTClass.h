@@ -21,11 +21,10 @@
 
 #include "Arduino.h"
 
-class USARTClass // : public HardwareSerial
+class USARTClass : public HardwareSerial
 {
   protected:
     RingBuffer *_rx_buffer ;
-    RingBuffer *_tx_buffer ;
 
   protected:
     Usart* _pUsart ;
@@ -33,7 +32,7 @@ class USARTClass // : public HardwareSerial
     uint32_t _dwId ;
 
   public:
-    USARTClass( Usart* pUsart, IRQn_Type dwIrq, uint32_t dwId, RingBuffer* pRx_buffer, RingBuffer* pTx_buffer ) ;
+    USARTClass( Usart* pUsart, IRQn_Type dwIrq, uint32_t dwId, RingBuffer* pRx_buffer ) ;
 
     void begin( const uint32_t dwBaudRate ) ;
     void end( void ) ;
@@ -46,7 +45,7 @@ class USARTClass // : public HardwareSerial
     void IrqHandler( void ) ;
 
 #if defined __GNUC__ /* GCC CS3 */
-//    using Print::write ; // pull in write(str) and write(buf, size) from Print
+    using Print::write ; // pull in write(str) and write(buf, size) from Print
 #elif defined __ICCARM__ /* IAR Ewarm 5.41+ */
 //    virtual void write( const char *str ) ;
 //    virtual void write( const uint8_t *buffer, size_t size ) ;

@@ -279,39 +279,28 @@ void UART_IrqHandler(void)
  * USART objects
  */
 RingBuffer rx_buffer2 ;
-RingBuffer tx_buffer2 ;
 RingBuffer rx_buffer3 ;
-RingBuffer tx_buffer3 ;
 RingBuffer rx_buffer4 ;
-RingBuffer tx_buffer4 ;
 
-USARTClass Serial2( USART0, USART0_IRQn, ID_USART0, &rx_buffer2, &tx_buffer2 ) ;
-USARTClass Serial3( USART1, USART1_IRQn, ID_USART1, &rx_buffer3, &tx_buffer3 ) ;
-USARTClass Serial4( USART2, USART2_IRQn, ID_USART2, &rx_buffer4, &tx_buffer4 ) ;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+USARTClass Serial2( USART0, USART0_IRQn, ID_USART0, &rx_buffer2 ) ;
+USARTClass Serial3( USART1, USART1_IRQn, ID_USART1, &rx_buffer3 ) ;
+USARTClass Serial4( USART2, USART2_IRQn, ID_USART2, &rx_buffer4 ) ;
 
 // IT handlers
-extern void USART0_IrqHandler( void )
+void USART0_IrqHandler( void )
 {
   Serial2.IrqHandler() ;
 }
 
-extern void USART1_IrqHandler( void )
+void USART1_IrqHandler( void )
 {
   Serial3.IrqHandler() ;
 }
 
-extern void USART2_IrqHandler( void )
+void USART2_IrqHandler( void )
 {
   Serial4.IrqHandler() ;
 }
-
-#ifdef __cplusplus
-}
-#endif
 
 // ----------------------------------------------------------------------------
 

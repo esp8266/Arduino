@@ -23,10 +23,9 @@
 
 // Constructors ////////////////////////////////////////////////////////////////
 
-USARTClass::USARTClass( Usart* pUsart, IRQn_Type dwIrq, uint32_t dwId, RingBuffer* pRx_buffer, RingBuffer* pTx_buffer )
+USARTClass::USARTClass( Usart* pUsart, IRQn_Type dwIrq, uint32_t dwId, RingBuffer* pRx_buffer )
 {
   _rx_buffer = pRx_buffer ;
-  _tx_buffer = pTx_buffer ;
 
   _pUsart=pUsart ;
   _dwIrq=dwIrq ;
@@ -37,39 +36,43 @@ USARTClass::USARTClass( Usart* pUsart, IRQn_Type dwIrq, uint32_t dwId, RingBuffe
 
 void USARTClass::begin( const uint32_t dwBaudRate )
 {
-  /* Configure PMC */
+  // Configure PMC
   PMC_EnablePeripheral( _dwId ) ;
 
-  /* Reset and disable receiver & transmitter */
+  // Disable PDC channel
+  _pUsart->US_PTCR = US_PTCR_RXTDIS | US_PTCR_TXTDIS ;
+
+  // Reset and disable receiver and transmitter
   _pUsart->US_CR = US_CR_RSTRX | US_CR_RSTTX | US_CR_RXDIS | US_CR_TXDIS ;
 
-  /* Configure mode */
+  // Configure mode
   _pUsart->US_MR = US_MR_USART_MODE_NORMAL | US_MR_USCLKS_MCK | US_MR_CHRL_8_BIT | US_MR_PAR_NO |
                    US_MR_NBSTOP_1_BIT | US_MR_CHMODE_NORMAL;
 
-  /* Configure baudrate */
-  /* Asynchronous, no oversampling */
+  // Configure baudrate, asynchronous no oversampling
   _pUsart->US_BRGR = (SystemCoreClock / dwBaudRate) / 16 ;
 
-  /* Disable PDC channel */
-  _pUsart->US_PTCR = US_PTCR_RXTDIS | US_PTCR_TXTDIS ;
+  // Configure interrupts
+  _pUsart->US_IDR = 0xFFFFFFFF;
+  _pUsart->US_IER = US_IER_RXRDY | US_IER_OVRE | US_IER_FRAME;
 
-  /* Enable UART interrupt in NVIC */
-//  NVIC_EnableIRQ( _dwIrq ) ;
+  // Enable UART interrupt in NVIC
+  NVIC_EnableIRQ( _dwIrq ) ;
 
-  /* Enable receiver and transmitter */
+  // Enable receiver and transmitter
   _pUsart->US_CR = US_CR_RXEN | US_CR_TXEN ;
 }
 
 void USARTClass::end( void )
 {
-  // wait for transmission of outgoing data
-  //while ( _tx_buffer->_iHead != _tx_buffer->_iTail )
-  //{
-  //}
-
   // clear any received data
   _rx_buffer->_iHead = _rx_buffer->_iTail ;
+
+  // Disable UART interrupt in NVIC
+  NVIC_DisableIRQ( _dwIrq ) ;
+
+  // Wait for any outstanding data to be sent
+  flush();
 
   PMC_DisablePeripheral( _dwId ) ;
 }
@@ -82,57 +85,53 @@ int USARTClass::available( void )
 int USARTClass::peek( void )
 {
   if ( _rx_buffer->_iHead == _rx_buffer->_iTail )
-  {
     return -1 ;
-  }
-  else
-  {
-    return _rx_buffer->_aucBuffer[_rx_buffer->_iTail] ;
-  }
+
+  return _rx_buffer->_aucBuffer[_rx_buffer->_iTail] ;
 }
 
 int USARTClass::read( void )
 {
   // if the head isn't ahead of the tail, we don't have any characters
   if ( _rx_buffer->_iHead == _rx_buffer->_iTail )
-  {
     return -1 ;
-  }
-  else
-  {
-    uint8_t uc = _rx_buffer->_aucBuffer[_rx_buffer->_iTail] ;
 
-    _rx_buffer->_iTail = (unsigned int)(_rx_buffer->_iTail + 1) % SERIAL_BUFFER_SIZE ;
-
-    return uc ;
-  }
+  uint8_t uc = _rx_buffer->_aucBuffer[_rx_buffer->_iTail] ;
+  _rx_buffer->_iTail = (unsigned int)(_rx_buffer->_iTail + 1) % SERIAL_BUFFER_SIZE ;
+  return uc ;
 }
 
 void USARTClass::flush( void )
 {
-  //while ( _tx_buffer->_iHead != _tx_buffer->_iTail )
-  //{
-  //}
+  // Wait for transmission to complete
+  while ((_pUsart->US_CSR & US_CSR_TXRDY) != US_CSR_TXRDY)
+	;
 }
 
 void USARTClass::write( const uint8_t uc_data )
 {
-  /* Check if the transmitter is ready */
-  if ( (_pUsart->US_CSR & US_CSR_TXRDY) != US_CSR_TXRDY )
-  {
-    return ;
-  }
+  // Check if the transmitter is ready
+  while ((_pUsart->US_CSR & US_CSR_TXRDY) != US_CSR_TXRDY)
+    ;
 
-  /* Send character */
-  _pUsart->US_THR=uc_data ;
+  // Send character
+  _pUsart->US_THR = uc_data ;
 }
 
 void USARTClass::IrqHandler( void )
 {
-  /* Did we receive data ? */
-  if ( (_pUsart->US_IER & US_IER_ENDRX) == US_IER_ENDRX )
-  {
+  uint32_t status = _pUsart->US_CSR;
+
+  // Did we receive data ?
+  if ((status & US_CSR_ENDRX) == US_CSR_ENDRX)
     _rx_buffer->store_char( _pUsart->US_RHR ) ;
+
+  // Acknowledge errors
+  if ((status & US_CSR_OVRE) == US_CSR_OVRE ||
+		  (status & US_CSR_FRAME) == US_CSR_FRAME)
+  {
+	// TODO: error reporting outside ISR
+    _pUsart->US_CR |= US_CR_RSTSTA;
   }
 }
 
