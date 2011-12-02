@@ -45,7 +45,7 @@ extern "C"{
 #define EXTERNAL 1
 #define INTERNAL 2
 #else  
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) || defined(__AVR_ATmega1284P__) 
 #define INTERNAL1V1 2
 #define INTERNAL2V56 3
 #else
