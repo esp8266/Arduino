@@ -110,6 +110,21 @@ void attachInterrupt(uint8_t interruptNum, void (*userFunc)(void), int mode) {
       #warning attachInterrupt may need some more work for this cpu (case 1)
     #endif
       break;
+    
+    case 2:
+    #if defined(EICRA) && defined(ISC20) && defined(ISC21) && defined(EIMSK)
+      EICRA = (EICRA & ~((1 << ISC20) | (1 << ISC21))) | (mode << ISC20);
+      EIMSK |= (1 << INT2);
+    #elif defined(MCUCR) && defined(ISC20) && defined(ISC21) && defined(GICR)
+      MCUCR = (MCUCR & ~((1 << ISC20) | (1 << ISC21))) | (mode << ISC20);
+      GICR |= (1 << INT2);
+    #elif defined(MCUCR) && defined(ISC20) && defined(GIMSK) && defined(GIMSK)
+      MCUCR = (MCUCR & ~((1 << ISC20) | (1 << ISC21))) | (mode << ISC20);
+      GIMSK |= (1 << INT2);
+    #else
+      #warning attachInterrupt may need some more work for this cpu (case 1)
+    #endif
+      break;
 #endif
     }
   }
@@ -236,6 +251,13 @@ SIGNAL(INT1_vect) {
   if(intFunc[EXTERNAL_INT_1])
     intFunc[EXTERNAL_INT_1]();
 }
+
+#if defined(EICRA) && defined(ISC20)
+SIGNAL(INT2_vect) {
+  if(intFunc[EXTERNAL_INT_2])
+    intFunc[EXTERNAL_INT_2]();
+}
+#endif
 
 #endif
 
