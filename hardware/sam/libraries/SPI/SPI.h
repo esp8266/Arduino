@@ -32,25 +32,31 @@
 #define SPI_CLOCK_MASK 0x03    // SPR1 = bit 1, SPR0 = bit 0 on SPCR
 #define SPI_2XCLOCK_MASK 0x01  // SPI2X = bit 0 on SPSR
 
-class SPIClass
-{
+class SPIClass {
   public:
-    static byte transfer( byte _data ) ;
+	SPIClass(Spi *_spi, uint32_t _id);
 
-    // SPI Configuration methods
+	byte transfer(byte _data);
 
-    static void attachInterrupt( void ) ;
-    static void detachInterrupt( void ) ; // Default
+	// SPI Configuration methods
 
-    static void begin( void ) ; // Default
-    static void end( void ) ;
+	void attachInterrupt(void);
+	void detachInterrupt(void); // Default
 
-    static void setBitOrder( uint8_t ) ;
-    static void setDataMode( uint8_t ) ;
-    static void setClockDivider( uint8_t ) ;
-} ;
+	void begin(void); // Default
+	void end(void);
 
-extern SPIClass SPI;
+	void setBitOrder(uint8_t);
+	void setDataMode(uint8_t);
+	void setClockDivider(uint8_t);
 
+  private:
+	Spi *spi;
+	uint32_t id, divider, mode;
+};
+
+#if SPI_INTERFACES_COUNT > 0
+extern SPIClass SPI0;
+#endif
 
 #endif

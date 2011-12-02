@@ -10,73 +10,48 @@
 
 #include "SPI.h"
 
-SPIClass SPI ;
-
-void SPIClass::begin()
-{
-  // Set direction register for SCK and MOSI pin.
-  // MISO pin automatically overrides to INPUT.
-  // When the SS pin is set as OUTPUT, it can be used as
-  // a general purpose output port (it doesn't influence
-  // SPI operations).
-
-  pinMode(SCK, OUTPUT);
-  pinMode(MOSI, OUTPUT);
-  pinMode(SS, OUTPUT);
-  
-  digitalWrite(SCK, LOW);
-  digitalWrite(MOSI, LOW);
-  digitalWrite(SS, HIGH);
-
-  // Warning: if the SS pin ever becomes a LOW INPUT then SPI 
-  // automatically switches to Slave, so the data direction of 
-  // the SS pin MUST be kept as OUTPUT.
-  SPCR |= _BV(MSTR);
-  SPCR |= _BV(SPE);
+SPIClass::SPIClass(Spi *_spi, uint32_t _id) : spi(_spi), id(_id) {
+	// Empty
 }
 
-void SPIClass::end()
-{
-  SPCR &= ~_BV(SPE);
+void SPIClass::begin() {
+	// Set CS on NPCS3
+	SPI_Configure(spi, id, SPI_MR_MSTR | SPI_MR_PS | SPI_MR_PCS(0x07));
+	SPI_Enable( spi);
+	setClockDivider(1);
 }
 
-void SPIClass::setBitOrder( uint8_t bitOrder )
-{
-  if(bitOrder == LSBFIRST)
-  {
-    SPCR |= _BV(DORD);
-  }
-  else
-  {
-    SPCR &= ~(_BV(DORD));
-  }
+void SPIClass::end() {
+	SPI_Disable( spi);
 }
 
-void SPIClass::setDataMode( uint8_t mode )
-{
-  SPCR = (SPCR & ~SPI_MODE_MASK) | mode;
+void SPIClass::setBitOrder(uint8_t bitOrder) {
+	// Not supported
 }
 
-void SPIClass::setClockDivider( uint8_t rate )
-{
-  SPCR = (SPCR & ~SPI_CLOCK_MASK) | (rate & SPI_CLOCK_MASK);
-  SPSR = (SPSR & ~SPI_2XCLOCK_MASK) | ((rate >> 2) & SPI_2XCLOCK_MASK);
+void SPIClass::setDataMode(uint8_t _mode) {
+	mode = _mode;
+	SPI_ConfigureNPCS(spi, 3, mode | SPI_CSR_SCBR(divider));
 }
 
-byte SPIClass::transfer( byte _data ) 
-{
-  SPDR = _data;
-  while (!(SPSR & _BV(SPIF)))
-    ;
-  return SPDR;
+void SPIClass::setClockDivider(uint8_t _divider) {
+	divider = _divider;
+	SPI_ConfigureNPCS(spi, 3, mode | SPI_CSR_SCBR(divider));
 }
 
-void SPIClass::attachInterrupt( void )
-{
-  SPCR |= _BV(SPIE) ;
+byte SPIClass::transfer(byte _data) {
+	SPI_Write(spi, 0, _data);
+	return SPI_Read(spi);
 }
 
-void SPIClass::detachInterrupt( void )
-{
-  SPCR &= ~_BV(SPIE) ;
+void SPIClass::attachInterrupt(void) {
+	// Should be enableInterrupt()
 }
+
+void SPIClass::detachInterrupt(void) {
+	// Should be disableInterrupt()
+}
+
+#if SPI_INTERFACES_COUNT > 0
+SPIClass SPI0(SPI_INTERFACE, SPI_INTERFACE_ID);
+#endif

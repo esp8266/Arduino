@@ -71,6 +71,15 @@
 #define PIN_LED2             PIN_LED_RXL
 #define PIN_LED3             PIN_LED_TXL
 
+#define SPI_INTERFACES_COUNT 1
+
+#define SPI_INTERFACE        SPI
+#define SPI_INTERFACE_ID     ID_SPI
+#define PIN_SPI_SS           (4u)
+#define PIN_SPI_MOSI         (76u)
+#define PIN_SPI_MISO         (75u)
+#define PIN_SPI_SCK          (77u)
+
 #define WIRE_INTERFACES_COUNT 2
 
 #define PIN_WIRE_SDA         (20u)
