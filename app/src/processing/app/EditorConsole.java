@@ -88,7 +88,9 @@ public class EditorConsole extends JScrollPane {
     Color bgColor    = Theme.getColor("console.color");
     Color fgColorOut = Theme.getColor("console.output.color");
     Color fgColorErr = Theme.getColor("console.error.color");
-    Font font        = Theme.getFont("console.font");
+    Font consoleFont = Theme.getFont("console.font");
+    Font editorFont = Preferences.getFont("editor.font");
+    Font font = new Font(consoleFont.getName(), consoleFont.getStyle(), editorFont.getSize());
 
     stdStyle = new SimpleAttributeSet();
     StyleConstants.setForeground(stdStyle, fgColorOut);

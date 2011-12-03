@@ -62,7 +62,9 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
   
     getContentPane().setLayout(new BorderLayout());
     
-    Font font = Theme.getFont("console.font");
+    Font consoleFont = Theme.getFont("console.font");
+    Font editorFont = Preferences.getFont("editor.font");
+    Font font = new Font(consoleFont.getName(), consoleFont.getStyle(), editorFont.getSize());
 
     textArea = new JTextArea(16, 40);
     textArea.setEditable(false);    
