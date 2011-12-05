@@ -34,7 +34,7 @@
 
 class SPIClass {
   public:
-	SPIClass(Spi *_spi, uint32_t _id);
+	SPIClass(Spi *_spi, uint32_t _id, void(*_initCb)(void));
 
 	byte transfer(byte _data);
 
@@ -53,6 +53,7 @@ class SPIClass {
   private:
 	Spi *spi;
 	uint32_t id, divider, mode;
+	void (*initCb)(void);
 };
 
 #if SPI_INTERFACES_COUNT > 0

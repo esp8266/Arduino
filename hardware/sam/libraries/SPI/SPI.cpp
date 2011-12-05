@@ -10,13 +10,16 @@
 
 #include "SPI.h"
 
-SPIClass::SPIClass(Spi *_spi, uint32_t _id) : spi(_spi), id(_id) {
+SPIClass::SPIClass(Spi *_spi, uint32_t _id, void(*_initCb)(void)) :
+	spi(_spi), id(_id), initCb(_initCb) {
 	// Empty
 }
 
 void SPIClass::begin() {
+	initCb();
+
 	// Set CS on NPCS3
-	SPI_Configure(spi, id, SPI_MR_MSTR | SPI_MR_PS | SPI_MR_PCS(0x07));
+	SPI_Configure(spi, id, SPI_MR_MSTR | SPI_MR_PCS(0x07));
 	SPI_Enable( spi);
 	setClockDivider(1);
 }
@@ -53,5 +56,20 @@ void SPIClass::detachInterrupt(void) {
 }
 
 #if SPI_INTERFACES_COUNT > 0
-SPIClass SPI0(SPI_INTERFACE, SPI_INTERFACE_ID);
+static void SPI0_Init(void) {
+	PIO_Configure(g_APinDescription[PIN_SPI_MOSI].pPort,
+			g_APinDescription[PIN_SPI_MOSI].ulPinType,
+			g_APinDescription[PIN_SPI_MOSI].ulPin,
+			g_APinDescription[PIN_SPI_MOSI].ulPinConfiguration);
+	PIO_Configure(g_APinDescription[PIN_SPI_MISO].pPort,
+			g_APinDescription[PIN_SPI_MISO].ulPinType,
+			g_APinDescription[PIN_SPI_MISO].ulPin,
+			g_APinDescription[PIN_SPI_MISO].ulPinConfiguration);
+	PIO_Configure(g_APinDescription[PIN_SPI_SCK].pPort,
+			g_APinDescription[PIN_SPI_SCK].ulPinType,
+			g_APinDescription[PIN_SPI_SCK].ulPin,
+			g_APinDescription[PIN_SPI_SCK].ulPinConfiguration);
+}
+
+SPIClass SPI0(SPI_INTERFACE, SPI_INTERFACE_ID, SPI0_Init);
 #endif
