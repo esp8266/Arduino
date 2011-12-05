@@ -123,7 +123,7 @@ void USARTClass::IrqHandler( void )
   uint32_t status = _pUsart->US_CSR;
 
   // Did we receive data ?
-  if ((status & US_CSR_ENDRX) == US_CSR_ENDRX)
+  if ((status & US_CSR_RXRDY) == US_CSR_RXRDY)
     _rx_buffer->store_char( _pUsart->US_RHR ) ;
 
   // Acknowledge errors

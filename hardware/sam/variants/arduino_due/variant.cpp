@@ -326,8 +326,28 @@ extern void init( void )
   WDT_Disable( WDT ) ;
 
   // Initialize Serial port UART, common to all SAM3 variants
-  PIO_Configure( g_APinDescription[PINS_UART].pPort, g_APinDescription[PINS_UART].ulPinType,
-                 g_APinDescription[PINS_UART].ulPin, g_APinDescription[PINS_UART].ulPinConfiguration ) ;
+  PIO_Configure(
+    g_APinDescription[PINS_UART].pPort,
+    g_APinDescription[PINS_UART].ulPinType,
+    g_APinDescription[PINS_UART].ulPin,
+    g_APinDescription[PINS_UART].ulPinConfiguration);
+
+  // Initialize Serial ports USART
+  PIO_Configure(
+    g_APinDescription[PINS_USART0].pPort,
+    g_APinDescription[PINS_USART0].ulPinType,
+    g_APinDescription[PINS_USART0].ulPin,
+    g_APinDescription[PINS_USART0].ulPinConfiguration);
+  PIO_Configure(
+    g_APinDescription[PINS_USART1].pPort,
+    g_APinDescription[PINS_USART1].ulPinType,
+    g_APinDescription[PINS_USART1].ulPin,
+    g_APinDescription[PINS_USART1].ulPinConfiguration);
+  PIO_Configure(
+    g_APinDescription[PINS_USART2].pPort,
+    g_APinDescription[PINS_USART2].ulPinType,
+    g_APinDescription[PINS_USART2].ulPin,
+    g_APinDescription[PINS_USART2].ulPinConfiguration);
 
   // Initialize 10bit Analog Controller
   /* Enable peripheral clock.*/
