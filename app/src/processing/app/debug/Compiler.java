@@ -183,12 +183,18 @@ public class Compiler implements MessageConsumer {
    }
 
     // 4. link it all together into the .elf file
-
+    // For atmega2560, need --relax linker option to link larger
+    // programs correctly.
+    String optRelax = "";
+    String atmega2560 = new String ("atmega2560");
+    if ( atmega2560.equals(boardPreferences.get("build.mcu")) ) {
+        optRelax = new String(",--relax");
+    }
    sketch.setCompilingProgress(60);
     List baseCommandLinker = new ArrayList(Arrays.asList(new String[] {
       avrBasePath + "avr-gcc",
       "-Os",
-      "-Wl,--gc-sections",
+      "-Wl,--gc-sections"+optRelax,
       "-mmcu=" + boardPreferences.get("build.mcu"),
       "-o",
       buildPath + File.separator + primaryClassName + ".elf"
