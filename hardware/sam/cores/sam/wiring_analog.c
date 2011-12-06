@@ -33,15 +33,13 @@ void analogReference(eAnalogReference ulMode)
 
 uint32_t analogRead(uint32_t ulPin)
 {
-	uint32_t ulValue = 0;
-	uint32_t ulChannel;
+  uint32_t ulValue = 0;
+  uint32_t ulChannel;
 
-	if (ulPin < A0)
-  {
-		ulPin += A0;
-  }
+  if (ulPin < A0)
+    ulPin += A0;
 
-	ulChannel = g_APinDescription[ulPin].ulADCChannelNumber ;
+  ulChannel = g_APinDescription[ulPin].ulADCChannelNumber ;
 
 #if defined __SAM3U4E__
 	switch ( g_APinDescription[ulPin].ulAnalogChannel )
@@ -112,50 +110,70 @@ uint32_t analogRead(uint32_t ulPin)
 	return ulValue;
 }
 
+static uint8_t PWMEnabled = 0;
+static uint8_t TCEnabled = 0;
+static uint8_t pinEnabled[PINS_COUNT];
+
+void analogOutputInit() {
+	uint8_t i;
+	for (i=0; i<PINS_COUNT; i++)
+		pinEnabled[i] = 0;
+}
+
 // Right now, PWM output only works on the pins with
 // hardware support.  These are defined in the appropriate
 // pins_*.c file.  For the rest of the pins, we default
 // to digital output.
-void analogWrite(uint32_t ulPin, uint32_t ulValue)
-{
-	pinMode(ulPin, OUTPUT);
+void analogWrite(uint32_t ulPin, uint32_t ulValue) {
+	uint32_t attr = g_APinDescription[ulPin].ulPinAttribute;
 
-	if (ulValue == 0)
-  {
-		digitalWrite(ulPin, LOW);
+	if ((attr & PIN_ATTR_PWM) == PIN_ATTR_PWM) {
+		if (!PWMEnabled) {
+			// PWM Startup code
+		    PMC_EnablePeripheral(ID_PWM);
+		    PWMC_ConfigureClocks(PWM_FREQUENCY * PWM_MAX_DUTY_CYCLE, 0, VARIANT_MCK);
+			PWMEnabled = 1;
+		}
+
+		uint32_t chan = g_APinDescription[ulPin].ulPWMChannel;
+		if (!pinEnabled[ulPin]) {
+			// Setup PWM for this pin
+			PIO_Configure(g_APinDescription[ulPin].pPort,
+					g_APinDescription[ulPin].ulPinType,
+					g_APinDescription[ulPin].ulPin,
+					g_APinDescription[ulPin].ulPinConfiguration);
+			PWMC_ConfigureChannel(PWM_INTERFACE, chan, PWM_CMR_CPRE_CLKA, 0, 0);
+			PWMC_SetPeriod(PWM_INTERFACE, chan, PWM_MAX_DUTY_CYCLE);
+			PWMC_SetDutyCycle(PWM_INTERFACE, chan, ulValue);
+			PWMC_EnableChannel(PWM_INTERFACE, chan);
+			pinEnabled[ulPin] = 1;
+		} else {
+			PWMC_SetDutyCycle(PWM_INTERFACE, chan, ulValue);
+		}
+		return;
 	}
-  else
-  {
-    if (ulValue == 255)
-    {
-      digitalWrite(ulPin, HIGH);
-    }
-    else
-    {
-      if ((g_APinDescription[ulPin].ulPinAttribute && PIN_ATTR_PWM)	== PIN_ATTR_PWM)
-      {
-        // Setup PWM for this pin
-      }
-      else
-      {
-        if ((g_APinDescription[ulPin].ulPinAttribute && PIN_ATTR_TIMER)	== PIN_ATTR_TIMER)
-        {
-          // Setup Timer for this pin
-        }
-        else
-        {
-          if (ulValue < 128)
-          {
-            digitalWrite(ulPin, LOW);
-          }
-          else
-          {
-            digitalWrite(ulPin, HIGH);
-          }
-        }
-      }
-    }
-  }
+
+	if ((attr & PIN_ATTR_TIMER) == PIN_ATTR_TIMER) {
+		// TODO
+		/*
+		if (!TCEnabled) {
+			TCEnabled = 1;
+		}
+
+		// Setup Timer for this pin
+		if (!pinEnabled[ulPin]) {
+		} else {
+		}
+		return;
+		*/
+	}
+
+	// Default to digital write
+	pinMode(ulPin, OUTPUT);
+	if (ulValue < 128)
+		digitalWrite(ulPin, LOW);
+	else
+		digitalWrite(ulPin, HIGH);
 }
 
 #ifdef __cplusplus

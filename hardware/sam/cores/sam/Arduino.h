@@ -94,7 +94,7 @@ typedef void (*voidFuncPtr)( void ) ;
 /* Definitions and types for pins */
 typedef enum _EAnalogChannel
 {
-  NONE=-1,
+  NO_ADC=-1,
   ADC0=0,
   ADC1,
   ADC2,
@@ -116,6 +116,17 @@ typedef enum _EAnalogChannel
 } EAnalogChannel ;
 
 #define ADC_CHANNEL_NUMBER_NONE 0xffffffff
+
+// Definition for PWM channels
+typedef enum _EPWMChannel
+{
+  NO_PWM=-1,
+  PWM_CH0=0,
+  PWM_CH1,
+  PWM_CH2,
+  PWM_CH3
+} EPWMChannel ;
+
 /**
  * Pin Attributes to be OR-ed
  */
@@ -136,6 +147,7 @@ typedef struct _PinDescription
   uint32_t ulPinAttribute ;
   EAnalogChannel ulAnalogChannel ; /* Describe which Analog pin is linked to a MCU pin */
   EAnalogChannel ulADCChannelNumber ; /* We use the same enum than for ADC pins to describe the ADC channel in use on this pin */
+  EPWMChannel ulPWMChannel ;
 } PinDescription ;
 
 /* Pins table to be instanciated into variant.cpp */

@@ -64,6 +64,10 @@
  *        Pins
  *----------------------------------------------------------------------------*/
 
+// Number of pins defined in PinDescription array
+#define PINS_COUNT           (84u)
+
+// LEDs
 #define PIN_LED_13           (13u)
 #define PIN_LED_RXL          (73u)
 #define PIN_LED_TXL          (74u)
@@ -71,6 +75,9 @@
 #define PIN_LED2             PIN_LED_RXL
 #define PIN_LED3             PIN_LED_TXL
 
+/*
+ * SPI Interfaces
+ */
 #define SPI_INTERFACES_COUNT 1
 
 #define SPI_INTERFACE        SPI
@@ -80,6 +87,14 @@
 #define PIN_SPI_MISO         (75u)
 #define PIN_SPI_SCK          (77u)
 
+static const uint8_t SS   = 4 ;
+static const uint8_t MOSI = 76 ;
+static const uint8_t MISO = 75 ;
+static const uint8_t SCK  = 77 ;
+
+/*
+ * Wire Interfaces
+ */
 #define WIRE_INTERFACES_COUNT 2
 
 #define PIN_WIRE_SDA         (20u)
@@ -94,17 +109,18 @@
 #define WIRE1_INTERFACE_ID   ID_TWI0
 #define WIRE1_ISR_HANDLER    TWI0_IrqHandler
 
+/*
+ * UART/USART Interfaces
+ */
 #define PINS_UART            (80u)
 
 #define PINS_USART0          (81u)
 #define PINS_USART1          (82u)
 #define PINS_USART2          (83u)
 
-static const uint8_t SS   = 4 ;
-static const uint8_t MOSI = 76 ;
-static const uint8_t MISO = 75 ;
-static const uint8_t SCK  = 77 ;
-
+/*
+ * Analog pins
+ */
 static const uint8_t A0  = 54;
 static const uint8_t A1  = 55;
 static const uint8_t A2  = 56;
@@ -121,6 +137,14 @@ static const uint8_t A12 = 66;
 static const uint8_t A13 = 67;
 // static const uint8_t A14 = ;
 // static const uint8_t A15 = ;
+
+/*
+ * PWM
+ */
+#define PWM_INTERFACE        PWM
+#define PWM_FREQUENCY        1000
+#define PWM_MAX_DUTY_CYCLE   255
+#define PWM_MIN_DUTY_CYCLE   0
 
 /*----------------------------------------------------------------------------
  *        Arduino objects - C++ only
