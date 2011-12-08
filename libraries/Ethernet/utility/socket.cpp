@@ -143,10 +143,10 @@ uint16_t send(SOCKET s, const uint8_t * buf, uint16_t len)
  * 		
  * @return	received data size for success else -1.
  */
-uint16_t recv(SOCKET s, uint8_t *buf, uint16_t len)
+int16_t recv(SOCKET s, uint8_t *buf, int16_t len)
 {
   // Check how much data is available
-  uint16_t ret = W5100.getRXReceivedSize(s);
+  int16_t ret = W5100.getRXReceivedSize(s);
   if ( ret == 0 )
   {
     // No data available.
