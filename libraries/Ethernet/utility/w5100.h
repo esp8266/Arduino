@@ -270,7 +270,10 @@ private:
   }                                                          \
   static uint16_t read##name(SOCKET _s) {                    \
     uint16_t res = readSn(_s, address);                      \
-    res = (res << 8) + readSn(_s, address + 1);              \
+    uint16_t res2 = readSn(_s,address + 1);                  \
+    res = res << 8;                                          \
+    res2 = res2 & 0xFF;                                      \
+    res = res | res2;                                        \
     return res;                                              \
   }
 #define __SOCKET_REGISTER_N(name, address, size)             \
