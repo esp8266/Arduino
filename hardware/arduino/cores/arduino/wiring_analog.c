@@ -204,14 +204,18 @@ void analogWrite(uint8_t pin, int val)
 				break;
 			#endif
 
-			#if defined(TCCR4A) && defined(COM4A1)
+			#if defined(TCCR4A)
 			case TIMER4A:
-				// connect pwm to pin on timer 4, channel A
+				//connect pwm to pin on timer 4, channel A
+				#if defined(PWM4A)		/* ATMEGA32U4 and related */
+				sbi(TCCR4A, PWM4A);
+				#elif defined(COM4A1)	/* ATMEGA1280/2560 and related */
 				sbi(TCCR4A, COM4A1);
-				OCR4A = val; // set pwm duty
+				#endif
+				OCR4A = val;	// set pwm duty
 				break;
 			#endif
-
+			
 			#if defined(TCCR4A) && defined(COM4B1)
 			case TIMER4B:
 				// connect pwm to pin on timer 4, channel B
@@ -228,14 +232,17 @@ void analogWrite(uint8_t pin, int val)
 				break;
 			#endif
 				
-			#if defined(TCCR4A) && defined(COM4D1)
-			case TIMER4D:
+			#if defined(TCCR4C)
+			case TIMER4D:				
 				// connect pwm to pin on timer 4, channel D
-				sbi(TCCR4A, COM4D1);
-				OCR4D = val; // set pwm duty
+				#if defined(PWM4D)	/* ATMEGA32U4 and related */
+				sbi(TCCR4C, PWM4D);				
+				#endif
+				OCR4D = val;	// set pwm duty
 				break;
 			#endif
 
+							
 			#if defined(TCCR5A) && defined(COM5A1)
 			case TIMER5A:
 				// connect pwm to pin on timer 5, channel A
@@ -270,3 +277,4 @@ void analogWrite(uint8_t pin, int val)
 		}
 	}
 }
+

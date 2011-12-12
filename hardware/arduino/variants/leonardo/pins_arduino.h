@@ -212,7 +212,7 @@ const uint8_t PROGMEM digital_pin_to_bit_mask_PGM[30] = {
 	_BV(6), // D29 / D12 - A11 - PD6
 };
 
-const uint8_t PROGMEM digital_pin_to_timer_PGM[18] = {
+const uint8_t PROGMEM digital_pin_to_timer_PGM[16] = {
 	NOT_ON_TIMER,	
 	NOT_ON_TIMER,
 	NOT_ON_TIMER,
