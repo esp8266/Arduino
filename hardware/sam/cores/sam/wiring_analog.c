@@ -110,9 +110,27 @@ uint32_t analogRead(uint32_t ulPin)
 	return ulValue;
 }
 
+static void TC_SetRA(Tc *tc, uint32_t chan, uint32_t v )
+{
+    TcChannel* ch = tc->TC_CHANNEL+chan;
+    ch->TC_RA = v;
+}
+
+static void TC_SetRB(Tc *tc, uint32_t chan, uint32_t v )
+{
+    TcChannel* ch = &tc->TC_CHANNEL+chan;
+    ch->TC_RB = v;
+}
+
+static void TC_SetRC(Tc *tc, uint32_t chan, uint32_t v )
+{
+    TcChannel* ch = &tc->TC_CHANNEL+chan;
+    ch->TC_RC = v;
+}
+
 static uint8_t PWMEnabled = 0;
-static uint8_t TCEnabled = 0;
 static uint8_t pinEnabled[PINS_COUNT];
+static uint8_t TCChanEnabled[] = {0, 0, 0};
 
 void analogOutputInit() {
 	uint8_t i;
@@ -130,7 +148,7 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 	if ((attr & PIN_ATTR_PWM) == PIN_ATTR_PWM) {
 		if (!PWMEnabled) {
 			// PWM Startup code
-		    PMC_EnablePeripheral(ID_PWM);
+		    PMC_EnablePeripheral(PWM_INTERFACE_ID);
 		    PWMC_ConfigureClocks(PWM_FREQUENCY * PWM_MAX_DUTY_CYCLE, 0, VARIANT_MCK);
 			PWMEnabled = 1;
 		}
@@ -147,25 +165,57 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 			PWMC_SetDutyCycle(PWM_INTERFACE, chan, ulValue);
 			PWMC_EnableChannel(PWM_INTERFACE, chan);
 			pinEnabled[ulPin] = 1;
-		} else {
-			PWMC_SetDutyCycle(PWM_INTERFACE, chan, ulValue);
 		}
+
+		PWMC_SetDutyCycle(PWM_INTERFACE, chan, ulValue);
 		return;
 	}
 
 	if ((attr & PIN_ATTR_TIMER) == PIN_ATTR_TIMER) {
-		// TODO
-		/*
-		if (!TCEnabled) {
-			TCEnabled = 1;
-		}
+		// We use MCLK/2 => 96Mhz/2 => 48Mhz as clock.
+		// To get 1KHz we should use 48000 as TC
+		// 48Mhz/48000 = 1KHz
+		const uint32_t TC = VARIANT_MCK / 2 / TC_FREQUENCY;
+
+		// Map value to Timer ranges 0..255=>0..48000
+		ulValue = ulValue * TC;
+		ulValue = ulValue / TC_MAX_DUTY_CYCLE;
 
 		// Setup Timer for this pin
+		ETCChannel channel = g_APinDescription[ulPin].ulTCChannel;
+		static const channelToChNo[] = { 0, 0, 1, 1, 2, 2 };
+		static const channelToAB[] = { 1, 0, 1, 0, 1, 0 };
+		uint32_t chNo = channelToChNo[channel];
+		uint32_t chA = channelToAB[channel];
+
+		if (!TCChanEnabled[chNo]) {
+			PMC_EnablePeripheral(TC_INTERFACE_ID + chNo);
+			TC_Configure(TC_INTERFACE, chNo,
+					TC_CMR_TCCLKS_TIMER_CLOCK1 |
+					TC_CMR_WAVE |
+					TC_CMR_WAVSEL_UP_RC |
+					TC_CMR_ACPA_CLEAR |   // RA Compare Effect on OA: clear
+					TC_CMR_ACPC_SET |     // RC Compare Effect on OA: set
+					TC_CMR_BCPB_CLEAR |   // RB Compare Effect on OB: clear
+					TC_CMR_BCPC_SET);     // RC Compare Effect on OB: set
+			TC_SetRC(TC_INTERFACE, chNo, TC);
+		}
+		if (chA)
+			TC_SetRA(TC_INTERFACE, chNo, ulValue);
+		else
+			TC_SetRB(TC_INTERFACE, chNo, ulValue);
 		if (!pinEnabled[ulPin]) {
-		} else {
+			PIO_Configure(g_APinDescription[ulPin].pPort,
+					g_APinDescription[ulPin].ulPinType,
+					g_APinDescription[ulPin].ulPin,
+					g_APinDescription[ulPin].ulPinConfiguration);
+			pinEnabled[ulPin] = 1;
+		}
+		if (!TCChanEnabled[chNo]) {
+			TC_Start(TC_INTERFACE, chNo);
+			TCChanEnabled[chNo] = 1;
 		}
 		return;
-		*/
 	}
 
 	// Default to digital write

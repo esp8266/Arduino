@@ -117,7 +117,7 @@ typedef enum _EAnalogChannel
 
 #define ADC_CHANNEL_NUMBER_NONE 0xffffffff
 
-// Definition for PWM channels
+// Definitions for PWM channels
 typedef enum _EPWMChannel
 {
   NO_PWM=-1,
@@ -126,6 +126,18 @@ typedef enum _EPWMChannel
   PWM_CH2,
   PWM_CH3
 } EPWMChannel ;
+
+// Definitions for TC channels
+typedef enum _ETCChannel
+{
+  NO_TC=-1,
+  TC0_CHA0=0,
+  TC0_CHB0,
+  TC0_CHA1,
+  TC0_CHB1,
+  TC0_CHA2,
+  TC0_CHB2
+} ETCChannel ;
 
 /**
  * Pin Attributes to be OR-ed
@@ -148,6 +160,7 @@ typedef struct _PinDescription
   EAnalogChannel ulAnalogChannel ; /* Describe which Analog pin is linked to a MCU pin */
   EAnalogChannel ulADCChannelNumber ; /* We use the same enum than for ADC pins to describe the ADC channel in use on this pin */
   EPWMChannel ulPWMChannel ;
+  ETCChannel ulTCChannel ;
 } PinDescription ;
 
 /* Pins table to be instanciated into variant.cpp */
