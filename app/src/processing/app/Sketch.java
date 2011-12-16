@@ -1626,8 +1626,7 @@ public class Sketch {
     }
 
     File appletFolder = new File(appletPath);
-    String use_dep = Base.getBoardPreferences().get("build.dependency");
-    if (use_dep == null || use_dep.compareToIgnoreCase("true") != 0 || deleteFilesOnNextBuild) {
+    if (deleteFilesOnNextBuild) {
       // delete the entire directory and all contents
       // when we know something changed and all objects
       // need to be recompiled, or if the board does not

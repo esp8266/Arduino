@@ -297,9 +297,6 @@ public class Compiler implements MessageConsumer {
   }
 
   private boolean is_already_compiled(File src, File obj, File dep, Map<String, String> prefs) {
-    String build_dep = prefs.get("build.dependency");
-    if (build_dep == null) return false;
-    if (build_dep.compareToIgnoreCase("true") != 0) return false;
     boolean ret=true;
     try {
       //System.out.println("\n  is_already_compiled: begin checks: " + obj.getPath());
