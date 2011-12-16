@@ -269,7 +269,11 @@ public class Compiler implements MessageConsumer {
  		
     for (File file : cSources) {
         String objectPath = buildPath + File.separator + file.getName() + ".o";
-        objectPaths.add(new File(objectPath));
+        String dependPath = buildPath + File.separator + file.getName() + ".d";
+        File objectFile = new File(objectPath);
+        File dependFile = new File(dependPath);
+        objectPaths.add(objectFile);
+        if (is_already_compiled(file, objectFile, dependFile, boardPreferences)) continue;
         execAsynchronously(getCommandCompilerC(avrBasePath, includePaths,
                                                file.getAbsolutePath(),
                                                objectPath,
@@ -278,7 +282,11 @@ public class Compiler implements MessageConsumer {
 
     for (File file : cppSources) {
         String objectPath = buildPath + File.separator + file.getName() + ".o";
-        objectPaths.add(new File(objectPath));
+        String dependPath = buildPath + File.separator + file.getName() + ".d";
+        File objectFile = new File(objectPath);
+        File dependFile = new File(dependPath);
+        objectPaths.add(objectFile);
+        if (is_already_compiled(file, objectFile, dependFile, boardPreferences)) continue;
         execAsynchronously(getCommandCompilerCPP(avrBasePath, includePaths,
                                                  file.getAbsolutePath(),
                                                  objectPath,
@@ -288,6 +296,71 @@ public class Compiler implements MessageConsumer {
     return objectPaths;
   }
 
+  private boolean is_already_compiled(File src, File obj, File dep, Map<String, String> prefs) {
+    String build_dep = prefs.get("build.dependency");
+    if (build_dep == null) return false;
+    if (build_dep.compareToIgnoreCase("true") != 0) return false;
+    boolean ret=true;
+    try {
+      //System.out.println("\n  is_already_compiled: begin checks: " + obj.getPath());
+      if (!obj.exists()) return false;  // object file (.o) does not exist
+      if (!dep.exists()) return false;  // dep file (.d) does not exist
+      long src_modified = src.lastModified();
+      long obj_modified = obj.lastModified();
+      if (src_modified >= obj_modified) return false;  // source modified since object compiled
+      if (src_modified >= dep.lastModified()) return false;  // src modified since dep compiled
+      BufferedReader reader = new BufferedReader(new FileReader(dep.getPath()));
+      String line;
+      boolean need_obj_parse = true;
+      while ((line = reader.readLine()) != null) {
+        if (line.endsWith("\\")) {
+          line = line.substring(0, line.length() - 1);
+        }
+        line = line.trim();
+        if (line.length() == 0) continue; // ignore blank lines
+        if (need_obj_parse) {
+          // line is supposed to be the object file - make sure it really is!
+          if (line.endsWith(":")) {
+            line = line.substring(0, line.length() - 1);
+            String objpath = obj.getCanonicalPath();
+            File linefile = new File(line);
+            String linepath = linefile.getCanonicalPath();
+            //System.out.println("  is_already_compiled: obj =  " + objpath);
+            //System.out.println("  is_already_compiled: line = " + linepath);
+            if (objpath.compareTo(linepath) == 0) {
+              need_obj_parse = false;
+              continue;
+            } else {
+              ret = false;  // object named inside .d file is not the correct file!
+              break;
+            }
+          } else {
+            ret = false;  // object file supposed to end with ':', but didn't
+            break;
+          }
+        } else {
+          // line is a prerequisite file
+          File prereq = new File(line);
+          if (!prereq.exists()) {
+            ret = false;  // prerequisite file did not exist
+            break;
+          }
+          if (prereq.lastModified() >= obj_modified) {
+            ret = false;  // prerequisite modified since object was compiled
+            break;
+          }
+          //System.out.println("  is_already_compiled:  prerequisite ok");
+        }
+      }
+      reader.close();
+    } catch (Exception e) {
+      return false;  // any error reading dep file = recompile it
+    }
+    if (ret && (verbose || Preferences.getBoolean("build.verbose"))) {
+      System.out.println("  Using previously compiled: " + obj.getPath());
+    }
+    return ret;
+  }
 
   boolean firstErrorFound;
   boolean secondErrorFound;
@@ -490,6 +563,7 @@ public class Compiler implements MessageConsumer {
       "-fdata-sections",
       "-mmcu=" + boardPreferences.get("build.mcu"),
       "-DF_CPU=" + boardPreferences.get("build.f_cpu"),
+      "-MMD", // output dependancy info
       "-DARDUINO=" + Base.REVISION,
     }));
 		
@@ -498,7 +572,8 @@ public class Compiler implements MessageConsumer {
     }
 
     baseCommandCompiler.add(sourceName);
-    baseCommandCompiler.add("-o"+ objectName);
+    baseCommandCompiler.add("-o");
+    baseCommandCompiler.add(objectName);
 
     return baseCommandCompiler;
   }
@@ -519,6 +594,7 @@ public class Compiler implements MessageConsumer {
       "-fdata-sections",
       "-mmcu=" + boardPreferences.get("build.mcu"),
       "-DF_CPU=" + boardPreferences.get("build.f_cpu"),
+      "-MMD", // output dependancy info
       "-DARDUINO=" + Base.REVISION,
     }));
 
@@ -527,7 +603,8 @@ public class Compiler implements MessageConsumer {
     }
 
     baseCommandCompilerCPP.add(sourceName);
-    baseCommandCompilerCPP.add("-o"+ objectName);
+    baseCommandCompilerCPP.add("-o");
+    baseCommandCompilerCPP.add(objectName);
 
     return baseCommandCompilerCPP;
   }

@@ -1010,6 +1010,7 @@ public class Base {
               Preferences.set("target", (String) getValue("target"));
               Preferences.set("board", (String) getValue("board"));
               onBoardOrPortChange();
+              Sketch.buildSettingChanged();
             }
           };
         action.putValue("target", target.getName());

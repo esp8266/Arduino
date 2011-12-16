@@ -1246,6 +1246,12 @@ public class Sketch {
    */
   //protected String compile() throws RunnerException {
 
+  // called when any setting changes that requires all files to be recompiled
+  public static void buildSettingChanged() {
+    deleteFilesOnNextBuild = true;
+  }
+
+  private static boolean deleteFilesOnNextBuild = true;
 
   /**
    * When running from the editor, take care of preparations before running 
@@ -1620,9 +1626,29 @@ public class Sketch {
     }
 
     File appletFolder = new File(appletPath);
-    // Nuke the old applet folder because it can cause trouble
-    if (Preferences.getBoolean("export.delete_target_folder")) {
+    String use_dep = Base.getBoardPreferences().get("build.dependency");
+    if (use_dep == null || use_dep.compareToIgnoreCase("true") != 0 || deleteFilesOnNextBuild) {
+      // delete the entire directory and all contents
+      // when we know something changed and all objects
+      // need to be recompiled, or if the board does not
+      // use setting build.dependency
       Base.removeDir(appletFolder);
+      deleteFilesOnNextBuild = false;
+    } else {
+      // delete only stale source files, from the previously
+      // compiled sketch.  This allows multiple windows to be
+      // used.  Keep everything else, which might be reusable
+      if (appletFolder.exists()) {
+        String files[] = appletFolder.list();
+        for (String file : files) {
+          if (file.endsWith(".c") || file.endsWith(".cpp") || file.endsWith(".s")) {
+            File deleteMe = new File(appletFolder, file);
+            if (!deleteMe.delete()) {
+              System.err.println("Could not delete " + deleteMe);
+            }
+          }
+        }
+      }
     }
     // Create a fresh applet folder (needed before preproc is run below)
     appletFolder.mkdirs();
