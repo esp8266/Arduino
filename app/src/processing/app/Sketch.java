@@ -1210,11 +1210,39 @@ public class Sketch {
     // won't be able to delete them, so we need to force a gc here
     System.gc();
 
-    // note that we can't remove the builddir itself, otherwise
-    // the next time we start up, internal runs using Runner won't
-    // work because the build dir won't exist at startup, so the classloader
-    // will ignore the fact that that dir is in the CLASSPATH in run.sh
-    Base.removeDescendants(tempBuildFolder);
+    if (deleteFilesOnNextBuild) {
+      // delete the entire directory and all contents
+      // when we know something changed and all objects
+      // need to be recompiled, or if the board does not
+      // use setting build.dependency
+      //Base.removeDir(tempBuildFolder);
+      
+      // note that we can't remove the builddir itself, otherwise
+      // the next time we start up, internal runs using Runner won't
+      // work because the build dir won't exist at startup, so the classloader
+      // will ignore the fact that that dir is in the CLASSPATH in run.sh
+      Base.removeDescendants(tempBuildFolder);
+      
+      deleteFilesOnNextBuild = false;
+    } else {
+      // delete only stale source files, from the previously
+      // compiled sketch.  This allows multiple windows to be
+      // used.  Keep everything else, which might be reusable
+      if (tempBuildFolder.exists()) {
+        String files[] = tempBuildFolder.list();
+        for (String file : files) {
+          if (file.endsWith(".c") || file.endsWith(".cpp") || file.endsWith(".s")) {
+            File deleteMe = new File(tempBuildFolder, file);
+            if (!deleteMe.delete()) {
+              System.err.println("Could not delete " + deleteMe);
+            }
+          }
+        }
+      }
+    }
+    
+    // Create a fresh applet folder (needed before preproc is run below)
+    //tempBuildFolder.mkdirs();
   }
 
 
@@ -1612,49 +1640,12 @@ public class Sketch {
    */
   public boolean exportApplet(String appletPath, boolean usingProgrammer)
     throws RunnerException, IOException, SerialException {
-    
-    // Make sure the user didn't hide the sketch folder
-    ensureExistence();
 
-    current.setProgram(editor.getText());
-
-    // Reload the code when an external editor is being used
-    if (Preferences.getBoolean("editor.external")) {
-      current = null;
-      // nuke previous files and settings
-      load();
-    }
-
-    File appletFolder = new File(appletPath);
-    if (deleteFilesOnNextBuild) {
-      // delete the entire directory and all contents
-      // when we know something changed and all objects
-      // need to be recompiled, or if the board does not
-      // use setting build.dependency
-      Base.removeDir(appletFolder);
-      deleteFilesOnNextBuild = false;
-    } else {
-      // delete only stale source files, from the previously
-      // compiled sketch.  This allows multiple windows to be
-      // used.  Keep everything else, which might be reusable
-      if (appletFolder.exists()) {
-        String files[] = appletFolder.list();
-        for (String file : files) {
-          if (file.endsWith(".c") || file.endsWith(".cpp") || file.endsWith(".s")) {
-            File deleteMe = new File(appletFolder, file);
-            if (!deleteMe.delete()) {
-              System.err.println("Could not delete " + deleteMe);
-            }
-          }
-        }
-      }
-    }
-    // Create a fresh applet folder (needed before preproc is run below)
-    appletFolder.mkdirs();
-
+    prepare();
+      
     // build the sketch
     editor.status.progressNotice(_("Compiling sketch..."));
-    String foundName = build(appletFolder.getPath(), false);
+    String foundName = build(appletPath, false);
     // (already reported) error during export, exit this function
     if (foundName == null) return false;
 
@@ -1668,7 +1659,7 @@ public class Sketch {
 //    }
 
     editor.status.progressNotice(_("Uploading..."));
-    upload(appletFolder.getPath(), foundName, usingProgrammer);
+    upload(appletPath, foundName, usingProgrammer);
     editor.status.progressUpdate(100);
     return true;
   }
