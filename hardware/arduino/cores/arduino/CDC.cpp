@@ -30,6 +30,25 @@ void Reboot()
 	asm volatile("jmp 0x7800");		// jump to bootloader - DiskLoader takes up last 2 kB
 }
 
+// Define constants and variables for buffering incoming serial data.  We're
+// using a ring buffer (I think), in which head is the index of the location
+// to which to write the next incoming character and tail is the index of the
+// location from which to read.
+#if (RAMEND < 1000)
+#define SERIAL_BUFFER_SIZE 16
+#else
+#define SERIAL_BUFFER_SIZE 64
+#endif
+
+struct ring_buffer
+{
+	unsigned char buffer[SERIAL_BUFFER_SIZE];
+	volatile int head;
+	volatile int tail;
+};
+
+ring_buffer cdc_rx_buffer = { { 0 }, 0, 0};
+
 typedef struct
 {
 	u32	dwDTERate;
@@ -111,33 +130,49 @@ void Serial_::end(void)
 {
 }
 
-int Serial_::available(void)
+void Serial_::accept(void) 
 {
-	u8 avail = USB_Available(CDC_RX);
-	if (_serialPeek != -1)
-		avail++;
-	return avail;
+	ring_buffer *buffer = &cdc_rx_buffer;
+	int c = USB_Recv(CDC_RX); 
+	int i = (unsigned int)(buffer->head+1) % SERIAL_BUFFER_SIZE;
+	
+	// if we should be storing the received character into the location
+	// just before the tail (meaning that the head would advance to the
+	// current location of the tail), we're about to overflow the buffer
+	// and so we don't write the character or advance the head.
+	if (i != buffer->tail) {
+		buffer->buffer[buffer->head] = c;
+		buffer->head = i;
+	}
 }
 
-//	peek is nasty
+int Serial_::available(void)
+{
+	ring_buffer *buffer = &cdc_rx_buffer;
+	return (unsigned int)(SERIAL_BUFFER_SIZE + buffer->head - buffer->tail) % SERIAL_BUFFER_SIZE;
+}
+
 int Serial_::peek(void)
 {
-	if (_serialPeek == -1)
-		_serialPeek = read();
-	return _serialPeek;
+	ring_buffer *buffer = &cdc_rx_buffer;
+	if (buffer->head == buffer->tail) {
+		return -1;
+	} else {
+		return buffer->buffer[buffer->tail];
+	}
 }
 
 int Serial_::read(void)
 {
-	int c;
-	if (_serialPeek != -1)
-	{
-		c = _serialPeek;
-		_serialPeek = -1;
+	ring_buffer *buffer = &cdc_rx_buffer;
+	// if the head isn't ahead of the tail, we don't have any characters
+	if (buffer->head == buffer->tail) {
+		return -1;
 	} else {
-		c = USB_Recv(CDC_RX);
-	}
-	return c;
+		unsigned char c = buffer->buffer[buffer->tail];
+		buffer->tail = (unsigned int)(buffer->tail + 1) % SERIAL_BUFFER_SIZE;
+		return c;
+	}	
 }
 
 void Serial_::flush(void)
