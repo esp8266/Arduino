@@ -143,6 +143,7 @@ private:
   
   void presend_DHCP();
   void send_DHCP_MESSAGE(uint8_t, uint16_t);
+  void printByte(char *, uint8_t);
   
   uint8_t parseDHCPResponse(unsigned long responseTimeout, uint32_t& transactionId);
 public:

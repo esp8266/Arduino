@@ -116,7 +116,6 @@ public class Preferences {
   JCheckBox exportSeparateBox;
   JCheckBox verboseCompilationBox;
   JCheckBox verboseUploadBox;
-  JCheckBox deletePreviousBox;
   JCheckBox externalEditorBox;
   JCheckBox memoryOverrideBox;
   JTextField memoryField;
@@ -302,17 +301,6 @@ public class Preferences {
     top += d.height + GUI_BETWEEN;
     
 
-    // [ ] Delete previous applet or application folder on export
-
-    deletePreviousBox =
-      new JCheckBox(_("Delete previous applet or application folder on export"));
-    pain.add(deletePreviousBox);
-    d = deletePreviousBox.getPreferredSize();
-    deletePreviousBox.setBounds(left, top, d.width + 10, d.height);
-    right = Math.max(right, left + d.width);
-    top += d.height + GUI_BETWEEN;
-
-
     // [ ] Use external editor
 
     externalEditorBox = new JCheckBox(_("Use external editor"));
@@ -494,8 +482,6 @@ public class Preferences {
     // put each of the settings into the table
     setBoolean("build.verbose", verboseCompilationBox.isSelected());
     setBoolean("upload.verbose", verboseUploadBox.isSelected());
-    setBoolean("export.delete_target_folder",
-               deletePreviousBox.isSelected());
 
 //    setBoolean("sketchbook.closing_last_window_quits",
 //               closingLastQuitsBox.isSelected());
@@ -553,8 +539,6 @@ public class Preferences {
     // set all settings entry boxes to their actual status
     verboseCompilationBox.setSelected(getBoolean("build.verbose"));
     verboseUploadBox.setSelected(getBoolean("upload.verbose"));
-    deletePreviousBox.
-      setSelected(getBoolean("export.delete_target_folder"));
 
     //closingLastQuitsBox.
     //  setSelected(getBoolean("sketchbook.closing_last_window_quits"));
