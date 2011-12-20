@@ -406,7 +406,8 @@ const uint8_t _asciimap[128] =
 };
 
 uint8_t USBPutChar(uint8_t c);
-size_t Keyboard_::write(uint8_t c)
+
+size_t Keyboard_::type(uint8_t c)
 {
 	// Keydown
 	{

@@ -104,7 +104,8 @@ private:
 	void setKeyMap(KeyMap* keyMap);	
 public:
 	Keyboard_();
-	virtual size_t write(uint8_t);
+	virtual size_t write(uint8_t c) {type(c);};
+	virtual size_t type(uint8_t c);
 };
 extern Keyboard_ Keyboard;
 
