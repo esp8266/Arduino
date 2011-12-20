@@ -105,6 +105,7 @@ private:
 public:
 	Keyboard_();
 	virtual size_t write(uint8_t);
+	virtual size_t type(uint8_t);
 };
 extern Keyboard_ Keyboard;
 
