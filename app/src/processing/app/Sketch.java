@@ -1438,9 +1438,12 @@ public class Sketch {
     // grab the imports from the code just preproc'd
 
     importedLibraries = new ArrayList<File>();
-
+    //Remember to clear library path before building it.
+    libraryPath = "";
     for (String item : preprocessor.getExtraImports()) {
-      File libFolder = (File) Base.importToLibraryTable.get(item);
+
+        File libFolder = (File) Base.importToLibraryTable.get(item);
+        //If needed can Debug libraryPath here
 
       if (libFolder != null && !importedLibraries.contains(libFolder)) {
         importedLibraries.add(libFolder);

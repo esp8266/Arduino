@@ -689,6 +689,9 @@ public class Editor extends JFrame implements RunnerListener {
     if (boardsMenu == null) {
       boardsMenu = new JMenu(_("Board"));
       base.rebuildBoardsMenu(boardsMenu);
+      //Debug: rebuild imports
+      importMenu.removeAll();
+      base.rebuildImportMenu(importMenu);
     }
     menu.add(boardsMenu);
     

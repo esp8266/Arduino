@@ -1,7 +1,8 @@
 ##############################################################
 
 uno.name=Arduino Uno
-uno.upload.protocol=arduino
+uno.platform=avr
+uno.upload.protocol=stk500
 uno.upload.maximum_size=32256
 uno.upload.speed=115200
 uno.bootloader.low_fuses=0xff
@@ -19,7 +20,7 @@ uno.build.variant=standard
 ##############################################################
 
 atmega328.name=Arduino Duemilanove w/ ATmega328
-
+atmega328.platform=avr
 atmega328.upload.protocol=arduino
 atmega328.upload.maximum_size=30720
 atmega328.upload.speed=57600
@@ -40,7 +41,7 @@ atmega328.build.variant=standard
 ##############################################################
 
 diecimila.name=Arduino Diecimila or Duemilanove w/ ATmega168
-
+diecimila.platform=avr
 diecimila.upload.protocol=arduino
 diecimila.upload.maximum_size=14336
 diecimila.upload.speed=19200
@@ -61,7 +62,7 @@ diecimila.build.variant=standard
 ##############################################################
 
 nano328.name=Arduino Nano w/ ATmega328
-
+nano328.platform=avr
 nano328.upload.protocol=arduino
 nano328.upload.maximum_size=30720
 nano328.upload.speed=57600
@@ -82,7 +83,7 @@ nano328.build.variant=eightanaloginputs
 ##############################################################
 
 nano.name=Arduino Nano w/ ATmega168
-
+nano.platform=avr
 nano.upload.protocol=arduino
 nano.upload.maximum_size=14336
 nano.upload.speed=19200
@@ -103,7 +104,7 @@ nano.build.variant=eightanaloginputs
 ##############################################################
 
 mega2560.name=Arduino Mega 2560 or Mega ADK
-
+mega2560.platform=avr
 mega2560.upload.protocol=stk500v2
 mega2560.upload.maximum_size=258048
 mega2560.upload.speed=115200
@@ -124,7 +125,7 @@ mega2560.build.variant=mega
 ##############################################################
 
 mega.name=Arduino Mega (ATmega1280)
-
+mega.platform=avr
 mega.upload.protocol=arduino
 mega.upload.maximum_size=126976
 mega.upload.speed=57600
@@ -145,6 +146,7 @@ mega.build.variant=mega
 ##############################################################
 
 #leonardo.name=Arduino Leonardo
+#leonardo.platform=avr
 #leonardo.upload.protocol=arduino
 #leonardo.upload.maximum_size=28672
 #leonardo.upload.speed=1200
@@ -163,6 +165,7 @@ mega.build.variant=mega
 ##############################################################
 
 #micro.name=Arduino Micro
+#micro.platform=avr
 #micro.upload.protocol=arduino
 #micro.upload.maximum_size=30720
 #micro.upload.speed=1200
@@ -181,7 +184,7 @@ mega.build.variant=mega
 ##############################################################
 
 mini328.name=Arduino Mini w/ ATmega328
-
+mini328.platform=avr
 mini328.upload.protocol=stk500
 mini328.upload.maximum_size=28672
 mini328.upload.speed=115200
@@ -202,7 +205,7 @@ mini328.build.variant=eightanaloginputs
 ##############################################################
 
 mini.name=Arduino Mini w/ ATmega168
-
+mini.platform=avr
 mini.upload.protocol=arduino
 mini.upload.maximum_size=14336
 mini.upload.speed=19200
@@ -223,7 +226,7 @@ mini.build.variant=eightanaloginputs
 ##############################################################
 
 ethernet.name=Arduino Ethernet
-
+ethernet.platform=avr
 ethernet.upload.protocol=arduino
 ethernet.upload.maximum_size=32256
 ethernet.upload.speed=115200
@@ -244,7 +247,7 @@ ethernet.build.core=arduino
 ##############################################################
 
 fio.name=Arduino Fio
-
+fio.platform=avr
 fio.upload.protocol=arduino
 fio.upload.maximum_size=30720
 fio.upload.speed=57600
@@ -265,7 +268,7 @@ fio.build.variant=eightanaloginputs
 ##############################################################
 
 bt328.name=Arduino BT w/ ATmega328
-
+bt328.platform=avr
 bt328.upload.protocol=arduino
 bt328.upload.maximum_size=28672
 bt328.upload.speed=19200
@@ -287,7 +290,7 @@ bt328.build.variant=eightanaloginputs
 ##############################################################
 
 bt.name=Arduino BT w/ ATmega168
-
+bt.platform=avr
 bt.upload.protocol=arduino
 bt.upload.maximum_size=14336
 bt.upload.speed=19200
@@ -309,7 +312,7 @@ bt.build.variant=eightanaloginputs
 ##############################################################
 
 lilypad328.name=LilyPad Arduino w/ ATmega328
-
+lilypad328.platform=avr
 lilypad328.upload.protocol=arduino
 lilypad328.upload.maximum_size=30720
 lilypad328.upload.speed=57600
@@ -330,7 +333,7 @@ lilypad328.build.variant=standard
 ##############################################################
 
 lilypad.name=LilyPad Arduino w/ ATmega168
-
+lilypad.platform=avr
 lilypad.upload.protocol=arduino
 lilypad.upload.maximum_size=14336
 lilypad.upload.speed=19200
@@ -351,7 +354,7 @@ lilypad.build.variant=standard
 ##############################################################
 
 pro5v328.name=Arduino Pro or Pro Mini (5V, 16 MHz) w/ ATmega328
-
+pro5v328.platform=avr
 pro5v328.upload.protocol=arduino
 pro5v328.upload.maximum_size=30720
 pro5v328.upload.speed=57600
@@ -372,7 +375,7 @@ pro5v328.build.variant=standard
 ##############################################################
 
 pro5v.name=Arduino Pro or Pro Mini (5V, 16 MHz) w/ ATmega168
-
+pro5v.platform=avr
 pro5v.upload.protocol=arduino
 pro5v.upload.maximum_size=14336
 pro5v.upload.speed=19200
@@ -393,7 +396,7 @@ pro5v.build.variant=standard
 ##############################################################
 
 pro328.name=Arduino Pro or Pro Mini (3.3V, 8 MHz) w/ ATmega328
-
+pro328.platform=avr
 pro328.upload.protocol=arduino
 pro328.upload.maximum_size=30720
 pro328.upload.speed=57600
@@ -414,7 +417,7 @@ pro328.build.variant=standard
 ##############################################################
 
 pro.name=Arduino Pro or Pro Mini (3.3V, 8 MHz) w/ ATmega168
-
+pro.platform=avr
 pro.upload.protocol=arduino
 pro.upload.maximum_size=14336
 pro.upload.speed=19200
@@ -435,7 +438,7 @@ pro.build.variant=standard
 ##############################################################
 
 atmega168.name=Arduino NG or older w/ ATmega168
-
+atmega168.platform=avr
 atmega168.upload.protocol=arduino
 atmega168.upload.maximum_size=14336
 atmega168.upload.speed=19200
@@ -456,7 +459,7 @@ atmega168.build.variant=standard
 ##############################################################
 
 atmega8.name=Arduino NG or older w/ ATmega8
-
+atmega8.platform=avr
 atmega8.upload.protocol=arduino
 atmega8.upload.maximum_size=7168
 atmega8.upload.speed=19200

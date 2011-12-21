@@ -1,0 +1,64 @@
+#########Compiler Recipe#################################
+##compile c object files
+##Default.recipe, overide if overide exists, these defauls should remain the same, if you need to change them do it as an overide.
+
+#default.recipe.c.o.pattern={0}{1}|{2}|{3}{4}|-DF_CPU={5}|-D{6}={7}|{8}|{9}|-o|{10}
+#default.recipe.cpp.o.pattern={0}{1}|{2}|{3}{4}|-DF_CPU={5}|-D{6}={7}|{8}|{9}|-o|{10}
+#default.recipe.ar.pattern={0}{1}|{2}|{3}{4}|{5}
+#default.recipe.c.combine.pattern={0}{1}|{2}|{3}{4}|-o|{5}{6}.elf|{7}|{8}|-L{9}|-lm
+#default.recipe.objcopy.eep.pattern={0}{1}|{2}|{3}.elf|{4}.eep
+#default.recipe.objcopy.hex.pattern={0}{1}|{2}|{3}.elf|{4}.hex
+
+########avr compile pattern ##########
+#avr.recipe.c.o.pattern={0=compiler.path}{1=compiler.c.cmd}{2=compiler.c.flags}{3=compiler.cpudef}{4=build.mcu}-DF_CPU={5=build.f_cpu}-D{7=ARDUINO}={6=Base.REVISION}{7=-I/INCLUDE_PATHS} {8=SOURCE_NAME} -o{9=OBJECT_NAME}
+#object name seems to have build path in it.
+avr.recipe.c.o.pattern={0}{1}|{2}|{3}{4}|-DF_CPU={5}|-D{6}={7}|{8}|{9}|-o|{10}
+
+
+##compile cc object files
+#avr.recipe.cc.o.pattern={0=compiler.path}{1=compiler.cc.cmd}{2=compiler.c.flags}{3=compiler.cpudef}{4=build.mcu}-DF_CPU={5=build.f_cpu}-DARDUINO={6=Base.REVISION}{-7=I/INCLUDE_PATHS} {8=SOURCE_NAME} -o{9=BUILD_PATH}{10=OBJECT_NAME}
+avr.recipe.cpp.o.pattern={0}{1}|{2}|{3}{4}|-DF_CPU={5}|-D{6}={7}|{8}|{9}|-o|{10}
+##create archives
+#avr.recipe.ar.pattern={0=compiler.path}{1=compiler.ar.cmd}{2=compiler.ar.flags}{3=BUILD_PATH}{4=CORE_NAME=core.a}{5=BUILD_PATH}{6=OBJECT_NAME}
+avr.recipe.ar.pattern={0}{1}|{2}|{3}{4}|{5}
+
+##combine gc-sections| archives, and objects
+#avr.recipe.c.combine.pattern={0=compiler.path}{1=compiler.c.cmd}{2=compiler.combine.flags}{3=compiler.cpudef}{4=build.mcu} -o {5=BUILD_PATH}{6=SOURCE_NAME}.elf {7=BUILD_PATH}{8=SOURCE_NAME}.o {9=BUILD_PATH}{10=CORE_NAME=core.a} -L{11=BUILD_PATH} -lm
+#avr.recipe.c.combine.pattern={0}{1}|{2}|{3}{4}|-o|{5}{6}.elf|{7}{8}|{9}|-L{10}|-lm
+avr.recipe.c.combine.pattern={0}{1}|{2}|{3}{4}|-o|{5}{6}.elf|{7}|{8}|-L{9}|-lm
+
+##create eeprom
+#avr.recipe.objcopy.eep.pattern={0=compiler.path}{1=compiler.objcopy.cmd}{2=compiler.objcopy.eep.flags} {3=BUILD_PATH}{4=SOURCE_NAME}.elf {5=BUILD_PATH}{6=SOURCE_NAME}.eep
+avr.recipe.objcopy.eep.pattern={0}{1}|{2}|{3}.elf|{4}.eep
+
+##create hex
+#avr.recipe.objcopy.hex.pattern={0=compiler.path}{1=compiler.objcopy.cmd}{2=compiler.objcopy.elf.flags} {3=BUILD_PATH}{4=SOURCE_NAME}.elf {5=BUILD_PATH}{6=SOURCE_NAME}.hex
+avr.recipe.objcopy.hex.pattern={0}{1}|{2}|{3}.elf|{4}.hex
+
+
+
+########################################################
+avr.name=Arduino
+#avr.compiler.path Official default is correct, only need to change this if you want to overide the initial default
+#avr.compiler.path={0}/hardware/tools/avr/bin/
+avr.compiler.c.cmd=avr-gcc
+avr.compiler.c.flags=|-c|-g|-Os|-w|-ffunction-sections|-fdata-sections
+avr.compiler.c.elf.flags=|-Os|-Wl,--gc-sections
+avr.compiler.c.elf.cmd=avr-gcc
+avr.compiler.S.flags=|-c|-g|-assembler-with-cpp
+avr.compiler.cpp.cmd=avr-g++
+avr.compiler.cpp.flags=|-c|-g|-Os|-w|-fno-exceptions|-ffunction-sections|-fdata-sections
+avr.compiler.ar.cmd=avr-ar
+avr.compiler.ar.flags=rcs
+avr.compiler.objcopy.cmd=avr-objcopy
+avr.compiler.objcopy.eep.flags=|-O|ihex|-j|.eeprom|--set-section-flags=.eeprom=alloc,load|--no-change-warnings|--change-section-lma|.eeprom=0
+avr.compiler.elf2hex.flags=|-O|ihex|-R|.eeprom
+avr.compiler.elf2hex.cmd=avr-objcopy
+avr.compiler.ldflags=
+avr.compiler.cpudef=-mmcu=
+avr.compiler.upload.cmd=
+avr.compiler.upload.flags=
+avr.compiler.define=-DARDUINO=
+avr.library.path=./hardware/arduino/cores/arduino
+avr.library.core.path=./libraries
+

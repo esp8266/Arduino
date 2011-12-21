@@ -34,6 +34,7 @@ import static processing.app.I18n._;
 import java.io.*;
 import java.util.*;
 import java.util.zip.*;
+import java.text.MessageFormat;
 
 
 public class Compiler implements MessageConsumer {
@@ -45,9 +46,22 @@ public class Compiler implements MessageConsumer {
   Sketch sketch;
   String buildPath;
   String primaryClassName;
-  boolean verbose;
+  String platform;
+  String board;
 
+  boolean verbose;
+	
   RunnerException exception;
+	
+  HashMap<String, String> configPreferences;
+  HashMap<String, String> boardPreferences;
+  HashMap<String, String> platformPreferences;
+	
+  String avrBasePath;
+  String corePath;
+	
+  List<File> objectFiles;
+  ArrayList<String> includePaths;
 
   public Compiler() { }
 
@@ -68,13 +82,56 @@ public class Compiler implements MessageConsumer {
     this.buildPath = buildPath;
     this.primaryClassName = primaryClassName;
     this.verbose = verbose;
+    objectFiles = new ArrayList<File>();
 
     // the pms object isn't used for anything but storage
     MessageStream pms = new MessageStream(this);
-
-    String avrBasePath = Base.getAvrBasePath();
     Map<String, String> boardPreferences = Base.getBoardPreferences();
-    String core = boardPreferences.get("build.core");
+    
+   	//Check for null platform, and use system default if not found
+	platform = boardPreferences.get("platform");
+	if (platform == null)
+	{
+	      platformPreferences = new HashMap(Base.getPlatformPreferences());
+	}
+	else
+	{
+		platformPreferences = new HashMap(Base.getPlatformPreferences(platform));
+	}
+   
+    System.out.println("////////////////////////////compiler.java is doing stuff/////////////////");
+	//Put all the global preference configuration into one Master configpreferences
+    configPreferences = mergePreferences( Preferences.getMap(), platformPreferences, boardPreferences);
+	avrBasePath = configPreferences.get("compiler.path");
+	if (avrBasePath == null) 
+	{
+		avrBasePath = Base.getAvrBasePath();
+		System.out.println("avrBasePath: " + avrBasePath);
+	}
+	else
+	{
+	    System.out.println("avrBasePath:exists: " + avrBasePath);
+
+		//Put in the system path in the compiler path if available
+		MessageFormat compileFormat = new MessageFormat(avrBasePath);	
+		String basePath = System.getProperty("user.dir");
+		if (Base.isMacOS()) {
+			//logger.debug("basePath: " + basePath);
+			basePath += "/Arduino.app/Contents/Resources/Java";
+		}
+		Object[] Args = {basePath};
+		avrBasePath = compileFormat.format(  Args );
+	    System.out.println("avrBasePath:new: " + avrBasePath);
+
+
+	}
+	this.board = configPreferences.get("board");
+	if (this.board == "")
+	{
+		this.board = "_UNKNOWN";
+	}    
+    
+	String core = configPreferences.get("build.core");
     if (core == null) {
     	RunnerException re = new RunnerException(_("No board selected; please choose a board from the Tools > Board menu."));
       re.hideStackTrace();
@@ -95,6 +152,9 @@ public class Compiler implements MessageConsumer {
 
     String variant = boardPreferences.get("build.variant");
     String variantPath = null;
+
+    String pins = configPreferences.get("build.pins");
+    String pinsPath = null;
     
     if (variant != null) {
       if (variant.indexOf(':') == -1) {
@@ -109,12 +169,11 @@ public class Compiler implements MessageConsumer {
       }
     }
 
-    List<File> objectFiles = new ArrayList<File>();
 
    // 0. include paths for core + all libraries
 
    sketch.setCompilingProgress(20);
-   List includePaths = new ArrayList();
+   ArrayList<String> includePaths = new ArrayList<String>();
    includePaths.add(corePath);
    if (variantPath != null) includePaths.add(variantPath);
    for (File file : sketch.getImportedLibraries()) {
@@ -122,18 +181,19 @@ public class Compiler implements MessageConsumer {
    }
 
    // 1. compile the sketch (already in the buildPath)
-
+   System.out.println("1. compileSketch");
    sketch.setCompilingProgress(30);
-   objectFiles.addAll(
-     compileFiles(avrBasePath, buildPath, includePaths,
-               findFilesInPath(buildPath, "S", false),
-               findFilesInPath(buildPath, "c", false),
-               findFilesInPath(buildPath, "cpp", false),
-               boardPreferences));
+   compileSketch(avrBasePath, buildPath, includePaths, configPreferences);
 
    // 2. compile the libraries, outputting .o files to: <buildPath>/<library>/
+   		// 2. compile the libraries, outputting .o files to:
+		// <buildPath>/<library>/
+		//Doesn't really use configPreferences
+	System.out.println("2. compileLibraries");
+	sketch.setCompilingProgress(40);
+	compileLibraries(avrBasePath, buildPath, includePaths, configPreferences);
+/*
 
-   sketch.setCompilingProgress(40);
    for (File libraryFolder : sketch.getImportedLibraries()) {
      File outputFolder = new File(buildPath, libraryFolder.getName());
      File utilityFolder = new File(libraryFolder, "utility");
@@ -157,11 +217,17 @@ public class Compiler implements MessageConsumer {
      // other libraries should not see this library's utility/ folder
      includePaths.remove(includePaths.size() - 1);
    }
+*/
 
    // 3. compile the core, outputting .o files to <buildPath> and then
    // collecting them into the core.a library file.
-
+   System.out.println("3. compileCore");
+   System.out.println("corePath: " + corePath);
    sketch.setCompilingProgress(50);
+   compileCore(avrBasePath, buildPath, corePath, pins, pinsPath, configPreferences);
+
+   
+/*
   includePaths.clear();
   includePaths.add(corePath);  // include path for core only
   if (variantPath != null) includePaths.add(variantPath);
@@ -183,16 +249,13 @@ public class Compiler implements MessageConsumer {
      commandAR.add(file.getAbsolutePath());
      execAsynchronously(commandAR);
    }
-
+*/
     // 4. link it all together into the .elf file
-    // For atmega2560, need --relax linker option to link larger
-    // programs correctly.
-    String optRelax = "";
-    String atmega2560 = new String ("atmega2560");
-    if ( atmega2560.equals(boardPreferences.get("build.mcu")) ) {
-        optRelax = new String(",--relax");
-    }
-   sketch.setCompilingProgress(60);
+    sketch.setCompilingProgress(60);
+    System.out.println("4. compileLink");
+    compileLink(avrBasePath, buildPath, corePath, includePaths, configPreferences);
+
+/*
     List baseCommandLinker = new ArrayList(Arrays.asList(new String[] {
       avrBasePath + "avr-gcc",
       "-Os",
@@ -219,9 +282,11 @@ public class Compiler implements MessageConsumer {
     }));
     
     List commandObjcopy;
+*/
 
     // 5. extract EEPROM data (from EEMEM directive) to .eep file.
     sketch.setCompilingProgress(70);
+/*
     commandObjcopy = new ArrayList(baseCommandObjcopy);
     commandObjcopy.add(2, "ihex");
     commandObjcopy.set(3, "-j");
@@ -233,26 +298,32 @@ public class Compiler implements MessageConsumer {
     commandObjcopy.add(buildPath + File.separator + primaryClassName + ".elf");
     commandObjcopy.add(buildPath + File.separator + primaryClassName + ".eep");
     execAsynchronously(commandObjcopy);
+*/
+    System.out.println("5. compileEep");
+    compileEep(avrBasePath, buildPath, includePaths, configPreferences);
     
     // 6. build the .hex file
     sketch.setCompilingProgress(80);
+/*
     commandObjcopy = new ArrayList(baseCommandObjcopy);
     commandObjcopy.add(2, "ihex");
     commandObjcopy.add(".eeprom"); // remove eeprom data
     commandObjcopy.add(buildPath + File.separator + primaryClassName + ".elf");
     commandObjcopy.add(buildPath + File.separator + primaryClassName + ".hex");
     execAsynchronously(commandObjcopy);
+*/
+    System.out.println("6. compileHex");
+    compileHex(avrBasePath, buildPath, includePaths, configPreferences);
     
     sketch.setCompilingProgress(90);
-   
     return true;
   }
 
 
   private List<File> compileFiles(String avrBasePath,
-                                  String buildPath, List<File> includePaths,
-                                  List<File> sSources, 
-                                  List<File> cSources, List<File> cppSources,
+                                  String buildPath, ArrayList<String> includePaths,
+                                  ArrayList<File> sSources, 
+                                  ArrayList<File> cSources, ArrayList<File> cppSources,
                                   Map<String, String> boardPreferences)
     throws RunnerException {
 
@@ -264,7 +335,7 @@ public class Compiler implements MessageConsumer {
       execAsynchronously(getCommandCompilerS(avrBasePath, includePaths,
                                              file.getAbsolutePath(),
                                              objectPath,
-                                             boardPreferences));
+                                             configPreferences));
     }
  		
     for (File file : cSources) {
@@ -277,7 +348,7 @@ public class Compiler implements MessageConsumer {
         execAsynchronously(getCommandCompilerC(avrBasePath, includePaths,
                                                file.getAbsolutePath(),
                                                objectPath,
-                                               boardPreferences));
+                                               configPreferences));
     }
 
     for (File file : cppSources) {
@@ -290,7 +361,7 @@ public class Compiler implements MessageConsumer {
         execAsynchronously(getCommandCompilerCPP(avrBasePath, includePaths,
                                                  file.getAbsolutePath(),
                                                  objectPath,
-                                                 boardPreferences));
+                                                 configPreferences));
     }
     
     return objectPaths;
@@ -365,9 +436,18 @@ public class Compiler implements MessageConsumer {
   /**
    * Either succeeds or throws a RunnerException fit for public consumption.
    */
-  private void execAsynchronously(List commandList) throws RunnerException {
-    String[] command = new String[commandList.size()];
-    commandList.toArray(command);
+  private void execAsynchronously(String[] command) throws RunnerException {
+      
+    //eliminate any empty array entries
+    List<String> stringList = new ArrayList<String>();
+    for(String string : command) {
+  	 string = string.trim();
+     if(string != null && string.length() > 0) {
+       stringList.add(string);
+    }
+   }
+   command = stringList.toArray(new String[stringList.size()]);
+   
     int result = 0;
     
     if (verbose || Preferences.getBoolean("build.verbose")) {
@@ -427,6 +507,7 @@ public class Compiler implements MessageConsumer {
       re.hideStackTrace();
       throw re;
     }
+    System.out.println("execAsync: Done.");
   }
 
 
@@ -523,7 +604,7 @@ public class Compiler implements MessageConsumer {
   }
 
   /////////////////////////////////////////////////////////////////////////////
-
+/*
   static private List getCommandCompilerS(String avrBasePath, List includePaths,
     String sourceName, String objectName, Map<String, String> boardPreferences) {
     List baseCommandCompiler = new ArrayList(Arrays.asList(new String[] {
@@ -545,7 +626,39 @@ public class Compiler implements MessageConsumer {
 
     return baseCommandCompiler;
   }
+*/
 
+	// ///////////////////////////////////////////////////////////////////////////
+	static private String[] getCommandCompilerS(String avrBasePath,
+			ArrayList<String> includePaths, String sourceName, String objectName,
+			HashMap<String, String> configPreferences) 
+			{
+		System.out.println("getCommandCompilerS: start");	
+		String baseCommandString = configPreferences.get("recipe.cpp.o.pattern");
+		MessageFormat compileFormat = new MessageFormat(baseCommandString);	
+		//getIncludes to String
+		
+		String includes = preparePaths(includePaths);
+		Object[] Args = {
+				avrBasePath,
+				configPreferences.get("compiler.cpp.cmd"),
+				configPreferences.get("compiler.S.flags"),
+				configPreferences.get("compiler.cpudef"),
+				configPreferences.get("build.mcu"),				
+				configPreferences.get("build.f_cpu"),
+				configPreferences.get("software"),
+				Base.REVISION,
+				includes,
+				sourceName,
+				objectName
+		};
+				
+		String command = compileFormat.format(  Args );	
+		String[] commandArray = command.split("\\|");	
+		return commandArray;
+	}
+
+/*
   
   static private List getCommandCompilerC(String avrBasePath, List includePaths,
     String sourceName, String objectName, Map<String, String> boardPreferences) {
@@ -574,7 +687,38 @@ public class Compiler implements MessageConsumer {
 
     return baseCommandCompiler;
   }
+	*/
 	
+	//removed static
+	private String[] getCommandCompilerC(String avrBasePath,
+			ArrayList<String> includePaths, String sourceName, String objectName,
+			HashMap<String, String> configPreferences) 
+			{
+		System.out.println("getCommandCompilerC: start");	
+		String baseCommandString = configPreferences.get("recipe.c.o.pattern");
+		MessageFormat compileFormat = new MessageFormat(baseCommandString);	
+		//getIncludes to String
+		String includes = preparePaths(includePaths);
+
+		Object[] Args = {
+				avrBasePath,
+				configPreferences.get("compiler.c.cmd"),
+				configPreferences.get("compiler.c.flags"),
+				configPreferences.get("compiler.cpudef"),
+				configPreferences.get("build.mcu"),				
+				configPreferences.get("build.f_cpu"),
+				configPreferences.get("software"),
+				Base.REVISION,
+				includes,
+				sourceName,
+				objectName
+		};
+						
+		String command = compileFormat.format(  Args );	
+		String[] commandArray = command.split("\\|");	
+		return commandArray;	
+	}
+/*
 	
   static private List getCommandCompilerCPP(String avrBasePath,
     List includePaths, String sourceName, String objectName,
@@ -605,7 +749,44 @@ public class Compiler implements MessageConsumer {
 
     return baseCommandCompilerCPP;
   }
+*/
 
+	static private String[] getCommandCompilerCPP(String avrBasePath,
+			ArrayList<String> includePaths, String sourceName, String objectName,
+			HashMap<String, String> configPreferences) 
+			{
+		System.out.println("getCommandCompilerCPP: start");	
+		String baseCommandString = configPreferences.get("recipe.cpp.o.pattern");
+		MessageFormat compileFormat = new MessageFormat(baseCommandString);	
+		//getIncludes to String
+		String includes = preparePaths(includePaths);
+
+		Object[] Args = {
+				avrBasePath,
+				configPreferences.get("compiler.cpp.cmd"),
+				configPreferences.get("compiler.cpp.flags"),
+				configPreferences.get("compiler.cpudef"),
+				configPreferences.get("build.mcu"),				
+				configPreferences.get("build.f_cpu"),
+				configPreferences.get("software"),
+				Base.REVISION,
+				includes,
+				sourceName,
+				objectName
+		};
+						
+		String command = compileFormat.format(  Args );	
+		String[] commandArray = command.split("\\|");	
+
+		/*
+		System.out.println("command:" + command);
+		for (int ii = 0; ii < commandArray.length; ii++)
+		{
+			System.out.println("'" + commandArray[ii] + "'");
+		} 
+		*/
+		return commandArray;	
+	}
 
 
   /////////////////////////////////////////////////////////////////////////////
@@ -633,6 +814,7 @@ public class Compiler implements MessageConsumer {
   
   static public ArrayList<File> findFilesInPath(String path, String extension,
                                                 boolean recurse) {
+                                                	System.out.println("findFilesInPath: " + path);
     return findFilesInFolder(new File(path), extension, recurse);
   }
   
@@ -655,4 +837,277 @@ public class Compiler implements MessageConsumer {
     
     return files;
   }
+  
+  
+  	// 1. compile the sketch (already in the buildPath)
+	void compileSketch(String avrBasePath, String buildPath, ArrayList<String> includePaths, HashMap<String, String> configPreferences)
+	throws RunnerException 
+	{
+		System.out.println("compileSketch: start");        
+		System.out.println("includePaths: ");
+		    for (int i = 0; i < includePaths.size(); i++) {
+     			System.out.println("-I" + (String) includePaths.get(i));
+    		}
+    		
+		//logger.debug("compileSketch: start");	
+		this.objectFiles.addAll(compileFiles(avrBasePath, buildPath, includePaths,
+				findFilesInPath(buildPath, "S", false),
+				findFilesInPath(buildPath, "c", false),
+				findFilesInPath(buildPath, "cpp", false), 
+				configPreferences));
+	}
+	
+	// 2. compile the libraries, outputting .o files to:
+	// <buildPath>/<library>/
+	void compileLibraries (String avrBasePath, String buildPath, ArrayList<String> includePaths, HashMap<String, String> configPreferences) 
+		throws RunnerException 
+	{
+	System.out.println("compileLibraries: start");
+	    
+   for (File libraryFolder : sketch.getImportedLibraries()) {
+   		System.out.println("libraryFolder: " + libraryFolder);
+     File outputFolder = new File(buildPath, libraryFolder.getName());
+     File utilityFolder = new File(libraryFolder, "utility");
+     createFolder(outputFolder);
+     // this library can use includes in its utility/ folder
+     includePaths.add(utilityFolder.getAbsolutePath());
+     //debug  includePaths
+     System.out.println("includePaths: ");
+     for (int i = 0; i < includePaths.size(); i++) {
+     	System.out.println("-I" + (String) includePaths.get(i));
+    }
+
+     
+     objectFiles.addAll(
+       compileFiles(avrBasePath, outputFolder.getAbsolutePath(), includePaths,
+               findFilesInFolder(libraryFolder, "S", false),
+               findFilesInFolder(libraryFolder, "c", false),
+               findFilesInFolder(libraryFolder, "cpp", false),
+               boardPreferences));
+     outputFolder = new File(outputFolder, "utility");
+     createFolder(outputFolder);
+     objectFiles.addAll(
+       compileFiles(avrBasePath, outputFolder.getAbsolutePath(), includePaths,
+               findFilesInFolder(utilityFolder, "S", false),
+               findFilesInFolder(utilityFolder, "c", false),
+               findFilesInFolder(utilityFolder, "cpp", false),
+               boardPreferences));
+     // other libraries should not see this library's utility/ folder
+     includePaths.remove(includePaths.size() - 1);
+   }
+  }
+	
+	// 3. compile the core, outputting .o files to <buildPath> and then
+	// collecting them into the core.a library file.
+	void compileCore (String avrBasePath, String buildPath, String corePath, String pins, String pinsPath, HashMap<String, String> configPreferences) 
+		throws RunnerException 
+	{
+		System.out.println("compileCore(...) start");
+
+		ArrayList<String>  includePaths =  new ArrayList();
+	    includePaths.add(corePath); //include core path only
+        if (pinsPath != null) includePaths.add(pinsPath);
+        
+         //debug  includePaths
+        System.out.println("includePaths: ");
+     	for (int i = 0; i < includePaths.size(); i++) {
+     		System.out.println("-I" + (String) includePaths.get(i));
+    	}
+
+		String baseCommandString = configPreferences.get("recipe.ar.pattern");
+		String commandString = "";
+		MessageFormat compileFormat = new MessageFormat(baseCommandString);	
+		System.out.println("corePath: " + corePath);		
+		List<File> coreObjectFiles	 = compileFiles(
+				avrBasePath, 
+				buildPath,
+				includePaths, 
+				findFilesInPath(corePath, "S", true),
+				findFilesInPath(corePath, "c", true),
+				findFilesInPath(corePath, "cpp", true), 
+				configPreferences);
+		
+		for (File file : coreObjectFiles) {
+			//List commandAR = new ArrayList(baseCommandAR);
+			//commandAR = commandAR +  file.getAbsolutePath();
+		
+			Object[] Args = {
+				avrBasePath,
+				configPreferences.get("compiler.ar.cmd"),
+				configPreferences.get("compiler.ar.flags"),
+				//corePath,
+				buildPath + File.separator,
+				"core.a",
+				//objectName
+				file.getAbsolutePath()
+			};
+		System.out.println("compileCore(...) substitute");
+
+			commandString = compileFormat.format(  Args );
+		    String[] commandArray = commandString.split("\\|");	
+			execAsynchronously(commandArray);
+			
+			
+		}
+	}
+			
+	// 4. link it all together into the .elf file
+	void compileLink(String avrBasePath, String buildPath, String corePath, ArrayList<String> includePaths, HashMap<String, String> configPreferences) 
+		throws RunnerException 
+	{	
+	    // For atmega2560, need --relax linker option to link larger
+	    // programs correctly.
+	    String optRelax = "";
+	    if (boardPreferences.get("build.mcu").equals("atmega2560"))
+	      optRelax = ",--relax";
+	    
+		System.out.println("compileLink: start");
+		String baseCommandString = configPreferences.get("recipe.c.combine.pattern");
+		String commandString = "";
+		MessageFormat compileFormat = new MessageFormat(baseCommandString);	
+		String objectFileList = "";
+		
+		for (File file : objectFiles) {
+			objectFileList = objectFileList + file.getAbsolutePath() + "|";
+		}
+		System.out.println("objectFileList: " + objectFileList);
+
+			Object[] Args = {
+				avrBasePath,
+				configPreferences.get("compiler.c.elf.cmd"),
+				configPreferences.get("compiler.c.elf.flags")+optRelax,
+				configPreferences.get("compiler.cpudef"),
+				configPreferences.get("build.mcu"),				
+				buildPath + File.separator,
+				primaryClassName,
+				objectFileList,
+				buildPath + File.separator + "core.a",
+				buildPath,
+				corePath,	
+				configPreferences.get("ldscript"),	
+			};
+			commandString = compileFormat.format(  Args );
+		    String[] commandArray = commandString.split("\\|");	
+			execAsynchronously(commandArray);
+	}
+
+	// 5. extract EEPROM data (from EEMEM directive) to .eep file.
+	void compileEep (String avrBasePath, String buildPath, ArrayList<String> includePaths, HashMap<String, String> configPreferences) 
+		throws RunnerException 
+	{
+		//logger.debug("compileEep: start");
+		String baseCommandString = configPreferences.get("recipe.objcopy.eep.pattern");
+		String commandString = "";
+		MessageFormat compileFormat = new MessageFormat(baseCommandString);	
+		String objectFileList = "";
+		
+		Object[] Args = {
+			avrBasePath,
+			configPreferences.get("compiler.objcopy.cmd"),
+			configPreferences.get("compiler.objcopy.eep.flags"),
+			buildPath + File.separator + primaryClassName,
+			buildPath + File.separator + primaryClassName
+			};
+		commandString = compileFormat.format(  Args );		
+		String[] commandArray = commandString.split("\\|");	
+	    execAsynchronously(commandArray);
+	}
+	
+	// 6. build the .hex file
+	void compileHex (String avrBasePath, String buildPath, ArrayList<String> includePaths, HashMap<String, String> configPreferences) 
+		throws RunnerException 
+	{
+		//logger.debug("compileHex: start");
+		String baseCommandString = configPreferences.get("recipe.objcopy.hex.pattern");
+		String commandString = "";
+		MessageFormat compileFormat = new MessageFormat(baseCommandString);	
+		String objectFileList = "";
+	
+		Object[] Args = {
+			avrBasePath,
+			configPreferences.get("compiler.elf2hex.cmd"),
+			configPreferences.get("compiler.elf2hex.flags"),
+			buildPath + File.separator + primaryClassName,
+			buildPath + File.separator + primaryClassName
+			};
+		commandString = compileFormat.format(  Args );						
+		String[] commandArray = commandString.split("\\|");	
+		execAsynchronously(commandArray);	
+	}
+  
+  	//merge all the preferences file in the correct order of precedence
+	HashMap mergePreferences(Map Preferences,  Map platformPreferences, Map boardPreferences)
+	{
+		HashMap _map = new HashMap();
+		
+	    Iterator iterator = Preferences.entrySet().iterator();
+       
+        while(iterator.hasNext())
+  	    {
+  	    	Map.Entry pair = (Map.Entry)iterator.next();
+  	    	if (pair.getValue() == null)
+  	    	{
+  	    		_map.put(pair.getKey(), "");
+  	    	}
+  	    	else
+  	    	{
+  	    		_map.put(pair.getKey(), pair.getValue());
+  	    	}
+	    }
+	    
+		//logger.debug("Done: Preferences");
+		
+		iterator = platformPreferences.entrySet().iterator();
+       
+       while(iterator.hasNext())
+  	    {
+  	    	Map.Entry pair = (Map.Entry)iterator.next();
+  	    	
+  	    	if (pair.getValue() == null)
+  	    	{
+  	    		_map.put(pair.getKey(), "");
+  	    	}
+  	    	else
+  	    	{
+  	    		_map.put(pair.getKey(), pair.getValue());
+  	    	}
+            //System.out.println(pair.getKey() + " = " + pair.getValue());
+	    }
+
+		//System.out.println("Done: platformPreferences");
+		iterator = boardPreferences.entrySet().iterator();
+
+        while(iterator.hasNext())
+  	    {
+  	    	Map.Entry pair = (Map.Entry)iterator.next();
+  	    	
+  	    	if (pair.getValue() == null)
+  	    	{
+  	    		_map.put(pair.getKey(), "");
+  	    	}
+  	    	else
+  	    	{
+  	    		_map.put(pair.getKey(), pair.getValue());
+  	    	}
+            //System.out.println(pair.getKey() + " = " + pair.getValue());
+	    }
+		//System.out.println("Done: boardPreferences");
+        
+
+	return _map;
+	}
+	
+	private static String preparePaths(ArrayList<String> includePaths) {
+	//getIncludes to String
+		//logger.debug("Start: Prepare paths");
+		String includes = "";
+		for (int i = 0; i < includePaths.size(); i++) 
+		{
+			includes = includes + (" -I" + (String) includePaths.get(i)) + "|";
+		}
+		//logger.debug("Paths prepared: " + includes);
+		return includes;
+	}
+	
+  
 }
