@@ -33,7 +33,6 @@ import static processing.app.I18n._;
 
 import java.io.*;
 import java.util.*;
-import java.util.zip.*;
 import java.text.MessageFormat;
 
 
@@ -54,7 +53,6 @@ public class Compiler implements MessageConsumer {
   RunnerException exception;
 	
   HashMap<String, String> configPreferences;
-  HashMap<String, String> boardPreferences;
   HashMap<String, String> platformPreferences;
 	
   String avrBasePath;
@@ -84,8 +82,6 @@ public class Compiler implements MessageConsumer {
     this.verbose = verbose;
     objectFiles = new ArrayList<File>();
 
-    // the pms object isn't used for anything but storage
-    MessageStream pms = new MessageStream(this);
     Map<String, String> boardPreferences = Base.getBoardPreferences();
     
    	//Check for null platform, and use system default if not found
@@ -153,25 +149,20 @@ public class Compiler implements MessageConsumer {
     String variant = boardPreferences.get("build.variant");
     String variantPath = null;
 
-    String pins = configPreferences.get("build.pins");
-    String pinsPath = null;
-    
     if (variant != null) {
       if (variant.indexOf(':') == -1) {
-	Target t = Base.getTarget();
-	File variantFolder = new File(new File(t.getFolder(), "variants"), variant);
-	variantPath = variantFolder.getAbsolutePath();
+	    Target t = Base.getTarget();
+	    File variantFolder = new File(new File(t.getFolder(), "variants"), variant);
+	    variantPath = variantFolder.getAbsolutePath();
       } else {
-	Target t = Base.targetsTable.get(variant.substring(0, variant.indexOf(':')));
-	File variantFolder = new File(t.getFolder(), "variants");
-	variantFolder = new File(variantFolder, variant.substring(variant.indexOf(':') + 1));
-	variantPath = variantFolder.getAbsolutePath();
+	    Target t = Base.targetsTable.get(variant.substring(0, variant.indexOf(':')));
+	    File variantFolder = new File(t.getFolder(), "variants");
+	    variantFolder = new File(variantFolder, variant.substring(variant.indexOf(':') + 1));
+	    variantPath = variantFolder.getAbsolutePath();
       }
     }
 
-
    // 0. include paths for core + all libraries
-
    sketch.setCompilingProgress(20);
    ArrayList<String> includePaths = new ArrayList<String>();
    includePaths.add(corePath);
@@ -224,7 +215,7 @@ public class Compiler implements MessageConsumer {
    System.out.println("3. compileCore");
    System.out.println("corePath: " + corePath);
    sketch.setCompilingProgress(50);
-   compileCore(avrBasePath, buildPath, corePath, pins, pinsPath, configPreferences);
+   compileCore(avrBasePath, buildPath, corePath, variant, variantPath, configPreferences);
 
    
 /*
@@ -859,7 +850,9 @@ public class Compiler implements MessageConsumer {
 	
 	// 2. compile the libraries, outputting .o files to:
 	// <buildPath>/<library>/
-	void compileLibraries (String avrBasePath, String buildPath, ArrayList<String> includePaths, HashMap<String, String> configPreferences) 
+	void compileLibraries (String avrBasePath, String buildPath,
+			ArrayList<String> includePaths, 
+			HashMap<String, String> configPreferences) 
 		throws RunnerException 
 	{
 	System.out.println("compileLibraries: start");
@@ -883,7 +876,7 @@ public class Compiler implements MessageConsumer {
                findFilesInFolder(libraryFolder, "S", false),
                findFilesInFolder(libraryFolder, "c", false),
                findFilesInFolder(libraryFolder, "cpp", false),
-               boardPreferences));
+               configPreferences));
      outputFolder = new File(outputFolder, "utility");
      createFolder(outputFolder);
      objectFiles.addAll(
@@ -891,7 +884,7 @@ public class Compiler implements MessageConsumer {
                findFilesInFolder(utilityFolder, "S", false),
                findFilesInFolder(utilityFolder, "c", false),
                findFilesInFolder(utilityFolder, "cpp", false),
-               boardPreferences));
+               configPreferences));
      // other libraries should not see this library's utility/ folder
      includePaths.remove(includePaths.size() - 1);
    }
@@ -899,14 +892,16 @@ public class Compiler implements MessageConsumer {
 	
 	// 3. compile the core, outputting .o files to <buildPath> and then
 	// collecting them into the core.a library file.
-	void compileCore (String avrBasePath, String buildPath, String corePath, String pins, String pinsPath, HashMap<String, String> configPreferences) 
+	void compileCore (String avrBasePath, String buildPath, 
+			String corePath, String variant, String variantPath, 
+			HashMap<String, String> configPreferences) 
 		throws RunnerException 
 	{
 		System.out.println("compileCore(...) start");
 
 		ArrayList<String>  includePaths =  new ArrayList();
 	    includePaths.add(corePath); //include core path only
-        if (pinsPath != null) includePaths.add(pinsPath);
+        if (variantPath != null) includePaths.add(variantPath);
         
          //debug  includePaths
         System.out.println("includePaths: ");
@@ -952,13 +947,15 @@ public class Compiler implements MessageConsumer {
 	}
 			
 	// 4. link it all together into the .elf file
-	void compileLink(String avrBasePath, String buildPath, String corePath, ArrayList<String> includePaths, HashMap<String, String> configPreferences) 
+	void compileLink(String avrBasePath, String buildPath, 
+			String corePath, ArrayList<String> includePaths, 
+			HashMap<String, String> configPreferences) 
 		throws RunnerException 
 	{	
 	    // For atmega2560, need --relax linker option to link larger
 	    // programs correctly.
 	    String optRelax = "";
-	    if (boardPreferences.get("build.mcu").equals("atmega2560"))
+	    if (configPreferences.get("build.mcu").equals("atmega2560"))
 	      optRelax = ",--relax";
 	    
 		System.out.println("compileLink: start");

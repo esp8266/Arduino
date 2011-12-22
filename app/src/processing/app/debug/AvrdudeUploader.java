@@ -28,14 +28,10 @@ package processing.app.debug;
 
 import processing.app.Base;
 import processing.app.Preferences;
-import processing.app.Serial;
 import processing.app.SerialException;
 
 import java.io.*;
 import java.util.*;
-import java.util.zip.*;
-import javax.swing.*;
-import gnu.io.*;
 
 
 public class AvrdudeUploader extends Uploader  {
@@ -44,7 +40,6 @@ public class AvrdudeUploader extends Uploader  {
 
   public boolean uploadUsingPreferences(String buildPath, String className, boolean usingProgrammer)
   throws RunnerException, SerialException {
-    this.verbose = verbose;
     Map<String, String> boardPreferences = Base.getBoardPreferences();
 
     // if no protocol is specified for this board, assume it lacks a 

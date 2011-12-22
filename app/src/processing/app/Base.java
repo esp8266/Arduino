@@ -1654,12 +1654,11 @@ static public Map<String, String> getPlatformPreferences() {
  
 static public Map<String, String> getBoardPreferences() {
     Target target = getTarget();
-    Map map = new LinkedHashMap();
 	if (target != null) {
-	    map = target.getBoards();
-	    map = (Map) map.get(Preferences.get("board"));
+		String board = Preferences.get("board");
+	    return target.getBoards().get(board);
 	}
-    return map;
+    return new HashMap<String, String>();
   } 
 
   static public File getSketchbookFolder() {

@@ -2,7 +2,7 @@
 
 uno.name=Arduino Uno
 uno.platform=avr
-uno.upload.protocol=stk500
+uno.upload.protocol=arduino
 uno.upload.maximum_size=32256
 uno.upload.speed=115200
 uno.bootloader.low_fuses=0xff
