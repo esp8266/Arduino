@@ -26,6 +26,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 
 import javax.swing.*;
 
@@ -48,7 +49,7 @@ public class Base {
   /** Set true if this a proper release rather than a numbered revision. */
   static public boolean RELEASE = false;
 
-  static HashMap<Integer, String> platformNames = new HashMap<Integer, String>();
+  static Map<Integer, String> platformNames = new HashMap<Integer, String>();
   static {
     platformNames.put(PConstants.WINDOWS, "windows");
     platformNames.put(PConstants.MACOSX, "macosx");
@@ -78,19 +79,18 @@ public class Base {
   static private File examplesFolder;
   static private File librariesFolder;
   static private File toolsFolder;
-  static private File hardwareFolder;
 
-  static HashSet<File> libraries;
+  static Set<File> libraries;
   
   // maps imported packages to their library folder
-  static HashMap<String, File> importToLibraryTable;
+  static Map<String, File> importToLibraryTable;
 
   // classpath for all known libraries for p5
   // (both those in the p5/libs folder and those with lib subfolders
   // found in the sketchbook)
   static public String librariesClassPath;
   
-  static public HashMap<String, Target> targetsTable;
+  static public Map<String, Target> targetsTable;
 
   // Location for untitled items
   static File untitledFolder;
@@ -99,10 +99,7 @@ public class Base {
 //  static Image icon;
 
 //  int editorCount;
-//  Editor[] editors;
-  java.util.List<Editor> editors =
-    Collections.synchronizedList(new ArrayList<Editor>());
-//  ArrayList editors = Collections.synchronizedList(new ArrayList<Editor>());
+  List<Editor> editors = Collections.synchronizedList(new ArrayList<Editor>());
   Editor activeEditor;
 
 
@@ -956,17 +953,19 @@ public class Base {
     //Choose which library to add by chip platform
     
     try {
-		//Find the current target. Get the platform, and then select the correct name and core path.
-	    	String platformname = this.getBoardPreferences().get("platform");
-	    	String targetname = this.getPlatformPreferences(platformname).get("name");
-	        String libraryPath = this.getPlatformPreferences(platformname).get("library.core.path");
+		// Find the current target. Get the platform, and then select the
+		// correct name and core path.
+		String platformname = getBoardPreferences().get("platform");
+		String targetname = getPlatformPreferences(platformname)
+				.get("name");
+		String libraryPath = getPlatformPreferences(platformname).get(
+				"library.core.path");
 
 		JMenuItem platformItem = new JMenuItem(targetname);
 		platformItem.setEnabled(false);
 		importMenu.add(platformItem);
 		importMenu.addSeparator();
 		addLibraries(importMenu, getCoreLibraries(libraryPath));
-    	
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -1574,91 +1573,28 @@ public class Base {
   }
   
  
-static public Map<String, String> getPlatformPreferences() {
-	System.out.println("getPlatformPreferences() no arguments: start");
+  static public PreferencesMap getPlatformPreferences() {
     Target target = getTarget();
-    //if (target == null) return new LinkedHashMap();
-    Map map = target.getPlatforms();
-    /*
-    if (map == null)
-    {
-    	System.err.println("Error loading platforms preference from Target");
-    	System.exit(0);	
-    }
-    */
-    //if (map == null) return new LinkedHashMap();
-    map =  (Map) map.get(Preferences.get("platform"));
-    //if (map == null) return new LinkedHashMap();
-    return map;
+    Map<String, PreferencesMap> platforms = target.getPlatforms();
+    return platforms.get(Preferences.get("platform"));
   }
 
   //Get a specific platform
-  static public Map<String, String> getPlatformPreferences(String platformname) {
-	if (platformname == null) {
-		platformname = Preferences.get("platform");
-		
-	}
-	System.out.println("getlatformPreferences(String platformname)): start: platformname = " + platformname );
+  static public PreferencesMap getPlatformPreferences(String platformName) {
+	if (platformName == null)
+		platformName = Preferences.get("platform");
   	Target target = getTarget();
-	if (target == null ) {
-		System.out.println("get target is null. trouble! ");
-	}
-        Map map = target.getPlatforms();
-        map =  (Map) map.get(platformname);
-
-	//What if null or defaults to nonexisent platform
-	System.out.println("PlatformName: " + platformname);
-	 if (map == null)
-    	{   
-        	System.err.println("Error loading platforms preference from Target");
-        	System.exit(0);
-    	}
-
-    	return map;
+    Map<String, PreferencesMap> platforms = target.getPlatforms();
+    return platforms.get(platformName);
   }
  
-  static public Map<String, String> bogusgetBoardPreferences() {
-    System.out.println("getBoardPrefences method: start");
-    Target target = getTarget();
-    if (target == null) {
-	    System.out.println("getBoardPrefereces  method: target == null");
-	 return new LinkedHashMap();
-	}
-    Map map = target.getBoards();
-    if (map == null) {
-	System.out.println("getBoardPrefereces  method: target.getBoards() == null");
-	return new LinkedHashMap();
-	}
-    map = (Map) map.get(Preferences.get("board"));
-    if (map == null) {
-	System.out.println("getBoardPrefereces  method: Preferences.get(board)  == null");
-	return new LinkedHashMap();
-	}
-   //Debug iterate the map
-   Iterator iterator = map.entrySet().iterator();
-   while(iterator.hasNext())
-  	    {
-  	    	Map.Entry pair = (Map.Entry)iterator.next();
-  	    	if (pair.getValue() == null)
-  	    	{
-  	    		System.out.println("KeyName: " + pair.getKey() + " val: null");
-  	    	}
-  	    	else
-  	    	{
-			System.out.println("KeyName: " + pair.getKey() + " val"  +  pair.getValue());
-  	    	}
-	    }
-
-    return map;
-  }
- 
-static public Map<String, String> getBoardPreferences() {
+  static public PreferencesMap getBoardPreferences() {
     Target target = getTarget();
 	if (target != null) {
 		String board = Preferences.get("board");
 	    return target.getBoards().get(board);
 	}
-    return new HashMap<String, String>();
+    return new PreferencesMap();
   } 
 
   static public File getSketchbookFolder() {

@@ -782,17 +782,16 @@ public class Preferences {
   }
   
   //get a Map of the Preferences
-  static public Map<String, String> getMap() 
+  static public PreferencesMap getMap() 
   {
-  	Map globalpreferences = new LinkedHashMap();
-    Enumeration e = table.keys();
+  	PreferencesMap globalpreferences = new PreferencesMap();
+    Enumeration<String> e = table.keys();
 
     while (e.hasMoreElements()) 
     {
 		String key = (String) e.nextElement();
-		//System.out.println("Key: " + key + "Val: " + table.get(key));
 		String value = (String) table.get(key);
-        globalpreferences.put(key, value );              
+        globalpreferences.put(key, value);              
     }
 
 	return globalpreferences;	
