@@ -133,16 +133,19 @@ public class EditorConsole extends JScrollPane {
       // The files and folders are not deleted on exit because they may be 
       // needed for debugging or bug reporting.
       tempFolder = Base.createTempFolder("console");
+      tempFolder.deleteOnExit();
       try {
         String outFileName = Preferences.get("console.output.file");
         if (outFileName != null) {
           outFile = new File(tempFolder, outFileName);
+          outFile.deleteOnExit();
           stdoutFile = new FileOutputStream(outFile);
         }
 
         String errFileName = Preferences.get("console.error.file");
         if (errFileName != null) {
           errFile = new File(tempFolder, errFileName);
+          errFile.deleteOnExit();
           stderrFile = new FileOutputStream(errFile);
         }
       } catch (IOException e) {
