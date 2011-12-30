@@ -29,22 +29,22 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import processing.app.PreferencesMap;
+import processing.app.helpers.PreferencesMap;
 
-public class Target {
+public class TargetPlatform {
 	private String name;
 	private File folder;
 	private Map<String, PreferencesMap> boards;
 	private Map<String, PreferencesMap> programmers;
-	private Map<String, PreferencesMap> platforms;
+	private PreferencesMap platform;
 
-	public Target(String _name, File _folder) {
-		System.out.println("Target: constructor start, name: " + _name);
+	public TargetPlatform(String _name, File _folder) {
+		System.out.println("TargetPlatform: constructor start, name: " + _name);
 		name = _name;
 		folder = _folder;
 		boards = new HashMap<String, PreferencesMap>();
 		programmers = new HashMap<String, PreferencesMap>();
-		platforms = new HashMap<String, PreferencesMap>();
+		platform = new PreferencesMap();
 
 		try {
 			File boardsFile = new File(_folder, "boards.txt");
@@ -59,11 +59,8 @@ public class Target {
 
 		try {
 			File platformsFile = new File(_folder, "platforms.txt");
-			if (platformsFile.exists()) {
-				PreferencesMap platformPreferences = new PreferencesMap();
-				platformPreferences.load(platformsFile);
-				platforms = platformPreferences.createFirstLevelMap();
-			}
+			if (platformsFile.exists())
+				platform.load(platformsFile);
 		} catch (Exception e) {
 			System.err.println("Error loading platforms from platform.txt: "
 					+ e);
@@ -99,7 +96,7 @@ public class Target {
 		return programmers;
 	}
 
-	public Map<String, PreferencesMap> getPlatforms() {
-		return platforms;
+	public PreferencesMap getPlatform() {
+		return platform;
 	}
 }

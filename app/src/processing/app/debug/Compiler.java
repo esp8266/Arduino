@@ -36,11 +36,11 @@ import java.util.List;
 import java.util.Map;
 
 import processing.app.Base;
-import processing.app.PreferencesMap;
 import processing.app.I18n;
 import processing.app.Preferences;
 import processing.app.Sketch;
 import processing.app.SketchCode;
+import processing.app.helpers.PreferencesMap;
 import processing.core.PApplet;
 
 public class Compiler implements MessageConsumer {
@@ -82,103 +82,102 @@ public class Compiler implements MessageConsumer {
     PreferencesMap boardPreferences = Base.getBoardPreferences();
     
    	// Check for null platform, and use system default if not found
-    PreferencesMap platformPreferences;
-	String platform = boardPreferences.get("platform");
-	if (platform == null)
-	  platformPreferences = Base.getPlatformPreferences();
-	else
-	  platformPreferences = Base.getPlatformPreferences(platform);
-	
-	// Merge all the global preference configuration
-	PreferencesMap configPreferences = new PreferencesMap();
-	configPreferences.putAll(Preferences.getMap());
-	configPreferences.putAll(platformPreferences);
-	configPreferences.putAll(boardPreferences);
-	for (String k : configPreferences.keySet()) {
-		if (configPreferences.get(k)==null)
-			configPreferences.put(k, "");
-	}
-   
-	String avrBasePath = configPreferences.get("compiler.path");
-	if (avrBasePath == null) 
-	{
-		avrBasePath = Base.getAvrBasePath();
-		System.out.println("avrBasePath: " + avrBasePath);
-	}
-	else
-	{
-	    System.out.println("avrBasePath:exists: " + avrBasePath);
+		String platform = boardPreferences.get("platform");
+		PreferencesMap platformPreferences;
+		if (platform == null)
+			platformPreferences = Base.getPlatformPreferences();
+		else
+			platformPreferences = Base.getPlatformPreferences(platform);
 
-		//Put in the system path in the compiler path if available
-		MessageFormat compileFormat = new MessageFormat(avrBasePath);	
-		String basePath = System.getProperty("user.dir");
-		if (Base.isMacOS()) {
-			//logger.debug("basePath: " + basePath);
-			basePath += "/Arduino.app/Contents/Resources/Java";
+		// Merge all the global preference configuration
+		PreferencesMap configPreferences = new PreferencesMap();
+		configPreferences.putAll(Preferences.getMap());
+		configPreferences.putAll(platformPreferences);
+		configPreferences.putAll(boardPreferences);
+		for (String k : configPreferences.keySet()) {
+			if (configPreferences.get(k) == null)
+				configPreferences.put(k, "");
 		}
-		Object[] Args = {basePath};
-		avrBasePath = compileFormat.format(  Args );
-	    System.out.println("avrBasePath:new: " + avrBasePath);
-	}
-	board = configPreferences.get("board");
-	if (board == "")
-		board = "_UNKNOWN";
-    
-	String core = configPreferences.get("build.core");
-    if (core == null) {
-      RunnerException re = new RunnerException(_("No board selected; please choose a board from the Tools > Board menu."));
-      re.hideStackTrace();
-      throw re;
-    }
 
-    String corePath;
-    if (core.indexOf(':') == -1) {
-      Target t = Base.getTarget();
-      File coreFolder = new File(new File(t.getFolder(), "cores"), core);
-      corePath = coreFolder.getAbsolutePath();
+		String avrBasePath = configPreferences.get("compiler.path");
+		if (avrBasePath == null) {
+			avrBasePath = Base.getAvrBasePath();
+			System.out.println("avrBasePath: " + avrBasePath);
+		} else {
+			System.out.println("avrBasePath:exists: " + avrBasePath);
+
+			// Put in the system path in the compiler path if available
+			MessageFormat compileFormat = new MessageFormat(avrBasePath);
+			String basePath = System.getProperty("user.dir");
+			if (Base.isMacOS()) {
+				// logger.debug("basePath: " + basePath);
+				basePath += "/Arduino.app/Contents/Resources/Java";
+			}
+			Object[] Args = { basePath };
+			avrBasePath = compileFormat.format(Args);
+			System.out.println("avrBasePath:new: " + avrBasePath);
+		}
+		board = configPreferences.get("board");
+		if (board == "")
+			board = "_UNKNOWN";
+
+		String core = configPreferences.get("build.core");
+		if (core == null) {
+			RunnerException re = new RunnerException(
+					_("No board selected; please choose a board from the Tools > Board menu."));
+			re.hideStackTrace();
+			throw re;
+		}
+
+    File coreFolder;
+    if (!core.contains(":")) {
+      TargetPlatform t = Base.getTarget();
+      coreFolder = new File(t.getFolder(), "cores");
+      coreFolder = new File(coreFolder, core);
     } else {
-      Target t = Base.targetsTable.get(core.substring(0, core.indexOf(':')));
-      File coreFolder = new File(t.getFolder(), "cores");
-      coreFolder = new File(coreFolder, core.substring(core.indexOf(':') + 1));
-      corePath = coreFolder.getAbsolutePath();
+    	String[] split = core.split(":", 3);
+    	TargetPlatform t = Base.getTargetPlatform(split[0], split[1]);
+      coreFolder = new File(t.getFolder(), "cores");
+      coreFolder = new File(coreFolder, split[2]);
     }
+    String corePath = coreFolder.getAbsolutePath();
 
     String variant = boardPreferences.get("build.variant");
     String variantPath = null;
-    if (variant != null) {
-      if (variant.indexOf(':') == -1) {
-	    Target t = Base.getTarget();
-	    File variantFolder = new File(new File(t.getFolder(), "variants"), variant);
-	    variantPath = variantFolder.getAbsolutePath();
-      } else {
-	    Target t = Base.targetsTable.get(variant.substring(0, variant.indexOf(':')));
-	    File variantFolder = new File(t.getFolder(), "variants");
-	    variantFolder = new File(variantFolder, variant.substring(variant.indexOf(':') + 1));
-	    variantPath = variantFolder.getAbsolutePath();
-      }
-    }
+		if (variant != null) {
+			File variantFolder;
+			if (!variant.contains(":")) {
+				TargetPlatform t = Base.getTarget();
+				variantFolder = new File(t.getFolder(), "variants");
+				variantFolder = new File(variantFolder, variant);
+			} else {
+				String[] split = variant.split(":");
+				TargetPlatform t = Base.getTargetPlatform(split[0], split[1]);
+				variantFolder = new File(t.getFolder(), "variants");
+				variantFolder = new File(variantFolder, split[2]);
+			}
+			variantPath = variantFolder.getAbsolutePath();
+		}
 
-   // 0. include paths for core + all libraries
-   sketch.setCompilingProgress(20);
-   List<String> includePaths = new ArrayList<String>();
-   includePaths.add(corePath);
-   if (variantPath != null) 
-	 includePaths.add(variantPath);
-   for (File file : sketch.getImportedLibraries())
-     includePaths.add(file.getPath());
+		// 0. include paths for core + all libraries
+		sketch.setCompilingProgress(20);
+		List<String> includePaths = new ArrayList<String>();
+		includePaths.add(corePath);
+		if (variantPath != null)
+			includePaths.add(variantPath);
+		for (File file : sketch.getImportedLibraries())
+			includePaths.add(file.getPath());
 
-   // 1. compile the sketch (already in the buildPath)
-   System.out.println("1. compileSketch");
-   sketch.setCompilingProgress(30);
-   compileSketch(avrBasePath, _buildPath, includePaths, configPreferences);
+		// 1. compile the sketch (already in the buildPath)
+		System.out.println("1. compileSketch");
+		sketch.setCompilingProgress(30);
+		compileSketch(avrBasePath, _buildPath, includePaths, configPreferences);
 
-   // 2. compile the libraries, outputting .o files to: <buildPath>/<library>/
-   		// 2. compile the libraries, outputting .o files to:
-		// <buildPath>/<library>/
-		//Doesn't really use configPreferences
-    System.out.println("2. compileLibraries");
-    sketch.setCompilingProgress(40);
-    compileLibraries(avrBasePath, _buildPath, includePaths, configPreferences);
+		// 2. compile the libraries, outputting .o files to: <buildPath>/<library>/
+		// Doesn't really use configPreferences
+		System.out.println("2. compileLibraries");
+		sketch.setCompilingProgress(40);
+		compileLibraries(avrBasePath, _buildPath, includePaths, configPreferences);
 /*
 
    for (File libraryFolder : sketch.getImportedLibraries()) {
@@ -206,13 +205,13 @@ public class Compiler implements MessageConsumer {
    }
 */
 
-   // 3. compile the core, outputting .o files to <buildPath> and then
-   // collecting them into the core.a library file.
-   System.out.println("3. compileCore");
-   System.out.println("corePath: " + corePath);
-   sketch.setCompilingProgress(50);
-   compileCore(avrBasePath, _buildPath, corePath, variant, variantPath, configPreferences);
-
+		// 3. compile the core, outputting .o files to <buildPath> and then
+		// collecting them into the core.a library file.
+		System.out.println("3. compileCore");
+		System.out.println("corePath: " + corePath);
+		sketch.setCompilingProgress(50);
+		compileCore(avrBasePath, _buildPath, corePath, variant, variantPath,
+				configPreferences);
    
 /*
   includePaths.clear();
@@ -237,10 +236,11 @@ public class Compiler implements MessageConsumer {
      execAsynchronously(commandAR);
    }
 */
-    // 4. link it all together into the .elf file
-    sketch.setCompilingProgress(60);
-    System.out.println("4. compileLink");
-    compileLink(avrBasePath, _buildPath, corePath, includePaths, configPreferences);
+		// 4. link it all together into the .elf file
+		sketch.setCompilingProgress(60);
+		System.out.println("4. compileLink");
+		compileLink(avrBasePath, _buildPath, corePath, includePaths,
+				configPreferences);
 
 /*
     List baseCommandLinker = new ArrayList(Arrays.asList(new String[] {
@@ -271,8 +271,8 @@ public class Compiler implements MessageConsumer {
     List commandObjcopy;
 */
 
-    // 5. extract EEPROM data (from EEMEM directive) to .eep file.
-    sketch.setCompilingProgress(70);
+		// 5. extract EEPROM data (from EEMEM directive) to .eep file.
+		sketch.setCompilingProgress(70);
 /*
     commandObjcopy = new ArrayList(baseCommandObjcopy);
     commandObjcopy.add(2, "ihex");
@@ -286,11 +286,11 @@ public class Compiler implements MessageConsumer {
     commandObjcopy.add(buildPath + File.separator + primaryClassName + ".eep");
     execAsynchronously(commandObjcopy);
 */
-    System.out.println("5. compileEep");
-    compileEep(avrBasePath, _buildPath, includePaths, configPreferences);
-    
-    // 6. build the .hex file
-    sketch.setCompilingProgress(80);
+		System.out.println("5. compileEep");
+		compileEep(avrBasePath, _buildPath, includePaths, configPreferences);
+
+		// 6. build the .hex file
+		sketch.setCompilingProgress(80);
 /*
     commandObjcopy = new ArrayList(baseCommandObjcopy);
     commandObjcopy.add(2, "ihex");
@@ -299,13 +299,12 @@ public class Compiler implements MessageConsumer {
     commandObjcopy.add(buildPath + File.separator + primaryClassName + ".hex");
     execAsynchronously(commandObjcopy);
 */
-    System.out.println("6. compileHex");
-    compileHex(avrBasePath, _buildPath, includePaths, configPreferences);
-    
-    sketch.setCompilingProgress(90);
-    return true;
-  }
+		System.out.println("6. compileHex");
+		compileHex(avrBasePath, _buildPath, includePaths, configPreferences);
 
+		sketch.setCompilingProgress(90);
+		return true;
+	}
 
   private List<File> compileFiles(String avrBasePath,
                                   String buildPath, List<String> includePaths,
@@ -425,22 +424,20 @@ public class Compiler implements MessageConsumer {
    */
   private void execAsynchronously(String[] command) throws RunnerException {
       
-    //eliminate any empty array entries
-    List<String> stringList = new ArrayList<String>();
-    for(String string : command) {
-  	 string = string.trim();
-     if(string != null && string.length() > 0) {
-       stringList.add(string);
-    }
-   }
-   command = stringList.toArray(new String[stringList.size()]);
+		// eliminate any empty array entries
+		List<String> stringList = new ArrayList<String>();
+		for (String string : command) {
+			string = string.trim();
+			if (!string.isEmpty())
+				stringList.add(string);
+		}
+		command = stringList.toArray(new String[stringList.size()]);
    
     int result = 0;
     
     if (verbose || Preferences.getBoolean("build.verbose")) {
-      for(int j = 0; j < command.length; j++) {
-        System.out.print(command[j] + " ");
-      }
+      for (String c : command)
+        System.out.print(c + " ");
       System.out.println();
     }
 
@@ -483,18 +480,18 @@ public class Compiler implements MessageConsumer {
     //System.out.println("throwing up " + exception);
     if (exception != null) { throw exception; }
 
-    if (result > 1) {
-      // a failure in the tool (e.g. unable to locate a sub-executable)
-      System.err.println(
-	  I18n.format(_("{0} returned {1}"), command[0], result));
-    }
+		if (result > 1) {
+			// a failure in the tool (e.g. unable to locate a sub-executable)
+			System.err
+					.println(I18n.format(_("{0} returned {1}"), command[0], result));
+		}
 
-    if (result != 0) {
-      RunnerException re = new RunnerException(_("Error compiling."));
-      re.hideStackTrace();
-      throw re;
-    }
-    System.out.println("execAsync: Done.");
+		if (result != 0) {
+			RunnerException re = new RunnerException(_("Error compiling."));
+			re.hideStackTrace();
+			throw re;
+		}
+		System.out.println("execAsync: Done.");
   }
 
 

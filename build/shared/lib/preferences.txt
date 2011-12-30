@@ -237,9 +237,9 @@ run.present.exclusive = false
 run.present.exclusive.macosx = true
 
 # ARDUINO PREFERENCES
+target_package = arduino
+target_platform = avr
 board = uno
-target = arduino
-platform = avr
 software=ARDUINO
 
 programmer = arduino:avrispmkii

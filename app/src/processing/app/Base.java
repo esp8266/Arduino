@@ -31,7 +31,10 @@ import java.util.List;
 import javax.swing.*;
 
 import processing.app.debug.Compiler;
-import processing.app.debug.Target;
+import processing.app.debug.TargetPackage;
+import processing.app.debug.TargetPlatform;
+import processing.app.helpers.PreferencesMap;
+import processing.app.helpers.filefilters.OnlyDirs;
 import processing.core.*;
 import static processing.app.I18n._;
 
@@ -90,7 +93,7 @@ public class Base {
   // found in the sketchbook)
   static public String librariesClassPath;
   
-  static public Map<String, Target> targetsTable;
+  static public Map<String, TargetPackage> targetsTable;
 
   // Location for untitled items
   static File untitledFolder;
@@ -267,7 +270,7 @@ public class Base {
       }
     }
     
-    targetsTable = new HashMap<String, Target>();
+    targetsTable = new HashMap<String, TargetPackage>();
     loadHardware(getHardwareFolder());
     loadHardware(getSketchbookHardwareFolder());
 
@@ -939,52 +942,51 @@ public class Base {
   }
 
 
-  public void rebuildImportMenu(JMenu importMenu) {
-    //System.out.println("rebuilding import menu");
-    importMenu.removeAll();
+	public void rebuildImportMenu(JMenu importMenu) {
+		// System.out.println("rebuilding import menu");
+		importMenu.removeAll();
 
-    // reset the set of libraries
-    libraries = new HashSet<File>();
+		// reset the set of libraries
+		libraries = new HashSet<File>();
 
-    // reset the table mapping imports to libraries
-    importToLibraryTable = new HashMap<String, File>();
+		// reset the table mapping imports to libraries
+		importToLibraryTable = new HashMap<String, File>();
 
-    // Add from the "libraries" subfolder in the Processing directory
-    //Choose which library to add by chip platform
-    
-    try {
-		// Find the current target. Get the platform, and then select the
-		// correct name and core path.
-		String platformname = getBoardPreferences().get("platform");
-		String targetname = getPlatformPreferences(platformname)
-				.get("name");
-		String libraryPath = getPlatformPreferences(platformname).get(
-				"library.core.path");
+		// Add from the "libraries" subfolder in the Processing directory
+		// Choose which library to add by chip platform
 
-		JMenuItem platformItem = new JMenuItem(targetname);
-		platformItem.setEnabled(false);
-		importMenu.add(platformItem);
-		importMenu.addSeparator();
-		addLibraries(importMenu, getCoreLibraries(libraryPath));
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    // Add libraries found in the sketchbook folder
-    int separatorIndex = importMenu.getItemCount();
-    try {
-      File sketchbookLibraries = getSketchbookLibrariesFolder();
-      boolean found = addLibraries(importMenu, sketchbookLibraries);
-      if (found) {
-        JMenuItem contrib = new JMenuItem(_("Contributed"));
-        contrib.setEnabled(false);
-        importMenu.insert(contrib, separatorIndex);
-        importMenu.insertSeparator(separatorIndex);
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
+		try {
+			// Find the current target. Get the platform, and then select the
+			// correct name and core path.
+			String platformname = getBoardPreferences().get("platform");
+			String targetname = getPlatformPreferences(platformname).get("name");
+			String libraryPath = getPlatformPreferences(platformname).get(
+					"library.core.path");
 
+			JMenuItem platformItem = new JMenuItem(targetname);
+			platformItem.setEnabled(false);
+			importMenu.add(platformItem);
+			importMenu.addSeparator();
+			addLibraries(importMenu, getCoreLibraries(libraryPath));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		// Add libraries found in the sketchbook folder
+		int separatorIndex = importMenu.getItemCount();
+		try {
+			File sketchbookLibraries = getSketchbookLibrariesFolder();
+			boolean found = addLibraries(importMenu, sketchbookLibraries);
+			if (found) {
+				JMenuItem contrib = new JMenuItem(_("Contributed"));
+				contrib.setEnabled(false);
+				importMenu.insert(contrib, separatorIndex);
+				importMenu.insertSeparator(separatorIndex);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
   public void rebuildExamplesMenu(JMenu menu) {
     //System.out.println("rebuilding examples menu");
@@ -1008,64 +1010,73 @@ public class Base {
   }
 
   
-  public void rebuildBoardsMenu(JMenu menu) {
+  @SuppressWarnings("serial")
+	public void rebuildBoardsMenu(JMenu menu) {
     //System.out.println("rebuilding boards menu");
     menu.removeAll();      
     ButtonGroup group = new ButtonGroup();
-    for (Target target : targetsTable.values()) {
-      for (String board : target.getBoards().keySet()) {
-        AbstractAction action = 
-          new AbstractAction(target.getBoards().get(board).get("name")) {
-            public void actionPerformed(ActionEvent actionevent) {
-              //System.out.println("Switching to " + target + ":" + board);
-              Preferences.set("target", (String) getValue("target"));
-              Preferences.set("board", (String) getValue("board"));
-              onBoardOrPortChange();
-              Sketch.buildSettingChanged();
-              //Debug: created new imports menu based on board
-              rebuildImportMenu(activeEditor.importMenu);
-            }
-          };
-        action.putValue("target", target.getName());
-        action.putValue("board", board);
-        JMenuItem item = new JRadioButtonMenuItem(action);
-        if (target.getName().equals(Preferences.get("target")) &&
-            board.equals(Preferences.get("board"))) {
-          item.setSelected(true);
-        }
-        group.add(item);
-        menu.add(item);
-      }
-    }
+		for (TargetPackage targetPackage : targetsTable.values()) {
+			for (TargetPlatform targetPlatform : targetPackage.platforms()) {
+				for (String board : targetPlatform.getBoards().keySet()) {
+					AbstractAction action = new AbstractAction(targetPlatform.getBoards().get(
+							board).get("name")) {
+						public void actionPerformed(ActionEvent actionevent) {
+							// System.out.println("Switching to " + target + ":" + board);
+							Preferences.set("package", (String) getValue("package"));
+							Preferences.set("platform", (String) getValue("platform"));
+							Preferences.set("board", (String) getValue("board"));
+							onBoardOrPortChange();
+							Sketch.buildSettingChanged();
+							// Debug: created new imports menu based on board
+							rebuildImportMenu(activeEditor.importMenu);
+						}
+					};
+					action.putValue("package", targetPackage.getName());
+					action.putValue("platform", targetPlatform.getName());
+					action.putValue("board", board);
+					JMenuItem item = new JRadioButtonMenuItem(action);
+					if (targetPackage.getName().equals(Preferences.get("package"))
+							&& targetPlatform.getName().equals(Preferences.get("platform"))
+							&& board.equals(Preferences.get("board"))) {
+						item.setSelected(true);
+					}
+					group.add(item);
+					menu.add(item);
+				}
+			}
+		}
   }
   
   
-  public void rebuildProgrammerMenu(JMenu menu) {
+  @SuppressWarnings("serial")
+	public void rebuildProgrammerMenu(JMenu menu) {
     //System.out.println("rebuilding programmer menu");
     menu.removeAll();      
     ButtonGroup group = new ButtonGroup();
-    for (Target target : targetsTable.values()) {
-      for (String programmer : target.getProgrammers().keySet()) {
-        AbstractAction action = 
-          new AbstractAction(
-            target.getProgrammers().get(programmer).get("name")) {
-            public void actionPerformed(ActionEvent actionevent) {
-              Preferences.set("programmer", getValue("target") + ":" +
-                                            getValue("programmer"));
-            }
-          };
-        action.putValue("target", target.getName());
-        action.putValue("programmer", programmer);
-        JMenuItem item = new JRadioButtonMenuItem(action);
-        if (Preferences.get("programmer").equals(target.getName() + ":" +
-                                                 programmer)) {
-          item.setSelected(true);
-        }
-        group.add(item);
-        menu.add(item);
-      }
-    }
-  }
+		for (TargetPackage targetPackage : targetsTable.values()) {
+			for (TargetPlatform targetPlatform : targetPackage.platforms()) {
+				for (String programmer : targetPlatform.getProgrammers().keySet()) {
+					String id = targetPackage.getName() + ":" + targetPlatform.getName() + ":"
+							+ programmer;
+					AbstractAction action = new AbstractAction(targetPlatform.getProgrammers()
+							.get(programmer).get("name")) {
+						public void actionPerformed(ActionEvent actionevent) {
+							Preferences.set("programmer", "" + getValue("id"));
+						}
+					};
+//					action.putValue("package", targetPackage.getName());
+//					action.putValue("platform", targetPlatform.getName());
+//					action.putValue("programmer", programmer);
+					action.putValue("id", id);
+					JMenuItem item = new JRadioButtonMenuItem(action);
+					if (Preferences.get("programmer").equals(id))
+						item.setSelected(true);
+					group.add(item);
+					menu.add(item);
+				}
+			}
+		}
+	}
 
 
   /**
@@ -1260,14 +1271,8 @@ public class Base {
   protected void loadHardware(File folder) {
     if (!folder.isDirectory()) return;
     
-    String list[] = folder.list(new FilenameFilter() {
-      public boolean accept(File dir, String name) {
-        // skip .DS_Store files, .svn folders, etc
-        if (name.charAt(0) == '.') return false;
-        if (name.equals("CVS")) return false;
-        return (new File(dir, name).isDirectory());
-      }
-    });
+    String list[] = folder.list(new OnlyDirs());
+    
     // if a bad folder or something like that, this might come back null
     if (list == null) return;
 
@@ -1277,7 +1282,7 @@ public class Base {
     
     for (String target : list) {
       File subfolder = new File(folder, target);
-      targetsTable.put(target, new Target(target, subfolder));
+      targetsTable.put(target, new TargetPackage(target, subfolder));
     }
   }
 
@@ -1560,36 +1565,38 @@ public class Base {
   }
   
   
-  static public Target getTarget() {
-  	System.out.println("Base.targetsTable.get(Preferences.get(\"target\"))" + Base.targetsTable.get(Preferences.get("target")));
-  	System.out.println("Preferences.get(\"target\")" + Preferences.get("target"));
-  	Target target = Base.targetsTable.get(Preferences.get("target"));
-  	if (target == null) {
-  		System.out.println("default target is not in list. Replace with default.");
-  		Preferences.set("target", "arduino");
-  		target = Base.targetsTable.get(Preferences.get("target"));
+  static public TargetPlatform getTarget() {
+  	TargetPackage pack = targetsTable.get(Preferences.get("target_package"));
+  	TargetPlatform platform = pack.get(Preferences.get("target_platform"));
+  	if (platform == null) {
+  		System.out.println("Selected platform is not in list. Replace with default.");
+  		Preferences.set("target_platform", "arduino");
+  		platform = pack.get(Preferences.get("target_platform"));
   	}
-    return target;
+    return platform;
   }
   
  
   static public PreferencesMap getPlatformPreferences() {
-    Target target = getTarget();
-    Map<String, PreferencesMap> platforms = target.getPlatforms();
-    return platforms.get(Preferences.get("platform"));
+    return getTarget().getPlatform();
   }
 
-  //Get a specific platform
-  static public PreferencesMap getPlatformPreferences(String platformName) {
-	if (platformName == null)
-		platformName = Preferences.get("platform");
-  	Target target = getTarget();
-    Map<String, PreferencesMap> platforms = target.getPlatforms();
-    return platforms.get(platformName);
+  // Search for a specific platform
+  static public TargetPlatform getTargetPlatform(String pack, String platform) {
+  	return targetsTable.get(pack).get(platform);
   }
+  
+  // Get a specific platform preferences inside actual package
+	static public PreferencesMap getPlatformPreferences(String platformName) {
+		if (platformName == null)
+			platformName = Preferences.get("platform");
+  	TargetPackage pack = targetsTable.get(Preferences.get("target_package"));
+		TargetPlatform target = pack.get(platformName);
+		return target.getPlatform();
+	}
  
   static public PreferencesMap getBoardPreferences() {
-    Target target = getTarget();
+    TargetPlatform target = getTarget();
 	if (target != null) {
 		String board = Preferences.get("board");
 	    return target.getBoards().get(board);

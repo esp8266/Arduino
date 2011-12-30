@@ -21,7 +21,7 @@
 
  $Id$
  */
-package processing.app;
+package processing.app.helpers;
 
 import java.io.File;
 import java.io.FileInputStream;

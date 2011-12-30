@@ -30,6 +30,7 @@ import java.util.*;
 
 import javax.swing.*;
 
+import processing.app.helpers.PreferencesMap;
 import processing.app.syntax.*;
 import processing.core.*;
 import static processing.app.I18n._;
