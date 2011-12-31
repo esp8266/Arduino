@@ -34,7 +34,7 @@
 u8 TxLEDPulse; /**< Milliseconds remaining for data Tx LED pulse */
 u8 RxLEDPulse; /**< Milliseconds remaining for data Rx LED pulse */
 
-void Reboot();
+void Reset();
 
 //==================================================================
 //==================================================================
@@ -500,7 +500,7 @@ int USBGetChar()
 		} 
 
 		if (!--_timeout) {
-			Reboot();	// USB not connected, run firmware
+			Reset();	
 		}
 		
 		_delay_us(100);	// stretch out the bootloader period to about 5 seconds after enumeration

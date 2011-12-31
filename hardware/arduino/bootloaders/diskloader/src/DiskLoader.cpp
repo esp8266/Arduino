@@ -56,7 +56,7 @@ void Program(u8 ep, u16 page, u8 count)
     boot_rww_enable ();
 }
 
-
+void StartSketch();
 int USBGetChar();
 #define getch USBGetChar
 
@@ -111,10 +111,15 @@ int main(void) __attribute__ ((naked));
 //	STK500v1 main loop, very similar to optiboot in protocol and implementation
 int main()
 {
+	uint8_t MCUSR_state = MCUSR;	// store the reason for the reset
+	MCUSR &= ~(1 << WDRF);			// must clear the watchdog reset flag before disabling and reenabling WDT
 	wdt_disable();
 	TXLED0;
 	RXLED0;
-	LED0;
+	LED0;		
+	if (MCUSR_state & (1<<WDRF) && (pgm_read_word(0) != -1)) {
+		StartSketch();				// if the reset was caused by WDT and if a sketch is already present then run the sketch instead of the bootloader
+	}	
 	BOARD_INIT();
 	USBInit();
 
@@ -225,7 +230,7 @@ void LEDPulse()
 		LED1;
 }
 
-void Reboot()
+void StartSketch()
 {
 	TXLED0;		// switch off the RX and TX LEDs before starting the user sketch
 	RXLED0;
@@ -236,4 +241,11 @@ void Reboot()
 		"clr r31\n"
 		"ijmp\n"
 	::);
+}
+
+void Reset() 
+{
+	wdt_enable(WDTO_15MS);
+	for (;;) 
+		;
 }
