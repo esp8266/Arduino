@@ -73,8 +73,8 @@ extern "C"{
 #define noInterrupts() cli()
 
 #define clockCyclesPerMicrosecond() ( F_CPU / 1000000L )
-#define clockCyclesToMicroseconds(a) ( ((a) * 1000L) / (F_CPU / 1000L) )
-#define microsecondsToClockCycles(a) ( ((a) * (F_CPU / 1000L)) / 1000L )
+#define clockCyclesToMicroseconds(a) ( (a) / clockCyclesPerMicrosecond() )
+#define microsecondsToClockCycles(a) ( (a) * clockCyclesPerMicrosecond() )
 
 #define lowByte(w) ((uint8_t) ((w) & 0xff))
 #define highByte(w) ((uint8_t) ((w) >> 8))
