@@ -1587,13 +1587,13 @@ public class Base {
   }
   
   // Get a specific platform preferences inside actual package
-	static public PreferencesMap getPlatformPreferences(String platformName) {
-		if (platformName == null)
-			platformName = Preferences.get("platform");
-  	TargetPackage pack = targetsTable.get(Preferences.get("target_package"));
-		TargetPlatform target = pack.get(platformName);
-		return target.getPlatform();
-	}
+  static public PreferencesMap getPlatformPreferences(String platformName) {
+    if (platformName == null)
+      platformName = Preferences.get("platform");
+    TargetPackage pack = targetsTable.get(Preferences.get("target_package"));
+    TargetPlatform target = pack.get(platformName);
+    return target.getPlatform();
+  }
  
   static public PreferencesMap getBoardPreferences() {
     TargetPlatform target = getTarget();

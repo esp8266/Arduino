@@ -135,10 +135,11 @@ public class Compiler implements MessageConsumer {
       coreFolder = new File(t.getFolder(), "cores");
       coreFolder = new File(coreFolder, core);
     } else {
-    	String[] split = core.split(":", 3);
-    	TargetPlatform t = Base.getTargetPlatform(split[0], split[1]);
+      String[] split = core.split(":", 2);
+      TargetPlatform t = Base.getTargetPlatform(split[0], Preferences
+          .get("target_platform"));
       coreFolder = new File(t.getFolder(), "cores");
-      coreFolder = new File(coreFolder, split[2]);
+      coreFolder = new File(coreFolder, split[1]);
     }
     String corePath = coreFolder.getAbsolutePath();
 
@@ -151,10 +152,11 @@ public class Compiler implements MessageConsumer {
         variantFolder = new File(t.getFolder(), "variants");
         variantFolder = new File(variantFolder, variant);
       } else {
-        String[] split = variant.split(":");
-        TargetPlatform t = Base.getTargetPlatform(split[0], split[1]);
+        String[] split = variant.split(":", 2);
+        TargetPlatform t = Base.getTargetPlatform(split[0], Preferences
+            .get("target_platform"));
         variantFolder = new File(t.getFolder(), "variants");
-        variantFolder = new File(variantFolder, split[2]);
+        variantFolder = new File(variantFolder, split[1]);
       }
       variantPath = variantFolder.getAbsolutePath();
     }

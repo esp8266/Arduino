@@ -49,9 +49,10 @@ public class AvrdudeUploader extends Uploader  {
       TargetPlatform targetPlatform = Base.getTarget();
 
       if (programmer.contains(":")) {
-      	String[] split = programmer.split(":");
-      	targetPlatform = Base.getTargetPlatform(split[0], split[1]);
-        programmer = split[2];
+        String[] split = programmer.split(":", 2);
+        targetPlatform = Base.getTargetPlatform(split[0], Preferences
+            .get("target_platform"));
+        programmer = split[1];
       }
       
       Collection<String> params = getProgrammerCommands(targetPlatform, programmer);
@@ -91,9 +92,10 @@ public class AvrdudeUploader extends Uploader  {
     String programmer = Preferences.get("programmer");
     TargetPlatform targetPlatform = Base.getTarget();
     if (programmer.contains(":")) {
-    	String[] split = programmer.split(":");
-    	targetPlatform = Base.getTargetPlatform(split[0], split[1]);
-      programmer = split[2];
+      String[] split = programmer.split(":", 2);
+      targetPlatform = Base.getTargetPlatform(split[0], Preferences
+          .get("target_platform"));
+      programmer = split[1];
     }
     return burnBootloader(getProgrammerCommands(targetPlatform, programmer));
   }
@@ -146,24 +148,25 @@ public class AvrdudeUploader extends Uploader  {
     List<String> bootloader = new ArrayList<String>();
     String bootloaderPath = boardPreferences.get("bootloader.path");
     
-		if (bootloaderPath != null) {
-			TargetPlatform targetPlatform;
-			if (bootloaderPath.contains(":")) {
-				// the current target (associated with the board)
-				targetPlatform = Base.getTarget();
-			} else {
-				String[] split = bootloaderPath.split(":", 3);
-				targetPlatform = Base.getTargetPlatform(split[0], split[1]);
-				bootloaderPath = split[2];
-			}
+    if (bootloaderPath != null) {
+      TargetPlatform targetPlatform;
+      if (bootloaderPath.contains(":")) {
+        // the current target (associated with the board)
+        targetPlatform = Base.getTarget();
+      } else {
+        String[] split = bootloaderPath.split(":", 2);
+        targetPlatform = Base.getTargetPlatform(split[0], Preferences
+            .get("target_platform"));
+        bootloaderPath = split[1];
+      }
 
-			File bootloadersFile = new File(targetPlatform.getFolder(), "bootloaders");
-			File bootloaderFile = new File(bootloadersFile, bootloaderPath);
-			bootloaderPath = bootloaderFile.getAbsolutePath();
+      File bootloadersFile = new File(targetPlatform.getFolder(), "bootloaders");
+      File bootloaderFile = new File(bootloadersFile, bootloaderPath);
+      bootloaderPath = bootloaderFile.getAbsolutePath();
 
-			bootloader.add("-Uflash:w:" + bootloaderPath + File.separator
-					+ boardPreferences.get("bootloader.file") + ":i");
-		}
+      bootloader.add("-Uflash:w:" + bootloaderPath + File.separator +
+          boardPreferences.get("bootloader.file") + ":i");
+    }
     if (boardPreferences.get("bootloader.lock_bits") != null)
       bootloader.add("-Ulock:w:" + boardPreferences.get("bootloader.lock_bits") + ":m");
 
