@@ -28,6 +28,7 @@ package processing.app.debug;
  * An exception with a line number attached that occurs
  * during either compile time or run time.
  */
+@SuppressWarnings("serial")
 public class RunnerException extends Exception /*RuntimeException*/ {
   protected String message;
   protected int codeIndex;
@@ -64,6 +65,10 @@ public class RunnerException extends Exception /*RuntimeException*/ {
   }
   
   
+  public RunnerException(Exception e) {
+    this(e.getMessage(), true);
+  }
+
   /** 
    * Override getMessage() in Throwable, so that I can set 
    * the message text outside the constructor.

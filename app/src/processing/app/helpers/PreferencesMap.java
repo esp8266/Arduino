@@ -35,6 +35,14 @@ import processing.core.PApplet;
 
 public class PreferencesMap extends HashMap<String, String> {
 
+	public PreferencesMap(PreferencesMap prefs) {
+		super(prefs);
+	}
+
+	public PreferencesMap() {
+		super();
+	}
+
 	/**
 	 * Parse a property list file and put kev/value pairs into the Map
 	 * 
@@ -67,6 +75,32 @@ public class PreferencesMap extends HashMap<String, String> {
 		}
 	}
 
+	/**
+	 * Create a new Map<String, PreferenceMap> where the keys are the first level
+	 * of the current mapping. E.g. the folowing mapping:<br />
+	 * 
+	 * <pre>
+	 * Map (
+	 *     alpha.some.keys = v1
+	 *     alpha.other.keys = v2
+	 *     beta.some.keys = v3
+	 *   )
+	 * </pre>
+	 * 
+	 * will generate the following result:
+	 * 
+	 * <pre>
+	 * alpha = Map(
+	 *     some.keys = v1
+	 *     other.keys = v2
+	 *   )
+	 * beta = Map(
+	 *     some.keys = v3
+	 *   )
+	 * </pre>
+	 * 
+	 * @return
+	 */
 	public Map<String, PreferencesMap> createFirstLevelMap() {
 		Map<String, PreferencesMap> res = new HashMap<String, PreferencesMap>();
 		for (String key : keySet()) {
@@ -80,6 +114,41 @@ public class PreferencesMap extends HashMap<String, String> {
 			if (!res.containsKey(parent))
 				res.put(parent, new PreferencesMap());
 			res.get(parent).put(child, get(key));
+		}
+		return res;
+	}
+
+	/**
+	 * Create a new PreferenceMap using a subtree of the current mapping. E.g.
+	 * with the folowing mapping:<br />
+	 * 
+	 * <pre>
+	 * Map (
+	 *     alpha.some.keys = v1
+	 *     alpha.other.keys = v2
+	 *     beta.some.keys = v3
+	 *   )
+	 * </pre>
+	 * 
+	 * a call to createSubTree("alpha") will generate the following result:
+	 * 
+	 * <pre>
+	 * Map(
+	 *     some.keys = v1
+	 *     other.keys = v2
+	 *   )
+	 * </pre>
+	 * 
+	 * @param parent
+	 * @return
+	 */
+	public PreferencesMap createSubTree(String parent) {
+		PreferencesMap res = new PreferencesMap();
+		parent += ".";
+		int parentLen = parent.length();
+		for (String key : keySet()) {
+			if (key.startsWith(parent))
+				res.put(key.substring(parentLen), get(key));
 		}
 		return res;
 	}
