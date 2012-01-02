@@ -46,7 +46,7 @@ public class AvrdudeUploader extends Uploader  {
     // bootloader and upload using the selected programmer.
     if (usingProgrammer || boardPreferences.get("upload.protocol") == null) {
       String programmer = Preferences.get("programmer");
-      TargetPlatform targetPlatform = Base.getTarget();
+      TargetPlatform targetPlatform = Base.getTargetPlatform();
 
       if (programmer.contains(":")) {
         String[] split = programmer.split(":", 2);
@@ -90,7 +90,7 @@ public class AvrdudeUploader extends Uploader  {
   
   public boolean burnBootloader() throws RunnerException {
     String programmer = Preferences.get("programmer");
-    TargetPlatform targetPlatform = Base.getTarget();
+    TargetPlatform targetPlatform = Base.getTargetPlatform();
     if (programmer.contains(":")) {
       String[] split = programmer.split(":", 2);
       targetPlatform = Base.getTargetPlatform(split[0], Preferences
@@ -152,7 +152,7 @@ public class AvrdudeUploader extends Uploader  {
       TargetPlatform targetPlatform;
       if (bootloaderPath.contains(":")) {
         // the current target (associated with the board)
-        targetPlatform = Base.getTarget();
+        targetPlatform = Base.getTargetPlatform();
       } else {
         String[] split = bootloaderPath.split(":", 2);
         targetPlatform = Base.getTargetPlatform(split[0], Preferences

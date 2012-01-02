@@ -83,13 +83,8 @@ public class Compiler implements MessageConsumer {
 
     PreferencesMap boardPreferences = Base.getBoardPreferences();
 
-    // Check for null platform, and use system default if not found
-    String platform = boardPreferences.get("platform");
-    PreferencesMap platformPreferences;
-    if (platform == null)
-      platformPreferences = Base.getPlatformPreferences();
-    else
-      platformPreferences = Base.getPlatformPreferences(platform);
+    TargetPlatform targetPlatform = Base.getTargetPlatform();
+    PreferencesMap platformPreferences = targetPlatform.getPreferences();
 
     // Merge all the global preference configuration in order of priority
     prefs = new PreferencesMap();
@@ -104,10 +99,7 @@ public class Compiler implements MessageConsumer {
     toolsPath = prefs.get("compiler.path");
     if (toolsPath == null) {
       toolsPath = Base.getAvrBasePath();
-      System.out.println("avrBasePath: " + toolsPath);
     } else {
-      System.out.println("avrBasePath:exists: " + toolsPath);
-
       // Put in the system path in the compiler path if available
       MessageFormat compileFormat = new MessageFormat(toolsPath);
       String basePath = System.getProperty("user.dir");
@@ -131,7 +123,7 @@ public class Compiler implements MessageConsumer {
 
     File coreFolder;
     if (!core.contains(":")) {
-      TargetPlatform t = Base.getTarget();
+      TargetPlatform t = Base.getTargetPlatform();
       coreFolder = new File(t.getFolder(), "cores");
       coreFolder = new File(coreFolder, core);
     } else {
@@ -148,7 +140,7 @@ public class Compiler implements MessageConsumer {
     if (variant != null) {
       File variantFolder;
       if (!variant.contains(":")) {
-        TargetPlatform t = Base.getTarget();
+        TargetPlatform t = Base.getTargetPlatform();
         variantFolder = new File(t.getFolder(), "variants");
         variantFolder = new File(variantFolder, variant);
       } else {

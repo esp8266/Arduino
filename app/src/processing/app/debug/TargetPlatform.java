@@ -34,7 +34,7 @@ public class TargetPlatform {
   private File folder;
   private Map<String, PreferencesMap> boards;
   private Map<String, PreferencesMap> programmers;
-  private PreferencesMap platform;
+  private PreferencesMap preferences;
 
   public TargetPlatform(String _name, File _folder) {
     System.out.println("TargetPlatform: constructor start, name: " + _name);
@@ -42,7 +42,7 @@ public class TargetPlatform {
     folder = _folder;
     boards = new HashMap<String, PreferencesMap>();
     programmers = new HashMap<String, PreferencesMap>();
-    platform = new PreferencesMap();
+    preferences = new PreferencesMap();
 
     try {
       File boardsFile = new File(_folder, "boards.txt");
@@ -58,7 +58,7 @@ public class TargetPlatform {
     try {
       File platformsFile = new File(_folder, "platforms.txt");
       if (platformsFile.exists())
-        platform.load(platformsFile);
+        preferences.load(platformsFile);
     } catch (Exception e) {
       System.err.println("Error loading platforms from platform.txt: " + e);
     }
@@ -92,7 +92,7 @@ public class TargetPlatform {
     return programmers;
   }
 
-  public PreferencesMap getPlatform() {
-    return platform;
+  public PreferencesMap getPreferences() {
+    return preferences;
   }
 }
