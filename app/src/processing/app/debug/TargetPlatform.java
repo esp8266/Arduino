@@ -1,7 +1,6 @@
 /* -*- mode: jde; c-basic-offset: 2; indent-tabs-mode: nil -*- */
-
 /*
- Target - represents a hardware platform
+ TargetPlatform - Represents a hardware platform
  Part of the Arduino project - http://www.arduino.cc/
 
  Copyright (c) 2009 David A. Mellis
@@ -22,7 +21,6 @@
 
  $Id$
  */
-
 package processing.app.debug;
 
 import java.io.File;
@@ -32,71 +30,69 @@ import java.util.Map;
 import processing.app.helpers.PreferencesMap;
 
 public class TargetPlatform {
-	private String name;
-	private File folder;
-	private Map<String, PreferencesMap> boards;
-	private Map<String, PreferencesMap> programmers;
-	private PreferencesMap platform;
+  private String name;
+  private File folder;
+  private Map<String, PreferencesMap> boards;
+  private Map<String, PreferencesMap> programmers;
+  private PreferencesMap platform;
 
-	public TargetPlatform(String _name, File _folder) {
-		System.out.println("TargetPlatform: constructor start, name: " + _name);
-		name = _name;
-		folder = _folder;
-		boards = new HashMap<String, PreferencesMap>();
-		programmers = new HashMap<String, PreferencesMap>();
-		platform = new PreferencesMap();
+  public TargetPlatform(String _name, File _folder) {
+    System.out.println("TargetPlatform: constructor start, name: " + _name);
+    name = _name;
+    folder = _folder;
+    boards = new HashMap<String, PreferencesMap>();
+    programmers = new HashMap<String, PreferencesMap>();
+    platform = new PreferencesMap();
 
-		try {
-			File boardsFile = new File(_folder, "boards.txt");
-			if (boardsFile.exists()) {
-				PreferencesMap boardPreferences = new PreferencesMap();
-				boardPreferences.load(boardsFile);
-				boards = boardPreferences.createFirstLevelMap();
-			}
-		} catch (Exception e) {
-			System.err.println("Error loading boards from boards.txt: " + e);
-		}
+    try {
+      File boardsFile = new File(_folder, "boards.txt");
+      if (boardsFile.exists()) {
+        PreferencesMap boardPreferences = new PreferencesMap();
+        boardPreferences.load(boardsFile);
+        boards = boardPreferences.createFirstLevelMap();
+      }
+    } catch (Exception e) {
+      System.err.println("Error loading boards from boards.txt: " + e);
+    }
 
-		try {
-			File platformsFile = new File(_folder, "platforms.txt");
-			if (platformsFile.exists())
-				platform.load(platformsFile);
-		} catch (Exception e) {
-			System.err.println("Error loading platforms from platform.txt: "
-					+ e);
-		}
+    try {
+      File platformsFile = new File(_folder, "platforms.txt");
+      if (platformsFile.exists())
+        platform.load(platformsFile);
+    } catch (Exception e) {
+      System.err.println("Error loading platforms from platform.txt: " + e);
+    }
 
-		try {
-			File programmersFile = new File(_folder, "programmers.txt");
-			if (programmersFile.exists()) {
-				PreferencesMap prefs = new PreferencesMap();
-				prefs.load(programmersFile);
-				programmers = prefs.createFirstLevelMap();
-			}
-		} catch (Exception e) {
-			System.err
-					.println("Error loading programmers from programmers.txt: "
-							+ e);
-		}
-	}
+    try {
+      File programmersFile = new File(_folder, "programmers.txt");
+      if (programmersFile.exists()) {
+        PreferencesMap prefs = new PreferencesMap();
+        prefs.load(programmersFile);
+        programmers = prefs.createFirstLevelMap();
+      }
+    } catch (Exception e) {
+      System.err
+          .println("Error loading programmers from programmers.txt: " + e);
+    }
+  }
 
-	public String getName() {
-		return name;
-	}
+  public String getName() {
+    return name;
+  }
 
-	public File getFolder() {
-		return folder;
-	}
+  public File getFolder() {
+    return folder;
+  }
 
-	public Map<String, PreferencesMap> getBoards() {
-		return boards;
-	}
+  public Map<String, PreferencesMap> getBoards() {
+    return boards;
+  }
 
-	public Map<String, PreferencesMap> getProgrammers() {
-		return programmers;
-	}
+  public Map<String, PreferencesMap> getProgrammers() {
+    return programmers;
+  }
 
-	public PreferencesMap getPlatform() {
-		return platform;
-	}
+  public PreferencesMap getPlatform() {
+    return platform;
+  }
 }
