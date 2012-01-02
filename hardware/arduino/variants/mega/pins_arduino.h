@@ -32,31 +32,31 @@
 #define analogInputToDigitalPin(p)  ((p < 16) ? (p) + 54 : -1)
 #define digitalPinHasPWM(p)         (((p) >= 2 && (p) <= 13) || ((p) >= 44 && (p)<= 46))
 
-const static uint8_t SS   = 53;
-const static uint8_t MOSI = 51;
-const static uint8_t MISO = 50;
-const static uint8_t SCK  = 52;
+static const uint8_t SS   = 53;
+static const uint8_t MOSI = 51;
+static const uint8_t MISO = 50;
+static const uint8_t SCK  = 52;
 
-const static uint8_t SDA = 20;
-const static uint8_t SCL = 21;
-const static uint8_t LED_BUILTIN = 13;
+static const uint8_t SDA = 20;
+static const uint8_t SCL = 21;
+static const uint8_t LED_BUILTIN = 13;
 
-const static uint8_t A0 = 54;
-const static uint8_t A1 = 55;
-const static uint8_t A2 = 56;
-const static uint8_t A3 = 57;
-const static uint8_t A4 = 58;
-const static uint8_t A5 = 59;
-const static uint8_t A6 = 60;
-const static uint8_t A7 = 61;
-const static uint8_t A8 = 62;
-const static uint8_t A9 = 63;
-const static uint8_t A10 = 64;
-const static uint8_t A11 = 65;
-const static uint8_t A12 = 66;
-const static uint8_t A13 = 67;
-const static uint8_t A14 = 68;
-const static uint8_t A15 = 69;
+static const uint8_t A0 = 54;
+static const uint8_t A1 = 55;
+static const uint8_t A2 = 56;
+static const uint8_t A3 = 57;
+static const uint8_t A4 = 58;
+static const uint8_t A5 = 59;
+static const uint8_t A6 = 60;
+static const uint8_t A7 = 61;
+static const uint8_t A8 = 62;
+static const uint8_t A9 = 63;
+static const uint8_t A10 = 64;
+static const uint8_t A11 = 65;
+static const uint8_t A12 = 66;
+static const uint8_t A13 = 67;
+static const uint8_t A14 = 68;
+static const uint8_t A15 = 69;
 
 // A majority of the pins are NOT PCINTs, SO BE WARNED (i.e. you cannot use them as receive pins)
 // Only pins available for RECEIVE (TRANSMIT can be on any pin):
