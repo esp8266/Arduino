@@ -56,7 +56,7 @@ public class TargetPlatform {
     }
 
     try {
-      File platformsFile = new File(_folder, "platforms.txt");
+      File platformsFile = new File(_folder, "platform.txt");
       if (platformsFile.exists())
         preferences.load(platformsFile);
     } catch (Exception e) {
