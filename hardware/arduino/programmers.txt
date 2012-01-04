@@ -1,3 +1,5 @@
+# See: http://code.google.com/p/arduino/wiki/Platforms
+
 avrisp.name=AVR ISP
 avrisp.communication=serial
 avrisp.protocol=stk500v1
