@@ -33,16 +33,11 @@ import processing.core.*;
 import static processing.app.I18n._;
 
 import java.awt.*;
-import java.awt.event.*;
-import java.beans.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
-import java.util.zip.*;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
 
 
 /**
@@ -1132,7 +1127,7 @@ public class Sketch {
     // make sure the user didn't hide the sketch folder
     ensureExistence();
 
-    String list[] = Compiler.headerListFromIncludePath(jarPath);
+    String list[] = Base.headerListFromIncludePath(new File(jarPath));
 
     // import statements into the main sketch file (code[0])
     // if the current code is a .java file, insert into current

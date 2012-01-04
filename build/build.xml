@@ -81,11 +81,6 @@
       <fileset dir="shared/tools" />
     </copy>
     
-    <!-- copy library folder -->
-    <copy todir="${target.path}/libraries">
-      <fileset dir="../libraries" />
-    </copy>
-    
     <!-- copy hardware folder -->
     <copy todir="${target.path}/hardware">
       <fileset dir="../hardware" />

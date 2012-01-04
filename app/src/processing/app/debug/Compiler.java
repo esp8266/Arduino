@@ -28,7 +28,6 @@ import static processing.app.I18n._;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -120,7 +119,6 @@ public class Compiler implements MessageConsumer {
       re.hideStackTrace();
       throw re;
     }
-
     File coreFolder;
     if (!core.contains(":")) {
       TargetPlatform t = Base.getTargetPlatform();
@@ -536,21 +534,6 @@ public class Compiler implements MessageConsumer {
       return;
     if (!folder.mkdir())
       throw new RunnerException("Couldn't create: " + folder);
-  }
-
-  /**
-   * Given a folder, return a list of the header files in that folder (but not
-   * the header files in its sub-folders, as those should be included from
-   * within the header files at the top-level).
-   */
-  static public String[] headerListFromIncludePath(String path) {
-    FilenameFilter onlyHFiles = new FilenameFilter() {
-      public boolean accept(File dir, String name) {
-        return name.endsWith(".h");
-      }
-    };
-
-    return (new File(path)).list(onlyHFiles);
   }
 
   static public List<File> findFilesInFolder(File folder, String extension,
