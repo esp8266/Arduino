@@ -89,6 +89,10 @@ TwoWire::TwoWire(Twi *_twi, void(*_beginCb)(void)) :
 void TwoWire::begin(void) {
 	if (onBeginCallback)
 		onBeginCallback();
+
+	// Disable PDC channel
+	twi->TWI_PTCR = UART_PTCR_RXTDIS | UART_PTCR_TXTDIS;
+
 	TWI_ConfigureMaster(twi, TWI_CLOCK, VARIANT_MCK);
 	status = MASTER_IDLE;
 }
@@ -96,6 +100,10 @@ void TwoWire::begin(void) {
 void TwoWire::begin(uint8_t address) {
 	if (onBeginCallback)
 		onBeginCallback();
+
+	// Disable PDC channel
+	twi->TWI_PTCR = UART_PTCR_RXTDIS | UART_PTCR_TXTDIS;
+
 	TWI_ConfigureSlave(twi, address);
 	status = SLAVE_IDLE;
 	TWI_EnableIt(twi, TWI_IER_SVACC);
