@@ -59,7 +59,7 @@ public class PdeKeywords extends CTokenMarker {
         keywordColoring = new KeywordMap(false);
         keywordToReference = new Hashtable();
         getKeywords(Base.getLibStream("keywords.txt"));
-        for (File lib : Base.getLibraries()) {
+        for (File lib : Base.getLibraries().values()) {
           File keywords = new File(lib, "keywords.txt");
           if (keywords.exists()) getKeywords(new FileInputStream(keywords));
         }

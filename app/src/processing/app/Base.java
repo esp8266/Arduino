@@ -80,12 +80,14 @@ public class Base {
 
   // these are static because they're used by Sketch
   static private File examplesFolder;
-  static private File librariesFolder;
   static private File toolsFolder;
 
-  static Set<File> libraries;
+  static private List<File> librariesFolders;
   
-  // maps imported packages to their library folder
+  // maps library name to their library folder
+  static private Map<String, File> libraries;
+  
+  // maps #included files to their library folder
   static Map<String, File> importToLibraryTable;
 
   // classpath for all known libraries for p5
@@ -632,8 +634,6 @@ public class Base {
     // Only show .pde files as eligible bachelors
     fd.setFilenameFilter(new FilenameFilter() {
         public boolean accept(File dir, String name) {
-          // TODO this doesn't seem to ever be used. AWESOME.
-          //System.out.println("check filter on " + dir + " " + name);
           return name.toLowerCase().endsWith(".ino")
               || name.toLowerCase().endsWith(".pde");
         }
@@ -891,7 +891,6 @@ public class Base {
     JMenuItem item;
     menu.removeAll();
 
-    //System.out.println("rebuilding toolbar menu");
     // Add the single "Open" item
     item = Editor.newJMenuItem(_("Open..."), 'O');
     item.addActionListener(new ActionListener() {
@@ -905,20 +904,15 @@ public class Base {
     // Add a list of all sketches and subfolders
     try {
       boolean sketches = addSketches(menu, getSketchbookFolder(), true);
-      //boolean sketches = addSketches(menu, getSketchbookFolder());
       if (sketches) menu.addSeparator();
     } catch (IOException e) {
       e.printStackTrace();
     }
 
-    //System.out.println("rebuilding examples menu");
     // Add each of the subfolders of examples directly to the menu
     try {
       boolean found = addSketches(menu, examplesFolder, true);
       if (found) menu.addSeparator();
-      found = addSketches(menu, getSketchbookLibrariesFolder(), true);
-      if (found) menu.addSeparator();
-      addSketches(menu, librariesFolder, true);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -940,15 +934,6 @@ public class Base {
   public void rebuildImportMenu(JMenu importMenu) {
     importMenu.removeAll();
 
-    // reset the set of libraries
-    libraries = new HashSet<File>();
-
-    // reset the table mapping imports to libraries
-    importToLibraryTable = new HashMap<String, File>();
-
-    // Add from the "libraries" subfolder in the Processing directory
-    // Choose which library to add by chip platform
-
     try {
       // Find the current target. Get the platform, and then select the
       // correct name and core path.
@@ -959,55 +944,92 @@ public class Base {
       platformItem.setEnabled(false);
       importMenu.add(platformItem);
       importMenu.addSeparator();
-      addLibraries(importMenu, librariesFolder);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-
-    // Add libraries found in the sketchbook folder
-    int separatorIndex = importMenu.getItemCount();
-    try {
-      File sketchbookLibraries = getSketchbookLibrariesFolder();
-      boolean found = addLibraries(importMenu, sketchbookLibraries);
-      if (found) {
-        JMenuItem contrib = new JMenuItem(_("Contributed"));
-        contrib.setEnabled(false);
-        importMenu.insert(contrib, separatorIndex);
-        importMenu.insertSeparator(separatorIndex);
-      }
+      addLibraries(importMenu, libraries);
     } catch (IOException e) {
       e.printStackTrace();
     }
   }
 
   public void rebuildExamplesMenu(JMenu menu) {
-    //System.out.println("rebuilding examples menu");
     try {
       menu.removeAll();
+      
+      // Add examples from distribution "example" folder
       boolean found = addSketches(menu, examplesFolder, false);
       if (found) menu.addSeparator();
-      found = addSketches(menu, getSketchbookLibrariesFolder(), false);
-      if (found) menu.addSeparator();
-      addSketches(menu, librariesFolder, false);
+
+      // Add examples from libraries
+      List<String> names = new ArrayList<String>(libraries.keySet());
+      Collections.sort(names, String.CASE_INSENSITIVE_ORDER);
+      for (String name : names) {
+        File folder = libraries.get(name);
+        addSketchesSubmenu(menu, name, folder, false);
+      }
     } catch (IOException e) {
       e.printStackTrace();
     }
   }
   
+  public Map<String, File> scanLibraries(List<File> folders) {
+    Map<String, File> res = new HashMap<String, File>(); 
+    for (File folder : folders)
+      res.putAll(scanLibraries(folder));
+    return res;
+  }
+  
+  public Map<String, File> scanLibraries(File folder) {
+    Map<String, File> res = new HashMap<String, File>();
+    String list[] = folder.list(new OnlyDirs());
+    // if a bad folder or something like that, this might come back null
+    if (list == null)
+      return res;
+
+    for (String libName : list) {
+      File subfolder = new File(folder, libName);
+      if (!Sketch.isSanitaryName(libName)) {
+        String mess = I18n.format(_("The library \"{0}\" cannot be used.\n"
+            + "Library names must contain only basic letters and numbers.\n"
+            + "(ASCII only and no spaces, and it cannot start with a number)"),
+                                  libName);
+        Base.showMessage(_("Ignoring bad library name"), mess);
+        continue;
+      }
+
+      // (also replace previously found libs with the same name) 
+      res.put(libName, subfolder);
+    }
+    return res;
+  }
   
   public void onBoardOrPortChange() {
     // Calculate paths for libraries and examples
     examplesFolder = getContentFile("examples");
+    toolsFolder = getContentFile("tools");
+    
     TargetPlatform targetPlatform = getTargetPlatform();
     PreferencesMap prefs = targetPlatform.getPreferences();
-    librariesFolder = new File(targetPlatform.getFolder(), prefs
-        .get("library.core.path"));
-    toolsFolder = getContentFile("tools");
+    librariesFolders = new ArrayList<File>();
+    librariesFolders.add(getContentFile("libraries"));
+    librariesFolders.add(new File(targetPlatform.getFolder(), prefs
+        .get("library.core.path")));
+    librariesFolders.add(getSketchbookLibrariesFolder());
+    
+    // Scan for libraries in each library folder.
+    // Libraries located in the latest folders on the list can override
+    // other libraries with the same.
+    libraries = scanLibraries(librariesFolders);
 
+    // Populate importToLibraryTable
+    importToLibraryTable = new HashMap<String, File>();
+    for (File subfolder : libraries.values()) {
+      String packages[] = headerListFromIncludePath(subfolder);
+      for (String pkg : packages)
+        importToLibraryTable.put(pkg, subfolder);
+    }
+    
     // Update editors status bar
-    for (Editor editor : editors) {
+    for (Editor editor : editors)
       editor.onBoardOrPortChange();
-    }  
   }
 
   
@@ -1103,8 +1125,25 @@ public class Base {
 
     // Alphabetize list, since it's not always alpha order
     Arrays.sort(list, String.CASE_INSENSITIVE_ORDER);
-    //processing.core.PApplet.println("adding sketches " + folder.getAbsolutePath());
-    //PApplet.println(list);
+
+    boolean ifound = false;
+
+    for (String name : list) {
+      if ((name.charAt(0) == '.') ||
+          name.equals("CVS")) continue;
+
+      File subfolder = new File(folder, name);
+      if (!subfolder.isDirectory()) continue;
+
+      if (addSketchesSubmenu(menu, name, subfolder, replaceExisting))
+        ifound = true;
+    }
+    
+    return ifound;  // actually ignored, but..
+  }
+
+  private boolean addSketchesSubmenu(JMenu menu, String name, File folder,
+                         final boolean replaceExisting) throws IOException {
 
     ActionListener listener = new ActionListener() {
       public void actionPerformed(ActionEvent e) {
@@ -1127,83 +1166,53 @@ public class Base {
         }
       }
     };
-    // offers no speed improvement
-    //menu.addActionListener(listener);
 
-    boolean ifound = false;
+    File entry = new File(folder, name + ".ino");
+    if (!entry.exists() && (new File(folder, name + ".pde")).exists())
+      entry = new File(folder, name + ".pde");
 
-    for (int i = 0; i < list.length; i++) {
-      if ((list[i].charAt(0) == '.') ||
-          list[i].equals("CVS")) continue;
+    // if a .pde file of the same prefix as the folder exists..
+    if (entry.exists()) {
 
-      File subfolder = new File(folder, list[i]);
-      if (!subfolder.isDirectory()) continue;
-
-      File entry = new File(subfolder, list[i] + ".ino");
-      if (!entry.exists() && (new File(subfolder, list[i] + ".pde")).exists()) {
-      	entry = new File(subfolder, list[i] + ".pde");
-      }
-      // if a .pde file of the same prefix as the folder exists..
-      if (entry.exists()) {
-        //String sanityCheck = sanitizedName(list[i]);
-        //if (!sanityCheck.equals(list[i])) {
-        if (!Sketch.isSanitaryName(list[i])) {
-          if (!builtOnce) {
-            String complaining = I18n.format(
-              _("The sketch \"{0}\" cannot be used.\n" +
-                "Sketch names must contain only basic letters and numbers\n" +
-                "(ASCII-only with no spaces, " +
-                "and it cannot start with a number).\n" +
-                "To get rid of this message, remove the sketch from\n" +
-	        "{1}"), list[i], entry.getAbsolutePath()
-	    );
-            Base.showMessage(_("Ignoring sketch with bad name"), complaining);
-          }
-          continue;
+      if (!Sketch.isSanitaryName(name)) {
+        if (!builtOnce) {
+          String complaining = I18n
+              .format(
+                      _("The sketch \"{0}\" cannot be used.\n"
+                          + "Sketch names must contain only basic letters and numbers\n"
+                          + "(ASCII-only with no spaces, "
+                          + "and it cannot start with a number).\n"
+                          + "To get rid of this message, remove the sketch from\n"
+                          + "{1}"), name, entry.getAbsolutePath());
+          Base.showMessage(_("Ignoring sketch with bad name"), complaining);
         }
-
-        JMenuItem item = new JMenuItem(list[i]);
-        item.addActionListener(listener);
-        item.setActionCommand(entry.getAbsolutePath());
-        menu.add(item);
-        ifound = true;
-
-      } else {
-        // don't create an extra menu level for a folder named "examples"
-        if (subfolder.getName().equals("examples")) {
-          boolean found = addSketches(menu, subfolder, replaceExisting);
-          if (found) ifound = true;
-        } else {
-        // not a sketch folder, but maybe a subfolder containing sketches
-        JMenu submenu = new JMenu(list[i]);
-        // needs to be separate var
-        // otherwise would set ifound to false
-        boolean found = addSketches(submenu, subfolder, replaceExisting);
-        //boolean found = addSketches(submenu, subfolder); //, false);
-        if (found) {
-          menu.add(submenu);
-          ifound = true;
-        }
+        return false;
       }
-    }
-    }
-    return ifound;  // actually ignored, but..
+
+      JMenuItem item = new JMenuItem(name);
+      item.addActionListener(listener);
+      item.setActionCommand(entry.getAbsolutePath());
+      menu.add(item);
+      return true;
+    } 
+
+    // don't create an extra menu level for a folder named "examples"
+    if (folder.getName().equals("examples"))
+      return addSketches(menu, folder, replaceExisting);
+
+    // not a sketch folder, but maybe a subfolder containing sketches
+    JMenu submenu = new JMenu(name);
+    boolean found = addSketches(submenu, folder, replaceExisting);
+    if (found)
+      menu.add(submenu);
+    return found;
   }
 
+  protected boolean addLibraries(JMenu menu, Map<String, File> libs) throws IOException {
 
-  protected boolean addLibraries(JMenu menu, File folder) throws IOException {
-    if (!folder.isDirectory())
-      return false;
-
-    String list[] = folder.list(new OnlyDirs());
-    // if a bad folder or something like that, this might come back null
-    if (list == null)
-      return false;
-
-    // alphabetize list, since it's not always alpha order
-    // replaced hella slow bubble sort with this feller for 0093
-    Arrays.sort(list, String.CASE_INSENSITIVE_ORDER);
-
+    List<String> list = new ArrayList<String>(libs.keySet());
+    Collections.sort(list, String.CASE_INSENSITIVE_ORDER);
+    
     ActionListener listener = new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         activeEditor.getSketch().importLibrary(e.getActionCommand());
@@ -1212,28 +1221,13 @@ public class Base {
 
     boolean found = false;
 
-    for (String libraryName : list) {
-      File subfolder = new File(folder, libraryName);
-      String sanityCheck = Sketch.sanitizeName(libraryName);
-      if (!sanityCheck.equals(libraryName)) {
-        String mess = I18n.format(_("The library \"{0}\" cannot be used.\n"
-            + "Library names must contain only basic letters and numbers.\n"
-            + "(ASCII only and no spaces, and it cannot start with a number)"),
-                                  libraryName);
-        Base.showMessage(_("Ignoring bad library name"), mess);
-        continue;
-      }
+    for (String name : list) {
+      File folder = libs.get(name);
 
-      libraries.add(subfolder);
-
-      String packages[] = headerListFromIncludePath(subfolder);
-      for (String pkg : packages) {
-        importToLibraryTable.put(pkg, subfolder);
-      }
-
-      JMenuItem item = new JMenuItem(libraryName);
+      // Add new element at the bottom
+      JMenuItem item = new JMenuItem(name);
       item.addActionListener(listener);
-      item.setActionCommand(subfolder.getAbsolutePath());
+      item.setActionCommand(folder.getAbsolutePath());
       menu.add(item);
       found = true;
 
@@ -1497,7 +1491,7 @@ public class Base {
   }
 
 
-  static public Set<File> getLibraries() {
+  static public Map<String, File> getLibraries() {
     return libraries;
   }
 
@@ -1507,8 +1501,8 @@ public class Base {
   }
 
 
-  static public String getLibrariesPath() {
-    return librariesFolder.getAbsolutePath();
+  static public List<File> getLibrariesPath() {
+    return librariesFolders;
   }
 
 

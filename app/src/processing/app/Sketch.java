@@ -1821,28 +1821,28 @@ public class Sketch {
    */
   public boolean isReadOnly() {
     String apath = folder.getAbsolutePath();
+    for (File folder : Base.getLibrariesPath()) {
+      if (apath.startsWith(folder.getAbsolutePath()))
+        return true;
+    }
     if (apath.startsWith(Base.getExamplesPath()) ||
-        apath.startsWith(Base.getLibrariesPath()) ||
         apath.startsWith(Base.getSketchbookLibrariesPath())) {
       return true;
+    }
 
-      // canWrite() doesn't work on directories
-      //} else if (!folder.canWrite()) {
-    } else {
-      // check to see if each modified code file can be written to
-      for (int i = 0; i < codeCount; i++) {
-        if (code[i].isModified() &&
-            code[i].fileReadOnly() &&
-            code[i].fileExists()) {
-          //System.err.println("found a read-only file " + code[i].file);
-          return true;
-        }
+    // canWrite() doesn't work on directories
+    // } else if (!folder.canWrite()) {
+    
+    // check to see if each modified code file can be written to
+    for (int i = 0; i < codeCount; i++) {
+      if (code[i].isModified() && code[i].fileReadOnly() &&
+          code[i].fileExists()) {
+        // System.err.println("found a read-only file " + code[i].file);
+        return true;
       }
-      //return true;
     }
     return false;
   }
-
 
   // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
