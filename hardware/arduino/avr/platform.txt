@@ -19,27 +19,23 @@ compiler.objcopy.eep.flags=-O ihex -j .eeprom --set-section-flags=.eeprom=alloc,
 compiler.elf2hex.flags=-O ihex -R .eeprom
 compiler.elf2hex.cmd=avr-objcopy
 compiler.ldflags=
-compiler.cpudef=-mmcu=
 compiler.upload.cmd=
 compiler.upload.flags=
-compiler.define=-DARDUINO=
-library.path=./hardware/arduino/cores/arduino
-library.core.path=./libraries
 
 # AVR compile patterns
 # --------------------
 
 ## Compile c files
-recipe.c.o.pattern={toolchain_path}{compiler.c.cmd} {compiler.c.flags} {compiler.cpudef}{build.mcu} -DF_CPU={build.f_cpu} -D{software}={ide_version} {includes} {source_file} -o {object_file}
+recipe.c.o.pattern={toolchain_path}{compiler.c.cmd} {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -D{software}={ide_version} {includes} {source_file} -o {object_file}
 
 ## Compile c++ files
-recipe.cpp.o.pattern={toolchain_path}{compiler.cpp.cmd} {compiler.cpp.flags} {compiler.cpudef}{build.mcu} -DF_CPU={build.f_cpu} -D{software}={ide_version} {includes} {source_file} -o {object_file}
+recipe.cpp.o.pattern={toolchain_path}{compiler.cpp.cmd} {compiler.cpp.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -D{software}={ide_version} {includes} {source_file} -o {object_file}
 
 ## Create archives
 recipe.ar.pattern={toolchain_path}{compiler.ar.cmd} {compiler.ar.flags} {build_path}{archive_file} {object_file}
 
 ## Combine gc-sections, archives, and objects
-recipe.c.combine.pattern={toolchain_path}{compiler.c.elf.cmd} {compiler.c.elf.flags} {compiler.cpudef}{build.mcu} -o {build_path}{project_name}.elf {object_files} {build_path}{archive_file} -L{build_path} -lm
+recipe.c.combine.pattern={toolchain_path}{compiler.c.elf.cmd} {compiler.c.elf.flags} -mmcu={build.mcu} -o {build_path}{project_name}.elf {object_files} {build_path}{archive_file} -L{build_path} -lm
 
 ## Create eeprom
 recipe.objcopy.eep.pattern={toolchain_path}{compiler.objcopy.cmd} {compiler.objcopy.eep.flags} {build_path}{project_name}.elf {build_path}{project_name}.eep

@@ -1006,12 +1006,10 @@ public class Base {
     examplesFolder = getContentFile("examples");
     toolsFolder = getContentFile("tools");
     
-    TargetPlatform targetPlatform = getTargetPlatform();
-    PreferencesMap prefs = targetPlatform.getPreferences();
+    File platformFolder = getTargetPlatform().getFolder();
     librariesFolders = new ArrayList<File>();
     librariesFolders.add(getContentFile("libraries"));
-    librariesFolders.add(new File(targetPlatform.getFolder(), prefs
-        .get("library.core.path")));
+    librariesFolders.add(new File(platformFolder, "libraries"));
     librariesFolders.add(getSketchbookLibrariesFolder());
     
     // Scan for libraries in each library folder.
