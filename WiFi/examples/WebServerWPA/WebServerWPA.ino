@@ -10,7 +10,7 @@
  
  created 13 July 2010
  by dlf (Metodo2 srl)
- modified 15 Sep 2011
+ modified 10 Jan 2012
  by Tom Igoe
  */
 
@@ -18,8 +18,8 @@
 #include <SPI.h>
 #include <WiFi.h>
 
-char ssid[] = "lamaison";          //  your network SSID (name) 
-char pass[] = "tenantaccess247";   // your network password
+char ssid[] = "networkName";     //  your network SSID (name) 
+char pass[] = "yourPassword";    // your network password
 int status = WL_IDLE_STATUS;
 
 WiFiServer server(80);
