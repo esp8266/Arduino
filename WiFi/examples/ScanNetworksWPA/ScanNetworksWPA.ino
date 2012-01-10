@@ -8,7 +8,7 @@
  
  created 13 July 2010
  by dlf (Metodo2 srl)
- modified 15 Sep 2011
+ modified 10 Jan 2012
  by Tom Igoe
  */
 
@@ -16,8 +16,8 @@
 #include <SPI.h>
 #include <WiFi.h>
 
-char ssid[] = "yourNetwork";          //  your network SSID (name) 
-char pass[] = "secretPassword";   // your network password
+char ssid[] = "networkName";     //  your network SSID (name) 
+char pass[] = "yourPassword";    // your network password
 int status = WL_IDLE_STATUS;     // the Wifi radio's status
 
 byte mac[6];                     // the MAC address of your Wifi shield
@@ -28,20 +28,19 @@ IPAddress subnet;                // the subnet mask
 void setup() {
   // initialize serial:
   Serial.begin(9600);
-   // scan for existing networks:
-  Serial.println("Scanning available networks...");
-  //WiFi.begin();
-  scanNetworks();
-
+ 
   // attempt to connect using WEP encryption:
-//  Serial.println("Attempting to connect to WEP-128 network...");
-//  status = WiFi.begin(ssid, keyIndex, key);
-  
-   // attempt to connect using WPA2 encryption:
+  //  Serial.println("Attempting to connect to WEP-128 network...");
+  //  status = WiFi.begin(ssid, keyIndex, key);
+
+  // attempt to connect using WPA2 encryption:
   Serial.println("Attempting to connect to WPA network...");
   status = WiFi.begin(ssid, pass);
 
-  
+  Serial.println("Scanning available networks...");
+  // scan for existing networks:
+  scanNetworks();
+
   Serial.print("SSID: ");
   Serial.println(ssid);
 
@@ -52,6 +51,7 @@ void setup() {
   } 
   // if you are connected, print out info about the connection:
   else {
+
     printIpData();      
     printCurrentNet();
   }
@@ -71,7 +71,7 @@ void printIpData() {
   subnet = WiFi.subnetMask();
   Serial.print("NETMASK: ");
   Serial.println(subnet);
- 
+
 
   // print your gateway address:
   gateway = WiFi.gatewayIP();
@@ -141,3 +141,4 @@ void scanNetworks() {
     Serial.println(WiFi.SSID(thisNet));
   }
 }
+

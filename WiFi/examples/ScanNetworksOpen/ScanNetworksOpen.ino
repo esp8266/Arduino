@@ -8,7 +8,7 @@
  
  created 13 July 2010
  by dlf (Metodo2 srl)
- modified 15 Sep 2011
+ modified 10 Jan 2012
  by Tom Igoe
  */
 
@@ -28,13 +28,14 @@ void setup() {
   // initialize serial:
   Serial.begin(9600);
 
-  // scan for existing networks:
-  Serial.println("Scanning available networks...");
-  scanNetworks();
 
   // attempt to connect using WEP encryption:
   Serial.println("Attempting to connect to open network...");
   status = WiFi.begin(ssid);
+
+  // scan for existing networks:
+  Serial.println("Scanning available networks...");
+  scanNetworks();
   
   Serial.print("SSID: ");
   Serial.println(ssid);
