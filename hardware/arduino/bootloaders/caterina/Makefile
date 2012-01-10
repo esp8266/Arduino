@@ -1,10 +1,10 @@
 ###############################################################################
-# Makefile for DiskLoader
+# Makefile for Caterina (formerly DiskLoader)
 ###############################################################################
 
 ## General Flags
-PROJECT = DiskLoader
-TARGET = DiskLoader.elf
+PROJECT = Caterina
+TARGET = Caterina.elf
 CC = avr-gcc
 
 # BOARD2
@@ -24,7 +24,7 @@ AVRDUDE_PROGRAMMER = avrispmkII
 AVRDUDE_PORT = usb	   
 
 # program name should not be changed...
-PROGRAM = DiskLoader
+PROGRAM = Caterina
 
 AVRDUDE = avrdude
 AVRDUDE_FLAGS = -p $(MCU) -P $(AVRDUDE_PORT) -c $(AVRDUDE_PROGRAMMER) -p $(MCU)
@@ -41,7 +41,7 @@ ASMFLAGS += -x assembler-with-cpp -Wa,-gdwarf2
 
 ## Linker flags
 LDFLAGS = $(COMMON)
-LDFLAGS += -Wl,-gc-sections,-Map=DiskLoader.map,--section-start=.text=0x7800,--relax
+LDFLAGS += -Wl,-gc-sections,-Map=Caterina.map,--section-start=.text=0x7800,--relax
 LDFLAGS += -nodefaultlibs -nostartfiles
 
 ## Intel Hex file production flags
@@ -65,7 +65,7 @@ vpath %.cpp $(SRC_DIR)
 
 .PHONY: all checkdirs clean
 
-all: checkdirs $(TARGET) DiskLoader.hex DiskLoader.lss size
+all: checkdirs $(TARGET) Caterina.hex Caterina.lss size
 
 -include $(DEP)
 
