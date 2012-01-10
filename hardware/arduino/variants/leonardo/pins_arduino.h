@@ -35,29 +35,29 @@
 #define RXLED0			PORTB |= (1<<0)
 #define RXLED1			PORTB &= ~(1<<0)
 
-const static uint8_t SDA = 2;
-const static uint8_t SCL = 3;
+static const uint8_t SDA = 2;
+static const uint8_t SCL = 3;
 
 // Map SPI port to 'new' pins D14..D17
-const static uint8_t SS   = 17;
-const static uint8_t MOSI = 16;
-const static uint8_t MISO = 14;
-const static uint8_t SCK  = 15;
+static const uint8_t SS   = 17;
+static const uint8_t MOSI = 16;
+static const uint8_t MISO = 14;
+static const uint8_t SCK  = 15;
 
 // Mapping of analog pins as digital I/O
 // A6-A11 share with digital pins
-const static uint8_t A0 = 18;
-const static uint8_t A1 = 19;
-const static uint8_t A2 = 20;
-const static uint8_t A3 = 21;
-const static uint8_t A4 = 22;
-const static uint8_t A5 = 23;
-const static uint8_t A6 = 24;	// D4
-const static uint8_t A7 = 25;	// D6
-const static uint8_t A8 = 26;	// D8
-const static uint8_t A9 = 27;	// D9
-const static uint8_t A10 = 28;	// D10
-const static uint8_t A11 = 29;	// D12
+static const uint8_t A0 = 18;
+static const uint8_t A1 = 19;
+static const uint8_t A2 = 20;
+static const uint8_t A3 = 21;
+static const uint8_t A4 = 22;
+static const uint8_t A5 = 23;
+static const uint8_t A6 = 24;	// D4
+static const uint8_t A7 = 25;	// D6
+static const uint8_t A8 = 26;	// D8
+static const uint8_t A9 = 27;	// D9
+static const uint8_t A10 = 28;	// D10
+static const uint8_t A11 = 29;	// D12
 
 //	__AVR_ATmega32U4__ has an unusual mapping of pins to channels
 extern const uint8_t PROGMEM analog_pin_to_channel_PGM[];

@@ -1,3 +1,5 @@
+# See: http://code.google.com/p/arduino/wiki/Platforms
+
 ##############################################################
 
 uno.name=Arduino Uno

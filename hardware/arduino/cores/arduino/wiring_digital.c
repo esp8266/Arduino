@@ -32,17 +32,25 @@ void pinMode(uint8_t pin, uint8_t mode)
 {
 	uint8_t bit = digitalPinToBitMask(pin);
 	uint8_t port = digitalPinToPort(pin);
-	volatile uint8_t *reg;
+	volatile uint8_t *reg, *out;
 
 	if (port == NOT_A_PIN) return;
 
 	// JWS: can I let the optimizer do this?
 	reg = portModeRegister(port);
+	out = portOutputRegister(port);
 
 	if (mode == INPUT) { 
 		uint8_t oldSREG = SREG;
                 cli();
 		*reg &= ~bit;
+		*out &= ~bit;
+		SREG = oldSREG;
+	} else if (mode == INPUT_PULLUP) {
+		uint8_t oldSREG = SREG;
+                cli();
+		*reg &= ~bit;
+		*out |= bit;
 		SREG = oldSREG;
 	} else {
 		uint8_t oldSREG = SREG;

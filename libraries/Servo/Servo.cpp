@@ -298,7 +298,7 @@ void Servo::writeMicroseconds(int value)
 {
   // calculate and store the values for the given channel
   byte channel = this->servoIndex;
-  if( (channel >= 0) && (channel < MAX_SERVOS) )   // ensure channel is valid
+  if( (channel < MAX_SERVOS) )   // ensure channel is valid
   {  
     if( value < SERVO_MIN() )          // ensure pulse width is valid
       value = SERVO_MIN();

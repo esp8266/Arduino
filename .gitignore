@@ -1,0 +1,5 @@
+app/bin/
+app/pde.jar
+build/macosx/work/
+core/bin/
+core/core.jar
