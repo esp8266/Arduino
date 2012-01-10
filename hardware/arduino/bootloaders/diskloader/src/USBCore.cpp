@@ -255,13 +255,13 @@ const u8 _initEndpoints[] =
 {
 	0,
 
-#ifdef CDC_ENABLED
 	EP_TYPE_INTERRUPT_IN,		// CDC_ENDPOINT_ACM
 	EP_TYPE_BULK_OUT,			// CDC_ENDPOINT_OUT
 	EP_TYPE_BULK_IN,			// CDC_ENDPOINT_IN
-#endif
 
+#ifdef HID_ENABLED
 	EP_TYPE_INTERRUPT_IN,		// HID_ENDPOINT_INT
+#endif
 };
 
 static void InitEndpoints()
@@ -357,13 +357,13 @@ bool SendDescriptor()
 	u8 t = setup.wValueH;
 	if (0x22 == t)
 	{
+#ifdef HID_ENABLED		
 		desc_addr = _rawHID;
 		desc_length = sizeof(desc_length);
+#endif
 	} else if (USB_DEVICE_DESCRIPTOR_TYPE == t)
 	{
-		if (setup.wLength == 8)
-			_cdcComposite = 1;
-		desc_addr = _cdcComposite ?  (const u8*)&USB_DeviceDescriptorA : (const u8*)&USB_DeviceDescriptor;
+		desc_addr = (const u8*)&USB_DeviceDescriptor;
 	}
 	else if (USB_CONFIGURATION_DESCRIPTOR_TYPE == t)
 	{

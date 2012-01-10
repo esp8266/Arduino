@@ -43,7 +43,10 @@ void Transfer(u8 ep, const u8* data, int len);
 void Recv(u8 ep, u8* dst, u8 len);
 void Program(u8 ep, u16 page, u8 count);
 
-#define CDC_ENABLED
+/* HID is not fully-supported in the bootloader - can be enabled
+   for testing, but note the descriptor report and other parts are 
+   not complete */
+//#define HID_ENABLED		
 
 #include "USBCore.h"
 #include "USBDesc.h"
