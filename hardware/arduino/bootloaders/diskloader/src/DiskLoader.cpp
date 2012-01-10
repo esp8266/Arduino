@@ -117,7 +117,7 @@ int main()
 	TX_LED_OFF();
 	RX_LED_OFF();
 	L_LED_OFF();
-	if (MCUSR_state & (1<<WDRF) && (pgm_read_word(0) != -1)) {
+	if (MCUSR_state & (1<<WDRF) && (pgm_read_word(0) != 0xFFFF)) {
 		StartSketch();				// if the reset was caused by WDT and if a sketch is already present then run the sketch instead of the bootloader
 	}	
 	BOARD_INIT();
@@ -126,7 +126,7 @@ int main()
 	_inSync = STK_INSYNC;
 	_ok = STK_OK;
 
-	if (pgm_read_word(0) != -1)
+	if (pgm_read_word(0) != 0xFFFF)
 		_ejected = 1;
 
 	for(;;)
