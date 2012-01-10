@@ -11,11 +11,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef unsigned char u8;
-typedef unsigned short u16;
-typedef unsigned long u32;
-
-
 #define CPU_PRESCALE(n)	(CLKPR = 0x80, CLKPR = (n))
 #define DISABLE_JTAG()  MCUCR = (1 << JTD) | (1 << IVCE) | (0 << PUD); MCUCR = (1 << JTD) | (0 << IVSEL) | (0 << IVCE) | (0 << PUD);
 
@@ -39,9 +34,9 @@ typedef unsigned long u32;
 #define TRANSFER_RELEASE	0x40
 #define TRANSFER_ZERO		0x20
 
-void Transfer(u8 ep, const u8* data, int len);
-void Recv(u8 ep, u8* dst, u8 len);
-void Program(u8 ep, u16 page, u8 count);
+void Transfer(uint8_t ep, const uint8_t* data, int len);
+void Recv(uint8_t ep, uint8_t* dst, uint8_t len);
+void Program(uint8_t ep, uint16_t page, uint8_t count);
 
 /* HID is not fully-supported in the bootloader - can be enabled
    for testing, but note the descriptor report and other parts are 

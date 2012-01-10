@@ -31,8 +31,8 @@
 
 /** Pulse generation counters to keep track of the number of milliseconds remaining for each pulse type */
 #define TX_RX_LED_PULSE_MS 100
-u8 TxLEDPulse; /**< Milliseconds remaining for data Tx LED pulse */
-u8 RxLEDPulse; /**< Milliseconds remaining for data Rx LED pulse */
+uint8_t TxLEDPulse; /**< Milliseconds remaining for data Tx LED pulse */
+uint8_t RxLEDPulse; /**< Milliseconds remaining for data Rx LED pulse */
 
 void Reset();
 
@@ -41,11 +41,11 @@ void Reset();
 
 typedef struct
 {
-	u32	dwDTERate;
-	u8	bCharFormat;
-	u8 	bParityType;
-	u8 	bDataBits;
-	u8	lineState;
+	uint32_t	dwDTERate;
+	uint8_t	bCharFormat;
+	uint8_t 	bParityType;
+	uint8_t 	bDataBits;
+	uint8_t	lineState;
 } LineInfo;
 
 static volatile LineInfo _usbLineInfo = { 57600, 0x00, 0x00, 0x00, 0x00 };
@@ -54,9 +54,9 @@ static volatile LineInfo _usbLineInfo = { 57600, 0x00, 0x00, 0x00, 0x00 };
 //==================================================================
 
 //	4 bytes of RAM
-volatile u8 _usbConfiguration;
-volatile u8 _ejected;
-volatile u16 _timeout;
+volatile uint8_t _usbConfiguration;
+volatile uint8_t _ejected;
+volatile uint16_t _timeout;
 
 static inline void WaitIN(void)
 {
@@ -74,7 +74,7 @@ static inline void WaitOUT(void)
 		;
 }
 
-static inline u8 WaitForINOrOUT()
+static inline uint8_t WaitForINOrOUT()
 {
 	while (!(UEINTX & ((1<<TXINI)|(1<<RXOUTI))))
 		;
@@ -87,7 +87,7 @@ static inline void ClearOUT(void)
 }
 
 static
-void Send(volatile const u8* data, u8 count)
+void Send(volatile const uint8_t* data, uint8_t count)
 {
 	TX_LED_ON();					// light the TX LED
 	TxLEDPulse = TX_RX_LED_PULSE_MS;
@@ -95,7 +95,7 @@ void Send(volatile const u8* data, u8 count)
 		UEDATX = *data++;
 }
 
-void Recv(volatile u8* data, u8 count)
+void Recv(volatile uint8_t* data, uint8_t count)
 {
 	RX_LED_ON();					// light the RX LED
 	RxLEDPulse = TX_RX_LED_PULSE_MS;
@@ -103,31 +103,31 @@ void Recv(volatile u8* data, u8 count)
 		*data++ = UEDATX;
 }
 
-static inline u8 Recv8()
+static inline uint8_t Recv8()
 {
 	RX_LED_ON();					// light the RX LED
 	RxLEDPulse = TX_RX_LED_PULSE_MS;
 	return UEDATX;
 }
 
-static inline void Send8(u8 d)
+static inline void Send8(uint8_t d)
 {
 	TX_LED_ON();					// light the TX LED
 	TxLEDPulse = TX_RX_LED_PULSE_MS;
 	UEDATX = d;
 }
 
-static inline void SetEP(u8 ep)
+static inline void SetEP(uint8_t ep)
 {
 	UENUM = ep;
 }
 
-static inline u8 FifoByteCount()
+static inline uint8_t FifoByteCount()
 {
 	return UEBCLX;
 }
 
-static inline u8 ReceivedSetupInt()
+static inline uint8_t ReceivedSetupInt()
 {
 	return UEINTX & (1<<RXSTPI);
 }
@@ -142,17 +142,17 @@ static inline void Stall()
 	UECONX = (1<<STALLRQ) | (1<<EPEN);
 }
 
-static inline u8 ReadWriteAllowed()
+static inline uint8_t ReadWriteAllowed()
 {
 	return UEINTX & (1<<RWAL);
 }
 
-static inline u8 Stalled()
+static inline uint8_t Stalled()
 {
 	return UEINTX & (1<<STALLEDI);
 }
 
-static inline u8 FifoFree()
+static inline uint8_t FifoFree()
 {
 	return UEINTX & (1<<FIFOCON);
 }
@@ -167,7 +167,7 @@ static inline void ReleaseTX()
 	UEINTX = 0x3A;	// FIFOCON=0 NAKINI=0 RWAL=1 NAKOUTI=1 RXSTPI=1 RXOUTI=0 STALLEDI=1 TXINI=0
 }
 
-static inline u8 FrameNumber()
+static inline uint8_t FrameNumber()
 {
 	return UDFNUML;
 }
@@ -178,7 +178,7 @@ static inline u8 FrameNumber()
 #define EP_SINGLE_64 0x32	// EP0
 #define EP_DOUBLE_64 0x36	// Other endpoints
 
-static void InitEP(u8 index, u8 type, u8 size)
+static void InitEP(uint8_t index, uint8_t type, uint8_t size)
 {
 	UENUM = index;
 	UECONX = 1;
@@ -202,19 +202,19 @@ void USBInit(void)
 	UDCON = 0;							// enable attach resistor
 }
 
-u8 USBGetConfiguration(void)
+uint8_t USBGetConfiguration(void)
 {
 	return _usbConfiguration;
 }
 
-u8 HasData(u8 ep)
+uint8_t HasData(uint8_t ep)
 {
 	SetEP(ep);
 	return ReadWriteAllowed();	// count in fifo
 }
 
 int USBGetChar();
-void Recv(u8 ep, u8* dst, u8 len)
+void Recv(uint8_t ep, uint8_t* dst, uint8_t len)
 {
 	SetEP(ep);
 	while (len--)
@@ -228,16 +228,16 @@ void Recv(u8 ep, u8* dst, u8 len)
 }
 
 //	Transmit a packet to endpoint
-void Transfer(u8 ep, const u8* data, int len)
+void Transfer(uint8_t ep, const uint8_t* data, int len)
 {
-	u8 zero = ep & TRANSFER_ZERO;
+	uint8_t zero = ep & TRANSFER_ZERO;
 	SetEP(ep & 7);
 	while (len--)
 	{
 		while (!ReadWriteAllowed())
 			;	// TODO Check for STALL etc
 
-		u8 d = (ep & TRANSFER_PGM) ? pgm_read_byte(data) : data[0];
+		uint8_t d = (ep & TRANSFER_PGM) ? pgm_read_byte(data) : data[0];
 		data++;
 		if (zero)
 			d = 0;
@@ -250,8 +250,8 @@ void Transfer(u8 ep, const u8* data, int len)
 		ReleaseTX();
 }
 
-extern const u8 _initEndpoints[] PROGMEM;
-const u8 _initEndpoints[] = 
+extern const uint8_t _initEndpoints[] PROGMEM;
+const uint8_t _initEndpoints[] = 
 {
 	0,
 
@@ -266,7 +266,7 @@ const u8 _initEndpoints[] =
 
 static void InitEndpoints()
 {
-	for (u8 i = 1; i < sizeof(_initEndpoints); i++)
+	for (uint8_t i = 1; i < sizeof(_initEndpoints); i++)
 	{
 		UENUM = i;
 		UECONX = 1;
@@ -279,12 +279,12 @@ static void InitEndpoints()
 
 typedef struct
 {
-	u8 bmRequestType;
-	u8 bRequest;
-	u8 wValueL;
-	u8 wValueH;
-	u16 wIndex;
-	u16 wLength;
+	uint8_t bmRequestType;
+	uint8_t bRequest;
+	uint8_t wValueL;
+	uint8_t wValueH;
+	uint16_t wIndex;
+	uint16_t wLength;
 } Setup;
 Setup _setup;
 
@@ -292,18 +292,18 @@ Setup _setup;
 bool USBHook()
 {
 	Setup& setup = _setup;
-	u8 r = setup.bRequest;
+	uint8_t r = setup.bRequest;
 
 	//	CDC Requests
 	if (CDC_GET_LINE_CODING == r)
 	{
-		Send((const volatile u8*)&_usbLineInfo,7);
+		Send((const volatile uint8_t*)&_usbLineInfo,7);
 	}
 
 	else if (CDC_SET_LINE_CODING ==  r)
 	{
 		WaitOUT();
-		Recv((volatile u8*)&_usbLineInfo,7);
+		Recv((volatile uint8_t*)&_usbLineInfo,7);
 		ClearOUT();
 	}
 
@@ -315,7 +315,7 @@ bool USBHook()
 	return true;
 }
 
-extern const u8 _rawHID[] PROGMEM;
+extern const uint8_t _rawHID[] PROGMEM;
 #define LSB(_x) ((_x) & 0xFF)
 #define MSB(_x) ((_x) >> 8)
 
@@ -324,7 +324,7 @@ extern const u8 _rawHID[] PROGMEM;
 #define RAWHID_TX_SIZE 64
 #define RAWHID_RX_SIZE 64
 
-const u8 _rawHID[] =
+const uint8_t _rawHID[] =
 {
 	//	RAW HID
 	0x06, LSB(RAWHID_USAGE_PAGE), MSB(RAWHID_USAGE_PAGE),	// 30
@@ -346,15 +346,15 @@ const u8 _rawHID[] =
 	0xC0					// end collection
 };
 
-u8 _cdcComposite = 0;
+uint8_t _cdcComposite = 0;
 
 bool SendDescriptor()
 {
 	Setup& setup = _setup;
-	u16 desc_length = 0;
-	const u8* desc_addr = 0;
+	uint16_t desc_length = 0;
+	const uint8_t* desc_addr = 0;
 
-	u8 t = setup.wValueH;
+	uint8_t t = setup.wValueH;
 	if (0x22 == t)
 	{
 #ifdef HID_ENABLED		
@@ -363,23 +363,23 @@ bool SendDescriptor()
 #endif
 	} else if (USB_DEVICE_DESCRIPTOR_TYPE == t)
 	{
-		desc_addr = (const u8*)&USB_DeviceDescriptor;
+		desc_addr = (const uint8_t*)&USB_DeviceDescriptor;
 	}
 	else if (USB_CONFIGURATION_DESCRIPTOR_TYPE == t)
 	{
-		desc_addr = (const u8*)&USB_ConfigDescriptor;
+		desc_addr = (const uint8_t*)&USB_ConfigDescriptor;
 		desc_length = sizeof(USB_ConfigDescriptor);
 	}
 	else if (USB_STRING_DESCRIPTOR_TYPE == t)
 	{
 		if (setup.wValueL == 0)
-			desc_addr = (const u8*)&STRING_LANGUAGE;
+			desc_addr = (const uint8_t*)&STRING_LANGUAGE;
 		else if (setup.wValueL == IPRODUCT) 
-			desc_addr = (const u8*)&STRING_IPRODUCT;
+			desc_addr = (const uint8_t*)&STRING_IPRODUCT;
 		else if (setup.wValueL == ISERIAL)
-			desc_addr = (const u8*)&STRING_SERIAL;
+			desc_addr = (const uint8_t*)&STRING_SERIAL;
 		else if (setup.wValueL == IMANUFACTURER)
-			desc_addr = (const u8*)&STRING_IMANUFACTURER;
+			desc_addr = (const uint8_t*)&STRING_IMANUFACTURER;
 		else
 			return false;
 	} else 
@@ -393,13 +393,13 @@ bool SendDescriptor()
 	//	Send descriptor
 	//	EP0 is 64 bytes long
 	//	RWAL and FIFOCON don't work on EP0
-	u16 n = 0;
+	uint16_t n = 0;
 	do
 	{
 		if (!WaitForINOrOUT())
 			return false;
 		Send8(pgm_read_byte(&desc_addr[n++]));
-		u8 clr = n & 0x3F;
+		uint8_t clr = n & 0x3F;
 		if (!clr)
 			ClearIN();	// Fifo is full, release this packet
 	} while (n < desc_length);
@@ -413,7 +413,7 @@ void USBSetupInterrupt()
 		return;
 
 	Setup& setup = _setup;	// global saves ~30 bytes
-	Recv((u8*)&setup,8);
+	Recv((uint8_t*)&setup,8);
 	ClearSetupInt();
 
 	if (setup.bmRequestType & DEVICETOHOST)
@@ -422,7 +422,7 @@ void USBSetupInterrupt()
 		ClearIN();
 
     bool ok = true;
-	u8 r = setup.bRequest;
+	uint8_t r = setup.bRequest;
 	if (SET_ADDRESS == r)
 	{
 		WaitIN();
@@ -458,7 +458,7 @@ void USBSetupInterrupt()
 
 void USBGeneralInterrupt()
 {
-	u8 udint = UDINT;
+	uint8_t udint = UDINT;
 	UDINT = 0;
 
 	//	End of Reset
@@ -493,7 +493,7 @@ int USBGetChar()
 		//	Read a char
 		if (HasData(CDC_RX))
 		{
-			u8 c = Recv8();
+			uint8_t c = Recv8();
 			if (!ReadWriteAllowed())
 				ReleaseRX();
 			return c;

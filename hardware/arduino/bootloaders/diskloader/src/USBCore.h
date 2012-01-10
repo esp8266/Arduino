@@ -97,32 +97,32 @@
 
 //	Device
 typedef struct {
-	u8 len;				// 18
-	u8 dtype;			// 1 USB_DEVICE_DESCRIPTOR_TYPE
-	u16 usbVersion;		// 0x200
-	u8	deviceClass;
-	u8	deviceSubClass;
-	u8	deviceProtocol;
-	u8	packetSize0;	// Packet 0
-	u16	idVendor;
-	u16	idProduct;
-	u16	deviceVersion;	// 0x100
-	u8	iManufacturer;
-	u8	iProduct;
-	u8	iSerialNumber;
-	u8	bNumConfigurations;
+	uint8_t len;				// 18
+	uint8_t dtype;			// 1 USB_DEVICE_DESCRIPTOR_TYPE
+	uint16_t usbVersion;		// 0x200
+	uint8_t	deviceClass;
+	uint8_t	deviceSubClass;
+	uint8_t	deviceProtocol;
+	uint8_t	packetSize0;	// Packet 0
+	uint16_t	idVendor;
+	uint16_t	idProduct;
+	uint16_t	deviceVersion;	// 0x100
+	uint8_t	iManufacturer;
+	uint8_t	iProduct;
+	uint8_t	iSerialNumber;
+	uint8_t	bNumConfigurations;
 } DeviceDescriptor;
 
 //	Config
 typedef struct {
-	u8	len;			// 9
-	u8	dtype;			// 2
-	u16 clen;			// total length
-	u8	numInterfaces;
-	u8	config;
-	u8	iconfig;
-	u8	attributes;
-	u8	maxPower;
+	uint8_t	len;			// 9
+	uint8_t	dtype;			// 2
+	uint16_t clen;			// total length
+	uint8_t	numInterfaces;
+	uint8_t	config;
+	uint8_t	iconfig;
+	uint8_t	attributes;
+	uint8_t	maxPower;
 } ConfigDescriptor;
 
 //	String
@@ -130,58 +130,58 @@ typedef struct {
 //	Interface
 typedef struct
 {
-	u8 len;		// 9
-	u8 dtype;	// 4
-	u8 number;
-	u8 alternate;
-	u8 numEndpoints;
-	u8 interfaceClass;
-	u8 interfaceSubClass;
-	u8 protocol;
-	u8 iInterface;
+	uint8_t len;		// 9
+	uint8_t dtype;	// 4
+	uint8_t number;
+	uint8_t alternate;
+	uint8_t numEndpoints;
+	uint8_t interfaceClass;
+	uint8_t interfaceSubClass;
+	uint8_t protocol;
+	uint8_t iInterface;
 } InterfaceDescriptor;
 
 //	Endpoint
 typedef struct
 {
-	u8 len;		// 7
-	u8 dtype;	// 5
-	u8 addr;
-	u8 attr;
-	u16 packetSize;
-	u8 interval;
+	uint8_t len;		// 7
+	uint8_t dtype;	// 5
+	uint8_t addr;
+	uint8_t attr;
+	uint16_t packetSize;
+	uint8_t interval;
 } EndpointDescriptor;
 
 // Interface Association Descriptor
 // Used to bind 2 interfaces together in CDC compostite device
 typedef struct
 {
-	u8 len;				// 8
-	u8 dtype;			// 11
-	u8 firstInterface;
-	u8 interfaceCount;
-	u8 functionClass;
-	u8 funtionSubClass;
-	u8 functionProtocol;
-	u8 iInterface;
+	uint8_t len;				// 8
+	uint8_t dtype;			// 11
+	uint8_t firstInterface;
+	uint8_t interfaceCount;
+	uint8_t functionClass;
+	uint8_t funtionSubClass;
+	uint8_t functionProtocol;
+	uint8_t iInterface;
 } IADDescriptor;
 
 //	CDC CS interface descriptor
 typedef struct
 {
-	u8 len;		// 5
-	u8 dtype;	// 0x24
-	u8 subtype;
-	u8 d0;
-	u8 d1;
+	uint8_t len;		// 5
+	uint8_t dtype;	// 0x24
+	uint8_t subtype;
+	uint8_t d0;
+	uint8_t d1;
 } CDCCSInterfaceDescriptor;
 
 typedef struct
 {
-	u8 len;		// 4
-	u8 dtype;	// 0x24
-	u8 subtype;
-	u8 d0;
+	uint8_t len;		// 4
+	uint8_t dtype;	// 0x24
+	uint8_t subtype;
+	uint8_t d0;
 } CDCCSInterfaceDescriptor4;
 
 typedef struct 
@@ -204,15 +204,15 @@ typedef struct
 
 typedef struct
 {
-	u8 len;			// 9
-	u8 dtype;		// 0x21
-	u8 addr;
-	u8	versionL;	// 0x101
-	u8	versionH;	// 0x101
-	u8	country;
-	u8	desctype;	// 0x22 report
-	u8	descLenL;
-	u8	descLenH;
+	uint8_t len;			// 9
+	uint8_t dtype;		// 0x21
+	uint8_t addr;
+	uint8_t	versionL;	// 0x101
+	uint8_t	versionH;	// 0x101
+	uint8_t	country;
+	uint8_t	desctype;	// 0x22 report
+	uint8_t	descLenL;
+	uint8_t	descLenH;
 } HIDDescDescriptor;
 
 typedef struct 

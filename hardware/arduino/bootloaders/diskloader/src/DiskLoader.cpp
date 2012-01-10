@@ -26,15 +26,15 @@ void entrypoint(void)
 		::);
 }
 
-u8 _flashbuf[128];
-u8 _inSync;
-u8 _ok;
-extern volatile u8 _ejected;
-extern volatile u16 _timeout;
+uint8_t _flashbuf[128];
+uint8_t _inSync;
+uint8_t _ok;
+extern volatile uint8_t _ejected;
+extern volatile uint16_t _timeout;
 
-void Program(u8 ep, u16 page, u8 count)
+void Program(uint8_t ep, uint16_t page, uint8_t count)
 {
-	u8 write = page < 30*1024;		// Don't write over firmware please
+	uint8_t write = page < 30*1024;		// Don't write over firmware please
 	if (write)
 		boot_page_erase(page);
 
@@ -46,9 +46,9 @@ void Program(u8 ep, u16 page, u8 count)
 	boot_spm_busy_wait();			// Wait until the memory is erased.
 
 	count >>= 1;
-	u16* p = (u16*)page;
-	u16* b = (u16*)_flashbuf;
-	for (u8 i = 0; i < count; i++)
+	uint16_t* p = (uint16_t*)page;
+	uint16_t* b = (uint16_t*)_flashbuf;
+	for (uint8_t i = 0; i < count; i++)
 		boot_page_fill(p++, b[i]);
 
     boot_page_write(page);
@@ -78,8 +78,8 @@ int USBGetChar();
 #define STK_READ_PAGE       0x74  // 't'
 #define STK_READ_SIGN       0x75  // 'u'
 
-extern const u8 _readSize[] PROGMEM;
-const u8 _readSize[] = 
+extern const uint8_t _readSize[] PROGMEM;
+const uint8_t _readSize[] = 
 {
 	STK_GET_PARAMETER,	1,
 	STK_SET_DEVICE,		20,
@@ -91,8 +91,8 @@ const u8 _readSize[] =
 	0,0
 };
 
-extern const u8 _consts[] PROGMEM;
-const u8 _consts[] = 
+extern const uint8_t _consts[] PROGMEM;
+const uint8_t _consts[] = 
 {
 	SIGNATURE_0,
 	SIGNATURE_1,
@@ -131,18 +131,18 @@ int main()
 
 	for(;;)
 	{
-		u8* packet = _flashbuf;
-		u16 address = 0;
+		uint8_t* packet = _flashbuf;
+		uint16_t address = 0;
 		for (;;)
 		{
-			u8 cmd = getch();
+			uint8_t cmd = getch();
 
 			//	Read packet contents
-			u8 len;
-			const u8* rs = _readSize;
+			uint8_t len;
+			const uint8_t* rs = _readSize;
 			for(;;)
 			{
-				u8 c = pgm_read_byte(rs++);
+				uint8_t c = pgm_read_byte(rs++);
 				len = pgm_read_byte(rs++);
 				if (c == cmd || c == 0)
 					break;
@@ -152,11 +152,11 @@ int main()
 			Recv(CDC_RX,packet,len);
 
 			//	Send a response
-			u8 send = 0;
-			const u8* pgm = _consts+7;			// 0
+			uint8_t send = 0;
+			const uint8_t* pgm = _consts+7;			// 0
 			if (STK_GET_PARAMETER == cmd)
 			{
-				u8 i = packet[0] - 0x80;
+				uint8_t i = packet[0] - 0x80;
 				if (i > 2)
 					i = (i == 0x18) ? 3 : 4;	// 0x80:HW_VER,0x81:SW_MAJOR,0x82:SW_MINOR,0x18:3 or 0
 				pgm = _consts + i + 3;
@@ -179,7 +179,7 @@ int main()
 
 			else if (STK_LOAD_ADDRESS == cmd)
 			{
-				address = *((u16*)packet);		// word addresses
+				address = *((uint16_t*)packet);		// word addresses
 				address += address;
 			}
 
@@ -191,7 +191,7 @@ int main()
 			else if (STK_READ_PAGE == cmd)
 			{
 				send = packet[1];
-				pgm = (const u8*)address;
+				pgm = (const uint8_t*)address;
 				address += send; // not sure of this is required
 			}
 
@@ -216,15 +216,15 @@ int main()
 }
 
 //	Nice breathing LED indicates we are in the firmware
-u16 _pulse;
+uint16_t _pulse;
 void LEDPulse()
 {
 	_pulse += 4;
-	u8 p = _pulse >> 9;
+	uint8_t p = _pulse >> 9;
 	if (p > 63)
 		p = 127-p;
 	p += p;
-	if (((u8)_pulse) > p)
+	if (((uint8_t)_pulse) > p)
 		L_LED_OFF();
 	else
 		L_LED_ON();
@@ -234,7 +234,7 @@ void StartSketch()
 {
 	TX_LED_OFF();	// switch off the RX and TX LEDs before starting the user sketch
 	RX_LED_OFF();
-	UDCON = 1;		// Detatch USB
+	UDCON = 1;		// Detach USB
 	UDIEN = 0;
 	asm volatile (	// Reset vector to run firmware
 		"clr r30\n"
@@ -245,7 +245,7 @@ void StartSketch()
 
 void Reset() 
 {
-	wdt_enable(WDTO_15MS);
+	wdt_enable(WDTO_15MS);	// reset the microcontroller to reinitialize all IO and other registers
 	for (;;) 
 		;
 }

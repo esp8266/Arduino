@@ -22,17 +22,17 @@
 //====================================================================================================
 //	Actual device descriptors
 
-const u16 STRING_LANGUAGE[2] = {
+const uint16_t STRING_LANGUAGE[2] = {
 	(3<<8) | (2+2),
 	0x0409	// English
 };
 
-const u16 STRING_SERIAL[13] = {
+const uint16_t STRING_SERIAL[13] = {
 	(3<<8) | (2+2*12),
 	USB_SERIAL_STRING
 };
 
-const u16 STRING_IPRODUCT[28] = {
+const uint16_t STRING_IPRODUCT[28] = {
 	(3<<8) | (2+2*27),
 #if USB_PID == USB_PID_LEONARDO	
 	'A','r','d','u','i','n','o',' ','L','e','o','n','a','r','d','o',' ','b','o','o','t','l','o','a','d','e','r'
@@ -41,7 +41,7 @@ const u16 STRING_IPRODUCT[28] = {
 #endif
 };
 
-const u16 STRING_IMANUFACTURER[12] = {
+const uint16_t STRING_IMANUFACTURER[12] = {
 	(3<<8) | (2+2*11),
 	'A','r','d','u','i','n','o',' ','L','L','C'
 };
