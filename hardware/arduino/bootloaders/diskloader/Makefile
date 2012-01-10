@@ -9,21 +9,22 @@ CC = avr-gcc
 
 # BOARD2
 MCU = atmega32u4
-AVR_FREQ   = 16000000L
+AVR_FREQ = 16000000L
 
 # Specify the Arduino model using the assigned PID.  This is used by Descriptors.c
 #   to set PID and product descriptor string
-# Arduino Leonardo PID
-ARDUINO_MODEL_PID = 0x0034
-# Arduino Micro PID
-#ARDUINO_MODEL_PID = 0x0035
+
+# Arduino Leonardo bootloader PID 
+ARDUINO_MODEL_PID = 0x0030
+# Arduino Micro bootloader PID
+#ARDUINO_MODEL_PID = 0x0031
 
 # Change if your programmer is different
 AVRDUDE_PROGRAMMER = avrispmkII
 AVRDUDE_PORT = usb	   
 
 # program name should not be changed...
-PROGRAM    = DiskLoader
+PROGRAM = DiskLoader
 
 AVRDUDE = avrdude
 AVRDUDE_FLAGS = -p $(MCU) -P $(AVRDUDE_PORT) -c $(AVRDUDE_PROGRAMMER) -p $(MCU)
@@ -42,7 +43,6 @@ ASMFLAGS += -x assembler-with-cpp -Wa,-gdwarf2
 LDFLAGS = $(COMMON)
 LDFLAGS += -Wl,-gc-sections,-Map=DiskLoader.map,--section-start=.text=0x7800,--relax
 LDFLAGS += -nodefaultlibs -nostartfiles
-
 
 ## Intel Hex file production flags
 HEX_EEPROM_FLAGS = -j .eeprom
@@ -102,4 +102,4 @@ size: $(TARGET)
 #	@avr-size -C --mcu=${MCU} ${TARGET}.elf
 
 program: $(TARGET).hex
-	$(AVRDUDE) $(AVRDUDE_FLAGS) -B 5 -u -U flash:w:$(TARGET).hex
+	$(AVRDUDE) $(AVRDUDE_FLAGS) -B 1 -u -U flash:w:$(TARGET).hex

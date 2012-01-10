@@ -34,9 +34,9 @@ const uint16_t STRING_SERIAL[13] = {
 
 const uint16_t STRING_IPRODUCT[28] = {
 	(3<<8) | (2+2*27),
-#if USB_PID == USB_PID_LEONARDO	
+#if USB_PID == USB_PID_LEONARDO_BOOTLOADER
 	'A','r','d','u','i','n','o',' ','L','e','o','n','a','r','d','o',' ','b','o','o','t','l','o','a','d','e','r'
-#elif USB_PID == USB_PID_MICRO
+#elif USB_PID == USB_PID_MICRO_BOOTLOADER
 	'A','r','d','u','i','n','o',' ','M','i','c','r','o',' ','b','o','o','t','l','o','a','d','e','r',' ',' ',' '
 #endif
 };
