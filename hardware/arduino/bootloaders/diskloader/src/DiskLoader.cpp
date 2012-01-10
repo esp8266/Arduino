@@ -114,9 +114,9 @@ int main()
 	uint8_t MCUSR_state = MCUSR;	// store the reason for the reset
 	MCUSR &= ~(1 << WDRF);			// must clear the watchdog reset flag before disabling and reenabling WDT
 	wdt_disable();
-	TXLED0;
-	RXLED0;
-	LED0;		
+	TX_LED_OFF();
+	RX_LED_OFF();
+	L_LED_OFF();
 	if (MCUSR_state & (1<<WDRF) && (pgm_read_word(0) != -1)) {
 		StartSketch();				// if the reset was caused by WDT and if a sketch is already present then run the sketch instead of the bootloader
 	}	
@@ -225,15 +225,15 @@ void LEDPulse()
 		p = 127-p;
 	p += p;
 	if (((u8)_pulse) > p)
-		LED0;
+		L_LED_OFF();
 	else
-		LED1;
+		L_LED_ON();
 }
 
 void StartSketch()
 {
-	TXLED0;		// switch off the RX and TX LEDs before starting the user sketch
-	RXLED0;
+	TX_LED_OFF();	// switch off the RX and TX LEDs before starting the user sketch
+	RX_LED_OFF();
 	UDCON = 1;		// Detatch USB
 	UDIEN = 0;
 	asm volatile (	// Reset vector to run firmware

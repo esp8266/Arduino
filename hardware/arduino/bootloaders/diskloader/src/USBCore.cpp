@@ -89,7 +89,7 @@ static inline void ClearOUT(void)
 static
 void Send(volatile const u8* data, u8 count)
 {
-	TXLED1;					// light the TX LED
+	TX_LED_ON();					// light the TX LED
 	TxLEDPulse = TX_RX_LED_PULSE_MS;
 	while (count--)
 		UEDATX = *data++;
@@ -97,7 +97,7 @@ void Send(volatile const u8* data, u8 count)
 
 void Recv(volatile u8* data, u8 count)
 {
-	RXLED1;					// light the RX LED
+	RX_LED_ON();					// light the RX LED
 	RxLEDPulse = TX_RX_LED_PULSE_MS;
 	while (count--)
 		*data++ = UEDATX;
@@ -105,14 +105,14 @@ void Recv(volatile u8* data, u8 count)
 
 static inline u8 Recv8()
 {
-	RXLED1;					// light the RX LED
+	RX_LED_ON();					// light the RX LED
 	RxLEDPulse = TX_RX_LED_PULSE_MS;
 	return UEDATX;
 }
 
 static inline void Send8(u8 d)
 {
-	TXLED1;					// light the TX LED
+	TX_LED_ON();					// light the TX LED
 	TxLEDPulse = TX_RX_LED_PULSE_MS;
 	UEDATX = d;
 }
@@ -473,9 +473,9 @@ void USBGeneralInterrupt()
 	{
 		// check whether the one-shot period has elapsed.  if so, turn off the LED
 		if (TxLEDPulse && !(--TxLEDPulse))
-			TXLED0;
+			TX_LED_OFF();
 		if (RxLEDPulse && !(--RxLEDPulse))
-			RXLED0;
+			RX_LED_OFF();
 		
 		if (!_ejected)
 			_timeout = 0;

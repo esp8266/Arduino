@@ -28,12 +28,12 @@ typedef unsigned long u32;
 
 #define OEM_NAME		'l','e','o','n','a','r','d','o'					// 8 chars
 #define BOARD_INIT()	DDRC |= (1<<7); DDRB |= (1<<0); DDRD |= (1<<5); CPU_PRESCALE(0); DISABLE_JTAG();
-#define LED0			PORTC &= ~(1<<7)
-#define LED1			PORTC |= (1<<7)
-#define TXLED0			PORTD |= (1<<5)
-#define TXLED1			PORTD &= ~(1<<5)
-#define RXLED0			PORTB |= (1<<0)
-#define RXLED1			PORTB &= ~(1<<0)
+#define L_LED_OFF()		PORTC &= ~(1<<7)
+#define L_LED_ON()		PORTC |= (1<<7)
+#define TX_LED_OFF()	PORTD |= (1<<5)
+#define TX_LED_ON()		PORTD &= ~(1<<5)
+#define RX_LED_OFF()	PORTB |= (1<<0)
+#define RX_LED_ON()		PORTB &= ~(1<<0)
 
 #define TRANSFER_PGM		0x80
 #define TRANSFER_RELEASE	0x40
