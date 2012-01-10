@@ -351,7 +351,7 @@ u8 _cdcComposite = 0;
 bool SendDescriptor()
 {
 	Setup& setup = _setup;
-	u8 desc_length = 0;
+	u16 desc_length = 0;
 	const u8* desc_addr = 0;
 
 	u8 t = setup.wValueH;
@@ -387,13 +387,13 @@ bool SendDescriptor()
 
 	if (desc_length == 0)
 		desc_length = pgm_read_byte(desc_addr);
-	if ((u8)setup.wLength < desc_length)		// bit of a cheat limiting to 255 bytes TODO (saved 8 bytes)
-		desc_length = (u8)setup.wLength;
+	if (setup.wLength < desc_length)		
+		desc_length = setup.wLength;
 
 	//	Send descriptor
 	//	EP0 is 64 bytes long
 	//	RWAL and FIFOCON don't work on EP0
-	u8 n = 0;
+	u16 n = 0;
 	do
 	{
 		if (!WaitForINOrOUT())
