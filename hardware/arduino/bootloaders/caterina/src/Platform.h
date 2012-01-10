@@ -41,7 +41,7 @@ void Program(uint8_t ep, uint16_t page, uint8_t count);
 /* HID is not fully-supported in the bootloader - can be enabled
    for testing, but note the descriptor report and other parts are 
    not complete */
-//#define HID_ENABLED		
+#define HID_ENABLED		
 
 #include "USBCore.h"
 #include "USBDesc.h"
