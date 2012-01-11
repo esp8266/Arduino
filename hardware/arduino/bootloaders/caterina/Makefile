@@ -15,9 +15,9 @@ AVR_FREQ = 16000000L
 #   to set PID and product descriptor string
 
 # Arduino Leonardo bootloader PID 
-ARDUINO_MODEL_PID = 0x0030
+ARDUINO_MODEL_PID = 0x0034
 # Arduino Micro bootloader PID
-#ARDUINO_MODEL_PID = 0x0031
+#ARDUINO_MODEL_PID = 0x0035
 
 # Change if your programmer is different
 AVRDUDE_PROGRAMMER = avrispmkII
