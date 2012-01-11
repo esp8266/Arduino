@@ -1,0 +1,3809 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html xmlns:p="urn:schemas-microsoft-com:office:powerpoint" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office"><head>
+  
+  <title>CMSIS: Cortex-M4 SIMD Instructions</title><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+  <meta name="ProgId" content="FrontPage.Editor.Document">
+  <style>
+<!--
+/*-----------------------------------------------------------Keil Software CHM Style Sheet
+-----------------------------------------------------------*/
+body { color: #000000; background-color: #FFFFFF; font-size: 75%; font-family: Verdana, Arial, 'Sans Serif' }
+a:link { color: #0000FF; text-decoration: underline }
+a:visited { color: #0000FF; text-decoration: underline }
+a:active { color: #FF0000; text-decoration: underline }
+a:hover { color: #FF0000; text-decoration: underline }
+h1 { font-family: Verdana; font-size: 18pt; color: #000080; font-weight: bold; text-align: Center; margin-right: 3 }
+h2 { font-family: Verdana; font-size: 14pt; color: #000080; font-weight: bold; background-color: #CCCCCC; margin-top: 24; margin-bottom: 3; padding: 6 }
+h3 { font-family: Verdana; font-size: 10pt; font-weight: bold; background-color: #CCCCCC; margin-top: 24; margin-bottom: 3; padding: 6 }
+pre { font-family: Courier New; font-size: 10pt; background-color: #CCFFCC; margin-left: 24; margin-right: 24 }
+ul { list-style-type: square; margin-top: 6pt; margin-bottom: 0 }
+ol { margin-top: 6pt; margin-bottom: 0 }
+li { clear: both; margin-bottom: 6pt }
+table { font-size: 100%; border-width: 0; padding: 0 }
+th { color: #FFFFFF; background-color: #000080; text-align: left; vertical-align: bottom; padding-right: 6pt }
+tr { text-align: left; vertical-align: top }
+td { text-align: left; vertical-align: top; padding-right: 6pt }
+.ToolT { font-size: 8pt; color: #808080 }
+.TinyT { font-size: 8pt; text-align: Center }
+code { color: #000000; background-color: #E0E0E0; font-family: 'Courier New', Courier; line-height: 120%; font-style: normal }
+/*-----------------------------------------------------------Notes
+-----------------------------------------------------------*/
+p.note { font-weight: bold; clear: both; margin-bottom: 3pt; padding-top: 6pt }
+/*-----------------------------------------------------------Expanding/Contracting Divisions
+-----------------------------------------------------------*/
+#expand { text-decoration: none; margin-bottom: 3pt }
+img.expand { border-style: none; border-width: medium }
+div.expand { display: none; margin-left: 9pt; margin-top: 0 }
+/*-----------------------------------------------------------Where List Tags
+-----------------------------------------------------------*/
+p.wh { font-weight: bold; clear: both; margin-top: 6pt; margin-bottom: 3pt }
+table.wh { width: 100% }
+td.whItem { white-space: nowrap; font-style: italic; padding-right: 6pt; padding-bottom: 6pt }
+td.whDesc { padding-bottom: 6pt }
+/*-----------------------------------------------------------Keil Table Tags
+-----------------------------------------------------------*/
+table.kt { width: 100%; border: 1pt solid #000000 }
+th.kt { white-space: nowrap; border-bottom: 1pt solid #000000; padding-left: 6pt; padding-right: 6pt; padding-top: 4pt; padding-bottom: 4pt }
+tr.kt { }
+td.kt { color: #000000; background-color: #E0E0E0; border-top: 1pt solid #A0A0A0; padding-left: 6pt; padding-right: 6pt; padding-top: 2pt; padding-bottom: 2pt }
+/*----------------------------------------------------------------------------------------------------------------------*/
+    .style1 {
+	background-color: #E0E0E0;
+}
+.O
+	{color:#1D315B;
+	font-size:149%;}
+    -->
+</style>
+</head>
+
+<body>
+
+<h1>CMSIS Support for Cortex-M4 SIMD Instructions</h1>
+
+<p align="center">This file describes the Cortex-M4 SIMD instructions supported by CMSIS.</p>
+<p align="center">Version: 1.00 - 25. November 2010</p>
+
+<p class="TinyT">Information in this file, the accompany manuals, and software is<br>
+                 Copyright © ARM Ltd.<br>All rights reserved.
+</p>
+
+<hr>
+
+<h2>Revision History</h2>
+<ul>
+	<li>Revision 0.01 - January 2010: Initial version</li>
+	<li>Revision 0.02 - June 2010: added __QADD, __QSUB</li>
+	<li>Revision 1.00 - November 2010: </li>
+</ul>
+
+<hr>
+
+<h2>Contents</h2>
+
+<ol>
+  <li class="LI2"><a href="#About">About</a></li>
+  <li class="LI2"><a href="#CM4-SIMD-Instructions">Cortex-M4 SIMD instruction support</a></li>
+  <li class="LI2"><a href="#Examples">Examples</a></li>
+</ol>
+
+
+
+<p>&nbsp;</p>
+<h2><a name="About"></a>About</h2>
+<p>
+  CMSIS provides for the Cortex-M4 a set of functions supporting Cortex-M4 SIMD instructions.
+</p>
+
+<p>&nbsp;</p>
+<h2><a name="CM4-SIMD-Instructions"></a>Cortex-M4 SIMD instruction support</h2>
+<p>CMSIS supports the following functions for Cortex-M4 instructions:
+</p>
+
+<table class="kt" border="0" cellpadding="0" cellspacing="0">
+  <tbody>
+    <tr>
+      <th class="kt">Name</th>
+      <th class="kt">Mnemonic</th>
+      <th class="kt">Description</th>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__SADD8">__SADD8</a></b></td>
+      <td class="kt">SADD8</td>
+      <td class="kt">GE setting quad 8-bit signed addition</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__QADD8">__QADD8</a></b></td>
+      <td class="kt">QADD8</td>
+      <td class="kt">Q setting quad 8-bit saturating addition</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__SHADD8">__SHADD8</a></b></td>
+      <td class="kt">SHADD8</td>
+      <td class="kt">Quad 8-bit signed addition with halved results</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__UADD8">__UADD8</a></b></td>
+      <td class="kt">UADD8</td>
+      <td class="kt">GE setting quad 8-bit unsigned addition</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__UQADD8">__UQADD8</a></b></td>
+      <td class="kt">UQADD8</td>
+      <td class="kt">Quad 8-bit unsigned saturating addition</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__UHADD8">__UHADD8</a></b></td>
+      <td class="kt">UHADD8</td>
+      <td class="kt">Quad 8-bit unsigned addition with halved results</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__SSUB8">__SSUB8</a></b></td>
+      <td class="kt">SSUB8</td>
+      <td class="kt">GE setting quad 8-bit signed subtraction</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__QSUB8">__QSUB8</a></b></td>
+      <td class="kt">QSUB8</td>
+      <td class="kt">Q setting quad 8-bit saturating subtract</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__SHSUB8">__SHSUB8</a></b></td>
+      <td class="kt">SHSUB8</td>
+      <td class="kt">Quad 8-bit signed subtraction with halved results</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__USUB8">__USUB8</a></b></td>
+      <td class="kt">USUB8</td>
+      <td class="kt">GE setting quad 8-bit unsigned subtract</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__UQSUB8">__UQSUB8</a></b></td>
+      <td class="kt">UQSUB8</td>
+      <td class="kt">Quad 8-bit unsigned saturating subtraction</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__UHSUB8">__UHSUB8</a></b></td>
+      <td class="kt">UHSUB8</td>
+      <td class="kt">Quad 8-bit unsigned subtraction with halved results</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__SADD16">__SADD16</a></b></td>
+      <td class="kt">SADD16</td>
+      <td class="kt">GE setting dual 16-bit signed addition</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__QADD16">__QADD16</a></b></td>
+      <td class="kt">QADD16</td>
+      <td class="kt">Q setting dual 16-bit saturating addition</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__SHADD16">__SHADD16</a></b></td>
+      <td class="kt">SHADD16</td>
+      <td class="kt">Dual 16-bit signed addition with halved results</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__UADD16">__UADD16</a></b></td>
+      <td class="kt">UADD16</td>
+      <td class="kt">GE setting dual 16-bit unsigned addition</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__UQADD16">__UQADD16</a></b></td>
+      <td class="kt">UQADD16</td>
+      <td class="kt">Dual 16-bit unsigned saturating addition</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__UHADD16">__UHADD16</a></b></td>
+      <td class="kt">UHADD16</td>
+      <td class="kt">Dual 16-bit unsigned addition with halved results</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__SSUB16">__SSUB16</a></b></td>
+      <td class="kt">SSUB16</td>
+      <td class="kt">GE setting dual 16-bit signed subtraction</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__QSUB16">__QSUB16</a></b></td>
+      <td class="kt">QSUB16</td>
+      <td class="kt">Q setting dual 16-bit saturating subtract</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__SHSUB16">__SHSUB16</a></b></td>
+      <td class="kt">SHSUB16</td>
+      <td class="kt">Dual 16-bit signed subtraction with halved results</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__USUB16">__USUB16</a></b></td>
+      <td class="kt">USUB16</td>
+      <td class="kt">GE setting dual 16-bit unsigned subtract</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__UQSUB16">__UQSUB16</a></b></td>
+      <td class="kt">UQSUB16</td>
+      <td class="kt">Dual 16-bit unsigned saturating subtraction</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__UHSUB16">__UHSUB16</a></b></td>
+      <td class="kt">UHSUB16</td>
+      <td class="kt">Dual 16-bit unsigned subtraction with halved results</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__SASX">__SASX</a></b></td>
+      <td class="kt">SASX</td>
+      <td class="kt">GE setting dual 16-bit addition and subtraction with exchange</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__QASX">__QASX</a></b></td>
+      <td class="kt">QASX</td>
+      <td class="kt">Q setting dual 16-bit add and subtract with exchange</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__SHASX">__SHASX</a></b></td>
+      <td class="kt">SHASX</td>
+      <td class="kt">Dual 16-bit signed addition and subtraction with halved results</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__UASX">__UASX</a></b></td>
+      <td class="kt">UASX</td>
+      <td class="kt">GE setting dual 16-bit unsigned addition and subtraction with exchange</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__UQASX">__UQASX</a></b></td>
+      <td class="kt">UQASX</td>
+      <td class="kt">Dual 16-bit unsigned saturating addition and subtraction with exchange</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__UHASX">__UHASX</a></b></td>
+      <td class="kt">UHASX</td>
+      <td class="kt">Dual 16-bit unsigned addition and subtraction with halved results and exchange</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__SSAX">__SSAX</a></b></td>
+      <td class="kt">SSAX</td>
+      <td class="kt">GE setting dual 16-bit signed subtraction and addition with exchange</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__QSAX">__QSAX</a></b></td>
+      <td class="kt">QSAX</td>
+      <td class="kt">Q setting dual 16-bit subtract and add with exchange</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__SHSAX">__SHSAX</a></b></td>
+      <td class="kt">SHSAX</td>
+      <td class="kt">Dual 16-bit signed subtraction and addition with halved results</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__USAX">__USAX</a></b></td>
+      <td class="kt">USAX</td>
+      <td class="kt">GE setting dual 16-bit unsigned subtract and add with exchange</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__UQSAX">__UQSAX</a></b></td>
+      <td class="kt">UQSAX</td>
+      <td class="kt">Dual 16-bit unsigned saturating subtraction and addition with exchange</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__UHSAX">__UHSAX</a></b></td>
+      <td class="kt">UHSAX</td>
+      <td class="kt">Dual 16-bit unsigned subtraction and addition with halved results and exchange</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__USAD8">__USAD8</a></b></td>
+      <td class="kt">USAD8</td>
+      <td class="kt">Unsigned sum of quad 8-bit unsigned absolute difference</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__USADA8">__USADA8</a></b></td>
+      <td class="kt">USADA8</td>
+      <td class="kt">Unsigned sum of quad 8-bit unsigned absolute difference with 32-bit accumulate</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__SSAT16">__SSAT16</a></b></td>
+      <td class="kt">SSAT16</td>
+      <td class="kt">Q setting dual 16-bit saturate</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__USAT16">__USAT16</a></b></td>
+      <td class="kt">USAT16</td>
+      <td class="kt">Q setting dual 16-bit unsigned saturate</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__UXTB16">__UXTB16</a></b></td>
+      <td class="kt">UXTB16</td>
+      <td class="kt">Dual extract 8-bits and zero-extend to 16-bits</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__UXTAB16">__UXTAB16</a></b></td>
+      <td class="kt">UXTAB16</td>
+      <td class="kt">Extracted 16-bit to 32-bit unsigned addition</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__SXTB16">__SXTB16</a></b></td>
+      <td class="kt">SXTB16</td>
+      <td class="kt">Dual extract 8-bits and sign extend each to 16-bits</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__SXTAB16">__SXTAB16</a></b></td>
+      <td class="kt">SXTAB16</td>
+      <td class="kt">Dual extracted 8-bit to 16-bit signed addition</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__SMUAD">__SMUAD</a></b></td>
+      <td class="kt">SMUAD</td>
+      <td class="kt">Q setting sum of dual 16-bit signed multiply</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__SMUADX">__SMUADX</a></b></td>
+      <td class="kt">SMUADX</td>
+      <td class="kt">Q setting sum of dual 16-bit signed multiply with exchange</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__SMLAD">__SMLAD</a></b></td>
+      <td class="kt">SMLAD</td>
+      <td class="kt">Q setting dual 16-bit signed multiply with single 32-bit accumulator</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__SMLADX">__SMLADX</a></b></td>
+      <td class="kt">SMLADX</td>
+      <td class="kt">Q setting pre-exchanged dual 16-bit signed multiply with single 32-bit accumulator</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__SMLALD">__SMLALD</a></b></td>
+      <td class="kt">SMLALD</td>
+      <td class="kt">Dual 16-bit signed multiply with single 64-bit accumulator</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__SMLALDX">__SMLALDX</a></b></td>
+      <td class="kt">SMLALDX</td>
+      <td class="kt">Dual 16-bit signed multiply with exchange with single 64-bit accumulator</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__SMUSD">__SMUSD</a></b></td>
+      <td class="kt">SMUSD</td>
+      <td class="kt">Dual 16-bit signed multiply returning difference</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__SMUSDX">__SMUSDX</a></b></td>
+      <td class="kt">SMUSDX</td>
+      <td class="kt">Dual 16-bit signed multiply with exchange returning difference</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__SMLSD">__SMLSD</a></b></td>
+      <td class="kt">SMLSD</td>
+      <td class="kt">Q setting dual 16-bit signed multiply subtract with 32-bit accumulate</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__SMLSDX">__SMLSDX</a></b></td>
+      <td class="kt">SMLSDX</td>
+      <td class="kt">Q setting dual 16-bit signed multiply with exchange subtract with 32-bit accumulate</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__SMLSLD">__SMLSLD</a></b></td>
+      <td class="kt">SMLSLD</td>
+      <td class="kt">Q setting dual 16-bit signed multiply subtract with 64-bit accumulate</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__SMLSLDX">__SMLSLDX</a></b></td>
+      <td class="kt">SMLSLDX</td>
+      <td class="kt">Q setting dual 16-bit signed multiply with exchange subtract with 64-bit accumulate</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__SEL">__SEL</a></b></td>
+      <td class="kt">SEL</td>
+      <td class="kt">Select bytes based on GE bits</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__QADD">__QADD</a></b></td>
+      <td class="kt">QADD</td>
+      <td class="kt">Q setting saturating add</td>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#__QSUB">__QSUB</a></b></td>
+      <td class="kt">QSUB/td>
+      <td class="kt">Q setting saturating subtract</td>
+    </tr>
+
+    </tbody>
+</table>
+
+<!-- --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------     -->
+<!-- --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------     -->
+
+<h3><a name="__SADD8"></a>Function __SADD8</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __SADD8(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to perform four 8-bit signed integer additions.<br>
+          The GE bits in the APSR are set according to the results of the additions.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first four 8-bit summands.</li>
+          <li><b>val2</b>: second four 8-bit summands.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the addition of the first bytes from each operand, in the first byte of the return value.</li>
+            <li>the addition of the second bytes of each operand, in the second byte of the return value.</li>
+            <li>the addition of the third bytes of each operand, in the third byte of the return value.</li>
+            <li>the addition of the fourth bytes of each operand, in the fourth byte of the return value.</li>
+          </ul>
+          <p>Each bit in APSR.GE is set or cleared for each byte in the return value, depending on 
+             the results of the operation.<br>
+             If <i>res</i> is the return value, then:
+          </p>
+          <ul style="margin-top:0px">
+            <li>if res[7:0] &ge; 0 then APSR.GE[0] = 1 else 0</li>
+            <li>if res[15:8] &ge; 0 then APSR.GE[1] = 1 else 0</li>
+            <li>if res[23:16] &ge; 0 then APSR.GE[2] = 1 else 0</li>
+            <li>if res[31:24] &ge; 0 then APSR.GE[3] = 1 else 0</li>
+         </ul>      
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[7:0]   = val1[7:0]   + val2[7:0]
+res[15:8]  = val1[15:8]  + val2[15:8]
+res[23:16] = val1[23:16] + val2[23:16]
+res[31:24] = val1[31:24] + val2[31:24]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__QADD8"></a>Function __QADD8</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __QADD8(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to perform four 8-bit integer additions, saturating the results to 
+          the 8-bit signed integer range -2<sup>7</sup> &le; x &le; 2<sup>7</sup> - 1.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first four 8-bit summands.</li>
+          <li><b>val2</b>: second four 8-bit summands.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the saturated addition of the first byte of each operand in the first byte of the return value.</li>
+            <li>the saturated addition of the second byte of each operand in the second byte of the return value.</li>
+            <li>the saturated addition of the third byte of each operand in the third byte of the return value.</li>
+            <li>the saturated addition of the fourth byte of each operand in the fourth byte of the return value.</li>
+          </ul>
+          <p>The returned results are saturated to the 16-bit signed integer range -2<sup>7</sup> &le; x &le; 2<sup>7</sup> - 1.
+          </p>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[7:0]   = val1[7:0]   + val2[7:0]
+res[15:8]  = val1[15:8]  + val2[15:8]
+res[23:16] = val1[23:16] + val2[23:16]
+res[31:24] = val1[31:24] + val2[31:24]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__SHADD8"></a>Function __SHADD8</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __SHADD8(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to perform four signed 8-bit integer additions, halving the results.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first four 8-bit summands.</li>
+          <li><b>val2</b>: second four 8-bit summands.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the halved addition of the first bytes from each operand, in the first byte of the return value.</li>
+            <li>the halved addition of the second bytes from each operand, in the second byte of the return value.</li>
+            <li>the halved addition fo the third bytes from each operand, in the third byte of the return value.</li>
+            <li>the halved addition of the fourth bytes from each operand, in the fourth byte of the return value.</li>
+          </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[7:0]   = (val1[7:0]   + val2[7:0])   &gt;&gt; 1
+res[15:8]  = (val1[15:8]  + val2[15:8])  &gt;&gt; 1
+res[23:16] = (val1[23:16] + val2[23:16]) &gt;&gt; 1
+res[31:24] = (val1[31:24] + val2[31:24]) &gt;&gt; 1</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__UADD8"></a>Function __UADD8</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __UADD8(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to perform four unsigned 8-bit integer additions.<br>
+          The GE bits in the APSR are set according to the results.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first four 8-bit summands for each addition.</li>
+          <li><b>val2</b>: second four 8-bit summands for each addition.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the addition of the first bytes in each operand, in the first byte of the return value.</li>
+            <li>the addition of the second bytes in each operand, in the second byte of the return value.</li>
+            <li>the addition of the third bytes in each operand, in the third byte of the return value.</li>
+            <li>the addition of the fourth bytes in each operand, in the fourth byte of the return value.</li>
+          </ul>
+          <p>Each bit in APSR.GE is set or cleared for each byte in the return value, depending on 
+             the results of the operation.<br>
+             If <i>res</i> is the return value, then:
+          </p>
+          <ul style="margin-top:0px">
+            <li>if res[7:0] &ge; 0x100 then APSR.GE[0] = 1 else 0</li>
+            <li>if res[15:8] &ge; 0x100 then APSR.GE[1] = 1 else 0</li>
+            <li>if res[23:16] &ge; 0x100 then APSR.GE[2] = 1 else 0</li>
+            <li>if res[31:24] &ge; 0x100 then APSR.GE[3] = 1 else 0</li>
+         </ul>      
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[7:0]   = val1[7:0]   + val2[7:0]
+res[15:8]  = val1[15:8]  + val2[15:8]
+res[23:16] = val1[23:16] + val2[23:16]
+res[31:24] = val1[31:24] + val2[31:24]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__UQADD8"></a>Function __UQADD8</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __UQADD8(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to perform four unsigned 8-bit integer additions, saturating the 
+          results to the 8-bit unsigned integer range 0 &le; x &le; 2<sup>8</sup> - 1.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first four 8-bit summands.</li>
+          <li><b>val2</b>: second four 8-bit summands.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the addition of the first bytes in each operand, in the first byte of the return value.</li>
+            <li>the addition of the second bytes in each operand, in the second byte of the return value.</li>
+            <li>the addition of the third bytes in each operand, in the third byte of the return value.</li>
+            <li>the addition of the fourth bytes in each operand, in the fourth byte of the return value.</li>
+          </ul>
+          <p>The results are saturated to the 8-bit unsigned integer range 0 &le; x &le; 2<sup>8</sup> - 1.
+          </p>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[7:0]   = val1[7:0]   + val2[7:0]
+res[15:8]  = val1[15:8]  + val2[15:8]
+res[23:16] = val1[23:16] + val2[23:16]
+res[31:24] = val1[31:24] + val2[31:24]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__UHADD8"></a>Function __UHADD8</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __UHADD8(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to perform four unsigned 8-bit integer additions, halving the results.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first four 8-bit summands.</li>
+          <li><b>val2</b>: second four 8-bit summands.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the halved addition of the first bytes in each operand, in the first byte of the return value.</li>
+            <li>the halved addition of the second bytes in each operand, in the second byte of the return value.</li>
+            <li>the halved addition of the third bytes in each operand, in the third byte of the return value.</li>
+            <li>the halved addition of the fourth bytes in each operand, in the fourth byte of the return value.</li>
+          </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[7:0]   = (val1[7:0]   + val2[7:0])   &gt;&gt; 1
+res[15:8]  = (val1[15:8]  + val2[15:8])  &gt;&gt; 1
+res[23:16] = (val1[23:16] + val2[23:16]) &gt;&gt; 1
+res[31:24] = (val1[31:24] + val2[31:24]) &gt;&gt; 1</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__SSUB8"></a>Function __SSUB8</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __SSUB8(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to perform four 8-bit signed integer subtractions.<br>
+          The GE bits in the APSR are set according to the results.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first four 8-bit operands of each subtraction.</li>
+          <li><b>val2</b>: second four 8-bit operands of each subtraction.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the subtraction of the first byte in the second operand from the first byte in the 
+                first operand, in the first bytes of the return value.</li>
+            <li>the subtraction of the second byte in the second operand from the second byte in 
+                the first operand, in the second byte of the return value.</li>
+            <li>the subtraction of the third byte in the second operand from the third byte in the 
+                first operand, in the third byte of the return value.</li>
+            <li>the subtraction of the fourth byte in the second operand from the fourth byte in 
+                the first operand, in the fourth byte of the return value.</li>
+          </ul>
+          <p>Each bit in APSR.GE is set or cleared for each byte in the return value, depending on 
+             the results of the operation. If <i>res</i> is the return value, then:
+          </p>
+          <ul style="margin-top:0px">
+            <li>if res[8:0] &ge; 0 then APSR.GE[0] = 1 else 0</li>
+            <li>if res[15:8] &ge; 0 then APSR.GE[1] = 1 else 0</li>
+            <li>if res[23:16] &ge; 0 then APSR.GE[2] = 1 else 0</li>
+            <li>if res[31:24] &ge; 0 then APSR.GE[3] = 1 else 0</li>
+         </ul>      
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[7:0]   = val1[7:0]   - val2[7:0]
+res[15:8]  = val1[15:8]  - val2[15:8]
+res[23:16] = val1[23:16] - val2[23:16]
+res[31:24] = val1[31:24] - val2[31:24]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__QSUB8"></a>Function __QSUB8</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __QADD8(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to perform four 8-bit integer subtractions, saturating the results 
+          to the 8-bit signed integer range -2<sup>7</sup> &le; x &le; 2<sup>7</sup> - 1.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first four 8-bit operands.</li>
+          <li><b>val2</b>: second four 8-bit operands.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the subtraction of the first byte in the second operand from the first byte in the 
+                first operand, in the first byte of the return value.</li>
+            <li>the subtraction of the second byte in the second operand from the second byte in 
+                the first operand, in the second byte of the return value.</li>
+            <li>the subtraction of the third byte in the second operand from the third byte in the 
+                first operand, in the third byte of the return value.</li>
+            <li>the subtraction of the fourth byte in the second operand from the fourth byte in 
+                the first operand, in the fourth byte of the return value.</li>
+          </ul>
+          <p>The returned results are saturated to the 8-bit signed integer range -2<sup>7</sup> &le; x &le; 2<sup>7</sup> - 1.
+          </p>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[7:0]   = val1[7:0]   - val2[7:0]
+res[15:8]  = val1[15:8]  - val2[15:8]
+res[23:16] = val1[23:16] - val2[23:16]
+res[31:24] = val1[31:24] - val2[31:24]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__SHSUB8"></a>Function __SHSUB8</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __SHSUB8(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to perform four signed 8-bit integer subtractions, halving the 
+          results.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first four 8-bit operands.</li>
+          <li><b>val2</b>: second four 8-bit operands.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the halved subtraction of the first byte in the second operand from the first byte 
+                in the first operand, in the first byte of the return value.</li>
+            <li>the halved subtraction of the second byte in the second operand from the second 
+                byte in the first operand, in the second byte of the return value.</li>
+            <li>the halved subtraction of the third byte in the second operand from the third byte 
+                in the first operand, in the third byte of the return value.</li>
+            <li>the halved subtraction of the fourth byte in the second operand from the fourth 
+                byte in the first operand, in the fourth byte of the return value.</li>
+          </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[7:0]   = (val1[7:0]   - val2[7:0])  &gt;&gt; 1
+res[15:8]  = (val1[15:8]  - val2[15:8]) &gt;&gt; 1
+res[23:16] = (val1[23:16] - val2[23:16] &gt;&gt; 1
+res[31:24] = (val1[31:24] - val2[31:24] &gt;&gt; 1</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__USUB8"></a>Function __USUB8</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __USUB8(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function It enables you to perform four 8-bit unsigned integer subtractions.<br>
+          The GE bits in the APSR are set according to the results.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first four 8-bit operands.</li>
+          <li><b>val2</b>: second four 8-bit operands.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the subtraction of the first byte in the second operand from the first byte in the 
+                first operand, in the first byte of the return value.</li>
+            <li>the subtraction of the second byte in the second operand from the second byte in 
+                the first operand, in the second byte of the return value.</li>
+            <li>the subtraction of the third byte in the second operand from the third byte in the 
+                first operand, in the third byte of the return value.</li>
+            <li>the subtraction of the fourth byte in the second operand from the fourth byte in 
+                the first operand, in the fourth byte of the return value.</li>
+          </ul>
+          <p>Each bit in APSR.GE is set or cleared for each byte in the return value, depending on 
+             the results of the operation.<br>
+             If <i>res</i> is the return value, then:
+          </p>
+          <ul style="margin-top:0px">
+            <li>if res[7:0] &ge; 0 then APSR.GE[0] = 1 else 0</li>
+            <li>if res[15:8] &ge; 0 then APSR.GE[1] = 1 else 0</li>
+            <li>if res[23:16] &ge; 0 then APSR.GE[2] = 1 else 0</li>
+            <li>if res[31:24] &ge; 0 then APSR.GE[3] = 1 else 0</li>
+         </ul>      
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[7:0]   = val1[7:0]   - val2[7:0]
+res[15:8]  = val1[15:8]  - val2[15:8]
+res[23:16] = val1[23:16] - val2[23:16]
+res[31:24] = val1[31:24] - val2[31:24]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__UQSUB8"></a>Function __UQSUB8</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __UQSUB8(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to perform four unsigned 8-bit integer subtractions, saturating 
+          the results to the 8-bit unsigned integer range 0 &le; x &le; 2<sup>8</sup> - 1.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first four 8-bit operands.</li>
+          <li><b>val2</b>: second four 8-bit operands.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the subtraction of the first byte in the second operand from the first byte in the 
+                first operand, in the first byte of the return value.</li>
+            <li>the subtraction of the second byte in the second operand from the second byte in 
+                the first operand, in the second byte of the return value.</li>
+            <li>the subtraction of the third byte in the second operand from the third byte in the 
+                first operand, in the third byte of the return value.</li>
+            <li>the subtraction of the fourth byte in the second operand from the fourth byte in 
+                the first operand, in the fourth byte of the return value.</li>
+          </ul>
+          <p>The results are saturated to the 8-bit unsigned integer range 0 &le; x &le; 2<sup>8</sup> - 1.
+          </p>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[7:0]   = val1[7:0]   - val2[7:0]
+res[15:8]  = val1[15:8]  - val2[15:8]
+res[23:16] = val1[23:16] - val2[23:16]
+res[31:24] = val1[31:24] - val2[31:24]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__UHSUB8"></a>Function __UHSUB8</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __UHSUB8(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to perform four unsigned 8-bit integer subtractions, halving the 
+          results.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first four 8-bit operands.</li>
+          <li><b>val2</b>: second four 8-bit operands.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the halved subtraction of the first byte in the second operand from the first byte 
+                in the first operand, in the first byte of the return value.</li>
+            <li>the halved subtraction of the second byte in the second operand from the second 
+                byte in the first operand, in the second byte of the return value.</li>
+            <li>the halved subtraction of the third byte in the second operand from the third byte 
+                in the first operand, in the third byte of the return value.</li>
+            <li>the halved subtraction of the fourth byte in the second operand from the fourth 
+                byte in the first operand, in the fourth byte of the return value.</li>
+          </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[7:0]   = (val1[7:0]   - val2[7:0])   &gt;&gt; 1
+res[15:8]  = (val1[15:8]  - val2[15:8])  &gt;&gt; 1
+res[23:16] = (val1[23:16] - val2[23:16]) &gt;&gt; 1
+res[31:24] = (val1[31:24] - val2[31:24]) &gt;&gt; 1</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__SADD16"></a>Function __SADD16</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __SADD16(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to perform two 16-bit signed integer additions.<br>
+          The GE bits in the APSR are set according to the results of the additions.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first two 16-bit summands.</li>
+          <li><b>val2</b>: second two 16-bit summands.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the addition of the low halfwords in the low halfword of the return value.</li>
+            <li>the addition of the high halfwords in the high halfword of the return value.</li>
+          </ul>
+          <p>Each bit in APSR.GE is set or cleared for each byte in the return value, depending on
+             the results of the operation.<br>
+             If <i>res</i> is the return value, then:
+          </p>
+          <ul style="margin-top:0px">
+            <li>if res[15:0] &ge; 0 then APSR.GE[1:0] = 11 else 00</li>
+            <li>if res[31:16] &ge; 0 then APSR.GE[3:2] = 11 else 00</li>
+         </ul>      
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[15:0]  = val1[15:0]  + val2[15:0]
+res[31:16] = val1[31:16] + val2[31:16]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__QADD16"></a>Function __QADD16</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __QADD16(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to perform two 16-bit integer arithmetic additions in parallel, 
+          saturating the results to the 16-bit signed integer range -2<sup>15</sup> &le; x &le; 2<sup>15</sup> - 1.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first two 16-bit summands.</li>
+          <li><b>val2</b>: second two 16-bit summands.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the saturated addition of the low halfwords in the low halfword of the return value.</li>
+            <li>the saturated addition of the high halfwords in the high halfword of the return value.</li>
+          </ul>
+          <p>The returned results are saturated to the 16-bit signed integer 
+             range -2<sup>15</sup> &le; x &le; 2<sup>15</sup> - 1
+          </p>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[15:0]  = val1[15:0]  + val2[15:0]
+res[16:31] = val1[31:16] + val2[31:16]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__SHADD16"></a>Function __SHADD16</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __SHADD16(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to perform two signed 16-bit integer additions, halving the 
+          results.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first two 16-bit summands.</li>
+          <li><b>val2</b>: second two 16-bit summands.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the halved addition of the low halfwords from each operand, in the low halfword 
+                of the return value.</li>
+            <li>the halved addition of the high halfwords from each operand, in the high halfword 
+                of the return value.</li>
+          </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[15:0]  = (val1[15:0]  + val2[15:0])  &gt;&gt; 1
+res[31:16] = (val1[31:16] + val2[31:16]) &gt;&gt; 1</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__UADD16"></a>Function __UADD16</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __UADD16(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to perform two 16-bit unsigned integer additions.<br>
+          The GE bits in the APSR are set according to the results.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first two 16-bit summands for each addition.</li>
+          <li><b>val2</b>: second two 16-bit summands for each addition.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the addition of the low halfwords in each operand, in the low halfword of the 
+                return value.</li>
+            <li>the addition of the high halfwords in each operand, in the high halfword of the 
+                return value.</li>
+          </ul>
+          <p>Each bit in APSR.GE is set or cleared for each byte in the return value, depending on 
+             the results of the operation.<br>
+             If <i>res</i> is the return value, then:
+          </p>
+          <ul style="margin-top:0px">
+            <li>if res[15:0] &ge; 0x10000 then APSR.GE[0] = 11 else 00</li>
+            <li>if res[31:16] &ge; 0x10000 then APSR.GE[1] = 11 else 00</li>
+         </ul>      
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[15:0]  = val1[15:0]  + val2[15:0]
+res[31:16] = val1[31:16] + val2[31:16]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__UQADD16"></a>Function __UQADD16</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __UQADD16(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to perform two unsigned 16-bit integer additions, saturating the 
+          results to the 16-bit unsigned integer range 0 &le; x &le; 2<sup>16</sup> - 1.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first two 16-bit summands.</li>
+          <li><b>val2</b>: second two 16-bit summands.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the addition of the low halfword in the first operand and the low halfword in the 
+                second operand, in the low halfword of the return value.</li>
+            <li>the addition of the high halfword in the first operand and the high halfword in the 
+                second operand, in the high halfword of the return value.</li>
+          </ul>
+          <p>The results are saturated to the 16-bit unsigned integer 
+             range 0 &le; x &le; 2<sup>16</sup> - 1.
+          </p>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[15:0]  = val1[15:0]  + val2[15:0]
+res[31:16] = val1[31:16] + val2[31:16]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__UHADD16"></a>Function __UHADD16</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __UHADD16(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to perform two unsigned 16-bit integer additions, halving the 
+          results.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first two 16-bit summands.</li>
+          <li><b>val2</b>: second two 16-bit summands.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the halved addition of the low halfwords in each operand, in the low halfword of 
+                the return value.</li>
+            <li>the halved addition of the high halfwords in each operand, in the high halfword 
+                of the return value.</li>
+          </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[15:0]  = (val1[15:0]  + val2[15:0])  &gt;&gt; 1
+res[31:16] = (val1[31:16] + val2[31:16]) &gt;&gt; 1</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__SSUB16"></a>Function __SSUB16</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __SSUB16(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to perform two 16-bit signed integer subtractions.<br>
+          The GE bits in the APSR are set according to the results.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first two 16-bit operands of each subtraction.</li>
+          <li><b>val2</b>: second two 16-bit operands of each subtraction.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the subtraction of the low halfword in the second operand from the low halfword 
+                in the first operand, in the low halfword of the return value.</li>
+            <li>the subtraction of the high halfword in the second operand from the high halfword 
+                in the first operand, in the high halfword of the return value.</li>
+          </ul>
+          <p>Each bit in APSR.GE is set or cleared for each byte in the return value, depending on 
+             the results of the operation.<br>
+             If <i>res</i> is the return value, then:
+          </p>
+          <ul style="margin-top:0px">
+            <li>if res[15:0] &ge; 0 then APSR.GE[1:0] = 11 else 00</li>
+            <li>if res[31:16] &ge; 0 then APSR.GE[3:2] = 11 else 00</li>
+         </ul>      
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[15:0]  = val1[15:0]  - val2[15:0]
+res[31:16] = val1[31:16] - val2[31:16]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__QSUB16"></a>Function __QSUB16</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __QSUB16(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to perform two 16-bit integer subtractions, saturating the 
+          results to the 16-bit signed integer range -2<sup>15</sup> &le; x &le; 2<sup>15</sup> - 1.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first two 16-bit operands.</li>
+          <li><b>val2</b>: second two 16-bit operands.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the saturated subtraction of the low halfword in the second operand from the low 
+                halfword in the first operand, in the low halfword of the returned result.</li>
+            <li>the saturated subtraction of the high halfword in the second operand from the high 
+                halfword in the first operand, in the high halfword of the returned result.</li>
+          </ul>
+          <p>The returned results are saturated to the 16-bit signed integer 
+             range -2<sup>15</sup> &le; x &le; 2<sup>15</sup> - 1.
+          </p>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[15:0]  = val1[15:0]  - val2[15:0]
+res[31:16] = val1[31:16] - val2[31:16]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__SHSUB16"></a>Function __SHSUB16</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __SHSUB16(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to perform two signed 16-bit integer subtractions, halving the 
+          results.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first two 16-bit operands.</li>
+          <li><b>val2</b>: second two 16-bit operands.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the halved subtraction of the low halfword in the second operand from the low 
+                halfword in the first operand, in the low halfword of the return value.</li>
+            <li>the halved subtraction of the high halfword in the second operand from the high 
+                halfword in the first operand, in the high halfword of the return value.</li>
+          </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[15:0]  = (val1[15:0]  - val2[15:0])  &gt;&gt; 1
+res[31:16] = (val1[31:16] - val2[31:16]) &gt;&gt; 1</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__USUB16"></a>Function __USUB16</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __USUB16(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to perform two 16-bit unsigned integer subtractions.<br>
+          The GE bits in the APSR are set according to the results.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first two 16-bit operands.</li>
+          <li><b>val2</b>: second two 16-bit operands.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the subtraction of the low halfword in the second operand from the low halfword 
+                in the first operand, in the low halfword of the return value.</li>
+            <li>the subtraction of the high halfword in the second operand from the high halfword 
+                in the first operand, in the high halfword of the return value.</li>
+          </ul>
+          <p>Each bit in APSR.GE is set or cleared for each byte in the return value, depending on
+             the results of the operation.<br>
+             If <i>res</i> is the return value, then:
+          </p>
+          <ul style="margin-top:0px">
+            <li>if res[15:0] &ge; 0 then APSR.GE[1:0] = 11 else 00</li>
+            <li>if res[31:16] &ge; 0 then APSR.GE[3:2] = 11 else 00</li>
+         </ul>      
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[15:0]  = val1[15:0]  - val2[15:0]
+res[31:16] = val1[31:16] - val2[31:16]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__UQSUB16"></a>Function __UQSUB16</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __UQSUB16(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to perform two unsigned 16-bit integer subtractions, saturating 
+          the results to the 16-bit unsigned integer range 0 &le; x &le; 2<sup>16</sup> - 1.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first two 16-bit operands for each subtraction.</li>
+          <li><b>val2</b>: second two 16-bit operands for each subtraction.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the subtraction of the low halfword in the second operand from the low halfword 
+                in the first operand, in the low halfword of the return value.</li>
+            <li>the subtraction of the high halfword in the second operand from the high halfword 
+                in the first operand, in the high halfword of the return value.</li>
+          </ul>
+          <p>The results are saturated to the 16-bit unsigned integer range 0 &le; x &le; 2<sup>16</sup> - 1.
+          </p>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[15:0]  = val1[15:0]  - val2[15:0]
+res[31:16] = val1[31:16] - val2[31:16]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__UHSUB16"></a>Function __UHSUB16</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __UHSUB16(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to perform two unsigned 16-bit integer subtractions, halving 
+          the results.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first two 16-bit operands.</li>
+          <li><b>val2</b>: second two 16-bit operands.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the halved subtraction of the low halfword in the second operand from the low 
+                halfword in the first operand, in the low halfword of the return value.</li>
+            <li>the halved subtraction of the high halfword in the second operand from the high 
+                halfword in the first operand, in the high halfword of the return value.</li>
+          </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[15:0]  = (val1[15:0]  - val2[15:0])  &gt;&gt; 1
+res[31:16] = (val1[31:16] - val2[31:16]) &gt;&gt; 1</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__SASX"></a>Function __SASX</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __SASX(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function inserts an SASX instruction into the instruction stream generated by the 
+          compiler. It enables you to exchange the halfwords of the second operand, add the high 
+          halfwords and subtract the low halfwords.<br>
+          The GE bits in the APRS are set according to the results.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first operand for the subtraction in the low halfword, and the
+              first operand for the addition in the high halfword.</li>
+          <li><b>val2</b>: second operand for the subtraction in the high halfword, and the 
+              second operand for the addition in the low halfword.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the subtraction of the high halfword in the second operand from the low halfword 
+                in the first operand, in the low halfword of the return value.</li>
+            <li>the addition of the high halfword in the first operand and the low halfword in the 
+                second operand, in the high halfword of the return value.</li>
+          </ul>
+          <p>Each bit in APSR.GE is set or cleared for each byte in the return value, depending on
+             the results of the operation.<br>
+             If <i>res</i> is the return value, then:
+          </p>
+          <ul style="margin-top:0px">
+            <li>if res[15:0] &ge; 0 then APSR.GE[1:0] = 11 else 00</li>
+            <li>if res[31:16] &ge; 0 then APSR.GE[3:2] = 11 else 00</li>
+         </ul>      
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[15:0]  = val1[15:0] - val2[31:16]
+res[31:16] = val1[31:16] + val2[15:0]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__QASX"></a>Function __QASX</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __QASX(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to exchange the halfwords of the one operand, then add the high
+          halfwords and subtract the low halfwords, saturating the results to the 16-bit signed 
+          integer range -2<sup>15</sup> &le; x &le; 2<sup>15</sup> - 1.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first operand for the subtraction in the low halfword, and the 
+                       first operand for the addition in the high halfword.</li>
+          <li><b>val2</b>: second operand for the subtraction in the high halfword, and the
+                       second operand for the addition in the low halfword.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the saturated subtraction of the high halfword in the second operand from the low 
+                halfword in the first operand, in the low halfword of the return value.</li>
+            <li>the saturated addition of the high halfword in the first operand and the low 
+                halfword in the second operand, in the high halfword of the return value.</li>
+          </ul>
+          <p>The returned results are saturated to the 16-bit signed integer 
+             range -2<sup>15</sup> &le; x &le; 2<sup>15</sup> - 1.
+          </p>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[15:0]  = val1[15:0]  - val2[31:16]
+res[31:16] = val1[31:16] + val2[15:0]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__SHASX"></a>Function __SHASX</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __SHASX(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to exchange the two halfwords of one operand, perform one 
+          signed 16-bit integer addition and one signed 16-bit subtraction, and halve the results.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first 16-bit operands.</li>
+          <li><b>val2</b>: second 16-bit operands.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the halved subtraction of the high halfword in the second operand from the low 
+                halfword in the first operand, in the low halfword of the return value.</li>
+            <li>the halved subtraction of the low halfword in the second operand from the high 
+                halfword in the first operand, in the high halfword of the return value.</li>
+          </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[15:0]  = (val1[15:0]  - val2[31:16]) &gt;&gt; 1
+res[31:16] = (val1[31:16] - val2[15:0])  &gt;&gt; 1</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__UASX"></a>Function __UASX</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __UASX(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to exchange the two halfwords of the second operand, add the 
+          high halfwords and subtract the low halfwords.<br>
+          The GE bits in the APSR are set according to the results.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first operand for the subtraction in the low halfword, and the
+              first operand for the addition in the high halfword.</li>
+          <li><b>val2</b>: second operand for the subtraction in the high halfword and the
+              second operand for the addition in the low halfword.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the subtraction of the high halfword in the second operand from the low halfword 
+                in the first operand, in the low halfword of the return value.</li>
+            <li>the addition of the high halfword in the first operand and the low halfword in the 
+                second operand, in the high halfword of the return value.</li>
+          </ul>
+          <p>Each bit in APSR.GE is set or cleared for each byte in the return value, depending on 
+             the results of the operation.<br>
+             If <i>res</i> is the return value, then:
+          </p>
+          <ul style="margin-top:0px">
+            <li>if res[15:0] &ge; 0 then APSR.GE[1:0] = 11 else 00</li>
+            <li>if res[31:16] &ge; 0x10000 then APSR.GE[3:2] = 11 else 00</li>
+         </ul>      
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[15:0]  = val1[15:0]  - val2[31:16]
+res[31:16] = val1[31:16] + val2[15:0]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__UQASX"></a>Function __UQASX</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __UQASX(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to exchange the halfwords of the second operand and perform 
+          one unsigned 16-bit integer addition and one unsigned 16-bit subtraction, saturating the 
+          results to the 16-bit unsigned integer range 0 &le; x &le; 2<sup>16</sup> - 1.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first two 16-bit operands.</li>
+          <li><b>val2</b>: second two 16-bit operands.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the subtraction of the high halfword in the second operand from the low halfword 
+                in the first operand, in the low halfword of the return value.</li>
+            <li>the subtraction of the low halfword in the second operand from the high halfword 
+                in the first operand, in the high halfword of the return value.</li>
+          </ul>
+          <p>The results are saturated to the 16-bit unsigned integer  
+             range 0 &le; x &le; 2<sup>16</sup> - 1.
+          </p>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[15:0]  = val1[15:0]  - val2[31:16]
+res[31:16] = val1[31:16] + val2[15:0]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__UHASX"></a>Function __UHASX</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __UHASX(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to exchange the halfwords of the second operand, add the high 
+          halfwords and subtract the low halfwords, halving the results.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first operand for the subtraction in the low halfword, and the
+           first operand for the addition in the high halfword.</li>
+          <li><b>val2</b>: second operand for the subtraction in the high halfword, and the 
+           second operand for the addition in the low halfword.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the halved subtraction of the high halfword in the second operand from the low 
+                halfword in the first operand.</li>
+            <li>the halved addition of the high halfword in the first operand and the low halfword 
+                in the second operand.</li>
+          </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[15:0]  = (val1[15:0]  - val2[31:16]) &gt;&gt; 1
+res[31:16] = (val1[31:16] + val2[15:0])  &gt;&gt; 1</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__SSAX"></a>Function __SSAX</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __SSAX(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to exchange the two halfwords of one operand and perform one 
+          16-bit integer subtraction and one 16-bit addition.<br>
+          The GE bits in the APSR are set according to the results.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first operand for the addition in the low halfword, and the first 
+              operand for the subtraction in the high halfword.</li>
+          <li><b>val2</b>: second operand for the addition in the high halfword, and the
+              second operand for the subtraction in the low halfword.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the addition of the low halfword in the first operand and the high halfword in the 
+                second operand, in the low halfword of the return value.</li>
+            <li>the subtraction of the low halfword in the second operand from the high halfword 
+                in the first operand, in the high halfword of the return value.</li>
+          </ul>
+          <p>Each bit in APSR.GE is set or cleared for each byte in the return value, depending on 
+             the results of the operation.<br>
+             If <i>res</i> is the return value, then:
+          </p>
+          <ul style="margin-top:0px">
+            <li>if res[15:0] &ge; 0 then APSR.GE[1:0] = 11 else 00</li>
+            <li>if res[31:16] &ge; 0 then APSR.GE[3:2] = 11 else 00</li>
+         </ul>      
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[15:0]  = val1[15:0]  + val2[31:16]
+res[31:16] = val1[31:16] - val2[15:0]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__QSAX"></a>Function __QSAX</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __QSAX(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to exchange the halfwords of one operand, then subtract the 
+          high halfwords and add the low halfwords, saturating the results to the 16-bit signed 
+          integer range -2<sup>15</sup> &le; x &le; 2<sup>15</sup> - 1.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first operand for the addition in the low halfword, and the first
+           operand for the subtraction in the high halfword.</li>
+          <li><b>val2</b>: second operand for the addition in the high halfword, and the 
+           second operand for the subtraction in the low halfword.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the saturated addition of the low halfword of the first operand and the high 
+                halfword of the second operand, in the low halfword of the return value.</li>
+            <li>the saturated subtraction of the low halfword of the second operand from the high 
+                halfword of the first operand, in the high halfword of the return value.</li>
+          </ul>
+          <p>The returned results are saturated to the 16-bit signed integer 
+             range -2<sup>15</sup> &le; x &le; 2<sup>15</sup> - 1.
+          </p>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[15:0]  = val1[15:0]  + val2[31:16]
+res[31:16] = val1[31:16] - val2[15:0]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__SHSAX"></a>Function __SHSAX</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __SHSAX(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to exchange the two halfwords of one operand, perform one 
+          signed 16-bit integer subtraction and one signed 16-bit addition, and halve the results.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first 16-bit operands.</li>
+          <li><b>val2</b>: second 16-bit operands.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the halved addition of the low halfword in the first operand and the high halfword 
+                in the second operand, in the low halfword of the return value.</li>
+            <li>the halved subtraction of the low halfword in the second operand from the high 
+                halfword in the first operand, in the high halfword of the return value.</li>
+          </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[15:0]  = (val1[15:0]  + val2[31:16]) &gt;&gt; 1
+res[31:16] = (val1[31:16] - val2[15:0])  &gt;&gt; 1</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__USAX"></a>Function __USAX</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __USAX(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to exchange the halfwords of the second operand, subtract the 
+          high halfwords and add the low halfwords.<br>
+          The GE bits in the APSR are set according to the results.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first operand for the addition in the low halfword, and the first
+              operand for the subtraction in the high halfword.</li>
+          <li><b>val2</b>: second operand for the addition in the high halfword, and the
+              second operand for the subtraction in the low halfword.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the addition of the low halfword in the first operand and the high halfword in the 
+                second operand, in the low halfword of the return value.</li>
+            <li>the subtraction of the low halfword in the second operand from the high halfword 
+                in the first operand, in the high halfword of the return value.</li>
+          </ul>
+          <p>Each bit in APSR.GE is set or cleared for each byte in the return value, depending on 
+             the results of the operation.<br>
+             If <i>res</i> is the return value, then:
+          </p>
+          <ul style="margin-top:0px">
+            <li>if res[15:0] &ge; 0x10000 then APSR.GE[1:0] = 11 else 00</li>
+            <li>if res[31:16] &ge; 0 then APSR.GE[3:2] = 11 else 00</li>
+         </ul>      
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[15:0]  = val1[15:0]  + val2[31:16]
+res[31:16] = val1[31:16] - val2[15:0]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__UQSAX"></a>Function __UQSAX</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __UQSAX(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to exchange the halfwords of the second operand and perform 
+          one unsigned 16-bit integer subtraction and one unsigned 16-bit addition, saturating the 
+          results to the 16-bit unsigned integer range 0 &le; x &le; 2<sup>16</sup> - 1.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first 16-bit operand for the addition in the low halfword, and the
+              first 16-bit operand for the subtraction in the high halfword.</li>
+          <li><b>val2</b>: second 16-bit halfword for the addition in the high halfword,
+              and the second 16-bit halfword for the subtraction in the low halfword.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the addition of the low halfword in the first operand and the high halfword in the 
+                second operand, in the low halfword of the return value.</li>
+            <li>the subtraction of the low halfword in the second operand from the high halfword 
+                in the first operand, in the high halfword of the return value.</li>
+          </ul>
+          <p>The results are saturated to the 16-bit unsigned integer 
+             range 0 &le; x &le; 2<sup>16</sup> - 1.
+          </p>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[15:0]  = val1[15:0]  + val2[31:16]
+res[31:16] = val1[31:16] - val2[15:0]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__UHSAX"></a>Function __UHSAX</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __UHSAX(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to exchange the halfwords of the second operand, subtract the 
+          high halfwords and add the low halfwords, halving the results.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first operand for the addition in the low halfword, and the first
+              operand for the subtraction in the high halfword.</li>
+          <li><b>val2</b>: second operand for the addition in the high halfword, and the
+              second operand for the subtraction in the low halfword.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the halved addition of the high halfword in the second operand and the low 
+                halfword in the first operand, in the low halfword of the return value.</li>
+            <li>the halved subtraction of the low halfword in the second operand from the high 
+                halfword in the first operand, in the high halfword of the return value.</li>
+          </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[15:0]  = (val1[15:0]  + val2[31:16]) &gt;&gt; 1
+res[31:16] = (val1[31:16] - val2[15:0])  &gt;&gt; 1</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__USAD8"></a>Function __USAD8</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __USAD8(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to perform four unsigned 8-bit subtractions, and add the 
+          absolute values of the differences together, returning the result as a single unsigned 
+          integer.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first four 8-bit operands for the subtractions.</li>
+          <li><b>val2</b>: second four 8-bit operands for the subtractions.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns the sum of the absolute differences of:</p>
+         <ul style="margin-top:0px">
+            <li>the subtraction of the first byte in the second operand from the first byte in the 
+                first operand.</li>
+            <li>the subtraction of the second byte in the second operand from the second byte in 
+                the first operand.</li>
+            <li>the subtraction of the third byte in the second operand from the third byte in the 
+                first operand.</li>
+            <li>the subtraction of the fourth byte in the second operand from the fourth byte in 
+                the first operand.</li>
+          </ul>
+          <p>The sum is returned as a single unsigned integer.</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+absdiff1  = val1[7:0]   - val2[7:0]
+absdiff2  = val1[15:8]  - val2[15:8]
+absdiff3  = val1[23:16] - val2[23:16]
+absdiff4  = val1[31:24] - val2[31:24]
+res[31:0] = absdiff1 + absdiff2 + absdiff3 + absdiff4</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__USADA8"></a>Function __USADA8</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __USADA8(uint32_t val1, uint32_t val2, uint32_t val3);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to perform four unsigned 8-bit subtractions, and add the 
+          absolute values of the differences to a 32-bit accumulate operand.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first four 8-bit operands for the subtractions.</li>
+          <li><b>val2</b>: second four 8-bit operands for the subtractions.</li>
+          <li><b>val3</b>: accumulation value.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns the sum of the absolute differences of the following 
+            bytes, added to the accumulation value:</p>
+         <ul style="margin-top:0px">
+            <li>the subtraction of the first byte in the second operand from the first byte in the 
+                first operand.</li>
+            <li>the subtraction of the second byte in the second operand from the second byte in 
+                the first operand.</li>
+            <li>the subtraction of the third byte in the second operand from the third byte in the 
+                first operand.</li>
+            <li>the subtraction of the fourth byte in the second operand from the fourth byte in 
+                the first operand.</li>
+          </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+absdiff1  = val1[7:0]   - val2[7:0]
+absdiff2  = val1[15:8]  - val2[15:8]
+absdiff3  = val1[23:16] - val2[23:16]
+absdiff4  = val1[31:24] - val2[31:24]
+sum       = absdiff1 + absdiff2 + absdiff3 + absdiff4
+res[31:0] = sum[31:0] + val3[31:0]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__SSAT16"></a>Function __SSAT16</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __SSAT16(uint32_t val1, const uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to saturate two signed 16-bit values to a selected signed range.<br>
+          The Q bit is set if either operation saturates.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: two signed 16-bit values to be saturated.</li>
+          <li><b>val2</b>: bit position for saturation, an integral constant expression in the
+              range 1 to 16.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns:</p>
+         <ul style="margin-top:0px">
+            <li>the signed saturation of the low halfword in <i>val1</i>, saturated to the bit position 
+                specified in <i>val2</i> and returned in the low halfword of the return value.</li>
+            <li>the signed saturation of the high halfword in <i>val1</i>, saturated to the bit position 
+                specified in <i>val2</i> and returned in the high halfword of the return value.</li>
+          </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+Saturate halfwords in val1 to the signed range specified by the bit position in val2</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__USAT16"></a>Function __USAT16</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __USAT16(uint32_t val1, const uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to saturate two signed 16-bit values to a selected unsigned 
+         range.<br>
+         The Q bit is set if either operation saturates.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: two 16-bit values that are to be saturated.</li>
+          <li><b>val2</b>: bit position for saturation, and must be an integral constant 
+           expression in the range 0 to 15.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns the saturation of the two signed 16-bit values, as non-negative values.</p>
+         <ul style="margin-top:0px">
+            <li>the saturation of the low halfword in <i>val1</i>, saturated to the bit position 
+                specified in <i>val2</i> and returned in the low halfword of the return value.</li>
+            <li>the saturation of the high halfword in <i>val1</i>, saturated to the bit position 
+                specified in <i>val2</i> and returned in the high halfword of the return value.</li>
+          </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+Saturate halfwords in val1 to the unsigned range specified by the bit position in val2</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__UXTB16"></a>Function __UXTB16</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __UXTB16(uint32_t val);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to extract two 8-bit values from an operand and zero-extend 
+          them to 16 bits each.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: two 8-bit values in val[7:0] and val[23:16] to be sign-extended.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns the 8-bit values zero-extended to 16-bit values.</p>
+         <ul style="margin-top:0px">
+            <li>zero-extended value of val[7:0] in the low halfword of the return value.</li>
+            <li>zero-extended value of val[23:16] in the high halfword of the return value.</li>
+          </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[15:0]  = ZeroExtended(val[7:0]  )
+res[31:16] = ZeroExtended(val[23:16])</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__UXTAB16"></a>Function __UXTAB16</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __UXTAB16(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to extract two 8-bit values from one operand, zero-extend them 
+          to 16 bits each, and add the results to two 16-bit values from another operand.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: value added to the zero-extended to 16-bit values.</li>
+          <li><b>val2</b>: two 8-bit values to be extracted and zero-extended.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns the 8-bit values in <i>val2</i>, zero-extended to 16-bit values 
+            and added to <i>val1</i>.</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[15:0]  = ZeroExt(val2[7:0]   to 16 bits) + val1[15:0]
+res[31:16] = ZeroExt(val2[31:16] to 16 bits) + val1[31:16]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__SXTB16"></a>Function __SXTB16</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __SXTB16(uint32_t val);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to extract two 8-bit values from an operand and sign-extend 
+          them to 16 bits each.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: two 8-bit values in val[7:0] and val[23:16] to be sign-extended.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns the 8-bit values sign-extended to 16-bit values.</p>
+         <ul style="margin-top:0px">
+            <li>sign-extended value of val[7:0] in the low halfword of the return value.</li>
+            <li>sign-extended value of val[23:16] in the high halfword of the return value.</li>
+          </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[15:0]  = SignExtended(val[7:0]
+res[31:16] = SignExtended(val[23:16]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__SXTAB16"></a>Function __SXTAB16</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __SXTAB16(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to extract two 8-bit values from the second operand (at bit 
+          positions [7:0] and [23:16]), sign-extend them to 16-bits each, and add the results to the 
+          first operand.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: values added to the zero-extended to 16-bit values.</li>
+          <li><b>val2</b>: two 8-bit values to be extracted and zero-extended.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns the addition of <i>val1</i> and <i>val2</i>, where the 8-bit values in 
+            val2[7:0] and val2[23:16] have been extracted and sign-extended prior to the addition.</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[15:0]  = val1[15:0]  + SignExtended(val2[7:0])
+res[31:16] = val1[31:16] + SignExtended(val2[23:16])</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__SMUAD"></a>Function __SMUAD</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __SMUAD(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function It enables you to perform two 16-bit signed multiplications, adding the 
+          products together.<br>
+          The Q bit is set if the addition overflows.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first 16-bit operands for each multiplication.</li>
+          <li><b>val2</b>: second 16-bit operands for each multiplication.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns the sum of the products of the two 16-bit signed multiplications.</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+p1 = val1[15:0]  * val2[15:0]
+p2 = val1[31:16] * val2[31:16]
+res[31:0] = p1 + p2</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__SMUADX"></a>Function __SMUADX</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __SMUADX(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to perform two 16-bit signed multiplications with exchanged
+          halfwords of the second operand, adding the products together.<br>
+          The Q bit is set if the addition overflows.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first 16-bit operands for each multiplication.</li>
+          <li><b>val2</b>: second 16-bit operands for each multiplication.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns the sum of the products of the two 16-bit signed multiplications with exchanged
+            halfwords of the second operand.</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+p1 = val1[15:0]  * val2[31:16]
+p2 = val1[31:16] * val2[15:0]
+res[31:0] = p1 + p2</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__SMLAD"></a>Function __SMLAD</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __SMLAD(uint32_t val1, uint32_t val2, uint32_t val3);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to perform two signed 16-bit multiplications, adding both 
+          results to a 32-bit accumulate operand.<br>
+          The Q bit is set if the addition overflows. Overflow cannot occur during the multiplications.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first 16-bit operands for each multiplication.</li>
+          <li><b>val2</b>: second 16-bit operands for each multiplication.</li>
+          <li><b>val2</b>: accumulate value.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns the product of each multiplication added to the accumulate 
+            value, as a 32-bit integer.</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+p1 = val1[15:0]  * val2[15:0]
+p2 = val1[31:16] * val2[31:16]
+res[31:0] = p1 + p2 + val3[31:0]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__SMLADX"></a>Function __SMLADX</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __SMLADX(uint32_t val1, uint32_t val2, uint32_t val3);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to perform two signed 16-bit multiplications with exchanged
+          halfwords of the second operand, adding both results to a 32-bit accumulate operand.<br>
+          The Q bit is set if the addition overflows. Overflow cannot occur during the multiplications.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first 16-bit operands for each multiplication.</li>
+          <li><b>val2</b>: second 16-bit operands for each multiplication.</li>
+          <li><b>val2</b>: accumulate value.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns the product of each multiplication with exchanged
+            halfwords of the second operand added to the accumulate value, as a 32-bit integer.</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+p1 = val1[15:0]  * val2[31:16]
+p2 = val1[31:16] * val2[15:0]
+res[31:0] = p1 + p2 + val3[31:0]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__SMLALD"></a>Function __SMLALD</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint64_t __SMLALD(uint32_t val1, uint32_t val2, uint64_t val3);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to perform two signed 16-bit multiplications, adding both 
+          results to a 64-bit accumulate operand. Overflow is only possible as a result of the 64-bit 
+          addition. This overflow is not detected if it occurs. Instead, the result wraps around 
+          modulo2<sup>64</sup>.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first 16-bit operands for each multiplication.</li>
+          <li><b>val2</b>: second 16-bit operands for each multiplication.</li>
+          <li><b>val2</b>: accumulate value.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns the product of each multiplication added to the accumulate value.</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+p1 = val1[15:0]  * val2[15:0]
+p2 = val1[31:16] * val2[31:16]
+sum = p1 + p2 + val3[63:32][31:0]
+res[63:32] = sum[63:32]
+res[31:0]  = sum[31:0]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__SMLALDX"></a>Function __SMLALDX</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+unsigned long long __SMLALDX(uint32_t val1, uint32_t val2, unsigned long long val3);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to exchange the halfwords of the second operand, and perform 
+          two signed 16-bit multiplications, adding both results to a 64-bit accumulate operand. 
+          Overflow is only possible as a result of the 64-bit addition. This overflow is not detected 
+          if it occurs. Instead, the result wraps around modulo2<sup>64</sup>.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first 16-bit operands for each multiplication.</li>
+          <li><b>val2</b>: second 16-bit operands for each multiplication.</li>
+          <li><b>val2</b>: accumulate value.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns the product of each multiplication added to the accumulate value.</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+p1 = val1[15:0]  * val2[31:16]
+p2 = val1[31:16] * val2[15:0]
+sum = p1 + p2 + val3[63:32][31:0]
+res[63:32] = sum[63:32]
+res[31:0] = sum[31:0]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__SMUSD"></a>Function __SMUSD</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __SMUSD(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to perform two 16-bit signed multiplications, taking the 
+          difference of the products by subtracting the high halfword product from the low 
+          halfword product.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first 16-bit operands for each multiplication.</li>
+          <li><b>val2</b>: second 16-bit operands for each multiplication.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns the difference of the products of the two 16-bit signed multiplications.</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+p1 = val1[15:0]  * val2[15:0]
+p2 = val1[31:16] * val2[31:16]
+res[31:0] = p1 - p2</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__SMUSDX"></a>Function __SMUSDX</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __SMUSDX(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to perform two 16-bit signed multiplications, subtracting one 
+          of the products from the other. The halfwords of the second operand are exchanged 
+          before performing the arithmetic. This produces top * bottom and bottom * top 
+          multiplication.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first 16-bit operands for each multiplication.</li>
+          <li><b>val2</b>: second 16-bit operands for each multiplication.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns the difference of the products of the two 16-bit signed multiplications.</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+p1 = val1[15:0]  * val2[31:16]
+p2 = val1[31:16] * val2[15:0]
+res[31:0] = p1 - p2</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__SMLSD"></a>Function __SMLSD</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __SMLSD(uint32_t val1, uint32_t val2, uint32_t val3);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to perform two 16-bit signed multiplications, take the 
+          difference of the products, subtracting the high halfword product from the low halfword 
+          product, and add the difference to a 32-bit accumulate operand.<br>
+          The Q bit is set if the accumulation overflows. Overflow cannot occur during the multiplications or the 
+          subtraction.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first 16-bit operands for each multiplication.</li>
+          <li><b>val2</b>: second 16-bit operands for each multiplication.</li>
+          <li><b>val3</b>: accumulate value.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns the difference of the product of each multiplication, added 
+            to the accumulate value.</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+p1 = val1[15:0]  * val2[15:0]
+p2 = val1[31:16] * val2[31:16]
+res[31:0] = p1 - p2 + val3[31:0]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__SMLSDX"></a>Function __SMLSDX</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __SMLSDX(uint32_t val1, uint32_t val2, uint32_t val3);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to exchange the halfwords in the second operand, then perform 
+          two 16-bit signed multiplications. The difference of the products is added to a 32-bit 
+          accumulate operand.<br>
+          The Q bit is set if the addition overflows. Overflow cannot occur during the multiplications or the subtraction.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first 16-bit operands for each multiplication.</li>
+          <li><b>val2</b>: second 16-bit operands for each multiplication.</li>
+          <li><b>val3</b>: accumulate value.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns the difference of the product of each multiplication, added 
+            to the accumulate value.</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+p1 = val1[15:0]  * val2[31:16]
+p2 = val1[31:16] * val2[15:0]
+res[31:0] = p1 - p2 + val3[31:0]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__SMLSLD"></a>Function __SMLSLD</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint64_t __SMLSLD(uint32_t val1, uint32_t val2, uint64_t val3);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function It enables you to perform two 16-bit signed multiplications, take the 
+          difference of the products, subtracting the high halfword product from the low halfword 
+          product, and add the difference to a 64-bit accumulate operand. Overflow cannot occur 
+          during the multiplications or the subtraction. Overflow can occur as a result of the 64-bit 
+          addition, and this overflow is not detected. Instead, the result wraps round to  
+          modulo2<sup>64</sup>.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first 16-bit operands for each multiplication.</li>
+          <li><b>val2</b>: second 16-bit operands for each multiplication.</li>
+          <li><b>val3</b>: accumulate value.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns the difference of the product of each multiplication, 
+            added to the accumulate value.</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+p1 = val1[15:0]  * val2[15:0]
+p2 = val1[31:16] * val2[31:16]
+res[63:0] = p1 - p2 + val3[63:0]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="__SMLSLDX"></a>Function __SMLSLDX</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+unsigned long long __SMLSLDX(uint32_t val1, uint32_t val2, unsigned long long val3);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to exchange the halfwords of the second operand, perform two 
+          16-bit multiplications, adding the difference of the products to a 64-bit accumulate 
+          operand. Overflow cannot occur during the multiplications or the subtraction. Overflow 
+          can occur as a result of the 64-bit addition, and this overflow is not detected. Instead, 
+          the result wraps round to modulo2<sup>64</sup>.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first 16-bit operands for each multiplication.</li>
+          <li><b>val2</b>: second 16-bit operands for each multiplication.</li>
+          <li><b>val3</b>: accumulate value.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns the difference of the product of each multiplication, 
+            added to the accumulate value.</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+p1 = val1[15:0]  * val2[31:16]
+p2 = val1[31:16] * val2[15:0]
+res[63:0] = p1 - p2 + val3[63:0]</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<h3><a name="__SEL"></a>Function __SEL</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __SEL(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function inserts a SEL instruction into the instruction stream generated by the 
+          compiler. It enables you to select bytes from the input parameters, whereby the bytes 
+          that are selected depend upon the results of previous SIMD instruction function. The 
+          results of previous SIMD instruction function are represented by the Greater than or 
+          Equal flags in the Application Program Status Register (APSR).
+          The __SEL function works equally well on both halfword and byte operand function 
+          results. This is because halfword operand operations set two (duplicate) GE bits per 
+          value.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: four selectable 8-bit values.</li>
+          <li><b>val2</b>: four selectable 8-bit values.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function selects bytes from the input parameters and returns them in the 
+            return value, res, according to the following criteria:</p>
+         <ul style="margin-top:0px">
+            <li>if APSR.GE[0] == 1 then res[7:0] = val1[7:0] else res[7:0] = val2[7:0]</li>
+            <li>if APSR.GE[1] == 1 then res[15:8] = val1[15:8] else res[15:8] = val2[15:8]</li>
+            <li>if APSR.GE[2] == 1 then res[23:16] = val1[23:16] else res[23:16] = val2[23:16]</li>
+            <li>if APSR.GE[3] == 1 then res[31;24] = val1[31:24] else res = val2[31:24]</li>
+          </ul>
+      </td>
+    </tr>
+
+  </tbody>
+</table>
+
+<h3><a name="__QADD"></a>Function __QADD</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __QADD(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to obtain the saturating add of two integers.<br>
+         The Q bit is set if the operation saturates.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: first summand of the saturating add operation.</li>
+          <li><b>val2</b>: second summand of the saturating add operation.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns the saturating addition of val1 and val2.</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[31:0] = SAT(val1 + SAT(val2 * 2))</pre>
+      </td>
+    </tr>
+
+  </tbody>
+</table>
+
+<h3><a name="__QSUB"></a>Function __QSUB</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Summary</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t __QSUB(uint32_t val1, uint32_t val2);</pre>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Description</b></td>
+      <td>This function enables you to obtain the saturating subtraction of two integers.<br>
+         The Q bit is set if the operation saturates.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Parameter</b></td>
+      <td>
+        <ul style="list-style-type:none; margin-left:0px; margin-top:0px">
+          <li><b>val1</b>: minuend of the saturating subtraction operation.</li>
+          <li><b>val2</b>: subtrahend of the saturating subtraction operation.</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Return Value</b></td>
+      <td>
+         <p>The function returns the saturating subtraction of val1 and val2.</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>Operation</b></td>
+      <td>
+        <pre style="margin-left:0px">
+res[31:0] = SAT(val1 - SAT(val2 * 2))</pre>
+      </td>
+    </tr>
+
+  </tbody>
+</table>
+
+<!-- --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------     -->
+<!-- --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------     -->
+<p>&nbsp;</p>
+<h2><a name="Examples"></a>Examples</h2>
+<p>Following are some coding examples using the SIMD functions:
+</p>
+
+<table class="kt" border="0" cellpadding="0" cellspacing="0">
+  <tbody>
+    <tr>
+      <th class="kt">Name</th>
+      <th class="kt">Description</th>
+    </tr>
+ 
+    <tr>
+      <td class="kt"><b><a href="#Addition">Addition</a></b></td>
+      <td class="kt">Add two values using SIMD function</td>
+      </tr>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#Addition">Subtraction</a></b></td>
+      <td class="kt">Subtract two values using SIMD function</td>
+      </tr>
+    </tr>
+
+    <tr>
+      <td class="kt"><b><a href="#Multiplication">Multiplication</a></b></td>
+      <td class="kt">Performing a multiplication using SIMD function</td>
+      </tr>
+    </tr>
+
+  </tbody>
+</table>
+
+
+<h3><a name="Addition"></a>Addition</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Example</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t add_halfwords(uint32_t val1, uint32_t val2)
+{
+   uint32_t res;
+   res = __SADD16(val1, val2);
+   return res;
+}</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="Subtraction"></a>Subtraction</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Example</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t sub_halfwords(uint32_t val1, uint32_t val2)
+{
+  uint32_t res;
+  res = __SSUB16(val1, val2);
+  return res;
+}</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3><a name="Multiplication"></a>Multiplication</h3>
+<table border="0" cellpadding="5" cellspacing="5">
+  <tbody>
+    <tr>
+      <td><b>Example</b></td>
+      <td>
+        <pre style="margin-left:0px">
+uint32_t dual_mul_add_products(uint32_t val1, uint32_t val2)
+{
+  uint32_t res;
+  res = __SMUAD(val1, val2);
+  return res;
+}</pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+</body>
+</html>

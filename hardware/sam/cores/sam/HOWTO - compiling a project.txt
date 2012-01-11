@@ -1,0 +1,55 @@
+
+1- Path to GCC ARM toolchain
+
+Set into environment variables the ARM_GCC_TOOLCHAIN variable:
+ex:
+ARM_GCC_TOOLCHAIN=C:\CodeSourcery_2011.03-42\bin
+
+2- Compile libsam (at91sam peripheral drivers)
+
+Go to hardware/sam/system/libsam/build_gcc
+
+run the command: 'cs-make'
+
+This will compile the libsam library and deliver to main Arduino folder the files:
+
+hardware/sam/cores/sam/libsam_sam3s4c_gcc_dbg.a
+hardware/sam/cores/sam/libsam_sam3s4c_gcc_dbg.a.txt (result of nm)
+
+3- Compile libarduino (Arduino API)
+
+Go to hardware/sam/cores/sam/build_gcc
+
+run the command: 'cs-make'
+
+This will compile the libarduino library and deliver to main Arduino folder the files:
+
+hardware/sam/cores/sam/libarduino_sam3s_ek_gcc_dbg.a
+hardware/sam/cores/sam/libarduino_sam3s_ek_gcc_dbg.a.txt (result of nm)
+
+4- Compile libvariant (variant specific library, use Arduino API and libsam)
+
+Go to hardware/sam/variants/sam3s-ek/build_gcc
+
+run the command: 'cs-make'
+
+This will compile the libvariant library and deliver to main Arduino folder the files:
+
+hardware/sam/cores/sam/libvariant_sam3s_ek_gcc_dbg.a
+hardware/sam/cores/sam/libvariant_sam3s_ek_gcc_dbg.a.txt (result of nm)
+
+5- Compile test application
+
+Go to hardware/sam/cores/sam/validation/build_gcc
+
+run the command: 'cs-make'
+
+This will compile the test application and deliver the binary into:
+
+hardware/sam/cores/sam/validation/debug_sam3s_ek/test_gcc_dbg.elf
+hardware/sam/cores/sam/validation/debug_sam3s_ek/test_gcc_dbg.bin
+hardware/sam/cores/sam/validation/debug_sam3s_ek/test_gcc_dbg.map (mapping matching linker script)
+hardware/sam/cores/sam/validation/debug_sam3s_ek/test_gcc_dbg.elf.txt (result of nm)
+
+
+

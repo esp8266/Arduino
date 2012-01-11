@@ -1,0 +1,57 @@
+/*
+  Copyright (c) 2011 Arduino.  All right reserved.
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+  See the GNU Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
+
+#include "WInterrupts.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/** PIO interrupt handlers array */
+/*volatile*/ static voidFuncPtr g_apfn_IntFunc[EXTERNAL_NUM_INTERRUPTS]={ 0 } ;
+
+void attachInterrupt( uint32_t ulInterrupt, void (*pfn_UserFunc)(void), uint32_t ulMode )
+{
+  if ( ulInterrupt < EXTERNAL_NUM_INTERRUPTS )
+  {
+    g_apfn_IntFunc[ulInterrupt] = pfn_UserFunc ;
+
+    // Configure the interrupt mode (trigger on low input, any change, rising
+    // edge, or falling edge).  The mode constants were chosen to correspond
+    // to the configuration bits in the hardware register, so we simply shift
+    // the mode into place.
+
+    // Enable the interrupt.
+
+  }
+}
+
+void detachInterrupt( uint32_t ulInterrupt )
+{
+  if ( ulInterrupt < EXTERNAL_NUM_INTERRUPTS )
+  {
+    /* Disable the interrupt. */
+
+
+    g_apfn_IntFunc[ulInterrupt] = NULL ;
+  }
+}
+
+#ifdef __cplusplus
+}
+#endif
