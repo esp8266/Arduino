@@ -1,7 +1,6 @@
 ##############################################################
 
 sam3s_ek.name=Atmel SAM3S-EK
-sam3s_ek.platform=sam
 sam3s_ek.upload.protocol=sam-ba
 sam3s_ek.upload.maximum_size=49152
 sam3s_ek.upload.speed=115200
@@ -15,7 +14,6 @@ sam3s_ek.build.pins=sam3s_ek
 ##############################################################
 
 sam3u_ek.name=Atmel SAM3U-EK
-sam3u_ek.platform=sam
 sam3u_ek.upload.protocol=sam-ba
 sam3u_ek.upload.maximum_size=49152
 sam3u_ek.upload.speed=115200
@@ -29,7 +27,6 @@ sam3u_ek.build.pins=sam3u_ek
 ##############################################################
 
 arduino_due.name=Arduino Due
-arduino_due.platform=sam
 arduino_due.uploader=bossac
 arduino_due.upload.maximum_size=49152
 arduino_due.upload.speed=115200
