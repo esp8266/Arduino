@@ -363,7 +363,9 @@ bool SendDescriptor()
 #endif
 	} else if (USB_DEVICE_DESCRIPTOR_TYPE == t)
 	{
-		desc_addr = (const uint8_t*)&USB_DeviceDescriptor;
+		if (setup.wLength == 8)
+			_cdcComposite = 1;
+		desc_addr = _cdcComposite ?  (const uint8_t*)&USB_DeviceDescriptorA : (const uint8_t*)&USB_DeviceDescriptor;
 	}
 	else if (USB_CONFIGURATION_DESCRIPTOR_TYPE == t)
 	{

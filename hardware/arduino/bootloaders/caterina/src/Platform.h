@@ -14,7 +14,7 @@
 #define CPU_PRESCALE(n)	(CLKPR = 0x80, CLKPR = (n))
 #define DISABLE_JTAG()  MCUCR = (1 << JTD) | (1 << IVCE) | (0 << PUD); MCUCR = (1 << JTD) | (0 << IVSEL) | (0 << IVCE) | (0 << PUD);
 
-#define USB_PID_LEONARDO_BOOTLOADER 0x0030
+#define USB_PID_LEONARDO_BOOTLOADER 0x008D
 #define USB_PID_MICRO_BOOTLOADER 0x0031
 #define USB_VID 0x2341	// arduino LLC vid
 #define USB_PID ARDUINO_MODEL_PID	// passed in by Makefile - 0x0034 for Leonardo, 0x0035 for MIcro

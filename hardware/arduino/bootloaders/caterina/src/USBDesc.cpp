@@ -46,8 +46,8 @@ const uint16_t STRING_IMANUFACTURER[12] = {
 	'A','r','d','u','i','n','o',' ','L','L','C'
 };
 
-
-DeviceDescriptor USB_DeviceDescriptor = D_DEVICE(0X02,0X00,0X00,64,USB_VID,USB_PID,0x100,0,IPRODUCT,ISERIAL,1);
+DeviceDescriptor USB_DeviceDescriptorA = D_DEVICE(0X02,0X00,0X00,64,USB_VID,USB_PID,0x100,0,IPRODUCT,ISERIAL,1);
+DeviceDescriptor USB_DeviceDescriptor = D_DEVICE(0x00,0x00,0x00,64,USB_VID,USB_PID,0x100,0,IPRODUCT,ISERIAL,1);
 
 Config USB_ConfigDescriptor =
 {
