@@ -29,17 +29,28 @@ import java.util.Map;
 
 public class StringReplacer {
 
-  public static String[] formatAndSplit(String src, Map<String, String> dict)
-      throws Exception {
-    // Do a replace with dictionary
-    src = StringReplacer.replaceFromMapping(src, dict);
+  public static String[] formatAndSplit(String src, Map<String, String> dict,
+                                        boolean recursive) throws Exception {
+    String res;
+
+    // Recursive replace with a max depth of 10 levels.
+    for (int i=0; i<10; i++) {
+      // Do a replace with dictionary
+      res = StringReplacer.replaceFromMapping(src, dict);
+      if (!recursive)
+        break;
+      if (res.equals(src))
+        break;
+      src = res;
+    }
 
     // Split the resulting string in arguments
     return quotedSplit(src, '"', false);
   }
 
   public static String[] quotedSplit(String src, char escapeChar,
-      boolean acceptEmptyArguments) throws Exception {
+                                     boolean acceptEmptyArguments)
+      throws Exception {
     String quote = "" + escapeChar;
     List<String> res = new ArrayList<String>();
     String escapedArg = null;
@@ -68,8 +79,8 @@ public class StringReplacer {
       escaping = false;
     }
     if (escaping)
-      throw new Exception("Invalid quoting: no closing '" + escapeChar
-          + "' char found.");
+      throw new Exception("Invalid quoting: no closing '" + escapeChar +
+          "' char found.");
     return res.toArray(new String[0]);
   }
 
@@ -78,7 +89,8 @@ public class StringReplacer {
   }
 
   public static String replaceFromMapping(String src, Map<String, String> map,
-      String leftDelimiter, String rightDelimiter) {
+                                          String leftDelimiter,
+                                          String rightDelimiter) {
     for (String k : map.keySet()) {
       String keyword = leftDelimiter + k + rightDelimiter;
       src = src.replace(keyword, map.get(k));

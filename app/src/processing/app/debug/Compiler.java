@@ -53,6 +53,8 @@ public class Compiler implements MessageConsumer {
 
   private String buildPath;
   private String toolsPath;
+  private String corePath;
+  private String variantPath;
   private String primaryClassName;
   private String board;
   private List<File> objectFiles;
@@ -134,7 +136,7 @@ public class Compiler implements MessageConsumer {
     String corePath = coreFolder.getAbsolutePath();
 
     String variant = boardPreferences.get("build.variant");
-    String variantPath = null;
+    variantPath = null;
     if (variant != null) {
       File variantFolder;
       if (!variant.contains(":")) {
@@ -172,7 +174,7 @@ public class Compiler implements MessageConsumer {
     // 3. compile the core, outputting .o files to <buildPath> and then
     // collecting them into the core.a library file.
     sketch.setCompilingProgress(50);
-    compileCore(corePath, variant, variantPath);
+    compileCore(variant);
 
     // 4. link it all together into the .elf file
     sketch.setCompilingProgress(60);
@@ -481,7 +483,7 @@ public class Compiler implements MessageConsumer {
 
     try {
       String cmd = prefs.get("recipe.S.o.pattern");
-      return StringReplacer.formatAndSplit(cmd, dict);
+      return StringReplacer.formatAndSplit(cmd, dict, true);
     } catch (Exception e) {
       throw new RunnerException(e);
     }
@@ -501,7 +503,7 @@ public class Compiler implements MessageConsumer {
 
     String cmd = prefs.get("recipe.c.o.pattern");
     try {
-      return StringReplacer.formatAndSplit(cmd, dict);
+      return StringReplacer.formatAndSplit(cmd, dict, true);
     } catch (Exception e) {
       throw new RunnerException(e);
     }
@@ -521,7 +523,7 @@ public class Compiler implements MessageConsumer {
 
     String cmd = prefs.get("recipe.cpp.o.pattern");
     try {
-      return StringReplacer.formatAndSplit(cmd, dict);
+      return StringReplacer.formatAndSplit(cmd, dict, true);
     } catch (Exception e) {
       throw new RunnerException(e);
     }
@@ -588,7 +590,7 @@ public class Compiler implements MessageConsumer {
 	
   // 3. compile the core, outputting .o files to <buildPath> and then
   // collecting them into the core.a library file.
-  void compileCore(String corePath, String variant, String variantPath)
+  void compileCore(String variant)
       throws RunnerException {
 
     List<String> includePaths = new ArrayList<String>();
@@ -611,7 +613,7 @@ public class Compiler implements MessageConsumer {
       String[] cmdArray;
       try {
         String cmd = prefs.get("recipe.ar.pattern");
-        cmdArray = StringReplacer.formatAndSplit(cmd, dict);
+        cmdArray = StringReplacer.formatAndSplit(cmd, dict, true);
       } catch (Exception e) {
         throw new RunnerException(e);
       }
@@ -646,11 +648,12 @@ public class Compiler implements MessageConsumer {
     dict.put("object_files", objectFileList);
     dict.put("ide_version", "" + Base.REVISION);
     dict.put("core_path", corePath);
+    dict.put("variant_path", variantPath + File.separator);
 
     String[] cmdArray;
     try {
       String cmd = prefs.get("recipe.c.combine.pattern");
-      cmdArray = StringReplacer.formatAndSplit(cmd, dict);
+      cmdArray = StringReplacer.formatAndSplit(cmd, dict, true);
     } catch (Exception e) {
       throw new RunnerException(e);
     }
@@ -668,7 +671,7 @@ public class Compiler implements MessageConsumer {
     String[] cmdArray;
     try {
       String cmd = prefs.get("recipe.objcopy.eep.pattern");
-      cmdArray = StringReplacer.formatAndSplit(cmd, dict);
+      cmdArray = StringReplacer.formatAndSplit(cmd, dict, true);
     } catch (Exception e) {
       throw new RunnerException(e);
     }
@@ -686,7 +689,7 @@ public class Compiler implements MessageConsumer {
     String[] cmdArray;
     try {
       String cmd = prefs.get("recipe.objcopy.hex.pattern");
-      cmdArray = StringReplacer.formatAndSplit(cmd, dict);
+      cmdArray = StringReplacer.formatAndSplit(cmd, dict, true);
     } catch (Exception e) {
       throw new RunnerException(e);
     }
