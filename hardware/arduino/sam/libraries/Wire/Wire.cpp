@@ -20,7 +20,6 @@
 
 extern "C" {
 #include <string.h>
-#include "twi.h"
 }
 
 #include "Wire.h"

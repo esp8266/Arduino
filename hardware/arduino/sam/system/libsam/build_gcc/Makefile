@@ -27,6 +27,13 @@ SUBMAKE_OPTIONS=--no-builtin-rules --no-builtin-variables
 # libsam_sam3s4c_gcc_rel.a libsam_sam3u4e_gcc_rel.a
 all: libsam_sam3s4c_gcc_dbg.a libsam_sam3u4e_gcc_dbg.a
 
+arduino_due:
+	@echo --- 
+	@echo --- 
+	@echo --- Making $@
+	@echo --- 
+	@$(MAKE) CHIP=__SAM3U4E__ $(SUBMAKE_OPTIONS) OUTPUT_BIN=../../../variants/arduino_due -f sam3.mk
+
 .PHONY: libsam_sam3s4c_gcc_dbg.a
 libsam_sam3s4c_gcc_dbg.a:
 	@echo --- 

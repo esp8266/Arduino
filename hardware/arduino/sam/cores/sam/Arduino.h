@@ -30,7 +30,9 @@
 extern "C"{
 #endif // __cplusplus
 
-#include "libsam/chip.h"
+// Includes Atmel CMSIS
+#include <chip.h>
+
 #include "wiring_constants.h"
 
 #define clockCyclesPerMicrosecond() ( SystemCoreClock / 1000000L )
