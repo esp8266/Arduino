@@ -133,7 +133,7 @@ public class Compiler implements MessageConsumer {
       coreFolder = new File(t.getFolder(), "cores");
       coreFolder = new File(coreFolder, split[1]);
     }
-    String corePath = coreFolder.getAbsolutePath();
+    corePath = coreFolder.getAbsolutePath();
 
     String variant = boardPreferences.get("build.variant");
     variantPath = null;
@@ -480,6 +480,7 @@ public class Compiler implements MessageConsumer {
     dict.put("source_file", sourceName);
     dict.put("object_file", objectName);
     dict.put("toolchain_path", toolsPath);
+    dict.put("core_path", corePath);
 
     try {
       String cmd = prefs.get("recipe.S.o.pattern");
@@ -500,6 +501,7 @@ public class Compiler implements MessageConsumer {
     dict.put("source_file", sourceName);
     dict.put("object_file", objectName);
     dict.put("toolchain_path", toolsPath);
+    dict.put("core_path", corePath);
 
     String cmd = prefs.get("recipe.c.o.pattern");
     try {
@@ -520,6 +522,7 @@ public class Compiler implements MessageConsumer {
     dict.put("source_file", sourceName);
     dict.put("object_file", objectName);
     dict.put("toolchain_path", toolsPath);
+    dict.put("core_path", corePath);
 
     String cmd = prefs.get("recipe.cpp.o.pattern");
     try {
