@@ -4,7 +4,7 @@
 
 name=Arduino
 # Default "compiler.path" is correct, change only if you want to overidde the initial value
-#compiler.path={0}/hardware/tools/avr/bin/
+#compiler.path={ide.path}/tools/avr/bin/..
 compiler.c.cmd=avr-gcc
 compiler.c.flags=-c -g -Os -w -ffunction-sections -fdata-sections
 compiler.c.elf.flags=-Os -Wl,--gc-sections
@@ -26,22 +26,22 @@ compiler.upload.flags=
 # --------------------
 
 ## Compile c files
-recipe.c.o.pattern={toolchain_path}{compiler.c.cmd} {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -D{software}={ide_version} {includes} {source_file} -o {object_file}
+recipe.c.o.pattern={compiler.path}{compiler.c.cmd} {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -D{software}={ide.version} {includes} {source_file} -o {object_file}
 
 ## Compile c++ files
-recipe.cpp.o.pattern={toolchain_path}{compiler.cpp.cmd} {compiler.cpp.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -D{software}={ide_version} {includes} {source_file} -o {object_file}
+recipe.cpp.o.pattern={compiler.path}{compiler.cpp.cmd} {compiler.cpp.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -D{software}={ide.version} {includes} {source_file} -o {object_file}
 
 ## Create archives
-recipe.ar.pattern={toolchain_path}{compiler.ar.cmd} {compiler.ar.flags} {build_path}{archive_file} {object_file}
+recipe.ar.pattern={compiler.path}{compiler.ar.cmd} {compiler.ar.flags} {build.path}/{archive_file} {object_file}
 
 ## Combine gc-sections, archives, and objects
-recipe.c.combine.pattern={toolchain_path}{compiler.c.elf.cmd} {compiler.c.elf.flags} -mmcu={build.mcu} -o {build_path}{project_name}.elf {object_files} {build_path}{archive_file} -L{build_path} -lm
+recipe.c.combine.pattern={compiler.path}{compiler.c.elf.cmd} {compiler.c.elf.flags} -mmcu={build.mcu} -o {build.path}/{project_name}.elf {object_files} {build.path}/{archive_file} -L{build.path} -lm
 
 ## Create eeprom
-recipe.objcopy.eep.pattern={toolchain_path}{compiler.objcopy.cmd} {compiler.objcopy.eep.flags} {build_path}{project_name}.elf {build_path}{project_name}.eep
+recipe.objcopy.eep.pattern={compiler.path}{compiler.objcopy.cmd} {compiler.objcopy.eep.flags} {build.path}/{project_name}.elf {build.path}/{project_name}.eep
 
 ## Create hex
-recipe.objcopy.hex.pattern={toolchain_path}{compiler.elf2hex.cmd} {compiler.elf2hex.flags} {build_path}{project_name}.elf {build_path}{project_name}.hex
+recipe.objcopy.hex.pattern={compiler.path}{compiler.elf2hex.cmd} {compiler.elf2hex.flags} {build.path}/{project_name}.elf {build.path}/{project_name}.hex
 
 
 

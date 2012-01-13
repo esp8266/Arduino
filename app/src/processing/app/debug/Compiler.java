@@ -29,7 +29,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -51,12 +50,7 @@ public class Compiler implements MessageConsumer {
 
   private Sketch sketch;
 
-  private String buildPath;
-  private String toolsPath;
-  private String corePath;
-  private String variantPath;
   private String primaryClassName;
-  private String board;
   private List<File> objectFiles;
 
   private PreferencesMap prefs;
@@ -77,43 +71,34 @@ public class Compiler implements MessageConsumer {
                          String _primaryClassName, boolean _verbose)
       throws RunnerException {
     sketch = _sketch;
-    buildPath = _buildPath;
     primaryClassName = _primaryClassName;
     verbose = _verbose;
     objectFiles = new ArrayList<File>();
 
-    PreferencesMap boardPreferences = Base.getBoardPreferences();
-
     TargetPlatform targetPlatform = Base.getTargetPlatform();
-    PreferencesMap platformPreferences = targetPlatform.getPreferences();
 
     // Merge all the global preference configuration in order of priority
     prefs = new PreferencesMap();
     prefs.putAll(Preferences.getMap());
-    prefs.putAll(platformPreferences);
-    prefs.putAll(boardPreferences);
+    prefs.putAll(targetPlatform.getPreferences());
+    prefs.putAll(Base.getBoardPreferences());
     for (String k : prefs.keySet()) {
       if (prefs.get(k) == null)
         prefs.put(k, "");
     }
 
-    toolsPath = prefs.get("compiler.path");
-    if (toolsPath == null) {
-      toolsPath = Base.getAvrBasePath();
-    } else {
-      // Put in the system path in the compiler path if available
-      MessageFormat compileFormat = new MessageFormat(toolsPath);
-      String basePath = System.getProperty("user.dir");
-      if (Base.isMacOS())
-        basePath += "/Arduino.app/Contents/Resources/Java";
-      Object[] Args = { basePath };
-      toolsPath = compileFormat.format(Args);
-      System.out.println("avrBasePath:new: " + toolsPath);
-    }
-    board = prefs.get("board");
-    if (board == "")
-      board = "_UNKNOWN";
+    prefs.put("build.path", _buildPath);
+    
+    String idePath = System.getProperty("user.dir");
+    if (Base.isMacOS())
+      idePath += "/Arduino.app/Contents/Resources/Java";
+    prefs.put("ide.path", idePath);
+    prefs.put("ide.version", "" + Base.REVISION);
 
+    if (!prefs.containsKey("compiler.path"))
+      prefs.put("compiler.path", Base.getAvrBasePath());
+
+    // Core folder
     String core = prefs.get("build.core");
     if (core == null) {
       RunnerException re = new RunnerException(
@@ -121,42 +106,49 @@ public class Compiler implements MessageConsumer {
       re.hideStackTrace();
       throw re;
     }
-    File coreFolder;
+    TargetPlatform tp;
     if (!core.contains(":")) {
-      TargetPlatform t = Base.getTargetPlatform();
-      coreFolder = new File(t.getFolder(), "cores");
-      coreFolder = new File(coreFolder, core);
+      tp = targetPlatform;
     } else {
       String[] split = core.split(":", 2);
-      TargetPlatform t = Base.getTargetPlatform(split[0], Preferences
-          .get("target_platform"));
-      coreFolder = new File(t.getFolder(), "cores");
-      coreFolder = new File(coreFolder, split[1]);
+      tp = Base.getTargetPlatform(split[0], Preferences.get("target_platform"));
+      core = split[1];
     }
-    corePath = coreFolder.getAbsolutePath();
-
-    String variant = boardPreferences.get("build.variant");
-    variantPath = null;
+    File coreFolder = new File(tp.getFolder(), "cores");
+    coreFolder = new File(coreFolder, core);
+    prefs.put("build.core.path", coreFolder.getAbsolutePath());
+    
+    // System Folder
+    File systemFolder = targetPlatform.getFolder();
+    systemFolder = new File(systemFolder, "system");
+    prefs.put("build.system.path", systemFolder.getAbsolutePath());
+    
+    // Variant Folder
+    String variantPath;
+    String variant = prefs.get("build.variant");
     if (variant != null) {
-      File variantFolder;
+      TargetPlatform t;
       if (!variant.contains(":")) {
-        TargetPlatform t = Base.getTargetPlatform();
-        variantFolder = new File(t.getFolder(), "variants");
-        variantFolder = new File(variantFolder, variant);
+        t = targetPlatform;
       } else {
         String[] split = variant.split(":", 2);
-        TargetPlatform t = Base.getTargetPlatform(split[0], Preferences
+        t = Base.getTargetPlatform(split[0], Preferences
             .get("target_platform"));
-        variantFolder = new File(t.getFolder(), "variants");
-        variantFolder = new File(variantFolder, split[1]);
+        variant = split[1];
       }
+      File variantFolder = new File(t.getFolder(), "variants");
+      variantFolder = new File(variantFolder, variant);
       variantPath = variantFolder.getAbsolutePath();
+      prefs.put("build.variant.path", variantPath);
+    } else {
+      variantPath = null;
+      prefs.put("build.variant.path", "");
     }
 
     // 0. include paths for core + all libraries
     sketch.setCompilingProgress(20);
     List<String> includePaths = new ArrayList<String>();
-    includePaths.add(corePath);
+    includePaths.add(prefs.get("build.core.path"));
     if (variantPath != null)
       includePaths.add(variantPath);
     for (File file : sketch.getImportedLibraries())
@@ -174,11 +166,11 @@ public class Compiler implements MessageConsumer {
     // 3. compile the core, outputting .o files to <buildPath> and then
     // collecting them into the core.a library file.
     sketch.setCompilingProgress(50);
-    compileCore(variant);
+    compileCore();
 
     // 4. link it all together into the .elf file
     sketch.setCompilingProgress(60);
-    compileLink(corePath, includePaths);
+    compileLink(includePaths);
 
     // 5. extract EEPROM data (from EEMEM directive) to .eep file.
     sketch.setCompilingProgress(70);
@@ -316,7 +308,8 @@ public class Compiler implements MessageConsumer {
         stringList.add(string);
     }
     command = stringList.toArray(new String[stringList.size()]);
-
+    if (command.length == 0)
+      return;
     int result = 0;
 
     if (verbose || Preferences.getBoolean("build.verbose")) {
@@ -391,6 +384,7 @@ public class Compiler implements MessageConsumer {
     // can't use replaceAll() because the path may have characters in it which
     // have meaning in a regular expression.
     if (!verbose) {
+      String buildPath = prefs.get("build.path");
       while ((i = s.indexOf(buildPath + File.separator)) != -1) {
         s = s.substring(0, i) + s.substring(i + (buildPath + File.separator).length());
       }
@@ -479,8 +473,6 @@ public class Compiler implements MessageConsumer {
     dict.put("includes", includes);
     dict.put("source_file", sourceName);
     dict.put("object_file", objectName);
-    dict.put("toolchain_path", toolsPath);
-    dict.put("core_path", corePath);
 
     try {
       String cmd = prefs.get("recipe.S.o.pattern");
@@ -500,8 +492,6 @@ public class Compiler implements MessageConsumer {
     dict.put("includes", includes);
     dict.put("source_file", sourceName);
     dict.put("object_file", objectName);
-    dict.put("toolchain_path", toolsPath);
-    dict.put("core_path", corePath);
 
     String cmd = prefs.get("recipe.c.o.pattern");
     try {
@@ -521,8 +511,6 @@ public class Compiler implements MessageConsumer {
     dict.put("includes", includes);
     dict.put("source_file", sourceName);
     dict.put("object_file", objectName);
-    dict.put("toolchain_path", toolsPath);
-    dict.put("core_path", corePath);
 
     String cmd = prefs.get("recipe.cpp.o.pattern");
     try {
@@ -565,6 +553,7 @@ public class Compiler implements MessageConsumer {
   
   // 1. compile the sketch (already in the buildPath)
   void compileSketch(List<String> includePaths) throws RunnerException {
+    String buildPath = prefs.get("build.path");
     objectFiles.addAll(compileFiles(buildPath, new File(buildPath), false,
                                     includePaths));
   }
@@ -574,7 +563,8 @@ public class Compiler implements MessageConsumer {
   void compileLibraries(List<String> includePaths) throws RunnerException {
 
     for (File libraryFolder : sketch.getImportedLibraries()) {
-      File outputFolder = new File(buildPath, libraryFolder.getName());
+      String outputPath = prefs.get("build.path");
+      File outputFolder = new File(outputPath, libraryFolder.getName());
       File utilityFolder = new File(libraryFolder, "utility");
       createFolder(outputFolder);
       // this library can use includes in its utility/ folder
@@ -593,23 +583,28 @@ public class Compiler implements MessageConsumer {
 	
   // 3. compile the core, outputting .o files to <buildPath> and then
   // collecting them into the core.a library file.
-  void compileCore(String variant)
+  void compileCore()
       throws RunnerException {
+
+    String corePath = prefs.get("build.core.path");
+    String variantPath = prefs.get("build.variant.path");
+    String buildPath = prefs.get("build.path");
 
     List<String> includePaths = new ArrayList<String>();
     includePaths.add(corePath); // include core path only
-    if (variantPath != null)
+    if (!variantPath.isEmpty())
       includePaths.add(variantPath);
 
     List<File> coreObjectFiles = compileFiles(buildPath, new File(corePath),
                                               true, includePaths);
+    if (!variantPath.isEmpty())
+      coreObjectFiles.addAll(compileFiles(buildPath, new File(variantPath),
+                                          true, includePaths));
 
     for (File file : coreObjectFiles) {
 
       PreferencesMap dict = new PreferencesMap(prefs);
-      dict.put("toolchain_path", toolsPath);
       dict.put("ide_version", "" + Base.REVISION);
-      dict.put("build_path", buildPath + File.separator);
       dict.put("archive_file", "core.a");
       dict.put("object_file", file.getAbsolutePath());
 
@@ -625,7 +620,7 @@ public class Compiler implements MessageConsumer {
   }
 			
   // 4. link it all together into the .elf file
-  void compileLink(String corePath, List<String> includePaths)
+  void compileLink(List<String> includePaths)
       throws RunnerException {
 
     // TODO: Make the --relax thing in configuration files.
@@ -644,14 +639,10 @@ public class Compiler implements MessageConsumer {
     PreferencesMap dict = new PreferencesMap(prefs);
     dict.put("compiler.c.elf.flags", dict
         .get("compiler.c.elf.flags" + optRelax));
-    dict.put("toolchain_path", toolsPath);
-    dict.put("build_path", buildPath + File.separator);
     dict.put("archive_file", "core.a");
     dict.put("project_name", primaryClassName);
     dict.put("object_files", objectFileList);
     dict.put("ide_version", "" + Base.REVISION);
-    dict.put("core_path", corePath);
-    dict.put("variant_path", variantPath + File.separator);
 
     String[] cmdArray;
     try {
@@ -666,8 +657,6 @@ public class Compiler implements MessageConsumer {
   // 5. extract EEPROM data (from EEMEM directive) to .eep file.
   void compileEep(List<String> includePaths) throws RunnerException {
     PreferencesMap dict = new PreferencesMap(prefs);
-    dict.put("toolchain_path", toolsPath);
-    dict.put("build_path", buildPath + File.separator);
     dict.put("project_name", primaryClassName);
     dict.put("ide_version", "" + Base.REVISION);
 
@@ -684,8 +673,6 @@ public class Compiler implements MessageConsumer {
   // 6. build the .hex file
   void compileHex(List<String> includePaths) throws RunnerException {
     PreferencesMap dict = new PreferencesMap(prefs);
-    dict.put("toolchain_path", toolsPath);
-    dict.put("build_path", buildPath + File.separator);
     dict.put("project_name", primaryClassName);
     dict.put("ide_version", "" + Base.REVISION);
 
