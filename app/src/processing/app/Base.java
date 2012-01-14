@@ -1256,6 +1256,9 @@ public class Base {
     Arrays.sort(list, String.CASE_INSENSITIVE_ORDER);
     
     for (String target : list) {
+      // Skip reserved 'tools' folder.
+      if (target.equals("tools"))
+        continue;
       File subfolder = new File(folder, target);
       packages.put(target, new TargetPackage(target, subfolder));
     }
