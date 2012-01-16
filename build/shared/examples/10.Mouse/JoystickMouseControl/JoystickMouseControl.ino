@@ -4,6 +4,10 @@
  Controls the mouse from a joystick on an Arduino Leonardo.
  Uses a pushbutton to turn on and off mouse control.
  
+ Hardware:
+ * 2-axis joystick connected to pins A1 and A2
+ * pushbutton connected to pin D6
+ 
  The mouse movement is always relative. This sketch reads 
  two analog inputs that range from 0 to 1023 (or less on either end)
  and translates them into ranges of -60 to 60. 
@@ -16,6 +20,7 @@
  you can turn on and off mouse control.
  
  created 15 Sept 2011
+ updated 16 Jan 2012
  by Tom Igoe
  
  this code is in the public domain
