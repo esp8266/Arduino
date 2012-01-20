@@ -48,8 +48,6 @@
 		#include "Descriptors.h"
 
 		#include <LUFA/Drivers/USB/USB.h>
-		#include <LUFA/Drivers/Board/LEDs.h>
-
 	/* Macros: */
 		/** Version major of the CDC bootloader. */
 		#define BOOTLOADER_VERSION_MAJOR     0x01
