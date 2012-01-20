@@ -76,7 +76,7 @@
 
 		void EVENT_USB_Device_ConfigurationChanged(void);
 
-		#if defined(INCLUDE_FROM_BOOTLOADERCDC_C) || defined(__DOXYGEN__)
+		#if defined(INCLUDE_FROM_CATERINA_C) || defined(__DOXYGEN__)
 			#if !defined(NO_BLOCK_SUPPORT)
 			static void    ReadWriteMemoryBlock(const uint8_t Command);
 			#endif

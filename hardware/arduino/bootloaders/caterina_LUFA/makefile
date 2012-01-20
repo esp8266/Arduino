@@ -48,7 +48,7 @@
 
 
 # MCU name
-MCU = at90usb1287
+MCU = atmega32u4
 
 
 # Target architecture (see library "Board Types" documentation).
@@ -72,7 +72,7 @@ BOARD = USBKEY
 #     does not *change* the processor frequency - it should merely be updated to
 #     reflect the processor speed set externally so that the code can use accurate
 #     software delays.
-F_CPU = 8000000
+F_CPU = 16000000
 
 
 # Input clock frequency.
@@ -94,7 +94,7 @@ F_USB = $(F_CPU)
 #
 # Note that the bootloader size and start address given in AVRStudio is in words and not
 # bytes, and so will need to be doubled to obtain the byte address needed by AVR-GCC.
-FLASH_SIZE_KB        = 128
+FLASH_SIZE_KB        = 32
 BOOT_SECTION_SIZE_KB = 4
 BOOT_START           = 0x$(shell echo "obase=16; ($(FLASH_SIZE_KB) - $(BOOT_SECTION_SIZE_KB)) * 1024" | bc)
 
@@ -104,7 +104,7 @@ FORMAT = ihex
 
 
 # Target file name (without extension).
-TARGET = BootloaderCDC
+TARGET = Caterina
 
 
 # Object files directory
@@ -114,7 +114,7 @@ OBJDIR = .
 
 
 # Path to the LUFA library
-LUFA_PATH = ../..
+LUFA_PATH = ../../../../../LUFA-111009
 
 
 # LUFA library compile-time options and predefined tokens

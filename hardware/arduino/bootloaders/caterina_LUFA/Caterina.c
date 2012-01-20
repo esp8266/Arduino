@@ -33,8 +33,8 @@
  *  Main source file for the CDC class bootloader. This file contains the complete bootloader logic.
  */
 
-#define  INCLUDE_FROM_BOOTLOADERCDC_C
-#include "BootloaderCDC.h"
+#define  INCLUDE_FROM_CATERINA_C
+#include "Caterina.h"
 
 /** Contains the current baud rate and other settings of the first virtual serial port. This must be retained as some
  *  operating systems will not open the port unless the settings can be set successfully.
