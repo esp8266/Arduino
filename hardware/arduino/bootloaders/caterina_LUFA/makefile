@@ -58,7 +58,7 @@ ARCH = AVR8
 # Target board (see library "Board Types" documentation, NONE for projects not requiring
 # LUFA board drivers). If USER is selected, put custom board drivers in a directory called
 # "Board" inside the application directory.
-BOARD = USBKEY
+BOARD = USER
 
 
 # Processor frequency.
@@ -354,7 +354,7 @@ LDFLAGS += $(PRINTF_LIB) $(SCANF_LIB) $(MATH_LIB)
 # Type: avrdude -c ?
 # to get a full listing.
 #
-AVRDUDE_PROGRAMMER = jtagmkII
+AVRDUDE_PROGRAMMER = avrispmkII
 
 # com1 = serial port. Use lpt1 to connect to parallel port.
 AVRDUDE_PORT = usb
@@ -424,7 +424,7 @@ OBJDUMP = avr-objdump
 SIZE = avr-size
 AR = avr-ar rcs
 NM = avr-nm
-AVRDUDE = avrdude
+AVRDUDE = /Applications/avrdude -C /Applications/avrdude.conf
 REMOVE = rm -f
 REMOVEDIR = rm -rf
 COPY = cp
