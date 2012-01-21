@@ -58,6 +58,16 @@ static bool RunBootloader = true;
 
 void StartSketch()
 {
+	/* Relocate the interrupt vector table to the application section */
+//	MCUCR = (1 << IVCE);	// these two lines are for moving interrupts to bootloader, not application
+//	MCUCR = (1 << IVSEL);
+	__asm__ volatile (	
+		"ldi r16, 	0x01\n"
+		"out 0x35, 	r16\n"
+		"ldi r16, 	0x00\n"
+		"out 0x35, 	r16\n"
+	::);
+	
 	UDCON = 1;		// Detach USB
 	UDIEN = 0;
 	__asm__ volatile (	// Reset vector to run firmware
@@ -73,12 +83,12 @@ void StartSketch()
  */
 int main(void)
 {
-	uint8_t MCUSR_state = MCUSR;	// store the reason for the reset
-	MCUSR &= ~(1 << WDRF);			// must clear the watchdog reset flag before disabling and reenabling WDT
-	wdt_disable();
-	if (MCUSR_state & (1<<WDRF) && (pgm_read_word(0) != 0xFFFF)) {
-		StartSketch();				// if the reset was caused by WDT and if a sketch is already present then run the sketch instead of the bootloader
-	}
+//	uint8_t MCUSR_state = MCUSR;	// store the reason for the reset
+//	MCUSR &= ~(1 << WDRF);			// must clear the watchdog reset flag before disabling and reenabling WDT
+//	wdt_disable();
+//	if (MCUSR_state & (1<<WDRF) && (pgm_read_word(0) != 0xFFFF)) {
+//		StartSketch();				// if the reset was caused by WDT and if a sketch is already present then run the sketch instead of the bootloader
+//	}
 	
 	/* Setup hardware required for the bootloader */
 	SetupHardware();
@@ -101,9 +111,11 @@ int main(void)
 	USB_Detach();
 
 	/* Enable the watchdog and force a timeout to reset the AVR */
-	wdt_enable(WDTO_250MS);
+//	wdt_enable(WDTO_250MS);
 
-	for (;;);
+//	for (;;);
+	
+	StartSketch();
 }
 
 /** Configures all hardware required for the bootloader. */
