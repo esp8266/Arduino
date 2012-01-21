@@ -56,6 +56,16 @@ static uint32_t CurrAddress;
  */
 static bool RunBootloader = true;
 
+void StartSketch()
+{
+	UDCON = 1;		// Detach USB
+	UDIEN = 0;
+	__asm__ volatile (	// Reset vector to run firmware
+		"clr r30\n"
+		"clr r31\n"
+		"ijmp\n"
+	::);
+}
 
 /** Main program entry point. This routine configures the hardware required by the bootloader, then continuously
  *  runs the bootloader processing routine until instructed to soft-exit, or hard-reset via the watchdog to start
@@ -63,17 +73,29 @@ static bool RunBootloader = true;
  */
 int main(void)
 {
+	uint8_t MCUSR_state = MCUSR;	// store the reason for the reset
+	MCUSR &= ~(1 << WDRF);			// must clear the watchdog reset flag before disabling and reenabling WDT
+	wdt_disable();
+	if (MCUSR_state & (1<<WDRF) && (pgm_read_word(0) != 0xFFFF)) {
+		StartSketch();				// if the reset was caused by WDT and if a sketch is already present then run the sketch instead of the bootloader
+	}
+	
 	/* Setup hardware required for the bootloader */
 	SetupHardware();
 
 	/* Enable global interrupts so that the USB stack can function */
 	sei();
+	
+	DDRD |= (1<<6);	// turn on LED attached to D12 - used to track bootloader progress
+	PORTD |= (1<<6);	
 
 	while (RunBootloader)
 	{
 		CDC_Task();
 		USB_USBTask();
 	}
+
+	PORTD &= ~(1<<6);	// turn off LED attached to D12
 
 	/* Disconnect from the host - USB interface will be reset later along with the AVR */
 	USB_Detach();
@@ -109,7 +131,7 @@ void SetupHardware(void)
 /** ISR to periodically toggle the LEDs on the board to indicate that the bootloader is active. */
 ISR(TIMER1_OVF_vect, ISR_BLOCK)
 {
-
+	PORTD ^= (1<<6);		// toggle LED on D12
 }
 
 /** Event handler for the USB_ConfigurationChanged event. This configures the device's endpoints ready
@@ -340,6 +362,20 @@ static void WriteNextResponseByte(const uint8_t Response)
 	Endpoint_Write_8(Response);
 }
 
+#define STK_OK              0x10
+#define STK_INSYNC          0x14  // ' '
+#define CRC_EOP             0x20  // 'SPACE'
+#define STK_GET_SYNC        0x30  // '0'
+
+#define STK_GET_PARAMETER   0x41  // 'A'
+#define STK_SET_DEVICE      0x42  // 'B'
+#define STK_SET_DEVICE_EXT  0x45  // 'E'
+#define STK_LOAD_ADDRESS    0x55  // 'U'
+#define STK_UNIVERSAL       0x56  // 'V'
+#define STK_PROG_PAGE       0x64  // 'd'
+#define STK_READ_PAGE       0x74  // 't'
+#define STK_READ_SIGN       0x75  // 'u'
+
 /** Task to read in AVR910 commands from the CDC data OUT endpoint, process them, perform the required actions
  *  and send the appropriate response back to the host.
  */
@@ -355,53 +391,62 @@ void CDC_Task(void)
 	/* Read in the bootloader command (first byte sent from host) */
 	uint8_t Command = FetchNextCommandByte();
 
+	/*
+	if (STK_UNIVERSAL == Command) {
+		WriteNextResponseByte(')');
+	} else {
+		WriteNextResponseByte(Command);
+	}
+	*/
+
+	
 	if (Command == 'E')
 	{
 		RunBootloader = false;
 	
-		/* Send confirmation byte back to the host */
+		// Send confirmation byte back to the host 
 		WriteNextResponseByte('\r');
 	}
 	else if (Command == 'T')
 	{
 		FetchNextCommandByte();
 
-		/* Send confirmation byte back to the host */
+		// Send confirmation byte back to the host 
 		WriteNextResponseByte('\r');
 	}
 	else if ((Command == 'L') || (Command == 'P'))
 	{
-		/* Send confirmation byte back to the host */
+		// Send confirmation byte back to the host 
 		WriteNextResponseByte('\r');
 	}
 	else if (Command == 't')
 	{
-		/* Return ATMEGA128 part code - this is only to allow AVRProg to use the bootloader */
+		// Return ATMEGA128 part code - this is only to allow AVRProg to use the bootloader 
 		WriteNextResponseByte(0x44);
 		WriteNextResponseByte(0x00);
 	}
 	else if (Command == 'a')
 	{
-		/* Indicate auto-address increment is supported */
+		// Indicate auto-address increment is supported 
 		WriteNextResponseByte('Y');
 	}
 	else if (Command == 'A')
 	{
-		/* Set the current address to that given by the host */
+		// Set the current address to that given by the host 
 		CurrAddress   = (FetchNextCommandByte() << 9);
 		CurrAddress  |= (FetchNextCommandByte() << 1);
 
-		/* Send confirmation byte back to the host */
+		// Send confirmation byte back to the host 
 		WriteNextResponseByte('\r');
 	}
 	else if (Command == 'p')
 	{
-		/* Indicate serial programmer back to the host */
+		// Indicate serial programmer back to the host 
 		WriteNextResponseByte('S');
 	}
 	else if (Command == 'S')
 	{
-		/* Write the 7-byte software identifier to the endpoint */
+		// Write the 7-byte software identifier to the endpoint 
 		for (uint8_t CurrByte = 0; CurrByte < 7; CurrByte++)
 		  WriteNextResponseByte(SOFTWARE_IDENTIFIER[CurrByte]);
 	}
@@ -418,7 +463,7 @@ void CDC_Task(void)
 	}
 	else if (Command == 'e')
 	{
-		/* Clear the application section of flash */
+		// Clear the application section of flash 
 		for (uint32_t CurrFlashAddress = 0; CurrFlashAddress < BOOT_START_ADDR; CurrFlashAddress += SPM_PAGESIZE)
 		{
 			boot_page_erase(CurrFlashAddress);
@@ -427,16 +472,16 @@ void CDC_Task(void)
 			boot_spm_busy_wait();
 		}
 
-		/* Send confirmation byte back to the host */
+		// Send confirmation byte back to the host 
 		WriteNextResponseByte('\r');
 	}
 	#if !defined(NO_LOCK_BYTE_WRITE_SUPPORT)
 	else if (Command == 'l')
 	{
-		/* Set the lock bits to those given by the host */
+		// Set the lock bits to those given by the host 
 		boot_lock_bits_set(FetchNextCommandByte());
 
-		/* Send confirmation byte back to the host */
+		// Send confirmation byte back to the host 
 		WriteNextResponseByte('\r');
 	}
 	#endif
@@ -461,45 +506,45 @@ void CDC_Task(void)
 	{
 		WriteNextResponseByte('Y');
 
-		/* Send block size to the host */
+		// Send block size to the host 
 		WriteNextResponseByte(SPM_PAGESIZE >> 8);
 		WriteNextResponseByte(SPM_PAGESIZE & 0xFF);
 	}
 	else if ((Command == 'B') || (Command == 'g'))
 	{
-		/* Delegate the block write/read to a separate function for clarity */
+		// Delegate the block write/read to a separate function for clarity 
 		ReadWriteMemoryBlock(Command);
 	}
 	#endif
 	#if !defined(NO_FLASH_BYTE_SUPPORT)
 	else if (Command == 'C')
 	{
-		/* Write the high byte to the current flash page */
+		// Write the high byte to the current flash page
 		boot_page_fill(CurrAddress, FetchNextCommandByte());
 
-		/* Send confirmation byte back to the host */
+		// Send confirmation byte back to the host 
 		WriteNextResponseByte('\r');
 	}
 	else if (Command == 'c')
 	{
-		/* Write the low byte to the current flash page */
+		// Write the low byte to the current flash page 
 		boot_page_fill(CurrAddress | 0x01, FetchNextCommandByte());
 
-		/* Increment the address */
+		// Increment the address 
 		CurrAddress += 2;
 
-		/* Send confirmation byte back to the host */
+		// Send confirmation byte back to the host 
 		WriteNextResponseByte('\r');
 	}
 	else if (Command == 'm')
 	{
-		/* Commit the flash page to memory */
+		// Commit the flash page to memory
 		boot_page_write(CurrAddress);
 
-		/* Wait until write operation has completed */
+		// Wait until write operation has completed 
 		boot_spm_busy_wait();
 
-		/* Send confirmation byte back to the host */
+		// Send confirmation byte back to the host 
 		WriteNextResponseByte('\r');
 	}
 	else if (Command == 'R')
@@ -517,29 +562,30 @@ void CDC_Task(void)
 	#if !defined(NO_EEPROM_BYTE_SUPPORT)
 	else if (Command == 'D')
 	{
-		/* Read the byte from the endpoint and write it to the EEPROM */
+		// Read the byte from the endpoint and write it to the EEPROM 
 		eeprom_write_byte((uint8_t*)((intptr_t)(CurrAddress >> 1)), FetchNextCommandByte());
 
-		/* Increment the address after use */
+		// Increment the address after use
 		CurrAddress += 2;
 
-		/* Send confirmation byte back to the host */
+		// Send confirmation byte back to the host 
 		WriteNextResponseByte('\r');
 	}
 	else if (Command == 'd')
 	{
-		/* Read the EEPROM byte and write it to the endpoint */
+		// Read the EEPROM byte and write it to the endpoint 
 		WriteNextResponseByte(eeprom_read_byte((uint8_t*)((intptr_t)(CurrAddress >> 1))));
 
-		/* Increment the address after use */
+		// Increment the address after use 
 		CurrAddress += 2;
 	}
 	#endif
 	else if (Command != 27)
 	{
-		/* Unknown (non-sync) command, return fail code */
+		// Unknown (non-sync) command, return fail code 
 		WriteNextResponseByte('?');
 	}
+	
 
 	/* Select the IN endpoint */
 	Endpoint_SelectEndpoint(CDC_TX_EPNUM);
