@@ -58,23 +58,16 @@ static bool RunBootloader = true;
 
 void StartSketch()
 {
+	cli();
 	/* Relocate the interrupt vector table to the application section */
-//	MCUCR = (1 << IVCE);	// these two lines are for moving interrupts to bootloader, not application
-//	MCUCR = (1 << IVSEL);
-	__asm__ volatile (	
-		"ldi r16, 	0x01\n"
-		"out 0x35, 	r16\n"
-		"ldi r16, 	0x00\n"
-		"out 0x35, 	r16\n"
-	::);
+	MCUCR = (1 << IVCE);
+	MCUCR = 0;
 	
-	UDCON = 1;		// Detach USB
-	UDIEN = 0;
-	__asm__ volatile (	// Reset vector to run firmware
-		"clr r30\n"
-		"clr r31\n"
-		"ijmp\n"
-	::);
+//	UDCON = 1;		// Detach USB
+//	UDIEN = 0;
+
+	/* jump to beginning of application space */
+	__asm__ volatile("jmp 0x0000");
 }
 
 /** Main program entry point. This routine configures the hardware required by the bootloader, then continuously
@@ -83,12 +76,7 @@ void StartSketch()
  */
 int main(void)
 {
-//	uint8_t MCUSR_state = MCUSR;	// store the reason for the reset
-//	MCUSR &= ~(1 << WDRF);			// must clear the watchdog reset flag before disabling and reenabling WDT
-//	wdt_disable();
-//	if (MCUSR_state & (1<<WDRF) && (pgm_read_word(0) != 0xFFFF)) {
-//		StartSketch();				// if the reset was caused by WDT and if a sketch is already present then run the sketch instead of the bootloader
-//	}
+	wdt_disable();
 	
 	/* Setup hardware required for the bootloader */
 	SetupHardware();
@@ -96,25 +84,20 @@ int main(void)
 	/* Enable global interrupts so that the USB stack can function */
 	sei();
 	
-	DDRD |= (1<<6);	// turn on LED attached to D12 - used to track bootloader progress
-	PORTD |= (1<<6);	
-
 	while (RunBootloader)
 	{
 		CDC_Task();
 		USB_USBTask();
+		/* time out and start the sketch if one is present 
+		 * TODO - handle ctr now that TIMER1 is gone */
+//		if (ctr++ > 10000 && pgm_read_word(0) != 0xFFFF) 
+//			RunBootloader = false;
 	}
-
-	PORTD &= ~(1<<6);	// turn off LED attached to D12
 
 	/* Disconnect from the host - USB interface will be reset later along with the AVR */
 	USB_Detach();
 
-	/* Enable the watchdog and force a timeout to reset the AVR */
-//	wdt_enable(WDTO_250MS);
-
-//	for (;;);
-	
+	/* Jump to beginning of application space to run the sketch - do not reset */	
 	StartSketch();
 }
 
@@ -134,16 +117,6 @@ void SetupHardware(void)
 
 	/* Initialize USB Subsystem */
 	USB_Init();
-	
-	/* Bootloader active LED toggle timer initialization */
-	TIMSK1 = (1 << TOIE1);
-	TCCR1B = ((1 << CS11) | (1 << CS10));	
-}
-
-/** ISR to periodically toggle the LEDs on the board to indicate that the bootloader is active. */
-ISR(TIMER1_OVF_vect, ISR_BLOCK)
-{
-	PORTD ^= (1<<6);		// toggle LED on D12
 }
 
 /** Event handler for the USB_ConfigurationChanged event. This configures the device's endpoints ready

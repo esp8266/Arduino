@@ -27,7 +27,10 @@ void Reboot()
 {
 	USB.detach();
 	cli();
-	asm volatile("jmp 0x7800");		// jump to bootloader - DiskLoader takes up last 2 kB
+
+	// Reset the microcontroller to run the bootloader
+	wdt_enable(WDTO_250MS);
+	for (;;);
 }
 
 // Define constants and variables for buffering incoming serial data.  We're
