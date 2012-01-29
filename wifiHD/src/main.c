@@ -74,10 +74,14 @@ void fw_download_cb(void* ctx, uint8_t** buf, uint32_t* len)
 #include "debug.h"
 #include "ard_utils.h"
 
-struct http_server {
+struct ctx_server {
 	struct netif *netif;
 	uint8_t wl_init_complete;
 };
+
+// to maintain the word alignment
+#define PAD_CTX_SIZE 	0x18
+#define PAD_NETIF_SIZE 	0x3c
 
 static bool initSpiComplete = false;
 
@@ -127,7 +131,7 @@ static void
 wl_cm_scan_cb(void* ctx)
 {
 #ifdef _APP_DEBUG_
-	struct http_server* hs = ctx;
+	struct ctx_server* hs = ctx;
 
 	uint8_t init = hs->wl_init_complete;
 
@@ -142,7 +146,9 @@ wl_cm_scan_cb(void* ctx)
 static void
 wl_cm_conn_cb(struct wl_network_t* net, void* ctx)
 {
-	struct http_server* hs = ctx;
+	struct ctx_server* hs = ctx;
+
+	LINK_LED_ON();
 
         printk("link up, connected to \"%s\"\n", ssid2str(&net->ssid));
         printk("requesting dhcp ... ");
@@ -157,7 +163,9 @@ wl_cm_conn_cb(struct wl_network_t* net, void* ctx)
 static void
 wl_cm_disconn_cb(void* ctx)
 {
-	struct http_server* hs = ctx;
+	struct ctx_server* hs = ctx;
+
+	LINK_LED_OFF();
 
         if (netif_is_up(hs->netif)) {
                 printk("link down, release dhcp\n");
@@ -187,16 +195,8 @@ ip_status_cb(struct netif* netif)
         if (netif_is_up(netif)) {
             set_result_cmd(WL_SUCCESS);
                 printk("bound to %s\n", ip2str(netif->ip_addr));
-                printk("starting httpd ... ");
-                if (httpd_start() == ERR_OK)
-                        printk("ok\n");
-                else
-                        printk("fail\n");
-
-        }
-        else {
-                printk("stopping httpd\n");
-                httpd_stop();
+        }else{
+        	WARN("Interface not up!");
         }
 }
 
@@ -207,10 +207,15 @@ ip_status_cb(struct netif* netif)
 void
 led_init(void)
 {
+	gpio_enable_gpio_pin(LED0_GPIO);
 	gpio_enable_gpio_pin(LED1_GPIO);
 	gpio_enable_gpio_pin(LED2_GPIO);
-     LED_Off(LED1);
-    LED_Off(LED2);
+	LINK_LED_OFF();
+	ERROR_LED_OFF();
+	DATA_LED_OFF();
+
+    //LED_Off(LED1);
+    //LED_Off(LED2);
 }
 
 
@@ -271,7 +276,7 @@ void wifi_init()
  *
  */
 void 
-poll(struct http_server* hs)
+poll(struct ctx_server* hs)
 {
         /* this will trigger any scheduled timer callbacks */
         timer_poll();
@@ -300,14 +305,16 @@ void initShell()
         console_add_cmd("connect", cmd_connect, NULL);
         console_add_cmd("setkey", cmd_setkey, NULL);
         console_add_cmd("status", cmd_status, NULL);
+#ifdef ADD_CMDS
         console_add_cmd("powersave", cmd_power, NULL);
         console_add_cmd("psconf", cmd_psconf, NULL);
         console_add_cmd("ping", cmd_ping, NULL);
+#endif
 #ifdef WITH_WPA
         console_add_cmd("wpass", cmd_setpass, NULL);
         console_add_cmd("dpass", cmd_delpass, NULL);
 #endif
-#if BOARD == ARDUINO
+#ifdef STAT_SPI
         console_add_cmd("spiStat", cmd_statSpi, NULL);
         console_add_cmd("resetSpiStat", cmd_resetStatSpi, NULL);
 #endif
@@ -320,7 +327,7 @@ void initShell()
 void 
 wl_init_complete_cb(void* ctx) 
 {
-	struct http_server *hs = ctx;
+	struct ctx_server *hs = ctx;
         struct ip_addr ipaddr, netmask, gw;
 	wl_err_t wl_status;
 	
@@ -355,6 +362,7 @@ wl_init_complete_cb(void* ctx)
         	initSpiComplete = true;
         	AVAIL_FOR_SPI();
         }
+
         /* start connection manager */
 	wl_status = wl_cm_start(wl_cm_scan_cb, wl_cm_conn_cb, wl_cm_disconn_cb, wl_cm_err_cb, hs);
 	ASSERT(wl_status == WL_SUCCESS, "failed to init wl conn mgr");
@@ -368,7 +376,7 @@ main(void)
 {
 	wl_err_t wl_status;
 	int status;
-	struct http_server *hs;
+	struct ctx_server *hs;
 
     startup_init();
 
@@ -394,12 +402,16 @@ main(void)
 #else
     printk("Arduino Wifi Startup... [%s]\n", __TIMESTAMP__);
 
-	hs = calloc(1, sizeof(struct http_server));
+    size_t size_ctx_server = sizeof(struct ctx_server)+PAD_CTX_SIZE;
+	hs = calloc(1, size_ctx_server);
 	ASSERT(hs, "out of memory");
 
-	hs->netif = calloc(1, sizeof(struct netif));
+	size_t size_netif = sizeof(struct netif)+PAD_NETIF_SIZE;
+	hs->netif = calloc(1, size_netif);
 	ASSERT(hs->netif, "out of memory");
 
+	INFO("hs:%p size:0x%x netif:%p size:0x%x\n", hs, size_ctx_server,
+			hs->netif, size_netif);
         timer_init(NULL, NULL);
         lwip_init();
         

@@ -193,7 +193,7 @@ cmd_status(int argc, char* argv[], void* ctx)
         return CMD_DONE;
 }
 
-
+#ifdef ADD_CMDS
 /**
  *
  */
@@ -225,8 +225,9 @@ cmd_power(int argc, char* argv[], void* ctx)
         printk(usage);
         return CMD_DONE;
 }
+#endif
 
-
+#ifdef ADD_CMDS
 /**
  *
  */
@@ -273,6 +274,7 @@ cmd_psconf(int argc, char* argv[], void* ctx)
         
         return CMD_DONE;
 }
+#endif
 
 #define MAX_KEY_LEN 64
 

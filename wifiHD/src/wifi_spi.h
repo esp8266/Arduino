@@ -45,6 +45,8 @@ enum {
     AVAIL_DATA_TCP_CMD	= 0x2B,
     GET_DATA_TCP_CMD	= 0x2C,
     START_CLIENT_TCP_CMD= 0x2D,
+    STOP_CLIENT_TCP_CMD = 0x2E,
+    GET_CLIENT_STATE_TCP_CMD = 0x2F,
 
     DISCONNECT_CMD		= 0x30,
     // All command with DATA_FLAG 0x40 send a 16bit Len

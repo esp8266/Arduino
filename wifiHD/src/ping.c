@@ -29,7 +29,7 @@
  * This file is derived from a part of the lwIP TCP/IP stack.
  * 
  */
-
+#ifdef ADD_CMDS
 #include "lwip/opt.h"
 
 #include "lwip/mem.h"
@@ -338,3 +338,4 @@ cmd_state_t cmd_ping(int argc, char* argv[], void* ctx)
         Assert(0);
 	return CMD_DONE;
 }
+#endif

@@ -84,7 +84,7 @@
 
 
 //! Number of LEDs.
-#define LED_COUNT   3
+#define LED_COUNT   0
 
 /*! \name GPIO Connections of LEDs
  */
@@ -114,8 +114,8 @@
  */
 //! @{
 #define LED_MONO0_GREEN   LED0
-#define LED_MONO1_GREEN   LED1
-#define LED_MONO2_GREEN   LED2
+#define LED_MONO1_RED   	LED1
+#define LED_MONO2_BLU   	LED2
 //! @}
 
 #if 0

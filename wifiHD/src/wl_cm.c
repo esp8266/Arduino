@@ -35,6 +35,7 @@
 
 #if 1
 # include "printf-stdarg.h"
+#include "ard_utils.h"
 # define CM_DPRINTF(fmt...) printk(fmt)
 #else
 # define CM_DPRINTF(fmt...)
@@ -178,6 +179,8 @@ wl_media_connected_cb(void* ctx)
         struct cm *cm = ctx;
         struct wl_network_t *net = wl_get_current_network();
         CM_DPRINTF("CM: connected to %s\n", ssid2str(&net->ssid));
+        LINK_LED_ON();
+        ERROR_LED_OFF();
         if (cm->conn_cb)
                 cm->conn_cb(net, cm->ctx);
 }
@@ -190,7 +193,8 @@ static void
 wl_conn_failure_cb(void* ctx)
 {
         CM_DPRINTF("CM: connect failed, scanning\n");
-        
+        ERROR_LED_ON();
+        LINK_LED_OFF();
         if (wl_scan() != WL_SUCCESS)
                 /* should never happen */
                 CM_DPRINTF("CM: could not start scan after connect fail!\n");
@@ -205,7 +209,7 @@ wl_conn_lost_cb(void* ctx)
 {
         struct cm *cm = ctx;
         CM_DPRINTF("CM: connection lost, scanning\n");
-
+        LINK_LED_OFF();
         if (cm->disconn_cb)
                 cm->disconn_cb(cm->ctx);
 

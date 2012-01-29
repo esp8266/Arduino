@@ -423,10 +423,10 @@
 
 #undef DHCP_DOES_ARP_CHECK
 
-#if 0
+#if 1
 #define LWIP_DEBUG 1
 //#define NETIF_DEBUG LWIP_DBG_ON
-#define DHCP_DEBUG LWIP_DBG_ON
+//#define DHCP_DEBUG LWIP_DBG_ON
 //#define ICMP_DEBUG LWIP_DBG_ON
 //#define TCP_DEBUG LWIP_DBG_ON
 //#define TCP_RTO_DEBUG LWIP_DBG_ON
@@ -434,8 +434,8 @@
 //#define TCP_CWND_DEBUG LWIP_DBG_ON
 //#define ETHARP_DEBUG LWIP_DBG_ON
 //#define PBUF_DEBUG LWIP_DBG_ON
-#define TCP_INPUT_DEBUG LWIP_DBG_ON
-#define TCP_OUTPUT_DEBUG LWIP_DBG_ON
+//#define TCP_INPUT_DEBUG LWIP_DBG_ON
+//#define TCP_OUTPUT_DEBUG LWIP_DBG_OFF
 #endif
 
 #define ETH_PAD_SIZE WL_HEADER_SIZE /* size of wifiengine header */

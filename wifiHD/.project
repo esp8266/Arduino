@@ -27,7 +27,7 @@
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildLocation</key>
-					<value>${workspace_loc:/wifiHD/Release}</value>
+					<value>${workspace_loc:/wifiHD/Debug}</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.contents</key>
@@ -60,6 +60,11 @@
 			<arguments>
 			</arguments>
 		</buildCommand>
+		<buildCommand>
+			<name>com.atmel.avr32.managedbuilder.ui.extras.ListingBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
 	</buildSpec>
 	<natures>
 		<nature>com.atmel.avr32.core.nature</nature>
@@ -76,7 +81,7 @@
 		<link>
 			<name>include</name>
 			<type>2</type>
-			<location>/usr/avr32/include</location>
+			<location>C:/usr/avr32/include</location>
 		</link>
 	</linkedResources>
 </projectDescription>

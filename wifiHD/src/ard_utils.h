@@ -9,23 +9,61 @@
 #define ARD_UTILS_H_
 
 #include "gpio.h"
+#include "arduino/arduino.h"
 #define INIT_SIGNAL_FOR_SPI() 	gpio_enable_pin_pull_up(ARDUINO_HANDSHAKE_PIN)
 #define BUSY_FOR_SPI() 			gpio_set_gpio_pin(ARDUINO_HANDSHAKE_PIN)
 #define AVAIL_FOR_SPI() 		gpio_clr_gpio_pin(ARDUINO_HANDSHAKE_PIN)
 
-#define SIGN0_UP() 				gpio_set_gpio_pin(LED0_GPIO)
-#define SIGN0_DN() 				gpio_clr_gpio_pin(LED0_GPIO)
-#define SIGN1_UP() 				gpio_set_gpio_pin(LED1_GPIO)
-#define SIGN1_DN() 				gpio_clr_gpio_pin(LED1_GPIO)
-#define SIGN2_UP() 				gpio_set_gpio_pin(LED2_GPIO)
-#define SIGN2_DN() 				gpio_clr_gpio_pin(LED2_GPIO)
+#define LED0_UP() 				gpio_set_gpio_pin(LED0_GPIO)
+#define LED0_DN() 				gpio_clr_gpio_pin(LED0_GPIO)
+#define LED0_TL() 				gpio_tgl_gpio_pin(LED0_GPIO)
+#define LED1_UP() 				gpio_set_gpio_pin(LED1_GPIO)
+#define LED1_DN() 				gpio_clr_gpio_pin(LED1_GPIO)
+#define LED1_TL() 				gpio_tgl_gpio_pin(LED1_GPIO)
+#define LED2_UP() 				gpio_set_gpio_pin(LED2_GPIO)
+#define LED2_DN() 				gpio_clr_gpio_pin(LED2_GPIO)
+#define LED2_TL() 				gpio_tgl_gpio_pin(LED2_GPIO)
+
+#ifdef _DEBUG_
+#define SIGN0_UP		LED0_UP
+#define SIGN0_DN 		LED0_DN
+#define SIGN0_TL 		LED0_TL
+#define SIGN1_UP 		LED1_UP
+#define SIGN1_DN 		LED1_DN
+#define SIGN1_TL 		LED1_TL
+#define SIGN2_UP 		LED2_UP
+#define SIGN2_DN 		LED2_DN
+#define SIGN2_TL 		LED2_TL
+
+#else
+#define SIGN0_UP()
+#define SIGN0_DN()
+#define SIGN0_TL()
+#define SIGN1_UP()
+#define SIGN1_DN()
+#define SIGN1_TL()
+#define SIGN2_UP()
+#define SIGN2_DN()
+#define SIGN2_TL()
+//#define TOGGLE_SIG0
+#endif
 
 #define DELAY_450NS asm volatile("nop")
 #define DELAY_1uS  DELAY_450NS; DELAY_450NS;
-
 #define TOGGLE_SIG0()	SIGN0_UP(); DELAY_450NS;SIGN0_DN();
 
 
+#define LINK_LED_OFF	LED0_UP
+#define ERROR_LED_OFF	LED1_UP
+#define DATA_LED_OFF	LED2_UP
+
+#define LINK_LED_ON		LED0_DN
+#define ERROR_LED_ON	LED1_DN
+#define DATA_LED_ON		LED2_DN
+
+#define LINK_LED_BL		LED0_TL
+#define ERROR_LED_BL	LED1_TL
+#define DATA_LED_BL		LED2_TL
 
 
 #define CREATE_HEADER_REPLY(REPLY, RECV, NUM_PARAMS)\
@@ -165,11 +203,13 @@
 
 typedef struct sData
 {
-	u8_t*	data;
-	u16_t	len;
-	u16_t	idx;
+	uint8_t*	data;
+	uint16_t	len;
+	uint16_t	idx;
 	void* 	pcb;
 }tData;
+
+struct pbuf;
 
 void insert_pBuf(struct pbuf* q, uint8_t sock, void* _pcb);
 
@@ -185,6 +225,6 @@ bool getTcpDataByte(uint8_t sock, uint8_t* payload);
 
 bool isAvailTcpDataByte(uint8_t sock);
 
-u8_t freeTcpData(uint8_t sock);
+uint8_t freeTcpData(uint8_t sock);
 
 #endif /* ARD_UTILS_H_ */
