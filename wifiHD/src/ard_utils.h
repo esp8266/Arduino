@@ -9,7 +9,7 @@
 #define ARD_UTILS_H_
 
 #include "gpio.h"
-#include "arduino/arduino.h"
+#include "ARDUINO/arduino.h"
 #define INIT_SIGNAL_FOR_SPI() 	gpio_enable_pin_pull_up(ARDUINO_HANDSHAKE_PIN)
 #define BUSY_FOR_SPI() 			gpio_set_gpio_pin(ARDUINO_HANDSHAKE_PIN)
 #define AVAIL_FOR_SPI() 		gpio_clr_gpio_pin(ARDUINO_HANDSHAKE_PIN)

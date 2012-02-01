@@ -79,9 +79,14 @@
 			<locationURI>framework:/com.atmel.avr32.sf.uc3</locationURI>
 		</link>
 		<link>
+			<name>arduino</name>
+			<type>2</type>
+			<location>/media/WindowsNTFS/Projects/Arduino/Arduino-git</location>
+		</link>
+		<link>
 			<name>include</name>
 			<type>2</type>
-			<location>C:/usr/avr32/include</location>
+			<location>/home/dlafauci/C::/usr/avr32/include</location>
 		</link>
 	</linkedResources>
 </projectDescription>

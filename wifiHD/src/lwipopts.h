@@ -423,8 +423,8 @@
 
 #undef DHCP_DOES_ARP_CHECK
 
-#if 1
-#define LWIP_DEBUG 1
+#if 0
+#define LWIP_DEBUG 0
 //#define NETIF_DEBUG LWIP_DBG_ON
 //#define DHCP_DEBUG LWIP_DBG_ON
 //#define ICMP_DEBUG LWIP_DBG_ON
