@@ -1087,8 +1087,7 @@ public class Base {
     for (TargetPackage targetPackage : packages.values()) {
       for (TargetPlatform targetPlatform : targetPackage.platforms()) {
         for (String programmer : targetPlatform.getProgrammers().keySet()) {
-          String id = targetPackage.getName() + ":" + targetPlatform.getName() +
-              ":" + programmer;
+          String id = targetPackage.getName() + ":" + programmer;
           AbstractAction action = new AbstractAction(targetPlatform
               .getProgrammers().get(programmer).get("name")) {
             public void actionPerformed(ActionEvent actionevent) {
@@ -1569,9 +1568,9 @@ public class Base {
   
   static public PreferencesMap getBoardPreferences() {
     TargetPlatform target = getTargetPlatform();
-	String board = Preferences.get("board");
+    String board = Preferences.get("board");
     return target.getBoards().get(board);
-  } 
+  }
 
   static public File getSketchbookFolder() {
     return new File(Preferences.get("sketchbook.path"));
