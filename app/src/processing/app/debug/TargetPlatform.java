@@ -92,6 +92,10 @@ public class TargetPlatform {
     return programmers;
   }
 
+  public PreferencesMap getTool(String tool) {
+    return getPreferences().createSubTree("tools").createSubTree(tool);
+  }
+  
   public PreferencesMap getPreferences() {
     return preferences;
   }

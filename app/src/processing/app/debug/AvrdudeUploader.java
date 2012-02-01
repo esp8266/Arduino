@@ -35,57 +35,87 @@ import processing.app.Base;
 import processing.app.Preferences;
 import processing.app.SerialException;
 import processing.app.helpers.PreferencesMap;
+import processing.app.helpers.StringReplacer;
 
 public class AvrdudeUploader extends Uploader  {
 
   public boolean uploadUsingPreferences(String buildPath, String className, boolean usingProgrammer)
   throws RunnerException, SerialException {
-    PreferencesMap boardPreferences = Base.getBoardPreferences();
+    // FIXME: Preferences should be reorganized
+    PreferencesMap prefs = Preferences.getMap();
+    prefs.putAll(Base.getBoardPreferences());
 
     // if no protocol is specified for this board, assume it lacks a 
     // bootloader and upload using the selected programmer.
-    if (usingProgrammer || boardPreferences.get("upload.protocol") == null) {
-      String programmer = Preferences.get("programmer");
-      TargetPlatform targetPlatform = Base.getTargetPlatform();
+    if (usingProgrammer || prefs.get("upload.protocol") == null) {
+      return uploadUsingProgrammer(buildPath, className);
+    }
 
-      if (programmer.contains(":")) {
-        String[] split = programmer.split(":", 2);
-        targetPlatform = Base.getTargetPlatform(split[0], Preferences
-            .get("target_platform"));
-        programmer = split[1];
+    prefs.put("build.path", buildPath);
+    prefs.put("build.project_name", className);
+
+    TargetPlatform targetPlatform = Base.getTargetPlatform();
+
+    prefs.putAll(targetPlatform.getTool(prefs.get("upload.tool")));
+    if (verbose)
+      prefs.put("upload.verbose", prefs.get("upload.params.verbose"));
+    else
+      prefs.put("upload.verbose", prefs.get("upload.params.quiet"));
+
+    String pattern = prefs.get("upload.pattern");
+    try {
+      if (prefs.get("upload.disable_flushing") == null
+          || prefs.get("upload.disable_flushing").toLowerCase().equals("false")) {
+        flushSerialBuffer();
       }
-      
-      Collection<String> params = getProgrammerCommands(targetPlatform, programmer);
-      params.add("-Uflash:w:" + buildPath + File.separator + className + ".hex:i");
-      return avrdude(params);
-    }
 
-    return uploadViaBootloader(buildPath, className);
+      String[] cmd = StringReplacer.formatAndSplit(pattern, prefs, true);
+      return executeUploadCommand(cmd);
+    } catch (Exception e) {
+      throw new RunnerException(e);
+    }
   }
-  
-  private boolean uploadViaBootloader(String buildPath, String className)
-  throws RunnerException, SerialException {
-    PreferencesMap boardPreferences = Base.getBoardPreferences();
-    List<String> commandDownloader = new ArrayList<String>();
-    String protocol = boardPreferences.get("upload.protocol");
-    
-    // avrdude wants "stk500v1" to distinguish it from stk500v2
-    if (protocol.equals("stk500"))
-      protocol = "stk500v1";
-    commandDownloader.add("-c" + protocol);
-    commandDownloader.add(
-      "-P" + (Base.isWindows() ? "\\\\.\\" : "") + Preferences.get("serial.port"));
-    commandDownloader.add(
-      "-b" + Integer.parseInt(boardPreferences.get("upload.speed")));
-    commandDownloader.add("-D"); // don't erase
-    commandDownloader.add("-Uflash:w:" + buildPath + File.separator + className + ".hex:i");
 
-    if (boardPreferences.get("upload.disable_flushing") == null ||
-        boardPreferences.get("upload.disable_flushing").toLowerCase().equals("false")) {
-      flushSerialBuffer();
+  public boolean uploadUsingProgrammer(String buildPath, String className)
+      throws RunnerException {
+    
+    String programmer = Preferences.get("programmer");
+    TargetPlatform targetPlatform = Base.getTargetPlatform();
+    if (programmer.contains(":")) {
+      String[] split = programmer.split(":", 2);
+      targetPlatform = Base.getTargetPlatform(split[0], Preferences
+          .get("target_platform"));
+      programmer = split[1];
     }
 
-    return avrdude(commandDownloader);
+    PreferencesMap prefs = Preferences.getMap();
+    prefs.putAll(Base.getBoardPreferences());
+    prefs.putAll(targetPlatform.getProgrammers().get(programmer));
+    
+    prefs.put("build.path", buildPath);
+    prefs.put("build.project_name", className);
+
+    PreferencesMap programmers = targetPlatform.getPreferences()
+        .createSubTree("programmers");
+    prefs.putAll(programmers.createSubTree(prefs.get("program.tool")));
+
+    if (verbose)
+      prefs.put("program.verbose", prefs.get("program.params.verbose"));
+    else
+      prefs.put("program.verbose", prefs.get("program.params.quiet"));
+
+    String pattern = prefs.get("program.pattern");
+    try {
+      if (prefs.get("program.disable_flushing") == null
+          || prefs.get("program.disable_flushing").toLowerCase().equals("false")) {
+        flushSerialBuffer();
+      }
+
+      String[] cmd = StringReplacer.formatAndSplit(pattern, prefs, true);
+      return executeUploadCommand(cmd);
+    } catch (Exception e) {
+      throw new RunnerException(e);
+    }
   }
   
   public boolean burnBootloader() throws RunnerException {
@@ -108,14 +138,15 @@ public class AvrdudeUploader extends Uploader  {
     if ("usb".equals(programmerPreferences.get("communication"))) {
       params.add("-Pusb");
     } else if ("serial".equals(programmerPreferences.get("communication"))) {
-      params.add("-P" + (Base.isWindows() ? "\\\\.\\" : "") + Preferences.get("serial.port"));
+      params.add("-P" + (Base.isWindows() ? "\\\\.\\" : "")
+                 + Preferences.get("serial.port"));
       if (programmerPreferences.get("speed") != null) {
-	params.add("-b" + Integer.parseInt(programmerPreferences.get("speed")));
+        params.add("-b" + Integer.parseInt(programmerPreferences.get("speed")));
       }
     }
     // XXX: add support for specifying the port address for parallel
     // programmers, although avrdude has a default that works in most cases.
-    
+
     if (programmerPreferences.get("force") != null &&
         programmerPreferences.get("force").toLowerCase().equals("true"))
       params.add("-F");
@@ -129,7 +160,7 @@ public class AvrdudeUploader extends Uploader  {
   protected boolean burnBootloader(Collection<String> params)
   throws RunnerException {
     PreferencesMap boardPreferences = Base.getBoardPreferences();
-    List<String> fuses = new ArrayList<String>();
+    List<String> fuses = new ArrayList<String>(params);
     fuses.add("-e"); // erase the chip
     if (boardPreferences.get("bootloader.unlock_bits") != null)
       fuses.add("-Ulock:w:" + boardPreferences.get("bootloader.unlock_bits") + ":m");
@@ -138,7 +169,7 @@ public class AvrdudeUploader extends Uploader  {
     fuses.add("-Uhfuse:w:" + boardPreferences.get("bootloader.high_fuses") + ":m");
     fuses.add("-Ulfuse:w:" + boardPreferences.get("bootloader.low_fuses") + ":m");
 
-    if (!avrdude(params, fuses))
+    if (!avrdude(fuses))
       return false;
 
     try {
@@ -170,16 +201,12 @@ public class AvrdudeUploader extends Uploader  {
     if (boardPreferences.get("bootloader.lock_bits") != null)
       bootloader.add("-Ulock:w:" + boardPreferences.get("bootloader.lock_bits") + ":m");
 
-    if (bootloader.size() > 0)
-      return avrdude(params, bootloader);
+    if (bootloader.size() > 0) {
+      params.addAll(bootloader);
+      return avrdude(params);
+    }
     
     return true;
-  }
-  
-  public boolean avrdude(Collection<String> p1, Collection<String> p2) throws RunnerException {
-    List<String> p = new ArrayList<String>(p1);
-    p.addAll(p2);
-    return avrdude(p);
   }
   
   public boolean avrdude(Collection<String> params) throws RunnerException {

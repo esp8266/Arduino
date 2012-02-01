@@ -50,7 +50,6 @@ public class Compiler implements MessageConsumer {
 
   private Sketch sketch;
 
-  private String primaryClassName;
   private List<File> objectFiles;
 
   private PreferencesMap prefs;
@@ -71,86 +70,17 @@ public class Compiler implements MessageConsumer {
                          String _primaryClassName, boolean _verbose)
       throws RunnerException {
     sketch = _sketch;
-    primaryClassName = _primaryClassName;
     verbose = _verbose;
     objectFiles = new ArrayList<File>();
 
-    TargetPlatform targetPlatform = Base.getTargetPlatform();
-
-    // Merge all the global preference configuration in order of priority
-    prefs = new PreferencesMap();
-    prefs.putAll(Preferences.getMap());
-    prefs.putAll(targetPlatform.getPreferences());
-    prefs.putAll(Base.getBoardPreferences());
-    for (String k : prefs.keySet()) {
-      if (prefs.get(k) == null)
-        prefs.put(k, "");
-    }
-
-    prefs.put("build.path", _buildPath);
-    
-    String idePath = System.getProperty("user.dir");
-    if (Base.isMacOS())
-      idePath += "/Arduino.app/Contents/Resources/Java";
-    prefs.put("ide.path", idePath);
-    prefs.put("ide.version", "" + Base.REVISION);
-
-    if (!prefs.containsKey("compiler.path"))
-      prefs.put("compiler.path", Base.getAvrBasePath());
-
-    // Core folder
-    String core = prefs.get("build.core");
-    if (core == null) {
-      RunnerException re = new RunnerException(
-          _("No board selected; please choose a board from the Tools > Board menu."));
-      re.hideStackTrace();
-      throw re;
-    }
-    TargetPlatform tp;
-    if (!core.contains(":")) {
-      tp = targetPlatform;
-    } else {
-      String[] split = core.split(":", 2);
-      tp = Base.getTargetPlatform(split[0], Preferences.get("target_platform"));
-      core = split[1];
-    }
-    File coreFolder = new File(tp.getFolder(), "cores");
-    coreFolder = new File(coreFolder, core);
-    prefs.put("build.core.path", coreFolder.getAbsolutePath());
-    
-    // System Folder
-    File systemFolder = targetPlatform.getFolder();
-    systemFolder = new File(systemFolder, "system");
-    prefs.put("build.system.path", systemFolder.getAbsolutePath());
-    
-    // Variant Folder
-    String variantPath;
-    String variant = prefs.get("build.variant");
-    if (variant != null) {
-      TargetPlatform t;
-      if (!variant.contains(":")) {
-        t = targetPlatform;
-      } else {
-        String[] split = variant.split(":", 2);
-        t = Base.getTargetPlatform(split[0], Preferences
-            .get("target_platform"));
-        variant = split[1];
-      }
-      File variantFolder = new File(t.getFolder(), "variants");
-      variantFolder = new File(variantFolder, variant);
-      variantPath = variantFolder.getAbsolutePath();
-      prefs.put("build.variant.path", variantPath);
-    } else {
-      variantPath = null;
-      prefs.put("build.variant.path", "");
-    }
+    prefs = createBuildPreferences(_buildPath, _primaryClassName);
 
     // 0. include paths for core + all libraries
     sketch.setCompilingProgress(20);
     List<String> includePaths = new ArrayList<String>();
     includePaths.add(prefs.get("build.core.path"));
-    if (variantPath != null)
-      includePaths.add(variantPath);
+    if (!prefs.get("build.variant.path").isEmpty())
+      includePaths.add(prefs.get("build.variant.path"));
     for (File file : sketch.getImportedLibraries())
       includePaths.add(file.getPath());
 
@@ -182,6 +112,74 @@ public class Compiler implements MessageConsumer {
 
     sketch.setCompilingProgress(90);
     return true;
+  }
+
+  private PreferencesMap createBuildPreferences(String _buildPath,
+                                                String _primaryClassName)
+      throws RunnerException {
+    TargetPlatform targetPlatform = Base.getTargetPlatform();
+
+    // Merge all the global preference configuration in order of priority
+    PreferencesMap p = new PreferencesMap();
+    p.putAll(Preferences.getMap());
+    p.putAll(targetPlatform.getPreferences());
+    p.putAll(Base.getBoardPreferences());
+    for (String k : p.keySet()) {
+      if (p.get(k) == null)
+        p.put(k, "");
+    }
+
+    p.put("build.path", _buildPath);
+    p.put("build.project_name", _primaryClassName);
+    
+    if (!p.containsKey("compiler.path"))
+      p.put("compiler.path", Base.getAvrBasePath());
+
+    // Core folder
+    String core = p.get("build.core");
+    if (core == null) {
+      RunnerException re = new RunnerException(
+          _("No board selected; please choose a board from the Tools > Board menu."));
+      re.hideStackTrace();
+      throw re;
+    }
+    TargetPlatform tp;
+    if (!core.contains(":")) {
+      tp = targetPlatform;
+    } else {
+      String[] split = core.split(":", 2);
+      tp = Base.getTargetPlatform(split[0], Preferences.get("target_platform"));
+      core = split[1];
+    }
+    File coreFolder = new File(tp.getFolder(), "cores");
+    coreFolder = new File(coreFolder, core);
+    p.put("build.core.path", coreFolder.getAbsolutePath());
+    
+    // System Folder
+    File systemFolder = targetPlatform.getFolder();
+    systemFolder = new File(systemFolder, "system");
+    p.put("build.system.path", systemFolder.getAbsolutePath());
+    
+    // Variant Folder
+    String variant = p.get("build.variant");
+    if (variant != null) {
+      TargetPlatform t;
+      if (!variant.contains(":")) {
+        t = targetPlatform;
+      } else {
+        String[] split = variant.split(":", 2);
+        t = Base
+            .getTargetPlatform(split[0], Preferences.get("target_platform"));
+        variant = split[1];
+      }
+      File variantFolder = new File(t.getFolder(), "variants");
+      variantFolder = new File(variantFolder, variant);
+      p.put("build.variant.path", variantFolder.getAbsolutePath());
+    } else {
+      p.put("build.variant.path", "");
+    }
+    
+    return p;
   }
 
   private List<File> compileFiles(String outputPath, File sourcePath,
@@ -640,7 +638,6 @@ public class Compiler implements MessageConsumer {
     dict.put("compiler.c.elf.flags", dict
         .get("compiler.c.elf.flags" + optRelax));
     dict.put("archive_file", "core.a");
-    dict.put("project_name", primaryClassName);
     dict.put("object_files", objectFileList);
     dict.put("ide_version", "" + Base.REVISION);
 
@@ -657,7 +654,6 @@ public class Compiler implements MessageConsumer {
   // 5. extract EEPROM data (from EEMEM directive) to .eep file.
   void compileEep(List<String> includePaths) throws RunnerException {
     PreferencesMap dict = new PreferencesMap(prefs);
-    dict.put("project_name", primaryClassName);
     dict.put("ide_version", "" + Base.REVISION);
 
     String[] cmdArray;
@@ -673,7 +669,6 @@ public class Compiler implements MessageConsumer {
   // 6. build the .hex file
   void compileHex(List<String> includePaths) throws RunnerException {
     PreferencesMap dict = new PreferencesMap(prefs);
-    dict.put("project_name", primaryClassName);
     dict.put("ide_version", "" + Base.REVISION);
 
     String[] cmdArray;

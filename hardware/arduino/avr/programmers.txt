@@ -1,24 +1,41 @@
 avrisp.name=AVR ISP
 avrisp.communication=serial
 avrisp.protocol=stk500v1
+avrisp.program.protocol=stk500v1
+avrisp.program.tool=avrdude
+avrisp.program.extra_params=-P{serial.port}
 
 avrispmkii.name=AVRISP mkII
 avrispmkii.communication=usb
 avrispmkii.protocol=stk500v2
+avrispmkii.program.protocol=stk500v2
+avrispmkii.program.tool=avrdude
+avrispmkii.program.extra_params=-Pusb
 
 usbtinyisp.name=USBtinyISP
 usbtinyisp.protocol=usbtiny
+usbtinyisp.program.tool=avrdude
+usbtinyisp.program.extra_params=
 
 usbasp.name=USBasp
 usbasp.communication=usb
 usbasp.protocol=usbasp
+usbasp.program.protocol=usbasp
+usbasp.program.tool=avrdude
+usbasp.program.extra_params=-Pusb
 
 parallel.name=Parallel Programmer
 parallel.protocol=dapa
 parallel.force=true
 # parallel.delay=200
+parallel.program.tool=avrdude
+parallel.program.extra_params=
 
 arduinoisp.name=Arduino as ISP
 arduinoisp.communication=serial
 arduinoisp.protocol=stk500v1
 arduinoisp.speed=9600
+arduinoisp.program.protocol=stk500v1
+arduinoisp.program.speed=9600
+arduinoisp.program.tool=avrdude
+arduinoisp.program.extra_params=-P{serial.port} -b{program.speed}

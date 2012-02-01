@@ -1,6 +1,7 @@
 ##############################################################
 
 uno.name=Arduino Uno
+uno.upload.tool=avrdude
 uno.upload.protocol=arduino
 uno.upload.maximum_size=32256
 uno.upload.speed=115200
@@ -175,7 +176,7 @@ mega.build.variant=mega
 ##############################################################
 
 mini328.name=Arduino Mini w/ ATmega328
-mini328.upload.protocol=stk500
+mini328.upload.protocol=stk500v1
 mini328.upload.maximum_size=28672
 mini328.upload.speed=115200
 
@@ -452,3 +453,4 @@ atmega8.build.mcu=atmega8
 atmega8.build.f_cpu=16000000L
 atmega8.build.core=arduino
 atmega8.build.variant=standard
+
