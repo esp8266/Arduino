@@ -29,21 +29,26 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 
 import processing.core.PApplet;
 
 public class PreferencesMap extends HashMap<String, String> {
 
-	public PreferencesMap(PreferencesMap prefs) {
-		super(prefs);
+	public PreferencesMap(Hashtable table) {
+		super(table);
 	}
 
+	public PreferencesMap(PreferencesMap prefs) {
+	  super(prefs);
+	}
+	
 	public PreferencesMap() {
 		super();
 	}
 
-	/**
+  /**
 	 * Parse a property list file and put kev/value pairs into the Map
 	 * 
 	 * @param file
