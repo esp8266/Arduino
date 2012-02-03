@@ -46,8 +46,8 @@
 struct ring_buffer
 {
   unsigned char buffer[SERIAL_BUFFER_SIZE];
-  volatile int head;
-  volatile int tail;
+  volatile unsigned int head;
+  volatile unsigned int tail;
 };
 
 #if defined(USBCON)
