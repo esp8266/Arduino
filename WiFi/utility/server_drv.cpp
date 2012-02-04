@@ -12,7 +12,7 @@ extern "C" {
 
 
 // Start server TCP on port specified
-void ServerDrv::StartServer(uint16_t port, uint8_t sock)
+void ServerDrv::startServer(uint16_t port, uint8_t sock)
 {
 	WAIT_FOR_SLAVE_SELECT();
     // Send Command
@@ -34,7 +34,7 @@ void ServerDrv::StartServer(uint16_t port, uint8_t sock)
 }
 
 // Start server TCP on port specified
-void ServerDrv::StartClient(uint32_t ipAddress, uint16_t port, uint8_t sock)
+void ServerDrv::startClient(uint32_t ipAddress, uint16_t port, uint8_t sock)
 {
 	WAIT_FOR_SLAVE_SELECT();
     // Send Command
@@ -56,7 +56,29 @@ void ServerDrv::StartClient(uint32_t ipAddress, uint16_t port, uint8_t sock)
     SpiDrv::spiSlaveDeselect();
 }
 
-uint8_t ServerDrv::getState(uint8_t sock)
+// Start server TCP on port specified
+void ServerDrv::stopClient(uint8_t sock)
+{
+	WAIT_FOR_SLAVE_SELECT();
+    // Send Command
+    SpiDrv::sendCmd(STOP_CLIENT_TCP_CMD, PARAM_NUMS_1);
+    SpiDrv::sendParam(&sock, 1, LAST_PARAM);
+
+    //Wait the reply elaboration
+    SpiDrv::waitForSlaveReady();
+
+    // Wait for reply
+    uint8_t _data = 0;
+    uint8_t _dataLen = 0;
+    if (!SpiDrv::waitResponseCmd(STOP_CLIENT_TCP_CMD, PARAM_NUMS_1, &_data, &_dataLen))
+    {
+        WARN("error waitResponse");
+    }
+    SpiDrv::spiSlaveDeselect();
+}
+
+
+uint8_t ServerDrv::getServerState(uint8_t sock)
 {
 	WAIT_FOR_SLAVE_SELECT();
     // Send Command
@@ -77,6 +99,26 @@ uint8_t ServerDrv::getState(uint8_t sock)
    return _data;
 }
 
+uint8_t ServerDrv::getClientState(uint8_t sock)
+{
+	WAIT_FOR_SLAVE_SELECT();
+    // Send Command
+    SpiDrv::sendCmd(GET_CLIENT_STATE_TCP_CMD, PARAM_NUMS_1);
+    SpiDrv::sendParam(&sock, sizeof(sock), LAST_PARAM);
+
+    //Wait the reply elaboration
+    SpiDrv::waitForSlaveReady();
+
+    // Wait for reply
+    uint8_t _data = 0;
+    uint8_t _dataLen = 0;
+    if (!SpiDrv::waitResponseCmd(GET_CLIENT_STATE_TCP_CMD, PARAM_NUMS_1, &_data, &_dataLen))
+    {
+        WARN("error waitResponse");
+    }
+    SpiDrv::spiSlaveDeselect();
+   return _data;
+}
 
 uint8_t ServerDrv::availData(uint8_t sock)
 {

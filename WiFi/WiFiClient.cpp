@@ -11,6 +11,7 @@ extern "C" {
 #include "WiFiServer.h"
 #include "server_drv.h"
 
+
 uint16_t WiFiClient::_srcport = 1024;
 
 WiFiClient::WiFiClient() : _sock(MAX_SOCK_NUM) {
@@ -41,7 +42,7 @@ int WiFiClient::connect(IPAddress ip, uint16_t port) {
     _sock = getFirstSocket();
     if (_sock != NO_SOCKET_AVAIL)
     {
-    	ServerDrv::StartClient(uint32_t(ip), port, _sock);
+    	ServerDrv::startClient(uint32_t(ip), port, _sock);
     	 WiFiClass::_state[_sock] = _sock;
     }else{
     	return 0;
@@ -106,11 +107,13 @@ void WiFiClient::flush() {
 }
 
 void WiFiClient::stop() {
+
+	INFO("1)Stop WiFi client sock:%d state:%d status:%d", _sock, WiFiClass::_state[_sock], status());
   if (_sock == 255)
     return;
-  
-  // attempt to close the connection gracefully (send a FIN to other side)
-  disconnect(WiFiClass::_state[_sock]);
+
+  ServerDrv::stopClient(_sock);
+
   unsigned long start = millis();
   
   // wait a second for the connection to close
@@ -119,9 +122,13 @@ void WiFiClient::stop() {
     
   // if it hasn't closed, close it forcefully
   if (status() != CLOSED)
-    close(_sock);
+  {
+	  //TODO force close
+	  //close(_sock);
+  }
+
   
-  WiFiClass::_server_port[_sock] = 0;
+  INFO("2)Stop WiFi client sock:%d state:%d status:%d", _sock, WiFiClass::_state[_sock], status());
   _sock = 255;
 }
 
@@ -130,6 +137,7 @@ uint8_t WiFiClient::connected() {
     return 0;
   } else {
     uint8_t s = status();
+    INFO("Client status: %d", s);
     return !(s == LISTEN || s == CLOSED || s == FIN_WAIT_1 || s == FIN_WAIT_2 ||
              (s == CLOSE_WAIT && !available()));
   }
@@ -139,7 +147,7 @@ uint8_t WiFiClient::status() {
     if (_sock == 255) {
     return CLOSED;
   } else {
-    return ServerDrv::getState(_sock);
+    return ServerDrv::getClientState(_sock);
   }
 }
 

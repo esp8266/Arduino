@@ -8,11 +8,15 @@ class ServerDrv
 {
 public:
     // Start server TCP on port specified
-    static void StartServer(uint16_t port, uint8_t sock);
+    static void startServer(uint16_t port, uint8_t sock);
 
-    static void StartClient(uint32_t ipAddress, uint16_t port, uint8_t sock);
+    static void startClient(uint32_t ipAddress, uint16_t port, uint8_t sock);
+
+    static void stopClient(uint8_t sock);
                                                                                   
-    static uint8_t getState(uint8_t sock);
+    static uint8_t getServerState(uint8_t sock);
+
+    static uint8_t getClientState(uint8_t sock);
 
     static bool getData(uint8_t sock, uint8_t *data);
 

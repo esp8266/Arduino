@@ -30,6 +30,12 @@
 
 #ifdef _DEBUG_
 
+#define INFO(format, args...) do { \
+	char buf[250];	\
+	sprintf(buf, format, args); \
+	Serial.println(buf); \
+} while(0);
+
 #define INFO1(x) do { PRINT_FILE_LINE() Serial.print("-I-");\
 		Serial.println(x);    			\
 }while (0);
@@ -39,11 +45,6 @@
 		Serial.print(x,16);Serial.print(",");Serial.println(y,16); \
 }while (0);
 
-#define INFO(format, args...) do { \
-	char buf[250];	\
-	sprintf(buf, format, args); \
-	Serial.println(buf); \
-} while(0);
 
 #else
 #define INFO1(x) do {} while(0);
