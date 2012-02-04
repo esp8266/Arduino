@@ -46,6 +46,7 @@ int WiFiClass::begin()
 {
 	// Add procedure to read the latest configuration from eeprom/dataflash
 	// and start the wifi connection
+	return WL_IDLE_STATUS;
 }
 
 int WiFiClass::begin(char* ssid)

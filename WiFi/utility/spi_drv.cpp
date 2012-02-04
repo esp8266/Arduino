@@ -181,7 +181,7 @@ void SpiDrv::getParam(uint8_t* param)
 int SpiDrv::waitResponseCmd(uint8_t cmd, uint8_t numParam, uint8_t* param, uint8_t* param_len)
 {
     char _data = 0;
-    int i =0, ii = 0;
+    int ii = 0;
 
     IF_CHECK_START_CMD(_data)
     {
@@ -233,7 +233,7 @@ int SpiDrv::waitResponse(uint8_t cmd, uint8_t numParam, uint8_t* param, uint16_t
 int SpiDrv::waitResponseData16(uint8_t cmd, uint8_t* param, uint16_t* param_len)
 {
     char _data = 0;
-    int i =0, ii = 0;
+    uint16_t ii = 0;
 
     IF_CHECK_START_CMD(_data)
     {
@@ -259,7 +259,7 @@ int SpiDrv::waitResponseData16(uint8_t cmd, uint8_t* param, uint16_t* param_len)
 int SpiDrv::waitResponseData8(uint8_t cmd, uint8_t* param, uint8_t* param_len)
 {
     char _data = 0;
-    int i =0, ii = 0;
+    int ii = 0;
 
     IF_CHECK_START_CMD(_data)
     {
@@ -464,7 +464,7 @@ uint16_t SpiDrv::readParamLen16(uint16_t* param_len)
 
 void SpiDrv::sendBuffer(uint8_t* param, uint16_t param_len, uint8_t lastParam)
 {
-    int i = 0;
+    uint16_t i = 0;
 
     // Send Spi paramLen
     sendParamLen16(param_len);
@@ -483,7 +483,6 @@ void SpiDrv::sendBuffer(uint8_t* param, uint16_t param_len, uint8_t lastParam)
 
 void SpiDrv::sendParam(uint16_t param, uint8_t lastParam)
 {
-    int i = 0;
     // Send Spi paramLen
     sendParamLen8(2);
 

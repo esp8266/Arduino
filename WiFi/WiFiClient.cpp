@@ -36,6 +36,7 @@ int WiFiClient::connect(const char* host, uint16_t port) {
     return ret;
   }
 #endif
+  return 0;
 }
 
 int WiFiClient::connect(IPAddress ip, uint16_t port) {
