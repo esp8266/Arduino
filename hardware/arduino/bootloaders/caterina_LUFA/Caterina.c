@@ -56,18 +56,49 @@ static uint32_t CurrAddress;
  */
 static bool RunBootloader = true;
 
-void StartSketch()
+/* Pulse generation counters to keep track of the time remaining for each pulse type */
+#define TX_RX_LED_PULSE_PERIOD 100
+uint16_t TxLEDPulse = 0; // time remaining for Tx LED pulse
+uint16_t RxLEDPulse = 0; // time remaining for Rx LED pulse
+
+/* Bootloader timeout timer */
+uint16_t Timeout = 0;
+
+void StartSketch(void)
 {
 	cli();
+	
+	/* Undo TIMER1 setup and clear the count before running the sketch */
+	TIMSK1 = 0;
+	TCCR1B = 0;
+	TCNT1H = 0;		// 16-bit write to TCNT1 requires high byte be written first
+	TCNT1L = 0;
+	
 	/* Relocate the interrupt vector table to the application section */
 	MCUCR = (1 << IVCE);
 	MCUCR = 0;
-	
-//	UDCON = 1;		// Detach USB
-//	UDIEN = 0;
+
+	L_LED_OFF();
+	TX_LED_OFF();
+	RX_LED_OFF();
 
 	/* jump to beginning of application space */
 	__asm__ volatile("jmp 0x0000");
+}
+
+/*	Breathing animation on L LED indicates bootloader is running */
+uint16_t LLEDPulse;
+void LEDPulse(void)
+{
+	LLEDPulse++;
+	uint8_t p = LLEDPulse >> 8;
+	if (p > 127)
+		p = 254-p;
+	p += p;
+	if (((uint8_t)LLEDPulse) > p)
+		L_LED_OFF();
+	else
+		L_LED_ON();
 }
 
 /** Main program entry point. This routine configures the hardware required by the bootloader, then continuously
@@ -76,6 +107,7 @@ void StartSketch()
  */
 int main(void)
 {
+	/* Watchdog may be configured with a 15 ms period so must disable it before doing anything else */
 	wdt_disable();
 	
 	/* Setup hardware required for the bootloader */
@@ -88,10 +120,11 @@ int main(void)
 	{
 		CDC_Task();
 		USB_USBTask();
-		/* time out and start the sketch if one is present 
-		 * TODO - handle ctr now that TIMER1 is gone */
-//		if (ctr++ > 10000 && pgm_read_word(0) != 0xFFFF) 
-//			RunBootloader = false;
+		/* Time out and start the sketch if one is present */
+		if (Timeout > 8000 && pgm_read_word(0) != 0xFFFF) 
+			RunBootloader = false;
+
+		LEDPulse();
 	}
 
 	/* Disconnect from the host - USB interface will be reset later along with the AVR */
@@ -114,9 +147,37 @@ void SetupHardware(void)
 	/* Relocate the interrupt vector table to the bootloader section */
 	MCUCR = (1 << IVCE);
 	MCUCR = (1 << IVSEL);
+	
+	LED_SETUP();
+	CPU_PRESCALE(0); 
+	L_LED_OFF();
+	TX_LED_OFF();
+	RX_LED_OFF();
+	
+	/* Initialize TIMER1 to handle bootloader timeout and LED tasks.  Compare match happens at approx. 1 ms interval */
+	OCR1AH = 0;
+	OCR1AL = 250;
+	TIMSK1 = (1 << OCIE1A);
+	TCCR1B = ((1 << CS11) | (1 << CS10));	
 
 	/* Initialize USB Subsystem */
 	USB_Init();
+}
+
+//uint16_t ctr = 0;
+ISR(TIMER1_COMPA_vect, ISR_BLOCK)
+{
+	/* Reset counter */
+	TCNT1H = 0;
+	TCNT1L = 0;
+
+	/* Check whether the TX or RX LED one-shot period has elapsed.  if so, turn off the LED */
+	if (TxLEDPulse && !(--TxLEDPulse))
+		TX_LED_OFF();
+	if (RxLEDPulse && !(--RxLEDPulse))
+		RX_LED_OFF();
+		
+	Timeout++;
 }
 
 /** Event handler for the USB_ConfigurationChanged event. This configures the device's endpoints ready
@@ -345,6 +406,9 @@ static void WriteNextResponseByte(const uint8_t Response)
 
 	/* Write the next byte to the IN endpoint */
 	Endpoint_Write_8(Response);
+	
+	TX_LED_ON();
+	TxLEDPulse = TX_RX_LED_PULSE_PERIOD;
 }
 
 #define STK_OK              0x10
@@ -372,19 +436,13 @@ void CDC_Task(void)
 	/* Check if endpoint has a command in it sent from the host */
 	if (!(Endpoint_IsOUTReceived()))
 	  return;
+	  
+	RX_LED_ON();
+	RxLEDPulse = TX_RX_LED_PULSE_PERIOD;
 
 	/* Read in the bootloader command (first byte sent from host) */
 	uint8_t Command = FetchNextCommandByte();
 
-	/*
-	if (STK_UNIVERSAL == Command) {
-		WriteNextResponseByte(')');
-	} else {
-		WriteNextResponseByte(Command);
-	}
-	*/
-
-	
 	if (Command == 'E')
 	{
 		RunBootloader = false;

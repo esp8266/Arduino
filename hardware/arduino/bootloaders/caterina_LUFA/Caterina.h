@@ -62,13 +62,26 @@
 		#define BOOTLOADER_HWVERSION_MINOR   0x00
 
 		/** Eight character bootloader firmware identifier reported to the host when requested */
-		#define SOFTWARE_IDENTIFIER          "LUFACDC"
+		#define SOFTWARE_IDENTIFIER          "CATERINA"
+		
+		#define CPU_PRESCALE(n)	(CLKPR = 0x80, CLKPR = (n))
+		#define LED_SETUP()		DDRC |= (1<<7); DDRB |= (1<<0); DDRD |= (1<<5);
+		#define L_LED_OFF()		PORTC &= ~(1<<7)
+		#define L_LED_ON()		PORTC |= (1<<7)
+		#define L_LED_TOGGLE()	PORTC ^= (1<<7)
+		#define TX_LED_OFF()	PORTD |= (1<<5)
+		#define TX_LED_ON()		PORTD &= ~(1<<5)
+		#define RX_LED_OFF()	PORTB |= (1<<0)
+		#define RX_LED_ON()		PORTB &= ~(1<<0)
 
 	/* Type Defines: */
 		/** Type define for a non-returning pointer to the start of the loaded application in flash memory. */
 		typedef void (*AppPtr_t)(void) ATTR_NO_RETURN;
 
 	/* Function Prototypes: */
+		void StartSketch(void);
+		void LEDPulse();
+	
 		void CDC_Task(void);
 		void SetupHardware(void);
 
