@@ -75,6 +75,21 @@ public class AvrdudeUploader extends Uploader  {
     // avrdude wants "stk500v1" to distinguish it from stk500v2
     if (protocol.equals("stk500"))
       protocol = "stk500v1";
+      
+	// need to do a little dance for Leonardo and derivatives:
+	// open then close the port at the magic baudrate (usually 1200 bps) first to signal to the 
+	// sketch that it should reset into bootloader.  after doing this wait a moment for the 
+	// bootloader to enumerate
+	if (boardPreferences.get("bootloader.path").equals("caterina_LUFA")) {
+    	try {
+    		Serial serial = new Serial(Integer.parseInt(boardPreferences.get("upload.speed")));
+    		serial.dispose();
+		    serial = null;
+		    Thread.sleep(2000);
+    	} catch (SerialException ex) { 
+    	} catch (InterruptedException ex) { }    	
+    }
+    
     commandDownloader.add("-c" + protocol);
     commandDownloader.add(
       "-P" + (Base.isWindows() ? "\\\\.\\" : "") + Preferences.get("serial.port"));

@@ -29,7 +29,7 @@ void Reboot()
 	cli();
 
 	// Reset the microcontroller to run the bootloader
-	wdt_enable(WDTO_250MS);
+	wdt_enable(WDTO_15MS);
 	for (;;);
 }
 
