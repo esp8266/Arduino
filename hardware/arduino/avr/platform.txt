@@ -19,8 +19,7 @@ compiler.objcopy.eep.flags=-O ihex -j .eeprom --set-section-flags=.eeprom=alloc,
 compiler.elf2hex.flags=-O ihex -R .eeprom
 compiler.elf2hex.cmd=avr-objcopy
 compiler.ldflags=
-compiler.upload.cmd=
-compiler.upload.flags=
+compiler.size.cmd=avr-size
 
 # AVR compile patterns
 # --------------------
@@ -42,6 +41,10 @@ recipe.objcopy.eep.pattern={compiler.path}{compiler.objcopy.cmd} {compiler.objco
 
 ## Create hex
 recipe.objcopy.hex.pattern={compiler.path}{compiler.elf2hex.cmd} {compiler.elf2hex.flags} {build.path}/{build.project_name}.elf {build.path}/{build.project_name}.hex
+
+## Compute size
+recipe.size.pattern={compiler.path}{compiler.size.cmd} -A {build.path}/{build.project_name}.hex
+recipe.size.regex=Total\s+([0-9]+).*
 
 
 # AVR Uploader/Programmers tools

@@ -689,4 +689,8 @@ public class Compiler implements MessageConsumer {
     // Remove first space
     return res.substring(1);
   }
+  
+  public PreferencesMap getBuildPreferences() {
+    return prefs;
+  }
 }

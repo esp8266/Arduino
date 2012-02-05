@@ -28,6 +28,7 @@ import processing.app.debug.Compiler;
 import processing.app.debug.RunnerException;
 import processing.app.debug.Sizer;
 import processing.app.debug.Uploader;
+import processing.app.helpers.PreferencesMap;
 import processing.app.preproc.*;
 import processing.core.*;
 import static processing.app.I18n._;
@@ -1610,9 +1611,7 @@ public class Sketch {
    *
    * @return null if compilation failed, main class name if not
    */
-  public String build(String buildPath, boolean verbose)
-    throws RunnerException {
-    
+  public String build(String buildPath, boolean verbose) throws RunnerException {
     // run the preprocessor
     editor.status.progressUpdate(20);
     String primaryClassName = preprocess(buildPath);
@@ -1621,12 +1620,11 @@ public class Sketch {
     // that will bubble up to whomever called build().
     Compiler compiler = new Compiler();
     if (compiler.compile(this, buildPath, primaryClassName, verbose)) {
-      size(buildPath, primaryClassName);
+      size(compiler.getBuildPreferences());
       return primaryClassName;
     }
     return null;
-  }
-  
+  }  
   
   protected boolean exportApplet(boolean usingProgrammer) throws Exception {
     return exportApplet(tempBuildFolder.getAbsolutePath(), usingProgrammer);
@@ -1668,30 +1666,27 @@ public class Sketch {
   }
 
   
-  protected void size(String buildPath, String suggestedClassName)
-    throws RunnerException {
+  protected void size(PreferencesMap prefs) throws RunnerException {
     long size = 0;
-    String maxsizeString = Base.getBoardPreferences().get("upload.maximum_size");
-    if (maxsizeString == null) return;
+    String maxsizeString = prefs.get("upload.maximum_size");
+    if (maxsizeString == null)
+      return;
     long maxsize = Integer.parseInt(maxsizeString);
-    Sizer sizer = new Sizer(buildPath, suggestedClassName);
-      try {
+    Sizer sizer = new Sizer(prefs);
+    try {
       size = sizer.computeSize();
-      System.out.println(
-	I18n.format(
-	  _("Binary sketch size: {0} bytes (of a {1} byte maximum)"),
-	  size, maxsize
-	)
-      );
+      System.out.println(I18n
+          .format(_("Binary sketch size: {0} bytes (of a {1} byte maximum)"),
+                  size, maxsize));
     } catch (RunnerException e) {
-      System.err.println(I18n.format(_("Couldn't determine program size: {0}"), e.getMessage()));
+      System.err.println(I18n.format(_("Couldn't determine program size: {0}"),
+                                     e.getMessage()));
     }
 
     if (size > maxsize)
       throw new RunnerException(
-        _("Sketch too big; see http://www.arduino.cc/en/Guide/Troubleshooting#size for tips on reducing it."));
+          _("Sketch too big; see http://www.arduino.cc/en/Guide/Troubleshooting#size for tips on reducing it."));
   }
-
 
   protected String upload(String buildPath, String suggestedClassName, boolean usingProgrammer)
     throws RunnerException, SerialException {
