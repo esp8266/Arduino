@@ -86,7 +86,7 @@ public abstract class Uploader implements MessageConsumer  {
     }
   }
 
-  protected boolean executeUploadCommand(Collection commandDownloader)
+  protected boolean executeUploadCommand(Collection<String> commandDownloader)
       throws RunnerException {
     String[] commandArray = new String[commandDownloader.size()];
     commandDownloader.toArray(commandArray);

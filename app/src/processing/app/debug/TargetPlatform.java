@@ -92,6 +92,10 @@ public class TargetPlatform {
     return programmers;
   }
 
+  public PreferencesMap getProgrammer(String programmer) {
+    return getProgrammers().get(programmer);
+  }
+  
   public PreferencesMap getTool(String tool) {
     return getPreferences().createSubTree("tools").createSubTree(tool);
   }

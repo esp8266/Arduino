@@ -2446,7 +2446,7 @@ public class Editor extends JFrame implements RunnerListener {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         try {
-          Uploader uploader = new AvrdudeUploader();
+          Uploader uploader = new BasicUploader();
           if (uploader.burnBootloader()) {
             statusNotice(_("Done burning bootloader."));
           } else {

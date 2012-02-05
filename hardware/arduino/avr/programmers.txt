@@ -29,7 +29,7 @@ parallel.protocol=dapa
 parallel.force=true
 # parallel.delay=200
 parallel.program.tool=avrdude
-parallel.program.extra_params=
+parallel.program.extra_params=-F
 
 arduinoisp.name=Arduino as ISP
 arduinoisp.communication=serial

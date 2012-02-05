@@ -36,127 +36,127 @@ import processing.core.PApplet;
 
 public class PreferencesMap extends HashMap<String, String> {
 
-	public PreferencesMap(Hashtable table) {
-		super(table);
-	}
+  public PreferencesMap(Hashtable<String, String> table) {
+    super(table);
+  }
 
-	public PreferencesMap(PreferencesMap prefs) {
-	  super(prefs);
-	}
-	
-	public PreferencesMap() {
-		super();
-	}
+  public PreferencesMap(PreferencesMap prefs) {
+    super(prefs);
+  }
+
+  public PreferencesMap() {
+    super();
+  }
 
   /**
-	 * Parse a property list file and put kev/value pairs into the Map
-	 * 
-	 * @param file
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 */
-	public void load(File file) throws FileNotFoundException, IOException {
-		load(new FileInputStream(file));
-	}
+   * Parse a property list file and put kev/value pairs into the Map
+   * 
+   * @param file
+   * @throws FileNotFoundException
+   * @throws IOException
+   */
+  public void load(File file) throws FileNotFoundException, IOException {
+    load(new FileInputStream(file));
+  }
 
-	/**
-	 * Parse a property list stream and put key/value pairs into the Map
-	 * 
-	 * @param input
-	 * @throws IOException
-	 */
-	public void load(InputStream input) throws IOException {
-		String[] lines = PApplet.loadStrings(input);
-		for (String line : lines) {
-			if (line.length() == 0 || line.charAt(0) == '#')
-				continue;
+  /**
+   * Parse a property list stream and put key/value pairs into the Map
+   * 
+   * @param input
+   * @throws IOException
+   */
+  public void load(InputStream input) throws IOException {
+    String[] lines = PApplet.loadStrings(input);
+    for (String line : lines) {
+      if (line.length() == 0 || line.charAt(0) == '#')
+        continue;
 
-			int equals = line.indexOf('=');
-			if (equals != -1) {
-				String key = line.substring(0, equals);
-				String value = line.substring(equals + 1);
-				put(key.trim(), value.trim());
-			}
-		}
-	}
+      int equals = line.indexOf('=');
+      if (equals != -1) {
+        String key = line.substring(0, equals);
+        String value = line.substring(equals + 1);
+        put(key.trim(), value.trim());
+      }
+    }
+  }
 
-	/**
-	 * Create a new Map<String, PreferenceMap> where the keys are the first level
-	 * of the current mapping. E.g. the folowing mapping:<br />
-	 * 
-	 * <pre>
-	 * Map (
-	 *     alpha.some.keys = v1
-	 *     alpha.other.keys = v2
-	 *     beta.some.keys = v3
-	 *   )
-	 * </pre>
-	 * 
-	 * will generate the following result:
-	 * 
-	 * <pre>
-	 * alpha = Map(
-	 *     some.keys = v1
-	 *     other.keys = v2
-	 *   )
-	 * beta = Map(
-	 *     some.keys = v3
-	 *   )
-	 * </pre>
-	 * 
-	 * @return
-	 */
-	public Map<String, PreferencesMap> createFirstLevelMap() {
-		Map<String, PreferencesMap> res = new HashMap<String, PreferencesMap>();
-		for (String key : keySet()) {
-			int dot = key.indexOf('.');
-			if (dot == -1)
-				continue;
+  /**
+   * Create a new Map<String, PreferenceMap> where the keys are the first level
+   * of the current mapping. E.g. the folowing mapping:<br />
+   * 
+   * <pre>
+   * Map (
+   *     alpha.some.keys = v1
+   *     alpha.other.keys = v2
+   *     beta.some.keys = v3
+   *   )
+   * </pre>
+   * 
+   * will generate the following result:
+   * 
+   * <pre>
+   * alpha = Map(
+   *     some.keys = v1
+   *     other.keys = v2
+   *   )
+   * beta = Map(
+   *     some.keys = v3
+   *   )
+   * </pre>
+   * 
+   * @return
+   */
+  public Map<String, PreferencesMap> createFirstLevelMap() {
+    Map<String, PreferencesMap> res = new HashMap<String, PreferencesMap>();
+    for (String key : keySet()) {
+      int dot = key.indexOf('.');
+      if (dot == -1)
+        continue;
 
-			String parent = key.substring(0, dot);
-			String child = key.substring(dot + 1);
+      String parent = key.substring(0, dot);
+      String child = key.substring(dot + 1);
 
-			if (!res.containsKey(parent))
-				res.put(parent, new PreferencesMap());
-			res.get(parent).put(child, get(key));
-		}
-		return res;
-	}
+      if (!res.containsKey(parent))
+        res.put(parent, new PreferencesMap());
+      res.get(parent).put(child, get(key));
+    }
+    return res;
+  }
 
-	/**
-	 * Create a new PreferenceMap using a subtree of the current mapping. E.g.
-	 * with the folowing mapping:<br />
-	 * 
-	 * <pre>
-	 * Map (
-	 *     alpha.some.keys = v1
-	 *     alpha.other.keys = v2
-	 *     beta.some.keys = v3
-	 *   )
-	 * </pre>
-	 * 
-	 * a call to createSubTree("alpha") will generate the following result:
-	 * 
-	 * <pre>
-	 * Map(
-	 *     some.keys = v1
-	 *     other.keys = v2
-	 *   )
-	 * </pre>
-	 * 
-	 * @param parent
-	 * @return
-	 */
-	public PreferencesMap createSubTree(String parent) {
-		PreferencesMap res = new PreferencesMap();
-		parent += ".";
-		int parentLen = parent.length();
-		for (String key : keySet()) {
-			if (key.startsWith(parent))
-				res.put(key.substring(parentLen), get(key));
-		}
-		return res;
-	}
+  /**
+   * Create a new PreferenceMap using a subtree of the current mapping. E.g.
+   * with the folowing mapping:<br />
+   * 
+   * <pre>
+   * Map (
+   *     alpha.some.keys = v1
+   *     alpha.other.keys = v2
+   *     beta.some.keys = v3
+   *   )
+   * </pre>
+   * 
+   * a call to createSubTree("alpha") will generate the following result:
+   * 
+   * <pre>
+   * Map(
+   *     some.keys = v1
+   *     other.keys = v2
+   *   )
+   * </pre>
+   * 
+   * @param parent
+   * @return
+   */
+  public PreferencesMap createSubTree(String parent) {
+    PreferencesMap res = new PreferencesMap();
+    parent += ".";
+    int parentLen = parent.length();
+    for (String key : keySet()) {
+      if (key.startsWith(parent))
+        res.put(key.substring(parentLen), get(key));
+    }
+    return res;
+  }
 
-	private static final long serialVersionUID = 2330591567444282843L;
+  private static final long serialVersionUID = 2330591567444282843L;
 }

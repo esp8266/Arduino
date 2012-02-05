@@ -1031,7 +1031,6 @@ public class Base {
   }
 
   
-  @SuppressWarnings("serial")
   public void rebuildBoardsMenu(JMenu menu) {
     String selPackage = Preferences.get("target_package");
     String selPlatform = Preferences.get("target_platform");
@@ -1053,6 +1052,7 @@ public class Base {
           
           // Setup a menu item for the current board
           String boardName = boards.get(board).get("name");
+          @SuppressWarnings("serial")
           AbstractAction action = new AbstractAction(boardName) {
             public void actionPerformed(ActionEvent actionevent) {
               Preferences.set("target_package", (String) getValue("package"));
@@ -1080,7 +1080,6 @@ public class Base {
     }
   }
   
-  @SuppressWarnings("serial")
   public void rebuildProgrammerMenu(JMenu menu) {
     menu.removeAll();
     ButtonGroup group = new ButtonGroup();
@@ -1088,8 +1087,10 @@ public class Base {
       for (TargetPlatform targetPlatform : targetPackage.platforms()) {
         for (String programmer : targetPlatform.getProgrammers().keySet()) {
           String id = targetPackage.getName() + ":" + programmer;
+
+          @SuppressWarnings("serial")
           AbstractAction action = new AbstractAction(targetPlatform
-              .getProgrammers().get(programmer).get("name")) {
+              .getProgrammer(programmer).get("name")) {
             public void actionPerformed(ActionEvent actionevent) {
               Preferences.set("programmer", "" + getValue("id"));
             }
@@ -1565,7 +1566,11 @@ public class Base {
                                                  String platformName) {
     return packages.get(packageName).get(platformName);
   }
-  
+
+  static public TargetPlatform getCurrentTargetPlatformFromPackage(String pack) {
+    return getTargetPlatform(pack, Preferences.get("target_platform"));
+  }
+
   static public PreferencesMap getBoardPreferences() {
     TargetPlatform target = getTargetPlatform();
     String board = Preferences.get("board");

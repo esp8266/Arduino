@@ -47,35 +47,18 @@ recipe.objcopy.hex.pattern={compiler.path}{compiler.elf2hex.cmd} {compiler.elf2h
 # AVR Uploader/Programmers tools
 # -------------------
 
-tools.avrdude.upload.cmd=avrdude
-tools.avrdude.upload.path={runtime.ide.path}/hardware/tools
-tools.avrdude.upload.config.path={upload.path}/avrdude.conf
+tools.avrdude.cmd=avrdude
+tools.avrdude.path={runtime.ide.path}/hardware/tools
+tools.avrdude.config.path={path}/avrdude.conf
+
 tools.avrdude.upload.params.verbose=-v -v -v -v
 tools.avrdude.upload.params.quiet=-q -q
-tools.avrdude.upload.pattern={upload.path}/{upload.cmd} -C{upload.config.path} {upload.verbose} -p{build.mcu} -c{upload.protocol} -P{serial.port} -b{upload.speed} -D -Uflash:w:{build.path}/{build.project_name}.hex:i
+tools.avrdude.upload.pattern={path}/{cmd} -C{config.path} {upload.verbose} -p{build.mcu} -c{upload.protocol} -P{serial.port} -b{upload.speed} -D -Uflash:w:{build.path}/{build.project_name}.hex:i
 
-# /home/megabug/git/ARM-merged/build/linux/work/hardware/tools/avrdude 
-# -C/home/megabug/git/ARM-merged/build/linux/work/hardware/tools/avrdude.conf 
-# -q -q 
-# -patmega328p 
-# -carduino 
-# -P/dev/ttyACM0 
-# -b115200 
-# -D 
-# -Uflash:w:/tmp/build366783256629686367.tmp/Blink.cpp.hex:i 
-
-tools.avrdude.program.cmd=avrdude
-tools.avrdude.program.path={runtime.ide.path}/hardware/tools
-tools.avrdude.program.config.path={program.path}/avrdude.conf
 tools.avrdude.program.params.verbose=-v -v -v -v
 tools.avrdude.program.params.quiet=-q -q
-tools.avrdude.program.pattern={program.path}/{program.cmd} -C{program.config.path} {program.verbose} -p{build.mcu} -c{protocol} {program.extra_params} -Uflash:w:{build.path}/{build.project_name}.hex:i
+tools.avrdude.program.pattern={path}/{cmd} -C{config.path} {program.verbose} -p{build.mcu} -c{protocol} {program.extra_params} -Uflash:w:{build.path}/{build.project_name}.hex:i
 
-# /home/megabug/git/ARM-merged/build/linux/work/hardware/tools/avrdude
-# -C/home/megabug/git/ARM-merged/build/linux/work/hardware/tools/avrdude.conf
-# -q -q
-# -patmega328p
-# -cusbasp
-# -Pusb
-# -Uflash:w:/tmp/build8190214930979711138.tmp/Blink.cpp.hex:i
-
+tools.avrdude.bootloader.params.verbose=-v -v -v -v
+tools.avrdude.bootloader.params.quiet=-q -q
+tools.avrdude.bootloader.pattern={path}/{cmd} -C{config.path} {bootloader.verbose} -p{build.mcu} -c{protocol} {program.extra_params} {bootloader.params}
