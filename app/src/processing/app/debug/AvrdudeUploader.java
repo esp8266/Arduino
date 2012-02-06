@@ -85,7 +85,7 @@ public class AvrdudeUploader extends Uploader  {
     		Serial serial = new Serial(Integer.parseInt(boardPreferences.get("upload.speed")));
     		serial.dispose();
 		    serial = null;
-		    Thread.sleep(2000);
+		    Thread.sleep(8000);
     	} catch (SerialException ex) { 
     	} catch (InterruptedException ex) { }    	
     }
