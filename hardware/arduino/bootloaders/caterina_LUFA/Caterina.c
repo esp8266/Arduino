@@ -121,7 +121,7 @@ int main(void)
 		CDC_Task();
 		USB_USBTask();
 		/* Time out and start the sketch if one is present */
-		if (Timeout > 16000 && pgm_read_word(0) != 0xFFFF) 
+		if (Timeout > 16000)
 			RunBootloader = false;
 
 		LEDPulse();
@@ -154,11 +154,16 @@ void SetupHardware(void)
 	TX_LED_OFF();
 	RX_LED_OFF();
 	
-	/* Initialize TIMER1 to handle bootloader timeout and LED tasks.  Compare match happens at approx. 1 ms interval */
+	/* Initialize TIMER1 to handle bootloader timeout and LED tasks.  
+	 * With 16 MHz clock and 1/64 prescaler, timer 1 is clocked at 250 kHz
+	 * Our chosen compare match generates an interrupt every 1 ms.
+	 * This interrupt is disabled selectively when doing memory reading, erasing,
+	 * or writing since SPM has tight timing requirements.
+	 */ 
 	OCR1AH = 0;
 	OCR1AL = 250;
-	TIMSK1 = (1 << OCIE1A);
-	TCCR1B = ((1 << CS11) | (1 << CS10));	
+	TIMSK1 = (1 << OCIE1A);					// enable timer 1 output compare A match interrupt
+	TCCR1B = ((1 << CS11) | (1 << CS10));	// 1/64 prescaler on timer 1 input
 
 	/* Initialize USB Subsystem */
 	USB_Init();
@@ -176,8 +181,9 @@ ISR(TIMER1_COMPA_vect, ISR_BLOCK)
 		TX_LED_OFF();
 	if (RxLEDPulse && !(--RxLEDPulse))
 		RX_LED_OFF();
-		
-	Timeout++;
+	
+	if (pgm_read_word(0) != 0xFFFF)
+		Timeout++;
 }
 
 /** Event handler for the USB_ConfigurationChanged event. This configures the device's endpoints ready
@@ -267,9 +273,13 @@ static void ReadWriteMemoryBlock(const uint8_t Command)
 		return;
 	}
 
+	/* Disable timer 1 interrupt - can't afford to process nonessential interrupts
+	 * while doing SPM tasks */
+	TIMSK1 = 0;
+
 	/* Check if command is to read memory */
 	if (Command == 'g')
-	{
+	{		
 		/* Re-enable RWW section */
 		boot_rww_enable();
 
@@ -353,6 +363,9 @@ static void ReadWriteMemoryBlock(const uint8_t Command)
 		/* Send response byte back to the host */
 		WriteNextResponseByte('\r');
 	}
+
+	/* Re-enable timer 1 interrupt disabled earlier in this routine */	
+	TIMSK1 = (1 << OCIE1A);
 }
 #endif
 
@@ -555,6 +568,7 @@ void CDC_Task(void)
 	}
 	else if ((Command == 'B') || (Command == 'g'))
 	{
+		Timeout = 0;
 		// Delegate the block write/read to a separate function for clarity 
 		ReadWriteMemoryBlock(Command);
 	}
