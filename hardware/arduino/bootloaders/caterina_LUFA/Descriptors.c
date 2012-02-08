@@ -53,13 +53,13 @@ const USB_Descriptor_Device_t DeviceDescriptor =
 
 	.Endpoint0Size          = FIXED_CONTROL_ENDPOINT_SIZE,
 
-	.VendorID               = 0x03EB,
-	.ProductID              = 0x204A,
+	.VendorID               = 0x2341,
+	.ProductID              = 0x3000,
 	.ReleaseNumber          = VERSION_BCD(00.01),
 
-	.ManufacturerStrIndex   = NO_DESCRIPTOR,
+	.ManufacturerStrIndex   = 0x02,
 	.ProductStrIndex        = 0x01,
-	.SerialNumStrIndex      = NO_DESCRIPTOR,
+	.SerialNumStrIndex      = 0x03,
 
 	.NumberOfConfigurations = FIXED_NUM_CONFIGURATIONS
 };
@@ -191,9 +191,23 @@ const USB_Descriptor_String_t LanguageString =
  */
 const USB_Descriptor_String_t ProductString =
 {
-	.Header                 = {.Size = USB_STRING_LEN(18), .Type = DTYPE_String},
+	.Header                 = {.Size = USB_STRING_LEN(16), .Type = DTYPE_String},
 
-	.UnicodeString          = L"AVR CDC Bootloader"
+	.UnicodeString          = L"Arduino Leonardo"
+};
+
+const USB_Descriptor_String_t SerialNumString = 
+{
+	.Header					= {.Size = USB_STRING_LEN(12), .Type = DTYPE_String},
+	
+	.UnicodeString			= L"000000001452"
+};
+
+const USB_Descriptor_String_t ManufNameString = 
+{
+	.Header					= {.Size = USB_STRING_LEN(11), .Type = DTYPE_String},
+	
+	.UnicodeString			= L"Arduino LLC"
 };
 
 /** This function is called by the library when in device mode, and must be overridden (see LUFA library "USB Descriptors"
@@ -228,10 +242,18 @@ uint16_t CALLBACK_USB_GetDescriptor(const uint16_t wValue,
 				Address = &LanguageString;
 				Size    = LanguageString.Header.Size;
 			}
-			else
+			else if (DescriptorNumber == DeviceDescriptor.ProductStrIndex) 
 			{
 				Address = &ProductString;
 				Size    = ProductString.Header.Size;
+			} else if (DescriptorNumber == DeviceDescriptor.SerialNumStrIndex)
+			{
+				Address = &SerialNumString;
+				Size 	= SerialNumString.Header.Size;
+			} else if (DescriptorNumber == DeviceDescriptor.ManufacturerStrIndex)
+			{
+				Address = &ManufNameString;
+				Size	= ManufNameString.Header.Size;
 			}
 
 			break;
