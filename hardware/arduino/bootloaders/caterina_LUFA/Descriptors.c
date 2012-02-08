@@ -54,12 +54,12 @@ const USB_Descriptor_Device_t DeviceDescriptor =
 	.Endpoint0Size          = FIXED_CONTROL_ENDPOINT_SIZE,
 
 	.VendorID               = 0x2341,
-	.ProductID              = 0x3000,
+	.ProductID              = 0x3002,
 	.ReleaseNumber          = VERSION_BCD(00.01),
 
 	.ManufacturerStrIndex   = 0x02,
 	.ProductStrIndex        = 0x01,
-	.SerialNumStrIndex      = 0x03,
+	.SerialNumStrIndex      = NO_DESCRIPTOR,
 
 	.NumberOfConfigurations = FIXED_NUM_CONFIGURATIONS
 };
