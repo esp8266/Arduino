@@ -52,25 +52,29 @@ int WiFiClient::connect(IPAddress ip, uint16_t port) {
 }
 
 size_t WiFiClient::write(uint8_t b) {
-  if (_sock != 255)
-  {
-	  START();
-      ServerDrv::sendData(_sock, &b, 1);
-      while (!ServerDrv::isDataSent(_sock));
-      END();
-      return 1;
-  }
-  return 0;
+	  return write(&b, 1);
 }
 
 size_t WiFiClient::write(const uint8_t *buf, size_t size) {
-  if (_sock != 255)
+  if (_sock >= MAX_SOCK_NUM)
   {
-      ServerDrv::sendData(_sock, buf, size);
-      while (!ServerDrv::isDataSent(_sock));
-      return size;
+	  setWriteError();
+	  return 0;
   }
-  return 0;
+  if (size==0)
+  {
+	  setWriteError();
+      return 0;
+  }
+
+
+  if ((!ServerDrv::sendData(_sock, buf, size)) ||
+		  (!ServerDrv::checkDataSent(_sock)))
+  {
+	  setWriteError();
+      return 0;
+  }
+  return size;
 }
 
 int WiFiClient::available() {
@@ -86,6 +90,7 @@ int WiFiClient::read() {
   uint8_t b;
   if (!available())
     return -1;
+
   ServerDrv::getData(_sock, &b);
   return b;
 }
@@ -109,7 +114,6 @@ void WiFiClient::flush() {
 
 void WiFiClient::stop() {
 
-	INFO("1)Stop WiFi client sock:%d state:%d status:%d", _sock, WiFiClass::_state[_sock], status());
   if (_sock == 255)
     return;
 
@@ -121,24 +125,16 @@ void WiFiClient::stop() {
   while (status() != CLOSED && millis() - start < 1000)
     delay(1);
     
-  // if it hasn't closed, close it forcefully
-  if (status() != CLOSED)
-  {
-	  //TODO force close
-	  //close(_sock);
-  }
-
-  
-  INFO("2)Stop WiFi client sock:%d state:%d status:%d", _sock, WiFiClass::_state[_sock], status());
   _sock = 255;
 }
 
 uint8_t WiFiClient::connected() {
+
   if (_sock == 255) {
     return 0;
   } else {
     uint8_t s = status();
-    INFO("Client status: %d", s);
+
     return !(s == LISTEN || s == CLOSED || s == FIN_WAIT_1 || s == FIN_WAIT_2 ||
              (s == CLOSE_WAIT && !available()));
   }

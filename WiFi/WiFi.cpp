@@ -1,8 +1,6 @@
 #include "wifi_drv.h"
 #include "WiFi.h"
 
-#define _DEBUG_
-
 extern "C" {
   #include "utility/wl_definitions.h"
   #include "utility/wl_types.h"
@@ -101,6 +99,7 @@ int WiFiClass::begin(char* ssid, const char *passphrase)
  	   {
  		   delay(WL_DELAY_START_CONNECTION);
  		   status = WiFiDrv::getConnectionStatus();
+ 		   INFO("Status: %d", status);
  	   }
 	   while ((( status == WL_IDLE_STATUS)||(status == WL_SCAN_COMPLETED))&&(--attempts>0));
     }else{

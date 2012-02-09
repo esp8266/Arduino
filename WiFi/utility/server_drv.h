@@ -26,7 +26,7 @@ public:
 
     static uint8_t availData(uint8_t sock);
 
-    static uint8_t isDataSent(uint8_t sock);
+    static uint8_t checkDataSent(uint8_t sock);
 };
 
 extern ServerDrv serverDrv;

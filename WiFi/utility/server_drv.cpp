@@ -3,8 +3,6 @@
 #include "Arduino.h"
 #include "spi_drv.h"
 
-#define _DEBUG_
-
 extern "C" {
 #include "wl_types.h"
 #include "debug.h"
@@ -223,26 +221,41 @@ bool ServerDrv::sendData(uint8_t sock, const uint8_t *data, uint16_t len)
 }
 
 
-uint8_t ServerDrv::isDataSent(uint8_t sock)
+uint8_t ServerDrv::checkDataSent(uint8_t sock)
 {
-	WAIT_FOR_SLAVE_SELECT();
-    // Send Command
-    SpiDrv::sendCmd(DATA_SENT_TCP_CMD, PARAM_NUMS_1);
-    SpiDrv::sendParam(&sock, sizeof(sock), LAST_PARAM);
+	const uint16_t TIMEOUT_DATA_SENT = 250;
+	static uint16_t timeout = 0;
+	uint8_t _data = 0;
+	uint8_t _dataLen = 0;
 
-    //Wait the reply elaboration
-    SpiDrv::waitForSlaveReady();
+	do {
+		WAIT_FOR_SLAVE_SELECT();
+		// Send Command
+		SpiDrv::sendCmd(DATA_SENT_TCP_CMD, PARAM_NUMS_1);
+		SpiDrv::sendParam(&sock, sizeof(sock), LAST_PARAM);
 
-    // Wait for reply
-    uint8_t _data = 0;
-    uint8_t _dataLen = 0;
-    if (!SpiDrv::waitResponseCmd(DATA_SENT_TCP_CMD, PARAM_NUMS_1, &_data, &_dataLen))
-    {
-        WARN("error waitResponse isDataSent");
-    }
-    SpiDrv::spiSlaveDeselect();
+		//Wait the reply elaboration
+		SpiDrv::waitForSlaveReady();
 
-    return _data;
+		// Wait for reply
+		if (!SpiDrv::waitResponseCmd(DATA_SENT_TCP_CMD, PARAM_NUMS_1, &_data, &_dataLen))
+		{
+			WARN("error waitResponse isDataSent");
+		}
+		SpiDrv::spiSlaveDeselect();
+
+		if (_data) timeout = 0;
+		else{
+			++timeout;
+			if (timeout > TIMEOUT_DATA_SENT)
+			{
+				timeout = 0;
+				INFO1("Timeout wainting for data sent");
+			}
+		}
+	}while((_data==0)&&(timeout<TIMEOUT_DATA_SENT));
+
+    return (timeout==TIMEOUT_DATA_SENT)?0:1;
 }
 
 ServerDrv serverDrv;

@@ -9,8 +9,6 @@ extern "C" {
 #include "WiFiClient.h"
 #include "WiFiServer.h"
 
-
-
 WiFiServer::WiFiServer(uint16_t port)
 {
     _port = port;
@@ -28,10 +26,8 @@ void WiFiServer::begin()
 
 WiFiClient WiFiServer::available(byte* status)
 {
-    //accept();
-	static byte tmp_cli_status = 0;
-	static byte tmp_ser_status = 0;
-	static int cycle = 0;
+	static int cycle_server_down = 0;
+	const int TH_SERVER_DOWN = 50;
 
     for (int sock = 0; sock < MAX_SOCK_NUM; sock++)
     {
@@ -40,21 +36,16 @@ WiFiClient WiFiServer::available(byte* status)
         	WiFiClient client(sock);
             uint8_t _status = client.status();
             uint8_t _ser_status = this->status();
-            if ((tmp_cli_status != _status)||(tmp_ser_status != _ser_status))
-            {
-            	INFO("%d)Sock: %d Client Status: %d Server Status: %d port: %d", cycle, sock, _status, _ser_status, WiFiClass::_server_port[sock]);
-            	tmp_cli_status = _status;
-            	tmp_ser_status = _ser_status;
-            	cycle = 0;
-            }else{
-            	++cycle;
-            }
+
             if (status != NULL)
             	*status = _status;
 
             //server not in listen state, restart it
-            if (this->status()==0)
+            if ((_ser_status == 0)&&(cycle_server_down++ > TH_SERVER_DOWN))
+            {
             	ServerDrv::startServer(_port, sock);
+            	cycle_server_down = 0;
+            }
 
             if (_status == ESTABLISHED)
             {                

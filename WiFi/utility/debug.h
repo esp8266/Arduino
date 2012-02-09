@@ -52,9 +52,13 @@
 #define INFO(format, args...) do {} while(0);
 #endif
 
+#if 0
 #define WARN(args) do { PRINT_FILE_LINE()			\
 		Serial.print("-W-"); Serial.println(args);	\
 }while (0);
+#else
+#define WARN(args) do {} while (0);
+#endif
 
 #define DBG_PIN2 5
 #define DBG_PIN 4
@@ -65,9 +69,9 @@
 #define RST_TRIGGER()   digitalWrite(DBG_PIN, LOW);
 
 #define INIT_TRIGGER()  pinMode(DBG_PIN, OUTPUT); \
-                        pinMode(DBG_PIN2, OUTPUT); \                        
+                        pinMode(DBG_PIN2, OUTPUT); \
                         RST_TRIGGER()
-#define TOGGLE_TRIGGER() SET_TRIGGER() \    
+#define TOGGLE_TRIGGER() SET_TRIGGER() \
                            delayMicroseconds(2);    \
                                RST_TRIGGER()
 
