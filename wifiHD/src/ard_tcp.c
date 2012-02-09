@@ -5,7 +5,7 @@
  *      Author: mlf by Metodo2 srl
  */
 
-#define _APP_DEBUG_
+//#define _APP_DEBUG_
 #include "lwip/opt.h"
 
 #include "lwip/mem.h"
@@ -20,6 +20,7 @@
 #include "lwip/udp.h"
 
 #include "ard_tcp.h"
+#include "ard_spi.h"
 #include "timer.h"
 #include "util.h"
 
@@ -27,79 +28,29 @@
 #include "ard_utils.h"
 #include "debug.h"
 
-#define TTCP_MODE_TRANSMIT          0
-#define TTCP_MODE_RECEIVE           1
-
-struct ttcp {
-
-	/* options */
-	struct ip_addr addr; /* host */
-	uint16_t port; /* -p */
-	uint16_t nbuf; /* -n */
-	int mode; /* -t */
-	int verbose; /* -v */
-	int udp; /* -u */
-	uint8_t sock;
-	uint8_t buff_sent;
-
-	/* common */
-	uint16_t print_cnt;
-	uint32_t start_time;
-	uint32_t left;
-	uint32_t recved;
-	ard_tcp_done_cb_t* done_cb;
-	void* opaque;
-	uint32_t buflen; /* -l */
-	uint32_t tid;
-
-	/* TCP specific */
-	struct tcp_pcb* tpcb;
-	struct tcp_pcb* lpcb;
-	char* payload;
-
-	/* UDP specific */
-	int udp_started;
-	uint16_t udp_end_marker_left;
-	struct udp_pcb* upcb;
-};
-
 unsigned int startTime = 0;
-
-/**
- * Calculate bitrate based on number of bytes transmitted and elapsed time
- */
-static void ard_tcp_print_stats(struct ttcp *ttcp) {
-	uint32_t ms = timer_get_ms() - ttcp->start_time;
-	uint32_t bytes = ttcp->mode == TTCP_MODE_TRANSMIT ? ttcp->nbuf
-			* ttcp->buflen : ttcp->recved;
-
-	if (ttcp->verbose)
-		printk("\n");
-
-	printk("TTCP [%p]: %d bytes processed, %d.%d KB/s (%s/%s)\n", ttcp, bytes,
-			bytes / ms, bytes % ms, ttcp->udp ? "udp" : "tcp", ttcp->mode
-					== TTCP_MODE_TRANSMIT ? "tx" : "rx");
-}
 
 /**
  * Clean up and free the ttcp structure
  */
 static void ard_tcp_destroy(struct ttcp* ttcp) {
 	err_t err = ERR_OK;
+	DUMP_TCP_STATE(ttcp);
+
 	if (ttcp->tpcb) {
 		tcp_arg(ttcp->tpcb, NULL);
 		tcp_sent(ttcp->tpcb, NULL);
 		tcp_recv(ttcp->tpcb, NULL);
 		tcp_err(ttcp->tpcb, NULL);
 		err = tcp_close(ttcp->tpcb);
-		printk("Closing tpcb: state:0x%x err:%d\n", ttcp->tpcb->state, err);
+		INFO_TCP("Closing tpcb: state:0x%x err:%d\n", ttcp->tpcb->state, err);
 	}
 
 	if (ttcp->lpcb) {
 		tcp_arg(ttcp->lpcb, NULL);
 		tcp_accept(ttcp->lpcb, NULL);
 		tcp_close(ttcp->lpcb);
-		printk("Closing lpcb: state:0x%x err:%d\n", ttcp->lpcb->state, err);
+		INFO_TCP("Closing lpcb: state:0x%x err:%d\n", ttcp->lpcb->state, err);
 	}
 
 	if (ttcp->upcb) {
@@ -114,11 +65,43 @@ static void ard_tcp_destroy(struct ttcp* ttcp) {
 }
 
 /**
+ * Clean up and free the ttcp structure
+ */
+static void ard_tcp_abort(struct ttcp* ttcp) {
+
+	INFO_TCP("Abort ttcb:%p tpcb:%p lpcb:%p\n", ttcp, ttcp->tpcb, ttcp->lpcb);
+	if (ttcp->tpcb) {
+		tcp_arg(ttcp->tpcb, NULL);
+		tcp_sent(ttcp->tpcb, NULL);
+		tcp_recv(ttcp->tpcb, NULL);
+		tcp_err(ttcp->tpcb, NULL);
+		tcp_abort(ttcp->tpcb);
+	}
+
+	if (ttcp->lpcb) {
+		tcp_arg(ttcp->lpcb, NULL);
+		tcp_accept(ttcp->lpcb, NULL);
+		tcp_abort(ttcp->lpcb);
+	}
+
+	if (ttcp->upcb) {
+		udp_disconnect(ttcp->upcb);
+		udp_remove(ttcp->upcb);
+	}
+
+	if (ttcp->payload)
+		free(ttcp->payload);
+
+	free(ttcp);
+}
+
+
+/**
  * Invoked when transfer is done or aborted (non-zero result).
  */
 static void ard_tcp_done(struct ttcp* ttcp, int result) {
-	if (result == 0)
-		ard_tcp_print_stats(ttcp);
+//	if (result == 0)
+//		ard_tcp_print_stats(ttcp);
 
 	if (ttcp->done_cb)
 		ttcp->done_cb(ttcp->opaque, result);
@@ -156,11 +139,12 @@ static void tcp_send_data(struct ttcp *ttcp) {
 			len /= 2;
 	} while (err == ERR_MEM && len > 1);
 
-	tcp_output(ttcp->tpcb);
-	if (err == ERR_OK)
+	if (err == ERR_OK){
+		tcp_output(ttcp->tpcb);
 		ttcp->left -= len;
+	}
 	else
-		printk("TTCP [%p]: tcp_write failed\n", ttcp);
+		WARN("TTCP [%p]: tcp_write failed\n", ttcp);
 	//
 	//        ttcp->tid = timer_sched_timeout_cb(0, TIMEOUT_ONESHOT,
 	//                                           tcp_timeout_cb, ttcp);
@@ -245,6 +229,9 @@ static void atcp_conn_err_cb(void *arg, err_t err) {
 	printk("TTCP [%p]: connection error:0x%x\n", ttcp, err);
 
 	ttcp->tpcb = NULL; /* free'd by lwip upon return */
+	int sock = getSock(ttcp);
+	if (sock)
+		clearMapSockTcp(sock);
 	ard_tcp_done(ttcp, err);
 }
 
@@ -256,7 +243,7 @@ static err_t atcp_recv_cb(void *arg, struct tcp_pcb *pcb, struct pbuf *p,
 	struct ttcp* ttcp = arg;
 	/* p will be NULL when remote end is done */
 	if (p == NULL) {
-		ard_tcp_print_stats(ttcp);
+		INFO_TCP("atcp_recv_cb p=NULL\n");
 		ard_tcp_done(ttcp, 0);
 		return ERR_OK;
 	}
@@ -265,7 +252,7 @@ static err_t atcp_recv_cb(void *arg, struct tcp_pcb *pcb, struct pbuf *p,
 	ttcp->recved += p->tot_len;
 
 	if (ttcp->verbose) {
-		INFO("Recv:%d\n",p->tot_len);
+		INFO_TCP("Recv:%d\n",p->tot_len);
 		DUMP(p->payload, p->tot_len);
 		ttcp->print_cnt++;
 	}
@@ -297,8 +284,8 @@ static err_t atcp_accept_cb(void *arg, struct tcp_pcb *newpcb, err_t err) {
 	tcp_err(ttcp->tpcb, atcp_conn_err_cb);
 	tcp_poll(ttcp->tpcb, atcp_poll, 4);
 
-	printk("ARD TCP [%p]: accept new [%p]\n", ttcp, newpcb);
-	INFO("local:%d remote:%d state:%d\n", newpcb->local_port, newpcb->remote_port, newpcb->state);
+	INFO_TCP("ARD TCP [%p]: accept new [%p]\n", ttcp, newpcb);
+	INFO_TCP("local:%d remote:%d state:%d\n", newpcb->local_port, newpcb->remote_port, newpcb->state);
 	ttcp->start_time = timer_get_ms();
 	return ERR_OK;
 }
@@ -310,13 +297,13 @@ static int atcp_start(struct ttcp* ttcp) {
 	err_t err = ERR_OK;
 	ttcp->tpcb = tcp_new();
 	if (ttcp->tpcb == NULL) {
-		printk("TTCP [%p]: could not allocate pcb\n", ttcp);
+		WARN("TTCP [%p]: could not allocate pcb\n", ttcp);
 		return -1;
 	}
 
 	ttcp->payload = malloc(ttcp->buflen);
 	if (ttcp->payload == NULL) {
-		printk("TTCP [%p]: could not allocate payload\n", ttcp);
+		WARN("TTCP [%p]: could not allocate payload\n", ttcp);
 		return -1;
 	}
 
@@ -327,26 +314,33 @@ static int atcp_start(struct ttcp* ttcp) {
 		tcp_recv(ttcp->tpcb, atcp_recv_cb);
 		if (tcp_connect(ttcp->tpcb, &ttcp->addr, ttcp->port, tcp_connect_cb)
 				!= ERR_OK) {
-			printk("TTCP [%p]: tcp connect failed\n", ttcp);
+			WARN("TTCP [%p]: tcp connect failed\n", ttcp);
 			atcp_conn_err_cb(ttcp, err);
 			return -1;
 		}
 
 	} else {
+		INFO_TCP("BEFORE BIND ttcp:%p lpcb:%p pcb:%p\n", ttcp, ttcp->lpcb, ttcp->tpcb);
+		INFO_TCP("[tpcb]-local:%d remote:%d state:%d\n", ttcp->tpcb->local_port,
+				ttcp->tpcb->remote_port, ttcp->tpcb->state);
+
 		err = tcp_bind(ttcp->tpcb, IP_ADDR_ANY, ttcp->port);
 		if (err != ERR_OK){
-			printk("TTCP [%p]: bind failed err=%d\n", ttcp, err);
+			WARN("TTCP [%p]: bind failed err=%d\n", ttcp, err);
 			return -1;
 		}
 
 		ttcp->lpcb = tcp_listen(ttcp->tpcb);
 		if (ttcp->lpcb == NULL) {
-			printk("TTCP [%p]: listen failed\n", ttcp);
+			WARN("TTCP [%p]: listen failed\n", ttcp);
 			return -1;
 		}
-		printk("ttcp:%p lpcb:%p pcb:%p\n", ttcp, ttcp->lpcb, ttcp->tpcb);
-		printk("local:%d remote:%d state:%d\n", ttcp->lpcb->local_port,
-				ttcp->lpcb->remote_port, ttcp->lpcb->state);
+		if (ttcp->lpcb == ttcp->tpcb ) {
+			WARN("TTCP [%p]: listen failed tpcb [%p] in listen mode\n", ttcp, ttcp->tpcb);
+			return -1;
+		}
+
+		DUMP_TCP_STATE(ttcp);
 		tcp_accept(ttcp->lpcb, atcp_accept_cb);
 	}
 
@@ -368,12 +362,12 @@ static void udp_timeout_cb(void *ctx) {
 static int udp_send_bytes(struct ttcp* ttcp, uint32_t len) {
 	struct pbuf* p = pbuf_alloc(PBUF_TRANSPORT, len, PBUF_RAM);
 	if (p == NULL) {
-		printk("TTCP [%p]: could not allocate pbuf\n", ttcp);
+		WARN("TTCP [%p]: could not allocate pbuf\n", ttcp);
 		return -1;
 	}
 
 	if (udp_send(ttcp->upcb, p) != ERR_OK) {
-		printk("TTCP [%p]: udp_send() failed\n", ttcp);
+		WARN("TTCP [%p]: udp_send() failed\n", ttcp);
 		pbuf_free(p);
 		return -1;
 	}
@@ -493,23 +487,23 @@ int ard_tcp_start(struct ip_addr addr, uint16_t port, void *opaque,
 	int status;
 
 	if (mode != TTCP_MODE_TRANSMIT && mode != TTCP_MODE_RECEIVE) {
-		printk("TTCP [-]: invalid mode\n");
+		WARN("TTCP [-]: invalid mode\n");
 		return -1;
 	}
 
 	if (nbuf == 0) {
-		printk("TTCP [-]: invalid nbuf\n");
+		WARN("TTCP [-]: invalid nbuf\n");
 		return -1;
 	}
 
 	if (buflen == 0) {
-		printk("TTCP [-]: invalid buflen\n");
+		WARN("TTCP [-]: invalid buflen\n");
 		return -1;
 	}
 
 	ttcp = calloc(1, sizeof(struct ttcp));
 	if (ttcp == NULL) {
-		printk("TTCP [-]: could not allocate memory for ttcp\n");
+		WARN("TTCP [-]: could not allocate memory for ttcp\n");
 		return -1;
 	}
 
@@ -530,10 +524,10 @@ int ard_tcp_start(struct ip_addr addr, uint16_t port, void *opaque,
 		status = atcp_start(ttcp);
 
 	if (status) {
-		WARN("Start server FAILED!");
+		WARN("Start server FAILED!\n");
 		goto fail;
 	}
-	printk("TTCP [%p-%p]: nbuf=%d, buflen=%d, port=%d (%s/%s)\n", ttcp,
+	INFO_TCP("TTCP [%p-%p]: nbuf=%d, buflen=%d, port=%d (%s/%s)\n", ttcp,
 			ttcp->tpcb, ttcp->nbuf, ttcp->buflen, ttcp->port, ttcp->udp ? "udp"
 					: "tcp", ttcp->mode == TTCP_MODE_TRANSMIT ? "tx" : "rx");
 
@@ -543,7 +537,7 @@ int ard_tcp_start(struct ip_addr addr, uint16_t port, void *opaque,
 
 	return 0;
 
-	fail: ard_tcp_destroy(ttcp);
+	fail: ard_tcp_abort(ttcp);
 	return -1;
 }
 
@@ -553,34 +547,43 @@ static void close_conn(struct ttcp *_ttcp) {
 
 void ard_tcp_stop(void* ttcp) {
 	struct ttcp* _ttcp = (struct ttcp*) ttcp;
-	printk("Stop client %p-%p-%p\n", _ttcp, _ttcp->tpcb, _ttcp->lpcb);
-	close_conn(_ttcp);
-	//asm("nop");
+	INFO_TCP("Closing connection...\n");
+	DUMP_TCP_STATE(_ttcp);
+	if ((_ttcp)&&(_ttcp->tpcb)&&(_ttcp->tpcb->state!=LAST_ACK)&&(_ttcp->tpcb->state!=CLOSED))
+		close_conn(_ttcp);
+//	else
+//		printk("Skip");
+
+	asm("nop");
 }
 
 uint8_t getStateTcp(void* p, bool client) {
 	struct ttcp* _ttcp = (struct ttcp*) p;
 
 	if ((_ttcp != NULL) && (_ttcp->tpcb != NULL)) {
-		//		INFO("ttcp:%p tpcb:%p state:%d lpcb:%p state:%d\n",
-		//				p, _ttcp->tpcb, _ttcp->tpcb->state,
-		//				_ttcp->lpcb, _ttcp->lpcb->state);
+		//DUMP_TCP_STATE(_ttcp);
 		if (client)
 			return _ttcp->tpcb->state;
 		else
 			return _ttcp->lpcb->state;
 	} else {
-		WARN("TCP not initialized ttcp:%p tpcb:%p lpcb:%p\n",
+		INFO_TCP("TCP not initialized ttcp:%p tpcb:%p lpcb:%p\n",
 				_ttcp, ((_ttcp)?_ttcp->tpcb:0), ((_ttcp)?_ttcp->lpcb:0));
 	}
 	return CLOSED;
 }
 
 uint8_t isDataSent(void* p) {
+	static int isDataSentCount = 0;
 	struct ttcp* _ttcp = (struct ttcp*) p;
 	if ((_ttcp != NULL) && (_ttcp->tpcb != NULL)) {
-		//INFO("ttcp:%p tpcb:%p sent:%d\n",p, _ttcp->tpcb, _ttcp->buff_sent);
-		return _ttcp->buff_sent;
+		//INFO_TCP("ttcp:%p tpcb:%p sent:%d\n",p, _ttcp->tpcb, _ttcp->buff_sent);
+		bool dataSent = _ttcp->buff_sent;
+		if (dataSent) isDataSentCount = 0;
+		else ++isDataSentCount;
+		if (isDataSentCount == 250)
+			WARN("data not sent\n");
+		return dataSent;
 	} else {
 		WARN("TCP null!\n");
 	}
@@ -597,20 +600,27 @@ static err_t tcp_data_sent(void *arg, struct tcp_pcb *pcb, u16_t len) {
 
 	if (_ttcp->left > 0) {
 		//send_data(pcb, hs);
-		INFO("data left: %d", _ttcp->left );
+		INFO_TCP("data left: %d", _ttcp->left );
 	}
+	if (_ttcp->buff_sent == 1)
+		WARN("Previous packet already\n");
 	_ttcp->buff_sent = 1;
-	//INFO("%s: duration: %d\n", __FUNCTION__, timer_get_ms() - startTime);
+	//INFO_TCP("%s: duration: %d\n", __FUNCTION__, timer_get_ms() - startTime);
 	return ERR_OK;
 }
 
 int sendTcpData(void* p, uint8_t* buf, uint16_t len) {
-	//INFO("buf:%p len:%d\n", buf, len);
+	//INFO_TCP("buf:%p len:%d\n", buf, len);
 	//DUMP(buf,len);
 
-	startTime = timer_get_ms();
+	//startTime = timer_get_ms();
 	struct ttcp* _ttcp = (struct ttcp*) p;
-	if ((_ttcp != NULL) && (_ttcp->tpcb != NULL) && (buf != NULL) && (len != 0)) {
+	if ((_ttcp != NULL) && (_ttcp->tpcb != NULL) &&
+			(buf != NULL) && (len != 0) && (_ttcp->payload != NULL)) {
+		if (_ttcp->tpcb->state == ESTABLISHED ||
+				_ttcp->tpcb->state == CLOSE_WAIT ||
+				_ttcp->tpcb->state == SYN_SENT ||
+				_ttcp->tpcb->state == SYN_RCVD) {
 		_ttcp->buff_sent = 0;
 		//pbuf_take(buf, len, _ttcp->);
 		memcpy(_ttcp->payload, buf, len);
@@ -619,7 +629,9 @@ int sendTcpData(void* p, uint8_t* buf, uint16_t len) {
 		tcp_send_data(_ttcp);
 
 		return WL_SUCCESS;
+		}
 	}
+	//printk("Write failure _ttcp=%p _ttcp->tpcb=%p buf=%p len=%d\n", _ttcp, _ttcp->tpcb, buf, len);
 	return WL_FAILURE;
 }
 
@@ -692,6 +704,7 @@ cmd_state_t cmd_ttcp(int argc, char* argv[], void* ctx) {
 
 	return CMD_DONE;
 }
+
 
 #if 0
 #include "lwip/sockets.h"

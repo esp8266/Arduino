@@ -40,5 +40,6 @@ cmd_state_t cmd_power(int argc, char* argv[], void* ctx);
 cmd_state_t cmd_psconf(int argc, char* argv[], void* ctx);
 cmd_state_t cmd_setpass(int argc, char* argv[], void* ctx);
 cmd_state_t cmd_delpass(int argc, char* argv[], void* ctx);
+cmd_state_t cmd_debug(int argc, char* argv[], void* ctx);
 
 #endif

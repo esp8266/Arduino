@@ -55,7 +55,7 @@ enum {
     GET_DATABUF_TCP_CMD		= 0x45,
 };
 
-
+#if 0
 enum wl_tcp_state {
   CLOSED      = 0,
   LISTEN      = 1,
@@ -69,7 +69,7 @@ enum wl_tcp_state {
   LAST_ACK    = 9,
   TIME_WAIT   = 10
 };
-
+#endif
 
 enum numParams{
     PARAM_NUMS_0,

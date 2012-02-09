@@ -36,6 +36,9 @@
 #include "wl_util.h"
 #include "util.h"
 #include "lwip/netif.h"
+#include "debug.h"
+
+extern void showTTCPstatus();
 
 /**
  *
@@ -190,6 +193,7 @@ cmd_status(int argc, char* argv[], void* ctx)
         else
                 printk("ip addr: none\n");
 
+        showTTCPstatus();
         return CMD_DONE;
 }
 
@@ -344,5 +348,53 @@ cmd_setkey(int argc, char* argv[], void* ctx)
         wl_set_auth_mode(AUTH_MODE_SHARED_KEY);
         wl_set_default_wep_key(idx);
 
+        return CMD_DONE;
+}
+
+cmd_state_t
+cmd_debug(int argc, char* argv[], void* ctx)
+{
+        int level;
+        const char *usage = "usage: debug <section> <level>\n\t"\
+        		"section: init, cm, spi, tcp , util, warn\n\t"
+        		"level  : 0 (off), 1 (on)\n\t"
+                "or: debug print/on/off\n";
+
+        if (argc == 2 && strcmp(argv[1], "off") == 0) {
+                printk("Debug OFF\n");
+                enableDebug = 0;
+                return CMD_DONE;
+        }else if (argc == 2 && strcmp(argv[1], "print") == 0) {
+            printk("Debug enabled: 0x%x\n", enableDebug);
+            return CMD_DONE;
+        }else if (argc == 2 && strcmp(argv[1], "on") == 0) {
+            printk("Debug ON\n");
+            enableDebug = 0xff;
+            return CMD_DONE;
+        }
+        if (argc < 3) {
+                printk(usage);
+                return CMD_DONE;
+        }
+        level = atoi(argv[2]);
+        if (argc == 3 && strcmp(argv[1], "init") == 0) {
+        	if (level) enableDebug |= INFO_INIT_FLAG;
+        	else enableDebug &= ~INFO_INIT_FLAG;
+        }else if (argc == 3 && strcmp(argv[1], "spi") == 0) {
+        	if (level) enableDebug |= INFO_SPI_FLAG;
+        	else enableDebug &= ~INFO_SPI_FLAG;
+        }else if (argc == 3 && strcmp(argv[1], "tcp") == 0) {
+        	if (level) enableDebug |= INFO_TCP_FLAG;
+        	else enableDebug &= ~INFO_TCP_FLAG;
+        }else if (argc == 3 && strcmp(argv[1], "cm") == 0) {
+        	if (level) enableDebug |= INFO_CM_FLAG;
+        	else enableDebug &= ~INFO_CM_FLAG;
+        }else if (argc == 3 && strcmp(argv[1], "util") == 0) {
+        	if (level) enableDebug |= INFO_UTIL_FLAG;
+        	else enableDebug &= ~INFO_UTIL_FLAG;
+        }else if (argc == 3 && strcmp(argv[1], "warn") == 0) {
+        	if (level) enableDebug |= INFO_WARN_FLAG;
+        	else enableDebug &= ~INFO_WARN_FLAG;
+        }
         return CMD_DONE;
 }

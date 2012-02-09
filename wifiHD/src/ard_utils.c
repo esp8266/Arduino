@@ -44,7 +44,7 @@ void insert_pBuf(struct pbuf* q, uint8_t sock, void* _pcb)
   		headBuf = 0;
   	  if (headBuf == tailBuf)
   		  WARN("Overwriting data!");
-  	  INFO("Insert: %p:%d-%d [%d,%d]\n", p, q->tot_len, p[0], headBuf, tailBuf);
+  	  INFO_UTIL("Insert: %p:%d-%d [%d,%d]\n", p, q->tot_len, p[0], headBuf, tailBuf);
     }
 }
 
@@ -56,7 +56,7 @@ tData* get_pBuf(uint8_t sock)
 	if (IS_BUF_AVAIL())
 	{
 		tData* p = &(pBufStore[tailBuf][sock]);
-		INFO("%p [%d,%d]\n", p, headBuf, tailBuf);
+		INFO_UTIL("%p [%d,%d]\n", p, headBuf, tailBuf);
 		return p;
 	}
 	return NULL;
@@ -80,10 +80,10 @@ bool isAvailTcpDataByte(uint8_t sock)
 
 	if (p != NULL)
 	{
-		INFO("check:%d %d %p\n",p->idx, p->len, p->data);
+		INFO_UTIL("check:%d %d %p\n",p->idx, p->len, p->data);
 		if (p->idx == p->len)
 		{
-			INFO("Free %p other buf %d\n", p->data, IS_BUF_AVAIL());
+			INFO_UTIL("Free %p other buf %d\n", p->data, IS_BUF_AVAIL());
 			freetData(p->data);
 			ack_recved(p->pcb, p->len);
 			return (IS_BUF_AVAIL());
@@ -107,11 +107,11 @@ bool getTcpDataByte(uint8_t sock, uint8_t* payload)
 		{
 		uint8_t* buf = (uint8_t*)p->data;
 		*payload = buf[p->idx++];
-		INFO("get:%d %p %d\n",p->idx, p->data, *payload);
+		INFO_UTIL("get:%d %p %d\n",p->idx, p->data, *payload);
 		return true;
 		}else{
 			//dealloc current buffer
-			INFO("Free %p\n", p->data);
+			INFO_UTIL("Free %p\n", p->data);
 			freetData(p->data);
 			ack_recved(p->pcb, p->len);
 		}

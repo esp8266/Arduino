@@ -9,6 +9,7 @@
 #define ARD_UTILS_H_
 
 #include "gpio.h"
+#include "debug.h"
 #include "ARDUINO/arduino.h"
 #define INIT_SIGNAL_FOR_SPI() 	gpio_enable_pin_pull_up(ARDUINO_HANDSHAKE_PIN)
 #define BUSY_FOR_SPI() 			gpio_set_gpio_pin(ARDUINO_HANDSHAKE_PIN)
@@ -199,6 +200,10 @@
 		statSpi.lastError = SPI_ERROR_TIMEOUT;	\
 		statSpi.status = spi_getStatus(ARD_SPI);
 
+#define DUMP_TCP_STATE(TTCP) \
+		INFO_TCP("ttcp:%p tpcb:%p state:%d lpcb:%p state:%d\n", \
+			TTCP, TTCP->tpcb, (TTCP->tpcb)?TTCP->tpcb->state:0, \
+			TTCP->lpcb, (TTCP->lpcb)?TTCP->lpcb->state:0);
 
 
 typedef struct sData

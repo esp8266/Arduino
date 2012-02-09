@@ -29,6 +29,7 @@
 #include "cmd_wl.h"
 #include "httpd.h"
 #include "ping.h"
+#include "ard_tcp.h"
 
 #if BOARD == ARDUINO
 #if !defined(DATAFLASH)
@@ -85,6 +86,9 @@ struct ctx_server {
 
 static bool initSpiComplete = false;
 
+// variable used as enable flag for debug prints
+uint16_t enableDebug = 0;
+
 /**
  *
  */
@@ -130,13 +134,12 @@ dhcp_coarse_tmr_cb(void *ctx)
 static void
 wl_cm_scan_cb(void* ctx)
 {
-#ifdef _APP_DEBUG_
 	struct ctx_server* hs = ctx;
 
 	uint8_t init = hs->wl_init_complete;
 
-    INFO("Scan networks...[ OK ] %d\n", init);
-#endif
+    INFO_INIT("Scan networks...[ OK ] %d 0x%x\n", init);
+
     set_result(WL_SCAN_COMPLETED);
 }
 
@@ -150,10 +153,13 @@ wl_cm_conn_cb(struct wl_network_t* net, void* ctx)
 
 	LINK_LED_ON();
 
-        printk("link up, connected to \"%s\"\n", ssid2str(&net->ssid));
-        printk("requesting dhcp ... ");
+	INFO_INIT("Connection cb...\n");
 
-        dhcp_start(hs->netif);
+	printk("link up, connected to \"%s\"\n", ssid2str(&net->ssid));
+    printk("requesting dhcp ... ");
+
+    INFO_INIT("Start DHCP...\n");
+    dhcp_start(hs->netif);
 }
 
 
@@ -166,23 +172,24 @@ wl_cm_disconn_cb(void* ctx)
 	struct ctx_server* hs = ctx;
 
 	LINK_LED_OFF();
+	INFO_INIT("Disconnection cb...\n");
 
-        if (netif_is_up(hs->netif)) {
-                printk("link down, release dhcp\n");
-                dhcp_release(hs->netif);
-                dhcp_stop(hs->netif);
-        } else {
-                printk("link down\n");
-        }
+    if (netif_is_up(hs->netif)) {
+    	printk("link down, release dhcp\n");
+        dhcp_release(hs->netif);
+        dhcp_stop(hs->netif);
+     } else {
+    	 printk("link down\n");
+     }
 
-        set_result_cmd(WL_FAILURE);
+     set_result_cmd(WL_FAILURE);
 }
 
 
 static void wl_cm_err_cb(void* ctx)
 {
     int err = *(int*)ctx;
-    printk("Error: %d\n", err);
+    WARN("Error: %d\n", err);
     set_result_cmd(err);
 }
 
@@ -192,11 +199,12 @@ static void wl_cm_err_cb(void* ctx)
 static void
 ip_status_cb(struct netif* netif)
 {
+	INFO_INIT("IP status cb...\n");
         if (netif_is_up(netif)) {
             set_result_cmd(WL_SUCCESS);
                 printk("bound to %s\n", ip2str(netif->ip_addr));
         }else{
-        	WARN("Interface not up!");
+        	WARN("Interface not up!\n");
         }
 }
 
@@ -300,16 +308,22 @@ poll(struct ctx_server* hs)
 void initShell()
 {
 	/* initialize shell */
+	INFO_INIT("Shell init...\n");
         console_init();
         console_add_cmd("scan", cmd_scan, NULL);
         console_add_cmd("connect", cmd_connect, NULL);
         console_add_cmd("setkey", cmd_setkey, NULL);
         console_add_cmd("status", cmd_status, NULL);
+        console_add_cmd("debug", cmd_debug, NULL);
+
 #ifdef ADD_CMDS
         console_add_cmd("powersave", cmd_power, NULL);
         console_add_cmd("psconf", cmd_psconf, NULL);
+#endif
+#ifdef PING_CMD
         console_add_cmd("ping", cmd_ping, NULL);
 #endif
+        console_add_cmd("ttcp", cmd_ttcp, NULL);
 #ifdef WITH_WPA
         console_add_cmd("wpass", cmd_setpass, NULL);
         console_add_cmd("dpass", cmd_delpass, NULL);
@@ -363,7 +377,9 @@ wl_init_complete_cb(void* ctx)
         	AVAIL_FOR_SPI();
         }
 
-        /* start connection manager */
+    /* start connection manager */
+   	INFO_INIT("Starting CM...\n");
+
 	wl_status = wl_cm_start(wl_cm_scan_cb, wl_cm_conn_cb, wl_cm_disconn_cb, wl_cm_err_cb, hs);
 	ASSERT(wl_status == WL_SUCCESS, "failed to init wl conn mgr");
 }
@@ -398,7 +414,6 @@ main(void)
     	spi_poll(NULL);
 
      }
-    printk("END Arduino Wifi\n");
 #else
     printk("Arduino Wifi Startup... [%s]\n", __TIMESTAMP__);
 
@@ -410,7 +425,7 @@ main(void)
 	hs->netif = calloc(1, size_netif);
 	ASSERT(hs->netif, "out of memory");
 
-	INFO("hs:%p size:0x%x netif:%p size:0x%x\n", hs, size_ctx_server,
+	INFO_INIT("hs:%p size:0x%x netif:%p size:0x%x\n", hs, size_ctx_server,
 			hs->netif, size_netif);
         timer_init(NULL, NULL);
         lwip_init();

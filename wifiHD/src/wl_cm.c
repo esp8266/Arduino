@@ -30,13 +30,13 @@
 #include "wl_cm.h"
 #include "wl_util.h"
 #include <string.h>
-
+#include "debug.h"
 
 
 #if 1
 # include "printf-stdarg.h"
 #include "ard_utils.h"
-# define CM_DPRINTF(fmt...) printk(fmt)
+# define CM_DPRINTF(fmt...) if (enableDebug & INFO_CM_FLAG) printk(fmt)
 #else
 # define CM_DPRINTF(fmt...)
 #endif
