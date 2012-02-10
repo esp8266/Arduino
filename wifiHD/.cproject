@@ -95,7 +95,7 @@
 </option>
 <option id="avr32.c.compiler.option.flashvault.1511808014" name="Enable FlashVault support" superClass="avr32.c.compiler.option.flashvault" value="false" valueType="boolean"/>
 <option id="avr32.c.compiler.option.fpic.1413737757" name="Generate position-independent code" superClass="avr32.c.compiler.option.fpic" value="false" valueType="boolean"/>
-<option id="avr32.c.compiler.option.mforce-double-align.1833231832" name="Force double-word alignment" superClass="avr32.c.compiler.option.mforce-double-align" value="false" valueType="boolean"/>
+<option id="avr32.c.compiler.option.mforce-double-align.1833231832" name="Force double-word alignment" superClass="avr32.c.compiler.option.mforce-double-align" value="true" valueType="boolean"/>
 <option id="gnu.c.compiler.option.warnings.pedantic.error.266375625" name="Pedantic warnings as errors (-pedantic-errors)" superClass="gnu.c.compiler.option.warnings.pedantic.error" value="false" valueType="boolean"/>
 <option id="gnu.c.compiler.option.warnings.toerrors.1148543352" name="Warnings as errors (-Werror)" superClass="gnu.c.compiler.option.warnings.toerrors" value="false" valueType="boolean"/>
 <option id="gnu.c.compiler.option.misc.verbose.1690548506" name="Verbose (-v)" superClass="gnu.c.compiler.option.misc.verbose" value="false" valueType="boolean"/>
@@ -193,8 +193,8 @@
 </toolChain>
 </folderInfo>
 <sourceEntries>
+<entry excluding="ttcp.h|ttcp.c|fsdata.c|hdwireless_gif.h|http_server_gui.h|http_server_gui.c|SOFTWARE_FRAMEWORK/COMPONENTS/TOUCH|SOFTWARE_FRAMEWORK/DRIVERS/ADC|SOFTWARE_FRAMEWORK/COMPONENTS/WIFI/HD/wl_fw.h|gui.c|SOFTWARE_FRAMEWORK/DRIVERS/EBI/SMC|SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY|SOFTWARE_FRAMEWORK/COMPONENTS/DISPLAY/ET024006DHU|gui_getstring.c|SOFTWARE_FRAMEWORK/BOARDS/EVK1105" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 <entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src/SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX"/>
-<entry excluding="ping.c|ttcp.h|ttcp.c|fsdata.c|hdwireless_gif.h|http_server_gui.h|http_server_gui.c|SOFTWARE_FRAMEWORK/COMPONENTS/TOUCH|SOFTWARE_FRAMEWORK/DRIVERS/ADC|SOFTWARE_FRAMEWORK/COMPONENTS/WIFI/HD/wl_fw.h|gui.c|SOFTWARE_FRAMEWORK/DRIVERS/EBI/SMC|SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY|SOFTWARE_FRAMEWORK/COMPONENTS/DISPLAY/ET024006DHU|gui_getstring.c|SOFTWARE_FRAMEWORK/BOARDS/EVK1105" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 </sourceEntries>
 </configuration>
 </storageModule>
@@ -1109,6 +1109,7 @@
 </option>
 <option id="avr32.c.compiler.option.flashvault.579935240" name="Enable FlashVault support" superClass="avr32.c.compiler.option.flashvault" value="false" valueType="boolean"/>
 <option id="avr32.c.compiler.option.muse-rodata-section.46188949" name="Use section .rodata for read-only data" superClass="avr32.c.compiler.option.muse-rodata-section" value="false" valueType="boolean"/>
+<option id="avr32.c.compiler.option.mforce-double-align.1255447070" name="Force double-word alignment" superClass="avr32.c.compiler.option.mforce-double-align" value="true" valueType="boolean"/>
 <inputType id="avr32.managedbuild.tool.gnu.c.compiler.input.233400464" superClass="avr32.managedbuild.tool.gnu.c.compiler.input"/>
 </tool>
 <tool id="avr32.managedbuild.tool.gnu.c.linker.exe.release.166522415" name="32-bit AVR/GNU C Linker" superClass="avr32.managedbuild.tool.gnu.c.linker.exe.release">
@@ -1198,8 +1199,8 @@
 </toolChain>
 </folderInfo>
 <sourceEntries>
+<entry excluding="ttcp.h|ttcp.c|fsdata.c|hdwireless_gif.h|http_server_gui.h|http_server_gui.c|SOFTWARE_FRAMEWORK/COMPONENTS/TOUCH|SOFTWARE_FRAMEWORK/DRIVERS/ADC|SOFTWARE_FRAMEWORK/COMPONENTS/WIFI/HD/wl_fw.h|gui.c|SOFTWARE_FRAMEWORK/DRIVERS/EBI/SMC|SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY|SOFTWARE_FRAMEWORK/COMPONENTS/DISPLAY/ET024006DHU|gui_getstring.c|SOFTWARE_FRAMEWORK/BOARDS/EVK1105" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 <entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src/SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX"/>
-<entry excluding="ping.c|ttcp.h|ttcp.c|fsdata.c|hdwireless_gif.h|http_server_gui.h|http_server_gui.c|SOFTWARE_FRAMEWORK/COMPONENTS/TOUCH|SOFTWARE_FRAMEWORK/DRIVERS/ADC|SOFTWARE_FRAMEWORK/COMPONENTS/WIFI/HD/wl_fw.h|gui.c|SOFTWARE_FRAMEWORK/DRIVERS/EBI/SMC|SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY|SOFTWARE_FRAMEWORK/COMPONENTS/DISPLAY/ET024006DHU|gui_getstring.c|SOFTWARE_FRAMEWORK/BOARDS/EVK1105" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 </sourceEntries>
 </configuration>
 </storageModule>

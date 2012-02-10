@@ -551,10 +551,6 @@ void ard_tcp_stop(void* ttcp) {
 	DUMP_TCP_STATE(_ttcp);
 	if ((_ttcp)&&(_ttcp->tpcb)&&(_ttcp->tpcb->state!=LAST_ACK)&&(_ttcp->tpcb->state!=CLOSED))
 		close_conn(_ttcp);
-//	else
-//		printk("Skip");
-
-	asm("nop");
 }
 
 uint8_t getStateTcp(void* p, bool client) {

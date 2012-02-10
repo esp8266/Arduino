@@ -60,6 +60,11 @@
 			<arguments>
 			</arguments>
 		</buildCommand>
+		<buildCommand>
+			<name>com.atmel.avr32.managedbuilder.ui.extras.ListingBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
 	</buildSpec>
 	<natures>
 		<nature>com.atmel.avr32.core.nature</nature>
