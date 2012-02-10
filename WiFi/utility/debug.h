@@ -13,16 +13,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#define INFO_0 1
-#define INFO_1 2
-#define INFO_2 4
-#define INFO_3 8
-#define INFO_4 16
-#define INFO_5 32
-#define INFO_D (1<<0xD)     // Debug
-#define INFO_E (1<<0xE)     // Error
-#define INFO_F (1<<0xF)     // Warning
-
 #define PRINT_FILE_LINE() do { 						\
 		Serial.print("[");Serial.print(__FILE__);		\
 		Serial.print("::");Serial.print(__LINE__);Serial.print("]");\

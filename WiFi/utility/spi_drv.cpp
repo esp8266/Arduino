@@ -140,7 +140,6 @@ char SpiDrv::readChar()
     {                                           \
         TOGGLE_TRIGGER()                        \
         WARN("Error waiting START_CMD");        \
-        Serial.println(cmd, 16);                \
         return 0;                               \
     }else                                       \
 
@@ -307,14 +306,12 @@ int SpiDrv::waitResponseParams(uint8_t cmd, uint8_t numParam, tParam* params)
         } else
         {
             WARN("Error numParam == 0");
-            Serial.println(cmd, 16);
             return 0;
         }
 
         if (numParam != _numParam)
         {
             WARN("Mismatch numParam");
-            Serial.println(cmd, 16);
             return 0;
         }
 
@@ -402,7 +399,6 @@ int SpiDrv::waitResponse(uint8_t cmd, uint8_t* numParamRead, uint8_t** params, u
         } else
         {
             WARN("Error numParams == 0");
-            Serial.println(cmd, 16);
             return 0;
         }
         readAndCheckChar(END_CMD, &_data);

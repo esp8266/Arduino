@@ -99,7 +99,6 @@ int WiFiClass::begin(char* ssid, const char *passphrase)
  	   {
  		   delay(WL_DELAY_START_CONNECTION);
  		   status = WiFiDrv::getConnectionStatus();
- 		   INFO("Status: %d", status);
  	   }
 	   while ((( status == WL_IDLE_STATUS)||(status == WL_SCAN_COMPLETED))&&(--attempts>0));
     }else{
