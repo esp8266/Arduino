@@ -288,19 +288,20 @@ end_oid:
 static int asn1_get_printable_str(const uint8_t *buf, int *offset, char **str)
 {
     int len = X509_NOT_OK;
+    int asn1_type = buf[*offset];
 
     /* some certs have this awful crud in them for some reason */
-    if (buf[*offset] != ASN1_PRINTABLE_STR &&  
-            buf[*offset] != ASN1_PRINTABLE_STR2 &&  
-            buf[*offset] != ASN1_TELETEX_STR &&  
-            buf[*offset] != ASN1_IA5_STR &&  
-            buf[*offset] != ASN1_UNICODE_STR)
+    if (buf[asn1_type] != ASN1_PRINTABLE_STR &&  
+            buf[asn1_type] != ASN1_PRINTABLE_STR2 &&  
+            buf[asn1_type] != ASN1_TELETEX_STR &&  
+            buf[asn1_type] != ASN1_IA5_STR &&  
+            buf[asn1_type] != ASN1_UNICODE_STR)
         goto end_pnt_str;
 
         (*offset)++;
         len = get_asn1_length(buf, offset);
 
-        if (buf[*offset - 1] == ASN1_UNICODE_STR)
+        if (buf[asn1_type - 1] == ASN1_UNICODE_STR)
         {
             int i;
             *str = (char *)malloc(len/2+1);     /* allow for null */
@@ -330,7 +331,7 @@ int asn1_name(const uint8_t *cert, int *offset, char *dn[])
 {
     int ret = X509_NOT_OK;
     int dn_type;
-    char *tmp = NULL;
+    char *tmp;
 
     if (asn1_next_obj(cert, offset, ASN1_SEQUENCE) < 0)
         goto end_name;
@@ -342,6 +343,8 @@ int asn1_name(const uint8_t *cert, int *offset, char *dn[])
         if (asn1_next_obj(cert, offset, ASN1_SEQUENCE) < 0 ||
                (dn_type = asn1_get_oid_x520(cert, offset)) < 0)
             goto end_name;
+
+        tmp = NULL;
 
         if (asn1_get_printable_str(cert, offset, &tmp) < 0)
         {

@@ -259,6 +259,7 @@ static int pem_decrypt(const char *where, const char *end,
 
     /* turn base64 into binary */
     pem_size = (int)(end-start);
+    ssl_obj->len = sizeof(ssl_obj->buf);
     if (base64_decode(start, pem_size, ssl_obj->buf, &ssl_obj->len) != 0)
         goto error;
 
@@ -326,11 +327,15 @@ static int new_pem_obj(SSL_CTX *ssl_ctx, int is_cacert, char *where,
                         goto error;
                     }
                 }
-                else if (base64_decode(start, pem_size, 
-                            ssl_obj->buf, &ssl_obj->len) != 0)
+                else 
                 {
-                    ret = SSL_ERROR_BAD_CERTIFICATE;
-                    goto error;
+                    ssl_obj->len = pem_size;
+                    if (base64_decode(start, pem_size, 
+                                ssl_obj->buf, &ssl_obj->len) != 0)
+                    {
+                        ret = SSL_ERROR_BAD_CERTIFICATE;
+                        goto error;
+                    }
                 }
 
                 switch (i)

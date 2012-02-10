@@ -152,7 +152,7 @@ static int procheadelem(struct connstruct *cn, char *buf)
     else if (strcasecmp(buf, "Authorization:") == 0 &&
                                     strncmp(value, "Basic ", 6) == 0)
     {
-        int size;
+        int size = sizeof(cn->authorization);
         if (base64_decode(&value[6], strlen(&value[6]), 
                                         (uint8_t *)cn->authorization, &size))
             cn->authorization[0] = 0;   /* error */
@@ -1051,7 +1051,8 @@ static int check_digest(char *salt, const char *msg_passwd)
 {
     uint8_t b256_salt[MAXREQUESTLENGTH];
     uint8_t real_passwd[MD5_SIZE];
-    int salt_size;
+    int salt_size = sizeof(b256_salt);
+    int password_size = sizeof(real_passwd);
     char *b64_passwd;
     uint8_t md5_result[MD5_SIZE];
     MD5_CTX ctx;
@@ -1064,7 +1065,8 @@ static int check_digest(char *salt, const char *msg_passwd)
     if (base64_decode(salt, strlen(salt), b256_salt, &salt_size))
         return -1;
 
-    if (base64_decode(b64_passwd, strlen(b64_passwd), real_passwd, NULL))
+    if (base64_decode(b64_passwd, strlen(b64_passwd), real_passwd,
+                &password_size))
         return -1;
 
     /* very simple MD5 crypt algorithm, but then the salt we use is large */
