@@ -259,7 +259,6 @@ static int pem_decrypt(const char *where, const char *end,
 
     /* turn base64 into binary */
     pem_size = (int)(end-start);
-    ssl_obj->len = sizeof(ssl_obj->buf);
     if (base64_decode(start, pem_size, ssl_obj->buf, &ssl_obj->len) != 0)
         goto error;
 
@@ -315,6 +314,7 @@ static int new_pem_obj(SSL_CTX *ssl_ctx, int is_cacert, char *where,
 
                 /* 4/3 bigger than what we need but so what */
                 ssl_obj->buf = (uint8_t *)calloc(1, pem_size);
+                ssl_obj->len = pem_size;
 
                 if (i == IS_RSA_PRIVATE_KEY && 
                             strstr(start, "Proc-Type:") && 

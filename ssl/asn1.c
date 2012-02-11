@@ -291,34 +291,34 @@ static int asn1_get_printable_str(const uint8_t *buf, int *offset, char **str)
     int asn1_type = buf[*offset];
 
     /* some certs have this awful crud in them for some reason */
-    if (buf[asn1_type] != ASN1_PRINTABLE_STR &&  
-            buf[asn1_type] != ASN1_PRINTABLE_STR2 &&  
-            buf[asn1_type] != ASN1_TELETEX_STR &&  
-            buf[asn1_type] != ASN1_IA5_STR &&  
-            buf[asn1_type] != ASN1_UNICODE_STR)
+    if (asn1_type != ASN1_PRINTABLE_STR &&  
+            asn1_type != ASN1_PRINTABLE_STR2 &&  
+            asn1_type != ASN1_TELETEX_STR &&  
+            asn1_type != ASN1_IA5_STR &&  
+            asn1_type != ASN1_UNICODE_STR)
         goto end_pnt_str;
 
-        (*offset)++;
-        len = get_asn1_length(buf, offset);
+    (*offset)++;
+    len = get_asn1_length(buf, offset);
 
-        if (buf[asn1_type - 1] == ASN1_UNICODE_STR)
-        {
-            int i;
-            *str = (char *)malloc(len/2+1);     /* allow for null */
+    if (asn1_type == ASN1_UNICODE_STR)
+    {
+        int i;
+        *str = (char *)malloc(len/2+1);     /* allow for null */
 
-            for (i = 0; i < len; i += 2)
-                (*str)[i/2] = buf[*offset + i + 1];
+        for (i = 0; i < len; i += 2)
+            (*str)[i/2] = buf[*offset + i + 1];
 
-            (*str)[len/2] = 0;                  /* null terminate */
-        }
-        else
-        {
-            *str = (char *)malloc(len+1);       /* allow for null */
-            memcpy(*str, &buf[*offset], len);
-            (*str)[len] = 0;                    /* null terminate */
-        }
+        (*str)[len/2] = 0;                  /* null terminate */
+    }
+    else
+    {
+        *str = (char *)malloc(len+1);       /* allow for null */
+        memcpy(*str, &buf[*offset], len);
+        (*str)[len] = 0;                    /* null terminate */
+    }
 
-        *offset += len;
+    *offset += len;
 
 end_pnt_str:
     return len;
