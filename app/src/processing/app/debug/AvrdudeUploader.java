@@ -30,6 +30,7 @@ import processing.app.Base;
 import processing.app.Preferences;
 import processing.app.Serial;
 import processing.app.SerialException;
+import static processing.app.I18n._;
 
 import java.io.*;
 import java.util.*;
@@ -63,36 +64,53 @@ public class AvrdudeUploader extends Uploader  {
       return avrdude(params);
     }
 
-    return uploadViaBootloader(buildPath, className);
+    return uploadViaBootloader(buildPath, className);  
+  }
+  
+  private static String selectLeonardoUploadPort() {
+  	String names[] = Serial.list();
+	String result = (String)JOptionPane.showInputDialog(null, processing.app.I18n.format(_("Please select the Leonardo upload port:")), "Select upload port", JOptionPane.PLAIN_MESSAGE, null, names, 0);
+	return result;	
   }
   
   private boolean uploadViaBootloader(String buildPath, String className)
-  throws RunnerException, SerialException {
+  		throws RunnerException, SerialException {
     Map<String, String> boardPreferences = Base.getBoardPreferences();
     List commandDownloader = new ArrayList();
     String protocol = boardPreferences.get("upload.protocol");
     
     // avrdude wants "stk500v1" to distinguish it from stk500v2
     if (protocol.equals("stk500"))
-      protocol = "stk500v1";
-      
+      protocol = "stk500v1";      
+    
 	// need to do a little dance for Leonardo and derivatives:
 	// open then close the port at the magic baudrate (usually 1200 bps) first to signal to the 
 	// sketch that it should reset into bootloader.  after doing this wait a moment for the 
-	// bootloader to enumerate
+	// bootloader to enumerate.  On Windows, also must deal with the fact that the COM port number
+	// changes from bootloader to sketch.
+	String leonardoUploadPort = null;
 	if (boardPreferences.get("bootloader.path").equals("caterina_LUFA")) {
     	try {
-    		Serial serial = new Serial(Integer.parseInt(boardPreferences.get("upload.speed")));
-    		serial.dispose();
-		    serial = null;
-		    Thread.sleep(8000);
+    		Serial.touchPort(Preferences.get("serial.port"), 1200);
+    		Thread.sleep(8000);
     	} catch (SerialException ex) { 
-    	} catch (InterruptedException ex) { }    	
+    	} catch (InterruptedException ex) { }
+
+		if (Base.isWindows()) {
+			leonardoUploadPort = selectLeonardoUploadPort();
+			if (null == leonardoUploadPort) 
+				return false;
+		}
     }
     
     commandDownloader.add("-c" + protocol);
-    commandDownloader.add(
-      "-P" + (Base.isWindows() ? "\\\\.\\" : "") + Preferences.get("serial.port"));
+    if (null == leonardoUploadPort) {
+	    commandDownloader.add(
+    	  "-P" + (Base.isWindows() ? "\\\\.\\" : "") + Preferences.get("serial.port"));
+    } else {
+	    commandDownloader.add(
+    	  "-P" + (Base.isWindows() ? "\\\\.\\" : "") + leonardoUploadPort);    
+    }
     commandDownloader.add(
       "-b" + Integer.parseInt(boardPreferences.get("upload.speed")));
     commandDownloader.add("-D"); // don't erase

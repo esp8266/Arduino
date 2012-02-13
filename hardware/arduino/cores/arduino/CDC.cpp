@@ -23,20 +23,6 @@
 #if defined(USBCON)
 #ifdef CDC_ENABLED
 
-void Reboot()
-{
-	USB.detach();
-	cli();
-
-	// Reset the microcontroller to run the bootloader
-	wdt_enable(WDTO_15MS);
-	for (;;);
-}
-
-// Define constants and variables for buffering incoming serial data.  We're
-// using a ring buffer (I think), in which head is the index of the location
-// to which to write the next incoming character and tail is the index of the
-// location from which to read.
 #if (RAMEND < 1000)
 #define SERIAL_BUFFER_SIZE 16
 #else
@@ -114,9 +100,14 @@ bool WEAK CDC_Setup(Setup& setup)
 
 		if (CDC_SET_CONTROL_LINE_STATE == r)
 		{
-			if (0 != _usbLineInfo.lineState && 1200 == _usbLineInfo.dwDTERate)	// auto-reset is triggered when the port, already open at 1200 bps, is closed
-				Reboot();
 			_usbLineInfo.lineState = setup.wValueL;
+			// auto-reset into the bootloader is triggered when the port, already 
+			// open at 1200 bps, is closed.  this is the signal to start the watchdog
+			// with a relatively long period so it can finish housekeeping tasks
+			// like servicing endpoints before the sketch ends
+			if (0 != _usbLineInfo.lineState && 1200 == _usbLineInfo.dwDTERate) {	
+				wdt_enable(WDTO_2S);
+			}
 			return true;
 		}
 	}
