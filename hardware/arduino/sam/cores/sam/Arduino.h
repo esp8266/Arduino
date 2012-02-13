@@ -179,4 +179,7 @@ extern const PinDescription g_APinDescription[] ;
 #include "wiring_pulse.h"
 #endif // __cplusplus
 
+// Include board variant
+#include "variant.h"
+
 #endif // Arduino_h

@@ -1,0 +1,323 @@
+
+adc10_sam3u.o:
+00000000 T adc_check_ovr
+00000000 T adc_configure_power_save
+00000000 T adc_configure_timing
+00000000 T adc_configure_trigger
+00000000 T adc_disable_channel
+00000000 T adc_disable_interrupt
+00000000 T adc_enable_channel
+00000000 T adc_enable_interrupt
+00000000 T adc_get_actual_adc_clock
+00000000 T adc_get_channel_status
+00000000 T adc_get_interrupt_mask
+00000000 T adc_get_interrupt_status
+00000000 T adc_get_latest_value
+00000000 T adc_get_pdc_base
+00000000 T adc_get_status
+00000000 T adc_get_value
+00000000 T adc_init
+00000000 T adc_set_resolution
+00000000 T adc_start
+00000000 T adc_stop
+
+adc12_sam3u.o:
+00000000 T adc12_check_ovr
+00000000 T adc12_configure_power_save
+00000000 T adc12_configure_timing
+00000000 T adc12_configure_trigger
+00000000 T adc12_disable_channel
+00000000 T adc12_disable_differential_input
+00000000 T adc12_disable_input_offset
+00000000 T adc12_disable_interrupt
+00000000 T adc12_enable_channel
+00000000 T adc12_enable_differential_input
+00000000 T adc12_enable_input_offset
+00000000 T adc12_enable_interrupt
+00000000 T adc12_get_actual_adc_clock
+00000000 T adc12_get_channel_status
+00000000 T adc12_get_interrupt_mask
+00000000 T adc12_get_interrupt_status
+00000000 T adc12_get_latest_value
+00000000 T adc12_get_pdc_base
+00000000 T adc12_get_status
+00000000 T adc12_get_value
+00000000 T adc12_init
+00000000 T adc12_set_bias_current
+00000000 T adc12_set_input_gain
+00000000 T adc12_set_resolution
+00000000 T adc12_start
+00000000 T adc12_stop
+
+adc_sam3snxa.o:
+
+pio.o:
+00000000 T PIO_Clear
+00000000 T PIO_Configure
+00000000 T PIO_DisableInterrupt
+00000000 T PIO_Get
+00000000 T PIO_GetOutputDataStatus
+00000000 T PIO_PullUp
+00000000 T PIO_Set
+00000000 T PIO_SetDebounceFilter
+00000000 T PIO_SetInput
+00000000 T PIO_SetOutput
+00000000 T PIO_SetPeripheral
+
+pmc.o:
+00000000 T PMC_DisablePeripheral
+00000000 T PMC_EnablePeripheral
+00000000 T PMC_IsPeripheralEnabled
+
+pwmc.o:
+00000000 r C.1.6738
+00000000 t FindClockConfiguration
+00000000 T PWMC_ConfigureChannel
+00000000 T PWMC_ConfigureChannelExt
+00000000 T PWMC_ConfigureClocks
+00000000 T PWMC_ConfigureComparisonUnit
+00000000 T PWMC_ConfigureEventLineMode
+00000000 T PWMC_ConfigureSyncChannel
+00000000 T PWMC_DisableChannel
+00000000 T PWMC_DisableChannelIt
+00000000 T PWMC_DisableIt
+00000000 T PWMC_DisableOverrideOutput
+00000000 T PWMC_EnableChannel
+00000000 T PWMC_EnableChannelIt
+00000000 T PWMC_EnableFaultProtection
+00000000 T PWMC_EnableIt
+00000000 T PWMC_EnableOverrideOutput
+00000000 T PWMC_FaultClear
+00000000 T PWMC_SetDeadTime
+00000000 T PWMC_SetDutyCycle
+00000000 T PWMC_SetFaultMode
+00000000 T PWMC_SetFaultProtectionValue
+00000000 T PWMC_SetOverrideValue
+00000000 T PWMC_SetPeriod
+00000000 T PWMC_SetSyncChannelUpdatePeriod
+00000000 T PWMC_SetSyncChannelUpdateUnlock
+00000000 T PWMC_WriteBuffer
+0000002c r __FUNCTION__.5544
+00000043 r __FUNCTION__.5555
+00000059 r __FUNCTION__.5570
+00000072 r __FUNCTION__.5581
+00000087 r __FUNCTION__.5592
+00000099 r __FUNCTION__.5599
+000000aa r __FUNCTION__.5681
+000000c7 r __FUNCTION__.5687
+         U __assert_func
+
+rtc.o:
+00000000 T RTC_ClearSCCR
+00000000 T RTC_DisableIt
+00000000 T RTC_EnableIt
+00000000 T RTC_GetDate
+00000000 T RTC_GetHourMode
+00000000 T RTC_GetSR
+00000000 T RTC_GetTime
+00000000 T RTC_SetDate
+00000000 T RTC_SetDateAlarm
+00000000 T RTC_SetHourMode
+00000000 T RTC_SetTime
+00000000 T RTC_SetTimeAlarm
+00000000 r __FUNCTION__.5541
+00000010 r __FUNCTION__.5550
+0000001d r __FUNCTION__.5555
+         U __assert_func
+
+rtt.o:
+00000000 T RTT_EnableIT
+00000000 T RTT_GetStatus
+00000000 T RTT_GetTime
+00000000 T RTT_SetAlarm
+00000000 T RTT_SetPrescaler
+00000000 r __FUNCTION__.5548
+0000000d r __FUNCTION__.5556
+         U __assert_func
+
+spi.o:
+         U PMC_EnablePeripheral
+00000000 T SPI_Configure
+00000000 T SPI_ConfigureNPCS
+00000000 T SPI_Disable
+00000000 T SPI_DisableIt
+00000000 T SPI_Enable
+00000000 T SPI_EnableIt
+00000000 T SPI_GetStatus
+00000000 T SPI_IsFinished
+00000000 T SPI_Read
+00000000 T SPI_Write
+
+tc.o:
+00000000 T TC_Configure
+00000000 T TC_FindMckDivisor
+00000000 T TC_Start
+00000000 T TC_Stop
+00000000 r __FUNCTION__.5543
+0000000d r __FUNCTION__.5549
+00000016 r __FUNCTION__.5555
+         U __assert_func
+
+timetick.o:
+00000000 T GetTickCount
+00000000 T Sleep
+00000000 T TimeTick_Configure
+00000000 T TimeTick_Increment
+00000000 T Wait
+00000000 b _dwTickCount
+
+twi.o:
+00000000 T TWI_ByteReceived
+00000000 T TWI_ByteSent
+00000000 T TWI_ConfigureMaster
+00000000 T TWI_ConfigureSlave
+00000000 T TWI_DisableIt
+00000000 T TWI_EnableIt
+00000000 T TWI_GetMaskedStatus
+00000000 T TWI_GetStatus
+00000000 T TWI_ReadByte
+00000000 T TWI_SendSTOPCondition
+00000000 T TWI_StartRead
+00000000 T TWI_StartWrite
+00000000 T TWI_Stop
+00000000 T TWI_TransferComplete
+00000000 T TWI_WriteByte
+00000000 r __FUNCTION__.6126
+00000014 r __FUNCTION__.6141
+00000027 r __FUNCTION__.6145
+00000030 r __FUNCTION__.6152
+0000003e r __FUNCTION__.6156
+0000004b r __FUNCTION__.6161
+00000059 r __FUNCTION__.6169
+00000068 r __FUNCTION__.6183
+00000075 r __FUNCTION__.6188
+00000083 r __FUNCTION__.6192
+00000091 r __FUNCTION__.6197
+000000a5 r __FUNCTION__.6201
+         U __assert_func
+
+usart.o:
+00000000 T USART_Configure
+00000000 T USART_DisableIt
+00000000 T USART_EnableIt
+00000000 T USART_GetChar
+00000000 T USART_GetStatus
+00000000 T USART_IsDataAvailable
+00000000 T USART_IsRxReady
+00000000 T USART_PutChar
+00000000 T USART_Read
+00000000 T USART_ReadBuffer
+00000000 T USART_SetIrdaFilter
+00000000 T USART_SetReceiverEnabled
+00000000 T USART_SetTransmitterEnabled
+00000000 T USART_Write
+00000000 T USART_WriteBuffer
+00000000 r __FUNCTION__.5925
+         U __assert_func
+
+wdt.o:
+00000000 T WDT_Disable
+00000000 T WDT_Enable
+00000000 T WDT_GetPeriod
+00000000 T WDT_GetStatus
+00000000 T WDT_Restart
+
+exceptions.o:
+00000000 W ADC12B_IrqHandler
+00000000 W ADC_IrqHandler
+00000000 W BusFault_Handler
+00000000 W DMAC_IrqHandler
+00000000 W DebugMon_Handler
+00000000 T Dummy_Handler
+00000000 W EFC0_IrqHandler
+00000000 W EFC1_IrqHandler
+00000000 W MCI_IrqHandler
+00000000 W MemManage_Handler
+00000000 W NMI_Handler
+00000000 W PIOA_IrqHandler
+00000000 W PIOB_IrqHandler
+00000000 W PIOC_IrqHandler
+00000000 W PMC_IrqHandler
+00000000 W PWM_IrqHandler
+00000000 W PendSV_Handler
+00000000 W RSTC_IrqHandler
+00000000 W RTC_IrqHandler
+00000000 W RTT_IrqHandler
+00000000 W SMC_IrqHandler
+00000000 W SPI_IrqHandler
+00000000 W SSC_IrqHandler
+00000000 W SUPC_IrqHandler
+00000000 W SVC_Handler
+00000000 W SysTick_Handler
+00000000 W TC0_IrqHandler
+00000000 W TC1_IrqHandler
+00000000 W TC2_IrqHandler
+00000000 W TWI0_IrqHandler
+00000000 W TWI1_IrqHandler
+00000000 W UART_IrqHandler
+00000000 W UDPHS_IrqHandler
+00000000 W USART0_IrqHandler
+00000000 W USART1_IrqHandler
+00000000 W USART2_IrqHandler
+00000000 W USART3_IrqHandler
+00000000 W UsageFault_Handler
+00000000 W WDT_IrqHandler
+
+system_sam3u.o:
+00000000 D SystemCoreClock
+00000000 T SystemCoreClockUpdate
+00000000 T SystemInit
+00000000 T system_init_flash_and_watchdog
+
+startup_sam3u.o:
+         U ADC12B_IrqHandler
+         U ADC_IrqHandler
+         U BusFault_Handler
+         U DMAC_IrqHandler
+         U DebugMon_Handler
+         U Dummy_Handler
+         U EFC0_IrqHandler
+         U EFC1_IrqHandler
+         U HardFault_Handler
+         U MCI_IrqHandler
+         U MemManage_Handler
+         U NMI_Handler
+         U PIOA_IrqHandler
+         U PIOB_IrqHandler
+         U PIOC_IrqHandler
+         U PMC_IrqHandler
+         U PWM_IrqHandler
+         U PendSV_Handler
+         U RSTC_IrqHandler
+         U RTC_IrqHandler
+         U RTT_IrqHandler
+00000000 T Reset_Handler
+         U SMC_IrqHandler
+         U SPI_IrqHandler
+         U SSC_IrqHandler
+         U SUPC_IrqHandler
+         U SVC_Handler
+         U SysTick_Handler
+         U TC0_IrqHandler
+         U TC1_IrqHandler
+         U TC2_IrqHandler
+         U TWI0_IrqHandler
+         U TWI1_IrqHandler
+         U UART_IrqHandler
+         U UDPHS_IrqHandler
+         U USART0_IrqHandler
+         U USART1_IrqHandler
+         U USART2_IrqHandler
+         U USART3_IrqHandler
+         U UsageFault_Handler
+         U WDT_IrqHandler
+         U __libc_init_array
+         U _erelocate
+         U _estack
+         U _etext
+         U _ezero
+         U _sfixed
+         U _srelocate
+         U _szero
+00000000 D exception_table
+         U main

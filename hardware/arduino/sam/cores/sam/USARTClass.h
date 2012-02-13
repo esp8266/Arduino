@@ -19,7 +19,10 @@
 #ifndef _USART_CLASS_
 #define _USART_CLASS_
 
-#include "Arduino.h"
+#include "HardwareSerial.h"
+
+// Includes Atmel CMSIS
+#include <chip.h>
 
 class USARTClass : public HardwareSerial
 {

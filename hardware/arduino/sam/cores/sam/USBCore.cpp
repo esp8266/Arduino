@@ -16,12 +16,12 @@
 ** SOFTWARE.
 */
 #define USBCON
+#if 0
 #include "Platform.h"
 #include "USBAPI.h"
 #include "USBDesc.h"
 #include "USBCore.h"
 
-#if 0
 
 #if defined(USBCON)
 

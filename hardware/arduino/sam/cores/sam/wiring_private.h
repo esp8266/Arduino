@@ -27,7 +27,9 @@
 extern "C"{
 #endif
 
-#include "libsam/chip.h"
+// Includes Atmel CMSIS
+#include <chip.h>
+
 #include "wiring_constants.h"
 
 #ifdef __cplusplus
