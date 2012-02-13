@@ -101,6 +101,32 @@ public class Serial implements SerialPortEventListener {
       new Float(Preferences.get("serial.stopbits")).floatValue());
   }
 
+  public static boolean touchPort(String iname, int irate) throws SerialException {
+    SerialPort port;
+    boolean result = false;
+    try {
+      Enumeration portList = CommPortIdentifier.getPortIdentifiers();
+      while (portList.hasMoreElements()) {
+        CommPortIdentifier portId = (CommPortIdentifier) portList.nextElement();
+        if ((CommPortIdentifier.PORT_SERIAL == portId.getPortType()) && (portId.getName().equals(iname))) {
+          port = (SerialPort) portId.open("tap", 2000);
+          port.setSerialPortParams(irate, 8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+          port.close();				
+          result = true;
+        }
+      }
+    } catch (PortInUseException e) {
+      throw new SerialException(
+        I18n.format(_("Serial port ''{0}'' already in use. Try quiting any programs that may be using it."), iname)
+      );
+    } catch (Exception e) {
+      throw new SerialException(
+        I18n.format(_("Error touching serial port ''{0}''."), iname), e
+      );
+    }
+	return result;
+  }
+
   public Serial(String iname, int irate,
                  char iparity, int idatabits, float istopbits)
   throws SerialException {
