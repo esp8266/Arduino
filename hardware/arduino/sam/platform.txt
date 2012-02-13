@@ -3,7 +3,7 @@
 # --------------------- 
 
 name=Atmel SAM3
-compiler.path={ide.path}/hardware/tools/g++_arm_none_eabi/bin/
+compiler.path={runtime.ide.path}/hardware/tools/g++_arm_none_eabi/bin/
 compiler.c.cmd=arm-none-eabi-gcc
 compiler.c.flags=-c -g -Os -w -mthumb -mlong-calls -ffunction-sections -nostdlib --param max-inline-insns-single=500 -Dprintf=iprintf
 compiler.c.elf.cmd=arm-none-eabi-gcc
@@ -19,8 +19,6 @@ compiler.elf2hex.flags=-O binary
 compiler.elf2hex.cmd=arm-none-eabi-objcopy
 compiler.ldflags=
 compiler.size.cmd=arm-none-eabi-size
-compiler.upload.cmd=
-compiler.upload.flags=
 compiler.define=-DARDUINO=
 
 compiler.libsam.c.flags=-I{build.system.path}/libsam -I{build.system.path}/CMSIS/Include/
@@ -29,24 +27,35 @@ compiler.libsam.c.flags=-I{build.system.path}/libsam -I{build.system.path}/CMSIS
 # ---------------------
 
 ## Compile c files
-recipe.c.o.pattern={compiler.path}{compiler.c.cmd} {compiler.c.flags} -mcpu={build.mcu} -DF_CPU={build.f_cpu} -D{software}={ide.version} {build.extra_flags} {compiler.libsam.c.flags} {includes} {source_file} -o {object_file}
+recipe.c.o.pattern={compiler.path}{compiler.c.cmd} {compiler.c.flags} -mcpu={build.mcu} -DF_CPU={build.f_cpu} -D{software}={runtime.ide.version} {build.extra_flags} {compiler.libsam.c.flags} {includes} {source_file} -o {object_file}
 
 ## Compile c++ files
-recipe.cpp.o.pattern={compiler.path}{compiler.cpp.cmd} {compiler.cpp.flags} -mcpu={build.mcu} -DF_CPU={build.f_cpu} -D{software}={ide.version} {build.extra_flags} {compiler.libsam.c.flags} {includes} {source_file} -o {object_file}
+recipe.cpp.o.pattern={compiler.path}{compiler.cpp.cmd} {compiler.cpp.flags} -mcpu={build.mcu} -DF_CPU={build.f_cpu} -D{software}={runtime.ide.version} {build.extra_flags} {compiler.libsam.c.flags} {includes} {source_file} -o {object_file}
 
 ## Create archives
 recipe.ar.pattern={compiler.path}{compiler.ar.cmd} {compiler.ar.flags} {build.path}/{archive_file} {object_file}
 
 ## Combine gc-sections, archives, and objects
-recipe.c.combine.pattern={compiler.path}{compiler.c.elf.cmd} {compiler.c.elf.flags} -mcpu={build.mcu} -T{build.variant.path}/{build.ldscript} -Wl,-Map,{build.path}/{project_name}.map -o {build.path}/{project_name}.elf -L{build.path} -lm -lgcc -mthumb -Wl,--cref -Wl,--check-sections -Wl,--gc-sections -Wl,--entry=Reset_Handler -Wl,--unresolved-symbols=report-all -Wl,--warn-common -Wl,--warn-section-align -Wl,--warn-unresolved-symbols -Wl,--start-group {object_files} {build.variant.path}/libsam_sam3u4e_gcc_rel.a {build.path}/{archive_file} -Wl,--end-group
+recipe.c.combine.pattern={compiler.path}{compiler.c.elf.cmd} {compiler.c.elf.flags} -mcpu={build.mcu} -T{build.variant.path}/{build.ldscript} -Wl,-Map,{build.path}/{build.project_name}.map -o {build.path}/{build.project_name}.elf -L{build.path} -lm -lgcc -mthumb -Wl,--cref -Wl,--check-sections -Wl,--gc-sections -Wl,--entry=Reset_Handler -Wl,--unresolved-symbols=report-all -Wl,--warn-common -Wl,--warn-section-align -Wl,--warn-unresolved-symbols -Wl,--start-group {object_files} {build.variant.path}/libsam_sam3u4e_gcc_rel.a {build.path}/{archive_file} -Wl,--end-group
 
 ## Create eeprom
 recipe.objcopy.eep.pattern=
 
 ## Create hex
-recipe.objcopy.hex.pattern={compiler.path}{compiler.elf2hex.cmd} {compiler.elf2hex.flags} {build.path}/{project_name}.elf {build.path}/{project_name}.bin
+recipe.objcopy.hex.pattern={compiler.path}{compiler.elf2hex.cmd} {compiler.elf2hex.flags} {build.path}/{build.project_name}.elf {build.path}/{build.project_name}.bin
 
-## Compute Size
-#recipe.size.pattern={compiler.path}{1} {2}.elf
+## Compute size
+recipe.size.pattern={compiler.path}{compiler.size.cmd} -A {build.path}/{build.project_name}.elf
+recipe.size.regex=\.text\s+([0-9]+).*
 
+
+# SAM3 Uploader tools
+# -------------------
+
+tools.bossac.cmd=bossac
+tools.bossac.path={runtime.ide.path}/hardware/tools
+
+tools.bossac.upload.params.verbose=-i -d
+tools.bossac.upload.params.quiet=
+tools.bossac.upload.pattern={path}/{cmd} {upload.verbose} --port={serial.port.file} -e -w -v -b {build.path}/{build.project_name}.bin
 

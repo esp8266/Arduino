@@ -27,9 +27,9 @@ sam3u_ek.build.pins=sam3u_ek
 ##############################################################
 
 arduino_due.name=Arduino Due
-arduino_due.uploader=bossac
+arduino_due.upload.tool=bossac
+arduino_due.upload.protocol=sam-ba
 arduino_due.upload.maximum_size=49152
-arduino_due.upload.speed=115200
 arduino_due.build.mcu=cortex-m3
 arduino_due.build.f_cpu=96000000L
 arduino_due.build.core=sam
