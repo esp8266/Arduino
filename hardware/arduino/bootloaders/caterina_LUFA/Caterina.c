@@ -110,6 +110,15 @@ int main(void)
 	/* Watchdog may be configured with a 15 ms period so must disable it before doing anything else */
 	wdt_disable();
 	
+	/* Check the reason for the reset and act accordingly */
+	uint8_t  mcusr_state = MCUSR;		// store the initial state of the Status register
+	MCUSR = 0;							// clear all reset flags	
+	// After a power-on reset skip the bootloader and jump straight to sketch 
+	// if one exists.
+	if (mcusr_state & (1<<PORF) && pgm_read_word(0) != 0xFFFF) {		
+		StartSketch();
+	}
+	
 	/* Setup hardware required for the bootloader */
 	SetupHardware();
 
@@ -121,7 +130,7 @@ int main(void)
 		CDC_Task();
 		USB_USBTask();
 		/* Time out and start the sketch if one is present */
-		if (Timeout > 16000)
+		if (Timeout > 16000 && pgm_read_word(0) != 0xFFFF)
 			RunBootloader = false;
 
 		LEDPulse();
