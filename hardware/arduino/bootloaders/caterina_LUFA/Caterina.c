@@ -64,6 +64,9 @@ uint16_t RxLEDPulse = 0; // time remaining for Rx LED pulse
 /* Bootloader timeout timer */
 uint16_t Timeout = 0;
 
+uint16_t bootKey = 0x7777;
+volatile uint16_t *const bootKeyPtr = (volatile uint16_t *)0x0A00;
+
 void StartSketch(void)
 {
 	cli();
@@ -116,6 +119,11 @@ int main(void)
 	// After a power-on reset skip the bootloader and jump straight to sketch 
 	// if one exists.
 	if (mcusr_state & (1<<PORF) && pgm_read_word(0) != 0xFFFF) {		
+		StartSketch();
+	}
+	uint16_t bootKeyPtrVal = *bootKeyPtr;
+	*bootKeyPtr = 0;
+	if ((mcusr_state & (1<<WDRF)) && (bootKeyPtrVal != bootKey) && (pgm_read_word(0) != 0xFFFF)) {	
 		StartSketch();
 	}
 	

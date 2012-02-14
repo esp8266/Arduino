@@ -195,14 +195,14 @@ const USB_Descriptor_String_t ProductString =
 
 	.UnicodeString          = L"Arduino Leonardo"
 };
-
+/*
 const USB_Descriptor_String_t SerialNumString = 
 {
 	.Header					= {.Size = USB_STRING_LEN(12), .Type = DTYPE_String},
 	
 	.UnicodeString			= L"000000001452"
 };
-
+*/
 const USB_Descriptor_String_t ManufNameString = 
 {
 	.Header					= {.Size = USB_STRING_LEN(11), .Type = DTYPE_String},
@@ -246,10 +246,10 @@ uint16_t CALLBACK_USB_GetDescriptor(const uint16_t wValue,
 			{
 				Address = &ProductString;
 				Size    = ProductString.Header.Size;
-			} else if (DescriptorNumber == DeviceDescriptor.SerialNumStrIndex)
-			{
-				Address = &SerialNumString;
-				Size 	= SerialNumString.Header.Size;
+//			} else if (DescriptorNumber == DeviceDescriptor.SerialNumStrIndex)
+//			{
+//				Address = &SerialNumString;
+//				Size 	= SerialNumString.Header.Size;
 			} else if (DescriptorNumber == DeviceDescriptor.ManufacturerStrIndex)
 			{
 				Address = &ManufNameString;

@@ -80,7 +80,7 @@
 
 	/* Function Prototypes: */
 		void StartSketch(void);
-		void LEDPulse();
+		void LEDPulse(void);
 	
 		void CDC_Task(void);
 		void SetupHardware(void);

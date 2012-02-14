@@ -105,7 +105,8 @@ bool WEAK CDC_Setup(Setup& setup)
 			// open at 1200 bps, is closed.  this is the signal to start the watchdog
 			// with a relatively long period so it can finish housekeeping tasks
 			// like servicing endpoints before the sketch ends
-			if (0 != _usbLineInfo.lineState && 1200 == _usbLineInfo.dwDTERate) {	
+			if (0 != _usbLineInfo.lineState && 1200 == _usbLineInfo.dwDTERate) {
+				*(uint16_t *)0x0A00 = 0x7777;
 				wdt_enable(WDTO_2S);
 			}
 			return true;
