@@ -76,11 +76,16 @@ editor.window.width.default = 500
 editor.window.height.default = 600
 
 editor.window.width.min = 400
-editor.window.height.min = 500
+editor.window.height.min = 290
+
+# the following commented out to better support netbooks
+# http://code.google.com/p/arduino/issues/detail?id=52
+#editor.window.height.min = 500
 # tested as approx 440 on OS X
-editor.window.height.min.macosx = 450
+#editor.window.height.min.macosx = 450
 # tested to be 515 on Windows XP, this leaves some room
-editor.window.height.min.windows = 530
+#editor.window.height.min.windows = 530
+
 
 # font size for editor
 editor.font=Monospaced,plain,12

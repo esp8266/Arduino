@@ -264,7 +264,9 @@ public class Editor extends JFrame implements RunnerListener {
       splitPane.setDividerSize(dividerSize);
     }
 
-    splitPane.setMinimumSize(new Dimension(600, 400));
+    // the following changed from 600, 400 for netbooks
+    // http://code.google.com/p/arduino/issues/detail?id=52
+    splitPane.setMinimumSize(new Dimension(600, 100));
     box.add(splitPane);
 
     // hopefully these are no longer needed w/ swing
