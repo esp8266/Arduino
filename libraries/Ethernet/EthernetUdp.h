@@ -48,6 +48,7 @@ private:
   IPAddress _remoteIP; // remote IP address for the incoming packet whilst it's being processed
   uint16_t _remotePort; // remote port for the incoming packet whilst it's being processed
   uint16_t _offset; // offset into the packet being sent
+  uint16_t _remaining; // remaining bytes of incoming packet yet to be processed
 
 public:
   EthernetUDP();  // Constructor
