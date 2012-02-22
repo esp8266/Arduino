@@ -15,6 +15,8 @@
   You should have received a copy of the GNU Lesser General Public
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ 
+  Modified 2012 by Todd Krein (todd@krein.org) to implement repeated starts
 */
 
 extern "C" {
@@ -73,14 +75,14 @@ void TwoWire::begin(int address)
   begin((uint8_t)address);
 }
 
-uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity)
+uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity, uint8_t sendStop)
 {
   // clamp to buffer length
   if(quantity > BUFFER_LENGTH){
     quantity = BUFFER_LENGTH;
   }
   // perform blocking read into buffer
-  uint8_t read = twi_readFrom(address, rxBuffer, quantity);
+  uint8_t read = twi_readFrom(address, rxBuffer, quantity, sendStop);
   // set rx buffer iterator vars
   rxBufferIndex = 0;
   rxBufferLength = read;
@@ -88,9 +90,19 @@ uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity)
   return read;
 }
 
+uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity)
+{
+  return requestFrom((uint8_t)address, (uint8_t)quantity, (uint8_t)true);
+}
+
 uint8_t TwoWire::requestFrom(int address, int quantity)
 {
-  return requestFrom((uint8_t)address, (uint8_t)quantity);
+  return requestFrom((uint8_t)address, (uint8_t)quantity, (uint8_t)true);
+}
+
+uint8_t TwoWire::requestFrom(int address, int quantity, int sendStop)
+{
+  return requestFrom((uint8_t)address, (uint8_t)quantity, (uint8_t)sendStop);
 }
 
 void TwoWire::beginTransmission(uint8_t address)
@@ -109,16 +121,37 @@ void TwoWire::beginTransmission(int address)
   beginTransmission((uint8_t)address);
 }
 
-uint8_t TwoWire::endTransmission(void)
+//
+//	Originally, 'endTransmission' was an f(void) function.
+//	It has been modified to take one parameter indicating
+//	whether or not a STOP should be performed on the bus.
+//	Calling endTransmission(false) allows a sketch to 
+//	perform a repeated start. 
+//
+//	WARNING: Nothing in the library keeps track of whether
+//	the bus tenure has been properly ended with a STOP. It
+//	is very possible to leave the bus in a hung state if
+//	no call to endTransmission(true) is made. Some I2C
+//	devices will behave oddly if they do not see a STOP.
+//
+uint8_t TwoWire::endTransmission(uint8_t sendStop)
 {
   // transmit buffer (blocking)
-  int8_t ret = twi_writeTo(txAddress, txBuffer, txBufferLength, 1);
+  int8_t ret = twi_writeTo(txAddress, txBuffer, txBufferLength, 1, sendStop);
   // reset tx buffer iterator vars
   txBufferIndex = 0;
   txBufferLength = 0;
   // indicate that we are done transmitting
   transmitting = 0;
   return ret;
+}
+
+//	This provides backwards compatibility with the original
+//	definition, and expected behaviour, of endTransmission
+//
+uint8_t TwoWire::endTransmission(void)
+{
+  return endTransmission(true);
 }
 
 // must be called in:

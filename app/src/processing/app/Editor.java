@@ -264,7 +264,9 @@ public class Editor extends JFrame implements RunnerListener {
       splitPane.setDividerSize(dividerSize);
     }
 
-    splitPane.setMinimumSize(new Dimension(600, 400));
+    // the following changed from 600, 400 for netbooks
+    // http://code.google.com/p/arduino/issues/detail?id=52
+    splitPane.setMinimumSize(new Dimension(600, 100));
     box.add(splitPane);
 
     // hopefully these are no longer needed w/ swing
@@ -288,19 +290,9 @@ public class Editor extends JFrame implements RunnerListener {
     setPlacement(location);
 
 
-    // If the window is resized too small this will resize it again to the
-    // minimums. Adapted by Chris Lonnen from comments here:
-    // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4320050
-    // as a fix for http://dev.processing.org/bugs/show_bug.cgi?id=25
-    final int minW = Preferences.getInteger("editor.window.width.min");
-    final int minH = Preferences.getInteger("editor.window.height.min");
-    addComponentListener(new java.awt.event.ComponentAdapter() {
-        public void componentResized(ComponentEvent event) {
-          setSize((getWidth() < minW) ? minW : getWidth(),
-                  (getHeight() < minH) ? minH : getHeight());
-        }
-      });
-
+    // Set the minimum size for the editor window
+    setMinimumSize(new Dimension(Preferences.getInteger("editor.window.width.min"),
+                                 Preferences.getInteger("editor.window.height.min")));
 //    System.out.println("t3");
 
     // Bring back the general options for the editor
