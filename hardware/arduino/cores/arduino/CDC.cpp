@@ -107,7 +107,7 @@ bool WEAK CDC_Setup(Setup& setup)
 			// like servicing endpoints before the sketch ends
 			if (0 != _usbLineInfo.lineState && 1200 == _usbLineInfo.dwDTERate) {
 				*(uint16_t *)0x0A00 = 0x7777;
-				wdt_enable(WDTO_2S);
+				wdt_enable(WDTO_250MS);
 			}
 			return true;
 		}
