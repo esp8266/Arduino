@@ -67,12 +67,6 @@ public class AvrdudeUploader extends Uploader  {
     return uploadViaBootloader(buildPath, className);  
   }
   
-  private static String selectLeonardoUploadPort() {
-  	String names[] = Serial.list();
-	String result = (String)JOptionPane.showInputDialog(null, processing.app.I18n.format(_("Please select the Leonardo upload port:")), "Select upload port", JOptionPane.PLAIN_MESSAGE, null, names, 0);
-	return result;	
-  }
-  
   private boolean uploadViaBootloader(String buildPath, String className)
   		throws RunnerException, SerialException {
     Map<String, String> boardPreferences = Base.getBoardPreferences();
@@ -90,17 +84,58 @@ public class AvrdudeUploader extends Uploader  {
 	// changes from bootloader to sketch.
 	String leonardoUploadPort = null;
 	if (boardPreferences.get("bootloader.path").equals("caterina_LUFA")) {
-    	try {
-    		Serial.touchPort(Preferences.get("serial.port"), 1200);
-    		Thread.sleep(8000);
+    	try {    		
+			long startTime = System.currentTimeMillis();
+			String portsBeforeReenum[] = Serial.list();
+	    	Serial.touchPort(Preferences.get("serial.port"), 1200);    		
+    		if (Base.isWindows()) {	    		
+    			// Windows has a complicated relationship with CDC devices.  Have to deal with 
+    			// devices being slow to disconnect, slow to connect, and the fact that COM numbers
+    			// change from bootloader to sketch.  To find the bootloader port we scan the list
+    			// of reported ports continuously, waiting for the selected port to disappear, then
+    			// waiting for a new port to appear.  Have to have long delays between calls to 
+    			// Serial.list() on Windows otherwise rxtx causes a bluescreen error.
+    			
+	    		// Wait for the port to disappear from the list...
+				long timeout = 0;
+		    	while (true == Arrays.asList(Serial.list()).contains(Preferences.get("serial.port")) && ((timeout = (System.currentTimeMillis() - startTime)) < 4000)) {
+	    			Thread.sleep(1000);
+	    		}
+				System.out.println("first timeout: " + timeout);				
+	    		
+				Thread.sleep(1000);
+				
+	    		// ...and wait for a port, any port to appear.
+	    		while ((portsBeforeReenum.length != Serial.list().length) && ((timeout = (System.currentTimeMillis() - startTime)) < 8000)) {
+	    			Thread.sleep(1000);
+	    		}
+				System.out.println("second timeout: " + timeout);	    		
+	    		
+	    		// Figure out which port is new.
+				String portsAfterReenum[] = Serial.list();
+	    		for (String port : portsAfterReenum) {
+	    			if (!Arrays.asList(portsBeforeReenum).contains(port))
+	    				leonardoUploadPort = port;
+	    		}
+				System.out.println("found leo: " + leonardoUploadPort);
+    		} else {	
+    			// Reenumeration is much faster and less complicated on *nix:
+    			// After touching the port wait for it to disappear (timeout on this operation in
+    			// case the port is either not a Leonardo, is a Leonardo with no sketch loaded, 
+    			// or is a Leonardo that has already been manually reset).  Then wait for the same
+    			// port to reappear in the list and proceed.
+   	
+   				// Wait for the port to disappear from the list...
+		    	while (true == Arrays.asList(Serial.list()).contains(Preferences.get("serial.port")) && (System.currentTimeMillis() - startTime < 4000)) {
+	    			Thread.sleep(10);
+	    		}
+	    		// ...and wait for the same-named port to come back.
+	    		while (false == Arrays.asList(Serial.list()).contains(Preferences.get("serial.port")) && (System.currentTimeMillis() - startTime < 8000)) {
+  			   		Thread.sleep(10);
+	  		   	}
+	    	}	    	
     	} catch (SerialException ex) { 
     	} catch (InterruptedException ex) { }
-
-		if (Base.isWindows()) {
-			leonardoUploadPort = selectLeonardoUploadPort();
-			if (null == leonardoUploadPort) 
-				return false;
-		}
     }
     
     commandDownloader.add("-c" + protocol);
