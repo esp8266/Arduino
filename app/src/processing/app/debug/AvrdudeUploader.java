@@ -77,75 +77,69 @@ public class AvrdudeUploader extends Uploader  {
     if (protocol.equals("stk500"))
       protocol = "stk500v1";      
     
-	// need to do a little dance for Leonardo and derivatives:
-	// open then close the port at the magic baudrate (usually 1200 bps) first to signal to the 
-	// sketch that it should reset into bootloader.  after doing this wait a moment for the 
-	// bootloader to enumerate.  On Windows, also must deal with the fact that the COM port number
-	// changes from bootloader to sketch.
-	String leonardoUploadPort = null;
-	if (boardPreferences.get("bootloader.path").equals("caterina_LUFA")) {
-    	try {    		
-			long startTime = System.currentTimeMillis();
-			String portsBeforeReenum[] = Serial.list();
-	    	Serial.touchPort(Preferences.get("serial.port"), 1200);    		
-    		if (Base.isWindows()) {	    		
-    			// Windows has a complicated relationship with CDC devices.  Have to deal with 
-    			// devices being slow to disconnect, slow to connect, and the fact that COM numbers
-    			// change from bootloader to sketch.  To find the bootloader port we scan the list
-    			// of reported ports continuously, waiting for the selected port to disappear, then
-    			// waiting for a new port to appear.  Have to have long delays between calls to 
-    			// Serial.list() on Windows otherwise rxtx causes a bluescreen error.
-    			
-	    		// Wait for the port to disappear from the list...
-				long timeout = 0;
-		    	while (true == Arrays.asList(Serial.list()).contains(Preferences.get("serial.port")) && ((timeout = (System.currentTimeMillis() - startTime)) < 4000)) {
-	    			Thread.sleep(1000);
-	    		}
-				System.out.println("first timeout: " + timeout);				
-	    		
-				Thread.sleep(1000);
-				
-	    		// ...and wait for a port, any port to appear.
-	    		while ((portsBeforeReenum.length != Serial.list().length) && ((timeout = (System.currentTimeMillis() - startTime)) < 8000)) {
-	    			Thread.sleep(1000);
-	    		}
-				System.out.println("second timeout: " + timeout);	    		
-	    		
-	    		// Figure out which port is new.
-				String portsAfterReenum[] = Serial.list();
-	    		for (String port : portsAfterReenum) {
-	    			if (!Arrays.asList(portsBeforeReenum).contains(port))
-	    				leonardoUploadPort = port;
-	    		}
-				System.out.println("found leo: " + leonardoUploadPort);
-    		} else {	
-    			// Reenumeration is much faster and less complicated on *nix:
-    			// After touching the port wait for it to disappear (timeout on this operation in
-    			// case the port is either not a Leonardo, is a Leonardo with no sketch loaded, 
-    			// or is a Leonardo that has already been manually reset).  Then wait for the same
-    			// port to reappear in the list and proceed.
-   	
-   				// Wait for the port to disappear from the list...
-		    	while (true == Arrays.asList(Serial.list()).contains(Preferences.get("serial.port")) && (System.currentTimeMillis() - startTime < 4000)) {
-	    			Thread.sleep(10);
-	    		}
-	    		// ...and wait for the same-named port to come back.
-	    		while (false == Arrays.asList(Serial.list()).contains(Preferences.get("serial.port")) && (System.currentTimeMillis() - startTime < 8000)) {
-  			   		Thread.sleep(10);
-	  		   	}
-	    	}	    	
-    	} catch (SerialException ex) { 
-    	} catch (InterruptedException ex) { }
+    String uploadPort = Preferences.get("serial.port");
+
+    // need to do a little dance for Leonardo and derivatives:
+    // open then close the port at the magic baudrate (usually 1200 bps) first
+    // to signal to the sketch that it should reset into bootloader. after doing
+    // this wait a moment for the bootloader to enumerate. On Windows, also must
+    // deal with the fact that the COM port number changes from bootloader to
+    // sketch.
+    if (boardPreferences.get("bootloader.path").equals("caterina_LUFA")) {
+      String caterinaUploadPort = null;
+      try {
+        // Toggle 1200 bps on selected serial port to force board reset.
+        List<String> before = Serial.list();
+        if (before.contains(uploadPort)) {
+          if (verbose)
+            System.out
+                .println(_("Forcing reset using 1200bps open/close on port ")
+                    + uploadPort);
+          Serial.touchPort(uploadPort, 1200);
+        }
+
+        // Wait for a port to appear on the list
+        long timeout = System.currentTimeMillis() + 10000;
+        while (System.currentTimeMillis() < timeout) {
+          List<String> now = Serial.list();
+          List<String> diff = new ArrayList<String>(now);
+          diff.removeAll(before);
+          System.out.print("{");
+          for (String p : before)
+            System.out.print(p+",");
+          System.out.print("} / {");
+          for (String p : now)
+            System.out.print(p+",");
+          System.out.print("} => {");
+          for (String p : diff)
+            System.out.print(p+",");
+          System.out.println("}");
+          if (diff.size() > 0) {
+            caterinaUploadPort = diff.get(0);
+            System.out.println("found leo: " + caterinaUploadPort);
+            break;
+          }
+          
+          // Keep track of port that disappears
+          before = now;
+          Thread.sleep(500);
+        }
+        
+        if (caterinaUploadPort == null)
+          // Something happened while detecting port
+          return false;
+        
+        uploadPort = caterinaUploadPort;
+      } catch (SerialException ex) {
+        return false;
+      } catch (InterruptedException ex) {
+        return false;
+      }
     }
     
     commandDownloader.add("-c" + protocol);
-    if (null == leonardoUploadPort) {
-	    commandDownloader.add(
-    	  "-P" + (Base.isWindows() ? "\\\\.\\" : "") + Preferences.get("serial.port"));
-    } else {
-	    commandDownloader.add(
-    	  "-P" + (Base.isWindows() ? "\\\\.\\" : "") + leonardoUploadPort);    
-    }
+    commandDownloader.add("-P" + (Base.isWindows() ? "\\\\.\\" : "")
+        + uploadPort);
     commandDownloader.add(
       "-b" + Integer.parseInt(boardPreferences.get("upload.speed")));
     commandDownloader.add("-D"); // don't erase
