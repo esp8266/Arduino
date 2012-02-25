@@ -1667,8 +1667,10 @@ SSL_SESSION *ssl_session_update(int max_sessions, SSL_SESSION *ssl_sessions[],
         {
             if (ssl_sessions[i])
             {
-                /* kill off any expired sessions */
-                if (tm > ssl_sessions[i]->conn_time + SSL_EXPIRY_TIME)
+                /* kill off any expired sessions (including those in 
+                   the future) */
+                if ((tm > ssl_sessions[i]->conn_time + SSL_EXPIRY_TIME) ||
+                            (tm < ssl_sessions[i]->conn_time))
                 {
                     session_free(ssl_sessions, i);
                     continue;
@@ -1712,13 +1714,9 @@ SSL_SESSION *ssl_session_update(int max_sessions, SSL_SESSION *ssl_sessions[],
     }
 
     /* ok, we've used up all of our sessions. So blow the oldest session away */
-    if (oldest_sess != NULL)
-    {
-        oldest_sess->conn_time = tm;
-        memset(oldest_sess->session_id, 0, sizeof(SSL_SESSION_ID_SIZE));
-        memset(oldest_sess->master_secret, 0, sizeof(SSL_SECRET_SIZE));
-    }
-
+    oldest_sess->conn_time = tm;
+    memset(oldest_sess->session_id, 0, sizeof(SSL_SESSION_ID_SIZE));
+    memset(oldest_sess->master_secret, 0, sizeof(SSL_SECRET_SIZE));
     SSL_CTX_UNLOCK(ssl->ssl_ctx->mutex);
     return oldest_sess;
 }
