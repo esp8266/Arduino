@@ -125,25 +125,24 @@ public class AvrdudeUploader extends Uploader  {
           Thread.sleep(500);
           elapsed += 500;
           
-          // If after 4 seconds the selected port is active use that port
-          if (elapsed == 4000) {
+          // If after 5 seconds the selected port is active use that port
+          if (elapsed == 5000 && now.contains(uploadPort)) {
             System.out.println("using selected port: " + uploadPort);
-            if (now.contains(uploadPort)) {
-              caterinaUploadPort = uploadPort;
-              break;
-            }
+            caterinaUploadPort = uploadPort;
+            break;
           }
         }
         
         if (caterinaUploadPort == null)
           // Something happened while detecting port
-          return false;
+          throw new RunnerException(
+              _("Couldn’t find the selected board. Try pressing the reset button after initiating the upload."));
         
         uploadPort = caterinaUploadPort;
-      } catch (SerialException ex) {
-        return false;
-      } catch (InterruptedException ex) {
-        return false;
+      } catch (SerialException e) {
+        throw new RunnerException(e.getMessage());
+      } catch (InterruptedException e) {
+        throw new RunnerException(e.getMessage());
       }
     }
     
