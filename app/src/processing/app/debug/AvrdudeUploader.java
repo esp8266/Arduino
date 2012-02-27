@@ -99,8 +99,8 @@ public class AvrdudeUploader extends Uploader  {
         }
 
         // Wait for a port to appear on the list
-        long timeout = System.currentTimeMillis() + 10000;
-        while (System.currentTimeMillis() < timeout) {
+        int elapsed = 0;
+        while (elapsed < 20000) {
           List<String> now = Serial.list();
           List<String> diff = new ArrayList<String>(now);
           diff.removeAll(before);
@@ -123,6 +123,16 @@ public class AvrdudeUploader extends Uploader  {
           // Keep track of port that disappears
           before = now;
           Thread.sleep(500);
+          elapsed += 500;
+          
+          // If after 4 seconds the selected port is active use that port
+          if (elapsed == 4000) {
+            System.out.println("using selected port: " + uploadPort);
+            if (now.contains(uploadPort)) {
+              caterinaUploadPort = uploadPort;
+              break;
+            }
+          }
         }
         
         if (caterinaUploadPort == null)
