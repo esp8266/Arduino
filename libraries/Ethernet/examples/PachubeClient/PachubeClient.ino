@@ -6,21 +6,32 @@
  the Adafruit Ethernet shield, either one will work, as long as it's got
  a Wiznet Ethernet module on board.
  
+ This example has been updated to use version 2.0 of the Pachube.com API. 
+ To make it work, create a feed with a datastream, and give it the ID
+ sensor1. Or change the code below to match your feed.
+ 
+ 
  Circuit:
  * Analog sensor attached to analog in 0
  * Ethernet shield attached to pins 10, 11, 12, 13
  
  created 15 March 2010
- updated 26 Oct 2011
- by Tom Igoe
+ updated 27 Feb 2012
+ by Tom Igoe with input from Usman Haque and Joe Saavedra
  
- http://www.tigoe.net/pcomp/code/category/arduinowiring/873
+http://arduino.cc/en/Tutorial/PachubeClient
  This code is in the public domain.
  
  */
 
 #include <SPI.h>
 #include <Ethernet.h>
+
+
+
+#define APIKEY         "YOUR API KEY GOES HERE" // replace your pachube api key here
+#define FEEDID         00000 // replace your feed ID
+#define USERAGENT      "My Project" // user agent is the project name
 
 // assign a MAC address for the ethernet controller.
 // Newer Ethernet shields have a MAC address printed on a sticker on the shield
@@ -41,19 +52,10 @@ const int postingInterval = 10000;  //delay between updates to Pachube.com
 void setup() {
   // start serial port:
   Serial.begin(9600);
-  // start the Ethernet connection:
+ // start the Ethernet connection:
   if (Ethernet.begin(mac) == 0) {
     Serial.println("Failed to configure Ethernet using DHCP");
-    // no point in carrying on, so do nothing forevermore:
-    for(;;)
-      ;
-  }
-  // give the ethernet module time to boot up:
-  delay(1000);
-  // start the Ethernet connection:
-  if (Ethernet.begin(mac) == 0) {
-    Serial.println("Failed to configure Ethernet using DHCP");
-    // Configure manually:
+    // DHCP failed, so use a fixed IP address:
     Ethernet.begin(mac, ip);
   }
 }
@@ -93,31 +95,40 @@ void sendData(int thisData) {
   // if there's a successful connection:
   if (client.connect("www.pachube.com", 80)) {
     Serial.println("connecting...");
-    // send the HTTP PUT request. 
-    // fill in your feed address here:
-    client.print("PUT /api/YOUR_FEED_HERE.csv HTTP/1.1\n");
-    client.print("Host: www.pachube.com\n");
-    // fill in your Pachube API key here:
-    client.print("X-PachubeApiKey: YOUR_KEY_HERE\n");
+   // send the HTTP PUT request:
+    client.print("PUT /v2/feeds/");
+    client.print(FEEDID);
+    client.println(".csv HTTP/1.1");
+    client.print("Host: api.pachube.com\n");
+    client.print("X-PachubeApiKey: ");
+    client.println(APIKEY);
+    client.print("User-Agent: ");
+    client.println(USERAGENT);
     client.print("Content-Length: ");
 
     // calculate the length of the sensor reading in bytes:
-    int thisLength = getLength(thisData);
-    client.println(thisLength, DEC);
+    // 8 bytes for "sensor1," + number of digits of the data:
+    int thisLength = 8 + getLength(thisData);
+    client.println(thisLength);
 
     // last pieces of the HTTP PUT request:
     client.print("Content-Type: text/csv\n");
     client.println("Connection: close\n");
 
     // here's the actual content of the PUT request:
-    client.println(thisData, DEC);
+     client.print("sensor1,");
+    client.println(thisData);
 
     // note the time that the connection was made:
     lastConnectionTime = millis();
   } 
   else {
-    // if you couldn't make a connection:
+  // if you couldn't make a connection:
     Serial.println("connection failed");
+    Serial.println();
+    Serial.println("disconnecting.");
+    client.stop();
+    lastConnected = client.connected();
   }
 }
 
