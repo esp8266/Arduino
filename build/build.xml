@@ -349,6 +349,13 @@
 
     <copy todir="linux/work" file="linux/dist/arduino" />
     <chmod perm="755" file="linux/work/arduino" />
+
+    <!-- Unzip AVR tools -->
+    <bunzip2 dest="linux" src="linux/avr_tools_linux32.tar.bz2" />
+    <exec executable="tar" dir="linux/work/hardware">
+      <arg value="-xvf"/>
+      <arg value="../../avr_tools_linux32.tar"/>
+    </exec>
   </target>
 
   <target name="linux64-build" depends="linux-build" description="Build linux (64-bit) version">
