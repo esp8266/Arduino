@@ -364,6 +364,12 @@
   <target name="linux64-build" depends="linux-build" description="Build linux (64-bit) version">
     <copy tofile="linux/work/hardware/tools/avrdude" file="linux/dist/tools/avrdude64" />
     <copy tofile="linux/work/lib/librxtxSerial.so" file="linux/dist/lib/librxtxSerial64.so" />
+    <!-- Unzip AVR tools -->
+    <bunzip2 dest="linux" src="linux/avr_tools_linux64.tar.bz2" />
+    <exec executable="tar" dir="linux/work/hardware">
+      <arg value="-xvf"/>
+      <arg value="../../avr_tools_linux64.tar"/>
+    </exec>
   </target>
   
   <target name="linux32-run" depends="linux32-build" 
