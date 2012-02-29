@@ -102,17 +102,20 @@ public class Serial implements SerialPortEventListener {
   }
 
   public static boolean touchPort(String iname, int irate) throws SerialException {
-    SerialPort port;
-    boolean result = false;
     try {
       Enumeration portList = CommPortIdentifier.getPortIdentifiers();
       while (portList.hasMoreElements()) {
         CommPortIdentifier portId = (CommPortIdentifier) portList.nextElement();
         if ((CommPortIdentifier.PORT_SERIAL == portId.getPortType()) && (portId.getName().equals(iname))) {
-          port = (SerialPort) portId.open("tap", 2000);
+          final SerialPort port = (SerialPort) portId.open("tap", 2000);
           port.setSerialPortParams(irate, 8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
-          port.close();				
-          result = true;
+          // Sometime the port close takes a lot to complete, so we run it in a parallel thread
+          new Thread() {
+            public void run() {
+              port.close();				
+            };
+          }.start();
+          return true;
         }
       }
     } catch (PortInUseException e) {
@@ -124,7 +127,7 @@ public class Serial implements SerialPortEventListener {
         I18n.format(_("Error touching serial port ''{0}''."), iname), e
       );
     }
-	return result;
+    return false;
   }
 
   public Serial(String iname, int irate,
