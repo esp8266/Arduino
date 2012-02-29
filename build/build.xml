@@ -341,18 +341,18 @@
     <antcall target="assemble">
       <param name="target.path" value="linux/work" />
     </antcall>
-  </target>
 
-  <target name="linux32-build" depends="linux-build" description="Build linux (32-bit) version">
+    <copy todir="linux/work" file="linux/dist/arduino" />
+    <chmod perm="755" file="linux/work/arduino" />
+
     <copy todir="linux/work/hardware">
       <fileset dir="linux/dist" includes="tools/**" />
     </copy>
 
     <chmod perm="755" file="linux/work/hardware/tools/avrdude" />
+  </target>
 
-    <copy todir="linux/work" file="linux/dist/arduino" />
-    <chmod perm="755" file="linux/work/arduino" />
-
+  <target name="linux32-build" depends="linux-build" description="Build linux (32-bit) version">
     <!-- Unzip AVR tools -->
     <bunzip2 dest="linux" src="linux/avr_tools_linux32.tar.bz2" />
     <exec executable="tar" dir="linux/work/hardware">
@@ -362,12 +362,15 @@
   </target>
 
   <target name="linux64-build" depends="linux-build" description="Build linux (64-bit) version">
-    <copy tofile="linux/work/hardware/tools/avrdude" file="linux/dist/tools/avrdude64" />
-    <copy tofile="linux/work/lib/librxtxSerial.so" file="linux/dist/lib/librxtxSerial64.so" />
+    <copy tofile="linux/work/hardware/tools/avrdude" file="linux/dist/tools/avrdude64" overwrite="true" />
+    <copy tofile="linux/work/lib/librxtxSerial.so" file="linux/dist/lib/librxtxSerial64.so" overwrite="true" />
+
+    <chmod perm="755" file="linux/work/hardware/tools/avrdude" />
+
     <!-- Unzip AVR tools -->
     <bunzip2 dest="linux" src="linux/avr_tools_linux64.tar.bz2" />
     <exec executable="tar" dir="linux/work/hardware">
-      <arg value="-xvf"/>
+      <arg value="-xf"/>
       <arg value="../../avr_tools_linux64.tar"/>
     </exec>
   </target>
