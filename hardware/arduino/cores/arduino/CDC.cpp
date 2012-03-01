@@ -106,21 +106,22 @@ bool WEAK CDC_Setup(Setup& setup)
 			// open at 1200 bps, is closed.  this is the signal to start the watchdog
 			// with a relatively long period so it can finish housekeeping tasks
 			// like servicing endpoints before the sketch ends
-
-			// We check DTR state to determine if host port is open (bit 0 of lineState).
-			// Serial1.print(">"); Serial1.println(_usbLineInfo.lineState, HEX);
-			if ((_usbLineInfo.lineState & 0x01) == 0 && _usbLineInfo.dwDTERate == 1200) {
-				*(uint16_t *)0x0A00 = 0x7777;
-				wdt_enable(WDTO_250MS);
-			} else {
-				// Most OSs do some intermediate steps when configuring ports and DTR can
-				// twiggle more than once before stabilizing.
-				// To avoid spurious resets we set the watchdog to 250ms and eventually
-				// cancel if DTR goes back high.
-
-				wdt_disable();
-				wdt_reset();
-				*(uint16_t *)0x0A00 = 0x0;
+			if (1200 == _usbLineInfo.dwDTERate) {
+				// We check DTR state to determine if host port is open (bit 0 of lineState).
+				// Serial1.print(">"); Serial1.println(_usbLineInfo.lineState, HEX);
+				if ((_usbLineInfo.lineState & 0x01) == 0) {
+					*(uint16_t *)0x0A00 = 0x7777;
+					wdt_enable(WDTO_250MS);
+				} else {
+					// Most OSs do some intermediate steps when configuring ports and DTR can
+					// twiggle more than once before stabilizing.
+					// To avoid spurious resets we set the watchdog to 250ms and eventually
+					// cancel if DTR goes back high.
+	
+					wdt_disable();
+					wdt_reset();
+					*(uint16_t *)0x0A00 = 0x0;
+				}
 			}
 			return true;
 		}
