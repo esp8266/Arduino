@@ -8,6 +8,7 @@
   <condition property="macosx"><os family="mac" /></condition>
   <condition property="windows"><os family="windows" /></condition>
   <condition property="linux"><os family="unix" /></condition>
+  <condition property="linux32"><os family="unix" arch="i386" /></condition>
   <condition property="linux64"><os family="unix" arch="amd64" /></condition>
   
   <condition property="platform" 
@@ -15,7 +16,7 @@
   <condition property="platform" 
 	     value="windows"><os family="windows" /></condition>
   <condition property="platform" 
-	     value="linux"><os family="unix" arch="i386" /></condition>
+	     value="linux32"><os family="unix" arch="i386" /></condition>
   <condition property="platform" 
 	     value="linux64"><os family="unix" arch="amd64" /></condition>
 
@@ -341,19 +342,21 @@
       <param name="target.path" value="linux/work" />
     </antcall>
 
+    <copy todir="linux/work" file="linux/dist/arduino" />
+    <chmod perm="755" file="linux/work/arduino" />
+
     <copy todir="linux/work/hardware">
       <fileset dir="linux/dist" includes="tools/**" />
     </copy>
 
     <chmod perm="755" file="linux/work/hardware/tools/avrdude" />
+  </target>
 
-    <copy todir="linux/work" file="linux/dist/arduino" />
-    <chmod perm="755" file="linux/work/arduino" />
-
+  <target name="linux32-build" depends="linux-build" description="Build linux (32-bit) version">
     <!-- Unzip AVR tools -->
     <bunzip2 dest="linux" src="linux/avr_tools_linux32.tar.bz2" />
     <exec executable="tar" dir="linux/work/hardware">
-      <arg value="-xvf"/>
+      <arg value="-xf"/>
       <arg value="../../avr_tools_linux32.tar"/>
     </exec>
   </target>
@@ -361,15 +364,18 @@
   <target name="linux64-build" depends="linux-build" description="Build linux (64-bit) version">
     <copy tofile="linux/work/hardware/tools/avrdude" file="linux/dist/tools/avrdude64" overwrite="true" />
     <copy tofile="linux/work/lib/librxtxSerial.so" file="linux/dist/lib/librxtxSerial64.so" overwrite="true" />
+
+    <chmod perm="755" file="linux/work/hardware/tools/avrdude" />
+
     <!-- Unzip AVR tools -->
     <bunzip2 dest="linux" src="linux/avr_tools_linux64.tar.bz2" />
     <exec executable="tar" dir="linux/work/hardware">
-      <arg value="-xvf"/>
+      <arg value="-xf"/>
       <arg value="../../avr_tools_linux64.tar"/>
     </exec>
   </target>
   
-  <target name="linux-run" depends="linux-build" 
+  <target name="linux32-run" depends="linux32-build" 
 	  description="Run Linux (32-bit) version">
     <exec executable="./linux/work/arduino" spawn="false"/>
   </target>
@@ -393,7 +399,7 @@
 <!--
     <tar compression="gzip" basedir="linux/work" 
 	 destfile="linux/arduino-${version}.tgz" />
--->
+
     <tar compression="gzip" destfile="linux/arduino-${version}-linux.tgz">
       <tarfileset dir="linux/work" 
 		  prefix="arduino-${version}" 
@@ -405,6 +411,18 @@
       <tarfileset file="linux/work/hardware/tools/avrdude" filemode="755" 
 		  prefix="arduino-${version}/hardware/tools" />
     </tar>
+-->
+    <move file="linux/work" tofile="linux/arduino-${version}" />
+
+    <exec executable="tar" dir="linux">
+      <arg value="-z"/>
+      <arg value="-c"/>
+      <arg value="-f"/>
+      <arg value="arduino-${version}-linux.tgz"/>
+      <arg value="arduino-${version}"/>
+    </exec>
+
+    <move file="linux/arduino-${version}" tofile="linux/work" />
 
     <echo>
       =======================================================
@@ -415,6 +433,8 @@
     </echo>
   </target>
 
+  <target name="linux32-dist" depends="linux-dist" 
+	  description="Build .tar.gz of linux version" />
   
   <target name="linux64-dist" depends="linux-dist" 
 	  description="Build .tar.gz of linux version" />

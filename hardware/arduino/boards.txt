@@ -185,7 +185,7 @@ leonardo.build.variant=leonardo
 
 mini328.name=Arduino Mini w/ ATmega328
 
-mini328.upload.protocol=stk500
+mini328.upload.protocol=arduino
 mini328.upload.maximum_size=28672
 mini328.upload.speed=115200
 
