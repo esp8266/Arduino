@@ -138,7 +138,7 @@ int main(void)
 		CDC_Task();
 		USB_USBTask();
 		/* Time out and start the sketch if one is present */
-		if (Timeout > 16000 && pgm_read_word(0) != 0xFFFF)
+		if (Timeout > 8000)
 			RunBootloader = false;
 
 		LEDPulse();
