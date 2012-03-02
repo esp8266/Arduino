@@ -45,6 +45,13 @@
 #define MAX_DHCP_OPT	16
 
 #define HOST_NAME "WIZnet"
+#define DEFAULT_LEASE	(900) //default lease time in seconds
+
+#define DHCP_CHECK_NONE         (0)
+#define DHCP_CHECK_RENEW_FAIL   (1)
+#define DHCP_CHECK_RENEW_OK     (2)
+#define DHCP_CHECK_REBIND_FAIL  (3)
+#define DHCP_CHECK_REBIND_OK    (4)
 
 enum
 {
@@ -139,8 +146,19 @@ private:
   uint8_t  _dhcpGatewayIp[4];
   uint8_t  _dhcpDhcpServerIp[4];
   uint8_t  _dhcpDnsServerIp[4];
+  uint32_t _dhcpLeaseTime;
+  uint32_t _dhcpT1, _dhcpT2;
+  signed long _renewInSec;
+  signed long _rebindInSec;
+  signed long _lastCheck;
+  unsigned long _timeout;
+  unsigned long _responseTimeout;
+  unsigned long _secTimeout;
+  uint8_t _dhcp_state;
   EthernetUDP _dhcpUdpSocket;
   
+  int request_DHCP_lease();
+  void reset_DHCP_lease();
   void presend_DHCP();
   void send_DHCP_MESSAGE(uint8_t, uint16_t);
   void printByte(char *, uint8_t);
@@ -154,6 +172,7 @@ public:
   IPAddress getDnsServerIp();
   
   int beginWithDHCP(uint8_t *, unsigned long timeout = 60000, unsigned long responseTimeout = 4000);
+  int checkLease();
 };
 
 #endif
