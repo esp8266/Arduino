@@ -14,10 +14,9 @@
  version 0019.  
  
  Circuit:
-  * Ethernet shield attached to pins 10, 11, 12, 13
+ * Ethernet shield attached to pins 10, 11, 12, 13
  
  created 21 May 2011
- updates 2 Mar 2012
  by Tom Igoe
  
  This code is in the public domain.
@@ -30,7 +29,7 @@
 // Enter a MAC address and IP address for your controller below.
 // The IP address will be dependent on your local network:
 byte mac[] = { 
-  0xDE,0xAD,0xBE,0xEF,0xFE,0xED };
+  0x00, 0xAA, 0xBB, 0xCC, 0xDE, 0x01 };
 IPAddress ip(192,168,1,20);
 
 // initialize the library instance:
@@ -52,17 +51,17 @@ void setup() {
   currentLine.reserve(256);
   tweet.reserve(150);
 
-// initialize serial:
+  // initialize serial:
   Serial.begin(9600);
   // attempt a DHCP connection:
   Serial.println("Attempting to get an IP address using DHCP:");
   if (!Ethernet.begin(mac)) {
-    Serial.println("failed to get an IP address using DHCP, trying manually");
     // if DHCP fails, start with a hard-coded address:
+    Serial.println("failed to get an IP address using DHCP, trying manually");
     Ethernet.begin(mac, ip);
   }
-  Serial.print("My IP address:");
-  Serial.println(ip);
+  Serial.print("My address:");
+  Serial.println(Ethernet.localIP());
   // connect to Twitter:
   connectToServer();
 }
@@ -119,7 +118,7 @@ void connectToServer() {
   Serial.println("connecting to server...");
   if (client.connect(serverName, 80)) {
     Serial.println("making HTTP request...");
-  // make HTTP GET request to twitter:
+    // make HTTP GET request to twitter:
     client.println("GET /1/statuses/user_timeline.xml?screen_name=arduino&count=1 HTTP/1.1");
     client.println("HOST: api.twitter.com");
     client.println();
@@ -127,3 +126,4 @@ void connectToServer() {
   // note the time of this connect attempt:
   lastAttemptTime = millis();
 }   
+
