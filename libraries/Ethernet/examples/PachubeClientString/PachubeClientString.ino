@@ -47,7 +47,7 @@ EthernetClient client;
 
 long lastConnectionTime = 0;        // last time you connected to the server, in milliseconds
 boolean lastConnected = false;      // state of the connection last time through the main loop
-const int postingInterval = 10000;  //delay between updates to Pachube.com
+const unsigned long postingInterval = 10000;  //delay between updates to Pachube.com
 
 void setup() {
   // start serial port:
