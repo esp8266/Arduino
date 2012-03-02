@@ -200,7 +200,7 @@ public class FindReplace extends JFrame implements ActionListener {
 
     pack();
     Insets insets = getInsets();
-    System.out.println("Insets = " + insets);
+    //System.out.println("Insets = " + insets);
     setSize(wide + insets.left + insets.right,high + insets.top + insets.bottom); 
 
     setLocationRelativeTo( null ); // center
