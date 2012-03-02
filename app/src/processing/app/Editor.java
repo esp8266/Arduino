@@ -1120,7 +1120,11 @@ public class Editor extends JFrame implements RunnerListener {
     undoItem.addActionListener(undoAction = new UndoAction());
     menu.add(undoItem);
 
-    redoItem = newJMenuItem(_("Redo"), 'Y');
+    if (!Base.isMacOS()) {
+        redoItem = newJMenuItem(_("Redo"), 'Y');
+    } else {
+        redoItem = newJMenuItemShift(_("Redo"), 'Z');
+    }
     redoItem.addActionListener(redoAction = new RedoAction());
     menu.add(redoItem);
 
@@ -1232,10 +1236,29 @@ public class Editor extends JFrame implements RunnerListener {
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           if (find != null) {
-            //find.find(true);
-            //FindReplace find = new FindReplace(Editor.this); //.show();
-            find.find(true);
+            find.findNext();
           }
+        }
+      });
+    menu.add(item);
+
+    item = newJMenuItemShift(_("Find Previous"), 'G');
+    item.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          if (find != null) {
+            find.findPrevious();
+          }
+        }
+      });
+    menu.add(item);
+
+    item = newJMenuItem(_("Use Selection For Find"), 'E');
+    item.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          if (find == null) {
+            find = new FindReplace(Editor.this);
+          }
+          find.setFindText( getSelectedText() );
         }
       });
     menu.add(item);
