@@ -93,7 +93,7 @@ void printCurrentNet() {
 
   // print the received signal strength:
   long rssi = WiFi.RSSI();
-  Serial.print("signal sgtrength (RSSI):");
+  Serial.print("signal strength (RSSI):");
   Serial.println(rssi);
 
   // print the encryption type:
