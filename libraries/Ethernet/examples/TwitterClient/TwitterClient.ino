@@ -17,6 +17,7 @@
   * Ethernet shield attached to pins 10, 11, 12, 13
  
  created 21 May 2011
+ updates 2 Mar 2012
  by Tom Igoe
  
  This code is in the public domain.
@@ -29,18 +30,18 @@
 // Enter a MAC address and IP address for your controller below.
 // The IP address will be dependent on your local network:
 byte mac[] = { 
-  0x00, 0xAA, 0xBB, 0xCC, 0xDE, 0x01 };
+  0xDE,0xAD,0xBE,0xEF,0xFE,0xED };
 IPAddress ip(192,168,1,20);
 
 // initialize the library instance:
 EthernetClient client;
 
-const int requestInterval = 60000;  // delay between requests
+const unsigned long requestInterval = 60000;  // delay between requests
 
 char serverName[] = "api.twitter.com";  // twitter URL
 
 boolean requested;                   // whether you've made a request since connecting
-long lastAttemptTime = 0;            // last time you connected to the server, in milliseconds
+unsigned long lastAttemptTime = 0;            // last time you connected to the server, in milliseconds
 
 String currentLine = "";            // string to hold the text from server
 String tweet = "";                  // string to hold the tweet
@@ -54,10 +55,14 @@ void setup() {
 // initialize serial:
   Serial.begin(9600);
   // attempt a DHCP connection:
+  Serial.println("Attempting to get an IP address using DHCP:");
   if (!Ethernet.begin(mac)) {
+    Serial.println("failed to get an IP address using DHCP, trying manually");
     // if DHCP fails, start with a hard-coded address:
     Ethernet.begin(mac, ip);
   }
+  Serial.print("My IP address:");
+  Serial.println(ip);
   // connect to Twitter:
   connectToServer();
 }
