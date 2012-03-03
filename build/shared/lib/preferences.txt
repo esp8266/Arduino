@@ -248,6 +248,7 @@ target = arduino
 programmer = arduino:avrispmkii
 
 upload.using = bootloader
+upload.verify = true
 
 serial.port=COM1
 serial.databits=8

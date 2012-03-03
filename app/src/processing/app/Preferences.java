@@ -116,6 +116,7 @@ public class Preferences {
   JCheckBox exportSeparateBox;
   JCheckBox verboseCompilationBox;
   JCheckBox verboseUploadBox;
+  JCheckBox verifyUploadBox;
   JCheckBox externalEditorBox;
   JCheckBox memoryOverrideBox;
   JTextField memoryField;
@@ -299,8 +300,16 @@ public class Preferences {
     d = box.getPreferredSize();
     box.setBounds(left, top, d.width, d.height);
     top += d.height + GUI_BETWEEN;
-    
 
+    // [ ] Verify code after upload
+    
+    verifyUploadBox = new JCheckBox("Verify code after upload");
+    pain.add(verifyUploadBox);
+    d = verifyUploadBox.getPreferredSize();
+    verifyUploadBox.setBounds(left, top, d.width + 10, d.height);
+    right = Math.max(right, left + d.width);
+    top += d.height + GUI_BETWEEN;
+    
     // [ ] Use external editor
 
     externalEditorBox = new JCheckBox(_("Use external editor"));
@@ -482,7 +491,8 @@ public class Preferences {
     // put each of the settings into the table
     setBoolean("build.verbose", verboseCompilationBox.isSelected());
     setBoolean("upload.verbose", verboseUploadBox.isSelected());
-
+    setBoolean("upload.verify", verifyUploadBox.isSelected());
+    
 //    setBoolean("sketchbook.closing_last_window_quits",
 //               closingLastQuitsBox.isSelected());
     //setBoolean("sketchbook.prompt", sketchPromptBox.isSelected());
@@ -539,6 +549,7 @@ public class Preferences {
     // set all settings entry boxes to their actual status
     verboseCompilationBox.setSelected(getBoolean("build.verbose"));
     verboseUploadBox.setSelected(getBoolean("upload.verbose"));
+    verifyUploadBox.setSelected(getBoolean("upload.verify"));
 
     //closingLastQuitsBox.
     //  setSelected(getBoolean("sketchbook.closing_last_window_quits"));
