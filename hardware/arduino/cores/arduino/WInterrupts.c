@@ -133,8 +133,6 @@ void attachInterrupt(uint8_t interruptNum, void (*userFunc)(void), int mode) {
     #elif defined(MCUCR) && defined(ISC20) && defined(GIMSK) && defined(GIMSK)
       MCUCR = (MCUCR & ~((1 << ISC20) | (1 << ISC21))) | (mode << ISC20);
       GIMSK |= (1 << INT2);
-    #else
-      #warning attachInterrupt may need some more work for this cpu (case 1)
     #endif
       break;
 #endif
