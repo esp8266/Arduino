@@ -144,7 +144,6 @@ u8 _hid_protocol = 1;
 u8 _hid_idle = 1;
 
 #define WEAK __attribute__ ((weak))
-#define WEAK 
 
 int WEAK HID_GetInterface(u8* interfaceNum)
 {
@@ -245,7 +244,7 @@ void Mouse_::release(uint8_t b)
 
 bool Mouse_::isPressed(uint8_t b)
 {
-	if (b & _buttons > 0) 
+	if ((b & _buttons) > 0) 
 		return true;
 	return false;
 }
