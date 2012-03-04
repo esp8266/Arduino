@@ -5,6 +5,8 @@
  *      Author: mlf by Metodo2 srl
  */
 
+//#define _APP_DEBUG_
+
 #include <avr32/io.h>
 #include "board.h"
 #include "gpio.h"
@@ -163,6 +165,9 @@ int result = WL_CONNECT_FAILED; //Store the result of the last operation
 void* mapSockTCP[MAX_SOCK_NUM];
 
 struct netif* ard_netif = NULL;
+
+// Network list retrived in the last scanNetwork
+static struct wl_network_t network_list[WL_NETWORKS_LIST_MAXNUM];
 
 void* getTTCP(uint8_t sock)
 {
@@ -355,6 +360,23 @@ void dump(char* _buf, uint16_t _count) {
 	printk("\n");
 #endif
 }
+
+#ifdef _APP_DEBUG_
+#define DUMP_SPI_CMD(BUF) do {				\
+	int i = 0;								\
+	for (; i < CMD_MAX_LEN; ++i) 			\
+	{										\
+		printk("0x%x ", BUF[i]);			\
+		if (BUF[i] == END_CMD)				\
+			break;							\
+	}										\
+	printk("\n");							\
+}while(0);
+#else
+#define DUMP_SPI_CMD(BUF) do {}while(0);
+#endif
+
+
 
 int spi_add_cmd(char _cmd_id, cmd_spi_cb_t cb, cmd_spi_rcb_t rcb, void* ctx,
 		char flag) {
@@ -796,10 +818,59 @@ cmd_spi_state_t get_reply_curr_net_cb(char* recv, char* reply, void* ctx, uint16
     return SPI_CMD_DONE;
 }
 
+cmd_spi_state_t get_reply_idx_net_cb(char* recv, char* reply, void* ctx, uint16_t* count) {
+
+	uint32_t type = (uint32_t)ctx;
+    CHECK_ARD_NETIF(recv, reply, count);
+
+    CREATE_HEADER_REPLY(reply, recv, 1);
+
+    DUMP_SPI_CMD(recv);
+
+    GET_DATA_BYTE(idx, recv+4);
+
+    if (idx >= WL_NETWORKS_LIST_MAXNUM)
+    {
+    	WARN("Index out of range: %d\n", idx);
+    	return SPI_CMD_DONE;
+    }
+    uint8_t len = 0;
+    switch (type)
+    {
+    	default:
+    	case GET_IDX_SSID_CMD:
+			{
+				len = network_list[idx].ssid.len;
+				PUT_BUFDATA_BYTE(network_list[idx].ssid.ssid, len, reply, 3);
+				INFO_UTIL("SSID:%s\n", network_list[idx].ssid.ssid);
+				break;
+			}
+    	case GET_IDX_RSSI_CMD:
+			{
+				len = 4;
+				PUT_LONG_IN_BYTE_HO(network_list[idx].rssi, reply, 3);
+				INFO_UTIL("RSSI:%d\n", network_list[idx].rssi);
+				break;
+			}
+    	case GET_IDX_ENCT_CMD:
+			{
+				len = 1;
+				PUT_DATA_BYTE(network_list[idx].enc_type, reply, 3);
+				INFO_UTIL("ENCT:%d\n", network_list[idx].enc_type);
+				break;
+			}
+   	}
+
+
+    END_HEADER_REPLY(reply, 3+len+1, *count);
+
+    dump(reply, *count);
+
+    return SPI_CMD_DONE;
+}
+
 
 cmd_spi_state_t get_reply_scan_networks_cb(char* recv, char* reply, void* ctx, uint16_t* count) {
-
-	struct wl_network_t network_list[WL_NETWORKS_LIST_MAXNUM];
 
 	INFO_SPI("netif:0x%x\n", ard_netif);
 	CHECK_ARD_NETIF(recv, reply, count);
@@ -837,6 +908,8 @@ cmd_spi_state_t get_reply_scan_networks_cb(char* recv, char* reply, void* ctx, u
     	 uint8_t len = network_list[ii].ssid.len;
     	 PUT_BUFDATA_BYTE(network_list[ii].ssid.ssid, len, reply, start);
     	 start += len+1;
+    	 INFO_SPI("%d - %s - %d - %d - 0x%x\n",ii, network_list[ii].ssid.ssid, network_list[ii].enc_type,
+    			 network_list[ii].rssi, network_list[ii].bssid);
      }
 
      END_HEADER_REPLY(reply, start, *count);
@@ -1129,6 +1202,10 @@ void init_spi_cmds() {
 	spi_add_cmd(GET_CURR_ENCT_CMD, ack_cmd_cb, get_reply_curr_net_cb, (void*)GET_CURR_ENCT_CMD, CMD_GET_FLAG);
 	spi_add_cmd(SCAN_NETWORKS, ack_cmd_cb, get_reply_scan_networks_cb, NULL, CMD_GET_FLAG);
 	spi_add_cmd(DISCONNECT_CMD, disconnect_cmd_cb, ack_reply_cb, NULL, CMD_SET_FLAG);
+	spi_add_cmd(GET_IDX_ENCT_CMD, ack_cmd_cb, get_reply_idx_net_cb, (void*)GET_IDX_ENCT_CMD, CMD_GET_FLAG);
+	spi_add_cmd(GET_IDX_SSID_CMD, ack_cmd_cb, get_reply_idx_net_cb, (void*)GET_IDX_SSID_CMD, CMD_GET_FLAG);
+	spi_add_cmd(GET_IDX_RSSI_CMD, ack_cmd_cb, get_reply_idx_net_cb, (void*)GET_IDX_RSSI_CMD, CMD_GET_FLAG);
+
 	spi_add_cmd(START_SERVER_TCP_CMD, start_server_tcp_cmd_cb, ack_reply_cb, NULL, CMD_SET_FLAG);
 	spi_add_cmd(START_CLIENT_TCP_CMD, start_client_tcp_cmd_cb, ack_reply_cb, NULL, CMD_SET_FLAG);
 	spi_add_cmd(STOP_CLIENT_TCP_CMD, stop_client_tcp_cmd_cb, ack_reply_cb, NULL, CMD_SET_FLAG);
@@ -1237,7 +1314,6 @@ void spi_poll(struct netif* netif) {
 			{
 				//LED_On(LED1);
 				//INFO_SPI("[E(0x%x):%d spiStatus:%d]\n", statSpi.lastCmd, err, statSpi.status);
-				PRINT_STATS_SPI();
 				DUMP(buf, count);
 				DUMP(reply, replyCount);
 				//LED_Off(LED1);

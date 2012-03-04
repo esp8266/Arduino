@@ -47,8 +47,10 @@ enum {
     START_CLIENT_TCP_CMD= 0x2D,
     STOP_CLIENT_TCP_CMD = 0x2E,
     GET_CLIENT_STATE_TCP_CMD = 0x2F,
-
     DISCONNECT_CMD		= 0x30,
+	GET_IDX_SSID_CMD	= 0x31,
+	GET_IDX_RSSI_CMD	= 0x32,
+	GET_IDX_ENCT_CMD	= 0x33,
     // All command with DATA_FLAG 0x40 send a 16bit Len
 
 	SEND_DATA_TCP_CMD		= 0x44,

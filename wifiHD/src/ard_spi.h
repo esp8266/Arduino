@@ -45,12 +45,6 @@ typedef enum {
 typedef int (*cmd_spi_cb_t)(int numParam, char* buf, void* ctx);
 typedef cmd_spi_state_t (*cmd_spi_rcb_t)(char* recv, char* reply, void* ctx, uint16_t* _count);
 
-#ifdef _APP_DEBUG_
-#define PRINT_STATS_SPI() do { printStatSpi(); }while(0);
-#else
-#define PRINT_STATS_SPI() do { }while(0);
-#endif
-
 void set_result_cmd(int err) ;
 
 void set_result(wl_status_t _status);
