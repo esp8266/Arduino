@@ -132,7 +132,8 @@ void printWifiStatus() {
 
   // print your WiFi shield's IP address:
   IPAddress ip = WiFi.localIP();
-  Serial.print("IP Address: ");
+    Serial.print("IP Address: ");
+  Serial.println(ip);
 
   // print the received signal strength:
   long rssi = WiFi.RSSI();

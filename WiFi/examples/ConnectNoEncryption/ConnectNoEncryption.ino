@@ -48,7 +48,8 @@ void loop() {
 void printWifiData() {
   // print your WiFi shield's IP address:
   IPAddress ip = WiFi.localIP();
-  Serial.print("IP Address: ");
+    Serial.print("IP Address: ");
+  Serial.println(ip);
   Serial.println(ip);
   
   // print your MAC address:
