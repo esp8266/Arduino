@@ -24,19 +24,19 @@ void setup() {
 
   // attempt to connect using WEP encryption:
   Serial.println("Initializing Wifi...");
-  //WiFi.begin("no network");
   printMacAddress();
+
 
   // scan for existing networks:
   Serial.println("Scanning available networks...");
-  scanNetworks();
+  listNetworks();
 }
 
 void loop() {
   delay(10000);
   // scan for existing networks:
   Serial.println("Scanning available networks...");
-  scanNetworks();
+  listNetworks();
 }
 
 void printMacAddress() {
@@ -59,19 +59,20 @@ void printMacAddress() {
   Serial.println(mac[0],HEX);
 }
 
-void scanNetworks() {
+void listNetworks() {
   // scan for nearby networks:
   Serial.println("** Scan Networks **");
   byte numSsid = WiFi.scanNetworks();
 
   // print the list of networks seen:
-  Serial.print("SSID List:");
+  Serial.print("number of available networks:");
   Serial.println(numSsid);
-  Serial.println("#\tNetwork:\tRSSI:\tEncryption:");
+  
+  Serial.println("#\tName\tRSSI\tencryptionType:");
   // print the network number and name for each network found:
   for (int thisNet = 0; thisNet<numSsid; thisNet++) {
     Serial.print(thisNet);
-    Serial.print(")\t");
+    Serial.print("\t");
     Serial.print(WiFi.SSID(thisNet));
     Serial.print("\t");
     Serial.print(WiFi.RSSI(thisNet));
