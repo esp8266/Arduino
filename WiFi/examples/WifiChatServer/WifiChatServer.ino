@@ -22,12 +22,9 @@
 
 #include <SPI.h>
 #include <WiFi.h>
-char ssid[] = "tigoenet"; //  your network SSID (name) 
-char pass[] = "m30w-m30w";    // your network password (use for WPA, or use as key for WEP)
 
-
-//char ssid[] = "YourNetwork"; //  your network SSID (name) 
-//char pass[] = "password";    // your network password (use for WPA, or use as key for WEP)
+char ssid[] = "YourNetwork"; //  your network SSID (name) 
+char pass[] = "password";    // your network password (use for WPA, or use as key for WEP)
 int keyIndex = 0;            // your network key Index number (needed only for WEP)
 
 int status = WL_IDLE_STATUS;
