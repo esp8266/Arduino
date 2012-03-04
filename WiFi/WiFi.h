@@ -4,9 +4,10 @@
 #include <inttypes.h>
 
 extern "C" {
-  #include "utility/wl_definitions.h"
+	#include "utility/wl_definitions.h"
+	#include "utility/wl_types.h"
 }
-  
+
 #include "IPAddress.h"
 #include "WiFiClient.h"
 #include "WiFiServer.h"
@@ -28,20 +29,31 @@ public:
 
     WiFiClass();
 
-    // Get thefirst socket available
+    // Get the first socket available
     static uint8_t getSocket();
 
-    // Start Wifi connection with latest settings
-    int begin();
-
-    // Start Wifi connection with no encryption
+    /* Start Wifi connection for OPEN networks
+     *
+     * param ssid: Pointer to the SSID string.
+     */
     int begin(char* ssid);
 
-    // Start Wifi connection with WEP encryption
+    /* Start Wifi connection with WEP encryption.
+     * Configure a key into the device. The key type (WEP-40, WEP-104)
+     * is determined by the size of the key (5 bytes for WEP-40, 13 bytes for WEP-104).
+     *
+     * param ssid: Pointer to the SSID string.
+     * param key_idx: The key index to set. Valid values are 0-3.
+     * param key: Key input buffer.
+     */
     int begin(char* ssid, uint8_t key_idx, const char* key);
 
-    // Start Wifi connection with passphrase
-    // the most secure supported mode will be automatically selected
+    /* Start Wifi connection with passphrase
+     * the most secure supported mode will be automatically selected
+     *
+     * param passphrase: Passphrase. Valid characters in a passphrase
+     *        must be between ASCII 32-126 (decimal).
+     */
     int begin(char* ssid, const char *passphrase);
 
     // Disconnect from the network
@@ -83,11 +95,11 @@ public:
     // Return the current RSSI /Received Signal Strength in dBm) associated with the network identified with networkItem
     int32_t RSSI(uint8_t networkItem);
 
-    // Return Connection status
+    /* Return Connection status.
+     *
+     * return: one of the value defined in wl_status_t
+     */
     uint8_t status();
-
-    // function used for test
-    uint8_t test();
 
     friend class WiFiClient;
     friend class WiFiServer;

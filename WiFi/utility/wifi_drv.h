@@ -14,6 +14,8 @@ class WiFiDrv
 private:
 	// settings of requested network
 	static char 	_networkSsid[WL_NETWORKS_LIST_MAXNUM][WL_SSID_MAX_LENGTH];
+	static int32_t 	_networkRssi[WL_NETWORKS_LIST_MAXNUM];
+	static uint8_t 	_networkEncr[WL_NETWORKS_LIST_MAXNUM];
 
 	// settings of current selected network
 	static char 	_ssid[WL_SSID_MAX_LENGTH];
@@ -63,7 +65,6 @@ public:
 
     static uint8_t getEncTypeNetowrks(uint8_t networkItem);
 
-    static uint8_t testCmd();
 };
 
 extern WiFiDrv wiFiDrv;

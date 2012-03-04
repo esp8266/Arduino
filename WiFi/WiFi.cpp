@@ -40,13 +40,6 @@ uint8_t WiFiClass::getSocket()
     return NO_SOCKET_AVAIL;
 }
 
-int WiFiClass::begin()
-{
-	// Add procedure to read the latest configuration from eeprom/dataflash
-	// and start the wifi connection
-	return WL_IDLE_STATUS;
-}
-
 int WiFiClass::begin(char* ssid)
 {
 	uint8_t status = WL_IDLE_STATUS;
@@ -187,12 +180,5 @@ uint8_t WiFiClass::status()
 {
     return WiFiDrv::getConnectionStatus();
 }
-
-uint8_t WiFiClass::test()
-{
-    return WiFiDrv::testCmd();
-}
-
-
 
 WiFiClass WiFi;

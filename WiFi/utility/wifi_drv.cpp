@@ -15,6 +15,9 @@ extern "C" {
 }
 
 char 	WiFiDrv::_networkSsid[][WL_SSID_MAX_LENGTH] = {{"1"},{"2"},{"3"},{"4"},{"5"}};
+int32_t WiFiDrv::_networkRssi[WL_NETWORKS_LIST_MAXNUM] = { 0 };
+uint8_t WiFiDrv::_networkEncr[WL_NETWORKS_LIST_MAXNUM] = { 0 };
+
 char 	WiFiDrv::_ssid[] = {0};
 uint8_t	WiFiDrv::_bssid[] = {0};
 uint8_t WiFiDrv::_mac[] = {0};
@@ -289,7 +292,7 @@ uint8_t WiFiDrv::getCurrentEncryptionType()
     // Wait for reply
     uint8_t dataLen = 0;
     uint8_t encType = 0;
-    SpiDrv::waitResponseCmd(GET_CURR_ENCT_CMD, PARAM_NUMS_1, (uint8_t*)encType, &dataLen);
+    SpiDrv::waitResponseCmd(GET_CURR_ENCT_CMD, PARAM_NUMS_1, (uint8_t*)&encType, &dataLen);
 
     SpiDrv::spiSlaveDeselect();
 
@@ -302,9 +305,6 @@ uint8_t WiFiDrv::scanNetworks()
 
     // Send Command
     SpiDrv::sendCmd(SCAN_NETWORKS, PARAM_NUMS_0);
-
-//    uint8_t _dummy = DUMMY_DATA;
-//    SpiDrv::sendParam(&_dummy, 1, LAST_PARAM);
 
     //Wait the reply elaboration
     SpiDrv::waitForSlaveReady();
@@ -330,10 +330,25 @@ uint8_t WiFiDrv::getEncTypeNetowrks(uint8_t networkItem)
 {
 	if (networkItem >= WL_NETWORKS_LIST_MAXNUM)
 		return NULL;
-	uint8_t networkEncType = 0;
 
-	//TODO make an RPC call to get the encryption type associated with networkItem
-	return networkEncType;
+	WAIT_FOR_SLAVE_SELECT();
+
+    // Send Command
+    SpiDrv::sendCmd(GET_IDX_ENCT_CMD, PARAM_NUMS_1);
+
+    SpiDrv::sendParam(&networkItem, 1, LAST_PARAM);
+
+    //Wait the reply elaboration
+    SpiDrv::waitForSlaveReady();
+
+    // Wait for reply
+    uint8_t dataLen = 0;
+    uint8_t encType = 0;
+    SpiDrv::waitResponseCmd(GET_IDX_ENCT_CMD, PARAM_NUMS_1, (uint8_t*)&encType, &dataLen);
+
+    SpiDrv::spiSlaveDeselect();
+
+    return encType;
 }
 
 int32_t WiFiDrv::getRSSINetoworks(uint8_t networkItem)
@@ -342,29 +357,23 @@ int32_t WiFiDrv::getRSSINetoworks(uint8_t networkItem)
 		return NULL;
 	int32_t	networkRssi = 0;
 
-	//TODO make an RPC call to get the rssi associated with networkItem
-	return networkRssi;
-}
-
-uint8_t WiFiDrv::testCmd()
-{
 	WAIT_FOR_SLAVE_SELECT();
 
     // Send Command
-    SpiDrv::sendCmd(TEST_CMD, PARAM_NUMS_0);
+    SpiDrv::sendCmd(GET_IDX_RSSI_CMD, PARAM_NUMS_1);
+
+    SpiDrv::sendParam(&networkItem, 1, LAST_PARAM);
 
     //Wait the reply elaboration
     SpiDrv::waitForSlaveReady();
 
     // Wait for reply
-    uint8_t _data = 0;
-    uint8_t _dataLen = 0;
-    SpiDrv::waitResponseCmd(TEST_CMD, PARAM_NUMS_1, &_data, &_dataLen);
+    uint8_t dataLen = 0;
+    SpiDrv::waitResponseCmd(GET_IDX_RSSI_CMD, PARAM_NUMS_1, (uint8_t*)&networkRssi, &dataLen);
 
     SpiDrv::spiSlaveDeselect();
 
-    return _data;
+	return networkRssi;
 }
-
 
 WiFiDrv wiFiDrv;
