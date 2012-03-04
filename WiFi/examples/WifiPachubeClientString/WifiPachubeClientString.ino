@@ -4,6 +4,13 @@
  This sketch connects an analog sensor to Pachube (http://www.pachube.com)
  using a Arduino Wifi shield.
  
+ This example is written for a network using WPA encryption. For 
+ WEP or WPA, change the Wifi.begin() call accordingly.
+ 
+ This example has been updated to use version 2.0 of the Pachube.com API. 
+ To make it work, create a feed with a datastream, and give it the ID
+ sensor1. Or change the code below to match your feed.
+ 
  This example uses the String library, which is part of the Arduino core from
  version 0019.  
  
@@ -11,7 +18,7 @@
  * Analog sensor attached to analog in 0
  * Wifi shield attached to pins 10, 11, 12, 13
  
- created 2 March 2012
+ created 4 March 2012
  by Tom Igoe
  
  This code is in the public domain.
@@ -39,7 +46,7 @@ const int postingInterval = 10000;  //delay between updates to Pachube.com
 void setup() {
   // start serial port:
   Serial.begin(9600);
-    status = WiFi.begin(ssid, pass);
+  status = WiFi.begin(ssid, pass);
   if ( status != WL_CONNECTED) { 
     Serial.println("Couldn't get a wifi connection");
     while(true);
@@ -53,9 +60,9 @@ void loop() {
   // read the analog sensor:
   int sensorReading = analogRead(A0);   
   // convert the data to a String to send it:
-  
+
   String dataString = "sensor1,";
- dataString += sensorReading;
+  dataString += sensorReading;
 
   // you can append multiple readings to this String if your
   // pachube feed is set up to handle multiple values:
@@ -125,3 +132,5 @@ void sendData(String thisData) {
     lastConnected = client.connected();
   }
 }
+
+
