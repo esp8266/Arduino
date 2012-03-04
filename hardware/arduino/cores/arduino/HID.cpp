@@ -253,7 +253,7 @@ bool Mouse_::isPressed(uint8_t b)
 //================================================================================
 //	Keyboard
 
-Keyboard_::Keyboard_() : _keyMap(0)
+Keyboard_::Keyboard_() : _keyMap(0) 
 {
 }
 
@@ -406,38 +406,80 @@ const uint8_t _asciimap[128] =
 
 uint8_t USBPutChar(uint8_t c);
 
+size_t Keyboard_::press(uint8_t k) 
+{
+	uint8_t i;
+	k = pgm_read_byte(_asciimap + k);
+	if (!k) {
+		setWriteError();
+		return 0;
+	}
+	if (k & 0x80) {
+		_keyReport.modifiers |= KEY_MODIFIER_LEFT_SHIFT;
+		k &= 0x7F;
+	}
+	if (_keyReport.keys[0] != k && _keyReport.keys[1] != k && 
+		_keyReport.keys[2] != k && _keyReport.keys[3] != k &&
+		_keyReport.keys[4] != k && _keyReport.keys[5] != k) {
+		
+		for (i=0; i<6; i++) {
+			if (_keyReport.keys[i] == 0x00) {
+				_keyReport.keys[i] = k;
+				break;
+			}
+		}
+		if (i == 6) {
+			setWriteError();
+			return 0;
+		}	
+	}
+	sendReport(&_keyReport);
+	return 1;
+}
+
+size_t Keyboard_::release(uint8_t k) 
+{
+	uint8_t i;
+	k = pgm_read_byte(_asciimap + k);
+	if (!k) {
+		return 0;
+	}
+	if (k & 0x80) {
+		_keyReport.modifiers |= KEY_MODIFIER_LEFT_SHIFT;
+		k &= 0x7F;
+	}
+	for (i=0; i<6; i++) {
+		if (_keyReport.keys[i] == k) {
+			_keyReport.keys[i] = 0x00;
+			break;
+		}
+	}
+	if (i == 6) {
+		return 0;
+	}
+	sendReport(&_keyReport);
+	return 1;
+}
+
+void Keyboard_::releaseAll(void)
+{
+	_keyReport.keys[0] = 0;
+	_keyReport.keys[1] = 0;	
+	_keyReport.keys[2] = 0;
+	_keyReport.keys[3] = 0;	
+	_keyReport.keys[4] = 0;
+	_keyReport.keys[5] = 0;	
+	_keyReport.modifiers = 0;
+	sendReport(&_keyReport);
+}
+
 size_t Keyboard_::type(uint8_t c)
 {
+	releaseAll();
 	// Keydown
-	{
-		KeyReport keys = {0};
-		if (_keyMap)
-			_keyMap->charToKey(c,&keys);
-		else
-		{
-			if (c >= 128) {
-				setWriteError();
-				return 0;
-			}
-			c = pgm_read_byte(_asciimap + c);
-			if (!c) {
-				setWriteError();
-				return 0;
-			}
-			if (c & 0x80)
-			{
-				keys.modifiers |= KEY_MODIFIER_LEFT_SHIFT;
-				c &= 0x7F;
-			}
-			keys.keys[0] = c;
-		}
-		sendReport(&keys);
-	}
+	press(c);
 	//	Keyup
-	{
-		KeyReport keys = {0};
-		sendReport(&keys);
-	}
+	releaseAll();
 	return 1;
 }
 

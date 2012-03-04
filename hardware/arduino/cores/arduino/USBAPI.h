@@ -100,12 +100,16 @@ class Keyboard_ : public Print
 {
 private:
 	KeyMap* _keyMap;
+	KeyReport _keyReport;
 	void sendReport(KeyReport* keys);
 	void setKeyMap(KeyMap* keyMap);	
 public:
 	Keyboard_();
-	virtual size_t write(uint8_t c) {return type(c);};
-	virtual size_t type(uint8_t c);
+	virtual size_t write(uint8_t k) {return type(k);};
+	virtual size_t type(uint8_t k);
+	virtual size_t press(uint8_t k);
+	virtual size_t release(uint8_t k);
+	virtual void releaseAll(void);
 };
 extern Keyboard_ Keyboard;
 
