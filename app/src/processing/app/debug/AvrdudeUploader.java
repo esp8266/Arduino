@@ -152,6 +152,7 @@ public class AvrdudeUploader extends Uploader  {
     commandDownloader.add(
       "-b" + Integer.parseInt(boardPreferences.get("upload.speed")));
     commandDownloader.add("-D"); // don't erase
+    if (!Preferences.getBoolean("upload.verify")) commandDownloader.add("-V"); // disable verify
     commandDownloader.add("-Uflash:w:" + buildPath + File.separator + className + ".hex:i");
 
     if (boardPreferences.get("upload.disable_flushing") == null ||
