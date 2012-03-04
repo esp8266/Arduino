@@ -253,18 +253,13 @@ bool Mouse_::isPressed(uint8_t b)
 //================================================================================
 //	Keyboard
 
-Keyboard_::Keyboard_() : _keyMap(0) 
+Keyboard_::Keyboard_() 
 {
 }
 
 void Keyboard_::sendReport(KeyReport* keys)
 {
 	HID_SendReport(2,keys,sizeof(KeyReport));
-}
-
-void Keyboard_::setKeyMap(KeyMap* keyMap)
-{
-	_keyMap = keyMap;
 }
 
 extern

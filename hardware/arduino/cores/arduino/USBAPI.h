@@ -87,22 +87,11 @@ typedef struct
 	uint8_t keys[6];
 } KeyReport;
 
-//	Map a character into a key report
-//	Called from Print to map text to keycodes
-class KeyMap
-{
-public:
-	virtual void charToKey(int c, KeyReport* keyReport) = 0;
-};
-
-//	
 class Keyboard_ : public Print
 {
 private:
-	KeyMap* _keyMap;
 	KeyReport _keyReport;
 	void sendReport(KeyReport* keys);
-	void setKeyMap(KeyMap* keyMap);	
 public:
 	Keyboard_();
 	virtual size_t write(uint8_t k) {return type(k);};
