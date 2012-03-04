@@ -401,18 +401,32 @@ const uint8_t _asciimap[128] =
 
 uint8_t USBPutChar(uint8_t c);
 
+// press() adds the specified key (printing, non-printing, or modifier)
+// to the persistent key report and sends the report.  Because of the way 
+// USB HID works, the host acts like the key remains pressed until we 
+// call release(), releaseAll(), or otherwise clear the report and resend.
 size_t Keyboard_::press(uint8_t k) 
 {
 	uint8_t i;
-	k = pgm_read_byte(_asciimap + k);
-	if (!k) {
-		setWriteError();
-		return 0;
+	if (k >= 136) {			// it's a non-printing key (not a modifier)
+		k = k - 136;
+	} else if (k >= 128) {	// it's a modifier key
+		_keyReport.modifiers |= (1<<(k-128));
+		k = 0;
+	} else {				// it's a printing key
+		k = pgm_read_byte(_asciimap + k);
+		if (!k) {
+			setWriteError();
+			return 0;
+		}
+		if (k & 0x80) {
+			_keyReport.modifiers |= 0x02;	// the left shift modifier
+			k &= 0x7F;
+		}
 	}
-	if (k & 0x80) {
-		_keyReport.modifiers |= KEY_MODIFIER_LEFT_SHIFT;
-		k &= 0x7F;
-	}
+	
+	// Add k to the key report only if it's not already present
+	// and if there is an empty slot.
 	if (_keyReport.keys[0] != k && _keyReport.keys[1] != k && 
 		_keyReport.keys[2] != k && _keyReport.keys[3] != k &&
 		_keyReport.keys[4] != k && _keyReport.keys[5] != k) {
@@ -432,17 +446,40 @@ size_t Keyboard_::press(uint8_t k)
 	return 1;
 }
 
+// release() takes the specified key out of the persistent key report and
+// sends the report.  This tells the OS the key is no longer pressed and that
+// it shouldn't be repeated any more.
 size_t Keyboard_::release(uint8_t k) 
 {
+	/*
 	uint8_t i;
 	k = pgm_read_byte(_asciimap + k);
 	if (!k) {
 		return 0;
 	}
 	if (k & 0x80) {
-		_keyReport.modifiers |= KEY_MODIFIER_LEFT_SHIFT;
+		_keyReport.modifiers |= 0x02;	// the left shift modifier
 		k &= 0x7F;
 	}
+	*/
+	uint8_t i;
+	if (k >= 136) {			// it's a non-printing key (not a modifier)
+		k = k - 136;
+	} else if (k >= 128) {	// it's a modifier key
+		_keyReport.modifiers &= ~(1<<(k-128));
+		k = 0;
+	} else {				// it's a printing key
+		k = pgm_read_byte(_asciimap + k);
+		if (!k) {
+			return 0;
+		}
+		if (k & 0x80) {
+			_keyReport.modifiers &= ~(0x02);	// the left shift modifier
+			k &= 0x7F;
+		}
+	}
+	
+	// Test the key report to see if k is present.  Clear it if it exists.
 	for (i=0; i<6; i++) {
 		if (_keyReport.keys[i] == k) {
 			_keyReport.keys[i] = 0x00;
@@ -468,6 +505,7 @@ void Keyboard_::releaseAll(void)
 	sendReport(&_keyReport);
 }
 
+// type() does a press and release of the specified key. 
 size_t Keyboard_::type(uint8_t c)
 {
 	releaseAll();
