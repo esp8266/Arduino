@@ -125,8 +125,10 @@ public class AvrdudeUploader extends Uploader  {
           Thread.sleep(250);
           elapsed += 250;
           
-          // If after 5 seconds the selected port is active use that port
-          if (elapsed == 5000 && now.contains(uploadPort)) {
+          // On Windows, it can take a long time for the port to disappear and
+          // come back, so use a longer time out before assuming that the selected
+          // port is the bootloader (not the sketch).
+          if (((!Base.isWindows() && elapsed >= 500) || elapsed >= 5000) && now.contains(uploadPort)) {
             System.out.println("using selected port: " + uploadPort);
             caterinaUploadPort = uploadPort;
             break;
