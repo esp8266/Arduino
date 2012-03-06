@@ -1215,7 +1215,6 @@ void init_spi_cmds() {
 	spi_add_cmd(SEND_DATA_TCP_CMD, send_data_tcp_cmd_cb, ack_reply_cb, NULL, CMD_IMM_SET_FLAG);
 	spi_add_cmd(DATA_SENT_TCP_CMD, ack_cmd_cb, data_sent_tcp_cmd_cb, NULL, CMD_GET_FLAG);
 	spi_add_cmd(GET_DATABUF_TCP_CMD, ack_cmd_cb, get_databuf_tcp_cmd_cb, NULL, CMD_GET_FLAG);
-	spi_add_cmd(TEST_CMD, ack_cmd_cb, test_cmd_cb, NULL, CMD_GET_FLAG);
 	spi_add_cmd(GET_CLIENT_STATE_TCP_CMD, ack_cmd_cb, get_client_state_tcp_cmd_cb, NULL, CMD_GET_FLAG);
 }
 
