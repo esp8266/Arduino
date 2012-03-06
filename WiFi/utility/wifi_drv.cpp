@@ -14,10 +14,12 @@ extern "C" {
 #include "debug.h"
 }
 
+// Array of data to cache the information related to the networks discovered
 char 	WiFiDrv::_networkSsid[][WL_SSID_MAX_LENGTH] = {{"1"},{"2"},{"3"},{"4"},{"5"}};
 int32_t WiFiDrv::_networkRssi[WL_NETWORKS_LIST_MAXNUM] = { 0 };
 uint8_t WiFiDrv::_networkEncr[WL_NETWORKS_LIST_MAXNUM] = { 0 };
 
+// Cached values of retrieved data
 char 	WiFiDrv::_ssid[] = {0};
 uint8_t	WiFiDrv::_bssid[] = {0};
 uint8_t WiFiDrv::_mac[] = {0};
@@ -57,7 +59,6 @@ void WiFiDrv::wifiDriverInit()
     SpiDrv::begin();
 }
 
-// If ssid == NULL execute a wifi scan, otherwise try to connect to the network specified
 uint8_t WiFiDrv::wifiSetNetwork(char* ssid, uint8_t ssid_len)
 {
 	WAIT_FOR_SLAVE_SELECT();
@@ -194,13 +195,12 @@ void WiFiDrv::getIpAddress(IPAddress& ip)
 {
 	getNetworkData(_localIp, _subnetMask, _gatewayIp);
 	ip = _localIp;
-	//memcpy(ip, _localIp, WL_IPV4_LENGTH);
 }
 
- void WiFiDrv::getSubnetMask(IPAddress& ip)
+ void WiFiDrv::getSubnetMask(IPAddress& mask)
  {
 	getNetworkData(_localIp, _subnetMask, _gatewayIp);
-	ip = _subnetMask;
+	mask = _subnetMask;
  }
 
  void WiFiDrv::getGatewayIP(IPAddress& ip)

@@ -15,12 +15,6 @@ extern "C" {
 class WiFiClass
 {
 private:
-    // this data are stored in EEPROM and loaded at begin
-    // The next connect overwrite these values
-    static  char		_ssid[WL_SSID_MAX_LENGTH];
-    static  char 		_key[WL_WEP_KEY_MAX_LENGTH];
-    static  char 		_passph[WL_WPA_KEY_MAX_LENGTH];
-    static  wl_status_t _status;
 
     static void init();
 public:
@@ -29,7 +23,9 @@ public:
 
     WiFiClass();
 
-    // Get the first socket available
+    /*
+     * Get the first socket available
+     */
     static uint8_t getSocket();
 
     /* Start Wifi connection for OPEN networks
@@ -51,51 +47,113 @@ public:
     /* Start Wifi connection with passphrase
      * the most secure supported mode will be automatically selected
      *
+     * param ssid: Pointer to the SSID string.
      * param passphrase: Passphrase. Valid characters in a passphrase
      *        must be between ASCII 32-126 (decimal).
      */
     int begin(char* ssid, const char *passphrase);
 
-    // Disconnect from the network
+    /*
+     * Disconnect from the network
+     *
+     * return: one value of wl_status_t enum
+     */
     int disconnect(void);
 
-    //Get the interface MAC address.
+    /*
+     * Get the interface MAC address.
+     *
+     * return: pointer to uint8_t array with length WL_MAC_ADDR_LENGTH
+     */
     uint8_t* macAddress(uint8_t* mac);
 
-    //Get the DHCP information related to IP
+    /*
+     * Get the interface IP address.
+     *
+     * return: Ip address value
+     */
     IPAddress localIP();
 
-    //Get the DHCP information related to subnetMask
+    /*
+     * Get the interface subnet mask address.
+     *
+     * return: subnet mask address value
+     */
     IPAddress subnetMask();
 
-    //Get the DHCP information related to gateway IP
-    IPAddress gatewayIP();
+    /*
+     * Get the gateway ip address.
+     *
+     * return: gateway ip address value
+     */
+   IPAddress gatewayIP();
 
-    // Return the current SSID associated with the network
+    /*
+     * Return the current SSID associated with the network
+     *
+     * return: ssid string
+     */
     char* SSID();
 
-    // Return the current BSSID associated with the network
+    /*
+      * Return the current BSSID associated with the network.
+      * It is the MAC address of the Access Point
+      *
+      * return: pointer to uint8_t array with length WL_MAC_ADDR_LENGTH
+      */
     uint8_t* BSSID(uint8_t* bssid);
 
-    // Return the current RSSI /Received Signal Strength in dBm) associated with the network
+    /*
+      * Return the current RSSI /Received Signal Strength in dBm)
+      * associated with the network
+      *
+      * return: signed value
+      */
     int32_t RSSI();
 
-    // Return the Encryption Type associated with the network
+    /*
+      * Return the Encryption Type associated with the network
+      *
+      * return: one value of wl_enc_type enum
+      */
     uint8_t	encryptionType();
 
-    // Start scan WiFi networks available and return the discovered number
+    /*
+     * Start scan WiFi networks available
+     *
+     * return: Number of discovered networks
+     */
     uint8_t scanNetworks();
 
-    // Return SSID item associated with the network identified with networkItem
+    /*
+     * Return the SSID discovered during the network scan.
+     *
+     * param networkItem: specify from which network item want to get the information
+	 *
+     * return: ssid string of the specified item on the networks scanned list
+     */
     char*	SSID(uint8_t networkItem);
 
-    // Return the Encryption Type associated with the network identified with networkItem
+    /*
+     * Return the encryption type of the networks discovered during the scanNetworks
+     *
+     * param networkItem: specify from which network item want to get the information
+	 *
+     * return: encryption type (enum wl_enc_type) of the specified item on the networks scanned list
+     */
     uint8_t	encryptionType(uint8_t networkItem);
 
-    // Return the current RSSI /Received Signal Strength in dBm) associated with the network identified with networkItem
+    /*
+     * Return the RSSI of the networks discovered during the scanNetworks
+     *
+     * param networkItem: specify from which network item want to get the information
+	 *
+     * return: signed value of RSSI of the specified item on the networks scanned list
+     */
     int32_t RSSI(uint8_t networkItem);
 
-    /* Return Connection status.
+    /*
+     * Return Connection status.
      *
      * return: one of the value defined in wl_status_t
      */

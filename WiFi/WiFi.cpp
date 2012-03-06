@@ -4,18 +4,12 @@
 extern "C" {
   #include "utility/wl_definitions.h"
   #include "utility/wl_types.h"
-	#include "debug.h"
+  #include "debug.h"
 }
 
 // XXX: don't make assumptions about the value of MAX_SOCK_NUM.
 int16_t 	WiFiClass::_state[MAX_SOCK_NUM] = { 0, 0, 0, 0 };
 uint16_t 	WiFiClass::_server_port[MAX_SOCK_NUM] = { 0, 0, 0, 0 };
-
-char    	WiFiClass::_ssid[] = { 0 };
-char    	WiFiClass::_key[] = { 0 };
-char    	WiFiClass::_passph[] = { 0 };
-wl_status_t WiFiClass::_status;
-
 
 WiFiClass::WiFiClass()
 {
