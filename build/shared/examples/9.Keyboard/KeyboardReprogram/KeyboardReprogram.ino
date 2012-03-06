@@ -3,7 +3,7 @@
  
  This sketch demonstrates the Keyboard library.
  
- When you connect pin 12 to ground, it creates a new
+ When you connect pin 2 to ground, it creates a new
  window with a key combination (CTRL-N),
  then types in the Blink sketch, then auto-formats the text
  using another key combination (CTRL-T), then 
@@ -12,7 +12,7 @@
  
  Circuit:
  * Arduino Leonardo
- * wire to connect D12 to ground.
+ * wire to connect D2 to ground.
  
  created 5 Mar 2012
  by Tom Igoe
@@ -21,24 +21,34 @@
  
  http://www.arduino.cc/en/Tutorial/KeyboardReprogram
  */
+
+// use this option for OSX:
+char ctrlKey = KEY_LEFT_GUI;
+// use this option for Windows and Linux:
+//  char ctrlKey = KEY_KEFT_CTRL;    
+
+
 void setup() {
-  // make pin 12 an input and turn on the 
+  // make pin 2 an input and turn on the 
   // pullup resistor so it goes high unless
   // connected to ground:
-  pinMode(12, INPUT_PULLUP);
+  pinMode(2, INPUT_PULLUP);
 }
 
 void loop() {
-  while (digitalRead(12) == HIGH) {
-    // do nothing until pin 12 goes low
+  while (digitalRead(2) == HIGH) {
+    // do nothing until pin 2 goes low
     delay(500);
   }
+  delay(1000);
   // new document:
-  Keyboard.press(KEY_LEFT_CTRL);
-  Keyboard.press('N');
+  Keyboard.press(ctrlKey);
+  Keyboard.press('n');
+  delay(100);
   Keyboard.releaseAll();
   // wait for new window to open:
   delay(1000);
+
   // Type out "blink":
   Keyboard.println("void setup() {");
   Keyboard.println("pinMode(13, OUTPUT);");
@@ -55,19 +65,25 @@ void loop() {
   Keyboard.println("1000);");
   Keyboard.println("digitalWrite(13, LOW);");
   Keyboard.println("delay(1000);");
+  Keyboard.println("}");
   // tidy up:
-  Keyboard.press(KEY_LEFT_CTRL);
-  Keyboard.press('T');
+  Keyboard.press(ctrlKey);
+  Keyboard.press('t');
+  delay(100);
   Keyboard.releaseAll();
   delay(3000);
   // upload code:
-  Keyboard.press(KEY_LEFT_CTRL);
-  Keyboard.press('U');
+  Keyboard.press(ctrlKey);
+  Keyboard.press('u');
+  delay(100);
   Keyboard.releaseAll();
 
   // wait for the sweet oblivion of reprogramming:
   while(true);
 }
+
+
+
 
 
 
