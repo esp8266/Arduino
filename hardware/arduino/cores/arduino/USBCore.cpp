@@ -637,6 +637,12 @@ void USB_::attach()
 	PLLCSR = 0x12;						// Need 16 MHz xtal
 	while (!(PLLCSR & (1<<PLOCK)))		// wait for lock pll
 		;
+
+	// Some tests on specific versions of macosx (10.7.3), reported some
+	// strange behaviuors when the board is reset using the serial
+	// port touch at 1200 bps. This delay fixes this behaviour.
+	delay(1);
+
 	USBCON = ((1<<USBE)|(1<<OTGPADE));	// start USB clock
 	UDIEN = (1<<EORSTE)|(1<<SOFE);		// Enable interrupts for EOR (End of Reset) and SOF (start of frame)
 	UDCON = 0;							// enable attach resistor
