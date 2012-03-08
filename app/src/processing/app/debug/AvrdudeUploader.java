@@ -85,7 +85,7 @@ public class AvrdudeUploader extends Uploader  {
     // this wait a moment for the bootloader to enumerate. On Windows, also must
     // deal with the fact that the COM port number changes from bootloader to
     // sketch.
-    if (boardPreferences.get("bootloader.path").equals("caterina_LUFA")) {
+    if (boardPreferences.get("bootloader.path").equals("caterina")) {
       String caterinaUploadPort = null;
       try {
         // Toggle 1200 bps on selected serial port to force board reset.
