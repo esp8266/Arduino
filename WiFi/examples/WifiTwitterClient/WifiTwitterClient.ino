@@ -13,7 +13,7 @@
  Circuit:
  * WiFi shield attached to pins 10, 11, 12, 13
  
- created 4 Mar 2012
+ created 8 Mar 2012
  by Tom Igoe
  
  This code is in the public domain.
@@ -25,7 +25,7 @@
 char ssid[] = "YourNetwork"; //  your network SSID (name) 
 char pass[] = "password";    // your network password (use for WPA, or use as key for WEP)
 int keyIndex = 0;            // your network key Index number (needed only for WEP)
-
+int status = WL_IDLE_STATUS; // status of the wifi connection
 
 // initialize the library instance:
 WiFiClient client;
