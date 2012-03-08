@@ -62,6 +62,7 @@ uint16_t TxLEDPulse = 0; // time remaining for Tx LED pulse
 uint16_t RxLEDPulse = 0; // time remaining for Rx LED pulse
 
 /* Bootloader timeout timer */
+#define TIMEOUT_PERIOD	8000
 uint16_t Timeout = 0;
 
 uint16_t bootKey = 0x7777;
@@ -133,12 +134,14 @@ int main(void)
 	/* Enable global interrupts so that the USB stack can function */
 	sei();
 	
+	Timeout = 0;
+	
 	while (RunBootloader)
 	{
 		CDC_Task();
 		USB_USBTask();
 		/* Time out and start the sketch if one is present */
-		if (Timeout > 8000)
+		if (Timeout > TIMEOUT_PERIOD)
 			RunBootloader = false;
 
 		LEDPulse();
@@ -475,7 +478,11 @@ void CDC_Task(void)
 
 	if (Command == 'E')
 	{
-		RunBootloader = false;
+		/* We nearly run out the bootloader timeout clock, 
+		* leaving just a few hundred milliseconds so the 
+		* bootloder has time to respond and service any 
+		* subsequent requests */
+		Timeout = TIMEOUT_PERIOD - 250;
 	
 		// Send confirmation byte back to the host 
 		WriteNextResponseByte('\r');
