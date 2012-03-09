@@ -16,7 +16,7 @@
  
  created 13 July 2010
  by dlf (Metodo2 srl)
- modified 4 Mar 2012
+ modified 9 Mar 2012
  by Tom Igoe
  */
 
@@ -29,7 +29,7 @@ char pass[] = "password";    // your network password (use for WPA, or use as ke
 int keyIndex = 0;            // your network key Index number (needed only for WEP)
 
 int status = WL_IDLE_STATUS;
-IPAddress server(74,125,115,105);  // Google
+IPAddress server(173,194,43,18);  // Google
 
 // Initialize the Ethernet client library
 // with the IP address and port of the server 
@@ -56,7 +56,9 @@ void setup() {
     if (client.connect(server, 80)) {
       Serial.println("connected to server");
       // Make a HTTP request:
-      client.println("GET /search?q=arduino HTTP/1.0");
+      client.println("GET /search?q=arduino HTTP/1.1");
+      client.println("Host:www.google.com");
+      client.println("Connection:close");
       client.println();
     }
   }
@@ -65,7 +67,7 @@ void setup() {
 void loop() {
   // if there are incoming bytes available 
   // from the server, read them and print them:
-  if (client.available()) {
+  if (client.available()>0) {
     char c = client.read();
     Serial.print(c);
   }
