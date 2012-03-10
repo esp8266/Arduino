@@ -18,7 +18,7 @@
  * Analog sensor attached to analog in 0
  * Wifi shield attached to pins 10, 11, 12, 13
  
- created 4 March 2012
+ created 9 March 2012
  by Tom Igoe
  
  This code is in the public domain.
@@ -29,19 +29,21 @@
 #include <WiFi.h>
 
 #define APIKEY         "YOUR API KEY GOES HERE" // replace your pachube api key here
-#define FEEDID         00000 // replace your feed ID
-#define USERAGENT      "My Project" // user agent is the project name
+#define FEEDID         00000                    // replace your feed ID
+#define USERAGENT      "My Project"             // user agent is the project name
 
-char ssid[] = "yourNetwork";          //  your network SSID (name) 
+char ssid[] = "yourNetwork";      //  your network SSID (name) 
 char pass[] = "secretPassword";   // your network password
-int status = WL_IDLE_STATUS;
+int status = WL_IDLE_STATUS
 
 // initialize the library instance:
 WiFiClient client;
+IPAddress server(216,52,233,122);
+//char server[] = "api.pachube.com";
 
-long lastConnectionTime = 0;        // last time you connected to the server, in milliseconds
-boolean lastConnected = false;      // state of the connection last time through the main loop
-const int postingInterval = 10000;  //delay between updates to Pachube.com
+unsigned long lastConnectionTime = 0;          // last time you connected to the server, in milliseconds
+boolean lastConnected = false;                 // state of the connection last time through the main loop
+const unsigned long postingInterval = 10*1000;  //delay between updates to Pachube.com
 
 void setup() {
   // start serial port:
@@ -87,7 +89,7 @@ void loop() {
   }
 
   // if you're not connected, and ten seconds have passed since
-  // your last connection, then connect again and send data:
+  // your last connection, then connect again and send data: 
   if(!client.connected() && (millis() - lastConnectionTime > postingInterval)) {
     sendData(dataString);
   }
@@ -99,7 +101,7 @@ void loop() {
 // this method makes a HTTP connection to the server:
 void sendData(String thisData) {
   // if there's a successful connection:
-  if (client.connect("api.pachube.com", 80)) {
+  if (client.connect(server, 80)) {
     Serial.println("connecting...");
     // send the HTTP PUT request:
     client.print("PUT /v2/feeds/");
@@ -119,9 +121,6 @@ void sendData(String thisData) {
 
     // here's the actual content of the PUT request:
     client.println(thisData);
-
-    // note the time that the connection was made:
-    lastConnectionTime = millis();
   } 
   else {
     // if you couldn't make a connection:
@@ -129,8 +128,8 @@ void sendData(String thisData) {
     Serial.println();
     Serial.println("disconnecting.");
     client.stop();
-    lastConnected = client.connected();
   }
+  // note the time that the connection was made:
+  lastConnectionTime = millis();
+  lastConnected = client.connected();
 }
-
-

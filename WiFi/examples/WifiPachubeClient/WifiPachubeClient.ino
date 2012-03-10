@@ -15,31 +15,31 @@
  * Analog sensor attached to analog in 0
  * Wifi shield attached to pins 10, 11, 12, 13
  
- created 4 March 2012
+ created 9 March 2012
  by Tom Igoe
  
  This code is in the public domain.
  
  */
-
 #include <SPI.h>
 #include <WiFi.h>
 
-
 #define APIKEY         "YOUR API KEY GOES HERE" // replace your pachube api key here
-#define FEEDID         00000 // replace your feed ID
-#define USERAGENT      "My Project" // user agent is the project name
+#define FEEDID         00000                    // replace your feed ID
+#define USERAGENT      "My Project"             // user agent is the project name
 
-char ssid[] = "yourNetwork";          //  your network SSID (name) 
+char ssid[] = "yourNetwork";      //  your network SSID (name) 
 char pass[] = "secretPassword";   // your network password
 int status = WL_IDLE_STATUS;
 
 // initialize the library instance:
 WiFiClient client;
+IPAddress server(216,52,233,122);
+//char server[] = "api.pachube.com";
 
-long lastConnectionTime = 0;        // last time you connected to the server, in milliseconds
-boolean lastConnected = false;      // state of the connection last time through the main loop
-const int postingInterval = 10000;  //delay between updates to Pachube.com
+unsigned long lastConnectionTime = 0;          // last time you connected to the server, in milliseconds
+boolean lastConnected = false;                 // state of the connection last time through the main loop
+const unsigned long postingInterval = 10*1000;  //delay between updates to Pachube.com
 
 void setup() {
   Serial.begin(9600);
@@ -93,7 +93,7 @@ void loop() {
 // this method makes a HTTP connection to the server:
 void sendData(int thisData) {
   // if there's a successful connection:
-  if (client.connect("www.pachube.com", 80)) {
+  if (client.connect(server, 80)) {
     Serial.println("connecting...");
     // send the HTTP PUT request:
     client.print("PUT /v2/feeds/");
@@ -119,8 +119,6 @@ void sendData(int thisData) {
     client.print("sensor1,");
     client.println(thisData);
 
-    // note the time that the connection was made:
-    lastConnectionTime = millis();
   } 
   else {
     // if you couldn't make a connection:
@@ -129,6 +127,8 @@ void sendData(int thisData) {
     Serial.println("disconnecting.");
     client.stop();
   }
+  // note the time that the connection was made:
+  lastConnectionTime = millis();
   lastConnected = client.connected();
 }
 
@@ -160,7 +160,7 @@ void printWifiStatus() {
 
   // print your WiFi shield's IP address:
   IPAddress ip = WiFi.localIP();
-    Serial.print("IP Address: ");
+  Serial.print("IP Address: ");
   Serial.println(ip);
 
   // print the received signal strength:
@@ -169,8 +169,3 @@ void printWifiStatus() {
   Serial.print(rssi);
   Serial.println(" dBm");
 }
-
-
-
-
-
