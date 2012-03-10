@@ -10,7 +10,7 @@
  
  created 13 July 2010
  by dlf (Metodo2 srl)
- modified 4 Mar 2012
+ modified 9 Mar 2012
  by Tom Igoe
  */
 
@@ -68,16 +68,17 @@ void listNetworks() {
   Serial.print("number of available networks:");
   Serial.println(numSsid);
   
-  Serial.println("#\tName\tRSSI\tencryptionType:");
   // print the network number and name for each network found:
   for (int thisNet = 0; thisNet<numSsid; thisNet++) {
     Serial.print(thisNet);
-    Serial.print("\t");
-    Serial.print(WiFi.SSID(thisNet));
-    Serial.print("\t");
+    Serial.print(") ");
+    Serial.println(WiFi.SSID(thisNet));
+    Serial.print("Signal Strength: ");
     Serial.print(WiFi.RSSI(thisNet));
-    Serial.print("\t");
+    Serial.println("dBm");
+    Serial.print("Encryption Type: ");
     Serial.println(WiFi.encryptionType(thisNet));
+    Serial.println();
   }
 }
 
