@@ -13,7 +13,7 @@
  Circuit:
  * WiFi shield attached to pins 10, 11, 12, 13
  
- created 8 Mar 2012
+ created 9 Mar 2012
  by Tom Igoe
  
  This code is in the public domain.
@@ -71,7 +71,9 @@ void loop()
     if (client.available()) {
       // read incoming bytes:
       char inChar = client.read();
-      
+      // print the incoming byte (for debugging):
+      Serial.write(inChar);
+
       // add incoming byte to end of line:
       currentLine += inChar; 
 
@@ -117,7 +119,8 @@ void connectToServer() {
     Serial.println("making HTTP request...");
     // make HTTP GET request to twitter:
     client.println("GET /1/statuses/user_timeline.xml?screen_name=arduinoteam HTTP/1.1");
-    client.println("HOST:api.twitter.com");
+    client.println("Host:api.twitter.com");
+    client.println("Connection:close");
     client.println();
   }
   // note the time of this connect attempt:
@@ -132,7 +135,7 @@ void printWifiStatus() {
 
   // print your WiFi shield's IP address:
   IPAddress ip = WiFi.localIP();
-    Serial.print("IP Address: ");
+  Serial.print("IP Address: ");
   Serial.println(ip);
 
   // print the received signal strength:
@@ -141,4 +144,5 @@ void printWifiStatus() {
   Serial.print(rssi);
   Serial.println(" dBm");
 }
+
 
