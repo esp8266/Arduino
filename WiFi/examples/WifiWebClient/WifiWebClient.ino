@@ -26,10 +26,12 @@
 
 char ssid[] = "YourNetwork"; //  your network SSID (name) 
 char pass[] = "password";    // your network password (use for WPA, or use as key for WEP)
+
 int keyIndex = 0;            // your network key Index number (needed only for WEP)
 
 int status = WL_IDLE_STATUS;
-IPAddress server(173,194,43,18);  // Google
+IPAddress server(173,194,73,105);  // Google
+//char server[] = "www.google.com";
 
 // Initialize the Ethernet client library
 // with the IP address and port of the server 
