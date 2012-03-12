@@ -14,24 +14,24 @@
  
  created 18 Dec 2009
  by David A. Mellis
- modified 4 Mar 2012
+ modified 12 Mar 2012
  by Tom Igoe
  
  */
-
 
 #include <SPI.h>
 #include <WiFi.h>
 
 char ssid[] = "YourNetwork"; //  your network SSID (name) 
 char pass[] = "password";    // your network password (use for WPA, or use as key for WEP)
+
 int keyIndex = 0;            // your network key Index number (needed only for WEP)
 
 int status = WL_IDLE_STATUS;
 
 WiFiServer server(23);
 
-boolean gotAMessage = false; // whether or not you got a message from the client yet
+boolean alreadyConnected = false; // whether or not the client was connected previously
 
 void setup() {
   // initialize serial:
@@ -55,20 +55,25 @@ void loop() {
   // wait for a new client:
   WiFiClient client = server.available();
 
+  
   // when the client sends the first byte, say hello:
   if (client) {
-    if (!gotAMessage) {
+    if (!alreadyConnected) {
+      // clead out the input buffer:
+      client.flush();    
       Serial.println("We have a new client");
       client.println("Hello, client!"); 
-      gotAMessage = true;
-    }
+      alreadyConnected = true;
+    } 
 
-    // read the bytes incoming from the client:
-    char thisChar = client.read();
-    // echo the bytes back to the client:
-    server.write(thisChar);
-    // echo the bytes to the server as well:
-    Serial.print(thisChar);
+    if (client.available() > 0) {
+      // read the bytes incoming from the client:
+      char thisChar = client.read();
+      // echo the bytes back to the client:
+      server.write(thisChar);
+      // echo the bytes to the server as well:
+      Serial.write(thisChar);
+    }
   }
 }
 
