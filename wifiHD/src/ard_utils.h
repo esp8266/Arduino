@@ -216,6 +216,8 @@ typedef struct sData
 
 struct pbuf;
 
+void init_pBuf();
+
 void insert_pBuf(struct pbuf* q, uint8_t sock, void* _pcb);
 
 tData* get_pBuf(uint8_t sock);

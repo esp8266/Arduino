@@ -25,6 +25,8 @@
 
 
 extern uint16_t enableDebug;
+extern uint16_t verboseDebug;
+
 #define INFO_INIT(msg, args...) do { 			\
 if (enableDebug & INFO_INIT_FLAG) printk("I-[%s] " msg , __func__ , ##args );	\
 } while (0)
@@ -70,3 +72,10 @@ extern void dump(char* _buf, uint16_t _count);
 #define DUMP(BUF, COUNT) do {} while (0)
 #endif
 #endif
+
+#define DUMP_TCP(BUF, COUNT) do {			\
+	if (verboseDebug & INFO_TCP_FLAG) {		\
+	printk("[%s]\n", __func__);				\
+	dump((char*)BUF, COUNT);				\
+	}} while (0)
+

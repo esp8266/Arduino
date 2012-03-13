@@ -66,11 +66,12 @@ static void init_interrupts(void)
 
 void startup_init(void)
 {
+	INIT_SIGNAL_FOR_SPI();
+	BUSY_FOR_SPI();
+
 	init_exceptions();
 	init_hmatrix();
 	init_sys_clocks();
 	init_interrupts();
 	init_dbg_rs232(FPBA_HZ);
-	INIT_SIGNAL_FOR_SPI();
-	BUSY_FOR_SPI();
 }

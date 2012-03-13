@@ -88,6 +88,7 @@ static bool initSpiComplete = false;
 
 // variable used as enable flag for debug prints
 uint16_t enableDebug = 0;
+uint16_t verboseDebug = 0;
 
 /**
  *

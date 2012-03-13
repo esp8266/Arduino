@@ -89,7 +89,7 @@ bool end_write = false;	//TODO only for debug
 // Signal indicating a new command is coming from SPI interface
 static volatile Bool startRecvCmdSignal = FALSE;
 
-#define MAX_CMD_NUM 25
+#define MAX_CMD_NUM 30
 typedef struct sCmd_spi_list{
 	cmd_spi_cb_t cb;
 	char cmd_id;
@@ -362,7 +362,26 @@ void dump(char* _buf, uint16_t _count) {
 }
 
 #ifdef _APP_DEBUG_
+#define DUMP_SPI_DATA(BUF, COUNT) do {		\
+	if (verboseDebug & INFO_SPI_FLAG) {		\
+	int i = 0;								\
+	for (; i < COUNT; ++i) 					\
+	{										\
+		printk("0x%x ", BUF[i]);			\
+		if (i % 20 == 0)					\
+			printk("\n");					\
+	}										\
+	printk("\n");							\
+	}										\
+}while(0);
+#else
+#define DUMP_SPI_DATA(BUF, COUNT) do {}while(0);
+#endif
+
+
+#ifdef _APP_DEBUG_
 #define DUMP_SPI_CMD(BUF) do {				\
+	if (verboseDebug & INFO_SPI_FLAG) {		\
 	int i = 0;								\
 	for (; i < CMD_MAX_LEN; ++i) 			\
 	{										\
@@ -371,6 +390,7 @@ void dump(char* _buf, uint16_t _count) {
 			break;							\
 	}										\
 	printk("\n");							\
+	}										\
 }while(0);
 #else
 #define DUMP_SPI_CMD(BUF) do {}while(0);
@@ -944,7 +964,13 @@ cmd_spi_state_t get_client_state_tcp_cmd_cb(char* recv, char* reply, void* ctx, 
     uint8_t _state = CLOSED;
     if ((recv[3]==1)&&(recv[4]>=0)&&(recv[4]<MAX_SOCK_NUM))
     {
-    	_state = getStateTcp(mapSockTCP[(uint8_t)recv[4]], 1);
+    	// get if we are in server or Transmit mode (0)
+    	if (getModeTcp(mapSockTCP[(uint8_t)recv[4]]) == TTCP_MODE_TRANSMIT)
+    	{
+    		_state = _connected ? ESTABLISHED : CLOSED;
+    	}else {
+    		_state = getStateTcp(mapSockTCP[(uint8_t)recv[4]], 1);
+    	}
     }
     PUT_DATA_BYTE(_state, reply, 3);
     END_HEADER_REPLY(reply, 5, *count);
@@ -1272,7 +1298,7 @@ bool checkMsgFormat(uint8_t* _recv, int len, int* offset)
 			paramLenTot = checkMsgParam8(recv);
 		else
 		{
-			//DUMP(_recv, len);
+			DUMP_SPI_DATA(_recv, len);
 			paramLenTot = checkMsgParam16(recv);
 		}
 
@@ -1313,8 +1339,8 @@ void spi_poll(struct netif* netif) {
 			{
 				//LED_On(LED1);
 				//INFO_SPI("[E(0x%x):%d spiStatus:%d]\n", statSpi.lastCmd, err, statSpi.status);
-				DUMP(buf, count);
-				DUMP(reply, replyCount);
+				DUMP_SPI_DATA(buf, count);
+				DUMP_SPI_DATA(reply, replyCount);
 				//LED_Off(LED1);
 			}
 			receivedChars = 0;
@@ -1334,7 +1360,7 @@ void spi_poll(struct netif* netif) {
 		{
 			sendError();
 			WARN("Check format msg failed!\n");
-			//dump((char*)_receiveBuffer, receivedChars);
+			dump((char*)_receiveBuffer, receivedChars);
 			state = SPI_CMD_IDLE;
 			count=0;
 		}
@@ -1562,6 +1588,8 @@ int initSpi()
 	init_spi_cmds();
 
 	memset(_receiveBuffer, 0, _BUFFERSIZE);
+
+	init_pBuf();
 
 	return 0;
 }

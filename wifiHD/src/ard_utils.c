@@ -21,6 +21,11 @@ unsigned char tailBuf = 0;
 #define IS_BUF_AVAIL() (tailBuf!=headBuf)
 #define IS_BUF_EMPTY() ((tailBuf == 0) && (headBuf == 0))
 
+void init_pBuf()
+{
+	memset(pBufStore, 0, sizeof(pBufStore));
+}
+
 void insert_pBuf(struct pbuf* q, uint8_t sock, void* _pcb)
 {
 	if (q == NULL)

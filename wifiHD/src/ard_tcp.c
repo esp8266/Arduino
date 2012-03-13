@@ -134,13 +134,15 @@ static void tcp_send_data(struct ttcp *ttcp) {
 		len = tcp_sndbuf(ttcp->tpcb);
 
 	do {
-		err = tcp_write(ttcp->tpcb, ttcp->payload, len, 0);
+		err = tcp_write(ttcp->tpcb, ttcp->payload, len, TCP_WRITE_FLAG_COPY);
 		if (err == ERR_MEM)
 			len /= 2;
 	} while (err == ERR_MEM && len > 1);
 
 	if (err == ERR_OK){
 		tcp_output(ttcp->tpcb);
+		INFO_TCP("tcp_output: left=%d new left:%d\n",
+				ttcp->left, ttcp->left-len);
 		ttcp->left -= len;
 	}
 	else
@@ -209,14 +211,12 @@ tcp_sent_cb(void *arg, struct tcp_pcb *pcb, u16_t len)
 static err_t tcp_connect_cb(void *arg, struct tcp_pcb *tpcb, err_t err) {
 	struct ttcp* ttcp = arg;
 
-	printk("TTCP [%p]: connect\n", ttcp);
+	INFO_TCP("TTCP [%p]: connect %d %d\n", ttcp, err, ttcp->tpcb->state);
+
+	_connected = true;
 
 	ttcp->start_time = timer_get_ms();
-#if 0
-	tcp_sent(tpcb, tcp_sent_cb);
 
-	tcp_send_data(ttcp);
-#endif
 	return ERR_OK;
 }
 
@@ -251,9 +251,10 @@ static err_t atcp_recv_cb(void *arg, struct tcp_pcb *pcb, struct pbuf *p,
 	/* for print_stats() */
 	ttcp->recved += p->tot_len;
 
-	if (ttcp->verbose) {
+	if ((ttcp->verbose)||(verboseDebug & INFO_TCP_FLAG)) {
 		INFO_TCP("Recv:%d\n",p->tot_len);
-		DUMP(p->payload, p->tot_len);
+		//INFO_TCP("%s\n",(char*)p->payload);
+		DUMP_TCP(p->payload, p->tot_len);
 		ttcp->print_cnt++;
 	}
 
@@ -312,6 +313,7 @@ static int atcp_start(struct ttcp* ttcp) {
 	if (ttcp->mode == TTCP_MODE_TRANSMIT) {
 		tcp_err(ttcp->tpcb, atcp_conn_err_cb);
 		tcp_recv(ttcp->tpcb, atcp_recv_cb);
+		_connected = false;
 		if (tcp_connect(ttcp->tpcb, &ttcp->addr, ttcp->port, tcp_connect_cb)
 				!= ERR_OK) {
 			WARN("TTCP [%p]: tcp connect failed\n", ttcp);
@@ -569,6 +571,15 @@ uint8_t getStateTcp(void* p, bool client) {
 	return CLOSED;
 }
 
+uint8_t getModeTcp(void* p) {
+	struct ttcp* _ttcp = (struct ttcp*) p;
+
+	if (_ttcp != NULL)
+		return _ttcp->mode;
+	return 0;
+}
+
+
 uint8_t isDataSent(void* p) {
 	static int isDataSentCount = 0;
 	struct ttcp* _ttcp = (struct ttcp*) p;
@@ -601,15 +612,16 @@ static err_t tcp_data_sent(void *arg, struct tcp_pcb *pcb, u16_t len) {
 	if (_ttcp->buff_sent == 1)
 		WARN("Previous packet already\n");
 	_ttcp->buff_sent = 1;
+	INFO_TCP("Packet sent len:%d dur:%d\n", len, timer_get_ms() - startTime);
 	//INFO_TCP("%s: duration: %d\n", __FUNCTION__, timer_get_ms() - startTime);
 	return ERR_OK;
 }
 
 int sendTcpData(void* p, uint8_t* buf, uint16_t len) {
-	//INFO_TCP("buf:%p len:%d\n", buf, len);
-	//DUMP(buf,len);
+	INFO_TCP("buf:%p len:%d\n", buf, len);
+	DUMP_TCP(buf,len);
 
-	//startTime = timer_get_ms();
+	startTime = timer_get_ms();
 	struct ttcp* _ttcp = (struct ttcp*) p;
 	if ((_ttcp != NULL) && (_ttcp->tpcb != NULL) &&
 			(buf != NULL) && (len != 0) && (_ttcp->payload != NULL)) {
@@ -620,6 +632,8 @@ int sendTcpData(void* p, uint8_t* buf, uint16_t len) {
 		_ttcp->buff_sent = 0;
 		//pbuf_take(buf, len, _ttcp->);
 		memcpy(_ttcp->payload, buf, len);
+		_ttcp->payload[len]='\0';
+		INFO_TCP("%s\n", _ttcp->payload);
 		_ttcp->left = len;
 		tcp_sent(_ttcp->tpcb, tcp_data_sent);
 		tcp_send_data(_ttcp);
