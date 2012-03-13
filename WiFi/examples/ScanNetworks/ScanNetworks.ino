@@ -10,7 +10,7 @@
  
  created 13 July 2010
  by dlf (Metodo2 srl)
- modified 9 Mar 2012
+ modified 12 Mar 2012
  by Tom Igoe
  */
 
@@ -25,7 +25,6 @@ void setup() {
   // attempt to connect using WEP encryption:
   Serial.println("Initializing Wifi...");
   printMacAddress();
-
 
   // scan for existing networks:
   Serial.println("Scanning available networks...");
@@ -72,13 +71,12 @@ void listNetworks() {
   for (int thisNet = 0; thisNet<numSsid; thisNet++) {
     Serial.print(thisNet);
     Serial.print(") ");
-    Serial.println(WiFi.SSID(thisNet));
-    Serial.print("Signal Strength: ");
+    Serial.print(WiFi.SSID(thisNet));
+    Serial.print("\tSignal: ");
     Serial.print(WiFi.RSSI(thisNet));
-    Serial.println("dBm");
-    Serial.print("Encryption Type: ");
+    Serial.print(" dBm");
+    Serial.print("\tEncryption: ");
     Serial.println(WiFi.encryptionType(thisNet));
-    Serial.println();
   }
 }
 
