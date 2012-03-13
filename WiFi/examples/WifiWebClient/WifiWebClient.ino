@@ -16,7 +16,7 @@
  
  created 13 July 2010
  by dlf (Metodo2 srl)
- modified 9 Mar 2012
+ modified 13 Mar 2012
  by Tom Igoe
  */
 
@@ -26,12 +26,13 @@
 
 char ssid[] = "YourNetwork"; //  your network SSID (name) 
 char pass[] = "password";    // your network password (use for WPA, or use as key for WEP)
-
 int keyIndex = 0;            // your network key Index number (needed only for WEP)
 
 int status = WL_IDLE_STATUS;
-IPAddress server(173,194,73,105);  // Google
-//char server[] = "www.google.com";
+// if you don't want to use DNS (and reduce your sketch size)
+// use the numeric IP instead of the name for the server:
+IPAddress server(173,194,73,105);  // numeric IP for Google (no DNS)
+//char server[] = "www.google.com";    // name address for Google (using DNS)
 
 // Initialize the Ethernet client library
 // with the IP address and port of the server 
@@ -47,10 +48,10 @@ void setup() {
   status = WiFi.begin(ssid, pass);
   if ( status != WL_CONNECTED) { 
     Serial.println("Couldn't get a wifi connection");
-    // don't do anything else:
+    // stop here and do nothing:
     while(true);
   } 
-  else {
+ else {
     Serial.println("Connected to wifi");
     printWifiStatus();
     Serial.println("\nStarting connection to server...");
@@ -60,7 +61,7 @@ void setup() {
       // Make a HTTP request:
       client.println("GET /search?q=arduino HTTP/1.1");
       client.println("Host:www.google.com");
-      client.println("Connection:close");
+      client.println("Connection: close");
       client.println();
     }
   }
