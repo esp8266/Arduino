@@ -1,3 +1,5 @@
+//#define _DEBUG_
+
 #include "server_drv.h"
 
 #include "Arduino.h"

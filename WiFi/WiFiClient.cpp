@@ -44,7 +44,8 @@ int WiFiClient::connect(IPAddress ip, uint16_t port) {
     if (_sock != NO_SOCKET_AVAIL)
     {
     	ServerDrv::startClient(uint32_t(ip), port, _sock);
-    	 WiFiClass::_state[_sock] = _sock;
+    	WiFiClass::_state[_sock] = _sock;
+    	while(!connected());
     }else{
     	return 0;
     }
