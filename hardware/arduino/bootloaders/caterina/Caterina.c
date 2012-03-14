@@ -484,6 +484,10 @@ void CDC_Task(void)
 		* subsequent requests */
 		Timeout = TIMEOUT_PERIOD - 500;
 	
+		/* Re-enable RWW section - must be done here in case 
+		 * user has disabled verification on upload.  */
+		boot_rww_enable_safe();		
+
 		// Send confirmation byte back to the host 
 		WriteNextResponseByte('\r');
 	}
@@ -592,6 +596,7 @@ void CDC_Task(void)
 	}
 	else if ((Command == 'B') || (Command == 'g'))
 	{
+		// Keep resetting the timeout counter if we're receiving self-programming instructions
 		Timeout = 0;
 		// Delegate the block write/read to a separate function for clarity 
 		ReadWriteMemoryBlock(Command);
