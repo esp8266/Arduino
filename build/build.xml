@@ -354,10 +354,9 @@
 
   <target name="linux32-build" depends="linux-build" description="Build linux (32-bit) version">
     <!-- Unzip AVR tools -->
-    <bunzip2 dest="linux" src="linux/avr_tools_linux32.tar.bz2" />
     <exec executable="tar" dir="linux/work/hardware">
-      <arg value="-xf"/>
-      <arg value="../../avr_tools_linux32.tar"/>
+      <arg value="-xjf"/>
+      <arg value="../../avr_tools_linux32.tar.bz2"/>
     </exec>
   </target>
 
@@ -368,10 +367,9 @@
     <chmod perm="755" file="linux/work/hardware/tools/avrdude" />
 
     <!-- Unzip AVR tools -->
-    <bunzip2 dest="linux" src="linux/avr_tools_linux64.tar.bz2" />
     <exec executable="tar" dir="linux/work/hardware">
-      <arg value="-xf"/>
-      <arg value="../../avr_tools_linux64.tar"/>
+      <arg value="-xjf"/>
+      <arg value="../../avr_tools_linux64.tar.bz2"/>
     </exec>
   </target>
   

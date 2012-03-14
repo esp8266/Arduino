@@ -122,6 +122,14 @@ public class EditorListener {
       }
     }
 
+    if ((event.getModifiers() & KeyEvent.CTRL_MASK) != 0) {
+      // Consume ctrl-m(carriage return) keypresses
+      if (code == KeyEvent.VK_M) {
+        event.consume();  // does nothing
+        return false;
+      }
+    }
+
     if ((event.getModifiers() & KeyEvent.META_MASK) != 0) {
       //event.consume();  // does nothing
       return false;
