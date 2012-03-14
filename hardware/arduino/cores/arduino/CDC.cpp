@@ -111,7 +111,7 @@ bool WEAK CDC_Setup(Setup& setup)
 				// Serial1.print(">"); Serial1.println(_usbLineInfo.lineState, HEX);
 				if ((_usbLineInfo.lineState & 0x01) == 0) {
 					*(uint16_t *)0x0A00 = 0x7777;
-					wdt_enable(WDTO_250MS);
+					wdt_enable(WDTO_120MS);
 				} else {
 					// Most OSs do some intermediate steps when configuring ports and DTR can
 					// twiggle more than once before stabilizing.
