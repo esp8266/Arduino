@@ -482,7 +482,7 @@ void CDC_Task(void)
 		* leaving just a few hundred milliseconds so the 
 		* bootloder has time to respond and service any 
 		* subsequent requests */
-		Timeout = TIMEOUT_PERIOD - 250;
+		Timeout = TIMEOUT_PERIOD - 500;
 	
 		// Send confirmation byte back to the host 
 		WriteNextResponseByte('\r');
