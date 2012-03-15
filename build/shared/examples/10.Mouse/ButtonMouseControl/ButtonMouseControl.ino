@@ -4,7 +4,7 @@
  Controls the mouse from five pushbuttons on an Arduino Leonardo.
  
  Hardware:
- * 5 pushbuttons attached to D2, D3, D4, D5
+ * 5 pushbuttons attached to D2, D3, D4, D5, D6
  
  
  The mouse movement is always relative. This sketch reads 
@@ -13,7 +13,7 @@
  WARNING:  When you use the Mouse.move() command, the Arduino takes
  over your mouse!  Make sure you have control before you use the mouse commands.
  
- created 9 Mar 2012
+ created 15 Mar 2012
  by Tom Igoe
  
  this code is in the public domain
@@ -27,8 +27,8 @@ const int leftButton = 4;
 const int rightButton = 5;
 const int mouseButton = 6;
 
-int range = 12;            // output range of X or Y movement
-int responseDelay = 6;     // response delay of the mouse, in ms
+int range = 5;              // output range of X or Y movement; affects movement speed
+int responseDelay = 10;     // response delay of the mouse, in ms
 
 
 void setup() {
