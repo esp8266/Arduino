@@ -23,6 +23,7 @@
 #include "delay.h"
 #include "eic.h"
 #include "timer.h"
+#include "lwip/dns.h"
 
 
 
@@ -168,6 +169,8 @@ struct netif* ard_netif = NULL;
 
 // Network list retrived in the last scanNetwork
 static struct wl_network_t network_list[WL_NETWORKS_LIST_MAXNUM];
+
+struct ip_addr _hostIpAddr;
 
 void* getTTCP(uint8_t sock)
 {
@@ -407,7 +410,7 @@ int spi_add_cmd(char _cmd_id, cmd_spi_cb_t cb, cmd_spi_rcb_t rcb, void* ctx,
 
 	if (i == ARRAY_SIZE(cmd_spi_list))
 	{
-		WARN("List Commands full!\n");
+		printk("List Commands full!\n");
 		return -1;
 	}
 	cmd_spi_list[i].cmd_id = _cmd_id;
@@ -762,6 +765,47 @@ cmd_spi_state_t get_reply_ipaddr_cb(char* recv, char* reply, void* ctx, uint16_t
     return SPI_CMD_DONE;
 }
 
+void foundHostByName(const char *name, struct ip_addr *ipaddr, void *callback_arg)
+{
+	INFO_SPI("foundHostByName: Found Host: name=%s ip=0x%x\n", name, ipaddr->addr);
+	_hostIpAddr.addr = ipaddr->addr;
+}
+
+int req_reply_host_by_name_cb(int numParam, char* buf, void* ctx) {
+
+    char hostName[DNS_MAX_NAME_LENGTH];
+	tParam* params = (tParam*) buf;
+
+    // HostName
+	if (params->paramLen < DNS_MAX_NAME_LENGTH) {
+		memcpy(hostName, &params->param, params->paramLen);
+		hostName[params->paramLen]='\0';
+	} else {
+		RETURN_ERR(WL_FAILURE)
+	}
+
+	_hostIpAddr.addr = 0;
+    err_t err = dns_gethostbyname(hostName, &_hostIpAddr, foundHostByName, NULL);
+    if (err == ERR_OK)
+    {
+    	INFO_SPI("Found Host: name=%s ip=0x%x\n", hostName, _hostIpAddr.addr);
+		RETURN_ERR(WL_SUCCESS)
+    }
+	RETURN_ERR(WL_FAILURE)
+}
+
+cmd_spi_state_t get_reply_host_by_name_cb(char* recv, char* reply, void* ctx, uint16_t* count) {
+
+    CHECK_ARD_NETIF(recv, reply, count);
+
+    CREATE_HEADER_REPLY(reply, recv, 1);
+
+    PUT_LONG_IN_BYTE_NO(_hostIpAddr.addr, reply, 3);
+
+    END_HEADER_REPLY(reply, 8, *count);
+
+    return SPI_CMD_DONE;
+}
 
 cmd_spi_state_t get_reply_mac_cb(char* recv, char* reply, void* ctx, uint16_t* count) {
 
@@ -1231,7 +1275,8 @@ void init_spi_cmds() {
 	spi_add_cmd(GET_IDX_ENCT_CMD, ack_cmd_cb, get_reply_idx_net_cb, (void*)GET_IDX_ENCT_CMD, CMD_GET_FLAG);
 	spi_add_cmd(GET_IDX_SSID_CMD, ack_cmd_cb, get_reply_idx_net_cb, (void*)GET_IDX_SSID_CMD, CMD_GET_FLAG);
 	spi_add_cmd(GET_IDX_RSSI_CMD, ack_cmd_cb, get_reply_idx_net_cb, (void*)GET_IDX_RSSI_CMD, CMD_GET_FLAG);
-
+	spi_add_cmd(REQ_HOST_BY_NAME_CMD, req_reply_host_by_name_cb, ack_reply_cb, NULL, CMD_SET_FLAG);
+	spi_add_cmd(GET_HOST_BY_NAME_CMD, ack_cmd_cb, get_reply_host_by_name_cb, NULL, CMD_GET_FLAG);
 	spi_add_cmd(START_SERVER_TCP_CMD, start_server_tcp_cmd_cb, ack_reply_cb, NULL, CMD_SET_FLAG);
 	spi_add_cmd(START_CLIENT_TCP_CMD, start_client_tcp_cmd_cb, ack_reply_cb, NULL, CMD_SET_FLAG);
 	spi_add_cmd(STOP_CLIENT_TCP_CMD, stop_client_tcp_cmd_cb, ack_reply_cb, NULL, CMD_SET_FLAG);

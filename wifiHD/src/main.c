@@ -16,6 +16,7 @@
 
 #include "lwip/init.h"
 #include "lwip/dhcp.h"
+#include "lwip/dns.h"
 #include "lwip/tcp.h"
 #include "netif/etharp.h"
 #include "netif/wlif.h"
@@ -77,7 +78,7 @@ void fw_download_cb(void* ctx, uint8_t** buf, uint32_t* len)
 
 struct ctx_server {
 	struct netif *netif;
-	uint8_t wl_init_complete;
+	//uint8_t wl_init_complete;
 };
 
 // to maintain the word alignment
@@ -87,7 +88,7 @@ struct ctx_server {
 static bool initSpiComplete = false;
 
 // variable used as enable flag for debug prints
-uint16_t enableDebug = 0;
+uint16_t enableDebug = 0; //INFO_WARN_FLAG;
 uint16_t verboseDebug = 0;
 
 /**
@@ -133,14 +134,18 @@ dhcp_coarse_tmr_cb(void *ctx)
  *
  */
 static void
+dns_tmr_cb(void *ctx)
+{
+	dns_tmr();
+}
+
+
+/**
+ *
+ */
+static void
 wl_cm_scan_cb(void* ctx)
 {
-	struct ctx_server* hs = ctx;
-
-	uint8_t init = hs->wl_init_complete;
-
-    INFO_INIT("Scan networks...[ OK ] %d 0x%x\n", init);
-
     set_result(WL_SCAN_COMPLETED);
 }
 
@@ -161,6 +166,9 @@ wl_cm_conn_cb(struct wl_network_t* net, void* ctx)
 
     INFO_INIT("Start DHCP...\n");
     dhcp_start(hs->netif);
+
+    INFO_INIT("Start DNS...\n");
+    dns_init();
 }
 
 
@@ -333,7 +341,9 @@ void initShell()
         console_add_cmd("spiStat", cmd_statSpi, NULL);
         console_add_cmd("resetSpiStat", cmd_resetStatSpi, NULL);
 #endif
-
+#ifdef _DNS_CMD_
+        console_add_cmd("getHost", cmd_gethostbyname, NULL);
+#endif
 }
 
 /**
@@ -363,12 +373,14 @@ wl_init_complete_cb(void* ctx)
 			       etharp_tmr_cb, hs);
         timer_sched_timeout_cb(TCP_TMR_INTERVAL, TIMEOUT_PERIODIC, 
 			       tcp_tmr_cb, hs);
-	timer_sched_timeout_cb(DHCP_FINE_TIMER_MSECS, TIMEOUT_PERIODIC, 
+        timer_sched_timeout_cb(DHCP_FINE_TIMER_MSECS, TIMEOUT_PERIODIC,
 			       dhcp_fine_tmr_cb, hs);
         timer_sched_timeout_cb(DHCP_COARSE_TIMER_MSECS, TIMEOUT_PERIODIC,
 			       dhcp_coarse_tmr_cb, hs);
+//        timer_sched_timeout_cb(DNS_TMR_INTERVAL, TIMEOUT_PERIODIC,
+//			       dns_tmr_cb, NULL);
 
-        initShell();
+
 
         if (initSpi())
         	WARN("Spi not initialized\n");
@@ -417,6 +429,8 @@ main(void)
      }
 #else
     printk("Arduino Wifi Startup... [%s]\n", __TIMESTAMP__);
+
+    initShell();
 
     size_t size_ctx_server = sizeof(struct ctx_server)+PAD_CTX_SIZE;
 	hs = calloc(1, size_ctx_server);

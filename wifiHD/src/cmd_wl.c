@@ -36,6 +36,7 @@
 #include "wl_util.h"
 #include "util.h"
 #include "lwip/netif.h"
+#include "lwip/dns.h"
 #include "debug.h"
 
 extern void showTTCPstatus();
@@ -169,6 +170,42 @@ cmd_setpass(int argc, char* argv[], void* ctx)
                               AUTH_MODE_AUTO) 
             != WL_SUCCESS) {
                 printk("%s : Failed to add passphrase\n", __func__);
+        }
+
+        return CMD_DONE;
+}
+#endif
+
+#ifdef _DNS_CMD_
+void foundHost(const char *name, struct ip_addr *ipaddr, void *callback_arg)
+{
+	printk("Found Host: name=%s ip=0x%x\n", name, ipaddr->addr);
+}
+
+/**
+ *
+ */
+cmd_state_t
+cmd_gethostbyname(int argc, char* argv[], void* ctx)
+{
+        const char *usage = "usage: getHost <hostname>\n";
+        char hostname[DNS_MAX_NAME_LENGTH];
+        struct ip_addr _addr;
+        int len = 0;
+
+        if (argc < 2) {
+                printk(usage);
+                return CMD_DONE;
+        }
+
+        len = join_argv(hostname, sizeof hostname, argc - 1, argv + 1);
+        if (0 == len) {
+                return CMD_DONE;
+        }
+        err_t err = dns_gethostbyname(hostname, &_addr, foundHost, NULL);
+        if (err == ERR_OK)
+        {
+        	printk("Found Host: name=%s ip=0x%x\n", hostname, _addr.addr);
         }
 
         return CMD_DONE;

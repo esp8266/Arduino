@@ -232,6 +232,7 @@ static void atcp_conn_err_cb(void *arg, err_t err) {
 	int sock = getSock(ttcp);
 	if (sock)
 		clearMapSockTcp(sock);
+	_connected = false;
 	ard_tcp_done(ttcp, err);
 }
 

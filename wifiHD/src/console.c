@@ -37,11 +37,12 @@
 #include <string.h>
 #include "console.h"
 
+#define MAX_CMD_CONSOLE_NUM 9
 struct {
         cmd_cb_t cb;
         const char* str;
         void* ctx;
-} cmd_list[16] = { { 0 } };
+} cmd_list[MAX_CMD_CONSOLE_NUM] = { { 0 } };
 
 #define ARRAY_SIZE(a) sizeof(a) / sizeof(a[0])
 
@@ -53,15 +54,15 @@ struct {
 #error
 #endif
 
-#ifndef CMD_MAX_LEN
-#define CMD_MAX_LEN 80
+#ifndef CMD_CONSOLE_MAX_LEN
+#define CMD_CONSOLE_MAX_LEN 25
 #endif
 
 static Bool is_initialized = FALSE;
 
 char* console_gets()
 {
-        static char buf[CMD_MAX_LEN];
+        static char buf[CMD_CONSOLE_MAX_LEN];
         static int pos = 0;
         int c;
         int status;
