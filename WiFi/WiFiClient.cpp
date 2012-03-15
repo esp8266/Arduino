@@ -21,22 +21,12 @@ WiFiClient::WiFiClient(uint8_t sock) : _sock(sock) {
 }
 
 int WiFiClient::connect(const char* host, uint16_t port) {
-	/* TODO Add DNS wifi spi function to resolve DNS */
-#if 0
-  // Look up the host first
-  int ret = 0;
-  DNSClient dns;
-  IPAddress remote_addr;
-
-  dns.begin(Ethernet.dnsServerIP());
-  ret = dns.getHostByName(host, remote_addr);
-  if (ret == 1) {
-    return connect(remote_addr, port);
-  } else {
-    return ret;
-  }
-#endif
-  return 0;
+	IPAddress remote_addr;
+	if (WiFi.hostByName(host, remote_addr))
+	{
+		return connect(remote_addr, port);
+	}
+	return 0;
 }
 
 int WiFiClient::connect(IPAddress ip, uint16_t port) {

@@ -175,4 +175,9 @@ uint8_t WiFiClass::status()
     return WiFiDrv::getConnectionStatus();
 }
 
+int WiFiClass::hostByName(const char* aHostname, IPAddress& aResult)
+{
+	return WiFiDrv::getHostByName(aHostname, aResult);
+}
+
 WiFiClass WiFi;

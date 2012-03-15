@@ -376,4 +376,66 @@ int32_t WiFiDrv::getRSSINetoworks(uint8_t networkItem)
 	return networkRssi;
 }
 
+uint8_t WiFiDrv::reqHostByName(const char* aHostname)
+{
+	WAIT_FOR_SLAVE_SELECT();
+
+    // Send Command
+    SpiDrv::sendCmd(REQ_HOST_BY_NAME_CMD, PARAM_NUMS_1);
+    SpiDrv::sendParam((uint8_t*)aHostname, strlen(aHostname), LAST_PARAM);
+
+    //Wait the reply elaboration
+    SpiDrv::waitForSlaveReady();
+
+    // Wait for reply
+    uint8_t _data = 0;
+    uint8_t _dataLen = 0;
+    uint8_t result = SpiDrv::waitResponseCmd(REQ_HOST_BY_NAME_CMD, PARAM_NUMS_1, &_data, &_dataLen);
+
+    SpiDrv::spiSlaveDeselect();
+
+    return result;
+}
+
+int WiFiDrv::getHostByName(IPAddress& aResult)
+{
+	uint8_t  _ipAddr[WL_IPV4_LENGTH];
+	IPAddress dummy(0xFF,0xFF,0xFF,0xFF);
+	int result = 0;
+
+	WAIT_FOR_SLAVE_SELECT();
+    // Send Command
+    SpiDrv::sendCmd(GET_HOST_BY_NAME_CMD, PARAM_NUMS_0);
+
+    //Wait the reply elaboration
+    SpiDrv::waitForSlaveReady();
+
+    // Wait for reply
+    uint8_t _dataLen = 0;
+    if (!SpiDrv::waitResponseCmd(GET_HOST_BY_NAME_CMD, PARAM_NUMS_1, _ipAddr, &_dataLen))
+    {
+        WARN("error waitResponse");
+    }else{
+    	aResult = _ipAddr;
+    	result = (aResult != dummy);
+    }
+    SpiDrv::spiSlaveDeselect();
+    return result;
+}
+
+int WiFiDrv::getHostByName(const char* aHostname, IPAddress& aResult)
+{
+	uint8_t retry = 10;
+	if (reqHostByName(aHostname))
+	{
+		while(!getHostByName(aResult) && --retry > 0)
+		{
+			delay(500);
+		}
+	}else{
+		return 0;
+	}
+	return 1;
+}
+
 WiFiDrv wiFiDrv;

@@ -31,6 +31,10 @@ private:
 	 */
     static void getNetworkData(uint8_t *ip, uint8_t *mask, uint8_t *gwip);
 
+    static uint8_t reqHostByName(const char* aHostname);
+
+    static int getHostByName(IPAddress& aResult);
+
 public:
 
     /*
@@ -180,6 +184,15 @@ public:
      * return: encryption type (enum wl_enc_type) of the specified item on the networks scanned list
      */
     static uint8_t getEncTypeNetowrks(uint8_t networkItem);
+
+    /*
+     * Resolve the given hostname to an IP address.
+     * param aHostname: Name to be resolved
+     * param aResult: IPAddress structure to store the returned IP address
+     * result: 1 if aIPAddrString was successfully converted to an IP address,
+     *          else error code
+     */
+    static int getHostByName(const char* aHostname, IPAddress& aResult);
 
 };
 

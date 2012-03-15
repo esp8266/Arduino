@@ -45,6 +45,8 @@ enum {
 	GET_IDX_SSID_CMD	= 0x31,
 	GET_IDX_RSSI_CMD	= 0x32,
 	GET_IDX_ENCT_CMD	= 0x33,
+	REQ_HOST_BY_NAME_CMD= 0x34,
+	GET_HOST_BY_NAME_CMD= 0x35,
 
     // All command with DATA_FLAG 0x40 send a 16bit Len
 
