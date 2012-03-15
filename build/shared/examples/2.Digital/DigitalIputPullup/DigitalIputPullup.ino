@@ -14,6 +14,8 @@
  created 14 March 2012
  by Scott Fitzgerald
  
+ http://www.arduino.cc/en/Tutorial/InputPullupSerial
+ 
  This example code is in the public domain
  
  */
