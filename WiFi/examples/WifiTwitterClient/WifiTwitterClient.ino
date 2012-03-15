@@ -13,7 +13,7 @@
  Circuit:
  * WiFi shield attached to pins 10, 11, 12, 13
  
- created 13 Mar 2012
+ created 15 Mar 2012
  by Tom Igoe
  
  This code is in the public domain.
@@ -22,8 +22,8 @@
 #include <SPI.h>
 #include <WiFi.h>
 
-//char ssid[] = "YourNetwork"; //  your network SSID (name) 
-//char pass[] = "password";    // your network password (use for WPA, or use as key for WEP)
+char ssid[] = "YourNetwork"; //  your network SSID (name) 
+char pass[] = "password";    // your network password (use for WPA, or use as key for WEP)
 
 int keyIndex = 0;            // your network key Index number (needed only for WEP)
 int status = WL_IDLE_STATUS; // status of the wifi connection
@@ -35,8 +35,8 @@ const unsigned long requestInterval = 30*1000;    // delay between requests; 30 
 
 // if you don't want to use DNS (and reduce your sketch size)
 // use the numeric IP instead of the name for the server:
-IPAddress server(199,59,149,200);    // numeric IP for api.twitter.com
-//char server[] = "api.twitter.com";     // name address for twitter API
+//IPAddress server(199,59,149,200);    // numeric IP for api.twitter.com
+char server[] = "api.twitter.com";     // name address for twitter API
 
 boolean requested;                     // whether you've made a request since connecting
 unsigned long lastAttemptTime = 0;     // last time you connected to the server, in milliseconds
@@ -52,9 +52,7 @@ void setup() {
   // initialize serial:
   Serial.begin(9600);
   Serial.println("Attempting to connect to WPA network...");
-  Serial.print("SSID: ");
-  Serial.println(ssid);
-
+  
   status = WiFi.begin(ssid, pass);
   if ( status != WL_CONNECTED) { 
     Serial.println("Couldn't get a wifi connection");
@@ -87,6 +85,8 @@ void loop()
         // tweet is beginning. Clear the tweet string:
         readingTweet = true; 
         tweet = "";
+        // break out of the loop so this character isn't added to the tweet:
+        return;
       }
       // if you're currently reading the bytes of a tweet,
       // add them to the tweet String:
