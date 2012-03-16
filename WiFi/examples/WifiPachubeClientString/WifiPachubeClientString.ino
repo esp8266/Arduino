@@ -18,7 +18,7 @@
  * Analog sensor attached to analog in 0
  * Wifi shield attached to pins 10, 11, 12, 13
  
- created 13 March 2012
+ created 16 March 2012
  by Tom Igoe
  
  This code is in the public domain.
@@ -42,8 +42,8 @@ WiFiClient client;
 
 // if you don't want to use DNS (and reduce your sketch size)
 // use the numeric IP instead of the name for the server:
-IPAddress server(216,52,233,122);      // numeric IP for api.pachube.com
-//char server[] = "api.pachube.com";   // name address for pachube API
+//IPAddress server(216,52,233,122);      // numeric IP for api.pachube.com
+char server[] = "api.pachube.com";   // name address for pachube API
 
 unsigned long lastConnectionTime = 0;          // last time you connected to the server, in milliseconds
 boolean lastConnected = false;                 // state of the connection last time through the main loop
@@ -63,6 +63,7 @@ void setup() {
   } 
   else {
     Serial.println("Connected to wifi");
+    printWifiStatus();
   }
 }
 
@@ -140,5 +141,23 @@ void sendData(String thisData) {
   }
   // note the time that the connection was made or attempted:
   lastConnectionTime = millis();
+}
+
+
+void printWifiStatus() {
+  // print the SSID of the network you're attached to:
+  Serial.print("SSID: ");
+  Serial.println(WiFi.SSID());
+
+  // print your WiFi shield's IP address:
+  IPAddress ip = WiFi.localIP();
+  Serial.print("IP Address: ");
+  Serial.println(ip);
+
+  // print the received signal strength:
+  long rssi = WiFi.RSSI();
+  Serial.print("signal strength (RSSI):");
+  Serial.print(rssi);
+  Serial.println(" dBm");
 }
 
