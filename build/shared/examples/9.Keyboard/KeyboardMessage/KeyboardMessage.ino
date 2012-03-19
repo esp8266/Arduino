@@ -8,6 +8,7 @@
  * 10-kilohm resistor attached from pin 4 to ground
  
  created 24 Oct 2011
+ modified 19 Mar 2012
  by Tom Igoe
  
  This example code is in the public domain.
@@ -34,7 +35,7 @@ void loop() {
       // increment the button counter
     counter++;
     // type out a message
-    Keyboard.print("You pressed the button: ");
+    Keyboard.print("You pressed the button ");
     Keyboard.print(counter); 
     Keyboard.println(" times.");
   }
