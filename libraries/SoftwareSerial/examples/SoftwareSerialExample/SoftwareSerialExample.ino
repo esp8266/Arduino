@@ -5,7 +5,8 @@
  Receives from software serial, sends to hardware serial.
  
  The circuit: 
- * Software serial  TX attached to digital pin 2, RX to pin 3
+ * RX is digital pin 2 (connect to TX of other device)
+ * TX is digital pin 3 (connect to RX of other device)
  
  created back in the mists of time
  by Tom Igoe
@@ -16,8 +17,7 @@
  */
 #include <SoftwareSerial.h>
 
-// software serial port: TX = digital pin 2, RX = digital pin 3
-SoftwareSerial mySerial(2, 3);
+SoftwareSerial mySerial(2, 3); // RX, TX
 
 void setup()  
 {
