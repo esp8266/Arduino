@@ -26,7 +26,7 @@ sam3u_ek.build.pins=sam3u_ek
 
 ##############################################################
 
-arduino_due.name=Arduino Due
+arduino_due.name=Arduino DueU Dev. Ed.
 arduino_due.upload.tool=bossac
 arduino_due.upload.protocol=sam-ba
 arduino_due.upload.maximum_size=49152
@@ -35,4 +35,18 @@ arduino_due.build.f_cpu=96000000L
 arduino_due.build.core=sam
 arduino_due.build.extra_flags=-D__SAM3U4E__
 arduino_due.build.ldscript=linker_scripts/gcc/flash.ld
-arduino_due.build.variant=arduino_due
+arduino_due.build.variant=arduino_due_u
+
+##############################################################
+
+arduino_due.name=Arduino DueX Dev. Ed.
+arduino_due.upload.tool=bossac
+arduino_due.upload.protocol=sam-ba
+arduino_due.upload.maximum_size=49152
+arduino_due.build.mcu=cortex-m3
+arduino_due.build.f_cpu=96000000L
+arduino_due.build.core=sam
+arduino_due.build.extra_flags=-D__SAM3U4E__
+arduino_due.build.ldscript=linker_scripts/gcc/flash.ld
+arduino_due.build.variant=arduino_due_x
+
