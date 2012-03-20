@@ -211,9 +211,9 @@ tcp_sent_cb(void *arg, struct tcp_pcb *pcb, u16_t len)
 static err_t tcp_connect_cb(void *arg, struct tcp_pcb *tpcb, err_t err) {
 	struct ttcp* ttcp = arg;
 
-	INFO_TCP("TTCP [%p]: connect %d %d\n", ttcp, err, ttcp->tpcb->state);
+	INFO_TCP("TTCP [%p-%p]: connect %d %d\n", ttcp, tpcb, err, ttcp->tpcb->state);
 
-	_connected = true;
+	_connected =  ( ttcp->tpcb->state == ESTABLISHED) ? 1 : 0;
 
 	ttcp->start_time = timer_get_ms();
 
@@ -315,6 +315,8 @@ static int atcp_start(struct ttcp* ttcp) {
 		tcp_err(ttcp->tpcb, atcp_conn_err_cb);
 		tcp_recv(ttcp->tpcb, atcp_recv_cb);
 		_connected = false;
+		INFO_TCP("[tpcb]- %p\n", ttcp->tpcb);
+
 		if (tcp_connect(ttcp->tpcb, &ttcp->addr, ttcp->port, tcp_connect_cb)
 				!= ERR_OK) {
 			WARN("TTCP [%p]: tcp connect failed\n", ttcp);

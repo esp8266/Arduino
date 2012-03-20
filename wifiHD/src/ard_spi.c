@@ -1008,12 +1008,16 @@ cmd_spi_state_t get_client_state_tcp_cmd_cb(char* recv, char* reply, void* ctx, 
     uint8_t _state = CLOSED;
     if ((recv[3]==1)&&(recv[4]>=0)&&(recv[4]<MAX_SOCK_NUM))
     {
+    	void * p= mapSockTCP[(uint8_t)recv[4]];
     	// get if we are in server or Transmit mode (0)
-    	if (getModeTcp(mapSockTCP[(uint8_t)recv[4]]) == TTCP_MODE_TRANSMIT)
+    	if (getModeTcp(p) == TTCP_MODE_TRANSMIT)
     	{
-    		_state = _connected ? ESTABLISHED : CLOSED;
+
+    		_state = getStateTcp(p, 1);
+    		INFO_TCP("p=%p _ttcp=%p state:%d\n",
+    				p, ((struct ttcp*) p)->tpcb, _state);
     	}else {
-    		_state = getStateTcp(mapSockTCP[(uint8_t)recv[4]], 1);
+    		_state = getStateTcp(p, 1);
     	}
     }
     PUT_DATA_BYTE(_state, reply, 3);
