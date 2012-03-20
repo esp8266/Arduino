@@ -13,7 +13,7 @@
  
  created 13 July 2010
  by dlf (Metodo2 srl)
- modified 4 Mar 2012
+ modified 20 Mar 2012
  by Tom Igoe
  */
 
@@ -21,9 +21,10 @@
 #include <SPI.h>
 #include <WiFi.h>
 
-char ssid[] = "YourNetwork"; //  your network SSID (name) 
-char pass[] = "password";    // your network password (use for WPA, or use as key for WEP)
-int keyIndex = 0;            // your network key Index number (needed only for WEP)
+
+char ssid[] = "yourNetwork";      //  your network SSID (name) 
+char pass[] = "secretPassword";   // your network password
+int keyIndex = 0;                 // your network key Index number (needed only for WEP)
 
 int status = WL_IDLE_STATUS;
 
@@ -53,11 +54,13 @@ void loop() {
   // listen for incoming clients
   WiFiClient client = server.available();
   if (client) {
+    Serial.println("new client");
     // an http request ends with a blank line
     boolean currentLineIsBlank = true;
     while (client.connected()) {
       if (client.available()) {
         char c = client.read();
+        Serial.write(c);
         // if you've gotten to the end of the line (received a newline
         // character) and the line is blank, the http request has ended,
         // so you can send a reply
@@ -65,18 +68,23 @@ void loop() {
           // send a standard http response header
           client.println("HTTP/1.1 200 OK");
           client.println("Content-Type: text/html");
+          client.println("Connnection: close");
           client.println();
+          client.println("<!DOCTYPE HTML>");
           client.println("<html>");
+          // add a meta refresh tag, so the browser pulls again every 5 seconds:
+          client.println("<meta http-equiv=\"refresh\" content=\"5\">");
           // output the value of each analog input pin
           for (int analogChannel = 0; analogChannel < 6; analogChannel++) {
+            int sensorReading = analogRead(analogChannel);
             client.print("analog input ");
             client.print(analogChannel);
             client.print(" is ");
-            client.print(analogRead(analogChannel));
+            client.print(sensorReading);
             client.println("<br />");       
           }
           client.println("</html>");
-          break;
+           break;
         }
         if (c == '\n') {
           // you're starting a new line
@@ -90,8 +98,9 @@ void loop() {
     }
     // give the web browser time to receive the data
     delay(1);
-    // close the connection:
-    client.stop();
+      // close the connection:
+      client.stop();
+      Serial.println("client disonnected");
   }
 }
 
@@ -103,7 +112,7 @@ void printWifiStatus() {
 
   // print your WiFi shield's IP address:
   IPAddress ip = WiFi.localIP();
-    Serial.print("IP Address: ");
+  Serial.print("IP Address: ");
   Serial.println(ip);
 
   // print the received signal strength:
@@ -112,3 +121,4 @@ void printWifiStatus() {
   Serial.print(rssi);
   Serial.println(" dBm");
 }
+
