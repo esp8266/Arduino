@@ -8,7 +8,7 @@
 #
 #  This library is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #  See the GNU Lesser General Public License for more details.
 #
 #  You should have received a copy of the GNU Lesser General Public
@@ -51,6 +51,9 @@ CHIP_SERIE=sam3u
 else ifeq ($(CHIP), __SAM3N4C__)
 CHIP_NAME=sam3n4c
 CHIP_SERIE=sam3n
+else ifeq ($(CHIP), __SAM3X8E__)
+CHIP_NAME=sam3x8e
+CHIP_SERIE=sam3xa
 else ifeq ($(CHIP), __SAM3X8H__)
 CHIP_NAME=sam3x8h
 CHIP_SERIE=sam3xa
@@ -112,7 +115,7 @@ C_SRC+=$(wildcard $(CMSIS_CHIP_PATH)/source/templates/gcc/*.c)
 C_OBJ_TEMP=$(patsubst %.c, %.o, $(notdir $(C_SRC)))
 
 # during development, remove some files
-C_OBJ_FILTER=pio_it.o adc.o
+C_OBJ_FILTER=
 
 C_OBJ=$(filter-out $(C_OBJ_FILTER), $(C_OBJ_TEMP))
 

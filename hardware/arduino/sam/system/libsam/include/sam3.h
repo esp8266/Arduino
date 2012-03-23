@@ -1,7 +1,7 @@
 /* ----------------------------------------------------------------------------
  *         SAM Software Package License 
  * ----------------------------------------------------------------------------
- * Copyright (c) 2011, Atmel Corporation
+ * Copyright (c) 2012, Atmel Corporation
  *
  * All rights reserved.
  *
@@ -77,25 +77,32 @@
   #include "cmsis/sam3n/include/sam3n.h"
   #include "cmsis/sam3n/source/templates/system_sam3n.h"
   #include "cmsis/sam3n/source/templates/exceptions.h"
+#elif (defined __SAM3N0C__) || (defined __SAM3N0B__) || (defined __SAM3N0A__) /* SAM3N0 */
+  #include "cmsis/sam3n/include/sam3n.h"
+  #include "cmsis/sam3n/source/templates/system_sam3n.h"
+  #include "cmsis/sam3n/source/templates/exceptions.h"
+#elif (defined __SAM3N00B__) || (defined __SAM3N00A__) /* SAM3N00 */
+  #include "cmsis/sam3n/include/sam3n.h"
+  #include "cmsis/sam3n/source/templates/system_sam3n.h"
+  #include "cmsis/sam3n/source/templates/exceptions.h"
 
 #elif (defined __SAM3A8C__) || (defined __SAM3A4C__) || (defined __SAM3A2C__) /* SAM3A */
   #include "cmsis/sam3xa/include/sam3xa.h"
   #include "cmsis/sam3xa/source/templates/system_sam3xa.h"
   #include "cmsis/sam3xa/source/templates/exceptions.h"
 
-#elif (defined __SAM3X8C__) || (defined __SAM3X8E__) || (defined __SAM3X8G__) || (defined __SAM3X8H__) /* SAM3X8 */
+#elif (defined __SAM3X8C__) || (defined __SAM3X8E__) || (defined __SAM3X8H__) /* SAM3X8 */
   #include "cmsis/sam3xa/include/sam3xa.h"
   #include "cmsis/sam3xa/source/templates/system_sam3xa.h"
   #include "cmsis/sam3xa/source/templates/exceptions.h"
-#elif (defined __SAM3X4C__) || (defined __SAM3X4E__) || (defined __SAM3X4G__) || (defined __SAM3X4H__) /* SAM3X4 */
+#elif (defined __SAM3X4C__) || (defined __SAM3X4E__) /* SAM3X4 */
   #include "cmsis/sam3xa/include/sam3xa.h"
   #include "cmsis/sam3xa/source/templates/system_sam3xa.h"
   #include "cmsis/sam3xa/source/templates/exceptions.h"
-#elif (defined __SAM3X2C__) || (defined __SAM3X2E__) || (defined __SAM3X2G__) || (defined __SAM3X2H__) /* SAM3X2 */
+#elif (defined __SAM3A4C__) || (defined __SAM3A8C__) /* SAM3A */
   #include "cmsis/sam3xa/include/sam3xa.h"
   #include "cmsis/sam3xa/source/templates/system_sam3xa.h"
   #include "cmsis/sam3xa/source/templates/exceptions.h"
-
 #else
   #error Library does not support the specified device.
 #endif

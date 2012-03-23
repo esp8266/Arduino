@@ -1,5 +1,5 @@
 /* ----------------------------------------------------------------------------
- *         SAM Software Package License 
+ *         SAM Software Package License
  * ----------------------------------------------------------------------------
  * Copyright (c) 2011, Atmel Corporation
  *
@@ -34,14 +34,14 @@
  * The PWM macrocell controls square output waveforms of 4 channels.
  * Characteristics of output waveforms such as period, duty-cycle,
  * dead-time can be configured.\n
- * Some of PWM channels can be linked together as synchronous channel and
+ * Some of PWM channels can be linked together as synchronous ul_channel and
  * duty-cycle of synchronous channels can be updated by PDC automaticly.
  *
  * Before enabling the channels, they must have been configured first.
  * The main settings include:
  * <ul>
  * <li>Configuration of the clock generator.</li>
- * <li>Selection of the clock for each channel.</li>
+ * <li>Selection of the clock for each ul_channel.</li>
  * <li>Configuration of output waveform characteristics, such as period, duty-cycle etc.</li>
  * <li>Configuration for synchronous channels if needed.</li>
  *    - Selection of the synchronous channels.
@@ -54,7 +54,7 @@
  * After the channels is enabled, the user must use respective update registers
  * to change the wave characteristics to prevent unexpected output waveform.
  * i.e. PWM_CDTYUPDx register should be used if user want to change duty-cycle
- * when the channel is enabled.
+ * when the ul_channel is enabled.
  *
  * For more accurate information, please look at the PWM section of the
  * Datasheet.
@@ -132,23 +132,18 @@ static uint16_t FindClockConfiguration(
  *----------------------------------------------------------------------------*/
 
 /**
- * \brief Configures PWM a channel with the given parameters, basic configure function.
+ * \brief Configures PWM a ul_channel with the given parameters, basic configure function.
  *
  * The PWM controller must have been clocked in the PMC prior to calling this
  * function.
- * Beware: this function disables the channel. It waits until disable is effective.
+ * Beware: this function disables the ul_channel. It waits until disable is effective.
  *
- * \param channel  Channel number.
+ * \param ul_channel  Channel number.
  * \param prescaler  Channel prescaler.
  * \param alignment  Channel alignment.
  * \param polarity  Channel polarity.
  */
-void PWMC_ConfigureChannel(
-    Pwm* pPwm,
-    uint8_t channel,
-    uint32_t prescaler,
-    uint32_t alignment,
-    uint32_t polarity)
+void PWMC_ConfigureChannel( Pwm* pPwm, uint32_t ul_channel, uint32_t prescaler, uint32_t alignment, uint32_t polarity )
 {
     pPwm->PWM_CH_NUM[0].PWM_CMR = 1;
 
@@ -156,24 +151,24 @@ void PWMC_ConfigureChannel(
     assert((alignment & (uint32_t)~PWM_CMR_CALG) == 0);
     assert((polarity & (uint32_t)~PWM_CMR_CPOL) == 0);
 
-    /* Disable channel (effective at the end of the current period) */
-    if ((pPwm->PWM_SR & (1 << channel)) != 0) {
-        pPwm->PWM_DIS = 1 << channel;
-        while ((pPwm->PWM_SR & (1 << channel)) != 0);
+    /* Disable ul_channel (effective at the end of the current period) */
+    if ((pPwm->PWM_SR & (1 << ul_channel)) != 0) {
+        pPwm->PWM_DIS = 1 << ul_channel;
+        while ((pPwm->PWM_SR & (1 << ul_channel)) != 0);
     }
 
-    /* Configure channel */
-    pPwm->PWM_CH_NUM[channel].PWM_CMR = prescaler | alignment | polarity;
+    /* Configure ul_channel */
+    pPwm->PWM_CH_NUM[ul_channel].PWM_CMR = prescaler | alignment | polarity;
 }
 
 /**
- * \brief Configures PWM a channel with the given parameters, extend configure function.
+ * \brief Configures PWM a ul_channel with the given parameters, extend configure function.
  *
  * The PWM controller must have been clocked in the PMC prior to calling this
  * function.
- * Beware: this function disables the channel. It waits until disable is effective.
+ * Beware: this function disables the ul_channel. It waits until disable is effective.
  *
- * \param channel            Channel number.
+ * \param ul_channel            Channel number.
  * \param prescaler          Channel prescaler.
  * \param alignment          Channel alignment.
  * \param polarity           Channel polarity.
@@ -182,16 +177,8 @@ void PWMC_ConfigureChannel(
  * \param DTHInverte         Channel Dead-Time PWMHx output Inverted.
  * \param DTLInverte         Channel Dead-Time PWMHx output Inverted.
  */
-void PWMC_ConfigureChannelExt(
-    Pwm* pPwm,
-    uint8_t channel,
-    uint32_t prescaler,
-    uint32_t alignment,
-    uint32_t polarity,
-    uint32_t countEventSelect,
-    uint32_t DTEnable,
-    uint32_t DTHInverte,
-    uint32_t DTLInverte)
+void PWMC_ConfigureChannelExt( Pwm* pPwm, uint32_t ul_channel, uint32_t prescaler, uint32_t alignment, uint32_t polarity,
+                               uint32_t countEventSelect, uint32_t DTEnable, uint32_t DTHInverte, uint32_t DTLInverte )
 {
 //    assert(prescaler < PWM_CMR0_CPRE_MCKB);
     assert((alignment & (uint32_t)~PWM_CMR_CALG) == 0);
@@ -201,14 +188,14 @@ void PWMC_ConfigureChannelExt(
     assert((DTHInverte & (uint32_t)~PWM_CMR_DTHI) == 0);
     assert((DTLInverte & (uint32_t)~PWM_CMR_DTLI) == 0);
 
-    /* Disable channel (effective at the end of the current period) */
-    if ((pPwm->PWM_SR & (1 << channel)) != 0) {
-        pPwm->PWM_DIS = 1 << channel;
-        while ((pPwm->PWM_SR & (1 << channel)) != 0);
+    /* Disable ul_channel (effective at the end of the current period) */
+    if ((pPwm->PWM_SR & (1 << ul_channel)) != 0) {
+        pPwm->PWM_DIS = 1 << ul_channel;
+        while ((pPwm->PWM_SR & (1 << ul_channel)) != 0);
     }
 
-    /* Configure channel */
-    pPwm->PWM_CH_NUM[channel].PWM_CMR = prescaler | alignment | polarity |
+    /* Configure ul_channel */
+    pPwm->PWM_CH_NUM[ul_channel].PWM_CMR = prescaler | alignment | polarity |
         countEventSelect | DTEnable | DTHInverte | DTLInverte;
 }
 
@@ -248,109 +235,105 @@ void PWMC_ConfigureClocks(uint32_t clka, uint32_t clkb, uint32_t mck)
 }
 
 /**
- * \brief Sets the period value used by a PWM channel.
+ * \brief Sets the period value used by a PWM ul_channel.
  *
- * This function writes directly to the CPRD register if the channel is disabled;
+ * This function writes directly to the CPRD register if the ul_channel is disabled;
  * otherwise, it uses the update register CPRDUPD.
  *
- * \param channel Channel number.
+ * \param ul_channel Channel number.
  * \param period  Period value.
  */
-void PWMC_SetPeriod( Pwm* pPwm, uint8_t channel, uint16_t period)
+void PWMC_SetPeriod( Pwm* pPwm, uint32_t ul_channel, uint16_t period)
 {
-    /* If channel is disabled, write to CPRD */
-    if ((pPwm->PWM_SR & (1 << channel)) == 0) {
+    /* If ul_channel is disabled, write to CPRD */
+    if ((pPwm->PWM_SR & (1 << ul_channel)) == 0) {
 
-        pPwm->PWM_CH_NUM[channel].PWM_CPRD = period;
+        pPwm->PWM_CH_NUM[ul_channel].PWM_CPRD = period;
     }
     /* Otherwise use update register */
     else {
 
-        pPwm->PWM_CH_NUM[channel].PWM_CPRDUPD = period;
+        pPwm->PWM_CH_NUM[ul_channel].PWM_CPRDUPD = period;
     }
 }
 
 /**
- * \brief Sets the duty cycle used by a PWM channel.
- * This function writes directly to the CDTY register if the channel is disabled;
+ * \brief Sets the duty cycle used by a PWM ul_channel.
+ * This function writes directly to the CDTY register if the ul_channel is disabled;
  * otherwise it uses the update register CDTYUPD.
- * Note that the duty cycle must always be inferior or equal to the channel
+ * Note that the duty cycle must always be inferior or equal to the ul_channel
  * period.
  *
- * \param channel  Channel number.
+ * \param ul_channel  Channel number.
  * \param duty     Duty cycle value.
  */
-void PWMC_SetDutyCycle( Pwm* pPwm, uint8_t channel, uint16_t duty)
+void PWMC_SetDutyCycle( Pwm* pPwm, uint32_t ul_channel, uint16_t duty)
 {
-    assert(duty <= pPwm->PWM_CH_NUM[channel].PWM_CPRD);
+    assert(duty <= pPwm->PWM_CH_NUM[ul_channel].PWM_CPRD);
 
-    /* If channel is disabled, write to CDTY */
-    if ((pPwm->PWM_SR & (1 << channel)) == 0) {
+    /* If ul_channel is disabled, write to CDTY */
+    if ((pPwm->PWM_SR & (1 << ul_channel)) == 0) {
 
-        pPwm->PWM_CH_NUM[channel].PWM_CDTY = duty;
+        pPwm->PWM_CH_NUM[ul_channel].PWM_CDTY = duty;
     }
     /* Otherwise use update register */
     else {
 
-        pPwm->PWM_CH_NUM[channel].PWM_CDTYUPD = duty;
+        pPwm->PWM_CH_NUM[ul_channel].PWM_CDTYUPD = duty;
     }
 }
 
 /**
- * \brief Sets the dead time used by a PWM channel.
- * This function writes directly to the DT register if the channel is disabled;
+ * \brief Sets the dead time used by a PWM ul_channel.
+ * This function writes directly to the DT register if the ul_channel is disabled;
  * otherwise it uses the update register DTUPD.
- * Note that the dead time must always be inferior or equal to the channel
+ * Note that the dead time must always be inferior or equal to the ul_channel
  * period.
  *
- * \param channel  Channel number.
+ * \param ul_channel  Channel number.
  * \param timeH    Dead time value for PWMHx output.
  * \param timeL    Dead time value for PWMLx output.
  */
-void PWMC_SetDeadTime( Pwm* pPwm, uint8_t channel, uint16_t timeH, uint16_t timeL)
+void PWMC_SetDeadTime( Pwm* pPwm, uint32_t ul_channel, uint16_t timeH, uint16_t timeL)
 {
-    assert(timeH <= pPwm->PWM_CH_NUM[channel].PWM_CPRD);
-    assert(timeL <= pPwm->PWM_CH_NUM[channel].PWM_CPRD);
+    assert(timeH <= pPwm->PWM_CH_NUM[ul_channel].PWM_CPRD);
+    assert(timeL <= pPwm->PWM_CH_NUM[ul_channel].PWM_CPRD);
 
-    /* If channel is disabled, write to DT */
-    if ((pPwm->PWM_SR & (1 << channel)) == 0) {
+    /* If ul_channel is disabled, write to DT */
+    if ((pPwm->PWM_SR & (1 << ul_channel)) == 0) {
 
-        pPwm->PWM_CH_NUM[channel].PWM_DT = timeH | (timeL << 16);
+        pPwm->PWM_CH_NUM[ul_channel].PWM_DT = timeH | (timeL << 16);
     }
     /* Otherwise use update register */
     else {
-        pPwm->PWM_CH_NUM[channel].PWM_DTUPD = timeH | (timeL << 16);
+        pPwm->PWM_CH_NUM[ul_channel].PWM_DTUPD = timeH | (timeL << 16);
     }
 }
 
 /**
- * \brief Configures Syncronous channel with the given parameters.
+ * \brief Configures Syncronous ul_channel with the given parameters.
  * Beware: At this time, the channels should be disabled.
  *
  * \param channels                 Bitwise OR of Syncronous channels.
- * \param updateMode               Syncronous channel update mode.
+ * \param updateMode               Syncronous ul_channel update mode.
  * \param requestMode              PDC transfer request mode.
  * \param requestComparisonSelect  PDC transfer request comparison selection.
  */
-void PWMC_ConfigureSyncChannel( Pwm* pPwm,
-    uint32_t channels,
-    uint32_t updateMode,
-    uint32_t requestMode,
-    uint32_t requestComparisonSelect)
+void PWMC_ConfigureSyncChannel( Pwm* pPwm, uint32_t ul_channels, uint32_t updateMode, uint32_t requestMode, uint32_t requestComparisonSelect )
 {
-    pPwm->PWM_SCM = channels | updateMode | requestMode | requestComparisonSelect;
+    pPwm->PWM_SCM = ul_channels | updateMode | requestMode | requestComparisonSelect;
 }
 
 /**
  * \brief Sets the update period of the synchronous channels.
- * This function writes directly to the SCUP register if the channel #0 is disabled;
+ * This function writes directly to the SCUP register if the ul_channel #0 is disabled;
  * otherwise it uses the update register SCUPUPD.
  *
  * \param period   update period.
  */
-void PWMC_SetSyncChannelUpdatePeriod( Pwm* pPwm, uint8_t period)
+void PWMC_SetSyncChannelUpdatePeriod( Pwm* pPwm, uint8_t period )
 {
-    /* If channel is disabled, write to SCUP */
+    /* If ul_channel is disabled, write to SCUP */
     if ((pPwm->PWM_SR & (1 << 0)) == 0) {
 
         pPwm->PWM_SCUP = period;
@@ -379,49 +362,49 @@ void PWMC_SetSyncChannelUpdateUnlock( Pwm* pPwm )
 }
 
 /**
- * \brief Enables the given PWM channel.
+ * \brief Enables the given PWM ul_channel.
  *
  * This does NOT enable the corresponding pin;this must be done in the user code.
  *
- * \param channel  Channel number.
+ * \param ul_channel  Channel number.
  */
-void PWMC_EnableChannel( Pwm* pPwm, uint8_t channel)
+void PWMC_EnableChannel( Pwm* pPwm, uint32_t ul_channel)
 {
-    pPwm->PWM_ENA = 1 << channel;
+    pPwm->PWM_ENA = 1 << ul_channel;
 }
 
 /**
- * \brief Disables the given PWM channel.
+ * \brief Disables the given PWM ul_channel.
  *
- * Beware, channel will be effectively disabled at the end of the current period.
- * Application can check channel is disabled using the following wait loop:
- * while ((PWM->PWM_SR & (1 << channel)) != 0);
+ * Beware, ul_channel will be effectively disabled at the end of the current period.
+ * Application can check ul_channel is disabled using the following wait loop:
+ * while ((PWM->PWM_SR & (1 << ul_channel)) != 0);
  *
- * \param channel  Channel number.
+ * \param ul_channel  Channel number.
  */
-void PWMC_DisableChannel( Pwm* pPwm, uint8_t channel)
+void PWMC_DisableChannel( Pwm* pPwm, uint32_t ul_channel)
 {
-    pPwm->PWM_DIS = 1 << channel;
+    pPwm->PWM_DIS = 1 << ul_channel;
 }
 
 /**
- * \brief Enables the period interrupt for the given PWM channel.
+ * \brief Enables the period interrupt for the given PWM ul_channel.
  *
- * \param channel  Channel number.
+ * \param ul_channel  Channel number.
  */
-void PWMC_EnableChannelIt( Pwm* pPwm, uint8_t channel)
+void PWMC_EnableChannelIt( Pwm* pPwm, uint32_t ul_channel)
 {
-    pPwm->PWM_IER1 = 1 << channel;
+    pPwm->PWM_IER1 = 1 << ul_channel;
 }
 
 /**
- * \brief Disables the period interrupt for the given PWM channel.
+ * \brief Disables the period interrupt for the given PWM ul_channel.
  *
- * \param channel  Channel number.
+ * \param ul_channel  Channel number.
  */
-void PWMC_DisableChannelIt( Pwm* pPwm, uint8_t channel)
+void PWMC_DisableChannelIt( Pwm* pPwm, uint32_t ul_channel)
 {
-    pPwm->PWM_IDR1 = 1 << channel;
+    pPwm->PWM_IDR1 = 1 << ul_channel;
 }
 
 /**
@@ -455,18 +438,16 @@ void PWMC_DisableIt( Pwm* pPwm, uint32_t sources1, uint32_t sources2)
  * Note: Duty cycle of syncronous channels can update by PDC
  *       when the field UPDM (Update Mode) in the PWM_SCM register is set to 2.
  *
- * \param pwmc    Pointer to an Pwm instance.
- * \param buffer  Data buffer to send.
- * \param length  Length of the data buffer.
+ * \param pwmc      Pointer to an Pwm instance.
+ * \param pvBuffer  Data buffer to send.
+ * \param length    Length of the data buffer.
  */
-uint8_t PWMC_WriteBuffer(Pwm *pwmc,
-    void *buffer,
-    uint32_t length)
+uint8_t PWMC_WriteBuffer( Pwm *pwmc, void* pvBuffer, uint32_t length)
 {
     /* Check if first bank is free */
     if (pwmc->PWM_TCR == 0) {
 
-        pwmc->PWM_TPR = (uint32_t) buffer;
+        pwmc->PWM_TPR = (uint32_t) pvBuffer;
         pwmc->PWM_TCR = length;
         pwmc->PWM_PTCR = PERIPH_PTCR_TXTEN;
         return 1;
@@ -474,7 +455,7 @@ uint8_t PWMC_WriteBuffer(Pwm *pwmc,
     /* Check if second bank is free */
     else if (pwmc->PWM_TNCR == 0) {
 
-        pwmc->PWM_TNPR = (uint32_t) buffer;
+        pwmc->PWM_TNPR = (uint32_t) pvBuffer;
         pwmc->PWM_TNCR = length;
         return 1;
     }
@@ -562,9 +543,38 @@ void PWMC_SetFaultProtectionValue( Pwm* pPwm, uint32_t value)
  *
  * \param value  Bitwise OR of FPEx[y].
  */
-void PWMC_EnableFaultProtection( Pwm* pPwm, uint32_t value)
+void PWMC_EnableFaultProtection( Pwm* pPwm, uint32_t ul_channel, uint32_t ul_value)
 {
-    pPwm->PWM_FPE = value;
+	/* Fault Protection Enable Register */
+	uint32_t ul_fault_enable_reg = 0;
+
+#if (SAM3XA)
+	if (ul_channel < 4)
+  {
+		ul_channel *= 8;
+		ul_fault_enable_reg = pPwm->PWM_FPE1;
+		ul_fault_enable_reg &= ~(0xFF << ul_channel);
+		ul_fault_enable_reg |= (ul_value << ul_channel);
+		pPwm->PWM_FPE1 = ul_fault_enable_reg;
+	}
+  else
+  {
+		ul_channel -= 4;
+		ul_channel *= 8;
+		ul_fault_enable_reg = pPwm->PWM_FPE2;
+		ul_fault_enable_reg &= ~(0xFF << ul_channel);
+		ul_fault_enable_reg |= (ul_value << ul_channel);
+		pPwm->PWM_FPE2 = ul_fault_enable_reg;
+	}
+#endif
+
+#if (SAM3U || SAM3S || SAM4S)
+	ul_channel *= 8;
+	ul_fault_enable_reg = pPwm->PWM_FPE;
+	ul_fault_enable_reg &= ~(0xFF << ul_channel);
+	ul_fault_enable_reg |= (ul_value << ul_channel);
+	pPwm->PWM_FPE = ul_fault_enable_reg;
+#endif
 }
 
 /**
@@ -578,7 +588,7 @@ void PWMC_ConfigureComparisonUnit( Pwm* pPwm, uint32_t x, uint32_t value, uint32
 {
     assert(x < 8);
 
-    /* If channel is disabled, write to CMPxM & CMPxV */
+    /* If ul_channel is disabled, write to CMPxM & CMPxV */
     if ((pPwm->PWM_SR & (1 << 0)) == 0) {
         pPwm->PWM_CMP[x].PWM_CMPM = mode;
         pPwm->PWM_CMP[x].PWM_CMPV = value;

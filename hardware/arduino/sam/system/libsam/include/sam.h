@@ -85,22 +85,13 @@
     part_is_defined( SAM3N4B ) || \
     part_is_defined( SAM3N4C ) )
 	
-#define SAM3X2 ( \
-    part_is_defined( SAM3X2C ) || \
-	part_is_defined( SAM3X2E ) || \
-    part_is_defined( SAM3X2G ) || \
-    part_is_defined( SAM3X2H ) )
-
 #define SAM3X4 ( \
     part_is_defined( SAM3X4C ) || \
-	part_is_defined( SAM3X4E ) || \
-    part_is_defined( SAM3X4G ) || \
-    part_is_defined( SAM3X4H ) )
+    part_is_defined( SAM3X4E ) )
 
 #define SAM3X8 ( \
     part_is_defined( SAM3X8C ) || \
-	part_is_defined( SAM3X8E ) || \
-    part_is_defined( SAM3X8G ) || \
+    part_is_defined( SAM3X8E ) || \
     part_is_defined( SAM3X8H ) )
 
 #define SAM3A2 ( \
@@ -122,7 +113,7 @@
 #define SAM3N (SAM3N1 || SAM3N2 || SAM3N4)
 
 /* Entire SAM3XA Family */
-#define SAM3XA (SAM3X2 || SAM3X4 || SAM3X8 || SAM3A2 || SAM3A4 || SAM3A8)
+#define SAM3XA ( SAM3X4 || SAM3X8 || SAM3A2 || SAM3A4 || SAM3A8)
 
 /* SAM9 family */
 
