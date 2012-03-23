@@ -15,7 +15,7 @@
  *
  ******************************************************************************/
 
-#include "system_sam3x.h"
+#include "system_sam3xa.h"
 #include "sam3xa.h"
 
 /* @cond 0 */
