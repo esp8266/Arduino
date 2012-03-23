@@ -39,7 +39,7 @@ void SystemInit(void);
 /** 
  * Initialize the flash and watchdog setting .
  */
-void set_flash_and_watchdog(void);
+void system_init_flash_and_watchdog(uint32_t dw_clk);
 
 /**
  * @brief Updates the SystemCoreClock with current core Clock 
