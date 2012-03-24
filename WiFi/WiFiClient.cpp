@@ -126,7 +126,8 @@ uint8_t WiFiClient::connected() {
   } else {
     uint8_t s = status();
 
-    return !(s == LISTEN || s == CLOSED || s == FIN_WAIT_1 || s == FIN_WAIT_2 ||
+    return !(s == LISTEN || s == CLOSED || s == FIN_WAIT_1 ||
+    		s == FIN_WAIT_2 || s == TIME_WAIT ||
              (s == CLOSE_WAIT && !available()));
   }
 }
