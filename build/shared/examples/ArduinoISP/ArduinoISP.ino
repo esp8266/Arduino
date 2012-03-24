@@ -66,7 +66,7 @@
 void pulse(int pin, int times);
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(19200);
   pinMode(LED_PMODE, OUTPUT);
   pulse(LED_PMODE, 2);
   pinMode(LED_ERR, OUTPUT);
@@ -109,7 +109,7 @@ void heartbeat() {
   if (hbval < 32) hbdelta = -hbdelta;
   hbval += hbdelta;
   analogWrite(LED_HB, hbval);
-  delay(40);
+  delay(20);
 }
 
 

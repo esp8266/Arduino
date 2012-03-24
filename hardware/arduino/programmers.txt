@@ -23,4 +23,4 @@ parallel.force=true
 arduinoisp.name=Arduino as ISP
 arduinoisp.communication=serial
 arduinoisp.protocol=stk500v1
-arduinoisp.speed=9600
+arduinoisp.speed=19200
