@@ -39,7 +39,6 @@ typedef enum {
 
 #define TIMEOUT_SPI  	200
 //#define TIMEOUT_SENT_REPLY 1000
-#define MAX_CMD_PIPE_SIZE	5
 #define DUMMY_DATA	0xFF
 
 typedef int (*cmd_spi_cb_t)(int numParam, char* buf, void* ctx);

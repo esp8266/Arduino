@@ -72,7 +72,7 @@
 #define REPLY_MAX_LEN 1024
 #endif
 
-uint8_t counter = 0;
+#define  _BUFFERSIZE 100
 
 extern void tcp_debug_print_pcbs(void);
 
@@ -82,7 +82,6 @@ static uint16_t count = 0;
 static uint16_t replyCount = 0;
 static cmd_spi_state_t state = SPI_CMD_IDLE;
 int receivedChars = 0;
-#define  _BUFFERSIZE 100
 static uint8_t _receiveBuffer[_BUFFERSIZE];
 bool startReply = false;
 bool end_write = false;	//TODO only for debug
@@ -159,8 +158,6 @@ cmd_resetStatSpi(int argc, char* argv[], void* ctx)
 #define RETURN_ERR(e) return (e==WL_SUCCESS) ? WIFI_SPI_ACK : WIFI_SPI_ERR;
 #define RESET_USART_CSR(usart) usart->cr = AVR32_USART_CR_RSTSTA_MASK;
 
-tSpiMsg spiMsgBuf[MAX_CMD_PIPE_SIZE];
-unsigned char indexCmdPipe = 0;
 int result = WL_CONNECT_FAILED; //Store the result of the last operation
 
 void* mapSockTCP[MAX_SOCK_NUM];
@@ -194,6 +191,11 @@ void clearMapSockTcp(uint8_t sock)
 {
 	if (sock < MAX_SOCK_NUM)
 		mapSockTCP[sock] = NULL;
+}
+
+void initMapSockTcp()
+{
+	memset(mapSockTCP, 0, sizeof(void*)*MAX_SOCK_NUM);
 }
 
 /**
@@ -1014,9 +1016,13 @@ cmd_spi_state_t get_client_state_tcp_cmd_cb(char* recv, char* reply, void* ctx, 
     	{
 
     		_state = getStateTcp(p, 1);
-    		INFO_TCP("p=%p _ttcp=%p state:%d\n",
+    		INFO_TCP_VER("p=%p _ttcp=%p state:%d\n",
     				p, ((struct ttcp*) p)->tpcb, _state);
     	}else {
+    		INFO_TCP_VER("p=%p _ttcp=%p state(tpcb):%d state(lpcb):%d\n",
+    		    				p, ((struct ttcp*) p)->tpcb,
+    		    				((struct ttcp*) p)->tpcb->state,
+    		    				((struct ttcp*) p)->lpcb->state);
     		_state = getStateTcp(p, 1);
     	}
     }
@@ -1380,6 +1386,8 @@ void spi_poll(struct netif* netif) {
 		{
 			state = SPI_CMD_INPROGRESS;
 			count = receivedChars-offset;
+			if (count >= CMD_MAX_LEN)
+				count = CMD_MAX_LEN;
 			memcpy(buf, &_receiveBuffer[offset], count);
 
 			DISABLE_SPI_INT();
@@ -1637,6 +1645,10 @@ int initSpi()
 	init_spi_cmds();
 
 	memset(_receiveBuffer, 0, _BUFFERSIZE);
+	memset(buf, 0, CMD_MAX_LEN);
+	memset(reply, 0, REPLY_MAX_LEN);
+
+	initMapSockTcp();
 
 	init_pBuf();
 

@@ -297,12 +297,13 @@ static err_t atcp_accept_cb(void *arg, struct tcp_pcb *newpcb, err_t err) {
  */
 static int atcp_start(struct ttcp* ttcp) {
 	err_t err = ERR_OK;
+
 	ttcp->tpcb = tcp_new();
 	if (ttcp->tpcb == NULL) {
 		WARN("TTCP [%p]: could not allocate pcb\n", ttcp);
 		return -1;
 	}
-
+	INFO_TCP("tcp:%x\n", ttcp->tpcb);
 	ttcp->payload = malloc(ttcp->buflen);
 	if (ttcp->payload == NULL) {
 		WARN("TTCP [%p]: could not allocate payload\n", ttcp);

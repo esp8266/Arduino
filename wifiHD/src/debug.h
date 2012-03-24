@@ -23,10 +23,10 @@
 #define INFO_E (1<<0xE)     // Error
 #define INFO_WARN_FLAG (1<<0xF)     // Warning
 
-
 extern uint16_t enableDebug;
 extern uint16_t verboseDebug;
 
+#ifdef _INFO_DEBUG_
 #define INFO_INIT(msg, args...) do { 			\
 if (enableDebug & INFO_INIT_FLAG) printk("I-[%s] " msg , __func__ , ##args );	\
 } while (0)
@@ -35,6 +35,12 @@ if (enableDebug & INFO_INIT_FLAG) printk("I-[%s] " msg , __func__ , ##args );	\
 if (enableDebug & INFO_TCP_FLAG) printk("I-[%s] " msg , __func__ , ##args );	\
 } while (0)
 
+#define INFO_TCP_VER(msg, args...) do { 			\
+if ((enableDebug & INFO_TCP_FLAG)&&(verboseDebug & INFO_TCP_FLAG)) \
+	printk("I-[%s] " msg , __func__ , ##args );	\
+} while (0)
+
+
 #define INFO_SPI(msg, args...) do { 			\
 if (enableDebug & INFO_SPI_FLAG) printk("I-[%s] " msg , __func__ , ##args );	\
 } while (0)
@@ -42,7 +48,13 @@ if (enableDebug & INFO_SPI_FLAG) printk("I-[%s] " msg , __func__ , ##args );	\
 #define INFO_UTIL(msg, args...) do { 			\
 if (enableDebug & INFO_UTIL_FLAG) printk("I-[%s] " msg , __func__ , ##args );	\
 } while (0)
-
+#else
+#define INFO_INIT(msg, args...) do {}while(0);
+#define INFO_TCP(msg, args...) do {}while(0);
+#define INFO_TCP_VER(msg, args...) do { }while(0);
+#define INFO_SPI(msg, args...) do {}while(0);
+#define INFO_UTIL(msg, args...) do {}while(0);
+#endif
 
 #ifdef _APP_DEBUG_
 #define INFO(msg, args...) do { 			\
