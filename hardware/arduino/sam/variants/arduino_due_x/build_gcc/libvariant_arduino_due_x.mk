@@ -20,7 +20,7 @@
 .SUFFIXES: .o .a .c .s
 
 CHIP=__SAM3U4E__
-VARIANT=arduino_due
+VARIANT=arduino_due_x
 LIBNAME=libvariant_$(VARIANT)
 TOOLCHAIN=gcc
 

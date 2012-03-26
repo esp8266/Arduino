@@ -25,18 +25,18 @@ SUBMAKE_OPTIONS=--no-builtin-rules --no-builtin-variables
 # Rules
 #-------------------------------------------------------------------------------
 
-all: arduino_due
+all: arduino_due_u
 
-.PHONY: arduino_due
-arduino_due:
-	@echo --- Making arduino_due
-	@$(MAKE) DEBUG=1 $(SUBMAKE_OPTIONS) -f libvariant_arduino_due.mk
+.PHONY: arduino_due_u
+arduino_due_u:
+	@echo --- Making arduino_due_u
+	@$(MAKE) DEBUG=1 $(SUBMAKE_OPTIONS) -f libvariant_arduino_due_u.mk
 #	@$(MAKE) $(SUBMAKE_OPTIONS) -f libvariant_arduino_due.mk
 
 .PHONY: clean
 clean:
-	@echo --- Cleaning arduino_due
-	@$(MAKE) DEBUG=1 $(SUBMAKE_OPTIONS) -f libvariant_arduino_due.mk $@
+	@echo --- Cleaning arduino_due_u
+	@$(MAKE) DEBUG=1 $(SUBMAKE_OPTIONS) -f libvariant_arduino_due_u.mk $@
 #	@$(MAKE) $(SUBMAKE_OPTIONS) -f libvariant_arduino_due.mk $@
 
 
