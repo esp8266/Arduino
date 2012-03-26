@@ -130,6 +130,21 @@ public:
 	virtual size_t type(uint8_t k);
 	virtual size_t press(uint8_t k);
 	virtual size_t release(uint8_t k);
+	
+	virtual size_t press(uint8_t k[], uint8_t len);
+	virtual size_t press(uint8_t k1, uint8_t k2);	
+	virtual size_t press(uint8_t k1, uint8_t k2, uint8_t k3);	
+	virtual size_t press(uint8_t k1, uint8_t k2, uint8_t k3, uint8_t k4);	
+	virtual size_t press(uint8_t k1, uint8_t k2, uint8_t k3, uint8_t k4, uint8_t k5);	
+	virtual size_t press(uint8_t k1, uint8_t k2, uint8_t k3, uint8_t k4, uint8_t k5, uint8_t k6);	
+
+	virtual size_t release(uint8_t k[], uint8_t len);
+	virtual size_t release(uint8_t k1, uint8_t k2);	
+	virtual size_t release(uint8_t k1, uint8_t k2, uint8_t k3);	
+	virtual size_t release(uint8_t k1, uint8_t k2, uint8_t k3, uint8_t k4);	
+	virtual size_t release(uint8_t k1, uint8_t k2, uint8_t k3, uint8_t k4, uint8_t k5);	
+	virtual size_t release(uint8_t k1, uint8_t k2, uint8_t k3, uint8_t k4, uint8_t k5, uint8_t k6);	
+	
 	virtual void releaseAll(void);
 };
 extern Keyboard_ Keyboard;

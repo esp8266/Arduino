@@ -467,17 +467,6 @@ size_t Keyboard_::press(uint8_t k)
 // it shouldn't be repeated any more.
 size_t Keyboard_::release(uint8_t k) 
 {
-	/*
-	uint8_t i;
-	k = pgm_read_byte(_asciimap + k);
-	if (!k) {
-		return 0;
-	}
-	if (k & 0x80) {
-		_keyReport.modifiers |= 0x02;	// the left shift modifier
-		k &= 0x7F;
-	}
-	*/
 	uint8_t i;
 	if (k >= 136) {			// it's a non-printing key (not a modifier)
 		k = k - 136;
@@ -508,6 +497,87 @@ size_t Keyboard_::release(uint8_t k)
 	sendReport(&_keyReport);
 	return 1;
 }
+
+size_t Keyboard_::press(uint8_t k[], uint8_t len) {
+	uint8_t i;
+	uint8_t result = 0;
+	for (i=0; i<len; i++) {
+		result += press(k[i]);
+	}
+	return result;
+}
+
+size_t Keyboard_::press(uint8_t k1, uint8_t k2) 
+{
+	uint8_t k[] = {k1, k2};
+	return press(k, 2);
+}
+
+size_t Keyboard_::press(uint8_t k1, uint8_t k2, uint8_t k3) 
+{
+	uint8_t k[] = {k1, k2, k3};
+	return press(k, 3);
+}
+
+size_t Keyboard_::press(uint8_t k1, uint8_t k2, uint8_t k3, uint8_t k4) 
+{
+	uint8_t k[] = {k1, k2, k3, k4};
+	return press(k, 4);
+}
+
+size_t Keyboard_::press(uint8_t k1, uint8_t k2, uint8_t k3, uint8_t k4, uint8_t k5) 
+{
+	uint8_t k[] = {k1, k2, k3, k4, k5};
+	return press(k, 5);
+}
+
+size_t Keyboard_::press(uint8_t k1, uint8_t k2, uint8_t k3, uint8_t k4, uint8_t k5, uint8_t k6) 
+{
+	uint8_t k[] = {k1, k2, k3, k4, k5, k6};
+	return press(k, 6);
+}
+
+
+
+size_t Keyboard_::release(uint8_t k[], uint8_t len) {
+	uint8_t i;
+	uint8_t result = 0;
+	for (i=0; i<len; i++) {
+		result += release(k[i]);
+	}
+	return result;
+}
+
+size_t Keyboard_::release(uint8_t k1, uint8_t k2) 
+{
+	uint8_t k[] = {k1, k2};
+	return release(k, 2);
+}
+
+size_t Keyboard_::release(uint8_t k1, uint8_t k2, uint8_t k3) 
+{
+	uint8_t k[] = {k1, k2, k3};
+	return release(k, 3);
+}
+
+size_t Keyboard_::release(uint8_t k1, uint8_t k2, uint8_t k3, uint8_t k4) 
+{
+	uint8_t k[] = {k1, k2, k3, k4};
+	return release(k, 4);
+}
+
+size_t Keyboard_::release(uint8_t k1, uint8_t k2, uint8_t k3, uint8_t k4, uint8_t k5) 
+{
+	uint8_t k[] = {k1, k2, k3, k4, k5};
+	return release(k, 5);
+}
+
+size_t Keyboard_::release(uint8_t k1, uint8_t k2, uint8_t k3, uint8_t k4, uint8_t k5, uint8_t k6) 
+{
+	uint8_t k[] = {k1, k2, k3, k4, k5, k6};
+	return release(k, 6);
+}
+
 
 void Keyboard_::releaseAll(void)
 {
