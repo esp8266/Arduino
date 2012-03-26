@@ -126,7 +126,11 @@ typedef enum _EPWMChannel
   PWM_CH0=0,
   PWM_CH1,
   PWM_CH2,
-  PWM_CH3
+  PWM_CH3,
+  PWM_CH4,
+  PWM_CH5,
+  PWM_CH6,
+  PWM_CH7
 } EPWMChannel ;
 
 // Definitions for TC channels
@@ -138,7 +142,19 @@ typedef enum _ETCChannel
   TC0_CHA1,
   TC0_CHB1,
   TC0_CHA2,
-  TC0_CHB2
+  TC0_CHB2,
+  TC1_CHA3,
+  TC1_CHB3,
+  TC1_CHA4,
+  TC1_CHB4,
+  TC1_CHA5,
+  TC1_CHB5,
+  TC2_CHA6,
+  TC2_CHB6,
+  TC2_CHA7,
+  TC2_CHB7,
+  TC2_CHA8,
+  TC2_CHB8
 } ETCChannel ;
 
 /**

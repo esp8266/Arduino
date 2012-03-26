@@ -124,7 +124,7 @@ extern const PinDescription g_APinDescription[]=
 
   // 2
   { PIOB, PIO_PB25B_TIOA0,   ID_PIOB, PIO_PERIPH_B, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_TIMER), NO_ADC, NO_ADC, NO_PWM,  TC0_CHA0 }, // TIOA0
-  { PIOC, PIO_PC28B_TIOA7,   ID_PIOC, PIO_PERIPH_B, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_TIMER), NO_ADC, NO_ADC, NO_PWM,  TC0_CHA7 }, // TIOA7
+  { PIOC, PIO_PC28B_TIOA7,   ID_PIOC, PIO_PERIPH_B, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_TIMER), NO_ADC, NO_ADC, NO_PWM,  TC2_CHA7 }, // TIOA7
   { PIOA, PIO_PA29A_SPI0_NPCS1,ID_PIOA,PIO_PERIPH_A,PIO_DEFAULT,  PIN_ATTR_DIGITAL,                 NO_ADC, NO_ADC, NO_PWM,  NO_TC    }, // NPCS1
 
   // 5
@@ -136,15 +136,15 @@ extern const PinDescription g_APinDescription[]=
   // 10
 //  *  10       TIOA0 |  PA28 PC29???
   { PIOA, PIO_PA1,           ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_TIMER), NO_ADC, NO_ADC, NO_PWM,  TC0_CHA0 }, // TIOA0
-  { PIOD, PIO_PD7B_TIOA8,    ID_PIOD, PIO_PERIPH_B, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_TIMER), NO_ADC, NO_ADC, NO_PWM,  TC0_CHA8 }, // TIOA8
-  { PIOD, PIO_PD8B_TIOB8,    ID_PIOD, PIO_PERIPH_B, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_TIMER), NO_ADC, NO_ADC, NO_PWM,  TC0_CHB8 }, // TIOB8
+  { PIOD, PIO_PD7B_TIOA8,    ID_PIOD, PIO_PERIPH_B, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_TIMER), NO_ADC, NO_ADC, NO_PWM,  TC2_CHA8 }, // TIOA8
+  { PIOD, PIO_PD8B_TIOB8,    ID_PIOD, PIO_PERIPH_B, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_TIMER), NO_ADC, NO_ADC, NO_PWM,  TC2_CHB8 }, // TIOB8
 
   // 13 - AMBER LED
   { PIOB, PIO_PB27B_TIOB0,   ID_PIOB, PIO_OUTPUT_0, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_TIMER), NO_ADC, NO_ADC, NO_PWM,  TC0_CHB0 }, // TIOB0
 
   // 14/15 - USART2 (Serial4)
-  { PIOA, PIO_PA22A_TXD2,    ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NO_PWM,  NO_TC    }, // TXD2
-  { PIOA, PIO_PA23A_RXD2,    ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NO_PWM,  NO_TC    }, // RXD2
+  { PIOD, PIO_PD4B_TXD3,     ID_PIOD, PIO_PERIPH_B, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NO_PWM,  NO_TC    }, // TXD3
+  { PIOD, PIO_PD5B_RXD3,     ID_PIOD, PIO_PERIPH_B, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NO_PWM,  NO_TC    }, // RXD3
 
   // 16/17 - USART1 (Serial3)
   { PIOA, PIO_PA13A_TXD1,    ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NO_PWM,  NO_TC    }, // TXD1
@@ -261,7 +261,7 @@ extern const PinDescription g_APinDescription[]=
   // 83 - USART1 (Serial3) all pins
   { PIOA, PIO_PA13A_TXD1|PIO_PA12A_RXD1, ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_COMBO), NO_ADC, NO_ADC, NO_PWM, NO_TC },
   // 84 - USART2 (Serial4) all pins
-  { PIOA, PIO_PA22A_TXD2|PIO_PA23A_RXD2, ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_COMBO), NO_ADC, NO_ADC, NO_PWM, NO_TC },
+  { PIOD, PIO_PD4B_TXD3|PIO_PD5B_RXD3, ID_PIOD, PIO_PERIPH_B, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_COMBO), NO_ADC, NO_ADC, NO_PWM, NO_TC },
 
   // END
   { NULL, 0, 0, PIO_NOT_A_PIN, PIO_DEFAULT, 0, NO_ADC, NO_ADC, NO_PWM, NO_TC }
@@ -361,18 +361,12 @@ extern void init( void )
   // Initialize 10bit Analog Controller
   PMC_EnablePeripheral( ID_ADC ) ;
   adc_init( ADC, SystemCoreClock, ADC_FREQ_MAX, ADC_STARTUP ) ;
-  adc_configure_timing( ADC, 15 ) ;
-  adc_configure_trigger( ADC, ADC_TRIG_SW ) ;	
+//  adc_configure_timing( ADC, 15 ) ;
+	adc_configure_timing(ADC, 0, ADC_SETTLING_TIME_3, 1);
+//  adc_configure_trigger( ADC, ADC_TRIG_SW ) ;	
+	adc_configure_trigger(ADC, ADC_TRIG_SW, 0);	/* Disable hardware trigger. */
   adc_disable_interrupt( ADC, 0xFFFFFFFF ) ; /* Disable all adc interrupt. */	
   adc_disable_channel( ADC, ADC_ALL_CHANNEL ) ;
-
-  // Initialize 12bit Analog Controller
-  PMC_EnablePeripheral( ID_ADC12B ) ;
-  adc12_init( ADC12B, SystemCoreClock, ADC12_FREQ_MAX, ADC12_STARTUP_FAST, 1 ) ;
-  adc12_configure_timing( ADC12B, 15 ) ;
-  adc12_configure_trigger( ADC12B, ADC_TRIG_SW ) ;	
-  adc12_disable_interrupt( ADC12B, 0xFFFFFFFF ) ; /* Disable all adc interrupt. */
-  adc12_disable_channel( ADC12B, ADC_ALL_CHANNEL ) ;
 
   // Initialize analogOutput module
   analogOutputInit();

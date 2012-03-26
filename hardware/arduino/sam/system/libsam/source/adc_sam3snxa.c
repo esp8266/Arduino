@@ -48,7 +48,7 @@ extern "C" {
 /**INDENT-ON**/
 /// @endcond
 
-#if SAM3S || SAM3N || SAM3XA
+#if SAM3S_SERIES || SAM3N_SERIES || SAM3XA_SERIES
 
 /**
  * \brief Initializes the given ADC with the specified ADC clock and startup time.
@@ -75,8 +75,6 @@ uint32_t adc_init(Adc *p_adc, uint32_t ul_mck, uint32_t ul_adc_clock, uint8_t uc
     p_adc->ADC_PTCR = (ADC_PTCR_RXTDIS | ADC_PTCR_TXTDIS);
     p_adc->ADC_RCR = 0;
     p_adc->ADC_RNCR = 0;
-    p_adc->ADC_TCR = 0;
-    p_adc->ADC_TNCR = 0;	
 	
     ul_prescal = ul_mck/(2 * ul_adc_clock) - 1;
     p_adc->ADC_MR |= ADC_MR_PRESCAL( ul_prescal ) | ( (uc_startup<<ADC_MR_STARTUP_Pos) & ADC_MR_STARTUP_Msk);
@@ -155,7 +153,7 @@ void adc_configure_sequence(Adc *p_adc, adc_channel_num_t ch_list[], uint8_t uc_
     }
 }
 
-#if SAM3S ||  SAM3XA
+#if SAM3S_SERIES ||  SAM3XA_SERIES
 /**
  * \brief Configures ADC timing.
  *
@@ -171,7 +169,7 @@ void adc_configure_timing(Adc *p_adc, uint8_t uc_tracking, adc_settling_time_t s
                  | settling
                  | ADC_MR_TRACKTIM( uc_tracking ) ;
 }
-#elif  SAM3N 
+#elif  SAM3N_SERIES 
 /**
  * \brief Configures ADC timing.
  *
@@ -185,7 +183,7 @@ void adc_configure_timing(Adc *p_adc, uint8_t uc_tracking)
 }
 #endif
 
-#if SAM3S || SAM3XA
+#if SAM3S_SERIES || SAM3XA_SERIES
 /**
  * \brief enable analog change.
  *
@@ -199,7 +197,7 @@ void adc_enable_anch( Adc *pAdc )
 }
 #endif
 
-#if SAM3S || SAM3XA
+#if SAM3S_SERIES || SAM3XA_SERIES
 /**
  * \brief disable analog change.
  * 
@@ -449,7 +447,7 @@ void adc_set_comparison_channel(Adc *p_adc, adc_channel_num_t channel)
     }
 }
 
-#if SAM3S || SAM3XA
+#if SAM3S_SERIES || SAM3XA_SERIES
 /**
  * \brief Enables differential input for the specified channel.
  *
@@ -516,9 +514,9 @@ void adc_set_input_gain(Adc *p_adc, adc_channel_num_t channel, adc_gainvalue_t g
 {
     p_adc->ADC_CGR |= (0x03u << (2*channel)) & (gain << (2*channel));
 }
-#endif /* SAM3S || SAM3XA */
+#endif /* SAM3S_SERIES || SAM3XA_SERIES */
 
-#if SAM3S8 || SAM3SD8
+#if SAM3SD8_SERIES
 /**
  * \brief set adc auto calibration mode.
  *
@@ -529,7 +527,7 @@ void adc_set_calibmode(Adc *p_adc)
 {
     p_adc->ADC_CR |= ADC_CR_AUTOCAL;
 }
-#endif /* SAM3S8 || SAM3SD8 */
+#endif /* SAM3SD8_SERIES */
 
 /**
  * \brief Returns the actual ADC clock.
@@ -609,7 +607,7 @@ uint32_t adc_check_ovr(Adc *p_adc,adc_channel_num_t adc_ch)
     return p_adc->ADC_OVER & (0x01u << adc_ch);
 }
 
-#if SAM3S || SAM3XA
+#if SAM3S_SERIES || SAM3XA_SERIES
 /**
  * \brief Adapts performance versus power consumption.
  *
@@ -625,7 +623,7 @@ void adc_set_bias_current(Adc *p_adc, uint8_t uc_ibctl)
 }
 #endif
 
-#if SAM3S ||  SAM3XA
+#if SAM3S_SERIES ||  SAM3XA_SERIES
 /**
  * \brief turn on temperature sensor.
  *
@@ -638,7 +636,7 @@ void adc_enable_ts(Adc *p_adc)
 }
 #endif
 
-#if SAM3S ||  SAM3XA
+#if SAM3S_SERIES ||  SAM3XA_SERIES
 /**
  * \brief turn off temperature sensor.
  *
@@ -798,9 +796,9 @@ Pdc *adc_get_pdc_base(Adc *p_adc)
 /**INDENT-OFF**/
 #ifdef __cplusplus
 }
-#endif // SAM3S || SAM3N || SAM3XA
+#endif
 /**INDENT-ON**/
 /// @endcond
 
-#endif /* SAM3S || SAM3N || SAM3XA */
+#endif /* SAM3S_SERIES || SAM3N_SERIES || SAM3XA_SERIES */
 

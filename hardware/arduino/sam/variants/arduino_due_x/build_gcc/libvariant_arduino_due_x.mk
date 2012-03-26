@@ -19,7 +19,7 @@
 # Makefile for compiling libArduino
 .SUFFIXES: .o .a .c .s
 
-CHIP=__SAM3U4E__
+CHIP=__SAM3X8E__
 VARIANT=arduino_due_x
 LIBNAME=libvariant_$(VARIANT)
 TOOLCHAIN=gcc
@@ -37,7 +37,7 @@ SYSTEM_PATH = ../../../system
 CMSIS_ROOT_PATH = $(SYSTEM_PATH)/CMSIS
 CMSIS_ARM_PATH=$(CMSIS_ROOT_PATH)/CMSIS/Include
 CMSIS_ATMEL_PATH=$(CMSIS_ROOT_PATH)/Device/ATMEL
-CMSIS_CHIP_PATH=$(CMSIS_ROOT_PATH)/Device/ATMEL/$(CHIP_SERIE)
+#CMSIS_CHIP_PATH=$(CMSIS_ROOT_PATH)/Device/ATMEL/$(CHIP_SERIE)
 
 ARDUINO_PATH = ../../../cores/sam
 VARIANT_BASE_PATH = ../../../variants

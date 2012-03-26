@@ -42,8 +42,8 @@
 
 /*----------------------------------------------------------------------------*/
 
-#ifndef arduino_due
-#define arduino_due
+#ifndef arduino_due_x
+#define arduino_due_x
 #endif
 
 /** Name of the board */
@@ -58,7 +58,7 @@
 #define VARIANT_MAINOSC           12000000
 
 /** Master clock frequency */
-#define VARIANT_MCK               96000000
+#define VARIANT_MCK               84000000
 
 /*----------------------------------------------------------------------------
  *        Pins
