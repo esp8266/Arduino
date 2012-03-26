@@ -201,7 +201,15 @@ bool WEAK HID_Setup(Setup& setup)
 //================================================================================
 //	Mouse
 
-Mouse_::Mouse_() : _buttons(0)
+Mouse_::Mouse_(void) : _buttons(0)
+{
+}
+
+void Mouse_::begin(void) 
+{
+}
+
+void Mouse_::end(void) 
 {
 }
 
@@ -253,7 +261,15 @@ bool Mouse_::isPressed(uint8_t b)
 //================================================================================
 //	Keyboard
 
-Keyboard_::Keyboard_() 
+Keyboard_::Keyboard_(void) 
+{
+}
+
+void Keyboard_::begin(void) 
+{
+}
+
+void Keyboard_::end(void) 
 {
 }
 

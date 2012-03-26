@@ -57,7 +57,9 @@ private:
 	uint8_t _buttons;
 	void buttons(uint8_t b);
 public:
-	Mouse_();
+	Mouse_(void);
+	void begin(void);
+	void end(void);
 	void click(uint8_t b = MOUSE_LEFT);
 	void move(signed char x, signed char y, signed char wheel = 0);	
 	void press(uint8_t b = MOUSE_LEFT);		// press LEFT by default
@@ -121,7 +123,9 @@ private:
 	KeyReport _keyReport;
 	void sendReport(KeyReport* keys);
 public:
-	Keyboard_();
+	Keyboard_(void);
+	void begin(void);
+	void end(void);
 	virtual size_t write(uint8_t k) {return type(k);};
 	virtual size_t type(uint8_t k);
 	virtual size_t press(uint8_t k);
