@@ -548,7 +548,7 @@ void PWMC_EnableFaultProtection( Pwm* pPwm, uint32_t ul_channel, uint32_t ul_val
 	/* Fault Protection Enable Register */
 	uint32_t ul_fault_enable_reg = 0;
 
-#if (SAM3XA)
+#if (SAM3XA_SERIES)
 	if (ul_channel < 4)
   {
 		ul_channel *= 8;
@@ -568,7 +568,7 @@ void PWMC_EnableFaultProtection( Pwm* pPwm, uint32_t ul_channel, uint32_t ul_val
 	}
 #endif
 
-#if (SAM3U || SAM3S || SAM4S)
+#if (SAM3U_SERIES || SAM3S_SERIES || SAM3SD8_SERIES || SAM4S_SERIES)
 	ul_channel *= 8;
 	ul_fault_enable_reg = pPwm->PWM_FPE;
 	ul_fault_enable_reg &= ~(0xFF << ul_channel);

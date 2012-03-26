@@ -1,6 +1,6 @@
 ifeq ("$(VARIANTS)", "")
-VARIANTS = arduino_due_x
-#VARIANTS = sam3u_ek sam3s_ek sam3x_ek arduino_due_u
+VARIANTS = arduino_due_x arduino_due_u
+#VARIANTS = sam3u_ek sam3s_ek sam3x_ek
 endif
 
 SUBMAKE_OPTIONS=--no-builtin-rules --no-builtin-variables

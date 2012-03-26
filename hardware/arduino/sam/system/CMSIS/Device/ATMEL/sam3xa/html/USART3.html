@@ -1,0 +1,3366 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>SAM3XA USART3</title>
+    <link rel="stylesheet" type="text/css" href="css/html.css" media="all" />
+  </head>
+  <body id="abstract">
+    <div id="container">
+      <div id="content">
+        <a id="USART3"></a>
+        <h1>SAM3XA USART3</h1>
+        <a id="USART3__User_Interface"></a>
+        <h2>Universal Synchronous Asynchronous Receiver Transmitter (USART3) User Interface</h2>
+<!--As per 6089W programmer datasheet.-->
+        <h3>Registers</h3>
+        <table class="registers">
+          <caption>Register Mapping</caption>
+          <thead>
+            <tr>
+              <th class="address">Address</th>
+              <th class="description">Register</th>
+              <th class="name">Name</th>
+              <th class="access">Access</th>
+              <th class="reset">Reset</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="odd">
+              <td class="address" id="address_0x400A4000">0x400A4000</td>
+              <td class="description">Control Register</td>
+              <td class="name">
+                <a href="#USART3_CR" title="Control Register" class="one_click_away">USART3_CR</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400A4004">0x400A4004</td>
+              <td class="description">Mode Register</td>
+              <td class="name">
+                <a href="#USART3_MR" title="Mode Register" class="one_click_away">USART3_MR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400A4008">0x400A4008</td>
+              <td class="description">Interrupt Enable Register</td>
+              <td class="name">
+                <a href="#USART3_IER" title="Interrupt Enable Register" class="one_click_away">USART3_IER</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400A400C">0x400A400C</td>
+              <td class="description">Interrupt Disable Register</td>
+              <td class="name">
+                <a href="#USART3_IDR" title="Interrupt Disable Register" class="one_click_away">USART3_IDR</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400A4010">0x400A4010</td>
+              <td class="description">Interrupt Mask Register</td>
+              <td class="name">
+                <a href="#USART3_IMR" title="Interrupt Mask Register" class="one_click_away">USART3_IMR</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400A4014">0x400A4014</td>
+              <td class="description">Channel Status Register</td>
+              <td class="name">
+                <a href="#USART3_CSR" title="Channel Status Register" class="one_click_away">USART3_CSR</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400A4018">0x400A4018</td>
+              <td class="description">Receiver Holding Register</td>
+              <td class="name">
+                <a href="#USART3_RHR" title="Receiver Holding Register" class="one_click_away">USART3_RHR</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400A401C">0x400A401C</td>
+              <td class="description">Transmitter Holding Register</td>
+              <td class="name">
+                <a href="#USART3_THR" title="Transmitter Holding Register" class="one_click_away">USART3_THR</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400A4020">0x400A4020</td>
+              <td class="description">Baud Rate Generator Register</td>
+              <td class="name">
+                <a href="#USART3_BRGR" title="Baud Rate Generator Register" class="one_click_away">USART3_BRGR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400A4024">0x400A4024</td>
+              <td class="description">Receiver Time-out Register</td>
+              <td class="name">
+                <a href="#USART3_RTOR" title="Receiver Time-out Register" class="one_click_away">USART3_RTOR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400A4028">0x400A4028</td>
+              <td class="description">Transmitter Timeguard Register</td>
+              <td class="name">
+                <a href="#USART3_TTGR" title="Transmitter Timeguard Register" class="one_click_away">USART3_TTGR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400A4040">0x400A4040</td>
+              <td class="description">FI DI Ratio Register</td>
+              <td class="name">
+                <a href="#USART3_FIDI" title="FI DI Ratio Register" class="one_click_away">USART3_FIDI</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000174</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400A4044">0x400A4044</td>
+              <td class="description">Number of Errors Register</td>
+              <td class="name">
+                <a href="#USART3_NER" title="Number of Errors Register" class="one_click_away">USART3_NER</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400A404C">0x400A404C</td>
+              <td class="description">IrDA Filter Register</td>
+              <td class="name">
+                <a href="#USART3_IF" title="IrDA Filter Register" class="one_click_away">USART3_IF</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400A4050">0x400A4050</td>
+              <td class="description">Manchester Encoder Decoder Register</td>
+              <td class="name">
+                <a href="#USART3_MAN" title="Manchester Encoder Decoder Register" class="one_click_away">USART3_MAN</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x30011004</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400A4054">0x400A4054</td>
+              <td class="description">LIN Mode Register</td>
+              <td class="name">
+                <a href="#USART3_LINMR" title="LIN Mode Register" class="one_click_away">USART3_LINMR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400A4058">0x400A4058</td>
+              <td class="description">LIN Identifier Register</td>
+              <td class="name">
+                <a href="#USART3_LINIR" title="LIN Identifier Register" class="one_click_away">USART3_LINIR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400A40E4">0x400A40E4</td>
+              <td class="description">Write Protect Mode Register</td>
+              <td class="name">
+                <a href="#USART3_WPMR" title="Write Protect Mode Register" class="one_click_away">USART3_WPMR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400A40E8">0x400A40E8</td>
+              <td class="description">Write Protect Status Register</td>
+              <td class="name">
+                <a href="#USART3_WPSR" title="Write Protect Status Register" class="one_click_away">USART3_WPSR</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400A4100">0x400A4100</td>
+              <td class="description">Receive Pointer Register</td>
+              <td class="name">
+                <a href="#USART3_RPR" title="Receive Pointer Register" class="one_click_away">USART3_RPR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400A4104">0x400A4104</td>
+              <td class="description">Receive Counter Register</td>
+              <td class="name">
+                <a href="#USART3_RCR" title="Receive Counter Register" class="one_click_away">USART3_RCR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400A4108">0x400A4108</td>
+              <td class="description">Transmit Pointer Register</td>
+              <td class="name">
+                <a href="#USART3_TPR" title="Transmit Pointer Register" class="one_click_away">USART3_TPR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400A410C">0x400A410C</td>
+              <td class="description">Transmit Counter Register</td>
+              <td class="name">
+                <a href="#USART3_TCR" title="Transmit Counter Register" class="one_click_away">USART3_TCR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400A4110">0x400A4110</td>
+              <td class="description">Receive Next Pointer Register</td>
+              <td class="name">
+                <a href="#USART3_RNPR" title="Receive Next Pointer Register" class="one_click_away">USART3_RNPR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400A4114">0x400A4114</td>
+              <td class="description">Receive Next Counter Register</td>
+              <td class="name">
+                <a href="#USART3_RNCR" title="Receive Next Counter Register" class="one_click_away">USART3_RNCR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400A4118">0x400A4118</td>
+              <td class="description">Transmit Next Pointer Register</td>
+              <td class="name">
+                <a href="#USART3_TNPR" title="Transmit Next Pointer Register" class="one_click_away">USART3_TNPR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400A411C">0x400A411C</td>
+              <td class="description">Transmit Next Counter Register</td>
+              <td class="name">
+                <a href="#USART3_TNCR" title="Transmit Next Counter Register" class="one_click_away">USART3_TNCR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400A4120">0x400A4120</td>
+              <td class="description">Transfer Control Register</td>
+              <td class="name">
+                <a href="#USART3_PTCR" title="Transfer Control Register" class="one_click_away">USART3_PTCR</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400A4124">0x400A4124</td>
+              <td class="description">Transfer Status Register</td>
+              <td class="name">
+                <a href="#USART3_PTSR" title="Transfer Status Register" class="one_click_away">USART3_PTSR</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x00000000</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3>Register Fields</h3>
+        <h4 id="USART3_CR">USART3 Control Register</h4>
+        <p><strong>Name</strong>: USART3_CR</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x400A4000</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#USART3_CR__LINWKUP" title="Send LIN Wakeup Signal">LINWKUP</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CR__LINABT" title="Abort LIN Transmission">LINABT</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CR__RTSDIS" title="Request to Send Disable">RTSDIS</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CR__RTSEN" title="Request to Send Enable">RTSEN</a>
+              </td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#USART3_CR__RETTO" title="Rearm Time-out">RETTO</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CR__RSTNACK" title="Reset Non Acknowledge">RSTNACK</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CR__RSTIT" title="Reset Iterations">RSTIT</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CR__SENDA" title="Send Address">SENDA</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CR__STTTO" title="Start Time-out">STTTO</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CR__STPBRK" title="Stop Break">STPBRK</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CR__STTBRK" title="Start Break">STTBRK</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CR__RSTSTA" title="Reset Status Bits">RSTSTA</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#USART3_CR__TXDIS" title="Transmitter Disable">TXDIS</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CR__TXEN" title="Transmitter Enable">TXEN</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CR__RXDIS" title="Receiver Disable">RXDIS</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CR__RXEN" title="Receiver Enable">RXEN</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CR__RSTTX" title="Reset Transmitter">RSTTX</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CR__RSTRX" title="Reset Receiver">RSTRX</a>
+              </td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="USART3_CR__RSTRX"><strong>RSTRX</strong>: Reset Receiver<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Resets the receiver.</td></tr></tbody></table></li>
+          <li id="USART3_CR__RSTTX"><strong>RSTTX</strong>: Reset Transmitter<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Resets the transmitter.</td></tr></tbody></table></li>
+          <li id="USART3_CR__RXEN"><strong>RXEN</strong>: Receiver Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the receiver, if RXDIS is 0.</td></tr></tbody></table></li>
+          <li id="USART3_CR__RXDIS"><strong>RXDIS</strong>: Receiver Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the receiver.</td></tr></tbody></table></li>
+          <li id="USART3_CR__TXEN"><strong>TXEN</strong>: Transmitter Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the transmitter if TXDIS is 0.</td></tr></tbody></table></li>
+          <li id="USART3_CR__TXDIS"><strong>TXDIS</strong>: Transmitter Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the transmitter.</td></tr></tbody></table></li>
+          <li id="USART3_CR__RSTSTA"><strong>RSTSTA</strong>: Reset Status Bits<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Resets the status bits PARE, FRAME, OVRE, MANERR, LINBE, LINISFE, LINIPE, LINCE, LINSNRE, LINID, LINTC, LINBK, UNRE and RXBRK in US_CSR.</td></tr></tbody></table></li>
+          <li id="USART3_CR__STTBRK"><strong>STTBRK</strong>: Start Break<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Starts transmission of a break after the characters present in US_THR and the Transmit Shift Register have been trans-mitted. No effect if a break is already being transmitted.</td></tr></tbody></table></li>
+          <li id="USART3_CR__STPBRK"><strong>STPBRK</strong>: Stop Break<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Stops transmission of the break after a minimum of one character length and transmits a high level during 12-bit periods. No effect if no break is being transmitted.</td></tr></tbody></table></li>
+          <li id="USART3_CR__STTTO"><strong>STTTO</strong>: Start Time-out<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Starts waiting for a character before clocking the time-out counter. Resets the status bit TIMEOUT in US_CSR.</td></tr></tbody></table></li>
+          <li id="USART3_CR__SENDA"><strong>SENDA</strong>: Send Address<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">In Multidrop Mode only, the next character written to the US_THR is sent with the address bit set.</td></tr></tbody></table></li>
+          <li id="USART3_CR__RSTIT"><strong>RSTIT</strong>: Reset Iterations<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Resets ITERATION in US_CSR. No effect if the ISO7816 is not enabled.</td></tr></tbody></table></li>
+          <li id="USART3_CR__RSTNACK"><strong>RSTNACK</strong>: Reset Non Acknowledge<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Resets NACK in US_CSR.</td></tr></tbody></table></li>
+          <li id="USART3_CR__RETTO"><strong>RETTO</strong>: Rearm Time-out<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Restart Time-out</td></tr></tbody></table></li>
+          <li id="USART3_CR__RTSEN"><strong>RTSEN</strong>: Request to Send Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Drives the pin RTS to 0.</td></tr></tbody></table></li>
+          <li id="USART3_CR__FCS"><strong>FCS</strong>: Force SPI Chip Select</li>
+          <p>-</p>
+          <li id="USART3_CR__RTSDIS"><strong>RTSDIS</strong>: Request to Send Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Drives the pin RTS to 1.</td></tr></tbody></table></li>
+          <li id="USART3_CR__RCS"><strong>RCS</strong>: Release SPI Chip Select</li>
+          <p>-</p>
+          <li id="USART3_CR__LINABT"><strong>LINABT</strong>: Abort LIN Transmission<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Abort the current LIN transmission.</td></tr></tbody></table></li>
+          <li id="USART3_CR__LINWKUP"><strong>LINWKUP</strong>: Send LIN Wakeup Signal<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect:</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Sends a wakeup signal on the LIN bus.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="USART3_MR">USART3 Mode Register</h4>
+        <p><strong>Name</strong>: USART3_MR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400A4004</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#USART3_MR__ONEBIT" title="Start Frame Delimiter Selector">ONEBIT</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_MR__MODSYNC" title="Manchester Synchronization Mode">MODSYNC</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_MR__MAN" title="Manchester Encoder/Decoder Enable">MAN</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_MR__FILTER" title="Infrared Receive Line Filter">FILTER</a>
+              </td>
+              <td>-</td>
+              <td colspan="3">
+                <a href="#USART3_MR__MAX_ITERATION" title="">MAX_ITERATION</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#USART3_MR__INVDATA" title="INverted Data">INVDATA</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_MR__VAR_SYNC" title="Variable Synchronization of Command/Data Sync Start Frame Delimiter">VAR_SYNC</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_MR__DSNACK" title="Disable Successive NACK">DSNACK</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_MR__INACK" title="Inhibit Non Acknowledge">INACK</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_MR__OVER" title="Oversampling Mode">OVER</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_MR__CLKO" title="Clock Output Select">CLKO</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_MR__MODE9" title="9-bit Character Length">MODE9</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_MR__MSBF" title="Bit Order">MSBF</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="2">
+                <a href="#USART3_MR__CHMODE" title="Channel Mode">CHMODE</a>
+              </td>
+              <td colspan="2">
+                <a href="#USART3_MR__NBSTOP" title="Number of Stop Bits">NBSTOP</a>
+              </td>
+              <td colspan="3">
+                <a href="#USART3_MR__PAR" title="Parity Type">PAR</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_MR__SYNC" title="Synchronous Mode Select">SYNC</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="2">
+                <a href="#USART3_MR__CHRL" title="Character Length.">CHRL</a>
+              </td>
+              <td colspan="2">
+                <a href="#USART3_MR__USCLKS" title="Clock Selection">USCLKS</a>
+              </td>
+              <td colspan="4">
+                <a href="#USART3_MR__USART_MODE" title="">USART_MODE</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="USART3_MR__USART_MODE">
+            <strong>USART_MODE</strong>
+            <table class="values">
+              <thead>
+                <tr>
+                  <th>Value</th>
+                  <th>Name</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="odd">
+                  <td class="value">0x0</td>
+                  <td class="name">NORMAL</td>
+                  <td class="description">Normal mode</td>
+                </tr>
+                <tr class="even">
+                  <td class="value">0x1</td>
+                  <td class="name">RS485</td>
+                  <td class="description">RS485</td>
+                </tr>
+                <tr class="odd">
+                  <td class="value">0x2</td>
+                  <td class="name">HW_HANDSHAKING</td>
+                  <td class="description">Hardware Handshaking</td>
+                </tr>
+                <tr class="even">
+                  <td class="value">0x4</td>
+                  <td class="name">IS07816_T_0</td>
+                  <td class="description">IS07816 Protocol: T = 0</td>
+                </tr>
+                <tr class="odd">
+                  <td class="value">0x6</td>
+                  <td class="name">IS07816_T_1</td>
+                  <td class="description">IS07816 Protocol: T = 1</td>
+                </tr>
+                <tr class="even">
+                  <td class="value">0x8</td>
+                  <td class="name">IRDA</td>
+                  <td class="description">IrDA</td>
+                </tr>
+                <tr class="odd">
+                  <td class="value">0xA</td>
+                  <td class="name">LIN_MASTER</td>
+                  <td class="description">LIN Master</td>
+                </tr>
+                <tr class="even">
+                  <td class="value">0xB</td>
+                  <td class="name">LIN_SLAVE</td>
+                  <td class="description">LIN Slave</td>
+                </tr>
+                <tr class="odd">
+                  <td class="value">0xE</td>
+                  <td class="name">SPI_MASTER</td>
+                  <td class="description">SPI Master</td>
+                </tr>
+                <tr class="even">
+                  <td class="value">0xF</td>
+                  <td class="name">SPI_SLAVE</td>
+                  <td class="description">SPI Slave</td>
+                </tr>
+              </tbody>
+            </table>
+          </li>
+          <li id="USART3_MR__USCLKS"><strong>USCLKS</strong>: Clock Selection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">MCK</td><td class="description">Master Clock MCK is selected</td></tr><tr class="even"><td class="value">0x1</td><td class="name">DIV</td><td class="description">Internal Clock Divided MCK/DIV (DIV=8) is selected</td></tr><tr class="odd"><td class="value">0x3</td><td class="name">SCK</td><td class="description">Serial Clock SLK is selected</td></tr></tbody></table></li>
+          <li id="USART3_MR__CHRL"><strong>CHRL</strong>: Character Length.<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">5_BIT</td><td class="description">Character length is 5 bits</td></tr><tr class="even"><td class="value">0x1</td><td class="name">6_BIT</td><td class="description">Character length is 6 bits</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">7_BIT</td><td class="description">Character length is 7 bits</td></tr><tr class="even"><td class="value">0x3</td><td class="name">8_BIT</td><td class="description">Character length is 8 bits</td></tr></tbody></table></li>
+          <li id="USART3_MR__SYNC"><strong>SYNC</strong>: Synchronous Mode Select<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">USART operates in Asynchronous Mode.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">USART operates in Synchronous Mode.</td></tr></tbody></table></li>
+          <li id="USART3_MR__CPHA"><strong>CPHA</strong>: SPI Clock Phase</li>
+          <p>-</p>
+          <li id="USART3_MR__PAR"><strong>PAR</strong>: Parity Type<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">EVEN</td><td class="description">Even parity</td></tr><tr class="even"><td class="value">0x1</td><td class="name">ODD</td><td class="description">Odd parity</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">SPACE</td><td class="description">Parity forced to 0 (Space)</td></tr><tr class="even"><td class="value">0x3</td><td class="name">MARK</td><td class="description">Parity forced to 1 (Mark)</td></tr><tr class="odd"><td class="value">0x4</td><td class="name">NO</td><td class="description">No parity</td></tr><tr class="even"><td class="value">0x6</td><td class="name">MULTIDROP</td><td class="description">Multidrop mode</td></tr></tbody></table></li>
+          <li id="USART3_MR__NBSTOP"><strong>NBSTOP</strong>: Number of Stop Bits<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">1_BIT</td><td class="description">1 stop bit</td></tr><tr class="even"><td class="value">0x1</td><td class="name">1_5_BIT</td><td class="description">1.5 stop bit (SYNC = 0) or reserved (SYNC = 1)</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">2_BIT</td><td class="description">2 stop bits</td></tr></tbody></table></li>
+          <li id="USART3_MR__CHMODE"><strong>CHMODE</strong>: Channel Mode<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">NORMAL</td><td class="description">Normal Mode</td></tr><tr class="even"><td class="value">0x1</td><td class="name">AUTOMATIC</td><td class="description">Automatic Echo. Receiver input is connected to the TXD pin.</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">LOCAL_LOOPBACK</td><td class="description">Local Loopback. Transmitter output is connected to the Receiver Input.</td></tr><tr class="even"><td class="value">0x3</td><td class="name">REMOTE_LOOPBACK</td><td class="description">Remote Loopback. RXD pin is internally connected to the TXD pin.</td></tr></tbody></table></li>
+          <li id="USART3_MR__MSBF"><strong>MSBF</strong>: Bit Order<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Least Significant Bit is sent/received first.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Most Significant Bit is sent/received first.</td></tr></tbody></table></li>
+          <li id="USART3_MR__CPOL"><strong>CPOL</strong>: SPI Clock Polarity</li>
+          <p>-</p>
+          <li id="USART3_MR__MODE9"><strong>MODE9</strong>: 9-bit Character Length<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">CHRL defines character length.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">9-bit character length.</td></tr></tbody></table></li>
+          <li id="USART3_MR__CLKO"><strong>CLKO</strong>: Clock Output Select<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The USART does not drive the SCK pin.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The USART drives the SCK pin if USCLKS does not select the external clock SCK.</td></tr></tbody></table></li>
+          <li id="USART3_MR__OVER"><strong>OVER</strong>: Oversampling Mode<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">16x Oversampling.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">8x Oversampling.</td></tr></tbody></table></li>
+          <li id="USART3_MR__INACK"><strong>INACK</strong>: Inhibit Non Acknowledge<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The NACK is generated.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The NACK is not generated.</td></tr></tbody></table></li>
+          <li id="USART3_MR__DSNACK"><strong>DSNACK</strong>: Disable Successive NACK<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">NACK is sent on the ISO line as soon as a parity error occurs in the received character (unless INACK is set).</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Successive parity errors are counted up to the value specified in the MAX_ITERATION field. These parity errors gener-ate a NACK on the ISO line. As soon as this value is reached, no additional NACK is sent on the ISO line. The flag ITERATION is asserted.</td></tr></tbody></table></li>
+          <li id="USART3_MR__VAR_SYNC"><strong>VAR_SYNC</strong>: Variable Synchronization of Command/Data Sync Start Frame Delimiter<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">User defined configuration of command or data sync field depending on MODSYNC value.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The sync field is updated when a character is written into US_THR register.</td></tr></tbody></table></li>
+          <li id="USART3_MR__INVDATA"><strong>INVDATA</strong>: INverted Data<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The data field transmitted on TXD line is the same as the one written in US_THR register or the content read in US_RHR is the same as RXD line. Normal mode of operation.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The data field transmitted on TXD line is inverted (voltage polarity only) compared to the value written on US_THR regis-ter or the content read in US_RHR is inverted compared to what is received on RXD line (or ISO7816 IO line). Inverted Mode of operation, useful for contactless card application. To be used with configuration bit MSBF.</td></tr></tbody></table></li>
+          <li id="USART3_MR__MAX_ITERATION">
+            <strong>MAX_ITERATION</strong>
+          </li>
+          <p>-</p>
+          <li id="USART3_MR__FILTER"><strong>FILTER</strong>: Infrared Receive Line Filter<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The USART does not filter the receive line.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The USART filters the receive line using a three-sample filter (1/16-bit clock) (2 over 3 majority).</td></tr></tbody></table></li>
+          <li id="USART3_MR__MAN"><strong>MAN</strong>: Manchester Encoder/Decoder Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Manchester Encoder/Decoder are disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Manchester Encoder/Decoder are enabled.</td></tr></tbody></table></li>
+          <li id="USART3_MR__MODSYNC"><strong>MODSYNC</strong>: Manchester Synchronization Mode<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The Manchester Start bit is a 0 to 1 transition</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The Manchester Start bit is a 1 to 0 transition.</td></tr></tbody></table></li>
+          <li id="USART3_MR__ONEBIT"><strong>ONEBIT</strong>: Start Frame Delimiter Selector<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Start Frame delimiter is COMMAND or DATA SYNC.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Start Frame delimiter is One Bit.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="USART3_IER">USART3 Interrupt Enable Register</h4>
+        <p><strong>Name</strong>: USART3_IER</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x400A4008</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#USART3_IER__LINSNRE" title="LIN Slave Not Responding Error Interrupt Enable">LINSNRE</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IER__LINCE" title="LIN Checksum Error Interrupt Enable">LINCE</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IER__LINIPE" title="LIN Identifier Parity Interrupt Enable">LINIPE</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IER__LINISFE" title="LIN Inconsistent Synch Field Error Interrupt Enable">LINISFE</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IER__LINBE" title="LIN Bus Error Interrupt Enable">LINBE</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IER__MANE" title="Manchester Error Interrupt Enable">MANE</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#USART3_IER__CTSIC" title="Clear to Send Input Change Interrupt Enable">CTSIC</a>
+              </td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#USART3_IER__LINTC" title="LIN Transfer Completed Interrupt Enable">LINTC</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IER__LINID" title="LIN Identifier Sent or LIN Identifier Received Interrupt Enable">LINID</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IER__NACK" title="Non Acknowledge Interrupt Enable">NACK</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IER__RXBUFF" title="Buffer Full Interrupt Enable">RXBUFF</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IER__TXBUFE" title="Buffer Empty Interrupt Enable">TXBUFE</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IER__ITER" title="Max number of Repetitions Reached">ITER</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IER__TXEMPTY" title="TXEMPTY Interrupt Enable">TXEMPTY</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IER__TIMEOUT" title="Time-out Interrupt Enable">TIMEOUT</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#USART3_IER__PARE" title="Parity Error Interrupt Enable">PARE</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IER__FRAME" title="Framing Error Interrupt Enable">FRAME</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IER__OVRE" title="Overrun Error Interrupt Enable">OVRE</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IER__ENDTX" title="End of Transmit Interrupt Enable">ENDTX</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IER__ENDRX" title="End of Receive Transfer Interrupt Enable">ENDRX</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IER__RXBRK" title="Receiver Break Interrupt Enable">RXBRK</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IER__TXRDY" title="TXRDY Interrupt Enable">TXRDY</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IER__RXRDY" title="RXRDY Interrupt Enable">RXRDY</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="USART3_IER__RXRDY"><strong>RXRDY</strong>: RXRDY Interrupt Enable</li>
+          <p>-</p>
+          <li id="USART3_IER__TXRDY"><strong>TXRDY</strong>: TXRDY Interrupt Enable</li>
+          <p>-</p>
+          <li id="USART3_IER__RXBRK"><strong>RXBRK</strong>: Receiver Break Interrupt Enable</li>
+          <p>-</p>
+          <li id="USART3_IER__ENDRX"><strong>ENDRX</strong>: End of Receive Transfer Interrupt Enable</li>
+          <p>-</p>
+          <li id="USART3_IER__ENDTX"><strong>ENDTX</strong>: End of Transmit Interrupt Enable</li>
+          <p>-</p>
+          <li id="USART3_IER__OVRE"><strong>OVRE</strong>: Overrun Error Interrupt Enable</li>
+          <p>-</p>
+          <li id="USART3_IER__FRAME"><strong>FRAME</strong>: Framing Error Interrupt Enable</li>
+          <p>-</p>
+          <li id="USART3_IER__PARE"><strong>PARE</strong>: Parity Error Interrupt Enable</li>
+          <p>-</p>
+          <li id="USART3_IER__TIMEOUT"><strong>TIMEOUT</strong>: Time-out Interrupt Enable</li>
+          <p>-</p>
+          <li id="USART3_IER__TXEMPTY"><strong>TXEMPTY</strong>: TXEMPTY Interrupt Enable</li>
+          <p>-</p>
+          <li id="USART3_IER__ITER"><strong>ITER</strong>: Max number of Repetitions Reached</li>
+          <p>-</p>
+          <li id="USART3_IER__UNRE"><strong>UNRE</strong>: SPI Underrun Error</li>
+          <p>-</p>
+          <li id="USART3_IER__TXBUFE"><strong>TXBUFE</strong>: Buffer Empty Interrupt Enable</li>
+          <p>-</p>
+          <li id="USART3_IER__RXBUFF"><strong>RXBUFF</strong>: Buffer Full Interrupt Enable</li>
+          <p>-</p>
+          <li id="USART3_IER__NACK"><strong>NACK</strong>: Non Acknowledge Interrupt Enable</li>
+          <p>-</p>
+          <li id="USART3_IER__LINBK"><strong>LINBK</strong>: LIN Break Sent or LIN Break Received Interrupt Enable</li>
+          <p>-</p>
+          <li id="USART3_IER__LINID"><strong>LINID</strong>: LIN Identifier Sent or LIN Identifier Received Interrupt Enable</li>
+          <p>-</p>
+          <li id="USART3_IER__LINTC"><strong>LINTC</strong>: LIN Transfer Completed Interrupt Enable</li>
+          <p>-</p>
+          <li id="USART3_IER__CTSIC"><strong>CTSIC</strong>: Clear to Send Input Change Interrupt Enable</li>
+          <p>-</p>
+          <li id="USART3_IER__MANE"><strong>MANE</strong>: Manchester Error Interrupt Enable</li>
+          <p>-</p>
+          <li id="USART3_IER__LINBE"><strong>LINBE</strong>: LIN Bus Error Interrupt Enable</li>
+          <p>-</p>
+          <li id="USART3_IER__LINISFE"><strong>LINISFE</strong>: LIN Inconsistent Synch Field Error Interrupt Enable</li>
+          <p>-</p>
+          <li id="USART3_IER__LINIPE"><strong>LINIPE</strong>: LIN Identifier Parity Interrupt Enable</li>
+          <p>-</p>
+          <li id="USART3_IER__LINCE"><strong>LINCE</strong>: LIN Checksum Error Interrupt Enable</li>
+          <p>-</p>
+          <li id="USART3_IER__LINSNRE"><strong>LINSNRE</strong>: LIN Slave Not Responding Error Interrupt Enable</li>
+          <p>-</p>
+        </ul>
+        <h4 id="USART3_IDR">USART3 Interrupt Disable Register</h4>
+        <p><strong>Name</strong>: USART3_IDR</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x400A400C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#USART3_IDR__LINSNRE" title="LIN Slave Not Responding Error Interrupt Disable">LINSNRE</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IDR__LINCE" title="LIN Checksum Error Interrupt Disable">LINCE</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IDR__LINIPE" title="LIN Identifier Parity Interrupt Disable">LINIPE</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IDR__LINISFE" title="LIN Inconsistent Synch Field Error Interrupt Disable">LINISFE</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IDR__LINBE" title="LIN Bus Error Interrupt Disable">LINBE</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IDR__MANE" title="Manchester Error Interrupt Disable">MANE</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#USART3_IDR__CTSIC" title="Clear to Send Input Change Interrupt Disable">CTSIC</a>
+              </td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#USART3_IDR__LINTC" title="LIN Transfer Completed Interrupt Disable">LINTC</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IDR__LINID" title="LIN Identifier Sent or LIN Identifier Received Interrupt Disable">LINID</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IDR__NACK" title="Non Acknowledge Interrupt Disable">NACK</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IDR__RXBUFF" title="Buffer Full Interrupt Disable">RXBUFF</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IDR__TXBUFE" title="Buffer Empty Interrupt Disable">TXBUFE</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IDR__ITER" title="Max number of Repetitions Reached Disable">ITER</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IDR__TXEMPTY" title="TXEMPTY Interrupt Disable">TXEMPTY</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IDR__TIMEOUT" title="Time-out Interrupt Disable">TIMEOUT</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#USART3_IDR__PARE" title="Parity Error Interrupt Disable">PARE</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IDR__FRAME" title="Framing Error Interrupt Disable">FRAME</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IDR__OVRE" title="Overrun Error Interrupt Disable">OVRE</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IDR__ENDTX" title="End of Transmit Interrupt Disable">ENDTX</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IDR__ENDRX" title="End of Receive Transfer Interrupt Disable">ENDRX</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IDR__RXBRK" title="Receiver Break Interrupt Disable">RXBRK</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IDR__TXRDY" title="TXRDY Interrupt Disable">TXRDY</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IDR__RXRDY" title="RXRDY Interrupt Disable">RXRDY</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="USART3_IDR__RXRDY"><strong>RXRDY</strong>: RXRDY Interrupt Disable</li>
+          <p>-</p>
+          <li id="USART3_IDR__TXRDY"><strong>TXRDY</strong>: TXRDY Interrupt Disable</li>
+          <p>-</p>
+          <li id="USART3_IDR__RXBRK"><strong>RXBRK</strong>: Receiver Break Interrupt Disable</li>
+          <p>-</p>
+          <li id="USART3_IDR__ENDRX"><strong>ENDRX</strong>: End of Receive Transfer Interrupt Disable</li>
+          <p>-</p>
+          <li id="USART3_IDR__ENDTX"><strong>ENDTX</strong>: End of Transmit Interrupt Disable</li>
+          <p>-</p>
+          <li id="USART3_IDR__OVRE"><strong>OVRE</strong>: Overrun Error Interrupt Disable</li>
+          <p>-</p>
+          <li id="USART3_IDR__FRAME"><strong>FRAME</strong>: Framing Error Interrupt Disable</li>
+          <p>-</p>
+          <li id="USART3_IDR__PARE"><strong>PARE</strong>: Parity Error Interrupt Disable</li>
+          <p>-</p>
+          <li id="USART3_IDR__TIMEOUT"><strong>TIMEOUT</strong>: Time-out Interrupt Disable</li>
+          <p>-</p>
+          <li id="USART3_IDR__TXEMPTY"><strong>TXEMPTY</strong>: TXEMPTY Interrupt Disable</li>
+          <p>-</p>
+          <li id="USART3_IDR__ITER"><strong>ITER</strong>: Max number of Repetitions Reached Disable</li>
+          <p>-</p>
+          <li id="USART3_IDR__UNRE"><strong>UNRE</strong>: SPI Underrun Error Disable</li>
+          <p>-</p>
+          <li id="USART3_IDR__TXBUFE"><strong>TXBUFE</strong>: Buffer Empty Interrupt Disable</li>
+          <p>-</p>
+          <li id="USART3_IDR__RXBUFF"><strong>RXBUFF</strong>: Buffer Full Interrupt Disable</li>
+          <p>-</p>
+          <li id="USART3_IDR__NACK"><strong>NACK</strong>: Non Acknowledge Interrupt Disable</li>
+          <p>-</p>
+          <li id="USART3_IDR__LINBK"><strong>LINBK</strong>: LIN Break Sent or LIN Break Received Interrupt Disable</li>
+          <p>-</p>
+          <li id="USART3_IDR__LINID"><strong>LINID</strong>: LIN Identifier Sent or LIN Identifier Received Interrupt Disable</li>
+          <p>-</p>
+          <li id="USART3_IDR__LINTC"><strong>LINTC</strong>: LIN Transfer Completed Interrupt Disable</li>
+          <p>-</p>
+          <li id="USART3_IDR__CTSIC"><strong>CTSIC</strong>: Clear to Send Input Change Interrupt Disable</li>
+          <p>-</p>
+          <li id="USART3_IDR__MANE"><strong>MANE</strong>: Manchester Error Interrupt Disable</li>
+          <p>-</p>
+          <li id="USART3_IDR__LINBE"><strong>LINBE</strong>: LIN Bus Error Interrupt Disable</li>
+          <p>-</p>
+          <li id="USART3_IDR__LINISFE"><strong>LINISFE</strong>: LIN Inconsistent Synch Field Error Interrupt Disable</li>
+          <p>-</p>
+          <li id="USART3_IDR__LINIPE"><strong>LINIPE</strong>: LIN Identifier Parity Interrupt Disable</li>
+          <p>-</p>
+          <li id="USART3_IDR__LINCE"><strong>LINCE</strong>: LIN Checksum Error Interrupt Disable</li>
+          <p>-</p>
+          <li id="USART3_IDR__LINSNRE"><strong>LINSNRE</strong>: LIN Slave Not Responding Error Interrupt Disable</li>
+          <p>-</p>
+        </ul>
+        <h4 id="USART3_IMR">USART3 Interrupt Mask Register</h4>
+        <p><strong>Name</strong>: USART3_IMR</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x400A4010</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#USART3_IMR__LINSNRE" title="LIN Slave Not Responding Error Interrupt Mask">LINSNRE</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IMR__LINCE" title="LIN Checksum Error Interrupt Mask">LINCE</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IMR__LINIPE" title="LIN Identifier Parity Interrupt Mask">LINIPE</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IMR__LINISFE" title="LIN Inconsistent Synch Field Error Interrupt Mask">LINISFE</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IMR__LINBE" title="LIN Bus Error Interrupt Mask">LINBE</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IMR__MANE" title="Manchester Error Interrupt Mask">MANE</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#USART3_IMR__CTSIC" title="Clear to Send Input Change Interrupt Mask">CTSIC</a>
+              </td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#USART3_IMR__LINTC" title="LIN Transfer Completed Interrupt Mask">LINTC</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IMR__LINID" title="LIN Identifier Sent or LIN Identifier Received Interrupt Mask">LINID</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IMR__NACK" title="Non Acknowledge Interrupt Mask">NACK</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IMR__RXBUFF" title="Buffer Full Interrupt Mask">RXBUFF</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IMR__TXBUFE" title="Buffer Empty Interrupt Mask">TXBUFE</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IMR__ITER" title="Max number of Repetitions Reached Mask">ITER</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IMR__TXEMPTY" title="TXEMPTY Interrupt Mask">TXEMPTY</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IMR__TIMEOUT" title="Time-out Interrupt Mask">TIMEOUT</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#USART3_IMR__PARE" title="Parity Error Interrupt Mask">PARE</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IMR__FRAME" title="Framing Error Interrupt Mask">FRAME</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IMR__OVRE" title="Overrun Error Interrupt Mask">OVRE</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IMR__ENDTX" title="End of Transmit Interrupt Mask">ENDTX</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IMR__ENDRX" title="End of Receive Transfer Interrupt Mask">ENDRX</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IMR__RXBRK" title="Receiver Break Interrupt Mask">RXBRK</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IMR__TXRDY" title="TXRDY Interrupt Mask">TXRDY</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_IMR__RXRDY" title="RXRDY Interrupt Mask">RXRDY</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="USART3_IMR__RXRDY"><strong>RXRDY</strong>: RXRDY Interrupt Mask</li>
+          <p>-</p>
+          <li id="USART3_IMR__TXRDY"><strong>TXRDY</strong>: TXRDY Interrupt Mask</li>
+          <p>-</p>
+          <li id="USART3_IMR__RXBRK"><strong>RXBRK</strong>: Receiver Break Interrupt Mask</li>
+          <p>-</p>
+          <li id="USART3_IMR__ENDRX"><strong>ENDRX</strong>: End of Receive Transfer Interrupt Mask</li>
+          <p>-</p>
+          <li id="USART3_IMR__ENDTX"><strong>ENDTX</strong>: End of Transmit Interrupt Mask</li>
+          <p>-</p>
+          <li id="USART3_IMR__OVRE"><strong>OVRE</strong>: Overrun Error Interrupt Mask</li>
+          <p>-</p>
+          <li id="USART3_IMR__FRAME"><strong>FRAME</strong>: Framing Error Interrupt Mask</li>
+          <p>-</p>
+          <li id="USART3_IMR__PARE"><strong>PARE</strong>: Parity Error Interrupt Mask</li>
+          <p>-</p>
+          <li id="USART3_IMR__TIMEOUT"><strong>TIMEOUT</strong>: Time-out Interrupt Mask</li>
+          <p>-</p>
+          <li id="USART3_IMR__TXEMPTY"><strong>TXEMPTY</strong>: TXEMPTY Interrupt Mask</li>
+          <p>-</p>
+          <li id="USART3_IMR__ITER"><strong>ITER</strong>: Max number of Repetitions Reached Mask</li>
+          <p>-</p>
+          <li id="USART3_IMR__UNRE"><strong>UNRE</strong>: SPI Underrun Error Mask</li>
+          <p>-</p>
+          <li id="USART3_IMR__TXBUFE"><strong>TXBUFE</strong>: Buffer Empty Interrupt Mask</li>
+          <p>-</p>
+          <li id="USART3_IMR__RXBUFF"><strong>RXBUFF</strong>: Buffer Full Interrupt Mask</li>
+          <p>-</p>
+          <li id="USART3_IMR__NACK"><strong>NACK</strong>: Non Acknowledge Interrupt Mask</li>
+          <p>-</p>
+          <li id="USART3_IMR__LINBK"><strong>LINBK</strong>: LIN Break Sent or LIN Break Received Interrupt Mask</li>
+          <p>-</p>
+          <li id="USART3_IMR__LINID"><strong>LINID</strong>: LIN Identifier Sent or LIN Identifier Received Interrupt Mask</li>
+          <p>-</p>
+          <li id="USART3_IMR__LINTC"><strong>LINTC</strong>: LIN Transfer Completed Interrupt Mask</li>
+          <p>-</p>
+          <li id="USART3_IMR__CTSIC"><strong>CTSIC</strong>: Clear to Send Input Change Interrupt Mask</li>
+          <p>-</p>
+          <li id="USART3_IMR__MANE"><strong>MANE</strong>: Manchester Error Interrupt Mask</li>
+          <p>-</p>
+          <li id="USART3_IMR__LINBE"><strong>LINBE</strong>: LIN Bus Error Interrupt Mask</li>
+          <p>-</p>
+          <li id="USART3_IMR__LINISFE"><strong>LINISFE</strong>: LIN Inconsistent Synch Field Error Interrupt Mask</li>
+          <p>-</p>
+          <li id="USART3_IMR__LINIPE"><strong>LINIPE</strong>: LIN Identifier Parity Interrupt Mask</li>
+          <p>-</p>
+          <li id="USART3_IMR__LINCE"><strong>LINCE</strong>: LIN Checksum Error Interrupt Mask</li>
+          <p>-</p>
+          <li id="USART3_IMR__LINSNRE"><strong>LINSNRE</strong>: LIN Slave Not Responding Error Interrupt Mask</li>
+          <p>-</p>
+        </ul>
+        <h4 id="USART3_CSR">USART3 Channel Status Register</h4>
+        <p><strong>Name</strong>: USART3_CSR</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x400A4014</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#USART3_CSR__LINSNRE" title="LIN Slave Not Responding Error">LINSNRE</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CSR__LINCE" title="LIN Checksum Error">LINCE</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CSR__LINIPE" title="LIN Identifier Parity Error">LINIPE</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CSR__LINISFE" title="LIN Inconsistent Synch Field Error">LINISFE</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CSR__LINBE" title="LIN Bit Error">LINBE</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CSR__MANERR" title="Manchester Error">MANERR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#USART3_CSR__CTS" title="Image of CTS Input">CTS</a>
+              </td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#USART3_CSR__CTSIC" title="Clear to Send Input Change Flag">CTSIC</a>
+              </td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#USART3_CSR__LINTC" title="LIN Transfer Completed">LINTC</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CSR__LINID" title="LIN Identifier Sent or LIN Identifier Received">LINID</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CSR__NACK" title="Non Acknowledge Interrupt">NACK</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CSR__RXBUFF" title="Reception Buffer Full">RXBUFF</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CSR__TXBUFE" title="Transmission Buffer Empty">TXBUFE</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CSR__ITER" title="Max number of Repetitions Reached">ITER</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CSR__TXEMPTY" title="Transmitter Empty">TXEMPTY</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CSR__TIMEOUT" title="Receiver Time-out">TIMEOUT</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#USART3_CSR__PARE" title="Parity Error">PARE</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CSR__FRAME" title="Framing Error">FRAME</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CSR__OVRE" title="Overrun Error">OVRE</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CSR__ENDTX" title="End of Transmitter Transfer">ENDTX</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CSR__ENDRX" title="End of Receiver Transfer">ENDRX</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CSR__RXBRK" title="Break Received/End of Break">RXBRK</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CSR__TXRDY" title="Transmitter Ready">TXRDY</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_CSR__RXRDY" title="Receiver Ready">RXRDY</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="USART3_CSR__RXRDY"><strong>RXRDY</strong>: Receiver Ready<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No complete character has been received since the last read of US_RHR or the receiver is disabled. If characters were being received when the receiver was disabled, RXRDY changes to 1 when the receiver is enabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">At least one complete character has been received and US_RHR has not yet been read.</td></tr></tbody></table></li>
+          <li id="USART3_CSR__TXRDY"><strong>TXRDY</strong>: Transmitter Ready<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">A character is in the US_THR waiting to be transferred to the Transmit Shift Register, or an STTBRK command has been requested, or the transmitter is disabled. As soon as the transmitter is enabled, TXRDY becomes 1.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">There is no character in the US_THR.</td></tr></tbody></table></li>
+          <li id="USART3_CSR__RXBRK"><strong>RXBRK</strong>: Break Received/End of Break<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No Break received or End of Break detected since the last RSTSTA.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Break Received or End of Break detected since the last RSTSTA.</td></tr></tbody></table></li>
+          <li id="USART3_CSR__ENDRX"><strong>ENDRX</strong>: End of Receiver Transfer<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The End of Transfer signal from the Receive PDC channel is inactive.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The End of Transfer signal from the Receive PDC channel is active.</td></tr></tbody></table></li>
+          <li id="USART3_CSR__ENDTX"><strong>ENDTX</strong>: End of Transmitter Transfer<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The End of Transfer signal from the Transmit PDC channel is inactive.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The End of Transfer signal from the Transmit PDC channel is active.</td></tr></tbody></table></li>
+          <li id="USART3_CSR__OVRE"><strong>OVRE</strong>: Overrun Error<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No overrun error has occurred since the last RSTSTA.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">At least one overrun error has occurred since the last RSTSTA.</td></tr></tbody></table></li>
+          <li id="USART3_CSR__FRAME"><strong>FRAME</strong>: Framing Error<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No stop bit has been detected low since the last RSTSTA.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">At least one stop bit has been detected low since the last RSTSTA.</td></tr></tbody></table></li>
+          <li id="USART3_CSR__PARE"><strong>PARE</strong>: Parity Error<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No parity error has been detected since the last RSTSTA.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">At least one parity error has been detected since the last RSTSTA.</td></tr></tbody></table></li>
+          <li id="USART3_CSR__TIMEOUT"><strong>TIMEOUT</strong>: Receiver Time-out<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">There has not been a time-out since the last Start Time-out command (STTTO in US_CR) or the Time-out Register is 0.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">There has been a time-out since the last Start Time-out command (STTTO in US_CR).</td></tr></tbody></table></li>
+          <li id="USART3_CSR__TXEMPTY"><strong>TXEMPTY</strong>: Transmitter Empty<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">There are characters in either US_THR or the Transmit Shift Register, or the transmitter is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">There are no characters in US_THR, nor in the Transmit Shift Register.</td></tr></tbody></table></li>
+          <li id="USART3_CSR__ITER"><strong>ITER</strong>: Max number of Repetitions Reached<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Maximum number of repetitions has not been reached since the last RSTSTA.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Maximum number of repetitions has been reached since the last RSTSTA.</td></tr></tbody></table></li>
+          <li id="USART3_CSR__UNRE"><strong>UNRE</strong>: SPI Underrun Error</li>
+          <p>-</p>
+          <li id="USART3_CSR__TXBUFE"><strong>TXBUFE</strong>: Transmission Buffer Empty<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The signal Buffer Empty from the Transmit PDC channel is inactive.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The signal Buffer Empty from the Transmit PDC channel is active.</td></tr></tbody></table></li>
+          <li id="USART3_CSR__RXBUFF"><strong>RXBUFF</strong>: Reception Buffer Full<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The signal Buffer Full from the Receive PDC channel is inactive.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The signal Buffer Full from the Receive PDC channel is active.</td></tr></tbody></table></li>
+          <li id="USART3_CSR__NACK"><strong>NACK</strong>: Non Acknowledge Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Non Acknowledge has not been detected since the last RSTNACK.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">At least one Non Acknowledge has been detected since the last RSTNACK.</td></tr></tbody></table></li>
+          <li id="USART3_CSR__LINBK"><strong>LINBK</strong>: LIN Break Sent or LIN Break Received</li>
+          <p>-</p>
+          <li id="USART3_CSR__LINID"><strong>LINID</strong>: LIN Identifier Sent or LIN Identifier Received<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">-</td><td class="description">No LIN Identifier has been sent since the last RSTSTA.</td></tr><tr class="even"><td class="value">0x1</td><td class="name">-</td><td class="description">At least one LIN Identifier has been sent since the last RSTSTA.</td></tr></tbody></table></li>
+          <li id="USART3_CSR__LINTC"><strong>LINTC</strong>: LIN Transfer Completed<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The USART is idle or a LIN transfer is ongoing.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">A LIN transfer has been completed since the last RSTSTA.</td></tr></tbody></table></li>
+          <li id="USART3_CSR__CTSIC"><strong>CTSIC</strong>: Clear to Send Input Change Flag<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No input change has been detected on the CTS pin since the last read of US_CSR.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">At least one input change has been detected on the CTS pin since the last read of US_CSR.</td></tr></tbody></table></li>
+          <li id="USART3_CSR__CTS"><strong>CTS</strong>: Image of CTS Input<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">CTS is set to 0.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">CTS is set to 1.</td></tr></tbody></table></li>
+          <li id="USART3_CSR__LINBLS"><strong>LINBLS</strong>: LIN Bus Line Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">LIN Bus Line is set to 0.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">LIN Bus Line is set to 1.</td></tr></tbody></table></li>
+          <li id="USART3_CSR__MANERR"><strong>MANERR</strong>: Manchester Error<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No Manchester error has been detected since the last RSTSTA.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">At least one Manchester error has been detected since the last RSTSTA.</td></tr></tbody></table></li>
+          <li id="USART3_CSR__LINBE"><strong>LINBE</strong>: LIN Bit Error<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No Bit Error has been detected since the last RSTSTA.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">A Bit Error has been detected since the last RSTSTA.</td></tr></tbody></table></li>
+          <li id="USART3_CSR__LINISFE"><strong>LINISFE</strong>: LIN Inconsistent Synch Field Error<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No LIN Inconsistent Synch Field Error has been detected since the last RSTSTA</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The USART is configured as a Slave node and a LIN Inconsistent Synch Field Error has been detected since the last RSTSTA.</td></tr></tbody></table></li>
+          <li id="USART3_CSR__LINIPE"><strong>LINIPE</strong>: LIN Identifier Parity Error<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No LIN Identifier Parity Error has been detected since the last RSTSTA.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">A LIN Identifier Parity Error has been detected since the last RSTSTA.</td></tr></tbody></table></li>
+          <li id="USART3_CSR__LINCE"><strong>LINCE</strong>: LIN Checksum Error<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No LIN Checksum Error has been detected since the last RSTSTA.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">A LIN Checksum Error has been detected since the last RSTSTA.</td></tr></tbody></table></li>
+          <li id="USART3_CSR__LINSNRE"><strong>LINSNRE</strong>: LIN Slave Not Responding Error<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No LIN Slave Not Responding Error has been detected since the last RSTSTA.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">A LIN Slave Not Responding Error has been detected since the last RSTSTA.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="USART3_RHR">USART3 Receiver Holding Register</h4>
+        <p><strong>Name</strong>: USART3_RHR</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x400A4018</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#USART3_RHR__RXSYNH" title="Received Sync">RXSYNH</a>
+              </td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#USART3_RHR__RXCHR" title="Received Character">RXCHR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_RHR__RXCHR" title="Received Character">RXCHR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="USART3_RHR__RXCHR"><strong>RXCHR</strong>: Received Character</li>
+          <p>-</p>
+          <li id="USART3_RHR__RXSYNH"><strong>RXSYNH</strong>: Received Sync<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Last Character received is a Data.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Last Character received is a Command.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="USART3_THR">USART3 Transmitter Holding Register</h4>
+        <p><strong>Name</strong>: USART3_THR</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x400A401C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#USART3_THR__TXSYNH" title="Sync Field to be transmitted">TXSYNH</a>
+              </td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#USART3_THR__TXCHR" title="Character to be Transmitted">TXCHR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_THR__TXCHR" title="Character to be Transmitted">TXCHR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="USART3_THR__TXCHR"><strong>TXCHR</strong>: Character to be Transmitted</li>
+          <p>-</p>
+          <li id="USART3_THR__TXSYNH"><strong>TXSYNH</strong>: Sync Field to be transmitted<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The next character sent is encoded as a data. Start Frame Delimiter is DATA SYNC.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The next character sent is encoded as a command. Start Frame Delimiter is COMMAND SYNC.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="USART3_BRGR">USART3 Baud Rate Generator Register</h4>
+        <p><strong>Name</strong>: USART3_BRGR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400A4020</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="3">
+                <a href="#USART3_BRGR__FP" title="Fractional Part">FP</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_BRGR__CD" title="Clock Divider">CD</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_BRGR__CD" title="Clock Divider">CD</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="USART3_BRGR__CD"><strong>CD</strong>: Clock Divider</li>
+          <p>-</p>
+          <li id="USART3_BRGR__FP"><strong>FP</strong>: Fractional Part</li>
+          <p>-</p>
+        </ul>
+        <h4 id="USART3_RTOR">USART3 Receiver Time-out Register</h4>
+        <p><strong>Name</strong>: USART3_RTOR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400A4024</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#USART3_RTOR__TO" title="Time-out Value">TO</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_RTOR__TO" title="Time-out Value">TO</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_RTOR__TO" title="Time-out Value">TO</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="USART3_RTOR__TO"><strong>TO</strong>: Time-out Value</li>
+          <p>-</p>
+        </ul>
+        <h4 id="USART3_TTGR">USART3 Transmitter Timeguard Register</h4>
+        <p><strong>Name</strong>: USART3_TTGR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400A4028</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_TTGR__TG" title="Timeguard Value">TG</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="USART3_TTGR__TG"><strong>TG</strong>: Timeguard Value</li>
+          <p>-</p>
+        </ul>
+        <h4 id="USART3_FIDI">USART3 FI DI Ratio Register</h4>
+        <p><strong>Name</strong>: USART3_FIDI</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400A4040</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="3">
+                <a href="#USART3_FIDI__FI_DI_RATIO" title="FI Over DI Ratio Value">FI_DI_RATIO</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_FIDI__FI_DI_RATIO" title="FI Over DI Ratio Value">FI_DI_RATIO</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="USART3_FIDI__FI_DI_RATIO"><strong>FI_DI_RATIO</strong>: FI Over DI Ratio Value</li>
+          <p>-</p>
+        </ul>
+        <h4 id="USART3_NER">USART3 Number of Errors Register</h4>
+        <p><strong>Name</strong>: USART3_NER</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x400A4044</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_NER__NB_ERRORS" title="Number of Errors">NB_ERRORS</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="USART3_NER__NB_ERRORS"><strong>NB_ERRORS</strong>: Number of Errors</li>
+          <p>-</p>
+        </ul>
+        <h4 id="USART3_IF">USART3 IrDA Filter Register</h4>
+        <p><strong>Name</strong>: USART3_IF</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400A404C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_IF__IRDA_FILTER" title="IrDA Filter">IRDA_FILTER</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="USART3_IF__IRDA_FILTER"><strong>IRDA_FILTER</strong>: IrDA Filter</li>
+          <p>-</p>
+        </ul>
+        <h4 id="USART3_MAN">USART3 Manchester Encoder Decoder Register</h4>
+        <p><strong>Name</strong>: USART3_MAN</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400A4050</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td colspan="1">
+                <a href="#USART3_MAN__DRIFT" title="Drift compensation">DRIFT</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_MAN__STUCKTO1">STUCKTO1</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_MAN__RX_MPOL" title="Receiver Manchester Polarity">RX_MPOL</a>
+              </td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="2">
+                <a href="#USART3_MAN__RX_PP" title="Receiver Preamble Pattern detected">RX_PP</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="4">
+                <a href="#USART3_MAN__RX_PL" title="Receiver Preamble Length">RX_PL</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#USART3_MAN__TX_MPOL" title="Transmitter Manchester Polarity">TX_MPOL</a>
+              </td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="2">
+                <a href="#USART3_MAN__TX_PP" title="Transmitter Preamble Pattern">TX_PP</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="4">
+                <a href="#USART3_MAN__TX_PL" title="Transmitter Preamble Length">TX_PL</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="USART3_MAN__TX_PL"><strong>TX_PL</strong>: Transmitter Preamble Length</li>
+          <p>-</p>
+          <li id="USART3_MAN__TX_PP"><strong>TX_PP</strong>: Transmitter Preamble Pattern<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">ALL_ONE</td><td class="description">The preamble is composed of '1's</td></tr><tr class="even"><td class="value">0x1</td><td class="name">ALL_ZERO</td><td class="description">The preamble is composed of '0's</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">ZERO_ONE</td><td class="description">The preamble is composed of '01's</td></tr><tr class="even"><td class="value">0x3</td><td class="name">ONE_ZERO</td><td class="description">The preamble is composed of '10's</td></tr></tbody></table></li>
+          <li id="USART3_MAN__TX_MPOL"><strong>TX_MPOL</strong>: Transmitter Manchester Polarity<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Logic Zero is coded as a zero-to-one transition, Logic One is coded as a one-to-zero transition.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Logic Zero is coded as a one-to-zero transition, Logic One is coded as a zero-to-one transition.</td></tr></tbody></table></li>
+          <li id="USART3_MAN__RX_PL"><strong>RX_PL</strong>: Receiver Preamble Length</li>
+          <p>-</p>
+          <li id="USART3_MAN__RX_PP"><strong>RX_PP</strong>: Receiver Preamble Pattern detected<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">ALL_ONE</td><td class="description">The preamble is composed of '1's</td></tr><tr class="even"><td class="value">0x1</td><td class="name">ALL_ZERO</td><td class="description">The preamble is composed of '0's</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">ZERO_ONE</td><td class="description">The preamble is composed of '01's</td></tr><tr class="even"><td class="value">0x3</td><td class="name">ONE_ZERO</td><td class="description">The preamble is composed of '10's</td></tr></tbody></table></li>
+          <li id="USART3_MAN__RX_MPOL"><strong>RX_MPOL</strong>: Receiver Manchester Polarity<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Logic Zero is coded as a zero-to-one transition, Logic One is coded as a one-to-zero transition.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Logic Zero is coded as a one-to-zero transition, Logic One is coded as a zero-to-one transition.</td></tr></tbody></table></li>
+          <li id="USART3_MAN__STUCKTO1">
+            <strong>STUCKTO1</strong>
+          </li>
+          <p>-</p>
+          <li id="USART3_MAN__DRIFT"><strong>DRIFT</strong>: Drift compensation<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The USART can not recover from an important clock drift</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The USART can recover from clock drift. The 16X clock mode must be enabled.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="USART3_LINMR">USART3 LIN Mode Register</h4>
+        <p><strong>Name</strong>: USART3_LINMR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400A4054</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#USART3_LINMR__PDCM" title="PDC Mode">PDCM</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_LINMR__DLC" title="Data Length Control">DLC</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#USART3_LINMR__WKUPTYP" title="Wakeup Signal Type">WKUPTYP</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_LINMR__FSDIS" title="Frame Slot Mode Disable">FSDIS</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_LINMR__DLM" title="Data Length Mode">DLM</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_LINMR__CHKTYP" title="Checksum Type">CHKTYP</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_LINMR__CHKDIS" title="Checksum Disable">CHKDIS</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_LINMR__PARDIS" title="Parity Disable">PARDIS</a>
+              </td>
+              <td colspan="2">
+                <a href="#USART3_LINMR__NACT" title="LIN Node Action">NACT</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="USART3_LINMR__NACT"><strong>NACT</strong>: LIN Node Action<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">PUBLISH</td><td class="description">The USART transmits the response.</td></tr><tr class="even"><td class="value">0x1</td><td class="name">SUBSCRIBE</td><td class="description">The USART receives the response.</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">IGNORE</td><td class="description">The USART does not transmit and does not receive the response.</td></tr></tbody></table></li>
+          <li id="USART3_LINMR__PARDIS"><strong>PARDIS</strong>: Parity Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">In Master node configuration, the Identifier Parity is computed and sent automatically. In Master node and Slave node configuration, the parity is checked automatically.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Whatever the node configuration is, the Identifier parity is not computed/sent and it is not checked.</td></tr></tbody></table></li>
+          <li id="USART3_LINMR__CHKDIS"><strong>CHKDIS</strong>: Checksum Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">In Master node configuration, the checksum is computed and sent automatically. In Slave node configuration, the check-sum is checked automatically.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Whatever the node configuration is, the checksum is not computed/sent and it is not checked.</td></tr></tbody></table></li>
+          <li id="USART3_LINMR__CHKTYP"><strong>CHKTYP</strong>: Checksum Type<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">LIN 2.0 "Enhanced" Checksum</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">LIN 1.3 "Classic" Checksum</td></tr></tbody></table></li>
+          <li id="USART3_LINMR__DLM"><strong>DLM</strong>: Data Length Mode<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The response data length is defined by the field DLC of this register.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The response data length is defined by the bits 5 and 6 of the Identifier (IDCHR in US_LINIR).</td></tr></tbody></table></li>
+          <li id="USART3_LINMR__FSDIS"><strong>FSDIS</strong>: Frame Slot Mode Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The Frame Slot Mode is enabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The Frame Slot Mode is disabled.</td></tr></tbody></table></li>
+          <li id="USART3_LINMR__WKUPTYP"><strong>WKUPTYP</strong>: Wakeup Signal Type<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">setting the bit LINWKUP in the control register sends a LIN 2.0 wakeup signal.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">setting the bit LINWKUP in the control register sends a LIN 1.3 wakeup signal.</td></tr></tbody></table></li>
+          <li id="USART3_LINMR__DLC"><strong>DLC</strong>: Data Length Control</li>
+          <p>-</p>
+          <li id="USART3_LINMR__PDCM"><strong>PDCM</strong>: PDC Mode<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The LIN mode register US_LINMR is not written by the PDC.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The LIN mode register US_LINMR (excepting that flag) is written by the PDC.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="USART3_LINIR">USART3 LIN Identifier Register</h4>
+        <p><strong>Name</strong>: USART3_LINIR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400A4058</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_LINIR__IDCHR" title="Identifier Character">IDCHR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="USART3_LINIR__IDCHR"><strong>IDCHR</strong>: Identifier Character</li>
+          <p>-</p>
+        </ul>
+        <h4 id="USART3_WPMR">USART3 Write Protect Mode Register</h4>
+        <p><strong>Name</strong>: USART3_WPMR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400A40E4</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_WPMR__WPKEY" title="Write Protect KEY">WPKEY</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_WPMR__WPKEY" title="Write Protect KEY">WPKEY</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_WPMR__WPKEY" title="Write Protect KEY">WPKEY</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#USART3_WPMR__WPEN" title="Write Protect Enable">WPEN</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="USART3_WPMR__WPEN"><strong>WPEN</strong>: Write Protect Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Disables the Write Protect if WPKEY corresponds to 0x555341 ("USA" in ASCII).</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the Write Protect if WPKEY corresponds to 0x555341 ("USA" in ASCII).</td></tr></tbody></table></li>
+          <li id="USART3_WPMR__WPKEY"><strong>WPKEY</strong>: Write Protect KEY</li>
+          <p>-</p>
+        </ul>
+        <h4 id="USART3_WPSR">USART3 Write Protect Status Register</h4>
+        <p><strong>Name</strong>: USART3_WPSR</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x400A40E8</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_WPSR__WPVSRC" title="Write Protect Violation Source">WPVSRC</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_WPSR__WPVSRC" title="Write Protect Violation Source">WPVSRC</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#USART3_WPSR__WPVS" title="Write Protect Violation Status">WPVS</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="USART3_WPSR__WPVS"><strong>WPVS</strong>: Write Protect Violation Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No Write Protect Violation has occurred since the last read of the US_WPSR register.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">A Write Protect Violation has occurred since the last read of the US_WPSR register. If this violation is an unauthorized attempt to write a protected register, the associated violation is reported into field WPVSRC.</td></tr></tbody></table></li>
+          <li id="USART3_WPSR__WPVSRC"><strong>WPVSRC</strong>: Write Protect Violation Source</li>
+          <p>-</p>
+        </ul>
+        <h4 id="USART3_RPR">USART3 Receive Pointer Register</h4>
+        <p><strong>Name</strong>: USART3_RPR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400A4100</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_RPR__RXPTR" title="Receive Pointer Register">RXPTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_RPR__RXPTR" title="Receive Pointer Register">RXPTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_RPR__RXPTR" title="Receive Pointer Register">RXPTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_RPR__RXPTR" title="Receive Pointer Register">RXPTR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="USART3_RPR__RXPTR"><strong>RXPTR</strong>: Receive Pointer Register</li>
+          <p>-</p>
+        </ul>
+        <h4 id="USART3_RCR">USART3 Receive Counter Register</h4>
+        <p><strong>Name</strong>: USART3_RCR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400A4104</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_RCR__RXCTR" title="Receive Counter Register">RXCTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_RCR__RXCTR" title="Receive Counter Register">RXCTR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="USART3_RCR__RXCTR"><strong>RXCTR</strong>: Receive Counter Register</li>
+          <p>-</p>
+        </ul>
+        <h4 id="USART3_TPR">USART3 Transmit Pointer Register</h4>
+        <p><strong>Name</strong>: USART3_TPR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400A4108</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_TPR__TXPTR" title="Transmit Counter Register">TXPTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_TPR__TXPTR" title="Transmit Counter Register">TXPTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_TPR__TXPTR" title="Transmit Counter Register">TXPTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_TPR__TXPTR" title="Transmit Counter Register">TXPTR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="USART3_TPR__TXPTR"><strong>TXPTR</strong>: Transmit Counter Register</li>
+          <p>-</p>
+        </ul>
+        <h4 id="USART3_TCR">USART3 Transmit Counter Register</h4>
+        <p><strong>Name</strong>: USART3_TCR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400A410C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_TCR__TXCTR" title="Transmit Counter Register">TXCTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_TCR__TXCTR" title="Transmit Counter Register">TXCTR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="USART3_TCR__TXCTR"><strong>TXCTR</strong>: Transmit Counter Register</li>
+          <p>-</p>
+        </ul>
+        <h4 id="USART3_RNPR">USART3 Receive Next Pointer Register</h4>
+        <p><strong>Name</strong>: USART3_RNPR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400A4110</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_RNPR__RXNPTR" title="Receive Next Pointer">RXNPTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_RNPR__RXNPTR" title="Receive Next Pointer">RXNPTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_RNPR__RXNPTR" title="Receive Next Pointer">RXNPTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_RNPR__RXNPTR" title="Receive Next Pointer">RXNPTR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="USART3_RNPR__RXNPTR"><strong>RXNPTR</strong>: Receive Next Pointer</li>
+          <p>-</p>
+        </ul>
+        <h4 id="USART3_RNCR">USART3 Receive Next Counter Register</h4>
+        <p><strong>Name</strong>: USART3_RNCR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400A4114</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_RNCR__RXNCTR" title="Receive Next Counter">RXNCTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_RNCR__RXNCTR" title="Receive Next Counter">RXNCTR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="USART3_RNCR__RXNCTR"><strong>RXNCTR</strong>: Receive Next Counter</li>
+          <p>-</p>
+        </ul>
+        <h4 id="USART3_TNPR">USART3 Transmit Next Pointer Register</h4>
+        <p><strong>Name</strong>: USART3_TNPR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400A4118</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_TNPR__TXNPTR" title="Transmit Next Pointer">TXNPTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_TNPR__TXNPTR" title="Transmit Next Pointer">TXNPTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_TNPR__TXNPTR" title="Transmit Next Pointer">TXNPTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_TNPR__TXNPTR" title="Transmit Next Pointer">TXNPTR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="USART3_TNPR__TXNPTR"><strong>TXNPTR</strong>: Transmit Next Pointer</li>
+          <p>-</p>
+        </ul>
+        <h4 id="USART3_TNCR">USART3 Transmit Next Counter Register</h4>
+        <p><strong>Name</strong>: USART3_TNCR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400A411C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_TNCR__TXNCTR" title="Transmit Counter Next">TXNCTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#USART3_TNCR__TXNCTR" title="Transmit Counter Next">TXNCTR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="USART3_TNCR__TXNCTR"><strong>TXNCTR</strong>: Transmit Counter Next</li>
+          <p>-</p>
+        </ul>
+        <h4 id="USART3_PTCR">USART3 Transfer Control Register</h4>
+        <p><strong>Name</strong>: USART3_PTCR</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x400A4120</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#USART3_PTCR__TXTDIS" title="Transmitter Transfer Disable">TXTDIS</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_PTCR__TXTEN" title="Transmitter Transfer Enable">TXTEN</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#USART3_PTCR__RXTDIS" title="Receiver Transfer Disable">RXTDIS</a>
+              </td>
+              <td colspan="1">
+                <a href="#USART3_PTCR__RXTEN" title="Receiver Transfer Enable">RXTEN</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="USART3_PTCR__RXTEN"><strong>RXTEN</strong>: Receiver Transfer Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables PDC receiver channel requests if RXTDIS is not set.</td></tr></tbody></table></li>
+          <li id="USART3_PTCR__RXTDIS"><strong>RXTDIS</strong>: Receiver Transfer Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the PDC receiver channel requests.</td></tr></tbody></table></li>
+          <li id="USART3_PTCR__TXTEN"><strong>TXTEN</strong>: Transmitter Transfer Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the PDC transmitter channel requests.</td></tr></tbody></table></li>
+          <li id="USART3_PTCR__TXTDIS"><strong>TXTDIS</strong>: Transmitter Transfer Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the PDC transmitter channel requests.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="USART3_PTSR">USART3 Transfer Status Register</h4>
+        <p><strong>Name</strong>: USART3_PTSR</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x400A4124</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#USART3_PTSR__TXTEN" title="Transmitter Transfer Enable">TXTEN</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#USART3_PTSR__RXTEN" title="Receiver Transfer Enable">RXTEN</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="USART3_PTSR__RXTEN"><strong>RXTEN</strong>: Receiver Transfer Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">PDC Receiver channel requests are disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">PDC Receiver channel requests are enabled.</td></tr></tbody></table></li>
+          <li id="USART3_PTSR__TXTEN"><strong>TXTEN</strong>: Transmitter Transfer Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">PDC Transmitter channel requests are disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">PDC Transmitter channel requests are enabled.</td></tr></tbody></table></li>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>

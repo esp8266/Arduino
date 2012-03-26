@@ -51,7 +51,7 @@ extern "C" {
 /**INDENT-ON**/
 /// @endcond
 
-#if SAM3S || SAM3N || SAM3XA
+#if SAM3S_SERIES || SAM3N_SERIES || SAM3XA_SERIES
 
 /**
  * \brief Initializes the given ADC with the specified ADC clock and startup time.
@@ -108,7 +108,7 @@ extern void adc_configure_power_save(Adc *p_adc, uint8_t uc_sleep, uint8_t uc_fw
  */
 extern void adc_configure_sequence(Adc *p_adc, adc_channel_num_t ch_list[], uint8_t uc_num);
 
-#if SAM3S || SAM3XA
+#if SAM3S_SERIES || SAM3XA_SERIES
 /**
  * \brief Configures ADC timing.
  *
@@ -119,7 +119,7 @@ extern void adc_configure_sequence(Adc *p_adc, adc_channel_num_t ch_list[], uint
  *
  */
 extern void adc_configure_timing(Adc *p_adc, uint8_t uc_tracking, adc_settling_time_t settling, uint8_t uc_transfer);
-#elif SAM3N
+#elif SAM3N_SERIES
 /**
  * \brief Configures ADC timing.
  *
@@ -130,7 +130,7 @@ extern void adc_configure_timing(Adc *p_adc, uint8_t uc_tracking, adc_settling_t
 extern void adc_configure_timing(Adc *p_adc, uint8_t uc_tracking);
 #endif
 
-#if SAM3S || SAM3XA
+#if SAM3S_SERIES || SAM3XA_SERIES
 /**
  * \brief enable analog change.
  *
@@ -314,7 +314,7 @@ extern void adc_set_comparsion_window(Adc *p_adc, uint16_t us_low_threshold, uin
  */
 extern void adc_set_comparison_channel(Adc *p_adc, adc_channel_num_t channel);
 
-#if SAM3S || SAM3XA
+#if SAM3S_SERIES || SAM3XA_SERIES
 /**
  * \brief Enables differential input for the specified channel.
  *
@@ -362,7 +362,7 @@ extern void adc_disable_input_offset(Adc *p_adc, adc_channel_num_t channel);
 extern void adc_set_input_gain(Adc *p_adc, adc_channel_num_t channel, adc_gainvalue_t uc_gain);
 #endif
 
-#if  SAM3S8 || SAM3SD8
+#if  SAM3SD8_SERIES
 /**
  * \brief set adc auto calibration mode.
  *
@@ -426,7 +426,7 @@ extern uint32_t adc_get_interrupt_mask(Adc *p_adc);
  */
 extern uint32_t adc_check_ovr(Adc *p_adc, adc_channel_num_t adc_ch);
 
-#if SAM3S || SAM3XA
+#if SAM3S_SERIES || SAM3XA_SERIES
 /**
  * \brief Adapts performance versus power consumption.
  *
@@ -439,7 +439,7 @@ extern uint32_t adc_check_ovr(Adc *p_adc, adc_channel_num_t adc_ch);
 extern void adc_set_bias_current(Adc *p_adc, uint8_t uc_ibctl);
 #endif
 
-#if SAM3S ||  SAM3XA
+#if SAM3S_SERIES ||  SAM3XA_SERIES
 /**
  * \brief turn on temperature sensor.
  *
@@ -500,6 +500,6 @@ extern Pdc *adc_get_pdc_base(Adc *p_adc);
 /**INDENT-ON**/
 /// @endcond
 
-#endif /* SAM3S || SAM3N || SAM3XA */
+#endif /* SAM3S_SERIES || SAM3N_SERIES || SAM3XA_SERIES */
 
 #endif /* #ifndef ADC_SAM3SNXA_H_INCLUDED */

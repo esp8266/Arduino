@@ -17,7 +17,10 @@ OUTPUT_BIN = ..
 # Libraries
 PROJECT_BASE_PATH = ..
 SYSTEM_PATH = ../../../system
-CMSIS_PATH = $(SYSTEM_PATH)/CMSIS/Include
+CMSIS_ROOT_PATH = $(SYSTEM_PATH)/CMSIS
+CMSIS_ARM_PATH=$(CMSIS_ROOT_PATH)/CMSIS/Include
+CMSIS_ATMEL_PATH=$(CMSIS_ROOT_PATH)/Device/ATMEL
+CMSIS_CHIP_PATH=$(CMSIS_ROOT_PATH)/Device/ATMEL/$(CHIP_SERIE)
 VARIANT_PATH = ../../../variants/$(VARIANT)
 
 #-------------------------------------------------------------------------------
@@ -32,10 +35,11 @@ VPATH+=$(PROJECT_BASE_PATH)
 
 INCLUDES =
 INCLUDES += -I$(PROJECT_BASE_PATH)
+INCLUDES += -I$(VARIANT_PATH)
+INCLUDES += -I$(CMSIS_ARM_PATH)
+INCLUDES += -I$(CMSIS_ATMEL_PATH)
 INCLUDES += -I$(SYSTEM_PATH)
 INCLUDES += -I$(SYSTEM_PATH)/libsam
-INCLUDES += -I$(VARIANT_PATH)
-INCLUDES += -I$(CMSIS_PATH)
 
 #-------------------------------------------------------------------------------
 ifdef DEBUG
@@ -106,7 +110,7 @@ $(VARIANT): create_output $(OUTPUT_LIB)
 
 .PHONY: create_output
 create_output:
-	@echo --- Preparing $(VARIANT) files in $(OUTPUT_PATH) $(OUTPUT_BIN) 
+	@echo --- Preparing $(VARIANT) files in $(OUTPUT_PATH) $(OUTPUT_BIN)
 	@echo -------------------------
 	@echo *$(INCLUDES)
 	@echo -------------------------

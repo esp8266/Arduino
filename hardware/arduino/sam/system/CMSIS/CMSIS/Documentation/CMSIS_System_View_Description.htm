@@ -1,0 +1,1157 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html xmlns:p="urn:schemas-microsoft-com:office:powerpoint" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:m="http://schemas.microsoft.com/office/2004/12/omml"><head>
+  
+  <title>CMSIS - SVD: Cortex Microcontroller Software Interface Standard - System View Description</title><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+  <meta name="ProgId" content="FrontPage.Editor.Document">
+  <style type="text">
+
+
+
+</style>
+	<style type="text/css">
+.style1 {
+				text-align: center;
+}
+.style2 {
+				font-weight: normal;
+}
+.style3 {
+				text-align: left;
+}
+.style4 {
+				color: #008000;
+}
+.style5 {
+				color: #0000FF;
+}
+.style6 {
+				color: #000000;
+}
+</style>
+</head>
+
+<body>
+<h1 class="style1">Cortex Microcontroller Software Interface Standard<br>
+System View Description</h1>
+
+<p class="style1">This file describes the Cortex Microcontroller Software 
+Interface Standard - System View Description (CMSIS - SVD) concept and syntax.</p>
+<p class="style1">Version: 1.02 - 27. July 2011</p>
+
+<p class="style1">Information in this file, the accompany manuals, and software is<br>
+                 Copyright © ARM Ltd.<br>All rights reserved.
+</p>
+
+<hr>
+
+<p><span style="FONT-WEIGHT: bold">Revision History</span></p>
+<ul>
+	<li>Version 0.91: initial proposal.</li>
+	<li>Version 0.92: revised proposal considering forum feedback (e.g. consider 
+	IP-XACT constructs and naming scheme)</li>
+	<li>Version 1.0: new elements: peripheral version, vendor specific 
+	extension section, interrupt mapping information, global peripheral disable 
+	condition, naming of register arrays, enhanced naming schemes, etc.</li>
+	<li>Version 1.0: SVD versioning and updated schema file</li>
+	<li>Version 1.01: Error corrections in the example code. "include" has been removed. Restricted to one device per file.</li>
+	<li>Version 1.02: Adding the use case of device header file generation.</li>
+</ul>
+
+<p>&nbsp;</p>
+
+<hr>
+
+<h2>Contents</h2>
+
+<ol>
+  <li class="LI2"><a href="#1">About</a></li>
+  <li class="LI2"><a href="#2">Motivation</a></li>
+  <li class="LI2"><a href="#3">Requirements</a></li>
+  <li class="LI2"><a href="#4">Format</a></li>
+  <li class="LI2"><a href="#5">Example</a></li>
+  <li class="LI2"><a href="#6">Questions &amp; Answers</a></li>
+</ol>
+
+<h2><a name="1"></a>About</h2>
+
+<p>
+  The <strong>Cortex Microcontroller Software Interface Standard - System View 
+	Description</strong> (CMSIS - SVD) answers the challenges
+  of accurate, detailed and timely device aware peripheral debugging support for Cortex 
+	Microcontroller based devices by the software development 
+	tools vendor community.
+</p>
+<p>
+  Silicon vendors shall create and maintain a formalized description of the 
+	debug view for all the peripherals contained in their Cortex 
+	Microcontroller based devices. Tool vendors use such descriptions to 
+	establish device specific debug support in their debugging tools with minimal turn around times and 
+	manageable effort. Device support across many development tools&nbsp; is 
+	essential for silicon provider in order to promote new devices and device 
+	variants entering the market. Device aware debug views provide fast and 
+	convenient access to all registers and fields as well as a detailed 
+	description. This enables software developer to 
+	develop and debug code most efficiently and adopt new devices early and 
+	quickly.</p>
+<p>
+  A standardized System View Description shall provide a common approach to 
+	capturing peripheral debug related information in a machine readable files. 
+	The scope of the contained information is agreed to match the level usually 
+	provided by silicon vendors in their device reference manuals, however in a 
+	formalized XML based format. There 
+	are other description languages already available. IP-XACT from the SPIRIT 
+	consortium is a prominent example. IP-XACT covers the register description 
+	sufficiently, however it comprises many other aspects of the devices like 
+	ports, bus-protocols, modeling, tool flows, etc. making a direct use of 
+	IP-XACT too complex. The design of the SVD language is 
+	taking some guidance from IP-XACT thus allowing straight forward conversion 
+	from IP-XACT to CMSIS-SVD where IP-XACT device information is already 
+	available.</p>
+<p>
+  In a second step the CMSIS-SVD description shall be used for automatically 
+	generating CMSIS compliant a device header file. This enables the 
+	information in the header file to be consistent with what the debugger will 
+	display and CMSIS compliant by construction. The header file generation will 
+	require some additional pieces of information and therefore a future version 
+	of the description will need to include some extensions for this purpose.</p>
+<p>
+  Device aware debugging support is only one aspect of device 
+	support essential to software development environments, however it is one of 
+	the most time consuming and error prone ones.</p>
+<h2><a name="2"></a>Motivation</h2>
+<p>
+
+The software developer of microcontroller devices is faced with a growing number 
+of devices with an ever increasing number of peripheral blocks providing a wide 
+range of distinct and complex functionality. The development of drivers for 
+these peripherals is in the critical path of every project. Modern debuggers are supporting the software developer in getting the 
+software to run according to the requirements. A debugger providing peripheral awareness improves the 
+ability to access and interpret complex configuration and status information of 
+peripherals. Even though this is only one aspect of device support within microcontroller 
+development environments it is essential for the successful and timely adoption 
+of development tools and the device by the market.</p>
+<p>Today software development environments address device aware 
+debugging in various ways. They either use documents or proprietary file formats 
+as input for providing peripheral views in the debuggers. 
+Extracting peripheral information from written documentation is a very time 
+consuming, tedious and error prone task. Having a file containing peripheral specific information to generate peripheral views 
+is going to make device support more affordable, reliable and timely. 
+The challenge for the tool providers is the support of many 
+different and incompatible file formats from a growing number of silicon vendors. 
+For silicon vendors it is time consuming and costly to engage with many tool 
+provider in order to achieve device support in a wide range of development 
+environments.</p>
+<p>Standardizing on a System View Description aims to ease this challenge 
+by agreeing on a formal XML-based file format. In conjunction with supporting web server infrastructure silicon partner 
+shall upload and maintain such descriptions in a tool vendor agnostic device 
+database, hosted e.g. by the web server infrastructure 
+<a href="http://cmsis.arm.com">
+cmsis.arm.com</a> . Access control to sensitive information is managed on a per user 
+basis. This allows silicon vendors to upload information for devices that have 
+not been made public.&nbsp; </p>
+<p>Such an approach provides benefits for silicon and tool vendors as well as 
+software developers of Cortex-M based microcontroller devices</p>
+<ul>
+  <li>timely and accurate device support provided by a whole range of tool providers </li>
+	<li>tool providers become more efficient in supporting a multitude of devices 
+	and device variants</li>
+	<li>less interaction required between silicon vendors and the  
+	tool providers</li>
+	<li>silicon provider has control over and maintains the System View 
+	Description during the life cycle of the device</li>
+	<li>high quality device support in terms of completeness and correctness of 
+	device aware debugging</li>
+	<li>improved productivity and user experience for the software developer</li>
+</ul>
+<h2><a name="3"></a>Requirements</h2>
+<p>The debug description shall capture the information about all 
+the peripherals contained in a specific device. This section describes which 
+items of information are deemed relevant for a debugger. Silicon vendors are expected to 
+provide the System View Description for their devices, matching the information 
+contained in device reference manuals. The System View Description shall be suitable for straight forward 
+generation from existing databases like IP-XACT descriptions or SIDSC. The size 
+of device description is a concern and therefore redundancy in the description 
+shall be avoided. The size of SVD files affects the efficiency of 
+distribution as well as the loading time by the development tools. Last but not least manual editing of SVD files shall be possible for 
+the purpose of customization by SW developers.</p>
+<h4>Required content of the description</h4>
+<p>From a programmer's perspective a peripheral can be seen as a set of registers 
+with unique<em> names</em> being mapped to fixed<em> addresses</em> allocated 
+within a defined <em>range</em> of an address space.</p>
+<p>From a debugger's point of view read accesses to a physical register need to be 
+executed in order to display its current value. The debugger executes a write 
+access to a register when a user edits its value. For this purpose the debugger 
+needs to know about the following additional attributes: </p>
+<ul>
+				<li><em>minimal addressable unit </em>= smallest series of bits 
+				identified by a unique address (e.g. byte-addressable memory) </li>
+				<li><em>register size</em> = number of bits forming a register (ARM Cortex-M usually 
+				32 bits)</li>
+				<li><em>access permission</em> = read and write, read only, 
+				write only</li>
+				<li><em>access side effects</em> = accesses by the debugger must 
+				be avoided if it has side effects. Some side effects may be 
+				reversed by the debugger to compensate for the side effect</li>
+</ul>
+<p>In many cases peripheral registers are partitioned into chunks of bits of 
+distinct functionality. In this document these chunks are referred to as <em>
+field</em>. Each 
+register that consists of fields shall&nbsp; be described by a list 
+of <em>uniquely named</em> fields (Note: field names are not required to be 
+unique across registers). In order for a debugger to extract the 
+value of a field from the corresponding register the following attributes are required:</p>
+<ul>
+				<li><em>most significant bit </em>= highest bit position of the 
+				bit-field in the corresponding register</li>
+				<li><em>least significant bit</em> = lowest bit position of the 
+				bit-field within the corresponding register</li>
+				<li><em>access permission</em> = read and write, read only, 
+				write only</li>
+</ul>
+<p>An enumerated value maps a number to a specific descriptive string 
+representing the semantics of the value of a field. The debugger displays the 
+descriptive string rather than the number to simplify the access to the 
+information thus 
+avoiding the necessity of a look-up in the device reference manual. Each item of 
+an enumerated value has the following attributes:</p>
+<ul>
+				<li><em>value</em> = value of the bit-field that corresponds to 
+				the string attribute</li>
+				<li><em>name</em> = short string that describes the semantics of a 
+				field when the corresponding value is set</li>
+				<li><em>description</em> = detailed description of the semantics 
+				of the field when the corresponding value is set</li>
+</ul>
+<p>The hierarchical structure of the description looks like this:</p>
+<p><strong>Device =</strong></p>
+<ul>
+	<li>
+		<p>&nbsp;<strong>Peripherals</strong></p>
+		<ul>
+						<li>
+						<p class="style2"><strong>Peripheral</strong></p>
+						<ul>
+										<li>
+										<p class="style2"><strong>Registers</strong></p>
+										<ul>
+														<li>
+														<p class="style2">
+														<strong>Register</strong></p>
+														<ul>
+																		<li>
+																		<p class="style2">
+																		<strong>Fields</strong></p>
+																		<ul>
+																						<li>
+																						<p class="style2"><strong>Field</strong></p>
+																						<ul>
+																										<li>
+																										<p class="style2"><strong>Enumerated Values</strong></p>
+																										<ul>
+																														<li>
+																														<p class="style2"><strong>Enumerated Value</strong></p>
+																														</li>
+																										</ul>
+																										</li>
+																						</ul>
+																						</li>
+																		</ul>
+																		</li>
+														</ul>
+														</li>
+										</ul>
+										</li>
+						</ul>
+						</li>
+		</ul>
+	</li>
+</ul>
+
+<p>One file can only contain a description for a single device or device family 
+sharing the identical description. Devices consists of a one or more peripherals. 
+Each peripheral contains 
+one or more registers, where each register may consist of one or more fields. 
+The values of a field maybe represented through descriptive strings and detailed 
+descriptions, the enumerated values.</p>
+<p>In many cases there are multiple 
+instances of the same peripheral in a device (e.g. Timer0, Timer1, etc.). For 
+this reason the description has the concept of deriving a peripheral from a peripheral 
+that has already been described. The attribute <em>derivedFrom </em>specifies 
+such a relationship. 
+Similarly registers or fields can be reused within the device description. The 
+grouping of&nbsp; peripherals providing 
+similar functionality (e.g. Simple Timer, Complex Timer) is controlled via the element <em>groupName</em>. 
+All peripherals associated with the same group name are collectively listed under this group 
+in the order they have been specified in the file. 
+Collecting&nbsp; 
+similar or related peripherals into peripheral groups helps structuring the list 
+of peripherals e.g. in a drop down menu (tool dependent). Devices with a large 
+set of peripherals will benefit from this additional level of structure.</p>
+<p>Each of the items (i.e. Device, Peripheral, Register and 
+Field) owns an <em>description </em>element containing verbose information about 
+the respective element. The description field plays 
+an important part in improving the software development productivity. Instead of 
+searching through the reference manual the detailed explanation from the manual 
+could become immediately accessible from within the development environment.</p>
+<p>Details about the exact display format and layout of the peripheral view are 
+considered beyond the scope of the description. It is up to the tool vendor to 
+visualize the contained information appropriately. The  
+silicon vendor provides details about the device's peripherals that is commonly available. </p>
+<p>System View Description files need to be validated for:</p>
+<ol>
+				<li>syntactical correctness using XML-Schema checking utilities</li>
+				<li>consistency&nbsp; of the provided information (e.g. multiple registers mapped to the same address, 
+				all registers located within the specified address ranges of a 
+				peripheral, all fields are within the range of the register 
+				size, etc.) by a utility developed by ARM (SVDConv.exe)</li>
+				<li>&nbsp;semantical correctness of the System View Description 
+				against the silicon specification executed by the silicon vendor</li>
+</ol>
+<p>The SVD description format was extended by numerous elements during the 
+review period targeting version 1.0 and new extensions are expected for future 
+versions of this format. A new section named &quot;vendorExtensions&quot; has been added 
+to the end of the top level to allow silicon vendors and tool partners to 
+innovate and expand the description in order to overcome limitations of the 
+current specification until these can be incorporated into new versions of 
+CMSIS-SVD. <br>
+</p>
+
+<h2>&nbsp;<a name="4"></a><span class="style9">Format</span></h2>
+
+<p>
+  The following section describes the SVD file format in detail. Each subsection 
+	defines a single hierarchy level of the description and lists all mandatory 
+	and optional language elements for that specific level including type 
+	information for each element. Each element is discussed in more detail and a 
+	brief snippet is provided as an example. The sequence of elements shown 
+	below is binding. Optional elements are highlighted in green, blue elements 
+	are mandatory unless they have been already specified globally on a higher 
+	level.</p>
+<p>
+  An XML-schema file is provided alongside this document for syntactical 
+	checking of descriptions being developed.</p>
+<h4>&lt;device schemaVersion=&quot;xs:decimal&quot; <span class="style2"><em>xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xs:noNamespaceSchemaLocation=&quot;CMSIS-SVD_Schema_1_0.xsd</em></span>&quot;&gt;</h4>
+<p>&nbsp;&nbsp; &lt;<span class="style2">name&gt;<em>xs:Name</em>&lt;/name&gt;<br>
+&nbsp;&nbsp; &lt;version<em>&gt;xs:string&lt;</em>/version&gt;<br>
+&nbsp;&nbsp; &lt;description&gt;<em>xs:string</em>&lt;/description&gt;<br>
+</span>&nbsp;&nbsp; &lt;<span class="style2">addressUnitBits&gt;<em>scaledNonNegativeInteger</em>&lt;/addressUnitBits&gt;<br>
+&nbsp;&nbsp; &lt;width&gt;<em>scaledNonNegativeInteger</em> &lt;/width&gt;</span><br>
+<br>
+&nbsp;&nbsp;<span class="style4"> &lt;</span><span class="style2"><span class="style4">size&gt;<em>scaledNonNegativeInteger</em>&lt;/size&gt;<em><br>
+</em>&nbsp;&nbsp; &lt;access&gt;<em>accessType</em>&lt;/access&gt;<br>
+&nbsp;&nbsp; &lt;resetValue&gt;<em>scaledNonNegativeIntege</em>r&lt;/resetValue&gt;<br>
+&nbsp;&nbsp; &lt;resetMask&gt;<em>scaledNonNegativeInteger</em>&lt;/resetMask&gt;</span></span></p>
+<p>&nbsp;&nbsp; &lt;peripherals&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...<br>
+&nbsp;&nbsp; &lt;/peripherals&gt;<br>
+<span class="style4">&nbsp;&nbsp; &lt;vendorExtensions&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...<br>
+&nbsp;&nbsp;&nbsp; &lt;/vendorExtensions&gt;</span></p>
+<h4>&lt;/device&gt;</h4>
+<p>The <strong>device</strong> provides the outermost frame of the description. All other 
+elements like peripherals, registers and fields are described inside of this scope. A device contains one or more peripherals.
+The optional elements size, access, resetValue and resetMask are used as default values throughout the 
+device description unless they get overruled on a lower level of the description 
+(e.g. peripheral or register).</p>
+<h4>Mandatory items:</h4>
+<p><strong>name = </strong>the unique name string is used to identify the device. 
+All devices of a silicon vendor are required to have a unique name. In case an 
+SVD description covers a family or series of devices, the name of the series or 
+family is placed here. The device names of the members of the series or family 
+are listed in &lt;memberDevices&gt;</p>
+<p><strong>description = </strong>string describing main features of a device 
+(e.g. CPU, clock frequency, peripheral overview, etc.)</p>
+<p><strong>version = </strong>the string is defining the version of the 
+description for this device. Silicon vendors will maintain the description 
+throughout the lifecycle of the device and need to ensure that all updated and 
+released copies have a unique version string indicating the order in which. Note: this must not be used for 
+detailing the version of the device.</p>
+<p>&nbsp;</p>
+<p><strong>addressUnitBits = </strong>defines the number of data bits for each address 
+increment. The value for Cortex-M based devices is&nbsp; 8 (byte-addressable).</p>
+<p><strong>width = </strong>defines the number of bits for the maximum single 
+transfer size allowed by the bus interface hence the maximum size of a single 
+register that can be defined for the address space. This information is relevant 
+for debuggers when determining the size of debug transfers. The expected value 
+for Cortex-M based devices is 32.</p>
+<p><strong>peripherals = </strong>next level of description (see next section 
+for details)</p>
+<h4>Optional Items:</h4>
+<p><strong>size = </strong>defines the default bit-width of registers contained 
+in the device. This element can be overruled by re-specifying the size element on a lower level of the 
+description.</p>
+<p><strong>access =</strong> defines the default access permissions for all 
+registers in the device. The allowed tokens are:<br>
+&nbsp; - <em>read-only</em>: read access is permitted. Write operations have an undefined 
+result.<br>
+&nbsp; - <em>write-only</em>: write access is permitted. Read operations have an 
+undefined result. <br>
+&nbsp; -<em>read-write</em>: both read and write accesses are permitted. Writes affect 
+the state of the register and reads return a value related to the register<br>
+&nbsp; -<em>writeOnce</em>: only the first write after reset has an effect on the 
+register. Read operations deliver undefined results<br>
+&nbsp; -<em>read-writeOnce</em>: Read operations deliver a result related to the register 
+content. Only the first write access to this register after a reset will have an 
+effect on the register content.</p>
+<p><strong>resetValue = </strong>defines the default value of all registers 
+after a reset. There are scenarios where SW developers need to know, what the 
+reset value of a register or field is. Even though listed as optional on this 
+level of the description, silicon vendors should ensure that this information is 
+provided for all registers. </p>
+<p><strong>resetMask =</strong> defines those bit positions set to one to be 
+taken from resetValue element. All other elements are undefined. If a register 
+does not have a defined reset value the resetMask needs to be set to 0.</p>
+<p><strong>vendorExtensions </strong>= the content and format of this section of 
+the description is unspecified. Silicon vendors may choose to provide additional 
+information. The assumption is that by default this section is completely 
+ignored by the debugger. It is up to the silicon vendor to specify the content 
+of this section and share the specification with the tool vendors. The new 
+elements shall be considered for a future version of the description format.</p>
+<h4>Example:</h4>
+<pre>&lt;device schemaVersion=&quot;1.0&quot; xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xs:noNamespaceSchemaLocation=&quot;CMSIS-SVD_Schema_1_0.xsd&quot; &gt;
+  &lt;name&gt;CMSIS_Cortex-M3&lt;/name&gt;
+  &lt;version&gt;0.1&lt;/version&gt;
+  &lt;description&gt;ARM Cortex-M3 based Microcontroller demonstration device&lt;/description&gt;
+  &lt;addressUnitBits&gt;8&lt;/addressUnitBits&gt;
+  &lt;width&gt;32&lt;/width&gt;
+  &lt;size&gt;32&lt;/size&gt;
+  &lt;access&gt;read-write&lt;/access&gt;
+  &lt;resetValue&gt;0&lt;/resetValue&gt;
+  &lt;resetMask&gt;0xffffffff&lt;/resetMask&gt;</pre>
+<pre>  &lt;peripherals&gt;
+    ...
+  &lt;/peripherals&gt;
+&lt;/device&gt;</pre>
+<p>The device description above is at version 0.1 and uniquely identifies the 
+device by the name &quot;CMSIS_Cortex-M3&quot;. The peripherals are memory mapped in a 
+byte-addressable address space with a bus width of 32 bits. The default size of 
+the registers contained in the peripherals is set to 32 bits. Unless redefined 
+for specific peripherals, registers or fields all registers are read-write 
+accessible. A reset value of 0 valid for all 32 bits as specified by the reset 
+mask is set for all registers unless overruled at a lower level of the description.</p>
+<hr>
+<h4>&lt;peripherals&gt;</h4>
+<p>&nbsp;&nbsp; &lt;peripheral&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp; ...<br>
+&nbsp;&nbsp; &lt;/peripheral&gt;</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp; ...</p>
+<p>&nbsp;&nbsp; &lt;peripheral&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp; ...<br>
+&nbsp;&nbsp; &lt;/peripheral&gt;</p>
+<h4>&lt;/peripherals&gt;</h4>
+<p>This construct sets the frame for all peripherals and peripheral groups contained in a device. This 
+creates a container element which ease-up processing with languages like Java.</p>
+<hr>
+<h4>&lt;peripheral <span class="style2"><span class="style4">derivedFrom=<em>&quot;xs:Name&quot;</em></span></span>&gt;</h4>
+<p>&nbsp;&nbsp; &lt;name&gt;<em>xs:Name</em>&lt;/name&gt;<br>
+&nbsp;&nbsp; <span class="style4">&lt;version&gt;xs:string&lt;/name&gt;</span><br>
+&nbsp;&nbsp; &lt;description&gt;<em>xs:string </em>&lt;/description&gt;<br>
+&nbsp;&nbsp; <span class="style4">&lt;groupName&gt;<em>xs:string</em>&lt;/groupName&gt;<br>
+&nbsp;&nbsp; &lt;prependToName&gt;<em>xs:string</em>&lt;/prependToName&gt;<br>
+&nbsp;&nbsp; &lt;appendToName&gt;<em>xs:string</em>&lt;/appendToName&gt;</span><br>
+&nbsp;&nbsp; <span class="style4">&lt;disableCondition&gt;<em>xs:string</em>&lt;/disableCondition&gt;</span><br>
+&nbsp;&nbsp; &lt;baseAddress&gt;<em>scaledNonNegativeInteger</em>&lt;/baseAddress&gt;<br>
+&nbsp;&nbsp;<span class="style4"> &lt;</span><span class="style2"><span class="style4">size&gt;<em>scaledNonNegativeInteger</em>&lt;/size&gt;<em><br>
+</em>&nbsp;&nbsp; &lt;access&gt;<em>accessType</em>&lt;/access&gt;<br>
+&nbsp;&nbsp; &lt;resetValue&gt;<em>scaledNonNegativeIntege</em>r&lt;/resetValue&gt;<br>
+&nbsp;&nbsp; &lt;resetMask&gt;<em>scaledNonNegativeInteger</em>&lt;/resetMask&gt;</span></span></p>
+<p>&nbsp;&nbsp; <span class="style10">&lt;addressBlock&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;offset&gt;</span><em>scaledNonNegativeInteger</em><span class="style10">&lt;/offset&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;size&gt;</span><em>scaledNonNegativeInteger</em><span class="style10">&lt;/size&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;usage<em>&gt;usageType&lt;</em>/usage&gt;<br>
+<em>&nbsp;&nbsp; &lt;/</em>addressBlock&gt;<em><br>
+</em>&nbsp;&nbsp; ...<br>
+</span>&nbsp; <span class="style10"><span class="style4">&lt;addressBlock&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;offset&gt;</span></span><span class="style4"><em>scaledNonNegativeInteger</em></span><span class="style10"><span class="style4">&lt;/offset&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;size&gt;</span></span><span class="style4"><em>scaledNonNegativeInteger</em></span><span class="style10"><span class="style4">&lt;/size&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;usage&gt;<em>usageType</em>&lt;/usage&gt;<br>
+<em>&nbsp;&nbsp; &lt;/</em>addressBlock&gt;<br>
+&nbsp;&nbsp; &lt;interrupt&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;name&gt;<em>xs:string</em>&lt;/name&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;value&gt;<em>scaledNonNegativeInteger</em>&lt;/value&gt;<br>
+&nbsp;&nbsp; &lt;/interrupt&gt;</span><em><br>
+</em></span>&nbsp;&nbsp; &lt;registers&gt;<br>
+&nbsp;&nbsp; ...<br>
+&nbsp;&nbsp; &lt;/registers&gt;</p>
+<h4>&lt;/peripheral&gt;</h4>
+<p>A peripheral encloses the description of one or more registers belonging to 
+this named peripheral. The address range allocated in the address space for this 
+peripheral is defined through one or more address ranges. An address range is 
+specified relative to the base address of the peripheral. This information 
+allows to display a memory map overview for all peripherals. Please note that 
+such a memory map does not contain any information for memories and unoccupied 
+address ranges.</p>
+<h4>Mandatory items:</h4>
+<p><strong>name = </strong>name string used to identify the peripheral. Peripheral 
+names are required to be unique within the scope of a device.</p>
+<p><strong>baseAddress </strong>= lowest address reserved or used by the peripheral</p>
+<p><strong>description = </strong>string providing an overview of the purpose 
+and functionality of the peripheral</p>
+<p><strong>addressBlock = </strong>a peripheral may occupy one or more disparate 
+blocks in the address space. An addressBlock is a complex element consisting of 
+the mandatory elements:<br>
+&nbsp;&nbsp;&nbsp; <strong>offset</strong>: specifying the start address of an address block. It 
+is calculated from the sum of baseAddress and offset<br>
+&nbsp;&nbsp;&nbsp; <strong>size</strong>: specifying the number of addressUnitBits being covered 
+by this address block. The end address of an address block is the sum of start 
+address and the size - 1.<br>
+&nbsp;&nbsp;&nbsp; <strong>usage</strong>: the usage element is of <em>usageType </em>specifying 
+if the addresses within the specified address block is used for<strong> </strong>
+<em>registers</em><strong> </strong>or <em>buffer</em><strong> </strong>or is <em>reserved</em>. 
+<br>
+Note: registers must not be allocated 
+to an address within a reserved or buffer address range.</p>
+<p><strong>registers = </strong>next lower level of description (see next section 
+for details)</p>
+<h4>Optional items:</h4>
+<p><strong>derivedFrom = </strong>this attribute specifies the name of a peripheral 
+that has already been described for this device. The description of that device 
+will be copied. It is mandatory to overwrite the name as well as the 
+addressOffset. All other specified information will overwrite the respective 
+elements in the copy.</p>
+<p><strong>version = </strong>the string specifies the version of this 
+peripheral description.</p>
+<p><strong>disableCondition = </strong>C language compliant logical expression 
+resulting in a true or false result. If &quot;true&quot; the refresh of the display 
+for this peripheral is disabled 
+and related accesses by the debugger are suppressed. Only constants and references to other registers 
+contained in the description are allowed:&nbsp; 
+&lt;peripheral&gt;-&gt;&lt;register&gt;-&gt;&lt;field&gt; (e.g.: (System-&gt;ClockControl-&gt;apbEnable == 0)). 
+Only the following operators are allowed [&amp;&amp;,||, ==, !=, &gt;&gt;, &lt;&lt;, &amp;, |]. Warning! 
+This feature must only be use in case accesses from the debugger to registers of 
+un-clocked peripherals result in severe debugging failures. SVD is intended to 
+be fully static information and not include any run-time computation or 
+functions such capabilities may be added by the tools but is considered beyond 
+the scope of this description language.</p>
+<p><strong>prependToName = </strong>all register names of this peripheral have 
+their names prepended with the string specified</p>
+<p><strong>appendToName = </strong>all register names of this peripheral have 
+their names appended with the string specified</p>
+<p><strong>size = </strong>defines the default bit-width of registers contained 
+in the device. This element can be overruled by re-specifying the size element on a lower level of the 
+description.</p>
+<p><strong>access =</strong> defines the default access permissions for all 
+registers in the peripheral. The value can be reset on a lower level of the 
+description. The allowed tokens are:<br>
+&nbsp; - <em>read-only</em>: read access is permitted. Write operations have an undefined 
+result.<br>
+&nbsp; - <em>write-only</em>: write access is permitted. Read operations have an 
+undefined result. <br>
+&nbsp; -<em>read-write</em>: both read and write accesses are permitted. Writes affect 
+the state of the register and reads return a value related to the register<br>
+&nbsp; -<em>writeOnce</em>: only the first write after reset has an effect on the 
+register. Read operations deliver undefined results<br>
+&nbsp; -<em>read-writeOnce</em>: Read operations deliver a result related to the register 
+content. Only the first write access to this register after a reset will have an 
+effect on the register content.</p>
+<p><strong>resetValue = </strong>defines the default value of all registers 
+after a reset but can be set for individual registers and fields on a lower 
+level of the description.</p>
+<p><strong>resetMask =</strong> defines those bit positions set to one to be 
+taken from resetValue element. All other elements are undefined. This is the 
+default value for the whole peripheral but can be readjusted on lower levels. If 
+a register does not have a defined reset value the resetMask needs to be set to 
+0.</p>
+<p><strong>interrupt = </strong>is a complex type that consists of the <strong>name</strong> of 
+the interrupt and the associated enumeration<strong> value</strong>. A peripheral can also have 
+multiple associated interrupts. This entry is mainly intended for information 
+only purposes in order to display the interrupts and respective interrupt 
+numbers associated with a peripheral.</p>
+<h4>Example:</h4>
+<pre>...&nbsp;
+    &lt;peripheral&gt;
+       &lt;name&gt;Timer0&lt;/name&gt;
+       &lt;version&gt;1.0.32&lt;/version&gt;
+       &lt;description&gt;Timer 0 is a simple 16 bit timer counting down ... &lt;/description&gt;
+       &lt;baseAddress&gt;0x40000000&lt;/baseAddress&gt;
+       &lt;addressBlock&gt;
+         &lt;offset&gt;0x0&lt;/offset&gt;
+         &lt;size&gt;0x400&lt;/size&gt;
+         &lt;usage&gt;registers&lt;/usage&gt;
+       &lt;/addressBlock&gt;
+       &lt;interrupt&gt;&lt;name&gt;TIM0_INT&lt;/name&gt;&lt;value&gt;34&lt;/value&gt;&lt;/interrupt&gt;
+       &lt;registers&gt;
+         ...
+       &lt;/registers&gt;
+    &lt;/peripheral&gt;
+    &lt;peripheral derivedFrom=&quot;Timer0&quot;&gt;
+      &lt;name&gt;Timer1&lt;/name&gt;
+      &lt;baseAddress&gt;0x40000400&lt;/baseAddress&gt;
+    &lt;/peripheral&gt;
+
+...</pre>
+<hr>
+<h4>&lt;registers&gt; ... &lt;/registers&gt;</h4>
+<p>This construct sets the frame for all registers contained in a peripheral. 
+This creates container elements which ease-up processing with languages like Java.</p>
+<hr>
+<h4>&lt;register <span class="style2">derivedFrom=<em>xs:Name</em></span>&gt;</h4>
+<p>&nbsp;&nbsp; <span class="style4">&lt;dim&gt;<em>scaledNonNegativeInteger</em>&lt;/dim&gt;<br>
+&nbsp;&nbsp; &lt;dimIncrement&gt;<em>scaledNonNegativeInteger</em>&lt;/dimIncrement&gt;<br>
+&nbsp;&nbsp; &lt;dimIndex&gt;<em>xs:string</em>&lt;/dimIndex&gt;</span><br>
+&nbsp;&nbsp; &lt;<span class="style2">name&gt;<em>xs:Name</em>&lt;/name&gt;<br>
+&nbsp;&nbsp; <span class="style4">&lt;displayName&gt;<em>xs:string</em>&lt;/displayName&gt;</span><br>
+</span>&nbsp;&nbsp; <span class="style2">&lt;description&gt;<em>xs:string</em>&lt;/description&gt;</span><br>
+&nbsp;<span class="style2">&nbsp; <span class="style4">&lt;alternateGroup&gt;<em>xs:Name</em>&lt;/alternateGroup&gt;</span><br>
+</span>&nbsp; <span class="style2">&nbsp;&lt;addressOffset&gt;<em>scaledNonNegativeInteger</em> 
+&lt;/addressOffset&gt;<br>
+&nbsp;<span class="style5">&nbsp;&nbsp; &lt;size&gt;<em>scaledNonNegativeInteger</em>&lt;/size&gt;<br>
+</span><span class="style4">&nbsp;</span><span class="style5">&nbsp; &lt;access&gt;<em>accessType</em>&lt;/access&gt;<br>
+&nbsp;&nbsp; </span><span class="style4">&lt;</span><span class="style5">resetValue&gt;<em>scaledNonNegativeInteger</em>&lt;/resetValue&gt;<br>
+&nbsp;&nbsp; &lt;resetMask&gt;<em>scaledNonNegativeInteger</em>&lt;/resetMask&gt;<br>
+</span>
+</span><span class="style4">&nbsp;&nbsp; &lt;modifiedWriteValues&gt;<em>writeValueType</em>&lt;/modifiedWriteValues&gt;<br>
+&nbsp;&nbsp; &lt;writeConstraint&gt;<em>writeConstraintType</em>&lt;/writeConstraint&gt;<br>
+&nbsp;&nbsp; &lt;readAction&gt;<em>readActionType</em> &lt;/readAction&gt;</span><span class="style2"><br>
+</span>&nbsp;&nbsp; <span class="style4">&lt;fields&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...<br>
+&nbsp;&nbsp; &lt;/fields&gt;</span> </p>
+<h4>&lt;/register&gt;</h4>
+<p>The definition of registers is the central part of the description. A 
+register may use its complete size for a single purpose and therefore not 
+consist of fields. Otherwise the description 
+of fields is mandatory.</p>
+<h4>Mandatory items:<br>
+</h4>
+<p><strong>name = </strong>name string used to identify the register. Register 
+names are required to be unique within the scope of a peripheral.</p>
+<p><strong>description = </strong>string describing the details of the register.</p>
+<p><strong>addressOffset = </strong>value defining the address of the register relative to 
+the baseAddress defined by the peripheral the register belongs to.<br>
+</p>
+<p><span class="style5">The following elements can be omitted</span> if the corresponding value has been set 
+on a higher level of the description and matches the value required for this register:</p>
+<p><strong>size =</strong>value defining the bit-width of the register</p>
+<p><strong>access =</strong> predefined tokens: read-only, write-only, read-write, 
+writeOnce, read-writeOnce strings defining the allowed 
+accesses for this register.</p>
+<p><strong>resetValue =</strong> element defining the value of the register 
+immediately after a reset.</p>
+<p><strong>resetMask= </strong>element specifying those bits of the resetValue that 
+are defined<strong> </strong>(bit positions containing a 0 bit are ignored, bit 
+positions containing a 1 bit are taken from the corresponding bit position of 
+the resetValue). If a register does not have a defined reset value the resetMask 
+needs to be set to 0.</p>
+<h4>Optional items:</h4>
+<p><strong>dim = </strong>if this field is specified the value defines the 
+number of elements in an array of registers.</p>
+<p><strong>dimIncrement =</strong> if dim is specified this element becomes 
+mandatory and specifies the address increment in between 
+two neighboring registers of the register array in the address map.</p>
+<p><strong>dimIndex = </strong>this element specifies the substrings within the 
+register array names that will replace the %s within the register name. By 
+default the index is a decimal value starting with 0 for the first register. 
+Examples:<br>
+&nbsp;&nbsp; &lt;dim&gt;6&lt;/dim&gt; &lt;dimIncrement&gt;4&lt;/dimIncrement&gt; &lt;dimIndex&gt;A,B,C,D,E,Z&lt;/dimIndex&gt; 
+&lt;name&gt;GPIO_%s_CTRL&lt;/name&gt; ...<br>
+&nbsp;&nbsp; =&gt; GPIO_A_CTRL, GPIO_B_CTRL, GPIO_C_CTRL, GPIO_D_CTRL, GPIO_E_CTRL, 
+GPIO_Z_CTRL<br>
+&nbsp;&nbsp; &lt;dim&gt;4&lt;/dim&gt; &lt;dimIncrement&gt;4&lt;/dimIncrement&gt; &lt;dimIndex&gt;3-6&lt;/dimIndex&gt; 
+&lt;name&gt;IRQ%s&lt;/name&gt; ... <br>
+&nbsp;&nbsp; =&gt; IRQ3, IRQ4, IRQ5, IRQ6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </p>
+<p><strong>displayName = </strong>when used, this is the string being used by a 
+graphical frontend to visualize the register otherwise the name element is used. 
+Note: the display name may contain special characters and white spaces. It also 
+uses &quot;%s&quot; as the place holder for the dimIndex substring.</p>
+<p><strong>alternateGroup =</strong> when used, this element specifies a name of 
+a group that all alternate register with the same name a associated with. At the 
+same time it indicates that there is a register description allocating the same 
+absolute address in the address space. </p>
+<p><strong>modifiedWriteValues = </strong>element to describe the manipulation of 
+data written to a register. If not specified the value written to the field is the 
+value stored in the field. The other options are bitwise operations: <br>
+&nbsp; <em>oneToClear:</em> write data bits of one shall clear (set to zero) the 
+corresponding bit in the register<br>
+&nbsp; <em>oneToSet:</em> write data bits of one shall set (set to one) the 
+corresponding bit in the register<br>
+&nbsp; <em>oneToToggle:</em> write data bits of one shall toggle (invert) the 
+corresponding bit in the register<br>
+&nbsp; <em>zeroToClear:</em> write data bits of zero shall clear (set to zero) 
+the corresponding bit in the register<br>
+&nbsp; <em>zeroToSet:</em> write data bits of zero shall set (set to one) the 
+corresponding bit in the register<br>
+&nbsp; <em>zeroToToggle:</em> write data bits of zero shall toggle (invert) the 
+corresponding bit in the register<br>
+&nbsp; <em>clear:</em> after a write operation all bits in the field are cleared (set to 
+zero)<br>
+&nbsp; <em>set:</em> after a write operation all bits in the field are set (set to one)<br>
+&nbsp; <em>modify:</em> after a write operation all bit in the field may be modified 
+(default)</p>
+<p><strong>writeConstraint: </strong>has a set of options:<br>
+&nbsp; <em>writeAsRead</em> = if true only the last read value can be written<br>
+&nbsp; <em>useEnumeratedValues</em> = if true only those values listed in the 
+enumeratedValues list are considered valid write values<br>
+&nbsp; <em>minimum</em> = specifies the smallest number to be written to the 
+register<br>
+&nbsp; <em>maximum</em> = specifies the largest number to be written to the 
+register</p>
+<p><strong>readAction: </strong>if set it specifies the side effect following 
+read operations. If not set the register is not modified following a read 
+operations. The defined side effects are:<br>
+&nbsp; <em>clear:</em> indicates that the register is cleared (set to zero) 
+following a read operation<br>
+&nbsp; <em>set:</em> indicates that the register is set (set to ones) following a 
+read operation<br>
+&nbsp; <em>modify</em>: indicates that the register is modified in some way 
+after a read operation<br>
+&nbsp; <em>modifyExternal: </em>indicates that one or more dependent resources 
+other than the current register 
+are immediately affected by a read (it is recommended that the register 
+description specifies these dependencies). Debuggers are not expected to read 
+this register location unless explicitly instructed by user.</p>
+<p><strong>fields = </strong>next lower level of description (see next section 
+for details).</p>
+<h4>Optional attribute:</h4>
+<p><strong>derivedFrom = </strong>specifies the name of the register to be 
+replicated. Elements being specified underneath will override the values specified 
+from the register being derived from. Note that it is mandatory to overwrite at 
+least name and addressOffset.</p>
+<h4>Example:</h4>
+<pre>...&nbsp;
+       &lt;register&gt;
+         &lt;name&gt;TimerCtrl0&lt;/name&gt;
+         &lt;description&gt;Timer Control Register&lt;/description&gt;
+         &lt;addressOffset&gt;0x0&lt;/addressOffset&gt;
+         &lt;access&gt;read-write&lt;/access&gt;
+         &lt;resetValue&gt;0x00008001&lt;/resetValue&gt;
+         &lt;resetMask&gt;0x0000ffff&lt;/resetMask&gt;
+         &lt;size&gt;32&lt;size&gt;
+         &lt;fields&gt;
+           ...
+         &lt;/fields&gt;
+       &lt;/register&gt;
+       &lt;register derivedFrom=&quot;TimerCtrl0&quot;&gt;
+         &lt;name&gt;TimerCtrl1&lt;/name&gt;
+         &lt;addressOffset&gt;0x4&lt;addressOffset&gt;
+       &lt;/register&gt;
+...</pre>
+<hr>
+<h4>&lt;fields&gt; ... &lt;/fields&gt;</h4>
+<p>This construct sets the frame for all fields contained in a register. 
+This creates container elements which ease-up processing with languages like Java.</p>
+<hr>
+<h4>&nbsp;&lt;field <span class="style2">derivedFrom=<em>&quot;xs:Name</em>&quot;</span>&gt;</h4>
+<p>&nbsp;<span class="style2">&nbsp; &lt;name&gt;<em>xs:Name&lt;/name&gt;<br>
+&nbsp;</em></span>&nbsp; &lt;description&gt;<em>xs:string</em>&lt;/description&gt;<br>
+<span class="style5">&nbsp;</span><span class="style2"><span class="style5"><em>&nbsp; </em>
+</span>&lt;<span class="style5">bitOffset&gt;<em>scaledNonNegativeInteger&lt;/</em>bitOffset&gt;
+</span>&lt;<span class="style5">bitWidth&gt;<em>scaledNonNegativeInteger</em>&lt;/bitWidth&gt;<br>
+&nbsp;&nbsp; </span><span class="style6">or</span><span class="style5"><br>
+&nbsp;&nbsp; &lt;lsb&gt;scaledNonNegativeInteger&lt;/lsb&gt; &lt;msb&gt;scaledNonNegativeInteger&lt;/msb&gt;<br>
+&nbsp;&nbsp; </span><span class="style6">or</span><span class="style5"><br>
+&nbsp;&nbsp; &lt;bitRange&gt;<em>pattern</em>&lt;/bitRange&gt;<br>
+&nbsp;&nbsp; &lt;access&gt;<em>accessType</em>&lt;/access&gt;<br>
+</span></span><span class="style4">&nbsp;&nbsp; &lt;modifiedWriteValues&gt;<em>writeValueType</em>&lt;/modifiedWriteValues&gt;<br>
+&nbsp;&nbsp; &lt;writeConstraint&gt;<em>writeConstraintType</em>&lt;/writeConstraint&gt;<br>
+&nbsp;&nbsp; &lt;readAction&gt;<em>readActionType</em> &lt;/readAction&gt;</span><span class="style2"><br>
+&nbsp;</span>&nbsp; <span class="style4">&lt;enumeratedValues&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...<br>
+&nbsp;&nbsp; &lt;/enumeratedValues&gt;</span></p>
+<h4>&lt;/field&gt;</h4>
+<p>A bit-field has a name that is unique for the register it belongs to. The 
+position and size within the register is either described by the combination of 
+the least significant bit's position (lsb) and the most significant bit's 
+position (msb) or the lsb and the size, specifying the bit-width of the 
+field.&nbsp; A field may define an enumeratedValue in order to make the display 
+more intuitive to read. </p>
+<h4>Mandatory items:</h4>
+<p><strong>name = </strong>name string used to identify the field. Field names 
+are required to be unique within the scope of a register.<br>
+</p>
+<p><strong>description = </strong>string describing the details of the register.<br>
+</p>
+<p>There are 3 ways to describe a field to be used mutually exclusive:<br>
+a) specifying bitOffset and bitWidth (IP-XACT like)<br>
+b) specifying lsb and msb of the field.<br>
+c) specifying a bit range in the format &quot;[&lt;msb&gt;:&lt;lsb&gt;]&quot;</p>
+<p><strong>bitOffset = </strong>value defining the position of the least significant bit 
+of the field within the register it belongs to.<br>
+<strong>bitWidth = </strong>value defining the bit-width of the bitfield within the 
+register it belongs to.<br>
+</p>
+<p>
+<strong>lsb =</strong> value defining the bit position of the least significant 
+bit within the register it belongs to.<br>
+<strong>msb =</strong> value defining the bit position of the most significant 
+bit within the register it belongs to. 
+</p>
+<p><strong>bitRange = </strong>a string in the format: [&lt;msb&gt;:&lt;lsb&gt;]<br>
+</p>
+<h4>Optional items:</h4>
+<p><strong>derivedFrom = </strong>the field is cloned 
+from a previously defined field with a unique name.</p>
+<p><strong>access =</strong> predefined strings defining the allowed 
+accesses for this register: <em>read-only, write-only, read-write, writeOnce, 
+read-writeOnce</em><strong>.</strong> Can be omitted if it matches the access permission set for the parent register.</p>
+<p><strong>enumeratedValues = </strong>next lower level of description (see next section 
+for details)</p>
+<p><strong>modifiedWriteValues = </strong>element to describe the manipulation of 
+data written to a field. If not specified the value written to the field is the 
+value stored in the field. The other options are bitwise operations: <br>
+&nbsp; <em>oneToClear:</em> write data bit of one shall clear (set to zero) the 
+corresponding bit in the field<br>
+&nbsp; <em>oneToSet:</em> write data bit of one shall set (set to one) the corresponding 
+bit in the field<br>
+&nbsp; <em>oneToToggle:</em> write data bit of one shall toggle (invert) the 
+corresponding bit in the field<br>
+&nbsp; <em>zeroToClear:</em> write data bit of zero shall clear (set to zero) the 
+corresponding bit in the field<br>
+&nbsp; <em>zeroToSet:</em> write data bit of zero shall set (set to one) the 
+corresponding bit in the field<br>
+&nbsp; <em>zeroToToggle:</em> write data bit of zero shall toggle (invert) the 
+corresponding bit in the field<br>
+&nbsp; <em>clear:</em> after a write operation all bits in the field are cleared (set to 
+zero)<br>
+&nbsp; <em>set:</em> after a write operation all bits in the field are set (set to one)<br>
+&nbsp; <em>modify:</em> after a write operation all bit in the field may be modified 
+(default)</p>
+<p><strong>writeConstraint: </strong>has a set of options:<br>
+&nbsp; <em>writeAsRead</em> = if true only the last read value can be written<br>
+&nbsp; <em>useEnumeratedValues</em> = if true only those values listed in the 
+enumeratedValues list are considered valid write values<br>
+&nbsp; <em>minimum</em> = specifies the smallest number to be written to the field<br>
+&nbsp; <em>maximum</em> = specifies the largest number to be written to the field</p>
+<p><strong>readAction: </strong>if set it specifies the side effect following 
+read operations. If not set the field is not modified following a read 
+operations. The defined side effects are:<br>
+&nbsp; <em>clear:</em> indicates that the field is cleared (set to zero) 
+following a read operation<br>
+&nbsp; <em>set:</em> indicates that the field is set (set to ones) following a 
+read operation<br>
+&nbsp; <em>modify</em>: indicates that the field is modified in some way after a 
+read operation&nbsp;
+<br>
+&nbsp; <em>modifyExternal: </em>indicates that one or more dependent resources 
+other than this field are immediately affected by a read (it is recommended that 
+the field description specifies these dependencies). Debuggers are not expected 
+to read the field unless explicitly instructed by user.</p>
+<h4>Example:</h4>
+<pre>...
+         &lt;field&gt;
+           &lt;name&gt;TimerCtrl0_IntSel&lt;/name&gt;
+           &lt;description&gt;Select interrupt line t<span class="style8">hat is triggered by timer overflow</span>.&lt;/description&gt;
+	   &lt;bitOffset&gt;1&lt;/bitOffset&gt;
+           &lt;bitWidth&gt;3&lt;/bitWidth&gt;
+           &lt;access&gt;read-write&lt;/access&gt;
+	   &lt;resetValue&gt;0x0&lt;/resetValue&gt;
+           &lt;modifiedWriteValues&gt;oneToSet&lt;/modifiedWriteValues&gt;
+           &lt;writeConstraint&gt;
+              &lt;range&gt;
+                &lt;minimum&gt;0&lt;/minimum&gt;
+                &lt;maximum&gt;5&lt;/maximum&gt;
+              &lt;/range&gt;
+           &lt;/writeConstraint&gt;
+           &lt;readAction&gt;clear&lt;/readAction&gt;
+ 
+           &lt;enumeratedValues&gt;
+              ...
+           &lt;/enumeratedValues&gt;
+         &lt;/field&gt;
+...</pre>
+<hr>
+<h4 class="style3">&lt;enumeratedValues <span class="style2">
+<span class="style4">derivedFrom=</span><em>&quot;<span class="style4">xs:Name&quot;</span></em></span>&gt;</h4>
+<p>&nbsp;<span class="style2"><span class="style4">&nbsp; &lt;name&gt;<em>xs:Name</em>&lt;/name</span></span>&gt;<span class="style4"><br>
+&nbsp;&nbsp; &lt;usage&gt;<em>usageType</em>&lt;/usage&gt;</span><br>
+&nbsp;&nbsp; &lt;enumeratedValue&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...<br>
+&nbsp;&nbsp; &lt;/enumeratedValue&gt;</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...&nbsp;</p>
+<p>&nbsp;&nbsp;&nbsp;&lt;enumeratedValue&gt;<br>
+&nbsp;&nbsp; &nbsp;&nbsp; ...<br>
+&nbsp;&nbsp; &lt;/enumeratedValue&gt;</p>
+<h4>&lt;/enumeratedValues&gt;</h4>
+<p>An enumerated value provides one or more enumeration items (enumeratedValue), defining a map 
+between all possible values of the bit-field it belongs to and the corresponding 
+human readable semantics of that value.</p>
+<p>Mandatory items:<br>
+<strong>enumeratedValue = </strong>next lower level of description (see next section 
+for details)</p>
+<p>Optional items:<br>
+<strong>derivedFrom = </strong>the enumeratedValues can be copied or derived 
+from a previously defined enumeratedValue that has been given a unique name.<br>
+<strong>name =</strong> name string to identify an enumeratedValue. Named 
+enumeratedValues need to be unique in the scope of a device in order to be reusable 
+throughout the description of a device.<br>
+<strong>usage = </strong>possible values are <strong>read, write </strong>or
+<strong>read-write.</strong> This allows to specify two different enumerated values 
+depending whether it is to be used for a read or a write access. If not specified the enueratedValues are valid for read and write.</p>
+<h4>Example:</h4>
+<pre>...
+           &lt;enumeratedValues&gt;
+              &lt;name&gt;TimerIntSelect&lt;/name&gt;
+              &lt;usage&gt;read-write&lt;/usage&gt;
+              &lt;enumeratedValue&gt;
+                &lt;name&gt;disabled&lt;/name&gt;
+                &lt;description&gt;disabled bit&lt;/description&gt;
+                &lt;value&gt;0&lt;/value&gt;
+              &lt;/enumeratedValue&gt;
+              ...
+              &lt;enumeratedValue&gt;
+                &lt;name&gt;reserved&lt;/name&gt;
+	        &lt;description&gt;reserved values. Do not use&lt;/description&gt;
+                &lt;isDefault&gt;true&lt;/isDefault&gt;
+              &lt;/enumeratedValue&gt;
+           &lt;/enumeratedValues&gt;
+...</pre>
+<hr>
+<h4>&lt;enumeratedValue&gt;</h4>
+<p>&nbsp;&nbsp; &lt;name<em>&gt;xs:name</em>&lt;/name&gt;<br>
+&nbsp;&nbsp; <span class="style10"><span class="style4">&lt;description&gt;xs:<em>string</em>&lt;/description&gt;</span><br>
+</span><em>&nbsp;&nbsp; &lt;</em>value<span class="style2">&gt;<em>scaledNonNegativeInteger</em>&lt;/value&gt;<em><br>
+&nbsp;&nbsp;
+</em>or<em><br>
+&nbsp;&nbsp; &lt;</em>isDefault&gt;<em>xs:boolean</em>&lt;/isDefault&gt;<em><br>
+</em></span></p>
+<h4>&lt;/enumeratedValue&gt;</h4>
+<p>An enumeratedValue defines a map between a value and the string reading the 
+corresponding human readable semantics for that value in a brief and a detailed 
+version</p>
+<h4>Mandatory items:</h4>
+<p><strong>name=</strong> brief string verbally describing the semantics of the value 
+defined for this enumeratedValue. E.g. used for display in visualization of a bit-field 
+instead of the value.</p>
+<p>
+<strong>value = </strong>defines the constant of the bit-field that the name 
+corresponds to<strong>.</strong></p>
+<p><strong>isDefault = </strong>defines the name and description for all other 
+values that are not explicitly listed</p>
+<h4>Optional item:</h4>
+<p><strong>description = </strong>extended string verbally describing the semantics 
+of the value defined for this enumeratedValue in full detail.</p>
+<h4>Example:</h4>
+<pre>...
+         &lt;enumeratedValue&gt;
+            &lt;name&gt;disabled&lt;/name&gt;
+            &lt;description&gt;Timer does not generate interrupts&lt;/description&gt;
+            &lt;value&gt;0&lt;/value&gt;
+         &lt;/enumeratedValue&gt;
+         ...
+         &lt;enumeratedValue&gt;
+            &lt;name&gt;enabled&lt;/name&gt;
+            &lt;description&gt;Timer does not generate interrupts&lt;/description&gt;
+            &lt;isDefault&gt;true&lt;/isDefault&gt;
+         &lt;/enumeratedValue&gt;
+
+...</pre>
+<hr>
+<h4>Names</h4>
+<p>Names shall comply with ANSI C variable naming restrictions.</p>
+<h4>Constants</h4>
+<p>Number constants shall be entered in hexadecimal, decimal or binary format.</p>
+<ul>
+				<li>hexadecimal is indicated by a leading &quot;0x&quot;</li>
+				<li>binary format is indicated by a leading&nbsp; &quot;#&quot;</li>
+				<li>all other formats are interpreted as decimal numbers</li>
+				<li>the value tag in enumeratedValue accepts do not care bits 
+				represented by &quot;x&quot;</li>
+</ul>
+<h4><b>Comments</b> </h4>
+<p>Comments have the standard XML format <strong>&quot;&lt;!--&quot;</strong> starts a comment
+	<strong><span class="style2">&quot;--&gt;&quot;</span></strong> terminates a comment</p>
+<h2>Example</h2>
+<pre>
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&nbsp;
+&lt;device schemaVersion=&quot;1.0&quot; xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xs:noNamespaceSchemaLocation=&quot;CMSIS-SVD_Schema_1_0.xsd&quot; &gt;
+  &lt;name&gt;Cortex_M3_Sample&lt;/name&gt;
+  &lt;version&gt;0.1&lt;/version&gt;
+  &lt;description&gt;ARM Cortex-M3 based Microcontroller dummy device&lt;/description&gt;
+  &lt;!-- Bus Interface Properties --&gt;
+  &lt;!-- Cortex-M3 is byte addressable --&gt;
+  &lt;addressUnitBits&gt;8&lt;/addressUnitBits&gt;
+  &lt;!-- the maximum data bit width accessible within a single transfer is 32bits --&gt;
+  &lt;width&gt;32&lt;/width&gt;
+
+  &lt;!-- Register Default Properties --&gt;
+  &lt;!-- the size of the registers is set to a bit width of 32. This can be overruled for individual peripherals and/or registers --&gt;
+  &lt;size&gt;32&lt;/size&gt;
+  &lt;!-- the access to all registers is set to be readable and writeable. This can be overruled for individual peripherals and/or registers --&gt;
+  &lt;access&gt;read-write&lt;/access&gt;
+  &lt;!-- for demonstration purposes the resetValue for all registers of the device is set to be 0. This can be overruled within the description --&gt;
+  &lt;resetValue&gt;0&lt;/resetValue&gt;
+  &lt;!-- the resetMask = 0 specifies that by default no register of this device has a defined reset value --&gt;
+  &lt;resetMask&gt;0&lt;/resetMask&gt;
+
+  &lt;peripherals&gt;
+    &lt;peripheral&gt;
+      &lt;name&gt;Timer0&lt;/name&gt;
+      &lt;description&gt;A simple 16 bit timer counting down ... &lt;/description&gt;
+      &lt;groupName&gt;Timer&lt;/groupName&gt;
+      &lt;baseAddress&gt;0x40000000&lt;/baseAddress&gt;
+      &lt;!-- the first addressBlock is occupied by registers. The second block is reserved -&gt; no access permission --&gt;
+      &lt;addressBlock&gt;
+        &lt;offset&gt;0&lt;/offset&gt;
+        &lt;size&gt;0x8&lt;/size&gt;
+        &lt;usage&gt;registers&lt;/usage&gt;
+      &lt;/addressBlock&gt;
+      &lt;addressBlock&gt;
+        &lt;offset&gt;0x8&lt;/offset&gt;
+        &lt;size&gt;0x3f8&lt;/size&gt;
+        &lt;usage&gt;reserved&lt;/usage&gt;
+      &lt;/addressBlock&gt;
+      &lt;interrupt&gt;
+        &lt;name&gt;TIM0_IRQn&lt;/name&gt;
+        &lt;value&gt;34&lt;/value&gt;
+      &lt;/interrupt&gt;
+      &lt;registers&gt;
+        &lt;register&gt; 
+          &lt;name&gt;TimerCtrl0&lt;/name&gt;
+          &lt;!-- the display name is an unrestricted string. --&gt;
+          &lt;displayName&gt;Timer Ctrl 0&lt;/displayName&gt;
+          &lt;description&gt;Timer Control Register&lt;/description&gt;
+          &lt;addressOffset&gt;0x0&lt;/addressOffset&gt;
+          &lt;!-- size=32, access=read-write, resetValue=0x0, resetMask=0xffffffff, volatile=false --&gt;
+          &lt;fields&gt;
+            &lt;field&gt;
+              &lt;name&gt;TimerCtrl0_En&lt;/name&gt;
+              &lt;description&gt;Enable Bit activates the timer.&lt;/description&gt;
+              &lt;!-- Spirit like bit range description: [0:0] --&gt;
+              &lt;bitOffset&gt;0&lt;/bitOffset&gt;
+              &lt;bitWidth&gt;1&lt;/bitWidth&gt;
+              &lt;!-- Writing 1 enables, writing 0 has no effect --&gt;
+	      &lt;modifiedWriteValues&gt;oneToSet&lt;/modifiedWriteValues&gt;
+              &lt;!-- The write constraint is defined to be that only the values provided by the enumeratedValues below are allowed --&gt;
+              &lt;writeConstraint&gt;
+                &lt;useEnumeratedValues&gt;true&lt;/useEnumeratedValues&gt;
+              &lt;/writeConstraint&gt;
+              &lt;!-- there is no side effect on reads, therefore &lt;readAction&gt; is not set --&gt;
+              &lt;!-- oneBitEnable named enumeration that can be reused in other parts of the description --&gt;
+              &lt;enumeratedValues&gt;
+                &lt;name&gt;oneBitEnable&lt;/name&gt;
+                &lt;!-- the same enumerated Values are used for read and write. This default is assumed when this tag is missing --&gt;
+                &lt;usage&gt;read-write&lt;/usage&gt;
+                &lt;enumeratedValue&gt;
+                  &lt;name&gt;enabled&lt;/name&gt;
+                  &lt;description&gt;Timer is enabled and active&lt;/description&gt;
+                  &lt;value&gt;0x0&lt;/value&gt;
+                &lt;/enumeratedValue&gt;
+                &lt;enumeratedValue&gt;
+                  &lt;name&gt;disabled&lt;/name&gt;
+                  &lt;description&gt;Timer is disabled and inactive&lt;/description&gt;
+                  &lt;value&gt;0x1&lt;/value&gt;
+                &lt;/enumeratedValue&gt;
+              &lt;/enumeratedValues&gt;
+            &lt;/field&gt;
+            &lt;field&gt;
+              &lt;name&gt;TimerCtrl0_Dis&lt;/name&gt;
+              &lt;description&gt;Disable Bit deactivates the timer.&lt;/description&gt;
+              &lt;!-- Spirit like bit range description: [1:1] --&gt;
+              &lt;bitOffset&gt;1&lt;/bitOffset&gt;
+              &lt;bitWidth&gt;1&lt;/bitWidth&gt;
+              &lt;!-- Writing 1 sets, writing 0 has no effect --&gt;
+	      &lt;modifiedWriteValues&gt;oneToSet&lt;/modifiedWriteValues&gt;
+              &lt;!-- The write constraint is defined to be that only the values provided by the enumeratedValues below are allowed --&gt;
+              &lt;writeConstraint&gt;
+                &lt;useEnumeratedValues&gt;true&lt;/useEnumeratedValues&gt;
+              &lt;/writeConstraint&gt;
+              &lt;!-- there is no side effect on reads, therefore &lt;readAction&gt; is not set --&gt;
+              &lt;!-- oneBitEnable named enumeration that can be reused in other parts of the description --&gt;
+              &lt;enumeratedValues derivedFrom=&quot;oneBitEnable&quot;&gt;&lt;/enumeratedValues&gt;
+            &lt;/field&gt;
+            &lt;field&gt;
+              &lt;name&gt;TimerCtrl0_Int&lt;/name&gt;
+              &lt;description&gt;Select interrupt line that is triggered by timer overflow.&lt;/description&gt;
+              &lt;!-- the position of the bit field is described in the bitRange style. --&gt;
+              &lt;bitRange&gt;[4:2]&lt;/bitRange&gt;
+              &lt;enumeratedValues&gt;
+                &lt;enumeratedValue&gt;
+                  &lt;name&gt;disabled&lt;/name&gt;
+                  &lt;description&gt;Timer does not generate interrupts&lt;/description&gt;
+                  &lt;value&gt;0&lt;/value&gt;
+                &lt;/enumeratedValue&gt;
+                &lt;enumeratedValue&gt;
+                  &lt;name&gt;int 0&lt;/name&gt;
+                  &lt;description&gt;Timer does generate interrupts on interrupt line 0&lt;/description&gt;
+                  &lt;value&gt;1&lt;/value&gt;
+                &lt;/enumeratedValue&gt;
+                &lt;enumeratedValue&gt;
+                  &lt;name&gt;int 1&lt;/name&gt;
+                  &lt;description&gt;Timer does generate interrupts on interrupt line 1&lt;/description&gt;
+                  &lt;value&gt;2&lt;/value&gt;
+                &lt;/enumeratedValue&gt;
+                &lt;enumeratedValue&gt;
+                  &lt;name&gt;int 2&lt;/name&gt;
+                  &lt;description&gt;Timer does generate interrupts on interrupt line 2&lt;/description&gt;
+                  &lt;value&gt;3&lt;/value&gt;
+                &lt;/enumeratedValue&gt;
+                &lt;enumeratedValue&gt;
+                  &lt;name&gt;int 3&lt;/name&gt;
+                  &lt;description&gt;Timer does generate interrupts on interrupt line 3&lt;/description&gt;
+                  &lt;value&gt;4&lt;/value&gt;
+                &lt;/enumeratedValue&gt;
+                &lt;enumeratedValue&gt;
+                  &lt;name&gt;int 4&lt;/name&gt;
+                  &lt;description&gt;Timer does generate interrupts on interrupt line 4&lt;/description&gt;
+                  &lt;value&gt;5&lt;/value&gt;
+                &lt;/enumeratedValue&gt;
+                &lt;!-- this is the default element. All the valid value not listed above (6,7) have the following name and description --&gt;
+                &lt;enumeratedValue&gt;
+                  &lt;name&gt;reserved&lt;/name&gt;
+                  &lt;description&gt;Timer is configured incorrectly and the functionality is considered unpredictable&lt;/description&gt;
+                  &lt;isDefault&gt;true&lt;/isDefault&gt;
+                &lt;/enumeratedValue&gt;
+              &lt;/enumeratedValues&gt;
+            &lt;/field&gt;
+          &lt;/fields&gt;
+        &lt;/register&gt;
+        &lt;register&gt;
+          &lt;name&gt;TimerCounter0&lt;/name&gt;
+          &lt;description&gt;Timer0 16 Bit Counter Register&lt;/description&gt;
+          &lt;addressOffset&gt;0x4&lt;/addressOffset&gt;
+          &lt;size&gt;16&lt;/size&gt;
+        &lt;/register&gt;
+        &lt;!-- a copy of the counter register TimerCounter0 with the name=&quot;TimerCounter1&quot; and the addressOffset=&quot;0x8&quot; --&gt;
+        &lt;register derivedFrom=&quot;TimerCounter0&quot;&gt;
+          &lt;name&gt;TimerCounter1&lt;/name&gt;
+          &lt;addressOffset&gt;0x6&lt;/addressOffset&gt;
+        &lt;/register&gt;
+        &lt;!-- ... this is a restricted demo example and a real timer peripheral would have more register to be complete --&gt;
+      &lt;/registers&gt;
+    &lt;/peripheral&gt;
+    &lt;!-- a copy of Timer0 with the name=&quot;Timer1 and the baseAddress=&quot;0x40000400&quot; --&gt;
+    &lt;peripheral derivedFrom=&quot;Timer0&quot;&gt;
+      &lt;name&gt;Timer1&lt;/name&gt;
+      &lt;baseAddress&gt;0x40000400&lt;/baseAddress&gt;
+      &lt;interrupt&gt;
+        &lt;name&gt;TIM1_IRQn&lt;/name&gt;
+        &lt;value&gt;35&lt;/value&gt;
+      &lt;/interrupt&gt;
+    &lt;/peripheral&gt;
+  &lt;/peripherals&gt;
+&lt;/device&gt;</pre>
+
+<h2><a name="6"></a>Questions &amp; Answers</h2>
+<h3>Is there any relation between the System View Description and the CMSIS 
+standard?</h3>
+<p>Initiallly there was no immediate link but both initiatives had a common goal: 
+Create a sound software development eco-system for Cortex-M based 
+Microcontroller, giving the customers the free choice of devices and software 
+development environments and all resources required for a successful product 
+development in a single location.&nbsp;Meanwhile we have started to generate 
+CMSIS compliant device header files from the same CMSIS-SVD description. We will 
+introduce a small number of additional description tags in the next version of 
+the specification. The benefit is the synchronization between symbols used in 
+the application and the symbols displayed by the debugger.&nbsp; </p>
+<h3>Why does the format not provide constructs like macros and 
+conditional statements?</h3>
+<p>It is assumed that the description is generated from other sources and 
+therefore such concepts would only complicate the language unnecessarily. It is 
+recommended to use a standard C pre-processor to generate the debug description 
+format from a redundancy optimized description.</p>
+<h3>Do we need to consider endianess in the description?</h3>
+<p>This should be specified on a device configuration level and is not specific 
+to the visualization of peripheral details in a System View. Endianess becomes 
+relevant when using bit fields in the CMSIS compliant device header file.</p>
+<h3>Is the System View Description limited to Cortex-M based devices ?</h3>
+
+
+<p>There may have been assumptions made about the structure of the device due to 
+it being developed around a Cortex-M processor. E.g. that all peripherals are 
+assumed to be memory mapped and to reside in a single address space. It is quite 
+likely that the description format may also serve other architectures 
+sufficiently. There is no intent to limit the format to Cortex-M 
+processor based devices. </p>
+
+
+</body></html>

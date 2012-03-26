@@ -1,0 +1,50 @@
+* Make-3.81 for Windows *
+=========================
+
+What is it?
+-----------
+Make: GNU make utility to maintain groups of programs
+
+Description
+-----------
+Make is a tool which controls the generation of executables and other non-source files of a program from the program's source files. Make gets its knowledge of how to build your program from a file called the makefile, which lists each of the non-source files and how to compute it from other files. When you write a program, you should write a makefile for it, so that it is possible to use Make to build and install the program. Capabilities of Make - Make enables the end user to build and install your package without knowing the details of how that is done -- because these details are recorded in the makefile that you supply. - Make figures out automatically which files it needs to update, based on which source files have changed. It also automatically determines the proper order for updating files, in case one non-source file depends on another non-source file. As a result, if you change a few source files and then run Make, it does not need to recompile all of your program. It updates only those non-source files that depend directly or indirectly on the source files that you changed. - Make is not limited to any particular language. For each non-source file in the program, the makefile specifies the shell commands to compute it. These shell commands can run a compiler to produce an object file, the linker to produce an executable, ar to update a library, or TeX or Makeinfo to format documentation. - Make is not limited to building a package. You can also use Make to control installing or deinstalling a package, generate tags tables for it, or anything else you want to do often enough to make it worth while writing down how to do it.
+	 
+Homepage
+--------
+http://www.gnu.org/software/make
+	 
+System
+------
+- Win32, i.e. MS-Windows 95 / 98 / ME / NT / 2000 / XP / 2003 with msvcrt.dll
+- if msvcrt.dll is not in your Windows/System folder, get it from
+  Microsoft <http://support.microsoft.com/default.aspx?scid=kb;en-us;259403">
+  or by installing Internet Explorer 4.0 or higher
+  <http://www.microsoft.com/windows/ie> 
+- libintl3 <http://gnuwin32.sourceforge.net/packages/libintl3.htm> 
+- libiconv2 <http://gnuwin32.sourceforge.net/packages/libiconv2.htm> 
+
+Notes
+-----
+- Bugs and questions on this MS-Windows port: gnuwin32@users.sourceforge.net
+
+Package Availability
+--------------------
+- in: http://gnuwin32.sourceforge.net
+Installation
+------------
+
+Sources
+-------
+- make-3.81-src.zip
+
+Compilation
+-----------
+The package has been compiled with GNU auto-tools, GNU make, and Mingw
+(GCC for MS-Windows). Any differences from the original sources are given
+in make-3.81-GnuWin32.diffs in make-3.81-src.zip. Libraries needed
+for compilation can be found at the lines starting with 'LIBS = ' in the
+Makefiles. Usually, these are standard libraries provided with Mingw, or
+libraries from the package itself; 'gw32c' refers to the libgw32c package,
+which provides MS-Windows substitutes or stubs for functions normally found in
+Unix. For more information, see: http://gnuwin32.sourceforge.net/compile.html
+and http://gnuwin32.sourceforge.net/packages/libgw32c.htm.

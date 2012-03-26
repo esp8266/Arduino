@@ -1,0 +1,840 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>SAM3S8 SUPC</title>
+    <link rel="stylesheet" type="text/css" href="css/html.css" media="all" />
+  </head>
+  <body id="abstract">
+    <div id="container">
+      <div id="content">
+        <a id="SUPC"></a>
+        <h1>SAM3S8 SUPC</h1>
+        <a id="SUPC__User_Interface"></a>
+        <h2>Supply Controller (SUPC) User Interface</h2>
+<!--As per 6452M programmer datasheet.-->
+        <h3>Registers</h3>
+        <table class="registers">
+          <caption>Register Mapping</caption>
+          <thead>
+            <tr>
+              <th class="address">Address</th>
+              <th class="description">Register</th>
+              <th class="name">Name</th>
+              <th class="access">Access</th>
+              <th class="reset">Reset</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="odd">
+              <td class="address" id="address_0x400E1410">0x400E1410</td>
+              <td class="description">Supply Controller Control Register</td>
+              <td class="name">
+                <a href="#SUPC_CR" title="Supply Controller Control Register" class="one_click_away">SUPC_CR</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400E1414">0x400E1414</td>
+              <td class="description">Supply Controller Supply Monitor Mode Register</td>
+              <td class="name">
+                <a href="#SUPC_SMMR" title="Supply Controller Supply Monitor Mode Register" class="one_click_away">SUPC_SMMR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400E1418">0x400E1418</td>
+              <td class="description">Supply Controller Mode Register</td>
+              <td class="name">
+                <a href="#SUPC_MR" title="Supply Controller Mode Register" class="one_click_away">SUPC_MR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00005A00</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400E141C">0x400E141C</td>
+              <td class="description">Supply Controller Wake Up Mode Register</td>
+              <td class="name">
+                <a href="#SUPC_WUMR" title="Supply Controller Wake Up Mode Register" class="one_click_away">SUPC_WUMR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400E1420">0x400E1420</td>
+              <td class="description">Supply Controller Wake Up Inputs Register</td>
+              <td class="name">
+                <a href="#SUPC_WUIR" title="Supply Controller Wake Up Inputs Register" class="one_click_away">SUPC_WUIR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400E1424">0x400E1424</td>
+              <td class="description">Supply Controller Status Register</td>
+              <td class="name">
+                <a href="#SUPC_SR" title="Supply Controller Status Register" class="one_click_away">SUPC_SR</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x00000800</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3>Register Fields</h3>
+        <h4 id="SUPC_CR">SUPC Supply Controller Control Register</h4>
+        <p><strong>Name</strong>: SUPC_CR</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x400E1410</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#SUPC_CR__KEY" title="Password">KEY</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#SUPC_CR__XTALSEL" title="Crystal Oscillator Select">XTALSEL</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_CR__VROFF" title="Voltage Regulator Off">VROFF</a>
+              </td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="SUPC_CR__VROFF"><strong>VROFF</strong>: Voltage Regulator Off<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">NO_EFFECT</td><td class="description">no effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">STOP_VREG</td><td class="description">if KEY is correct, asserts vddcore_nreset and stops the voltage regulator.</td></tr></tbody></table></li>
+          <li id="SUPC_CR__XTALSEL"><strong>XTALSEL</strong>: Crystal Oscillator Select<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">NO_EFFECT</td><td class="description">no effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">CRYSTAL_SEL</td><td class="description">if KEY is correct, switches the slow clock on the crystal oscillator output.</td></tr></tbody></table></li>
+          <li id="SUPC_CR__KEY"><strong>KEY</strong>: Password</li>
+          <p>-</p>
+        </ul>
+        <h4 id="SUPC_SMMR">SUPC Supply Controller Supply Monitor Mode Register</h4>
+        <p><strong>Name</strong>: SUPC_SMMR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400E1414</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#SUPC_SMMR__SMIEN" title="Supply Monitor Interrupt Enable">SMIEN</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_SMMR__SMRSTEN" title="Supply Monitor Reset Enable">SMRSTEN</a>
+              </td>
+              <td>-</td>
+              <td colspan="3">
+                <a href="#SUPC_SMMR__SMSMPL" title="Supply Monitor Sampling Period">SMSMPL</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="4">
+                <a href="#SUPC_SMMR__SMTH" title="Supply Monitor Threshold">SMTH</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="SUPC_SMMR__SMTH"><strong>SMTH</strong>: Supply Monitor Threshold<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">1_9V</td><td class="description">1.9 V</td></tr><tr class="even"><td class="value">0x1</td><td class="name">2_0V</td><td class="description">2.0 V</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">2_1V</td><td class="description">2.1 V</td></tr><tr class="even"><td class="value">0x3</td><td class="name">2_2V</td><td class="description">2.2 V</td></tr><tr class="odd"><td class="value">0x4</td><td class="name">2_3V</td><td class="description">2.3 V</td></tr><tr class="even"><td class="value">0x5</td><td class="name">2_4V</td><td class="description">2.4 V</td></tr><tr class="odd"><td class="value">0x6</td><td class="name">2_5V</td><td class="description">2.5 V</td></tr><tr class="even"><td class="value">0x7</td><td class="name">2_6V</td><td class="description">2.6 V</td></tr><tr class="odd"><td class="value">0x8</td><td class="name">2_7V</td><td class="description">2.7 V</td></tr><tr class="even"><td class="value">0x9</td><td class="name">2_8V</td><td class="description">2.8 V</td></tr><tr class="odd"><td class="value">0xA</td><td class="name">2_9V</td><td class="description">2.9 V</td></tr><tr class="even"><td class="value">0xB</td><td class="name">3_0V</td><td class="description">3.0 V</td></tr><tr class="odd"><td class="value">0xC</td><td class="name">3_1V</td><td class="description">3.1 V</td></tr><tr class="even"><td class="value">0xD</td><td class="name">3_2V</td><td class="description">3.2 V</td></tr><tr class="odd"><td class="value">0xE</td><td class="name">3_3V</td><td class="description">3.3 V</td></tr><tr class="even"><td class="value">0xF</td><td class="name">3_4V</td><td class="description">3.4 V</td></tr></tbody></table></li>
+          <li id="SUPC_SMMR__SMSMPL"><strong>SMSMPL</strong>: Supply Monitor Sampling Period<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">SMD</td><td class="description">Supply Monitor disabled</td></tr><tr class="even"><td class="value">0x1</td><td class="name">CSM</td><td class="description">Continuous Supply Monitor</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">32SLCK</td><td class="description">Supply Monitor enabled one SLCK period every 32 SLCK periods</td></tr><tr class="even"><td class="value">0x3</td><td class="name">256SLCK</td><td class="description">Supply Monitor enabled one SLCK period every 256 SLCK periods</td></tr><tr class="odd"><td class="value">0x4</td><td class="name">2048SLCK</td><td class="description">Supply Monitor enabled one SLCK period every 2,048 SLCK periods</td></tr></tbody></table></li>
+          <li id="SUPC_SMMR__SMRSTEN"><strong>SMRSTEN</strong>: Supply Monitor Reset Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">NOT_ENABLE</td><td class="description">the core reset signal "vddcore_nreset" is not affected when a supply monitor detection occurs.</td></tr><tr class="even"><td class="value">1</td><td class="name">ENABLE</td><td class="description">the core reset signal, vddcore_nreset is asserted when a supply monitor detection occurs.</td></tr></tbody></table></li>
+          <li id="SUPC_SMMR__SMIEN"><strong>SMIEN</strong>: Supply Monitor Interrupt Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">NOT_ENABLE</td><td class="description">the SUPC interrupt signal is not affected when a supply monitor detection occurs.</td></tr><tr class="even"><td class="value">1</td><td class="name">ENABLE</td><td class="description">the SUPC interrupt signal is asserted when a supply monitor detection occurs.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="SUPC_MR">SUPC Supply Controller Mode Register</h4>
+        <p><strong>Name</strong>: SUPC_MR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400E1418</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#SUPC_MR__KEY" title="Password Key">KEY</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#SUPC_MR__OSCBYPASS" title="Oscillator Bypass">OSCBYPASS</a>
+              </td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td colspan="1">
+                <a href="#SUPC_MR__ONREG" title="Voltage Regulator enable">ONREG</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_MR__BODDIS" title="Brownout Detector Disable">BODDIS</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_MR__BODRSTEN" title="Brownout Detector Reset Enable">BODRSTEN</a>
+              </td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="SUPC_MR__BODRSTEN"><strong>BODRSTEN</strong>: Brownout Detector Reset Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">NOT_ENABLE</td><td class="description">the core reset signal "vddcore_nreset" is not affected when a brownout detection occurs.</td></tr><tr class="even"><td class="value">1</td><td class="name">ENABLE</td><td class="description">the core reset signal, vddcore_nreset is asserted when a brownout detection occurs.</td></tr></tbody></table></li>
+          <li id="SUPC_MR__BODDIS"><strong>BODDIS</strong>: Brownout Detector Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">ENABLE</td><td class="description">the core brownout detector is enabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">DISABLE</td><td class="description">the core brownout detector is disabled.</td></tr></tbody></table></li>
+          <li id="SUPC_MR__ONREG"><strong>ONREG</strong>: Voltage Regulator enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">ONREG_UNUSED</td><td class="description">Voltage Regulator is not used</td></tr><tr class="even"><td class="value">1</td><td class="name">ONREG_USED</td><td class="description">Voltage Regulator is used</td></tr></tbody></table></li>
+          <li id="SUPC_MR__OSCBYPASS"><strong>OSCBYPASS</strong>: Oscillator Bypass<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">NO_EFFECT</td><td class="description">no effect. Clock selection depends on XTALSEL value.</td></tr><tr class="even"><td class="value">1</td><td class="name">BYPASS</td><td class="description">the 32-KHz XTAL oscillator is selected and is put in bypass mode.</td></tr></tbody></table></li>
+          <li id="SUPC_MR__KEY"><strong>KEY</strong>: Password Key</li>
+          <p>-</p>
+        </ul>
+        <h4 id="SUPC_WUMR">SUPC Supply Controller Wake Up Mode Register</h4>
+        <p><strong>Name</strong>: SUPC_WUMR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400E141C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="3">
+                <a href="#SUPC_WUMR__LPDBC" title="Low Power DeBounCer Period">LPDBC</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td colspan="3">
+                <a href="#SUPC_WUMR__WKUPDBC" title="Wake Up Inputs Debouncer Period">WKUPDBC</a>
+              </td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#SUPC_WUMR__LPDBCCLR" title="Low power Debouncer Clear">LPDBCCLR</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_WUMR__LPDBCEN1" title="Low power Debouncer ENable WKUP1">LPDBCEN1</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_WUMR__LPDBCEN0" title="Low power Debouncer ENable WKUP0">LPDBCEN0</a>
+              </td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#SUPC_WUMR__RTCEN" title="Real Time Clock Wake Up Enable">RTCEN</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_WUMR__RTTEN" title="Real Time Timer Wake Up Enable">RTTEN</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_WUMR__SMEN" title="Supply Monitor Wake Up Enable">SMEN</a>
+              </td>
+              <td>-</td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="SUPC_WUMR__SMEN"><strong>SMEN</strong>: Supply Monitor Wake Up Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">NOT_ENABLE</td><td class="description">the supply monitor detection has no wake up effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">ENABLE</td><td class="description">the supply monitor detection forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUMR__RTTEN"><strong>RTTEN</strong>: Real Time Timer Wake Up Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">NOT_ENABLE</td><td class="description">the RTT alarm signal has no wake up effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">ENABLE</td><td class="description">the RTT alarm signal forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUMR__RTCEN"><strong>RTCEN</strong>: Real Time Clock Wake Up Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">NOT_ENABLE</td><td class="description">the RTC alarm signal has no wake up effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">ENABLE</td><td class="description">the RTC alarm signal forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUMR__LPDBCEN0"><strong>LPDBCEN0</strong>: Low power Debouncer ENable WKUP0<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">NOT_ENABLE</td><td class="description">the WKUP0 input pin is not connected with low power debouncer.</td></tr><tr class="even"><td class="value">1</td><td class="name">ENABLE</td><td class="description">the WKUP0 input pin is connected with low power debouncer and can force a core wake up.</td></tr></tbody></table></li>
+          <li id="SUPC_WUMR__LPDBCEN1"><strong>LPDBCEN1</strong>: Low power Debouncer ENable WKUP1<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">NOT_ENABLE</td><td class="description">the WKUP1input pin is not connected with low power debouncer.</td></tr><tr class="even"><td class="value">1</td><td class="name">ENABLE</td><td class="description">the WKUP1 input pin is connected with low power debouncer and can force a core wake up.</td></tr></tbody></table></li>
+          <li id="SUPC_WUMR__LPDBCCLR"><strong>LPDBCCLR</strong>: Low power Debouncer Clear<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">NOT_ENABLE</td><td class="description">a low power debounce event does not create an immediate clear on first half GPBR registers.</td></tr><tr class="even"><td class="value">1</td><td class="name">ENABLE</td><td class="description">a low power debounce event on WKUP0 or WKUP1 generates an immediate clear on first half GPBR registers.</td></tr></tbody></table></li>
+          <li id="SUPC_WUMR__WKUPDBC"><strong>WKUPDBC</strong>: Wake Up Inputs Debouncer Period<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">IMMEDIATE</td><td class="description">Immediate, no debouncing, detected active at least on one Slow Clock edge.</td></tr><tr class="even"><td class="value">0x1</td><td class="name">3_SCLK</td><td class="description">WKUPx shall be in its active state for at least 3 SLCK periods</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">32_SCLK</td><td class="description">WKUPx shall be in its active state for at least 32 SLCK periods</td></tr><tr class="even"><td class="value">0x3</td><td class="name">512_SCLK</td><td class="description">WKUPx shall be in its active state for at least 512 SLCK periods</td></tr><tr class="odd"><td class="value">0x4</td><td class="name">4096_SCLK</td><td class="description">WKUPx shall be in its active state for at least 4,096 SLCK periods</td></tr><tr class="even"><td class="value">0x5</td><td class="name">32768_SCLK</td><td class="description">WKUPx shall be in its active state for at least 32,768 SLCK periods</td></tr></tbody></table></li>
+          <li id="SUPC_WUMR__LPDBC"><strong>LPDBC</strong>: Low Power DeBounCer Period<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">DISABLE</td><td class="description">Disable the low power debouncer.</td></tr><tr class="even"><td class="value">0x1</td><td class="name">2_RTCOUT0</td><td class="description">WKUP0/1 in its active state for at least 2 RTCOUT0 periods</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">3_RTCOUT0</td><td class="description">WKUP0/1 in its active state for at least 3 RTCOUT0 periods</td></tr><tr class="even"><td class="value">0x3</td><td class="name">4_RTCOUT0</td><td class="description">WKUP0/1 in its active state for at least 4 RTCOUT0 periods</td></tr><tr class="odd"><td class="value">0x4</td><td class="name">5_RTCOUT0</td><td class="description">WKUP0/1 in its active state for at least 5 RTCOUT0 periods</td></tr><tr class="even"><td class="value">0x5</td><td class="name">6_RTCOUT0</td><td class="description">WKUP0/1 in its active state for at least 6 RTCOUT0 periods</td></tr><tr class="odd"><td class="value">0x6</td><td class="name">7_RTCOUT0</td><td class="description">WKUP0/1 in its active state for at least 7 RTCOUT0 periods</td></tr><tr class="even"><td class="value">0x7</td><td class="name">8_RTCOUT0</td><td class="description">WKUP0/1 in its active state for at least 8 RTCOUT0 periods</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="SUPC_WUIR">SUPC Supply Controller Wake Up Inputs Register</h4>
+        <p><strong>Name</strong>: SUPC_WUIR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400E1420</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#SUPC_WUIR__WKUPT15" title="Wake Up Input Type 15">WKUPT15</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_WUIR__WKUPT14" title="Wake Up Input Type 14">WKUPT14</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_WUIR__WKUPT13" title="Wake Up Input Type 13">WKUPT13</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_WUIR__WKUPT12" title="Wake Up Input Type 12">WKUPT12</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_WUIR__WKUPT11" title="Wake Up Input Type 11">WKUPT11</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_WUIR__WKUPT10" title="Wake Up Input Type 10">WKUPT10</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_WUIR__WKUPT9" title="Wake Up Input Type 9">WKUPT9</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_WUIR__WKUPT8" title="Wake Up Input Type 8">WKUPT8</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#SUPC_WUIR__WKUPT7" title="Wake Up Input Type 7">WKUPT7</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_WUIR__WKUPT6" title="Wake Up Input Type 6">WKUPT6</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_WUIR__WKUPT5" title="Wake Up Input Type 5">WKUPT5</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_WUIR__WKUPT4" title="Wake Up Input Type 4">WKUPT4</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_WUIR__WKUPT3" title="Wake Up Input Type 3">WKUPT3</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_WUIR__WKUPT2" title="Wake Up Input Type 2">WKUPT2</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_WUIR__WKUPT1" title="Wake Up Input Type 1">WKUPT1</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_WUIR__WKUPT0" title="Wake Up Input Type 0">WKUPT0</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#SUPC_WUIR__WKUPEN15" title="Wake Up Input Enable 15">WKUPEN15</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_WUIR__WKUPEN14" title="Wake Up Input Enable 14">WKUPEN14</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_WUIR__WKUPEN13" title="Wake Up Input Enable 13">WKUPEN13</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_WUIR__WKUPEN12" title="Wake Up Input Enable 12">WKUPEN12</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_WUIR__WKUPEN11" title="Wake Up Input Enable 11">WKUPEN11</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_WUIR__WKUPEN10" title="Wake Up Input Enable 10">WKUPEN10</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_WUIR__WKUPEN9" title="Wake Up Input Enable 9">WKUPEN9</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_WUIR__WKUPEN8" title="Wake Up Input Enable 8">WKUPEN8</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#SUPC_WUIR__WKUPEN7" title="Wake Up Input Enable 7">WKUPEN7</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_WUIR__WKUPEN6" title="Wake Up Input Enable 6">WKUPEN6</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_WUIR__WKUPEN5" title="Wake Up Input Enable 5">WKUPEN5</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_WUIR__WKUPEN4" title="Wake Up Input Enable 4">WKUPEN4</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_WUIR__WKUPEN3" title="Wake Up Input Enable 3">WKUPEN3</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_WUIR__WKUPEN2" title="Wake Up Input Enable 2">WKUPEN2</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_WUIR__WKUPEN1" title="Wake Up Input Enable 1">WKUPEN1</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_WUIR__WKUPEN0" title="Wake Up Input Enable 0">WKUPEN0</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="SUPC_WUIR__WKUPEN0"><strong>WKUPEN0</strong>: Wake Up Input Enable 0<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DISABLE</td><td class="description">the corresponding wake-up input has no wake up effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">ENABLE</td><td class="description">the corresponding wake-up input forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUIR__WKUPEN1"><strong>WKUPEN1</strong>: Wake Up Input Enable 1<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DISABLE</td><td class="description">the corresponding wake-up input has no wake up effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">ENABLE</td><td class="description">the corresponding wake-up input forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUIR__WKUPEN2"><strong>WKUPEN2</strong>: Wake Up Input Enable 2<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DISABLE</td><td class="description">the corresponding wake-up input has no wake up effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">ENABLE</td><td class="description">the corresponding wake-up input forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUIR__WKUPEN3"><strong>WKUPEN3</strong>: Wake Up Input Enable 3<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DISABLE</td><td class="description">the corresponding wake-up input has no wake up effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">ENABLE</td><td class="description">the corresponding wake-up input forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUIR__WKUPEN4"><strong>WKUPEN4</strong>: Wake Up Input Enable 4<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DISABLE</td><td class="description">the corresponding wake-up input has no wake up effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">ENABLE</td><td class="description">the corresponding wake-up input forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUIR__WKUPEN5"><strong>WKUPEN5</strong>: Wake Up Input Enable 5<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DISABLE</td><td class="description">the corresponding wake-up input has no wake up effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">ENABLE</td><td class="description">the corresponding wake-up input forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUIR__WKUPEN6"><strong>WKUPEN6</strong>: Wake Up Input Enable 6<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DISABLE</td><td class="description">the corresponding wake-up input has no wake up effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">ENABLE</td><td class="description">the corresponding wake-up input forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUIR__WKUPEN7"><strong>WKUPEN7</strong>: Wake Up Input Enable 7<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DISABLE</td><td class="description">the corresponding wake-up input has no wake up effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">ENABLE</td><td class="description">the corresponding wake-up input forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUIR__WKUPEN8"><strong>WKUPEN8</strong>: Wake Up Input Enable 8<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DISABLE</td><td class="description">the corresponding wake-up input has no wake up effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">ENABLE</td><td class="description">the corresponding wake-up input forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUIR__WKUPEN9"><strong>WKUPEN9</strong>: Wake Up Input Enable 9<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DISABLE</td><td class="description">the corresponding wake-up input has no wake up effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">ENABLE</td><td class="description">the corresponding wake-up input forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUIR__WKUPEN10"><strong>WKUPEN10</strong>: Wake Up Input Enable 10<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DISABLE</td><td class="description">the corresponding wake-up input has no wake up effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">ENABLE</td><td class="description">the corresponding wake-up input forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUIR__WKUPEN11"><strong>WKUPEN11</strong>: Wake Up Input Enable 11<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DISABLE</td><td class="description">the corresponding wake-up input has no wake up effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">ENABLE</td><td class="description">the corresponding wake-up input forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUIR__WKUPEN12"><strong>WKUPEN12</strong>: Wake Up Input Enable 12<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DISABLE</td><td class="description">the corresponding wake-up input has no wake up effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">ENABLE</td><td class="description">the corresponding wake-up input forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUIR__WKUPEN13"><strong>WKUPEN13</strong>: Wake Up Input Enable 13<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DISABLE</td><td class="description">the corresponding wake-up input has no wake up effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">ENABLE</td><td class="description">the corresponding wake-up input forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUIR__WKUPEN14"><strong>WKUPEN14</strong>: Wake Up Input Enable 14<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DISABLE</td><td class="description">the corresponding wake-up input has no wake up effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">ENABLE</td><td class="description">the corresponding wake-up input forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUIR__WKUPEN15"><strong>WKUPEN15</strong>: Wake Up Input Enable 15<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DISABLE</td><td class="description">the corresponding wake-up input has no wake up effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">ENABLE</td><td class="description">the corresponding wake-up input forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUIR__WKUPT0"><strong>WKUPT0</strong>: Wake Up Input Type 0<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">LOW</td><td class="description">a low level for a period defined by WKUPDBC on the corresponding wake-up input forces the wake up of the core power supply.</td></tr><tr class="even"><td class="value">1</td><td class="name">HIGH</td><td class="description">a high levelfor a period defined by WKUPDBC on the correspond-ing wake-up input forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUIR__WKUPT1"><strong>WKUPT1</strong>: Wake Up Input Type 1<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">LOW</td><td class="description">a low level for a period defined by WKUPDBC on the corresponding wake-up input forces the wake up of the core power supply.</td></tr><tr class="even"><td class="value">1</td><td class="name">HIGH</td><td class="description">a high levelfor a period defined by WKUPDBC on the correspond-ing wake-up input forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUIR__WKUPT2"><strong>WKUPT2</strong>: Wake Up Input Type 2<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">LOW</td><td class="description">a low level for a period defined by WKUPDBC on the corresponding wake-up input forces the wake up of the core power supply.</td></tr><tr class="even"><td class="value">1</td><td class="name">HIGH</td><td class="description">a high levelfor a period defined by WKUPDBC on the correspond-ing wake-up input forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUIR__WKUPT3"><strong>WKUPT3</strong>: Wake Up Input Type 3<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">LOW</td><td class="description">a low level for a period defined by WKUPDBC on the corresponding wake-up input forces the wake up of the core power supply.</td></tr><tr class="even"><td class="value">1</td><td class="name">HIGH</td><td class="description">a high levelfor a period defined by WKUPDBC on the correspond-ing wake-up input forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUIR__WKUPT4"><strong>WKUPT4</strong>: Wake Up Input Type 4<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">LOW</td><td class="description">a low level for a period defined by WKUPDBC on the corresponding wake-up input forces the wake up of the core power supply.</td></tr><tr class="even"><td class="value">1</td><td class="name">HIGH</td><td class="description">a high levelfor a period defined by WKUPDBC on the correspond-ing wake-up input forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUIR__WKUPT5"><strong>WKUPT5</strong>: Wake Up Input Type 5<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">LOW</td><td class="description">a low level for a period defined by WKUPDBC on the corresponding wake-up input forces the wake up of the core power supply.</td></tr><tr class="even"><td class="value">1</td><td class="name">HIGH</td><td class="description">a high levelfor a period defined by WKUPDBC on the correspond-ing wake-up input forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUIR__WKUPT6"><strong>WKUPT6</strong>: Wake Up Input Type 6<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">LOW</td><td class="description">a low level for a period defined by WKUPDBC on the corresponding wake-up input forces the wake up of the core power supply.</td></tr><tr class="even"><td class="value">1</td><td class="name">HIGH</td><td class="description">a high levelfor a period defined by WKUPDBC on the correspond-ing wake-up input forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUIR__WKUPT7"><strong>WKUPT7</strong>: Wake Up Input Type 7<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">LOW</td><td class="description">a low level for a period defined by WKUPDBC on the corresponding wake-up input forces the wake up of the core power supply.</td></tr><tr class="even"><td class="value">1</td><td class="name">HIGH</td><td class="description">a high levelfor a period defined by WKUPDBC on the correspond-ing wake-up input forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUIR__WKUPT8"><strong>WKUPT8</strong>: Wake Up Input Type 8<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">LOW</td><td class="description">a low level for a period defined by WKUPDBC on the corresponding wake-up input forces the wake up of the core power supply.</td></tr><tr class="even"><td class="value">1</td><td class="name">HIGH</td><td class="description">a high levelfor a period defined by WKUPDBC on the correspond-ing wake-up input forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUIR__WKUPT9"><strong>WKUPT9</strong>: Wake Up Input Type 9<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">LOW</td><td class="description">a low level for a period defined by WKUPDBC on the corresponding wake-up input forces the wake up of the core power supply.</td></tr><tr class="even"><td class="value">1</td><td class="name">HIGH</td><td class="description">a high levelfor a period defined by WKUPDBC on the correspond-ing wake-up input forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUIR__WKUPT10"><strong>WKUPT10</strong>: Wake Up Input Type 10<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">LOW</td><td class="description">a low level for a period defined by WKUPDBC on the corresponding wake-up input forces the wake up of the core power supply.</td></tr><tr class="even"><td class="value">1</td><td class="name">HIGH</td><td class="description">a high levelfor a period defined by WKUPDBC on the correspond-ing wake-up input forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUIR__WKUPT11"><strong>WKUPT11</strong>: Wake Up Input Type 11<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">LOW</td><td class="description">a low level for a period defined by WKUPDBC on the corresponding wake-up input forces the wake up of the core power supply.</td></tr><tr class="even"><td class="value">1</td><td class="name">HIGH</td><td class="description">a high levelfor a period defined by WKUPDBC on the correspond-ing wake-up input forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUIR__WKUPT12"><strong>WKUPT12</strong>: Wake Up Input Type 12<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">LOW</td><td class="description">a low level for a period defined by WKUPDBC on the corresponding wake-up input forces the wake up of the core power supply.</td></tr><tr class="even"><td class="value">1</td><td class="name">HIGH</td><td class="description">a high levelfor a period defined by WKUPDBC on the correspond-ing wake-up input forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUIR__WKUPT13"><strong>WKUPT13</strong>: Wake Up Input Type 13<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">LOW</td><td class="description">a low level for a period defined by WKUPDBC on the corresponding wake-up input forces the wake up of the core power supply.</td></tr><tr class="even"><td class="value">1</td><td class="name">HIGH</td><td class="description">a high levelfor a period defined by WKUPDBC on the correspond-ing wake-up input forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUIR__WKUPT14"><strong>WKUPT14</strong>: Wake Up Input Type 14<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">LOW</td><td class="description">a low level for a period defined by WKUPDBC on the corresponding wake-up input forces the wake up of the core power supply.</td></tr><tr class="even"><td class="value">1</td><td class="name">HIGH</td><td class="description">a high levelfor a period defined by WKUPDBC on the correspond-ing wake-up input forces the wake up of the core power supply.</td></tr></tbody></table></li>
+          <li id="SUPC_WUIR__WKUPT15"><strong>WKUPT15</strong>: Wake Up Input Type 15<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">LOW</td><td class="description">a low level for a period defined by WKUPDBC on the corresponding wake-up input forces the wake up of the core power supply.</td></tr><tr class="even"><td class="value">1</td><td class="name">HIGH</td><td class="description">a high levelfor a period defined by WKUPDBC on the correspond-ing wake-up input forces the wake up of the core power supply.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="SUPC_SR">SUPC Supply Controller Status Register</h4>
+        <p><strong>Name</strong>: SUPC_SR</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x400E1424</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#SUPC_SR__WKUPIS15" title="WKUP Input Status 15">WKUPIS15</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_SR__WKUPIS14" title="WKUP Input Status 14">WKUPIS14</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_SR__WKUPIS13" title="WKUP Input Status 13">WKUPIS13</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_SR__WKUPIS12" title="WKUP Input Status 12">WKUPIS12</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_SR__WKUPIS11" title="WKUP Input Status 11">WKUPIS11</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_SR__WKUPIS10" title="WKUP Input Status 10">WKUPIS10</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_SR__WKUPIS9" title="WKUP Input Status 9">WKUPIS9</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_SR__WKUPIS8" title="WKUP Input Status 8">WKUPIS8</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#SUPC_SR__WKUPIS7" title="WKUP Input Status 7">WKUPIS7</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_SR__WKUPIS6" title="WKUP Input Status 6">WKUPIS6</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_SR__WKUPIS5" title="WKUP Input Status 5">WKUPIS5</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_SR__WKUPIS4" title="WKUP Input Status 4">WKUPIS4</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_SR__WKUPIS3" title="WKUP Input Status 3">WKUPIS3</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_SR__WKUPIS2" title="WKUP Input Status 2">WKUPIS2</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_SR__WKUPIS1" title="WKUP Input Status 1">WKUPIS1</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_SR__WKUPIS0" title="WKUP Input Status 0">WKUPIS0</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td colspan="1">
+                <a href="#SUPC_SR__LPDBCS1" title="Low Power Debouncer Wake Up Status on WKUP1">LPDBCS1</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_SR__LPDBCS0" title="Low Power Debouncer Wake Up Status on WKUP0">LPDBCS0</a>
+              </td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#SUPC_SR__OSCSEL" title="32-kHz Oscillator Selection Status">OSCSEL</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_SR__SMOS" title="Supply Monitor Output Status">SMOS</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_SR__SMS" title="Supply Monitor Status">SMS</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_SR__SMRSTS" title="Supply Monitor Reset Status">SMRSTS</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_SR__BODRSTS" title="Brownout Detector Reset Status">BODRSTS</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_SR__SMWS" title="Supply Monitor Detection Wake Up Status">SMWS</a>
+              </td>
+              <td colspan="1">
+                <a href="#SUPC_SR__WKUPS" title="WKUP Wake Up Status">WKUPS</a>
+              </td>
+              <td>-</td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="SUPC_SR__WKUPS"><strong>WKUPS</strong>: WKUP Wake Up Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">NO</td><td class="description">no wake up due to the assertion of the WKUP pins has occurred since the last read of SUPC_SR.</td></tr><tr class="even"><td class="value">1</td><td class="name">PRESENT</td><td class="description">at least one wake up due to the assertion of the WKUP pins has occurred since the last read of SUPC_SR.</td></tr></tbody></table></li>
+          <li id="SUPC_SR__SMWS"><strong>SMWS</strong>: Supply Monitor Detection Wake Up Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">NO</td><td class="description">no wake up due to a supply monitor detection has occurred since the last read of SUPC_SR.</td></tr><tr class="even"><td class="value">1</td><td class="name">PRESENT</td><td class="description">at least one wake up due to a supply monitor detection has occurred since the last read of SUPC_SR.</td></tr></tbody></table></li>
+          <li id="SUPC_SR__BODRSTS"><strong>BODRSTS</strong>: Brownout Detector Reset Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">NO</td><td class="description">no core brownout rising edge event has been detected since the last read of the SUPC_SR.</td></tr><tr class="even"><td class="value">1</td><td class="name">PRESENT</td><td class="description">at least one brownout output rising edge event has been detected since the last read of the SUPC_SR.</td></tr></tbody></table></li>
+          <li id="SUPC_SR__SMRSTS"><strong>SMRSTS</strong>: Supply Monitor Reset Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">NO</td><td class="description">no supply monitor detection has generated a core reset since the last read of the SUPC_SR.</td></tr><tr class="even"><td class="value">1</td><td class="name">PRESENT</td><td class="description">at least one supply monitor detection has generated a core reset since the last read of the SUPC_SR.</td></tr></tbody></table></li>
+          <li id="SUPC_SR__SMS"><strong>SMS</strong>: Supply Monitor Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">NO</td><td class="description">no supply monitor detection since the last read of SUPC_SR.</td></tr><tr class="even"><td class="value">1</td><td class="name">PRESENT</td><td class="description">at least one supply monitor detection since the last read of SUPC_SR.</td></tr></tbody></table></li>
+          <li id="SUPC_SR__SMOS"><strong>SMOS</strong>: Supply Monitor Output Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">HIGH</td><td class="description">the supply monitor detected VDDIO higher than its threshold at its last measurement.</td></tr><tr class="even"><td class="value">1</td><td class="name">LOW</td><td class="description">the supply monitor detected VDDIO lower than its threshold at its last measurement.</td></tr></tbody></table></li>
+          <li id="SUPC_SR__OSCSEL"><strong>OSCSEL</strong>: 32-kHz Oscillator Selection Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">RC</td><td class="description">the slow clock, SLCK is generated by the embedded 32-kHz RC oscillator.</td></tr><tr class="even"><td class="value">1</td><td class="name">CRYST</td><td class="description">the slow clock, SLCK is generated by the 32-kHz crystal oscillator.</td></tr></tbody></table></li>
+          <li id="SUPC_SR__LPDBCS0"><strong>LPDBCS0</strong>: Low Power Debouncer Wake Up Status on WKUP0<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">NO</td><td class="description">no wake up due to the assertion of the WKUP0 pin has occurred since the last read of SUPC_SR.</td></tr><tr class="even"><td class="value">1</td><td class="name">PRESENT</td><td class="description">at least one wake up due to the assertion of the WKUP0 pin has occurred since the last read of SUPC_SR.</td></tr></tbody></table></li>
+          <li id="SUPC_SR__LPDBCS1"><strong>LPDBCS1</strong>: Low Power Debouncer Wake Up Status on WKUP1<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">NO</td><td class="description">no wake up due to the assertion of the WKUP1 pin has occurred since the last read of SUPC_SR.</td></tr><tr class="even"><td class="value">1</td><td class="name">PRESENT</td><td class="description">at least one wake up due to the assertion of the WKUP1 pin has occurred since the last read of SUPC_SR.</td></tr></tbody></table></li>
+          <li id="SUPC_SR__WKUPIS0"><strong>WKUPIS0</strong>: WKUP Input Status 0<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DIS</td><td class="description">the corresponding wake-up input is disabled, or was inactive at the time the debouncer triggered a wake up event.</td></tr><tr class="even"><td class="value">1</td><td class="name">EN</td><td class="description">the corresponding wake-up input was active at the time the debouncer triggered a wake up event.</td></tr></tbody></table></li>
+          <li id="SUPC_SR__WKUPIS1"><strong>WKUPIS1</strong>: WKUP Input Status 1<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DIS</td><td class="description">the corresponding wake-up input is disabled, or was inactive at the time the debouncer triggered a wake up event.</td></tr><tr class="even"><td class="value">1</td><td class="name">EN</td><td class="description">the corresponding wake-up input was active at the time the debouncer triggered a wake up event.</td></tr></tbody></table></li>
+          <li id="SUPC_SR__WKUPIS2"><strong>WKUPIS2</strong>: WKUP Input Status 2<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DIS</td><td class="description">the corresponding wake-up input is disabled, or was inactive at the time the debouncer triggered a wake up event.</td></tr><tr class="even"><td class="value">1</td><td class="name">EN</td><td class="description">the corresponding wake-up input was active at the time the debouncer triggered a wake up event.</td></tr></tbody></table></li>
+          <li id="SUPC_SR__WKUPIS3"><strong>WKUPIS3</strong>: WKUP Input Status 3<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DIS</td><td class="description">the corresponding wake-up input is disabled, or was inactive at the time the debouncer triggered a wake up event.</td></tr><tr class="even"><td class="value">1</td><td class="name">EN</td><td class="description">the corresponding wake-up input was active at the time the debouncer triggered a wake up event.</td></tr></tbody></table></li>
+          <li id="SUPC_SR__WKUPIS4"><strong>WKUPIS4</strong>: WKUP Input Status 4<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DIS</td><td class="description">the corresponding wake-up input is disabled, or was inactive at the time the debouncer triggered a wake up event.</td></tr><tr class="even"><td class="value">1</td><td class="name">EN</td><td class="description">the corresponding wake-up input was active at the time the debouncer triggered a wake up event.</td></tr></tbody></table></li>
+          <li id="SUPC_SR__WKUPIS5"><strong>WKUPIS5</strong>: WKUP Input Status 5<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DIS</td><td class="description">the corresponding wake-up input is disabled, or was inactive at the time the debouncer triggered a wake up event.</td></tr><tr class="even"><td class="value">1</td><td class="name">EN</td><td class="description">the corresponding wake-up input was active at the time the debouncer triggered a wake up event.</td></tr></tbody></table></li>
+          <li id="SUPC_SR__WKUPIS6"><strong>WKUPIS6</strong>: WKUP Input Status 6<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DIS</td><td class="description">the corresponding wake-up input is disabled, or was inactive at the time the debouncer triggered a wake up event.</td></tr><tr class="even"><td class="value">1</td><td class="name">EN</td><td class="description">the corresponding wake-up input was active at the time the debouncer triggered a wake up event.</td></tr></tbody></table></li>
+          <li id="SUPC_SR__WKUPIS7"><strong>WKUPIS7</strong>: WKUP Input Status 7<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DIS</td><td class="description">the corresponding wake-up input is disabled, or was inactive at the time the debouncer triggered a wake up event.</td></tr><tr class="even"><td class="value">1</td><td class="name">EN</td><td class="description">the corresponding wake-up input was active at the time the debouncer triggered a wake up event.</td></tr></tbody></table></li>
+          <li id="SUPC_SR__WKUPIS8"><strong>WKUPIS8</strong>: WKUP Input Status 8<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DIS</td><td class="description">the corresponding wake-up input is disabled, or was inactive at the time the debouncer triggered a wake up event.</td></tr><tr class="even"><td class="value">1</td><td class="name">EN</td><td class="description">the corresponding wake-up input was active at the time the debouncer triggered a wake up event.</td></tr></tbody></table></li>
+          <li id="SUPC_SR__WKUPIS9"><strong>WKUPIS9</strong>: WKUP Input Status 9<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DIS</td><td class="description">the corresponding wake-up input is disabled, or was inactive at the time the debouncer triggered a wake up event.</td></tr><tr class="even"><td class="value">1</td><td class="name">EN</td><td class="description">the corresponding wake-up input was active at the time the debouncer triggered a wake up event.</td></tr></tbody></table></li>
+          <li id="SUPC_SR__WKUPIS10"><strong>WKUPIS10</strong>: WKUP Input Status 10<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DIS</td><td class="description">the corresponding wake-up input is disabled, or was inactive at the time the debouncer triggered a wake up event.</td></tr><tr class="even"><td class="value">1</td><td class="name">EN</td><td class="description">the corresponding wake-up input was active at the time the debouncer triggered a wake up event.</td></tr></tbody></table></li>
+          <li id="SUPC_SR__WKUPIS11"><strong>WKUPIS11</strong>: WKUP Input Status 11<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DIS</td><td class="description">the corresponding wake-up input is disabled, or was inactive at the time the debouncer triggered a wake up event.</td></tr><tr class="even"><td class="value">1</td><td class="name">EN</td><td class="description">the corresponding wake-up input was active at the time the debouncer triggered a wake up event.</td></tr></tbody></table></li>
+          <li id="SUPC_SR__WKUPIS12"><strong>WKUPIS12</strong>: WKUP Input Status 12<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DIS</td><td class="description">the corresponding wake-up input is disabled, or was inactive at the time the debouncer triggered a wake up event.</td></tr><tr class="even"><td class="value">1</td><td class="name">EN</td><td class="description">the corresponding wake-up input was active at the time the debouncer triggered a wake up event.</td></tr></tbody></table></li>
+          <li id="SUPC_SR__WKUPIS13"><strong>WKUPIS13</strong>: WKUP Input Status 13<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DIS</td><td class="description">the corresponding wake-up input is disabled, or was inactive at the time the debouncer triggered a wake up event.</td></tr><tr class="even"><td class="value">1</td><td class="name">EN</td><td class="description">the corresponding wake-up input was active at the time the debouncer triggered a wake up event.</td></tr></tbody></table></li>
+          <li id="SUPC_SR__WKUPIS14"><strong>WKUPIS14</strong>: WKUP Input Status 14<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DIS</td><td class="description">the corresponding wake-up input is disabled, or was inactive at the time the debouncer triggered a wake up event.</td></tr><tr class="even"><td class="value">1</td><td class="name">EN</td><td class="description">the corresponding wake-up input was active at the time the debouncer triggered a wake up event.</td></tr></tbody></table></li>
+          <li id="SUPC_SR__WKUPIS15"><strong>WKUPIS15</strong>: WKUP Input Status 15<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DIS</td><td class="description">the corresponding wake-up input is disabled, or was inactive at the time the debouncer triggered a wake up event.</td></tr><tr class="even"><td class="value">1</td><td class="name">EN</td><td class="description">the corresponding wake-up input was active at the time the debouncer triggered a wake up event.</td></tr></tbody></table></li>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>

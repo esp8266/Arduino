@@ -40,7 +40,7 @@ OUTPUT_BIN = ../../../cores/sam
 
 # Libraries
 PROJECT_BASE_PATH = ..
-CMSIS_BASE_PATH = $(PROJECT_BASE_PATH)/../CMSIS/Include
+CMSIS_ROOT_PATH = $(PROJECT_BASE_PATH)/../CMSIS
 
 ifeq ($(CHIP), __SAM3S4C__)
 CHIP_NAME=sam3s4c
@@ -60,26 +60,28 @@ CHIP_SERIE=sam3xa
 else
 endif
 
-CMSIS_CHIP_PATH=$(PROJECT_BASE_PATH)/cmsis/$(CHIP_SERIE)
+CMSIS_ARM_PATH=$(CMSIS_ROOT_PATH)/CMSIS/Include
+CMSIS_ATMEL_PATH=$(CMSIS_ROOT_PATH)/Device/ATMEL
+CMSIS_CHIP_PATH=$(CMSIS_ROOT_PATH)/Device/ATMEL/$(CHIP_SERIE)
 
 #-------------------------------------------------------------------------------
 # Files
 #-------------------------------------------------------------------------------
 
-vpath %.h $(PROJECT_BASE_PATH)/include $(PROJECT_BASE_PATH)/../cmsis/$(CHIP_SERIE)/include
-vpath %.c $(PROJECT_BASE_PATH)/source $(CMSIS_BASE_PATH) $(CMSIS_CHIP_PATH)/source/templates $(CMSIS_CHIP_PATH)/source/templates
+vpath %.h $(PROJECT_BASE_PATH)/include $(CMSIS_ATMEL_PATH) $(CMSIS_CHIP_PATH)/include
+vpath %.c $(PROJECT_BASE_PATH)/source $(CMSIS_ARM_PATH) $(CMSIS_CHIP_PATH)/source
 
 VPATH+=$(PROJECT_BASE_PATH)/source
-VPATH+=$(CMSIS_BASE_PATH)
+VPATH+=$(CMSIS_ARM_PATH)
 VPATH+=$(CMSIS_CHIP_PATH)/include
-VPATH+=$(CMSIS_CHIP_PATH)/source/templates
-VPATH+=$(CMSIS_CHIP_PATH)/source/templates/gcc
+VPATH+=$(CMSIS_CHIP_PATH)/source/
+VPATH+=$(CMSIS_CHIP_PATH)/source/gcc
 
 INCLUDES = -I$(PROJECT_BASE_PATH)
 INCLUDES += -I$(PROJECT_BASE_PATH)/include
-INCLUDES += -I$(CMSIS_BASE_PATH)
+INCLUDES += -I$(CMSIS_ARM_PATH)
+INCLUDES += -I$(CMSIS_ATMEL_PATH)
 INCLUDES += -I$(CMSIS_CHIP_PATH)/include
-INCLUDES += -I$(CMSIS_CHIP_PATH)/source/templates
 
 #-------------------------------------------------------------------------------
 ifdef DEBUG
@@ -109,8 +111,8 @@ OUTPUT_PATH=$(OUTPUT_OBJ)_$(CHIP_NAME)
 # C source files and objects
 #-------------------------------------------------------------------------------
 C_SRC=$(wildcard $(PROJECT_BASE_PATH)/source/*.c)
-C_SRC+=$(wildcard $(CMSIS_CHIP_PATH)/source/templates/*.c)
-C_SRC+=$(wildcard $(CMSIS_CHIP_PATH)/source/templates/gcc/*.c)
+C_SRC+=$(wildcard $(CMSIS_CHIP_PATH)/source/*.c)
+C_SRC+=$(wildcard $(CMSIS_CHIP_PATH)/source/gcc/*.c)
 
 C_OBJ_TEMP=$(patsubst %.c, %.o, $(notdir $(C_SRC)))
 

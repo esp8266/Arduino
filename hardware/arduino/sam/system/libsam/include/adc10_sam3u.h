@@ -52,7 +52,7 @@ extern "C" {
 /// @endcond
 
 
-#if SAM3U
+#if SAM3U_SERIES
 
 /**
  * \brief Initializes the given ADC with the specified ADC clock and startup time.
@@ -263,7 +263,7 @@ extern uint32_t adc_get_latest_value(Adc *p_adc);
  */
 extern uint32_t adc_get_actual_adc_clock(Adc *p_adc, uint32_t ul_mck);
 
-#endif /* SAM3U */
+#endif /* SAM3U_SERIES */
 
 /**
  * \brief Gets PDC registers base address.

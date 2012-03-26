@@ -1,0 +1,987 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>SAM3S8 ACC</title>
+    <link rel="stylesheet" type="text/css" href="css/html.css" media="all" />
+  </head>
+  <body id="abstract">
+    <div id="container">
+      <div id="content">
+        <a id="ACC"></a>
+        <h1>SAM3S8 ACC</h1>
+        <a id="ACC__User_Interface"></a>
+        <h2>Analog Comparator Controller (ACC) User Interface</h2>
+<!--As per 6490C programmer datasheet.-->
+        <h3>Registers</h3>
+        <table class="registers">
+          <caption>Register Mapping</caption>
+          <thead>
+            <tr>
+              <th class="address">Address</th>
+              <th class="description">Register</th>
+              <th class="name">Name</th>
+              <th class="access">Access</th>
+              <th class="reset">Reset</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="odd">
+              <td class="address" id="address_0x40040000">0x40040000</td>
+              <td class="description">Control Register</td>
+              <td class="name">
+                <a href="#ACC_CR" title="Control Register" class="one_click_away">ACC_CR</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x40040004">0x40040004</td>
+              <td class="description">Mode Register</td>
+              <td class="name">
+                <a href="#ACC_MR" title="Mode Register" class="one_click_away">ACC_MR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x40040024">0x40040024</td>
+              <td class="description">Interrupt Enable Register</td>
+              <td class="name">
+                <a href="#ACC_IER" title="Interrupt Enable Register" class="one_click_away">ACC_IER</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x40040028">0x40040028</td>
+              <td class="description">Interrupt Disable Register</td>
+              <td class="name">
+                <a href="#ACC_IDR" title="Interrupt Disable Register" class="one_click_away">ACC_IDR</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x4004002C">0x4004002C</td>
+              <td class="description">Interrupt Mask Register</td>
+              <td class="name">
+                <a href="#ACC_IMR" title="Interrupt Mask Register" class="one_click_away">ACC_IMR</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x40040030">0x40040030</td>
+              <td class="description">Interrupt Status Register</td>
+              <td class="name">
+                <a href="#ACC_ISR" title="Interrupt Status Register" class="one_click_away">ACC_ISR</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x40040094">0x40040094</td>
+              <td class="description">Analog Control Register</td>
+              <td class="name">
+                <a href="#ACC_ACR" title="Analog Control Register" class="one_click_away">ACC_ACR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400400E4">0x400400E4</td>
+              <td class="description">Write Protect Mode Register</td>
+              <td class="name">
+                <a href="#ACC_WPMR" title="Write Protect Mode Register" class="one_click_away">ACC_WPMR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400400E8">0x400400E8</td>
+              <td class="description">Write Protect Status Register</td>
+              <td class="name">
+                <a href="#ACC_WPSR" title="Write Protect Status Register" class="one_click_away">ACC_WPSR</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x00000000</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3>Register Fields</h3>
+        <h4 id="ACC_CR">ACC Control Register</h4>
+        <p><strong>Name</strong>: ACC_CR</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x40040000</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#ACC_CR__SWRST" title="SoftWare ReSeT">SWRST</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="ACC_CR__SWRST"><strong>SWRST</strong>: SoftWare ReSeT<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">no effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">resets the module.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="ACC_MR">ACC Mode Register</h4>
+        <p><strong>Name</strong>: ACC_MR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x40040004</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td colspan="1">
+                <a href="#ACC_MR__FE" title="Fault Enable">FE</a>
+              </td>
+              <td colspan="1">
+                <a href="#ACC_MR__SELFS" title="SELection of Fault Source">SELFS</a>
+              </td>
+              <td colspan="1">
+                <a href="#ACC_MR__INV" title="INVert comparator output">INV</a>
+              </td>
+              <td>-</td>
+              <td colspan="2">
+                <a href="#ACC_MR__EDGETYP" title="EDGE TYPe">EDGETYP</a>
+              </td>
+              <td colspan="1">
+                <a href="#ACC_MR__ACEN" title="Analog Comparator ENable">ACEN</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td colspan="3">
+                <a href="#ACC_MR__SELPLUS" title="SELection for PLUS comparator input">SELPLUS</a>
+              </td>
+              <td>-</td>
+              <td colspan="3">
+                <a href="#ACC_MR__SELMINUS" title="SELection for MINUS comparator input">SELMINUS</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="ACC_MR__SELMINUS"><strong>SELMINUS</strong>: SELection for MINUS comparator input<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">TS</td><td class="description">SelectTS</td></tr><tr class="even"><td class="value">0x1</td><td class="name">ADVREF</td><td class="description">Select ADVREF</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">DAC0</td><td class="description">Select DAC0</td></tr><tr class="even"><td class="value">0x3</td><td class="name">DAC1</td><td class="description">Select DAC1</td></tr><tr class="odd"><td class="value">0x4</td><td class="name">AD0</td><td class="description">Select AD0</td></tr><tr class="even"><td class="value">0x5</td><td class="name">AD1</td><td class="description">Select AD1</td></tr><tr class="odd"><td class="value">0x6</td><td class="name">AD2</td><td class="description">Select AD2</td></tr><tr class="even"><td class="value">0x7</td><td class="name">AD3</td><td class="description">Select AD3</td></tr></tbody></table></li>
+          <li id="ACC_MR__SELPLUS"><strong>SELPLUS</strong>: SELection for PLUS comparator input<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">AD0</td><td class="description">Select AD0</td></tr><tr class="even"><td class="value">0x1</td><td class="name">AD1</td><td class="description">Select AD1</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">AD2</td><td class="description">Select AD2</td></tr><tr class="even"><td class="value">0x3</td><td class="name">AD3</td><td class="description">Select AD3</td></tr><tr class="odd"><td class="value">0x4</td><td class="name">AD4</td><td class="description">Select AD4</td></tr><tr class="even"><td class="value">0x5</td><td class="name">AD5</td><td class="description">Select AD5</td></tr><tr class="odd"><td class="value">0x6</td><td class="name">AD6</td><td class="description">Select AD6</td></tr><tr class="even"><td class="value">0x7</td><td class="name">AD7</td><td class="description">Select AD7</td></tr></tbody></table></li>
+          <li id="ACC_MR__ACEN"><strong>ACEN</strong>: Analog Comparator ENable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DIS</td><td class="description">Analog Comparator Disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">EN</td><td class="description">Analog Comparator Enabled.</td></tr></tbody></table></li>
+          <li id="ACC_MR__EDGETYP"><strong>EDGETYP</strong>: EDGE TYPe<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">RISING</td><td class="description">only rising edge of comparator output</td></tr><tr class="even"><td class="value">0x1</td><td class="name">FALLING</td><td class="description">falling edge of comparator output</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">ANY</td><td class="description">any edge of comparator output</td></tr></tbody></table></li>
+          <li id="ACC_MR__INV"><strong>INV</strong>: INVert comparator output<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DIS</td><td class="description">Analog Comparator output is directly processed.</td></tr><tr class="even"><td class="value">1</td><td class="name">EN</td><td class="description">Analog Comparator output is inverted prior to being processed.</td></tr></tbody></table></li>
+          <li id="ACC_MR__SELFS"><strong>SELFS</strong>: SELection of Fault Source<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">CF</td><td class="description">the CF flag is used to drive the FAULT output.</td></tr><tr class="even"><td class="value">1</td><td class="name">OUTPUT</td><td class="description">the output of the Analog Comparator flag is used to drive the FAULT output.</td></tr></tbody></table></li>
+          <li id="ACC_MR__FE"><strong>FE</strong>: Fault Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">DIS</td><td class="description">the FAULT output is tied to 0.</td></tr><tr class="even"><td class="value">1</td><td class="name">EN</td><td class="description">the FAULT output is driven by the signal defined by SELFS.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="ACC_IER">ACC Interrupt Enable Register</h4>
+        <p><strong>Name</strong>: ACC_IER</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x40040024</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#ACC_IER__CE" title="Comparison Edge">CE</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="ACC_IER__CE"><strong>CE</strong>: Comparison Edge<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">no effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">enables the interruption when the selected edge (defined by EDGETYP) occurs.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="ACC_IDR">ACC Interrupt Disable Register</h4>
+        <p><strong>Name</strong>: ACC_IDR</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x40040028</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#ACC_IDR__CE" title="Comparison Edge">CE</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="ACC_IDR__CE"><strong>CE</strong>: Comparison Edge<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">no effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">disables the interruption when the selected edge (defined by EDGETYP) occurs.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="ACC_IMR">ACC Interrupt Mask Register</h4>
+        <p><strong>Name</strong>: ACC_IMR</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x4004002C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#ACC_IMR__CE" title="Comparison Edge">CE</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="ACC_IMR__CE"><strong>CE</strong>: Comparison Edge<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">the interruption is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">the interruption is enabled.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="ACC_ISR">ACC Interrupt Status Register</h4>
+        <p><strong>Name</strong>: ACC_ISR</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x40040030</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#ACC_ISR__MASK" title="">MASK</a>
+              </td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#ACC_ISR__SCO" title="Synchronized Comparator Output">SCO</a>
+              </td>
+              <td colspan="1">
+                <a href="#ACC_ISR__CE" title="Comparison Edge">CE</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="ACC_ISR__CE"><strong>CE</strong>: Comparison Edge<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">no edge occurred (defined by EDGETYP) on analog comparator output since the last read of ACC_ISR register.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">a selected edge (defined by EDGETYP) on analog comparator output occurred since the last read of ACC_ISR register.</td></tr></tbody></table></li>
+          <li id="ACC_ISR__SCO"><strong>SCO</strong>: Synchronized Comparator Output</li>
+          <p>-</p>
+          <li id="ACC_ISR__MASK">
+            <strong>MASK</strong>
+            <table class="values">
+              <thead>
+                <tr>
+                  <th>Value</th>
+                  <th>Name</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="odd">
+                  <td class="value">0</td>
+                  <td class="name">-</td>
+                  <td class="description">The CE flag is valid.</td>
+                </tr>
+                <tr class="even">
+                  <td class="value">1</td>
+                  <td class="name">-</td>
+                  <td class="description">The CE flag and SCO value are invalid.</td>
+                </tr>
+              </tbody>
+            </table>
+          </li>
+        </ul>
+        <h4 id="ACC_ACR">ACC Analog Control Register</h4>
+        <p><strong>Name</strong>: ACC_ACR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x40040094</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="2">
+                <a href="#ACC_ACR__HYST" title="HYSTeresis selection">HYST</a>
+              </td>
+              <td colspan="1">
+                <a href="#ACC_ACR__ISEL" title="Current SELection">ISEL</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="ACC_ACR__ISEL"><strong>ISEL</strong>: Current SELection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">LOPW</td><td class="description">low power option.</td></tr><tr class="even"><td class="value">1</td><td class="name">HISP</td><td class="description">high speed option.</td></tr></tbody></table></li>
+          <li id="ACC_ACR__HYST"><strong>HYST</strong>: HYSTeresis selection</li>
+          <p>-</p>
+        </ul>
+        <h4 id="ACC_WPMR">ACC Write Protect Mode Register</h4>
+        <p><strong>Name</strong>: ACC_WPMR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400400E4</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#ACC_WPMR__WPKEY" title="Write Protect KEY">WPKEY</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#ACC_WPMR__WPKEY" title="Write Protect KEY">WPKEY</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#ACC_WPMR__WPKEY" title="Write Protect KEY">WPKEY</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#ACC_WPMR__WPEN" title="Write Protect Enable">WPEN</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="ACC_WPMR__WPEN"><strong>WPEN</strong>: Write Protect Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">disables the Write Protect if WPKEY corresponds to 0x414343 ("ACC" in ASCII).</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">enables the Write Protect if WPKEY corresponds to 0x414343 ("ACC" in ASCII).</td></tr></tbody></table></li>
+          <li id="ACC_WPMR__WPKEY"><strong>WPKEY</strong>: Write Protect KEY</li>
+          <p>-</p>
+        </ul>
+        <h4 id="ACC_WPSR">ACC Write Protect Status Register</h4>
+        <p><strong>Name</strong>: ACC_WPSR</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x400400E8</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#ACC_WPSR__WPROTERR" title="Write PROTection ERRor">WPROTERR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="ACC_WPSR__WPROTERR"><strong>WPROTERR</strong>: Write PROTection ERRor<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">no Write Protect Violation has occurred since the last read of the ACC_WPSR register.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">a Write Protect Violation (WPEN = 1) has occurred since the last read of the ACC_WPSR register.</td></tr></tbody></table></li>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>

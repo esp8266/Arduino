@@ -54,22 +54,22 @@
 
 /* Definitions for ADC resolution */
 typedef enum _adc_resolution_t {
-#if SAM3N || SAM3U
+#if SAM3N_SERIES || SAM3U_SERIES
     ADC_8_BITS = ADC_MR_LOWRES_BITS_8,  /* ADC 8-bit resolution */
-#endif /* SAM3N || SAM3U */
+#endif /* SAM3N_SERIES || SAM3U_SERIES */
     ADC_10_BITS = ADC_MR_LOWRES_BITS_10,  /* ADC 10-bit resolution */
-#if SAM3S || SAM3XA
+#if SAM3S_SERIES || SAM3XA_SERIES
     ADC_12_BITS = ADC_MR_LOWRES_BITS_12,  /* ADC 12-bit resolution */
-#endif /* SAM3S || SAM3XA */
+#endif /* SAM3S_SERIES || SAM3XA_SERIES */
     ADC_NONE
 } adc_resolution_t;
 
-#if SAM3U
+#if SAM3U_SERIES
 typedef enum _adc12_resolution_t {
     ADC12_10_BITS = ADC12B_MR_LOWRES_BITS_10,  /* ADC 10-bit resolution */
     ADC12_12_BITS = ADC12B_MR_LOWRES_BITS_12  /* ADC 12-bit resolution */
 } adc12_resolution_t;
-#endif /* SAM3U */
+#endif /* SAM3U_SERIES */
 
 /* Definitions for ADC trigger */
 typedef enum _adc_trigger_t {
@@ -78,7 +78,7 @@ typedef enum _adc_trigger_t {
     ADC_TRIG_TIO_CH_0         = (ADC_MR_TRGSEL_ADC_TRIG1 & ADC_MR_TRGSEL_Msk) | ADC_MR_TRGEN,  /* TIO Output of the Timer Counter Channel 0 */
     ADC_TRIG_TIO_CH_1         = (ADC_MR_TRGSEL_ADC_TRIG2 & ADC_MR_TRGSEL_Msk) | ADC_MR_TRGEN,  /* TIO Output of the Timer Counter Channel 1 */
     ADC_TRIG_TIO_CH_2         = (ADC_MR_TRGSEL_ADC_TRIG3 & ADC_MR_TRGSEL_Msk) | ADC_MR_TRGEN,  /* TIO Output of the Timer Counter Channel 2 */
-#if SAM3S || SAM3XA || SAM3U
+#if SAM3S_SERIES || SAM3XA_SERIES || SAM3U_SERIES
     ADC_TRIG_PWM_EVENT_LINE_0 = (ADC_MR_TRGSEL_ADC_TRIG4 & ADC_MR_TRGSEL_Msk) | ADC_MR_TRGEN,  /* PWM Event Line 0 */
     ADC_TRIG_PWM_EVENT_LINE_1 = (ADC_MR_TRGSEL_ADC_TRIG5 & ADC_MR_TRGSEL_Msk) | ADC_MR_TRGEN  /* PWM Event Line 1 */
 #endif
@@ -94,7 +94,7 @@ typedef enum _adc_channel_num_t {
     ADC_CHANNEL_5  = 5,
     ADC_CHANNEL_6  = 6,
     ADC_CHANNEL_7  = 7,
-#if SAM3S ||  SAM3N || SAM3XA
+#if SAM3S_SERIES ||  SAM3N_SERIES || SAM3XA_SERIES
     ADC_CHANNEL_8  = 8,
     ADC_CHANNEL_9  = 9,
     ADC_CHANNEL_10 = 10,
@@ -104,9 +104,9 @@ typedef enum _adc_channel_num_t {
     ADC_CHANNEL_14 = 14,
     ADC_TEMPERATURE_SENSOR = 15,
     ADC_ALL_CHANNEL = 0xffff
-#elif SAM3U
+#elif SAM3U_SERIES
     ADC_ALL_CHANNEL = 0xff
-#endif /* SAM3U */
+#endif /* SAM3U_SERIES */
 } adc_channel_num_t;
 
 typedef enum _adc_gainvalue_t {
@@ -116,7 +116,7 @@ typedef enum _adc_gainvalue_t {
     ADC_GAINVALUE_3 = 3
 } adc_gainvalue_t ;
 
-#if SAM3S ||  SAM3XA
+#if SAM3S_SERIES ||  SAM3XA_SERIES
 typedef enum {
     ADC_SETTLING_TIME_0 = ADC_MR_SETTLING_AST3,
     ADC_SETTLING_TIME_1 = ADC_MR_SETTLING_AST5,
@@ -125,11 +125,11 @@ typedef enum {
 }adc_settling_time_t;
 #endif
 
-#if SAM3S ||  SAM3N || SAM3XA
+#if SAM3S_SERIES ||  SAM3N_SERIES || SAM3XA_SERIES
 
 #include "adc_sam3snxa.h"
 
-#elif SAM3U
+#elif SAM3U_SERIES
 
 #include "adc10_sam3u.h"
 #include "adc12_sam3u.h"

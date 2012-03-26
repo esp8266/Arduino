@@ -22,7 +22,7 @@
 /*
  * Core and peripherals registers definitions
  */
-#include "include/sam.h"
+#include "sam.h"
 
 /* Define attribute */
 #if defined (  __GNUC__  ) /* GCC CS3 */

@@ -1,0 +1,1961 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>SAM3N UART0</title>
+    <link rel="stylesheet" type="text/css" href="css/html.css" media="all" />
+  </head>
+  <body id="abstract">
+    <div id="container">
+      <div id="content">
+        <a id="UART0"></a>
+        <h1>SAM3N UART0</h1>
+        <a id="UART0__User_Interface"></a>
+        <h2>Universal Asynchronous Receiver Transmitter (UART0) User Interface</h2>
+<!--As per 6418E programmer datasheet.-->
+        <h3>Registers</h3>
+        <table class="registers">
+          <caption>Register Mapping</caption>
+          <thead>
+            <tr>
+              <th class="address">Address</th>
+              <th class="description">Register</th>
+              <th class="name">Name</th>
+              <th class="access">Access</th>
+              <th class="reset">Reset</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="odd">
+              <td class="address" id="address_0x400E0600">0x400E0600</td>
+              <td class="description">Control Register</td>
+              <td class="name">
+                <a href="#UART0_CR" title="Control Register" class="one_click_away">UART0_CR</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400E0604">0x400E0604</td>
+              <td class="description">Mode Register</td>
+              <td class="name">
+                <a href="#UART0_MR" title="Mode Register" class="one_click_away">UART0_MR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400E0608">0x400E0608</td>
+              <td class="description">Interrupt Enable Register</td>
+              <td class="name">
+                <a href="#UART0_IER" title="Interrupt Enable Register" class="one_click_away">UART0_IER</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400E060C">0x400E060C</td>
+              <td class="description">Interrupt Disable Register</td>
+              <td class="name">
+                <a href="#UART0_IDR" title="Interrupt Disable Register" class="one_click_away">UART0_IDR</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400E0610">0x400E0610</td>
+              <td class="description">Interrupt Mask Register</td>
+              <td class="name">
+                <a href="#UART0_IMR" title="Interrupt Mask Register" class="one_click_away">UART0_IMR</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400E0614">0x400E0614</td>
+              <td class="description">Status Register</td>
+              <td class="name">
+                <a href="#UART0_SR" title="Status Register" class="one_click_away">UART0_SR</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400E0618">0x400E0618</td>
+              <td class="description">Receive Holding Register</td>
+              <td class="name">
+                <a href="#UART0_RHR" title="Receive Holding Register" class="one_click_away">UART0_RHR</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400E061C">0x400E061C</td>
+              <td class="description">Transmit Holding Register</td>
+              <td class="name">
+                <a href="#UART0_THR" title="Transmit Holding Register" class="one_click_away">UART0_THR</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400E0620">0x400E0620</td>
+              <td class="description">Baud Rate Generator Register</td>
+              <td class="name">
+                <a href="#UART0_BRGR" title="Baud Rate Generator Register" class="one_click_away">UART0_BRGR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400E0700">0x400E0700</td>
+              <td class="description">Receive Pointer Register</td>
+              <td class="name">
+                <a href="#UART0_RPR" title="Receive Pointer Register" class="one_click_away">UART0_RPR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400E0704">0x400E0704</td>
+              <td class="description">Receive Counter Register</td>
+              <td class="name">
+                <a href="#UART0_RCR" title="Receive Counter Register" class="one_click_away">UART0_RCR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400E0708">0x400E0708</td>
+              <td class="description">Transmit Pointer Register</td>
+              <td class="name">
+                <a href="#UART0_TPR" title="Transmit Pointer Register" class="one_click_away">UART0_TPR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400E070C">0x400E070C</td>
+              <td class="description">Transmit Counter Register</td>
+              <td class="name">
+                <a href="#UART0_TCR" title="Transmit Counter Register" class="one_click_away">UART0_TCR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400E0710">0x400E0710</td>
+              <td class="description">Receive Next Pointer Register</td>
+              <td class="name">
+                <a href="#UART0_RNPR" title="Receive Next Pointer Register" class="one_click_away">UART0_RNPR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400E0714">0x400E0714</td>
+              <td class="description">Receive Next Counter Register</td>
+              <td class="name">
+                <a href="#UART0_RNCR" title="Receive Next Counter Register" class="one_click_away">UART0_RNCR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400E0718">0x400E0718</td>
+              <td class="description">Transmit Next Pointer Register</td>
+              <td class="name">
+                <a href="#UART0_TNPR" title="Transmit Next Pointer Register" class="one_click_away">UART0_TNPR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400E071C">0x400E071C</td>
+              <td class="description">Transmit Next Counter Register</td>
+              <td class="name">
+                <a href="#UART0_TNCR" title="Transmit Next Counter Register" class="one_click_away">UART0_TNCR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400E0720">0x400E0720</td>
+              <td class="description">Transfer Control Register</td>
+              <td class="name">
+                <a href="#UART0_PTCR" title="Transfer Control Register" class="one_click_away">UART0_PTCR</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400E0724">0x400E0724</td>
+              <td class="description">Transfer Status Register</td>
+              <td class="name">
+                <a href="#UART0_PTSR" title="Transfer Status Register" class="one_click_away">UART0_PTSR</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x00000000</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3>Register Fields</h3>
+        <h4 id="UART0_CR">UART0 Control Register</h4>
+        <p><strong>Name</strong>: UART0_CR</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x400E0600</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#UART0_CR__RSTSTA" title="Reset Status Bits">RSTSTA</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#UART0_CR__TXDIS" title="Transmitter Disable">TXDIS</a>
+              </td>
+              <td colspan="1">
+                <a href="#UART0_CR__TXEN" title="Transmitter Enable">TXEN</a>
+              </td>
+              <td colspan="1">
+                <a href="#UART0_CR__RXDIS" title="Receiver Disable">RXDIS</a>
+              </td>
+              <td colspan="1">
+                <a href="#UART0_CR__RXEN" title="Receiver Enable">RXEN</a>
+              </td>
+              <td colspan="1">
+                <a href="#UART0_CR__RSTTX" title="Reset Transmitter">RSTTX</a>
+              </td>
+              <td colspan="1">
+                <a href="#UART0_CR__RSTRX" title="Reset Receiver">RSTRX</a>
+              </td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="UART0_CR__RSTRX"><strong>RSTRX</strong>: Reset Receiver<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The receiver logic is reset and disabled. If a character is being received, the reception is aborted.</td></tr></tbody></table></li>
+          <li id="UART0_CR__RSTTX"><strong>RSTTX</strong>: Reset Transmitter<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The transmitter logic is reset and disabled. If a character is being transmitted, the transmission is aborted.</td></tr></tbody></table></li>
+          <li id="UART0_CR__RXEN"><strong>RXEN</strong>: Receiver Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The receiver is enabled if RXDIS is 0.</td></tr></tbody></table></li>
+          <li id="UART0_CR__RXDIS"><strong>RXDIS</strong>: Receiver Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The receiver is disabled. If a character is being processed and RSTRX is not set, the character is completed before the receiver is stopped.</td></tr></tbody></table></li>
+          <li id="UART0_CR__TXEN"><strong>TXEN</strong>: Transmitter Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The transmitter is enabled if TXDIS is 0.</td></tr></tbody></table></li>
+          <li id="UART0_CR__TXDIS"><strong>TXDIS</strong>: Transmitter Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The transmitter is disabled. If a character is being processed and a character has been written in the UART_THR and RSTTX is not set, both characters are completed before the transmitter is stopped.</td></tr></tbody></table></li>
+          <li id="UART0_CR__RSTSTA"><strong>RSTSTA</strong>: Reset Status Bits<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Resets the status bits PARE, FRAME and OVRE in the UART_SR.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="UART0_MR">UART0 Mode Register</h4>
+        <p><strong>Name</strong>: UART0_MR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400E0604</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="2">
+                <a href="#UART0_MR__CHMODE" title="Channel Mode">CHMODE</a>
+              </td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="3">
+                <a href="#UART0_MR__PAR" title="Parity Type">PAR</a>
+              </td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="UART0_MR__PAR"><strong>PAR</strong>: Parity Type<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">EVEN</td><td class="description">Even parity</td></tr><tr class="even"><td class="value">0x1</td><td class="name">ODD</td><td class="description">Odd parity</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">SPACE</td><td class="description">Space: parity forced to 0</td></tr><tr class="even"><td class="value">0x3</td><td class="name">MARK</td><td class="description">Mark: parity forced to 1</td></tr><tr class="odd"><td class="value">0x4</td><td class="name">NO</td><td class="description">No parity</td></tr></tbody></table></li>
+          <li id="UART0_MR__CHMODE"><strong>CHMODE</strong>: Channel Mode<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">NORMAL</td><td class="description">Normal Mode</td></tr><tr class="even"><td class="value">0x1</td><td class="name">AUTOMATIC</td><td class="description">Automatic Echo</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">LOCAL_LOOPBACK</td><td class="description">Local Loopback</td></tr><tr class="even"><td class="value">0x3</td><td class="name">REMOTE_LOOPBACK</td><td class="description">Remote Loopback</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="UART0_IER">UART0 Interrupt Enable Register</h4>
+        <p><strong>Name</strong>: UART0_IER</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x400E0608</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#UART0_IER__RXBUFF" title="Enable Buffer Full Interrupt">RXBUFF</a>
+              </td>
+              <td colspan="1">
+                <a href="#UART0_IER__TXBUFE" title="Enable Buffer Empty Interrupt">TXBUFE</a>
+              </td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#UART0_IER__TXEMPTY" title="Enable TXEMPTY Interrupt">TXEMPTY</a>
+              </td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#UART0_IER__PARE" title="Enable Parity Error Interrupt">PARE</a>
+              </td>
+              <td colspan="1">
+                <a href="#UART0_IER__FRAME" title="Enable Framing Error Interrupt">FRAME</a>
+              </td>
+              <td colspan="1">
+                <a href="#UART0_IER__OVRE" title="Enable Overrun Error Interrupt">OVRE</a>
+              </td>
+              <td colspan="1">
+                <a href="#UART0_IER__ENDTX" title="Enable End of Transmit Interrupt">ENDTX</a>
+              </td>
+              <td colspan="1">
+                <a href="#UART0_IER__ENDRX" title="Enable End of Receive Transfer Interrupt">ENDRX</a>
+              </td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#UART0_IER__TXRDY" title="Enable TXRDY Interrupt">TXRDY</a>
+              </td>
+              <td colspan="1">
+                <a href="#UART0_IER__RXRDY" title="Enable RXRDY Interrupt">RXRDY</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="UART0_IER__RXRDY"><strong>RXRDY</strong>: Enable RXRDY Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="UART0_IER__TXRDY"><strong>TXRDY</strong>: Enable TXRDY Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="UART0_IER__ENDRX"><strong>ENDRX</strong>: Enable End of Receive Transfer Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="UART0_IER__ENDTX"><strong>ENDTX</strong>: Enable End of Transmit Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="UART0_IER__OVRE"><strong>OVRE</strong>: Enable Overrun Error Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="UART0_IER__FRAME"><strong>FRAME</strong>: Enable Framing Error Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="UART0_IER__PARE"><strong>PARE</strong>: Enable Parity Error Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="UART0_IER__TXEMPTY"><strong>TXEMPTY</strong>: Enable TXEMPTY Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="UART0_IER__TXBUFE"><strong>TXBUFE</strong>: Enable Buffer Empty Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="UART0_IER__RXBUFF"><strong>RXBUFF</strong>: Enable Buffer Full Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding interrupt.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="UART0_IDR">UART0 Interrupt Disable Register</h4>
+        <p><strong>Name</strong>: UART0_IDR</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x400E060C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#UART0_IDR__RXBUFF" title="Disable Buffer Full Interrupt">RXBUFF</a>
+              </td>
+              <td colspan="1">
+                <a href="#UART0_IDR__TXBUFE" title="Disable Buffer Empty Interrupt">TXBUFE</a>
+              </td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#UART0_IDR__TXEMPTY" title="Disable TXEMPTY Interrupt">TXEMPTY</a>
+              </td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#UART0_IDR__PARE" title="Disable Parity Error Interrupt">PARE</a>
+              </td>
+              <td colspan="1">
+                <a href="#UART0_IDR__FRAME" title="Disable Framing Error Interrupt">FRAME</a>
+              </td>
+              <td colspan="1">
+                <a href="#UART0_IDR__OVRE" title="Disable Overrun Error Interrupt">OVRE</a>
+              </td>
+              <td colspan="1">
+                <a href="#UART0_IDR__ENDTX" title="Disable End of Transmit Interrupt">ENDTX</a>
+              </td>
+              <td colspan="1">
+                <a href="#UART0_IDR__ENDRX" title="Disable End of Receive Transfer Interrupt">ENDRX</a>
+              </td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#UART0_IDR__TXRDY" title="Disable TXRDY Interrupt">TXRDY</a>
+              </td>
+              <td colspan="1">
+                <a href="#UART0_IDR__RXRDY" title="Disable RXRDY Interrupt">RXRDY</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="UART0_IDR__RXRDY"><strong>RXRDY</strong>: Disable RXRDY Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="UART0_IDR__TXRDY"><strong>TXRDY</strong>: Disable TXRDY Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="UART0_IDR__ENDRX"><strong>ENDRX</strong>: Disable End of Receive Transfer Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="UART0_IDR__ENDTX"><strong>ENDTX</strong>: Disable End of Transmit Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="UART0_IDR__OVRE"><strong>OVRE</strong>: Disable Overrun Error Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="UART0_IDR__FRAME"><strong>FRAME</strong>: Disable Framing Error Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="UART0_IDR__PARE"><strong>PARE</strong>: Disable Parity Error Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="UART0_IDR__TXEMPTY"><strong>TXEMPTY</strong>: Disable TXEMPTY Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="UART0_IDR__TXBUFE"><strong>TXBUFE</strong>: Disable Buffer Empty Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="UART0_IDR__RXBUFF"><strong>RXBUFF</strong>: Disable Buffer Full Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding interrupt.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="UART0_IMR">UART0 Interrupt Mask Register</h4>
+        <p><strong>Name</strong>: UART0_IMR</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x400E0610</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#UART0_IMR__RXBUFF" title="Mask RXBUFF Interrupt">RXBUFF</a>
+              </td>
+              <td colspan="1">
+                <a href="#UART0_IMR__TXBUFE" title="Mask TXBUFE Interrupt">TXBUFE</a>
+              </td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#UART0_IMR__TXEMPTY" title="Mask TXEMPTY Interrupt">TXEMPTY</a>
+              </td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#UART0_IMR__PARE" title="Mask Parity Error Interrupt">PARE</a>
+              </td>
+              <td colspan="1">
+                <a href="#UART0_IMR__FRAME" title="Mask Framing Error Interrupt">FRAME</a>
+              </td>
+              <td colspan="1">
+                <a href="#UART0_IMR__OVRE" title="Mask Overrun Error Interrupt">OVRE</a>
+              </td>
+              <td colspan="1">
+                <a href="#UART0_IMR__ENDTX" title="Mask End of Transmit Interrupt">ENDTX</a>
+              </td>
+              <td colspan="1">
+                <a href="#UART0_IMR__ENDRX" title="Mask End of Receive Transfer Interrupt">ENDRX</a>
+              </td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#UART0_IMR__TXRDY" title="Disable TXRDY Interrupt">TXRDY</a>
+              </td>
+              <td colspan="1">
+                <a href="#UART0_IMR__RXRDY" title="Mask RXRDY Interrupt">RXRDY</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="UART0_IMR__RXRDY"><strong>RXRDY</strong>: Mask RXRDY Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The corresponding interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The corresponding interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="UART0_IMR__TXRDY"><strong>TXRDY</strong>: Disable TXRDY Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The corresponding interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The corresponding interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="UART0_IMR__ENDRX"><strong>ENDRX</strong>: Mask End of Receive Transfer Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The corresponding interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The corresponding interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="UART0_IMR__ENDTX"><strong>ENDTX</strong>: Mask End of Transmit Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The corresponding interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The corresponding interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="UART0_IMR__OVRE"><strong>OVRE</strong>: Mask Overrun Error Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The corresponding interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The corresponding interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="UART0_IMR__FRAME"><strong>FRAME</strong>: Mask Framing Error Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The corresponding interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The corresponding interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="UART0_IMR__PARE"><strong>PARE</strong>: Mask Parity Error Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The corresponding interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The corresponding interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="UART0_IMR__TXEMPTY"><strong>TXEMPTY</strong>: Mask TXEMPTY Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The corresponding interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The corresponding interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="UART0_IMR__TXBUFE"><strong>TXBUFE</strong>: Mask TXBUFE Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The corresponding interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The corresponding interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="UART0_IMR__RXBUFF"><strong>RXBUFF</strong>: Mask RXBUFF Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The corresponding interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The corresponding interrupt is enabled.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="UART0_SR">UART0 Status Register</h4>
+        <p><strong>Name</strong>: UART0_SR</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x400E0614</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#UART0_SR__RXBUFF" title="Receive Buffer Full">RXBUFF</a>
+              </td>
+              <td colspan="1">
+                <a href="#UART0_SR__TXBUFE" title="Transmission Buffer Empty">TXBUFE</a>
+              </td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#UART0_SR__TXEMPTY" title="Transmitter Empty">TXEMPTY</a>
+              </td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#UART0_SR__PARE" title="Parity Error">PARE</a>
+              </td>
+              <td colspan="1">
+                <a href="#UART0_SR__FRAME" title="Framing Error">FRAME</a>
+              </td>
+              <td colspan="1">
+                <a href="#UART0_SR__OVRE" title="Overrun Error">OVRE</a>
+              </td>
+              <td colspan="1">
+                <a href="#UART0_SR__ENDTX" title="End of Transmitter Transfer">ENDTX</a>
+              </td>
+              <td colspan="1">
+                <a href="#UART0_SR__ENDRX" title="End of Receiver Transfer">ENDRX</a>
+              </td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#UART0_SR__TXRDY" title="Transmitter Ready">TXRDY</a>
+              </td>
+              <td colspan="1">
+                <a href="#UART0_SR__RXRDY" title="Receiver Ready">RXRDY</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="UART0_SR__RXRDY"><strong>RXRDY</strong>: Receiver Ready<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No character has been received since the last read of the UART_RHR or the receiver is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">At least one complete character has been received, transferred to UART_RHR and not yet read.</td></tr></tbody></table></li>
+          <li id="UART0_SR__TXRDY"><strong>TXRDY</strong>: Transmitter Ready<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">A character has been written to UART_THR and not yet transferred to the Shift Register, or the transmitter is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">There is no character written to UART_THR not yet transferred to the Shift Register.</td></tr></tbody></table></li>
+          <li id="UART0_SR__ENDRX"><strong>ENDRX</strong>: End of Receiver Transfer<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The End of Transfer signal from the receiver Peripheral Data Controller channel is inactive.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The End of Transfer signal from the receiver Peripheral Data Controller channel is active.</td></tr></tbody></table></li>
+          <li id="UART0_SR__ENDTX"><strong>ENDTX</strong>: End of Transmitter Transfer<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The End of Transfer signal from the transmitter Peripheral Data Controller channel is inactive.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The End of Transfer signal from the transmitter Peripheral Data Controller channel is active.</td></tr></tbody></table></li>
+          <li id="UART0_SR__OVRE"><strong>OVRE</strong>: Overrun Error<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No overrun error has occurred since the last RSTSTA.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">At least one overrun error has occurred since the last RSTSTA.</td></tr></tbody></table></li>
+          <li id="UART0_SR__FRAME"><strong>FRAME</strong>: Framing Error<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No framing error has occurred since the last RSTSTA.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">At least one framing error has occurred since the last RSTSTA.</td></tr></tbody></table></li>
+          <li id="UART0_SR__PARE"><strong>PARE</strong>: Parity Error<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No parity error has occurred since the last RSTSTA.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">At least one parity error has occurred since the last RSTSTA.</td></tr></tbody></table></li>
+          <li id="UART0_SR__TXEMPTY"><strong>TXEMPTY</strong>: Transmitter Empty<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">There are characters in UART_THR, or characters being processed by the transmitter, or the transmitter is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">There are no characters in UART_THR and there are no characters being processed by the transmitter.</td></tr></tbody></table></li>
+          <li id="UART0_SR__TXBUFE"><strong>TXBUFE</strong>: Transmission Buffer Empty<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The buffer empty signal from the transmitter PDC channel is inactive.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The buffer empty signal from the transmitter PDC channel is active.</td></tr></tbody></table></li>
+          <li id="UART0_SR__RXBUFF"><strong>RXBUFF</strong>: Receive Buffer Full<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The buffer full signal from the receiver PDC channel is inactive.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The buffer full signal from the receiver PDC channel is active.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="UART0_RHR">UART0 Receive Holding Register</h4>
+        <p><strong>Name</strong>: UART0_RHR</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x400E0618</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#UART0_RHR__RXCHR" title="Received Character">RXCHR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="UART0_RHR__RXCHR"><strong>RXCHR</strong>: Received Character</li>
+          <p>-</p>
+        </ul>
+        <h4 id="UART0_THR">UART0 Transmit Holding Register</h4>
+        <p><strong>Name</strong>: UART0_THR</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x400E061C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#UART0_THR__TXCHR" title="Character to be Transmitted">TXCHR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="UART0_THR__TXCHR"><strong>TXCHR</strong>: Character to be Transmitted</li>
+          <p>-</p>
+        </ul>
+        <h4 id="UART0_BRGR">UART0 Baud Rate Generator Register</h4>
+        <p><strong>Name</strong>: UART0_BRGR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400E0620</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#UART0_BRGR__CD" title="Clock Divisor">CD</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#UART0_BRGR__CD" title="Clock Divisor">CD</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="UART0_BRGR__CD"><strong>CD</strong>: Clock Divisor</li>
+          <p>-</p>
+        </ul>
+        <h4 id="UART0_RPR">UART0 Receive Pointer Register</h4>
+        <p><strong>Name</strong>: UART0_RPR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400E0700</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#UART0_RPR__RXPTR" title="Receive Pointer Register">RXPTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#UART0_RPR__RXPTR" title="Receive Pointer Register">RXPTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#UART0_RPR__RXPTR" title="Receive Pointer Register">RXPTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#UART0_RPR__RXPTR" title="Receive Pointer Register">RXPTR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="UART0_RPR__RXPTR"><strong>RXPTR</strong>: Receive Pointer Register</li>
+          <p>-</p>
+        </ul>
+        <h4 id="UART0_RCR">UART0 Receive Counter Register</h4>
+        <p><strong>Name</strong>: UART0_RCR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400E0704</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#UART0_RCR__RXCTR" title="Receive Counter Register">RXCTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#UART0_RCR__RXCTR" title="Receive Counter Register">RXCTR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="UART0_RCR__RXCTR"><strong>RXCTR</strong>: Receive Counter Register</li>
+          <p>-</p>
+        </ul>
+        <h4 id="UART0_TPR">UART0 Transmit Pointer Register</h4>
+        <p><strong>Name</strong>: UART0_TPR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400E0708</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#UART0_TPR__TXPTR" title="Transmit Counter Register">TXPTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#UART0_TPR__TXPTR" title="Transmit Counter Register">TXPTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#UART0_TPR__TXPTR" title="Transmit Counter Register">TXPTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#UART0_TPR__TXPTR" title="Transmit Counter Register">TXPTR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="UART0_TPR__TXPTR"><strong>TXPTR</strong>: Transmit Counter Register</li>
+          <p>-</p>
+        </ul>
+        <h4 id="UART0_TCR">UART0 Transmit Counter Register</h4>
+        <p><strong>Name</strong>: UART0_TCR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400E070C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#UART0_TCR__TXCTR" title="Transmit Counter Register">TXCTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#UART0_TCR__TXCTR" title="Transmit Counter Register">TXCTR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="UART0_TCR__TXCTR"><strong>TXCTR</strong>: Transmit Counter Register</li>
+          <p>-</p>
+        </ul>
+        <h4 id="UART0_RNPR">UART0 Receive Next Pointer Register</h4>
+        <p><strong>Name</strong>: UART0_RNPR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400E0710</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#UART0_RNPR__RXNPTR" title="Receive Next Pointer">RXNPTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#UART0_RNPR__RXNPTR" title="Receive Next Pointer">RXNPTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#UART0_RNPR__RXNPTR" title="Receive Next Pointer">RXNPTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#UART0_RNPR__RXNPTR" title="Receive Next Pointer">RXNPTR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="UART0_RNPR__RXNPTR"><strong>RXNPTR</strong>: Receive Next Pointer</li>
+          <p>-</p>
+        </ul>
+        <h4 id="UART0_RNCR">UART0 Receive Next Counter Register</h4>
+        <p><strong>Name</strong>: UART0_RNCR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400E0714</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#UART0_RNCR__RXNCTR" title="Receive Next Counter">RXNCTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#UART0_RNCR__RXNCTR" title="Receive Next Counter">RXNCTR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="UART0_RNCR__RXNCTR"><strong>RXNCTR</strong>: Receive Next Counter</li>
+          <p>-</p>
+        </ul>
+        <h4 id="UART0_TNPR">UART0 Transmit Next Pointer Register</h4>
+        <p><strong>Name</strong>: UART0_TNPR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400E0718</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#UART0_TNPR__TXNPTR" title="Transmit Next Pointer">TXNPTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#UART0_TNPR__TXNPTR" title="Transmit Next Pointer">TXNPTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#UART0_TNPR__TXNPTR" title="Transmit Next Pointer">TXNPTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#UART0_TNPR__TXNPTR" title="Transmit Next Pointer">TXNPTR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="UART0_TNPR__TXNPTR"><strong>TXNPTR</strong>: Transmit Next Pointer</li>
+          <p>-</p>
+        </ul>
+        <h4 id="UART0_TNCR">UART0 Transmit Next Counter Register</h4>
+        <p><strong>Name</strong>: UART0_TNCR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400E071C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#UART0_TNCR__TXNCTR" title="Transmit Counter Next">TXNCTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#UART0_TNCR__TXNCTR" title="Transmit Counter Next">TXNCTR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="UART0_TNCR__TXNCTR"><strong>TXNCTR</strong>: Transmit Counter Next</li>
+          <p>-</p>
+        </ul>
+        <h4 id="UART0_PTCR">UART0 Transfer Control Register</h4>
+        <p><strong>Name</strong>: UART0_PTCR</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x400E0720</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#UART0_PTCR__TXTDIS" title="Transmitter Transfer Disable">TXTDIS</a>
+              </td>
+              <td colspan="1">
+                <a href="#UART0_PTCR__TXTEN" title="Transmitter Transfer Enable">TXTEN</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#UART0_PTCR__RXTDIS" title="Receiver Transfer Disable">RXTDIS</a>
+              </td>
+              <td colspan="1">
+                <a href="#UART0_PTCR__RXTEN" title="Receiver Transfer Enable">RXTEN</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="UART0_PTCR__RXTEN"><strong>RXTEN</strong>: Receiver Transfer Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables PDC receiver channel requests if RXTDIS is not set.</td></tr></tbody></table></li>
+          <li id="UART0_PTCR__RXTDIS"><strong>RXTDIS</strong>: Receiver Transfer Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the PDC receiver channel requests.</td></tr></tbody></table></li>
+          <li id="UART0_PTCR__TXTEN"><strong>TXTEN</strong>: Transmitter Transfer Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the PDC transmitter channel requests.</td></tr></tbody></table></li>
+          <li id="UART0_PTCR__TXTDIS"><strong>TXTDIS</strong>: Transmitter Transfer Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the PDC transmitter channel requests.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="UART0_PTSR">UART0 Transfer Status Register</h4>
+        <p><strong>Name</strong>: UART0_PTSR</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x400E0724</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#UART0_PTSR__TXTEN" title="Transmitter Transfer Enable">TXTEN</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#UART0_PTSR__RXTEN" title="Receiver Transfer Enable">RXTEN</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="UART0_PTSR__RXTEN"><strong>RXTEN</strong>: Receiver Transfer Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">PDC Receiver channel requests are disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">PDC Receiver channel requests are enabled.</td></tr></tbody></table></li>
+          <li id="UART0_PTSR__TXTEN"><strong>TXTEN</strong>: Transmitter Transfer Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">PDC Transmitter channel requests are disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">PDC Transmitter channel requests are enabled.</td></tr></tbody></table></li>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>

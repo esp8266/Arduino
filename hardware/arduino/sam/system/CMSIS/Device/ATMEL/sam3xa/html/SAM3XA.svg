@@ -1,0 +1,653 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg height="100%" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<g id="Address_memory_space" style="font-family: sans-serif; font-size: 8px" transform="translate(80,20)">
+		<text text-anchor="middle" x="45" y="-4">Address memory space</text>
+		<g transform="translate(0,0)">
+			<rect height="50" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text text-anchor="middle" transform="translate(0,2)" x="45" y="25">Code</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x00000000</text>
+		</g>
+		<g transform="translate(0,50)">
+			<rect height="50" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text text-anchor="middle" transform="translate(0,2)" x="45" y="25">SRAM</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x20000000</text>
+		</g>
+		<g transform="translate(0,100)">
+			<rect height="50" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text text-anchor="middle" transform="translate(0,2)" x="45" y="25">Peripherals</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x40000000</text>
+		</g>
+		<g transform="translate(0,150)">
+			<rect height="50" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text text-anchor="middle" transform="translate(0,2)" x="45" y="25">External SRAM</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x60000000</text>
+		</g>
+		<g transform="translate(0,200)">
+			<rect height="50" style="fill: #EEEEEE; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text text-anchor="middle" transform="translate(0,2)" x="45" y="25">Reserved</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0xA0000000</text>
+		</g>
+		<g transform="translate(0,250)">
+			<rect height="50" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text text-anchor="middle" transform="translate(0,2)" x="45" y="25">System</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0xE0000000</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="52">0xFFFFFFFF</text>
+		</g>
+		<rect height="300" style="fill: none; stroke: black; stroke-width: 1" width="90" x="0" y="0" />
+	</g>
+	<g id="Code" style="font-family: sans-serif; font-size: 8px" transform="translate(260,20)">
+		<text text-anchor="middle" x="45" y="-4">Code</text>
+		<g transform="translate(0,0)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">Boot Memory</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x00000000</text>
+		</g>
+		<g transform="translate(0,25)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">Internal Flash 0</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x00080000</text>
+		</g>
+		<g transform="translate(0,50)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">Internal Flash 1</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x00090000</text>
+		</g>
+		<g transform="translate(0,75)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">Internal ROM</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x00100000</text>
+		</g>
+		<g transform="translate(0,100)">
+			<rect height="25" style="fill: #EEEEEE; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">Reserved</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x00200000</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="27">0x1FFFFFFF</text>
+		</g>
+		<rect height="125" style="fill: none; stroke: black; stroke-width: 1" width="90" x="0" y="0" />
+	</g>
+	<g id="SRAM" style="font-family: sans-serif; font-size: 8px" transform="translate(260,170)">
+		<text text-anchor="middle" x="45" y="-4">SRAM</text>
+		<g transform="translate(0,0)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="SRAM0.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">SRAM0</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x20000000</text>
+		</g>
+		<g transform="translate(0,25)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="SRAM1.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">SRAM1</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x20080000</text>
+		</g>
+		<g transform="translate(0,50)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">NFC (SRAM)</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x20100000</text>
+		</g>
+		<g transform="translate(0,75)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">UOTGHS (DMA)</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x20180000</text>
+		</g>
+		<g transform="translate(0,100)">
+			<rect height="25" style="fill: #EEEEEE; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">Undefined (Abort)</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x20200000</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="27">0x40000000</text>
+		</g>
+		<rect height="125" style="fill: none; stroke: black; stroke-width: 1" width="90" x="0" y="0" />
+	</g>
+	<g id="Peripherals" style="font-family: sans-serif; font-size: 8px" transform="translate(260,320)">
+		<text text-anchor="middle" x="45" y="-4">Peripherals</text>
+		<g transform="translate(0,0)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="HSMCI.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">HSMCI</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">21</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x40000000</text>
+		</g>
+		<g transform="translate(0,25)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="SSC.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">SSC</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">26</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x40004000</text>
+		</g>
+		<g transform="translate(0,50)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="SPI0.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">SPI0</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">24</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x40008000</text>
+		</g>
+		<g transform="translate(0,75)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="SPI1.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">SPI1</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">25</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x4000C000</text>
+		</g>
+		<g transform="translate(0,100)">
+			<a xlink:href="TC0.html">
+				<text style="font-family: monospace; font-style: oblique" text-anchor="start" x="4" y="9">TC0</text>
+			</a>
+			<a xlink:href="TC0.html">
+				<text text-anchor="middle" x="45" y="14.5">TC0</text>
+			</a>
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text style="font-family: monospace; font-style: normal" text-anchor="end" x="-2" y="2">0x40080000</text>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">27</text>
+		</g>
+		<g transform="translate(0,125)">
+			<a xlink:href="TC0.html">
+				<text style="font-family: monospace; font-style: oblique" text-anchor="start" x="4" y="9">TC0</text>
+			</a>
+			<a xlink:href="TC1.html">
+				<text text-anchor="middle" x="45" y="14.5">TC1</text>
+			</a>
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text style="font-family: monospace; font-style: oblique" text-anchor="end" x="-2" y="2">+0x40</text>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">28</text>
+		</g>
+		<g transform="translate(0,150)">
+			<a xlink:href="TC0.html">
+				<text style="font-family: monospace; font-style: oblique" text-anchor="start" x="4" y="9">TC0</text>
+			</a>
+			<a xlink:href="TC2.html">
+				<text text-anchor="middle" x="45" y="14.5">TC2</text>
+			</a>
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text style="font-family: monospace; font-style: oblique" text-anchor="end" x="-2" y="2">+0x80</text>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">29</text>
+		</g>
+		<g transform="translate(0,175)">
+			<a xlink:href="TC1.html">
+				<text style="font-family: monospace; font-style: oblique" text-anchor="start" x="4" y="9">TC1</text>
+			</a>
+			<a xlink:href="TC3.html">
+				<text text-anchor="middle" x="45" y="14.5">TC3</text>
+			</a>
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text style="font-family: monospace; font-style: normal" text-anchor="end" x="-2" y="2">0x40084000</text>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">30</text>
+		</g>
+		<g transform="translate(0,200)">
+			<a xlink:href="TC1.html">
+				<text style="font-family: monospace; font-style: oblique" text-anchor="start" x="4" y="9">TC1</text>
+			</a>
+			<a xlink:href="TC4.html">
+				<text text-anchor="middle" x="45" y="14.5">TC4</text>
+			</a>
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text style="font-family: monospace; font-style: oblique" text-anchor="end" x="-2" y="2">+0x40</text>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">31</text>
+		</g>
+		<g transform="translate(0,225)">
+			<a xlink:href="TC1.html">
+				<text style="font-family: monospace; font-style: oblique" text-anchor="start" x="4" y="9">TC1</text>
+			</a>
+			<a xlink:href="TC5.html">
+				<text text-anchor="middle" x="45" y="14.5">TC5</text>
+			</a>
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text style="font-family: monospace; font-style: oblique" text-anchor="end" x="-2" y="2">+0x80</text>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">32</text>
+		</g>
+		<g transform="translate(0,250)">
+			<a xlink:href="TC2.html">
+				<text style="font-family: monospace; font-style: oblique" text-anchor="start" x="4" y="9">TC2</text>
+			</a>
+			<a xlink:href="TC6.html">
+				<text text-anchor="middle" x="45" y="14.5">TC6</text>
+			</a>
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text style="font-family: monospace; font-style: normal" text-anchor="end" x="-2" y="2">0x40088000</text>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">33</text>
+		</g>
+		<g transform="translate(0,275)">
+			<a xlink:href="TC2.html">
+				<text style="font-family: monospace; font-style: oblique" text-anchor="start" x="4" y="9">TC2</text>
+			</a>
+			<a xlink:href="TC7.html">
+				<text text-anchor="middle" x="45" y="14.5">TC7</text>
+			</a>
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text style="font-family: monospace; font-style: oblique" text-anchor="end" x="-2" y="2">+0x40</text>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">34</text>
+		</g>
+		<g transform="translate(0,300)">
+			<a xlink:href="TC2.html">
+				<text style="font-family: monospace; font-style: oblique" text-anchor="start" x="4" y="9">TC2</text>
+			</a>
+			<a xlink:href="TC8.html">
+				<text text-anchor="middle" x="45" y="14.5">TC8</text>
+			</a>
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text style="font-family: monospace; font-style: oblique" text-anchor="end" x="-2" y="2">+0x80</text>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">35</text>
+		</g>
+		<g transform="translate(0,325)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="TWI0.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">TWI0</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">22</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x4008C000</text>
+		</g>
+		<g transform="translate(0,350)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="TWI1.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">TWI1</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">23</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x40090000</text>
+		</g>
+		<g transform="translate(0,375)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="PWM.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">PWM</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">36</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x40094000</text>
+		</g>
+		<g transform="translate(0,400)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="USART0.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">USART0</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">17</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x40098000</text>
+		</g>
+		<g transform="translate(0,425)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="USART1.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">USART1</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">18</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x4009C000</text>
+		</g>
+		<g transform="translate(0,450)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="USART2.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">USART2</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">19</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x400A0000</text>
+		</g>
+		<g transform="translate(0,475)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="USART3.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">USART3</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">20</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x400A4000</text>
+		</g>
+		<g transform="translate(0,500)">
+			<rect height="25" style="fill: #EEEEEE; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">Reserved</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x400A8000</text>
+		</g>
+		<g transform="translate(0,525)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="UOTGHS.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">UOTGHS</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">40</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x400AC000</text>
+		</g>
+		<g transform="translate(0,550)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="EMAC.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">EMAC</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">42</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x400B0000</text>
+		</g>
+		<g transform="translate(0,575)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="CAN0.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">CAN0</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">43</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x400B4000</text>
+		</g>
+		<g transform="translate(0,600)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="CAN1.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">CAN1</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">44</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x400B8000</text>
+		</g>
+		<g transform="translate(0,625)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="TRNG.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">TRNG</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">41</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x400BC000</text>
+		</g>
+		<g transform="translate(0,650)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="ADC.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">ADC</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">37</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x400C0000</text>
+		</g>
+		<g transform="translate(0,675)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="DMAC.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">DMAC</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">39</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x400C4000</text>
+		</g>
+		<g transform="translate(0,700)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="DACC.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">DACC</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">38</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x400C8000</text>
+		</g>
+		<g transform="translate(0,725)">
+			<rect height="25" style="fill: #EEEEEE; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">Reserved</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x400D0000</text>
+		</g>
+		<g transform="translate(0,750)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">System controller</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x400E0000</text>
+		</g>
+		<g transform="translate(0,775)">
+			<rect height="25" style="fill: #EEEEEE; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">Reserved</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x400E2600</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="27">0x60000000</text>
+		</g>
+		<rect height="800" style="fill: none; stroke: black; stroke-width: 1" width="90" x="0" y="0" />
+	</g>
+	<g id="External_SRAM" style="font-family: sans-serif; font-size: 8px" transform="translate(260,1145)">
+		<text text-anchor="middle" x="45" y="-4">External SRAM</text>
+		<g transform="translate(0,0)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">EBI Chip Select 0</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x60000000</text>
+		</g>
+		<g transform="translate(0,25)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">EBI Chip Select 1</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x61000000</text>
+		</g>
+		<g transform="translate(0,50)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">EBI Chip Select 2</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x62000000</text>
+		</g>
+		<g transform="translate(0,75)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">EBI Chip Select 3</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x63000000</text>
+		</g>
+		<g transform="translate(0,100)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">EBI Chip Select 4</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x64000000</text>
+		</g>
+		<g transform="translate(0,125)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">EBI Chip Select 5</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x65000000</text>
+		</g>
+		<g transform="translate(0,150)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">EBI Chip Select 6</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x66000000</text>
+		</g>
+		<g transform="translate(0,175)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">EBI Chip Select 7</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x67000000</text>
+		</g>
+		<g transform="translate(0,200)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">NFC</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x68000000</text>
+		</g>
+		<g transform="translate(0,225)">
+			<rect height="25" style="fill: #EEEEEE; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">reserved</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x69000000</text>
+		</g>
+		<g transform="translate(0,250)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">CS SDRAMC</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x70000000</text>
+		</g>
+		<g transform="translate(0,275)">
+			<rect height="25" style="fill: #EEEEEE; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">reserved</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x80000000</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="27">0x9FFFFFFF</text>
+		</g>
+		<rect height="300" style="fill: none; stroke: black; stroke-width: 1" width="90" x="0" y="0" />
+	</g>
+	<g id="System_controller" style="font-family: sans-serif; font-size: 8px" transform="translate(440,20)">
+		<text text-anchor="middle" x="45" y="-4">System controller</text>
+		<g transform="translate(0,0)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="SMC.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">SMC</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">9</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x400E0000</text>
+		</g>
+		<g transform="translate(0,25)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="SDRAMC.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">SDRAMC</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">10</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x400E0200</text>
+		</g>
+		<g transform="translate(0,50)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="MATRIX.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">MATRIX</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x400E0400</text>
+		</g>
+		<g transform="translate(0,75)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="PMC.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">PMC</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">5</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x400E0600</text>
+		</g>
+		<g transform="translate(0,100)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="UART.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">UART</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">8</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x400E0800</text>
+		</g>
+		<g transform="translate(0,125)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="CHIPID.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">CHIPID</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x400E0940</text>
+		</g>
+		<g transform="translate(0,150)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="EFC0.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">EFC0</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">6</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x400E0A00</text>
+		</g>
+		<g transform="translate(0,175)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="EFC1.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">EFC1</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">7</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x400E0C00</text>
+		</g>
+		<g transform="translate(0,200)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="PIOA.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">PIOA</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">11</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x400E0E00</text>
+		</g>
+		<g transform="translate(0,225)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="PIOB.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">PIOB</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">12</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x400E1000</text>
+		</g>
+		<g transform="translate(0,250)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="PIOC.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">PIOC</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">13</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x400E1200</text>
+		</g>
+		<g transform="translate(0,275)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="PIOD.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">PIOD</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">14</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x400E1400</text>
+		</g>
+		<g transform="translate(0,300)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="PIOE.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">PIOE</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">15</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x400E1600</text>
+		</g>
+		<g transform="translate(0,325)">
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<a xlink:href="PIOF.html">
+				<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">PIOF</text>
+			</a>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">16</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x400E1800</text>
+		</g>
+		<g transform="translate(0,350)">
+			<a xlink:href="SYSC.html">
+				<text style="font-family: monospace; font-style: oblique" text-anchor="start" x="4" y="9">SYSC</text>
+			</a>
+			<a xlink:href="RSTC.html">
+				<text text-anchor="middle" x="45" y="14.5">RSTC</text>
+			</a>
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text style="font-family: monospace; font-style: normal" text-anchor="end" x="-2" y="2">0x400E1A00</text>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">1</text>
+		</g>
+		<g transform="translate(0,375)">
+			<a xlink:href="SYSC.html">
+				<text style="font-family: monospace; font-style: oblique" text-anchor="start" x="4" y="9">SYSC</text>
+			</a>
+			<a xlink:href="SUPC.html">
+				<text text-anchor="middle" x="45" y="14.5">SUPC</text>
+			</a>
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text style="font-family: monospace; font-style: oblique" text-anchor="end" x="-2" y="2">+0x10</text>
+		</g>
+		<g transform="translate(0,400)">
+			<a xlink:href="SYSC.html">
+				<text style="font-family: monospace; font-style: oblique" text-anchor="start" x="4" y="9">SYSC</text>
+			</a>
+			<a xlink:href="RTT.html">
+				<text text-anchor="middle" x="45" y="14.5">RTT</text>
+			</a>
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text style="font-family: monospace; font-style: oblique" text-anchor="end" x="-2" y="2">+0x30</text>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">3</text>
+		</g>
+		<g transform="translate(0,425)">
+			<a xlink:href="SYSC.html">
+				<text style="font-family: monospace; font-style: oblique" text-anchor="start" x="4" y="9">SYSC</text>
+			</a>
+			<a xlink:href="WDT.html">
+				<text text-anchor="middle" x="45" y="14.5">WDT</text>
+			</a>
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text style="font-family: monospace; font-style: oblique" text-anchor="end" x="-2" y="2">+0x50</text>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">4</text>
+		</g>
+		<g transform="translate(0,450)">
+			<a xlink:href="SYSC.html">
+				<text style="font-family: monospace; font-style: oblique" text-anchor="start" x="4" y="9">SYSC</text>
+			</a>
+			<a xlink:href="RTC.html">
+				<text text-anchor="middle" x="45" y="14.5">RTC</text>
+			</a>
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text style="font-family: monospace; font-style: oblique" text-anchor="end" x="-2" y="2">+0x60</text>
+			<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">2</text>
+		</g>
+		<g transform="translate(0,475)">
+			<a xlink:href="SYSC.html">
+				<text style="font-family: monospace; font-style: oblique" text-anchor="start" x="4" y="9">SYSC</text>
+			</a>
+			<a xlink:href="GPBR.html">
+				<text text-anchor="middle" x="45" y="14.5">GPBR</text>
+			</a>
+			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text style="font-family: monospace; font-style: oblique" text-anchor="end" x="-2" y="2">+0x90</text>
+		</g>
+		<g transform="translate(0,500)">
+			<rect height="25" style="fill: #EEEEEE; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">reserved</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x400E1C00</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="27">0x4007FFFF</text>
+		</g>
+		<rect height="525" style="fill: none; stroke: black; stroke-width: 1" width="90" x="0" y="0" />
+	</g>
+	<g style="font-family: sans-serif; font-size: 8px" transform="translate(80,370)">
+		<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+		<text style="font-family: monospace" text-anchor="end" x="-2" y="2">offset</text>
+		<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="21">ID</text>
+		<text style="font-family: monospace" text-anchor="end" transform="translate(0,2)" x="86" y="31">(+ : wired-or)</text>
+		<text text-anchor="middle" x="45" y="14.5">peripheral</text>
+		<text style="font-family: monospace; font-style: oblique" text-anchor="start" x="4" y="9">block</text>
+	</g>
+	<g >
+		<line stroke="grey" stroke-dasharray="2px 2px" stroke-width="1" x1="170" x2="260" y1="20" y2="20" />
+		<line stroke="grey" stroke-dasharray="2px 2px" stroke-width="1" x1="170" x2="260" y1="70" y2="145" />
+		<line stroke="grey" stroke-dasharray="2px 2px" stroke-width="1" x1="170" x2="260" y1="70" y2="170" />
+		<line stroke="grey" stroke-dasharray="2px 2px" stroke-width="1" x1="170" x2="260" y1="120" y2="295" />
+		<line stroke="grey" stroke-dasharray="2px 2px" stroke-width="1" x1="170" x2="260" y1="120" y2="320" />
+		<line stroke="grey" stroke-dasharray="2px 2px" stroke-width="1" x1="170" x2="260" y1="170" y2="1120" />
+		<line stroke="grey" stroke-dasharray="2px 2px" stroke-width="1" x1="170" x2="260" y1="170" y2="1145" />
+		<line stroke="grey" stroke-dasharray="2px 2px" stroke-width="1" x1="170" x2="260" y1="220" y2="1445" />
+		<line stroke="grey" stroke-dasharray="2px 2px" stroke-width="1" x1="350" x2="440" y1="1070" y2="20" />
+		<line stroke="grey" stroke-dasharray="2px 2px" stroke-width="1" x1="350" x2="440" y1="1095" y2="545" />
+	</g>
+	<!-- 
+	Generated using the Perl SVG Module V2.50
+	by Ronan Oger
+	Info: http://www.roitsystems.com/
+ -->
+</svg>

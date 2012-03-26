@@ -1,0 +1,1189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>SAM3XA SDRAMC</title>
+    <link rel="stylesheet" type="text/css" href="css/html.css" media="all" />
+  </head>
+  <body id="abstract">
+    <div id="container">
+      <div id="content">
+        <a id="SDRAMC"></a>
+        <h1>SAM3XA SDRAMC</h1>
+        <a id="SDRAMC__User_Interface"></a>
+        <h2>SDRAM Controller (SDRAMC) User Interface</h2>
+<!--As per 6100N programmer datasheet.-->
+        <h3>Registers</h3>
+        <table class="registers">
+          <caption>Register Mapping</caption>
+          <thead>
+            <tr>
+              <th class="address">Address</th>
+              <th class="description">Register</th>
+              <th class="name">Name</th>
+              <th class="access">Access</th>
+              <th class="reset">Reset</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="odd">
+              <td class="address" id="address_0x400E0200">0x400E0200</td>
+              <td class="description">SDRAMC Mode Register</td>
+              <td class="name">
+                <a href="#SDRAMC_MR" title="SDRAMC Mode Register" class="one_click_away">SDRAMC_MR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400E0204">0x400E0204</td>
+              <td class="description">SDRAMC Refresh Timer Register</td>
+              <td class="name">
+                <a href="#SDRAMC_TR" title="SDRAMC Refresh Timer Register" class="one_click_away">SDRAMC_TR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400E0208">0x400E0208</td>
+              <td class="description">SDRAMC Configuration Register</td>
+              <td class="name">
+                <a href="#SDRAMC_CR" title="SDRAMC Configuration Register" class="one_click_away">SDRAMC_CR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x852372C0</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400E0210">0x400E0210</td>
+              <td class="description">SDRAMC Low Power Register</td>
+              <td class="name">
+                <a href="#SDRAMC_LPR" title="SDRAMC Low Power Register" class="one_click_away">SDRAMC_LPR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400E0214">0x400E0214</td>
+              <td class="description">SDRAMC Interrupt Enable Register</td>
+              <td class="name">
+                <a href="#SDRAMC_IER" title="SDRAMC Interrupt Enable Register" class="one_click_away">SDRAMC_IER</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400E0218">0x400E0218</td>
+              <td class="description">SDRAMC Interrupt Disable Register</td>
+              <td class="name">
+                <a href="#SDRAMC_IDR" title="SDRAMC Interrupt Disable Register" class="one_click_away">SDRAMC_IDR</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400E021C">0x400E021C</td>
+              <td class="description">SDRAMC Interrupt Mask Register</td>
+              <td class="name">
+                <a href="#SDRAMC_IMR" title="SDRAMC Interrupt Mask Register" class="one_click_away">SDRAMC_IMR</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400E0220">0x400E0220</td>
+              <td class="description">SDRAMC Interrupt Status Register</td>
+              <td class="name">
+                <a href="#SDRAMC_ISR" title="SDRAMC Interrupt Status Register" class="one_click_away">SDRAMC_ISR</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400E0224">0x400E0224</td>
+              <td class="description">SDRAMC Memory Device Register</td>
+              <td class="name">
+                <a href="#SDRAMC_MDR" title="SDRAMC Memory Device Register" class="one_click_away">SDRAMC_MDR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400E0228">0x400E0228</td>
+              <td class="description">SDRAMC Configuration Register 1</td>
+              <td class="name">
+                <a href="#SDRAMC_CR1" title="SDRAMC Configuration Register 1" class="one_click_away">SDRAMC_CR1</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000002</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400E022C">0x400E022C</td>
+              <td class="description">SDRAMC OCMS Register 1</td>
+              <td class="name">
+                <a href="#SDRAMC_OCMS" title="SDRAMC OCMS Register 1" class="one_click_away">SDRAMC_OCMS</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3>Register Fields</h3>
+        <h4 id="SDRAMC_MR">SDRAMC SDRAMC Mode Register</h4>
+        <p><strong>Name</strong>: SDRAMC_MR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400E0200</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="3">
+                <a href="#SDRAMC_MR__MODE" title="SDRAMC Command Mode">MODE</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="SDRAMC_MR__MODE"><strong>MODE</strong>: SDRAMC Command Mode<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">NORMAL</td><td class="description">Normal mode. Any access to the SDRAM is decoded normally. To activate this mode, command must be followed by a write to the SDRAM.</td></tr><tr class="even"><td class="value">0x1</td><td class="name">NOP</td><td class="description">The SDRAM Controller issues a NOP command when the SDRAM device is accessed regardless of the cycle. To activate this mode, command must be followed by a write to the SDRAM.</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">ALLBANKS_PRECHARGE</td><td class="description">The SDRAM Controller issues an "All Banks Precharge" command when the SDRAM device is accessed regardless of the cycle. To activate this mode, command must be followed by a write to the SDRAM.</td></tr><tr class="even"><td class="value">0x3</td><td class="name">LOAD_MODEREG</td><td class="description">The SDRAM Controller issues a "Load Mode Register" command when the SDRAM device is accessed regardless of the cycle. To activate this mode, command must be followed by a write to the SDRAM.</td></tr><tr class="odd"><td class="value">0x4</td><td class="name">AUTO_REFRESH</td><td class="description">The SDRAM Controller issues an "Auto-Refresh" Command when the SDRAM device is accessed regardless of the cycle. Previously, an "All Banks Precharge" command must be issued. To activate this mode, command must be followed by a write to the SDRAM.</td></tr><tr class="even"><td class="value">0x5</td><td class="name">EXT_LOAD_MODEREG</td><td class="description">The SDRAM Controller issues an "Extended Load Mode Register" command when the SDRAM device is accessed regardless of the cycle. To activate this mode, the "Extended Load Mode Register" command must be followed by a write to the SDRAM. The write in the SDRAM must be done in the appropriate bank; most low-power SDRAM devices use the bank 1.</td></tr><tr class="odd"><td class="value">0x6</td><td class="name">DEEP_POWERDOWN</td><td class="description">Deep power-down mode. Enters deep power-down mode.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="SDRAMC_TR">SDRAMC SDRAMC Refresh Timer Register</h4>
+        <p><strong>Name</strong>: SDRAMC_TR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400E0204</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="4">
+                <a href="#SDRAMC_TR__COUNT" title="SDRAMC Refresh Timer Count">COUNT</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#SDRAMC_TR__COUNT" title="SDRAMC Refresh Timer Count">COUNT</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="SDRAMC_TR__COUNT"><strong>COUNT</strong>: SDRAMC Refresh Timer Count</li>
+          <p>-</p>
+        </ul>
+        <h4 id="SDRAMC_CR">SDRAMC SDRAMC Configuration Register</h4>
+        <p><strong>Name</strong>: SDRAMC_CR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400E0208</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="4">
+                <a href="#SDRAMC_CR__TXSR" title="Exit Self Refresh to Active Delay">TXSR</a>
+              </td>
+              <td colspan="4">
+                <a href="#SDRAMC_CR__TRAS" title="Active to Precharge Delay">TRAS</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="4">
+                <a href="#SDRAMC_CR__TRCD" title="Row to Column Delay">TRCD</a>
+              </td>
+              <td colspan="4">
+                <a href="#SDRAMC_CR__TRP" title="Row Precharge Delay">TRP</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="4">
+                <a href="#SDRAMC_CR__TRC_TRFC" title="Row Cycle Delay and Row Refresh Cycle">TRC_TRFC</a>
+              </td>
+              <td colspan="4">
+                <a href="#SDRAMC_CR__TWR" title="Write Recovery Delay">TWR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#SDRAMC_CR__DBW" title="Data Bus Width">DBW</a>
+              </td>
+              <td colspan="2">
+                <a href="#SDRAMC_CR__CAS" title="CAS Latency">CAS</a>
+              </td>
+              <td colspan="1">
+                <a href="#SDRAMC_CR__NB" title="Number of Banks">NB</a>
+              </td>
+              <td colspan="2">
+                <a href="#SDRAMC_CR__NR" title="Number of Row Bits">NR</a>
+              </td>
+              <td colspan="2">
+                <a href="#SDRAMC_CR__NC" title="Number of Column Bits">NC</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="SDRAMC_CR__NC"><strong>NC</strong>: Number of Column Bits<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">COL8</td><td class="description">8 column bits</td></tr><tr class="even"><td class="value">0x1</td><td class="name">COL9</td><td class="description">9 column bits</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">COL10</td><td class="description">10 column bits</td></tr><tr class="even"><td class="value">0x3</td><td class="name">COL11</td><td class="description">11 column bits</td></tr></tbody></table></li>
+          <li id="SDRAMC_CR__NR"><strong>NR</strong>: Number of Row Bits<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">ROW11</td><td class="description">11 row bits</td></tr><tr class="even"><td class="value">0x1</td><td class="name">ROW12</td><td class="description">12 row bits</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">ROW13</td><td class="description">13 row bits</td></tr></tbody></table></li>
+          <li id="SDRAMC_CR__NB"><strong>NB</strong>: Number of Banks<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">BANK2</td><td class="description">2 banks</td></tr><tr class="even"><td class="value">1</td><td class="name">BANK4</td><td class="description">4 banks</td></tr></tbody></table></li>
+          <li id="SDRAMC_CR__CAS"><strong>CAS</strong>: CAS Latency<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x1</td><td class="name">LATENCY1</td><td class="description">1 cycle CAS latency</td></tr><tr class="even"><td class="value">0x2</td><td class="name">LATENCY2</td><td class="description">2 cycle CAS latency</td></tr><tr class="odd"><td class="value">0x3</td><td class="name">LATENCY3</td><td class="description">3 cycle CAS latency</td></tr></tbody></table></li>
+          <li id="SDRAMC_CR__DBW"><strong>DBW</strong>: Data Bus Width</li>
+          <p>-</p>
+          <li id="SDRAMC_CR__TWR"><strong>TWR</strong>: Write Recovery Delay</li>
+          <p>-</p>
+          <li id="SDRAMC_CR__TRC_TRFC"><strong>TRC_TRFC</strong>: Row Cycle Delay and Row Refresh Cycle</li>
+          <p>-</p>
+          <li id="SDRAMC_CR__TRP"><strong>TRP</strong>: Row Precharge Delay</li>
+          <p>-</p>
+          <li id="SDRAMC_CR__TRCD"><strong>TRCD</strong>: Row to Column Delay</li>
+          <p>-</p>
+          <li id="SDRAMC_CR__TRAS"><strong>TRAS</strong>: Active to Precharge Delay</li>
+          <p>-</p>
+          <li id="SDRAMC_CR__TXSR"><strong>TXSR</strong>: Exit Self Refresh to Active Delay</li>
+          <p>-</p>
+        </ul>
+        <h4 id="SDRAMC_LPR">SDRAMC SDRAMC Low Power Register</h4>
+        <p><strong>Name</strong>: SDRAMC_LPR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400E0210</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td colspan="2">
+                <a href="#SDRAMC_LPR__TIMEOUT" title="Time to define when low-power mode is enable">TIMEOUT</a>
+              </td>
+              <td colspan="2">
+                <a href="#SDRAMC_LPR__DS" title="Drive Strength (only for low-power SDRAM)">DS</a>
+              </td>
+              <td colspan="2">
+                <a href="#SDRAMC_LPR__TCSR" title="Temperature Compensated Self-Refresh (only for low-power SDRAM)">TCSR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td colspan="3">
+                <a href="#SDRAMC_LPR__PASR" title="Partial Array Self-refresh (only for low-power SDRAM)">PASR</a>
+              </td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="2">
+                <a href="#SDRAMC_LPR__LPCB" title="Low-power Configuration Bits">LPCB</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="SDRAMC_LPR__LPCB"><strong>LPCB</strong>: Low-power Configuration Bits<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">DISABLED</td><td class="description">Low Power Feature is inhibited: no Power-down, Self-refresh or Deep Power-down command is issued to the SDRAM device.</td></tr><tr class="even"><td class="value">0x1</td><td class="name">SELF_REFRESH</td><td class="description">The SDRAM Controller issues a Self-refresh command to the SDRAM device, the SDCK clock is deactivated and the SDCKE signal is set low. The SDRAM device leaves the Self Refresh Mode when accessed and enters it after the access.</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">POWER_DOWN</td><td class="description">The SDRAM Controller issues a Power-down Command to the SDRAM device after each access, the SDCKE signal is set to low. The SDRAM device leaves the Power-down Mode when accessed and enters it after the access.</td></tr><tr class="even"><td class="value">0x3</td><td class="name">DEEP_POWER_DOWN</td><td class="description">The SDRAM Controller issues a Deep Power-down command to the SDRAM device. This mode is unique to low-power SDRAM.</td></tr></tbody></table></li>
+          <li id="SDRAMC_LPR__PASR"><strong>PASR</strong>: Partial Array Self-refresh (only for low-power SDRAM)</li>
+          <p>-</p>
+          <li id="SDRAMC_LPR__TCSR"><strong>TCSR</strong>: Temperature Compensated Self-Refresh (only for low-power SDRAM)</li>
+          <p>-</p>
+          <li id="SDRAMC_LPR__DS"><strong>DS</strong>: Drive Strength (only for low-power SDRAM)</li>
+          <p>-</p>
+          <li id="SDRAMC_LPR__TIMEOUT"><strong>TIMEOUT</strong>: Time to define when low-power mode is enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">LP_LAST_XFER</td><td class="description">The SDRAM controller activates the SDRAM low-power mode immediately after the end of the last transfer.</td></tr><tr class="even"><td class="value">0x1</td><td class="name">LP_LAST_XFER_64</td><td class="description">The SDRAM controller activates the SDRAM low-power mode 64 clock cycles after the end of the last transfer.</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">LP_LAST_XFER_128</td><td class="description">The SDRAM controller activates the SDRAM low-power mode 128 clock cycles after the end of the last transfer.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="SDRAMC_IER">SDRAMC SDRAMC Interrupt Enable Register</h4>
+        <p><strong>Name</strong>: SDRAMC_IER</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x400E0214</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#SDRAMC_IER__RES" title="Refresh Error Status">RES</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="SDRAMC_IER__RES"><strong>RES</strong>: Refresh Error Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the refresh error interrupt.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="SDRAMC_IDR">SDRAMC SDRAMC Interrupt Disable Register</h4>
+        <p><strong>Name</strong>: SDRAMC_IDR</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x400E0218</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#SDRAMC_IDR__RES" title="Refresh Error Status">RES</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="SDRAMC_IDR__RES"><strong>RES</strong>: Refresh Error Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the refresh error interrupt.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="SDRAMC_IMR">SDRAMC SDRAMC Interrupt Mask Register</h4>
+        <p><strong>Name</strong>: SDRAMC_IMR</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x400E021C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#SDRAMC_IMR__RES" title="Refresh Error Status">RES</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="SDRAMC_IMR__RES"><strong>RES</strong>: Refresh Error Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The refresh error interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The refresh error interrupt is enabled.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="SDRAMC_ISR">SDRAMC SDRAMC Interrupt Status Register</h4>
+        <p><strong>Name</strong>: SDRAMC_ISR</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x400E0220</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#SDRAMC_ISR__RES" title="Refresh Error Status">RES</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="SDRAMC_ISR__RES"><strong>RES</strong>: Refresh Error Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No refresh error has been detected since the register was last read.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">A refresh error has been detected since the register was last read.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="SDRAMC_MDR">SDRAMC SDRAMC Memory Device Register</h4>
+        <p><strong>Name</strong>: SDRAMC_MDR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400E0224</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="2">
+                <a href="#SDRAMC_MDR__MD" title="Memory Device Type">MD</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="SDRAMC_MDR__MD"><strong>MD</strong>: Memory Device Type<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">SDRAM</td><td class="description">SDRAM</td></tr><tr class="even"><td class="value">0x1</td><td class="name">LPSDRAM</td><td class="description">Low-power SDRAM</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="SDRAMC_CR1">SDRAMC SDRAMC Configuration Register 1</h4>
+        <p><strong>Name</strong>: SDRAMC_CR1</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400E0228</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="4">
+                <a href="#SDRAMC_CR1__TXSR" title="Exit Self Refresh to Active Delay">TXSR</a>
+              </td>
+              <td colspan="4">
+                <a href="#SDRAMC_CR1__TRAS" title="Active to Precharge Delay">TRAS</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="4">
+                <a href="#SDRAMC_CR1__TRCD" title="Row to Column Delay">TRCD</a>
+              </td>
+              <td colspan="4">
+                <a href="#SDRAMC_CR1__TRP" title="Row Precharge Delay">TRP</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="4">
+                <a href="#SDRAMC_CR1__TRC_TRFC" title="Row Cycle Delay and Row Refresh Cycle">TRC_TRFC</a>
+              </td>
+              <td colspan="4">
+                <a href="#SDRAMC_CR1__TWR" title="Write Recovery Delay">TWR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#SDRAMC_CR1__DBW" title="Data Bus Width">DBW</a>
+              </td>
+              <td colspan="2">
+                <a href="#SDRAMC_CR1__CAS" title="CAS Latency">CAS</a>
+              </td>
+              <td colspan="1">
+                <a href="#SDRAMC_CR1__NB" title="Number of Banks">NB</a>
+              </td>
+              <td colspan="2">
+                <a href="#SDRAMC_CR1__NR" title="Number of Row Bits">NR</a>
+              </td>
+              <td colspan="2">
+                <a href="#SDRAMC_CR1__NC" title="Number of Column Bits">NC</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="SDRAMC_CR1__NC"><strong>NC</strong>: Number of Column Bits<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">COL8</td><td class="description">8 column bits</td></tr><tr class="even"><td class="value">0x1</td><td class="name">COL9</td><td class="description">9 column bits</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">COL10</td><td class="description">10 column bits</td></tr><tr class="even"><td class="value">0x3</td><td class="name">COL11</td><td class="description">11 column bits</td></tr></tbody></table></li>
+          <li id="SDRAMC_CR1__NR"><strong>NR</strong>: Number of Row Bits<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">ROW11</td><td class="description">11 row bits</td></tr><tr class="even"><td class="value">0x1</td><td class="name">ROW12</td><td class="description">12 row bits</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">ROW13</td><td class="description">13 row bits</td></tr></tbody></table></li>
+          <li id="SDRAMC_CR1__NB"><strong>NB</strong>: Number of Banks<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">BANK2</td><td class="description">2 banks</td></tr><tr class="even"><td class="value">1</td><td class="name">BANK4</td><td class="description">4 banks</td></tr></tbody></table></li>
+          <li id="SDRAMC_CR1__CAS"><strong>CAS</strong>: CAS Latency<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x1</td><td class="name">LATENCY1</td><td class="description">1 cycle CAS latency</td></tr><tr class="even"><td class="value">0x2</td><td class="name">LATENCY2</td><td class="description">2 cycle CAS latency</td></tr><tr class="odd"><td class="value">0x3</td><td class="name">LATENCY3</td><td class="description">3 cycle CAS latency</td></tr></tbody></table></li>
+          <li id="SDRAMC_CR1__DBW"><strong>DBW</strong>: Data Bus Width</li>
+          <p>-</p>
+          <li id="SDRAMC_CR1__TWR"><strong>TWR</strong>: Write Recovery Delay</li>
+          <p>-</p>
+          <li id="SDRAMC_CR1__TRC_TRFC"><strong>TRC_TRFC</strong>: Row Cycle Delay and Row Refresh Cycle</li>
+          <p>-</p>
+          <li id="SDRAMC_CR1__TRP"><strong>TRP</strong>: Row Precharge Delay</li>
+          <p>-</p>
+          <li id="SDRAMC_CR1__TRCD"><strong>TRCD</strong>: Row to Column Delay</li>
+          <p>-</p>
+          <li id="SDRAMC_CR1__TRAS"><strong>TRAS</strong>: Active to Precharge Delay</li>
+          <p>-</p>
+          <li id="SDRAMC_CR1__TXSR"><strong>TXSR</strong>: Exit Self Refresh to Active Delay</li>
+          <p>-</p>
+        </ul>
+        <h4 id="SDRAMC_OCMS">SDRAMC SDRAMC OCMS Register 1</h4>
+        <p><strong>Name</strong>: SDRAMC_OCMS</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400E022C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#SDRAMC_OCMS__SDR_SE" title="SDRAM Memory Controller Scrambling Enable">SDR_SE</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="SDRAMC_OCMS__SDR_SE"><strong>SDR_SE</strong>: SDRAM Memory Controller Scrambling Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Disable "Off Chip" Scrambling for SDR-SDRAM access.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enable "Off Chip" Scrambling for SDR-SDRAM access.</td></tr></tbody></table></li>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>
