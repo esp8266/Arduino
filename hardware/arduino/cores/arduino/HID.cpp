@@ -523,13 +523,10 @@ void Keyboard_::releaseAll(void)
 
 // type() does a press and release of the specified key. 
 size_t Keyboard_::type(uint8_t c)
-{
-	releaseAll();
-	// Keydown
-	press(c);
-	//	Keyup
-	releaseAll();
-	return 1;
+{	
+	uint8_t p = press(c);		// Keydown
+	uint8_t r = release(c);		// Keyup
+	return (p&r);
 }
 
 #endif
