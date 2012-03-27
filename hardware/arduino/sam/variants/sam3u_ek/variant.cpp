@@ -8,7 +8,7 @@
 
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   See the GNU Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser General Public
@@ -23,6 +23,11 @@
  */
 extern const PinDescription g_APinDescription[]=
 {
+  // 0 .. 53 - Digital pins
+  // ----------------------
+  // 0/1 - UART (Serial)
+  { PIOA, PIO_PA8A_URXD,     ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT,  PIN_ATTR_DIGITAL,                 NO_ADC, NO_ADC, NO_PWM,  NO_TC    }, // URXD
+  { PIOA, PIO_PA9A_UTXD,     ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT,  PIN_ATTR_DIGITAL,                 NO_ADC, NO_ADC, NO_PWM,  NO_TC    }, // UTXD
   // LEDS, 0..2
   { PIOB, PIO_PB0, ID_PIOB, PIO_OUTPUT_0, PIO_DEFAULT }, // LED BLUE
   { PIOB, PIO_PB1, ID_PIOB, PIO_OUTPUT_1, PIO_DEFAULT }, // LED GREEN
@@ -77,6 +82,13 @@ extern const PinDescription g_APinDescription[]=
   { PIOB, PIO_PB8, ID_PIOB, PIO_OUTPUT_0, PIO_DEFAULT }, // LCD RS
   { PIOC, PIO_PC19, ID_PIOC, PIO_OUTPUT_0, PIO_DEFAULT }, // LCD BackLight
 
+  // 79 .. 84 - "All pins" masks
+  // 79 - TWI0 all pins
+  { PIOA, PIO_PA17A_TWD0|PIO_PA18A_TWCK0, ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_COMBO), NO_ADC, NO_ADC, NO_PWM, NO_TC },
+  // 81 - UART (Serial) all pins
+  { PIOA, PIO_PA8A_URXD|PIO_PA9A_UTXD, ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_COMBO), NO_ADC, NO_ADC, NO_PWM, NO_TC },
+  // 82 - USART0 (Serial2) all pins
+  { PIOA, PIO_PA11A_TXD0|PIO_PA10A_RXD0, ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_COMBO), NO_ADC, NO_ADC, NO_PWM, NO_TC },
   { NULL, 0, 0, PIO_NOT_A_PIN, PIO_DEFAULT } // END
 } ;
 
@@ -84,54 +96,35 @@ extern const PinDescription g_APinDescription[]=
  * UART objects
  */
 RingBuffer rx_buffer1 ;
-RingBuffer tx_buffer1 ;
 
-UARTClass Serial( UART, UART_IRQn, ID_UART, &rx_buffer1, &tx_buffer1 ) ;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+UARTClass Serial( UART, UART_IRQn, ID_UART, &rx_buffer1 ) ;
 
 // IT handlers
-extern void UART_Handler( void )
+void UART_Handler(void)
 {
   Serial.IrqHandler() ;
 }
-
-#ifdef __cplusplus
-}
-#endif
 
 // ----------------------------------------------------------------------------
 /*
  * USART objects
  */
 RingBuffer rx_buffer2 ;
-RingBuffer tx_buffer2 ;
 RingBuffer rx_buffer3 ;
-RingBuffer tx_buffer3 ;
 
-USARTClass Serial2( USART0, USART0_IRQn, ID_USART0, &rx_buffer2, &tx_buffer2 ) ;
-USARTClass Serial3( USART1, USART1_IRQn, ID_USART1, &rx_buffer3, &tx_buffer3 ) ;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+USARTClass Serial2( USART0, USART0_IRQn, ID_USART0, &rx_buffer2 ) ;
+USARTClass Serial3( USART1, USART1_IRQn, ID_USART1, &rx_buffer3 ) ;
 
 // IT handlers
-extern void USART0_Handler( void )
+void USART0_Handler( void )
 {
   Serial2.IrqHandler() ;
 }
 
-extern void USART1_Handler( void )
+void USART1_Handler( void )
 {
   Serial3.IrqHandler() ;
 }
-
-#ifdef __cplusplus
-}
-#endif
 
 // ----------------------------------------------------------------------------
 
@@ -139,31 +132,68 @@ extern void USART1_Handler( void )
 extern "C" {
 #endif
 
+// Should be made in a better way...
+extern void analogOutputInit(void);
+
 /**
  *
  */
 extern void init( void )
 {
-	SystemInit() ;
+  SystemInit() ;
 
-    /* Set Systick to 1ms interval, common to all SAM3 variants */
-	if ( SysTick_Config( SystemCoreClock / 1000 ) )
+  // Set Systick to 1ms interval, common to all SAM3 variants
+  if ( SysTick_Config( SystemCoreClock / 1000 ) )
   {
-    /* Capture error */
+    // Capture error
     while ( 1 ) ;
-	}
+  }
 
-  /* Disable watchdog, common to all SAM variants */
+  // Disable watchdog, common to all SAM variants
   WDT_Disable( WDT ) ;
 
-  // Initialize UART Serial port 
-  PIO_Configure( g_APinDescription[PINS_UART].pPort, g_APinDescription[PINS_UART].ulPinType,
-                 g_APinDescription[PINS_UART].ulPin, g_APinDescription[PINS_UART].ulPinConfiguration ) ;
+  // Initialize Serial port UART, common to all SAM3 variants
+  PIO_Configure(
+    g_APinDescription[PINS_UART].pPort,
+    g_APinDescription[PINS_UART].ulPinType,
+    g_APinDescription[PINS_UART].ulPin,
+    g_APinDescription[PINS_UART].ulPinConfiguration);
+
+  // Initialize Serial ports USART
+  PIO_Configure(
+    g_APinDescription[PINS_USART0].pPort,
+    g_APinDescription[PINS_USART0].ulPinType,
+    g_APinDescription[PINS_USART0].ulPin,
+    g_APinDescription[PINS_USART0].ulPinConfiguration);
+  PIO_Configure(
+    g_APinDescription[PINS_USART1].pPort,
+    g_APinDescription[PINS_USART1].ulPinType,
+    g_APinDescription[PINS_USART1].ulPin,
+    g_APinDescription[PINS_USART1].ulPinConfiguration);
 
   // Switch off Power LED
   PIO_Configure( g_APinDescription[PIN_LED_RED].pPort, g_APinDescription[PIN_LED_RED].ulPinType,
                  g_APinDescription[PIN_LED_RED].ulPin, g_APinDescription[PIN_LED_RED].ulPinConfiguration ) ;
   PIO_Clear( g_APinDescription[PIN_LED_RED].pPort, g_APinDescription[PIN_LED_RED].ulPin ) ;
+
+  // Initialize 10bit Analog Controller
+  PMC_EnablePeripheral( ID_ADC ) ;
+  adc_init( ADC, SystemCoreClock, ADC_FREQ_MAX, ADC_STARTUP ) ;
+  adc_configure_timing( ADC, 15 ) ;
+  adc_configure_trigger( ADC, ADC_TRIG_SW ) ;
+  adc_disable_interrupt( ADC, 0xFFFFFFFF ) ; /* Disable all adc interrupt. */
+  adc_disable_channel( ADC, ADC_ALL_CHANNEL ) ;
+
+  // Initialize 12bit Analog Controller
+  PMC_EnablePeripheral( ID_ADC12B ) ;
+  adc12_init( ADC12B, SystemCoreClock, ADC12_FREQ_MAX, ADC12_STARTUP_FAST, 1 ) ;
+  adc12_configure_timing( ADC12B, 15 ) ;
+  adc12_configure_trigger( ADC12B, ADC_TRIG_SW ) ;
+  adc12_disable_interrupt( ADC12B, 0xFFFFFFFF ) ; /* Disable all adc interrupt. */
+  adc12_disable_channel( ADC12B, ADC_ALL_CHANNEL ) ;
+
+  // Initialize analogOutput module
+  analogOutputInit();
 }
 #ifdef __cplusplus
 }

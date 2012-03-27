@@ -8,7 +8,7 @@
 #
 #  This library is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #  See the GNU Lesser General Public License for more details.
 #
 #  You should have received a copy of the GNU Lesser General Public
@@ -17,7 +17,6 @@
 #
 
 # Tool suffix when cross-compiling
-#CROSS_COMPILE = ../../../../tools/CodeSourcery_arm/bin/arm-none-eabi-
 CROSS_COMPILE = $(ARM_GCC_TOOLCHAIN)/arm-none-eabi-
 
 # Compilation tools
@@ -25,11 +24,13 @@ AR = $(CROSS_COMPILE)ar
 CC = $(CROSS_COMPILE)gcc
 CXX = $(CROSS_COMPILE)g++
 AS = $(CROSS_COMPILE)as
-#LD = $(CROSS_COMPILE)ld
-#SIZE = $(CROSS_COMPILE)size
 NM = $(CROSS_COMPILE)nm
-#OBJCOPY = $(CROSS_COMPILE)objcopy
+ifeq ($(OS),Windows_NT)
 RM=cs-rm -Rf
+else
+RM=rm -Rf
+endif
+
 SEP=\\
 
 # ---------------------------------------------------------------------------------------
@@ -49,7 +50,7 @@ CFLAGS += -Wcast-align
 #CFLAGS += -Wmissing-noreturn
 #CFLAGS += -Wconversion
 
-CFLAGS += --param max-inline-insns-single=500 -mcpu=cortex-m3 -mthumb -mlong-calls -ffunction-sections -nostdlib 
+CFLAGS += --param max-inline-insns-single=500 -mcpu=cortex-m3 -mthumb -mlong-calls -ffunction-sections -nostdlib -std=c99
 CFLAGS += $(OPTIMIZATION) $(INCLUDES) -D$(CHIP) -D$(VARIANT)
 
 # To reduce application size use only integer printf function.
@@ -69,8 +70,7 @@ CPPFLAGS += -Wpacked -Wredundant-decls -Winline -Wlong-long
 #CPPFLAGS += -Wmissing-noreturn
 #CPPFLAGS += -Wconversion
 
-# -fno-rtti -fno-exceptions
-CPPFLAGS += --param max-inline-insns-single=500 -mcpu=cortex-m3 -mthumb -mlong-calls -ffunction-sections
+CPPFLAGS += --param max-inline-insns-single=500 -mcpu=cortex-m3 -mthumb -mlong-calls -ffunction-sections -fno-rtti -fno-exceptions -std=c++98
 CPPFLAGS += $(OPTIMIZATION) $(INCLUDES) -D$(CHIP)
 
 # To reduce application size use only integer printf function.

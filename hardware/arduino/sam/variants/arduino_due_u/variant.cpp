@@ -8,7 +8,7 @@
 
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   See the GNU Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser General Public
@@ -356,15 +356,15 @@ extern void init( void )
   PMC_EnablePeripheral( ID_ADC ) ;
   adc_init( ADC, SystemCoreClock, ADC_FREQ_MAX, ADC_STARTUP ) ;
   adc_configure_timing( ADC, 15 ) ;
-  adc_configure_trigger( ADC, ADC_TRIG_SW ) ;	
-  adc_disable_interrupt( ADC, 0xFFFFFFFF ) ; /* Disable all adc interrupt. */	
+  adc_configure_trigger( ADC, ADC_TRIG_SW ) ;
+  adc_disable_interrupt( ADC, 0xFFFFFFFF ) ; /* Disable all adc interrupt. */
   adc_disable_channel( ADC, ADC_ALL_CHANNEL ) ;
 
   // Initialize 12bit Analog Controller
   PMC_EnablePeripheral( ID_ADC12B ) ;
   adc12_init( ADC12B, SystemCoreClock, ADC12_FREQ_MAX, ADC12_STARTUP_FAST, 1 ) ;
   adc12_configure_timing( ADC12B, 15 ) ;
-  adc12_configure_trigger( ADC12B, ADC_TRIG_SW ) ;	
+  adc12_configure_trigger( ADC12B, ADC_TRIG_SW ) ;
   adc12_disable_interrupt( ADC12B, 0xFFFFFFFF ) ; /* Disable all adc interrupt. */
   adc12_disable_channel( ADC12B, ADC_ALL_CHANNEL ) ;
 
