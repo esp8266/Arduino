@@ -1,3 +1,4 @@
+
 /*
   ButtonMouseControl
  
@@ -14,6 +15,7 @@
  over your mouse!  Make sure you have control before you use the mouse commands.
  
  created 15 Mar 2012
+ modified 27 Mar 2012
  by Tom Igoe
  
  this code is in the public domain
@@ -38,6 +40,8 @@ void setup() {
   pinMode(leftButton, INPUT);       
   pinMode(rightButton, INPUT);       
   pinMode(mouseButton, INPUT);
+  // initialize mouse control:
+  Mouse.begin();
 }
 
 void loop() {

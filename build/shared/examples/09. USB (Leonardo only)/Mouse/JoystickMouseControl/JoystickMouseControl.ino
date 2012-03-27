@@ -21,7 +21,7 @@
  you can turn on and off mouse control.
  
  created 15 Sept 2011
- updated 15 Mar 2012
+ updated 27 Mar 2012
  by Tom Igoe
  
  this code is in the public domain
@@ -67,13 +67,15 @@ void loop() {
   int xReading = readAxis(A0);
   int yReading = readAxis(A1);
 
+  // take control of the mouse:
+  Mouse.begin();
   // if the mouse control state is active, move the mouse:
   if (mouseIsActive) {
     Mouse.move(xReading, yReading, 0);
   }  
-  
+
   // read the mouse button and click or not click:
-   // if the mouse button is pressed:
+  // if the mouse button is pressed:
   if (digitalRead(mouseButton) == HIGH) {
     // if the mouse is not pressed, press it:
     if (!Mouse.isPressed(MOUSE_LEFT)) {
@@ -87,7 +89,7 @@ void loop() {
       Mouse.release(MOUSE_LEFT); 
     }
   }
-  
+
   delay(responseDelay);
 }
 
@@ -106,7 +108,7 @@ int readAxis(int thisAxis) {
   // if the output reading is outside from the
   // rest position threshold,  use it:
   int distance = reading - center;
-  
+
   if (abs(distance) < threshold) {
     distance = 0;
   } 
@@ -114,5 +116,6 @@ int readAxis(int thisAxis) {
   // return the distance for this axis:
   return distance;
 }
+
 
 

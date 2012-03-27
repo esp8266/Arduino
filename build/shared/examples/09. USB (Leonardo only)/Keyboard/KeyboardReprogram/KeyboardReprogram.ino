@@ -15,6 +15,7 @@
  * wire to connect D2 to ground.
  
  created 5 Mar 2012
+ modified 27 Mar 2012
  by Tom Igoe
  
  This example is in the public domain
@@ -33,6 +34,8 @@ void setup() {
   // pullup resistor so it goes high unless
   // connected to ground:
   pinMode(2, INPUT_PULLUP);
+  // initialize control over the keyboard:
+  Keyboard.begin();
 }
 
 void loop() {

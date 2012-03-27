@@ -9,6 +9,7 @@
  * none
  
  created 21 Oct 2011
+ modified 27 Mar 2012
  by Tom Igoe
  
 This example code is in the public domain.
@@ -19,6 +20,8 @@ This example code is in the public domain.
 void setup() {
   // open the serial port:
 Serial.begin(9600);
+  // initialize control over the keyboard:
+  Keyboard.begin();
 }
 
 void loop() {

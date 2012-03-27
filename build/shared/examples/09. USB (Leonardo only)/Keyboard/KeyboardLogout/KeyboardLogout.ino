@@ -17,6 +17,7 @@
  * wire to connect D2 to ground.
  
  created 6 Mar 2012
+ modified 27 Mar 2012
  by Tom Igoe
  
  This example is in the public domain
@@ -36,6 +37,7 @@ void setup() {
   // pullup resistor so it goes high unless
   // connected to ground:
   pinMode(2, INPUT_PULLUP);
+  Keyboard.begin();
 }
  
 void loop() {
@@ -54,7 +56,7 @@ void loop() {
     delay(100);
     Keyboard.releaseAll();
      // enter:
-    Keyboard.type(KEY_RETURN);  
+    Keyboard.write(KEY_RETURN);  
     break;
   case WINDOWS:
     // CTRL-ALT-DEL:
@@ -77,7 +79,7 @@ void loop() {
     delay(1000);
     Keyboard.releaseAll();
     // Enter to confirm logout:
-    Keyboard.type(KEY_RETURN);
+    Keyboard.write(KEY_RETURN);
     break;
   }
 // do nothing:
