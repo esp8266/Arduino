@@ -48,7 +48,7 @@ extern "C" {
 /**INDENT-ON**/
 /// @endcond
 
-#if SAM3U
+#if SAM3U_SERIES
 
 /**
  * \brief Initializes the given ADC with the specified ADC clock and startup time.
@@ -73,8 +73,6 @@ uint32_t adc12_init(Adc12b *p_adc, uint32_t ul_mck, uint32_t ul_adc_clock, uint3
     p_adc->ADC12B_PTCR = (ADC12B_PTCR_RXTDIS | ADC12B_PTCR_TXTDIS);
     p_adc->ADC12B_RCR = 0;
     p_adc->ADC12B_RNCR = 0;
-    p_adc->ADC12B_TCR = 0;
-    p_adc->ADC12B_TNCR = 0;		
     uint32_t prescal = ul_mck/(2 * ul_adc_clock) - 1;
     // check for rounding errors
     if ( (ul_mck/((prescal+1)*2)) > ul_adc_clock ) {
@@ -376,4 +374,4 @@ Pdc *adc12_get_pdc_base(Adc12b *p_adc)
 /**INDENT-ON**/
 /// @endcond
 
-#endif /* SAM3U */
+#endif /* SAM3U_SERIES */

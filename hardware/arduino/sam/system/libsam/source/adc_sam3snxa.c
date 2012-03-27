@@ -268,7 +268,7 @@ void adc_disable_channel(Adc *p_adc, adc_channel_num_t adc_ch)
  * \retval 1 means the specified channel is enabled.
  *         0 means the specified channel is disabled.
  */
-uint32_t adc_get_channnel_status(Adc *p_adc, adc_channel_num_t adc_ch)
+uint32_t adc_get_channel_status(Adc *p_adc, adc_channel_num_t adc_ch)
 {
     return p_adc->ADC_CHSR & (1 << adc_ch);
 }
@@ -672,6 +672,7 @@ uint32_t adc_get_writeprotect_status(Adc *p_adc)
     return p_adc->ADC_WPSR & ADC_WPSR_WPVS;
 }
 
+#if 0
 /**
  * \brief calcul_startup
  */
@@ -715,7 +716,6 @@ static uint32_t calcul_startup( uint32_t ul_startup )
     return ul_startup_value;
 }
 
-#if 0
 /**
  * \brief Checks ADC configurations.
  *
