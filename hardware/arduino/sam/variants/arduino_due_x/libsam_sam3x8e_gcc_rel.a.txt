@@ -1,0 +1,251 @@
+
+adc10_sam3u.o:
+
+adc12_sam3u.o:
+
+adc_sam3snxa.o:
+
+pio.o:
+00000000 T PIO_Clear
+00000000 T PIO_Configure
+00000000 T PIO_DisableInterrupt
+00000000 T PIO_Get
+00000000 T PIO_GetOutputDataStatus
+00000000 T PIO_PullUp
+00000000 T PIO_Set
+00000000 T PIO_SetDebounceFilter
+00000000 T PIO_SetInput
+00000000 T PIO_SetOutput
+00000000 T PIO_SetPeripheral
+
+pmc.o:
+00000000 T PMC_DisablePeripheral
+00000000 T PMC_EnablePeripheral
+00000000 T PMC_IsPeripheralEnabled
+00000000 r __FUNCTION__.5784
+00000015 r __FUNCTION__.5788
+0000002b r __FUNCTION__.5792
+         U __assert_func
+
+pwmc.o:
+00000000 r C.9.6997
+00000000 t FindClockConfiguration
+00000000 T PWMC_ConfigureChannel
+00000000 T PWMC_ConfigureChannelExt
+00000000 T PWMC_ConfigureClocks
+00000000 T PWMC_ConfigureComparisonUnit
+00000000 T PWMC_ConfigureEventLineMode
+00000000 T PWMC_ConfigureSyncChannel
+00000000 T PWMC_DisableChannel
+00000000 T PWMC_DisableChannelIt
+00000000 T PWMC_DisableIt
+00000000 T PWMC_DisableOverrideOutput
+00000000 T PWMC_EnableChannel
+00000000 T PWMC_EnableChannelIt
+00000000 T PWMC_EnableFaultProtection
+00000000 T PWMC_EnableIt
+00000000 T PWMC_EnableOverrideOutput
+00000000 T PWMC_FaultClear
+00000000 T PWMC_SetDeadTime
+00000000 T PWMC_SetDutyCycle
+00000000 T PWMC_SetFaultMode
+00000000 T PWMC_SetFaultProtectionValue
+00000000 T PWMC_SetOverrideValue
+00000000 T PWMC_SetPeriod
+00000000 T PWMC_SetSyncChannelUpdatePeriod
+00000000 T PWMC_SetSyncChannelUpdateUnlock
+00000000 T PWMC_WriteBuffer
+0000002c r __FUNCTION__.5788
+00000043 r __FUNCTION__.5799
+00000059 r __FUNCTION__.5814
+00000072 r __FUNCTION__.5825
+00000087 r __FUNCTION__.5836
+00000099 r __FUNCTION__.5843
+000000aa r __FUNCTION__.5927
+000000c7 r __FUNCTION__.5933
+         U __assert_func
+
+rtc.o:
+00000000 T RTC_ClearSCCR
+00000000 T RTC_DisableIt
+00000000 T RTC_EnableIt
+00000000 T RTC_GetDate
+00000000 T RTC_GetHourMode
+00000000 T RTC_GetSR
+00000000 T RTC_GetTime
+00000000 T RTC_SetDate
+00000000 T RTC_SetDateAlarm
+00000000 T RTC_SetHourMode
+00000000 T RTC_SetTime
+00000000 T RTC_SetTimeAlarm
+00000000 r __FUNCTION__.5785
+00000010 r __FUNCTION__.5794
+0000001d r __FUNCTION__.5799
+         U __assert_func
+
+rtt.o:
+00000000 T RTT_EnableIT
+00000000 T RTT_GetStatus
+00000000 T RTT_GetTime
+00000000 T RTT_SetAlarm
+00000000 T RTT_SetPrescaler
+00000000 r __FUNCTION__.5792
+0000000d r __FUNCTION__.5800
+         U __assert_func
+
+spi.o:
+         U PMC_EnablePeripheral
+00000000 T SPI_Configure
+00000000 T SPI_ConfigureNPCS
+00000000 T SPI_Disable
+00000000 T SPI_DisableIt
+00000000 T SPI_Enable
+00000000 T SPI_EnableIt
+00000000 T SPI_GetStatus
+00000000 T SPI_IsFinished
+00000000 T SPI_Read
+00000000 T SPI_Write
+
+tc.o:
+00000000 T TC_Configure
+00000000 T TC_FindMckDivisor
+00000000 T TC_Start
+00000000 T TC_Stop
+00000000 r __FUNCTION__.5787
+0000000d r __FUNCTION__.5793
+00000016 r __FUNCTION__.5799
+         U __assert_func
+
+timetick.o:
+00000000 T GetTickCount
+00000000 T Sleep
+00000000 T TimeTick_Configure
+00000000 T TimeTick_Increment
+00000000 T Wait
+00000000 b _dwTickCount
+
+twi.o:
+00000000 T TWI_ByteReceived
+00000000 T TWI_ByteSent
+00000000 T TWI_ConfigureMaster
+00000000 T TWI_ConfigureSlave
+00000000 T TWI_DisableIt
+00000000 T TWI_EnableIt
+00000000 T TWI_GetMaskedStatus
+00000000 T TWI_GetStatus
+00000000 T TWI_ReadByte
+00000000 T TWI_SendSTOPCondition
+00000000 T TWI_StartRead
+00000000 T TWI_StartWrite
+00000000 T TWI_Stop
+00000000 T TWI_TransferComplete
+00000000 T TWI_WriteByte
+00000000 r __FUNCTION__.6370
+00000014 r __FUNCTION__.6385
+00000027 r __FUNCTION__.6389
+00000030 r __FUNCTION__.6396
+0000003e r __FUNCTION__.6400
+0000004b r __FUNCTION__.6405
+00000059 r __FUNCTION__.6413
+00000068 r __FUNCTION__.6427
+00000075 r __FUNCTION__.6432
+00000083 r __FUNCTION__.6436
+00000091 r __FUNCTION__.6441
+000000a5 r __FUNCTION__.6445
+         U __assert_func
+
+usart.o:
+00000000 T USART_Configure
+00000000 T USART_DisableIt
+00000000 T USART_EnableIt
+00000000 T USART_GetChar
+00000000 T USART_GetStatus
+00000000 T USART_IsDataAvailable
+00000000 T USART_IsRxReady
+00000000 T USART_PutChar
+00000000 T USART_Read
+00000000 T USART_ReadBuffer
+00000000 T USART_SetIrdaFilter
+00000000 T USART_SetReceiverEnabled
+00000000 T USART_SetTransmitterEnabled
+00000000 T USART_Write
+00000000 T USART_WriteBuffer
+00000000 r __FUNCTION__.6169
+         U __assert_func
+
+wdt.o:
+00000000 T WDT_Disable
+00000000 T WDT_Enable
+00000000 T WDT_GetPeriod
+00000000 T WDT_GetStatus
+00000000 T WDT_Restart
+
+system_sam3xa.o:
+00000000 D SystemCoreClock
+00000000 T SystemCoreClockUpdate
+00000000 T SystemInit
+00000000 T system_init_flash
+
+startup_sam3xa.o:
+00000000 W ADC_Handler
+00000000 W BusFault_Handler
+00000000 W CAN0_Handler
+00000000 W CAN1_Handler
+00000000 W DACC_Handler
+00000000 W DMAC_Handler
+00000000 W DebugMon_Handler
+00000000 T Dummy_Handler
+00000000 W EFC0_Handler
+00000000 W EFC1_Handler
+00000000 W EMAC_Handler
+00000000 W HSMCI_Handler
+00000000 W HardFault_Handler
+00000000 W MemManage_Handler
+00000000 W NMI_Handler
+00000000 W PIOA_Handler
+00000000 W PIOB_Handler
+00000000 W PIOC_Handler
+00000000 W PIOD_Handler
+00000000 W PMC_Handler
+00000000 W PWM_Handler
+00000000 W PendSV_Handler
+00000000 W RSTC_Handler
+00000000 W RTC_Handler
+00000000 W RTT_Handler
+00000000 T Reset_Handler
+00000000 W SMC_Handler
+00000000 W SPI0_Handler
+00000000 W SSC_Handler
+00000000 W SUPC_Handler
+00000000 W SVC_Handler
+00000000 W SysTick_Handler
+00000000 W TC0_Handler
+00000000 W TC1_Handler
+00000000 W TC2_Handler
+00000000 W TC3_Handler
+00000000 W TC4_Handler
+00000000 W TC5_Handler
+00000000 W TC6_Handler
+00000000 W TC7_Handler
+00000000 W TC8_Handler
+00000000 W TRNG_Handler
+00000000 W TWI0_Handler
+00000000 W TWI1_Handler
+00000000 W UART_Handler
+00000000 W UOTGHS_Handler
+00000000 W USART0_Handler
+00000000 W USART1_Handler
+00000000 W USART2_Handler
+00000000 W USART3_Handler
+00000000 W UsageFault_Handler
+00000000 W WDT_Handler
+         U __libc_init_array
+         U _erelocate
+         U _estack
+         U _etext
+         U _ezero
+         U _sfixed
+         U _srelocate
+         U _szero
+00000000 R exception_table
+         U main
