@@ -146,12 +146,12 @@ extern "C" {
 #endif
 
 // IT handlers
-extern void UART0_IrqHandler( void )
+extern void UART0_Handler( void )
 {
   Serial.IrqHandler() ;
 }
 
-extern void UART1_IrqHandler( void )
+extern void UART1_Handler( void )
 {
   Serial2.IrqHandler() ;
 }
@@ -177,12 +177,12 @@ extern "C" {
 #endif
 
 // IT handlers
-extern void USART0_IrqHandler( void )
+extern void USART0_Handler( void )
 {
   Serial3.IrqHandler() ;
 }
 
-extern void USART1_IrqHandler( void )
+extern void USART1_Handler( void )
 {
   Serial4.IrqHandler() ;
 }

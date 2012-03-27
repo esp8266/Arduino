@@ -269,7 +269,7 @@ RingBuffer rx_buffer1 ;
 UARTClass Serial( UART, UART_IRQn, ID_UART, &rx_buffer1 ) ;
 
 // IT handlers
-void UART_IrqHandler(void)
+void UART_Handler(void)
 {
   Serial.IrqHandler() ;
 }
@@ -287,17 +287,17 @@ USARTClass Serial3( USART1, USART1_IRQn, ID_USART1, &rx_buffer3 ) ;
 USARTClass Serial4( USART2, USART2_IRQn, ID_USART2, &rx_buffer4 ) ;
 
 // IT handlers
-void USART0_IrqHandler( void )
+void USART0_Handler( void )
 {
   Serial2.IrqHandler() ;
 }
 
-void USART1_IrqHandler( void )
+void USART1_Handler( void )
 {
   Serial3.IrqHandler() ;
 }
 
-void USART2_IrqHandler( void )
+void USART2_Handler( void )
 {
   Serial4.IrqHandler() ;
 }
