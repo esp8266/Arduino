@@ -62,6 +62,7 @@ void loop() {
   Keyboard.print("delay(3000);");
   // 3000 ms is too long. Delete it:
   for (int keystrokes=0; keystrokes < 6; keystrokes++) {
+    delay(500);
     Keyboard.type(KEY_BACKSPACE); 
   }
   // make it 1000 instead:
