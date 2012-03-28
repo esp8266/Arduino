@@ -591,8 +591,7 @@ void Keyboard_::releaseAll(void)
 	sendReport(&_keyReport);
 }
 
-// type() does a press and release of the specified key. 
-size_t Keyboard_::type(uint8_t c)
+size_t Keyboard_::write(uint8_t c)
 {	
 	uint8_t p = press(c);		// Keydown
 	uint8_t r = release(c);		// Keyup

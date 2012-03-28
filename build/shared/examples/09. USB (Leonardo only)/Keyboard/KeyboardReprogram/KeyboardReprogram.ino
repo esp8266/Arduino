@@ -15,7 +15,7 @@
  * wire to connect D2 to ground.
  
  created 5 Mar 2012
- modified 27 Mar 2012
+ modified 28 Mar 2012
  by Tom Igoe
  
  This example is in the public domain
@@ -63,7 +63,7 @@ void loop() {
   // 3000 ms is too long. Delete it:
   for (int keystrokes=0; keystrokes < 6; keystrokes++) {
     delay(500);
-    Keyboard.type(KEY_BACKSPACE); 
+    Keyboard.write(KEY_BACKSPACE); 
   }
   // make it 1000 instead:
   Keyboard.println("1000);");
