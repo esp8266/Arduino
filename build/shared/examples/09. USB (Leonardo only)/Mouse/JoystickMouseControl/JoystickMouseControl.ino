@@ -21,7 +21,7 @@
  you can turn on and off mouse control.
  
  created 15 Sept 2011
- updated 27 Mar 2012
+ updated 28 Mar 2012
  by Tom Igoe
  
  this code is in the public domain
@@ -47,6 +47,8 @@ int lastSwitchState = LOW;        // previous switch state
 void setup() {
   pinMode(switchPin, INPUT);       // the switch pin
   pinMode(ledPin, OUTPUT);         // the LED pin  
+ // take control of the mouse:
+  Mouse.begin();
 }
 
 void loop() {
@@ -67,8 +69,6 @@ void loop() {
   int xReading = readAxis(A0);
   int yReading = readAxis(A1);
 
-  // take control of the mouse:
-  Mouse.begin();
   // if the mouse control state is active, move the mouse:
   if (mouseIsActive) {
     Mouse.move(xReading, yReading, 0);
