@@ -435,7 +435,7 @@ size_t Keyboard_::press(uint8_t k)
 			setWriteError();
 			return 0;
 		}
-		if (k & 0x80) {
+		if (k & 0x80) {						// it's a capital letter or other character reached with shift
 			_keyReport.modifiers |= 0x02;	// the left shift modifier
 			k &= 0x7F;
 		}
@@ -478,22 +478,20 @@ size_t Keyboard_::release(uint8_t k)
 		if (!k) {
 			return 0;
 		}
-		if (k & 0x80) {
+		if (k & 0x80) {							// it's a capital letter or other character reached with shift
 			_keyReport.modifiers &= ~(0x02);	// the left shift modifier
 			k &= 0x7F;
 		}
 	}
 	
 	// Test the key report to see if k is present.  Clear it if it exists.
+	// Check all positions in case the key is present more than once (which it shouldn't be)
 	for (i=0; i<6; i++) {
-		if (_keyReport.keys[i] == k) {
+		if (0 != k && _keyReport.keys[i] == k) {
 			_keyReport.keys[i] = 0x00;
-			break;
 		}
 	}
-	if (i == 6) {
-		return 0;
-	}
+
 	sendReport(&_keyReport);
 	return 1;
 }
@@ -514,7 +512,7 @@ size_t Keyboard_::write(uint8_t c)
 {	
 	uint8_t p = press(c);		// Keydown
 	uint8_t r = release(c);		// Keyup
-	return (p&r);
+	return (p);					// just return the result of press() since release() almost always returns 1
 }
 
 #endif
