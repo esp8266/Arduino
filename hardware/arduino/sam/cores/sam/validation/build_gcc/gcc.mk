@@ -30,7 +30,13 @@ GDB = $(CROSS_COMPILE)gdb
 SIZE = $(CROSS_COMPILE)size
 NM = $(CROSS_COMPILE)nm
 OBJCOPY = $(CROSS_COMPILE)objcopy
+
+ifeq ($(OS),Windows_NT)
 RM=cs-rm -Rf
+else
+RM=rm -Rf
+endif
+
 SEP=\\
 
 # ---------------------------------------------------------------------------------------
@@ -48,7 +54,7 @@ CFLAGS += -Wpacked -Wredundant-decls -Wnested-externs -Winline -Wlong-long
 CFLAGS += -Wunreachable-code
 CFLAGS += -Wcast-align
 
-CFLAGS += --param max-inline-insns-single=500 -mcpu=cortex-m3 -mthumb -mlong-calls -ffunction-sections -nostdlib 
+CFLAGS += --param max-inline-insns-single=500 -mcpu=cortex-m3 -mthumb -mlong-calls -ffunction-sections -nostdlib -std=c99
 CFLAGS += $(OPTIMIZATION) $(INCLUDES) -D$(CHIP) -D$(VARIANT)
 
 # To reduce application size use only integer printf function.
@@ -67,7 +73,7 @@ CPPFLAGS += -Wformat -Wmissing-format-attribute -Wno-deprecated-declarations
 CPPFLAGS += -Wpacked -Wredundant-decls -Winline -Wlong-long
 
 #-fno-rtti -fno-exceptions
-CPPFLAGS += --param max-inline-insns-single=500 -mcpu=cortex-m3 -mthumb -mlong-calls -ffunction-sections 
+CPPFLAGS += --param max-inline-insns-single=500 -mcpu=cortex-m3 -mthumb -mlong-calls -ffunction-sections -std=c++98
 CPPFLAGS += $(OPTIMIZATION) $(INCLUDES) -D$(CHIP)
 
 # To reduce application size use only integer printf function.

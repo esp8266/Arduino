@@ -68,13 +68,9 @@ typedef struct {
   WoReg     UDPHS_EPTRST;     /**< \brief (Udphs Offset: 0x1C) UDPHS Endpoints Reset Register */
   RoReg     Reserved2[48];
   RwReg     UDPHS_TST;        /**< \brief (Udphs Offset: 0xE0) UDPHS Test Register */
-  RoReg     Reserved3[3];
-  RoReg     UDPHS_IPNAME1;    /**< \brief (Udphs Offset: 0xF0) UDPHS Name1 Register */
-  RoReg     UDPHS_IPNAME2;    /**< \brief (Udphs Offset: 0xF4) UDPHS Name2 Register */
-  RoReg     UDPHS_IPFEATURES; /**< \brief (Udphs Offset: 0xF8) UDPHS Features Register */
-  RoReg     Reserved4[1];
+  RoReg     Reserved3[7];
   UdphsEpt  UDPHS_EPT[UDPHSEPT_NUMBER]; /**< \brief (Udphs Offset: 0x100) endpoint = 0 .. 6 */
-  RoReg     Reserved5[72];
+  RoReg     Reserved4[72];
   UdphsDma  UDPHS_DMA[UDPHSDMA_NUMBER]; /**< \brief (Udphs Offset: 0x300) channel = 0 .. 5 */
 } Udphs;
 #endif /* !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
@@ -162,39 +158,6 @@ typedef struct {
 #define UDPHS_TST_TST_K (0x1u << 3) /**< \brief (UDPHS_TST) Test K Mode */
 #define UDPHS_TST_TST_PKT (0x1u << 4) /**< \brief (UDPHS_TST) Test Packet Mode */
 #define UDPHS_TST_OPMODE2 (0x1u << 5) /**< \brief (UDPHS_TST) OpMode2 */
-/* -------- UDPHS_IPNAME1 : (UDPHS Offset: 0xF0) UDPHS Name1 Register -------- */
-#define UDPHS_IPNAME1_IP_NAME1_Pos 0
-#define UDPHS_IPNAME1_IP_NAME1_Msk (0xffffffffu << UDPHS_IPNAME1_IP_NAME1_Pos) /**< \brief (UDPHS_IPNAME1)  */
-/* -------- UDPHS_IPNAME2 : (UDPHS Offset: 0xF4) UDPHS Name2 Register -------- */
-#define UDPHS_IPNAME2_IP_NAME2_Pos 0
-#define UDPHS_IPNAME2_IP_NAME2_Msk (0xffffffffu << UDPHS_IPNAME2_IP_NAME2_Pos) /**< \brief (UDPHS_IPNAME2)  */
-/* -------- UDPHS_IPFEATURES : (UDPHS Offset: 0xF8) UDPHS Features Register -------- */
-#define UDPHS_IPFEATURES_EPT_NBR_MAX_Pos 0
-#define UDPHS_IPFEATURES_EPT_NBR_MAX_Msk (0xfu << UDPHS_IPFEATURES_EPT_NBR_MAX_Pos) /**< \brief (UDPHS_IPFEATURES) Max Number of Endpoints */
-#define UDPHS_IPFEATURES_DMA_CHANNEL_NBR_Pos 4
-#define UDPHS_IPFEATURES_DMA_CHANNEL_NBR_Msk (0x7u << UDPHS_IPFEATURES_DMA_CHANNEL_NBR_Pos) /**< \brief (UDPHS_IPFEATURES) Number of DMA Channels */
-#define UDPHS_IPFEATURES_DMA_B_SIZ (0x1u << 7) /**< \brief (UDPHS_IPFEATURES) DMA Buffer Size */
-#define UDPHS_IPFEATURES_DMA_FIFO_WORD_DEPTH_Pos 8
-#define UDPHS_IPFEATURES_DMA_FIFO_WORD_DEPTH_Msk (0xfu << UDPHS_IPFEATURES_DMA_FIFO_WORD_DEPTH_Pos) /**< \brief (UDPHS_IPFEATURES) DMA FIFO Depth in Words */
-#define UDPHS_IPFEATURES_FIFO_MAX_SIZE_Pos 12
-#define UDPHS_IPFEATURES_FIFO_MAX_SIZE_Msk (0x7u << UDPHS_IPFEATURES_FIFO_MAX_SIZE_Pos) /**< \brief (UDPHS_IPFEATURES) DPRAM Size */
-#define UDPHS_IPFEATURES_BW_DPRAM (0x1u << 15) /**< \brief (UDPHS_IPFEATURES) DPRAM Byte Write Capability */
-#define UDPHS_IPFEATURES_DATAB16_8 (0x1u << 16) /**< \brief (UDPHS_IPFEATURES) UTMI DataBus16_8 */
-#define UDPHS_IPFEATURES_ISO_EPT_1 (0x1u << 17) /**< \brief (UDPHS_IPFEATURES) Endpointx High Bandwidth Isochronous Capability */
-#define UDPHS_IPFEATURES_ISO_EPT_2 (0x1u << 18) /**< \brief (UDPHS_IPFEATURES) Endpointx High Bandwidth Isochronous Capability */
-#define UDPHS_IPFEATURES_ISO_EPT_3 (0x1u << 19) /**< \brief (UDPHS_IPFEATURES) Endpointx High Bandwidth Isochronous Capability */
-#define UDPHS_IPFEATURES_ISO_EPT_4 (0x1u << 20) /**< \brief (UDPHS_IPFEATURES) Endpointx High Bandwidth Isochronous Capability */
-#define UDPHS_IPFEATURES_ISO_EPT_5 (0x1u << 21) /**< \brief (UDPHS_IPFEATURES) Endpointx High Bandwidth Isochronous Capability */
-#define UDPHS_IPFEATURES_ISO_EPT_6 (0x1u << 22) /**< \brief (UDPHS_IPFEATURES) Endpointx High Bandwidth Isochronous Capability */
-#define UDPHS_IPFEATURES_ISO_EPT_7 (0x1u << 23) /**< \brief (UDPHS_IPFEATURES) Endpointx High Bandwidth Isochronous Capability */
-#define UDPHS_IPFEATURES_ISO_EPT_8 (0x1u << 24) /**< \brief (UDPHS_IPFEATURES) Endpointx High Bandwidth Isochronous Capability */
-#define UDPHS_IPFEATURES_ISO_EPT_9 (0x1u << 25) /**< \brief (UDPHS_IPFEATURES) Endpointx High Bandwidth Isochronous Capability */
-#define UDPHS_IPFEATURES_ISO_EPT_10 (0x1u << 26) /**< \brief (UDPHS_IPFEATURES) Endpointx High Bandwidth Isochronous Capability */
-#define UDPHS_IPFEATURES_ISO_EPT_11 (0x1u << 27) /**< \brief (UDPHS_IPFEATURES) Endpointx High Bandwidth Isochronous Capability */
-#define UDPHS_IPFEATURES_ISO_EPT_12 (0x1u << 28) /**< \brief (UDPHS_IPFEATURES) Endpointx High Bandwidth Isochronous Capability */
-#define UDPHS_IPFEATURES_ISO_EPT_13 (0x1u << 29) /**< \brief (UDPHS_IPFEATURES) Endpointx High Bandwidth Isochronous Capability */
-#define UDPHS_IPFEATURES_ISO_EPT_14 (0x1u << 30) /**< \brief (UDPHS_IPFEATURES) Endpointx High Bandwidth Isochronous Capability */
-#define UDPHS_IPFEATURES_ISO_EPT_15 (0x1u << 31) /**< \brief (UDPHS_IPFEATURES) Endpointx High Bandwidth Isochronous Capability */
 /* -------- UDPHS_EPTCFG : (UDPHS Offset: N/A) UDPHS Endpoint Configuration Register -------- */
 #define UDPHS_EPTCFG_EPT_SIZE_Pos 0
 #define UDPHS_EPTCFG_EPT_SIZE_Msk (0x7u << UDPHS_EPTCFG_EPT_SIZE_Pos) /**< \brief (UDPHS_EPTCFG) Endpoint Size */

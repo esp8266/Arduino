@@ -162,7 +162,7 @@ static const uint8_t A15 = 69;
 
 #ifdef __cplusplus
 
-extern UARTClass Serial ;
+extern UARTClass Serial1 ;
 
 extern USARTClass Serial2 ;
 extern USARTClass Serial3 ;

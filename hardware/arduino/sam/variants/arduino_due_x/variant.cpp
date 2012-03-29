@@ -272,12 +272,12 @@ extern const PinDescription g_APinDescription[]=
  */
 RingBuffer rx_buffer1 ;
 
-UARTClass Serial( UART, UART_IRQn, ID_UART, &rx_buffer1 ) ;
+UARTClass Serial1( UART, UART_IRQn, ID_UART, &rx_buffer1 ) ;
 
 // IT handlers
 void UART_Handler(void)
 {
-  Serial.IrqHandler() ;
+  Serial1.IrqHandler() ;
 }
 
 // ----------------------------------------------------------------------------

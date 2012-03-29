@@ -16,7 +16,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "Arduino.h"
+#include "chip.h"
 
 #if SAM3U_SERIES
 
@@ -24,8 +24,8 @@
 #include "udphs.h"
 
 /// Max size of the FMA FIFO
-#define EPT_VIRTUAL_SIZE     16384
-#define SHIFT_INTERUPT    8
+#define EPT_VIRTUAL_SIZE  (16384u)
+#define SHIFT_INTERUPT    (8u)
 
 int _cmark;
 int _cend;
@@ -34,146 +34,109 @@ int _cend;
 unsigned int NumEndpoint=0;
 
 
-inline void USBD_WaitIN( void )
+void USBD_WaitIN(void)
 {
 //	while (!(UEINTX & (1<<TXINI)));
-    while (!(UDPHS->UDPHS_EPT[0].UDPHS_EPTSTA & UDPHS_EPTSTA_TX_PK_RDY));
+  while (!(UDPHS->UDPHS_EPT[0].UDPHS_EPTSTA & UDPHS_EPTSTA_TX_PK_RDY));
 }
 
-inline void USBD_ClearIN( void )
-{
-//	UEINTX = ~(1<<TXINI);
-   UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTCLRSTA = UDPHS_EPTCLRSTA_TX_COMPLT; 
-}
-
-inline void USBD_WaitOUT( void )
+void USBD_WaitOUT(void)
 {
 //	while (!(UEINTX & (1<<RXOUTI)))
 //		;
-    // Waiting for Status stage
-    while (UDPHS_EPTSTA_RX_BK_RDY != (UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTSTA & UDPHS_EPTSTA_RX_BK_RDY));
+  // Waiting for Status stage
+  while (UDPHS_EPTSTA_RX_BK_RDY != (UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTSTA & UDPHS_EPTSTA_RX_BK_RDY));
 }
 
-inline uint8_t USBD_WaitForINOrOUT( void )
+void USBD_ClearIN(void)
+{
+//	UEINTX = ~(1<<TXINI);
+  UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTCLRSTA = UDPHS_EPTCLRSTA_TX_COMPLT; 
+}
+
+void USBD_ClearOUT(void)
+{
+//	UEINTX = ~(1<<RXOUTI);
+  UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTCLRSTA = UDPHS_EPTCLRSTA_RX_BK_RDY;
+}
+
+uint8_t USBD_WaitForINOrOUT(void)
 {
 //	while (!(UEINTX & ((1<<TXINI)|(1<<RXOUTI))))
 //		;
 //	return (UEINTX & (1<<RXOUTI)) == 0;
-    while (!(UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTSTA & (UDPHS_EPTSTA_RX_BK_RDY | UDPHS_EPTSTA_TX_PK_RDY)));
-  	return (UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTSTA & UDPHS_EPTSTA_RX_BK_RDY) == 0;
+  while (!(UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTSTA & (UDPHS_EPTSTA_RX_BK_RDY | UDPHS_EPTSTA_TX_PK_RDY)));
+  return (UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTSTA & UDPHS_EPTSTA_RX_BK_RDY) == 0;
 }
 
-inline void USBD_ClearOUT(void)
+void USBD_ClearRxFlag(unsigned char bEndpoint)
 {
-//	UEINTX = ~(1<<RXOUTI);
-    UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTCLRSTA = UDPHS_EPTCLRSTA_RX_BK_RDY;
+  UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTCLRSTA = UDPHS_EPTCLRSTA_RX_BK_RDY;
 }
 
-/*
-void USBD_ClearRxFlag( unsigned char bEndpoint )
+void USBD_Stall(void)
 {
-    UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTCLRSTA = UDPHS_EPTCLRSTA_RX_BK_RDY;
+//	UECONX = (1<<STALLRQ) | (1<<EPEN);
+  UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTSETSTA = UDPHS_EPTSETSTA_FRCESTALL;
 }
-*/
 
-void USBD_Recv(volatile uint8_t* data, uint8_t count)
+uint8_t USBD_Stalled(void)
 {
-    uint8_t     *pFifo;
-
-    pFifo = (uint8_t*)((u32 *)UDPHS_EPTFIFO + (EPT_VIRTUAL_SIZE * NumEndpoint));
-
-    while (count--)
-		*data++ = pFifo[0]; // UEDATX;
-
-	RXLED1;					// light the RX LED
-	RxLEDPulse = TX_RX_LED_PULSE_MS;
+//	return UEINTX & (1<<STALLEDI);
+  // Check if the data has been STALLed
+  return ( UDPHS_EPTSTA_FRCESTALL == (UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTSTA & UDPHS_EPTSTA_FRCESTALL));
 }
 
-
-inline uint8_t USBD_Recv8( void )
+uint8_t USBD_ReceivedSetupInt(void)
 {
-    uint8_t     *pFifo;
-
-	RXLED1;					// light the RX LED
-	RxLEDPulse = TX_RX_LED_PULSE_MS;
-
-    pFifo = (uint8_t*)((u32 *)UDPHS_EPTFIFO + (EPT_VIRTUAL_SIZE * NumEndpoint));
-
-//	return UEDATX;
-    return (pFifo[0]);
+//	return UEINTX & (1<<RXSTPI);
+  return ( UDPHS_EPTSTA_RX_SETUP == (UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTSTA & UDPHS_EPTSTA_RX_SETUP) );
 }
 
-inline void USBD_Send8(uint8_t d)
+void USBD_ClearSetupInt(void)
 {
-    uint8_t     *pFifo;
-    pFifo = (uint8_t*)((u32 *)UDPHS_EPTFIFO + (EPT_VIRTUAL_SIZE * NumEndpoint));
-//	UEDATX = d;
-    pFifo[0] =d;
+//	UEINTX = ~((1<<RXSTPI) | (1<<RXOUTI) | (1<<TXINI));
+  UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTCLRSTA = UDPHS_EPTSTA_RX_SETUP | UDPHS_EPTCLRSTA_RX_BK_RDY | UDPHS_EPTCLRSTA_TX_COMPLT;
 }
 
-inline void USBD_SetEP(uint8_t ep)
+uint8_t USBD_ReadWriteAllowed(void)
+{
+	//return UEINTX & (1<<RWAL);
+  return 1;
+}
+
+void USBD_SetEP(uint8_t ep)
 {
 //	UENUM = ep;
 	NumEndpoint = ep & 7;
 }
 
-inline u16 USBD_FifoByteCount()
+uint16_t USBD_FifoByteCount(void)
 {
 //	return UEBCLX;
-    // SAM3X
-    //return ((UOTGHS->UOTGHS_DEVEPTISR[ep] & UOTGHS_DEVEPTISR_BYCT_Msk) >> UOTGHS_DEVEPTISR_BYCT_Pos);
-    // SAM3U //AT91C_UDPHS_BYTE_COUNT (0x7FF << 20)
-    return ((UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTSTA & (0x7FF << 20)) >> 20);
+  // SAM3X
+  //return ((UOTGHS->UOTGHS_DEVEPTISR[ep] & UOTGHS_DEVEPTISR_BYCT_Msk) >> UOTGHS_DEVEPTISR_BYCT_Pos);
+  // SAM3U //AT91C_UDPHS_BYTE_COUNT (0x7FF << 20)
+  return ((UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTSTA & UDPHS_EPTSTA_BYTE_COUNT_Msk) >> UDPHS_EPTSTA_BYTE_COUNT_Pos);
 }
 
-inline uint8_t USBD_ReceivedSetupInt()
-{
-//	return UEINTX & (1<<RXSTPI);
-    return ( UDPHS_EPTSTA_RX_SETUP == (UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTSTA & UDPHS_EPTSTA_RX_SETUP) );
-}
-
-inline void USBD_ClearSetupInt()
-{
-//	UEINTX = ~((1<<RXSTPI) | (1<<RXOUTI) | (1<<TXINI));
-    UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTCLRSTA = UDPHS_EPTSTA_RX_SETUP | UDPHS_EPTCLRSTA_RX_BK_RDY | UDPHS_EPTCLRSTA_TX_COMPLT;
-}
-
-inline void USBD_Stall()
-{
-//	UECONX = (1<<STALLRQ) | (1<<EPEN);
-    UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTSETSTA = UDPHS_EPTSETSTA_FRCESTALL;
-}
-
-inline uint8_t USBD_ReadWriteAllowed()
-{
-	//return UEINTX & (1<<RWAL);
-    return 1;
-}
-
-inline uint8_t USBD_Stalled()
-{
-//	return UEINTX & (1<<STALLEDI);
-    // Check if the data has been STALLed
-    return ( UDPHS_EPTSTA_FRCESTALL == (UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTSTA & UDPHS_EPTSTA_FRCESTALL));
-}
-
-uint8_t USBD_FifoFree()
+uint8_t USBD_FifoFree(void)
 {
 //	return UEINTX & (1<<FIFOCON);
-    return( 0 != (UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTSTA & UDPHS_EPTSTA_TX_PK_RDY ));
+  return( 0 != (UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTSTA & UDPHS_EPTSTA_TX_PK_RDY ));
 }
 
-//inline void USBD_ReleaseRX()
-//{
-//	UEINTX = 0x6B;	// FIFOCON=0 NAKINI=1 RWAL=1 NAKOUTI=0 RXSTPI=1 RXOUTI=0 STALLEDI=1 TXINI=1
-//}
+void USBD_ReleaseRX(void)
+{
+	UEINTX = 0x6B;	// FIFOCON=0 NAKINI=1 RWAL=1 NAKOUTI=0 RXSTPI=1 RXOUTI=0 STALLEDI=1 TXINI=1
+}
 
-//inline void USBD_ReleaseTX()
-//{
-//	UEINTX = 0x3A;	// FIFOCON=0 NAKINI=0 RWAL=1 NAKOUTI=1 RXSTPI=1 RXOUTI=0 STALLEDI=1 TXINI=0
-//}
+void USBD_ReleaseTX()
+{
+	UEINTX = 0x3A;	// FIFOCON=0 NAKINI=0 RWAL=1 NAKOUTI=1 RXSTPI=1 RXOUTI=0 STALLEDI=1 TXINI=0
+}
 
-inline uint8_t USBD_FrameNumber()
+uint8_t USBD_FrameNumber(void)
 {
 	return UDFNUML;
 }
@@ -183,49 +146,42 @@ uint8_t USBD_GetConfiguration(void)
 	return _usbConfiguration;
 }
 
-//	Number of bytes, assumes a rx endpoint
-uint8_t USBD_Available(uint8_t ep)
+
+
+void USBD_Recv(volatile uint8_t* data, uint8_t count)
 {
-	SetEP(ep);
-	return FifoByteCount();
+  uint8_t     *pFifo;
+
+  pFifo = (uint8_t*)((uint32_t *)UDPHS_RAM_ADDR + (EPT_VIRTUAL_SIZE * NumEndpoint));
+
+  while (count--)
+  {
+    *data++ = pFifo[0];
+  }
+
+//	RXLED1;					// light the RX LED
+//	RxLEDPulse = TX_RX_LED_PULSE_MS;
 }
 
-//	Non Blocking receive
-//	Return number of bytes read
-int USBD_Recv(uint8_t ep, void* d, int len)
+uint8_t USBD_Recv8(void)
 {
-	if (!_usbConfiguration || len < 0)
-		return -1;
+    uint8_t     *pFifo;
 
-	SetEP(ep);
-	uint8_t n = FifoByteCount();
-	len = min(n,len);
-	n = len;
-	uint8_t* dst = (uint8_t*)d;
-	while (n--)
-		*dst++ = Recv8();
-//	if (len && !FifoByteCount())	// release empty buffer
-//		ReleaseRX();
+//	RXLED1;					// light the RX LED
+//	RxLEDPulse = TX_RX_LED_PULSE_MS;
 
-	return len;
+    pFifo = (uint8_t*)((uint32_t *)UDPHS_RAM_ADDR + (EPT_VIRTUAL_SIZE * NumEndpoint));
+
+//	return UEDATX;
+    return (pFifo[0]);
 }
 
-//	Recv 1 byte if ready
-int USBD_Recv(uint8_t ep)
+void USBD_Send8(uint8_t d)
 {
-	uint8_t c;
-	if (USB_Recv(ep,&c,1) != 1)
-		return -1;
-	return c;
-}
-
-//	Space in send EP
-uint8_t USBD_SendSpace(uint8_t ep)
-{
-	SetEP(ep);
-	if (!ReadWriteAllowed())
-		return 0;
-	return 64 - FifoByteCount();
+    uint8_t     *pFifo;
+    pFifo = (uint8_t*)((uint32_t *)UDPHS_RAM_ADDR + (EPT_VIRTUAL_SIZE * NumEndpoint));
+//	UEDATX = d;
+    pFifo[0] =d;
 }
 
 //	Blocking Send of data to an endpoint
@@ -279,6 +235,26 @@ int USBD_Send(uint8_t ep, const void* d, int len)
 }
 
 
+//	Space in send EP
+uint8_t USBD_SendSpace(uint8_t ep)
+{
+	SetEP(ep);
+	if (!ReadWriteAllowed())
+  {
+		return 0;
+  }
+  
+	return 64 - FifoByteCount();
+}
+
+//	Number of bytes, assumes a rx endpoint
+uint8_t USBD_Available(uint8_t ep)
+{
+	SetEP(ep);
+  
+	return FifoByteCount();
+}
+
 void USBD_InitEP(uint8_t index, uint8_t type, uint8_t size)
 {
 	UENUM = index;
@@ -288,7 +264,7 @@ void USBD_InitEP(uint8_t index, uint8_t type, uint8_t size)
 }
 
 
-void USBD_InitEndpoints()
+void USBD_InitEndpoints(void)
 {
 	for (uint8_t i = 1; i < sizeof(_initEndpoints); i++)
 	{
@@ -310,33 +286,17 @@ void USBD_InitEndpoints()
 ///\//	UERST = 0;
 }
 
-//	Handle CLASS_INTERFACE requests
-bool USBD_ClassInterfaceRequest(Setup& setup)
-{
-	uint8_t i = setup.wIndex;
-
-#ifdef CDC_ENABLED
-	if (CDC_ACM_INTERFACE == i)
-		return CDC_Setup(setup);
-#endif
-
-#ifdef HID_ENABLED
-	if (HID_INTERFACE == i)
-		return HID_Setup(setup);
-#endif
-	return false;
-}
-
-
 void USBD_InitControl(int end)
 {
 	SetEP(0);
-    UDPHS->UDPHS_EPT[0].UDPHS_EPTCFG = _initEndpoints[0];
-    while( (signed int)UDPHS_EPTCFG_EPT_MAPD != (signed int)((UDPHS->UDPHS_EPT[0].UDPHS_EPTCFG) & (unsigned int)UDPHS_EPTCFG_EPT_MAPD) )
-    ;
-    UDPHS->UDPHS_EPT[0].UDPHS_EPTCTLENB = UDPHS_EPTCTLENB_RX_BK_RDY 
-                                         | UDPHS_EPTCTLENB_RX_SETUP
-                                         | UDPHS_EPTCTLENB_EPT_ENABL;
+  UDPHS->UDPHS_EPT[0].UDPHS_EPTCFG = _initEndpoints[0];
+  
+  while( (signed int)UDPHS_EPTCFG_EPT_MAPD != (signed int)((UDPHS->UDPHS_EPT[0].UDPHS_EPTCFG) & (unsigned int)UDPHS_EPTCFG_EPT_MAPD) )
+  ;
+  
+  UDPHS->UDPHS_EPT[0].UDPHS_EPTCTLENB = UDPHS_EPTCTLENB_RX_BK_RDY 
+                                       | UDPHS_EPTCTLENB_RX_SETUP
+                                       | UDPHS_EPTCTLENB_EPT_ENABL;
 
 	_cmark = 0;
 	_cend = end;

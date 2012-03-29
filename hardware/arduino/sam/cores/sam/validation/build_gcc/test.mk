@@ -30,8 +30,12 @@ ifeq ("$(VARIANT)", "sam3s_ek")
 CHIP=__SAM3S4C__
 else ifeq ("$(VARIANT)", "sam3u_ek")
 CHIP=__SAM3U4E__
-else ifeq ("$(VARIANT)", "arduino_due")
+else ifeq ("$(VARIANT)", "sam3x_ek")
+CHIP=__SAM3X8H__
+else ifeq ("$(VARIANT)", "arduino_due_u")
 CHIP=__SAM3U4E__
+else ifeq ("$(VARIANT)", "arduino_due_x")
+CHIP=__SAM3X8E__
 endif
 
 TOOLCHAIN=gcc

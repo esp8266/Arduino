@@ -58,11 +58,11 @@
 #define HID_TX HID_ENDPOINT_INT
 #endif
 
-#define IMANUFACTURER	1
-#define IPRODUCT		2
-#define USB_PID_LEONARDO 0x0034
-#define USB_PID_MICRO 0x0035
-#define ARDUINO_MODEL_USB_PID 0x0036
-#define USB_VID 0x2341	// arduino LLC vid
-#define USB_PID	ARDUINO_MODEL_USB_PID	
+#define IMANUFACTURER    (1u)
+#define IPRODUCT	       (2u)
+#define USB_PID_LEONARDO (0x0034u)
+#define USB_PID_MICRO    (0x0035u)
+#define USB_PID_DUE      (0x0036u)
 
+#define USB_VID          (0x2341u) // Arduino LLC vendor id
+#define USB_PID	         USB_PID_DUE	

@@ -19,8 +19,6 @@
 #ifndef UDPHS_H_INCLUDED
 #define UDPHS_H_INCLUDED
 
-#include "arduino.h"
-
 #define NUM_IT_MAX 3
 
 #define EP_SINGLE_64 0x32	// EP0

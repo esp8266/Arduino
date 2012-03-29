@@ -43,10 +43,10 @@ extern Serial_ Serial;
 //================================================================================
 //	Mouse
 
-#define MOUSE_LEFT 1
-#define MOUSE_RIGHT 2
-#define MOUSE_MIDDLE 4
-#define MOUSE_ALL (MOUSE_LEFT | MOUSE_RIGHT | MOUSE_MIDDLE)
+#define MOUSE_LEFT    (1u)
+#define MOUSE_RIGHT   (2u)
+#define MOUSE_MIDDLE  (4u)
+#define MOUSE_ALL     (MOUSE_LEFT | MOUSE_RIGHT | MOUSE_MIDDLE)
 
 class Mouse_
 {
@@ -67,14 +67,14 @@ extern Mouse_ Mouse;
 //================================================================================
 //	Keyboard
 
-#define KEY_MODIFIER_LEFT_CTRL		0x01
-#define KEY_MODIFIER_LEFT_SHIFT		0x02
-#define KEY_MODIFIER_LEFT_ALT		0x04
-#define KEY_MODIFIER_LEFT_GUI		0x08
-#define KEY_MODIFIER_RIGHT_CTRL		0x010
-#define KEY_MODIFIER_RIGHT_SHIFT	0x020
-#define KEY_MODIFIER_RIGHT_ALT		0x040
-#define KEY_MODIFIER_RIGHT_GUI		0x080
+#define KEY_MODIFIER_LEFT_CTRL		(0x01u)
+#define KEY_MODIFIER_LEFT_SHIFT		(0x02u)
+#define KEY_MODIFIER_LEFT_ALT		  (0x04u)
+#define KEY_MODIFIER_LEFT_GUI		  (0x08u)
+#define KEY_MODIFIER_RIGHT_CTRL		(0x010u)
+#define KEY_MODIFIER_RIGHT_SHIFT	(0x020u)
+#define KEY_MODIFIER_RIGHT_ALT		(0x040u)
+#define KEY_MODIFIER_RIGHT_GUI		(0x080u)
 
 //	Low level key report: up to 6 keys and shift, ctrl etc at once
 typedef struct
@@ -147,10 +147,6 @@ bool	CDC_Setup(Setup& setup);
 
 //================================================================================
 //================================================================================
-
-#define TRANSFER_PGM		0x80
-#define TRANSFER_RELEASE	0x40
-#define TRANSFER_ZERO		0x20
 
 int USB_SendControl(uint8_t flags, const void* d, int len);
 int USB_RecvControl(void* d, int len);

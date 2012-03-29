@@ -25,10 +25,8 @@
 
 #if defined(USBCON)
 
-
-
-extern const u8 _initEndpoints[] ;
-const u8 _initEndpoints[] =
+extern const uint8_t _initEndpoints[] ;
+const uint8_t _initEndpoints[] =
 {
 	0,
 
@@ -45,37 +43,37 @@ const u8 _initEndpoints[] =
 
 /** Pulse generation counters to keep track of the number of milliseconds remaining for each pulse type */
 #define TX_RX_LED_PULSE_MS 100
-volatile u8 TxLEDPulse; /**< Milliseconds remaining for data Tx LED pulse */
-volatile u8 RxLEDPulse; /**< Milliseconds remaining for data Rx LED pulse */
+volatile uint8_t TxLEDPulse; /**< Milliseconds remaining for data Tx LED pulse */
+volatile uint8_t RxLEDPulse; /**< Milliseconds remaining for data Rx LED pulse */
 
 //==================================================================
 //==================================================================
 
-extern const u16 STRING_LANGUAGE[] ;
-extern const u16 STRING_IPRODUCT[] ;
-extern const u16 STRING_IMANUFACTURER[] ;
+extern const uint16_t STRING_LANGUAGE[] ;
+extern const uint16_t STRING_IPRODUCT[] ;
+extern const uint16_t STRING_IMANUFACTURER[] ;
 extern const DeviceDescriptor USB_DeviceDescriptor ;
 extern const DeviceDescriptor USB_DeviceDescriptorA ;
 
-const u16 STRING_LANGUAGE[2] = {
+const uint16_t STRING_LANGUAGE[2] = {
 	(3<<8) | (2+2),
 	0x0409	// English
 };
 
-const u16 STRING_IPRODUCT[17] = {
+const uint16_t STRING_IPRODUCT[17] = {
 	(3<<8) | (2+2*16),
 #if USB_PID == USB_PID_LEONARDO
 	'A','r','d','u','i','n','o',' ','L','e','o','n','a','r','d','o'
 #elif USB_PID == USB_PID_MICRO
 	'A','r','d','u','i','n','o',' ','M','i','c','r','o',' ',' ',' '
-#elif USB_PID == ARDUINO_MODEL_USB_PID
+#elif USB_PID == USB_PID_DUE
 	'A','r','d','u','i','n','o',' ','D','u','e',' ',' ',' ',' ',' '
 #else
 #error "Need an USB PID"
 #endif
 };
 
-const u16 STRING_IMANUFACTURER[12] = {
+const uint16_t STRING_IMANUFACTURER[12] = {
 	(3<<8) | (2+2*11),
 	'A','r','d','u','i','n','o',' ','L','L','C'
 };
@@ -96,63 +94,140 @@ const DeviceDescriptor USB_DeviceDescriptorA =
 //==================================================================
 //==================================================================
 
-volatile u8 _usbConfiguration = 0;
+volatile uint8_t _usbConfiguration = 0;
+uint8_t _cdcComposite = 0;
+
 
 //==================================================================
 //==================================================================
 
-static
-bool SendControl(u8 d)
+//	Recv 1 byte if ready
+int USBD_Recv(uint8_t ep)
 {
-	if (_cmark < _cend)
+	uint8_t c;
+
+	if (USB_Recv(ep,&c,1) != 1)
+  {
+		return -1;
+  }
+  else
+  {
+	  return c;
+  }
+}
+
+//	Non Blocking receive
+//	Return number of bytes read
+int USBD_Recv(uint8_t ep, void* d, int len)
+{
+  uint8_t n ;
+	uint8_t* dst ;
+
+	if (!_usbConfiguration || len < 0)
+  {
+		return -1;
+  }
+
+	n = FifoByteCount(ep);
+  
+	len = min(n,len);
+	n = len;
+	dst = (uint8_t*)d;
+	while (n--)
+  {
+		*dst++ = Recv8(ep);
+  }
+//	if (len && !FifoByteCount())	// release empty buffer
+//		ReleaseRX();
+
+	return len;
+}
+
+static bool USBD_SendControl(uint8_t d)
+{
+	if ( _cmark < _cend )
 	{
-		if (!WaitForINOrOUT())
+		if ( !WaitForINOrOUT() )
+    {
 			return false;
-		Send8(d);
-		if (!((_cmark + 1) & 0x3F))
+    }
+      
+		Send8( d ) ;
+    
+		if ( !((_cmark + 1) & 0x3F) )
+    {
 			ClearIN();	// Fifo is full, release this packet
+    }
 	}
 	_cmark++;
-	return true;
-};
+  
+	return true ;
+}
 
 //	Clipped by _cmark/_cend
-int USB_SendControl(u8 flags, const void* d, int len)
+int USBD_SendControl(uint8_t flags, const void* d, int len)
 {
 	int sent = len;
-	const u8* data = (const u8*)d;
-	bool pgm = flags & TRANSFER_PGM;
-	while (len--)
+	const uint8_t* data = (const uint8_t*)d ;
+
+	while ( len-- )
 	{
-		u8 c = pgm ? *data++ : *data++;
-		if (!SendControl(c))
+		uint8_t c = *data++ ;
+    
+		if ( !SendControl( c ) )
+    {
 			return -1;
+    }
 	}
+
 	return sent;
 }
 
 //	Does not timeout or cross fifo boundaries
 //	Will only work for transfers <= 64 bytes
 //	TODO
-int USB_RecvControl(void* d, int len)
+int USBD_RecvControl(void* d, int len)
 {
-	WaitOUT();
-	Recv((u8*)d,len);
-	ClearOUT();
-	return len;
+	WaitOUT() ;
+	Recv( (uint8_t*)d, len ) ;
+	ClearOUT() ;
+
+	return len ;
 }
 
-int SendInterfaces()
+//	Handle CLASS_INTERFACE requests
+bool USBD_ClassInterfaceRequest(Setup& setup)
 {
-	int total = 0;
-	u8 interfaces = 0;
+	uint8_t i = setup.wIndex;
 
 #ifdef CDC_ENABLED
-	total = CDC_GetInterface(&interfaces);
+	if ( CDC_ACM_INTERFACE == i )
+  {
+		return CDC_Setup(setup);
+  }
 #endif
 
 #ifdef HID_ENABLED
-	total += HID_GetInterface(&interfaces);
+	if ( HID_INTERFACE == i )
+  {
+		return HID_Setup(setup);
+  }
+#endif
+
+	return false ;
+}
+
+int USBD_SendInterfaces(void)
+{
+	int total = 0;
+	uint8_t interfaces = 0;
+
+#ifdef CDC_ENABLED
+	total = CDC_GetInterface(&interfaces) ;
+#endif
+
+#ifdef HID_ENABLED
+	total += HID_GetInterface(&interfaces) ;
 #endif
 
 	return interfaces;
@@ -161,8 +236,7 @@ int SendInterfaces()
 //	Construct a dynamic configuration descriptor
 //	This really needs dynamic endpoint allocation etc
 //	TODO
-static
-bool SendConfiguration(int maxlen)
+static bool USBD_SendConfiguration(int maxlen)
 {
 	//	Count and measure interfaces
 	InitControl(0);
@@ -176,73 +250,89 @@ bool SendConfiguration(int maxlen)
 	return true;
 }
 
-u8 _cdcComposite = 0;
-
-static
-bool SendDescriptor(Setup& setup)
+static bool USBD_SendDescriptor(Setup& setup)
 {
-	u8 t = setup.wValueH;
-	if (USB_CONFIGURATION_DESCRIPTOR_TYPE == t)
+	uint8_t t = setup.wValueH;
+	uint8_t desc_length = 0;
+	const uint8_t* desc_addr = 0;
+
+	if ( USB_CONFIGURATION_DESCRIPTOR_TYPE == t )
+  {
 		return SendConfiguration(setup.wLength);
+  }
 
 	InitControl(setup.wLength);
 #ifdef HID_ENABLED
-	if (HID_REPORT_DESCRIPTOR_TYPE == t)
-		return HID_GetDescriptor(t);
+	if ( HID_REPORT_DESCRIPTOR_TYPE == t )
+  {
+		return HID_GetDescriptor( t ) ;
+  }
 #endif
 
-	u8 desc_length = 0;
-	const u8* desc_addr = 0;
 	if (USB_DEVICE_DESCRIPTOR_TYPE == t)
 	{
-		if (setup.wLength == 8)
+		if ( setup.wLength == 8 )
+    {
 			_cdcComposite = 1;
-		desc_addr = _cdcComposite ?  (const u8*)&USB_DeviceDescriptorA : (const u8*)&USB_DeviceDescriptor;
+    }
+		desc_addr = _cdcComposite ?  (const uint8_t*)&USB_DeviceDescriptorA : (const uint8_t*)&USB_DeviceDescriptor;
 	}
 	else if (USB_STRING_DESCRIPTOR_TYPE == t)
 	{
 		if (setup.wValueL == 0)
-			desc_addr = (const u8*)&STRING_LANGUAGE;
+			desc_addr = (const uint8_t*)&STRING_LANGUAGE;
 		else if (setup.wValueL == IPRODUCT)
-			desc_addr = (const u8*)&STRING_IPRODUCT;
+			desc_addr = (const uint8_t*)&STRING_IPRODUCT;
 		else if (setup.wValueL == IMANUFACTURER)
-			desc_addr = (const u8*)&STRING_IMANUFACTURER;
+			desc_addr = (const uint8_t*)&STRING_IMANUFACTURER;
 		else
 			return false;
 	}
 
-	if (desc_addr == 0)
-		return false;
-	if (desc_length == 0)
+	if ( desc_addr == 0 )
+  {
+		return false ;
+  }
+  
+	if ( desc_length == 0 )
+  {
 		desc_length = *desc_addr;
+  }
 
 	USB_SendControl(TRANSFER_PGM,desc_addr,desc_length);
+
 	return true;
 }
 
 //	Endpoint 0 interrupt
-//ISR(USB_COM_vect)
 void USB_ISR()
 {
-    SetEP(0);
-	if (!ReceivedSetupInt())
+  SetEP(0) ;
+  
+	if ( !ReceivedSetupInt() )
+  {
 		return;
+  }
 
-	Setup setup;
-	Recv((u8*)&setup,8);
+	Setup setup ;
+	Recv((uint8_t*)&setup,8);
 	ClearSetupInt();
 
-	u8 requestType = setup.bmRequestType;
+	uint8_t requestType = setup.bmRequestType;
 	if (requestType & REQUEST_DEVICETOHOST)
+  {
 		WaitIN();
+  }
 	else
+  {
 		ClearIN();
+  }
 
-    bool ok = true;
+  bool ok = true ;
 	if (REQUEST_STANDARD == (requestType & REQUEST_TYPE))
 	{
 		//	Standard Requests
-		u8 r = setup.bRequest;
+		uint8_t r = setup.bRequest;
 		if (GET_STATUS == r)
 		{
 			Send8(0);		// TODO
@@ -277,8 +367,11 @@ void USB_ISR()
 			{
 				InitEndpoints();
 				_usbConfiguration = setup.wValueL;
-			} else
+			} 
+      else
+      {
 				ok = false;
+      }
 		}
 		else if (GET_INTERFACE == r)
 		{
@@ -294,14 +387,16 @@ void USB_ISR()
 	}
 
 	if (ok)
+  {
 		ClearIN();
+  }
 	else
 	{
 		Stall();
 	}
 }
 
-void USB_Flush(u8 ep)
+void USBD_Flush(uint8_t ep)
 {
 	SetEP(ep);
 //	if (FifoByteCount())
@@ -316,7 +411,7 @@ void USB_Flush(u8 ep)
 //  General interrupt
 ISR(USB_GEN_vect)
 {
-    u8 udint = UDINT;
+    uint8_t udint = UDINT;
     UDINT = 0;
 
     //  End of Reset
@@ -348,9 +443,9 @@ ISR(USB_GEN_vect)
 
 //	VBUS or counting frames
 //	Any frame counting?
-u8 USBConnected()
+uint8_t USBD_Connected(void)
 {
-	u8 f = UDFNUML;
+	uint8_t f = UDFNUML;
 	delay(3);
 	return f != UDFNUML;
 }
@@ -365,51 +460,12 @@ USB_::USB_()
 {
 }
 
-void USB_::attach()
-{/*
-	_usbConfiguration = 0;
+void USB_::attach(void)
+{
+  USBD_Attach() ;
+}
 
-	//UHWCON = 0x01;						// power internal reg
-	//USBCON = (1<<USBE)|(1<<FRZCLK);		// clock frozen, usb enabled
-	//PLLCSR = 0x12;						// Need 16 MHz xtal
-	//while (!(PLLCSR & (1<<PLOCK)))		// wait for lock pll
-	//	;
-    PMC->PMC_PCER = (1 << ID_UDPHS);
-    // Enable 480MHZ
-    //AT91C_BASE_CKGR->CKGR_UCKR |= (AT91C_CKGR_PLLCOUNT & (3 << 20)) | AT91C_CKGR_UPLLEN;
-    CKGR->CKGR_UCKR |= ((0xf << 20) & (3 << 20)) | AT91C_CKGR_UPLLEN;
-    // Wait until UTMI PLL is locked
-    while ((PMC->PMC_SR & PMC_LOCKU) == 0);
-
-    // Reset and enable IP UDPHS
-    UDPHS->UDPHS_CTRL &= ~UDPHS_CTRL_EN_UDPHS;
-    UDPHS->UDPHS_CTRL |= UDPHS_CTRL_EN_UDPHS;
-
-	//USBCON = ((1<<USBE)|(1<<OTGPADE));	// start USB clock
-    UDPHS->UDPHS_IEN = 0;
-    UDPHS->UDPHS_CLRINT = UDPHS_CLRINT_UPSTR_RES
-                                   | UDPHS_CLRINT_ENDOFRSM
-                                   | UDPHS_CLRINT_WAKE_UP
-                                   | UDPHS_CLRINT_ENDRESET
-                                   | UDPHS_CLRINT_INT_SOF
-                                   | UDPHS_CLRINT_MICRO_SOF
-                                   | UDPHS_CLRINT_DET_SUSPD;
-
-    // Enable interrupts for EOR (End of Reset), wake up and SOF (start of frame)
-    //UDIEN = (1<<EORSTE)|(1<<SOFE);
-    UDPHS->UDPHS_IEN = UDPHS_IEN_ENDOFRSM
-                                | UDPHS_IEN_WAKE_UP
-                                | UDPHS_IEN_DET_SUSPD;
-
-	// enable attach resistor
-	//UDCON = 0;
-    UDPHS->UDPHS_CTRL &= ~UDPHS_CTRL_DETACH;   // Pull Up on DP
-    UDPHS->UDPHS_CTRL |= UDPHS_CTRL_PULLD_DIS; // Disable Pull Down
-
-	TX_RX_LED_INIT;
-*/}
-
-void USB_::detach()
+void USB_::detach(void)
 {
     UDPHS->UDPHS_CTRL |= UDPHS_CTRL_DETACH; // detach
     UDPHS->UDPHS_CTRL &= ~UDPHS_CTRL_PULLD_DIS; // Enable Pull Down

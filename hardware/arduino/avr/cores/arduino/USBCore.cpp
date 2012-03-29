@@ -230,7 +230,7 @@ int USB_Recv(u8 ep, void* d, int len)
 	n = len;
 	u8* dst = (u8*)d;
 	while (n--)
-		*dst++ = Recv8();
+		*dst++ = USBD_Recv8();
 	if (len && !FifoByteCount())	// release empty buffer
 		ReleaseRX();
 	
