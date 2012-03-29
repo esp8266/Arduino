@@ -23,9 +23,11 @@
  http://www.arduino.cc/en/Tutorial/KeyboardReprogram
  */
 
-// use this option for OSX:
+// use this option for OSX. 
+// Comment it out if using Windows or Linux:
 char ctrlKey = KEY_LEFT_GUI;
-// use this option for Windows and Linux:
+// use this option for Windows and Linux.
+// leave commented out if using OSX:
 //  char ctrlKey = KEY_LEFT_CTRL;    
 
 
