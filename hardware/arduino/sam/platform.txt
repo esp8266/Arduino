@@ -5,12 +5,12 @@
 name=Atmel SAM3
 compiler.path={runtime.ide.path}/hardware/tools/g++_arm_none_eabi/bin/
 compiler.c.cmd=arm-none-eabi-gcc
-compiler.c.flags=-c -g -Os -w -mthumb -mlong-calls -ffunction-sections -nostdlib --param max-inline-insns-single=500 -Dprintf=iprintf
+compiler.c.flags=-c -g -Os -w -mlong-calls -ffunction-sections -nostdlib --param max-inline-insns-single=500 -Dprintf=iprintf
 compiler.c.elf.cmd=arm-none-eabi-gcc
 compiler.c.elf.flags=-Os -Wl,--gc-sections
 compiler.S.flags=-c -g -assembler-with-cpp
 compiler.cpp.cmd=arm-none-eabi-g++
-compiler.cpp.flags=-c -g -Os -w -mthumb -mlong-calls -ffunction-sections -nostdlib --param max-inline-insns-single=500 -fno-rtti -fno-exceptions -Dprintf=iprintf
+compiler.cpp.flags=-c -g -Os -w -mlong-calls -ffunction-sections -nostdlib --param max-inline-insns-single=500 -fno-rtti -fno-exceptions -Dprintf=iprintf
 compiler.ar.cmd=arm-none-eabi-ar
 compiler.ar.flags=rcs
 compiler.objcopy.cmd=arm-none-eabi-objcopy

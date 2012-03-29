@@ -1,39 +1,13 @@
 ##############################################################
 
-sam3s_ek.name=Atmel SAM3S-EK
-sam3s_ek.upload.protocol=sam-ba
-sam3s_ek.upload.maximum_size=49152
-sam3s_ek.upload.speed=115200
-sam3s_ek.bootloader.path=sam3s_boot
-sam3s_ek.bootloader.file=sam3s_boot.bin
-sam3s_ek.build.mcu=cortex-m3
-sam3s_ek.build.f_cpu=64000000L
-sam3s_ek.build.core=sam
-sam3s_ek.build.pins=sam3s_ek
-
-##############################################################
-
-sam3u_ek.name=Atmel SAM3U-EK
-sam3u_ek.upload.protocol=sam-ba
-sam3u_ek.upload.maximum_size=49152
-sam3u_ek.upload.speed=115200
-sam3u_ek.bootloader.path=sam3u_boot
-sam3u_ek.bootloader.file=sam3u_boot.bin
-sam3u_ek.build.mcu=cortex-m3
-sam3u_ek.build.f_cpu=96000000L
-sam3u_ek.build.core=sam
-sam3u_ek.build.pins=sam3u_ek
-
-##############################################################
-
 arduino_due_u.name=Arduino DueU Dev. Ed.
 arduino_due_u.upload.tool=bossac
 arduino_due_u.upload.protocol=sam-ba
 arduino_due_u.upload.maximum_size=49152
 arduino_due_u.build.mcu=cortex-m3
-arduino_due_u.build.f_cpu=96000000L
+arduino_due_u.build.f_cpu=84000000L
 arduino_due_u.build.core=sam
-arduino_due_u.build.extra_flags=-D__SAM3U4E__
+arduino_due_u.build.extra_flags=-D__SAM3U4E__ -mthumb 
 arduino_due_u.build.ldscript=linker_scripts/gcc/flash.ld
 arduino_due_u.build.variant=arduino_due_u
 arduino_due_u.build.variant_system_lib=libsam_sam3u4e_gcc_rel.a
@@ -47,7 +21,7 @@ arduino_due_x.upload.maximum_size=49152
 arduino_due_x.build.mcu=cortex-m3
 arduino_due_x.build.f_cpu=96000000L
 arduino_due_x.build.core=sam
-arduino_due_x.build.extra_flags=-D__SAM3X8E__
+arduino_due_x.build.extra_flags=-D__SAM3X8E__ -mthumb 
 arduino_due_x.build.ldscript=linker_scripts/gcc/flash.ld
 arduino_due_x.build.variant=arduino_due_x
 arduino_due_x.build.variant_system_lib=libsam_sam3x8e_gcc_rel.a
