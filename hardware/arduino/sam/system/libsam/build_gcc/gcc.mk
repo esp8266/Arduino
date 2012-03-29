@@ -8,7 +8,7 @@
 #
 #  This library is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #  See the GNU Lesser General Public License for more details.
 #
 #  You should have received a copy of the GNU Lesser General Public
@@ -32,8 +32,8 @@ endif
 
 SEP=/
 
-
-# Flags
+# ---------------------------------------------------------------------------------------
+# C Flags
 
 CFLAGS += -Wall -Wchar-subscripts -Wcomment -Wformat=2 -Wimplicit-int
 CFLAGS += -Werror-implicit-function-declaration -Wmain -Wparentheses
@@ -54,5 +54,9 @@ CFLAGS += -Dprintf=iprintf
 
 CFLAGS += --param max-inline-insns-single=500 -mcpu=cortex-m3 -mthumb -mlong-calls -ffunction-sections -std=c99
 CFLAGS += $(OPTIMIZATION) $(INCLUDES) -D$(CHIP)
+
+
+# ---------------------------------------------------------------------------------------
+# ASM Flags
 
 ASFLAGS = -mcpu=cortex-m3 -mthumb -Wall -a -g $(INCLUDES)
