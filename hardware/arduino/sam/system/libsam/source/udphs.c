@@ -34,19 +34,19 @@ int _cend;
 unsigned int NumEndpoint=0;
 
 
-inline void usbd_WaitIN( void )
+inline void USBD_WaitIN( void )
 {
 //	while (!(UEINTX & (1<<TXINI)));
     while (!(UDPHS->UDPHS_EPT[0].UDPHS_EPTSTA & UDPHS_EPTSTA_TX_PK_RDY));
 }
 
-inline void ClearIN( void )
+inline void USBD_ClearIN( void )
 {
 //	UEINTX = ~(1<<TXINI);
    UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTCLRSTA = UDPHS_EPTCLRSTA_TX_COMPLT; 
 }
 
-inline void WaitOUT( void )
+inline void USBD_WaitOUT( void )
 {
 //	while (!(UEINTX & (1<<RXOUTI)))
 //		;
@@ -54,7 +54,7 @@ inline void WaitOUT( void )
     while (UDPHS_EPTSTA_RX_BK_RDY != (UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTSTA & UDPHS_EPTSTA_RX_BK_RDY));
 }
 
-inline u8 WaitForINOrOUT( void )
+inline uint8_t USBD_WaitForINOrOUT( void )
 {
 //	while (!(UEINTX & ((1<<TXINI)|(1<<RXOUTI))))
 //		;
@@ -63,24 +63,24 @@ inline u8 WaitForINOrOUT( void )
   	return (UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTSTA & UDPHS_EPTSTA_RX_BK_RDY) == 0;
 }
 
-inline void ClearOUT(void)
+inline void USBD_ClearOUT(void)
 {
 //	UEINTX = ~(1<<RXOUTI);
     UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTCLRSTA = UDPHS_EPTCLRSTA_RX_BK_RDY;
 }
 
 /*
-void UDPHS_ClearRxFlag( unsigned char bEndpoint )
+void USBD_ClearRxFlag( unsigned char bEndpoint )
 {
     UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTCLRSTA = UDPHS_EPTCLRSTA_RX_BK_RDY;
 }
 */
 
-void Recv(volatile u8* data, u8 count)
+void USBD_Recv(volatile uint8_t* data, uint8_t count)
 {
-    u8     *pFifo;
+    uint8_t     *pFifo;
 
-    pFifo = (u8*)((u32 *)UDPHS_EPTFIFO + (EPT_VIRTUAL_SIZE * NumEndpoint));
+    pFifo = (uint8_t*)((u32 *)UDPHS_EPTFIFO + (EPT_VIRTUAL_SIZE * NumEndpoint));
 
     while (count--)
 		*data++ = pFifo[0]; // UEDATX;
@@ -90,34 +90,34 @@ void Recv(volatile u8* data, u8 count)
 }
 
 
-inline u8 Recv8()
+inline uint8_t USBD_Recv8( void )
 {
-    u8     *pFifo;
+    uint8_t     *pFifo;
 
 	RXLED1;					// light the RX LED
 	RxLEDPulse = TX_RX_LED_PULSE_MS;
 
-    pFifo = (u8*)((u32 *)UDPHS_EPTFIFO + (EPT_VIRTUAL_SIZE * NumEndpoint));
+    pFifo = (uint8_t*)((u32 *)UDPHS_EPTFIFO + (EPT_VIRTUAL_SIZE * NumEndpoint));
 
 //	return UEDATX;
     return (pFifo[0]);
 }
 
-inline void Send8(u8 d)
+inline void USBD_Send8(uint8_t d)
 {
-    u8     *pFifo;
-    pFifo = (u8*)((u32 *)UDPHS_EPTFIFO + (EPT_VIRTUAL_SIZE * NumEndpoint));
+    uint8_t     *pFifo;
+    pFifo = (uint8_t*)((u32 *)UDPHS_EPTFIFO + (EPT_VIRTUAL_SIZE * NumEndpoint));
 //	UEDATX = d;
     pFifo[0] =d;
 }
 
-inline void SetEP(u8 ep)
+inline void USBD_SetEP(uint8_t ep)
 {
 //	UENUM = ep;
 	NumEndpoint = ep & 7;
 }
 
-inline u16 FifoByteCount()
+inline u16 USBD_FifoByteCount()
 {
 //	return UEBCLX;
     // SAM3X
@@ -126,65 +126,65 @@ inline u16 FifoByteCount()
     return ((UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTSTA & (0x7FF << 20)) >> 20);
 }
 
-inline u8 ReceivedSetupInt()
+inline uint8_t USBD_ReceivedSetupInt()
 {
 //	return UEINTX & (1<<RXSTPI);
     return ( UDPHS_EPTSTA_RX_SETUP == (UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTSTA & UDPHS_EPTSTA_RX_SETUP) );
 }
 
-inline void ClearSetupInt()
+inline void USBD_ClearSetupInt()
 {
 //	UEINTX = ~((1<<RXSTPI) | (1<<RXOUTI) | (1<<TXINI));
     UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTCLRSTA = UDPHS_EPTSTA_RX_SETUP | UDPHS_EPTCLRSTA_RX_BK_RDY | UDPHS_EPTCLRSTA_TX_COMPLT;
 }
 
-inline void Stall()
+inline void USBD_Stall()
 {
 //	UECONX = (1<<STALLRQ) | (1<<EPEN);
     UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTSETSTA = UDPHS_EPTSETSTA_FRCESTALL;
 }
 
-inline u8 ReadWriteAllowed()
+inline uint8_t USBD_ReadWriteAllowed()
 {
 	//return UEINTX & (1<<RWAL);
     return 1;
 }
 
-inline u8 Stalled()
+inline uint8_t USBD_Stalled()
 {
 //	return UEINTX & (1<<STALLEDI);
     // Check if the data has been STALLed
     return ( UDPHS_EPTSTA_FRCESTALL == (UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTSTA & UDPHS_EPTSTA_FRCESTALL));
 }
 
-u8 FifoFree()
+uint8_t USBD_FifoFree()
 {
 //	return UEINTX & (1<<FIFOCON);
     return( 0 != (UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTSTA & UDPHS_EPTSTA_TX_PK_RDY ));
 }
 
-//inline void ReleaseRX()
+//inline void USBD_ReleaseRX()
 //{
 //	UEINTX = 0x6B;	// FIFOCON=0 NAKINI=1 RWAL=1 NAKOUTI=0 RXSTPI=1 RXOUTI=0 STALLEDI=1 TXINI=1
 //}
 
-//inline void ReleaseTX()
+//inline void USBD_ReleaseTX()
 //{
 //	UEINTX = 0x3A;	// FIFOCON=0 NAKINI=0 RWAL=1 NAKOUTI=1 RXSTPI=1 RXOUTI=0 STALLEDI=1 TXINI=0
 //}
 
-inline u8 FrameNumber()
+inline uint8_t USBD_FrameNumber()
 {
 	return UDFNUML;
 }
 
-u8 USBGetConfiguration(void)
+uint8_t USBD_GetConfiguration(void)
 {
 	return _usbConfiguration;
 }
 
 //	Number of bytes, assumes a rx endpoint
-u8 USB_Available(u8 ep)
+uint8_t USBD_Available(uint8_t ep)
 {
 	SetEP(ep);
 	return FifoByteCount();
@@ -192,16 +192,16 @@ u8 USB_Available(u8 ep)
 
 //	Non Blocking receive
 //	Return number of bytes read
-int USBD_Recv(u8 ep, void* d, int len)
+int USBD_Recv(uint8_t ep, void* d, int len)
 {
 	if (!_usbConfiguration || len < 0)
 		return -1;
 
 	SetEP(ep);
-	u8 n = FifoByteCount();
+	uint8_t n = FifoByteCount();
 	len = min(n,len);
 	n = len;
-	u8* dst = (u8*)d;
+	uint8_t* dst = (uint8_t*)d;
 	while (n--)
 		*dst++ = Recv8();
 //	if (len && !FifoByteCount())	// release empty buffer
@@ -211,16 +211,16 @@ int USBD_Recv(u8 ep, void* d, int len)
 }
 
 //	Recv 1 byte if ready
-int USBD_Recv(u8 ep)
+int USBD_Recv(uint8_t ep)
 {
-	u8 c;
+	uint8_t c;
 	if (USB_Recv(ep,&c,1) != 1)
 		return -1;
 	return c;
 }
 
 //	Space in send EP
-u8 USB_SendSpace(u8 ep)
+uint8_t USBD_SendSpace(uint8_t ep)
 {
 	SetEP(ep);
 	if (!ReadWriteAllowed())
@@ -229,18 +229,18 @@ u8 USB_SendSpace(u8 ep)
 }
 
 //	Blocking Send of data to an endpoint
-int USB_Send(u8 ep, const void* d, int len)
+int USBD_Send(uint8_t ep, const void* d, int len)
 {
 	if (!_usbConfiguration)
 		return -1;
 
 	int r = len;
-	const u8* data = (const u8*)d;
-	u8 zero = ep & TRANSFER_ZERO;
-	u8 timeout = 250;		// 250ms timeout on send? TODO
+	const uint8_t* data = (const uint8_t*)d;
+	uint8_t zero = ep & TRANSFER_ZERO;
+	uint8_t timeout = 250;		// 250ms timeout on send? TODO
 	while (len)
 	{
-		u8 n = USB_SendSpace(ep);
+		uint8_t n = USB_SendSpace(ep);
 		if (n == 0)
 		{
 			if (!(--timeout))
@@ -279,20 +279,18 @@ int USB_Send(u8 ep, const void* d, int len)
 }
 
 
-//static
-//void InitEP(u8 index, u8 type, u8 size)
-//{
-//	UENUM = index;
-//	UECONX = 1;
-//	UECFG0X = type;
-//	UECFG1X = size;
-//}
-
-
-static
-void InitEndpoints()
+void USBD_InitEP(uint8_t index, uint8_t type, uint8_t size)
 {
-	for (u8 i = 1; i < sizeof(_initEndpoints); i++)
+	UENUM = index;
+	UECONX = 1;
+	UECFG0X = type;
+	UECFG1X = size;
+}
+
+
+void USBD_InitEndpoints()
+{
+	for (uint8_t i = 1; i < sizeof(_initEndpoints); i++)
 	{
         // Reset Endpoint Fifos
         UDPHS->UDPHS_EPT[i].UDPHS_EPTCLRSTA = UDPHS_EPTCLRSTA_TOGGLESQ | UDPHS_EPTCLRSTA_FRCESTALL;
@@ -313,10 +311,9 @@ void InitEndpoints()
 }
 
 //	Handle CLASS_INTERFACE requests
-static
-bool ClassInterfaceRequest(Setup& setup)
+bool USBD_ClassInterfaceRequest(Setup& setup)
 {
-	u8 i = setup.wIndex;
+	uint8_t i = setup.wIndex;
 
 #ifdef CDC_ENABLED
 	if (CDC_ACM_INTERFACE == i)
@@ -450,7 +447,7 @@ void UDPHS_Handler( void )
     }
 }
 
-void usbd_attach( void )
+void USBD_Attach( void )
 {/*
 	_usbConfiguration = 0;
 
@@ -494,7 +491,7 @@ void usbd_attach( void )
 	TX_RX_LED_INIT;
 */}
 
-void usbd_detach( void )
+void USBD_Detach( void )
 {
   UDPHS->UDPHS_CTRL |= UDPHS_CTRL_DETACH; // detach
   UDPHS->UDPHS_CTRL &= ~UDPHS_CTRL_PULLD_DIS; // Enable Pull Down
