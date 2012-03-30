@@ -91,7 +91,7 @@ public class AvrdudeUploader extends Uploader  {
         // Toggle 1200 bps on selected serial port to force board reset.
         List<String> before = Serial.list();
         if (before.contains(uploadPort)) {
-          if (verbose)
+          if (verbose || Preferences.getBoolean("upload.verbose"))
             System.out
                 .println(_("Forcing reset using 1200bps open/close on port ")
                     + uploadPort);
@@ -110,19 +110,22 @@ public class AvrdudeUploader extends Uploader  {
           List<String> now = Serial.list();
           List<String> diff = new ArrayList<String>(now);
           diff.removeAll(before);
-          System.out.print("{");
-          for (String p : before)
-            System.out.print(p+",");
-          System.out.print("} / {");
-          for (String p : now)
-            System.out.print(p+",");
-          System.out.print("} => {");
-          for (String p : diff)
-            System.out.print(p+",");
-          System.out.println("}");
+          if (verbose || Preferences.getBoolean("upload.verbose")) {
+	          System.out.print("PORTS {");
+    	      for (String p : before)
+        	    System.out.print(p+", ");
+	          System.out.print("} / {");
+    	      for (String p : now)
+	            System.out.print(p+", ");
+    	      System.out.print("} => {");
+	          for (String p : diff)
+	            System.out.print(p+", ");
+    	      System.out.println("}");
+          }
           if (diff.size() > 0) {
             caterinaUploadPort = diff.get(0);
-            System.out.println("found leo: " + caterinaUploadPort);
+            if (verbose || Preferences.getBoolean("upload.verbose"))
+	            System.out.println("Found Leonardo upload port: " + caterinaUploadPort);
             break;
           }
           
@@ -135,7 +138,8 @@ public class AvrdudeUploader extends Uploader  {
           // come back, so use a longer time out before assuming that the selected
           // port is the bootloader (not the sketch).
           if (((!Base.isWindows() && elapsed >= 500) || elapsed >= 5000) && now.contains(uploadPort)) {
-            System.out.println("using selected port: " + uploadPort);
+          	if (verbose || Preferences.getBoolean("upload.verbose")) 
+	            System.out.println("Uploading using selected port: " + uploadPort);
             caterinaUploadPort = uploadPort;
             break;
           }
@@ -144,7 +148,7 @@ public class AvrdudeUploader extends Uploader  {
         if (caterinaUploadPort == null)
           // Something happened while detecting port
           throw new RunnerException(
-              _("Couldn’t find the selected board. Try pressing the reset button after initiating the upload."));
+              _("Couldn’t find a Leonardo on the selected port. Check that you have the correct port selected.  If it is correct, try pressing the board's reset button after initiating the upload."));
         
         uploadPort = caterinaUploadPort;
       } catch (SerialException e) {
