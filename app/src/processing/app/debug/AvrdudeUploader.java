@@ -286,6 +286,11 @@ public class AvrdudeUploader extends Uploader  {
       commandDownloader.add("-v");
       commandDownloader.add("-v");
       commandDownloader.add("-v");
+    } else if (Base.getBoardPreferences().get("bootloader.path").equals("caterina")) {
+	  /* avrdude draws the line between verbose and quiet differently 
+	   * uploads using AVR109 protocol.  Compensate by being a little less 
+	   * quiet about the results for these uploads */
+      commandDownloader.add("-q");
     } else {
       commandDownloader.add("-q");
       commandDownloader.add("-q");
