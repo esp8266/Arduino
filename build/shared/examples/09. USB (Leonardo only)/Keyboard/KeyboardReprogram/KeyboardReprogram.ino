@@ -15,7 +15,7 @@
  * wire to connect D2 to ground.
  
  created 5 Mar 2012
- modified 28 Mar 2012
+ modified 29 Mar 2012
  by Tom Igoe
  
  This example is in the public domain
@@ -23,10 +23,12 @@
  http://www.arduino.cc/en/Tutorial/KeyboardReprogram
  */
 
-// use this option for OSX:
+// use this option for OSX. 
+// Comment it out if using Windows or Linux:
 char ctrlKey = KEY_LEFT_GUI;
-// use this option for Windows and Linux:
-//  char ctrlKey = KEY_KEFT_CTRL;    
+// use this option for Windows and Linux.
+// leave commented out if using OSX:
+//  char ctrlKey = KEY_LEFT_CTRL;    
 
 
 void setup() {
