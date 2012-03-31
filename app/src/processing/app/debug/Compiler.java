@@ -503,6 +503,16 @@ public class Compiler implements MessageConsumer {
               "to Wire.read() for consistency with other libraries.\n\n");
       }
 
+      if (pieces[3].trim().equals("'Mouse' was not declared in this scope")) {
+        error = _("'Mouse' only supported on the Arduino Leonardo");
+        //msg = _("\nThe 'Mouse' class is only supported on the Arduino Leonardo.\n\n");
+      }
+      
+      if (pieces[3].trim().equals("'Keyboard' was not declared in this scope")) {
+        error = _("'Keyboard' only supported on the Arduino Leonardo");
+        //msg = _("\nThe 'Keyboard' class is only supported on the Arduino Leonardo.\n\n");
+      }
+      
       RunnerException e = sketch.placeException(error, pieces[1], PApplet.parseInt(pieces[2]) - 1);
 
       // replace full file path with the name of the sketch tab (unless we're
