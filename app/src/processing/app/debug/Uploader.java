@@ -184,7 +184,17 @@ public abstract class Uploader implements MessageConsumer  {
   boolean notFoundError;
 
   public void message(String s) {
-    //System.err.println("MSG: " + s);
+  	// selectively suppress a bunch of avrdude output for AVR109/Caterina that should already be quelled but isn't
+	if (!Preferences.getBoolean("upload.verbose") && ( 
+		s.indexOf("Connecting to programmer:") != -1 ||
+		s.indexOf("Found programmer: Id = \"CATERIN\"; type = S") != -1 ||
+		s.indexOf("Software Version = 1.0; No Hardware Version given.") != -1 ||
+		s.indexOf("Programmer supports auto addr increment.") != -1 ||
+		s.indexOf("Programmer supports buffered memory access with buffersize=128 bytes.") != -1 || 
+		s.indexOf("Programmer supports the following devices:") != -1 || 
+		s.indexOf("Device code: 0x44") != -1))
+		s = "";	
+    
     System.err.print(s);
 
     // ignore cautions
