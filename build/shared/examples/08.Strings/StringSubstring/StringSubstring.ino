@@ -3,7 +3,7 @@
  
  Examples of how to use substring in a String
  
- created 27 July 2010
+ created 27 July 2010, modified 1 April 2012
  by Tom Igoe
  
  http://arduino.cc/en/Tutorial/StringSubstring
@@ -13,6 +13,9 @@
 
 void setup() {
   Serial.begin(9600);
+  // Wait for port to be opened:
+  while (!Serial)
+    ;
   Serial.println("\n\nString  substring():");
 }
 
