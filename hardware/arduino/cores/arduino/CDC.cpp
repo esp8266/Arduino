@@ -213,6 +213,12 @@ size_t Serial_::write(uint8_t c)
 	return 0;
 }
 
+Serial_::operator bool() {
+	if (_usbLineInfo.lineState > 0)
+		return true;
+	return false;
+}
+
 Serial_ Serial;
 
 #endif

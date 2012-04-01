@@ -39,6 +39,7 @@ public:
 	virtual int read(void);
 	virtual void flush(void);
 	virtual size_t write(uint8_t);
+	operator bool();
 };
 extern Serial_ Serial;
 
