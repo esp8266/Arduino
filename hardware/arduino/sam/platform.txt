@@ -53,6 +53,7 @@ recipe.size.regex=\.text\s+([0-9]+).*
 # -------------------
 
 tools.bossac.cmd=bossac
+tools.bossac.cmd.windows=bossac.exe
 tools.bossac.path={runtime.ide.path}/hardware/tools
 
 tools.bossac.upload.params.verbose=-i -d

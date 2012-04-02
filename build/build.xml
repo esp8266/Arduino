@@ -462,6 +462,14 @@
       <fileset file="windows/eeprom.h" />
     </copy>
 
+    <!-- Copy bossac.exe tool -->
+    <copy todir="windows/work/hardware/tools">
+      <fileset file="windows/bossac.exe" />
+    </copy>
+    <chmod perm="755">
+      <fileset file="windows/work/hardware/tools/bossac.exe" />
+    </chmod>
+
     <antcall target="assemble">
       <param name="target.path" value="windows/work" />
     </antcall>
