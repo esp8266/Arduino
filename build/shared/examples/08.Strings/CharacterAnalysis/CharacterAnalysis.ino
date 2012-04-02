@@ -14,7 +14,9 @@
 void setup() {
   // Open serial communications and wait for port to open:
   Serial.begin(9600);
-  while(!Serial) ;
+  // this check is only needed on the Leonardo:
+  while (!Serial) ;
+ ;
 
   // send an intro:
   Serial.println("send any byte and I'll tell you everything I can about it");

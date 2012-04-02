@@ -41,7 +41,9 @@ void setup() {
   Ethernet.begin(mac, ip);
  // Open serial communications and wait for port to open:
   Serial.begin(9600);
-  while(!Serial) ;
+  // this check is only needed on the Leonardo:
+  while (!Serial) ;
+ ;
 
   // give the Ethernet shield a second to initialize:
   delay(1000);

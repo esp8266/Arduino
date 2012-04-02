@@ -22,6 +22,7 @@
 void setup() { 
  //Initialize serial and wait for port to open:
   Serial.begin(9600); 
+  // this check is only needed on the Leonardo:
   while (!Serial) ;
   
   // prints title with ending line break 

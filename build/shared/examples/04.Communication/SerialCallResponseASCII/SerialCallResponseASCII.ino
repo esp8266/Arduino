@@ -37,7 +37,9 @@ void setup()
 {
   // start serial port at 9600 bps and wait for port to open:
   Serial.begin(9600);
+  // this check is only needed on the Leonardo:
   while (!Serial) ;
+ ;
   
   pinMode(2, INPUT);   // digital sensor is on digital pin 2
   establishContact();  // send a byte to establish contact until receiver responds 

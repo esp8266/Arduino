@@ -15,7 +15,9 @@
 void setup() {
   Serial.begin(9600);
   // Wait for port to be opened:
+  // this check is only needed on the Leonardo:
   while (!Serial) ;
+ ;
   
   Serial.println("\n\nString  substring():");
 }

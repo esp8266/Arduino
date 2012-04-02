@@ -15,7 +15,9 @@
 void setup() {
  // Open serial communications and wait for port to open:
   Serial.begin(9600);
-  while(!Serial) ;
+  // this check is only needed on the Leonardo:
+  while (!Serial) ;
+ ;
 
   Serial.println("\n\nString  case changes:");
 }

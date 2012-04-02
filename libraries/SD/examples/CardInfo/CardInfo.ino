@@ -37,7 +37,9 @@ void setup()
 {
  // Open serial communications and wait for port to open:
   Serial.begin(9600);
-  while(!Serial) ;
+  // this check is only needed on the Leonardo:
+  while (!Serial) ;
+ ;
 
   Serial.print("\nInitializing SD card...");
   // On the Ethernet Shield, CS is pin 4. It's set as an output by default.

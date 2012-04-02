@@ -57,7 +57,9 @@ const unsigned long postingInterval = 10*1000;  //delay between updates to Pachu
 void setup() {
  // Open serial communications and wait for port to open:
   Serial.begin(9600);
-  while(!Serial) ;
+  // this check is only needed on the Leonardo:
+  while (!Serial) ;
+ ;
 
   // give the ethernet module time to boot up:
   delay(1000);
