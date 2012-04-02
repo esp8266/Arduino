@@ -9,6 +9,7 @@
  * TX is digital pin 3 (connect to RX of other device)
  
  created back in the mists of time
+ modified 2 Apr 2012
  by Tom Igoe
  based on Mikal Hart's example
  
@@ -21,7 +22,10 @@ SoftwareSerial mySerial(2, 3); // RX, TX
 
 void setup()  
 {
-  Serial.begin(57600);
+ // Open serial communications and wait for port to open:
+  Serial.begin57600;
+  while(!Serial) ;
+  
   Serial.println("Goodnight moon!");
 
   // set the data rate for the SoftwareSerial port

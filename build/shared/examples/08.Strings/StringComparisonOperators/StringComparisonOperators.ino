@@ -4,7 +4,7 @@
  Examples of how to compare strings using the comparison operators
  
  created 27 July 2010
- modified 30 Aug 2011
+ modified 2 Apr 2012
  by Tom Igoe
  
  http://arduino.cc/en/Tutorial/StringComparisonOperators
@@ -15,7 +15,10 @@
 String stringOne, stringTwo;
 
 void setup() {
+ // Open serial communications and wait for port to open:
   Serial.begin(9600);
+  while(!Serial) ;
+
   stringOne = String("this");
   stringTwo = String("that");
   Serial.println("\n\nComparing Strings:");

@@ -4,6 +4,7 @@
  Examples of how to use length() and trim() in a String
  
  created 27 July 2010
+ modified 2 Apr 2012
  by Tom Igoe
  
  http://arduino.cc/en/Tutorial/StringLengthTrim
@@ -12,7 +13,10 @@
  */
 
 void setup() {
+ // Open serial communications and wait for port to open:
   Serial.begin(9600);
+  while(!Serial) ;
+
   Serial.println("\n\nString  length() and trim():");
 }
 

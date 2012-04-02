@@ -19,7 +19,7 @@
  
  Created 26 Sept. 2005
  by Tom Igoe
- modified 26 Oct 2011
+ modified 2 Apr 2012
  by Tom Igoe and Scott Fitzgerald
  
  This example code is in the public domain.
@@ -35,8 +35,10 @@ int inByte = 0;         // incoming serial byte
 
 void setup()
 {
-  // start serial port at 9600 bps:
+  // start serial port at 9600 bps and wait for port to open:
   Serial.begin(9600);
+  while (!Serial) ;
+  
   pinMode(2, INPUT);   // digital sensor is on digital pin 2
   establishContact();  // send a byte to establish contact until receiver responds 
 }

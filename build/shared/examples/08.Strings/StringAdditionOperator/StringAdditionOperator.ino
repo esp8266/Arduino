@@ -5,7 +5,7 @@
  You can also add several different data types to string, as shown here:
  
  created 27 July 2010
- modified 30 Aug 2011
+ modified 2 Apr 2012
  by Tom Igoe
  
  http://arduino.cc/en/Tutorial/StringAdditionOperator
@@ -17,7 +17,10 @@
 String stringOne, stringTwo, stringThree;
 
 void setup() {
+  // initialize serial and wait for port to open:
   Serial.begin(9600);
+  while (!Serial) ;
+  
   stringOne = String("stringThree = ");
   stringTwo = String("this string");
   stringThree = String ();

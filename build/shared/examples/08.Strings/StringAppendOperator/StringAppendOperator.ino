@@ -4,7 +4,7 @@
  Examples of how to append different data types to strings
  
  created 27 July 2010
- modified 30 Aug 2011
+ modified 2 Apr 2012
  by Tom Igoe
  
  http://arduino.cc/en/Tutorial/StringAppendOperator
@@ -14,7 +14,10 @@
 String stringOne, stringTwo;
 
 void setup() {
+ // Open serial communications and wait for port to open:
   Serial.begin(9600);
+  while(!Serial) ;
+
   stringOne = String("Sensor ");
   stringTwo = String("value");
   Serial.println("\n\nAppending to a string:");

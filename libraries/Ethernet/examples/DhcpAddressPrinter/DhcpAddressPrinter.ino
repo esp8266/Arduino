@@ -9,6 +9,7 @@
  * Ethernet shield attached to pins 10, 11, 12, 13
  
  created 12 April 2011
+ modified 2 Apr 2012
  by Tom Igoe
  
  */
@@ -27,8 +28,10 @@ byte mac[] = {
 EthernetClient client;
 
 void setup() {
-  // start the serial library:
+ // Open serial communications and wait for port to open:
   Serial.begin(9600);
+  while(!Serial) ;
+
   // start the Ethernet connection:
   if (Ethernet.begin(mac) == 0) {
     Serial.println("Failed to configure Ethernet using DHCP");

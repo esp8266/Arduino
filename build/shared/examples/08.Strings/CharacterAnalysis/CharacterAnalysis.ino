@@ -5,14 +5,16 @@
  Send any byte and the sketch will tell you about it.
  
  created 29 Nov 2010
+ modified 2 Apr 2012
  by Tom Igoe
  
  This example code is in the public domain.
  */
 
 void setup() {
-  // Open serial communications:
+  // Open serial communications and wait for port to open:
   Serial.begin(9600);
+  while(!Serial) ;
 
   // send an intro:
   Serial.println("send any byte and I'll tell you everything I can about it");

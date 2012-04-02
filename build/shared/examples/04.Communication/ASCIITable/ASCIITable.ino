@@ -11,7 +11,7 @@
  
  created 2006
  by Nicholas Zambetti 
- modified 30 Aug 2011
+ modified 2 Apr 2012
  by Tom Igoe
  
  This example code is in the public domain.
@@ -19,10 +19,11 @@
  <http://www.zambetti.com> 
  
  */
-void setup() 
-{ 
+void setup() { 
+ //Initialize serial and wait for port to open:
   Serial.begin(9600); 
-
+  while (!Serial) ;
+  
   // prints title with ending line break 
   Serial.println("ASCII Table ~ Character Map"); 
 } 
@@ -33,8 +34,7 @@ int thisByte = 33;
 // for example. '!' is the same as 33, so you could also use this:
 //int thisByte = '!';  
 
-void loop() 
-{ 
+void loop() { 
   // prints value unaltered, i.e. the raw binary version of the 
   // byte. The serial monitor interprets all bytes as 
   // ASCII, so 33, the first number,  will show up as '!' 
