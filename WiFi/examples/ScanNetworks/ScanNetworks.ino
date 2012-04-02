@@ -10,7 +10,7 @@
  
  created 13 July 2010
  by dlf (Metodo2 srl)
- modified 12 Mar 2012
+ modified 2 April 2012
  by Tom Igoe
  */
 
@@ -19,8 +19,9 @@
 #include <WiFi.h>
 
 void setup() {
-  // initialize serial:
+  // initialize serial and wait for the port to open:
   Serial.begin(9600);
+  while(!Serial) ;
 
   // attempt to connect using WEP encryption:
   Serial.println("Initializing Wifi...");
@@ -41,7 +42,7 @@ void loop() {
 void printMacAddress() {
   // the MAC address of your Wifi shield
   byte mac[6];                     
-  
+
   // print your MAC address:
   WiFi.macAddress(mac);
   Serial.print("MAC: ");
@@ -66,7 +67,7 @@ void listNetworks() {
   // print the list of networks seen:
   Serial.print("number of available networks:");
   Serial.println(numSsid);
-  
+
   // print the network number and name for each network found:
   for (int thisNet = 0; thisNet<numSsid; thisNet++) {
     Serial.print(thisNet);
@@ -79,5 +80,6 @@ void listNetworks() {
     Serial.println(WiFi.encryptionType(thisNet));
   }
 }
+
 
 
