@@ -28,10 +28,8 @@ import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
-import gnu.io.CommPortIdentifier;
-import java.util.Enumeration;
 
-public class SerialMonitor extends JFrame implements MessageConsumer, Runnable {
+public class SerialMonitor extends JFrame implements MessageConsumer {
   private Serial serial;
   private String port;
   private JTextArea textArea;
@@ -173,9 +171,6 @@ public class SerialMonitor extends JFrame implements MessageConsumer, Runnable {
         }
       }
     }
-    
-    Thread thread = new Thread(this);
-    thread.start();
   }
   
   protected void setPlacement(int[] location) {
@@ -232,27 +227,5 @@ public class SerialMonitor extends JFrame implements MessageConsumer, Runnable {
         	textArea.setCaretPosition(textArea.getDocument().getLength());
         }
       }});
-  }
-  
-  public void run() {
-  	while (!Thread.interrupted()) {
-  		if (serial != null) {
-			Enumeration portList = CommPortIdentifier.getPortIdentifiers();
-			boolean portStillHere = false;
-			while (portList.hasMoreElements()) {
-				CommPortIdentifier portId = (CommPortIdentifier) portList.nextElement();
-				if (portId.getName().equals(port)) {
-					portStillHere = true;
-		        }
-		    }
-		    if (!portStillHere) {
-				closeSerialPort();
-				setVisible(false);
-		    }
-	        try {
-				Thread.sleep(100);
-			} catch (InterruptedException ex) { } 		
-		}
-  	}
   }
 }
