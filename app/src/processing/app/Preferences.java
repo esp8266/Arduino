@@ -303,7 +303,7 @@ public class Preferences {
 
     // [ ] Verify code after upload
     
-    verifyUploadBox = new JCheckBox("Verify code after upload");
+    verifyUploadBox = new JCheckBox(_("Verify code after upload"));
     pain.add(verifyUploadBox);
     d = verifyUploadBox.getPreferredSize();
     verifyUploadBox.setBounds(left, top, d.width + 10, d.height);
