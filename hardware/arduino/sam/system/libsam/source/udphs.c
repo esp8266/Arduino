@@ -18,7 +18,7 @@
 
 #include "chip.h"
 
-#if SAM3U_SERIES
+#if 0 //SAM3U_SERIES
 
 #include "USB_driver.h"
 #include "udphs.h"
