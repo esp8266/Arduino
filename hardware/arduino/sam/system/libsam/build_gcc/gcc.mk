@@ -52,7 +52,7 @@ CFLAGS += -Wcast-align
 # To reduce application size use only integer printf function.
 CFLAGS += -Dprintf=iprintf
 
-CFLAGS += --param max-inline-insns-single=500 -mcpu=cortex-m3 -mthumb -mlong-calls -ffunction-sections -std=c99
+CFLAGS += --param max-inline-insns-single=500 -mcpu=cortex-m3 -mthumb -mlong-calls -ffunction-sections -fdata-sections -std=c99
 CFLAGS += $(OPTIMIZATION) $(INCLUDES) -D$(CHIP)
 
 

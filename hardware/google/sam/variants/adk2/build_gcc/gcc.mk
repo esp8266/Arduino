@@ -49,7 +49,7 @@ CFLAGS += -Wcast-align
 #CFLAGS += -Wmissing-noreturn
 #CFLAGS += -Wconversion
 
-CFLAGS += --param max-inline-insns-single=500 -mcpu=cortex-m3 -mthumb -mlong-calls -ffunction-sections -nostdlib 
+CFLAGS += --param max-inline-insns-single=500 -mcpu=cortex-m3 -mthumb -mlong-calls -ffunction-sections -fdata-sections -nostdlib 
 CFLAGS += $(OPTIMIZATION) $(INCLUDES) -D$(CHIP) -D$(VARIANT)
 
 # To reduce application size use only integer printf function.
@@ -69,7 +69,7 @@ CPPFLAGS += -Wpacked -Wredundant-decls -Winline -Wlong-long
 #CPPFLAGS += -Wmissing-noreturn
 #CPPFLAGS += -Wconversion
 
-CPPFLAGS += --param max-inline-insns-single=500 -mcpu=cortex-m3 -mthumb -mlong-calls -ffunction-sections -fno-rtti -fno-exceptions
+CPPFLAGS += --param max-inline-insns-single=500 -mcpu=cortex-m3 -mthumb -mlong-calls -ffunction-sections -fno-rtti -fdata-sections -fno-exceptions
 CPPFLAGS += $(OPTIMIZATION) $(INCLUDES) -D$(CHIP)
 
 # To reduce application size use only integer printf function.
