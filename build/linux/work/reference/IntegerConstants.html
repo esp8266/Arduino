@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+  <title>Arduino Reference - IntegerConstants </title>
+  <link rel="shortcut icon" type="image/x-icon" href="http://arduino.cc/en/favicon.png">
+  <link rel='stylesheet' href='arduinoWideRender.css' 
+type='text/css' />
+    <!--HeaderText--><style type='text/css'><!--
+  ul, ol, pre, dl, p { margin-top:0px; margin-bottom:0px; }
+  code { white-space: nowrap; }
+  .vspace { margin-top:1.33em; }
+  .indent { margin-left:40px; }
+  .outdent { margin-left:40px; text-indent:-40px; }
+  a.createlinktext { text-decoration:none; border-bottom:1px dotted gray; }
+  a.createlink { text-decoration:none; position:relative; top:-0.5em;
+    font-weight:bold; font-size:smaller; border-bottom:none; }
+  img { border:0px; }
+  .editconflict { color:green; 
+  font-style:italic; margin-top:1.33em; margin-bottom:1.33em; }
+
+  table.markup { border: 2px dotted #ccf; width:90%; }
+  td.markup1, td.markup2 { padding-left:10px; padding-right:10px; }
+  td.markup1 { border-bottom: 1px solid #ccf; }
+  div.faq { margin-left:2em; }
+  div.faq p.question { margin: 1em 0 0.75em -2em; font-weight:bold; }
+  div.faq hr { margin-left: -2em; }
+   
+    .frame 
+      { border:1px solid #cccccc; padding:4px; background-color:#f9f9f9; }
+    .lfloat { float:left; margin-right:0.5em; }
+    .rfloat { float:right; margin-left:0.5em; }
+a.varlink { text-decoration:none; }
+
+--></style>  <meta name='robots' content='index,follow' />
+
+  <meta name="verify-v1" content="TtxFIEJAB6zdJ509wLxjnapQzKAMNm9u0Wj4ho6wxIY=" />
+</head>
+<body>
+<div id="page">
+  <!--PageHeaderFmt-->
+  <div id="pageheader">
+    <div class="title"><a href='http://arduino.cc/en'>Arduino</a></div>
+  </div>
+  <!--/PageHeaderFmt-->
+
+  <!--PageLeftFmt-->
+  <div id="pagenav">
+    <div id="navbar">
+  	<p><a class='wikilink' href='http://arduino.cc/en/Main/Buy'>Buy</a>
+<a class='wikilink' href='http://arduino.cc/en/Main/Software'>Download</a>
+<a class='wikilink' href='Guide_index.html'>Getting Started</a>
+<a class='wikilink' href='http://arduino.cc/en/Tutorial/HomePage'>Learning</a>
+<a class='wikilink' href='index.html'>Reference</a>
+<a class='wikilink' href='http://arduino.cc/en/Main/Hardware'>Hardware</a>
+<a class='wikilink' href='FAQ.html'>FAQ</a>
+</p>
+<p class='vspace'></p>
+
+    </div>
+  </div>
+  <!--/PageLeftFmt-->
+
+  <div id="pagetext">
+  <!--PageText-->
+<div id='wikitext'>
+<p><strong>Reference</strong> &nbsp;  <a class='wikilink' href='index.html'>Language</a> | <a class='wikilink' href='Libraries.html'>Libraries</a> | <a class='wikilink' href='Comparison.html'>Comparison</a> | <a class='wikilink' href='Changes.html'>Changes</a>
+</p>
+<p class='vspace'></p><h2>Integer Constants</h2>
+<p>Integer constants are numbers used directly in a sketch, like <code>123</code>.  By default, these numbers are treated as <a class='wikilink' href='Int.html'>int</a>'s but you can change this with the U and L modifiers (see below).
+</p>
+<p class='vspace'></p><p>Normally, integer constants are treated as base 10 (decimal) integers, but special notation (formatters) may be used to enter numbers in other bases.  
+</p>
+<p class='vspace'></p><pre>
+Base               Example    Formatter        Comment
+
+10 (decimal)           123    none
+
+2 (binary)        B1111011    leading 'B'      only works with 8 bit values (0 to 255)
+                                               characters 0-1 valid
+
+8 (octal)             0173    leading "0"      characters 0-7 valid       
+
+16 (hexadecimal)      0x7B    leading "0x"     characters 0-9, A-F, a-f valid    
+
+</pre>
+<p class='vspace'></p><p><strong>Decimal</strong> is base 10. This is the common-sense math with which you are acquainted. Constants without other prefixes are assumed to be in decimal format.
+</p>
+<p class='vspace'></p>Example:<pre>
+101     // same as 101 decimal   ((1 * 10^2) + (0 * 10^1) + 1)
+</pre>
+<p><br />
+<strong>Binary</strong> is base two.  Only characters 0 and 1 are valid. 
+</p>
+<p class='vspace'></p>Example:<pre>
+B101    // same as 5 decimal   ((1 * 2^2) + (0 * 2^1) + 1)
+</pre>
+<p>The binary formatter only works on bytes (8 bits) between 0 (B0) and 255 (B11111111). If it is convenient to input an int (16 bits) in binary form you can do it a two-step procedure such as:
+</p>
+<p class='vspace'></p><pre>
+myInt = (B11001100 * 256) + B10101010;    // B11001100 is the high byte
+
+</pre>
+<p class='vspace'></p><p><strong>Octal</strong> is base eight.  Only characters 0 through 7 are valid. Octal values are indicated by the prefix "0"
+</p>
+<p class='vspace'></p><p>Example:
+</p><pre>
+0101    // same as 65 decimal   ((1 * 8^2) + (0 * 8^1) + 1) 
+</pre><div class='indent'>Warning
+</div><div class='indent'>It is possible to generate a hard-to-find bug by (unintentionally) including a leading zero before a constant and having the compiler unintentionally interpret your constant as octal.
+</div><p><br />
+<strong>Hexadecimal (or hex)</strong> is base sixteen. Valid characters are 0 through 9 and letters A through F; A has the value 10, B is 11, up to F, which is 15. Hex values are indicated by the prefix "0x". Note that A-F may be syted in upper or lower case (a-f).
+</p>
+<p class='vspace'></p><p>Example:
+</p><pre>
+0x101   // same as 257 decimal   ((1 * 16^2) + (0 * 16^1) + 1)
+
+</pre>
+<p class='vspace'></p><h4>U &amp; L formatters</h4>
+<p>By default, an integer constant is treated as an <a class='wikilink' href='Int.html'>int</a> with the attendant limitations in values.  To specify an integer constant with another data type, follow it with:
+</p>
+<p class='vspace'></p><ul><li>a 'u' or 'U' to force the constant into an unsigned data format. Example: <code>33u</code>
+</li><li>a 'l' or 'L' to force the constant into a long data format. Example: <code>100000L</code>
+</li><li>a 'ul' or 'UL' to force the constant into an unsigned long constant. Example: <code>32767ul</code> 
+</li></ul><p><br />
+</p>
+<p class='vspace'></p><h4>See also</h4>
+<ul><li><a class='wikilink' href='Constants.html'>constants</a>
+</li><li><a class='wikilink' href='Define.html'>#define</a>
+</li><li><a class='wikilink' href='Byte.html'>byte</a>
+</li><li><a class='wikilink' href='Int.html'>int</a>
+</li><li><a class='wikilink' href='UnsignedInt.html'>unsigned int</a>
+</li><li><a class='wikilink' href='Long.html'>long</a>
+</li><li><a class='wikilink' href='UnsignedLong.html'>unsigned long</a>
+</li></ul><p class='vspace'></p><p><a class='wikilink' href='index.html'>Reference Home</a>
+</p>
+<p class='vspace'></p><p><em>Corrections, suggestions, and new documentation should be posted to the <a class='urllink' href='http://arduino.cc/forum/index.php/board,23.0.html' rel='nofollow'>Forum</a>.</em>
+</p>
+<p class='vspace'></p><p>The text of the Arduino reference is licensed under a
+<a class='urllink' href='http://creativecommons.org/licenses/by-sa/3.0/' rel='nofollow'>Creative Commons Attribution-ShareAlike 3.0 License</a>.  Code samples in the reference are released into the public domain.
+</p>
+</div>
+
+
+  </div>
+
+  <!--PageFooterFmt-->
+  <div id="pagefooter">
+&copy;Arduino | 
+  <a href='#'>Edit Page</a> | <a href='#'>Page History</a> | <a href='#' target='_blank'>Printable View</a> | <a href='http://arduino.cc/en/Site/AllRecentChanges'>All Recent Site Changes</a>
+  </div>
+  <!--/PageFooterFmt-->
+
+</div>
+</body>
+</html>

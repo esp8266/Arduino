@@ -13,11 +13,11 @@
  */
 
 void setup() {
- // Open serial communications and wait for port to open:
+  // Open serial communications and wait for port to open:
   Serial.begin(9600);
   // this check is only needed on the Leonardo:
   while (!Serial) ;
- ;
+  ;
 
   Serial.println("\n\nString  length() and trim():");
 }
@@ -30,7 +30,7 @@ void loop() {
   Serial.println(stringOne.length());
 
   // trim the white space off the string:
-  stringOne = stringOne.trim();
+  stringOne.trim();
   Serial.print(stringOne);
   Serial.print("<--- end of trimmed string. Length: ");
   Serial.println(stringOne.length());

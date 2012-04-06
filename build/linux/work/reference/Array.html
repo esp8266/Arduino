@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+  <title>Arduino Reference - Array </title>
+  <link rel="shortcut icon" type="image/x-icon" href="http://arduino.cc/en/favicon.png">
+  <link rel='stylesheet' href='arduinoWideRender.css' 
+type='text/css' />
+    <!--HeaderText--><style type='text/css'><!--
+  ul, ol, pre, dl, p { margin-top:0px; margin-bottom:0px; }
+  code { white-space: nowrap; }
+  .vspace { margin-top:1.33em; }
+  .indent { margin-left:40px; }
+  .outdent { margin-left:40px; text-indent:-40px; }
+  a.createlinktext { text-decoration:none; border-bottom:1px dotted gray; }
+  a.createlink { text-decoration:none; position:relative; top:-0.5em;
+    font-weight:bold; font-size:smaller; border-bottom:none; }
+  img { border:0px; }
+  .editconflict { color:green; 
+  font-style:italic; margin-top:1.33em; margin-bottom:1.33em; }
+
+  table.markup { border: 2px dotted #ccf; width:90%; }
+  td.markup1, td.markup2 { padding-left:10px; padding-right:10px; }
+  td.markup1 { border-bottom: 1px solid #ccf; }
+  div.faq { margin-left:2em; }
+  div.faq p.question { margin: 1em 0 0.75em -2em; font-weight:bold; }
+  div.faq hr { margin-left: -2em; }
+   
+    .frame 
+      { border:1px solid #cccccc; padding:4px; background-color:#f9f9f9; }
+    .lfloat { float:left; margin-right:0.5em; }
+    .rfloat { float:right; margin-left:0.5em; }
+a.varlink { text-decoration:none; }
+
+--></style>  <meta name='robots' content='index,follow' />
+
+  <meta name="verify-v1" content="TtxFIEJAB6zdJ509wLxjnapQzKAMNm9u0Wj4ho6wxIY=" />
+</head>
+<body>
+<div id="page">
+  <!--PageHeaderFmt-->
+  <div id="pageheader">
+    <div class="title"><a href='http://arduino.cc/en'>Arduino</a></div>
+  </div>
+  <!--/PageHeaderFmt-->
+
+  <!--PageLeftFmt-->
+  <div id="pagenav">
+    <div id="navbar">
+  	<p><a class='wikilink' href='http://arduino.cc/en/Main/Buy'>Buy</a>
+<a class='wikilink' href='http://arduino.cc/en/Main/Software'>Download</a>
+<a class='wikilink' href='Guide_index.html'>Getting Started</a>
+<a class='wikilink' href='http://arduino.cc/en/Tutorial/HomePage'>Learning</a>
+<a class='wikilink' href='index.html'>Reference</a>
+<a class='wikilink' href='http://arduino.cc/en/Main/Hardware'>Hardware</a>
+<a class='wikilink' href='FAQ.html'>FAQ</a>
+</p>
+<p class='vspace'></p>
+
+    </div>
+  </div>
+  <!--/PageLeftFmt-->
+
+  <div id="pagetext">
+  <!--PageText-->
+<div id='wikitext'>
+<p><strong>Reference</strong> &nbsp;  <a class='wikilink' href='index.html'>Language</a> | <a class='wikilink' href='Libraries.html'>Libraries</a> | <a class='wikilink' href='Comparison.html'>Comparison</a> | <a class='wikilink' href='Changes.html'>Changes</a>
+</p>
+<p class='vspace'></p><h2>Arrays</h2>
+<p>An array is a collection of variables that are accessed with an index number. Arrays in the C programming language, on which Arduino is based, can be complicated, but using simple arrays is relatively straightforward.
+</p>
+<p class='vspace'></p><h4>Creating (Declaring) an Array</h4>
+<p>All of the methods below are valid ways to create (declare) an array.
+</p>
+<p class='vspace'></p><pre>
+  int myInts[6];
+  int myPins[] = {2, 4, 8, 3, 6};
+  int mySensVals[6] = {2, 4, -8, 3, 2};
+  char message[6] = "hello";
+
+</pre>
+<p class='vspace'></p><p>You can declare an array without initializing it as in myInts.<br /><br />In myPins we declare an array without explicitly choosing a size. The compiler counts the elements and creates an array of the appropriate size.
+</p>
+<p class='vspace'></p><p>Finally you can both initialize and size your array, as in mySensVals. Note that when declaring an array of type char, one more element than your initialization is required, to hold the required null character.
+</p>
+<p class='vspace'></p><h4>Accessing an Array</h4>
+<p>Arrays are <strong>zero indexed</strong>, that is, referring to the array initialization above, the first element of the array is at index 0, hence<br /><br /><code>mySensVals[0] == 2, mySensVals[1] == 4,</code> and so forth.
+</p>
+<p class='vspace'></p><p>It also means that in an array with ten elements, index nine is the last element. Hence:
+</p><pre>
+int myArray[10]={9,3,2,4,3,2,7,8,9,11};
+     // myArray[9]    contains 11
+     // myArray[10]   is invalid and contains random information (other memory address)      
+
+</pre>
+<p class='vspace'></p><p>For this reason you should be careful in accessing arrays. Accessing past the end of an array (using an index number greater than your declared array size - 1) is reading from memory that is in use for other purposes. Reading from these locations is probably not going to do much except yield invalid data. Writing to random memory locations is definitely a bad idea and can often lead to unhappy results such as crashes or program malfunction. This can also be a difficult bug to track down.
+</p>
+<p class='vspace'></p><p>Unlike BASIC or JAVA, the C compiler does no checking to see if array access is within legal bounds of the array size that you have declared.
+</p>
+<p class='vspace'></p><h4>To assign a value to an array:</h4>
+<pre>
+mySensVals[0] = 10;
+</pre>
+<p class='vspace'></p><h4>To retrieve a value from an array:</h4>
+<p><code>x = mySensVals[4]</code>;
+</p>
+<p class='vspace'></p><h4>Arrays and FOR Loops</h4>
+<p>Arrays are often manipulated inside <strong>for</strong> loops, where the loop counter is used as the index for each array element. For example, to print the elements of an array over the serial port, you could do something like this:
+</p>
+<p class='vspace'></p><pre>
+int i;
+for (i = 0; i &lt; 5; i = i + 1) {
+  Serial.println(myPins[i]);
+}
+</pre><h4>Example</h4>
+<p>For a complete program that demonstrates the use of arrays, see the <a class='urllink' href='http://www.arduino.cc/en/Tutorial/KnightRider' rel='nofollow'>Knight Rider example</a> from the <a class='urllink' href='http://www.arduino.cc/en/Main/LearnArduino' rel='nofollow'>Tutorials</a>.
+</p>
+<p class='vspace'></p><h4>See also</h4>
+<ul><li><a class='urllink' href='http://arduino.cc/en/Reference/VariableDeclaration' rel='nofollow'>Variable Declaration</a>
+</li><li><a class='wikilink' href='PROGMEM.html'>PROGMEM</a>
+</li></ul><p class='vspace'></p><p><a class='wikilink' href='index.html'>Reference Home</a>
+</p>
+<p class='vspace'></p><p><em>Corrections, suggestions, and new documentation should be posted to the <a class='urllink' href='http://arduino.cc/forum/index.php/board,23.0.html' rel='nofollow'>Forum</a>.</em>
+</p>
+<p class='vspace'></p><p>The text of the Arduino reference is licensed under a
+<a class='urllink' href='http://creativecommons.org/licenses/by-sa/3.0/' rel='nofollow'>Creative Commons Attribution-ShareAlike 3.0 License</a>.  Code samples in the reference are released into the public domain.
+</p>
+</div>
+
+
+  </div>
+
+  <!--PageFooterFmt-->
+  <div id="pagefooter">
+&copy;Arduino | 
+  <a href='#'>Edit Page</a> | <a href='#'>Page History</a> | <a href='#' target='_blank'>Printable View</a> | <a href='http://arduino.cc/en/Site/AllRecentChanges'>All Recent Site Changes</a>
+  </div>
+  <!--/PageFooterFmt-->
+
+</div>
+</body>
+</html>

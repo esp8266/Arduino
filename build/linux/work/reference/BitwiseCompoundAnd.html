@@ -1,0 +1,149 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+  <title>Arduino Reference - BitwiseCompoundAnd </title>
+  <link rel="shortcut icon" type="image/x-icon" href="http://arduino.cc/en/favicon.png">
+  <link rel='stylesheet' href='arduinoWideRender.css' 
+type='text/css' />
+    <!--HeaderText--><style type='text/css'><!--
+  ul, ol, pre, dl, p { margin-top:0px; margin-bottom:0px; }
+  code { white-space: nowrap; }
+  .vspace { margin-top:1.33em; }
+  .indent { margin-left:40px; }
+  .outdent { margin-left:40px; text-indent:-40px; }
+  a.createlinktext { text-decoration:none; border-bottom:1px dotted gray; }
+  a.createlink { text-decoration:none; position:relative; top:-0.5em;
+    font-weight:bold; font-size:smaller; border-bottom:none; }
+  img { border:0px; }
+  .editconflict { color:green; 
+  font-style:italic; margin-top:1.33em; margin-bottom:1.33em; }
+
+  table.markup { border: 2px dotted #ccf; width:90%; }
+  td.markup1, td.markup2 { padding-left:10px; padding-right:10px; }
+  td.markup1 { border-bottom: 1px solid #ccf; }
+  div.faq { margin-left:2em; }
+  div.faq p.question { margin: 1em 0 0.75em -2em; font-weight:bold; }
+  div.faq hr { margin-left: -2em; }
+   
+    .frame 
+      { border:1px solid #cccccc; padding:4px; background-color:#f9f9f9; }
+    .lfloat { float:left; margin-right:0.5em; }
+    .rfloat { float:right; margin-left:0.5em; }
+a.varlink { text-decoration:none; }
+
+--></style>  <meta name='robots' content='index,follow' />
+
+  <meta name="verify-v1" content="TtxFIEJAB6zdJ509wLxjnapQzKAMNm9u0Wj4ho6wxIY=" />
+</head>
+<body>
+<div id="page">
+  <!--PageHeaderFmt-->
+  <div id="pageheader">
+    <div class="title"><a href='http://arduino.cc/en'>Arduino</a></div>
+  </div>
+  <!--/PageHeaderFmt-->
+
+  <!--PageLeftFmt-->
+  <div id="pagenav">
+    <div id="navbar">
+  	<p><a class='wikilink' href='http://arduino.cc/en/Main/Buy'>Buy</a>
+<a class='wikilink' href='http://arduino.cc/en/Main/Software'>Download</a>
+<a class='wikilink' href='Guide_index.html'>Getting Started</a>
+<a class='wikilink' href='http://arduino.cc/en/Tutorial/HomePage'>Learning</a>
+<a class='wikilink' href='index.html'>Reference</a>
+<a class='wikilink' href='http://arduino.cc/en/Main/Hardware'>Hardware</a>
+<a class='wikilink' href='FAQ.html'>FAQ</a>
+</p>
+<p class='vspace'></p>
+
+    </div>
+  </div>
+  <!--/PageLeftFmt-->
+
+  <div id="pagetext">
+  <!--PageText-->
+<div id='wikitext'>
+<p><strong>Reference</strong> &nbsp;  <a class='wikilink' href='index.html'>Language</a> | <a class='wikilink' href='Libraries.html'>Libraries</a> | <a class='wikilink' href='Comparison.html'>Comparison</a> | <a class='wikilink' href='Changes.html'>Changes</a>
+</p>
+<p class='vspace'></p><h2>compound bitwise AND (&amp;=)</h2>
+<h4>Description </h4>
+<p>The compound bitwise AND operator (&amp;=) is often used with a variable and a constant to force particular bits in a variable to the LOW state (to 0). This is often referred to in programming guides as "clearing" or "resetting" bits.
+</p>
+<p class='vspace'></p><h4>Syntax:</h4>
+<pre>
+x &amp;= y;   // equivalent to x = x &amp; y; 
+</pre>
+<p class='vspace'></p><h4>Parameters</h4>
+<p>x: a char, int or long variable<br />y: an integer constant or char, int, or long
+</p>
+<p class='vspace'></p><h4>Example:</h4>
+<p>First, a review of the Bitwise AND (&amp;) operator
+</p><pre>
+   0  0  1  1    operand1
+   0  1  0  1    operand2
+   ----------
+   0  0  0  1    (operand1 &amp; operand2) - returned result
+
+</pre>
+<p class='vspace'></p><p>Bits that are "bitwise <span class='wikiword'>ANDed</span>" with 0 are cleared to 0 so, if myByte is a byte variable,<br />
+<code>myByte &amp; B00000000 = 0;</code> 
+</p>
+<p class='vspace'></p><p>Bits that are "bitwise <span class='wikiword'>ANDed</span>" with 1 are unchanged so, <br />
+<code>myByte &amp; B11111111 = myByte;</code>
+</p>
+<p class='vspace'></p><p>Note: because we are dealing with bits in a bitwise operator - it is convenient to use the binary formatter with <a class='wikilink' href='IntegerConstants.html'>constants.</a> The numbers are still the same value in other representations, they are just not as easy to understand. Also, B00000000 is shown for clarity, but zero in any number format is zero (hmmm something philosophical there?)
+</p>
+<p class='vspace'></p><p>Consequently - to clear (set to zero) bits 0 &amp; 1 of a variable, while leaving the rest of the variable unchanged, use the compound  bitwise AND operator (&amp;=) with the constant B11111100
+</p><pre>
+   1  0  1  0  1  0  1  0    variable  
+   1  1  1  1  1  1  0  0    mask
+   ----------------------
+   1  0  1  0  1  0  0  0
+
+ variable unchanged
+                     bits cleared
+  
+</pre><p>Here is the same representation with the variable's bits replaced with the symbol x
+</p>
+<p class='vspace'></p><pre>
+   x  x  x  x  x  x  x  x    variable
+   1  1  1  1  1  1  0  0    mask
+   ----------------------
+   x  x  x  x  x  x  0  0
+
+ variable unchanged
+                     bits cleared
+ 
+</pre><p>So if:
+</p><pre>
+myByte =  10101010;
+
+myByte &amp;= B1111100 == B10101000;
+</pre>
+<p class='vspace'></p><p>See Also
+</p><ul><li><a class='wikilink' href='BitwiseCompoundOr.html'>|=</a> (compound bitwise or)
+</li><li><a class='wikilink' href='BitwiseAnd.html'>&amp;</a> (bitwise AND)
+</li><li><a class='wikilink' href='BitwiseAnd.html'>|</a> (bitwise OR)
+</li></ul><p><a class='wikilink' href='index.html'>Reference Home</a>
+</p>
+<p class='vspace'></p><p><em>Corrections, suggestions, and new documentation should be posted to the <a class='urllink' href='http://arduino.cc/forum/index.php/board,23.0.html' rel='nofollow'>Forum</a>.</em>
+</p>
+<p class='vspace'></p><p>The text of the Arduino reference is licensed under a
+<a class='urllink' href='http://creativecommons.org/licenses/by-sa/3.0/' rel='nofollow'>Creative Commons Attribution-ShareAlike 3.0 License</a>.  Code samples in the reference are released into the public domain.
+</p>
+</div>
+
+
+  </div>
+
+  <!--PageFooterFmt-->
+  <div id="pagefooter">
+&copy;Arduino | 
+  <a href='#'>Edit Page</a> | <a href='#'>Page History</a> | <a href='#' target='_blank'>Printable View</a> | <a href='http://arduino.cc/en/Site/AllRecentChanges'>All Recent Site Changes</a>
+  </div>
+  <!--/PageFooterFmt-->
+
+</div>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+  <title>Arduino Reference - MacOSX </title>
+  <link rel="shortcut icon" type="image/x-icon" href="http://arduino.cc/en/favicon.png">
+  <link rel='stylesheet' href='arduinoWideRender.css' 
+type='text/css' />
+    <!--HeaderText--><style type='text/css'><!--
+  ul, ol, pre, dl, p { margin-top:0px; margin-bottom:0px; }
+  code { white-space: nowrap; }
+  .vspace { margin-top:1.33em; }
+  .indent { margin-left:40px; }
+  .outdent { margin-left:40px; text-indent:-40px; }
+  a.createlinktext { text-decoration:none; border-bottom:1px dotted gray; }
+  a.createlink { text-decoration:none; position:relative; top:-0.5em;
+    font-weight:bold; font-size:smaller; border-bottom:none; }
+  img { border:0px; }
+  .editconflict { color:green; 
+  font-style:italic; margin-top:1.33em; margin-bottom:1.33em; }
+
+  table.markup { border: 2px dotted #ccf; width:90%; }
+  td.markup1, td.markup2 { padding-left:10px; padding-right:10px; }
+  td.markup1 { border-bottom: 1px solid #ccf; }
+  div.faq { margin-left:2em; }
+  div.faq p.question { margin: 1em 0 0.75em -2em; font-weight:bold; }
+  div.faq hr { margin-left: -2em; }
+   
+    .frame 
+      { border:1px solid #cccccc; padding:4px; background-color:#f9f9f9; }
+    .lfloat { float:left; margin-right:0.5em; }
+    .rfloat { float:right; margin-left:0.5em; }
+a.varlink { text-decoration:none; }
+
+--></style>  <meta name='robots' content='index,follow' />
+
+  <meta name="verify-v1" content="TtxFIEJAB6zdJ509wLxjnapQzKAMNm9u0Wj4ho6wxIY=" />
+</head>
+<body>
+<div id="page">
+  <!--PageHeaderFmt-->
+  <div id="pageheader">
+    <div class="title"><a href='http://arduino.cc/en'>Arduino</a></div>
+  </div>
+  <!--/PageHeaderFmt-->
+
+  <!--PageLeftFmt-->
+  <div id="pagenav">
+    <div id="navbar">
+  	<p><a class='wikilink' href='http://arduino.cc/en/Main/Buy'>Buy</a>
+<a class='wikilink' href='http://arduino.cc/en/Main/Software'>Download</a>
+<a class='wikilink' href='Guide_index.html'>Getting Started</a>
+<a class='wikilink' href='http://arduino.cc/en/Tutorial/HomePage'>Learning</a>
+<a class='wikilink' href='index.html'>Reference</a>
+<a class='wikilink' href='http://arduino.cc/en/Main/Hardware'>Hardware</a>
+<a class='wikilink' href='FAQ.html'>FAQ</a>
+</p>
+<p class='vspace'></p>
+
+    </div>
+  </div>
+  <!--/PageLeftFmt-->
+
+  <div id="pagetext">
+  <!--PageText-->
+<div id='wikitext'>
+<h2>Getting Started w/ Arduino on Mac OS X</h2>
+<p><em>This document explains how to connect your Arduino board to the computer and upload your first sketch.</em>
+</p>
+<p class='vspace'></p><p>(:*toc :)
+</p>
+<p class='vspace'></p><h3>1 | Get an Arduino board and USB cable</h3>
+<p>In this tutorial, we assume you're using an <a class='wikilink' href='http://arduino.cc/en/Main/ArduinoBoardUno'>Arduino Uno</a>, <a class='wikilink' href='http://arduino.cc/en/Main/ArduinoBoardDuemilanove'>Arduino Duemilanove</a>, <a class='wikilink' href='http://arduino.cc/en/Main/ArduinoBoardNano'>Nano</a>, or <a class='wikilink' href='http://arduino.cc/en/Main/ArduinoBoardDiecimila'>Diecimila</a>.  If you have another board, read the corresponding page in this getting started guide.
+</p>
+<p class='vspace'></p><p>You also need a standard USB cable (A plug to B plug): the kind you would connect to a USB printer, for example.  (For the Arduino Nano, you'll need an A to Mini-B cable instead.)
+</p>
+<p class='vspace'></p><div><img src='http://arduino.cc/en/uploads/Main/ArduinoUnoFront240.jpg' alt='' title='' /> <img src='http://arduino.cc/en/uploads/Guide/USBCable.jpg' alt='' title='' /></div>
+<p class='vspace'></p><h3>2 | Download the Arduino environment</h3>
+<p>Get the latest version from the <a class='wikilink' href='http://arduino.cc/en/Main/Software'>download page</a>.
+</p>
+<p class='vspace'></p><p>The disk image (.dmg) should mount automatically.  If it doesn't, double-click it.  It should look like the following image.
+</p>
+<p class='vspace'></p><div><img src='http://arduino.cc/en/uploads/Guide/ArduinoDiskImage.png' alt='' title='' /></div>
+<p class='vspace'></p><h3>3 | Install the Software</h3>
+<p>Copy the Arduino application into the Applications folder (or elsewhere on your computer).  
+If you're using an Arduino Uno or Mga 2560, you don't have any drivers to install.  Skip ahead to the next step.
+</p>
+<p class='vspace'></p><p>If you're using an older board (Duemilanove, Diecimila, or any board with an FTDI driver chip that looks like this:
+</p>
+<p class='vspace'></p><div><img src='http://arduino.cc/en/uploads/Guide/FTDIChip.png' alt='' title='' /></div>
+<p class='vspace'></p><p>you will need to install the drivers for the FTDI chip on the board.  Double-click the <strong><span class='wikiword'>FTDIUSBSerialDriver</span>_10_4_10_5_10_6.mpkg</strong> icon and follow the instructions in the installer.  You'll need to restart your computer after installing the drivers.  (The latest version of the drivers can be found on the <a class='urllink' href='http://www.ftdichip.com/Drivers/VCP.htm' rel='nofollow'>FTDI website</a>.)
+</p>
+<p class='vspace'></p><h3>4 | Connect the board</h3>
+<p>The Arduino Uno, Mega, Duemilanove and Arduino Nano automatically draw power from either the USB connection to the computer or an external power supply.  If you're using an Arduino Diecimila, you'll need to make sure that the board is configured to draw power from the USB connection.  The power source is selected with a jumper, a small piece of plastic that fits onto two of the three pins between the USB and power jacks.  Check that it's on the two pins closest to the USB port.
+</p>
+<p class='vspace'></p><p>Connect the Arduino board to your computer using the USB cable.  The green power LED (labelled <strong>PWR</strong>) should go on.
+</p>
+<p class='vspace'></p><p>If you're using the Arduino Uno or Arduino Mega 2560, a dialog box will appear telling you that a new network interface has been detected.  Click  "Network Preferences...", and when it opens, simply click "Apply".  The Uno or Mega 2560 will show up as "Not Configured", but it's working properly.  Quit System Preferences.
+</p>
+<p class='vspace'></p><h3>5 | Launch the Arduino application</h3>
+<p>Double-click the Arduino application.
+</p>
+<p class='vspace'></p><h3>6 | Open the blink example</h3>
+<p>Open the LED blink example sketch: <strong>File  &gt; Examples &gt; 1.Basics &gt; Blink</strong>.
+</p>
+<p class='vspace'></p><div><img src='http://arduino.cc/en/uploads/Guide/Arduino0018Blink.png' alt='' title='' /></div>
+<p class='vspace'></p><h3>7 | Select your board</h3>
+<p>You'll need to select the entry in the <strong>Tools &gt; Board</strong> menu that corresponds to your Arduino. 
+</p>
+<p class='vspace'></p><div><img src='http://arduino.cc/en/uploads/Guide/ToolsMenu.png' alt='' title='' /></div>
+<p><span style='font-size:83%'>Selecting an Arduino Uno</span>
+</p>
+<p class='vspace'></p><p>For Duemilanove Arduino boards with an <span class='wikiword'>ATmega328</span> (check the text on the chip on the board), select <strong>Arduino Duemilanove or Nano w/ <span class='wikiword'>ATmega328</span></strong>.  Previously, Arduino boards came with an <span class='wikiword'>ATmega168</span>; for those, select <strong>Arduino Diecimila, Duemilanove, or Nano w/ <span class='wikiword'>ATmega168</span></strong>.  (Details of the board menu entries are available <a class='urllink' href='http://arduino.cc/en/Guide/Environment#boards' rel='nofollow'>on the environment page</a>.)
+</p>
+<p class='vspace'></p><h3>8 | Select your serial port</h3>
+<p>Select the serial device of the Arduino board from the <strong>Tools &gt; Serial Port</strong> menu.  On the Mac, this should be something with <strong>/dev/tty.usbmodem</strong> (for the Uno or Mega 2560) or <strong>/dev/tty.usbserial</strong> (for older boards) in it.
+</p>
+<p class='vspace'></p><div><img src='http://arduino.cc/en/uploads/Guide/SelectingUno.png' alt='' title='' /></div>
+<p><span style='font-size:83%'>selecting an Uno, Mega2560, or newer board</span>
+</p>
+<p class='vspace'></p><div><img src='http://arduino.cc/en/uploads/Guide/SelectingFTDIArduino.png' alt='' title='' /></div>
+<p><span style='font-size:83%'>selecting an older FTDI-based board</span>
+</p>
+<p class='vspace'></p><h3>9 | Upload the program</h3>
+<p>Now, simply click the "Upload" button in the environment.  Wait a few seconds - you should see the RX and TX leds on the board flashing.  If the upload is successful, the message "Done uploading." will appear in the status bar.  (<em>Note:</em> If you have an Arduino Mini, NG, or other board, you'll need to physically present the reset button on the board immediately before pressing the upload button.)
+</p>
+<p class='vspace'></p><div><img src='http://arduino.cc/en/uploads/Guide/UploadButton.png' alt='' title='' /></div>
+<p class='vspace'></p><p>A few seconds after the upload finishes, you should see the pin 13 (L) LED on the board start to blink (in orange).  If it does, congratulations!  You've gotten Arduino up-and-running.
+</p>
+<p class='vspace'></p><p>If you have problems, please see the <a class='wikilink' href='Guide_Troubleshooting.html'>troubleshooting suggestions</a>.
+</p>
+<p class='vspace'></p><p>You might also want to look at:
+</p><ul><li>the <a class='wikilink' href='http://arduino.cc/en/Tutorial/HomePage'>examples</a> for using various sensors and actuators
+</li><li>the <a class='wikilink' href='index.html'>reference</a> for the Arduino language
+</li></ul><p>The text of the Arduino getting started guide is licensed under a
+<a class='urllink' href='http://creativecommons.org/licenses/by-sa/3.0/' rel='nofollow'>Creative Commons Attribution-ShareAlike 3.0 License</a>.  Code samples in the guide are released into the public domain.
+</p>
+</div>
+
+
+  </div>
+
+  <!--PageFooterFmt-->
+  <div id="pagefooter">
+&copy;Arduino | 
+  <a href='Guide_MacOSX?action=edit.html'>Edit Page</a> | <a href='Guide_MacOSX?action=diff.html'>Page History</a> | <a href='Guide_MacOSX?action=print.html' target='_blank'>Printable View</a> | <a href='http://arduino.cc/en/Site/AllRecentChanges'>All Recent Site Changes</a>
+  </div>
+  <!--/PageFooterFmt-->
+
+</div>
+</body>
+</html>

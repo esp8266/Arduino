@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+  <title>Arduino Reference - ArduinoEthernetShield </title>
+  <link rel="shortcut icon" type="image/x-icon" href="http://arduino.cc/en/favicon.png">
+  <link rel='stylesheet' href='arduinoWideRender.css' 
+type='text/css' />
+    <!--HeaderText--><style type='text/css'><!--
+  ul, ol, pre, dl, p { margin-top:0px; margin-bottom:0px; }
+  code { white-space: nowrap; }
+  .vspace { margin-top:1.33em; }
+  .indent { margin-left:40px; }
+  .outdent { margin-left:40px; text-indent:-40px; }
+  a.createlinktext { text-decoration:none; border-bottom:1px dotted gray; }
+  a.createlink { text-decoration:none; position:relative; top:-0.5em;
+    font-weight:bold; font-size:smaller; border-bottom:none; }
+  img { border:0px; }
+  .editconflict { color:green; 
+  font-style:italic; margin-top:1.33em; margin-bottom:1.33em; }
+
+  table.markup { border: 2px dotted #ccf; width:90%; }
+  td.markup1, td.markup2 { padding-left:10px; padding-right:10px; }
+  td.markup1 { border-bottom: 1px solid #ccf; }
+  div.faq { margin-left:2em; }
+  div.faq p.question { margin: 1em 0 0.75em -2em; font-weight:bold; }
+  div.faq hr { margin-left: -2em; }
+   
+    .frame 
+      { border:1px solid #cccccc; padding:4px; background-color:#f9f9f9; }
+    .lfloat { float:left; margin-right:0.5em; }
+    .rfloat { float:right; margin-left:0.5em; }
+a.varlink { text-decoration:none; }
+
+--></style>  <meta name='robots' content='index,follow' />
+
+  <meta name="verify-v1" content="TtxFIEJAB6zdJ509wLxjnapQzKAMNm9u0Wj4ho6wxIY=" />
+</head>
+<body>
+<div id="page">
+  <!--PageHeaderFmt-->
+  <div id="pageheader">
+    <div class="title"><a href='http://arduino.cc/en'>Arduino</a></div>
+  </div>
+  <!--/PageHeaderFmt-->
+
+  <!--PageLeftFmt-->
+  <div id="pagenav">
+    <div id="navbar">
+  	<p><a class='wikilink' href='http://arduino.cc/en/Main/Buy'>Buy</a>
+<a class='wikilink' href='http://arduino.cc/en/Main/Software'>Download</a>
+<a class='wikilink' href='Guide_index.html'>Getting Started</a>
+<a class='wikilink' href='http://arduino.cc/en/Tutorial/HomePage'>Learning</a>
+<a class='wikilink' href='index.html'>Reference</a>
+<a class='wikilink' href='http://arduino.cc/en/Main/Hardware'>Hardware</a>
+<a class='wikilink' href='FAQ.html'>FAQ</a>
+</p>
+<p class='vspace'></p>
+
+    </div>
+  </div>
+  <!--/PageLeftFmt-->
+
+  <div id="pagetext">
+  <!--PageText-->
+<div id='wikitext'>
+<h2>Arduino Ethernet Shield</h2>
+<p>The <a class='wikilink' href='http://arduino.cc/en/Main/ArduinoEthernetShield'>Arduino Ethernet shield</a> allows an Arduino board to connect to the internet using the <a class='wikilink' href='Ethernet.html'>Ethernet library</a> and to read and write an SD card using the <a class='wikilink' href='SD.html'>SD library</a>.
+</p>
+<p class='vspace'></p><h4>Connecting the Shield</h4>
+<div><img height='300' src='http://arduino.cc/en/uploads/Guide/ArduinoWithEthernetShield.jpg' alt='' title='' /></div>
+<p class='vspace'></p><p>To use the shield, mount it on top of an Arduino board (e.g. the Uno).  To upload sketches to the board, connect it to your computer with a USB cable as you normally would.  Once the sketch has been uploaded, you can disconnect the board from your computer and power it with an external power supply.  
+</p>
+<p class='vspace'></p><p>Connect the shield to your computer or a network hub or router using a standard ethernet cable (<span class='wikiword'>CAT5</span> or <span class='wikiword'>CAT6</span> with <span class='wikiword'>RJ45</span> connectors).  Connecting to a computer may require the use of a cross-over cable (although many computers, including <a class='urllink' href='http://support.apple.com/kb/HT2274' rel='nofollow'>all recent Macs</a> can do the cross-over internally).  
+</p>
+<p class='vspace'></p><h4>Network Settings</h4>
+<p>The shield must be assigned a MAC address and a fixed IP address using the <a class='wikilink' href='EthernetBegin.html'>Ethernet.begin()</a> function.  A MAC address is a globally unique identifier for a particular device.  Current Ethernet shields come with a sticker indicating the MAC address you should use with them.  For older shields without a dedicated MAC address, inventing a random one should work, but don't use the same one for multiple boards.  Valid IP addresses depend on the configuration of your network.  It is possible to use DHCP to dynamically assign an IP to the shield.  Optionally, you can also specify a network gateway and subnet.  
+</p>
+<p class='vspace'></p><h4>SD Card</h4>
+<p>The latest revision of the Ethernet Shield includes a micro-SD card slot, which can be interfaced with using the <a class='wikilink' href='SD.html'>SD library</a>.
+</p>
+<p class='vspace'></p><p>The text of the Arduino getting started guide is licensed under a
+<a class='urllink' href='http://creativecommons.org/licenses/by-sa/3.0/' rel='nofollow'>Creative Commons Attribution-ShareAlike 3.0 License</a>.  Code samples in the guide are released into the public domain.
+</p>
+</div>
+
+
+  </div>
+
+  <!--PageFooterFmt-->
+  <div id="pagefooter">
+&copy;Arduino | 
+  <a href='Guide_ArduinoEthernetShield?action=edit.html'>Edit Page</a> | <a href='Guide_ArduinoEthernetShield?action=diff.html'>Page History</a> | <a href='Guide_ArduinoEthernetShield?action=print.html' target='_blank'>Printable View</a> | <a href='http://arduino.cc/en/Site/AllRecentChanges'>All Recent Site Changes</a>
+  </div>
+  <!--/PageFooterFmt-->
+
+</div>
+</body>
+</html>
