@@ -1,0 +1,140 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+  <title>Arduino Reference - SDCardNotes </title>
+  <link rel="shortcut icon" type="image/x-icon" href="http://arduino.cc/en/favicon.png">
+  <link rel='stylesheet' href='arduinoWideRender.css' 
+type='text/css' />
+    <!--HeaderText--><style type='text/css'><!--
+  ul, ol, pre, dl, p { margin-top:0px; margin-bottom:0px; }
+  code { white-space: nowrap; }
+  .vspace { margin-top:1.33em; }
+  .indent { margin-left:40px; }
+  .outdent { margin-left:40px; text-indent:-40px; }
+  a.createlinktext { text-decoration:none; border-bottom:1px dotted gray; }
+  a.createlink { text-decoration:none; position:relative; top:-0.5em;
+    font-weight:bold; font-size:smaller; border-bottom:none; }
+  img { border:0px; }
+  .editconflict { color:green; 
+  font-style:italic; margin-top:1.33em; margin-bottom:1.33em; }
+
+  table.markup { border: 2px dotted #ccf; width:90%; }
+  td.markup1, td.markup2 { padding-left:10px; padding-right:10px; }
+  td.markup1 { border-bottom: 1px solid #ccf; }
+  div.faq { margin-left:2em; }
+  div.faq p.question { margin: 1em 0 0.75em -2em; font-weight:bold; }
+  div.faq hr { margin-left: -2em; }
+   
+    .frame 
+      { border:1px solid #cccccc; padding:4px; background-color:#f9f9f9; }
+    .lfloat { float:left; margin-right:0.5em; }
+    .rfloat { float:right; margin-left:0.5em; }
+a.varlink { text-decoration:none; }
+
+--></style>  <meta name='robots' content='index,follow' />
+
+  <meta name="verify-v1" content="TtxFIEJAB6zdJ509wLxjnapQzKAMNm9u0Wj4ho6wxIY=" />
+</head>
+<body>
+<div id="page">
+  <!--PageHeaderFmt-->
+  <div id="pageheader">
+    <div class="title"><a href='http://arduino.cc/en'>Arduino</a></div>
+  </div>
+  <!--/PageHeaderFmt-->
+
+  <!--PageLeftFmt-->
+  <div id="pagenav">
+    <div id="navbar">
+  	<p><a class='wikilink' href='http://arduino.cc/en/Main/Buy'>Buy</a>
+<a class='wikilink' href='http://arduino.cc/en/Main/Software'>Download</a>
+<a class='wikilink' href='Guide_index.html'>Getting Started</a>
+<a class='wikilink' href='http://arduino.cc/en/Tutorial/HomePage'>Learning</a>
+<a class='wikilink' href='index.html'>Reference</a>
+<a class='wikilink' href='http://arduino.cc/en/Main/Hardware'>Hardware</a>
+<a class='wikilink' href='FAQ.html'>FAQ</a>
+</p>
+<p class='vspace'></p>
+
+    </div>
+  </div>
+  <!--/PageLeftFmt-->
+
+  <div id="pagetext">
+  <!--PageText-->
+<div id='wikitext'>
+<p><strong>Reference</strong> &nbsp;  <a class='wikilink' href='index.html'>Language</a> | <a class='wikilink' href='Libraries.html'>Libraries</a> | <a class='wikilink' href='Comparison.html'>Comparison</a> | <a class='wikilink' href='Changes.html'>Changes</a>
+</p>
+<p class='vspace'></p><h2>Some things to keep in mind when using the SD Library</h2>
+<h3>Overview</h3>
+<p>The communication between the microcontroller and the SD card uses <a class='wikilink' href='SPI.html'>SPI</a>, which takes place on digital pins 11, 12, and 13 (on most Arduino boards) or 50, 51, and 52 (Arduino Mega). Additionally, another pin must be used to select the SD card. This can be the hardware SS pin - pin 10 (on most Arduino boards) or pin 53 (on the Mega) - or another pin specified in the call to SD.begin().  <strong>Note that even if you don't use the hardware SS pin, it must be left as an output or the SD library won't work. Different boards use different pins for this functionality, so be sure you’ve selected the correct pin in SD.begin().</strong>
+</p>
+<p class='vspace'></p><p>Not all the functions are listed on the main SD library page, because they are part of the library's utility functions. 
+</p>
+<p class='vspace'></p><h3>Formatting/Preparing the card</h3>
+<p>(NB : whenever referring to the SD card, it means SD and microSD sizes, as well as SD and SDHD formats)
+</p>
+<p class='vspace'></p><p>You’ll need a SD reader and computer to format your card properly. The library supports the <span class='wikiword'>FAT16</span> and <span class='wikiword'>FAT32</span> filesystems, but use <span class='wikiword'>FAT16</span> when possible. The process to format is fairly straightforward.
+</p>
+<p class='vspace'></p><p><strong>Windows</strong> : right click on your card’s directory and choose “Format” from the drop down. Make sure you choose FAT as the filesystem.  
+</p>
+<p class='vspace'></p><p><strong>OSX</strong> : Open Disk Utility (located in Applications&gt;Utilities). Choose the Card, click on the erase tab, select MS-DOS(FAT) as the Format, and click Erase.
+<em>NB: OSX places a number of “hidden” files on the device when it formats a drive. To format a SD car without the extra files on OSX, <a class='urllink' href='http://forums.adafruit.com/viewtopic.php?f=31&amp;t=7108%23p34846' rel='nofollow'>follow these notes</a> on Ladyada’s site.</em>
+</p>
+<p class='vspace'></p><p><strong>Linux</strong>: With a SD card inserted, open a terminal window. At the prompt, type <code>df</code>, and press enter. The windows will report the device name of your SD card, it should look something like /dev/sdb1. Unmount the SD card, but leave it in the computer. Type <code>sudo mkdosfs -F 16 /dev/sdb1</code>, replacing the device name with yours. Remove the SD card and replace it to verify it works.
+</p>
+<p class='vspace'></p><h3>File Naming</h3>
+<p>FAT file systems have a limitation when it comes to naming conventions. You must use the 8.3 format, so that file names look like “<span class='wikiword'>NAME001</span>.EXT”, where “<span class='wikiword'>NAME001</span>” is an 8 character or fewer string, and “EXT” is a 3 character extension. People commonly use the extensions .TXT and .LOG. It is possible to have a shorter file name (for example, mydata.txt, or time.log), but you cannot use longer file names. <a class='urllink' href='http://en.wikipedia.org/wiki/8.3_filename' rel='nofollow'>Read more on the 8.3 convention.</a>
+</p>
+<p class='vspace'></p><h3>Opening/Closing files</h3>
+<p>When you use file.write(), it doesn't write to the card until you flush() or close(). Whenever you open a file, be sure to close it to save your data.
+</p>
+<p class='vspace'></p><p>As of version 1.0, it is possible to have multiple files open.
+</p>
+<p class='vspace'></p><h3>Different Shields/boards</h3>
+<p>There are a number of different shields that support SD cards. This list is not exclusive, but are commonly used.
+</p>
+<p class='vspace'></p><p><strong>Arduino Ethernet Shield</strong>
+</p><div><a class='urllink' href='http://arduino.cc/en/uploads/Reference/arduinoEthernetShieldSD.jpg' rel='nofollow'><img height='300px' src='http://arduino.cc/en/uploads/Reference/arduinoEthernetShieldSD.jpg' alt='' title='' /></a></div>
+<p class='vspace'></p><p>The Ethernet Shield comes with an SD card slot onboard. The shield fits on top of your Arduino. Because the Ethernet module uses pin 10, the CS pin for the SD card has been moved to pin 4. Make sure you use SD.begin(4) to use the SD card functionality.
+</p>
+<p class='vspace'></p><p><strong>Adafruit Micro-SD breakout Board</strong>
+</p><div><a class='urllink' href='http://arduino.cc/en/uploads/Reference/aadafruitSDBoard.jpg' rel='nofollow'><img height='400px' src='http://arduino.cc/en/uploads/Reference/aadafruitSDBoard.jpg' alt='' title='' /></a></div>
+<p>This board supports Micro-SD cards, ans you’ll need to wire it up before you can use it. On the board, connect GND to ground, 5v to 5v, CLK to Pin 13 on your Arduino, DO to pin 12, DI to pin 11, and CS to pin 10. If you are already using pin 10, you can use a different pin, as long as you remember to change the pin in SD.begin().
+</p>
+<p class='vspace'></p><p><strong>Sparkfun SD Shield</strong>
+</p><div><a class='urllink' href='http://arduino.cc/en/uploads/Reference/sparkfunSDShield.jpg' rel='nofollow'><img height='300px' src='http://arduino.cc/en/uploads/Reference/sparkfunSDShield.jpg' alt='' title='' /></a></div>
+<p>The Sparkfun shield fits on your Arduino and uses pin 8 for CS. You will need use SD.begin(8) to use the card.
+<em>NB: the Sparkfun shield was recently updated. Older versions look similar, but were lacking a connection to the 3.3V bus and did not have the onboard hex inverter.</em>
+</p>
+<p class='vspace'></p><h3>See Also:</h3>
+<ul><li><a class='wikilink' href='SD.html'>SD library</a>
+</li><li><a class='selflink' href='SDCardNotes.html'>Notes on using SD cards</a>
+</li><li><a class='wikilink' href='http://arduino.cc/en/Tutorial/Datalogger'>DataLogger</a> 
+</li><li><a class='wikilink' href='http://arduino.cc/en/Tutorial/DumpFile'>DumpFile</a>
+</li><li><a class='wikilink' href='http://arduino.cc/en/Tutorial/Files'>Files</a> 
+</li><li><a class='wikilink' href='http://arduino.cc/en/Tutorial/ReadWrite'>ReadWrite</a> 
+</li><li><a class='wikilink' href='http://arduino.cc/en/Tutorial/CardInfo'>CardInfo</a>
+</li></ul><p><a class='wikilink' href='index.html'>Reference Home</a>
+</p>
+<p class='vspace'></p><p><em>Corrections, suggestions, and new documentation should be posted to the <a class='urllink' href='http://arduino.cc/forum/index.php/board,23.0.html' rel='nofollow'>Forum</a>.</em>
+</p>
+<p class='vspace'></p><p>The text of the Arduino reference is licensed under a
+<a class='urllink' href='http://creativecommons.org/licenses/by-sa/3.0/' rel='nofollow'>Creative Commons Attribution-ShareAlike 3.0 License</a>.  Code samples in the reference are released into the public domain.
+</p>
+</div>
+
+
+  </div>
+
+  <!--PageFooterFmt-->
+  <div id="pagefooter">
+&copy;Arduino | 
+  <a href='#'>Edit Page</a> | <a href='#'>Page History</a> | <a href='#' target='_blank'>Printable View</a> | <a href='http://arduino.cc/en/Site/AllRecentChanges'>All Recent Site Changes</a>
+  </div>
+  <!--/PageFooterFmt-->
+
+</div>
+</body>
+</html>

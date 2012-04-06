@@ -1,0 +1,161 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+  <title>Arduino Reference - String </title>
+  <link rel="shortcut icon" type="image/x-icon" href="http://arduino.cc/en/favicon.png">
+  <link rel='stylesheet' href='arduinoWideRender.css' 
+type='text/css' />
+    <!--HeaderText--><style type='text/css'><!--
+  ul, ol, pre, dl, p { margin-top:0px; margin-bottom:0px; }
+  code { white-space: nowrap; }
+  .vspace { margin-top:1.33em; }
+  .indent { margin-left:40px; }
+  .outdent { margin-left:40px; text-indent:-40px; }
+  a.createlinktext { text-decoration:none; border-bottom:1px dotted gray; }
+  a.createlink { text-decoration:none; position:relative; top:-0.5em;
+    font-weight:bold; font-size:smaller; border-bottom:none; }
+  img { border:0px; }
+  .editconflict { color:green; 
+  font-style:italic; margin-top:1.33em; margin-bottom:1.33em; }
+
+  table.markup { border: 2px dotted #ccf; width:90%; }
+  td.markup1, td.markup2 { padding-left:10px; padding-right:10px; }
+  td.markup1 { border-bottom: 1px solid #ccf; }
+  div.faq { margin-left:2em; }
+  div.faq p.question { margin: 1em 0 0.75em -2em; font-weight:bold; }
+  div.faq hr { margin-left: -2em; }
+   
+    .frame 
+      { border:1px solid #cccccc; padding:4px; background-color:#f9f9f9; }
+    .lfloat { float:left; margin-right:0.5em; }
+    .rfloat { float:right; margin-left:0.5em; }
+a.varlink { text-decoration:none; }
+
+--></style>  <meta name='robots' content='index,follow' />
+
+  <meta name="verify-v1" content="TtxFIEJAB6zdJ509wLxjnapQzKAMNm9u0Wj4ho6wxIY=" />
+</head>
+<body>
+<div id="page">
+  <!--PageHeaderFmt-->
+  <div id="pageheader">
+    <div class="title"><a href='http://arduino.cc/en'>Arduino</a></div>
+  </div>
+  <!--/PageHeaderFmt-->
+
+  <!--PageLeftFmt-->
+  <div id="pagenav">
+    <div id="navbar">
+  	<p><a class='wikilink' href='http://arduino.cc/en/Main/Buy'>Buy</a>
+<a class='wikilink' href='http://arduino.cc/en/Main/Software'>Download</a>
+<a class='wikilink' href='Guide_index.html'>Getting Started</a>
+<a class='wikilink' href='http://arduino.cc/en/Tutorial/HomePage'>Learning</a>
+<a class='wikilink' href='index.html'>Reference</a>
+<a class='wikilink' href='http://arduino.cc/en/Main/Hardware'>Hardware</a>
+<a class='wikilink' href='FAQ.html'>FAQ</a>
+</p>
+<p class='vspace'></p>
+
+    </div>
+  </div>
+  <!--/PageLeftFmt-->
+
+  <div id="pagetext">
+  <!--PageText-->
+<div id='wikitext'>
+<p><strong>Reference</strong> &nbsp;  <a class='wikilink' href='index.html'>Language</a> | <a class='wikilink' href='Libraries.html'>Libraries</a> | <a class='wikilink' href='Comparison.html'>Comparison</a> | <a class='wikilink' href='Changes.html'>Changes</a>
+</p>
+<p class='vspace'></p><h2>string</h2>
+<h4>Description</h4>
+<p>Text strings can be represented in two ways.  you can use the String data type, which is part of the core as of version 0019, or you can make a string out of an array of type char and null-terminate it.  This page described the latter method. For more details on the String object, which gives you more functionality at the cost of more memory, see the <a class='wikilink' href='StringObject.html'>String object</a> page.
+</p>
+<p class='vspace'></p><h4>Examples</h4>
+<p>All of the following are valid declarations for strings.
+</p><pre>
+  char Str1[15];
+  char Str2[8] = {'a', 'r', 'd', 'u', 'i', 'n', 'o'};
+  char Str3[8] = {'a', 'r', 'd', 'u', 'i', 'n', 'o', '\0'};
+  char Str4[ ] = "arduino";
+  char Str5[8] = "arduino";
+  char Str6[15] = "arduino";
+
+</pre>
+<p class='vspace'></p><p><strong>Possibilities for declaring strings</strong>
+</p>
+<p class='vspace'></p><ul><li>Declare an array of chars without initializing it as in Str1
+</li><li>Declare an array of chars (with one extra char) and the compiler will add the required null character, as in Str2
+</li><li>Explicitly add the null character, Str3
+</li><li>Initialize with a string constant in quotation marks; the compiler will size the array to fit the string constant and a terminating null character, Str4
+</li><li>Initialize the array with an explicit size and string constant, Str5
+</li><li>Initialize the array, leaving extra space for a larger string, Str6
+</li></ul><p class='vspace'></p><p><strong>Null termination</strong>
+</p>
+<p class='vspace'></p><p>Generally, strings are terminated with a null character (ASCII code 0).  This allows functions (like Serial.print()) to tell where the end of a string is.  Otherwise, they would continue reading subsequent bytes of memory that aren't actually part of the string.
+</p>
+<p class='vspace'></p><p>This means that your string needs to have space for one more character than the text you want it to contain.  That is why Str2 and Str5 need to be eight characters, even though "arduino" is only seven - the last position is automatically filled with a null character.  Str4 will be automatically sized to eight characters, one for the extra null.  In Str3, we've explicitly included the null character (written '\0') ourselves.  
+</p>
+<p class='vspace'></p><p>Note that it's possible to have a string without a final null character (e.g. if you had specified the length of Str2 as seven instead of eight).  This will break most functions that use strings, so you shouldn't do it intentionally.  If you notice something behaving strangely (operating on characters not in the string), however, this could be the problem.
+</p>
+<p class='vspace'></p><p><strong>Single quotes or double quotes?</strong>
+</p>
+<p class='vspace'></p><p>Strings are always defined inside double quotes ("Abc") and characters are always defined inside single quotes('A').
+</p>
+<p class='vspace'></p><p><strong>Wrapping long strings</strong>
+</p>
+<p class='vspace'></p><p>You can wrap long strings like this:
+</p><pre>
+char myString[] = "This is the first line"
+" this is the second line"
+" etcetera";
+
+</pre>
+<p class='vspace'></p><p><strong>Arrays of strings</strong>
+</p>
+<p class='vspace'></p><p>It is often convenient, when working with large amounts of text, such as a project with an LCD display, to setup an array of strings. Because strings themselves are arrays, this is in actually an example of a two-dimensional array. 
+</p>
+<p class='vspace'></p><p>In the code below, the asterisk after the datatype char "char*" indicates that this is an array of "pointers". All array names are actually pointers, so this is required to make an array of arrays. Pointers are one of the more esoteric parts of C for beginners to understand, but it isn't necessary to understand pointers in detail to use them effectively here.
+</p>
+<p class='vspace'></p><h4>Example</h4>
+<pre>
+
+char* myStrings[]={"This is string 1", "This is string 2", "This is string 3",
+"This is string 4", "This is string 5","This is string 6"};
+
+void setup(){
+Serial.begin(9600);
+}
+
+void loop(){
+for (int i = 0; i &lt; 6; i++){
+   Serial.println(myStrings[i]);
+   delay(500);
+   }
+}
+</pre>
+<p class='vspace'></p><h4>See Also</h4>
+<ul><li><a class='wikilink' href='Array.html'>array</a>
+</li><li><a class='wikilink' href='PROGMEM.html'>PROGMEM</a>
+</li><li><a class='urllink' href='http://arduino.cc/en/Reference/VariableDeclaration' rel='nofollow'>Variable Declaration</a>
+</li></ul><p class='vspace'></p><p><a class='wikilink' href='index.html'>Reference Home</a>
+</p>
+<p class='vspace'></p><p><em>Corrections, suggestions, and new documentation should be posted to the <a class='urllink' href='http://arduino.cc/forum/index.php/board,23.0.html' rel='nofollow'>Forum</a>.</em>
+</p>
+<p class='vspace'></p><p>The text of the Arduino reference is licensed under a
+<a class='urllink' href='http://creativecommons.org/licenses/by-sa/3.0/' rel='nofollow'>Creative Commons Attribution-ShareAlike 3.0 License</a>.  Code samples in the reference are released into the public domain.
+</p>
+</div>
+
+
+  </div>
+
+  <!--PageFooterFmt-->
+  <div id="pagefooter">
+&copy;Arduino | 
+  <a href='#'>Edit Page</a> | <a href='#'>Page History</a> | <a href='#' target='_blank'>Printable View</a> | <a href='http://arduino.cc/en/Site/AllRecentChanges'>All Recent Site Changes</a>
+  </div>
+  <!--/PageFooterFmt-->
+
+</div>
+</body>
+</html>

@@ -13,20 +13,22 @@
  */
 
 void setup() {
+  // Open serial communications and wait for port to open:
   Serial.begin(9600);
-  // Wait for port to be opened:
-  // this check is only needed on the Leonardo:
-  while (!Serial) ;
- ;
-  
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
+
+  // send an intro:
   Serial.println("\n\nString  substring():");
+  Serial.println();
 }
 
 void loop() {
   // Set up a String:
   String stringOne = "Content-Type: text/html";
   Serial.println(stringOne);
-  
+
   // substring(index) looks for the substring from the index position to the end:
   if (stringOne.substring(19) == "html") {
     Serial.println("It's an html file"); 

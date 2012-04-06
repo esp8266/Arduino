@@ -1,0 +1,209 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+  <title>Arduino Reference - Environment </title>
+  <link rel="shortcut icon" type="image/x-icon" href="http://arduino.cc/en/favicon.png">
+  <link rel='stylesheet' href='arduinoWideRender.css' 
+type='text/css' />
+    <!--HeaderText--><style type='text/css'><!--
+  ul, ol, pre, dl, p { margin-top:0px; margin-bottom:0px; }
+  code { white-space: nowrap; }
+  .vspace { margin-top:1.33em; }
+  .indent { margin-left:40px; }
+  .outdent { margin-left:40px; text-indent:-40px; }
+  a.createlinktext { text-decoration:none; border-bottom:1px dotted gray; }
+  a.createlink { text-decoration:none; position:relative; top:-0.5em;
+    font-weight:bold; font-size:smaller; border-bottom:none; }
+  img { border:0px; }
+  .editconflict { color:green; 
+  font-style:italic; margin-top:1.33em; margin-bottom:1.33em; }
+
+  table.markup { border: 2px dotted #ccf; width:90%; }
+  td.markup1, td.markup2 { padding-left:10px; padding-right:10px; }
+  td.markup1 { border-bottom: 1px solid #ccf; }
+  div.faq { margin-left:2em; }
+  div.faq p.question { margin: 1em 0 0.75em -2em; font-weight:bold; }
+  div.faq hr { margin-left: -2em; }
+   
+    .frame 
+      { border:1px solid #cccccc; padding:4px; background-color:#f9f9f9; }
+    .lfloat { float:left; margin-right:0.5em; }
+    .rfloat { float:right; margin-left:0.5em; }
+a.varlink { text-decoration:none; }
+
+--></style>  <meta name='robots' content='index,follow' />
+
+  <meta name="verify-v1" content="TtxFIEJAB6zdJ509wLxjnapQzKAMNm9u0Wj4ho6wxIY=" />
+</head>
+<body>
+<div id="page">
+  <!--PageHeaderFmt-->
+  <div id="pageheader">
+    <div class="title"><a href='http://arduino.cc/en'>Arduino</a></div>
+  </div>
+  <!--/PageHeaderFmt-->
+
+  <!--PageLeftFmt-->
+  <div id="pagenav">
+    <div id="navbar">
+  	<p><a class='wikilink' href='http://arduino.cc/en/Main/Buy'>Buy</a>
+<a class='wikilink' href='http://arduino.cc/en/Main/Software'>Download</a>
+<a class='wikilink' href='Guide_index.html'>Getting Started</a>
+<a class='wikilink' href='http://arduino.cc/en/Tutorial/HomePage'>Learning</a>
+<a class='wikilink' href='index.html'>Reference</a>
+<a class='wikilink' href='http://arduino.cc/en/Main/Hardware'>Hardware</a>
+<a class='wikilink' href='FAQ.html'>FAQ</a>
+</p>
+<p class='vspace'></p>
+
+    </div>
+  </div>
+  <!--/PageLeftFmt-->
+
+  <div id="pagetext">
+  <!--PageText-->
+<div id='wikitext'>
+<h2>Arduino Development Environment</h2>
+<p>The Arduino development environment contains a text editor for writing code, a message area, a text console, a toolbar with buttons for common functions, and a series of menus.  It connects to the Arduino hardware to upload programs and communicate with them.
+</p>
+<p class='vspace'></p><p>Software written using Arduino are called <strong>sketches</strong>. These sketches are written in the text editor. Sketches are saved with the file extension .ino. It has features for cutting/pasting and for searching/replacing text. The message area gives feedback while saving and exporting and also displays errors. The console displays text output by the Arduino environment including complete error messages and other information. The bottom righthand corner of the window displays the current board and serial port. The toolbar buttons allow you to verify and upload programs, create, open, and save sketches, and open the serial monitor:
+</p>
+<p class='vspace'></p><p><strong>NB: Versions of the IDE prior to 1.0 saved sketches with the extension .pde. It is possible to open these files with version 1.0, you will be prompted to save the sketch with the .ino extension on save.</strong>
+</p>
+<p class='vspace'></p>
+<p class='vspace'></p><table  width='100%'><tr><td  width='40' valign='top'>
+<p class='vspace'></p><div><img src='http://arduino.cc/en/uploads/Guide/play.png' alt='' title='' /></div>
+<p class='vspace'></p></td><td  valign='top'>
+<p class='vspace'></p><p><em>Verify</em> <br clear='all' /> Checks your code for errors.
+</p>
+<p class='vspace'></p></td></tr><tr><td  valign='top'>
+<p class='vspace'></p><div><img src='http://arduino.cc/en/uploads/Guide/export.png' alt='' title='' /></div>
+<p class='vspace'></p></td><td  valign='top'>
+<p class='vspace'></p><p><em>Upload</em> <br clear='all' />  Compiles your code and uploads it to the Arduino I/O board.  See <a href='#uploading'>uploading</a> below for details.
+</p>
+<p class='vspace'></p><p>Note: If you are using an external programmer, you can hold down the "shift" key on your computer when using this icon. The text will change to "Upload using Programmer" 
+</p>
+<p class='vspace'></p></td></tr><tr><td  valign='top'>
+<p class='vspace'></p><div><img src='http://arduino.cc/en/uploads/Guide/new.png' alt='' title='' /></div>
+<p class='vspace'></p></td><td  valign='top'>
+<p class='vspace'></p><p><em>New</em> <br clear='all' />  Creates a new sketch.
+</p>
+<p class='vspace'></p></td></tr><tr><td  valign='top'>
+<p class='vspace'></p><div><img src='http://arduino.cc/en/uploads/Guide/open.png' alt='' title='' /></div>
+<p class='vspace'></p></td><td  valign='top'>
+<p class='vspace'></p><p><em>Open</em> <br clear='all' />  Presents a menu of all the sketches in your sketchbook.  Clicking one will open it within the current window. 
+</p>
+<p class='vspace'></p><p>Note: due to a bug in Java, this menu doesn't scroll; if you need to open a sketch late in the list, use the <strong>File | Sketchbook</strong> menu instead.
+</p>
+<p class='vspace'></p></td></tr><tr><td  valign='top'>
+<p class='vspace'></p><div><img src='http://arduino.cc/en/uploads/Guide/save.png' alt='' title='' /></div>
+<p class='vspace'></p></td><td  valign='top'>
+<p class='vspace'></p><p><em>Save</em> <br clear='all' />  Saves your sketch.
+</p>
+<p class='vspace'></p></td></tr><tr><td  valign='top'>
+<p class='vspace'></p><div><img src='http://arduino.cc/en/uploads/Guide/serial_monitor.png' alt='' title='' /></div>
+<p class='vspace'></p></td><td  valign='top'>
+<p class='vspace'></p><p><em>Serial Monitor</em> <br clear='all' />  Opens the <a href='#serialmonitor'>serial monitor</a>.
+</p>
+<p class='vspace'></p></td></tr></table>
+<p class='vspace'></p><p>Additional commands are found within the five menus: <strong>File</strong>, <strong>Edit</strong>, <strong>Sketch</strong>, <strong>Tools</strong>, <strong>Help</strong>. The menus are context sensitive which means only those items relevant to the work currently being carried out are available.
+</p>
+<p class='vspace'></p><h4>Edit</h4>
+<ul><li><em>Copy for Forum</em> <br clear='all' /> Copies the code of your sketch to the clipboard in a form suitable for posting to the forum, complete with syntax coloring.
+<p class='vspace'></p></li><li><em>Copy as HTML</em> <br clear='all' /> Copies the code of your sketch to the clipboard as HTML, suitable for embedding in web pages.
+</li></ul><p class='vspace'></p><h4>Sketch</h4>
+<ul><li><em>Verify/Compile</em> <br clear='all' /> Checks your sketch for errors.
+<p class='vspace'></p></li><li><em>Show Sketch Folder</em> <br clear='all' /> Opens the current sketch folder.
+<p class='vspace'></p></li><li><em>Add File...</em> <br clear='all' /> Adds a source file to the sketch (it will be copied from its current location). The new file appears in a new tab in the sketch window. Files can be removed from the sketch using the tab menu.
+<p class='vspace'></p></li><li><em>Import Library</em> <br clear='all' /> Adds a library to your sketch by inserting #include statements at the code of your code.  For more details, see <a href='#libraries'>libraries</a> below.
+</li></ul><p class='vspace'></p><h4>Tools</h4>
+<ul><li><em>Auto Format</em> <br clear='all' /> This formats your code nicely: i.e. indents it so that opening and closing curly braces line up, and that the statements instead curly braces are indented more.
+<p class='vspace'></p></li><li><em>Archive Sketch</em> <br clear='all' /> Archives a copy of the current sketch in .zip format. The archive is placed in the same directory as the sketch.
+<p class='vspace'></p></li><li><em>Board</em> <br clear='all' /> Select the board that you're using. See below for <a href='#boards'>descriptions of the various boards</a>.
+<p class='vspace'></p></li><li><em>Serial Port</em> <br clear='all' /> This menu contains all the serial devices (real or virtual) on your machine.  It should automatically refresh every time you open the top-level tools menu.
+<p class='vspace'></p></li><li><em>Programmer</em> <br clear='all' /> For selecting a harware programmer when programming a board or chip and not using the onboard USB-serial connection. Normally you won't need this, but if you're <a class='wikilink' href='http://arduino.cc/en/Tutorial/Bootloader'>burning a bootloader</a> to a new microcontroller, you will use this.
+<p class='vspace'></p></li><li><em>Burn Bootloader</em> <br clear='all' /> The items in this menu allow you to burn a <a class='wikilink' href='http://arduino.cc/en/Tutorial/Bootloader'>bootloader</a> onto the microcontroller on an Arduino board.  This is not required for normal use of an Arduino board but is useful if you purchase a new <span class='wikiword'>ATmega</span> microcontroller (which normally come without a bootloader).  Ensure that you've selected the correct board from the <strong>Boards</strong> menu before burning the bootloader.
+</li></ul><p class='vspace'></p><p><a name='sketchbook' id='sketchbook'></a>
+</p><h3>Sketchbook</h3>
+<p>The Arduino environment uses the concept of a sketchbook: a standard place to store your programs (or sketches).  The sketches in your sketchbook can be opened from the <strong>File &gt; Sketchbook</strong> menu or from the <strong>Open</strong> button on the toolbar.  The first time you run the Arduino software, it will automatically create a directory for your sketchbook.  You can view or change the location of the sketchbook location from with the <strong>Preferences</strong> dialog.
+</p>
+<p class='vspace'></p><p>'''Beginning with version 1.0, files are saved with a .ino file extension. Previous versions use the .pde extension. You may still open .pde named files in version 1.0 and later, the software will automatically rename the extension to .ino.
+</p>
+<p class='vspace'></p><h3>Tabs, Multiple Files, and Compilation</h3>
+<p>Allows you to manage sketches with more than one file (each of which appears in its own tab).  These can be normal Arduino code files (no extension), C files (.c extension), C++ files (.cpp), or header files (.h). 
+</p>
+<p class='vspace'></p><p><a name='uploading' id='uploading'></a>
+</p><h3>Uploading</h3>
+<p>Before uploading your sketch, you need to select the correct items from the <strong>Tools &gt; Board</strong> and  <strong>Tools &gt; Serial Port</strong> menus.  The <a href='#boards'>boards</a> are described below.  On the Mac, the serial port is probably something like <strong>/dev/tty.usbmodem241</strong> (for an Uno or Mega2560 or Leonardo) or  <strong>/dev/tty.usbserial-1B1</strong> (for a Duemilanove or earlier USB board), or <strong>/dev/<span class='wikiword'>tty.USA19QW1b1P1</span>.1</strong> (for a serial board connected with a Keyspan USB-to-Serial adapter).  On Windows, it's probably <strong><span class='wikiword'>COM1</span></strong> or <strong><span class='wikiword'>COM2</span></strong> (for a serial board) or <strong><span class='wikiword'>COM4</span></strong>, <strong><span class='wikiword'>COM5</span></strong>, <strong><span class='wikiword'>COM7</span></strong>, or higher (for a USB board) - to find out, you look for USB serial device in the ports section of the Windows Device Manager.  On Linux, it should be <strong>/dev/ttyUSB0</strong>, <strong>/dev/ttyUSB1</strong> or similar.
+</p>
+<p class='vspace'></p><p>Once you've selected the correct serial port and board, press the upload button in the toolbar or select the <strong>Upload</strong> item from the <strong>File</strong> menu.  Current Arduino boards will reset automatically and begin the upload.  With older boards (pre-Diecimila) that lack auto-reset, you'll need to press the reset button on the board just before starting the upload.  On most boards, you'll see the RX and TX <span class='wikiword'>LEDs</span> blink as the sketch is uploaded.  The Arduino environment will display a message when the upload is complete, or show an error.  
+</p>
+<p class='vspace'></p><p>When you upload a sketch, you're using the Arduino <strong>bootloader</strong>, a small program that has been loaded on to the microcontroller on your board.  It allows you to upload code without using any additional hardware.  The bootloader is active for a few seconds when the board resets; then it starts whichever sketch was most recently uploaded to the microcontroller.  The bootloader will blink the on-board (pin 13) LED when it starts (i.e. when the board resets).  
+</p>
+<p class='vspace'></p><p><a name='libraries' id='libraries'></a>
+</p><h3>Libraries</h3>
+<p>Libraries provide extra functionality for use in sketches, e.g. working with hardware or manipulating data.  To use a library in a sketch, select it from the <strong>Sketch &gt; Import Library</strong> menu.  This will insert one or more <strong>#include</strong> statements at the top of the sketch and compile the library with your sketch.  Because libraries are uploaded to the board with your sketch, they increase the amount of space it takes up.  If a sketch no longer needs a library, simply delete its <strong>#include</strong> statements from the top of your code.
+</p>
+<p class='vspace'></p><p>There is a <a class='wikilink' href='Libraries.html'>list of libraries</a> in the reference.  Some libraries are included with the Arduino software.  Others can be downloaded from a variety of sources.  To install these third-party libraries, create a directory called <strong>libraries</strong> within your <a href='#sketchbook'>sketchbook directory</a>.  Then unzip the library there.  For example, to install the <span class='wikiword'>DateTime</span> library, its files should be in the <strong>/<span class='wikiword'>libraries/DateTime</span></strong> sub-folder of your sketchbook folder.
+</p>
+<p class='vspace'></p><p>To write your own library, see <a class='wikilink' href='http://arduino.cc/en/Hacking/LibraryTutorial'>this tutorial</a>.
+</p>
+<p class='vspace'></p><p><a name='thirdpartyhardware' id='thirdpartyhardware'></a>
+</p><h3>Third-Party Hardware</h3>
+<p>Support for third-party hardware can be added to the <strong>hardware</strong> directory of your sketchbook directory.  Platforms installed there may include board definitions (which appear in the board menu), core libraries, bootloaders, and programmer definitions.  To install, create the <strong>hardware</strong> directory, then unzip the third-party platform into its own sub-directory.  (Don't use "arduino" as the sub-directory name or you'll override the built-in Arduino platform.)  To uninstall, simply delete its directory.  
+</p>
+<p class='vspace'></p><p>For details on creating packages for third-party hardware, see the <a class='urllink' href='http://code.google.com/p/arduino/wiki/Platforms' rel='nofollow'>platforms page</a> on the Arduino Google Code developers site.
+</p>
+<p class='vspace'></p><p><a name='serialmonitor' id='serialmonitor'></a>
+</p><h3>Serial Monitor</h3>
+<p>Displays serial data being sent from the Arduino board (USB or serial board).  To send data to the board, enter text and click on the "send" button or press enter.  Choose the baud rate from the drop-down that matches the rate passed to <strong>Serial.begin</strong> in your sketch.  Note that on Mac or Linux, the Arduino board will reset (rerun your sketch from the beginning) when you connect with the serial monitor.
+</p>
+<p class='vspace'></p><p>You can also talk to the board from Processing, Flash, <span class='wikiword'>MaxMSP</span>, etc (see the <a class='urllink' href='http://www.arduino.cc/playground/Main/Interfacing' rel='nofollow'>interfacing page</a> for details).
+</p>
+<p class='vspace'></p><p><a name='preferences' id='preferences'></a>
+</p><h3>Preferences</h3>
+<p>Some preferences can be set in the preferences dialog (found under the <strong>Arduino</strong> menu on the Mac, or <strong>File</strong> on Windows and Linux).  The rest can be found in the preferences file, whose location is shown in the preference dialog.
+</p>
+<p class='vspace'></p><p><a name='boards' id='boards'></a>
+</p><h3>Boards</h3>
+<p>The board selection has two effects: it sets the parameters (e.g. CPU speed and baud rate) used when compiling and uploading sketches; and sets and the file and fuse settings used by the burn bootloader command.  Some of the board definitions differ only in the latter, so even if you've been uploading successfully with a particular selection you'll want to check it before burning the bootloader.
+</p>
+<p class='vspace'></p><ul><li><em>Arduino Uno</em> <br clear='all' /> An <span class='wikiword'>ATmega328</span> running at 16 <span class='wikiword'>MHz</span> with auto-reset, using the optiboot bootloader (115200 baud, 0.5 KB).  
+<p class='vspace'></p></li><li><em>Arduino Duemilanove or Nano w/ <span class='wikiword'>ATmega328</span></em> <br clear='all' />  An <span class='wikiword'>ATmega328</span> running at 16 <span class='wikiword'>MHz</span> with auto-reset. 
+<p class='vspace'></p></li><li><em>Arduino Diecimila, Duemilanove, or Nano w/ <span class='wikiword'>ATmega168</span></em> <br clear='all' />  An <span class='wikiword'>ATmega168</span> running at 16 <span class='wikiword'>MHz</span> with auto-reset.  Compilation and upload is equivalent to Arduino NG or older w/ <span class='wikiword'>ATmega168</span>, but the bootloader burned has a faster timeout (and blinks the pin 13 LED only once on reset). 
+<p class='vspace'></p></li><li><em>Arduino Mega 2560</em> <br clear='all' /> An <span class='wikiword'>ATmega2560</span> running at 16 <span class='wikiword'>MHz</span> with auto-reset, using an stk500v2 bootloader.  
+<p class='vspace'></p></li><li><em>Arduino Mega (<span class='wikiword'>ATmega1280</span>)</em> <br clear='all' />  An <span class='wikiword'>ATmega1280</span> running at 16 <span class='wikiword'>MHz</span> with auto-reset.
+<p class='vspace'></p></li><li><em>Arduino Mini</em> <br clear='all' />  Equivalent to Arduino NG or older w/ <span class='wikiword'>ATmega168</span> (i.e. an <span class='wikiword'>ATmega168</span> running at 16 <span class='wikiword'>MHz</span> without auto-reset).
+<p class='vspace'></p></li><li><em>Arduino Ethernet</em> <br clear='all' />  Equivalent to Arduino UNO with an Ethernet shield.
+<p class='vspace'></p></li><li><em>Arduino Fio</em> <br clear='all' /> An <span class='wikiword'>ATmega328</span> running at 8 <span class='wikiword'>MHz</span> with auto-reset. Equivalent to Arduino Pro or Pro Mini (3.3V, 8 <span class='wikiword'>MHz</span>) w/ <span class='wikiword'>ATmega328</span>.
+<p class='vspace'></p></li><li><em>Arduino BT w/ <span class='wikiword'>ATmega328</span></em> <br clear='all' />  <span class='wikiword'>ATmega328</span> running at 16 <span class='wikiword'>MHz</span>.  The bootloader burned (4 KB) includes codes to initialize the on-board bluetooth module.
+<p class='vspace'></p></li><li><em>Arduino BT w/ <span class='wikiword'>ATmega168</span></em> <br clear='all' />  <span class='wikiword'>ATmega168</span> running at 16 <span class='wikiword'>MHz</span>.  The bootloader burned includes codes to initialize the on-board bluetooth module.
+<p class='vspace'></p></li><li><em><span class='wikiword'>LilyPad</span> Arduino w/ <span class='wikiword'>ATmega328</span></em> <br clear='all' />  An <span class='wikiword'>ATmega328</span> running at 8 <span class='wikiword'>MHz</span> (3.3V) with auto-reset.  Equivalent to Arduino Pro or Pro Mini (3.3V, 8 <span class='wikiword'>MHz</span>) w/ <span class='wikiword'>ATmega328</span>.
+<p class='vspace'></p></li><li><em><span class='wikiword'>LilyPad</span> Arduino w/ <span class='wikiword'>ATmega168</span></em> <br clear='all' />  An <span class='wikiword'>ATmega168</span> running at 8 <span class='wikiword'>MHz</span>.  Compilation and upload is equivalent to the Arduino Pro or Pro Mini (8 <span class='wikiword'>MHz</span>) w/ <span class='wikiword'>ATmega168</span>.  The bootloader burned, however, has a slower timeout (and blinks the pin 13 LED three times on reset) because the original versions of the <span class='wikiword'>LilyPad</span> didn't support auto-reset.  They also didn't include an external clock, so the burn bootloader command configures the fuses of <span class='wikiword'>ATmega168</span> for an internal 8 <span class='wikiword'>MHz</span> clock.  <br clear='all' /> <br clear='all' /> If you have a recent version of the <span class='wikiword'>LilyPad</span>, (w/ a 6-pin programming header), you'll want to select Arduino Pro or Pro Mini (8 <span class='wikiword'>MHz</span>) w/ <span class='wikiword'>ATmega168</span> before burning the bootloader.
+<p class='vspace'></p></li><li><em>Arduino Pro or Pro Mini (5V, 16 <span class='wikiword'>MHz</span>) w/ <span class='wikiword'>ATmega328</span></em> <br clear='all' />  An <span class='wikiword'>ATmega328</span> running at 16 <span class='wikiword'>MHz</span> with auto-reset.  Equivalent to Arduino Duemilanove or Nano w/ <span class='wikiword'>ATmega328</span>.
+<p class='vspace'></p></li><li><em>Arduino Pro or Pro Mini (5V, 16 <span class='wikiword'>MHz</span>) w/ <span class='wikiword'>ATmega168</span></em> <br clear='all' />  An <span class='wikiword'>ATmega168</span> running at 16 <span class='wikiword'>MHz</span> with auto-reset.  Equivalent to Arduino Diecimila, Duemilanove, or Nano w/ <span class='wikiword'>ATmega168</span>.
+<p class='vspace'></p></li><li><em>Arduino Diecimila, Duemilanove, or Nano w/ <span class='wikiword'>ATmega168</span></em> <br clear='all' />  An <span class='wikiword'>ATmega168</span> running at 16 <span class='wikiword'>MHz</span> with auto-reset.  Compilation and upload is equivalent to Arduino NG or older w/ <span class='wikiword'>ATmega168</span>, but the bootloader burned has a faster timeout (and blinks the pin 13 LED only once on reset).  Also used for the 16 <span class='wikiword'>MHz</span> (5V) versions of the Arduino Pro and Pro Mini with an <span class='wikiword'>ATmega168</span>.
+<p class='vspace'></p></li><li><em>Arduino Pro or Pro Mini (3.3V, 8 <span class='wikiword'>MHz</span>) w/ <span class='wikiword'>ATmega328</span></em> <br clear='all' />  An <span class='wikiword'>ATmega328</span> running at 8 <span class='wikiword'>MHz</span> (3.3V) with auto-reset.  Equivalent to <span class='wikiword'>LilyPad</span> Arduino w/ <span class='wikiword'>ATmega328</span>.
+<p class='vspace'></p></li><li><em>Arduino Pro or Pro Mini (3.3V, 8 <span class='wikiword'>MHz</span>) w/ <span class='wikiword'>ATmega168</span></em> <br clear='all' />  An <span class='wikiword'>ATmega168</span> running at 8 <span class='wikiword'>MHz</span> (3.3V) with auto-reset.
+<p class='vspace'></p></li><li><em>Arduino NG or older w/ <span class='wikiword'>ATmega168</span></em> <br clear='all' />  An <span class='wikiword'>ATmega168</span> running at 16 <span class='wikiword'>MHz</span> <em>without</em> auto-reset.  Compilation and upload is equivalent to Arduino Diecimila or Duemilanove w/ <span class='wikiword'>ATmega168</span>, but the bootloader burned has a slower timeout (and blinks the pin 13 LED three times on reset).
+<p class='vspace'></p></li><li><em>Arduino NG or older w/ <span class='wikiword'>ATmega8</span></em> <br clear='all' />  An <span class='wikiword'>ATmega8</span> running at 16 <span class='wikiword'>MHz</span> <em>without</em> auto-reset.
+</li></ul><p class='vspace'></p><p>For instructions on installing support for other boards, see <a href='#thirdpartyhardware'>third-party hardware</a> above.
+The text of the Arduino getting started guide is licensed under a
+<a class='urllink' href='http://creativecommons.org/licenses/by-sa/3.0/' rel='nofollow'>Creative Commons Attribution-ShareAlike 3.0 License</a>.  Code samples in the guide are released into the public domain.
+</p>
+</div>
+
+
+  </div>
+
+  <!--PageFooterFmt-->
+  <div id="pagefooter">
+&copy;Arduino | 
+  <a href='Guide_Environment?action=edit.html'>Edit Page</a> | <a href='Guide_Environment?action=diff.html'>Page History</a> | <a href='Guide_Environment?action=print.html' target='_blank'>Printable View</a> | <a href='http://arduino.cc/en/Site/AllRecentChanges'>All Recent Site Changes</a>
+  </div>
+  <!--/PageFooterFmt-->
+
+</div>
+</body>
+</html>

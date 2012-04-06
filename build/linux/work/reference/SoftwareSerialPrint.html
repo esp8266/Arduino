@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+  <title>Arduino Reference - SoftwareSerialPrint </title>
+  <link rel="shortcut icon" type="image/x-icon" href="http://arduino.cc/en/favicon.png">
+  <link rel='stylesheet' href='arduinoWideRender.css' 
+type='text/css' />
+    <!--HeaderText--><style type='text/css'><!--
+  ul, ol, pre, dl, p { margin-top:0px; margin-bottom:0px; }
+  code { white-space: nowrap; }
+  .vspace { margin-top:1.33em; }
+  .indent { margin-left:40px; }
+  .outdent { margin-left:40px; text-indent:-40px; }
+  a.createlinktext { text-decoration:none; border-bottom:1px dotted gray; }
+  a.createlink { text-decoration:none; position:relative; top:-0.5em;
+    font-weight:bold; font-size:smaller; border-bottom:none; }
+  img { border:0px; }
+  .editconflict { color:green; 
+  font-style:italic; margin-top:1.33em; margin-bottom:1.33em; }
+
+  table.markup { border: 2px dotted #ccf; width:90%; }
+  td.markup1, td.markup2 { padding-left:10px; padding-right:10px; }
+  td.markup1 { border-bottom: 1px solid #ccf; }
+  div.faq { margin-left:2em; }
+  div.faq p.question { margin: 1em 0 0.75em -2em; font-weight:bold; }
+  div.faq hr { margin-left: -2em; }
+   
+    .frame 
+      { border:1px solid #cccccc; padding:4px; background-color:#f9f9f9; }
+    .lfloat { float:left; margin-right:0.5em; }
+    .rfloat { float:right; margin-left:0.5em; }
+a.varlink { text-decoration:none; }
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.arduino  {font-family:monospace;}
+.arduino .imp {font-weight: bold; color: red;}
+.arduino .kw1 {color: #CC6600;}
+.arduino .kw2 {color: #006699;}
+.arduino .kw3 {color: #CC6600; font-weight: bold;}
+.arduino .co1 {color: #7E7E7E; font-style: italic;}
+.arduino .co2 {color: #7E7E7E;}
+.arduino .coMULTI {color: #7E7E7E; font-style: italic;}
+.arduino .es0 {color: #000099; font-weight: bold;}
+.arduino .es1 {color: #000099; font-weight: bold;}
+.arduino .es2 {color: #660099; font-weight: bold;}
+.arduino .es3 {color: #660099; font-weight: bold;}
+.arduino .es4 {color: #660099; font-weight: bold;}
+.arduino .es5 {color: #006699; font-weight: bold;}
+.arduino .br0 {color: #000000;}
+.arduino .sy0 {color: #000000;}
+.arduino .st0 {color: #0066CC;}
+.arduino .nu0 {color: #000000;}
+.arduino .nu6 {color: #208080;}
+.arduino .nu8 {color: #208080;}
+.arduino .nu12 {color: #208080;}
+.arduino .nu16 {color:#800080;}
+.arduino .nu17 {color:#800080;}
+.arduino .nu18 {color:#800080;}
+.arduino .nu19 {color:#800080;}
+.arduino .me1 {color: #ff1493;}
+.arduino .me2 {color: #ff1493;}
+.arduino span.xtra { display:block; }
+
+.sourceblocklink {
+  text-align: right;
+  font-size: smaller;
+}
+.sourceblocktext {
+  padding: 0.5em;
+  color: #000000;
+  background-color: #ffffff;
+}
+.sourceblocktext div {
+  font-family: monospace;
+  font-size: small;
+  line-height: 1;
+  height: 1%;
+}
+.sourceblocktext div.head,
+.sourceblocktext div.foot {
+  font: italic medium serif;
+  padding: 0.5em;
+}
+
+--></style>  <meta name='robots' content='index,follow' />
+
+  <meta name="verify-v1" content="TtxFIEJAB6zdJ509wLxjnapQzKAMNm9u0Wj4ho6wxIY=" />
+</head>
+<body>
+<div id="page">
+  <!--PageHeaderFmt-->
+  <div id="pageheader">
+    <div class="title"><a href='http://arduino.cc/en'>Arduino</a></div>
+  </div>
+  <!--/PageHeaderFmt-->
+
+  <!--PageLeftFmt-->
+  <div id="pagenav">
+    <div id="navbar">
+  	<p><a class='wikilink' href='http://arduino.cc/en/Main/Buy'>Buy</a>
+<a class='wikilink' href='http://arduino.cc/en/Main/Software'>Download</a>
+<a class='wikilink' href='Guide_index.html'>Getting Started</a>
+<a class='wikilink' href='http://arduino.cc/en/Tutorial/HomePage'>Learning</a>
+<a class='wikilink' href='index.html'>Reference</a>
+<a class='wikilink' href='http://arduino.cc/en/Main/Hardware'>Hardware</a>
+<a class='wikilink' href='FAQ.html'>FAQ</a>
+</p>
+<p class='vspace'></p>
+
+    </div>
+  </div>
+  <!--/PageLeftFmt-->
+
+  <div id="pagetext">
+  <!--PageText-->
+<div id='wikitext'>
+<p><strong>Reference</strong> &nbsp;  <a class='wikilink' href='index.html'>Language</a> | <a class='wikilink' href='Libraries.html'>Libraries</a> | <a class='wikilink' href='Comparison.html'>Comparison</a> | <a class='wikilink' href='Changes.html'>Changes</a>
+</p>
+<p class='vspace'></p><h2><span class='wikiword'>SoftwareSerial</span>: print(data)</h2>
+<h4>Description</h4>
+<p>Prints data to the transmit pin of the software serial port.  Works the same as the <a class='wikilink' href='Serial_Print.html'>Serial.print</a>() function.  
+</p>
+<p class='vspace'></p><h4>Parameters</h4>
+<p>vary, see <a class='wikilink' href='Serial_Print.html'>Serial.print</a>() for details
+</p>
+<p class='vspace'></p><h4>Returns</h4>
+<p>byte<br />print() will return the number of bytes written, though reading that number is optional
+</p>
+<p class='vspace'></p><h4>Example</h4>
+<p>
+<div class='sourceblock ' id='sourceblock1'>
+  <div class='sourceblocktext'><div class="arduino">SoftwareSerial serial<span class="br0">&#40;</span><span class="nu0">6</span><span class="sy0">,</span> <span class="nu0">7</span><span class="br0">&#41;</span><span class="sy0">;</span><br />
+<span class="kw1">int</span> analogValue<span class="sy0">;</span><br />
+<br />
+<span class="kw1">void</span> <span class="kw3">setup</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; serial.<span class="kw1">begin</span><span class="br0">&#40;</span><span class="nu0">9600</span><span class="br0">&#41;</span><span class="sy0">;</span><br />
+<span class="br0">&#125;</span><br />
+<br />
+<span class="kw1">void</span> <span class="kw3">loop</span><span class="br0">&#40;</span><span class="br0">&#41;</span><br />
+<span class="br0">&#123;</span><br />
+&nbsp; <span class="co1">// read the analog input on pin 0:</span><br />
+&nbsp; analogValue <span class="sy0">=</span> <span class="kw1">analogRead</span><span class="br0">&#40;</span><span class="nu0">0</span><span class="br0">&#41;</span><span class="sy0">;</span><br />
+<br />
+&nbsp; <span class="co1">// print it out in many formats:</span><br />
+&nbsp; serial.<span class="kw1">print</span><span class="br0">&#40;</span>analogValue<span class="br0">&#41;</span><span class="sy0">;</span> &nbsp; &nbsp; &nbsp; &nbsp; <span class="co1">// print as an ASCII-encoded decimal</span><br />
+&nbsp; serial.<span class="kw1">print</span><span class="br0">&#40;</span><span class="st0">&quot;<span class="es1">\t</span>&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="co1">// print a tab character</span><br />
+&nbsp; serial.<span class="kw1">print</span><span class="br0">&#40;</span>analogValue<span class="sy0">,</span> <span class="kw2">DEC</span><span class="br0">&#41;</span><span class="sy0">;</span> &nbsp; &nbsp;<span class="co1">// print as an ASCII-encoded decimal</span><br />
+&nbsp; serial.<span class="kw1">print</span><span class="br0">&#40;</span><span class="st0">&quot;<span class="es1">\t</span>&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="co1">// print a tab character</span><br />
+&nbsp; serial.<span class="kw1">print</span><span class="br0">&#40;</span>analogValue<span class="sy0">,</span> <span class="kw2">HEX</span><span class="br0">&#41;</span><span class="sy0">;</span> &nbsp; &nbsp;<span class="co1">// print as an ASCII-encoded hexadecimal</span><br />
+&nbsp; serial.<span class="kw1">print</span><span class="br0">&#40;</span><span class="st0">&quot;<span class="es1">\t</span>&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="co1">// print a tab character</span><br />
+&nbsp; serial.<span class="kw1">print</span><span class="br0">&#40;</span>analogValue<span class="sy0">,</span> <span class="kw2">OCT</span><span class="br0">&#41;</span><span class="sy0">;</span> &nbsp; &nbsp;<span class="co1">// print as an ASCII-encoded octal</span><br />
+&nbsp; serial.<span class="kw1">print</span><span class="br0">&#40;</span><span class="st0">&quot;<span class="es1">\t</span>&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="co1">// print a tab character</span><br />
+&nbsp; serial.<span class="kw1">print</span><span class="br0">&#40;</span>analogValue<span class="sy0">,</span> <span class="kw2">BIN</span><span class="br0">&#41;</span><span class="sy0">;</span> &nbsp; &nbsp;<span class="co1">// print as an ASCII-encoded binary</span><br />
+&nbsp; serial.<span class="kw1">print</span><span class="br0">&#40;</span><span class="st0">&quot;<span class="es1">\t</span>&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="co1">// print a tab character</span><br />
+&nbsp; serial.<span class="kw1">print</span><span class="br0">&#40;</span>analogValue<span class="sy0">/</span><span class="nu0">4</span><span class="sy0">,</span> <span class="kw2">BYTE</span><span class="br0">&#41;</span><span class="sy0">;</span> <span class="co1">// print as a raw byte value (divide the</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="co1">// value by 4 because analogRead() returns numbers</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="co1">// from 0 to 1023, but a byte can only hold values</span><br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="co1">// up to 255)</span><br />
+&nbsp; serial.<span class="kw1">print</span><span class="br0">&#40;</span><span class="st0">&quot;<span class="es1">\t</span>&quot;</span><span class="br0">&#41;</span><span class="sy0">;</span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="co1">// print a tab character &nbsp; &nbsp;</span><br />
+&nbsp; serial.<span class="kw1">println</span><span class="br0">&#40;</span><span class="br0">&#41;</span><span class="sy0">;</span> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span class="co1">// print a linefeed character</span><br />
+<br />
+&nbsp; <span class="co1">// delay 10 milliseconds before the next reading:</span><br />
+&nbsp; <span class="kw1">delay</span><span class="br0">&#40;</span><span class="nu0">10</span><span class="br0">&#41;</span><span class="sy0">;</span><br />
+<span class="br0">&#125;</span></div></div>
+  <div class='sourceblocklink'><a href='#' type='text/plain'>[Get Code]</a></div>
+</div>
+
+</p>
+<p class='vspace'></p><h4>See also</h4>
+<ul><li><a class='wikilink' href='SoftwareSerialConstructor.html'>SoftwareSerial</a>()
+</li><li><a class='wikilink' href='SoftwareSerialBegin.html'>begin</a>()
+</li><li><a class='wikilink' href='SoftwareSerialRead.html'>read</a>()
+</li><li><a class='wikilink' href='SoftwareSerialPrintln.html'>println</a>()
+</li></ul><p><a class='wikilink' href='index.html'>Reference Home</a>
+</p>
+<p class='vspace'></p><p><em>Corrections, suggestions, and new documentation should be posted to the <a class='urllink' href='http://arduino.cc/forum/index.php/board,23.0.html' rel='nofollow'>Forum</a>.</em>
+</p>
+<p class='vspace'></p><p>The text of the Arduino reference is licensed under a
+<a class='urllink' href='http://creativecommons.org/licenses/by-sa/3.0/' rel='nofollow'>Creative Commons Attribution-ShareAlike 3.0 License</a>.  Code samples in the reference are released into the public domain.
+</p>
+</div>
+
+
+  </div>
+
+  <!--PageFooterFmt-->
+  <div id="pagefooter">
+&copy;Arduino | 
+  <a href='#'>Edit Page</a> | <a href='#'>Page History</a> | <a href='#' target='_blank'>Printable View</a> | <a href='http://arduino.cc/en/Site/AllRecentChanges'>All Recent Site Changes</a>
+  </div>
+  <!--/PageFooterFmt-->
+
+</div>
+</body>
+</html>

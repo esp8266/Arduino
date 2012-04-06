@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+  <title>Arduino Reference - Libraries </title>
+  <link rel="shortcut icon" type="image/x-icon" href="http://arduino.cc/en/favicon.png">
+  <link rel='stylesheet' href='arduinoWideRender.css' 
+type='text/css' />
+    <!--HeaderText--><style type='text/css'><!--
+  ul, ol, pre, dl, p { margin-top:0px; margin-bottom:0px; }
+  code { white-space: nowrap; }
+  .vspace { margin-top:1.33em; }
+  .indent { margin-left:40px; }
+  .outdent { margin-left:40px; text-indent:-40px; }
+  a.createlinktext { text-decoration:none; border-bottom:1px dotted gray; }
+  a.createlink { text-decoration:none; position:relative; top:-0.5em;
+    font-weight:bold; font-size:smaller; border-bottom:none; }
+  img { border:0px; }
+  .editconflict { color:green; 
+  font-style:italic; margin-top:1.33em; margin-bottom:1.33em; }
+
+  table.markup { border: 2px dotted #ccf; width:90%; }
+  td.markup1, td.markup2 { padding-left:10px; padding-right:10px; }
+  td.markup1 { border-bottom: 1px solid #ccf; }
+  div.faq { margin-left:2em; }
+  div.faq p.question { margin: 1em 0 0.75em -2em; font-weight:bold; }
+  div.faq hr { margin-left: -2em; }
+   
+    .frame 
+      { border:1px solid #cccccc; padding:4px; background-color:#f9f9f9; }
+    .lfloat { float:left; margin-right:0.5em; }
+    .rfloat { float:right; margin-left:0.5em; }
+a.varlink { text-decoration:none; }
+
+--></style>  <meta name='robots' content='index,follow' />
+
+  <meta name="verify-v1" content="TtxFIEJAB6zdJ509wLxjnapQzKAMNm9u0Wj4ho6wxIY=" />
+</head>
+<body>
+<div id="page">
+  <!--PageHeaderFmt-->
+  <div id="pageheader">
+    <div class="title"><a href='http://arduino.cc/en'>Arduino</a></div>
+  </div>
+  <!--/PageHeaderFmt-->
+
+  <!--PageLeftFmt-->
+  <div id="pagenav">
+    <div id="navbar">
+  	<p><a class='wikilink' href='http://arduino.cc/en/Main/Buy'>Buy</a>
+<a class='wikilink' href='http://arduino.cc/en/Main/Software'>Download</a>
+<a class='wikilink' href='Guide_index.html'>Getting Started</a>
+<a class='wikilink' href='http://arduino.cc/en/Tutorial/HomePage'>Learning</a>
+<a class='wikilink' href='index.html'>Reference</a>
+<a class='wikilink' href='http://arduino.cc/en/Main/Hardware'>Hardware</a>
+<a class='wikilink' href='FAQ.html'>FAQ</a>
+</p>
+<p class='vspace'></p>
+
+    </div>
+  </div>
+  <!--/PageLeftFmt-->
+
+  <div id="pagetext">
+  <!--PageText-->
+<div id='wikitext'>
+<p><strong>Reference</strong> &nbsp;  <a class='wikilink' href='index.html'>Language</a> | <a class='selflink' href='Libraries.html'>Libraries</a> | <a class='wikilink' href='Comparison.html'>Comparison</a> | <a class='wikilink' href='Changes.html'>Changes</a>
+</p>
+<p class='vspace'></p><h2>Libraries</h2>
+<p>Libraries provide extra functionality for use in sketches, e.g. working with hardware or manipulating data. To use a library in a sketch, select it from <strong>Sketch &gt; Import Library</strong>.   
+</p>
+<p class='vspace'></p><h3>Standard Libraries</h3>
+<ul><li><a class='wikilink' href='EEPROM.html'>EEPROM</a> - reading and writing to "permanent" storage
+</li><li><a class='wikilink' href='Ethernet.html'>Ethernet</a> - for connecting to the internet using the Arduino Ethernet Shield
+</li><li><a class='wikilink' href='Firmata.html'>Firmata</a> - for communicating with applications on the computer using a standard serial protocol.
+</li><li><a class='wikilink' href='LiquidCrystal.html'>LiquidCrystal</a> - for controlling liquid crystal displays (<span class='wikiword'>LCDs</span>)
+</li><li><a class='wikilink' href='SD.html'>SD</a> - for reading and writing SD cards
+</li><li><a class='wikilink' href='Servo.html'>Servo</a> - for controlling servo motors
+</li><li><a class='wikilink' href='SPI.html'>SPI</a> - for communicating with devices using the Serial Peripheral Interface (SPI) Bus
+</li><li><a class='wikilink' href='SoftwareSerial.html'>SoftwareSerial</a> - for serial communication on any digital pins
+</li><li><a class='wikilink' href='Stepper.html'>Stepper</a> - for controlling stepper motors
+</li><li><a class='wikilink' href='Wire.html'>Wire</a> - Two Wire Interface (<span class='wikiword'>TWI/I2C</span>) for sending and receiving data over a net of devices or sensors.
+</li></ul><p class='vspace'></p><p>The Matrix and Sprite libraries are no longer part of the core distribution.
+</p>
+<p class='vspace'></p><h3>Contributed Libraries</h3>
+<p>If you're using one of these libraries, you need to install it first.  To do so, download the library and unzip it. It should be in a folder of its own, and will typically contain at least two files, one with a .h suffix and one with a .cpp suffix.  Open your Arduino sketchbook folder. If there is already a folder there called <strong>libraries</strong>, place the library folder in there.  If not, create a folder called <strong>libraries</strong> in the sketchbook folder, and drop the library folder in there.  Then re-start the Arduino programming environment, and you should see your new library in the <strong>Sketch &gt; Import Library</strong> menu.
+</p>
+<p class='vspace'></p><p>For details, see the page on  <a class='wikilink' href='Guide_Environment#libraries.html'>the Arduino environment</a>.
+</p>
+<p class='vspace'></p><p>Communication (networking and protocols):
+</p><ul><li><a class='urllink' href='http://www.arduino.cc/playground/Code/Messenger' rel='nofollow'>Messenger</a> - for processing text-based messages from the computer
+</li><li><a class='urllink' href='http://sundial.org/arduino/index.php/newsoftserial/' rel='nofollow'>NewSoftSerial</a> - an improved version of the <span class='wikiword'>SoftwareSerial</span> library
+</li><li><a class='urllink' href='http://www.arduino.cc/playground/Learning/OneWire' rel='nofollow'>OneWire</a> - control devices (from Dallas Semiconductor) that use the One Wire protocol.
+</li><li><a class='urllink' href='http://www.arduino.cc/playground/Main/PS2Keyboard' rel='nofollow'>PS2Keyboard</a> - read characters from a <span class='wikiword'>PS2</span> keyboard.
+</li><li><a class='urllink' href='http://www.arduino.cc/playground/Code/SimpleMessageSystem' rel='nofollow'>Simple Message System</a> - send messages between Arduino and the computer
+</li><li><a class='urllink' href='http://code.google.com/p/sserial2mobile/' rel='nofollow'>SSerial2Mobile</a> - send text messages or emails using a cell phone (via AT commands over software serial)
+</li><li><a class='urllink' href='http://code.google.com/p/webduino/' rel='nofollow'>Webduino</a> - extensible web server library (for use with the Arduino Ethernet Shield)
+</li><li><a class='wikilink' href='http://arduino.cc/en/Tutorial/X10'>X10</a> - Sending X10 signals over AC power lines
+</li><li><a class='urllink' href='http://code.google.com/p/xbee-arduino/' rel='nofollow'>XBee</a> - for communicating with <span class='wikiword'>XBees</span> in API mode
+</li><li><a class='urllink' href='http://www.arduino.cc/playground/Code/SerialControl' rel='nofollow'>SerialControl</a> - Remote control other Arduinos over a serial connection
+</li></ul><p class='vspace'></p><p>Sensing:
+</p><ul><li><a class='urllink' href='http://www.arduino.cc/playground/Main/CapSense' rel='nofollow'>Capacitive Sensing</a> - turn two or more pins into capacitive sensors
+</li><li><a class='urllink' href='http://www.arduino.cc/playground/Code/Debounce' rel='nofollow'>Debounce</a> - for reading noisy digital inputs (e.g. from buttons)
+</li></ul><p class='vspace'></p><p>Displays and <span class='wikiword'>LEDs</span>:
+</p><ul><li><a class='urllink' href='http://web.alfredstate.edu/weimandn/arduino/LiquidCrystal_library/LiquidCrystal_index.html' rel='nofollow'>Improved LCD library</a> fixes LCD initialization bugs in official Arduino LCD library
+</li><li><a class='urllink' href='http://www.arduino.cc/playground/Code/GLCDks0108' rel='nofollow'>GLCD</a> - graphics routines for LCD based on the <span class='wikiword'>KS0108</span> or equivalent chipset.
+</li><li><a class='urllink' href='http://www.arduino.cc/playground/Main/LedControl' rel='nofollow'>LedControl</a> - for controlling LED matrices or seven-segment displays with a <span class='wikiword'>MAX7221</span> or <span class='wikiword'>MAX7219</span>.
+</li><li><a class='urllink' href='http://www.wayoda.org/arduino/ledcontrol/index.html' rel='nofollow'>LedControl</a> - an alternative to the Matrix library for driving multiple <span class='wikiword'>LEDs</span> with Maxim chips.
+</li><li><a class='urllink' href='http://www.arduino.cc/playground/Main/LedDisplay' rel='nofollow'>LedDisplay</a> - control of a <a class='urllink' href='http://sigma.octopart.com/23295/datasheet/Avago-HCMS-2973.pdf' rel='nofollow'>HCMS-29xx</a> scrolling LED display.
+</li></ul><p>These libraries are compatible Wiring versions, and the links below point to the (excellent) Wiring documentation.
+</p><ul><li><a class='urllink' href='http://wiring.org.co/reference/libraries/Matrix/index.html' rel='nofollow'>Matrix</a> - Basic LED Matrix display manipulation library
+</li><li><a class='urllink' href='http://wiring.org.co/reference/libraries/Sprite/index.html' rel='nofollow'>Sprite</a> - Basic image sprite manipulation library for use in animations with an LED matrix
+</li></ul><p class='vspace'></p><p>Frequency Generation and Audio:
+</p><ul><li><a class='urllink' href='http://code.google.com/p/arduino-tone/' rel='nofollow'>Tone</a> - generate audio frequency square waves in the background on any microcontroller pin
+</li></ul><p class='vspace'></p><p>Motors and PWM:
+</p><ul><li><a class='urllink' href='http://www.arduino.cc/playground/Learning/TLC5940' rel='nofollow'>TLC5940</a> - 16 channel 12 bit PWM controller.
+</li></ul><p class='vspace'></p><p>Timing:
+</p><ul><li><a class='urllink' href='http://www.arduino.cc/playground/Code/DateTime' rel='nofollow'>DateTime</a> - a library for keeping track of the current date and time in software.
+</li><li><a class='urllink' href='http://www.arduino.cc/playground/Code/Metro' rel='nofollow'>Metro</a> - help you time actions at regular intervals
+</li><li><a class='urllink' href='http://www.arduino.cc/playground/Main/MsTimer2' rel='nofollow'>MsTimer2</a> - uses the timer 2 interrupt to trigger an action every N milliseconds.
+</li></ul><p class='vspace'></p><p>Utilities:
+</p><ul><li><a class='urllink' href='http://sundial.org/arduino/index.php/pstring/' rel='nofollow'>PString</a> - a lightweight class for printing to buffers
+</li><li><a class='urllink' href='http://arduiniana.org/libraries/streaming/' rel='nofollow'>Streaming</a> -  a method to simplify print statements
+</li></ul><p class='vspace'></p><p>For a guide to writing your own libraries, see <a class='wikilink' href='http://arduino.cc/en/Hacking/LibraryTutorial'>this tutorial</a>.
+</p>
+<p class='vspace'></p><p><a class='wikilink' href='index.html'>Reference Home</a>
+</p>
+<p class='vspace'></p><p><em>Corrections, suggestions, and new documentation should be posted to the <a class='urllink' href='http://arduino.cc/forum/index.php/board,23.0.html' rel='nofollow'>Forum</a>.</em>
+</p>
+<p class='vspace'></p><p>The text of the Arduino reference is licensed under a
+<a class='urllink' href='http://creativecommons.org/licenses/by-sa/3.0/' rel='nofollow'>Creative Commons Attribution-ShareAlike 3.0 License</a>.  Code samples in the reference are released into the public domain.
+</p>
+</div>
+
+
+  </div>
+
+  <!--PageFooterFmt-->
+  <div id="pagefooter">
+&copy;Arduino | 
+  <a href='#'>Edit Page</a> | <a href='#'>Page History</a> | <a href='#' target='_blank'>Printable View</a> | <a href='http://arduino.cc/en/Site/AllRecentChanges'>All Recent Site Changes</a>
+  </div>
+  <!--/PageFooterFmt-->
+
+</div>
+</body>
+</html>

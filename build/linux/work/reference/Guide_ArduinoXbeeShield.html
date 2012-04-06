@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+  <title>Arduino Reference - ArduinoXbeeShield </title>
+  <link rel="shortcut icon" type="image/x-icon" href="http://arduino.cc/en/favicon.png">
+  <link rel='stylesheet' href='arduinoWideRender.css' 
+type='text/css' />
+    <!--HeaderText--><style type='text/css'><!--
+  ul, ol, pre, dl, p { margin-top:0px; margin-bottom:0px; }
+  code { white-space: nowrap; }
+  .vspace { margin-top:1.33em; }
+  .indent { margin-left:40px; }
+  .outdent { margin-left:40px; text-indent:-40px; }
+  a.createlinktext { text-decoration:none; border-bottom:1px dotted gray; }
+  a.createlink { text-decoration:none; position:relative; top:-0.5em;
+    font-weight:bold; font-size:smaller; border-bottom:none; }
+  img { border:0px; }
+  .editconflict { color:green; 
+  font-style:italic; margin-top:1.33em; margin-bottom:1.33em; }
+
+  table.markup { border: 2px dotted #ccf; width:90%; }
+  td.markup1, td.markup2 { padding-left:10px; padding-right:10px; }
+  td.markup1 { border-bottom: 1px solid #ccf; }
+  div.faq { margin-left:2em; }
+  div.faq p.question { margin: 1em 0 0.75em -2em; font-weight:bold; }
+  div.faq hr { margin-left: -2em; }
+   
+    .frame 
+      { border:1px solid #cccccc; padding:4px; background-color:#f9f9f9; }
+    .lfloat { float:left; margin-right:0.5em; }
+    .rfloat { float:right; margin-left:0.5em; }
+a.varlink { text-decoration:none; }
+
+--></style>  <meta name='robots' content='index,follow' />
+
+  <meta name="verify-v1" content="TtxFIEJAB6zdJ509wLxjnapQzKAMNm9u0Wj4ho6wxIY=" />
+</head>
+<body>
+<div id="page">
+  <!--PageHeaderFmt-->
+  <div id="pageheader">
+    <div class="title"><a href='http://arduino.cc/en'>Arduino</a></div>
+  </div>
+  <!--/PageHeaderFmt-->
+
+  <!--PageLeftFmt-->
+  <div id="pagenav">
+    <div id="navbar">
+  	<p><a class='wikilink' href='http://arduino.cc/en/Main/Buy'>Buy</a>
+<a class='wikilink' href='http://arduino.cc/en/Main/Software'>Download</a>
+<a class='wikilink' href='Guide_index.html'>Getting Started</a>
+<a class='wikilink' href='http://arduino.cc/en/Tutorial/HomePage'>Learning</a>
+<a class='wikilink' href='index.html'>Reference</a>
+<a class='wikilink' href='http://arduino.cc/en/Main/Hardware'>Hardware</a>
+<a class='wikilink' href='FAQ.html'>FAQ</a>
+</p>
+<p class='vspace'></p>
+
+    </div>
+  </div>
+  <!--/PageLeftFmt-->
+
+  <div id="pagetext">
+  <!--PageText-->
+<div id='wikitext'>
+<h2>Arduino <span class='wikiword'>XBee</span> Shield</h2>
+<p>The Arduino Xbee shield allows your Arduino board to communicate wirelessly using Zigbee.  It was developed in collaboration with <a class='urllink' href='http://www.libelium.com/' rel='nofollow'>Libelium</a>.  This documentation describes the use of the shield with the <span class='wikiword'>XBee</span> 802.15.4 module (sometimes called "Series 1" to distinguish them from the Series 2 modules, although "Series 1" doesn't appear in the official name or product description).  For the <span class='wikiword'>XBee</span> <span class='wikiword'>ZNet</span> 2.5 ("Series 2") modules, see <a class='urllink' href='http://www.humboldt.edu/~cm19/XBee%20setup.pdf' rel='nofollow'>this configuration guide</a>.
+</p>
+<p class='vspace'></p><h3>A Simple Example</h3>
+<p>You should be able to get two Arduino boards with Xbee shields talking to each other without any configuration, using just the standard Arduino serial commands (described in the <a class='wikilink' href='index.html'>reference</a>).  
+</p>
+<p class='vspace'></p><p>To upload a sketch to an Arduino board with a Xbee shield, you'll need to put both jumpers on the shield to the "USB" setting (i.e. place them on the two pins closest to the edge of the board) or remove them completely (but be sure not to lose them!).  Then, you can upload a sketch normally from the Arduino environment.  In this case, upload the <strong>Communication | Physical Pixel</strong> sketch to one of the boards.  This sketch instructs the board to turn on the LED attached to pin 13 whenever it receives an 'H' over its serial connection, and turn the LED off when it gets an 'L'.  You can test it by connecting to the board with the Arduino serial monitor (be sure it's set at 9600 baud), typing an H, and pressing enter (or clicking send).  The LED should turn on.  Send an L and the LED should turn off.  If nothing happens, you may have an Arduino board that doesn't have a built-in LED on pin 13 (see the <a class='wikilink' href='http://arduino.cc/en/Main/Boards'>board index</a> to check for sure), in this case you'll need to supply your own.
+</p>
+<p class='vspace'></p><p>Once you've uploaded the Physical Pixel sketch and made sure that it's working, unplug the first Arduino board from the computer.  Switch the jumpers to the Xbee setting (i.e. place each on the center pin and the pin farthest from the edge of the board).  Now, you need to upload a sketch to the other board.  Make sure its jumpers are in the USB setting.  Then upload the following sketch to the board:
+</p>
+<p class='vspace'></p><pre>
+void setup()
+{
+  Serial.begin(9600);
+}
+
+void loop()
+{
+  Serial.print('H');
+  delay(1000);
+  Serial.print('L');
+  delay(1000);
+}
+
+</pre>
+<p class='vspace'></p><p>When it's finished uploading, you can check that it's working with the Arduino serial monitor.  You should see H's and L's arriving one a second.  Turn off the serial monitor and unplug the board.  Switch the jumpers to the Xbee setting.  Now connect both boards to the computer.  After a few seconds, you should see the LED on the first board turn on and off, once a second.  (This is the LED on the Arduino board itself, not the one on the Xbee shield, which conveys information about the state of the Xbee module.)  If so, congratulations, your Arduino boards are communicating wirelessly.  This may not seem that exciting when both boards are connected to the same computer, but if you connect them to different computers (or power them with an external power supply - being sure to switch the power jumper on the Arduino board), they should still be able to communicate.  
+</p>
+<p class='vspace'></p><h3>A Few Notes</h3>
+<p>You can use any of the standard Arduino serial commands with the Xbee shield.  With the shield's jumpers in the Xbee position, the print and println commands will send data over the Xbee shield and the USB connection (i.e. to other Xbee shields and to the computer at the same time).  In this configuration, however, the board will only receive data from the Xbee shield not from the USB connection (you'll need to switch the jumpers to allow the board to receive data from the computer).  
+</p>
+<p class='vspace'></p><p>The Xbee module on the shield is set up to work at 9600 baud by default, so unless you reconfigure it, you'll need to make sure you're passing 9600 to the Serial.begin() command in your sketch.
+</p>
+<p class='vspace'></p><p>To allow your computer to communicate directly with the Xbee shield, connect it to an Arduino board whose microcontroller has been removed and place its jumpers in the USB configuration.  Then you can send data to and receive data from the Xbee module from any terminal program.  This allows you, for example, to see the data that the module is receiving from other Xbee shields (e.g. to collect sensor data wirelessly from a number of locations).
+</p>
+<p class='vspace'></p><h3>Configuring the Xbee Module</h3>
+<p>You can configure the Xbee module from code running on the Arduino board or from software on the computer.  To configure it from the Arduino board, you'll need to have the jumpers in the Xbee position.  To configure it from the computer, you'll need to have the jumpers in the USB configuration and have removed the microncontroller from your Arduino board.  
+</p>
+<p class='vspace'></p><p>To get the module into configuration mode, you need to send it three plus signs: +++ and there needs to be at least one second before and after during which you send no other character to the module.  Note that this includes newlines or carriage return characters.  Thus, if you're trying to configure the module from the computer, you need to make sure your terminal software is configured to send characters as you type them, without waiting for you to press enter.  Otherwise, it will send the plus signs immediately followed by a newline (i.e. you won't get the needed one second delay after the +++).  If you successfully enter configuration mode, the module will send back the two characters 'OK', followed by a carriage return.
+</p>
+<p class='vspace'></p>
+<table  width="60%"><tr><td  width="50%" valign='top'> Send Command
+</td><td  width="50%" valign='top'> Expected Response 
+</td></tr><tr><td  valign='top'> <code>+++</code>
+</td><td  valign='top'> <code>OK</code><em>&lt;CR&gt;</em>
+</td></tr></table>
+<p class='vspace'></p><p>Once in configuration mode, you can send AT commands to the module.  Command strings have the form <span class='wikiword'>ATxx</span> (where xx is the name of a setting).  To read the current value of the setting, send the command string followed by a carriage return.  To write a new value to the setting, send the command string, immediately followed by the new setting (with no spaces or newlines in-between), followed by a carriage return.  For example, to read the network ID of the module (which determines which other Xbee modules it will communicate with), use the <em>'ATID</em> command:
+</p>
+<p class='vspace'></p>
+<table  width="60%"><tr><td  width="50%" valign='top'> Send Command
+</td><td  width="50%" valign='top'> Expected Response 
+</td></tr><tr><td  valign='top'> <code>ATID</code><em>&lt;enter&gt;</em>
+</td><td  valign='top'> <code>3332</code><em>&lt;CR&gt;</em>
+</td></tr></table>
+<p class='vspace'></p><p>To change the network ID of the module:
+</p>
+<p class='vspace'></p>
+<table  width="60%"><tr><td  width="50%" valign='top'> Send Command
+</td><td  width="50%" valign='top'> Expected Response 
+</td></tr><tr><td  valign='top'> <code><span class='wikiword'>ATID3331</span></code><em>&lt;enter&gt;</em>
+</td><td  valign='top'> <code>OK</code><em>&lt;CR&gt;</em>
+</td></tr></table>
+<p class='vspace'></p><p>Now, check that the setting has taken effect:
+</p>
+<p class='vspace'></p>
+<table  width="60%"><tr><td  width="50%" valign='top'> Send Command
+</td><td  width="50%" valign='top'> Expected Response 
+</td></tr><tr><td  valign='top'> <code>ATID</code><em>&lt;enter&gt;</em>
+</td><td  valign='top'> <code>3331</code><em>&lt;CR&gt;</em>
+</td></tr></table>
+<p class='vspace'></p><p>Unless you tell the module to write the changes to non-volatile (long-term) memory, they will only be in effect until the module loses power.  To save the changes permanently (until you explicitly modify them again), use the <strong>ATWR</strong> command:
+</p>
+<p class='vspace'></p>
+<table  width="60%"><tr><td  width="50%" valign='top'> Send Command
+</td><td  width="50%" valign='top'> Expected Response 
+</td></tr><tr><td  valign='top'> <code>ATWR</code><em>&lt;enter&gt;</em>
+</td><td  valign='top'> <code>OK</code><em>&lt;CR&gt;</em>
+</td></tr></table>
+<p class='vspace'></p><p>To reset the module to the factory settings, use the <strong>ATRE</strong> command:
+</p>
+<p class='vspace'></p>
+<table  width="60%"><tr><td  width="50%" valign='top'> Send Command
+</td><td  width="50%" valign='top'> Expected Response 
+</td></tr><tr><td  valign='top'> <code>ATRE</code><em>&lt;enter&gt;</em>
+</td><td  valign='top'> <code>OK</code><em>&lt;CR&gt;</em>
+</td></tr></table>
+<p class='vspace'></p><p>Note that like the other commands, the reset will not be permanent unless you follow it with the <strong>ATWR</strong> comamand.
+</p>
+<p class='vspace'></p><h3>References</h3>
+<p>For more information, see: the <a class='wikilink' href='http://arduino.cc/en/Main/ArduinoXbeeShield'>hardware page</a> for the Xbee shield, the <a class='urllink' href='http://www.squidbee.org/' rel='nofollow'>Libelium SquidBee wiki</a>, and the <a class='urllink' href='http://www.maxstream.net/products/xbee/xbee-oem-rf-module-zigbee.php' rel='nofollow'>MaxStream Xbee page</a>.
+</p>
+<p class='vspace'></p><p>The text of the Arduino getting started guide is licensed under a
+<a class='urllink' href='http://creativecommons.org/licenses/by-sa/3.0/' rel='nofollow'>Creative Commons Attribution-ShareAlike 3.0 License</a>.  Code samples in the guide are released into the public domain.
+</p>
+</div>
+
+
+  </div>
+
+  <!--PageFooterFmt-->
+  <div id="pagefooter">
+&copy;Arduino | 
+  <a href='Guide_ArduinoXbeeShield?action=edit.html'>Edit Page</a> | <a href='Guide_ArduinoXbeeShield?action=diff.html'>Page History</a> | <a href='Guide_ArduinoXbeeShield?action=print.html' target='_blank'>Printable View</a> | <a href='http://arduino.cc/en/Site/AllRecentChanges'>All Recent Site Changes</a>
+  </div>
+  <!--/PageFooterFmt-->
+
+</div>
+</body>
+</html>

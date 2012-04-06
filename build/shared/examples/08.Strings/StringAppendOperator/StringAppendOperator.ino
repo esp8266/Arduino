@@ -14,15 +14,17 @@
 String stringOne, stringTwo;
 
 void setup() {
- // Open serial communications and wait for port to open:
+  // Open serial communications and wait for port to open:
   Serial.begin(9600);
-  // this check is only needed on the Leonardo:
-  while (!Serial) ;
- ;
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
 
   stringOne = String("Sensor ");
   stringTwo = String("value");
+  // send an intro:
   Serial.println("\n\nAppending to a string:");
+  Serial.println();
 }
 
 void loop() {
@@ -67,3 +69,4 @@ void loop() {
   // do nothing while true:
   while(true);
 }
+
