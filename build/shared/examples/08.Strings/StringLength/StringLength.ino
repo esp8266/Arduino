@@ -17,11 +17,13 @@ int lastStringLength = txtMsg.length();     // previous length of the String
 void setup() {
   // Open serial communications and wait for port to open:
   Serial.begin(9600);
-  // this check is only needed on the Leonardo:
-  while (!Serial) ;
-  ;
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
 
+  // send an intro:
   Serial.println("\n\nString  length():");
+  Serial.ptintln();
 }
 
 void loop() {

@@ -27,11 +27,13 @@ int red, green, blue = 0;
 void setup() {
   // Open serial communications and wait for port to open:
   Serial.begin(9600);
-  // this check is only needed on the Leonardo:
-  while (!Serial) ;
-  ;
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
 
+  // send an intro:
   Serial.println("\n\nString toInt() RGB:");
+  Serial.println();
   // set LED cathode pins as outputs:
   pinMode(9, OUTPUT);
   pinMode(10, OUTPUT);
@@ -99,7 +101,6 @@ void loop() {
     inString = ""; 
     // reset the color counter:
     currentColor = 0;
-
   }
 
 }
@@ -221,8 +222,7 @@ Here's a Processing sketch that will draw a color wheel and send a serial
  myPort.write(colorString );
  }
  
- 
- */
+*/
 
 
 
