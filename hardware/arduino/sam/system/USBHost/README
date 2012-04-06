@@ -1,0 +1,7 @@
+This is the most reliable library to control the USB host chip MAX3421E. It is used to handle the communication between the Arduino ADK board and Android devices supporting Accessory mode. It of course works with other devices, but documenting that is outside our scope. 
+
+It is of course based in the original by CircuitsAtHome.com and has been patched by Follower (RancidBacon.com)
+
+CircuitsAtHome has discontinued the development of this project. The Arduino Team commissioned a patch to the library to make it reliable up to a 99%. 
+CircuitsAtHome revision of the code can be found at https://github.com/felis/USB_Host_Shield_2.0. However the Arduino Team does not recommend using that library, yet, with ADK compatible boards, as v1 is much more stable.
+
