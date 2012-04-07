@@ -1,2 +1,0 @@
-echo ../../../tools/avr/bin/make OS=macosx ENV=arduino $*
-../../../tools/avr/bin/make OS=macosx ENV=arduino $*
