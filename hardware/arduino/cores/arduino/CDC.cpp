@@ -213,10 +213,19 @@ size_t Serial_::write(uint8_t c)
 	return 0;
 }
 
+// This operator is a convenient way for a sketch to check whether the
+// port has actually been configured and opened by the host (as opposed
+// to just being connected to the host).  It can be used, for example, in 
+// setup() before printing to ensure that an application on the host is
+// actually ready to receive and display the data.
+// We add a short delay before returning to fix a bug observed by Federico
+// where the port is configured (lineState != 0) but not quite opened.
 Serial_::operator bool() {
-	if (_usbLineInfo.lineState > 0)
-		return true;
-	return false;
+	bool result = false;
+	if (_usbLineInfo.lineState > 0) 
+		result = true;
+	delay(10);
+	return result;
 }
 
 Serial_ Serial;
