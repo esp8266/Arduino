@@ -1,0 +1,27 @@
+#######################################
+# Syntax Coloring Map for NewSoftSerial
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+NewSoftSerial	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+end	KEYWORD2
+read	KEYWORD2
+available	KEYWORD2
+isListening	KEYWORD2
+overflow	KEYWORD2
+flush	KEYWORD2
+listen	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+

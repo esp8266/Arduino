@@ -19,14 +19,16 @@ String stringOne, stringTwo, stringThree;
 void setup() {
   // initialize serial and wait for port to open:
   Serial.begin(9600);
-  // this check is only needed on the Leonardo:
-  while (!Serial) ;
- ;
-  
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
+
   stringOne = String("stringThree = ");
   stringTwo = String("this string");
   stringThree = String ();
+  // send an intro:
   Serial.println("\n\nAdding strings together (concatenation):");
+  Serial.println();
 }
 
 void loop() {

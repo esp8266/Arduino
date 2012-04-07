@@ -13,30 +13,31 @@
  */
 
 void setup() {
- // Open serial communications and wait for port to open:
+  // Open serial communications and wait for port to open:
   Serial.begin(9600);
-  // this check is only needed on the Leonardo:
-  while (!Serial) ;
- ;
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
 
+  // send an intro:
   Serial.println("\n\nString startsWith() and endsWith():");
-
+  Serial.println();
 }
 
 void loop() {
-// startsWith() checks to see if a String starts with a particular substring:
-    String stringOne = "HTTP/1.1 200 OK";
-    Serial.println(stringOne);
+  // startsWith() checks to see if a String starts with a particular substring:
+  String stringOne = "HTTP/1.1 200 OK";
+  Serial.println(stringOne);
   if (stringOne.startsWith("HTTP/1.1")) {
     Serial.println("Server's using http version 1.1"); 
   } 
-  
+
   // you can also look for startsWith() at an offset position in the string:
-     stringOne = "HTTP/1.1 200 OK";
+  stringOne = "HTTP/1.1 200 OK";
   if (stringOne.startsWith("200 OK", 9)) {
     Serial.println("Got an OK from the server"); 
   } 
-  
+
   // endsWith() checks to see if a String ends with a particular character:
   String sensorReading = "sensor = ";
   sensorReading += analogRead(A0);
@@ -49,6 +50,6 @@ void loop() {
 
   }
 
-// do nothing while true:
- while(true);
+  // do nothing while true:
+  while(true);
 }

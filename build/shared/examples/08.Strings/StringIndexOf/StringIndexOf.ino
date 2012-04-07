@@ -13,18 +13,19 @@
  */
 
 void setup() {
- // Open serial communications and wait for port to open:
+  // Open serial communications and wait for port to open:
   Serial.begin(9600);
-  // this check is only needed on the Leonardo:
-  while (!Serial) ;
- ;
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
 
+  // send an intro:
   Serial.println("\n\nString indexOf() and lastIndexOf()  functions:");
-
+  Serial.println();
 }
 
 void loop() {
- // indexOf() returns the position (i.e. index) of a particular character
+  // indexOf() returns the position (i.e. index) of a particular character
   // in a string. For example, if you were parsing HTML tags, you could use it:
   String stringOne = "<HTML><HEAD><BODY>";
   int firstClosingBracket = stringOne.indexOf('>');
@@ -53,12 +54,13 @@ void loop() {
   Serial.println("The index of the last list item in the string " + stringOne + " is " + lastListItem);
 
 
-// lastIndexOf() can also search for a string:
-   stringOne = "<p>Lorem ipsum dolor sit amet</p><p>Ipsem</p><p>Quod</p>";
+  // lastIndexOf() can also search for a string:
+  stringOne = "<p>Lorem ipsum dolor sit amet</p><p>Ipsem</p><p>Quod</p>";
   int lastParagraph = stringOne.lastIndexOf("<p");
   int secondLastGraf = stringOne.lastIndexOf("<p", lastParagraph - 1);
   Serial.println("The index of the second last paragraph tag " + stringOne + " is " + secondLastGraf);
 
-// do nothing while true:
- while(true);
+  // do nothing while true:
+  while(true);
 }
+

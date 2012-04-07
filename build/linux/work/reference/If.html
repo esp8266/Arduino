@@ -1,0 +1,133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+  <title>Arduino Reference - If </title>
+  <link rel="shortcut icon" type="image/x-icon" href="http://arduino.cc/en/favicon.png">
+  <link rel='stylesheet' href='arduinoWideRender.css' 
+type='text/css' />
+    <!--HeaderText--><style type='text/css'><!--
+  ul, ol, pre, dl, p { margin-top:0px; margin-bottom:0px; }
+  code { white-space: nowrap; }
+  .vspace { margin-top:1.33em; }
+  .indent { margin-left:40px; }
+  .outdent { margin-left:40px; text-indent:-40px; }
+  a.createlinktext { text-decoration:none; border-bottom:1px dotted gray; }
+  a.createlink { text-decoration:none; position:relative; top:-0.5em;
+    font-weight:bold; font-size:smaller; border-bottom:none; }
+  img { border:0px; }
+  .editconflict { color:green; 
+  font-style:italic; margin-top:1.33em; margin-bottom:1.33em; }
+
+  table.markup { border: 2px dotted #ccf; width:90%; }
+  td.markup1, td.markup2 { padding-left:10px; padding-right:10px; }
+  td.markup1 { border-bottom: 1px solid #ccf; }
+  div.faq { margin-left:2em; }
+  div.faq p.question { margin: 1em 0 0.75em -2em; font-weight:bold; }
+  div.faq hr { margin-left: -2em; }
+   
+    .frame 
+      { border:1px solid #cccccc; padding:4px; background-color:#f9f9f9; }
+    .lfloat { float:left; margin-right:0.5em; }
+    .rfloat { float:right; margin-left:0.5em; }
+a.varlink { text-decoration:none; }
+
+--></style>  <meta name='robots' content='index,follow' />
+
+  <meta name="verify-v1" content="TtxFIEJAB6zdJ509wLxjnapQzKAMNm9u0Wj4ho6wxIY=" />
+</head>
+<body>
+<div id="page">
+  <!--PageHeaderFmt-->
+  <div id="pageheader">
+    <div class="title"><a href='http://arduino.cc/en'>Arduino</a></div>
+  </div>
+  <!--/PageHeaderFmt-->
+
+  <!--PageLeftFmt-->
+  <div id="pagenav">
+    <div id="navbar">
+  	<p><a class='wikilink' href='http://arduino.cc/en/Main/Buy'>Buy</a>
+<a class='wikilink' href='http://arduino.cc/en/Main/Software'>Download</a>
+<a class='wikilink' href='Guide_index.html'>Getting Started</a>
+<a class='wikilink' href='http://arduino.cc/en/Tutorial/HomePage'>Learning</a>
+<a class='wikilink' href='index.html'>Reference</a>
+<a class='wikilink' href='http://arduino.cc/en/Main/Hardware'>Hardware</a>
+<a class='wikilink' href='FAQ.html'>FAQ</a>
+</p>
+<p class='vspace'></p>
+
+    </div>
+  </div>
+  <!--/PageLeftFmt-->
+
+  <div id="pagetext">
+  <!--PageText-->
+<div id='wikitext'>
+<p><strong>Reference</strong> &nbsp;  <a class='wikilink' href='index.html'>Language</a> | <a class='wikilink' href='Libraries.html'>Libraries</a> | <a class='wikilink' href='Comparison.html'>Comparison</a> | <a class='wikilink' href='Changes.html'>Changes</a>
+</p>
+<p class='vspace'></p><h2>if  (conditional)  and   ==,  !=,  &lt;,  &gt; (comparison operators)</h2>
+<p><strong><code>if</code></strong>, which is used in conjunction with a comparison operator, tests whether a certain condition has been reached, such as an input being above a certain number. The format for an if test is:
+</p>
+<p class='vspace'></p><pre>if (someVariable &gt; 50)
+{
+  // do something here
+}
+</pre>
+<p class='vspace'></p><p>The program tests to see if someVariable is greater than 50. If it is, the program takes a particular action. Put another way, if the statement in parentheses is true, the statements inside the brackets are run. If not, the program skips over the code.
+</p>
+<p class='vspace'></p><p>The brackets may be omitted after an <em>if</em> statement. If this is done, the next line (defined by the semicolon) becomes the only conditional statement.
+</p><pre>
+
+if (x &gt; 120) digitalWrite(LEDpin, HIGH); 
+
+if (x &gt; 120)
+digitalWrite(LEDpin, HIGH); 
+
+if (x &gt; 120){ digitalWrite(LEDpin, HIGH); } 
+
+if (x &gt; 120){ 
+  digitalWrite(LEDpin1, HIGH);
+  digitalWrite(LEDpin2, HIGH); 
+}                                 // all are correct
+
+</pre>
+<p class='vspace'></p><p>The statements being evaluated inside the parentheses require the use of one or more operators:
+</p>
+<p class='vspace'></p><h3>Comparison Operators:</h3>
+<pre> <strong>x == y</strong> (x is equal to y)
+ <strong>x != y</strong> (x is not equal to y)
+ <strong>x &lt;  y</strong> (x is less than y)  
+ <strong>x &gt;  y</strong> (x is greater than y) 
+ <strong>x &lt;= y</strong> (x is less than or equal to y) 
+ <strong>x &gt;= y</strong> (x is greater than or equal to y)
+</pre>
+<p class='vspace'></p><h4>Warning:  </h4>
+<p>Beware of accidentally using the single equal sign  (e.g.<code> if (x = 10)</code> ). The single equal sign is the assignment operator, and sets x to 10 (puts the value 10 into the variable x).  Instead use the double equal sign (e.g.<code> if (x == 10) </code>), which is the comparison operator, and tests <em>whether</em> x is equal to 10 or not. The latter statement is only true if x equals 10, but the former statement will always be true.
+</p>
+<p class='vspace'></p><p>This is because C evaluates the statement <code> if (x=10) </code> as follows: 10 is assigned to x (remember that the single equal sign is the <a class='wikilink' href='Assignment.html'>assignment operator</a>), so x now contains 10. Then the 'if' conditional evaluates 10, which always evaluates to TRUE, since any non-zero number evaluates to TRUE. Consequently,  <code>if (x = 10)</code> will always evaluate to TRUE, which is not the desired result when using an 'if' statement. Additionally, the variable x will be set to 10, which is also not a desired action.
+</p>
+<p class='vspace'></p><p><strong>if</strong> can also be part of a branching control structure using the <a class='wikilink' href='Else.html'>if...else</a>] construction.
+</p>
+<p class='vspace'></p><p><a class='wikilink' href='index.html'>Reference Home</a>
+</p>
+<p class='vspace'></p><p><em>Corrections, suggestions, and new documentation should be posted to the <a class='urllink' href='http://arduino.cc/forum/index.php/board,23.0.html' rel='nofollow'>Forum</a>.</em>
+</p>
+<p class='vspace'></p><p>The text of the Arduino reference is licensed under a
+<a class='urllink' href='http://creativecommons.org/licenses/by-sa/3.0/' rel='nofollow'>Creative Commons Attribution-ShareAlike 3.0 License</a>.  Code samples in the reference are released into the public domain.
+</p>
+</div>
+
+
+  </div>
+
+  <!--PageFooterFmt-->
+  <div id="pagefooter">
+&copy;Arduino | 
+  <a href='#'>Edit Page</a> | <a href='#'>Page History</a> | <a href='#' target='_blank'>Printable View</a> | <a href='http://arduino.cc/en/Site/AllRecentChanges'>All Recent Site Changes</a>
+  </div>
+  <!--/PageFooterFmt-->
+
+</div>
+</body>
+</html>

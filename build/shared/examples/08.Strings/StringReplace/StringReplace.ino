@@ -13,27 +13,36 @@
  */
 
 void setup() {
- // Open serial communications and wait for port to open:
+  // Open serial communications and wait for port to open:
   Serial.begin(9600);
-  // this check is only needed on the Leonardo:
-  while (!Serial) ;
- ;
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
 
-  Serial.println("\n\nString  replace:");
+  // send an intro:
+  Serial.println("\n\nString  replace:\n");
+  Serial.println();
 }
 
 void loop() {
   String stringOne = "<html><head><body>";
   Serial.println(stringOne);
   // replace() changes all instances of one substring with another:
-  String stringTwo = stringOne.replace("<", "</");
-  Serial.println(stringTwo);
+  // first, make a copy of th original string:
+  String stringTwo = stringOne;
+  // then perform the replacements:
+  stringTwo.replace("<", "</");
+  // print the original:
+  Serial.println("Original string: " + stringOne);
+  // and print the modified string:
+  Serial.println("Modified string: " + stringTwo);
 
   // you can also use replace() on single characters:
   String normalString = "bookkeeper";
   Serial.println("normal: " + normalString);
-  String leetString = normalString.replace('o', '0');
-  leetString = leetString.replace('e', '3');
+  String leetString = normalString;
+  leetString.replace('o', '0');
+  leetString.replace('e', '3');
   Serial.println("l33tspeak: " + leetString);
 
   // do nothing while true:

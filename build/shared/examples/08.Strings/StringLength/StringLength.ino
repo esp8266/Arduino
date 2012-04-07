@@ -15,8 +15,15 @@ String txtMsg = "";                         // a string for incoming text
 int lastStringLength = txtMsg.length();     // previous length of the String
 
 void setup() {
-  // open the serial port:
+  // Open serial communications and wait for port to open:
   Serial.begin(9600);
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
+
+  // send an intro:
+  Serial.println("\n\nString  length():");
+  Serial.ptintln();
 }
 
 void loop() {
