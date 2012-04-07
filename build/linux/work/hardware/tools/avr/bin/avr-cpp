@@ -1,3 +1,0 @@
-#!/bin/bash
-export LD_LIBRARY_PATH="`dirname "$0"`/../lib"
-exec -a "$0" "`dirname "$0"`/../bin.gcc/avr-cpp" "$@"
