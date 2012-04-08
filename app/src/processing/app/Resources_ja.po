@@ -78,7 +78,7 @@ msgstr "プリンタの設定..."
 msgid "Print"
 msgstr "印刷..."
 
-#: Editor.java:576 Preferences.java:291
+#: Editor.java:576 Preferences.java:293
 msgid "Preferences"
 msgstr "環境設定"
 
@@ -327,7 +327,7 @@ msgstr "移動中"
 
 #: Editor.java:2120 Editor.java:2131 Editor.java:2141 Editor.java:2159
 #: Sketch.java:479 Sketch.java:485 Sketch.java:500 Sketch.java:507
-#: Sketch.java:530 Sketch.java:547 Base.java:1861 Preferences.java:252
+#: Sketch.java:530 Sketch.java:547 Base.java:1861 Preferences.java:254
 msgid "Error"
 msgstr "エラー"
 
@@ -1508,10 +1508,14 @@ msgid "Romanian"
 msgstr ""
 
 #: Preferences.java:133
+msgid "Russian"
+msgstr ""
+
+#: Preferences.java:134
 msgid "Spanish"
 msgstr ""
 
-#: Preferences.java:222
+#: Preferences.java:224
 msgid ""
 "Could not read default settings.\n"
 "You'll need to reinstall Arduino."
@@ -1519,16 +1523,16 @@ msgstr ""
 "既定の設定を読み込むことができませんでした。\n"
 "Arduino IDEをもう一度インストールしてください。"
 
-#: Preferences.java:254
+#: Preferences.java:256
 #, java-format
 msgid "Could not read preferences from {0}"
 msgstr "「{0}」から設定を読み込めませんでした。"
 
-#: Preferences.java:273
+#: Preferences.java:275
 msgid "Error reading preferences"
 msgstr "設定ファイルを読み込む際にエラーが発生しました。"
 
-#: Preferences.java:275
+#: Preferences.java:277
 #, java-format
 msgid ""
 "Error reading the preferences file. Please delete (or move)\n"
@@ -1537,67 +1541,67 @@ msgstr ""
 "初期設定ファイルを読み込む際にエラーが発生しました。"
 "「{0}」を削除または移動してから、Arduino IDEを再起動してください。"
 
-#: Preferences.java:311
+#: Preferences.java:313
 msgid "Sketchbook location:"
 msgstr "スケッチブックの保存場所："
 
-#: Preferences.java:326
+#: Preferences.java:328
 msgid "Select new sketchbook location"
 msgstr "スケッチブックの保存場所を決めてください"
 
-#: Preferences.java:350
+#: Preferences.java:352
 msgid "Editor font size: "
 msgstr "エディタの文字の大きさ："
 
-#: Preferences.java:354 Preferences.java:442
+#: Preferences.java:356 Preferences.java:444
 msgid "  (requires restart of Arduino)"
 msgstr "（変更の反映には、Arduino IDEの再起動が必要。）"
 
-#: Preferences.java:367
+#: Preferences.java:369
 msgid "Show verbose output during: "
 msgstr "より詳細な情報を表示する："
 
-#: Preferences.java:369
+#: Preferences.java:371
 msgid "compilation "
 msgstr "コンパイル "
 
-#: Preferences.java:371
+#: Preferences.java:373
 msgid "upload"
 msgstr "書き込み"
 
-#: Preferences.java:380
+#: Preferences.java:382
 msgid "Verify code after upload"
 msgstr ""
 
-#: Preferences.java:389
+#: Preferences.java:391
 msgid "Use external editor"
 msgstr "外部のエディタを使用する。"
 
-#: Preferences.java:399
+#: Preferences.java:401
 msgid "Check for updates on startup"
 msgstr "起動時に最新バージョンの有無をチェックする。"
 
-#: Preferences.java:408
+#: Preferences.java:410
 msgid "Update sketch files to new extension on save (.pde -> .ino)"
 msgstr "スケッチを保存する際に、拡張子を.pdeから.inoに変更する"
 
-#: Preferences.java:419
+#: Preferences.java:421
 msgid "Automatically associate .ino files with Arduino"
 msgstr ".inoファイルをArduino IDEに関連づける。"
 
-#: Preferences.java:429
+#: Preferences.java:431
 msgid "Preferred Language: "
 msgstr ""
 
-#: Preferences.java:454
+#: Preferences.java:456
 msgid "More preferences can be edited directly in the file"
 msgstr "以下のファイルを直接編集すれば、より多くの設定を行うことができます。"
 
-#: Preferences.java:483
+#: Preferences.java:485
 msgid "(edit only when Arduino is not running)"
 msgstr "（編集する際には、Arduino IDEを終了させておいてください。）"
 
-#: Preferences.java:630
+#: Preferences.java:632
 #, java-format
 msgid "ignoring invalid font size {0}"
 msgstr "フォントサイズの指定「{0}」が異常なので無視します。"
