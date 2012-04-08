@@ -573,6 +573,7 @@
       <tarfileset dir="../" 
 		  prefix="arduino-${version}" 
 		  excludes="**/*.tgz,
+			     **/*.bz2,
 			     **/macosx/,
 			     **/windows/,
 			     **/work/,
