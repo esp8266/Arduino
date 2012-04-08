@@ -172,7 +172,29 @@ public class AvrdudeUploader extends Uploader  {
       flushSerialBuffer();
     }
 
-    return avrdude(commandDownloader);
+    boolean avrdudeResult = avrdude(commandDownloader);
+
+	// For Leonardo wait until the bootloader serial port disconnects and the sketch serial
+	// port reconnects (or timeout after a few seconds if the sketch port never comes back).
+	// Doing this saves users from accidentally opening Serial Monitor on the soon-to-be-orphaned
+	// bootloader port.
+    if (true == avrdudeResult && boardPreferences.get("bootloader.path").equals("caterina")) {
+    	try {
+    		Thread.sleep(500);
+    	} catch (InterruptedException ex) { } 
+    	long timeout = System.currentTimeMillis() + 2000;
+    	while (timeout > System.currentTimeMillis()) {
+	    	List<String> portList = Serial.list();
+    		if (portList.contains(Preferences.get("serial.port"))) {
+    			break;
+    		}
+    		try {
+    			Thread.sleep(100);
+    		} catch (InterruptedException ex) { }
+    	}    		
+    }
+    
+    return avrdudeResult;
   }
   
   public boolean burnBootloader() throws RunnerException {
