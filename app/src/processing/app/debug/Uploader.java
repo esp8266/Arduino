@@ -215,7 +215,11 @@ public abstract class Uploader implements MessageConsumer  {
     }
     if (s.indexOf("Programmer is not responding") != -1 ||
         s.indexOf("programmer is not responding") != -1 ||
-        s.indexOf("protocol error") != -1) {
+        s.indexOf("protocol error") != -1 ||
+        s.indexOf("avrdude: ser_open(): can't open device") != -1 ||
+        s.indexOf("avrdude: ser_drain(): read error") != -1 ||
+        s.indexOf("avrdude: ser_send(): write error") != -1 ||
+        s.indexOf("avrdude: error: buffered memory access not supported.") != -1) {
       exception = new RunnerException(_("Problem uploading to board.  See http://www.arduino.cc/en/Guide/Troubleshooting#upload for suggestions."));
       return;
     }
