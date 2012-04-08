@@ -112,6 +112,7 @@ public class Preferences {
 
   // language related arrays, please read notes later, where the language combo box is introduced
   String[] languages = {
+                        _("System Default"),
                         _("Catalan"),
                         _("Chinese Simplified"),
                         _("Chinese Taiwan"),
@@ -133,6 +134,7 @@ public class Preferences {
                         _("Russian"),
                         _("Spanish")};
   String[] languagesISO = {
+                        "",
                         "ca",
                         "zh_cn",
                         "zh_tw",

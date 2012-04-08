@@ -25,7 +25,8 @@ public class I18n {
   static protected void init (String language) {
     // there might be a null pointer exception ... most likely will never happen but the jvm gets mad
     try {
-      locale = new Locale(language);
+      if (language == null || language.trim().isEmpty()) locale = Locale.getDefault();
+      else locale = new Locale(language);
       i18n = ResourceBundle.getBundle("processing.app.Resources", locale);
     } catch (java.lang.NullPointerException e) {
     }
