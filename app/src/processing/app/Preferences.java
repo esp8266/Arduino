@@ -79,38 +79,6 @@ public class Preferences {
   static final String PROMPT_OK      = _("OK");
   static final String PROMPT_BROWSE  = _("Browse");
 
-  // XXX: DC 20120407
-  // Language Combo Box 
-  // the right way to do this would be having a string[] inside the preferences.txt
-  // file like follows:
-  //
-  // # list of available languages (in English so far)
-  // editor.languages.available.list = Catalan,English,Spanish
-  //
-  // # list of ISO names (same order as previous)
-  // editor.languages.ISO.list = ca,en,es
-  // 
-  // --> but that will require having a method to upgrade to the latest selection of
-  //     translation files. That could be done in multiple ways, but requires some thought
-  // 
-  // the code to gather those arrays into Preferences.java goes as follows:
-  //
-  //        String languagesAvailable = Preferences.get("editor.languages.available.list");
-  //        String languagesAvailableISO = Preferences.get("editor.languages.ISO.list");
-  //        String[] languages = languagesAvailable.split(",");
-  //        String[] languagesISO = languagesAvailableISO.split(",");
-  //
-  // --> instead, DM and DC agree that, for the time being, the languages will be listed internally
-  //     inside the Java code, they will have to be moved out at some point
-  //
-  // also note that right now, by default we will take English, in the future, once JRE7 is running in
-  // Arduino, we will use the locale, since it will behave in a similar way for all OSs. Thing is, up
-  // to JRE6, it was misbehaving as noted here:
-  // http://stackoverflow.com/questions/7107972/java-7-default-locale
-  //
-  // ALSO: for this to work, the languages/languagesISO arraylists need to be declared global, yeah! 
-
-  // language related arrays, please read notes later, where the language combo box is introduced
   String[] languages = {
                         _("System Default"),
                         "Català" + " (" + _("Catalan") + ")",
