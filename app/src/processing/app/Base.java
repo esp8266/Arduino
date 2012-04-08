@@ -169,6 +169,9 @@ public class Base {
     // run static initialization that grabs all the prefs
     Preferences.init(null);
 
+    // load the I18n module for internationalization
+    I18n.init(Preferences.get("editor.languages.current"));
+
     // setup the theme coloring fun
     Theme.init();
 

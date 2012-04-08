@@ -79,6 +79,79 @@ public class Preferences {
   static final String PROMPT_OK      = _("OK");
   static final String PROMPT_BROWSE  = _("Browse");
 
+  // XXX: DC 20120407
+  // Language Combo Box 
+  // the right way to do this would be having a string[] inside the preferences.txt
+  // file like follows:
+  //
+  // # list of available languages (in English so far)
+  // editor.languages.available.list = Catalan,English,Spanish
+  //
+  // # list of ISO names (same order as previous)
+  // editor.languages.ISO.list = ca,en,es
+  // 
+  // --> but that will require having a method to upgrade to the latest selection of
+  //     translation files. That could be done in multiple ways, but requires some thought
+  // 
+  // the code to gather those arrays into Preferences.java goes as follows:
+  //
+  //        String languagesAvailable = Preferences.get("editor.languages.available.list");
+  //        String languagesAvailableISO = Preferences.get("editor.languages.ISO.list");
+  //        String[] languages = languagesAvailable.split(",");
+  //        String[] languagesISO = languagesAvailableISO.split(",");
+  //
+  // --> instead, DM and DC agree that, for the time being, the languages will be listed internally
+  //     inside the Java code, they will have to be moved out at some point
+  //
+  // also note that right now, by default we will take English, in the future, once JRE7 is running in
+  // Arduino, we will use the locale, since it will behave in a similar way for all OSs. Thing is, up
+  // to JRE6, it was misbehaving as noted here:
+  // http://stackoverflow.com/questions/7107972/java-7-default-locale
+  //
+  // ALSO: for this to work, the languages/languagesISO arraylists need to be declared global, yeah! 
+
+  // language related arrays, please read notes later, where the language combo box is introduced
+  String[] languages = {
+                        _("Catalan"),
+                        _("Chinese Simplified"),
+                        _("Chinese Taiwan"),
+                        _("Danish"),
+                        _("Dutch"),
+                        _("English"),
+                        _("French"),
+                        _("Filipino"),
+                        _("Galician"),
+                        _("German"),
+                        _("Greek"),
+                        _("Hungarian"),
+                        _("Italian"),
+                        _("Japanese"),
+                        _("Latvian"),
+                        _("Persian"),
+                        _("Portuguese (Brazil)"),
+                        _("Romanian"),
+                        _("Spanish")};
+  String[] languagesISO = {
+                        "ca",
+                        "zh_cn",
+                        "zh_tw",
+                        "da",
+                        "nl",
+                        "en",
+                        "fr",
+                        "tl",
+                        "gl",
+                        "de",
+                        "el",
+                        "hu",
+                        "it",
+                        "ja",
+                        "lv",
+                        "fa",
+                        "pt_br",
+                        "ro",
+                        "es"};
+  
   /**
    * Standardized width for buttons. Mac OS X 10.3 wants 70 as its default,
    * Windows XP needs 66, and my Ubuntu machine needs 80+, so 80 seems proper.
@@ -124,6 +197,7 @@ public class Preferences {
   JTextField fontSizeField;
   JCheckBox updateExtensionBox;
   JCheckBox autoAssociateBox;
+  JComboBox comboLanguage;
 
 
   // the calling editor, so updates can be applied
@@ -350,6 +424,30 @@ public class Preferences {
       top += d.height + GUI_BETWEEN;
     }
 
+    //Label for the language combo box
+    box = Box.createHorizontalBox();
+    label = new JLabel(_("Preferred Language: "));
+    box.add(label);
+
+    //Create the combo box, select the item at index 4.
+    comboLanguage = new JComboBox(languages);
+    comboLanguage.setSelectedIndex((Arrays.asList(languagesISO)).indexOf(Preferences.get("editor.languages.current")));
+    comboLanguage.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent evt) {
+          JComboBox cb = (JComboBox)evt.getSource();
+          // the update to the language is done outside
+      }
+    });
+    box.add(comboLanguage);
+    label = new JLabel(_("  (requires restart of Arduino)"));
+    box.add(label);
+    pain.add(box);
+    d = box.getPreferredSize();
+    box.setForeground(Color.gray);
+    box.setBounds(left, top, d.width, d.height);
+    right = Math.max(right, left + d.width);
+    top += d.height + GUI_BETWEEN;
+
 
     // More preferences are in the ...
 
@@ -538,6 +636,11 @@ public class Preferences {
     }
     
     setBoolean("editor.update_extension", updateExtensionBox.isSelected());
+
+    // adds the selected language to the preferences file
+    Object newItem = comboLanguage.getSelectedItem();
+    int pos = (Arrays.asList(languages)).indexOf(newItem.toString());  // position in the languages array
+    set("editor.languages.current",(Arrays.asList(languagesISO)).get(pos));        
 
     editor.applyPreferences();
   }
