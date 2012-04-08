@@ -130,6 +130,7 @@ public class Preferences {
                         _("Persian"),
                         _("Portuguese (Brazil)"),
                         _("Romanian"),
+                        _("Russian"),
                         _("Spanish")};
   String[] languagesISO = {
                         "ca",
@@ -150,6 +151,7 @@ public class Preferences {
                         "fa",
                         "pt_br",
                         "ro",
+                        "ru",
                         "es"};
   
   /**
