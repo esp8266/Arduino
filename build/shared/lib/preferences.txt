@@ -259,5 +259,4 @@ serial.debug_rate=9600
 # I18 Preferences
 
 # default chosen language (none for none)
-editor.languages.current = en
-
+editor.languages.current = 
