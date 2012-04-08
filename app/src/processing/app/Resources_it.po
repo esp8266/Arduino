@@ -79,7 +79,7 @@ msgstr "Imposta Pagina"
 msgid "Print"
 msgstr "Stampa"
 
-#: Editor.java:576 Preferences.java:291
+#: Editor.java:576 Preferences.java:293
 msgid "Preferences"
 msgstr "Preferenze"
 
@@ -328,7 +328,7 @@ msgstr "Sto Spostando"
 
 #: Editor.java:2120 Editor.java:2131 Editor.java:2141 Editor.java:2159
 #: Sketch.java:479 Sketch.java:485 Sketch.java:500 Sketch.java:507
-#: Sketch.java:530 Sketch.java:547 Base.java:1861 Preferences.java:252
+#: Sketch.java:530 Sketch.java:547 Base.java:1861 Preferences.java:254
 msgid "Error"
 msgstr "Errore"
 
@@ -1528,10 +1528,14 @@ msgid "Romanian"
 msgstr ""
 
 #: Preferences.java:133
+msgid "Russian"
+msgstr ""
+
+#: Preferences.java:134
 msgid "Spanish"
 msgstr ""
 
-#: Preferences.java:222
+#: Preferences.java:224
 msgid ""
 "Could not read default settings.\n"
 "You'll need to reinstall Arduino."
@@ -1539,16 +1543,16 @@ msgstr ""
 "Impossibile leggere le impostazioni predefinite.\n"
 "E' necessario reinstallare Arduino."
 
-#: Preferences.java:254
+#: Preferences.java:256
 #, java-format
 msgid "Could not read preferences from {0}"
 msgstr "Impossibile leggere le preferenze da {0}"
 
-#: Preferences.java:273
+#: Preferences.java:275
 msgid "Error reading preferences"
 msgstr "Errore nella lettura delle preferenze"
 
-#: Preferences.java:275
+#: Preferences.java:277
 #, java-format
 msgid ""
 "Error reading the preferences file. Please delete (or move)\n"
@@ -1557,67 +1561,67 @@ msgstr ""
 "Errore nella letture del file di preferenze. Per favore eliminare (spostare)\n"
 "{0} e riavviare Arduino."
 
-#: Preferences.java:311
+#: Preferences.java:313
 msgid "Sketchbook location:"
 msgstr "Posizione degli Sketch:"
 
-#: Preferences.java:326
+#: Preferences.java:328
 msgid "Select new sketchbook location"
 msgstr "Selezionare una nuova posizione per gli Sketch"
 
-#: Preferences.java:350
+#: Preferences.java:352
 msgid "Editor font size: "
 msgstr "Dimensioni font dell'editor:"
 
-#: Preferences.java:354 Preferences.java:442
+#: Preferences.java:356 Preferences.java:444
 msgid "  (requires restart of Arduino)"
 msgstr "  (richiede il riavvio di Arduino)"
 
-#: Preferences.java:367
+#: Preferences.java:369
 msgid "Show verbose output during: "
 msgstr "Mostra output verboso durante:"
 
-#: Preferences.java:369
+#: Preferences.java:371
 msgid "compilation "
 msgstr "compilazione "
 
-#: Preferences.java:371
+#: Preferences.java:373
 msgid "upload"
 msgstr "caricamento"
 
-#: Preferences.java:380
+#: Preferences.java:382
 msgid "Verify code after upload"
 msgstr "Verifica il codice dopo il caricamento"
 
-#: Preferences.java:389
+#: Preferences.java:391
 msgid "Use external editor"
 msgstr "Usa un editor esterno"
 
-#: Preferences.java:399
+#: Preferences.java:401
 msgid "Check for updates on startup"
 msgstr "Controlla gli aggiornamenti all'avvio"
 
-#: Preferences.java:408
+#: Preferences.java:410
 msgid "Update sketch files to new extension on save (.pde -> .ino)"
 msgstr "Aggiorna gli Sketch alla nuova estensione durante il salvataggio (.pde -> .ino)"
 
-#: Preferences.java:419
+#: Preferences.java:421
 msgid "Automatically associate .ino files with Arduino"
 msgstr "Associa automaticamente i file .ino con Arduino"
 
-#: Preferences.java:429
+#: Preferences.java:431
 msgid "Preferred Language: "
 msgstr ""
 
-#: Preferences.java:454
+#: Preferences.java:456
 msgid "More preferences can be edited directly in the file"
 msgstr "Ulteriori preferenze possono essere modificate direttamente nel file"
 
-#: Preferences.java:483
+#: Preferences.java:485
 msgid "(edit only when Arduino is not running)"
 msgstr "(modifica solo quando Arduino non è in esecuzione)"
 
-#: Preferences.java:630
+#: Preferences.java:632
 #, java-format
 msgid "ignoring invalid font size {0}"
 msgstr "sto ignorando la dimensione del font non valida {0}"

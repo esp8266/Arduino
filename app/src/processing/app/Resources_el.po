@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: Arduino - Greek\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2012-03-30 02:33+0000\n"
+"PO-Revision-Date: 2012-04-08 20:30+0000\n"
 "Last-Translator: tzikis <billgeo13@gmail.com>\n"
 "Language-Team: Greek (http://www.transifex.net/projects/p/arduino_greek/language/el/)\n"
 "MIME-Version: 1.0\n"
@@ -80,7 +80,7 @@ msgstr "Ρύθμιση Σελίδας"
 msgid "Print"
 msgstr "Εκτύπωση"
 
-#: Editor.java:576 Preferences.java:291
+#: Editor.java:576 Preferences.java:293
 msgid "Preferences"
 msgstr "Επιλογές"
 
@@ -321,7 +321,7 @@ msgstr "Μεταφορά"
 
 #: Editor.java:2120 Editor.java:2131 Editor.java:2141 Editor.java:2159
 #: Sketch.java:479 Sketch.java:485 Sketch.java:500 Sketch.java:507
-#: Sketch.java:530 Sketch.java:547 Base.java:1861 Preferences.java:252
+#: Sketch.java:530 Sketch.java:547 Base.java:1861 Preferences.java:254
 msgid "Error"
 msgstr "Σφάλμα"
 
@@ -594,7 +594,7 @@ msgstr "Αρχειοθέτηση Σχεδίου"
 
 #: tools/Archiver.java:59
 msgid "yyMMdd"
-msgstr "yyΜΜdd"
+msgstr "yyMMdd"
 
 #: tools/Archiver.java:74
 msgid "Couldn't archive sketch"
@@ -1321,163 +1321,167 @@ msgstr "Περιήγηση"
 
 #: Preferences.java:115
 msgid "Catalan"
-msgstr ""
+msgstr "Καταλανικά"
 
 #: Preferences.java:116
 msgid "Chinese Simplified"
-msgstr ""
+msgstr "Απλοποιημένα Κινέζικα"
 
 #: Preferences.java:117
 msgid "Chinese Taiwan"
-msgstr ""
+msgstr "Ταϊβανέζικα Κινέζικα"
 
 #: Preferences.java:118
 msgid "Danish"
-msgstr ""
+msgstr "Δανέζικα"
 
 #: Preferences.java:119
 msgid "Dutch"
-msgstr ""
+msgstr "Ολλανδικά"
 
 #: Preferences.java:120
 msgid "English"
-msgstr ""
+msgstr "Αγγλικά"
 
 #: Preferences.java:121
 msgid "French"
-msgstr ""
+msgstr "Γαλλικά"
 
 #: Preferences.java:122
 msgid "Filipino"
-msgstr ""
+msgstr "Φιλιπινέζικα"
 
 #: Preferences.java:123
 msgid "Galician"
-msgstr ""
+msgstr "Γαλικιανά"
 
 #: Preferences.java:124
 msgid "German"
-msgstr ""
+msgstr "Γερμανικά"
 
 #: Preferences.java:125
 msgid "Greek"
-msgstr ""
+msgstr "Ελληνικά"
 
 #: Preferences.java:126
 msgid "Hungarian"
-msgstr ""
+msgstr "Ουγγρικά"
 
 #: Preferences.java:127
 msgid "Italian"
-msgstr ""
+msgstr "Ιταλικά"
 
 #: Preferences.java:128
 msgid "Japanese"
-msgstr ""
+msgstr "Ιαπωνικά"
 
 #: Preferences.java:129
 msgid "Latvian"
-msgstr ""
+msgstr "Λετονικά"
 
 #: Preferences.java:130
 msgid "Persian"
-msgstr ""
+msgstr "Πέρσικα"
 
 #: Preferences.java:131
 msgid "Portuguese (Brazil)"
-msgstr ""
+msgstr "Πορτογαλλικά (Βραζιλίας)"
 
 #: Preferences.java:132
 msgid "Romanian"
-msgstr ""
+msgstr "Ρουμανικά"
 
 #: Preferences.java:133
-msgid "Spanish"
+msgid "Russian"
 msgstr ""
 
-#: Preferences.java:222
+#: Preferences.java:134
+msgid "Spanish"
+msgstr "Ισπανικά"
+
+#: Preferences.java:224
 msgid ""
 "Could not read default settings.\n"
 "You'll need to reinstall Arduino."
 msgstr "Αδύνατη η ανάγνωση προεπιλεγμένων ρυθμίσεων.\nΘα χρειαστεί να επανεγκαταστήσετε το Arduino."
 
-#: Preferences.java:254
+#: Preferences.java:256
 #, java-format
 msgid "Could not read preferences from {0}"
 msgstr "Αδύνατη η ανάγνωση των επιλογών από το {0}"
 
-#: Preferences.java:273
+#: Preferences.java:275
 msgid "Error reading preferences"
 msgstr "Σφάλμα ανάγνωσης επιλογών"
 
-#: Preferences.java:275
+#: Preferences.java:277
 #, java-format
 msgid ""
 "Error reading the preferences file. Please delete (or move)\n"
 "{0} and restart Arduino."
 msgstr "Σφάλμα ανάγνωσης του αρχείου επιλογών. Παρακαλούμε διαγράψτε\n(ή μεταφέρετε) το {0} και επανεκκινήστε το Arduino."
 
-#: Preferences.java:311
+#: Preferences.java:313
 msgid "Sketchbook location:"
 msgstr "Τοποθεσία Σχεδίων:"
 
-#: Preferences.java:326
+#: Preferences.java:328
 msgid "Select new sketchbook location"
 msgstr "Επιλέξτε καινούργια τοποθεσία σχεδίων"
 
-#: Preferences.java:350
+#: Preferences.java:352
 msgid "Editor font size: "
 msgstr "Μέγεθος γραμματοσειράς επεξεργαστή κειμένου: "
 
-#: Preferences.java:354 Preferences.java:442
+#: Preferences.java:356 Preferences.java:444
 msgid "  (requires restart of Arduino)"
 msgstr "  (απαιτεί επανεκκίνηση του Arduino)"
 
-#: Preferences.java:367
+#: Preferences.java:369
 msgid "Show verbose output during: "
 msgstr "Εμφάνιση αναλυτικής εξόδου κατά την: "
 
-#: Preferences.java:369
+#: Preferences.java:371
 msgid "compilation "
 msgstr "μεταγλώττιση "
 
-#: Preferences.java:371
+#: Preferences.java:373
 msgid "upload"
 msgstr "φόρτωση"
 
-#: Preferences.java:380
+#: Preferences.java:382
 msgid "Verify code after upload"
-msgstr ""
+msgstr "Επαλήθευση κώδικα μετά την φόρτωση"
 
-#: Preferences.java:389
+#: Preferences.java:391
 msgid "Use external editor"
 msgstr "Χρήση εξωτερικού προγράμματος επεξεργασίας"
 
-#: Preferences.java:399
+#: Preferences.java:401
 msgid "Check for updates on startup"
 msgstr "Έλεγχος ενημερώσεων στην εκκίνηση"
 
-#: Preferences.java:408
+#: Preferences.java:410
 msgid "Update sketch files to new extension on save (.pde -> .ino)"
 msgstr "Αναβάθμιση των αρχείων σχεδίων στην νέα κατάληξη κατά την αποθήκευση (.pde -> .ino)"
 
-#: Preferences.java:419
+#: Preferences.java:421
 msgid "Automatically associate .ino files with Arduino"
 msgstr "Αυτόματη σύνδεση των αρχείων .ino με το Arduino"
 
-#: Preferences.java:429
+#: Preferences.java:431
 msgid "Preferred Language: "
-msgstr ""
+msgstr "Προτεινόμενη Γλώσσα:"
 
-#: Preferences.java:454
+#: Preferences.java:456
 msgid "More preferences can be edited directly in the file"
 msgstr "Περισσότερες προτιμήσεις μπορούν να επεξεργασθούν απεθείας στο αρχείο"
 
-#: Preferences.java:483
+#: Preferences.java:485
 msgid "(edit only when Arduino is not running)"
 msgstr "(επεξεργαστείτε το αρχείο μόνο ενώ το Arduino δεν τρέχει)"
 
-#: Preferences.java:630
+#: Preferences.java:632
 #, java-format
 msgid "ignoring invalid font size {0}"
 msgstr "Παράβλεψη λανθασμένου μεγέθος γραμματοσειράς {0}"
