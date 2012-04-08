@@ -346,9 +346,25 @@ public class Preferences {
     top += vmax + GUI_BETWEEN;
 
 
+    // Preferred language: [        ] (requires restart of Arduino)
+    Container box = Box.createHorizontalBox();
+    label = new JLabel(_("Editor Language: "));
+    box.add(label);
+    comboLanguage = new JComboBox(languages);
+    comboLanguage.setSelectedIndex((Arrays.asList(languagesISO)).indexOf(Preferences.get("editor.languages.current")));
+    box.add(comboLanguage);
+    label = new JLabel(_("  (requires restart of Arduino)"));
+    box.add(label);
+    pain.add(box);
+    d = box.getPreferredSize();
+    box.setForeground(Color.gray);
+    box.setBounds(left, top, d.width, d.height);
+    right = Math.max(right, left + d.width);
+    top += d.height + GUI_BETWEEN;
+    
     // Editor font size [    ]
 
-    Container box = Box.createHorizontalBox();
+    box = Box.createHorizontalBox();
     label = new JLabel(_("Editor font size: "));
     box.add(label);
     fontSizeField = new JTextField(4);
@@ -425,31 +441,6 @@ public class Preferences {
       right = Math.max(right, left + d.width);
       top += d.height + GUI_BETWEEN;
     }
-
-    //Label for the language combo box
-    box = Box.createHorizontalBox();
-    label = new JLabel(_("Preferred Language: "));
-    box.add(label);
-
-    //Create the combo box, select the item at index 4.
-    comboLanguage = new JComboBox(languages);
-    comboLanguage.setSelectedIndex((Arrays.asList(languagesISO)).indexOf(Preferences.get("editor.languages.current")));
-    comboLanguage.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent evt) {
-          JComboBox cb = (JComboBox)evt.getSource();
-          // the update to the language is done outside
-      }
-    });
-    box.add(comboLanguage);
-    label = new JLabel(_("  (requires restart of Arduino)"));
-    box.add(label);
-    pain.add(box);
-    d = box.getPreferredSize();
-    box.setForeground(Color.gray);
-    box.setBounds(left, top, d.width, d.height);
-    right = Math.max(right, left + d.width);
-    top += d.height + GUI_BETWEEN;
-
 
     // More preferences are in the ...
 
