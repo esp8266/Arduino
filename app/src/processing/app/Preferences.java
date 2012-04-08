@@ -114,8 +114,8 @@ public class Preferences {
   String[] languages = {
                         _("System Default"),
                         "Català" + " (" + _("Catalan") + ")",
-                        "大陆简体" + " (" + _("Chinese Simplified") + ")",
-                        "台灣正體" + " (" + _("Chinese Traditional") + ")",
+                        "简体中文" + " (" + _("Chinese Simplified") + ")",
+                        "繁體中文" + " (" + _("Chinese Traditional") + ")",
                         "Dansk" + " (" + _("Danish") + ")",
                         "Nederlands" + " (" + _("Dutch") + ")",
                         "English" + " (" + _("English") + ")",
