@@ -318,7 +318,7 @@ public class Preferences {
 
     // Preferred language: [        ] (requires restart of Arduino)
     Container box = Box.createHorizontalBox();
-    label = new JLabel(_("Editor Language: "));
+    label = new JLabel(_("Editor language: "));
     box.add(label);
     comboLanguage = new JComboBox(languages);
     comboLanguage.setSelectedIndex((Arrays.asList(languagesISO)).indexOf(Preferences.get("editor.languages.current")));
