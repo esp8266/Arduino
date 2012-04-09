@@ -182,5 +182,17 @@ parseFloat	KEYWORD2
 readBytes	KEYWORD2
 readBytesUntil	KEYWORD2
 
+# USB-related keywords
+
+Keyboard	KEYWORD3
+Mouse	KEYWORD3
+press	KEYWORD2
+release	KEYWORD2
+releaseAll	KEYWORD2
+accept	KEYWORD2
+click	KEYWORD2
+move	KEYWORD2
+isPressed	KEYWORD2
+
 setup	KEYWORD3	Setup
 loop	KEYWORD3	Loop
