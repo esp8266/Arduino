@@ -53,8 +53,8 @@ const USB_Descriptor_Device_t DeviceDescriptor =
 
 	.Endpoint0Size          = FIXED_CONTROL_ENDPOINT_SIZE,
 
-	.VendorID               = 0x2341,
-	.ProductID              = 0x0701,
+	.VendorID               = DEVICE_VID,
+	.ProductID              = DEVICE_PID,
 	.ReleaseNumber          = VERSION_BCD(00.01),
 
 	.ManufacturerStrIndex   = 0x02,
@@ -193,7 +193,13 @@ const USB_Descriptor_String_t ProductString =
 {
 	.Header                 = {.Size = USB_STRING_LEN(16), .Type = DTYPE_String},
 
-	.UnicodeString          = L"Arduino Leonardo"
+	#if DEVICE_PID == 0x0034
+	.UnicodeString          = L"Arduino Leonardo" 
+	#elif DEVICE_PID == 0x0035
+	.UnicodeString			= L"Arduino Micro   "
+	#else 
+	.UnicodeString			= L"USB IO board    "
+	#endif
 };
 /*
 const USB_Descriptor_String_t SerialNumString = 

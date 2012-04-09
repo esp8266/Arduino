@@ -46,6 +46,17 @@
 # To rebuild project do "make clean" then "make all".
 #----------------------------------------------------------------------------
 
+# USB vendor ID (VID)
+# official Arduino LLC VID
+VID = 0x2341
+
+
+# USB product ID (PID)
+# official Leonardo PID
+#PID = 0x0034
+# official Micro PID
+PID = 0x0035
+
 
 # MCU name
 MCU = atmega32u4
@@ -193,6 +204,8 @@ CDEFS  = -DF_CPU=$(F_CPU)UL
 CDEFS += -DF_USB=$(F_USB)UL
 CDEFS += -DBOARD=BOARD_$(BOARD) -DARCH=ARCH_$(ARCH)
 CDEFS += -DBOOT_START_ADDR=$(BOOT_START)UL
+CDEFS += -DDEVICE_VID=$(VID)UL
+CDEFS += -DDEVICE_PID=$(PID)UL
 CDEFS += $(LUFA_OPTS)
 
 
