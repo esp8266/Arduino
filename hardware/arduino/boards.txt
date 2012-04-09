@@ -155,31 +155,36 @@ leonardo.bootloader.low_fuses=0xff
 leonardo.bootloader.high_fuses=0xd8
 leonardo.bootloader.extended_fuses=0xcb
 leonardo.bootloader.path=caterina
-leonardo.bootloader.file=Caterina.hex
+leonardo.bootloader.file=Caterina-Leonardo.hex
 leonardo.bootloader.unlock_bits=0x3F
 leonardo.bootloader.lock_bits=0x2F
 leonardo.build.mcu=atmega32u4
 leonardo.build.f_cpu=16000000L
+leonardo.build.vid=0x2341
+leonardo.build.pid=0x8034
 leonardo.build.core=arduino
 leonardo.build.variant=leonardo
 
 ##############################################################
 
-#micro.name=Arduino Micro
-#micro.upload.protocol=arduino
-#micro.upload.maximum_size=30720
-#micro.upload.speed=1200
-#micro.bootloader.low_fuses=0xde
-#micro.bootloader.high_fuses=0xda
-#micro.bootloader.extended_fuses=0xcb
-#micro.bootloader.path=caterina
-#micro.bootloader.file=Caterina-Micro.hex
-#micro.bootloader.unlock_bits=0x3F
-#micro.bootloader.lock_bits=0x2F
-#micro.build.mcu=atmega32u4
-#micro.build.f_cpu=16000000L
-#micro.build.core=arduino
-#micro.build.variant=micro
+micro.name=Arduino Micro
+micro.upload.protocol=avr109
+micro.upload.maximum_size=28672
+micro.upload.speed=57600
+micro.upload.disable_flushing=true
+micro.bootloader.low_fuses=0xff
+micro.bootloader.high_fuses=0xd8
+micro.bootloader.extended_fuses=0xcb
+micro.bootloader.path=caterina
+micro.bootloader.file=Caterina-Micro.hex
+micro.bootloader.unlock_bits=0x3F
+micro.bootloader.lock_bits=0x2F
+micro.build.mcu=atmega32u4
+micro.build.f_cpu=16000000L
+micro.build.vid=0x2341
+micro.build.pid=0x8035
+micro.build.core=arduino
+micro.build.variant=micro
 
 ##############################################################
 

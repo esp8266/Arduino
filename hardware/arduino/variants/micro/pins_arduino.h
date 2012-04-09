@@ -23,5 +23,3 @@
 */
 
 #include "../leonardo/pins_arduino.h"
-#undef ARDUINO_MODEL_USB_PID
-#define ARDUINO_MODEL_USB_PID	0x0035

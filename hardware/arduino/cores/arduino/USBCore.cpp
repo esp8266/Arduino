@@ -51,9 +51,9 @@ const u16 STRING_LANGUAGE[2] = {
 
 const u16 STRING_IPRODUCT[17] = {
 	(3<<8) | (2+2*16),
-#if USB_PID == USB_PID_LEONARDO	
+#if USB_PID == 0x8034	
 	'A','r','d','u','i','n','o',' ','L','e','o','n','a','r','d','o'
-#elif USB_PID == USB_PID_MICRO
+#elif USB_PID == 0x8035
 	'A','r','d','u','i','n','o',' ','M','i','c','r','o',' ',' ',' '
 #endif
 };

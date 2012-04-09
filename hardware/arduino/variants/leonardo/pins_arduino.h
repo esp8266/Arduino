@@ -27,8 +27,6 @@
 
 #include <avr/pgmspace.h>
 
-#define ARDUINO_MODEL_USB_PID	0x0801
-
 #define TX_RX_LED_INIT	DDRD |= (1<<5), DDRB |= (1<<0)
 #define TXLED0			PORTD |= (1<<5)
 #define TXLED1			PORTD &= ~(1<<5)

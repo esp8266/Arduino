@@ -542,8 +542,10 @@ public class Compiler implements MessageConsumer {
       "-g", // include debugging info (so errors include line numbers)
       "-assembler-with-cpp",
       "-mmcu=" + boardPreferences.get("build.mcu"),
-      "-DF_CPU=" + boardPreferences.get("build.f_cpu"),
+      "-DF_CPU=" + boardPreferences.get("build.f_cpu"),      
       "-DARDUINO=" + Base.REVISION,
+      "-DUSB_VID=" + boardPreferences.get("build.vid"),
+      "-DUSB_PID=" + boardPreferences.get("build.pid"),
     }));
 
     for (int i = 0; i < includePaths.size(); i++) {
@@ -571,7 +573,9 @@ public class Compiler implements MessageConsumer {
       "-mmcu=" + boardPreferences.get("build.mcu"),
       "-DF_CPU=" + boardPreferences.get("build.f_cpu"),
       "-MMD", // output dependancy info
-      "-DARDUINO=" + Base.REVISION,
+      "-DUSB_VID=" + boardPreferences.get("build.vid"),
+      "-DUSB_PID=" + boardPreferences.get("build.pid"),
+      "-DARDUINO=" + Base.REVISION, 
     }));
 		
     for (int i = 0; i < includePaths.size(); i++) {
@@ -602,6 +606,8 @@ public class Compiler implements MessageConsumer {
       "-mmcu=" + boardPreferences.get("build.mcu"),
       "-DF_CPU=" + boardPreferences.get("build.f_cpu"),
       "-MMD", // output dependancy info
+      "-DUSB_VID=" + boardPreferences.get("build.vid"),
+      "-DUSB_PID=" + boardPreferences.get("build.pid"),      
       "-DARDUINO=" + Base.REVISION,
     }));
 
