@@ -54,8 +54,6 @@ VID = 0x2341
 # USB product ID (PID)
 # official Leonardo PID
 #PID = 0x0034
-# official Micro PID
-PID = 0x0035
 
 
 # MCU name

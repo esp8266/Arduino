@@ -53,14 +53,18 @@ const u16 STRING_IPRODUCT[17] = {
 	(3<<8) | (2+2*16),
 #if USB_PID == 0x8034	
 	'A','r','d','u','i','n','o',' ','L','e','o','n','a','r','d','o'
-#elif USB_PID == 0x8035
-	'A','r','d','u','i','n','o',' ','M','i','c','r','o',' ',' ',' '
+#else
+	'U','S','B',' ','I','O',' ','B','O','A','R','D',' ',' ',' ',' '
 #endif
 };
 
 const u16 STRING_IMANUFACTURER[12] = {
 	(3<<8) | (2+2*11),
+#if USB_VID == 0x2341
 	'A','r','d','u','i','n','o',' ','L','L','C'
+#else
+	'U','n','k','n','o','w','n',' ',' ',' ',' '
+#endif
 };
 
 #ifdef CDC_ENABLED
