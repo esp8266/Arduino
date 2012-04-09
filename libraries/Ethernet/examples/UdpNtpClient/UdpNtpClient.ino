@@ -9,7 +9,7 @@
  
  created 4 Sep 2010 
  by Michael Margolis
- modified 2 Apr 2012
+ modified 9 Apr 2012
  by Tom Igoe
  
  This code is in the public domain.
@@ -40,9 +40,10 @@ void setup()
 {
  // Open serial communications and wait for port to open:
   Serial.begin(9600);
-  // this check is only needed on the Leonardo:
-  while (!Serial) ;
- ;
+   while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
+
 
   // start Ethernet and UDP
   if (Ethernet.begin(mac) == 0) {

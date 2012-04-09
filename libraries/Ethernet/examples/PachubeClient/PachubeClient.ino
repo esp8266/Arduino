@@ -16,7 +16,7 @@
  * Ethernet shield attached to pins 10, 11, 12, 13
  
  created 15 March 2010
- modified 2 Apr 2012
+ modified 9 Apr 2012
  by Tom Igoe with input from Usman Haque and Joe Saavedra
  
 http://arduino.cc/en/Tutorial/PachubeClient
@@ -55,9 +55,10 @@ const unsigned long postingInterval = 10*1000; //delay between updates to Pachub
 void setup() {
  // Open serial communications and wait for port to open:
   Serial.begin(9600);
-  // this check is only needed on the Leonardo:
-  while (!Serial) ;
- ;
+   while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
+
 
  // start the Ethernet connection:
   if (Ethernet.begin(mac) == 0) {

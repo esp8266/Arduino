@@ -19,7 +19,7 @@
  
  Created 26 Sept. 2005
  by Tom Igoe
- modified 2 Apr 2012
+ modified 9 Apr 2012
  by Tom Igoe and Scott Fitzgerald
  
  This example code is in the public domain.
@@ -37,9 +37,10 @@ void setup()
 {
   // start serial port at 9600 bps and wait for port to open:
   Serial.begin(9600);
-  // this check is only needed on the Leonardo:
-  while (!Serial) ;
- ;
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
+
   
   pinMode(2, INPUT);   // digital sensor is on digital pin 2
   establishContact();  // send a byte to establish contact until receiver responds 
