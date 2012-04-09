@@ -13,6 +13,7 @@ void setup() {
 void loop() {
   int sensorValue = digitalRead(2);
   Serial.println(sensorValue);
+  delay(1);    // short delay in between reads for stability
 }
 
 
