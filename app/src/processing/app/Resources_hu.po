@@ -1,277 +1,278 @@
-# Japanese language resource for the Arduino IDE.
-# Copyright (C) 2011 switch-science.com
-# This file is distributed under the same license as the Arduino IDE package.
-# Shigeru KANEMOTO <c2drQHN3aXRjaC1zY2llbmNlLmNvbQ==>.
+# Hungarian translations for PACKAGE package.
+# Copyright (C) 2012 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Robert Cseh <tavir@tavir.hu>, 2012.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-11 23:09+0900\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Shigeru KANEMOTO <c2drQHN3aXRjaC1zY2llbmNlLmNvbQ==>\n"
-"Language-Team: \n"
+"Report-Msgid-Bugs-To: Robert Cseh<tavir@tavir.hu>\n"
+"POT-Creation-Date: 2012-04-03 10:24-0400\n"
+"PO-Revision-Date: 2012-04-04 10:24-0400\n"
+"Last-Translator: Robert Cseh <tavir@tavir.hu>\n"
+"Language-Team: Hungarian\n"
+"Language: hu\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: Editor.java:366
 msgid "No files were added to the sketch."
-msgstr "スケッチにファイルは追加されませんでした。"
+msgstr "Nem lett file hozzáadva a Sketch-hez."
 
 #: Editor.java:369 Sketch.java:996
 msgid "One file added to the sketch."
-msgstr "スケッチにファイルを1個追加しました。"
+msgstr "Egy file a Sketch-hez hozzáadásra került."
 
 #: Editor.java:373
 #, java-format
 msgid "{0} files added to the sketch."
-msgstr "スケッチにファイルを{0}個追加しました。"
+msgstr  "{0} file a Sketch-hez hozzáadásra került."
 
 #: Editor.java:484
 msgid "File"
-msgstr "ファイル"
+msgstr "File"
 
 #: Editor.java:486 EditorToolbar.java:41
 msgid "New"
-msgstr "新規ファイル"
+msgstr "Új"
 
 #: Editor.java:494 Base.java:903
 msgid "Open..."
-msgstr "開く..."
+msgstr "Megnyit..."
 
 #: Editor.java:503
 msgid "Sketchbook"
-msgstr "スケッチブック"
+msgstr "SketchBook"
 
 #: Editor.java:509
 msgid "Examples"
-msgstr "スケッチ例"
+msgstr "Minták"
 
 #: Editor.java:514 Editor.java:1977
 msgid "Close"
-msgstr "閉じる"
+msgstr "Bezár"
 
 #: Editor.java:522 Editor.java:2017 Editor.java:2421 EditorToolbar.java:41
 #: EditorToolbar.java:46
 msgid "Save"
-msgstr "保存"
+msgstr "Mentés"
 
 #: Editor.java:530
 msgid "Save As..."
-msgstr "名前を付けて保存"
+msgstr "Mentés másként ..."
 
 #: Editor.java:538 EditorToolbar.java:41
 msgid "Upload"
-msgstr "マイコンボードに書き込む"
+msgstr "Feltöltés"
 
 #: Editor.java:546 EditorToolbar.java:46
 msgid "Upload Using Programmer"
-msgstr "書込装置を使って書き込む"
+msgstr "Feltöltés programozóval"
 
 #: Editor.java:556
 msgid "Page Setup"
-msgstr "プリンタの設定..."
+msgstr "Oldalbeállítás"
 
 #: Editor.java:564
 msgid "Print"
-msgstr "印刷..."
+msgstr "Nyomtatás"
 
 #: Editor.java:576 Preferences.java:293
 msgid "Preferences"
-msgstr "環境設定"
+msgstr "Beállítások"
 
 #: Editor.java:586 Base.java:782
 msgid "Quit"
-msgstr "終了"
+msgstr "Kilépés"
 
 #: Editor.java:600
 msgid "Sketch"
-msgstr "スケッチ"
+msgstr "Sketch"
 
 #: Editor.java:602
 msgid "Verify / Compile"
-msgstr "検証・コンパイル"
+msgstr "Elleõrzés / Fordítás"
 
 #: Editor.java:629
 msgid "Import Library..."
-msgstr "ライブラリを使用"
+msgstr "Függvény importálás..."
 
 #: Editor.java:634
 msgid "Show Sketch Folder"
-msgstr "スケッチのフォルダを表示"
+msgstr "Sketch mappa"
 
 #: Editor.java:643
 msgid "Add File..."
-msgstr "ファイルを追加..."
+msgstr "File hozzáadása..."
 
 #: Editor.java:656
 msgid "Tools"
-msgstr "ツール"
+msgstr "Eszközök"
 
 #: Editor.java:662 EditorToolbar.java:41 EditorToolbar.java:46
 msgid "Serial Monitor"
-msgstr "シリアルモニタ"
+msgstr "Soros monitor"
 
 #: Editor.java:682
 msgid "Board"
-msgstr "マイコンボード"
+msgstr "Alappanel"
 
 #: Editor.java:690
 msgid "Serial Port"
-msgstr "シリアルポート"
+msgstr "Soros port"
 
 #: Editor.java:695
 msgid "Programmer"
-msgstr "書込装置"
+msgstr "Programozó"
 
 #: Editor.java:699
 msgid "Burn Bootloader"
-msgstr "ブートローダを書き込む"
+msgstr "Bootloader beégetése"
 
 #: Editor.java:923
 msgid "serialMenu is null"
-msgstr "serialMenuがカラです"
+msgstr "Üres a serialMenü"
 
 #: Editor.java:927 Editor.java:934
 msgid "name is null"
-msgstr "名前がカラです"
+msgstr "a név: üres"
 
 #: Editor.java:986
 msgid "error retrieving port list"
-msgstr "ポート名の一覧を取得できませんでした。"
+msgstr "hiba a portlista lekérésekor"
 
 #: Editor.java:1002
 msgid "Help"
-msgstr "ヘルプ"
+msgstr "Súgó"
 
 #: Editor.java:1041
 msgid "Getting Started"
-msgstr "初心者向けガイド"
+msgstr "Elsõ lépések"
 
 #: Editor.java:1049
 msgid "Environment"
-msgstr "このソフトの使い方について"
+msgstr "Környezet"
 
 #: Editor.java:1057
 msgid "Troubleshooting"
-msgstr "トラブルシューティング"
+msgstr "Hibaelhárítás"
 
 #: Editor.java:1065
 msgid "Reference"
-msgstr "リファレンス"
+msgstr "Referencia"
 
 #: Editor.java:1073 Editor.java:2728
 msgid "Find in Reference"
-msgstr "リファレンスで検索"
+msgstr "Kereseés a Referenciák közt"
 
 #: Editor.java:1083
 msgid "Frequently Asked Questions"
-msgstr "よくある質問"
+msgstr "Gyakran ismételt kérdések"
 
 #: Editor.java:1091
 msgid "Visit Arduino.cc"
-msgstr "Arduino.ccウェブサイトを開く"
+msgstr "arduino.cc honlap megnyitása"
 
 #: Editor.java:1094
 msgid "http://arduino.cc/"
-msgstr ""
+msgstr "http://arduino.cc/"
 
 #: Editor.java:1102
 msgid "About Arduino"
-msgstr "Arduinoについて..."
+msgstr "Arduino-ról..."
 
 #: Editor.java:1116
 msgid "Edit"
-msgstr "編集"
+msgstr "Szerkesztés"
 
 #: Editor.java:1119 Editor.java:1341
 msgid "Undo"
-msgstr "元に戻す"
+msgstr "Mégse"
 
 #: Editor.java:1124 Editor.java:1126 Editor.java:1376
 msgid "Redo"
-msgstr "やり直し"
+msgstr "Mégis"
 
 #: Editor.java:1135 Editor.java:2652
 msgid "Cut"
-msgstr "切り取り"
+msgstr "Kivágás"
 
 #: Editor.java:1143 Editor.java:2660
 msgid "Copy"
-msgstr "コピー"
+msgstr "Másolás"
 
 #: Editor.java:1151 Editor.java:2668
 msgid "Copy for Forum"
-msgstr "フォーラム投稿形式でコピーする"
+msgstr "Másolás a Fórumhoz"
 
 #: Editor.java:1163 Editor.java:2676
 msgid "Copy as HTML"
-msgstr "HTML形式でコピーする"
+msgstr "Másolás HTML-ként"
 
 #: Editor.java:1175 Editor.java:2684
 msgid "Paste"
-msgstr "貼り付け"
+msgstr "Beillesztés"
 
 #: Editor.java:1184 Editor.java:2692
 msgid "Select All"
-msgstr "全て選択"
+msgstr "Minden kijelölése"
 
 #: Editor.java:1194 Editor.java:2702
 msgid "Comment/Uncomment"
-msgstr "コメント化・復帰"
+msgstr "Megjegyzés/Mégsem"
 
 #: Editor.java:1202 Editor.java:2710
 msgid "Increase Indent"
-msgstr "インデントを増やす"
+msgstr "Behúzás növelése"
 
 #: Editor.java:1210 Editor.java:2718
 msgid "Decrease Indent"
-msgstr "インデントを減らす"
+msgstr "Behúzás csökkentése"
 
 #: Editor.java:1220
 msgid "Find..."
-msgstr "検索..."
+msgstr "Keresés..."
 
 #: Editor.java:1235
 msgid "Find Next"
-msgstr "次を検索"
+msgstr "Következõ keresése"
 
 #: Editor.java:1245
 msgid "Find Previous"
-msgstr ""
+msgstr "Elõzõ keresése"
 
 #: Editor.java:1255
 msgid "Use Selection For Find"
-msgstr ""
+msgstr "Kiválasztás használata kereséshez"
 
 #: Editor.java:1816
 msgid "First select a word to find in the reference."
-msgstr "リファレンスで検索したい言葉を選んだ状態にしてから実行してください。"
+msgstr "Elõször egy szót kell választani a Referenciák közti kereséshez."
 
 #: Editor.java:1823
 #, java-format
 msgid "No reference available for \"{0}\""
-msgstr "リファレンスマニュアルに「{0}」はありません。"
+msgstr "Referencia nem található a {0} bejegyzéshez"
 
 #: Editor.java:1826
 #, java-format
 msgid "{0}.html"
-msgstr ""
+msgstr "{0}.html"
 
 #: Editor.java:1843 Sketch.java:1647
 msgid "Compiling sketch..."
-msgstr "スケッチをコンパイルしています…"
+msgstr "Sketch fordítása..."
 
 #: Editor.java:1864 Editor.java:1881
 msgid "Done compiling."
-msgstr "コンパイル終了。"
+msgstr "Fordítás kész."
 
 #: Editor.java:1973
 #, java-format
 msgid "Save changes to \"{0}\"?  "
-msgstr "変更内容を「{0}」に書き込みますか？"
+msgstr ""
 
 #: Editor.java:2006
 msgid ""
@@ -281,35 +282,34 @@ msgid ""
 "save, your changes will be lost."
 msgstr ""
 "<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p "
-"{ font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>"
-"閉じる前にスケッチに加えた変更内容を保存しますか？</b>"
-"<p>保存しないと、変更内容は失われます。"
+"{ font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Változtatás "
+"mentése a kilépés elõtt a sketck-be?</b><p>Mentés nékül a változtatások elvesznek."
 
 #: Editor.java:2017 Editor.java:2098 Editor.java:2418 Sketch.java:589
 #: Sketch.java:741 Sketch.java:1046 Preferences.java:78
 msgid "Cancel"
-msgstr "キャンセル"
+msgstr "Mégse"
 
 #: Editor.java:2017
 msgid "Don't Save"
-msgstr "保存しない"
+msgstr "Nincs mentés"
 
 #: Editor.java:2089
 msgid "Bad file selected"
-msgstr "間違ったファイルを開きました。"
+msgstr "Hibás file van kiválasztva"
 
 #: Editor.java:2090
 msgid ""
 "Processing can only open its own sketches\n"
 "and other files ending in .ino or .pde"
 msgstr ""
-"このIDEは、ファイル名が拡張子.inoまたは.pdeで\n"
-"終わるファイルだけを開くことができます。"
+"Processing csak a saját állományát tudja megnyitni\n"
+"és az .ino vagy .pde kiterjesztésûeket"
 
 #: Editor.java:2098 Editor.java:2418 Sketch.java:589 Sketch.java:741
 #: Sketch.java:1046 Preferences.java:79
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: Editor.java:2100
 #, java-format
@@ -318,52 +318,53 @@ msgid ""
 "a sketch folder named \"{1}\".\n"
 "Create this folder, move the file, and continue?"
 msgstr ""
-"「{0}」というファイルは、「{1}」という名前のフォルダの中にある必要がありま"
-"す。自動的にこのフォルダを作って、ファイルを中に入れますか？"
+"A \"{0}\" file-nak a {1} mappán belül kell lennie.\n"
+"Mi legyen?\n"
+"Mappa létrehozása, file mozgatása és folytatás?"
 
 #: Editor.java:2109
 msgid "Moving"
-msgstr "移動中"
+msgstr "Átmozgatás"
 
 #: Editor.java:2120 Editor.java:2131 Editor.java:2141 Editor.java:2159
 #: Sketch.java:479 Sketch.java:485 Sketch.java:500 Sketch.java:507
 #: Sketch.java:530 Sketch.java:547 Base.java:1861 Preferences.java:254
 msgid "Error"
-msgstr "エラー"
+msgstr "Hiba"
 
 #: Editor.java:2122
 #, java-format
 msgid "A folder named \"{0}\" already exists. Can't open sketch."
-msgstr "「{0}」という名前のフォルダはすでに存在します。スケッチを開けません。"
+msgstr "A {0} mappa már létezik. Sketch nem megnyitható."
 
 #: Editor.java:2132
 msgid "Could not create the sketch folder."
-msgstr "スケッチフォルダを作成できません。"
+msgstr "Sketch mappája nem hozható létre."
 
 #: Editor.java:2141
 msgid "Could not copy to a proper location."
-msgstr "コピーするべきフォルダにファイルをコピーできませんでした。"
+msgstr "Nem másolható a megfelelõ helyre."
 
 #: Editor.java:2159
 msgid "Could not create the sketch."
-msgstr "スケッチを作成できません。"
+msgstr "Sketch nem hozható létre."
 
 #: Editor.java:2166
 #, java-format
 msgid "{0} | Arduino {1}"
-msgstr ""
+msgstr "{0} | Arduino {1}"
 
 #: Editor.java:2223 Editor.java:2261
 msgid "Saving..."
-msgstr "保存中です..."
+msgstr "Mentés..."
 
 #: Editor.java:2228 Editor.java:2264
 msgid "Done Saving."
-msgstr "保存しました。"
+msgstr "Mentés kész."
 
 #: Editor.java:2270
 msgid "Save Canceled."
-msgstr "保存を中止しました。"
+msgstr "Mentés megszakítva."
 
 #: Editor.java:2296
 #, java-format
@@ -371,159 +372,157 @@ msgid ""
 "Serial port {0} not found.\n"
 "Retry the upload with another serial port?"
 msgstr ""
-"シリアルポート「{0}」が存在しません。\n"
-"シリアルポートを変更して、もう一度書き込みますか？"
+"{0} soros port nem található.\n"
+"Másik soros porton megismételjük?"
 
 #: Editor.java:2331
 msgid "Uploading to I/O Board..."
-msgstr "マイコンボードに書き込んでいます…"
+msgstr "Feltöltés alappanelre..."
 
 #: Editor.java:2348 Editor.java:2384
 msgid "Done uploading."
-msgstr "マイコンボードへの書き込みが完了しました。"
+msgstr "Feltöltés kész."
 
 #: Editor.java:2356 Editor.java:2392
 msgid "Upload canceled."
-msgstr "書き込みを取りやめました。"
+msgstr "Feltöltés megszakítva."
 
 #: Editor.java:2420
 msgid "Save changes before export?"
-msgstr "エクスポートを行う前に保存しますか？"
+msgstr "Exportálás elõtt mentés?"
 
 #: Editor.java:2435
 msgid "Export canceled, changes must first be saved."
-msgstr ""
-"エクスポートを取りやめました。"
-"エクスポートを行う前に保存する必要があります。"
+msgstr "Expoerálás megszakítva. Elõször menteni kell!"
 
 #: Editor.java:2457
 msgid "Burning bootloader to I/O Board (this may take a minute)..."
-msgstr "マイコンボードにブートローダを書き込んでいます…"
+msgstr "Bootloader égetése (néhány percet vesz igénybe)..."
 
 #: Editor.java:2463
 msgid "Done burning bootloader."
-msgstr "ブートローダの書き込みが完了しました。"
+msgstr "Bootloader égetés kész."
 
 #: Editor.java:2465 Editor.java:2469 Editor.java:2473
 msgid "Error while burning bootloader."
-msgstr "ブートローダを書き込もうとしましたが、エラーが発生しました。"
+msgstr "Hiba lépett fel a bootloader égetésekor."
 
 #: Editor.java:2500
 msgid "Printing..."
-msgstr "印刷しています..."
+msgstr "Nyomtatás..."
 
 #: Editor.java:2517
 msgid "Done printing."
-msgstr "印刷が完了しました。"
+msgstr "Nyomtatás kész."
 
 #: Editor.java:2520
 msgid "Error while printing."
-msgstr "印刷中にエラーが発生しました。"
+msgstr "Hiba a nyomtatás során."
 
 #: Editor.java:2524
 msgid "Printing canceled."
-msgstr "印刷を取りやめました。"
+msgstr "Nyomtatás megszakítva."
 
 #: Editor.java:2572
 #, java-format
 msgid "Bad error line: {0}"
-msgstr "エラーの行番号「{0}」は範囲外です。"
+msgstr "Hibás sor: {0}"
 
 #: Editor.java:2641
 msgid "Open URL"
-msgstr "URLを開く"
+msgstr "URL megnyitása"
 
 #: UpdateCheck.java:53
 msgid "http://www.arduino.cc/latest.txt"
-msgstr ""
+msgstr "http://www.arduino.cc/latest.txt"
 
 #: UpdateCheck.java:103
 msgid ""
 "A new version of Arduino is available,\n"
 "would you like to visit the Arduino download page?"
 msgstr ""
-"Arduino IDEの新しいバージョンが入手可能になりました。\n"
-"ダウンロードページを開きますか？"
+"Új kiadás jelent meg Arduino-ból,\n"
+"megmutassam a letöltési oldalt?"
 
 #: UpdateCheck.java:108 Preferences.java:76
 msgid "Yes"
-msgstr "はい"
+msgstr "Igen"
 
 #: UpdateCheck.java:108 Preferences.java:77
 msgid "No"
-msgstr "いいえ"
+msgstr "Nem"
 
 #: UpdateCheck.java:111
 msgid "Update"
-msgstr "更新"
+msgstr "Frissítés"
 
 #: UpdateCheck.java:118
 msgid "http://www.arduino.cc/en/Main/Software"
-msgstr ""
+msgstr "http://www.arduino.cc/en/Main/Software"
 
 #: FindReplace.java:80
 msgid "Find:"
-msgstr "検索テキスト："
+msgstr "Keresés:"
 
 #: FindReplace.java:81
 msgid "Replace with:"
-msgstr "置換テキスト："
+msgstr "Csere erre:"
 
 #: FindReplace.java:96
 msgid "Ignore Case"
-msgstr "大文字小文字を区別しない"
+msgstr "Kisbetû-nagybetû független"
 
 #: FindReplace.java:105
 msgid "Wrap Around"
-msgstr ""
+msgstr "Teljesen szövegben"
 
 #: FindReplace.java:120 FindReplace.java:131
 msgid "Replace All"
-msgstr "全て置換"
+msgstr "Mindent cserél"
 
 #: FindReplace.java:121 FindReplace.java:130 Sketch.java:1050
 msgid "Replace"
-msgstr "置換"
+msgstr "Cserél"
 
 #: FindReplace.java:122 FindReplace.java:129
 msgid "Replace & Find"
-msgstr "置換して次"
+msgstr "Keres és cserél"
 
 #: FindReplace.java:123 FindReplace.java:128
 msgid "Previous"
-msgstr ""
+msgstr "Elõzõ"
 
 #: FindReplace.java:124 FindReplace.java:127
 msgid "Find"
-msgstr "検索"
+msgstr "Keres"
 
 #: SerialMonitor.java:93
 msgid "Send"
-msgstr "送信"
+msgstr "Küld"
 
 #: SerialMonitor.java:110
 msgid "Autoscroll"
-msgstr "自動スクロール"
+msgstr "Autogörgetés"
 
 #: SerialMonitor.java:112
 msgid "No line ending"
-msgstr "改行なし"
+msgstr "Nincs sorlezárás"
 
 #: SerialMonitor.java:112
 msgid "Newline"
-msgstr "LFのみ"
+msgstr "Soremelés"
 
 #: SerialMonitor.java:112
 msgid "Carriage return"
-msgstr "CRのみ"
+msgstr "Kocsi-vissza"
 
 #: SerialMonitor.java:112
 msgid "Both NL & CR"
-msgstr "CRおよびLF"
+msgstr "Soremelés és Kocsi-vissza"
 
 #: SerialMonitor.java:130 SerialMonitor.java:133
 msgid " baud"
-msgstr " bps"
+msgstr " baud"
 
 #: Serial.java:147
 #, java-format
@@ -531,13 +530,13 @@ msgid ""
 "Serial port ''{0}'' already in use. Try quiting any programs that may be "
 "using it."
 msgstr ""
-"シリアルポート「{0}」は、ほかのアプリケーションが使用中です。"
-"シリアルポートを使っている可能性のあるアプリケーションを終了してみてください。"
+"''{0}'' soros port használatban van. A programból való"
+"kilépés után próbálja újra."
 
 #: Serial.java:154
 #, java-format
 msgid "Error opening serial port ''{0}''."
-msgstr "シリアルポート「{0}」が開けません。"
+msgstr "Hiba a \"{0}\" soros port megnyitása során."
 
 #: Serial.java:167
 #, java-format
@@ -545,9 +544,8 @@ msgid ""
 "Serial port ''{0}'' not found. Did you select the right one from the Tools > "
 "Serial Port menu?"
 msgstr ""
-"シリアルポート「{0}」が存在しません。"
-"「ツール」メニューの「シリアルポート」で、"
-"正しいシリアルポートを選んでありますか？"
+"A ''{0}'' soros port nem található. Megfelelõt kiválasztani az Eszközök > "
+"Soros port alatt."
 
 #: Serial.java:424
 #, java-format
@@ -555,49 +553,50 @@ msgid ""
 "readBytesUntil() byte buffer is too small for the {0} bytes up to and "
 "including char {1}"
 msgstr ""
-"readBytesUntil()で文字「{1}」が見つかるまで読み込もうとしましたが、バッファの長さ{0}バイトでは足りません。"
+"readBytesUntil() byte buffer túl kicsi {0} byte befogadására "
+"és ideértve a {1} karaktert"
 
 #: Serial.java:567
 #, java-format
 msgid "Error inside Serial.{0}()"
-msgstr "Serial.{0}()でエラー"
+msgstr "Hiba a Serial.{0}()-ban"
 
 #: tools/AutoFormat.java:91
 msgid "Auto Format"
-msgstr "自動整形"
+msgstr "Autoformázás"
 
 #: tools/AutoFormat.java:913 tools/format/src/AutoFormat.java:54
 msgid "No changes necessary for Auto Format."
-msgstr "整形の必要はありませんでした。"
+msgstr "Nem szükséges semmilyen változtatás autoformázáshoz."
 
 #: tools/AutoFormat.java:919
 msgid "Auto Format Canceled: Too many right parentheses."
-msgstr "「)」が多すぎるため、自動整形を取りやめました。"
+msgstr "Autoformázás megszakítva: túl sok a zárójel."
 
 #: tools/AutoFormat.java:922
 msgid "Auto Format Canceled: Too many left parentheses."
-msgstr "「(」が多すぎるため、自動整形を取りやめました。"
+msgstr "Autoformázás megszakítva: túl sok nyitó zárójel."
 
 #: tools/AutoFormat.java:928
 msgid "Auto Format Canceled: Too many right curly braces."
-msgstr "「}」が多すぎるため、自動整形を取りやめました。"
+msgstr "Autoformázás megszakítva: túl sok záró kapcsos-zárójel."
 
 #: tools/AutoFormat.java:931
 msgid "Auto Format Canceled: Too many left curly braces."
-msgstr "「{」が多すぎるため、自動整形を取りやめました。"
+msgstr "Autoformázás megszakítva: túl sok nyitó kapcsos-zárójel."
 
 #: tools/AutoFormat.java:941
 msgid "Auto Format finished."
-msgstr "自動整形が完了しました。"
+msgstr "Autoformázás befejezõdött."
 
 #: tools/FixEncoding.java:41 tools/FixEncoding.java:58
 #: tools/FixEncoding.java:79
 msgid "Fix Encoding & Reload"
-msgstr "エンコーディングを修正"
+msgstr "Betöltéskor Autoformázás"
 
 #: tools/FixEncoding.java:57
 msgid "Discard all changes and reload sketch?"
-msgstr "未保存の変更を破棄してスケッチを読み込み直しますか？"
+msgstr "Módosítások elvetése és Sketch újratöltése?"
 
 #: tools/FixEncoding.java:77
 msgid ""
@@ -605,42 +604,42 @@ msgid ""
 "Do not attempt to save this sketch as it may overwrite\n"
 "the old version. Use Open to re-open the sketch and try again.\n"
 msgstr ""
-"エンコーディングを修正しようとしましたが、エラーが発生しました。\n"
-"今ここで保存すると、修正前のスケッチをおかしな内容で上書きしてしまう\n"
-"可能性があります。スケッチを開き直して、もう一度エンコーディングの\n"
-"修正をしてみてください。"
+"Hiba lépett fel a file fixálása/javítása során.\n"
+"Nem javasolt a felülírásos mentés.\n"
+"A Sketch újra-megnyitása talán megoldja a problémát.\n"
 
 #: tools/Archiver.java:48
 msgid "Archive Sketch"
-msgstr "スケッチをアーカイブする。"
+msgstr "Sketch archiválás"
 
 #: tools/Archiver.java:59
 msgid "yyMMdd"
-msgstr "yyyyMMdd"
+msgstr "yyMMdd"
 
 #: tools/Archiver.java:74
 msgid "Couldn't archive sketch"
-msgstr "スケッチをアーカイブできませんでした。"
+msgstr "Sketch nem archiválható"
 
 #: tools/Archiver.java:75
 msgid ""
 "Archiving the sketch has been canceled because\n"
 "the sketch couldn't save properly."
 msgstr ""
-"スケッチを保存できなかったため、スケッチのアーカイブは取りやめました。"
+"A Sketch archiválása megszakadt, mivel\n"
+"a Sketch pontos mentése nem volt lehetséges."
 
 #: tools/Archiver.java:109
 msgid "Archive sketch as:"
-msgstr "スケッチをアーカイブする名前："
+msgstr "Sketch archiválva, mint:"
 
 #: tools/Archiver.java:139
 msgid "Archive sketch canceled."
-msgstr "スケッチのアーカイブを取りやめました"
+msgstr "Sketch archiválása megszakítva."
 
 #: SketchCode.java:83
 #, java-format
 msgid "Error while loading code {0}"
-msgstr "「{0}」からのコード読み込みの際にエラーが発生しました。"
+msgstr "Hiba a kód betöltése közben: {0}"
 
 #: SketchCode.java:258
 #, java-format
@@ -650,11 +649,10 @@ msgid ""
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
 msgstr ""
-"「{0}」には、認識できない文字が含まれています。もしも、古いバージョンのIDEでこのスケッチを作成していた場合には、「ツール」メニューの「エンコーディングの修正」を実行する事によって、ファイルのエンコーディングをUTF-8に変更してください。そうでない場合には、これらの認識できない文字を手作業で削除していただく必要があります。"
 
 #: Sketch.java:278 Sketch.java:307 Sketch.java:581 Sketch.java:970
 msgid "Sketch is Read-Only"
-msgstr "スケッチに書き込めません。"
+msgstr "Sketch csak olvasható"
 
 #: Sketch.java:279 Sketch.java:308 Sketch.java:582 Sketch.java:971
 msgid ""
@@ -662,36 +660,38 @@ msgid ""
 "need to re-save the sketch in another location,\n"
 "and try again."
 msgstr ""
-"読込専用に設定されたファイルがあります。\n"
-"スケッチを別の場所に保存してください。\n"
+"Néhány fie csak olvasható, így más helyre mentés után\n"
+"meg kell újra próbálni.\n"
+"\n"
 
 #: Sketch.java:286
 msgid "Name for new file:"
-msgstr "新規ファイルの名前："
+msgstr "Új file neve:"
 
 #: Sketch.java:298
 msgid "Sketch is Untitled"
-msgstr "スケッチには、まだ名前がありません。"
+msgstr "A Sketch most Névtelen"
 
 #: Sketch.java:299
 msgid ""
 "How about saving the sketch first \n"
 "before trying to rename it?"
 msgstr ""
-"スケッチの名前を変更する前に、スケッチを保存しますか？"
+"A Sketch csak mentés után\n"
+"nevezhetõ át!"
 
 #: Sketch.java:359 Sketch.java:366 Sketch.java:377
 msgid "Problem with rename"
-msgstr "名前を変更できませんでした。"
+msgstr "Hiba az átnevezés során"
 
 #: Sketch.java:360
 msgid "The name cannot start with a period."
-msgstr "この名前の先頭はピリオド「.」にしてはいけません。"
+msgstr "A név nem kezdõdhet periódus-jellel."
 
 #: Sketch.java:368
 #, java-format
 msgid "\".{0}\" is not a valid extension."
-msgstr "拡張子「.{0}」は、使えません。"
+msgstr  "\".{0}\" nem megfelelõ kiterjesztés."
 
 #: Sketch.java:378
 msgid ""
@@ -699,95 +699,98 @@ msgid ""
 "(It may be time for your to graduate to a\n"
 "\"real\" programming environment)"
 msgstr ""
+"A fõ-file nem tartalmazhat kiterjesztést.\n"
+"(Talán itt az idõ, hogy megismerje a\n"
+"\"valódi\" programozási környezetet)"
 
 #: Sketch.java:400 Sketch.java:414 Sketch.java:423 Sketch.java:863
 msgid "Nope"
-msgstr "ダメ。"
+msgstr "Dehogy, nem"
 
 #: Sketch.java:402
 #, java-format
 msgid "A file named \"{0}\" already exists in \"{1}\""
-msgstr "「{0}」というファイルは、すでにフォルダ「{1}」内に存在します。"
+msgstr "A \"{0}\" file már létezik a \"{1}\" mappában!"
 
 #: Sketch.java:415
 msgid "You can't have a .cpp file with the same name as the sketch."
-msgstr "スケッチと同じ名前の.cppファイルは使えません。"
+msgstr "Nem lehet azonos néven a .cpp állomány, mint a Sketch."
 
 #: Sketch.java:425
 msgid ""
 "You can't rename the sketch to \"{0}\"\n"
 "because the sketch already has a .cpp file with that name."
 msgstr ""
-"このスケッチには、すでにその名前の.cppファイルが存在するため、"
-"スケッチの名前を「{0}」に変更する事ができません。"
+"Nem nevezhetõ át a Sketch, mert létezik a \"{0}\"\n"
+"nevû .cpp állomány."
 
 #: Sketch.java:459
 msgid "Cannot Rename"
-msgstr "名前を変更できません。"
+msgstr "Átnevezési hiba"
 
 #: Sketch.java:461
 #, java-format
 msgid "Sorry, a sketch (or folder) named \"{0}\" already exists."
-msgstr "すでに「{0}」という名前のスケッチまたはフォルダが存在します。"
+msgstr "Hiba: Sketch (vagy mappa) már létezik \"{0}\" néven."
 
 #: Sketch.java:479
 msgid "Could not rename the sketch. (0)"
-msgstr "スケッチの名前を変更できませんでした。(0)"
+msgstr "A Sketch nem nevezhetõ át :(0)."
 
 #: Sketch.java:487 Sketch.java:532
 #, java-format
 msgid "Could not rename \"{0}\" to \"{1}\""
-msgstr "「{0}」の名前を「{1}」に変更できませんでした。"
+msgstr "Nem nevezhetõ át: \"{0}\" -> \"{1}\""
 
 #: Sketch.java:500
 msgid "Could not rename the sketch. (1)"
-msgstr "スケッチの名前を変更できませんでした。(1)"
+msgstr "Nem nevezhetõ át a Sketch: (1)"
 
 #: Sketch.java:507
 msgid "Could not rename the sketch. (2)"
-msgstr "スケッチの名前を変更できませんでした。(2)"
+msgstr "Nem nevezhetõ át a Sketch (2)."
 
 #: Sketch.java:544
 msgid "createNewFile() returned false"
-msgstr "createNewFile()がfalseを返しました。"
+msgstr "a createNewFile() hibát jelzett"
 
 #: Sketch.java:591
 msgid "Are you sure you want to delete this sketch?"
-msgstr "このスケッチを本当に削除しますか？"
+msgstr "Tényleg törölni kell a Sketch-et? Biztosan?"
 
 #: Sketch.java:592
 #, java-format
 msgid "Are you sure you want to delete \"{0}\"?"
-msgstr "「{0}」を本当に削除しますか？"
+msgstr "A(z) \"{0}\" állomány tényleg törlésre kerüljön?"
 
 #: Sketch.java:595 EditorHeader.java:314
 msgid "Delete"
-msgstr "削除"
+msgstr "Törlés"
 
 #: Sketch.java:620
 msgid "Couldn't do it"
-msgstr "それは実行できませんでした。"
+msgstr "Nem tudom megtenni"
 
 #: Sketch.java:621
 #, java-format
 msgid "Could not delete \"{0}\"."
-msgstr "「{0}」を削除できませんでした。"
+msgstr "Nem törölhetõ file: \"{0}\"."
 
 #: Sketch.java:651
 msgid "removeCode: internal error.. could not find code"
-msgstr "removeCode：内部エラー、対象のコードが見つかりません。"
+msgstr "removeCode: belsõ hiba... Kód nem található"
 
 #: Sketch.java:724
 msgid "Sketch is read-only"
-msgstr "スケッチに書き込めません。"
+msgstr "A Sketch csak olvasható"
 
 #: Sketch.java:725
 msgid ""
 "Some files are marked \"read-only\", so you'll\n"
 "need to re-save this sketch to another location."
 msgstr ""
-"書き込み先の場所には、書き込み禁止のファイルがあります。"
-"このため、このスケッチは別の場所に保存し直してください。"
+"Néhány file csak olvasható, így el kell menteni egy\n"
+"másik mappába."
 
 #: Sketch.java:743
 msgid ""
@@ -799,66 +802,62 @@ msgid ""
 "\n"
 "Save sketch and update its extension?"
 msgstr ""
-"Arduino 1.0では、スケッチのファイルの拡張子を.pdeから.inoに\n"
-"変更しました。新しいスケッチおよび「名前を付けて保存」で保存\n"
-"したスケッチには、新しい拡張子が使われます。また、既存のスケッチ\n"
-"を開いてから保存すると、新しい拡張子に自動的に変更されます。\n"
-"この機能は、「環境設定」で無効にする事ができます。\n"
+"Az Arduino 1.0-ban az alappértelmezett kiterjesztés megváltozott\n"
+".pde-rõl .ino-ra. Az új Sketck-ek (ideértve a Mentés másként... létrehozottakat is)\n"
+"már az új kiterjesztést használják. A mentés\n"
+"közbeni átnevezés tiltható a Beállítások menüpontban.\n"
 "\n"
-"拡張子を変更してスケッチを保存しますか？"
+"Sketch mentése és kiterjesztés frissítése?"
 
 #: Sketch.java:750
 msgid ".pde -> .ino"
-msgstr ""
+msgstr ".pde -> .ino"
 
 #: Sketch.java:829
 msgid "Save sketch folder as..."
-msgstr "スケッチのフォルダの保存先..."
+msgstr "Sketch mappa mentése, mint..."
 
 #: Sketch.java:865
 msgid ""
 "You can't save the sketch as \"{0}\"\n"
 "because the sketch already has a .cpp file with that name."
 msgstr ""
-"このスケッチには、すでにその名前の.cppファイルが存在するため、"
-"スケッチを「{0}」として保存することができません。"
+"Sketch nem menthetõ, mint \"{0}\"\n"
+"mert már van ilyen .cpp állomány."
 
 #: Sketch.java:886
 msgid "How very Borges of you"
-msgstr "それはムリ。"
+msgstr "Nono!"
 
 #: Sketch.java:887
 msgid ""
 "You cannot save the sketch into a folder\n"
 "inside itself. This would go on forever."
 msgstr ""
-"自らのスケッチのフォルダの中にスケッチを保存することなんてできません。"
-"無限ループになっちゃいます。"
+"Sketch nem menthetõ a mappába.\n"
+"Így egy végtelen történetté alakulna."
 
 #: Sketch.java:979
 msgid "Select an image or other data file to copy to your sketch"
-msgstr ""
-"画像など、スケッチの一部としてコピーして加えたいファイルを選択してください。"
+msgstr "Kép vagy egyéb adat választása a Sketch-be másoláshoz"
 
 #: Sketch.java:1047
 #, java-format
 msgid "Replace the existing version of {0}?"
-msgstr ""
-"すでに同じ「{0}」という名前のファイルがスケッチの中にありますが、"
-"置き換えますか？"
+msgstr "A meglevõ {0} cseréje?"
 
 #: Sketch.java:1069 Sketch.java:1092
 msgid "Error adding file"
-msgstr "ファイルを追加する際にエラーが発生しました。"
+msgstr "File hozzáadási hiba"
 
 #: Sketch.java:1070
 #, java-format
 msgid "Could not delete the existing ''{0}'' file."
-msgstr "既存の「{0}」というファイルを削除できませんでした。"
+msgstr "Nem törölhetõ a meglevõ ''{0}'' file."
 
 #: Sketch.java:1078
 msgid "You can't fool me"
-msgstr "ヘンなことしちゃだめ。"
+msgstr "Ne bolondozzon velem"
 
 #: Sketch.java:1079
 msgid ""
@@ -866,60 +865,59 @@ msgid ""
 "location from which where you're trying to add it.\n"
 "I ain't not doin nuthin'."
 msgstr ""
-"このファイルはすでにコピーされてスケッチの中にあります。"
-"まだ、何もしてませんよ！"
+"A file már másolásra került a mappába\n"
+"ahonnan hozzá próbálta adni.\n"
+"Még mindig nem végrehajtható."
 
 #: Sketch.java:1093
 #, java-format
 msgid "Could not add ''{0}'' to the sketch."
-msgstr "ファイル「{0}」をスケッチに加えることができませんでした。"
+msgstr "A ''{0}'' nem adható hozzá a Sketch-hez."
 
 #: Sketch.java:1393 Sketch.java:1424
 msgid "Build folder disappeared or could not be written"
-msgstr "ビルド用のフォルダが消えてしまったか、書き込みができません。"
+msgstr "A fordítási mappa elérhetetlen vagy írásvédett."
 
 #: Sketch.java:1408
 msgid "Could not find main class"
-msgstr "メインのクラスが見つかりません。"
+msgstr "A fõ programosztály (main class) nem található"
 
 #: Sketch.java:1433
 #, java-format
 msgid "Uncaught exception type: {0}"
-msgstr "想定外の例外「{0}」が発生しました。"
+msgstr "Hibás kivétel típus: {0}"
 
 #: Sketch.java:1465
 #, java-format
 msgid "Problem moving {0} to the build folder"
-msgstr "「{0}」をビルドフォルダに移動できませんでした。"
+msgstr "Hiba a {0} fordítási mappába mozgatása során"
 
 #: Sketch.java:1661
 msgid "Uploading..."
-msgstr "マイコンボードに書き込んでいます…"
+msgstr "Feltöltés..."
 
 #: Sketch.java:1684
 #, java-format
 msgid "Binary sketch size: {0} bytes (of a {1} byte maximum)"
-msgstr "コンパイル後のスケッチのサイズ：{0}バイト（最大容量{1}バイト）"
+msgstr "Sketch mérete: {0} byte (maximálisan lehetséges: {1} byte)"
 
 #: Sketch.java:1689
 msgid "Couldn't determine program size: {0}"
-msgstr "コンパイル後のサイズがわかりません：{0}"
+msgstr "Nem meghatározható a {0} program mérete"
 
 #: Sketch.java:1694
 msgid ""
 "Sketch too big; see http://www.arduino.cc/en/Guide/Troubleshooting#size for "
 "tips on reducing it."
-msgstr ""
-"スケッチが大きすぎます。"
-"http://www.arduino.cc/en/Guide/Troubleshooting#size には、小さくするコツが書いてあります。"
+msgstr "Túl nagy a Sketch; méret csökkentéséhez a http://www.arduino.cc/en/Guide/Troubleshooting#size oldalon találhatóak tippek."
 
 #: Sketch.java:1754
 msgid "Missing the */ from the end of a /* comment */"
-msgstr "「/* */」形式のコメントの「*/」がありません。"
+msgstr "Hiányzik a megjegyzés záró */ jel"
 
 #: Sketch.java:1796
 msgid "Sketch Disappeared"
-msgstr "スケッチが消滅してしまいました。"
+msgstr "A Sketch elveszett"
 
 #: Sketch.java:1797
 msgid ""
@@ -927,22 +925,21 @@ msgid ""
 " Will attempt to re-save in the same location,\n"
 "but anything besides the code will be lost."
 msgstr ""
-"スケッチブックの保存場所フォルダが無くなってしまいました。\n"
-"環境設定で指定している保存場所に保存し直します。\n"
-"このスケッチと一緒に保存していたファイルは失われるかもしれません。"
+"A Sketch mappája elveszett.\n"
+"A Sketch újramentésre kerül,\n"
+"a kód egyes részei megsemmisülhettek."
 
 #: Sketch.java:1810
 msgid "Could not re-save sketch"
-msgstr "スケッチを保存し直すことができませんでした。"
+msgstr "Nem lehetséges a Sketch újramentése"
 
 #: Sketch.java:1811
 msgid ""
 "Could not properly re-save the sketch. You may be in trouble at this point,\n"
 "and it might be time to copy and paste your code to another text editor."
 msgstr ""
-"スケッチを正常に保存することができませんでした。\n"
-"保存先に問題がある可能性があります。\n"
-"別のテキストエディタでスケッチを開き、コードをコピー＆ペーストして別のファイルに保存することをおすすめします。"
+"Tökéletesen nem lehetséges a Sketch újramentése. A megoldás jelen helyzetben, hogy\n"
+"a szerkesztõbõl a kódot kimásolja egy másik szerkesztõprogramba."
 
 #: Sketch.java:2060
 msgid ""
@@ -950,70 +947,69 @@ msgid ""
 "of ASCII characters and numbers (but cannot start with a number).\n"
 "They should also be less less than 64 characters long."
 msgstr ""
-"都合により、スケッチの名前を変更しました。"
-"スケッチの名前は、ASCII文字および数字（先頭を除く）であり、"
-"６４文字以下であることが必要です。"
+"A Sketch neve módosításra került. Az elnevezése csak\n"
+"ASCII betûket, számokat tartalmazhat (de nem kezdõdhet számmal).\n"
+"Valamint a név hossza nem haladhatja meg a 64 karaktert."
 
 #: debug/Uploader.java:52
 msgid "https://developer.berlios.de/bugs/?group_id=3590"
-msgstr ""
+msgstr "https://developer.berlios.de/bugs/?group_id=3590"
 
 #: debug/Uploader.java:54 debug/Compiler.java:43
 #, java-format
 msgid "Compiler error, please submit this code to {0}"
-msgstr "コンパイラのエラーです。問題の起きたスケッチを{0}に送ってください。"
+msgstr "Fordítási hiba, ezt a kódot kérem küldje el a {0} címre"
 
 #: debug/Uploader.java:199
 #, java-format
 msgid ""
 "the selected serial port {0} does not exist or your board is not connected"
-msgstr ""
-"シリアルポート「{0}」が選択されていますが、そのポートは存在しないか、マイコンボードが接続されていません。"
+msgstr "kiválasztott {0} port nem elérhetõ vagy az alappanel nincs csatlakoztatva"
 
 #: debug/Uploader.java:203
 msgid ""
 "Device is not responding, check the right serial port is selected or RESET "
 "the board right before exporting"
 msgstr ""
-"マイコンボードが応答しません。シリアルポートが正しく選択されている事を確認してください。また、書き込みの直前にマイコンボードのリセットボタンを押してみてください。"
+"Eszköz nem válaszol: talán hibás port lett kiválasztva, vagy a panel"
+"újraindítása szükséges exportálás elõtt"
 
 #: debug/Uploader.java:209
 msgid ""
 "Problem uploading to board.  See http://www.arduino.cc/en/Guide/"
 "Troubleshooting#upload for suggestions."
 msgstr ""
-"マイコンボードに書き込もうとしましたが、エラーが発生しました。\n"
-"このページを参考にしてください。\n"
-"http://www.arduino.cc/en/Guide/Troubleshooting#upload"
+"Hiba a feltöltés során. A hiba elhárítása a "
+"http://www.arduino.cc/en/Guide/ oldalon a Troubleshooting#upload alatt került leírásra."
 
 #: debug/Uploader.java:213
 msgid ""
 "Wrong microcontroller found.  Did you select the right board from the Tools "
 "> Board menu?"
 msgstr ""
-"マイコンボードと通信したところ、選択と異なるマイコンチップが応答しました。"
-"「ツール」メニューの「マイコンボード」の選択肢から、正しいマイコンボードを選んでください。"
+"Nem megfelelõ mikrokontroller lett kiválasztva. Pontosítani az Eszközök "
+"> Alappanelek menüben lehet."
 
 #: debug/Compiler.java:41
 msgid "http://code.google.com/p/arduino/issues/list"
-msgstr ""
+msgstr "http://code.google.com/p/arduino/issues/list"
 
 #: debug/Compiler.java:79
 msgid "No board selected; please choose a board from the Tools > Board menu."
-msgstr "マイコンボードが選ばれていません。「ツール」メニューの「マイコンボード」の選択肢から、マイコンボードを選んでください。"
+msgstr "Nincs alappanel kiválasztva. Választani az Eszközök > Alappanel menübõl lehet."
 
 #: debug/Compiler.java:422
 #, java-format
 msgid "{0} returned {1}"
-msgstr "{0}が{1}を返しました。"
+msgstr "{0} eredménye {1}"
 
 #: debug/Compiler.java:426
 msgid "Error compiling."
-msgstr "コンパイル時にエラーが発生しました。"
+msgstr "Hiba a fordítás során."
 
 #: debug/Compiler.java:465
 msgid "Please import the SPI library from the Sketch > Import Library menu."
-msgstr "「スケッチ」メニューの「ライブラリを使用」で、SPIライブラリを読み込んでください。"
+msgstr "Az SPI függvények használatához a Sketch > Függvény import alatt az SPI-re van szüksége."
 
 #: debug/Compiler.java:466
 msgid ""
@@ -1024,13 +1020,13 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"Arduino 0019以降、EthernetライブラリはSPIライブラリに依存しています。\n"
-"Ethernetライブラリまたはその他の、SPIライブラリに依存するライブラリを使用しているようですね。\n"
+"Az Arduino-0019 óta az Ethernet függvények kapcsolódnak az SPI függvényekhez.\n"
+"Ez így használható, vagy másik függvény alkalmazható az SPI kezelésére.\n"
 "\n"
 
 #: debug/Compiler.java:471
 msgid "The 'BYTE' keyword is no longer supported."
-msgstr "「BYTE」キーワードは、使用できなくなりました。"
+msgstr "A 'BYTE' kulcsszó nem támogatott."
 
 #: debug/Compiler.java:472
 msgid ""
@@ -1040,13 +1036,13 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"Arduino 1.0以降、「BYTE」キーワードは使用できなくなりました。\n"
-"Serial.write()を使用してください。\n"
+"Az Arduino 1.0 alatt a 'BYTE' kulcsszó nem támogatott.\n"
+"Helyette a Serial.write() használható.\n"
 "\n"
 
 #: debug/Compiler.java:477
 msgid "The Server class has been renamed EthernetServer."
-msgstr "「Server」クラスは「EthernetServer」に名称変更されました。"
+msgstr "A Server függvényosztály EthernetServer névre hallgat."
 
 #: debug/Compiler.java:478
 msgid ""
@@ -1056,12 +1052,12 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"Arduino 1.0以降、Ethernetライブラリの「Server」クラスは、「EthernetServer」に名称変更されました。\n"
+"Az Arduino 1.0-ban, az Ethernet függvény Server osztálya EthernetServer-re változott.\n"
 "\n"
 
 #: debug/Compiler.java:483
 msgid "The Client class has been renamed EthernetClient."
-msgstr "「Client」クラスは「EthernetClient」に名称変更されました。"
+msgstr "A Client osztály új neve: EthernetClient"
 
 #: debug/Compiler.java:484
 msgid ""
@@ -1071,12 +1067,12 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"Arduino 1.0以降、Ethernetライブラリの「Client」クラスは、「EthernetClient」に名称変更されました。\n"
+"Az Arduino 1.0-ban az Ethernet függvény Client osztály új neve: EthernetClient.\n"
 "\n"
 
 #: debug/Compiler.java:489
 msgid "The Udp class has been renamed EthernetUdp."
-msgstr "「Udp」クラスは「EthernetUdp」に名称変更されました。"
+msgstr "Az Udp osztály új neve: EthernetUdp."
 
 #: debug/Compiler.java:490
 msgid ""
@@ -1086,12 +1082,12 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"Arduino 1.0以降、Ethernetライブラリの「Udp」クラスは、「EthernetUdp」に名称変更されました。\n"
+"Az Arduino 1.0-ban az Ethernet függvény Udp osztály új neve: EthernetUdp.\n"
 "\n"
 
 #: debug/Compiler.java:495
 msgid "Wire.send() has been renamed Wire.write()."
-msgstr "「Wire.send()」は、「Wire.write()」に名称変更されました。"
+msgstr "A Wire.send() új neve: Wire.write()."
 
 #: debug/Compiler.java:496
 msgid ""
@@ -1101,12 +1097,12 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"Arduino 1.0以降、「Wire.send()」関数は、他のライブラリとの整合性を高めるため、「Wire.write()」に名称変更されました。"
+"Az Arduino 1.0-ban a Wire.send() funkció ún neve: Wire.write(), az egyéb függvényekkel analóg módon.\n"
 "\n"
 
 #: debug/Compiler.java:501
 msgid "Wire.receive() has been renamed Wire.read()."
-msgstr "「Wire.receive()」は、「Wire.read()」に名称変更されました。"
+msgstr "A Wire.receive() új neve: Wire.read()."
 
 #: debug/Compiler.java:502
 msgid ""
@@ -1116,59 +1112,57 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"Arduino 1.0以降、「Wire.receive()」関数は、他のライブラリとの整合性を高めるため、「Wire.read()」に名称変更されました。"
+"Az Arduino 1.0-ban a Wire.receive() funkció ún neve: Wire.read(), az egyéb függvényekkel analóg módon.\n"
 "\n"
 
 #: EditorConsole.java:152
 msgid "Console Error"
-msgstr "コンソールの異常"
+msgstr "Konzol hiba"
 
 #: EditorConsole.java:153
 msgid ""
 "A problem occurred while trying to open the\n"
 "files used to store the console output."
 msgstr ""
-"コンソール出力を保存するファイルを開こうとしたら、\n"
-"問題が発生しました。"
+"Hiba lépett fel, miközben a megnyitott file\n"
+"a konzolt használta volna."
 
 #: Base.java:184
 msgid "Non-fatal error while setting the Look & Feel."
-msgstr "GUIの挙動を設定する際にエラーが発生しましたが、重大ではありません。"
+msgstr "Nem-végzetes hiba a kinézet beállítása során (a program férfi géneket hordoz)."
 
 #: Base.java:185
 msgid "The error message follows, however Arduino should run fine."
-msgstr "エラーメッセージは以下の通りです。Arduino IDEの動作に問題はありません。"
+msgstr "A hibaüzenetet követõen az Arduino megfelelõen mûködik."
 
 #: Base.java:220
 msgid "Problem Setting the Platform"
-msgstr "プラットフォームを設定する際に問題が発生しました。"
+msgstr "A keretrendszer konfigurálása során hiba lépett fel"
 
 #: Base.java:221
 msgid ""
 "An unknown error occurred while trying to load\n"
 "platform-specific code for your machine."
-msgstr ""
-"プラットフォーム依存の機能を読み込む際に、\n"
-"何らかのエラーが発生しました。"
+msgstr "Rendszerfüggõ kód betöltése során\n "
+"hiba lépett fel (A hiba az Ön gépében van.)"
 
 #: Base.java:232
 msgid "Please install JDK 1.5 or later"
-msgstr "JDKのバージョン1.5以降をインストールしてください。"
+msgstr "A futtatáshoz telepített Java 1.5 vagy újabb szoftverkörnyezet szükséges"
 
 #: Base.java:233
 msgid ""
 "Arduino requires a full JDK (not just a JRE)\n"
 "to run. Please install JDK 1.5 or later.\n"
 "More information can be found in the reference."
-msgstr ""
-"Arduino IDEを実行するにはJDKが必要です。\n"
-"JREでは動作しません。\n"
-"JDKのバージョン1.5以降をインストールしてください。\n"
-"詳しくはリファレンスマニュアルをご覧ください。"
+msgstr "Az Arduino futtatásához teljes telepítésû JDK (Java Fejlesztõi Környezet)"
+"szükséges, nem elegendõ csak a JRE (Java futtatókörnyezet)"
+"A JDK 1.5 vagy újabb szofver telepítése szükséges"
+"Bõvebb információ a Referenciák közt található."
 
 #: Base.java:257
 msgid "Sketchbook folder disappeared"
-msgstr "スケッチブックの保存場所フォルダが無くなってしまいました。"
+msgstr "A Sketchbook mappa elérhetetlen"
 
 #: Base.java:258
 msgid ""
@@ -1177,31 +1171,32 @@ msgid ""
 "location, and create a new sketchbook folder if\n"
 "necessary. Arduino will then stop talking about\n"
 "himself in the third person."
-msgstr ""
+msgstr "A sketckbook mappa nem érhetõ el.\n"
+"Az alapértelmezett hely lesz kiválasztva, és\n"
+"itt létrehozva a sketch mappa."
 
 #: Base.java:532
 msgid "Time for a Break"
-msgstr "そろそろ休みましょう"
+msgstr "Itt az idõ szünetet tartani"
 
 #: Base.java:533
 msgid ""
 "You've reached the limit for auto naming of new sketches\n"
 "for the day. How about going for a walk instead?"
-msgstr ""
-"今日はもう、これ以上、新しいスケッチに自動的に名前を付ける\n"
-"事ができません。そろそろ、お休みにしませんか？"
+msgstr "Meghaladtad az egy napra jutó új sketch-ek létrehozási\n "
+"számát. Nem kéne sétálni egyet - pihenésül?"
 
 #: Base.java:537
 msgid "Sunshine"
-msgstr "終わりにしましょう"
+msgstr "Napfény"
 
 #: Base.java:538
 msgid "No really, time for some fresh air for you."
-msgstr "先程も指摘したように、今日は頑張りすぎです。"
+msgstr "Hoppá, itt az idõ levegõznöd egyet."
 
 #: Base.java:633
 msgid "Open an Arduino sketch..."
-msgstr "Arduinoのスケッチを開く..."
+msgstr "Arduino Sketch megnyitása..."
 
 #: Base.java:772
 msgid ""
@@ -1209,14 +1204,16 @@ msgid ""
 "{ font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Are you "
 "sure you want to Quit?</b><p>Closing the last open sketch will quit Arduino."
 msgstr ""
+"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p "
+"{ font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Biztosan ki akarsz lépni?</b><p>Az utolsó Sketch bezárásával az Arduino kilép."
 
 #: Base.java:970
 msgid "Contributed"
-msgstr "ユーザ提供"
+msgstr "Hozzáadás"
 
 #: Base.java:1095
 msgid "Sketch Does Not Exist"
-msgstr "スケッチが存在しません。"
+msgstr "Sketch nem megnyitható"
 
 #: Base.java:1096
 msgid ""
@@ -1224,8 +1221,9 @@ msgid ""
 "You may need to restart Arduino to update\n"
 "the sketchbook menu."
 msgstr ""
-"選択したスケッチが存在しません。\n"
-"スケッチブックメニューを更新するにはArduino IDEを再起動して下さい。"
+"A kiválasztott Sketch nem érhetõ el.\n"
+"A SketchBook menü frissítéséhez az Arduino\n"
+"újraindítása szükséges."
 
 #: Base.java:1125
 #, java-format
@@ -1236,15 +1234,15 @@ msgid ""
 "To get rid of this message, remove the sketch from\n"
 "{1}"
 msgstr ""
-"「{0}」という名前をスケッチに付けることはできません。\n"
-"スケッチ名には半角文字と数字のみが使用可能です。\n"
-"（ASCII文字のみ、スペースを除きます。数字で始まる名前は使えません。）\n"
-"このメッセージを表示しないようにするには、「{1}」からスケッチを削除\n"
-"して下さい。"
+"A sketch \"{0}\" Sketch nem használható.\n"
+"A Sketch neve csak angol abc betûit, számokat\n"
+"tartalmazhat, szóköz nélkül és az elsõ betûje nem lehet szám.\n"
+"A hibás Sketch-et távolítsd el a mappából:\n"
+"{1}"
 
 #: Base.java:1132
 msgid "Ignoring sketch with bad name"
-msgstr "使用できない名前のスケッチは無視します。"
+msgstr "Hibás Sketch név kihagyása"
 
 #: Base.java:1202
 #, java-format
@@ -1253,50 +1251,53 @@ msgid ""
 "Library names must contain only basic letters and numbers.\n"
 "(ASCII only and no spaces, and it cannot start with a number)"
 msgstr ""
-"「{0}」という名前のライブラリは使用できません。\n"
-"ライブラリ名には半角文字と数字のみが使用可能です。\n"
-"（ASCII文字のみ、スペースを除きます。数字で始まる名前は使えません。）"
+"A \"{0}\" könyvtár nem használható.\n"
+"A neve az angol abc betûit és számokat tartalmazhat\n"
+"(szóköz nem lehet benne és nem kezdõdhet számmal)."
 
 #: Base.java:1207
 msgid "Ignoring bad library name"
-msgstr "使用できないファイル名のライブラリは無視します。"
+msgstr "Hibás könyvtárnév kihagyása"
 
 #: Base.java:1432
 msgid "Problem getting data folder"
-msgstr "データフォルダを読み込めません。"
+msgstr "Probléma a könyvtár elérésekor"
 
 #: Base.java:1433
 msgid "Error getting the Arduino data folder."
-msgstr "Arduino IDEデータフォルダを読み込めません。"
+msgstr "Hiba az Arduino data könyvtár elérésekor."
 
 #: Base.java:1440
 msgid "Settings issues"
-msgstr "設定に関する問題"
+msgstr "Kimenetek beállítása"
 
 #: Base.java:1441
 msgid ""
 "Arduino cannot run because it could not\n"
 "create a folder to store your settings."
 msgstr ""
-"設定を保存するためのフォルダを作成できないため、動作を停止します。"
+"Arduino nem futtatható, mert nem hozható létre\n"
+"a felhasználói beállítások mappája."
 
 #: Base.java:1602
 msgid "You forgot your sketchbook"
-msgstr "スケッチブックをどこかにやっちゃいましたね。"
+msgstr "Felejtsd el a SketchBook-ot"
 
 #: Base.java:1603
 msgid ""
 "Arduino cannot run because it could not\n"
 "create a folder to store your sketchbook."
-msgstr "スケッチブックを保存するフォルダを作成できないため、動作を停止します。"
+msgstr ""
+"Arduino nem futtatható, mert nem hozható létre\n"
+"a felhasználói Sketch mentések mappája."
 
 #: Base.java:1623
 msgid "Select (or create new) folder for sketches..."
-msgstr "スケッチを保存するフォルダを選択するか作成してください。"
+msgstr "Válassz (vagy hozz létre) mappát a Sketch-eknek..."
 
 #: Base.java:1647
 msgid "Problem Opening URL"
-msgstr "指定のURLを開くことができませんでした。"
+msgstr "Hiba az URL megnyitásakor"
 
 #: Base.java:1648
 #, java-format
@@ -1304,11 +1305,12 @@ msgid ""
 "Could not open the URL\n"
 "{0}"
 msgstr ""
-"URL「{0}」を開くことができませんでした。"
+"Nem nyitható meg az URL:\n"
+"{0}"
 
 #: Base.java:1671
 msgid "Problem Opening Folder"
-msgstr "フォルダを開くことができませんでした。"
+msgstr "Hiba a mappa megnyitásakor"
 
 #: Base.java:1672
 #, java-format
@@ -1316,102 +1318,103 @@ msgid ""
 "Could not open the folder\n"
 "{0}"
 msgstr ""
-"フォルダ「{0}」を開くことができませんでした。"
+"Nem nyitható meg a mappa:\n"
+"{0}"
 
 #: Base.java:1785
 msgid "Guide_MacOSX.html"
-msgstr ""
+msgstr "Guide_MacOSX.html"
 
 #: Base.java:1787
 msgid "Guide_Windows.html"
-msgstr ""
+msgstr "Guide_Windows.html"
 
 #: Base.java:1789
 msgid "http://www.arduino.cc/playground/Learning/Linux"
-msgstr ""
+msgstr "http://www.arduino.cc/playground/Learning/Linux"
 
 #: Base.java:1794
 msgid "index.html"
-msgstr ""
+msgstr "index.html"
 
 #: Base.java:1799
 msgid "Guide_Environment.html"
-msgstr ""
+msgstr "Guide_Environment.html"
 
 #: Base.java:1804
 msgid "environment"
-msgstr ""
+msgstr "környezet"
 
 #: Base.java:1804
 msgid "platforms.html"
-msgstr ""
+msgstr "platforms.html"
 
 #: Base.java:1809
 msgid "Guide_Troubleshooting.html"
-msgstr ""
+msgstr "Guide_Troubleshooting.html"
 
 #: Base.java:1814
 msgid "FAQ.html"
-msgstr ""
+msgstr "FAQ.html"
 
 #: Base.java:1826
 msgid "Message"
-msgstr "メッセージ"
+msgstr "Üzenet"
 
 #: Base.java:1842
 msgid "Warning"
-msgstr "警告"
+msgstr "Figyelmeztetés"
 
 #: Base.java:2196
 #, java-format
 msgid "Could not remove old version of {0}"
-msgstr "「{0}」の古いバージョンを削除できませんでした。"
+msgstr "Nem törölhetõ a {0} régi verziója"
 
 #: Base.java:2206
 #, java-format
 msgid "Could not replace {0}"
-msgstr "「{0}」を置き換える事ができませんでした。"
+msgstr "Nem cserélhetõ: {0}"
 
 #: Base.java:2247 Base.java:2270
 #, java-format
 msgid "Could not delete {0}"
-msgstr "「{0}」を削除できませんでした。"
+msgstr "Nem törölhetõ: {0}"
 
 #: EditorHeader.java:292
 msgid "New Tab"
-msgstr "新規タブ"
+msgstr "Új fül"
 
 #: EditorHeader.java:300
 msgid "Rename"
-msgstr "名前を変更"
+msgstr "Átnevezés"
 
 #: EditorHeader.java:326
 msgid "Previous Tab"
-msgstr "前のタブ"
+msgstr "Elõzõ fül"
 
 #: EditorHeader.java:340
 msgid "Next Tab"
-msgstr "次のタブ"
+msgstr "Következõ fül"
 
 #: EditorToolbar.java:41 EditorToolbar.java:46
 msgid "Verify"
-msgstr "検証"
+msgstr "Ellenõrzés"
 
 #: EditorToolbar.java:41
 msgid "Open"
-msgstr "開く"
+msgstr "Megnyitás"
 
 #: EditorToolbar.java:46
 msgid "New Editor Window"
-msgstr "新規ウィンドウ"
+msgstr "Új szerkesztõablak"
 
 #: EditorToolbar.java:46
 msgid "Open in Another Window"
-msgstr "新規ウィンドウでファイルを開く"
+msgstr "Megnyitás új ablakban"
 
 #: Platform.java:167
 msgid "No launcher available"
-msgstr "外部プログラム起動ツールが有りません。"
+msgstr "Nem indítható"
 
 #: Platform.java:168
 msgid ""
@@ -1419,21 +1422,21 @@ msgid ""
 "To enable opening URLs or folders, add a \n"
 "\"launcher=/path/to/app\" line to preferences.txt"
 msgstr ""
-"外部プログラム起動ツールが有りません。"
-"URLやフォルダを自動的に開く機能を有効にするには、"
-"preferences.txtに\"launcher=/path/to/app\"の設定行を追加してください。"
+"Nem ismert platform, indítás nem lehetséges.\n"
+"Az URL vagy mappa megnyitásához a preferences.txt-ben a\n"
+"\"launcher=/path/to/app\" sor hozzáadása szükséges"
 
 #: Theme.java:52
 msgid ""
 "Could not read color theme settings.\n"
 "You'll need to reinstall Processing."
 msgstr ""
-"カラーテーマの設定を読み込めません。\n"
-"Arduino IDEを再インストールしてください。"
+"Nem olvasható a színséma,\n"
+"a Processing újratelepítésére van szükség."
 
 #: Preferences.java:80
 msgid "Browse"
-msgstr "参照"
+msgstr "Tallóz"
 
 #: Preferences.java:115
 msgid "Catalan"
@@ -1520,17 +1523,18 @@ msgid ""
 "Could not read default settings.\n"
 "You'll need to reinstall Arduino."
 msgstr ""
-"既定の設定を読み込むことができませんでした。\n"
-"Arduino IDEをもう一度インストールしてください。"
+"Az alapértelezett beállítások nem olvashatóak\n"
+"Az Arduino újratelepítése szükséges."
 
 #: Preferences.java:256
 #, java-format
 msgid "Could not read preferences from {0}"
-msgstr "「{0}」から設定を読み込めませんでした。"
+msgstr ""
+"A beállítások nem olvashatóak: {0}"
 
 #: Preferences.java:275
 msgid "Error reading preferences"
-msgstr "設定ファイルを読み込む際にエラーが発生しました。"
+msgstr "Alapbeállítások olvasása közben hiba lépett fel"
 
 #: Preferences.java:277
 #, java-format
@@ -1538,36 +1542,36 @@ msgid ""
 "Error reading the preferences file. Please delete (or move)\n"
 "{0} and restart Arduino."
 msgstr ""
-"初期設定ファイルを読み込む際にエラーが発生しました。"
-"「{0}」を削除または移動してから、Arduino IDEを再起動してください。"
+"Hiba a beállítások olvasása során. Kérem törölje (vagy mozgassa el) a\n"
+"{0} file-t és indítsa újra az Arduino-t!"
 
 #: Preferences.java:313
 msgid "Sketchbook location:"
-msgstr "スケッチブックの保存場所："
+msgstr "SketchBook helye:"
 
 #: Preferences.java:328
 msgid "Select new sketchbook location"
-msgstr "スケッチブックの保存場所を決めてください"
+msgstr "Válasszon új SketchBook mappát"
 
 #: Preferences.java:352
 msgid "Editor font size: "
-msgstr "エディタの文字の大きさ："
+msgstr "Szerkesztõ betûméret:"
 
 #: Preferences.java:356 Preferences.java:444
 msgid "  (requires restart of Arduino)"
-msgstr "（変更の反映には、Arduino IDEの再起動が必要。）"
+msgstr " (Arduino újraindítása szükséges)"
 
 #: Preferences.java:369
 msgid "Show verbose output during: "
-msgstr "より詳細な情報を表示する："
+msgstr "Log mutatása, mialatt:"
 
 #: Preferences.java:371
 msgid "compilation "
-msgstr "コンパイル "
+msgstr "fordítás "
 
 #: Preferences.java:373
 msgid "upload"
-msgstr "書き込み"
+msgstr "feltöltés"
 
 #: Preferences.java:382
 msgid "Verify code after upload"
@@ -1575,19 +1579,19 @@ msgstr ""
 
 #: Preferences.java:391
 msgid "Use external editor"
-msgstr "外部のエディタを使用する。"
+msgstr "Külsõ szerkesztõ használata"
 
 #: Preferences.java:401
 msgid "Check for updates on startup"
-msgstr "起動時に最新バージョンの有無をチェックする。"
+msgstr "Újabb verzió ellenõrzése indításkor"
 
 #: Preferences.java:410
 msgid "Update sketch files to new extension on save (.pde -> .ino)"
-msgstr "スケッチを保存する際に、拡張子を.pdeから.inoに変更する"
+msgstr "Sketch frissítése az új kiterjesztéssel (.pde -> .ino)"
 
 #: Preferences.java:421
 msgid "Automatically associate .ino files with Arduino"
-msgstr ".inoファイルをArduino IDEに関連づける。"
+msgstr "Automatikus kiterjesztés-hozzárendelés: .ino->Arduino"
 
 #: Preferences.java:431
 msgid "Preferred Language: "
@@ -1595,13 +1599,13 @@ msgstr ""
 
 #: Preferences.java:456
 msgid "More preferences can be edited directly in the file"
-msgstr "以下のファイルを直接編集すれば、より多くの設定を行うことができます。"
+msgstr "További számos beállítás elérhetõ a file közvetlen szerkesztésével"
 
 #: Preferences.java:485
 msgid "(edit only when Arduino is not running)"
-msgstr "（編集する際には、Arduino IDEを終了させておいてください。）"
+msgstr "(csak akkor szerkeszthetõ, ha az Arduino nem fut)"
 
 #: Preferences.java:632
 #, java-format
 msgid "ignoring invalid font size {0}"
-msgstr "フォントサイズの指定「{0}」が異常なので無視します。"
+msgstr "hibás fontméret kihagyása: {0}"

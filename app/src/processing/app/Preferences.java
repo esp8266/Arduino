@@ -79,6 +79,51 @@ public class Preferences {
   static final String PROMPT_OK      = _("OK");
   static final String PROMPT_BROWSE  = _("Browse");
 
+  String[] languages = {
+                        _("System Default"),
+                        "Català" + " (" + _("Catalan") + ")",
+                        "简体中文" + " (" + _("Chinese Simplified") + ")",
+                        "繁體中文" + " (" + _("Chinese Traditional") + ")",
+                        "Dansk" + " (" + _("Danish") + ")",
+                        "Nederlands" + " (" + _("Dutch") + ")",
+                        "English" + " (" + _("English") + ")",
+                        "Français" + " (" + _("French") + ")",
+                        "Pilipino" + " (" + _("Filipino") + ")",
+                        "Galego" + " (" + _("Galician") + ")",
+                        "Deutsch" + " (" + _("German") + ")",
+                        "ελληνικά" + " (" + _("Greek") + ")",
+                        "Magyar" + " (" + _("Hungarian") + ")",
+                        "Italiano" + " (" + _("Italian") + ")",
+                        "日本語" + " (" + _("Japanese") + ")",
+                        "Latviešu" + " (" + _("Latvian") + ")",
+                        "فارسی" + " (" + _("Persian") + ")",
+                        "Português" + " (" + _("Portuguese") + ")",
+                        "Română" + " (" + _("Romanian") + ")",
+                        "русский" + " (" + _("Russian") + ")",
+                        "Español" + " (" + _("Spanish") + ")"};
+  String[] languagesISO = {
+                        "",
+                        "ca",
+                        "zh_cn",
+                        "zh_tw",
+                        "da",
+                        "nl",
+                        "en",
+                        "fr",
+                        "tl",
+                        "gl",
+                        "de",
+                        "el",
+                        "hu",
+                        "it",
+                        "ja",
+                        "lv",
+                        "fa",
+                        "pt_br",
+                        "ro",
+                        "ru",
+                        "es"};
+  
   /**
    * Standardized width for buttons. Mac OS X 10.3 wants 70 as its default,
    * Windows XP needs 66, and my Ubuntu machine needs 80+, so 80 seems proper.
@@ -124,6 +169,7 @@ public class Preferences {
   JTextField fontSizeField;
   JCheckBox updateExtensionBox;
   JCheckBox autoAssociateBox;
+  JComboBox comboLanguage;
 
 
   // the calling editor, so updates can be applied
@@ -270,9 +316,25 @@ public class Preferences {
     top += vmax + GUI_BETWEEN;
 
 
+    // Preferred language: [        ] (requires restart of Arduino)
+    Container box = Box.createHorizontalBox();
+    label = new JLabel(_("Editor language: "));
+    box.add(label);
+    comboLanguage = new JComboBox(languages);
+    comboLanguage.setSelectedIndex((Arrays.asList(languagesISO)).indexOf(Preferences.get("editor.languages.current")));
+    box.add(comboLanguage);
+    label = new JLabel(_("  (requires restart of Arduino)"));
+    box.add(label);
+    pain.add(box);
+    d = box.getPreferredSize();
+    box.setForeground(Color.gray);
+    box.setBounds(left, top, d.width, d.height);
+    right = Math.max(right, left + d.width);
+    top += d.height + GUI_BETWEEN;
+    
     // Editor font size [    ]
 
-    Container box = Box.createHorizontalBox();
+    box = Box.createHorizontalBox();
     label = new JLabel(_("Editor font size: "));
     box.add(label);
     fontSizeField = new JTextField(4);
@@ -349,7 +411,6 @@ public class Preferences {
       right = Math.max(right, left + d.width);
       top += d.height + GUI_BETWEEN;
     }
-
 
     // More preferences are in the ...
 
@@ -538,6 +599,11 @@ public class Preferences {
     }
     
     setBoolean("editor.update_extension", updateExtensionBox.isSelected());
+
+    // adds the selected language to the preferences file
+    Object newItem = comboLanguage.getSelectedItem();
+    int pos = (Arrays.asList(languages)).indexOf(newItem.toString());  // position in the languages array
+    set("editor.languages.current",(Arrays.asList(languagesISO)).get(pos));        
 
     editor.applyPreferences();
   }
