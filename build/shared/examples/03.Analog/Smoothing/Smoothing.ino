@@ -10,9 +10,9 @@
     * Analog sensor (potentiometer will do) attached to analog input 0
 
   Created 22 April 2007
-  modified 30 Aug 2011
   By David A. Mellis  <dam@mellis.org>
-
+  modified 9 Apr 2012
+  by Tom Igoe
   http://www.arduino.cc/en/Tutorial/Smoothing
   
   This example code is in the public domain.
@@ -61,7 +61,8 @@ void loop() {
   // calculate the average:
   average = total / numReadings;         
   // send it to the computer as ASCII digits
-  Serial.println(average);               
+  Serial.println(average);   
+  delay(1);        // delay in between reads for stability            
 }
 
 

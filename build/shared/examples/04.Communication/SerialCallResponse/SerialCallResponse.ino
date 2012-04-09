@@ -15,7 +15,7 @@
  
  Created 26 Sept. 2005
  by Tom Igoe
- modified 30 Aug 2011
+ modified 9 Apr 2012
  by Tom Igoe and Scott Fitzgerald
 
  This example code is in the public domain.
@@ -33,6 +33,10 @@ void setup()
 {
   // start serial port at 9600 bps:
   Serial.begin(9600);
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
+
   pinMode(2, INPUT);   // digital sensor is on digital pin 2
   establishContact();  // send a byte to establish contact until receiver responds 
 }

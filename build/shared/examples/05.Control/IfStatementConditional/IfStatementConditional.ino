@@ -16,7 +16,7 @@
  connected to pin 13, so you don't need any extra components for this example.
  
  created 17 Jan 2009
- modified 30 Aug 2011
+ modified 9 Apr 2012
  by Tom Igoe
 
 This example code is in the public domain.
@@ -51,6 +51,6 @@ void loop() {
 
   // print the analog value:
   Serial.println(analogValue);
-
+  delay(1);        // delay in between reads for stability
 }
 

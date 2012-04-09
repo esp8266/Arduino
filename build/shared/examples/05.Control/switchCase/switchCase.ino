@@ -14,7 +14,7 @@
  * 10K resistor from analog in 0 to ground
  
  created 1 Jul 2009
- modified 30 Aug 2011
+ modified 9 Apr 2012
  by Tom Igoe 
  
  This example code is in the public domain.
@@ -22,7 +22,8 @@
  http://www.arduino.cc/en/Tutorial/SwitchCase
  */
 
-// these constants won't change:
+// these constants won't change. They are the
+// lowest and highest readings you get from your sensor:
 const int sensorMin = 0;      // sensor minimum, discovered through experiment
 const int sensorMax = 600;    // sensor maximum, discovered through experiment
 
@@ -53,7 +54,7 @@ void loop() {
     Serial.println("bright");
     break;
   } 
-
+  delay(1);        // delay in between reads for stability
 }
 
 

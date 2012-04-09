@@ -12,7 +12,7 @@
  * LED connected from digital pin 9 to ground
  
  created 29 Dec. 2008
- modified 30 Aug 2011
+ modified 9 Apr 2012
  by Tom Igoe
  
  This example code is in the public domain.
@@ -46,8 +46,8 @@ void loop() {
   Serial.print("\t output = ");      
   Serial.println(outputValue);   
 
-  // wait 10 milliseconds before the next loop
+  // wait 2 milliseconds before the next loop
   // for the analog-to-digital converter to settle
   // after the last reading:
-  delay(10);                     
+  delay(2);                     
 }

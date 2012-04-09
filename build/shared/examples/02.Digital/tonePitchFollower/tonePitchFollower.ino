@@ -9,7 +9,7 @@
  * 4.7K resistor on analog 0 to ground
  
  created 21 Jan 2010
- modified 30 Aug 2011
+ modified 9 Apr 2012
  by Tom Igoe 
 
 This example code is in the public domain.
@@ -36,7 +36,7 @@ void loop() {
 
   // play the pitch:
   tone(9, thisPitch, 10);
-
+  delay(1);        // delay in between reads for stability
 }
 
 

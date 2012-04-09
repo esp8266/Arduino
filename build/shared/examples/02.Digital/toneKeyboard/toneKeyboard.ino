@@ -9,7 +9,7 @@
  * 8-ohm speaker on digital pin 8
  
  created 21 Jan 2010
- modified 30 Aug 2011
+ modified 9 Apr 2012
  by Tom Igoe 
 
 This example code is in the public domain.
@@ -41,5 +41,4 @@ void loop() {
       tone(8, notes[thisSensor], 20);
     } 
   }
-  Serial.println();
 }

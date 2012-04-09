@@ -18,7 +18,7 @@
   
  created 2006
  by David A. Mellis
- modified 30 Aug 2011
+ modified 9 Apr 2012
  by Tom Igoe and Scott Fitzgerald
  
  This example code is in the public domain.
@@ -36,7 +36,7 @@ void loop() {
   Serial.println(analogRead(A0));
   // wait a bit for the analog-to-digital converter 
   // to stabilize after the last reading:
-  delay(10);
+  delay(2);
 }
 
 /* Processing code for this example
