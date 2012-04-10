@@ -107,6 +107,47 @@ uint32_t analogRead(uint32_t ulPin)
 	}
 #endif
 
+#if defined __SAM3X8E__
+	switch ( g_APinDescription[ulPin].ulAnalogChannel )
+	{
+		// Handling ADC 10 bits channels
+		case ADC0 :
+		case ADC1 :
+		case ADC2 :
+		case ADC3 :
+		case ADC4 :
+		case ADC5 :
+		case ADC6 :
+		case ADC7 :
+		case ADC8 :
+		case ADC9 :
+		case ADC10 :
+		case ADC11 :      // Enable the corresponding channel
+      adc_enable_channel( ADC, ulChannel );
+
+      // Start the ADC
+      adc_start( ADC );
+
+      // Wait for end of conversion
+      while ((adc_get_status(ADC) & (1<<ulChannel)) == 0);
+
+      // Read the value
+      ulValue=adc_get_value( ADC, ulChannel );
+
+      // Disable the corresponding channel
+      adc_disable_channel( ADC, ulChannel );
+
+      // Stop the ADC
+      //      adc_stop( ADC ) ; // never do adc_stop() else we have to reconfigure the ADC each time
+		break;
+
+		// Compiler could yell because we don't handle DAC pins
+		default :
+      ulValue=0;
+		break;
+	}
+#endif
+
 	return ulValue;
 }
 
