@@ -1,3 +1,21 @@
+#
+#  Copyright (c) 2012 Arduino.  All right reserved.
+#
+#  This library is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU Lesser General Public
+#  License as published by the Free Software Foundation; either
+#  version 2.1 of the License, or (at your option) any later version.
+#
+#  This library is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#  See the GNU Lesser General Public License for more details.
+#
+#  You should have received a copy of the GNU Lesser General Public
+#  License along with this library; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#
+
 # Makefile for compiling libArduino
 .SUFFIXES: .o .a .c .s
 
@@ -73,7 +91,7 @@ C_SRC=$(wildcard $(PROJECT_BASE_PATH)/*.c)
 C_OBJ_TEMP = $(patsubst %.c, %.o, $(notdir $(C_SRC)))
 
 # during development, remove some files
-C_OBJ_FILTER=dlib_lowlevel_sam3.o
+C_OBJ_FILTER=
 
 C_OBJ=$(filter-out $(C_OBJ_FILTER), $(C_OBJ_TEMP))
 
@@ -134,23 +152,23 @@ create_output:
 	-@mkdir $(OUTPUT_PATH) 1>NUL 2>&1
 
 $(addprefix $(OUTPUT_PATH)/,$(C_OBJ)): $(OUTPUT_PATH)/%.o: %.c
-#	@$(CC) -v -c $(CFLAGS) $< -o $@
-	@$(CC) -c $(CFLAGS) $< -o $@
+#	@"$(CC)" -v -c $(CFLAGS) $< -o $@
+	@"$(CC)" -c $(CFLAGS) $< -o $@
 
 $(addprefix $(OUTPUT_PATH)/,$(CPP_OBJ)): $(OUTPUT_PATH)/%.o: %.cpp
-#	@$(CC) -c $(CPPFLAGS) $< -o $@
-	@$(CC) -xc++ -c $(CPPFLAGS) $< -o $@
+#	@"$(CC)" -c $(CPPFLAGS) $< -o $@
+	@"$(CC)" -xc++ -c $(CPPFLAGS) $< -o $@
 
 $(addprefix $(OUTPUT_PATH)/,$(A_OBJ)): $(OUTPUT_PATH)/%.o: %.s
-	@$(AS) -c $(ASFLAGS) $< -o $@
+	@"$(AS)" -c $(ASFLAGS) $< -o $@
 
 $(OUTPUT_LIB): $(addprefix $(OUTPUT_PATH)/, $(C_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(CPP_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(A_OBJ))
-	@$(AR) -v -r "$(OUTPUT_BIN)/$@" $^
-	@$(NM) "$(OUTPUT_BIN)/$@" > "$(OUTPUT_BIN)/$@.txt"
+	@"$(AR)" -v -r "$(OUTPUT_BIN)/$@" $^
+	@"$(NM)" "$(OUTPUT_BIN)/$@" > "$(OUTPUT_BIN)/$@.txt"
 
 
 .PHONY: clean
 clean:
 	@echo --- Cleaning $(VARIANT) files [$(OUTPUT_PATH)$(SEP)*.o]
-	-@$(RM) $(OUTPUT_PATH) 1>NUL 2>&1
-	-@$(RM) $(OUTPUT_BIN)/$(OUTPUT_LIB) 1>NUL 2>&1
+	-@"$(RM)" $(OUTPUT_PATH) 1>NUL 2>&1
+	-@"$(RM)" $(OUTPUT_BIN)/$(OUTPUT_LIB) 1>NUL 2>&1
