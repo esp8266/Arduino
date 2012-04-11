@@ -16,9 +16,7 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-//#include "wiring_private.h"
 #include "Arduino.h"
-#include "variant.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,11 +57,12 @@ uint32_t analogRead(uint32_t ulPin)
       // Start the ADC
       adc_start( ADC );
 
-      // Wait for end of conversion
-      while ((adc_get_status(ADC) & (1<<ulChannel)) == 0);
+			// Wait for end of conversion
+			while ((adc_get_status(ADC) & ADC_SR_DRDY) != ADC_SR_DRDY)
+				;
 
-      // Read the value
-      ulValue=adc_get_value( ADC, ulChannel );
+			// Read the value
+			ulValue = adc_get_latest_value(ADC);
 
       // Disable the corresponding channel
       adc_disable_channel( ADC, ulChannel );
@@ -82,22 +81,23 @@ uint32_t analogRead(uint32_t ulPin)
 		case ADC14 :
 		case ADC15 :
       // Enable the corresponding channel
-      adc12_enable_channel( ADC12B, ulChannel );
+      adc12b_enable_channel( ADC12B, ulChannel );
 
       // Start the ADC12B
-      adc12_start( ADC12B );
+      adc12b_start( ADC12B );
 
-      // Wait for end of conversion
-      while ((adc12_get_status(ADC12B) & (1<<(ulChannel))) == 0);
+			// Wait for end of conversion
+			while ((adc12b_get_status(ADC12B) & ADC12B_SR_DRDY) != ADC12B_SR_DRDY)
+				;
 
-      // Read the value
-      ulValue=adc12_get_value( ADC12B, ulChannel );
+			// Read the value
+			ulValue = adc12b_get_latest_value(ADC12B);
 
       // Stop the ADC12B
       //      adc12_stop( ADC12B ) ; // never do adc12_stop() else we have to reconfigure the ADC12B each time
 
       // Disable the corresponding channel
-      adc12_disable_channel( ADC12B, ulChannel );
+      adc12b_disable_channel( ADC12B, ulChannel );
 		break;
 
 		// Compiler could yell because we don't handle DAC pins
@@ -122,29 +122,29 @@ uint32_t analogRead(uint32_t ulPin)
 		case ADC8 :
 		case ADC9 :
 		case ADC10 :
-		case ADC11 :      // Enable the corresponding channel
-      adc_enable_channel( ADC, ulChannel );
+		case ADC11 :      
+		
+			// Enable the corresponding channel
+			adc_enable_channel( ADC, ulChannel );
 
-      // Start the ADC
-      adc_start( ADC );
+			// Start the ADC
+			adc_start( ADC );
 
-      // Wait for end of conversion
-      while ((adc_get_status(ADC) & (1<<ulChannel)) == 0);
+			// Wait for end of conversion
+			while ((adc_get_status(ADC) & ADC_ISR_DRDY) != ADC_ISR_DRDY)
+				;
 
-      // Read the value
-      ulValue=adc_get_value( ADC, ulChannel );
+			// Read the value
+			ulValue = adc_get_latest_value(ADC);
 
-      // Disable the corresponding channel
-      adc_disable_channel( ADC, ulChannel );
-
-      // Stop the ADC
-      //      adc_stop( ADC ) ; // never do adc_stop() else we have to reconfigure the ADC each time
-		break;
+			// Disable the corresponding channel
+			adc_disable_channel(ADC, ulChannel);
+			break;
 
 		// Compiler could yell because we don't handle DAC pins
 		default :
-      ulValue=0;
-		break;
+			ulValue=0;
+			break;
 	}
 #endif
 
@@ -153,27 +153,24 @@ uint32_t analogRead(uint32_t ulPin)
 
 static void TC_SetRA(Tc *tc, uint32_t chan, uint32_t v )
 {
-    TcChannel* ch = tc->TC_CHANNEL+chan;
-    ch->TC_RA = v;
+    tc->TC_CHANNEL[chan].TC_RA = v;
 }
 
 static void TC_SetRB(Tc *tc, uint32_t chan, uint32_t v )
 {
-    TcChannel* ch = &tc->TC_CHANNEL+chan;
-    ch->TC_RB = v;
+    tc->TC_CHANNEL[chan].TC_RB = v;
 }
 
 static void TC_SetRC(Tc *tc, uint32_t chan, uint32_t v )
 {
-    TcChannel* ch = &tc->TC_CHANNEL+chan;
-    ch->TC_RC = v;
+    tc->TC_CHANNEL[chan].TC_RC = v;
 }
 
 static uint8_t PWMEnabled = 0;
 static uint8_t pinEnabled[PINS_COUNT];
 static uint8_t TCChanEnabled[] = {0, 0, 0};
 
-void analogOutputInit() {
+void analogOutputInit(void) {
 	uint8_t i;
 	for (i=0; i<PINS_COUNT; i++)
 		pinEnabled[i] = 0;
@@ -224,8 +221,8 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 
 		// Setup Timer for this pin
 		ETCChannel channel = g_APinDescription[ulPin].ulTCChannel;
-		static const channelToChNo[] = { 0, 0, 1, 1, 2, 2 };
-		static const channelToAB[] = { 1, 0, 1, 0, 1, 0 };
+		static const uint32_t channelToChNo[] = { 0, 0, 1, 1, 2, 2 };
+		static const uint32_t channelToAB[] = { 1, 0, 1, 0, 1, 0 };
 		uint32_t chNo = channelToChNo[channel];
 		uint32_t chA = channelToAB[channel];
 

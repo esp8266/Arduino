@@ -314,9 +314,6 @@ void USART2_Handler( void )
 extern "C" {
 #endif
 
-// Should be made in a better way...
-extern void analogOutputInit(void);
-
 /**
  *
  */
@@ -358,20 +355,17 @@ extern void init( void )
     g_APinDescription[PINS_USART2].ulPin,
     g_APinDescription[PINS_USART2].ulPinConfiguration);
 
-  /*
   // Initialize 10bit Analog Controller
   PMC_EnablePeripheral( ID_ADC ) ;
-  adc_init( ADC, SystemCoreClock, ADC_FREQ_MAX, ADC_STARTUP ) ;
-//  adc_configure_timing( ADC, 15 ) ;
-	adc_configure_timing(ADC, 0, ADC_SETTLING_TIME_3, 1);
-//  adc_configure_trigger( ADC, ADC_TRIG_SW ) ;	
-	adc_configure_trigger(ADC, ADC_TRIG_SW, 0);	// Disable hardware trigger.
-  adc_disable_interrupt( ADC, 0xFFFFFFFF ) ; // Disable all adc interrupt.
-  adc_disable_channel( ADC, ADC_ALL_CHANNEL ) ;
+  adc_init( ADC, SystemCoreClock, ADC_FREQ_MAX, ADC_STARTUP_FAST ) ;
+  adc_configure_timing(ADC, 0, ADC_SETTLING_TIME_3, 1);
+  adc_configure_trigger(ADC, ADC_TRIG_SW, 0); // Disable hardware trigger.
+  adc_disable_interrupt( ADC, 0xFFFFFFFF ) ; // Disable all ADC interrupts.
+  adc_disable_all_channel( ADC ) ;
 
   // Initialize analogOutput module
   analogOutputInit();
-  */
+
 }
 #ifdef __cplusplus
 }
