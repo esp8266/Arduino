@@ -1,261 +1,307 @@
-# Filipino translations for Arduino IDE package.
-# Copyright (C) 2012 THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# David A. Mellis <>, 2012.
-# Translation to Filipino by Marc Lester Tan <mharkus(at)gmail(dot)com>
+# Arabic translations for the Arduino IDE.
+# Copyright (C) 2012
+# This file is distributed under the same license as the Arduino IDE package.
+# Belal M.R. Affouri <belal@eshtre.com>, 2012.
+# Ameen Sarsour <>, 2012.
 
+
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: Bersyon 1.0\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2012-03-29 10:24-0400\n"
-"Last-Translator: Marc Lester Tan <mharkus(at)gmail(dot)com>\n"
-"Language-Team: Filipino <mharkus[at]gmail[dot]com>\n\n"
-"Language: tl\n"
+"Project-Id-Version: Arduino 1.01\n"
+"Report-Msgid-Bugs-To: belal@eshtre.com \n"
+"POT-Creation-Date: 2012-04-8 18:10 +0600\n"
+"PO-Revision-Date: 2012-04-09 12:00 +0600\n"
+"Last-Translator: Belal Affouri <>\n"
+"Language-Team: Arabic\n"
+"Language: ar\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=ASCII\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: Editor.java:366
 msgid "No files were added to the sketch."
-msgstr "Walang naidagdag na file sa sketch."
+msgstr "لا يوجد ملفات اضيفت للسكتش."
+
 
 #: Editor.java:369 Sketch.java:996
 msgid "One file added to the sketch."
-msgstr "Isang file ang naidagdag sa sketch."
+msgstr "ملف واحد اضيف للسكتش"
+
 
 #: Editor.java:373
 #, java-format
 msgid "{0} files added to the sketch."
-msgstr "{0} files and naidagdag sa sketch."
+msgstr "{0} ملفات  اضيفت للسكتش."
+
+
 
 #: Editor.java:484
 msgid "File"
-msgstr "File"
+msgstr "ملف"
+
 
 #: Editor.java:486 EditorToolbar.java:41
 msgid "New"
-msgstr "Bago"
+msgstr "جديد"
+
 
 #: Editor.java:494 Base.java:903
 msgid "Open..."
-msgstr "Buksan..."
+msgstr "...افتح"
+
 
 #: Editor.java:503
 msgid "Sketchbook"
-msgstr "Sketchbook"
+msgstr "سكتش بوك"
+
 
 #: Editor.java:509
 msgid "Examples"
-msgstr "Mga Halimbawa"
+msgstr "أمثلة"
+
 
 #: Editor.java:514 Editor.java:1977
 msgid "Close"
-msgstr "Isara"
+msgstr "إغلاق"
+
 
 #: Editor.java:522 Editor.java:2017 Editor.java:2421 EditorToolbar.java:41
 #: EditorToolbar.java:46
 msgid "Save"
-msgstr "I-save"
+msgstr "حفظ"
+
 
 #: Editor.java:530
 msgid "Save As..."
-msgstr "I-save bilang"
+msgstr "حفظ بإسم..."
+
 
 #: Editor.java:538 EditorToolbar.java:41
 msgid "Upload"
-msgstr "I-upload"
+msgstr "رفع"
+
 
 #: Editor.java:546 EditorToolbar.java:46
 msgid "Upload Using Programmer"
-msgstr "I-upload gamit ang Programmer"
+msgstr "رفع بواسطة المبرمجة"
+
 
 #: Editor.java:556
 msgid "Page Setup"
-msgstr "Kompigurasyon ng Pahina"
+msgstr "اعدادات الصفحة"
+
 
 #: Editor.java:564
 msgid "Print"
-msgstr "I-print"
+msgstr "اطبع"
 
-#: Editor.java:576 Preferences.java:263
+
+#: Editor.java:576 Preferences.java:291
 msgid "Preferences"
-msgstr "Mga Kagustuhan"
+msgstr "تفضيلات"
 
 #: Editor.java:586 Base.java:782
 msgid "Quit"
-msgstr "Quit"
+msgstr "خروج"
 
 #: Editor.java:600
 msgid "Sketch"
-msgstr "Sketch"
+msgstr "سكتش"
 
 #: Editor.java:602
 msgid "Verify / Compile"
-msgstr "Beripikahin / I-compile"
+msgstr "تدقيق \\ ترجم"
 
 #: Editor.java:629
 msgid "Import Library..."
-msgstr "Humango ng Library..."
+msgstr "...استيراد مكتبة"
 
 #: Editor.java:634
 msgid "Show Sketch Folder"
-msgstr "Ipakita ang Sketch Folder"
+msgstr "اعرض مجلد السكتش"
+
 
 #: Editor.java:643
 msgid "Add File..."
-msgstr "Magdagdag ng File..."
+msgstr "...اضف ملف"
+
 
 #: Editor.java:656
 msgid "Tools"
-msgstr "Mga Kasangkapan"
+msgstr "ادوات"
+
 
 #: Editor.java:662 EditorToolbar.java:41 EditorToolbar.java:46
 msgid "Serial Monitor"
-msgstr "Serial Monitor"
+msgstr "مراقب السيريال"
 
 #: Editor.java:682
 msgid "Board"
-msgstr "Board"
+msgstr "لوحة"
 
 #: Editor.java:690
 msgid "Serial Port"
-msgstr "Serial Port"
+msgstr "منفذ السيريال"
+
 
 #: Editor.java:695
 msgid "Programmer"
-msgstr "Programmer"
+msgstr "المبرمجة"
+
 
 #: Editor.java:699
 msgid "Burn Bootloader"
-msgstr "Ilagay ang Bootloader"
+msgstr "احرق البوتلودر"
+
 
 #: Editor.java:923
 msgid "serialMenu is null"
-msgstr "serialMenu ay null"
+msgstr "قائمة-السيريال فارغة"
+
 
 #: Editor.java:927 Editor.java:934
 msgid "name is null"
-msgstr "ang pangalan ay null"
+msgstr "الاسم فارغ"
+
 
 #: Editor.java:986
 msgid "error retrieving port list"
-msgstr "may mali sa pagkuha ng listahan ng port"
+msgstr "خطأ في استرجاع قائمة المنفذ"
+
 
 #: Editor.java:1002
 msgid "Help"
-msgstr "Tulong"
+msgstr "مساعدة"
+
 
 #: Editor.java:1041
 msgid "Getting Started"
-msgstr "Mga Patnubay sa Pagsisimula"
+msgstr "الشروع في العمل"
+
 
 #: Editor.java:1049
 msgid "Environment"
-msgstr "Environment"
+msgstr "البيئة"
 
 #: Editor.java:1057
 msgid "Troubleshooting"
-msgstr "Mga Sagot sa Problema"
+msgstr "استكشاف الاخطاء واصلاحها"
+
 
 #: Editor.java:1065
 msgid "Reference"
-msgstr "Sanggunian"
+msgstr "مرجع"
+
 
 #: Editor.java:1073 Editor.java:2728
 msgid "Find in Reference"
-msgstr "Hanapin sa Sanggunian"
+msgstr "ابحث في المرجع"
+
 
 #: Editor.java:1083
 msgid "Frequently Asked Questions"
-msgstr "Mga Karaniwang Tanong"
+msgstr "اسئلة متكررة"
+
 
 #: Editor.java:1091
 msgid "Visit Arduino.cc"
-msgstr "Bisitahin ang Arduino.cc"
+msgstr "Arduino.cc زر "
+
 
 #: Editor.java:1094
 msgid "http://arduino.cc/"
 msgstr "http://arduino.cc/"
 
+
 #: Editor.java:1102
 msgid "About Arduino"
-msgstr "Tungkol sa Arduino"
+msgstr "عن الاردوينو"
+
 
 #: Editor.java:1116
 msgid "Edit"
-msgstr "Baguhin"
+msgstr "عدل"
+
 
 #: Editor.java:1119 Editor.java:1341
 msgid "Undo"
-msgstr "Ipawalang Bisa"
+msgstr "تراجع"
+
 
 #: Editor.java:1124 Editor.java:1126 Editor.java:1376
 msgid "Redo"
-msgstr "Ulitin Muli"
+msgstr "اعادة"
+
 
 #: Editor.java:1135 Editor.java:2652
 msgid "Cut"
-msgstr "I-Cut"
+msgstr "قص"
+
 
 #: Editor.java:1143 Editor.java:2660
 msgid "Copy"
-msgstr "Kopyahin"
+msgstr "نسخ"
+
 
 #: Editor.java:1151 Editor.java:2668
 msgid "Copy for Forum"
-msgstr "Kopyahin para sa Forum"
+msgstr "انسخ للمنتدى"
+
 
 #: Editor.java:1163 Editor.java:2676
 msgid "Copy as HTML"
-msgstr "Kopyahin bilang HTML"
+msgstr "انسخ ك HTML"
+
 
 #: Editor.java:1175 Editor.java:2684
 msgid "Paste"
-msgstr "Ilagay"
+msgstr "لصق"
+
 
 #: Editor.java:1184 Editor.java:2692
 msgid "Select All"
-msgstr "Piliin Lahat"
+msgstr "اختر الكل"
+
 
 #: Editor.java:1194 Editor.java:2702
 msgid "Comment/Uncomment"
-msgstr "I-Comment/I-Uncomment"
+msgstr "ملاحظة \\ الغاء الملاحظة"
 
 #: Editor.java:1202 Editor.java:2710
 msgid "Increase Indent"
-msgstr "Dagdagan ang Indent"
+msgstr "زيادة البادئة"
+
 
 #: Editor.java:1210 Editor.java:2718
 msgid "Decrease Indent"
-msgstr "Bawasan ang Indent"
+msgstr "تقليل البادئة"
 
 #: Editor.java:1220
 msgid "Find..."
-msgstr "Hanapin..."
+msgstr "...ابحث"
 
 #: Editor.java:1235
 msgid "Find Next"
-msgstr "Hanapin ang Susunod"
+msgstr "ابحث التالي"
 
 #: Editor.java:1245
 msgid "Find Previous"
-msgstr "Hanapin ang Nauna"
+msgstr "ابحث السابق"
 
 #: Editor.java:1255
 msgid "Use Selection For Find"
-msgstr "Gamitin ang Napili sa Paghahanap"
+msgstr "استخدم المظلل للبحث"
 
 #: Editor.java:1816
 msgid "First select a word to find in the reference."
-msgstr "Pumili muna ng salita na hahanapin sa sanggunian."
+msgstr ".اختر الكلمة الاولى لإيجاد المرجع"
 
 #: Editor.java:1823
 #, java-format
 msgid "No reference available for \"{0}\""
-msgstr "Walang sanggunian para sa \"{0}\""
+msgstr "\"{0}\"لا يوجد مرجع متاح ل "
 
 #: Editor.java:1826
 #, java-format
@@ -264,16 +310,16 @@ msgstr "{0}.html"
 
 #: Editor.java:1843 Sketch.java:1647
 msgid "Compiling sketch..."
-msgstr "Kinokompile ang Sketch..."
+msgstr "...ترجمة السكتش"
 
 #: Editor.java:1864 Editor.java:1881
 msgid "Done compiling."
-msgstr "Tapos na ang pagkokompile."
+msgstr ".انتهاء الترجمة"
 
 #: Editor.java:1973
 #, java-format
 msgid "Save changes to \"{0}\"?  "
-msgstr "I-Save ang mga pagbabago sa \"{0}\"?  "
+msgstr "\"{0}\" حفظ التغييرات ل "
 
 #: Editor.java:2006
 msgid ""
@@ -281,33 +327,31 @@ msgid ""
 "{ font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Do you "
 "want to save changes to this sketch<BR> before closing?</b><p>If you don't "
 "save, your changes will be lost."
-msgstr "<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p { font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Nais mo bang I-save ang iyong mga nagawa<BR> bago isara?</b><p>Mawawala ang lahat ng ginawa kapag hindi mo I-sesave."
+msgstr "<html dir=\"RTL\"> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p { font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>هل تريد حفظ الغييرات لهذا السكتش<BR>قبل الاغلاق ؟</b><p>اذا لم ترد الحفظ , سوف تفقد جميع التغييرات."
 
 #: Editor.java:2017 Editor.java:2098 Editor.java:2418 Sketch.java:589
 #: Sketch.java:741 Sketch.java:1046 Preferences.java:78
 msgid "Cancel"
-msgstr "Kanselahin"
+msgstr "الغاء"
 
 #: Editor.java:2017
 msgid "Don't Save"
-msgstr "Huwag I-Save"
+msgstr "لا تحفظ"
 
 #: Editor.java:2089
 msgid "Bad file selected"
-msgstr "Mali ang File na napili"
+msgstr "اختيار ملف سيئ"
 
 #: Editor.java:2090
 msgid ""
 "Processing can only open its own sketches\n"
 "and other files ending in .ino or .pde"
-msgstr ""
-"Maari lamang buksan ng Processing ang sariling sketches\n"
-"at iba pang file na may extension na .ino o .pde"
+msgstr "المعالجة يمكن فقط ان تفتح السكتشات الخاصة بها\nوالملفات التي تعدل في .pde او .ino"
 
 #: Editor.java:2098 Editor.java:2418 Sketch.java:589 Sketch.java:741
 #: Sketch.java:1046 Preferences.java:79
 msgid "OK"
-msgstr "OK"
+msgstr "موافق"
 
 #: Editor.java:2100
 #, java-format
@@ -315,54 +359,51 @@ msgid ""
 "The file \"{0}\" needs to be inside\n"
 "a sketch folder named \"{1}\".\n"
 "Create this folder, move the file, and continue?"
-msgstr ""
-"Ang file \"{0}\" ay nararapat na nasa loob\n"
-"ng sketch folder na \"{1}\".\n"
-"I-create ang folder, ilipat ang file at magpatuloy?"
+msgstr "الملف \"{0}\" بحاجة لأن يكون بداخل \n\"{1}\" مجلد السكتش المسمى \n أنشاء المجلد ونقل الملفات والمتباعة؟"
 
 #: Editor.java:2109
 msgid "Moving"
-msgstr "Inililipat"
+msgstr "نقل"
 
 #: Editor.java:2120 Editor.java:2131 Editor.java:2141 Editor.java:2159
 #: Sketch.java:479 Sketch.java:485 Sketch.java:500 Sketch.java:507
-#: Sketch.java:530 Sketch.java:547 Base.java:1861 Preferences.java:224
+#: Sketch.java:530 Sketch.java:547 Base.java:1861 Preferences.java:252
 msgid "Error"
-msgstr "Mali"
+msgstr "خطأ"
 
 #: Editor.java:2122
 #, java-format
 msgid "A folder named \"{0}\" already exists. Can't open sketch."
-msgstr "Mayroon nang folder na \"{0}\". Hindi mabuksan ang sketch."
+msgstr "المجلد المسكى \"{0}\" موجود مسبقا. لا يمكن فتح السكتش"
 
 #: Editor.java:2132
 msgid "Could not create the sketch folder."
-msgstr "Hindi makalikha ng sketch folder."
+msgstr ".لا يمكن انشاء مجلد السكتش"
 
 #: Editor.java:2141
 msgid "Could not copy to a proper location."
-msgstr "Hindi makopya sa tamang lokasyon"
+msgstr "لا يمكن النسخ لمكان مناسب"
 
 #: Editor.java:2159
 msgid "Could not create the sketch."
-msgstr "Hindi makalikha ng sketch."
+msgstr ".لا يمكن انشاء السكتش"
 
 #: Editor.java:2166
 #, java-format
 msgid "{0} | Arduino {1}"
-msgstr "{0} | Arduino {1}"
+msgstr "{0} | أردوينو {1}"
 
 #: Editor.java:2223 Editor.java:2261
 msgid "Saving..."
-msgstr "Sine-save..."
+msgstr "...حفظ"
 
 #: Editor.java:2228 Editor.java:2264
 msgid "Done Saving."
-msgstr "Tapos na sa pag save."
+msgstr "...انتهاء الحفظ"
 
 #: Editor.java:2270
 msgid "Save Canceled."
-msgstr "Nakansela ang pag save."
+msgstr ".الغاء الحفظ"
 
 #: Editor.java:2296
 #, java-format
@@ -370,178 +411,211 @@ msgid ""
 "Serial port {0} not found.\n"
 "Retry the upload with another serial port?"
 msgstr ""
-"Hindi makita ang serial port na {0}.\n"
-"Subukan muli ang pagupload gamit ang ibang serial port?"
 
 #: Editor.java:2331
 msgid "Uploading to I/O Board..."
-msgstr "Ina-upload sa I/O Board..."
+msgstr ".منفذ السيريال {0} غير موجود \n"
+
 
 #: Editor.java:2348 Editor.java:2384
 msgid "Done uploading."
-msgstr "Tapos na ang pagupload."
+msgstr "التحميل انتهى"
+
 
 #: Editor.java:2356 Editor.java:2392
 msgid "Upload canceled."
-msgstr "Nakansela ang pag upload."
+msgstr "التحميل ألغي"
+
 
 #: Editor.java:2420
 msgid "Save changes before export?"
-msgstr "I-save ang mga nagawa bago i-export?"
+msgstr "حفظالتغييرات فبل التصدير ؟"
+
 
 #: Editor.java:2435
 msgid "Export canceled, changes must first be saved."
-msgstr "Nakansela ang pag export, kailangan muna i-save ang mga nagawa."
+msgstr ".التصدير الغي , يجب حفظ التغييرات"
+
 
 #: Editor.java:2457
 msgid "Burning bootloader to I/O Board (this may take a minute)..."
-msgstr "Inilalagay ang bootloader sa I/O Board (Maaring abutin ng isang minuto)..."
+msgstr "حرق البوتلودر للوحة ال I/O (يمكن ان يستغرق دقيقة ) ..."
+
 
 #: Editor.java:2463
 msgid "Done burning bootloader."
-msgstr "Tapos na ang paglagay ng bootloader."
+msgstr "النتهاء حرق البوتلودر"
+
 
 #: Editor.java:2465 Editor.java:2469 Editor.java:2473
 msgid "Error while burning bootloader."
-msgstr "May mali habang naglalagay ng bootloader."
+msgstr "خطأ خلال عملية حرق البوتلودر"
+
 
 #: Editor.java:2500
 msgid "Printing..."
-msgstr "Nagpi-print..."
+msgstr "...طباعة "
+
 
 #: Editor.java:2517
 msgid "Done printing."
-msgstr "Tapos na ang pag print."
+msgstr "...انتهاء الطباعة"
+
 
 #: Editor.java:2520
 msgid "Error while printing."
-msgstr "May mali habang nagpi-print."
+msgstr ".خطأ خلال الطباعة "
+
 
 #: Editor.java:2524
 msgid "Printing canceled."
-msgstr "Nakansela ang pagpi-print."
+msgstr "الطباعة الغيت"
+
 
 #: Editor.java:2572
 #, java-format
 msgid "Bad error line: {0}"
-msgstr "May mali sa linya: {0}"
+msgstr "خطأ سيئ السطر : {0}"
+
 
 #: Editor.java:2641
 msgid "Open URL"
-msgstr "Buksan ang URL"
+msgstr "افتح الرابط"
+
 
 #: UpdateCheck.java:53
 msgid "http://www.arduino.cc/latest.txt"
 msgstr "http://www.arduino.cc/latest.txt"
 
+
 #: UpdateCheck.java:103
 msgid ""
 "A new version of Arduino is available,\n"
 "would you like to visit the Arduino download page?"
-msgstr ""
-"May bagong bersyon ng Arduino,\n"
-"nais mo bang magpunta sa Arduino download page?"
+msgstr "اصدار جديد من الارديونو متاح حاليا,\n هل ترغب بزيارة صفحة الارديونو؟"
 
 #: UpdateCheck.java:108 Preferences.java:76
 msgid "Yes"
-msgstr "Oo"
+msgstr "نعم"
+
 
 #: UpdateCheck.java:108 Preferences.java:77
 msgid "No"
-msgstr "Hindi"
+msgstr "لا"
+
 
 #: UpdateCheck.java:111
 msgid "Update"
-msgstr "I-update"
+msgstr "تحديث"
+
 
 #: UpdateCheck.java:118
 msgid "http://www.arduino.cc/en/Main/Software"
 msgstr "http://www.arduino.cc/en/Main/Software"
 
+
 #: FindReplace.java:80
 msgid "Find:"
-msgstr "Hanapin:"
+msgstr "بحث :"
+
 
 #: FindReplace.java:81
 msgid "Replace with:"
-msgstr "Palitan ng:"
+msgstr "استبدال ب:"
+
 
 #: FindReplace.java:96
 msgid "Ignore Case"
-msgstr "Ignore Case"
+msgstr "تجاهل الحالة"
+
 
 #: FindReplace.java:105
 msgid "Wrap Around"
-msgstr "Wrap Around"
+msgstr "التف حول"
+
 
 #: FindReplace.java:120 FindReplace.java:131
 msgid "Replace All"
-msgstr "Palitan Lahat"
+msgstr "استبدال الكل"
+
 
 #: FindReplace.java:121 FindReplace.java:130 Sketch.java:1050
 msgid "Replace"
-msgstr "Palitan"
+msgstr "استبدال"
+
 
 #: FindReplace.java:122 FindReplace.java:129
 msgid "Replace & Find"
-msgstr "Palitan at Hanapin"
+msgstr "اسبدال و بحث"
+
 
 #: FindReplace.java:123 FindReplace.java:128
 msgid "Previous"
-msgstr "Nakaraan"
+msgstr "السابق"
+
 
 #: FindReplace.java:124 FindReplace.java:127
 msgid "Find"
-msgstr "Hanapin"
+msgstr "بحث"
+
 
 #: SerialMonitor.java:93
 msgid "Send"
-msgstr "Ipadala"
+msgstr "ارسل"
+
 
 #: SerialMonitor.java:110
 msgid "Autoscroll"
 msgstr "Autoscroll"
 
+
 #: SerialMonitor.java:112
 msgid "No line ending"
-msgstr "Walang pagtatapos sa linya"
+msgstr "نهاية السطر غير موجودة"
+
 
 #: SerialMonitor.java:112
 msgid "Newline"
-msgstr "Bagong linya"
+msgstr "سطر جديد"
+
 
 #: SerialMonitor.java:112
 msgid "Carriage return"
-msgstr "Carriage return"
+msgstr "اعادة الحمل"
+
 
 #: SerialMonitor.java:112
 msgid "Both NL & CR"
-msgstr "Parehong NL at CR"
+msgstr "كلاهما NL & CR"
+
 
 #: SerialMonitor.java:130 SerialMonitor.java:133
 msgid " baud"
-msgstr "baud"
+msgstr " baud"
+
 
 #: Serial.java:147
 #, java-format
 msgid ""
 "Serial port ''{0}'' already in use. Try quiting any programs that may be "
 "using it."
-msgstr "Ang serial port ''{0}'' ay kasalukuyang ginagamit. Subukang ihinto ang ibang programa na maaring gumagamit nito."
+msgstr "المنفذ التسلسلي ''{0}'' مستخدم حاليا. حاول اغلاق اي برامج تستخدم ذلك المنفذ."
+
+
+
 
 #: Serial.java:154
 #, java-format
 msgid "Error opening serial port ''{0}''."
-msgstr "May mali sa pagbukas ng serial port ''{0}''."
+msgstr "خطأ في فتح المنفذ التسلسل ''{0}''."
+
 
 #: Serial.java:167
 #, java-format
 msgid ""
 "Serial port ''{0}'' not found. Did you select the right one from the Tools > "
 "Serial Port menu?"
-msgstr ""
-"Hindi makita ang serial port na ''{0}''. Tama ba ang iyong napili sa Mga Kasangkapan > "
-"Serial Port menu?"
+msgstr "المنفذ التسلسل ''{0}'' غير موجود. هل قمت بإختيار المنفذ الصحيح من قائمة الادوات  > المنفذ التل"
 
 #: Serial.java:424
 #, java-format
@@ -549,93 +623,106 @@ msgid ""
 "readBytesUntil() byte buffer is too small for the {0} bytes up to and "
 "including char {1}"
 msgstr ""
-"readBytesUntil() byte buffer ay masyadong maliit para sa {0} bytes hanggang sa "
-"char {1}"
+"readBytesUntil() byte buffer is too small for the {0} bytes up to and "
+"including char {1}"
+
 
 #: Serial.java:567
 #, java-format
 msgid "Error inside Serial.{0}()"
-msgstr "May mali sa loob ng Serial.{0}()"
+msgstr "Serial.{0}() خطأ داخل "
+
 
 #: tools/AutoFormat.java:91
 msgid "Auto Format"
-msgstr "Auto Format"
+msgstr "تنسيق تلقائي"
+
 
 #: tools/AutoFormat.java:913 tools/format/src/AutoFormat.java:54
 msgid "No changes necessary for Auto Format."
-msgstr ""
+msgstr "لا يوجد تغييرات ضرورية للتنسيق التلقائي."
+
 
 #: tools/AutoFormat.java:919
 msgid "Auto Format Canceled: Too many right parentheses."
-msgstr "Nakansela ang Auto Format: Napakaraming kanang panaklong."
+msgstr "التنسيق التلقائي الغي: كثير من الاقواس اليمين"
+
 
 #: tools/AutoFormat.java:922
 msgid "Auto Format Canceled: Too many left parentheses."
-msgstr "Nakansela ang Auto Format: Napakaraming kaliwang panaklong."
+msgstr "التنسيق التلقائي الغي: كثير من الاقواس لجهة الشمال"
+
 
 #: tools/AutoFormat.java:928
 msgid "Auto Format Canceled: Too many right curly braces."
-msgstr "Nakansela ang Auto Format: Napakaraming kanang panaklaw."
+msgstr "التنسيق التلقائي الغي: كثير من الاقواس الملتوية لجهة اليمين"
+
 
 #: tools/AutoFormat.java:931
 msgid "Auto Format Canceled: Too many left curly braces."
-msgstr ""
+msgstr "التنسيق التلقائي الغي: كثير من الاقواس الملتوية لجهة الشمال"
+
 
 #: tools/AutoFormat.java:941
 msgid "Auto Format finished."
-msgstr "Tapos na ang pag Auto Format"
+msgstr "التنسيق التلقائي انتهى"
+
 
 #: tools/FixEncoding.java:41 tools/FixEncoding.java:58
 #: tools/FixEncoding.java:79
 msgid "Fix Encoding & Reload"
-msgstr "Itama ang Encoding at I-reload"
+msgstr "الترميز و أعد التحميل"
+
 
 #: tools/FixEncoding.java:57
 msgid "Discard all changes and reload sketch?"
-msgstr "Alisin ang lahat ng nagawa at i-reload ang sketch?"
+msgstr "تجاهل كل التغييرات واعد تحميل السكتش"
+
 
 #: tools/FixEncoding.java:77
 msgid ""
 "An error occurred while trying to fix the file encoding.\n"
 "Do not attempt to save this sketch as it may overwrite\n"
 "the old version. Use Open to re-open the sketch and try again.\n"
-msgstr ""
-"May pagkakamali habang sinusubukang ayusin ang file encoding.\n"
-"Huwag subukang i-save ang sketch na ito dahil maaaring mapatungan\n"
-"ang lumang bersion. Gamitin ang Buksan para buksan muli ang sketch.\n"
+msgstr "خطأ اثناء محاولة تصحيح ترميز الملف.\nلا تقم بحفظ هذا الملف حيث يمكن ان يكتب فوقه الاصدار القديم\nاستخدم فتح للإعادة. فتح السكتس وحاول مرة اخرى"
 
 #: tools/Archiver.java:48
 msgid "Archive Sketch"
-msgstr "Archive Sketch"
+msgstr "ارشفة السكتش"
+
 
 #: tools/Archiver.java:59
 msgid "yyMMdd"
 msgstr "yyMMdd"
 
+
 #: tools/Archiver.java:74
 msgid "Couldn't archive sketch"
-msgstr "Hindi mai-archive and sketch"
+msgstr "لا يمكن ارشفة السكتش"
+
 
 #: tools/Archiver.java:75
 msgid ""
 "Archiving the sketch has been canceled because\n"
 "the sketch couldn't save properly."
-msgstr ""
-"Nakansela ang pag archive ng sketch sapagkat\n"
-"hindi ito mai-save ng tama."
+msgstr "ارشفة السكتش الغيت لأنه\nالسكتش لا يمكن حفظه بشكل مناسب"
+
 
 #: tools/Archiver.java:109
 msgid "Archive sketch as:"
-msgstr "I-archive ang sketch bilang:"
+msgstr "ارشفة السكتش ك:"
+
 
 #: tools/Archiver.java:139
 msgid "Archive sketch canceled."
-msgstr "Nakansela ang pag-archive ng sketch"
+msgstr "ارشفة السكتش الغيت "
+
 
 #: SketchCode.java:83
 #, java-format
 msgid "Error while loading code {0}"
-msgstr "May mali habang niloload ang code {0}"
+msgstr "خطأ اثناء تحميل الكود {0}"
+
 
 #: SketchCode.java:258
 #, java-format
@@ -644,153 +731,162 @@ msgid ""
 "older version of Processing,you may need to use Tools -> Fix Encoding & "
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
-msgstr ""
-"Ang \"{0}\" ay naglalaman ng hindi maintidihang titik. Kung ang code na ito ay ginawa mula sa "
-"lumang bersyon ng Processing, Kinakailangan mong gamitin ang Mga Kasangkapan -> Itama ang Encoding at "
-"I-reload para magamit ang UTF-8 encoding sa sketch. Kung hindi naman ay kinakailangan mong "
-"alisin ang mga hindi maintidihang titik para maalis ang babalang ito."
+msgstr "\"{0}\" يحتوي على احرف غير معرفة . اذا انشئ الكود مع اصدار اقدم من المعالجة , يلزمك ان تستخدم ادوات -> اصلاح الترميز واعد\nالتحميل لتحديث السكتش ليستخدم ترميز UTF-8 . غير ذلك يمكنك ان تحذف الاحرف الغير معرفة للتخلص من هذا التحذير."
+
 
 #: Sketch.java:278 Sketch.java:307 Sketch.java:581 Sketch.java:970
 msgid "Sketch is Read-Only"
-msgstr "Ang sketch ay Read-Only"
+msgstr "السكتش للقرائة فقط"
+
 
 #: Sketch.java:279 Sketch.java:308 Sketch.java:582 Sketch.java:971
 msgid ""
 "Some files are marked \"read-only\", so you'll\n"
 "need to re-save the sketch in another location,\n"
 "and try again."
-msgstr ""
-"Ang ilang files ay \"read-only\", kaya kinakailangan\n"
-"mong i-save ang sketch sa ibang lokasyon,\n"
-"at subukan muli."
+msgstr "\"read-only\"بعض الملفات معلمة ب\nتحتاج لإعادة حفظ في مكان آخر,\nو حاول مرة اخرى"
+
 
 #: Sketch.java:286
 msgid "Name for new file:"
-msgstr "Pangalan para sa bagong file:"
+msgstr "اسم لملف جديد :"
+
 
 #: Sketch.java:298
 msgid "Sketch is Untitled"
-msgstr "Walang pangalan ang Sketch"
+msgstr "السكتش تم تحديثه"
+
 
 #: Sketch.java:299
 msgid ""
 "How about saving the sketch first \n"
 "before trying to rename it?"
-msgstr ""
-"I-save muna ang sketch bago \n"
-"palitan ng pangalan?"
+msgstr "هل ترغب بحفظ السكتش اولا\nقبل اعادة تسميه"
 
 #: Sketch.java:359 Sketch.java:366 Sketch.java:377
 msgid "Problem with rename"
-msgstr "May mali sa pag palit ng pangalan"
+msgstr "مشكلة في اعادة التسمية"
+
 
 #: Sketch.java:360
 msgid "The name cannot start with a period."
-msgstr "Hindi maaaring magsimula ang pangalan sa tuldok."
+msgstr "الاسم لا يمكن ان يبدأ بمسافة."
+
 
 #: Sketch.java:368
 #, java-format
 msgid "\".{0}\" is not a valid extension."
-msgstr "\".{0}\" ay hindi tamang extension."
+msgstr "\".{0}\" امتداد غير صالح"
+
 
 #: Sketch.java:378
 msgid ""
 "The main file can't use an extension.\n"
 "(It may be time for your to graduate to a\n"
 "\"real\" programming environment)"
-msgstr ""
-"Hindi maaaring gumamit ng extension ang main file.\n"
-"(Sa tingin ko ay oras na para ikaw ay gumamit\n"
-"ng totoong programming environment)"
+msgstr "الملف الرئيسي لا يستطيع استخدام الامتداد.\n(قد يكون الوقت قد حان  لتخريجه ل\nبيئة برمجية حقيقية)"
 
 #: Sketch.java:400 Sketch.java:414 Sketch.java:423 Sketch.java:863
 msgid "Nope"
-msgstr "Hindi"
+msgstr "لا يا صديقي"
+
 
 #: Sketch.java:402
 #, java-format
 msgid "A file named \"{0}\" already exists in \"{1}\""
-msgstr "Mayroon ng file na nagngangalang \"{0}\""
+msgstr "الملف المسمى \"{0}\" موجود مسبقا في \"{1}\""
+
 
 #: Sketch.java:415
 msgid "You can't have a .cpp file with the same name as the sketch."
-msgstr "Hindi maaaring magkaroon ng .cpp file na kaparehong pangalan ng sketch."
+msgstr "لا يمكن ان يكون لديك ملف .cpp مع نفس اسم السكتش "
+
 
 #: Sketch.java:425
 msgid ""
 "You can't rename the sketch to \"{0}\"\n"
 "because the sketch already has a .cpp file with that name."
-msgstr ""
-"Hindi maaaring palitan ang pangalan sa \"{0}\"\n"
-"sapagkat mayroon ng .cpp file na may ganyang pangalan sa sketch."
+msgstr "\"{0}\"لا يمكن اعادة تسمية السكتش ل\nلأن السكتش مسبقا لديه ملف .cpp مع نفس الاسم"
 
 #: Sketch.java:459
 msgid "Cannot Rename"
-msgstr "Hindi maaaring palitan ang pangalan"
+msgstr "لا يمكن اعاعدة التسمية"
+
 
 #: Sketch.java:461
 #, java-format
 msgid "Sorry, a sketch (or folder) named \"{0}\" already exists."
-msgstr "Paumanhin, mayroon ng sketch o folder na may pangalang \"{0}\"."
+msgstr "اسف, السكتش (او المجلد ) مسمى ب \"{0}\" مستخدم مسبقا"
+
 
 #: Sketch.java:479
 msgid "Could not rename the sketch. (0)"
-msgstr "Ayaw mapalitan ang pangalan ng sketch. (0)"
+msgstr "لا يمكن اعادة تسمية السكتش . (0)"
+
 
 #: Sketch.java:487 Sketch.java:532
 #, java-format
 msgid "Could not rename \"{0}\" to \"{1}\""
-msgstr "Hindi mapalitan ang pangalan mula \"{0}\" para maging \"{1}\""
+msgstr "لا يمكن اعادة تسمية \"{0}\" الى \"{1}\""
 
+بعض الملفات معلمة ب \"read-only\" , لذلك سوف تحتاج ان
 #: Sketch.java:500
 msgid "Could not rename the sketch. (1)"
-msgstr "Hindi mapalitan ang pangalan ng sketch. (1)"
+msgstr "لا يمكن اعادة تسمية الملف . (1)"
+
 
 #: Sketch.java:507
 msgid "Could not rename the sketch. (2)"
-msgstr "Hindi mapalitan ang pangalan ng sketch. (2)"
+msgstr "لا يمكن اعادة تسمية الملف . (2)"
+
 
 #: Sketch.java:544
 msgid "createNewFile() returned false"
-msgstr "createNewFile() ay nagbalik ng false"
+msgstr "createNewFile() returned false"
+
 
 #: Sketch.java:591
 msgid "Are you sure you want to delete this sketch?"
-msgstr "Nais mo bang burahin ang sketch na ito?"
+msgstr "هل انت متأكد انك تريد حذف السكتش ؟"
+
 
 #: Sketch.java:592
 #, java-format
 msgid "Are you sure you want to delete \"{0}\"?"
-msgstr "Nais mo bang burahin ang \"{0}\"?"
+msgstr "هل انت متأكد انك تريد حذف \"{0}\"؟"
+
 
 #: Sketch.java:595 EditorHeader.java:314
 msgid "Delete"
-msgstr "Alisin"
+msgstr "حذف"
+
 
 #: Sketch.java:620
 msgid "Couldn't do it"
-msgstr "Hindi ko magawa yan"
+msgstr "لا يمكن فعل ذلك"
+
 
 #: Sketch.java:621
 #, java-format
 msgid "Could not delete \"{0}\"."
-msgstr "Hindi ko madelete \"{0}\"."
+msgstr "لا يمكن حذف \"{0}\"."
+
 
 #: Sketch.java:651
 msgid "removeCode: internal error.. could not find code"
-msgstr "removeCode: internal error...hindi makita ang code"
+msgstr "removeCode: خطأ داخلي .. لا يمكن ايجاد الكود"
+
 
 #: Sketch.java:724
 msgid "Sketch is read-only"
-msgstr "Ang sketch ay read-only"
+msgstr "السكتش للقرائة فقط"
+
 
 #: Sketch.java:725
 msgid ""
 "Some files are marked \"read-only\", so you'll\n"
 "need to re-save this sketch to another location."
-msgstr ""
-"Ang ilang files ay \"read-only\", kaya kinakailangan\n"
-"mong i-resave ang sketch sa ibang lokasyon."
+msgstr "بعض الملفات معلمة ب \"read-only\" , لذلك سوف تحتاج ان\nتعيد حفظ السكتش في مكان آخر."
 
 #: Sketch.java:743
 msgid ""
@@ -801,126 +897,128 @@ msgid ""
 "disable this in the Preferences dialog.\n"
 "\n"
 "Save sketch and update its extension?"
-msgstr ""
-"Sa Arduino 1.0, ang default na file extension ay naging\n"
-".ino mula .pde.  Ang mga bagong sketches (kasama ung mga nagawa \n"
-"gamit ang \"I-save bilang\" ay gagamit ng bagong extension.  Ang extension\n"
-"ng mga dati ng sketches ay mababago pag save, ngunit maaari mo itong\n"
-"mabago sa Mga Kagustuhan na dialog.\n"
-"\n"
-"I-save ang sketch at baguhin ang kanyang extension?"
+msgstr "في Arduino 1.0 الامتداد التلقائي قد تغير\nمن .pde الى .ino. السكتشات الجديدة سوف تستخدم الامتداد الجديد -\nايضا الملفات الملفات المنشأة بواسطة حفظ بإسم - الامتداد للملفات الموجودة\nسوف يحدث عند الحفظ. لكن يمكنك ان تتحكم بذلك من قائمة الخصائص\nحفظ السكتش وتحديث الامتداد ؟"
 
 #: Sketch.java:750
 msgid ".pde -> .ino"
 msgstr ".pde -> .ino"
 
+
 #: Sketch.java:829
 msgid "Save sketch folder as..."
-msgstr "I-save ang sketch folder bilang..."
+msgstr "حفظ مجلد السكتش الى ..."
+
 
 #: Sketch.java:865
 msgid ""
 "You can't save the sketch as \"{0}\"\n"
 "because the sketch already has a .cpp file with that name."
-msgstr ""
-"Hindi maaaring ma-save ang sketch bilang \"{0}\"\n"
-"dahil ang mayroon na itong .cpp na may parehong pangalan."
+msgstr "\"{0}\"لا يمكنك حبظ السكتش بـ\nلان سكتش موجود فعلا."
 
 #: Sketch.java:886
 msgid "How very Borges of you"
-msgstr "Napaka Borges mo"
+msgstr "ما هذه السخافة"
+
 
 #: Sketch.java:887
 msgid ""
 "You cannot save the sketch into a folder\n"
 "inside itself. This would go on forever."
-msgstr ""
-"Hindi mo maaaring i-save ang sketch sa loob ng folder\n"
-"kung saaan nakalagay sketch. Magpapatuloy lamang ito ng walang katapusan."
+msgstr "لا يمكن حفظ السكتش الى نفسه\nربما يسير الى الابد."
 
 #: Sketch.java:979
 msgid "Select an image or other data file to copy to your sketch"
-msgstr "Pumili ng image o kahit anong data file na kokopyahin sa iyong sketch"
+msgstr "اختيار الصورة او ملف لنسخه الى السكتش"
+
 
 #: Sketch.java:1047
 #, java-format
 msgid "Replace the existing version of {0}?"
-msgstr "Palitan ang version {0}?"
+msgstr "استبدال الاصدار الموجود  {0}?"
+
 
 #: Sketch.java:1069 Sketch.java:1092
 msgid "Error adding file"
-msgstr "May mali sa pagdagdag ng file"
+msgstr "مشكلة في اضافة الملف"
+
 
 #: Sketch.java:1070
 #, java-format
 msgid "Could not delete the existing ''{0}'' file."
-msgstr "Hindi mabura ang file na ''{0}''."
+msgstr "''{0}''لا يمكن حذف الملف"
+
 
 #: Sketch.java:1078
 msgid "You can't fool me"
-msgstr "Hindi mo ako maloloko"
+msgstr "لا يمكنك خداعي"
+
 
 #: Sketch.java:1079
 msgid ""
 "This file has already been copied to the\n"
 "location from which where you're trying to add it.\n"
 "I ain't not doin nuthin'."
-msgstr ""
-"Ang file na ito ay nakopya na sa "
-"lokasyon kung saan mo sya gustong ikopya.\n"
-"Wala na akong gagawin."
+msgstr "هذا الملف تم بالفعل نسخه الى\nالموقع الذي تحاول اضافته اليه."
 
 #: Sketch.java:1093
 #, java-format
 msgid "Could not add ''{0}'' to the sketch."
-msgstr "Hindi maidagdag ang ''{0}'' sa sketch"
+msgstr "لا يمكن اضافة  ''{0}'' الى السكتش."
+
 
 #: Sketch.java:1393 Sketch.java:1424
 msgid "Build folder disappeared or could not be written"
-msgstr "Nawawala ang build folder o hindi sya masulatan"
+msgstr "مجلد البناء غير موجود او انه لايمكن الكتابة عليه"
+
 
 #: Sketch.java:1408
 msgid "Could not find main class"
-msgstr "Hindi makita ang main class"
+msgstr "لا يوجد الكلاس الاساسي"
+
 
 #: Sketch.java:1433
 #, java-format
 msgid "Uncaught exception type: {0}"
-msgstr "Hindi nahuling exception type: {0}"
+msgstr "نوع المشكلة غير محدد: {0}"
+
 
 #: Sketch.java:1465
 #, java-format
 msgid "Problem moving {0} to the build folder"
-msgstr "May problema sa paglipat ng {0} sa build folder"
+msgstr "مشكلة في نقل  {0} الى الفولدر البناء"
+
 
 #: Sketch.java:1661
 msgid "Uploading..."
-msgstr "Inaupload..."
+msgstr "رفع"
+
 
 #: Sketch.java:1684
 #, java-format
 msgid "Binary sketch size: {0} bytes (of a {1} byte maximum)"
-msgstr "Sukat ng Binary sketch: {0} bytes (of a {1} byte maximum)"
+msgstr "حجم السكتش المترجم: {0} بايت ( {1} كحد أقصى"
+
 
 #: Sketch.java:1689
 msgid "Couldn't determine program size: {0}"
-msgstr "Hindi malaman ang sukat ng programa: {0}"
+msgstr "لا يمكن تحديد حجم البرنامج  {0}"
+
 
 #: Sketch.java:1694
 msgid ""
 "Sketch too big; see http://www.arduino.cc/en/Guide/Troubleshooting#size for "
 "tips on reducing it."
-msgstr ""
-"Masyadong malaki ang sketch; Tignan ang http://www.arduino.cc/en/Guide/Troubleshooting#size para "
-"sa mga patnubay para mapaliit ito."
+msgstr "http://www.arduino.cc/en/Guide/Troubleshooting#size السكتش كبير جدا; راجع\nملاحظات لاختصاره."
 
 #: Sketch.java:1754
 msgid "Missing the */ from the end of a /* comment */"
-msgstr "Nawawala ang  */ sa dulo ng /* comment */"
+msgstr "نهاية التعليق /* غير موجود /* تعليق*/"
+
 
 #: Sketch.java:1796
 msgid "Sketch Disappeared"
-msgstr "Nawala ang sketch"
+msgstr "السكتش غير موجود"
+
 
 #: Sketch.java:1797
 msgid ""
@@ -928,21 +1026,24 @@ msgid ""
 " Will attempt to re-save in the same location,\n"
 "but anything besides the code will be lost."
 msgstr ""
-"Nawala ng folder ng sketch.\n"
-" Susubukang ire-save sa parehong lokasyon,\n"
-"subalit lahat maliban sa code ay mawawala."
+"مجلد السكتش اختفى.\n"
+" حاول اعادة حفظه في نفس المكان,\n"
+"ولكن  سيتم فقدان الكود."
+
 
 #: Sketch.java:1810
 msgid "Could not re-save sketch"
-msgstr "Hindi mai-resave ang sketch"
+msgstr "لا يمكن اعادة نسخ السكتش"
+
 
 #: Sketch.java:1811
 msgid ""
 "Could not properly re-save the sketch. You may be in trouble at this point,\n"
 "and it might be time to copy and paste your code to another text editor."
 msgstr ""
-"Hindi mai-resave ng maayos ang sketch. Maaaring malaki na ang iyong problema sa oras na ito,\n"
-"kaya mas mabuti pang icopy-paste mo na ang code mo sa ibang text editor."
+"لا يمكنه اعادة حفظ. الامر خطير,\n"
+"ويجب عليك نسخ النص ولصقه في محرر نصوص اخر."
+
 
 #: Sketch.java:2060
 msgid ""
@@ -950,70 +1051,82 @@ msgid ""
 "of ASCII characters and numbers (but cannot start with a number).\n"
 "They should also be less less than 64 characters long."
 msgstr ""
-"Kinakailangang palitan ang sketch name. Ang pangalan ng sketch ay maaari lamang magkaroon ng\n"
-"ASCII characters at mga numero (ngunit hindi maaaring magsimula sa numero).\n"
-"Hindi rin maaaring lumagpas ng 64 na titik ang pangalan."
+"اسم السكتش تم تغيره. اسم التكتش يجب ان يكون\n"
+"عنصرامن  ASCII او رقم (لكن لا يجوز ان يبدأ رقم).\n"
+"يجب ان يكون اقل من 64 حرف ورقم."
+
 
 #: debug/Uploader.java:52
 msgid "https://developer.berlios.de/bugs/?group_id=3590"
 msgstr "https://developer.berlios.de/bugs/?group_id=3590"
 
+
 #: debug/Uploader.java:54 debug/Compiler.java:43
 #, java-format
 msgid "Compiler error, please submit this code to {0}"
-msgstr "May error sa compiler, Pakisubmit ang code na ito sa {0}"
+msgstr "خطأ في الترجمة, رجاءا ارسل الكود الى {0}"
+
 
 #: debug/Uploader.java:199
 #, java-format
 msgid ""
 "the selected serial port {0} does not exist or your board is not connected"
 msgstr ""
-"hindi makita ang napiling serial port {0}  o kaya naman ay hindi kunektado ang iyong board"
+"رقم المنفذ port {0} المختار غير موجود او ان البورد غير موصول"
+
 
 #: debug/Uploader.java:203
 msgid ""
 "Device is not responding, check the right serial port is selected or RESET "
 "the board right before exporting"
 msgstr ""
-"Hindi tumutugon ang device, siguraduhing tama ang napiling serial port o kaya ay pindutin ang RESET "
-"bago mag export"
+"الجهاز لا يستجيب, تأكد من المنفذ port او قم باعدات التشغيل RESET "
+"للبورد قبل الرفع"
+
 
 #: debug/Uploader.java:209
 msgid ""
 "Problem uploading to board.  See http://www.arduino.cc/en/Guide/"
 "Troubleshooting#upload for suggestions."
 msgstr ""
-"May problema sa pagupload sa board. Tignan ang http://www.arduino.cc/en/Guide/"
-"Troubleshooting#upload para sa mga karagdagang kaalaman."
+"مشكلة في الرفع الى البورد. راجع http://www.arduino.cc/en/Guide/"
+"Troubleshooting#upload fعلى سبيل الاقتراح ."
+
 
 #: debug/Uploader.java:213
 msgid ""
 "Wrong microcontroller found.  Did you select the right board from the Tools "
 "> Board menu?"
 msgstr ""
-"Mali ang nakitang microcontroller. Napili mo ba ang tamang board mula sa Mga Kasangkapan "
-"> Board menu?"
+"وجد خطأ في المايكرو كونترولر. هل انت متاكد من نوع البورد المختار في قائمة الأدوات"
+
+
 
 #: debug/Compiler.java:41
 msgid "http://code.google.com/p/arduino/issues/list"
 msgstr "http://code.google.com/p/arduino/issues/list"
 
+
 #: debug/Compiler.java:79
 msgid "No board selected; please choose a board from the Tools > Board menu."
-msgstr "Walang piniling board; Maaari lamang na pumili ng board mula sa Mga Kasangkapan > Board menu."
+msgstr "لم تختار البورد; رجاءا اختار البورد من قائمة أدوات > بورد."
+
 
 #: debug/Compiler.java:422
 #, java-format
 msgid "{0} returned {1}"
-msgstr "{0} ay nagbalik ng {1}"
+msgstr "{0} أرجع  {1}"
+
 
 #: debug/Compiler.java:426
 msgid "Error compiling."
-msgstr "May mali sa pagcompile"
+msgstr "خطأ في الترجمة"
+
 
 #: debug/Compiler.java:465
 msgid "Please import the SPI library from the Sketch > Import Library menu."
-msgstr ""
+msgstr "رجاءا استورد مكتبة الSPI من سكاتش > استيرادة "
+
 
 #: debug/Compiler.java:466
 msgid ""
@@ -1024,13 +1137,15 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"Mula sa Arduino 0019, ang Ethernet library ay nakasalalay sa SPI library.\n"
-"Maaaring ginagamit mo ito o kaya ibang library na nakasalalay sa SPI library.\n"
+"كما في الاردوينو 0019, مكتبة الـ Ethernet معتمدة على مكتبة  SPI.\n"
+"ربما عليك استخدام مكتبة اخرى معتمدة على SPI "
 "\n"
+
 
 #: debug/Compiler.java:471
 msgid "The 'BYTE' keyword is no longer supported."
-msgstr "Ang 'BYTE' keyword ay hindi na sinusuportahan."
+msgstr "الـ 'BYTE' لم تعد مدعومة."
+
 
 #: debug/Compiler.java:472
 msgid ""
@@ -1040,13 +1155,15 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"Mula sa Arduino 1.0, ang 'BYTE' keyword ay hindi na susuportahan.\n"
-"Maaari lamang na gumamit na lang ng Serial.write().\n"
+"كما في الاردوينو 1.0, الـ 'BYTE' لم تعد مدعومة.\n"
+"رجاءا استخدم الــ Serial.write().\n"
 "\n"
+
 
 #: debug/Compiler.java:477
 msgid "The Server class has been renamed EthernetServer."
-msgstr "Ang Server class ay pinalitan ng pangalan at naging EthernetServer."
+msgstr "الـ Server class أعيد تسميته الى EthernetServer."
+
 
 #: debug/Compiler.java:478
 msgid ""
@@ -1056,13 +1173,15 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"Mula sa Arduino 1.0, ang Server class mula sa Ethernet library ay papalitan na para maging  "
+"كما في الأدرونو 1.0, Server class في Ethernet أعيد تسميته الى "
 "EthernetServer.\n"
 "\n"
 
+
 #: debug/Compiler.java:483
 msgid "The Client class has been renamed EthernetClient."
-msgstr "Ang Client class ay pinangalanan ng EthernetClient."
+msgstr "الـ Client class أعيد تسميته الى EthernetClient."
+
 
 #: debug/Compiler.java:484
 msgid ""
@@ -1072,13 +1191,15 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"Mula sa Arduino 1.0, ang Client class mula sa Ethernet library ay pinangalanan ng "
+"كم هو في الأردوينو 1.0, Client class في مكتبة Ethernet أعيد تسميته الى"
 "EthernetClient.\n"
 "\n"
 
+
 #: debug/Compiler.java:489
 msgid "The Udp class has been renamed EthernetUdp."
-msgstr "Ang Udp class ay pinangalanang EthernetUdp."
+msgstr "The Udp class أعيد تسميته الى EthernetUdp."
+
 
 #: debug/Compiler.java:490
 msgid ""
@@ -1088,13 +1209,15 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"Mula sa Arduino 1.0, ang Udp class mula  sa Ethernet library hay pinangalanan ng "
+"كما هو في الأردوينو 1.0 , الـ Udp class في مكتبة Ethernet تم اعادة تسميته الى"
 "EthernetClient.\n"
 "\n"
 
+
 #: debug/Compiler.java:495
 msgid "Wire.send() has been renamed Wire.write()."
-msgstr "Wire.send() ay pinangalanan ng Wire.write()."
+msgstr "Wire.send() أعيدت تسميته الى Wire.write()."""
+
 
 #: debug/Compiler.java:496
 msgid ""
@@ -1104,13 +1227,15 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"Mula sa Arduino 1.0, ang Wire.send() function ay pinangalanan ng Wire.write() para sa "
-"pagkakakapareho sa ibang libraries.\n"
+"كما هو في الاردوينو 1.0, الـ Wire.send() تم اعادة تسميته الى  Wire.write() "
+"من اجل التناسق مع المكتبات الأخرى.\n"
 "\n"
+
 
 #: debug/Compiler.java:501
 msgid "Wire.receive() has been renamed Wire.read()."
-msgstr "Wire.receive() ay pinangalanang Wire.read()."
+msgstr "Wire.receive() تم اعادة تسميتها الىWire.read()."
+
 
 #: debug/Compiler.java:502
 msgid ""
@@ -1120,45 +1245,53 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"Mula sa Arduino 1.0, ang Wire.receive() function ay pinangalanan ng Wire.read() "
-"para sa pagkakapareho sa ibang libraries.\n"
+"كما هو في اردوينو 1.0,  الـ Wire.receive() تم اعادة تسميته الى Wire.read() "
+"من اجل التناسق مع المكتبات الأخرى.\n"
 "\n"
+
 
 #: EditorConsole.java:152
 msgid "Console Error"
-msgstr "May error sa console"
+msgstr "خطأ في وحدة التحكم Console"
+
 
 #: EditorConsole.java:153
 msgid ""
 "A problem occurred while trying to open the\n"
 "files used to store the console output."
 msgstr ""
-"May nangyaring problema habang inoopen ang files\n"
-"na gagamitin para mastore ang console output."
+"حدثت مشكلة اثناء فتح\n"
+"ملفات تستخدم لتخزين المخرجات."
+
 
 #: Base.java:184
 msgid "Non-fatal error while setting the Look & Feel."
-msgstr "Non-fatal error habang nagseset ng Look & Feel"
+msgstr "خطأ غير ضار اثناى اعداد الواجهة والشعور"
+
 
 #: Base.java:185
 msgid "The error message follows, however Arduino should run fine."
-msgstr "Narito ang error message, subalit ang Arduino ay gagana pa rin ng maayos"
+msgstr  "اتباع راسالة الخطأ، على كل حال ستعمل الاردوينو بشكل جيد"
+
 
 #: Base.java:220
 msgid "Problem Setting the Platform"
-msgstr "May problema sa pagset ng Platform"
+msgstr "اعدادات المنصة خاطئة"
+
 
 #: Base.java:221
 msgid ""
 "An unknown error occurred while trying to load\n"
 "platform-specific code for your machine."
 msgstr ""
-"May hindi alam na error ang nangyari habang niloload ang \n"
-"platform-specific code para sa iyong machine."
+"مشكلة غير معروفة اثناء تحميل\n"
+"المنصة المخصصة على جهازك."
+
 
 #: Base.java:232
 msgid "Please install JDK 1.5 or later"
-msgstr "Maaari lamang na maginstall ng JDK 1.5 pataas"
+msgstr "الرجاء تنصيب JDK 1.5 أو احدث"
+
 
 #: Base.java:233
 msgid ""
@@ -1166,13 +1299,15 @@ msgid ""
 "to run. Please install JDK 1.5 or later.\n"
 "More information can be found in the reference."
 msgstr ""
-"Ang Arduino ay nangangailangan ng full JDK (hindi lamang JRE)\n"
-"para gumana. Maaari lamang na maginstall ng JDK 1.5 pataas.\n"
-"Maaaring makakuha ng karagdagang kaalaman sa sanggunian."
+"الاردوينو بحاجة الى JDK وليس فقط JRE لكي يشتغل\n"
+"الرجاء تنصيب JDK 1.5 أو أحدث.\n"
+"مزيد من التفاصيل تجدها في المراجع."
+
 
 #: Base.java:257
 msgid "Sketchbook folder disappeared"
-msgstr "Nawala ang folder ng sketchbook"
+msgstr "مجلد السكتش بوك مختفي"
+
 
 #: Base.java:258
 msgid ""
@@ -1182,53 +1317,59 @@ msgid ""
 "necessary. Arduino will then stop talking about\n"
 "himself in the third person."
 msgstr ""
-"Ang sketchbook folder ay hindi ko na makita.\n"
-"Gagamitin ko na ang default lokasyon ng sketchbook \n"
-"at gagawa ng bagong sketchbook folder kung\n"
-"kinakailangan. At hindi ko na kakausapin\n"
-"ang sarili ko."
+"مجلد السكتش بوك لم يعد موجودا.\n"
+"سينتقل الاردوينو الى مكان السكتش بوك\n"
+"الافتراضي, او انشاء واحد جديد اذا تطلب الأمرif\n"
+". الاردوينو سيوقف الحديث \n"
+"عن نفسه."
+
 
 #: Base.java:532
 msgid "Time for a Break"
-msgstr "Oras na para magpahinga"
+msgstr "وقت الاستراحة"
+
 
 #: Base.java:533
 msgid ""
 "You've reached the limit for auto naming of new sketches\n"
 "for the day. How about going for a walk instead?"
 msgstr ""
-"Naabot mo na ang limit para sa pagauto-name ng bagong sketches\n"
-"para sa araw na ito. Bakit hindi ka maglakad lakad sa paligid-ligid?"
+"لقد وصلت الى الحد الاقصى للتسمية التلقائية"
+"لليوم. ماذا عن الخروج في نزهة بدل الليوم?"
+
 
 #: Base.java:537
 msgid "Sunshine"
-msgstr "Sinag ng araw"
+msgstr "أشعة الشمس"
+
 
 #: Base.java:538
 msgid "No really, time for some fresh air for you."
-msgstr "Hindi nga walang biro, oras na para makalanghap ka ng sariwang hangin."
+msgstr "لا يا صديقي , حان الوقت لتأخذ فترة راحة قصيرة "
+
 
 #: Base.java:633
 msgid "Open an Arduino sketch..."
-msgstr "Magbukas ng Arduino sketch..."
+msgstr "فتح الاردوينو سكتش"
+
 
 #: Base.java:772
 msgid ""
 "<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p "
 "{ font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Are you "
 "sure you want to Quit?</b><p>Closing the last open sketch will quit Arduino."
-msgstr ""
-"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p "
-"{ font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Sigurado ka ba "
-"na gusto mo mag Quit?</b><p>Ang pagsara ng huling nakabukas na sketch ay magki-quit ng Arduino."
+msgstr "<html dir=\"RTL\"> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p { font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>هل انت متأكد من الخروج ؟</b><p>اغلاق اخر سكتش سوف يغلق الارديونو."
+
 
 #: Base.java:970
 msgid "Contributed"
-msgstr "Nakapagbahagi"
+msgstr "مساهمة"
+
 
 #: Base.java:1095
 msgid "Sketch Does Not Exist"
-msgstr "Hindi makita ang sketch"
+msgstr "السكتش غير موجود"
+
 
 #: Base.java:1096
 msgid ""
@@ -1236,9 +1377,10 @@ msgid ""
 "You may need to restart Arduino to update\n"
 "the sketchbook menu."
 msgstr ""
-"Ang napiling sketch nay hindi na makita.\n"
-"kinakailangan mong  i-restart ang Arduino para maupdate\n"
-"ang sketchbook menu."
+"السكتش المحدد لم يعد موجودا.\n"
+"يجب اعادة تشغيل الاردوينو للتحديث\n"
+"قائمة السكتش بوك."
+
 
 #: Base.java:1125
 #, java-format
@@ -1249,15 +1391,17 @@ msgid ""
 "To get rid of this message, remove the sketch from\n"
 "{1}"
 msgstr ""
-"Ang sketch \"{0}\" ay hindi maaaring gamitin.\n"
-"Ang pangalan ng sketch ay maaarin lamang magkaroon ng titik at numero\n"
-"(ASCII lamang at walang spaces, at hindi ito maaaring magsimula sa numero).\n"
-"Para maaalis ang message na ito, alisin ang sketch mula sa \n"
+"السكتش \"{0}\" لا يمكن استخدامه.\n"
+"اسم السكتش يجب ان يحتوي حروف وارقام فقط\n"
+"(حروف من دون فراغات,ولا يمكن ان يبدأ في رقم).\n"
+"لتخلص من هذه الرسالة, احذف السكتش من \n"
 "{1}"
+
 
 #: Base.java:1132
 msgid "Ignoring sketch with bad name"
-msgstr "Hindi papansin ang sketch na may maling pangalan"
+msgstr "تجاهل السكتش ذات الاسم الخاطئ"
+
 
 #: Base.java:1202
 #, java-format
@@ -1266,53 +1410,63 @@ msgid ""
 "Library names must contain only basic letters and numbers.\n"
 "(ASCII only and no spaces, and it cannot start with a number)"
 msgstr ""
-"Ang library \"{0}\" ay maaaring gamitin.\n"
-"Ang pangalan ng library ay maaari lamang magkaron ng titik at numero.\n"
-"(ASCII lamang at walang spaces, at hindi ito maaaring magsimula sa numero)"
+"المكتبة  \"{0}\" لا يمكن استخدامها.\n"
+"اسم المكتبة يجب ان يكون حروف وارقام فقط.\n"
+"(لا فراغات ولا يمكن البدء في رقم)"
+
 
 #: Base.java:1207
 msgid "Ignoring bad library name"
-msgstr "Hindi papansinin ang library na may maling pangalan"
+msgstr "تجاهل اسم المكتبة الخاطئ"
+
 
 #: Base.java:1432
 msgid "Problem getting data folder"
-msgstr "May problema sa pagkuha ng data folder"
+msgstr "مشكلة في الحصول على مجلد البيانات"
+
 
 #: Base.java:1433
 msgid "Error getting the Arduino data folder."
-msgstr "May problema sa pagkuha ng Arduino data folder"
+msgstr "مشكلة في الحصول على مجلد بيانات الاردوينو"
+
 
 #: Base.java:1440
 msgid "Settings issues"
-msgstr "May problema sa Settings"
+msgstr "ضبط القضايا"
+
 
 #: Base.java:1441
 msgid ""
 "Arduino cannot run because it could not\n"
 "create a folder to store your settings."
 msgstr ""
-"Ayaw gumana ng Arduino sapagkat hindi ito\n"
-"makagawa ng folder kung saan ilalagay ang iyong settings."
+"الاردوينو لا تعمل لعدم\n"
+"تمكنها من انشاء مجلد لحفظ الاعدادات."
+
 
 #: Base.java:1602
 msgid "You forgot your sketchbook"
-msgstr "Nakalimutan mo ang iyong sketchbook"
+msgstr "لقد نسيت السكتشبوك (sketchbook)"
+
 
 #: Base.java:1603
 msgid ""
 "Arduino cannot run because it could not\n"
 "create a folder to store your sketchbook."
 msgstr ""
-"Ayaw gumana ng Arduino sapagkat hindi ito\n"
-"makagawa ng folder kung saan ilalagay ang iyong sketchbook."
+"الارديوينو لم تتمكن من التشغيل بسبب  انها \n"
+"لا تستطيع انشاء مجلد لحفظ السكتشبوك (sketchbook)."
+
 
 #: Base.java:1623
 msgid "Select (or create new) folder for sketches..."
-msgstr "Pumili (o gumawa ng bago) ng folder para sa sketches..."
+msgstr "اختيار(او انشاء جديد) لمجلد السكتش"
+
 
 #: Base.java:1647
 msgid "Problem Opening URL"
-msgstr "May problema sa pagbukas ng URL"
+msgstr "مشكلة في فتح عنوان URL"
+
 
 #: Base.java:1648
 #, java-format
@@ -1320,12 +1474,14 @@ msgid ""
 "Could not open the URL\n"
 "{0}"
 msgstr ""
-"Hindi mabuksan ang URL\n"
+"لا يمكن فتح عنوان URL \n"
 "{0}"
+
 
 #: Base.java:1671
 msgid "Problem Opening Folder"
-msgstr "May problema sa pagbukas ng Folder"
+msgstr "مشكلة في فتح المجلد"
+
 
 #: Base.java:1672
 #, java-format
@@ -1333,103 +1489,127 @@ msgid ""
 "Could not open the folder\n"
 "{0}"
 msgstr ""
-"Hindi mabuksan ang folder\n"
+"لا يمكن فتح المجلد\n"
 "{0}"
+
 
 #: Base.java:1785
 msgid "Guide_MacOSX.html"
 msgstr "Guide_MacOSX.html"
 
+
 #: Base.java:1787
 msgid "Guide_Windows.html"
 msgstr "Guide_Windows.html"
+
 
 #: Base.java:1789
 msgid "http://www.arduino.cc/playground/Learning/Linux"
 msgstr "http://www.arduino.cc/playground/Learning/Linux"
 
+
 #: Base.java:1794
 msgid "index.html"
 msgstr "index.html"
+
 
 #: Base.java:1799
 msgid "Guide_Environment.html"
 msgstr "Guide_Environment.html"
 
+
 #: Base.java:1804
 msgid "environment"
-msgstr "environment"
+msgstr "البيئة"
+
 
 #: Base.java:1804
 msgid "platforms.html"
 msgstr "platforms.html"
 
+
 #: Base.java:1809
 msgid "Guide_Troubleshooting.html"
 msgstr "Guide_Troubleshooting.html"
+
 
 #: Base.java:1814
 msgid "FAQ.html"
 msgstr "FAQ.html"
 
+
 #: Base.java:1826
 msgid "Message"
-msgstr "Mensahe"
+msgstr "رسالة"
+
 
 #: Base.java:1842
 msgid "Warning"
-msgstr "Warning"
+msgstr "تحذير"
+
 
 #: Base.java:2196
 #, java-format
 msgid "Could not remove old version of {0}"
-msgstr "Hindi maaalis ang lumang bersyon na {0}"
+msgstr "لا يمكن حذف الاصدار السابق  {0}"
+
 
 #: Base.java:2206
 #, java-format
 msgid "Could not replace {0}"
-msgstr "Hindi mapalitan ang {0}"
+msgstr "لا يمكن استبدال {0}"
+
 
 #: Base.java:2247 Base.java:2270
 #, java-format
 msgid "Could not delete {0}"
-msgstr "Hindi maalis ang {0}"
+msgstr "لا يمكن حذف {0}"
+
 
 #: EditorHeader.java:292
 msgid "New Tab"
-msgstr "Bagong Tab"
+msgstr "تبويب جديد"
+
 
 #: EditorHeader.java:300
 msgid "Rename"
-msgstr "Palitan ng Pangalan"
+msgstr "اعادة تسمية "
+
 
 #: EditorHeader.java:326
 msgid "Previous Tab"
-msgstr "Nakaraang Tab"
+msgstr "التبويب السابق"
+
 
 #: EditorHeader.java:340
 msgid "Next Tab"
-msgstr "Susunod na Tab"
+msgstr "تبويب جديد"
+
 
 #: EditorToolbar.java:41 EditorToolbar.java:46
 msgid "Verify"
-msgstr "Beripikahin"
+msgstr "فحص"
+
 
 #: EditorToolbar.java:41
 msgid "Open"
-msgstr "Buksan"
+msgstr "فتح"
+
 
 #: EditorToolbar.java:46
 msgid "New Editor Window"
-msgstr "Bagong Editor Window"
+msgstr "نافذة تحرير جديدة"
+
 
 #: EditorToolbar.java:46
 msgid "Open in Another Window"
-msgstr "Buksan sa ibang Window"
+msgstr "فتح نافذة اخرى"
+
 
 #: Platform.java:167
 msgid "No launcher available"
-msgstr "Walang launcher na maaaring magamit"
+msgstr "لا يوجد منصة متاحة"
+
 
 #: Platform.java:168
 msgid ""
@@ -1437,193 +1617,194 @@ msgid ""
 "To enable opening URLs or folders, add a \n"
 "\"launcher=/path/to/app\" line to preferences.txt"
 msgstr ""
-"Hindi malamang platform, walang launcher na maaaring magamit.\n"
-"Para mabuksan ang URLs o folders, magdagdag ng\n"
-"\"launcher=/path/to/app\" sa preferences.txt"
+"المنصة غير محددة، المشغل غير متاح.\n"
+"اضف سطر \"launcher=/path/to/app\" الى preferences.txt"
+
 
 #: Theme.java:52
 msgid ""
 "Could not read color theme settings.\n"
 "You'll need to reinstall Processing."
 msgstr ""
-"Hindi mabasa ang color theme settings.\n"
-"Kinakailangan mong i-reinstall ang Processing."
+"لا يمكن قرائة اعتدادات الالوان.\n"
+"يجب عليك اعادة تنصيب العملية"
+
 
 #: Preferences.java:80
 msgid "Browse"
-msgstr "Browse"
+msgstr "استعراض"
 
-#: Preferences.java:83
-msgid "System Default"
-msgstr ""
-
-#: Preferences.java:84
+#: Preferences.java:115
 msgid "Catalan"
-msgstr "Catalan"
+msgstr ""
 
-#: Preferences.java:85
+#: Preferences.java:116
 msgid "Chinese Simplified"
-msgstr "Chinese Simplified"
-
-#: Preferences.java:86
-msgid "Chinese Traditional"
 msgstr ""
 
-#: Preferences.java:87
+#: Preferences.java:117
+msgid "Chinese Taiwan"
+msgstr ""
+
+#: Preferences.java:118
 msgid "Danish"
-msgstr "Danish"
+msgstr ""
 
-#: Preferences.java:88
+#: Preferences.java:119
 msgid "Dutch"
-msgstr "Dutch"
+msgstr ""
 
-#: Preferences.java:89
+#: Preferences.java:120
 msgid "English"
-msgstr "Ingles"
+msgstr ""
 
-#: Preferences.java:90
+#: Preferences.java:121
 msgid "French"
-msgstr "French"
+msgstr ""
 
-#: Preferences.java:91
+#: Preferences.java:122
 msgid "Filipino"
-msgstr "Filipino"
+msgstr ""
 
-#: Preferences.java:92
+#: Preferences.java:123
 msgid "Galician"
-msgstr "Galician"
+msgstr ""
 
-#: Preferences.java:93
+#: Preferences.java:124
 msgid "German"
-msgstr "German"
+msgstr ""
 
-#: Preferences.java:94
+#: Preferences.java:125
 msgid "Greek"
-msgstr "Greek"
+msgstr ""
 
-#: Preferences.java:95
+
+#: Preferences.java:126
 msgid "Hungarian"
-msgstr "Hungarian"
+msgstr ""
 
-#: Preferences.java:96
+#: Preferences.java:127
 msgid "Italian"
-msgstr "Italian"
+msgstr ""
 
-#: Preferences.java:97
+#: Preferences.java:128
 msgid "Japanese"
-msgstr "Japanese"
+msgstr ""
 
-#: Preferences.java:98
+#: Preferences.java:129
 msgid "Latvian"
-msgstr "Latvian"
+msgstr ""
 
-#: Preferences.java:99
+#: Preferences.java:130
 msgid "Persian"
-msgstr "Persian"
-
-#: Preferences.java:100
-msgid "Portuguese"
 msgstr ""
 
-#: Preferences.java:101
+#: Preferences.java:131
+msgid "Portuguese (Brazil)"
+msgstr ""
+
+#: Preferences.java:132
 msgid "Romanian"
-msgstr "Romanian"
-
-#: Preferences.java:102
-msgid "Russian"
 msgstr ""
 
-#: Preferences.java:103
+#: Preferences.java:133
 msgid "Spanish"
-msgstr "Spanish"
-
-#: Preferences.java:194
+msgstr ""
+#: Preferences.java:222
 msgid ""
 "Could not read default settings.\n"
 "You'll need to reinstall Arduino."
 msgstr ""
-"Hindi mabasa ang default settings.\n"
-"Kinakailangan mong i-reinstall ang Arduino."
+"لا يمكن قرائة الاعدادات الافتراضية"
+"يجب عليك اعادت تنصيب الاردوينو"
 
-#: Preferences.java:226
+
+#: Preferences.java:254
 #, java-format
 msgid "Could not read preferences from {0}"
-msgstr "Hindi mabasa ang mga kagustuhan mula sa {0}"
+msgstr "لا يمكن قرائة الخصائص من {0} "
 
-#: Preferences.java:245
+
+#: Preferences.java:273
 msgid "Error reading preferences"
-msgstr "May problema sa pagread ng preferences"
+msgstr "خطا في قراءة الخصائص"
 
-#: Preferences.java:247
+
+#: Preferences.java:275
 #, java-format
 msgid ""
 "Error reading the preferences file. Please delete (or move)\n"
 "{0} and restart Arduino."
 msgstr ""
-"May problema sa pagbasa ng preferences file. Maaari lamang na i-delete (o ilipat) ang \n"
-"{0} at irestart ang Arduino."
+"خطافي قرائة ملف الخصائص . رجاءا احذف (او انقل )\n"
+"{0} ثم اعد تشغيل الارديونو"
 
-#: Preferences.java:283
+#: Preferences.java:311
 msgid "Sketchbook location:"
-msgstr "Lokasyon ng Sketchbook:"
+msgstr "مكان السكتش"
 
-#: Preferences.java:298
+
+#: Preferences.java:326
 msgid "Select new sketchbook location"
-msgstr "Pumili ng bagong lokasyon ng sketchbook"
+msgstr "اختيار مكان السكتش الجديد"
 
-#: Preferences.java:321
-msgid "Editor language: "
-msgstr ""
 
-#: Preferences.java:326 Preferences.java:342
-msgid "  (requires restart of Arduino)"
-msgstr " (kinakailangang i-restart ang Arduino)"
-
-#: Preferences.java:338
+#: Preferences.java:350
 msgid "Editor font size: "
-msgstr "Sukat ng font para sa Editor:"
+msgstr "حجم خط المحرر :"
 
-#: Preferences.java:355
+
+#: Preferences.java:354 Preferences.java:442
+msgid "  (requires restart of Arduino)"
+msgstr "(يتطلب اعادت تشغيل للأردوينو)"
+
+
+#: Preferences.java:367
 msgid "Show verbose output during: "
-msgstr "Ipakita ang verbose na output: "
+msgstr "عرض المخرجات خلال"
 
-#: Preferences.java:357
+
+#: Preferences.java:369
 msgid "compilation "
-msgstr "compilation"
+msgstr "ترجمة"
 
-#: Preferences.java:359
+
+#: Preferences.java:371
 msgid "upload"
-msgstr "upload"
+msgstr "رفع"
 
-#: Preferences.java:368
-msgid "Verify code after upload"
-msgstr "I-verify ang code pagkatapos mai-upload"
 
-#: Preferences.java:377
+#: Preferences.java:389
 msgid "Use external editor"
-msgstr "Gumamit ng ibang editor"
+msgstr "استعمال محرر خارجي"
 
-#: Preferences.java:387
+
+#: Preferences.java:399
 msgid "Check for updates on startup"
-msgstr "Suriin ang updates tuwing magsisimula"
+msgstr "افحص التحديثات عند التشغيل"
 
-#: Preferences.java:396
+
+#: Preferences.java:408
 msgid "Update sketch files to new extension on save (.pde -> .ino)"
-msgstr "Baguhin ang sketch files na gumamit ng bagong extension kapag nagsave (.pde -> .ino)"
+msgstr "تحديث ملفات السكتش ملف الى الامتداد الجديد عند الحفظ (.pde -> .ino)"
 
-#: Preferences.java:407
+
+#: Preferences.java:419
 msgid "Automatically associate .ino files with Arduino"
-msgstr "Kusang iassociate ang .ino files sa Arduino"
+msgstr "دمج .ino بشكل تلقائي مع الاردوينو"
 
-#: Preferences.java:417
+
+#: Preferences.java:454
 msgid "More preferences can be edited directly in the file"
-msgstr "Madami pang preferences ang maaaring baguhin mula sa file"
+msgstr "يمكن تعديل خصائص اكثر بتعديل الملف بشكل مباشر"
 
-#: Preferences.java:446
+
+#: Preferences.java:483
 msgid "(edit only when Arduino is not running)"
-msgstr "(baguhin lamang kung hindi tumatakbo ang Arduino)"
+msgstr "(لا يمكن التحرير والأردوينو تعمل)"
 
-#: Preferences.java:593
+
+#: Preferences.java:630
 #, java-format
 msgid "ignoring invalid font size {0}"
-msgstr "hindi papansinin ang maling sukat ng font {0}"
+msgstr "تجاهل الخطأ في حجم الخط {0}"

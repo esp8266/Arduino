@@ -1,5 +1,5 @@
 # Japanese language resource for the Arduino IDE.
-# Copyright (C) 2011 switch-science.com
+# Copyright (C) 2011,2012 switch-science.com
 # This file is distributed under the same license as the Arduino IDE package.
 # Shigeru KANEMOTO <c2drQHN3aXRjaC1zY2llbmNlLmNvbQ==>.
 #
@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-11 23:09+0900\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"POT-Creation-Date: 2012-03-29 10:24-0400\n"
+"PO-Revision-Date: 2012-04-11 13:41+0900\n"
 "Last-Translator: Shigeru KANEMOTO <c2drQHN3aXRjaC1zY2llbmNlLmNvbQ==>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -78,7 +78,7 @@ msgstr "プリンタの設定..."
 msgid "Print"
 msgstr "印刷..."
 
-#: Editor.java:576 Preferences.java:293
+#: Editor.java:576 Preferences.java:263
 msgid "Preferences"
 msgstr "環境設定"
 
@@ -240,11 +240,11 @@ msgstr "次を検索"
 
 #: Editor.java:1245
 msgid "Find Previous"
-msgstr ""
+msgstr "前を検索"
 
 #: Editor.java:1255
 msgid "Use Selection For Find"
-msgstr ""
+msgstr "選択されている文字列を検索"
 
 #: Editor.java:1816
 msgid "First select a word to find in the reference."
@@ -258,7 +258,7 @@ msgstr "リファレンスマニュアルに「{0}」はありません。"
 #: Editor.java:1826
 #, java-format
 msgid "{0}.html"
-msgstr ""
+msgstr "{0}.html"
 
 #: Editor.java:1843 Sketch.java:1647
 msgid "Compiling sketch..."
@@ -309,7 +309,7 @@ msgstr ""
 #: Editor.java:2098 Editor.java:2418 Sketch.java:589 Sketch.java:741
 #: Sketch.java:1046 Preferences.java:79
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: Editor.java:2100
 #, java-format
@@ -327,7 +327,7 @@ msgstr "移動中"
 
 #: Editor.java:2120 Editor.java:2131 Editor.java:2141 Editor.java:2159
 #: Sketch.java:479 Sketch.java:485 Sketch.java:500 Sketch.java:507
-#: Sketch.java:530 Sketch.java:547 Base.java:1861 Preferences.java:254
+#: Sketch.java:530 Sketch.java:547 Base.java:1861 Preferences.java:224
 msgid "Error"
 msgstr "エラー"
 
@@ -351,7 +351,7 @@ msgstr "スケッチを作成できません。"
 #: Editor.java:2166
 #, java-format
 msgid "{0} | Arduino {1}"
-msgstr ""
+msgstr "{0} | Arduino {1}"
 
 #: Editor.java:2223 Editor.java:2261
 msgid "Saving..."
@@ -435,7 +435,7 @@ msgstr "URLを開く"
 
 #: UpdateCheck.java:53
 msgid "http://www.arduino.cc/latest.txt"
-msgstr ""
+msgstr "http://www.arduino.cc/latest.txt"
 
 #: UpdateCheck.java:103
 msgid ""
@@ -459,7 +459,7 @@ msgstr "更新"
 
 #: UpdateCheck.java:118
 msgid "http://www.arduino.cc/en/Main/Software"
-msgstr ""
+msgstr "http://www.arduino.cc/en/Main/Software"
 
 #: FindReplace.java:80
 msgid "Find:"
@@ -475,7 +475,7 @@ msgstr "大文字小文字を区別しない"
 
 #: FindReplace.java:105
 msgid "Wrap Around"
-msgstr ""
+msgstr "行末を折り曲げる"
 
 #: FindReplace.java:120 FindReplace.java:131
 msgid "Replace All"
@@ -491,7 +491,7 @@ msgstr "置換して次"
 
 #: FindReplace.java:123 FindReplace.java:128
 msgid "Previous"
-msgstr ""
+msgstr "前"
 
 #: FindReplace.java:124 FindReplace.java:127
 msgid "Find"
@@ -699,6 +699,7 @@ msgid ""
 "(It may be time for your to graduate to a\n"
 "\"real\" programming environment)"
 msgstr ""
+"スケッチのメインのファイルには、拡張子を指定できません。"
 
 #: Sketch.java:400 Sketch.java:414 Sketch.java:423 Sketch.java:863
 msgid "Nope"
@@ -809,7 +810,7 @@ msgstr ""
 
 #: Sketch.java:750
 msgid ".pde -> .ino"
-msgstr ""
+msgstr ".pdeから.inoへ"
 
 #: Sketch.java:829
 msgid "Save sketch folder as..."
@@ -950,13 +951,13 @@ msgid ""
 "of ASCII characters and numbers (but cannot start with a number).\n"
 "They should also be less less than 64 characters long."
 msgstr ""
-"都合により、スケッチの名前を変更しました。"
-"スケッチの名前は、ASCII文字および数字（先頭を除く）であり、"
-"６４文字以下であることが必要です。"
+"都合により、スケッチの名前を変更しました。\n"
+"スケッチの名前に使える文字は半角英数字です（数字は先頭を除く）。\n"
+"また、64文字以下であることが必要です。"
 
 #: debug/Uploader.java:52
 msgid "https://developer.berlios.de/bugs/?group_id=3590"
-msgstr ""
+msgstr "https://developer.berlios.de/bugs/?group_id=3590"
 
 #: debug/Uploader.java:54 debug/Compiler.java:43
 #, java-format
@@ -996,7 +997,7 @@ msgstr ""
 
 #: debug/Compiler.java:41
 msgid "http://code.google.com/p/arduino/issues/list"
-msgstr ""
+msgstr "http://code.google.com/p/arduino/issues/list"
 
 #: debug/Compiler.java:79
 msgid "No board selected; please choose a board from the Tools > Board menu."
@@ -1178,6 +1179,9 @@ msgid ""
 "necessary. Arduino will then stop talking about\n"
 "himself in the third person."
 msgstr ""
+"スケッチブックの保存場所フォルダが有りません。\n"
+"デフォルトの場所にスケッチブックの保存場所\n"
+"フォルダを作成し、今後はこちらを使用します。"
 
 #: Base.java:532
 msgid "Time for a Break"
@@ -1209,6 +1213,9 @@ msgid ""
 "{ font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Are you "
 "sure you want to Quit?</b><p>Closing the last open sketch will quit Arduino."
 msgstr ""
+"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p "
+"{ font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>"
+"本当に終了しますか？</b><p>開かれている最後のスケッチを閉じると、Arduino IDEは終了します。"
 
 #: Base.java:970
 msgid "Contributed"
@@ -1320,39 +1327,39 @@ msgstr ""
 
 #: Base.java:1785
 msgid "Guide_MacOSX.html"
-msgstr ""
+msgstr "Guide_MacOSX.html"
 
 #: Base.java:1787
 msgid "Guide_Windows.html"
-msgstr ""
+msgstr "Guide_Windows.html"
 
 #: Base.java:1789
 msgid "http://www.arduino.cc/playground/Learning/Linux"
-msgstr ""
+msgstr "http://www.arduino.cc/playground/Learning/Linux"
 
 #: Base.java:1794
 msgid "index.html"
-msgstr ""
+msgstr "index.html"
 
 #: Base.java:1799
 msgid "Guide_Environment.html"
-msgstr ""
+msgstr "Guide_Environment.html"
 
 #: Base.java:1804
 msgid "environment"
-msgstr ""
+msgstr "environment"
 
 #: Base.java:1804
 msgid "platforms.html"
-msgstr ""
+msgstr "platforms.html"
 
 #: Base.java:1809
 msgid "Guide_Troubleshooting.html"
-msgstr ""
+msgstr "Guide_Troubleshooting.html"
 
 #: Base.java:1814
 msgid "FAQ.html"
-msgstr ""
+msgstr "FAQ.html"
 
 #: Base.java:1826
 msgid "Message"
@@ -1435,87 +1442,91 @@ msgstr ""
 msgid "Browse"
 msgstr "参照"
 
-#: Preferences.java:115
+#: Preferences.java:83
+msgid "System Default"
+msgstr ""
+
+#: Preferences.java:84
 msgid "Catalan"
-msgstr ""
+msgstr "カタルーニャ語"
 
-#: Preferences.java:116
+#: Preferences.java:85
 msgid "Chinese Simplified"
+msgstr "中国語（簡体字）"
+
+#: Preferences.java:86
+msgid "Chinese Traditional"
 msgstr ""
 
-#: Preferences.java:117
-msgid "Chinese Taiwan"
-msgstr ""
-
-#: Preferences.java:118
+#: Preferences.java:87
 msgid "Danish"
-msgstr ""
+msgstr "デンマーク語"
 
-#: Preferences.java:119
+#: Preferences.java:88
 msgid "Dutch"
-msgstr ""
+msgstr "オランダ語"
 
-#: Preferences.java:120
+#: Preferences.java:89
 msgid "English"
-msgstr ""
+msgstr "英語"
 
-#: Preferences.java:121
+#: Preferences.java:90
 msgid "French"
-msgstr ""
+msgstr "フランス語"
 
-#: Preferences.java:122
+#: Preferences.java:91
 msgid "Filipino"
-msgstr ""
+msgstr "フィリピン語"
 
-#: Preferences.java:123
+#: Preferences.java:92
 msgid "Galician"
-msgstr ""
+msgstr "ガリシア語"
 
-#: Preferences.java:124
+#: Preferences.java:93
 msgid "German"
-msgstr ""
+msgstr "ドイツ語"
 
-#: Preferences.java:125
+#: Preferences.java:94
 msgid "Greek"
-msgstr ""
+msgstr "ギリシア語"
 
-#: Preferences.java:126
+#: Preferences.java:95
 msgid "Hungarian"
-msgstr ""
+msgstr "ハンガリー語"
 
-#: Preferences.java:127
+#: Preferences.java:96
 msgid "Italian"
-msgstr ""
+msgstr "イタリア語"
 
-#: Preferences.java:128
+#: Preferences.java:97
 msgid "Japanese"
-msgstr ""
+msgstr "日本語"
 
-#: Preferences.java:129
+#: Preferences.java:98
 msgid "Latvian"
-msgstr ""
+msgstr "ラトビア語"
 
-#: Preferences.java:130
+#: Preferences.java:99
 msgid "Persian"
+msgstr "ペルシャ語"
+
+#: Preferences.java:100
+msgid "Portuguese"
 msgstr ""
 
-#: Preferences.java:131
-msgid "Portuguese (Brazil)"
-msgstr ""
-
-#: Preferences.java:132
+#: Preferences.java:101
 msgid "Romanian"
-msgstr ""
+msgstr "ルーマニア語"
 
-#: Preferences.java:133
+#: Preferences.java:102
 msgid "Russian"
 msgstr ""
 
-#: Preferences.java:134
+#: Preferences.java:103
 msgid "Spanish"
-msgstr ""
+msgstr "スペイン語"
 
-#: Preferences.java:224
+#: Preferences.java:194
 msgid ""
 "Could not read default settings.\n"
 "You'll need to reinstall Arduino."
@@ -1523,16 +1534,16 @@ msgstr ""
 "既定の設定を読み込むことができませんでした。\n"
 "Arduino IDEをもう一度インストールしてください。"
 
-#: Preferences.java:256
+#: Preferences.java:226
 #, java-format
 msgid "Could not read preferences from {0}"
 msgstr "「{0}」から設定を読み込めませんでした。"
 
-#: Preferences.java:275
+#: Preferences.java:245
 msgid "Error reading preferences"
 msgstr "設定ファイルを読み込む際にエラーが発生しました。"
 
-#: Preferences.java:277
+#: Preferences.java:247
 #, java-format
 msgid ""
 "Error reading the preferences file. Please delete (or move)\n"
@@ -1541,67 +1552,67 @@ msgstr ""
 "初期設定ファイルを読み込む際にエラーが発生しました。"
 "「{0}」を削除または移動してから、Arduino IDEを再起動してください。"
 
-#: Preferences.java:313
+#: Preferences.java:283
 msgid "Sketchbook location:"
 msgstr "スケッチブックの保存場所："
 
-#: Preferences.java:328
+#: Preferences.java:298
 msgid "Select new sketchbook location"
-msgstr "スケッチブックの保存場所を決めてください"
+msgstr "スケッチブックの保存場所を決める"
 
-#: Preferences.java:352
+#: Preferences.java:321
+msgid "Editor language: "
+msgstr ""
+
+#: Preferences.java:326 Preferences.java:342
+msgid "  (requires restart of Arduino)"
+msgstr "  変更の反映にはArduino IDEの再起動が必要。"
+
+#: Preferences.java:338
 msgid "Editor font size: "
 msgstr "エディタの文字の大きさ："
 
-#: Preferences.java:356 Preferences.java:444
-msgid "  (requires restart of Arduino)"
-msgstr "（変更の反映には、Arduino IDEの再起動が必要。）"
-
-#: Preferences.java:369
+#: Preferences.java:355
 msgid "Show verbose output during: "
 msgstr "より詳細な情報を表示する："
 
-#: Preferences.java:371
+#: Preferences.java:357
 msgid "compilation "
 msgstr "コンパイル "
 
-#: Preferences.java:373
+#: Preferences.java:359
 msgid "upload"
 msgstr "書き込み"
 
-#: Preferences.java:382
+#: Preferences.java:368
 msgid "Verify code after upload"
-msgstr ""
+msgstr "書き込みを検証する"
 
-#: Preferences.java:391
+#: Preferences.java:377
 msgid "Use external editor"
 msgstr "外部のエディタを使用する。"
 
-#: Preferences.java:401
+#: Preferences.java:387
 msgid "Check for updates on startup"
 msgstr "起動時に最新バージョンの有無をチェックする。"
 
-#: Preferences.java:410
+#: Preferences.java:396
 msgid "Update sketch files to new extension on save (.pde -> .ino)"
-msgstr "スケッチを保存する際に、拡張子を.pdeから.inoに変更する"
+msgstr "スケッチを保存する際に、拡張子を.pdeから.inoに変更する。"
 
-#: Preferences.java:421
+#: Preferences.java:407
 msgid "Automatically associate .ino files with Arduino"
 msgstr ".inoファイルをArduino IDEに関連づける。"
 
-#: Preferences.java:431
-msgid "Preferred Language: "
-msgstr ""
-
-#: Preferences.java:456
+#: Preferences.java:417
 msgid "More preferences can be edited directly in the file"
 msgstr "以下のファイルを直接編集すれば、より多くの設定を行うことができます。"
 
-#: Preferences.java:485
+#: Preferences.java:446
 msgid "(edit only when Arduino is not running)"
-msgstr "（編集する際には、Arduino IDEを終了させておいてください。）"
+msgstr "編集する際には、Arduino IDEを終了させておいてください。"
 
-#: Preferences.java:632
+#: Preferences.java:593
 #, java-format
 msgid "ignoring invalid font size {0}"
 msgstr "フォントサイズの指定「{0}」が異常なので無視します。"
