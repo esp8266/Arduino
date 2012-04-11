@@ -29,7 +29,7 @@ void setup( void )
   pinMode( PIN_LED2, OUTPUT ) ;
   digitalWrite( PIN_LED2, HIGH ) ;
 
-  Serial.begin( 115200 ) ;
+  Serial1.begin( 115200 ) ;
 }
 
 static void led_step1( void )
@@ -44,10 +44,10 @@ static void led_step1( void )
   digitalWrite( PIN_LED2, LOW ) ;   // set the red LED off
 #endif /* sam3u_ek */
 
-#if defined arduino_due
+#if defined arduino_due_x
   digitalWrite( PIN_LED, LOW ) ;  // set the LED on
   digitalWrite( PIN_LED2, LOW ) ;   // set the red LED off
-#endif /* arduino_due */
+#endif /* arduino_due_x */
 }
 
 static void led_step2( void )
@@ -62,10 +62,10 @@ static void led_step2( void )
   digitalWrite( PIN_LED2, HIGH ) ;  // set the red LED on
 #endif /* sam3u_ek */
 
-#if defined arduino_due
+#if defined arduino_due_x
   digitalWrite( PIN_LED, HIGH ) ;   // set the LED off
   digitalWrite( PIN_LED2, HIGH ) ;  // set the red LED on
-#endif /* arduino_due */
+#endif /* arduino_due_x */
 }
 
 void loop( void )
@@ -75,7 +75,16 @@ void loop( void )
   led_step2() ;
   delay( 1000 ) ;              // wait for a second
 
-  Serial.write( '-' ) ;   // send a char
-//  Serial.write( "test1\n" ) ;   // send a string
-//  Serial.write( "test2" ) ;   // send another string
+  Serial1.write( '-' ) ;   // send a char
+//  Serial1.write( "test1\n" ) ;   // send a string
+//  Serial1.write( "test2" ) ;   // send another string
+
+  Serial1.print("Analog ins: ");
+  for (int i=A0; i<A11; i++) {
+    int a = analogRead(i);
+    Serial1.print(a, DEC);
+    Serial1.print(" ");
+  }
+  Serial1.println();
+  delay(100);
 }
