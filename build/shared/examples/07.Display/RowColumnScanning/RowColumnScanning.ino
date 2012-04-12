@@ -50,9 +50,7 @@ int x = 5;
 int y = 5;
 
 void setup() {
-  Serial.begin(9600);
-  // initialize the I/O pins as outputs:
-
+  // initialize the I/O pins as outputs
   // iterate over the pins:
   for (int thisPin = 0; thisPin < 8; thisPin++) {
     // initialize the output pins:
