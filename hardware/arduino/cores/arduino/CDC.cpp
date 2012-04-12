@@ -108,9 +108,8 @@ bool WEAK CDC_Setup(Setup& setup)
 			// like servicing endpoints before the sketch ends
 			if (1200 == _usbLineInfo.dwDTERate) {
 				// We check DTR state to determine if host port is open (bit 0 of lineState).
-				// Serial1.print(">"); Serial1.println(_usbLineInfo.lineState, HEX);
 				if ((_usbLineInfo.lineState & 0x01) == 0) {
-					*(uint16_t *)0x0A00 = 0x7777;
+					*(uint16_t *)0x0800 = 0x7777;
 					wdt_enable(WDTO_120MS);
 				} else {
 					// Most OSs do some intermediate steps when configuring ports and DTR can
@@ -120,7 +119,7 @@ bool WEAK CDC_Setup(Setup& setup)
 	
 					wdt_disable();
 					wdt_reset();
-					*(uint16_t *)0x0A00 = 0x0;
+					*(uint16_t *)0x0800 = 0x0;
 				}
 			}
 			return true;

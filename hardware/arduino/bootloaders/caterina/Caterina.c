@@ -66,7 +66,7 @@ uint16_t RxLEDPulse = 0; // time remaining for Rx LED pulse
 uint16_t Timeout = 0;
 
 uint16_t bootKey = 0x7777;
-volatile uint16_t *const bootKeyPtr = (volatile uint16_t *)0x0A00;
+volatile uint16_t *const bootKeyPtr = (volatile uint16_t *)0x0800;
 
 void StartSketch(void)
 {
@@ -106,25 +106,29 @@ void LEDPulse(void)
 }
 
 /** Main program entry point. This routine configures the hardware required by the bootloader, then continuously
- *  runs the bootloader processing routine until instructed to soft-exit, or hard-reset via the watchdog to start
- *  the loaded application code.
+ *  runs the bootloader processing routine until it times out or is instructed to exit.
  */
 int main(void)
 {
-	/* Watchdog may be configured with a 15 ms period so must disable it before doing anything else */
-	wdt_disable();
-	
-	/* Check the reason for the reset and act accordingly */
-	uint8_t  mcusr_state = MCUSR;		// store the initial state of the Status register
-	MCUSR = 0;							// clear all reset flags	
-	// After a power-on reset skip the bootloader and jump straight to sketch 
-	// if one exists.
-	if (mcusr_state & (1<<PORF) && pgm_read_word(0) != 0xFFFF) {		
-		StartSketch();
-	}
+	/* Save the value of the boot key memory before it is overwritten */
 	uint16_t bootKeyPtrVal = *bootKeyPtr;
 	*bootKeyPtr = 0;
-	if ((mcusr_state & (1<<WDRF)) && (bootKeyPtrVal != bootKey) && (pgm_read_word(0) != 0xFFFF)) {	
+
+	/* Check the reason for the reset so we can act accordingly */
+	uint8_t  mcusr_state = MCUSR;		// store the initial state of the Status register
+	MCUSR = 0;							// clear all reset flags	
+
+	/* Watchdog may be configured with a 15 ms period so must disable it before going any further */
+	wdt_disable();
+	
+	if (mcusr_state & (1<<EXTRF)) {
+		// External reset -  we should continue to self-programming mode.
+	} else if (mcusr_state == (1<<PORF) && pgm_read_word(0) != 0xFFFF) {		
+		// After a power-on reset skip the bootloader and jump straight to sketch 
+		// if one exists.	
+		StartSketch();
+	} else if ((mcusr_state == (1<<WDRF)) && (bootKeyPtrVal != bootKey) && (pgm_read_word(0) != 0xFFFF)) {	
+		// If it looks like an "accidental" watchdog reset then start the sketch.
 		StartSketch();
 	}
 	
