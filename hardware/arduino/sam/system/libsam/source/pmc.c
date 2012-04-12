@@ -33,7 +33,7 @@
 
 #include "chip.h"
 
-#include <assert.h>
+//#include <assert.h>
 
 /*----------------------------------------------------------------------------
  *        Local definitions
@@ -57,7 +57,7 @@
 extern void PMC_EnablePeripheral( uint32_t dwId )
 {
 #if (defined _SAM3S_) || (defined _SAM3S8_) || (defined _SAM3XA_)
-    assert( dwId < 35 ) ;
+    //assert( dwId < 35 ) ;
 
     if ( dwId < 32 )
     {
@@ -103,7 +103,7 @@ extern void PMC_EnablePeripheral( uint32_t dwId )
 extern void PMC_DisablePeripheral( uint32_t dwId )
 {
 #if (defined _SAM3S_) || (defined _SAM3S8_) || (defined _SAM3XA_)
-    assert( dwId < 35 ) ;
+    //assert( dwId < 35 ) ;
 
     if ( dwId < 32 )
     {
@@ -144,7 +144,7 @@ extern void PMC_DisablePeripheral( uint32_t dwId )
 extern uint32_t PMC_IsPeripheralEnabled( uint32_t dwId )
 {
 #if (defined _SAM3S_) || (defined _SAM3S8_) || (defined _SAM3XA_)
-    assert( dwId < 35 ) ;
+    //assert( dwId < 35 ) ;
 
     if ( dwId < 32 )
     {
