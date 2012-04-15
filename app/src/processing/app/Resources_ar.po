@@ -433,7 +433,7 @@ msgstr "http://www.arduino.cc/latest.txt"
 msgid ""
 "A new version of Arduino is available,\n"
 "would you like to visit the Arduino download page?"
-msgstr "اصدار جديد من الارديونو متاح حاليا,\n هل ترغب بزيارة صفحة الارديونو؟"
+msgstr "إصدار جديد من الأردوينو متوفر ,/n هل ترغب بزيارة صفحة تحميل الأردوينو"
 
 #: UpdateCheck.java:108 Preferences.java:76
 msgid "Yes"
@@ -532,7 +532,7 @@ msgstr "خطأ في فتح المنفذ التسلسل ''{0}''."
 msgid ""
 "Serial port ''{0}'' not found. Did you select the right one from the Tools > "
 "Serial Port menu?"
-msgstr "المنفذ التسلسل ''{0}'' غير موجود. هل قمت بإختيار المنفذ الصحيح من قائمة الادوات  > المنفذ التل"
+msgstr "المنفذ التسلسلي ''{0}'' غير موجود. هل قمت بإختيار المنفذ الصحيح من قائمة الادوات  > المنفذ التسلسلي"
 
 #: Serial.java:424
 #, java-format
@@ -707,7 +707,7 @@ msgstr "اسف, السكتش (او المجلد ) مسمى ب \"{0}\" مستخد
 
 #: Sketch.java:479
 msgid "Could not rename the sketch. (0)"
-msgstr "لا يمكن اعادة تسمية السكتش . (0)"
+msgstr "لا يمكن إعادة تسمية السكتش .(0 )"
 
 #: Sketch.java:487 Sketch.java:532
 #, java-format
@@ -754,7 +754,7 @@ msgstr "removeCode: خطأ داخلي .. لا يمكن ايجاد الكود"
 
 #: Sketch.java:724
 msgid "Sketch is read-only"
-msgstr "السكتش للقرائة فقط"
+msgstr "السكتش للقراءة فقط"
 
 #: Sketch.java:725
 msgid ""
@@ -966,7 +966,7 @@ msgstr "خطأ في الترجمة"
 
 #: debug/Compiler.java:465
 msgid "Please import the SPI library from the Sketch > Import Library menu."
-msgstr "رجاءا استورد مكتبة الSPI من سكاتش > استيرادة "
+msgstr "الرجاء استورد مكتبة الـSPI من القائمة سكتش > قائمة استيراد مكتبة"
 
 #: debug/Compiler.java:466
 msgid ""

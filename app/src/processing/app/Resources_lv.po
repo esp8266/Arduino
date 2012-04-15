@@ -1,15 +1,15 @@
 # Latvian translations for the Arduino IDE.
 # Copyright (C) 2012
 # This file is distributed under the same license as the Arduino IDE package.
-# Kristofers <kristozz@gmail.com>, 2012
+# Kristofers Celms<kristozz@gmail.com>, 2012
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 18:10 +0600\n"
-"PO-Revision-Date: 2012-04-07 16:34+0200\n"
-"Last-Translator: Kristofers <kristozz@gmail.com>\n"
+"PO-Revision-Date: 2012-04-15 00:34+0200\n"
+"Last-Translator: Kristofers Celms<kristozz@gmail.com>\n"
 "Language-Team: Latvian\n"
 "Language: lv\n"
 "MIME-Version: 1.0\n"
@@ -162,11 +162,11 @@ msgstr "Traucējummeklēšana"
 
 #: Editor.java:1065
 msgid "Reference"
-msgstr "Norāde"
+msgstr "Atsauce"
 
 #: Editor.java:1073 Editor.java:2728
 msgid "Find in Reference"
-msgstr "Meklēt norādē"
+msgstr "Meklēt atsaucē"
 
 #: Editor.java:1083
 msgid "Frequently Asked Questions"
@@ -246,7 +246,7 @@ msgstr "Meklēt iepriekšējo"
 
 #: Editor.java:1255
 msgid "Use Selection For Find"
-msgstr "Izmantot izīmēto vietu meklēsanai"
+msgstr "Izmantot iezīmēto vietu meklēšanai"
 
 #: Editor.java:1816
 msgid "First select a word to find in the reference."
@@ -525,7 +525,7 @@ msgstr "Abi - jauna rinda un kursora atgriešanās"
 
 #: SerialMonitor.java:130 SerialMonitor.java:133
 msgid " baud"
-msgstr " bods"
+msgstr " bodu"
 
 #: Serial.java:147
 #, java-format
@@ -1525,7 +1525,7 @@ msgstr ""
 
 #: Preferences.java:98
 msgid "Latvian"
-msgstr ""
+msgstr "Latviešu"
 
 #: Preferences.java:99
 msgid "Persian"
