@@ -78,7 +78,7 @@ msgstr "プリンタの設定..."
 msgid "Print"
 msgstr "印刷..."
 
-#: Editor.java:576 Preferences.java:263
+#: Editor.java:576 Preferences.java:277
 msgid "Preferences"
 msgstr "環境設定"
 
@@ -327,7 +327,7 @@ msgstr "移動中"
 
 #: Editor.java:2120 Editor.java:2131 Editor.java:2141 Editor.java:2159
 #: Sketch.java:479 Sketch.java:485 Sketch.java:500 Sketch.java:507
-#: Sketch.java:530 Sketch.java:547 Base.java:1861 Preferences.java:224
+#: Sketch.java:530 Sketch.java:547 Base.java:1861 Preferences.java:238
 msgid "Error"
 msgstr "エラー"
 
@@ -1447,86 +1447,110 @@ msgid "System Default"
 msgstr ""
 
 #: Preferences.java:84
+msgid "Arabic"
+msgstr ""
+
+#: Preferences.java:85
+msgid "Aragonese"
+msgstr ""
+
+#: Preferences.java:86
 msgid "Catalan"
 msgstr "カタルーニャ語"
 
-#: Preferences.java:85
+#: Preferences.java:87
 msgid "Chinese Simplified"
 msgstr "中国語（簡体字）"
 
-#: Preferences.java:86
+#: Preferences.java:88
 msgid "Chinese Traditional"
 msgstr ""
 
-#: Preferences.java:87
+#: Preferences.java:89
 msgid "Danish"
 msgstr "デンマーク語"
 
-#: Preferences.java:88
+#: Preferences.java:90
 msgid "Dutch"
 msgstr "オランダ語"
 
-#: Preferences.java:89
+#: Preferences.java:91
 msgid "English"
 msgstr "英語"
 
-#: Preferences.java:90
+#: Preferences.java:92
+msgid "Estonian"
+msgstr ""
+
+#: Preferences.java:93
 msgid "French"
 msgstr "フランス語"
 
-#: Preferences.java:91
+#: Preferences.java:94
 msgid "Filipino"
 msgstr "フィリピン語"
 
-#: Preferences.java:92
+#: Preferences.java:95
 msgid "Galician"
 msgstr "ガリシア語"
 
-#: Preferences.java:93
+#: Preferences.java:96
 msgid "German"
 msgstr "ドイツ語"
 
-#: Preferences.java:94
+#: Preferences.java:97
 msgid "Greek"
 msgstr "ギリシア語"
 
-#: Preferences.java:95
+#: Preferences.java:98
 msgid "Hungarian"
 msgstr "ハンガリー語"
 
-#: Preferences.java:96
+#: Preferences.java:99
 msgid "Italian"
 msgstr "イタリア語"
 
-#: Preferences.java:97
+#: Preferences.java:100
 msgid "Japanese"
 msgstr "日本語"
 
-#: Preferences.java:98
+#: Preferences.java:101
+msgid "Korean"
+msgstr ""
+
+#: Preferences.java:102
 msgid "Latvian"
 msgstr "ラトビア語"
 
-#: Preferences.java:99
+#: Preferences.java:103
+msgid "Lithuaninan"
+msgstr ""
+
+#: Preferences.java:104
 msgid "Persian"
 msgstr "ペルシャ語"
 
-#: Preferences.java:100
+#: Preferences.java:105
+msgid "Polish"
+msgstr ""
+
+#: Preferences.java:106 Preferences.java:107
 msgid "Portuguese"
 msgstr ""
 
-#: Preferences.java:101
+#: Preferences.java:108
 msgid "Romanian"
 msgstr "ルーマニア語"
 
-#: Preferences.java:102
+#: Preferences.java:109
 msgid "Russian"
 msgstr ""
 
-#: Preferences.java:103
+#: Preferences.java:110
 msgid "Spanish"
 msgstr "スペイン語"
 
-#: Preferences.java:194
+#: Preferences.java:208
 msgid ""
 "Could not read default settings.\n"
 "You'll need to reinstall Arduino."
@@ -1534,16 +1558,16 @@ msgstr ""
 "既定の設定を読み込むことができませんでした。\n"
 "Arduino IDEをもう一度インストールしてください。"
 
-#: Preferences.java:226
+#: Preferences.java:240
 #, java-format
 msgid "Could not read preferences from {0}"
 msgstr "「{0}」から設定を読み込めませんでした。"
 
-#: Preferences.java:245
+#: Preferences.java:259
 msgid "Error reading preferences"
 msgstr "設定ファイルを読み込む際にエラーが発生しました。"
 
-#: Preferences.java:247
+#: Preferences.java:261
 #, java-format
 msgid ""
 "Error reading the preferences file. Please delete (or move)\n"
@@ -1552,67 +1576,67 @@ msgstr ""
 "初期設定ファイルを読み込む際にエラーが発生しました。"
 "「{0}」を削除または移動してから、Arduino IDEを再起動してください。"
 
-#: Preferences.java:283
+#: Preferences.java:297
 msgid "Sketchbook location:"
 msgstr "スケッチブックの保存場所："
 
-#: Preferences.java:298
+#: Preferences.java:312
 msgid "Select new sketchbook location"
 msgstr "スケッチブックの保存場所を決める"
 
-#: Preferences.java:321
+#: Preferences.java:335
 msgid "Editor language: "
 msgstr ""
 
-#: Preferences.java:326 Preferences.java:342
+#: Preferences.java:340 Preferences.java:356
 msgid "  (requires restart of Arduino)"
 msgstr "  変更の反映にはArduino IDEの再起動が必要。"
 
-#: Preferences.java:338
+#: Preferences.java:352
 msgid "Editor font size: "
 msgstr "エディタの文字の大きさ："
 
-#: Preferences.java:355
+#: Preferences.java:369
 msgid "Show verbose output during: "
 msgstr "より詳細な情報を表示する："
 
-#: Preferences.java:357
+#: Preferences.java:371
 msgid "compilation "
 msgstr "コンパイル "
 
-#: Preferences.java:359
+#: Preferences.java:373
 msgid "upload"
 msgstr "書き込み"
 
-#: Preferences.java:368
+#: Preferences.java:382
 msgid "Verify code after upload"
 msgstr "書き込みを検証する"
 
-#: Preferences.java:377
+#: Preferences.java:391
 msgid "Use external editor"
 msgstr "外部のエディタを使用する。"
 
-#: Preferences.java:387
+#: Preferences.java:401
 msgid "Check for updates on startup"
 msgstr "起動時に最新バージョンの有無をチェックする。"
 
-#: Preferences.java:396
+#: Preferences.java:410
 msgid "Update sketch files to new extension on save (.pde -> .ino)"
 msgstr "スケッチを保存する際に、拡張子を.pdeから.inoに変更する。"
 
-#: Preferences.java:407
+#: Preferences.java:421
 msgid "Automatically associate .ino files with Arduino"
 msgstr ".inoファイルをArduino IDEに関連づける。"
 
-#: Preferences.java:417
+#: Preferences.java:431
 msgid "More preferences can be edited directly in the file"
 msgstr "以下のファイルを直接編集すれば、より多くの設定を行うことができます。"
 
-#: Preferences.java:446
+#: Preferences.java:460
 msgid "(edit only when Arduino is not running)"
 msgstr "編集する際には、Arduino IDEを終了させておいてください。"
 
-#: Preferences.java:593
+#: Preferences.java:607
 #, java-format
 msgid "ignoring invalid font size {0}"
 msgstr "フォントサイズの指定「{0}」が異常なので無視します。"

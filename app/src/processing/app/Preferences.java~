@@ -103,8 +103,7 @@ public class Preferences {
                         "Lietuvių Kalba" + " (" + _("Lithuaninan") + ")",
                         "فارسی" + " (" + _("Persian") + ")",
                         "Język Polski" + " (" + _("Polish") + ")",
-                        "Português" + " (" + _("Portuguese") + " - Brazil)",
-                        "Português" + " (" + _("Portuguese") + " - Portugal)",
+                        "Português" + " (" + _("Portuguese") + ")",
                         "Română" + " (" + _("Romanian") + ")",
                         "Русский" + " (" + _("Russian") + ")",
                         "Español" + " (" + _("Spanish") + ")"};
@@ -133,7 +132,6 @@ public class Preferences {
                         "fa",
                         "pl",
                         "pt_br",
-                        "pt_pt",
                         "ro",
                         "ru",
                         "es"};

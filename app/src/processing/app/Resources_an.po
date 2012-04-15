@@ -2,13 +2,13 @@
 # Copyright (C) 2012 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the Arduino IDE package.
 # Juan Pablo Martinez <juanpabl@gmail.com>, 2012.
-# Juan Pablo Martínez Cortés <juanpabl@gmail.com>, 2012.
+# Daniel Martinez <entaltoaragon@gmail.com>, 2012.
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: 1.0.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-04-03 07:48+0200\n"
-"PO-Revision-Date: 2012-04-14 15:25+0200\n"
+"PO-Revision-Date: 2012-04-15 20:54+0200\n"
 "Last-Translator: Juan Pablo Martínez Cortés <juanpabl@gmail.com>\n"
 "Language-Team: Softaragonés\n"
 "Language: an\n"
@@ -70,17 +70,17 @@ msgstr "Cargar"
 
 #: Editor.java:546 EditorToolbar.java:46
 msgid "Upload Using Programmer"
-msgstr "Cargar fendo servir o Programador"
+msgstr "Cargar fendo servir o programador"
 
 #: Editor.java:556
 msgid "Page Setup"
-msgstr "Configuración d'a Pachina"
+msgstr "Configuración d'a pachina"
 
 #: Editor.java:564
 msgid "Print"
 msgstr "Imprentar"
 
-#: Editor.java:576 Preferences.java:263
+#: Editor.java:576 Preferences.java:277
 msgid "Preferences"
 msgstr "Preferencias"
 
@@ -102,7 +102,7 @@ msgstr "Importar Biblioteca..."
 
 #: Editor.java:634
 msgid "Show Sketch Folder"
-msgstr "Amostrar a Carpeta de Sketch"
+msgstr "Amostrar a Carpeta de sketch"
 
 #: Editor.java:643
 msgid "Add File..."
@@ -114,7 +114,7 @@ msgstr "Ferramientas"
 
 #: Editor.java:662 EditorToolbar.java:41 EditorToolbar.java:46
 msgid "Serial Monitor"
-msgstr "Monitor Serial"
+msgstr "Monitor serie"
 
 #: Editor.java:682
 msgid "Board"
@@ -122,7 +122,7 @@ msgstr "Tarcheta"
 
 #: Editor.java:690
 msgid "Serial Port"
-msgstr "Puerto Serial"
+msgstr "Puerto serie"
 
 #: Editor.java:695
 msgid "Programmer"
@@ -130,7 +130,7 @@ msgstr "Programador"
 
 #: Editor.java:699
 msgid "Burn Bootloader"
-msgstr "Gravar Seqüencia d'inicio"
+msgstr "Gravar o bootloader"
 
 #: Editor.java:923
 msgid "serialMenu is null"
@@ -166,7 +166,7 @@ msgstr "Referencia"
 
 #: Editor.java:1073 Editor.java:2728
 msgid "Find in Reference"
-msgstr "Trobar en a Referencia"
+msgstr "Trobar en a referencia"
 
 #: Editor.java:1083
 msgid "Frequently Asked Questions"
@@ -218,7 +218,7 @@ msgstr "Apegar"
 
 #: Editor.java:1184 Editor.java:2692
 msgid "Select All"
-msgstr "Seleccionar-lo Tot"
+msgstr "Seleccionar-lo tot"
 
 #: Editor.java:1194 Editor.java:2702
 msgid "Comment/Uncomment"
@@ -282,10 +282,10 @@ msgid ""
 "want to save changes to this sketch<BR> before closing?</b><p>If you don't "
 "save, your changes will be lost."
 msgstr ""
-"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p { "
-"font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Quiers alzar "
-"os cambeos feitos a iste sketch<BR> antes de zarrar?</b><p>Si no los alzas, "
-"os cambeos se perderán."
+"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p "
+"{ font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Quiers "
+"alzar os cambeos feitos a iste sketch<BR> antes de zarrar?</b><p>Si no los "
+"alzas, os cambeos se perderán."
 
 #: Editor.java:2017 Editor.java:2098 Editor.java:2418 Sketch.java:589
 #: Sketch.java:741 Sketch.java:1046 Preferences.java:78
@@ -330,7 +330,7 @@ msgstr "Movendo"
 
 #: Editor.java:2120 Editor.java:2131 Editor.java:2141 Editor.java:2159
 #: Sketch.java:479 Sketch.java:485 Sketch.java:500 Sketch.java:507
-#: Sketch.java:530 Sketch.java:547 Base.java:1861 Preferences.java:224
+#: Sketch.java:530 Sketch.java:547 Base.java:1861 Preferences.java:238
 msgid "Error"
 msgstr "Error"
 
@@ -374,12 +374,12 @@ msgid ""
 "Serial port {0} not found.\n"
 "Retry the upload with another serial port?"
 msgstr ""
-"No s'ha trobau o pueto serial {0}.\n"
-"Quiers tornar a intentar a carga con belatro puerto serial?"
+"No s'ha trobau o puerto serie {0}.\n"
+"Quiers tornar a intentar a carga con belatro puerto serie?"
 
 #: Editor.java:2331
 msgid "Uploading to I/O Board..."
-msgstr "Cargando ta la Tarcheta I/O..."
+msgstr "Cargando ta la tarcheta I/O..."
 
 #: Editor.java:2348 Editor.java:2384
 msgid "Done uploading."
@@ -400,16 +400,16 @@ msgstr "S'ha cancelau a exportación: en primeras has d'alzaus os cambeos."
 #: Editor.java:2457
 msgid "Burning bootloader to I/O Board (this may take a minute)..."
 msgstr ""
-"Se ye gravando a seqüencia d'inicio en a Tarcheta I/O (podría tardar un "
+"Se ye gravando o bootloader en a tarcheta I/O (podría tardar un "
 "minuto)..."
 
 #: Editor.java:2463
 msgid "Done burning bootloader."
-msgstr "S'ha rematau a gravación d'a seqüencia d'inicio."
+msgstr "S'ha rematau a gravación d'o bootloader."
 
 #: Editor.java:2465 Editor.java:2469 Editor.java:2473
 msgid "Error while burning bootloader."
-msgstr "S'ha trobau una error en gravar a seqüencia d'inicio."
+msgstr "S'ha trobau una error en gravar o bootloader."
 
 #: Editor.java:2500
 msgid "Printing..."
@@ -534,13 +534,13 @@ msgid ""
 "Serial port ''{0}'' already in use. Try quiting any programs that may be "
 "using it."
 msgstr ""
-"O puerto serial ''{0}'' ya ye en uso. Intenta-lo zarrando qualsiquier atro "
+"O puerto serie ''{0}'' ya ye en uso. Mira de zarrar qualsiquier atro "
 "programa que lo podese estar usando."
 
 #: Serial.java:154
 #, java-format
 msgid "Error opening serial port ''{0}''."
-msgstr "S'ha trobau una error en ubrir o puerto serial ''{0}''."
+msgstr "S'ha trobau una error en ubrir o puerto serie ''{0}''."
 
 #: Serial.java:167
 #, java-format
@@ -548,8 +548,8 @@ msgid ""
 "Serial port ''{0}'' not found. Did you select the right one from the Tools > "
 "Serial Port menu?"
 msgstr ""
-"No s'ha trobau o puerto serial ''{0}''. Yes seguro que trigués o correcto en "
-"o menú Ferramientas > Puerto Serial?"
+"No s'ha trobau o puerto serie ''{0}''. Yes seguro que trigués o correcto en "
+"o menú Ferramientas > Puerto Serie?"
 
 #: Serial.java:424
 #, java-format
@@ -567,11 +567,11 @@ msgstr "S'ha trobau una error en Serial.{0}()"
 
 #: tools/AutoFormat.java:91
 msgid "Auto Format"
-msgstr "Formato Automatico"
+msgstr "Formato automatico"
 
 #: tools/AutoFormat.java:913 tools/format/src/AutoFormat.java:54
 msgid "No changes necessary for Auto Format."
-msgstr "No s'amenista garra cambeo ta o Formato Automatico."
+msgstr "No s'amenista garra cambeo ta o formato automatico."
 
 #: tools/AutoFormat.java:919
 msgid "Auto Format Canceled: Too many right parentheses."
@@ -614,7 +614,7 @@ msgstr ""
 
 #: tools/Archiver.java:48
 msgid "Archive Sketch"
-msgstr "Archivar o Sketch"
+msgstr "Archivar o sketch"
 
 #: tools/Archiver.java:59
 msgid "yyMMdd"
@@ -938,7 +938,7 @@ msgid ""
 " Will attempt to re-save in the same location,\n"
 "but anything besides the code will be lost."
 msgstr ""
-"A carpeta sketch ha desapareixiu.\n"
+"A carpeta de sketches ha desapareixiu.\n"
 " Se mirará de tornar a alzar-la en o mesmo puesto,\n"
 "pero tot, fueras d'o codigo, se perderá."
 
@@ -979,14 +979,14 @@ msgstr "Error de compilación, por favor ninvia iste codigo a {0}"
 msgid ""
 "the selected serial port {0} does not exist or your board is not connected"
 msgstr ""
-"o puerto serial seleccionau {0} no existe u a tuya tarcheta ye sin connectar"
+"o puerto serie seleccionau {0} no existe u a tuya tarcheta ye sin connectar"
 
 #: debug/Uploader.java:203
 msgid ""
 "Device is not responding, check the right serial port is selected or RESET "
 "the board right before exporting"
 msgstr ""
-"O dispositivo no responde, revisa que siga seleccionau o puerto serial u "
+"O dispositivo no responde, revisa que siga seleccionau o puerto serie u "
 "REINICIA a tarcheta antes d'exportar"
 
 #: debug/Uploader.java:209
@@ -1039,11 +1039,6 @@ msgid ""
 "library.\n"
 "\n"
 msgstr ""
-"\n"
-"Dende Arduino 0019, a biblioteca d'Ethernet pende en a biblioteca SPI.\n"
-"Pareixe que la yes fendo servir u belatra biblioteca que tamién pende en a "
-"biblioteca SPI.\n"
-"\n"
 
 #: debug/Compiler.java:471
 msgid "The 'BYTE' keyword is no longer supported."
@@ -1089,8 +1084,8 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"Dende Arduino 1.0, a clase Server en a biblioteca Ethernet s'ha renombrau\n"
-"como EthernetServer.\n"
+"Dende Arduino 1.0, a clase Client en a biblioteca Ethernet s'ha renombrau\n"
+"como EthernetClient.\n"
 "\n"
 
 #: debug/Compiler.java:489
@@ -1237,8 +1232,8 @@ msgid ""
 "{ font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Are you "
 "sure you want to Quit?</b><p>Closing the last open sketch will quit Arduino."
 msgstr ""
-"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p { "
-"font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Yes \n"
+"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p "
+"{ font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Yes \n"
 "seguro que quiers salir-ne?</b><p>Si zarras o zaguer sketch ubierto se "
 "zarrará\n"
 "Arduino."
@@ -1478,86 +1473,110 @@ msgid "System Default"
 msgstr ""
 
 #: Preferences.java:84
+msgid "Arabic"
+msgstr ""
+
+#: Preferences.java:85
+msgid "Aragonese"
+msgstr ""
+
+#: Preferences.java:86
 msgid "Catalan"
 msgstr "Catalán"
 
-#: Preferences.java:85
+#: Preferences.java:87
 msgid "Chinese Simplified"
 msgstr "Chinés Simplificau"
 
-#: Preferences.java:86
+#: Preferences.java:88
 msgid "Chinese Traditional"
 msgstr ""
 
-#: Preferences.java:87
+#: Preferences.java:89
 msgid "Danish"
 msgstr "Danés"
 
-#: Preferences.java:88
+#: Preferences.java:90
 msgid "Dutch"
 msgstr "Neerlandés"
 
-#: Preferences.java:89
+#: Preferences.java:91
 msgid "English"
 msgstr "Anglés"
 
-#: Preferences.java:90
+#: Preferences.java:92
+msgid "Estonian"
+msgstr ""
+
+#: Preferences.java:93
 msgid "French"
 msgstr "Francés"
 
-#: Preferences.java:91
+#: Preferences.java:94
 msgid "Filipino"
 msgstr "Filipino"
 
-#: Preferences.java:92
+#: Preferences.java:95
 msgid "Galician"
 msgstr "Gallego"
 
-#: Preferences.java:93
+#: Preferences.java:96
 msgid "German"
 msgstr "Alemán"
 
-#: Preferences.java:94
+#: Preferences.java:97
 msgid "Greek"
 msgstr "Griego"
 
-#: Preferences.java:95
+#: Preferences.java:98
 msgid "Hungarian"
 msgstr "Hongaro"
 
-#: Preferences.java:96
+#: Preferences.java:99
 msgid "Italian"
 msgstr "Italián"
 
-#: Preferences.java:97
+#: Preferences.java:100
 msgid "Japanese"
 msgstr "Chaponés"
 
-#: Preferences.java:98
+#: Preferences.java:101
+msgid "Korean"
+msgstr ""
+
+#: Preferences.java:102
 msgid "Latvian"
 msgstr "Letón"
 
-#: Preferences.java:99
+#: Preferences.java:103
+msgid "Lithuaninan"
+msgstr ""
+
+#: Preferences.java:104
 msgid "Persian"
 msgstr "Persa"
 
-#: Preferences.java:100
+#: Preferences.java:105
+msgid "Polish"
+msgstr ""
+
+#: Preferences.java:106 Preferences.java:107
 msgid "Portuguese"
 msgstr ""
 
-#: Preferences.java:101
+#: Preferences.java:108
 msgid "Romanian"
 msgstr "Rumán"
 
-#: Preferences.java:102
+#: Preferences.java:109
 msgid "Russian"
 msgstr ""
 
-#: Preferences.java:103
+#: Preferences.java:110
 msgid "Spanish"
 msgstr "Espanyol"
 
-#: Preferences.java:194
+#: Preferences.java:208
 msgid ""
 "Could not read default settings.\n"
 "You'll need to reinstall Arduino."
@@ -1565,16 +1584,16 @@ msgstr ""
 "No s'ha puesto leyer a configuración predeterminada.\n"
 "Te caldrá tornar a instalar Arduino."
 
-#: Preferences.java:226
+#: Preferences.java:240
 #, java-format
 msgid "Could not read preferences from {0}"
 msgstr "No s'ha puesto leyer as preferencias de {0}"
 
-#: Preferences.java:245
+#: Preferences.java:259
 msgid "Error reading preferences"
 msgstr "Error en leyer as preferencias"
 
-#: Preferences.java:247
+#: Preferences.java:261
 #, java-format
 msgid ""
 "Error reading the preferences file. Please delete (or move)\n"
@@ -1583,69 +1602,69 @@ msgstr ""
 "Error en leyer o fichero de preferencias. Por favor borra (u mueve)\n"
 "{0} y reinicia Arduino."
 
-#: Preferences.java:283
+#: Preferences.java:297
 msgid "Sketchbook location:"
 msgstr "Ubicación d'o sketchbook:"
 
-#: Preferences.java:298
+#: Preferences.java:312
 msgid "Select new sketchbook location"
 msgstr "Selecciona a nueva ubicación d'o sketchbook"
 
-#: Preferences.java:321
+#: Preferences.java:335
 msgid "Editor language: "
 msgstr ""
 
-#: Preferences.java:326 Preferences.java:342
+#: Preferences.java:340 Preferences.java:356
 msgid "  (requires restart of Arduino)"
 msgstr "  (cal reiniciar Arduino)"
 
-#: Preferences.java:338
+#: Preferences.java:352
 msgid "Editor font size: "
 msgstr "Grandaria de tipo de letra ta l'editor: "
 
-#: Preferences.java:355
+#: Preferences.java:369
 msgid "Show verbose output during: "
 msgstr "Amostrar resultau detallau entre: "
 
-#: Preferences.java:357
+#: Preferences.java:371
 msgid "compilation "
 msgstr "compilación "
 
-#: Preferences.java:359
+#: Preferences.java:373
 msgid "upload"
 msgstr "carga"
 
-#: Preferences.java:368
+#: Preferences.java:382
 msgid "Verify code after upload"
 msgstr "Verificar o codigo dimpués de cargar"
 
-#: Preferences.java:377
+#: Preferences.java:391
 msgid "Use external editor"
 msgstr "Fer servir un editor externo"
 
-#: Preferences.java:387
+#: Preferences.java:401
 msgid "Check for updates on startup"
 msgstr "Verificar actualizacions en empecipiar"
 
-#: Preferences.java:396
+#: Preferences.java:410
 msgid "Update sketch files to new extension on save (.pde -> .ino)"
 msgstr ""
 "Actualizar fichers de sketch a nueva extensión en alzar \n"
 "(.pde -> .ino)"
 
-#: Preferences.java:407
+#: Preferences.java:421
 msgid "Automatically associate .ino files with Arduino"
 msgstr "Asociar automaticament fichers .ino con Arduino"
 
-#: Preferences.java:417
+#: Preferences.java:431
 msgid "More preferences can be edited directly in the file"
 msgstr "Mas preferencias se pueden editar dreitament en o fichero"
 
-#: Preferences.java:446
+#: Preferences.java:460
 msgid "(edit only when Arduino is not running)"
 msgstr "(editar nomaś quan Arduino no se siga executando)"
 
-#: Preferences.java:593
+#: Preferences.java:607
 #, java-format
 msgid "ignoring invalid font size {0}"
 msgstr "ignorando a grandaria invalida d'o tipo de letra {0}"
