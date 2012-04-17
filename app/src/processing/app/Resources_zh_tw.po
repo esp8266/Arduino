@@ -78,7 +78,7 @@ msgstr "頁面設定"
 msgid "Print"
 msgstr "列印"
 
-#: Editor.java:576 Preferences.java:277
+#: Editor.java:576 Preferences.java:279
 msgid "Preferences"
 msgstr "偏好設定"
 
@@ -328,7 +328,7 @@ msgstr "移動中"
 
 #: Editor.java:2120 Editor.java:2131 Editor.java:2141 Editor.java:2159
 #: Sketch.java:479 Sketch.java:485 Sketch.java:500 Sketch.java:507
-#: Sketch.java:530 Sketch.java:547 Base.java:1861 Preferences.java:238
+#: Sketch.java:530 Sketch.java:547 Base.java:1861 Preferences.java:240
 msgid "Error"
 msgstr "錯誤"
 
@@ -1515,50 +1515,54 @@ msgid "Hungarian"
 msgstr ""
 
 #: Preferences.java:99
-msgid "Italian"
+msgid "Indonesian"
 msgstr ""
 
 #: Preferences.java:100
-msgid "Japanese"
+msgid "Italian"
 msgstr ""
 
 #: Preferences.java:101
-msgid "Korean"
+msgid "Japanese"
 msgstr ""
 
 #: Preferences.java:102
-msgid "Latvian"
+msgid "Korean"
 msgstr ""
 
 #: Preferences.java:103
-msgid "Lithuaninan"
+msgid "Latvian"
 msgstr ""
 
 #: Preferences.java:104
-msgid "Persian"
+msgid "Lithuaninan"
 msgstr ""
 
 #: Preferences.java:105
+msgid "Persian"
+msgstr ""
+
+#: Preferences.java:106
 msgid "Polish"
 msgstr ""
 
-#: Preferences.java:106 Preferences.java:107
+#: Preferences.java:107 Preferences.java:108
 msgid "Portuguese"
 msgstr ""
 
-#: Preferences.java:108
+#: Preferences.java:109
 msgid "Romanian"
 msgstr ""
 
-#: Preferences.java:109
+#: Preferences.java:110
 msgid "Russian"
 msgstr ""
 
-#: Preferences.java:110
+#: Preferences.java:111
 msgid "Spanish"
 msgstr ""
 
-#: Preferences.java:208
+#: Preferences.java:210
 msgid ""
 "Could not read default settings.\n"
 "You'll need to reinstall Arduino."
@@ -1566,16 +1570,16 @@ msgstr ""
 "無法讀取預設設定，\n"
 "你需要重新安裝Arduino"
 
-#: Preferences.java:240
+#: Preferences.java:242
 #, java-format
 msgid "Could not read preferences from {0}"
 msgstr "無法從{0}讀取偏好設定"
 
-#: Preferences.java:259
+#: Preferences.java:261
 msgid "Error reading preferences"
 msgstr "讀取偏好設定時發生錯誤"
 
-#: Preferences.java:261
+#: Preferences.java:263
 #, java-format
 msgid ""
 "Error reading the preferences file. Please delete (or move)\n"
@@ -1584,67 +1588,67 @@ msgstr ""
 "讀取偏好設定檔時發生錯誤，請刪除（或移動）\n"
 "{0}並且重新啟動Arduino"
 
-#: Preferences.java:297
+#: Preferences.java:299
 msgid "Sketchbook location:"
 msgstr "草稿碼簿的位置："
 
-#: Preferences.java:312
+#: Preferences.java:314
 msgid "Select new sketchbook location"
 msgstr "選擇新的草稿碼簿位置"
 
-#: Preferences.java:335
+#: Preferences.java:337
 msgid "Editor language: "
 msgstr ""
 
-#: Preferences.java:340 Preferences.java:356
+#: Preferences.java:342 Preferences.java:358
 msgid "  (requires restart of Arduino)"
 msgstr "  （需要重新啟動Arduino）"
 
-#: Preferences.java:352
+#: Preferences.java:354
 msgid "Editor font size: "
 msgstr "編輯器字型大小："
 
-#: Preferences.java:369
+#: Preferences.java:371
 msgid "Show verbose output during: "
 msgstr "顯示詳細輸出："
 
-#: Preferences.java:371
+#: Preferences.java:373
 msgid "compilation "
 msgstr "編譯"
 
-#: Preferences.java:373
+#: Preferences.java:375
 msgid "upload"
 msgstr "上傳"
 
-#: Preferences.java:382
+#: Preferences.java:384
 msgid "Verify code after upload"
 msgstr ""
 
-#: Preferences.java:391
+#: Preferences.java:393
 msgid "Use external editor"
 msgstr "使用外部編輯器"
 
-#: Preferences.java:401
+#: Preferences.java:403
 msgid "Check for updates on startup"
 msgstr "在啟動時檢查更新"
 
-#: Preferences.java:410
+#: Preferences.java:412
 msgid "Update sketch files to new extension on save (.pde -> .ino)"
 msgstr "儲存時更新草稿碼檔案的附檔名（.pde -> .ino）"
 
-#: Preferences.java:421
+#: Preferences.java:423
 msgid "Automatically associate .ino files with Arduino"
 msgstr "自動將.ino檔案與Arduino關聯起來"
 
-#: Preferences.java:431
+#: Preferences.java:433
 msgid "More preferences can be edited directly in the file"
 msgstr "在偏好設定檔案裡還有更多的設定值，可以直接編輯"
 
-#: Preferences.java:460
+#: Preferences.java:462
 msgid "(edit only when Arduino is not running)"
 msgstr "（只能在不執行Arduino時進行編輯）"
 
-#: Preferences.java:607
+#: Preferences.java:609
 #, java-format
 msgid "ignoring invalid font size {0}"
 msgstr "忽略無效的字型大小{0}"

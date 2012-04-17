@@ -3,11 +3,14 @@
 # This file is distributed under the same license as the IDE_translations package.
 # Alexis Morin <mail@alexismorin.com>, 2012.
 # Denis Barbier <bouzim@gmail.com>, 2012.
+# Philippe Rivet <philipe.rivet at gmail.com>, 2012
 #
 # Lexique des termes utilisés dans cette traduction :
 #  - board : carte
 #  - burn bootloader : graver la séquence d'initialisation
 #  - library : bibliothèque
+#  - look & feel : apparence
+#  - programmer : programmateur
 #  - sketch : croquis
 #  - sketchbook : carnet de croquis
 #  - upload : téléverser/téléversement
@@ -20,7 +23,7 @@ msgstr ""
 "Project-Id-Version: IDE_translations 1.01\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-04-03 07:48+0200\n"
-"PO-Revision-Date: 2012-04-08 09:18+0200\n"
+"PO-Revision-Date: 2012-04-17 09:07+0200\n"
 "Last-Translator: Denis Barbier <bouzim@gmail.com>\n"
 "Language-Team: French\n"
 "Language: fr\n"
@@ -81,7 +84,7 @@ msgstr "Téléverser"
 
 #: Editor.java:546 EditorToolbar.java:46
 msgid "Upload Using Programmer"
-msgstr "Téléverser avec un programmeur"
+msgstr "Téléverser avec un programmateur"
 
 #: Editor.java:556
 msgid "Page Setup"
@@ -91,7 +94,7 @@ msgstr "Mise en page"
 msgid "Print"
 msgstr "Imprimer"
 
-#: Editor.java:576 Preferences.java:277
+#: Editor.java:576 Preferences.java:279
 msgid "Preferences"
 msgstr "Préférences"
 
@@ -137,7 +140,7 @@ msgstr "Port série"
 
 #: Editor.java:695
 msgid "Programmer"
-msgstr "Programmeur"
+msgstr "Programmateur"
 
 #: Editor.java:699
 msgid "Burn Bootloader"
@@ -169,7 +172,7 @@ msgstr "Environnement"
 
 #: Editor.java:1057
 msgid "Troubleshooting"
-msgstr "Solutions aux problèmes"
+msgstr "Dépannage"
 
 #: Editor.java:1065
 msgid "Reference"
@@ -295,7 +298,7 @@ msgid ""
 msgstr ""
 "<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p "
 "{ font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Voulez-"
-"vous enregistrer les changements à ce croquis<BR> avant de fermer ?</b><p>Si "
+"vous enregistrer les changements<BR> avant de fermer ?</b><p>Si "
 "vous n'enregistrez pas, vos changements seront perdus."
 
 #: Editor.java:2017 Editor.java:2098 Editor.java:2418 Sketch.java:589
@@ -341,7 +344,7 @@ msgstr "Déplacement"
 
 #: Editor.java:2120 Editor.java:2131 Editor.java:2141 Editor.java:2159
 #: Sketch.java:479 Sketch.java:485 Sketch.java:500 Sketch.java:507
-#: Sketch.java:530 Sketch.java:547 Base.java:1861 Preferences.java:238
+#: Sketch.java:530 Sketch.java:547 Base.java:1861 Preferences.java:240
 msgid "Error"
 msgstr "Erreur"
 
@@ -390,7 +393,7 @@ msgstr ""
 
 #: Editor.java:2331
 msgid "Uploading to I/O Board..."
-msgstr "Téléversement vers les E/S de la carte..."
+msgstr "Téléversement vers la carte E/S..."
 
 #: Editor.java:2348 Editor.java:2384
 msgid "Done uploading."
@@ -411,7 +414,7 @@ msgstr "Exportation annulée, les changements doivent d'abord être enregistrés
 #: Editor.java:2457
 msgid "Burning bootloader to I/O Board (this may take a minute)..."
 msgstr ""
-"Grave la séquence d'initialisation vers les E/S de la carte\n"
+"Grave la séquence d'initialisation vers la carte E/S\n"
 "(Cela pourrait prendre quelque temps)..."
 
 #: Editor.java:2463
@@ -441,7 +444,7 @@ msgstr "Impression annulée."
 #: Editor.java:2572
 #, java-format
 msgid "Bad error line: {0}"
-msgstr "Mauvaise erreur à la ligne : {0}"
+msgstr "Erreur à la ligne : {0}"
 
 #: Editor.java:2641
 msgid "Open URL"
@@ -457,7 +460,7 @@ msgid ""
 "would you like to visit the Arduino download page?"
 msgstr ""
 "Une nouvelle version d'Arduino est disponible,\n"
-"voudriez-vous visiter la page de téléchargement ?"
+"voulez-vous visiter la page de téléchargement ?"
 
 #: UpdateCheck.java:108 Preferences.java:76
 msgid "Yes"
@@ -559,8 +562,8 @@ msgid ""
 "Serial port ''{0}'' not found. Did you select the right one from the Tools > "
 "Serial Port menu?"
 msgstr ""
-"Port série « {0} » non trouvé. Avez-vous sélectionné le bon dans le menu "
-"Outils > Port Série ?"
+"Port série « {0} » non trouvé. L'avez-vous bien sélectionné dans le menu "
+"Outils > Port série ?"
 
 #: Serial.java:424
 #, java-format
@@ -620,7 +623,7 @@ msgid ""
 "the old version. Use Open to re-open the sketch and try again.\n"
 msgstr ""
 "Une erreur est survenue lors de la réparation de l'encodage du fichier.\n"
-"Ne pas tenter d'enregistrer ce croquis, comme cela pourrait écraser\n"
+"Ne pas tenter d'enregistrer ce croquis, car cela pourrait écraser\n"
 "l'ancienne version. Utiliser Ouvrir pour réouvrir le croquis et réessayer.\n"
 
 #: tools/Archiver.java:48
@@ -697,7 +700,7 @@ msgid ""
 "before trying to rename it?"
 msgstr ""
 "Et si vous enregistriez le croquis\n"
-"avant d'essayer de la renommer ?"
+"avant d'essayer de le renommer ?"
 
 #: Sketch.java:359 Sketch.java:366 Sketch.java:377
 msgid "Problem with rename"
@@ -788,7 +791,7 @@ msgstr "Supprimer"
 
 #: Sketch.java:620
 msgid "Couldn't do it"
-msgstr "N'a pu le faire"
+msgstr "Impossible"
 
 #: Sketch.java:621
 #, java-format
@@ -854,8 +857,8 @@ msgid ""
 "You cannot save the sketch into a folder\n"
 "inside itself. This would go on forever."
 msgstr ""
-"Vous ne pouvez enregistrer le croquis dans un dossier\n"
-"se contenant. Ça irait pour toujours."
+"Vous ne pouvez enregistrer ce croquis dans son\n"
+"propre dossier. Cela ferait une boucle infinie."
 
 #: Sketch.java:979
 msgid "Select an image or other data file to copy to your sketch"
@@ -879,7 +882,7 @@ msgstr "Impossible de supprimer le fichier « {0} » existant."
 
 #: Sketch.java:1078
 msgid "You can't fool me"
-msgstr "Tu ne peux pas me truquer !"
+msgstr "Tu ne peux pas me tromper !"
 
 #: Sketch.java:1079
 msgid ""
@@ -951,7 +954,7 @@ msgid ""
 msgstr ""
 "Le dossier croquis a disparu.\n"
 " Nous allons essayer de réenregistrer au même emplacement,\n"
-"mais tout sauf le code sera perdu."
+"mais seul le code sera conservé."
 
 #: Sketch.java:1810
 msgid "Could not re-save sketch"
@@ -962,9 +965,8 @@ msgid ""
 "Could not properly re-save the sketch. You may be in trouble at this point,\n"
 "and it might be time to copy and paste your code to another text editor."
 msgstr ""
-"Impossible de réenregistrer correctement le croquis. Vous êtes peut-être "
-"dans le pétrin,\n"
-"et il serait temps de copier-coller votre code dans un autre éditeur texte."
+"Impossible de réenregistrer correctement le croquis. Pour éviter de perdre votre\n"
+"travail, faites un copier-coller de votre code dans un autre éditeur texte."
 
 #: Sketch.java:2060
 msgid ""
@@ -991,7 +993,7 @@ msgstr "Erreur de compilation, veuillez soumettre ce code à {0}"
 msgid ""
 "the selected serial port {0} does not exist or your board is not connected"
 msgstr ""
-"le port série sélectionné {0} n'existe pas ou votre carte n'est pas connectée"
+"le port série sélectionné {0} n'existe pas ou votre Arduino n'est pas connectée"
 
 #: debug/Uploader.java:203
 msgid ""
@@ -999,7 +1001,7 @@ msgid ""
 "the board right before exporting"
 msgstr ""
 "L'appareil ne répond pas, vérifiez que le bon port série est sélectionné ou "
-"réinitialisez (RESET) la carte avant d'exporter"
+"réinitialisez (RESET) l'Arduino avant d'exporter"
 
 #: debug/Uploader.java:209
 msgid ""
@@ -1214,7 +1216,7 @@ msgstr ""
 "Le dossier des croquis n'existe plus.\n"
 "Arduino va aller à l'emplacement\n"
 "par défaut, et créer un nouveau dossier\n"
-"croquis si nécessaire. Arduino cessera ensuite\n"
+"si nécessaire. Arduino cessera ensuite\n"
 "de parler de lui-même à la troisième personne."
 
 #: Base.java:532
@@ -1250,7 +1252,7 @@ msgstr ""
 "<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p "
 "{ font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Êtes-"
 "vous certain de vouloir quitter ?</b><p>Fermer le dernier croquis quittera "
-"Arduino."
+"l'environnement Arduino."
 
 #: Base.java:970
 msgid "Contributed"
@@ -1549,67 +1551,71 @@ msgid "Hungarian"
 msgstr "hongrois"
 
 #: Preferences.java:99
+msgid "Indonesian"
+msgstr ""
+
+#: Preferences.java:100
 msgid "Italian"
 msgstr "italien"
 
-#: Preferences.java:100
+#: Preferences.java:101
 msgid "Japanese"
 msgstr "japonais"
 
-#: Preferences.java:101
+#: Preferences.java:102
 msgid "Korean"
 msgstr ""
 
-#: Preferences.java:102
+#: Preferences.java:103
 msgid "Latvian"
 msgstr "letton"
 
-#: Preferences.java:103
+#: Preferences.java:104
 msgid "Lithuaninan"
 msgstr ""
 
-#: Preferences.java:104
+#: Preferences.java:105
 msgid "Persian"
 msgstr "persan"
 
-#: Preferences.java:105
+#: Preferences.java:106
 msgid "Polish"
 msgstr ""
 
-#: Preferences.java:106 Preferences.java:107
+#: Preferences.java:107 Preferences.java:108
 msgid "Portuguese"
 msgstr ""
 
-#: Preferences.java:108
+#: Preferences.java:109
 msgid "Romanian"
 msgstr "roumain"
 
-#: Preferences.java:109
+#: Preferences.java:110
 msgid "Russian"
 msgstr ""
 
-#: Preferences.java:110
+#: Preferences.java:111
 msgid "Spanish"
 msgstr "castillan"
 
-#: Preferences.java:208
+#: Preferences.java:210
 msgid ""
 "Could not read default settings.\n"
 "You'll need to reinstall Arduino."
 msgstr ""
 "Impossible de lire les paramètres par défaut.\n"
-"Vous devrez réinstaller Arduino."
+"Vous devrez réinstaller l'environnement Arduino."
 
-#: Preferences.java:240
+#: Preferences.java:242
 #, java-format
 msgid "Could not read preferences from {0}"
 msgstr "Impossible de lire les préférences depuis {0}"
 
-#: Preferences.java:259
+#: Preferences.java:261
 msgid "Error reading preferences"
 msgstr "Erreur de lecture des préférences"
 
-#: Preferences.java:261
+#: Preferences.java:263
 #, java-format
 msgid ""
 "Error reading the preferences file. Please delete (or move)\n"
@@ -1619,70 +1625,70 @@ msgstr ""
 "déplacer)\n"
 "{0} et redémarrer Arduino."
 
-#: Preferences.java:297
+#: Preferences.java:299
 msgid "Sketchbook location:"
 msgstr "Emplacement du carnet de croquis"
 
-#: Preferences.java:312
+#: Preferences.java:314
 msgid "Select new sketchbook location"
-msgstr "Sélectionner nouvel emplacement du carnet de croquis"
+msgstr "Sélectionner un nouvel emplacement pour le carnet de croquis"
 
-#: Preferences.java:335
+#: Preferences.java:337
 msgid "Editor language: "
 msgstr ""
 
-#: Preferences.java:340 Preferences.java:356
+#: Preferences.java:342 Preferences.java:358
 msgid "  (requires restart of Arduino)"
 msgstr " (nécessite un redémarrage d'Arduino)"
 
-#: Preferences.java:352
+#: Preferences.java:354
 msgid "Editor font size: "
 msgstr "Taille de police de l'éditeur"
 
-#: Preferences.java:369
+#: Preferences.java:371
 msgid "Show verbose output during: "
 msgstr "Afficher les résultats détaillés pendant : "
 
-#: Preferences.java:371
+#: Preferences.java:373
 msgid "compilation "
 msgstr "compilation "
 
-#: Preferences.java:373
+#: Preferences.java:375
 msgid "upload"
 msgstr "téléversement"
 
-#: Preferences.java:382
+#: Preferences.java:384
 msgid "Verify code after upload"
 msgstr "Vérifier le code après téléversement"
 
-#: Preferences.java:391
+#: Preferences.java:393
 msgid "Use external editor"
 msgstr "Utiliser un éditeur externe"
 
-#: Preferences.java:401
+#: Preferences.java:403
 msgid "Check for updates on startup"
-msgstr "Au démarrage, vérifier pour les mises à jour."
+msgstr "Vérifier les mises à jour au démmarrage."
 
-#: Preferences.java:410
+#: Preferences.java:412
 msgid "Update sketch files to new extension on save (.pde -> .ino)"
 msgstr ""
-"Mettre à jour les fichiers de croquis vers la nouvelle extension lors de la "
+"Mettre à jour vers la nouvelle extension lors de la "
 "sauvegarde (.pde -> .ino)"
 
-#: Preferences.java:421
+#: Preferences.java:423
 msgid "Automatically associate .ino files with Arduino"
 msgstr "Associer automatiquement les fichiers .ino avec Arduino"
 
-#: Preferences.java:431
+#: Preferences.java:433
 msgid "More preferences can be edited directly in the file"
 msgstr ""
 "Davantage de préférences peuvent être éditées directement dans le fichier"
 
-#: Preferences.java:460
+#: Preferences.java:462
 msgid "(edit only when Arduino is not running)"
 msgstr "(éditer uniquement lorsque Arduino ne s'exécute pas)"
 
-#: Preferences.java:607
+#: Preferences.java:609
 #, java-format
 msgid "ignoring invalid font size {0}"
 msgstr "ignore la taille de police invalide {0}"
