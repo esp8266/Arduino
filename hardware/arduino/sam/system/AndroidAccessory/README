@@ -1,0 +1,11 @@
+Copyright Google, Inc. 2011
+
+This directory contains files & directories originally found in the
+ADK_release_0512.zip archive:
+
+README.txt                 This file
+AndroidAccessory.*         Open Accessory Protocol and USB Host Libraries
+
+The original README.txt suggested you go to
+http://a.android.com/demokit for more information about how to use the
+ADK.
