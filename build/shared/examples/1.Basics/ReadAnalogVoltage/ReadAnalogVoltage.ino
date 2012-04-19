@@ -1,6 +1,6 @@
 /*
-  AnalogReadSerial
-  Reads an analog input on pin 0, prints the result to the serial monitor.
+  ReadAnalogVoltage
+  Reads an analog input on pin 0, converts it to voltage, and prints the result to the serial monitor.
   Attach the center pin of a potentiometer to pin A0, and the outside pins to +5V and ground.
  
  This example code is in the public domain.
@@ -16,7 +16,8 @@ void setup() {
 void loop() {
   // read the input on analog pin 0:
   int sensorValue = analogRead(A0);
+  // Convert the analog reading (which goes from 0 - 1023) to a voltage (0 - 5V):
+  float voltage = sensorValue * (5.0 / 1023.0);
   // print out the value you read:
-  Serial.println(sensorValue);
-  delay(1);        // delay in between reads for stability
+  Serial.println(voltage);
 }
