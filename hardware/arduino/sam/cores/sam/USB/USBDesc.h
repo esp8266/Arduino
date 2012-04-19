@@ -39,9 +39,9 @@
 #define CDC_ACM_INTERFACE	0	// CDC ACM
 #define CDC_DATA_INTERFACE	1	// CDC Data
 #define CDC_FIRST_ENDPOINT	1
-#define CDC_ENDPOINT_IN	    (CDC_FIRST_ENDPOINT)							// CDC First
+#define CDC_ENDPOINT_ACM	(CDC_FIRST_ENDPOINT)							// CDC First
 #define CDC_ENDPOINT_OUT	(CDC_FIRST_ENDPOINT+1)
-#define CDC_ENDPOINT_ACM	(CDC_FIRST_ENDPOINT+2)
+#define CDC_ENDPOINT_IN		(CDC_FIRST_ENDPOINT+2)
 
 #define HID_INTERFACE		(CDC_ACM_INTERFACE + CDC_INTERFACE_COUNT)		// HID Interface
 #define HID_FIRST_ENDPOINT	(CDC_FIRST_ENDPOINT + CDC_ENPOINT_COUNT)
@@ -58,11 +58,6 @@
 #define HID_TX HID_ENDPOINT_INT
 #endif
 
-#define IMANUFACTURER    (1u)
-#define IPRODUCT	       (2u)
-#define USB_PID_LEONARDO (0x0034u)
-#define USB_PID_MICRO    (0x0035u)
-#define USB_PID_DUE      (0x0036u)
+#define IMANUFACTURER	1
+#define IPRODUCT		2
 
-#define USB_VID          (0x2341u) // Arduino LLC vendor id
-#define USB_PID	         USB_PID_DUE	

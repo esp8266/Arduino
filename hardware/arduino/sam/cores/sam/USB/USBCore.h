@@ -248,7 +248,6 @@ typedef struct
 	InterfaceDescriptor			dif;
 	EndpointDescriptor			in;
 	EndpointDescriptor			out;
-
 } CDCDescriptor;
 
 typedef struct 
