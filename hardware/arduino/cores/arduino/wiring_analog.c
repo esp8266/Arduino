@@ -210,6 +210,9 @@ void analogWrite(uint8_t pin, int val)
 			case TIMER4A:
 				//connect pwm to pin on timer 4, channel A
 				sbi(TCCR4A, COM4A1);
+				#if defined(COM4A0)		// only used on 32U4
+				cbi(TCCR4A, COM4A0);
+				#endif
 				OCR4A = val;	// set pwm duty
 				break;
 			#endif
@@ -234,6 +237,9 @@ void analogWrite(uint8_t pin, int val)
 			case TIMER4D:				
 				// connect pwm to pin on timer 4, channel D
 				sbi(TCCR4C, COM4D1);
+				#if defined(COM4D0)		// only used on 32U4
+				cbi(TCCR4C, COM4D0);
+				#endif
 				OCR4D = val;	// set pwm duty
 				break;
 			#endif
