@@ -6,8 +6,7 @@
  the Adafruit Ethernet shield, either one will work, as long as it's got
  a Wiznet Ethernet module on board.
  
- This example uses the String library, which is part of the Arduino core from
- version 0019. It also uses DNS, by assigning the Ethernet client with a MAC address,
+ This example uses DNS, by assigning the Ethernet client with a MAC address,
  IP address, and DNS address.
  
  Circuit:
