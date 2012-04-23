@@ -16,11 +16,11 @@
 ** SOFTWARE.  
 */
 
+#if defined(USBCON)
 #include "Platform.h"
 #include "USBAPI.h"
 #include <avr/wdt.h>
 
-#if defined(USBCON)
 #ifdef CDC_ENABLED
 
 #if (RAMEND < 1000)
