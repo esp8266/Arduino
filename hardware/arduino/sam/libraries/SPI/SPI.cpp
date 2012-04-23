@@ -56,7 +56,7 @@ void SPIClass::detachInterrupt(void) {
 }
 
 #if SPI_INTERFACES_COUNT > 0
-static void SPI0_Init(void) {
+static void SPI_0_Init(void) {
 	PIO_Configure(g_APinDescription[PIN_SPI_MOSI].pPort,
 			g_APinDescription[PIN_SPI_MOSI].ulPinType,
 			g_APinDescription[PIN_SPI_MOSI].ulPin,
@@ -71,5 +71,5 @@ static void SPI0_Init(void) {
 			g_APinDescription[PIN_SPI_SCK].ulPinConfiguration);
 }
 
-SPIClass SPI0(SPI_INTERFACE, SPI_INTERFACE_ID, SPI0_Init);
+SPIClass SPI_0(SPI_INTERFACE, SPI_INTERFACE_ID, SPI_0_Init);
 #endif

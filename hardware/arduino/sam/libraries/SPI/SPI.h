@@ -57,7 +57,7 @@ class SPIClass {
 };
 
 #if SPI_INTERFACES_COUNT > 0
-extern SPIClass SPI0;
+extern SPIClass SPI_0;
 #endif
 
 #endif

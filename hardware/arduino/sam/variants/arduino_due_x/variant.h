@@ -80,8 +80,8 @@
  */
 #define SPI_INTERFACES_COUNT 1
 
-#define SPI_INTERFACE        SPI
-#define SPI_INTERFACE_ID     ID_SPI
+#define SPI_INTERFACE        SPI0
+#define SPI_INTERFACE_ID     ID_SPI0
 #define PIN_SPI_SS           (77u)
 #define PIN_SPI_MOSI         (75u)
 #define PIN_SPI_MISO         (74u)
