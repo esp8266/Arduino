@@ -21,7 +21,6 @@
 void setup() {
   // initialize serial and wait for the port to open:
   Serial.begin(9600);
-  while(!Serial) ;
 
   // attempt to connect using WEP encryption:
   Serial.println("Initializing Wifi...");

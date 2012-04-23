@@ -18,7 +18,8 @@
  * Analog sensor attached to analog in 0
  * Wifi shield attached to pins 10, 11, 12, 13
  
- created 16 March 2012
+ created 16 Mar 2012
+ modified 23 Apr 2012
  by Tom Igoe
  
  This code is in the public domain.
@@ -50,21 +51,22 @@ boolean lastConnected = false;                 // state of the connection last t
 const unsigned long postingInterval = 10*1000;  //delay between updates to Pachube.com
 
 void setup() {
+  // start serial port:
   Serial.begin(9600);
-  Serial.println("Attempting to connect to Wifi network...");
-  Serial.print("SSID: ");
-  Serial.println(ssid);
 
-  status = WiFi.begin(ssid, pass);
-  if ( status != WL_CONNECTED) { 
-    Serial.println("Couldn't get a wifi connection");
-    // stop here and do nothing:
-    while(true);
+  // attempt to connect to Wifi network:
+  while ( status != WL_CONNECTED) { 
+    Serial.print("Attempting to connect to SSID: ");
+    Serial.println(ssid);
+    status = WiFi.begin(ssid, pass);
+    // wait 10 seconds for connection:
+    delay(10000);
   } 
-  else {
-    Serial.println("Connected to wifi");
-    printWifiStatus();
-  }
+  // you're connected now, so print out the status:
+  printWifiStatus();
+  // print the Wifi board/shield's IP address:
+  Serial.print("My IP address: ");
+  Serial.println(WiFi.localIP());
 }
 
 void loop() {
@@ -160,4 +162,5 @@ void printWifiStatus() {
   Serial.print(rssi);
   Serial.println(" dBm");
 }
+
 

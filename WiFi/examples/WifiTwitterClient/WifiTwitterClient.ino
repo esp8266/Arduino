@@ -13,7 +13,7 @@
  Circuit:
  * WiFi shield attached to pins 10, 11, 12, 13
  
- created 15 Mar 2012
+ created 23 apr 2012
  by Tom Igoe
  
  This code is in the public domain.
@@ -24,8 +24,8 @@
 
 char ssid[] = "YourNetwork"; //  your network SSID (name) 
 char pass[] = "password";    // your network password (use for WPA, or use as key for WEP)
-
 int keyIndex = 0;            // your network key Index number (needed only for WEP)
+
 int status = WL_IDLE_STATUS; // status of the wifi connection
 
 // initialize the library instance:
@@ -49,22 +49,25 @@ void setup() {
   // reserve space for the strings:
   currentLine.reserve(256);
   tweet.reserve(150);
-  // initialize serial:
+  // start serial port:
   Serial.begin(9600);
-  Serial.println("Attempting to connect to WPA network...");
-  
-  status = WiFi.begin(ssid, pass);
-  if ( status != WL_CONNECTED) { 
-    Serial.println("Couldn't get a wifi connection");
-    // stop here and do nothing:
-    while(true);
+
+  // attempt to connect to Wifi network:
+  while ( status != WL_CONNECTED) { 
+    Serial.print("Attempting to connect to SSID: ");
+    Serial.println(ssid);
+    status = WiFi.begin(ssid, pass);
+    // wait 10 seconds for connection:
+    delay(10000);
   } 
- else {
-    Serial.println("Connected to wifi");
-    printWifiStatus();
-    connectToServer();
-  }
+  // you're connected now, so print out the status:
+  printWifiStatus();
+  // print the Wifi board/shield's IP address:
+  Serial.print("My IP address: ");
+  Serial.println(WiFi.localIP());
+  connectToServer();
 }
+
 void loop()
 {
   if (client.connected()) {
@@ -144,6 +147,7 @@ void printWifiStatus() {
   Serial.print(rssi);
   Serial.println(" dBm");
 }
+
 
 
 

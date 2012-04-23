@@ -14,7 +14,7 @@
  
  created 18 Dec 2009
  by David A. Mellis
- modified 12 Mar 2012
+ modified 23 Apr 2012
  by Tom Igoe
  
  */
@@ -34,28 +34,32 @@ WiFiServer server(23);
 boolean alreadyConnected = false; // whether or not the client was connected previously
 
 void setup() {
-  // initialize serial:
+  // start serial port:
   Serial.begin(9600);
-  Serial.println("Attempting to connect to Wifi network...");
-  Serial.print("SSID: ");
-  Serial.println(ssid);
 
-  status = WiFi.begin(ssid, pass);
-  if ( status != WL_CONNECTED) { 
-    Serial.println("Couldn't get a wifi connection");
-    while(true);
+  // attempt to connect to Wifi network:
+  while ( status != WL_CONNECTED) { 
+    Serial.print("Attempting to connect to SSID: ");
+    Serial.println(ssid);
+    status = WiFi.begin(ssid, pass);
+    // wait 10 seconds for connection:
+    delay(10000);
   } 
-  else {
-    server.begin();
-    Serial.print("Connected to wifi.");
-    printWifiStatus();
-  }
+  // start the server:
+  server.begin();
+  // you're connected now, so print out the status:
+  printWifiStatus();
+  // print the Wifi board/shield's IP address:
+  Serial.print("My IP address: ");
+  Serial.println(WiFi.localIP());
 }
+
+
 void loop() {
   // wait for a new client:
   WiFiClient client = server.available();
 
-  
+
   // when the client sends the first byte, say hello:
   if (client) {
     if (!alreadyConnected) {
@@ -94,4 +98,5 @@ void printWifiStatus() {
   Serial.print(rssi);
   Serial.println(" dBm");
 }
+
 

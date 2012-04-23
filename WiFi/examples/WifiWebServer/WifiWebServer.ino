@@ -13,11 +13,9 @@
  
  created 13 July 2010
  by dlf (Metodo2 srl)
- modified 20 Mar 2012
+ modified 23 Apr 2012
  by Tom Igoe
  */
-
-
 #include <SPI.h>
 #include <WiFi.h>
 
@@ -31,22 +29,23 @@ int status = WL_IDLE_STATUS;
 WiFiServer server(80);
 
 void setup() {
-  // initialize serial:
+  // start serial port:
   Serial.begin(9600);
-  Serial.println("Attempting to connect to Wifi network...");
-  Serial.print("SSID: ");
-  Serial.println(ssid);
-
-  status = WiFi.begin(ssid, pass);
-  if ( status != WL_CONNECTED) { 
-    Serial.println("Couldn't get a wifi connection");
-    while(true);
+  
+  // attempt to connect to Wifi network:
+  while ( status != WL_CONNECTED) { 
+    Serial.print("Attempting to connect to SSID: ");
+    Serial.println(ssid);
+    status = WiFi.begin(ssid, pass);
+    // wait 10 seconds for connection:
+    delay(10000);
   } 
-  else {
-    server.begin();
-    Serial.print("Connected to wifi.");
-    printWifiStatus();
-  }
+  server.begin();
+  // you're connected now, so print out the status:
+  printWifiStatus();
+  // print the Wifi board/shield's IP address:
+  Serial.print("My IP address: ");
+  Serial.println(WiFi.localIP());
 }
 
 
