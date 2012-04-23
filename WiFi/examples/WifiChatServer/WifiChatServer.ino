@@ -49,10 +49,7 @@ void setup() {
   server.begin();
   // you're connected now, so print out the status:
   printWifiStatus();
-  // print the Wifi board/shield's IP address:
-  Serial.print("My IP address: ");
-  Serial.println(WiFi.localIP());
-}
+ }
 
 
 void loop() {

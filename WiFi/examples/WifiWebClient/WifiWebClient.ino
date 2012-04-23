@@ -62,7 +62,6 @@ void setup() {
     client.println("Host:www.google.com");
     client.println("Connection: close");
     client.println();
-
   }
 }
 
