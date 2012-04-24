@@ -82,12 +82,19 @@
 
 #define SPI_INTERFACE        SPI0
 #define SPI_INTERFACE_ID     ID_SPI0
-#define PIN_SPI_SS           (77u)
+#define SPI_CHANNELS_NUM 4
+#define PIN_SPI_SS0          (77u)
+#define PIN_SPI_SS1          (4u)
+#define PIN_SPI_SS2          (0u)
+#define PIN_SPI_SS3          (78u)
 #define PIN_SPI_MOSI         (75u)
 #define PIN_SPI_MISO         (74u)
 #define PIN_SPI_SCK          (76u)
 
-static const uint8_t SS   = PIN_SPI_SS ;
+static const uint8_t SS   = PIN_SPI_SS0 ;
+static const uint8_t SS1  = PIN_SPI_SS1 ;
+static const uint8_t SS2  = PIN_SPI_SS2 ;
+static const uint8_t SS3  = PIN_SPI_SS3 ;
 static const uint8_t MOSI = PIN_SPI_MOSI ;
 static const uint8_t MISO = PIN_SPI_MISO ;
 static const uint8_t SCK  = PIN_SPI_SCK ;

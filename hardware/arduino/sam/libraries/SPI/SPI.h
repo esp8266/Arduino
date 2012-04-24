@@ -14,45 +14,42 @@
 #include "variant.h"
 #include <stdio.h>
 
-#define SPI_CLOCK_DIV4   0x00
-#define SPI_CLOCK_DIV16  0x01
-#define SPI_CLOCK_DIV64  0x02
-#define SPI_CLOCK_DIV128 0x03
-#define SPI_CLOCK_DIV2   0x04
-#define SPI_CLOCK_DIV8   0x05
-#define SPI_CLOCK_DIV32  0x06
-#define SPI_CLOCK_DIV64  0x07
-
 #define SPI_MODE0 0x00
-#define SPI_MODE1 0x02
-#define SPI_MODE2 0x01
+#define SPI_MODE1 0x01
+#define SPI_MODE2 0x02
 #define SPI_MODE3 0x03
-
-#define SPI_MODE_MASK 0x03     // CPOL = bit 3, CPHA = bit 2 on SPCR
-#define SPI_CLOCK_MASK 0x03    // SPR1 = bit 1, SPR0 = bit 0 on SPCR
-#define SPI_2XCLOCK_MASK 0x01  // SPI2X = bit 0 on SPSR
 
 class SPIClass {
   public:
-	SPIClass(Spi *_spi, uint32_t _id, void(*_initCb)(void));
+	SPIClass(Spi *_spi, uint32_t _id, void(*_initCb)(void), uint32_t *_ss);
 
-	byte transfer(byte _data);
+	byte transfer(byte _data, uint8_t _channel = 0, bool _last = true);
 
 	// SPI Configuration methods
 
 	void attachInterrupt(void);
-	void detachInterrupt(void); // Default
+	void detachInterrupt(void);
 
-	void begin(void); // Default
+	void begin(void);
+	void addSlave(uint8_t _channel);
 	void end(void);
 
+	// These methods sets the same parameters on all channels
 	void setBitOrder(uint8_t);
 	void setDataMode(uint8_t);
 	void setClockDivider(uint8_t);
 
+	// These methods sets a parameter on a single channel
+	void setBitOrder(uint8_t, uint8_t _channel);
+	void setDataMode(uint8_t, uint8_t _channel);
+	void setClockDivider(uint8_t, uint8_t _channel);
+
   private:
 	Spi *spi;
-	uint32_t id, divider, mode;
+	uint32_t id;
+	uint32_t divider[SPI_CHANNELS_NUM];
+	uint32_t mode[SPI_CHANNELS_NUM];
+	uint32_t ssPins[SPI_CHANNELS_NUM];
 	void (*initCb)(void);
 };
 
