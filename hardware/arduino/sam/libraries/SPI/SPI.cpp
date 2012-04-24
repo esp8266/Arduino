@@ -24,7 +24,7 @@ void SPIClass::begin() {
 	SPI_Configure(spi, id, SPI_MR_MSTR | SPI_MR_PS);
 	SPI_Enable(spi);
 	setClockDivider(1);
-	setDataMode(0);
+	setDataMode(SPI_MODE0);
 }
 
 void SPIClass::addSlave(uint8_t _channel) {
