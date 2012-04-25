@@ -48,12 +48,12 @@
 
 # USB vendor ID (VID)
 # official Arduino LLC VID
-VID = 0x2341
+# VID = 0x2341
 
 
 # USB product ID (PID)
 # official Leonardo PID
-#PID = 0x0034
+# PID = 0x0036
 
 
 # MCU name

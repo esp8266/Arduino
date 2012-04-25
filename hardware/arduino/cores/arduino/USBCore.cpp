@@ -51,10 +51,10 @@ const u16 STRING_LANGUAGE[2] = {
 
 const u16 STRING_IPRODUCT[17] = {
 	(3<<8) | (2+2*16),
-#if USB_PID == 0x8034	
+#if USB_PID == 0x8036	
 	'A','r','d','u','i','n','o',' ','L','e','o','n','a','r','d','o'
 #else
-	'U','S','B',' ','I','O',' ','B','O','A','R','D',' ',' ',' ',' '
+	'U','S','B',' ','I','O',' ','B','o','a','r','d',' ',' ',' ',' '
 #endif
 };
 

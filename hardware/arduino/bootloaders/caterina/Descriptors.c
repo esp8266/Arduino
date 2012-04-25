@@ -193,7 +193,7 @@ const USB_Descriptor_String_t ProductString =
 {
 	.Header                 = {.Size = USB_STRING_LEN(16), .Type = DTYPE_String},
 
-	#if DEVICE_PID == 0x0034
+	#if DEVICE_PID == 0x0036
 	.UnicodeString          = L"Arduino Leonardo" 
 	#else
 	.UnicodeString			= L"USB IO board    "
@@ -204,7 +204,11 @@ const USB_Descriptor_String_t ManufNameString =
 {
 	.Header					= {.Size = USB_STRING_LEN(11), .Type = DTYPE_String},
 	
+	#if DEVICE_VID == 0x2341
 	.UnicodeString			= L"Arduino LLC"
+	#else
+	.UnicodeString			= L"Unknown    "
+	#endif
 };
 
 /** This function is called by the library when in device mode, and must be overridden (see LUFA library "USB Descriptors"
