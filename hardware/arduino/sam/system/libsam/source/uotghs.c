@@ -20,8 +20,5 @@
 
 #if SAM3XA_SERIES
 
-#include "USB_driver.h"
-#include "uotghs.h"
-
 
 #endif /* SAM3XA_SERIES */

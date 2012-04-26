@@ -54,5 +54,10 @@
 #include "include/wdt.h"
 
 #include "include/timetick.h"
+#include "include/USB_driver.h"
+
+#if SAM3XA_SERIES
+#include "include/uotghs.h"
+#endif /* SAM3XA_SERIES */
 
 #endif /* _LIB_SAM_ */
