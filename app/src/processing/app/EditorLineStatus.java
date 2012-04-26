@@ -96,7 +96,10 @@ public class EditorLineStatus extends JComponent {
   public void paintComponent(Graphics g) {
     if (name=="" && serialport=="") {
       Map<String, String> boardPreferences =  Base.getBoardPreferences();
-      setBoardName(boardPreferences.get("name"));
+      if (boardPreferences!=null)
+        setBoardName(boardPreferences.get("name"));
+      else
+        setBoardName("-");
       setSerialPort(Preferences.get("serial.port"));
     }
     g.setColor(background);

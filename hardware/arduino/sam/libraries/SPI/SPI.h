@@ -14,10 +14,10 @@
 #include "variant.h"
 #include <stdio.h>
 
-#define SPI_MODE0 0x00
-#define SPI_MODE1 0x01
-#define SPI_MODE2 0x02
-#define SPI_MODE3 0x03
+#define SPI_MODE0 0x02
+#define SPI_MODE1 0x00
+#define SPI_MODE2 0x03
+#define SPI_MODE3 0x01
 
 class SPIClass {
   public:

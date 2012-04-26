@@ -7,7 +7,6 @@ void setup() {
   Serial1.begin(9600);
   SPI_0.begin();
   SPI_0.addSlave(FLASH_SPI_CHAN);
-  SPI_0.setDataMode(SPI_MODE2, FLASH_SPI_CHAN);
   SPI_0.setClockDivider(2); // We are too fast with 1
 }
 
