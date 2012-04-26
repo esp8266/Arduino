@@ -49,7 +49,7 @@ typedef struct {
 #define RSTC_CR_PERRST (0x1u << 2) /**< \brief (RSTC_CR) Peripheral Reset */
 #define RSTC_CR_EXTRST (0x1u << 3) /**< \brief (RSTC_CR) External Reset */
 #define RSTC_CR_KEY_Pos 24
-#define RSTC_CR_KEY_Msk (0xffu << RSTC_CR_KEY_Pos) /**< \brief (RSTC_CR) Password */
+#define RSTC_CR_KEY_Msk (0xffu << RSTC_CR_KEY_Pos) /**< \brief (RSTC_CR) System Reset Key */
 #define RSTC_CR_KEY(value) ((RSTC_CR_KEY_Msk & ((value) << RSTC_CR_KEY_Pos)))
 /* -------- RSTC_SR : (RSTC Offset: 0x04) Status Register -------- */
 #define RSTC_SR_URSTS (0x1u << 0) /**< \brief (RSTC_SR) User Reset Status */

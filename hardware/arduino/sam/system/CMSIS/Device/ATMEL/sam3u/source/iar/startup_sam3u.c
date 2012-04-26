@@ -41,7 +41,7 @@ int __low_level_init(void);
 void Dummy_Handler(void);
 
 /* Cortex-M3 core handlers */
-#pragma weak Reset_Handler=Dummy_Handler
+#pragma weak Reset_Handler
 #pragma weak NMI_Handler=Dummy_Handler
 #pragma weak HardFault_Handler=Dummy_Handler
 #pragma weak MemManage_Handler=Dummy_Handler
@@ -101,13 +101,13 @@ const DeviceVectors __vector_table[] = {
 	(void*) MemManage_Handler,
 	(void*) BusFault_Handler,
 	(void*) UsageFault_Handler,
-	(void*) 0,                  /* Reserved */
-  (void*) 0,                  /* Reserved */
-  (void*) 0,                  /* Reserved */
-  (void*) 0,                  /* Reserved */
+	(void*) (0UL),           /* Reserved */
+	(void*) (0UL),           /* Reserved */
+	(void*) (0UL),           /* Reserved */
+	(void*) (0UL),           /* Reserved */
 	(void*) SVC_Handler,
 	(void*) DebugMon_Handler,
-	(void*) 0,                  /* Reserved  */
+	(void*) (0UL),           /* Reserved */
 	(void*) PendSV_Handler,
 	(void*) SysTick_Handler,
 
@@ -124,11 +124,19 @@ const DeviceVectors __vector_table[] = {
 	(void*) SMC_Handler,     /* 9  SMC */
 	(void*) PIOA_Handler,    /* 10 Parallel IO Controller A */
 	(void*) PIOB_Handler,    /* 11 Parallel IO Controller B */
+#ifdef _SAM3U_PIOC_INSTANCE_
 	(void*) PIOC_Handler,    /* 12 Parallel IO Controller C */
+#else
+	(void*) (0UL),           /* 12 Reserved */
+#endif /* _SAM3U_PIOC_INSTANCE_ */
 	(void*) USART0_Handler,  /* 13 USART 0 */
 	(void*) USART1_Handler,  /* 14 USART 1 */
 	(void*) USART2_Handler,  /* 15 USART 2 */
+#ifdef _SAM3U_USART3_INSTANCE_
 	(void*) USART3_Handler,  /* 16 USART 3 */
+#else
+	(void*) (0UL),           /* 16 Reserved */
+#endif /* _SAM3U_USART3_INSTANCE_ */
 	(void*) HSMCI_Handler,   /* 17 MCI */
 	(void*) TWI0_Handler,    /* 18 TWI 0 */
 	(void*) TWI1_Handler,    /* 19 TWI 1 */
@@ -141,17 +149,8 @@ const DeviceVectors __vector_table[] = {
 	(void*) ADC12B_Handler,  /* 26 ADC12B controller */
 	(void*) ADC_Handler,     /* 27 ADC controller */
 	(void*) DMAC_Handler,    /* 28 DMA controller */
-	(void*) UDPHS_Handler,   /* 29 USB High Speed Port */
+	(void*) UDPHS_Handler    /* 29 USB High Speed Port */
 };
-
-/* EWARM 6.30 integrates CMSIS 2.10 (__CM3_CMSIS_VERSION 0x0210),
- * in which SCB_VTOR_TBLBASE_Msk not defined.
- */
-#if (__VER__ >= 6030000)
-/* TEMPORARY PATCH FOR SCB */
-#define SCB_VTOR_TBLBASE_Pos               29                            /*!< SCB VTOR: TBLBASE Position */
-#define SCB_VTOR_TBLBASE_Msk               (1UL << SCB_VTOR_TBLBASE_Pos) /*!< SCB VTOR: TBLBASE Mask */
-#endif
 
 /**------------------------------------------------------------------------------
  * This is the code that gets called on processor reset. To initialize the

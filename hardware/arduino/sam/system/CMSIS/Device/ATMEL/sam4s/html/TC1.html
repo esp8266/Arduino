@@ -13,7 +13,7 @@
         <h1>SAM4S TC1</h1>
         <a id="TC1__User_Interface"></a>
         <h2>Timer Counter (TC1) User Interface</h2>
-<!--As per 6082N programmer datasheet.-->
+<!--As per 6082Q programmer datasheet.-->
         <h3>Registers</h3>
         <table class="registers">
           <caption>Register Mapping</caption>
@@ -540,10 +540,10 @@
               <td>-</td>
               <td>-</td>
               <td colspan="2">
-                <a href="#TC1_CMR0__LDRB" title="RB Loading Selection">LDRB</a>
+                <a href="#TC1_CMR0__LDRB" title="RB Loading Edge Selection">LDRB</a>
               </td>
               <td colspan="2">
-                <a href="#TC1_CMR0__LDRA" title="RA Loading Selection">LDRA</a>
+                <a href="#TC1_CMR0__LDRA" title="RA Loading Edge Selection">LDRA</a>
               </td>
             </tr>
             <tr class="offsets">
@@ -558,7 +558,7 @@
             </tr>
             <tr class="fields">
               <td colspan="1">
-                <a href="#TC1_CMR0__WAVE" title="">WAVE</a>
+                <a href="#TC1_CMR0__WAVE" title="Waveform Mode">WAVE</a>
               </td>
               <td colspan="1">
                 <a href="#TC1_CMR0__CPCTRG" title="RC Compare Trigger Enable">CPCTRG</a>
@@ -611,32 +611,9 @@
           <li id="TC1_CMR0__ETRGEDG"><strong>ETRGEDG</strong>: External Trigger Edge Selection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">NONE</td><td class="description">The clock is not gated by an external signal.</td></tr><tr class="even"><td class="value">0x1</td><td class="name">RISING</td><td class="description">Rising edge</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">FALLING</td><td class="description">Falling edge</td></tr><tr class="even"><td class="value">0x3</td><td class="name">EDGE</td><td class="description">Each edge</td></tr></tbody></table></li>
           <li id="TC1_CMR0__ABETRG"><strong>ABETRG</strong>: TIOA or TIOB External Trigger Selection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">TIOB is used as an external trigger.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">TIOA is used as an external trigger.</td></tr></tbody></table></li>
           <li id="TC1_CMR0__CPCTRG"><strong>CPCTRG</strong>: RC Compare Trigger Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">RC Compare has no effect on the counter and its clock.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">RC Compare resets the counter and starts the counter clock.</td></tr></tbody></table></li>
-          <li id="TC1_CMR0__WAVE">
-            <strong>WAVE</strong>
-            <table class="values">
-              <thead>
-                <tr>
-                  <th>Value</th>
-                  <th>Name</th>
-                  <th>Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr class="odd">
-                  <td class="value">0</td>
-                  <td class="name">-</td>
-                  <td class="description">Capture Mode is enabled.</td>
-                </tr>
-                <tr class="even">
-                  <td class="value">1</td>
-                  <td class="name">-</td>
-                  <td class="description">Capture Mode is disabled (Waveform Mode is enabled).</td>
-                </tr>
-              </tbody>
-            </table>
-          </li>
-          <li id="TC1_CMR0__LDRA"><strong>LDRA</strong>: RA Loading Selection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">NONE</td><td class="description">None</td></tr><tr class="even"><td class="value">0x1</td><td class="name">RISING</td><td class="description">Rising edge of TIOA</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">FALLING</td><td class="description">Falling edge of TIOA</td></tr><tr class="even"><td class="value">0x3</td><td class="name">EDGE</td><td class="description">Each edge of TIOA</td></tr></tbody></table></li>
-          <li id="TC1_CMR0__LDRB"><strong>LDRB</strong>: RB Loading Selection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">NONE</td><td class="description">None</td></tr><tr class="even"><td class="value">0x1</td><td class="name">RISING</td><td class="description">Rising edge of TIOA</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">FALLING</td><td class="description">Falling edge of TIOA</td></tr><tr class="even"><td class="value">0x3</td><td class="name">EDGE</td><td class="description">Each edge of TIOA</td></tr></tbody></table></li>
+          <li id="TC1_CMR0__WAVE"><strong>WAVE</strong>: Waveform Mode<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Capture Mode is enabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Capture Mode is disabled (Waveform Mode is enabled).</td></tr></tbody></table></li>
+          <li id="TC1_CMR0__LDRA"><strong>LDRA</strong>: RA Loading Edge Selection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">NONE</td><td class="description">None</td></tr><tr class="even"><td class="value">0x1</td><td class="name">RISING</td><td class="description">Rising edge of TIOA</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">FALLING</td><td class="description">Falling edge of TIOA</td></tr><tr class="even"><td class="value">0x3</td><td class="name">EDGE</td><td class="description">Each edge of TIOA</td></tr></tbody></table></li>
+          <li id="TC1_CMR0__LDRB"><strong>LDRB</strong>: RB Loading Edge Selection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">NONE</td><td class="description">None</td></tr><tr class="even"><td class="value">0x1</td><td class="name">RISING</td><td class="description">Rising edge of TIOA</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">FALLING</td><td class="description">Falling edge of TIOA</td></tr><tr class="even"><td class="value">0x3</td><td class="name">EDGE</td><td class="description">Each edge of TIOA</td></tr></tbody></table></li>
         </ul>
         <p><strong>Alternate</strong>: WAVE_EQ_1</p>
         <table class="fields">
@@ -719,30 +696,7 @@
           <li id="-__EEVT"><strong>EEVT</strong>: External Event Selection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">TIOB</td><td class="description">TIOB</td></tr><tr class="even"><td class="value">0x1</td><td class="name">XC0</td><td class="description">XC0</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">XC1</td><td class="description">XC1</td></tr><tr class="even"><td class="value">0x3</td><td class="name">XC2</td><td class="description">XC2</td></tr></tbody></table></li>
           <li id="-__ENETRG"><strong>ENETRG</strong>: External Event Trigger Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">the external event has no effect on the counter and its clock. In this case, the selected external event only controls the TIOA output.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">the external event resets the counter and starts the counter clock.</td></tr></tbody></table></li>
           <li id="-__WAVSEL"><strong>WAVSEL</strong>: Waveform Selection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">UP</td><td class="description">UP mode without automatic trigger on RC Compare</td></tr><tr class="even"><td class="value">0x1</td><td class="name">UPDOWN</td><td class="description">UPDOWN mode without automatic trigger on RC Compare</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">UP_RC</td><td class="description">UP mode with automatic trigger on RC Compare</td></tr><tr class="even"><td class="value">0x3</td><td class="name">UPDOWN_RC</td><td class="description">UPDOWN mode with automatic trigger on RC Compare</td></tr></tbody></table></li>
-          <li id="-__WAVE">
-            <strong>WAVE</strong>
-            <table class="values">
-              <thead>
-                <tr>
-                  <th>Value</th>
-                  <th>Name</th>
-                  <th>Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr class="odd">
-                  <td class="value">0</td>
-                  <td class="name">-</td>
-                  <td class="description">Waveform Mode is disabled (Capture Mode is enabled).</td>
-                </tr>
-                <tr class="even">
-                  <td class="value">1</td>
-                  <td class="name">-</td>
-                  <td class="description">Waveform Mode is enabled.</td>
-                </tr>
-              </tbody>
-            </table>
-          </li>
+          <li id="-__WAVE"><strong>WAVE</strong>: Waveform Mode<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Waveform Mode is disabled (Capture Mode is enabled).</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Waveform Mode is enabled.</td></tr></tbody></table></li>
           <li id="-__ACPA"><strong>ACPA</strong>: RA Compare Effect on TIOA<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">NONE</td><td class="description">None</td></tr><tr class="even"><td class="value">0x1</td><td class="name">SET</td><td class="description">Set</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">CLEAR</td><td class="description">Clear</td></tr><tr class="even"><td class="value">0x3</td><td class="name">TOGGLE</td><td class="description">Toggle</td></tr></tbody></table></li>
           <li id="-__ACPC"><strong>ACPC</strong>: RC Compare Effect on TIOA<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">NONE</td><td class="description">None</td></tr><tr class="even"><td class="value">0x1</td><td class="name">SET</td><td class="description">Set</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">CLEAR</td><td class="description">Clear</td></tr><tr class="even"><td class="value">0x3</td><td class="name">TOGGLE</td><td class="description">Toggle</td></tr></tbody></table></li>
           <li id="-__AEEVT"><strong>AEEVT</strong>: External Event Effect on TIOA<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">NONE</td><td class="description">None</td></tr><tr class="even"><td class="value">0x1</td><td class="name">SET</td><td class="description">Set</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">CLEAR</td><td class="description">Clear</td></tr><tr class="even"><td class="value">0x3</td><td class="name">TOGGLE</td><td class="description">Toggle</td></tr></tbody></table></li>
@@ -1742,10 +1696,10 @@
               <td>-</td>
               <td>-</td>
               <td colspan="2">
-                <a href="#TC1_CMR1__LDRB" title="RB Loading Selection">LDRB</a>
+                <a href="#TC1_CMR1__LDRB" title="RB Loading Edge Selection">LDRB</a>
               </td>
               <td colspan="2">
-                <a href="#TC1_CMR1__LDRA" title="RA Loading Selection">LDRA</a>
+                <a href="#TC1_CMR1__LDRA" title="RA Loading Edge Selection">LDRA</a>
               </td>
             </tr>
             <tr class="offsets">
@@ -1760,7 +1714,7 @@
             </tr>
             <tr class="fields">
               <td colspan="1">
-                <a href="#TC1_CMR1__WAVE" title="">WAVE</a>
+                <a href="#TC1_CMR1__WAVE" title="Waveform Mode">WAVE</a>
               </td>
               <td colspan="1">
                 <a href="#TC1_CMR1__CPCTRG" title="RC Compare Trigger Enable">CPCTRG</a>
@@ -1813,32 +1767,9 @@
           <li id="TC1_CMR1__ETRGEDG"><strong>ETRGEDG</strong>: External Trigger Edge Selection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">NONE</td><td class="description">The clock is not gated by an external signal.</td></tr><tr class="even"><td class="value">0x1</td><td class="name">RISING</td><td class="description">Rising edge</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">FALLING</td><td class="description">Falling edge</td></tr><tr class="even"><td class="value">0x3</td><td class="name">EDGE</td><td class="description">Each edge</td></tr></tbody></table></li>
           <li id="TC1_CMR1__ABETRG"><strong>ABETRG</strong>: TIOA or TIOB External Trigger Selection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">TIOB is used as an external trigger.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">TIOA is used as an external trigger.</td></tr></tbody></table></li>
           <li id="TC1_CMR1__CPCTRG"><strong>CPCTRG</strong>: RC Compare Trigger Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">RC Compare has no effect on the counter and its clock.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">RC Compare resets the counter and starts the counter clock.</td></tr></tbody></table></li>
-          <li id="TC1_CMR1__WAVE">
-            <strong>WAVE</strong>
-            <table class="values">
-              <thead>
-                <tr>
-                  <th>Value</th>
-                  <th>Name</th>
-                  <th>Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr class="odd">
-                  <td class="value">0</td>
-                  <td class="name">-</td>
-                  <td class="description">Capture Mode is enabled.</td>
-                </tr>
-                <tr class="even">
-                  <td class="value">1</td>
-                  <td class="name">-</td>
-                  <td class="description">Capture Mode is disabled (Waveform Mode is enabled).</td>
-                </tr>
-              </tbody>
-            </table>
-          </li>
-          <li id="TC1_CMR1__LDRA"><strong>LDRA</strong>: RA Loading Selection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">NONE</td><td class="description">None</td></tr><tr class="even"><td class="value">0x1</td><td class="name">RISING</td><td class="description">Rising edge of TIOA</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">FALLING</td><td class="description">Falling edge of TIOA</td></tr><tr class="even"><td class="value">0x3</td><td class="name">EDGE</td><td class="description">Each edge of TIOA</td></tr></tbody></table></li>
-          <li id="TC1_CMR1__LDRB"><strong>LDRB</strong>: RB Loading Selection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">NONE</td><td class="description">None</td></tr><tr class="even"><td class="value">0x1</td><td class="name">RISING</td><td class="description">Rising edge of TIOA</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">FALLING</td><td class="description">Falling edge of TIOA</td></tr><tr class="even"><td class="value">0x3</td><td class="name">EDGE</td><td class="description">Each edge of TIOA</td></tr></tbody></table></li>
+          <li id="TC1_CMR1__WAVE"><strong>WAVE</strong>: Waveform Mode<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Capture Mode is enabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Capture Mode is disabled (Waveform Mode is enabled).</td></tr></tbody></table></li>
+          <li id="TC1_CMR1__LDRA"><strong>LDRA</strong>: RA Loading Edge Selection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">NONE</td><td class="description">None</td></tr><tr class="even"><td class="value">0x1</td><td class="name">RISING</td><td class="description">Rising edge of TIOA</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">FALLING</td><td class="description">Falling edge of TIOA</td></tr><tr class="even"><td class="value">0x3</td><td class="name">EDGE</td><td class="description">Each edge of TIOA</td></tr></tbody></table></li>
+          <li id="TC1_CMR1__LDRB"><strong>LDRB</strong>: RB Loading Edge Selection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">NONE</td><td class="description">None</td></tr><tr class="even"><td class="value">0x1</td><td class="name">RISING</td><td class="description">Rising edge of TIOA</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">FALLING</td><td class="description">Falling edge of TIOA</td></tr><tr class="even"><td class="value">0x3</td><td class="name">EDGE</td><td class="description">Each edge of TIOA</td></tr></tbody></table></li>
         </ul>
         <p><strong>Alternate</strong>: WAVE_EQ_1</p>
         <table class="fields">
@@ -1921,30 +1852,7 @@
           <li id="-__EEVT"><strong>EEVT</strong>: External Event Selection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">TIOB</td><td class="description">TIOB</td></tr><tr class="even"><td class="value">0x1</td><td class="name">XC0</td><td class="description">XC0</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">XC1</td><td class="description">XC1</td></tr><tr class="even"><td class="value">0x3</td><td class="name">XC2</td><td class="description">XC2</td></tr></tbody></table></li>
           <li id="-__ENETRG"><strong>ENETRG</strong>: External Event Trigger Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">the external event has no effect on the counter and its clock. In this case, the selected external event only controls the TIOA output.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">the external event resets the counter and starts the counter clock.</td></tr></tbody></table></li>
           <li id="-__WAVSEL"><strong>WAVSEL</strong>: Waveform Selection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">UP</td><td class="description">UP mode without automatic trigger on RC Compare</td></tr><tr class="even"><td class="value">0x1</td><td class="name">UPDOWN</td><td class="description">UPDOWN mode without automatic trigger on RC Compare</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">UP_RC</td><td class="description">UP mode with automatic trigger on RC Compare</td></tr><tr class="even"><td class="value">0x3</td><td class="name">UPDOWN_RC</td><td class="description">UPDOWN mode with automatic trigger on RC Compare</td></tr></tbody></table></li>
-          <li id="-__WAVE">
-            <strong>WAVE</strong>
-            <table class="values">
-              <thead>
-                <tr>
-                  <th>Value</th>
-                  <th>Name</th>
-                  <th>Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr class="odd">
-                  <td class="value">0</td>
-                  <td class="name">-</td>
-                  <td class="description">Waveform Mode is disabled (Capture Mode is enabled).</td>
-                </tr>
-                <tr class="even">
-                  <td class="value">1</td>
-                  <td class="name">-</td>
-                  <td class="description">Waveform Mode is enabled.</td>
-                </tr>
-              </tbody>
-            </table>
-          </li>
+          <li id="-__WAVE"><strong>WAVE</strong>: Waveform Mode<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Waveform Mode is disabled (Capture Mode is enabled).</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Waveform Mode is enabled.</td></tr></tbody></table></li>
           <li id="-__ACPA"><strong>ACPA</strong>: RA Compare Effect on TIOA<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">NONE</td><td class="description">None</td></tr><tr class="even"><td class="value">0x1</td><td class="name">SET</td><td class="description">Set</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">CLEAR</td><td class="description">Clear</td></tr><tr class="even"><td class="value">0x3</td><td class="name">TOGGLE</td><td class="description">Toggle</td></tr></tbody></table></li>
           <li id="-__ACPC"><strong>ACPC</strong>: RC Compare Effect on TIOA<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">NONE</td><td class="description">None</td></tr><tr class="even"><td class="value">0x1</td><td class="name">SET</td><td class="description">Set</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">CLEAR</td><td class="description">Clear</td></tr><tr class="even"><td class="value">0x3</td><td class="name">TOGGLE</td><td class="description">Toggle</td></tr></tbody></table></li>
           <li id="-__AEEVT"><strong>AEEVT</strong>: External Event Effect on TIOA<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">NONE</td><td class="description">None</td></tr><tr class="even"><td class="value">0x1</td><td class="name">SET</td><td class="description">Set</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">CLEAR</td><td class="description">Clear</td></tr><tr class="even"><td class="value">0x3</td><td class="name">TOGGLE</td><td class="description">Toggle</td></tr></tbody></table></li>
@@ -2944,10 +2852,10 @@
               <td>-</td>
               <td>-</td>
               <td colspan="2">
-                <a href="#TC1_CMR2__LDRB" title="RB Loading Selection">LDRB</a>
+                <a href="#TC1_CMR2__LDRB" title="RB Loading Edge Selection">LDRB</a>
               </td>
               <td colspan="2">
-                <a href="#TC1_CMR2__LDRA" title="RA Loading Selection">LDRA</a>
+                <a href="#TC1_CMR2__LDRA" title="RA Loading Edge Selection">LDRA</a>
               </td>
             </tr>
             <tr class="offsets">
@@ -2962,7 +2870,7 @@
             </tr>
             <tr class="fields">
               <td colspan="1">
-                <a href="#TC1_CMR2__WAVE" title="">WAVE</a>
+                <a href="#TC1_CMR2__WAVE" title="Waveform Mode">WAVE</a>
               </td>
               <td colspan="1">
                 <a href="#TC1_CMR2__CPCTRG" title="RC Compare Trigger Enable">CPCTRG</a>
@@ -3015,32 +2923,9 @@
           <li id="TC1_CMR2__ETRGEDG"><strong>ETRGEDG</strong>: External Trigger Edge Selection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">NONE</td><td class="description">The clock is not gated by an external signal.</td></tr><tr class="even"><td class="value">0x1</td><td class="name">RISING</td><td class="description">Rising edge</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">FALLING</td><td class="description">Falling edge</td></tr><tr class="even"><td class="value">0x3</td><td class="name">EDGE</td><td class="description">Each edge</td></tr></tbody></table></li>
           <li id="TC1_CMR2__ABETRG"><strong>ABETRG</strong>: TIOA or TIOB External Trigger Selection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">TIOB is used as an external trigger.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">TIOA is used as an external trigger.</td></tr></tbody></table></li>
           <li id="TC1_CMR2__CPCTRG"><strong>CPCTRG</strong>: RC Compare Trigger Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">RC Compare has no effect on the counter and its clock.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">RC Compare resets the counter and starts the counter clock.</td></tr></tbody></table></li>
-          <li id="TC1_CMR2__WAVE">
-            <strong>WAVE</strong>
-            <table class="values">
-              <thead>
-                <tr>
-                  <th>Value</th>
-                  <th>Name</th>
-                  <th>Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr class="odd">
-                  <td class="value">0</td>
-                  <td class="name">-</td>
-                  <td class="description">Capture Mode is enabled.</td>
-                </tr>
-                <tr class="even">
-                  <td class="value">1</td>
-                  <td class="name">-</td>
-                  <td class="description">Capture Mode is disabled (Waveform Mode is enabled).</td>
-                </tr>
-              </tbody>
-            </table>
-          </li>
-          <li id="TC1_CMR2__LDRA"><strong>LDRA</strong>: RA Loading Selection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">NONE</td><td class="description">None</td></tr><tr class="even"><td class="value">0x1</td><td class="name">RISING</td><td class="description">Rising edge of TIOA</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">FALLING</td><td class="description">Falling edge of TIOA</td></tr><tr class="even"><td class="value">0x3</td><td class="name">EDGE</td><td class="description">Each edge of TIOA</td></tr></tbody></table></li>
-          <li id="TC1_CMR2__LDRB"><strong>LDRB</strong>: RB Loading Selection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">NONE</td><td class="description">None</td></tr><tr class="even"><td class="value">0x1</td><td class="name">RISING</td><td class="description">Rising edge of TIOA</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">FALLING</td><td class="description">Falling edge of TIOA</td></tr><tr class="even"><td class="value">0x3</td><td class="name">EDGE</td><td class="description">Each edge of TIOA</td></tr></tbody></table></li>
+          <li id="TC1_CMR2__WAVE"><strong>WAVE</strong>: Waveform Mode<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Capture Mode is enabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Capture Mode is disabled (Waveform Mode is enabled).</td></tr></tbody></table></li>
+          <li id="TC1_CMR2__LDRA"><strong>LDRA</strong>: RA Loading Edge Selection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">NONE</td><td class="description">None</td></tr><tr class="even"><td class="value">0x1</td><td class="name">RISING</td><td class="description">Rising edge of TIOA</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">FALLING</td><td class="description">Falling edge of TIOA</td></tr><tr class="even"><td class="value">0x3</td><td class="name">EDGE</td><td class="description">Each edge of TIOA</td></tr></tbody></table></li>
+          <li id="TC1_CMR2__LDRB"><strong>LDRB</strong>: RB Loading Edge Selection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">NONE</td><td class="description">None</td></tr><tr class="even"><td class="value">0x1</td><td class="name">RISING</td><td class="description">Rising edge of TIOA</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">FALLING</td><td class="description">Falling edge of TIOA</td></tr><tr class="even"><td class="value">0x3</td><td class="name">EDGE</td><td class="description">Each edge of TIOA</td></tr></tbody></table></li>
         </ul>
         <p><strong>Alternate</strong>: WAVE_EQ_1</p>
         <table class="fields">
@@ -3123,30 +3008,7 @@
           <li id="-__EEVT"><strong>EEVT</strong>: External Event Selection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">TIOB</td><td class="description">TIOB</td></tr><tr class="even"><td class="value">0x1</td><td class="name">XC0</td><td class="description">XC0</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">XC1</td><td class="description">XC1</td></tr><tr class="even"><td class="value">0x3</td><td class="name">XC2</td><td class="description">XC2</td></tr></tbody></table></li>
           <li id="-__ENETRG"><strong>ENETRG</strong>: External Event Trigger Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">the external event has no effect on the counter and its clock. In this case, the selected external event only controls the TIOA output.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">the external event resets the counter and starts the counter clock.</td></tr></tbody></table></li>
           <li id="-__WAVSEL"><strong>WAVSEL</strong>: Waveform Selection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">UP</td><td class="description">UP mode without automatic trigger on RC Compare</td></tr><tr class="even"><td class="value">0x1</td><td class="name">UPDOWN</td><td class="description">UPDOWN mode without automatic trigger on RC Compare</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">UP_RC</td><td class="description">UP mode with automatic trigger on RC Compare</td></tr><tr class="even"><td class="value">0x3</td><td class="name">UPDOWN_RC</td><td class="description">UPDOWN mode with automatic trigger on RC Compare</td></tr></tbody></table></li>
-          <li id="-__WAVE">
-            <strong>WAVE</strong>
-            <table class="values">
-              <thead>
-                <tr>
-                  <th>Value</th>
-                  <th>Name</th>
-                  <th>Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr class="odd">
-                  <td class="value">0</td>
-                  <td class="name">-</td>
-                  <td class="description">Waveform Mode is disabled (Capture Mode is enabled).</td>
-                </tr>
-                <tr class="even">
-                  <td class="value">1</td>
-                  <td class="name">-</td>
-                  <td class="description">Waveform Mode is enabled.</td>
-                </tr>
-              </tbody>
-            </table>
-          </li>
+          <li id="-__WAVE"><strong>WAVE</strong>: Waveform Mode<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Waveform Mode is disabled (Capture Mode is enabled).</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Waveform Mode is enabled.</td></tr></tbody></table></li>
           <li id="-__ACPA"><strong>ACPA</strong>: RA Compare Effect on TIOA<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">NONE</td><td class="description">None</td></tr><tr class="even"><td class="value">0x1</td><td class="name">SET</td><td class="description">Set</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">CLEAR</td><td class="description">Clear</td></tr><tr class="even"><td class="value">0x3</td><td class="name">TOGGLE</td><td class="description">Toggle</td></tr></tbody></table></li>
           <li id="-__ACPC"><strong>ACPC</strong>: RC Compare Effect on TIOA<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">NONE</td><td class="description">None</td></tr><tr class="even"><td class="value">0x1</td><td class="name">SET</td><td class="description">Set</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">CLEAR</td><td class="description">Clear</td></tr><tr class="even"><td class="value">0x3</td><td class="name">TOGGLE</td><td class="description">Toggle</td></tr></tbody></table></li>
           <li id="-__AEEVT"><strong>AEEVT</strong>: External Event Effect on TIOA<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">NONE</td><td class="description">None</td></tr><tr class="even"><td class="value">0x1</td><td class="name">SET</td><td class="description">Set</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">CLEAR</td><td class="description">Clear</td></tr><tr class="even"><td class="value">0x3</td><td class="name">TOGGLE</td><td class="description">Toggle</td></tr></tbody></table></li>
@@ -4216,7 +4078,7 @@
           <li id="TC1_BMR__TC1XC1S"><strong>TC1XC1S</strong>: External Clock Signal 1 Selection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">TCLK1</td><td class="description">Signal connected to XC1: TCLK1</td></tr><tr class="even"><td class="value">0x2</td><td class="name">TIOA0</td><td class="description">Signal connected to XC1: TIOA0</td></tr><tr class="odd"><td class="value">0x3</td><td class="name">TIOA2</td><td class="description">Signal connected to XC1: TIOA2</td></tr></tbody></table></li>
           <li id="TC1_BMR__TC2XC2S"><strong>TC2XC2S</strong>: External Clock Signal 2 Selection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">TCLK2</td><td class="description">Signal connected to XC2: TCLK2</td></tr><tr class="even"><td class="value">0x2</td><td class="name">TIOA1</td><td class="description">Signal connected to XC2: TIOA1</td></tr><tr class="odd"><td class="value">0x3</td><td class="name">TIOA2</td><td class="description">Signal connected to XC2: TIOA2</td></tr></tbody></table></li>
           <li id="TC1_BMR__QDEN"><strong>QDEN</strong>: Quadrature Decoder ENabled<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">enables the quadrature decoder logic (filter, edge detection and quadrature decoding).</td></tr></tbody></table></li>
-          <li id="TC1_BMR__POSEN"><strong>POSEN</strong>: POSition ENabled<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">disable position.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">enables the position measure on channel 0 and 1</td></tr></tbody></table></li>
+          <li id="TC1_BMR__POSEN"><strong>POSEN</strong>: POSition ENabled<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">disable position.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">enables the position measure on channel 0 and 1.</td></tr></tbody></table></li>
           <li id="TC1_BMR__SPEEDEN"><strong>SPEEDEN</strong>: SPEED ENabled<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">enables the speed measure on channel 0, the time base being provided by channel 2.</td></tr></tbody></table></li>
           <li id="TC1_BMR__QDTRANS"><strong>QDTRANS</strong>: Quadrature Decoding TRANSparent<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">full quadrature decoding logic is active (direction change detected).</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">quadrature decoding logic is inactive (direction change inactive) but input filtering and edge detection are performed.</td></tr></tbody></table></li>
           <li id="TC1_BMR__EDGPHA"><strong>EDGPHA</strong>: EDGe on PHA count mode<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">edges are detected on both PHA and PHB.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">edges are detected on PHA only.</td></tr></tbody></table></li>
@@ -4614,7 +4476,7 @@
               <td>-</td>
               <td>-</td>
               <td colspan="1">
-                <a href="#TC1_QISR__DIR" title="Direction">DIR</a>
+                <a href="#TC1_QISR__DIR" title="DIRection">DIR</a>
               </td>
             </tr>
             <tr class="offsets">
@@ -4646,10 +4508,10 @@
           </tbody>
         </table>
         <ul class="values">
-          <li id="TC1_QISR__IDX"><strong>IDX</strong>: InDeX<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">no Index input change since the last read of TC_QISR.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">the IDX input has change since the last read of TC_QISR.</td></tr></tbody></table></li>
+          <li id="TC1_QISR__IDX"><strong>IDX</strong>: InDeX<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">no Index input change since the last read of TC_QISR.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">the IDX input has changed since the last read of TC_QISR.</td></tr></tbody></table></li>
           <li id="TC1_QISR__DIRCHG"><strong>DIRCHG</strong>: DIRection CHanGe<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">no change on rotation direction since the last read of TC_QISR.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">the rotation direction changed since the last read of TC_QISR.</td></tr></tbody></table></li>
-          <li id="TC1_QISR__QERR"><strong>QERR</strong>: Quadrature ERRor<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">no quadrature error since the last read of TC_QISR.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">A quadrature error occurred since the last read of TC_QISR.</td></tr></tbody></table></li>
-          <li id="TC1_QISR__DIR"><strong>DIR</strong>: Direction</li>
+          <li id="TC1_QISR__QERR"><strong>QERR</strong>: Quadrature ERRor<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">no quadrature error since the last read of TC_QISR.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">a quadrature error occurred since the last read of TC_QISR.</td></tr></tbody></table></li>
+          <li id="TC1_QISR__DIR"><strong>DIR</strong>: DIRection</li>
           <p>-</p>
         </ul>
         <h4 id="TC1_FMR">TC1 Fault Mode Register</h4>

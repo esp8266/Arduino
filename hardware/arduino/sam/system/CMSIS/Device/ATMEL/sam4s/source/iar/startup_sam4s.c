@@ -1,20 +1,33 @@
-/*! \file *********************************************************************
+/* ----------------------------------------------------------------------------
+ *         SAM Software Package License
+ * ----------------------------------------------------------------------------
+ * Copyright (c) 2012, Atmel Corporation
  *
- * \brief Startup file for SAM4S.
+ * All rights reserved.
  *
- * $asf_license$
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following condition is met:
  *
- * This file defines common SAM series.
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the disclaimer below.
  *
- * - Compiler:           IAR EWARM
- * - Supported devices:  All SAM4S devices can be used.
- * - AppNote:
+ * Atmel's name may not be used to endorse or promote products derived from
+ * this software without specific prior written permission.
  *
- ******************************************************************************/
+ * DISCLAIMER: THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
+ * DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+ * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * ----------------------------------------------------------------------------
+ */
 
-#include "exceptions.h"
 #include "sam4s.h"
-#include "system_sam4s.h"
 
 typedef void (*intfunc) (void);
 typedef union { intfunc __fun; void * __ptr; } intvec_elem;
@@ -22,9 +35,65 @@ typedef union { intfunc __fun; void * __ptr; } intvec_elem;
 void __iar_program_start(void);
 int __low_level_init(void);
 
+/* Default empty handler */
+void Dummy_Handler(void);
+
+/* Cortex-M3 core handlers */
+#pragma weak NMI_Handler=Dummy_Handler
+#pragma weak HardFault_Handler=Dummy_Handler
+#pragma weak MemManage_Handler=Dummy_Handler
+#pragma weak BusFault_Handler=Dummy_Handler
+#pragma weak UsageFault_Handler=Dummy_Handler
+#pragma weak SVC_Handler=Dummy_Handler
+#pragma weak DebugMon_Handler=Dummy_Handler
+#pragma weak PendSV_Handler=Dummy_Handler
+#pragma weak SysTick_Handler=Dummy_Handler
+
+/* Peripherals handlers */
+#pragma weak SUPC_Handler=Dummy_Handler
+#pragma weak RSTC_Handler=Dummy_Handler
+#pragma weak RTC_Handler=Dummy_Handler
+#pragma weak RTT_Handler=Dummy_Handler
+#pragma weak WDT_Handler=Dummy_Handler
+#pragma weak PMC_Handler=Dummy_Handler
+#pragma weak EFC_Handler=Dummy_Handler
+#pragma weak UART0_Handler=Dummy_Handler
+#pragma weak UART1_Handler=Dummy_Handler
+#ifdef _SAM4S_SMC_INSTANCE_
+#pragma weak SMC_Handler=Dummy_Handler
+#endif /* _SAM4S_SMC_INSTANCE_ */
+#pragma weak PIOA_Handler=Dummy_Handler
+#pragma weak PIOB_Handler=Dummy_Handler
+#ifdef _SAM4S_PIOC_INSTANCE_
+#pragma weak PIOC_Handler=Dummy_Handler
+#endif /* _SAM4S_PIOC_INSTANCE_ */
+#pragma weak USART0_Handler=Dummy_Handler
+#ifdef _SAM4S_USART1_INSTANCE_
+#pragma weak USART1_Handler=Dummy_Handler
+#endif /* _SAM4S_USART1_INSTANCE_ */
+#ifdef _SAM4S_HSMCI_INSTANCE_
+#pragma weak HSMCI_Handler=Dummy_Handler
+#endif /* _SAM4S_HSMCI_INSTANCE_ */
+#pragma weak TWI0_Handler=Dummy_Handler
+#pragma weak TWI1_Handler=Dummy_Handler
+#pragma weak SPI_Handler=Dummy_Handler
+#pragma weak SSC_Handler=Dummy_Handler
+#pragma weak TC0_Handler=Dummy_Handler
+#pragma weak TC1_Handler=Dummy_Handler
+#pragma weak TC2_Handler=Dummy_Handler
+#ifdef _SAM4S_TC1_INSTANCE_
+#pragma weak TC3_Handler=Dummy_Handler
+#pragma weak TC4_Handler=Dummy_Handler
+#pragma weak TC5_Handler=Dummy_Handler
+#endif /* _SAM4S_TC1_INSTANCE_ */
+#pragma weak ADC_Handler=Dummy_Handler
+#pragma weak DACC_Handler=Dummy_Handler
+#pragma weak PWM_Handler=Dummy_Handler
+#pragma weak CRCCU_Handler=Dummy_Handler
+#pragma weak ACC_Handler=Dummy_Handler
+#pragma weak UDP_Handler=Dummy_Handler
+
 /* Exception Table */
-#pragma language=extended
-#pragma segment="CSTACK"
 
 /* The name "__vector_table" has special meaning for C-SPY: */
 /* it is where the SP start value is found, and the NVIC vector */
@@ -32,69 +101,84 @@ int __low_level_init(void);
 
 #pragma section = ".intvec"
 #pragma location = ".intvec"
-const intvec_elem __vector_table[] = {
-	{.__ptr = __sfe("CSTACK")},
-	{Reset_Handler},
+const DeviceVectors __vector_table[] = {
+	(void*) (&__cstack_end__),
+	(void*) Reset_Handler,
 
-	{NMI_Handler},
-	{HardFault_Handler},
-	{MemManage_Handler},
-	{BusFault_Handler},
-	{UsageFault_Handler},
-	{0}, {0}, {0}, {0},   /*  Reserved */
-	{SVC_Handler},
-	{DebugMon_Handler},
-	{0},                   /*  Reserved */
-	{PendSV_Handler},
-	{SysTick_Handler},
+	(void*) NMI_Handler,
+	(void*) HardFault_Handler,
+	(void*) MemManage_Handler,
+	(void*) BusFault_Handler,
+	(void*) UsageFault_Handler,
+	(void*) (0UL),           /* Reserved */
+	(void*) (0UL),           /* Reserved */
+	(void*) (0UL),           /* Reserved */
+	(void*) (0UL),           /* Reserved */
+	(void*) SVC_Handler,
+	(void*) DebugMon_Handler,
+	(void*) (0UL),           /* Reserved */
+	(void*) PendSV_Handler,
+	(void*) SysTick_Handler,
 
 	/* Configurable interrupts */
-	{SUPC_IrqHandler},     /* 0  Supply Controller */
-	{RSTC_IrqHandler},     /* 1  Reset Controller */
-	{RTC_IrqHandler},      /* 2  Real Time Clock */
-	{RTT_IrqHandler},      /* 3  Real Time Timer */
-	{WDT_IrqHandler},      /* 4  Watchdog Timer */
-	{PMC_IrqHandler},      /* 5  PMC */
-	{EEFC_IrqHandler},     /* 6  EEFC */
-	{Dummy_Handler},       /* 7  Reserved */
-	{UART0_IrqHandler},    /* 8  UART0 */
-	{UART1_IrqHandler},    /* 9  UART1 */
-	{SMC_IrqHandler},      /* 10 SMC */
-	{PIOA_IrqHandler},     /* 11 Parallel IO Controller A */
-	{PIOB_IrqHandler},     /* 12 Parallel IO Controller B */
-	{PIOC_IrqHandler},     /* 13 Parallel IO Controller C */
-	{USART0_IrqHandler},   /* 14 USART 0 */
-	{USART1_IrqHandler},   /* 15 USART 1 */
-	{Dummy_Handler},       /* 16 Reserved */
-	{Dummy_Handler},       /* 17 Reserved */
-	{MCI_IrqHandler},      /* 18 MCI */
-	{TWI0_IrqHandler},     /* 19 TWI 0 */
-	{TWI1_IrqHandler},     /* 20 TWI 1 */
-	{SPI_IrqHandler},      /* 21 SPI */
-	{SSC_IrqHandler},      /* 22 SSC */
-	{TC0_IrqHandler},      /* 23 Timer Counter 0 */
-	{TC1_IrqHandler},      /* 24 Timer Counter 1 */
-	{TC2_IrqHandler},      /* 25 Timer Counter 2 */
-	{TC3_IrqHandler},      /* 26 Timer Counter 3 */
-	{TC4_IrqHandler},      /* 27 Timer Counter 4 */
-	{TC5_IrqHandler},      /* 28 Timer Counter 5 */
-	{ADC_IrqHandler},      /* 29 ADC controller */
-	{DAC_IrqHandler},      /* 30 DAC controller */
-	{PWM_IrqHandler},      /* 31 PWM */
-	{CRCCU_IrqHandler},	   /* 32 CRC Calculation Unit */
-	{ACC_IrqHandler},      /* 33 Analog Comparator */
-	{USBD_IrqHandler},     /* 34 USB Device Port */
-	{Dummy_Handler}        /* 35 not used */
+	(void*) SUPC_Handler,    /* 0  Supply Controller */
+	(void*) RSTC_Handler,    /* 1  Reset Controller */
+	(void*) RTC_Handler,     /* 2  Real Time Clock */
+	(void*) RTT_Handler,     /* 3  Real Time Timer */
+	(void*) WDT_Handler,     /* 4  Watchdog Timer */
+	(void*) PMC_Handler,     /* 5  PMC */
+	(void*) EFC_Handler,     /* 6  EEFC */
+	(void*) (0UL),           /* 7  Reserved */
+	(void*) UART0_Handler,   /* 8  UART0 */
+	(void*) UART1_Handler,   /* 9  UART1 */
+#ifdef _SAM4S_SMC_INSTANCE_
+	(void*) SMC_Handler,     /* 10 SMC */
+#else
+	(void*) (0UL),           /* 10 Reserved */
+#endif /* _SAM4S_SMC_INSTANCE_ */
+	(void*) PIOA_Handler,    /* 11 Parallel IO Controller A */
+	(void*) PIOB_Handler,    /* 12 Parallel IO Controller B */
+#ifdef _SAM4S_PIOC_INSTANCE_
+	(void*) PIOC_Handler,    /* 13 Parallel IO Controller C */
+#else
+	(void*) (0UL),           /* 13 Reserved */
+#endif /* _SAM4S_PIOC_INSTANCE_ */
+	(void*) USART0_Handler,  /* 14 USART 0 */
+#ifdef _SAM4S_USART1_INSTANCE_
+	(void*) USART1_Handler,  /* 15 USART 1 */
+#else
+	(void*) (0UL),           /* 15 Reserved */
+#endif /* _SAM4S_USART1_INSTANCE_ */
+	(void*) (0UL),           /* 16 Reserved */
+	(void*) (0UL),           /* 17 Reserved */
+#ifdef _SAM4S_HSMCI_INSTANCE_
+	(void*) HSMCI_Handler,   /* 18 MCI */
+#else
+	(void*) (0UL),           /* 18 Reserved */
+#endif /* _SAM4S_HSMCI_INSTANCE_ */
+	(void*) TWI0_Handler,    /* 19 TWI 0 */
+	(void*) TWI1_Handler,    /* 20 TWI 1 */
+	(void*) SPI_Handler,     /* 21 SPI */
+	(void*) SSC_Handler,     /* 22 SSC */
+	(void*) TC0_Handler,     /* 23 Timer Counter 0 */
+	(void*) TC1_Handler,     /* 24 Timer Counter 1 */
+	(void*) TC2_Handler,     /* 25 Timer Counter 2 */
+#ifdef _SAM4S_TC1_INSTANCE_
+	(void*) TC3_Handler,     /* 26 Timer Counter 3 */
+	(void*) TC4_Handler,     /* 27 Timer Counter 4 */
+	(void*) TC5_Handler,     /* 28 Timer Counter 5 */
+#else
+	(void*) (0UL),           /* 26 Reserved */
+	(void*) (0UL),           /* 27 Reserved */
+	(void*) (0UL),           /* 28 Reserved */
+#endif /* _SAM4S_TC1_INSTANCE_ */
+	(void*) ADC_Handler,     /* 29 ADC controller */
+	(void*) DACC_Handler,    /* 30 DAC controller */
+	(void*) PWM_Handler,     /* 31 PWM */
+	(void*) CRCCU_Handler,   /* 32 CRC Calculation Unit */
+	(void*) ACC_Handler,     /* 33 Analog Comparator */
+	(void*) UDP_Handler      /* 34 USB Device Port */
 };
-
-/* EWARM 6.30 integrates CMSIS 2.10 (__CM4_CMSIS_VERSION 0x0210),
- * in which SCB_VTOR_TBLBASE_Msk not defined.
- */
-#if (__VER__ >= 6030000)
-/* TEMPORARY PATCH FOR SCB */
-#define SCB_VTOR_TBLBASE_Pos               29                            /*!< SCB VTOR: TBLBASE Position */
-#define SCB_VTOR_TBLBASE_Msk               (1UL << SCB_VTOR_TBLBASE_Pos) /*!< SCB VTOR: TBLBASE Mask */
-#endif
 
 /**------------------------------------------------------------------------------
  * This is the code that gets called on processor reset. To initialize the
@@ -107,7 +191,7 @@ int __low_level_init(void)
 	SCB->VTOR = ((uint32_t) pSrc & SCB_VTOR_TBLOFF_Msk);
 
 	if (((uint32_t) pSrc >= IRAM_ADDR) && ((uint32_t) pSrc < (uint32_t) IRAM_ADDR + (uint32_t) IRAM_SIZE)) {
-		SCB->VTOR |= (uint32_t) (1 << SCB_VTOR_TBLBASE_Pos);
+		SCB->VTOR |= (1UL) << SCB_VTOR_TBLBASE_Pos;
 	}
 
 	return 1; /* if return 0, the data sections will not be initialized */

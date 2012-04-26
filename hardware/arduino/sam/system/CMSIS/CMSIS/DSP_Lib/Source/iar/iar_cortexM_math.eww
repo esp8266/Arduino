@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<workspace>
+  <project>
+    <path>$WS_DIR$\iar_cortexM0_math.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$\iar_cortexM3_math.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$\iar_cortexM4_math.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$\iar_cortexM4F_math.ewp</path>
+  </project>
+</workspace>
+
+

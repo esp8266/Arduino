@@ -270,20 +270,25 @@
 			<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">Reserved</text>
 			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x40048000</text>
 		</g>
-		<g transform="translate(0,575)">
+		<g transform="translate(0,600)">
+			<rect height="25" style="fill: #EEEEEE; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
+			<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">Reserved</text>
+			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x400E0000</text>
+		</g>
+		<g transform="translate(0,625)">
 			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
 			<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">System Controller</text>
 			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x400E0000</text>
 		</g>
-		<g transform="translate(0,600)">
+		<g transform="translate(0,650)">
 			<rect height="25" style="fill: #EEEEEE; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
 			<text text-anchor="middle" transform="translate(0,2)" x="45" y="12.5">Reserved</text>
 			<text style="font-family: monospace" text-anchor="end" x="-2" y="2">0x400E2600</text>
 			<text style="font-family: monospace" text-anchor="end" x="-2" y="27">0x60000000</text>
 		</g>
-		<rect height="625" style="fill: none; stroke: black; stroke-width: 1" width="90" x="0" y="0" />
+		<rect height="675" style="fill: none; stroke: black; stroke-width: 1" width="90" x="0" y="0" />
 	</g>
-	<g id="External_SRAM" style="font-family: sans-serif; font-size: 8px" transform="translate(260,870)">
+	<g id="External_SRAM" style="font-family: sans-serif; font-size: 8px" transform="translate(260,920)">
 		<text text-anchor="middle" x="45" y="-4">External SRAM</text>
 		<g transform="translate(0,0)">
 			<rect height="25" style="fill: none; stroke: black; stroke-width: 0.25" width="90" x="0" y="0" />
@@ -484,14 +489,14 @@
 		<line stroke="grey" stroke-dasharray="2px 2px" stroke-width="1" x1="170" x2="260" y1="70" y2="145" />
 		<line stroke="grey" stroke-dasharray="2px 2px" stroke-width="1" x1="170" x2="260" y1="120" y2="195" />
 		<line stroke="grey" stroke-dasharray="2px 2px" stroke-width="1" x1="170" x2="260" y1="120" y2="220" />
-		<line stroke="grey" stroke-dasharray="2px 2px" stroke-width="1" x1="170" x2="260" y1="170" y2="845" />
-		<line stroke="grey" stroke-dasharray="2px 2px" stroke-width="1" x1="170" x2="260" y1="170" y2="870" />
-		<line stroke="grey" stroke-dasharray="2px 2px" stroke-width="1" x1="170" x2="260" y1="220" y2="995" />
-		<line stroke="grey" stroke-dasharray="2px 2px" stroke-width="1" x1="350" x2="440" y1="795" y2="20" />
-		<line stroke="grey" stroke-dasharray="2px 2px" stroke-width="1" x1="350" x2="440" y1="820" y2="470" />
+		<line stroke="grey" stroke-dasharray="2px 2px" stroke-width="1" x1="170" x2="260" y1="170" y2="895" />
+		<line stroke="grey" stroke-dasharray="2px 2px" stroke-width="1" x1="170" x2="260" y1="170" y2="920" />
+		<line stroke="grey" stroke-dasharray="2px 2px" stroke-width="1" x1="170" x2="260" y1="220" y2="1045" />
+		<line stroke="grey" stroke-dasharray="2px 2px" stroke-width="1" x1="350" x2="440" y1="845" y2="20" />
+		<line stroke="grey" stroke-dasharray="2px 2px" stroke-width="1" x1="350" x2="440" y1="870" y2="470" />
 	</g>
-	<!-- 
-	Generated using the Perl SVG Module V2.50
+	<!--
+	Generated using the Perl SVG Module V2.51
 	by Ronan Oger
 	Info: http://www.roitsystems.com/
  -->

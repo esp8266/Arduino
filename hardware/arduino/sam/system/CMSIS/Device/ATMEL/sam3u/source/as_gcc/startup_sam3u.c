@@ -109,13 +109,13 @@ const DeviceVectors exception_table = {
 	(void*) MemManage_Handler,
 	(void*) BusFault_Handler,
 	(void*) UsageFault_Handler,
-	(void*) 0,                  /* Reserved */
-  (void*) 0,                  /* Reserved */
-  (void*) 0,                  /* Reserved */
-  (void*) 0,                  /* Reserved */
+	(void*) (0UL),           /* Reserved */
+	(void*) (0UL),           /* Reserved */
+	(void*) (0UL),           /* Reserved */
+	(void*) (0UL),           /* Reserved */
 	(void*) SVC_Handler,
 	(void*) DebugMon_Handler,
-	(void*) 0,                  /* Reserved  */
+	(void*) (0UL),           /* Reserved */
 	(void*) PendSV_Handler,
 	(void*) SysTick_Handler,
 
@@ -134,12 +134,16 @@ const DeviceVectors exception_table = {
 	(void*) PIOB_Handler,    /* 11 Parallel IO Controller B */
 #ifdef _SAM3U_PIOC_INSTANCE_
 	(void*) PIOC_Handler,    /* 12 Parallel IO Controller C */
+#else
+	(void*) (0UL),           /* 12 Reserved */
 #endif /* _SAM3U_PIOC_INSTANCE_ */
 	(void*) USART0_Handler,  /* 13 USART 0 */
 	(void*) USART1_Handler,  /* 14 USART 1 */
 	(void*) USART2_Handler,  /* 15 USART 2 */
 #ifdef _SAM3U_USART3_INSTANCE_
 	(void*) USART3_Handler,  /* 16 USART 3 */
+#else
+	(void*) (0UL),           /* 16 Reserved */
 #endif /* _SAM3U_USART3_INSTANCE_ */
 	(void*) HSMCI_Handler,   /* 17 MCI */
 	(void*) TWI0_Handler,    /* 18 TWI 0 */
@@ -153,7 +157,7 @@ const DeviceVectors exception_table = {
 	(void*) ADC12B_Handler,  /* 26 ADC12B controller */
 	(void*) ADC_Handler,     /* 27 ADC controller */
 	(void*) DMAC_Handler,    /* 28 DMA controller */
-	(void*) UDPHS_Handler,   /* 29 USB High Speed Port */
+	(void*) UDPHS_Handler    /* 29 USB High Speed Port */
 };
 
 /**
@@ -184,7 +188,7 @@ void Reset_Handler(void)
 	SCB->VTOR = ((uint32_t) pSrc & SCB_VTOR_TBLOFF_Msk);
 
 	if (((uint32_t) pSrc >= IRAM0_ADDR) && ((uint32_t) pSrc < IRAM0_ADDR + IRAM_SIZE)) {
-		SCB->VTOR |= 1 << SCB_VTOR_TBLBASE_Pos;
+		SCB->VTOR |= (1UL) << SCB_VTOR_TBLBASE_Pos;
 	}
 
 	/* Initialize the C library */

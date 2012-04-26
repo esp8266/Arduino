@@ -117,17 +117,17 @@ const DeviceVectors exception_table = {
 	(void*) MemManage_Handler,
 	(void*) BusFault_Handler,
 	(void*) UsageFault_Handler,
-	(void*) 0,                  /* Reserved */
-  (void*) 0,                  /* Reserved */
-  (void*) 0,                  /* Reserved */
-  (void*) 0,                  /* Reserved */
+	(void*) (0UL),           /* Reserved */
+	(void*) (0UL),           /* Reserved */
+	(void*) (0UL),           /* Reserved */
+	(void*) (0UL),           /* Reserved */
 	(void*) SVC_Handler,
 	(void*) DebugMon_Handler,
-	(void*) 0,                  /* Reserved  */
+	(void*) (0UL),           /* Reserved */
 	(void*) PendSV_Handler,
 	(void*) SysTick_Handler,
 
-	/* Configurable interrupts  */
+	/* Configurable interrupts */
 	(void*) SUPC_Handler,    /* 0  Supply Controller */
 	(void*) RSTC_Handler,    /* 1  Reset Controller */
 	(void*) RTC_Handler,     /* 2  Real Time Clock */
@@ -135,25 +135,33 @@ const DeviceVectors exception_table = {
 	(void*) WDT_Handler,     /* 4  Watchdog Timer */
 	(void*) PMC_Handler,     /* 5  PMC */
 	(void*) EFC_Handler,     /* 6  EEFC */
-	(void*) 0,               /* 7  Reserved */
+	(void*) (0UL),           /* 7  Reserved */
 	(void*) UART0_Handler,   /* 8  UART0 */
 	(void*) UART1_Handler,   /* 9  UART1 */
 #ifdef _SAM4S_SMC_INSTANCE_
 	(void*) SMC_Handler,     /* 10 SMC */
-#endif /* _SAM4S_SMC_INSTANCE_ */
+#else
+	(void*) (0UL),           /* 10 Reserved */
+#endif /* _SAM3S_SMC_INSTANCE_ */
 	(void*) PIOA_Handler,    /* 11 Parallel IO Controller A */
 	(void*) PIOB_Handler,    /* 12 Parallel IO Controller B */
 #ifdef _SAM4S_PIOC_INSTANCE_
 	(void*) PIOC_Handler,    /* 13 Parallel IO Controller C */
+#else
+	(void*) (0UL),           /* 13 Reserved */
 #endif /* _SAM4S_PIOC_INSTANCE_ */
 	(void*) USART0_Handler,  /* 14 USART 0 */
 #ifdef _SAM4S_USART1_INSTANCE_
 	(void*) USART1_Handler,  /* 15 USART 1 */
+#else
+	(void*) (0UL),           /* 15 Reserved */
 #endif /* _SAM4S_USART1_INSTANCE_ */
-	(void*) 0,               /* 16 Reserved */
-	(void*) 0,               /* 17 Reserved */
+	(void*) (0UL),           /* 16 Reserved */
+	(void*) (0UL),           /* 17 Reserved */
 #ifdef _SAM4S_HSMCI_INSTANCE_
 	(void*) HSMCI_Handler,   /* 18 MCI */
+#else
+	(void*) (0UL),           /* 18 Reserved */
 #endif /* _SAM4S_HSMCI_INSTANCE_ */
 	(void*) TWI0_Handler,    /* 19 TWI 0 */
 	(void*) TWI1_Handler,    /* 20 TWI 1 */
@@ -166,6 +174,10 @@ const DeviceVectors exception_table = {
 	(void*) TC3_Handler,     /* 26 Timer Counter 3 */
 	(void*) TC4_Handler,     /* 27 Timer Counter 4 */
 	(void*) TC5_Handler,     /* 28 Timer Counter 5 */
+#else
+	(void*) (0UL),           /* 26 Reserved */
+	(void*) (0UL),           /* 27 Reserved */
+	(void*) (0UL),           /* 28 Reserved */
 #endif /* _SAM4S_TC1_INSTANCE_ */
 	(void*) ADC_Handler,     /* 29 ADC controller */
 	(void*) DACC_Handler,    /* 30 DAC controller */

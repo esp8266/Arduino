@@ -109,7 +109,6 @@
 /** \example arm_graphic_equalizer_example_q31.c 
  */  
  
-     
 #include "arm_math.h" 
 #include "math_helper.h"
 

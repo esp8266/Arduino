@@ -118,7 +118,9 @@ typedef enum IRQn
   TRNG_IRQn            = 41, /**< 41 SAM3X8H True Random Number Generator (TRNG) */
   EMAC_IRQn            = 42, /**< 42 SAM3X8H Ethernet MAC (EMAC) */
   CAN0_IRQn            = 43, /**< 43 SAM3X8H CAN Controller 0 (CAN0) */
-  CAN1_IRQn            = 44  /**< 44 SAM3X8H CAN Controller 1 (CAN1) */
+  CAN1_IRQn            = 44, /**< 44 SAM3X8H CAN Controller 1 (CAN1) */
+
+  PERIPH_COUNT_IRQn    = 45  /**< Number of peripheral IDs */
 } IRQn_Type;
 
 typedef struct _DeviceVectors
@@ -408,6 +410,8 @@ void WDT_Handler        ( void );
 #define ID_EMAC   (42) /**< \brief Ethernet MAC (EMAC) */
 #define ID_CAN0   (43) /**< \brief CAN Controller 0 (CAN0) */
 #define ID_CAN1   (44) /**< \brief CAN Controller 1 (CAN1) */
+
+#define ID_PERIPH_COUNT (45) /**< \brief Number of peripheral IDs */
 /*@}*/
 
 /* ************************************************************************** */

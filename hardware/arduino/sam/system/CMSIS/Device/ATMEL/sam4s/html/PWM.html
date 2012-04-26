@@ -13,7 +13,7 @@
         <h1>SAM4S PWM</h1>
         <a id="PWM__User_Interface"></a>
         <h2>Pulse Width Modulation Controller (PWM) User Interface</h2>
-<!--As per 6343G programmer datasheet.-->
+<!--As per 6343I programmer datasheet.-->
         <h3>Registers</h3>
         <table class="registers">
           <caption>Register Mapping</caption>
@@ -1845,10 +1845,10 @@
             </tr>
             <tr class="fields">
               <td colspan="3">
-                <a href="#PWM_SCM__PTRCS" title="PDC Transfer Request Comparison Selection">PTRCS</a>
+                <a href="#PWM_SCM__PTRCS" title="PDCDMA Transfer Request Comparison Selection">PTRCS</a>
               </td>
               <td colspan="1">
-                <a href="#PWM_SCM__PTRM" title="PDC Transfer Request Mode">PTRM</a>
+                <a href="#PWM_SCM__PTRM" title="PDCDMA Transfer Request Mode">PTRM</a>
               </td>
               <td>-</td>
               <td>-</td>
@@ -1912,8 +1912,8 @@
           <li id="PWM_SCM__SYNC2"><strong>SYNC2</strong>: Synchronous Channel 2<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Channel x is not a synchronous channel.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Channel x is a synchronous channel.</td></tr></tbody></table></li>
           <li id="PWM_SCM__SYNC3"><strong>SYNC3</strong>: Synchronous Channel 3<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Channel x is not a synchronous channel.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Channel x is a synchronous channel.</td></tr></tbody></table></li>
           <li id="PWM_SCM__UPDM"><strong>UPDM</strong>: Synchronous Channels Update Mode<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">MODE0</td><td class="description">Manual write of double buffer registers and manual update of synchronous channels</td></tr><tr class="even"><td class="value">0x1</td><td class="name">MODE1</td><td class="description">Manual write of double buffer registers and automatic update of synchronous channels</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">MODE2</td><td class="description">Automatic write of duty-cycle update registers by the PDC and automatic update of synchronous channels</td></tr></tbody></table></li>
-          <li id="PWM_SCM__PTRM"><strong>PTRM</strong>: PDC Transfer Request Mode<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x1</td><td class="name">-</td><td class="description">The WRDY flag in "PWM Interrupt Status Register 2" on page 60 and the PDC transfer request are set to 1 as soon as the selected comparison matches.</td></tr><tr class="even"><td class="value">0xA</td><td class="name">-</td><td class="description">The WRDY flag in "PWM Interrupt Status Register 2" on page 60 is set to 1 as soon as the update period is elapsed, the PDC transfer request is never set to 1.</td></tr><tr class="odd"><td class="value">0x14</td><td class="name">-</td><td class="description">The WRDY flag in "PWM Interrupt Status Register 2" on page 60 and the PDC transfer request are set to 1 as soon as the update period is elapsed.</td></tr></tbody></table></li>
-          <li id="PWM_SCM__PTRCS"><strong>PTRCS</strong>: PDC Transfer Request Comparison Selection</li>
+          <li id="PWM_SCM__PTRM"><strong>PTRM</strong>: PDCDMA Transfer Request Mode<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x1</td><td class="name">-</td><td class="description">The WRDY flag in "PWM Interrupt Status Register 2" on page 68 and the PDC transfer request are set to 1 as soon as the selected comparison matches.</td></tr><tr class="even"><td class="value">0xA</td><td class="name">-</td><td class="description">The WRDY flag in "PWM Interrupt Status Register 2" on page 68 is set to 1 as soon as the update period is elapsed, the PDC transfer request is never set to 1.</td></tr><tr class="odd"><td class="value">0x14</td><td class="name">-</td><td class="description">The WRDY flag in "PWM Interrupt Status Register 2" on page 68 and the PDC transfer request are set to 1 as soon as the update period is elapsed.</td></tr></tbody></table></li>
+          <li id="PWM_SCM__PTRCS"><strong>PTRCS</strong>: PDCDMA Transfer Request Comparison Selection</li>
           <p>-</p>
         </ul>
         <h4 id="PWM_SCUC">PWM PWM Sync Channels Update Control Register</h4>
@@ -2007,7 +2007,7 @@
           </tbody>
         </table>
         <ul class="values">
-          <li id="PWM_SCUC__UPDULOCK"><strong>UPDULOCK</strong>: Synchronous Channels Update Unlock<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">If the UPDM field is set to "0" in "PWM Sync Channels Mode Register" on page 53, writing the UPDULOCK bit to "1" triggers the update of the period value, the duty-cycle and the dead-time values of synchronous channels at the beginning of the next PWM period. If the field UPDM is set to "1" or "2", writing the UPDULOCK bit to "1" triggers only the update of the period value and of the dead-time values of synchronous channels.</td></tr></tbody></table></li>
+          <li id="PWM_SCUC__UPDULOCK"><strong>UPDULOCK</strong>: Synchronous Channels Update Unlock<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">If the UPDM field is set to "0" in "PWM Sync Channels Mode Register" on page 61, writing the UPDULOCK bit to "1" triggers the update of the period value, the duty-cycle and the dead-time values of synchronous channels at the beginning of the next PWM period. If the field UPDM is set to "1" or "2", writing the UPDULOCK bit to "1" triggers only the update of the period value and of the dead-time values of synchronous channels.</td></tr></tbody></table></li>
         </ul>
         <h4 id="PWM_SCUP">PWM PWM Sync Channels Update Period Register</h4>
         <p><strong>Name</strong>: PWM_SCUP</p>

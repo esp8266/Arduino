@@ -39,6 +39,7 @@ float arm_snr_f32(float *pRef, float *pTest,  uint32_t buffSize);
 void arm_float_to_q12_20(float *pIn, q31_t * pOut, uint32_t numSamples);
 void arm_provide_guard_bits_q15(q15_t *input_buf, uint32_t blockSize, uint32_t guard_bits);
 void arm_provide_guard_bits_q31(q31_t *input_buf, uint32_t blockSize, uint32_t guard_bits);
+void arm_provide_guard_bits_q7 (q7_t * input_buf, uint32_t blockSize, uint32_t guard_bits);
 void arm_float_to_q14(float *pIn, q15_t *pOut, uint32_t numSamples);
 void arm_float_to_q29(float *pIn, q31_t *pOut, uint32_t numSamples);
 void arm_float_to_q28(float *pIn, q31_t *pOut, uint32_t numSamples);

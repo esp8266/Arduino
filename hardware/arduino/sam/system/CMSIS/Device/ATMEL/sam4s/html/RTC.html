@@ -13,7 +13,7 @@
         <h1>SAM4S RTC</h1>
         <a id="RTC__User_Interface"></a>
         <h2>Real-time Clock (RTC) User Interface</h2>
-<!--As per 6056H programmer datasheet.-->
+<!--As per 6056J programmer datasheet.-->
         <h3>Registers</h3>
         <table class="registers">
           <caption>Register Mapping</caption>
@@ -357,7 +357,7 @@
           <li id="RTC_MR__HIGHPPM"><strong>HIGHPPM</strong>: HIGH PPM Correction<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">lower range ppm correction with accurate correction.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">higher range ppm correction with accurate correction.</td></tr></tbody></table></li>
           <li id="RTC_MR__OUT0"><strong>OUT0</strong>: RTCOUT0 Output Source Selection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">NO_WAVE</td><td class="description">no waveform, stuck at '0'</td></tr><tr class="even"><td class="value">0x1</td><td class="name">FREQ1HZ</td><td class="description">1 Hz square wave</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">FREQ32HZ</td><td class="description">32 Hz square wave</td></tr><tr class="even"><td class="value">0x3</td><td class="name">FREQ64HZ</td><td class="description">64 Hz square wave</td></tr><tr class="odd"><td class="value">0x4</td><td class="name">FREQ512HZ</td><td class="description">512 Hz square wave</td></tr><tr class="even"><td class="value">0x5</td><td class="name">ALARM_TOGGLE</td><td class="description">output toggles when alarm flag rises</td></tr><tr class="odd"><td class="value">0x6</td><td class="name">ALARM_FLAG</td><td class="description">output is a copy of the alarm flag</td></tr><tr class="even"><td class="value">0x7</td><td class="name">PROG_PULSE</td><td class="description">duty cycle programmable pulse</td></tr></tbody></table></li>
           <li id="RTC_MR__OUT1"><strong>OUT1</strong>: RTCOUT1 Output Source Selection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">NO_WAVE</td><td class="description">no waveform, stuck at '0'</td></tr><tr class="even"><td class="value">0x1</td><td class="name">FREQ1HZ</td><td class="description">1 Hz square wave</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">FREQ32HZ</td><td class="description">32 Hz square wave</td></tr><tr class="even"><td class="value">0x3</td><td class="name">FREQ64HZ</td><td class="description">64 Hz square wave</td></tr><tr class="odd"><td class="value">0x4</td><td class="name">FREQ512HZ</td><td class="description">512 Hz square wave</td></tr><tr class="even"><td class="value">0x5</td><td class="name">ALARM_TOGGLE</td><td class="description">output toggles when alarm flag rises</td></tr><tr class="odd"><td class="value">0x6</td><td class="name">ALARM_FLAG</td><td class="description">output is a copy of the alarm flag</td></tr><tr class="even"><td class="value">0x7</td><td class="name">PROG_PULSE</td><td class="description">duty cycle programmable pulse</td></tr></tbody></table></li>
-          <li id="RTC_MR__THIGH"><strong>THIGH</strong>: High Duration of the Output Pulse<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">H_31MS</td><td class="description">31.2 ms</td></tr><tr class="even"><td class="value">0x1</td><td class="name">H_16MS</td><td class="description">15.6 ms</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">H_4MS</td><td class="description">3.91 ms</td></tr><tr class="even"><td class="value">0x3</td><td class="name">H_967US</td><td class="description">967 \xb5 s</td></tr><tr class="odd"><td class="value">0x4</td><td class="name">H_488US</td><td class="description">488 \xb5 s</td></tr><tr class="even"><td class="value">0x5</td><td class="name">H_122US</td><td class="description">122 \xb5 s</td></tr><tr class="odd"><td class="value">0x6</td><td class="name">H_30US</td><td class="description">30.5 \xb5 s</td></tr><tr class="even"><td class="value">0x7</td><td class="name">H_15US</td><td class="description">15.2 \xb5 s</td></tr></tbody></table></li>
+          <li id="RTC_MR__THIGH"><strong>THIGH</strong>: High Duration of the Output Pulse<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">H_31MS</td><td class="description">31.2 ms</td></tr><tr class="even"><td class="value">0x1</td><td class="name">H_16MS</td><td class="description">15.6 ms</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">H_4MS</td><td class="description">3.91 ms</td></tr><tr class="even"><td class="value">0x3</td><td class="name">H_976US</td><td class="description">976 \xb5 s</td></tr><tr class="odd"><td class="value">0x4</td><td class="name">H_488US</td><td class="description">488 \xb5 s</td></tr><tr class="even"><td class="value">0x5</td><td class="name">H_122US</td><td class="description">122 \xb5 s</td></tr><tr class="odd"><td class="value">0x6</td><td class="name">H_30US</td><td class="description">30.5 \xb5 s</td></tr><tr class="even"><td class="value">0x7</td><td class="name">H_15US</td><td class="description">15.2 \xb5 s</td></tr></tbody></table></li>
           <li id="RTC_MR__TPERIOD"><strong>TPERIOD</strong>: Period of the Output Pulse<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">P_1S</td><td class="description">1 second</td></tr><tr class="even"><td class="value">0x1</td><td class="name">P_500MS</td><td class="description">500 ms</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">P_250MS</td><td class="description">250 ms</td></tr><tr class="even"><td class="value">0x3</td><td class="name">P_125MS</td><td class="description">125 ms</td></tr></tbody></table></li>
         </ul>
         <h4 id="RTC_TIMR">RTC Time Register</h4>
@@ -806,7 +806,9 @@
             <tr class="fields">
               <td>-</td>
               <td>-</td>
-              <td>-</td>
+              <td colspan="1">
+                <a href="#RTC_SR__TDERR" title="Time and/or Date Free Running Error">TDERR</a>
+              </td>
               <td colspan="1">
                 <a href="#RTC_SR__CALEV" title="Calendar Event">CALEV</a>
               </td>
@@ -826,11 +828,12 @@
           </tbody>
         </table>
         <ul class="values">
-          <li id="RTC_SR__ACKUPD"><strong>ACKUPD</strong>: Acknowledge for Update<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Time and calendar registers cannot be updated.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Time and calendar registers can be updated.</td></tr></tbody></table></li>
-          <li id="RTC_SR__ALARM"><strong>ALARM</strong>: Alarm Flag<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No alarm matching condition occurred.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">An alarm matching condition has occurred.</td></tr></tbody></table></li>
-          <li id="RTC_SR__SEC"><strong>SEC</strong>: Second Event<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No second event has occurred since the last clear.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">At least one second event has occurred since the last clear.</td></tr></tbody></table></li>
-          <li id="RTC_SR__TIMEV"><strong>TIMEV</strong>: Time Event<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No time event has occurred since the last clear.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">At least one time event has occurred since the last clear.</td></tr></tbody></table></li>
-          <li id="RTC_SR__CALEV"><strong>CALEV</strong>: Calendar Event<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No calendar event has occurred since the last clear.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">At least one calendar event has occurred since the last clear.</td></tr></tbody></table></li>
+          <li id="RTC_SR__ACKUPD"><strong>ACKUPD</strong>: Acknowledge for Update<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">FREERUN</td><td class="description">Time and calendar registers cannot be updated.</td></tr><tr class="even"><td class="value">1</td><td class="name">UPDATE</td><td class="description">Time and calendar registers can be updated.</td></tr></tbody></table></li>
+          <li id="RTC_SR__ALARM"><strong>ALARM</strong>: Alarm Flag<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">NO_ALARMEVENT</td><td class="description">No alarm matching condition occurred.</td></tr><tr class="even"><td class="value">1</td><td class="name">ALARMEVENT</td><td class="description">An alarm matching condition has occurred.</td></tr></tbody></table></li>
+          <li id="RTC_SR__SEC"><strong>SEC</strong>: Second Event<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">NO_SECEVENT</td><td class="description">No second event has occurred since the last clear.</td></tr><tr class="even"><td class="value">1</td><td class="name">SECEVENT</td><td class="description">At least one second event has occurred since the last clear.</td></tr></tbody></table></li>
+          <li id="RTC_SR__TIMEV"><strong>TIMEV</strong>: Time Event<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">NO_TIMEVENT</td><td class="description">No time event has occurred since the last clear.</td></tr><tr class="even"><td class="value">1</td><td class="name">TIMEVENT</td><td class="description">At least one time event has occurred since the last clear.</td></tr></tbody></table></li>
+          <li id="RTC_SR__CALEV"><strong>CALEV</strong>: Calendar Event<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">NO_CALEVENT</td><td class="description">No calendar event has occurred since the last clear.</td></tr><tr class="even"><td class="value">1</td><td class="name">CALEVENT</td><td class="description">At least one calendar event has occurred since the last clear.</td></tr></tbody></table></li>
+          <li id="RTC_SR__TDERR"><strong>TDERR</strong>: Time and/or Date Free Running Error<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">CORRECT</td><td class="description">The internal free running counters are carrying valid values since the last read of RTC_SR.</td></tr><tr class="even"><td class="value">1</td><td class="name">ERR_TIMEDATE</td><td class="description">The internal free running counters have been corrupted (invalid date or time, non-BCD values) since the last read and/or they are still invalid.</td></tr></tbody></table></li>
         </ul>
         <h4 id="RTC_SCCR">RTC Status Clear Command Register</h4>
         <p><strong>Name</strong>: RTC_SCCR</p>
@@ -911,7 +914,9 @@
             <tr class="fields">
               <td>-</td>
               <td>-</td>
-              <td>-</td>
+              <td colspan="1">
+                <a href="#RTC_SCCR__TDERRCLR" title="Time and/or Date Free Running Error Clear">TDERRCLR</a>
+              </td>
               <td colspan="1">
                 <a href="#RTC_SCCR__CALCLR" title="Calendar Clear">CALCLR</a>
               </td>
@@ -936,6 +941,7 @@
           <li id="RTC_SCCR__SECCLR"><strong>SECCLR</strong>: Second Clear<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Clears corresponding status flag in the Status Register (RTC_SR).</td></tr></tbody></table></li>
           <li id="RTC_SCCR__TIMCLR"><strong>TIMCLR</strong>: Time Clear<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Clears corresponding status flag in the Status Register (RTC_SR).</td></tr></tbody></table></li>
           <li id="RTC_SCCR__CALCLR"><strong>CALCLR</strong>: Calendar Clear<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Clears corresponding status flag in the Status Register (RTC_SR).</td></tr></tbody></table></li>
+          <li id="RTC_SCCR__TDERRCLR"><strong>TDERRCLR</strong>: Time and/or Date Free Running Error Clear<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Clears corresponding status flag in the Status Register (RTC_SR).</td></tr></tbody></table></li>
         </ul>
         <h4 id="RTC_IER">RTC Interrupt Enable Register</h4>
         <p><strong>Name</strong>: RTC_IER</p>
@@ -1016,7 +1022,9 @@
             <tr class="fields">
               <td>-</td>
               <td>-</td>
-              <td>-</td>
+              <td colspan="1">
+                <a href="#RTC_IER__TDERREN" title="Time and/or Date Error Interrupt Enable">TDERREN</a>
+              </td>
               <td colspan="1">
                 <a href="#RTC_IER__CALEN" title="Calendar Event Interrupt Enable">CALEN</a>
               </td>
@@ -1041,6 +1049,7 @@
           <li id="RTC_IER__SECEN"><strong>SECEN</strong>: Second Event Interrupt Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The second periodic interrupt is enabled.</td></tr></tbody></table></li>
           <li id="RTC_IER__TIMEN"><strong>TIMEN</strong>: Time Event Interrupt Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The selected time event interrupt is enabled.</td></tr></tbody></table></li>
           <li id="RTC_IER__CALEN"><strong>CALEN</strong>: Calendar Event Interrupt Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr></tbody></table></li>
+          <li id="RTC_IER__TDERREN"><strong>TDERREN</strong>: Time and/or Date Error Interrupt Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr></tbody></table></li>
         </ul>
         <h4 id="RTC_IDR">RTC Interrupt Disable Register</h4>
         <p><strong>Name</strong>: RTC_IDR</p>
@@ -1121,7 +1130,9 @@
             <tr class="fields">
               <td>-</td>
               <td>-</td>
-              <td>-</td>
+              <td colspan="1">
+                <a href="#RTC_IDR__TDERRDIS" title="Time and/or Date Error Interrupt Disable">TDERRDIS</a>
+              </td>
               <td colspan="1">
                 <a href="#RTC_IDR__CALDIS" title="Calendar Event Interrupt Disable">CALDIS</a>
               </td>
@@ -1146,6 +1157,7 @@
           <li id="RTC_IDR__SECDIS"><strong>SECDIS</strong>: Second Event Interrupt Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The second periodic interrupt is disabled.</td></tr></tbody></table></li>
           <li id="RTC_IDR__TIMDIS"><strong>TIMDIS</strong>: Time Event Interrupt Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The selected time event interrupt is disabled.</td></tr></tbody></table></li>
           <li id="RTC_IDR__CALDIS"><strong>CALDIS</strong>: Calendar Event Interrupt Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The selected calendar event interrupt is disabled.</td></tr></tbody></table></li>
+          <li id="RTC_IDR__TDERRDIS"><strong>TDERRDIS</strong>: Time and/or Date Error Interrupt Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr></tbody></table></li>
         </ul>
         <h4 id="RTC_IMR">RTC Interrupt Mask Register</h4>
         <p><strong>Name</strong>: RTC_IMR</p>

@@ -41,7 +41,6 @@ int __low_level_init(void);
 void Dummy_Handler(void);
 
 /* Cortex-M3 core handlers */
-#pragma weak Reset_Handler=Dummy_Handler
 #pragma weak NMI_Handler=Dummy_Handler
 #pragma weak HardFault_Handler=Dummy_Handler
 #pragma weak MemManage_Handler=Dummy_Handler
@@ -53,32 +52,38 @@ void Dummy_Handler(void);
 #pragma weak SysTick_Handler=Dummy_Handler
 
 /* Peripherals handlers */
-#pragma weak ADC_Handler=Dummy_Handler
-#pragma weak DACC_Handler=Dummy_Handler
-#pragma weak EFC_Handler=Dummy_Handler
-#pragma weak PIOA_Handler=Dummy_Handler
-#pragma weak PIOB_Handler=Dummy_Handler
-#pragma weak PIOC_Handler=Dummy_Handler
-#pragma weak PMC_Handler=Dummy_Handler
-#pragma weak PWM_Handler=Dummy_Handler
+#pragma weak SUPC_Handler=Dummy_Handler
 #pragma weak RSTC_Handler=Dummy_Handler
 #pragma weak RTC_Handler=Dummy_Handler
 #pragma weak RTT_Handler=Dummy_Handler
+#pragma weak WDT_Handler=Dummy_Handler
+#pragma weak PMC_Handler=Dummy_Handler
+#pragma weak EFC_Handler=Dummy_Handler
+#pragma weak UART0_Handler=Dummy_Handler
+#pragma weak UART1_Handler=Dummy_Handler
+#pragma weak PIOA_Handler=Dummy_Handler
+#pragma weak PIOB_Handler=Dummy_Handler
+#ifdef _SAM3N_PIOC_INSTANCE_
+#pragma weak PIOC_Handler=Dummy_Handler
+#endif /* _SAM3N_PIOC_INSTANCE_ */
+#pragma weak USART0_Handler=Dummy_Handler
+#ifdef _SAM3N_USART1_INSTANCE_
+#pragma weak USART1_Handler=Dummy_Handler
+#endif /* _SAM3N_USART1_INSTANCE_ */
+#pragma weak TWI0_Handler=Dummy_Handler
+#pragma weak TWI1_Handler=Dummy_Handler
 #pragma weak SPI_Handler=Dummy_Handler
-#pragma weak SUPC_Handler=Dummy_Handler
 #pragma weak TC0_Handler=Dummy_Handler
 #pragma weak TC1_Handler=Dummy_Handler
 #pragma weak TC2_Handler=Dummy_Handler
+#ifdef _SAM3N_TC1_INSTANCE_
 #pragma weak TC3_Handler=Dummy_Handler
 #pragma weak TC4_Handler=Dummy_Handler
 #pragma weak TC5_Handler=Dummy_Handler
-#pragma weak TWI0_Handler=Dummy_Handler
-#pragma weak TWI1_Handler=Dummy_Handler
-#pragma weak UART0_Handler=Dummy_Handler
-#pragma weak UART1_Handler=Dummy_Handler
-#pragma weak USART0_Handler=Dummy_Handler
-#pragma weak USART1_Handler=Dummy_Handler
-#pragma weak WDT_Handler=Dummy_Handler
+#endif /* _SAM3N_TC1_INSTANCE_ */
+#pragma weak ADC_Handler=Dummy_Handler
+#pragma weak DACC_Handler=Dummy_Handler
+#pragma weak PWM_Handler=Dummy_Handler
 
 /* Exception Table */
 
@@ -97,13 +102,13 @@ const DeviceVectors __vector_table[] = {
 	(void*) MemManage_Handler,
 	(void*) BusFault_Handler,
 	(void*) UsageFault_Handler,
-	(void*) 0,                  /* Reserved */
-  (void*) 0,                  /* Reserved */
-  (void*) 0,                  /* Reserved */
-  (void*) 0,                  /* Reserved */
+	(void*) (0UL),           /* Reserved */
+	(void*) (0UL),           /* Reserved */
+	(void*) (0UL),           /* Reserved */
+	(void*) (0UL),           /* Reserved */
 	(void*) SVC_Handler,
 	(void*) DebugMon_Handler,
-	(void*) 0,                  /* Reserved  */
+	(void*) (0UL),           /* Reserved */
 	(void*) PendSV_Handler,
 	(void*) SysTick_Handler,
 
@@ -113,43 +118,48 @@ const DeviceVectors __vector_table[] = {
 	(void*) RTC_Handler,     /* 2  Real Time Clock */
 	(void*) RTT_Handler,     /* 3  Real Time Timer */
 	(void*) WDT_Handler,     /* 4  Watchdog Timer */
- 	(void*) PMC_Handler,     /* 5  PMC */
+	(void*) PMC_Handler,     /* 5  PMC */
 	(void*) EFC_Handler,     /* 6  EEFC */
-	(void*) 0,               /* 7  Reserved */
- 	(void*) UART0_Handler,   /* 8  UART0 */
+	(void*) (0UL),           /* 7  Reserved */
+	(void*) UART0_Handler,   /* 8  UART0 */
 	(void*) UART1_Handler,   /* 9  UART1 */
-	(void*) 0,               /* 10 Reserved */
+	(void*) (0UL),           /* 10 Reserved */
 	(void*) PIOA_Handler,    /* 11 Parallel IO Controller A */
 	(void*) PIOB_Handler,    /* 12 Parallel IO Controller B */
+#ifdef _SAM3N_PIOC_INSTANCE_
 	(void*) PIOC_Handler,    /* 13 Parallel IO Controller C */
+#else
+	(void*) (0UL),           /* 13 Reserved */
+#endif /* _SAM3S_PIOC_INSTANCE_ */
 	(void*) USART0_Handler,  /* 14 USART 0 */
+#ifdef _SAM3N_USART1_INSTANCE_
 	(void*) USART1_Handler,  /* 15 USART 1 */
-	(void*) 0,               /* 16 Reserved */
-	(void*) 0,               /* 17 Reserved */
-	(void*) 0,               /* 18 Reserved */
+#else
+	(void*) (0UL),           /* 15 Reserved */
+#endif /* _SAM3N_USART1_INSTANCE_ */
+	(void*) (0UL),           /* 16 Reserved */
+	(void*) (0UL),           /* 17 Reserved */
+	(void*) (0UL),           /* 18 Reserved */
 	(void*) TWI0_Handler,    /* 19 TWI 0 */
 	(void*) TWI1_Handler,    /* 20 TWI 1 */
  	(void*) SPI_Handler,     /* 21 SPI */
-	(void*) 0,               /* 22 Reserved */
+	(void*) (0UL),           /* 22 Reserved */
 	(void*) TC0_Handler,     /* 23 Timer Counter 0 */
 	(void*) TC1_Handler,     /* 24 Timer Counter 1 */
 	(void*) TC2_Handler,     /* 25 Timer Counter 2 */
+#ifdef _SAM3N_TC1_INSTANCE_
 	(void*) TC3_Handler,     /* 26 Timer Counter 3 */
  	(void*) TC4_Handler,     /* 27 Timer Counter 4 */
 	(void*) TC5_Handler,     /* 28 Timer Counter 5 */
+#else
+	(void*) (0UL),           /* 26 Reserved */
+	(void*) (0UL),           /* 27 Reserved */
+	(void*) (0UL),           /* 28 Reserved */
+#endif /* _SAM3N_TC1_INSTANCE_ */
 	(void*) ADC_Handler,     /* 29 ADC controller */
 	(void*) DACC_Handler,    /* 30 DAC controller */
-	(void*) PWM_Handler,     /* 31 PWM */
+	(void*) PWM_Handler      /* 31 PWM */
 };
-
-/* EWARM 6.30 integrates CMSIS 2.10 (__CM3_CMSIS_VERSION 0x0210),
- * in which SCB_VTOR_TBLBASE_Msk not defined.
- */
-#if (__VER__ >= 6030000)
-/* TEMPORARY PATCH FOR SCB */
-#define SCB_VTOR_TBLBASE_Pos               29                            /*!< SCB VTOR: TBLBASE Position */
-#define SCB_VTOR_TBLBASE_Msk               (1UL << SCB_VTOR_TBLBASE_Pos) /*!< SCB VTOR: TBLBASE Mask */
-#endif
 
 /**------------------------------------------------------------------------------
  * This is the code that gets called on processor reset. To initialize the

@@ -99,7 +99,9 @@ typedef enum IRQn
   TC5_IRQn             = 28, /**< 28 SAM3N0C Timer/Counter 5 (TC5) */
   ADC_IRQn             = 29, /**< 29 SAM3N0C Analog To Digital Converter (ADC) */
   DACC_IRQn            = 30, /**< 30 SAM3N0C Digital To Analog Converter (DACC) */
-  PWM_IRQn             = 31  /**< 31 SAM3N0C Pulse Width Modulation (PWM) */
+  PWM_IRQn             = 31, /**< 31 SAM3N0C Pulse Width Modulation (PWM) */
+
+  PERIPH_COUNT_IRQn    = 32  /**< Number of peripheral IDs */
 } IRQn_Type;
 
 typedef struct _DeviceVectors
@@ -312,6 +314,8 @@ void WDT_Handler        ( void );
 #define ID_ADC    (29) /**< \brief Analog To Digital Converter (ADC) */
 #define ID_DACC   (30) /**< \brief Digital To Analog Converter (DACC) */
 #define ID_PWM    (31) /**< \brief Pulse Width Modulation (PWM) */
+
+#define ID_PERIPH_COUNT (32) /**< \brief Number of peripheral IDs */
 /*@}*/
 
 /* ************************************************************************** */

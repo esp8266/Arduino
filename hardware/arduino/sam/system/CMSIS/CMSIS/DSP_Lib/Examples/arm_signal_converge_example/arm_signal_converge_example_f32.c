@@ -91,7 +91,7 @@
   */  
      
 #include "arm_math.h" 
-#include "math_helper.h" 
+#include "math_helper.h"
  
 /* ---------------------------------------------------------------------- 
 ** Global defines for the simulation 

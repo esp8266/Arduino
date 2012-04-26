@@ -13,7 +13,7 @@
         <h1>SAM4S HSMCI</h1>
         <a id="HSMCI__User_Interface"></a>
         <h2>High Speed MultiMedia Card Interface (HSMCI) User Interface</h2>
-<!--As per 6449G programmer datasheet.-->
+<!--As per 6449H programmer datasheet.-->
         <h3>Registers</h3>
         <table class="registers">
           <caption>Register Mapping</caption>
@@ -413,9 +413,14 @@
               <td>24</td>
             </tr>
             <tr class="fields">
-              <td colspan="8">
-                <a href="#HSMCI_MR__BLKLEN" title="Data Block Length">BLKLEN</a>
-              </td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
             </tr>
             <tr class="offsets">
               <td>23</td>
@@ -428,9 +433,14 @@
               <td>16</td>
             </tr>
             <tr class="fields">
-              <td colspan="8">
-                <a href="#HSMCI_MR__BLKLEN" title="Data Block Length">BLKLEN</a>
-              </td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
             </tr>
             <tr class="offsets">
               <td>15</td>
@@ -535,8 +545,6 @@
           <li id="HSMCI_MR__FBYTE"><strong>FBYTE</strong>: Force Byte Transfer<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Disables Force Byte Transfer.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables Force Byte Transfer.</td></tr></tbody></table></li>
           <li id="HSMCI_MR__PADV"><strong>PADV</strong>: Padding Value<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">0x00 value is used when padding data in write transfer.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">0xFF value is used when padding data in write transfer.</td></tr></tbody></table></li>
           <li id="HSMCI_MR__PDCMODE"><strong>PDCMODE</strong>: PDC-oriented Mode<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Disables PDC transfer</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables PDC transfer. In this case, UNRE and OVRE flags in the MCI Mode Register (MCI_SR) are deactivated after the PDC transfer has been completed.</td></tr></tbody></table></li>
-          <li id="HSMCI_MR__BLKLEN"><strong>BLKLEN</strong>: Data Block Length</li>
-          <p>-</p>
         </ul>
         <h4 id="HSMCI_DTOR">HSMCI Data Timeout Register</h4>
         <p><strong>Name</strong>: HSMCI_DTOR</p>
@@ -2256,9 +2264,14 @@
               <td>24</td>
             </tr>
             <tr class="fields">
-              <td colspan="8">
-                <a href="#HSMCI_FIFO__DATA" title="Data to Read or Data to Write">DATA</a>
-              </td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
             </tr>
             <tr class="offsets">
               <td>23</td>
@@ -2271,9 +2284,14 @@
               <td>16</td>
             </tr>
             <tr class="fields">
-              <td colspan="8">
-                <a href="#HSMCI_FIFO__DATA" title="Data to Read or Data to Write">DATA</a>
-              </td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
             </tr>
             <tr class="offsets">
               <td>15</td>
@@ -2286,9 +2304,14 @@
               <td>8</td>
             </tr>
             <tr class="fields">
-              <td colspan="8">
-                <a href="#HSMCI_FIFO__DATA" title="Data to Read or Data to Write">DATA</a>
-              </td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
             </tr>
             <tr class="offsets">
               <td>7</td>
@@ -2301,16 +2324,18 @@
               <td>0</td>
             </tr>
             <tr class="fields">
-              <td colspan="8">
-                <a href="#HSMCI_FIFO__DATA" title="Data to Read or Data to Write">DATA</a>
-              </td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
             </tr>
           </tbody>
         </table>
-        <ul class="values">
-          <li id="HSMCI_FIFO__DATA"><strong>DATA</strong>: Data to Read or Data to Write</li>
-          <p>-</p>
-        </ul>
+        <ul class="values"></ul>
         <h4 id="HSMCI_RPR">HSMCI Receive Pointer Register</h4>
         <p><strong>Name</strong>: HSMCI_RPR</p>
         <p><strong>Access</strong>: read-write</p>

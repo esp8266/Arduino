@@ -100,15 +100,15 @@ typedef struct {
 #define   TC_CMR_ETRGEDG_EDGE (0x3u << 8) /**< \brief (TC_CMR) Each edge */
 #define TC_CMR_ABETRG (0x1u << 10) /**< \brief (TC_CMR) TIOA or TIOB External Trigger Selection */
 #define TC_CMR_CPCTRG (0x1u << 14) /**< \brief (TC_CMR) RC Compare Trigger Enable */
-#define TC_CMR_WAVE (0x1u << 15) /**< \brief (TC_CMR)  */
+#define TC_CMR_WAVE (0x1u << 15) /**< \brief (TC_CMR) Waveform Mode */
 #define TC_CMR_LDRA_Pos 16
-#define TC_CMR_LDRA_Msk (0x3u << TC_CMR_LDRA_Pos) /**< \brief (TC_CMR) RA Loading Selection */
+#define TC_CMR_LDRA_Msk (0x3u << TC_CMR_LDRA_Pos) /**< \brief (TC_CMR) RA Loading Edge Selection */
 #define   TC_CMR_LDRA_NONE (0x0u << 16) /**< \brief (TC_CMR) None */
 #define   TC_CMR_LDRA_RISING (0x1u << 16) /**< \brief (TC_CMR) Rising edge of TIOA */
 #define   TC_CMR_LDRA_FALLING (0x2u << 16) /**< \brief (TC_CMR) Falling edge of TIOA */
 #define   TC_CMR_LDRA_EDGE (0x3u << 16) /**< \brief (TC_CMR) Each edge of TIOA */
 #define TC_CMR_LDRB_Pos 18
-#define TC_CMR_LDRB_Msk (0x3u << TC_CMR_LDRB_Pos) /**< \brief (TC_CMR) RB Loading Selection */
+#define TC_CMR_LDRB_Msk (0x3u << TC_CMR_LDRB_Pos) /**< \brief (TC_CMR) RB Loading Edge Selection */
 #define   TC_CMR_LDRB_NONE (0x0u << 18) /**< \brief (TC_CMR) None */
 #define   TC_CMR_LDRB_RISING (0x1u << 18) /**< \brief (TC_CMR) Rising edge of TIOA */
 #define   TC_CMR_LDRB_FALLING (0x2u << 18) /**< \brief (TC_CMR) Falling edge of TIOA */
@@ -287,7 +287,7 @@ typedef struct {
 #define TC_QISR_IDX (0x1u << 0) /**< \brief (TC_QISR) InDeX */
 #define TC_QISR_DIRCHG (0x1u << 1) /**< \brief (TC_QISR) DIRection CHanGe */
 #define TC_QISR_QERR (0x1u << 2) /**< \brief (TC_QISR) Quadrature ERRor */
-#define TC_QISR_DIR (0x1u << 8) /**< \brief (TC_QISR) Direction */
+#define TC_QISR_DIR (0x1u << 8) /**< \brief (TC_QISR) DIRection */
 /* -------- TC_FMR : (TC Offset: 0xD8) Fault Mode Register -------- */
 #define TC_FMR_ENCF0 (0x1u << 0) /**< \brief (TC_FMR) ENable Compare Fault Channel 0 */
 #define TC_FMR_ENCF1 (0x1u << 1) /**< \brief (TC_FMR) ENable Compare Fault Channel 1 */

@@ -70,13 +70,23 @@ typedef struct {
 #define ADC12B_CR_START (0x1u << 1) /**< \brief (ADC12B_CR) Start Conversion */
 /* -------- ADC12B_MR : (ADC12B Offset: 0x04) Mode Register -------- */
 #define ADC12B_MR_TRGEN (0x1u << 0) /**< \brief (ADC12B_MR) Trigger Enable */
+#define   ADC12B_MR_TRGEN_DIS (0x0u << 0) /**< \brief (ADC12B_MR) Hardware triggers are disabled. Starting a conversion is only possible by software. */
+#define   ADC12B_MR_TRGEN_EN (0x1u << 0) /**< \brief (ADC12B_MR) Hardware trigger selected by TRGSEL field is enabled. */
 #define ADC12B_MR_TRGSEL_Pos 1
 #define ADC12B_MR_TRGSEL_Msk (0x7u << ADC12B_MR_TRGSEL_Pos) /**< \brief (ADC12B_MR) Trigger Selection */
 #define ADC12B_MR_TRGSEL(value) ((ADC12B_MR_TRGSEL_Msk & ((value) << ADC12B_MR_TRGSEL_Pos)))
+#define   ADC12B_MR_TRGSEL_ADC_TRIG0 (0x0u << 1) /**< \brief (ADC12B_MR) External trigger */
+#define   ADC12B_MR_TRGSEL_ADC_TRIG1 (0x1u << 1) /**< \brief (ADC12B_MR) TIO Output of the Timer Counter Channel 0 */
+#define   ADC12B_MR_TRGSEL_ADC_TRIG2 (0x2u << 1) /**< \brief (ADC12B_MR) TIO Output of the Timer Counter Channel 1 */
+#define   ADC12B_MR_TRGSEL_ADC_TRIG3 (0x3u << 1) /**< \brief (ADC12B_MR) TIO Output of the Timer Counter Channel 2 */
+#define   ADC12B_MR_TRGSEL_ADC_TRIG4 (0x4u << 1) /**< \brief (ADC12B_MR) PWM Event Line 0 */
+#define   ADC12B_MR_TRGSEL_ADC_TRIG5 (0x5u << 1) /**< \brief (ADC12B_MR) PWM Event Line 1 */
 #define ADC12B_MR_LOWRES (0x1u << 4) /**< \brief (ADC12B_MR) Resolution */
-#define ADC12B_MR_LOWRES_BITS_12 (0x0u << 4) /**< \brief (ADC_MR) 12-bit resolution */
-#define ADC12B_MR_LOWRES_BITS_10 (0x1u << 4) /**< \brief (ADC_MR) 10-bit resolution */
+#define   ADC12B_MR_LOWRES_BITS_12 (0x0u << 4) /**< \brief (ADC12B_MR) 12-bit resolution */
+#define   ADC12B_MR_LOWRES_BITS_10 (0x1u << 4) /**< \brief (ADC12B_MR) 10-bit resolution */
 #define ADC12B_MR_SLEEP (0x1u << 5) /**< \brief (ADC12B_MR) Sleep Mode */
+#define   ADC12B_MR_SLEEP_NORMAL (0x0u << 5) /**< \brief (ADC12B_MR) Normal Mode: The ADC Core and reference voltage circuitry are kept ON between conversions */
+#define   ADC12B_MR_SLEEP_SLEEP (0x1u << 5) /**< \brief (ADC12B_MR) Sleep Mode: The ADC Core and reference voltage circuitry are OFF between conversions */
 #define ADC12B_MR_PRESCAL_Pos 8
 #define ADC12B_MR_PRESCAL_Msk (0xffu << ADC12B_MR_PRESCAL_Pos) /**< \brief (ADC12B_MR) Prescaler Rate Selection */
 #define ADC12B_MR_PRESCAL(value) ((ADC12B_MR_PRESCAL_Msk & ((value) << ADC12B_MR_PRESCAL_Pos)))

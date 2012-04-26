@@ -103,7 +103,9 @@ typedef enum IRQn
   ADC12B_IRQn          = 26, /**< 26 SAM3U4E 12-bit ADC Controller (ADC12B) */
   ADC_IRQn             = 27, /**< 27 SAM3U4E 10-bit ADC Controller (ADC) */
   DMAC_IRQn            = 28, /**< 28 SAM3U4E DMA Controller (DMAC) */
-  UDPHS_IRQn           = 29  /**< 29 SAM3U4E USB Device High Speed (UDPHS) */
+  UDPHS_IRQn           = 29, /**< 29 SAM3U4E USB Device High Speed (UDPHS) */
+
+  PERIPH_COUNT_IRQn    = 30  /**< Number of peripheral IDs */
 } IRQn_Type;
 
 typedef struct _DeviceVectors
@@ -333,6 +335,8 @@ void WDT_Handler        ( void );
 #define ID_ADC    (27) /**< \brief 10-bit ADC Controller (ADC) */
 #define ID_DMAC   (28) /**< \brief DMA Controller (DMAC) */
 #define ID_UDPHS  (29) /**< \brief USB Device High Speed (UDPHS) */
+
+#define ID_PERIPH_COUNT (30) /**< \brief Number of peripheral IDs */
 /*@}*/
 
 /* ************************************************************************** */
@@ -444,11 +448,11 @@ void WDT_Handler        ( void );
 #define IFLASH0_SIZE             (0x20000u)
 #define IFLASH0_PAGE_SIZE        (256u)
 #define IFLASH0_LOCK_REGION_SIZE (8192u)
-#define IFLASH0_NB_OF_PAGES      (64u)
+#define IFLASH0_NB_OF_PAGES      (512u)
 #define IFLASH1_SIZE             (0x20000u)
 #define IFLASH1_PAGE_SIZE        (256u)
 #define IFLASH1_LOCK_REGION_SIZE (8192u)
-#define IFLASH1_NB_OF_PAGES      (64u)
+#define IFLASH1_NB_OF_PAGES      (512u)
 #define IRAM0_SIZE               (0x8000u)
 #define IRAM1_SIZE               (0x4000u)
 #define NFCRAM_SIZE              (0x1000u)

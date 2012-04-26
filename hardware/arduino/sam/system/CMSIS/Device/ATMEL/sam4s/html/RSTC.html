@@ -13,7 +13,7 @@
         <h1>SAM4S RSTC</h1>
         <a id="RSTC__User_Interface"></a>
         <h2>Reset Controller (RSTC) User Interface</h2>
-<!--As per 11009A programmer datasheet.-->
+<!--As per 11009B programmer datasheet.-->
         <h3>Registers</h3>
         <table class="registers">
           <caption>Register Mapping</caption>
@@ -75,7 +75,7 @@
             </tr>
             <tr class="fields">
               <td colspan="8">
-                <a href="#RSTC_CR__KEY" title="Password">KEY</a>
+                <a href="#RSTC_CR__KEY" title="System Reset Key">KEY</a>
               </td>
             </tr>
             <tr class="offsets">
@@ -150,7 +150,7 @@
           <li id="RSTC_CR__PROCRST"><strong>PROCRST</strong>: Processor Reset<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">If KEY is correct, resets the processor.</td></tr></tbody></table></li>
           <li id="RSTC_CR__PERRST"><strong>PERRST</strong>: Peripheral Reset<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">If KEY is correct, resets the peripherals.</td></tr></tbody></table></li>
           <li id="RSTC_CR__EXTRST"><strong>EXTRST</strong>: External Reset<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">If KEY is correct, asserts the NRST pin.</td></tr></tbody></table></li>
-          <li id="RSTC_CR__KEY"><strong>KEY</strong>: Password</li>
+          <li id="RSTC_CR__KEY"><strong>KEY</strong>: System Reset Key</li>
           <p>-</p>
         </ul>
         <h4 id="RSTC_SR">RSTC Status Register</h4>

@@ -66,7 +66,7 @@
   */  
  
 #include <math.h>     
-#include "arm_math.h" 
+#include "arm_math.h"
  
 /* ---------------------------------------------------------------------- 
 * Defines each of the tests performed 

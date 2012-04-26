@@ -68,7 +68,7 @@
   */  
      
 #include "arm_math.h" 
-#include "math_helper.h" 
+#include "math_helper.h"
  
 #define SNR_THRESHOLD 			90 
 #define TEST_LENGTH_SAMPLES 	10 

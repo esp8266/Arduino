@@ -97,7 +97,9 @@ typedef enum IRQn
   PWM_IRQn             = 31, /**< 31 SAM3S1A Pulse Width Modulation (PWM) */
   CRCCU_IRQn           = 32, /**< 32 SAM3S1A CRC Calculation Unit (CRCCU) */
   ACC_IRQn             = 33, /**< 33 SAM3S1A Analog Comparator (ACC) */
-  UDP_IRQn             = 34  /**< 34 SAM3S1A USB Device Port (UDP) */
+  UDP_IRQn             = 34, /**< 34 SAM3S1A USB Device Port (UDP) */
+
+  PERIPH_COUNT_IRQn    = 35  /**< Number of peripheral IDs */
 } IRQn_Type;
 
 typedef struct _DeviceVectors
@@ -312,6 +314,8 @@ void WDT_Handler        ( void );
 #define ID_CRCCU  (32) /**< \brief CRC Calculation Unit (CRCCU) */
 #define ID_ACC    (33) /**< \brief Analog Comparator (ACC) */
 #define ID_UDP    (34) /**< \brief USB Device Port (UDP) */
+
+#define ID_PERIPH_COUNT (35) /**< \brief Number of peripheral IDs */
 /*@}*/
 
 /* ************************************************************************** */

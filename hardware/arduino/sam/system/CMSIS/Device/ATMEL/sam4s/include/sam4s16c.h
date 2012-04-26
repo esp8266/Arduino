@@ -105,7 +105,9 @@ typedef enum IRQn
   PWM_IRQn             = 31, /**< 31 SAM4S16C Pulse Width Modulation (PWM) */
   CRCCU_IRQn           = 32, /**< 32 SAM4S16C CRC Calculation Unit (CRCCU) */
   ACC_IRQn             = 33, /**< 33 SAM4S16C Analog Comparator (ACC) */
-  UDP_IRQn             = 34  /**< 34 SAM4S16C USB Device Port (UDP) */
+  UDP_IRQn             = 34, /**< 34 SAM4S16C USB Device Port (UDP) */
+
+  PERIPH_COUNT_IRQn    = 35  /**< Number of peripheral IDs */
 } IRQn_Type;
 
 typedef struct _DeviceVectors
@@ -346,6 +348,8 @@ void WDT_Handler        ( void );
 #define ID_CRCCU  (32) /**< \brief CRC Calculation Unit (CRCCU) */
 #define ID_ACC    (33) /**< \brief Analog Comparator (ACC) */
 #define ID_UDP    (34) /**< \brief USB Device Port (UDP) */
+
+#define ID_PERIPH_COUNT (35) /**< \brief Number of peripheral IDs */
 /*@}*/
 
 /* ************************************************************************** */
@@ -460,11 +464,13 @@ void WDT_Handler        ( void );
 /*   MEMORY MAPPING DEFINITIONS FOR SAM4S16C */
 /* ************************************************************************** */
 
-#define IFLASH_SIZE             (0x100000u)
-#define IFLASH_PAGE_SIZE        (512u)
-#define IFLASH_LOCK_REGION_SIZE (8192u)
-#define IFLASH_NB_OF_PAGES      (1024u)
-#define IRAM_SIZE               (0x20000u)
+#define IFLASH0_SIZE             (0x100000u)
+#define IFLASH0_PAGE_SIZE        (512u)
+#define IFLASH0_LOCK_REGION_SIZE (8192u)
+#define IFLASH0_NB_OF_PAGES      (2048u)
+#define IFLASH0_NB_OF_LOCK_BITS  (128u)
+#define IRAM_SIZE                (0x20000u)
+#define IFLASH_SIZE              (IFLASH0_SIZE)
 
 #define IFLASH_ADDR  (0x00400000u) /**< Internal Flash base address */
 #define IROM_ADDR    (0x00800000u) /**< Internal ROM base address */

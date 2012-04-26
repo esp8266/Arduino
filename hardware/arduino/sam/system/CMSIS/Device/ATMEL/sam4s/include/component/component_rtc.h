@@ -100,7 +100,7 @@ typedef struct {
 #define   RTC_MR_THIGH_H_31MS (0x0u << 24) /**< \brief (RTC_MR) 31.2 ms */
 #define   RTC_MR_THIGH_H_16MS (0x1u << 24) /**< \brief (RTC_MR) 15.6 ms */
 #define   RTC_MR_THIGH_H_4MS (0x2u << 24) /**< \brief (RTC_MR) 3.91 ms */
-#define   RTC_MR_THIGH_H_967US (0x3u << 24) /**< \brief (RTC_MR) 967 \xb5 s */
+#define   RTC_MR_THIGH_H_976US (0x3u << 24) /**< \brief (RTC_MR) 976 \xb5 s */
 #define   RTC_MR_THIGH_H_488US (0x4u << 24) /**< \brief (RTC_MR) 488 \xb5 s */
 #define   RTC_MR_THIGH_H_122US (0x5u << 24) /**< \brief (RTC_MR) 122 \xb5 s */
 #define   RTC_MR_THIGH_H_30US (0x6u << 24) /**< \brief (RTC_MR) 30.5 \xb5 s */
@@ -163,28 +163,44 @@ typedef struct {
 #define RTC_CALALR_DATEEN (0x1u << 31) /**< \brief (RTC_CALALR) Date Alarm Enable */
 /* -------- RTC_SR : (RTC Offset: 0x18) Status Register -------- */
 #define RTC_SR_ACKUPD (0x1u << 0) /**< \brief (RTC_SR) Acknowledge for Update */
+#define   RTC_SR_ACKUPD_FREERUN (0x0u << 0) /**< \brief (RTC_SR) Time and calendar registers cannot be updated. */
+#define   RTC_SR_ACKUPD_UPDATE (0x1u << 0) /**< \brief (RTC_SR) Time and calendar registers can be updated. */
 #define RTC_SR_ALARM (0x1u << 1) /**< \brief (RTC_SR) Alarm Flag */
+#define   RTC_SR_ALARM_NO_ALARMEVENT (0x0u << 1) /**< \brief (RTC_SR) No alarm matching condition occurred. */
+#define   RTC_SR_ALARM_ALARMEVENT (0x1u << 1) /**< \brief (RTC_SR) An alarm matching condition has occurred. */
 #define RTC_SR_SEC (0x1u << 2) /**< \brief (RTC_SR) Second Event */
+#define   RTC_SR_SEC_NO_SECEVENT (0x0u << 2) /**< \brief (RTC_SR) No second event has occurred since the last clear. */
+#define   RTC_SR_SEC_SECEVENT (0x1u << 2) /**< \brief (RTC_SR) At least one second event has occurred since the last clear. */
 #define RTC_SR_TIMEV (0x1u << 3) /**< \brief (RTC_SR) Time Event */
+#define   RTC_SR_TIMEV_NO_TIMEVENT (0x0u << 3) /**< \brief (RTC_SR) No time event has occurred since the last clear. */
+#define   RTC_SR_TIMEV_TIMEVENT (0x1u << 3) /**< \brief (RTC_SR) At least one time event has occurred since the last clear. */
 #define RTC_SR_CALEV (0x1u << 4) /**< \brief (RTC_SR) Calendar Event */
+#define   RTC_SR_CALEV_NO_CALEVENT (0x0u << 4) /**< \brief (RTC_SR) No calendar event has occurred since the last clear. */
+#define   RTC_SR_CALEV_CALEVENT (0x1u << 4) /**< \brief (RTC_SR) At least one calendar event has occurred since the last clear. */
+#define RTC_SR_TDERR (0x1u << 5) /**< \brief (RTC_SR) Time and/or Date Free Running Error */
+#define   RTC_SR_TDERR_CORRECT (0x0u << 5) /**< \brief (RTC_SR) The internal free running counters are carrying valid values since the last read of RTC_SR. */
+#define   RTC_SR_TDERR_ERR_TIMEDATE (0x1u << 5) /**< \brief (RTC_SR) The internal free running counters have been corrupted (invalid date or time, non-BCD values) since the last read and/or they are still invalid. */
 /* -------- RTC_SCCR : (RTC Offset: 0x1C) Status Clear Command Register -------- */
 #define RTC_SCCR_ACKCLR (0x1u << 0) /**< \brief (RTC_SCCR) Acknowledge Clear */
 #define RTC_SCCR_ALRCLR (0x1u << 1) /**< \brief (RTC_SCCR) Alarm Clear */
 #define RTC_SCCR_SECCLR (0x1u << 2) /**< \brief (RTC_SCCR) Second Clear */
 #define RTC_SCCR_TIMCLR (0x1u << 3) /**< \brief (RTC_SCCR) Time Clear */
 #define RTC_SCCR_CALCLR (0x1u << 4) /**< \brief (RTC_SCCR) Calendar Clear */
+#define RTC_SCCR_TDERRCLR (0x1u << 5) /**< \brief (RTC_SCCR) Time and/or Date Free Running Error Clear */
 /* -------- RTC_IER : (RTC Offset: 0x20) Interrupt Enable Register -------- */
 #define RTC_IER_ACKEN (0x1u << 0) /**< \brief (RTC_IER) Acknowledge Update Interrupt Enable */
 #define RTC_IER_ALREN (0x1u << 1) /**< \brief (RTC_IER) Alarm Interrupt Enable */
 #define RTC_IER_SECEN (0x1u << 2) /**< \brief (RTC_IER) Second Event Interrupt Enable */
 #define RTC_IER_TIMEN (0x1u << 3) /**< \brief (RTC_IER) Time Event Interrupt Enable */
 #define RTC_IER_CALEN (0x1u << 4) /**< \brief (RTC_IER) Calendar Event Interrupt Enable */
+#define RTC_IER_TDERREN (0x1u << 5) /**< \brief (RTC_IER) Time and/or Date Error Interrupt Enable */
 /* -------- RTC_IDR : (RTC Offset: 0x24) Interrupt Disable Register -------- */
 #define RTC_IDR_ACKDIS (0x1u << 0) /**< \brief (RTC_IDR) Acknowledge Update Interrupt Disable */
 #define RTC_IDR_ALRDIS (0x1u << 1) /**< \brief (RTC_IDR) Alarm Interrupt Disable */
 #define RTC_IDR_SECDIS (0x1u << 2) /**< \brief (RTC_IDR) Second Event Interrupt Disable */
 #define RTC_IDR_TIMDIS (0x1u << 3) /**< \brief (RTC_IDR) Time Event Interrupt Disable */
 #define RTC_IDR_CALDIS (0x1u << 4) /**< \brief (RTC_IDR) Calendar Event Interrupt Disable */
+#define RTC_IDR_TDERRDIS (0x1u << 5) /**< \brief (RTC_IDR) Time and/or Date Error Interrupt Disable */
 /* -------- RTC_IMR : (RTC Offset: 0x28) Interrupt Mask Register -------- */
 #define RTC_IMR_ACK (0x1u << 0) /**< \brief (RTC_IMR) Acknowledge Update Interrupt Mask */
 #define RTC_IMR_ALR (0x1u << 1) /**< \brief (RTC_IMR) Alarm Interrupt Mask */

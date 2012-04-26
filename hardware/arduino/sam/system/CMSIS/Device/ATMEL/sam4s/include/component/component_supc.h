@@ -117,13 +117,13 @@ typedef struct {
 #define   SUPC_WUMR_RTCEN_ENABLE (0x1u << 3) /**< \brief (SUPC_WUMR) the RTC alarm signal forces the wake up of the core power supply. */
 #define SUPC_WUMR_LPDBCEN0 (0x1u << 5) /**< \brief (SUPC_WUMR) Low power Debouncer ENable WKUP0 */
 #define   SUPC_WUMR_LPDBCEN0_NOT_ENABLE (0x0u << 5) /**< \brief (SUPC_WUMR) the WKUP0 input pin is not connected with low power debouncer. */
-#define   SUPC_WUMR_LPDBCEN0_ENABLE (0x1u << 5) /**< \brief (SUPC_WUMR) the WKUP0 input pin is connected with low power debouncer and can force the a core wake up. */
+#define   SUPC_WUMR_LPDBCEN0_ENABLE (0x1u << 5) /**< \brief (SUPC_WUMR) the WKUP0 input pin is connected with low power debouncer and can force a core wake up. */
 #define SUPC_WUMR_LPDBCEN1 (0x1u << 6) /**< \brief (SUPC_WUMR) Low power Debouncer ENable WKUP1 */
 #define   SUPC_WUMR_LPDBCEN1_NOT_ENABLE (0x0u << 6) /**< \brief (SUPC_WUMR) the WKUP1input pin is not connected with low power debouncer. */
-#define   SUPC_WUMR_LPDBCEN1_ENABLE (0x1u << 6) /**< \brief (SUPC_WUMR) the WKUP1 input pin is connected with low power debouncer and can force the a core wake up. */
+#define   SUPC_WUMR_LPDBCEN1_ENABLE (0x1u << 6) /**< \brief (SUPC_WUMR) the WKUP1 input pin is connected with low power debouncer and can force a core wake up. */
 #define SUPC_WUMR_LPDBCCLR (0x1u << 7) /**< \brief (SUPC_WUMR) Low power Debouncer Clear */
-#define   SUPC_WUMR_LPDBCCLR_NOT_ENABLE (0x0u << 7) /**< \brief (SUPC_WUMR) a low power debounce event does not create an immediate clear on half GPBR registers. */
-#define   SUPC_WUMR_LPDBCCLR_ENABLE (0x1u << 7) /**< \brief (SUPC_WUMR) a low power debounce event on WKUP0 or WKUP1 generates an immediate clear on half GPBR registers. */
+#define   SUPC_WUMR_LPDBCCLR_NOT_ENABLE (0x0u << 7) /**< \brief (SUPC_WUMR) a low power debounce event does not create an immediate clear on first half GPBR registers. */
+#define   SUPC_WUMR_LPDBCCLR_ENABLE (0x1u << 7) /**< \brief (SUPC_WUMR) a low power debounce event on WKUP0 or WKUP1 generates an immediate clear on first half GPBR registers. */
 #define SUPC_WUMR_WKUPDBC_Pos 12
 #define SUPC_WUMR_WKUPDBC_Msk (0x7u << SUPC_WUMR_WKUPDBC_Pos) /**< \brief (SUPC_WUMR) Wake Up Inputs Debouncer Period */
 #define   SUPC_WUMR_WKUPDBC_IMMEDIATE (0x0u << 12) /**< \brief (SUPC_WUMR) Immediate, no debouncing, detected active at least on one Slow Clock edge. */
@@ -144,101 +144,101 @@ typedef struct {
 #define   SUPC_WUMR_LPDBC_8_RTCOUT0 (0x7u << 16) /**< \brief (SUPC_WUMR) WKUP0/1 in its active state for at least 8 RTCOUT0 periods */
 /* -------- SUPC_WUIR : (SUPC Offset: 0x10) Supply Controller Wake Up Inputs Register -------- */
 #define SUPC_WUIR_WKUPEN0 (0x1u << 0) /**< \brief (SUPC_WUIR) Wake Up Input Enable 0 */
-#define   SUPC_WUIR_WKUPEN0_NOT_ENABLE (0x0u << 0) /**< \brief (SUPC_WUIR) the corresponding wake-up input has no wake up effect. */
+#define   SUPC_WUIR_WKUPEN0_DISABLE (0x0u << 0) /**< \brief (SUPC_WUIR) the corresponding wake-up input has no wake up effect. */
 #define   SUPC_WUIR_WKUPEN0_ENABLE (0x1u << 0) /**< \brief (SUPC_WUIR) the corresponding wake-up input forces the wake up of the core power supply. */
 #define SUPC_WUIR_WKUPEN1 (0x1u << 1) /**< \brief (SUPC_WUIR) Wake Up Input Enable 1 */
-#define   SUPC_WUIR_WKUPEN1_NOT_ENABLE (0x0u << 1) /**< \brief (SUPC_WUIR) the corresponding wake-up input has no wake up effect. */
+#define   SUPC_WUIR_WKUPEN1_DISABLE (0x0u << 1) /**< \brief (SUPC_WUIR) the corresponding wake-up input has no wake up effect. */
 #define   SUPC_WUIR_WKUPEN1_ENABLE (0x1u << 1) /**< \brief (SUPC_WUIR) the corresponding wake-up input forces the wake up of the core power supply. */
 #define SUPC_WUIR_WKUPEN2 (0x1u << 2) /**< \brief (SUPC_WUIR) Wake Up Input Enable 2 */
-#define   SUPC_WUIR_WKUPEN2_NOT_ENABLE (0x0u << 2) /**< \brief (SUPC_WUIR) the corresponding wake-up input has no wake up effect. */
+#define   SUPC_WUIR_WKUPEN2_DISABLE (0x0u << 2) /**< \brief (SUPC_WUIR) the corresponding wake-up input has no wake up effect. */
 #define   SUPC_WUIR_WKUPEN2_ENABLE (0x1u << 2) /**< \brief (SUPC_WUIR) the corresponding wake-up input forces the wake up of the core power supply. */
 #define SUPC_WUIR_WKUPEN3 (0x1u << 3) /**< \brief (SUPC_WUIR) Wake Up Input Enable 3 */
-#define   SUPC_WUIR_WKUPEN3_NOT_ENABLE (0x0u << 3) /**< \brief (SUPC_WUIR) the corresponding wake-up input has no wake up effect. */
+#define   SUPC_WUIR_WKUPEN3_DISABLE (0x0u << 3) /**< \brief (SUPC_WUIR) the corresponding wake-up input has no wake up effect. */
 #define   SUPC_WUIR_WKUPEN3_ENABLE (0x1u << 3) /**< \brief (SUPC_WUIR) the corresponding wake-up input forces the wake up of the core power supply. */
 #define SUPC_WUIR_WKUPEN4 (0x1u << 4) /**< \brief (SUPC_WUIR) Wake Up Input Enable 4 */
-#define   SUPC_WUIR_WKUPEN4_NOT_ENABLE (0x0u << 4) /**< \brief (SUPC_WUIR) the corresponding wake-up input has no wake up effect. */
+#define   SUPC_WUIR_WKUPEN4_DISABLE (0x0u << 4) /**< \brief (SUPC_WUIR) the corresponding wake-up input has no wake up effect. */
 #define   SUPC_WUIR_WKUPEN4_ENABLE (0x1u << 4) /**< \brief (SUPC_WUIR) the corresponding wake-up input forces the wake up of the core power supply. */
 #define SUPC_WUIR_WKUPEN5 (0x1u << 5) /**< \brief (SUPC_WUIR) Wake Up Input Enable 5 */
-#define   SUPC_WUIR_WKUPEN5_NOT_ENABLE (0x0u << 5) /**< \brief (SUPC_WUIR) the corresponding wake-up input has no wake up effect. */
+#define   SUPC_WUIR_WKUPEN5_DISABLE (0x0u << 5) /**< \brief (SUPC_WUIR) the corresponding wake-up input has no wake up effect. */
 #define   SUPC_WUIR_WKUPEN5_ENABLE (0x1u << 5) /**< \brief (SUPC_WUIR) the corresponding wake-up input forces the wake up of the core power supply. */
 #define SUPC_WUIR_WKUPEN6 (0x1u << 6) /**< \brief (SUPC_WUIR) Wake Up Input Enable 6 */
-#define   SUPC_WUIR_WKUPEN6_NOT_ENABLE (0x0u << 6) /**< \brief (SUPC_WUIR) the corresponding wake-up input has no wake up effect. */
+#define   SUPC_WUIR_WKUPEN6_DISABLE (0x0u << 6) /**< \brief (SUPC_WUIR) the corresponding wake-up input has no wake up effect. */
 #define   SUPC_WUIR_WKUPEN6_ENABLE (0x1u << 6) /**< \brief (SUPC_WUIR) the corresponding wake-up input forces the wake up of the core power supply. */
 #define SUPC_WUIR_WKUPEN7 (0x1u << 7) /**< \brief (SUPC_WUIR) Wake Up Input Enable 7 */
-#define   SUPC_WUIR_WKUPEN7_NOT_ENABLE (0x0u << 7) /**< \brief (SUPC_WUIR) the corresponding wake-up input has no wake up effect. */
+#define   SUPC_WUIR_WKUPEN7_DISABLE (0x0u << 7) /**< \brief (SUPC_WUIR) the corresponding wake-up input has no wake up effect. */
 #define   SUPC_WUIR_WKUPEN7_ENABLE (0x1u << 7) /**< \brief (SUPC_WUIR) the corresponding wake-up input forces the wake up of the core power supply. */
 #define SUPC_WUIR_WKUPEN8 (0x1u << 8) /**< \brief (SUPC_WUIR) Wake Up Input Enable 8 */
-#define   SUPC_WUIR_WKUPEN8_NOT_ENABLE (0x0u << 8) /**< \brief (SUPC_WUIR) the corresponding wake-up input has no wake up effect. */
+#define   SUPC_WUIR_WKUPEN8_DISABLE (0x0u << 8) /**< \brief (SUPC_WUIR) the corresponding wake-up input has no wake up effect. */
 #define   SUPC_WUIR_WKUPEN8_ENABLE (0x1u << 8) /**< \brief (SUPC_WUIR) the corresponding wake-up input forces the wake up of the core power supply. */
 #define SUPC_WUIR_WKUPEN9 (0x1u << 9) /**< \brief (SUPC_WUIR) Wake Up Input Enable 9 */
-#define   SUPC_WUIR_WKUPEN9_NOT_ENABLE (0x0u << 9) /**< \brief (SUPC_WUIR) the corresponding wake-up input has no wake up effect. */
+#define   SUPC_WUIR_WKUPEN9_DISABLE (0x0u << 9) /**< \brief (SUPC_WUIR) the corresponding wake-up input has no wake up effect. */
 #define   SUPC_WUIR_WKUPEN9_ENABLE (0x1u << 9) /**< \brief (SUPC_WUIR) the corresponding wake-up input forces the wake up of the core power supply. */
 #define SUPC_WUIR_WKUPEN10 (0x1u << 10) /**< \brief (SUPC_WUIR) Wake Up Input Enable 10 */
-#define   SUPC_WUIR_WKUPEN10_NOT_ENABLE (0x0u << 10) /**< \brief (SUPC_WUIR) the corresponding wake-up input has no wake up effect. */
+#define   SUPC_WUIR_WKUPEN10_DISABLE (0x0u << 10) /**< \brief (SUPC_WUIR) the corresponding wake-up input has no wake up effect. */
 #define   SUPC_WUIR_WKUPEN10_ENABLE (0x1u << 10) /**< \brief (SUPC_WUIR) the corresponding wake-up input forces the wake up of the core power supply. */
 #define SUPC_WUIR_WKUPEN11 (0x1u << 11) /**< \brief (SUPC_WUIR) Wake Up Input Enable 11 */
-#define   SUPC_WUIR_WKUPEN11_NOT_ENABLE (0x0u << 11) /**< \brief (SUPC_WUIR) the corresponding wake-up input has no wake up effect. */
+#define   SUPC_WUIR_WKUPEN11_DISABLE (0x0u << 11) /**< \brief (SUPC_WUIR) the corresponding wake-up input has no wake up effect. */
 #define   SUPC_WUIR_WKUPEN11_ENABLE (0x1u << 11) /**< \brief (SUPC_WUIR) the corresponding wake-up input forces the wake up of the core power supply. */
 #define SUPC_WUIR_WKUPEN12 (0x1u << 12) /**< \brief (SUPC_WUIR) Wake Up Input Enable 12 */
-#define   SUPC_WUIR_WKUPEN12_NOT_ENABLE (0x0u << 12) /**< \brief (SUPC_WUIR) the corresponding wake-up input has no wake up effect. */
+#define   SUPC_WUIR_WKUPEN12_DISABLE (0x0u << 12) /**< \brief (SUPC_WUIR) the corresponding wake-up input has no wake up effect. */
 #define   SUPC_WUIR_WKUPEN12_ENABLE (0x1u << 12) /**< \brief (SUPC_WUIR) the corresponding wake-up input forces the wake up of the core power supply. */
 #define SUPC_WUIR_WKUPEN13 (0x1u << 13) /**< \brief (SUPC_WUIR) Wake Up Input Enable 13 */
-#define   SUPC_WUIR_WKUPEN13_NOT_ENABLE (0x0u << 13) /**< \brief (SUPC_WUIR) the corresponding wake-up input has no wake up effect. */
+#define   SUPC_WUIR_WKUPEN13_DISABLE (0x0u << 13) /**< \brief (SUPC_WUIR) the corresponding wake-up input has no wake up effect. */
 #define   SUPC_WUIR_WKUPEN13_ENABLE (0x1u << 13) /**< \brief (SUPC_WUIR) the corresponding wake-up input forces the wake up of the core power supply. */
 #define SUPC_WUIR_WKUPEN14 (0x1u << 14) /**< \brief (SUPC_WUIR) Wake Up Input Enable 14 */
-#define   SUPC_WUIR_WKUPEN14_NOT_ENABLE (0x0u << 14) /**< \brief (SUPC_WUIR) the corresponding wake-up input has no wake up effect. */
+#define   SUPC_WUIR_WKUPEN14_DISABLE (0x0u << 14) /**< \brief (SUPC_WUIR) the corresponding wake-up input has no wake up effect. */
 #define   SUPC_WUIR_WKUPEN14_ENABLE (0x1u << 14) /**< \brief (SUPC_WUIR) the corresponding wake-up input forces the wake up of the core power supply. */
 #define SUPC_WUIR_WKUPEN15 (0x1u << 15) /**< \brief (SUPC_WUIR) Wake Up Input Enable 15 */
-#define   SUPC_WUIR_WKUPEN15_NOT_ENABLE (0x0u << 15) /**< \brief (SUPC_WUIR) the corresponding wake-up input has no wake up effect. */
+#define   SUPC_WUIR_WKUPEN15_DISABLE (0x0u << 15) /**< \brief (SUPC_WUIR) the corresponding wake-up input has no wake up effect. */
 #define   SUPC_WUIR_WKUPEN15_ENABLE (0x1u << 15) /**< \brief (SUPC_WUIR) the corresponding wake-up input forces the wake up of the core power supply. */
-#define SUPC_WUIR_WKUPT0 (0x1u << 16) /**< \brief (SUPC_WUIR) Wake Up Input Transition 0 */
-#define   SUPC_WUIR_WKUPT0_HIGH_TO_LOW (0x0u << 16) /**< \brief (SUPC_WUIR) a high to low level transition on the corresponding wake-up input forces the wake up of the core power supply. */
-#define   SUPC_WUIR_WKUPT0_LOW_TO_HIGH (0x1u << 16) /**< \brief (SUPC_WUIR) a low to high level transition on the corresponding wake-up input forces the wake up of the core power supply. */
-#define SUPC_WUIR_WKUPT1 (0x1u << 17) /**< \brief (SUPC_WUIR) Wake Up Input Transition 1 */
-#define   SUPC_WUIR_WKUPT1_HIGH_TO_LOW (0x0u << 17) /**< \brief (SUPC_WUIR) a high to low level transition on the corresponding wake-up input forces the wake up of the core power supply. */
-#define   SUPC_WUIR_WKUPT1_LOW_TO_HIGH (0x1u << 17) /**< \brief (SUPC_WUIR) a low to high level transition on the corresponding wake-up input forces the wake up of the core power supply. */
-#define SUPC_WUIR_WKUPT2 (0x1u << 18) /**< \brief (SUPC_WUIR) Wake Up Input Transition 2 */
-#define   SUPC_WUIR_WKUPT2_HIGH_TO_LOW (0x0u << 18) /**< \brief (SUPC_WUIR) a high to low level transition on the corresponding wake-up input forces the wake up of the core power supply. */
-#define   SUPC_WUIR_WKUPT2_LOW_TO_HIGH (0x1u << 18) /**< \brief (SUPC_WUIR) a low to high level transition on the corresponding wake-up input forces the wake up of the core power supply. */
-#define SUPC_WUIR_WKUPT3 (0x1u << 19) /**< \brief (SUPC_WUIR) Wake Up Input Transition 3 */
-#define   SUPC_WUIR_WKUPT3_HIGH_TO_LOW (0x0u << 19) /**< \brief (SUPC_WUIR) a high to low level transition on the corresponding wake-up input forces the wake up of the core power supply. */
-#define   SUPC_WUIR_WKUPT3_LOW_TO_HIGH (0x1u << 19) /**< \brief (SUPC_WUIR) a low to high level transition on the corresponding wake-up input forces the wake up of the core power supply. */
-#define SUPC_WUIR_WKUPT4 (0x1u << 20) /**< \brief (SUPC_WUIR) Wake Up Input Transition 4 */
-#define   SUPC_WUIR_WKUPT4_HIGH_TO_LOW (0x0u << 20) /**< \brief (SUPC_WUIR) a high to low level transition on the corresponding wake-up input forces the wake up of the core power supply. */
-#define   SUPC_WUIR_WKUPT4_LOW_TO_HIGH (0x1u << 20) /**< \brief (SUPC_WUIR) a low to high level transition on the corresponding wake-up input forces the wake up of the core power supply. */
-#define SUPC_WUIR_WKUPT5 (0x1u << 21) /**< \brief (SUPC_WUIR) Wake Up Input Transition 5 */
-#define   SUPC_WUIR_WKUPT5_HIGH_TO_LOW (0x0u << 21) /**< \brief (SUPC_WUIR) a high to low level transition on the corresponding wake-up input forces the wake up of the core power supply. */
-#define   SUPC_WUIR_WKUPT5_LOW_TO_HIGH (0x1u << 21) /**< \brief (SUPC_WUIR) a low to high level transition on the corresponding wake-up input forces the wake up of the core power supply. */
-#define SUPC_WUIR_WKUPT6 (0x1u << 22) /**< \brief (SUPC_WUIR) Wake Up Input Transition 6 */
-#define   SUPC_WUIR_WKUPT6_HIGH_TO_LOW (0x0u << 22) /**< \brief (SUPC_WUIR) a high to low level transition on the corresponding wake-up input forces the wake up of the core power supply. */
-#define   SUPC_WUIR_WKUPT6_LOW_TO_HIGH (0x1u << 22) /**< \brief (SUPC_WUIR) a low to high level transition on the corresponding wake-up input forces the wake up of the core power supply. */
-#define SUPC_WUIR_WKUPT7 (0x1u << 23) /**< \brief (SUPC_WUIR) Wake Up Input Transition 7 */
-#define   SUPC_WUIR_WKUPT7_HIGH_TO_LOW (0x0u << 23) /**< \brief (SUPC_WUIR) a high to low level transition on the corresponding wake-up input forces the wake up of the core power supply. */
-#define   SUPC_WUIR_WKUPT7_LOW_TO_HIGH (0x1u << 23) /**< \brief (SUPC_WUIR) a low to high level transition on the corresponding wake-up input forces the wake up of the core power supply. */
-#define SUPC_WUIR_WKUPT8 (0x1u << 24) /**< \brief (SUPC_WUIR) Wake Up Input Transition 8 */
-#define   SUPC_WUIR_WKUPT8_HIGH_TO_LOW (0x0u << 24) /**< \brief (SUPC_WUIR) a high to low level transition on the corresponding wake-up input forces the wake up of the core power supply. */
-#define   SUPC_WUIR_WKUPT8_LOW_TO_HIGH (0x1u << 24) /**< \brief (SUPC_WUIR) a low to high level transition on the corresponding wake-up input forces the wake up of the core power supply. */
-#define SUPC_WUIR_WKUPT9 (0x1u << 25) /**< \brief (SUPC_WUIR) Wake Up Input Transition 9 */
-#define   SUPC_WUIR_WKUPT9_HIGH_TO_LOW (0x0u << 25) /**< \brief (SUPC_WUIR) a high to low level transition on the corresponding wake-up input forces the wake up of the core power supply. */
-#define   SUPC_WUIR_WKUPT9_LOW_TO_HIGH (0x1u << 25) /**< \brief (SUPC_WUIR) a low to high level transition on the corresponding wake-up input forces the wake up of the core power supply. */
-#define SUPC_WUIR_WKUPT10 (0x1u << 26) /**< \brief (SUPC_WUIR) Wake Up Input Transition 10 */
-#define   SUPC_WUIR_WKUPT10_HIGH_TO_LOW (0x0u << 26) /**< \brief (SUPC_WUIR) a high to low level transition on the corresponding wake-up input forces the wake up of the core power supply. */
-#define   SUPC_WUIR_WKUPT10_LOW_TO_HIGH (0x1u << 26) /**< \brief (SUPC_WUIR) a low to high level transition on the corresponding wake-up input forces the wake up of the core power supply. */
-#define SUPC_WUIR_WKUPT11 (0x1u << 27) /**< \brief (SUPC_WUIR) Wake Up Input Transition 11 */
-#define   SUPC_WUIR_WKUPT11_HIGH_TO_LOW (0x0u << 27) /**< \brief (SUPC_WUIR) a high to low level transition on the corresponding wake-up input forces the wake up of the core power supply. */
-#define   SUPC_WUIR_WKUPT11_LOW_TO_HIGH (0x1u << 27) /**< \brief (SUPC_WUIR) a low to high level transition on the corresponding wake-up input forces the wake up of the core power supply. */
-#define SUPC_WUIR_WKUPT12 (0x1u << 28) /**< \brief (SUPC_WUIR) Wake Up Input Transition 12 */
-#define   SUPC_WUIR_WKUPT12_HIGH_TO_LOW (0x0u << 28) /**< \brief (SUPC_WUIR) a high to low level transition on the corresponding wake-up input forces the wake up of the core power supply. */
-#define   SUPC_WUIR_WKUPT12_LOW_TO_HIGH (0x1u << 28) /**< \brief (SUPC_WUIR) a low to high level transition on the corresponding wake-up input forces the wake up of the core power supply. */
-#define SUPC_WUIR_WKUPT13 (0x1u << 29) /**< \brief (SUPC_WUIR) Wake Up Input Transition 13 */
-#define   SUPC_WUIR_WKUPT13_HIGH_TO_LOW (0x0u << 29) /**< \brief (SUPC_WUIR) a high to low level transition on the corresponding wake-up input forces the wake up of the core power supply. */
-#define   SUPC_WUIR_WKUPT13_LOW_TO_HIGH (0x1u << 29) /**< \brief (SUPC_WUIR) a low to high level transition on the corresponding wake-up input forces the wake up of the core power supply. */
-#define SUPC_WUIR_WKUPT14 (0x1u << 30) /**< \brief (SUPC_WUIR) Wake Up Input Transition 14 */
-#define   SUPC_WUIR_WKUPT14_HIGH_TO_LOW (0x0u << 30) /**< \brief (SUPC_WUIR) a high to low level transition on the corresponding wake-up input forces the wake up of the core power supply. */
-#define   SUPC_WUIR_WKUPT14_LOW_TO_HIGH (0x1u << 30) /**< \brief (SUPC_WUIR) a low to high level transition on the corresponding wake-up input forces the wake up of the core power supply. */
-#define SUPC_WUIR_WKUPT15 (0x1u << 31) /**< \brief (SUPC_WUIR) Wake Up Input Transition 15 */
-#define   SUPC_WUIR_WKUPT15_HIGH_TO_LOW (0x0u << 31) /**< \brief (SUPC_WUIR) a high to low level transition on the corresponding wake-up input forces the wake up of the core power supply. */
-#define   SUPC_WUIR_WKUPT15_LOW_TO_HIGH (0x1u << 31) /**< \brief (SUPC_WUIR) a low to high level transition on the corresponding wake-up input forces the wake up of the core power supply. */
+#define SUPC_WUIR_WKUPT0 (0x1u << 16) /**< \brief (SUPC_WUIR) Wake Up Input Type 0 */
+#define   SUPC_WUIR_WKUPT0_LOW (0x0u << 16) /**< \brief (SUPC_WUIR) a low level for a period defined by WKUPDBC on the corresponding wake-up input forces the wake up of the core power supply. */
+#define   SUPC_WUIR_WKUPT0_HIGH (0x1u << 16) /**< \brief (SUPC_WUIR) a high levelfor a period defined by WKUPDBC on the correspond-ing wake-up input forces the wake up of the core power supply. */
+#define SUPC_WUIR_WKUPT1 (0x1u << 17) /**< \brief (SUPC_WUIR) Wake Up Input Type 1 */
+#define   SUPC_WUIR_WKUPT1_LOW (0x0u << 17) /**< \brief (SUPC_WUIR) a low level for a period defined by WKUPDBC on the corresponding wake-up input forces the wake up of the core power supply. */
+#define   SUPC_WUIR_WKUPT1_HIGH (0x1u << 17) /**< \brief (SUPC_WUIR) a high levelfor a period defined by WKUPDBC on the correspond-ing wake-up input forces the wake up of the core power supply. */
+#define SUPC_WUIR_WKUPT2 (0x1u << 18) /**< \brief (SUPC_WUIR) Wake Up Input Type 2 */
+#define   SUPC_WUIR_WKUPT2_LOW (0x0u << 18) /**< \brief (SUPC_WUIR) a low level for a period defined by WKUPDBC on the corresponding wake-up input forces the wake up of the core power supply. */
+#define   SUPC_WUIR_WKUPT2_HIGH (0x1u << 18) /**< \brief (SUPC_WUIR) a high levelfor a period defined by WKUPDBC on the correspond-ing wake-up input forces the wake up of the core power supply. */
+#define SUPC_WUIR_WKUPT3 (0x1u << 19) /**< \brief (SUPC_WUIR) Wake Up Input Type 3 */
+#define   SUPC_WUIR_WKUPT3_LOW (0x0u << 19) /**< \brief (SUPC_WUIR) a low level for a period defined by WKUPDBC on the corresponding wake-up input forces the wake up of the core power supply. */
+#define   SUPC_WUIR_WKUPT3_HIGH (0x1u << 19) /**< \brief (SUPC_WUIR) a high levelfor a period defined by WKUPDBC on the correspond-ing wake-up input forces the wake up of the core power supply. */
+#define SUPC_WUIR_WKUPT4 (0x1u << 20) /**< \brief (SUPC_WUIR) Wake Up Input Type 4 */
+#define   SUPC_WUIR_WKUPT4_LOW (0x0u << 20) /**< \brief (SUPC_WUIR) a low level for a period defined by WKUPDBC on the corresponding wake-up input forces the wake up of the core power supply. */
+#define   SUPC_WUIR_WKUPT4_HIGH (0x1u << 20) /**< \brief (SUPC_WUIR) a high levelfor a period defined by WKUPDBC on the correspond-ing wake-up input forces the wake up of the core power supply. */
+#define SUPC_WUIR_WKUPT5 (0x1u << 21) /**< \brief (SUPC_WUIR) Wake Up Input Type 5 */
+#define   SUPC_WUIR_WKUPT5_LOW (0x0u << 21) /**< \brief (SUPC_WUIR) a low level for a period defined by WKUPDBC on the corresponding wake-up input forces the wake up of the core power supply. */
+#define   SUPC_WUIR_WKUPT5_HIGH (0x1u << 21) /**< \brief (SUPC_WUIR) a high levelfor a period defined by WKUPDBC on the correspond-ing wake-up input forces the wake up of the core power supply. */
+#define SUPC_WUIR_WKUPT6 (0x1u << 22) /**< \brief (SUPC_WUIR) Wake Up Input Type 6 */
+#define   SUPC_WUIR_WKUPT6_LOW (0x0u << 22) /**< \brief (SUPC_WUIR) a low level for a period defined by WKUPDBC on the corresponding wake-up input forces the wake up of the core power supply. */
+#define   SUPC_WUIR_WKUPT6_HIGH (0x1u << 22) /**< \brief (SUPC_WUIR) a high levelfor a period defined by WKUPDBC on the correspond-ing wake-up input forces the wake up of the core power supply. */
+#define SUPC_WUIR_WKUPT7 (0x1u << 23) /**< \brief (SUPC_WUIR) Wake Up Input Type 7 */
+#define   SUPC_WUIR_WKUPT7_LOW (0x0u << 23) /**< \brief (SUPC_WUIR) a low level for a period defined by WKUPDBC on the corresponding wake-up input forces the wake up of the core power supply. */
+#define   SUPC_WUIR_WKUPT7_HIGH (0x1u << 23) /**< \brief (SUPC_WUIR) a high levelfor a period defined by WKUPDBC on the correspond-ing wake-up input forces the wake up of the core power supply. */
+#define SUPC_WUIR_WKUPT8 (0x1u << 24) /**< \brief (SUPC_WUIR) Wake Up Input Type 8 */
+#define   SUPC_WUIR_WKUPT8_LOW (0x0u << 24) /**< \brief (SUPC_WUIR) a low level for a period defined by WKUPDBC on the corresponding wake-up input forces the wake up of the core power supply. */
+#define   SUPC_WUIR_WKUPT8_HIGH (0x1u << 24) /**< \brief (SUPC_WUIR) a high levelfor a period defined by WKUPDBC on the correspond-ing wake-up input forces the wake up of the core power supply. */
+#define SUPC_WUIR_WKUPT9 (0x1u << 25) /**< \brief (SUPC_WUIR) Wake Up Input Type 9 */
+#define   SUPC_WUIR_WKUPT9_LOW (0x0u << 25) /**< \brief (SUPC_WUIR) a low level for a period defined by WKUPDBC on the corresponding wake-up input forces the wake up of the core power supply. */
+#define   SUPC_WUIR_WKUPT9_HIGH (0x1u << 25) /**< \brief (SUPC_WUIR) a high levelfor a period defined by WKUPDBC on the correspond-ing wake-up input forces the wake up of the core power supply. */
+#define SUPC_WUIR_WKUPT10 (0x1u << 26) /**< \brief (SUPC_WUIR) Wake Up Input Type 10 */
+#define   SUPC_WUIR_WKUPT10_LOW (0x0u << 26) /**< \brief (SUPC_WUIR) a low level for a period defined by WKUPDBC on the corresponding wake-up input forces the wake up of the core power supply. */
+#define   SUPC_WUIR_WKUPT10_HIGH (0x1u << 26) /**< \brief (SUPC_WUIR) a high levelfor a period defined by WKUPDBC on the correspond-ing wake-up input forces the wake up of the core power supply. */
+#define SUPC_WUIR_WKUPT11 (0x1u << 27) /**< \brief (SUPC_WUIR) Wake Up Input Type 11 */
+#define   SUPC_WUIR_WKUPT11_LOW (0x0u << 27) /**< \brief (SUPC_WUIR) a low level for a period defined by WKUPDBC on the corresponding wake-up input forces the wake up of the core power supply. */
+#define   SUPC_WUIR_WKUPT11_HIGH (0x1u << 27) /**< \brief (SUPC_WUIR) a high levelfor a period defined by WKUPDBC on the correspond-ing wake-up input forces the wake up of the core power supply. */
+#define SUPC_WUIR_WKUPT12 (0x1u << 28) /**< \brief (SUPC_WUIR) Wake Up Input Type 12 */
+#define   SUPC_WUIR_WKUPT12_LOW (0x0u << 28) /**< \brief (SUPC_WUIR) a low level for a period defined by WKUPDBC on the corresponding wake-up input forces the wake up of the core power supply. */
+#define   SUPC_WUIR_WKUPT12_HIGH (0x1u << 28) /**< \brief (SUPC_WUIR) a high levelfor a period defined by WKUPDBC on the correspond-ing wake-up input forces the wake up of the core power supply. */
+#define SUPC_WUIR_WKUPT13 (0x1u << 29) /**< \brief (SUPC_WUIR) Wake Up Input Type 13 */
+#define   SUPC_WUIR_WKUPT13_LOW (0x0u << 29) /**< \brief (SUPC_WUIR) a low level for a period defined by WKUPDBC on the corresponding wake-up input forces the wake up of the core power supply. */
+#define   SUPC_WUIR_WKUPT13_HIGH (0x1u << 29) /**< \brief (SUPC_WUIR) a high levelfor a period defined by WKUPDBC on the correspond-ing wake-up input forces the wake up of the core power supply. */
+#define SUPC_WUIR_WKUPT14 (0x1u << 30) /**< \brief (SUPC_WUIR) Wake Up Input Type 14 */
+#define   SUPC_WUIR_WKUPT14_LOW (0x0u << 30) /**< \brief (SUPC_WUIR) a low level for a period defined by WKUPDBC on the corresponding wake-up input forces the wake up of the core power supply. */
+#define   SUPC_WUIR_WKUPT14_HIGH (0x1u << 30) /**< \brief (SUPC_WUIR) a high levelfor a period defined by WKUPDBC on the correspond-ing wake-up input forces the wake up of the core power supply. */
+#define SUPC_WUIR_WKUPT15 (0x1u << 31) /**< \brief (SUPC_WUIR) Wake Up Input Type 15 */
+#define   SUPC_WUIR_WKUPT15_LOW (0x0u << 31) /**< \brief (SUPC_WUIR) a low level for a period defined by WKUPDBC on the corresponding wake-up input forces the wake up of the core power supply. */
+#define   SUPC_WUIR_WKUPT15_HIGH (0x1u << 31) /**< \brief (SUPC_WUIR) a high levelfor a period defined by WKUPDBC on the correspond-ing wake-up input forces the wake up of the core power supply. */
 /* -------- SUPC_SR : (SUPC Offset: 0x14) Supply Controller Status Register -------- */
 #define SUPC_SR_WKUPS (0x1u << 1) /**< \brief (SUPC_SR) WKUP Wake Up Status */
 #define   SUPC_SR_WKUPS_NO (0x0u << 1) /**< \brief (SUPC_SR) no wake up due to the assertion of the WKUP pins has occurred since the last read of SUPC_SR. */
