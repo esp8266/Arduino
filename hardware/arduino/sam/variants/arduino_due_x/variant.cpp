@@ -35,12 +35,12 @@
  *  11       TIOA8 |  PD7
  *  12       TIOB8 |  PD8
  *  13       TIOB0 |  PB27
- *  14   TX3 TXD2  |  PD4
- *  15   RX3 RXD2  |  PD5
+ *  14   TX3 TXD3  |  PD4
+ *  15   RX3 RXD3  |  PD5
  *  16   TX2 TXD1  |  PA13
  *  17   RX2 RXD1  |  PA12
- *  18   TX1       |  PA11
- *  19   RX1       |  PA10
+ *  18   TX1 TXD0  |  PA11
+ *  19   RX1 RXD0  |  PA10
  *  20   SDA       |  PB12 (this pin is level adapted to 5V)
  *  21   SCL       |  PB13 (this pin is level adapted to 5V)
  *  22             |  PB26
@@ -260,7 +260,7 @@ extern const PinDescription g_APinDescription[]=
   { PIOA, PIO_PA11A_TXD0|PIO_PA10A_RXD0, ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_COMBO), NO_ADC, NO_ADC, NO_PWM, NO_TC },
   // 83 - USART1 (Serial3) all pins
   { PIOA, PIO_PA13A_TXD1|PIO_PA12A_RXD1, ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_COMBO), NO_ADC, NO_ADC, NO_PWM, NO_TC },
-  // 84 - USART2 (Serial4) all pins
+  // 84 - USART3 (Serial4) all pins
   { PIOD, PIO_PD4B_TXD3|PIO_PD5B_RXD3, ID_PIOD, PIO_PERIPH_B, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_COMBO), NO_ADC, NO_ADC, NO_PWM, NO_TC },
 
   // END
@@ -290,7 +290,7 @@ RingBuffer rx_buffer4 ;
 
 USARTClass Serial2( USART0, USART0_IRQn, ID_USART0, &rx_buffer2 ) ;
 USARTClass Serial3( USART1, USART1_IRQn, ID_USART1, &rx_buffer3 ) ;
-USARTClass Serial4( USART2, USART2_IRQn, ID_USART2, &rx_buffer4 ) ;
+USARTClass Serial4( USART3, USART3_IRQn, ID_USART3, &rx_buffer4 ) ;
 
 // IT handlers
 void USART0_Handler( void )
@@ -303,7 +303,7 @@ void USART1_Handler( void )
   Serial3.IrqHandler() ;
 }
 
-void USART2_Handler( void )
+void USART3_Handler( void )
 {
   Serial4.IrqHandler() ;
 }
