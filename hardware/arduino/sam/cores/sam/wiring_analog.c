@@ -186,7 +186,7 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 	if ((attr & PIN_ATTR_PWM) == PIN_ATTR_PWM) {
 		if (!PWMEnabled) {
 			// PWM Startup code
-		    PMC_EnablePeripheral(PWM_INTERFACE_ID);
+		    pmc_enable_periph_clk(PWM_INTERFACE_ID);
 		    PWMC_ConfigureClocks(PWM_FREQUENCY * PWM_MAX_DUTY_CYCLE, 0, VARIANT_MCK);
 			PWMEnabled = 1;
 		}
