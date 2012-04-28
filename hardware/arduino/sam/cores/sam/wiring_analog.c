@@ -122,8 +122,8 @@ uint32_t analogRead(uint32_t ulPin)
 		case ADC8 :
 		case ADC9 :
 		case ADC10 :
-		case ADC11 :      
-		
+		case ADC11 :
+
 			// Enable the corresponding channel
 			adc_enable_channel( ADC, ulChannel );
 
@@ -227,7 +227,7 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 		uint32_t chA = channelToAB[channel];
 
 		if (!TCChanEnabled[chNo]) {
-			PMC_EnablePeripheral(TC_INTERFACE_ID + chNo);
+			pmc_enable_periph_clk(TC_INTERFACE_ID + chNo);
 			TC_Configure(TC_INTERFACE, chNo,
 					TC_CMR_TCCLKS_TIMER_CLOCK1 |
 					TC_CMR_WAVE |
