@@ -8,7 +8,7 @@
 
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   See the GNU Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser General Public
@@ -124,6 +124,11 @@ static const uint8_t SCK  = PIN_SPI_SCK ;
 #define PINS_USART0          (82u)
 #define PINS_USART1          (83u)
 #define PINS_USART2          (84u)
+
+/*
+ * USB Interfaces
+ */
+#define PINS_USB             (85u)
 
 /*
  * Analog pins

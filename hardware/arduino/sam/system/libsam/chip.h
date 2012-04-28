@@ -8,7 +8,7 @@
 
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   See the GNU Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser General Public
@@ -54,7 +54,7 @@
 #include "include/wdt.h"
 
 #include "include/timetick.h"
-#include "include/USB_driver.h"
+#include "include/USB_device.h"
 
 #if SAM3XA_SERIES
 #include "include/uotghs.h"

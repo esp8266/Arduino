@@ -8,7 +8,7 @@
 
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   See the GNU Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser General Public
@@ -20,7 +20,7 @@
 
 #if 0 //SAM3U_SERIES
 
-#include "USB_driver.h"
+#include "USB_device.h"
 #include "udphs.h"
 
 /// Max size of the FMA FIFO
@@ -51,7 +51,7 @@ void USBD_WaitOUT(void)
 void USBD_ClearIN(void)
 {
 //	UEINTX = ~(1<<TXINI);
-  UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTCLRSTA = UDPHS_EPTCLRSTA_TX_COMPLT; 
+  UDPHS->UDPHS_EPT[NumEndpoint].UDPHS_EPTCLRSTA = UDPHS_EPTCLRSTA_TX_COMPLT;
 }
 
 void USBD_ClearOUT(void)
@@ -243,7 +243,7 @@ uint8_t USBD_SendSpace(uint8_t ep)
   {
 		return 0;
   }
-  
+
 	return 64 - FifoByteCount();
 }
 
@@ -251,7 +251,7 @@ uint8_t USBD_SendSpace(uint8_t ep)
 uint8_t USBD_Available(uint8_t ep)
 {
 	SetEP(ep);
-  
+
 	return FifoByteCount();
 }
 
@@ -290,11 +290,11 @@ void USBD_InitControl(int end)
 {
 	SetEP(0);
   UDPHS->UDPHS_EPT[0].UDPHS_EPTCFG = _initEndpoints[0];
-  
+
   while( (signed int)UDPHS_EPTCFG_EPT_MAPD != (signed int)((UDPHS->UDPHS_EPT[0].UDPHS_EPTCFG) & (unsigned int)UDPHS_EPTCFG_EPT_MAPD) )
   ;
-  
-  UDPHS->UDPHS_EPT[0].UDPHS_EPTCTLENB = UDPHS_EPTCTLENB_RX_BK_RDY 
+
+  UDPHS->UDPHS_EPT[0].UDPHS_EPTCTLENB = UDPHS_EPTCTLENB_RX_BK_RDY
                                        | UDPHS_EPTCTLENB_RX_SETUP
                                        | UDPHS_EPTCTLENB_EPT_ENABL;
 

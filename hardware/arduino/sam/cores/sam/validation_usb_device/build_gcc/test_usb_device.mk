@@ -8,7 +8,7 @@
 #
 #  This library is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #  See the GNU Lesser General Public License for more details.
 #
 #  You should have received a copy of the GNU Lesser General Public
@@ -99,6 +99,7 @@ INCLUDES += -I$(SYSTEM_PATH)/libsam
 INCLUDES += -I$(CMSIS_ARM_PATH)
 INCLUDES += -I$(CMSIS_ATMEL_PATH)
 INCLUDES += -I$(CMSIS_CHIP_PATH)
+INCLUDES += -I$(PROJECT_BASE_PATH)/../USB
 
 #-------------------------------------------------------------------------------
 ifdef DEBUG
@@ -153,7 +154,7 @@ test: create_output libsam_$(CHIP_NAME)_$(TOOLCHAIN)_$(LIBS_POSTFIX).a libarduin
 
 .PHONY: create_output
 create_output:
-	@echo --- Preparing $(VARIANT) files in $(OUTPUT_PATH) $(OUTPUT_BIN) 
+	@echo --- Preparing $(VARIANT) files in $(OUTPUT_PATH) $(OUTPUT_BIN)
 #	@echo -------------------------
 #	@echo *$(INCLUDES)
 #	@echo -------------------------
@@ -190,11 +191,11 @@ $(OUTPUT_BIN): $(addprefix $(OUTPUT_PATH)/, $(C_OBJ)) $(addprefix $(OUTPUT_PATH)
 clean:
 	@echo --- Cleaning test files
 	-@$(RM) $(OUTPUT_PATH) 1>NUL 2>&1
-	
+
 #	-$(RM) $(OUTPUT_PATH)/test.o
-#	-$(RM) $(OUTPUT_PATH)/$(OUTPUT_BIN).elf 
+#	-$(RM) $(OUTPUT_PATH)/$(OUTPUT_BIN).elf
 #	-$(RM) $(OUTPUT_PATH)/$(OUTPUT_BIN).elf.txt
-#	-$(RM) $(OUTPUT_PATH)/$(OUTPUT_BIN).bin 
+#	-$(RM) $(OUTPUT_PATH)/$(OUTPUT_BIN).bin
 #	-$(RM) $(OUTPUT_PATH)/$(OUTPUT_BIN).map
 
 debug: test

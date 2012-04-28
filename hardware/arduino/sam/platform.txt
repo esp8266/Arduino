@@ -3,7 +3,8 @@
 # --------------------- 
 
 name=Atmel SAM3
-compiler.path={runtime.ide.path}/hardware/tools/g++_arm_none_eabi/bin/
+#compiler.path={runtime.ide.path}/hardware/tools/g++_arm_none_eabi/bin/
+compiler.path=C:/arm-none-eabi-gcc-4_6/bin/
 compiler.c.cmd=arm-none-eabi-gcc
 compiler.c.flags=-c -g -Os -w -mlong-calls -ffunction-sections -fdata-sections -nostdlib --param max-inline-insns-single=500 -Dprintf=iprintf
 compiler.c.elf.cmd=arm-none-eabi-gcc

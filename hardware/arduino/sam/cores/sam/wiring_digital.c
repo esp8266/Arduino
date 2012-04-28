@@ -8,7 +8,7 @@
 
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   See the GNU Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser General Public
@@ -33,7 +33,7 @@ extern void pinMode( uint32_t ulPin, uint32_t ulMode )
     {
         case INPUT:
             /* Enable peripheral for clocking input */
-            PMC_EnablePeripheral( g_APinDescription[ulPin].ulPeripheralId ) ;
+            pmc_enable_periph_clk( g_APinDescription[ulPin].ulPeripheralId ) ;
             PIO_Configure( g_APinDescription[ulPin].pPort, PIO_INPUT, g_APinDescription[ulPin].ulPin, 0 ) ;
         break ;
 
@@ -41,7 +41,7 @@ extern void pinMode( uint32_t ulPin, uint32_t ulMode )
             /* if all pins are output, disable PIO Controller clocking, reduce power consomption */
             if ( g_APinDescription[ulPin].pPort->PIO_OSR == 0xffffffff )
             {
-                PMC_DisablePeripheral( g_APinDescription[ulPin].ulPeripheralId ) ;
+                pmc_disable_periph_clk( g_APinDescription[ulPin].ulPeripheralId ) ;
             }
             PIO_Configure( g_APinDescription[ulPin].pPort, PIO_OUTPUT_1, g_APinDescription[ulPin].ulPin, g_APinDescription[ulPin].ulPinConfiguration ) ;
         break ;

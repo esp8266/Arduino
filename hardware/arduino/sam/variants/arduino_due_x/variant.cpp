@@ -8,7 +8,7 @@
 
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   See the GNU Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser General Public
@@ -101,6 +101,12 @@
  *  SI             |  PA26
  *  SCK            |  PA27
  *  #CS        SS3 |  PB23
+ *
+ *
+ * USB pin         |  PORT
+ * ----------------+--------
+ *  ID             |  PB11
+ *  VBOF           |  PB10
  *
  *
  * LEDs            |  PORT
@@ -263,6 +269,9 @@ extern const PinDescription g_APinDescription[]=
   // 84 - USART3 (Serial4) all pins
   { PIOD, PIO_PD4B_TXD3|PIO_PD5B_RXD3, ID_PIOD, PIO_PERIPH_B, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_COMBO), NO_ADC, NO_ADC, NO_PWM, NO_TC },
 
+  // 85 - USB
+  { PIOB, PIO_PB11A_UOTGID|PIO_PB10A_UOTGVBOF, ID_PIOB, PIO_PERIPH_A, PIO_DEFAULT, PIN_ATTR_DIGITAL,NO_ADC, NO_ADC, NO_PWM,  NO_TC    }, // ID - VBOF
+
   // END
   { NULL, 0, 0, PIO_NOT_A_PIN, PIO_DEFAULT, 0, NO_ADC, NO_ADC, NO_PWM, NO_TC }
 } ;
@@ -355,8 +364,15 @@ extern void init( void )
     g_APinDescription[PINS_USART2].ulPin,
     g_APinDescription[PINS_USART2].ulPinConfiguration);
 
+  // Initialize USB
+  PIO_Configure(
+    g_APinDescription[PINS_USB].pPort,
+    g_APinDescription[PINS_USB].ulPinType,
+    g_APinDescription[PINS_USB].ulPin,
+    g_APinDescription[PINS_USB].ulPinConfiguration);
+
   // Initialize 10bit Analog Controller
-  PMC_EnablePeripheral( ID_ADC ) ;
+  pmc_enable_periph_clk( ID_ADC ) ;
   adc_init( ADC, SystemCoreClock, ADC_FREQ_MAX, ADC_STARTUP_FAST ) ;
   adc_configure_timing(ADC, 0, ADC_SETTLING_TIME_3, 1);
   adc_configure_trigger(ADC, ADC_TRIG_SW, 0); // Disable hardware trigger.

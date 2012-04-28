@@ -8,7 +8,7 @@
 
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   See the GNU Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser General Public
@@ -37,7 +37,7 @@ USARTClass::USARTClass( Usart* pUsart, IRQn_Type dwIrq, uint32_t dwId, RingBuffe
 void USARTClass::begin( const uint32_t dwBaudRate )
 {
   // Configure PMC
-  PMC_EnablePeripheral( _dwId ) ;
+  pmc_enable_periph_clk( _dwId ) ;
 
   // Disable PDC channel
   _pUsart->US_PTCR = US_PTCR_RXTDIS | US_PTCR_TXTDIS ;
@@ -74,7 +74,7 @@ void USARTClass::end( void )
   // Wait for any outstanding data to be sent
   flush();
 
-  PMC_DisablePeripheral( _dwId ) ;
+  pmc_disable_periph_clk( _dwId ) ;
 }
 
 int USARTClass::available( void )

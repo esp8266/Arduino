@@ -28,7 +28,7 @@ extern USB_ USB;
 class Serial_ : public Stream
 {
 private:
-	ring_buffer *_cdc_rx_buffer;
+	RingBuffer *_cdc_rx_buffer;
 public:
 	void begin(uint16_t baud_count);
 	void end(void);
@@ -39,6 +39,7 @@ public:
 	virtual int read(void);
 	virtual void flush(void);
 	virtual size_t write(uint8_t);
+	virtual void write(uint8_t);
 	operator bool();
 };
 extern Serial_ Serial;
@@ -62,7 +63,7 @@ public:
 	void begin(void);
 	void end(void);
 	void click(uint8_t b = MOUSE_LEFT);
-	void move(signed char x, signed char y, signed char wheel = 0);	
+	void move(signed char x, signed char y, signed char wheel = 0);
 	void press(uint8_t b = MOUSE_LEFT);		// press LEFT by default
 	void release(uint8_t b = MOUSE_LEFT);	// release LEFT by default
 	bool isPressed(uint8_t b = MOUSE_ALL);	// check all buttons by default

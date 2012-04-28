@@ -1,5 +1,5 @@
 /* ----------------------------------------------------------------------------
- *         SAM Software Package License 
+ *         SAM Software Package License
  * ----------------------------------------------------------------------------
  * Copyright (c) 2011, Atmel Corporation
  *
@@ -128,7 +128,7 @@ extern void SPI_DisableIt( Spi* spi, uint32_t dwSources )
  */
 extern void SPI_Configure( Spi* spi, uint32_t dwId, uint32_t dwConfiguration )
 {
-    PMC_EnablePeripheral( dwId ) ;
+    pmc_enable_periph_clk( dwId ) ;
     spi->SPI_CR = SPI_CR_SPIDIS ;
 
     /* Execute a software reset of the SPI twice */

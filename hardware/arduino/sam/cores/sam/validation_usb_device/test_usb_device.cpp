@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2011 Arduino.  All right reserved.
+  Copyright (c) 2012 Arduino.  All right reserved.
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -8,7 +8,7 @@
 
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   See the GNU Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser General Public
@@ -17,74 +17,86 @@
 */
 
 #include "variant.h"
+#include <stdio.h>
 
-void setup( void )
-{
-  // Initialize the digital pin as an output.
-  // Pin PIN_LED has a LED connected on most Arduino boards:
-  pinMode( PIN_LED, OUTPUT ) ;
-  digitalWrite( PIN_LED, LOW ) ;
+// set pin numbers for the five buttons:
+const int upButton = 2;
+const int downButton = 3;
+const int leftButton = 4;
+const int rightButton = 5;
+const int mouseButton = 6;
 
-  // Initialize the PIN_LED2 digital pin as an output.
-  pinMode( PIN_LED2, OUTPUT ) ;
-  digitalWrite( PIN_LED2, HIGH ) ;
+int range = 5;              // output range of X or Y movement; affects movement speed
+int responseDelay = 10;     // response delay of the mouse, in ms
 
-  Serial1.begin( 115200 ) ;
+/*
+void setup() {
+  // initialize the buttons' inputs:
+  pinMode(upButton, INPUT);
+  pinMode(downButton, INPUT);
+  pinMode(leftButton, INPUT);
+  pinMode(rightButton, INPUT);
+  pinMode(mouseButton, INPUT);
+  // initialize mouse control:
+  Mouse.begin();
 }
 
-static void led_step1( void )
-{
-#if defined sam3s_ek
-  digitalWrite( PIN_LED, HIGH ) ;  // set the LED on
-  digitalWrite( PIN_LED2, LOW ) ;   // set the red LED off
-#endif /* sam3s_ek */
+void loop() {
+  // read the buttons:
+  int upState = digitalRead(upButton);
+  int downState = digitalRead(downButton);
+  int rightState = digitalRead(rightButton);
+  int leftState = digitalRead(leftButton);
+  int clickState = digitalRead(mouseButton);
 
-#if defined sam3u_ek
-  digitalWrite( PIN_LED, HIGH ) ;  // set the LED on
-  digitalWrite( PIN_LED2, LOW ) ;   // set the red LED off
-#endif /* sam3u_ek */
+  // calculate the movement distance based on the button states:
+  int  xDistance = (leftState - rightState)*range;
+  int  yDistance = (upState - downState)*range;
 
-#if defined arduino_due_x
-  digitalWrite( PIN_LED, LOW ) ;  // set the LED on
-  digitalWrite( PIN_LED2, LOW ) ;   // set the red LED off
-#endif /* arduino_due_x */
-}
-
-static void led_step2( void )
-{
-#if defined sam3s_ek
-  digitalWrite( PIN_LED, LOW ) ;   // set the LED off
-  digitalWrite( PIN_LED2, HIGH ) ;  // set the red LED on
-#endif /* sam3s_ek */
-
-#if defined sam3u_ek
-  digitalWrite( PIN_LED, LOW ) ;   // set the LED off
-  digitalWrite( PIN_LED2, HIGH ) ;  // set the red LED on
-#endif /* sam3u_ek */
-
-#if defined arduino_due_x
-  digitalWrite( PIN_LED, HIGH ) ;   // set the LED off
-  digitalWrite( PIN_LED2, HIGH ) ;  // set the red LED on
-#endif /* arduino_due_x */
-}
-
-void loop( void )
-{
-  led_step1() ;
-  delay( 1000 ) ;              // wait for a second
-  led_step2() ;
-  delay( 1000 ) ;              // wait for a second
-
-  Serial1.write( '-' ) ;   // send a char
-//  Serial1.write( "test1\n" ) ;   // send a string
-//  Serial1.write( "test2" ) ;   // send another string
-
-  Serial1.print("Analog ins: ");
-  for (int i=A0; i<A11; i++) {
-    int a = analogRead(i);
-    Serial1.print(a, DEC);
-    Serial1.print(" ");
+  // if X or Y is non-zero, move:
+  if ((xDistance != 0) || (yDistance != 0)) {
+    Mouse.move(xDistance, yDistance, 0);
   }
-  Serial1.println();
-  delay(100);
+
+  // if the mouse button is pressed:
+  if (clickState == HIGH) {
+    // if the mouse is not pressed, press it:
+    if (!Mouse.isPressed(MOUSE_LEFT)) {
+      Mouse.press(MOUSE_LEFT);
+    }
+  }
+  // else the mouse button is not pressed:
+  else {
+    // if the mouse is pressed, release it:
+    if (Mouse.isPressed(MOUSE_LEFT)) {
+      Mouse.release(MOUSE_LEFT);
+    }
+  }
+
+  // a delay so the mouse doesn't move too fast:
+  delay(responseDelay);
 }
+*/
+
+
+#include "USBAPI.h"
+
+
+
+// Cet exemple fonctionne !!! ;-)
+void setup() {
+	// initialize the digital pin as an output.
+	// Pin 13 has an LED connected on most Arduino boards:
+	//pinMode(13, OUTPUT);
+	Serial1.begin(115200) ;
+	printf("USB test starting...\r\n");
+}
+
+void loop() {
+	//digitalWrite(13, HIGH);   // set the LED on
+	//delay(1000);              // wait for a second
+	//digitalWrite(13, LOW);    // set the LED off
+	delay(1000);              // wait for a second
+	printf("loop...\r\n");
+}
+

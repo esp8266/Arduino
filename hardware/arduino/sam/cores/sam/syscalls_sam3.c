@@ -8,7 +8,7 @@
 
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   See the GNU Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser General Public
@@ -32,6 +32,7 @@
 
 #include <stdio.h>
 #include <stdarg.h>
+#include "sam.h"
 #if defined (  __GNUC__  ) /* GCC CS3 */
   #include <sys/types.h>
   #include <sys/stat.h>
@@ -109,6 +110,13 @@ extern int _write( int file, char *ptr, int len )
     for ( iIndex=0 ; iIndex < len ; iIndex++, ptr++ )
     {
 //        UART_PutChar( *ptr ) ;
+
+		// Check if the transmitter is ready
+		  while ((UART->UART_SR & UART_SR_TXRDY) != UART_SR_TXRDY)
+			;
+
+		  // Send character
+		  UART->UART_THR = *ptr;
     }
 
     return iIndex ;
