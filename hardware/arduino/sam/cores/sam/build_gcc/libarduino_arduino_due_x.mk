@@ -161,6 +161,9 @@ $(addprefix $(OUTPUT_PATH)/,$(C_OBJ)): $(OUTPUT_PATH)/%.o: %.c
 #	"$(CC)" -v -c $(CFLAGS) $< -o $@
 	@"$(CC)" -c $(CFLAGS) $< -o $@
 
+#$(addprefix $(OUTPUT_PATH)/,$(CPP_OBJ)): $(OUTPUT_PATH)/%.d: %.o
+#	"$(CC)" -M -MF $@.d -c $(CPPFLAGS) $<
+
 $(addprefix $(OUTPUT_PATH)/,$(CPP_OBJ)): $(OUTPUT_PATH)/%.o: %.cpp
 	"$(CC)" -xc++ -c $(CPPFLAGS) $< -o $@
 #	@"$(CC)" -xc++ -c $(CPPFLAGS) $< -o $@

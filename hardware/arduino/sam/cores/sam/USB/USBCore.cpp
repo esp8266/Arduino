@@ -16,18 +16,18 @@
 
 #include "Arduino.h"
 
-const uint8_t _initEndpoints[] =
+const uint32_t _initEndpoints[] =
 {
-	0,
+	EP_TYPE_CONTROL,
 
 #ifdef CDC_ENABLED
-	EP_TYPE_BULK_IN,			// CDC_ENDPOINT_IN
-	EP_TYPE_BULK_OUT,			// CDC_ENDPOINT_OUT
-	EP_TYPE_INTERRUPT_IN,		// CDC_ENDPOINT_ACM
+	EP_TYPE_BULK_IN,                // CDC_ENDPOINT_IN
+	EP_TYPE_BULK_OUT,               // CDC_ENDPOINT_OUT
+	EP_TYPE_INTERRUPT_IN,           // CDC_ENDPOINT_ACM
 #endif
 
 #ifdef HID_ENABLED
-	EP_TYPE_INTERRUPT_IN		// HID_ENDPOINT_INT
+	EP_TYPE_INTERRUPT_IN_HID        // HID_ENDPOINT_INT
 #endif
 };
 
