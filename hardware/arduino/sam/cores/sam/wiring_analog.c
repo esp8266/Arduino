@@ -107,7 +107,7 @@ uint32_t analogRead(uint32_t ulPin)
 	}
 #endif
 
-#if defined __SAM3X8E__
+#if defined __SAM3X8E__ || defined __SAM3X8H__
 	switch ( g_APinDescription[ulPin].ulAnalogChannel )
 	{
 		// Handling ADC 10 bits channels

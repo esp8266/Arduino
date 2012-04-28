@@ -51,22 +51,27 @@ extern const PinDescription g_APinDescription[]=
   // 0/1 - UART (Serial)
   { PIOA, PIO_PA8A_URXD,     ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT,  PIN_ATTR_DIGITAL,                 NO_ADC, NO_ADC, NO_PWM,  NO_TC    }, // URXD
   { PIOA, PIO_PA9A_UTXD,     ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT,  PIN_ATTR_DIGITAL,                 NO_ADC, NO_ADC, NO_PWM,  NO_TC    }, // UTXD
-  
+
   // 2/5 - LEDS
   { PIOB, PIO_PB13,          ID_PIOB, PIO_OUTPUT_1, PIO_DEFAULT,  PIN_ATTR_DIGITAL,                 NO_ADC, NO_ADC, NO_PWM,  NO_TC    }, // USER_LED1
   { PIOB, PIO_PB12,          ID_PIOB, PIO_OUTPUT_1, PIO_DEFAULT,  PIN_ATTR_DIGITAL,                 NO_ADC, NO_ADC, NO_PWM,  NO_TC    }, // USER_LED2
   { PIOA, PIO_PA12,          ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT,  PIN_ATTR_DIGITAL,                 NO_ADC, NO_ADC, NO_PWM,  NO_TC    }, // USER_LED3
   { PIOA, PIO_PA13,          ID_PIOA, PIO_OUTPUT_0, PIO_DEFAULT,  PIN_ATTR_DIGITAL,                 NO_ADC, NO_ADC, NO_PWM,  NO_TC    }, // POWER_LED
 
-  // USART0 (Serial2)
+  // 6/7 - USART0 (Serial2)
   { PIOA, PIO_PA10A_RXD0,    ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT,  PIN_ATTR_DIGITAL,                 NO_ADC, NO_ADC, NO_PWM,  NO_TC    }, // URXD
   { PIOA, PIO_PA11A_TXD0,    ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT,  PIN_ATTR_DIGITAL,                 NO_ADC, NO_ADC, NO_PWM,  NO_TC    }, // UTXD
 
-  // x .. x - "All pins" masks
-  // x - UART (Serial) all pins
+  // 8 - UART (Serial) all pins
   { PIOA, PIO_PA8A_URXD|PIO_PA9A_UTXD, ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_COMBO), NO_ADC, NO_ADC, NO_PWM, NO_TC },
-  // x - USART0 (Serial2) all pins
+
+  // 9 - USART0 (Serial2) all pins
   { PIOA, PIO_PA11A_TXD0|PIO_PA10A_RXD0, ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_COMBO), NO_ADC, NO_ADC, NO_PWM, NO_TC },
+
+  // 10 - Analog pins
+  // ----------------------
+  { PIOA, PIO_PA3,           ID_PIOA, PIO_INPUT,    PIO_DEFAULT, PIN_ATTR_ANALOG,                   ADC0,   ADC7,   NO_PWM,  NO_TC    }, // AD0
+
   { NULL, 0,                 0,       PIO_NOT_A_PIN, PIO_DEFAULT, PIN_ATTR_DIGITAL,                 NO_ADC, NO_ADC, NO_PWM,  NO_TC } // END
 } ;
 
@@ -75,12 +80,12 @@ extern const PinDescription g_APinDescription[]=
  */
 RingBuffer rx_buffer1 ;
 
-UARTClass Serial( UART, UART_IRQn, ID_UART, &rx_buffer1 ) ;
+UARTClass Serial1( UART, UART_IRQn, ID_UART, &rx_buffer1 ) ;
 
 // IT handlers
 void UART_Handler(void)
 {
-  Serial.IrqHandler() ;
+  Serial1.IrqHandler() ;
 }
 
 // ----------------------------------------------------------------------------
@@ -137,11 +142,11 @@ extern void init( void )
                   g_APinDescription[PINS_USART0].ulPinConfiguration ) ;
 
   // Switch off Power LED
-  PIO_Configure( g_APinDescription[PIN_LED_RED].pPort, 
+  PIO_Configure( g_APinDescription[PIN_LED_RED].pPort,
                   g_APinDescription[PIN_LED_RED].ulPinType,
-                  g_APinDescription[PIN_LED_RED].ulPin, 
+                  g_APinDescription[PIN_LED_RED].ulPin,
                   g_APinDescription[PIN_LED_RED].ulPinConfiguration ) ;
-                  
+
   PIO_Clear( g_APinDescription[PIN_LED_RED].pPort, g_APinDescription[PIN_LED_RED].ulPin ) ;
 }
 #ifdef __cplusplus

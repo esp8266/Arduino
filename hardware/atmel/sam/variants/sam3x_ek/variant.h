@@ -16,8 +16,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef _VARIANT_SAM3U_EK_
-#define _VARIANT_SAM3U_EK_
+#ifndef _VARIANT_SAM3X_EK_
+#define _VARIANT_SAM3X_EK_
 
 /*----------------------------------------------------------------------------
  *        Headers
@@ -86,18 +86,39 @@
 #define PINS_USART0          (9u)
 
 
+/*
+ * Analog pins
+ */
+static const uint8_t A0  = 10;
 
+/*
+ * PWM
+ */
+#define PWM_INTERFACE        PWM
+#define PWM_INTERFACE_ID     ID_PWM
+#define PWM_FREQUENCY        1000
+#define PWM_MAX_DUTY_CYCLE   255
+#define PWM_MIN_DUTY_CYCLE   0
+
+/*
+ * TC
+ */
+#define TC_INTERFACE        TC0
+#define TC_INTERFACE_ID     ID_TC0
+#define TC_FREQUENCY        1000
+#define TC_MAX_DUTY_CYCLE   255
+#define TC_MIN_DUTY_CYCLE   0
 /*----------------------------------------------------------------------------
  *        Arduino objects - C++ only
  *----------------------------------------------------------------------------*/
 
 #ifdef __cplusplus
 
-extern UARTClass Serial ;
+extern UARTClass Serial1 ;
 
 extern USARTClass Serial2 ;
 
 #endif
 
-#endif /* _VARIANT_SAM3U_EK_ */
+#endif /* _VARIANT_SAM3X_EK_ */
 

@@ -16,8 +16,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef _VARIANT_ARDUINO_DUE_
-#define _VARIANT_ARDUINO_DUE_
+#ifndef _VARIANT_ARDUINO_DUE_X_
+#define _VARIANT_ARDUINO_DUE_X_
 
 /*----------------------------------------------------------------------------
  *        Headers
@@ -182,5 +182,5 @@ extern USARTClass Serial4 ;
 
 #endif
 
-#endif /* _VARIANT_ARDUINO_DUE_ */
+#endif /* _VARIANT_ARDUINO_DUE_X_ */
 

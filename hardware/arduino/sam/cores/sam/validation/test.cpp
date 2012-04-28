@@ -8,7 +8,7 @@
 
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   See the GNU Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser General Public
@@ -17,6 +17,12 @@
 */
 
 #include "variant.h"
+
+#ifdef _VARIANT_SAM3X_EK_
+#define MAX_ANALOG A0
+#elif _VARIANT_ARDUINO_DUE_X_
+#define MAX_ANALOG A10
+#endif
 
 void setup( void )
 {
@@ -80,7 +86,7 @@ void loop( void )
 //  Serial1.write( "test2" ) ;   // send another string
 
   Serial1.print("Analog ins: ");
-  for (int i=A0; i<A11; i++) {
+  for (int i=A0; i<=MAX_ANALOG; i++) {
     int a = analogRead(i);
     Serial1.print(a, DEC);
     Serial1.print(" ");

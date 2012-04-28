@@ -8,7 +8,7 @@
 #
 #  This library is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #  See the GNU Lesser General Public License for more details.
 #
 #  You should have received a copy of the GNU Lesser General Public
@@ -23,18 +23,19 @@
 ifeq ("$(VARIANT)", "")
 #VARIANT=sam3s_ek
 #VARIANT=sam3u_ek
-VARIANT=arduino_due_x
+VARIANT=sam3x_ek
+#VARIANT=arduino_due_x
 endif
 
 ifeq ("$(VARIANT)", "sam3s_ek")
 CHIP=__SAM3S4C__
-VARIANT_PATH = ../../../../atmel/sam/variants/$(VARIANT)
+VARIANT_PATH = ../../../../../../atmel/sam/variants/$(VARIANT)
 else ifeq ("$(VARIANT)", "sam3u_ek")
 CHIP=__SAM3U4E__
-VARIANT_PATH = ../../../../atmel/sam/variants/$(VARIANT)
+VARIANT_PATH = ../../../../../../atmel/sam/variants/$(VARIANT)
 else ifeq ("$(VARIANT)", "sam3x_ek")
 CHIP=__SAM3X8H__
-VARIANT_PATH = ../../../../atmel/sam/variants/$(VARIANT)
+VARIANT_PATH = ../../../../../../atmel/sam/variants/$(VARIANT)
 else ifeq ("$(VARIANT)", "arduino_due_u")
 CHIP=__SAM3U4E__
 VARIANT_PATH = ../../../../variants/$(VARIANT)
@@ -153,7 +154,7 @@ test: create_output libsam_$(CHIP_NAME)_$(TOOLCHAIN)_$(LIBS_POSTFIX).a libarduin
 
 .PHONY: create_output
 create_output:
-	@echo --- Preparing $(VARIANT) files in $(OUTPUT_PATH) $(OUTPUT_BIN) 
+	@echo --- Preparing $(VARIANT) files in $(OUTPUT_PATH) $(OUTPUT_BIN)
 #	@echo -------------------------
 #	@echo *$(INCLUDES)
 #	@echo -------------------------
@@ -190,11 +191,11 @@ $(OUTPUT_BIN): $(addprefix $(OUTPUT_PATH)/, $(C_OBJ)) $(addprefix $(OUTPUT_PATH)
 clean:
 	@echo --- Cleaning test files
 	-@$(RM) $(OUTPUT_PATH) 1>NUL 2>&1
-	
+
 #	-$(RM) $(OUTPUT_PATH)/test.o
-#	-$(RM) $(OUTPUT_PATH)/$(OUTPUT_BIN).elf 
+#	-$(RM) $(OUTPUT_PATH)/$(OUTPUT_BIN).elf
 #	-$(RM) $(OUTPUT_PATH)/$(OUTPUT_BIN).elf.txt
-#	-$(RM) $(OUTPUT_PATH)/$(OUTPUT_BIN).bin 
+#	-$(RM) $(OUTPUT_PATH)/$(OUTPUT_BIN).bin
 #	-$(RM) $(OUTPUT_PATH)/$(OUTPUT_BIN).map
 
 debug: test

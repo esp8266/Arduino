@@ -39,7 +39,7 @@ CMSIS_ROOT_PATH = $(SYSTEM_PATH)/CMSIS
 CMSIS_ARM_PATH=$(CMSIS_ROOT_PATH)/CMSIS/Include
 CMSIS_ATMEL_PATH=$(CMSIS_ROOT_PATH)/Device/ATMEL
 CMSIS_CHIP_PATH=$(CMSIS_ROOT_PATH)/Device/ATMEL/$(CHIP_SERIE)
-VARIANT_PATH = ../../../variants/$(VARIANT)
+VARIANT_PATH = ../../../../../atmel/sam/variants/$(VARIANT)
 
 #-------------------------------------------------------------------------------
 # Files

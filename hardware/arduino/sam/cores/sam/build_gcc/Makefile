@@ -1,6 +1,6 @@
 ifeq ("$(VARIANTS)", "")
-VARIANTS = arduino_due_x arduino_due_u
-#VARIANTS = sam3u_ek sam3s_ek sam3x_ek
+VARIANTS = arduino_due_x arduino_due_u sam3x_ek
+#VARIANTS = sam3u_ek sam3s_ek
 endif
 
 SUBMAKE_OPTIONS=--no-builtin-rules --no-builtin-variables
@@ -11,7 +11,7 @@ SUBMAKE_OPTIONS=--no-builtin-rules --no-builtin-variables
 
 all: $(VARIANTS)
 
-.PHONY: sam3s_ek 
+.PHONY: sam3s_ek
 sam3s_ek:
 	@echo --- Making sam3s_ek
 	@$(MAKE) DEBUG=1 $(SUBMAKE_OPTIONS) -f libarduino_sam3s_ek.mk
