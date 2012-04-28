@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2011 Arduino.  All right reserved.
+  Copyright (c) 2012 Arduino.  All right reserved.
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -8,7 +8,7 @@
 
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   See the GNU Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser General Public
@@ -197,5 +197,17 @@ extern const PinDescription g_APinDescription[] ;
 
 // Include board variant
 #include "variant.h"
+
+#if defined USBCON
+  #define USB_VID            0x2341 // arduino LLC vid
+
+  #define USB_PID_LEONARDO   0x0034
+  #define USB_PID_MICRO      0x0035
+  #define USB_PID_DUE        0xcafe
+
+	#include "USBDesc.h"
+	#include "USBCore.h"
+	#include "USBAPI.h"
+#endif // if defined USBCON
 
 #endif // Arduino_h

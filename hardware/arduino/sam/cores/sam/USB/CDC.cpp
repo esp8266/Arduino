@@ -1,37 +1,30 @@
-
-
-/* Copyright (c) 2011, Peter Barrett  
-**  
-** Permission to use, copy, modify, and/or distribute this software for  
-** any purpose with or without fee is hereby granted, provided that the  
-** above copyright notice and this permission notice appear in all copies.  
-** 
-** THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL  
-** WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED  
-** WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR  
-** BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES  
-** OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,  
-** WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,  
-** ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS  
-** SOFTWARE.  
+/* Copyright (c) 2011, Peter Barrett
+**
+** Permission to use, copy, modify, and/or distribute this software for
+** any purpose with or without fee is hereby granted, provided that the
+** above copyright notice and this permission notice appear in all copies.
+**
+** THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+** WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+** WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR
+** BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES
+** OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,
+** WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+** ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
+** SOFTWARE.
 */
 
+#include "Arduino.h"
+
 #if defined(USBCON)
-#include "Platform.h"
-#include "USBAPI.h"
-#include <avr/wdt.h>
 
 #ifdef CDC_ENABLED
 
-#if (RAMEND < 1000)
-#define SERIAL_BUFFER_SIZE 16
-#else
-#define SERIAL_BUFFER_SIZE 64
-#endif
+#define CDC_SERIAL_BUFFER_SIZE 64
 
 struct ring_buffer
 {
-	unsigned char buffer[SERIAL_BUFFER_SIZE];
+	unsigned char buffer[CDC_SERIAL_BUFFER_SIZE];
 	volatile int head;
 	volatile int tail;
 };
@@ -40,19 +33,16 @@ ring_buffer cdc_rx_buffer = { { 0 }, 0, 0};
 
 typedef struct
 {
-	u32	dwDTERate;
-	u8	bCharFormat;
-	u8 	bParityType;
-	u8 	bDataBits;
-	u8	lineState;
+	uint32_t	dwDTERate;
+	uint8_t	bCharFormat;
+	uint8_t 	bParityType;
+	uint8_t 	bDataBits;
+	uint8_t	lineState;
 } LineInfo;
 
 static volatile LineInfo _usbLineInfo = { 57600, 0x00, 0x00, 0x00, 0x00 };
 
-#define WEAK __attribute__ ((weak))
-
-extern const CDCDescriptor _cdcInterface PROGMEM;
-const CDCDescriptor _cdcInterface =
+static const CDCDescriptor _cdcInterface =
 {
 	D_IAD(0,2,CDC_COMMUNICATION_INTERFACE_CLASS,CDC_ABSTRACT_CONTROL_MODEL,1),
 
@@ -70,7 +60,7 @@ const CDCDescriptor _cdcInterface =
 	D_ENDPOINT(USB_ENDPOINT_IN (CDC_ENDPOINT_IN ),USB_ENDPOINT_TYPE_BULK,0x40,0)
 };
 
-int WEAK CDC_GetInterface(u8* interfaceNum)
+int WEAK CDC_GetInterface(uint8_t* interfaceNum)
 {
 	interfaceNum[0] += 2;	// uses 2
 	return USB_SendControl(TRANSFER_PGM,&_cdcInterface,sizeof(_cdcInterface));
@@ -78,8 +68,8 @@ int WEAK CDC_GetInterface(u8* interfaceNum)
 
 bool WEAK CDC_Setup(Setup& setup)
 {
-	u8 r = setup.bRequest;
-	u8 requestType = setup.bmRequestType;
+	uint8_t r = setup.bRequest;
+	uint8_t requestType = setup.bmRequestType;
 
 	if (REQUEST_DEVICETOHOST_CLASS_INTERFACE == requestType)
 	{
@@ -102,24 +92,30 @@ bool WEAK CDC_Setup(Setup& setup)
 		{
 			_usbLineInfo.lineState = setup.wValueL;
 
-			// auto-reset into the bootloader is triggered when the port, already 
+			// auto-reset into the bootloader is triggered when the port, already
 			// open at 1200 bps, is closed.  this is the signal to start the watchdog
 			// with a relatively long period so it can finish housekeeping tasks
 			// like servicing endpoints before the sketch ends
 			if (1200 == _usbLineInfo.dwDTERate) {
 				// We check DTR state to determine if host port is open (bit 0 of lineState).
-				if ((_usbLineInfo.lineState & 0x01) == 0) {
+				if ((_usbLineInfo.lineState & 0x01) == 0)
+        {
+/* TODO, AVR Stuff
 					*(uint16_t *)0x0800 = 0x7777;
 					wdt_enable(WDTO_120MS);
-				} else {
+*/
+				}
+        else
+        {
 					// Most OSs do some intermediate steps when configuring ports and DTR can
 					// twiggle more than once before stabilizing.
 					// To avoid spurious resets we set the watchdog to 250ms and eventually
 					// cancel if DTR goes back high.
-	
+/* TODO, AVR Stuff
 					wdt_disable();
 					wdt_reset();
 					*(uint16_t *)0x0800 = 0x0;
+*/
 				}
 			}
 			return true;
@@ -138,12 +134,12 @@ void Serial_::end(void)
 {
 }
 
-void Serial_::accept(void) 
+void Serial_::accept(void)
 {
 	ring_buffer *buffer = &cdc_rx_buffer;
-	int c = USB_Recv(CDC_RX); 
+	int c = USB_Recv(CDC_RX);
 	int i = (unsigned int)(buffer->head+1) % SERIAL_BUFFER_SIZE;
-	
+
 	// if we should be storing the received character into the location
 	// just before the tail (meaning that the head would advance to the
 	// current location of the tail), we're about to overflow the buffer
@@ -180,7 +176,7 @@ int Serial_::read(void)
 		unsigned char c = buffer->buffer[buffer->tail];
 		buffer->tail = (unsigned int)(buffer->tail + 1) % SERIAL_BUFFER_SIZE;
 		return c;
-	}	
+	}
 }
 
 void Serial_::flush(void)
@@ -190,12 +186,12 @@ void Serial_::flush(void)
 
 size_t Serial_::write(uint8_t c)
 {
-	/* only try to send bytes if the high-level CDC connection itself 
+	/* only try to send bytes if the high-level CDC connection itself
 	 is open (not just the pipe) - the OS should set lineState when the port
 	 is opened and clear lineState when the port is closed.
 	 bytes sent before the user opens the connection or after
 	 the connection is closed are lost - just like with a UART. */
-	
+
 	// TODO - ZE - check behavior on different OSes and test what happens if an
 	// open connection isn't broken cleanly (cable is yanked out, host dies
 	// or locks up, or host virtual serial port hangs)
@@ -214,14 +210,14 @@ size_t Serial_::write(uint8_t c)
 
 // This operator is a convenient way for a sketch to check whether the
 // port has actually been configured and opened by the host (as opposed
-// to just being connected to the host).  It can be used, for example, in 
+// to just being connected to the host).  It can be used, for example, in
 // setup() before printing to ensure that an application on the host is
 // actually ready to receive and display the data.
 // We add a short delay before returning to fix a bug observed by Federico
 // where the port is configured (lineState != 0) but not quite opened.
 Serial_::operator bool() {
 	bool result = false;
-	if (_usbLineInfo.lineState > 0) 
+	if (_usbLineInfo.lineState > 0)
 		result = true;
 	delay(10);
 	return result;

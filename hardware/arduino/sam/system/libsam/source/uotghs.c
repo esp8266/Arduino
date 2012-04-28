@@ -20,8 +20,24 @@
 
 #if SAM3XA_SERIES
 
-void USBD_InitEndpoints(void)
+void USBD_InitEndpoints( uint8_t* puc_EndPoints, uint32_t ul_EndPoints )
 {
+	for (uint8_t i = 1; i < sizeof(_initEndpoints); i++)
+	{
+    // Reset Endpoint Fifos
+    UOTGHS->UOTGHS_DEVEPTISR[i].UDPHS_EPTCLRSTA = UDPHS_EPTCLRSTA_TOGGLESQ | UDPHS_EPTCLRSTA_FRCESTALL;
+    UOTGHS->UDPHS_EPTRST = 1<<i;
+
+		//UECONX = 1;
+		//UECFG0X = pgm_read_byte(_initEndpoints+i);
+        UOTGHS->UDPHS_EPT[i].UDPHS_EPTCFG = _initEndpoints[i];
+
+        while( (signed int)UDPHS_EPTCFG_EPT_MAPD != (signed int)((UOTGHS->UDPHS_EPT[i].UDPHS_EPTCFG) & (unsigned int)UDPHS_EPTCFG_EPT_MAPD) )
+        ;
+        UOTGHS->UDPHS_EPT[i].UDPHS_EPTCTLENB = UDPHS_EPTCTLENB_EPT_ENABL;
+
+        //		UECFG1X = EP_DOUBLE_64;
+	}
 }
 
 uint32_t USBD_Init(void)

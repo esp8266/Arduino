@@ -1,5 +1,3 @@
-
-
 /* Copyright (c) 2011, Peter Barrett
 **
 ** Permission to use, copy, modify, and/or distribute this software for
@@ -16,11 +14,7 @@
 ** SOFTWARE.
 */
 
-#define USBCON
-
-#include "Platform.h"
-#include "USBAPI.h"
-#include "USBDesc.h"
+#include "Arduino.h"
 
 #if defined(USBCON)
 #ifdef HID_ENABLED
@@ -45,7 +39,7 @@ Keyboard_ Keyboard;
 #define RAWHID_TX_SIZE 64
 #define RAWHID_RX_SIZE 64
 
-extern const u8 _hidReportDescriptor[] = {
+extern const uint8_t _hidReportDescriptor[] = {
 	//	Mouse
     0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)	// 54
     0x09, 0x02,                    // USAGE (Mouse)
@@ -139,12 +133,12 @@ extern const HIDDescriptor _hidInterface =
 //================================================================================
 //	Driver
 
-u8 _hid_protocol = 1;
-u8 _hid_idle = 1;
+uint8_t _hid_protocol = 1;
+uint8_t _hid_idle = 1;
 
 #define WEAK __attribute__ ((weak))
 
-int WEAK HID_GetInterface(u8* interfaceNum)
+int WEAK HID_GetInterface(uint8_t* interfaceNum)
 {
 	interfaceNum[0] += 1;	// uses 1
 	return USB_SendControl(TRANSFER_PGM,&_hidInterface,sizeof(_hidInterface));
@@ -155,7 +149,7 @@ int WEAK HID_GetDescriptor(int i)
 	return USB_SendControl(TRANSFER_PGM,_hidReportDescriptor,sizeof(_hidReportDescriptor));
 }
 
-void WEAK HID_SendReport(u8 id, const void* data, int len)
+void WEAK HID_SendReport(uint8_t id, const void* data, int len)
 {
 	USB_Send(HID_TX, &id, 1);
 	USB_Send(HID_TX | TRANSFER_RELEASE,data,len);
@@ -163,8 +157,8 @@ void WEAK HID_SendReport(u8 id, const void* data, int len)
 
 bool WEAK HID_Setup(Setup& setup)
 {
-	u8 r = setup.bRequest;
-	u8 requestType = setup.bmRequestType;
+	uint8_t r = setup.bRequest;
+	uint8_t requestType = setup.bmRequestType;
 	if (REQUEST_DEVICETOHOST_CLASS_INTERFACE == requestType)
 	{
 		if (HID_GET_REPORT == r)
@@ -222,7 +216,7 @@ void Mouse_::click(uint8_t b)
 
 void Mouse_::move(signed char x, signed char y, signed char wheel)
 {
-	u8 m[4];
+	uint8_t m[4];
 	m[0] = _buttons;
 	m[1] = x;
 	m[2] = y;

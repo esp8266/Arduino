@@ -1,5 +1,3 @@
-
-
 /* Copyright (c) 2010, Peter Barrett
 **
 ** Permission to use, copy, modify, and/or distribute this software for
@@ -15,17 +13,9 @@
 ** ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 ** SOFTWARE.
 */
-#define USBCON
 
-#include "Platform.h"
-#include "USBAPI.h"
-#include "USBDesc.h"
-#include "USBCore.h"
+#include "Arduino.h"
 
-
-#if defined(USBCON)
-
-extern const uint8_t _initEndpoints[] ;
 const uint8_t _initEndpoints[] =
 {
 	0,
@@ -366,7 +356,7 @@ void USB_ISR()
 		{
 			if (REQUEST_DEVICE == (requestType & REQUEST_RECIPIENT))
 			{
-				InitEndpoints();
+				InitEndpoints(_initEndpoints, sizeof(_initEndpoints)/sizeof(_initEndpoints[0]));
 				_usbConfiguration = setup.wValueL;
 			}
       else
@@ -447,7 +437,9 @@ ISR(USB_GEN_vect)
 uint8_t USBD_Connected(void)
 {
 	uint8_t f = UDFNUML;
+
 	delay(3);
+
 	return f != UDFNUML;
 }
 
@@ -503,5 +495,3 @@ bool USB_::configured()
 void USB_::poll()
 {
 }
-
-#endif /* if defined(USBCON) */

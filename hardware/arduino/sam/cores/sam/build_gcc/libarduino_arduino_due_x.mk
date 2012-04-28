@@ -74,6 +74,9 @@ endif
 
 include $(TOOLCHAIN).mk
 
+CFLAGS += -DUSB_VID=0x2341 -DUSB_PID=0xcafe
+CPPFLAGS += -DUSB_VID=0x2341 -DUSB_PID=0xcafe
+
 #-------------------------------------------------------------------------------
 ifdef DEBUG
 OUTPUT_OBJ=debug
@@ -155,12 +158,12 @@ create_output:
 	-@mkdir $(OUTPUT_PATH) 1>NUL 2>&1
 
 $(addprefix $(OUTPUT_PATH)/,$(C_OBJ)): $(OUTPUT_PATH)/%.o: %.c
-#	@"$(CC)" -v -c $(CFLAGS) $< -o $@
+#	"$(CC)" -v -c $(CFLAGS) $< -o $@
 	@"$(CC)" -c $(CFLAGS) $< -o $@
 
 $(addprefix $(OUTPUT_PATH)/,$(CPP_OBJ)): $(OUTPUT_PATH)/%.o: %.cpp
-#	@"$(CC)" -c $(CPPFLAGS) $< -o $@
-	@"$(CC)" -xc++ -c $(CPPFLAGS) $< -o $@
+	"$(CC)" -xc++ -c $(CPPFLAGS) $< -o $@
+#	@"$(CC)" -xc++ -c $(CPPFLAGS) $< -o $@
 
 $(addprefix $(OUTPUT_PATH)/,$(A_OBJ)): $(OUTPUT_PATH)/%.o: %.s
 	@"$(AS)" -c $(ASFLAGS) $< -o $@
