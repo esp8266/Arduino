@@ -132,9 +132,10 @@ $(VARIANT): create_output $(OUTPUT_LIB)
 
 .PHONY: create_output
 create_output:
+	@echo -------------------------
 	@echo --- Preparing $(VARIANT) files in $(OUTPUT_PATH) $(OUTPUT_BIN)
 	@echo -------------------------
-	@echo *$(INCLUDES)
+#	@echo *$(INCLUDES)
 #	@echo -------------------------
 #	@echo *$(C_SRC)
 #	@echo -------------------------
@@ -149,24 +150,24 @@ create_output:
 #	@echo *$(addprefix $(OUTPUT_PATH)/, $(CPP_OBJ))
 #	@echo -------------------------
 #	@echo *$(A_SRC)
-	@echo -------------------------
+#	@echo -------------------------
 
 	-@mkdir $(OUTPUT_PATH) 1>NUL 2>&1
 
 $(addprefix $(OUTPUT_PATH)/,$(C_OBJ)): $(OUTPUT_PATH)/%.o: %.c
-#	@$(CC) -v -c $(CFLAGS) $< -o $@
-	@$(CC) -c $(CFLAGS) $< -o $@
+#	@"$(CC)" -v -c $(CFLAGS) $< -o $@
+	@"$(CC)" -c $(CFLAGS) $< -o $@
 
 $(addprefix $(OUTPUT_PATH)/,$(CPP_OBJ)): $(OUTPUT_PATH)/%.o: %.cpp
-#	@$(CC) -c $(CPPFLAGS) $< -o $@
-	@$(CC) -xc++ -c $(CPPFLAGS) $< -o $@
+#	@"$(CC)" -c $(CPPFLAGS) $< -o $@
+	@"$(CC)" -xc++ -c $(CPPFLAGS) $< -o $@
 
 $(addprefix $(OUTPUT_PATH)/,$(A_OBJ)): $(OUTPUT_PATH)/%.o: %.s
-	@$(AS) -c $(ASFLAGS) $< -o $@
+	@"$(AS)" -c $(ASFLAGS) $< -o $@
 
 $(OUTPUT_LIB): $(addprefix $(OUTPUT_PATH)/, $(C_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(CPP_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(A_OBJ))
-	@$(AR) -v -r "$(OUTPUT_BIN)/$@" $^
-	@$(NM) "$(OUTPUT_BIN)/$@" > "$(OUTPUT_BIN)/$@.txt"
+	@"$(AR)" -v -r "$(OUTPUT_BIN)/$@" $^
+	@"$(NM)" "$(OUTPUT_BIN)/$@" > "$(OUTPUT_BIN)/$@.txt"
 
 
 .PHONY: clean

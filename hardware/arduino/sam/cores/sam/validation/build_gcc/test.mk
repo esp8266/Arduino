@@ -76,6 +76,9 @@ CMSIS_ARM_PATH=$(CMSIS_ROOT_PATH)/CMSIS/Include
 CMSIS_ATMEL_PATH=$(CMSIS_ROOT_PATH)/Device/ATMEL
 CMSIS_CHIP_PATH=$(CMSIS_ROOT_PATH)/Device/ATMEL/$(CHIP_SERIE)
 
+ARDUINO_CORE_PATH=$(PROJECT_BASE_PATH)/..
+ARDUINO_USB_PATH=$(PROJECT_BASE_PATH)/../USB
+
 # Output directories
 OUTPUT_PATH = debug_$(VARIANT)
 
@@ -120,8 +123,6 @@ LIBS_POSTFIX=rel
 endif
 
 OUTPUT_BIN=test_$(TOOLCHAIN)_$(LIBS_POSTFIX)
-#LIBS=-L../libsam_$(CHIP_NAME)_$(TOOLCHAIN)_rel.a -L../arduino_$(VARIANT)_$(TOOLCHAIN)_rel.a
-# 
 LIBS=-Wl,--start-group -lgcc -lc -lstdc++ -lsam_$(CHIP_NAME)_$(TOOLCHAIN)_$(LIBS_POSTFIX) -larduino_$(VARIANT)_$(TOOLCHAIN)_$(LIBS_POSTFIX) -lvariant_$(VARIANT)_$(TOOLCHAIN)_$(LIBS_POSTFIX) -Wl,--end-group
 
 LIB_PATH =-L$(PROJECT_BASE_PATH)/..
@@ -147,28 +148,29 @@ CPP_OBJ=$(filter-out $(CPP_OBJ_FILTER), $(CPP_OBJ_TEMP))
 #-------------------------------------------------------------------------------
 all: test
 
-test: create_output $(OUTPUT_BIN)
+test: create_output libsam_$(CHIP_NAME)_$(TOOLCHAIN)_$(LIBS_POSTFIX).a libarduino_$(VARIANT)_$(TOOLCHAIN)_$(LIBS_POSTFIX).a libvariant_$(VARIANT)_$(TOOLCHAIN)_$(LIBS_POSTFIX).a $(OUTPUT_BIN)
+
 
 .PHONY: create_output
 create_output:
 	@echo --- Preparing $(VARIANT) files in $(OUTPUT_PATH) $(OUTPUT_BIN) 
-	@echo -------------------------
-	@echo *$(INCLUDES)
-	@echo -------------------------
-	@echo *$(C_SRC)
-	@echo -------------------------
-	@echo *$(C_OBJ)
-	@echo -------------------------
-	@echo *$(addprefix $(OUTPUT_PATH)/, $(C_OBJ))
-	@echo -------------------------
-	@echo *$(CPP_SRC)
-	@echo -------------------------
-	@echo *$(CPP_OBJ)
-	@echo -------------------------
-	@echo *$(addprefix $(OUTPUT_PATH)/, $(CPP_OBJ))
-	@echo -------------------------
-	@echo *$(A_SRC)
-	@echo -------------------------
+#	@echo -------------------------
+#	@echo *$(INCLUDES)
+#	@echo -------------------------
+#	@echo *$(C_SRC)
+#	@echo -------------------------
+#	@echo *$(C_OBJ)
+#	@echo -------------------------
+#	@echo *$(addprefix $(OUTPUT_PATH)/, $(C_OBJ))
+#	@echo -------------------------
+#	@echo *$(CPP_SRC)
+#	@echo -------------------------
+#	@echo *$(CPP_OBJ)
+#	@echo -------------------------
+#	@echo *$(addprefix $(OUTPUT_PATH)/, $(CPP_OBJ))
+#	@echo -------------------------
+#	@echo *$(A_SRC)
+#	@echo -------------------------
 
 	-@mkdir $(OUTPUT_PATH) 1>NUL 2>&1
 
@@ -187,12 +189,27 @@ $(OUTPUT_BIN): $(addprefix $(OUTPUT_PATH)/, $(C_OBJ)) $(addprefix $(OUTPUT_PATH)
 .PHONY: clean
 clean:
 	@echo --- Cleaning test files
-	-@"$(RM)" $(OUTPUT_PATH)/test.o 1>NUL 2>&1
-	-@"$(RM)" $(OUTPUT_PATH)/$(OUTPUT_BIN).elf 1>NUL 2>&1
-	-@"$(RM)" $(OUTPUT_PATH)/$(OUTPUT_BIN).elf.txt 1>NUL 2>&1
-	-@"$(RM)" $(OUTPUT_PATH)/$(OUTPUT_BIN).bin 1>NUL 2>&1
-	-@"$(RM)" $(OUTPUT_PATH)/$(OUTPUT_BIN).map 1>NUL 2>&1
+	-@$(RM) $(OUTPUT_PATH) 1>NUL 2>&1
+	
+#	-$(RM) $(OUTPUT_PATH)/test.o
+#	-$(RM) $(OUTPUT_PATH)/$(OUTPUT_BIN).elf 
+#	-$(RM) $(OUTPUT_PATH)/$(OUTPUT_BIN).elf.txt
+#	-$(RM) $(OUTPUT_PATH)/$(OUTPUT_BIN).bin 
+#	-$(RM) $(OUTPUT_PATH)/$(OUTPUT_BIN).map
 
 debug: test
 	@"$(GDB)" -x "$(VARIANT_PATH)/debug_scripts/gcc/$(VARIANT)_flash.gdb" -ex "reset" -readnow -se $(OUTPUT_PATH)/$(OUTPUT_BIN).elf
 #	@"$(GDB)" -w -x "$(VARIANT_PATH)/debug_scripts/gcc/$(VARIANT)_sram.gdb" -ex "reset" -readnow -se $(OUTPUT_PATH)/$(OUTPUT_BIN).elf
+
+libsam_$(CHIP_NAME)_$(TOOLCHAIN)_$(LIBS_POSTFIX).a:
+	@echo Building $@
+	@$(MAKE) -C $(SYSTEM_PATH)/libsam/build_gcc -f Makefile $@
+
+libarduino_$(VARIANT)_$(TOOLCHAIN)_$(LIBS_POSTFIX).a:
+	@echo Building $@
+	$(MAKE) -C $(ARDUINO_CORE_PATH)/build_gcc -f Makefile $(VARIANT)
+
+libvariant_$(VARIANT)_$(TOOLCHAIN)_$(LIBS_POSTFIX).a:
+	@echo Building $@
+	$(MAKE) -C $(VARIANT_PATH)/build_gcc -f Makefile $(VARIANT)
+

@@ -132,9 +132,10 @@ $(VARIANT): create_output $(OUTPUT_LIB)
 
 .PHONY: create_output
 create_output:
+	@echo -------------------------
 	@echo --- Preparing $(VARIANT) files in $(OUTPUT_PATH) $(OUTPUT_BIN)
 	@echo -------------------------
-	@echo *$(INCLUDES)
+#	@echo *$(INCLUDES)
 #	@echo -------------------------
 #	@echo *$(C_SRC)
 #	@echo -------------------------
@@ -149,7 +150,7 @@ create_output:
 #	@echo *$(addprefix $(OUTPUT_PATH)/, $(CPP_OBJ))
 #	@echo -------------------------
 #	@echo *$(A_SRC)
-	@echo -------------------------
+#	@echo -------------------------
 
 	-@mkdir $(OUTPUT_PATH) 1>NUL 2>&1
 

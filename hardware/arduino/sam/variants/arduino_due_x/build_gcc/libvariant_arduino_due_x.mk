@@ -42,15 +42,13 @@ CMSIS_ATMEL_PATH=$(CMSIS_ROOT_PATH)/Device/ATMEL
 ARDUINO_PATH = ../../../cores/sam
 VARIANT_BASE_PATH = ../../../variants
 VARIANT_PATH = ../../../variants/$(VARIANT)
-VARIANT_COMMON_PATH = ../../common
 
 #-------------------------------------------------------------------------------
 # Files
 #-------------------------------------------------------------------------------
 
-vpath %.h $(PROJECT_BASE_PATH) $(SYSTEM_PATH) $(VARIANT_PATH) $(VARIANT_COMMON_PATH)
-#vpath %.c $(PROJECT_BASE_PATH) $(VARIANT_PATH)
-vpath %.cpp $(PROJECT_BASE_PATH) $(PROJECT_BASE_PATH) $(VARIANT_COMMON_PATH)
+vpath %.h $(PROJECT_BASE_PATH) $(SYSTEM_PATH) $(VARIANT_PATH)
+vpath %.cpp $(PROJECT_BASE_PATH) $(PROJECT_BASE_PATH)
 
 VPATH+=$(PROJECT_BASE_PATH)
 
@@ -105,7 +103,6 @@ C_OBJ=$(filter-out $(C_OBJ_FILTER), $(C_OBJ_TEMP))
 # CPP source files and objects
 #-------------------------------------------------------------------------------
 CPP_SRC=$(wildcard $(PROJECT_BASE_PATH)/*.cpp)
-CPP_SRC+=$(wildcard $(VARIANT_COMMON_PATH)/*.cpp)
 
 CPP_OBJ_TEMP = $(patsubst %.cpp, %.o, $(notdir $(CPP_SRC)))
 
@@ -135,24 +132,25 @@ $(VARIANT): create_output $(OUTPUT_LIB)
 
 .PHONY: create_output
 create_output:
+	@echo -------------------------
 	@echo --- Preparing $(VARIANT) files in $(OUTPUT_PATH) $(OUTPUT_BIN)
 	@echo -------------------------
-	@echo *$(INCLUDES)
-	@echo -------------------------
-	@echo *$(C_SRC)
-	@echo -------------------------
-	@echo *$(C_OBJ)
-	@echo -------------------------
-	@echo *$(addprefix $(OUTPUT_PATH)/, $(C_OBJ))
-	@echo -------------------------
-	@echo *$(CPP_SRC)
-	@echo -------------------------
-	@echo *$(CPP_OBJ)
-	@echo -------------------------
-	@echo *$(addprefix $(OUTPUT_PATH)/, $(CPP_OBJ))
-	@echo -------------------------
-	@echo *$(A_SRC)
-	@echo -------------------------
+#	@echo *$(INCLUDES)
+#	@echo -------------------------
+#	@echo *$(C_SRC)
+#	@echo -------------------------
+#	@echo *$(C_OBJ)
+#	@echo -------------------------
+#	@echo *$(addprefix $(OUTPUT_PATH)/, $(C_OBJ))
+#	@echo -------------------------
+#	@echo *$(CPP_SRC)
+#	@echo -------------------------
+#	@echo *$(CPP_OBJ)
+#	@echo -------------------------
+#	@echo *$(addprefix $(OUTPUT_PATH)/, $(CPP_OBJ))
+#	@echo -------------------------
+#	@echo *$(A_SRC)
+#	@echo -------------------------
 
 	-@mkdir $(OUTPUT_PATH) 1>NUL 2>&1
 
@@ -175,5 +173,5 @@ $(OUTPUT_LIB): $(addprefix $(OUTPUT_PATH)/, $(C_OBJ)) $(addprefix $(OUTPUT_PATH)
 .PHONY: clean
 clean:
 	@echo --- Cleaning $(VARIANT) files [$(OUTPUT_PATH)$(SEP)*.o]
-	-@"$(RM)" $(OUTPUT_PATH) 1>NUL 2>&1
-	-@"$(RM)" $(OUTPUT_BIN)/$(OUTPUT_LIB) 1>NUL 2>&1
+	-@$(RM) $(OUTPUT_PATH) 1>NUL 2>&1
+	-@$(RM) $(OUTPUT_BIN)/$(OUTPUT_LIB) 1>NUL 2>&1

@@ -8,7 +8,7 @@
 #
 #  This library is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #  See the GNU Lesser General Public License for more details.
 #
 #  You should have received a copy of the GNU Lesser General Public
@@ -34,30 +34,33 @@ OUTPUT_BIN = ../../../cores/sam
 # Libraries
 PROJECT_BASE_PATH = ..
 SYSTEM_PATH = ../../../system
-CMSIS_PATH = $(SYSTEM_PATH)/CMSIS/Include
+CMSIS_ROOT_PATH = $(SYSTEM_PATH)/CMSIS
+CMSIS_ARM_PATH=$(CMSIS_ROOT_PATH)/CMSIS/Include
+CMSIS_ATMEL_PATH=$(CMSIS_ROOT_PATH)/Device/ATMEL
+#CMSIS_CHIP_PATH=$(CMSIS_ROOT_PATH)/Device/ATMEL/$(CHIP_SERIE)
+
 ARDUINO_PATH = ../../../cores/sam
 VARIANT_BASE_PATH = ../../../variants
 VARIANT_PATH = ../../../variants/$(VARIANT)
-VARIANT_COMMON_PATH = ../../common
 
 #-------------------------------------------------------------------------------
 # Files
 #-------------------------------------------------------------------------------
 
-vpath %.h $(PROJECT_BASE_PATH) $(SYSTEM_PATH) $(VARIANT_PATH) $(VARIANT_COMMON_PATH)
-#vpath %.c $(PROJECT_BASE_PATH) $(VARIANT_PATH)
-vpath %.cpp $(PROJECT_BASE_PATH) $(PROJECT_BASE_PATH) $(VARIANT_COMMON_PATH)
+vpath %.h $(PROJECT_BASE_PATH) $(SYSTEM_PATH) $(VARIANT_PATH)
+vpath %.cpp $(PROJECT_BASE_PATH) $(PROJECT_BASE_PATH)
 
 VPATH+=$(PROJECT_BASE_PATH)
 
-INCLUDES = 
+INCLUDES =
 #INCLUDES += -I$(PROJECT_BASE_PATH)
 INCLUDES += -I$(ARDUINO_PATH)
 INCLUDES += -I$(SYSTEM_PATH)
 INCLUDES += -I$(SYSTEM_PATH)/libsam
 INCLUDES += -I$(VARIANT_BASE_PATH)
 INCLUDES += -I$(VARIANT_PATH)
-INCLUDES += -I$(CMSIS_PATH)
+INCLUDES += -I$(CMSIS_ARM_PATH)
+INCLUDES += -I$(CMSIS_ATMEL_PATH)
 
 #-------------------------------------------------------------------------------
 ifdef DEBUG
@@ -100,7 +103,6 @@ C_OBJ=$(filter-out $(C_OBJ_FILTER), $(C_OBJ_TEMP))
 # CPP source files and objects
 #-------------------------------------------------------------------------------
 CPP_SRC=$(wildcard $(PROJECT_BASE_PATH)/*.cpp)
-CPP_SRC+=$(wildcard $(VARIANT_COMMON_PATH)/*.cpp)
 
 CPP_OBJ_TEMP = $(patsubst %.cpp, %.o, $(notdir $(CPP_SRC)))
 
@@ -130,41 +132,42 @@ $(VARIANT): create_output $(OUTPUT_LIB)
 
 .PHONY: create_output
 create_output:
-	@echo --- Preparing $(VARIANT) files in $(OUTPUT_PATH) $(OUTPUT_BIN) 
 	@echo -------------------------
-	@echo *$(INCLUDES)
+	@echo --- Preparing $(VARIANT) files in $(OUTPUT_PATH) $(OUTPUT_BIN)
 	@echo -------------------------
-	@echo *$(C_SRC)
-	@echo -------------------------
-	@echo *$(C_OBJ)
-	@echo -------------------------
-	@echo *$(addprefix $(OUTPUT_PATH)/, $(C_OBJ))
-	@echo -------------------------
-	@echo *$(CPP_SRC)
-	@echo -------------------------
-	@echo *$(CPP_OBJ)
-	@echo -------------------------
-	@echo *$(addprefix $(OUTPUT_PATH)/, $(CPP_OBJ))
-	@echo -------------------------
-	@echo *$(A_SRC)
-	@echo -------------------------
+#	@echo *$(INCLUDES)
+#	@echo -------------------------
+#	@echo *$(C_SRC)
+#	@echo -------------------------
+#	@echo *$(C_OBJ)
+#	@echo -------------------------
+#	@echo *$(addprefix $(OUTPUT_PATH)/, $(C_OBJ))
+#	@echo -------------------------
+#	@echo *$(CPP_SRC)
+#	@echo -------------------------
+#	@echo *$(CPP_OBJ)
+#	@echo -------------------------
+#	@echo *$(addprefix $(OUTPUT_PATH)/, $(CPP_OBJ))
+#	@echo -------------------------
+#	@echo *$(A_SRC)
+#	@echo -------------------------
 
 	-@mkdir $(OUTPUT_PATH) 1>NUL 2>&1
 
 $(addprefix $(OUTPUT_PATH)/,$(C_OBJ)): $(OUTPUT_PATH)/%.o: %.c
-#	@$(CC) -v -c $(CFLAGS) $< -o $@
-	@$(CC) -c $(CFLAGS) $< -o $@
+#	@"$(CC)" -v -c $(CFLAGS) $< -o $@
+	@"$(CC)" -c $(CFLAGS) $< -o $@
 
 $(addprefix $(OUTPUT_PATH)/,$(CPP_OBJ)): $(OUTPUT_PATH)/%.o: %.cpp
-#	@$(CC) -c $(CPPFLAGS) $< -o $@
-	@$(CC) -xc++ -c $(CPPFLAGS) $< -o $@
+#	@"$(CC)" -c $(CPPFLAGS) $< -o $@
+	@"$(CC)" -xc++ -c $(CPPFLAGS) $< -o $@
 
 $(addprefix $(OUTPUT_PATH)/,$(A_OBJ)): $(OUTPUT_PATH)/%.o: %.s
-	@$(AS) -c $(ASFLAGS) $< -o $@
+	@"$(AS)" -c $(ASFLAGS) $< -o $@
 
 $(OUTPUT_LIB): $(addprefix $(OUTPUT_PATH)/, $(C_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(CPP_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(A_OBJ))
-	@$(AR) -v -r "$(OUTPUT_BIN)/$@" $^
-	@$(NM) "$(OUTPUT_BIN)/$@" > "$(OUTPUT_BIN)/$@.txt"
+	@"$(AR)" -v -r "$(OUTPUT_BIN)/$@" $^
+	@"$(NM)" "$(OUTPUT_BIN)/$@" > "$(OUTPUT_BIN)/$@.txt"
 
 
 .PHONY: clean
