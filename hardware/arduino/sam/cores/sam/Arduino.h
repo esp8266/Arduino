@@ -8,7 +8,7 @@
 
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   See the GNU Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser General Public
@@ -175,8 +175,8 @@ typedef struct _PinDescription
   EPioType ulPinType ;
   uint32_t ulPinConfiguration ;
   uint32_t ulPinAttribute ;
-  EAnalogChannel ulAnalogChannel ; /* Describe which Analog pin is linked to a MCU pin */
-  EAnalogChannel ulADCChannelNumber ; /* We use the same enum than for ADC pins to describe the ADC channel in use on this pin */
+  EAnalogChannel ulAnalogChannel ; /* Analog pin in the Arduino context (label on the board) */
+  EAnalogChannel ulADCChannelNumber ; /* ADC Channel number in the SAM device */
   EPWMChannel ulPWMChannel ;
   ETCChannel ulTCChannel ;
 } PinDescription ;
