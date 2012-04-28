@@ -85,7 +85,7 @@ void loop( void )
 //  Serial1.write( "test1\n" ) ;   // send a string
 //  Serial1.write( "test2" ) ;   // send another string
 
-  Serial1.print("Analog ins: ");
+  Serial1.print("Analog pins: ");
   for (int i=A0; i<=MAX_ANALOG; i++) {
     int a = analogRead(i);
     Serial1.print(a, DEC);

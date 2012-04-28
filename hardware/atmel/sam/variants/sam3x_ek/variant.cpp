@@ -70,7 +70,7 @@ extern const PinDescription g_APinDescription[]=
 
   // 10 - Analog pins
   // ----------------------
-  { PIOA, PIO_PA3,           ID_PIOA, PIO_INPUT,    PIO_DEFAULT, PIN_ATTR_ANALOG,                   ADC0,   ADC7,   NO_PWM,  NO_TC    }, // AD0
+  { PIOA, PIO_PA3,           ID_PIOA, PIO_INPUT,    PIO_DEFAULT, PIN_ATTR_ANALOG,                   ADC0,   ADC1,   NO_PWM,  NO_TC    }, // AD0
 
   { NULL, 0,                 0,       PIO_NOT_A_PIN, PIO_DEFAULT, PIN_ATTR_DIGITAL,                 NO_ADC, NO_ADC, NO_PWM,  NO_TC } // END
 } ;
@@ -109,9 +109,6 @@ void USART0_Handler( void )
 extern "C" {
 #endif
 
-// Should be made in a better way...
-extern void analogOutputInit(void);
-
 /**
  *
  */
@@ -148,6 +145,18 @@ extern void init( void )
                   g_APinDescription[PIN_LED_RED].ulPinConfiguration ) ;
 
   PIO_Clear( g_APinDescription[PIN_LED_RED].pPort, g_APinDescription[PIN_LED_RED].ulPin ) ;
+
+  // Initialize 10bit Analog Controller
+  pmc_enable_periph_clk( ID_ADC ) ;
+  adc_init( ADC, SystemCoreClock, ADC_FREQ_MAX, ADC_STARTUP_FAST ) ;
+  adc_configure_timing(ADC, 0, ADC_SETTLING_TIME_3, 1);
+  adc_configure_trigger(ADC, ADC_TRIG_SW, 0); // Disable hardware trigger.
+  adc_disable_interrupt( ADC, 0xFFFFFFFF ) ; // Disable all ADC interrupts.
+  adc_disable_all_channel( ADC ) ;
+
+  // Initialize analogOutput module
+  analogOutputInit();
+
 }
 #ifdef __cplusplus
 }
