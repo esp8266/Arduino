@@ -108,7 +108,7 @@ void USARTClass::flush( void )
 	;
 }
 
-void USARTClass::write( const uint8_t uc_data )
+size_t USARTClass::write( const uint8_t uc_data )
 {
   // Check if the transmitter is ready
   while ((_pUsart->US_CSR & US_CSR_TXRDY) != US_CSR_TXRDY)
@@ -116,6 +116,7 @@ void USARTClass::write( const uint8_t uc_data )
 
   // Send character
   _pUsart->US_THR = uc_data ;
+  return 1;
 }
 
 void USARTClass::IrqHandler( void )

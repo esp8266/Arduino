@@ -20,6 +20,7 @@
 #define _UART_CLASS_
 
 #include "HardwareSerial.h"
+#include "RingBuffer.h"
 
 // Includes Atmel CMSIS
 #include <chip.h>
@@ -43,7 +44,7 @@ class UARTClass : public HardwareSerial
     int peek( void ) ;
     int read( void ) ;
     void flush( void ) ;
-    void write( const uint8_t c ) ;
+    size_t write( const uint8_t c ) ;
 
     void IrqHandler( void ) ;
 

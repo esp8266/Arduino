@@ -107,7 +107,7 @@ void UARTClass::flush( void )
     ;
 }
 
-void UARTClass::write( const uint8_t uc_data )
+size_t UARTClass::write( const uint8_t uc_data )
 {
   // Check if the transmitter is ready
   while ((_pUart->UART_SR & UART_SR_TXRDY) != UART_SR_TXRDY)
@@ -115,6 +115,7 @@ void UARTClass::write( const uint8_t uc_data )
 
   // Send character
   _pUart->UART_THR = uc_data;
+  return 1;
 }
 
 void UARTClass::IrqHandler( void )

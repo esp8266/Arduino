@@ -150,13 +150,13 @@ unsigned char String::changeBuffer(unsigned int maxStrLen)
 /*  Copy and Move                            */
 /*********************************************/
 
-String & String::copy(const char *cstr, unsigned int length)
+String & String::copy(const char *cstr, unsigned int _length)
 {
-	if (!reserve(length)) {
+	if (!reserve(_length)) {
 		invalidate();
 		return *this;
 	}
-	len = length;
+	len = _length;
 	strcpy(buffer, cstr);
 	return *this;
 }
@@ -224,11 +224,11 @@ unsigned char String::concat(const String &s)
 	return concat(s.buffer, s.len);
 }
 
-unsigned char String::concat(const char *cstr, unsigned int length)
+unsigned char String::concat(const char *cstr, unsigned int _length)
 {
-	unsigned int newlen = len + length;
+	unsigned int newlen = len + _length;
 	if (!cstr) return 0;
-	if (length == 0) return 1;
+	if (_length == 0) return 1;
 	if (!reserve(newlen)) return 0;
 	strcpy(buffer + len, cstr);
 	len = newlen;
@@ -252,7 +252,7 @@ unsigned char String::concat(char c)
 unsigned char String::concat(unsigned char num)
 {
 	char buf[4];
-//	itoa(num, buf, 10);
+	itoa(num, buf, 10);
 	return concat(buf, strlen(buf));
 }
 
@@ -499,9 +499,9 @@ int String::lastIndexOf( char theChar ) const
 	return lastIndexOf(theChar, len - 1);
 }
 
-int String::lastIndexOf(char ch, int fromIndex) const
+int String::lastIndexOf(char ch, unsigned int fromIndex) const
 {
-	if (fromIndex >= len || fromIndex < 0) return -1;
+	if (fromIndex >= len) return -1;
 	char tempchar = buffer[fromIndex + 1];
 	buffer[fromIndex + 1] = '\0';
 	char* temp = strrchr( buffer, ch );
@@ -515,15 +515,15 @@ int String::lastIndexOf(const String &s2) const
 	return lastIndexOf(s2, len - s2.len);
 }
 
-int String::lastIndexOf(const String &s2, int fromIndex) const
+int String::lastIndexOf(const String &s2, unsigned int fromIndex) const
 {
-  	if (s2.len == 0 || len == 0 || s2.len > len || fromIndex < 0) return -1;
+  	if (s2.len == 0 || len == 0 || s2.len > len) return -1;
 	if (fromIndex >= len) fromIndex = len - 1;
 	int found = -1;
 	for (char *p = buffer; p <= buffer + fromIndex; p++) {
 		p = strstr(p, s2.buffer);
 		if (!p) break;
-		if (p - buffer <= fromIndex) found = p - buffer;
+		if ((unsigned int)(p - buffer) <= fromIndex) found = p - buffer;
 	}
 	return found;
 }
@@ -554,24 +554,24 @@ String String::substring(unsigned int left, unsigned int right) const
 /*  Modification                             */
 /*********************************************/
 
-void String::replace(char find, char replace)
+void String::replace(char find, char _replace)
 {
 	if (!buffer) return;
 	for (char *p = buffer; *p; p++) {
-		if (*p == find) *p = replace;
+		if (*p == find) *p = _replace;
 	}
 }
 
-void String::replace(const String& find, const String& replace)
+void String::replace(const String& find, const String& _replace)
 {
 	if (len == 0 || find.len == 0) return;
-	int diff = replace.len - find.len;
+	int diff = _replace.len - find.len;
 	char *readFrom = buffer;
 	char *foundAt;
 	if (diff == 0) {
 		while ((foundAt = strstr(readFrom, find.buffer)) != NULL) {
-			memcpy(foundAt, replace.buffer, replace.len);
-			readFrom = foundAt + replace.len;
+			memcpy(foundAt, _replace.buffer, _replace.len);
+			readFrom = foundAt + _replace.len;
 		}
 	} else if (diff < 0) {
 		char *writeTo = buffer;
@@ -579,8 +579,8 @@ void String::replace(const String& find, const String& replace)
 			unsigned int n = foundAt - readFrom;
 			memcpy(writeTo, readFrom, n);
 			writeTo += n;
-			memcpy(writeTo, replace.buffer, replace.len);
-			writeTo += replace.len;
+			memcpy(writeTo, _replace.buffer, _replace.len);
+			writeTo += _replace.len;
 			readFrom = foundAt + find.len;
 			len += diff;
 		}
@@ -594,12 +594,12 @@ void String::replace(const String& find, const String& replace)
 		if (size == len) return;
 		if (size > capacity && !changeBuffer(size)) return; // XXX: tell user!
 		int index = len - 1;
-		while ((index = lastIndexOf(find, index)) >= 0) {
+		while (index >= 0 && (index = lastIndexOf(find, index)) >= 0) {
 			readFrom = buffer + index + find.len;
 			memmove(readFrom + diff, readFrom, len - (readFrom - buffer));
 			len += diff;
 			buffer[len] = 0;
-			memcpy(buffer + index, replace.buffer, replace.len);
+			memcpy(buffer + index, _replace.buffer, _replace.len);
 			index--;
 		}
 	}
