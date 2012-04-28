@@ -15,8 +15,8 @@ public:
 	USB_();
 	bool configured();
 
-	void attach();
-	void detach();	// Serial port goes down too...
+	bool attach();
+	bool detach();	// Serial port goes down too...
 	void poll();
 };
 extern USB_ USB;

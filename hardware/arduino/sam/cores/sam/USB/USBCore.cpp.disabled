@@ -94,8 +94,9 @@ const DeviceDescriptor USB_DeviceDescriptorA =
 //==================================================================
 //==================================================================
 
-volatile uint8_t _usbConfiguration = 0;
-uint8_t _cdcComposite = 0;
+volatile uint32_t _usbConfiguration = 0;
+volatile uint32_t _usbInitialized = 0;
+uint32_t _cdcComposite = 0;
 
 
 //==================================================================
@@ -129,7 +130,7 @@ int USBD_Recv(uint8_t ep, void* d, int len)
   }
 
 	n = FifoByteCount(ep);
-  
+
 	len = min(n,len);
 	n = len;
 	dst = (uint8_t*)d;
@@ -151,16 +152,16 @@ static bool USBD_SendControl(uint8_t d)
     {
 			return false;
     }
-      
+
 		Send8( d ) ;
-    
+
 		if ( !((_cmark + 1) & 0x3F) )
     {
 			ClearIN();	// Fifo is full, release this packet
     }
 	}
 	_cmark++;
-  
+
 	return true ;
 }
 
@@ -173,7 +174,7 @@ int USBD_SendControl(uint8_t flags, const void* d, int len)
 	while ( len-- )
 	{
 		uint8_t c = *data++ ;
-    
+
 		if ( !SendControl( c ) )
     {
 			return -1;
@@ -293,7 +294,7 @@ static bool USBD_SendDescriptor(Setup& setup)
   {
 		return false ;
   }
-  
+
 	if ( desc_length == 0 )
   {
 		desc_length = *desc_addr;
@@ -308,7 +309,7 @@ static bool USBD_SendDescriptor(Setup& setup)
 void USB_ISR()
 {
   SetEP(0) ;
-  
+
 	if ( !ReceivedSetupInt() )
   {
 		return;
@@ -367,7 +368,7 @@ void USB_ISR()
 			{
 				InitEndpoints();
 				_usbConfiguration = setup.wValueL;
-			} 
+			}
       else
       {
 				ok = false;
@@ -458,17 +459,38 @@ USB_ USB;
 
 USB_::USB_()
 {
+  if ( USBD_Init() == 0UL )
+  {
+    _usbInitialized=1UL ;
+  }
 }
 
-void USB_::attach(void)
+bool USB_::attach(void)
 {
-  USBD_Attach() ;
+  if ( _usbInitialized != 0UL )
+  {
+    USBD_Attach() ;
+
+    return true ;
+  }
+  else
+  {
+    return false ;
+  }
 }
 
-void USB_::detach(void)
+bool USB_::detach(void)
 {
-    UDPHS->UDPHS_CTRL |= UDPHS_CTRL_DETACH; // detach
-    UDPHS->UDPHS_CTRL &= ~UDPHS_CTRL_PULLD_DIS; // Enable Pull Down
+  if ( _usbInitialized != 0UL )
+  {
+    USBD_Detach() ;
+
+    return true ;
+  }
+  else
+  {
+    return false ;
+  }
 }
 
 //	Check for interrupts

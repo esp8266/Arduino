@@ -8,7 +8,7 @@
 
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   See the GNU Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser General Public
@@ -63,6 +63,8 @@ extern void USBD_InitEP(uint8_t index, uint8_t type, uint8_t size) ;
 extern void USBD_InitEndpoints(void) ;
 
 extern void USBD_InitControl(int end) ;
+
+extern uint32_t USBD_Init(void) ;
 
 extern void USBD_Attach(void) ;
 extern void USBD_Detach(void) ;

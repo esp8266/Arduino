@@ -148,8 +148,6 @@ create_output:
 #	@echo *$(A_SRC)
 #	@echo -------------------------
 
-#	-@mkdir $(subst /,$(SEP),$(OUTPUT_BIN)) 1>NUL 2>&1
-	-mkdir $(subst /,$(SEP),$(OUTPUT_BIN))
 	-@mkdir $(OUTPUT_PATH) 1>NUL 2>&1
 
 $(addprefix $(OUTPUT_PATH)/,$(C_OBJ)): $(OUTPUT_PATH)/%.o: %.c
