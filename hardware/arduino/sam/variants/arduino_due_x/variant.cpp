@@ -347,6 +347,8 @@ extern void init( void )
     g_APinDescription[PINS_UART].ulPin,
     g_APinDescription[PINS_UART].ulPinConfiguration);
 
+	Serial1.begin(115200);
+
   // Initialize Serial ports USART
   PIO_Configure(
     g_APinDescription[PINS_USART0].pPort,

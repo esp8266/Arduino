@@ -16,6 +16,7 @@
 
 #include "Arduino.h"
 #include "USBAPI.h"
+#include <stdio.h>
 
 const uint32_t _initEndpoints[] =
 {
@@ -115,21 +116,6 @@ uint32_t USBD_Available(uint32_t ep)
 	return UDD_FifoByteCount();
 }
 
-//	Recv 1 byte if ready
-/*uint8_t USBD_Recv8(uint32_t ep)
-{
-	uint8_t c;
-
-	if (USBD_Recv(ep, &c, 1) != 1)
-	{
-		return -1;
-	}
-	else
-	{
-		return c;
-	}
-}*/
-
 //	Non Blocking receive
 //	Return number of bytes read
 uint32_t USBD_Recv(uint32_t ep, void* d, uint32_t len)
@@ -148,6 +134,16 @@ uint32_t USBD_Recv(uint32_t ep, void* d, uint32_t len)
 		UDD_ReleaseRX();
 
 	return len;
+}
+
+//	Recv 1 byte if ready
+uint32_t USBD_Recv(uint32_t ep)
+{
+	uint8_t c;
+	if (USBD_Recv(ep, &c, 1) != 1)
+		return -1;
+	else
+		return c;
 }
 
 //	Space in send EP
@@ -223,7 +219,10 @@ static bool USBD_SendControl(uint8_t d)
 		UDD_Send8(d);
 
 		if (!((_cmark + 1) & 0x3F))
+		{
+			puts("Sent!\r\n");
 			UDD_ClearIN();	// Fifo is full, release this packet
+		}
 	}
 	_cmark++;
 	return true;
@@ -291,6 +290,7 @@ int USBD_SendInterfaces(void)
 	total += HID_GetInterface(&interfaces) ;
 #endif
 
+	printf("=> USBD_SendInterfaces, total=%d interfaces=%d\r\n", total, interfaces);
 	return interfaces;
 }
 
@@ -301,8 +301,15 @@ static bool USBD_SendConfiguration(int maxlen)
 {
 	//	Count and measure interfaces
 	USBD_InitControl(0);
+	printf("=> USBD_SendConfiguration _cmark1=%d\r\n", _cmark);
 	int interfaces = USBD_SendInterfaces();
+	printf("=> USBD_SendConfiguration _cmark2=%d\r\n", _cmark);
+	printf("=> USBD_SendConfiguration sizeof=%d\r\n", sizeof(ConfigDescriptor));
+
+_Pragma("pack(1)")
 	ConfigDescriptor config = D_CONFIG(_cmark + sizeof(ConfigDescriptor),interfaces);
+_Pragma("pack()")
+	printf("=> USBD_SendConfiguration clen=%d\r\n", config.clen);
 
 	//	Now send them
 	USBD_InitControl(maxlen);
@@ -318,28 +325,32 @@ static bool USBD_SendDescriptor(Setup& setup)
 	const uint8_t* desc_addr = 0;
 
 	if ( USB_CONFIGURATION_DESCRIPTOR_TYPE == t )
-  {
+	{
+		printf("=> USBD_SendDescriptor : USB_CONFIGURATION_DESCRIPTOR_TYPE length=%d\r\n", setup.wLength);
 		return USBD_SendConfiguration(setup.wLength);
-  }
+	}
 
 	USBD_InitControl(setup.wLength);
 #ifdef HID_ENABLED
 	if ( HID_REPORT_DESCRIPTOR_TYPE == t )
-  {
+	{
+		puts("=> USBD_SendDescriptor : HID_REPORT_DESCRIPTOR_TYPE\r\n");
 		return HID_GetDescriptor( t ) ;
-  }
+	}
 #endif
 
 	if (USB_DEVICE_DESCRIPTOR_TYPE == t)
 	{
+		puts("=> USBD_SendDescriptor : USB_DEVICE_DESCRIPTOR_TYPE\r\n");
 		if ( setup.wLength == 8 )
-    {
+		{
 			_cdcComposite = 1;
-    }
+		}
 		desc_addr = _cdcComposite ?  (const uint8_t*)&USB_DeviceDescriptorA : (const uint8_t*)&USB_DeviceDescriptor;
 	}
 	else if (USB_STRING_DESCRIPTOR_TYPE == t)
 	{
+		puts("=> USBD_SendDescriptor : USB_STRING_DESCRIPTOR_TYPE\r\n");
 		if (setup.wValueL == 0)
 			desc_addr = (const uint8_t*)&STRING_LANGUAGE;
 		else if (setup.wValueL == IPRODUCT)
@@ -351,26 +362,33 @@ static bool USBD_SendDescriptor(Setup& setup)
 	}
 
 	if ( desc_addr == 0 )
-  {
+	{
 		return false ;
-  }
+	}
 
 	if ( desc_length == 0 )
-  {
+	{
 		desc_length = *desc_addr;
-  }
+	}
 
+	printf("=> USBD_SendDescriptor : desc_addr=%x desc_length=%d\r\n", desc_addr, desc_length);
 	USBD_SendControl(0, desc_addr, desc_length);
 
 	return true;
 }
 
+volatile int cpt = 0;
+
 //	Endpoint 0 interrupt
 static void USB_ISR(void)
 {
+	while (cpt++ > 100)
+		;
+
     //  End of Reset
     if (Is_udd_reset())
     {
+		printf(">>> End of Reset\r\n");
 		// Reset USB address to 0
 		udd_configure_address(0);
 		udd_enable_address();
@@ -384,11 +402,15 @@ static void USB_ISR(void)
         _usbConfiguration = 0;
 		_cmark = 0;
 		_cend = 0;
+		udd_ack_reset(); /* /!\/!\/!\ TAKEN FROM ASF TO CLEAR ISR /!\/!\/!\ */
+
     }
 
     //  Start of Frame - happens every millisecond so we use it for TX and RX LED one-shot timing, too
+#if 0
     if (Is_udd_sof())
     {
+		printf(">>> Start of Frame\r\n");
 #ifdef CDC_ENABLED
         USBD_Flush(CDC_TX);              // Send a tx frame if found
 #endif
@@ -398,11 +420,15 @@ static void USB_ISR(void)
             TXLED0;
         if (RxLEDPulse && !(--RxLEDPulse))
             RXLED0;*/
+
+		udd_ack_sof(); /* /!\/!\/!\ TAKEN FROM ASF TO CLEAR ISR /!\/!\/!\ */
     }
+#endif
 
 	// EP 0 Interrupt
 	if (Is_udd_endpoint_interrupt(0))
 	{
+		printf(">>> EP0 Int: 0x%x\r\n", UOTGHS->UOTGHS_DEVEPTISR[0]);
 
 		if ( !UDD_ReceivedSetupInt() )
 		{
@@ -413,15 +439,21 @@ static void USB_ISR(void)
 		UDD_Recv((uint8_t*)&setup,8);
 		UDD_ClearSetupInt();
 
+		printf(">>> EP0 Int: AP clear: 0x%x\r\n", UOTGHS->UOTGHS_DEVEPTISR[0]);
+
 		uint8_t requestType = setup.bmRequestType;
 		if (requestType & REQUEST_DEVICETOHOST)
 		{
+			printf(">>> EP0 Int: IN Request\r\n");
 			UDD_WaitIN();
 		}
 		else
 		{
+			printf(">>> EP0 Int: OUT Request\r\n");
 			UDD_ClearIN();
 		}
+
+
 
 		bool ok = true ;
 		if (REQUEST_STANDARD == (requestType & REQUEST_TYPE))
@@ -430,6 +462,7 @@ static void USB_ISR(void)
 			uint8_t r = setup.bRequest;
 			if (GET_STATUS == r)
 			{
+				puts(">>> EP0 Int: GET_STATUS\r\n");
 				UDD_Send8(0);		// TODO
 				UDD_Send8(0);
 			}
@@ -441,23 +474,28 @@ static void USB_ISR(void)
 			}
 			else if (SET_ADDRESS == r)
 			{
+				puts(">>> EP0 Int: SET_ADDRESS\r\n");
 				UDD_WaitIN();
 				UDD_SetAddress(setup.wValueL);
 			}
 			else if (GET_DESCRIPTOR == r)
 			{
+				puts(">>> EP0 Int: GET_DESCRIPTOR\r\n");
 				ok = USBD_SendDescriptor(setup);
 			}
 			else if (SET_DESCRIPTOR == r)
 			{
+				puts(">>> EP0 Int: SET_DESCRIPTOR\r\n");
 				ok = false;
 			}
 			else if (GET_CONFIGURATION == r)
 			{
+				puts(">>> EP0 Int: GET_CONFIGURATION\r\n");
 				UDD_Send8(1);
 			}
 			else if (SET_CONFIGURATION == r)
 			{
+				puts(">>> EP0 Int: SET_CONFIGURATION\r\n");
 				if (REQUEST_DEVICE == (requestType & REQUEST_RECIPIENT))
 				{
 					UDD_InitEndpoints(_initEndpoints);
@@ -477,16 +515,19 @@ static void USB_ISR(void)
 		}
 		else
 		{
+			puts(">>> EP0 Int: ClassInterfaceRequest\r\n");
 			USBD_InitControl(setup.wLength);		//	Max length of transfer
 			ok = USBD_ClassInterfaceRequest(setup);
 		}
 
 		if (ok)
 		{
+			puts(">>> EP0 Int: Send packet\r\n");
 			UDD_ClearIN();
 		}
 		else
 		{
+			puts(">>> EP0 Int: Stall\r\n");
 			UDD_Stall();
 		}
 	}
@@ -555,10 +596,10 @@ USB_::USB_()
 {
 	UDD_SetStack(&USB_ISR);
 
-  if ( UDD_Init() == 0UL )
-  {
-    _usbInitialized=1UL ;
-  }
+	if ( UDD_Init() == 0UL )
+	{
+		_usbInitialized=1UL ;
+	}
 }
 
 bool USB_::attach(void)
@@ -566,8 +607,8 @@ bool USB_::attach(void)
   if ( _usbInitialized != 0UL )
   {
     UDD_Attach() ;
-
-    return true ;
+	_usbConfiguration = 0;
+	return true;
   }
   else
   {
@@ -577,7 +618,8 @@ bool USB_::attach(void)
 
 bool USB_::detach(void)
 {
-  if ( _usbInitialized != 0UL )
+	return true;
+/*  if ( _usbInitialized != 0UL )
   {
     UDD_Detach() ;
 
@@ -586,7 +628,7 @@ bool USB_::detach(void)
   else
   {
     return false ;
-  }
+  }*/
 }
 
 //	Check for interrupts

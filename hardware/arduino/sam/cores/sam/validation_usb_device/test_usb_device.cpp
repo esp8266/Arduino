@@ -29,7 +29,7 @@ const int mouseButton = 6;
 int range = 5;              // output range of X or Y movement; affects movement speed
 int responseDelay = 10;     // response delay of the mouse, in ms
 
-/*
+
 void setup() {
   // initialize the buttons' inputs:
   pinMode(upButton, INPUT);
@@ -76,15 +76,15 @@ void loop() {
   // a delay so the mouse doesn't move too fast:
   delay(responseDelay);
 }
-*/
 
 
-#include "USBAPI.h"
+
+//#include "USBAPI.h"
 
 
 
 // Cet exemple fonctionne !!! ;-)
-void setup() {
+/*void setup() {
 	// initialize the digital pin as an output.
 	// Pin 13 has an LED connected on most Arduino boards:
 	//pinMode(13, OUTPUT);
@@ -98,5 +98,5 @@ void loop() {
 	//digitalWrite(13, LOW);    // set the LED off
 	delay(1000);              // wait for a second
 	printf("loop...\r\n");
-}
+}*/
 
