@@ -213,8 +213,9 @@ static bool USBD_SendControl(uint8_t d)
 {
 	if (_cmark < _cend)
 	{
-		if (!UDD_WaitForINOrOUT())
-			return false;
+		// /!\ NE DEVRAIT THEORIQUEMENT PAS ETRE COMMENTE... mais ca marche mieux sans... pourquoi?!!!
+		//if (!UDD_WaitForINOrOUT())
+		//	return false;
 
 		UDD_Send8(d);
 
@@ -238,7 +239,10 @@ int USBD_SendControl(uint8_t flags, const void* d, uint32_t len)
 	{
 		uint8_t c = *data++;
 		if (!USBD_SendControl(c))
+		{
+			printf("=> USBD_SendControl : return -1\r\n");
 			return -1;
+		}
 	}
 	return sent;
 }
@@ -311,6 +315,8 @@ _Pragma("pack(1)")
 _Pragma("pack()")
 	printf("=> USBD_SendConfiguration clen=%d\r\n", config.clen);
 
+printf("=> USBD_SendConfiguration maxlen=%d\r\n", maxlen);
+
 	//	Now send them
 	USBD_InitControl(maxlen);
 	USBD_SendControl(0,&config,sizeof(ConfigDescriptor));
@@ -382,9 +388,6 @@ volatile int cpt = 0;
 //	Endpoint 0 interrupt
 static void USB_ISR(void)
 {
-	while (cpt++ > 100)
-		;
-
     //  End of Reset
     if (Is_udd_reset())
     {
@@ -407,7 +410,6 @@ static void USB_ISR(void)
     }
 
     //  Start of Frame - happens every millisecond so we use it for TX and RX LED one-shot timing, too
-#if 0
     if (Is_udd_sof())
     {
 		printf(">>> Start of Frame\r\n");
@@ -423,7 +425,6 @@ static void USB_ISR(void)
 
 		udd_ack_sof(); /* /!\/!\/!\ TAKEN FROM ASF TO CLEAR ISR /!\/!\/!\ */
     }
-#endif
 
 	// EP 0 Interrupt
 	if (Is_udd_endpoint_interrupt(0))

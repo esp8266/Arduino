@@ -32,18 +32,18 @@ int responseDelay = 10;     // response delay of the mouse, in ms
 
 void setup() {
   // initialize the buttons' inputs:
-  pinMode(upButton, INPUT);
+ /* pinMode(upButton, INPUT);
   pinMode(downButton, INPUT);
   pinMode(leftButton, INPUT);
   pinMode(rightButton, INPUT);
-  pinMode(mouseButton, INPUT);
+  pinMode(mouseButton, INPUT);*/
   // initialize mouse control:
   Mouse.begin();
 }
 
 void loop() {
   // read the buttons:
-  int upState = digitalRead(upButton);
+ /* int upState = digitalRead(upButton);
   int downState = digitalRead(downButton);
   int rightState = digitalRead(rightButton);
   int leftState = digitalRead(leftButton);
@@ -71,8 +71,8 @@ void loop() {
     if (Mouse.isPressed(MOUSE_LEFT)) {
       Mouse.release(MOUSE_LEFT);
     }
-  }
-
+  }*/
+Mouse.move(10, 10, 0);
   // a delay so the mouse doesn't move too fast:
   delay(responseDelay);
 }
