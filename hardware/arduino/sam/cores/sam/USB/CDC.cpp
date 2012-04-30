@@ -15,6 +15,7 @@
 */
 
 #include "Arduino.h"
+#include "USBAPI.h"
 
 #if defined(USBCON)
 
@@ -63,7 +64,7 @@ static const CDCDescriptor _cdcInterface =
 int WEAK CDC_GetInterface(uint8_t* interfaceNum)
 {
 	interfaceNum[0] += 2;	// uses 2
-	return USB_SendControl(TRANSFER_PGM,&_cdcInterface,sizeof(_cdcInterface));
+	return USBD_SendControl(0,&_cdcInterface,sizeof(_cdcInterface));
 }
 
 bool WEAK CDC_Setup(Setup& setup)
@@ -75,7 +76,7 @@ bool WEAK CDC_Setup(Setup& setup)
 	{
 		if (CDC_GET_LINE_CODING == r)
 		{
-			USB_SendControl(0,(void*)&_usbLineInfo,7);
+			USBD_SendControl(0,(void*)&_usbLineInfo,7);
 			return true;
 		}
 	}
@@ -84,7 +85,7 @@ bool WEAK CDC_Setup(Setup& setup)
 	{
 		if (CDC_SET_LINE_CODING == r)
 		{
-			USB_RecvControl((void*)&_usbLineInfo,7);
+			USBD_RecvControl((void*)&_usbLineInfo,7);
 			return true;
 		}
 
@@ -137,7 +138,7 @@ void Serial_::end(void)
 void Serial_::accept(void)
 {
 	ring_buffer *buffer = &cdc_rx_buffer;
-	int c = USB_Recv(CDC_RX);
+	int c = USBD_Recv(CDC_RX);
 	int i = (unsigned int)(buffer->head+1) % SERIAL_BUFFER_SIZE;
 
 	// if we should be storing the received character into the location
@@ -181,7 +182,7 @@ int Serial_::read(void)
 
 void Serial_::flush(void)
 {
-	USB_Flush(CDC_TX);
+	USBD_Flush(CDC_TX);
 }
 
 size_t Serial_::write(uint8_t c)
@@ -196,7 +197,7 @@ size_t Serial_::write(uint8_t c)
 	// open connection isn't broken cleanly (cable is yanked out, host dies
 	// or locks up, or host virtual serial port hangs)
 	if (_usbLineInfo.lineState > 0)	{
-		int r = USB_Send(CDC_TX,&c,1);
+		int r = USBD_Send(CDC_TX,&c,1);
 		if (r > 0) {
 			return r;
 		} else {

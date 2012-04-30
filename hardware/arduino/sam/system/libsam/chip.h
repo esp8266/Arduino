@@ -42,6 +42,7 @@
  * Peripherals
  */
 #include "include/adc.h"
+#include "include/interrupt_sam_nvic.h"
 #include "include/pio.h"
 #include "include/pmc.h"
 #include "include/pwmc.h"

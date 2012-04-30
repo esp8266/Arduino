@@ -15,6 +15,7 @@
 */
 
 #include "Arduino.h"
+#include "USBAPI.h"
 
 const uint32_t _initEndpoints[] =
 {
@@ -92,96 +93,165 @@ uint32_t _cdcComposite = 0;
 //==================================================================
 //==================================================================
 
+#define USB_RECV_TIMEOUT
+class LockEP
+{
+	irqflags_t flags;
+public:
+	LockEP(uint32_t ep) : flags(cpu_irq_save())
+	{
+		UDD_SetEP(ep & 7);
+	}
+	~LockEP()
+	{
+		cpu_irq_restore(flags);
+	}
+};
+
+//	Number of bytes, assumes a rx endpoint
+uint32_t USBD_Available(uint32_t ep)
+{
+	LockEP lock(ep);
+	return UDD_FifoByteCount();
+}
+
 //	Recv 1 byte if ready
-int USBD_Recv(uint8_t ep)
+/*uint8_t USBD_Recv8(uint32_t ep)
 {
 	uint8_t c;
 
-	if (USB_Recv(ep,&c,1) != 1)
-  {
+	if (USBD_Recv(ep, &c, 1) != 1)
+	{
 		return -1;
-  }
-  else
-  {
-	  return c;
-  }
-}
+	}
+	else
+	{
+		return c;
+	}
+}*/
 
 //	Non Blocking receive
 //	Return number of bytes read
-int USBD_Recv(uint8_t ep, void* d, int len)
+uint32_t USBD_Recv(uint32_t ep, void* d, uint32_t len)
 {
-  uint8_t n ;
-	uint8_t* dst ;
-
 	if (!_usbConfiguration || len < 0)
-  {
 		return -1;
-  }
 
-	n = FifoByteCount(ep);
-
+	LockEP lock(ep);
+	uint32_t n = UDD_FifoByteCount();
 	len = min(n,len);
 	n = len;
-	dst = (uint8_t*)d;
+	uint8_t* dst = (uint8_t*)d;
 	while (n--)
-  {
-		*dst++ = Recv8(ep);
-  }
-//	if (len && !FifoByteCount())	// release empty buffer
-//		ReleaseRX();
+		*dst++ = UDD_Recv8();
+	if (len && !UDD_FifoByteCount())	// release empty buffer
+		UDD_ReleaseRX();
 
 	return len;
 }
 
-static bool USBD_SendControl(uint8_t d)
+//	Space in send EP
+uint32_t USBD_SendSpace(uint32_t ep)
 {
-	if ( _cmark < _cend )
-	{
-		if ( !WaitForINOrOUT() )
-    {
-			return false;
-    }
-
-		Send8( d ) ;
-
-		if ( !((_cmark + 1) & 0x3F) )
-    {
-			ClearIN();	// Fifo is full, release this packet
-    }
-	}
-	_cmark++;
-
-	return true ;
+	LockEP lock(ep);
+	if (!UDD_ReadWriteAllowed())
+		return 0;
+	return 64 - UDD_FifoByteCount();
 }
 
+//	Blocking Send of data to an endpoint
+uint32_t USBD_Send(uint32_t ep, const void* d, uint32_t len)
+{
+	if (!_usbConfiguration)
+		return -1;
+
+	int r = len;
+	const uint8_t* data = (const uint8_t*)d;
+	uint8_t timeout = 250;		// 250ms timeout on send? TODO
+	while (len)
+	{
+		uint8_t n = USBD_SendSpace(ep);
+		if (n == 0)
+		{
+			if (!(--timeout))
+				return -1;
+			delay(1);
+			continue;
+		}
+
+		if (n > len)
+			n = len;
+		len -= n;
+		{
+			LockEP lock(ep);
+			if (ep & TRANSFER_ZERO)
+			{
+				while (n--)
+					UDD_Send8(0);
+			}
+			else
+			{
+				while (n--)
+					UDD_Send8(*data++);
+			}
+			if (!UDD_ReadWriteAllowed() || ((len == 0) && (ep & TRANSFER_RELEASE)))	// Release full buffer
+				UDD_ReleaseTX();
+		}
+	}
+	//TXLED1;					// light the TX LED
+	//TxLEDPulse = TX_RX_LED_PULSE_MS;
+	return r;
+}
+
+int _cmark;
+int _cend;
+
+void USBD_InitControl(int end)
+{
+	UDD_SetEP(0);
+	_cmark = 0;
+	_cend = end;
+}
+
+static bool USBD_SendControl(uint8_t d)
+{
+	if (_cmark < _cend)
+	{
+		if (!UDD_WaitForINOrOUT())
+			return false;
+
+		UDD_Send8(d);
+
+		if (!((_cmark + 1) & 0x3F))
+			UDD_ClearIN();	// Fifo is full, release this packet
+	}
+	_cmark++;
+	return true;
+};
+
 //	Clipped by _cmark/_cend
-int USBD_SendControl(uint8_t flags, const void* d, int len)
+int USBD_SendControl(uint8_t flags, const void* d, uint32_t len)
 {
 	int sent = len;
-	const uint8_t* data = (const uint8_t*)d ;
+	const uint8_t* data = (const uint8_t*)d;
 
-	while ( len-- )
+	while (len--)
 	{
-		uint8_t c = *data++ ;
-
-		if ( !SendControl( c ) )
-    {
+		uint8_t c = *data++;
+		if (!USBD_SendControl(c))
 			return -1;
-    }
 	}
-
 	return sent;
 }
 
 //	Does not timeout or cross fifo boundaries
 //	Will only work for transfers <= 64 bytes
 //	TODO
-int USBD_RecvControl(void* d, int len)
+int USBD_RecvControl(void* d, uint32_t len)
 {
-	WaitOUT() ;
-	Recv( (uint8_t*)d, len ) ;
-	ClearOUT() ;
+	UDD_WaitOUT() ;
+	UDD_Recv( (uint8_t*)d, len ) ;
+	UDD_ClearOUT() ;
 
 	return len ;
 }
@@ -230,14 +300,14 @@ int USBD_SendInterfaces(void)
 static bool USBD_SendConfiguration(int maxlen)
 {
 	//	Count and measure interfaces
-	InitControl(0);
-	int interfaces = SendInterfaces();
+	USBD_InitControl(0);
+	int interfaces = USBD_SendInterfaces();
 	ConfigDescriptor config = D_CONFIG(_cmark + sizeof(ConfigDescriptor),interfaces);
 
 	//	Now send them
-	InitControl(maxlen);
-	USB_SendControl(0,&config,sizeof(ConfigDescriptor));
-	SendInterfaces();
+	USBD_InitControl(maxlen);
+	USBD_SendControl(0,&config,sizeof(ConfigDescriptor));
+	USBD_SendInterfaces();
 	return true;
 }
 
@@ -249,10 +319,10 @@ static bool USBD_SendDescriptor(Setup& setup)
 
 	if ( USB_CONFIGURATION_DESCRIPTOR_TYPE == t )
   {
-		return SendConfiguration(setup.wLength);
+		return USBD_SendConfiguration(setup.wLength);
   }
 
-	InitControl(setup.wLength);
+	USBD_InitControl(setup.wLength);
 #ifdef HID_ENABLED
 	if ( HID_REPORT_DESCRIPTOR_TYPE == t )
   {
@@ -290,108 +360,143 @@ static bool USBD_SendDescriptor(Setup& setup)
 		desc_length = *desc_addr;
   }
 
-	USB_SendControl(TRANSFER_PGM,desc_addr,desc_length);
+	USBD_SendControl(0, desc_addr, desc_length);
 
 	return true;
 }
 
 //	Endpoint 0 interrupt
-void USB_ISR()
+static void USB_ISR(void)
 {
-  SetEP(0) ;
+    //  End of Reset
+    if (Is_udd_reset())
+    {
+		// Reset USB address to 0
+		udd_configure_address(0);
+		udd_enable_address();
 
-	if ( !ReceivedSetupInt() )
-  {
-		return;
-  }
+		// Configure EP 0
+        UDD_InitEP(0, EP_TYPE_CONTROL);
+		udd_allocate_memory(0);
+		udd_enable_setup_received_interrupt(0);
+		udd_enable_endpoint_interrupt(0);
 
-	Setup setup ;
-	Recv((uint8_t*)&setup,8);
-	ClearSetupInt();
+        _usbConfiguration = 0;
+		_cmark = 0;
+		_cend = 0;
+    }
 
-	uint8_t requestType = setup.bmRequestType;
-	if (requestType & REQUEST_DEVICETOHOST)
-  {
-		WaitIN();
-  }
-	else
-  {
-		ClearIN();
-  }
+    //  Start of Frame - happens every millisecond so we use it for TX and RX LED one-shot timing, too
+    if (Is_udd_sof())
+    {
+#ifdef CDC_ENABLED
+        USBD_Flush(CDC_TX);              // Send a tx frame if found
+#endif
 
-  bool ok = true ;
-	if (REQUEST_STANDARD == (requestType & REQUEST_TYPE))
+        // check whether the one-shot period has elapsed.  if so, turn off the LED
+        /*if (TxLEDPulse && !(--TxLEDPulse))
+            TXLED0;
+        if (RxLEDPulse && !(--RxLEDPulse))
+            RXLED0;*/
+    }
+
+	// EP 0 Interrupt
+	if (Is_udd_endpoint_interrupt(0))
 	{
-		//	Standard Requests
-		uint8_t r = setup.bRequest;
-		if (GET_STATUS == r)
+
+		if ( !UDD_ReceivedSetupInt() )
 		{
-			Send8(0);		// TODO
-			Send8(0);
+			return;
 		}
-		else if (CLEAR_FEATURE == r)
+
+		Setup setup ;
+		UDD_Recv((uint8_t*)&setup,8);
+		UDD_ClearSetupInt();
+
+		uint8_t requestType = setup.bmRequestType;
+		if (requestType & REQUEST_DEVICETOHOST)
 		{
+			UDD_WaitIN();
 		}
-		else if (SET_FEATURE == r)
+		else
 		{
+			UDD_ClearIN();
 		}
-		else if (SET_ADDRESS == r)
+
+		bool ok = true ;
+		if (REQUEST_STANDARD == (requestType & REQUEST_TYPE))
 		{
-			WaitIN();
-			UDPHS->UDPHS_CTRL |= UDPHS_CTRL_DEV_ADDR(setup.wValueL) | UDPHS_CTRL_FADDR_EN;
-		}
-		else if (GET_DESCRIPTOR == r)
-		{
-			ok = SendDescriptor(setup);
-		}
-		else if (SET_DESCRIPTOR == r)
-		{
-			ok = false;
-		}
-		else if (GET_CONFIGURATION == r)
-		{
-			Send8(1);
-		}
-		else if (SET_CONFIGURATION == r)
-		{
-			if (REQUEST_DEVICE == (requestType & REQUEST_RECIPIENT))
+			//	Standard Requests
+			uint8_t r = setup.bRequest;
+			if (GET_STATUS == r)
 			{
-				InitEndpoints(_initEndpoints, sizeof(_initEndpoints)/sizeof(_initEndpoints[0]));
-				_usbConfiguration = setup.wValueL;
+				UDD_Send8(0);		// TODO
+				UDD_Send8(0);
 			}
-      else
-      {
+			else if (CLEAR_FEATURE == r)
+			{
+			}
+			else if (SET_FEATURE == r)
+			{
+			}
+			else if (SET_ADDRESS == r)
+			{
+				UDD_WaitIN();
+				UDD_SetAddress(setup.wValueL);
+			}
+			else if (GET_DESCRIPTOR == r)
+			{
+				ok = USBD_SendDescriptor(setup);
+			}
+			else if (SET_DESCRIPTOR == r)
+			{
 				ok = false;
-      }
+			}
+			else if (GET_CONFIGURATION == r)
+			{
+				UDD_Send8(1);
+			}
+			else if (SET_CONFIGURATION == r)
+			{
+				if (REQUEST_DEVICE == (requestType & REQUEST_RECIPIENT))
+				{
+					UDD_InitEndpoints(_initEndpoints);
+					_usbConfiguration = setup.wValueL;
+				}
+				else
+				{
+					ok = false;
+				}
+			}
+			else if (GET_INTERFACE == r)
+			{
+			}
+			else if (SET_INTERFACE == r)
+			{
+			}
 		}
-		else if (GET_INTERFACE == r)
+		else
 		{
+			USBD_InitControl(setup.wLength);		//	Max length of transfer
+			ok = USBD_ClassInterfaceRequest(setup);
 		}
-		else if (SET_INTERFACE == r)
-		{
-		}
-	}
-	else
-	{
-		InitControl(setup.wLength);		//	Max length of transfer
-		ok = ClassInterfaceRequest(setup);
-	}
 
-	if (ok)
-  {
-		ClearIN();
-  }
-	else
-	{
-		Stall();
+		if (ok)
+		{
+			UDD_ClearIN();
+		}
+		else
+		{
+			UDD_Stall();
+		}
 	}
 }
 
-void USBD_Flush(uint8_t ep)
+void USBD_Flush(uint32_t ep)
 {
-	SetEP(ep);
-//	if (FifoByteCount())
-//		ReleaseTX();
+	UDD_SetEP(ep);
+	if (UDD_FifoByteCount())
+		UDD_ReleaseTX();
 }
 
 //	General interrupt
@@ -427,20 +532,17 @@ ISR(USB_GEN_vect)
             RXLED0;
     }
 }
-
 */
-
-
 
 //	VBUS or counting frames
 //	Any frame counting?
-uint8_t USBD_Connected(void)
+uint32_t USBD_Connected(void)
 {
-	uint8_t f = UDFNUML;
+	uint8_t f = UDD_GetFrameNumber();
 
 	delay(3);
 
-	return f != UDFNUML;
+	return f != UDD_GetFrameNumber();
 }
 
 
@@ -451,7 +553,9 @@ USB_ USB;
 
 USB_::USB_()
 {
-  if ( USBD_Init() == 0UL )
+	UDD_SetStack(&USB_ISR);
+
+  if ( UDD_Init() == 0UL )
   {
     _usbInitialized=1UL ;
   }
@@ -461,7 +565,7 @@ bool USB_::attach(void)
 {
   if ( _usbInitialized != 0UL )
   {
-    USBD_Attach() ;
+    UDD_Attach() ;
 
     return true ;
   }
@@ -475,7 +579,7 @@ bool USB_::detach(void)
 {
   if ( _usbInitialized != 0UL )
   {
-    USBD_Detach() ;
+    UDD_Detach() ;
 
     return true ;
   }

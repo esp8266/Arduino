@@ -21,6 +21,8 @@
 
 #if defined __cplusplus && defined USBCON
 
+#include "RingBuffer.h"
+
 //================================================================================
 //================================================================================
 //	USB
@@ -171,7 +173,7 @@ typedef struct
 int		HID_GetInterface(uint8_t* interfaceNum);
 int		HID_GetDescriptor(int i);
 bool	HID_Setup(Setup& setup);
-void	HID_SendReport(uint8_t id, const void* data, int len);
+void	HID_SendReport(uint8_t id, const void* data, uint32_t len);
 
 //================================================================================
 //================================================================================
@@ -193,18 +195,24 @@ bool	CDC_Setup(Setup& setup);
 //================================================================================
 //================================================================================
 
-#define TRANSFER_PGM		0x80
 #define TRANSFER_RELEASE	0x40
 #define TRANSFER_ZERO		0x20
 
-int USB_SendControl(uint8_t flags, const void* d, int len);
-int USB_RecvControl(void* d, int len);
+void USBD_InitControl(int end);
+int USBD_SendControl(uint8_t flags, const void* d, uint32_t len);
+int USBD_RecvControl(void* d, uint32_t len);
+int USBD_SendInterfaces(void);
+bool USBD_ClassInterfaceRequest(Setup& setup);
 
-uint8_t	USB_Available(uint8_t ep);
-int USB_Send(uint8_t ep, const void* data, int len);	// blocking
-int USB_Recv(uint8_t ep, void* data, int len);		// non-blocking
-int USB_Recv(uint8_t ep);							// non-blocking
-void USB_Flush(uint8_t ep);
+uint32_t USBD_Recv(uint32_t ep, void* d, uint32_t len);
+uint8_t USBD_Recv8(uint32_t ep);
+uint32_t USBD_Available(uint32_t ep);
+uint32_t USBD_SendSpace(uint32_t ep);
+uint32_t USBD_Send(uint32_t ep, const void* d, uint32_t len);
+int USBD_Recv(uint8_t ep, void* data, uint32_t len);		// non-blocking
+int USBD_Recv(uint8_t ep);							// non-blocking
+void USBD_Flush(uint32_t ep);
+uint32_t USBD_Connected(void);
 
 #endif
 

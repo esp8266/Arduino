@@ -141,18 +141,18 @@ uint8_t _hid_idle = 1;
 int WEAK HID_GetInterface(uint8_t* interfaceNum)
 {
 	interfaceNum[0] += 1;	// uses 1
-	return USB_SendControl(TRANSFER_PGM,&_hidInterface,sizeof(_hidInterface));
+	return USBD_SendControl(0,&_hidInterface,sizeof(_hidInterface));
 }
 
 int WEAK HID_GetDescriptor(int i)
 {
-	return USB_SendControl(TRANSFER_PGM,_hidReportDescriptor,sizeof(_hidReportDescriptor));
+	return USBD_SendControl(0,_hidReportDescriptor,sizeof(_hidReportDescriptor));
 }
 
-void WEAK HID_SendReport(uint8_t id, const void* data, int len)
+void WEAK HID_SendReport(uint8_t id, const void* data, uint32_t len)
 {
-	USB_Send(HID_TX, &id, 1);
-	USB_Send(HID_TX | TRANSFER_RELEASE,data,len);
+	USBD_Send(HID_TX, &id, 1);
+	USBD_Send(HID_TX | TRANSFER_RELEASE,data,len);
 }
 
 bool WEAK HID_Setup(Setup& setup)
