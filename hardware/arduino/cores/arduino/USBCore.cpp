@@ -627,13 +627,13 @@ u8 USBConnected()
 //=======================================================================
 //=======================================================================
 
-USB_ USB;
+USBDevice_ USBDevice;
 
-USB_::USB_()
+USBDevice_::USBDevice_()
 {
 }
 
-void USB_::attach()
+void USBDevice_::attach()
 {
 	_usbConfiguration = 0;
 	UHWCON = 0x01;						// power internal reg
@@ -654,18 +654,18 @@ void USB_::attach()
 	TX_RX_LED_INIT;
 }
 
-void USB_::detach()
+void USBDevice_::detach()
 {
 }
 
 //	Check for interrupts
 //	TODO: VBUS detection
-bool USB_::configured()
+bool USBDevice_::configured()
 {
 	return _usbConfiguration;
 }
 
-void USB_::poll()
+void USBDevice_::poll()
 {
 }
 
