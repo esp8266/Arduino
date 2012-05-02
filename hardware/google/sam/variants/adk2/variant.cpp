@@ -8,7 +8,7 @@
 
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   See the GNU Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser General Public
@@ -101,6 +101,10 @@
  * "L"             |  PC9
  */
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*
  * Pins descriptions
@@ -236,21 +240,28 @@ extern const PinDescription g_APinDescription[]=
   // 74 - USART3 (Serial5) all pins
   { PIOD, PIO_PD5B_RXD3|PIO_PD4B_TXD3, ID_PIOD, PIO_PERIPH_B, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_COMBO), NO_ADC, NO_ADC, NO_PWM, NO_TC },
 
+  // 75 - USB
+  { PIOB, PIO_PB11A_UOTGID|PIO_PB10A_UOTGVBOF, ID_PIOB, PIO_PERIPH_A, PIO_DEFAULT, PIN_ATTR_DIGITAL,NO_ADC, NO_ADC, NO_PWM,  NO_TC    }, // ID - VBOF
+
   // END
   { NULL, 0, 0, PIO_NOT_A_PIN, PIO_DEFAULT, 0, NO_ADC, NO_ADC, NO_PWM, NO_TC }
 } ;
+
+#ifdef __cplusplus
+}
+#endif
 
 /*
  * UART objects
  */
 RingBuffer rx_buffer1 ;
 
-UARTClass Serial( UART, UART_IRQn, ID_UART, &rx_buffer1 ) ;
+UARTClass Serial1( UART, UART_IRQn, ID_UART, &rx_buffer1 ) ;
 
 // IT handlers
-void UART_IrqHandler(void)
+void UART_Handler(void)
 {
-  Serial.IrqHandler() ;
+  Serial1.IrqHandler() ;
 }
 
 // ----------------------------------------------------------------------------
@@ -268,22 +279,22 @@ USARTClass Serial4( USART2, USART2_IRQn, ID_USART2, &rx_buffer4 ) ;
 USARTClass Serial5( USART3, USART3_IRQn, ID_USART3, &rx_buffer5 ) ;
 
 // IT handlers
-void USART0_IrqHandler( void )
+void USART0_Handler( void )
 {
   Serial2.IrqHandler() ;
 }
 
-void USART1_IrqHandler( void )
+void USART1_Handler( void )
 {
   Serial3.IrqHandler() ;
 }
 
-void USART2_IrqHandler( void )
+void USART2_Handler( void )
 {
   Serial4.IrqHandler() ;
 }
 
-void USART3_IrqHandler( void )
+void USART3_Handler( void )
 {
   Serial5.IrqHandler() ;
 }
@@ -293,9 +304,6 @@ void USART3_IrqHandler( void )
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-// Should be made in a better way...
-extern void analogOutputInit(void);
 
 /**
  *
@@ -343,27 +351,25 @@ extern void init( void )
     g_APinDescription[PINS_USART3].ulPin,
     g_APinDescription[PINS_USART3].ulPinConfiguration);
 
-
+  // Initialize USB
+  PIO_Configure(
+    g_APinDescription[PINS_USB].pPort,
+    g_APinDescription[PINS_USB].ulPinType,
+    g_APinDescription[PINS_USB].ulPin,
+    g_APinDescription[PINS_USB].ulPinConfiguration);
 
   // Initialize 10bit Analog Controller
-  PMC_EnablePeripheral( ID_ADC ) ;
-  adc_init( ADC, SystemCoreClock, ADC_FREQ_MAX, ADC_STARTUP ) ;
-  adc_configure_timing( ADC, 15, ADC_SETTLING_TIME_0, 15 ) ; // FIXME: Last two parameters (settling time and transfer time) need to be corrected!
-  adc_configure_trigger( ADC, ADC_TRIG_SW, ADC_MR_FREERUN_OFF ) ;	
-  adc_disable_interrupt( ADC, 0xFFFFFFFF ) ; /* Disable all adc interrupt. */	
-  adc_disable_channel( ADC, ADC_ALL_CHANNEL ) ;
-
-  // Initialize 12bit Analog Controller
-//  PMC_EnablePeripheral( ID_ADC12B ) ;
-//  adc12_init( ADC12B, SystemCoreClock, ADC12_FREQ_MAX, ADC12_STARTUP_FAST, 1 ) ;
-//  adc12_configure_timing( ADC12B, 15 ) ;
-//  adc12_configure_trigger( ADC12B, ADC_TRIG_SW ) ;	
-//  adc12_disable_interrupt( ADC12B, 0xFFFFFFFF ) ; /* Disable all adc interrupt. */
-//  adc12_disable_channel( ADC12B, ADC_ALL_CHANNEL ) ;
+  pmc_enable_periph_clk( ID_ADC ) ;
+  adc_init( ADC, SystemCoreClock, ADC_FREQ_MAX, ADC_STARTUP_FAST ) ;
+  adc_configure_timing(ADC, 0, ADC_SETTLING_TIME_3, 1);
+  adc_configure_trigger(ADC, ADC_TRIG_SW, 0); // Disable hardware trigger.
+  adc_disable_interrupt( ADC, 0xFFFFFFFF ) ; // Disable all ADC interrupts.
+  adc_disable_all_channel( ADC ) ;
 
   // Initialize analogOutput module
   analogOutputInit();
 }
+
 #ifdef __cplusplus
 }
 #endif

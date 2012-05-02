@@ -16,14 +16,15 @@
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-# Makefile for compiling libArduino
-.SUFFIXES: .o .a .c .s
+# Makefile for compiling validation application
+.SUFFIXES: .o .a .c .cpp .s
 
 # putting default variant
 ifeq ("$(VARIANT)", "")
 #VARIANT=sam3s_ek
 #VARIANT=sam3u_ek
-VARIANT=sam3x_ek
+#VARIANT=sam3x_ek
+VARIANT=adk2
 #VARIANT=arduino_due_x
 endif
 
@@ -42,6 +43,9 @@ VARIANT_PATH = ../../../../variants/$(VARIANT)
 else ifeq ("$(VARIANT)", "arduino_due_x")
 CHIP=__SAM3X8E__
 VARIANT_PATH = ../../../../variants/$(VARIANT)
+else ifeq ("$(VARIANT)", "adk2")
+CHIP=__SAM3X8E__
+VARIANT_PATH = ../../../../../../google/sam/variants/$(VARIANT)
 endif
 
 TOOLCHAIN=gcc
@@ -51,7 +55,7 @@ TOOLCHAIN=gcc
 #-------------------------------------------------------------------------------
 
 # Libraries
-PROJECT_BASE_PATH = ./..
+PROJECT_BASE_PATH = ..
 SYSTEM_PATH = ../../../../system
 
 ifeq ($(CHIP), __SAM3S4C__)
@@ -77,8 +81,8 @@ CMSIS_ARM_PATH=$(CMSIS_ROOT_PATH)/CMSIS/Include
 CMSIS_ATMEL_PATH=$(CMSIS_ROOT_PATH)/Device/ATMEL
 CMSIS_CHIP_PATH=$(CMSIS_ROOT_PATH)/Device/ATMEL/$(CHIP_SERIE)
 
-ARDUINO_CORE_PATH=$(PROJECT_BASE_PATH)/..
-ARDUINO_USB_PATH=$(PROJECT_BASE_PATH)/../USB
+ARDUINO_CORE_PATH=../../../../cores/sam
+ARDUINO_USB_PATH=$(ARDUINO_CORE_PATH)/USB
 
 # Output directories
 OUTPUT_PATH = debug_$(VARIANT)
@@ -87,15 +91,14 @@ OUTPUT_PATH = debug_$(VARIANT)
 # Files
 #-------------------------------------------------------------------------------
 
-vpath %.h $(PROJECT_BASE_PATH)/.. $(VARIANT_PATH) $(SYSTEM_PATH) $(CMSIS_ARM_PATH)
+#vpath %.h $(PROJECT_BASE_PATH)/.. $(PROJECT_BASE_PATH)/../USB $(VARIANT_PATH) $(SYSTEM_PATH) $(CMSIS_ARM_PATH)
 vpath %.cpp $(PROJECT_BASE_PATH)
 
-VPATH+=$(PROJECT_BASE_PATH)
+#VPATH+=$(PROJECT_BASE_PATH)
 
-INCLUDES = -I$(PROJECT_BASE_PATH)/..
+INCLUDES = -I$(ARDUINO_CORE_PATH)
+INCLUDES += -I$(ARDUINO_CORE_PATH)/USB
 INCLUDES += -I$(VARIANT_PATH)
-#INCLUDES += -I$(VARIANT_PATH)/..
-#INCLUDES += -I$(SYSTEM_PATH)
 INCLUDES += -I$(SYSTEM_PATH)/libsam
 INCLUDES += -I$(CMSIS_ARM_PATH)
 INCLUDES += -I$(CMSIS_ATMEL_PATH)
@@ -154,6 +157,7 @@ test: create_output libsam_$(CHIP_NAME)_$(TOOLCHAIN)_$(LIBS_POSTFIX).a libarduin
 
 .PHONY: create_output
 create_output:
+	@echo ------------------------------------------------------------------------------------
 	@echo --- Preparing $(VARIANT) files in $(OUTPUT_PATH) $(OUTPUT_BIN)
 #	@echo -------------------------
 #	@echo *$(INCLUDES)
@@ -174,11 +178,12 @@ create_output:
 #	@echo -------------------------
 
 	-@mkdir $(OUTPUT_PATH) 1>NUL 2>&1
+	@echo ------------------------------------------------------------------------------------
 
 $(addprefix $(OUTPUT_PATH)/,$(CPP_OBJ)): $(OUTPUT_PATH)/%.o: %.cpp
-#	@"$(CC)" -c $(CPPFLAGS) $< -o $@
-#	@"$(CXX)" -c $(CPPFLAGS) $< -o $@
-	@"$(CXX)" -v -c $(CPPFLAGS) $< -o $@
+	@echo *** Current folder is $(shell cd)
+	@"$(CXX)" -c $(CPPFLAGS) $< -o $@
+#	"$(CXX)" -v -c $(CPPFLAGS) $< -o $@
 
 $(OUTPUT_BIN): $(addprefix $(OUTPUT_PATH)/, $(C_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(CPP_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(A_OBJ))
 	@"$(CC)" $(LIB_PATH) $(LDFLAGS) -T"$(VARIANT_PATH)/linker_scripts/gcc/flash.ld" -Wl,-Map,$(OUTPUT_PATH)/$@.map -o $(OUTPUT_PATH)/$@.elf $^ $(LIBS)
@@ -189,8 +194,22 @@ $(OUTPUT_BIN): $(addprefix $(OUTPUT_PATH)/, $(C_OBJ)) $(addprefix $(OUTPUT_PATH)
 
 .PHONY: clean
 clean:
-	@echo --- Cleaning test files
+	@echo ------------------------------------------------------------------------------------
+	@echo --- Cleaning test files for $(VARIANT)
 	-@$(RM) $(OUTPUT_PATH) 1>NUL 2>&1
+	@echo ------------------------------------------------------------------------------------
+	@echo ------------------------------------------------------------------------------------
+	@echo Sub-making clean for libsam
+	@$(MAKE) -C $(SYSTEM_PATH)/libsam/build_gcc -f Makefile clean
+	@echo ------------------------------------------------------------------------------------
+	@echo ------------------------------------------------------------------------------------
+	@echo Sub-making clean for Arduino core
+	$(MAKE) -C $(ARDUINO_CORE_PATH)/build_gcc -f Makefile clean
+	@echo ------------------------------------------------------------------------------------
+	@echo ------------------------------------------------------------------------------------
+	@echo Sub-making clean for variant $(VARIANT)
+	$(MAKE) -C $(VARIANT_PATH)/build_gcc -f Makefile clean
+	@echo ------------------------------------------------------------------------------------
 
 #	-$(RM) $(OUTPUT_PATH)/test.o
 #	-$(RM) $(OUTPUT_PATH)/$(OUTPUT_BIN).elf
@@ -203,14 +222,20 @@ debug: test
 #	@"$(GDB)" -w -x "$(VARIANT_PATH)/debug_scripts/gcc/$(VARIANT)_sram.gdb" -ex "reset" -readnow -se $(OUTPUT_PATH)/$(OUTPUT_BIN).elf
 
 libsam_$(CHIP_NAME)_$(TOOLCHAIN)_$(LIBS_POSTFIX).a:
-	@echo Building $@
+	@echo ------------------------------------------------------------------------------------
+	@echo Sub-making $@
 	@$(MAKE) -C $(SYSTEM_PATH)/libsam/build_gcc -f Makefile $@
+	@echo ------------------------------------------------------------------------------------
 
 libarduino_$(VARIANT)_$(TOOLCHAIN)_$(LIBS_POSTFIX).a:
-	@echo Building $@
+	@echo ------------------------------------------------------------------------------------
+	@echo Sub-making $@
 	$(MAKE) -C $(ARDUINO_CORE_PATH)/build_gcc -f Makefile $(VARIANT)
+	@echo ------------------------------------------------------------------------------------
 
 libvariant_$(VARIANT)_$(TOOLCHAIN)_$(LIBS_POSTFIX).a:
-	@echo Building $@
+	@echo ------------------------------------------------------------------------------------
+	@echo Sub-making $@
 	$(MAKE) -C $(VARIANT_PATH)/build_gcc -f Makefile $(VARIANT)
+	@echo ------------------------------------------------------------------------------------
 

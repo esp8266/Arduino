@@ -8,7 +8,7 @@
 
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   See the GNU Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser General Public
@@ -23,11 +23,18 @@
  *        Headers
  *----------------------------------------------------------------------------*/
 
+// We have native USB on this variant
+#define USBCON
+
 #include "Arduino.h"
 #ifdef __cplusplus
 #include "UARTClass.h"
 #include "USARTClass.h"
 #endif
+
+#ifdef __cplusplus
+extern "C"{
+#endif // __cplusplus
 
 /**
  * Libc porting layers
@@ -49,16 +56,11 @@
 /** Name of the board */
 #define VARIANT_NAME "ADK2"
 
-/*
-#define VARIANT_REV_A
-#define VARIANT_REV_B
-*/
-
 /** Frequency of the board main oscillator */
 #define VARIANT_MAINOSC           12000000
 
 /** Master clock frequency */
-#define VARIANT_MCK               96000000
+#define VARIANT_MCK               84000000
 
 /*----------------------------------------------------------------------------
  *        Pins
@@ -120,6 +122,12 @@ static const uint8_t SCK  = 52 ;
 #define PINS_USART3          (74u)
 
 /*
+ * USB Interfaces
+ */
+#define PINS_USB             (75u)
+
+
+/*
  * Analog pins
  */
 static const uint8_t A0  = 54;
@@ -157,13 +165,17 @@ static const uint8_t A9  = 63;
 #define TC_MAX_DUTY_CYCLE   255
 #define TC_MIN_DUTY_CYCLE   0
 
+#ifdef __cplusplus
+}
+#endif
+
 /*----------------------------------------------------------------------------
  *        Arduino objects - C++ only
  *----------------------------------------------------------------------------*/
 
 #ifdef __cplusplus
 
-extern UARTClass Serial ;
+extern UARTClass Serial1 ;
 
 extern USARTClass Serial2 ;
 extern USARTClass Serial3 ;

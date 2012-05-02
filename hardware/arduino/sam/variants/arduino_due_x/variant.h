@@ -32,6 +32,10 @@
 #include "USARTClass.h"
 #endif
 
+#ifdef __cplusplus
+extern "C"{
+#endif // __cplusplus
+
 /**
  * Libc porting layers
  */
@@ -51,11 +55,6 @@
 
 /** Name of the board */
 #define VARIANT_NAME "ARDUINO_DUE"
-
-/*
-#define VARIANT_REV_A
-#define VARIANT_REV_B
-*/
 
 /** Frequency of the board main oscillator */
 #define VARIANT_MAINOSC           12000000
@@ -170,6 +169,10 @@ static const uint8_t A15 = 69;
 #define TC_FREQUENCY        1000
 #define TC_MAX_DUTY_CYCLE   255
 #define TC_MIN_DUTY_CYCLE   0
+
+#ifdef __cplusplus
+}
+#endif
 
 /*----------------------------------------------------------------------------
  *        Arduino objects - C++ only

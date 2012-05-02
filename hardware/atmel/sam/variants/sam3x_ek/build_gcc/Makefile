@@ -8,7 +8,7 @@
 #
 #  This library is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #  See the GNU Lesser General Public License for more details.
 #
 #  You should have received a copy of the GNU Lesser General Public
@@ -16,10 +16,7 @@
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-# Makefile for compiling libboard
-BOARD = 
-
-SUBMAKE_OPTIONS=--no-builtin-rules --no-builtin-variables
+SUBMAKE_OPTIONS=--no-builtin-rules --no-builtin-variables --no-print-directory
 
 #-------------------------------------------------------------------------------
 # Rules
@@ -38,5 +35,4 @@ clean:
 	@echo --- Cleaning sam3x_ek
 	@$(MAKE) DEBUG=1 $(SUBMAKE_OPTIONS) -f libvariant_sam3x_ek.mk $@
 #	@$(MAKE) $(SUBMAKE_OPTIONS) -f libvariant_sam3x_ek.mk $@
-
 

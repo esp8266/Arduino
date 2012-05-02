@@ -29,17 +29,17 @@ TOOLCHAIN=gcc
 #-------------------------------------------------------------------------------
 
 # Output directories
-OUTPUT_BIN = ../../../cores/sam
+OUTPUT_BIN = ../../../../../arduino/sam/cores/sam
 
 # Libraries
 PROJECT_BASE_PATH = ..
-SYSTEM_PATH = ../../../system
+SYSTEM_PATH = ../../../../../arduino/sam/system
 CMSIS_ROOT_PATH = $(SYSTEM_PATH)/CMSIS
 CMSIS_ARM_PATH=$(CMSIS_ROOT_PATH)/CMSIS/Include
 CMSIS_ATMEL_PATH=$(CMSIS_ROOT_PATH)/Device/ATMEL
 #CMSIS_CHIP_PATH=$(CMSIS_ROOT_PATH)/Device/ATMEL/$(CHIP_SERIE)
 
-ARDUINO_PATH = ../../../cores/sam
+ARDUINO_PATH = ../../../../../arduino/sam/cores/sam
 VARIANT_BASE_PATH = ../../../variants
 VARIANT_PATH = ../../../variants/$(VARIANT)
 
@@ -47,14 +47,15 @@ VARIANT_PATH = ../../../variants/$(VARIANT)
 # Files
 #-------------------------------------------------------------------------------
 
-vpath %.h $(PROJECT_BASE_PATH) $(SYSTEM_PATH) $(VARIANT_PATH)
-vpath %.cpp $(PROJECT_BASE_PATH) $(PROJECT_BASE_PATH)
+#vpath %.h $(PROJECT_BASE_PATH) $(SYSTEM_PATH) $(VARIANT_PATH)
+vpath %.cpp $(PROJECT_BASE_PATH)
 
 VPATH+=$(PROJECT_BASE_PATH)
 
 INCLUDES =
 #INCLUDES += -I$(PROJECT_BASE_PATH)
 INCLUDES += -I$(ARDUINO_PATH)
+INCLUDES += -I$(ARDUINO_PATH)/USB
 INCLUDES += -I$(SYSTEM_PATH)
 INCLUDES += -I$(SYSTEM_PATH)/libsam
 INCLUDES += -I$(VARIANT_BASE_PATH)
@@ -132,8 +133,9 @@ $(VARIANT): create_output $(OUTPUT_LIB)
 
 .PHONY: create_output
 create_output:
+	@echo ------------------------------------------------------------------------------------
 	@echo -------------------------
-	@echo --- Preparing $(VARIANT) files in $(OUTPUT_PATH) $(OUTPUT_BIN)
+	@echo --- Preparing variant $(VARIANT) files in $(OUTPUT_PATH) $(OUTPUT_BIN)
 	@echo -------------------------
 #	@echo *$(INCLUDES)
 #	@echo -------------------------
@@ -153,6 +155,7 @@ create_output:
 #	@echo -------------------------
 
 	-@mkdir $(OUTPUT_PATH) 1>NUL 2>&1
+	@echo ------------------------------------------------------------------------------------
 
 $(addprefix $(OUTPUT_PATH)/,$(C_OBJ)): $(OUTPUT_PATH)/%.o: %.c
 #	@"$(CC)" -v -c $(CFLAGS) $< -o $@
@@ -172,6 +175,9 @@ $(OUTPUT_LIB): $(addprefix $(OUTPUT_PATH)/, $(C_OBJ)) $(addprefix $(OUTPUT_PATH)
 
 .PHONY: clean
 clean:
+	@echo ------------------------------------------------------------------------------------
 	@echo --- Cleaning $(VARIANT) files [$(OUTPUT_PATH)$(SEP)*.o]
 	-@$(RM) $(OUTPUT_PATH) 1>NUL 2>&1
 	-@$(RM) $(OUTPUT_BIN)/$(OUTPUT_LIB) 1>NUL 2>&1
+	@echo ------------------------------------------------------------------------------------
+

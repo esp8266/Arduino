@@ -29,30 +29,31 @@ TOOLCHAIN=gcc
 #-------------------------------------------------------------------------------
 
 # Output directories
-#OUTPUT_BIN = ../lib
 OUTPUT_BIN = ..
 
 # Libraries
 PROJECT_BASE_PATH = ..
+PROJECT_BASE_PATH_USB = ../USB
 SYSTEM_PATH = ../../../system
 CMSIS_ROOT_PATH = $(SYSTEM_PATH)/CMSIS
 CMSIS_ARM_PATH=$(CMSIS_ROOT_PATH)/CMSIS/Include
 CMSIS_ATMEL_PATH=$(CMSIS_ROOT_PATH)/Device/ATMEL
 CMSIS_CHIP_PATH=$(CMSIS_ROOT_PATH)/Device/ATMEL/$(CHIP_SERIE)
-VARIANT_PATH = ../../../variants/$(VARIANT)
+VARIANT_PATH = ../../../../../atmel/sam/variants/$(VARIANT)
 
 #-------------------------------------------------------------------------------
 # Files
 #-------------------------------------------------------------------------------
 
-vpath %.h $(PROJECT_BASE_PATH) $(SYSTEM_PATH) $(VARIANT_PATH)
-vpath %.c $(PROJECT_BASE_PATH) $(VARIANT_PATH)
-vpath %.cpp $(PROJECT_BASE_PATH) $(PROJECT_BASE_PATH)
+vpath %.h $(PROJECT_BASE_PATH) $(PROJECT_BASE_PATH_USB) $(SYSTEM_PATH) $(VARIANT_PATH)
+vpath %.c $(PROJECT_BASE_PATH) $(PROJECT_BASE_PATH_USB) $(VARIANT_PATH)
+vpath %.cpp $(PROJECT_BASE_PATH) $(PROJECT_BASE_PATH_USB)
 
 VPATH+=$(PROJECT_BASE_PATH)
 
 INCLUDES =
 INCLUDES += -I$(PROJECT_BASE_PATH)
+INCLUDES += -I$(PROJECT_BASE_PATH_USB)
 INCLUDES += -I$(VARIANT_PATH)
 INCLUDES += -I$(CMSIS_ARM_PATH)
 INCLUDES += -I$(CMSIS_ATMEL_PATH)
@@ -72,6 +73,9 @@ endif
 
 include $(TOOLCHAIN).mk
 
+CFLAGS += -DUSB_VID=0x2341 -DUSB_PID=0xcafe
+CPPFLAGS += -DUSB_VID=0x2341 -DUSB_PID=0xcafe
+
 #-------------------------------------------------------------------------------
 ifdef DEBUG
 OUTPUT_OBJ=debug
@@ -86,7 +90,7 @@ OUTPUT_PATH=$(OUTPUT_OBJ)_$(VARIANT)
 #-------------------------------------------------------------------------------
 # C source files and objects
 #-------------------------------------------------------------------------------
-C_SRC=$(wildcard $(PROJECT_BASE_PATH)/*.c)
+C_SRC=$(wildcard $(PROJECT_BASE_PATH)/*.c $(PROJECT_BASE_PATH_USB)/*.c)
 
 C_OBJ_TEMP = $(patsubst %.c, %.o, $(notdir $(C_SRC)))
 
@@ -98,7 +102,7 @@ C_OBJ=$(filter-out $(C_OBJ_FILTER), $(C_OBJ_TEMP))
 #-------------------------------------------------------------------------------
 # CPP source files and objects
 #-------------------------------------------------------------------------------
-CPP_SRC=$(wildcard $(PROJECT_BASE_PATH)/*.cpp)
+CPP_SRC=$(wildcard $(PROJECT_BASE_PATH)/*.cpp $(PROJECT_BASE_PATH_USB)/*.cpp)
 
 CPP_OBJ_TEMP = $(patsubst %.cpp, %.o, $(notdir $(CPP_SRC)))
 
@@ -128,9 +132,9 @@ $(VARIANT): create_output $(OUTPUT_LIB)
 
 .PHONY: create_output
 create_output:
-	@echo -------------------------
+	@echo ------------------------------------------------------------------------------------
 	@echo --- Preparing $(VARIANT) files in $(OUTPUT_PATH) $(OUTPUT_BIN)
-	@echo -------------------------
+	@echo ------------------------------------------------------------------------------------
 #	@echo *$(INCLUDES)
 #	@echo -------------------------
 #	@echo *$(C_SRC)
@@ -149,21 +153,27 @@ create_output:
 #	@echo -------------------------
 
 	-@mkdir $(OUTPUT_PATH) 1>NUL 2>&1
+	@echo ------------------------------------------------------------------------------------
 
 $(addprefix $(OUTPUT_PATH)/,$(C_OBJ)): $(OUTPUT_PATH)/%.o: %.c
-#	@"$(CC)" -v -c $(CFLAGS) $< -o $@
+#	"$(CC)" -v -c $(CFLAGS) $< -o $@
 	@"$(CC)" -c $(CFLAGS) $< -o $@
 
+#$(addprefix $(OUTPUT_PATH)/,$(CPP_OBJ)): $(OUTPUT_PATH)/%.d: %.o
+#	"$(CC)" -M -MF $@.d -c $(CPPFLAGS) $<
+
 $(addprefix $(OUTPUT_PATH)/,$(CPP_OBJ)): $(OUTPUT_PATH)/%.o: %.cpp
-#	@"$(CC)" -c $(CPPFLAGS) $< -o $@
+#	"$(CC)" -xc++ -c $(CPPFLAGS) $< -o $@
 	@"$(CC)" -xc++ -c $(CPPFLAGS) $< -o $@
 
 $(addprefix $(OUTPUT_PATH)/,$(A_OBJ)): $(OUTPUT_PATH)/%.o: %.s
 	@"$(AS)" -c $(ASFLAGS) $< -o $@
 
 $(OUTPUT_LIB): $(addprefix $(OUTPUT_PATH)/, $(C_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(CPP_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(A_OBJ))
-	@"$(AR)" -v -r "$(OUTPUT_BIN)/$@" $^
+	@echo ------------------------------------------------------------------------------------
+	@"$(AR)" -r "$(OUTPUT_BIN)/$@" $^
 	@"$(NM)" "$(OUTPUT_BIN)/$@" > "$(OUTPUT_BIN)/$@.txt"
+	@echo ------------------------------------------------------------------------------------
 
 
 .PHONY: clean

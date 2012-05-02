@@ -29,7 +29,6 @@ TOOLCHAIN=gcc
 #-------------------------------------------------------------------------------
 
 # Output directories
-#OUTPUT_BIN = ../lib
 OUTPUT_BIN = ..
 
 # Libraries
@@ -46,9 +45,9 @@ VARIANT_PATH = ../../../variants/$(VARIANT)
 # Files
 #-------------------------------------------------------------------------------
 
-vpath %.h $(PROJECT_BASE_PATH) $(PROJECT_BASE_PATH_USB) $(SYSTEM_PATH) $(VARIANT_PATH)
+#vpath %.h $(PROJECT_BASE_PATH) $(PROJECT_BASE_PATH_USB) $(SYSTEM_PATH) $(VARIANT_PATH)
 vpath %.c $(PROJECT_BASE_PATH) $(PROJECT_BASE_PATH_USB) $(VARIANT_PATH)
-vpath %.cpp $(PROJECT_BASE_PATH) $(PROJECT_BASE_PATH_USB) $(PROJECT_BASE_PATH)
+vpath %.cpp $(PROJECT_BASE_PATH) $(PROJECT_BASE_PATH_USB)
 
 VPATH+=$(PROJECT_BASE_PATH)
 
@@ -133,9 +132,9 @@ $(VARIANT): create_output $(OUTPUT_LIB)
 
 .PHONY: create_output
 create_output:
-	@echo -------------------------
+	@echo ------------------------------------------------------------------------------------
 	@echo --- Preparing $(VARIANT) files in $(OUTPUT_PATH) $(OUTPUT_BIN)
-	@echo -------------------------
+	@echo ------------------------------------------------------------------------------------
 #	@echo *$(INCLUDES)
 #	@echo -------------------------
 #	@echo *$(C_SRC)
@@ -153,9 +152,8 @@ create_output:
 #	@echo *$(A_SRC)
 #	@echo -------------------------
 
-#	-@mkdir $(subst /,$(SEP),$(OUTPUT_BIN)) 1>NUL 2>&1
-	-mkdir $(subst /,$(SEP),$(OUTPUT_BIN))
 	-@mkdir $(OUTPUT_PATH) 1>NUL 2>&1
+	@echo ------------------------------------------------------------------------------------
 
 $(addprefix $(OUTPUT_PATH)/,$(C_OBJ)): $(OUTPUT_PATH)/%.o: %.c
 #	"$(CC)" -v -c $(CFLAGS) $< -o $@
@@ -165,15 +163,17 @@ $(addprefix $(OUTPUT_PATH)/,$(C_OBJ)): $(OUTPUT_PATH)/%.o: %.c
 #	"$(CC)" -M -MF $@.d -c $(CPPFLAGS) $<
 
 $(addprefix $(OUTPUT_PATH)/,$(CPP_OBJ)): $(OUTPUT_PATH)/%.o: %.cpp
-	"$(CC)" -xc++ -c $(CPPFLAGS) $< -o $@
-#	@"$(CC)" -xc++ -c $(CPPFLAGS) $< -o $@
+#	"$(CC)" -xc++ -c $(CPPFLAGS) $< -o $@
+	@"$(CC)" -xc++ -c $(CPPFLAGS) $< -o $@
 
 $(addprefix $(OUTPUT_PATH)/,$(A_OBJ)): $(OUTPUT_PATH)/%.o: %.s
 	@"$(AS)" -c $(ASFLAGS) $< -o $@
 
 $(OUTPUT_LIB): $(addprefix $(OUTPUT_PATH)/, $(C_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(CPP_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(A_OBJ))
-	@"$(AR)" -v -r "$(OUTPUT_BIN)/$@" $^
+	@echo ------------------------------------------------------------------------------------
+	@"$(AR)" -r "$(OUTPUT_BIN)/$@" $^
 	@"$(NM)" "$(OUTPUT_BIN)/$@" > "$(OUTPUT_BIN)/$@.txt"
+	@echo ------------------------------------------------------------------------------------
 
 
 .PHONY: clean

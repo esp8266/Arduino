@@ -16,12 +16,14 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "variant.h"
+#include "Arduino.h"
 
 #ifdef _VARIANT_SAM3X_EK_
 #define MAX_ANALOG A0
-#elif _VARIANT_ARDUINO_DUE_X_
+#elif defined _VARIANT_ARDUINO_DUE_X_
 #define MAX_ANALOG A10
+#elif defined _VARIANT_ADK2_
+#define MAX_ANALOG A9
 #endif
 
 void setup( void )

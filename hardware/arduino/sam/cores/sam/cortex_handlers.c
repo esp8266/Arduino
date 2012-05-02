@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2011 Arduino.  All right reserved.
+  Copyright (c) 2012 Arduino.  All right reserved.
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -8,7 +8,7 @@
 
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   See the GNU Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser General Public
@@ -22,42 +22,42 @@
 extern "C" {
 #endif
 
-extern void NMI_Handler( void )
+void NMI_Handler( void )
 {
   for ( ;; ) ;
 }
 
-extern void HardFault_Handler( void )
+void HardFault_Handler( void )
 {
   for ( ;; ) ;
 }
 
-extern void MemManage_Handler( void )
+void MemManage_Handler( void )
 {
   for ( ;; ) ;
 }
 
-extern void BusFault_Handler( void )
+void BusFault_Handler( void )
 {
   for ( ;; ) ;
 }
 
-extern void UsageFault_Handler( void )
+void UsageFault_Handler( void )
 {
   for ( ;; ) ;
 }
 
-extern void SVC_Handler( void )
+void SVC_Handler( void )
 {
   for ( ;; ) ;
 }
 
-extern void DebugMon_Handler( void )
+void DebugMon_Handler( void )
 {
   for ( ;; ) ;
 }
 
-extern void PendSV_Handler( void )
+void PendSV_Handler( void )
 {
   for ( ;; ) ;
 }

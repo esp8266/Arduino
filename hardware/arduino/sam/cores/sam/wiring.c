@@ -57,11 +57,11 @@ void delayMicroseconds( uint32_t dwUs )
 /*
  * Cortex-M3 Systick IT handler: MOVED TO MAIN DUE TO WEAK SYMBOL ISSUE NOT RESOLVED
  */
-/*extern void SysTick_Handler( void )
+void SysTick_Handler( void )
 {
   // Increment tick count each ms
   TimeTick_Increment() ;
-}*/
+}
 
 #if defined ( __ICCARM__ ) /* IAR Ewarm 5.41+ */
 extern signed int putchar( signed int c ) ;

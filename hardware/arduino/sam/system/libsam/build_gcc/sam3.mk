@@ -147,6 +147,7 @@ $(CHIP): create_output $(OUTPUT_LIB)
 
 .PHONY: create_output
 create_output:
+	@echo ------------------------------------------------------------------------------------
 	@echo --- Preparing $(CHIP) files $(OUTPUT_PATH) to $(OUTPUT_BIN)
 #	@echo -------------------------
 #	@echo *$(C_SRC)
@@ -160,6 +161,7 @@ create_output:
 
 	-@mkdir $(subst /,$(SEP),$(OUTPUT_BIN)) 1>$(DEV_NUL) 2>&1
 	-@mkdir $(OUTPUT_PATH) 1>$(DEV_NUL) 2>&1
+	@echo ------------------------------------------------------------------------------------
 
 $(addprefix $(OUTPUT_PATH)/,$(C_OBJ)): $(OUTPUT_PATH)/%.o: %.c
 #	"$(CC)" -v -c $(CFLAGS) -Wa,aln=$(subst .o,.s,$@) $< -o $@
@@ -175,10 +177,12 @@ $(OUTPUT_LIB): $(addprefix $(OUTPUT_PATH)/, $(C_OBJ)) $(addprefix $(OUTPUT_PATH)
 
 .PHONY: clean
 clean:
+	@echo ------------------------------------------------------------------------------------
 	@echo --- Cleaning $(CHIP) files $(OUTPUT_PATH) $(subst /,$(SEP),$(OUTPUT_BIN)/$(OUTPUT_LIB))
 	-@$(RM) $(OUTPUT_PATH) 1>$(DEV_NUL) 2>&1
 	-@$(RM) $(subst /,$(SEP),$(OUTPUT_BIN)/$(OUTPUT_LIB)) 1>$(DEV_NUL) 2>&1
 	-@$(RM) $(subst /,$(SEP),$(OUTPUT_BIN)/$(OUTPUT_LIB)).txt 1>$(DEV_NUL) 2>&1
+	@echo ------------------------------------------------------------------------------------
 
 # dependencies
 $(addprefix $(OUTPUT_PATH)/,$(C_OBJ)): $(OUTPUT_PATH)/%.o: $(PROJECT_BASE_PATH)/chip.h $(wildcard $(PROJECT_BASE_PATH)/include/*.h) $(wildcard $(CMSIS_BASE_PATH)/*.h)
