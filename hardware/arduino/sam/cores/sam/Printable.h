@@ -20,8 +20,6 @@
 #ifndef Printable_h
 #define Printable_h
 
-#include <new.h>
-
 class Print;
 
 /** The Printable class provides a way for new classes to allow themselves to be printed.
