@@ -37,6 +37,10 @@ int main( void )
 {
 	init();
 
+#if defined(USBCON)
+	USB.attach();
+#endif
+
 	setup();
 
 	for (;;)

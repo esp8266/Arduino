@@ -204,13 +204,12 @@ int USBD_RecvControl(void* d, uint32_t len);
 int USBD_SendInterfaces(void);
 bool USBD_ClassInterfaceRequest(Setup& setup);
 
-uint32_t USBD_Recv(uint32_t ep, void* d, uint32_t len);
-uint8_t USBD_Recv8(uint32_t ep);
+
 uint32_t USBD_Available(uint32_t ep);
 uint32_t USBD_SendSpace(uint32_t ep);
 uint32_t USBD_Send(uint32_t ep, const void* d, uint32_t len);
-int USBD_Recv(uint8_t ep, void* data, uint32_t len);		// non-blocking
-int USBD_Recv(uint8_t ep);							// non-blocking
+uint32_t USBD_Recv(uint32_t ep, void* data, uint32_t len);		// non-blocking
+uint32_t USBD_Recv(uint32_t ep);							// non-blocking
 void USBD_Flush(uint32_t ep);
 uint32_t USBD_Connected(void);
 

@@ -17,6 +17,7 @@
 */
 
 #include "chip.h"
+#include <stdio.h>
 
 #if SAM3XA_SERIES
 
@@ -35,52 +36,6 @@ void UOTGHS_Handler( void )
 		gpf_isr();
 }
 
-void UDD_SetEP( uint32_t ep )
-{
-	ul_ep = ep;
-}
-
-void UDD_InitEndpoints(const uint32_t* eps_table)
-{
-	uint32_t ul_ep_nb ;
-
-	for (ul_ep_nb = 1; ul_ep_nb < sizeof(eps_table); ul_ep_nb++)
-	{
-    // Reset Endpoint Fifos
-   /* UOTGHS->UOTGHS_DEVEPTISR[ul_EP].UDPHS_EPTCLRSTA = UDPHS_EPTCLRSTA_TOGGLESQ | UDPHS_EPTCLRSTA_FRCESTALL;
-    UOTGHS->UOTGHS_DEVEPT = 1<<ul_EP;
-
-		//UECONX = 1;
-		//UECFG0X = pgm_read_byte(_initEndpoints+ul_EP);
-        UOTGHS->UDPHS_EPT[ul_EP].UDPHS_EPTCFG = _initEndpoints[ul_EP];
-
-        while( (signed int)UDPHS_EPTCFG_EPT_MAPD != (signed int)((UOTGHS->UDPHS_EPT[ul_EP].UDPHS_EPTCFG) & (unsigned int)UDPHS_EPTCFG_EPT_MAPD) )
-        ;
-        UOTGHS->UDPHS_EPT[ul_EP].UDPHS_EPTCTLENB = UDPHS_EPTCTLENB_EPT_ENABL;
-
-        //		UECFG1X = EP_DOUBLE_64;
-	}*/
-
-		// Reset EP
-		UOTGHS->UOTGHS_DEVEPT = (UOTGHS_DEVEPT_EPRST0 << ul_ep_nb);
-		// Configure EP
-		UOTGHS->UOTGHS_DEVEPTCFG[ul_ep_nb] = eps_table[ul_ep_nb];
-		// Enable EP
-		UOTGHS->UOTGHS_DEVEPT = (UOTGHS_DEVEPT_EPEN0 << ul_ep_nb);
-	}
-
-}
-
-void UDD_InitEP( uint32_t ul_ep_nb, uint32_t ul_ep_cfg )
-{
-	// Reset EP
-	UOTGHS->UOTGHS_DEVEPT = (UOTGHS_DEVEPT_EPRST0 << ul_ep_nb);
-	// Configure EP
-	UOTGHS->UOTGHS_DEVEPTCFG[ul_ep_nb] = ul_ep_cfg;
-	// Enable EP
-	UOTGHS->UOTGHS_DEVEPT = (UOTGHS_DEVEPT_EPEN0 << ul_ep_nb);
-}
-
 uint32_t UDD_Init(void)
 {
 	uint32_t ul ;
@@ -97,10 +52,43 @@ uint32_t UDD_Init(void)
 
 	// Always authorize asynchrone USB interrupts to exit from sleep mode
 	//   for SAM3 USB wake up device except BACKUP mode
-	pmc_set_fast_startup_input(PMC_FSMR_USBAL);
+	//pmc_set_fast_startup_input(PMC_FSMR_USBAL);
+
+
+
+
+	// ID pin not used then force device mode
+	otg_disable_id_pin();
+	otg_force_device_mode();
+
+	// Enable USB hardware
+	otg_disable_pad();
+	otg_enable_pad();
+	otg_enable();
+	otg_unfreeze_clock();
+	// Check USB clock
+	while (!Is_otg_clock_usable())
+		;
+
+	udd_low_speed_disable();
+	udd_high_speed_disable();
+
+
+	//otg_ack_vbus_transition();
+	// Force Vbus interrupt in case of Vbus always with a high level
+	// This is possible with a short timing between a Host mode stop/start.
+	/*if (Is_otg_vbus_high()) {
+		otg_raise_vbus_transition();
+	}
+	otg_enable_vbus_interrupt();*/
+	otg_freeze_clock();
+
+
+
+
 
 	// Enable USB
-	UOTGHS->UOTGHS_CTRL |= UOTGHS_CTRL_USBE;
+	/*UOTGHS->UOTGHS_CTRL |= UOTGHS_CTRL_USBE;
 
 	// Automatic mode speed for device
 	UOTGHS->UOTGHS_DEVCTRL &= ~UOTGHS_DEVCTRL_SPDCONF_Msk;  // Normal mode
@@ -215,20 +203,152 @@ uint32_t UDD_Init(void)
 
 	UOTGHS->UOTGHS_CTRL |= UOTGHS_CTRL_VBUSTE;
 	UOTGHS->UOTGHS_DEVIER = UOTGHS_DEVIER_WAKEUPES;
-
+*/
 	return 0UL ;
 }
 
 void UDD_Attach(void)
 {
-  UOTGHS->UOTGHS_DEVCTRL &= ~(unsigned int)UOTGHS_DEVCTRL_DETACH;
+	//USBCON = ((1<<USBE)|(1<<OTGPADE));	// start USB clock
+	//UDIEN = (1<<EORSTE)|(1<<SOFE);		// Enable interrupts for EOR (End of Reset) and SOF (start of frame)
+	//UDCON = 0;							// enable attach resistor
+
+
+
+
+	irqflags_t flags = cpu_irq_save();
+
+
+	printf("=> UDD_Attach\r\n");
+
+
+
+
+
+
+
+	otg_unfreeze_clock();
+
+	// This section of clock check can be improved with a chek of
+	// USB clock source via sysclk()
+	// Check USB clock because the source can be a PLL
+	while (!Is_otg_clock_usable());
+
+	// Authorize attach if Vbus is present
+	udd_attach_device();
+
+	// Enable USB line events
+	udd_enable_reset_interrupt();
+	//udd_enable_suspend_interrupt();
+	//udd_enable_wake_up_interrupt();
+
+
+	//////////////udd_enable_sof_interrupt();
+
+
+
+
+	// Reset following interupts flag
+	//udd_ack_reset();
+	//udd_ack_sof();
+
+
+	// The first suspend interrupt must be forced
+	// The first suspend interrupt is not detected else raise it
+	//udd_raise_suspend();
+
+	//udd_ack_wake_up();
+	//otg_freeze_clock();
+
+	cpu_irq_restore(flags);
+
+
+
+
+/*
+	otg_disable_id_pin();
+	otg_force_device_mode();
+
+
+	UOTGHS->UOTGHS_CTRL &= ~UOTGHS_CTRL_OTGPADE;
+	UOTGHS->UOTGHS_CTRL |= UOTGHS_CTRL_OTGPADE;
+	UOTGHS->UOTGHS_CTRL |= UOTGHS_CTRL_USBE;
+	UOTGHS->UOTGHS_CTRL &= ~UOTGHS_CTRL_FRZCLK;
+
+	udd_low_speed_disable();
+	udd_high_speed_disable();
+
+
+	UOTGHS->UOTGHS_DEVIER = (UOTGHS_DEVIER_EORSTES | UOTGHS_DEVIER_SOFES);
+
+	otg_ack_vbus_transition();
+	// Force Vbus interrupt in case of Vbus always with a high level
+	// This is possible with a short timing between a Host mode stop/start.
+	if (Is_otg_vbus_high()) {
+		otg_raise_vbus_transition();
+	}
+	otg_enable_vbus_interrupt();
+	otg_freeze_clock();
+*/
+
 }
 
 void UDD_Detach(void)
 {
-  UOTGHS->UOTGHS_DEVCTRL |= UOTGHS_DEVCTRL_DETACH;
+	printf("=> UDD_Detach\r\n");
+	UOTGHS->UOTGHS_DEVCTRL |= UOTGHS_DEVCTRL_DETACH;
 }
 
+void UDD_InitEP( uint32_t ul_ep_nb, uint32_t ul_ep_cfg )
+{
+	printf("=> UDD_InitEP\r\n");
+
+	// Reset EP
+	UOTGHS->UOTGHS_DEVEPT = (UOTGHS_DEVEPT_EPRST0 << ul_ep_nb);
+	// Configure EP
+	UOTGHS->UOTGHS_DEVEPTCFG[ul_ep_nb] = ul_ep_cfg;
+	// Enable EP
+	UOTGHS->UOTGHS_DEVEPT = (UOTGHS_DEVEPT_EPEN0 << ul_ep_nb);
+}
+
+void UDD_InitEndpoints(const uint32_t* eps_table)
+{
+	uint32_t ul_ep_nb ;
+
+	printf("=> UDD_InitEndpoints\r\n");
+
+	for (ul_ep_nb = 1; ul_ep_nb < sizeof(eps_table); ul_ep_nb++)
+	{
+    // Reset Endpoint Fifos
+   /* UOTGHS->UOTGHS_DEVEPTISR[ul_EP].UDPHS_EPTCLRSTA = UDPHS_EPTCLRSTA_TOGGLESQ | UDPHS_EPTCLRSTA_FRCESTALL;
+    UOTGHS->UOTGHS_DEVEPT = 1<<ul_EP;
+
+		//UECONX = 1;
+		//UECFG0X = pgm_read_byte(_initEndpoints+ul_EP);
+        UOTGHS->UDPHS_EPT[ul_EP].UDPHS_EPTCFG = _initEndpoints[ul_EP];
+
+        while( (signed int)UDPHS_EPTCFG_EPT_MAPD != (signed int)((UOTGHS->UDPHS_EPT[ul_EP].UDPHS_EPTCFG) & (unsigned int)UDPHS_EPTCFG_EPT_MAPD) )
+        ;
+        UOTGHS->UDPHS_EPT[ul_EP].UDPHS_EPTCTLENB = UDPHS_EPTCTLENB_EPT_ENABL;
+
+        //		UECFG1X = EP_DOUBLE_64;
+	}*/
+
+		// Reset EP
+		UOTGHS->UOTGHS_DEVEPT = (UOTGHS_DEVEPT_EPRST0 << ul_ep_nb);
+		// Configure EP
+		UOTGHS->UOTGHS_DEVEPTCFG[ul_ep_nb] = eps_table[ul_ep_nb];
+		// Enable EP
+		UOTGHS->UOTGHS_DEVEPT = (UOTGHS_DEVEPT_EPEN0 << ul_ep_nb);
+	}
+}
+
+void UDD_SetEP( uint32_t ep )
+{
+	ul_ep = ep;
+}
+
+// Wait until ready to accept IN packet.
 void UDD_WaitIN(void)
 {
 	//while (!(UEINTX & (1<<TXINI)));
@@ -246,8 +366,10 @@ void UDD_WaitOUT(void)
 uint32_t ul_send_index = 0;
 uint32_t ul_rcv_index = 0;
 
+// Send packet.
 void UDD_ClearIN(void)
 {
+	printf("=> UDD_ClearIN: sent %d bytes\r\n", ul_send_index);
 	// UEINTX = ~(1<<TXINI);
 	UOTGHS->UOTGHS_DEVEPTICR[ul_ep] = UOTGHS_DEVEPTICR_TXINIC;
 	ul_send_index = 0;
@@ -260,6 +382,8 @@ void UDD_ClearOUT(void)
 	ul_rcv_index = 0;
 }
 
+// Wait for IN FIFO to be ready to accept data or OUT FIFO to receive data.
+// Return true if new IN FIFO buffer available.
 uint32_t UDD_WaitForINOrOUT(void)
 {
 	//while (!(UEINTX & ((1<<TXINI)|(1<<RXOUTI))));
@@ -277,13 +401,15 @@ uint32_t UDD_ReceivedSetupInt(void)
 void UDD_ClearSetupInt(void)
 {
 	//UEINTX = ~((1<<RXSTPI) | (1<<RXOUTI) | (1<<TXINI));
-	UOTGHS->UOTGHS_DEVEPTICR[ul_ep] = (UOTGHS_DEVEPTICR_RXSTPIC | UOTGHS_DEVEPTICR_RXOUTIC | UOTGHS_DEVEPTICR_TXINIC);
+	//UOTGHS->UOTGHS_DEVEPTICR[ul_ep] = (UOTGHS_DEVEPTICR_RXSTPIC | UOTGHS_DEVEPTICR_RXOUTIC | UOTGHS_DEVEPTICR_TXINIC);
+	UOTGHS->UOTGHS_DEVEPTICR[ul_ep] = (UOTGHS_DEVEPTICR_RXSTPIC);
 }
 
 void UDD_Send8( uint8_t data )
 {
 	uint8_t *ptr_dest = (uint8_t *) &udd_get_endpoint_fifo_access8(ul_ep);
 
+	printf("=> UDD_Send8 : ul_send_index=%d\r\n", ul_send_index);
 	ptr_dest[ul_send_index++] = data;
 }
 
@@ -322,6 +448,7 @@ void UDD_ReleaseRX(void)
 	nakouti a clearer
 	rxouti/killbank a clearer*/
 
+	puts("=> UDD_ReleaseRX\r\n");
 	UOTGHS->UOTGHS_DEVEPTICR[ul_ep] = (UOTGHS_DEVEPTICR_NAKOUTIC | UOTGHS_DEVEPTICR_RXOUTIC);
 	UOTGHS->UOTGHS_DEVEPTIDR[ul_ep] = UOTGHS_DEVEPTIDR_FIFOCONC;
 }
@@ -334,6 +461,7 @@ void UDD_ReleaseTX(void)
 	rxouti/killbank a clearer
 	txini a clearer*/
 
+	puts("=> UDD_ReleaseTX\r\n");
 	UOTGHS->UOTGHS_DEVEPTICR[ul_ep] = (UOTGHS_DEVEPTICR_NAKINIC | UOTGHS_DEVEPTICR_RXOUTIC | UOTGHS_DEVEPTICR_TXINIC);
 	UOTGHS->UOTGHS_DEVEPTIDR[ul_ep] = UOTGHS_DEVEPTIDR_FIFOCONC;
 }
@@ -345,6 +473,7 @@ uint32_t UDD_ReadWriteAllowed(void)
 
 void UDD_SetAddress(uint32_t addr)
 {
+	printf("=> UDD_SetAddress : setting address to %d\r\n", addr);
 	udd_configure_address(addr);
 	udd_enable_address();
 }

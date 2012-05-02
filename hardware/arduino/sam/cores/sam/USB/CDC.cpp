@@ -25,9 +25,9 @@
 
 struct ring_buffer
 {
-	unsigned char buffer[CDC_SERIAL_BUFFER_SIZE];
-	volatile int head;
-	volatile int tail;
+	uint8_t buffer[CDC_SERIAL_BUFFER_SIZE];
+	volatile uint32_t head;
+	volatile uint32_t tail;
 };
 
 ring_buffer cdc_rx_buffer = { { 0 }, 0, 0};
@@ -138,8 +138,8 @@ void Serial_::end(void)
 void Serial_::accept(void)
 {
 	ring_buffer *buffer = &cdc_rx_buffer;
-	int c = USBD_Recv(CDC_RX);
-	int i = (unsigned int)(buffer->head+1) % SERIAL_BUFFER_SIZE;
+	uint32_t c = USBD_Recv(CDC_RX);
+	uint32_t i = (uint32_t)(buffer->head+1) % SERIAL_BUFFER_SIZE;
 
 	// if we should be storing the received character into the location
 	// just before the tail (meaning that the head would advance to the

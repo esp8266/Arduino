@@ -124,6 +124,7 @@
 #define HID_REPORT_DESCRIPTOR_TYPE				0x22
 #define HID_PHYSICAL_DESCRIPTOR_TYPE			0x23
 
+_Pragma("pack(1)")
 
 //	Device
 typedef struct {
@@ -277,6 +278,7 @@ typedef struct
 	EndpointDescriptor			in;
 } HIDDescriptor;
 
+_Pragma("pack()")
 
 #define D_DEVICE(_class,_subClass,_proto,_packetSize0,_vid,_pid,_version,_im,_ip,_is,_configs) \
 	{ 18, 1, 0x200, _class,_subClass,_proto,_packetSize0,_vid,_pid,_version,_im,_ip,_is,_configs }
