@@ -127,7 +127,7 @@ extern const HIDDescriptor _hidInterface =
 {
 	D_INTERFACE(HID_INTERFACE,1,3,0,0),
 	D_HIDREPORT(sizeof(_hidReportDescriptor)),
-	D_ENDPOINT(USB_ENDPOINT_IN (HID_ENDPOINT_INT),USB_ENDPOINT_TYPE_INTERRUPT,0x40,0x01)
+	D_ENDPOINT(USB_ENDPOINT_IN(HID_ENDPOINT_INT),USB_ENDPOINT_TYPE_INTERRUPT,0x40,0x01)
 };
 _Pragma("pack()")
 
@@ -161,8 +161,12 @@ bool WEAK HID_Setup(Setup& setup)
 {
 	uint8_t r = setup.bRequest;
 	uint8_t requestType = setup.bmRequestType;
+
+	printf("=> HID_Setup\r\n");
+
 	if (REQUEST_DEVICETOHOST_CLASS_INTERFACE == requestType)
 	{
+		printf("=> REQUEST_DEVICETOHOST_CLASS_INTERFACE\r\n");
 		if (HID_GET_REPORT == r)
 		{
 			//HID_GetReport();
@@ -177,6 +181,7 @@ bool WEAK HID_Setup(Setup& setup)
 
 	if (REQUEST_HOSTTODEVICE_CLASS_INTERFACE == requestType)
 	{
+		printf("=> REQUEST_HOSTTODEVICE_CLASS_INTERFACE\r\n");
 		if (HID_SET_PROTOCOL == r)
 		{
 			_hid_protocol = setup.wValueL;
@@ -502,12 +507,9 @@ void Keyboard_::releaseAll(void)
 
 size_t Keyboard_::write(uint8_t c)
 {
-/* TODO
 	uint8_t p = press(c);		// Keydown
 	uint8_t r = release(c);		// Keyup
 	return (p);					// just return the result of press() since release() almost always returns 1
-  */
-  return 1 ;
 }
 
 #endif

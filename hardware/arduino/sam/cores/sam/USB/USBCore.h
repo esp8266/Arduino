@@ -45,7 +45,7 @@
 #define REQUEST_INTERFACE		0x01
 #define REQUEST_ENDPOINT		0x02
 #define REQUEST_OTHER			0x03
-#define REQUEST_RECIPIENT		0x03
+#define REQUEST_RECIPIENT		0x1F
 
 #define REQUEST_DEVICETOHOST_CLASS_INTERFACE  (REQUEST_DEVICETOHOST + REQUEST_CLASS + REQUEST_INTERFACE)
 #define REQUEST_HOSTTODEVICE_CLASS_INTERFACE  (REQUEST_HOSTTODEVICE + REQUEST_CLASS + REQUEST_INTERFACE)
@@ -284,7 +284,7 @@ _Pragma("pack()")
 	{ 18, 1, 0x200, _class,_subClass,_proto,_packetSize0,_vid,_pid,_version,_im,_ip,_is,_configs }
 
 #define D_CONFIG(_totalLength,_interfaces) \
-	{ 9, 2, _totalLength,_interfaces, 1, 0, USB_CONFIG_BUS_POWERED, USB_CONFIG_POWER_MA(500) }
+	{ 9, 2, _totalLength,_interfaces, 1, 0, USB_CONFIG_SELF_POWERED, USB_CONFIG_POWER_MA(500) }
 
 #define D_INTERFACE(_n,_numEndpoints,_class,_subClass,_protocol) \
 	{ 9, 4, _n, 0, _numEndpoints, _class,_subClass, _protocol, 0 }

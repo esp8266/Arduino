@@ -72,9 +72,9 @@ void loop() {
       Mouse.release(MOUSE_LEFT);
     }
   }*/
-Mouse.move(10, 10, 0);
+Mouse.move(10, 0, 0);
   // a delay so the mouse doesn't move too fast:
-  delay(responseDelay);
+  delay(1000);
 }
 
 

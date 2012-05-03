@@ -52,7 +52,7 @@ extern void UDD_Recv(volatile uint8_t* data, uint32_t count);
 
 
 
-extern void UDD_InitEndpoints(const uint32_t* eps);
+extern void UDD_InitEndpoints(const uint32_t* eps_table, const uint32_t ul_eps_table_size);
 
 extern void UDD_InitControl(int end) ;
 

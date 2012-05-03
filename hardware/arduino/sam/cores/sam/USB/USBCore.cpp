@@ -18,7 +18,7 @@
 #include "USBAPI.h"
 #include <stdio.h>
 
-const uint32_t _initEndpoints[] =
+static const uint32_t EndPoints[] =
 {
 	EP_TYPE_CONTROL,
 
@@ -59,7 +59,7 @@ const uint16_t STRING_IPRODUCT[17] = {
 #elif USB_PID == USB_PID_MICRO
 	'A','r','d','u','i','n','o',' ','M','i','c','r','o',' ',' ',' '
 #elif USB_PID == USB_PID_DUE
-	'A','r','d','u','i','n','o',' ','D','u','e',' ',' ',' ',' ',' '
+	'A','r','d','u','i','n','o',' ','D','u','e',' ',' ',' ',' ','X'
 #else
 #error "Need an USB PID"
 #endif
@@ -101,7 +101,7 @@ class LockEP
 public:
 	LockEP(uint32_t ep) : flags(cpu_irq_save())
 	{
-		UDD_SetEP(ep & 7);
+		UDD_SetEP(ep & 0xF);
 	}
 	~LockEP()
 	{
@@ -190,6 +190,7 @@ uint32_t USBD_Send(uint32_t ep, const void* d, uint32_t len)
 				while (n--)
 					UDD_Send8(*data++);
 			}
+
 			if (!UDD_ReadWriteAllowed() || ((len == 0) && (ep & TRANSFER_RELEASE)))	// Release full buffer
 				UDD_ReleaseTX();
 		}
@@ -264,18 +265,20 @@ bool USBD_ClassInterfaceRequest(Setup& setup)
 {
 	uint8_t i = setup.wIndex;
 
+	printf("=> USBD_ClassInterfaceRequest\r\n");
+
 #ifdef CDC_ENABLED
 	if ( CDC_ACM_INTERFACE == i )
-  {
+	{
 		return CDC_Setup(setup);
-  }
+	}
 #endif
 
 #ifdef HID_ENABLED
 	if ( HID_INTERFACE == i )
-  {
+	{
 		return HID_Setup(setup);
-  }
+	}
 #endif
 
 	return false ;
@@ -383,8 +386,6 @@ static bool USBD_SendDescriptor(Setup& setup)
 	return true;
 }
 
-volatile int cpt = 0;
-
 //	Endpoint 0 interrupt
 static void USB_ISR(void)
 {
@@ -397,24 +398,23 @@ static void USB_ISR(void)
 		udd_enable_address();
 
 		// Configure EP 0
+		UDD_SetEP(0);
         UDD_InitEP(0, EP_TYPE_CONTROL);
-		udd_allocate_memory(0);
 		udd_enable_setup_received_interrupt(0);
 		udd_enable_endpoint_interrupt(0);
 
         _usbConfiguration = 0;
-		_cmark = 0;
-		_cend = 0;
 		udd_ack_reset(); /* /!\/!\/!\ TAKEN FROM ASF TO CLEAR ISR /!\/!\/!\ */
-
     }
 
     //  Start of Frame - happens every millisecond so we use it for TX and RX LED one-shot timing, too
     if (Is_udd_sof())
     {
-		printf(">>> Start of Frame\r\n");
+		//printf(">>> Start of Frame\r\n");
 #ifdef CDC_ENABLED
-        USBD_Flush(CDC_TX);              // Send a tx frame if found
+		USBD_Flush(CDC_TX);				// Send a tx frame if found
+		while (USBD_Available(CDC_RX))	// Handle received bytes (if any)
+			Serial.accept();
 #endif
 
         // check whether the one-shot period has elapsed.  if so, turn off the LED
@@ -429,7 +429,9 @@ static void USB_ISR(void)
 	// EP 0 Interrupt
 	if (Is_udd_endpoint_interrupt(0))
 	{
-		printf(">>> EP0 Int: 0x%x\r\n", UOTGHS->UOTGHS_DEVEPTISR[0]);
+		UDD_SetEP(0);
+
+		//printf(">>> EP0 Int: 0x%x\r\n", UOTGHS->UOTGHS_DEVEPTISR[0]);
 
 		if ( !UDD_ReceivedSetupInt() )
 		{
@@ -440,7 +442,7 @@ static void USB_ISR(void)
 		UDD_Recv((uint8_t*)&setup,8);
 		UDD_ClearSetupInt();
 
-		printf(">>> EP0 Int: AP clear: 0x%x\r\n", UOTGHS->UOTGHS_DEVEPTISR[0]);
+		//printf(">>> EP0 Int: AP clear: 0x%x\r\n", UOTGHS->UOTGHS_DEVEPTISR[0]);
 
 		uint8_t requestType = setup.bmRequestType;
 		if (requestType & REQUEST_DEVICETOHOST)
@@ -496,22 +498,26 @@ static void USB_ISR(void)
 			}
 			else if (SET_CONFIGURATION == r)
 			{
-				puts(">>> EP0 Int: SET_CONFIGURATION\r\n");
 				if (REQUEST_DEVICE == (requestType & REQUEST_RECIPIENT))
 				{
-					UDD_InitEndpoints(_initEndpoints);
+					printf(">>> EP0 Int: SET_CONFIGURATION REQUEST_DEVICE %d\r\n", setup.wValueL);
+
+					UDD_InitEndpoints(EndPoints, (sizeof(EndPoints) / sizeof(EndPoints[0])));
 					_usbConfiguration = setup.wValueL;
 				}
 				else
 				{
+					puts(">>> EP0 Int: SET_CONFIGURATION failed!\r\n");
 					ok = false;
 				}
 			}
 			else if (GET_INTERFACE == r)
 			{
+				puts(">>> EP0 Int: GET_INTERFACE\r\n");
 			}
 			else if (SET_INTERFACE == r)
 			{
+				puts(">>> EP0 Int: SET_INTERFACE\r\n");
 			}
 		}
 		else
@@ -524,6 +530,7 @@ static void USB_ISR(void)
 		if (ok)
 		{
 			puts(">>> EP0 Int: Send packet\r\n");
+			UDD_ClearOUT(); // rajouté par moi, pe pas nécessaire car la fifo est suffisament grande
 			UDD_ClearIN();
 		}
 		else
@@ -540,41 +547,6 @@ void USBD_Flush(uint32_t ep)
 	if (UDD_FifoByteCount())
 		UDD_ReleaseTX();
 }
-
-//	General interrupt
-// USB device interrupt handler
-/*
-// Manages device resume, suspend, end of bus reset.
-// Forwards endpoint interrupts to the appropriate handler.
-//  General interrupt
-ISR(USB_GEN_vect)
-{
-    uint8_t udint = UDINT;
-    UDINT = 0;
-
-    //  End of Reset
-    if (udint & (1<<EORSTI))
-    {
-        InitEP(0,EP_TYPE_CONTROL,EP_SINGLE_64); // init ep0
-        _usbConfiguration = 0;          // not configured yet
-        UEIENX = 1 << RXSTPE;           // Enable interrupts for ep0
-    }
-
-    //  Start of Frame - happens every millisecond so we use it for TX and RX LED one-shot timing, too
-    if (udint & (1<<SOFI))
-    {
-#ifdef CDC_ENABLED
-        USB_Flush(CDC_TX);              // Send a tx frame if found
-#endif
-
-        // check whether the one-shot period has elapsed.  if so, turn off the LED
-        if (TxLEDPulse && !(--TxLEDPulse))
-            TXLED0;
-        if (RxLEDPulse && !(--RxLEDPulse))
-            RXLED0;
-    }
-}
-*/
 
 //	VBUS or counting frames
 //	Any frame counting?
@@ -619,17 +591,15 @@ bool USB_::attach(void)
 
 bool USB_::detach(void)
 {
-	return true;
-/*  if ( _usbInitialized != 0UL )
-  {
-    UDD_Detach() ;
-
-    return true ;
-  }
-  else
-  {
-    return false ;
-  }*/
+	if ( _usbInitialized != 0UL )
+	{
+		UDD_Detach() ;
+		return true ;
+	}
+	else
+	{
+		return false ;
+	}
 }
 
 //	Check for interrupts
