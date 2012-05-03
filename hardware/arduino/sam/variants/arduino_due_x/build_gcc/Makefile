@@ -8,7 +8,7 @@
 #
 #  This library is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #  See the GNU Lesser General Public License for more details.
 #
 #  You should have received a copy of the GNU Lesser General Public
@@ -16,10 +16,7 @@
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-# Makefile for compiling libboard
-BOARD = 
-
-SUBMAKE_OPTIONS=--no-builtin-rules --no-builtin-variables
+SUBMAKE_OPTIONS=--no-builtin-rules --no-builtin-variables --no-print-directory
 
 #-------------------------------------------------------------------------------
 # Rules
@@ -29,14 +26,17 @@ all: arduino_due_x
 
 .PHONY: arduino_due_x
 arduino_due_x:
-	@echo --- Making arduino_due_x
+	@echo ------------------------------------------------------------------------------------
+	@echo --- Making variant arduino_due_x
 	@$(MAKE) DEBUG=1 $(SUBMAKE_OPTIONS) -f libvariant_arduino_due_x.mk
-#	@$(MAKE) $(SUBMAKE_OPTIONS) -f libvariant_arduino_due.mk
+#	@$(MAKE) $(SUBMAKE_OPTIONS) -f libvariant_arduino_due_x.mk
+	@echo ------------------------------------------------------------------------------------
 
 .PHONY: clean
 clean:
-	@echo --- Cleaning arduino_due_x
+	@echo ------------------------------------------------------------------------------------
+	@echo --- Cleaning variant arduino_due_x
 	@$(MAKE) DEBUG=1 $(SUBMAKE_OPTIONS) -f libvariant_arduino_due_x.mk $@
-#	@$(MAKE) $(SUBMAKE_OPTIONS) -f libvariant_arduino_due.mk $@
-
+#	@$(MAKE) $(SUBMAKE_OPTIONS) -f libvariant_arduino_due_x.mk $@
+	@echo ------------------------------------------------------------------------------------
 

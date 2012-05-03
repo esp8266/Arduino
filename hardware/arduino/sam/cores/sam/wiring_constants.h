@@ -8,7 +8,7 @@
 
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   See the GNU Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser General Public
@@ -56,8 +56,14 @@ extern "C"{
 #undef abs
 #endif // abs
 
+#ifndef min
 #define min(a,b) ((a)<(b)?(a):(b))
+#endif // min
+
+#ifndef max
 #define max(a,b) ((a)>(b)?(a):(b))
+#endif // max
+
 #define abs(x) ((x)>0?(x):-(x))
 #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
 #define round(x)     ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))

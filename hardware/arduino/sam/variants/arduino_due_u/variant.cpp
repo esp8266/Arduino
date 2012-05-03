@@ -110,6 +110,10 @@
  */
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * Pins descriptions
  */
@@ -261,6 +265,10 @@ extern const PinDescription g_APinDescription[]=
   { NULL, 0, 0, PIO_NOT_A_PIN, PIO_DEFAULT, 0, NO_ADC, NO_ADC, NO_PWM, NO_TC }
 } ;
 
+#ifdef __cplusplus
+}
+#endif
+
 /*
  * UART objects
  */
@@ -307,9 +315,6 @@ void USART2_Handler( void )
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-// Should be made in a better way...
-extern void analogOutputInit(void);
 
 /**
  *
@@ -371,6 +376,7 @@ extern void init( void )
   // Initialize analogOutput module
   analogOutputInit();
 }
+
 #ifdef __cplusplus
 }
 #endif

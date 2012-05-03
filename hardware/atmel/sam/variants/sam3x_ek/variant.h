@@ -23,6 +23,9 @@
  *        Headers
  *----------------------------------------------------------------------------*/
 
+// We have native USB on this variant
+#define USBCON
+
 #include "Arduino.h"
 #ifdef __cplusplus
 #include "UARTClass.h"
@@ -49,12 +52,6 @@
 /** Name of the board */
 #define VARIANT_NAME "SAM3X-EK"
 
-/*
-#define VARIANT_REV_A
-#define VARIANT_REV_B
-#define VARIANT_REV_C
-#define VARIANT_REV_D
-*/
 
 /** Frequency of the board main oscillator */
 #define VARIANT_MAINOSC           12000000
@@ -108,6 +105,7 @@ static const uint8_t A0  = 10;
 #define TC_FREQUENCY        1000
 #define TC_MAX_DUTY_CYCLE   255
 #define TC_MIN_DUTY_CYCLE   0
+
 /*----------------------------------------------------------------------------
  *        Arduino objects - C++ only
  *----------------------------------------------------------------------------*/

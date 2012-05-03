@@ -28,11 +28,11 @@ class HardwareSerial : public Stream
   public:
     void begin(unsigned long);
     void end();
-    virtual int available(void);
-    virtual int peek(void);
-    virtual int read(void);
-    virtual void flush(void);
-    virtual size_t write(uint8_t);
+    virtual int available(void) = 0;
+    virtual int peek(void) = 0;
+    virtual int read(void) = 0;
+    virtual void flush(void) = 0;
+    virtual size_t write(uint8_t) = 0;
     using Print::write; // pull in write(str) and write(buf, size) from Print
     operator bool();
 };

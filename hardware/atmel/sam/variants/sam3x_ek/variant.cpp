@@ -156,7 +156,6 @@ extern void init( void )
 
   // Initialize analogOutput module
   analogOutputInit();
-
 }
 #ifdef __cplusplus
 }

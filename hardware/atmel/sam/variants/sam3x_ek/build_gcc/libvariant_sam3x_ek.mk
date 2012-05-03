@@ -48,13 +48,14 @@ VARIANT_PATH = ../../../variants/$(VARIANT)
 #-------------------------------------------------------------------------------
 
 vpath %.h $(PROJECT_BASE_PATH) $(SYSTEM_PATH) $(VARIANT_PATH)
-vpath %.cpp $(PROJECT_BASE_PATH) $(PROJECT_BASE_PATH)
+vpath %.cpp $(PROJECT_BASE_PATH)
 
 VPATH+=$(PROJECT_BASE_PATH)
 
 INCLUDES =
 #INCLUDES += -I$(PROJECT_BASE_PATH)
 INCLUDES += -I$(ARDUINO_PATH)
+INCLUDES += -I$(ARDUINO_PATH)/USB
 INCLUDES += -I$(SYSTEM_PATH)
 INCLUDES += -I$(SYSTEM_PATH)/libsam
 INCLUDES += -I$(VARIANT_BASE_PATH)
@@ -166,8 +167,8 @@ $(addprefix $(OUTPUT_PATH)/,$(A_OBJ)): $(OUTPUT_PATH)/%.o: %.s
 	@"$(AS)" -c $(ASFLAGS) $< -o $@
 
 $(OUTPUT_LIB): $(addprefix $(OUTPUT_PATH)/, $(C_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(CPP_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(A_OBJ))
-	"$(AR)" -v -r "$(OUTPUT_BIN)/$@" $^
-	"$(NM)" "$(OUTPUT_BIN)/$@" > "$(OUTPUT_BIN)/$@.txt"
+	@"$(AR)" -v -r "$(OUTPUT_BIN)/$@" $^
+	@"$(NM)" "$(OUTPUT_BIN)/$@" > "$(OUTPUT_BIN)/$@.txt"
 
 
 .PHONY: clean
@@ -175,3 +176,4 @@ clean:
 	@echo --- Cleaning $(VARIANT) files [$(OUTPUT_PATH)$(SEP)*.o]
 	-@$(RM) $(OUTPUT_PATH) 1>NUL 2>&1
 	-@$(RM) $(OUTPUT_BIN)/$(OUTPUT_LIB) 1>NUL 2>&1
+

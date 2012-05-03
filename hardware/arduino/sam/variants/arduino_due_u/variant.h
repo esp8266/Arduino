@@ -8,7 +8,7 @@
 
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   See the GNU Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser General Public
@@ -16,18 +16,25 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef _VARIANT_ARDUINO_DUE_
-#define _VARIANT_ARDUINO_DUE_
+#ifndef _VARIANT_ARDUINO_DUE_U_
+#define _VARIANT_ARDUINO_DUE_U_
 
 /*----------------------------------------------------------------------------
  *        Headers
  *----------------------------------------------------------------------------*/
+
+// We have native USB on this variant
+//#define USBCON
 
 #include "Arduino.h"
 #ifdef __cplusplus
 #include "UARTClass.h"
 #include "USARTClass.h"
 #endif
+
+#ifdef __cplusplus
+extern "C"{
+#endif // __cplusplus
 
 /**
  * Libc porting layers
@@ -42,8 +49,8 @@
 
 /*----------------------------------------------------------------------------*/
 
-#ifndef arduino_due
-#define arduino_due
+#ifndef arduino_due_u
+#define arduino_due_u
 #endif
 
 /** Name of the board */
@@ -156,6 +163,10 @@ static const uint8_t A13 = 67;
 #define TC_MAX_DUTY_CYCLE   255
 #define TC_MIN_DUTY_CYCLE   0
 
+#ifdef __cplusplus
+}
+#endif
+
 /*----------------------------------------------------------------------------
  *        Arduino objects - C++ only
  *----------------------------------------------------------------------------*/
@@ -170,5 +181,5 @@ extern USARTClass Serial4 ;
 
 #endif
 
-#endif /* _VARIANT_ARDUINO_DUE_ */
+#endif /* _VARIANT_ARDUINO_DUE_U_ */
 
