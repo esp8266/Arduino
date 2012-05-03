@@ -19,6 +19,11 @@
 #ifndef UOTGHS_H_INCLUDED
 #define UOTGHS_H_INCLUDED
 
+
+#define MAX_ENDPOINTS	10
+
+#define EP0				0
+
 #define EP_SINGLE_64 (0x32UL) // EP0
 #define EP_DOUBLE_64 (0x36UL) // Other endpoints
 

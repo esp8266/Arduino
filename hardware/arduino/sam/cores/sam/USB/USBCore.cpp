@@ -101,7 +101,7 @@ class LockEP
 public:
 	LockEP(uint32_t ep) : flags(cpu_irq_save())
 	{
-		UDD_SetEP(ep & 0xF);
+		//UDD_SetEP(ep & 0xF);
 	}
 	~LockEP()
 	{
@@ -113,7 +113,7 @@ public:
 uint32_t USBD_Available(uint32_t ep)
 {
 	LockEP lock(ep);
-	return UDD_FifoByteCount();
+	return UDD_FifoByteCount(ep & 0xF);
 }
 
 //	Non Blocking receive
@@ -124,14 +124,14 @@ uint32_t USBD_Recv(uint32_t ep, void* d, uint32_t len)
 		return -1;
 
 	LockEP lock(ep);
-	uint32_t n = UDD_FifoByteCount();
+	uint32_t n = UDD_FifoByteCount(ep & 0xF);
 	len = min(n,len);
 	n = len;
 	uint8_t* dst = (uint8_t*)d;
 	while (n--)
-		*dst++ = UDD_Recv8();
-	if (len && !UDD_FifoByteCount())	// release empty buffer
-		UDD_ReleaseRX();
+		*dst++ = UDD_Recv8(ep & 0xF);
+	if (len && !UDD_FifoByteCount(ep & 0xF))	// release empty buffer
+		UDD_ReleaseRX(ep & 0xF);
 
 	return len;
 }
@@ -140,7 +140,7 @@ uint32_t USBD_Recv(uint32_t ep, void* d, uint32_t len)
 uint32_t USBD_Recv(uint32_t ep)
 {
 	uint8_t c;
-	if (USBD_Recv(ep, &c, 1) != 1)
+	if (USBD_Recv(ep & 0xF, &c, 1) != 1)
 		return -1;
 	else
 		return c;
@@ -150,9 +150,9 @@ uint32_t USBD_Recv(uint32_t ep)
 uint32_t USBD_SendSpace(uint32_t ep)
 {
 	LockEP lock(ep);
-	if (!UDD_ReadWriteAllowed())
+	if (!UDD_ReadWriteAllowed(ep & 0xF))
 		return 0;
-	return 64 - UDD_FifoByteCount();
+	return 64 - UDD_FifoByteCount(ep & 0xF);
 }
 
 //	Blocking Send of data to an endpoint
@@ -164,6 +164,7 @@ uint32_t USBD_Send(uint32_t ep, const void* d, uint32_t len)
 	int r = len;
 	const uint8_t* data = (const uint8_t*)d;
 	uint8_t timeout = 250;		// 250ms timeout on send? TODO
+
 	while (len)
 	{
 		uint8_t n = USBD_SendSpace(ep);
@@ -178,22 +179,11 @@ uint32_t USBD_Send(uint32_t ep, const void* d, uint32_t len)
 		if (n > len)
 			n = len;
 		len -= n;
-		{
-			LockEP lock(ep);
-			if (ep & TRANSFER_ZERO)
-			{
-				while (n--)
-					UDD_Send8(0);
-			}
-			else
-			{
-				while (n--)
-					UDD_Send8(*data++);
-			}
 
-			if (!UDD_ReadWriteAllowed() || ((len == 0) && (ep & TRANSFER_RELEASE)))	// Release full buffer
-				UDD_ReleaseTX();
-		}
+		UDD_Send(ep & 0xF, data, n);
+
+		if (!UDD_ReadWriteAllowed(ep & 0xF) || ((len == 0) && (ep & TRANSFER_RELEASE)))	// Release full buffer
+			UDD_ReleaseTX(ep & 0xF);
 	}
 	//TXLED1;					// light the TX LED
 	//TxLEDPulse = TX_RX_LED_PULSE_MS;
@@ -205,46 +195,36 @@ int _cend;
 
 void USBD_InitControl(int end)
 {
-	UDD_SetEP(0);
 	_cmark = 0;
 	_cend = end;
 }
-
-static bool USBD_SendControl(uint8_t d)
-{
-	if (_cmark < _cend)
-	{
-		// /!\ NE DEVRAIT THEORIQUEMENT PAS ETRE COMMENTE... mais ca marche mieux sans... pourquoi?!!!
-		//if (!UDD_WaitForINOrOUT())
-		//	return false;
-
-		UDD_Send8(d);
-
-		if (!((_cmark + 1) & 0x3F))
-		{
-			puts("Sent!\r\n");
-			UDD_ClearIN();	// Fifo is full, release this packet
-		}
-	}
-	_cmark++;
-	return true;
-};
 
 //	Clipped by _cmark/_cend
 int USBD_SendControl(uint8_t flags, const void* d, uint32_t len)
 {
 	int sent = len;
+	uint32_t i = 0;
 	const uint8_t* data = (const uint8_t*)d;
 
-	while (len--)
+	printf("=> USBD_SendControl TOTAL len=%d\r\n", len);
+
+	for (i = 0; len > 64; ++i, len -= 64, _cmark += 64)
 	{
-		uint8_t c = *data++;
-		if (!USBD_SendControl(c))
+		if (_cmark < _cend)
 		{
-			printf("=> USBD_SendControl : return -1\r\n");
-			return -1;
+			UDD_Send(EP0, data + (i * 64), 64);
+			UDD_ClearIN();	// Fifo is full, release this packet
+			UDD_WaitIN(); // Wait for new FIFO buffer to be ready
 		}
 	}
+
+	if (len > 0)
+	{
+		if (_cmark < _cend)
+			UDD_Send(EP0, data + (i * 64), len);
+		_cmark += len;
+	}
+
 	return sent;
 }
 
@@ -254,7 +234,7 @@ int USBD_SendControl(uint8_t flags, const void* d, uint32_t len)
 int USBD_RecvControl(void* d, uint32_t len)
 {
 	UDD_WaitOUT() ;
-	UDD_Recv( (uint8_t*)d, len ) ;
+	UDD_Recv(EP0, (uint8_t*)d, len ) ; // WILL NOT WORK WITH CDC
 	UDD_ClearOUT() ;
 
 	return len ;
@@ -398,7 +378,7 @@ static void USB_ISR(void)
 		udd_enable_address();
 
 		// Configure EP 0
-		UDD_SetEP(0);
+		//UDD_SetEP(0);
         UDD_InitEP(0, EP_TYPE_CONTROL);
 		udd_enable_setup_received_interrupt(0);
 		udd_enable_endpoint_interrupt(0);
@@ -429,7 +409,7 @@ static void USB_ISR(void)
 	// EP 0 Interrupt
 	if (Is_udd_endpoint_interrupt(0))
 	{
-		UDD_SetEP(0);
+		//UDD_SetEP(0);
 
 		//printf(">>> EP0 Int: 0x%x\r\n", UOTGHS->UOTGHS_DEVEPTISR[0]);
 
@@ -439,7 +419,7 @@ static void USB_ISR(void)
 		}
 
 		Setup setup ;
-		UDD_Recv((uint8_t*)&setup,8);
+		UDD_Recv(EP0, (uint8_t*)&setup, 8);
 		UDD_ClearSetupInt();
 
 		//printf(">>> EP0 Int: AP clear: 0x%x\r\n", UOTGHS->UOTGHS_DEVEPTISR[0]);
@@ -466,8 +446,8 @@ static void USB_ISR(void)
 			if (GET_STATUS == r)
 			{
 				puts(">>> EP0 Int: GET_STATUS\r\n");
-				UDD_Send8(0);		// TODO
-				UDD_Send8(0);
+				UDD_Send8(EP0, 0);		// TODO
+				UDD_Send8(EP0, 0);
 			}
 			else if (CLEAR_FEATURE == r)
 			{
@@ -494,7 +474,7 @@ static void USB_ISR(void)
 			else if (GET_CONFIGURATION == r)
 			{
 				puts(">>> EP0 Int: GET_CONFIGURATION\r\n");
-				UDD_Send8(1);
+				UDD_Send8(EP0, 1);
 			}
 			else if (SET_CONFIGURATION == r)
 			{
@@ -543,9 +523,9 @@ static void USB_ISR(void)
 
 void USBD_Flush(uint32_t ep)
 {
-	UDD_SetEP(ep);
-	if (UDD_FifoByteCount())
-		UDD_ReleaseTX();
+	//UDD_SetEP(ep);
+	if (UDD_FifoByteCount(ep))
+		UDD_ReleaseTX(ep);
 }
 
 //	VBUS or counting frames

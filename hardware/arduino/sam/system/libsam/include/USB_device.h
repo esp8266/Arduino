@@ -33,22 +33,25 @@ extern void UDD_ClearRxFlag( unsigned char bEndpoint ) ;
 extern uint32_t UDD_ReceivedSetupInt(void);
 extern void UDD_ClearSetupInt(void);
 
-extern uint32_t UDD_ReadWriteAllowed(void) ;
+extern uint32_t UDD_ReadWriteAllowed(uint32_t ep) ;
 
-extern void UDD_SetEP( uint32_t ep ) ;
-extern uint32_t UDD_FifoByteCount(void) ;
+
+extern uint32_t UDD_FifoByteCount(uint32_t ep) ;
 extern uint8_t UDD_FifoFree(void) ;
 
-extern void UDD_ReleaseRX(void) ;
-extern void UDD_ReleaseTX(void) ;
+extern void UDD_ReleaseRX(uint32_t ep) ;
+extern void UDD_ReleaseTX(uint32_t ep) ;
 extern uint8_t UDD_FrameNumber(void) ;
 
 extern uint8_t UDD_GetConfiguration(void) ;
 
 
-extern void UDD_Send8( uint8_t d ) ;
-extern uint8_t UDD_Recv8(void);
-extern void UDD_Recv(volatile uint8_t* data, uint32_t count);
+
+
+extern void UDD_Send(uint32_t ep, const void* data, uint32_t len);
+extern void UDD_Send8(uint32_t ep,  uint8_t data );
+extern uint8_t UDD_Recv8(uint32_t ep);
+extern void UDD_Recv(uint32_t ep, uint8_t* data, uint32_t len);
 
 
 
@@ -65,7 +68,6 @@ extern void UDD_SetStack(void (*pf_isr)(void));
 extern void UDD_SetAddress(uint32_t addr);
 extern void UDD_Stall(void);
 extern uint32_t UDD_GetFrameNumber(void);
-
 
 /*! \name Usual Types
  */

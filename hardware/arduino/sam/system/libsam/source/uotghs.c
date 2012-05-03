@@ -23,9 +23,10 @@
 
 static void (*gpf_isr)(void)	= (0UL);
 
-static volatile uint32_t ul_ep			= (0UL);
-static volatile uint32_t ul_send_index	= (0UL);
-static volatile uint32_t ul_recv_index	= (0UL);
+//static volatile uint32_t ul_ep			= (0UL);
+
+static volatile uint32_t ul_send_fifo_ptr[MAX_ENDPOINTS];
+static volatile uint32_t ul_recv_fifo_ptr[MAX_ENDPOINTS];
 
 void UDD_SetStack(void (*pf_isr)(void))
 {
@@ -40,7 +41,13 @@ void UOTGHS_Handler( void )
 
 uint32_t UDD_Init(void)
 {
-	uint32_t ul ;
+	uint32_t i;
+
+	for (i = 0; i < MAX_ENDPOINTS; ++i)
+	{
+		ul_send_fifo_ptr[i] = 0;
+		ul_recv_fifo_ptr[i] = 0;
+	}
 
 	// Enables the USB Clock
 	pmc_enable_periph_clk(ID_UOTGHS);
@@ -212,23 +219,18 @@ udd_enable_endpoint(ul_ep_nb);
 
 }
 
-void UDD_SetEP( uint32_t ep )
-{
-	ul_ep = ep & 0xF; // EP range is 0..9, hence mask is 0xF.
-}
-
 // Wait until ready to accept IN packet.
 void UDD_WaitIN(void)
 {
 	//while (!(UEINTX & (1<<TXINI)));
-	while (!(UOTGHS->UOTGHS_DEVEPTISR[ul_ep] & UOTGHS_DEVEPTISR_TXINI))
+	while (!(UOTGHS->UOTGHS_DEVEPTISR[EP0] & UOTGHS_DEVEPTISR_TXINI))
 		;
 }
 
 void UDD_WaitOUT(void)
 {
 	//while (!(UEINTX & (1<<RXOUTI)));
-	while (!(UOTGHS->UOTGHS_DEVEPTISR[ul_ep] & UOTGHS_DEVEPTISR_RXOUTI))
+	while (!(UOTGHS->UOTGHS_DEVEPTISR[EP0] & UOTGHS_DEVEPTISR_RXOUTI))
 		;
 }
 
@@ -237,15 +239,15 @@ void UDD_ClearIN(void)
 {
 	//printf("=> UDD_ClearIN: sent %d bytes\r\n", ul_send_index);
 	// UEINTX = ~(1<<TXINI);
-	UOTGHS->UOTGHS_DEVEPTICR[ul_ep] = UOTGHS_DEVEPTICR_TXINIC;
-	ul_send_index = 0;
+	UOTGHS->UOTGHS_DEVEPTICR[EP0] = UOTGHS_DEVEPTICR_TXINIC;
+	ul_send_fifo_ptr[EP0] = 0;
 }
 
 void UDD_ClearOUT(void)
 {
 	// UEINTX = ~(1<<RXOUTI);
-	UOTGHS->UOTGHS_DEVEPTICR[ul_ep] = UOTGHS_DEVEPTICR_RXOUTIC;
-	ul_recv_index = 0;
+	UOTGHS->UOTGHS_DEVEPTICR[EP0] = UOTGHS_DEVEPTICR_RXOUTIC;
+	ul_recv_fifo_ptr[EP0] = 0;
 }
 
 // Wait for IN FIFO to be ready to accept data or OUT FIFO to receive data.
@@ -254,61 +256,80 @@ uint32_t UDD_WaitForINOrOUT(void)
 {
 	//while (!(UEINTX & ((1<<TXINI)|(1<<RXOUTI))));
 	//return (UEINTX & (1<<RXOUTI)) == 0;
-	while (!(UOTGHS->UOTGHS_DEVEPTISR[ul_ep] & (UOTGHS_DEVEPTISR_TXINI | UOTGHS_DEVEPTISR_RXOUTI)))
+	while (!(UOTGHS->UOTGHS_DEVEPTISR[EP0] & (UOTGHS_DEVEPTISR_TXINI | UOTGHS_DEVEPTISR_RXOUTI)))
 		;
-	return ((UOTGHS->UOTGHS_DEVEPTISR[ul_ep] & UOTGHS_DEVEPTISR_RXOUTI) == 0);
+	return ((UOTGHS->UOTGHS_DEVEPTISR[EP0] & UOTGHS_DEVEPTISR_RXOUTI) == 0);
 }
 
 uint32_t UDD_ReceivedSetupInt(void)
 {
-	return UOTGHS->UOTGHS_DEVEPTISR[ul_ep] & UOTGHS_DEVEPTISR_RXSTPI;
+	return UOTGHS->UOTGHS_DEVEPTISR[EP0] & UOTGHS_DEVEPTISR_RXSTPI;
 }
 
 void UDD_ClearSetupInt(void)
 {
 	//UEINTX = ~((1<<RXSTPI) | (1<<RXOUTI) | (1<<TXINI));
 	//UOTGHS->UOTGHS_DEVEPTICR[ul_ep] = (UOTGHS_DEVEPTICR_RXSTPIC | UOTGHS_DEVEPTICR_RXOUTIC | UOTGHS_DEVEPTICR_TXINIC);
-	UOTGHS->UOTGHS_DEVEPTICR[ul_ep] = (UOTGHS_DEVEPTICR_RXSTPIC);
+	UOTGHS->UOTGHS_DEVEPTICR[EP0] = (UOTGHS_DEVEPTICR_RXSTPIC);
 }
 
-void UDD_Send8( uint8_t data )
+void UDD_Send(uint32_t ep, const void* data, uint32_t len)
 {
-	uint8_t *ptr_dest = (uint8_t *) &udd_get_endpoint_fifo_access8(ul_ep);
+	const uint8_t *ptr_src = data;
+	uint8_t *ptr_dest = (uint8_t *) &udd_get_endpoint_fifo_access8(ep);
+	uint32_t i;
 
-	printf("=> UDD_Send8 : ul_send_index=%d data=0x%x\r\n", ul_send_index, data);
-	ptr_dest[ul_send_index++] = data;
+	//printf("=> UDD_Send : ep=%d ptr_dest=%d len=%d\r\n", ep, ul_send_fifo_ptr[ep], len);
+
+	for (i = 0, ptr_dest += ul_send_fifo_ptr[ep]; i < len; ++i)
+		*ptr_dest++ = *ptr_src++;
+
+	ul_send_fifo_ptr[ep] += i;
 }
 
-uint8_t UDD_Recv8(void)
+void UDD_Send8(uint32_t ep,  uint8_t data )
 {
-	uint8_t *ptr_dest = (uint8_t *) &udd_get_endpoint_fifo_access8(ul_ep);
+	uint8_t *ptr_dest = (uint8_t *) &udd_get_endpoint_fifo_access8(ep);
+	//printf("=> UDD_Send8 : ul_send_index=%d data=0x%x\r\n", ul_send_index, data);
+	ptr_dest[ul_send_fifo_ptr[ep]] = data;
+	ul_send_fifo_ptr[ep] += 1;
+}
 
+uint8_t UDD_Recv8(uint32_t ep)
+{
+	uint8_t *ptr_dest = (uint8_t *) &udd_get_endpoint_fifo_access8(ep);
+	uint8_t data = ptr_dest[ul_recv_fifo_ptr[ep]];
 	////printf("=> UDD_Recv8 : ul_recv_index=%d\r\n", ul_recv_index);
-	return ptr_dest[ul_recv_index++];
+	ul_recv_fifo_ptr[ep] += 1;
+	return data;
 }
 
-void UDD_Recv(volatile uint8_t* data, uint32_t count)
+void UDD_Recv(uint32_t ep, uint8_t* data, uint32_t len)
 {
-	uint8_t *ptr_dest = (uint8_t *) &udd_get_endpoint_fifo_access8(ul_ep);
+	uint8_t *ptr_src = (uint8_t *) &udd_get_endpoint_fifo_access8(ep);
+	uint8_t *ptr_dest = data;
+	uint32_t i;
 
-	while (count--)
-		*data++ = ptr_dest[ul_recv_index++];
+	for (i = 0, ptr_src += ul_recv_fifo_ptr[ep]; i < len; ++i)
+		*ptr_dest++ = *ptr_src++;
+
+	ul_recv_fifo_ptr[ep] += i;
 }
 
 void UDD_Stall(void)
 {
 	//UECONX = (1<<STALLRQ) | (1<<EPEN);
-	UOTGHS->UOTGHS_DEVEPT = (UOTGHS_DEVEPT_EPEN0 << ul_ep);
-	UOTGHS->UOTGHS_DEVEPTIER[ul_ep] = UOTGHS_DEVEPTIER_STALLRQS;
+	UOTGHS->UOTGHS_DEVEPT = (UOTGHS_DEVEPT_EPEN0 << EP0);
+	UOTGHS->UOTGHS_DEVEPTIER[EP0] = UOTGHS_DEVEPTIER_STALLRQS;
 }
 
 
-uint32_t UDD_FifoByteCount(void)
+uint32_t UDD_FifoByteCount(uint32_t ep)
 {
-	return ((UOTGHS->UOTGHS_DEVEPTISR[ul_ep] & UOTGHS_DEVEPTISR_BYCT_Msk) >> UOTGHS_DEVEPTISR_BYCT_Pos);
+	return ((UOTGHS->UOTGHS_DEVEPTISR[ep] & UOTGHS_DEVEPTISR_BYCT_Msk) >> UOTGHS_DEVEPTISR_BYCT_Pos);
 }
 
-void UDD_ReleaseRX(void)
+void UDD_ReleaseRX(uint32_t ep)
 {
 /*	UEINTX = 0x6B;	// FIFOCON=0 NAKINI=1 RWAL=1 NAKOUTI=0 RXSTPI=1 RXOUTI=0 STALLEDI=1 TXINI=1
 	clear fifocon = send and switch bank
@@ -316,12 +337,12 @@ void UDD_ReleaseRX(void)
 	rxouti/killbank a clearer*/
 
 	//puts("=> UDD_ReleaseRX\r\n");
-	UOTGHS->UOTGHS_DEVEPTICR[ul_ep] = (UOTGHS_DEVEPTICR_NAKOUTIC | UOTGHS_DEVEPTICR_RXOUTIC);
-	UOTGHS->UOTGHS_DEVEPTIDR[ul_ep] = UOTGHS_DEVEPTIDR_FIFOCONC;
-	ul_recv_index = 0;
+	UOTGHS->UOTGHS_DEVEPTICR[ep] = (UOTGHS_DEVEPTICR_NAKOUTIC | UOTGHS_DEVEPTICR_RXOUTIC);
+	UOTGHS->UOTGHS_DEVEPTIDR[ep] = UOTGHS_DEVEPTIDR_FIFOCONC;
+	ul_recv_fifo_ptr[ep] = 0;
 }
 
-void UDD_ReleaseTX(void)
+void UDD_ReleaseTX(uint32_t ep)
 {
 /*	UEINTX = 0x3A;	// FIFOCON=0 NAKINI=0 RWAL=1 NAKOUTI=1 RXSTPI=1 RXOUTI=0 STALLEDI=1 TXINI=0
 	clear fifocon = send and switch bank
@@ -330,15 +351,15 @@ void UDD_ReleaseTX(void)
 	txini a clearer*/
 
 	//puts("=> UDD_ReleaseTX\r\n");
-	UOTGHS->UOTGHS_DEVEPTICR[ul_ep] = (UOTGHS_DEVEPTICR_NAKINIC | UOTGHS_DEVEPTICR_RXOUTIC | UOTGHS_DEVEPTICR_TXINIC);
-	UOTGHS->UOTGHS_DEVEPTIDR[ul_ep] = UOTGHS_DEVEPTIDR_FIFOCONC;
-	ul_send_index = 0;
+	UOTGHS->UOTGHS_DEVEPTICR[ep] = (UOTGHS_DEVEPTICR_NAKINIC | UOTGHS_DEVEPTICR_RXOUTIC | UOTGHS_DEVEPTICR_TXINIC);
+	UOTGHS->UOTGHS_DEVEPTIDR[ep] = UOTGHS_DEVEPTIDR_FIFOCONC;
+	ul_send_fifo_ptr[ep] = 0;
 }
 
 // Return true if the current bank is not full.
-uint32_t UDD_ReadWriteAllowed(void)
+uint32_t UDD_ReadWriteAllowed(uint32_t ep)
 {
-	return (UOTGHS->UOTGHS_DEVEPTISR[ul_ep] & UOTGHS_DEVEPTISR_RWALL);
+	return (UOTGHS->UOTGHS_DEVEPTISR[ep] & UOTGHS_DEVEPTISR_RWALL);
 }
 
 void UDD_SetAddress(uint32_t addr)
