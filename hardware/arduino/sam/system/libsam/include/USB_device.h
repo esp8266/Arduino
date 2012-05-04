@@ -48,7 +48,7 @@ extern uint8_t UDD_GetConfiguration(void) ;
 
 
 
-extern void UDD_Send(uint32_t ep, const void* data, uint32_t len);
+extern uint32_t UDD_Send(uint32_t ep, const void* data, uint32_t len);
 extern void UDD_Send8(uint32_t ep,  uint8_t data );
 extern uint8_t UDD_Recv8(uint32_t ep);
 extern void UDD_Recv(uint32_t ep, uint8_t* data, uint32_t len);

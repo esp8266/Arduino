@@ -177,8 +177,8 @@ create_output:
 
 $(addprefix $(OUTPUT_PATH)/,$(CPP_OBJ)): $(OUTPUT_PATH)/%.o: %.cpp
 #	@"$(CC)" -c $(CPPFLAGS) $< -o $@
-#	@"$(CXX)" -c $(CPPFLAGS) $< -o $@
-	@"$(CXX)" -v -c $(CPPFLAGS) $< -o $@
+	@"$(CXX)" -c $(CPPFLAGS) $< -o $@
+#	@"$(CXX)" -v -c $(CPPFLAGS) $< -o $@
 
 $(OUTPUT_BIN): $(addprefix $(OUTPUT_PATH)/, $(C_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(CPP_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(A_OBJ))
 	@"$(CC)" $(LIB_PATH) $(LDFLAGS) -T"$(VARIANT_PATH)/linker_scripts/gcc/flash.ld" -Wl,-Map,$(OUTPUT_PATH)/$@.map -o $(OUTPUT_PATH)/$@.elf $^ $(LIBS)

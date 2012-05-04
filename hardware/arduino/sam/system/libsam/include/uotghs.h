@@ -21,8 +21,9 @@
 
 
 #define MAX_ENDPOINTS	10
-
 #define EP0				0
+#define EP0_SIZE		64
+#define EPX_SIZE		1024
 
 #define EP_SINGLE_64 (0x32UL) // EP0
 #define EP_DOUBLE_64 (0x36UL) // Other endpoints

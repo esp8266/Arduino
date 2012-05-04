@@ -162,11 +162,8 @@ bool WEAK HID_Setup(Setup& setup)
 	uint8_t r = setup.bRequest;
 	uint8_t requestType = setup.bmRequestType;
 
-	printf("=> HID_Setup\r\n");
-
 	if (REQUEST_DEVICETOHOST_CLASS_INTERFACE == requestType)
 	{
-		printf("=> REQUEST_DEVICETOHOST_CLASS_INTERFACE\r\n");
 		if (HID_GET_REPORT == r)
 		{
 			//HID_GetReport();
@@ -181,7 +178,6 @@ bool WEAK HID_Setup(Setup& setup)
 
 	if (REQUEST_HOSTTODEVICE_CLASS_INTERFACE == requestType)
 	{
-		printf("=> REQUEST_HOSTTODEVICE_CLASS_INTERFACE\r\n");
 		if (HID_SET_PROTOCOL == r)
 		{
 			_hid_protocol = setup.wValueL;
@@ -289,9 +285,9 @@ extern const uint8_t _asciimap[128] =
 	0x00,             // ENQ
 	0x00,             // ACK
 	0x00,             // BEL
-	0x2a,			// BS	Backspace
-	0x2b,			// TAB	Tab
-	0x28,			// LF	Enter
+	0x2a,             // BS	Backspace
+	0x2b,             // TAB	Tab
+	0x28,             // LF	Enter
 	0x00,             // VT
 	0x00,             // FF
 	0x00,             // CR

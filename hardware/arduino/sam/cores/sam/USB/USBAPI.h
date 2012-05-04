@@ -48,7 +48,7 @@ class Serial_ : public Stream
 private:
 	RingBuffer *_cdc_rx_buffer;
 public:
-	void begin(uint16_t baud_count);
+	void begin(uint32_t baud_count);
 	void end(void);
 
 	virtual int available(void);

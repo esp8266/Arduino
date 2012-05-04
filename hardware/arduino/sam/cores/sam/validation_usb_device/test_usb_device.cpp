@@ -30,7 +30,7 @@ int range = 5;              // output range of X or Y movement; affects movement
 int responseDelay = 10;     // response delay of the mouse, in ms
 
 
-void setup() {
+//void setup() {
   // initialize the buttons' inputs:
  /* pinMode(upButton, INPUT);
   pinMode(downButton, INPUT);
@@ -38,10 +38,10 @@ void setup() {
   pinMode(rightButton, INPUT);
   pinMode(mouseButton, INPUT);*/
   // initialize mouse control:
-  Mouse.begin();
-}
+ // Mouse.begin();
+//}
 
-void loop() {
+//void loop() {
   // read the buttons:
  /* int upState = digitalRead(upButton);
   int downState = digitalRead(downButton);
@@ -72,10 +72,10 @@ void loop() {
       Mouse.release(MOUSE_LEFT);
     }
   }*/
-Mouse.move(10, 0, 0);
+/*Mouse.move(10, 0, 0);
   // a delay so the mouse doesn't move too fast:
   delay(1000);
-}
+}*/
 
 
 
@@ -99,4 +99,33 @@ void loop() {
 	delay(1000);              // wait for a second
 	printf("loop...\r\n");
 }*/
+
+
+void setup() {
+  // open the serial port:
+Serial.begin(57600);
+  // initialize control over the keyboard:
+//  Keyboard.begin();
+}
+
+void loop() {
+  // check for incoming serial data:
+  //if (Serial.available() > 0) {
+    // read incoming serial data:
+    //char inChar = Serial.read();
+    // Type the next ASCII value from what you received:
+   // Keyboard.write(inChar+1);
+   //Serial.print("toto\r\n");
+     // check for incoming serial data:
+
+	if (Serial.available() > 0) {
+		// read incoming serial data:
+		char inChar = Serial.read();
+		// Type the next ASCII value from what you received:
+		Serial.print(inChar);
+		Serial1.print(inChar);
+	}
+	delay(10);
+}
+
 

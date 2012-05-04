@@ -21,9 +21,10 @@
 
 #if SAM3XA_SERIES
 
-static void (*gpf_isr)(void)	= (0UL);
+//#define TRACE_UOTGHS(x)	x
+#define TRACE_UOTGHS(x)
 
-//static volatile uint32_t ul_ep			= (0UL);
+static void (*gpf_isr)(void) = (0UL);
 
 static volatile uint32_t ul_send_fifo_ptr[MAX_ENDPOINTS];
 static volatile uint32_t ul_recv_fifo_ptr[MAX_ENDPOINTS];
@@ -94,19 +95,12 @@ uint32_t UDD_Init(void)
 
 void UDD_Attach(void)
 {
-	//USBCON = ((1<<USBE)|(1<<OTGPADE));	// start USB clock
-	//UDIEN = (1<<EORSTE)|(1<<SOFE);		// Enable interrupts for EOR (End of Reset) and SOF (start of frame)
-	//UDCON = 0;							// enable attach resistor
-
 	irqflags_t flags = cpu_irq_save();
 
-	//printf("=> UDD_Attach\r\n");
-
+	TRACE_UOTGHS(printf("=> UDD_Attach\r\n");)
 
 	otg_unfreeze_clock();
 
-	// This section of clock check can be improved with a chek of
-	// USB clock source via sysclk()
 	// Check USB clock because the source can be a PLL
 	while (!Is_otg_clock_usable());
 
@@ -115,52 +109,30 @@ void UDD_Attach(void)
 
 	// Enable USB line events
 	udd_enable_reset_interrupt();
-	//udd_enable_suspend_interrupt();
-	//udd_enable_wake_up_interrupt();
-
-
-	//////////////udd_enable_sof_interrupt();
-
-
-
-	// Reset following interupts flag
-	//udd_ack_reset();
-	//udd_ack_sof();
-
-
-	// The first suspend interrupt must be forced
-	// The first suspend interrupt is not detected else raise it
-	//udd_raise_suspend();
-
-	//udd_ack_wake_up();
-	//otg_freeze_clock();
+	//udd_enable_sof_interrupt();
 
 	cpu_irq_restore(flags);
 }
 
 void UDD_Detach(void)
 {
-	//printf("=> UDD_Detach\r\n");
+	TRACE_UOTGHS(printf("=> UDD_Detach\r\n");)
 	UOTGHS->UOTGHS_DEVCTRL |= UOTGHS_DEVCTRL_DETACH;
 }
 
 void UDD_InitEP( uint32_t ul_ep_nb, uint32_t ul_ep_cfg )
 {
-
 	ul_ep_nb = ul_ep_nb & 0xF; // EP range is 0..9, hence mask is 0xF.
-	//printf("=> UDD_InitEP : init EP %d\r\n", ul_ep_nb);
 
-	// Reset EP
-	//UOTGHS->UOTGHS_DEVEPT = (UOTGHS_DEVEPT_EPRST0 << ul_ep_nb);
+	TRACE_UOTGHS(printf("=> UDD_InitEP : init EP %d\r\n", ul_ep_nb);)
+
 	// Configure EP
 	UOTGHS->UOTGHS_DEVEPTCFG[ul_ep_nb] = ul_ep_cfg;
-	// Allocate memory
-	//udd_allocate_memory(ul_ep_nb);
 	// Enable EP
-//	UOTGHS->UOTGHS_DEVEPT |= (UOTGHS_DEVEPT_EPEN0 << ul_ep_nb);
-udd_enable_endpoint(ul_ep_nb);
+	udd_enable_endpoint(ul_ep_nb);
+
 	if (!Is_udd_endpoint_configured(ul_ep_nb)) {
-		//printf("=> UDD_InitEP : ############################## ERROR FAILED TO INIT EP %d\r\n", ul_ep_nb);
+		TRACE_UOTGHS(printf("=> UDD_InitEP : ERROR FAILED TO INIT EP %d\r\n", ul_ep_nb);)
 	}
 }
 
@@ -169,67 +141,28 @@ void UDD_InitEndpoints(const uint32_t* eps_table, const uint32_t ul_eps_table_si
 {
 	uint32_t ul_ep_nb ;
 
-
-
-
-
 	for (ul_ep_nb = 1; ul_ep_nb < ul_eps_table_size; ul_ep_nb++)
-
-
-/*void UDD_InitEndpoints(const uint32_t eps_table[])
-{
-	uint32_t ul_ep_nb ;
-
-
-//printf("=> UDD_InitEndpoints : Taille tableau %d %d\r\n", sizeof(eps_table), (sizeof(eps_table) / sizeof(eps_table[0])));
-
-	for (ul_ep_nb = 1; ul_ep_nb < sizeof(eps_table) / sizeof(eps_table[0]); ul_ep_nb++)*/
 	{
-    // Reset Endpoint Fifos
-   /* UOTGHS->UOTGHS_DEVEPTISR[ul_EP].UDPHS_EPTCLRSTA = UDPHS_EPTCLRSTA_TOGGLESQ | UDPHS_EPTCLRSTA_FRCESTALL;
-    UOTGHS->UOTGHS_DEVEPT = 1<<ul_EP;
-
-		//UECONX = 1;
-		//UECFG0X = pgm_read_byte(_initEndpoints+ul_EP);
-        UOTGHS->UDPHS_EPT[ul_EP].UDPHS_EPTCFG = _initEndpoints[ul_EP];
-
-        while( (signed int)UDPHS_EPTCFG_EPT_MAPD != (signed int)((UOTGHS->UDPHS_EPT[ul_EP].UDPHS_EPTCFG) & (unsigned int)UDPHS_EPTCFG_EPT_MAPD) )
-        ;
-        UOTGHS->UDPHS_EPT[ul_EP].UDPHS_EPTCTLENB = UDPHS_EPTCTLENB_EPT_ENABL;
-
-        //		UECFG1X = EP_DOUBLE_64;
-	}*/
-
-		//printf("=> UDD_InitEndpoints : init EP %d\r\n", ul_ep_nb);
-
-
-		// Reset EP
-		//UOTGHS->UOTGHS_DEVEPT = (UOTGHS_DEVEPT_EPRST0 << ul_ep_nb);
 		// Configure EP
 		UOTGHS->UOTGHS_DEVEPTCFG[ul_ep_nb] = eps_table[ul_ep_nb];
-		// Allocate memory
-		//udd_allocate_memory(ul_ep_nb);
 		// Enable EP
-		//UOTGHS->UOTGHS_DEVEPT |= (UOTGHS_DEVEPT_EPEN0 << ul_ep_nb);
-udd_enable_endpoint(ul_ep_nb);
+		udd_enable_endpoint(ul_ep_nb);
+
 		if (!Is_udd_endpoint_configured(ul_ep_nb)) {
-			//printf("=> UDD_InitEP : ############################## ERROR FAILED TO INIT EP %d\r\n", ul_ep_nb);
+			TRACE_UOTGHS(printf("=> UDD_InitEP : ERROR FAILED TO INIT EP %d\r\n", ul_ep_nb);)
 		}
 	}
-
 }
 
 // Wait until ready to accept IN packet.
 void UDD_WaitIN(void)
 {
-	//while (!(UEINTX & (1<<TXINI)));
 	while (!(UOTGHS->UOTGHS_DEVEPTISR[EP0] & UOTGHS_DEVEPTISR_TXINI))
 		;
 }
 
 void UDD_WaitOUT(void)
 {
-	//while (!(UEINTX & (1<<RXOUTI)));
 	while (!(UOTGHS->UOTGHS_DEVEPTISR[EP0] & UOTGHS_DEVEPTISR_RXOUTI))
 		;
 }
@@ -237,15 +170,14 @@ void UDD_WaitOUT(void)
 // Send packet.
 void UDD_ClearIN(void)
 {
-	//printf("=> UDD_ClearIN: sent %d bytes\r\n", ul_send_index);
-	// UEINTX = ~(1<<TXINI);
+	TRACE_UOTGHS(printf("=> UDD_ClearIN: sent %d bytes\r\n", ul_send_fifo_ptr[EP0]);)
+
 	UOTGHS->UOTGHS_DEVEPTICR[EP0] = UOTGHS_DEVEPTICR_TXINIC;
 	ul_send_fifo_ptr[EP0] = 0;
 }
 
 void UDD_ClearOUT(void)
 {
-	// UEINTX = ~(1<<RXOUTI);
 	UOTGHS->UOTGHS_DEVEPTICR[EP0] = UOTGHS_DEVEPTICR_RXOUTIC;
 	ul_recv_fifo_ptr[EP0] = 0;
 }
@@ -254,8 +186,6 @@ void UDD_ClearOUT(void)
 // Return true if new IN FIFO buffer available.
 uint32_t UDD_WaitForINOrOUT(void)
 {
-	//while (!(UEINTX & ((1<<TXINI)|(1<<RXOUTI))));
-	//return (UEINTX & (1<<RXOUTI)) == 0;
 	while (!(UOTGHS->UOTGHS_DEVEPTISR[EP0] & (UOTGHS_DEVEPTISR_TXINI | UOTGHS_DEVEPTISR_RXOUTI)))
 		;
 	return ((UOTGHS->UOTGHS_DEVEPTISR[EP0] & UOTGHS_DEVEPTISR_RXOUTI) == 0);
@@ -268,29 +198,61 @@ uint32_t UDD_ReceivedSetupInt(void)
 
 void UDD_ClearSetupInt(void)
 {
-	//UEINTX = ~((1<<RXSTPI) | (1<<RXOUTI) | (1<<TXINI));
-	//UOTGHS->UOTGHS_DEVEPTICR[ul_ep] = (UOTGHS_DEVEPTICR_RXSTPIC | UOTGHS_DEVEPTICR_RXOUTIC | UOTGHS_DEVEPTICR_TXINIC);
 	UOTGHS->UOTGHS_DEVEPTICR[EP0] = (UOTGHS_DEVEPTICR_RXSTPIC);
 }
 
-void UDD_Send(uint32_t ep, const void* data, uint32_t len)
+uint32_t UDD_Send(uint32_t ep, const void* data, uint32_t len)
 {
 	const uint8_t *ptr_src = data;
 	uint8_t *ptr_dest = (uint8_t *) &udd_get_endpoint_fifo_access8(ep);
 	uint32_t i;
 
-	//printf("=> UDD_Send : ep=%d ptr_dest=%d len=%d\r\n", ep, ul_send_fifo_ptr[ep], len);
+	TRACE_UOTGHS(printf("=> UDD_Send (1): ep=%d ul_send_fifo_ptr=%d len=%d\r\n", ep, ul_send_fifo_ptr[ep], len);)
+
+	if (ep == EP0)
+	{
+		if (ul_send_fifo_ptr[ep] + len > EP0_SIZE)
+			len = EP0_SIZE - ul_send_fifo_ptr[ep];
+	}
+	else
+	{
+		if (ul_send_fifo_ptr[ep] + len > EPX_SIZE)
+			len = EPX_SIZE - ul_send_fifo_ptr[ep];
+	}
 
 	for (i = 0, ptr_dest += ul_send_fifo_ptr[ep]; i < len; ++i)
 		*ptr_dest++ = *ptr_src++;
 
 	ul_send_fifo_ptr[ep] += i;
+
+
+	if (ep == EP0)
+	{
+		TRACE_UOTGHS(printf("=> UDD_Send (2): ep=%d ptr_dest=%d maxlen=%d\r\n", ep, ul_send_fifo_ptr[ep], EP0_SIZE);)
+		if (ul_send_fifo_ptr[ep] == EP0_SIZE)
+		{
+			UDD_ClearIN();	// Fifo is full, release this packet
+			UDD_WaitIN(); // Wait for new FIFO buffer to be ready
+		}
+	}
+	else
+	{
+		if (ul_send_fifo_ptr[ep] == EPX_SIZE)
+		{
+			UDD_ClearIN();	// Fifo is full, release this packet
+			UDD_WaitIN(); // Wait for new FIFO buffer to be ready
+		}
+	}
+
+	return len;
 }
 
 void UDD_Send8(uint32_t ep,  uint8_t data )
 {
 	uint8_t *ptr_dest = (uint8_t *) &udd_get_endpoint_fifo_access8(ep);
-	//printf("=> UDD_Send8 : ul_send_index=%d data=0x%x\r\n", ul_send_index, data);
+
+	TRACE_UOTGHS(printf("=> UDD_Send8 : ul_send_fifo_ptr=%d data=0x%x\r\n", ul_send_fifo_ptr[ep], data);)
+
 	ptr_dest[ul_send_fifo_ptr[ep]] = data;
 	ul_send_fifo_ptr[ep] += 1;
 }
@@ -299,7 +261,9 @@ uint8_t UDD_Recv8(uint32_t ep)
 {
 	uint8_t *ptr_dest = (uint8_t *) &udd_get_endpoint_fifo_access8(ep);
 	uint8_t data = ptr_dest[ul_recv_fifo_ptr[ep]];
-	////printf("=> UDD_Recv8 : ul_recv_index=%d\r\n", ul_recv_index);
+
+	TRACE_UOTGHS(printf("=> UDD_Recv8 : ul_recv_fifo_ptr=%d\r\n", ul_recv_fifo_ptr[ep]);)
+
 	ul_recv_fifo_ptr[ep] += 1;
 	return data;
 }
@@ -318,7 +282,6 @@ void UDD_Recv(uint32_t ep, uint8_t* data, uint32_t len)
 
 void UDD_Stall(void)
 {
-	//UECONX = (1<<STALLRQ) | (1<<EPEN);
 	UOTGHS->UOTGHS_DEVEPT = (UOTGHS_DEVEPT_EPEN0 << EP0);
 	UOTGHS->UOTGHS_DEVEPTIER[EP0] = UOTGHS_DEVEPTIER_STALLRQS;
 }
@@ -331,12 +294,7 @@ uint32_t UDD_FifoByteCount(uint32_t ep)
 
 void UDD_ReleaseRX(uint32_t ep)
 {
-/*	UEINTX = 0x6B;	// FIFOCON=0 NAKINI=1 RWAL=1 NAKOUTI=0 RXSTPI=1 RXOUTI=0 STALLEDI=1 TXINI=1
-	clear fifocon = send and switch bank
-	nakouti a clearer
-	rxouti/killbank a clearer*/
-
-	//puts("=> UDD_ReleaseRX\r\n");
+	TRACE_UOTGHS(puts("=> UDD_ReleaseRX\r\n");)
 	UOTGHS->UOTGHS_DEVEPTICR[ep] = (UOTGHS_DEVEPTICR_NAKOUTIC | UOTGHS_DEVEPTICR_RXOUTIC);
 	UOTGHS->UOTGHS_DEVEPTIDR[ep] = UOTGHS_DEVEPTIDR_FIFOCONC;
 	ul_recv_fifo_ptr[ep] = 0;
@@ -344,13 +302,7 @@ void UDD_ReleaseRX(uint32_t ep)
 
 void UDD_ReleaseTX(uint32_t ep)
 {
-/*	UEINTX = 0x3A;	// FIFOCON=0 NAKINI=0 RWAL=1 NAKOUTI=1 RXSTPI=1 RXOUTI=0 STALLEDI=1 TXINI=0
-	clear fifocon = send and switch bank
-	nakini a clearer
-	rxouti/killbank a clearer
-	txini a clearer*/
-
-	//puts("=> UDD_ReleaseTX\r\n");
+	TRACE_UOTGHS(printf("=> UDD_ReleaseTX ep=%d\r\n", ep);)
 	UOTGHS->UOTGHS_DEVEPTICR[ep] = (UOTGHS_DEVEPTICR_NAKINIC | UOTGHS_DEVEPTICR_RXOUTIC | UOTGHS_DEVEPTICR_TXINIC);
 	UOTGHS->UOTGHS_DEVEPTIDR[ep] = UOTGHS_DEVEPTIDR_FIFOCONC;
 	ul_send_fifo_ptr[ep] = 0;
@@ -364,7 +316,8 @@ uint32_t UDD_ReadWriteAllowed(uint32_t ep)
 
 void UDD_SetAddress(uint32_t addr)
 {
-	//printf("=> UDD_SetAddress : setting address to %d\r\n", addr);
+	TRACE_UOTGHS(printf("=> UDD_SetAddress : setting address to %d\r\n", addr);)
+
 	udd_configure_address(addr);
 	udd_enable_address();
 }

@@ -21,7 +21,12 @@
 
 #ifdef CDC_ENABLED
 
-#define CDC_SERIAL_BUFFER_SIZE 64
+#define CDC_SERIAL_BUFFER_SIZE	64
+
+#define CDC_LINESTATE_DTR		0x01 // Data Terminal Ready
+#define CDC_LINESTATE_RTS		0x02 // Ready to Send
+
+#define CDC_LINESTATE_READY		(CDC_LINESTATE_RTS | CDC_LINESTATE_DTR)
 
 struct ring_buffer
 {
@@ -35,17 +40,20 @@ ring_buffer cdc_rx_buffer = { { 0 }, 0, 0};
 typedef struct
 {
 	uint32_t	dwDTERate;
-	uint8_t	bCharFormat;
+	uint8_t		bCharFormat;
 	uint8_t 	bParityType;
 	uint8_t 	bDataBits;
-	uint8_t	lineState;
+	uint8_t		lineState;
 } LineInfo;
 
 static volatile LineInfo _usbLineInfo = { 57600, 0x00, 0x00, 0x00, 0x00 };
 
+_Pragma("pack(1)")
 static const CDCDescriptor _cdcInterface =
 {
+#ifdef HID_ENABLED
 	D_IAD(0,2,CDC_COMMUNICATION_INTERFACE_CLASS,CDC_ABSTRACT_CONTROL_MODEL,1),
+#endif
 
 	//	CDC communication interface
 	D_INTERFACE(CDC_ACM_INTERFACE,1,CDC_COMMUNICATION_INTERFACE_CLASS,CDC_ABSTRACT_CONTROL_MODEL,0),
@@ -60,6 +68,7 @@ static const CDCDescriptor _cdcInterface =
 	D_ENDPOINT(USB_ENDPOINT_OUT(CDC_ENDPOINT_OUT),USB_ENDPOINT_TYPE_BULK,0x40,0),
 	D_ENDPOINT(USB_ENDPOINT_IN (CDC_ENDPOINT_IN ),USB_ENDPOINT_TYPE_BULK,0x40,0)
 };
+_Pragma("pack()")
 
 int WEAK CDC_GetInterface(uint8_t* interfaceNum)
 {
@@ -92,22 +101,22 @@ bool WEAK CDC_Setup(Setup& setup)
 		if (CDC_SET_CONTROL_LINE_STATE == r)
 		{
 			_usbLineInfo.lineState = setup.wValueL;
-
 			// auto-reset into the bootloader is triggered when the port, already
 			// open at 1200 bps, is closed.  this is the signal to start the watchdog
 			// with a relatively long period so it can finish housekeeping tasks
 			// like servicing endpoints before the sketch ends
-			if (1200 == _usbLineInfo.dwDTERate) {
+			if (1200 == _usbLineInfo.dwDTERate)
+			{
 				// We check DTR state to determine if host port is open (bit 0 of lineState).
 				if ((_usbLineInfo.lineState & 0x01) == 0)
-        {
+				{
 /* TODO, AVR Stuff
 					*(uint16_t *)0x0800 = 0x7777;
 					wdt_enable(WDTO_120MS);
 */
 				}
-        else
-        {
+				else
+				{
 					// Most OSs do some intermediate steps when configuring ports and DTR can
 					// twiggle more than once before stabilizing.
 					// To avoid spurious resets we set the watchdog to 250ms and eventually
@@ -127,7 +136,7 @@ bool WEAK CDC_Setup(Setup& setup)
 
 
 int _serialPeek = -1;
-void Serial_::begin(uint16_t baud_count)
+void Serial_::begin(uint32_t baud_count)
 {
 }
 
@@ -160,9 +169,13 @@ int Serial_::available(void)
 int Serial_::peek(void)
 {
 	ring_buffer *buffer = &cdc_rx_buffer;
-	if (buffer->head == buffer->tail) {
+
+	if (buffer->head == buffer->tail)
+	{
 		return -1;
-	} else {
+	}
+	else
+	{
 		return buffer->buffer[buffer->tail];
 	}
 }
@@ -170,10 +183,14 @@ int Serial_::peek(void)
 int Serial_::read(void)
 {
 	ring_buffer *buffer = &cdc_rx_buffer;
+
 	// if the head isn't ahead of the tail, we don't have any characters
-	if (buffer->head == buffer->tail) {
+	if (buffer->head == buffer->tail)
+	{
 		return -1;
-	} else {
+	}
+	else
+	{
 		unsigned char c = buffer->buffer[buffer->tail];
 		buffer->tail = (unsigned int)(buffer->tail + 1) % SERIAL_BUFFER_SIZE;
 		return c;
@@ -196,11 +213,16 @@ size_t Serial_::write(uint8_t c)
 	// TODO - ZE - check behavior on different OSes and test what happens if an
 	// open connection isn't broken cleanly (cable is yanked out, host dies
 	// or locks up, or host virtual serial port hangs)
-	if (_usbLineInfo.lineState > 0)	{
+	if (_usbLineInfo.lineState == CDC_LINESTATE_READY)
+	{
 		int r = USBD_Send(CDC_TX,&c,1);
-		if (r > 0) {
+
+		if (r > 0)
+		{
+			USBD_Flush(CDC_TX);
 			return r;
-		} else {
+		} else
+		{
 			setWriteError();
 			return 0;
 		}
@@ -216,10 +238,15 @@ size_t Serial_::write(uint8_t c)
 // actually ready to receive and display the data.
 // We add a short delay before returning to fix a bug observed by Federico
 // where the port is configured (lineState != 0) but not quite opened.
-Serial_::operator bool() {
+Serial_::operator bool()
+{
 	bool result = false;
-	if (_usbLineInfo.lineState > 0)
+
+	if (_usbLineInfo.lineState == CDC_LINESTATE_READY)
+	{
 		result = true;
+	}
+
 	delay(10);
 	return result;
 }
