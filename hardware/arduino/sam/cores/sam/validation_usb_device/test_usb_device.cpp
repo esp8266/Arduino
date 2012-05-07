@@ -29,62 +29,20 @@ const int mouseButton = 6;
 int range = 5;              // output range of X or Y movement; affects movement speed
 int responseDelay = 10;     // response delay of the mouse, in ms
 
+/*
+void setup() {
+	Mouse.begin();
+}
 
-//void setup() {
-  // initialize the buttons' inputs:
- /* pinMode(upButton, INPUT);
-  pinMode(downButton, INPUT);
-  pinMode(leftButton, INPUT);
-  pinMode(rightButton, INPUT);
-  pinMode(mouseButton, INPUT);*/
-  // initialize mouse control:
- // Mouse.begin();
-//}
-
-//void loop() {
-  // read the buttons:
- /* int upState = digitalRead(upButton);
-  int downState = digitalRead(downButton);
-  int rightState = digitalRead(rightButton);
-  int leftState = digitalRead(leftButton);
-  int clickState = digitalRead(mouseButton);
-
-  // calculate the movement distance based on the button states:
-  int  xDistance = (leftState - rightState)*range;
-  int  yDistance = (upState - downState)*range;
-
-  // if X or Y is non-zero, move:
-  if ((xDistance != 0) || (yDistance != 0)) {
-    Mouse.move(xDistance, yDistance, 0);
-  }
-
-  // if the mouse button is pressed:
-  if (clickState == HIGH) {
-    // if the mouse is not pressed, press it:
-    if (!Mouse.isPressed(MOUSE_LEFT)) {
-      Mouse.press(MOUSE_LEFT);
-    }
-  }
-  // else the mouse button is not pressed:
-  else {
-    // if the mouse is pressed, release it:
-    if (Mouse.isPressed(MOUSE_LEFT)) {
-      Mouse.release(MOUSE_LEFT);
-    }
-  }*/
-/*Mouse.move(10, 0, 0);
-  // a delay so the mouse doesn't move too fast:
-  delay(1000);
-}*/
+void loop() {
+	Mouse.move(10, 0, 0);
+	delay(1000);
+}
+*/
 
 
-
-//#include "USBAPI.h"
-
-
-
-// Cet exemple fonctionne !!! ;-)
-/*void setup() {
+/*
+void setup() {
 	// initialize the digital pin as an output.
 	// Pin 13 has an LED connected on most Arduino boards:
 	//pinMode(13, OUTPUT);
@@ -98,34 +56,21 @@ void loop() {
 	//digitalWrite(13, LOW);    // set the LED off
 	delay(1000);              // wait for a second
 	printf("loop...\r\n");
-}*/
-
+}
+*/
 
 void setup() {
-  // open the serial port:
-Serial.begin(57600);
-  // initialize control over the keyboard:
-//  Keyboard.begin();
+	Serial.begin(57600);
 }
 
 void loop() {
-  // check for incoming serial data:
-  //if (Serial.available() > 0) {
-    // read incoming serial data:
-    //char inChar = Serial.read();
-    // Type the next ASCII value from what you received:
-   // Keyboard.write(inChar+1);
-   //Serial.print("toto\r\n");
-     // check for incoming serial data:
 
-	if (Serial.available() > 0) {
-		// read incoming serial data:
+	if (Serial.available() > 0)
+	{
 		char inChar = Serial.read();
-		// Type the next ASCII value from what you received:
 		Serial.print(inChar);
 		Serial1.print(inChar);
 	}
 	delay(10);
 }
-
 

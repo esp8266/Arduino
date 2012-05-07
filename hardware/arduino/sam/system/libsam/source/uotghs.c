@@ -75,8 +75,8 @@ uint32_t UDD_Init(void)
 	otg_unfreeze_clock();
 
 	// Check USB clock
-	while (!Is_otg_clock_usable())
-		;
+	//while (!Is_otg_clock_usable())
+	//	;
 
 	udd_low_speed_disable();
 	udd_high_speed_disable();

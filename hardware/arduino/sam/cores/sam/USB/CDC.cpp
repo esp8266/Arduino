@@ -51,9 +51,7 @@ static volatile LineInfo _usbLineInfo = { 57600, 0x00, 0x00, 0x00, 0x00 };
 _Pragma("pack(1)")
 static const CDCDescriptor _cdcInterface =
 {
-#ifdef HID_ENABLED
 	D_IAD(0,2,CDC_COMMUNICATION_INTERFACE_CLASS,CDC_ABSTRACT_CONTROL_MODEL,1),
-#endif
 
 	//	CDC communication interface
 	D_INTERFACE(CDC_ACM_INTERFACE,1,CDC_COMMUNICATION_INTERFACE_CLASS,CDC_ABSTRACT_CONTROL_MODEL,0),

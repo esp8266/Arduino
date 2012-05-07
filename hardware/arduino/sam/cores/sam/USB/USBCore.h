@@ -234,10 +234,8 @@ typedef struct
 
 typedef struct
 {
-#ifdef HID_ENABLED
 	//	IAD
 	IADDescriptor				iad;	// Only needed on compound device
-#endif
 
 	//	Control
 	InterfaceDescriptor			cif;	//
