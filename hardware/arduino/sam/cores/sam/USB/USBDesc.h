@@ -17,7 +17,7 @@
 */
 
 #define CDC_ENABLED
-//#define HID_ENABLED
+#define HID_ENABLED
 
 
 #ifdef CDC_ENABLED
