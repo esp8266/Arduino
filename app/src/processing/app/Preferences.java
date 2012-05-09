@@ -99,7 +99,7 @@ public class Preferences {
                         "فارسی" + " (" + _("Persian") + ")",
                         "Português" + " (" + _("Portuguese") + ")",
                         "Română" + " (" + _("Romanian") + ")",
-                        "русский" + " (" + _("Russian") + ")",
+                        "Русский" + " (" + _("Russian") + ")",
                         "Español" + " (" + _("Spanish") + ")"};
   String[] languagesISO = {
                         "",

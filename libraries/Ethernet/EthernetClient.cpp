@@ -41,7 +41,7 @@ int EthernetClient::connect(IPAddress ip, uint16_t port) {
 
   for (int i = 0; i < MAX_SOCK_NUM; i++) {
     uint8_t s = W5100.readSnSR(i);
-    if (s == SnSR::CLOSED || s == SnSR::FIN_WAIT) {
+    if (s == SnSR::CLOSED || s == SnSR::FIN_WAIT || s == SnSR::CLOSE_WAIT) {
       _sock = i;
       break;
     }
