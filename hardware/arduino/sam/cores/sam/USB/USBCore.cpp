@@ -425,16 +425,14 @@ static void USB_ISR(void)
 		uint8_t requestType = setup.bmRequestType;
 		if (requestType & REQUEST_DEVICETOHOST)
 		{
-			TRACE_CORE(printf(">>> EP0 Int: IN Request\r\n");)
+			TRACE_CORE(puts(">>> EP0 Int: IN Request\r\n");)
 			UDD_WaitIN();
 		}
 		else
 		{
-			TRACE_CORE(printf(">>> EP0 Int: OUT Request\r\n");)
+			TRACE_CORE(puts(">>> EP0 Int: OUT Request\r\n");)
 			UDD_ClearIN();
 		}
-
-
 
 		bool ok = true ;
 		if (REQUEST_STANDARD == (requestType & REQUEST_TYPE))
@@ -507,6 +505,9 @@ static void USB_ISR(void)
 		else
 		{
 			TRACE_CORE(puts(">>> EP0 Int: ClassInterfaceRequest\r\n");)
+
+			UDD_WaitIN(); // Workaround: need tempo here, else CDC serial won't open correctly
+
 			USBD_InitControl(setup.wLength); // Max length of transfer
 			ok = USBD_ClassInterfaceRequest(setup);
 		}
