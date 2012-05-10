@@ -1,34 +1,28 @@
-;
-; Windows USB CDC Driver Setup File for ARDUINO Due
-;
-; On Windows 7, right click to update driver software. It may take a while to
-; get this option, even if you cancel the auto driver search.
-; choose "browse my computer for driver software",
-; choose "let me pick from a list of device drivers on my computer",
-; Click "have disk" and browse to this .inf file
-; If there is a problem, right click and uninstall, checking delete driver software.
+;************************************************************
+; Windows USB CDC ACM Setup File
+; Copyright (c) 2000 Microsoft Corporation
 
-;------------------------------------------------------------------------------
 
 [Version]
 Signature="$Windows NT$"
 Class=Ports
 ClassGuid={4D36E978-E325-11CE-BFC1-08002BE10318}
-Provider=%ARDUINO%
+Provider=%MFGNAME%
 LayoutFile=layout.inf
-
-DriverVer= 03/09/2011,2.0.0.0
+CatalogFile=%MFGFILENAME%.cat
+DriverVer=11/15/2007,5.1.2600.0
 
 [Manufacturer]
-%ARDUINO%=DeviceList,NTamd64
+%MFGNAME%=DeviceList, NTamd64
 
 [DestinationDirs]
 DefaultDestDir=12
 
 
 ;------------------------------------------------------------------------------
-;              Windows 2000/XP/Vista32 Support
+;  Windows 2000/XP/Vista-32bit Sections
 ;------------------------------------------------------------------------------
+
 [DriverInstall.nt]
 include=mdmcpq.inf
 CopyFiles=DriverCopyFiles.nt
@@ -39,21 +33,21 @@ usbser.sys,,,0x20
 
 [DriverInstall.nt.AddReg]
 HKR,,DevLoader,,*ntkern
-HKR,,NTMPDriver,,usbser.sys
+HKR,,NTMPDriver,,%DRIVERFILENAME%.sys
 HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider"
 
 [DriverInstall.nt.Services]
 AddService=usbser, 0x00000002, DriverService.nt
 
 [DriverService.nt]
-DisplayName=%USBtoSerialConverter%
+DisplayName=%SERVICE%
 ServiceType=1
 StartType=3
 ErrorControl=1
-ServiceBinary=%12%\usbser.sys
+ServiceBinary=%12%\%DRIVERFILENAME%.sys
 
 ;------------------------------------------------------------------------------
-;              Windows Vista64 Support
+;  Vista-64bit Sections
 ;------------------------------------------------------------------------------
 
 [DriverInstall.NTamd64]
@@ -62,41 +56,50 @@ CopyFiles=DriverCopyFiles.NTamd64
 AddReg=DriverInstall.NTamd64.AddReg
 
 [DriverCopyFiles.NTamd64]
-usbser.sys,,,0x20
+%DRIVERFILENAME%.sys,,,0x20
 
 [DriverInstall.NTamd64.AddReg]
 HKR,,DevLoader,,*ntkern
-HKR,,NTMPDriver,,usbser.sys
+HKR,,NTMPDriver,,%DRIVERFILENAME%.sys
 HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider"
 
 [DriverInstall.NTamd64.Services]
 AddService=usbser, 0x00000002, DriverService.NTamd64
 
 [DriverService.NTamd64]
-DisplayName=%USBtoSerialConverter%
+DisplayName=%SERVICE%
 ServiceType=1
 StartType=3
 ErrorControl=1
-ServiceBinary=%12%\usbser.sys
+ServiceBinary=%12%\%DRIVERFILENAME%.sys
 
 
 ;------------------------------------------------------------------------------
-;            VID/PID Settings
+;  Vendor and Product ID Definitions
+;------------------------------------------------------------------------------
+; When developing your USB device, the VID and PID used in the PC side
+; application program and the firmware on the microcontroller must match.
+; Modify the below line to use your VID and PID.  Use the format as shown below.
+; Note: One INF file can be used for multiple devices with different VID and PIDs.
+; For each supported device, append ",USB\VID_xxxx&PID_yyyy" to the end of the line.
 ;------------------------------------------------------------------------------
 [SourceDisksFiles]
 [SourceDisksNames]
 [DeviceList]
-%USBtoSerialConverter%=DriverInstall, USB\VID_2341&PID_CAFF         ; CDC
-%USBtoSerialConverter%=DriverInstall, USB\VID_2341&PID_DAFF&MI_00   ; HID + CDC
+%DESCRIPTION%=DriverInstall, USB\VID_2341&PID_003E&MI_00
 
 [DeviceList.NTamd64]
-%USBtoSerialConverter%=DriverInstall, USB\VID_2341&PID_CAFF         ; CDC
-%USBtoSerialConverter%=DriverInstall, USB\VID_2341&PID_DAFF&MI_00   ; HID + CDC
+%DESCRIPTION%=DriverInstall, USB\VID_2341&PID_003E&MI_00
 
 ;------------------------------------------------------------------------------
-;              String Definitions
+;  String Definitions
+;------------------------------------------------------------------------------
+;Modify these strings to customize your device
 ;------------------------------------------------------------------------------
 [Strings]
-
-ARDUINO="ARDUINO LLC"                                           ; String value for the ARDUINO symbol
-USBtoSerialConverter="Arduino USB to Serial Converter"          ; String value for the USBtoSerialConverter symbol
+MFGFILENAME="CDC_vista"
+DRIVERFILENAME ="usbser"
+MFGNAME="Arduino LLC (www.arduino.cc)"
+INSTDISK="Arduino Due X Driver Installer"
+DESCRIPTION="Arduino Due X"
+SERVICE="USB RS-232 Emulation Driver"
