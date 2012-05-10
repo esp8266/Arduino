@@ -203,11 +203,11 @@ extern const PinDescription g_APinDescription[] ;
 
   #define USB_PID_LEONARDO   0x0034
   #define USB_PID_MICRO      0x0035
-  #define USB_PID_DUE        0xcafe
+  #define USB_PID_DUE        0x003E
 
-	#include "USBDesc.h"
-	#include "USBCore.h"
-	#include "USBAPI.h"
+  #include "USB/USBDesc.h"
+  #include "USB/USBCore.h"
+  #include "USB/USBAPI.h"
 #endif // if defined USBCON
 
 #endif // Arduino_h

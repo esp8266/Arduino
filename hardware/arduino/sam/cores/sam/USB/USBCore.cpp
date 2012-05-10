@@ -79,13 +79,14 @@ const uint16_t STRING_IMANUFACTURER[12] = {
 #define DEVICE_CLASS 0x00
 #endif
 
-#if defined CDC_ENABLED && defined HID_ENABLED
-#define USB_PID_FINAL (USB_PID|0x1001UL)
-#elif defined HID_ENABLED
-#define USB_PID_FINAL (USB_PID|0x1000UL)
-#elif defined CDC_ENABLED
-#define USB_PID_FINAL (USB_PID|0x0001UL)
-#endif
+//#if defined CDC_ENABLED && defined HID_ENABLED
+//#define USB_PID_FINAL (USB_PID|0x1001UL)
+//#elif defined HID_ENABLED
+//#define USB_PID_FINAL (USB_PID|0x1000UL)
+//#elif defined CDC_ENABLED
+//#define USB_PID_FINAL (USB_PID|0x0001UL)
+//#endif
+#define USB_PID_FINAL USB_PID
 
 //	DEVICE DESCRIPTOR
 const DeviceDescriptor USB_DeviceDescriptor =
