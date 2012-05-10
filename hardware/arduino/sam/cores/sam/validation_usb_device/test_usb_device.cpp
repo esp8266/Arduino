@@ -19,51 +19,14 @@
 #include "variant.h"
 #include <stdio.h>
 
-// set pin numbers for the five buttons:
-const int upButton = 2;
-const int downButton = 3;
-const int leftButton = 4;
-const int rightButton = 5;
-const int mouseButton = 6;
-
-int range = 5;              // output range of X or Y movement; affects movement speed
-int responseDelay = 10;     // response delay of the mouse, in ms
-
-/*
 void setup() {
+	Serial.begin(57600);
 	Mouse.begin();
 }
 
 void loop() {
-	Mouse.move(10, 0, 0);
-	delay(1000);
-}
-*/
 
-
-/*
-void setup() {
-	// initialize the digital pin as an output.
-	// Pin 13 has an LED connected on most Arduino boards:
-	//pinMode(13, OUTPUT);
-	Serial1.begin(115200) ;
-	printf("USB test starting...\r\n");
-}
-
-void loop() {
-	//digitalWrite(13, HIGH);   // set the LED on
-	//delay(1000);              // wait for a second
-	//digitalWrite(13, LOW);    // set the LED off
-	delay(1000);              // wait for a second
-	printf("loop...\r\n");
-}
-*/
-
-void setup() {
-	Serial.begin(57600);
-}
-
-void loop() {
+	Mouse.move(1, 0, 0);
 
 	if (Serial.available() > 0)
 	{
@@ -73,4 +36,3 @@ void loop() {
 	}
 	delay(10);
 }
-

@@ -73,8 +73,8 @@ endif
 
 include $(TOOLCHAIN).mk
 
-CFLAGS += -DUSB_VID=0x2341 -DUSB_PID=0xcafe
-CPPFLAGS += -DUSB_VID=0x2341 -DUSB_PID=0xcafe
+CFLAGS += -DUSB_VID=0x2341 -DUSB_PID=0x003e
+CPPFLAGS += -DUSB_VID=0x2341 -DUSB_PID=0x003e
 
 #-------------------------------------------------------------------------------
 ifdef DEBUG
