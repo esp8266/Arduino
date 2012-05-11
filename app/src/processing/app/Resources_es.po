@@ -1,10 +1,10 @@
 # Spanish translations for the Arduino IDE.
 # Copyright (C) 2012
 # This file is distributed under the same license as the Arduino IDE package.
-# Juan Gomez <16652b12e6f13f1c6f12fa12898a21e50f973323>, 2012.
+# Juan Gomez <3f615b5b28bd435629faa36ded272d837cda2805>, 2012.
 # David Cuartielles <c7afdd1968c6506100ac15ecaad67a8305c50cc5>, 2012
 # Jesús Sánchez <da4122b3b83899758123e02c0feee62783987d2b>, 2012.
-# Eduardo Sacristan <da4122b3b83899758123e02c0feee62783987d2b>, 2012.
+# Eduardo Sacristan <3f615b5b28bd435629faa36ded272d837cda2805>, 2012.
 # Jose Manuel Escuder <dbda52959cefcb044bda126ee4b0dddb92fb2f0d, 2012
 # Merche Blasco <5066f2c416c20aa131abd52f58bba0aed8c9d5b6>, 2012
 #
@@ -13,8 +13,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 18:10 +0600\n"
-"PO-Revision-Date: 2012-04-04 21:00 +0600\n"
-"Last-Translator: Juan Gomez <16652b12e6f13f1c6f12fa12898a21e50f973323>\n"
+"PO-Revision-Date: 2012-04-08 23:20 +0600\n"
+"Last-Translator: Juan Gomez <3f615b5b28bd435629faa36ded272d837cda2805>\n"
 "Language-Team: Spanish\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -122,7 +122,7 @@ msgstr "Monitor Serial"
 
 #: Editor.java:682
 msgid "Board"
-msgstr "tarjeta"
+msgstr "Tarjeta"
 
 #: Editor.java:690
 msgid "Serial Port"
@@ -250,7 +250,7 @@ msgstr "Buscar Anterior"
 
 #: Editor.java:1255
 msgid "Use Selection For Find"
-msgstr "Utilizar selección para buscar"
+msgstr "Utilizar Selección para Buscar"
 
 #: Editor.java:1816
 msgid "First select a word to find in the reference."
@@ -277,7 +277,7 @@ msgstr "Compilación terminada"
 #: Editor.java:1973
 #, java-format
 msgid "Save changes to \"{0}\"?  "
-msgstr "¿Guardar los cambios a \"{0}\"?  "
+msgstr "¿Guardar los cambios en \"{0}\"?  "
 
 #: Editor.java:2006
 msgid ""
@@ -287,9 +287,9 @@ msgid ""
 "save, your changes will be lost."
 msgstr ""
 "<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p "
-"{ font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>¿Desea "
+"{ font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>¿Deseas "
 "guardar los cambios a este Sketch<BR> antes de cerrar?</b><p>Si no los "
-"guarda, los cambios se perderán."
+"guardas, los cambios se perderán."
 
 #: Editor.java:2017 Editor.java:2098 Editor.java:2418 Sketch.java:589
 #: Sketch.java:741 Sketch.java:1046 Preferences.java:78
@@ -449,7 +449,7 @@ msgid ""
 "would you like to visit the Arduino download page?"
 msgstr ""
 "Una nueva versión de Arduino Está disponible,\n"
-"¿Desea visitar la pagina de descargas de Arduino?"
+"¿Deseas visitar la página de descargas de Arduino?"
 
 #: UpdateCheck.java:108 Preferences.java:76
 msgid "Yes"
@@ -574,23 +574,23 @@ msgstr "Formato Automático"
 
 #: tools/AutoFormat.java:913 tools/format/src/AutoFormat.java:54
 msgid "No changes necessary for Auto Format."
-msgstr "No hay cambios necesarios para el Formato Automático"
+msgstr "No hay cambios necesarios para el Formato Automático."
 
 #: tools/AutoFormat.java:919
 msgid "Auto Format Canceled: Too many right parentheses."
-msgstr "Formato automático cancelado: demasiados paréntesis derechos"
+msgstr "Formato automático cancelado: demasiados paréntesis derechos."
 
 #: tools/AutoFormat.java:922
 msgid "Auto Format Canceled: Too many left parentheses."
-msgstr "Formato automático cancelado: demasiados paréntesis izquierdos"
+msgstr "Formato automático cancelado: demasiados paréntesis izquierdos."
 
 #: tools/AutoFormat.java:928
 msgid "Auto Format Canceled: Too many right curly braces."
-msgstr "Formato automático cancelado: demasiados corchetes derechos"
+msgstr "Formato automático cancelado: demasiados corchetes derechos."
 
 #: tools/AutoFormat.java:931
 msgid "Auto Format Canceled: Too many left curly braces."
-msgstr "Formato automático cancelado: demasiados corchetes izquierdos"
+msgstr "Formato automático cancelado: demasiados corchetes izquierdos."
 
 #: tools/AutoFormat.java:941
 msgid "Auto Format finished."
@@ -633,7 +633,7 @@ msgid ""
 "the sketch couldn't save properly."
 msgstr "" 
 "El archivado del Sketch ha sido cancelado porque\n"
-"el Sketch no se pudo guardar debidamente"
+"el Sketch no se pudo guardar debidamente."
 
 #: tools/Archiver.java:109
 msgid "Archive sketch as:"
@@ -664,7 +664,7 @@ msgstr ""
 
 #: Sketch.java:278 Sketch.java:307 Sketch.java:581 Sketch.java:970
 msgid "Sketch is Read-Only"
-msgstr "El Skecth es de sólo  lectura"
+msgstr "El Skecth es de sólo lectura"
 
 #: Sketch.java:279 Sketch.java:308 Sketch.java:582 Sketch.java:971
 msgid ""
@@ -678,7 +678,7 @@ msgstr ""
 
 #: Sketch.java:286
 msgid "Name for new file:"
-msgstr "Nombre para el nuevo archivo"
+msgstr "Nombre para el nuevo archivo:"
 
 #: Sketch.java:298
 msgid "Sketch is Untitled"
@@ -698,7 +698,7 @@ msgstr "Problema al renombrar"
 
 #: Sketch.java:360
 msgid "The name cannot start with a period."
-msgstr "El nombre no puede empezar con un punto"
+msgstr "El nombre no puede empezar con un punto."
 
 #: Sketch.java:368
 #, java-format
@@ -712,7 +712,7 @@ msgid ""
 "\"real\" programming environment)"
 msgstr ""
 "El archivo principal no puede usar una extensión.\n"
-"(Puede Qué  ya sea hora de Qué  te gradúes a un\n"
+"(Puede qué ya sea hora de qué te gradúes a un\n"
 "entorno de desarrollo \"real\")"
 
 #: Sketch.java:400 Sketch.java:414 Sketch.java:423 Sketch.java:863
@@ -794,7 +794,7 @@ msgstr "removeCode: error interno... No se pudo encontrar el código"
 
 #: Sketch.java:724
 msgid "Sketch is read-only"
-msgstr "El Skecth es de sólo  lectura"
+msgstr "El Skecth es de sólo lectura"
 
 #: Sketch.java:725
 msgid ""
@@ -802,7 +802,7 @@ msgid ""
 "need to re-save this sketch to another location."
 msgstr ""
 "Algunos archivos están marcados como \"sólo lectura\",\n"
-"así que necesitara volver a guardar este Sketch en otra ubicación."
+"así que necesitarás volver a guardar este Sketch en otra ubicación."
 
 #: Sketch.java:743
 msgid ""
@@ -840,7 +840,7 @@ msgstr ""
 
 #: Sketch.java:886
 msgid "How very Borges of you"
-msgstr "Qué  tan Borges de tu parte"
+msgstr "Qué tan Borges de tu parte"
 
 #: Sketch.java:887
 msgid ""
@@ -881,7 +881,7 @@ msgid ""
 msgstr ""
 "Este archivo ya ha sido copiado al lugar\n"
 "desde el que está intentando agregarlo.\n"
-"Simplemente voy a ignorarte"
+"Simplemente voy a ignorarte."
 
 #: Sketch.java:1093
 #, java-format
@@ -1153,12 +1153,12 @@ msgstr ""
 
 #: Base.java:184
 msgid "Non-fatal error while setting the Look & Feel."
-msgstr "Error no fatal mientras se configuraba la Apariencia"
+msgstr "Error no fatal mientras se configuraba la Apariencia."
 
 #: Base.java:185
 msgid "The error message follows, however Arduino should run fine."
 msgstr "El que sigue es el mensaje de error, pero Arduino debería continuar\n"
-"funcionando bien"
+"funcionando bien."
 
 #: Base.java:220
 msgid "Problem Setting the Platform"
@@ -1169,7 +1169,7 @@ msgid ""
 "An unknown error occurred while trying to load\n"
 "platform-specific code for your machine."
 msgstr "Un error desconocido ha ocurrido mientras\n"
-"se cargaba el código especifico para tu plataforma"
+"se cargaba el código especifico para tu plataforma."
 
 #: Base.java:232
 msgid "Please install JDK 1.5 or later"
@@ -1201,7 +1201,7 @@ msgstr ""
 "Arduino cambiará a la ubicación predeterminada\n"
 "del Sketchbook y creará una nueva carpeta Sketchbook\n"
 "si es necesario. Arduino dejará después de hablar de sí mismo\n"
-"en tercera persona"
+"en tercera persona."
 
 #: Base.java:532
 msgid "Time for a Break"
@@ -1483,11 +1483,11 @@ msgstr ""
 
 #: Preferences.java:86
 msgid "Catalan"
-msgstr ""
+msgstr "Catalán"
 
 #: Preferences.java:87
 msgid "Chinese Simplified"
-msgstr ""
+msgstr "Chino Simplificado"
 
 #: Preferences.java:88
 msgid "Chinese Traditional"
@@ -1495,15 +1495,15 @@ msgstr ""
 
 #: Preferences.java:89
 msgid "Danish"
-msgstr ""
+msgstr "Danés"
 
 #: Preferences.java:90
 msgid "Dutch"
-msgstr ""
+msgstr "Holandés"
 
 #: Preferences.java:91
 msgid "English"
-msgstr ""
+msgstr "Ingles"
 
 #: Preferences.java:92
 msgid "Estonian"
@@ -1511,27 +1511,27 @@ msgstr ""
 
 #: Preferences.java:93
 msgid "French"
-msgstr ""
+msgstr "Francés"
 
 #: Preferences.java:94
 msgid "Filipino"
-msgstr ""
+msgstr "Filipino"
 
 #: Preferences.java:95
 msgid "Galician"
-msgstr ""
+msgstr "Gallego"
 
 #: Preferences.java:96
 msgid "German"
-msgstr ""
+msgstr "Alemán"
 
 #: Preferences.java:97
 msgid "Greek"
-msgstr ""
+msgstr "Griego"
 
 #: Preferences.java:98
 msgid "Hungarian"
-msgstr ""
+msgstr "Húngaro"
 
 #: Preferences.java:99
 msgid "Indonesian"
@@ -1539,11 +1539,11 @@ msgstr ""
 
 #: Preferences.java:100
 msgid "Italian"
-msgstr ""
+msgstr "Italiano"
 
 #: Preferences.java:101
 msgid "Japanese"
-msgstr ""
+msgstr "Japonés"
 
 #: Preferences.java:102
 msgid "Korean"
@@ -1551,7 +1551,7 @@ msgstr ""
 
 #: Preferences.java:103
 msgid "Latvian"
-msgstr ""
+msgstr "Letón"
 
 #: Preferences.java:104
 msgid "Lithuaninan"
@@ -1559,7 +1559,7 @@ msgstr ""
 
 #: Preferences.java:105
 msgid "Persian"
-msgstr ""
+msgstr "Persa"
 
 #: Preferences.java:106
 msgid "Polish"
@@ -1571,7 +1571,7 @@ msgstr ""
 
 #: Preferences.java:109
 msgid "Romanian"
-msgstr ""
+msgstr "Rumano"
 
 #: Preferences.java:110
 msgid "Russian"
@@ -1579,7 +1579,7 @@ msgstr ""
 
 #: Preferences.java:111
 msgid "Spanish"
-msgstr ""
+msgstr "Español"
 
 #: Preferences.java:210
 msgid ""
@@ -1666,9 +1666,9 @@ msgstr "Más preferencias pueden ser editadas directamente en el archivo"
 
 #: Preferences.java:462
 msgid "(edit only when Arduino is not running)"
-msgstr "(editar sólo cuando Arduino no esté ejecutando)"
+msgstr "(editar sólo cuando Arduino no se esté ejecutando)"
 
 #: Preferences.java:609
 #, java-format
 msgid "ignoring invalid font size {0}"
-msgstr "ignorando tamaño inválido de tipo de letra {0}"
+msgstr "ignorando tamaño inválido del tipo de letra {0}"

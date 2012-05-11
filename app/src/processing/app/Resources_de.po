@@ -1332,11 +1332,11 @@ msgstr ""
 
 #: Preferences.java:86
 msgid "Catalan"
-msgstr "Katalanisch"
+msgstr "Català"
 
 #: Preferences.java:87
 msgid "Chinese Simplified"
-msgstr "Vereinfachtes Chinesisch"
+msgstr "大陆简体"
 
 #: Preferences.java:88
 msgid "Chinese Traditional"
@@ -1344,15 +1344,15 @@ msgstr ""
 
 #: Preferences.java:89
 msgid "Danish"
-msgstr "Dänisch"
+msgstr "Dansk"
 
 #: Preferences.java:90
 msgid "Dutch"
-msgstr "Niederländisch"
+msgstr "Nederlands"
 
 #: Preferences.java:91
 msgid "English"
-msgstr "Englisch"
+msgstr "English"
 
 #: Preferences.java:92
 msgid "Estonian"
@@ -1360,15 +1360,15 @@ msgstr ""
 
 #: Preferences.java:93
 msgid "French"
-msgstr "Französisch"
+msgstr "Français"
 
 #: Preferences.java:94
 msgid "Filipino"
-msgstr "Philippinisch"
+msgstr "Pilipino"
 
 #: Preferences.java:95
 msgid "Galician"
-msgstr "Galizisch"
+msgstr "Galego"
 
 #: Preferences.java:96
 msgid "German"
@@ -1376,11 +1376,11 @@ msgstr "Deutsch"
 
 #: Preferences.java:97
 msgid "Greek"
-msgstr "Griechisch"
+msgstr "ελληνικά"
 
 #: Preferences.java:98
 msgid "Hungarian"
-msgstr "Ungarisch"
+msgstr "Magyar"
 
 #: Preferences.java:99
 msgid "Indonesian"
@@ -1388,11 +1388,11 @@ msgstr ""
 
 #: Preferences.java:100
 msgid "Italian"
-msgstr "Italiensich"
+msgstr "Italiano"
 
 #: Preferences.java:101
 msgid "Japanese"
-msgstr "Japanisch"
+msgstr "日本語"
 
 #: Preferences.java:102
 msgid "Korean"
@@ -1400,7 +1400,7 @@ msgstr ""
 
 #: Preferences.java:103
 msgid "Latvian"
-msgstr "Lettisch"
+msgstr "Latviešu Valoda"
 
 #: Preferences.java:104
 msgid "Lithuaninan"
@@ -1408,7 +1408,7 @@ msgstr ""
 
 #: Preferences.java:105
 msgid "Persian"
-msgstr "Persisch"
+msgstr "فارسی"
 
 #: Preferences.java:106
 msgid "Polish"
@@ -1420,7 +1420,7 @@ msgstr ""
 
 #: Preferences.java:109
 msgid "Romanian"
-msgstr "Rumänisch"
+msgstr "Limba Română"
 
 #: Preferences.java:110
 msgid "Russian"
@@ -1428,7 +1428,7 @@ msgstr ""
 
 #: Preferences.java:111
 msgid "Spanish"
-msgstr "Spanisch"
+msgstr "Español"
 
 #: Preferences.java:210
 msgid ""

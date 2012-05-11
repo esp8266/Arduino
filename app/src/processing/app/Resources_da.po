@@ -73,7 +73,7 @@ msgstr "Upload Med Programmer"
 
 #: Editor.java:556
 msgid "Page Setup"
-msgstr "Side Opsætning"
+msgstr "Sideopsætning"
 
 #: Editor.java:564
 msgid "Print"
@@ -85,7 +85,7 @@ msgstr "Indstillinger"
 
 #: Editor.java:586 Base.java:782
 msgid "Quit"
-msgstr "Slut"
+msgstr "Afslut"
 
 #: Editor.java:600
 msgid "Sketch"
@@ -185,7 +185,7 @@ msgstr "Om Arduino"
 
 #: Editor.java:1116
 msgid "Edit"
-msgstr "Editer"
+msgstr "Rediger"
 
 #: Editor.java:1119 Editor.java:1341
 msgid "Undo"
@@ -193,7 +193,7 @@ msgstr "Fortryd"
 
 #: Editor.java:1124 Editor.java:1126 Editor.java:1376
 msgid "Redo"
-msgstr "Gør Det Igen"
+msgstr "Omgør"
 
 #: Editor.java:1135 Editor.java:2652
 msgid "Cut"
@@ -321,11 +321,11 @@ msgid ""
 msgstr ""
 "Denne fil \"{0}\" skal være i en\n"
 "sketch mappe med navnet \"{1}\".\n"
-"Skal denne mappe oprettes, filen flyttes, og gå videre?"
+"Opret mappe, flyt filen, og gå videre?"
 
 #: Editor.java:2109
 msgid "Moving"
-msgstr "Flytter."
+msgstr "Flytter"
 
 #: Editor.java:2120 Editor.java:2131 Editor.java:2141 Editor.java:2159
 #: Sketch.java:479 Sketch.java:485 Sketch.java:500 Sketch.java:507
@@ -398,7 +398,7 @@ msgstr "Eksport afbrudt, ændringer skal gemmes først."
 
 #: Editor.java:2457
 msgid "Burning bootloader to I/O Board (this may take a minute)..."
-msgstr "Brænder bootloader til I/O Kort (dette kan godt tage et minut)..."
+msgstr "Brænder bootloader til I/O Kort (dette kan godt tage et minuts tid)..."
 
 #: Editor.java:2463
 msgid "Done burning bootloader."

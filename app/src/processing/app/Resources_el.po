@@ -1,4 +1,4 @@
-# German translations for PACKAGE package.
+# Greek translations for PACKAGE package.
 # Copyright (C) 2012 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # 

@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2012-04-11 13:41+0900\n"
+"PO-Revision-Date: 2012-04-22 01:32+0900\n"
 "Last-Translator: Shigeru KANEMOTO <c2drQHN3aXRjaC1zY2llbmNlLmNvbQ==>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -47,7 +47,7 @@ msgstr "スケッチブック"
 
 #: Editor.java:509
 msgid "Examples"
-msgstr "スケッチ例"
+msgstr "スケッチの例"
 
 #: Editor.java:514 Editor.java:1977
 msgid "Close"
@@ -132,11 +132,11 @@ msgstr "ブートローダを書き込む"
 
 #: Editor.java:923
 msgid "serialMenu is null"
-msgstr "serialMenuがカラです"
+msgstr "serialMenuがnullです"
 
 #: Editor.java:927 Editor.java:934
 msgid "name is null"
-msgstr "名前がカラです"
+msgstr "nameがnullです"
 
 #: Editor.java:986
 msgid "error retrieving port list"
@@ -176,7 +176,7 @@ msgstr "Arduino.ccウェブサイトを開く"
 
 #: Editor.java:1094
 msgid "http://arduino.cc/"
-msgstr ""
+msgstr "http://arduino.cc/"
 
 #: Editor.java:1102
 msgid "About Arduino"
@@ -262,7 +262,7 @@ msgstr "{0}.html"
 
 #: Editor.java:1843 Sketch.java:1647
 msgid "Compiling sketch..."
-msgstr "スケッチをコンパイルしています…"
+msgstr "スケッチをコンパイルしています..."
 
 #: Editor.java:1864 Editor.java:1881
 msgid "Done compiling."
@@ -376,7 +376,7 @@ msgstr ""
 
 #: Editor.java:2331
 msgid "Uploading to I/O Board..."
-msgstr "マイコンボードに書き込んでいます…"
+msgstr "マイコンボードに書き込んでいます..."
 
 #: Editor.java:2348 Editor.java:2384
 msgid "Done uploading."
@@ -384,7 +384,7 @@ msgstr "マイコンボードへの書き込みが完了しました。"
 
 #: Editor.java:2356 Editor.java:2392
 msgid "Upload canceled."
-msgstr "書き込みを取りやめました。"
+msgstr "書き込みを中止しました。"
 
 #: Editor.java:2420
 msgid "Save changes before export?"
@@ -393,12 +393,12 @@ msgstr "エクスポートを行う前に保存しますか？"
 #: Editor.java:2435
 msgid "Export canceled, changes must first be saved."
 msgstr ""
-"エクスポートを取りやめました。"
+"エクスポートを中止しました。"
 "エクスポートを行う前に保存する必要があります。"
 
 #: Editor.java:2457
 msgid "Burning bootloader to I/O Board (this may take a minute)..."
-msgstr "マイコンボードにブートローダを書き込んでいます…"
+msgstr "マイコンボードにブートローダを書き込んでいます..."
 
 #: Editor.java:2463
 msgid "Done burning bootloader."
@@ -406,7 +406,7 @@ msgstr "ブートローダの書き込みが完了しました。"
 
 #: Editor.java:2465 Editor.java:2469 Editor.java:2473
 msgid "Error while burning bootloader."
-msgstr "ブートローダを書き込もうとしましたが、エラーが発生しました。"
+msgstr "ブートローダの書き込み中にエラーが発生しました。"
 
 #: Editor.java:2500
 msgid "Printing..."
@@ -422,7 +422,7 @@ msgstr "印刷中にエラーが発生しました。"
 
 #: Editor.java:2524
 msgid "Printing canceled."
-msgstr "印刷を取りやめました。"
+msgstr "印刷を中止しました。"
 
 #: Editor.java:2572
 #, java-format
@@ -572,19 +572,19 @@ msgstr "整形の必要はありませんでした。"
 
 #: tools/AutoFormat.java:919
 msgid "Auto Format Canceled: Too many right parentheses."
-msgstr "「)」が多すぎるため、自動整形を取りやめました。"
+msgstr "「)」が多すぎるため、自動整形を中止しました。"
 
 #: tools/AutoFormat.java:922
 msgid "Auto Format Canceled: Too many left parentheses."
-msgstr "「(」が多すぎるため、自動整形を取りやめました。"
+msgstr "「(」が多すぎるため、自動整形を中止しました。"
 
 #: tools/AutoFormat.java:928
 msgid "Auto Format Canceled: Too many right curly braces."
-msgstr "「}」が多すぎるため、自動整形を取りやめました。"
+msgstr "「}」が多すぎるため、自動整形を中止しました。"
 
 #: tools/AutoFormat.java:931
 msgid "Auto Format Canceled: Too many left curly braces."
-msgstr "「{」が多すぎるため、自動整形を取りやめました。"
+msgstr "「{」が多すぎるため、自動整形を中止しました。"
 
 #: tools/AutoFormat.java:941
 msgid "Auto Format finished."
@@ -612,7 +612,7 @@ msgstr ""
 
 #: tools/Archiver.java:48
 msgid "Archive Sketch"
-msgstr "スケッチをアーカイブする。"
+msgstr "スケッチをアーカイブする"
 
 #: tools/Archiver.java:59
 msgid "yyMMdd"
@@ -627,7 +627,7 @@ msgid ""
 "Archiving the sketch has been canceled because\n"
 "the sketch couldn't save properly."
 msgstr ""
-"スケッチを保存できなかったため、スケッチのアーカイブは取りやめました。"
+"スケッチを保存できなかったため、スケッチのアーカイブを中止しました。"
 
 #: tools/Archiver.java:109
 msgid "Archive sketch as:"
@@ -635,12 +635,12 @@ msgstr "スケッチをアーカイブする名前："
 
 #: tools/Archiver.java:139
 msgid "Archive sketch canceled."
-msgstr "スケッチのアーカイブを取りやめました"
+msgstr "スケッチのアーカイブを中止しました"
 
 #: SketchCode.java:83
 #, java-format
 msgid "Error while loading code {0}"
-msgstr "「{0}」からのコード読み込みの際にエラーが発生しました。"
+msgstr "「{0}」からコードを読み込む際にエラーが発生しました。"
 
 #: SketchCode.java:258
 #, java-format
@@ -650,7 +650,11 @@ msgid ""
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
 msgstr ""
-"「{0}」には、認識できない文字が含まれています。もしも、古いバージョンのIDEでこのスケッチを作成していた場合には、「ツール」メニューの「エンコーディングの修正」を実行する事によって、ファイルのエンコーディングをUTF-8に変更してください。そうでない場合には、これらの認識できない文字を手作業で削除していただく必要があります。"
+"「{0}」には、認識できない文字が含まれています。もしも、古いバージョンのIDE"
+"でこのスケッチを作成していた場合には、「ツール」メニューの「エンコーディン"
+"グの修正」を実行する事によって、ファイルのエンコーディングをUTF-8に変更し"
+"てください。そうでない場合には、これらの認識できない文字を手作業で削除して"
+"いただく必要があります。"
 
 #: Sketch.java:278 Sketch.java:307 Sketch.java:581 Sketch.java:970
 msgid "Sketch is Read-Only"
@@ -682,11 +686,11 @@ msgstr ""
 
 #: Sketch.java:359 Sketch.java:366 Sketch.java:377
 msgid "Problem with rename"
-msgstr "名前を変更できませんでした。"
+msgstr "スケッチの名前を変更できませんでした。"
 
 #: Sketch.java:360
 msgid "The name cannot start with a period."
-msgstr "この名前の先頭はピリオド「.」にしてはいけません。"
+msgstr "スケッチの名前の先頭はピリオド「.」にしてはいけません。"
 
 #: Sketch.java:368
 #, java-format
@@ -703,7 +707,7 @@ msgstr ""
 
 #: Sketch.java:400 Sketch.java:414 Sketch.java:423 Sketch.java:863
 msgid "Nope"
-msgstr "ダメ。"
+msgstr "エラー"
 
 #: Sketch.java:402
 #, java-format
@@ -826,7 +830,7 @@ msgstr ""
 
 #: Sketch.java:886
 msgid "How very Borges of you"
-msgstr "それはムリ。"
+msgstr "それはムリです"
 
 #: Sketch.java:887
 msgid ""
@@ -859,7 +863,7 @@ msgstr "既存の「{0}」というファイルを削除できませんでした
 
 #: Sketch.java:1078
 msgid "You can't fool me"
-msgstr "ヘンなことしちゃだめ。"
+msgstr "ヘンなことしちゃだめです"
 
 #: Sketch.java:1079
 msgid ""
@@ -895,7 +899,7 @@ msgstr "「{0}」をビルドフォルダに移動できませんでした。"
 
 #: Sketch.java:1661
 msgid "Uploading..."
-msgstr "マイコンボードに書き込んでいます…"
+msgstr "マイコンボードに書き込んでいます..."
 
 #: Sketch.java:1684
 #, java-format
@@ -1129,12 +1133,12 @@ msgid ""
 "A problem occurred while trying to open the\n"
 "files used to store the console output."
 msgstr ""
-"コンソール出力を保存するファイルを開こうとしたら、\n"
+"コンソール出力を保存するファイルを開く際に、\n"
 "問題が発生しました。"
 
 #: Base.java:184
 msgid "Non-fatal error while setting the Look & Feel."
-msgstr "GUIの挙動を設定する際にエラーが発生しましたが、重大ではありません。"
+msgstr "GUIの挙動の設定中にエラーが発生しましたが、重大ではありません。"
 
 #: Base.java:185
 msgid "The error message follows, however Arduino should run fine."
@@ -1289,13 +1293,15 @@ msgstr ""
 
 #: Base.java:1602
 msgid "You forgot your sketchbook"
-msgstr "スケッチブックをどこかにやっちゃいましたね。"
+msgstr "スケッチブック行方不明"
 
 #: Base.java:1603
 msgid ""
 "Arduino cannot run because it could not\n"
 "create a folder to store your sketchbook."
-msgstr "スケッチブックを保存するフォルダを作成できないため、動作を停止します。"
+msgstr ""
+"スケッチブックを保存するフォルダを作成できないので、\n"
+"Arduino IDEは動作できません。"
 
 #: Base.java:1623
 msgid "Select (or create new) folder for sketches..."
@@ -1444,7 +1450,7 @@ msgstr "参照"
 
 #: Preferences.java:83
 msgid "System Default"
-msgstr ""
+msgstr "パソコンの設定に従う"
 
 #: Preferences.java:84
 msgid "Arabic"
@@ -1464,7 +1470,7 @@ msgstr "中国語（簡体字）"
 
 #: Preferences.java:88
 msgid "Chinese Traditional"
-msgstr ""
+msgstr "中国語（繁体字）"
 
 #: Preferences.java:89
 msgid "Danish"
@@ -1540,7 +1546,7 @@ msgstr ""
 
 #: Preferences.java:107 Preferences.java:108
 msgid "Portuguese"
-msgstr ""
+msgstr "ポルトガル語"
 
 #: Preferences.java:109
 msgid "Romanian"
@@ -1548,7 +1554,7 @@ msgstr "ルーマニア語"
 
 #: Preferences.java:110
 msgid "Russian"
-msgstr ""
+msgstr "ロシア語"
 
 #: Preferences.java:111
 msgid "Spanish"
@@ -1590,11 +1596,11 @@ msgstr "スケッチブックの保存場所を決める"
 
 #: Preferences.java:337
 msgid "Editor language: "
-msgstr ""
+msgstr "言語設定："
 
 #: Preferences.java:342 Preferences.java:358
 msgid "  (requires restart of Arduino)"
-msgstr "  変更の反映にはArduino IDEの再起動が必要。"
+msgstr "  変更の反映にはArduino IDEの再起動が必要"
 
 #: Preferences.java:354
 msgid "Editor font size: "
@@ -1618,19 +1624,19 @@ msgstr "書き込みを検証する"
 
 #: Preferences.java:393
 msgid "Use external editor"
-msgstr "外部のエディタを使用する。"
+msgstr "外部のエディタを使用する"
 
 #: Preferences.java:403
 msgid "Check for updates on startup"
-msgstr "起動時に最新バージョンの有無をチェックする。"
+msgstr "起動時に最新バージョンの有無をチェックする"
 
 #: Preferences.java:412
 msgid "Update sketch files to new extension on save (.pde -> .ino)"
-msgstr "スケッチを保存する際に、拡張子を.pdeから.inoに変更する。"
+msgstr "スケッチを保存する際に、拡張子を.pdeから.inoに変更する"
 
 #: Preferences.java:423
 msgid "Automatically associate .ino files with Arduino"
-msgstr ".inoファイルをArduino IDEに関連づける。"
+msgstr ".inoファイルをArduino IDEに関連づける"
 
 #: Preferences.java:433
 msgid "More preferences can be edited directly in the file"
