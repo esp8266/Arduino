@@ -350,6 +350,8 @@
     </copy>
 
     <chmod perm="755" file="linux/work/hardware/tools/avrdude" />
+    <chmod perm="755" file="linux/work/hardware/tools/bossac" />
+    <chmod perm="755" file="linux/work/hardware/tools/bossac64" />
 
     <copy todir="linux/work" file="linux/dist/arduino" />
     <chmod perm="755" file="linux/work/arduino" />
