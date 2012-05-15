@@ -1,0 +1,1656 @@
+# Korean translations for PACKAGE package.
+# Copyright (C) 2012 www.wiznet.co.kr
+# This file is distributed under the same license as the PACKAGE package.
+# Jinbuhm Kim <jinbuhm@gmail.com>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-03-29 10:24-0400\n"
+"PO-Revision-Date: 2012-03-29 10:24-0400\n"
+"Last-Translator: Jinbuhm Kim <jinbuhm@gmail.com>\n"
+"Language-Team: Korean\n"
+"Language: ko\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: Editor.java:366
+msgid "No files were added to the sketch."
+msgstr "스케치에 파일이 추가되지 않았습니다."
+
+#: Editor.java:369 Sketch.java:996
+msgid "One file added to the sketch."
+msgstr "스케치에 1개의 파일이 추가되었습니다."
+
+#: Editor.java:373
+#, java-format
+msgid "{0} files added to the sketch."
+msgstr "스케치에 {0}파일이 추가되었습니다."
+
+#: Editor.java:484
+msgid "File"
+msgstr "파일"
+
+#: Editor.java:486 EditorToolbar.java:41
+msgid "New"
+msgstr "새 파일"
+
+#: Editor.java:494 Base.java:903
+msgid "Open..."
+msgstr "열기..."
+
+#: Editor.java:503
+msgid "Sketchbook"
+msgstr "스케치북"
+
+#: Editor.java:509
+msgid "Examples"
+msgstr "예제"
+
+#: Editor.java:514 Editor.java:1977
+msgid "Close"
+msgstr "닫기"
+
+#: Editor.java:522 Editor.java:2017 Editor.java:2421 EditorToolbar.java:41
+#: EditorToolbar.java:46
+msgid "Save"
+msgstr "저장"
+
+#: Editor.java:530
+msgid "Save As..."
+msgstr "다른 이름으로 저장..."
+
+#: Editor.java:538 EditorToolbar.java:41
+msgid "Upload"
+msgstr "업로드"
+
+#: Editor.java:546 EditorToolbar.java:46
+msgid "Upload Using Programmer"
+msgstr "프로그래머를 이용해 업로드"
+
+#: Editor.java:556
+msgid "Page Setup"
+msgstr "페이지 설정"
+
+#: Editor.java:564
+msgid "Print"
+msgstr "인쇄"
+
+#: Editor.java:576 Preferences.java:279
+msgid "Preferences"
+msgstr "환경 설정"
+
+#: Editor.java:586 Base.java:782
+msgid "Quit"
+msgstr "종료"
+
+#: Editor.java:600
+msgid "Sketch"
+msgstr "스케치"
+
+#: Editor.java:602
+msgid "Verify / Compile"
+msgstr "확인 / 컴파일"
+
+#: Editor.java:629
+msgid "Import Library..."
+msgstr "라이브러리 가져오기..."
+
+#: Editor.java:634
+msgid "Show Sketch Folder"
+msgstr "스케치 폴더 보이기"
+
+#: Editor.java:643
+msgid "Add File..."
+msgstr "파일 추가..."
+
+#: Editor.java:656
+msgid "Tools"
+msgstr "도구"
+
+#: Editor.java:662 EditorToolbar.java:41 EditorToolbar.java:46
+msgid "Serial Monitor"
+msgstr "시리얼 모니터"
+
+#: Editor.java:682
+msgid "Board"
+msgstr "보드"
+
+#: Editor.java:690
+msgid "Serial Port"
+msgstr "시리얼 포트"
+
+#: Editor.java:695
+msgid "Programmer"
+msgstr "프로그래머"
+
+#: Editor.java:699
+msgid "Burn Bootloader"
+msgstr "부트로더 굽기"
+
+#: Editor.java:923
+msgid "serialMenu is null"
+msgstr "serialMenu가 Null입니다"
+
+#: Editor.java:927 Editor.java:934
+msgid "name is null"
+msgstr "name 이 null입니다."
+
+#: Editor.java:986
+msgid "error retrieving port list"
+msgstr "포트 리스르를 가져오는데 오류"
+
+#: Editor.java:1002
+msgid "Help"
+msgstr "도움말"
+
+#: Editor.java:1041
+msgid "Getting Started"
+msgstr "시작하기"
+
+#: Editor.java:1049
+msgid "Environment"
+msgstr "환경"
+
+#: Editor.java:1057
+msgid "Troubleshooting"
+msgstr "문제해결"
+
+#: Editor.java:1065
+msgid "Reference"
+msgstr "참조"
+
+#: Editor.java:1073 Editor.java:2728
+msgid "Find in Reference"
+msgstr "참조에서 찾기"
+
+#: Editor.java:1083
+msgid "Frequently Asked Questions"
+msgstr "자주 묻는 질문"
+
+#: Editor.java:1091
+msgid "Visit Arduino.cc"
+msgstr "Arduino.cc를 방문"
+
+#: Editor.java:1094
+msgid "http://arduino.cc/"
+msgstr "http://arduino.cc/"
+
+#: Editor.java:1102
+msgid "About Arduino"
+msgstr "아두이노 정보"
+
+#: Editor.java:1116
+msgid "Edit"
+msgstr "편집"
+
+#: Editor.java:1119 Editor.java:1341
+msgid "Undo"
+msgstr "취소"
+
+#: Editor.java:1124 Editor.java:1126 Editor.java:1376
+msgid "Redo"
+msgstr "다시 실행"
+
+#: Editor.java:1135 Editor.java:2652
+msgid "Cut"
+msgstr "잘라내기"
+
+#: Editor.java:1143 Editor.java:2660
+msgid "Copy"
+msgstr "복사"
+
+#: Editor.java:1151 Editor.java:2668
+msgid "Copy for Forum"
+msgstr "포럼을 위해 복사"
+
+#: Editor.java:1163 Editor.java:2676
+msgid "Copy as HTML"
+msgstr "HTML로 복사"
+
+#: Editor.java:1175 Editor.java:2684
+msgid "Paste"
+msgstr "붙여넣기"
+
+#: Editor.java:1184 Editor.java:2692
+msgid "Select All"
+msgstr "모두 선택"
+
+#: Editor.java:1194 Editor.java:2702
+msgid "Comment/Uncomment"
+msgstr "주석추가/주석삭제"
+
+#: Editor.java:1202 Editor.java:2710
+msgid "Increase Indent"
+msgstr "들여쓰기 추가"
+
+#: Editor.java:1210 Editor.java:2718
+msgid "Decrease Indent"
+msgstr "들여쓰기 삭제"
+
+#: Editor.java:1220
+msgid "Find..."
+msgstr "찾기..."
+
+#: Editor.java:1235
+msgid "Find Next"
+msgstr "다음 찾기"
+
+#: Editor.java:1245
+msgid "Find Previous"
+msgstr "이전 찾기"
+
+#: Editor.java:1255
+msgid "Use Selection For Find"
+msgstr "찾기위해 선택된 부분을 사용"
+
+#: Editor.java:1816
+msgid "First select a word to find in the reference."
+msgstr "참조에서 찾기위해 단어를 선택"
+
+#: Editor.java:1823
+#, java-format
+msgid "No reference available for \"{0}\""
+msgstr "\"{0}\" 가 참조에존재하지 않습니다."
+
+#: Editor.java:1826
+#, java-format
+msgid "{0}.html"
+msgstr "{0}.html"
+
+#: Editor.java:1843 Sketch.java:1647
+msgid "Compiling sketch..."
+msgstr "스케치 컴파일..."
+
+#: Editor.java:1864 Editor.java:1881
+msgid "Done compiling."
+msgstr "컴파일 완료"
+
+#: Editor.java:1973
+#, java-format
+msgid "Save changes to \"{0}\"?  "
+msgstr "변경 사항을 \"{0}\"? 에 저장하시겠습니까? "
+
+#: Editor.java:2006
+msgid ""
+"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p "
+"{ font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Do you "
+"want to save changes to this sketch<BR> before closing?</b><p>If you don't "
+"save, your changes will be lost."
+msgstr ""
+"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p "
+"{ font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b> "
+"<BR> 닫기전에 변경사항을 저장하시겠습니까 ?</b><p>만약 저장하지 않으면"
+"변경된 사항은 손실됩니다."
+
+#: Editor.java:2017 Editor.java:2098 Editor.java:2418 Sketch.java:589
+#: Sketch.java:741 Sketch.java:1046 Preferences.java:78
+msgid "Cancel"
+msgstr "취소"
+
+#: Editor.java:2017
+msgid "Don't Save"
+msgstr "저장하지 않습니다"
+
+#: Editor.java:2089
+msgid "Bad file selected"
+msgstr "잘못된 파일이 선택됐습니다"
+
+#: Editor.java:2090
+msgid ""
+"Processing can only open its own sketches\n"
+"and other files ending in .ino or .pde"
+msgstr ""
+"프로세싱은 자체 스케치와 .ino 나 .pde로 끝나는 파일을\n"
+"열수 있습니니다.  "
+
+#: Editor.java:2098 Editor.java:2418 Sketch.java:589 Sketch.java:741
+#: Sketch.java:1046 Preferences.java:79
+msgid "OK"
+msgstr "확인"
+
+#: Editor.java:2100
+#, java-format
+msgid ""
+"The file \"{0}\" needs to be inside\n"
+"a sketch folder named \"{1}\".\n"
+"Create this folder, move the file, and continue?"
+msgstr ""
+"\"{0}\" 파일은 스케치 폴더 \"{1}\" 에 있어야 합니다.\n"
+"a sketch folder named .\n"
+"이 폴더를 생성하고 파일을 이동하고 계속하시겠습니까?"
+
+#: Editor.java:2109
+msgid "Moving"
+msgstr "이동"
+
+#: Editor.java:2120 Editor.java:2131 Editor.java:2141 Editor.java:2159
+#: Sketch.java:479 Sketch.java:485 Sketch.java:500 Sketch.java:507
+#: Sketch.java:530 Sketch.java:547 Base.java:1861 Preferences.java:240
+msgid "Error"
+msgstr "에러"
+
+#: Editor.java:2122
+#, java-format
+msgid "A folder named \"{0}\" already exists. Can't open sketch."
+msgstr " \"{0}\" 폴더 이름이 존재합니다. 스케치를 열수 없습니다."
+
+#: Editor.java:2132
+msgid "Could not create the sketch folder."
+msgstr "스케치 폴더를 생성할 수 없습니다."
+
+#: Editor.java:2141
+msgid "Could not copy to a proper location."
+msgstr "지정한 위치로 파일을 복사할 수 없습니다."
+
+#: Editor.java:2159
+msgid "Could not create the sketch."
+msgstr "스케치를 생성할 수 없습니다."
+
+#: Editor.java:2166
+#, java-format
+msgid "{0} | Arduino {1}"
+msgstr "{0} | 아두이노 {1}"
+
+#: Editor.java:2223 Editor.java:2261
+msgid "Saving..."
+msgstr "저장..."
+
+#: Editor.java:2228 Editor.java:2264
+msgid "Done Saving."
+msgstr "저장 완료"
+
+#: Editor.java:2270
+msgid "Save Canceled."
+msgstr "저장 취소"
+
+#: Editor.java:2296
+#, java-format
+msgid ""
+"Serial port {0} not found.\n"
+"Retry the upload with another serial port?"
+msgstr ""
+"시리얼 포트 {0} 를 찾을 수 없습니다.\n"
+"다른 시리얼 포트로 업로드를 다시 시도하시겠습니까?"
+
+#: Editor.java:2331
+msgid "Uploading to I/O Board..."
+msgstr "I/O 보드에 업로드..."
+
+#: Editor.java:2348 Editor.java:2384
+msgid "Done uploading."
+msgstr "업로드 완료"
+
+#: Editor.java:2356 Editor.java:2392
+msgid "Upload canceled."
+msgstr "업로드 취소"
+
+#: Editor.java:2420
+msgid "Save changes before export?"
+msgstr "내보내기전에 변경내용을 저장하시겠습니까?"
+
+#: Editor.java:2435
+msgid "Export canceled, changes must first be saved."
+msgstr "내보내기 취소, 변경사항은 먼저 저장되야 합니다."
+
+#: Editor.java:2457
+msgid "Burning bootloader to I/O Board (this may take a minute)..."
+msgstr "I/O 보드에 부트로더 굽기 (이것은 시간이 걸릴 수 있습니다)..."
+
+#: Editor.java:2463
+msgid "Done burning bootloader."
+msgstr "부트로더 굽기 완료"
+
+#: Editor.java:2465 Editor.java:2469 Editor.java:2473
+msgid "Error while burning bootloader."
+msgstr "부트로더 굽는중 에러발생"
+
+#: Editor.java:2500
+msgid "Printing..."
+msgstr "인쇄..."
+
+#: Editor.java:2517
+msgid "Done printing."
+msgstr "인쇄 완료"
+
+#: Editor.java:2520
+msgid "Error while printing."
+msgstr "인쇄하는 중에 오류 발생했습니다."
+
+#: Editor.java:2524
+msgid "Printing canceled."
+msgstr "인쇄가 취소되었습니다."
+
+#: Editor.java:2572
+#, java-format
+msgid "Bad error line: {0}"
+msgstr "잘못된 오류 라인: {0}"
+
+#: Editor.java:2641
+msgid "Open URL"
+msgstr "URL 열기"
+
+#: UpdateCheck.java:53
+msgid "http://www.arduino.cc/latest.txt"
+msgstr "http://www.arduino.cc/latest.txt"
+
+#: UpdateCheck.java:103
+msgid ""
+"A new version of Arduino is available,\n"
+"would you like to visit the Arduino download page?"
+msgstr "새로운 버젼의 아두이노가 다운로드 가능합니다,\n"
+"아두이노 다운로드 페이지로 방문할까요?"
+
+#: UpdateCheck.java:108 Preferences.java:76
+msgid "Yes"
+msgstr "예"
+
+#: UpdateCheck.java:108 Preferences.java:77
+msgid "No"
+msgstr "아니요"
+
+#: UpdateCheck.java:111
+msgid "Update"
+msgstr "업데이트"
+
+#: UpdateCheck.java:118
+msgid "http://www.arduino.cc/en/Main/Software"
+msgstr "http://www.arduino.cc/en/Main/Software"
+
+#: FindReplace.java:80
+msgid "Find:"
+msgstr "찾기:"
+
+#: FindReplace.java:81
+msgid "Replace with:"
+msgstr "대체:"
+
+#: FindReplace.java:96
+msgid "Ignore Case"
+msgstr "대소문자 무시"
+
+#: FindReplace.java:105
+msgid "Wrap Around"
+msgstr "자동 줄바꿈"
+
+#: FindReplace.java:120 FindReplace.java:131
+msgid "Replace All"
+msgstr "모두 바꾸기"
+
+#: FindReplace.java:121 FindReplace.java:130 Sketch.java:1050
+msgid "Replace"
+msgstr "바꾸기"
+
+#: FindReplace.java:122 FindReplace.java:129
+msgid "Replace & Find"
+msgstr "바꾸기 & 찾기"
+
+#: FindReplace.java:123 FindReplace.java:128
+msgid "Previous"
+msgstr "이전"
+
+#: FindReplace.java:124 FindReplace.java:127
+msgid "Find"
+msgstr "찾기"
+
+#: SerialMonitor.java:93
+msgid "Send"
+msgstr "Send"
+
+#: SerialMonitor.java:110
+msgid "Autoscroll"
+msgstr "Autoscroll"
+
+#: SerialMonitor.java:112
+msgid "No line ending"
+msgstr "No line ending"
+
+#: SerialMonitor.java:112
+msgid "Newline"
+msgstr "Newline"
+
+#: SerialMonitor.java:112
+msgid "Carriage return"
+msgstr "Carriage return"
+
+#: SerialMonitor.java:112
+msgid "Both NL & CR"
+msgstr "Both NL & CR"
+
+#: SerialMonitor.java:130 SerialMonitor.java:133
+msgid " baud"
+msgstr "baud"
+
+#: Serial.java:147
+#, java-format
+msgid ""
+"Serial port ''{0}'' already in use. Try quiting any programs that may be "
+"using it."
+msgstr ""
+"시리얼 포트 ''{0}'' 가 이미 사용되고 있습니다. 이 포트를 사용하는 다른 프로그램을 "
+"종료하십시요. "
+
+#: Serial.java:154
+#, java-format
+msgid "Error opening serial port ''{0}''."
+msgstr "시리얼 포트  ''{0}'' 를 여는데 에러 발생"
+
+#: Serial.java:167
+#, java-format
+msgid ""
+"Serial port ''{0}'' not found. Did you select the right one from the Tools > "
+"Serial Port menu?"
+msgstr ""
+"시리얼 포트 ''{0}''를 찾을 수 없습니다. Tools > Serial Port 메뉴에서 올바른 포트를"
+"선택했나요?"
+
+#: Serial.java:424
+#, java-format
+msgid ""
+"readBytesUntil() byte buffer is too small for the {0} bytes up to and "
+"including char {1}"
+msgstr ""
+"char {1}을 포함 {0} 바이트를 위한 readBytesUntil() 바이트 버퍼가"
+" 너무 작습니니다."
+
+#: Serial.java:567
+#, java-format
+msgid "Error inside Serial.{0}()"
+msgstr "Serial.{0}() 내부 에러"
+
+#: tools/AutoFormat.java:91
+msgid "Auto Format"
+msgstr "자동 포맷"
+
+#: tools/AutoFormat.java:913 tools/format/src/AutoFormat.java:54
+msgid "No changes necessary for Auto Format."
+msgstr "자동 포맷을 위해 변경이 필요없습니다."
+
+#: tools/AutoFormat.java:919
+msgid "Auto Format Canceled: Too many right parentheses."
+msgstr "자동 포맷 취소: 너무 많은 오른 괄호"
+
+#: tools/AutoFormat.java:922
+msgid "Auto Format Canceled: Too many left parentheses."
+msgstr "자동 포맷 취소: 너무 많은 왼 괄호"
+
+#: tools/AutoFormat.java:928
+msgid "Auto Format Canceled: Too many right curly braces."
+msgstr "자동 포맷 취소: 너무 많은 오른 중괄호"
+
+#: tools/AutoFormat.java:931
+msgid "Auto Format Canceled: Too many left curly braces."
+msgstr "자동 포맷 취소: 너무 많은 왼 중괄호"
+
+#: tools/AutoFormat.java:941
+msgid "Auto Format finished."
+msgstr "자동 포맷 완료"
+
+#: tools/FixEncoding.java:41 tools/FixEncoding.java:58
+#: tools/FixEncoding.java:79
+msgid "Fix Encoding & Reload"
+msgstr "인코딩 수정 & 새로 고침"
+
+#: tools/FixEncoding.java:57
+msgid "Discard all changes and reload sketch?"
+msgstr "모든 변경을 취소하고 스케치를 다시 로드하나요?"
+
+#: tools/FixEncoding.java:77
+msgid ""
+"An error occurred while trying to fix the file encoding.\n"
+"Do not attempt to save this sketch as it may overwrite\n"
+"the old version. Use Open to re-open the sketch and try again.\n"
+msgstr ""
+"파일 인코딩 문제를 해결하는 동안 오류가 발생했습니다.\n"
+"이전 버젼을 덮어쓸 수 있으므로 이 스케치 저장하지 마십시요.\n"
+"열기 메뉴를 사용하여 스케치를 다시 열고 다시 시도하십시요.\n"
+
+#: tools/Archiver.java:48
+msgid "Archive Sketch"
+msgstr "스케치 보관하기"
+
+#: tools/Archiver.java:59
+msgid "yyMMdd"
+msgstr "yyMMdd"
+
+#: tools/Archiver.java:74
+msgid "Couldn't archive sketch"
+msgstr "스케치를 보관 할 수 없습니다"
+
+#: tools/Archiver.java:75
+msgid ""
+"Archiving the sketch has been canceled because\n"
+"the sketch couldn't save properly."
+msgstr ""
+"스케치가 제대로 저장되지 않아서 스케치를 보관하는 것이\n"
+"취소되었습니다."
+
+#: tools/Archiver.java:109
+msgid "Archive sketch as:"
+msgstr "스케치를 보관:"
+
+#: tools/Archiver.java:139
+msgid "Archive sketch canceled."
+msgstr "스케치 보관 취소"
+
+#: SketchCode.java:83
+#, java-format
+msgid "Error while loading code {0}"
+msgstr "코드 {0}를 로딩하는 중 에러"
+
+#: SketchCode.java:258
+#, java-format
+msgid ""
+"\"{0}\" contains unrecognized characters.If this code was created with an "
+"older version of Processing,you may need to use Tools -> Fix Encoding & "
+"Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
+"todelete the bad characters to get rid of this warning."
+msgstr ""
+"\"{0}\"에 인식할 수 없는 문자가 포함되어 있습니다. 만약 이 코드가"
+"이전 버전의 프로세싱으로 만들어졌다면, Tools -> Fix Encoding & Reload 로"
+" UTF-8 인토딩으로 업데이트 할 수 있습니다."
+"아니면 잘못된 문자를 삭제하여 이 경고를 제거할 수 있습니다."
+
+#: Sketch.java:278 Sketch.java:307 Sketch.java:581 Sketch.java:970
+msgid "Sketch is Read-Only"
+msgstr "스케치가 읽기 전용입니다"
+
+#: Sketch.java:279 Sketch.java:308 Sketch.java:582 Sketch.java:971
+msgid ""
+"Some files are marked \"read-only\", so you'll\n"
+"need to re-save the sketch in another location,\n"
+"and try again."
+msgstr ""
+"파일이 \"읽기 전용\" 으로 표시됩니다. 따라서 \n"
+"다른 장소에 스케치를 다시 저장을 하고\n"
+"다시 시도하십시요."
+
+#: Sketch.java:286
+msgid "Name for new file:"
+msgstr "새로운 파일을 위한 이름:"
+
+#: Sketch.java:298
+msgid "Sketch is Untitled"
+msgstr "스케치가 제목이 없습니다"
+
+#: Sketch.java:299
+msgid ""
+"How about saving the sketch first \n"
+"before trying to rename it?"
+msgstr ""
+"스케치를 다른 이름으로 바꾸기 전에 \n"
+"저장하는 것은 어떤가요?"
+
+#: Sketch.java:359 Sketch.java:366 Sketch.java:377
+msgid "Problem with rename"
+msgstr "이름바꾸기 문제"
+
+#: Sketch.java:360
+msgid "The name cannot start with a period."
+msgstr "이름은 마침표로 시작할 수 없습니다."
+
+#: Sketch.java:368
+#, java-format
+msgid "\".{0}\" is not a valid extension."
+msgstr "\".{0}\" 는 확장자로 사용할 수 없습니다."
+
+#: Sketch.java:378
+msgid ""
+"The main file can't use an extension.\n"
+"(It may be time for your to graduate to a\n"
+"\"real\" programming environment)"
+msgstr ""
+"메인 파일은 확장자를 사용할 수 없습니다.\n"
+"(\"real\" 프로그래밍 환경으로 전환하는\n"
+" 시간일 수도 있습니다.)"
+
+#: Sketch.java:400 Sketch.java:414 Sketch.java:423 Sketch.java:863
+msgid "Nope"
+msgstr "아니요"
+
+#: Sketch.java:402
+#, java-format
+msgid "A file named \"{0}\" already exists in \"{1}\""
+msgstr "\"{0}\" 파일 이름이 \"{1}\"에 이미 존재합니다."
+
+#: Sketch.java:415
+msgid "You can't have a .cpp file with the same name as the sketch."
+msgstr "스케치와 동일한 이름의 .cpp 파일을 가질수 없습니다."
+
+#: Sketch.java:425
+msgid ""
+"You can't rename the sketch to \"{0}\"\n"
+"because the sketch already has a .cpp file with that name."
+msgstr ""
+"스케치가 이미 같은 이름의 .cpp파일을 가지고 있기 때문에"
+"스케치의 이름을 \"{0}\"로 바꿀 수 없습니다\n"
+
+#: Sketch.java:459
+msgid "Cannot Rename"
+msgstr "이름을 바꿀 수 없습니다"
+
+#: Sketch.java:461
+#, java-format
+msgid "Sorry, a sketch (or folder) named \"{0}\" already exists."
+msgstr "죄송합니다, \"{0}\"이름의 스케치(또는 폴더)가 이미 존재합니다."
+
+#: Sketch.java:479
+msgid "Could not rename the sketch. (0)"
+msgstr "스케치 이름을 바꿀 수 없습니다. (0)"
+
+#: Sketch.java:487 Sketch.java:532
+#, java-format
+msgid "Could not rename \"{0}\" to \"{1}\""
+msgstr "\"{0}\" 를 \"{1}\"로 이름을 바꿀 수 없습니다."
+
+#: Sketch.java:500
+msgid "Could not rename the sketch. (1)"
+msgstr "스케치 이름을 바꿀 수 없습니다. (1)"
+
+#: Sketch.java:507
+msgid "Could not rename the sketch. (2)"
+msgstr "스케치 이름을 바꿀 수 없습니다. (2)"
+
+#: Sketch.java:544
+msgid "createNewFile() returned false"
+msgstr "createNewFile()가 false를 반환했습니다"
+
+#: Sketch.java:591
+msgid "Are you sure you want to delete this sketch?"
+msgstr "정말로 스케치를 삭제하시겠습니까?"
+
+#: Sketch.java:592
+#, java-format
+msgid "Are you sure you want to delete \"{0}\"?"
+msgstr "정말로 \"{0}\"를 삭제하시겠습니까?"
+
+#: Sketch.java:595 EditorHeader.java:314
+msgid "Delete"
+msgstr "삭제"
+
+#: Sketch.java:620
+msgid "Couldn't do it"
+msgstr "할 수 없습니다."
+
+#: Sketch.java:621
+#, java-format
+msgid "Could not delete \"{0}\"."
+msgstr "\"{0}\"를 삭제할 수 없습니다."
+
+#: Sketch.java:651
+msgid "removeCode: internal error.. could not find code"
+msgstr "removeCode: 내부 에러.. 코드를 찾을 수 없습니다"
+
+#: Sketch.java:724
+msgid "Sketch is read-only"
+msgstr "스케치는 읽기전용입니다"
+
+#: Sketch.java:725
+msgid ""
+"Some files are marked \"read-only\", so you'll\n"
+"need to re-save this sketch to another location."
+msgstr ""
+"파일이 \"읽기 전용\" 으로 표시됩니다.\n"
+"다른 장소에 스케치를 다시 저장을 해야 합니다."
+
+#: Sketch.java:743
+msgid ""
+"In Arduino 1.0, the default file extension has changed\n"
+"from .pde to .ino.  New sketches (including those created\n"
+"by \"Save-As\" will use the new extension.  The extension\n"
+"of existing sketches will be updated on save, but you can\n"
+"disable this in the Preferences dialog.\n"
+"\n"
+"Save sketch and update its extension?"
+msgstr ""
+"아두이노 1.0에 기본 확장자가 .pde 에서 .ino로 변경이 되었습니다\n"
+"새로운 스케치(\"Save-As\"를 통해서 생성된 것도 포함해서)는\n"
+"새로운 확장자를 사용합니다.\n"
+"기존 스케치는 저장시 업데이트되지만 환경설정 대화상자에서 이 기능을\n"
+"해제할 수 있습니다.\n"
+"\n"
+"스케치를 저장하고 확장자를 업데이트 할까요?"
+
+#: Sketch.java:750
+msgid ".pde -> .ino"
+msgstr ".pde -> .ino"
+
+#: Sketch.java:829
+msgid "Save sketch folder as..."
+msgstr "스케치 폴더를 다른이름으로 저장..."
+
+#: Sketch.java:865
+msgid ""
+"You can't save the sketch as \"{0}\"\n"
+"because the sketch already has a .cpp file with that name."
+msgstr ""
+"스케치가 이미 같은 이름의 .cpp파일을 가지고 있기 때문에"
+"스케치의 이름을 \"{0}\"로 바꿀 수 없습니다\n"
+
+#: Sketch.java:886
+msgid "How very Borges of you"
+msgstr "How very Borges of you"
+
+#: Sketch.java:887
+msgid ""
+"You cannot save the sketch into a folder\n"
+"inside itself. This would go on forever."
+msgstr ""
+"스케치를 그 자체의 폴더에 저장할 수 없습니다.\n"
+"무한 반복될 수 있습니다."
+
+#: Sketch.java:979
+msgid "Select an image or other data file to copy to your sketch"
+msgstr "스케치에 복사하기위해 이미지 또는 다른 데이터 파일을 선택"
+
+#: Sketch.java:1047
+#, java-format
+msgid "Replace the existing version of {0}?"
+msgstr "{0}의 기존 버전을 교체하시겠습니까?"
+
+#: Sketch.java:1069 Sketch.java:1092
+msgid "Error adding file"
+msgstr "파일 추가 오류"
+
+#: Sketch.java:1070
+#, java-format
+msgid "Could not delete the existing ''{0}'' file."
+msgstr "''{0}'' 파일을 삭제할 수 없습니다."
+
+#: Sketch.java:1078
+msgid "You can't fool me"
+msgstr "날 속일 생각 말게"
+
+#: Sketch.java:1079
+msgid ""
+"This file has already been copied to the\n"
+"location from which where you're trying to add it.\n"
+"I ain't not doin nuthin'."
+msgstr ""
+"이 파일은 이미 당신이 추가하려는\n"
+"장소에 복사되었습니다.\n"
+"더 이상 진행 할 수 없습니다.\n"
+
+#: Sketch.java:1093
+#, java-format
+msgid "Could not add ''{0}'' to the sketch."
+msgstr "''{0}''를 스케치에 추가할 수 없습니다."
+
+#: Sketch.java:1393 Sketch.java:1424
+msgid "Build folder disappeared or could not be written"
+msgstr "빌드 폴더가 사라졌거나 사용할 수 없습니다"
+
+#: Sketch.java:1408
+msgid "Could not find main class"
+msgstr "메인 클래스를 찾을 수 없습니다"
+
+#: Sketch.java:1433
+#, java-format
+msgid "Uncaught exception type: {0}"
+msgstr "해결할 수 없는 예외상황 발생: {0}"
+
+#: Sketch.java:1465
+#, java-format
+msgid "Problem moving {0} to the build folder"
+msgstr "빌드 폴더로 {0}를 이동할때 문제 발생"
+
+#: Sketch.java:1661
+msgid "Uploading..."
+msgstr "업로딩..."
+
+#: Sketch.java:1684
+#, java-format
+msgid "Binary sketch size: {0} bytes (of a {1} byte maximum)"
+msgstr "바이너리 스케치 사이즈: {0} 바이트 (최대 {1} 바이트)"
+
+#: Sketch.java:1689
+msgid "Couldn't determine program size: {0}"
+msgstr "프로그램의 사이즈를 결정할 수 없습니다: {0}"
+
+#: Sketch.java:1694
+msgid ""
+"Sketch too big; see http://www.arduino.cc/en/Guide/Troubleshooting#size for "
+"tips on reducing it."
+msgstr ""
+"스케치가 너무 큼; http://www.arduino.cc/en/Guide/Troubleshooting#size"
+"이것을 줄이기 위한 도움말"
+
+#: Sketch.java:1754
+msgid "Missing the */ from the end of a /* comment */"
+msgstr "/* 주석 */의 끝에 */ 누락"
+
+#: Sketch.java:1796
+msgid "Sketch Disappeared"
+msgstr "스케치가 사라졌습니다"
+
+#: Sketch.java:1797
+msgid ""
+"The sketch folder has disappeared.\n"
+" Will attempt to re-save in the same location,\n"
+"but anything besides the code will be lost."
+msgstr ""
+"스케치 폴더가 사라졌습니다\n"
+" 같은 장소에 다시 저장을 시도합니다,\n"
+"하지만 코드를 제외한 나머지 부분은 잃어버립니다."
+
+#: Sketch.java:1810
+msgid "Could not re-save sketch"
+msgstr "재 저장을 할 수 없습니다"
+
+#: Sketch.java:1811
+msgid ""
+"Could not properly re-save the sketch. You may be in trouble at this point,\n"
+"and it might be time to copy and paste your code to another text editor."
+msgstr ""
+"스케치를 제대로 다시 저장할 수 없습니다. 문제가 있어서 아마도 다른 텍스트 에디터에,\n"
+"복사하여 붙여넣을 수 있습니다."
+
+#: Sketch.java:2060
+msgid ""
+"The sketch name had to be modified. Sketch names can only consist\n"
+"of ASCII characters and numbers (but cannot start with a number).\n"
+"They should also be less less than 64 characters long."
+msgstr ""
+"스케치 이름을 변경해야 합니다. 스케치 이름은 아스키 문자나\n"
+" 숫자(하지만 숫자로 시장할 수 없습니다)만 가능합니다.\n"
+"그리고 64자 미만이여야 합니다."
+
+#: debug/Uploader.java:52
+msgid "https://developer.berlios.de/bugs/?group_id=3590"
+msgstr "https://developer.berlios.de/bugs/?group_id=3590"
+
+#: debug/Uploader.java:54 debug/Compiler.java:43
+#, java-format
+msgid "Compiler error, please submit this code to {0}"
+msgstr "컴파일 에러,이 코드를 {0}로 제출해 주시기 바랍니다"
+
+#: debug/Uploader.java:199
+#, java-format
+msgid ""
+"the selected serial port {0} does not exist or your board is not connected"
+msgstr ""
+"선택돤 시리얼 포트(0)는 존재하지 않거나 해당 보드가 연결되지 않았습니다."
+
+#: debug/Uploader.java:203
+msgid ""
+"Device is not responding, check the right serial port is selected or RESET "
+"the board right before exporting"
+msgstr ""
+"디바이스가 응답하지 않습니다. 올바른 시리얼 포트가 선택이 되었는지 확인하거나"
+"데이터를 내보내기 전에 보드를 리셋하기 바랍니다."
+
+#: debug/Uploader.java:209
+msgid ""
+"Problem uploading to board.  See http://www.arduino.cc/en/Guide/"
+"Troubleshooting#upload for suggestions."
+msgstr ""
+"보드에 업로딩중에 문제 발생. http://www.arduino.cc/en/Guide/"
+"Troubleshooting#upload 를 참고하세요."
+
+#: debug/Uploader.java:213
+msgid ""
+"Wrong microcontroller found.  Did you select the right board from the Tools "
+"> Board menu?"
+msgstr ""
+"잘못된 마이크로콘트롤러 발견. Tools > Board 메뉴에서 올바른 보드를 선택을 하셨나요?"
+
+#: debug/Compiler.java:41
+msgid "http://code.google.com/p/arduino/issues/list"
+msgstr "http://code.google.com/p/arduino/issues/list"
+
+#: debug/Compiler.java:79
+msgid "No board selected; please choose a board from the Tools > Board menu."
+msgstr "보드가 선택되지 않았습니다; 툴>보드 메뉴에서 보드를 선택하시기 바랍니다."
+
+#: debug/Compiler.java:422
+#, java-format
+msgid "{0} returned {1}"
+msgstr "{0} 가 {1}를 리턴했습니다"
+
+#: debug/Compiler.java:426
+msgid "Error compiling."
+msgstr "컴파일 오류 발생"
+
+#: debug/Compiler.java:465
+msgid "Please import the SPI library from the Sketch > Import Library menu."
+msgstr "스케치 > 라이브러리 가져오기 메뉴에서 SPI 라이브러리를 가져오시기 바랍니다."
+
+#: debug/Compiler.java:466
+msgid ""
+"\n"
+"As of Arduino 0019, the Ethernet library depends on the SPI library.\n"
+"You appear to be using it or another library that depends on the SPI "
+"library.\n"
+"\n"
+msgstr ""
+"\n"
+"아두이노 0019 경우, 이더넷 라이브러리는 SPI라이브러리에 의존합니다.\n"
+"이 사이브러리를 사용하거나 SPI 라이브러리에 의존적인\n"
+"다른 라이브러리를 사용하는 것 같습니다."
+"\n"
+
+#: debug/Compiler.java:471
+msgid "The 'BYTE' keyword is no longer supported."
+msgstr "'BYTE' 키워드는 더이상 지원되지 않습니니다."
+
+#: debug/Compiler.java:472
+msgid ""
+"\n"
+"As of Arduino 1.0, the 'BYTE' keyword is no longer supported.\n"
+"Please use Serial.write() instead.\n"
+"\n"
+msgstr ""
+"\n"
+"아두이노 1.0 경우, 'BYTE' 키워드는 더 이상 지원하지 않습니니다.\n"
+"대신 Serial.write()를 사용하시기 바랍니다.\n"
+"\n"
+
+#: debug/Compiler.java:477
+msgid "The Server class has been renamed EthernetServer."
+msgstr "Server 클래스는 EthernetServer로 이름이 변경되었습니다."
+
+#: debug/Compiler.java:478
+msgid ""
+"\n"
+"As of Arduino 1.0, the Server class in the Ethernet library has been renamed "
+"to EthernetServer.\n"
+"\n"
+msgstr ""
+"\n"
+"아두이노 1.0 경우, 이더넷 라이브러리의 Server 클래스는 EthernetServer로 이름이 변경되었습니다"
+"\n"
+
+#: debug/Compiler.java:483
+msgid "The Client class has been renamed EthernetClient."
+msgstr "Client 클래스는 EthernetClient로 이름이 변경되었습니다."
+
+#: debug/Compiler.java:484
+msgid ""
+"\n"
+"As of Arduino 1.0, the Client class in the Ethernet library has been renamed "
+"to EthernetClient.\n"
+"\n"
+msgstr ""
+"\n"
+"아두이노 1.0 경우, 이더넷 라이브러리의 Client 클래스는 EthernetClient로 이름이 변경되었습니다"
+"\n"
+
+#: debug/Compiler.java:489
+msgid "The Udp class has been renamed EthernetUdp."
+msgstr "Udp 클래스는 EthernetUdp로 이름이 변경되었습니다."
+
+#: debug/Compiler.java:490
+msgid ""
+"\n"
+"As of Arduino 1.0, the Udp class in the Ethernet library has been renamed to "
+"EthernetClient.\n"
+"\n"
+msgstr ""
+"\n"
+"아두이노 1.0 경우, 이더넷 라이브러리의 Udp 클래스는 EthernetClient로 이름이 변경되었습니다"
+"\n"
+
+#: debug/Compiler.java:495
+msgid "Wire.send() has been renamed Wire.write()."
+msgstr "Wire.send()는 Wire.write()로 이름이 변경되었습니다."
+
+#: debug/Compiler.java:496
+msgid ""
+"\n"
+"As of Arduino 1.0, the Wire.send() function was renamed to Wire.write() for "
+"consistency with other libraries.\n"
+"\n"
+msgstr ""
+"\n"
+"아두이노 1.0 경우, Wire.send()함수는 다른 라이브러리와의 일관성을 위해 "
+"Wire.write()로 이름이 변경되었습니다"
+"\n"
+
+#: debug/Compiler.java:501
+msgid "Wire.receive() has been renamed Wire.read()."
+msgstr "Wire.receive()는 Wire.read()로 이름이 변경되었습니다."
+
+#: debug/Compiler.java:502
+msgid ""
+"\n"
+"As of Arduino 1.0, the Wire.receive() function was renamed to Wire.read() "
+"for consistency with other libraries.\n"
+"\n"
+msgstr ""
+"\n"
+"아두이노 1.0 경우, Wire.receive()함수는 다른 라이브러리와의 일관성을 위해 "
+"Wire.read()로 이름이 변경되었습니다"
+"\n"
+
+#: EditorConsole.java:152
+msgid "Console Error"
+msgstr "콘솔 오류"
+
+#: EditorConsole.java:153
+msgid ""
+"A problem occurred while trying to open the\n"
+"files used to store the console output."
+msgstr ""
+"콘솔 출력을 저장하는데 사용된 파일을 여는 중에\n"
+"문제가 발생했습니다."
+
+#: Base.java:184
+msgid "Non-fatal error while setting the Look & Feel."
+msgstr "GUI 동작을 설정할때 에러가 발생을 했지만 치명적이지는 않습니다."
+
+#: Base.java:185
+msgid "The error message follows, however Arduino should run fine."
+msgstr "에러 메시지는 다음에 표시됩니다. 하지만 아두이노는 이상 없이 동작합니다."
+
+#: Base.java:220
+msgid "Problem Setting the Platform"
+msgstr "플랫폼 설정 문제"
+
+#: Base.java:221
+msgid ""
+"An unknown error occurred while trying to load\n"
+"platform-specific code for your machine."
+msgstr ""
+"플랫폼에 특정한 코드를 로드하는 동안\n"
+"알수 없는 에러가 발생했습니니다."
+
+#: Base.java:232
+msgid "Please install JDK 1.5 or later"
+msgstr "JDK 1.5 이상을 설치하시기 바랍니다."
+
+#: Base.java:233
+msgid ""
+"Arduino requires a full JDK (not just a JRE)\n"
+"to run. Please install JDK 1.5 or later.\n"
+"More information can be found in the reference."
+msgstr ""
+"아두이노를 실행하려면 단지 JRE뿐 아니라 전체 JDK가 필요합니니다.\n"
+"JDK 1.5이상을 설치하시기 바랍니다.\n"
+"자세한 내용은 레퍼런스에서 찾을 수 있습니니다."
+
+#: Base.java:257
+msgid "Sketchbook folder disappeared"
+msgstr "스케치북 폴더가 사라졌습니니다."
+
+#: Base.java:258
+msgid ""
+"The sketchbook folder no longer exists.\n"
+"Arduino will switch to the default sketchbook\n"
+"location, and create a new sketchbook folder if\n"
+"necessary. Arduino will then stop talking about\n"
+"himself in the third person."
+msgstr ""
+"스케치북 폴더가 더 이상 존재하지 않습니다.\n"
+"아두이노는 기본 스케치북 위치으로 전환합니다.\n"
+"필요한면 새로운 스케치북 폴더를 만드세요\n"
+"그러면 아두이노는 더 이상 얘기하지 않을겁니다.\n"
+
+#: Base.java:532
+msgid "Time for a Break"
+msgstr "휴식 시간"
+
+#: Base.java:533
+msgid ""
+"You've reached the limit for auto naming of new sketches\n"
+"for the day. How about going for a walk instead?"
+msgstr ""
+"새로운 스케치의 자동 네이밍의 한계에 도달했습니다.\n"
+"산책을 하시는 것이 어떤가요?"
+
+#: Base.java:537
+msgid "Sunshine"
+msgstr "햇살"
+
+#: Base.java:538
+msgid "No really, time for some fresh air for you."
+msgstr "당신의 신선한 공기를 위한 시간입니다."
+
+#: Base.java:633
+msgid "Open an Arduino sketch..."
+msgstr "아두이노 스케치를 여세요..."
+
+#: Base.java:772
+msgid ""
+"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p "
+"{ font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Are you "
+"sure you want to Quit?</b><p>Closing the last open sketch will quit Arduino."
+msgstr ""
+"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p "
+"{ font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>정말로"
+"종료하기를 원하나요?</b><p>마지막에 연 스케치를 닫으면 아두이노를 종료합니니다."
+
+#: Base.java:970
+msgid "Contributed"
+msgstr "기여"
+
+#: Base.java:1095
+msgid "Sketch Does Not Exist"
+msgstr "스케치가 존재하지 않습니다"
+
+#: Base.java:1096
+msgid ""
+"The selected sketch no longer exists.\n"
+"You may need to restart Arduino to update\n"
+"the sketchbook menu."
+msgstr ""
+"선택한 스케치가 더 이상 존재하지 않습니니다.\n"
+"스케체북 메뉴를 업데이트하기 위해 아두이노를\n"
+"다시 시작해야 할 수도 있습니다."
+
+#: Base.java:1125
+#, java-format
+msgid ""
+"The sketch \"{0}\" cannot be used.\n"
+"Sketch names must contain only basic letters and numbers\n"
+"(ASCII-only with no spaces, and it cannot start with a number).\n"
+"To get rid of this message, remove the sketch from\n"
+"{1}"
+msgstr ""
+" 스케치 \"{0}\" 를 사용할 수 없습니다.\n"
+"스케치 이름은 기본 문자와 숫자를 포함해야 합니다\n"
+"(숫자로 시작할 수 없으며 스페이스 없는 아스키문자를 사용하세요).\n"
+"이 메시지를 제거하려면 {1}에서 스케치를 제거하세요\n"
+
+#: Base.java:1132
+msgid "Ignoring sketch with bad name"
+msgstr "잘못된 이름의 스케치를 무시"
+
+#: Base.java:1202
+#, java-format
+msgid ""
+"The library \"{0}\" cannot be used.\n"
+"Library names must contain only basic letters and numbers.\n"
+"(ASCII only and no spaces, and it cannot start with a number)"
+msgstr ""
+"라이브러리 \"{0}\"를 사용할 수 없습니다.\n"
+"라이브러리 이름은 기본 문자와 숫자를 포함해야 합니다\n"
+"(숫자로 시작할 수 없으며 스페이스 없는 아스키문자를 사용하세요).\n"
+
+#: Base.java:1207
+msgid "Ignoring bad library name"
+msgstr "잘못된 라이브러리 이름을 무시"
+
+#: Base.java:1432
+msgid "Problem getting data folder"
+msgstr "데이터 폴더를 가져오는데 문제 발생"
+
+#: Base.java:1433
+msgid "Error getting the Arduino data folder."
+msgstr "아두이노 데이터 폴더를 가져올 때 에러 발생"
+
+#: Base.java:1440
+msgid "Settings issues"
+msgstr "설정 문제"
+
+#: Base.java:1441
+msgid ""
+"Arduino cannot run because it could not\n"
+"create a folder to store your settings."
+msgstr ""
+"설정을 저장하기 위한 폴더를 생성하지 못해서\n"
+"아두이노를 실행할 수 없습니다."
+
+#: Base.java:1602
+msgid "You forgot your sketchbook"
+msgstr "스케치북을 잊었습니다"
+
+#: Base.java:1603
+msgid ""
+"Arduino cannot run because it could not\n"
+"create a folder to store your sketchbook."
+msgstr ""
+"스케치를  저장하기 위한 폴더를 생성하지 못해서\n"
+"아두이노를 실행할 수 없습니다."
+
+#: Base.java:1623
+msgid "Select (or create new) folder for sketches..."
+msgstr "스케치를 위한 폴더를 선택(또는 새로 만들기)..."
+
+#: Base.java:1647
+msgid "Problem Opening URL"
+msgstr "URL을 열때 문제 발생"
+
+#: Base.java:1648
+#, java-format
+msgid ""
+"Could not open the URL\n"
+"{0}"
+msgstr ""
+"URL {0}를\n"
+"열 수 없습니다.\n"
+
+#: Base.java:1671
+msgid "Problem Opening Folder"
+msgstr "폴더를 열때 문제 발생"
+
+#: Base.java:1672
+#, java-format
+msgid ""
+"Could not open the folder\n"
+"{0}"
+msgstr ""
+"폴더 {0}를\n"
+"열 수 없습니다.\n"
+
+#: Base.java:1785
+msgid "Guide_MacOSX.html"
+msgstr "Guide_MacOSX.html"
+
+#: Base.java:1787
+msgid "Guide_Windows.html"
+msgstr "Guide_Windows.html"
+
+#: Base.java:1789
+msgid "http://www.arduino.cc/playground/Learning/Linux"
+msgstr "http://www.arduino.cc/playground/Learning/Linux"
+
+#: Base.java:1794
+msgid "index.html"
+msgstr "index.html"
+
+#: Base.java:1799
+msgid "Guide_Environment.html"
+msgstr "Guide_Environment.html"
+
+#: Base.java:1804
+msgid "environment"
+msgstr "환경"
+
+#: Base.java:1804
+msgid "platforms.html"
+msgstr "platforms.html"
+
+#: Base.java:1809
+msgid "Guide_Troubleshooting.html"
+msgstr "Guide_Troubleshooting.html"
+
+#: Base.java:1814
+msgid "FAQ.html"
+msgstr "FAQ.html"
+
+#: Base.java:1826
+msgid "Message"
+msgstr "메시지"
+
+#: Base.java:1842
+msgid "Warning"
+msgstr "경고"
+
+#: Base.java:2196
+#, java-format
+msgid "Could not remove old version of {0}"
+msgstr "{0}의 이전 버젼을 삭제할 수 없습니다"
+
+#: Base.java:2206
+#, java-format
+msgid "Could not replace {0}"
+msgstr "{0}를 바꿀 수 없습니다"
+
+#: Base.java:2247 Base.java:2270
+#, java-format
+msgid "Could not delete {0}"
+msgstr "{0}를 삭제할 수 없습니다"
+
+#: EditorHeader.java:292
+msgid "New Tab"
+msgstr "새 탭"
+
+#: EditorHeader.java:300
+msgid "Rename"
+msgstr "이름 바꾸기"
+
+#: EditorHeader.java:326
+msgid "Previous Tab"
+msgstr "이전 탭"
+
+#: EditorHeader.java:340
+msgid "Next Tab"
+msgstr "다음 탭"
+
+#: EditorToolbar.java:41 EditorToolbar.java:46
+msgid "Verify"
+msgstr "확인"
+
+#: EditorToolbar.java:41
+msgid "Open"
+msgstr "열기"
+
+#: EditorToolbar.java:46
+msgid "New Editor Window"
+msgstr "새 에디터 창"
+
+#: EditorToolbar.java:46
+msgid "Open in Another Window"
+msgstr "다른 창에서 열기"
+
+#: Platform.java:167
+msgid "No launcher available"
+msgstr "런처를 사용할 수 없습니다"
+
+#: Platform.java:168
+msgid ""
+"Unspecified platform, no launcher available.\n"
+"To enable opening URLs or folders, add a \n"
+"\"launcher=/path/to/app\" line to preferences.txt"
+msgstr ""
+"지정되지 않은 플랫폼, 런처를 사용할 수 없습니다.\n"
+"URL 또는 폴더를 사용하려면,\n"
+"\"launcher=/path/to/app\" 라인을 preferences.txt에 추가합니다."
+
+#: Theme.java:52
+msgid ""
+"Could not read color theme settings.\n"
+"You'll need to reinstall Processing."
+msgstr ""
+"컬러 테마를 읽을 수 없습니다.\n"
+"프로세싱을 다시 설치해야 합니다."
+
+#: Preferences.java:80
+msgid "Browse"
+msgstr "찾아보기"
+
+#: Preferences.java:83
+msgid "System Default"
+msgstr ""
+
+#: Preferences.java:84
+msgid "Arabic"
+msgstr ""
+
+#: Preferences.java:85
+msgid "Aragonese"
+msgstr ""
+
+#: Preferences.java:86
+msgid "Catalan"
+msgstr ""
+
+#: Preferences.java:87
+msgid "Chinese Simplified"
+msgstr ""
+
+#: Preferences.java:88
+msgid "Chinese Traditional"
+msgstr ""
+
+#: Preferences.java:89
+msgid "Danish"
+msgstr ""
+
+#: Preferences.java:90
+msgid "Dutch"
+msgstr ""
+
+#: Preferences.java:91
+msgid "English"
+msgstr ""
+
+#: Preferences.java:92
+msgid "Estonian"
+msgstr ""
+
+#: Preferences.java:93
+msgid "French"
+msgstr ""
+
+#: Preferences.java:94
+msgid "Filipino"
+msgstr ""
+
+#: Preferences.java:95
+msgid "Galician"
+msgstr ""
+
+#: Preferences.java:96
+msgid "German"
+msgstr ""
+
+#: Preferences.java:97
+msgid "Greek"
+msgstr ""
+
+#: Preferences.java:98
+msgid "Hungarian"
+msgstr ""
+
+#: Preferences.java:99
+msgid "Indonesian"
+msgstr ""
+
+#: Preferences.java:100
+msgid "Italian"
+msgstr ""
+
+#: Preferences.java:101
+msgid "Japanese"
+msgstr ""
+
+#: Preferences.java:102
+msgid "Korean"
+msgstr ""
+
+#: Preferences.java:103
+msgid "Latvian"
+msgstr ""
+
+#: Preferences.java:104
+msgid "Lithuaninan"
+msgstr ""
+
+#: Preferences.java:105
+msgid "Persian"
+msgstr ""
+
+#: Preferences.java:106
+msgid "Polish"
+msgstr ""
+
+#: Preferences.java:107 Preferences.java:108
+msgid "Portuguese"
+msgstr ""
+
+#: Preferences.java:109
+msgid "Romanian"
+msgstr ""
+
+#: Preferences.java:110
+msgid "Russian"
+msgstr ""
+
+#: Preferences.java:111
+msgid "Spanish"
+msgstr ""
+
+#: Preferences.java:210
+msgid ""
+"Could not read default settings.\n"
+"You'll need to reinstall Arduino."
+msgstr ""
+"기본 설정을 읽을 수 없습니다.\n"
+"아두이노를 다시 설치해야 합니다."
+
+#: Preferences.java:242
+#, java-format
+msgid "Could not read preferences from {0}"
+msgstr "{0}로 부터 환경설정을 읽을 수 없습니다"
+
+#: Preferences.java:261
+msgid "Error reading preferences"
+msgstr "환경설정을 읽는 중 오류"
+
+#: Preferences.java:263
+#, java-format
+msgid ""
+"Error reading the preferences file. Please delete (or move)\n"
+"{0} and restart Arduino."
+msgstr ""
+"환경설정을 읽는 중 오류. {0}을 삭제(또는 이동)하고\n"
+"아두이노를 다시 시작합니다."
+
+#: Preferences.java:299
+msgid "Sketchbook location:"
+msgstr "스케치북 위치: "
+
+#: Preferences.java:314
+msgid "Select new sketchbook location"
+msgstr "새로운 스케치북 위치를 선택"
+
+#: Preferences.java:337
+msgid "Editor language: "
+msgstr ""
+
+#: Preferences.java:342 Preferences.java:358
+msgid "  (requires restart of Arduino)"
+msgstr "  (아두이노를 재시작해야 함)"
+
+#: Preferences.java:354
+msgid "Editor font size: "
+msgstr "에디터 글꼴 크기: "
+
+#: Preferences.java:371
+msgid "Show verbose output during: "
+msgstr "다음 동작중 자세한  출력 보이기: "
+
+#: Preferences.java:373
+msgid "compilation "
+msgstr "컴파일 "
+
+#: Preferences.java:375
+msgid "upload"
+msgstr "업로드"
+
+#: Preferences.java:384
+msgid "Verify code after upload"
+msgstr ""
+
+#: Preferences.java:393
+msgid "Use external editor"
+msgstr "외부 에디터 사용"
+
+#: Preferences.java:403
+msgid "Check for updates on startup"
+msgstr "시작시 업데이트 확인"
+
+#: Preferences.java:412
+msgid "Update sketch files to new extension on save (.pde -> .ino)"
+msgstr "스케치 파일을 저장할때 새로운 확장자(.pde -> .ino)로 업데이트"
+
+#: Preferences.java:423
+msgid "Automatically associate .ino files with Arduino"
+msgstr ".ino파일을 아두이노와 자동으로 연결합니니다."
+
+#: Preferences.java:433
+msgid "More preferences can be edited directly in the file"
+msgstr "추가적인 환경 설정은 직접 파일에서 편집할 수 있습니다"
+
+#: Preferences.java:462
+msgid "(edit only when Arduino is not running)"
+msgstr "(아두이노가 실행되지 않는 경우에만 수정 가능)"
+
+#: Preferences.java:609
+#, java-format
+msgid "ignoring invalid font size {0}"
+msgstr "잘못된 글꼴크기 {0}를 무시"

@@ -1,4 +1,4 @@
-# German translations for PACKAGE package.
+# English translations for PACKAGE package.
 # Copyright (C) 2012 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # David A. Mellis <>, 2012.
@@ -79,7 +79,7 @@ msgstr ""
 msgid "Print"
 msgstr ""
 
-#: Editor.java:576 Preferences.java:293
+#: Editor.java:576 Preferences.java:279
 msgid "Preferences"
 msgstr ""
 
@@ -320,7 +320,7 @@ msgstr ""
 
 #: Editor.java:2120 Editor.java:2131 Editor.java:2141 Editor.java:2159
 #: Sketch.java:479 Sketch.java:485 Sketch.java:500 Sketch.java:507
-#: Sketch.java:530 Sketch.java:547 Base.java:1861 Preferences.java:254
+#: Sketch.java:530 Sketch.java:547 Base.java:1861 Preferences.java:240
 msgid "Error"
 msgstr ""
 
@@ -1318,169 +1318,201 @@ msgstr ""
 msgid "Browse"
 msgstr ""
 
-#: Preferences.java:115
+#: Preferences.java:83
+msgid "System Default"
+msgstr ""
+
+#: Preferences.java:84
+msgid "Arabic"
+msgstr ""
+
+#: Preferences.java:85
+msgid "Aragonese"
+msgstr ""
+
+#: Preferences.java:86
 msgid "Catalan"
 msgstr ""
 
-#: Preferences.java:116
+#: Preferences.java:87
 msgid "Chinese Simplified"
 msgstr ""
 
-#: Preferences.java:117
-msgid "Chinese Taiwan"
+#: Preferences.java:88
+msgid "Chinese Traditional"
 msgstr ""
 
-#: Preferences.java:118
+#: Preferences.java:89
 msgid "Danish"
 msgstr ""
 
-#: Preferences.java:119
+#: Preferences.java:90
 msgid "Dutch"
 msgstr ""
 
-#: Preferences.java:120
+#: Preferences.java:91
 msgid "English"
 msgstr ""
 
-#: Preferences.java:121
+#: Preferences.java:92
+msgid "Estonian"
+msgstr ""
+
+#: Preferences.java:93
 msgid "French"
 msgstr ""
 
-#: Preferences.java:122
+#: Preferences.java:94
 msgid "Filipino"
 msgstr ""
 
-#: Preferences.java:123
+#: Preferences.java:95
 msgid "Galician"
 msgstr ""
 
-#: Preferences.java:124
+#: Preferences.java:96
 msgid "German"
 msgstr ""
 
-#: Preferences.java:125
+#: Preferences.java:97
 msgid "Greek"
 msgstr ""
 
-#: Preferences.java:126
+#: Preferences.java:98
 msgid "Hungarian"
 msgstr ""
 
-#: Preferences.java:127
+#: Preferences.java:99
+msgid "Indonesian"
+msgstr ""
+
+#: Preferences.java:100
 msgid "Italian"
 msgstr ""
 
-#: Preferences.java:128
+#: Preferences.java:101
 msgid "Japanese"
 msgstr ""
 
-#: Preferences.java:129
+#: Preferences.java:102
+msgid "Korean"
+msgstr ""
+
+#: Preferences.java:103
 msgid "Latvian"
 msgstr ""
 
-#: Preferences.java:130
+#: Preferences.java:104
+msgid "Lithuaninan"
+msgstr ""
+
+#: Preferences.java:105
 msgid "Persian"
 msgstr ""
 
-#: Preferences.java:131
-msgid "Portuguese (Brazil)"
+#: Preferences.java:106
+msgid "Polish"
 msgstr ""
 
-#: Preferences.java:132
+#: Preferences.java:107 Preferences.java:108
+msgid "Portuguese"
+msgstr ""
+
+#: Preferences.java:109
 msgid "Romanian"
 msgstr ""
 
-#: Preferences.java:133
+#: Preferences.java:110
 msgid "Russian"
 msgstr ""
 
-#: Preferences.java:134
+#: Preferences.java:111
 msgid "Spanish"
 msgstr ""
 
-#: Preferences.java:224
+#: Preferences.java:210
 msgid ""
 "Could not read default settings.\n"
 "You'll need to reinstall Arduino."
 msgstr ""
 
-#: Preferences.java:256
+#: Preferences.java:242
 #, java-format
 msgid "Could not read preferences from {0}"
 msgstr ""
 
-#: Preferences.java:275
+#: Preferences.java:261
 msgid "Error reading preferences"
 msgstr ""
 
-#: Preferences.java:277
+#: Preferences.java:263
 #, java-format
 msgid ""
 "Error reading the preferences file. Please delete (or move)\n"
 "{0} and restart Arduino."
 msgstr ""
 
-#: Preferences.java:313
+#: Preferences.java:299
 msgid "Sketchbook location:"
 msgstr ""
 
-#: Preferences.java:328
+#: Preferences.java:314
 msgid "Select new sketchbook location"
 msgstr ""
 
-#: Preferences.java:352
-msgid "Editor font size: "
+#: Preferences.java:337
+msgid "Editor language: "
 msgstr ""
 
-#: Preferences.java:356 Preferences.java:444
+#: Preferences.java:342 Preferences.java:358
 msgid "  (requires restart of Arduino)"
 msgstr ""
 
-#: Preferences.java:369
-msgid "Show verbose output during: "
+#: Preferences.java:354
+msgid "Editor font size: "
 msgstr ""
 
 #: Preferences.java:371
-msgid "compilation "
+msgid "Show verbose output during: "
 msgstr ""
 
 #: Preferences.java:373
+msgid "compilation "
+msgstr ""
+
+#: Preferences.java:375
 msgid "upload"
 msgstr ""
 
-#: Preferences.java:382
+#: Preferences.java:384
 msgid "Verify code after upload"
 msgstr ""
 
-#: Preferences.java:391
+#: Preferences.java:393
 msgid "Use external editor"
 msgstr ""
 
-#: Preferences.java:401
+#: Preferences.java:403
 msgid "Check for updates on startup"
 msgstr ""
 
-#: Preferences.java:410
+#: Preferences.java:412
 msgid "Update sketch files to new extension on save (.pde -> .ino)"
 msgstr ""
 
-#: Preferences.java:421
+#: Preferences.java:423
 msgid "Automatically associate .ino files with Arduino"
 msgstr ""
 
-#: Preferences.java:431
-msgid "Preferred Language: "
-msgstr ""
-
-#: Preferences.java:456
+#: Preferences.java:433
 msgid "More preferences can be edited directly in the file"
 msgstr ""
 
-#: Preferences.java:485
+#: Preferences.java:462
 msgid "(edit only when Arduino is not running)"
 msgstr ""
 
-#: Preferences.java:632
+#: Preferences.java:609
 #, java-format
 msgid "ignoring invalid font size {0}"
 msgstr ""
