@@ -466,6 +466,10 @@
     </exec>
   </target>
 
+  <target name="linux64-get-arm-toolchain" depends="linux-check-arm-toolchain" if="arm_not_available">
+    <antcall target="linux-get-arm-toolchain" />
+  </target>
+
   <target name="linux-dist" depends="build" 
 	  description="Build .tar.gz of linux version">
 
