@@ -150,16 +150,16 @@
   <!-- Download of toolchains for ARM      -->
   <!-- - - - - - - - - - - - - - - - - - - -->
 
-  <target name="get-arm-toolchain" description="Download and unpack toolchain for ARM">
-    <antcall target="${platform}-get-arm-toolchain" />
+  <target name="unzip-arm-toolchain" description="Unpack toolchain for ARM. Also download latest distribution file if needed.">
+    <antcall target="${platform}-unzip-arm-toolchain" />
   </target>
 
-  <target name="get-arm-toolchain-help" if="arm_not_available">
+  <target name="get-arm-toolchain-help" unless="arm_available">
     <echo>
       =========================================================
       To download and install ARM-gcc toolchain use the command
       
-      ant get-arm-toolchain
+      ant unzip-arm-toolchain
       =========================================================
     </echo>
   </target>
@@ -246,28 +246,30 @@
     <exec executable="macosx/work/Arduino.app/Contents/MacOS/JavaApplicationStub" spawn="false"/>
   </target>
 
+  <target name="macosx-check-arm-toolchain-distfile">
+    <available file="linux/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-macosx.tar.gz" property="arm_distfile_available" />
+  </target>
+
+  <target name="macosx-get-arm-toolchain" depends="macosx-check-arm-toolchain-distfile" unless="arm_distfile_available">
+    <!-- Retrieve ARM toolchain -->
+    <get 
+      src="http://arduino.googlecode.com/files/gcc-arm-none-eabi-4.4.1-2010q1-188-macos.tar.gz"
+      dest="macosx/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-macos.tar.gz" verbose="true" />
+  </target>
+
   <target name="macosx-check-arm-toolchain">
     <available file="macosx/work/Arduino.app/Contents/Resources/Java/hardware/tools/g++_arm_none_eabi" 
       property="arm_available" />
-    <condition property="arm_not_available">
-      <not>
-        <isset property="arm_available" />
-      </not>
-    </condition>
   </target>
 
-  <target name="macosx-get-arm-toolchain" depends="macosx-check-arm-toolchain" if="arm_not_available">
-    <!-- Retrieve ARM toolchain... -->
-    <get 
-      src="http://arduino.googlecode.com/files/gcc-arm-none-eabi-4.4.1-2010q1-188-macos.tar.gz"
-      dest="macosx/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-macos.tar.gz"
-      skipexisting="true" verbose="true" />
+  <target name="macosx-unzip-arm-toolchain" depends="macosx-get-arm-toolchain, macosx-check-arm-toolchain" unless="arm_available">
     <checksum file="macosx/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-macos.tar.gz" algorithm="sha" 
       fileext=".sha" verifyproperty="checksum.matches"/>
     <condition property="checksum.matches.fail">
       <equals arg1="${checksum.matches}" arg2="false"/>
     </condition>
-    <fail if="checksum.matches.fail">
+    <fail if="checksum.matches.fail">Checksum failed.
+
       File gcc-arm-none-eabi-4.4.1-2010q1-188-macos.tar.gz failed checksum. 
       Please remove "macosx/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-macos.tar.gz" to download it again.
     </fail>
@@ -433,32 +435,35 @@
     <exec executable="./linux/work/arduino" spawn="false"/>
   </target>
 
-  <target name="linux-check-arm-toolchain">
-    <available file="linux/work/hardware/tools/g++_arm_none_eabi" property="arm_available" />
-    <condition property="arm_not_available">
-      <not>
-        <isset property="arm_available" />
-      </not>
-    </condition>
+  <target name="linux-check-arm-toolchain-distfile">
+    <available file="linux/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-linux32.tar.gz" property="arm_distfile_available" />
   </target>
 
-  <target name="linux-get-arm-toolchain" depends="linux-check-arm-toolchain" if="arm_not_available">
-    <!-- Retrieve ARM toolchain... -->
+  <target name="linux-get-arm-toolchain" depends="linux-check-arm-toolchain-distfile" unless="arm_distfile_available">
+    <!-- Retrieve ARM toolchain -->
     <get 
       src="http://arduino.googlecode.com/files/gcc-arm-none-eabi-4.4.1-2010q1-188-linux32.tar.gz"
       dest="linux/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-linux32.tar.gz"
-      skipexisting="true" verbose="true" />
+      verbose="true" />
+  </target>
+
+  <target name="linux-check-arm-toolchain">
+    <available file="linux/work/hardware/tools/g++_arm_none_eabi" property="arm_available" />
+  </target>
+
+  <target name="linux-unzip-arm-toolchain" depends="linux-get-arm-toolchain, linux-check-arm-toolchain" unless="arm_available">
     <checksum file="linux/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-linux32.tar.gz" algorithm="sha" 
       fileext=".sha" verifyproperty="checksum.matches"/>
     <condition property="checksum.matches.fail">
       <equals arg1="${checksum.matches}" arg2="false"/>
     </condition>
-    <fail if="checksum.matches.fail">
+    <fail if="checksum.matches.fail">Checksum failed.
+
       File gcc-arm-none-eabi-4.4.1-2010q1-188-linux32.tar.gz failed checksum. 
-      Please remove "linux/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-linux32.tar.gz" to download again.
+      Please remove "linux/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-linux32.tar.gz" to download it again.
     </fail>
 
-    <!-- ...and unzip on the destination folder -->
+    <!-- Unzip toolchain to the destination folder -->
     <exec executable="tar" output="/dev/null" os="Linux">
       <arg value="xfz"/>
       <arg value="linux/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-linux32.tar.gz"/>
@@ -466,8 +471,12 @@
     </exec>
   </target>
 
-  <target name="linux64-get-arm-toolchain" depends="linux-check-arm-toolchain" if="arm_not_available">
+  <target name="linux64-get-arm-toolchain" depends="linux-check-arm-toolchain-distfile" unless="arm_distfile_available">
     <antcall target="linux-get-arm-toolchain" />
+  </target>
+
+  <target name="linux64-unzip-arm-toolchain" depends="linux-get-arm-toolchain" unless="arm_available">
+    <antcall target="linux-unzip-arm-toolchain" />
   </target>
 
   <target name="linux-dist" depends="build" 
