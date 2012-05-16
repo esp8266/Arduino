@@ -1,3 +1,38 @@
+ARDUINO 1.0.1
+
+[environment]
+
+* The IDE has been internationalized and translated into multiple languages.
+  Thanks to Shigeru Kanemoto for the internationalization and Japanese
+  translation and many others for the other translations.  For more
+  information, see: http://arduino.cc/playground/Main/LanguagesIDE
+
+* Added preference for selecting the language in which to display the
+  Arduino software.  Defaults to the operating system locale.  
+
+* The editor font size preference now applies to the serial monitor and
+  error / message console as well as the editor.  (Paul Stoffregen)
+
+* Compilation has been speeded up by only compiling changed files.  (All
+  files are recompiled when a new board is selected.)  (Paul Stoffregen)
+
+* Console log files (stdout.txt and stderr.txt) are now removed when the
+  Arduino software exits.  (Paul Stoffregen)
+
+* The minimum size for the Arduino software window has been reduced.
+
+* Improvements to the Find / Replace dialog.  (Peter Lewis)
+
+* Support for selecting words (on double-click) and lines (triple-click)
+  in the Arduino software.  (Peter Lewis)
+
+* Added a preference for disabling verification on upload (for increased
+  speed).  (Nathan Seidle)
+
+[core / libraries]
+
+* 
+
 ARDUINO 1.0 - 2011.11.30
 
 [environment]
