@@ -419,28 +419,25 @@
   <target name="linux-get-arm-toolchain" depends="linux-check-arm-toolchain" if="arm_not_available">
     <!-- Retrieve ARM toolchain... -->
     <get 
-      src="http://static.leaflabs.com/pub/codesourcery/gcc-arm-none-eabi-latest-linux32.tar.gz"
-      dest="linux/dist/gcc-arm-none-eabi-latest-linux32.tar.gz"
+      src="http://arduino.googlecode.com/files/gcc-arm-none-eabi-4.4.1-2010q1-188-linux32.tar.gz"
+      dest="linux/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-linux32.tar.gz"
       skipexisting="true" verbose="true" />
-    <checksum file="linux/dist/gcc-arm-none-eabi-latest-linux32.tar.gz" algorithm="sha" 
+    <checksum file="linux/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-linux32.tar.gz" algorithm="sha" 
       fileext=".sha" verifyproperty="checksum.matches"/>
     <condition property="checksum.matches.fail">
       <equals arg1="${checksum.matches}" arg2="false"/>
     </condition>
     <fail if="checksum.matches.fail">
-      File gcc-arm-none-eabi-latest-linux32.tar.gz failed checksum. 
-      Please remove "linux/dist/gcc-arm-none-eabi-latest-linux32.tar.gz" to download again.
+      File gcc-arm-none-eabi-4.4.1-2010q1-188-linux32.tar.gz failed checksum. 
+      Please remove "linux/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-linux32.tar.gz" to download again.
     </fail>
 
     <!-- ...and unzip on the destination folder -->
     <exec executable="tar" output="/dev/null" os="Linux">
       <arg value="xfz"/>
-      <arg value="linux/dist/gcc-arm-none-eabi-latest-linux32.tar.gz"/>
+      <arg value="linux/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-linux32.tar.gz"/>
       <arg value="--directory=linux/work/hardware/tools"/>
     </exec>
-
-    <move file="linux/work/hardware/tools/arm" 
-      tofile="linux/work/hardware/tools/g++_arm_none_eabi" />
 
     <copy todir="linux/work" file="linux/dist/arduino" />
     <chmod perm="755" file="linux/work/arduino" />
