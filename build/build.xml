@@ -600,12 +600,50 @@
     <chmod perm="755">
       <fileset dir="windows/work" includes="**/*.html, **/*.dll, **/*.exe" />
     </chmod>
+
+    <antcall target="get-arm-toolchain-help" />
   </target>
   
   <target name="windows-run" depends="windows-build" 
 	  description="Run windows version">
     <exec executable="windows/work/arduino.exe" 
 	  dir="windows/work" spawn="true"/>
+  </target>
+
+  <target name="windows-check-arm-toolchain-distfile">
+    <available file="windows/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-win32.tar.gz" property="arm_distfile_available" />
+  </target>
+
+  <target name="windows-get-arm-toolchain" depends="windows-check-arm-toolchain-distfile" unless="arm_distfile_available">
+    <!-- Retrieve ARM toolchain -->
+    <get 
+      src="http://arduino.googlecode.com/files/gcc-arm-none-eabi-4.4.1-2010q1-188-win32.tar.gz"
+      dest="windows/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-win32.tar.gz"
+      verbose="true" />
+  </target>
+
+  <target name="windows-check-arm-toolchain">
+    <available file="windows/work/hardware/tools/g++_arm_none_eabi" property="arm_available" />
+  </target>
+
+  <target name="windows-unzip-arm-toolchain" depends="windows-get-arm-toolchain, windows-check-arm-toolchain" unless="arm_available">
+    <checksum file="windows/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-win32.tar.gz" algorithm="sha" 
+      fileext=".sha" verifyproperty="checksum.matches"/>
+    <condition property="checksum.matches.fail">
+      <equals arg1="${checksum.matches}" arg2="false"/>
+    </condition>
+    <fail if="checksum.matches.fail">Checksum failed.
+
+      File gcc-arm-none-eabi-4.4.1-2010q1-188-win32.tar.gz failed checksum. 
+      Please remove "windows/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-win32.tar.gz" to download it again.
+    </fail>
+
+    <!-- Unzip toolchain to the destination folder -->
+    <exec executable="tar">
+      <arg value="xfz"/>
+      <arg value="windows/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-win32.tar.gz"/>
+      <arg value="--directory=windows/work/hardware/tools"/>
+    </exec>
   </target>
 
   <target name="windows-dist" depends="windows-build" 
