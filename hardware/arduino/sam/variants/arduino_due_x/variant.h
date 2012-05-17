@@ -92,6 +92,7 @@ extern "C"{
 #define PIN_SPI_MOSI         (75u)
 #define PIN_SPI_MISO         (74u)
 #define PIN_SPI_SCK          (76u)
+#define SPI_PIN_TO_SPI_CHANNEL(x) (x==PIN_SPI_SS0 ? 0 : (x==PIN_SPI_SS1 ? 1 : (x==PIN_SPI_SS2 ? 2 : 3)))
 
 static const uint8_t SS   = PIN_SPI_SS0 ;
 static const uint8_t SS1  = PIN_SPI_SS1 ;

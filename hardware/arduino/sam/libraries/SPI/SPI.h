@@ -19,42 +19,45 @@
 #define SPI_MODE2 0x03
 #define SPI_MODE3 0x01
 
+enum SPITransferMode {
+	SPI_CONTINUE,
+	SPI_LAST
+};
+
 class SPIClass {
   public:
-	SPIClass(Spi *_spi, uint32_t _id, void(*_initCb)(void), uint32_t *_ss);
+	SPIClass(Spi *_spi, uint32_t _id, void(*_initCb)(void));
 
-	byte transfer(byte _data, uint8_t _channel = 0, bool _last = true);
+	byte transfer(byte _channel, uint8_t _data, SPITransferMode _mode = SPI_LAST);
 
 	// SPI Configuration methods
 
 	void attachInterrupt(void);
 	void detachInterrupt(void);
 
-	void begin(void);
-	void addSlave(uint8_t _channel);
+	void begin(uint8_t _channel);
 	void end(void);
 
 	// These methods sets the same parameters on all channels
-	void setBitOrder(uint8_t);
+	//void setBitOrder(uint8_t);
 	void setDataMode(uint8_t);
 	void setClockDivider(uint8_t);
 
 	// These methods sets a parameter on a single channel
-	void setBitOrder(uint8_t, uint8_t _channel);
-	void setDataMode(uint8_t, uint8_t _channel);
-	void setClockDivider(uint8_t, uint8_t _channel);
+	// void setBitOrder(uint8_t _channel, uint8_t);
+	void setDataMode(uint8_t _channel, uint8_t);
+	void setClockDivider(uint8_t _channel, uint8_t);
 
   private:
 	Spi *spi;
 	uint32_t id;
 	uint32_t divider[SPI_CHANNELS_NUM];
 	uint32_t mode[SPI_CHANNELS_NUM];
-	uint32_t ssPins[SPI_CHANNELS_NUM];
 	void (*initCb)(void);
 };
 
 #if SPI_INTERFACES_COUNT > 0
-extern SPIClass SPI_0;
+extern SPIClass SPI;
 #endif
 
 #endif
