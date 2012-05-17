@@ -229,7 +229,7 @@
   </target>
 
   <target name="macosx-check-arm-toolchain-distfile">
-    <available file="linux/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-macosx.tar.gz" property="arm_distfile_available" />
+    <available file="macosx/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-macos.tar.gz" property="arm_distfile_available" />
   </target>
 
   <target name="macosx-get-arm-toolchain" depends="macosx-check-arm-toolchain-distfile" unless="arm_distfile_available">
