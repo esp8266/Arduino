@@ -146,24 +146,6 @@
 	  message="Fix revision number in Base.java" />
   </target>
   
-  <!-- - - - - - - - - - - - - - - - - - - -->
-  <!-- Download of toolchains for ARM      -->
-  <!-- - - - - - - - - - - - - - - - - - - -->
-
-  <target name="unzip-arm-toolchain" description="Unpack toolchain for ARM. Also download latest distribution file if needed.">
-    <antcall target="${platform}-unzip-arm-toolchain" />
-  </target>
-
-  <target name="get-arm-toolchain-help" unless="arm_available">
-    <echo>
-      =========================================================
-      To download and install ARM-gcc toolchain use the command
-      
-      ant unzip-arm-toolchain
-      =========================================================
-    </echo>
-  </target>
-
   <!-- - - - - - - - -->
   <!-- Mac OS X      -->
   <!-- - - - - - - - -->
@@ -235,7 +217,7 @@
       <param name="target.path" value="macosx/work/Arduino.app/Contents/Resources/Java" />
     </antcall>
 
-    <antcall target="get-arm-toolchain-help" />
+    <antcall target="macosx-unzip-arm-toolchain" />
   </target>
 
   <target name="macosx-run" depends="macosx-build" description="Run Mac OS X version">
@@ -417,7 +399,7 @@
     <copy todir="linux/work" file="linux/dist/arduino" />
     <chmod perm="755" file="linux/work/arduino" />
 
-    <antcall target="get-arm-toolchain-help" />
+    <antcall target="linux-unzip-arm-toolchain" />
   </target>
 
   <target name="linux64-build" depends="linux-build" description="Build linux (64-bit) version">
@@ -601,7 +583,7 @@
       <fileset dir="windows/work" includes="**/*.html, **/*.dll, **/*.exe" />
     </chmod>
 
-    <antcall target="get-arm-toolchain-help" />
+    <antcall target="windows-unzip-arm-toolchain" />
   </target>
   
   <target name="windows-run" depends="windows-build" 
