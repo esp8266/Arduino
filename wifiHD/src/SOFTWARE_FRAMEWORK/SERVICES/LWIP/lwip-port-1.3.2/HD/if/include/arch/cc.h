@@ -1,5 +1,3 @@
-/* This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0 Release */
-
 /*
  * Copyright (c) 2001-2003 Swedish Institute of Computer Science.
  * All rights reserved. 
@@ -34,11 +32,6 @@
 #ifndef __ARCH_CC_H__
 #define __ARCH_CC_H__
 
-/* Include some files for defining library routines */
-#include <string.h>
-#include <sys/time.h>
-#include "printf-stdarg.h"
-
 /* Define platform endianness */
 #ifndef BYTE_ORDER
 #define BYTE_ORDER BIG_ENDIAN
@@ -68,13 +61,19 @@ typedef u32_t mem_ptr_t;
 #define PACK_STRUCT_BEGIN
 #define PACK_STRUCT_END
 
-/* prototypes for printf() and abort() */
-#include <stdio.h>
-#include <stdlib.h>
 /* Plaform specific diagnostic output */
-#define LWIP_PLATFORM_DIAG(x)	do {printk x;} while(0)
+#ifdef CONFIG_OWL
+# include <owl/core/owl_debug.h>
+# define LWIP_PLATFORM_DIAG(x)	owl_printf x
+# define LWIP_PLATFORM_ASSERT(x) owl_assert(x)
+#else
+# include <printf-stdarg.h>
+# define LWIP_PLATFORM_DIAG(x)	do { printk x; } while(0)
+# define LWIP_PLATFORM_ASSERT(x) do {                                   \
+        printk("Assertion \"%s\" failed at line "                       \
+               "%d in %s\n",                                            \
+               x, __LINE__, __FILE__); while(1);                        \
+    } while(0)
+#endif
 
-#define LWIP_PLATFORM_ASSERT(x) do {printk("Assertion \"%s\" failed at line %d in %s\n", \
-                                     x, __LINE__, __FILE__); fflush(NULL); abort();} while(0)
-				     
 #endif /* __ARCH_CC_H__ */

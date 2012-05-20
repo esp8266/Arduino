@@ -22,6 +22,7 @@
 #define INFO_D (1<<0xD)     // Debug
 #define INFO_E (1<<0xE)     // Error
 #define INFO_WARN_FLAG (1<<0xF)     // Warning
+#define DEFAULT_INFO_FLAG 0 //INFO_WARN_FLAG
 
 extern uint16_t enableDebug;
 extern uint16_t verboseDebug;

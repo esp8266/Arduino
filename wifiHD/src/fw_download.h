@@ -31,8 +31,8 @@
 #define FW_DOWNLOAD_H
 
 #include <stdint.h>
+#include <stdio.h>
 
 int fw_download_init(void);
-void fw_download_cb(void *ctx, uint8_t** buf, uint32_t* len);
-
+size_t fw_read_cb(void *ctx, const uint8_t** buf, size_t offset, size_t len);
 #endif

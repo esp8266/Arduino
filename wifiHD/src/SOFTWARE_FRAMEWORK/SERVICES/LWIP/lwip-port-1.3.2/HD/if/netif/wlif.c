@@ -1,5 +1,3 @@
-/* This source file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0 Release */
-
 #include "lwip/opt.h"
 #include "lwip/def.h"
 #include "lwip/mem.h"
@@ -8,7 +6,8 @@
 #include "lwip/sys.h"
 #include "netif/etharp.h"
 #include "netif/wlif.h"
-#include "wl_api.h"
+#include <wl_api.h>
+#include <wlap_api.h>
 
 #define IFNAME0 'w'
 #define IFNAME1 'l'
@@ -70,7 +69,8 @@ static err_t process_pqueue(struct netif* netif)
                 p->len - WL_HEADER_SIZE,     /* input buffer len */
                 p->tot_len - WL_HEADER_SIZE, /* pkt len */
                 p->payload,                  /* ptr to WE hdr */
-                0);                          /* prio */
+                0,                           /* prio */
+                p);                          /* pkt handle */
 
         /* if we fail due to power save mode, leave packet in queue and
          * try again when target is awake again (upon WL_RX_EVENT_WAKEUP).
@@ -127,8 +127,10 @@ static err_t
 low_level_init(struct netif *netif)
 {
         /* device capabilities */
-        netif->flags = NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP | NETIF_FLAG_IGMP |
-		NETIF_FLAG_LINK_UP;
+        netif->flags = NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP |
+                NETIF_FLAG_IGMP;
+        
+        /* NETIF_FLAG_LINK_UP must be set only when we have an wlan assoc */
 
         /* set MAC hardware address length */
         netif->hwaddr_len = ETHARP_HWADDR_LEN;
@@ -207,14 +209,19 @@ low_level_input(struct netif *netif)
 
         /* We allocate a continous pbuf */
         p = pbuf_alloc(PBUF_RAW, len, PBUF_RAM);
-        if (p == NULL)
+        if (p == NULL) {
+                LWIP_DEBUGF(NETIF_DEBUG, ("low_level_input: fail to alloc "
+                                          "pbuf of len:%"S32_F"\n", len));
                 return NULL;
+        }
 
         /* Read the entire msg */
-        wl_rx(p->payload, &len);
 	priv->rx_pending = 0;
-        if (len == 0)
+        wl_rx(p->payload, &len);
+        if (len == 0) {
+                LWIP_DEBUGF(NETIF_DEBUG, ("low_level_input: len was 0"));
                 return NULL;
+        }
 
         status = wl_process_rx(
                 p->payload,             /* input buf */
@@ -224,6 +231,7 @@ low_level_input(struct netif *netif)
                 &vlan);
 
         if (status == WL_ABSORBED) {
+                LWIP_DEBUGF(NETIF_DEBUG, ("low_level_input: absorbed"));
                 pbuf_free(p);
                 return NULL;
         }
@@ -284,6 +292,23 @@ wlif_input(struct netif *netif)
         }
 }
 
+static ssize_t pkt_read_cb(char *dst,
+                           void *src_handle,
+                           size_t read_len,
+                           int offset) {
+        ssize_t rc;
+
+        rc = pbuf_copy_partial((struct pbuf *)src_handle,
+                               dst,
+                               read_len,
+                               offset + WL_HEADER_SIZE);
+        if ( 0 == rc ) {
+                return -1;
+        }
+
+        return rc;
+}
+
 /**
  * Should be called at the beginning of the program to set up the
  * network interface. It calls the function low_level_init() to do the
@@ -299,13 +324,15 @@ wlif_input(struct netif *netif)
 err_t
 wlif_init(struct netif *netif)
 {
-	static struct wlif_t wlif = { 0 };
+        static struct wlif_t wlif;
 
         LWIP_ASSERT("netif != NULL", (netif != NULL));
 
 #if LWIP_NETIF_HOSTNAME
         /* Initialize interface hostname */
-        netif->hostname = "wlif";
+        if ( NULL == netif->hostname ) {
+                netif->hostname = "wlif";
+        }
 #endif /* LWIP_NETIF_HOSTNAME */
 
 	netif->state = &wlif;
@@ -320,6 +347,7 @@ wlif_init(struct netif *netif)
         netif->linkoutput = low_level_output;
 	
 	wl_register_rx_isr(rx_isr, netif);
+        wl_register_pkt_read_cb(pkt_read_cb);
 
         /* initialize the hardware */
         return low_level_init(netif);
@@ -332,7 +360,13 @@ wlif_init(struct netif *netif)
 void
 wlif_poll(struct netif* netif)
 {
-	struct wlif_t* priv = (struct wlif_t*) netif->state;
+        struct wlif_t* priv = NULL;
+
+        /* wl api forward progress */
+        wl_poll();
+
+        if (netif)
+                priv = (struct wlif_t*) netif->state;
 
         /* wlif_init() not called yet? */
         if (priv == NULL)

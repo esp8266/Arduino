@@ -30,10 +30,18 @@
 #ifndef CMD_CM_H
 #define CMD_CM_H
 
-#include "console.h"
+#include <console.h>
+#include "netif/wlif.h"
+
+/*! A pointer to a struct of type "struct net_cfg" should be passed as
+ *  the ctx pointer in the callbacks below. The struct must have a
+ *  single instance per netif.
+ */
+#define _DNS_CMD_
 
 cmd_state_t cmd_scan(int argc, char* argv[], void* ctx);
 cmd_state_t cmd_connect(int argc, char* argv[], void* ctx);
+cmd_state_t cmd_set_ip(int argc, char* argv[], void* ctx);
 cmd_state_t cmd_setkey(int argc, char* argv[], void* ctx);
 cmd_state_t cmd_status(int argc, char* argv[], void* ctx);
 cmd_state_t cmd_power(int argc, char* argv[], void* ctx);
@@ -41,5 +49,10 @@ cmd_state_t cmd_psconf(int argc, char* argv[], void* ctx);
 cmd_state_t cmd_setpass(int argc, char* argv[], void* ctx);
 cmd_state_t cmd_delpass(int argc, char* argv[], void* ctx);
 cmd_state_t cmd_debug(int argc, char* argv[], void* ctx);
+cmd_state_t cmd_debug_toggle(int argc, char* argv[], void* ctx);
+#ifdef WFE_6_12
+cmd_state_t cmd_ibss(int argc, char* argv[], void* ctx);
+#endif
+
 
 #endif

@@ -11,6 +11,7 @@
 #include "board.h"
 #include "gpio.h"
 
+#include <stdint.h>
 #include "wl_api.h"
 #include "wl_cm.h"
 
@@ -21,16 +22,26 @@
 #include "netif/etharp.h"
 #include "netif/wlif.h"
 
+#include "board_init.h"
 #include "startup.h"
 #include "trace.h"
 
 #include "timer.h"
-#include "wl_util.h"
 #include "util.h"
 #include "cmd_wl.h"
 #include "httpd.h"
 #include "ping.h"
 #include "ard_tcp.h"
+#include "spi.h"
+#include "ard_spi.h"
+#include "delay.h"
+#include "tc.h"
+#include "debug.h"
+#include "ard_utils.h"
+#include <lwip_setup.h>
+
+
+//void board_init(void);
 
 #if BOARD == ARDUINO
 #if !defined(DATAFLASH)
@@ -69,76 +80,22 @@ void fw_download_cb(void* ctx, uint8_t** buf, uint32_t* len)
 #endif
 #endif
 
-#include "spi.h"
-#include "ard_spi.h"
-#include "delay.h"
-#include "tc.h"
-#include "debug.h"
-#include "ard_utils.h"
-
 struct ctx_server {
-	struct netif *netif;
-	//uint8_t wl_init_complete;
+	struct net_cfg net_cfg;
+	uint8_t wl_init_complete;
 };
 
 // to maintain the word alignment
-#define PAD_CTX_SIZE 	0x18
-#define PAD_NETIF_SIZE 	0x3c
+//#define PAD_CTX_SIZE 	0x18
+//#define PAD_NETIF_SIZE 	0x3c
+#define PAD_CTX_SIZE 	0
+#define PAD_NETIF_SIZE 	0
 
 static bool initSpiComplete = false;
 
 // variable used as enable flag for debug prints
-uint16_t enableDebug = 0; //INFO_WARN_FLAG;
+uint16_t enableDebug = DEFAULT_INFO_FLAG;
 uint16_t verboseDebug = 0;
-
-/**
- *
- */
-static void
-tcp_tmr_cb(void *ctx)
-{
-	tcp_tmr();
-}
-
-
-/**
- *
- */
-static void
-etharp_tmr_cb(void *ctx)
-{
-	etharp_tmr();
-}
-
-
-/**
- *
- */
-static void
-dhcp_fine_tmr_cb(void *ctx)
-{
-	dhcp_fine_tmr();
-}
-
-
-/**
- *
- */
-static void
-dhcp_coarse_tmr_cb(void *ctx)
-{
-	dhcp_coarse_tmr();
-}
-
-/**
- *
- */
-static void
-dns_tmr_cb(void *ctx)
-{
-	dns_tmr();
-}
-
 
 /**
  *
@@ -162,10 +119,16 @@ wl_cm_conn_cb(struct wl_network_t* net, void* ctx)
 	INFO_INIT("Connection cb...\n");
 
 	printk("link up, connected to \"%s\"\n", ssid2str(&net->ssid));
-    printk("requesting dhcp ... ");
-
-    INFO_INIT("Start DHCP...\n");
-    dhcp_start(hs->netif);
+    if ( hs->net_cfg.dhcp_enabled ) {
+			INFO_INIT("Start DHCP...\n");
+		    printk("requesting dhcp ... ");
+            int8_t result = dhcp_start(hs->net_cfg.netif);
+            printk((result==ERR_OK)?"OK\n":"FAILED\n");
+            hs->net_cfg.dhcp_running = 1;
+    }
+    else {
+            netif_set_up(hs->net_cfg.netif);
+    }
 
     INFO_INIT("Start DNS...\n");
     dns_init();
@@ -183,12 +146,14 @@ wl_cm_disconn_cb(void* ctx)
 	LINK_LED_OFF();
 	INFO_INIT("Disconnection cb...\n");
 
-    if (netif_is_up(hs->netif)) {
+    if (hs->net_cfg.dhcp_running) {
     	printk("link down, release dhcp\n");
-        dhcp_release(hs->netif);
-        dhcp_stop(hs->netif);
+        dhcp_release(hs->net_cfg.netif);
+        dhcp_stop(hs->net_cfg.netif);
+        hs->net_cfg.dhcp_running = 0;
      } else {
     	 printk("link down\n");
+    	 netif_set_down(hs->net_cfg.netif);
      }
 
      set_result_cmd(WL_FAILURE);
@@ -284,11 +249,6 @@ void tc_init(void)
 
 }
 
-
-void wifi_init()
-{
-}
-
 /**
  *
  */
@@ -302,12 +262,12 @@ poll(struct ctx_server* hs)
         console_poll();
 
         /* wl api 'tick' */
-        wl_poll(timer_get_ms());
+        wl_tick(timer_get_ms());
 
         /* lwip driver poll */
-        wlif_poll(hs->netif);
+        wlif_poll(hs->net_cfg.netif);
 
-        if (initSpiComplete) spi_poll(hs->netif);
+        if (initSpiComplete) spi_poll(hs->net_cfg.netif);
 
 #ifdef WITH_GUI
         gui_exec(timer_get_ms());
@@ -343,6 +303,7 @@ void initShell()
 #endif
 #ifdef _DNS_CMD_
         console_add_cmd("getHost", cmd_gethostbyname, NULL);
+        console_add_cmd("setDNS", cmd_setDnsServer, NULL);
 #endif
 }
 
@@ -353,48 +314,46 @@ void
 wl_init_complete_cb(void* ctx) 
 {
 	struct ctx_server *hs = ctx;
-        struct ip_addr ipaddr, netmask, gw;
+    struct ip_addr ipaddr, netmask, gw;
 	wl_err_t wl_status;
 	
-        IP4_ADDR(&gw, 0,0,0,0);
-        IP4_ADDR(&ipaddr, 0,0,0,0);
-        IP4_ADDR(&netmask, 0,0,0,0);
+	IP4_ADDR(&gw, 0,0,0,0);
+    IP4_ADDR(&ipaddr, 0,0,0,0);
+    IP4_ADDR(&netmask, 0,0,0,0);
         
-	/* add wl to lwip interface list and set as default */
-        hs->netif = netif_add(hs->netif, &ipaddr, &netmask, &gw, NULL,
-			      wlif_init, /* init */
-			      ethernet_input /* handles ARP and IP packets */);
-	ASSERT(hs->netif, "failed to add netif");
-        netif_set_default(hs->netif);
-        netif_set_status_callback(hs->netif, ip_status_cb);
+    /* default is dhcp enabled */
+    hs->net_cfg.dhcp_enabled = 1;
+    start_ip_stack(&hs->net_cfg,
+                   ipaddr,
+                   netmask,
+                   gw);
+    netif_set_status_callback(hs->net_cfg.netif, ip_status_cb);
 
-	/* register lwip timer callbacks for tcp, arp and dhcp protocols */
-        timer_sched_timeout_cb(5000, TIMEOUT_PERIODIC, 
-			       etharp_tmr_cb, hs);
-        timer_sched_timeout_cb(TCP_TMR_INTERVAL, TIMEOUT_PERIODIC, 
-			       tcp_tmr_cb, hs);
-        timer_sched_timeout_cb(DHCP_FINE_TIMER_MSECS, TIMEOUT_PERIODIC,
-			       dhcp_fine_tmr_cb, hs);
-        timer_sched_timeout_cb(DHCP_COARSE_TIMER_MSECS, TIMEOUT_PERIODIC,
-			       dhcp_coarse_tmr_cb, hs);
-//        timer_sched_timeout_cb(DNS_TMR_INTERVAL, TIMEOUT_PERIODIC,
-//			       dns_tmr_cb, NULL);
-
-
-
-        if (initSpi())
-        	WARN("Spi not initialized\n");
-        else
-        {
-        	initSpiComplete = true;
-        	AVAIL_FOR_SPI();
-        }
-
+    INFO_INIT("Starting CM...\n");
     /* start connection manager */
-   	INFO_INIT("Starting CM...\n");
+    wl_status = wl_cm_init(NULL, wl_cm_conn_cb, wl_cm_disconn_cb, hs);
+    ASSERT(wl_status == WL_SUCCESS, "failed to init wl conn mgr");
+    wl_cm_start();
 
-	wl_status = wl_cm_start(wl_cm_scan_cb, wl_cm_conn_cb, wl_cm_disconn_cb, wl_cm_err_cb, hs);
-	ASSERT(wl_status == WL_SUCCESS, "failed to init wl conn mgr");
+    wl_scan();
+
+    initShell();
+
+    if (initSpi()){
+    	WARN("Spi not initialized\n");
+    }else
+    {
+    	initSpiComplete = true;
+        AVAIL_FOR_SPI();
+    }
+
+    hs->wl_init_complete = 1;
+}
+
+void startup_init(void)
+{
+	INIT_SIGNAL_FOR_SPI();
+	BUSY_FOR_SPI();
 }
 
 /**
@@ -406,12 +365,13 @@ main(void)
 	wl_err_t wl_status;
 	int status;
 	struct ctx_server *hs;
+    enum wl_host_attention_mode mode;
 
     startup_init();
 
-    led_init();
+    board_init();
 
-    wifi_init();
+    led_init();
 
     tc_init();
 
@@ -430,45 +390,58 @@ main(void)
 #else
     printk("Arduino Wifi Startup... [%s]\n", __TIMESTAMP__);
 
-    initShell();
-
     size_t size_ctx_server = sizeof(struct ctx_server)+PAD_CTX_SIZE;
 	hs = calloc(1, size_ctx_server);
 	ASSERT(hs, "out of memory");
 
 	size_t size_netif = sizeof(struct netif)+PAD_NETIF_SIZE;
-	hs->netif = calloc(1, size_netif);
-	ASSERT(hs->netif, "out of memory");
+	hs->net_cfg.netif = calloc(1, size_netif);
+	ASSERT(hs->net_cfg.netif, "out of memory");
 
 	INFO_INIT("hs:%p size:0x%x netif:%p size:0x%x\n", hs, size_ctx_server,
-			hs->netif, size_netif);
-        timer_init(NULL, NULL);
-        lwip_init();
+			hs->net_cfg.netif, size_netif);
+
+	timer_init(NULL, NULL);
+    lwip_init();
         
 	status = fw_download_init();
 	ASSERT(status == 0, "failed to prepare for firmware download\n");
 
-        wl_status = wl_init(hs, fw_download_cb, wl_init_complete_cb);
-        switch (wl_status) {
-        case WL_SUCCESS:
-                /* ok */
-                break;
+    wl_status = wl_transport_init(fw_read_cb, hs, &mode);
+    if (wl_status != WL_SUCCESS)
+            goto err;
+    INFO_INIT("Mode: 0x%x\n", mode);
+    wl_status = wl_init(hs, wl_init_complete_cb, mode);
+    if (wl_status != WL_SUCCESS)
+            goto err;
 
-        case WL_CARD_FAILURE:
-                printk("Could not detect wl device, aborting\n");
-                return -1;
+    /* start main loop */
+    for (;;)
+            poll(hs);
 
-        case WL_FIRMWARE_INVALID:
-                printk("Invalid firmware data, aborting\n");
-                return -1;
 
-        default:
-                printk("Failed to start wl initialization\n");
-                return -1;
-        }
+err:
+    /* show error message on console and display if wlan initialization fails */
 
-	/* start main loop */
-        for (;;)
-                poll(hs);
+#define WL_CARD_FAILURE_STR     "Could not detect wl device, aborting\n"
+#define WL_FIRMWARE_INVALID_STR "Invalid firmware data, aborting\n"
+#define WL_OTHER_FAILURE_STR    "Failed to start wl initialization\n"
+
+    switch (wl_status) {
+    case WL_CARD_FAILURE:
+            printk(WL_CARD_FAILURE_STR);
+            break;
+
+    case WL_FIRMWARE_INVALID:
+            printk(WL_FIRMWARE_INVALID_STR);
+            break;
+
+    default:
+            printk(WL_OTHER_FAILURE_STR);
+            break;
+    }
+    for (;;) {
+            timer_poll();
+    }
 #endif
 }

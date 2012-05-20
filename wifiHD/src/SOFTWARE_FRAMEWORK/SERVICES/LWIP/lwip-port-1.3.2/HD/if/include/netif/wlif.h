@@ -1,5 +1,3 @@
-/* This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0 Release */
-
 #ifndef __NETIF_NRWLANIF_H__
 #define __NETIF_NRWLANIF_H__
 

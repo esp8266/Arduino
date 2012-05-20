@@ -1,5 +1,3 @@
-/* This source file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0 Release */
-
 /* This source file is part of the ATMEL AVR32-SoftwareFramework-AT32UC3A-1.4.0 Release */
 
 /*This file has been prepared for Doxygen automatic documentation generation.*/
@@ -71,20 +69,17 @@
 */
 
 
-#include <sys/reent.h>
 #include <stdarg.h>
-
-#define putchar(c) print_dbg_char(c)
 
 static void printchar(char **str, int c)
 {
-	extern int putchar(int c);
+        extern int board_putchar(char c);
 	
 	if (str) {
 		**str = c;
 		++(*str);
 	}
-	else (void)putchar(c);
+	else (void) board_putchar(c);
 }
 
 #define PAD_RIGHT 1
@@ -166,10 +161,13 @@ static int printi(char **out, int i, int b, int sg, int width, int pad, int letb
 	return pc + prints (out, s, width, pad);
 }
 
+#if 0
 int fprintf(__FILE *stream, const char *format, ...)
 {
 return 0;
 }
+#endif
+
 int printk_va(char **out, const char *format, va_list args )
 {
 	register int width, pad;
@@ -247,6 +245,7 @@ int printk(const char *format, ...)
         return printk_va( 0, format, args );
 }
 
+#ifndef __ARM__
 int sprintf(char *out, const char *format, ...)
 {
         va_list args;
@@ -254,6 +253,7 @@ int sprintf(char *out, const char *format, ...)
         va_start( args, format );
         return printk_va( &out, format, args );
 }
+#endif
 
 #ifdef TEST_PRINTF
 int main(void)

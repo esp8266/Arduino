@@ -1,50 +1,13 @@
-/* This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0 Release */
-
-/*! \page License
- * Copyright (C) 2009, H&D Wireless AB All rights reserved.
+/*
+ *  Programming interface for wl_api.
+ *  Copyright (C) 2010 HD Wireless AB
  *
- * The license to use this software in whole and in part and to
- * redistribute it in any form follows with the WiFi HW module from H&D
- * Wireless and is granted under the following restrictions:
- *
- * 1. Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * 3. The name of H&D Wireless AB may not be used to endorse or promote
- * products derived from this software without specific prior written
- * permission.
- *
- * 4. The software may only be used together with hardware from H&D
- * Wireless all other use is prohibited.
- *
- * 5. The license to use and redistribute the software is granted
- * together with the purchase of a hardware platform on a one to one
- * basis
- *
- * 6. The binary code may not be reversed engineered or by other means
- * copied to circumvent this license.
- *
- * THIS SOFTWARE IS PROVIDED BY H&D WIRELESS AB ``AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT
- * SHALL HD WIRELESS AB BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
- * OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * For more information regarding this software license Contact H&D
- * Wireless AB (support@hd-wireless.se).
+ *  You should have received a copy of the license along with this library.
  */
+
+#ifndef WITHOUT_STDINT
 #include <stdint.h>
+#endif
 const uint8_t fw_buf[154188] = {
     0x10, 0x61, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 
     0x30, 0x00, 0x00, 0x00, 0x10, 0x61, 0x04, 0x00, 
@@ -11319,7 +11282,7 @@ const uint8_t fw_buf[154188] = {
     0x24, 0x01, 0x07, 0x00, 0x32, 0x00, 0x00, 0x00, 
     0xe8, 0x03, 0x00, 0x00, 0x40, 0x06, 0x01, 0x00, 
     0x06, 0x00, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 
-    0x4e, 0x61, 0x6e, 0x6f, 0x72, 0x61, 0x64, 0x69, 
+    0x41, 0x6e, 0x62, 0x69, 0x7e, 0x64, 0x61, 0x6f, 
     0x6f, 0x00, 0x00, 0x00, 0x52, 0x65, 0x6c, 0x65, 
     0x61, 0x73, 0x65, 0x20, 0x36, 0x5f, 0x37, 0x5f, 
     0x31, 0x35, 0x20, 0x42, 0x75, 0x69, 0x6c, 0x64, 
@@ -11819,8 +11782,8 @@ const uint8_t fw_buf[154188] = {
     0x00, 0x00, 0x00, 0x00, 0x38, 0x4e, 0x01, 0x00, 
     0x0e, 0x00, 0x00, 0x64, 0x9c, 0x57, 0x01, 0x01, 
     0x91, 0x88, 0x41, 0xe3, 0x3c, 0x00, 0x38, 0x4e, 
-    0x01, 0x00, 0x4e, 0x61, 0x6e, 0x6f, 0x72, 0x61, 
-    0x64, 0x69, 0x6f, 0x20, 0x41, 0x42, 0x00, 0x00, 
+    0x01, 0x00, 0x6e, 0x41, 0x67, 0x6f, 0xe2, 0x65, 
+    0x60, 0x69, 0x6f, 0x20, 0x41, 0x42, 0x00, 0x00, 
     0x00, 0x00, 0xf0, 0x4d, 0x01, 0x00, 0x09, 0x00, 
     0x00, 0x0a, 0x48, 0x4e, 0x01, 0x00, 0x01, 0x00, 
     0x00, 0x0a, 0xe8, 0x4d, 0x01, 0x00, 0x01, 0x00, 

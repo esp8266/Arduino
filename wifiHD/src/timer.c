@@ -1,5 +1,3 @@
-/* This source file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0 Release */
-
 /*! \page License
  * Copyright (C) 2009, H&D Wireless AB All rights reserved.
  *
@@ -31,7 +29,13 @@
 #include <stdint.h>
 #include <rtc.h>
 #include <intc.h>
-#include "timer.h"
+#include <timer.h>
+#ifdef FREERTOS_USED
+#include "FreeRTOS.h"
+#include "task.h"
+#endif
+
+#define TIMER_HZ 4
 
 
 struct timeout_t {
@@ -45,36 +49,70 @@ struct timeout_t {
 
 struct timer_t {
         volatile U32 tick;
-        struct timeout_t timeout[8];
+        struct timeout_t timeout[10];
         void (*tick_isr) (void* ctx);
         const U32 MS_PER_TICK;
-	void *ctx;
+        void *ctx;
 };
 
 #define ARRAY_SIZE(a) sizeof(a) / sizeof(a[0])
 
-static __attribute__((__interrupt__)) void irq_handler(void);
 
 static struct timer_t TIMER = {
         .tick = 0,
+#ifdef FREERTOS_USED
+        .MS_PER_TICK = 1 / portTICK_RATE_MS,
+#else
         .MS_PER_TICK = TIMER_HZ,
+#endif
         .timeout = { { 0 } },
 };
+
+#ifdef FREERTOS_USED /* Use TICK-hook */
+
+void vApplicationTickHook( void ) {
+        struct timer_t* priv = &TIMER;
+        priv->tick++;
+        if(priv->tick_isr) {
+                priv->tick_isr(priv->ctx);
+        }
+}
+
+#else /* Use interrupt directly */
+
+static __attribute__((__interrupt__)) void irq_handler(void)
+{
+        volatile avr32_rtc_t *rtc = &AVR32_RTC;
+        struct timer_t* priv = &TIMER;
+        priv->tick++;
+
+        if(priv->tick_isr)
+                priv->tick_isr(priv->ctx);
+        
+        rtc->icr = AVR32_RTC_ICR_TOPI_MASK;
+        rtc->isr;
+}
+
+#endif
 
 void timer_init(void (*tick_isr) (void* ctx), void* ctx)
 {
         struct timer_t* priv = &TIMER;
         uint8_t id;
         
+#ifndef FREERTOS_USED
         INTC_register_interrupt(&irq_handler, AVR32_RTC_IRQ, AVR32_INTC_INT0);
         if (!rtc_init(&AVR32_RTC, RTC_OSC_RC, 0))
                 Assert(0);
 
-	priv->tick_isr = tick_isr;
-	priv->ctx = ctx;
         rtc_set_top_value(&AVR32_RTC, 115 * priv->MS_PER_TICK / 2);
         rtc_enable_interrupt(&AVR32_RTC);
         rtc_enable(&AVR32_RTC);
+#else
+        /* With FreeRTOS we use the OS tick instead */
+#endif
+        priv->tick_isr = tick_isr;
+        priv->ctx = ctx;
 
         for (id = 0; id < ARRAY_SIZE(priv->timeout); id++)
                 priv->timeout[id].expired = TRUE;
@@ -162,6 +200,16 @@ U32 timer_sched_timeout_cb(U32 ms, U8 type, void (*cb)(void *ctx), void* ctx)
 }
 
 
+U32 timer_mod(U32 id, U32 ms, U8 type, void (*cb)(void *ctx), void* ctx)
+{
+        struct timer_t* priv = &TIMER;
+
+        if (id != INVALID_TIMER_ID && !priv->timeout[id].expired)
+                timer_cancel_timeout(id);
+        
+        return timer_sched_timeout_cb(ms, type, cb, ctx);
+}
+
 void timer_cancel_timeout(U32 id)
 {
         struct timer_t* priv = &TIMER;
@@ -171,15 +219,14 @@ void timer_cancel_timeout(U32 id)
         tmo->expired = TRUE;
 }
 
-static __attribute__((__interrupt__)) void irq_handler(void)
-{
-        volatile avr32_rtc_t *rtc = &AVR32_RTC;
-        struct timer_t* priv = &TIMER;
-        priv->tick++;
-
-        if(priv->tick_isr)
-                priv->tick_isr(priv->ctx);
-        
-        rtc->icr = AVR32_RTC_ICR_TOPI_MASK;
-        rtc->isr;
+int timer_interval_passed(U32 old, U32 new, U32 diff) {
+        /* New did not wrap */
+        if (new > old && new - old > diff) {
+                return 1;
+        }
+        /* New did wrap */
+        else if (new < old && ( ( (U32)(-1) - old ) + new ) > diff ) {
+                return 1;
+        }
+        return 0;
 }

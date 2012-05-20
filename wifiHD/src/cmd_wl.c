@@ -27,14 +27,18 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#include <top_defs.h>
 #include <ctype.h>
+#include <stdlib.h>
+#include <string.h>
 
-#include "cmd_wl.h"
+#include <cmd_wl.h>
 
-#include "wl_cm.h"
-#include "console.h"
-#include "wl_util.h"
-#include "util.h"
+#include <wl_cm.h>
+#include <console.h>
+#include <util.h>
+#include <lwip_setup.h>
+
 #include "lwip/netif.h"
 #include "lwip/dns.h"
 #include "debug.h"
@@ -56,6 +60,8 @@ extern void showTTCPstatus();
 		else verboseDebug &= ~FLAG;			\
 		}while(0);
 
+#define  _DNS_CMD_
+
 /**
  *
  */
@@ -70,6 +76,22 @@ cmd_scan(int argc, char* argv[], void* ctx)
         return CMD_DONE;
 }
 
+cmd_state_t 
+cmd_debug_toggle(int argc, char* argv[], void* ctx)
+{
+        extern uint8_t tr_data_trace;
+        if ( argc != 2 ) {
+                printk("usage: dt <1|0>\n");
+                return CMD_DONE;
+        }
+        if ( '0' == argv[1][0] ) {
+                tr_data_trace = 0;
+        }
+        if ( '1' == argv[1][0] ) {
+                tr_data_trace = 1;
+        }
+        return CMD_DONE;
+}
 
 /**
  *
@@ -93,10 +115,114 @@ cmd_connect(int argc, char* argv[], void* ctx)
 
         memcpy(ssid.ssid, desired_ssid, len);
         ssid.len = len;
+        /* Start connection manager */
         wl_cm_set_network(&ssid, NULL);
+        wl_cm_start();
         return CMD_DONE;
 }
 
+#ifdef WFE_6_12
+cmd_state_t 
+cmd_ibss(int argc, char* argv[], void* ctx)
+{
+        struct wl_ssid_t ssid;
+        char desired_ssid[WL_SSID_MAX_LENGTH];
+        uint8_t channel;
+        enum wl_auth_mode amode;
+        int len = 0;
+        wl_err_t ret;
+        
+        if ( 2 == argc && ! strncmp(argv[1], "none", 4) ) {
+                printk("Disconnecting\n");
+                wl_disconnect();
+                wl_cm_stop();
+                return CMD_DONE;
+        }
+        if (argc < 4) {
+                printk("usage: ibss <ssid> <channel (1-14)> <wep_enable (1|0)>\n");
+                printk("       ibss none\n");
+                return CMD_DONE;
+        }
+        
+        channel = atoi(argv[argc - 2]);
+        if ( *argv[argc - 1] == '0' ) {
+                amode = AUTH_MODE_OPEN_SYSTEM;
+        } else {
+                amode = AUTH_MODE_SHARED_KEY;
+        }
+        len = join_argv(desired_ssid, sizeof desired_ssid, argc - 3, argv + 1);
+        if (0 == len) {
+                return CMD_DONE;
+        }
+        if ( channel > 14 ) {
+                printk("Invalid channel %d\n", (int)channel);
+                return CMD_DONE;
+        }
+        printk("%s : Start with ssid \"%s\", channel %d\n", __func__,
+               desired_ssid, channel);
+        memcpy(ssid.ssid, desired_ssid, len);
+        ssid.len = len;
+        /* Stop the connection manager */
+        wl_cm_stop();
+        
+        ret = wl_start_adhoc_net(ssid, channel, amode);
+        switch (ret) {
+        case WL_BUSY:
+                printk("Driver is busy. Already connected?\n");
+                break;
+        case WL_RETRY:
+                printk("Driver is busy. Retry operation\n");
+                break;
+        case WL_OOM:
+                printk("Out of memory\n");
+                break;
+        case WL_INVALID_ARGS:
+                printk("Invalid argument\n");
+                break;
+        case WL_SUCCESS:
+                break;
+        default:
+                printk("Unknown error %d\n", ret);
+                break;
+        }
+        return CMD_DONE;
+}
+#endif
+/**
+ *
+ */
+cmd_state_t 
+cmd_set_ip(int argc, char* argv[], void* ctx)
+{
+        struct net_cfg *ncfg = ctx;
+        struct ip_addr lwip_addr;
+        struct netif *nif = ncfg->netif;
+
+        if (argc == 2 && 
+            (strncmp(argv[1], "none", 4) == 0)) {
+                ncfg->dhcp_enabled = 1;
+                
+                return CMD_DONE;
+        }
+        else if (argc != 4 ) {
+                printk("usage: ip <ip> <netmask> <gateway-ip>\n");
+                printk("  or : ip none (to enable DHCP)\n");
+                return CMD_DONE;
+        }
+        /* IP address */
+        lwip_addr = str2ip(argv[1]);
+        netif_set_ipaddr(nif, &lwip_addr);
+        /* Netmask */
+        lwip_addr = str2ip(argv[2]);
+        netif_set_netmask(nif, &lwip_addr);
+        /* Default Gateway address */
+        lwip_addr = str2ip(argv[3]);
+        netif_set_gw(nif, &lwip_addr);
+        /* Disable DHCP */
+        ncfg->dhcp_enabled = 0;
+
+        return CMD_DONE;
+}
 
 #ifdef WITH_WPA
 
@@ -210,6 +336,38 @@ cmd_gethostbyname(int argc, char* argv[], void* ctx)
 
         return CMD_DONE;
 }
+
+/**
+ *
+ */
+cmd_state_t
+cmd_setDnsServer(int argc, char* argv[], void* ctx)
+{
+        const char *usage = "usage: setdns [1-2] aaa.bbb.ccc.ddd\n";
+        struct ip_addr dnsIp;
+        int dnsIdx = 0;
+
+        if (argc < 3) {
+                printk(usage);
+                return CMD_DONE;
+        }
+
+        /* DNS IDX */
+        dnsIdx = atoi(argv[1])-1;
+        /* IP address */
+        dnsIp = str2ip(argv[2]);
+
+        printk("Set DNS server %d to %s\n", dnsIdx, ip2str(dnsIp));
+        dns_setserver(dnsIdx, &dnsIp);
+        struct ip_addr addr1 = dns_getserver(0);
+        struct ip_addr addr2 = dns_getserver(1);
+
+        printk("==> DNS1: %s\n", ip2str(addr1), addr1);
+        printk("==> DNS2: %s\n", ip2str(addr2), addr2);
+
+        return CMD_DONE;
+}
+
 #endif
 
 
@@ -219,6 +377,7 @@ cmd_gethostbyname(int argc, char* argv[], void* ctx)
 cmd_state_t
 cmd_status(int argc, char* argv[], void* ctx)
 {
+        struct net_cfg *ncfg = ctx;
         struct wl_network_t* net;
         uint8_t mac[WL_MAC_ADDR_LENGTH];
 
@@ -226,24 +385,37 @@ cmd_status(int argc, char* argv[], void* ctx)
         /* print mac address */
         if (wl_get_mac_addr(mac) != WL_SUCCESS) {
                 printk("failed to get mac address\n");
-                return CMD_DONE;
-        }
+        }else{
         printk("hw addr: %s\n", mac2str(mac));
+        }
 
         /* print network info */
         net = wl_get_current_network();
         printk("link status: "); 
         if (!net) { 
                 printk("down\n");
-                return CMD_DONE;
-        }
+
+        }else{
         print_network(net);
+        }
         
         /* print ip address */
         if (netif_is_up(netif_default))
                 printk("ip addr: %s\n", ip2str(netif_default->ip_addr));
         else
-                printk("ip addr: none\n");
+                printk("ip interface is down\n");
+        printk("dhcp : ");
+        if (ncfg->dhcp_enabled) {
+                printk("enabled\n");
+        }
+        else {
+                printk("disabled\n");
+        }
+        struct ip_addr addr1 = dns_getserver(0);
+        struct ip_addr addr2 = dns_getserver(1);
+
+        printk("==> DNS1: %s\n", ip2str(addr1), addr1);
+        printk("==> DNS2: %s\n", ip2str(addr2), addr2);
 
         showTTCPstatus();
         return CMD_DONE;
@@ -332,34 +504,6 @@ cmd_psconf(int argc, char* argv[], void* ctx)
 }
 #endif
 
-#define MAX_KEY_LEN 64
-
-/**
- *
- */
-uint8_t ascii_to_key(char *outp, const char *inp) {
-        char buf[3];
-        int len;
-        buf[2] = '\0';
-        len = strlen(inp);
-        if (len % 2) {
-                printk("Invalid length\n");
-        }
-        len = 0;
-        while (*inp) {
-                if (! isxdigit(*inp) || ! isxdigit(*(inp+1)) ||
-                    len > MAX_KEY_LEN) {
-                        return 0;
-                }
-                buf[0] = *inp++;
-                buf[1] = *inp++;
-                *outp++ = strtol(buf, NULL, 16);
-                len++;
-        }
-        return len;
-}
-
-
 /**
  *
  */
@@ -375,7 +519,6 @@ cmd_setkey(int argc, char* argv[], void* ctx)
         memset(&bssid.octet, 0xff, sizeof bssid.octet);
         if (argc == 2 && strcmp(argv[1], "none") == 0) {
                 printk("Deleting WEP keys\n");
-                wl_set_auth_mode(AUTH_MODE_OPEN_SYSTEM);
                 wl_delete_wep_key(0, &bssid);
                 wl_delete_wep_key(1, &bssid);
                 wl_delete_wep_key(2, &bssid);
@@ -387,17 +530,24 @@ cmd_setkey(int argc, char* argv[], void* ctx)
                 return CMD_DONE;
         }
         idx = atoi(argv[1]);
-        len = ascii_to_key(key, argv[2]);
-        if (0 == len || idx > 3 || idx < 0 || (idx == 0 && *argv[1] != '0')) {
-                printk(usage);
-                return CMD_DONE;
+        len = strlen(argv[2]);
+        /* Pass phrase? */
+        if ( 5 == len || 13 == len ) {
+                strncpy(key, argv[2], len);
         }
-        if (len != 5 && len != 13) {
-                printk(" WEP key must be 10 (WEP-40) or 26 (WEP-104) digits\n");
-                return CMD_DONE;
+        /* Otherwise it's a hex string */
+        else {
+                len = ascii_to_key(key, argv[2]);
+                if (0 == len || idx > 3 || idx < 0 || (idx == 0 && *argv[1] != '0')) {
+                        printk(usage);
+                        return CMD_DONE;
+                }
+                if (len != 5 && len != 13) {
+                        printk(" WEP key must be 10 (WEP-40) or 26 (WEP-104) digits\n");
+                        return CMD_DONE;
+                }
         }
         wl_add_wep_key(idx, len, key, &bssid);
-        wl_set_auth_mode(AUTH_MODE_SHARED_KEY);
         wl_set_default_wep_key(idx);
 
         return CMD_DONE;
@@ -414,7 +564,7 @@ cmd_debug(int argc, char* argv[], void* ctx)
 
         if (argc == 2 && strcmp(argv[1], "off") == 0) {
                 printk("Debug OFF\n");
-                enableDebug = 0;
+                enableDebug = DEFAULT_INFO_FLAG;
                 verboseDebug = 0;
                 return CMD_DONE;
         }else if (argc == 2 && strcmp(argv[1], "print") == 0) {

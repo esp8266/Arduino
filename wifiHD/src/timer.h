@@ -1,5 +1,3 @@
-/* This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0 Release */
-
 /*! \page License
  * Copyright (C) 2009, H&D Wireless AB All rights reserved.
  *
@@ -29,8 +27,7 @@
  */
 #ifndef TIMER_H
 #define TIMER_H
-
-#include <compiler.h>
+#include <stdint.h>
 
 enum {
         TIMEOUT_ONESHOT,
@@ -39,13 +36,16 @@ enum {
 
 #define INVALID_TIMER_ID 0xFFFFFFFF
 
+/* Handle timer overflows. Return 1 if the interval has passed. */
+int timer_interval_passed(uint32_t old, uint32_t new, uint32_t diff);
+
+void timer_tick();
 void timer_init(void (*tick_isr) (void* ctx), void* ctx);
 void timer_poll(void);
-void timer_delay(U32 ms);
-U32 timer_sched_timeout_cb(U32 ms, U8 type, void (*cb)(void *ctx), void* ctx);
-void timer_cancel_timeout(U32 id);
-U32 timer_get_ms(void);
-
-#define TIMER_HZ 4
+void timer_delay(uint32_t ms);
+uint32_t timer_sched_timeout_cb(uint32_t ms, uint8_t type, void (*cb)(void *ctx), void* ctx);
+uint32_t timer_mod(uint32_t id, uint32_t ms, uint8_t type, void (*cb)(void *ctx), void* ctx);
+void timer_cancel_timeout(uint32_t id);
+uint32_t timer_get_ms(void);
 
 #endif

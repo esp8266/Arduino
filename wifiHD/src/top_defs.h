@@ -1,5 +1,3 @@
-/* This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0 Release */
-
 /*! \page License
  * Copyright (C) 2009, H&D Wireless AB All rights reserved.
  *
@@ -30,12 +28,33 @@
 #ifndef _TOP_DEFS_H
 #define _TOP_DEFS_H
 
+#include <stdlib.h>
+#include <stdint.h>
+
 #define ARRAY_SIZE(a) sizeof(a) / sizeof((a)[0])
 
+#ifndef UNREF
+#define UNREF(x) x = x
+#endif
+
 #if __GNUC__
+#ifdef __KERNEL__
+#define WEAK_DECL
+#else
 #define WEAK_DECL __attribute__ ((__weak__))
+#endif
+#define PACKED __attribute__ ((__packed__))
+#define USED __attribute__ ((__used__))
 #else
  #error "Unsupported compiler"
+#endif
+
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+#ifndef FALSE
+#define FALSE 0
 #endif
 
 
@@ -63,5 +82,39 @@ int vscanf(const char *format, va_list ap) __attribute__ ((deprecated));
 int vsscanf(const char *str, const char *format, va_list ap) __attribute__ ((deprecated));
 int vfscanf(FILE *stream, const char *format, va_list ap) __attribute__ ((deprecated));
 #endif
+
+#endif
+
+
+
+#if defined(__linux__) || defined(__APPLE__)
+ #include <stdint.h>
+ #include <assert.h>
+ #define sniprintf snprintf
+ #define asiprintf asprintf
+ #define printk printf
+ #define siscanf sscanf
+
+ #define WL_ASSERT(x) assert(x)
+ #define WL_DEBUG(args...) printf(args)
+
+ #ifdef NO_LWIP
+  /* IP address representation from lwIP */
+  struct ip_addr {
+         uint32_t addr;
+  } PACKED;
+ #endif
+
+ #define FEAT_SOCKETS 
+
+#else
+ #define WL_ASSERT(cond) do {                                    \
+                if (!(cond)) {                                  \
+                        printk("%s:%d\n", __FILE__, __LINE__);  \
+                        for(;;);                                \
+                }                                               \
+        } while(0)
+ #define WL_DEBUG(args...) printk(args)
+
 
 #endif

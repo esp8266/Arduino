@@ -1,5 +1,3 @@
-/* This source file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0 Release */
-
 /*! \page License
  * Copyright (C) 2009, H&D Wireless AB All rights reserved.
  *
@@ -27,64 +25,79 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include <avr32/io.h>
-#include "compiler.h"
-#include "board.h"
-#include "power_clocks_lib.h"
-#include "gpio.h"
-#include "usart.h"
-#include "printf-stdarg.h"
-#include <string.h>
-#include "console.h"
 
-#define MAX_CMD_CONSOLE_NUM 9
+#include <top_defs.h>
+#include <string.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <printf-stdarg.h>
+#include <console.h>
+#include <board_init.h>
+#include <usart.h>
+
+#define MAX_CMD_CONSOLE_NUM 12
 struct {
         cmd_cb_t cb;
         const char* str;
         void* ctx;
 } cmd_list[MAX_CMD_CONSOLE_NUM] = { { 0 } };
 
-#define ARRAY_SIZE(a) sizeof(a) / sizeof(a[0])
-
-#if BOARD == EVK1104 || BOARD == EVK1100 || BOARD == EVK1101 || BOARD ==ARDUINO
-#define AVR32_USART AVR32_USART1
-#elif BOARD == EVK1105 
-#define AVR32_USART AVR32_USART0
-#else
-#error
+#ifndef CMD_MAX_LEN
+#define CMD_MAX_LEN 80
 #endif
+extern int board_putchar(char c);
+int io_getc(char *c)
+{
+        int ci;
+        int status;
+        status = usart_read_char(&CONFIG_CONSOLE_PORT, &ci);
+        if (status == USART_RX_EMPTY)
+                return 1;
+        
+        if (status == USART_RX_ERROR) {
+                CONFIG_CONSOLE_PORT.cr = AVR32_USART_CR_RSTSTA_MASK;
+                return 1;
+        }
 
-#ifndef CMD_CONSOLE_MAX_LEN
-#define CMD_CONSOLE_MAX_LEN 25
-#endif
+        if (ci == '\r') {
+                board_putchar('\n');
+        /* Echo char. */
+        } else if (ci == '\b') {
+                board_putchar(ci);
+                board_putchar(' ');
+                board_putchar(ci);
+        } else
+                board_putchar(ci);
+        
 
-static Bool is_initialized = FALSE;
+        *c = ci;
+        return 0;
+}
+
+static uint8_t is_initialized = 0;
 
 char* console_gets()
 {
-        static char buf[CMD_CONSOLE_MAX_LEN];
+        static char buf[CMD_MAX_LEN];
         static int pos = 0;
-        int c;
-        int status;
+        char c;
         
         for (;;) {
-                status = usart_read_char(&AVR32_USART, &c);
-                if (status == USART_RX_EMPTY)
+                if (io_getc(&c))
                         return NULL;
                 
-                if (status == USART_RX_ERROR) {
-                        AVR32_USART.cr = AVR32_USART_CR_RSTSTA_MASK;
-                        return NULL;
-                }
-                
-                if (c == '\r') {
-                        usart_putchar(&AVR32_USART, '\n');
+                if (c == '\r' || c == '\n') {
                         buf[pos] = 0;
                         pos = 0;
                         return buf;
                 }
-                usart_putchar(&AVR32_USART, c);
-                buf[pos++] = c;
+                if (c == '\b') {
+                        pos -= 1;
+                        if (pos < 0) pos = 0;
+                        buf[pos] = 0;
+                }
+                else
+                        buf[pos++] = c;
                 if (pos == sizeof(buf))
                         pos = 0;
         }
@@ -93,7 +106,7 @@ char* console_gets()
 
 int console_add_cmd(const char* str, cmd_cb_t cb, void* ctx)
 {
-        U32 i;
+        uint32_t i;
         for (i = 0; i < ARRAY_SIZE(cmd_list); i++)
                 if (!cmd_list[i].cb)
                         break;
@@ -110,15 +123,15 @@ int console_add_cmd(const char* str, cmd_cb_t cb, void* ctx)
 void console_init(void)
 {
         printk("\n$ ");
-        is_initialized = TRUE;
+        is_initialized = 1;
 }
 
 void console_init_silent(void) {
-        is_initialized = TRUE;
+        is_initialized = 1;
 }
 
 int console_schedule_cmd(char *cmd, int interactive) {
-#define MAX_ARGS 8
+#define MAX_ARGS 16
         static int argc, i;
         static char* argv[MAX_ARGS];
         static char *buf;
@@ -144,7 +157,7 @@ int console_schedule_cmd(char *cmd, int interactive) {
                        buf);
 #endif
                 for (i = 0; i < ARRAY_SIZE(cmd_list); i++)
-                        if(!strncmp(cmd_list[i].str, buf, 2))
+                        if(cmd_list[i].str && !strncmp(cmd_list[i].str, buf, min(strlen(cmd_list[i].str), strlen(buf))))
                                 break;
 
                 if (ARRAY_SIZE(cmd_list) == 0) {
@@ -170,7 +183,6 @@ int console_schedule_cmd(char *cmd, int interactive) {
                                 break;
                 }
                 
-                
                 state = RUN;
         } /* fall through */
                 
@@ -182,6 +194,7 @@ int console_schedule_cmd(char *cmd, int interactive) {
                 interactive ? printk("$ ") : 0;
 
                 argc = 0;
+                memset(argv, 0, sizeof argv);
                 free(buf);
                 state = INPUT;
         }

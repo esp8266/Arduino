@@ -53,17 +53,17 @@
 <option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.option.optimization.level.187661945" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" value="gnu.c.optimization.level.optimize" valueType="enumerated"/>
 <option id="gnu.c.compiler.option.debugging.level.957359437" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
 <option id="avr32.c.compiler.option.mcu.442256180" name="Microcontroller Unit" superClass="avr32.c.compiler.option.mcu" value="-mpart=uc3a1256" valueType="string"/>
-<option id="gnu.c.compiler.option.optimization.flags.1362317068" name="Other optimization flags" superClass="gnu.c.compiler.option.optimization.flags" value="-fdata-sections" valueType="string"/>
+<option id="gnu.c.compiler.option.optimization.flags.1362317068" name="Other optimization flags" superClass="gnu.c.compiler.option.optimization.flags" value="-fdata-sections -ffunction-sections" valueType="string"/>
 <option id="gnu.c.compiler.option.preprocessor.def.symbols.2032815329" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
 <listOptionValue builtIn="false" value="BOARD=ARDUINO"/>
 <listOptionValue builtIn="false" value="NO_SYS"/>
 <listOptionValue builtIn="false" value="_DEBUG_"/>
 <listOptionValue builtIn="false" value="_ASSERT_ENABLE_"/>
-<listOptionValue builtIn="false" value="EXT_BOARD=SPB104"/>
 <listOptionValue builtIn="false" value="WITH_KEY"/>
 <listOptionValue builtIn="false" value="WITH_WPA"/>
 <listOptionValue builtIn="false" value="WITH_NO_DMA"/>
 <listOptionValue builtIn="false" value="DATAFLASH=1"/>
+<listOptionValue builtIn="false" value="_INFO_DEBUG_=1"/>
 </option>
 <option id="gnu.c.compiler.option.include.paths.199111087" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
 <listOptionValue builtIn="false" value="../src/SOFTWARE_FRAMEWORK/DRIVERS/PDCA"/>
@@ -109,12 +109,12 @@
 <option id="gnu.c.link.option.paths.1433794230" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths">
 <listOptionValue builtIn="false" value="../src/SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS"/>
 <listOptionValue builtIn="false" value="../src/SOFTWARE_FRAMEWORK/BOARDS"/>
-<listOptionValue builtIn="false" value="../src/SOFTWARE_FRAMEWORK/COMPONENTS/WIFI/HD/v2.1.1/UCR2/GCC"/>
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/wifiHD/src/SOFTWARE_FRAMEWORK/COMPONENTS/WIFI/HD/v2.7.0/UCR2/GCC}&quot;"/>
 </option>
 <option id="gnu.c.link.option.libs.1720035119" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
 <listOptionValue builtIn="false" value="newlib_addons-at32ucr2-speed_opt"/>
-<listOptionValue builtIn="false" value="_ucr2_hd_spi_standalone_v2.1.1"/>
-<listOptionValue builtIn="false" value="_ucr2_hd_wl_standalone_v2.1.1"/>
+<listOptionValue builtIn="false" value="_ucr2_hd_spi_v2.7.0"/>
+<listOptionValue builtIn="false" value="_ucr2_hd_wl_sta_intwpa_v2.7.0"/>
 </option>
 <option id="gnu.c.link.option.strip.878241046" name="Omit all symbol information (-s)" superClass="gnu.c.link.option.strip" value="false" valueType="boolean"/>
 <option id="avr32.c.linker.option.gc-sections.1193662367" name="Garbage collect unused sections" superClass="avr32.c.linker.option.gc-sections" value="true" valueType="boolean"/>
@@ -193,8 +193,8 @@
 </toolChain>
 </folderInfo>
 <sourceEntries>
-<entry excluding="ttcp.h|ttcp.c|fsdata.c|hdwireless_gif.h|http_server_gui.h|http_server_gui.c|SOFTWARE_FRAMEWORK/COMPONENTS/TOUCH|SOFTWARE_FRAMEWORK/DRIVERS/ADC|SOFTWARE_FRAMEWORK/COMPONENTS/WIFI/HD/wl_fw.h|gui.c|SOFTWARE_FRAMEWORK/DRIVERS/EBI/SMC|SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY|SOFTWARE_FRAMEWORK/COMPONENTS/DISPLAY/ET024006DHU|gui_getstring.c|SOFTWARE_FRAMEWORK/BOARDS/EVK1105" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 <entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src/SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX"/>
+<entry excluding="spb.h|httpd.h|httpd.c|platform_spi.h|clocks.c|clocks.h|nor_flash.h|nor_flash.c|wl_util.h|wl_util.c|startup.h|startup.c|ttcp.h|ttcp.c|fsdata.c|hdwireless_gif.h|http_server_gui.h|http_server_gui.c|SOFTWARE_FRAMEWORK/COMPONENTS/TOUCH|SOFTWARE_FRAMEWORK/DRIVERS/ADC|SOFTWARE_FRAMEWORK/COMPONENTS/WIFI/HD/wl_fw.h|gui.c|SOFTWARE_FRAMEWORK/DRIVERS/EBI/SMC|SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY|SOFTWARE_FRAMEWORK/COMPONENTS/DISPLAY/ET024006DHU|gui_getstring.c|SOFTWARE_FRAMEWORK/BOARDS/EVK1105" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 </sourceEntries>
 </configuration>
 </storageModule>
@@ -1078,6 +1078,7 @@
 <listOptionValue builtIn="false" value="WITH_WPA"/>
 <listOptionValue builtIn="false" value="WITH_NO_DMA"/>
 <listOptionValue builtIn="false" value="DATAFLASH=1"/>
+<listOptionValue builtIn="false" value="_INFO_DEBUG_=1"/>
 </option>
 <option id="gnu.c.compiler.option.include.paths.1012245137" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
 <listOptionValue builtIn="false" value="../src/SOFTWARE_FRAMEWORK/DRIVERS/PDCA"/>
@@ -1199,8 +1200,8 @@
 </toolChain>
 </folderInfo>
 <sourceEntries>
-<entry excluding="ttcp.h|ttcp.c|fsdata.c|hdwireless_gif.h|http_server_gui.h|http_server_gui.c|SOFTWARE_FRAMEWORK/COMPONENTS/TOUCH|SOFTWARE_FRAMEWORK/DRIVERS/ADC|SOFTWARE_FRAMEWORK/COMPONENTS/WIFI/HD/wl_fw.h|gui.c|SOFTWARE_FRAMEWORK/DRIVERS/EBI/SMC|SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY|SOFTWARE_FRAMEWORK/COMPONENTS/DISPLAY/ET024006DHU|gui_getstring.c|SOFTWARE_FRAMEWORK/BOARDS/EVK1105" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 <entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src/SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX"/>
+<entry excluding="spb.h|httpd.h|httpd.c|platform_spi.h|clocks.c|clocks.h|nor_flash.h|nor_flash.c|wl_util.h|wl_util.c|startup.h|startup.c|ttcp.h|ttcp.c|fsdata.c|hdwireless_gif.h|http_server_gui.h|http_server_gui.c|SOFTWARE_FRAMEWORK/COMPONENTS/TOUCH|SOFTWARE_FRAMEWORK/DRIVERS/ADC|SOFTWARE_FRAMEWORK/COMPONENTS/WIFI/HD/wl_fw.h|gui.c|SOFTWARE_FRAMEWORK/DRIVERS/EBI/SMC|SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY|SOFTWARE_FRAMEWORK/COMPONENTS/DISPLAY/ET024006DHU|gui_getstring.c|SOFTWARE_FRAMEWORK/BOARDS/EVK1105" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 </sourceEntries>
 </configuration>
 </storageModule>
@@ -2085,6 +2086,7 @@
 <listOptionValue builtIn="false" value="WITH_WPA"/>
 <listOptionValue builtIn="false" value="WITH_NO_DMA"/>
 <listOptionValue builtIn="false" value="LWIP_DEBUG"/>
+<listOptionValue builtIn="false" value="_INFO_DEBUG_=1"/>
 </option>
 <option id="gnu.c.compiler.option.include.paths.1906241430" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
 <listOptionValue builtIn="false" value="../src/SOFTWARE_FRAMEWORK/DRIVERS/PDCA"/>
@@ -2207,7 +2209,7 @@
 </folderInfo>
 <sourceEntries>
 <entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src/SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX"/>
-<entry excluding="ttcp.h|ttcp.c|fsdata.c|hdwireless_gif.h|http_server_gui.h|http_server_gui.c|SOFTWARE_FRAMEWORK/COMPONENTS/TOUCH|SOFTWARE_FRAMEWORK/DRIVERS/ADC|SOFTWARE_FRAMEWORK/COMPONENTS/WIFI/HD/wl_fw.h|gui.c|SOFTWARE_FRAMEWORK/DRIVERS/EBI/SMC|SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY|SOFTWARE_FRAMEWORK/COMPONENTS/DISPLAY/ET024006DHU|gui_getstring.c|SOFTWARE_FRAMEWORK/BOARDS/EVK1105" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+<entry excluding="spb.h|httpd.h|httpd.c|platform_spi.h|clocks.c|clocks.h|nor_flash.h|nor_flash.c|wl_util.h|wl_util.c|startup.h|startup.c|ttcp.h|ttcp.c|fsdata.c|hdwireless_gif.h|http_server_gui.h|http_server_gui.c|SOFTWARE_FRAMEWORK/COMPONENTS/TOUCH|SOFTWARE_FRAMEWORK/DRIVERS/ADC|SOFTWARE_FRAMEWORK/COMPONENTS/WIFI/HD/wl_fw.h|gui.c|SOFTWARE_FRAMEWORK/DRIVERS/EBI/SMC|SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY|SOFTWARE_FRAMEWORK/COMPONENTS/DISPLAY/ET024006DHU|gui_getstring.c|SOFTWARE_FRAMEWORK/BOARDS/EVK1105" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 </sourceEntries>
 </configuration>
 </storageModule>
@@ -3091,6 +3093,7 @@
 <listOptionValue builtIn="false" value="WITH_WPA"/>
 <listOptionValue builtIn="false" value="WITH_NO_DMA"/>
 <listOptionValue builtIn="false" value="LWIP_DEBUG"/>
+<listOptionValue builtIn="false" value="_INFO_DEBUG_=1"/>
 </option>
 <option id="gnu.c.compiler.option.include.paths.193739172" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
 <listOptionValue builtIn="false" value="../src/SOFTWARE_FRAMEWORK/DRIVERS/PDCA"/>
@@ -3211,7 +3214,7 @@
 </folderInfo>
 <sourceEntries>
 <entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src/SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX"/>
-<entry excluding="ttcp.h|ttcp.c|fsdata.c|hdwireless_gif.h|http_server_gui.h|http_server_gui.c|SOFTWARE_FRAMEWORK/COMPONENTS/TOUCH|SOFTWARE_FRAMEWORK/DRIVERS/ADC|SOFTWARE_FRAMEWORK/COMPONENTS/WIFI/HD/wl_fw.h|gui.c|SOFTWARE_FRAMEWORK/DRIVERS/EBI/SMC|SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY|SOFTWARE_FRAMEWORK/COMPONENTS/DISPLAY/ET024006DHU|gui_getstring.c|SOFTWARE_FRAMEWORK/BOARDS/EVK1105" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+<entry excluding="spb.h|httpd.h|httpd.c|platform_spi.h|clocks.c|clocks.h|nor_flash.h|nor_flash.c|wl_util.h|wl_util.c|startup.h|startup.c|ttcp.h|ttcp.c|fsdata.c|hdwireless_gif.h|http_server_gui.h|http_server_gui.c|SOFTWARE_FRAMEWORK/COMPONENTS/TOUCH|SOFTWARE_FRAMEWORK/DRIVERS/ADC|SOFTWARE_FRAMEWORK/COMPONENTS/WIFI/HD/wl_fw.h|gui.c|SOFTWARE_FRAMEWORK/DRIVERS/EBI/SMC|SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY|SOFTWARE_FRAMEWORK/COMPONENTS/DISPLAY/ET024006DHU|gui_getstring.c|SOFTWARE_FRAMEWORK/BOARDS/EVK1105" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 </sourceEntries>
 </configuration>
 </storageModule>

@@ -62,6 +62,8 @@ cmd_state_t cmd_resetStatSpi(int argc, char* argv[], void* ctx);
 
 cmd_state_t cmd_gethostbyname(int argc, char* argv[], void* ctx);
 
+cmd_state_t cmd_setDnsServer(int argc, char* argv[], void* ctx);
+
 void showTTCPstatus();
 
 int getSock(void * _ttcp);

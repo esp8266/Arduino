@@ -43,7 +43,6 @@
 
 #include "ping.h"
 #include "timer.h"
-#include "wl_util.h"
 #include "util.h"
 
 #include "getopt.h"

@@ -1,51 +1,11 @@
-/* This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0 Release */
-
-/*! \page License
- * Copyright (C) 2009, H&D Wireless AB All rights reserved.
+/*
+ *  Programming interface for wl_api.
+ *  Copyright (C) 2010 HD Wireless AB
  *
- * The license to use this software in whole and in part and to
- * redistribute it in any form follows with the WiFi HW module from H&D
- * Wireless and is granted under the following restrictions:
- *
- * 1. Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * 3. The name of H&D Wireless AB may not be used to endorse or promote
- * products derived from this software without specific prior written
- * permission.
- *
- * 4. The software may only be used together with hardware from H&D
- * Wireless all other use is prohibited.
- *
- * 5. The license to use and redistribute the software is granted
- * together with the purchase of a hardware platform on a one to one
- * basis
- *
- * 6. The binary code may not be reversed engineered or by other means
- * copied to circumvent this license.
- *
- * THIS SOFTWARE IS PROVIDED BY H&D WIRELESS AB ``AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT
- * SHALL HD WIRELESS AB BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
- * OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * For more information regarding this software license Contact H&D
- * Wireless AB (support@hd-wireless.se).
+ *  You should have received a copy of the license along with this library.
  */
 
-/*! \file wl_api.h **************************************************************
+/*! \file wl_api.h *************************************************************
  *
  * \brief Basic WiFi API
  *
@@ -133,52 +93,71 @@ The second important property is that wl_api is \b polled.  wl_api
 never executes "by itself", since it would then have to support
 interrupts, timers, locks and other operating system dependent
 features.  Instead all asynchronous processes proceed when wl_api is
-polled by calling the \a wl_poll() function. When \a wl_poll() is called
-wl_api reacts to any received packets, expires any internal timers and
+polled by calling the \a wl_tick() function. When \a wl_tick() is called
+wl_api reacts to any received management frames, expires any internal timers and
 performs any other tasks necessary for forward progress. After
-\a wl_poll() returns nothing will happen unless it or some other wl_api
-function is called again.
+\a wl_tick() returns nothing will happen unless it or some other wl_api
+function is called again. Also, to send and receive data, the \a wl_process_rx()
+and \a wl_process_tx() must be invoked upon reception and transmission of data.
 
 The third important property is that wl_api is \b not \b thread \b safe. 
 All wl_api calls must execute in the same context since the
 library has no knowledge of the locking mechanisms available (if any).
+
+\section wl_api_code_examples A note on the code examples
+
+The code examples illustrate how to call the different wl_api functions.
+They do not constitute a complete program. Functions with the prefix "app_" 
+in the code examples are application specific calls that illustrate a
+particular action. These functions are not part of the API and will have
+to be implemented if needed. For a complete working code example see
+one of the H&D Wireless software reference designs, such as the WiFi HTTP 
+server demo code in the Atmel Software Framework.
 
 The API is structured into these functional groups:
 
 \li \ref wl_api
 \li \ref wl_wifi
 \li \ref wl_data
+\li \ref wl_transport
+\li \ref wl_custom
 
+Also documented here is the transport layers for SPI and SDIO.
+There interfaces are only necessary when porting the library to
+a new hardware platform.
+
+\li \ref wl_spi
+\li \ref wl_sdio
 
  * \section contactinfo Contact Information
  * For further information, visit
  * <A href="http://www.hd-wireless.se/">H&D Wireless</A>.\n
  * Support and FAQ: http://www.atmel.com/
  */
-
-#include <stdint.h>
-#include <stdlib.h>
-#include "spb.h"
-
+ 
 #ifndef WL_API_H
 #define WL_API_H
+ 
+#define WL_API_RELEASE_NAME "v2.7.0"
 
-#define WL_API_RELEASE_NAME "v2.1.1"
-
-/*! Size of the wl_api packet header */
-#define WL_HEADER_SIZE 14 
-/*! Maximum packet size (including wl_api headers and paddings */
-#define WL_MAX_PKT_LEN 1600
 /*! Maximum size of a SSID */
 #define WL_SSID_MAX_LENGTH 32
 /*! Size of a MAC-address or BSSID */
 #define WL_MAC_ADDR_LENGTH 6
+/*! Maximum length of a passphrase */
+#define WL_MAX_PASS_LEN 64
+/*! Indicates that there is no SNR information */
+#define WL_SNR_UNKNOWN -128
 
+#define SPB104 104
+#define SPB105 105
+ 
 /*! \ingroup wl_api 
  * API Error codes */
 typedef enum {
         WL_FAILURE = -1,
         WL_SUCCESS = 1,
+        WL_NOEFFECT,
         WL_OOM,
         WL_INVALID_LENGTH,
         WL_NOT_SUPPORTED,
@@ -201,8 +180,8 @@ enum wl_event_id_t {
         WL_EVENT_MEDIA_CONNECTED = 0,
         WL_EVENT_CONN_FAILURE,
         WL_EVENT_MEDIA_DISCONNECTED,
-        WL_EVENT_CONN_LOST,
         WL_EVENT_SCAN_COMPLETE,
+        WL_EVENT_FAILURE,
         MAX_WL_EVENT
 };
 
@@ -230,6 +209,10 @@ enum wl_enc_type {  /* Values map to 802.11 encryption suites... */
         ENC_TYPE_AUTO = 8
 };
 
+enum wl_host_attention_mode {
+        WL_HOST_ATTENTION_SDIO = 0x1, /*!< For SDIO or polled SPI */
+        WL_HOST_ATTENTION_SPI  = 0x5a /*!< For SPI with interrupt line */
+};
 
 /*! \ingroup wl_wifi 
  * Event descriptor 
@@ -239,8 +222,37 @@ struct wl_event_t {
 
 };
 
-/*! Struct member alignment macro */
-#define ALIGN __attribute__ ((aligned (4))) 
+/*! \ingroup wl_wifi
+ * Infrastructure (ESS) or Ad-hoc (IBSS) connection modes.
+ */
+enum wl_conn_type_t {
+        WL_CONN_TYPE_INFRA, /*!< For infrastructure mode (default) */
+        WL_CONN_TYPE_ADHOC  /*!< For ad-hoc mode */
+};
+
+/* Note:
+ * If your environment does not have stdint.h you will have to
+ * define the fixed-width integer types specified in that file
+ * yourself, make sure that those definitions are included 
+ * before any inclusions of wl_api.h, and build with the macro
+ * WITHOUT_STDINT defined. In this case the wl_api library
+ * must have been built with the same integer type definitions.
+ */
+
+#ifndef WITHOUT_STDINT
+#include <stdint.h>
+#endif
+
+/* Note:
+ * If your environment does not have stdio.h you will have to define
+ * the size_t type yourself, make sure that that definition is
+ * included before any inclusions of wl_api.h, and build with the
+ * macro WITHOUT_STDIO defined. In this case the wl_api library must
+ * have been built with the same size_t type definition.
+ */
+#ifndef WITHOUT_STDIO
+#include <stdio.h>
+#endif
 
 /*! \ingroup wl_wifi
  *
@@ -255,7 +267,7 @@ struct wl_ssid_t
         char ssid[WL_SSID_MAX_LENGTH]; /**< Octet array containing the SSID data. */
         uint8_t len; /**< Length of valid data in ssid member.
                       *   Cannot be longer than WL_SSID_MAX_LENGTH. */
-} ALIGN;
+};
 
 /*! \ingroup wl_wifi
  *
@@ -279,9 +291,52 @@ struct wl_network_t
 {
         struct wl_ssid_t ssid; /**< The SSID of the network. */
         struct wl_mac_addr_t bssid; /**<  The BSSID of the network. */
+        uint8_t channel; /**< The wlan channel which the network uses */
+        uint32_t beacon_period; /**< Beacon period for the network */
+        uint16_t dtim_period; /**< DTIM period for the network */
         int32_t rssi; /**< Received Signal Strength in dBm (measured on beacons) */
+        int32_t snr; /**< Received Signal to noise ratio in dBm (measured on beacons) */
         uint8_t enc_type; /**< The encryption type used in the network. */
-} ALIGN;
+    
+        enum wl_conn_type_t net_type; /**< Type of network (Infrastructure or Ad-Hoc */
+        size_t ie_len;    /**< Always 0 unless wl_api has been built with WL_CONFIG_WPA_SUPPLICANT */
+                             
+        uint8_t ie[0]; /**< Not used unless wl_api has been built with WL_CONFIG_WPA_SUPPLICANT */
+};
+
+/*! \ingroup wl_wifi 
+ * Network list representation. Array of pointers to wl_network_t entries.
+ *
+ */
+struct wl_network_list_t
+{
+        struct wl_network_t **net; /**< The list of pointers to networks */
+        size_t cnt;                /**< Number of networks */
+};
+
+#define WL_RATE_1MBIT      2
+#define WL_RATE_2MBIT      4
+#define WL_RATE_5_5MBIT    11
+#define WL_RATE_6MBIT      12
+#define WL_RATE_9MBIT      18
+#define WL_RATE_11MBIT     22
+#define WL_RATE_12MBIT     24
+#define WL_RATE_18MBIT     36
+#define WL_RATE_22MBIT     44
+#define WL_RATE_24MBIT     48
+#define WL_RATE_33MBIT     66
+#define WL_RATE_36MBIT     72
+#define WL_RATE_48MBIT     96
+#define WL_RATE_54MBIT     108
+#define WL_RATE_NUM_RATES  14
+#define WL_RATE_INVALID    WL_RATE_NUM_RATES
+
+/*! \ingroup wl_wifi 
+ *
+ * Rate representation 
+ *
+ */
+typedef uint8_t wl_rate_t;
     
 /** \defgroup wl_api Library support functions
  *
@@ -294,31 +349,51 @@ without an operating system.
 
 Before the library can do anything it needs to start up the WiFi
 hardware by downloading a firmware image. The firmware image is
-relatively big (around 144kB) and is not included in the library since
+relatively big (around 144kB) and is therefore not included in the library 
 it is only needed once. It is up to the application to decide where to
 store the firmware image and how to read it into the wl_api library.
 
-Step one is to write a function of the type \a ::wl_fw_download_cb_t
-that wl_api will call to retrive the firmware image. Assuming that
-you have some spare RAM on your platform you can simply include
-the firmware image from the \a fw.h header file and write a
+Step one is to write a function of the type \a ::wl_fw_read_cb_t
+that wl_api will call to retrive the firmware image. Assuming that you
+have some spare RAM (or whatever memory type is used for read only
+data, such as FLASH memory) on your platform you can simply include
+the firmware image from the \a wl_fw.h header file and write a
 firmware read function like this
 
 \code
-static void fw_download_cb(void* ctx, uint8_t** buf, uint32_t* len)
+static size_t fw_read_cb(void* ctx, 
+                         uint8_t** buf, 
+                         size_t offset, 
+                         size_t len)
 {
-        *buf = (uint8_t*) fw_buf;
-        *len = fw_len;
+        if ( NULL == buf ) {
+                return 0;
+        }
+        *buf = ((uint8_t*) fw_buf) + offset;
+        if ( len > ( fw_len - offset ) ) {
+                return fw_len - offset;
+        }
+        return len;
 }
+
 \endcode
 
 If the firmware image is stored in ROM this function may have to read
 it back block by block instead.
 
-The wl_api library is initialized like this 
+First, firmware must be downloaded to the device
 
 \code
-if ( wl_init(NULL, fw_download_cb, init_complete_cb) != WL_SUCCESS ) {
+if ( wl_transport_init(fw_read_cb, NULL, &mode) != WL_SUCCESS ) {
+        app_error("Firmware download failed");
+        return 0;
+}
+\endcode
+
+The wl_api library is then initialized like this 
+
+\code
+if ( wl_init(NULL, init_complete_cb, mode) != WL_SUCCESS ) {
         app_error("Init failed");
         return 0;
 }
@@ -350,22 +425,23 @@ if (wl_register_event_cb(event_cb, NULL) != WL_SUCCESS) {
 }
 \endcode
 
-The \a wl_poll() function takes a free running "tick" counter with
-millisecond resolution as an argument so that it can trigger internal
-timers when necessary. Assuming that such a tick counter is provided
-by the macro GET_MS_TICK() the wl_api execution loop becomes
+Similar to \a wl_poll(), there is also a \a wl_tick() function that takes a
+free running "tick" counter with millisecond resolution as an argument so
+that it can trigger internal timers when necessary. Assuming that such a tick
+counter is provided by the macro GET_MS_TICK() the wl_api execution loop becomes
 
 \code
 while (TRUE) {
-       wl_poll(GET_MS_TICK());
+       wl_tick(GET_MS_TICK());
+       wl_poll();
 }
 \endcode
 
 In a stand-alone application this loop would usually be the main application
 loop and include application specific calls as well.
 
-After some number of main loop iterations the WL_EVENT_INIT_COMPLETE
-event is posted and the application can initialize its IP stack.
+After some number of main loop iterations the init_complete_cb will be
+invoked and the application can initialize its IP stack.
 
  *  @{
  */
@@ -388,51 +464,6 @@ event is posted and the application can initialize its IP stack.
 typedef void (*wl_event_cb_t) (struct wl_event_t event, void* ctx);
 
 
-/*! \brief WiFi event callback.
- * 
- * This function is invoked in interrupt context when there is new data
- * available from the mac. This function is supplied by the user
- * of the API.
- *
- * This function is typically used only by the TCP/IP stack driver.
- *
- * @param ctx   A context handle. This handle is passed
- *              untouched to the callback and has the same value
- *              as the context registered with the callback in
- *              wl_register_event_cb().
- */
-typedef void (*wl_rx_isr_t) (void* ctx);
-
-
-/*! \brief Firmware access function.
- *
- * Reads the WiFi firmware image. This function is supplied by
- * the user of this API since storage for the firmware image is
- * managed by the application.
- *
- * This function should read a number of bytes of the firmware of the firmware
- * image. The number of remaining bytes is given as the input value of
- * \a len. Upon return, \a buf should point to a buffer which holds the read
- * data and \a len should hold the number of bytes read. Hence, \a len is both
- * an input and an output parameter.
- *
- * The offset where reading starts should be incremented sequentially by the
- * ouput value of \a len bytes upon completion of each call.
- *
- * This function will be called repeatedly until the complete firmware image
- * has been read. The last call will have the input value of \a len set to 0
- * to indicate that no more data is needed and that any dynamically allocated
- * buffer which holds firmware data are safe to free.
- *
- * @param ctx Opaque context pointer as provided to \a wl_init() that will be
- *            passed back to the callback.
- * @param buf  Should be assigned the address of the buffer holding the read
- *             data upon return.
- * @param len  Should hold the value of the number of bytes read upon return.
- */
-typedef void (wl_fw_download_cb_t)(void *ctx, uint8_t** buf, uint32_t* len);
-
-
 /*! \brief Initialization complete callback function.
  *
  * Invoked when WiFi initialization is complete.
@@ -442,7 +473,7 @@ typedef void (wl_fw_download_cb_t)(void *ctx, uint8_t** buf, uint32_t* len);
  */
 typedef void (wl_init_complete_cb_t)(void* ctx);
 
-
+ 
 /*! \brief Register an event handler.
  *
  * Register an event handler with the driver. This
@@ -468,35 +499,49 @@ wl_err_t wl_register_event_cb(wl_event_cb_t cb, void* ctx);
  * init_complete_cb when completed. The callback will not be invoked if any
  * error occurs during initialization.
  *
- * @param ctx Opaque context pointer that will be passed to the callbacks
- *            when they are invoked. This parameter is never
- *            accessed by the API.
- * @param fw_download_cb callback function to invoke during firmware download.
+ * This function should be called after firmware has been downloaded to the
+ * device.
+ *
+ * @param ctx Opaque context pointer that will be passed to the callback
+ *            when invoked. This parameter is never accessed by the API.
  * @param init_complete_cb callback function to invoke when initialization is 
  *        complete.
+ * @param mode Indicates the host attention mode used by the device. If
+ *         \a wl_transport_init() was used to download the firmware image to the
+ *         device, the proper mode can be obtained from the mode parameter of
+ *         that function.
+ *
  * @return 
  * - WL_SUCCESS 
  * - WL_FAILURE
- * - WL_CARD_FAILURE if the wl hardware device is not available
- * - WL_FIRMWARE_INVALID if the firmware obtained through fw_download_cb is
- *                       invalid.
  */
-wl_err_t wl_init(void* ctx, 
-                 wl_fw_download_cb_t fw_download_cb,
-                 wl_init_complete_cb_t init_complete_cb);
+wl_err_t wl_init(void* ctx, wl_init_complete_cb_t init_complete_cb,
+                 enum wl_host_attention_mode mode);
 
-/*! \brief WiFi driver forward progress function
+
+/*! \brief Shutdown the wl_api library and free resources.
  *
- * This function must be called in stand-alone environments to
- * ensure forward progress. Periodic timers are triggered from this function
- * so it should be called as often as possible if precision
- * timing is required (traffic timeouts, authentication timeouts
- * etc).
+ * \a wl_init() must be invoked to startup the library
+ * again.
+ *
+ * @return 
+ * - WL_SUCCESS on success
+ * - WL_FAILURE
+ *
+ */
+wl_err_t wl_shutdown(void);
+
+
+/*! \brief WiFi driver timer tick function
+ *
+ * Periodic timers are triggered from this function so it should be called as
+ * often as possible if precision timing is required (traffic timeouts,
+ * authentication timeouts etc).
  *
  * @param tick A tick count in us. This is used to expire timers
  *  in the driver.
  */
-void wl_poll(uint32_t tick);
+void wl_tick(uint32_t tick);
 
 /*!  @} */
 
@@ -527,16 +572,14 @@ and retrieve the list of seen networks from the library
 \code
 static void event_cb(struct wl_event_t event, void* ctx) {
        switch(event.id) {
-              case WL_EVENT_INIT_COMPLETE:
-                     app_init_ip_stack();
-                     break;
               case WL_EVENT_SCAN_COMPLETE:
-                     struct wl_network_t* netlist;
+                     struct wl_network_list_t *netlist;
                      uint8_t netcnt;
                      
-                     wl_get_network_list(&netlist, &netcnt);
+                     wl_get_network_list(&netlist);
+                     netcnt = netlist->cnt;
                      while (--netcnt) {
-                             print_network(netlist + netcnt);
+                             print_network(netlist->net[netcnt]);
                      }
                      break;
        }
@@ -600,16 +643,14 @@ must be also be caught
 \code
 static void event_cb(struct wl_event_t event, void* ctx) {
        switch(event.id) {
-              case WL_EVENT_INIT_COMPLETE:
-                     app_init_ip_stack();
-                     break;
               case WL_EVENT_SCAN_COMPLETE:
-                     struct wl_network_t* netlist;
+                     struct wl_network_list_t *netlist;
                      uint8_t netcnt;
                      
-                     wl_get_network_list(&netlist, &netcnt);
+                     wl_get_network_list(&netlist);
+                     netcnt = netlist->cnt;
                      while (--netcnt) {
-                             print_network(netlist + netcnt);
+                             print_network(netlist->net[netcnt]);
                      }
                      break;
               case WL_EVENT_CONN_FAILURE:
@@ -646,25 +687,6 @@ To set the 40-bit WEP key 0xDEADBEEF00 as default key for key index 0 do
          }
 \endcode
 
-If Shared Key authentication is required then this is configured through
-a call to \a wl_set_auth_mode(). 
-
-\code
-        if ( wl_set_auth_mode(AUTH_MODE_SHARED_KEY) != WL_SUCCESS) {
-              app_error("Failed to set authentication mode.");
-              return 0;
-        }
-\endcode
-
-It is important to know that \a wl_set_auth_mode() sets a \b forcing
-authentication mode. If the mode is set to AUTH_MODE_SHARED_KEY then
-all connection attempts made will fail if the target of the connection
-attempt does not support Shared Key authentication. This is true of all
-non-WEP Access Points, including Access Points with WPA or WPA2. To 
-reset the authentication mode call \a wl_set_auth_mode() with the
-mode set to AUTH_MODE_OPEN_SYSTEM (this is the default mode if
-\a wl_set_auth_mode() is never called).
-
 To use WPA/WPA2 with a Pre-shared key a passphrase must be associated
 with the network before the connection is initiated. 
 
@@ -696,6 +718,7 @@ key from the passphrase before the connection attempt can start.
  *  @{
  */
 
+    
 /*! \brief Scan all channels.
  * 
  * Starts a scan of all WiFi channels allowed in this regulatory
@@ -704,6 +727,13 @@ key from the passphrase before the connection attempt can start.
  *
  * The scan will proceed asynchronously and will raise a
  * WL_EVENT_SCAN_COMPLETE event when completed.
+ *
+ * Currently, there's a limit on the scan list size that depends on the
+ * architecture (6 networks for the AVR32 UCR1 architecture 16 networks for
+ * other architectures. If more network exist, the strongest networks are
+ * chosen. Note that the limitation on the scan list size does not limit the
+ * networks which the device can connect to. See wl_connect() for more
+ * details.
  *
  * @return
  * - WL_SUCCESS
@@ -724,20 +754,55 @@ wl_err_t wl_scan(void);
  * Note that a successful scan does not necessarily
  * find any networks.
  *
- * This function is not thread safe. It must be called in the
- * same execution context as wl_poll().
- *
  * @param network_list Output buffer. The API call returns
- *        a pointer to allocated memory containing \a network_cnt
- *        network entries.
- * @param network_cnt The number of networks
- *        allocated in network_list. 
+ *        a pointer to allocated memory containing the network list.
  * @return
  * - WL_SUCCESS
  * - WL_FAILURE.
  */
-wl_err_t wl_get_network_list(struct wl_network_t** network_list, uint8_t* network_cnt);
+wl_err_t wl_get_network_list(struct wl_network_list_t **network_list);
 
+#ifdef WFE_6_12
+/*! \brief Start a Ad-hoc network.
+ *
+ * Attempt to start a Ad-hoc (IBSS) network. If a Ad-hoc network
+ * is successfully started then a WL_EVENT_MEDIA_CONNECTED event
+ * will be raised once the first peer station connects to the Ad-hoc
+ * network (and not when the network is announced on the air).
+ *
+ * If a Ad-hoc network should be started with encryption 
+ * enabled then \a wl_set_passphrase() should be called before
+ * \a wl_start_adhoc_net() to configure the security parameters.
+ * The Ad-hoc network is started with the security parameters
+ * (if any) that was configured for the specified \a ssid.
+ *
+ * @param ssid The SSID of the new network. If there's a network
+ *             already present with this SSID this call will fail.
+ * @param channel The channel to use. Valid channels are 1-14
+ * @param auth_mode The authentication mode to use. Supported
+ *        authentication modes for Ad-hoc networks are 
+ *        AUTH_MODE_OPEN_SYSTEM and AUTH_MODE_SHARED_KEY.
+ *        Passing other modes will cause a WL_INVALID_ARGS return.
+ *        If AUTH_MODE_SHARED_KEY is used then a valid WEP
+ *        key must be set with a call to \a wl_add_wep_key()
+ *        and the default WEP key index must be set with a
+ *        call to \a wl_set_default_wep_key().
+ * @return 
+ *        - WL_SUCCESS on success.
+ *        - WL_INVALID_ARGS if the ssid is malformed, if
+ *          the channel not valid or if the authentication mode
+ *          is invalid.
+ *        - WL_RETRY if the driver is busy resolving a conflicting
+ *          operation.  The operation should be retried after a wait
+ *          (at least one call to wl_poll() for polled implementations).  
+ *        - WL_BUSY if the driver is already connected or if a network
+ *          with the same SSID is already known.
+ *         
+ */
+wl_err_t wl_start_adhoc_net(struct wl_ssid_t ssid, 
+                            uint8_t channel,
+                            enum wl_auth_mode auth_mode);
+#endif
 /*! \brief Connect to a SSID.
  *
  * Attempt to connect to a given SSID. If the driver is already
@@ -751,6 +816,11 @@ wl_err_t wl_get_network_list(struct wl_network_t** network_list, uint8_t* networ
  * a WL_EVENT_MEDIA_DISCONNECT event will be raised if the connection is
  * terminated. Note that this can be caused by external factors and can
  * happen at any time.
+ *
+ * If wl_connect() is invoked with a network that is not shown in the
+ * scan list, the device will probe for that specific network and connect
+ * to it, if found. This is also the method to use in order to connect to
+ * "hidden" networks (AP's that doesn't broadcast its SSID).
  *
  * @param ssid Pointer to the SSID string.
  *             Freed by caller.
@@ -779,6 +849,10 @@ wl_err_t wl_connect(char* ssid, size_t ssid_len);
  * terminated. Note that this can be caused by external factors and can
  * happen at any time.
  *
+ * If wl_connect_bssid() is invoked with a network that is not shown in the
+ * scan list, the device will probe for that specific network and connect
+ * to it, if found.
+ *
  * @param bssid Pointer to the BSSID. Freed by caller.
  * @return 
  *  - WL_SUCCESS
@@ -805,29 +879,6 @@ wl_err_t wl_connect_bssid(struct wl_mac_addr_t bssid);
  *     WL_EVENT_MEDIA_CONNECTED or a WL_EVENT_CONN_FAILURE event).
  */
 wl_err_t wl_disconnect(void);
-
-/*! \brief Set the WEP authentication mode of the driver.
- *
- * Set the authentication mode to use. This is only for
- * enforcing Shared Key authentication in WEP networks.
- * The default mode is AUTH_MODE_OPEN_SYSTEM which works
- * with all types of encryption.
- *
- * Note that as long as the mode is set to AUTH_MODE_SHARED_KEY
- * all connections to APs using no encryption or WPA/WPA2 will
- * fail since those require Open System authenticaton.
- *
- * @param mode AUTH_MODE_OPEN_SYSTEM for Open System authentication
- *             (that is no authentication). This should be used for WPA/WPA2
- *             connections.
- *             AUTH_MODE_SHARED_KEY for WEP shared key authentication.
- *             Other values of \a mode are invalid with this call
- *             and will cause WL_FAILURE to be returned.
- * @return
- *      - WL_SUCCESS on success. 
- *      - WL_FAILURE on failure.
- */
-wl_err_t wl_set_auth_mode(enum wl_auth_mode mode);
 
 /*!
  * @brief Add a WEP encryption key to the device.
@@ -927,6 +978,7 @@ wl_err_t wl_set_passphrase(const struct wl_network_t *net,
  */
 wl_err_t wl_clear_passphrase(struct wl_network_t *net);
 
+
 /*! \brief Enable legacy power save mode
  *
  * Enable legacy power save mode. In legacy power save mode, the device
@@ -984,8 +1036,7 @@ wl_err_t wl_conf_ps(uint8_t use_ps_poll,
                     uint32_t ps_delay,
                     uint8_t rx_all_dtim,
                     uint16_t listen_interval);
-
-    
+ 
 /*! \brief Get the interface MAC address.
  *
  * Return the 802.3 MAC address of the network interface.
@@ -1012,12 +1063,11 @@ struct wl_network_t* wl_get_current_network(void);
 
 /** \defgroup wl_data Data Transfer
  *
- * \brief Packet transport interface.
+ * \brief Packet processing interface.
  *
- * These functions access the low level transport driver which makes
- * the application independent of the actual physical transport
- * layer (usually SDIO or SPI).
- *
+ * Note that the examples in this group assumes that the transport library
+ * functions in the \a wl_transport group are being used. For more information,
+ * See the documentation for those functions in the \a wl_transport group. 
 
 For the IP stack integration you need to intercept received packets so
 they can be sent up the stack and to transmit packets coming down the
@@ -1090,9 +1140,7 @@ Continuing the ip_stack_rx_pkt() example
                                        len,
                                        &stripped_pkt,
                                        &stripped_pkt_len,
-                                       &NULL,
-                                       &vlan,
-                                       NULL);
+                                       &vlan);
                 if (WL_ABSORBED == status) {
                        // This is normal. The packet was a
                        // wl_api-internal message.
@@ -1110,7 +1158,7 @@ Continuing the ip_stack_rx_pkt() example
 If \a wl_process_rx() decides that the packet was a command it processes
 it and returns \a WL_ABSORBED to signal that the packet should
 not be used by anyone else. Otherwise stripped_pkt is
-pointing to the beginning of a 802.3 ethernet frame of length
+pointing to the beginning of a 802.3 Ethernet frame of length
 stripped_pkt_len. If the IP stack supports VLAN and QoS
 the extra VLAN tag should be passed to the IP stack
 together with the packet. For IP stacks without this support the VLAN tag 
@@ -1129,9 +1177,8 @@ packets to send.
 \code
 int ip_stack_tx_pkt(char *pkt, size_t len, uint16_t vlan_tag) {
         int status;
-        size_t hdr_len;
         char wlan_hdr[WL_HEADER_SIZE];
-        // The packet must have an ethernet header
+        // The packet must have an Ethernet header
         if (len < ETHERNET_HEADER_SIZE) {
                 app_error("Invalid packet length");
                 return 0;
@@ -1141,7 +1188,6 @@ int ip_stack_tx_pkt(char *pkt, size_t len, uint16_t vlan_tag) {
                                ETHERNET_HEADER_SIZE,
                                len,
                                wlan_hdr,
-                               &hdr_len,
                                vlan_tag,
                                NULL);
         if ( WL_SUCCESS != status ) {
@@ -1174,11 +1220,43 @@ the MAC address of the WiFi interface
  *  @{
  */
 
+/*! Size of the wl_api packet header */
+#ifdef WFE_6_12
+#define WL_HEADER_SIZE 16
+#else
+#define WL_HEADER_SIZE 14
+#endif
+    
+/*! Maximum packet size (including wl_api headers and paddings)
+ *
+ * Maximum packet size is obtained with the following data:
+ *
+ * 1500 bytes of Ethernet payload (MTU) + 14 bytes of Ethernet header +
+ * WL_HEADER_SIZE of wl header. This data is then size-aligned to 16.
+ * 
+ */
+#define WL_MAX_PKT_LEN 1536
+
+
 /*!
  * \brief Process rx packet.
  *
  * Processes a raw rx packet by unencrypting it (if necessary)
  * and stripping headers so as to output a 802.3 frame.
+ *
+ * wl_process_rx() will strip bytes both from the head and from the tail.
+ *
+ * Upon return from wl_process_rx(), the pointer at stripped_pkt will
+ * point to the start of the Ethernet header, hence adjusting the offset
+ * by WL_HEADER_LEN bytes. Any padding (added by the wifi device) will
+ * be removed from the tail of the packet, hence making len smaller.
+ *
+ * The wl_api library of the device will not perform any Ethernet padding
+ * removal. The padding removal performed by wl_process_rx() is only for
+ * the padding used in the protocol shared by the host and the device.
+ * This padding is mainly there to ensure that the host does not have to
+ * deal with rx of odd-sized data buffers (which some DMA's have problems
+ * to handle).
  *
  * @param pkt Input buffer (raw packet)
  * @param pkt_len Length of the input buffer (in bytes)
@@ -1211,13 +1289,37 @@ wl_err_t wl_process_rx(char *pkt, size_t pkt_len, char **stripped_pkt,
  * 
  * This function is typically used only by the TCP/IP stack driver.
  *
- * Takes a Ethernet II frame header and generates a message passing header for it.
- * The ethernet header is assumed to have the following layout :
+ * Takes a Ethernet II frame header and generates a message passing header
+ * for it.
+ *
+ * The caller should ensure that any frames injected into wl_process_tx()
+ * are proper Ethernet frames. The wl_api library or the device will not
+ * perform any Ethernet padding if the frames are too short.
+ *
+ * The Ethernet header is assumed to have the following layout :
  * <dst addr:6><src addr:6><type:2>...
- * The rest of the ethernet header buffer (if any) is ignored.
+ * The rest of the Ethernet header buffer (if any) is ignored.
  * 
- * @param eth_hdr Input buffer (ethernet header)
+ * A note on the TX packet representation :
+ * If your TX packets are simple contiguous buffers you can ignore
+ * the rest of this note and pass NULL in parameter \a pkt_handle.
+ * A TX packet may have a more complex structure than a RX packet
+ * (which must be a contiguous, flat buffer). The IP stack may
+ * for example represent a packet as a linked list of buffers where
+ * the Ethernet header, the IP header and other headers, are represented
+ * by separate buffers. In some cases, such as when the driver is
+ * running in SoftAP mode, a TX packet has to be copied and queued 
+ * internally for later processing and to support this when packets
+ * have a complicated structure a special data access function can
+ * be registered. See \a wl_register_pkt_read_cb() for details.
+ * If you use \a wl_process_tx() with non-simple packets you
+ * should pass a handle to the packet in parameter \a pkt_handle
+ * and register an access function with \a wl_register_pkt_read_cb().
+ *
+ * @param eth_hdr Input buffer (Ethernet header)
  * @param eth_hdr_len Input buffer length (must be >= 14)
+ *  This is usually the same as pkt_len unless e.g linked list or buffers
+ *  chained in other ways are being used.
  * @param pkt_len Length of the complete data packet (in bytes)
  * @param hdr Pointer to the header buffer (must be
  * allocated by the caller). The length of the buffer
@@ -1231,6 +1333,12 @@ wl_err_t wl_process_rx(char *pkt, size_t pkt_len, char **stripped_pkt,
  *  0|   VLANID   |PRI
  * </PRE>
  * Ignored for legacy association (no WMM)
+ * @param pkt_handle A handle to the complete packet. If this parameter
+ *  is NULL then \a eth_hdr is expected to point to the whole packet
+ *  in a single contiguous buffer (the default). If a different packet
+ *  representation is used this parameter should be a handle to the 
+ *  complete packet and will be passed unmodified to the data
+ *  access function that was registered with \a wl_register_pkt_read_cb().
  *
  * @returns 
  *          - WL_FAILURE
@@ -1240,11 +1348,159 @@ wl_err_t wl_process_rx(char *pkt, size_t pkt_len, char **stripped_pkt,
  *          - WL_AVAIL     if network not available
  *          - WL_SUCCESS   if packet is ready for transmission through wl_tx().
  */
-wl_err_t wl_process_tx(char *eth_hdr, size_t eth_hdr_len, size_t pkt_len, 
-                       char *hdr, uint16_t vlanid_prio);
+wl_err_t wl_process_tx(char *eth_hdr, 
+                       size_t eth_hdr_len, 
+                       size_t pkt_len, 
+                       char *hdr,
+                       uint16_t vlanid_prio,
+                       void *pkt_handle);
+
+ 
+/*! \brief Get current TX and RX rate used for data transfer
+ *
+ * During transmission and reception of data, the actual rate used will depend
+ * on the signal quality. This function can be used to get the actual rate used
+ * for the last tx and rx data.
+ *
+ * @param tx will hold the tx rate upon successful return.
+ * @param rx will hold the rx rate upon successful return.
+ *
+ * @return
+ * - WL_SUCCESS on success
+ * - WL_FAILURE on failure.
+ */ 
+wl_err_t wl_get_rate(wl_rate_t *tx, wl_rate_t *rx);
 
 
+/*! @} */ /* End wl_data group */
 
+
+/** \defgroup wl_transport Transport interface
+ *
+ * \brief Low level transport interface.
+ *
+ * These functions access the low level transport driver which makes
+ * the application independent of the actual physical transport
+ * layer (usually SDIO or SPI).
+ *
+ 
+For applications running on an real time kernel or without an
+operating system, the provided transport library will fit right into the
+application design. However, when running on a more complex operating system
+(such as windows or linux) which has its own transport primitivies and
+components (and probably its own IP stack) it might be preferred to design a
+custom transport library for that specific environment. Therefore, these
+transport interface functions are fully optional.
+
+
+ *  @{
+ */
+
+#define WL_RX_MIN_PKT_LEN    32
+
+
+/*! \brief WiFi event callback.
+ * 
+ * This function is invoked in interrupt context when there is new data
+ * available from the mac. This function is supplied by the user
+ * of the API.
+ *
+ * This function is typically used only by the TCP/IP stack driver.
+ *
+ * @param ctx   A context handle. This handle is passed
+ *              untouched to the callback and has the same value
+ *              as the context registered with the callback in
+ *              wl_register_event_cb().
+ */
+typedef void (*wl_rx_isr_t) (void* ctx);
+
+
+/*! \brief Firmware access function.
+ *
+ * Reads the WiFi firmware image. This function is supplied by
+ * the user of this API since storage for the firmware image is
+ * managed by the application.
+ *
+ * This function should read the specified number of bytes of the
+ * firmware image starting at the specified \a offset. The number of
+ * bytes to read is given in \a len. Upon return, \a buf should point
+ * to a buffer which holds the read data and the number of valid bytes
+ * in \a buf is returned from the call.
+ *
+ * This function will be called repeatedly until the complete firmware
+ * image has been read.
+ * 
+ * This function may be called again at any time while the driver is
+ * running to download further pieces of the WiFi firmware image as
+ * needed by the runtime requirements. This will normally only happen
+ * when the driver switches between networks of different kinds such
+ * as from WEP to WPA, or from ESS to IBSS for example.
+ *
+ * For convenience, any time a firmware chunk has been completely
+ * downloaded this function will be called once with the \a buf
+ * parameter set to NULL to indicate that no more data is needed right
+ * now and that any dynamically allocated buffers which holds firmware
+ * data can be freed without much performance impact. 
+ *
+ * @param ctx Opaque context pointer as provided to \a wl_init() that will be
+ *            passed back to the callback.
+ * @param buf Should be assigned the address of the buffer holding the read
+ *            data upon return. This parameter can be NULL which indicates
+ *            that there are no further immediately pending accesses.
+ * @param offset Offset in bytes from the start of the firmware image.
+ *            Data should be copied into buf starting at \a offset.
+ * @param len The number of bytes to copy into \a buf. 
+ * @return The number of bytes copied into buf. This may be smaller than
+ *         \len if the implementation of the function so requires.
+ */
+typedef size_t (wl_fw_read_cb_t)(void *ctx, 
+                                 const uint8_t **buf, 
+                                 size_t offset, 
+                                 size_t len);
+
+
+/*! \brief Initialize the transport interface and download the WiFi firmware
+ * image to the device.
+ *
+ * This operation will proceed synchronously until the firmware is completely
+ * downloaded. wl_init() should be called after this function has returned to
+ * perform device initialization.
+ *
+ * @param fw_read_cb callback function to invoke during firmware download.
+ * @param ctx Opaque context pointer that will be passed to the callbacks
+ *            when they are invoked. This parameter is never
+ *            accessed by the API.
+ * @param mode will hold the host attention mode used by the transport layer.
+ *         This parameter can be passed directly to \a wl_init().
+ *
+ * @return 
+ *
+ * - WL_CARD_FAILURE if the wl hardware device is not available
+ * - WL_FIRMWARE_INVALID if the firmware obtained through fw_read_cb is
+ *                       invalid.
+ * - WL_OOM if the necessary memory could not be allocated.
+ */
+wl_err_t wl_transport_init(wl_fw_read_cb_t *fw_read_cb,
+                           void *ctx,
+                           enum wl_host_attention_mode *mode);
+ 
+/*! \brief WiFi driver forward progress function
+ *
+ * This function must be called in polled environments to
+ * ensure forward progress. The call can be made as often as possible from
+ * the main application loop. However, the call will not have any effect unless
+ * there is an interrupt pending from the hardware.
+ *
+ * In interrupt mode, wl_poll() must be called if no interrupt
+ * handler is registered through wl_register_rx_isr(). When an interrupt
+ * handler is registered, it is no longer necessary to invoke wl_poll().
+ *
+ * Note that this function should not be invoked from interrupt context.
+ *
+ */
+void wl_poll(void);
+
+ 
 /*! \brief Register RX callback
  *
  * Register function to be called by the low level transport driver
@@ -1294,7 +1550,137 @@ wl_err_t wl_rx(uint8_t* buf, uint16_t* len);
  */
 wl_err_t wl_tx(const uint8_t* buf, uint16_t len);
 
-/*! @} */ /* End wl_data group */
+ 
+/*! \brief Configure data alignment
+ *
+ * This function can be used if the host SDIO/SPI controller has certain
+ * requirements on the data transfer sizes that can be used on the SDIO/SPI bus.
+ *
+ * If the txsize parameter is non-zero, additional padding data should be added
+ * when performing the low level transfer of data buffer of sizes that are not
+ * a multiple of the size_align parameter. See \ref wl_sdio and \ref wl_spi for
+ * more information.
+ *
+ * @param txsize will configure the size alignment for tx data.
+ *
+ */
+void wl_conf_alignment(uint8_t txsize);
+
+
+/*! @} */ /* End wl_transport group */
+
+
+/** \defgroup wl_custom Custom environment support
+ *
+ * \brief Support for custom environments
+ *
+ * These functions should only be used in cases where the transport library is
+ * not used at all. This usually applies to operating systems and environments
+ * where there already exists a transport layer framework, e.g. linux or
+ * windows.
+ *
+ *
+
+Note that the \a wl_poll() function is part of the transport library. Therefore,
+it should not be used in custom environments. Therefore, it is necessary to
+implement a custom polling or interrupt based scheme to ensure that any
+incoming packets are processed by the core.
+
+ *  @{
+ */
+ 
+ /*! \brief Wakeup callback function.
+ *
+ * Invoked when the WiFi device should wake up from power save mode.
+ * This function should send the proper commands to the device.
+ *
+ * Note that this type should only be used in custom environments, where
+ * the transport library is not used.
+ *
+ * @param ctx Opaque context pointer as provided to \a wl_register_wakeup_cb()
+ *            that will be passed back to the callback.
+ * @param wakeup indicates whether wakeup should be set or cleared in the
+ *               device.
+ */
+typedef void (wl_wakeup_cb_t)(void* ctx, uint8_t wakeup);
+
+/*! \brief Register wakeup callback function.
+ *
+ * Register a function that will be invoked when the WiFi device should wake
+ * up from power save mode.
+ *
+ * Note that this function should only be used in custom environments, where
+ * the transport library is not used.
+ *
+ * @param wakeup_cb Will be invoked when the device should wakeup from sleep
+ *                 mode.
+ * @param ctx Opaque context pointer that will be passed back to the callback.
+ */
+void wl_register_wakeup_cb(wl_wakeup_cb_t *wakeup_cb, void *ctx);
+ 
+
+/*! \brief Management tx callback function.
+ *
+ * Invoked when the a management message should be transmitted to the
+ * WiFi device. This function should ensure that the message is passed through
+ * to the device and should never fail.
+ *
+ * Note that this type should only be used in custom environments, where
+ * the transport library is not used.
+ *
+ * @param ctx Opaque context pointer as provided to \a wl_register_mgmt_tx_cb()
+ *            that will be passed back to the callback.
+ * @param buf Points to the buffer which holds the management data,
+ * @param len Size of the buffer.
+ */
+typedef void (wl_mgmt_tx_cb_t)(void *ctx, const uint8_t *buf, uint16_t len);
+
+
+/*! \brief Register management tx callback function
+ *
+ * Register a function that will be invoked when a management message should
+ * be transmitted to the device.
+ *
+ * Note that this function should only be used in custom environments, where
+ * the transport library is not used.
+ *
+ * IMPORTANT : In a custom environment without a transport library \a
+ *             wl_register_mgmt_tx_cb() \b must have been called
+ *             before \a wl_fw_download() is called since \a
+ *             wl_fw_download() depends on the \a mgmt_tx_cb() to send
+ *             the firmware data to the WiFi chip.
+ *
+ * @param mgmt_tx_cb The callback function to invoke.
+ * @param ctx Opaque context pointer that  will be passed back to the callback.
+ */
+void wl_register_mgmt_tx_cb(wl_mgmt_tx_cb_t *mgmt_tx_cb, void *ctx);
+
+
+
+/*! \brief Download the WiFi firmware image to the device.
+ *
+ * This operation will proceed synchronously until the firmware is completely
+ * downloaded. wl_init() should be called after this function has returned to
+ * perform device initialization. This function depends on \a
+ * wl_register_mgmt_tx_cb(). See that function for details.
+ *
+ * @param ctx Opaque context pointer that will be passed to the callbacks
+ *            when they are invoked. This parameter is never
+ *            accessed by the API.
+ * @param fw_read_cb callback function to invoke during firmware download.
+ *
+ * @return 
+ *
+ * - WL_CARD_FAILURE if the wl hardware device is not available
+ * - WL_FIRMWARE_INVALID if the firmware obtained through fw_read_cb is
+ *                       invalid.
+ * - WL_OOM if the necessary memory could not be allocated.
+ */
+ wl_err_t wl_fw_download(wl_fw_read_cb_t *fw_read_cb, void *ctx);
+
+ 
+ 
+/*! @} */ /* End wl_custom group */
 
 
 

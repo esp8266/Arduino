@@ -18,12 +18,12 @@
 #include "ard_utils.h"
 #include "intc.h"
 #include "spi.h"
-#include "clocks.h"
 #include "debug.h"
 #include "delay.h"
 #include "eic.h"
 #include "timer.h"
 #include "lwip/dns.h"
+#include <board_init.h>
 
 
 
@@ -165,9 +165,11 @@ void* mapSockTCP[MAX_SOCK_NUM];
 struct netif* ard_netif = NULL;
 
 // Network list retrived in the last scanNetwork
-static struct wl_network_t network_list[WL_NETWORKS_LIST_MAXNUM];
+static struct wl_network_list_t network_list = { 0 };
 
 struct ip_addr _hostIpAddr;
+
+static hostIpAddrFound = false;
 
 void* getTTCP(uint8_t sock)
 {
@@ -497,7 +499,7 @@ int set_key_cmd_cb(int numParam, char* buf, void* ctx) {
     memset(&bssid.octet, 0xff, sizeof bssid.octet);
 
     wl_add_wep_key(idx, len, key, &bssid);
-    wl_set_auth_mode(AUTH_MODE_SHARED_KEY);
+    //wl_set_auth_mode(AUTH_MODE_SHARED_KEY);
     wl_set_default_wep_key(idx);
 
     //Connect
@@ -769,8 +771,9 @@ cmd_spi_state_t get_reply_ipaddr_cb(char* recv, char* reply, void* ctx, uint16_t
 
 void foundHostByName(const char *name, struct ip_addr *ipaddr, void *callback_arg)
 {
-	INFO_SPI("foundHostByName: Found Host: name=%s ip=0x%x\n", name, ipaddr->addr);
-	_hostIpAddr.addr = ipaddr->addr;
+	_hostIpAddr.addr = (ipaddr)?ipaddr->addr:0xffffffff;
+	INFO_SPI("foundHostByName: Found Host: name=%s ip=0x%x\n", name, _hostIpAddr.addr);
+	hostIpAddrFound = true;
 }
 
 int req_reply_host_by_name_cb(int numParam, char* buf, void* ctx) {
@@ -786,11 +789,14 @@ int req_reply_host_by_name_cb(int numParam, char* buf, void* ctx) {
 		RETURN_ERR(WL_FAILURE)
 	}
 
+	INFO_SPI("Looking for Host: name=%s\n", hostName);
 	_hostIpAddr.addr = 0;
+	hostIpAddrFound = false;
     err_t err = dns_gethostbyname(hostName, &_hostIpAddr, foundHostByName, NULL);
     if (err == ERR_OK)
     {
     	INFO_SPI("Found Host: name=%s ip=0x%x\n", hostName, _hostIpAddr.addr);
+    	hostIpAddrFound = true;
 		RETURN_ERR(WL_SUCCESS)
     }
 	RETURN_ERR(WL_FAILURE)
@@ -798,11 +804,14 @@ int req_reply_host_by_name_cb(int numParam, char* buf, void* ctx) {
 
 cmd_spi_state_t get_reply_host_by_name_cb(char* recv, char* reply, void* ctx, uint16_t* count) {
 
+	u32_t addr = (hostIpAddrFound)?_hostIpAddr.addr : 0xffffffff;
+	INFO_SPI("Searching for Host: ip=0x%x found=%d\n", addr, hostIpAddrFound);
+
     CHECK_ARD_NETIF(recv, reply, count);
 
     CREATE_HEADER_REPLY(reply, recv, 1);
 
-    PUT_LONG_IN_BYTE_NO(_hostIpAddr.addr, reply, 3);
+    PUT_LONG_IN_BYTE_NO(addr, reply, 3);
 
     END_HEADER_REPLY(reply, 8, *count);
 
@@ -906,23 +915,23 @@ cmd_spi_state_t get_reply_idx_net_cb(char* recv, char* reply, void* ctx, uint16_
     	default:
     	case GET_IDX_SSID_CMD:
 			{
-				len = network_list[idx].ssid.len;
-				PUT_BUFDATA_BYTE(network_list[idx].ssid.ssid, len, reply, 3);
-				INFO_UTIL("SSID:%s\n", network_list[idx].ssid.ssid);
+				len = network_list.net[idx]->ssid.len;
+				PUT_BUFDATA_BYTE(network_list.net[idx]->ssid.ssid, len, reply, 3);
+				INFO_UTIL("SSID:%s\n", network_list.net[idx]->ssid.ssid);
 				break;
 			}
     	case GET_IDX_RSSI_CMD:
 			{
 				len = 4;
-				PUT_LONG_IN_BYTE_HO(network_list[idx].rssi, reply, 3);
-				INFO_UTIL("RSSI:%d\n", network_list[idx].rssi);
+				PUT_LONG_IN_BYTE_HO(network_list.net[idx]->rssi, reply, 3);
+				INFO_UTIL("RSSI:%d\n", network_list.net[idx]->rssi);
 				break;
 			}
     	case GET_IDX_ENCT_CMD:
 			{
 				len = 1;
-				PUT_DATA_BYTE(network_list[idx].enc_type, reply, 3);
-				INFO_UTIL("ENCT:%d\n", network_list[idx].enc_type);
+				PUT_DATA_BYTE(network_list.net[idx]->enc_type, reply, 3);
+				INFO_UTIL("ENCT:%d\n", network_list.net[idx]->enc_type);
 				break;
 			}
    	}
@@ -935,6 +944,37 @@ cmd_spi_state_t get_reply_idx_net_cb(char* recv, char* reply, void* ctx, uint16_
     return SPI_CMD_DONE;
 }
 
+static void copy_network_list(struct wl_network_list_t *dst,
+                              struct wl_network_list_t *src)
+{
+        int i;
+        for (i = 0; i < dst->cnt; i++)
+                free(dst->net[i]);
+        free(dst->net);
+
+        dst->cnt = 0;
+
+        if (src->cnt == 0)
+                return;
+        dst->net = calloc(1, src->cnt * sizeof(struct wl_network_t *));
+        if (dst->net == NULL) {
+                printk("could not allocate all gui net array\n");
+                return;
+        }
+
+        for (i = 0; i < src->cnt; i++) {
+                struct wl_network_t *net = src->net[i];
+                dst->net[i] = malloc(sizeof(*net));
+                if (dst->net[i] == NULL) {
+                        printk("could not allocate all gui nets\n");
+                        return;
+                }
+
+                memcpy(dst->net[i], net, sizeof(*net));
+                dst->cnt++;
+        }
+}
+
 
 cmd_spi_state_t get_reply_scan_networks_cb(char* recv, char* reply, void* ctx, uint16_t* count) {
 
@@ -943,39 +983,38 @@ cmd_spi_state_t get_reply_scan_networks_cb(char* recv, char* reply, void* ctx, u
 
     int network_cnt = 0;
 
-    struct wl_network_t* wl_network_list;
-    uint8_t wl_network_cnt;
+    struct wl_network_list_t* wl_network_list;
 
-     wl_get_network_list(&wl_network_list, &wl_network_cnt);
-     if (wl_network_cnt == 0)
+    wl_scan();
+    wl_get_network_list(&wl_network_list);
+     if (wl_network_list->cnt == 0)
      {
     	 CREATE_HEADER_REPLY(reply, recv, 0);
     	 END_HEADER_REPLY(reply, 3, *count);
     	 return SPI_CMD_DONE;
      }
 
-     if (wl_network_cnt > WL_NETWORKS_LIST_MAXNUM)
+     if (wl_network_list->cnt > WL_NETWORKS_LIST_MAXNUM)
      {
     	 network_cnt = WL_NETWORKS_LIST_MAXNUM ;
      }
      else{
-    	 network_cnt = wl_network_cnt ;
+    	 network_cnt = wl_network_list->cnt ;
      }
 
-     memcpy(network_list, wl_network_list,
-            sizeof(struct wl_network_t) * network_cnt);
-
+     copy_network_list(&network_list, wl_network_list);
      CREATE_HEADER_REPLY(reply, recv, network_cnt);
 
      uint8_t start = 3;
      int ii = 0;
      for (; ii < network_cnt; ii++)
      {
-    	 uint8_t len = network_list[ii].ssid.len;
-    	 PUT_BUFDATA_BYTE(network_list[ii].ssid.ssid, len, reply, start);
+    	 uint8_t len = network_list.net[ii]->ssid.len;
+    	 PUT_BUFDATA_BYTE(network_list.net[ii]->ssid.ssid, len, reply, start);
     	 start += len+1;
-    	 INFO_SPI("%d - %s - %d - %d - 0x%x\n",ii, network_list[ii].ssid.ssid, network_list[ii].enc_type,
-    			 network_list[ii].rssi, network_list[ii].bssid);
+    	 INFO_SPI("%d - %s - %d - %d - 0x%x\n",ii, network_list.net[ii]->ssid.ssid,
+    			 network_list.net[ii]->enc_type,
+    			 network_list.net[ii]->rssi, network_list.net[ii]->bssid);
      }
 
      END_HEADER_REPLY(reply, start, *count);

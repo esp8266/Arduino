@@ -1,5 +1,3 @@
-/* This header file is part of the ATMEL AVR-UC3-SoftwareFramework-1.7.0 Release */
-
 /*! \page License
  * Copyright (C) 2009, H&D Wireless AB All rights reserved.
  *

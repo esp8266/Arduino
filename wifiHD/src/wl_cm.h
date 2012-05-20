@@ -30,19 +30,22 @@
 #ifndef WL_CM_H
 #define WL_CM_H
 
-#include "wl_api.h"
+#include <stdint.h>
+#include <stdlib.h>
+#include <wl_api.h>
 
 typedef void (cm_scan_cb_t)(void* ctx);
 typedef void (cm_conn_cb_t)(struct wl_network_t *net, void* ctx);
 typedef void (cm_disconn_cb_t)(void* ctx);
-typedef void (cm_err_cb_t)(void* ctx);
 
 wl_err_t wl_cm_set_network(struct wl_ssid_t *ssid, struct wl_mac_addr_t *bssid);
 
-wl_err_t wl_cm_start(cm_scan_cb_t scan_cb, 
-                     cm_conn_cb_t conn_cb, 
-                     cm_disconn_cb_t disconn_cb,
-                     cm_err_cb_t    err_cb,
-                     void* ctx);
+wl_err_t wl_cm_init(cm_scan_cb_t scan_cb, 
+                    cm_conn_cb_t conn_cb, 
+                    cm_disconn_cb_t disconn_cb,
+                    void* ctx);
+
+wl_err_t wl_cm_start(void);
+wl_err_t wl_cm_stop(void);
 
 #endif
