@@ -1089,7 +1089,7 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"Da Arduno 1.0, la classe Udp nella libreria Ethernet è stata rinominata EthernerClient.\n"
+"Da Arduino 1.0, la classe Udp nella libreria Ethernet è stata rinominata EthernetClient.\n"
 "\n"
 
 #: debug/Compiler.java:495
