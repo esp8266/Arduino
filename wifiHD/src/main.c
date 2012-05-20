@@ -23,13 +23,11 @@
 #include "netif/wlif.h"
 
 #include "board_init.h"
-#include "startup.h"
 #include "trace.h"
 
 #include "timer.h"
 #include "util.h"
 #include "cmd_wl.h"
-#include "httpd.h"
 #include "ping.h"
 #include "ard_tcp.h"
 #include "spi.h"

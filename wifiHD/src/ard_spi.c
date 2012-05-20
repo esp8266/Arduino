@@ -169,7 +169,7 @@ static struct wl_network_list_t network_list = { 0 };
 
 struct ip_addr _hostIpAddr;
 
-static hostIpAddrFound = false;
+static bool hostIpAddrFound = false;
 
 void* getTTCP(uint8_t sock)
 {

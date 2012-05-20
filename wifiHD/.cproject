@@ -1120,12 +1120,12 @@
 <option id="gnu.c.link.option.paths.1927497406" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths">
 <listOptionValue builtIn="false" value="../src/SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS"/>
 <listOptionValue builtIn="false" value="../src/SOFTWARE_FRAMEWORK/BOARDS"/>
-<listOptionValue builtIn="false" value="../src/SOFTWARE_FRAMEWORK/COMPONENTS/WIFI/HD/v2.1.1/UCR2/GCC"/>
+<listOptionValue builtIn="false" value="../src/SOFTWARE_FRAMEWORK/COMPONENTS/WIFI/HD/v2.7.0/UCR2/GCC"/>
 </option>
 <option id="gnu.c.link.option.libs.161654023" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
 <listOptionValue builtIn="false" value="newlib_addons-at32ucr2-speed_opt"/>
-<listOptionValue builtIn="false" value="_ucr2_hd_spi_standalone_v2.1.1"/>
-<listOptionValue builtIn="false" value="_ucr2_hd_wl_standalone_v2.1.1"/>
+<listOptionValue builtIn="false" value="_ucr2_hd_wl_sta_intwpa_v2.7.0"/>
+<listOptionValue builtIn="false" value="_ucr2_hd_spi_v2.7.0"/>
 </option>
 <inputType id="cdt.managedbuild.tool.gnu.c.linker.input.506365499" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 <additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
