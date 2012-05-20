@@ -29,7 +29,7 @@ TOOLCHAIN=gcc
 #-------------------------------------------------------------------------------
 
 # Output directories
-OUTPUT_BIN = ../../../cores/sam
+OUTPUT_BIN = ../../../cores/arduino
 
 # Libraries
 PROJECT_BASE_PATH = ..
@@ -39,7 +39,7 @@ CMSIS_ARM_PATH=$(CMSIS_ROOT_PATH)/CMSIS/Include
 CMSIS_ATMEL_PATH=$(CMSIS_ROOT_PATH)/Device/ATMEL
 #CMSIS_CHIP_PATH=$(CMSIS_ROOT_PATH)/Device/ATMEL/$(CHIP_SERIE)
 
-ARDUINO_PATH = ../../../cores/sam
+ARDUINO_PATH = ../../../cores/arduino
 VARIANT_BASE_PATH = ../../../variants
 VARIANT_PATH = ../../../variants/$(VARIANT)
 

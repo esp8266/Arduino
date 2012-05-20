@@ -41,7 +41,7 @@ endif
 #-------------------------------------------------------------------------------
 
 # Output directories
-OUTPUT_BIN = ../../../cores/sam
+OUTPUT_BIN = ../../../cores/arduino
 
 # Libraries
 PROJECT_BASE_PATH = ..
