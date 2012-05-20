@@ -11,7 +11,8 @@
  * Serial monitor open on Serial port 0:
  
  created 30 Dec. 2008
- by Tom Igoe
+ modified 20 May 2012
+ by Tom Igoe & Jed Roach
  
  This example code is in the public domain.
  
@@ -29,5 +30,11 @@ void loop() {
   if (Serial1.available()) {
     int inByte = Serial1.read();
     Serial.write(inByte); 
+  }
+  
+  // read from port 0, send to port 1:
+  if (Serial.available()) {
+    int inByte = Serial.read();
+    Serial1.write(inByte); 
   }
 }
