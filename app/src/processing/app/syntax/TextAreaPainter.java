@@ -515,7 +515,10 @@ implements TabExpander, Printable
    */
   public Dimension getMinimumSize()
   {
-    return getPreferredSize();
+    Dimension dim = new Dimension();
+    dim.width = fm.charWidth('w') * 10;
+    dim.height = fm.getHeight() * 4;
+    return dim;
   }
 
   // package-private members

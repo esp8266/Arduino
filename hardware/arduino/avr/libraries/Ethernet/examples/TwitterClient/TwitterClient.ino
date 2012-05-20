@@ -14,7 +14,7 @@
  version 0019.  
  
  Circuit:
-  * Ethernet shield attached to pins 10, 11, 12, 13
+ * Ethernet shield attached to pins 10, 11, 12, 13
  
  created 21 May 2011
  by Tom Igoe
@@ -35,12 +35,12 @@ IPAddress ip(192,168,1,20);
 // initialize the library instance:
 EthernetClient client;
 
-const int requestInterval = 60000;  // delay between requests
+const unsigned long requestInterval = 60000;  // delay between requests
 
 char serverName[] = "api.twitter.com";  // twitter URL
 
 boolean requested;                   // whether you've made a request since connecting
-long lastAttemptTime = 0;            // last time you connected to the server, in milliseconds
+unsigned long lastAttemptTime = 0;            // last time you connected to the server, in milliseconds
 
 String currentLine = "";            // string to hold the text from server
 String tweet = "";                  // string to hold the tweet
@@ -51,13 +51,17 @@ void setup() {
   currentLine.reserve(256);
   tweet.reserve(150);
 
-// initialize serial:
+  // initialize serial:
   Serial.begin(9600);
   // attempt a DHCP connection:
+  Serial.println("Attempting to get an IP address using DHCP:");
   if (!Ethernet.begin(mac)) {
     // if DHCP fails, start with a hard-coded address:
+    Serial.println("failed to get an IP address using DHCP, trying manually");
     Ethernet.begin(mac, ip);
   }
+  Serial.print("My address:");
+  Serial.println(Ethernet.localIP());
   // connect to Twitter:
   connectToServer();
 }
@@ -114,7 +118,7 @@ void connectToServer() {
   Serial.println("connecting to server...");
   if (client.connect(serverName, 80)) {
     Serial.println("making HTTP request...");
-  // make HTTP GET request to twitter:
+    // make HTTP GET request to twitter:
     client.println("GET /1/statuses/user_timeline.xml?screen_name=arduino&count=1 HTTP/1.1");
     client.println("HOST: api.twitter.com");
     client.println();
@@ -122,3 +126,4 @@ void connectToServer() {
   // note the time of this connect attempt:
   lastAttemptTime = millis();
 }   
+

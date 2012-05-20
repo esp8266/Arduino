@@ -89,7 +89,7 @@ static inline void handle_interrupts(timer16_Sequence_t timer, volatile uint16_t
   }  
   else { 
     // finished all channels so wait for the refresh period to expire before starting over 
-    if( (unsigned)*TCNTn <  (usToTicks(REFRESH_INTERVAL) + 4) )  // allow a few ticks to ensure the next OCR1A not missed
+    if( ((unsigned)*TCNTn) + 4 < usToTicks(REFRESH_INTERVAL) )  // allow a few ticks to ensure the next OCR1A not missed
       *OCRnA = (unsigned int)usToTicks(REFRESH_INTERVAL);  
     else 
       *OCRnA = *TCNTn + 4;  // at least REFRESH_INTERVAL has elapsed
@@ -298,7 +298,7 @@ void Servo::writeMicroseconds(int value)
 {
   // calculate and store the values for the given channel
   byte channel = this->servoIndex;
-  if( (channel >= 0) && (channel < MAX_SERVOS) )   // ensure channel is valid
+  if( (channel < MAX_SERVOS) )   // ensure channel is valid
   {  
     if( value < SERVO_MIN() )          // ensure pulse width is valid
       value = SERVO_MIN();

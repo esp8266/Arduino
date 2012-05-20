@@ -52,15 +52,16 @@ uint8_t EthernetUDP::begin(uint16_t port) {
     return 0;
 
   _port = port;
+  _remaining = 0;
   socket(_sock, SnMR::UDP, _port, 0);
 
   return 1;
 }
 
-/* Is data available in rx buffer? Returns 0 if no, number of available bytes if yes. 
- * returned value includes 8 byte UDP header!*/
+/* return number of bytes available in the current packet,
+   will return zero if parsePacket hasn't been called yet */
 int EthernetUDP::available() {
-  return W5100.getRXReceivedSize(_sock);
+  return _remaining;
 }
 
 /* Release any resources being used by this EthernetUDP instance */
@@ -116,11 +117,14 @@ size_t EthernetUDP::write(const uint8_t *buffer, size_t size)
 
 int EthernetUDP::parsePacket()
 {
-  if (available() > 0)
+  // discard any remaining bytes in the last packet
+  flush();
+
+  if (W5100.getRXReceivedSize(_sock) > 0)
   {
     //HACK - hand-parse the UDP packet using TCP recv method
     uint8_t tmpBuf[8];
-    int ret =0;	
+    int ret =0; 
     //read 8 header bytes and get IP and port from it
     ret = recv(_sock,tmpBuf,8);
     if (ret > 0)
@@ -128,8 +132,11 @@ int EthernetUDP::parsePacket()
       _remoteIP = tmpBuf;
       _remotePort = tmpBuf[4];
       _remotePort = (_remotePort << 8) + tmpBuf[5];
+      _remaining = tmpBuf[6];
+      _remaining = (_remaining << 8) + tmpBuf[7];
+
       // When we get here, any remaining bytes are the data
-      ret = available();
+      ret = _remaining;
     }
     return ret;
   }
@@ -140,34 +147,58 @@ int EthernetUDP::parsePacket()
 int EthernetUDP::read()
 {
   uint8_t byte;
-  if (recv(_sock, &byte, 1) > 0)
+
+  if ((_remaining > 0) && (recv(_sock, &byte, 1) > 0))
   {
     // We read things without any problems
+    _remaining--;
     return byte;
   }
+
   // If we get here, there's no data available
   return -1;
 }
 
 int EthernetUDP::read(unsigned char* buffer, size_t len)
 {
-  /* In the readPacket that copes with truncating packets, the buffer was
-     filled with this code.  Not sure why it loops round reading out a byte
-     at a time.
-  int i;
-  for(i=0;i<(int)bufLen;i++) {
-    recv(_sock,tmpBuf,1);
-    buf[i]=tmpBuf[0];
+
+  if (_remaining > 0)
+  {
+
+    int got;
+
+    if (_remaining <= len)
+    {
+      // data should fit in the buffer
+      got = recv(_sock, buffer, _remaining);
+    }
+    else
+    {
+      // too much data for the buffer, 
+      // grab as much as will fit
+      got = recv(_sock, buffer, len);
+    }
+
+    if (got > 0)
+    {
+      _remaining -= got;
+      return got;
+    }
+
   }
-  */
-  return recv(_sock, buffer, len);
+
+  // If we get here, there's no data available or recv failed
+  return -1;
+
 }
 
 int EthernetUDP::peek()
 {
   uint8_t b;
-  // Unlike recv, peek doesn't check to see if there's any data available, so we must
-  if (!available())
+  // Unlike recv, peek doesn't check to see if there's any data available, so we must.
+  // If the user hasn't called parsePacket yet then return nothing otherwise they
+  // may get the UDP header
+  if (!_remaining)
     return -1;
   ::peek(_sock, &b);
   return b;
@@ -175,7 +206,11 @@ int EthernetUDP::peek()
 
 void EthernetUDP::flush()
 {
-  while (available())
+  // could this fail (loop endlessly) if _remaining > 0 and recv in read fails?
+  // should only occur if recv fails after telling us the data is there, lets
+  // hope the w5100 always behaves :)
+
+  while (_remaining)
   {
     read();
   }
