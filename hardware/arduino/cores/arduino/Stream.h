@@ -82,6 +82,8 @@ class Stream : public Print
   // returns the number of characters placed in the buffer (0 means no valid data found)
 
   // Arduino String functions to be added here
+  String readString();
+  String readStringUntil(char terminator);
 
   protected:
   long parseInt(char skipChar); // as above but the given skipChar is ignored
