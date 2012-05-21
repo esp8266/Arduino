@@ -34,6 +34,7 @@ my $wire = create_page('Wire.html', "$ARDUINO/Reference/Wire");
 my $sd = create_page('SD.html', "$ARDUINO/Reference/SD");
 my $servo = create_page('Servo.html', "$ARDUINO/Reference/Servo");
 my $spi = create_page('SPI.html', "$ARDUINO/Reference/SPI");
+my $mousekeyboard = create_page('MouseKeyboard.html', "$ARDUINO/Reference/MouseKeyboard");
 my $lcd = create_page('LiquidCrystal.html', "$ARDUINO/Reference/LiquidCrystal");
 my $ethernet = create_page('Ethernet.html', "$ARDUINO/Reference/Ethernet");
 my $serial = create_page('Serial.html', "$ARDUINO/Reference/Serial");
@@ -48,6 +49,8 @@ create_linked_pages($servo, qr!$ARDUINO/Reference/(Servo\w+)!,        '%%.html')
 create_linked_pages($sd, qr!$ARDUINO/Reference/(SD\w+)!,        '%%.html');
 create_linked_pages($sd, qr!$ARDUINO/Reference/(File\w+)!,        '%%.html');
 create_linked_pages($spi, qr!$ARDUINO/Reference/(SPI\w+)!,        '%%.html');
+create_linked_pages($mousekeyboard, qr!$ARDUINO/Reference/(Mouse\w+)!,        '%%.html');
+create_linked_pages($mousekeyboard, qr!$ARDUINO/Reference/(Keyboard\w+)!,        '%%.html');
 create_linked_pages($lcd, qr!$ARDUINO/Reference/(LiquidCrystal\w+)!,        '%%.html');
 create_linked_pages($ethernet, qr!$ARDUINO/Reference/(Ethernet\w+)!,        '%%.html');
 create_linked_pages($ethernet, qr!$ARDUINO/Reference/(Server\w+)!,        '%%.html');
