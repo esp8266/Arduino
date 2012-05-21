@@ -12,26 +12,105 @@ ARDUINO 1.0.1
 
 * The editor font size preference now applies to the serial monitor and
   error / message console as well as the editor.  (Paul Stoffregen)
+  http://code.google.com/p/arduino/issues/detail?id=550
 
 * Compilation has been speeded up by only compiling changed files.  (All
   files are recompiled when a new board is selected.)  (Paul Stoffregen)
+  http://code.google.com/p/arduino/issues/detail?id=638
 
 * Console log files (stdout.txt and stderr.txt) are now removed when the
   Arduino software exits.  (Paul Stoffregen)
 
 * The minimum size for the Arduino software window has been reduced.
+  http://code.google.com/p/arduino/issues/detail?id=52
 
 * Improvements to the Find / Replace dialog.  (Peter Lewis)
+  http://code.google.com/p/arduino/issues/detail?id=825
 
 * Support for selecting words (on double-click) and lines (triple-click)
   in the Arduino software.  (Peter Lewis)
+  http://code.google.com/p/arduino/issues/detail?id=824
+
+* Don't insert newline when using serial monitor keyboard
+  shortcut. (Lars J. Nielsen)
+  http://code.google.com/p/arduino/issues/detail?id=279
 
 * Added a preference for disabling verification on upload (for increased
   speed).  (Nathan Seidle)
+  http://code.google.com/p/arduino/issues/detail?id=842
+
+* Added the gcc toolchain to the Linux distribution.  (To use the 
+  toolchain already installed on your system, simply delete the one
+  that comes with the Arduino software.)  (Paul Stoffregen)
+  http://code.google.com/p/arduino/issues/detail?id=300
+
+* Updating Arduino Mini upload protocol to 'arduino' from 'stk500' (should
+  fix problems with auto-reset not working).
 
 [core / libraries]
 
-* 
+* Adding overloads to Wire.write() (for Wire.write(0)). (Paul Stoffregen)
+  http://code.google.com/p/arduino/issues/detail?id=527
+
+* Fixing delayMicroseconds() for 20 MHz clocks (Erdem U. Altinyurt)
+  http://code.google.com/p/arduino/issues/detail?id=306
+
+* Support third external interrupt on ATmega1284P. (maniacbug)
+  http://code.google.com/p/arduino/issues/detail?id=728
+
+* Update reference voltage constants for ATmega1284P. (maniacbug)
+  http://code.google.com/p/arduino/issues/detail?id=728
+
+* Adding --relax linker flag for ATmega2560. (arducopter)
+  http://code.google.com/p/arduino/issues/detail?id=729
+
+* Fixing Ethernet library bug on avr-gcc 4.5.1 (SurferTim)
+  http://code.google.com/p/arduino/issues/detail?id=605
+
+* Fixed DHCP hostname generation. (peter)
+
+* Simplifying microseconds to clock cycles conversions (Rob Tillaart)
+  http://code.google.com/p/arduino/issues/detail?id=675
+
+* Fixed various warnings.  (maniacbug)
+  http://code.google.com/p/arduino/issues/detail?id=688
+
+* Fixed bug w/ repeated initial characters in findUntil().  (Jeffery.zksun)
+  http://code.google.com/p/arduino/issues/detail?id=768
+
+* Added INPUT_PULLUP option for pinMode().  The INPUT mode now explicitly
+  disables the pullup resistors.  (Paul Stoffregen)
+  http://code.google.com/p/arduino/issues/detail?id=246
+
+* Fixing bug in the receiving of multiple UDP packets.  (dylan and peter)
+  http://code.google.com/p/arduino/issues/detail?id=669
+
+* Added ability to generate repeated starts in the Wire library (in
+  master mode).  Extra boolean parameters to endTransmission() and
+  requestFrom() control whether or not to send a stop (or a repeated
+  start instead).  (Todd Krein)
+  http://code.google.com/p/arduino/issues/detail?id=663
+
+* Added Ethernet.maintain() to renew DHCP leases.  (Peter Magnusson)
+  http://code.google.com/p/arduino/issues/detail?id=716
+
+* Fix for CLOSE_WAIT bug that could cause Ethernet sketches to crash
+  over time.  (mr-russ and Johann Richard)
+
+* Fix to servo pulse timing calculation. (jwatte)
+  http://code.google.com/p/arduino/issues/detail?id=908
+
+* Added readString() and readStringUntil() functions.  (Adrian McEwen)
+  http://code.google.com/p/arduino/issues/detail?id=454
+
+[examples]
+
+* Updated to latest ArduinoISP sketch. (rsbohn)
+  http://code.google.com/p/arduino/issues/detail?id=378
+
+* Fixed ArduinoISP sketch by lowering delay() in heartbeat.
+
+* Other updates.
 
 ARDUINO 1.0 - 2011.11.30
 
