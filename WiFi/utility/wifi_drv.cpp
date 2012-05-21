@@ -430,12 +430,12 @@ int WiFiDrv::getHostByName(const char* aHostname, IPAddress& aResult)
 	{
 		while(!getHostByName(aResult) && --retry > 0)
 		{
-			delay(500);
+			delay(1000);
 		}
 	}else{
 		return 0;
 	}
-	return 1;
+	return (retry>0);
 }
 
 WiFiDrv wiFiDrv;
