@@ -1,4 +1,4 @@
-ARDUINO 1.0.1
+ARDUINO 1.0.1 - 2012.05.21
 
 [environment]
 
@@ -9,6 +9,8 @@ ARDUINO 1.0.1
 
 * Added preference for selecting the language in which to display the
   Arduino software.  Defaults to the operating system locale.  
+
+* New upload process for the Arduino Leonardo (ATmega32U4).
 
 * The editor font size preference now applies to the serial monitor and
   error / message console as well as the editor.  (Paul Stoffregen)
@@ -48,6 +50,9 @@ ARDUINO 1.0.1
   fix problems with auto-reset not working).
 
 [core / libraries]
+
+* Updated (and official) support for the Arduino Leonardo (ATmega32U4).
+  Includes new bootloader and various fixes to the core.  
 
 * Adding overloads to Wire.write() (for Wire.write(0)). (Paul Stoffregen)
   http://code.google.com/p/arduino/issues/detail?id=527
