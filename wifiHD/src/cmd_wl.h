@@ -50,6 +50,11 @@ cmd_state_t cmd_setpass(int argc, char* argv[], void* ctx);
 cmd_state_t cmd_delpass(int argc, char* argv[], void* ctx);
 cmd_state_t cmd_debug(int argc, char* argv[], void* ctx);
 cmd_state_t cmd_debug_toggle(int argc, char* argv[], void* ctx);
+cmd_state_t cmd_statSpi(int argc, char* argv[], void* ctx);
+cmd_state_t cmd_resetStatSpi(int argc, char* argv[], void* ctx);
+cmd_state_t cmd_gethostbyname(int argc, char* argv[], void* ctx);
+cmd_state_t cmd_setDnsServer(int argc, char* argv[], void* ctx);
+cmd_state_t cmd_startTcpSrv(int argc, char* argv[], void* ctx);
 #ifdef WFE_6_12
 cmd_state_t cmd_ibss(int argc, char* argv[], void* ctx);
 #endif

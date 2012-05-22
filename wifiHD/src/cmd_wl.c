@@ -42,6 +42,7 @@
 #include "lwip/netif.h"
 #include "lwip/dns.h"
 #include "debug.h"
+#include "ard_spi.h"
 
 extern void showTTCPstatus();
 
@@ -367,6 +368,36 @@ cmd_setDnsServer(int argc, char* argv[], void* ctx)
 
         return CMD_DONE;
 }
+
+/**
+ *
+ */
+cmd_state_t
+cmd_startTcpSrv(int argc, char* argv[], void* ctx)
+{
+        const char *usage = "usage: startTcpSrv <port> <sock>\n";
+
+        int port = 0;
+        int sock = 0;
+
+        if (argc < 3) {
+                printk(usage);
+                return CMD_DONE;
+        }
+
+        /* TCP port */
+        port = atoi(argv[1]);
+        /* socket index */
+        sock = atoi(argv[2]);
+
+        printk("Start TCP server on port %d sock %d\n", port, sock);
+        if (start_server_tcp(port, sock) != -1)
+        {
+        	printk("Start TCP server on port %d sock %d FAILED\n", port, sock);
+        }
+        return CMD_DONE;
+}
+
 
 #endif
 

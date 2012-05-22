@@ -302,6 +302,7 @@ void initShell()
 #ifdef _DNS_CMD_
         console_add_cmd("getHost", cmd_gethostbyname, NULL);
         console_add_cmd("setDNS", cmd_setDnsServer, NULL);
+        console_add_cmd("startTcpSrv", cmd_startTcpSrv, NULL);
 #endif
 }
 

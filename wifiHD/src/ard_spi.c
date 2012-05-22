@@ -189,6 +189,13 @@ int getSock(void * _ttcp)
 	return -1;
 }
 
+void setMapSock(uint8_t sock, void* _ttcp)
+{
+	if (sock < MAX_SOCK_NUM)
+		mapSockTCP[sock]=_ttcp;
+	printk("Map [%d, %p]\n", sock, _ttcp);
+}
+
 void clearMapSockTcp(uint8_t sock)
 {
 	if (sock < MAX_SOCK_NUM)
@@ -197,7 +204,7 @@ void clearMapSockTcp(uint8_t sock)
 
 void initMapSockTcp()
 {
-	memset(mapSockTCP, 0, sizeof(void*)*MAX_SOCK_NUM);
+	memset(mapSockTCP, 0, sizeof(mapSockTCP));
 }
 
 /**
@@ -222,16 +229,16 @@ void showTTCPstatus()
 	int i = 0;
 	for (; i<MAX_SOCK_NUM; i++)
 	{
-		void* p = mapSockTCP[i];
+		void* p = getTTCP(i);
 		if (p)
 		{
 			ttcp_t* _ttcp = (ttcp_t* )p;
 			printk("Socket n.:%d addr:0x%x port:%d\n", i, _ttcp->addr, _ttcp->port);
 			if (_ttcp->tpcb){
-				printk("[tpcp]-Status:%d\n", _ttcp->tpcb->state);
+				printk("[tpcp-%p]-Status:%d\n", _ttcp->tpcb, _ttcp->tpcb->state);
 			}
 			if (_ttcp->lpcb){
-				printk("[tlcp]-Status:%d\n", _ttcp->lpcb->state);
+				printk("[tlcp-%p]-Status:%d\n", _ttcp->lpcb, _ttcp->lpcb->state);
 			}
 			ard_tcp_print_stats(_ttcp);
 		}
@@ -594,6 +601,45 @@ void set_result_cmd(int err)
 extern int ttcp_start(struct ip_addr addr, uint16_t port, void *opaque,
            void *done_cb, int mode, uint16_t nbuf, uint16_t buflen, int udp, int verbose);
 
+
+int start_server_tcp(uint16_t port, uint8_t sock)
+{
+	struct ip_addr addr = { 0 };
+    uint16_t buflen = 1024;
+    uint16_t nbuf = 1024;
+    wl_err_t err = WL_FAILURE;
+
+#ifdef _APP_DEBUG_
+    int verbose = 1;
+#else
+    int verbose = 0;
+#endif
+    int udp = 0;
+    int mode = 1;   //RECEIVE
+    void* _ttcp = NULL;
+
+    if (sock >= MAX_SOCK_NUM)
+    	return WIFI_SPI_ERR;
+
+    if (_connected)
+    {
+    	printk("Still connected...wait\n");
+    	return WIFI_SPI_ERR;
+    }
+
+    if (ard_tcp_start(addr, port, NULL, NULL, mode, nbuf, buflen, udp, verbose, sock, &_ttcp) == 0)
+    {
+    	INFO_SPI("Start Server [%d, %d] OK!\n", port, sock);
+    	setMapSock(sock, _ttcp);
+        err = WL_SUCCESS;
+    }else{
+    	INFO_SPI("Start Server [%d, %d] FAILED!\n", port, sock);
+    	clearMapSockTcp(sock);
+    }
+    return err;
+}
+
+
 int start_server_tcp_cmd_cb(int numParam, char* buf, void* ctx) {
 	wl_err_t err = WL_FAILURE;
 	tParam* params = (tParam*) buf;
@@ -601,30 +647,7 @@ int start_server_tcp_cmd_cb(int numParam, char* buf, void* ctx) {
     {
     	GET_PARAM_NEXT(INT, params, port);
     	GET_PARAM_NEXT(BYTE, params, sock);
-
-    	struct ip_addr addr = { 0 };
-        uint16_t buflen = 1024;
-        uint16_t nbuf = 1024;
-#ifdef _APP_DEBUG_
-        int verbose = 1;
-#else
-        int verbose = 0;
-#endif
-        int udp = 0;
-        int mode = 1;   //RECEIVE
-        void* _ttcp = NULL;
-
-        if (sock >= MAX_SOCK_NUM)
-        	return WIFI_SPI_ERR;
-
-        INFO_SPI("Start Server [%d, %d]\n", port, sock);
-        if (ard_tcp_start(addr, port, NULL, NULL, mode, nbuf, buflen, udp, verbose, sock, &_ttcp) == 0)
-        {
-        	if (sock < MAX_SOCK_NUM)
-        		mapSockTCP[sock]=_ttcp;
-        	INFO_SPI("Map [%d, %p]\n", sock, _ttcp);
-            err = WL_SUCCESS;
-        }
+    	err = start_server_tcp(port, sock);
     }
     return (err==WL_SUCCESS) ? WIFI_SPI_ACK : WIFI_SPI_ERR;
 }
@@ -655,15 +678,14 @@ int start_client_tcp_cmd_cb(int numParam, char* buf, void* ctx) {
         if (sock >= MAX_SOCK_NUM)
         	return WIFI_SPI_ERR;
 
-        INFO_SPI("Start Client [0x%x, %d, %d]\n", addr, port, sock);
         if (ard_tcp_start((struct ip_addr)addr, port, NULL, NULL, mode, nbuf, buflen, udp, verbose, sock, &_ttcp) == 0)
         {
-        	if (sock < MAX_SOCK_NUM)
-        		mapSockTCP[sock]=_ttcp;
-        	INFO_SPI("Map [%d, %p]\n", sock, _ttcp);
+        	INFO_SPI("Start Client [0x%x, %d, %d] OK!\n", addr, port, sock);
+        	setMapSock(sock, _ttcp);
             err = WL_SUCCESS;
         }else{
-        	mapSockTCP[sock]=0;
+        	INFO_SPI("Start Client [0x%x, %d, %d] FAILED!\n", addr, port, sock);
+        	clearMapSockTcp(sock);
         }
     }
     return (err==WL_SUCCESS) ? WIFI_SPI_ACK : WIFI_SPI_ERR;
@@ -682,9 +704,8 @@ int stop_client_tcp_cmd_cb(int numParam, char* buf, void* ctx) {
 
         if (sock < MAX_SOCK_NUM)
         {
-        	_ttcp = mapSockTCP[sock];
+        	_ttcp = getTTCP(sock);
         	ard_tcp_stop(_ttcp);
-        	mapSockTCP[sock]=0;
             err = WL_SUCCESS;
         }
     }
@@ -1032,10 +1053,11 @@ cmd_spi_state_t get_state_tcp_cmd_cb(char* recv, char* reply, void* ctx, uint16_
     uint8_t _state = CLOSED;
     if ((recv[3]==1)&&(recv[4]>=0)&&(recv[4]<MAX_SOCK_NUM))
     {
-    	_state = getStateTcp(mapSockTCP[(uint8_t)recv[4]], 0);
+    	_state = getStateTcp(getTTCP((uint8_t)recv[4]), 0);
     }
     PUT_DATA_BYTE(_state, reply, 3);
     END_HEADER_REPLY(reply, 5, *count);
+    INFO_SPI("state:%d\n", _state);
 
     return SPI_CMD_DONE;
 }
@@ -1049,7 +1071,7 @@ cmd_spi_state_t get_client_state_tcp_cmd_cb(char* recv, char* reply, void* ctx, 
     uint8_t _state = CLOSED;
     if ((recv[3]==1)&&(recv[4]>=0)&&(recv[4]<MAX_SOCK_NUM))
     {
-    	void * p= mapSockTCP[(uint8_t)recv[4]];
+    	void * p= getTTCP((uint8_t)recv[4]);
     	// get if we are in server or Transmit mode (0)
     	if (getModeTcp(p) == TTCP_MODE_TRANSMIT)
     	{
@@ -1067,6 +1089,7 @@ cmd_spi_state_t get_client_state_tcp_cmd_cb(char* recv, char* reply, void* ctx, 
     }
     PUT_DATA_BYTE(_state, reply, 3);
     END_HEADER_REPLY(reply, 5, *count);
+    INFO_SPI("state:%d\n", _state);
 
     return SPI_CMD_DONE;
 }
@@ -1084,6 +1107,9 @@ cmd_spi_state_t avail_data_tcp_cmd_cb(char* recv, char* reply, void* ctx, uint16
     }
 	PUT_DATA_BYTE(dataAvail, reply, 3);
 	END_HEADER_REPLY(reply, 5, *count);
+
+	INFO_SPI("dataAvail:%d\n", dataAvail);
+
     return SPI_CMD_DONE;
 }
 
@@ -1128,7 +1154,7 @@ cmd_spi_state_t data_sent_tcp_cmd_cb(char* recv, char* reply, void* ctx, uint16_
 	uint8_t dataSent = 0;
     if ((recv[3]==1)&&(recv[4]>=0)&&(recv[4]<MAX_SOCK_NUM))
     {
-    	dataSent = isDataSent(mapSockTCP[(uint8_t)recv[4]]);
+    	dataSent = isDataSent(getTTCP((uint8_t)recv[4]));
     }
 	PUT_DATA_BYTE(dataSent, reply, 3);
 	END_HEADER_REPLY(reply, 5, *count);
@@ -1509,7 +1535,7 @@ inline int spi_slaveReceiveInt(volatile avr32_spi_t *spi, bool startRecvd)
     }
 
     /* break on buffer overflow */
-    if (receivedChars > _BUFFERSIZE) {
+    if (receivedChars >= _BUFFERSIZE) {
 		err = SPI_ERROR_OVERRUN_AND_MODE_FAULT;
       break;
     }
@@ -1683,9 +1709,9 @@ int initSpi()
 #endif
 	init_spi_cmds();
 
-	memset(_receiveBuffer, 0, _BUFFERSIZE);
-	memset(buf, 0, CMD_MAX_LEN);
-	memset(reply, 0, REPLY_MAX_LEN);
+	memset(_receiveBuffer, 0, sizeof(_receiveBuffer));
+	memset(buf, 0, sizeof(buf));
+	memset(reply, 0, sizeof(reply));
 
 	initMapSockTcp();
 

@@ -56,18 +56,12 @@ void spi_poll(struct netif* netif);
 
 int spi_slaveReceive(volatile avr32_spi_t *spi);
 
-cmd_state_t cmd_statSpi(int argc, char* argv[], void* ctx);
-
-cmd_state_t cmd_resetStatSpi(int argc, char* argv[], void* ctx);
-
-cmd_state_t cmd_gethostbyname(int argc, char* argv[], void* ctx);
-
-cmd_state_t cmd_setDnsServer(int argc, char* argv[], void* ctx);
-
 void showTTCPstatus();
 
 int getSock(void * _ttcp);
 
 void clearMapSockTcp(uint8_t sock);
+
+int start_server_tcp(uint16_t port, uint8_t sock);
 
 #endif /* ARD_SPI_H_ */
