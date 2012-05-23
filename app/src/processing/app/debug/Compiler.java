@@ -117,6 +117,14 @@ public class Compiler implements MessageConsumer {
   private PreferencesMap createBuildPreferences(String _buildPath,
                                                 String _primaryClassName)
       throws RunnerException {
+    
+    if (Base.getBoardPreferences() == null) {
+      RunnerException re = new RunnerException(
+          _("No board selected; please choose a board from the Tools > Board menu."));
+      re.hideStackTrace();
+      throw re;
+    }
+
     TargetPlatform targetPlatform = Base.getTargetPlatform();
 
     // Merge all the global preference configuration in order of priority
@@ -137,12 +145,6 @@ public class Compiler implements MessageConsumer {
 
     // Core folder
     String core = p.get("build.core");
-    if (core == null) {
-      RunnerException re = new RunnerException(
-          _("No board selected; please choose a board from the Tools > Board menu."));
-      re.hideStackTrace();
-      throw re;
-    }
     TargetPlatform tp;
     if (!core.contains(":")) {
       tp = targetPlatform;
