@@ -17,6 +17,7 @@
  * Ethernet shield attached to pins 10, 11, 12, 13
  
  created 21 May 2011
+ modified 9 Apr 2012
  by Tom Igoe
  
  This code is in the public domain.
@@ -51,8 +52,13 @@ void setup() {
   currentLine.reserve(256);
   tweet.reserve(150);
 
-  // initialize serial:
+ // Open serial communications and wait for port to open:
   Serial.begin(9600);
+   while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
+
+
   // attempt a DHCP connection:
   Serial.println("Attempting to get an IP address using DHCP:");
   if (!Ethernet.begin(mac)) {

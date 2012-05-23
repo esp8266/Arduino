@@ -13,6 +13,7 @@
  * Ethernet shield attached to pins 10, 11, 12, 13
  
  created 14 Sep 2010
+ modified 9 Apr 2012
  by Tom Igoe
  
  */
@@ -38,8 +39,13 @@ EthernetClient client;
 void setup() {
   // start the Ethernet connection:
   Ethernet.begin(mac, ip);
-  // start the serial library:
+ // Open serial communications and wait for port to open:
   Serial.begin(9600);
+   while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
+
+
   // give the Ethernet shield a second to initialize:
   delay(1000);
   Serial.println("connecting...");

@@ -10,7 +10,7 @@
  
  created 18 Dec 2009
  by David A. Mellis
- modified 20 Mar 2012
+ modified 9 Apr 2012
  by Tom Igoe
  
  */
@@ -30,7 +30,13 @@ IPAddress ip(192,168,1, 177);
 EthernetServer server(80);
 
 void setup() {
+ // Open serial communications and wait for port to open:
   Serial.begin(9600);
+   while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
+
+
   // start the Ethernet connection and the server:
   Ethernet.begin(mac, ip);
   server.begin();

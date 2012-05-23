@@ -101,6 +101,32 @@ public class Serial implements SerialPortEventListener {
       new Float(Preferences.get("serial.stopbits")).floatValue());
   }
 
+  public static boolean touchPort(String iname, int irate) throws SerialException {
+    SerialPort port;
+    boolean result = false;
+    try {
+      Enumeration portList = CommPortIdentifier.getPortIdentifiers();
+      while (portList.hasMoreElements()) {
+        CommPortIdentifier portId = (CommPortIdentifier) portList.nextElement();
+        if ((CommPortIdentifier.PORT_SERIAL == portId.getPortType()) && (portId.getName().equals(iname))) {
+          port = (SerialPort) portId.open("tap", 2000);
+          port.setSerialPortParams(irate, 8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+          port.close();				
+          result = true;
+        }
+      }
+    } catch (PortInUseException e) {
+      throw new SerialException(
+        I18n.format(_("Serial port ''{0}'' already in use. Try quitting any programs that may be using it."), iname)
+      );
+    } catch (Exception e) {
+      throw new SerialException(
+        I18n.format(_("Error touching serial port ''{0}''."), iname), e
+      );
+    }
+	return result;
+  }
+
   public Serial(String iname, int irate,
                  char iparity, int idatabits, float istopbits)
   throws SerialException {
@@ -527,10 +553,11 @@ public class Serial implements SerialPortEventListener {
    * it may be because the DLL doesn't have its exec bit set.
    * Why the hell that'd be the case, who knows.
    */
-  static public String[] list() {
-    Vector list = new Vector();
+  static public List<String> list() {
+    List<String> list = new ArrayList<String>();
     try {
       //System.err.println("trying");
+      @SuppressWarnings("unchecked")
       Enumeration portList = CommPortIdentifier.getPortIdentifiers();
       //System.err.println("got port list");
       while (portList.hasMoreElements()) {
@@ -540,7 +567,7 @@ public class Serial implements SerialPortEventListener {
 
         if (portId.getPortType() == CommPortIdentifier.PORT_SERIAL) {
           String name = portId.getName();
-          list.addElement(name);
+          list.add(name);
         }
       }
 
@@ -553,9 +580,7 @@ public class Serial implements SerialPortEventListener {
       errorMessage("ports", e);
     }
     //System.err.println("move out");
-    String outgoing[] = new String[list.size()];
-    list.copyInto(outgoing);
-    return outgoing;
+    return list;
   }
 
 

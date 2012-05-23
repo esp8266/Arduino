@@ -9,7 +9,7 @@
  
  created 18 Dec 2009
  by David A. Mellis
- modified 12 April 2011
+ modified 9 Apr 2012
  by Tom Igoe, based on work by Adrian McEwen
  
  */
@@ -28,8 +28,13 @@ char serverName[] = "www.google.com";
 EthernetClient client;
 
 void setup() {
-  // start the serial library:
+ // Open serial communications and wait for port to open:
   Serial.begin(9600);
+   while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
+
+
   // start the Ethernet connection:
   if (Ethernet.begin(mac) == 0) {
     Serial.println("Failed to configure Ethernet using DHCP");

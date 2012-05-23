@@ -9,7 +9,7 @@
  
  created 4 Sep 2010 
  by Michael Margolis
- modified 17 Sep 2010
+ modified 9 Apr 2012
  by Tom Igoe
  
  This code is in the public domain.
@@ -38,7 +38,12 @@ EthernetUDP Udp;
 
 void setup() 
 {
+ // Open serial communications and wait for port to open:
   Serial.begin(9600);
+   while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
+
 
   // start Ethernet and UDP
   if (Ethernet.begin(mac) == 0) {

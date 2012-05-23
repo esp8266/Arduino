@@ -8,6 +8,7 @@
  * Ethernet shield attached to pins 10, 11, 12, 13
  
  created 18 Dec 2009
+ modified 9 Apr 2012
  by David A. Mellis
  
  */
@@ -26,8 +27,12 @@ IPAddress server(173,194,33,104); // Google
 EthernetClient client;
 
 void setup() {
-  // start the serial library:
+ // Open serial communications and wait for port to open:
   Serial.begin(9600);
+   while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
+
   // start the Ethernet connection:
   if (Ethernet.begin(mac) == 0) {
     Serial.println("Failed to configure Ethernet using DHCP");

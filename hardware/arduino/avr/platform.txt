@@ -6,12 +6,12 @@ name=Arduino
 # Default "compiler.path" is correct, change only if you want to overidde the initial value
 #compiler.path={ide.path}/tools/avr/bin/..
 compiler.c.cmd=avr-gcc
-compiler.c.flags=-c -g -Os -w -ffunction-sections -fdata-sections
+compiler.c.flags=-c -g -Os -w -ffunction-sections -fdata-sections -MMD
 compiler.c.elf.flags=-Os -Wl,--gc-sections
 compiler.c.elf.cmd=avr-gcc
 compiler.S.flags=-c -g -assembler-with-cpp
 compiler.cpp.cmd=avr-g++
-compiler.cpp.flags=-c -g -Os -w -fno-exceptions -ffunction-sections -fdata-sections
+compiler.cpp.flags=-c -g -Os -w -fno-exceptions -ffunction-sections -fdata-sections -MMD
 compiler.ar.cmd=avr-ar
 compiler.ar.flags=rcs
 compiler.objcopy.cmd=avr-objcopy
@@ -25,10 +25,10 @@ compiler.size.cmd=avr-size
 # --------------------
 
 ## Compile c files
-recipe.c.o.pattern={compiler.path}{compiler.c.cmd} {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -D{software}={runtime.ide.version} {includes} {source_file} -o {object_file}
+recipe.c.o.pattern={compiler.path}{compiler.c.cmd} {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -D{software}={runtime.ide.version} {build.extra_flags} {includes} {source_file} -o {object_file}
 
 ## Compile c++ files
-recipe.cpp.o.pattern={compiler.path}{compiler.cpp.cmd} {compiler.cpp.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -D{software}={runtime.ide.version} {includes} {source_file} -o {object_file}
+recipe.cpp.o.pattern={compiler.path}{compiler.cpp.cmd} {compiler.cpp.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -D{software}={runtime.ide.version} {build.extra_flags} {includes} {source_file} -o {object_file}
 
 ## Create archives
 recipe.ar.pattern={compiler.path}{compiler.ar.cmd} {compiler.ar.flags} {build.path}/{archive_file} {object_file}

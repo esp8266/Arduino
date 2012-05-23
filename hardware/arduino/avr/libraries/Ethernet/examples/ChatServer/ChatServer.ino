@@ -12,7 +12,7 @@
  
  created 18 Dec 2009
  by David A. Mellis
- modified 12 March 2012
+ modified 9 Apr 2012
  by Tom Igoe
  
  */
@@ -39,8 +39,13 @@ void setup() {
   Ethernet.begin(mac, ip, gateway, subnet);
   // start listening for clients
   server.begin();
-  // open the serial port
+ // Open serial communications and wait for port to open:
   Serial.begin(9600);
+   while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
+
+
   Serial.print("Chat server address:");
   Serial.println(Ethernet.localIP());
 }

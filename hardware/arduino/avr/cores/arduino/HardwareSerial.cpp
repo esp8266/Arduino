@@ -398,6 +398,10 @@ size_t HardwareSerial::write(uint8_t c)
   return 1;
 }
 
+HardwareSerial::operator bool() {
+	return true;
+}
+
 // Preinstantiate Objects //////////////////////////////////////////////////////
 
 #if defined(UBRRH) && defined(UBRRL)

@@ -17,6 +17,7 @@
  * Second serial device's TX attached to digital pin 4, RX to pin 5
  
  created 18 Apr. 2011
+ modified 9 Apr 2012
  by Tom Igoe
  based on Mikal Hart's twoPortRXExample
  
@@ -33,8 +34,12 @@ SoftwareSerial portTwo(4, 5);
 
 void setup()
 {
-  // Start the hardware serial port
+ // Open serial communications and wait for port to open:
   Serial.begin(9600);
+   while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
+
 
   // Start each software serial port
   portOne.begin(9600);

@@ -12,6 +12,7 @@
  * Ethernet shield attached to pins 10, 11, 12, 13
  
  created 21 May 2011
+ modified 9 Apr 2012
  by Tom Igoe
  Based on ChatServer example by David A. Mellis
  
@@ -34,8 +35,14 @@ EthernetServer server(23);
 boolean gotAMessage = false; // whether or not you got a message from the client yet
 
 void setup() {
-   // open the serial port
+  // Open serial communications and wait for port to open:
   Serial.begin(9600);
+  // this check is only needed on the Leonardo:
+   while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
+
+
   // start the Ethernet connection:
   Serial.println("Trying to get an IP address using DHCP");
   if (Ethernet.begin(mac) == 0) {

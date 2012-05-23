@@ -9,17 +9,17 @@
 //================================================================================
 //	USB
 
-class USB_
+class USBDevice_
 {
 public:
-	USB_();
+	USBDevice_();
 	bool configured();
 
 	void attach();
 	void detach();	// Serial port goes down too...
 	void poll();
 };
-extern USB_ USB;
+extern USBDevice_ USBDevice;
 
 //================================================================================
 //================================================================================
@@ -27,15 +27,19 @@ extern USB_ USB;
 
 class Serial_ : public Stream
 {
+private:
+	ring_buffer *_cdc_rx_buffer;
 public:
 	void begin(uint16_t baud_count);
 	void end(void);
 
 	virtual int available(void);
+	virtual void accept(void);
 	virtual int peek(void);
 	virtual int read(void);
 	virtual void flush(void);
 	virtual size_t write(uint8_t);
+	operator bool();
 };
 extern Serial_ Serial;
 
@@ -54,12 +58,14 @@ private:
 	uint8_t _buttons;
 	void buttons(uint8_t b);
 public:
-	Mouse_();
+	Mouse_(void);
+	void begin(void);
+	void end(void);
 	void click(uint8_t b = MOUSE_LEFT);
 	void move(signed char x, signed char y, signed char wheel = 0);	
 	void press(uint8_t b = MOUSE_LEFT);		// press LEFT by default
 	void release(uint8_t b = MOUSE_LEFT);	// release LEFT by default
-	bool isPressed(uint8_t b = MOUSE_ALL);	// check all buttons by default
+	bool isPressed(uint8_t b = MOUSE_LEFT);	// check LEFT by default
 };
 extern Mouse_ Mouse;
 
@@ -67,14 +73,42 @@ extern Mouse_ Mouse;
 //================================================================================
 //	Keyboard
 
-#define KEY_MODIFIER_LEFT_CTRL		0x01
-#define KEY_MODIFIER_LEFT_SHIFT		0x02
-#define KEY_MODIFIER_LEFT_ALT		0x04
-#define KEY_MODIFIER_LEFT_GUI		0x08
-#define KEY_MODIFIER_RIGHT_CTRL		0x010
-#define KEY_MODIFIER_RIGHT_SHIFT	0x020
-#define KEY_MODIFIER_RIGHT_ALT		0x040
-#define KEY_MODIFIER_RIGHT_GUI		0x080
+#define KEY_LEFT_CTRL		0x80
+#define KEY_LEFT_SHIFT		0x81
+#define KEY_LEFT_ALT		0x82
+#define KEY_LEFT_GUI		0x83
+#define KEY_RIGHT_CTRL		0x84
+#define KEY_RIGHT_SHIFT		0x85
+#define KEY_RIGHT_ALT		0x86
+#define KEY_RIGHT_GUI		0x87
+
+#define KEY_UP_ARROW		0xDA
+#define KEY_DOWN_ARROW		0xD9
+#define KEY_LEFT_ARROW		0xD8
+#define KEY_RIGHT_ARROW		0xD7
+#define KEY_BACKSPACE		0xB2
+#define KEY_TAB				0xB3
+#define KEY_RETURN			0xB0
+#define KEY_ESC				0xB1
+#define KEY_INSERT			0xD1
+#define KEY_DELETE			0xD4
+#define KEY_PAGE_UP			0xD3
+#define KEY_PAGE_DOWN		0xD6
+#define KEY_HOME			0xD2
+#define KEY_END				0xD5
+#define KEY_CAPS_LOCK		0xC1
+#define KEY_F1				0xC2
+#define KEY_F2				0xC3
+#define KEY_F3				0xC4
+#define KEY_F4				0xC5
+#define KEY_F5				0xC6
+#define KEY_F6				0xC7
+#define KEY_F7				0xC8
+#define KEY_F8				0xC9
+#define KEY_F9				0xCA
+#define KEY_F10				0xCB
+#define KEY_F11				0xCC
+#define KEY_F12				0xCD
 
 //	Low level key report: up to 6 keys and shift, ctrl etc at once
 typedef struct
@@ -84,24 +118,19 @@ typedef struct
 	uint8_t keys[6];
 } KeyReport;
 
-//	Map a character into a key report
-//	Called from Print to map text to keycodes
-class KeyMap
-{
-public:
-	virtual void charToKey(int c, KeyReport* keyReport) = 0;
-};
-
-//	
 class Keyboard_ : public Print
 {
 private:
-	KeyMap* _keyMap;
+	KeyReport _keyReport;
 	void sendReport(KeyReport* keys);
-	void setKeyMap(KeyMap* keyMap);	
 public:
-	Keyboard_();
-	virtual size_t write(uint8_t);
+	Keyboard_(void);
+	void begin(void);
+	void end(void);
+	virtual size_t write(uint8_t k);
+	virtual size_t press(uint8_t k);
+	virtual size_t release(uint8_t k);
+	virtual void releaseAll(void);
 };
 extern Keyboard_ Keyboard;
 

@@ -32,7 +32,7 @@
  
  This example code is in the public domain.
  
- http://www.arduino.cc/en/Tutorial/LiquidCrystal
+ http://arduino.cc/en/Tutorial/LiquidCrystalTextDirection
  
  */
 
@@ -49,7 +49,6 @@ void setup() {
   lcd.begin(16, 2);
   // turn on the cursor:
   lcd.cursor();
-  Serial.begin(9600);
 }
 
 void loop() {

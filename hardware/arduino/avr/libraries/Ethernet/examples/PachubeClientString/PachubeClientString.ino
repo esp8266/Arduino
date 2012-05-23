@@ -1,12 +1,12 @@
 /*
-  Pachube sensor client with Strings
+  Cosm sensor client with Strings
  
- This sketch connects an analog sensor to Pachube (http://www.pachube.com)
+ This sketch connects an analog sensor to Cosm (http://www.cosm.com)
  using a Wiznet Ethernet shield. You can use the Arduino Ethernet shield, or
  the Adafruit Ethernet shield, either one will work, as long as it's got
  a Wiznet Ethernet module on board.
  
- This example has been updated to use version 2.0 of the Pachube.com API. 
+ This example has been updated to use version 2.0 of the Cosm.com API. 
  To make it work, create a feed with two datastreams, and give them the IDs
  sensor1 and sensor2. Or change the code below to match your feed.
  
@@ -18,10 +18,10 @@
  * Ethernet shield attached to pins 10, 11, 12, 13
  
  created 15 March 2010
- updated 16 Mar 2012
+ modified 9 Apr 2012
  by Tom Igoe with input from Usman Haque and Joe Saavedra
  
- http://arduino.cc/en/Tutorial/PachubeClientString
+ http://arduino.cc/en/Tutorial/CosmClientString
  This code is in the public domain.
  
  */
@@ -30,14 +30,16 @@
 #include <Ethernet.h>
 
 
-#define APIKEY         "YOUR API KEY GOES HERE" // replace your pachube api key here
+/#define APIKEY         "YOUR API KEY GOES HERE" // replace your Cosm api key here
 #define FEEDID         00000 // replace your feed ID
 #define USERAGENT      "My Project" // user agent is the project name
+
 
 // assign a MAC address for the ethernet controller.
 // fill in your address here:
   byte mac[] = { 
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
+
 // fill in an available IP address on your network here,
 // for manual configuration:
 IPAddress ip(10,0,1,20);
@@ -47,16 +49,21 @@ EthernetClient client;
 
 // if you don't want to use DNS (and reduce your sketch size)
 // use the numeric IP instead of the name for the server:
-//IPAddress server(216,52,233,122);      // numeric IP for api.pachube.com
-char server[] = "api.pachube.com";   // name address for pachube API
+IPAddress server(216,52,233,121);      // numeric IP for api.cosm.com
+//char server[] = "api.cosm.com";   // name address for Cosm API
 
 unsigned long lastConnectionTime = 0;          // last time you connected to the server, in milliseconds
 boolean lastConnected = false;                 // state of the connection last time through the main loop
-const unsigned long postingInterval = 10*1000;  //delay between updates to Pachube.com
+const unsigned long postingInterval = 10*1000;  //delay between updates to Cosm.com
 
 void setup() {
-  // start serial port:
+ // Open serial communications and wait for port to open:
   Serial.begin(9600);
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
+
+
   // give the ethernet module time to boot up:
   delay(1000);
   // start the Ethernet connection:
@@ -76,7 +83,7 @@ void loop() {
   dataString += sensorReading;
 
   // you can append multiple readings to this String if your
-  // pachube feed is set up to handle multiple values:
+  // Cosm feed is set up to handle multiple values:
   int otherSensorReading = analogRead(A1);
   dataString += "\nsensor2,";
   dataString += otherSensorReading;
@@ -116,8 +123,8 @@ void sendData(String thisData) {
     client.print("PUT /v2/feeds/");
     client.print(FEEDID);
     client.println(".csv HTTP/1.1");
-    client.println("Host: api.pachube.com");
-    client.print("X-PachubeApiKey: ");
+    client.println("Host: api.cosm.com");
+    client.print("X-CosmApiKey: ");
     client.println(APIKEY);
     client.print("User-Agent: ");
     client.println(USERAGENT);

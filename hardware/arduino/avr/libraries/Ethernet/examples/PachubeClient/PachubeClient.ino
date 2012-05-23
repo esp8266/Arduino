@@ -16,7 +16,7 @@
  * Ethernet shield attached to pins 10, 11, 12, 13
  
  created 15 March 2010
- updated 16 Mar 2012
+ modified 9 Apr 2012
  by Tom Igoe with input from Usman Haque and Joe Saavedra
  
 http://arduino.cc/en/Tutorial/PachubeClient
@@ -53,8 +53,13 @@ boolean lastConnected = false;                 // state of the connection last t
 const unsigned long postingInterval = 10*1000; //delay between updates to Pachube.com
 
 void setup() {
-  // start serial port:
+ // Open serial communications and wait for port to open:
   Serial.begin(9600);
+   while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
+
+
  // start the Ethernet connection:
   if (Ethernet.begin(mac) == 0) {
     Serial.println("Failed to configure Ethernet using DHCP");
