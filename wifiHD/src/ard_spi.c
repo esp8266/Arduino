@@ -1038,11 +1038,12 @@ cmd_spi_state_t get_reply_scan_networks_cb(char* recv, char* reply, void* ctx, u
      int ii = 0;
      for (; ii < network_cnt; ii++)
      {
-    	 uint8_t len = network_list.net[ii]->ssid.len;
+    	 uint8_t len = network_list.net[ii]->ssid.len+1;
+    	 network_list.net[ii]->ssid.ssid[network_list.net[ii]->ssid.len]=0;
     	 PUT_BUFDATA_BYTE(network_list.net[ii]->ssid.ssid, len, reply, start);
     	 start += len+1;
-    	 INFO_SPI("%d - %s - %d - %d - 0x%x\n",ii, network_list.net[ii]->ssid.ssid,
-    			 network_list.net[ii]->enc_type,
+    	 INFO_SPI("%d - %s [%d]- %d - %d - 0x%x\n",ii, network_list.net[ii]->ssid.ssid,
+    			 len, network_list.net[ii]->enc_type,
     			 network_list.net[ii]->rssi, network_list.net[ii]->bssid);
      }
 
