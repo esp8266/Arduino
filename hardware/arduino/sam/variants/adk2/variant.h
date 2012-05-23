@@ -24,7 +24,7 @@
  *----------------------------------------------------------------------------*/
 
 // We have native USB on this variant
-#define USBCON
+//#define USBCON
 
 #include "Arduino.h"
 #ifdef __cplusplus
