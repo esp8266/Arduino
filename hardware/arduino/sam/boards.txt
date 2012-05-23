@@ -29,3 +29,17 @@ arduino_due_x.build.variant=arduino_due_x
 arduino_due_x.build.variant_system_lib=libsam_sam3x8e_gcc_rel.a
 arduino_due_x.build.vid=0x2341
 arduino_due_x.build.pid=0x003e
+
+##############################################################
+
+adk2.name=Google ADK2
+adk2.upload.tool=bossac
+adk2.upload.protocol=sam-ba
+adk2.upload.maximum_size=49152
+adk2.build.mcu=cortex-m3
+adk2.build.f_cpu=84000000L
+adk2.build.core=arduino
+adk2.build.extra_flags=-D__SAM3X8E__ -mthumb
+adk2.build.ldscript=linker_scripts/gcc/flash.ld
+adk2.build.variant=adk2
+adk2.build.variant_system_lib=libsam_sam3x8e_gcc_rel.a
