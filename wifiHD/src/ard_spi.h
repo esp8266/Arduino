@@ -60,6 +60,8 @@ void showTTCPstatus();
 
 int getSock(void * _ttcp);
 
+void* getTTCP(uint8_t sock);
+
 void clearMapSockTcp(uint8_t sock);
 
 int start_server_tcp(uint16_t port, uint8_t sock);

@@ -83,6 +83,8 @@ struct ctx_server {
 	uint8_t wl_init_complete;
 };
 
+bool ifStatus = false;
+
 // to maintain the word alignment
 //#define PAD_CTX_SIZE 	0x18
 //#define PAD_NETIF_SIZE 	0x3c
@@ -101,6 +103,7 @@ uint16_t verboseDebug = 0;
 static void
 wl_cm_scan_cb(void* ctx)
 {
+	INFO_INIT("Scan Completed!\n");
     set_result(WL_SCAN_COMPLETED);
 }
 
@@ -174,8 +177,11 @@ ip_status_cb(struct netif* netif)
 	INFO_INIT("IP status cb...\n");
         if (netif_is_up(netif)) {
             set_result_cmd(WL_SUCCESS);
-                printk("bound to %s\n", ip2str(netif->ip_addr));
+            printk("bound to %s\n", ip2str(netif->ip_addr));
+            ifStatus = true;
         }else{
+        	ifStatus = false;
+        	closeConnections();
         	WARN("Interface not up!\n");
         }
 }

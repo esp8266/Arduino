@@ -66,4 +66,6 @@ uint8_t isDataSent(void* p );
 
 cmd_state_t cmd_ttcp(int argc, char* argv[], void* ctx);
 
+void closeConnections();
+
 #endif

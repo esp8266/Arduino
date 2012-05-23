@@ -75,6 +75,7 @@
 #define  _BUFFERSIZE 100
 
 extern void tcp_debug_print_pcbs(void);
+extern bool ifStatus;
 
 static char buf[CMD_MAX_LEN];
 static char reply[REPLY_MAX_LEN];
@@ -623,9 +624,16 @@ int start_server_tcp(uint16_t port, uint8_t sock)
 
     if (_connected)
     {
-    	printk("Still connected...wait\n");
+    	WARN("Still connected...wait\n");
     	return WIFI_SPI_ERR;
     }
+
+    if (!ifStatus)
+     {
+    	WARN("IF down...wait\n");
+     	return WIFI_SPI_ERR;
+     }
+
 
     if (ard_tcp_start(addr, port, NULL, NULL, mode, nbuf, buflen, udp, verbose, sock, &_ttcp) == 0)
     {
@@ -1714,6 +1722,7 @@ int initSpi()
 	memset(reply, 0, sizeof(reply));
 
 	initMapSockTcp();
+	set_result(WL_IDLE_STATUS);
 
 	init_pBuf();
 

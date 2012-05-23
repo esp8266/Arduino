@@ -29,6 +29,7 @@
 #include "debug.h"
 
 unsigned int startTime = 0;
+extern bool ifStatus;
 
 /**
  * Clean up and free the ttcp structure
@@ -49,7 +50,7 @@ static void ard_tcp_destroy(struct ttcp* ttcp) {
 	if (ttcp->lpcb) {
 		tcp_arg(ttcp->lpcb, NULL);
 		tcp_accept(ttcp->lpcb, NULL);
-		tcp_close(ttcp->lpcb);
+		err = tcp_close(ttcp->lpcb);
 		INFO_TCP("Closing lpcb: state:0x%x err:%d\n", ttcp->lpcb->state, err);
 	}
 
@@ -141,12 +142,12 @@ static void tcp_send_data(struct ttcp *ttcp) {
 
 	if (err == ERR_OK){
 		tcp_output(ttcp->tpcb);
-		INFO_TCP("tcp_output: left=%d new left:%d\n",
+		INFO_TCP_VER("tcp_output: left=%d new left:%d\n",
 				ttcp->left, ttcp->left-len);
 		ttcp->left -= len;
 	}
 	else
-		WARN("TTCP [%p]: tcp_write failed\n", ttcp);
+		WARN("TTCP [%p]: tcp_write failed err:%d len:%d\n", ttcp, err, len);
 	//
 	//        ttcp->tid = timer_sched_timeout_cb(0, TIMEOUT_ONESHOT,
 	//                                           tcp_timeout_cb, ttcp);
@@ -220,20 +221,57 @@ static err_t tcp_connect_cb(void *arg, struct tcp_pcb *tpcb, err_t err) {
 	return ERR_OK;
 }
 
+static void cleanSockState_cb(void *ctx) {
+	struct ttcp* ttcp = ctx;
+
+	int sock = getSock(ttcp);
+	if (sock != -1)
+		clearMapSockTcp(sock);
+	printk("TTCP [%p]: cleanSockState_cb %d\n", ttcp, sock);
+	_connected = false;
+}
+
 /** 
  * Only used in TCP mode.
  */
 static void atcp_conn_err_cb(void *arg, err_t err) {
 	struct ttcp* ttcp = arg;
 
-	printk("TTCP [%p]: connection error:0x%x\n", ttcp, err);
+	printk("TTCP [%p]: connection error:%s [%d]\n",
+			ttcp, lwip_strerr(err), err);
 
-	ttcp->tpcb = NULL; /* free'd by lwip upon return */
-	int sock = getSock(ttcp);
-	if (sock)
-		clearMapSockTcp(sock);
-	_connected = false;
-	ard_tcp_done(ttcp, err);
+	if (ifStatus == false)
+		printk("Abort connection\n");
+	cleanSockState_cb(ttcp);
+	//ttcp->tpcb = NULL; /* free'd by lwip upon return */
+	//ard_tcp_done(ttcp, err);
+}
+
+static void close_conn(struct ttcp *_ttcp) {
+	tcp_arg(_ttcp->tpcb, NULL);
+	tcp_sent(_ttcp->tpcb, NULL);
+	tcp_recv(_ttcp->tpcb, NULL);
+	err_t err = tcp_close(_ttcp->tpcb);
+	INFO_TCP("Closing tpcb[%p]: state:0x%x err:%d\n",_ttcp->tpcb, _ttcp->tpcb->state, err);
+}
+
+void closeConnections()
+{
+	int i = 0;
+	for (; i<MAX_SOCK_NUM; i++)
+	{
+		void* p = getTTCP(i);
+		if (p)
+		{
+			ttcp_t* _ttcp = (ttcp_t* )p;
+
+			INFO_TCP("Closing connections tpcb[%p] state:0x%x - lpcb[%p] state: 0x%x\n",
+					_ttcp->tpcb, _ttcp->tpcb->state, _ttcp->lpcb, _ttcp->lpcb->state);
+			//tcp_close(_ttcp->tpcb);
+			ard_tcp_destroy(_ttcp);
+			cleanSockState_cb(_ttcp);
+		}
+	}
 }
 
 /**
@@ -245,7 +283,8 @@ static err_t atcp_recv_cb(void *arg, struct tcp_pcb *pcb, struct pbuf *p,
 	/* p will be NULL when remote end is done */
 	if (p == NULL) {
 		INFO_TCP("atcp_recv_cb p=NULL\n");
-		ard_tcp_done(ttcp, 0);
+		//ard_tcp_done(ttcp, 0);
+		close_conn(ttcp);
 		return ERR_OK;
 	}
 	DATA_LED_ON();
@@ -260,8 +299,8 @@ static err_t atcp_recv_cb(void *arg, struct tcp_pcb *pcb, struct pbuf *p,
 	}
 
 	insert_pBuf(p, ttcp->sock, (void*) pcb);
-	pbuf_free(p);
 	tcp_recved(pcb, p->tot_len);
+	pbuf_free(p);
 	DATA_LED_OFF();
 	return ERR_OK;
 }
@@ -272,6 +311,8 @@ void ack_recved(void* pcb, int len) {
 }
 
 static err_t atcp_poll(void *arg, struct tcp_pcb *pcb) {
+	INFO_TCP("ARD TCP [%p] arg=%p\n", pcb, arg);
+	//tcp_abort(pcb);
 	return ERR_OK;
 }
 
@@ -280,6 +321,8 @@ static err_t atcp_poll(void *arg, struct tcp_pcb *pcb) {
  */
 static err_t atcp_accept_cb(void *arg, struct tcp_pcb *newpcb, err_t err) {
 	struct ttcp* ttcp = arg;
+
+    tcp_setprio(newpcb, TCP_PRIO_MIN);
 
 	ttcp->tpcb = newpcb;
 	tcp_recv(ttcp->tpcb, atcp_recv_cb);
@@ -332,7 +375,7 @@ static int atcp_start(struct ttcp* ttcp) {
 
 		err = tcp_bind(ttcp->tpcb, IP_ADDR_ANY, ttcp->port);
 		if (err != ERR_OK){
-			WARN("TTCP [%p]: bind failed err=%d\n", ttcp, err);
+			WARN("TTCP [%p]: bind failed err=%d Port already used\n", ttcp, err);
 			return -1;
 		}
 
@@ -543,12 +586,9 @@ int ard_tcp_start(struct ip_addr addr, uint16_t port, void *opaque,
 
 	return 0;
 
-	fail: ard_tcp_abort(ttcp);
+	//fail: ard_tcp_abort(ttcp);
+	fail: ard_tcp_destroy(ttcp);
 	return -1;
-}
-
-static void close_conn(struct ttcp *_ttcp) {
-	ard_tcp_done(_ttcp, 0);
 }
 
 void ard_tcp_stop(void* ttcp) {
@@ -556,12 +596,16 @@ void ard_tcp_stop(void* ttcp) {
 	INFO_TCP("Closing connection...\n");
 	DUMP_TCP_STATE(_ttcp);
 	if ((_ttcp)&&(_ttcp->tpcb)&&(_ttcp->tpcb->state!=LAST_ACK)&&(_ttcp->tpcb->state!=CLOSED))
+	{
 		close_conn(_ttcp);
+	}
 }
 
 uint8_t getStateTcp(void* p, bool client) {
 	struct ttcp* _ttcp = (struct ttcp*) p;
 
+	if (ifStatus == false)
+		return CLOSED;
 	if ((_ttcp != NULL) && (_ttcp->tpcb != NULL)) {
 		//DUMP_TCP_STATE(_ttcp);
 		if (client)
@@ -569,7 +613,7 @@ uint8_t getStateTcp(void* p, bool client) {
 		else
 			return _ttcp->lpcb->state;
 	} else {
-		INFO_TCP("TCP not initialized ttcp:%p tpcb:%p lpcb:%p\n",
+		INFO_TCP_VER("TCP not initialized ttcp:%p tpcb:%p lpcb:%p\n",
 				_ttcp, ((_ttcp)?_ttcp->tpcb:0), ((_ttcp)?_ttcp->lpcb:0));
 	}
 	return CLOSED;
@@ -611,18 +655,18 @@ static err_t tcp_data_sent(void *arg, struct tcp_pcb *pcb, u16_t len) {
 
 	if (_ttcp->left > 0) {
 		//send_data(pcb, hs);
-		INFO_TCP("data left: %d", _ttcp->left );
+		INFO_TCP_VER("data left: %d", _ttcp->left );
 	}
 	if (_ttcp->buff_sent == 1)
 		WARN("Previous packet already\n");
 	_ttcp->buff_sent = 1;
-	INFO_TCP("Packet sent len:%d dur:%d\n", len, timer_get_ms() - startTime);
+	INFO_TCP_VER("Packet sent len:%d dur:%d\n", len, timer_get_ms() - startTime);
 	//INFO_TCP("%s: duration: %d\n", __FUNCTION__, timer_get_ms() - startTime);
 	return ERR_OK;
 }
 
 int sendTcpData(void* p, uint8_t* buf, uint16_t len) {
-	INFO_TCP("buf:%p len:%d\n", buf, len);
+	INFO_TCP_VER("buf:%p len:%d\n", buf, len);
 	DUMP_TCP(buf,len);
 
 	startTime = timer_get_ms();
@@ -637,7 +681,7 @@ int sendTcpData(void* p, uint8_t* buf, uint16_t len) {
 		//pbuf_take(buf, len, _ttcp->);
 		memcpy(_ttcp->payload, buf, len);
 		_ttcp->payload[len]='\0';
-		INFO_TCP("%s\n", _ttcp->payload);
+		INFO_TCP_VER("%s\n", _ttcp->payload);
 		_ttcp->left = len;
 		tcp_sent(_ttcp->tpcb, tcp_data_sent);
 		tcp_send_data(_ttcp);
