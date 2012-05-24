@@ -156,7 +156,14 @@ public:
      *
      * return: Number of discovered networks
      */
-    static uint8_t scanNetworks();
+    static uint8_t startScanNetworks();
+
+    /*
+     * Get the networks available
+     *
+     * return: Number of discovered networks
+     */
+    static uint8_t getScanNetworks();
 
     /*
      * Return the SSID discovered during the network scan.

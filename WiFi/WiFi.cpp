@@ -152,7 +152,17 @@ uint8_t WiFiClass::encryptionType()
 
 uint8_t WiFiClass::scanNetworks()
 {
-	return WiFiDrv::scanNetworks();
+	uint8_t attempts = 10;
+	uint8_t numOfNetworks = 0;
+
+	WiFiDrv::startScanNetworks();
+ 	do
+ 	{
+ 		delay(2000);
+ 		numOfNetworks = WiFiDrv::getScanNetworks();
+ 	}
+	while (( numOfNetworks == 0)&&(--attempts>0));
+	return numOfNetworks;
 }
 
 char* WiFiClass::SSID(uint8_t networkItem)

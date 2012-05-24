@@ -399,6 +399,7 @@ int SpiDrv::waitResponse(uint8_t cmd, uint8_t* numParamRead, uint8_t** params, u
         } else
         {
             WARN("Error numParams == 0");
+            readAndCheckChar(END_CMD, &_data);
             return 0;
         }
         readAndCheckChar(END_CMD, &_data);

@@ -299,7 +299,28 @@ uint8_t WiFiDrv::getCurrentEncryptionType()
     return encType;
 }
 
-uint8_t WiFiDrv::scanNetworks()
+uint8_t WiFiDrv::startScanNetworks()
+{
+	WAIT_FOR_SLAVE_SELECT();
+
+    // Send Command
+    SpiDrv::sendCmd(START_SCAN_NETWORKS, PARAM_NUMS_0);
+
+    //Wait the reply elaboration
+    SpiDrv::waitForSlaveReady();
+
+    // Wait for reply
+    uint8_t _data = 0;
+    uint8_t _dataLen = 0;
+    uint8_t result = SpiDrv::waitResponseCmd(START_SCAN_NETWORKS, PARAM_NUMS_1, &_data, &_dataLen);
+
+    SpiDrv::spiSlaveDeselect();
+
+    return result;
+}
+
+
+uint8_t WiFiDrv::getScanNetworks()
 {
 	WAIT_FOR_SLAVE_SELECT();
 
