@@ -76,6 +76,7 @@
 
 extern void tcp_debug_print_pcbs(void);
 extern bool ifStatus;
+extern bool scanNetCompleted;
 
 static char buf[CMD_MAX_LEN];
 static char reply[REPLY_MAX_LEN];
@@ -1004,22 +1005,45 @@ static void copy_network_list(struct wl_network_list_t *dst,
         }
 }
 
+int start_scan_net_cmd_cb(int numParam, char* buf, void* ctx) {
+	wl_err_t err = WL_FAILURE;
+
+	INFO_SPI("Start Network Scan %d\n", numParam);
+	if (scanNetCompleted){
+		scanNetCompleted = false;
+		err = wl_scan();
+		if (err != WL_SUCCESS)
+		{
+			// May be busy scanning already, no fatal error
+			WARN("err=%d\n", err);
+			err = WL_SUCCESS;
+		}
+	}
+	return err;
+}
 
 cmd_spi_state_t get_reply_scan_networks_cb(char* recv, char* reply, void* ctx, uint16_t* count) {
 
-	INFO_SPI("netif:0x%x\n", ard_netif);
-	CHECK_ARD_NETIF(recv, reply, count);
+	const int8_t SCAN_NOT_YET_COMPLETED = 0;
+
+	if (!scanNetCompleted)
+	{
+		//return empty list with an error to retry
+	     CREATE_HEADER_REPLY(reply, recv, SCAN_NOT_YET_COMPLETED);
+	     END_HEADER_REPLY(reply, 3, *count);
+	     INFO_SPI("Scan not completed!\n");
+	     return SPI_CMD_DONE;
+	}
 
     int network_cnt = 0;
-
     struct wl_network_list_t* wl_network_list;
 
-    wl_scan();
     wl_get_network_list(&wl_network_list);
      if (wl_network_list->cnt == 0)
      {
     	 CREATE_HEADER_REPLY(reply, recv, 0);
     	 END_HEADER_REPLY(reply, 3, *count);
+    	 INFO_SPI("Networks not found!\n");
     	 return SPI_CMD_DONE;
      }
 
@@ -1354,6 +1378,7 @@ void init_spi_cmds() {
 	spi_add_cmd(GET_CURR_BSSID_CMD, ack_cmd_cb, get_reply_curr_net_cb, (void*)GET_CURR_BSSID_CMD, CMD_GET_FLAG);
 	spi_add_cmd(GET_CURR_RSSI_CMD, ack_cmd_cb, get_reply_curr_net_cb, (void*)GET_CURR_RSSI_CMD, CMD_GET_FLAG);
 	spi_add_cmd(GET_CURR_ENCT_CMD, ack_cmd_cb, get_reply_curr_net_cb, (void*)GET_CURR_ENCT_CMD, CMD_GET_FLAG);
+	spi_add_cmd(START_SCAN_NETWORKS, start_scan_net_cmd_cb, ack_reply_cb, NULL, CMD_SET_FLAG);
 	spi_add_cmd(SCAN_NETWORKS, ack_cmd_cb, get_reply_scan_networks_cb, NULL, CMD_GET_FLAG);
 	spi_add_cmd(DISCONNECT_CMD, disconnect_cmd_cb, ack_reply_cb, NULL, CMD_SET_FLAG);
 	spi_add_cmd(GET_IDX_ENCT_CMD, ack_cmd_cb, get_reply_idx_net_cb, (void*)GET_IDX_ENCT_CMD, CMD_GET_FLAG);

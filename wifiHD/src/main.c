@@ -84,6 +84,7 @@ struct ctx_server {
 };
 
 bool ifStatus = false;
+bool scanNetCompleted = false;
 
 // to maintain the word alignment
 //#define PAD_CTX_SIZE 	0x18
@@ -105,6 +106,7 @@ wl_cm_scan_cb(void* ctx)
 {
 	INFO_INIT("Scan Completed!\n");
     set_result(WL_SCAN_COMPLETED);
+    scanNetCompleted=true;
 }
 
 /**
@@ -336,7 +338,7 @@ wl_init_complete_cb(void* ctx)
 
     INFO_INIT("Starting CM...\n");
     /* start connection manager */
-    wl_status = wl_cm_init(NULL, wl_cm_conn_cb, wl_cm_disconn_cb, hs);
+    wl_status = wl_cm_init(wl_cm_scan_cb, wl_cm_conn_cb, wl_cm_disconn_cb, hs);
     ASSERT(wl_status == WL_SUCCESS, "failed to init wl conn mgr");
     wl_cm_start();
 
