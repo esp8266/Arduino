@@ -249,14 +249,10 @@ uint8_t ServerDrv::checkDataSent(uint8_t sock)
 		if (_data) timeout = 0;
 		else{
 			++timeout;
-			if (timeout > TIMEOUT_DATA_SENT)
-			{
-				timeout = 0;
-				INFO1("Timeout wainting for data sent");
-			}
+			delay(10);
 		}
-	}while((_data==0)&&(timeout<TIMEOUT_DATA_SENT));
 
+	}while((_data==0)&&(timeout<TIMEOUT_DATA_SENT));
     return (timeout==TIMEOUT_DATA_SENT)?0:1;
 }
 
