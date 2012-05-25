@@ -293,7 +293,7 @@ Bool at45dbx_mem_check(void)
     // Unexpected device density value.
     if ((status & AT45DBX_MSK_DENSITY) < AT45DBX_DENSITY)
     {
-    	printk("Unexpected device density value: %d (0x%x)\n", (status & AT45DBX_MSK_DENSITY), status);
+    	//printk("Unexpected device density value: %d (0x%x)\n", (status & AT45DBX_MSK_DENSITY), status);
     	//return KO;
     	}
   }
