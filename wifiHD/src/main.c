@@ -105,7 +105,6 @@ static void
 wl_cm_scan_cb(void* ctx)
 {
 	INFO_INIT("Scan Completed!\n");
-    set_result(WL_SCAN_COMPLETED);
     scanNetCompleted=true;
 }
 

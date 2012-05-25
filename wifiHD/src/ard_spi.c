@@ -642,6 +642,7 @@ int start_server_tcp(uint16_t port, uint8_t sock)
     	setMapSock(sock, _ttcp);
         err = WL_SUCCESS;
     }else{
+
     	INFO_SPI("Start Server [%d, %d] FAILED!\n", port, sock);
     	clearMapSockTcp(sock);
     }
@@ -741,7 +742,8 @@ int ack_cmd_cb(int numParam, char* buf, void* ctx) {
 }
 
 int get_result_cmd_cb(int numParam, char* buf, void* ctx) {
-	*buf=result;
+	INFO_SPI("ifStatus:%d result:%d\n", ifStatus, result);
+	*buf=(ifStatus)?WL_CONNECTED:result;
 	return WIFI_SPI_ACK;
 }
 
