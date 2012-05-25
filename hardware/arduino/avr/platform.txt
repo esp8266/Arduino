@@ -25,25 +25,25 @@ compiler.size.cmd=avr-size
 # --------------------
 
 ## Compile c files
-recipe.c.o.pattern={compiler.path}{compiler.c.cmd} {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -D{software}={runtime.ide.version} {build.extra_flags} {includes} {source_file} -o {object_file}
+recipe.c.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -D{software}={runtime.ide.version} {build.extra_flags} {includes} "{source_file}" -o "{object_file}"
 
 ## Compile c++ files
-recipe.cpp.o.pattern={compiler.path}{compiler.cpp.cmd} {compiler.cpp.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -D{software}={runtime.ide.version} {build.extra_flags} {includes} {source_file} -o {object_file}
+recipe.cpp.o.pattern="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -D{software}={runtime.ide.version} {build.extra_flags} {includes} "{source_file}" -o "{object_file}"
 
 ## Create archives
-recipe.ar.pattern={compiler.path}{compiler.ar.cmd} {compiler.ar.flags} {build.path}/{archive_file} {object_file}
+recipe.ar.pattern="{compiler.path}{compiler.ar.cmd}" {compiler.ar.flags} "{build.path}/{archive_file}" "{object_file}"
 
 ## Combine gc-sections, archives, and objects
-recipe.c.combine.pattern={compiler.path}{compiler.c.elf.cmd} {compiler.c.elf.flags} -mmcu={build.mcu} -o {build.path}/{build.project_name}.elf {object_files} {build.path}/{archive_file} -L{build.path} -lm
+recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {compiler.c.elf.flags} -mmcu={build.mcu} -o "{build.path}/{build.project_name}.elf" {object_files} "{build.path}/{archive_file}" "-L{build.path}" -lm
 
 ## Create eeprom
-recipe.objcopy.eep.pattern={compiler.path}{compiler.objcopy.cmd} {compiler.objcopy.eep.flags} {build.path}/{build.project_name}.elf {build.path}/{build.project_name}.eep
+recipe.objcopy.eep.pattern="{compiler.path}{compiler.objcopy.cmd}" {compiler.objcopy.eep.flags} "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.eep"
 
 ## Create hex
-recipe.objcopy.hex.pattern={compiler.path}{compiler.elf2hex.cmd} {compiler.elf2hex.flags} {build.path}/{build.project_name}.elf {build.path}/{build.project_name}.hex
+recipe.objcopy.hex.pattern="{compiler.path}{compiler.elf2hex.cmd}" {compiler.elf2hex.flags} "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.hex"
 
 ## Compute size
-recipe.size.pattern={compiler.path}{compiler.size.cmd} -A {build.path}/{build.project_name}.hex
+recipe.size.pattern="{compiler.path}{compiler.size.cmd}" -A "{build.path}/{build.project_name}.hex"
 recipe.size.regex=Total\s+([0-9]+).*
 
 
@@ -56,12 +56,13 @@ tools.avrdude.config.path={path}/avrdude.conf
 
 tools.avrdude.upload.params.verbose=-v -v -v -v
 tools.avrdude.upload.params.quiet=-q -q
-tools.avrdude.upload.pattern={path}/{cmd} -C{config.path} {upload.verbose} -p{build.mcu} -c{upload.protocol} -P{serial.port} -b{upload.speed} -D -Uflash:w:{build.path}/{build.project_name}.hex:i
+tools.avrdude.upload.pattern="{path}/{cmd}" "-C{config.path}" {upload.verbose} -p{build.mcu} -c{upload.protocol} -P{serial.port} -b{upload.speed} -D "-Uflash:w:{build.path}/{build.project_name}.hex:i"
 
 tools.avrdude.program.params.verbose=-v -v -v -v
 tools.avrdude.program.params.quiet=-q -q
-tools.avrdude.program.pattern={path}/{cmd} -C{config.path} {program.verbose} -p{build.mcu} -c{protocol} {program.extra_params} -Uflash:w:{build.path}/{build.project_name}.hex:i
+tools.avrdude.program.pattern="{path}/{cmd}" "-C{config.path}" {program.verbose} -p{build.mcu} -c{protocol} {program.extra_params} "-Uflash:w:{build.path}/{build.project_name}.hex:i"
 
 tools.avrdude.bootloader.params.verbose=-v -v -v -v
 tools.avrdude.bootloader.params.quiet=-q -q
-tools.avrdude.bootloader.pattern={path}/{cmd} -C{config.path} {bootloader.verbose} -p{build.mcu} -c{protocol} {program.extra_params} {bootloader.params}
+tools.avrdude.bootloader.pattern="{path}/{cmd}" "-C{config.path}" {bootloader.verbose} -p{build.mcu} -c{protocol} {program.extra_params} {bootloader.params}
+

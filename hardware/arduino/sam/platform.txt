@@ -22,31 +22,31 @@ compiler.ldflags=
 compiler.size.cmd=arm-none-eabi-size
 compiler.define=-DARDUINO=
 
-compiler.libsam.c.flags=-I{build.system.path}/libsam -I{build.system.path}/CMSIS/CMSIS/Include/ -I{build.system.path}/CMSIS/Device/ATMEL/
+compiler.libsam.c.flags="-I{build.system.path}/libsam" "-I{build.system.path}/CMSIS/CMSIS/Include/" "-I{build.system.path}/CMSIS/Device/ATMEL/"
 
 # SAM3 compile patterns
 # ---------------------
 
 ## Compile c files
-recipe.c.o.pattern={compiler.path}{compiler.c.cmd} {compiler.c.flags} -mcpu={build.mcu} -DF_CPU={build.f_cpu} -D{software}={runtime.ide.version} {build.extra_flags} {compiler.libsam.c.flags} {includes} {source_file} -o {object_file}
+recipe.c.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.c.flags} -mcpu={build.mcu} -DF_CPU={build.f_cpu} -D{software}={runtime.ide.version} {build.extra_flags} {compiler.libsam.c.flags} {includes} "{source_file}" -o "{object_file}"
 
 ## Compile c++ files
-recipe.cpp.o.pattern={compiler.path}{compiler.cpp.cmd} {compiler.cpp.flags} -mcpu={build.mcu} -DF_CPU={build.f_cpu} -D{software}={runtime.ide.version} {build.extra_flags} {compiler.libsam.c.flags} {includes} {source_file} -o {object_file}
+recipe.cpp.o.pattern="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} -mcpu={build.mcu} -DF_CPU={build.f_cpu} -D{software}={runtime.ide.version} {build.extra_flags} {compiler.libsam.c.flags} {includes} "{source_file}" -o "{object_file}"
 
 ## Create archives
-recipe.ar.pattern={compiler.path}{compiler.ar.cmd} {compiler.ar.flags} {build.path}/{archive_file} {object_file}
+recipe.ar.pattern="{compiler.path}{compiler.ar.cmd}" {compiler.ar.flags} "{build.path}/{archive_file}" "{object_file}"
 
 ## Combine gc-sections, archives, and objects
-recipe.c.combine.pattern={compiler.path}{compiler.c.elf.cmd} {compiler.c.elf.flags} -mcpu={build.mcu} -T{build.variant.path}/{build.ldscript} -Wl,-Map,{build.path}/{build.project_name}.map -o {build.path}/{build.project_name}.elf -L{build.path} -lm -lgcc -mthumb -Wl,--cref -Wl,--check-sections -Wl,--gc-sections -Wl,--entry=Reset_Handler -Wl,--unresolved-symbols=report-all -Wl,--warn-common -Wl,--warn-section-align -Wl,--warn-unresolved-symbols -Wl,--start-group {object_files} {build.variant.path}/{build.variant_system_lib} {build.path}/{archive_file} -Wl,--end-group
+recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {compiler.c.elf.flags} -mcpu={build.mcu} "-T{build.variant.path}/{build.ldscript}" "-Wl,-Map,{build.path}/{build.project_name}.map" -o "{build.path}/{build.project_name}.elf" "-L{build.path}" -lm -lgcc -mthumb -Wl,--cref -Wl,--check-sections -Wl,--gc-sections -Wl,--entry=Reset_Handler -Wl,--unresolved-symbols=report-all -Wl,--warn-common -Wl,--warn-section-align -Wl,--warn-unresolved-symbols -Wl,--start-group {object_files} "{build.variant.path}/{build.variant_system_lib}" "{build.path}/{archive_file}" -Wl,--end-group
 
 ## Create eeprom
 recipe.objcopy.eep.pattern=
 
 ## Create hex
-recipe.objcopy.hex.pattern={compiler.path}{compiler.elf2hex.cmd} {compiler.elf2hex.flags} {build.path}/{build.project_name}.elf {build.path}/{build.project_name}.bin
+recipe.objcopy.hex.pattern="{compiler.path}{compiler.elf2hex.cmd}" {compiler.elf2hex.flags} "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.bin"
 
 ## Compute size
-recipe.size.pattern={compiler.path}{compiler.size.cmd} -A {build.path}/{build.project_name}.elf
+recipe.size.pattern="{compiler.path}{compiler.size.cmd}" -A "{build.path}/{build.project_name}.elf"
 recipe.size.regex=\.text\s+([0-9]+).*
 
 
@@ -59,5 +59,5 @@ tools.bossac.path={runtime.ide.path}/hardware/tools
 
 tools.bossac.upload.params.verbose=-i -d
 tools.bossac.upload.params.quiet=
-tools.bossac.upload.pattern={path}/{cmd} {upload.verbose} --port={serial.port.file} -e -w -v -b {build.path}/{build.project_name}.bin
+tools.bossac.upload.pattern="{path}/{cmd}" {upload.verbose} --port={serial.port.file} -e -w -v -b "{build.path}/{build.project_name}.bin"
 
