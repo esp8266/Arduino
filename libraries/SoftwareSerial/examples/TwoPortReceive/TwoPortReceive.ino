@@ -16,8 +16,17 @@
  * First serial device's TX attached to digital pin 2, RX to pin 3
  * Second serial device's TX attached to digital pin 4, RX to pin 5
  
+ Note:
+ Not all pins on the Mega and Mega 2560 support change interrupts, 
+ so only the following can be used for RX: 
+ 10, 11, 12, 13, 50, 51, 52, 53, 62, 63, 64, 65, 66, 67, 68, 69
+ 
+ Not all pins on the Leonardo support change interrupts, 
+ so only the following can be used for RX: 
+ 8, 9, 10, 11, 14 (MISO), 15 (SCK), 16 (MOSI).
+ 
  created 18 Apr. 2011
- modified 9 Apr 2012
+ modified 25 May 2012
  by Tom Igoe
  based on Mikal Hart's twoPortRXExample
  
@@ -26,11 +35,12 @@
  */
 
 #include <SoftwareSerial.h>
-// software serial #1: TX = digital pin 2, RX = digital pin 3
-SoftwareSerial portOne(2, 3);
+// software serial #1: TX = digital pin 10, RX = digital pin 11
+SoftwareSerial portOne(10,11);
 
-// software serial #2: TX = digital pin 4, RX = digital pin 5
-SoftwareSerial portTwo(4, 5);
+// software serial #2: TX = digital pin 8, RX = digital pin 9
+// on the Mega, use other pins instead, since 8 and 9 don't work on the Mega
+SoftwareSerial portTwo(8,9);
 
 void setup()
 {
