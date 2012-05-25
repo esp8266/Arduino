@@ -124,11 +124,14 @@ public class BasicUploader extends Uploader  {
     prefs.putAll(Base.getBoardPreferences());
     prefs.putAll(targetPlatform.getProgrammer(programmer));
     prefs.putAll(targetPlatform.getTool(prefs.get("bootloader.tool")));
-    if (verbose)
+    if (verbose) {
+      prefs.put("erase.verbose", prefs.get("erase.params.verbose"));
       prefs.put("bootloader.verbose", prefs.get("bootloader.params.verbose"));
-    else
+    } else {
+      prefs.put("erase.verbose", prefs.get("erase.params.quiet"));
       prefs.put("bootloader.verbose", prefs.get("bootloader.params.quiet"));
-
+    }
+    
     try {
       // if (prefs.get("program.disable_flushing") == null
       // || prefs.get("program.disable_flushing").toLowerCase().equals("false"))
@@ -136,13 +139,11 @@ public class BasicUploader extends Uploader  {
       // flushSerialBuffer();
       // }
 
-      prefs.put("bootloader.params", prefs.get("bootloader.erase.params"));
-      String pattern = prefs.get("bootloader.pattern");
+      String pattern = prefs.get("erase.pattern");
       String[] cmd = StringReplacer.formatAndSplit(pattern, prefs, true);
       if (!executeUploadCommand(cmd))
         return false;
 
-      prefs.put("bootloader.params", prefs.get("bootloader.write.params"));
       pattern = prefs.get("bootloader.pattern");
       cmd = StringReplacer.formatAndSplit(pattern, prefs, true);
       return executeUploadCommand(cmd);
