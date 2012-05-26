@@ -61,7 +61,12 @@ void printMacAddress() {
 void listNetworks() {
   // scan for nearby networks:
   Serial.println("** Scan Networks **");
-  byte numSsid = WiFi.scanNetworks();
+  int numSsid = WiFi.scanNetworks();
+  if (numSsid == -1)
+  { 
+    Serial.println("Couldn't get a wifi connection");
+    while(true);
+  } 
 
   // print the list of networks seen:
   Serial.print("number of available networks:");
