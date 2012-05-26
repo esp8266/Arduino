@@ -150,12 +150,13 @@ uint8_t WiFiClass::encryptionType()
 }
 
 
-uint8_t WiFiClass::scanNetworks()
+int8_t WiFiClass::scanNetworks()
 {
 	uint8_t attempts = 10;
 	uint8_t numOfNetworks = 0;
 
-	WiFiDrv::startScanNetworks();
+	if (WiFiDrv::startScanNetworks() == WL_FAILURE)
+		return WL_FAILURE;
  	do
  	{
  		delay(2000);

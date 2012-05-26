@@ -52,7 +52,7 @@ public:
      * param ssid_len: Lenght of ssid string.
      * return: WL_SUCCESS or WL_FAILURE
 	 */
-    static uint8_t wifiSetNetwork(char* ssid, uint8_t ssid_len);
+    static int8_t wifiSetNetwork(char* ssid, uint8_t ssid_len);
 
     /* Start Wifi connection with passphrase
      * the most secure supported mode will be automatically selected
@@ -64,7 +64,7 @@ public:
      * param len: Lenght of passphrase string.
      * return: WL_SUCCESS or WL_FAILURE
      */
-    static uint8_t wifiSetPassphrase(char* ssid, uint8_t ssid_len, const char *passphrase, const uint8_t len);
+    static int8_t wifiSetPassphrase(char* ssid, uint8_t ssid_len, const char *passphrase, const uint8_t len);
 
     /* Start Wifi connection with WEP encryption.
      * Configure a key into the device. The key type (WEP-40, WEP-104)
@@ -77,14 +77,14 @@ public:
      * param len: Lenght of key string.
      * return: WL_SUCCESS or WL_FAILURE
      */
-    static uint8_t wifiSetKey(char* ssid, uint8_t ssid_len, uint8_t key_idx, const void *key, const uint8_t len);
+    static int8_t wifiSetKey(char* ssid, uint8_t ssid_len, uint8_t key_idx, const void *key, const uint8_t len);
 
     /*
      * Disconnect from the network
      *
      * return: WL_SUCCESS or WL_FAILURE
      */
-    static uint8_t disconnect();
+    static int8_t disconnect();
 
     /*
      * Disconnect from the network
@@ -156,7 +156,7 @@ public:
      *
      * return: Number of discovered networks
      */
-    static uint8_t startScanNetworks();
+    static int8_t startScanNetworks();
 
     /*
      * Get the networks available

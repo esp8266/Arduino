@@ -123,7 +123,7 @@ public:
      *
      * return: Number of discovered networks
      */
-    uint8_t scanNetworks();
+    int8_t scanNetworks();
 
     /*
      * Return the SSID discovered during the network scan.
