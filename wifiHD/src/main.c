@@ -86,12 +86,6 @@ struct ctx_server {
 bool ifStatus = false;
 bool scanNetCompleted = false;
 
-// to maintain the word alignment
-//#define PAD_CTX_SIZE 	0x18
-//#define PAD_NETIF_SIZE 	0x3c
-#define PAD_CTX_SIZE 	0
-#define PAD_NETIF_SIZE 	0
-
 static bool initSpiComplete = false;
 
 // variable used as enable flag for debug prints
@@ -396,11 +390,11 @@ main(void)
 #else
     printk("Arduino Wifi Startup... [%s]\n", __TIMESTAMP__);
 
-    size_t size_ctx_server = sizeof(struct ctx_server)+PAD_CTX_SIZE;
+    size_t size_ctx_server = sizeof(struct ctx_server);
 	hs = calloc(1, size_ctx_server);
 	ASSERT(hs, "out of memory");
 
-	size_t size_netif = sizeof(struct netif)+PAD_NETIF_SIZE;
+	size_t size_netif = sizeof(struct netif);
 	hs->net_cfg.netif = calloc(1, size_netif);
 	ASSERT(hs->net_cfg.netif, "out of memory");
 

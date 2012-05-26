@@ -182,11 +182,14 @@ void* getTTCP(uint8_t sock)
 
 int getSock(void * _ttcp)
 {
-	int i = 0;
-	for (; i<MAX_SOCK_NUM; i++)
+	if (_ttcp != NULL)
 	{
-		if (_ttcp == mapSockTCP[i])
-			return i;
+		int i = 0;
+		for (; i<MAX_SOCK_NUM; i++)
+		{
+			if (_ttcp == mapSockTCP[i])
+				return i;
+		}
 	}
 	return -1;
 }
