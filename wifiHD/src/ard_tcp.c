@@ -705,12 +705,13 @@ static err_t tcp_data_sent(void *arg, struct tcp_pcb *pcb, u16_t len) {
 
 	tcp_poll_retries = 0;
 
+	INFO_TCP("Packet sent pcb:%p len:%d dur:%d\n", pcb, len, timer_get_ms() - startTime);
+
 	if (_ttcp->left > 0) {
 		INFO_TCP("data left: %d\n", _ttcp->left );
 		tcp_send_data(_ttcp);
 	}
 
-	INFO_TCP("Packet sent len:%d dur:%d\n", len, timer_get_ms() - startTime);
 	return ERR_OK;
 }
 
