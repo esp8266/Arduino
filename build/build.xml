@@ -282,9 +282,12 @@
     <replace file="macosx/work/Arduino.app/Contents/Info.plist"
              token="REVISION" value="${revision}" />
     
-    <exec executable="ditto" dir="macosx/work">
-      <arg line="-c -k -rsrc . ../arduino-${version}-macosx.zip" />
+    <exec executable="zip" dir="macosx/work">
+      <arg line="-q -r ../arduino-${version}-macosx.zip ." />
     </exec>
+    <!-- <exec executable="ditto" dir="macosx/work">
+      <arg line="-c -k -rsrc . ../arduino-${version}-macosx.zip" />
+    </exec> -->
 
     <echo>
       =======================================================
