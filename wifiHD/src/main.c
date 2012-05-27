@@ -155,13 +155,14 @@ wl_cm_disconn_cb(void* ctx)
      set_result_cmd(WL_FAILURE);
 }
 
-
+#if 0
 static void wl_cm_err_cb(void* ctx)
 {
     int err = *(int*)ctx;
     WARN("Error: %d\n", err);
     set_result_cmd(err);
 }
+#endif
 
 /**
  *
@@ -194,9 +195,6 @@ led_init(void)
 	LINK_LED_OFF();
 	ERROR_LED_OFF();
 	DATA_LED_OFF();
-
-    //LED_Off(LED1);
-    //LED_Off(LED2);
 }
 
 
@@ -354,6 +352,10 @@ void startup_init(void)
 {
 	INIT_SIGNAL_FOR_SPI();
 	BUSY_FOR_SPI();
+
+	// if DEBUG enabled use DEB_PIN_GPIO for debug purposes
+    DEB_PIN_ENA();
+    DEB_PIN_UP();
 }
 
 /**

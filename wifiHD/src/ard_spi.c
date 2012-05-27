@@ -343,7 +343,7 @@ int write_stream(volatile avr32_spi_t *spi, const char *stream, uint16_t len)
 
 void sendError()
 {
-	 AVAIL_FOR_SPI();
+	AVAIL_FOR_SPI();
 	if (spi_write(&AVR32_SPI, ERR_CMD) != SPI_ERROR_TIMEOUT)
 	{
 		//Wait to empty the buffer
@@ -1277,20 +1277,25 @@ unsigned char* getStartCmdSeq(unsigned char* _recv, int len, int *offset)
 {
 	int i = 0;
 	*offset = 0;
+	DEB_PIN_UP();
 	for (; i<len; ++i)
 	{
 		if (_recv[i]==START_CMD)
 		{
 			if (i!=0)
 			{
+				DEB_PIN_DN();
 				//WARN("Disall. %d/%d cmd:%d\n", i, len,_recv[i+1]);
-				//SIGN2_DN();
+				WARN("D=%d\n", i);
+
 			}
 			*offset = i;
 			return &_recv[i];
 		}
 	}
-	WARN("Disall. %d\n", i);
+	DEB_PIN_DN();
+	WARN("D=%d\n", i);
+
 	return NULL;
 }
 
@@ -1442,10 +1447,9 @@ bool checkMsgFormat(uint8_t* _recv, int len, int* offset)
 	unsigned char* recv = getStartCmdSeq(_recv, len, offset);
 	if ((recv == NULL)||(recv!=_recv))
 	{
-		//LED_On(LED2);
-		if (len < 20)	//TODO stamp only short messages wrong
+		if ((verboseDebug & INFO_SPI_FLAG)&&(len < 20))	//TODO stamp only short messages wrong
 			dump((char*)_recv, len);
-		//LED_Off(LED2);
+
 		if (recv == NULL)
 			return false;
 	}
@@ -1498,11 +1502,8 @@ void spi_poll(struct netif* netif) {
 			int err = call_reply_cb(buf, &reply[0]);
 			if (err != REPLY_NO_ERR)
 			{
-				//LED_On(LED1);
-				//INFO_SPI("[E(0x%x):%d spiStatus:%d]\n", statSpi.lastCmd, err, statSpi.status);
 				DUMP_SPI_DATA(buf, count);
 				DUMP_SPI_DATA(reply, replyCount);
-				//LED_Off(LED1);
 			}
 			receivedChars = 0;
 			count = 0;

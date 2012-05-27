@@ -11,7 +11,7 @@
 #include "gpio.h"
 #include "debug.h"
 #include "ARDUINO/arduino.h"
-#define INIT_SIGNAL_FOR_SPI() 	gpio_enable_pin_pull_up(ARDUINO_HANDSHAKE_PIN)
+#define INIT_SIGNAL_FOR_SPI() 	gpio_disable_pin_pull_up(ARDUINO_HANDSHAKE_PIN);
 #define BUSY_FOR_SPI() 			gpio_set_gpio_pin(ARDUINO_HANDSHAKE_PIN)
 #define AVAIL_FOR_SPI() 		gpio_clr_gpio_pin(ARDUINO_HANDSHAKE_PIN)
 
@@ -25,6 +25,7 @@
 #define LED2_DN() 				gpio_clr_gpio_pin(LED2_GPIO)
 #define LED2_TL() 				gpio_tgl_gpio_pin(LED2_GPIO)
 
+
 #ifdef _DEBUG_
 #define SIGN0_UP		LED0_UP
 #define SIGN0_DN 		LED0_DN
@@ -36,6 +37,10 @@
 #define SIGN2_DN 		LED2_DN
 #define SIGN2_TL 		LED2_TL
 
+#define DEB_PIN_UP() 			gpio_set_gpio_pin(DEB_PIN_GPIO)
+#define DEB_PIN_DN() 			gpio_clr_gpio_pin(DEB_PIN_GPIO)
+#define DEB_PIN_ENA() 			gpio_enable_gpio_pin(DEB_PIN_GPIO);
+
 #else
 #define SIGN0_UP()
 #define SIGN0_DN()
@@ -46,6 +51,10 @@
 #define SIGN2_UP()
 #define SIGN2_DN()
 #define SIGN2_TL()
+
+#define DEB_PIN_UP()
+#define DEB_PIN_DN()
+
 //#define TOGGLE_SIG0
 #endif
 

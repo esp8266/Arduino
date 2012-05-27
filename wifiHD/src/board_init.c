@@ -282,16 +282,16 @@ static void init_printk(void)
 void board_init(void)
 {
         
-        init_exceptions();
-	init_hmatrix();
-	init_sys_clocks();
-	init_interrupts();
+    init_exceptions();
+    init_hmatrix();
+    init_sys_clocks();
+    init_interrupts();
 
-        init_rs232();
-        init_printk();
+    init_rs232();
+    init_printk();
         
 #ifdef WITH_SDRAM
-        sdramc_init(FHSB_HZ);
+    sdramc_init(FHSB_HZ);
 #endif
-        init_spi();
+    init_spi();
 }
