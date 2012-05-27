@@ -222,10 +222,9 @@ public class Preferences {
 
     // set some runtime constants (not saved on preferences file)
     table.put("runtime.os", PConstants.platformNames[PApplet.platform]);
-    String idePath = System.getProperty("user.dir");
-    if (Base.isMacOS())
-      idePath += "/Arduino.app/Contents/Resources/Java";
-    table.put("runtime.ide.path", idePath);
+    File hardwareFolder = Base.getHardwareFolder();
+    table.put("runtime.hardware.path", hardwareFolder.getAbsolutePath());
+    table.put("runtime.ide.path", hardwareFolder.getParentFile().getAbsolutePath());
     table.put("runtime.ide.version", "" + Base.REVISION);
     
     // check for platform-specific properties in the defaults
