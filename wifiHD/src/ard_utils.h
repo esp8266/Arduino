@@ -54,6 +54,7 @@
 
 #define DEB_PIN_UP()
 #define DEB_PIN_DN()
+#define DEB_PIN_ENA()
 
 //#define TOGGLE_SIG0
 #endif
