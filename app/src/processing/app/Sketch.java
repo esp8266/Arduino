@@ -1373,6 +1373,9 @@ public class Sketch {
     for (SketchCode sc : code) {
       if (sc.isExtension("ino") || sc.isExtension("pde")) {
         sc.setPreprocOffset(bigCount);
+        // These #line directives help the compiler report errors with
+        // correct the filename and line number (issue 281 & 907)
+        bigCode.append("#line 1 \"" + sc.getFileName() + "\"\n");
         bigCode.append(sc.getProgram());
         bigCode.append('\n');
         bigCount += sc.getLineCount();
@@ -1542,54 +1545,16 @@ public class Sketch {
   public RunnerException placeException(String message, 
                                         String dotJavaFilename, 
                                         int dotJavaLine) {
-    int codeIndex = 0; //-1;
-    int codeLine = -1;
-
-//    System.out.println("placing " + dotJavaFilename + " " + dotJavaLine);
-//    System.out.println("code count is " + getCodeCount());
-
-    // first check to see if it's a .java file
-    for (int i = 0; i < getCodeCount(); i++) {
-      SketchCode code = getCode(i);
-      if (!code.isExtension(getDefaultExtension())) {
-        if (dotJavaFilename.equals(code.getFileName())) {
-          codeIndex = i;
-          codeLine = dotJavaLine;
-          return new RunnerException(message, codeIndex, codeLine);
-        }
-      }
-    }
-
-    // If not the preprocessed file at this point, then need to get out
-    if (!dotJavaFilename.equals(name + ".cpp")) {
-      return null;
-    }
-
-    // if it's not a .java file, codeIndex will still be 0
-    // this section searches through the list of .pde files
-    codeIndex = 0;
-    for (int i = 0; i < getCodeCount(); i++) {
-      SketchCode code = getCode(i);
-
-      if (code.isExtension(getDefaultExtension())) {
-//        System.out.println("preproc offset is " + code.getPreprocOffset());
-//        System.out.println("looking for line " + dotJavaLine);
-        if (code.getPreprocOffset() <= dotJavaLine) {
-          codeIndex = i;
-//          System.out.println("i'm thinkin file " + i);
-          codeLine = dotJavaLine - code.getPreprocOffset();
-        }
-      }
-    }
-    // could not find a proper line number, so deal with this differently.
-    // but if it was in fact the .java file we're looking for, though, 
-    // send the error message through.
-    // this is necessary because 'import' statements will be at a line
-    // that has a lower number than the preproc offset, for instance.
-//    if (codeLine == -1 && !dotJavaFilename.equals(name + ".java")) {
-//      return null;
-//    }
-    return new RunnerException(message, codeIndex, codeLine);
+     // Placing errors is simple, because we inserted #line directives
+     // into the preprocessed source.  The compiler gives us correct
+     // the file name and line number.  :-)
+     for (int codeIndex = 0; codeIndex < getCodeCount(); codeIndex++) {
+       SketchCode code = getCode(codeIndex);
+       if (dotJavaFilename.equals(code.getFileName())) {
+         return new RunnerException(message, codeIndex, dotJavaLine);
+       }
+     }
+     return null;
   }
 
 

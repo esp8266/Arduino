@@ -46,6 +46,7 @@ public class Compiler implements MessageConsumer {
   String buildPath;
   String primaryClassName;
   boolean verbose;
+  boolean sketchIsCompiled;
 
   RunnerException exception;
 
@@ -68,6 +69,7 @@ public class Compiler implements MessageConsumer {
     this.buildPath = buildPath;
     this.primaryClassName = primaryClassName;
     this.verbose = verbose;
+    this.sketchIsCompiled = false;
 
     // the pms object isn't used for anything but storage
     MessageStream pms = new MessageStream(this);
@@ -130,6 +132,7 @@ public class Compiler implements MessageConsumer {
                findFilesInPath(buildPath, "c", false),
                findFilesInPath(buildPath, "cpp", false),
                boardPreferences));
+   sketchIsCompiled = true;
 
    // 2. compile the libraries, outputting .o files to: <buildPath>/<library>/
 
@@ -513,14 +516,20 @@ public class Compiler implements MessageConsumer {
         //msg = _("\nThe 'Keyboard' class is only supported on the Arduino Leonardo.\n\n");
       }
       
-      RunnerException e = sketch.placeException(error, pieces[1], PApplet.parseInt(pieces[2]) - 1);
+      RunnerException e = null;
+      if (!sketchIsCompiled) {
+        // Place errors when compiling the sketch, but never while compiling libraries
+        // or the core.  The user's sketch might contain the same filename!
+        e = sketch.placeException(error, pieces[1], PApplet.parseInt(pieces[2]) - 1);
+      }
 
       // replace full file path with the name of the sketch tab (unless we're
       // in verbose mode, in which case don't modify the compiler output)
       if (e != null && !verbose) {
         SketchCode code = sketch.getCode(e.getCodeIndex());
-        String fileName = code.isExtension(sketch.getDefaultExtension()) ? code.getPrettyName() : code.getFileName();
-        s = fileName + ":" + e.getCodeLine() + ": error: " + pieces[3] + msg;        
+        String fileName = (code.isExtension("ino") || code.isExtension("pde")) ? code.getPrettyName() : code.getFileName();
+        int lineNum = e.getCodeLine() + 1;
+        s = fileName + ":" + lineNum + ": error: " + pieces[3] + msg;        
       }
             
       if (exception == null && e != null) {
