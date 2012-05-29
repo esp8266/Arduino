@@ -33,7 +33,7 @@ arduino_due_x.build.pid=0x003e
 ##############################################################
 
 adk2.name=Google ADK2
-adk2.upload.tool=bossac
+adk2.upload.tool=adk2install
 adk2.upload.protocol=sam-ba
 adk2.upload.maximum_size=49152
 adk2.build.mcu=cortex-m3
