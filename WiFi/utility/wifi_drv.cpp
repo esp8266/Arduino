@@ -75,7 +75,7 @@ int8_t WiFiDrv::wifiSetNetwork(char* ssid, uint8_t ssid_len)
     if (!SpiDrv::waitResponseCmd(SET_NET_CMD, PARAM_NUMS_1, &_data, &_dataLen))
     {
         WARN("error waitResponse");
-        return WL_FAILURE;
+        _data = WL_FAILURE;
     }
     SpiDrv::spiSlaveDeselect();
 
@@ -99,7 +99,7 @@ int8_t WiFiDrv::wifiSetPassphrase(char* ssid, uint8_t ssid_len, const char *pass
     if (!SpiDrv::waitResponseCmd(SET_PASSPHRASE_CMD, PARAM_NUMS_1, &_data, &_dataLen))
     {
         WARN("error waitResponse");
-        return WL_FAILURE;
+        _data = WL_FAILURE;
     }
     SpiDrv::spiSlaveDeselect();
     return _data;
@@ -124,7 +124,7 @@ int8_t WiFiDrv::wifiSetKey(char* ssid, uint8_t ssid_len, uint8_t key_idx, const 
     if (!SpiDrv::waitResponseCmd(SET_KEY_CMD, PARAM_NUMS_1, &_data, &_dataLen))
     {
         WARN("error waitResponse");
-        return WL_FAILURE;
+        _data = WL_FAILURE;
     }
     SpiDrv::spiSlaveDeselect();
     return _data;
@@ -319,12 +319,12 @@ int8_t WiFiDrv::startScanNetworks()
     if (!SpiDrv::waitResponseCmd(START_SCAN_NETWORKS, PARAM_NUMS_1, &_data, &_dataLen))
      {
          WARN("error waitResponse");
-         return WL_FAILURE;
+         _data = WL_FAILURE;
      }
 
     SpiDrv::spiSlaveDeselect();
 
-    return WL_SUCCESS;
+    return (_data == WL_FAILURE)? _data : WL_SUCCESS;
 }
 
 

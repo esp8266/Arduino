@@ -54,6 +54,10 @@ void setup() {
     Serial.print("Attempting to connect to SSID: ");
     Serial.println(ssid);
     status = WiFi.begin(ssid, pass);
+    if ( status != WL_CONNECTED) { 
+      Serial.println("Couldn't get a wifi connection");
+      while(true);
+    } 
     // wait 10 seconds for connection:
     delay(10000);
   } 
