@@ -128,6 +128,7 @@ uint8_t WiFiClient::connected() {
 
     return !(s == LISTEN || s == CLOSED || s == FIN_WAIT_1 ||
     		s == FIN_WAIT_2 || s == TIME_WAIT ||
+    		s == SYN_SENT || s== SYN_RCVD ||
              (s == CLOSE_WAIT && !available()));
   }
 }
