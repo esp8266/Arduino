@@ -698,7 +698,7 @@ int start_client_tcp_cmd_cb(int numParam, char* buf, void* ctx) {
     	_ttcp = getTTCP(sock);
     	if (_ttcp != NULL)
     	{
-    		printk("Previous client %p not stopped !\n", _ttcp);
+    		WARN("Previous client %p not stopped !\n", _ttcp);
     		ard_tcp_stop(_ttcp);
     		clearMapSockTcp(sock);
     	}

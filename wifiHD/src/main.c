@@ -335,8 +335,6 @@ wl_init_complete_cb(void* ctx)
 
     wl_scan();
 
-    initShell();
-
     if (initSpi()){
     	WARN("Spi not initialized\n");
     }else
@@ -376,6 +374,8 @@ main(void)
     led_init();
 
     tc_init();
+
+    initShell();
 
     delay_init(FOSC0);
 
