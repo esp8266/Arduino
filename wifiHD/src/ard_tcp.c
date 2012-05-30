@@ -151,7 +151,7 @@ static void tcp_send_data(struct ttcp *ttcp) {
 	do {
 		startTime = timer_get_ms();
 		err = tcp_write(ttcp->tpcb, ttcp->payload, len, TCP_WRITE_FLAG_COPY);
-		INFO_TCP("%d) tcp_write %p len:%d err:%d\n", count++, ttcp->tpcb, len, err);
+		INFO_TCP_VER("%d) tcp_write %p state:%d len:%d err:%d\n", count++, ttcp->tpcb, ttcp->tpcb->state, len, err);
 		if (err == ERR_MEM)
 		{
 			len /= 2;
@@ -185,6 +185,7 @@ static err_t tcp_connect_cb(void *arg, struct tcp_pcb *tpcb, err_t err) {
 	INFO_TCP("TTCP [%p-%p]: connect %d %d\n", ttcp, tpcb, err, ttcp->tpcb->state);
 
 	_connected =  ( ttcp->tpcb->state == ESTABLISHED) ? 1 : 0;
+    tcp_poll_retries = 0;
 
 	ttcp->start_time = timer_get_ms();
 
@@ -223,6 +224,21 @@ static void atcp_conn_err_cb(void *arg, err_t err) {
 
 	pending_close = false;
 }
+
+static void atcp_conn_cli_err_cb(void *arg, err_t err) {
+	struct ttcp* _ttcp = arg;
+
+	WARN("TTCP [%p]: connection error: %d arg:%p\n",
+			_ttcp, err, arg);
+
+	if (ifStatus == false)
+		printk("Abort connection\n");
+	ard_tcp_destroy(_ttcp);
+	cleanSockState_cb(_ttcp);
+
+	pending_close = false;
+}
+
 
 static void close_conn(struct ttcp *_ttcp) {
 	tcp_arg(_ttcp->tpcb, NULL);
@@ -331,6 +347,44 @@ static err_t atcp_poll(void *arg, struct tcp_pcb *pcb) {
 	return ERR_OK;
 }
 
+static err_t atcp_poll_conn(void *arg, struct tcp_pcb *pcb) {
+	struct ttcp* _ttcp = arg;
+	++tcp_poll_retries;
+
+	if (tcp_poll_retries > 4) {
+		WARN("ARD TCP [%p] arg=%p retries=%d\n",
+				pcb, arg, tcp_poll_retries);
+		tcp_poll_retries = 0;
+		tcp_abort(pcb);
+		ard_tcp_destroy(_ttcp);
+		cleanSockState_cb(_ttcp);
+		pending_close = false;
+	    return ERR_ABRT;
+	}
+
+	if (pending_close)
+	{
+		err_t err = tcp_close(pcb);
+		if (err == ERR_MEM)
+		{
+			pending_close = true;
+		}
+		else
+		{
+			pending_close = false;
+		}
+
+		INFO_TCP("ARD TCP [%p-%p] try to close pending:%d\n", pcb, (_ttcp)?_ttcp->tpcb:0, pending_close);
+	}else{
+		WARN("ARD TCP [%p-%p] arg=%p retries=%d\n", (_ttcp)?_ttcp->tpcb:0, pcb, arg, tcp_poll_retries);
+		if (_ttcp) tcp_send_data(_ttcp);
+		else WARN("ttcp NULL!");
+	}
+
+	return ERR_OK;
+}
+
+
 /**
  * Only used in TCP mode.
  */
@@ -379,11 +433,12 @@ static int atcp_start(struct ttcp* ttcp) {
 	atcp_init();
 
 	if (ttcp->mode == TTCP_MODE_TRANSMIT) {
-		tcp_err(ttcp->tpcb, atcp_conn_err_cb);
+		tcp_err(ttcp->tpcb, atcp_conn_cli_err_cb);
 		tcp_recv(ttcp->tpcb, atcp_recv_cb);
+		tcp_poll(ttcp->tpcb, atcp_poll, 4);
 		_connected = false;
 		INFO_TCP("[tpcb]- %p\n", ttcp->tpcb);
-
+		DUMP_TCP_STATE(ttcp);
 		if (tcp_connect(ttcp->tpcb, &ttcp->addr, ttcp->port, tcp_connect_cb)
 				!= ERR_OK) {
 			WARN("TTCP [%p]: tcp connect failed\n", ttcp);
@@ -616,12 +671,22 @@ int ard_tcp_start(struct ip_addr addr, uint16_t port, void *opaque,
 
 void ard_tcp_stop(void* ttcp) {
 	struct ttcp* _ttcp = (struct ttcp*) ttcp;
-
-	INFO_TCP("Closing connection...state:%d\n", _ttcp->tpcb->state);
-	DUMP_TCP_STATE(_ttcp);
-	if ((_ttcp)&&(_ttcp->tpcb)&&(_ttcp->tpcb->state!=LAST_ACK)&&(_ttcp->tpcb->state!=CLOSED))
+	if (_ttcp == NULL)
 	{
-		close_conn(_ttcp);
+		WARN("ttcp = NULL!\n");
+		return;
+	}
+	if (_ttcp->mode == TTCP_MODE_TRANSMIT) {
+		INFO_TCP("Destroy TCP connection...state:%d\n", _ttcp->tpcb->state);
+		ard_tcp_destroy(_ttcp);
+    	clearMapSockTcp(getSock(_ttcp));
+	}else{
+		INFO_TCP("Closing connection...state:%d\n", _ttcp->tpcb->state);
+		DUMP_TCP_STATE(_ttcp);
+		if ((_ttcp)&&(_ttcp->tpcb)&&(_ttcp->tpcb->state!=LAST_ACK)&&(_ttcp->tpcb->state!=CLOSED))
+		{
+			close_conn(_ttcp);
+		}
 	}
 }
 
@@ -672,9 +737,9 @@ static err_t tcp_data_sent(void *arg, struct tcp_pcb *pcb, u16_t len) {
 
 	tcp_poll_retries = 0;
 
-	INFO_TCP("Packet sent pcb:%p len:%d dur:%d\n", pcb, len, timer_get_ms() - startTime);
+	INFO_TCP_VER("Packet sent pcb:%p len:%d dur:%d\n", pcb, len, timer_get_ms() - startTime);
 
-	if (_ttcp->left > 0) {
+	if ((_ttcp)&&(_ttcp->left > 0)) {
 		INFO_TCP("data left: %d\n", _ttcp->left );
 		tcp_send_data(_ttcp);
 	}
@@ -687,6 +752,18 @@ int sendTcpData(void* p, uint8_t* buf, uint16_t len) {
 	DUMP_TCP(buf,len);
 
 	struct ttcp* _ttcp = (struct ttcp*) p;
+
+	if (_ttcp==NULL)
+	{
+		WARN("ttcp == NULL!");
+		return WL_FAILURE;
+	}
+
+	INFO_TCP_VER("CLI> p=%p _ttcp=%p state(tpcb):%d state(lpcb):%d\n",
+	    		    				p, ((struct ttcp*) p)->tpcb,
+	    		    				((struct ttcp*) p)->tpcb->state,
+	    		    				((struct ttcp*) p)->lpcb->state);
+
 	if ((_ttcp != NULL) && (_ttcp->tpcb != NULL) &&
 			(buf != NULL) && (len != 0) && (_ttcp->payload != NULL)) {
 		if (_ttcp->tpcb->state == ESTABLISHED ||

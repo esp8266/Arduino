@@ -231,6 +231,9 @@ static void ard_tcp_print_stats(struct ttcp *ttcp) {
 
 void showTTCPstatus()
 {
+	printk("IF   status: %s\n", (ifStatus) ? "UP":"DOWN");
+	printk("CONN status: %s\n", (_connected) ? "UP":"DOWN");
+
 	int i = 0;
 	for (; i<MAX_SOCK_NUM; i++)
 	{
@@ -691,6 +694,15 @@ int start_client_tcp_cmd_cb(int numParam, char* buf, void* ctx) {
         if (sock >= MAX_SOCK_NUM)
         	return WIFI_SPI_ERR;
 
+        // Check previous connection
+    	_ttcp = getTTCP(sock);
+    	if (_ttcp != NULL)
+    	{
+    		printk("Previous client %p not stopped !\n", _ttcp);
+    		ard_tcp_stop(_ttcp);
+    		clearMapSockTcp(sock);
+    	}
+
         if (ard_tcp_start((struct ip_addr)addr, port, NULL, NULL, mode, nbuf, buflen, udp, verbose, sock, &_ttcp) == 0)
         {
         	INFO_SPI("Start Client [0x%x, %d, %d] OK!\n", addr, port, sock);
@@ -1110,19 +1122,26 @@ cmd_spi_state_t get_client_state_tcp_cmd_cb(char* recv, char* reply, void* ctx, 
     if ((recv[3]==1)&&(recv[4]>=0)&&(recv[4]<MAX_SOCK_NUM))
     {
     	void * p= getTTCP((uint8_t)recv[4]);
-    	// get if we are in server or Transmit mode (0)
-    	if (getModeTcp(p) == TTCP_MODE_TRANSMIT)
+    	if (p!=NULL)
     	{
+			// get if we are in server or Transmit mode (0)
+			if (getModeTcp(p) == TTCP_MODE_TRANSMIT)
+			{
 
-    		_state = getStateTcp(p, 1);
-    		INFO_TCP_VER("p=%p _ttcp=%p state:%d\n",
-    				p, ((struct ttcp*) p)->tpcb, _state);
-    	}else {
-    		INFO_TCP_VER("p=%p _ttcp=%p state(tpcb):%d state(lpcb):%d\n",
-    		    				p, ((struct ttcp*) p)->tpcb,
-    		    				((struct ttcp*) p)->tpcb->state,
-    		    				((struct ttcp*) p)->lpcb->state);
-    		_state = getStateTcp(p, 1);
+				_state = getStateTcp(p, 1);
+				INFO_TCP_VER("CLI> p=%p _ttcp=%p state(tpcb):%d state:%d\n",
+									p, ((struct ttcp*) p)->tpcb,
+									((struct ttcp*) p)->tpcb->state,
+									_state);
+			}else {
+				_state = getStateTcp(p, 1);
+				INFO_TCP_VER("SER> p=%p _ttcp=%p state(tpcb):%d state(lpcb):%d state:%d\n",
+									p, ((struct ttcp*) p)->tpcb,
+									((struct ttcp*) p)->tpcb->state,
+									((struct ttcp*) p)->lpcb->state,
+									_state);
+
+			}
     	}
     }
     PUT_DATA_BYTE(_state, reply, 3);
