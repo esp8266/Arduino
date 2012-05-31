@@ -26,7 +26,8 @@
 #define WL_MAX_ATTEMPT_CONNECTION	10
 
 typedef enum {
-        WL_IDLE_STATUS,
+		WL_NO_SHIELD = 255,
+        WL_IDLE_STATUS = 0,
         WL_NO_SSID_AVAIL,
         WL_SCAN_COMPLETED,
         WL_CONNECTED,

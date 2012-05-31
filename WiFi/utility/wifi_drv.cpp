@@ -163,7 +163,7 @@ uint8_t WiFiDrv::getConnectionStatus()
     SpiDrv::waitForSlaveReady();
 
     // Wait for reply
-    uint8_t _data = 0;
+    uint8_t _data = -1;
     uint8_t _dataLen = 0;
     SpiDrv::waitResponseCmd(GET_CONN_STATUS_CMD, PARAM_NUMS_1, &_data, &_dataLen);
 
