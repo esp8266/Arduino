@@ -538,9 +538,9 @@ uint32_t USBD_Connected(void)
 //=======================================================================
 //=======================================================================
 
-USB_ USB;
+USBDevice_ USBDevice;
 
-USB_::USB_()
+USBDevice_::USBDevice_()
 {
 	UDD_SetStack(&USB_ISR);
 
@@ -550,7 +550,7 @@ USB_::USB_()
 	}
 }
 
-bool USB_::attach(void)
+bool USBDevice_::attach(void)
 {
   if ( _usbInitialized != 0UL )
   {
@@ -564,7 +564,7 @@ bool USB_::attach(void)
   }
 }
 
-bool USB_::detach(void)
+bool USBDevice_::detach(void)
 {
 	if ( _usbInitialized != 0UL )
 	{
@@ -579,11 +579,11 @@ bool USB_::detach(void)
 
 //	Check for interrupts
 //	TODO: VBUS detection
-bool USB_::configured()
+bool USBDevice_::configured()
 {
 	return _usbConfiguration;
 }
 
-void USB_::poll()
+void USBDevice_::poll()
 {
 }

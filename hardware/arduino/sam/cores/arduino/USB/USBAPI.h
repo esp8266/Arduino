@@ -27,17 +27,17 @@
 //================================================================================
 //	USB
 
-class USB_
+class USBDevice_
 {
 public:
-	USB_();
+	USBDevice_();
 	bool configured();
 
 	bool attach();
 	bool detach();	// Serial port goes down too...
 	void poll();
 };
-extern USB_ USB;
+extern USBDevice_ USBDevice;
 
 //================================================================================
 //================================================================================
