@@ -350,7 +350,7 @@ EXP_FUNC int STDCALL base64_decode(const char *in, int len,
         }
 
         /* check that we don't go past the output buffer */
-        if (z >= *outlen) 
+        if (z > *outlen) 
             goto error;
     }
 
@@ -358,7 +358,6 @@ EXP_FUNC int STDCALL base64_decode(const char *in, int len,
         goto error;
 
     *outlen = z;
-
     ret = 0;
 
 error:
