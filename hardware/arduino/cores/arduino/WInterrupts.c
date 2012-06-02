@@ -59,6 +59,14 @@ void attachInterrupt(uint8_t interruptNum, void (*userFunc)(void), int mode) {
 		EICRA = (EICRA & ~((1<<ISC10) | (1<<ISC11))) | (mode << ISC10);
 		EIMSK |= (1<<INT1);
 		break;	
+    case 2:
+        EICRA = (EICRA & ~((1<<ISC20) | (1<<ISC21))) | (mode << ISC20);
+        EIMSK |= (1<<INT2);
+        break;
+    case 3:
+        EICRA = (EICRA & ~((1<<ISC30) | (1<<ISC31))) | (mode << ISC30);
+        EIMSK |= (1<<INT3);
+        break;
 #elif defined(EICRA) && defined(EICRB) && defined(EIMSK)
     case 2:
       EICRA = (EICRA & ~((1 << ISC00) | (1 << ISC01))) | (mode << ISC00);
@@ -147,12 +155,18 @@ void detachInterrupt(uint8_t interruptNum) {
     // ATmega8.  There, INT0 is 6 and INT1 is 7.)
     switch (interruptNum) {
 #if defined(__AVR_ATmega32U4__)
-	case 0:
-		EIMSK &= ~(1<<INT0);
-		break;
-	case 1:
-		EIMSK &= ~(1<<INT1);
-		break;		
+    case 0:
+        EIMSK &= ~(1<<INT0);
+        break;
+    case 1:
+        EIMSK &= ~(1<<INT1);
+        break;
+    case 2:
+        EIMSK &= ~(1<<INT2);
+        break;
+    case 3:
+        EIMSK &= ~(1<<INT3);
+        break;		
 #elif defined(EICRA) && defined(EICRB) && defined(EIMSK)
     case 2:
       EIMSK &= ~(1 << INT0);
@@ -224,6 +238,16 @@ SIGNAL(INT0_vect) {
 SIGNAL(INT1_vect) {
 	if(intFunc[EXTERNAL_INT_1])
 		intFunc[EXTERNAL_INT_1]();
+}
+
+SIGNAL(INT2_vect) {
+    if(intFunc[EXTERNAL_INT_2])
+		intFunc[EXTERNAL_INT_2]();
+}
+
+SIGNAL(INT3_vect) {
+    if(intFunc[EXTERNAL_INT_3])
+		intFunc[EXTERNAL_INT_3]();
 }
 
 #elif defined(EICRA) && defined(EICRB)
