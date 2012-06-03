@@ -17,52 +17,32 @@ SPIClass::SPIClass(Spi *_spi, uint32_t _id, void(*_initCb)(void)) :
 
 	SPI_Configure(spi, id, SPI_MR_MSTR | SPI_MR_PS);
 	SPI_Enable(spi);
-	setClockDivider(1);
-	setDataMode(SPI_MODE0);
 }
 
 void SPIClass::begin(uint8_t _pin) {
 	if (_pin == 0)
 		return;
-	PIO_Configure(g_APinDescription[_pin].pPort,
+	PIO_Configure(
+		g_APinDescription[_pin].pPort,
 		g_APinDescription[_pin].ulPinType,
 		g_APinDescription[_pin].ulPin,
 		g_APinDescription[_pin].ulPinConfiguration);
+	setClockDivider(_pin, 1);
+	setDataMode(_pin, SPI_MODE0);
 }
 
 void SPIClass::end() {
 	SPI_Disable(spi);
 }
 
-//void SPIClass::setBitOrder(uint8_t bitOrder) {
-//	setBitOrder(bitOrder, 0);
-//	setBitOrder(bitOrder, 1);
-//	setBitOrder(bitOrder, 2);
-//	setBitOrder(bitOrder, 3);
-//}
-
-//void SPIClass::setBitOrder(uint8_t bitOrder, uint8_t _channel) {
+//void SPIClass::setBitOrder(uint8_t _bitOrder, uint8_t _channel) {
 //	// Not supported
 //}
-
-void SPIClass::setDataMode(uint8_t _mode) {
-	setDataMode(PIN_SPI_SS0, _mode);
-	setDataMode(PIN_SPI_SS1, _mode);
-	setDataMode(PIN_SPI_SS2, _mode);
-	setDataMode(PIN_SPI_SS3, _mode);
-}
 
 void SPIClass::setDataMode(uint8_t _pin, uint8_t _mode) {
 	uint32_t _channel = SPI_PIN_TO_SPI_CHANNEL(_pin);
 	mode[_channel] = _mode | SPI_CSR_CSAAT;
 	SPI_ConfigureNPCS(spi, _channel, mode[_channel] | SPI_CSR_SCBR(divider[_channel]));
-}
-
-void SPIClass::setClockDivider(uint8_t _divider) {
-	setClockDivider(PIN_SPI_SS0, _divider);
-	setClockDivider(PIN_SPI_SS1, _divider);
-	setClockDivider(PIN_SPI_SS2, _divider);
-	setClockDivider(PIN_SPI_SS3, _divider);
 }
 
 void SPIClass::setClockDivider(uint8_t _pin, uint8_t _divider) {
@@ -99,15 +79,18 @@ void SPIClass::detachInterrupt(void) {
 
 #if SPI_INTERFACES_COUNT > 0
 static void SPI_0_Init(void) {
-	PIO_Configure(g_APinDescription[PIN_SPI_MOSI].pPort,
+	PIO_Configure(
+			g_APinDescription[PIN_SPI_MOSI].pPort,
 			g_APinDescription[PIN_SPI_MOSI].ulPinType,
 			g_APinDescription[PIN_SPI_MOSI].ulPin,
 			g_APinDescription[PIN_SPI_MOSI].ulPinConfiguration);
-	PIO_Configure(g_APinDescription[PIN_SPI_MISO].pPort,
+	PIO_Configure(
+			g_APinDescription[PIN_SPI_MISO].pPort,
 			g_APinDescription[PIN_SPI_MISO].ulPinType,
 			g_APinDescription[PIN_SPI_MISO].ulPin,
 			g_APinDescription[PIN_SPI_MISO].ulPinConfiguration);
-	PIO_Configure(g_APinDescription[PIN_SPI_SCK].pPort,
+	PIO_Configure(
+			g_APinDescription[PIN_SPI_SCK].pPort,
 			g_APinDescription[PIN_SPI_SCK].ulPinType,
 			g_APinDescription[PIN_SPI_SCK].ulPin,
 			g_APinDescription[PIN_SPI_SCK].ulPinConfiguration);
