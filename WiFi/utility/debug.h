@@ -50,6 +50,7 @@
 #define WARN(args) do {} while (0);
 #endif
 
+#if _DEBUG_SPI_
 #define DBG_PIN2 5
 #define DBG_PIN 4
 
@@ -64,5 +65,13 @@
 #define TOGGLE_TRIGGER() SET_TRIGGER() \
                            delayMicroseconds(2);    \
                                RST_TRIGGER()
+#else
+#define START()
+#define END()
+#define SET_TRIGGER()
+#define RST_TRIGGER()
+#define INIT_TRIGGER()
+#define TOGGLE_TRIGGER()
+#endif
 
 #endif

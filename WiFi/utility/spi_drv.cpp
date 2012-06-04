@@ -13,7 +13,9 @@ extern "C" {
 #define SLAVESELECT 10//ss
 #define SLAVEREADY 3
 
-#define DELAY_100NS asm volatile("nop")
+#define DELAY_100NS do { asm volatile("nop"); }while(0);
+#define DELAY_SPI(X) { int ii=0; do {  asm volatile("nop"); }while(++ii<X);}
+#define DELAY_TRANSFER() DELAY_SPI(10)
 
 void SpiDrv::begin()
 {
@@ -78,9 +80,8 @@ char SpiDrv::spiTransfer(volatile char data)
     {
     };
     char result = SPDR;
-    DELAY_100NS;
-    DELAY_100NS;
-    //delayMicroseconds(SPI_TX_DELAY);
+    DELAY_TRANSFER();
+
     return result;                    // return the received byte
 }
 
@@ -99,25 +100,8 @@ int SpiDrv::waitSpiChar(unsigned char waitChar)
     return  (_readChar == waitChar);
 }
 
-//int SpiDrv::waitSpiChar(char waitChar, char* readChar)
-//{
-//    int timeout = TIMEOUT_CHAR;
-//    do{
-//        *readChar = spiTransfer(DUMMY_DATA); //get data byte
-//        if (*readChar == WAIT_CMD)
-//        {
-//            INFO1("WAIT");
-//            delayMicroseconds(WAIT_CHAR_DELAY);
-//        }
-//    }while((timeout-- > 0) && (*readChar != waitChar));
-//
-//    return  (*readChar == waitChar);
-//}
-
-
 int SpiDrv::readAndCheckChar(char checkChar, char* readChar)
 {
-    //*readChar = spiTransfer(DUMMY_DATA); //get data byte
     getParam((uint8_t*)readChar);
 
     return  (*readChar == checkChar);
@@ -128,11 +112,8 @@ char SpiDrv::readChar()
 	uint8_t readChar = 0;
 	getParam(&readChar);
 	return readChar;
-    //return spiTransfer(DUMMY_DATA); //get data byte
 }
 
-//#define WAIT_START_CMD(x) waitSpiChar(START_CMD, &x)
-//#define WAIT_START_CMD(x) readAndCheckChar(START_CMD, &x)
 #define WAIT_START_CMD(x) waitSpiChar(START_CMD)
 
 #define IF_CHECK_START_CMD(x)                      \
@@ -171,10 +152,7 @@ void SpiDrv::getParam(uint8_t* param)
 {
     // Get Params data
     *param = spiTransfer(DUMMY_DATA);
-    DELAY_100NS;
-    DELAY_100NS;
-    DELAY_100NS;
-    DELAY_100NS;
+    DELAY_TRANSFER();
 }
 
 int SpiDrv::waitResponseCmd(uint8_t cmd, uint8_t numParam, uint8_t* param, uint8_t* param_len)
