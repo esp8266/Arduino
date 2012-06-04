@@ -325,6 +325,10 @@ static err_t atcp_poll(void *arg, struct tcp_pcb *pcb) {
 	    return ERR_ABRT;
 	}
 
+	WARN("ARD TCP [%p-%p] arg=%p retries=%d\n", (_ttcp)?_ttcp->tpcb:0, pcb, arg, tcp_poll_retries);
+	if (_ttcp) tcp_send_data(_ttcp);
+	else WARN("ttcp NULL!");
+
 	if (pending_close)
 	{
 		err_t err = tcp_close(pcb);
@@ -338,12 +342,7 @@ static err_t atcp_poll(void *arg, struct tcp_pcb *pcb) {
 		}
 
 		INFO_TCP("ARD TCP [%p-%p] try to close pending:%d\n", pcb, (_ttcp)?_ttcp->tpcb:0, pending_close);
-	}else{
-		WARN("ARD TCP [%p-%p] arg=%p retries=%d\n", (_ttcp)?_ttcp->tpcb:0, pcb, arg, tcp_poll_retries);
-		if (_ttcp) tcp_send_data(_ttcp);
-		else WARN("ttcp NULL!");
 	}
-
 	return ERR_OK;
 }
 
@@ -362,6 +361,10 @@ static err_t atcp_poll_conn(void *arg, struct tcp_pcb *pcb) {
 	    return ERR_ABRT;
 	}
 
+	WARN("ARD TCP [%p-%p] arg=%p retries=%d\n", (_ttcp)?_ttcp->tpcb:0, pcb, arg, tcp_poll_retries);
+	if (_ttcp) tcp_send_data(_ttcp);
+	else WARN("ttcp NULL!");
+
 	if (pending_close)
 	{
 		err_t err = tcp_close(pcb);
@@ -375,12 +378,7 @@ static err_t atcp_poll_conn(void *arg, struct tcp_pcb *pcb) {
 		}
 
 		INFO_TCP("ARD TCP [%p-%p] try to close pending:%d\n", pcb, (_ttcp)?_ttcp->tpcb:0, pending_close);
-	}else{
-		WARN("ARD TCP [%p-%p] arg=%p retries=%d\n", (_ttcp)?_ttcp->tpcb:0, pcb, arg, tcp_poll_retries);
-		if (_ttcp) tcp_send_data(_ttcp);
-		else WARN("ttcp NULL!");
 	}
-
 	return ERR_OK;
 }
 
@@ -737,10 +735,10 @@ static err_t tcp_data_sent(void *arg, struct tcp_pcb *pcb, u16_t len) {
 
 	tcp_poll_retries = 0;
 
-	INFO_TCP_VER("Packet sent pcb:%p len:%d dur:%d\n", pcb, len, timer_get_ms() - startTime);
+	INFO_TCP("Packet sent pcb:%p len:%d dur:%d left:%d\n", pcb, len, timer_get_ms() - startTime,
+			(_ttcp)?(_ttcp->left):0);
 
 	if ((_ttcp)&&(_ttcp->left > 0)) {
-		INFO_TCP("data left: %d\n", _ttcp->left );
 		tcp_send_data(_ttcp);
 	}
 
@@ -748,7 +746,7 @@ static err_t tcp_data_sent(void *arg, struct tcp_pcb *pcb, u16_t len) {
 }
 
 int sendTcpData(void* p, uint8_t* buf, uint16_t len) {
-	INFO_TCP_VER("buf:%p len:%d\n", buf, len);
+	INFO_TCP("buf:%p len:%d\n", buf, len);
 	DUMP_TCP(buf,len);
 
 	struct ttcp* _ttcp = (struct ttcp*) p;

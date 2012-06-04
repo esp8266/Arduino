@@ -1129,13 +1129,13 @@ cmd_spi_state_t get_client_state_tcp_cmd_cb(char* recv, char* reply, void* ctx, 
 			{
 
 				_state = getStateTcp(p, 1);
-				INFO_TCP_VER("CLI> p=%p _ttcp=%p state(tpcb):%d state:%d\n",
+				INFO_SPI_VER("CLI> p=%p _ttcp=%p state(tpcb):%d state:%d\n",
 									p, ((struct ttcp*) p)->tpcb,
 									((struct ttcp*) p)->tpcb->state,
 									_state);
 			}else {
 				_state = getStateTcp(p, 1);
-				INFO_TCP_VER("SER> p=%p _ttcp=%p state(tpcb):%d state(lpcb):%d state:%d\n",
+				INFO_SPI_VER("SER> p=%p _ttcp=%p state(tpcb):%d state(lpcb):%d state:%d\n",
 									p, ((struct ttcp*) p)->tpcb,
 									((struct ttcp*) p)->tpcb->state,
 									((struct ttcp*) p)->lpcb->state,
@@ -1466,7 +1466,7 @@ bool checkMsgFormat(uint8_t* _recv, int len, int* offset)
 	unsigned char* recv = getStartCmdSeq(_recv, len, offset);
 	if ((recv == NULL)||(recv!=_recv))
 	{
-		if ((verboseDebug & INFO_SPI_FLAG)&&(len < 20))	//TODO stamp only short messages wrong
+		if ((/*verboseDebug & */INFO_SPI_FLAG)&&(len < 20))	//TODO stamp only short messages wrong
 			dump((char*)_recv, len);
 
 		if (recv == NULL)
