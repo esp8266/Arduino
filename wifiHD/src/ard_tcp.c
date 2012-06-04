@@ -249,8 +249,10 @@ static void close_conn(struct ttcp *_ttcp) {
 
 	if (err == ERR_MEM)
 		pending_close = true;
-	pending_accept = false;
-	WARN("----------------------\n");
+	else{
+		pending_accept = false;
+		WARN("----------------------\n");
+	}
 }
 
 void closeConnections()
