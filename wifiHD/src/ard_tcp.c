@@ -325,9 +325,9 @@ static err_t atcp_poll(void *arg, struct tcp_pcb *pcb) {
 	    return ERR_ABRT;
 	}
 
-	WARN("ARD TCP [%p-%p] arg=%p retries=%d\n", (_ttcp)?_ttcp->tpcb:0, pcb, arg, tcp_poll_retries);
+	WARN("ARD TCP [%p-%p] arg=%p retries=%d pend.close:%d\n", (_ttcp)?_ttcp->tpcb:0, pcb, arg,
+			tcp_poll_retries, pending_close);
 	if (_ttcp) tcp_send_data(_ttcp);
-	else WARN("ttcp NULL!");
 
 	if (pending_close)
 	{
@@ -361,9 +361,10 @@ static err_t atcp_poll_conn(void *arg, struct tcp_pcb *pcb) {
 	    return ERR_ABRT;
 	}
 
-	WARN("ARD TCP [%p-%p] arg=%p retries=%d\n", (_ttcp)?_ttcp->tpcb:0, pcb, arg, tcp_poll_retries);
+	WARN("ARD TCP [%p-%p] arg=%p retries=%d pend.close:%d\n", (_ttcp)?_ttcp->tpcb:0, pcb, arg,
+			tcp_poll_retries, pending_close);
+
 	if (_ttcp) tcp_send_data(_ttcp);
-	else WARN("ttcp NULL!");
 
 	if (pending_close)
 	{

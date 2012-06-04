@@ -46,6 +46,12 @@ if ((enableDebug & INFO_TCP_FLAG)&&(verboseDebug & INFO_TCP_FLAG)) \
 if (enableDebug & INFO_SPI_FLAG) printk("I-[%s] " msg , __func__ , ##args );	\
 } while (0)
 
+#define INFO_SPI_VER(msg, args...) do { 			\
+if ((enableDebug & INFO_SPI_FLAG)&&(verboseDebug & INFO_SPI_FLAG)) \
+	printk("I-[%s] " msg , __func__ , ##args );	\
+} while (0)
+
+
 #define INFO_UTIL(msg, args...) do { 			\
 if (enableDebug & INFO_UTIL_FLAG) printk("I-[%s] " msg , __func__ , ##args );	\
 } while (0)
