@@ -146,12 +146,13 @@ uint8_t ServerDrv::availData(uint8_t sock)
     return false;
 }
 
-bool ServerDrv::getData(uint8_t sock, uint8_t *data)
+bool ServerDrv::getData(uint8_t sock, uint8_t *data, uint8_t peek)
 {
 	WAIT_FOR_SLAVE_SELECT();
     // Send Command
-    SpiDrv::sendCmd(GET_DATA_TCP_CMD, PARAM_NUMS_1);
-    SpiDrv::sendParam(&sock, sizeof(sock), LAST_PARAM);
+    SpiDrv::sendCmd(GET_DATA_TCP_CMD, PARAM_NUMS_2);
+    SpiDrv::sendParam(&sock, sizeof(sock));
+    SpiDrv::sendParam(peek, LAST_PARAM);
 
     //Wait the reply elaboration
     SpiDrv::waitForSlaveReady();
