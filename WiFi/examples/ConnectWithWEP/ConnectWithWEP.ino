@@ -19,7 +19,7 @@
  
  created 13 July 2010
  by dlf (Metodo2 srl)
- modified 4 Mar 2012
+ modified 31 May 2012
  by Tom Igoe
  */
 #include <WiFi.h>
@@ -33,22 +33,27 @@ void setup() {
   // initialize serial:
   Serial.begin(9600);
 
-  // attempt to connect to an open network:
-  Serial.print("Attempting to connect to WEP network: ");
-  Serial.println(ssid);
-  status = WiFi.begin(ssid, keyIndex, key);
-
-  // if you're not connected, stop here:
-  if ( status != WL_CONNECTED) { 
-    Serial.println("Couldn't get a wifi connection");
+  // check for the presence of the shield:
+  if (WiFi.status() == WL_NO_SHIELD) {
+    Serial.println("WiFi shield not present"); 
+    // don't continue:
     while(true);
   } 
-  // if you are connected :
-  else {
-    Serial.print("You're connected to the network");
-    printCurrentNet();
-    printWifiData();
+
+  // attempt to connect to Wifi network:
+  while ( status != WL_CONNECTED) { 
+    Serial.print("Attempting to connect to WEP network, SSID: ");
+    Serial.println(ssid);
+    status = WiFi.begin(ssid, keyIndex, key);
+
+    // wait 10 seconds for connection:
+    delay(10000);
   }
+
+  // once you are connected :
+  Serial.print("You're connected to the network");
+  printCurrentNet();
+  printWifiData();
 }
 
 void loop() {
@@ -60,7 +65,7 @@ void loop() {
 void printWifiData() {
   // print your WiFi shield's IP address:
   IPAddress ip = WiFi.localIP();
-    Serial.print("IP Address: ");
+  Serial.print("IP Address: ");
   Serial.println(ip);
   Serial.println(ip);
 
@@ -113,5 +118,6 @@ void printCurrentNet() {
   Serial.println(encryption,HEX);
   Serial.println();
 }
+
 
 

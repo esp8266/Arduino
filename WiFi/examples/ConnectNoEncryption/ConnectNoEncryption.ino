@@ -9,8 +9,8 @@
  
  created 13 July 2010
  by dlf (Metodo2 srl)
- modified 29 Feb 2012
- by Scott Fitzgerald
+ modified 31 May 2012
+ by Tom Igoe
  */
  #include <WiFi.h>
 
@@ -20,23 +20,28 @@ int status = WL_IDLE_STATUS;     // the Wifi radio's status
 void setup() {
   // initialize serial:
   Serial.begin(9600);
-
-  // attempt to connect to an open network:
-  Serial.print("Attempting to connect to open network: ");
-  Serial.println(ssid);
-  status = WiFi.begin(ssid);
-
-  // if you're not connected, stop here:
-  if ( status != WL_CONNECTED) { 
-    Serial.println("Couldn't get a wifi connection");
+  
+  // check for the presence of the shield:
+  if (WiFi.status() == WL_NO_SHIELD) {
+    Serial.println("WiFi shield not present"); 
+    // don't continue:
     while(true);
   } 
-  // if you are connected :
-  else {
-      Serial.print("You're connected to the network");
-      printCurrentNet();
-      printWifiData();
+  
+ // attempt to connect to Wifi network:
+  while ( status != WL_CONNECTED) { 
+    Serial.print("Attempting to connect to open SSID: ");
+    Serial.println(ssid);
+    status = WiFi.begin(ssid);
+
+    // wait 10 seconds for connection:
+    delay(10000);
   }
+   
+  // you're connected now, so print out the data:
+  Serial.print("You're connected to the network");
+  printCurrentNet();
+  printWifiData();
 }
 
 void loop() {

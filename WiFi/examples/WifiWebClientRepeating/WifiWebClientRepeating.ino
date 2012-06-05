@@ -7,7 +7,8 @@
  Circuit:
  * Wifi shield attached to pins 10, 11, 12, 13
  
- created 23 Apr 2012
+ created 23 April 2012
+ modifide 31 May 2012
  by Tom Igoe
  
  http://arduino.cc/en/Tutorial/WifiWebClientRepeating
@@ -38,15 +39,20 @@ void setup() {
   // start serial port:
   Serial.begin(9600);
   
+  // check for the presence of the shield:
+  if (WiFi.status() == WL_NO_SHIELD) {
+    Serial.println("WiFi shield not present"); 
+    // don't continue:
+    while(true);
+  } 
+  
   // attempt to connect to Wifi network:
   while ( status != WL_CONNECTED) { 
     Serial.print("Attempting to connect to SSID: ");
     Serial.println(ssid);
+    // Connect to WPA/WPA2 network. Change this line if using open or WEP network:    
     status = WiFi.begin(ssid, pass);
-    if ( status != WL_CONNECTED) { 
-      Serial.println("Couldn't get a wifi connection");
-      while(true);
-    } 
+
     // wait 10 seconds for connection:
     delay(10000);
   } 

@@ -10,7 +10,7 @@
  
  created 13 July 2010
  by dlf (Metodo2 srl)
- modified 22 April 2012
+ modified 31 May 2012
  by Tom Igoe
  */
 
@@ -21,9 +21,15 @@
 void setup() {
   // initialize serial and wait for the port to open:
   Serial.begin(9600);
-
-  // attempt to connect using WEP encryption:
-  Serial.println("Initializing Wifi...");
+  
+  // check for the presence of the shield:
+  if (WiFi.status() == WL_NO_SHIELD) {
+    Serial.println("WiFi shield not present"); 
+    // don't continue:
+    while(true);
+  } 
+  
+  // Print WiFi MAC address:
   printMacAddress();
 
   // scan for existing networks:
