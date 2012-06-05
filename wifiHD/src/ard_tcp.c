@@ -36,6 +36,8 @@ static int isDataSentCount = 0;
 bool pending_close = false;
 bool pending_accept = false;
 
+static err_t tcp_data_sent(void *arg, struct tcp_pcb *pcb, u16_t len);
+
 static void atcp_init()
 {
 	pending_close = false;
@@ -48,12 +50,16 @@ static void ard_tcp_destroy(struct ttcp* ttcp) {
 	err_t err = ERR_OK;
 	DUMP_TCP_STATE(ttcp);
 
+	if (getSock(ttcp)==-1)
+		WARN("ttcp already deallocated!\n");
+
 	if (ttcp->tpcb) {
 		tcp_arg(ttcp->tpcb, NULL);
 		tcp_sent(ttcp->tpcb, NULL);
 		tcp_recv(ttcp->tpcb, NULL);
 		tcp_err(ttcp->tpcb, NULL);
-		err = tcp_close(ttcp->tpcb);
+		//TEMPORAQARY
+		//err = tcp_close(ttcp->tpcb);
 		INFO_TCP("Closing tpcb: state:0x%x err:%d\n", ttcp->tpcb->state, err);
 	}
 
@@ -118,6 +124,7 @@ static void ard_tcp_done(struct ttcp* ttcp, int result) {
 		ttcp->done_cb(ttcp->opaque, result);
 
 	ard_tcp_destroy(ttcp);
+	clearMapSockTcp(getSock(ttcp));
 }
 
 static void
@@ -233,8 +240,16 @@ static void atcp_conn_cli_err_cb(void *arg, err_t err) {
 
 	if (ifStatus == false)
 		printk("Abort connection\n");
-	ard_tcp_destroy(_ttcp);
-	cleanSockState_cb(_ttcp);
+
+	if ((_ttcp)&&(err == ERR_ABRT))
+	{
+		WARN("TTCP [%p]: free memory\n", _ttcp);
+		tcp_poll_retries = 0;
+		cleanSockState_cb(_ttcp);
+		if (_ttcp->payload)
+			free(_ttcp->payload);
+		free(_ttcp);
+	}
 
 	pending_close = false;
 }
@@ -269,7 +284,7 @@ void closeConnections()
 					_ttcp->tpcb, _ttcp->tpcb->state, _ttcp->lpcb, _ttcp->lpcb->state);
 			//tcp_close(_ttcp->tpcb);
 			ard_tcp_destroy(_ttcp);
-			cleanSockState_cb(_ttcp);
+	    	clearMapSockTcp(getSock(_ttcp));
 		}
 	}
 }
@@ -305,6 +320,8 @@ static err_t atcp_recv_cb(void *arg, struct tcp_pcb *pcb, struct pbuf *p,
 		close_conn(ttcp);
 	}
 
+	if (err!=ERR_OK)
+		WARN("err=%d p=%p\n", err, p);
 	return ERR_OK;
 }
 
@@ -352,21 +369,18 @@ static err_t atcp_poll_conn(void *arg, struct tcp_pcb *pcb) {
 	struct ttcp* _ttcp = arg;
 	++tcp_poll_retries;
 
-	if (tcp_poll_retries > 4) {
-		WARN("ARD TCP [%p] arg=%p retries=%d\n",
-				pcb, arg, tcp_poll_retries);
+	if (tcp_poll_retries > 8) {
+		WARN("ARD TCP [%p-%p] arg=%p retries=%d\n",
+				pcb, _ttcp->tpcb, arg, tcp_poll_retries);
 		tcp_poll_retries = 0;
 		tcp_abort(pcb);
-		ard_tcp_destroy(_ttcp);
-		cleanSockState_cb(_ttcp);
-		pending_close = false;
-	    return ERR_ABRT;
+		return ERR_ABRT;
 	}
 
-	WARN("ARD TCP [%p-%p] arg=%p retries=%d pend.close:%d\n", (_ttcp)?_ttcp->tpcb:0, pcb, arg,
-			tcp_poll_retries, pending_close);
+	WARN("ARD TCP [%p-%p] arg=%p retries=%d pend.close:%d conn:%d\n", (_ttcp)?_ttcp->tpcb:0, pcb, arg,
+			tcp_poll_retries, pending_close, _connected);
 
-	if (_ttcp) tcp_send_data(_ttcp);
+	if ((_ttcp)&&(_connected)) tcp_send_data(_ttcp);
 
 	if (pending_close)
 	{
@@ -377,7 +391,12 @@ static err_t atcp_poll_conn(void *arg, struct tcp_pcb *pcb) {
 		}
 		else
 		{
+			cleanSockState_cb(_ttcp);
+			if (_ttcp->payload)
+				free(_ttcp->payload);
+			free(_ttcp);
 			pending_close = false;
+
 		}
 
 		INFO_TCP("ARD TCP [%p-%p] try to close pending:%d\n", pcb, (_ttcp)?_ttcp->tpcb:0, pending_close);
@@ -423,7 +442,7 @@ static int atcp_start(struct ttcp* ttcp) {
 		WARN("TTCP [%p]: could not allocate pcb\n", ttcp);
 		return -1;
 	}
-	INFO_TCP("tcp:%x\n", ttcp->tpcb);
+
 	ttcp->payload = malloc(ttcp->buflen);
 	if (ttcp->payload == NULL) {
 		WARN("TTCP [%p]: could not allocate payload\n", ttcp);
@@ -436,14 +455,14 @@ static int atcp_start(struct ttcp* ttcp) {
 	if (ttcp->mode == TTCP_MODE_TRANSMIT) {
 		tcp_err(ttcp->tpcb, atcp_conn_cli_err_cb);
 		tcp_recv(ttcp->tpcb, atcp_recv_cb);
-		tcp_poll(ttcp->tpcb, atcp_poll, 4);
+		tcp_sent(ttcp->tpcb, tcp_data_sent);
+		tcp_poll(ttcp->tpcb, atcp_poll_conn, 4);
 		_connected = false;
-		INFO_TCP("[tpcb]- %p\n", ttcp->tpcb);
+		INFO_TCP("[tpcb]-%p payload:%p\n", ttcp->tpcb, ttcp->payload);
 		DUMP_TCP_STATE(ttcp);
 		if (tcp_connect(ttcp->tpcb, &ttcp->addr, ttcp->port, tcp_connect_cb)
 				!= ERR_OK) {
 			WARN("TTCP [%p]: tcp connect failed\n", ttcp);
-			atcp_conn_err_cb(ttcp, err);
 			return -1;
 		}
 
@@ -681,6 +700,7 @@ void ard_tcp_stop(void* ttcp) {
 		INFO_TCP("Destroy TCP connection...state:%d\n", _ttcp->tpcb->state);
 		ard_tcp_destroy(_ttcp);
     	clearMapSockTcp(getSock(_ttcp));
+    	tcp_poll_retries = 0;
 	}else{
 		INFO_TCP("Closing connection...state:%d\n", _ttcp->tpcb->state);
 		DUMP_TCP_STATE(_ttcp);
@@ -688,6 +708,7 @@ void ard_tcp_stop(void* ttcp) {
 		{
 			close_conn(_ttcp);
 		}
+		pending_accept = false;
 	}
 }
 
@@ -756,7 +777,7 @@ int sendTcpData(void* p, uint8_t* buf, uint16_t len) {
 
 	if (_ttcp==NULL)
 	{
-		WARN("ttcp == NULL!");
+		WARN("ttcp == NULL!\n");
 		return WL_FAILURE;
 	}
 

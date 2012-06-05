@@ -25,7 +25,7 @@
 #define LED2_DN() 				gpio_clr_gpio_pin(LED2_GPIO)
 #define LED2_TL() 				gpio_tgl_gpio_pin(LED2_GPIO)
 
-
+#define _DEBUG_
 #ifdef _DEBUG_
 #define SIGN0_UP		LED0_UP
 #define SIGN0_DN 		LED0_DN
@@ -238,7 +238,7 @@ bool isBufAvail();
 
 bool getTcpData(uint8_t sock, void** payload, uint16_t* len);
 
-bool getTcpDataByte(uint8_t sock, uint8_t* payload);
+bool getTcpDataByte(uint8_t sock, uint8_t* payload, uint8_t peek);
 
 bool isAvailTcpDataByte(uint8_t sock);
 

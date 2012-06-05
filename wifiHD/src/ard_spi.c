@@ -204,7 +204,11 @@ void setMapSock(uint8_t sock, void* _ttcp)
 void clearMapSockTcp(uint8_t sock)
 {
 	if (sock < MAX_SOCK_NUM)
+	{
+		//printk("UnMap [%d, %p]\n", sock, mapSockTCP[sock]);
 		mapSockTCP[sock] = NULL;
+	}
+
 }
 
 void initMapSockTcp()
@@ -649,7 +653,7 @@ int start_server_tcp(uint16_t port, uint8_t sock)
         err = WL_SUCCESS;
     }else{
 
-    	INFO_SPI("Start Server [%d, %d] FAILED!\n", port, sock);
+    	WARN("Start Server [%d, %d] FAILED!\n", port, sock);
     	clearMapSockTcp(sock);
     }
     return err;
@@ -1140,7 +1144,6 @@ cmd_spi_state_t get_client_state_tcp_cmd_cb(char* recv, char* reply, void* ctx, 
 									((struct ttcp*) p)->tpcb->state,
 									((struct ttcp*) p)->lpcb->state,
 									_state);
-
 			}
     	}
     }
@@ -1226,10 +1229,16 @@ cmd_spi_state_t get_data_tcp_cmd_cb(char* recv, char* reply, void* ctx, uint16_t
 
     CHECK_ARD_NETIF(recv, reply, count);
 
+    tParam* params = (tParam*)&recv[3];
+
+    GET_PARAM_NEXT(BYTE, params, _sock);
+    GET_PARAM_NEXT(INT, params, _peek);
+
     if ((recv[3]==1)&&(recv[4]>=0)&&(recv[4]<MAX_SOCK_NUM))
     {
     	SIGN2_DN();
-    	if (getTcpDataByte((uint8_t)recv[4], &data))
+
+    	if (getTcpDataByte((uint8_t)recv[4], &data, _peek))
     	{
     		CREATE_HEADER_REPLY(reply, recv, PARAM_NUMS_1);
     		PUT_DATA_BYTE(data, reply, 3);

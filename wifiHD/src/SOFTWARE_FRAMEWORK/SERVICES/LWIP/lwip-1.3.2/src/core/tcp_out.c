@@ -57,7 +57,7 @@
 #include "lwip/snmp.h"
 
 #include <string.h>
-
+#define _TEST_HD_
 /* Forward declarations.*/
 static void tcp_output_segment(struct tcp_seg *seg, struct tcp_pcb *pcb);
 
@@ -699,6 +699,19 @@ tcp_output_segment(struct tcp_seg *seg, struct tcp_pcb *pcb)
   }
 #endif
 
+#ifdef _TEST_HD_
+  /* ANGR: set rtime this _before_ checking ip_route(). Otherwise TCP_SYN will
+   * not be retransmitted in case the interface was down and tcp_connect()
+   * will not return any error. Since we still want the err_cb() (or maybe
+   * the wifi link comes up), make sure that we fulfill the retransmissions in
+   * tcp_slowtmr()
+   */
+
+  /* Set retransmission timer running if it is not currently enabled */
+  if(pcb->rtime == -1)
+    pcb->rtime = 0;
+#endif
+
   /* If we don't have a local IP address, we get one by
      calling ip_route(). */
   if (ip_addr_isany(&(pcb->local_ip))) {
@@ -709,9 +722,11 @@ tcp_output_segment(struct tcp_seg *seg, struct tcp_pcb *pcb)
     ip_addr_set(&(pcb->local_ip), &(netif->ip_addr));
   }
 
-  /* Set retransmission timer running if it is not currently enabled */
+#ifndef _TEST_HD_
+  //Set retransmission timer running if it is not currently enabled
   if(pcb->rtime == -1)
     pcb->rtime = 0;
+#endif
 
   if (pcb->rttest == 0) {
     pcb->rttest = tcp_ticks;

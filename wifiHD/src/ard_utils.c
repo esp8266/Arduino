@@ -88,9 +88,10 @@ bool isAvailTcpDataByte(uint8_t sock)
 		INFO_UTIL("check:%d %d %p\n",p->idx, p->len, p->data);
 		if (p->idx == p->len)
 		{
-			INFO_UTIL("Free %p other buf %d\n", p->data, IS_BUF_AVAIL());
 			freetData(p->data);
 			ack_recved(p->pcb, p->len);
+			INFO_UTIL("Free %p other buf %d tail:%d head:%d\n",
+					p->data, IS_BUF_AVAIL(), tailBuf, headBuf);
 			return (IS_BUF_AVAIL());
 		}else{
 			return true;
@@ -101,7 +102,7 @@ bool isAvailTcpDataByte(uint8_t sock)
 
 
 
-bool getTcpDataByte(uint8_t sock, uint8_t* payload)
+bool getTcpDataByte(uint8_t sock, uint8_t* payload, uint8_t peek)
 {
 	// ref field in struct pbuf has been used as index pointer for byte data
 	tData* p = get_pBuf(sock);
@@ -111,7 +112,10 @@ bool getTcpDataByte(uint8_t sock, uint8_t* payload)
 		if (p->idx < p->len)
 		{
 		uint8_t* buf = (uint8_t*)p->data;
-		*payload = buf[p->idx++];
+		if (peek)
+			*payload = buf[p->idx];
+		else
+			*payload = buf[p->idx++];
 		INFO_UTIL("get:%d %p %d\n",p->idx, p->data, *payload);
 		return true;
 		}else{
