@@ -356,7 +356,8 @@ void sendError()
 		//Wait to empty the buffer
 		while(!spi_writeRegisterEmptyCheck(&AVR32_SPI));
 	}
-
+	BUSY_FOR_SPI();
+	WARN("Send SPI error!");
 }
 
 #define ENABLE_SPI_INT() do {											\
@@ -379,13 +380,15 @@ void sendError()
 	}while(0);
 
 void dump(char* _buf, uint16_t _count) {
-#ifdef _APP_DEBUG_
+
 	int i;
 	for (i = 0; i < _count; ++i)
 		printk("0x%x ", _buf[i]);
 	printk("\n");
-#endif
 }
+#ifdef _APP_DEBUG_
+#define DUMP dump
+#endif
 
 #ifdef _APP_DEBUG_
 #define DUMP_SPI_DATA(BUF, COUNT) do {		\
@@ -510,7 +513,7 @@ int set_key_cmd_cb(int numParam, char* buf, void* ctx) {
         //printk("KEY len out of range %d", len);
         RETURN_ERR(WL_FAILURE)
     }
-#ifdef _APP_DEBUG_
+#if 0
     printk("KEY IDX = %d\n", idx);
     dump(key, len);
     printk("KEY len %d\n", len);
@@ -990,7 +993,7 @@ cmd_spi_state_t get_reply_idx_net_cb(char* recv, char* reply, void* ctx, uint16_
 
     END_HEADER_REPLY(reply, 3+len+1, *count);
 
-    dump(reply, *count);
+    DUMP(reply, *count);
 
     return SPI_CMD_DONE;
 }
@@ -1313,16 +1316,14 @@ unsigned char* getStartCmdSeq(unsigned char* _recv, int len, int *offset)
 			if (i!=0)
 			{
 				DEB_PIN_DN();
-				//WARN("Disall. %d/%d cmd:%d\n", i, len,_recv[i+1]);
-				WARN("D=%d\n", i);
-
+				WARN("Disall. %d/%d cmd:%d\n", i, len,_recv[i+1]);
 			}
 			*offset = i;
 			return &_recv[i];
 		}
 	}
 	DEB_PIN_DN();
-	WARN("D=%d\n", i);
+	WARN("Disall. %d\n", i);
 
 	return NULL;
 }
@@ -1399,7 +1400,7 @@ int call_reply_cb(char* recv, char* reply) {
 	if (i==ARRAY_SIZE(cmd_spi_list))
 	{
 		WARN("Unknown cmd 0x%x\n", cmdId);
-		dump(recv, count);
+		DUMP(recv, count);
 		return REPLY_ERR_CMD;
 	}
 	return REPLY_NO_ERR;
@@ -1475,7 +1476,7 @@ bool checkMsgFormat(uint8_t* _recv, int len, int* offset)
 	unsigned char* recv = getStartCmdSeq(_recv, len, offset);
 	if ((recv == NULL)||(recv!=_recv))
 	{
-		if ((/*verboseDebug & */INFO_SPI_FLAG)&&(len < 20))	//TODO stamp only short messages wrong
+		if ((INFO_WARN_FLAG)&&(len < 20))	//TODO stamp only short messages wrong
 			dump((char*)_recv, len);
 
 		if (recv == NULL)
@@ -1550,7 +1551,8 @@ void spi_poll(struct netif* netif) {
 		{
 			sendError();
 			WARN("Check format msg failed!\n");
-			dump((char*)_receiveBuffer, receivedChars);
+			if (INFO_WARN_FLAG)
+				dump((char*)_receiveBuffer, receivedChars);
 			state = SPI_CMD_IDLE;
 			count=0;
 		}

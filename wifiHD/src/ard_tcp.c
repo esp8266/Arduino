@@ -38,9 +38,10 @@ bool pending_accept = false;
 
 static err_t tcp_data_sent(void *arg, struct tcp_pcb *pcb, u16_t len);
 
-static void atcp_init()
+static void atcp_init_pend_flags()
 {
 	pending_close = false;
+	pending_accept = false;
 }
 
 /**
@@ -229,7 +230,7 @@ static void atcp_conn_err_cb(void *arg, err_t err) {
 		printk("Abort connection\n");
 	cleanSockState_cb(_ttcp);
 
-	pending_close = false;
+	atcp_init_pend_flags();
 }
 
 static void atcp_conn_cli_err_cb(void *arg, err_t err) {
@@ -251,7 +252,7 @@ static void atcp_conn_cli_err_cb(void *arg, err_t err) {
 		free(_ttcp);
 	}
 
-	pending_close = false;
+	atcp_init_pend_flags();
 }
 
 
@@ -265,7 +266,7 @@ static void close_conn(struct ttcp *_ttcp) {
 	if (err == ERR_MEM)
 		pending_close = true;
 	else{
-		pending_accept = false;
+		atcp_init_pend_flags();
 		WARN("----------------------\n");
 	}
 }
@@ -339,8 +340,7 @@ static err_t atcp_poll(void *arg, struct tcp_pcb *pcb) {
 				pcb, arg, tcp_poll_retries);
 		tcp_poll_retries = 0;
 		tcp_abort(pcb);
-		pending_accept = false;
-		pending_close = false;
+		atcp_init_pend_flags();
 	    return ERR_ABRT;
 	}
 
@@ -357,7 +357,7 @@ static err_t atcp_poll(void *arg, struct tcp_pcb *pcb) {
 		}
 		else
 		{
-			pending_close = false;
+			atcp_init_pend_flags();
 		}
 
 		INFO_TCP("ARD TCP [%p-%p] try to close pending:%d\n", pcb, (_ttcp)?_ttcp->tpcb:0, pending_close);
@@ -450,7 +450,7 @@ static int atcp_start(struct ttcp* ttcp) {
 	}
 
 	tcp_arg(ttcp->tpcb, ttcp);
-	atcp_init();
+	atcp_init_pend_flags();
 
 	if (ttcp->mode == TTCP_MODE_TRANSMIT) {
 		tcp_err(ttcp->tpcb, atcp_conn_cli_err_cb);
