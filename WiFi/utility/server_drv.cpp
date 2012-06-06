@@ -226,8 +226,8 @@ bool ServerDrv::sendData(uint8_t sock, const uint8_t *data, uint16_t len)
 
 uint8_t ServerDrv::checkDataSent(uint8_t sock)
 {
-	const uint16_t TIMEOUT_DATA_SENT = 250;
-	static uint16_t timeout = 0;
+	const uint16_t TIMEOUT_DATA_SENT = 25;
+    uint16_t timeout = 0;
 	uint8_t _data = 0;
 	uint8_t _dataLen = 0;
 
@@ -250,7 +250,7 @@ uint8_t ServerDrv::checkDataSent(uint8_t sock)
 		if (_data) timeout = 0;
 		else{
 			++timeout;
-			delay(10);
+			delay(100);
 		}
 
 	}while((_data==0)&&(timeout<TIMEOUT_DATA_SENT));

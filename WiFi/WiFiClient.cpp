@@ -70,12 +70,17 @@ size_t WiFiClient::write(const uint8_t *buf, size_t size) {
   }
 
 
-  if ((!ServerDrv::sendData(_sock, buf, size)) ||
-		  (!ServerDrv::checkDataSent(_sock)))
+  if (!ServerDrv::sendData(_sock, buf, size))
   {
 	  setWriteError();
       return 0;
   }
+  if (!ServerDrv::checkDataSent(_sock))
+  {
+	  setWriteError();
+      return 0;
+  }
+
   return size;
 }
 
