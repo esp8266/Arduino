@@ -15,9 +15,7 @@ SPIClass SPI;
 
 void SPIClass::begin() {
 
-  // Set SS to high because many users use this as chip-select
-  // and most chips "select" when SS is high.  If your chip
-  // does not, you can set it back to LOW after begin() is called.
+  // Set SS to high so a connected chip will be "deselected" by default
   digitalWrite(SS, HIGH);
 
   // When the SS pin is set as OUTPUT, it can be used as
