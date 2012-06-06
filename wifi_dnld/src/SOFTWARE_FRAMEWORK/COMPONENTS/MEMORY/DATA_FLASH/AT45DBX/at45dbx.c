@@ -144,6 +144,7 @@
 /*! \name AT45DB081 Memories
  */
 //! @{
+#define AT45DB021D_DENSITY                0x14        //!< Device density value.
 #define AT45DBX_DENSITY                   0x24        //!< Device density value.
 #define AT45DBX_BYTE_ADDR_BITS             9          //!< Address bits for byte position within buffer.
 
@@ -291,11 +292,11 @@ Bool at45dbx_mem_check(void)
     at45dbx_chipselect_df(df, FALSE);
 
     // Unexpected device density value.
-    if ((status & AT45DBX_MSK_DENSITY) < AT45DBX_DENSITY)
+    if ((status & AT45DBX_MSK_DENSITY) < AT45DB021D_DENSITY)
     {
-    	//printk("Unexpected device density value: %d (0x%x)\n", (status & AT45DBX_MSK_DENSITY), status);
-    	//return KO;
-    	}
+    	printk("Unexpected device density value: %d (0x%x)\n", (status & AT45DBX_MSK_DENSITY), status);
+    	return KO;
+    }
   }
 
   return OK;

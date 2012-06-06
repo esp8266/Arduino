@@ -33,18 +33,54 @@
 #include "wl_fw.h"
 #include "startup.h"
 #include "nor_flash.h"
+#include "gpio.h"
+
+#define GREEN_OFF() 		gpio_set_gpio_pin(LED0_GPIO)
+#define GREEN_ON() 			gpio_clr_gpio_pin(LED0_GPIO)
+#define GREEN_BLINK() 		gpio_tgl_gpio_pin(LED0_GPIO)
+#define RED_OFF() 			gpio_set_gpio_pin(LED1_GPIO)
+#define RED_ON() 			gpio_clr_gpio_pin(LED1_GPIO)
+#define RED_BLINK() 		gpio_tgl_gpio_pin(LED1_GPIO)
+#define BLUE_OFF() 			gpio_set_gpio_pin(LED2_GPIO)
+#define BLUE_ON() 			gpio_clr_gpio_pin(LED2_GPIO)
+#define BLUE_BLINK() 		gpio_tgl_gpio_pin(LED2_GPIO)
+
+
+/**
+ *
+ */
+void
+led_init(void)
+{
+	gpio_enable_gpio_pin(LED0_GPIO);
+	gpio_enable_gpio_pin(LED1_GPIO);
+	gpio_enable_gpio_pin(LED2_GPIO);
+	GREEN_OFF();
+	RED_OFF();
+	BLUE_OFF();
+}
+
 
 int main(void)
 {
         U32 pos, len;
 
         startup_init();
+        printk("*** HD chip firmware upgrade ver 2.7 ***\n");
+        led_init();
         flash_init();
-        printk("Memory check...");
+        GREEN_ON();
         if (at45dbx_mem_check() == OK)
-        	printk(" OK\n");
+        {
+        	printk("Memory check... [  OK  ]\n");
+        }
         else
-        	printk(" FAIL\n");
+        {
+        	RED_ON();
+        	GREEN_OFF();
+        	printk("Memory check... [FAIL]\n");
+        	return 0;
+        }
         printk("Writing firmware data to flash\n");
         pos = 0;
         while (pos < fw_len) {
@@ -72,6 +108,8 @@ int main(void)
 
                 for (i = 0; i < len; i++)
                     if (*(page_buf + i) != *(fw_buf + pos + i)) {
+                    	RED_ON();
+                    	GREEN_OFF();
                         printk("Verify failed at byte %d, 0x%02x != 0x%02x\n",
                                pos + i, *(page_buf + i), *(fw_buf + pos + i));
                         return 0;
@@ -80,7 +118,8 @@ int main(void)
                 
                 pos += len;
         }
-
+        GREEN_OFF();
+        BLUE_ON();
         printk("Firmware successfully stored in flash!\n");
         return 0;
 }
