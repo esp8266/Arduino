@@ -40,7 +40,11 @@ IPAddress server(173,194,73,105);  // numeric IP for Google (no DNS)
 WiFiClient client;
 
 void setup() {
-  Serial.begin(9600);
+  //Initialize serial and wait for port to open:
+  Serial.begin(9600); 
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
   
   // check for the presence of the shield:
   if (WiFi.status() == WL_NO_SHIELD) {

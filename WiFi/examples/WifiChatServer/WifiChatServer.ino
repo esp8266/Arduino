@@ -34,8 +34,11 @@ WiFiServer server(23);
 boolean alreadyConnected = false; // whether or not the client was connected previously
 
 void setup() {
-  // start serial port:
-  Serial.begin(9600);
+  //Initialize serial and wait for port to open:
+  Serial.begin(9600); 
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
   
   // check for the presence of the shield:
   if (WiFi.status() == WL_NO_SHIELD) {

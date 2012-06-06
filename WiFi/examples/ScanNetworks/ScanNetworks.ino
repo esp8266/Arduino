@@ -19,8 +19,11 @@
 #include <WiFi.h>
 
 void setup() {
-  // initialize serial and wait for the port to open:
-  Serial.begin(9600);
+  //Initialize serial and wait for port to open:
+  Serial.begin(9600); 
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
   
   // check for the presence of the shield:
   if (WiFi.status() == WL_NO_SHIELD) {
