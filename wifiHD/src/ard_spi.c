@@ -1476,7 +1476,7 @@ bool checkMsgFormat(uint8_t* _recv, int len, int* offset)
 	unsigned char* recv = getStartCmdSeq(_recv, len, offset);
 	if ((recv == NULL)||(recv!=_recv))
 	{
-		if ((INFO_WARN_FLAG)&&(len < 20))	//TODO stamp only short messages wrong
+		if ((enableDebug & INFO_WARN_FLAG)&&(len < 20))	//TODO stamp only short messages wrong
 			dump((char*)_recv, len);
 
 		if (recv == NULL)
@@ -1551,7 +1551,7 @@ void spi_poll(struct netif* netif) {
 		{
 			sendError();
 			WARN("Check format msg failed!\n");
-			if (INFO_WARN_FLAG)
+			if (enableDebug & INFO_WARN_FLAG)
 				dump((char*)_receiveBuffer, receivedChars);
 			state = SPI_CMD_IDLE;
 			count=0;

@@ -142,6 +142,7 @@ static void tcp_send_data(struct ttcp *ttcp) {
 	uint32_t len, orig_len;
 
 	len = ttcp->left;
+	ttcp->buff_sent = 0;
 	INFO_TCP_VER("left=%d len:%d tcp_sndbuf:%d\n", ttcp->left, len, tcp_sndbuf(ttcp->tpcb));
 
 
@@ -164,7 +165,7 @@ static void tcp_send_data(struct ttcp *ttcp) {
 		{
 			len /= 2;
 			ttcp->buff_sent = 0;
-		}else{
+		}else if (err == ERR_OK){
 			ttcp->buff_sent = 1;
 			isDataSentCount = 0;
 		}
@@ -758,9 +759,13 @@ static err_t tcp_data_sent(void *arg, struct tcp_pcb *pcb, u16_t len) {
 	_ttcp = arg;
 
 	tcp_poll_retries = 0;
+	if (_ttcp) _ttcp->buff_sent = 1;
 
-	INFO_TCP("Packet sent pcb:%p len:%d dur:%d left:%d\n", pcb, len, timer_get_ms() - startTime,
-			(_ttcp)?(_ttcp->left):0);
+
+	INFO_TCP("Packet sent pcb:%p len:%d dur:%d left:%d count:%d\n", pcb, len, timer_get_ms() - startTime,
+			(_ttcp)?(_ttcp->left):0, isDataSentCount);
+
+	isDataSentCount = 0;
 
 	if ((_ttcp)&&(_ttcp->left > 0)) {
 		tcp_send_data(_ttcp);
