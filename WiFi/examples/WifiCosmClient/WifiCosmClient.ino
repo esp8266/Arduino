@@ -81,7 +81,7 @@ void loop() {
   // if there's incoming data from the net connection.
   // send it out the serial port.  This is for debugging
   // purposes only:
-  if (client.available()) {
+  while (client.available()) {
     char c = client.read();
     Serial.print(c);
   }
