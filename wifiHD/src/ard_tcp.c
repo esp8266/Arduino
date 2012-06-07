@@ -298,8 +298,8 @@ static err_t atcp_recv_cb(void *arg, struct tcp_pcb *pcb, struct pbuf *p,
 		err_t err) {
 	struct ttcp* ttcp = arg;
 
-	INFO_TCP("pcb:%p pbuf: %p err:%d\n", pcb, p, err);
 	if (err == ERR_OK && p != NULL) {
+		INFO_TCP("pcb:%p pbuf: %p err:%d len:%d\n", pcb, p, err, p->tot_len);
 		DATA_LED_ON();
 		/* for print_stats() */
 		ttcp->recved += p->tot_len;
