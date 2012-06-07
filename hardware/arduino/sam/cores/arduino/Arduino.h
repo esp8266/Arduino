@@ -193,6 +193,9 @@ extern const PinDescription g_APinDescription[] ;
 #include "WMath.h"
 #include "HardwareSerial.h"
 #include "wiring_pulse.h"
+
+#include "Usb.h"
+
 #endif // __cplusplus
 
 // Include board variant

@@ -40,7 +40,7 @@ int main( void )
 	delay(1);
 
 #if defined(USBCON)
-	USB.attach();
+	//USB.attach();
 #endif
 
 	setup();

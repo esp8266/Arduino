@@ -34,6 +34,7 @@ OUTPUT_BIN = ..
 # Libraries
 PROJECT_BASE_PATH = ..
 PROJECT_BASE_PATH_USB = ../USB
+PROJECT_BASE_PATH_USB_HOST = ../../../system/USBHost
 SYSTEM_PATH = ../../../system
 CMSIS_ROOT_PATH = $(SYSTEM_PATH)/CMSIS
 CMSIS_ARM_PATH=$(CMSIS_ROOT_PATH)/CMSIS/Include
@@ -45,15 +46,16 @@ VARIANT_PATH = ../../../variants/$(VARIANT)
 # Files
 #-------------------------------------------------------------------------------
 
-#vpath %.h $(PROJECT_BASE_PATH) $(PROJECT_BASE_PATH_USB) $(SYSTEM_PATH) $(VARIANT_PATH)
-vpath %.c $(PROJECT_BASE_PATH) $(PROJECT_BASE_PATH_USB) $(VARIANT_PATH)
-vpath %.cpp $(PROJECT_BASE_PATH) $(PROJECT_BASE_PATH_USB)
+#vpath %.h $(PROJECT_BASE_PATH) $(PROJECT_BASE_PATH_USB) $(PROJECT_BASE_PATH_USB_HOST) $(SYSTEM_PATH) $(VARIANT_PATH)
+vpath %.c $(PROJECT_BASE_PATH) $(PROJECT_BASE_PATH_USB) $(PROJECT_BASE_PATH_USB_HOST) $(VARIANT_PATH)
+vpath %.cpp $(PROJECT_BASE_PATH) $(PROJECT_BASE_PATH_USB) $(PROJECT_BASE_PATH_USB_HOST)
 
 VPATH+=$(PROJECT_BASE_PATH)
 
 INCLUDES =
 INCLUDES += -I$(PROJECT_BASE_PATH)
 INCLUDES += -I$(PROJECT_BASE_PATH_USB)
+INCLUDES += -I$(PROJECT_BASE_PATH_USB_HOST)
 INCLUDES += -I$(VARIANT_PATH)
 INCLUDES += -I$(CMSIS_ARM_PATH)
 INCLUDES += -I$(CMSIS_ATMEL_PATH)
@@ -90,7 +92,7 @@ OUTPUT_PATH=$(OUTPUT_OBJ)_$(VARIANT)
 #-------------------------------------------------------------------------------
 # C source files and objects
 #-------------------------------------------------------------------------------
-C_SRC=$(wildcard $(PROJECT_BASE_PATH)/*.c $(PROJECT_BASE_PATH_USB)/*.c)
+C_SRC=$(wildcard $(PROJECT_BASE_PATH)/*.c $(PROJECT_BASE_PATH_USB)/*.c $(PROJECT_BASE_PATH_USB_HOST)/*.c)
 
 C_OBJ_TEMP = $(patsubst %.c, %.o, $(notdir $(C_SRC)))
 
@@ -102,7 +104,7 @@ C_OBJ=$(filter-out $(C_OBJ_FILTER), $(C_OBJ_TEMP))
 #-------------------------------------------------------------------------------
 # CPP source files and objects
 #-------------------------------------------------------------------------------
-CPP_SRC=$(wildcard $(PROJECT_BASE_PATH)/*.cpp $(PROJECT_BASE_PATH_USB)/*.cpp)
+CPP_SRC=$(wildcard $(PROJECT_BASE_PATH)/*.cpp $(PROJECT_BASE_PATH_USB)/*.cpp $(PROJECT_BASE_PATH_USB_HOST)/*.cpp)
 
 CPP_OBJ_TEMP = $(patsubst %.cpp, %.o, $(notdir $(CPP_SRC)))
 

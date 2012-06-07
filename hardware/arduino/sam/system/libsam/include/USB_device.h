@@ -16,8 +16,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef _USB_DRIVER_
-#define _USB_DRIVER_
+#ifndef USB_DEVICE_H_INCLUDED
+#define USB_DEVICE_H_INCLUDED
 
 #include <stdint.h>
 
@@ -403,4 +403,4 @@ typedef uint32_t                iram_size_t;
 
 //! @}
 
-#endif /* _USB_DRIVER_*/
+#endif /* USB_DEVICE_H_INCLUDED */
