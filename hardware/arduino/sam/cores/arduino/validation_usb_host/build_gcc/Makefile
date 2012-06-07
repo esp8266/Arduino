@@ -22,20 +22,20 @@ SUBMAKE_OPTIONS=--no-builtin-rules --no-builtin-variables
 # Rules
 #-------------------------------------------------------------------------------
 
-all: test_usb_device
+all: test_usb_host
 
-.PHONY: test_usb_device
+.PHONY: test_usb_host
 test:
-	@echo --- Making test_usb_device
-	@$(MAKE) DEBUG=1 $(SUBMAKE_OPTIONS) -f test_usb_device.mk
+	@echo --- Making test_usb_host
+	@$(MAKE) DEBUG=1 $(SUBMAKE_OPTIONS) -f test_usb_host.mk
 
 .PHONY: clean
 clean:
-	@echo --- Cleaning test_usb_device
-	@$(MAKE) DEBUG=1 $(SUBMAKE_OPTIONS) -f test_usb_device.mk $@
+	@echo --- Cleaning test_usb_host
+	@$(MAKE) DEBUG=1 $(SUBMAKE_OPTIONS) -f test_usb_host.mk $@
 
 .PHONY: debug
 debug:
-	@echo --- Debugging test_usb_device
-	@$(MAKE) DEBUG=1 $(SUBMAKE_OPTIONS) -f test_usb_device.mk $@
+	@echo --- Debugging test_usb_host
+	@$(MAKE) DEBUG=1 $(SUBMAKE_OPTIONS) -f test_usb_host.mk $@
 
