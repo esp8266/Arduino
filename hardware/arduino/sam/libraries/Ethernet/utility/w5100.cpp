@@ -26,11 +26,12 @@ W5100Class W5100;
 
 void W5100Class::init(void)
 {
-  SPI.begin(SPI_CS);
-  SPI.setClockDivider(SPI_CS, 255);
-  SPI.setDataMode(SPI_CS, SPI_MODE0);
-
   delay(300);
+
+  SPI.begin(SPI_CS);
+  // Set clock to 4Mhz (W5100 should support up to about 14Mhz)
+  SPI.setClockDivider(SPI_CS, 21);
+  SPI.setDataMode(SPI_CS, SPI_MODE0);
 
   writeMR(1<<RST);
   writeTMSR(0x55);

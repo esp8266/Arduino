@@ -26,7 +26,8 @@ void SPIClass::begin(uint8_t _pin) {
 		g_APinDescription[spiPin].ulPinType,
 		g_APinDescription[spiPin].ulPin,
 		g_APinDescription[spiPin].ulPinConfiguration);
-	setClockDivider(_pin, 1);
+	// Default speed set to 500Khz
+	setClockDivider(_pin, 168);
 	setDataMode(_pin, SPI_MODE0);
 }
 
@@ -41,12 +42,16 @@ void SPIClass::end() {
 void SPIClass::setDataMode(uint8_t _pin, uint8_t _mode) {
 	uint32_t _channel = BOARD_PIN_TO_SPI_CHANNEL(_pin);
 	mode[_channel] = _mode | SPI_CSR_CSAAT;
+	// SPI_CSR_DLYBCT(1) keeps CS enabled for 32 MCLK after a completed
+	// transfer. Some device needs that for working properly.
 	SPI_ConfigureNPCS(spi, _channel, mode[_channel] | SPI_CSR_SCBR(divider[_channel]) | SPI_CSR_DLYBCT(1));
 }
 
 void SPIClass::setClockDivider(uint8_t _pin, uint8_t _divider) {
 	uint32_t _channel = BOARD_PIN_TO_SPI_CHANNEL(_pin);
 	divider[_channel] = _divider;
+	// SPI_CSR_DLYBCT(1) keeps CS enabled for 32 MCLK after a completed
+	// transfer. Some device needs that for working properly.
 	SPI_ConfigureNPCS(spi, _channel, mode[_channel] | SPI_CSR_SCBR(divider[_channel]) | SPI_CSR_DLYBCT(1));
 }
 
