@@ -67,7 +67,7 @@ extern "C"{
  *----------------------------------------------------------------------------*/
 
 // Number of pins defined in PinDescription array
-#define PINS_COUNT           (84u)
+#define PINS_COUNT           (88u)
 
 // LEDs
 #define PIN_LED_13           (13u)
@@ -86,19 +86,31 @@ extern "C"{
 #define SPI_INTERFACE_ID     ID_SPI0
 #define SPI_CHANNELS_NUM 4
 #define PIN_SPI_SS0          (77u)
-#define PIN_SPI_SS1          (4u)
-#define PIN_SPI_SS2          (0u)
+#define PIN_SPI_SS1          (87u)
+#define PIN_SPI_SS2          (86u)
 #define PIN_SPI_SS3          (78u)
-#define PIN_SPI_SS_DEFAULT   PIN_SPI_SS2
 #define PIN_SPI_MOSI         (75u)
 #define PIN_SPI_MISO         (74u)
 #define PIN_SPI_SCK          (76u)
-#define SPI_PIN_TO_SPI_CHANNEL(x) (x==PIN_SPI_SS0 ? 0 : (x==PIN_SPI_SS1 ? 1 : (x==PIN_SPI_SS2 ? 2 : 3)))
+#define BOARD_SPI_SS0        (10u)
+#define BOARD_SPI_SS1        (4u)
+#define BOARD_SPI_SS2        (52u)
+#define BOARD_SPI_SS3        PIN_SPI_SS3
+#define BOARD_PIN_SS_DEFAULT BOARD_SPI_SS2
 
-static const uint8_t SS   = PIN_SPI_SS0 ;
-static const uint8_t SS1  = PIN_SPI_SS1 ;
-static const uint8_t SS2  = PIN_SPI_SS2 ;
-static const uint8_t SS3  = PIN_SPI_SS3 ;
+#define BOARD_PIN_TO_SPI_PIN(x) \
+	(x==BOARD_SPI_SS0 ? PIN_SPI_SS0 : \
+	(x==BOARD_SPI_SS1 ? PIN_SPI_SS1 : \
+	(x==BOARD_SPI_SS2 ? PIN_SPI_SS2 : PIN_SPI_SS3 )))
+#define BOARD_PIN_TO_SPI_CHANNEL(x) \
+	(x==BOARD_SPI_SS0 ? 0 : \
+	(x==BOARD_SPI_SS1 ? 1 : \
+	(x==BOARD_SPI_SS2 ? 2 : 3)))
+
+static const uint8_t SS   = BOARD_SPI_SS0 ;
+static const uint8_t SS1  = BOARD_SPI_SS1 ;
+static const uint8_t SS2  = BOARD_SPI_SS2 ;
+static const uint8_t SS3  = BOARD_SPI_SS3 ;
 static const uint8_t MOSI = PIN_SPI_MOSI ;
 static const uint8_t MISO = PIN_SPI_MISO ;
 static const uint8_t SCK  = PIN_SPI_SCK ;

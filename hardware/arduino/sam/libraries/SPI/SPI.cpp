@@ -15,18 +15,17 @@ SPIClass::SPIClass(Spi *_spi, uint32_t _id, void(*_initCb)(void)) :
 {
 	initCb();
 
-	SPI_Configure(spi, id, SPI_MR_MSTR | SPI_MR_PS);
+	SPI_Configure(spi, id, SPI_MR_MSTR | SPI_MR_PS | SPI_MR_MODFDIS);
 	SPI_Enable(spi);
 }
 
 void SPIClass::begin(uint8_t _pin) {
-	if (_pin == 0)
-		return;
+	uint32_t spiPin = BOARD_PIN_TO_SPI_PIN(_pin);
 	PIO_Configure(
-		g_APinDescription[_pin].pPort,
-		g_APinDescription[_pin].ulPinType,
-		g_APinDescription[_pin].ulPin,
-		g_APinDescription[_pin].ulPinConfiguration);
+		g_APinDescription[spiPin].pPort,
+		g_APinDescription[spiPin].ulPinType,
+		g_APinDescription[spiPin].ulPin,
+		g_APinDescription[spiPin].ulPinConfiguration);
 	setClockDivider(_pin, 1);
 	setDataMode(_pin, SPI_MODE0);
 }
@@ -40,19 +39,19 @@ void SPIClass::end() {
 //}
 
 void SPIClass::setDataMode(uint8_t _pin, uint8_t _mode) {
-	uint32_t _channel = SPI_PIN_TO_SPI_CHANNEL(_pin);
+	uint32_t _channel = BOARD_PIN_TO_SPI_CHANNEL(_pin);
 	mode[_channel] = _mode | SPI_CSR_CSAAT;
-	SPI_ConfigureNPCS(spi, _channel, mode[_channel] | SPI_CSR_SCBR(divider[_channel]));
+	SPI_ConfigureNPCS(spi, _channel, mode[_channel] | SPI_CSR_SCBR(divider[_channel]) | SPI_CSR_DLYBCT(1));
 }
 
 void SPIClass::setClockDivider(uint8_t _pin, uint8_t _divider) {
-	uint32_t _channel = SPI_PIN_TO_SPI_CHANNEL(_pin);
+	uint32_t _channel = BOARD_PIN_TO_SPI_CHANNEL(_pin);
 	divider[_channel] = _divider;
-	SPI_ConfigureNPCS(spi, _channel, mode[_channel] | SPI_CSR_SCBR(divider[_channel]));
+	SPI_ConfigureNPCS(spi, _channel, mode[_channel] | SPI_CSR_SCBR(divider[_channel]) | SPI_CSR_DLYBCT(1));
 }
 
 byte SPIClass::transfer(byte _pin, uint8_t _data, SPITransferMode _mode) {
-	uint32_t _channel = SPI_PIN_TO_SPI_CHANNEL(_pin);
+	uint32_t _channel = BOARD_PIN_TO_SPI_CHANNEL(_pin);
 	uint32_t d = _data | SPI_PCS(_channel);
 	if (_mode == SPI_LAST)
 		d |= SPI_TDR_LASTXFER;

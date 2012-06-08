@@ -26,12 +26,14 @@
  *   2       TIOA0 |  PB25
  *   3       TIOA7 |  PC28
  *   4       NPCS1 |  PA29
+ *           TIOB6 |  PC26
  *   5       TIOA6 |  PC25
  *   6       PWML7 |  PC24
  *   7       PWML6 |  PC23
  *   8       PWML5 |  PC22
  *   9       PWML4 |  PC21
- *  10       TIOB7 |  PC29
+ *  10       NPCS0 |  PA28
+ *           TIOB7 |  PC29
  *  11       TIOA8 |  PD7
  *  12       TIOB8 |  PD8
  *  13       TIOB0 |  PB27
@@ -73,7 +75,7 @@
  *  49             |  PC14
  *  50             |  PC13
  *  51             |  PC12
- *  52             |  PB21
+ *  52       NPCS2 |  PB21
  *  53             |  PB14
  *  A0             |  PA16
  *  A1             |  PA24
@@ -135,7 +137,7 @@ extern const PinDescription g_APinDescription[]=
   // 2
   { PIOB, PIO_PB25B_TIOA0,   ID_PIOB, PIO_PERIPH_B, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_TIMER), NO_ADC, NO_ADC, NO_PWM,  TC0_CHA0 }, // TIOA0
   { PIOC, PIO_PC28B_TIOA7,   ID_PIOC, PIO_PERIPH_B, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_TIMER), NO_ADC, NO_ADC, NO_PWM,  TC2_CHA7 }, // TIOA7
-  { PIOA, PIO_PA29A_SPI0_NPCS1,ID_PIOA,PIO_PERIPH_A,PIO_DEFAULT,  PIN_ATTR_DIGITAL,                 NO_ADC, NO_ADC, NO_PWM,  NO_TC    }, // NPCS1
+  { PIOC, PIO_PC26B_TIOB6,   ID_PIOC, PIO_PERIPH_B, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_TIMER), NO_ADC, NO_ADC, NO_PWM,  TC2_CHB6 }, // TIOB6
 
   // 5
   { PIOC, PIO_PC25B_TIOA6,   ID_PIOC, PIO_PERIPH_B, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_TIMER), NO_ADC, NO_ADC, NO_PWM,  TC0_CHA2 }, // TIOA6
@@ -274,6 +276,12 @@ extern const PinDescription g_APinDescription[]=
 
   // 85 - USB
   { PIOB, PIO_PB11A_UOTGID|PIO_PB10A_UOTGVBOF, ID_PIOB, PIO_PERIPH_A, PIO_DEFAULT, PIN_ATTR_DIGITAL,NO_ADC, NO_ADC, NO_PWM,  NO_TC    }, // ID - VBOF
+
+  // 86 - SPI CS2
+  { PIOB, PIO_PB21B_SPI0_NPCS2, ID_PIOB, PIO_PERIPH_B, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NO_PWM,  NO_TC    }, // NPCS2
+
+  // 87 - SPI CS1
+  { PIOA, PIO_PA29A_SPI0_NPCS1, ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NO_PWM,  NO_TC    }, // NPCS1
 
   // END
   { NULL, 0, 0, PIO_NOT_A_PIN, PIO_DEFAULT, 0, NO_ADC, NO_ADC, NO_PWM, NO_TC }
