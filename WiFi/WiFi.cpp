@@ -34,6 +34,11 @@ uint8_t WiFiClass::getSocket()
     return NO_SOCKET_AVAIL;
 }
 
+char* WiFiClass::firmwareVersion()
+{
+	return WiFiDrv::getFwVersion();
+}
+
 int WiFiClass::begin(char* ssid)
 {
 	uint8_t status = WL_IDLE_STATUS;

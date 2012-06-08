@@ -26,6 +26,8 @@ uint8_t WiFiDrv::_mac[] = {0};
 uint8_t WiFiDrv::_localIp[] = {0};
 uint8_t WiFiDrv::_subnetMask[] = {0};
 uint8_t WiFiDrv::_gatewayIp[] = {0};
+// Firmware version
+char    WiFiDrv::fwVersion[] = {0};
 
 
 // Private Methods
@@ -465,6 +467,25 @@ int WiFiDrv::getHostByName(const char* aHostname, IPAddress& aResult)
 		return 0;
 	}
 	return (retry>0);
+}
+
+char*  WiFiDrv::getFwVersion()
+{
+	WAIT_FOR_SLAVE_SELECT();
+    // Send Command
+    SpiDrv::sendCmd(GET_FW_VERSION_CMD, PARAM_NUMS_0);
+
+    //Wait the reply elaboration
+    SpiDrv::waitForSlaveReady();
+
+    // Wait for reply
+    uint8_t _dataLen = 0;
+    if (!SpiDrv::waitResponseCmd(GET_FW_VERSION_CMD, PARAM_NUMS_1, (uint8_t*)fwVersion, &_dataLen))
+    {
+        WARN("error waitResponse");
+    }
+    SpiDrv::spiSlaveDeselect();
+    return fwVersion;
 }
 
 WiFiDrv wiFiDrv;

@@ -7,11 +7,12 @@ extern "C" {
 #include "debug.h"
 }
 
-#define DATAOUT 11//MOSI
-#define DATAIN  12//MISO 
-#define SPICLOCK  13//sck
-#define SLAVESELECT 10//ss
-#define SLAVEREADY 3
+#define DATAOUT 	11 // MOSI
+#define DATAIN  	12 // MISO
+#define SPICLOCK  	13 // sck
+#define SLAVESELECT 10 // ss
+#define SLAVEREADY 	3  // handshake pin
+#define WIFILED 	9  // led on wifi shield
 
 #define DELAY_100NS do { asm volatile("nop"); }while(0);
 #define DELAY_SPI(X) { int ii=0; do {  asm volatile("nop"); }while(++ii<X);}
@@ -30,11 +31,13 @@ void SpiDrv::begin()
 	  pinMode(SS, OUTPUT);
 	  pinMode(SLAVESELECT, OUTPUT);
 	  pinMode(SLAVEREADY, INPUT);
+	  pinMode(WIFILED, OUTPUT);
 
 	  digitalWrite(SCK, LOW);
 	  digitalWrite(MOSI, LOW);
 	  digitalWrite(SS, HIGH);
 	  digitalWrite(SLAVESELECT, HIGH);
+	  digitalWrite(WIFILED, LOW);
 
 #ifdef _DEBUG_
 	  INIT_TRIGGER()

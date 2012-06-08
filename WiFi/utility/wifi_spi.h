@@ -48,6 +48,7 @@ enum {
 	REQ_HOST_BY_NAME_CMD= 0x34,
 	GET_HOST_BY_NAME_CMD= 0x35,
 	START_SCAN_NETWORKS	= 0x36,
+	GET_FW_VERSION_CMD	= 0x37,
 
     // All command with DATA_FLAG 0x40 send a 16bit Len
 
