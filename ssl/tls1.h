@@ -42,6 +42,7 @@ extern "C" {
 
 #include "version.h"
 #include "crypto.h"
+#include "os_int.h"
 #include "crypto_misc.h"
 
 #define SSL_PROTOCOL_MIN_VERSION    0x31   /* TLS v1.0 */

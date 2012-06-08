@@ -166,6 +166,7 @@ EXP_FUNC SSL_CTX *STDCALL ssl_ctx_new(uint32_t options, int num_sessions)
 {
     SSL_CTX *ssl_ctx = (SSL_CTX *)calloc(1, sizeof (SSL_CTX));
     ssl_ctx->options = options;
+    RNG_initialize();
 
     if (load_key_certs(ssl_ctx) < 0)
     {

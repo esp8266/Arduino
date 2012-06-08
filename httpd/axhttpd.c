@@ -453,7 +453,7 @@ static void addtoservers(int sd)
 static void handlenewconnection(int listenfd, int is_ssl) 
 {
     struct sockaddr_in6 their_addr;
-    int tp = sizeof(their_addr);
+    socklen_t tp = sizeof(their_addr);
     char ipbuf[100];
     int connfd = accept(listenfd, (struct sockaddr *)&their_addr, &tp);
 
@@ -506,8 +506,11 @@ static int openlistener(char *address, int port)
 
     my_addr.sin6_family = AF_INET6;
     my_addr.sin6_port = htons(port);
-    my_addr.sin6_addr.s_addr = address == NULL ? 
-                        INADDR_ANY : iinet_addr(address);
+
+    if (address == NULL)
+        my_addr.sin6_addr = in6addr_any;
+    else 
+        inet_pton(AF_INET6, address, &my_addr.sin6_addr);
 #endif
 
     setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, &tp, sizeof(tp));

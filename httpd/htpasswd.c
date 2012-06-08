@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    RNG_initialize((uint8_t *)pw, sizeof(pw));
+    RNG_initialize();
     get_random(MD5_SIZE, md5_salt);
     RNG_terminate();
     base64_encode(md5_salt, MD5_SIZE, b64_salt, sizeof(b64_salt));

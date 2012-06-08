@@ -56,7 +56,6 @@ static HCRYPTPROV gCryptProv;
 static uint8_t entropy_pool[ENTROPY_POOL_SIZE];
 #endif
 
-static int rng_ref_count;
 const char * const unsupported_str = "Error: Feature not supported\n";
 
 #ifndef CONFIG_SSL_SKELETON_MODE
@@ -102,46 +101,44 @@ int get_file(const char *filename, uint8_t **buf)
  * - On Linux use /dev/urandom
  * - If none of these work then use a custom RNG.
  */
-EXP_FUNC void STDCALL RNG_initialize(const uint8_t *seed_buf, int size)
+EXP_FUNC void STDCALL RNG_initialize()
 {
-    if (rng_ref_count == 0)
-    {
 #if !defined(WIN32) && defined(CONFIG_USE_DEV_URANDOM)
-        rng_fd = ax_open("/dev/urandom", O_RDONLY);
+    rng_fd = ax_open("/dev/urandom", O_RDONLY);
 #elif defined(WIN32) && defined(CONFIG_WIN32_USE_CRYPTO_LIB)
-        if (!CryptAcquireContext(&gCryptProv, 
-                          NULL, NULL, PROV_RSA_FULL, 0))
+    if (!CryptAcquireContext(&gCryptProv, 
+                      NULL, NULL, PROV_RSA_FULL, 0))
+    {
+        if (GetLastError() == NTE_BAD_KEYSET &&
+                !CryptAcquireContext(&gCryptProv, 
+                       NULL, 
+                       NULL, 
+                       PROV_RSA_FULL, 
+                       CRYPT_NEWKEYSET))
         {
-            if (GetLastError() == NTE_BAD_KEYSET &&
-                    !CryptAcquireContext(&gCryptProv, 
-                           NULL, 
-                           NULL, 
-                           PROV_RSA_FULL, 
-                           CRYPT_NEWKEYSET))
-            {
-                printf("CryptoLib: %x\n", unsupported_str, GetLastError());
-                exit(1);
-            }
+            printf("CryptoLib: %x\n", unsupported_str, GetLastError());
+            exit(1);
         }
-#else   
-        int i;
-        uint32_t seed_addr_val = (uint32_t)&seed_buf;
-        uint32_t *ep = (uint32_t *)entropy_pool;
-
-        /* help start the entropy with the user's private key - this is 
-           a number that should be hard to find, due to the fact that it 
-           relies on knowing the private key */
-        memcpy(entropy_pool, seed_buf, ENTROPY_POOL_SIZE);
-        srand((long)entropy_pool); 
-
-        /* mix it up a little with a stack address */
-        for (i = 0; i < ENTROPY_POOL_SIZE/4; i++)
-            ep[i] ^= seed_addr_val;
-
-#endif
     }
+#else
+    /* start of with a stack to copy across */
+    int i;
+    memcpy(entropy_pool, &i, ENTROPY_POOL_SIZE);
+    srand(&i); 
+#endif
+}
 
-    rng_ref_count++;
+/**
+ * If no /dev/urandom, then initialise the RNG with something interesting.
+ */
+EXP_FUNC void STDCALL RNG_custom_init(const uint8_t *seed_buf, int size)
+{
+#if defined(WIN32) || defined(CONFIG_WIN32_USE_CRYPTO_LIB)
+    int i;
+
+    for (i = 0; i < ENTROPY_POOL_SIZE && i < size; i++)
+        entropy_pool[i] ^= seed_buf[i];
+#endif
 }
 
 /**
@@ -149,14 +146,11 @@ EXP_FUNC void STDCALL RNG_initialize(const uint8_t *seed_buf, int size)
  */
 EXP_FUNC void STDCALL RNG_terminate(void)
 {
-    if (--rng_ref_count == 0)
-    {
 #ifndef WIN32
-        close(rng_fd);
+    close(rng_fd);
 #elif defined(CONFIG_WIN32_USE_CRYPTO_LIB)
-        CryptReleaseContext(gCryptProv, 0);
+    CryptReleaseContext(gCryptProv, 0);
 #endif
-    }
 }
 
 /**
