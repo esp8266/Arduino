@@ -38,8 +38,8 @@
 #include "ard_utils.h"
 #include <lwip_setup.h>
 
-
-//void board_init(void);
+/* FIRMWARE version */
+const char* fwVersion = "1.0.0";
 
 #if BOARD == ARDUINO
 #if !defined(DATAFLASH)

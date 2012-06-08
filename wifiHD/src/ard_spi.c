@@ -25,7 +25,7 @@
 #include "lwip/dns.h"
 #include <board_init.h>
 
-
+extern const char* fwVersion;
 
 /*! \name USART Settings
  */
@@ -1278,6 +1278,20 @@ cmd_spi_state_t get_databuf_tcp_cmd_cb(char* recv, char* reply, void* ctx, uint1
     return SPI_CMD_DONE;
 }
 
+cmd_spi_state_t get_firmware_version_cmd_cb(char* recv, char* reply, void* ctx, uint16_t* count) {
+
+    CHECK_ARD_NETIF(recv, reply, count);
+
+    CREATE_HEADER_REPLY(reply, recv, 1);
+
+    uint8_t len = strlen(fwVersion);
+
+    PUT_BUFDATA_BYTE(fwVersion, len, reply, 3);
+
+    END_HEADER_REPLY(reply, 3+len+1, *count);
+
+    return SPI_CMD_DONE;
+}
 
 int sendReply(int cmdIdx, char* recv, char* reply, void* resultCmd)
 {
@@ -1435,6 +1449,7 @@ void init_spi_cmds() {
 	spi_add_cmd(DATA_SENT_TCP_CMD, ack_cmd_cb, data_sent_tcp_cmd_cb, NULL, CMD_GET_FLAG);
 	spi_add_cmd(GET_DATABUF_TCP_CMD, ack_cmd_cb, get_databuf_tcp_cmd_cb, NULL, CMD_GET_FLAG);
 	spi_add_cmd(GET_CLIENT_STATE_TCP_CMD, ack_cmd_cb, get_client_state_tcp_cmd_cb, NULL, CMD_GET_FLAG);
+	spi_add_cmd(GET_FW_VERSION_CMD, ack_cmd_cb, get_firmware_version_cmd_cb, NULL, CMD_GET_FLAG);
 }
 
 
