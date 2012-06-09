@@ -19,6 +19,14 @@ SPIClass::SPIClass(Spi *_spi, uint32_t _id, void(*_initCb)(void)) :
 	SPI_Enable(spi);
 }
 
+void SPIClass::begin() {
+	// NPCS control is left to the user
+
+	// Default speed set to 500Khz
+	setClockDivider(BOARD_SPI_DEFAULT_SS, 168);
+	setDataMode(BOARD_SPI_DEFAULT_SS, SPI_MODE0);
+}
+
 void SPIClass::begin(uint8_t _pin) {
 	uint32_t spiPin = BOARD_PIN_TO_SPI_PIN(_pin);
 	PIO_Configure(

@@ -102,7 +102,7 @@
  *  SO             |  PA25
  *  SI             |  PA26
  *  SCK            |  PA27
- *  #CS        SS3 |  PB23
+ *  #CS      NPCS3 |  PB23
  *
  *
  * USB pin         |  PORT

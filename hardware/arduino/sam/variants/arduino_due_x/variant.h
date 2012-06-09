@@ -96,7 +96,7 @@ extern "C"{
 #define BOARD_SPI_SS1        (4u)
 #define BOARD_SPI_SS2        (52u)
 #define BOARD_SPI_SS3        PIN_SPI_SS3
-#define BOARD_PIN_SS_DEFAULT BOARD_SPI_SS2
+#define BOARD_SPI_DEFAULT_SS BOARD_SPI_SS2
 
 #define BOARD_PIN_TO_SPI_PIN(x) \
 	(x==BOARD_SPI_SS0 ? PIN_SPI_SS0 : \

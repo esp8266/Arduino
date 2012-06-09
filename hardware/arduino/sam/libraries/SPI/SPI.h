@@ -28,7 +28,7 @@ class SPIClass {
   public:
 	SPIClass(Spi *_spi, uint32_t _id, void(*_initCb)(void));
 
-	//byte transfer(uint8_t _data, SPITransferMode _mode = SPI_LAST) { transfer(BOARD_PIN_SS_DEFAULT, _data, _mode); }
+	byte transfer(uint8_t _data, SPITransferMode _mode = SPI_LAST) { return transfer(BOARD_SPI_DEFAULT_SS, _data, _mode); }
 	byte transfer(byte _channel, uint8_t _data, SPITransferMode _mode = SPI_LAST);
 
 	// SPI Configuration methods
@@ -37,7 +37,7 @@ class SPIClass {
 	void detachInterrupt(void);
 
 	void begin(uint8_t _channel);
-	//void begin(void) { begin(BOARD_PIN_SS_DEFAULT); };
+	void begin(void);
 	void end(void);
 
 	// These methods sets a parameter on a single pin
@@ -47,8 +47,8 @@ class SPIClass {
 
 	// These methods sets the same parameters but on default pin PIN_SPI_SS_DEFAULT
 	//void setBitOrder(uint8_t _order) { setBitOrder(PIN_SPI_SS_DEFAULT, _order); };
-	//void setDataMode(uint8_t _mode) { setDataMode(BOARD_PIN_SS_DEFAULT, _mode); };
-	//void setClockDivider(uint8_t _div) { setClockDivider(BOARD_PIN_SS_DEFAULT, _div); };
+	void setDataMode(uint8_t _mode) { setDataMode(BOARD_SPI_DEFAULT_SS, _mode); };
+	void setClockDivider(uint8_t _div) { setClockDivider(BOARD_SPI_DEFAULT_SS, _div); };
 
   private:
 	Spi *spi;
