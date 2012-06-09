@@ -326,7 +326,14 @@ public class Preferences {
           File file =
             Base.selectFolder(_("Select new sketchbook location"), dflt, dialog);
           if (file != null) {
-            sketchbookLocationField.setText(file.getAbsolutePath());
+	    String path = file.getAbsolutePath();
+	    if (Base.getPortableFolder() != null) {
+	      path = RelativePath.relativePath(Base.getPortableFolder().toString(), path);
+	      if (path == null) {
+		path = Base.getPortableSketchbookFolder();
+	      }
+	    }
+	    sketchbookLocationField.setText(path);
           }
         }
       });
@@ -439,6 +446,10 @@ public class Preferences {
       autoAssociateBox.setBounds(left, top, d.width + 10, d.height);
       right = Math.max(right, left + d.width);
       top += d.height + GUI_BETWEEN;
+
+      // If using portable mode, it's bad manner to change PC setting.
+      if (Base.getPortableFolder() != null)
+	autoAssociateBox.setEnabled(false);
     }
 
     // More preferences are in the ...
@@ -591,6 +602,12 @@ public class Preferences {
     // if the sketchbook path has changed, rebuild the menus
     String oldPath = get("sketchbook.path");
     String newPath = sketchbookLocationField.getText();
+    if (newPath.isEmpty()) {
+      if (Base.getPortableFolder() == null)
+	newPath = editor.base.getDefaultSketchbookFolder().toString();
+      else
+	newPath = Base.getPortableSketchbookFolder();
+    }
     if (!newPath.equals(oldPath)) {
       editor.base.rebuildSketchbookMenus();
       set("sketchbook.path", newPath);
