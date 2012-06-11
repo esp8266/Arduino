@@ -151,24 +151,34 @@ uint32_t analogRead(uint32_t ulPin)
 	return ulValue;
 }
 
-static void TC_SetRA(Tc *tc, uint32_t chan, uint32_t v )
+static void TC_SetRA(Tc *tc, uint32_t chan, uint32_t v)
 {
     tc->TC_CHANNEL[chan].TC_RA = v;
 }
 
-static void TC_SetRB(Tc *tc, uint32_t chan, uint32_t v )
+static void TC_SetRB(Tc *tc, uint32_t chan, uint32_t v)
 {
     tc->TC_CHANNEL[chan].TC_RB = v;
 }
 
-static void TC_SetRC(Tc *tc, uint32_t chan, uint32_t v )
+static void TC_SetRC(Tc *tc, uint32_t chan, uint32_t v)
 {
     tc->TC_CHANNEL[chan].TC_RC = v;
 }
 
+static void TC_SetCMR_ChannelA(Tc *tc, uint32_t chan, uint32_t v)
+{
+	tc->TC_CHANNEL[chan].TC_CMR = (tc->TC_CHANNEL[chan].TC_CMR & 0xFFF0FFFF) | v;
+}
+
+static void TC_SetCMR_ChannelB(Tc *tc, uint32_t chan, uint32_t v)
+{
+	tc->TC_CHANNEL[chan].TC_CMR = (tc->TC_CHANNEL[chan].TC_CMR & 0xF0FFFFFF) | v;
+}
+
 static uint8_t PWMEnabled = 0;
 static uint8_t pinEnabled[PINS_COUNT];
-static uint8_t TCChanEnabled[] = {0, 0, 0};
+static uint8_t TCChanEnabled[] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 void analogOutputInit(void) {
 	uint8_t i;
@@ -210,38 +220,52 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 	}
 
 	if ((attr & PIN_ATTR_TIMER) == PIN_ATTR_TIMER) {
-		// We use MCLK/2 => 96Mhz/2 => 48Mhz as clock.
-		// To get 1KHz we should use 48000 as TC
-		// 48Mhz/48000 = 1KHz
+		// We use MCLK/2 as clock.
 		const uint32_t TC = VARIANT_MCK / 2 / TC_FREQUENCY;
 
-		// Map value to Timer ranges 0..255=>0..48000
+		// Map value to Timer ranges 0..255 => 0..TC
 		ulValue = ulValue * TC;
 		ulValue = ulValue / TC_MAX_DUTY_CYCLE;
 
 		// Setup Timer for this pin
 		ETCChannel channel = g_APinDescription[ulPin].ulTCChannel;
-		static const uint32_t channelToChNo[] = { 0, 0, 1, 1, 2, 2 };
-		static const uint32_t channelToAB[] = { 1, 0, 1, 0, 1, 0 };
+		static const uint32_t channelToChNo[] = { 0, 0, 1, 1, 2, 2, 0, 0, 1, 1, 2, 2, 0, 0, 1, 1, 2, 2 };
+		static const uint32_t channelToAB[]   = { 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0 };
+		static const Tc *channelToTC[] = {
+			TC0, TC0, TC0, TC0, TC0, TC0,
+			TC1, TC1, TC1, TC1, TC1, TC1,
+			TC2, TC2, TC2, TC2, TC2, TC2 };
+		static const uint32_t channelToId[] = { 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8 };
 		uint32_t chNo = channelToChNo[channel];
-		uint32_t chA = channelToAB[channel];
+		uint32_t chA  = channelToAB[channel];
+		Tc *chTC = channelToTC[channel];
+		uint32_t interfaceID = channelToId[channel];
 
-		if (!TCChanEnabled[chNo]) {
-			pmc_enable_periph_clk(TC_INTERFACE_ID + chNo);
-			TC_Configure(TC_INTERFACE, chNo,
-					TC_CMR_TCCLKS_TIMER_CLOCK1 |
-					TC_CMR_WAVE |
-					TC_CMR_WAVSEL_UP_RC |
-					TC_CMR_ACPA_CLEAR |   // RA Compare Effect on OA: clear
-					TC_CMR_ACPC_SET |     // RC Compare Effect on OA: set
-					TC_CMR_BCPB_CLEAR |   // RB Compare Effect on OB: clear
-					TC_CMR_BCPC_SET);     // RC Compare Effect on OB: set
-			TC_SetRC(TC_INTERFACE, chNo, TC);
+		if (!TCChanEnabled[interfaceID]) {
+			pmc_enable_periph_clk(TC_INTERFACE_ID + interfaceID);
+			TC_Configure(chTC, chNo,
+				TC_CMR_TCCLKS_TIMER_CLOCK1 |
+				TC_CMR_WAVE |         // Waveform mode
+				TC_CMR_WAVSEL_UP_RC | // Counter running up and reset when equals to RC
+				TC_CMR_EEVT_XC0 |     // Set external events from XC0 (this setup TIOB as output)
+				TC_CMR_ACPA_CLEAR | TC_CMR_ACPC_CLEAR |
+				TC_CMR_BCPB_CLEAR | TC_CMR_BCPC_CLEAR);
+			TC_SetRC(chTC, chNo, TC);
 		}
-		if (chA)
-			TC_SetRA(TC_INTERFACE, chNo, ulValue);
-		else
-			TC_SetRB(TC_INTERFACE, chNo, ulValue);
+		if (ulValue == 0) {
+			if (chA)
+				TC_SetCMR_ChannelA(chTC, chNo, TC_CMR_ACPA_CLEAR | TC_CMR_ACPC_CLEAR);
+			else
+				TC_SetCMR_ChannelB(chTC, chNo, TC_CMR_BCPB_CLEAR | TC_CMR_BCPC_CLEAR);
+		} else {
+			if (chA) {
+				TC_SetRA(chTC, chNo, ulValue);
+				TC_SetCMR_ChannelA(chTC, chNo, TC_CMR_ACPA_CLEAR | TC_CMR_ACPC_SET);
+			} else {
+				TC_SetRB(chTC, chNo, ulValue);
+				TC_SetCMR_ChannelB(chTC, chNo, TC_CMR_BCPB_CLEAR | TC_CMR_BCPC_SET);
+			}
+		}
 		if (!pinEnabled[ulPin]) {
 			PIO_Configure(g_APinDescription[ulPin].pPort,
 					g_APinDescription[ulPin].ulPinType,
@@ -249,14 +273,14 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 					g_APinDescription[ulPin].ulPinConfiguration);
 			pinEnabled[ulPin] = 1;
 		}
-		if (!TCChanEnabled[chNo]) {
-			TC_Start(TC_INTERFACE, chNo);
-			TCChanEnabled[chNo] = 1;
+		if (!TCChanEnabled[interfaceID]) {
+			TC_Start(chTC, chNo);
+			TCChanEnabled[interfaceID] = 1;
 		}
 		return;
 	}
 
-	// Default to digital write
+	// Defaults to digital write
 	pinMode(ulPin, OUTPUT);
 	if (ulValue < 128)
 		digitalWrite(ulPin, LOW);
