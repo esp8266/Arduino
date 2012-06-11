@@ -369,6 +369,11 @@ static void Wire1_Init(void) {
 			g_APinDescription[PIN_WIRE1_SCL].ulPinType,
 			g_APinDescription[PIN_WIRE1_SCL].ulPin,
 			g_APinDescription[PIN_WIRE1_SCL].ulPinConfiguration);
+
+	NVIC_DisableIRQ(TWI0_IRQn);
+	NVIC_ClearPendingIRQ(TWI0_IRQn);
+	NVIC_SetPriority(TWI0_IRQn, 0);
+	NVIC_EnableIRQ(TWI0_IRQn);
 }
 
 TwoWire Wire1 = TwoWire(WIRE1_INTERFACE, Wire1_Init);
