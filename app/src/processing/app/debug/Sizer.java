@@ -63,10 +63,8 @@ public class Sizer implements MessageConsumer {
 
       while(running) {
         try {
-          if (in.thread != null)
-            in.thread.join();
-          if (err.thread != null)
-            err.thread.join();
+          in.join();
+          err.join();
           r = process.waitFor();
           running = false;
         } catch (InterruptedException intExc) { }

@@ -401,10 +401,8 @@ public class Compiler implements MessageConsumer {
     boolean compiling = true;
     while (compiling) {
       try {
-        if (in.thread != null)
-          in.thread.join();
-        if (err.thread != null)
-          err.thread.join();
+        in.join();
+        err.join();
         result = process.waitFor();
         //System.out.println("result is " + result);
         compiling = false;
