@@ -9,13 +9,8 @@
  * 4.7K resistor on analog 0 to ground
  
  created 21 Jan 2010
-<<<<<<< HEAD:build/shared/examples/02.Digital/tonePitchFollower/tonePitchFollower.ino
- modified 9 Apr 2012
- by Tom Igoe 
-=======
  modified 31 May 2012
  by Tom Igoe, with suggestion from Michael Flynn
->>>>>>> Made changes to TonePitchFollower example for clarity, suggestions by user Michael Flynn:build/shared/examples/2.Digital/tonePitchFollower/tonePitchFollower.ino
 
 This example code is in the public domain.
  
