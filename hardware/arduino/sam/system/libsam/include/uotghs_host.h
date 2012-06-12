@@ -244,14 +244,14 @@
 #  define uhd_enable_ping(p)                     (Set_bits(UOTGHS->UOTGHS_HSTPIPCFG[p], UOTGHS_HSTPIPCFG_PINGEN))
 //#endif
 #define uhd_configure_pipe(p, freq, ep_num, type, token, size, bank, bank_switch) \
-	(Set_bits(UOTGHS->UOTGHS_HSTPIPCFG[p],\
+	(UOTGHS->UOTGHS_HSTPIPCFG[p] = \
 		(bank)|\
 		((uhd_format_pipe_size(size)<<UOTGHS_HSTPIPCFG_PSIZE_Pos)&UOTGHS_HSTPIPCFG_PSIZE_Msk)|\
-		(((token)<<UOTGHS_HSTPIPCFG_PTOKEN_Pos)&UOTGHS_HSTPIPCFG_PTOKEN_Msk)|\
-		(((type)<<UOTGHS_HSTPIPCFG_PTYPE_Pos)&UOTGHS_HSTPIPCFG_PTYPE_Msk)|\
+		((token)&UOTGHS_HSTPIPCFG_PTOKEN_Msk)|\
+		((type)&UOTGHS_HSTPIPCFG_PTYPE_Msk)|\
 		(((ep_num)<<UOTGHS_HSTPIPCFG_PEPNUM_Pos)&UOTGHS_HSTPIPCFG_PEPNUM_Msk)|\
 		bank_switch |\
-		(((freq)<<UOTGHS_HSTPIPCFG_INTFRQ_Pos)&UOTGHS_HSTPIPCFG_INTFRQ_Msk)))
+		(((freq)<<UOTGHS_HSTPIPCFG_INTFRQ_Pos)&UOTGHS_HSTPIPCFG_INTFRQ_Msk))
 
 #define Is_uhd_pipe_configured(p)                (Tst_bits(UOTGHS->UOTGHS_HSTPIPISR[p], UOTGHS_HSTPIPISR_CFGOK))
 //! @}

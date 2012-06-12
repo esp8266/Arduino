@@ -99,14 +99,14 @@ pwmc.o:
 00000000 T PWMC_SetSyncChannelUpdateUnlock
 00000000 T PWMC_WriteBuffer
          U __assert_func
-00000000 r __func__.3227
-00000000 r __func__.3238
-00000000 r __func__.3253
-00000000 r __func__.3264
-00000000 r __func__.3275
-00000000 r __func__.3282
-00000000 r __func__.3366
-00000000 r __func__.3372
+00000000 r __func__.3235
+00000000 r __func__.3246
+00000000 r __func__.3261
+00000000 r __func__.3272
+00000000 r __func__.3283
+00000000 r __func__.3290
+00000000 r __func__.3374
+00000000 r __func__.3380
 
 rtc.o:
 00000000 T RTC_ClearSCCR
@@ -122,9 +122,9 @@ rtc.o:
 00000000 T RTC_SetTime
 00000000 T RTC_SetTimeAlarm
          U __assert_func
-00000000 r __func__.3224
-00000000 r __func__.3233
-00000000 r __func__.3238
+00000000 r __func__.3232
+00000000 r __func__.3241
+00000000 r __func__.3246
 
 rtt.o:
 00000000 T RTT_EnableIT
@@ -133,8 +133,8 @@ rtt.o:
 00000000 T RTT_SetAlarm
 00000000 T RTT_SetPrescaler
          U __assert_func
-00000000 r __func__.3231
 00000000 r __func__.3239
+00000000 r __func__.3247
 
 spi.o:
 00000000 T SPI_Configure
@@ -155,9 +155,9 @@ tc.o:
 00000000 T TC_Start
 00000000 T TC_Stop
          U __assert_func
-00000000 r __func__.3226
-00000000 r __func__.3232
-00000000 r __func__.3238
+00000000 r __func__.3234
+00000000 r __func__.3240
+00000000 r __func__.3246
 
 timetick.o:
 00000000 T GetTickCount
@@ -184,18 +184,18 @@ twi.o:
 00000000 T TWI_TransferComplete
 00000000 T TWI_WriteByte
          U __assert_func
-00000000 r __func__.3591
-00000000 r __func__.3606
-00000000 r __func__.3610
-00000000 r __func__.3617
-00000000 r __func__.3621
-00000000 r __func__.3626
+00000000 r __func__.3599
+00000000 r __func__.3614
+00000000 r __func__.3618
+00000000 r __func__.3625
+00000000 r __func__.3629
 00000000 r __func__.3634
-00000000 r __func__.3648
-00000000 r __func__.3653
-00000000 r __func__.3657
-00000000 r __func__.3662
-00000000 r __func__.3666
+00000000 r __func__.3642
+00000000 r __func__.3656
+00000000 r __func__.3661
+00000000 r __func__.3665
+00000000 r __func__.3670
+00000000 r __func__.3674
 
 usart.o:
 00000000 T USART_Configure
@@ -214,7 +214,7 @@ usart.o:
 00000000 T USART_Write
 00000000 T USART_WriteBuffer
          U __assert_func
-00000000 r __func__.3512
+00000000 r __func__.3520
 
 wdt.o:
 00000000 T WDT_Disable
@@ -386,6 +386,7 @@ uotghs_device.o:
 uotghs_host.o:
 00000000 T UHD_BusReset
 00000000 T UHD_EP0_Alloc
+00000000 T UHD_EP_Alloc
 00000000 T UHD_EP_Free
 00000000 T UHD_EP_Is_Transfer_Complete
 00000000 T UHD_EP_Read

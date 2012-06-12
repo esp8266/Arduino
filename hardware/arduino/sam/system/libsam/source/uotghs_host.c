@@ -32,7 +32,7 @@ static void UHD_ISR(void)
 {
 	// Manage dis/connection event
 	if (Is_uhd_disconnection() && Is_uhd_disconnection_int_enabled()) {
-		printf(">>> UHD_ISR : Disconnection INT\r\n");
+		TRACE_UOTGHS(printf(">>> UHD_ISR : Disconnection INT\r\n");)
 		uhd_ack_disconnection();
 		uhd_disable_disconnection_int();
 		// Stop reset signal, in case of disconnection during reset
@@ -48,7 +48,7 @@ static void UHD_ISR(void)
 		return;
 	}
 	if (Is_uhd_connection() && Is_uhd_connection_int_enabled()) {
-		printf(">>> UHD_ISR : Connection INT\r\n");
+		TRACE_UOTGHS(printf(">>> UHD_ISR : Connection INT\r\n");)
 		uhd_ack_connection();
 		uhd_disable_connection_int();
 		uhd_ack_disconnection();
@@ -61,7 +61,7 @@ static void UHD_ISR(void)
 	// Manage Vbus error
 	if (Is_uhd_vbus_error_interrupt())
 	{
-		printf(">>> UHD_ISR : VBUS error INT\r\n");
+		TRACE_UOTGHS(printf(">>> UHD_ISR : VBUS error INT\r\n");)
 		uhd_ack_vbus_error_interrupt();
 		uhd_state = UHD_STATE_ERROR;
 		return;
@@ -78,23 +78,23 @@ static void UHD_ISR(void)
 		otg_ack_vbus_transition();
 		if (Is_otg_vbus_high())
 		{
-			printf(">>> UHD_ISR : VBUS transition INT : UHD_STATE_DISCONNECT\r\n");
+			TRACE_UOTGHS(printf(">>> UHD_ISR : VBUS transition INT : UHD_STATE_DISCONNECT\r\n");)
 			uhd_state = UHD_STATE_DISCONNECTED;
 		}
 		else
 		{
-			printf(">>> UHD_ISR : VBUS transition INT : UHD_STATE_NO_VBUS\r\n");
+			TRACE_UOTGHS(printf(">>> UHD_ISR : VBUS transition INT : UHD_STATE_NO_VBUS\r\n");)
 			otg_freeze_clock();
 			uhd_state = UHD_STATE_NO_VBUS;
 		}
-		printf(">>> UHD_ISR : VBUS transition INT : done.\r\n");
+		TRACE_UOTGHS(printf(">>> UHD_ISR : VBUS transition INT : done.\r\n");)
 		return;
 	}
 
 	// Other errors
 	if (Is_uhd_errors_interrupt())
 	{
-		printf(">>> UHD_ISR : Other error INT\r\n");
+		TRACE_UOTGHS(printf(">>> UHD_ISR : Other error INT\r\n");)
 		uhd_ack_errors_interrupt();
 		return;
 	}
@@ -247,10 +247,41 @@ uint32_t UHD_EP0_Alloc(uint32_t ul_add, uint32_t ul_ep_size)
 
 	uhd_configure_address(0, ul_add);
 
-	// Always enable stall and error interrupts of control endpoint
-	/*uhd_enable_stall_interrupt(0);
-	uhd_enable_pipe_error_interrupt(0);
-	uhd_enable_pipe_interrupt(0);*/
+	return 0;
+}
+
+/**
+ * \brief Allocate FIFO for the specified pipe.
+ *
+ * \param ul_add Address of remote device for pipe 0.
+ * \param ul_ep_size Actual size of the FIFO in bytes.
+ *
+ * \retval 0 success.
+ * \retval 1 error.
+ */
+uint32_t UHD_EP_Alloc(uint32_t ul_pipe, uint32_t ul_addr, uint32_t ul_interval, uint32_t ul_type, uint32_t ul_dir, uint32_t ul_maxsize, uint32_t ul_bank)
+{
+	if (Is_uhd_pipe_enabled(ul_pipe))
+	{
+		// Pipe is already allocated
+		return 0;
+	}
+
+	uhd_enable_pipe(ul_pipe);
+
+	uhd_configure_pipe(ul_pipe, ul_interval, ul_addr, ul_type, ul_dir,
+			ul_maxsize, ul_bank, UOTGHS_HSTPIPCFG_AUTOSW);
+
+	uhd_allocate_memory(ul_pipe);
+
+	if (!Is_uhd_pipe_configured(ul_pipe))
+	{
+		uhd_disable_pipe(ul_pipe);
+		return 1;
+	}
+
+	uhd_configure_address(ul_pipe, ul_addr);
+
 	return 0;
 }
 
@@ -331,11 +362,12 @@ void UHD_EP_Send(uint32_t ul_ep, uint32_t ul_token_type)
 	if (!Is_uhd_pipe_enabled(ul_ep))
 	{
 		// Endpoint not valid
-		TRACE_UOTGHS(printf("/!\\ UHD_EP_Send : pipe is not enabled!\r\n");)
+		TRACE_UOTGHS(printf("/!\\ UHD_EP_Send : pipe %lu is not enabled!\r\n", ul_ep);)
 		return;
 	}
 
-	// Set token type
+	// Set token type for zero length packet
+	// When actually using the FIFO, pipe token MUST be configured first
 	uhd_configure_pipe_token(ul_ep, ul_token_type);
 
 	// Clear interrupt flags

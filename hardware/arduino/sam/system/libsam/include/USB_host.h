@@ -50,6 +50,7 @@ extern void UHD_Init(void);
 extern void UHD_BusReset(void);
 extern uhd_vbus_state_t UHD_GetVBUSState(void);
 extern uint32_t UHD_EP0_Alloc(uint32_t ul_add, uint32_t ul_ep_size);
+extern uint32_t UHD_EP_Alloc(uint32_t ul_pipe, uint32_t ul_addr, uint32_t ul_interval, uint32_t ul_type, uint32_t ul_dir, uint32_t ul_maxsize, uint32_t ul_bank);
 extern void UHD_EP_Free(uint32_t add, uint32_t endp);
 extern uint32_t UHD_EP_Read(uint32_t ul_ep, uint32_t ul_size, uint8_t* data);
 extern void UHD_EP_Write(uint32_t ul_ep, uint32_t ul_size, uint8_t* data);
