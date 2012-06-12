@@ -1,42 +1,30 @@
-/**
- * \file
+/* ----------------------------------------------------------------------------
+ *         SAM Software Package License
+ * ----------------------------------------------------------------------------
+ * Copyright (c) 2011-2012, Atmel Corporation
  *
- * \brief Analog-to-Digital Converter (ADC/ADC12B) driver for SAM.
- *
- * Copyright (c) 2011 - 2012 Atmel Corporation. All rights reserved.
- *
- * \asf_license_start
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * modification, are permitted provided that the following condition is met:
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the disclaimer below.
  *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
+ * Atmel's name may not be used to endorse or promote products derived from
+ * this software without specific prior written permission.
  *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an
- *    Atmel microcontroller product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * DISCLAIMER: THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- * \asf_license_stop
- *
+ * DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+ * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * ----------------------------------------------------------------------------
  */
 
 #include "../chip.h"
@@ -52,12 +40,12 @@ extern "C" {
 /**
  * \defgroup sam_drivers_adc_group Analog-to-digital Converter (ADC)
  *
- * Driver for the Analog-to-digital Converter. This driver provides access to the main 
+ * Driver for the Analog-to-digital Converter. This driver provides access to the main
  * features of the ADC controller.
  *
  * @{
  */
- 
+
 #if SAM3U_SERIES
 
 /**
@@ -66,9 +54,9 @@ extern "C" {
  * \param p_adc Pointer to an ADC instance.
  * \param ul_mck Main clock of the device (in Hz).
  * \param ul_adc_clock Analog-to-Digital conversion clock (in Hz).
- * \param ul_startuptime ADC startup time value (value in us). 
+ * \param ul_startuptime ADC startup time value (value in us).
  * Please refer to the product datasheet for more details.
- * \param ul_offmode_startuptime ADC off mode startup time value (value in us). 
+ * \param ul_offmode_startuptime ADC off mode startup time value (value in us).
  * Please refer to the product datasheet for more details.
  *
  * \return 0 on success.
@@ -124,7 +112,7 @@ void adc12b_configure_trigger(Adc12b *p_adc, const enum adc_trigger_t trigger)
  * \brief Configure ADC power saving mode.
  *
  * \param p_adc Pointer to an ADC instance.
- * \param uc_sleep ADC_MR_SLEEP_NORMAL keeps the ADC Core and reference 
+ * \param uc_sleep ADC_MR_SLEEP_NORMAL keeps the ADC Core and reference
  * voltage circuitry ON between conversions.
  * ADC_MR_SLEEP_SLEEP keeps the ADC Core and reference voltage circuitry
  * OFF between conversions.
@@ -151,7 +139,7 @@ void adc12b_configure_timing(Adc12b *p_adc, const uint32_t ul_sh)
 /**
  * \brief Start ADC conversion.
  *
- * \note If one of the hardware event is selected as ADC trigger, 
+ * \note If one of the hardware event is selected as ADC trigger,
  * this function can NOT start ADC conversion.
  *
  * \param p_adc Pointer to an ADC instance.
@@ -376,7 +364,7 @@ uint32_t adc12b_get_status(const Adc12b *p_adc)
 /**
  * \brief Adapt performance versus power consumption.
  *
- * \note Please refer to ADC Characteristics in the product datasheet 
+ * \note Please refer to ADC Characteristics in the product datasheet
  * for more details.
  *
  * \param p_adc Pointer to an ADC instance.

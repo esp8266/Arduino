@@ -1,42 +1,30 @@
-/**
- * \file
+/* ----------------------------------------------------------------------------
+ *         SAM Software Package License
+ * ----------------------------------------------------------------------------
+ * Copyright (c) 2011-2012, Atmel Corporation
  *
- * \brief Analog-to-Digital Converter (ADC/ADC12B) driver for SAM.
- *
- * Copyright (c) 2011 - 2012 Atmel Corporation. All rights reserved.
- *
- * \asf_license_start
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * modification, are permitted provided that the following condition is met:
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the disclaimer below.
  *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
+ * Atmel's name may not be used to endorse or promote products derived from
+ * this software without specific prior written permission.
  *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an
- *    Atmel microcontroller product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * DISCLAIMER: THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- * \asf_license_stop
- *
+ * DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+ * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * ----------------------------------------------------------------------------
  */
 
 #include "../chip.h"
@@ -52,7 +40,7 @@ extern "C" {
 /**
  * \defgroup sam_drivers_adc_group Analog-to-digital Converter (ADC)
  *
- * Driver for the Analog-to-digital Converter. This driver provides access to the main 
+ * Driver for the Analog-to-digital Converter. This driver provides access to the main
  * features of the ADC controller.
  *
  * @{
@@ -65,7 +53,7 @@ extern "C" {
  * \param p_adc Pointer to an ADC instance.
  * \param ul_mck Main clock of the device (value in Hz).
  * \param ul_adc_clock Analog-to-Digital conversion clock (value in Hz).
- * \param uc_startup ADC start up time. Please refer to the product datasheet 
+ * \param uc_startup ADC start up time. Please refer to the product datasheet
  * for details.
  *
  * \return 0 on success.
@@ -99,11 +87,11 @@ uint32_t adc_init(Adc *p_adc, const uint32_t ul_mck,
  * \param p_adc Pointer to an ADC instance.
  * \param ul_mck Main clock of the device (value in Hz).
  * \param ul_adc_clock Analog-to-Digital conversion clock (in Hz).
- * \param ul_startuptime ADC startup time value (value in us). 
+ * \param ul_startuptime ADC startup time value (value in us).
  * Please refer to the product datasheet for details.
- * \param ul_offmode_startuptime  ADC off mode startup time value (in us). 
+ * \param ul_offmode_startuptime  ADC off mode startup time value (in us).
  * Please refer to the product datasheet for details.
- *   
+ *
  * \return 0 on success.
  */
 uint32_t adc_init(Adc *p_adc, const uint32_t ul_mck, const uint32_t ul_adc_clock,
@@ -148,7 +136,7 @@ void adc_set_resolution(Adc *p_adc,const enum adc_resolution_t resolution)
  *
  * \param p_adc Pointer to an ADC instance.
  * \param trigger Conversion trigger.
- * \param uc_freerun ADC_MR_FREERUN_ON enables freerun mode, 
+ * \param uc_freerun ADC_MR_FREERUN_ON enables freerun mode,
  * ADC_MR_FREERUN_OFF disables freerun mode.
  *
  */
@@ -175,11 +163,11 @@ void adc_configure_trigger(Adc *p_adc, const enum adc_trigger_t trigger)
  * \brief Configures ADC power saving mode.
  *
  * \param p_adc Pointer to an ADC instance.
- * \param uc_sleep ADC_MR_SLEEP_NORMAL keeps the ADC Core and reference voltage 
+ * \param uc_sleep ADC_MR_SLEEP_NORMAL keeps the ADC Core and reference voltage
  * circuitry ON between conversions.
- * ADC_MR_SLEEP_SLEEP keeps the ADC Core and reference voltage circuitry OFF 
+ * ADC_MR_SLEEP_SLEEP keeps the ADC Core and reference voltage circuitry OFF
  * between conversions.
- * \param uc_fwup ADC_MR_FWUP_OFF configures sleep mode as uc_sleep setting, 
+ * \param uc_fwup ADC_MR_FWUP_OFF configures sleep mode as uc_sleep setting,
  * ADC_MR_FWUP_ON keeps voltage reference ON and ADC Core OFF between conversions.
  */
 void adc_configure_power_save(Adc *p_adc, const uint8_t uc_sleep, const uint8_t uc_fwup)
@@ -192,9 +180,9 @@ void adc_configure_power_save(Adc *p_adc, const uint8_t uc_sleep, const uint8_t 
  * \brief Configure ADC power saving mode.
  *
  * \param p_adc Pointer to an ADC instance.
- * \param uc_sleep ADC_MR_SLEEP_NORMAL keeps the ADC Core and reference 
+ * \param uc_sleep ADC_MR_SLEEP_NORMAL keeps the ADC Core and reference
  * voltage circuitry ON between conversions.
- * ADC_MR_SLEEP_SLEEP keeps the ADC Core and reference voltage circuitry 
+ * ADC_MR_SLEEP_SLEEP keeps the ADC Core and reference voltage circuitry
  * OFF between conversions.
  * \param uc_offmode 0 for Standby Mode (if Sleep Bit = 1), 1 for Off Mode.
  */
@@ -290,7 +278,7 @@ void adc_enable_anch(Adc *p_adc)
 #if SAM3S_SERIES || SAM4S_SERIES || SAM3XA_SERIES
 /**
  * \brief Disable analog change.
- * 
+ *
  * \note DIFF0, GAIN0 and OFF0 are used for all channels.
  *
  * \param p_Adc Pointer to an ADC instance.
@@ -304,7 +292,7 @@ void adc_disable_anch(Adc *p_adc)
 /**
  * \brief Start analog-to-digital conversion.
  *
- * \note If one of the hardware event is selected as ADC trigger, 
+ * \note If one of the hardware event is selected as ADC trigger,
  * this function can NOT start analog to digital conversion.
  *
  * \param p_adc Pointer to an ADC instance.
@@ -422,7 +410,7 @@ uint32_t adc_get_latest_value(const Adc *p_adc)
 
 #if SAM3S_SERIES || SAM4S_SERIES || SAM3N_SERIES || SAM3XA_SERIES
 /**
- * \brief Enable TAG option so that the number of the last converted channel 
+ * \brief Enable TAG option so that the number of the last converted channel
  * can be indicated.
  *
  * \param p_adc Pointer to an ADC instance.
@@ -449,7 +437,7 @@ void adc_disable_tag(Adc *p_adc)
 /**
  * \brief Indicate the last converted channel.
  *
- * \note If TAG option is NOT enabled before, an incorrect channel 
+ * \note If TAG option is NOT enabled before, an incorrect channel
  * number is returned.
  *
  * \param p_adc Pointer to an ADC instance.
@@ -729,7 +717,7 @@ uint32_t adc_get_interrupt_mask(const Adc *p_adc)
 /**
  * \brief Adapt performance versus power consumption.
  *
- * \note Please refer to ADC Characteristics in the product datasheet 
+ * \note Please refer to ADC Characteristics in the product datasheet
  * for more details.
  *
  * \param p_adc Pointer to an ADC instance.
@@ -784,7 +772,7 @@ void adc_set_writeprotect(Adc *p_adc, const uint32_t ul_enable)
  *
  * \param p_adc Pointer to an ADC instance.
  *
- * \return 0 if the peripheral is not protected, or 16-bit write protect 
+ * \return 0 if the peripheral is not protected, or 16-bit write protect
  * violation Status.
  */
 uint32_t adc_get_writeprotect_status(const Adc *p_adc)
@@ -856,11 +844,11 @@ void adc_check(Adc *p_adc, const uint32_t ul_mck)
 	printf("ADC clock frequency = %d Hz\r\n", (int)ul_adcfreq);
 
 	if (ul_adcfreq < ADC_FREQ_MIN) {
-		printf("adc frequency too low (out of specification: %d Hz)\r\n", 
+		printf("adc frequency too low (out of specification: %d Hz)\r\n",
 			(int)ADC_FREQ_MIN);
 	}
 	if (ul_adcfreq > ADC_FREQ_MAX) {
-		printf("adc frequency too high (out of specification: %d Hz)\r\n", 
+		printf("adc frequency too high (out of specification: %d Hz)\r\n",
 			(int)ADC_FREQ_MAX);
 	}
 
@@ -883,8 +871,8 @@ void adc_check(Adc *p_adc, const uint32_t ul_mck)
 			/* Sleep 40ms */
 			if (ADC_STARTUP_NORM * ul_adcfreq / 1000000 >
 					calcul_startup(ul_startup)) {
-				printf("Startup time too small: %d, programmed: %d\r\n", 
-					(int)(ADC_STARTUP_NORM * ul_adcfreq / 1000000), 
+				printf("Startup time too small: %d, programmed: %d\r\n",
+					(int)(ADC_STARTUP_NORM * ul_adcfreq / 1000000),
 					(int)(calcul_startup(ul_startup)));
 			}
 		} else {
@@ -892,8 +880,8 @@ void adc_check(Adc *p_adc, const uint32_t ul_mck)
 				/* Fast Wake Up Sleep Mode: 12ms */
 				if (ADC_STARTUP_FAST * ul_adcfreq / 1000000 >
 						calcul_startup(ul_startup)) {
-					printf("Startup time too small: %d, programmed: %d\r\n", 
-						(int)(ADC_STARTUP_NORM * ul_adcfreq / 1000000), 
+					printf("Startup time too small: %d, programmed: %d\r\n",
+						(int)(ADC_STARTUP_NORM * ul_adcfreq / 1000000),
 						(int)(calcul_startup(ul_startup)));
 				}
 			}

@@ -1,42 +1,30 @@
-/**
- * \file
+/* ----------------------------------------------------------------------------
+ *         SAM Software Package License
+ * ----------------------------------------------------------------------------
+ * Copyright (c) 2011-2012, Atmel Corporation
  *
- * \brief Analog-to-Digital Converter (ADC/ADC12B) driver for SAM.
- *
- * Copyright (c) 2011 Atmel Corporation. All rights reserved.
- *
- * \asf_license_start
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * modification, are permitted provided that the following condition is met:
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the disclaimer below.
  *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
+ * Atmel's name may not be used to endorse or promote products derived from
+ * this software without specific prior written permission.
  *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an
- *    Atmel microcontroller product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * DISCLAIMER: THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- * \asf_license_stop
- *
+ * DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+ * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * ----------------------------------------------------------------------------
  */
 
 #ifndef ADC_H_INCLUDED
@@ -83,20 +71,20 @@ enum adc_resolution_t {
 /* Definitions for ADC trigger */
 enum adc_trigger_t {
 	ADC_TRIG_SW = ADC_MR_TRGEN_DIS,  /* Starting a conversion is only possible by software. */
-	ADC_TRIG_EXT = ((ADC_MR_TRGSEL_ADC_TRIG0 << ADC_MR_TRGSEL_Pos) & 
+	ADC_TRIG_EXT = ((ADC_MR_TRGSEL_ADC_TRIG0 << ADC_MR_TRGSEL_Pos) &
 									ADC_MR_TRGSEL_Msk) | ADC_MR_TRGEN,  /* External trigger */
-	ADC_TRIG_TIO_CH_0 = (ADC_MR_TRGSEL_ADC_TRIG1  & ADC_MR_TRGSEL_Msk) | 
+	ADC_TRIG_TIO_CH_0 = (ADC_MR_TRGSEL_ADC_TRIG1  & ADC_MR_TRGSEL_Msk) |
 											ADC_MR_TRGEN,  /* TIO Output of the Timer Counter Channel 0 */
-	ADC_TRIG_TIO_CH_1 = (ADC_MR_TRGSEL_ADC_TRIG2  & ADC_MR_TRGSEL_Msk) | 
+	ADC_TRIG_TIO_CH_1 = (ADC_MR_TRGSEL_ADC_TRIG2  & ADC_MR_TRGSEL_Msk) |
 											ADC_MR_TRGEN,  /* TIO Output of the Timer Counter Channel 1 */
-	ADC_TRIG_TIO_CH_2 = (ADC_MR_TRGSEL_ADC_TRIG3  & ADC_MR_TRGSEL_Msk) | 
+	ADC_TRIG_TIO_CH_2 = (ADC_MR_TRGSEL_ADC_TRIG3  & ADC_MR_TRGSEL_Msk) |
 											ADC_MR_TRGEN,  /* TIO Output of the Timer Counter Channel 2 */
 #if SAM3S_SERIES || SAM4S_SERIES || SAM3XA_SERIES || SAM3U_SERIES
 	ADC_TRIG_PWM_EVENT_LINE_0 = (ADC_MR_TRGSEL_ADC_TRIG4  & ADC_MR_TRGSEL_Msk) |
 															ADC_MR_TRGEN, /* PWM Event Line 0 */
-	ADC_TRIG_PWM_EVENT_LINE_1 = (ADC_MR_TRGSEL_ADC_TRIG5  & ADC_MR_TRGSEL_Msk) | 
+	ADC_TRIG_PWM_EVENT_LINE_1 = (ADC_MR_TRGSEL_ADC_TRIG5  & ADC_MR_TRGSEL_Msk) |
 															ADC_MR_TRGEN  /* PWM Event Line 1 */
-#endif    
+#endif
 } ;
 
 #if SAM3S_SERIES || SAM4S_SERIES || SAM3N_SERIES || SAM3XA_SERIES
@@ -138,7 +126,7 @@ enum adc_gainvalue_t{
 	ADC_GAINVALUE_1 = 1,
 	ADC_GAINVALUE_2 = 2,
 	ADC_GAINVALUE_3 = 3
-};    
+};
 /* Definitions for ADC analog settling time */
 #if SAM3S_SERIES || SAM4S_SERIES || SAM3XA_SERIES
 enum adc_settling_time_t{
@@ -146,13 +134,13 @@ enum adc_settling_time_t{
 	ADC_SETTLING_TIME_1 = ADC_MR_SETTLING_AST5,
 	ADC_SETTLING_TIME_2 = ADC_MR_SETTLING_AST9,
 	ADC_SETTLING_TIME_3 = ADC_MR_SETTLING_AST17
-};    
+};
 #endif
 
 #if SAM3S_SERIES || SAM4S_SERIES || SAM3N_SERIES || SAM3XA_SERIES
-uint32_t adc_init(Adc *p_adc, const uint32_t ul_mck, 
+uint32_t adc_init(Adc *p_adc, const uint32_t ul_mck,
                             const uint32_t ul_adc_clock, const uint8_t uc_startup);
-void adc_configure_trigger(Adc *p_adc, const enum adc_trigger_t trigger, 
+void adc_configure_trigger(Adc *p_adc, const enum adc_trigger_t trigger,
 				const uint8_t uc_freerun);
 void adc_configure_power_save(Adc *p_adc, const uint8_t uc_sleep, const uint8_t uc_fwup);
 void adc_configure_sequence(Adc *p_adc, const enum adc_channel_num_t ch_list[],
@@ -196,7 +184,7 @@ uint32_t adc_get_interrupt_mask(const Adc *p_adc);
 Pdc *adc_get_pdc_base(const Adc *p_adc);
 
 #if SAM3S_SERIES || SAM4S_SERIES || SAM3XA_SERIES
-void adc_configure_timing(Adc *p_adc, const uint8_t uc_tracking, 
+void adc_configure_timing(Adc *p_adc, const uint8_t uc_tracking,
                                          const enum adc_settling_time_t settling, const uint8_t uc_transfer);
 void adc_enable_anch( Adc *p_adc );
 void adc_disable_anch( Adc *p_adc );
@@ -204,12 +192,12 @@ void adc_enable_channel_differential_input(Adc *p_adc, const enum adc_channel_nu
 void adc_disable_channel_differential_input(Adc *p_adc, const enum adc_channel_num_t channel);
 void adc_enable_channel_input_offset(Adc *p_adc, const enum adc_channel_num_t channel);
 void adc_disable_channel_input_offset(Adc *p_adc, const enum adc_channel_num_t channel);
-void adc_set_channel_input_gain(Adc *p_adc, const enum adc_channel_num_t channel, 
+void adc_set_channel_input_gain(Adc *p_adc, const enum adc_channel_num_t channel,
                                                        const enum adc_gainvalue_t uc_gain);
 void adc_set_bias_current(Adc *p_adc, const uint8_t uc_ibctl);
 void adc_enable_ts(Adc *p_adc);
 void adc_disable_ts(Adc *p_adc);
-#elif SAM3N_SERIES 
+#elif SAM3N_SERIES
 void adc_configure_timing(Adc *p_adc, const uint8_t uc_tracking);
 #elif SAM3U_SERIES
 void adc_configure_timing(Adc *p_adc, const uint32_t ul_sh);
@@ -220,7 +208,7 @@ void adc_set_calibmode(Adc *p_adc);
 #endif
 
 #if SAM3U_SERIES
-uint32_t adc12b_init(Adc12b *p_adc, const uint32_t ul_mck, const uint32_t ul_adc_clock, 
+uint32_t adc12b_init(Adc12b *p_adc, const uint32_t ul_mck, const uint32_t ul_adc_clock,
                                    const uint32_t ul_startuptime, const uint32_t ul_offmode_startuptime);
 void adc12b_set_resolution(Adc12b *p_adc, const enum adc_resolution_t resolution);
 void adc12b_configure_trigger(Adc12b *p_adc, const enum adc_trigger_t trigger);
