@@ -193,6 +193,50 @@ void analogOutputInit(void) {
 void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 	uint32_t attr = g_APinDescription[ulPin].ulPinAttribute;
 
+	if ((attr & PIN_ATTR_ANALOG) == PIN_ATTR_ANALOG) {
+		EAnalogChannel channel = g_APinDescription[ulPin].ulADCChannelNumber;
+		if (channel == DAC0 || channel == DAC1) {
+			uint32_t chDACC = ((channel == DAC0) ? 0 : 1);
+			if ((dacc_get_channel_status(DACC_INTERFACE) & (1 << chDACC)) == 0) {
+				/* Enable clock for DACC_INTERFACE */
+				pmc_enable_periph_clk(DACC_INTERFACE_ID);
+
+				/* Reset DACC registers */
+				dacc_reset(DACC_INTERFACE);
+
+				/* Half word transfer mode */
+				dacc_set_transfer_mode(DACC_INTERFACE, 0);
+
+				/* Power save:
+				 * sleep mode  - 0 (disabled)
+				 * fast wakeup - 0 (disabled)
+				 */
+				dacc_set_power_save(DACC_INTERFACE, 0, 0);
+				/* Timing:
+				 * refresh        - 0x08 (1024*8 dacc clocks)
+				 * max speed mode -    0 (disabled)
+				 * startup time   - 0x10 (1024 dacc clocks)
+				 */
+				dacc_set_timing(DACC_INTERFACE, 0x08, 0, 0x10);
+
+				/* Disable TAG and select output channel chDACC */
+				dacc_set_channel_selection(DACC_INTERFACE, chDACC);
+
+				/* Enable output channel chDACC */
+				dacc_enable_channel(DACC_INTERFACE, chDACC);
+
+				/* Set up analog current */
+				dacc_set_analog_control(DACC_INTERFACE, DACC_ACR_IBCTLCH0(0x02) |
+											DACC_ACR_IBCTLCH1(0x02) |
+											DACC_ACR_IBCTLDACCORE(0x01));
+			}
+
+			// Write user value
+			dacc_write_conversion_data(DACC_INTERFACE, ulValue);
+			return;
+		}
+	}
+
 	if ((attr & PIN_ATTR_PWM) == PIN_ATTR_PWM) {
 		if (!PWMEnabled) {
 			// PWM Startup code
