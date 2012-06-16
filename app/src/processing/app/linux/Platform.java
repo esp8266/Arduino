@@ -53,6 +53,12 @@ public class Platform extends processing.app.Platform {
   }
 
 
+  public File getDefaultSketchbookFolder() throws Exception {
+    File home = new File(System.getProperty("user.home"));
+    return new File(home, "Arduino");
+  }
+
+
   public void openURL(String url) throws Exception {
     if (openFolderAvailable()) {
       String launcher = Preferences.get("launcher");
