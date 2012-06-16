@@ -197,10 +197,17 @@
 		GET_PARAM_##TYPE(PARAM, DATA)		\
 		NEXT_PARAM(PARAM)
 
+#ifdef _SPI_STATS_
 #define STATSPI_TIMEOUT_ERROR()		\
 		statSpi.timeoutIntErr++;	\
 		statSpi.rxErr++;			\
 		statSpi.lastError = err;	\
+		statSpi.status = spi_getStatus(ARD_SPI);
+
+#define STATSPI_DISALIGN_ERROR()		\
+		statSpi.frameDisalign++;	\
+		statSpi.rxErr++;			\
+		statSpi.lastError = SPI_ALIGN_ERROR;	\
 		statSpi.status = spi_getStatus(ARD_SPI);
 
 #define STATSPI_TX_TIMEOUT_ERROR()	\
@@ -208,6 +215,11 @@
 		statSpi.txErr++;			\
 		statSpi.lastError = SPI_ERROR_TIMEOUT;	\
 		statSpi.status = spi_getStatus(ARD_SPI);
+#else
+#define STATSPI_TIMEOUT_ERROR()
+#define STATSPI_TX_TIMEOUT_ERROR()
+#define STATSPI_DISALIGN_ERROR()
+#endif
 
 #define DUMP_TCP_STATE(TTCP) \
 		INFO_TCP("ttcp:%p tpcb:%p state:%d lpcb:%p state:%d\n", \

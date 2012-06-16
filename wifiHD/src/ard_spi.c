@@ -110,6 +110,7 @@ typedef struct sStatSpi
 	int txErr;
 	int	rxErr;
 	int wrongFrame;
+	int frameDisalign;
 	int lastCmd;
 	int lastError;
 	unsigned long status;
@@ -127,6 +128,7 @@ void initStatSpi()
 	statSpi.timeoutErr= 0;
 	statSpi.timeoutIntErr= 0;
 	statSpi.wrongFrame = 0;
+	statSpi.frameDisalign = 0;
 }
 
 void printStatSpi()
@@ -139,6 +141,7 @@ void printStatSpi()
 	printk("spiTmoErr\t: 0x%x\n", statSpi.timeoutErr);
 	printk("spiTmoIntErr\t: 0x%x\n", statSpi.timeoutIntErr);
 	printk("wrongFrame\t: 0x%x\n", statSpi.wrongFrame);
+	printk("disalFrame\t: 0x%x\n", statSpi.frameDisalign);
 }
 
 cmd_state_t
@@ -259,30 +262,6 @@ void showTTCPstatus()
 	tcp_debug_print_pcbs();
 }
 
-
-inline spi_status_t myspi_read(volatile avr32_spi_t *spi, unsigned short *data)
-{
-	if (spi->sr & AVR32_SPI_SR_RDRF_MASK)
-		*data = spi->rdr >> AVR32_SPI_RDR_RD_OFFSET;
-  return SPI_OK;
-}
-
-inline spi_status_t myspi_write(volatile avr32_spi_t *spi, unsigned short data)
-{
-  unsigned int timeout = SPI_TIMEOUT;
-
-  while (!(spi->sr & AVR32_SPI_SR_TDRE_MASK)) {
-    if (!timeout--) {
-      return SPI_ERROR_TIMEOUT;
-    }
-  }
-
-  spi->tdr = data << AVR32_SPI_TDR_TD_OFFSET;
-
-  return SPI_OK;
-}
-
-
 int write_stream(volatile avr32_spi_t *spi, const char *stream, uint16_t len)
 {
 	uint16_t _len = 0;
@@ -307,44 +286,19 @@ int write_stream(volatile avr32_spi_t *spi, const char *stream, uint16_t len)
     		else
     		{
     			stream++;
-    			unsigned long data = ARD_SPI->rdr;
-    			data = data;
+    			spi_read(spi,&dummy);
     		}
     		//SIGN1_UP();
-
-//    		if (myspi_read(spi, &dummy) == SPI_ERROR_TIMEOUT)
-//    		{
-//    			statSpi.timeoutErr++;
-//    			statSpi.rxErr++;
-//    			statSpi.lastError = SPI_ERROR_TIMEOUT;
-//    			statSpi.status = spi_getStatus(spi);
-//    			return SPI_ERROR_TIMEOUT;
-//    		}
 	}while ((!streamExit)&&(_len++ <= len));
- 		end_write=true;
 
-     	//while (spi_readRegisterFullCheck(spi));
- 		spi_read(spi,&dummy);
-     	if ((ARD_SPI->sr & AVR32_SPI_SR_RDRF_MASK) != 0)
-     	{
-     		int a = 0;
-     		if ((ARD_SPI->sr & AVR32_SPI_SR_RDRF_MASK) != 0)
-     			a = rand();
-     		a=a+5;
-     	}
-
-	if (!streamExit)
-	{
+     if (!streamExit)
+     {
 #ifdef _SPI_STATS_
-		statSpi.wrongFrame++;
-		statSpi.lastError = SPI_ERROR_ARGUMENT;
+    	 statSpi.wrongFrame++;
+    	 statSpi.lastError = SPI_ERROR_ARGUMENT;
 #endif
-		return SPI_ERROR_ARGUMENT;
-	}
-	if ((ARD_SPI->sr & AVR32_SPI_SR_RDRF_MASK) != 0)
-	     	{
-		//SIGN1_DN();
-	     	}
+    	 return SPI_ERROR_ARGUMENT;
+     }
 	return SPI_OK;
 }
 
@@ -357,21 +311,23 @@ void sendError()
 		while(!spi_writeRegisterEmptyCheck(&AVR32_SPI));
 	}
 	BUSY_FOR_SPI();
-	WARN("Send SPI error!");
+	WARN("Send SPI error!\n");
 }
 
-#define ENABLE_SPI_INT() do {											\
+#define ENABLE_SPI_INT() do {										\
+	volatile avr32_spi_t *spi = ARD_SPI;							\
     Bool global_interrupt_enabled = Is_global_interrupt_enabled();	\
     if (global_interrupt_enabled) Disable_global_interrupt();		\
-    ARD_SPI->IER.rdrf = 1;											\
-    ARD_SPI->IER.rxbuff = 1;	ARD_SPI->IER.endrx = 1;										\
+    spi->IER.rdrf = 1;												\
+    spi->IER.rxbuff = 1;	spi->IER.endrx = 1;						\
     if (global_interrupt_enabled) Enable_global_interrupt();		\
 }while(0);
 
 #define DISABLE_SPI_INT() do {										\
+	volatile avr32_spi_t *spi = ARD_SPI;							\
     Bool global_interrupt_enabled = Is_global_interrupt_enabled();	\
     if (global_interrupt_enabled) Disable_global_interrupt();		\
-    ARD_SPI->IDR.rdrf = 1; ARD_SPI->IDR.rxbuff = 1;	ARD_SPI->IDR.endrx = 1;										\
+    spi->IDR.rdrf = 1; spi->IDR.rxbuff = 1;	spi->IDR.endrx = 1;										\
     if (global_interrupt_enabled) Enable_global_interrupt();		\
 }while(0);
 
@@ -1494,6 +1450,8 @@ bool checkMsgFormat(uint8_t* _recv, int len, int* offset)
 		if ((enableDebug & INFO_WARN_FLAG)&&(len < 20))	//TODO stamp only short messages wrong
 			dump((char*)_recv, len);
 
+		STATSPI_DISALIGN_ERROR();
+
 		if (recv == NULL)
 			return false;
 	}
@@ -1552,15 +1510,6 @@ void spi_poll(struct netif* netif) {
 			receivedChars = 0;
 			count = 0;
 			state = SPI_CMD_IDLE;
-	     	if ((ARD_SPI->sr & AVR32_SPI_SR_RDRF_MASK) != 0)
-	     	{
-	     		unsigned long data = ARD_SPI->rdr;
-	     		data = data;
-	     		if ((ARD_SPI->sr & AVR32_SPI_SR_RDRF_MASK) != 0)
-	     		{
-	     			//SIGN1_DN();
-	     		}
-	     	}
 		}
 		else
 		{
@@ -1577,9 +1526,18 @@ void spi_poll(struct netif* netif) {
 		//Available for receiving a new spi data
 	    AVAIL_FOR_SPI();
 	}
+
+#ifdef _SPI_STATS_
+    if (statSpi.lastError != 0)
+    {
+    	WARN("[E(0x%x) spiStatus:0x%x]\n", statSpi.lastError, statSpi.status);
+    	statSpi.lastError = 0;
+    }
+#endif
 }
 
-inline int spi_slaveReceiveInt(volatile avr32_spi_t *spi, bool startRecvd)
+// ****TEMPORARY
+/*inline*/ int spi_slaveReceiveInt(volatile avr32_spi_t *spi, bool startRecvd)
 {
   receivedChars=0;
   int index = 0;
@@ -1595,20 +1553,15 @@ inline int spi_slaveReceiveInt(volatile avr32_spi_t *spi, bool startRecvd)
   }
   do {
 	err = SPI_OK;
-	//SIGN1_DN();
-	//spi->tdr = DUMMY_DATA << AVR32_SPI_TDR_TD_OFFSET;
+
     while ((spi->sr & (AVR32_SPI_SR_RDRF_MASK | AVR32_SPI_SR_TXEMPTY_MASK)) !=
            (AVR32_SPI_SR_RDRF_MASK | AVR32_SPI_SR_TXEMPTY_MASK)) {
-      if (!timeout--) {
+      if ((timeout--)==0) {
     	  err=SPI_ERROR_TIMEOUT;
     	  break;
       }
     }
     _receiveBuffer[index] = (spi->rdr >> AVR32_SPI_RDR_RD_OFFSET) & 0x00ff;
-    if (_receiveBuffer[index] == START_CMD){
-    	TOGGLE_SIG0();
-    //SIGN1_UP();
-    }
     if (err == SPI_OK) {
         ++index;
         ++receivedChars;
@@ -1629,10 +1582,6 @@ inline int spi_slaveReceiveInt(volatile avr32_spi_t *spi, bool startRecvd)
   return err;
 }
 
-
-uint32_t data = 0;
-uint32_t status_register = 0;
-
 #if defined (__GNUC__)
 __attribute__((__interrupt__))
 #elif defined (__ICCAVR32__)
@@ -1640,40 +1589,28 @@ __interrupt
 #endif
 static void spi_int_handler(void)
 {
-	//SIGN2_DN();
+	volatile avr32_spi_t *spi = ARD_SPI;
+	//DEB_PIN_DN();
 	//eic_clear_interrupt_line(&AVR32_EIC, AVR32_SPI0_IRQ);
 	AVAIL_FOR_SPI();
 	DISABLE_SPI_INT();
 
-	//TODO verify why after the reply write the RDRF is set
 	unsigned short dummy = 0;
-	if ((end_write)&&((ARD_SPI->sr & AVR32_SPI_SR_RDRF_MASK) != 0)) {
-		end_write=false;
-		//SIGN1_UP();
-		spi_read(ARD_SPI, &dummy);
-	}
 
-	if (((ARD_SPI->sr & AVR32_SPI_SR_RDRF_MASK) != 0)||(dummy==START_CMD))
+	if (((spi->sr & AVR32_SPI_SR_RDRF_MASK) != 0)||(dummy==START_CMD))
 	{
 		int err = spi_slaveReceiveInt(ARD_SPI, dummy==START_CMD);
-        if (err != SPI_OK)
+        if (err == SPI_OK)
         {
-#ifdef _SPI_STATS_
-        	//TODO verify why at the end of cmd cycle RDF bit is high without any data recv.
-        	if (statSpi.lastError != SPI_ERROR_TIMEOUT)
-        		INFO_SPI("[E(0x%x):%d spiStatus:%d]\n", statSpi.lastError, err, statSpi.status);
-#endif
-        }else{
         	BUSY_FOR_SPI();
         	startReply=true;
         	//maintain disable interrupt to send the reply command
-        	//SIGN2_UP();
+        	//DEB_PIN_UP();
         	return;
         }
-
    	}
 	ENABLE_SPI_INT();
-	//SIGN2_UP();
+	//DEB_PIN_UP();
 }
 
 inline spi_status_t spi_read8(volatile avr32_spi_t *spi, unsigned char *data)

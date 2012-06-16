@@ -89,8 +89,14 @@ bool scanNetCompleted = false;
 static bool initSpiComplete = false;
 
 // variable used as enable flag for debug prints
+#ifdef _DEBUG_
+uint16_t enableDebug = DEFAULT_INFO_FLAG | INFO_WARN_FLAG;// | INFO_SPI_FLAG;
+uint16_t verboseDebug = 0;
+#else
 uint16_t enableDebug = DEFAULT_INFO_FLAG;
 uint16_t verboseDebug = 0;
+#endif
+
 
 /**
  *
@@ -294,7 +300,7 @@ void initShell()
         console_add_cmd("wpass", cmd_setpass, NULL);
         console_add_cmd("dpass", cmd_delpass, NULL);
 #endif
-#ifdef STAT_SPI
+#ifdef _SPI_STATS_
         console_add_cmd("spiStat", cmd_statSpi, NULL);
         console_add_cmd("resetSpiStat", cmd_resetStatSpi, NULL);
 #endif

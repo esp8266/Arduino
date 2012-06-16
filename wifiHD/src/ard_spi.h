@@ -37,9 +37,9 @@ typedef enum {
 	CMD_IMM_SET_FLAG = 0x04,
 }cmd_flags;
 
-#define TIMEOUT_SPI  	200
-//#define TIMEOUT_SENT_REPLY 1000
-#define DUMMY_DATA	0xFF
+#define TIMEOUT_SPI  		200
+#define SPI_ALIGN_ERROR		0xF0
+#define DUMMY_DATA			0xFF
 
 typedef int (*cmd_spi_cb_t)(int numParam, char* buf, void* ctx);
 typedef cmd_spi_state_t (*cmd_spi_rcb_t)(char* recv, char* reply, void* ctx, uint16_t* _count);
