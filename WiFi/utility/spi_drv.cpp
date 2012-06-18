@@ -11,7 +11,7 @@ extern "C" {
 #define DATAIN  	12 // MISO
 #define SPICLOCK  	13 // sck
 #define SLAVESELECT 10 // ss
-#define SLAVEREADY 	3  // handshake pin
+#define SLAVEREADY 	7  // handshake pin
 #define WIFILED 	9  // led on wifi shield
 
 #define DELAY_100NS do { asm volatile("nop"); }while(0);
