@@ -205,7 +205,7 @@ void setMapSock(uint8_t sock, void* _ttcp)
 {
 	if (sock < MAX_SOCK_NUM)
 		mapSockTCP[sock]=_ttcp;
-	printk("Map [%d, %p]\n", sock, _ttcp);
+	INFO_TCP("Map [%d, %p]\n", sock, _ttcp);
 }
 
 void clearMapSockTcp(uint8_t sock)
