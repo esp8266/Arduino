@@ -39,6 +39,7 @@ typedef enum {
 
 #define TIMEOUT_SPI  		200
 #define SPI_ALIGN_ERROR		0xF0
+#define SPI_OVERRIDE_ERROR	0xF1
 #define DUMMY_DATA			0xFF
 
 typedef int (*cmd_spi_cb_t)(int numParam, char* buf, void* ctx);

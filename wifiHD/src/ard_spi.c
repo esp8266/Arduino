@@ -80,6 +80,7 @@ extern bool scanNetCompleted;
 
 static char buf[CMD_MAX_LEN];
 static char reply[REPLY_MAX_LEN];
+static uint16_t cmdCorr = 0;
 static uint16_t count = 0;
 static uint16_t replyCount = 0;
 static cmd_spi_state_t state = SPI_CMD_IDLE;
@@ -111,6 +112,7 @@ typedef struct sStatSpi
 	int	rxErr;
 	int wrongFrame;
 	int frameDisalign;
+	int overrideFrame;
 	int lastCmd;
 	int lastError;
 	unsigned long status;
@@ -129,6 +131,7 @@ void initStatSpi()
 	statSpi.timeoutIntErr= 0;
 	statSpi.wrongFrame = 0;
 	statSpi.frameDisalign = 0;
+	statSpi.overrideFrame = 0;
 }
 
 void printStatSpi()
@@ -142,6 +145,7 @@ void printStatSpi()
 	printk("spiTmoIntErr\t: 0x%x\n", statSpi.timeoutIntErr);
 	printk("wrongFrame\t: 0x%x\n", statSpi.wrongFrame);
 	printk("disalFrame\t: 0x%x\n", statSpi.frameDisalign);
+	printk("overrideFrame\t: 0x%x\n", statSpi.overrideFrame);
 }
 
 cmd_state_t
@@ -286,10 +290,11 @@ int write_stream(volatile avr32_spi_t *spi, const char *stream, uint16_t len)
     		else
     		{
     			stream++;
+    			_len++;
     			spi_read(spi,&dummy);
     		}
     		//SIGN1_UP();
-	}while ((!streamExit)&&(_len++ <= len));
+	}while ((!streamExit)&&(_len <= len));
 
      if (!streamExit)
      {
@@ -1113,7 +1118,6 @@ cmd_spi_state_t get_client_state_tcp_cmd_cb(char* recv, char* reply, void* ctx, 
     return SPI_CMD_DONE;
 }
 
-
 cmd_spi_state_t avail_data_tcp_cmd_cb(char* recv, char* reply, void* ctx, uint16_t* count) {
 
 	CHECK_ARD_NETIF(recv, reply, count);
@@ -1143,28 +1147,6 @@ cmd_spi_state_t test_cmd_cb(char* recv, char* reply, void* ctx, uint16_t* count)
     return SPI_CMD_DONE;
 }
 
-
-
-/*
-cmd_spi_state_t ack_data_sent_reply_cb(char* recv, char* reply, void* ctx, uint16_t* count) {
-
-	CHECK_ARD_NETIF(recv, reply, count);
-
-	CREATE_HEADER_REPLY(reply, recv, PARAM_NUMS_1);
-	uint8_t dataSent = 0;
-    if ((recv[3]==1)&&(recv[4]>=0)&&(recv[4]<MAX_SOCK_NUM))
-    {
-    	int timeout = 0;
-    	do {
-    		dataSent = isDataSent(mapSockTCP[(uint8_t)recv[4]]);
-    	}while ((dataSent == 0)&&(timeout++ < TIMEOUT_SENT_REPLY));
-    }
-	PUT_DATA_BYTE(dataSent, reply, 3);
-	END_HEADER_REPLY(reply, 5, *count);
-    return SPI_CMD_DONE;
-}
-*/
-
 cmd_spi_state_t data_sent_tcp_cmd_cb(char* recv, char* reply, void* ctx, uint16_t* count) {
 
 	CHECK_ARD_NETIF(recv, reply, count);
@@ -1180,7 +1162,6 @@ cmd_spi_state_t data_sent_tcp_cmd_cb(char* recv, char* reply, void* ctx, uint16_
 	SIGN2_UP();
     return SPI_CMD_DONE;
 }
-
 
 cmd_spi_state_t get_data_tcp_cmd_cb(char* recv, char* reply, void* ctx, uint16_t* count) {
 
@@ -1249,6 +1230,29 @@ cmd_spi_state_t get_firmware_version_cmd_cb(char* recv, char* reply, void* ctx, 
     return SPI_CMD_DONE;
 }
 
+cmd_spi_state_t get_test_cmd_cb(char* recv, char* reply, void* ctx, uint16_t* count) {
+
+	uint8_t buffer[255] = {0};
+
+    CHECK_ARD_NETIF(recv, reply, count);
+
+    CREATE_HEADER_REPLY(reply, recv, 1);
+    uint8_t len = 0;
+    if ((recv[3]==1)&&(recv[4]>=0)&&(recv[4]<0xFF))
+    {
+    	len = recv[4];
+    	int i= 0;
+    	for (; i<len; ++i) buffer[i]=i;
+    	PUT_BUFDATA_BYTE(buffer, len, reply, 3);
+    }else{
+    	len = strlen(fwVersion);
+    	PUT_BUFDATA_BYTE(fwVersion, len, reply, 3);
+    }
+    END_HEADER_REPLY(reply, 3+len+1, *count);
+
+    return SPI_CMD_DONE;
+}
+
 int sendReply(int cmdIdx, char* recv, char* reply, void* resultCmd)
 {
 	uint16_t _count = 0;
@@ -1286,14 +1290,14 @@ unsigned char* getStartCmdSeq(unsigned char* _recv, int len, int *offset)
 			if (i!=0)
 			{
 				DEB_PIN_DN();
-				WARN("Disall. %d/%d cmd:%d\n", i, len,_recv[i+1]);
+				WARN("%d] Disall. %d/%d cmd:%d\n", cmdCorr, i, len,_recv[i+1]);
 			}
 			*offset = i;
 			return &_recv[i];
 		}
 	}
 	DEB_PIN_DN();
-	WARN("Disall. %d\n", i);
+	WARN("%d] Disall. %d\n", cmdCorr, i);
 
 	return NULL;
 }
@@ -1406,6 +1410,7 @@ void init_spi_cmds() {
 	spi_add_cmd(GET_DATABUF_TCP_CMD, ack_cmd_cb, get_databuf_tcp_cmd_cb, NULL, CMD_GET_FLAG);
 	spi_add_cmd(GET_CLIENT_STATE_TCP_CMD, ack_cmd_cb, get_client_state_tcp_cmd_cb, NULL, CMD_GET_FLAG);
 	spi_add_cmd(GET_FW_VERSION_CMD, ack_cmd_cb, get_firmware_version_cmd_cb, NULL, CMD_GET_FLAG);
+	spi_add_cmd(GET_TEST_CMD, ack_cmd_cb, get_test_cmd_cb, NULL, CMD_GET_FLAG);
 }
 
 
@@ -1473,7 +1478,7 @@ bool checkMsgFormat(uint8_t* _recv, int len, int* offset)
 		{
 			return true;
 		}else{
-			WARN("Not found end cmd: 0x%x\n", *p);
+			WARN("%d] Not found end cmd: 0x%x\n", cmdCorr, *p);
 		}
 	}
 	return false;
@@ -1492,6 +1497,7 @@ void spi_poll(struct netif* netif) {
 	{
 		startReply = false;
 		int offset = 0;
+		DISABLE_SPI_INT();
 		if (checkMsgFormat(_receiveBuffer, receivedChars, &offset))
 		{
 			state = SPI_CMD_INPROGRESS;
@@ -1500,7 +1506,9 @@ void spi_poll(struct netif* netif) {
 				count = CMD_MAX_LEN;
 			memcpy(buf, &_receiveBuffer[offset], count);
 
-			DISABLE_SPI_INT();
+			//mark as buffer used
+			_receiveBuffer[0] = 0;
+
 			int err = call_reply_cb(buf, &reply[0]);
 			if (err != REPLY_NO_ERR)
 			{
@@ -1514,11 +1522,13 @@ void spi_poll(struct netif* netif) {
 		else
 		{
 			sendError();
-			WARN("Check format msg failed!\n");
+			WARN("%d] Check format msg failed!\n", cmdCorr);
 			if (enableDebug & INFO_WARN_FLAG)
 				dump((char*)_receiveBuffer, receivedChars);
 			state = SPI_CMD_IDLE;
 			count=0;
+			//mark as buffer used
+			_receiveBuffer[0] = 0;
 		}
 		CLEAR_SPI_INT();
 		//Enable Spi int to receive a new command
@@ -1530,56 +1540,53 @@ void spi_poll(struct netif* netif) {
 #ifdef _SPI_STATS_
     if (statSpi.lastError != 0)
     {
-    	WARN("[E(0x%x) spiStatus:0x%x]\n", statSpi.lastError, statSpi.status);
+    	WARN("%d] Errot=0x%x spiStatus:0x%x\n", cmdCorr, statSpi.lastError, statSpi.status);
     	statSpi.lastError = 0;
     }
 #endif
 }
 
-// ****TEMPORARY
-/*inline*/ int spi_slaveReceiveInt(volatile avr32_spi_t *spi, bool startRecvd)
+inline int spi_slaveReceiveInt(volatile avr32_spi_t *spi)
 {
-  receivedChars=0;
-  int index = 0;
-  int err = SPI_OK;
-  state = SPI_CMD_INPUT;
-  unsigned int timeout = SPI_TIMEOUT;
-  if (startRecvd)
-  {
-	  TOGGLE_SIG0();
-	  _receiveBuffer[index]=START_CMD;
-	  ++receivedChars;
-	  ++index;
-  }
-  do {
-	err = SPI_OK;
+	receivedChars=0;
+	int index = 0;
+	int err = SPI_OK;
+	state = SPI_CMD_INPUT;
 
-    while ((spi->sr & (AVR32_SPI_SR_RDRF_MASK | AVR32_SPI_SR_TXEMPTY_MASK)) !=
-           (AVR32_SPI_SR_RDRF_MASK | AVR32_SPI_SR_TXEMPTY_MASK)) {
-      if ((timeout--)==0) {
-    	  err=SPI_ERROR_TIMEOUT;
-    	  break;
-      }
-    }
-    _receiveBuffer[index] = (spi->rdr >> AVR32_SPI_RDR_RD_OFFSET) & 0x00ff;
-    if (err == SPI_OK) {
-        ++index;
-        ++receivedChars;
-    }else{
+	if (_receiveBuffer[0] != 0)
+	{
+		STATSPI_OVERRIDE_ERROR();
+	}
+
+	do {
+		unsigned int timeout = SPI_TIMEOUT;
+		err = SPI_OK;
+
+		while ((spi->sr & (AVR32_SPI_SR_RDRF_MASK | AVR32_SPI_SR_TXEMPTY_MASK)) !=
+				(AVR32_SPI_SR_RDRF_MASK | AVR32_SPI_SR_TXEMPTY_MASK)) {
+			if ((timeout--)==0) {
+				err=SPI_ERROR_TIMEOUT;
+				break;
+			}
+		}
+		_receiveBuffer[index] = (spi->rdr >> AVR32_SPI_RDR_RD_OFFSET) & 0x00ff;
+		if (err == SPI_OK) {
+			++index;
+			++receivedChars;
+		}else{
 #ifdef _SPI_STATS_
-    	STATSPI_TIMEOUT_ERROR();
+			STATSPI_TIMEOUT_ERROR();
 #endif
-    	break;
-    }
+			break;
+		}
 
-    /* break on buffer overflow */
-    if (receivedChars >= _BUFFERSIZE) {
-		err = SPI_ERROR_OVERRUN_AND_MODE_FAULT;
-      break;
-    }
-
-  } while (_receiveBuffer[index - 1] != END_CMD);
-  return err;
+		/* break on buffer overflow */
+		if (receivedChars >= _BUFFERSIZE) {
+			err = SPI_ERROR_OVERRUN_AND_MODE_FAULT;
+			break;
+		}
+	} while (_receiveBuffer[index - 1] != END_CMD);
+	return err;
 }
 
 #if defined (__GNUC__)
@@ -1591,19 +1598,17 @@ static void spi_int_handler(void)
 {
 	volatile avr32_spi_t *spi = ARD_SPI;
 	//DEB_PIN_DN();
-	//eic_clear_interrupt_line(&AVR32_EIC, AVR32_SPI0_IRQ);
-	AVAIL_FOR_SPI();
+	//AVAIL_FOR_SPI();
 	DISABLE_SPI_INT();
 
-	unsigned short dummy = 0;
-
-	if (((spi->sr & AVR32_SPI_SR_RDRF_MASK) != 0)||(dummy==START_CMD))
+	if ((spi->sr & AVR32_SPI_SR_RDRF_MASK) != 0)
 	{
-		int err = spi_slaveReceiveInt(ARD_SPI, dummy==START_CMD);
+		int err = spi_slaveReceiveInt(ARD_SPI);
         if (err == SPI_OK)
         {
         	BUSY_FOR_SPI();
         	startReply=true;
+        	++cmdCorr;
         	//maintain disable interrupt to send the reply command
         	//DEB_PIN_UP();
         	return;

@@ -210,6 +210,12 @@
 		statSpi.lastError = SPI_ALIGN_ERROR;	\
 		statSpi.status = spi_getStatus(ARD_SPI);
 
+#define STATSPI_OVERRIDE_ERROR()		\
+		statSpi.overrideFrame++;	\
+		statSpi.rxErr++;			\
+		statSpi.lastError = SPI_OVERRIDE_ERROR;	\
+		statSpi.status = spi_getStatus(ARD_SPI);
+
 #define STATSPI_TX_TIMEOUT_ERROR()	\
 		statSpi.timeoutErr++;		\
 		statSpi.txErr++;			\
