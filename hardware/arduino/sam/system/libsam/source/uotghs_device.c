@@ -32,8 +32,8 @@
 
 #if SAM3XA_SERIES
 
-//#define TRACE_UOTGHS(x)	x
-#define TRACE_UOTGHS(x)
+#define TRACE_UOTGHS_DEVICE(x)	x
+//#define TRACE_UOTGHS_DEVICE(x)
 
 extern void (*gpf_isr)(void);
 
@@ -83,8 +83,9 @@ uint32_t UDD_Init(void)
 	//while (!Is_otg_clock_usable())
 	//	;
 
+	// Enable High Speed
 	udd_low_speed_disable();
-	udd_high_speed_disable();
+	udd_high_speed_enable();
 
 	//otg_ack_vbus_transition();
 	// Force Vbus interrupt in case of Vbus always with a high level
@@ -102,7 +103,7 @@ void UDD_Attach(void)
 {
 	irqflags_t flags = cpu_irq_save();
 
-	TRACE_UOTGHS(printf("=> UDD_Attach\r\n");)
+	TRACE_UOTGHS_DEVICE(printf("=> UDD_Attach\r\n");)
 
 	otg_unfreeze_clock();
 
@@ -121,7 +122,7 @@ void UDD_Attach(void)
 
 void UDD_Detach(void)
 {
-	TRACE_UOTGHS(printf("=> UDD_Detach\r\n");)
+	TRACE_UOTGHS_DEVICE(printf("=> UDD_Detach\r\n");)
 	UOTGHS->UOTGHS_DEVCTRL |= UOTGHS_DEVCTRL_DETACH;
 }
 
@@ -129,7 +130,7 @@ void UDD_InitEP( uint32_t ul_ep_nb, uint32_t ul_ep_cfg )
 {
 	ul_ep_nb = ul_ep_nb & 0xF; // EP range is 0..9, hence mask is 0xF.
 
-	TRACE_UOTGHS(printf("=> UDD_InitEP : init EP %d\r\n", ul_ep_nb);)
+	TRACE_UOTGHS_DEVICE(printf("=> UDD_InitEP : init EP %lu\r\n", ul_ep_nb);)
 
 	// Configure EP
 	UOTGHS->UOTGHS_DEVEPTCFG[ul_ep_nb] = ul_ep_cfg;
@@ -137,7 +138,7 @@ void UDD_InitEP( uint32_t ul_ep_nb, uint32_t ul_ep_cfg )
 	udd_enable_endpoint(ul_ep_nb);
 
 	if (!Is_udd_endpoint_configured(ul_ep_nb)) {
-		TRACE_UOTGHS(printf("=> UDD_InitEP : ERROR FAILED TO INIT EP %d\r\n", ul_ep_nb);)
+		TRACE_UOTGHS_DEVICE(printf("=> UDD_InitEP : ERROR FAILED TO INIT EP %lu\r\n", ul_ep_nb);)
 	}
 }
 
@@ -154,7 +155,7 @@ void UDD_InitEndpoints(const uint32_t* eps_table, const uint32_t ul_eps_table_si
 		udd_enable_endpoint(ul_ep_nb);
 
 		if (!Is_udd_endpoint_configured(ul_ep_nb)) {
-			TRACE_UOTGHS(printf("=> UDD_InitEP : ERROR FAILED TO INIT EP %d\r\n", ul_ep_nb);)
+			TRACE_UOTGHS_DEVICE(printf("=> UDD_InitEP : ERROR FAILED TO INIT EP %lu\r\n", ul_ep_nb);)
 		}
 	}
 }
@@ -175,7 +176,7 @@ void UDD_WaitOUT(void)
 // Send packet.
 void UDD_ClearIN(void)
 {
-	TRACE_UOTGHS(printf("=> UDD_ClearIN: sent %d bytes\r\n", ul_send_fifo_ptr[EP0]);)
+	TRACE_UOTGHS_DEVICE(printf("=> UDD_ClearIN: sent %lu bytes\r\n", ul_send_fifo_ptr[EP0]);)
 
 	UOTGHS->UOTGHS_DEVEPTICR[EP0] = UOTGHS_DEVEPTICR_TXINIC;
 	ul_send_fifo_ptr[EP0] = 0;
@@ -212,7 +213,7 @@ uint32_t UDD_Send(uint32_t ep, const void* data, uint32_t len)
 	uint8_t *ptr_dest = (uint8_t *) &udd_get_endpoint_fifo_access8(ep);
 	uint32_t i;
 
-	TRACE_UOTGHS(printf("=> UDD_Send (1): ep=%d ul_send_fifo_ptr=%d len=%d\r\n", ep, ul_send_fifo_ptr[ep], len);)
+	TRACE_UOTGHS_DEVICE(printf("=> UDD_Send (1): ep=%lu ul_send_fifo_ptr=%lu len=%lu\r\n", ep, ul_send_fifo_ptr[ep], len);)
 
 	if (ep == EP0)
 	{
@@ -233,7 +234,7 @@ uint32_t UDD_Send(uint32_t ep, const void* data, uint32_t len)
 
 	if (ep == EP0)
 	{
-		TRACE_UOTGHS(printf("=> UDD_Send (2): ep=%d ptr_dest=%d maxlen=%d\r\n", ep, ul_send_fifo_ptr[ep], EP0_SIZE);)
+		TRACE_UOTGHS_DEVICE(printf("=> UDD_Send (2): ep=%lu ptr_dest=%lu maxlen=%d\r\n", ep, ul_send_fifo_ptr[ep], EP0_SIZE);)
 		if (ul_send_fifo_ptr[ep] == EP0_SIZE)
 		{
 			UDD_ClearIN();	// Fifo is full, release this packet
@@ -256,7 +257,7 @@ void UDD_Send8(uint32_t ep,  uint8_t data )
 {
 	uint8_t *ptr_dest = (uint8_t *) &udd_get_endpoint_fifo_access8(ep);
 
-	TRACE_UOTGHS(printf("=> UDD_Send8 : ul_send_fifo_ptr=%d data=0x%x\r\n", ul_send_fifo_ptr[ep], data);)
+	TRACE_UOTGHS_DEVICE(printf("=> UDD_Send8 : ul_send_fifo_ptr=%lu data=0x%x\r\n", ul_send_fifo_ptr[ep], data);)
 
 	ptr_dest[ul_send_fifo_ptr[ep]] = data;
 	ul_send_fifo_ptr[ep] += 1;
@@ -267,7 +268,7 @@ uint8_t UDD_Recv8(uint32_t ep)
 	uint8_t *ptr_dest = (uint8_t *) &udd_get_endpoint_fifo_access8(ep);
 	uint8_t data = ptr_dest[ul_recv_fifo_ptr[ep]];
 
-	TRACE_UOTGHS(printf("=> UDD_Recv8 : ul_recv_fifo_ptr=%d\r\n", ul_recv_fifo_ptr[ep]);)
+	TRACE_UOTGHS_DEVICE(printf("=> UDD_Recv8 : ul_recv_fifo_ptr=%lu\r\n", ul_recv_fifo_ptr[ep]);)
 
 	ul_recv_fifo_ptr[ep] += 1;
 	return data;
@@ -299,7 +300,7 @@ uint32_t UDD_FifoByteCount(uint32_t ep)
 
 void UDD_ReleaseRX(uint32_t ep)
 {
-	TRACE_UOTGHS(puts("=> UDD_ReleaseRX\r\n");)
+	TRACE_UOTGHS_DEVICE(puts("=> UDD_ReleaseRX\r\n");)
 	UOTGHS->UOTGHS_DEVEPTICR[ep] = (UOTGHS_DEVEPTICR_NAKOUTIC | UOTGHS_DEVEPTICR_RXOUTIC);
 	UOTGHS->UOTGHS_DEVEPTIDR[ep] = UOTGHS_DEVEPTIDR_FIFOCONC;
 	ul_recv_fifo_ptr[ep] = 0;
@@ -307,7 +308,7 @@ void UDD_ReleaseRX(uint32_t ep)
 
 void UDD_ReleaseTX(uint32_t ep)
 {
-	TRACE_UOTGHS(printf("=> UDD_ReleaseTX ep=%d\r\n", ep);)
+	TRACE_UOTGHS_DEVICE(printf("=> UDD_ReleaseTX ep=%lu\r\n", ep);)
 	UOTGHS->UOTGHS_DEVEPTICR[ep] = (UOTGHS_DEVEPTICR_NAKINIC | UOTGHS_DEVEPTICR_RXOUTIC | UOTGHS_DEVEPTICR_TXINIC);
 	UOTGHS->UOTGHS_DEVEPTIDR[ep] = UOTGHS_DEVEPTIDR_FIFOCONC;
 	ul_send_fifo_ptr[ep] = 0;
@@ -321,7 +322,7 @@ uint32_t UDD_ReadWriteAllowed(uint32_t ep)
 
 void UDD_SetAddress(uint32_t addr)
 {
-	TRACE_UOTGHS(printf("=> UDD_SetAddress : setting address to %d\r\n", addr);)
+	TRACE_UOTGHS_DEVICE(printf("=> UDD_SetAddress : setting address to %lu\r\n", addr);)
 
 	udd_configure_address(addr);
 	udd_enable_address();

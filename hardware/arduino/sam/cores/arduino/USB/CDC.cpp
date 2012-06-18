@@ -17,8 +17,6 @@
 #include "Arduino.h"
 #include "USBAPI.h"
 
-#if defined(USBCON)
-
 #ifdef CDC_ENABLED
 
 #define CDC_SERIAL_BUFFER_SIZE	64
@@ -252,4 +250,3 @@ Serial_::operator bool()
 Serial_ Serial;
 
 #endif
-#endif /* if defined(USBCON) */

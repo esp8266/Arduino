@@ -39,9 +39,7 @@ int main( void )
 
 	delay(1);
 
-#if defined(USBCON)
-	//USB.attach();
-#endif
+	USB.attach();
 
 	setup();
 
@@ -50,5 +48,5 @@ int main( void )
 		loop();
 	}
 
-//	return 0 ;
+	return 0;
 }

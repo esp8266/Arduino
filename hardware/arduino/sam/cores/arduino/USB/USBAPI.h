@@ -19,7 +19,7 @@
 #ifndef __USBAPI__
 #define __USBAPI__
 
-#if defined __cplusplus && defined USBCON
+#if defined __cplusplus
 
 #include "RingBuffer.h"
 
@@ -214,5 +214,4 @@ void USBD_Flush(uint32_t ep);
 uint32_t USBD_Connected(void);
 
 #endif
-
-#endif /* if defined USBCON */
+#endif

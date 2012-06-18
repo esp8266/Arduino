@@ -194,6 +194,7 @@ extern const PinDescription g_APinDescription[] ;
 #include "HardwareSerial.h"
 #include "wiring_pulse.h"
 
+// USB Host
 #include "Usb.h"
 
 #endif // __cplusplus
@@ -201,16 +202,13 @@ extern const PinDescription g_APinDescription[] ;
 // Include board variant
 #include "variant.h"
 
-#if defined USBCON
-  #define USB_VID            0x2341 // arduino LLC vid
-
-  #define USB_PID_LEONARDO   0x0034
-  #define USB_PID_MICRO      0x0035
-  #define USB_PID_DUE        0x003E
-
-  #include "USB/USBDesc.h"
-  #include "USB/USBCore.h"
-  #include "USB/USBAPI.h"
-#endif // if defined USBCON
+// USB Device
+#define USB_VID            0x2341 // arduino LLC vid
+#define USB_PID_LEONARDO   0x0034
+#define USB_PID_MICRO      0x0035
+#define USB_PID_DUE        0x003E
+#include "USB/USBDesc.h"
+#include "USB/USBCore.h"
+#include "USB/USBAPI.h"
 
 #endif // Arduino_h

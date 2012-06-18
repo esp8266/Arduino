@@ -16,8 +16,6 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#if defined(USBCON)
-
 #include "variant.h"
 #include <stdio.h>
 
@@ -36,7 +34,6 @@ void loop() {
 		Serial.print(inChar);
 		Serial1.print(inChar);
 	}
+
 	delay(10);
 }
-
-#endif

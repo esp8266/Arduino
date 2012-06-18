@@ -23,9 +23,6 @@
  *        Headers
  *----------------------------------------------------------------------------*/
 
-// We have native USB on this variant
-#define USBCON
-
 #include "Arduino.h"
 #ifdef __cplusplus
 #include "UARTClass.h"

@@ -1,5 +1,3 @@
-#ifdef USBCON
-
 /* Copyright (c) 2010, Peter Barrett
 **
 ** Permission to use, copy, modify, and/or distribute this software for
@@ -20,8 +18,8 @@
 #include "USBAPI.h"
 #include <stdio.h>
 
-//#define TRACE_CORE(x)	x
-#define TRACE_CORE(x)
+#define TRACE_CORE(x)	x
+//#define TRACE_CORE(x)
 
 static const uint32_t EndPoints[] =
 {
@@ -212,14 +210,14 @@ int USBD_SendControl(uint8_t flags, const void* d, uint32_t len)
 	uint32_t sent = 0;
 	uint32_t pos = 0;
 
-	TRACE_CORE(printf("=> USBD_SendControl TOTAL len=%d\r\n", len);)
+	TRACE_CORE(printf("=> USBD_SendControl TOTAL len=%lu\r\n", len);)
 
 	if (_cmark < _cend)
 	{
 		while (len > 0)
 		{
 			sent = UDD_Send(EP0, data + pos, len);
-			TRACE_CORE(printf("=> USBD_SendControl sent=%d\r\n", sent);)
+			TRACE_CORE(printf("=> USBD_SendControl sent=%lu\r\n", sent);)
 			pos += sent;
 			len -= sent;
 		}
@@ -540,7 +538,7 @@ uint32_t USBD_Connected(void)
 //=======================================================================
 //=======================================================================
 
-//USB_ USB;
+USB_ USB;
 
 USB_::USB_()
 {
@@ -589,5 +587,3 @@ bool USB_::configured()
 void USB_::poll()
 {
 }
-
-#endif // USBCON

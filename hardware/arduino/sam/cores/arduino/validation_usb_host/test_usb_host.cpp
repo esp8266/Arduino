@@ -2,58 +2,49 @@
 #include <stdio.h>
 #include <hidboot.h>
 
-class KbdRptParser : public KeyboardReportParser
+class MouseRptParser : public MouseReportParser
 {
-	void PrintKey(uint8_t mod, uint8_t key);
-
 protected:
-	virtual void OnKeyDown	(uint8_t mod, uint8_t key);
-	virtual void OnKeyUp	(uint8_t mod, uint8_t key);
-	virtual void OnKeyPressed(uint8_t key);
+	virtual void OnMouseMove		(MOUSEINFO *mi);
+	virtual void OnLeftButtonUp		(MOUSEINFO *mi);
+	virtual void OnLeftButtonDown	(MOUSEINFO *mi);
+	virtual void OnRightButtonUp	(MOUSEINFO *mi);
+	virtual void OnRightButtonDown	(MOUSEINFO *mi);
+	virtual void OnMiddleButtonUp	(MOUSEINFO *mi);
+	virtual void OnMiddleButtonDown	(MOUSEINFO *mi);
 };
-
-void KbdRptParser::PrintKey(uint8_t m, uint8_t key)
+void MouseRptParser::OnMouseMove(MOUSEINFO *mi)
 {
-    MODIFIERKEYS mod;
-
-    *((uint8_t*)&mod) = m;
-    printf((mod.bmLeftCtrl   == 1) ? "C" : " ");
-    printf((mod.bmLeftShift  == 1) ? "S" : " ");
-    printf((mod.bmLeftAlt    == 1) ? "A" : " ");
-    printf((mod.bmLeftGUI    == 1) ? "G" : " ");
-
-    printf("<%c>", key);
-
-    printf((mod.bmRightCtrl   == 1) ? "C" : " ");
-    printf((mod.bmRightShift  == 1) ? "S" : " ");
-    printf((mod.bmRightAlt    == 1) ? "A" : " ");
-    printf((mod.bmRightGUI    == 1) ? "G" : " ");
+    printf("Pos={%d,%d}\r\n", mi->dX, mi->dY);
 };
-
-void KbdRptParser::OnKeyDown(uint8_t mod, uint8_t key)
+void MouseRptParser::OnLeftButtonUp (MOUSEINFO *mi)
 {
-    printf("DN ");
-    PrintKey(mod, key);
-    uint8_t c = OemToAscii(mod, key);
-
-    if (c)
-        OnKeyPressed(c);
-}
-
-void KbdRptParser::OnKeyUp(uint8_t mod, uint8_t key)
+    printf("L Butt Up\r\n");
+};
+void MouseRptParser::OnLeftButtonDown (MOUSEINFO *mi)
 {
-    printf("UP ");
-    PrintKey(mod, key);
-}
-
-void KbdRptParser::OnKeyPressed(uint8_t key)
+    printf("L Butt Dn\r\n");
+};
+void MouseRptParser::OnRightButtonUp (MOUSEINFO *mi)
 {
-    printf("ASCII: %c", key);
+    printf("R Butt Up\r\n");
+};
+void MouseRptParser::OnRightButtonDown (MOUSEINFO *mi)
+{
+    printf("R Butt Dn\r\n");
+};
+void MouseRptParser::OnMiddleButtonUp (MOUSEINFO *mi)
+{
+    printf("M Butt Up\r\n");
+};
+void MouseRptParser::OnMiddleButtonDown (MOUSEINFO *mi)
+{
+    printf("M Butt Dn\r\n");
 };
 
 USBHost Usb;
-HIDBoot<HID_PROTOCOL_KEYBOARD> Kbd(&Usb);
-KbdRptParser Prs;
+HIDBoot<HID_PROTOCOL_MOUSE> HostMouse(&Usb);
+MouseRptParser Prs;
 
 void setup()
 {
@@ -61,7 +52,7 @@ void setup()
 	printf("\r\nProgram started:\r\n");
 	delay(200);
 
-    Kbd.SetReportParser(0, (HIDReportParser*)&Prs);
+    HostMouse.SetReportParser(0,(HIDReportParser*)&Prs);
 }
 
 void loop()

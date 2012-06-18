@@ -16,7 +16,6 @@
 
 #include "Arduino.h"
 
-#if defined(USBCON)
 #ifdef HID_ENABLED
 
 //#define RAWHID_ENABLED
@@ -509,5 +508,3 @@ size_t Keyboard_::write(uint8_t c)
 }
 
 #endif
-
-#endif /* if defined(USBCON) */
