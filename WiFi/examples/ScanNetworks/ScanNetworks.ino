@@ -10,8 +10,8 @@
  
  created 13 July 2010
  by dlf (Metodo2 srl)
- modified 31 May 2012
- by Tom Igoe
+ modified 21 Junn 2012
+ by Tom Igoe and Jaymes Dec
  */
 
 
@@ -24,14 +24,14 @@ void setup() {
   while (!Serial) {
     ; // wait for serial port to connect. Needed for Leonardo only
   }
-  
+
   // check for the presence of the shield:
   if (WiFi.status() == WL_NO_SHIELD) {
     Serial.println("WiFi shield not present"); 
     // don't continue:
     while(true);
   } 
-  
+
   // Print WiFi MAC address:
   printMacAddress();
 
@@ -90,8 +90,29 @@ void listNetworks() {
     Serial.print(WiFi.RSSI(thisNet));
     Serial.print(" dBm");
     Serial.print("\tEncryption: ");
-    Serial.println(WiFi.encryptionType(thisNet));
+    printEncryptionType(WiFi.encryptionType(thisNet));
   }
+}
+
+void printEncryptionType(int thisType) {
+  // read the encryption type and print out the name:
+  switch (thisType) {
+  case ENC_TYPE_WEP:
+    Serial.println("WEP");
+    break;
+  case ENC_TYPE_TKIP:
+    Serial.println("WPA");
+    break;
+  case ENC_TYPE_CCMP:
+    Serial.println("WPA2");
+    break;
+  case ENC_TYPE_NONE:
+    Serial.println("None");
+    break;
+  case ENC_TYPE_AUTO:
+    Serial.println("Auto");
+    break;
+  } 
 }
 
 
