@@ -1,7 +1,5 @@
-
-
-/* Copyright (c) 2011, Peter Barrett
-**
+// Copyright (c) 2010, Peter Barrett
+/*
 ** Permission to use, copy, modify, and/or distribute this software for
 ** any purpose with or without fee is hereby granted, provided that the
 ** above copyright notice and this permission notice appear in all copies.
@@ -16,9 +14,11 @@
 ** SOFTWARE.
 */
 
+#ifndef __USBDESC_H__
+#define __USBDESC_H__
+
 #define CDC_ENABLED
 #define HID_ENABLED
-
 
 #ifdef CDC_ENABLED
 #define CDC_INTERFACE_COUNT	2
@@ -39,11 +39,11 @@
 #define CDC_ACM_INTERFACE	0	// CDC ACM
 #define CDC_DATA_INTERFACE	1	// CDC Data
 #define CDC_FIRST_ENDPOINT	1
-#define CDC_ENDPOINT_ACM	(CDC_FIRST_ENDPOINT)							// CDC First
+#define CDC_ENDPOINT_ACM	(CDC_FIRST_ENDPOINT)						// CDC First
 #define CDC_ENDPOINT_OUT	(CDC_FIRST_ENDPOINT+1)
 #define CDC_ENDPOINT_IN		(CDC_FIRST_ENDPOINT+2)
 
-#define HID_INTERFACE		(CDC_ACM_INTERFACE + CDC_INTERFACE_COUNT)		// HID Interface
+#define HID_INTERFACE		(CDC_ACM_INTERFACE + CDC_INTERFACE_COUNT)	// HID Interface
 #define HID_FIRST_ENDPOINT	(CDC_FIRST_ENDPOINT + CDC_ENPOINT_COUNT)
 #define HID_ENDPOINT_INT	(HID_FIRST_ENDPOINT)
 
@@ -60,3 +60,5 @@
 
 #define IMANUFACTURER	1
 #define IPRODUCT		2
+
+#endif /* __USBDESC_H__ */

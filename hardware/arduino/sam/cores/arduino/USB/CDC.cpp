@@ -21,6 +21,7 @@
 
 #define CDC_SERIAL_BUFFER_SIZE	64
 
+/* For information purpose only since RTS is not always handled by the terminal application */
 #define CDC_LINESTATE_DTR		0x01 // Data Terminal Ready
 #define CDC_LINESTATE_RTS		0x02 // Ready to Send
 
@@ -209,7 +210,7 @@ size_t Serial_::write(uint8_t c)
 	// TODO - ZE - check behavior on different OSes and test what happens if an
 	// open connection isn't broken cleanly (cable is yanked out, host dies
 	// or locks up, or host virtual serial port hangs)
-	if (_usbLineInfo.lineState == CDC_LINESTATE_READY)
+	if (_usbLineInfo.lineState > 0)
 	{
 		int r = USBD_Send(CDC_TX,&c,1);
 
@@ -238,7 +239,7 @@ Serial_::operator bool()
 {
 	bool result = false;
 
-	if (_usbLineInfo.lineState == CDC_LINESTATE_READY)
+	if (_usbLineInfo.lineState > 0)
 	{
 		result = true;
 	}

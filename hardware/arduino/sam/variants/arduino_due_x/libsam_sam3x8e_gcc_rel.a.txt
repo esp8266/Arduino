@@ -376,12 +376,10 @@ uotghs_device.o:
 00000000 T UDD_WaitOUT
          U g_interrupt_enabled
          U gpf_isr
-         U iprintf
          U pmc_enable_periph_clk
          U pmc_enable_udpck
          U pmc_enable_upll_clock
          U pmc_switch_udpck_to_upllck
-         U puts
 00000000 b ul_recv_fifo_ptr
 00000000 b ul_send_fifo_ptr
 

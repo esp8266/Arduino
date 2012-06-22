@@ -32,49 +32,35 @@
 
 #include <stdint.h>
 
-extern void UDD_WaitIN(void) ;
-extern void UDD_WaitOUT(void) ;
-extern void UDD_ClearIN(void) ;
-extern void UDD_ClearOUT(void) ;
-extern uint32_t UDD_WaitForINOrOUT(void) ;
-
-extern void UDD_ClearRxFlag( unsigned char bEndpoint ) ;
-
-
+extern void UDD_WaitIN(void);
+extern void UDD_WaitOUT(void);
+extern void UDD_ClearIN(void);
+extern void UDD_ClearOUT(void);
+extern uint32_t UDD_WaitForINOrOUT(void);
+extern void UDD_ClearRxFlag(unsigned char bEndpoint);
 extern uint32_t UDD_ReceivedSetupInt(void);
 extern void UDD_ClearSetupInt(void);
-
-extern uint32_t UDD_ReadWriteAllowed(uint32_t ep) ;
-
-
-extern uint32_t UDD_FifoByteCount(uint32_t ep) ;
-extern uint8_t UDD_FifoFree(void) ;
-
-extern void UDD_ReleaseRX(uint32_t ep) ;
-extern void UDD_ReleaseTX(uint32_t ep) ;
-extern uint8_t UDD_FrameNumber(void) ;
-
-extern uint8_t UDD_GetConfiguration(void) ;
-
-
-
+extern uint32_t UDD_ReadWriteAllowed(uint32_t ep);
+extern uint32_t UDD_FifoByteCount(uint32_t ep);
+extern uint8_t UDD_FifoFree(void);
+extern void UDD_ReleaseRX(uint32_t ep);
+extern void UDD_ReleaseTX(uint32_t ep);
+extern uint8_t UDD_FrameNumber(void);
+extern uint8_t UDD_GetConfiguration(void);
 
 extern uint32_t UDD_Send(uint32_t ep, const void* data, uint32_t len);
 extern void UDD_Send8(uint32_t ep,  uint8_t data );
 extern uint8_t UDD_Recv8(uint32_t ep);
 extern void UDD_Recv(uint32_t ep, uint8_t* data, uint32_t len);
 
-
-
 extern void UDD_InitEndpoints(const uint32_t* eps_table, const uint32_t ul_eps_table_size);
-
-extern void UDD_InitControl(int end) ;
-
-extern uint32_t UDD_Init(void) ;
+extern void UDD_InitControl(int end);
+extern uint32_t UDD_Init(void);
 extern void UDD_InitEP( uint32_t ul_ep, uint32_t ul_ep_cfg );
 
-extern void UDD_Attach(void) ;
-extern void UDD_Detach(void) ;
+extern void UDD_Attach(void);
+extern void UDD_Detach(void);
+
 extern void UDD_SetStack(void (*pf_isr)(void));
 extern void UDD_SetAddress(uint32_t addr);
 extern void UDD_Stall(void);
@@ -91,8 +77,8 @@ typedef unsigned char           Bool; //!< Boolean.
 typedef unsigned char           bool; //!< Boolean.
 #endif
 #endif
-typedef int8_t                  S8 ;  //!< 8-bit signed integer.
-typedef uint8_t                 U8 ;  //!< 8-bit unsigned integer.
+typedef int8_t                  S8;  //!< 8-bit signed integer.
+typedef uint8_t                 U8;  //!< 8-bit unsigned integer.
 typedef int16_t                 S16;  //!< 16-bit signed integer.
 typedef uint16_t                U16;  //!< 16-bit unsigned integer.
 typedef uint16_t                le16_t;

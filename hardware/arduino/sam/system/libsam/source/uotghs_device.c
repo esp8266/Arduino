@@ -32,8 +32,8 @@
 
 #if SAM3XA_SERIES
 
-#define TRACE_UOTGHS_DEVICE(x)	x
-//#define TRACE_UOTGHS_DEVICE(x)
+//#define TRACE_UOTGHS_DEVICE(x)	x
+#define TRACE_UOTGHS_DEVICE(x)
 
 extern void (*gpf_isr)(void);
 
