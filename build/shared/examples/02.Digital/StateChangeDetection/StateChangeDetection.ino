@@ -64,6 +64,8 @@ void loop() {
       // wend from on to off:
       Serial.println("off"); 
     }
+    // Delay a little bit to avoid bouncing
+    delay(50);
   }
   // save the current state as the last state, 
   //for next time through the loop
