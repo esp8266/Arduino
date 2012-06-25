@@ -9,8 +9,8 @@
  * 4.7K resistor on analog 0 to ground
  
  created 21 Jan 2010
- modified 9 Apr 2012
- by Tom Igoe 
+ modified 31 May 2012
+ by Tom Igoe, with suggestion from Michael Flynn
 
 This example code is in the public domain.
  
@@ -29,10 +29,11 @@ void loop() {
   int sensorReading = analogRead(A0);
   // print the sensor reading so you know its range
   Serial.println(sensorReading);
-  // map the pitch to the range of the analog input.
+  // map the analog input range (in this case, 400 - 1000 from the photoresistor)
+  // to the output pitch range (120 - 1500Hz)
   // change the minimum and maximum input numbers below
   // depending on the range your sensor's giving:
-  int thisPitch = map(sensorReading, 400, 1000, 100, 1000);
+  int thisPitch = map(sensorReading, 400, 1000, 120, 1500);
 
   // play the pitch:
   tone(9, thisPitch, 10);

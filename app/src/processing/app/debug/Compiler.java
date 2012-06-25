@@ -54,6 +54,7 @@ public class Compiler implements MessageConsumer {
 
   private PreferencesMap prefs;
   private boolean verbose;
+  private boolean sketchIsCompiled;
 	
   private RunnerException exception;
   
@@ -71,6 +72,7 @@ public class Compiler implements MessageConsumer {
       throws RunnerException {
     sketch = _sketch;
     verbose = _verbose;
+    sketchIsCompiled = false;
     objectFiles = new ArrayList<File>();
 
     prefs = createBuildPreferences(_buildPath, _primaryClassName);
@@ -87,6 +89,7 @@ public class Compiler implements MessageConsumer {
     // 1. compile the sketch (already in the buildPath)
     sketch.setCompilingProgress(30);
     compileSketch(includePaths);
+    sketchIsCompiled = true;
 
     // 2. compile the libraries, outputting .o files to: <buildPath>/<library>/
     // Doesn't really use configPreferences
@@ -339,10 +342,8 @@ public class Compiler implements MessageConsumer {
     boolean compiling = true;
     while (compiling) {
       try {
-        if (in.thread != null)
-          in.thread.join();
-        if (err.thread != null)
-          err.thread.join();
+        in.join();
+        err.join();
         result = process.waitFor();
         //System.out.println("result is " + result);
         compiling = false;
@@ -430,7 +431,7 @@ public class Compiler implements MessageConsumer {
       if (pieces[3].trim().equals("'Udp' was not declared in this scope")) {
         error = _("The Udp class has been renamed EthernetUdp.");
         msg = _("\nAs of Arduino 1.0, the Udp class in the Ethernet library " +
-              "has been renamed to EthernetClient.\n\n");
+              "has been renamed to EthernetUdp.\n\n");
       }
       
       if (pieces[3].trim().equals("'class TwoWire' has no member named 'send'")) {
@@ -455,14 +456,20 @@ public class Compiler implements MessageConsumer {
         //msg = _("\nThe 'Keyboard' class is only supported on the Arduino Leonardo.\n\n");
       }
       
-      RunnerException e = sketch.placeException(error, pieces[1], PApplet.parseInt(pieces[2]) - 1);
+      RunnerException e = null;
+      if (!sketchIsCompiled) {
+        // Place errors when compiling the sketch, but never while compiling libraries
+        // or the core.  The user's sketch might contain the same filename!
+        e = sketch.placeException(error, pieces[1], PApplet.parseInt(pieces[2]) - 1);
+      }
 
       // replace full file path with the name of the sketch tab (unless we're
       // in verbose mode, in which case don't modify the compiler output)
       if (e != null && !verbose) {
         SketchCode code = sketch.getCode(e.getCodeIndex());
-        String fileName = code.isExtension(sketch.getDefaultExtension()) ? code.getPrettyName() : code.getFileName();
-        s = fileName + ":" + e.getCodeLine() + ": error: " + pieces[3] + msg;        
+        String fileName = (code.isExtension("ino") || code.isExtension("pde")) ? code.getPrettyName() : code.getFileName();
+        int lineNum = e.getCodeLine() + 1;
+        s = fileName + ":" + lineNum + ": error: " + pieces[3] + msg;        
       }
             
       if (exception == null && e != null) {

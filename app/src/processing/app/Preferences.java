@@ -139,7 +139,7 @@ public class Preferences {
                         "lv",
                         "lt",
                         "mr",
-                        "no",
+                        "no_nb",
                         "fa",
                         "pl",
                         "pt_br",

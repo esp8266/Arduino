@@ -85,8 +85,15 @@ public class MessageSiphon implements Runnable {
     }
   }
   
-  
+  // Wait until the MessageSiphon thread is complete.
+  public void join() throws java.lang.InterruptedException {
+    // Grab a temp copy in case another thread nulls the "thread" 
+    // member variable
+    Thread t = thread;
+    if (t != null) t.join();
+  }
+
   public Thread getThread() {
     return thread;
-}
+  }
 }
