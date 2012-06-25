@@ -41,6 +41,16 @@ extern void pinMode( uint32_t ulPin, uint32_t ulMode )
             	0 ) ;
         break ;
 
+        case INPUT_PULLUP:
+            /* Enable peripheral for clocking input */
+            pmc_enable_periph_clk( g_APinDescription[ulPin].ulPeripheralId ) ;
+            PIO_Configure(
+            	g_APinDescription[ulPin].pPort,
+            	PIO_INPUT,
+            	g_APinDescription[ulPin].ulPin,
+            	PIO_PULLUP ) ;
+        break ;
+
         case OUTPUT:
             PIO_Configure(
             	g_APinDescription[ulPin].pPort,
