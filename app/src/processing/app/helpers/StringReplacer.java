@@ -58,7 +58,7 @@ public class StringReplacer {
     for (String i : src.split(" ")) {
       if (!escaping) {
         if (!i.startsWith(quote)) {
-          if (!i.trim().isEmpty() || acceptEmptyArguments)
+          if (i.trim().length() != 0 || acceptEmptyArguments)
             res.add(i);
           continue;
         }
@@ -74,7 +74,7 @@ public class StringReplacer {
       }
 
       escapedArg += i.substring(0, i.length() - 1);
-      if (!escapedArg.trim().isEmpty() || acceptEmptyArguments)
+      if (escapedArg.trim().length() != 0 || acceptEmptyArguments)
         res.add(escapedArg);
       escaping = false;
     }

@@ -79,7 +79,7 @@ public class Compiler implements MessageConsumer {
     sketch.setCompilingProgress(20);
     List<String> includePaths = new ArrayList<String>();
     includePaths.add(prefs.get("build.core.path"));
-    if (!prefs.get("build.variant.path").isEmpty())
+    if (prefs.get("build.variant.path").length() != 0)
       includePaths.add(prefs.get("build.variant.path"));
     for (File file : sketch.getImportedLibraries())
       includePaths.add(file.getPath());
@@ -304,7 +304,7 @@ public class Compiler implements MessageConsumer {
     List<String> stringList = new ArrayList<String>();
     for (String string : command) {
       string = string.trim();
-      if (!string.isEmpty())
+      if (string.length() != 0)
         stringList.add(string);
     }
     command = stringList.toArray(new String[stringList.size()]);
@@ -602,12 +602,12 @@ public class Compiler implements MessageConsumer {
 
     List<String> includePaths = new ArrayList<String>();
     includePaths.add(corePath); // include core path only
-    if (!variantPath.isEmpty())
+    if (variantPath.length() != 0)
       includePaths.add(variantPath);
 
     List<File> coreObjectFiles = compileFiles(buildPath, new File(corePath),
                                               true, includePaths);
-    if (!variantPath.isEmpty())
+    if (variantPath.length() != 0)
       coreObjectFiles.addAll(compileFiles(buildPath, new File(variantPath),
                                           true, includePaths));
 
