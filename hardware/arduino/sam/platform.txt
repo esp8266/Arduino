@@ -21,6 +21,9 @@ compiler.elf2hex.cmd=arm-none-eabi-objcopy
 compiler.ldflags=
 compiler.size.cmd=arm-none-eabi-size
 compiler.define=-DARDUINO=
+# this can be overriden in boards.txt
+build.extra_flags=
+
 
 compiler.libsam.c.flags="-I{build.system.path}/libsam" "-I{build.system.path}/CMSIS/CMSIS/Include/" "-I{build.system.path}/CMSIS/Device/ATMEL/"
 

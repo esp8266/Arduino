@@ -20,7 +20,6 @@ uno.build.mcu=atmega328p
 uno.build.f_cpu=16000000L
 uno.build.core=arduino
 uno.build.variant=standard
-uno.build.extra_flags=
 
 ##############################################################
 
