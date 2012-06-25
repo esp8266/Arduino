@@ -1,5 +1,5 @@
-/* Copyright (c) 2010, Peter Barrett
-**
+// Copyright (c) 2010, Peter Barrett
+/*
 ** Permission to use, copy, modify, and/or distribute this software for
 ** any purpose with or without fee is hereby granted, provided that the
 ** above copyright notice and this permission notice appear in all copies.
@@ -44,11 +44,11 @@ volatile uint8_t RxLEDPulse; /**< Milliseconds remaining for data Rx LED pulse *
 //==================================================================
 //==================================================================
 
-extern const uint16_t STRING_LANGUAGE[] ;
-extern const uint16_t STRING_IPRODUCT[] ;
-extern const uint16_t STRING_IMANUFACTURER[] ;
-extern const DeviceDescriptor USB_DeviceDescriptor ;
-extern const DeviceDescriptor USB_DeviceDescriptorA ;
+extern const uint16_t STRING_LANGUAGE[];
+extern const uint16_t STRING_IPRODUCT[];
+extern const uint16_t STRING_IMANUFACTURER[];
+extern const DeviceDescriptor USB_DeviceDescriptor;
+extern const DeviceDescriptor USB_DeviceDescriptorA;
 
 const uint16_t STRING_LANGUAGE[2] = {
 	(3<<8) | (2+2),
@@ -85,8 +85,6 @@ const DeviceDescriptor USB_DeviceDescriptor =
 
 const DeviceDescriptor USB_DeviceDescriptorA =
 	D_DEVICE(DEVICE_CLASS,0x00,0x00,64,USB_VID,USB_PID,0x100,IMANUFACTURER,IPRODUCT,0,1);
-
-
 
 //==================================================================
 //==================================================================
@@ -233,11 +231,11 @@ int USBD_SendControl(uint8_t flags, const void* d, uint32_t len)
 //	TODO
 int USBD_RecvControl(void* d, uint32_t len)
 {
-	UDD_WaitOUT() ;
-	UDD_Recv(EP0, (uint8_t*)d, len ) ;
-	UDD_ClearOUT() ;
+	UDD_WaitOUT();
+	UDD_Recv(EP0, (uint8_t*)d, len);
+	UDD_ClearOUT();
 
-	return len ;
+	return len;
 }
 
 //	Handle CLASS_INTERFACE requests
@@ -248,20 +246,20 @@ bool USBD_ClassInterfaceRequest(Setup& setup)
 	TRACE_CORE(printf("=> USBD_ClassInterfaceRequest\r\n");)
 
 #ifdef CDC_ENABLED
-	if ( CDC_ACM_INTERFACE == i )
+	if (CDC_ACM_INTERFACE == i)
 	{
 		return CDC_Setup(setup);
 	}
 #endif
 
 #ifdef HID_ENABLED
-	if ( HID_INTERFACE == i )
+	if (HID_INTERFACE == i)
 	{
 		return HID_Setup(setup);
 	}
 #endif
 
-	return false ;
+	return false;
 }
 
 int USBD_SendInterfaces(void)
@@ -270,11 +268,11 @@ int USBD_SendInterfaces(void)
 	uint8_t interfaces = 0;
 
 #ifdef CDC_ENABLED
-	total = CDC_GetInterface(&interfaces) ;
+	total = CDC_GetInterface(&interfaces);
 #endif
 
 #ifdef HID_ENABLED
-	total += HID_GetInterface(&interfaces) ;
+	total += HID_GetInterface(&interfaces);
 #endif
 
 	total = total; // Get rid of compiler warning
@@ -314,7 +312,7 @@ static bool USBD_SendDescriptor(Setup& setup)
 	uint8_t desc_length = 0;
 	const uint8_t* desc_addr = 0;
 
-	if ( USB_CONFIGURATION_DESCRIPTOR_TYPE == t )
+	if (USB_CONFIGURATION_DESCRIPTOR_TYPE == t)
 	{
 		TRACE_CORE(printf("=> USBD_SendDescriptor : USB_CONFIGURATION_DESCRIPTOR_TYPE length=%d\r\n", setup.wLength);)
 		return USBD_SendConfiguration(setup.wLength);
@@ -322,17 +320,17 @@ static bool USBD_SendDescriptor(Setup& setup)
 
 	USBD_InitControl(setup.wLength);
 #ifdef HID_ENABLED
-	if ( HID_REPORT_DESCRIPTOR_TYPE == t )
+	if (HID_REPORT_DESCRIPTOR_TYPE == t)
 	{
 		TRACE_CORE(puts("=> USBD_SendDescriptor : HID_REPORT_DESCRIPTOR_TYPE\r\n");)
-		return HID_GetDescriptor( t ) ;
+		return HID_GetDescriptor(t);
 	}
 #endif
 
 	if (USB_DEVICE_DESCRIPTOR_TYPE == t)
 	{
 		TRACE_CORE(puts("=> USBD_SendDescriptor : USB_DEVICE_DESCRIPTOR_TYPE\r\n");)
-		if ( setup.wLength == 8 )
+		if (setup.wLength == 8)
 		{
 			_cdcComposite = 1;
 		}
@@ -351,17 +349,17 @@ static bool USBD_SendDescriptor(Setup& setup)
 			return false;
 	}
 
-	if ( desc_addr == 0 )
+	if (desc_addr == 0)
 	{
-		return false ;
+		return false;
 	}
 
-	if ( desc_length == 0 )
+	if (desc_length == 0)
 	{
 		desc_length = *desc_addr;
 	}
 
-	TRACE_CORE(printf("=> USBD_SendDescriptor : desc_addr=%x desc_length=%d\r\n", desc_addr, desc_length);)
+	TRACE_CORE(printf("=> USBD_SendDescriptor : desc_addr=%p desc_length=%d\r\n", desc_addr, desc_length);)
 	USBD_SendControl(0, desc_addr, desc_length);
 
 	return true;
@@ -397,7 +395,7 @@ static void USB_ISR(void)
 		while (USBD_Available(CDC_RX))
 			Serial.accept();
 
-		udd_ack_fifocon(CDC_RX) ;
+		udd_ack_fifocon(CDC_RX);
 	}
 #endif
 
@@ -405,12 +403,12 @@ static void USB_ISR(void)
 	if (Is_udd_endpoint_interrupt(0))
 	{
 
-		if ( !UDD_ReceivedSetupInt() )
+		if (!UDD_ReceivedSetupInt())
 		{
 			return;
 		}
 
-		Setup setup ;
+		Setup setup;
 		UDD_Recv(EP0, (uint8_t*)&setup, 8);
 		UDD_ClearSetupInt();
 
@@ -426,7 +424,7 @@ static void USB_ISR(void)
 			UDD_ClearIN();
 		}
 
-		bool ok = true ;
+		bool ok = true;
 		if (REQUEST_STANDARD == (requestType & REQUEST_TYPE))
 		{
 			// Standard Requests
@@ -544,36 +542,36 @@ USBDevice_::USBDevice_()
 {
 	UDD_SetStack(&USB_ISR);
 
-	if ( UDD_Init() == 0UL )
+	if (UDD_Init() == 0UL)
 	{
-		_usbInitialized=1UL ;
+		_usbInitialized=1UL;
 	}
 }
 
 bool USBDevice_::attach(void)
 {
-  if ( _usbInitialized != 0UL )
+  if (_usbInitialized != 0UL)
   {
-    UDD_Attach() ;
+    UDD_Attach();
 	_usbConfiguration = 0;
 	return true;
   }
   else
   {
-    return false ;
+    return false;
   }
 }
 
 bool USBDevice_::detach(void)
 {
-	if ( _usbInitialized != 0UL )
+	if (_usbInitialized != 0UL)
 	{
-		UDD_Detach() ;
-		return true ;
+		UDD_Detach();
+		return true;
 	}
 	else
 	{
-		return false ;
+		return false;
 	}
 }
 

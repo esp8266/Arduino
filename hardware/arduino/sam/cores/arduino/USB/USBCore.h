@@ -1,4 +1,3 @@
-
 // Copyright (c) 2010, Peter Barrett
 /*
 ** Permission to use, copy, modify, and/or distribute this software for
@@ -19,33 +18,33 @@
 #define __USBCORE_H__
 
 //	Standard requests
-#define GET_STATUS			0
-#define CLEAR_FEATURE		1
-#define SET_FEATURE			3
-#define SET_ADDRESS			5
-#define GET_DESCRIPTOR		6
-#define SET_DESCRIPTOR		7
-#define GET_CONFIGURATION	8
-#define SET_CONFIGURATION	9
-#define GET_INTERFACE		10
-#define SET_INTERFACE		11
+#define GET_STATUS					0
+#define CLEAR_FEATURE				1
+#define SET_FEATURE					3
+#define SET_ADDRESS					5
+#define GET_DESCRIPTOR				6
+#define SET_DESCRIPTOR				7
+#define GET_CONFIGURATION			8
+#define SET_CONFIGURATION			9
+#define GET_INTERFACE				10
+#define SET_INTERFACE				11
 
 
 // bmRequestType
-#define REQUEST_HOSTTODEVICE	0x00
-#define REQUEST_DEVICETOHOST	0x80
-#define REQUEST_DIRECTION		0x80
+#define REQUEST_HOSTTODEVICE		0x00
+#define REQUEST_DEVICETOHOST		0x80
+#define REQUEST_DIRECTION			0x80
 
-#define REQUEST_STANDARD		0x00
-#define REQUEST_CLASS			0x20
-#define REQUEST_VENDOR			0x40
-#define REQUEST_TYPE			0x60
+#define REQUEST_STANDARD			0x00
+#define REQUEST_CLASS				0x20
+#define REQUEST_VENDOR				0x40
+#define REQUEST_TYPE				0x60
 
-#define REQUEST_DEVICE			0x00
-#define REQUEST_INTERFACE		0x01
-#define REQUEST_ENDPOINT		0x02
-#define REQUEST_OTHER			0x03
-#define REQUEST_RECIPIENT		0x1F
+#define REQUEST_DEVICE				0x00
+#define REQUEST_INTERFACE			0x01
+#define REQUEST_ENDPOINT			0x02
+#define REQUEST_OTHER				0x03
+#define REQUEST_RECIPIENT			0x1F
 
 #define REQUEST_DEVICETOHOST_CLASS_INTERFACE  (REQUEST_DEVICETOHOST + REQUEST_CLASS + REQUEST_INTERFACE)
 #define REQUEST_HOSTTODEVICE_CLASS_INTERFACE  (REQUEST_HOSTTODEVICE + REQUEST_CLASS + REQUEST_INTERFACE)
@@ -129,12 +128,12 @@ _Pragma("pack(1)")
 //	Device
 typedef struct {
 	uint8_t len;				// 18
-	uint8_t dtype;			// 1 USB_DEVICE_DESCRIPTOR_TYPE
+	uint8_t dtype;				// 1 USB_DEVICE_DESCRIPTOR_TYPE
 	uint16_t usbVersion;		// 0x200
 	uint8_t	deviceClass;
 	uint8_t	deviceSubClass;
 	uint8_t	deviceProtocol;
-	uint8_t	packetSize0;	// Packet 0
+	uint8_t	packetSize0;		// Packet 0
 	uint16_t	idVendor;
 	uint16_t	idProduct;
 	uint16_t	deviceVersion;	// 0x100
@@ -162,7 +161,7 @@ typedef struct {
 typedef struct
 {
 	uint8_t len;		// 9
-	uint8_t dtype;	// 4
+	uint8_t dtype;		// 4
 	uint8_t number;
 	uint8_t alternate;
 	uint8_t numEndpoints;
@@ -176,7 +175,7 @@ typedef struct
 typedef struct
 {
 	uint8_t len;		// 7
-	uint8_t dtype;	// 5
+	uint8_t dtype;		// 5
 	uint8_t addr;
 	uint8_t attr;
 	uint16_t packetSize;
@@ -188,7 +187,7 @@ typedef struct
 typedef struct
 {
 	uint8_t len;				// 8
-	uint8_t dtype;			// 11
+	uint8_t dtype;				// 11
 	uint8_t firstInterface;
 	uint8_t interfaceCount;
 	uint8_t functionClass;
@@ -201,7 +200,7 @@ typedef struct
 typedef struct
 {
 	uint8_t len;		// 5
-	uint8_t dtype;	// 0x24
+	uint8_t dtype;		// 0x24
 	uint8_t subtype;
 	uint8_t d0;
 	uint8_t d1;
@@ -210,7 +209,7 @@ typedef struct
 typedef struct
 {
 	uint8_t len;		// 4
-	uint8_t dtype;	// 0x24
+	uint8_t dtype;		// 0x24
 	uint8_t subtype;
 	uint8_t d0;
 } CDCCSInterfaceDescriptor4;
@@ -238,7 +237,7 @@ typedef struct
 	IADDescriptor				iad;	// Only needed on compound device
 
 	//	Control
-	InterfaceDescriptor			cif;	//
+	InterfaceDescriptor			cif;
 	CDCCSInterfaceDescriptor	header;
 	CMFunctionalDescriptor		callManagement;			// Call Management
 	ACMFunctionalDescriptor		controlManagement;		// ACM
@@ -261,21 +260,21 @@ typedef struct
 typedef struct
 {
 	uint8_t len;			// 9
-	uint8_t dtype;		// 0x21
+	uint8_t dtype;			// 0x21
 	uint8_t addr;
-	uint8_t	versionL;	// 0x101
-	uint8_t	versionH;	// 0x101
+	uint8_t	versionL;		// 0x101
+	uint8_t	versionH;		// 0x101
 	uint8_t	country;
-	uint8_t	desctype;	// 0x22 report
+	uint8_t	desctype;		// 0x22 report
 	uint8_t	descLenL;
 	uint8_t	descLenH;
 } HIDDescDescriptor;
 
 typedef struct
 {
-	InterfaceDescriptor			hid;
-	HIDDescDescriptor			desc;
-	EndpointDescriptor			in;
+	InterfaceDescriptor		hid;
+	HIDDescDescriptor		desc;
+	EndpointDescriptor		in;
 } HIDDescriptor;
 
 _Pragma("pack()")

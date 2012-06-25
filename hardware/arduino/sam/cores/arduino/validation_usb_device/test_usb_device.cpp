@@ -25,7 +25,6 @@ void setup() {
 }
 
 void loop() {
-
 	Mouse.move(1, 0, 0);
 
 	if (Serial.available() > 0)
