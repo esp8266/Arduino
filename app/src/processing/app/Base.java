@@ -32,6 +32,7 @@ import javax.swing.*;
 
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
+import processing.app.helpers.FileUtils;
 import processing.app.helpers.PreferencesMap;
 import processing.app.helpers.filefilters.OnlyDirs;
 import processing.app.helpers.filefilters.OnlyFilesWithExtension;
@@ -937,6 +938,21 @@ public class Base {
   public void rebuildImportMenu(JMenu importMenu) {
     importMenu.removeAll();
 
+    // Split between user supplied libraries and IDE libraries
+    Map<String, File> ideLibs = new HashMap<String, File>(libraries);
+    Map<String, File> userLibs = new HashMap<String, File>(libraries);
+    for (String lib : libraries.keySet()) {
+      try {
+        if (FileUtils.isSubDirectory(getSketchbookFolder(), libraries.get(lib)))
+          ideLibs.remove(lib);
+        else
+          userLibs.remove(lib);
+      } catch (IOException e) {
+        ideLibs.remove(lib);
+        userLibs.remove(lib);
+      }
+    }
+    
     try {
       // Find the current target. Get the platform, and then select the
       // correct name and core path.
@@ -947,7 +963,9 @@ public class Base {
       platformItem.setEnabled(false);
       importMenu.add(platformItem);
       importMenu.addSeparator();
-      addLibraries(importMenu, libraries);
+      addLibraries(importMenu, ideLibs);
+      importMenu.addSeparator();
+      addLibraries(importMenu, userLibs);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -1017,7 +1035,7 @@ public class Base {
     
     // Scan for libraries in each library folder.
     // Libraries located in the latest folders on the list can override
-    // other libraries with the same.
+    // other libraries with the same name.
     libraries = scanLibraries(librariesFolders);
 
     // Populate importToLibraryTable
@@ -1209,7 +1227,7 @@ public class Base {
     return found;
   }
 
-  protected boolean addLibraries(JMenu menu, Map<String, File> libs) throws IOException {
+  protected void addLibraries(JMenu menu, Map<String, File> libs) throws IOException {
 
     List<String> list = new ArrayList<String>(libs.keySet());
     Collections.sort(list, String.CASE_INSENSITIVE_ORDER);
@@ -1220,8 +1238,6 @@ public class Base {
       }
     };
 
-    boolean found = false;
-
     for (String name : list) {
       File folder = libs.get(name);
 
@@ -1230,11 +1246,9 @@ public class Base {
       item.addActionListener(listener);
       item.setActionCommand(folder.getAbsolutePath());
       menu.add(item);
-      found = true;
 
       // XXX: DAM: should recurse here so that library folders can be nested
     }
-    return found;
   }
  
   /**
