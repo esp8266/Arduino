@@ -55,17 +55,16 @@ typedef enum {
 
 //extern uhd_speed_t uhd_get_speed(void);
 
-
 extern void UHD_SetStack(void (*pf_isr)(void));
 extern void UHD_Init(void);
 extern void UHD_BusReset(void);
 extern uhd_vbus_state_t UHD_GetVBUSState(void);
-extern uint32_t UHD_EP0_Alloc(uint32_t ul_add, uint32_t ul_ep_size);
-extern uint32_t UHD_EP_Alloc(uint32_t ul_pipe, uint32_t ul_addr, uint32_t ul_interval, uint32_t ul_type, uint32_t ul_dir, uint32_t ul_maxsize, uint32_t ul_bank);
-extern void UHD_EP_Free(uint32_t add, uint32_t endp);
-extern uint32_t UHD_EP_Read(uint32_t ul_ep, uint32_t ul_size, uint8_t* data);
-extern void UHD_EP_Write(uint32_t ul_ep, uint32_t ul_size, uint8_t* data);
-extern void UHD_EP_Send(uint32_t ul_ep, uint32_t ul_token_type);
-extern uint32_t UHD_EP_Is_Transfer_Complete(uint32_t ul_ep, uint32_t ul_token_type);
+extern uint32_t UHD_Pipe0_Alloc(uint32_t ul_add, uint32_t ul_ep_size);
+extern uint32_t UHD_Pipe_Alloc(uint32_t ul_dev_addr, uint32_t ul_dev_ep, uint32_t ul_type, uint32_t ul_dir, uint32_t ul_maxsize, uint32_t ul_interval, uint32_t ul_nb_bank);
+extern void UHD_Pipe_Free(uint32_t ul_pipe);
+extern uint32_t UHD_Pipe_Read(uint32_t ul_pipe, uint32_t ul_size, uint8_t* data);
+extern void UHD_Pipe_Write(uint32_t ul_pipe, uint32_t ul_size, uint8_t* data);
+extern void UHD_Pipe_Send(uint32_t ul_pipe, uint32_t ul_token_type);
+extern uint32_t UHD_Pipe_Is_Transfer_Complete(uint32_t ul_pipe, uint32_t ul_token_type);
 
 #endif /* USB_HOST_H_INCLUDED */

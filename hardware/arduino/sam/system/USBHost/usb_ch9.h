@@ -90,6 +90,7 @@ e-mail   :  support@circuitsathome.com
 #define USB_FEATURE_ENDPOINT_STALL              0       // Endpoint recipient
 #define USB_FEATURE_DEVICE_REMOTE_WAKEUP        1       // Device recipient
 #define USB_FEATURE_TEST_MODE                   2       // Device recipient
+
 _Pragma("pack(1)")
 
 /* descriptor data structures */
@@ -147,7 +148,7 @@ typedef struct
     uint8_t bDescriptorType;       // ENDPOINT descriptor type (USB_DESCRIPTOR_ENDPOINT).
     uint8_t bEndpointAddress;      // Endpoint address. Bit 7 indicates direction (0=OUT, 1=IN).
     uint8_t bmAttributes;          // Endpoint transfer type.
-    uint16_t wMaxPacketSize;        // Maximum packet size.
+    uint16_t wMaxPacketSize;       // Maximum packet size.
     uint8_t bInterval;             // Polling interval in frames.
 } USB_ENDPOINT_DESCRIPTOR;
 

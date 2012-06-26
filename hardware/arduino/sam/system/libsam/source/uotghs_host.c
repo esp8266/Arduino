@@ -32,13 +32,17 @@
 
 #if SAM3XA_SERIES
 
-#define TRACE_UOTGHS_HOST(x)	x
-//#define TRACE_UOTGHS_HOST(x)
+//#define TRACE_UOTGHS_HOST(x)	x
+#define TRACE_UOTGHS_HOST(x)
 
 extern void (*gpf_isr)(void);
 
+// Handle UOTGHS Host driver state
 static uhd_vbus_state_t uhd_state = UHD_STATE_NO_VBUS;
 
+/**
+ * \brief Interrupt sub routine for USB Host state machine management.
+ */
 static void UHD_ISR(void)
 {
 	// Manage dis/connection event
@@ -74,7 +78,7 @@ static void UHD_ISR(void)
 	{
 		TRACE_UOTGHS_HOST(printf(">>> UHD_ISR : VBUS error INT\r\n");)
 		uhd_ack_vbus_error_interrupt();
-		uhd_state = UHD_STATE_ERROR;
+		uhd_state = UHD_STATE_DISCONNECTED; //UHD_STATE_ERROR;
 		return;
 	}
 
@@ -111,11 +115,19 @@ static void UHD_ISR(void)
 	}
 }
 
+/**
+ * \brief Set the interrupt sub routines callback for USB interrupts.
+ *
+ * \param pf_isr the ISR address.
+ */
 void UHD_SetStack(void (*pf_isr)(void))
 {
 	gpf_isr = pf_isr;
 }
 
+/**
+ * \brief Initialize the UOTGHS host driver.
+ */
 void UHD_Init(void)
 {
 	irqflags_t flags;
@@ -178,7 +190,7 @@ void UHD_Init(void)
 
 	// Enable main control interrupt
 	// Connection, SOF and reset
-	UOTGHS->UOTGHS_HSTIER = UOTGHS_HSTICR_DCONNIC;// | UOTGHS_HSTICR_RSTIC;// | UOTGHS_HSTICR_HSOFIC;
+	UOTGHS->UOTGHS_HSTIER = UOTGHS_HSTICR_DCONNIC;
 
 	otg_freeze_clock();
 
@@ -187,11 +199,19 @@ void UHD_Init(void)
 	cpu_irq_restore(flags);
 }
 
+/**
+ * \brief Trigger a USB bus reset.
+ */
 void UHD_BusReset(void)
 {
 	uhd_start_reset();
 }
 
+/**
+ * \brief Get VBUS state.
+ *
+ * \return VBUS status.
+ */
 uhd_vbus_state_t UHD_GetVBUSState(void)
 {
 	return uhd_state;
@@ -224,7 +244,7 @@ uhd_vbus_state_t UHD_GetVBUSState(void)
  * \retval 0 success.
  * \retval 1 error.
  */
-uint32_t UHD_EP0_Alloc(uint32_t ul_add, uint32_t ul_ep_size)
+uint32_t UHD_Pipe0_Alloc(uint32_t ul_add, uint32_t ul_ep_size)
 {
 	if (ul_ep_size < 8)
 	{
@@ -262,88 +282,88 @@ uint32_t UHD_EP0_Alloc(uint32_t ul_add, uint32_t ul_ep_size)
 }
 
 /**
- * \brief Allocate FIFO for the specified pipe.
+ * \brief Allocate a new pipe.
  *
- * \param ul_add Address of remote device for pipe 0.
- * \param ul_ep_size Actual size of the FIFO in bytes.
+ * \note UOTGHS maximum pipe number is limited to 10, meaning that only a limited
+ * amount of devices can be connected. Unfortunately, using only one pipe shared accross
+ * various endpoints and devices is not possible because the UOTGHS IP does not allow to
+ * change the data toggle value through register interface.
  *
- * \retval 0 success.
- * \retval 1 error.
+ * \param ul_dev_addr Address of remote device.
+ * \param ul_dev_ep Targeted endpoint of remote device.
+ * \param ul_type Pipe type.
+ * \param ul_dir Pipe direction.
+ * \param ul_maxsize Pipe size.
+ * \param ul_interval Polling interval (if applicable to pipe type).
+ * \param ul_nb_bank Number of banks associated with this pipe.
+ *
+ * \return the newly allocated pipe number on success, 0 otherwise.
  */
-uint32_t UHD_EP_Alloc(uint32_t ul_pipe, uint32_t ul_addr, uint32_t ul_interval, uint32_t ul_type, uint32_t ul_dir, uint32_t ul_maxsize, uint32_t ul_bank)
+uint32_t UHD_Pipe_Alloc(uint32_t ul_dev_addr, uint32_t ul_dev_ep, uint32_t ul_type, uint32_t ul_dir, uint32_t ul_maxsize, uint32_t ul_interval, uint32_t ul_nb_bank)
 {
+	uint32_t ul_pipe = 1;
 
-/*
- * Warning: this is a first implementation, pipe allocation is very limited.
- * We should probably check maxsize and if maxsize > current size, then realloc with maxsize.
- * If pipe type is changed, a pipe reset and re-configuration is required.
- */
-
-	if (Is_uhd_pipe_enabled(ul_pipe))
+	for (ul_pipe = 1; ul_pipe < UOTGHS_EPT_NUM; ++ul_pipe)
 	{
-		// Pipe is already allocated
-		return 0;
+		if (Is_uhd_pipe_enabled(ul_pipe))
+		{
+			continue;
+		}
+
+		uhd_enable_pipe(ul_pipe);
+
+		uhd_configure_pipe(ul_pipe, ul_interval, ul_dev_ep, ul_type, ul_dir,
+				ul_maxsize, ul_nb_bank, UOTGHS_HSTPIPCFG_AUTOSW);
+
+		uhd_allocate_memory(ul_pipe);
+
+		if (!Is_uhd_pipe_configured(ul_pipe))
+		{
+			uhd_disable_pipe(ul_pipe);
+			return 0;
+		}
+
+		uhd_configure_address(ul_pipe, ul_dev_addr);
+
+		// Pipe is configured and allocated successfully
+		return ul_pipe;
 	}
-
-	uhd_enable_pipe(ul_pipe);
-
-	uhd_configure_pipe(ul_pipe, ul_interval, ul_addr, ul_type, ul_dir,
-			ul_maxsize, ul_bank, UOTGHS_HSTPIPCFG_AUTOSW);
-
-	uhd_allocate_memory(ul_pipe);
-
-	if (!Is_uhd_pipe_configured(ul_pipe))
-	{
-		uhd_disable_pipe(ul_pipe);
-		return 1;
-	}
-
-	uhd_configure_address(ul_pipe, ul_addr);
 
 	return 0;
 }
 
-void UHD_EP_Free(uint32_t add, uint32_t endp)
+/**
+ * \brief Free a pipe.
+ *
+ * \param ul_pipe Pipe number to free.
+ */
+void UHD_Pipe_Free(uint32_t ul_pipe)
 {
-	// Search endpoint(s) in all pipes
-	for (uint8_t pipe = 0; pipe < UOTGHS_EPT_NUM; pipe++)
-	{
-		if (!Is_uhd_pipe_enabled(pipe))
-		{
-			continue;
-		}
-
-		if (add != uhd_get_configured_address(pipe))
-		{
-			continue;
-		}
-
-	/*	if (endp != 0xFF)
-		{
-			// Disable specific endpoint number
-			if (endp != uhd_get_pipe_endpoint_address(pipe))
-			{
-				continue; // Mismatch
-			}
-		}
-*/
-		// Unalloc pipe
-		uhd_disable_pipe(pipe);
-		uhd_unallocate_memory(pipe);
-		uhd_reset_pipe(pipe);
-	}
+	// Unalloc pipe
+	uhd_disable_pipe(ul_pipe);
+	uhd_unallocate_memory(ul_pipe);
+	uhd_reset_pipe(ul_pipe);
 }
 
-uint32_t UHD_EP_Read(uint32_t ul_ep, uint32_t ul_size, uint8_t* data)
+/**
+ * \brief Read from a pipe.
+ *
+ * \param ul_pipe Pipe number.
+ * \param ul_size Maximum number of data to read.
+ * \param data Buffer to store the data.
+ *
+ * \return number of data read.
+ */
+uint32_t UHD_Pipe_Read(uint32_t ul_pipe, uint32_t ul_size, uint8_t* data)
 {
 	uint8_t *ptr_ep_data = 0;
 	uint8_t nb_byte_received = 0;
 	uint32_t ul_nb_trans = 0;
 
 	// Get information to read data
-	nb_byte_received = uhd_byte_count(ul_ep);
+	nb_byte_received = uhd_byte_count(ul_pipe);
 
-	ptr_ep_data = (uint8_t *) & uhd_get_pipe_fifo_access(ul_ep, 8);
+	ptr_ep_data = (uint8_t *) & uhd_get_pipe_fifo_access(ul_pipe, 8);
 
 	// Copy data from pipe to payload buffer
 	while (ul_size && nb_byte_received) {
@@ -356,98 +376,111 @@ uint32_t UHD_EP_Read(uint32_t ul_ep, uint32_t ul_size, uint8_t* data)
 	return ul_nb_trans;
 }
 
-void UHD_EP_Write(uint32_t ul_ep, uint32_t ul_size, uint8_t* data)
+/**
+ * \brief Write into a pipe.
+ *
+ * \param ul_pipe Pipe number.
+ * \param ul_size Maximum number of data to read.
+ * \param data Buffer containing data to write.
+ */
+void UHD_Pipe_Write(uint32_t ul_pipe, uint32_t ul_size, uint8_t* data)
 {
 	volatile uint8_t *ptr_ep_data = 0;
 	uint32_t i = 0;
 
 	// Check pipe
-	if (!Is_uhd_pipe_enabled(ul_ep))
+	if (!Is_uhd_pipe_enabled(ul_pipe))
 	{
 		// Endpoint not valid
 		TRACE_UOTGHS_HOST(printf("/!\\ UHD_EP_Send : pipe is not enabled!\r\n");)
 		return;
 	}
 
-	ptr_ep_data = (volatile uint8_t *)&uhd_get_pipe_fifo_access(ul_ep, 8);
+	ptr_ep_data = (volatile uint8_t *)&uhd_get_pipe_fifo_access(ul_pipe, 8);
 	for (i = 0; i < ul_size; ++i)
 		*ptr_ep_data++ = *data++;
 }
 
-void UHD_EP_Send(uint32_t ul_ep, uint32_t ul_token_type)
+/**
+ * \brief Send a pipe content.
+ *
+ * \param ul_pipe Pipe number.
+ * \param ul_token_type Token type.
+ */
+void UHD_Pipe_Send(uint32_t ul_pipe, uint32_t ul_token_type)
 {
 	// Check pipe
-	if (!Is_uhd_pipe_enabled(ul_ep))
+	if (!Is_uhd_pipe_enabled(ul_pipe))
 	{
 		// Endpoint not valid
-		TRACE_UOTGHS_HOST(printf("/!\\ UHD_EP_Send : pipe %lu is not enabled!\r\n", ul_ep);)
+		TRACE_UOTGHS_HOST(printf("/!\\ UHD_EP_Send : pipe %lu is not enabled!\r\n", ul_pipe);)
 		return;
 	}
 
 	// Set token type for zero length packet
 	// When actually using the FIFO, pipe token MUST be configured first
-	uhd_configure_pipe_token(ul_ep, ul_token_type);
+	uhd_configure_pipe_token(ul_pipe, ul_token_type);
 
 	// Clear interrupt flags
-	uhd_ack_setup_ready(ul_ep);
-	uhd_ack_in_received(ul_ep);
-	uhd_ack_out_ready(ul_ep);
-	uhd_ack_short_packet(ul_ep);
+	uhd_ack_setup_ready(ul_pipe);
+	uhd_ack_in_received(ul_pipe);
+	uhd_ack_out_ready(ul_pipe);
+	uhd_ack_short_packet(ul_pipe);
+	uhd_ack_nak_received(ul_pipe);
 
 	// Send actual packet
-	uhd_ack_fifocon(ul_ep);
-	uhd_unfreeze_pipe(ul_ep);
+	uhd_ack_fifocon(ul_pipe);
+	uhd_unfreeze_pipe(ul_pipe);
 }
 
 /**
- * \brief Check is transfer is complete.
+ * \brief Check for pipe transfer completion.
  *
- * \param ul_add Address of remote device for pipe 0.
- * \param ul_ep_size Actual size of the FIFO in bytes.
+ * \param ul_pipe Pipe number.
+ * \param ul_token_type Token type.
  *
  * \retval 0 transfer is not complete.
  * \retval 1 transfer is complete.
  */
-uint32_t UHD_EP_Is_Transfer_Complete(uint32_t ul_ep, uint32_t ul_token_type)
+uint32_t UHD_Pipe_Is_Transfer_Complete(uint32_t ul_pipe, uint32_t ul_token_type)
 {
 	// Check for transfer completion depending on token type
 	switch (ul_token_type)
 	{
 		case UOTGHS_HSTPIPCFG_PTOKEN_SETUP:
-			if (Is_uhd_setup_ready(ul_ep))
+			if (Is_uhd_setup_ready(ul_pipe))
 			{
-				uhd_freeze_pipe(ul_ep);
-				uhd_ack_setup_ready(ul_ep);
+				uhd_freeze_pipe(ul_pipe);
+				uhd_ack_setup_ready(ul_pipe);
 				return 1;
 			}
 
 		case UOTGHS_HSTPIPCFG_PTOKEN_IN:
-			if (Is_uhd_in_received(ul_ep))
+			if (Is_uhd_in_received(ul_pipe))
 			{
 				// In case of low USB speed and with a high CPU frequency,
 				// a ACK from host can be always running on USB line
 				// then wait end of ACK on IN pipe.
-				while(!Is_uhd_pipe_frozen(ul_ep))
+				while(!Is_uhd_pipe_frozen(ul_pipe))
 					;
 
 				// IN packet received
-				uhd_ack_in_received(ul_ep);
+				uhd_ack_in_received(ul_pipe);
 
 				return 1;
 			}
 
 		case UOTGHS_HSTPIPCFG_PTOKEN_OUT:
-			if (Is_uhd_out_ready(ul_ep))
+			if (Is_uhd_out_ready(ul_pipe))
 			{
 				// OUT packet sent
-				uhd_freeze_pipe(ul_ep);
-				uhd_ack_out_ready(ul_ep);
+				uhd_freeze_pipe(ul_pipe);
+				uhd_ack_out_ready(ul_pipe);
 
 				return 1;
 			}
 	}
 
-	// Nothing to report
 	return 0;
 }
 

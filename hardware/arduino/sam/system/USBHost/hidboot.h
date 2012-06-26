@@ -31,6 +31,9 @@ e-mail   :  support@circuitsathome.com
 #define KEY_ENTER					0x28
 #define KEY_PERIOD					0x63
 
+/**
+ * \brief MOUSEINFO definition.
+ */
 struct MOUSEINFO
 {
 	struct
@@ -44,6 +47,9 @@ struct MOUSEINFO
 	int8_t			dY;
 };
 
+/**
+ * \class MouseReportParser definition.
+ */
 class MouseReportParser : public HIDReportParser
 {
 	union
@@ -65,6 +71,9 @@ protected:
 	virtual void OnMiddleButtonDown	(MOUSEINFO *mi)	{};
 };
 
+/**
+ * \brief MODIFIERKEYS definition.
+ */
 struct MODIFIERKEYS
 {
 	uint8_t		bmLeftCtrl		: 1;
@@ -77,6 +86,9 @@ struct MODIFIERKEYS
 	uint8_t		bmRightGUI		: 1;
 };
 
+/**
+ * \brief KBDINFO definition.
+ */
 struct KBDINFO
 {
 	struct
@@ -94,6 +106,9 @@ struct KBDINFO
 	uint8_t			Keys[6];
 };
 
+/**
+ * \brief KBDLEDS definition.
+ */
 struct KBDLEDS
 {
 	uint8_t		bmNumLock		: 1;
@@ -105,9 +120,18 @@ struct KBDLEDS
 };
 
 #define KEY_NUM_LOCK				0x53
+
+// Clear compiler warning
+#ifdef KEY_CAPS_LOCK
+#undef KEY_CAPS_LOCK
+#endif
+
 #define KEY_CAPS_LOCK				0x39
 #define KEY_SCROLL_LOCK				0x47
 
+/**
+ * \class KeyboardReportParser definition.
+ */
 class KeyboardReportParser : public HIDReportParser
 {
 	static const uint8_t numKeys[];
@@ -146,6 +170,9 @@ protected:
 
 #define HID_MAX_HID_CLASS_DESCRIPTORS		5
 
+/**
+ * \class HIDBoot definition.
+ */
 template <const uint8_t BOOT_PROTOCOL>
 class HIDBoot : public HID
 {
@@ -167,7 +194,7 @@ class HIDBoot : public HID
 public:
 	HIDBoot(USBHost *p);
 
-	virtual bool SetReportParser(uint32_t id, HIDReportParser *prs) { pRptParser = prs; return true;}; /////////////////////// le return ne sert a rien ?!!!
+	virtual bool SetReportParser(uint32_t id, HIDReportParser *prs) { pRptParser = prs; return true; };
 
 	// USBDeviceConfig implementation
 	virtual uint32_t Init(uint32_t parent, uint32_t port, uint32_t lowspeed);
@@ -179,6 +206,9 @@ public:
 	virtual void EndpointXtract(uint32_t conf, uint32_t iface, uint32_t alt, uint32_t proto, const USB_ENDPOINT_DESCRIPTOR *ep);
 };
 
+/**
+ * \brief HIDBoot class constructor.
+ */
 template <const uint8_t BOOT_PROTOCOL>
 HIDBoot<BOOT_PROTOCOL>::HIDBoot(USBHost *p) :
 		HID(p),
@@ -192,21 +222,35 @@ HIDBoot<BOOT_PROTOCOL>::HIDBoot(USBHost *p) :
 		pUsb->RegisterDeviceClass(this);
 }
 
+/**
+ * \brief Initialize HIDBoot class.
+ */
 template <const uint8_t BOOT_PROTOCOL>
 void HIDBoot<BOOT_PROTOCOL>::Initialize()
 {
-	for(uint32_t i = 0; i < totalEndpoints; ++i)
+	for (uint32_t i = 0; i < totalEndpoints; ++i)
 	{
-		epInfo[i].epAddr		= 0;
+		epInfo[i].deviceEpNum	= 0;
+		epInfo[i].hostPipeNum	= 0;
 		epInfo[i].maxPktSize	= (i) ? 0 : 8;
 		epInfo[i].epAttribs		= 0;
 		epInfo[i].bmNakPower	= (i) ? USB_NAK_NOWAIT : USB_NAK_MAX_POWER;
 	}
+
 	bNumEP		= 1;
 	bNumIface	= 0;
 	bConfNum	= 0;
 }
 
+/**
+ * \brief Initialize connection to an HID device.
+ *
+ * \param parent USB device address of the Parent device.
+ * \param port USB device base address.
+ * \param lowspeed USB device speed.
+ *
+ * \return 0 on success, error code otherwise.
+ */
 template <const uint8_t BOOT_PROTOCOL>
 uint32_t HIDBoot<BOOT_PROTOCOL>::Init(uint32_t parent, uint32_t port, uint32_t lowspeed)
 {
@@ -214,13 +258,15 @@ uint32_t HIDBoot<BOOT_PROTOCOL>::Init(uint32_t parent, uint32_t port, uint32_t l
 
 	uint8_t		buf[constBufSize];
 	uint32_t	rcode = 0;
-	UsbDevice	*p = NULL;
-	EpInfo		*oldep_ptr = NULL;
+	UsbDevice	*p = 0;
+	EpInfo		*oldep_ptr = 0;
 	uint32_t	len = 0;
 
-	uint32_t	num_of_conf;	// number of configurations
+	uint32_t	num_of_conf = 0;	// number of configurations
 
 	AddressPool	&addrPool = pUsb->GetAddressPool();
+
+	TRACE_USBHOST(printf("HIDBoot::Init\r\n");)
 
 	if (bAddress)
 		return USB_ERROR_CLASS_INSTANCE_ALREADY_IN_USE;
@@ -246,9 +292,9 @@ uint32_t HIDBoot<BOOT_PROTOCOL>::Init(uint32_t parent, uint32_t port, uint32_t l
 	p->lowspeed = lowspeed;
 
 	// Get device descriptor
-	rcode = pUsb->getDevDescr( 0, 0, 8, (uint8_t*)buf );
+	rcode = pUsb->getDevDescr(0, 0, 8, (uint8_t*)buf);
 
-	if  (!rcode)
+	if (!rcode)
 		len = (buf[0] > constBufSize) ? constBufSize : buf[0];
 
 	if (rcode)
@@ -312,14 +358,12 @@ uint32_t HIDBoot<BOOT_PROTOCOL>::Init(uint32_t parent, uint32_t port, uint32_t l
 
 	for (uint32_t i = 0; i < num_of_conf; ++i)
 	{
-		//HexDumper<USBReadParser, uint16_t, uint16_t>		HexDump;
 		ConfigDescParser<
 			USB_CLASS_HID,
 			HID_BOOT_INTF_SUBCLASS,
 			BOOT_PROTOCOL,
-			CP_MASK_COMPARE_ALL>							confDescrParser(this);
+			CP_MASK_COMPARE_ALL>	confDescrParser(this);
 
-		//rcode = pUsb->getConfDescr(bAddress, 0, i, &HexDump);
 		rcode = pUsb->getConfDescr(bAddress, 0, i, &confDescrParser);
 
 		if (bNumEP > 1)
@@ -364,31 +408,41 @@ uint32_t HIDBoot<BOOT_PROTOCOL>::Init(uint32_t parent, uint32_t port, uint32_t l
 	return 0;
 
 FailGetDevDescr:
-	//USBTRACE("getDevDescr:");
+	TRACE_USBHOST(printf("HIDBoot::Init getDevDescr : ");)
 	goto Fail;
 
 FailSetDevTblEntry:
-	//USBTRACE("setDevTblEn:");
+	TRACE_USBHOST(printf("HIDBoot::Init setDevTblEn : ");)
 	goto Fail;
 
 FailSetProtocol:
-	//USBTRACE("SetProto:");
+	TRACE_USBHOST(printf("HIDBoot::Init SetProto : ");)
 	goto Fail;
 
 FailSetIdle:
-	//USBTRACE("SetIdle:");
+	TRACE_USBHOST(printf("HIDBoot::Init SetIdle : ");)
 	goto Fail;
 
 FailSetConfDescr:
-	//USBTRACE("setConf:");
+	TRACE_USBHOST(printf("HIDBoot::Init setConf : ");)
 	goto Fail;
 
 Fail:
-	//Serial.println(rcode, HEX);
+	TRACE_USBHOST(printf("error code: %lu\r\n", rcode);)
 	Release();
 	return rcode;
 }
 
+/**
+ * \brief Extract interrupt-IN endpoint information from configuration
+ * descriptor.
+ *
+ * \param conf Configuration number.
+ * \param iface Interface number.
+ * \param alt Alternate setting.
+ * \param proto Protocol version used.
+ * \param pep Pointer to endpoint descriptor.
+ */
 template <const uint8_t BOOT_PROTOCOL>
 void HIDBoot<BOOT_PROTOCOL>::EndpointXtract(uint32_t conf, uint32_t iface, uint32_t alt, uint32_t proto, const USB_ENDPOINT_DESCRIPTOR *pep)
 {
@@ -396,41 +450,56 @@ void HIDBoot<BOOT_PROTOCOL>::EndpointXtract(uint32_t conf, uint32_t iface, uint3
 	if (bNumEP > 1 && conf != bConfNum)
 		return;
 
-	//ErrorMessage<uint8_t>(PSTR("\r\nConf.Val"), conf);
-	//ErrorMessage<uint8_t>(PSTR("Iface Num"), iface);
-	//ErrorMessage<uint8_t>(PSTR("Alt.Set"), alt);
+	bConfNum = conf;
+	bIfaceNum = iface;
 
-	bConfNum	= conf;
-	bIfaceNum	= iface;
-
-	uint32_t index;
+	uint32_t index = 0;
+	uint32_t pipe = 0;
 
 	if ((pep->bmAttributes & 0x03) == 3 && (pep->bEndpointAddress & 0x80) == 0x80)
 	{
 		index = epInterruptInIndex;
 
 		// Fill in the endpoint info structure
-		epInfo[index].epAddr		= (pep->bEndpointAddress & 0x0F);
+		epInfo[index].deviceEpNum		= (pep->bEndpointAddress & 0x0F);
 		epInfo[index].maxPktSize	= (uint8_t)pep->wMaxPacketSize;
 		epInfo[index].epAttribs		= 0;
 
-		bNumEP++;
-
 		TRACE_USBHOST(printf("HIDBoot::EndpointXtract : Found new endpoint\r\n");)
-		TRACE_USBHOST(printf("HIDBoot::EndpointXtract : epAddr: %lu\r\n", epInfo[index].epAddr);)
+		TRACE_USBHOST(printf("HIDBoot::EndpointXtract : deviceEpNum: %lu\r\n", epInfo[index].deviceEpNum);)
 		TRACE_USBHOST(printf("HIDBoot::EndpointXtract : maxPktSize: %lu\r\n", epInfo[index].maxPktSize);)
 		TRACE_USBHOST(printf("HIDBoot::EndpointXtract : index: %lu\r\n", index);)
 
-		UHD_EP_Alloc(epInfo[index].epAddr, bAddress, 10, UOTGHS_HSTPIPCFG_PTYPE_INTRPT, UOTGHS_HSTPIPCFG_PTOKEN_IN, epInfo[index].maxPktSize, UOTGHS_HSTPIPCFG_PBK_1_BANK);
+		// Ensure pipe allocation is okay
+		pipe = UHD_Pipe_Alloc(bAddress, epInfo[index].deviceEpNum, UOTGHS_HSTPIPCFG_PTYPE_INTRPT, UOTGHS_HSTPIPCFG_PTOKEN_IN, epInfo[index].maxPktSize, 10, UOTGHS_HSTPIPCFG_PBK_1_BANK);
+		if (pipe == 0)
+		{
+			TRACE_USBHOST(printf("HIDBoot::EndpointXtract : Pipe allocation failure\r\n");)
+			// Enumeration failed
+			return;
+		}
 
-		//PrintEndpointDescriptor(pep);
+		epInfo[index].hostPipeNum = pipe;
+
+		bNumEP++;
 	}
 }
 
-
+/**
+ * \brief Release USB allocated resources (pipes and address).
+ *
+ * \note Release call is made from USBHost.task() on disconnection events.
+ * \note Release call is made from Init() on enumeration failure.
+ *
+ * \return Always 0.
+ */
 template <const uint8_t BOOT_PROTOCOL>
 uint32_t HIDBoot<BOOT_PROTOCOL>::Release()
 {
+	// Free allocated host pipes
+	UHD_Pipe_Free(epInfo[epInterruptInIndex].hostPipeNum);
+
+	// Free allocated USB address
 	pUsb->GetAddressPool().FreeAddress(bAddress);
 
 	bConfNum			= 0;
@@ -439,9 +508,17 @@ uint32_t HIDBoot<BOOT_PROTOCOL>::Release()
 	bAddress			= 0;
 	qNextPollTime		= 0;
 	bPollEnable			= false;
+
 	return 0;
 }
 
+/**
+ * \brief Poll USB device activity.
+ *
+ * \note Poll call is periodically made from USBHost.task().
+ *
+ * \return 0 on success, error code otherwise.
+ */
 template <const uint8_t BOOT_PROTOCOL>
 uint32_t HIDBoot<BOOT_PROTOCOL>::Poll()
 {
@@ -459,12 +536,10 @@ uint32_t HIDBoot<BOOT_PROTOCOL>::Poll()
 
 		uint32_t read = epInfo[epInterruptInIndex].maxPktSize;
 
-		rcode = pUsb->inTransfer(bAddress, epInfo[epInterruptInIndex].epAddr, &read, buf);
+		rcode = pUsb->inTransfer(bAddress, epInfo[epInterruptInIndex].deviceEpNum, &read, buf);
 
 		if (rcode)
 		{
-			//if (rcode != hrNAK)
-				//USBTRACE2("Poll:", rcode);
 			return rcode;
 		}
 

@@ -95,7 +95,10 @@ e-mail   :  support@circuitsathome.com
 #define HID_PROTOCOL_KEYBOARD       0x01
 #define HID_PROTOCOL_MOUSE          0x02
 
-struct HidItemPrefix
+/**
+ * \brief HidItemPrefix definition.
+ */
+struct HidItemPrefix				// Not used
 {
 	uint8_t		bSize : 2;
 	uint8_t		bType : 2;
@@ -125,7 +128,10 @@ struct HidItemPrefix
 #define HID_MAIN_ITEM_COLLECTION_USAGE_SWITCH		5
 #define HID_MAIN_ITEM_COLLECTION_USAGE_MODIFIER		6
 
-struct MainItemIOFeature
+/**
+ * \brief MainItemIOFeature definition.
+ */
+struct MainItemIOFeature			// Not used
 {
 	uint8_t		bmIsConstantOrData			: 1;
 	uint8_t		bmIsArrayOrVariable			: 1;
@@ -139,6 +145,11 @@ struct MainItemIOFeature
 
 class HID;
 
+/**
+ * \class Abstract HIDReportParser definition.
+ *
+ * \note This class is used to implement HID report parsing.
+ */
 class HIDReportParser
 {
 public:
@@ -148,6 +159,9 @@ public:
 #define MAX_REPORT_PARSERS					2
 #define HID_MAX_HID_CLASS_DESCRIPTORS		5
 
+/**
+ * \class HID definition.
+ */
 class HID : public USBDeviceConfig, public UsbConfigXtracter
 {
 protected:

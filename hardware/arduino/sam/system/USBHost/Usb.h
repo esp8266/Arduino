@@ -19,8 +19,8 @@ e-mail   :  support@circuitsathome.com
 #ifndef USB_H_INCLUDED
 #define USB_H_INCLUDED
 
-#define TRACE_USBHOST(x)	x
-//#define TRACE_USBHOST(x)
+//#define TRACE_USBHOST(x)	x
+#define TRACE_USBHOST(x)
 
 #include <stdint.h>
 #include "usb_ch9.h"
@@ -120,7 +120,11 @@ typedef struct
     uint16_t    wLength;                //   6      Depends on bRequest
 } SETUP_PKT, *PSETUP_PKT;
 
-// Base class for incoming data parser
+/**
+ * \class USBReadParser
+ *
+ * \brief Base class used for USB descriptor parsing.
+ */
 class USBReadParser
 {
 public:
@@ -128,21 +132,30 @@ public:
 };
 
 /**
- * USBDeviceConfig class.
+ * \class USBDeviceConfig
+ *
+ * \brief Device configuration class used for managing device life cycle.
  */
 class USBDeviceConfig
 {
 public:
+	//! @brief Perform final enumeration stage.
 	virtual uint32_t Init(uint32_t parent, uint32_t port, uint32_t lowspeed) = 0;
+
+	//! @brief Free USB allocated resources (pipes and address).
 	virtual uint32_t Release()		= 0;
+
+	//! @brief Poll USB device. Call is made for each connected USB device on USBHost.task() call.
 	virtual uint32_t Poll()			= 0;
+
+	//! @brief Retrieve USB device address.
 	virtual uint32_t GetAddress()	= 0;
 };
 
 /**
- * USBHost Class.
- * The device table is filled during enumeration.
- * Index corresponds to device address and each entry contains pointer to endpoint structure and device class to use.
+ * \class USBHost
+ *
+ * \brief Main USB host class.
  */
 class USBHost
 {
@@ -190,7 +203,7 @@ class USBHost
         uint32_t getDevDescr(uint32_t addr, uint32_t ep, uint32_t nbytes, uint8_t* dataptr);
         uint32_t getConfDescr(uint32_t addr, uint32_t ep, uint32_t nbytes, uint32_t conf, uint8_t* dataptr);
 		uint32_t getConfDescr(uint32_t addr, uint32_t ep, uint32_t conf, USBReadParser *p);
-		uint32_t getStrDescr(uint32_t addr, uint32_t ep, uint16_t ns, uint8_t index, uint16_t langid, uint8_t* dataptr);
+		uint32_t getStrDescr(uint32_t addr, uint32_t ep, uint32_t nbytes, uint8_t index, uint16_t langid, uint8_t* dataptr);
 		uint32_t setAddr(uint32_t oldaddr, uint32_t ep, uint32_t newaddr);
 		uint32_t setConf(uint32_t addr, uint32_t ep, uint32_t conf_value);
 		uint32_t ctrlReq(uint32_t addr, uint32_t ep, uint8_t bmReqType, uint8_t bRequest, uint8_t wValLo, uint8_t wValHi,
@@ -209,7 +222,7 @@ class USBHost
 
     private:
         void init();
-		uint32_t SetAddress(uint32_t addr, uint32_t ep, EpInfo **ppep, uint32_t &nak_limit);
+		uint32_t setPipeAddress(uint32_t addr, uint32_t ep, EpInfo **ppep, uint32_t &nak_limit);
 		uint32_t OutTransfer(EpInfo *pep, uint32_t nak_limit, uint32_t nbytes, uint8_t *data);
 		uint32_t InTransfer(EpInfo *pep, uint32_t nak_limit, uint32_t *nbytesptr, uint8_t* data);
 };

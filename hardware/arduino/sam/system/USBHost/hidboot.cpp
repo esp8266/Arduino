@@ -17,6 +17,14 @@ e-mail   :  support@circuitsathome.com
 
 #include "hidboot.h"
 
+/**
+ * \brief Parse HID mouse report.
+ *
+ * \param hid HID device pointer.
+ * \param is_rpt_id True if this is a report ID.
+ * \param len Buffer length.
+ * \param buf Buffer containing report data.
+ */
 void MouseReportParser::Parse(HID *hid, bool is_rpt_id, uint32_t len, uint8_t *buf)
 {
 	MOUSEINFO *pmi = (MOUSEINFO*)buf;
@@ -46,6 +54,14 @@ void MouseReportParser::Parse(HID *hid, bool is_rpt_id, uint32_t len, uint8_t *b
 		prevState.bInfo[i] = buf[i];
 };
 
+/**
+ * \brief Parse HID keyboard report.
+ *
+ * \param hid HID device pointer.
+ * \param is_rpt_id True if this is a report ID.
+ * \param len Buffer length.
+ * \param buf Buffer containing report data.
+ */
 void KeyboardReportParser::Parse(HID *hid, bool is_rpt_id, uint32_t len, uint8_t *buf)
 {
 	// On error - return
@@ -81,6 +97,15 @@ void KeyboardReportParser::Parse(HID *hid, bool is_rpt_id, uint32_t len, uint8_t
 		prevState.bInfo[i] = buf[i];
 };
 
+/**
+ * \brief Handle keyboard locking keys and manage keyboard leds using USB
+ * report.
+ *
+ * \param hid HID device pointer.
+ * \param key Locking key.
+ *
+ * \return 0 on success, error code otherwise.
+ */
 uint8_t KeyboardReportParser::HandleLockingKeys(HID *hid, uint8_t key)
 {
 	uint8_t old_keys = kbdLockingKeys.bLeds;
@@ -109,6 +134,14 @@ const uint8_t KeyboardReportParser::symKeysUp[] = { '_', '+', '{', '}', '|', '~'
 const uint8_t KeyboardReportParser::symKeysLo[] = { '-', '=', '[', ']', '\\', ' ', ';', '\'', '`', ',', '.', '/' };
 const uint8_t KeyboardReportParser::padKeys[] = { '/', '*', '-', '+', 0x13 };
 
+/**
+ * \brief Manage keyboard OEM to ASCII conversion.
+ *
+ * \param mod Keyboard modifier.
+ * \param key Key value to convert.
+ *
+ * \return Keyboard corresponding ASCII value on success, 0 otherwise.
+ */
 uint8_t KeyboardReportParser::OemToAscii(uint8_t mod, uint8_t key)
 {
 	uint8_t shift = (mod & 0x22);
@@ -154,5 +187,6 @@ uint8_t KeyboardReportParser::OemToAscii(uint8_t mod, uint8_t key)
 			case KEY_PERIOD:	return ((kbdLockingKeys.kbdLeds.bmNumLock == 1) ? '.' : 0);
 		}
 	}
+
 	return 0;
 }
