@@ -29,9 +29,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Set;
 
+import processing.app.Base;
 import processing.core.PApplet;
 
 public class PreferencesMap extends HashMap<String, String> {
@@ -76,6 +79,25 @@ public class PreferencesMap extends HashMap<String, String> {
         String key = line.substring(0, equals);
         String value = line.substring(equals + 1);
         put(key.trim(), value.trim());
+      }
+    }
+
+    // This is needed to avoid ConcurrentAccessExceptions
+    Set<String> keys = new HashSet<String>(keySet());
+
+    // Override keys that have OS specific versions
+    for (String k : keys) {
+      boolean replace = false;
+      if (Base.isLinux() && k.endsWith(".linux"))
+        replace = true;
+      if (Base.isWindows() && k.endsWith(".windows"))
+        replace = true;
+      if (Base.isMacOS() && k.endsWith(".macos"))
+        replace = true;
+      if (replace) {
+        int dot = k.lastIndexOf('.');
+        String overridenKey = k.substring(0, dot);
+        put(overridenKey, get(k));
       }
     }
   }

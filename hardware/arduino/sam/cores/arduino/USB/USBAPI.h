@@ -27,17 +27,17 @@
 //================================================================================
 //	USB
 
-class USB_
+class USBDevice_
 {
 public:
-	USB_();
+	USBDevice_();
 	bool configured();
 
 	bool attach();
 	bool detach();	// Serial port goes down too...
 	void poll();
 };
-extern USB_ USB;
+extern USBDevice_ USBDevice;
 
 //================================================================================
 //================================================================================
@@ -57,6 +57,7 @@ public:
 	virtual int read(void);
 	virtual void flush(void);
 	virtual size_t write(uint8_t);
+	using Print::write; // pull in write(str) and write(buf, size) from Print
 	operator bool();
 };
 extern Serial_ Serial;

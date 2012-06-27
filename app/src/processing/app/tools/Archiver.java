@@ -56,7 +56,7 @@ public class Archiver implements Tool {
     numberFormat.setGroupingUsed(false); // no commas
     numberFormat.setMinimumIntegerDigits(digits);
 
-    dateFormat = new SimpleDateFormat(_("yyMMdd"));
+    dateFormat = new SimpleDateFormat("yyMMdd");
   }
 
 

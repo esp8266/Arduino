@@ -80,6 +80,75 @@ public class Preferences {
   static final String PROMPT_OK      = _("OK");
   static final String PROMPT_BROWSE  = _("Browse");
 
+  String[] languages = {
+                        _("System Default"),
+                        "العربية" + " (" + _("Arabic") + ")",
+                        "Aragonés" + " (" + _("Aragonese") + ")",
+                        "Català" + " (" + _("Catalan") + ")",
+                        "简体中文" + " (" + _("Chinese Simplified") + ")",
+                        "繁體中文" + " (" + _("Chinese Traditional") + ")",
+                        "Dansk" + " (" + _("Danish") + ")",
+                        "Nederlands" + " (" + _("Dutch") + ")",
+                        "English" + " (" + _("English") + ")",
+                        "Eesti" + " (" + _("Estonian") + ")",
+                        "Pilipino" + " (" + _("Filipino") + ")",
+                        "Français" + " (" + _("French") + ")",
+                        "Galego" + " (" + _("Galician") + ")",
+                        "Deutsch" + " (" + _("German") + ")",
+                        "ελληνικά" + " (" + _("Greek") + ")",
+                        "Magyar" + " (" + _("Hindi") + ")",
+                        "Magyar" + " (" + _("Hungarian") + ")",
+                        "Bahasa Indonesia" + " (" + _("Indonesian") + ")",
+                        "Italiano" + " (" + _("Italian") + ")",
+                        "日本語" + " (" + _("Japanese") + ")",
+                                                                "한국어" + " (" + _("Korean") + ")",
+                        "Latviešu" + " (" + _("Latvian") + ")",
+                        "Lietuvių Kalba" + " (" + _("Lithuaninan") + ")",
+                                                 "मराठी" + " (" + _("Marathi") + ")",                        
+                        "Norsk" + " (" + _("Norwegian") + ")",
+                        "فارسی" + " (" + _("Persian") + ")",
+                        "Język Polski" + " (" + _("Polish") + ")",
+                        "Português" + " (" + _("Portuguese") + " - Brazil)",
+                        "Português" + " (" + _("Portuguese") + " - Portugal)",
+                        "Română" + " (" + _("Romanian") + ")",
+                        "Русский" + " (" + _("Russian") + ")",
+                        "Español" + " (" + _("Spanish") + ")",
+                        "தமிழ்" + " (" + _("Tamil") + ")"};
+  String[] languagesISO = {
+                        "",
+                        "ar",
+                        "an",
+                        "ca",
+                        "zh_cn",
+                        "zh_tw",
+                        "da",
+                        "nl",
+                        "en",
+                        "et",
+                        "tl",
+                        "fr",
+                        "gl",
+                        "de",
+                        "el",
+                        "hi",
+                        "hu",
+                        "id",
+                        "it",
+                        "ja",
+                        "ko",
+                        "lv",
+                        "lt",
+                        "mr",
+                        "no_nb",
+                        "fa",
+                        "pl",
+                        "pt_br",
+                        "pt_pt",
+                        "ro",
+                        "ru",
+                        "es",
+                        "ta"};
+  
   /**
    * Standardized width for buttons. Mac OS X 10.3 wants 70 as its default,
    * Windows XP needs 66, and my Ubuntu machine needs 80+, so 80 seems proper.
@@ -117,6 +186,7 @@ public class Preferences {
   JCheckBox exportSeparateBox;
   JCheckBox verboseCompilationBox;
   JCheckBox verboseUploadBox;
+  JCheckBox verifyUploadBox;
   JCheckBox externalEditorBox;
   JCheckBox memoryOverrideBox;
   JTextField memoryField;
@@ -124,6 +194,7 @@ public class Preferences {
   JTextField fontSizeField;
   JCheckBox updateExtensionBox;
   JCheckBox autoAssociateBox;
+  JComboBox comboLanguage;
 
 
   // the calling editor, so updates can be applied
@@ -151,10 +222,9 @@ public class Preferences {
 
     // set some runtime constants (not saved on preferences file)
     table.put("runtime.os", PConstants.platformNames[PApplet.platform]);
-    String idePath = System.getProperty("user.dir");
-    if (Base.isMacOS())
-      idePath += "/Arduino.app/Contents/Resources/Java";
-    table.put("runtime.ide.path", idePath);
+    File hardwareFolder = Base.getHardwareFolder();
+    table.put("runtime.hardware.path", hardwareFolder.getAbsolutePath());
+    table.put("runtime.ide.path", hardwareFolder.getParentFile().getAbsolutePath());
     table.put("runtime.ide.version", "" + Base.REVISION);
     
     // check for platform-specific properties in the defaults
@@ -278,9 +348,25 @@ public class Preferences {
     top += vmax + GUI_BETWEEN;
 
 
+    // Preferred language: [        ] (requires restart of Arduino)
+    Container box = Box.createHorizontalBox();
+    label = new JLabel(_("Editor language: "));
+    box.add(label);
+    comboLanguage = new JComboBox(languages);
+    comboLanguage.setSelectedIndex((Arrays.asList(languagesISO)).indexOf(Preferences.get("editor.languages.current")));
+    box.add(comboLanguage);
+    label = new JLabel(_("  (requires restart of Arduino)"));
+    box.add(label);
+    pain.add(box);
+    d = box.getPreferredSize();
+    box.setForeground(Color.gray);
+    box.setBounds(left, top, d.width, d.height);
+    right = Math.max(right, left + d.width);
+    top += d.height + GUI_BETWEEN;
+    
     // Editor font size [    ]
 
-    Container box = Box.createHorizontalBox();
+    box = Box.createHorizontalBox();
     label = new JLabel(_("Editor font size: "));
     box.add(label);
     fontSizeField = new JTextField(4);
@@ -308,8 +394,16 @@ public class Preferences {
     d = box.getPreferredSize();
     box.setBounds(left, top, d.width, d.height);
     top += d.height + GUI_BETWEEN;
-    
 
+    // [ ] Verify code after upload
+    
+    verifyUploadBox = new JCheckBox(_("Verify code after upload"));
+    pain.add(verifyUploadBox);
+    d = verifyUploadBox.getPreferredSize();
+    verifyUploadBox.setBounds(left, top, d.width + 10, d.height);
+    right = Math.max(right, left + d.width);
+    top += d.height + GUI_BETWEEN;
+    
     // [ ] Use external editor
 
     externalEditorBox = new JCheckBox(_("Use external editor"));
@@ -349,7 +443,6 @@ public class Preferences {
       right = Math.max(right, left + d.width);
       top += d.height + GUI_BETWEEN;
     }
-
 
     // More preferences are in the ...
 
@@ -491,7 +584,8 @@ public class Preferences {
     // put each of the settings into the table
     setBoolean("build.verbose", verboseCompilationBox.isSelected());
     setBoolean("upload.verbose", verboseUploadBox.isSelected());
-
+    setBoolean("upload.verify", verifyUploadBox.isSelected());
+    
 //    setBoolean("sketchbook.closing_last_window_quits",
 //               closingLastQuitsBox.isSelected());
     //setBoolean("sketchbook.prompt", sketchPromptBox.isSelected());
@@ -538,6 +632,11 @@ public class Preferences {
     
     setBoolean("editor.update_extension", updateExtensionBox.isSelected());
 
+    // adds the selected language to the preferences file
+    Object newItem = comboLanguage.getSelectedItem();
+    int pos = (Arrays.asList(languages)).indexOf(newItem.toString());  // position in the languages array
+    set("editor.languages.current",(Arrays.asList(languagesISO)).get(pos));        
+
     editor.applyPreferences();
   }
 
@@ -548,6 +647,7 @@ public class Preferences {
     // set all settings entry boxes to their actual status
     verboseCompilationBox.setSelected(getBoolean("build.verbose"));
     verboseUploadBox.setSelected(getBoolean("upload.verbose"));
+    verifyUploadBox.setSelected(getBoolean("upload.verify"));
 
     //closingLastQuitsBox.
     //  setSelected(getBoolean("sketchbook.closing_last_window_quits"));

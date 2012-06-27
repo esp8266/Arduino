@@ -46,8 +46,8 @@
 struct ring_buffer
 {
   unsigned char buffer[SERIAL_BUFFER_SIZE];
-  volatile int head;
-  volatile int tail;
+  volatile unsigned int head;
+  volatile unsigned int tail;
 };
 
 #if defined(USBCON)
@@ -396,6 +396,10 @@ size_t HardwareSerial::write(uint8_t c)
   sbi(*_ucsrb, _udrie);
   
   return 1;
+}
+
+HardwareSerial::operator bool() {
+	return true;
 }
 
 // Preinstantiate Objects //////////////////////////////////////////////////////

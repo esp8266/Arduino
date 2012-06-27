@@ -127,10 +127,10 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
     
     serialRates = new JComboBox();
     for (int i = 0; i < serialRateStrings.length; i++)
-      serialRates.addItem(serialRateStrings[i] + _(" baud"));
+      serialRates.addItem(serialRateStrings[i] + " " + _("baud"));
 
     serialRate = Preferences.getInteger("serial.debug_rate");
-    serialRates.setSelectedItem(serialRate + _(" baud"));
+    serialRates.setSelectedItem(serialRate + " " + _("baud"));
     serialRates.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         String wholeString = (String) serialRates.getSelectedItem();

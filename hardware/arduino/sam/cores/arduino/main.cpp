@@ -39,13 +39,16 @@ int main( void )
 
 	delay(1);
 
-	USB.attach();
+#if defined(USBCON)
+	USBDevice.attach();
+#endif
 
 	setup();
 
 	for (;;)
 	{
 		loop();
+		if (serialEventRun) serialEventRun();
 	}
 
 	return 0;

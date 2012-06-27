@@ -23,7 +23,7 @@ CREDITS
 Arduino is an open source project, supported by many.
 
 The Arduino team is composed of Massimo Banzi, David Cuartielles, Tom Igoe,
-Gianluca Martino, and David A. Mellis.
+Gianluca Martino, Daniela Antonietti, and David A. Mellis.
 
 Arduino uses the GNU avr-gcc toolchain, avrdude, avr-libc, and code from
 Processing and Wiring.

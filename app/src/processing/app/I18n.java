@@ -12,11 +12,25 @@
  */
 
 package processing.app;
+
 import java.util.*;
+import java.util.Locale.*;
 import java.text.MessageFormat;
 
 public class I18n {
+  // start using current locale but still allow using the dropdown list later
   private static ResourceBundle i18n = ResourceBundle.getBundle("processing.app.Resources");
+  public static Locale locale;
+
+  static protected void init (String language) {
+    // there might be a null pointer exception ... most likely will never happen but the jvm gets mad
+    try {
+      if (language == null || language.trim().length() == 0) locale = Locale.getDefault();
+      else locale = new Locale(language);
+      i18n = ResourceBundle.getBundle("processing.app.Resources", locale);
+    } catch (java.lang.NullPointerException e) {
+    }
+  }
 
   public static String _(String s) {
     try {

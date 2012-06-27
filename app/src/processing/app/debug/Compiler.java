@@ -54,6 +54,7 @@ public class Compiler implements MessageConsumer {
 
   private PreferencesMap prefs;
   private boolean verbose;
+  private boolean sketchIsCompiled;
 	
   private RunnerException exception;
   
@@ -71,6 +72,7 @@ public class Compiler implements MessageConsumer {
       throws RunnerException {
     sketch = _sketch;
     verbose = _verbose;
+    sketchIsCompiled = false;
     objectFiles = new ArrayList<File>();
 
     prefs = createBuildPreferences(_buildPath, _primaryClassName);
@@ -79,7 +81,7 @@ public class Compiler implements MessageConsumer {
     sketch.setCompilingProgress(20);
     List<String> includePaths = new ArrayList<String>();
     includePaths.add(prefs.get("build.core.path"));
-    if (!prefs.get("build.variant.path").isEmpty())
+    if (prefs.get("build.variant.path").length() != 0)
       includePaths.add(prefs.get("build.variant.path"));
     for (File file : sketch.getImportedLibraries())
       includePaths.add(file.getPath());
@@ -87,6 +89,7 @@ public class Compiler implements MessageConsumer {
     // 1. compile the sketch (already in the buildPath)
     sketch.setCompilingProgress(30);
     compileSketch(includePaths);
+    sketchIsCompiled = true;
 
     // 2. compile the libraries, outputting .o files to: <buildPath>/<library>/
     // Doesn't really use configPreferences
@@ -117,6 +120,14 @@ public class Compiler implements MessageConsumer {
   private PreferencesMap createBuildPreferences(String _buildPath,
                                                 String _primaryClassName)
       throws RunnerException {
+    
+    if (Base.getBoardPreferences() == null) {
+      RunnerException re = new RunnerException(
+          _("No board selected; please choose a board from the Tools > Board menu."));
+      re.hideStackTrace();
+      throw re;
+    }
+
     TargetPlatform targetPlatform = Base.getTargetPlatform();
 
     // Merge all the global preference configuration in order of priority
@@ -137,12 +148,6 @@ public class Compiler implements MessageConsumer {
 
     // Core folder
     String core = p.get("build.core");
-    if (core == null) {
-      RunnerException re = new RunnerException(
-          _("No board selected; please choose a board from the Tools > Board menu."));
-      re.hideStackTrace();
-      throw re;
-    }
     TargetPlatform tp;
     if (!core.contains(":")) {
       tp = targetPlatform;
@@ -302,7 +307,7 @@ public class Compiler implements MessageConsumer {
     List<String> stringList = new ArrayList<String>();
     for (String string : command) {
       string = string.trim();
-      if (!string.isEmpty())
+      if (string.length() != 0)
         stringList.add(string);
     }
     command = stringList.toArray(new String[stringList.size()]);
@@ -337,10 +342,8 @@ public class Compiler implements MessageConsumer {
     boolean compiling = true;
     while (compiling) {
       try {
-        if (in.thread != null)
-          in.thread.join();
-        if (err.thread != null)
-          err.thread.join();
+        in.join();
+        err.join();
         result = process.waitFor();
         //System.out.println("result is " + result);
         compiling = false;
@@ -428,7 +431,7 @@ public class Compiler implements MessageConsumer {
       if (pieces[3].trim().equals("'Udp' was not declared in this scope")) {
         error = _("The Udp class has been renamed EthernetUdp.");
         msg = _("\nAs of Arduino 1.0, the Udp class in the Ethernet library " +
-              "has been renamed to EthernetClient.\n\n");
+              "has been renamed to EthernetUdp.\n\n");
       }
       
       if (pieces[3].trim().equals("'class TwoWire' has no member named 'send'")) {
@@ -443,14 +446,30 @@ public class Compiler implements MessageConsumer {
               "to Wire.read() for consistency with other libraries.\n\n");
       }
 
-      RunnerException e = sketch.placeException(error, pieces[1], PApplet.parseInt(pieces[2]) - 1);
+      if (pieces[3].trim().equals("'Mouse' was not declared in this scope")) {
+        error = _("'Mouse' only supported on the Arduino Leonardo");
+        //msg = _("\nThe 'Mouse' class is only supported on the Arduino Leonardo.\n\n");
+      }
+      
+      if (pieces[3].trim().equals("'Keyboard' was not declared in this scope")) {
+        error = _("'Keyboard' only supported on the Arduino Leonardo");
+        //msg = _("\nThe 'Keyboard' class is only supported on the Arduino Leonardo.\n\n");
+      }
+      
+      RunnerException e = null;
+      if (!sketchIsCompiled) {
+        // Place errors when compiling the sketch, but never while compiling libraries
+        // or the core.  The user's sketch might contain the same filename!
+        e = sketch.placeException(error, pieces[1], PApplet.parseInt(pieces[2]) - 1);
+      }
 
       // replace full file path with the name of the sketch tab (unless we're
       // in verbose mode, in which case don't modify the compiler output)
       if (e != null && !verbose) {
         SketchCode code = sketch.getCode(e.getCodeIndex());
-        String fileName = code.isExtension(sketch.getDefaultExtension()) ? code.getPrettyName() : code.getFileName();
-        s = fileName + ":" + e.getCodeLine() + ": error: " + pieces[3] + msg;        
+        String fileName = (code.isExtension("ino") || code.isExtension("pde")) ? code.getPrettyName() : code.getFileName();
+        int lineNum = e.getCodeLine() + 1;
+        s = fileName + ":" + lineNum + ": error: " + pieces[3] + msg;        
       }
             
       if (exception == null && e != null) {
@@ -590,12 +609,12 @@ public class Compiler implements MessageConsumer {
 
     List<String> includePaths = new ArrayList<String>();
     includePaths.add(corePath); // include core path only
-    if (!variantPath.isEmpty())
+    if (variantPath.length() != 0)
       includePaths.add(variantPath);
 
     List<File> coreObjectFiles = compileFiles(buildPath, new File(corePath),
                                               true, includePaths);
-    if (!variantPath.isEmpty())
+    if (variantPath.length() != 0)
       coreObjectFiles.addAll(compileFiles(buildPath, new File(variantPath),
                                           true, includePaths));
 

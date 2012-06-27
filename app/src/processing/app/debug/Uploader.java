@@ -170,7 +170,17 @@ public abstract class Uploader implements MessageConsumer  {
   boolean notFoundError;
 
   public void message(String s) {
-    //System.err.println("MSG: " + s);
+  	// selectively suppress a bunch of avrdude output for AVR109/Caterina that should already be quelled but isn't
+	if (!Preferences.getBoolean("upload.verbose") && ( 
+		s.indexOf("Connecting to programmer:") != -1 ||
+		s.indexOf("Found programmer: Id = \"CATERIN\"; type = S") != -1 ||
+		s.indexOf("Software Version = 1.0; No Hardware Version given.") != -1 ||
+		s.indexOf("Programmer supports auto addr increment.") != -1 ||
+		s.indexOf("Programmer supports buffered memory access with buffersize=128 bytes.") != -1 || 
+		s.indexOf("Programmer supports the following devices:") != -1 || 
+		s.indexOf("Device code: 0x44") != -1))
+		s = "";	
+    
     System.err.print(s);
 
     // ignore cautions
@@ -191,7 +201,11 @@ public abstract class Uploader implements MessageConsumer  {
     }
     if (s.indexOf("Programmer is not responding") != -1 ||
         s.indexOf("programmer is not responding") != -1 ||
-        s.indexOf("protocol error") != -1) {
+        s.indexOf("protocol error") != -1 ||
+        s.indexOf("avrdude: ser_open(): can't open device") != -1 ||
+        s.indexOf("avrdude: ser_drain(): read error") != -1 ||
+        s.indexOf("avrdude: ser_send(): write error") != -1 ||
+        s.indexOf("avrdude: error: buffered memory access not supported.") != -1) {
       exception = new RunnerException(_("Problem uploading to board.  See http://www.arduino.cc/en/Guide/Troubleshooting#upload for suggestions."));
       return;
     }

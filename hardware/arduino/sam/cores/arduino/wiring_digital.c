@@ -34,16 +34,35 @@ extern void pinMode( uint32_t ulPin, uint32_t ulMode )
         case INPUT:
             /* Enable peripheral for clocking input */
             pmc_enable_periph_clk( g_APinDescription[ulPin].ulPeripheralId ) ;
-            PIO_Configure( g_APinDescription[ulPin].pPort, PIO_INPUT, g_APinDescription[ulPin].ulPin, 0 ) ;
+            PIO_Configure(
+            	g_APinDescription[ulPin].pPort,
+            	PIO_INPUT,
+            	g_APinDescription[ulPin].ulPin,
+            	0 ) ;
+        break ;
+
+        case INPUT_PULLUP:
+            /* Enable peripheral for clocking input */
+            pmc_enable_periph_clk( g_APinDescription[ulPin].ulPeripheralId ) ;
+            PIO_Configure(
+            	g_APinDescription[ulPin].pPort,
+            	PIO_INPUT,
+            	g_APinDescription[ulPin].ulPin,
+            	PIO_PULLUP ) ;
         break ;
 
         case OUTPUT:
-            /* if all pins are output, disable PIO Controller clocking, reduce power consomption */
+            PIO_Configure(
+            	g_APinDescription[ulPin].pPort,
+            	PIO_OUTPUT_1,
+            	g_APinDescription[ulPin].ulPin,
+            	g_APinDescription[ulPin].ulPinConfiguration ) ;
+
+            /* if all pins are output, disable PIO Controller clocking, reduce power consumption */
             if ( g_APinDescription[ulPin].pPort->PIO_OSR == 0xffffffff )
             {
                 pmc_disable_periph_clk( g_APinDescription[ulPin].ulPeripheralId ) ;
             }
-            PIO_Configure( g_APinDescription[ulPin].pPort, PIO_OUTPUT_1, g_APinDescription[ulPin].ulPin, g_APinDescription[ulPin].ulPinConfiguration ) ;
         break ;
 
         default:

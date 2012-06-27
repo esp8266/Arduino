@@ -32,7 +32,7 @@
 
 #include "wiring_private.h"
 
-volatile static voidFuncPtr intFunc[EXTERNAL_NUM_INTERRUPTS];
+static volatile voidFuncPtr intFunc[EXTERNAL_NUM_INTERRUPTS];
 // volatile static voidFuncPtr twiIntFunc;
 
 void attachInterrupt(uint8_t interruptNum, void (*userFunc)(void), int mode) {
@@ -47,7 +47,27 @@ void attachInterrupt(uint8_t interruptNum, void (*userFunc)(void), int mode) {
     // Enable the interrupt.
       
     switch (interruptNum) {
-#if defined(EICRA) && defined(EICRB) && defined(EIMSK)
+#if defined(__AVR_ATmega32U4__)
+	// I hate doing this, but the register assignment differs between the 1280/2560
+	// and the 32U4.  Since avrlib defines registers PCMSK1 and PCMSK2 that aren't 
+	// even present on the 32U4 this is the only way to distinguish between them.
+	case 0:
+		EICRA = (EICRA & ~((1<<ISC00) | (1<<ISC01))) | (mode << ISC00);
+		EIMSK |= (1<<INT0);
+		break;
+	case 1:
+		EICRA = (EICRA & ~((1<<ISC10) | (1<<ISC11))) | (mode << ISC10);
+		EIMSK |= (1<<INT1);
+		break;	
+    case 2:
+        EICRA = (EICRA & ~((1<<ISC20) | (1<<ISC21))) | (mode << ISC20);
+        EIMSK |= (1<<INT2);
+        break;
+    case 3:
+        EICRA = (EICRA & ~((1<<ISC30) | (1<<ISC31))) | (mode << ISC30);
+        EIMSK |= (1<<INT3);
+        break;
+#elif defined(EICRA) && defined(EICRB) && defined(EIMSK)
     case 2:
       EICRA = (EICRA & ~((1 << ISC00) | (1 << ISC01))) | (mode << ISC00);
       EIMSK |= (1 << INT0);
@@ -80,7 +100,7 @@ void attachInterrupt(uint8_t interruptNum, void (*userFunc)(void), int mode) {
       EICRB = (EICRB & ~((1 << ISC70) | (1 << ISC71))) | (mode << ISC70);
       EIMSK |= (1 << INT7);
       break;
-#else
+#else		
     case 0:
     #if defined(EICRA) && defined(ISC00) && defined(EIMSK)
       EICRA = (EICRA & ~((1 << ISC00) | (1 << ISC01))) | (mode << ISC00);
@@ -121,8 +141,6 @@ void attachInterrupt(uint8_t interruptNum, void (*userFunc)(void), int mode) {
     #elif defined(MCUCR) && defined(ISC20) && defined(GIMSK) && defined(GIMSK)
       MCUCR = (MCUCR & ~((1 << ISC20) | (1 << ISC21))) | (mode << ISC20);
       GIMSK |= (1 << INT2);
-    #else
-      #warning attachInterrupt may need some more work for this cpu (case 1)
     #endif
       break;
 #endif
@@ -136,7 +154,20 @@ void detachInterrupt(uint8_t interruptNum) {
     // to the number of the EIMSK bit to clear, as this isn't true on the 
     // ATmega8.  There, INT0 is 6 and INT1 is 7.)
     switch (interruptNum) {
-#if defined(EICRA) && defined(EICRB) && defined(EIMSK)
+#if defined(__AVR_ATmega32U4__)
+    case 0:
+        EIMSK &= ~(1<<INT0);
+        break;
+    case 1:
+        EIMSK &= ~(1<<INT1);
+        break;
+    case 2:
+        EIMSK &= ~(1<<INT2);
+        break;
+    case 3:
+        EIMSK &= ~(1<<INT3);
+        break;		
+#elif defined(EICRA) && defined(EICRB) && defined(EIMSK)
     case 2:
       EIMSK &= ~(1 << INT0);
       break;
@@ -198,7 +229,28 @@ void attachInterruptTwi(void (*userFunc)(void) ) {
 }
 */
 
-#if defined(EICRA) && defined(EICRB)
+#if defined(__AVR_ATmega32U4__)
+SIGNAL(INT0_vect) {
+	if(intFunc[EXTERNAL_INT_0])
+		intFunc[EXTERNAL_INT_0]();
+}
+
+SIGNAL(INT1_vect) {
+	if(intFunc[EXTERNAL_INT_1])
+		intFunc[EXTERNAL_INT_1]();
+}
+
+SIGNAL(INT2_vect) {
+    if(intFunc[EXTERNAL_INT_2])
+		intFunc[EXTERNAL_INT_2]();
+}
+
+SIGNAL(INT3_vect) {
+    if(intFunc[EXTERNAL_INT_3])
+		intFunc[EXTERNAL_INT_3]();
+}
+
+#elif defined(EICRA) && defined(EICRB)
 
 SIGNAL(INT0_vect) {
   if(intFunc[EXTERNAL_INT_2])

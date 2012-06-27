@@ -3,6 +3,7 @@
 HIGH	LITERAL1	Constants
 LOW	LITERAL1	Constants
 INPUT	LITERAL1	Constants
+INPUT_PULLUP	LITERAL1	Constants
 OUTPUT	LITERAL1	Constants
 DEC	LITERAL1	Serial_Print
 BIN	LITERAL1	Serial_Print
@@ -30,6 +31,7 @@ byte	KEYWORD1	Byte
 case	KEYWORD1	SwitchCase
 char	KEYWORD1	Char
 class	KEYWORD1
+const	KEYWORD1	Const
 continue	KEYWORD1	Continue
 default	KEYWORD1	SwitchCase	
 do	KEYWORD1	DoWhile
@@ -180,6 +182,18 @@ parseInt	KEYWORD2
 parseFloat	KEYWORD2
 readBytes	KEYWORD2
 readBytesUntil	KEYWORD2
+
+# USB-related keywords
+
+Keyboard	KEYWORD3
+Mouse	KEYWORD3
+press	KEYWORD2
+release	KEYWORD2
+releaseAll	KEYWORD2
+accept	KEYWORD2
+click	KEYWORD2
+move	KEYWORD2
+isPressed	KEYWORD2
 
 setup	KEYWORD3	Setup
 loop	KEYWORD3	Loop

@@ -12,6 +12,9 @@
  ** CS - pin 4
  
  created  22 December 2010
+ by Limor Fried
+ modified 9 Apr 2012
+ by Tom Igoe
  
  This example code is in the public domain.
  	 
@@ -27,7 +30,13 @@ const int chipSelect = 4;
 
 void setup()
 {
+ // Open serial communications and wait for port to open:
   Serial.begin(9600);
+   while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
+
+
   Serial.print("Initializing SD card...");
   // make sure that the default chip select pin is set to
   // output, even if you don't use it:

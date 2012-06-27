@@ -27,37 +27,40 @@
 
 #include <avr/pgmspace.h>
 
-#define ARDUINO_MODEL_USB_PID	0x0034
-
 #define TX_RX_LED_INIT	DDRD |= (1<<5), DDRB |= (1<<0)
 #define TXLED0			PORTD |= (1<<5)
 #define TXLED1			PORTD &= ~(1<<5)
 #define RXLED0			PORTB |= (1<<0)
 #define RXLED1			PORTB &= ~(1<<0)
 
-const static uint8_t SDA = 2;
-const static uint8_t SCL = 3;
+static const uint8_t SDA = 2;
+static const uint8_t SCL = 3;
 
 // Map SPI port to 'new' pins D14..D17
-const static uint8_t SS   = 17;
-const static uint8_t MOSI = 16;
-const static uint8_t MISO = 14;
-const static uint8_t SCK  = 15;
+static const uint8_t SS   = 17;
+static const uint8_t MOSI = 16;
+static const uint8_t MISO = 14;
+static const uint8_t SCK  = 15;
 
 // Mapping of analog pins as digital I/O
 // A6-A11 share with digital pins
-const static uint8_t A0 = 18;
-const static uint8_t A1 = 19;
-const static uint8_t A2 = 20;
-const static uint8_t A3 = 21;
-const static uint8_t A4 = 22;
-const static uint8_t A5 = 23;
-const static uint8_t A6 = 24;	// D4
-const static uint8_t A7 = 25;	// D6
-const static uint8_t A8 = 26;	// D8
-const static uint8_t A9 = 27;	// D9
-const static uint8_t A10 = 28;	// D10
-const static uint8_t A11 = 29;	// D12
+static const uint8_t A0 = 18;
+static const uint8_t A1 = 19;
+static const uint8_t A2 = 20;
+static const uint8_t A3 = 21;
+static const uint8_t A4 = 22;
+static const uint8_t A5 = 23;
+static const uint8_t A6 = 24;	// D4
+static const uint8_t A7 = 25;	// D6
+static const uint8_t A8 = 26;	// D8
+static const uint8_t A9 = 27;	// D9
+static const uint8_t A10 = 28;	// D10
+static const uint8_t A11 = 29;	// D12
+
+#define digitalPinToPCICR(p)    ((((p) >= 8 && (p) <= 11) || ((p) >= 14 && (p) <= 17) || ((p) >= A8 && (p) <= A10)) ? (&PCICR) : ((uint8_t *)0))
+#define digitalPinToPCICRbit(p) 0
+#define digitalPinToPCMSK(p)    ((((p) >= 8 && (p) <= 11) || ((p) >= 14 && (p) <= 17) || ((p) >= A8 && (p) <= A10)) ? (&PCMSK0) : ((uint8_t *)0))
+#define digitalPinToPCMSKbit(p) ( ((p) >= 8 && (p) <= 11) ? (p) - 4 : ((p) == 14 ? 3 : ((p) == 15 ? 1 : ((p) == 16 ? 2 : ((p) == 17 ? 0 : (p - A8 + 4))))))
 
 //	__AVR_ATmega32U4__ has an unusual mapping of pins to channels
 extern const uint8_t PROGMEM analog_pin_to_channel_PGM[];
@@ -212,7 +215,7 @@ const uint8_t PROGMEM digital_pin_to_bit_mask_PGM[30] = {
 	_BV(6), // D29 / D12 - A11 - PD6
 };
 
-const uint8_t PROGMEM digital_pin_to_timer_PGM[18] = {
+const uint8_t PROGMEM digital_pin_to_timer_PGM[16] = {
 	NOT_ON_TIMER,	
 	NOT_ON_TIMER,
 	NOT_ON_TIMER,

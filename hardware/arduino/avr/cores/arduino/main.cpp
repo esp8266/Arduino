@@ -5,7 +5,7 @@ int main(void)
 	init();
 
 #if defined(USBCON)
-	USB.attach();
+	USBDevice.attach();
 #endif
 	
 	setup();

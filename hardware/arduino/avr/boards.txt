@@ -7,10 +7,15 @@ uno.upload.tool=avrdude
 uno.upload.protocol=arduino
 uno.upload.maximum_size=32256
 uno.upload.speed=115200
+
 uno.bootloader.tool=avrdude
-uno.bootloader.erase.params=-e -Ulock:w:0x3F:m -Uefuse:w:0x05:m -Uhfuse:w:0xde:m -Ulfuse:w:0xff:m
-uno.bootloader.write.params=-Uflash:w:{bootloader.file}:i -Ulock:w:0x0F:m
-uno.bootloader.file={runtime.ide.path}/hardware/arduino/avr/optiboot/optiboot_atmega328.hex
+uno.bootloader.low_fuses=0xFF
+uno.bootloader.high_fuses=0xDE
+uno.bootloader.extended_fuses=0x05
+uno.bootloader.unlock_bits=0x3F
+uno.bootloader.lock_bits=0x0F
+uno.bootloader.file=optiboot/optiboot_atmega328.hex
+
 uno.build.mcu=atmega328p
 uno.build.f_cpu=16000000L
 uno.build.core=arduino
@@ -145,23 +150,28 @@ mega.build.variant=mega
 ##############################################################
 
 leonardo.name=Arduino Leonardo
+leonardo.upload.tool=avrdude
 leonardo.upload.protocol=avr109
 leonardo.upload.maximum_size=28672
 leonardo.upload.speed=57600
 leonardo.upload.disable_flushing=true
+leonardo.upload.use_1200bps_touch=true
+
+leonardo.bootloader.tool=avrdude
 leonardo.bootloader.low_fuses=0xff
 leonardo.bootloader.high_fuses=0xd8
 leonardo.bootloader.extended_fuses=0xcb
-leonardo.bootloader.path=caterina
-leonardo.bootloader.file=Caterina-Leonardo.hex
+leonardo.bootloader.file=caterina/Caterina-Leonardo.hex
 leonardo.bootloader.unlock_bits=0x3F
 leonardo.bootloader.lock_bits=0x2F
+
 leonardo.build.mcu=atmega32u4
 leonardo.build.f_cpu=16000000L
 leonardo.build.vid=0x2341
 leonardo.build.pid=0x8036
 leonardo.build.core=arduino
 leonardo.build.variant=leonardo
+leonardo.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid}
 
 ##############################################################
 

@@ -113,7 +113,7 @@ void TwoWire::begin(int address) {
 	begin((uint8_t) address);
 }
 
-uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity) {
+uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity, uint8_t sendStop) {
 	if (quantity > BUFFER_LENGTH)
 		quantity = BUFFER_LENGTH;
 
@@ -137,8 +137,16 @@ uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity) {
 	return readed;
 }
 
+uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity) {
+	return requestFrom((uint8_t) address, (uint8_t) quantity, (uint8_t) true);
+}
+
 uint8_t TwoWire::requestFrom(int address, int quantity) {
-	return requestFrom((uint8_t) address, (uint8_t) quantity);
+	return requestFrom((uint8_t) address, (uint8_t) quantity, (uint8_t) true);
+}
+
+uint8_t TwoWire::requestFrom(int address, int quantity, int sendStop) {
+	return requestFrom((uint8_t) address, (uint8_t) quantity, (uint8_t) sendStop);
 }
 
 void TwoWire::beginTransmission(uint8_t address) {
@@ -153,7 +161,20 @@ void TwoWire::beginTransmission(int address) {
 	beginTransmission((uint8_t) address);
 }
 
-uint8_t TwoWire::endTransmission(void) {
+//
+//	Originally, 'endTransmission' was an f(void) function.
+//	It has been modified to take one parameter indicating
+//	whether or not a STOP should be performed on the bus.
+//	Calling endTransmission(false) allows a sketch to
+//	perform a repeated start.
+//
+//	WARNING: Nothing in the library keeps track of whether
+//	the bus tenure has been properly ended with a STOP. It
+//	is very possible to leave the bus in a hung state if
+//	no call to endTransmission(true) is made. Some I2C
+//	devices will behave oddly if they do not see a STOP.
+//
+uint8_t TwoWire::endTransmission(uint8_t sendStop) {
 	// transmit buffer (blocking)
 	TWI_StartWrite(twi, txAddress, 0, 0, txBuffer[0]);
 	TWI_WaitByteSent(twi, XMIT_TIMEOUT);
@@ -172,36 +193,43 @@ uint8_t TwoWire::endTransmission(void) {
 	return sent;
 }
 
-void TwoWire::write(uint8_t data) {
+//	This provides backwards compatibility with the original
+//	definition, and expected behaviour, of endTransmission
+//
+uint8_t TwoWire::endTransmission(void)
+{
+	return endTransmission(true);
+}
+
+size_t TwoWire::write(uint8_t data) {
 	if (status == MASTER_SEND) {
 		if (txBufferLength >= BUFFER_LENGTH)
-			return;
+			return 0;
 		txBuffer[txBufferLength++] = data;
+		return 1;
 	} else {
 		if (srvBufferLength >= BUFFER_LENGTH)
-			return;
+			return 0;
 		srvBuffer[srvBufferLength++] = data;
+		return 1;
 	}
 }
 
-void TwoWire::write(const uint8_t *data, size_t quantity) {
+size_t TwoWire::write(const uint8_t *data, size_t quantity) {
 	if (status == MASTER_SEND) {
 		for (size_t i = 0; i < quantity; ++i) {
 			if (txBufferLength >= BUFFER_LENGTH)
-				return;
+				return i;
 			txBuffer[txBufferLength++] = data[i];
 		}
 	} else {
 		for (size_t i = 0; i < quantity; ++i) {
 			if (srvBufferLength >= BUFFER_LENGTH)
-				return;
+				return i;
 			srvBuffer[srvBufferLength++] = data[i];
 		}
 	}
-}
-
-void TwoWire::write(const char *data) {
-	write((uint8_t*) data, strlen(data));
+	return quantity;
 }
 
 int TwoWire::available(void) {
@@ -303,12 +331,14 @@ void TwoWire::onService(void) {
 
 #if WIRE_INTERFACES_COUNT > 0
 static void Wire_Init(void) {
-	PMC_EnablePeripheral( WIRE_INTERFACE_ID);
-	PIO_Configure(g_APinDescription[PIN_WIRE_SDA].pPort,
+	pmc_enable_periph_clk(WIRE_INTERFACE_ID);
+	PIO_Configure(
+			g_APinDescription[PIN_WIRE_SDA].pPort,
 			g_APinDescription[PIN_WIRE_SDA].ulPinType,
 			g_APinDescription[PIN_WIRE_SDA].ulPin,
 			g_APinDescription[PIN_WIRE_SDA].ulPinConfiguration);
-	PIO_Configure(g_APinDescription[PIN_WIRE_SCL].pPort,
+	PIO_Configure(
+			g_APinDescription[PIN_WIRE_SCL].pPort,
 			g_APinDescription[PIN_WIRE_SCL].ulPinType,
 			g_APinDescription[PIN_WIRE_SCL].ulPin,
 			g_APinDescription[PIN_WIRE_SCL].ulPinConfiguration);
@@ -328,15 +358,22 @@ void WIRE_ISR_HANDLER(void) {
 
 #if WIRE_INTERFACES_COUNT > 1
 static void Wire1_Init(void) {
-	PMC_EnablePeripheral( WIRE1_INTERFACE_ID);
-	PIO_Configure(g_APinDescription[PIN_WIRE1_SDA].pPort,
+	pmc_enable_periph_clk(WIRE1_INTERFACE_ID);
+	PIO_Configure(
+			g_APinDescription[PIN_WIRE1_SDA].pPort,
 			g_APinDescription[PIN_WIRE1_SDA].ulPinType,
 			g_APinDescription[PIN_WIRE1_SDA].ulPin,
 			g_APinDescription[PIN_WIRE1_SDA].ulPinConfiguration);
-	PIO_Configure(g_APinDescription[PIN_WIRE1_SCL].pPort,
+	PIO_Configure(
+			g_APinDescription[PIN_WIRE1_SCL].pPort,
 			g_APinDescription[PIN_WIRE1_SCL].ulPinType,
 			g_APinDescription[PIN_WIRE1_SCL].ulPin,
 			g_APinDescription[PIN_WIRE1_SCL].ulPinConfiguration);
+
+	NVIC_DisableIRQ(TWI0_IRQn);
+	NVIC_ClearPendingIRQ(TWI0_IRQn);
+	NVIC_SetPriority(TWI0_IRQn, 0);
+	NVIC_EnableIRQ(TWI0_IRQn);
 }
 
 TwoWire Wire1 = TwoWire(WIRE1_INTERFACE, Wire1_Init);
