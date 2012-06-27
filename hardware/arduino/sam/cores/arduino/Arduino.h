@@ -194,9 +194,6 @@ extern const PinDescription g_APinDescription[] ;
 #include "HardwareSerial.h"
 #include "wiring_pulse.h"
 
-// USB Host
-#include "Usb.h"
-
 #endif // __cplusplus
 
 // Include board variant
