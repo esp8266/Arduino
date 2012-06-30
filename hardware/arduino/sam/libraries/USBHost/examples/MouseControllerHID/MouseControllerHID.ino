@@ -1,45 +1,54 @@
-#include "variant.h"
-#include <stdio.h>
 #include <hidboot.h>
 
 class MouseRptParser : public MouseReportParser
 {
 protected:
-	virtual void OnMouseMove		(MOUSEINFO *mi);
-	virtual void OnLeftButtonUp		(MOUSEINFO *mi);
-	virtual void OnLeftButtonDown	(MOUSEINFO *mi);
-	virtual void OnRightButtonUp	(MOUSEINFO *mi);
-	virtual void OnRightButtonDown	(MOUSEINFO *mi);
-	virtual void OnMiddleButtonUp	(MOUSEINFO *mi);
-	virtual void OnMiddleButtonDown	(MOUSEINFO *mi);
+  virtual void OnMouseMove(MOUSEINFO *mi);
+  virtual void OnLeftButtonUp(MOUSEINFO *mi);
+  virtual void OnLeftButtonDown(MOUSEINFO *mi);
+  virtual void OnRightButtonUp(MOUSEINFO *mi);
+  virtual void OnRightButtonDown(MOUSEINFO *mi);
+  virtual void OnMiddleButtonUp(MOUSEINFO *mi);
+  virtual void OnMiddleButtonDown(MOUSEINFO *mi);
 };
+
 void MouseRptParser::OnMouseMove(MOUSEINFO *mi)
 {
-    printf("Pos={%d,%d}\r\n", mi->dX, mi->dY);
+  Serial1.print("Moving { ");
+  Serial1.print(mi->dX);
+  Serial1.print(", ");
+  Serial1.print(mi->dY);
+  Serial1.println(" }");
 };
-void MouseRptParser::OnLeftButtonUp (MOUSEINFO *mi)
+
+void MouseRptParser::OnLeftButtonUp(MOUSEINFO *mi)
 {
-    printf("L Butt Up\r\n");
+  Serial1.println("Left Button UP");
 };
-void MouseRptParser::OnLeftButtonDown (MOUSEINFO *mi)
+
+void MouseRptParser::OnLeftButtonDown(MOUSEINFO *mi)
 {
-    printf("L Butt Dn\r\n");
+  Serial1.println("Left Button DOWN");
 };
-void MouseRptParser::OnRightButtonUp (MOUSEINFO *mi)
+
+void MouseRptParser::OnRightButtonUp(MOUSEINFO *mi)
 {
-    printf("R Butt Up\r\n");
+  Serial1.println("Right Button UP");
 };
-void MouseRptParser::OnRightButtonDown (MOUSEINFO *mi)
+
+void MouseRptParser::OnRightButtonDown(MOUSEINFO *mi)
 {
-    printf("R Butt Dn\r\n");
+  Serial1.println("Right Button DOWN");
 };
-void MouseRptParser::OnMiddleButtonUp (MOUSEINFO *mi)
+
+void MouseRptParser::OnMiddleButtonUp(MOUSEINFO *mi)
 {
-    printf("M Butt Up\r\n");
+  Serial1.println("Middle Button UP");
 };
-void MouseRptParser::OnMiddleButtonDown (MOUSEINFO *mi)
+
+void MouseRptParser::OnMiddleButtonDown(MOUSEINFO *mi)
 {
-    printf("M Butt Dn\r\n");
+  Serial1.println("Middle Button DOWN");
 };
 
 USBHost Usb;
@@ -48,14 +57,14 @@ MouseRptParser Prs;
 
 void setup()
 {
-	cpu_irq_enable();
-	printf("\r\nProgram started:\r\n");
-	delay(200);
+  Serial1.begin(115200);
+  Serial1.println("Program started:");
+  delay(200);
 
-    HostMouse.SetReportParser(0,(HIDReportParser*)&Prs);
+  HostMouse.SetReportParser(0, &Prs);
 }
 
 void loop()
 {
-	Usb.Task();
+  Usb.Task();
 }
