@@ -935,24 +935,30 @@ public class Base {
     }
   }
 
+  public Map<String, File> getIDELibs() {
+    Map<String, File> ideLibs = new HashMap<String, File>(libraries);
+    for (String lib : libraries.keySet()) {
+      if (FileUtils.isSubDirectory(getSketchbookFolder(), libraries.get(lib)))
+        ideLibs.remove(lib);
+    }
+    return ideLibs;
+  }
+
+  public Map<String, File> getUserLibs() {
+    Map<String, File> userLibs = new HashMap<String, File>(libraries);
+    for (String lib : libraries.keySet()) {
+      if (!FileUtils.isSubDirectory(getSketchbookFolder(), libraries.get(lib)))
+        userLibs.remove(lib);
+    }
+    return userLibs;
+  }
+
   public void rebuildImportMenu(JMenu importMenu) {
     importMenu.removeAll();
 
     // Split between user supplied libraries and IDE libraries
-    Map<String, File> ideLibs = new HashMap<String, File>(libraries);
-    Map<String, File> userLibs = new HashMap<String, File>(libraries);
-    for (String lib : libraries.keySet()) {
-      try {
-        if (FileUtils.isSubDirectory(getSketchbookFolder(), libraries.get(lib)))
-          ideLibs.remove(lib);
-        else
-          userLibs.remove(lib);
-      } catch (IOException e) {
-        ideLibs.remove(lib);
-        userLibs.remove(lib);
-      }
-    }
-    
+    Map<String, File> ideLibs = getIDELibs();
+    Map<String, File> userLibs = getUserLibs();
     try {
       // Find the current target. Get the platform, and then select the
       // correct name and core path.
@@ -962,10 +968,14 @@ public class Base {
       JMenuItem platformItem = new JMenuItem(targetname);
       platformItem.setEnabled(false);
       importMenu.add(platformItem);
-      importMenu.addSeparator();
-      addLibraries(importMenu, ideLibs);
-      importMenu.addSeparator();
-      addLibraries(importMenu, userLibs);
+      if (ideLibs.size()>0) {
+        importMenu.addSeparator();
+        addLibraries(importMenu, ideLibs);
+      }
+      if (userLibs.size()>0) {
+        importMenu.addSeparator();
+        addLibraries(importMenu, userLibs);
+      }
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -980,11 +990,23 @@ public class Base {
       if (found) menu.addSeparator();
 
       // Add examples from libraries
-      List<String> names = new ArrayList<String>(libraries.keySet());
+      Map<String, File> ideLibs = getIDELibs();
+      List<String> names = new ArrayList<String>(ideLibs.keySet());
       Collections.sort(names, String.CASE_INSENSITIVE_ORDER);
       for (String name : names) {
-        File folder = libraries.get(name);
+        File folder = ideLibs.get(name);
         addSketchesSubmenu(menu, name, folder, false);
+      }
+
+      Map<String, File> userLibs = getUserLibs();
+      if (userLibs.size()>0) {
+        menu.addSeparator();
+        names = new ArrayList<String>(userLibs.keySet());
+        Collections.sort(names, String.CASE_INSENSITIVE_ORDER);
+        for (String name : names) {
+          File folder = userLibs.get(name);
+          addSketchesSubmenu(menu, name, folder, false);
+        }
       }
     } catch (IOException e) {
       e.printStackTrace();
