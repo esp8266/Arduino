@@ -1038,10 +1038,25 @@ public class Base {
         continue;
       }
 
+      subfolder = scanFatLibrary(subfolder);
+      
       // (also replace previously found libs with the same name) 
-      res.put(libName, subfolder);
+      if (subfolder != null)
+        res.put(libName, subfolder);
     }
     return res;
+  }
+  
+  public File scanFatLibrary(File libFolder) {
+    // Fat libraries must have metadata.txt file
+    File propFile = new File(libFolder, "metadata.txt");
+    if (!propFile.exists())
+      return libFolder;
+    // Search for a subfolder for actual architecture, return null if not found
+    File archSubfolder = new File(libFolder, Base.getTargetPlatform().getName());
+    if (!archSubfolder.exists() || !archSubfolder.isDirectory())
+      return null;
+    return archSubfolder;
   }
   
   public void onBoardOrPortChange() {
