@@ -996,6 +996,9 @@ public class Base {
       for (String name : names) {
         File folder = ideLibs.get(name);
         addSketchesSubmenu(menu, name, folder, false);
+        // Allows "fat" libraries to have examples in the root folder
+        if (folder.getName().equals(Base.getTargetPlatform()))
+          addSketchesSubmenu(menu, name, folder.getParentFile(), false);
       }
 
       Map<String, File> userLibs = getUserLibs();
@@ -1006,6 +1009,9 @@ public class Base {
         for (String name : names) {
           File folder = userLibs.get(name);
           addSketchesSubmenu(menu, name, folder, false);
+          // Allows "fat" libraries to have examples in the root folder
+          if (folder.getName().equals(Base.getTargetPlatform().getName()))
+            addSketchesSubmenu(menu, name, folder.getParentFile(), false);
         }
       }
     } catch (IOException e) {
@@ -1048,10 +1054,22 @@ public class Base {
   }
   
   public File scanFatLibrary(File libFolder) {
-    // Fat libraries must have metadata.txt file
-    File propFile = new File(libFolder, "metadata.txt");
-    if (!propFile.exists())
+    // A library is considered "fat" if there are folders besides
+    // examples and utility
+    boolean fat = false;
+    String[] folders = libFolder.list(new OnlyDirs());
+    for (String folder : folders) {
+      if (folder.equals("examples"))
+        continue;
+      if (folder.equals("utility"))
+        continue;
+      fat = true;
+      break;
+    }
+    
+    if (!fat)
       return libFolder;
+    
     // Search for a subfolder for actual architecture, return null if not found
     File archSubfolder = new File(libFolder, Base.getTargetPlatform().getName());
     if (!archSubfolder.exists() || !archSubfolder.isDirectory())
