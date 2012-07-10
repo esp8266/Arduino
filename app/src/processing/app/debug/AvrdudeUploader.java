@@ -185,7 +185,12 @@ public class AvrdudeUploader extends Uploader  {
     	long timeout = System.currentTimeMillis() + 2000;
     	while (timeout > System.currentTimeMillis()) {
 	    	List<String> portList = Serial.list();
-    		if (portList.contains(Preferences.get("serial.port"))) {
+		uploadPort = Preferences.get("serial.port");
+    		if (portList.contains(uploadPort)) {
+			// Remove the magic baud rate (1200bps) to avoid future unwanted board resets 
+			int serialRate = Preferences.getInteger("serial.debug_rate");
+			System.out.println("Set baud rate to " + serialRate);			
+		        Serial.touchPort(uploadPort, serialRate);	
     			break;
     		}
     		try {
