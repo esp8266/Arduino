@@ -110,7 +110,7 @@ public class PdePreprocessor {
     }
 
     //String importRegexp = "(?:^|\\s|;)(import\\s+)(\\S+)(\\s*;)";
-    String importRegexp = "^\\s*#include\\s+[<\"](\\S+)[\">]";
+    String importRegexp = "^\\s*#include\\s*[<\"](\\S+)[\">]";
     programImports = new ArrayList<String>();
 
     String[][] pieces = PApplet.matchAll(program, importRegexp);
