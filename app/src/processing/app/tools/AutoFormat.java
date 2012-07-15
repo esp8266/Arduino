@@ -241,7 +241,7 @@ public class AutoFormat implements Tool {
   public void cpp_comment() throws IOException
   {
     c = getchr();
-    while(c != '\n' && c != '\r' && j<133)
+    while(c != '\n' && c != '\r')
     {
       string[j++] = c;
       c = getchr();
