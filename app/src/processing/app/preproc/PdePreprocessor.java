@@ -316,13 +316,31 @@ public class PdePreprocessor {
     
     // XXX: doesn't handle ... varargs
     // XXX: doesn't handle function pointers
-    Pattern pattern = Pattern.compile("[\\w\\[\\]\\*]+\\s+[&\\[\\]\\*\\w\\s]+\\([&,\\[\\]\\*\\w\\s]*\\)(?=\\s*\\{)");
+    Pattern prototypePattern = Pattern.compile("[\\w\\[\\]\\*]+\\s+[&\\[\\]\\*\\w\\s]+\\([&,\\[\\]\\*\\w\\s]*\\)(?=\\s*;)");
+    Pattern functionPattern  = Pattern.compile("[\\w\\[\\]\\*]+\\s+[&\\[\\]\\*\\w\\s]+\\([&,\\[\\]\\*\\w\\s]*\\)(?=\\s*\\{)");
     
-    ArrayList<String> matches = new ArrayList<String>();
-    Matcher matcher = pattern.matcher(in);
-    while (matcher.find())
-      matches.add(matcher.group(0) + ";");
+    // Find already declared prototypes
+    ArrayList<String> prototypeMatches = new ArrayList<String>();
+    Matcher prototypeMatcher = prototypePattern.matcher(in);
+    while (prototypeMatcher.find())
+      prototypeMatches.add(prototypeMatcher.group(0) + ";");
     
-    return matches;
+    // Find all functions and generate prototypes for them
+    ArrayList<String> functionMatches = new ArrayList<String>();
+    Matcher functionMatcher = functionPattern.matcher(in);
+    while (functionMatcher.find())
+      functionMatches.add(functionMatcher.group(0) + ";");
+    
+    // Remove generated prototypes that exactly match ones found in the source file
+    for (int functionIndex=functionMatches.size() - 1; functionIndex >= 0; functionIndex--) {
+      for (int prototypeIndex=0; prototypeIndex < prototypeMatches.size(); prototypeIndex++) {
+        if ((functionMatches.get(functionIndex)).equals(prototypeMatches.get(prototypeIndex))) {
+          functionMatches.remove(functionIndex);
+          break;
+        }
+      }
+    }
+    
+    return functionMatches;
   }
 }
