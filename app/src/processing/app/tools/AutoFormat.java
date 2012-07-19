@@ -642,9 +642,6 @@ public class AutoFormat implements Tool {
           int count = 0;
           while(cc != c && EOF == 0)
           {
-            if (++count % 100000 == 0) {
-              System.err.println("Stuck: " + count);
-            }
             // max. length of line should be 256
             string[j++] = cc;
 
