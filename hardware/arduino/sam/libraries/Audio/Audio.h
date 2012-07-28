@@ -13,10 +13,11 @@
 
 #include "Arduino.h"
 #include "Print.h"
+#include "DAC.h"
 
 class AudioClass : public Print {
 public:
-	AudioClass(Dacc *_dac, uint32_t _dacId) : dac(_dac), dacId(_dacId) { };
+	AudioClass(DACClass &_dac) : dac(&_dac) { };
 	void begin(uint32_t sampleRate);
 	void end();
 
@@ -24,7 +25,7 @@ public:
 	virtual size_t write(const uint8_t *buffer, size_t size)  { return write((uint32_t*) buffer, size/4) * 4; };
 	virtual size_t write(const uint16_t *buffer, size_t size) { return write((uint32_t*) buffer, size/2) * 2; };
 	virtual size_t write(const int16_t *buffer, size_t size)  { return write((uint32_t*) buffer, size/2) * 2; };
-	virtual size_t write(const uint32_t *buffer, size_t size);
+	virtual size_t write(const uint32_t *buffer, size_t size) { return dac->queueBuffer(cook(buffer,size), size); };
 
 private:
 	uint32_t buffer0[1024];
@@ -33,8 +34,7 @@ private:
 
 	uint32_t *cook(const uint32_t *buffer, size_t size);
 
-	Dacc *dac;
-	uint32_t dacId;
+	DACClass *dac;
 };
 
 extern AudioClass Audio;

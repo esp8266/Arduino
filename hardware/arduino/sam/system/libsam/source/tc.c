@@ -173,3 +173,15 @@ extern uint32_t TC_FindMckDivisor( uint32_t dwFreq, uint32_t dwMCk, uint32_t *dw
     return 1 ;
 }
 
+void TC_SetRA(Tc *tc, uint32_t chan, uint32_t v) {
+	tc->TC_CHANNEL[chan].TC_RA = v;
+}
+
+void TC_SetRB(Tc *tc, uint32_t chan, uint32_t v) {
+	tc->TC_CHANNEL[chan].TC_RB = v;
+}
+
+void TC_SetRC(Tc *tc, uint32_t chan, uint32_t v) {
+	tc->TC_CHANNEL[chan].TC_RC = v;
+}
+
