@@ -603,7 +603,7 @@ ISR(USB_GEN_vect)
 	{
 #ifdef CDC_ENABLED
 		USB_Flush(CDC_TX);				// Send a tx frame if found
-		while (USB_Available(CDC_RX))	// Handle received bytes (if any)
+		if (USB_Available(CDC_RX))	// Handle received bytes (if any)
 			Serial.accept();
 #endif
 		
