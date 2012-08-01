@@ -162,12 +162,14 @@ static const uint8_t DA0 = 66;
 static const uint8_t DA1 = 67;
 static const uint8_t CANRX0 = 68;
 static const uint8_t CANTX0 = 69;
+#define ADC_RESOLUTION		12
 
 /*
  * DACC
  */
 #define DACC_INTERFACE		DACC
 #define DACC_INTERFACE_ID	ID_DACC
+#define DACC_RESOLUTION		12
 
 /*
  * PWM

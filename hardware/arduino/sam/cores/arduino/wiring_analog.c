@@ -22,6 +22,12 @@
 extern "C" {
 #endif
 
+static int _analogResolution = 10;
+
+void setAnalogResolution(int res) {
+	_analogResolution = res;
+}
+
 eAnalogReference analog_reference = AR_DEFAULT;
 
 void analogReference(eAnalogReference ulMode)
@@ -51,11 +57,11 @@ uint32_t analogRead(uint32_t ulPin)
 		case ADC5 :
 		case ADC6 :
 		case ADC7 :
-      // Enable the corresponding channel
-      adc_enable_channel( ADC, ulChannel );
+			// Enable the corresponding channel
+			adc_enable_channel( ADC, ulChannel );
 
-      // Start the ADC
-      adc_start( ADC );
+			// Start the ADC
+			adc_start( ADC );
 
 			// Wait for end of conversion
 			while ((adc_get_status(ADC) & ADC_SR_DRDY) != ADC_SR_DRDY)
@@ -64,12 +70,12 @@ uint32_t analogRead(uint32_t ulPin)
 			// Read the value
 			ulValue = adc_get_latest_value(ADC);
 
-      // Disable the corresponding channel
-      adc_disable_channel( ADC, ulChannel );
+			// Disable the corresponding channel
+			adc_disable_channel( ADC, ulChannel );
 
-      // Stop the ADC
-      //      adc_stop( ADC ) ; // never do adc_stop() else we have to reconfigure the ADC each time
-		break;
+			// Stop the ADC
+			//      adc_stop( ADC ) ; // never do adc_stop() else we have to reconfigure the ADC each time
+			break;
 
 		// Handling ADC 12 bits channels
 		case ADC8 :
@@ -80,11 +86,11 @@ uint32_t analogRead(uint32_t ulPin)
 		case ADC13 :
 		case ADC14 :
 		case ADC15 :
-      // Enable the corresponding channel
-      adc12b_enable_channel( ADC12B, ulChannel );
+			// Enable the corresponding channel
+			adc12b_enable_channel( ADC12B, ulChannel );
 
-      // Start the ADC12B
-      adc12b_start( ADC12B );
+			// Start the ADC12B
+			adc12b_start( ADC12B );
 
 			// Wait for end of conversion
 			while ((adc12b_get_status(ADC12B) & ADC12B_SR_DRDY) != ADC12B_SR_DRDY)
@@ -93,24 +99,24 @@ uint32_t analogRead(uint32_t ulPin)
 			// Read the value
 			ulValue = adc12b_get_latest_value(ADC12B) >> 2;
 
-      // Stop the ADC12B
-      //      adc12_stop( ADC12B ) ; // never do adc12_stop() else we have to reconfigure the ADC12B each time
+			// Stop the ADC12B
+			//      adc12_stop( ADC12B ) ; // never do adc12_stop() else we have to reconfigure the ADC12B each time
 
-      // Disable the corresponding channel
-      adc12b_disable_channel( ADC12B, ulChannel );
-		break;
+			// Disable the corresponding channel
+			adc12b_disable_channel( ADC12B, ulChannel );
+			break;
 
 		// Compiler could yell because we don't handle DAC pins
 		default :
-      ulValue=0;
-		break;
+			ulValue=0;
+			break;
 	}
 #endif
 
 #if defined __SAM3X8E__ || defined __SAM3X8H__
 	switch ( g_APinDescription[ulPin].ulAnalogChannel )
 	{
-		// Handling ADC 10 bits channels
+		// Handling ADC 12 bits channels
 		case ADC0 :
 		case ADC1 :
 		case ADC2 :
@@ -135,10 +141,16 @@ uint32_t analogRead(uint32_t ulPin)
 				;
 
 			// Read the value
-			ulValue = adc_get_latest_value(ADC) >> 2;
+			ulValue = adc_get_latest_value(ADC);
 
 			// Disable the corresponding channel
 			adc_disable_channel(ADC, ulChannel);
+
+			// Map result into user selected resolution
+			if (_analogResolution > ADC_RESOLUTION)
+				ulValue <<= _analogResolution - ADC_RESOLUTION;
+			if (_analogResolution < ADC_RESOLUTION)
+				ulValue >>= ADC_RESOLUTION - _analogResolution;
 			break;
 
 		// Compiler could yell because we don't handle DAC pins

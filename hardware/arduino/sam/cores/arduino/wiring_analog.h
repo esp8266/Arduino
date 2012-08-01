@@ -20,7 +20,7 @@
 #define _WIRING_ANALOG_
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /*
@@ -55,6 +55,13 @@ extern void analogWrite( uint32_t ulPin, uint32_t ulValue ) ;
  * \return Read value from selected pin, if no error.
  */
 extern uint32_t analogRead( uint32_t ulPin ) ;
+
+/*
+ * \brief Set the resolution of analogRead return values. Default is 10 bits (0..1024).
+ *
+ * \param res
+ */
+void setAnalogResolution(int res);
 
 extern void analogOutputInit( void ) ;
 
