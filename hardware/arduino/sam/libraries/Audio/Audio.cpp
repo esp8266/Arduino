@@ -10,31 +10,126 @@
 
 #include "Audio.h"
 
-void AudioClass::begin(uint32_t sampleRate) {
-	const uint32_t T = VARIANT_MCK / sampleRate;
-	dac->begin(T);
+class LockDAC {
+public:
+	LockDAC(DACClass *_dac) : dac(_dac)
+	           { dac->disableInterrupts(); };
+	~LockDAC() { dac->enableInterrupts(); };
+	DACClass *dac;
+};
 
-	currentBuffer = 0;
+void AudioClass::begin(uint32_t sampleRate, uint32_t msPreBuffer) {
+	// Allocate a buffer to keep msPreBuffer milliseconds of audio
+	bufferSize = msPreBuffer * sampleRate / 1000;
+	if (bufferSize < 2048)
+		bufferSize = 2048;
+	buffer = (uint32_t *) malloc(bufferSize * sizeof(uint32_t));
+	last = buffer + bufferSize;
+
+	// Buffering starts from the beginning
+	running = last;
+	current = buffer;
+	next = buffer;
+
+	// Run DAC
+	dac->begin(VARIANT_MCK / sampleRate);
+	dac->setOnTransmitEnd_CB(onTransmitEnd, this);
 }
 
 void AudioClass::end() {
 	dac->end();
+	free(buffer);
 }
 
-uint32_t *AudioClass::cook(const uint32_t *buffer, size_t size) {
-	if (currentBuffer == 0) {
-		// Use buffer0
-		for (int i = 0; i < size; i++)
-			buffer0[i] = buffer[i] | 0x10000000;
-		currentBuffer = 1;
-		return buffer0;
-	} else {
-		// Use buffer1
-		for (int i = 0; i < size; i++)
-			buffer1[i] = buffer[i] | 0x10000000;
-		currentBuffer = 0;
-		return buffer1;
+size_t AudioClass::write(const uint32_t *data, size_t size) {
+	LockDAC lock(dac);
+	//Serial1.print("WRI(");
+	const uint32_t TAG = 0x10000000;
+	int i;
+	for (i=0; i < size && next != running; i++) {
+		*next = data[i] | TAG;
+		next++;
+
+		// Wrap around circular buffer
+		if (next == last)
+			next = buffer;
 	}
+	debug();
+	if (dac->canQueue()) {
+		enqueue();
+		debug();
+	}
+	//Serial1.print(")");
+	return i;
+}
+
+void AudioClass::enqueue() {
+	if (!dac->canQueue())
+		// DMA queue full
+		return;
+
+	if (current == next)
+		// No data to enqueue
+		return;
+
+	// If wrapping happened
+	if (next < current) {
+
+		uint32_t size = last - current;
+
+		if (size < 1024) {
+			// enqueue the last part of the circular buffer
+			dac->queueBuffer(current, size);
+			current = buffer;
+			next = buffer;
+		} else {
+			// Enqueue only a block of 512
+			dac->queueBuffer(current, 512);
+			current += 512;
+		}
+		return;
+	}
+
+	bool aboutToWrap = (last - next) < 512;
+	uint32_t size = next - current;
+
+	// If buffered data is less than 512 bytes
+	if (size < 512) {
+
+		// Enqueue all
+		dac->queueBuffer(current, size);
+
+		if (aboutToWrap)
+			next = buffer;
+		current = next;
+
+	} else {
+
+		if (aboutToWrap && size < 1024) {
+			// Enqueue all
+			dac->queueBuffer(current, size);
+			next = buffer;
+			current = buffer;
+		} else {
+			// Enqueue only a block of 512
+			dac->queueBuffer(current, 512);
+			current += 512;
+		}
+
+	}
+}
+
+void AudioClass::onTransmitEnd(void *me) {
+	AudioClass *audio = reinterpret_cast<AudioClass *>(me);
+
+	//Serial1.print("INT(");
+	audio->enqueue();
+
+	// Update running pointer
+	audio->running = audio->dac->getCurrentQueuePointer();
+
+	audio->debug();
+	//Serial1.print(")");
 }
 
 AudioClass Audio(DAC);

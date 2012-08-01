@@ -18,19 +18,33 @@
 class AudioClass : public Print {
 public:
 	AudioClass(DACClass &_dac) : dac(&_dac) { };
-	void begin(uint32_t sampleRate);
+	void begin(uint32_t sampleRate, uint32_t msPreBuffer);
 	void end();
 
-	virtual size_t write(uint8_t c)                           { /* not implemented */ };
-	virtual size_t write(const uint8_t *buffer, size_t size)  { return write((uint32_t*) buffer, size/4) * 4; };
-	virtual size_t write(const uint16_t *buffer, size_t size) { return write((uint32_t*) buffer, size/2) * 2; };
-	virtual size_t write(const int16_t *buffer, size_t size)  { return write((uint32_t*) buffer, size/2) * 2; };
-	virtual size_t write(const uint32_t *buffer, size_t size) { return dac->queueBuffer(cook(buffer,size), size); };
+	virtual size_t write(uint8_t c)                         { /* not implemented */ };
+	virtual size_t write(const uint8_t *data, size_t size)  { return write(reinterpret_cast<const uint32_t*>(data), size/4) * 4; };
+	virtual size_t write(const uint16_t *data, size_t size) { return write(reinterpret_cast<const uint32_t*>(data), size/2) * 2; };
+	virtual size_t write(const int16_t *data, size_t size)  { return write(reinterpret_cast<const uint32_t*>(data), size/2) * 2; };
+	virtual size_t write(const uint32_t *data, size_t size);
 
+	void debug() {
+//		Serial1.print(running-buffer, DEC);
+//		Serial1.print(" ");
+//		Serial1.print(current-buffer, DEC);
+//		Serial1.print(" ");
+//		Serial1.print(next-buffer, DEC);
+//		Serial1.print(" ");
+//		Serial1.println(last-buffer, DEC);
+	}
 private:
-	uint32_t buffer0[1024];
-	uint32_t buffer1[1024];
-	int currentBuffer;
+	void enqueue();
+	static void onTransmitEnd(void *me);
+	uint32_t bufferSize;
+	uint32_t *buffer;
+	uint32_t *last;
+	uint32_t * volatile running;
+	uint32_t * volatile current;
+	uint32_t * volatile next;
 
 	uint32_t *cook(const uint32_t *buffer, size_t size);
 

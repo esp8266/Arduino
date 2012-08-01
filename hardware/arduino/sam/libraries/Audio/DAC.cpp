@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2012 by Cristian Maglie <c.maglie@bug.st>
+ * DAC library for Arduino Due.
+ *
+ * This file is free software; you can redistribute it and/or modify
+ * it under the terms of either the GNU General Public License version 2
+ * or the GNU Lesser General Public License version 2.1, both as
+ * published by the Free Software Foundation.
+ */
 
 #include <DAC.h>
 
@@ -108,21 +117,25 @@ size_t DACClass::queueBuffer(const uint32_t *buffer, size_t size) {
 	return 0;
 }
 
-void DACClass::setOnQueueFree_CB(OnQueueFree_CB _cb) {
+uint32_t *DACClass::getCurrentQueuePointer() {
+	return reinterpret_cast<uint32_t *>(dac->DACC_TPR);
+}
+
+void DACClass::setOnTransmitEnd_CB(OnTransmitEnd_CB _cb, void *_data) {
 	cb = _cb;
-	if (cb) {
-		dacc_enable_interrupt(dac, DACC_IER_ENDTX);
-	} else {
+	cbData = _data;
+	if (!cb)
 		dacc_disable_interrupt(dac, DACC_IDR_ENDTX);
-	}
 }
 
 void DACClass::onService() {
 	uint32_t sr = dac->DACC_ISR;
-	if (sr & DACC_ISR_ENDTX) {
+//	if (sr & DACC_ISR_ENDTX) {
+		// There is a free slot, enqueue data
 		dacc_disable_interrupt(dac, DACC_IDR_ENDTX);
-		if (cb) cb();
-	}
+		if (cb)
+			cb(cbData);
+//	}
 }
 
 DACClass DAC(DACC_INTERFACE, DACC_INTERFACE_ID, DACC_ISR_ID);
