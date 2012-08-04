@@ -40,8 +40,7 @@ MEMORY
 	ram (rwx)   : ORIGIN = 0x20070000, LENGTH = 0x00018000 /* sram, 96K */
 }
 
-/* The stack size used by the application. NOTE: you need to adjust  */
-STACK_SIZE = DEFINED(STACK_SIZE) ? STACK_SIZE : 0x2000 ;
+RAM_END = 0x20088000 ; /* There is a way to define this as ram.ORIGIN + ram.LENGTH ? */
 
 /* Section Definitions */
 SECTIONS
@@ -129,16 +128,13 @@ SECTIONS
         _ezero = .;
     } > ram
 
-    /* stack section */
-    .stack (NOLOAD):
-    {
-        . = ALIGN(8);
-        _sstack = .;
-        . = . + STACK_SIZE;
-        . = ALIGN(8);
-        _estack = .;
-    } > ram
-
     . = ALIGN(4);
     _end = . ;
+
+    /* put stack section at the bottom of ram space */
+    .stack RAM_END (NOLOAD):
+    {
+        _sstack = .;
+        _estack = .;
+    } > ram
 }
