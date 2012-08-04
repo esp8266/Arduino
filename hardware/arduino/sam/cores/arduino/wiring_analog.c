@@ -22,10 +22,24 @@
 extern "C" {
 #endif
 
-static int _analogResolution = 10;
+static int _readResolution = 10;
+static int _writeResolution = 8;
 
-void setAnalogResolution(int res) {
-	_analogResolution = res;
+void analogReadResolution(int res) {
+	_readResolution = res;
+}
+
+void analogWriteResolution(int res) {
+	_writeResolution = res;
+}
+
+static inline uint32_t mapResolution(uint32_t value, uint32_t from, uint32_t to) {
+	if (from == to)
+		return value;
+	if (from > to)
+		return value >> (from-to);
+	else
+		return value << (to-from);
 }
 
 eAnalogReference analog_reference = AR_DEFAULT;
@@ -69,6 +83,7 @@ uint32_t analogRead(uint32_t ulPin)
 
 			// Read the value
 			ulValue = adc_get_latest_value(ADC);
+			ulValue = mapResolution(ulValue, 10, _readResolution);
 
 			// Disable the corresponding channel
 			adc_disable_channel( ADC, ulChannel );
@@ -98,6 +113,7 @@ uint32_t analogRead(uint32_t ulPin)
 
 			// Read the value
 			ulValue = adc12b_get_latest_value(ADC12B) >> 2;
+			ulValue = mapResolution(ulValue, 12, _readResolution);
 
 			// Stop the ADC12B
 			//      adc12_stop( ADC12B ) ; // never do adc12_stop() else we have to reconfigure the ADC12B each time
@@ -142,15 +158,11 @@ uint32_t analogRead(uint32_t ulPin)
 
 			// Read the value
 			ulValue = adc_get_latest_value(ADC);
+			ulValue = mapResolution(ulValue, ADC_RESOLUTION, _readResolution);
 
 			// Disable the corresponding channel
 			adc_disable_channel(ADC, ulChannel);
 
-			// Map result into user selected resolution
-			if (_analogResolution > ADC_RESOLUTION)
-				ulValue <<= _analogResolution - ADC_RESOLUTION;
-			if (_analogResolution < ADC_RESOLUTION)
-				ulValue >>= ADC_RESOLUTION - _analogResolution;
 			break;
 
 		// Compiler could yell because we don't handle DAC pins
@@ -244,12 +256,15 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 			}
 
 			// Write user value
+			ulValue = mapResolution(ulValue, _writeResolution, DACC_RESOLUTION);
 			dacc_write_conversion_data(DACC_INTERFACE, ulValue);
 			return;
 		}
 	}
 
 	if ((attr & PIN_ATTR_PWM) == PIN_ATTR_PWM) {
+		ulValue = mapResolution(ulValue, _writeResolution, PWM_RESOLUTION);
+
 		if (!PWMEnabled) {
 			// PWM Startup code
 		    pmc_enable_periph_clk(PWM_INTERFACE_ID);
@@ -280,6 +295,7 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 		const uint32_t TC = VARIANT_MCK / 2 / TC_FREQUENCY;
 
 		// Map value to Timer ranges 0..255 => 0..TC
+		ulValue = mapResolution(ulValue, _writeResolution, TC_RESOLUTION);
 		ulValue = ulValue * TC;
 		ulValue = ulValue / TC_MAX_DUTY_CYCLE;
 
@@ -338,6 +354,7 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 
 	// Defaults to digital write
 	pinMode(ulPin, OUTPUT);
+	ulValue = mapResolution(ulValue, _writeResolution, 8);
 	if (ulValue < 128)
 		digitalWrite(ulPin, LOW);
 	else

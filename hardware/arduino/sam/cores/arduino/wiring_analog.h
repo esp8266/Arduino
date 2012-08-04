@@ -57,11 +57,18 @@ extern void analogWrite( uint32_t ulPin, uint32_t ulValue ) ;
 extern uint32_t analogRead( uint32_t ulPin ) ;
 
 /*
- * \brief Set the resolution of analogRead return values. Default is 10 bits (0..1024).
+ * \brief Set the resolution of analogRead return values. Default is 10 bits (range from 0 to 1023).
  *
  * \param res
  */
-void setAnalogResolution(int res);
+extern void analogReadResolution(int res);
+
+/*
+ * \brief Set the resolution of analogWrite parameters. Default is 8 bits (range from 0 to 255).
+ *
+ * \param res
+ */
+extern void analogWriteResolution(int res);
 
 extern void analogOutputInit( void ) ;
 
