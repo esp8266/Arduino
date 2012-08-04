@@ -175,21 +175,6 @@ uint32_t analogRead(uint32_t ulPin)
 	return ulValue;
 }
 
-static void TC_SetRA(Tc *tc, uint32_t chan, uint32_t v)
-{
-    tc->TC_CHANNEL[chan].TC_RA = v;
-}
-
-static void TC_SetRB(Tc *tc, uint32_t chan, uint32_t v)
-{
-    tc->TC_CHANNEL[chan].TC_RB = v;
-}
-
-static void TC_SetRC(Tc *tc, uint32_t chan, uint32_t v)
-{
-    tc->TC_CHANNEL[chan].TC_RC = v;
-}
-
 static void TC_SetCMR_ChannelA(Tc *tc, uint32_t chan, uint32_t v)
 {
 	tc->TC_CHANNEL[chan].TC_CMR = (tc->TC_CHANNEL[chan].TC_CMR & 0xFFF0FFFF) | v;

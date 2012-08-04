@@ -170,6 +170,8 @@ static const uint8_t CANTX0 = 69;
 #define DACC_INTERFACE		DACC
 #define DACC_INTERFACE_ID	ID_DACC
 #define DACC_RESOLUTION		12
+#define DACC_ISR_HANDLER    DACC_Handler
+#define DACC_ISR_ID         DACC_IRQn
 
 /*
  * PWM
