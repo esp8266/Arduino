@@ -49,23 +49,16 @@ extern "C"{
 
 /*----------------------------------------------------------------------------*/
 
-#ifndef arduino_due_u
-#define arduino_due_u
-#endif
+#define ArduinoDueU_DevEd
 
 /** Name of the board */
-#define VARIANT_NAME "ARDUINO_DUE"
-
-/*
-#define VARIANT_REV_A
-#define VARIANT_REV_B
-*/
+#define VARIANT_NAME		"Arduino_DueU_Dev_Ed"
 
 /** Frequency of the board main oscillator */
-#define VARIANT_MAINOSC           12000000
+#define VARIANT_MAINOSC		12000000
 
 /** Master clock frequency */
-#define VARIANT_MCK               96000000
+#define VARIANT_MCK			96000000
 
 /*----------------------------------------------------------------------------
  *        Pins
