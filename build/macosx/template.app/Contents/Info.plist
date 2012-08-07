@@ -14,6 +14,8 @@
     <string>VERSION</string>
     <!-- now stop changing things and get outta here -->
 
+    <key>NSHighResolutionCapable</key>
+    <true/>
     <key>CFBundleAllowMixedLocalizations</key>
     <string>true</string>
     <key>CFBundleExecutable</key>
