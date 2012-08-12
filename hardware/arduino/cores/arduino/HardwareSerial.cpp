@@ -434,7 +434,7 @@ try_again:
   {
     config_setting |= B10000000;
   }  
-  *_ucsrc = config_setting
+  *_ucsrc = config_setting;
   
   sbi(*_ucsrb, _rxen);
   sbi(*_ucsrb, _txen);
