@@ -18,6 +18,7 @@
   
   Modified 23 November 2006 by David A. Mellis
   Modified 28 September 2010 by Mark Sproul
+  Modified 12 August 2012 by Alarus
 */
 
 #include <stdlib.h>
@@ -109,13 +110,22 @@ inline void store_char(unsigned char c, ring_buffer *buffer)
 #endif
   {
   #if defined(UDR0)
-    unsigned char c  =  UDR0;
+    if (bit_is_clear(UCSR0A, UPE0)) {
+      unsigned char c = UDR0;
+      store_char(c, &rx_buffer);
+    } else {
+      unsigned char c = UDR0;
+    };
   #elif defined(UDR)
-    unsigned char c  =  UDR;
+    if (bit_is_clear(UCSRA, PE)) {     
+      unsigned char c = UDR;
+      store_char(c, &rx_buffer);
+    } else {
+      unsigned char c = UDR;
+    };
   #else
     #error UDR not defined
   #endif
-    store_char(c, &rx_buffer);
   }
 #endif
 #endif
@@ -126,8 +136,12 @@ inline void store_char(unsigned char c, ring_buffer *buffer)
   #define serialEvent1_implemented
   SIGNAL(USART1_RX_vect)
   {
-    unsigned char c = UDR1;
-    store_char(c, &rx_buffer1);
+    if (bit_is_clear(UCSR1A, UPE1)) {
+      unsigned char c = UDR1;
+      store_char(c, &rx_buffer1);
+    } else {
+      unsigned char c = UDR1;
+    };
   }
 #elif defined(SIG_USART1_RECV)
   #error SIG_USART1_RECV
@@ -139,8 +153,12 @@ inline void store_char(unsigned char c, ring_buffer *buffer)
   #define serialEvent2_implemented
   SIGNAL(USART2_RX_vect)
   {
-    unsigned char c = UDR2;
-    store_char(c, &rx_buffer2);
+    if (bit_is_clear(UCSR2A, UPE2)) {
+      unsigned char c = UDR2;
+      store_char(c, &rx_buffer2);
+    } else {
+      unsigned char c = UDR2;
+    };
   }
 #elif defined(SIG_USART2_RECV)
   #error SIG_USART2_RECV
@@ -152,8 +170,12 @@ inline void store_char(unsigned char c, ring_buffer *buffer)
   #define serialEvent3_implemented
   SIGNAL(USART3_RX_vect)
   {
-    unsigned char c = UDR3;
-    store_char(c, &rx_buffer3);
+    if (bit_is_clear(UCSR3A, UPE3)) {
+      unsigned char c = UDR3;
+      store_char(c, &rx_buffer3);
+    } else {
+      unsigned char c = UDR3;
+    };
   }
 #elif defined(SIG_USART3_RECV)
   #error SIG_USART3_RECV
@@ -274,7 +296,7 @@ ISR(USART3_UDRE_vect)
 HardwareSerial::HardwareSerial(ring_buffer *rx_buffer, ring_buffer *tx_buffer,
   volatile uint8_t *ubrrh, volatile uint8_t *ubrrl,
   volatile uint8_t *ucsra, volatile uint8_t *ucsrb,
-  volatile uint8_t *udr,
+  volatile uint8_t *ucsrc, volatile uint8_t *udr,
   uint8_t rxen, uint8_t txen, uint8_t rxcie, uint8_t udrie, uint8_t u2x)
 {
   _rx_buffer = rx_buffer;
@@ -283,6 +305,7 @@ HardwareSerial::HardwareSerial(ring_buffer *rx_buffer, ring_buffer *tx_buffer,
   _ubrrl = ubrrl;
   _ucsra = ucsra;
   _ucsrb = ucsrb;
+  _ucsrc = ucsrc;
   _udr = udr;
   _rxen = rxen;
   _txen = txen;
@@ -327,6 +350,92 @@ try_again:
   *_ubrrh = baud_setting >> 8;
   *_ubrrl = baud_setting;
 
+  sbi(*_ucsrb, _rxen);
+  sbi(*_ucsrb, _txen);
+  sbi(*_ucsrb, _rxcie);
+  cbi(*_ucsrb, _udrie);
+}
+
+void HardwareSerial::begin(unsigned long baud, byte databits, char parity, byte stopbits)
+{
+  uint16_t baud_setting;
+  uint8_t config_setting;
+  bool use_u2x = true;
+
+#if F_CPU == 16000000UL
+  // hardcoded exception for compatibility with the bootloader shipped
+  // with the Duemilanove and previous boards and the firmware on the 8U2
+  // on the Uno and Mega 2560.
+  if (baud == 57600) {
+    use_u2x = false;
+  }
+#endif
+
+try_again:
+  
+  if (use_u2x) {
+    *_ucsra = 1 << _u2x;
+    baud_setting = (F_CPU / 4 / baud - 1) / 2;
+  } else {
+    *_ucsra = 0;
+    baud_setting = (F_CPU / 8 / baud - 1) / 2;
+  }
+  
+  if ((baud_setting > 4095) && use_u2x)
+  {
+    use_u2x = false;
+    goto try_again;
+  }
+
+  // assign the baud_setting, a.k.a. ubbr (USART Baud Rate Register)
+  *_ubrrh = baud_setting >> 8;
+  *_ubrrl = baud_setting;
+
+  //set number of data bits
+  config_setting = *_ubrrh;
+  config_setting = *_ucsrc;
+  if (databits == 5)
+  {
+    config_setting |= B10000000;
+  }
+  else if (databits == 6)
+  {
+    config_setting |= B10000010;
+   }
+  else if (databits == 7)
+  {
+    config_setting |= B10000100;
+  }
+  else // (databits == 8)
+  {
+    config_setting |= B10000110;
+  }  
+  
+  //set parity
+  if ((parity == 'O')|(parity == 'o'))
+  {
+    config_setting |= B10110000;
+  }
+  else if ((parity == 'E')|(parity == 'e'))
+  {
+    config_setting |= B10100000;
+  }
+  else // ((parity == 'N')|(parity == 'n')))
+  {
+    config_setting |= B10000000;
+  }
+
+  //set number of stop bits
+  if (stopbits == 2)
+  {
+    config_setting |= B10001000;
+  }
+  else // (stopbits == 1)
+  {
+    config_setting |= B10000000;
+  }  
+  *_ucsrc = config_setting
+  
   sbi(*_ucsrb, _rxen);
   sbi(*_ucsrb, _txen);
   sbi(*_ucsrb, _rxcie);
@@ -405,9 +514,9 @@ HardwareSerial::operator bool() {
 // Preinstantiate Objects //////////////////////////////////////////////////////
 
 #if defined(UBRRH) && defined(UBRRL)
-  HardwareSerial Serial(&rx_buffer, &tx_buffer, &UBRRH, &UBRRL, &UCSRA, &UCSRB, &UDR, RXEN, TXEN, RXCIE, UDRIE, U2X);
+  HardwareSerial Serial(&rx_buffer, &tx_buffer, &UBRRH, &UBRRL, &UCSRA, &UCSRB, &UCSRC, &UDR, RXEN, TXEN, RXCIE, UDRIE, U2X);
 #elif defined(UBRR0H) && defined(UBRR0L)
-  HardwareSerial Serial(&rx_buffer, &tx_buffer, &UBRR0H, &UBRR0L, &UCSR0A, &UCSR0B, &UDR0, RXEN0, TXEN0, RXCIE0, UDRIE0, U2X0);
+  HardwareSerial Serial(&rx_buffer, &tx_buffer, &UBRR0H, &UBRR0L, &UCSR0A, &UCSR0B, &UCSR0C, &UDR0, RXEN0, TXEN0, RXCIE0, UDRIE0, U2X0);
 #elif defined(USBCON)
   // do nothing - Serial object and buffers are initialized in CDC code
 #else
@@ -415,13 +524,13 @@ HardwareSerial::operator bool() {
 #endif
 
 #if defined(UBRR1H)
-  HardwareSerial Serial1(&rx_buffer1, &tx_buffer1, &UBRR1H, &UBRR1L, &UCSR1A, &UCSR1B, &UDR1, RXEN1, TXEN1, RXCIE1, UDRIE1, U2X1);
+  HardwareSerial Serial1(&rx_buffer1, &tx_buffer1, &UBRR1H, &UBRR1L, &UCSR1A, &UCSR1B, &UCSR1C, &UDR1, RXEN1, TXEN1, RXCIE1, UDRIE1, U2X1);
 #endif
 #if defined(UBRR2H)
-  HardwareSerial Serial2(&rx_buffer2, &tx_buffer2, &UBRR2H, &UBRR2L, &UCSR2A, &UCSR2B, &UDR2, RXEN2, TXEN2, RXCIE2, UDRIE2, U2X2);
+  HardwareSerial Serial2(&rx_buffer2, &tx_buffer2, &UBRR2H, &UBRR2L, &UCSR2A, &UCSR2B, &UCSR2C, &UDR2, RXEN2, TXEN2, RXCIE2, UDRIE2, U2X2);
 #endif
 #if defined(UBRR3H)
-  HardwareSerial Serial3(&rx_buffer3, &tx_buffer3, &UBRR3H, &UBRR3L, &UCSR3A, &UCSR3B, &UDR3, RXEN3, TXEN3, RXCIE3, UDRIE3, U2X3);
+  HardwareSerial Serial3(&rx_buffer3, &tx_buffer3, &UBRR3H, &UBRR3L, &UCSR3A, &UCSR3B, &UCSR3C, &UDR3, RXEN3, TXEN3, RXCIE3, UDRIE3, U2X3);
 #endif
 
 #endif // whole file
