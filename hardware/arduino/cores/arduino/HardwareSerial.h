@@ -16,7 +16,7 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-  Modified 28 September 2010 by Mark Sproul
+  Modified 12 August 2012 by Alarus
 */
 
 #ifndef HardwareSerial_h
@@ -37,6 +37,7 @@ class HardwareSerial : public Stream
     volatile uint8_t *_ubrrl;
     volatile uint8_t *_ucsra;
     volatile uint8_t *_ucsrb;
+    volatile uint8_t *_ucsrc;
     volatile uint8_t *_udr;
     uint8_t _rxen;
     uint8_t _txen;
@@ -47,9 +48,10 @@ class HardwareSerial : public Stream
     HardwareSerial(ring_buffer *rx_buffer, ring_buffer *tx_buffer,
       volatile uint8_t *ubrrh, volatile uint8_t *ubrrl,
       volatile uint8_t *ucsra, volatile uint8_t *ucsrb,
-      volatile uint8_t *udr,
+      volatile uint8_t *ucsrc, volatile uint8_t *udr,
       uint8_t rxen, uint8_t txen, uint8_t rxcie, uint8_t udrie, uint8_t u2x);
     void begin(unsigned long);
+    void begin(unsigned long, byte, char, byte);
     void end();
     virtual int available(void);
     virtual int peek(void);
