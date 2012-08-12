@@ -117,7 +117,7 @@ inline void store_char(unsigned char c, ring_buffer *buffer)
       unsigned char c = UDR0;
     };
   #elif defined(UDR)
-    if (bit_is_clear(UCSRA, PE)) {     
+    if (bit_is_clear(UCSRA, PE)) {
       unsigned char c = UDR;
       store_char(c, &rx_buffer);
     } else {
