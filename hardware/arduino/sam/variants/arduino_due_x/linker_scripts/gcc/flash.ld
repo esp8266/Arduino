@@ -41,7 +41,7 @@ MEMORY
 }
 
 /* The stack size used by the application. NOTE: you need to adjust  */
-STACK_SIZE = DEFINED(STACK_SIZE) ? STACK_SIZE : 0x2000 ;
+STACK_SIZE = DEFINED(STACK_SIZE) ? STACK_SIZE : 0x8000 ;
 
 /* Section Definitions */
 SECTIONS
@@ -117,7 +117,7 @@ SECTIONS
     } > ram
 
     /* .bss section which is used for uninitialized data */
-    .bss (NOLOAD) :
+    .bss ALIGN(4) (NOLOAD) :
     {
         . = ALIGN(4);
         _sbss = . ;
