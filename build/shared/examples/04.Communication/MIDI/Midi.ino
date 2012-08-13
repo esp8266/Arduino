@@ -13,12 +13,12 @@
  Attach a MIDI cable to the jack, then to a MIDI synth, and play music.
 
  created 13 Jun 2006
- modified 30 Aug 2011
+ modified 13 Aug 2012
  by Tom Igoe 
 
  This example code is in the public domain.
  
- http://www.arduino.cc/en/Tutorial/MIDI
+ http://www.arduino.cc/en/Tutorial/Midi
  
  */
 
