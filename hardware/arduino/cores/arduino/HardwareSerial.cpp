@@ -18,7 +18,7 @@
   
   Modified 23 November 2006 by David A. Mellis
   Modified 28 September 2010 by Mark Sproul
-  Modified 12 August 2012 by Alarus
+  Modified 14 August 2012 by Alarus
 */
 
 #include <stdlib.h>
@@ -356,10 +356,10 @@ try_again:
   cbi(*_ucsrb, _udrie);
 }
 
-void HardwareSerial::begin(unsigned long baud, byte databits, char parity, byte stopbits)
+void HardwareSerial::begin(unsigned long baud, byte config)
 {
   uint16_t baud_setting;
-  uint8_t config_setting;
+  uint8_t current_config;
   bool use_u2x = true;
 
 #if F_CPU == 16000000UL
@@ -392,49 +392,10 @@ try_again:
   *_ubrrl = baud_setting;
 
   //set number of data bits
-  config_setting = *_ubrrh;
-  config_setting = *_ucsrc;
-  if (databits == 5)
-  {
-    config_setting |= B10000000;
-  }
-  else if (databits == 6)
-  {
-    config_setting |= B10000010;
-   }
-  else if (databits == 7)
-  {
-    config_setting |= B10000100;
-  }
-  else // (databits == 8)
-  {
-    config_setting |= B10000110;
-  }  
-  
-  //set parity
-  if ((parity == 'O')|(parity == 'o'))
-  {
-    config_setting |= B10110000;
-  }
-  else if ((parity == 'E')|(parity == 'e'))
-  {
-    config_setting |= B10100000;
-  }
-  else // ((parity == 'N')|(parity == 'n')))
-  {
-    config_setting |= B10000000;
-  }
-
-  //set number of stop bits
-  if (stopbits == 2)
-  {
-    config_setting |= B10001000;
-  }
-  else // (stopbits == 1)
-  {
-    config_setting |= B10000000;
-  }  
-  *_ucsrc = config_setting;
+  current_config = *_ubrrh;
+  current_config = *_ucsrc;
+  current_config |= config;
+  *_ucsrc = current_config;
   
   sbi(*_ucsrb, _rxen);
   sbi(*_ucsrb, _txen);
@@ -534,4 +495,3 @@ HardwareSerial::operator bool() {
 #endif
 
 #endif // whole file
-
