@@ -105,9 +105,10 @@ public class Serial implements SerialPortEventListener {
     SerialPort port;
     boolean result = false;
     try {
-      Enumeration portList = CommPortIdentifier.getPortIdentifiers();
+      @SuppressWarnings("unchecked")
+      Enumeration<CommPortIdentifier> portList = CommPortIdentifier.getPortIdentifiers();
       while (portList.hasMoreElements()) {
-        CommPortIdentifier portId = (CommPortIdentifier) portList.nextElement();
+        CommPortIdentifier portId = portList.nextElement();
         if ((CommPortIdentifier.PORT_SERIAL == portId.getPortType()) && (portId.getName().equals(iname))) {
           port = (SerialPort) portId.open("tap", 2000);
           port.setSerialPortParams(irate, 8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
@@ -148,10 +149,10 @@ public class Serial implements SerialPortEventListener {
 
     try {
       port = null;
-      Enumeration portList = CommPortIdentifier.getPortIdentifiers();
+      @SuppressWarnings("unchecked")
+      Enumeration<CommPortIdentifier> portList = CommPortIdentifier.getPortIdentifiers();
       while (portList.hasMoreElements()) {
-        CommPortIdentifier portId =
-          (CommPortIdentifier) portList.nextElement();
+        CommPortIdentifier portId = portList.nextElement();
 
         if (portId.getPortType() == CommPortIdentifier.PORT_SERIAL) {
           //System.out.println("found " + portId.getName());

@@ -30,6 +30,21 @@ arduino_due_x.build.variant_system_lib=libsam_sam3x8e_gcc_rel.a
 arduino_due_x.build.vid=0x2341
 arduino_due_x.build.pid=0x003e
 
+arduino_due_x_r2.name=Arduino DueX R2 Dev. Ed.
+arduino_due_x_r2.upload.tool=bossac
+arduino_due_x_r2.upload.protocol=sam-ba
+arduino_due_x_r2.upload.maximum_size=524288
+arduino_due_x_r2.upload.use_1200bps_touch=true
+arduino_due_x_r2.build.mcu=cortex-m3
+arduino_due_x_r2.build.f_cpu=84000000L
+arduino_due_x_r2.build.core=arduino
+arduino_due_x_r2.build.extra_flags=-D__SAM3X8E__ -mthumb -DUSB_PID={build.pid} -DUSB_VID={build.vid} -DUSBCON
+arduino_due_x_r2.build.ldscript=linker_scripts/gcc/flash.ld
+arduino_due_x_r2.build.variant=arduino_due_x
+arduino_due_x_r2.build.variant_system_lib=libsam_sam3x8e_gcc_rel.a
+arduino_due_x_r2.build.vid=0x2341
+arduino_due_x_r2.build.pid=0x003e
+
 ##############################################################
 
 adk2.name=Google ADK2

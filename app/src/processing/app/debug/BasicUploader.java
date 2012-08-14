@@ -67,7 +67,7 @@ public class BasicUploader extends Uploader  {
     boolean doTouch = use1200bpsTouch != null && use1200bpsTouch.equals("true");
     if (doTouch) {
       String uploadPort = prefs.get("serial.port");
-      String caterinaUploadPort = null;
+      String newUploadPort = null;
       try {
         // Toggle 1200 bps on selected serial port to force board reset.
         List<String> before = Serial.list();
@@ -104,10 +104,10 @@ public class BasicUploader extends Uploader  {
             System.out.println("}");
           }
           if (diff.size() > 0) {
-            caterinaUploadPort = diff.get(0);
+            newUploadPort = diff.get(0);
             if (verbose || Preferences.getBoolean("upload.verbose"))
-              System.out.println("Found Leonardo upload port: " +
-                  caterinaUploadPort);
+              System.out.println("Found upload port: " +
+                  newUploadPort);
             break;
           }
 
@@ -125,16 +125,16 @@ public class BasicUploader extends Uploader  {
             if (verbose || Preferences.getBoolean("upload.verbose"))
               System.out
                   .println("Uploading using selected port: " + uploadPort);
-            caterinaUploadPort = uploadPort;
+            newUploadPort = uploadPort;
             break;
           }
         }
-        if (caterinaUploadPort == null)
+        if (newUploadPort == null)
           // Something happened while detecting port
           throw new RunnerException(
               _("Couldn’t find a Leonardo on the selected port. Check that you have the correct port selected.  If it is correct, try pressing the board's reset button after initiating the upload."));
 
-        uploadPort = caterinaUploadPort;
+        uploadPort = newUploadPort;
       } catch (SerialException e) {
         throw new RunnerException(e.getMessage());
       } catch (InterruptedException e) {

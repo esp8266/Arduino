@@ -73,6 +73,38 @@ int WEAK CDC_GetInterface(uint8_t* interfaceNum)
 	return USBD_SendControl(0,&_cdcInterface,sizeof(_cdcInterface));
 }
 
+__attribute__ ((long_call, section (".ramfunc")))
+void banzai() {
+	// Disable all interrupts
+	__disable_irq();
+
+	// Set bootflag to run SAM-BA bootloader at restart
+	const int EEFC_FCMD_CGPB = 0x0C;
+	const int EEFC_KEY = 0x5A;
+	while (EFC0->EEFC_FSR & EEFC_FSR_FRDY == 0);
+	EFC0->EEFC_FCR =
+		EEFC_FCR_FCMD(EEFC_FCMD_CGPB) |
+		EEFC_FCR_FARG(1) |
+		EEFC_FCR_FKEY(EEFC_KEY);
+	while (EFC0->EEFC_FSR & EEFC_FSR_FRDY == 0);
+
+	// From here flash memory is no more available.
+
+	// Memory swap needs some time to stabilize
+	volatile uint32_t i;
+	for (i=0; i<1000000; i++);
+
+	// BANZAIIIIIII!!!
+	const int RSTC_KEY = 0xA5;
+	RSTC->RSTC_CR =
+		RSTC_CR_KEY(RSTC_KEY) |
+		RSTC_CR_PROCRST |
+		RSTC_CR_PERRST |
+		RSTC_CR_EXTRST;
+
+	while (true);
+}
+
 bool WEAK CDC_Setup(Setup& setup)
 {
 	uint8_t r = setup.bRequest;
@@ -99,38 +131,18 @@ bool WEAK CDC_Setup(Setup& setup)
 		{
 			_usbLineInfo.lineState = setup.wValueL;
 			// auto-reset into the bootloader is triggered when the port, already
-			// open at 1200 bps, is closed.  this is the signal to start the watchdog
-			// with a relatively long period so it can finish housekeeping tasks
-			// like servicing endpoints before the sketch ends
+			// open at 1200 bps, is closed.
 			if (1200 == _usbLineInfo.dwDTERate)
 			{
 				// We check DTR state to determine if host port is open (bit 0 of lineState).
 				if ((_usbLineInfo.lineState & 0x01) == 0)
-				{
-/* TODO, AVR Stuff
-					*(uint16_t *)0x0800 = 0x7777;
-					wdt_enable(WDTO_120MS);
-*/
-				}
-				else
-				{
-					// Most OSs do some intermediate steps when configuring ports and DTR can
-					// twiggle more than once before stabilizing.
-					// To avoid spurious resets we set the watchdog to 250ms and eventually
-					// cancel if DTR goes back high.
-/* TODO, AVR Stuff
-					wdt_disable();
-					wdt_reset();
-					*(uint16_t *)0x0800 = 0x0;
-*/
-				}
+					banzai();
 			}
 			return true;
 		}
 	}
 	return false;
 }
-
 
 int _serialPeek = -1;
 void Serial_::begin(uint32_t baud_count)
