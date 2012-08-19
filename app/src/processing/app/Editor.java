@@ -27,6 +27,7 @@ import processing.app.syntax.*;
 import processing.app.tools.*;
 import processing.core.*;
 import static processing.app.I18n._;
+import static processing.app.ObjectUtil.defaultIfEmpty;
 
 import java.awt.*;
 import java.awt.datatransfer.*;
@@ -1073,9 +1074,10 @@ public class Editor extends JFrame implements RunnerListener {
     item = newJMenuItemShift(_("Find in Reference"), 'F');
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          if (textarea.isSelectionActive()) {
-            handleFindReference();
-          }
+//          if (textarea.isSelectionActive()) {
+//            handleFindReference();
+//          }
+        	handleFindReference();
         }
       });
     menu.add(item);
@@ -1809,24 +1811,20 @@ public class Editor extends JFrame implements RunnerListener {
   }
 
 
-  protected void handleFindReference() {
-    String text = textarea.getSelectedText().trim();
+	protected void handleFindReference() {
+		String text = defaultIfEmpty(textarea.getSelectedText(), "").trim();
 
-    if (text.length() == 0) {
-      statusNotice(_("First select a word to find in the reference."));
-
-    } else {
-      String referenceFile = PdeKeywords.getReference(text);
-      //System.out.println("reference file is " + referenceFile);
-      if (referenceFile == null) {
-        statusNotice(
-	  I18n.format(_("No reference available for \"{0}\""), text)
-	);
-      } else {
-        Base.showReference(I18n.format(_("{0}.html"), referenceFile));
-      }
-    }
-  }
+		if (text.length() == 0) {
+			Base.showReference();
+		} else {
+			String referenceFile = PdeKeywords.getReference(text);
+			if (referenceFile == null) {
+				statusNotice(I18n.format(_("No reference available for \"{0}\""), text));
+			} else {
+				Base.showReference(I18n.format(_("{0}.html"), referenceFile));
+			}
+		}
+	}
 
 
   // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
