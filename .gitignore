@@ -15,3 +15,4 @@ hardware/arduino/bootloaders/caterina_LUFA/Caterina.eep
 hardware/arduino/bootloaders/caterina_LUFA/.dep/
 .gitignore
 build/windows/work/
+build/linux/work/
