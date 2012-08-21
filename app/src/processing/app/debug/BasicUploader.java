@@ -141,6 +141,10 @@ public class BasicUploader extends Uploader  {
         throw new RunnerException(e.getMessage());
       }
       prefs.put("serial.port", uploadPort);
+      if (uploadPort.startsWith("/dev/"))
+        prefs.put("serial.port.file", uploadPort.substring(5));
+      else
+        prefs.put("serial.port.file", uploadPort);
     }
     
     prefs.put("build.path", buildPath);
