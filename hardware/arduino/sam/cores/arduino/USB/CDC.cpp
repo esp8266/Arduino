@@ -228,7 +228,6 @@ size_t Serial_::write(uint8_t c)
 
 		if (r > 0)
 		{
-			USBD_Flush(CDC_TX);
 			return r;
 		} else
 		{

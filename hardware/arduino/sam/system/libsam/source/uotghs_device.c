@@ -115,7 +115,7 @@ void UDD_Attach(void)
 
 	// Enable USB line events
 	udd_enable_reset_interrupt();
-	//udd_enable_sof_interrupt();
+	udd_enable_sof_interrupt();
 
 	cpu_irq_restore(flags);
 }

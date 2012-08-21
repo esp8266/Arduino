@@ -397,6 +397,12 @@ static void USB_ISR(void)
 
 		udd_ack_fifocon(CDC_RX);
 	}
+
+	if (Is_udd_sof())
+	{
+		udd_ack_sof();
+		USBD_Flush(CDC_TX);
+	}
 #endif
 
 	// EP 0 Interrupt
