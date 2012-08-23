@@ -27,7 +27,6 @@ import processing.app.syntax.*;
 import processing.app.tools.*;
 import processing.core.*;
 import static processing.app.I18n._;
-import static processing.app.ObjectUtil.defaultIfEmpty;
 
 import java.awt.*;
 import java.awt.datatransfer.*;
