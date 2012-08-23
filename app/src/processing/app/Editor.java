@@ -1812,17 +1812,48 @@ public class Editor extends JFrame implements RunnerListener {
 
 
 	protected void handleFindReference() {
-		String text = defaultIfEmpty(textarea.getSelectedText(), "").trim();
-
-		if (text.length() == 0) {
-			Base.showReference();
-		} else {
-			String referenceFile = PdeKeywords.getReference(text);
-			if (referenceFile == null) {
-				statusNotice(I18n.format(_("No reference available for \"{0}\""), text));
-			} else {
-				Base.showReference(I18n.format(_("{0}.html"), referenceFile));
+		String text = "";
+		if( textarea.getSelectedText() != null )
+			text = textarea.getSelectedText().trim();
+		
+		try {
+			int current = textarea.getCaretPosition();
+			int startOffset = 0;
+			int endIndex = current;
+			String tmp = textarea.getDocument().getText(current,1);
+			// TODO probably a regexp that matches Arduino lang special chars already exists.
+			String regexp = "[\\s\\n();\\\\.!='\\[\\]{}]";
+		
+			while(!tmp.matches(regexp)) {
+				endIndex++;
+				tmp = textarea.getDocument().getText(endIndex,1);
 			}
+			// For some reason document index start at 2.
+			//if( current - start < 2 ) return;
+			
+			tmp = "";
+			while(!tmp.matches(regexp)) {
+				startOffset++;
+				if( current - startOffset < 0) { 
+					tmp = textarea.getDocument().getText(0, 1);
+					break;
+				}
+				else 
+					tmp = textarea.getDocument().getText(current - startOffset, 1);
+			}
+			startOffset--;
+			
+			int length = endIndex - current + startOffset;
+			text = textarea.getDocument().getText(current - startOffset, length);
+		} catch (BadLocationException bl ) {
+			 bl.printStackTrace();
+		}
+		
+		String referenceFile = PdeKeywords.getReference(text);
+		if (referenceFile == null) {
+			statusNotice(I18n.format(_("No reference available for \"{0}\""), text));
+		} else {
+			Base.showReference(I18n.format(_("{0}.html"), referenceFile));
 		}
 	}
 
