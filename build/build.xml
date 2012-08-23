@@ -574,8 +574,8 @@
 		  prefix="arduino-${version}" 
 		  excludes="**/*.tgz,
 			     **/*.bz2,
-			     **/macosx/,
-			     **/windows/,
+			     **/build/macosx/,
+			     **/build/windows/,
 			     **/work/,
 			     **/.git/,
 			     **/*.class"
