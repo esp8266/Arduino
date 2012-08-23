@@ -1073,9 +1073,10 @@ public class Editor extends JFrame implements RunnerListener {
     item = newJMenuItemShift(_("Find in Reference"), 'F');
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          if (textarea.isSelectionActive()) {
-            handleFindReference();
-          }
+//          if (textarea.isSelectionActive()) {
+//            handleFindReference();
+//          }
+        	handleFindReference();
         }
       });
     menu.add(item);
@@ -1809,24 +1810,51 @@ public class Editor extends JFrame implements RunnerListener {
   }
 
 
-  protected void handleFindReference() {
-    String text = textarea.getSelectedText().trim();
-
-    if (text.length() == 0) {
-      statusNotice(_("First select a word to find in the reference."));
-
-    } else {
-      String referenceFile = PdeKeywords.getReference(text);
-      //System.out.println("reference file is " + referenceFile);
-      if (referenceFile == null) {
-        statusNotice(
-	  I18n.format(_("No reference available for \"{0}\""), text)
-	);
-      } else {
-        Base.showReference(I18n.format(_("{0}.html"), referenceFile));
-      }
-    }
-  }
+	protected void handleFindReference() {
+		String text = "";
+		if( textarea.getSelectedText() != null )
+			text = textarea.getSelectedText().trim();
+		
+		try {
+			int current = textarea.getCaretPosition();
+			int startOffset = 0;
+			int endIndex = current;
+			String tmp = textarea.getDocument().getText(current,1);
+			// TODO probably a regexp that matches Arduino lang special chars already exists.
+			String regexp = "[\\s\\n();\\\\.!='\\[\\]{}]";
+		
+			while(!tmp.matches(regexp)) {
+				endIndex++;
+				tmp = textarea.getDocument().getText(endIndex,1);
+			}
+			// For some reason document index start at 2.
+			//if( current - start < 2 ) return;
+			
+			tmp = "";
+			while(!tmp.matches(regexp)) {
+				startOffset++;
+				if( current - startOffset < 0) { 
+					tmp = textarea.getDocument().getText(0, 1);
+					break;
+				}
+				else 
+					tmp = textarea.getDocument().getText(current - startOffset, 1);
+			}
+			startOffset--;
+			
+			int length = endIndex - current + startOffset;
+			text = textarea.getDocument().getText(current - startOffset, length);
+		} catch (BadLocationException bl ) {
+			 bl.printStackTrace();
+		}
+		
+		String referenceFile = PdeKeywords.getReference(text);
+		if (referenceFile == null) {
+			statusNotice(I18n.format(_("No reference available for \"{0}\""), text));
+		} else {
+			Base.showReference(I18n.format(_("{0}.html"), referenceFile));
+		}
+	}
 
 
   // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
