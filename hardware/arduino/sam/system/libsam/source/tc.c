@@ -173,14 +173,63 @@ extern uint32_t TC_FindMckDivisor( uint32_t dwFreq, uint32_t dwMCk, uint32_t *dw
     return 1 ;
 }
 
+/**
+ * \brief Read Timer Counter Counter Value on the selected TC & channel.
+ *
+ * \param p_tc Pointer to a TC instance.
+ * \param ul_channel Channel to configure.
+ *
+ * \return RC value.
+ */
+uint32_t TC_ReadCV(Tc *p_tc, uint32_t ul_channel){
+	return p_tc->TC_CHANNEL[ul_channel].TC_CV;
+}
+
+/**
+ * \brief Get current status on the selected channel.
+ *
+ * \param p_tc Pointer to a TC instance.
+ * \param ul_channel Channel to configure.
+ *
+ * \return The current TC status.
+ */
+uint32_t TC_GetStatus(Tc *p_tc, uint32_t ul_channel)
+{
+	TcChannel *tc_channel;
+
+	tc_channel = p_tc->TC_CHANNEL + ul_channel;
+	return tc_channel->TC_SR;
+}
+
+/**
+ * \brief Set RA on the selected channel.
+ *
+ * \param tc Pointer to a TC instance.
+ * \param chan Channel to configure.
+ * \param v New value for RA.
+ */
 void TC_SetRA(Tc *tc, uint32_t chan, uint32_t v) {
 	tc->TC_CHANNEL[chan].TC_RA = v;
 }
 
+/**
+ * \brief Set RB on the selected channel.
+ *
+ * \param tc Pointer to a TC instance.
+ * \param chan Channel to configure.
+ * \param v New value for RB.
+ */
 void TC_SetRB(Tc *tc, uint32_t chan, uint32_t v) {
 	tc->TC_CHANNEL[chan].TC_RB = v;
 }
 
+/**
+ * \brief Set RC on the selected channel.
+ *
+ * \param tc Pointer to a TC instance.
+ * \param chan Channel to configure.
+ * \param v New value for RC.
+ */
 void TC_SetRC(Tc *tc, uint32_t chan, uint32_t v) {
 	tc->TC_CHANNEL[chan].TC_RC = v;
 }

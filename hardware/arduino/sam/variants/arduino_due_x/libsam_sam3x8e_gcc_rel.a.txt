@@ -72,7 +72,7 @@ pmc.o:
 00000000 T pmc_switch_udpck_to_upllck
 
 pwmc.o:
-00000000 r C.9.7272
+00000000 r C.9.7280
 00000000 t FindClockConfiguration
 00000000 T PWMC_ConfigureChannel
 00000000 T PWMC_ConfigureChannelExt
@@ -100,14 +100,14 @@ pwmc.o:
 00000000 T PWMC_SetSyncChannelUpdateUnlock
 00000000 T PWMC_WriteBuffer
          U __assert_func
-00000000 r __func__.5968
-00000000 r __func__.5979
-00000000 r __func__.5994
-00000000 r __func__.6005
-00000000 r __func__.6016
-00000000 r __func__.6023
-00000000 r __func__.6107
+00000000 r __func__.5974
+00000000 r __func__.5985
+00000000 r __func__.6000
+00000000 r __func__.6011
+00000000 r __func__.6022
+00000000 r __func__.6029
 00000000 r __func__.6113
+00000000 r __func__.6119
 
 rtc.o:
 00000000 T RTC_ClearSCCR
@@ -123,9 +123,9 @@ rtc.o:
 00000000 T RTC_SetTime
 00000000 T RTC_SetTimeAlarm
          U __assert_func
-00000000 r __func__.5965
-00000000 r __func__.5974
-00000000 r __func__.5979
+00000000 r __func__.5971
+00000000 r __func__.5980
+00000000 r __func__.5985
 
 rtt.o:
 00000000 T RTT_EnableIT
@@ -134,8 +134,8 @@ rtt.o:
 00000000 T RTT_SetAlarm
 00000000 T RTT_SetPrescaler
          U __assert_func
-00000000 r __func__.5972
-00000000 r __func__.5980
+00000000 r __func__.5978
+00000000 r __func__.5986
 
 spi.o:
 00000000 T SPI_Configure
@@ -153,15 +153,17 @@ spi.o:
 tc.o:
 00000000 T TC_Configure
 00000000 T TC_FindMckDivisor
+00000000 T TC_GetStatus
+00000000 T TC_ReadCV
 00000000 T TC_SetRA
 00000000 T TC_SetRB
 00000000 T TC_SetRC
 00000000 T TC_Start
 00000000 T TC_Stop
          U __assert_func
-00000000 r __func__.5967
 00000000 r __func__.5973
 00000000 r __func__.5979
+00000000 r __func__.5985
 
 timetick.o:
 00000000 T GetTickCount
@@ -188,18 +190,18 @@ twi.o:
 00000000 T TWI_TransferComplete
 00000000 T TWI_WriteByte
          U __assert_func
-00000000 r __func__.6340
-00000000 r __func__.6355
-00000000 r __func__.6359
-00000000 r __func__.6366
-00000000 r __func__.6370
-00000000 r __func__.6375
-00000000 r __func__.6383
-00000000 r __func__.6397
-00000000 r __func__.6402
-00000000 r __func__.6406
-00000000 r __func__.6411
-00000000 r __func__.6415
+00000000 r __func__.6346
+00000000 r __func__.6361
+00000000 r __func__.6365
+00000000 r __func__.6372
+00000000 r __func__.6376
+00000000 r __func__.6381
+00000000 r __func__.6389
+00000000 r __func__.6403
+00000000 r __func__.6408
+00000000 r __func__.6412
+00000000 r __func__.6417
+00000000 r __func__.6421
 
 usart.o:
 00000000 T USART_Configure
@@ -218,7 +220,7 @@ usart.o:
 00000000 T USART_Write
 00000000 T USART_WriteBuffer
          U __assert_func
-00000000 r __func__.6261
+00000000 r __func__.6267
 
 wdt.o:
 00000000 T WDT_Disable

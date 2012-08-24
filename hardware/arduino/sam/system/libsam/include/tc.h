@@ -68,6 +68,10 @@ extern void TC_Stop( Tc *pTc, uint32_t dwChannel ) ;
 
 extern uint32_t TC_FindMckDivisor( uint32_t dwFreq, uint32_t dwMCk, uint32_t *dwDiv, uint32_t *dwTcClks, uint32_t dwBoardMCK ) ;
 
+extern uint32_t TC_ReadCV(Tc *p_tc, uint32_t ul_channel);
+
+extern uint32_t TC_GetStatus(Tc *p_tc, uint32_t ul_channel);
+
 extern void TC_SetRA(Tc *tc, uint32_t chan, uint32_t v) ;
 
 extern void TC_SetRB(Tc *tc, uint32_t chan, uint32_t v) ;
