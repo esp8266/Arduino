@@ -53,21 +53,16 @@ extern void loop( void ) ;
 // Get the bit location within the hardware port of the given virtual pin.
 // This comes from the pins_*.c file for the active board configuration.
 //
-// These perform slightly better as macros compared to inline functions
-//
-#define digitalPinToPort( ulPin )    ( g_APinDescription[ulPin]->pPort->PIO_PDSR )
-#define digitalPinToBitMask( ulPin ) ( g_APinDescription[ulPin]->dwPin )
-#define digitalPinToTimer( P )   (  )
-#define analogInPinToBit( P )    ( P )
-#define portOutputRegister( P )  (  )
-#define portInputRegister( P )   (  )
-#define portModeRegister( P )    (  )
+#define digitalPinToPort(P)        ( g_APinDescription[P]->pPort )
+#define digitalPinToBitMask(P)     ( g_APinDescription[P]->ulPin )
+#define digitalPinToTimer(P)       (  )
+//#define analogInPinToBit(P)        ( )
+#define portOutputRegister(port)   ( port->PIO_ODSR )
+#define portInputRegister(port)    ( port->PIO_PDSR )
+//#define portModeRegister(P)        (  )
 
 //#define NOT_A_PIN 0  // defined in pio.h/EPioType
 #define NOT_A_PORT           0
-
-#define NOT_ON_TIMER         0
-#define TIMER0               1
 
 typedef enum _EExt_Interrupts
 {
@@ -122,7 +117,7 @@ typedef enum _EAnalogChannel
 // Definitions for PWM channels
 typedef enum _EPWMChannel
 {
-  NO_PWM=-1,
+  NOT_ON_PWM=-1,
   PWM_CH0=0,
   PWM_CH1,
   PWM_CH2,
@@ -136,7 +131,7 @@ typedef enum _EPWMChannel
 // Definitions for TC channels
 typedef enum _ETCChannel
 {
-  NO_TC=-1,
+  NOT_ON_TIMER=-1,
   TC0_CHA0=0,
   TC0_CHB0,
   TC0_CHA1,
