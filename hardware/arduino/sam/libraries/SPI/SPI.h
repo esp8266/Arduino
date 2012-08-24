@@ -36,23 +36,27 @@ class SPIClass {
 	void attachInterrupt(void);
 	void detachInterrupt(void);
 
-	void begin(uint8_t _channel);
 	void begin(void);
 	void end(void);
 
-	// These methods sets a parameter on a single pin
-	//void setBitOrder(uint8_t _channel, uint8_t);
-	void setDataMode(uint8_t _channel, uint8_t);
-	void setClockDivider(uint8_t _channel, uint8_t);
+	// Attach/Detach pin to/from SPI controller
+	void begin(uint8_t _pin);
+	void end(uint8_t _pin);
 
-	// These methods sets the same parameters but on default pin PIN_SPI_SS_DEFAULT
-	//void setBitOrder(uint8_t _order) { setBitOrder(PIN_SPI_SS_DEFAULT, _order); };
+	// These methods sets a parameter on a single pin
+	void setBitOrder(uint8_t _pin, BitOrder);
+	void setDataMode(uint8_t _pin, uint8_t);
+	void setClockDivider(uint8_t _pin, uint8_t);
+
+	// These methods sets the same parameters but on default pin BOARD_SPI_DEFAULT_SS
+	void setBitOrder(BitOrder _order) { setBitOrder(BOARD_SPI_DEFAULT_SS, _order); };
 	void setDataMode(uint8_t _mode) { setDataMode(BOARD_SPI_DEFAULT_SS, _mode); };
 	void setClockDivider(uint8_t _div) { setClockDivider(BOARD_SPI_DEFAULT_SS, _div); };
 
   private:
 	Spi *spi;
 	uint32_t id;
+	BitOrder bitOrder[SPI_CHANNELS_NUM];
 	uint32_t divider[SPI_CHANNELS_NUM];
 	uint32_t mode[SPI_CHANNELS_NUM];
 	void (*initCb)(void);

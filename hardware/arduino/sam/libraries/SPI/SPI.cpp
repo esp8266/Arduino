@@ -25,6 +25,7 @@ void SPIClass::begin() {
 	// Default speed set to 4Mhz
 	setClockDivider(BOARD_SPI_DEFAULT_SS, 21);
 	setDataMode(BOARD_SPI_DEFAULT_SS, SPI_MODE0);
+	setBitOrder(BOARD_SPI_DEFAULT_SS, MSBFIRST);
 }
 
 void SPIClass::begin(uint8_t _pin) {
@@ -34,39 +35,50 @@ void SPIClass::begin(uint8_t _pin) {
 		g_APinDescription[spiPin].ulPinType,
 		g_APinDescription[spiPin].ulPin,
 		g_APinDescription[spiPin].ulPinConfiguration);
-	// Default speed set to 4Mhz
-	setClockDivider(_pin, 21);
+
+	// Default speed set to 500Khz
+	setClockDivider(_pin, 168);
 	setDataMode(_pin, SPI_MODE0);
+	setBitOrder(_pin, MSBFIRST);
+}
+
+void SPIClass::end(uint8_t _pin) {
+	uint32_t spiPin = BOARD_PIN_TO_SPI_PIN(_pin);
+	// Setting the pin as INPUT will disconnect it from SPI peripheral
+	pinMode(spiPin, INPUT);
 }
 
 void SPIClass::end() {
 	SPI_Disable(spi);
 }
 
-//void SPIClass::setBitOrder(uint8_t _bitOrder, uint8_t _channel) {
-//	// Not supported
-//}
+void SPIClass::setBitOrder(uint8_t _pin, BitOrder _bitOrder) {
+	uint32_t ch = BOARD_PIN_TO_SPI_CHANNEL(_pin);
+	bitOrder[ch] = _bitOrder;
+}
 
 void SPIClass::setDataMode(uint8_t _pin, uint8_t _mode) {
-	uint32_t _channel = BOARD_PIN_TO_SPI_CHANNEL(_pin);
-	mode[_channel] = _mode | SPI_CSR_CSAAT;
+	uint32_t ch = BOARD_PIN_TO_SPI_CHANNEL(_pin);
+	mode[ch] = _mode | SPI_CSR_CSAAT;
 	// SPI_CSR_DLYBCT(1) keeps CS enabled for 32 MCLK after a completed
 	// transfer. Some device needs that for working properly.
-	SPI_ConfigureNPCS(spi, _channel, mode[_channel] | SPI_CSR_SCBR(divider[_channel]) | SPI_CSR_DLYBCT(10) | (32<<16));
+	SPI_ConfigureNPCS(spi, ch, mode[ch] | SPI_CSR_SCBR(divider[ch]) | SPI_CSR_DLYBCT(1));
 }
 
 void SPIClass::setClockDivider(uint8_t _pin, uint8_t _divider) {
-	uint32_t _channel = BOARD_PIN_TO_SPI_CHANNEL(_pin);
-	divider[_channel] = _divider;
+	uint32_t ch = BOARD_PIN_TO_SPI_CHANNEL(_pin);
+	divider[ch] = _divider;
 	// SPI_CSR_DLYBCT(1) keeps CS enabled for 32 MCLK after a completed
 	// transfer. Some device needs that for working properly.
-//	SPI_ConfigureNPCS(spi, _channel, mode[_channel] | SPI_CSR_SCBR(divider[_channel]) | SPI_CSR_DLYBCT(1));
-	SPI_ConfigureNPCS(spi, _channel, mode[_channel] | SPI_CSR_SCBR(divider[_channel]) | SPI_CSR_DLYBCT(10) | (32<<16));
+	SPI_ConfigureNPCS(spi, ch, mode[ch] | SPI_CSR_SCBR(divider[ch]) | SPI_CSR_DLYBCT(1));
 }
 
 byte SPIClass::transfer(byte _pin, uint8_t _data, SPITransferMode _mode) {
-	uint32_t _channel = BOARD_PIN_TO_SPI_CHANNEL(_pin);
-	uint32_t d = _data | SPI_PCS(_channel);
+	uint32_t ch = BOARD_PIN_TO_SPI_CHANNEL(_pin);
+	// Reverse bit order
+	if (bitOrder[ch] == LSBFIRST)
+		_data = __REV(__RBIT(_data));
+	uint32_t d = _data | SPI_PCS(ch);
 	if (_mode == SPI_LAST)
 		d |= SPI_TDR_LASTXFER;
 
@@ -79,6 +91,9 @@ byte SPIClass::transfer(byte _pin, uint8_t _data, SPITransferMode _mode) {
     while ((spi->SPI_SR & SPI_SR_RDRF) == 0)
     	;
     d = spi->SPI_RDR;
+	// Reverse bit order
+	if (bitOrder[ch] == LSBFIRST)
+		d = __REV(__RBIT(d));
     return d & 0xFF;
 }
 

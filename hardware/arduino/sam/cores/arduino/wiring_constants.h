@@ -42,8 +42,10 @@ extern "C"{
 #define SERIAL  0x0
 #define DISPLAY 0x1
 
-#define LSBFIRST 0
-#define MSBFIRST 1
+enum BitOrder {
+	LSBFIRST = 0,
+	MSBFIRST = 1
+};
 
 #define CHANGE 1
 #define FALLING 2
