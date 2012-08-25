@@ -85,7 +85,7 @@ uint32_t UDD_Init(void)
 
 	// Enable High Speed
 	udd_low_speed_disable();
-	udd_high_speed_enable();
+	udd_high_speed_disable();
 
 	//otg_ack_vbus_transition();
 	// Force Vbus interrupt in case of Vbus always with a high level
