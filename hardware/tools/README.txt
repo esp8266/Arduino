@@ -1,1 +1,0 @@
-Here should be present the CodeSourcery ARM GCC toolchain

@@ -1,36 +1,5 @@
-##############################################################
 
-arduino_due_u.name=Arduino DueU Dev. Ed.
-arduino_due_u.upload.tool=bossac
-arduino_due_u.upload.protocol=sam-ba
-arduino_due_u.upload.maximum_size=262144
-arduino_due_u.build.mcu=cortex-m3
-arduino_due_u.build.f_cpu=96000000L
-arduino_due_u.build.core=arduino
-arduino_due_u.build.extra_flags=-D__SAM3U4E__ -mthumb -DUSB_PID={build.pid} -DUSB_VID={build.vid} -DUSBCON
-arduino_due_u.build.ldscript=linker_scripts/gcc/flash.ld
-arduino_due_u.build.variant=arduino_due_u
-arduino_due_u.build.variant_system_lib=libsam_sam3u4e_gcc_rel.a
-arduino_due_u.build.vid=0x2341
-arduino_due_u.build.pid=0x003e
-
-##############################################################
-
-arduino_due_x.name=Arduino DueX Dev. Ed.
-arduino_due_x.upload.tool=bossac
-arduino_due_x.upload.protocol=sam-ba
-arduino_due_x.upload.maximum_size=524288
-arduino_due_x.build.mcu=cortex-m3
-arduino_due_x.build.f_cpu=84000000L
-arduino_due_x.build.core=arduino
-arduino_due_x.build.extra_flags=-D__SAM3X8E__ -mthumb -DUSB_PID={build.pid} -DUSB_VID={build.vid} -DUSBCON
-arduino_due_x.build.ldscript=linker_scripts/gcc/flash.ld
-arduino_due_x.build.variant=arduino_due_x
-arduino_due_x.build.variant_system_lib=libsam_sam3x8e_gcc_rel.a
-arduino_due_x.build.vid=0x2341
-arduino_due_x.build.pid=0x003e
-
-arduino_due_x_r2.name=Arduino DueX R2 Dev. Ed.
+arduino_due_x_r2.name=Arduino Due Dev. Ed.
 arduino_due_x_r2.upload.tool=bossac
 arduino_due_x_r2.upload.protocol=sam-ba
 arduino_due_x_r2.upload.maximum_size=524288
@@ -45,16 +14,3 @@ arduino_due_x_r2.build.variant_system_lib=libsam_sam3x8e_gcc_rel.a
 arduino_due_x_r2.build.vid=0x2341
 arduino_due_x_r2.build.pid=0x003e
 
-##############################################################
-
-adk2.name=Google ADK2
-adk2.upload.tool=adk2install
-adk2.upload.protocol=sam-ba
-adk2.upload.maximum_size=49152
-adk2.build.mcu=cortex-m3
-adk2.build.f_cpu=84000000L
-adk2.build.core=arduino
-adk2.build.extra_flags=-D__SAM3X8E__ -mthumb
-adk2.build.ldscript=linker_scripts/gcc/flash.ld
-adk2.build.variant=adk2
-adk2.build.variant_system_lib=libsam_sam3x8e_gcc_rel.a
