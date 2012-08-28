@@ -43,6 +43,7 @@ class HardwareSerial : public Stream
     uint8_t _rxcie;
     uint8_t _udrie;
     uint8_t _u2x;
+    bool transmitting;
   public:
     HardwareSerial(ring_buffer *rx_buffer, ring_buffer *tx_buffer,
       volatile uint8_t *ubrrh, volatile uint8_t *ubrrl,

@@ -327,6 +327,8 @@ try_again:
   *_ubrrh = baud_setting >> 8;
   *_ubrrl = baud_setting;
 
+  transmitting = false;
+
   sbi(*_ucsrb, _rxen);
   sbi(*_ucsrb, _txen);
   sbi(*_ucsrb, _rxcie);
@@ -376,8 +378,9 @@ int HardwareSerial::read(void)
 
 void HardwareSerial::flush()
 {
-  while (_tx_buffer->head != _tx_buffer->tail)
-    ;
+  // UDR is kept full while the buffer is not empty, so TXC triggers when EMPTY && SENT
+  while (transmitting && ! (*_ucsra & _BV(TXC0)));
+  transmitting = false;
 }
 
 size_t HardwareSerial::write(uint8_t c)
@@ -394,6 +397,9 @@ size_t HardwareSerial::write(uint8_t c)
   _tx_buffer->head = i;
 	
   sbi(*_ucsrb, _udrie);
+  // clear the TXC bit -- "can be cleared by writing a one to its bit location"
+  transmitting = true;
+  sbi(*_ucsra, TXC0);
   
   return 1;
 }
