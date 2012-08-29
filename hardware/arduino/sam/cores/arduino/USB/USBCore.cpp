@@ -40,7 +40,8 @@ static const uint32_t EndPoints[] =
 #define TX_RX_LED_PULSE_MS 100
 volatile uint8_t TxLEDPulse; /**< Milliseconds remaining for data Tx LED pulse */
 volatile uint8_t RxLEDPulse; /**< Milliseconds remaining for data Rx LED pulse */
-
+static char isRemoteWakeUpEnabled = 0;
+static char isEndpointHalt = 0;
 //==================================================================
 //==================================================================
 
@@ -85,6 +86,10 @@ const DeviceDescriptor USB_DeviceDescriptor =
 
 const DeviceDescriptor USB_DeviceDescriptorA =
 	D_DEVICE(DEVICE_CLASS,0x00,0x00,64,USB_VID,USB_PID,0x100,IMANUFACTURER,IPRODUCT,0,1);
+
+const DeviceDescriptor USB_DeviceQualifier =
+	D_QUALIFIER(0x00,0x00,0x00,64,1);
+
 
 //==================================================================
 //==================================================================
@@ -183,8 +188,9 @@ uint32_t USBD_Send(uint32_t ep, const void* d, uint32_t len)
 
 		UDD_Send(ep & 0xF, data, n);
 
-		if (!UDD_ReadWriteAllowed(ep & 0xF) || ((len == 0) && (ep & TRANSFER_RELEASE)))	// Release full buffer
-			UDD_ReleaseTX(ep & 0xF);
+		//if (!UDD_ReadWriteAllowed(ep & 0xF) || ((len == 0) && (ep & TRANSFER_RELEASE))){	// Release full buffer
+			//UDD_ReleaseTX(ep & 0xF);
+        //}
 	}
 	//TXLED1;					// light the TX LED
 	//TxLEDPulse = TX_RX_LED_PULSE_MS;
@@ -345,9 +351,24 @@ static bool USBD_SendDescriptor(Setup& setup)
 			desc_addr = (const uint8_t*)&STRING_IPRODUCT;
 		else if (setup.wValueL == IMANUFACTURER)
 			desc_addr = (const uint8_t*)&STRING_IMANUFACTURER;
-		else
+		else {
 			return false;
+        }
 	}
+	else if (USB_DEVICE_QUALIFIER == t)
+	{
+		// Device qualifier descriptor requested
+		desc_addr = (const uint8_t*)&USB_DeviceQualifier;
+    }
+    else if (USB_OTHER_SPEED_CONFIGURATION == t)
+    {
+        // TODO
+		// Other configuration descriptor requested
+    }
+    else
+    {
+        //printf("Device ERROR");
+    }
 
 	if (desc_addr == 0)
 	{
@@ -401,7 +422,7 @@ static void USB_ISR(void)
 	if (Is_udd_sof())
 	{
 		udd_ack_sof();
-		USBD_Flush(CDC_TX);
+//		USBD_Flush(CDC_TX);
 	}
 #endif
 
@@ -437,15 +458,70 @@ static void USB_ISR(void)
 			uint8_t r = setup.bRequest;
 			if (GET_STATUS == r)
 			{
-				TRACE_CORE(puts(">>> EP0 Int: GET_STATUS\r\n");)
-				UDD_Send8(EP0, 0); // TODO
-				UDD_Send8(EP0, 0);
+                if( setup.bmRequestType == 0 )  // device
+                {
+                    // Send the device status
+     				TRACE_CORE(puts(">>> EP0 Int: GET_STATUS\r\n");)
+                    // Check current configuration for power mode (if device is configured)
+                    // TODO
+                    // Check if remote wake-up is enabled
+                    // TODO
+                    UDD_Send8(EP0, 0); // TODO
+	    			UDD_Send8(EP0, 0);
+                }
+                // if( setup.bmRequestType == 2 ) // Endpoint:
+                else
+                {
+                    // Send the endpoint status
+                    // Check if the endpoint if currently halted
+                    if( isEndpointHalt == 1 )
+    				UDD_Send8(EP0, 1); // TODO
+                    else                    
+    				UDD_Send8(EP0, 0); // TODO
+	    			UDD_Send8(EP0, 0);
+                }
 			}
 			else if (CLEAR_FEATURE == r)
 			{
-			}
+               // Check which is the selected feature
+                if( setup.wValueL == 1) // DEVICEREMOTEWAKEUP
+                {
+                    // Enable remote wake-up and send a ZLP
+                    if( isRemoteWakeUpEnabled == 1 )
+	    			UDD_Send8(EP0, 1);
+                    else
+	    			UDD_Send8(EP0, 0);
+                    UDD_Send8(EP0, 0);
+                }
+                else // if( setup.wValueL == 0) // ENDPOINTHALT
+                {
+                    isEndpointHalt = 0;  // TODO 
+    				UDD_Send8(EP0, 0);
+	    			UDD_Send8(EP0, 0);
+                }
+
+ 			}
 			else if (SET_FEATURE == r)
 			{
+                // Check which is the selected feature
+                if( setup.wValueL == 1) // DEVICEREMOTEWAKEUP
+                {
+                    // Enable remote wake-up and send a ZLP
+                    isRemoteWakeUpEnabled = 1;
+	    			UDD_Send8(EP0, 0);
+                }
+                if( setup.wValueL == 0) // ENDPOINTHALT
+                {
+                    // Halt endpoint
+                    isEndpointHalt = 1;
+                    //USBD_Halt(USBGenericRequest_GetEndpointNumber(pRequest));
+	    			UDD_Send8(EP0, 0);
+                }
+                if( setup.wValueL == 2) // TEST_MODE
+                {
+                    // 7.1.20 Test Mode Support, 9.4.9 SetFeature
+                    // TODO
+                }
 			}
 			else if (SET_ADDRESS == r)
 			{
@@ -466,7 +542,7 @@ static void USB_ISR(void)
 			else if (GET_CONFIGURATION == r)
 			{
 				TRACE_CORE(puts(">>> EP0 Int: GET_CONFIGURATION\r\n");)
-				UDD_Send8(EP0, 1);
+				UDD_Send8(EP0, _usbConfiguration);
 			}
 			else if (SET_CONFIGURATION == r)
 			{
@@ -491,10 +567,13 @@ static void USB_ISR(void)
 			}
 			else if (GET_INTERFACE == r)
 			{
+                // TODO
 				TRACE_CORE(puts(">>> EP0 Int: GET_INTERFACE\r\n");)
+				UDD_Send8(EP0, setup.wIndex);
 			}
 			else if (SET_INTERFACE == r)
 			{
+                // TODO
 				TRACE_CORE(puts(">>> EP0 Int: SET_INTERFACE\r\n");)
 			}
 		}

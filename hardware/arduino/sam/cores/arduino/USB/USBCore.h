@@ -77,6 +77,8 @@
 #define USB_STRING_DESCRIPTOR_TYPE             3
 #define USB_INTERFACE_DESCRIPTOR_TYPE          4
 #define USB_ENDPOINT_DESCRIPTOR_TYPE           5
+#define USB_DEVICE_QUALIFIER                   6
+#define USB_OTHER_SPEED_CONFIGURATION          7
 
 #define USB_DEVICE_CLASS_COMMUNICATIONS        0x02
 #define USB_DEVICE_CLASS_HUMAN_INTERFACE       0x03
@@ -290,6 +292,9 @@ _Pragma("pack()")
 
 #define D_ENDPOINT(_addr,_attr,_packetSize, _interval) \
 	{ 7, 5, _addr,_attr,_packetSize, _interval }
+
+#define D_QUALIFIER(_class,_subClass,_proto,_packetSize0,_configs) \
+	{ 10, 6, 0x200, _class,_subClass,_proto,_packetSize0,_configs }
 
 #define D_IAD(_firstInterface, _count, _class, _subClass, _protocol) \
 	{ 8, 11, _firstInterface, _count, _class, _subClass, _protocol, 0 }

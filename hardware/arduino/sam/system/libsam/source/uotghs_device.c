@@ -85,7 +85,7 @@ uint32_t UDD_Init(void)
 
 	// Enable High Speed
 	udd_low_speed_disable();
-	udd_high_speed_disable();
+	udd_high_speed_enable();
 
 	//otg_ack_vbus_transition();
 	// Force Vbus interrupt in case of Vbus always with a high level
@@ -301,7 +301,8 @@ uint32_t UDD_FifoByteCount(uint32_t ep)
 void UDD_ReleaseRX(uint32_t ep)
 {
 	TRACE_UOTGHS_DEVICE(puts("=> UDD_ReleaseRX\r\n");)
-	UOTGHS->UOTGHS_DEVEPTICR[ep] = (UOTGHS_DEVEPTICR_NAKOUTIC | UOTGHS_DEVEPTICR_RXOUTIC);
+//	UOTGHS->UOTGHS_DEVEPTICR[ep] = (UOTGHS_DEVEPTICR_NAKOUTIC | UOTGHS_DEVEPTICR_RXOUTIC);
+	UOTGHS->UOTGHS_DEVEPTICR[ep] = UOTGHS_DEVEPTICR_RXOUTIC;
 	UOTGHS->UOTGHS_DEVEPTIDR[ep] = UOTGHS_DEVEPTIDR_FIFOCONC;
 	ul_recv_fifo_ptr[ep] = 0;
 }
@@ -309,7 +310,8 @@ void UDD_ReleaseRX(uint32_t ep)
 void UDD_ReleaseTX(uint32_t ep)
 {
 	TRACE_UOTGHS_DEVICE(printf("=> UDD_ReleaseTX ep=%lu\r\n", ep);)
-	UOTGHS->UOTGHS_DEVEPTICR[ep] = (UOTGHS_DEVEPTICR_NAKINIC | UOTGHS_DEVEPTICR_RXOUTIC | UOTGHS_DEVEPTICR_TXINIC);
+//	UOTGHS->UOTGHS_DEVEPTICR[ep] = (UOTGHS_DEVEPTICR_NAKINIC | UOTGHS_DEVEPTICR_RXOUTIC | UOTGHS_DEVEPTICR_TXINIC);
+	UOTGHS->UOTGHS_DEVEPTICR[ep] = UOTGHS_DEVEPTICR_TXINIC;
 	UOTGHS->UOTGHS_DEVEPTIDR[ep] = UOTGHS_DEVEPTIDR_FIFOCONC;
 	ul_send_fifo_ptr[ep] = 0;
 }
