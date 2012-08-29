@@ -211,7 +211,7 @@ void Serial_::flush(void)
 	USBD_Flush(CDC_TX);
 }
 
-size_t Serial_::write(uint8_t c)
+size_t Serial_::write(const uint8_t *buffer, size_t size)
 {
 	/* only try to send bytes if the high-level CDC connection itself
 	 is open (not just the pipe) - the OS should set lineState when the port
@@ -224,7 +224,7 @@ size_t Serial_::write(uint8_t c)
 	// or locks up, or host virtual serial port hangs)
 	if (_usbLineInfo.lineState > 0)
 	{
-		int r = USBD_Send(CDC_TX,&c,1);
+		int r = USBD_Send(CDC_TX, buffer, size);
 
 		if (r > 0)
 		{
@@ -237,6 +237,10 @@ size_t Serial_::write(uint8_t c)
 	}
 	setWriteError();
 	return 0;
+}
+
+size_t Serial_::write(uint8_t c) {
+	return write(&c, 1);
 }
 
 // This operator is a convenient way for a sketch to check whether the
