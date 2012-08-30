@@ -87,7 +87,14 @@ class HardwareSerial : public Stream
  * conditional code in the cpp module.
  */
 #if !defined(TXC0)
+#if defined(TXC)
 #define TXC0 TXC
+#elif defined(TXC1)
+// Some devices have uart1 but no uart0
+#define TXC0 TXC1
+#else
+#error TXC0 not definable in HardwareSerial.h
+#endif
 #endif
 
 extern void serialEventRun(void) __attribute__((weak));
