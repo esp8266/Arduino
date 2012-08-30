@@ -1809,44 +1809,50 @@ public class Editor extends JFrame implements RunnerListener {
     stopCompoundEdit();
   }
 
-
-	protected void handleFindReference() {
+	protected String getCurrentKeyword() {
 		String text = "";
-		if( textarea.getSelectedText() != null )
+		if (textarea.getSelectedText() != null)
 			text = textarea.getSelectedText().trim();
-		
+
 		try {
 			int current = textarea.getCaretPosition();
 			int startOffset = 0;
 			int endIndex = current;
-			String tmp = textarea.getDocument().getText(current,1);
-			// TODO probably a regexp that matches Arduino lang special chars already exists.
+			String tmp = textarea.getDocument().getText(current, 1);
+			// TODO probably a regexp that matches Arduino lang special chars
+			// already exists.
 			String regexp = "[\\s\\n();\\\\.!='\\[\\]{}]";
-		
-			while(!tmp.matches(regexp)) {
+
+			while (!tmp.matches(regexp)) {
 				endIndex++;
-				tmp = textarea.getDocument().getText(endIndex,1);
+				tmp = textarea.getDocument().getText(endIndex, 1);
 			}
 			// For some reason document index start at 2.
-			//if( current - start < 2 ) return;
-			
+			// if( current - start < 2 ) return;
+
 			tmp = "";
-			while(!tmp.matches(regexp)) {
+			while (!tmp.matches(regexp)) {
 				startOffset++;
-				if( current - startOffset < 0) { 
+				if (current - startOffset < 0) {
 					tmp = textarea.getDocument().getText(0, 1);
 					break;
-				}
-				else 
+				} else
 					tmp = textarea.getDocument().getText(current - startOffset, 1);
 			}
 			startOffset--;
-			
+
 			int length = endIndex - current + startOffset;
 			text = textarea.getDocument().getText(current - startOffset, length);
-		} catch (BadLocationException bl ) {
-			 bl.printStackTrace();
+			
+		} catch (BadLocationException bl) {
+			bl.printStackTrace();
+		} finally {
+			return text;
 		}
+	}
+
+	protected void handleFindReference() {
+		String text = getCurrentKeyword();
 		
 		String referenceFile = PdeKeywords.getReference(text);
 		if (referenceFile == null) {
@@ -2781,16 +2787,15 @@ public class Editor extends JFrame implements RunnerListener {
         copyItem.setEnabled(true);
         discourseItem.setEnabled(true);
 
-        String sel = textarea.getSelectedText().trim();
-        referenceFile = PdeKeywords.getReference(sel);
-        referenceItem.setEnabled(referenceFile != null);
-
       } else {
         cutItem.setEnabled(false);
         copyItem.setEnabled(false);
         discourseItem.setEnabled(false);
-        referenceItem.setEnabled(false);
       }
+      
+      referenceFile = PdeKeywords.getReference(getCurrentKeyword());
+      referenceItem.setEnabled(referenceFile != null);
+      
       super.show(component, x, y);
     }
   }
