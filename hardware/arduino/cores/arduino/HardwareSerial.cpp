@@ -393,11 +393,11 @@ try_again:
   *_ubrrh = baud_setting >> 8;
   *_ubrrl = baud_setting;
 
-  //set number of data bits
-  current_config = *_ubrrh;
-  current_config = *_ucsrc;
-  current_config |= config;
-  *_ucsrc = current_config;
+  //set the data bits, parity, and stop bits
+#if defined(__AVR_ATmega8__)
+  config |= 0x80; // select UCSRC register (shared with UBRRH)
+#endif
+  *_ucsrc = config;
   
   sbi(*_ucsrb, _rxen);
   sbi(*_ucsrb, _txen);
