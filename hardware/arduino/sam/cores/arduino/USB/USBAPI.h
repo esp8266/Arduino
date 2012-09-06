@@ -191,6 +191,7 @@ bool	MSC_Data(uint8_t rx,uint8_t tx);
 //	CSC 'Driver'
 
 int		CDC_GetInterface(uint8_t* interfaceNum);
+int		CDC_GetOtherInterface(uint8_t* interfaceNum);
 int		CDC_GetDescriptor(int i);
 bool	CDC_Setup(Setup& setup);
 

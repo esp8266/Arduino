@@ -96,6 +96,7 @@ const DeviceDescriptor USB_DeviceQualifier =
 
 volatile uint32_t _usbConfiguration = 0;
 volatile uint32_t _usbInitialized = 0;
+uint32_t _usbSetInterface = 0;
 uint32_t _cdcComposite = 0;
 
 //==================================================================
@@ -283,6 +284,24 @@ int USBD_SendInterfaces(void)
 	return interfaces;
 }
 
+int USBD_SendOtherInterfaces(void)
+{
+	int total = 0;
+	uint8_t interfaces = 0;
+
+#ifdef CDC_ENABLED
+	total = CDC_GetOtherInterface(&interfaces);
+#endif
+
+#ifdef HID_ENABLED
+	total += HID_GetInterface(&interfaces);
+#endif
+
+	total = total; // Get rid of compiler warning
+	TRACE_CORE(printf("=> USBD_SendInterfaces, total=%d interfaces=%d\r\n", total, interfaces);)
+	return interfaces;
+}
+
 //	Construct a dynamic configuration descriptor
 //	This really needs dynamic endpoint allocation etc
 //	TODO
@@ -306,6 +325,29 @@ _Pragma("pack()")
 	USBD_InitControl(maxlen);
 	USBD_SendControl(0,&config,sizeof(ConfigDescriptor));
 	USBD_SendInterfaces();
+	return true;
+}
+
+static bool USBD_SendOtherConfiguration(int maxlen)
+{
+	//	Count and measure interfaces
+	USBD_InitControl(0);
+	//TRACE_CORE(printf("=> USBD_SendConfiguration _cmark1=%d\r\n", _cmark);)
+	int interfaces = USBD_SendOtherInterfaces();
+	//TRACE_CORE(printf("=> USBD_SendConfiguration _cmark2=%d\r\n", _cmark);)
+	//TRACE_CORE(printf("=> USBD_SendConfiguration sizeof=%d\r\n", sizeof(ConfigDescriptor));)
+
+_Pragma("pack(1)")
+	ConfigDescriptor config = D_OTHERCONFIG(_cmark + sizeof(ConfigDescriptor),interfaces);
+_Pragma("pack()")
+	//TRACE_CORE(printf("=> USBD_SendConfiguration clen=%d\r\n", config.clen);)
+
+	//TRACE_CORE(printf("=> USBD_SendConfiguration maxlen=%d\r\n", maxlen);)
+
+	//	Now send them
+	USBD_InitControl(maxlen);
+	USBD_SendControl(0,&config,sizeof(ConfigDescriptor));
+	USBD_SendOtherInterfaces();
 	return true;
 }
 
@@ -344,15 +386,12 @@ static bool USBD_SendDescriptor(Setup& setup)
 		TRACE_CORE(puts("=> USBD_SendDescriptor : USB_STRING_DESCRIPTOR_TYPE\r\n");)
 		if (setup.wValueL == 0) {
 			desc_addr = (const uint8_t*)&STRING_LANGUAGE;
-           printf("St1=%d\n\r", *desc_addr);
      }
 		else if (setup.wValueL == IPRODUCT) {
 			desc_addr = (const uint8_t*)&STRING_IPRODUCT;
-        printf("St2=%d\n\r", *desc_addr);
         }
 		else if (setup.wValueL == IMANUFACTURER) {
 			desc_addr = (const uint8_t*)&STRING_IMANUFACTURER;
-           printf("St3=%d\n\r", *desc_addr);
      }
 		else {
 			return false;
@@ -365,11 +404,14 @@ static bool USBD_SendDescriptor(Setup& setup)
 	{
 		// Device qualifier descriptor requested
 		desc_addr = (const uint8_t*)&USB_DeviceQualifier;
+        if( *desc_addr > setup.wLength ) {
+            desc_length = setup.wLength;
+        }
     }
     else if (USB_OTHER_SPEED_CONFIGURATION == t)
     {
-        // TODO
 		// Other configuration descriptor requested
+		return USBD_SendOtherConfiguration(setup.wLength);
     }
     else
     {
@@ -575,13 +617,12 @@ static void USB_ISR(void)
 			}
 			else if (GET_INTERFACE == r)
 			{
-                // TODO
 				TRACE_CORE(puts(">>> EP0 Int: GET_INTERFACE\r\n");)
-				UDD_Send8(EP0, setup.wIndex);
+				UDD_Send8(EP0, _usbSetInterface);
 			}
 			else if (SET_INTERFACE == r)
 			{
-                // TODO
+                _usbSetInterface = setup.wValueL;
 				TRACE_CORE(puts(">>> EP0 Int: SET_INTERFACE\r\n");)
 			}
 		}
