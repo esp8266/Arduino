@@ -26,9 +26,9 @@ static const uint32_t EndPoints[] =
 	EP_TYPE_CONTROL,
 
 #ifdef CDC_ENABLED
-	EP_TYPE_BULK_IN,                // CDC_ENDPOINT_IN
-	EP_TYPE_BULK_OUT,               // CDC_ENDPOINT_OUT
 	EP_TYPE_INTERRUPT_IN,           // CDC_ENDPOINT_ACM
+	EP_TYPE_BULK_OUT,               // CDC_ENDPOINT_OUT
+	EP_TYPE_BULK_IN,                // CDC_ENDPOINT_IN
 #endif
 
 #ifdef HID_ENABLED
@@ -153,45 +153,42 @@ uint32_t USBD_Recv(uint32_t ep)
 }
 
 //	Space in send EP
-uint32_t USBD_SendSpace(uint32_t ep)
-{
-	LockEP lock(ep);
-	if (!UDD_ReadWriteAllowed(ep & 0xF))
-		return 0;
-	return 64 - UDD_FifoByteCount(ep & 0xF);
-}
+//uint32_t USBD_SendSpace(uint32_t ep)
+//{
+	//LockEP lock(ep);
+////	if (!UDD_ReadWriteAllowed(ep & 0xF))
+    ////{
+        ////printf("pb "); // UOTGHS->UOTGHS_DEVEPTISR[%d]=0x%X\n\r", ep, UOTGHS->UOTGHS_DEVEPTISR[ep]);
+		////return 0;
+    ////}
+
+    //if(ep==0) return 64 - UDD_FifoByteCount(ep & 0xF);  // EP0_SIZE  jcb
+    //else return 512 - UDD_FifoByteCount(ep & 0xF);  // EPX_SIZE  jcb
+//}
 
 //	Blocking Send of data to an endpoint
 uint32_t USBD_Send(uint32_t ep, const void* d, uint32_t len)
 {
-	if (!_usbConfiguration)
-		return -1;
-
+    uint32_t n;
 	int r = len;
 	const uint8_t* data = (const uint8_t*)d;
-	uint8_t timeout = 250; // 250ms timeout on send? TODO
+
+    if (!_usbConfiguration)
+    {
+        printf("pb conf\n\r");
+		return -1;
+    }
 
 	while (len)
 	{
-		uint8_t n = USBD_SendSpace(ep);
-		if (n == 0)
-		{
-			if (!(--timeout))
-				return -1;
-			delay(1);
-			continue;
-		}
-
+        if(ep==0) n=  EP0_SIZE;
+        else n =  EPX_SIZE;
 		if (n > len)
 			n = len;
 		len -= n;
 
 		UDD_Send(ep & 0xF, data, n);
-
-		//if (!UDD_ReadWriteAllowed(ep & 0xF) || ((len == 0) && (ep & TRANSFER_RELEASE))){	// Release full buffer
-			//UDD_ReleaseTX(ep & 0xF);
-        //}
-	}
+    }
 	//TXLED1;					// light the TX LED
 	//TxLEDPulse = TX_RX_LED_PULSE_MS;
 	return r;
@@ -345,14 +342,23 @@ static bool USBD_SendDescriptor(Setup& setup)
 	else if (USB_STRING_DESCRIPTOR_TYPE == t)
 	{
 		TRACE_CORE(puts("=> USBD_SendDescriptor : USB_STRING_DESCRIPTOR_TYPE\r\n");)
-		if (setup.wValueL == 0)
+		if (setup.wValueL == 0) {
 			desc_addr = (const uint8_t*)&STRING_LANGUAGE;
-		else if (setup.wValueL == IPRODUCT)
+           printf("St1=%d\n\r", *desc_addr);
+     }
+		else if (setup.wValueL == IPRODUCT) {
 			desc_addr = (const uint8_t*)&STRING_IPRODUCT;
-		else if (setup.wValueL == IMANUFACTURER)
+        printf("St2=%d\n\r", *desc_addr);
+        }
+		else if (setup.wValueL == IMANUFACTURER) {
 			desc_addr = (const uint8_t*)&STRING_IMANUFACTURER;
+           printf("St3=%d\n\r", *desc_addr);
+     }
 		else {
 			return false;
+        }
+        if( *desc_addr > setup.wLength ) {
+            desc_length = setup.wLength;
         }
 	}
 	else if (USB_DEVICE_QUALIFIER == t)
@@ -386,10 +392,13 @@ static bool USBD_SendDescriptor(Setup& setup)
 	return true;
 }
 
+//unsigned int iii=0;
 //	Endpoint 0 interrupt
 static void USB_ISR(void)
 {
-    //  End of Reset
+//    printf("ISR=0x%X\n\r", UOTGHS->UOTGHS_DEVISR); // jcb
+//    if( iii++ > 1500 ) while(1); // jcb
+    // End of bus reset
     if (Is_udd_reset())
     {
 		TRACE_CORE(printf(">>> End of Reset\r\n");)
@@ -422,14 +431,13 @@ static void USB_ISR(void)
 	if (Is_udd_sof())
 	{
 		udd_ack_sof();
-//		USBD_Flush(CDC_TX);
+	//	USBD_Flush(CDC_TX); // jcb
 	}
 #endif
 
 	// EP 0 Interrupt
-	if (Is_udd_endpoint_interrupt(0))
+	if (Is_udd_endpoint_interrupt(0) )
 	{
-
 		if (!UDD_ReceivedSetupInt())
 		{
 			return;

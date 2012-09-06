@@ -19,7 +19,7 @@
 
 #ifdef CDC_ENABLED
 
-#define CDC_SERIAL_BUFFER_SIZE	64
+#define CDC_SERIAL_BUFFER_SIZE	512
 
 /* For information purpose only since RTS is not always handled by the terminal application */
 #define CDC_LINESTATE_DTR		0x01 // Data Terminal Ready
@@ -45,7 +45,13 @@ typedef struct
 	uint8_t		lineState;
 } LineInfo;
 
-static volatile LineInfo _usbLineInfo = { 57600, 0x00, 0x00, 0x00, 0x00 };
+static volatile LineInfo _usbLineInfo = { 
+    57600, // dWDTERate
+    0x00,  // bCharFormat
+    0x00,  // bParityType
+    0x08,  // bDataBits
+    0x00   // lineState
+};
 
 _Pragma("pack(1)")
 static const CDCDescriptor _cdcInterface =
@@ -62,8 +68,8 @@ static const CDCDescriptor _cdcInterface =
 
 	//	CDC data interface
 	D_INTERFACE(CDC_DATA_INTERFACE,2,CDC_DATA_INTERFACE_CLASS,0,0),
-	D_ENDPOINT(USB_ENDPOINT_OUT(CDC_ENDPOINT_OUT),USB_ENDPOINT_TYPE_BULK,0x200,0),
-	D_ENDPOINT(USB_ENDPOINT_IN (CDC_ENDPOINT_IN ),USB_ENDPOINT_TYPE_BULK,0x200,0)
+	D_ENDPOINT(USB_ENDPOINT_OUT(CDC_ENDPOINT_OUT),USB_ENDPOINT_TYPE_BULK,512,0),
+	D_ENDPOINT(USB_ENDPOINT_IN (CDC_ENDPOINT_IN ),USB_ENDPOINT_TYPE_BULK,512,0)
 };
 _Pragma("pack()")
 
@@ -228,7 +234,6 @@ size_t Serial_::write(const uint8_t *buffer, size_t size)
 
 		if (r > 0)
         {
-        	USBD_Flush(CDC_TX);
 			return r;
 		} else
 		{
