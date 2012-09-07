@@ -16,6 +16,7 @@
 
 #include "Arduino.h"
 #include "USBAPI.h"
+#include "Reset.h"
 
 #ifdef CDC_ENABLED
 
@@ -73,38 +74,6 @@ int WEAK CDC_GetInterface(uint8_t* interfaceNum)
 	return USBD_SendControl(0,&_cdcInterface,sizeof(_cdcInterface));
 }
 
-__attribute__ ((long_call, section (".ramfunc")))
-void banzai() {
-	// Disable all interrupts
-	__disable_irq();
-
-	// Set bootflag to run SAM-BA bootloader at restart
-	const int EEFC_FCMD_CGPB = 0x0C;
-	const int EEFC_KEY = 0x5A;
-	while (EFC0->EEFC_FSR & EEFC_FSR_FRDY == 0);
-	EFC0->EEFC_FCR =
-		EEFC_FCR_FCMD(EEFC_FCMD_CGPB) |
-		EEFC_FCR_FARG(1) |
-		EEFC_FCR_FKEY(EEFC_KEY);
-	while (EFC0->EEFC_FSR & EEFC_FSR_FRDY == 0);
-
-	// From here flash memory is no more available.
-
-	// Memory swap needs some time to stabilize
-	volatile uint32_t i;
-	for (i=0; i<1000000; i++);
-
-	// BANZAIIIIIII!!!
-	const int RSTC_KEY = 0xA5;
-	RSTC->RSTC_CR =
-		RSTC_CR_KEY(RSTC_KEY) |
-		RSTC_CR_PROCRST |
-		RSTC_CR_PERRST |
-		RSTC_CR_EXTRST;
-
-	while (true);
-}
-
 bool WEAK CDC_Setup(Setup& setup)
 {
 	uint8_t r = setup.bRequest;
@@ -136,7 +105,9 @@ bool WEAK CDC_Setup(Setup& setup)
 			{
 				// We check DTR state to determine if host port is open (bit 0 of lineState).
 				if ((_usbLineInfo.lineState & 0x01) == 0)
-					banzai();
+					Reset.initiate(240);
+				else
+					Reset.cancel();
 			}
 			return true;
 		}

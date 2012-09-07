@@ -91,7 +91,7 @@ public class BasicUploader extends Uploader  {
           
           uploadPort = waitForUploadPort(uploadPort, before);
         } else {
-          Thread.sleep(2500);
+          Thread.sleep(1000);
         }
       } catch (SerialException e) {
         throw new RunnerException(e.getMessage());
@@ -136,8 +136,13 @@ public class BasicUploader extends Uploader  {
         long timeout = System.currentTimeMillis() + 2000;
         while (timeout > System.currentTimeMillis()) {
           List<String> portList = Serial.list();
-          if (portList.contains(Preferences.get("serial.port")))
+          String uploadPort = Preferences.get("serial.port");
+          if (portList.contains(Preferences.get("serial.port"))) {
+            // Remove the magic baud rate (1200bps) to avoid 
+            // future unwanted board resets
+            Serial.touchPort(uploadPort, 9600);
             break;
+          }
           Thread.sleep(100);
         }
       }

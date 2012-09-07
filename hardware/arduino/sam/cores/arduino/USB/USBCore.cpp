@@ -16,6 +16,7 @@
 
 #include "Arduino.h"
 #include "USBAPI.h"
+#include "Reset.h"
 #include <stdio.h>
 
 //#define TRACE_CORE(x)	x
@@ -368,6 +369,8 @@ static bool USBD_SendDescriptor(Setup& setup)
 //	Endpoint 0 interrupt
 static void USB_ISR(void)
 {
+    Reset.tick();
+
     //  End of Reset
     if (Is_udd_reset())
     {
