@@ -63,11 +63,14 @@ public class BasicUploader extends Uploader  {
     // this wait a moment for the bootloader to enumerate. On Windows, also must
     // deal with the fact that the COM port number changes from bootloader to
     // sketch.
-    String use1200bpsTouch = prefs.get("upload.use_1200bps_touch");
-    boolean doTouch = use1200bpsTouch != null && use1200bpsTouch.equals("true");
+    String t = prefs.get("upload.use_1200bps_touch");
+    boolean doTouch = t != null && t.equals("true");
+    
+    t = prefs.get("upload.wait_for_upload_port");
+    boolean waitForUploadPort = (t != null) && t.equals("true");
+    
     if (doTouch) {
       String uploadPort = prefs.get("serial.port");
-      String newUploadPort = null;
       try {
         // Toggle 1200 bps on selected serial port to force board reset.
         List<String> before = Serial.list();
@@ -77,64 +80,19 @@ public class BasicUploader extends Uploader  {
                 .println(_("Forcing reset using 1200bps open/close on port ") +
                     uploadPort);
           Serial.touchPort(uploadPort, 1200);
-
+        }
+        if (waitForUploadPort) {
           // Scanning for available ports seems to open the port or
           // otherwise assert DTR, which would cancel the WDT reset if
           // it happened within 250 ms. So we wait until the reset should
           // have already occured before we start scanning.
           if (!Base.isMacOS())
             Thread.sleep(300);
+          
+          uploadPort = waitForUploadPort(uploadPort, before);
+        } else {
+          Thread.sleep(2500);
         }
-        // Wait for a port to appear on the list
-        int elapsed = 0;
-        while (elapsed < 10000) {
-          List<String> now = Serial.list();
-          List<String> diff = new ArrayList<String>(now);
-          diff.removeAll(before);
-          if (verbose || Preferences.getBoolean("upload.verbose")) {
-            System.out.print("PORTS {");
-            for (String p : before)
-              System.out.print(p + ", ");
-            System.out.print("} / {");
-            for (String p : now)
-              System.out.print(p + ", ");
-            System.out.print("} => {");
-            for (String p : diff)
-              System.out.print(p + ", ");
-            System.out.println("}");
-          }
-          if (diff.size() > 0) {
-            newUploadPort = diff.get(0);
-            if (verbose || Preferences.getBoolean("upload.verbose"))
-              System.out.println("Found upload port: " +
-                  newUploadPort);
-            break;
-          }
-
-          // Keep track of port that disappears
-          before = now;
-          Thread.sleep(250);
-          elapsed += 250;
-
-          // On Windows, it can take a long time for the port to disappear and
-          // come back, so use a longer time out before assuming that the
-          // selected
-          // port is the bootloader (not the sketch).
-          if (((!Base.isWindows() && elapsed >= 500) || elapsed >= 5000) &&
-              now.contains(uploadPort)) {
-            if (verbose || Preferences.getBoolean("upload.verbose"))
-              System.out
-                  .println("Uploading using selected port: " + uploadPort);
-            newUploadPort = uploadPort;
-            break;
-          }
-        }
-        if (newUploadPort == null)
-          // Something happened while detecting port
-          throw new RunnerException(
-              _("Couldn’t find a Leonardo on the selected port. Check that you have the correct port selected.  If it is correct, try pressing the board's reset button after initiating the upload."));
-
-        uploadPort = newUploadPort;
       } catch (SerialException e) {
         throw new RunnerException(e.getMessage());
       } catch (InterruptedException e) {
@@ -173,7 +131,7 @@ public class BasicUploader extends Uploader  {
     // sketch port never comes back). Doing this saves users from accidentally
     // opening Serial Monitor on the soon-to-be-orphaned bootloader port.
     try {
-      if (uploadResult && doTouch) {
+      if (uploadResult && waitForUploadPort) {
         Thread.sleep(500);
         long timeout = System.currentTimeMillis() + 2000;
         while (timeout > System.currentTimeMillis()) {
@@ -186,6 +144,56 @@ public class BasicUploader extends Uploader  {
     } catch (InterruptedException ex) {
     }
     return uploadResult;
+  }
+
+  private String waitForUploadPort(String uploadPort, List<String> before)
+      throws InterruptedException, RunnerException {
+    // Wait for a port to appear on the list
+    int elapsed = 0;
+    while (elapsed < 10000) {
+      List<String> now = Serial.list();
+      List<String> diff = new ArrayList<String>(now);
+      diff.removeAll(before);
+      if (verbose || Preferences.getBoolean("upload.verbose")) {
+        System.out.print("PORTS {");
+        for (String p : before)
+          System.out.print(p + ", ");
+        System.out.print("} / {");
+        for (String p : now)
+          System.out.print(p + ", ");
+        System.out.print("} => {");
+        for (String p : diff)
+          System.out.print(p + ", ");
+        System.out.println("}");
+      }
+      if (diff.size() > 0) {
+        String newPort = diff.get(0);
+        if (verbose || Preferences.getBoolean("upload.verbose"))
+          System.out.println("Found upload port: " + newPort);
+        return newPort;
+      }
+
+      // Keep track of port that disappears
+      before = now;
+      Thread.sleep(250);
+      elapsed += 250;
+
+      // On Windows, it can take a long time for the port to disappear and
+      // come back, so use a longer time out before assuming that the
+      // selected
+      // port is the bootloader (not the sketch).
+      if (((!Base.isWindows() && elapsed >= 500) || elapsed >= 5000) &&
+          now.contains(uploadPort)) {
+        if (verbose || Preferences.getBoolean("upload.verbose"))
+          System.out.println("Uploading using selected port: " +
+              uploadPort);
+        return uploadPort;
+      }
+    }
+    
+    // Something happened while detecting port
+    throw new RunnerException(
+        _("Couldn’t find a Leonardo on the selected port. Check that you have the correct port selected.  If it is correct, try pressing the board's reset button after initiating the upload."));
   }
 
   public boolean uploadUsingProgrammer(String buildPath, String className)

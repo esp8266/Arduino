@@ -162,6 +162,7 @@ leonardo.upload.maximum_size=28672
 leonardo.upload.speed=57600
 leonardo.upload.disable_flushing=true
 leonardo.upload.use_1200bps_touch=true
+leonardo.upload.wait_for_upload_port=true
 
 leonardo.bootloader.tool=avrdude
 leonardo.bootloader.low_fuses=0xff
