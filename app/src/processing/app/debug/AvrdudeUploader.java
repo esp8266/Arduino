@@ -138,7 +138,7 @@ public class AvrdudeUploader extends Uploader  {
           // come back, so use a longer time out before assuming that the selected
           // port is the bootloader (not the sketch).
           if (((!Base.isWindows() && elapsed >= 500) || elapsed >= 5000) && now.contains(uploadPort)) {
-          	if (verbose || Preferences.getBoolean("upload.verbose")) 
+          	if (verbose || Preferences.getBoolean("upload.verbose"))
 	            System.out.println("Uploading using selected port: " + uploadPort);
             caterinaUploadPort = uploadPort;
             break;
@@ -174,29 +174,33 @@ public class AvrdudeUploader extends Uploader  {
 
     boolean avrdudeResult = avrdude(commandDownloader);
 
-	// For Leonardo wait until the bootloader serial port disconnects and the sketch serial
-	// port reconnects (or timeout after a few seconds if the sketch port never comes back).
-	// Doing this saves users from accidentally opening Serial Monitor on the soon-to-be-orphaned
-	// bootloader port.
+    // For Leonardo wait until the bootloader serial port disconnects and the sketch serial
+    // port reconnects (or timeout after a few seconds if the sketch port never comes back).
+    // Doing this saves users from accidentally opening Serial Monitor on the soon-to-be-orphaned
+    // bootloader port.
     if (true == avrdudeResult && boardPreferences.get("bootloader.path") != null && boardPreferences.get("bootloader.path").equals("caterina")) {
-    	try {
-    		Thread.sleep(500);
-    	} catch (InterruptedException ex) { } 
-    	long timeout = System.currentTimeMillis() + 2000;
-    	while (timeout > System.currentTimeMillis()) {
-	    	List<String> portList = Serial.list();
-		uploadPort = Preferences.get("serial.port");
-    		if (portList.contains(uploadPort)) {
-			// Remove the magic baud rate (1200bps) to avoid future unwanted board resets 
-			int serialRate = Preferences.getInteger("serial.debug_rate");
-			System.out.println("Set baud rate to " + serialRate);			
-		        Serial.touchPort(uploadPort, serialRate);	
-    			break;
-    		}
-    		try {
-    			Thread.sleep(100);
-    		} catch (InterruptedException ex) { }
-    	}    		
+      try {
+        Thread.sleep(500);
+      } catch (InterruptedException ex) { }
+      long timeout = System.currentTimeMillis() + 2000;
+      while (timeout > System.currentTimeMillis()) {
+        List<String> portList = Serial.list();
+        uploadPort = Preferences.get("serial.port");
+        if (portList.contains(uploadPort)) {
+          try {
+            Thread.sleep(100); // delay to avoid port in use and invalid parameters errors
+          } catch (InterruptedException ex) { }
+          // Remove the magic baud rate (1200bps) to avoid future unwanted board resets
+          int serialRate = Preferences.getInteger("serial.debug_rate");
+          if (verbose || Preferences.getBoolean("upload.verbose"))
+            System.out.println("Setting baud rate to " + serialRate + " on " + uploadPort);
+          Serial.touchPort(uploadPort, serialRate);	
+          break;
+        }
+        try {
+          Thread.sleep(100);
+        } catch (InterruptedException ex) { }
+      }
     }
     
     return avrdudeResult;
