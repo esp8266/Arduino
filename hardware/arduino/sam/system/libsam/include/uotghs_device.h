@@ -34,7 +34,7 @@
 #define MAX_ENDPOINTS	10
 #define EP0				0
 #define EP0_SIZE		64
-#define EPX_SIZE		1024
+#define EPX_SIZE		512
 
 #define EP_SINGLE_64 (0x32UL) // EP0
 #define EP_DOUBLE_64 (0x36UL) // Other endpoints
@@ -116,7 +116,7 @@
   //! Get maximal number of banks of endpoints
 #define udd_get_endpoint_bank_max_nbr(ep)      ((ep == 0) ? 1 : (( ep <= 2) ? 3 : 2))
   //! Get maximal size of endpoint (3X, 1024/64)
-#define udd_get_endpoint_size_max(ep)          (((ep) == 0) ? 64 : 1024)
+#define udd_get_endpoint_size_max(ep)          (((ep) == 0) ? 64 : 512)  // for bulk
   //! Get DMA support of endpoints
 #define Is_udd_endpoint_dma_supported(ep)      ((((ep) >= 1) && ((ep) <= 6)) ? true : false)
   //! Get High Band Width support of endpoints

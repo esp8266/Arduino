@@ -20,7 +20,7 @@
 
 #ifdef CDC_ENABLED
 
-#define CDC_SERIAL_BUFFER_SIZE	64
+#define CDC_SERIAL_BUFFER_SIZE	512
 
 /* For information purpose only since RTS is not always handled by the terminal application */
 #define CDC_LINESTATE_DTR		0x01 // Data Terminal Ready
@@ -46,7 +46,13 @@ typedef struct
 	uint8_t		lineState;
 } LineInfo;
 
-static volatile LineInfo _usbLineInfo = { 57600, 0x00, 0x00, 0x00, 0x00 };
+static volatile LineInfo _usbLineInfo = { 
+    57600, // dWDTERate
+    0x00,  // bCharFormat
+    0x00,  // bParityType
+    0x08,  // bDataBits
+    0x00   // lineState
+};
 
 _Pragma("pack(1)")
 static const CDCDescriptor _cdcInterface =
@@ -59,12 +65,29 @@ static const CDCDescriptor _cdcInterface =
 	D_CDCCS(CDC_CALL_MANAGEMENT,1,1),							// Device handles call management (not)
 	D_CDCCS4(CDC_ABSTRACT_CONTROL_MANAGEMENT,6),				// SET_LINE_CODING, GET_LINE_CODING, SET_CONTROL_LINE_STATE supported
 	D_CDCCS(CDC_UNION,CDC_ACM_INTERFACE,CDC_DATA_INTERFACE),	// Communication interface is master, data interface is slave 0
-	D_ENDPOINT(USB_ENDPOINT_IN (CDC_ENDPOINT_ACM),USB_ENDPOINT_TYPE_INTERRUPT,0x10,0x40),
+	D_ENDPOINT(USB_ENDPOINT_IN (CDC_ENDPOINT_ACM),USB_ENDPOINT_TYPE_INTERRUPT,0x10, 0x10),
 
 	//	CDC data interface
 	D_INTERFACE(CDC_DATA_INTERFACE,2,CDC_DATA_INTERFACE_CLASS,0,0),
-	D_ENDPOINT(USB_ENDPOINT_OUT(CDC_ENDPOINT_OUT),USB_ENDPOINT_TYPE_BULK,0x40,0),
-	D_ENDPOINT(USB_ENDPOINT_IN (CDC_ENDPOINT_IN ),USB_ENDPOINT_TYPE_BULK,0x40,0)
+	D_ENDPOINT(USB_ENDPOINT_OUT(CDC_ENDPOINT_OUT),USB_ENDPOINT_TYPE_BULK,512,0),
+	D_ENDPOINT(USB_ENDPOINT_IN (CDC_ENDPOINT_IN ),USB_ENDPOINT_TYPE_BULK,512,0)
+};
+static const CDCDescriptor _cdcOtherInterface =
+{
+	D_IAD(0,2,CDC_COMMUNICATION_INTERFACE_CLASS,CDC_ABSTRACT_CONTROL_MODEL,1),
+
+	//	CDC communication interface
+	D_INTERFACE(CDC_ACM_INTERFACE,1,CDC_COMMUNICATION_INTERFACE_CLASS,CDC_ABSTRACT_CONTROL_MODEL,0),
+	D_CDCCS(CDC_HEADER,0x10,0x01),								// Header (1.10 bcd)
+	D_CDCCS(CDC_CALL_MANAGEMENT,1,1),							// Device handles call management (not)
+	D_CDCCS4(CDC_ABSTRACT_CONTROL_MANAGEMENT,6),				// SET_LINE_CODING, GET_LINE_CODING, SET_CONTROL_LINE_STATE supported
+	D_CDCCS(CDC_UNION,CDC_ACM_INTERFACE,CDC_DATA_INTERFACE),	// Communication interface is master, data interface is slave 0
+	D_ENDPOINT(USB_ENDPOINT_IN (CDC_ENDPOINT_ACM),USB_ENDPOINT_TYPE_INTERRUPT,0x10, 0x10),
+
+	//	CDC data interface
+	D_INTERFACE(CDC_DATA_INTERFACE,2,CDC_DATA_INTERFACE_CLASS,0,0),
+	D_ENDPOINT(USB_ENDPOINT_OUT(CDC_ENDPOINT_OUT),USB_ENDPOINT_TYPE_BULK,64,0),
+	D_ENDPOINT(USB_ENDPOINT_IN (CDC_ENDPOINT_IN ),USB_ENDPOINT_TYPE_BULK,64,0)
 };
 _Pragma("pack()")
 
@@ -72,6 +95,12 @@ int WEAK CDC_GetInterface(uint8_t* interfaceNum)
 {
 	interfaceNum[0] += 2;	// uses 2
 	return USBD_SendControl(0,&_cdcInterface,sizeof(_cdcInterface));
+}
+
+int WEAK CDC_GetOtherInterface(uint8_t* interfaceNum)
+{
+	interfaceNum[0] += 2;	// uses 2
+	return USBD_SendControl(0,&_cdcOtherInterface,sizeof(_cdcOtherInterface));
 }
 
 bool WEAK CDC_Setup(Setup& setup)
@@ -182,7 +211,7 @@ void Serial_::flush(void)
 	USBD_Flush(CDC_TX);
 }
 
-size_t Serial_::write(uint8_t c)
+size_t Serial_::write(const uint8_t *buffer, size_t size)
 {
 	/* only try to send bytes if the high-level CDC connection itself
 	 is open (not just the pipe) - the OS should set lineState when the port
@@ -195,10 +224,10 @@ size_t Serial_::write(uint8_t c)
 	// or locks up, or host virtual serial port hangs)
 	if (_usbLineInfo.lineState > 0)
 	{
-		int r = USBD_Send(CDC_TX,&c,1);
+		int r = USBD_Send(CDC_TX, buffer, size);
 
 		if (r > 0)
-		{
+        {
 			return r;
 		} else
 		{
@@ -208,6 +237,10 @@ size_t Serial_::write(uint8_t c)
 	}
 	setWriteError();
 	return 0;
+}
+
+size_t Serial_::write(uint8_t c) {
+	return write(&c, 1);
 }
 
 // This operator is a convenient way for a sketch to check whether the

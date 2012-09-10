@@ -27,9 +27,9 @@ static const uint32_t EndPoints[] =
 	EP_TYPE_CONTROL,
 
 #ifdef CDC_ENABLED
-	EP_TYPE_BULK_IN,                // CDC_ENDPOINT_IN
-	EP_TYPE_BULK_OUT,               // CDC_ENDPOINT_OUT
 	EP_TYPE_INTERRUPT_IN,           // CDC_ENDPOINT_ACM
+	EP_TYPE_BULK_OUT,               // CDC_ENDPOINT_OUT
+	EP_TYPE_BULK_IN,                // CDC_ENDPOINT_IN
 #endif
 
 #ifdef HID_ENABLED
@@ -41,7 +41,8 @@ static const uint32_t EndPoints[] =
 #define TX_RX_LED_PULSE_MS 100
 volatile uint8_t TxLEDPulse; /**< Milliseconds remaining for data Tx LED pulse */
 volatile uint8_t RxLEDPulse; /**< Milliseconds remaining for data Rx LED pulse */
-
+static char isRemoteWakeUpEnabled = 0;
+static char isEndpointHalt = 0;
 //==================================================================
 //==================================================================
 
@@ -87,11 +88,16 @@ const DeviceDescriptor USB_DeviceDescriptor =
 const DeviceDescriptor USB_DeviceDescriptorA =
 	D_DEVICE(DEVICE_CLASS,0x00,0x00,64,USB_VID,USB_PID,0x100,IMANUFACTURER,IPRODUCT,0,1);
 
+const DeviceDescriptor USB_DeviceQualifier =
+	D_QUALIFIER(0x00,0x00,0x00,64,1);
+
+
 //==================================================================
 //==================================================================
 
 volatile uint32_t _usbConfiguration = 0;
 volatile uint32_t _usbInitialized = 0;
+uint32_t _usbSetInterface = 0;
 uint32_t _cdcComposite = 0;
 
 //==================================================================
@@ -149,44 +155,42 @@ uint32_t USBD_Recv(uint32_t ep)
 }
 
 //	Space in send EP
-uint32_t USBD_SendSpace(uint32_t ep)
-{
-	LockEP lock(ep);
-	if (!UDD_ReadWriteAllowed(ep & 0xF))
-		return 0;
-	return 64 - UDD_FifoByteCount(ep & 0xF);
-}
+//uint32_t USBD_SendSpace(uint32_t ep)
+//{
+	//LockEP lock(ep);
+////	if (!UDD_ReadWriteAllowed(ep & 0xF))
+    ////{
+        ////printf("pb "); // UOTGHS->UOTGHS_DEVEPTISR[%d]=0x%X\n\r", ep, UOTGHS->UOTGHS_DEVEPTISR[ep]);
+		////return 0;
+    ////}
+
+    //if(ep==0) return 64 - UDD_FifoByteCount(ep & 0xF);  // EP0_SIZE  jcb
+    //else return 512 - UDD_FifoByteCount(ep & 0xF);  // EPX_SIZE  jcb
+//}
 
 //	Blocking Send of data to an endpoint
 uint32_t USBD_Send(uint32_t ep, const void* d, uint32_t len)
 {
-	if (!_usbConfiguration)
-		return -1;
-
+    uint32_t n;
 	int r = len;
 	const uint8_t* data = (const uint8_t*)d;
-	uint8_t timeout = 250; // 250ms timeout on send? TODO
+
+    if (!_usbConfiguration)
+    {
+        printf("pb conf\n\r");
+		return -1;
+    }
 
 	while (len)
 	{
-		uint8_t n = USBD_SendSpace(ep);
-		if (n == 0)
-		{
-			if (!(--timeout))
-				return -1;
-			delay(1);
-			continue;
-		}
-
+        if(ep==0) n=  EP0_SIZE;
+        else n =  EPX_SIZE;
 		if (n > len)
 			n = len;
 		len -= n;
 
 		UDD_Send(ep & 0xF, data, n);
-
-		if (!UDD_ReadWriteAllowed(ep & 0xF) || ((len == 0) && (ep & TRANSFER_RELEASE)))	// Release full buffer
-			UDD_ReleaseTX(ep & 0xF);
-	}
+    }
 	//TXLED1;					// light the TX LED
 	//TxLEDPulse = TX_RX_LED_PULSE_MS;
 	return r;
@@ -281,6 +285,24 @@ int USBD_SendInterfaces(void)
 	return interfaces;
 }
 
+int USBD_SendOtherInterfaces(void)
+{
+	int total = 0;
+	uint8_t interfaces = 0;
+
+#ifdef CDC_ENABLED
+	total = CDC_GetOtherInterface(&interfaces);
+#endif
+
+#ifdef HID_ENABLED
+	total += HID_GetInterface(&interfaces);
+#endif
+
+	total = total; // Get rid of compiler warning
+	TRACE_CORE(printf("=> USBD_SendInterfaces, total=%d interfaces=%d\r\n", total, interfaces);)
+	return interfaces;
+}
+
 //	Construct a dynamic configuration descriptor
 //	This really needs dynamic endpoint allocation etc
 //	TODO
@@ -304,6 +326,29 @@ _Pragma("pack()")
 	USBD_InitControl(maxlen);
 	USBD_SendControl(0,&config,sizeof(ConfigDescriptor));
 	USBD_SendInterfaces();
+	return true;
+}
+
+static bool USBD_SendOtherConfiguration(int maxlen)
+{
+	//	Count and measure interfaces
+	USBD_InitControl(0);
+	//TRACE_CORE(printf("=> USBD_SendConfiguration _cmark1=%d\r\n", _cmark);)
+	int interfaces = USBD_SendOtherInterfaces();
+	//TRACE_CORE(printf("=> USBD_SendConfiguration _cmark2=%d\r\n", _cmark);)
+	//TRACE_CORE(printf("=> USBD_SendConfiguration sizeof=%d\r\n", sizeof(ConfigDescriptor));)
+
+_Pragma("pack(1)")
+	ConfigDescriptor config = D_OTHERCONFIG(_cmark + sizeof(ConfigDescriptor),interfaces);
+_Pragma("pack()")
+	//TRACE_CORE(printf("=> USBD_SendConfiguration clen=%d\r\n", config.clen);)
+
+	//TRACE_CORE(printf("=> USBD_SendConfiguration maxlen=%d\r\n", maxlen);)
+
+	//	Now send them
+	USBD_InitControl(maxlen);
+	USBD_SendControl(0,&config,sizeof(ConfigDescriptor));
+	USBD_SendOtherInterfaces();
 	return true;
 }
 
@@ -340,15 +385,39 @@ static bool USBD_SendDescriptor(Setup& setup)
 	else if (USB_STRING_DESCRIPTOR_TYPE == t)
 	{
 		TRACE_CORE(puts("=> USBD_SendDescriptor : USB_STRING_DESCRIPTOR_TYPE\r\n");)
-		if (setup.wValueL == 0)
+		if (setup.wValueL == 0) {
 			desc_addr = (const uint8_t*)&STRING_LANGUAGE;
-		else if (setup.wValueL == IPRODUCT)
+     }
+		else if (setup.wValueL == IPRODUCT) {
 			desc_addr = (const uint8_t*)&STRING_IPRODUCT;
-		else if (setup.wValueL == IMANUFACTURER)
+        }
+		else if (setup.wValueL == IMANUFACTURER) {
 			desc_addr = (const uint8_t*)&STRING_IMANUFACTURER;
-		else
+     }
+		else {
 			return false;
+        }
+        if( *desc_addr > setup.wLength ) {
+            desc_length = setup.wLength;
+        }
 	}
+	else if (USB_DEVICE_QUALIFIER == t)
+	{
+		// Device qualifier descriptor requested
+		desc_addr = (const uint8_t*)&USB_DeviceQualifier;
+        if( *desc_addr > setup.wLength ) {
+            desc_length = setup.wLength;
+        }
+    }
+    else if (USB_OTHER_SPEED_CONFIGURATION == t)
+    {
+		// Other configuration descriptor requested
+		return USBD_SendOtherConfiguration(setup.wLength);
+    }
+    else
+    {
+        //printf("Device ERROR");
+    }
 
 	if (desc_addr == 0)
 	{
@@ -366,12 +435,15 @@ static bool USBD_SendDescriptor(Setup& setup)
 	return true;
 }
 
+//unsigned int iii=0;
 //	Endpoint 0 interrupt
 static void USB_ISR(void)
 {
     Reset.tick();
 
-    //  End of Reset
+//    printf("ISR=0x%X\n\r", UOTGHS->UOTGHS_DEVISR); // jcb
+//    if( iii++ > 1500 ) while(1); // jcb
+    // End of bus reset
     if (Is_udd_reset())
     {
 		TRACE_CORE(printf(">>> End of Reset\r\n");)
@@ -404,14 +476,13 @@ static void USB_ISR(void)
 	if (Is_udd_sof())
 	{
 		udd_ack_sof();
-		USBD_Flush(CDC_TX);
+	//	USBD_Flush(CDC_TX); // jcb
 	}
 #endif
 
 	// EP 0 Interrupt
-	if (Is_udd_endpoint_interrupt(0))
+	if (Is_udd_endpoint_interrupt(0) )
 	{
-
 		if (!UDD_ReceivedSetupInt())
 		{
 			return;
@@ -440,15 +511,70 @@ static void USB_ISR(void)
 			uint8_t r = setup.bRequest;
 			if (GET_STATUS == r)
 			{
-				TRACE_CORE(puts(">>> EP0 Int: GET_STATUS\r\n");)
-				UDD_Send8(EP0, 0); // TODO
-				UDD_Send8(EP0, 0);
+                if( setup.bmRequestType == 0 )  // device
+                {
+                    // Send the device status
+     				TRACE_CORE(puts(">>> EP0 Int: GET_STATUS\r\n");)
+                    // Check current configuration for power mode (if device is configured)
+                    // TODO
+                    // Check if remote wake-up is enabled
+                    // TODO
+                    UDD_Send8(EP0, 0); // TODO
+	    			UDD_Send8(EP0, 0);
+                }
+                // if( setup.bmRequestType == 2 ) // Endpoint:
+                else
+                {
+                    // Send the endpoint status
+                    // Check if the endpoint if currently halted
+                    if( isEndpointHalt == 1 )
+    				UDD_Send8(EP0, 1); // TODO
+                    else                    
+    				UDD_Send8(EP0, 0); // TODO
+	    			UDD_Send8(EP0, 0);
+                }
 			}
 			else if (CLEAR_FEATURE == r)
 			{
-			}
+               // Check which is the selected feature
+                if( setup.wValueL == 1) // DEVICEREMOTEWAKEUP
+                {
+                    // Enable remote wake-up and send a ZLP
+                    if( isRemoteWakeUpEnabled == 1 )
+	    			UDD_Send8(EP0, 1);
+                    else
+	    			UDD_Send8(EP0, 0);
+                    UDD_Send8(EP0, 0);
+                }
+                else // if( setup.wValueL == 0) // ENDPOINTHALT
+                {
+                    isEndpointHalt = 0;  // TODO 
+    				UDD_Send8(EP0, 0);
+	    			UDD_Send8(EP0, 0);
+                }
+
+ 			}
 			else if (SET_FEATURE == r)
 			{
+                // Check which is the selected feature
+                if( setup.wValueL == 1) // DEVICEREMOTEWAKEUP
+                {
+                    // Enable remote wake-up and send a ZLP
+                    isRemoteWakeUpEnabled = 1;
+	    			UDD_Send8(EP0, 0);
+                }
+                if( setup.wValueL == 0) // ENDPOINTHALT
+                {
+                    // Halt endpoint
+                    isEndpointHalt = 1;
+                    //USBD_Halt(USBGenericRequest_GetEndpointNumber(pRequest));
+	    			UDD_Send8(EP0, 0);
+                }
+                if( setup.wValueL == 2) // TEST_MODE
+                {
+                    // 7.1.20 Test Mode Support, 9.4.9 SetFeature
+                    // TODO
+                }
 			}
 			else if (SET_ADDRESS == r)
 			{
@@ -469,7 +595,7 @@ static void USB_ISR(void)
 			else if (GET_CONFIGURATION == r)
 			{
 				TRACE_CORE(puts(">>> EP0 Int: GET_CONFIGURATION\r\n");)
-				UDD_Send8(EP0, 1);
+				UDD_Send8(EP0, _usbConfiguration);
 			}
 			else if (SET_CONFIGURATION == r)
 			{
@@ -495,9 +621,11 @@ static void USB_ISR(void)
 			else if (GET_INTERFACE == r)
 			{
 				TRACE_CORE(puts(">>> EP0 Int: GET_INTERFACE\r\n");)
+				UDD_Send8(EP0, _usbSetInterface);
 			}
 			else if (SET_INTERFACE == r)
 			{
+                _usbSetInterface = setup.wValueL;
 				TRACE_CORE(puts(">>> EP0 Int: SET_INTERFACE\r\n");)
 			}
 		}

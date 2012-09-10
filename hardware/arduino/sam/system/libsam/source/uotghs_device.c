@@ -85,7 +85,7 @@ uint32_t UDD_Init(void)
 
 	// Enable High Speed
 	udd_low_speed_disable();
-	udd_high_speed_disable();
+	udd_high_speed_enable();
 
 	//otg_ack_vbus_transition();
 	// Force Vbus interrupt in case of Vbus always with a high level
@@ -115,7 +115,7 @@ void UDD_Attach(void)
 
 	// Enable USB line events
 	udd_enable_reset_interrupt();
-	udd_enable_sof_interrupt();
+//	udd_enable_sof_interrupt();
 
 	cpu_irq_restore(flags);
 }
@@ -139,6 +139,7 @@ void UDD_InitEP( uint32_t ul_ep_nb, uint32_t ul_ep_cfg )
 
 	if (!Is_udd_endpoint_configured(ul_ep_nb)) {
 		TRACE_UOTGHS_DEVICE(printf("=> UDD_InitEP : ERROR FAILED TO INIT EP %lu\r\n", ul_ep_nb);)
+		while(1);
 	}
 }
 
@@ -156,6 +157,7 @@ void UDD_InitEndpoints(const uint32_t* eps_table, const uint32_t ul_eps_table_si
 
 		if (!Is_udd_endpoint_configured(ul_ep_nb)) {
 			TRACE_UOTGHS_DEVICE(printf("=> UDD_InitEP : ERROR FAILED TO INIT EP %lu\r\n", ul_ep_nb);)
+			while(1);
 		}
 	}
 }
@@ -215,6 +217,8 @@ uint32_t UDD_Send(uint32_t ep, const void* data, uint32_t len)
 
 	TRACE_UOTGHS_DEVICE(printf("=> UDD_Send (1): ep=%lu ul_send_fifo_ptr=%lu len=%lu\r\n", ep, ul_send_fifo_ptr[ep], len);)
 
+	while( UOTGHS_DEVEPTISR_TXINI != (UOTGHS->UOTGHS_DEVEPTISR[ep] & UOTGHS_DEVEPTISR_TXINI )) {}
+
 	if (ep == EP0)
 	{
 		if (ul_send_fifo_ptr[ep] + len > EP0_SIZE)
@@ -222,34 +226,26 @@ uint32_t UDD_Send(uint32_t ep, const void* data, uint32_t len)
 	}
 	else
 	{
-		if (ul_send_fifo_ptr[ep] + len > EPX_SIZE)
-			len = EPX_SIZE - ul_send_fifo_ptr[ep];
+		ul_send_fifo_ptr[ep] = 0;
 	}
-
 	for (i = 0, ptr_dest += ul_send_fifo_ptr[ep]; i < len; ++i)
 		*ptr_dest++ = *ptr_src++;
 
 	ul_send_fifo_ptr[ep] += i;
-
 
 	if (ep == EP0)
 	{
 		TRACE_UOTGHS_DEVICE(printf("=> UDD_Send (2): ep=%lu ptr_dest=%lu maxlen=%d\r\n", ep, ul_send_fifo_ptr[ep], EP0_SIZE);)
 		if (ul_send_fifo_ptr[ep] == EP0_SIZE)
 		{
-			UDD_ClearIN();	// Fifo is full, release this packet
-			UDD_WaitIN(); // Wait for new FIFO buffer to be ready
-		}
+			UDD_ClearIN();	// Fifo is full, release this packet  // UOTGHS->UOTGHS_DEVEPTICR[EP0] = UOTGHS_DEVEPTICR_TXINIC;
+        }
 	}
 	else
 	{
-		if (ul_send_fifo_ptr[ep] == EPX_SIZE)
-		{
-			UDD_ClearIN();	// Fifo is full, release this packet
-			UDD_WaitIN(); // Wait for new FIFO buffer to be ready
-		}
+		UOTGHS->UOTGHS_DEVEPTICR[ep] = UOTGHS_DEVEPTICR_TXINIC;
+		UOTGHS->UOTGHS_DEVEPTIDR[ep] = UOTGHS_DEVEPTIDR_FIFOCONC;
 	}
-
 	return len;
 }
 
@@ -301,7 +297,8 @@ uint32_t UDD_FifoByteCount(uint32_t ep)
 void UDD_ReleaseRX(uint32_t ep)
 {
 	TRACE_UOTGHS_DEVICE(puts("=> UDD_ReleaseRX\r\n");)
-	UOTGHS->UOTGHS_DEVEPTICR[ep] = (UOTGHS_DEVEPTICR_NAKOUTIC | UOTGHS_DEVEPTICR_RXOUTIC);
+//	UOTGHS->UOTGHS_DEVEPTICR[ep] = (UOTGHS_DEVEPTICR_NAKOUTIC | UOTGHS_DEVEPTICR_RXOUTIC);
+	UOTGHS->UOTGHS_DEVEPTICR[ep] = UOTGHS_DEVEPTICR_RXOUTIC;
 	UOTGHS->UOTGHS_DEVEPTIDR[ep] = UOTGHS_DEVEPTIDR_FIFOCONC;
 	ul_recv_fifo_ptr[ep] = 0;
 }
@@ -309,7 +306,8 @@ void UDD_ReleaseRX(uint32_t ep)
 void UDD_ReleaseTX(uint32_t ep)
 {
 	TRACE_UOTGHS_DEVICE(printf("=> UDD_ReleaseTX ep=%lu\r\n", ep);)
-	UOTGHS->UOTGHS_DEVEPTICR[ep] = (UOTGHS_DEVEPTICR_NAKINIC | UOTGHS_DEVEPTICR_RXOUTIC | UOTGHS_DEVEPTICR_TXINIC);
+//	UOTGHS->UOTGHS_DEVEPTICR[ep] = (UOTGHS_DEVEPTICR_NAKINIC | UOTGHS_DEVEPTICR_RXOUTIC | UOTGHS_DEVEPTICR_TXINIC);
+	UOTGHS->UOTGHS_DEVEPTICR[ep] = UOTGHS_DEVEPTICR_TXINIC;
 	UOTGHS->UOTGHS_DEVEPTIDR[ep] = UOTGHS_DEVEPTIDR_FIFOCONC;
 	ul_send_fifo_ptr[ep] = 0;
 }
