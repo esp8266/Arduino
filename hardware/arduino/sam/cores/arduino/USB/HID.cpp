@@ -152,8 +152,15 @@ int WEAK HID_GetDescriptor(int i)
 
 void WEAK HID_SendReport(uint8_t id, const void* data, uint32_t len)
 {
-	USBD_Send(HID_TX, &id, 1);
-	USBD_Send(HID_TX | TRANSFER_RELEASE,data,len);
+	uint8_t p[5];
+	uint8_t* d = (uint8_t*)data;
+
+	p[0] = id;
+	p[1] = d[0];
+	p[2] = d[1];
+	p[3] = d[2];
+	p[4] = d[3];
+	USBD_Send(HID_TX, p, 5);
 }
 
 bool WEAK HID_Setup(Setup& setup)
