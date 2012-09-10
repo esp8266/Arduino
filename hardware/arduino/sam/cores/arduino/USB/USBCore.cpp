@@ -91,6 +91,15 @@ const DeviceDescriptor USB_DeviceDescriptorA =
 const DeviceDescriptor USB_DeviceQualifier =
 	D_QUALIFIER(0x00,0x00,0x00,64,1);
 
+//! 7.1.20 Test Mode Support
+static const unsigned char test_packet_buffer[] = {
+    0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,                // JKJKJKJK * 9
+    0xAA,0xAA,0xAA,0xAA,0xAA,0xAA,0xAA,0xAA,                     // JJKKJJKK * 8
+    0xEE,0xEE,0xEE,0xEE,0xEE,0xEE,0xEE,0xEE,                     // JJJJKKKK * 8
+    0xFE,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF, // JJJJJJJKKKKKKK * 8
+    0x7F,0xBF,0xDF,0xEF,0xF7,0xFB,0xFD,                          // JJJJJJJK * 8
+    0xFC,0x7E,0xBF,0xDF,0xEF,0xF7,0xFB,0xFD,0x7E                 // {JKKKKKKK * 10}, JK
+};
 
 //==================================================================
 //==================================================================
@@ -183,7 +192,7 @@ uint32_t USBD_Send(uint32_t ep, const void* d, uint32_t len)
 
 	while (len)
 	{
-        if(ep==0) n=  EP0_SIZE;
+        if(ep==0) n = EP0_SIZE;
         else n =  EPX_SIZE;
 		if (n > len)
 			n = len;
@@ -435,6 +444,129 @@ static bool USBD_SendDescriptor(Setup& setup)
 	return true;
 }
 
+
+static void USB_SendZlp( void )
+{
+    while( UOTGHS_DEVEPTISR_TXINI != (UOTGHS->UOTGHS_DEVEPTISR[0] & UOTGHS_DEVEPTISR_TXINI ) )
+    {
+        if((UOTGHS->UOTGHS_DEVISR & UOTGHS_DEVISR_SUSP) == UOTGHS_DEVISR_SUSP)
+        {
+            return;
+        }
+    }
+    UOTGHS->UOTGHS_DEVEPTICR[0] = UOTGHS_DEVEPTICR_TXINIC;
+}
+
+
+static void Test_Mode_Support( uint8_t wIndex )
+{
+    uint8_t i;
+	uint8_t *ptr_dest = (uint8_t *) &udd_get_endpoint_fifo_access8(2);
+
+	switch( wIndex )
+	{
+		case 4:
+			//Test mode Test_Packet:
+			//Upon command, a port must repetitively transmit the following test packet until
+			//the exit action is taken. This enables the testing of rise and fall times, eye
+			//patterns, jitter, and any other dynamic waveform specifications.
+			//The test packet is made up by concatenating the following strings.
+			//(Note: For J/K NRZI data, and for NRZ data, the bit on the left is the first one
+			//transmitted. “S” indicates that a bit stuff occurs, which inserts an “extra” NRZI data bit.
+			//“* N” is used to indicate N occurrences of a string of bits or symbols.)
+			//A port in Test_Packet mode must send this packet repetitively. The inter-packet timing
+			//must be no less than the minimum allowable inter-packet gap as defined in Section 7.1.18 and
+			//no greater than 125 us.
+
+			// Send ZLP
+			USB_SendZlp();
+
+			UOTGHS->UOTGHS_DEVDMA[0].UOTGHS_DEVDMACONTROL = 0; // raz
+			UOTGHS->UOTGHS_DEVDMA[1].UOTGHS_DEVDMACONTROL = 0; // raz
+
+			// Configure endpoint 2, 64 bytes, direction IN, type BULK, 1 bank
+			UOTGHS->UOTGHS_DEVEPTCFG[2] = UOTGHS_DEVEPTCFG_EPSIZE_64_BYTE
+												 | UOTGHS_DEVEPTCFG_EPDIR_IN
+												 | UOTGHS_DEVEPTCFG_EPTYPE_BLK
+												 | UOTGHS_DEVEPTCFG_EPBK_1_BANK;
+			// Check if the configuration is ok
+			UOTGHS->UOTGHS_DEVEPTCFG[2] |= UOTGHS_DEVEPTCFG_ALLOC;
+			while((UOTGHS->UOTGHS_DEVEPTISR[2]&UOTGHS_DEVEPTISR_CFGOK)==0) {}
+			UOTGHS->UOTGHS_DEVEPT |= UOTGHS_DEVEPT_EPEN2;
+			// Write FIFO
+			for( i=0; i<sizeof(test_packet_buffer); i++)
+			{
+				ptr_dest[i] = test_packet_buffer[i];;
+			}
+			// Tst PACKET
+			UOTGHS->UOTGHS_DEVCTRL |= UOTGHS_DEVCTRL_TSTPCKT;
+			// Send packet
+			UOTGHS->UOTGHS_DEVEPTICR[2] = UOTGHS_DEVEPTICR_TXINIC;
+			UOTGHS->UOTGHS_DEVEPTIDR[2] = UOTGHS_DEVEPTIDR_FIFOCONC;
+			for(;;);
+//      break;
+
+		case 1:
+			//Test mode Test_J:
+			//Upon command, a port’s transceiver must enter the high-speed J state and remain in that
+			//state until the exit action is taken. This enables the testing of the high output drive
+			//level on the D+ line.
+			// Send a ZLP
+			USB_SendZlp();
+			UOTGHS->UOTGHS_DEVCTRL |= UOTGHS_DEVCTRL_TSTJ;
+			for(;;);
+//      break;
+
+		case 2:
+			//Test mode Test_K:
+			//Upon command, a port’s transceiver must enter the high-speed K state and remain in
+			//that state until the exit action is taken. This enables the testing of the high output drive
+			//level on the D- line.
+			// Send a ZLP
+			USB_SendZlp();
+			UOTGHS->UOTGHS_DEVCTRL |= UOTGHS_DEVCTRL_TSTK;
+			for(;;);
+//		break;
+
+		case 3:
+			//Test mode Test_SE0_NAK:
+			//Upon command, a port’s transceiver must enter the high-speed receive mode
+			//and remain in that mode until the exit action is taken. This enables the testing
+			//of output impedance, low level output voltage, and loading characteristics.
+			//In addition, while in this mode, upstream facing ports (and only upstream facing ports)
+			//must respond to any IN token packet with a NAK handshake (only if the packet CRC is
+			//determined to be correct) within the normal allowed device response time. This enables testing of
+			//the device squelch level circuitry and, additionally, provides a general purpose stimulus/response
+			//test for basic functional testing.
+
+			// Send a ZLP
+			USB_SendZlp();
+			UOTGHS->UOTGHS_DEVIDR = UOTGHS_DEVIDR_SUSPEC
+							   | UOTGHS_DEVIDR_MSOFEC
+							   | UOTGHS_DEVIDR_SOFEC
+							   | UOTGHS_DEVIDR_EORSTEC
+							   | UOTGHS_DEVIDR_WAKEUPEC
+							   | UOTGHS_DEVIDR_EORSMEC
+							   | UOTGHS_DEVIDR_UPRSMEC
+							   | UOTGHS_DEVIDR_PEP_0
+							   | UOTGHS_DEVIDR_PEP_1
+							   | UOTGHS_DEVIDR_PEP_2
+							   | UOTGHS_DEVIDR_PEP_3
+							   | UOTGHS_DEVIDR_PEP_4
+							   | UOTGHS_DEVIDR_PEP_5
+							   | UOTGHS_DEVIDR_PEP_6
+							   | UOTGHS_DEVIDR_DMA_1
+							   | UOTGHS_DEVIDR_DMA_2
+							   | UOTGHS_DEVIDR_DMA_3
+							   | UOTGHS_DEVIDR_DMA_4
+							   | UOTGHS_DEVIDR_DMA_5
+							   | UOTGHS_DEVIDR_DMA_6;
+			for(;;);
+//		break;
+	}
+}
+
+
 //unsigned int iii=0;
 //	Endpoint 0 interrupt
 static void USB_ISR(void)
@@ -529,7 +661,7 @@ static void USB_ISR(void)
                     // Check if the endpoint if currently halted
                     if( isEndpointHalt == 1 )
     				UDD_Send8(EP0, 1); // TODO
-                    else                    
+                    else
     				UDD_Send8(EP0, 0); // TODO
 	    			UDD_Send8(EP0, 0);
                 }
@@ -548,7 +680,7 @@ static void USB_ISR(void)
                 }
                 else // if( setup.wValueL == 0) // ENDPOINTHALT
                 {
-                    isEndpointHalt = 0;  // TODO 
+                    isEndpointHalt = 0;  // TODO
     				UDD_Send8(EP0, 0);
 	    			UDD_Send8(EP0, 0);
                 }
@@ -573,7 +705,17 @@ static void USB_ISR(void)
                 if( setup.wValueL == 2) // TEST_MODE
                 {
                     // 7.1.20 Test Mode Support, 9.4.9 SetFeature
-                    // TODO
+                    if( (setup.bmRequestType == 0 /*USBGenericRequest_DEVICE*/) &&
+                        ((setup.wIndex & 0x000F) == 0) )
+                    {
+                        // the lower byte of wIndex must be zero
+                        // the most significant byte of wIndex is used to specify the specific test mode
+
+                        UOTGHS->UOTGHS_DEVIDR &= ~UOTGHS_DEVIDR_SUSPEC;
+                        UOTGHS->UOTGHS_DEVCTRL |= UOTGHS_DEVCTRL_SPDCONF_HIGH_SPEED; // remove suspend ?
+
+                        Test_Mode_Support( (setup.wIndex & 0xFF00)>>8 );
+                    }
                 }
 			}
 			else if (SET_ADDRESS == r)
