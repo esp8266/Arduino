@@ -186,7 +186,7 @@ uint32_t USBD_Send(uint32_t ep, const void* d, uint32_t len)
 
     if (!_usbConfiguration)
     {
-        printf("pb conf\n\r");
+    	TRACE_CORE(printf("pb conf\n\r");)
 		return -1;
     }
 
@@ -472,8 +472,8 @@ static void Test_Mode_Support( uint8_t wIndex )
 			//patterns, jitter, and any other dynamic waveform specifications.
 			//The test packet is made up by concatenating the following strings.
 			//(Note: For J/K NRZI data, and for NRZ data, the bit on the left is the first one
-			//transmitted. “S” indicates that a bit stuff occurs, which inserts an “extra” NRZI data bit.
-			//“* N” is used to indicate N occurrences of a string of bits or symbols.)
+			//transmitted. "S" indicates that a bit stuff occurs, which inserts an "extra" NRZI data bit.
+			//"* N" is used to indicate N occurrences of a string of bits or symbols.)
 			//A port in Test_Packet mode must send this packet repetitively. The inter-packet timing
 			//must be no less than the minimum allowable inter-packet gap as defined in Section 7.1.18 and
 			//no greater than 125 us.
@@ -508,7 +508,7 @@ static void Test_Mode_Support( uint8_t wIndex )
 
 		case 1:
 			//Test mode Test_J:
-			//Upon command, a port’s transceiver must enter the high-speed J state and remain in that
+			//Upon command, a port's transceiver must enter the high-speed J state and remain in that
 			//state until the exit action is taken. This enables the testing of the high output drive
 			//level on the D+ line.
 			// Send a ZLP
@@ -519,7 +519,7 @@ static void Test_Mode_Support( uint8_t wIndex )
 
 		case 2:
 			//Test mode Test_K:
-			//Upon command, a port’s transceiver must enter the high-speed K state and remain in
+			//Upon command, a port's transceiver must enter the high-speed K state and remain in
 			//that state until the exit action is taken. This enables the testing of the high output drive
 			//level on the D- line.
 			// Send a ZLP
@@ -530,7 +530,7 @@ static void Test_Mode_Support( uint8_t wIndex )
 
 		case 3:
 			//Test mode Test_SE0_NAK:
-			//Upon command, a port’s transceiver must enter the high-speed receive mode
+			//Upon command, a port's transceiver must enter the high-speed receive mode
 			//and remain in that mode until the exit action is taken. This enables the testing
 			//of output impedance, low level output voltage, and loading characteristics.
 			//In addition, while in this mode, upstream facing ports (and only upstream facing ports)
@@ -571,8 +571,6 @@ static void Test_Mode_Support( uint8_t wIndex )
 //	Endpoint 0 interrupt
 static void USB_ISR(void)
 {
-    Reset.tick();
-
 //    printf("ISR=0x%X\n\r", UOTGHS->UOTGHS_DEVISR); // jcb
 //    if( iii++ > 1500 ) while(1); // jcb
     // End of bus reset

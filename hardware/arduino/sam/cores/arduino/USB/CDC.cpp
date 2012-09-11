@@ -134,9 +134,9 @@ bool WEAK CDC_Setup(Setup& setup)
 			{
 				// We check DTR state to determine if host port is open (bit 0 of lineState).
 				if ((_usbLineInfo.lineState & 0x01) == 0)
-					Reset.initiate(240);
+					initiateReset(250);
 				else
-					Reset.cancel();
+					cancelReset();
 			}
 			return true;
 		}

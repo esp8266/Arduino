@@ -17,6 +17,7 @@
 */
 
 #include "Arduino.h"
+#include "Reset.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,7 +47,7 @@ void delay( uint32_t dwMs )
 
 void delayMicroseconds( uint32_t dwUs )
 {
-  uint32_t dwStartMicros=micros() ;
+	uint32_t dwStartMicros=micros() ;
 
 	while ( (micros() - dwStartMicros) < dwUs )
 	{
@@ -59,8 +60,10 @@ void delayMicroseconds( uint32_t dwUs )
  */
 void SysTick_Handler( void )
 {
-  // Increment tick count each ms
-  TimeTick_Increment() ;
+	tickReset();
+
+	// Increment tick count each ms
+	TimeTick_Increment() ;
 }
 
 #if defined ( __ICCARM__ ) /* IAR Ewarm 5.41+ */

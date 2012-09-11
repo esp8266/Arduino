@@ -19,6 +19,10 @@
 #include <Arduino.h>
 #include "Reset.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 __attribute__ ((long_call, section (".ramfunc")))
 void banzai() {
 	// Disable all interrupts
@@ -51,15 +55,17 @@ void banzai() {
 	while (true);
 }
 
-void ResetClass::initiate(int _ticks) {
+static int ticks = -1;
+
+void initiateReset(int _ticks) {
 	ticks = _ticks;
 }
 
-void ResetClass::cancel() {
+void cancelReset() {
 	ticks = -1;
 }
 
-void ResetClass::tick() {
+void tickReset() {
 	if (ticks == -1)
 		return;
 	ticks--;
@@ -67,4 +73,6 @@ void ResetClass::tick() {
 		banzai();
 }
 
-int ResetClass::ticks = -1;
+#ifdef __cplusplus
+}
+#endif

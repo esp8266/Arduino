@@ -19,15 +19,16 @@
 #ifndef RESET_H
 #define RESET_H
 
-class ResetClass {
-public:
-	static void initiate(int _ticks);
-	static void cancel();
-	static void tick();
-private:
-	static int ticks;
-};
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-extern ResetClass Reset;
+void initiateReset(int ms);
+void tickReset();
+void cancelReset();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
