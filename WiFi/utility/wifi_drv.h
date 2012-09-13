@@ -9,6 +9,8 @@
 #define KEY_IDX_LEN     1
 // 5 secs of delay to have the connection established
 #define WL_DELAY_START_CONNECTION 5000
+// firmware version string length
+#define WL_FW_VER_LENGTH 6
 
 class WiFiDrv
 {
@@ -17,6 +19,9 @@ private:
 	static char 	_networkSsid[WL_NETWORKS_LIST_MAXNUM][WL_SSID_MAX_LENGTH];
 	static int32_t 	_networkRssi[WL_NETWORKS_LIST_MAXNUM];
 	static uint8_t 	_networkEncr[WL_NETWORKS_LIST_MAXNUM];
+
+	// firmware version string in the format a.b.c
+	static char 	fwVersion[WL_FW_VER_LENGTH];
 
 	// settings of current selected network
 	static char 	_ssid[WL_SSID_MAX_LENGTH];
@@ -52,7 +57,7 @@ public:
      * param ssid_len: Lenght of ssid string.
      * return: WL_SUCCESS or WL_FAILURE
 	 */
-    static uint8_t wifiSetNetwork(char* ssid, uint8_t ssid_len);
+    static int8_t wifiSetNetwork(char* ssid, uint8_t ssid_len);
 
     /* Start Wifi connection with passphrase
      * the most secure supported mode will be automatically selected
@@ -64,7 +69,7 @@ public:
      * param len: Lenght of passphrase string.
      * return: WL_SUCCESS or WL_FAILURE
      */
-    static uint8_t wifiSetPassphrase(char* ssid, uint8_t ssid_len, const char *passphrase, const uint8_t len);
+    static int8_t wifiSetPassphrase(char* ssid, uint8_t ssid_len, const char *passphrase, const uint8_t len);
 
     /* Start Wifi connection with WEP encryption.
      * Configure a key into the device. The key type (WEP-40, WEP-104)
@@ -77,14 +82,14 @@ public:
      * param len: Lenght of key string.
      * return: WL_SUCCESS or WL_FAILURE
      */
-    static uint8_t wifiSetKey(char* ssid, uint8_t ssid_len, uint8_t key_idx, const void *key, const uint8_t len);
+    static int8_t wifiSetKey(char* ssid, uint8_t ssid_len, uint8_t key_idx, const void *key, const uint8_t len);
 
     /*
      * Disconnect from the network
      *
      * return: WL_SUCCESS or WL_FAILURE
      */
-    static uint8_t disconnect();
+    static int8_t disconnect();
 
     /*
      * Disconnect from the network
@@ -156,7 +161,14 @@ public:
      *
      * return: Number of discovered networks
      */
-    static uint8_t scanNetworks();
+    static int8_t startScanNetworks();
+
+    /*
+     * Get the networks available
+     *
+     * return: Number of discovered networks
+     */
+    static uint8_t getScanNetworks();
 
     /*
      * Return the SSID discovered during the network scan.
@@ -193,6 +205,12 @@ public:
      *          else error code
      */
     static int getHostByName(const char* aHostname, IPAddress& aResult);
+
+    /*
+     * Get the firmware version
+     * result: version as string with this format a.b.c
+     */
+    static char* getFwVersion();
 
 };
 

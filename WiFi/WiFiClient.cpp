@@ -35,8 +35,19 @@ int WiFiClient::connect(IPAddress ip, uint16_t port) {
     {
     	ServerDrv::startClient(uint32_t(ip), port, _sock);
     	WiFiClass::_state[_sock] = _sock;
-    	while(!connected());
+
+    	unsigned long start = millis();
+
+    	// wait 4 second for the connection to close
+    	while (!connected() && millis() - start < 10000)
+    		delay(1);
+
+    	if (!connected())
+       	{
+    		return 0;
+    	}
     }else{
+    	Serial.println("No Socket available");
     	return 0;
     }
     return 1;
@@ -59,12 +70,17 @@ size_t WiFiClient::write(const uint8_t *buf, size_t size) {
   }
 
 
-  if ((!ServerDrv::sendData(_sock, buf, size)) ||
-		  (!ServerDrv::checkDataSent(_sock)))
+  if (!ServerDrv::sendData(_sock, buf, size))
   {
 	  setWriteError();
       return 0;
   }
+  if (!ServerDrv::checkDataSent(_sock))
+  {
+	  setWriteError();
+      return 0;
+  }
+
   return size;
 }
 
@@ -94,8 +110,12 @@ int WiFiClient::read(uint8_t* buf, size_t size) {
 }
 
 int WiFiClient::peek() {
-	//TODO to be implemented
-	return 0;
+	  uint8_t b;
+	  if (!available())
+	    return -1;
+
+	  ServerDrv::getData(_sock, &b, 1);
+	  return b;
 }
 
 void WiFiClient::flush() {
@@ -112,10 +132,10 @@ void WiFiClient::stop() {
 
   unsigned long start = millis();
   
+
   // wait a second for the connection to close
   while (status() != CLOSED && millis() - start < 1000)
     delay(1);
-    
   _sock = 255;
 }
 
@@ -128,6 +148,7 @@ uint8_t WiFiClient::connected() {
 
     return !(s == LISTEN || s == CLOSED || s == FIN_WAIT_1 ||
     		s == FIN_WAIT_2 || s == TIME_WAIT ||
+    		s == SYN_SENT || s== SYN_RCVD ||
              (s == CLOSE_WAIT && !available()));
   }
 }

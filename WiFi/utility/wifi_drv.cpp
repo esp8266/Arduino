@@ -26,6 +26,8 @@ uint8_t WiFiDrv::_mac[] = {0};
 uint8_t WiFiDrv::_localIp[] = {0};
 uint8_t WiFiDrv::_subnetMask[] = {0};
 uint8_t WiFiDrv::_gatewayIp[] = {0};
+// Firmware version
+char    WiFiDrv::fwVersion[] = {0};
 
 
 // Private Methods
@@ -59,7 +61,7 @@ void WiFiDrv::wifiDriverInit()
     SpiDrv::begin();
 }
 
-uint8_t WiFiDrv::wifiSetNetwork(char* ssid, uint8_t ssid_len)
+int8_t WiFiDrv::wifiSetNetwork(char* ssid, uint8_t ssid_len)
 {
 	WAIT_FOR_SLAVE_SELECT();
     // Send Command
@@ -75,13 +77,14 @@ uint8_t WiFiDrv::wifiSetNetwork(char* ssid, uint8_t ssid_len)
     if (!SpiDrv::waitResponseCmd(SET_NET_CMD, PARAM_NUMS_1, &_data, &_dataLen))
     {
         WARN("error waitResponse");
+        _data = WL_FAILURE;
     }
     SpiDrv::spiSlaveDeselect();
 
     return(_data == WIFI_SPI_ACK) ? WL_SUCCESS : WL_FAILURE;
 }
 
-uint8_t WiFiDrv::wifiSetPassphrase(char* ssid, uint8_t ssid_len, const char *passphrase, const uint8_t len)
+int8_t WiFiDrv::wifiSetPassphrase(char* ssid, uint8_t ssid_len, const char *passphrase, const uint8_t len)
 {
 	WAIT_FOR_SLAVE_SELECT();
     // Send Command
@@ -98,13 +101,14 @@ uint8_t WiFiDrv::wifiSetPassphrase(char* ssid, uint8_t ssid_len, const char *pas
     if (!SpiDrv::waitResponseCmd(SET_PASSPHRASE_CMD, PARAM_NUMS_1, &_data, &_dataLen))
     {
         WARN("error waitResponse");
+        _data = WL_FAILURE;
     }
     SpiDrv::spiSlaveDeselect();
     return _data;
 }
 
 
-uint8_t WiFiDrv::wifiSetKey(char* ssid, uint8_t ssid_len, uint8_t key_idx, const void *key, const uint8_t len)
+int8_t WiFiDrv::wifiSetKey(char* ssid, uint8_t ssid_len, uint8_t key_idx, const void *key, const uint8_t len)
 {
 	WAIT_FOR_SLAVE_SELECT();
     // Send Command
@@ -122,12 +126,13 @@ uint8_t WiFiDrv::wifiSetKey(char* ssid, uint8_t ssid_len, uint8_t key_idx, const
     if (!SpiDrv::waitResponseCmd(SET_KEY_CMD, PARAM_NUMS_1, &_data, &_dataLen))
     {
         WARN("error waitResponse");
+        _data = WL_FAILURE;
     }
     SpiDrv::spiSlaveDeselect();
     return _data;
 }
                         
-uint8_t WiFiDrv::disconnect()
+int8_t WiFiDrv::disconnect()
 {
 	WAIT_FOR_SLAVE_SELECT();
     // Send Command
@@ -142,7 +147,7 @@ uint8_t WiFiDrv::disconnect()
     // Wait for reply
     uint8_t _data = 0;
     uint8_t _dataLen = 0;
-    uint8_t result = SpiDrv::waitResponseCmd(DISCONNECT_CMD, PARAM_NUMS_1, &_data, &_dataLen);
+    int8_t result = SpiDrv::waitResponseCmd(DISCONNECT_CMD, PARAM_NUMS_1, &_data, &_dataLen);
 
     SpiDrv::spiSlaveDeselect();
 
@@ -160,7 +165,7 @@ uint8_t WiFiDrv::getConnectionStatus()
     SpiDrv::waitForSlaveReady();
 
     // Wait for reply
-    uint8_t _data = 0;
+    uint8_t _data = -1;
     uint8_t _dataLen = 0;
     SpiDrv::waitResponseCmd(GET_CONN_STATUS_CMD, PARAM_NUMS_1, &_data, &_dataLen);
 
@@ -299,7 +304,33 @@ uint8_t WiFiDrv::getCurrentEncryptionType()
     return encType;
 }
 
-uint8_t WiFiDrv::scanNetworks()
+int8_t WiFiDrv::startScanNetworks()
+{
+	WAIT_FOR_SLAVE_SELECT();
+
+    // Send Command
+    SpiDrv::sendCmd(START_SCAN_NETWORKS, PARAM_NUMS_0);
+
+    //Wait the reply elaboration
+    SpiDrv::waitForSlaveReady();
+
+    // Wait for reply
+    uint8_t _data = 0;
+    uint8_t _dataLen = 0;
+
+    if (!SpiDrv::waitResponseCmd(START_SCAN_NETWORKS, PARAM_NUMS_1, &_data, &_dataLen))
+     {
+         WARN("error waitResponse");
+         _data = WL_FAILURE;
+     }
+
+    SpiDrv::spiSlaveDeselect();
+
+    return (_data == WL_FAILURE)? _data : WL_SUCCESS;
+}
+
+
+uint8_t WiFiDrv::getScanNetworks()
 {
 	WAIT_FOR_SLAVE_SELECT();
 
@@ -436,6 +467,25 @@ int WiFiDrv::getHostByName(const char* aHostname, IPAddress& aResult)
 		return 0;
 	}
 	return (retry>0);
+}
+
+char*  WiFiDrv::getFwVersion()
+{
+	WAIT_FOR_SLAVE_SELECT();
+    // Send Command
+    SpiDrv::sendCmd(GET_FW_VERSION_CMD, PARAM_NUMS_0);
+
+    //Wait the reply elaboration
+    SpiDrv::waitForSlaveReady();
+
+    // Wait for reply
+    uint8_t _dataLen = 0;
+    if (!SpiDrv::waitResponseCmd(GET_FW_VERSION_CMD, PARAM_NUMS_1, (uint8_t*)fwVersion, &_dataLen))
+    {
+        WARN("error waitResponse");
+    }
+    SpiDrv::spiSlaveDeselect();
+    return fwVersion;
 }
 
 WiFiDrv wiFiDrv;

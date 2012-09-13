@@ -14,7 +14,7 @@
  
  created 18 Dec 2009
  by David A. Mellis
- modified 23 Apr 2012
+ modified 31 May 2012
  by Tom Igoe
  
  */
@@ -22,8 +22,8 @@
 #include <SPI.h>
 #include <WiFi.h>
 
-char ssid[] = "YourNetwork"; //  your network SSID (name) 
-char pass[] = "password";    // your network password (use for WPA, or use as key for WEP)
+char ssid[] = "yourNetwork"; //  your network SSID (name) 
+char pass[] = "secretPassword";    // your network password (use for WPA, or use as key for WEP)
 
 int keyIndex = 0;            // your network key Index number (needed only for WEP)
 
@@ -34,14 +34,26 @@ WiFiServer server(23);
 boolean alreadyConnected = false; // whether or not the client was connected previously
 
 void setup() {
-  // start serial port:
-  Serial.begin(9600);
-
+  //Initialize serial and wait for port to open:
+  Serial.begin(9600); 
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
+  
+  // check for the presence of the shield:
+  if (WiFi.status() == WL_NO_SHIELD) {
+    Serial.println("WiFi shield not present"); 
+    // don't continue:
+    while(true);
+  } 
+  
   // attempt to connect to Wifi network:
   while ( status != WL_CONNECTED) { 
     Serial.print("Attempting to connect to SSID: ");
     Serial.println(ssid);
+    // Connect to WPA/WPA2 network. Change this line if using open or WEP network:    
     status = WiFi.begin(ssid, pass);
+
     // wait 10 seconds for connection:
     delay(10000);
   } 

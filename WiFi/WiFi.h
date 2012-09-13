@@ -28,6 +28,12 @@ public:
      */
     static uint8_t getSocket();
 
+    /*
+     * Get firmware version
+     */
+    static char* firmwareVersion();
+
+
     /* Start Wifi connection for OPEN networks
      *
      * param ssid: Pointer to the SSID string.
@@ -123,7 +129,7 @@ public:
      *
      * return: Number of discovered networks
      */
-    uint8_t scanNetworks();
+    int8_t scanNetworks();
 
     /*
      * Return the SSID discovered during the network scan.

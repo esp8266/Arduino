@@ -146,12 +146,13 @@ uint8_t ServerDrv::availData(uint8_t sock)
     return false;
 }
 
-bool ServerDrv::getData(uint8_t sock, uint8_t *data)
+bool ServerDrv::getData(uint8_t sock, uint8_t *data, uint8_t peek)
 {
 	WAIT_FOR_SLAVE_SELECT();
     // Send Command
-    SpiDrv::sendCmd(GET_DATA_TCP_CMD, PARAM_NUMS_1);
-    SpiDrv::sendParam(&sock, sizeof(sock), LAST_PARAM);
+    SpiDrv::sendCmd(GET_DATA_TCP_CMD, PARAM_NUMS_2);
+    SpiDrv::sendParam(&sock, sizeof(sock));
+    SpiDrv::sendParam(peek, LAST_PARAM);
 
     //Wait the reply elaboration
     SpiDrv::waitForSlaveReady();
@@ -225,8 +226,8 @@ bool ServerDrv::sendData(uint8_t sock, const uint8_t *data, uint16_t len)
 
 uint8_t ServerDrv::checkDataSent(uint8_t sock)
 {
-	const uint16_t TIMEOUT_DATA_SENT = 250;
-	static uint16_t timeout = 0;
+	const uint16_t TIMEOUT_DATA_SENT = 25;
+    uint16_t timeout = 0;
 	uint8_t _data = 0;
 	uint8_t _dataLen = 0;
 
@@ -249,14 +250,10 @@ uint8_t ServerDrv::checkDataSent(uint8_t sock)
 		if (_data) timeout = 0;
 		else{
 			++timeout;
-			if (timeout > TIMEOUT_DATA_SENT)
-			{
-				timeout = 0;
-				INFO1("Timeout wainting for data sent");
-			}
+			delay(100);
 		}
-	}while((_data==0)&&(timeout<TIMEOUT_DATA_SENT));
 
+	}while((_data==0)&&(timeout<TIMEOUT_DATA_SENT));
     return (timeout==TIMEOUT_DATA_SENT)?0:1;
 }
 

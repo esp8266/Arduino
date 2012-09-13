@@ -34,6 +34,11 @@ uint8_t WiFiClass::getSocket()
     return NO_SOCKET_AVAIL;
 }
 
+char* WiFiClass::firmwareVersion()
+{
+	return WiFiDrv::getFwVersion();
+}
+
 int WiFiClass::begin(char* ssid)
 {
 	uint8_t status = WL_IDLE_STATUS;
@@ -150,9 +155,20 @@ uint8_t WiFiClass::encryptionType()
 }
 
 
-uint8_t WiFiClass::scanNetworks()
+int8_t WiFiClass::scanNetworks()
 {
-	return WiFiDrv::scanNetworks();
+	uint8_t attempts = 10;
+	uint8_t numOfNetworks = 0;
+
+	if (WiFiDrv::startScanNetworks() == WL_FAILURE)
+		return WL_FAILURE;
+ 	do
+ 	{
+ 		delay(2000);
+ 		numOfNetworks = WiFiDrv::getScanNetworks();
+ 	}
+	while (( numOfNetworks == 0)&&(--attempts>0));
+	return numOfNetworks;
 }
 
 char* WiFiClass::SSID(uint8_t networkItem)

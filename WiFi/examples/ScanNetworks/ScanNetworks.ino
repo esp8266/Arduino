@@ -10,8 +10,8 @@
  
  created 13 July 2010
  by dlf (Metodo2 srl)
- modified 22 April 2012
- by Tom Igoe
+ modified 21 Junn 2012
+ by Tom Igoe and Jaymes Dec
  */
 
 
@@ -19,11 +19,20 @@
 #include <WiFi.h>
 
 void setup() {
-  // initialize serial and wait for the port to open:
-  Serial.begin(9600);
+  //Initialize serial and wait for port to open:
+  Serial.begin(9600); 
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
 
-  // attempt to connect using WEP encryption:
-  Serial.println("Initializing Wifi...");
+  // check for the presence of the shield:
+  if (WiFi.status() == WL_NO_SHIELD) {
+    Serial.println("WiFi shield not present"); 
+    // don't continue:
+    while(true);
+  } 
+
+  // Print WiFi MAC address:
   printMacAddress();
 
   // scan for existing networks:
@@ -61,7 +70,12 @@ void printMacAddress() {
 void listNetworks() {
   // scan for nearby networks:
   Serial.println("** Scan Networks **");
-  byte numSsid = WiFi.scanNetworks();
+  int numSsid = WiFi.scanNetworks();
+  if (numSsid == -1)
+  { 
+    Serial.println("Couldn't get a wifi connection");
+    while(true);
+  } 
 
   // print the list of networks seen:
   Serial.print("number of available networks:");
@@ -76,8 +90,29 @@ void listNetworks() {
     Serial.print(WiFi.RSSI(thisNet));
     Serial.print(" dBm");
     Serial.print("\tEncryption: ");
-    Serial.println(WiFi.encryptionType(thisNet));
+    printEncryptionType(WiFi.encryptionType(thisNet));
   }
+}
+
+void printEncryptionType(int thisType) {
+  // read the encryption type and print out the name:
+  switch (thisType) {
+  case ENC_TYPE_WEP:
+    Serial.println("WEP");
+    break;
+  case ENC_TYPE_TKIP:
+    Serial.println("WPA");
+    break;
+  case ENC_TYPE_CCMP:
+    Serial.println("WPA2");
+    break;
+  case ENC_TYPE_NONE:
+    Serial.println("None");
+    break;
+  case ENC_TYPE_AUTO:
+    Serial.println("Auto");
+    break;
+  } 
 }
 
 
