@@ -44,7 +44,8 @@ extern uint32_t _estack;
 int main(void);
 /** \endcond */
 
-void __libc_init_array(void);
+// Arduino: we must setup hardware before doing this
+// void __libc_init_array(void);
 
 /* Default empty handler */
 void Dummy_Handler(void);
@@ -272,7 +273,9 @@ void Reset_Handler(void)
 	}
 
 	/* Initialize the C library */
-	__libc_init_array();
+
+	// Arduino: we must setup hardware before doing this
+	//__libc_init_array();
 
 	/* Branch to main function */
 	main();

@@ -338,7 +338,9 @@ void USART3_Handler( void )
 extern "C" {
 #endif
 
-extern void init( void )
+void __libc_init_array(void);
+
+void init( void )
 {
   SystemInit() ;
 
@@ -351,6 +353,9 @@ extern void init( void )
 
   // Disable watchdog, common to all SAM variants
   WDT_Disable( WDT ) ;
+
+  // Initialize C library
+  __libc_init_array();
 
   // Initialize Serial port UART, common to all SAM3 variants
   PIO_Configure(
