@@ -31,13 +31,16 @@ uint32_t millis( void )
 
 uint32_t micros( void )
 {
-  uint32_t dwTicks ;
+    uint32_t ticks ;
+    uint32_t count ;
 
-  __disable_irq() ;
-  dwTicks=SysTick->VAL ;
-  __enable_irq() ;
+    SysTick->CTRL;
+    do {
+        ticks = SysTick->VAL;
+        count = GetTickCount();
+    } while (SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk);
 
-  return (GetTickCount()*1000) + ((SysTick->LOAD + 1 - dwTicks)/(SystemCoreClock/1000000)) ;
+    return count * 1000 + (SysTick->LOAD + 1 - ticks) / (SystemCoreClock/1000000) ;
 }
 
 void delay( uint32_t dwMs )
