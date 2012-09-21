@@ -1,3 +1,5 @@
+// This sketch demonstrate how to use low-level drivers (only for advanced users).
+
 #include <hidboot.h>
 
 class MouseRptParser : public MouseReportParser
