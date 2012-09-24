@@ -17,20 +17,32 @@
  * along with the Arduino Sd2Card Library.  If not, see
  * <http://www.gnu.org/licenses/>.
  */
+#define USE_SPI_LIB
 #include <Arduino.h>
 #include "Sd2Card.h"
 //------------------------------------------------------------------------------
 #ifndef SOFTWARE_SPI
+#ifdef USE_SPI_LIB
+#include <SPI.h>
+#endif
 // functions for hardware SPI
 /** Send a byte to the card */
 static void spiSend(uint8_t b) {
+#ifndef USE_SPI_LIB
   SPDR = b;
   while (!(SPSR & (1 << SPIF)));
+#else
+  SPI.transfer(b);
+#endif
 }
 /** Receive a byte from the card */
 static  uint8_t spiRec(void) {
+#ifndef USE_SPI_LIB
   spiSend(0XFF);
   return SPDR;
+#else
+  return SPI.transfer(0xFF);
+#endif
 }
 #else  // SOFTWARE_SPI
 //------------------------------------------------------------------------------
@@ -220,11 +232,14 @@ uint8_t Sd2Card::init(uint8_t sckRateID, uint8_t chipSelectPin) {
   // set pin modes
   pinMode(chipSelectPin_, OUTPUT);
   chipSelectHigh();
+#ifndef USE_SPI_LIB
   pinMode(SPI_MISO_PIN, INPUT);
   pinMode(SPI_MOSI_PIN, OUTPUT);
   pinMode(SPI_SCK_PIN, OUTPUT);
+#endif
 
 #ifndef SOFTWARE_SPI
+#ifndef USE_SPI_LIB
   // SS must be in output mode even it is not chip select
   pinMode(SS_PIN, OUTPUT);
   digitalWrite(SS_PIN, HIGH); // disable any SPI device using hardware SS pin
@@ -232,7 +247,15 @@ uint8_t Sd2Card::init(uint8_t sckRateID, uint8_t chipSelectPin) {
   SPCR = (1 << SPE) | (1 << MSTR) | (1 << SPR1) | (1 << SPR0);
   // clear double speed
   SPSR &= ~(1 << SPI2X);
-#endif  // SOFTWARE_SPI
+#else // USE_SPI_LIB
+  SPI.begin();
+#ifdef SPI_CLOCK_DIV128
+    SPI.setClockDivider(SPI_CLOCK_DIV128);
+#else
+    SPI.setClockDivider(255);
+#endif
+#endif // USE_SPI_LIB
+#endif // SOFTWARE_SPI
 
   // must supply min of 74 clock cycles with CS high.
   for (uint8_t i = 0; i < 10; i++) spiSend(0XFF);
@@ -456,6 +479,7 @@ uint8_t Sd2Card::setSckRate(uint8_t sckRateID) {
     error(SD_CARD_ERROR_SCK_RATE);
     return false;
   }
+#ifndef USE_SPI_LIB
   // see avr processor datasheet for SPI register bit definitions
   if ((sckRateID & 1) || sckRateID == 6) {
     SPSR &= ~(1 << SPI2X);
@@ -465,6 +489,23 @@ uint8_t Sd2Card::setSckRate(uint8_t sckRateID) {
   SPCR &= ~((1 <<SPR1) | (1 << SPR0));
   SPCR |= (sckRateID & 4 ? (1 << SPR1) : 0)
     | (sckRateID & 2 ? (1 << SPR0) : 0);
+#else // USE_SPI_LIB
+  int v;
+#ifdef SPI_CLOCK_DIV128
+  switch (sckRateID) {
+    case 0: v=SPI_CLOCK_DIV2; break;
+    case 1: v=SPI_CLOCK_DIV4; break;
+    case 2: v=SPI_CLOCK_DIV8; break;
+    case 3: v=SPI_CLOCK_DIV16; break;
+    case 4: v=SPI_CLOCK_DIV32; break;
+    case 5: v=SPI_CLOCK_DIV64; break;
+    case 6: v=SPI_CLOCK_DIV128; break;
+  }
+#else // SPI_CLOCK_DIV128
+  v = 2 << sckRateID;
+#endif // SPI_CLOCK_DIV128
+  SPI.setClockDivider(v);
+#endif // USE_SPI_LIB
   return true;
 }
 //------------------------------------------------------------------------------

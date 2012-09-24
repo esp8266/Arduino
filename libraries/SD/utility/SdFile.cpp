@@ -18,7 +18,9 @@
  * <http://www.gnu.org/licenses/>.
  */
 #include <SdFat.h>
+#ifdef __AVR__
 #include <avr/pgmspace.h>
+#endif
 #include <Arduino.h>
 //------------------------------------------------------------------------------
 // callback function for date/time
@@ -256,9 +258,15 @@ uint8_t SdFile::make83Name(const char* str, uint8_t* name) {
       i = 8;   // place for extension
     } else {
       // illegal FAT characters
-      PGM_P p = PSTR("|<>^+=?/[];,*\"\\");
       uint8_t b;
+#if defined(__AVR__)
+      PGM_P p = PSTR("|<>^+=?/[];,*\"\\");
       while ((b = pgm_read_byte(p++))) if (b == c) return false;
+#elif defined(__arm__)
+      const uint8_t valid[] = "|<>^+=?/[];,*\"\\";
+      const uint8_t *p = valid;
+      while ((b = *p++)) if (b == c) return false;
+#endif
       // check size and only allow ASCII printable characters
       if (i > n || c < 0X21 || c > 0X7E)return false;
       // only upper case allowed in 8.3 names - convert lower to upper
@@ -1232,6 +1240,7 @@ size_t SdFile::write(uint8_t b) {
 size_t SdFile::write(const char* str) {
   return write(str, strlen(str));
 }
+#ifdef __AVR__
 //------------------------------------------------------------------------------
 /**
  * Write a PROGMEM string to a file.
@@ -1251,3 +1260,4 @@ void SdFile::writeln_P(PGM_P str) {
   write_P(str);
   println();
 }
+#endif
