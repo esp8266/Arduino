@@ -252,6 +252,10 @@ size_t Serial_::write(uint8_t c) {
 // where the port is configured (lineState != 0) but not quite opened.
 Serial_::operator bool()
 {
+	// this is here to avoid spurious opening after upload
+	if (millis() < 500)
+		return false;
+
 	bool result = false;
 
 	if (_usbLineInfo.lineState > 0)
