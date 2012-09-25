@@ -18,6 +18,7 @@
  	 
  */
  
+#include <SPI.h>
 #include <SD.h>
 
 File myFile;
