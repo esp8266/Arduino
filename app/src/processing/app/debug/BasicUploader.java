@@ -198,7 +198,7 @@ public class BasicUploader extends Uploader  {
     
     // Something happened while detecting port
     throw new RunnerException(
-        _("Couldn’t find a Leonardo on the selected port. Check that you have the correct port selected.  If it is correct, try pressing the board's reset button after initiating the upload."));
+        _("Couldn't find a Board on the selected port. Check that you have the correct port selected.  If it is correct, try pressing the board's reset button after initiating the upload."));
   }
 
   public boolean uploadUsingProgrammer(String buildPath, String className)
