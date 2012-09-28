@@ -267,6 +267,6 @@ Serial_::operator bool()
 	return result;
 }
 
-Serial_ Serial;
+Serial_ SerialUSB;
 
 #endif

@@ -54,6 +54,8 @@ class UARTClass : public HardwareSerial
 //    virtual void write( const char *str ) ;
 //    virtual void write( const uint8_t *buffer, size_t size ) ;
 #endif
+
+    operator bool() { return true; }; // UART always active
 };
 
 #endif // _UART_CLASS_

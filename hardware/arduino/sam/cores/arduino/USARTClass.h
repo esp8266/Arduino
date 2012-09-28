@@ -54,6 +54,8 @@ class USARTClass : public HardwareSerial
 //    virtual void write( const char *str ) ;
 //    virtual void write( const uint8_t *buffer, size_t size ) ;
 #endif
+
+    operator bool() { return true; }; // USART always active
 };
 
 #endif // _USART_CLASS_

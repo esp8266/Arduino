@@ -296,12 +296,12 @@ extern const PinDescription g_APinDescription[]=
  */
 RingBuffer rx_buffer1 ;
 
-UARTClass Serial1( UART, UART_IRQn, ID_UART, &rx_buffer1 ) ;
+UARTClass Serial( UART, UART_IRQn, ID_UART, &rx_buffer1 ) ;
 
 // IT handlers
 void UART_Handler(void)
 {
-  Serial1.IrqHandler() ;
+  Serial.IrqHandler() ;
 }
 
 // ----------------------------------------------------------------------------
@@ -364,7 +364,7 @@ void init( void )
     g_APinDescription[PINS_UART].ulPin,
     g_APinDescription[PINS_UART].ulPinConfiguration);
 
-	Serial1.begin(115200);
+	Serial.begin(115200);
 
   // Initialize Serial ports USART
   PIO_Configure(

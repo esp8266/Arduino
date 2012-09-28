@@ -34,7 +34,7 @@ class HardwareSerial : public Stream
     virtual void flush(void) = 0;
     virtual size_t write(uint8_t) = 0;
     using Print::write; // pull in write(str) and write(buf, size) from Print
-    operator bool();
+    virtual operator bool() = 0;
 };
 
 extern void serialEventRun(void) __attribute__((weak));

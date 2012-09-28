@@ -61,7 +61,7 @@ public:
 	using Print::write; // pull in write(str) from Print
 	operator bool();
 };
-extern Serial_ Serial;
+extern Serial_ SerialUSB;
 
 //================================================================================
 //================================================================================
