@@ -41,10 +41,10 @@ private:
 	static void onTransmitEnd(void *me);
 	uint32_t bufferSize;
 	uint32_t *buffer;
+	uint32_t *half;
 	uint32_t *last;
-	uint32_t * volatile running;
-	uint32_t * volatile current;
-	uint32_t * volatile next;
+	uint32_t *volatile running;
+	uint32_t *volatile next;
 
 	uint32_t *cook(const uint32_t *buffer, size_t size);
 

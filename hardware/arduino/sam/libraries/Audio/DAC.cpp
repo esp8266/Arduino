@@ -85,11 +85,7 @@ void DACClass::end() {
 }
 
 bool DACClass::canQueue() {
-	if ((dac->DACC_TCR == 0) && (dac->DACC_TNCR == 0))
-		return true;
-	if (dac->DACC_TNCR == 0)
-		return true;
-	return false;
+	return (dac->DACC_TNCR == 0);
 }
 
 size_t DACClass::queueBuffer(const uint32_t *buffer, size_t size) {
@@ -117,10 +113,6 @@ size_t DACClass::queueBuffer(const uint32_t *buffer, size_t size) {
 	return 0;
 }
 
-uint32_t *DACClass::getCurrentQueuePointer() {
-	return reinterpret_cast<uint32_t *>(dac->DACC_TPR);
-}
-
 void DACClass::setOnTransmitEnd_CB(OnTransmitEnd_CB _cb, void *_data) {
 	cb = _cb;
 	cbData = _data;
@@ -130,12 +122,12 @@ void DACClass::setOnTransmitEnd_CB(OnTransmitEnd_CB _cb, void *_data) {
 
 void DACClass::onService() {
 	uint32_t sr = dac->DACC_ISR;
-//	if (sr & DACC_ISR_ENDTX) {
+	if (sr & DACC_ISR_ENDTX) {
 		// There is a free slot, enqueue data
 		dacc_disable_interrupt(dac, DACC_IDR_ENDTX);
 		if (cb)
 			cb(cbData);
-//	}
+	}
 }
 
 DACClass DAC(DACC_INTERFACE, DACC_INTERFACE_ID, DACC_ISR_ID);
