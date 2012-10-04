@@ -109,7 +109,7 @@ public class Base {
   Editor activeEditor;
 
 
-  static public void main(String args[]) {
+  static public void main(String args[]) throws Exception {
     try {
       File versionFile = getContentFile("lib/version.txt");
       if (versionFile.exists()) {
@@ -240,7 +240,7 @@ public class Base {
   }
 
 
-  public Base(String[] args) {
+  public Base(String[] args) throws Exception {
     platform.init(this);
 
     // Get the sketchbook path, and make sure it's set properly
@@ -276,11 +276,28 @@ public class Base {
     // Setup board-dependent variables.
     onBoardOrPortChange();
 
-    // Check if there were previously opened sketches to be restored
-    boolean opened = restoreSketches();
-
+    boolean opened = false;
+    boolean doUpload = false;
+    String selectBoard = null;
+    String selectPort = null;
     // Check if any files were passed in on the command line
     for (int i = 0; i < args.length; i++) {
+      if (args[i].equals("--upload")) {
+        doUpload = true;
+        continue;
+      }
+      if (args[i].equals("--board")) {
+        i++;
+        if (i < args.length)
+          selectBoard = args[i];
+        continue;
+      }
+      if (args[i].equals("--port")) {
+        i++;
+        if (i < args.length)
+          selectPort = args[i];
+        continue;
+      }
       String path = args[i];
       // Fix a problem with systems that use a non-ASCII languages. Paths are
       // being passed in with 8.3 syntax, which makes the sketch loader code
@@ -298,6 +315,23 @@ public class Base {
         opened = true;
       }
     }
+
+    if (doUpload) {
+      if (!opened)
+        throw new Exception(_("Can't open source sketch!"));
+      Thread.sleep(2000);
+      Editor editor = editors.get(0);
+      if (selectPort != null)
+        editor.selectSerialPort(selectPort);
+      if (selectBoard != null)
+        selectBoard(selectBoard);
+      editor.exportHandler.run();
+      System.exit(0);
+    }
+
+    // Check if there were previously opened sketches to be restored
+    if (restoreSketches())
+      opened = true;
 
     // Create a new empty window (will be replaced with any files to be opened)
     if (!opened) {
@@ -1131,19 +1165,10 @@ public class Base {
           @SuppressWarnings("serial")
           AbstractAction action = new AbstractAction(boardName) {
             public void actionPerformed(ActionEvent actionevent) {
-              Preferences.set("target_package", (String) getValue("package"));
-              Preferences.set("target_platform", (String) getValue("platform"));
-              Preferences.set("board", (String) getValue("board"));
-              
-              onBoardOrPortChange();
-              Sketch.buildSettingChanged();
-              rebuildImportMenu(Editor.importMenu);
-              rebuildExamplesMenu(Editor.examplesMenu);
+              selectBoard((String) getValue("b"));
             }
           };
-          action.putValue("package", packageName);
-          action.putValue("platform", platformName);
-          action.putValue("board", board);
+          action.putValue("b", packageName + ":" + platformName + ":" + board);
           JMenuItem item = new JRadioButtonMenuItem(action);
           if (packageName.equals(selPackage) &&
               platformName.equals(selPlatform) && board.equals(selBoard)) {
@@ -1155,7 +1180,20 @@ public class Base {
       }
     }
   }
-  
+
+
+  private void selectBoard(String selectBoard) {
+    String[] split = selectBoard.split(":");
+    Preferences.set("target_package", split[0]);
+    Preferences.set("target_platform", split[1]);
+    Preferences.set("board", split[2]);
+    onBoardOrPortChange();
+    Sketch.buildSettingChanged();
+    rebuildImportMenu(Editor.importMenu);
+    rebuildExamplesMenu(Editor.examplesMenu);
+  }
+
+
   public void rebuildProgrammerMenu(JMenu menu) {
     menu.removeAll();
     ButtonGroup group = new ButtonGroup();
