@@ -156,8 +156,8 @@ static const uint8_t A8  = 62;
 static const uint8_t A9  = 63;
 static const uint8_t A10 = 64;
 static const uint8_t A11 = 65;
-static const uint8_t DA0 = 66;
-static const uint8_t DA1 = 67;
+static const uint8_t DAC0 = 66;
+static const uint8_t DAC1 = 67;
 static const uint8_t CANRX0 = 68;
 static const uint8_t CANTX0 = 69;
 #define ADC_RESOLUTION		12

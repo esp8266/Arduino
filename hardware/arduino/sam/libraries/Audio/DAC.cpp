@@ -60,14 +60,14 @@ void DACClass::begin(uint32_t period) {
 	dacc_set_trigger(dac, 2);
 
 	// Configure pins
-	PIO_Configure(g_APinDescription[DA0].pPort,
-			g_APinDescription[DA0].ulPinType,
-			g_APinDescription[DA0].ulPin,
-			g_APinDescription[DA0].ulPinConfiguration);
-	PIO_Configure(g_APinDescription[DA1].pPort,
-			g_APinDescription[DA1].ulPinType,
-			g_APinDescription[DA1].ulPin,
-			g_APinDescription[DA1].ulPinConfiguration);
+	PIO_Configure(g_APinDescription[DAC0].pPort,
+			g_APinDescription[DAC0].ulPinType,
+			g_APinDescription[DAC0].ulPin,
+			g_APinDescription[DAC0].ulPinConfiguration);
+	PIO_Configure(g_APinDescription[DAC1].pPort,
+			g_APinDescription[DAC1].ulPinType,
+			g_APinDescription[DAC1].ulPin,
+			g_APinDescription[DAC1].ulPinConfiguration);
 
 	// Enable interrupt controller for DAC
 	dacc_disable_interrupt(dac, 0xFFFFFFFF);
