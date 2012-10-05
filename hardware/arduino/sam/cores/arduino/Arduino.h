@@ -108,8 +108,8 @@ typedef enum _EAnalogChannel
   ADC13,
   ADC14,
   ADC15,
-  DAC0,
-  DAC1
+  DA0,
+  DA1
 } EAnalogChannel ;
 
 #define ADC_CHANNEL_NUMBER_NONE 0xffffffff

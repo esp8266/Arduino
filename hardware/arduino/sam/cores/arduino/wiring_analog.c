@@ -204,8 +204,8 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 
 	if ((attr & PIN_ATTR_ANALOG) == PIN_ATTR_ANALOG) {
 		EAnalogChannel channel = g_APinDescription[ulPin].ulADCChannelNumber;
-		if (channel == DAC0 || channel == DAC1) {
-			uint32_t chDACC = ((channel == DAC0) ? 0 : 1);
+		if (channel == DA0 || channel == DA1) {
+			uint32_t chDACC = ((channel == DA0) ? 0 : 1);
 			if ((dacc_get_channel_status(DACC_INTERFACE) & (1 << chDACC)) == 0) {
 				/* Enable clock for DACC_INTERFACE */
 				pmc_enable_periph_clk(DACC_INTERFACE_ID);
