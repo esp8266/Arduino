@@ -1,3 +1,12 @@
+/*
+ Mouse Controller HID Example
+ 
+ Shows the output of a USB Mouse connected to the USB
+ controller of an Arduino Due Board.
+ 
+ created 8 Oct 2012
+ by Cristian Maglie
+ */
 
 // Require mouse control library
 #include <MouseController.h>

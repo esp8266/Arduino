@@ -27,8 +27,6 @@ enum MouseButton {
 	RIGHT_BUTTON  = 0x04
 };
 
-extern MouseButton mouseButton;
-
 class MouseController : public MouseReportParser
 {
 public:
