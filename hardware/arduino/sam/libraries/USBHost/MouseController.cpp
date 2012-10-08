@@ -28,69 +28,56 @@ void mouseMoved()    __attribute__ ((weak, alias("__mouseControllerEmptyCallback
 void mousePressed()  __attribute__ ((weak, alias("__mouseControllerEmptyCallback")));
 void mouseReleased() __attribute__ ((weak, alias("__mouseControllerEmptyCallback")));
 
-int mouseX = 0;
-int mouseY = 0;
-MouseButton mouseButton;
-bool mouseButtonPressed = false;
+int MouseController::getXChange() {
+	int r = dx;
+	dx = 0;
+	return r;
+}
+
+int MouseController::getYChange() {
+	int r = dy;
+	dy = 0;
+	return r;
+}
 
 void MouseController::OnMouseMove(MOUSEINFO *mi) {
-	mouseX += mi->dX;
-	mouseY += mi->dY;
-	if (mouseX < 0)
-		mouseX = 0;
-	if (mouseX > maxX)
-		mouseX = maxX;
-	if (mouseY < 0)
-		mouseY = 0;
-	if (mouseY > maxY)
-		mouseY = maxY;
-	if (mouseButtonPressed)
+	dx += mi->dX;
+	dy += mi->dY;
+	if (buttons != 0)
 		mouseDragged();
 	else
 		mouseMoved();
 }
 
 void MouseController::OnLeftButtonUp(MOUSEINFO *mi) {
-	buttons--;
-	mouseButtonPressed = (buttons > 0);
-	mouseButton = LEFT_BUTTON;
+	buttons &= ~LEFT_BUTTON;
 	mouseReleased();
 	mouseClicked();
 }
 
 void MouseController::OnLeftButtonDown(MOUSEINFO *mi) {
-	buttons++;
-	mouseButtonPressed = (buttons > 0);
-	mouseButton = LEFT_BUTTON;
+	buttons |= LEFT_BUTTON;
 	mousePressed();
 }
 
 void MouseController::OnMiddleButtonUp(MOUSEINFO *mi) {
-	buttons--;
-	mouseButtonPressed = (buttons > 0);
-	mouseButton = MIDDLE_BUTTON;
+	buttons &= ~MIDDLE_BUTTON;
 	mouseReleased();
 	mouseClicked();
 }
 
 void MouseController::OnMiddleButtonDown(MOUSEINFO *mi) {
-	buttons++;
-	mouseButtonPressed = (buttons > 0);
-	mouseButton = MIDDLE_BUTTON;
+	buttons |= MIDDLE_BUTTON;
 	mousePressed();
 }
 
 void MouseController::OnRightButtonUp(MOUSEINFO *mi) {
-	buttons--;
-	mouseButtonPressed = (buttons > 0);
-	mouseButton = RIGHT_BUTTON;
+	buttons &= ~RIGHT_BUTTON;
 	mouseReleased();
 	mouseClicked();
 }
 
 void MouseController::OnRightButtonDown(MOUSEINFO *mi) {
-	buttons++;
-	mouseButtonPressed = (buttons > 0);
-	mouseButton = RIGHT_BUTTON;
+	buttons |= RIGHT_BUTTON;
 	mousePressed();
 }

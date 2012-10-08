@@ -10,36 +10,48 @@ MouseController mouse(usb);
 
 // This function intercepts mouse movements
 void mouseMoved() {
-  Serial1.print("Moving mouse: ");
-  Serial1.print(mouseX);
-  Serial1.print(", ");
-  Serial1.println(mouseY);
+  Serial.print("Move: ");
+  Serial.print(mouse.getXChange());
+  Serial.print(", ");
+  Serial.println(mouse.getYChange());
 }
 
 // This function intercepts mouse movements when a button is pressed
 void mouseDragged() {
-  Serial1.print("DRAG: ");
-  Serial1.print(mouseX);
-  Serial1.print(", ");
-  Serial1.println(mouseY);
+  Serial.print("DRAG: ");
+  Serial.print(mouse.getXChange());
+  Serial.print(", ");
+  Serial.println(mouse.getYChange());
 }
 
 // This function intercepts mouse button press
 void mousePressed() {
-  Serial1.print("Pressed: ");
-  Serial1.println(mouseButton);
+  Serial.print("Pressed: ");
+  if (mouse.getButton(LEFT_BUTTON))
+    Serial.print("L");
+  if (mouse.getButton(MIDDLE_BUTTON))
+    Serial.print("M");
+  if (mouse.getButton(RIGHT_BUTTON))
+    Serial.print("R");
+  Serial.println();
 }
 
 // This function intercepts mouse button release
 void mouseReleased() {
-  Serial1.print("Released: ");
-  Serial1.println(mouseButton);
+  Serial.print("Released: ");
+  if (mouse.getButton(LEFT_BUTTON))
+    Serial.print("L");
+  if (mouse.getButton(MIDDLE_BUTTON))
+    Serial.print("M");
+  if (mouse.getButton(RIGHT_BUTTON))
+    Serial.print("R");
+  Serial.println();
 }
 
 void setup()
 {
-  Serial1.begin(115200);
-  Serial1.println("Program started");
+  Serial.begin(115200);
+  Serial.println("Program started");
   delay(200);
 }
 
@@ -48,4 +60,3 @@ void loop()
   // Process USB tasks
   usb.Task();
 }
-

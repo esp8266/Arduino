@@ -22,25 +22,24 @@
 #include <hidboot.h>
 
 enum MouseButton {
-	LEFT_BUTTON,
-	MIDDLE_BUTTON,
-	RIGHT_BUTTON
+	LEFT_BUTTON   = 0x01,
+	MIDDLE_BUTTON = 0x02,
+	RIGHT_BUTTON  = 0x04
 };
 
-extern int mouseX;
-extern int mouseY;
 extern MouseButton mouseButton;
-extern bool mouseButtonPressed;
 
 class MouseController : public MouseReportParser
 {
 public:
-  MouseController(USBHost &usb) : hostMouse(&usb), maxX(640), maxY(480), buttons(0) {
+  MouseController(USBHost &usb) : hostMouse(&usb), dx(0), dy(0), buttons(0) {
     hostMouse.SetReportParser(0, this);
   };
 
-  void setMaxX(int mx) { maxX = mx; };
-  void setMaxY(int my) { maxY = my; };
+  bool getButton(MouseButton button) { return (buttons & button) == button; };
+  int getXChange();
+  int getYChange();
+  // int getWheelChange(); // Not implemented
 
 protected:
   virtual void OnMouseMove(MOUSEINFO *mi);
@@ -53,8 +52,7 @@ protected:
 
 private:
   HIDBoot<HID_PROTOCOL_MOUSE> hostMouse;
-  int maxX;
-  int maxY;
+  int dx, dy;
   int buttons;
 };
 
