@@ -2,7 +2,7 @@
 # SAM3 compile variables
 # --------------------- 
 
-name=Atmel SAM3
+name=Arduino ARM (32-bits) Boards
 compiler.path={runtime.ide.path}/hardware/tools/g++_arm_none_eabi/bin/
 #compiler.path=C:/arm-none-eabi-gcc-4_6/bin/
 compiler.c.cmd=arm-none-eabi-gcc

@@ -1113,7 +1113,10 @@ public class Base {
     String selBoard = Preferences.get("board");
 
     menu.removeAll();
+    boolean first = true;
+    
     ButtonGroup group = new ButtonGroup();
+    
     // Cycle through all packages
     for (TargetPackage targetPackage : packages.values()) {
       String packageName = targetPackage.getName();
@@ -1123,8 +1126,16 @@ public class Base {
         String platformName = targetPlatform.getName();
         Map<String, PreferencesMap> boards = targetPlatform.getBoards();
         
-        // For every platform cycle throug all boards
-        for (String board : boards.keySet()) {
+        // Add a title for each group of boards
+        if (!first)
+          menu.add(new JSeparator());
+        first = false;
+        JMenuItem separator = new JMenuItem(targetPlatform.getPreferences().get("name"));
+        separator.setEnabled(false);
+        menu.add(separator);
+        
+        // For every platform cycle through all boards
+        for (String board : targetPlatform.getOrderedBoards()) {
           
           // Setup a menu item for the current board
           String boardName = boards.get(board).get("name");
