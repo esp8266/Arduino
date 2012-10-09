@@ -80,7 +80,7 @@ extern void digitalWrite( uint32_t ulPin, uint32_t ulVal )
 
   if ( PIO_GetOutputDataStatus( g_APinDescription[ulPin].pPort, g_APinDescription[ulPin].ulPin ) == 0 )
   {
-    PIO_PullUp( g_APinDescription[ulPin].pPort, g_APinDescription[ulPin].ulPin, 1 ) ;
+    PIO_PullUp( g_APinDescription[ulPin].pPort, g_APinDescription[ulPin].ulPin, ulVal ) ;
   }
   else
   {

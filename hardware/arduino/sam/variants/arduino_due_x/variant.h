@@ -62,7 +62,7 @@ extern "C"{
  *----------------------------------------------------------------------------*/
 
 // Number of pins defined in PinDescription array
-#define PINS_COUNT           (88u)
+#define PINS_COUNT           (79u)
 
 // LEDs
 #define PIN_LED_13           (13u)
@@ -158,8 +158,8 @@ static const uint8_t A10 = 64;
 static const uint8_t A11 = 65;
 static const uint8_t DAC0 = 66;
 static const uint8_t DAC1 = 67;
-static const uint8_t CANRX0 = 68;
-static const uint8_t CANTX0 = 69;
+static const uint8_t CANRX = 68;
+static const uint8_t CANTX = 69;
 #define ADC_RESOLUTION		12
 
 /*

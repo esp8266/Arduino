@@ -19,105 +19,96 @@
 #include "variant.h"
 
 /*
- * DUE Board pin   |  PORT
- * ----------------+--------
- *   0   RX0       |  PA8
- *   1   TX0       |  PA9
- *   2       TIOA0 |  PB25
- *   3       TIOA7 |  PC28
- *   4       NPCS1 |  PA29
- *           TIOB6 |  PC26
- *   5       TIOA6 |  PC25
- *   6       PWML7 |  PC24
- *   7       PWML6 |  PC23
- *   8       PWML5 |  PC22
- *   9       PWML4 |  PC21
- *  10       NPCS0 |  PA28
- *           TIOB7 |  PC29
- *  11       TIOA8 |  PD7
- *  12       TIOB8 |  PD8
- *  13       TIOB0 |  PB27
- *  14   TX3 TXD3  |  PD4
- *  15   RX3 RXD3  |  PD5
- *  16   TX2 TXD1  |  PA13
- *  17   RX2 RXD1  |  PA12
- *  18   TX1 TXD0  |  PA11
- *  19   RX1 RXD0  |  PA10
- *  20   SDA       |  PB12 (this pin is level adapted to 5V)
- *  21   SCL       |  PB13 (this pin is level adapted to 5V)
- *  22             |  PB26
- *  23             |  PA14
- *  24             |  PA15
- *  25             |  PD0
- *  26             |  PD1
- *  27             |  PD2
- *  28             |  PD3
- *  29             |  PD6
- *  30             |  PD9
- *  31             |  PA7
- *  32             |  PD10
- *  33             |  PC1
- *  34             |  PC2
- *  35             |  PC3
- *  36             |  PC4
- *  37             |  PC5
- *  38             |  PC6
- *  39             |  PC7
- *  40             |  PC8
- *  41             |  PC9
- *  42             |  PA19
- *  43             |  PA20
- *  44             |  PC19
- *  45             |  PC18
- *  46             |  PC17
- *  47             |  PC16
- *  48             |  PC15
- *  49             |  PC14
- *  50             |  PC13
- *  51             |  PC12
- *  52       NPCS2 |  PB21
- *  53             |  PB14
- *  A0             |  PA16
- *  A1             |  PA24
- *  A2             |  PA23
- *  A3             |  PA22
- *  A4       TIOB2 |  PA6
- *  A5             |  PA4
- *  A6       TIOB1 |  PA3
- *  A7       TIOA1 |  PA2
- *  A8             |  PB17
- *  A9             |  PB18
- * A10             |  PB19
- * A11             |  PB20
- * A12             |  PB15
- * A13             |  PB16
- * A14             |  PA1
- * A15             |  PA0
- *      SDA1       |  PA17
- *      SCL1       |  PA18
- *
- *
- * AT45DB021 pin   |  PORT
- * ----------------+--------
- *  SO             |  PA25
- *  SI             |  PA26
- *  SCK            |  PA27
- *  #CS      NPCS3 |  PB23
- *
+ * DUE Board pin   |  PORT  | Label
+ * ----------------+--------+-------
+ *   0             |  PA8   | "RX0"
+ *   1             |  PA9   | "TX0"
+ *   2       TIOA0 |  PB25  |
+ *   3       TIOA7 |  PC28  |
+ *   4       NPCS1 |  PA29  |
+ *           TIOB6 |  PC26  |
+ *   5       TIOA6 |  PC25  |
+ *   6       PWML7 |  PC24  |
+ *   7       PWML6 |  PC23  |
+ *   8       PWML5 |  PC22  |
+ *   9       PWML4 |  PC21  |
+ *  10       NPCS0 |  PA28  |
+ *           TIOB7 |  PC29  |
+ *  11       TIOA8 |  PD7   |
+ *  12       TIOB8 |  PD8   |
+ *  13       TIOB0 |  PB27  | LED AMBER "L"
+ *  14       TXD3  |  PD4   | "TX3"
+ *  15       RXD3  |  PD5   | "RX3"
+ *  16       TXD1  |  PA13  | "TX2"
+ *  17       RXD1  |  PA12  | "RX2"
+ *  18       TXD0  |  PA11  | "TX1"
+ *  19       RXD0  |  PA10  | "RX1"
+ *  20             |  PB12  | "SDA"
+ *  21             |  PB13  | "SCL"
+ *  22             |  PB26  |
+ *  23             |  PA14  |
+ *  24             |  PA15  |
+ *  25             |  PD0   |
+ *  26             |  PD1   |
+ *  27             |  PD2   |
+ *  28             |  PD3   |
+ *  29             |  PD6   |
+ *  30             |  PD9   |
+ *  31             |  PA7   |
+ *  32             |  PD10  |
+ *  33             |  PC1   |
+ *  34             |  PC2   |
+ *  35             |  PC3   |
+ *  36             |  PC4   |
+ *  37             |  PC5   |
+ *  38             |  PC6   |
+ *  39             |  PC7   |
+ *  40             |  PC8   |
+ *  41             |  PC9   |
+ *  42             |  PA19  |
+ *  43             |  PA20  |
+ *  44             |  PC19  |
+ *  45             |  PC18  |
+ *  46             |  PC17  |
+ *  47             |  PC16  |
+ *  48             |  PC15  |
+ *  49             |  PC14  |
+ *  50             |  PC13  |
+ *  51             |  PC12  |
+ *  52       NPCS2 |  PB21  |
+ *  53             |  PB14  |
+ *  54             |  PA16  | "A0"
+ *  55             |  PA24  | "A1"
+ *  56             |  PA23  | "A2"
+ *  57             |  PA22  | "A3"
+ *  58       TIOB2 |  PA6   | "A4"
+ *  69             |  PA4   | "A5"
+ *  60       TIOB1 |  PA3   | "A6"
+ *  61       TIOA1 |  PA2   | "A7"
+ *  62             |  PB17  | "A8"
+ *  63             |  PB18  | "A9"
+ *  64             |  PB19  | "A10"
+ *  65             |  PB20  | "A11"
+ *  66             |  PB15  | "DAC0"
+ *  67             |  PB16  | "DAC1"
+ *  68             |  PA1   | "CANRX"
+ *  69             |  PA0   | "CANTX"
+ *  70             |  PA17  | "SDA1"
+ *  71             |  PA18  | "SCL1"
+ *  72             |  PC30  | LED AMBER "RX"
+ *  73             |  PA21  | LED AMBER "TX"
+ *  74       MISO  |  PA25  |
+ *  75       MOSI  |  PA26  |
+ *  76       SCLK  |  PA27  |
+ *  77       NPCS0 |  PA28  |
+ *  78       NPCS3 |  PB23  | unconnected!
  *
  * USB pin         |  PORT
  * ----------------+--------
  *  ID             |  PB11
  *  VBOF           |  PB10
  *
- *
- * LEDs            |  PORT
- * ----------------+--------
- * "TX"            |  PA21
- * "RX"            |  PC30
- * "L"             |  PB27
  */
-
 
 #ifdef __cplusplus
 extern "C" {
@@ -256,7 +247,7 @@ extern const PinDescription g_APinDescription[]=
   // 77 - SPI CS0
   { PIOA, PIO_PA28A_SPI0_NPCS0,ID_PIOA,PIO_PERIPH_A,PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // NPCS0
 
-  // 78 - SPI CS3 (chip select for onboard AT45DB021)
+  // 78 - SPI CS3 (unconnected)
   { PIOB, PIO_PB23B_SPI0_NPCS3,ID_PIOB,PIO_PERIPH_B,PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // NPCS3
 
   // 79 .. 84 - "All pins" masks
@@ -356,6 +347,10 @@ void init( void )
 
   // Initialize C library
   __libc_init_array();
+
+  // Disable pull-up on every pin
+  for (int i = 0; i < PINS_COUNT; i++)
+	  digitalWrite(i, LOW);
 
   // Initialize Serial port UART, common to all SAM3 variants
   PIO_Configure(
