@@ -45,6 +45,7 @@ public class TargetPlatform {
     name = _name;
     folder = _folder;
     boards = new HashMap<String, PreferencesMap>();
+    boardsOrder = new ArrayList<String>();
     programmers = new HashMap<String, PreferencesMap>();
     preferences = new PreferencesMap();
 
