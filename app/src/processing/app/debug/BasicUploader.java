@@ -91,7 +91,7 @@ public class BasicUploader extends Uploader  {
           
           uploadPort = waitForUploadPort(uploadPort, before);
         } else {
-          Thread.sleep(1000);
+          Thread.sleep(400);
         }
       } catch (SerialException e) {
         throw new RunnerException(e.getMessage());
