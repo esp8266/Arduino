@@ -122,7 +122,7 @@ void yield(void) {
 	coopDoYield(cur);
 }
 
-void sleep(uint32_t ms) {
+void wait(uint32_t ms) {
 	uint32_t start = millis();
 	while (millis() - start < ms)
 		yield();

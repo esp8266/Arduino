@@ -23,7 +23,7 @@ extern "C" {
 	typedef void (*SchedulerTask)(void);
 	typedef void (*SchedulerParametricTask)(void *);
 
-	void sleep(uint32_t ms);
+	void wait(uint32_t ms);
 	void yield();
 }
 
@@ -34,7 +34,7 @@ public:
 	static void start(SchedulerTask task, uint32_t stackSize = 1024);
 	static void start(SchedulerParametricTask task, void *data, uint32_t stackSize = 1024);
 
-	static void sleep(uint32_t ms) { ::sleep(ms); };
+	static void wait(uint32_t ms) { ::wait(ms); };
 	static void yield() { ::yield(); };
 };
 
