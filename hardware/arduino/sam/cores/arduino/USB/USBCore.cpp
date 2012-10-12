@@ -64,7 +64,7 @@ const uint16_t STRING_IPRODUCT[17] = {
 #elif USB_PID == USB_PID_MICRO
 	'A','r','d','u','i','n','o',' ','M','i','c','r','o',' ',' ',' '
 #elif USB_PID == USB_PID_DUE
-	'A','r','d','u','i','n','o',' ','D','u','e',' ',' ',' ',' ','X'
+	'A','r','d','u','i','n','o',' ','D','u','e',' ',' ',' ',' ',' '
 #else
 #error "Need an USB PID"
 #endif
