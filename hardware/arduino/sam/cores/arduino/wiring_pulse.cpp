@@ -54,8 +54,8 @@ extern uint32_t pulseIn( uint32_t pin, uint32_t state, uint32_t timeout )
 	}
 
 	// convert the reading to microseconds. The loop has been determined
-	// to be 22 clock cycles long and have about 16 clocks between the edge
+	// to be 52 clock cycles long and have about 16 clocks between the edge
 	// and the start of the loop. There will be some error introduced by
 	// the interrupt handlers.
-	return clockCyclesToMicroseconds(width * 22 + 16);
+	return clockCyclesToMicroseconds(width * 52 + 16);
 }
