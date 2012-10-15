@@ -97,6 +97,7 @@ public class Editor extends JFrame implements RunnerListener {
   // actually used are determined by the preferences, which are shared)
   static JMenu boardsMenu;
   static JMenu serialMenu;
+  static JMenu cpuTypeMenu;
 
   static SerialMenuListener serialMenuListener;
   static SerialMonitor serialMonitor;
@@ -179,7 +180,8 @@ public class Editor extends JFrame implements RunnerListener {
           fileMenu.insert(examplesMenu, 3);
           sketchMenu.insert(importMenu, 4);
           toolsMenu.insert(boardsMenu, numTools);
-          toolsMenu.insert(serialMenu, numTools + 1);
+          toolsMenu.insert(cpuTypeMenu, numTools + 1);
+          toolsMenu.insert(serialMenu, numTools + 2);
         }
 
         // added for 1.0.5
@@ -190,6 +192,7 @@ public class Editor extends JFrame implements RunnerListener {
           fileMenu.remove(examplesMenu);
           sketchMenu.remove(importMenu);
           toolsMenu.remove(boardsMenu);
+          toolsMenu.remove(cpuTypeMenu);
           toolsMenu.remove(serialMenu);
         }
       });
@@ -680,12 +683,14 @@ public class Editor extends JFrame implements RunnerListener {
     
     if (boardsMenu == null) {
       boardsMenu = new JMenu(_("Board"));
-      base.rebuildBoardsMenu(boardsMenu);
+      cpuTypeMenu = new JMenu(_("CPUType"));
+      base.rebuildBoardsMenu(boardsMenu, cpuTypeMenu);
       //Debug: rebuild imports
       importMenu.removeAll();
       base.rebuildImportMenu(importMenu);
     }
     menu.add(boardsMenu);
+    menu.add(cpuTypeMenu);
     
     if (serialMenuListener == null)
       serialMenuListener  = new SerialMenuListener();

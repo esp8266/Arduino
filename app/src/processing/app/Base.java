@@ -1107,15 +1107,17 @@ public class Base {
   }
 
   
-  public void rebuildBoardsMenu(JMenu menu) {
+  public void rebuildBoardsMenu(JMenu boardsMenu, final JMenu cpuTypeMenu) {
     String selPackage = Preferences.get("target_package");
     String selPlatform = Preferences.get("target_platform");
     String selBoard = Preferences.get("board");
-
-    menu.removeAll();
+    String selBoardContainer = Preferences.get("board_container");
+    
+    boardsMenu.removeAll();
     boolean first = true;
     
-    ButtonGroup group = new ButtonGroup();
+    ButtonGroup boardsButtonGroup = new ButtonGroup();
+    ButtonGroup cpuTypesButtonGroup = new ButtonGroup();
     
     // Cycle through all packages
     for (TargetPackage targetPackage : packages.values()) {
@@ -1128,43 +1130,162 @@ public class Base {
         
         // Add a title for each group of boards
         if (!first)
-          menu.add(new JSeparator());
-        first = false;
+          boardsMenu.add(new JSeparator());
+          first = false;
         JMenuItem separator = new JMenuItem(targetPlatform.getPreferences().get("name"));
         separator.setEnabled(false);
-        menu.add(separator);
+        boardsMenu.add(separator);
         
         // For every platform cycle through all boards
-        for (String board : targetPlatform.getOrderedBoards()) {
+        for (String boardID : targetPlatform.getOrderedBoards()) {
           
-          // Setup a menu item for the current board
-          String boardName = boards.get(board).get("name");
+          PreferencesMap boardAttributes = boards.get(boardID);
+          final String boardContainer = boardAttributes.get("container");
+
+          AbstractAction filterCPUTypeMenuAction = new AbstractAction() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+              Preferences.set("board_container", (String) getValue("board_container"));
+              
+              cpuTypeMenu.setEnabled(true);
+              
+              for (int i = 0; i < cpuTypeMenu.getItemCount(); i++) {
+                JMenuItem cpuTypeMenuItem = cpuTypeMenu.getItem(i);
+                boolean visible = boardContainer.equals(cpuTypeMenuItem.getAction().getValue("board_container"));
+                cpuTypeMenuItem.setVisible(visible);
+              }
+
+              JMenuItem selectSelectedOrFirstVisibleMenuItem = selectVisibleSelectedOrFirstMenuItem(cpuTypeMenu);
+              selectSelectedOrFirstVisibleMenuItem.doClick();
+            }
+          };
+          filterCPUTypeMenuAction.putValue("board_container", boardContainer);
+          
           @SuppressWarnings("serial")
-          AbstractAction action = new AbstractAction(boardName) {
+          final AbstractAction selectBoardAction = new AbstractAction(boardAttributes.get("cpu")) {
             public void actionPerformed(ActionEvent actionevent) {
               Preferences.set("target_package", (String) getValue("package"));
               Preferences.set("target_platform", (String) getValue("platform"));
               Preferences.set("board", (String) getValue("board"));
-              
+
               onBoardOrPortChange();
               Sketch.buildSettingChanged();
               rebuildImportMenu(Editor.importMenu);
               rebuildExamplesMenu(Editor.examplesMenu);
             }
           };
-          action.putValue("package", packageName);
-          action.putValue("platform", platformName);
-          action.putValue("board", board);
-          JMenuItem item = new JRadioButtonMenuItem(action);
-          if (packageName.equals(selPackage) &&
-              platformName.equals(selPlatform) && board.equals(selBoard)) {
-            item.setSelected(true);
+          selectBoardAction.putValue("package", packageName);
+          selectBoardAction.putValue("platform", platformName);
+          selectBoardAction.putValue("board", boardID);
+          selectBoardAction.putValue("board_container", boardContainer);
+          
+          if (boardContainer != null) {
+            findOrCreateBoardContainerMenu(boardsMenu, boardsButtonGroup, boardContainer, filterCPUTypeMenuAction);
+
+            JMenuItem item = new JRadioButtonMenuItem(selectBoardAction);
+            cpuTypesButtonGroup.add(item);
+            cpuTypeMenu.add(item);
+          } else {
+            AbstractAction selectBoardWithoutContainerAction = new AbstractAction(boardAttributes.get("name")) {
+              
+              @Override
+              public void actionPerformed(ActionEvent e) {
+                cpuTypeMenu.setEnabled(false);
+                selectBoardAction.actionPerformed(e);
+              }
+            };
+            JMenuItem item = new JRadioButtonMenuItem(selectBoardWithoutContainerAction);
+            boardsButtonGroup.add(item);
+            boardsMenu.add(item);
           }
-          group.add(item);
-          menu.add(item);
         }
       }
     }
+    
+    JMenuItem selectedBoardMenu;
+    if (selBoardContainer == null) {
+      selectedBoardMenu = selectFirstEnabledMenuItem(boardsMenu);
+    } else {
+      selectedBoardMenu = selectMenuItemByBoardContainer(boardsMenu, selBoardContainer);
+    }
+    selectedBoardMenu.doClick();
+
+    if (cpuTypeMenu.isEnabled()) {
+      JMenuItem selectedCPUTypeMenu;
+      if (selBoard == null) {
+        selectedCPUTypeMenu = selectFirstEnabledMenuItem(cpuTypeMenu);
+      } else {
+        selectedCPUTypeMenu = selectMenuItemByBoardPackagePlatform(cpuTypeMenu, selBoard, selPackage, selPlatform);
+      }
+      selectedCPUTypeMenu.doClick();
+    }
+  }
+  
+  private static JMenuItem selectVisibleSelectedOrFirstMenuItem(JMenu menu) {
+    JMenuItem firstVisible = null;
+    for (int i = 0; i < menu.getItemCount(); i++) {
+      JMenuItem item = menu.getItem(i);
+      if (item != null && item.isVisible()) {
+        if (item.isSelected()) {
+          return item;
+        }
+        if (firstVisible == null) {
+          firstVisible = item;
+        }
+      }
+    }
+    
+    if (firstVisible != null) {
+      return firstVisible;
+    }
+    
+    throw new IllegalStateException("Menu has no enabled items");
+  }
+  
+  private static JMenuItem selectFirstEnabledMenuItem(JMenu menu) {
+    for (int i = 0; i < menu.getItemCount(); i++) {
+      JMenuItem item = menu.getItem(i);
+      if (item != null && item.isEnabled()) {
+        return item;
+      }
+    }
+    throw new IllegalStateException("Menu has no enabled items");
+  }
+  
+  private static JMenuItem selectMenuItemByBoardContainer(JMenu menu, String boardContainer) {
+    for (int i = 0; i < menu.getItemCount(); i++) {
+      JMenuItem item = menu.getItem(i);
+      if (item != null && item.getAction() != null && boardContainer.equals(item.getAction().getValue("board_container"))) {
+        return item;
+      }
+    }
+    return selectFirstEnabledMenuItem(menu);
+  }
+  
+  private static JMenuItem selectMenuItemByBoardPackagePlatform(JMenu menu, String selBoard, String selPackage, String selPlatform) {
+    for (int i = 0; i < menu.getItemCount(); i++) {
+      JMenuItem item = menu.getItem(i);
+      if (item != null && item.getAction() != null && selBoard.equals(item.getAction().getValue("board"))
+          && selPackage.equals(item.getAction().getValue("package")) && selPlatform.equals(item.getAction().getValue("platform"))) {
+        return item;
+      }
+    }
+    return selectFirstEnabledMenuItem(menu);
+  }
+  
+  private JMenuItem findOrCreateBoardContainerMenu(JMenu boardsMenu, ButtonGroup boardsButtonGroup, String boardContainerName, AbstractAction boardMenuAction) {
+    for (int i = 0; i < boardsMenu.getItemCount(); i++ ) {
+      JMenuItem boardContainer = boardsMenu.getItem(i);      
+      if (boardContainer != null && boardContainerName.equals(boardContainer.getText())) {
+        return boardContainer;
+      }
+    }
+    JMenuItem item = new JRadioButtonMenuItem(boardMenuAction);
+    item.setText(boardContainerName);
+    boardsButtonGroup.add(item);
+    boardsMenu.add(item);
+    return item;
   }
   
   public void rebuildProgrammerMenu(JMenu menu) {
