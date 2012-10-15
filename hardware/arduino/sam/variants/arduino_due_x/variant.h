@@ -102,13 +102,13 @@ extern "C"{
 	(x==BOARD_SPI_SS1 ? 1 : \
 	(x==BOARD_SPI_SS2 ? 2 : 3)))
 
-static const uint8_t SS   = BOARD_SPI_SS0 ;
-static const uint8_t SS1  = BOARD_SPI_SS1 ;
-static const uint8_t SS2  = BOARD_SPI_SS2 ;
-static const uint8_t SS3  = BOARD_SPI_SS3 ;
-static const uint8_t MOSI = PIN_SPI_MOSI ;
-static const uint8_t MISO = PIN_SPI_MISO ;
-static const uint8_t SCK  = PIN_SPI_SCK ;
+static const uint8_t SS   = BOARD_SPI_SS0;
+static const uint8_t SS1  = BOARD_SPI_SS1;
+static const uint8_t SS2  = BOARD_SPI_SS2;
+static const uint8_t SS3  = BOARD_SPI_SS3;
+static const uint8_t MOSI = PIN_SPI_MOSI;
+static const uint8_t MISO = PIN_SPI_MISO;
+static const uint8_t SCK  = PIN_SPI_SCK;
 
 /*
  * Wire Interfaces
@@ -130,11 +130,14 @@ static const uint8_t SCK  = PIN_SPI_SCK ;
 /*
  * UART/USART Interfaces
  */
+// Serial
 #define PINS_UART            (81u)
-
+// Serial1
 #define PINS_USART0          (82u)
+// Serial2
 #define PINS_USART1          (83u)
-#define PINS_USART2          (84u)
+// Serial3
+#define PINS_USART3          (84u)
 
 /*
  * USB Interfaces
@@ -201,11 +204,10 @@ static const uint8_t CANTX = 69;
 
 #ifdef __cplusplus
 
-extern UARTClass Serial ;
-
-extern USARTClass Serial2 ;
-extern USARTClass Serial3 ;
-extern USARTClass Serial4 ;
+extern UARTClass Serial;
+extern USARTClass Serial1;
+extern USARTClass Serial2;
+extern USARTClass Serial3;
 
 #endif
 

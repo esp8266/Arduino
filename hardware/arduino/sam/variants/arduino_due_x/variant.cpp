@@ -144,15 +144,15 @@ extern const PinDescription g_APinDescription[]=
   // 13 - AMBER LED
   { PIOB, PIO_PB27B_TIOB0,   ID_PIOB, PIO_PERIPH_B, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_TIMER), NO_ADC, NO_ADC, NOT_ON_PWM,  TC0_CHB0     }, // TIOB0
 
-  // 14/15 - USART2 (Serial4)
+  // 14/15 - USART3 (Serial3)
   { PIOD, PIO_PD4B_TXD3,     ID_PIOD, PIO_PERIPH_B, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // TXD3
   { PIOD, PIO_PD5B_RXD3,     ID_PIOD, PIO_PERIPH_B, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // RXD3
 
-  // 16/17 - USART1 (Serial3)
+  // 16/17 - USART1 (Serial2)
   { PIOA, PIO_PA13A_TXD1,    ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // TXD1
   { PIOA, PIO_PA12A_RXD1,    ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // RXD1
 
-  // 18/19 - USART0 (Serial2)
+  // 18/19 - USART0 (Serial1)
   { PIOA, PIO_PA11A_TXD0,    ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // TXD0
   { PIOA, PIO_PA10A_RXD0,    ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, PIN_ATTR_DIGITAL,                  NO_ADC, NO_ADC, NOT_ON_PWM,  NOT_ON_TIMER }, // RXD0
 
@@ -258,11 +258,11 @@ extern const PinDescription g_APinDescription[]=
   { PIOB, PIO_PB12A_TWD1|PIO_PB13A_TWCK1, ID_PIOB, PIO_PERIPH_A, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_COMBO), NO_ADC, NO_ADC, NOT_ON_PWM, NOT_ON_TIMER },
   // 81 - UART (Serial) all pins
   { PIOA, PIO_PA8A_URXD|PIO_PA9A_UTXD, ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_COMBO), NO_ADC, NO_ADC, NOT_ON_PWM, NOT_ON_TIMER },
-  // 82 - USART0 (Serial2) all pins
+  // 82 - USART0 (Serial1) all pins
   { PIOA, PIO_PA11A_TXD0|PIO_PA10A_RXD0, ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_COMBO), NO_ADC, NO_ADC, NOT_ON_PWM, NOT_ON_TIMER },
-  // 83 - USART1 (Serial3) all pins
+  // 83 - USART1 (Serial2) all pins
   { PIOA, PIO_PA13A_TXD1|PIO_PA12A_RXD1, ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_COMBO), NO_ADC, NO_ADC, NOT_ON_PWM, NOT_ON_TIMER },
-  // 84 - USART3 (Serial4) all pins
+  // 84 - USART3 (Serial3) all pins
   { PIOD, PIO_PD4B_TXD3|PIO_PD5B_RXD3, ID_PIOD, PIO_PERIPH_B, PIO_DEFAULT, (PIN_ATTR_DIGITAL|PIN_ATTR_COMBO), NO_ADC, NO_ADC, NOT_ON_PWM, NOT_ON_TIMER },
 
   // 85 - USB
@@ -285,42 +285,42 @@ extern const PinDescription g_APinDescription[]=
 /*
  * UART objects
  */
-RingBuffer rx_buffer1 ;
+RingBuffer rx_buffer1;
 
-UARTClass Serial( UART, UART_IRQn, ID_UART, &rx_buffer1 ) ;
+UARTClass Serial(UART, UART_IRQn, ID_UART, &rx_buffer1);
 
 // IT handlers
 void UART_Handler(void)
 {
-  Serial.IrqHandler() ;
+  Serial.IrqHandler();
 }
 
 // ----------------------------------------------------------------------------
 /*
  * USART objects
  */
-RingBuffer rx_buffer2 ;
-RingBuffer rx_buffer3 ;
-RingBuffer rx_buffer4 ;
+RingBuffer rx_buffer2;
+RingBuffer rx_buffer3;
+RingBuffer rx_buffer4;
 
-USARTClass Serial2( USART0, USART0_IRQn, ID_USART0, &rx_buffer2 ) ;
-USARTClass Serial3( USART1, USART1_IRQn, ID_USART1, &rx_buffer3 ) ;
-USARTClass Serial4( USART3, USART3_IRQn, ID_USART3, &rx_buffer4 ) ;
+USARTClass Serial1(USART0, USART0_IRQn, ID_USART0, &rx_buffer2);
+USARTClass Serial2(USART1, USART1_IRQn, ID_USART1, &rx_buffer3);
+USARTClass Serial3(USART3, USART3_IRQn, ID_USART3, &rx_buffer4);
 
 // IT handlers
-void USART0_Handler( void )
+void USART0_Handler(void)
 {
-  Serial2.IrqHandler() ;
+  Serial1.IrqHandler();
 }
 
-void USART1_Handler( void )
+void USART1_Handler(void)
 {
-  Serial3.IrqHandler() ;
+  Serial2.IrqHandler();
 }
 
-void USART3_Handler( void )
+void USART3_Handler(void)
 {
-  Serial4.IrqHandler() ;
+  Serial3.IrqHandler();
 }
 
 // ----------------------------------------------------------------------------
@@ -333,17 +333,17 @@ void __libc_init_array(void);
 
 void init( void )
 {
-  SystemInit() ;
+  SystemInit();
 
   // Set Systick to 1ms interval, common to all SAM3 variants
-  if ( SysTick_Config( SystemCoreClock / 1000 ) )
+  if (SysTick_Config(SystemCoreClock / 1000))
   {
     // Capture error
-    while ( 1 ) ;
+    while (true);
   }
 
-  // Disable watchdog, common to all SAM variants
-  WDT_Disable( WDT ) ;
+  // Disable watchdog
+  WDT_Disable(WDT);
 
   // Initialize C library
   __libc_init_array();
@@ -352,16 +352,12 @@ void init( void )
   for (int i = 0; i < PINS_COUNT; i++)
 	  digitalWrite(i, LOW);
 
-  // Initialize Serial port UART, common to all SAM3 variants
+  // Initialize Serial port U(S)ART pins
   PIO_Configure(
     g_APinDescription[PINS_UART].pPort,
     g_APinDescription[PINS_UART].ulPinType,
     g_APinDescription[PINS_UART].ulPin,
     g_APinDescription[PINS_UART].ulPinConfiguration);
-
-	Serial.begin(115200);
-
-  // Initialize Serial ports USART
   PIO_Configure(
     g_APinDescription[PINS_USART0].pPort,
     g_APinDescription[PINS_USART0].ulPinType,
@@ -373,12 +369,12 @@ void init( void )
     g_APinDescription[PINS_USART1].ulPin,
     g_APinDescription[PINS_USART1].ulPinConfiguration);
   PIO_Configure(
-    g_APinDescription[PINS_USART2].pPort,
-    g_APinDescription[PINS_USART2].ulPinType,
-    g_APinDescription[PINS_USART2].ulPin,
-    g_APinDescription[PINS_USART2].ulPinConfiguration);
+    g_APinDescription[PINS_USART3].pPort,
+    g_APinDescription[PINS_USART3].ulPinType,
+    g_APinDescription[PINS_USART3].ulPin,
+    g_APinDescription[PINS_USART3].ulPinConfiguration);
 
-  // Initialize USB
+  // Initialize USB pins
   PIO_Configure(
     g_APinDescription[PINS_USB].pPort,
     g_APinDescription[PINS_USB].ulPinType,
@@ -386,12 +382,12 @@ void init( void )
     g_APinDescription[PINS_USB].ulPinConfiguration);
 
   // Initialize Analog Controller
-  pmc_enable_periph_clk( ID_ADC ) ;
-  adc_init( ADC, SystemCoreClock, ADC_FREQ_MAX, ADC_STARTUP_FAST ) ;
+  pmc_enable_periph_clk(ID_ADC);
+  adc_init(ADC, SystemCoreClock, ADC_FREQ_MAX, ADC_STARTUP_FAST);
   adc_configure_timing(ADC, 0, ADC_SETTLING_TIME_3, 1);
   adc_configure_trigger(ADC, ADC_TRIG_SW, 0); // Disable hardware trigger.
-  adc_disable_interrupt( ADC, 0xFFFFFFFF ) ; // Disable all ADC interrupts.
-  adc_disable_all_channel( ADC ) ;
+  adc_disable_interrupt(ADC, 0xFFFFFFFF); // Disable all ADC interrupts.
+  adc_disable_all_channel(ADC);
 
   // Initialize analogOutput module
   analogOutputInit();
