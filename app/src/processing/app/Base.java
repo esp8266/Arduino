@@ -1192,7 +1192,18 @@ public class Base {
               @Override
               public void actionPerformed(ActionEvent e) {
                 cpuTypeMenu.setEnabled(false);
+                Preferences.unset("board_container");
                 selectBoardAction.actionPerformed(e);
+              }
+              
+              @Override
+              public Object getValue(String key) {
+                return selectBoardAction.getValue(key);
+              }
+              
+              @Override
+              public void putValue(String key, Object newValue) {
+                selectBoardAction.putValue(key, newValue);
               }
             };
             JMenuItem item = new JRadioButtonMenuItem(selectBoardWithoutContainerAction);
@@ -1203,11 +1214,12 @@ public class Base {
       }
     }
     
-    JMenuItem selectedBoardMenu;
-    if (selBoardContainer == null) {
-      selectedBoardMenu = selectFirstEnabledMenuItem(boardsMenu);
-    } else {
-      selectedBoardMenu = selectMenuItemByBoardContainer(boardsMenu, selBoardContainer);
+    JMenuItem selectedBoardMenu = selectMenuItemByBoardContainer(boardsMenu, selBoardContainer);
+    if (selectedBoardMenu == null) {
+      selectedBoardMenu = selectMenuItemByBoardPackagePlatform(boardsMenu, selBoard, selPackage, selPlatform);
+      if (selectedBoardMenu == null) {
+        selectedBoardMenu = selectFirstEnabledMenuItem(boardsMenu);
+      }
     }
     selectedBoardMenu.doClick();
 
@@ -1217,6 +1229,9 @@ public class Base {
         selectedCPUTypeMenu = selectFirstEnabledMenuItem(cpuTypeMenu);
       } else {
         selectedCPUTypeMenu = selectMenuItemByBoardPackagePlatform(cpuTypeMenu, selBoard, selPackage, selPlatform);
+        if (selectedCPUTypeMenu == null) {
+          selectedCPUTypeMenu = selectFirstEnabledMenuItem(cpuTypeMenu);
+        }
       }
       selectedCPUTypeMenu.doClick();
     }
@@ -1254,13 +1269,17 @@ public class Base {
   }
   
   private static JMenuItem selectMenuItemByBoardContainer(JMenu menu, String boardContainer) {
+    if (boardContainer == null) {
+      return null;
+    }
+    
     for (int i = 0; i < menu.getItemCount(); i++) {
       JMenuItem item = menu.getItem(i);
       if (item != null && item.getAction() != null && boardContainer.equals(item.getAction().getValue("board_container"))) {
         return item;
       }
     }
-    return selectFirstEnabledMenuItem(menu);
+    return null;
   }
   
   private static JMenuItem selectMenuItemByBoardPackagePlatform(JMenu menu, String selBoard, String selPackage, String selPlatform) {
@@ -1271,7 +1290,7 @@ public class Base {
         return item;
       }
     }
-    return selectFirstEnabledMenuItem(menu);
+    return null;
   }
   
   private JMenuItem findOrCreateBoardContainerMenu(JMenu boardsMenu, ButtonGroup boardsButtonGroup, String boardContainerName, AbstractAction boardMenuAction) {
