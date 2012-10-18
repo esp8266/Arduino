@@ -693,7 +693,7 @@ public class Editor extends JFrame implements RunnerListener {
     
     if (boardsMenu == null) {
       boardsMenu = new JMenu(_("Board"));
-      cpuTypeMenu = new JMenu(_("CPUType"));
+      cpuTypeMenu = new JMenu(_("Processor"));
       base.rebuildBoardsMenu(boardsMenu, cpuTypeMenu);
       //Debug: rebuild imports
       importMenu.removeAll();
