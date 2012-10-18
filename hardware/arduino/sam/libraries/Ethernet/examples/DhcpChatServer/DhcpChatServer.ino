@@ -1,5 +1,5 @@
 /*
- DHCP Chat  Server
+  DHCP Chat  Server
  
  A simple server that distributes any incoming messages to all
  connected clients.  To use telnet to  your device's IP address and type.
@@ -26,9 +26,9 @@
 // gateway and subnet are optional:
 byte mac[] = { 
   0x00, 0xAA, 0xBB, 0xCC, 0xDE, 0x02 };
-IPAddress ip(192,168,1, 177);
-IPAddress gateway(192,168,1, 1);
-IPAddress subnet(255, 255, 0, 0);
+IPAddress ip(192,168,1,177);
+IPAddress gateway(192,168,1,1);
+IPAddress subnet(255,255,0,0);
 
 // telnet defaults to port 23
 EthernetServer server(23);

@@ -11,6 +11,7 @@
  
  This example code is in the public domain.
  */
+
 String txtMsg = "";                         // a string for incoming text
 int lastStringLength = txtMsg.length();     // previous length of the String
 

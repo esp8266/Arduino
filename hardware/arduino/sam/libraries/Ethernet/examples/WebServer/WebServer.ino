@@ -22,7 +22,7 @@
 // The IP address will be dependent on your local network:
 byte mac[] = { 
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-IPAddress ip(192,168,1, 177);
+IPAddress ip(192,168,1,177);
 
 // Initialize the Ethernet server library
 // with the IP address and port you want to use 
@@ -30,7 +30,7 @@ IPAddress ip(192,168,1, 177);
 EthernetServer server(80);
 
 void setup() {
- // Open serial communications and wait for port to open:
+  // Open serial communications and wait for port to open:
   Serial.begin(9600);
    while (!Serial) {
     ; // wait for serial port to connect. Needed for Leonardo only
@@ -67,7 +67,7 @@ void loop() {
           client.println();
           client.println("<!DOCTYPE HTML>");
           client.println("<html>");
-                    // add a meta refresh tag, so the browser pulls again every 5 seconds:
+          // add a meta refresh tag, so the browser pulls again every 5 seconds:
           client.println("<meta http-equiv=\"refresh\" content=\"5\">");
           // output the value of each analog input pin
           for (int analogChannel = 0; analogChannel < 6; analogChannel++) {

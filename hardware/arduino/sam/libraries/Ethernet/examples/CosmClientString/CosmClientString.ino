@@ -36,7 +36,7 @@
 
 // assign a MAC address for the ethernet controller.
 // fill in your address here:
-  byte mac[] = { 
+byte mac[] = { 
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
   
 // fill in an available IP address on your network here,
@@ -48,12 +48,13 @@ EthernetClient client;
 
 // if you don't want to use DNS (and reduce your sketch size)
 // use the numeric IP instead of the name for the server:
-//IPAddress server(216,52,233,121);      // numeric IP for api.cosm.com
+// IPAddress server(216,52,233,121);      // numeric IP for api.cosm.com
 char server[] = "api.cosm.com";   // name address for Cosm API
 
-unsigned long lastConnectionTime = 0;          // last time you connected to the server, in milliseconds
-boolean lastConnected = false;                 // state of the connection last time through the main loop
-const unsigned long postingInterval = 10*1000;  //delay between updates to Cosm.com
+unsigned long lastConnectionTime = 0;             // last time you connected to the server, in milliseconds
+boolean lastConnected = false;                    // state of the connection last time through the main loop
+const unsigned long postingInterval = 10L*1000L;  // delay between updates to Cosm.com
+						  // the "L" is needed to use long type numbers
 
 void setup() {
   // start serial port:

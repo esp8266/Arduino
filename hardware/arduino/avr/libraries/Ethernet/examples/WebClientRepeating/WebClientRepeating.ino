@@ -39,9 +39,10 @@ EthernetClient client;
 
 char server[] = "www.arduino.cc";
 
-unsigned long lastConnectionTime = 0;          // last time you connected to the server, in milliseconds
-boolean lastConnected = false;                 // state of the connection last time through the main loop
-const unsigned long postingInterval = 60*1000;  // delay between updates, in milliseconds
+unsigned long lastConnectionTime = 0;             // last time you connected to the server, in milliseconds
+boolean lastConnected = false;                    // state of the connection last time through the main loop
+const unsigned long postingInterval = 60L*1000L;  // delay between updates, in milliseconds
+						  // the "L" is needed to use long type numbers
 
 void setup() {
   // start serial port:
