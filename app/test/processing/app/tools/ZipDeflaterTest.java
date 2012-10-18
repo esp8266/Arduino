@@ -10,6 +10,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import processing.app.helpers.FileUtils;
+
 public class ZipDeflaterTest {
 
   private File destFolder;
@@ -103,18 +105,7 @@ public class ZipDeflaterTest {
 
   @After
   public void deleteTempFolder() {
-    recursiveDelete(destFolder);
-  }
-
-  private void recursiveDelete(File folder) {
-    for (File file : folder.listFiles()) {
-      if (file.isDirectory()) {
-        recursiveDelete(file);
-      } else {
-        file.delete();
-      }
-    }
-    folder.delete();
+    FileUtils.recursiveDelete(destFolder);
   }
 
 }

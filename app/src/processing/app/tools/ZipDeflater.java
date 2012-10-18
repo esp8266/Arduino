@@ -10,6 +10,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
+import processing.app.helpers.FileUtils;
+
 public class ZipDeflater {
 
   private final ZipFile zipFile;
@@ -71,24 +73,11 @@ public class ZipDeflater {
   private void deleteUndesiredFoldersAndFiles(File folder) {
     for (File file : folder.listFiles()) {
       if (file.isDirectory() && "__MACOSX".equals(file.getName())) {
-        recursiveDelete(file);
+        FileUtils.recursiveDelete(file);
       } else if (file.getName().startsWith(".")) {
-        recursiveDelete(file);
+        FileUtils.recursiveDelete(file);
       }
     }
-  }
-
-  private void recursiveDelete(File file) {
-    if (file.isDirectory()) {
-      for (File current : file.listFiles()) {
-        if (current.isDirectory()) {
-          recursiveDelete(current);
-        } else {
-          current.delete();
-        }
-      }
-    }
-    file.delete();
   }
 
   private void ensureFoldersOfEntryExist(File folder, ZipEntry entry) {
@@ -109,7 +98,7 @@ public class ZipDeflater {
     }
 
     files[0].renameTo(new File(folder.getParentFile(), files[0].getName()));
-    recursiveDelete(folder);
+    FileUtils.recursiveDelete(folder);
   }
 
   private String folderNameFromZip() {
