@@ -31,6 +31,7 @@ import javax.swing.*;
 
 import processing.app.debug.Compiler;
 import processing.app.debug.Target;
+import processing.app.helpers.FileUtils;
 import processing.app.tools.ZipDeflater;
 import processing.core.*;
 import static processing.app.I18n._;
@@ -2364,24 +2365,43 @@ public class Base {
     }
   }
 
+  public void handleAddLibrary(Editor editor) {
+    JFileChooser fileChooser = new JFileChooser(System.getProperty("user.home"));
+    fileChooser.setDialogTitle(_("Select a zip file or a folder containing the library you'd like to add"));
+    fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 
-  public void handleAddZipLibrary(Editor editor) {
-    String prompt = _("Select a zip file containing the library you'd like to add");
-    FileDialog fd = new FileDialog(editor, prompt, FileDialog.LOAD);
-    fd.setDirectory(System.getProperty("user.home"));
-    fd.setVisible(true);
+    Dimension preferredSize = fileChooser.getPreferredSize();
+    fileChooser.setPreferredSize(new Dimension(preferredSize.width + 200, preferredSize.height + 200));
+    
+    int returnVal = fileChooser.showOpenDialog(editor);
 
-    String directory = fd.getDirectory();
-    String filename = fd.getFile();
-    if (filename == null) return;
-
-    File sourceFile = new File(directory, filename);
-    try {
-      ZipDeflater zipDeflater = new ZipDeflater(sourceFile, getSketchbookLibrariesFolder());
-      zipDeflater.deflate();
-      editor.statusNotice(_("Library added to your libraries. Check \"Import library\" menu"));
-    } catch (IOException e) {
-      editor.statusError(e);      
+    if (returnVal != JFileChooser.APPROVE_OPTION) {
+      return;
     }
+
+    File sourceFile = fileChooser.getSelectedFile();
+
+    if (sourceFile.isDirectory()) {
+      File destinationFolder = new File(getSketchbookLibrariesFolder(), sourceFile.getName());
+      if (!destinationFolder.mkdir()) {
+        editor.statusError("Can't create folder: " + sourceFile.getName() + " into libraries folder");
+        return;
+      }
+      try {
+        FileUtils.copy(sourceFile, destinationFolder);
+      } catch (IOException e) {
+        editor.statusError(e);
+        return;
+      }
+    } else {
+      try {
+        ZipDeflater zipDeflater = new ZipDeflater(sourceFile, getSketchbookLibrariesFolder());
+        zipDeflater.deflate();
+      } catch (IOException e) {
+        editor.statusError(e);
+        return;
+      }
+    }
+    editor.statusNotice(_("Library added to your libraries. Check \"Import library\" menu"));
   }
 }
