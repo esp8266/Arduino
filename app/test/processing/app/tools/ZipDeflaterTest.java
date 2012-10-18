@@ -10,7 +10,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import processing.app.tools.ZipDeflater;
+import processing.app.helpers.FileUtils;
 
 public class ZipDeflaterTest {
 
@@ -62,20 +62,50 @@ public class ZipDeflaterTest {
     assertEquals("readme.txt", files[4]);
   }
 
-  @After
-  public void deleteTempFolder() {
-    recursiveDelete(destFolder);
+  @Test
+  public void shouldDeflateMacZip() throws Exception {
+    File file = new File(ZipDeflater.class.getResource("/Keypad_mac.zip").getFile());
+    new ZipDeflater(file, destFolder).deflate();
+
+    String[] files = destFolder.list();
+    assertEquals(1, files.length);
+    assertEquals("Keypad", files[0]);
+
+    file = destFolder.listFiles()[0];
+    files = file.list();
+    assertEquals(4, files.length);
+    Arrays.sort(files);
+    assertEquals("Keypad.cpp", files[0]);
+    assertEquals("Keypad.h", files[1]);
+    assertEquals("examples", files[2]);
+    assertEquals("keywords.txt", files[3]);
+
+    files = new File(file, "examples").list();
+    assertEquals(4, files.length);
+    Arrays.sort(files);
+    assertEquals("CustomKeypad", files[0]);
+    assertEquals("DynamicKeypad", files[1]);
+    assertEquals("EventKeypad", files[2]);
+    assertEquals("HelloKeypad", files[3]);
   }
 
-  private void recursiveDelete(File folder) {
-    for (File file : folder.listFiles()) {
-      if (file.isDirectory()) {
-        recursiveDelete(file);
-      } else {
-        file.delete();
-      }
-    }
-    folder.delete();
+  @Test
+  public void shouldDeleteHiddenFiles() throws Exception {
+    File file = new File(ZipDeflater.class.getResource("/Keypad_with_hidden_files.zip").getFile());
+    new ZipDeflater(file, destFolder).deflate();
+
+    String[] files = destFolder.list();
+    assertEquals(1, files.length);
+    assertEquals("Keypad_with_hidden_files", files[0]);
+
+    file = destFolder.listFiles()[0];
+    files = file.list();
+    assertEquals(4, files.length);
+  }
+
+  @After
+  public void deleteTempFolder() {
+    FileUtils.recursiveDelete(destFolder);
   }
 
 }

@@ -1,6 +1,5 @@
 /*
-
- Udp NTP Client
+  Udp NTP Client
  
  Get the time from a Network Time Protocol (NTP) time server
  Demonstrates use of UDP sendPacket and ReceivePacket 
@@ -38,7 +37,7 @@ EthernetUDP Udp;
 
 void setup() 
 {
- // Open serial communications and wait for port to open:
+  // Open serial communications and wait for port to open:
   Serial.begin(9600);
    while (!Serial) {
     ; // wait for serial port to connect. Needed for Leonardo only
@@ -59,7 +58,7 @@ void loop()
 {
   sendNTPpacket(timeServer); // send an NTP packet to a time server
 
-    // wait to see if a reply is available
+  // wait to see if a reply is available
   delay(1000);  
   if ( Udp.parsePacket() ) {  
     // We've received a packet, read the data from it

@@ -634,10 +634,10 @@ public class Editor extends JFrame implements RunnerListener {
     }
     sketchMenu.add(importMenu);
 
-    item = new JMenuItem(_("Add Library from ZIP"));
+    item = new JMenuItem(_("Add Library..."));
     item.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        base.handleAddZipLibrary(Editor.this);
+        base.handleAddLibrary(Editor.this);
         base.onBoardOrPortChange();
         base.rebuildImportMenu(Editor.importMenu);
       }
@@ -693,7 +693,7 @@ public class Editor extends JFrame implements RunnerListener {
     
     if (boardsMenu == null) {
       boardsMenu = new JMenu(_("Board"));
-      cpuTypeMenu = new JMenu(_("CPUType"));
+      cpuTypeMenu = new JMenu(_("Processor"));
       base.rebuildBoardsMenu(boardsMenu, cpuTypeMenu);
       //Debug: rebuild imports
       importMenu.removeAll();
