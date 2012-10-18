@@ -120,7 +120,7 @@ mega2560.cpu=2560 or ADK
 mega2560.container=Arduino Mega
 
 mega2560.upload.tool=avrdude
-mega2560.upload.protocol=stk500v2
+mega2560.upload.protocol=wiring
 mega2560.upload.maximum_size=258048
 mega2560.upload.speed=115200
 

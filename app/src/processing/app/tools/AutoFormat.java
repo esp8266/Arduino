@@ -99,7 +99,7 @@ public class AutoFormat implements Tool {
     c = string[j++] = getchr(); // extra char
     while (done == 0) {
       c = string[j++] = getchr();
-      while ((c != '/') && (j < string.length)) {
+      while ((c != '/') && (j < string.length) && EOF == 0) {
         if(c == '\n' || c == '\r') {
           lineNumber++;
           putcoms();
@@ -111,7 +111,9 @@ public class AutoFormat implements Tool {
       if (j>1 && string[j-2] == '*') {
         done = 1;
         jdoc = 0;
-      }
+      } else if (EOF != 0) {
+        done = 1;
+      }   
     }
 
     putcoms();
@@ -134,7 +136,7 @@ public class AutoFormat implements Tool {
         }
         if (ch == '\'' || ch == '"') {
           cc = string[j++] = getchr();
-          while (cc != ch) {
+          while (cc != ch && EOF == 0) {
             if (cc == '\\') string[j++] = getchr();
             cc = string[j++] = getchr();
           }
@@ -207,7 +209,7 @@ public class AutoFormat implements Tool {
       }
       string[j] = '\0';
       i = 0;
-      while (string[i] == ' ') i++;
+      while (string[i] == ' ' && EOF == 0) i++;
       if (lookup_com(w_jdoc) == 1) jdoc = 1;
       String strBuffer = new String(string,0,j);
       if (string[i] == '/' && string[i+1]=='*')
@@ -241,7 +243,7 @@ public class AutoFormat implements Tool {
   public void cpp_comment() throws IOException
   {
     c = getchr();
-    while(c != '\n' && c != '\r' && j<133)
+    while(c != '\n' && c != '\r' && EOF == 0)
     {
       string[j++] = c;
       c = getchr();
@@ -337,7 +339,7 @@ public class AutoFormat implements Tool {
     peekc = getchr();
     //while ((peekc == '\t' || peekc == ' ') &&
     //     (j < string.length)) {
-    while (peekc == '\t' || peekc == ' ') {
+    while ((peekc == '\t' || peekc == ' ') && EOF == 0) {
       string[j++] = peekc;
       peek = -1;
       peekc = '`';
@@ -398,7 +400,7 @@ public class AutoFormat implements Tool {
 
     if (j<1) return (0);
     kk=0;
-    while(string[kk] == ' ')kk++;
+    while(string[kk] == ' ' && EOF == 0)kk++;
     l=0;
     l = j_string.indexOf(keyword);
     if (l<0 || l!=kk)
@@ -421,7 +423,7 @@ public class AutoFormat implements Tool {
 
     if (j<1) return (0);
     kk=0;
-    while(string[kk] == ' ')kk++;
+    while(string[kk] == ' ' && EOF == 0) kk++;
     l=0;
     l = j_string.indexOf(keyword);
     if (l<0 || l!=kk)
@@ -637,7 +639,8 @@ public class AutoFormat implements Tool {
         case '\'':
           string[j++] = c;
           cc = getchr();
-          while(cc != c)
+          int count = 0;
+          while(cc != c && EOF == 0)
           {
             // max. length of line should be 256
             string[j++] = cc;
@@ -784,7 +787,7 @@ public class AutoFormat implements Tool {
         case '#':
           string[j++] = c;
           cc = getchr();
-          while(cc != '\n')
+          while(cc != '\n' && EOF == 0)
           {
             string[j++] = cc;
             cc = getchr();
@@ -827,13 +830,13 @@ public class AutoFormat implements Tool {
           if ((lookup(w_for) == 1))
           {
             c = get_string();
-            while(c != ';') c = get_string();
+            while(c != ';' && EOF == 0) c = get_string();
             ct=0;
             int for_done = 0;
-            while (for_done==0)
+            while (for_done == 0 && EOF == 0)
             {
               c = get_string();
-              while(c != ')')
+              while(c != ')' && EOF == 0)
               {
                 if(c == '(') ct++;
                 c = get_string();

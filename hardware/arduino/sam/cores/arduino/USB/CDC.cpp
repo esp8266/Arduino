@@ -227,7 +227,7 @@ size_t Serial_::write(const uint8_t *buffer, size_t size)
 		int r = USBD_Send(CDC_TX, buffer, size);
 
 		if (r > 0)
-        {
+		{
 			return r;
 		} else
 		{
