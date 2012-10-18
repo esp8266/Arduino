@@ -654,8 +654,8 @@ public class Compiler implements MessageConsumer {
     objectFileList = objectFileList.substring(1);
 
     PreferencesMap dict = new PreferencesMap(prefs);
-    dict.put("compiler.c.elf.flags", dict
-        .get("compiler.c.elf.flags" + optRelax));
+    String flags = dict.get("compiler.c.elf.flags") + optRelax;
+    dict.put("compiler.c.elf.flags", flags);
     dict.put("archive_file", "core.a");
     dict.put("object_files", objectFileList);
     dict.put("ide_version", "" + Base.REVISION);
