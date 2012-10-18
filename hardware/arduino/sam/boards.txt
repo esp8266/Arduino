@@ -1,5 +1,5 @@
 
-arduino_due_x_dbg.name=Arduino Due Dev. Ed. (Programming port)
+arduino_due_x_dbg.name=Arduino Due (Programming Port)
 arduino_due_x_dbg.upload.tool=bossac
 arduino_due_x_dbg.upload.protocol=sam-ba
 arduino_due_x_dbg.upload.maximum_size=524288
@@ -16,7 +16,7 @@ arduino_due_x_dbg.build.variant_system_lib=libsam_sam3x8e_gcc_rel.a
 arduino_due_x_dbg.build.vid=0x2341
 arduino_due_x_dbg.build.pid=0x003e
 
-arduino_due_x.name=Arduino Due Dev. Ed. (Native port)
+arduino_due_x.name=Arduino Due (Native USB Port)
 arduino_due_x.upload.tool=bossac
 arduino_due_x.upload.protocol=sam-ba
 arduino_due_x.upload.maximum_size=524288
