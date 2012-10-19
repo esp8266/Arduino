@@ -28,6 +28,7 @@ import java.io.*;
 import java.util.*;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import processing.app.debug.Compiler;
 import processing.app.debug.Target;
@@ -2380,6 +2381,7 @@ public class Base {
     JFileChooser fileChooser = new JFileChooser(System.getProperty("user.home"));
     fileChooser.setDialogTitle(_("Select a zip file or a folder containing the library you'd like to add"));
     fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+    fileChooser.setFileFilter(new FileNameExtensionFilter("ZIP files or folders", "zip"));
 
     Dimension preferredSize = fileChooser.getPreferredSize();
     fileChooser.setPreferredSize(new Dimension(preferredSize.width + 200, preferredSize.height + 200));
@@ -2426,7 +2428,7 @@ public class Base {
       // copy folder
       File destinationFolder = new File(getSketchbookLibrariesFolder(), sourceFile.getName());
       if (!destinationFolder.mkdir()) {
-        editor.statusError("Can't create folder: " + sourceFile.getName() + " into libraries folder");
+        editor.statusError("A library named " + sourceFile.getName() + " already exists");
         return;
       }
       try {
