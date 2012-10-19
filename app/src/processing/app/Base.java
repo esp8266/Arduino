@@ -954,8 +954,18 @@ public class Base {
     return userLibs;
   }
 
-  public void rebuildImportMenu(JMenu importMenu) {
+  public void rebuildImportMenu(JMenu importMenu, final Editor editor) {
     importMenu.removeAll();
+    
+    JMenuItem addLibraryMenuItem = new JMenuItem(_("Add Library..."));
+    addLibraryMenuItem.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        Base.this.handleAddLibrary(editor);
+        Base.this.onBoardOrPortChange();
+        Base.this.rebuildImportMenu(Editor.importMenu, editor);
+      }
+    });
+    importMenu.add(addLibraryMenuItem);
 
     // Split between user supplied libraries and IDE libraries
     Map<String, File> ideLibs = getIDELibs();
@@ -1108,7 +1118,7 @@ public class Base {
   }
 
   
-  public void rebuildBoardsMenu(JMenu boardsMenu, final JMenu cpuTypeMenu) {
+  public void rebuildBoardsMenu(JMenu boardsMenu, final JMenu cpuTypeMenu, final Editor editor) {
     String selPackage = Preferences.get("target_package");
     String selPlatform = Preferences.get("target_platform");
     String selBoard = Preferences.get("board");
@@ -1172,7 +1182,7 @@ public class Base {
 
               onBoardOrPortChange();
               Sketch.buildSettingChanged();
-              rebuildImportMenu(Editor.importMenu);
+              rebuildImportMenu(Editor.importMenu, editor);
               rebuildExamplesMenu(Editor.examplesMenu);
             }
           };
