@@ -2382,7 +2382,7 @@ public class Base {
 
     Dimension preferredSize = fileChooser.getPreferredSize();
     fileChooser.setPreferredSize(new Dimension(preferredSize.width + 200, preferredSize.height + 200));
-    
+
     int returnVal = fileChooser.showOpenDialog(editor);
 
     if (returnVal != JFileChooser.APPROVE_OPTION) {
@@ -2390,8 +2390,39 @@ public class Base {
     }
 
     File sourceFile = fileChooser.getSelectedFile();
+    File tmpFolder = null;
 
-    if (sourceFile.isDirectory()) {
+    try {
+      // unpack ZIP
+      if (!sourceFile.isDirectory()) {
+        try {
+          tmpFolder = FileUtils.createTempFolder();
+          ZipDeflater zipDeflater = new ZipDeflater(sourceFile, tmpFolder);
+          zipDeflater.deflate();
+          File[] foldersInTmpFolder = tmpFolder.listFiles(new OnlyDirs());
+          if (foldersInTmpFolder.length != 1) {
+            throw new IOException("Zip doesn't contain one library");
+          }
+          sourceFile = foldersInTmpFolder[0];
+        } catch (IOException e) {
+          editor.statusError(e);
+          return;
+        }
+      }
+
+      // is there a library?
+      File libFolder = scanFatLibrary(sourceFile);
+      if (libFolder == null) {
+        editor.statusError("Not a valid library");
+        return;
+      }
+      String[] headerFiles = headerListFromIncludePath(libFolder);
+      if (headerFiles == null || headerFiles.length == 0) {
+        editor.statusError("Not a valid library");
+        return;
+      }
+
+      // copy folder
       File destinationFolder = new File(getSketchbookLibrariesFolder(), sourceFile.getName());
       if (!destinationFolder.mkdir()) {
         editor.statusError("Can't create folder: " + sourceFile.getName() + " into libraries folder");
@@ -2403,15 +2434,10 @@ public class Base {
         editor.statusError(e);
         return;
       }
-    } else {
-      try {
-        ZipDeflater zipDeflater = new ZipDeflater(sourceFile, getSketchbookLibrariesFolder());
-        zipDeflater.deflate();
-      } catch (IOException e) {
-        editor.statusError(e);
-        return;
-      }
+      editor.statusNotice(_("Library added to your libraries. Check \"Import library\" menu"));
+    } finally {
+      // delete zip created temp folder, if exists
+      FileUtils.recursiveDelete(tmpFolder);
     }
-    editor.statusNotice(_("Library added to your libraries. Check \"Import library\" menu"));
   }
 }
