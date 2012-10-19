@@ -385,11 +385,14 @@ static bool USBD_SendDescriptor(Setup& setup)
 	if (USB_DEVICE_DESCRIPTOR_TYPE == t)
 	{
 		TRACE_CORE(puts("=> USBD_SendDescriptor : USB_DEVICE_DESCRIPTOR_TYPE\r\n");)
-		if (setup.wLength == 8)
+		if (setup.wLength >= 8)
 		{
 			_cdcComposite = 1;
 		}
 		desc_addr = _cdcComposite ?  (const uint8_t*)&USB_DeviceDescriptorA : (const uint8_t*)&USB_DeviceDescriptor;
+        if( *desc_addr > setup.wLength ) {
+            desc_length = setup.wLength;
+        }
 	}
 	else if (USB_STRING_DESCRIPTOR_TYPE == t)
 	{

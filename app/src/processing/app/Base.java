@@ -29,6 +29,7 @@ import java.util.*;
 import java.util.List;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
@@ -954,8 +955,19 @@ public class Base {
     return userLibs;
   }
 
-  public void rebuildImportMenu(JMenu importMenu) {
+  public void rebuildImportMenu(JMenu importMenu, final Editor editor) {
     importMenu.removeAll();
+    
+    JMenuItem addLibraryMenuItem = new JMenuItem(_("Add Library..."));
+    addLibraryMenuItem.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        Base.this.handleAddLibrary(editor);
+        Base.this.onBoardOrPortChange();
+        Base.this.rebuildImportMenu(Editor.importMenu, editor);
+        Base.this.rebuildExamplesMenu(Editor.examplesMenu);
+      }
+    });
+    importMenu.add(addLibraryMenuItem);
 
     // Split between user supplied libraries and IDE libraries
     Map<String, File> ideLibs = getIDELibs();
@@ -1108,7 +1120,7 @@ public class Base {
   }
 
   
-  public void rebuildBoardsMenu(JMenu boardsMenu, final JMenu cpuTypeMenu) {
+  public void rebuildBoardsMenu(JMenu boardsMenu, final JMenu cpuTypeMenu, final Editor editor) {
     String selPackage = Preferences.get("target_package");
     String selPlatform = Preferences.get("target_platform");
     String selBoard = Preferences.get("board");
@@ -1172,7 +1184,7 @@ public class Base {
 
               onBoardOrPortChange();
               Sketch.buildSettingChanged();
-              rebuildImportMenu(Editor.importMenu);
+              rebuildImportMenu(Editor.importMenu, editor);
               rebuildExamplesMenu(Editor.examplesMenu);
             }
           };
@@ -2600,10 +2612,11 @@ public class Base {
     JFileChooser fileChooser = new JFileChooser(System.getProperty("user.home"));
     fileChooser.setDialogTitle(_("Select a zip file or a folder containing the library you'd like to add"));
     fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+    fileChooser.setFileFilter(new FileNameExtensionFilter("ZIP files or folders", "zip"));
 
     Dimension preferredSize = fileChooser.getPreferredSize();
     fileChooser.setPreferredSize(new Dimension(preferredSize.width + 200, preferredSize.height + 200));
-    
+
     int returnVal = fileChooser.showOpenDialog(editor);
 
     if (returnVal != JFileChooser.APPROVE_OPTION) {
@@ -2611,11 +2624,42 @@ public class Base {
     }
 
     File sourceFile = fileChooser.getSelectedFile();
+    File tmpFolder = null;
 
-    if (sourceFile.isDirectory()) {
+    try {
+      // unpack ZIP
+      if (!sourceFile.isDirectory()) {
+        try {
+          tmpFolder = FileUtils.createTempFolder();
+          ZipDeflater zipDeflater = new ZipDeflater(sourceFile, tmpFolder);
+          zipDeflater.deflate();
+          File[] foldersInTmpFolder = tmpFolder.listFiles(new OnlyDirs());
+          if (foldersInTmpFolder.length != 1) {
+            throw new IOException("Zip doesn't contain one library");
+          }
+          sourceFile = foldersInTmpFolder[0];
+        } catch (IOException e) {
+          editor.statusError(e);
+          return;
+        }
+      }
+
+      // is there a library?
+      File libFolder = scanFatLibrary(sourceFile);
+      if (libFolder == null) {
+        editor.statusError("Not a valid library");
+        return;
+      }
+      String[] headerFiles = headerListFromIncludePath(libFolder);
+      if (headerFiles == null || headerFiles.length == 0) {
+        editor.statusError("Not a valid library");
+        return;
+      }
+
+      // copy folder
       File destinationFolder = new File(getSketchbookLibrariesFolder(), sourceFile.getName());
       if (!destinationFolder.mkdir()) {
-        editor.statusError("Can't create folder: " + sourceFile.getName() + " into libraries folder");
+        editor.statusError("A library named " + sourceFile.getName() + " already exists");
         return;
       }
       try {
@@ -2624,15 +2668,10 @@ public class Base {
         editor.statusError(e);
         return;
       }
-    } else {
-      try {
-        ZipDeflater zipDeflater = new ZipDeflater(sourceFile, getSketchbookLibrariesFolder());
-        zipDeflater.deflate();
-      } catch (IOException e) {
-        editor.statusError(e);
-        return;
-      }
+      editor.statusNotice(_("Library added to your libraries. Check \"Import library\" menu"));
+    } finally {
+      // delete zip created temp folder, if exists
+      FileUtils.recursiveDelete(tmpFolder);
     }
-    editor.statusNotice(_("Library added to your libraries. Check \"Import library\" menu"));
   }
 }
