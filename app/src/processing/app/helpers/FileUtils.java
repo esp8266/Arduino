@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Random;
 
 public class FileUtils {
 
@@ -66,6 +67,9 @@ public class FileUtils {
   }
 
   public static void recursiveDelete(File file) {
+    if (file == null) {
+      return;
+    }
     if (file.isDirectory()) {
       for (File current : file.listFiles()) {
         if (current.isDirectory()) {
@@ -76,6 +80,14 @@ public class FileUtils {
       }
     }
     file.delete();
+  }
+
+  public static File createTempFolder() throws IOException {
+    File tmpFolder = new File(System.getProperty("java.io.tmpdir"), "arduino_" + new Random().nextInt(1000000));
+    if (!tmpFolder.mkdir()) {
+      throw new IOException("Unable to create temp folder " + tmpFolder);
+    }
+    return tmpFolder;
   }
 
 }
