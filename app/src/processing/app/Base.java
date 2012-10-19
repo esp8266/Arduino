@@ -953,6 +953,7 @@ public class Base {
         Base.this.handleAddLibrary(editor);
         Base.this.onBoardOrPortChange();
         Base.this.rebuildImportMenu(Editor.importMenu, editor);
+        Base.this.rebuildExamplesMenu(Editor.examplesMenu);
       }
     });
     importMenu.add(addLibraryMenuItem);
