@@ -348,8 +348,8 @@ void init( void )
   // Initialize C library
   __libc_init_array();
 
-  // Disable pull-up on every pin
-  for (int i = 0; i < PINS_COUNT; i++)
+  // Disable pull-up on every pin except RX0
+  for (int i = 1; i < PINS_COUNT; i++)
 	  digitalWrite(i, LOW);
 
   // Initialize Serial port U(S)ART pins
