@@ -18,6 +18,7 @@
 class AudioClass : public Print {
 public:
 	AudioClass(DACClass &_dac) : dac(&_dac) { };
+	void prepare(int16_t *buffer, int S, int volume);
 	void begin(uint32_t sampleRate, uint32_t msPreBuffer);
 	void end();
 

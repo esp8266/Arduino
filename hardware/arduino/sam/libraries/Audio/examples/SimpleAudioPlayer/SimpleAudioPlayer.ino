@@ -44,8 +44,8 @@ void loop()
     myFile.read(buffer, sizeof(buffer));
 
     // Prepare samples
-    int volume = analogRead(2);
-    prepare(buffer, S, volume);
+    int volume = 1024;
+    Audio.prepare(buffer, S, volume);
     // Feed samples to audio
     Audio.write(buffer, S);
 
@@ -58,20 +58,7 @@ void loop()
   }
   myFile.close();
 
-
   Serial.println("End of file. Thank you for listening!");
   while (true) ;
-}
-
-
-void prepare(int16_t *buffer, int S, int volume) {
-  uint16_t *ubuffer = (uint16_t*) buffer;
-  for (int i=0; i<S; i++) {
-    // set volume amplitude (signed multiply)
-    buffer[i] = buffer[i] * volume / 1024;
-    // convert from signed 16 bit to unsigned 12 bit for DAC.
-    ubuffer[i] += 0x8000;
-    ubuffer[i] >>= 4;
-  }
 }
 

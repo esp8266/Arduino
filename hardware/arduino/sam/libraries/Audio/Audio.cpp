@@ -33,6 +33,17 @@ void AudioClass::end() {
 	free( buffer);
 }
 
+void AudioClass::prepare(int16_t *buffer, int S, int volume){
+    uint16_t *ubuffer = (uint16_t*) buffer;
+    for (int i=0; i<S; i++) {
+        // set volume amplitude (signed multiply)
+        buffer[i] = buffer[i] * volume / 1024;
+        // convert from signed 16 bit to unsigned 12 bit for DAC.
+        ubuffer[i] += 0x8000;
+        ubuffer[i] >>= 4;
+    }
+}
+
 size_t AudioClass::write(const uint32_t *data, size_t size) {
 	const uint32_t TAG = 0x10000000;
 	int i;
