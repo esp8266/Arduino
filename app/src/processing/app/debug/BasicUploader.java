@@ -126,24 +126,32 @@ public class BasicUploader extends Uploader  {
       throw new RunnerException(e);
     }
     
-    // For Leonardo wait until the bootloader serial port disconnects and the
-    // sketch serial port reconnects (or timeout after a few seconds if the
-    // sketch port never comes back). Doing this saves users from accidentally
-    // opening Serial Monitor on the soon-to-be-orphaned bootloader port.
+    // Remove the magic baud rate (1200bps) to avoid
+    // future unwanted board resets
     try {
-      if (uploadResult && waitForUploadPort) {
-        Thread.sleep(500);
-        long timeout = System.currentTimeMillis() + 2000;
-        while (timeout > System.currentTimeMillis()) {
-          List<String> portList = Serial.list();
-          String uploadPort = Preferences.get("serial.port");
-          if (portList.contains(Preferences.get("serial.port"))) {
-            // Remove the magic baud rate (1200bps) to avoid 
-            // future unwanted board resets
-            Serial.touchPort(uploadPort, 9600);
-            break;
+      if (uploadResult && doTouch) {
+        String uploadPort = Preferences.get("serial.port");
+        if (waitForUploadPort) {
+          // For Due/Leonardo wait until the bootloader serial port disconnects and the
+          // sketch serial port reconnects (or timeout after a few seconds if the
+          // sketch port never comes back). Doing this saves users from accidentally
+          // opening Serial Monitor on the soon-to-be-orphaned bootloader port.
+          Thread.sleep(500);
+          long timeout = System.currentTimeMillis() + 2000;
+          while (timeout > System.currentTimeMillis()) {
+            List<String> portList = Serial.list();
+            if (portList.contains(uploadPort)) {
+              try {
+                Serial.touchPort(uploadPort, 9600);
+                break;
+              } catch (SerialException e) {
+                // Port already in use
+              }
+            }
+            Thread.sleep(250);
           }
-          Thread.sleep(100);
+        } else {
+          Serial.touchPort(uploadPort, 9600);
         }
       }
     } catch (InterruptedException ex) {

@@ -139,9 +139,12 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
         Preferences.set("serial.debug_rate", rateString);
         closeSerialPort();
         try {
+          Thread.sleep(100); // Wait for serial port to properly close
           openSerialPort();
         } catch (SerialException e) {
           System.err.println(e);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
         }
       }});
       
