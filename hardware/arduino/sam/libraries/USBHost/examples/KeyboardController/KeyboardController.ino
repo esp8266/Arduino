@@ -9,7 +9,7 @@
  
  http://arduino.cc/en/Tutorial/KeyboardController
  
- This samlple code is part of the public domain.
+ This sample code is part of the public domain.
  */
 
 
