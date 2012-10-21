@@ -1,19 +1,20 @@
 #######################################
-# Syntax Coloring Map For Audio
+# Syntax Coloring Map For Scheduler
 #######################################
 
 #######################################
 # Datatypes (KEYWORD1)
 #######################################
 
-Audio	KEYWORD1
+Scheduler	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
 
-prepare	KEYWORD2
-write	KEYWORD2
+yield	KEYWORD2
+wait	KEYWORD2
+startLoop	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)

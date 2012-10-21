@@ -1,8 +1,10 @@
 
 /*
   ButtonMouseControl
+
+ For Leonardo and Due boards only.  
  
- Controls the mouse from five pushbuttons on an Arduino Leonardo.
+ Controls the mouse from five pushbuttons on an Arduino Leonardo or Due.
  
  Hardware:
  * 5 pushbuttons attached to D2, D3, D4, D5, D6

@@ -3,6 +3,8 @@
  
  This sketch demonstrates the Keyboard library.
  
+ For Leonardo and Due boards only.
+ 
  When you connect pin 2 to ground, it creates a new
  window with a key combination (CTRL-N),
  then types in the Blink sketch, then auto-formats the text

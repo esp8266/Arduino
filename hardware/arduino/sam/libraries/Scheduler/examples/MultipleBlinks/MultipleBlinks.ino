@@ -1,3 +1,22 @@
+/*
+ Multiple Blinks
+
+ Demonstrates the use of the Scheduler library for the Arduino Due
+ 
+ Hardware required :
+ * LEDs connected to pins 11, 12, and 13
+
+ created 8 Oct 2012
+ by Cristian Maglie
+ Modified by 
+ Scott Fitzgerald 19 Oct 2012
+ 
+ This example code is in the public domain
+ 
+ http://arduino.cc/en/Tutorial/MultipleBlinks
+
+*/
+
 
 // Include Scheduler since we want to manage multiple tasks.
 #include <Scheduler.h>
@@ -7,7 +26,7 @@ int led2 = 12;
 int led3 = 11;
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
 
   // Setup the 3 pins as OUTPUT
   pinMode(led1, OUTPUT);
@@ -42,7 +61,7 @@ void loop2() {
   wait(100);
 }
 
-// Task no.3: accept commands from Serial1 port
+// Task no.3: accept commands from Serial port
 // '0' turns off LED
 // '1' turns on LED
 void loop3() {

@@ -1,6 +1,8 @@
 /* 
  Keyboard test
  
+ For Leonardo and Due boards only
+ 
  Reads a byte from the serial port, sends a keystroke back.
  The sent keystroke is one higher than what's received, e.g.
  if you send a, you get b, send A you get B, and so forth.

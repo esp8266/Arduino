@@ -1,5 +1,7 @@
 /* 
  Keyboard Button test
+
+ For Leonardo and Due boards only.
  
  Sends a text string when a button is pressed.
  

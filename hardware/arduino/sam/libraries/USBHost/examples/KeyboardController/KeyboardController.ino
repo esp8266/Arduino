@@ -1,12 +1,17 @@
 /*
- Keyboard Controller HID Example
+ Keyboard Controller Example
  
- Shows the output of a USB Keyboard connected to the USB
- controller of an Arduino Due Board.
+ Shows the output of a USB Keyboard connected to 
+ the Native USB port on an Arduino Due Board.
  
  created 8 Oct 2012
  by Cristian Maglie
+ 
+ http://arduino.cc/en/Tutorial/KeyboardController
+ 
+ This samlple code is part of the public domain.
  */
+
 
 // Require keyboard control library
 #include <KeyboardController.h>
@@ -66,7 +71,7 @@ void printKey() {
 
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(9600);
   Serial.println("Program started");
   delay(200);
 }

@@ -1,11 +1,15 @@
 /*
- Mouse Controller HID Example
+ Mouse Controller Example
  
- Shows the output of a USB Mouse connected to the USB
- controller of an Arduino Due Board.
+ Shows the output of a USB Mouse connected to 
+ the Native USB port on an Arduino Due Board.
  
  created 8 Oct 2012
  by Cristian Maglie
+ 
+ http://arduino.cc/en/Tutorial/MouseController
+ 
+ This samlple code is part of the public domain.
  */
 
 // Require mouse control library
@@ -17,6 +21,11 @@ USBHost usb;
 // Attach mouse controller to USB
 MouseController mouse(usb);
 
+// variables for mouse button states
+boolean leftButton = false;
+boolean middleButton = false;
+boolean rightButton = false;
+
 // This function intercepts mouse movements
 void mouseMoved() {
   Serial.print("Move: ");
@@ -25,7 +34,7 @@ void mouseMoved() {
   Serial.println(mouse.getYChange());
 }
 
-// This function intercepts mouse movements when a button is pressed
+// This function intercepts mouse movements while a button is pressed
 void mouseDragged() {
   Serial.print("DRAG: ");
   Serial.print(mouse.getXChange());
@@ -36,30 +45,42 @@ void mouseDragged() {
 // This function intercepts mouse button press
 void mousePressed() {
   Serial.print("Pressed: ");
-  if (mouse.getButton(LEFT_BUTTON))
+  if (mouse.getButton(LEFT_BUTTON)){
     Serial.print("L");
-  if (mouse.getButton(MIDDLE_BUTTON))
+    leftButton = true;
+  }
+  if (mouse.getButton(MIDDLE_BUTTON)){
     Serial.print("M");
-  if (mouse.getButton(RIGHT_BUTTON))
+    middleButton = true;
+  }
+  if (mouse.getButton(RIGHT_BUTTON)){
     Serial.print("R");
-  Serial.println();
+    Serial.println();
+    rightButton = true;
+  }
 }
 
 // This function intercepts mouse button release
 void mouseReleased() {
   Serial.print("Released: ");
-  if (mouse.getButton(LEFT_BUTTON))
+  if (!mouse.getButton(LEFT_BUTTON) && left==true) {
     Serial.print("L");
-  if (mouse.getButton(MIDDLE_BUTTON))
+    leftButton = false;
+  }
+  if (!mouse.getButton(MIDDLE_BUTTON) && middle==true) {
     Serial.print("M");
-  if (mouse.getButton(RIGHT_BUTTON))
+    middleButton = false;
+  }
+  if (!mouse.getButton(RIGHT_BUTTON) && right==true) {
     Serial.print("R");
+    rightButton = false;
+  }
   Serial.println();
 }
 
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(9600);
   Serial.println("Program started");
   delay(200);
 }
@@ -69,3 +90,4 @@ void loop()
   // Process USB tasks
   usb.Task();
 }
+

@@ -1,6 +1,8 @@
 
 /*
   KeyboardAndMouseControl
+
+ For Leonardo and Due boards only.
  
  Controls the mouse from five pushbuttons on an Arduino Leonardo.
  
