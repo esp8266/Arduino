@@ -141,10 +141,14 @@ public class BasicUploader extends Uploader  {
           while (timeout > System.currentTimeMillis()) {
             List<String> portList = Serial.list();
             if (portList.contains(uploadPort)) {
-              Serial.touchPort(uploadPort, 9600);
-              break;
+              try {
+                Serial.touchPort(uploadPort, 9600);
+                break;
+              } catch (SerialException e) {
+                // Port already in use
+              }
             }
-            Thread.sleep(100);
+            Thread.sleep(250);
           }
         } else {
           Serial.touchPort(uploadPort, 9600);
