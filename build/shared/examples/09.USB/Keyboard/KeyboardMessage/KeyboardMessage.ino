@@ -6,8 +6,9 @@
  Sends a text string when a button is pressed.
  
  The circuit:
- * pushbutton attached from pin 2 to +5V
- * 10-kilohm resistor attached from pin 4 to ground
+ * pushbutton attached from pin 2 to +5V on AVR boards 
+   and to +3.3V to the Arduino Due
+ * 10-kilohm resistor attached from pin 2 to ground
  
  created 24 Oct 2011
  modified 27 Mar 2012
