@@ -334,7 +334,8 @@ void ack_recved(void* pcb, int len) {
 
 static err_t atcp_poll(void *arg, struct tcp_pcb *pcb) {
 	struct ttcp* _ttcp = arg;
-	++tcp_poll_retries;
+	if ((_ttcp) && (_ttcp->left>0))
+		++tcp_poll_retries;
 
 	if (tcp_poll_retries > 4) {
 		WARN("ARD TCP [%p] arg=%p retries=%d\n",
