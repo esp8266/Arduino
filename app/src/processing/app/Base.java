@@ -2381,7 +2381,7 @@ public class Base {
     JFileChooser fileChooser = new JFileChooser(System.getProperty("user.home"));
     fileChooser.setDialogTitle(_("Select a zip file or a folder containing the library you'd like to add"));
     fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-    fileChooser.setFileFilter(new FileNameExtensionFilter("ZIP files or folders", "zip"));
+    fileChooser.setFileFilter(new FileNameExtensionFilter(_("ZIP files or folders"), "zip"));
 
     Dimension preferredSize = fileChooser.getPreferredSize();
     fileChooser.setPreferredSize(new Dimension(preferredSize.width + 200, preferredSize.height + 200));
@@ -2404,7 +2404,7 @@ public class Base {
           zipDeflater.deflate();
           File[] foldersInTmpFolder = tmpFolder.listFiles(new OnlyDirs());
           if (foldersInTmpFolder.length != 1) {
-            throw new IOException("Zip doesn't contain one library");
+            throw new IOException(_("Zip doesn't contain a library"));
           }
           sourceFile = foldersInTmpFolder[0];
         } catch (IOException e) {
@@ -2413,22 +2413,27 @@ public class Base {
         }
       }
 
-      // is there a library?
-      File libFolder = scanFatLibrary(sourceFile);
-      if (libFolder == null) {
-        editor.statusError("Not a valid library");
+      // is there a valid library?
+      File libFolder = sourceFile;
+      String libName = libFolder.getName();
+      if (!Sketch.isSanitaryName(libName)) {
+        String mess = I18n.format(_("The library \"{0}\" cannot be used.\n"
+            + "Library names must contain only basic letters and numbers.\n"
+            + "(ASCII only and no spaces, and it cannot start with a number)"),
+                                  libName);
+        editor.statusError(mess);
         return;
       }
       String[] headerFiles = headerListFromIncludePath(libFolder);
       if (headerFiles == null || headerFiles.length == 0) {
-        editor.statusError("Not a valid library");
+        editor.statusError(_("Not a valid library: no header files found"));
         return;
       }
 
       // copy folder
       File destinationFolder = new File(getSketchbookLibrariesFolder(), sourceFile.getName());
       if (!destinationFolder.mkdir()) {
-        editor.statusError("A library named " + sourceFile.getName() + " already exists");
+        editor.statusError(I18n.format(_("A library named {0} already exists"), sourceFile.getName()));
         return;
       }
       try {
