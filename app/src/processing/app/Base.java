@@ -1067,8 +1067,6 @@ public class Base {
   }
 
   /**
-   * <b>XXX FAT lib detection temporary disabled: compatibility issues arised.</b><br/>
-   * <br />
    * Scans inside a "FAT" (multi-platform) library folder to see if it contains
    * a version suitable for the actual selected architecture. If a suitable
    * version is found the folder containing that version is returned, otherwise
@@ -1081,27 +1079,12 @@ public class Base {
    * @return
    */
   public File scanFatLibrary(File libFolder) {
-    // A library is considered "fat" if there are folders besides
-    // examples and utility
-    boolean fat = false;
-    String[] folders = libFolder.list(new OnlyDirs());
-    for (String folder : folders) {
-      if (folder.equalsIgnoreCase("examples"))
-        continue;
-      if (folder.equalsIgnoreCase("utility"))
-        continue;
-      fat = true;
-      break;
-    }
-    
-    // XXX: Temporary override "FAT" (multiplatform) library detection.
-    // Compatibility issues arised: many library uses additional folders 
-    // https://code.google.com/p/arduino/issues/detail?id=1079
-    fat = false;
-   
-    if (!fat)
+    // A library is considered "fat" if it contains a file called
+    // "library.properties"
+    File libraryPropFile = new File(libFolder, "library.properties");
+    if (!libraryPropFile.exists() || !libraryPropFile.isFile())
       return libFolder;
-    
+
     // Search for a subfolder for actual architecture, return null if not found
     File archSubfolder = new File(libFolder, Base.getTargetPlatform().getName());
     if (!archSubfolder.exists() || !archSubfolder.isDirectory())
