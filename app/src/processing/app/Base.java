@@ -1065,21 +1065,40 @@ public class Base {
     }
     return res;
   }
-  
+
+  /**
+   * <b>XXX FAT lib detection temporary disabled: compatibility issues arised.</b><br/>
+   * <br />
+   * Scans inside a "FAT" (multi-platform) library folder to see if it contains
+   * a version suitable for the actual selected architecture. If a suitable
+   * version is found the folder containing that version is returned, otherwise
+   * <b>null</b> is returned.<br />
+   * <br />
+   * If a non-"FAT" library is detected, we assume that the library is suitable
+   * for the current architecture and the libFolder parameter is returned.<br />
+   * 
+   * @param libFolder
+   * @return
+   */
   public File scanFatLibrary(File libFolder) {
     // A library is considered "fat" if there are folders besides
     // examples and utility
     boolean fat = false;
     String[] folders = libFolder.list(new OnlyDirs());
     for (String folder : folders) {
-      if (folder.equals("examples"))
+      if (folder.equalsIgnoreCase("examples"))
         continue;
-      if (folder.equals("utility"))
+      if (folder.equalsIgnoreCase("utility"))
         continue;
       fat = true;
       break;
     }
     
+    // XXX: Temporary override "FAT" (multiplatform) library detection.
+    // Compatibility issues arised: many library uses additional folders 
+    // https://code.google.com/p/arduino/issues/detail?id=1079
+    fat = false;
+   
     if (!fat)
       return libFolder;
     
@@ -2612,7 +2631,7 @@ public class Base {
     JFileChooser fileChooser = new JFileChooser(System.getProperty("user.home"));
     fileChooser.setDialogTitle(_("Select a zip file or a folder containing the library you'd like to add"));
     fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-    fileChooser.setFileFilter(new FileNameExtensionFilter("ZIP files or folders", "zip"));
+    fileChooser.setFileFilter(new FileNameExtensionFilter(_("ZIP files or folders"), "zip"));
 
     Dimension preferredSize = fileChooser.getPreferredSize();
     fileChooser.setPreferredSize(new Dimension(preferredSize.width + 200, preferredSize.height + 200));
@@ -2635,7 +2654,7 @@ public class Base {
           zipDeflater.deflate();
           File[] foldersInTmpFolder = tmpFolder.listFiles(new OnlyDirs());
           if (foldersInTmpFolder.length != 1) {
-            throw new IOException("Zip doesn't contain one library");
+            throw new IOException(_("Zip doesn't contain a library"));
           }
           sourceFile = foldersInTmpFolder[0];
         } catch (IOException e) {
@@ -2644,22 +2663,27 @@ public class Base {
         }
       }
 
-      // is there a library?
-      File libFolder = scanFatLibrary(sourceFile);
-      if (libFolder == null) {
-        editor.statusError("Not a valid library");
+      // is there a valid library?
+      File libFolder = sourceFile;
+      String libName = libFolder.getName();
+      if (!Sketch.isSanitaryName(libName)) {
+        String mess = I18n.format(_("The library \"{0}\" cannot be used.\n"
+            + "Library names must contain only basic letters and numbers.\n"
+            + "(ASCII only and no spaces, and it cannot start with a number)"),
+                                  libName);
+        editor.statusError(mess);
         return;
       }
       String[] headerFiles = headerListFromIncludePath(libFolder);
       if (headerFiles == null || headerFiles.length == 0) {
-        editor.statusError("Not a valid library");
+        editor.statusError(_("Not a valid library: no header files found"));
         return;
       }
 
       // copy folder
       File destinationFolder = new File(getSketchbookLibrariesFolder(), sourceFile.getName());
       if (!destinationFolder.mkdir()) {
-        editor.statusError("A library named " + sourceFile.getName() + " already exists");
+        editor.statusError(I18n.format(_("A library named {0} already exists"), sourceFile.getName()));
         return;
       }
       try {
