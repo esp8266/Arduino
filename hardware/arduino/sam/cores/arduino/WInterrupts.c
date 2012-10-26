@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2011 Arduino.  All right reserved.
+  Copyright (c) 2011-2012 Arduino.  All right reserved.
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -18,38 +18,152 @@
 
 #include "WInterrupts.h"
 
+typedef void (*interruptCB)(void);
+
+static int pinMapping[EXTERNAL_NUM_INTERRUPTS] = { 2, 3, 4, 5, 6, 7, 8 };
+
+static interruptCB callbacksPioA[32];
+static interruptCB callbacksPioB[32];
+static interruptCB callbacksPioC[32];
+
+/* Configure PIO interrupt sources */
+static void __initialize() {
+	int i;
+	for (i=0; i<32; i++) {
+		callbacksPioA[i] = NULL;
+		callbacksPioB[i] = NULL;
+		callbacksPioC[i] = NULL;
+	}
+
+	pmc_enable_periph_clk(ID_PIOA);
+	NVIC_DisableIRQ(PIOA_IRQn);
+	NVIC_ClearPendingIRQ(PIOA_IRQn);
+	NVIC_SetPriority(PIOA_IRQn, 0);
+	NVIC_EnableIRQ(PIOA_IRQn);
+
+	pmc_enable_periph_clk(ID_PIOB);
+	NVIC_DisableIRQ(PIOB_IRQn);
+	NVIC_ClearPendingIRQ(PIOB_IRQn);
+	NVIC_SetPriority(PIOB_IRQn, 0);
+	NVIC_EnableIRQ(PIOB_IRQn);
+
+	pmc_enable_periph_clk(ID_PIOC);
+	NVIC_DisableIRQ(PIOC_IRQn);
+	NVIC_ClearPendingIRQ(PIOC_IRQn);
+	NVIC_SetPriority(PIOC_IRQn, 0);
+	NVIC_EnableIRQ(PIOC_IRQn);
+}
+
+
+void attachInterrupt(uint32_t interruptNum, void (*callback)(void), uint32_t mode)
+{
+	if (interruptNum >= EXTERNAL_NUM_INTERRUPTS)
+		return;
+
+	static int enabled = 0;
+	if (!enabled) {
+		__initialize();
+		enabled = 1;
+	}
+
+	// Retrieve pin information
+	uint32_t pin = pinMapping[interruptNum];
+	Pio *pio = g_APinDescription[pin].pPort;
+	uint32_t mask = g_APinDescription[pin].ulPin;
+	uint32_t pos = 0;
+
+	uint32_t t;
+	for (t = mask; t>1; t>>=1, pos++)
+		;
+
+	// Set callback function
+	if (pio == PIOA)
+		callbacksPioA[pos] = callback;
+	if (pio == PIOB)
+		callbacksPioB[pos] = callback;
+	if (pio == PIOC)
+		callbacksPioC[pos] = callback;
+
+	// Configure the interrupt mode
+	if (mode == CHANGE) {
+		// Disable additional interrupt mode (detects both rising and falling edges)
+		pio->PIO_AIMDR = mask;
+	} else {
+		// Enable additional interrupt mode
+		pio->PIO_AIMER = mask;
+
+		// Select mode of operation
+		if (mode == LOW) {
+			pio->PIO_LSR = mask;    // "Level" Select Register
+			pio->PIO_FELLSR = mask; // "Falling Edge / Low Level" Select Register
+		}
+		if (mode == HIGH) {
+			pio->PIO_LSR = mask;    // "Level" Select Register
+			pio->PIO_REHLSR = mask; // "Rising Edge / High Level" Select Register
+		}
+		if (mode == FALLING) {
+			pio->PIO_ESR = mask;    // "Edge" Select Register
+			pio->PIO_FELLSR = mask; // "Falling Edge / Low Level" Select Register
+		}
+		if (mode == RISING) {
+			pio->PIO_ESR = mask;    // "Edge" Select Register
+			pio->PIO_REHLSR = mask; // "Rising Edge / High Level" Select Register
+		}
+	}
+
+	// Enable interrupt
+	pio->PIO_IER = mask;
+}
+
+void detachInterrupt( uint32_t interruptNum )
+{
+	if (interruptNum >= EXTERNAL_NUM_INTERRUPTS)
+		return;
+
+	// Retrieve pin information
+	uint32_t pin = pinMapping[interruptNum];
+	Pio *pio = g_APinDescription[pin].pPort;
+	uint32_t mask = g_APinDescription[pin].ulPin;
+
+	// Disable interrupt
+	pio->PIO_IDR = mask;
+}
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/** PIO interrupt handlers array */
-/*volatile*/ static voidFuncPtr g_apfn_IntFunc[EXTERNAL_NUM_INTERRUPTS]={ 0 } ;
-
-void attachInterrupt( uint32_t ulInterrupt, void (*pfn_UserFunc)(void), uint32_t ulMode )
-{
-  if ( ulInterrupt < EXTERNAL_NUM_INTERRUPTS )
-  {
-    g_apfn_IntFunc[ulInterrupt] = pfn_UserFunc ;
-
-    // Configure the interrupt mode (trigger on low input, any change, rising
-    // edge, or falling edge).  The mode constants were chosen to correspond
-    // to the configuration bits in the hardware register, so we simply shift
-    // the mode into place.
-
-    // Enable the interrupt.
-
-  }
+void PIOA_Handler(void) {
+	uint32_t isr = PIOA->PIO_ISR;
+	uint32_t i;
+	for (i=0; i<32; i++, isr>>=1) {
+		if ((isr & 0x1) == 0)
+			continue;
+		if (callbacksPioA[i])
+			callbacksPioA[i]();
+	}
 }
 
-void detachInterrupt( uint32_t ulInterrupt )
-{
-  if ( ulInterrupt < EXTERNAL_NUM_INTERRUPTS )
-  {
-    /* Disable the interrupt. */
+void PIOB_Handler(void) {
+	uint32_t isr = PIOB->PIO_ISR;
+	uint32_t i;
+	for (i=0; i<32; i++, isr>>=1) {
+		if ((isr & 0x1) == 0)
+			continue;
+		if (callbacksPioB[i])
+			callbacksPioB[i]();
+	}
+}
 
-
-    g_apfn_IntFunc[ulInterrupt] = NULL ;
-  }
+void PIOC_Handler(void) {
+	uint32_t isr = PIOC->PIO_ISR;
+	uint32_t i;
+	for (i=0; i<32; i++, isr>>=1) {
+		if ((isr & 0x1) == 0)
+			continue;
+		if (callbacksPioC[i])
+			callbacksPioC[i]();
+	}
 }
 
 #ifdef __cplusplus
