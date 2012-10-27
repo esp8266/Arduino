@@ -167,6 +167,27 @@ leonardo.build.variant=leonardo
 
 ##############################################################
 
+micro.name=Arduino Micro
+micro.upload.protocol=avr109
+micro.upload.maximum_size=28672
+micro.upload.speed=57600
+micro.upload.disable_flushing=true
+micro.bootloader.low_fuses=0xff
+micro.bootloader.high_fuses=0xd8
+micro.bootloader.extended_fuses=0xcb
+micro.bootloader.path=caterina
+micro.bootloader.file=Caterina-Micro.hex
+micro.bootloader.unlock_bits=0x3F
+micro.bootloader.lock_bits=0x2F
+micro.build.mcu=atmega32u4
+micro.build.f_cpu=16000000L
+micro.build.vid=0x2341
+micro.build.pid=0x8037
+micro.build.core=arduino
+micro.build.variant=micro
+
+##############################################################
+
 mini328.name=Arduino Mini w/ ATmega328
 
 mini328.upload.protocol=arduino
