@@ -35,6 +35,7 @@ import java.awt.print.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.List;
 import java.util.zip.*;
 
 import javax.swing.*;
@@ -95,9 +96,8 @@ public class Editor extends JFrame implements RunnerListener {
   // these menus are shared so that the board and serial port selections
   // are the same for all windows (since the board and serial port that are
   // actually used are determined by the preferences, which are shared)
-  static JMenu boardsMenu;
+  static List<JMenu> boardsMenus;
   static JMenu serialMenu;
-  static JMenu cpuTypeMenu;
 
   static SerialMenuListener serialMenuListener;
   static SerialMonitor serialMonitor;
@@ -178,10 +178,13 @@ public class Editor extends JFrame implements RunnerListener {
           // re-add the sub-menus that are shared by all windows
           fileMenu.insert(sketchbookMenu, 2);
           fileMenu.insert(examplesMenu, 3);
-          //sketchMenu.insert(importMenu, 4);
-          toolsMenu.insert(boardsMenu, numTools);
-          toolsMenu.insert(cpuTypeMenu, numTools + 1);
-          toolsMenu.insert(serialMenu, numTools + 2);
+          sketchMenu.insert(importMenu, 4);
+          int offset = 0;
+          for (JMenu menu : boardsMenus) {
+            toolsMenu.insert(menu, numTools + offset);
+            offset++;
+          }
+          toolsMenu.insert(serialMenu, numTools + offset);
         }
 
         // added for 1.0.5
@@ -190,9 +193,10 @@ public class Editor extends JFrame implements RunnerListener {
 //          System.err.println("deactivate");  // not coming through
           fileMenu.remove(sketchbookMenu);
           fileMenu.remove(examplesMenu);
-          //sketchMenu.remove(importMenu);
-          toolsMenu.remove(boardsMenu);
-          toolsMenu.remove(cpuTypeMenu);
+          sketchMenu.remove(importMenu);
+          for (JMenu menu : boardsMenus) {
+            toolsMenu.remove(menu);
+          }
           toolsMenu.remove(serialMenu);
         }
       });
@@ -681,16 +685,13 @@ public class Editor extends JFrame implements RunnerListener {
     // XXX: DAM: these should probably be implemented using the Tools plugin
     // API, if possible (i.e. if it supports custom actions, etc.)
     
-    if (boardsMenu == null) {
-      boardsMenu = new JMenu(_("Board"));
-      cpuTypeMenu = new JMenu(_("Processor"));
-      base.rebuildBoardsMenu(boardsMenu, cpuTypeMenu, this);
+    if (boardsMenus == null) {
+      boardsMenus = new LinkedList<JMenu>();
+      base.rebuildBoardsMenu(toolsMenu, this);
       //Debug: rebuild imports
       importMenu.removeAll();
       base.rebuildImportMenu(importMenu, this);
     }
-    menu.add(boardsMenu);
-    menu.add(cpuTypeMenu);
     
     if (serialMenuListener == null)
       serialMenuListener  = new SerialMenuListener();
@@ -2660,7 +2661,7 @@ public class Editor extends JFrame implements RunnerListener {
   // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
   protected void onBoardOrPortChange() {
-    Map<String, String> boardPreferences =  Base.getBoardPreferences();
+    Map<String, String> boardPreferences = Base.getBoardPreferences();
     lineStatus.setBoardName(boardPreferences.get("name"));
     lineStatus.setSerialPort(Preferences.get("serial.port"));
     lineStatus.repaint();

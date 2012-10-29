@@ -1,5 +1,9 @@
 # See: http://code.google.com/p/arduino/wiki/Platforms
 
+menu.cpu=Processor
+#FIXME
+menu.speed=Speed
+
 ##############################################################
 
 uno.name=Arduino Uno
@@ -67,51 +71,44 @@ diecimila.build.variant=standard
 
 ##############################################################
 
-nano328.name=Arduino Nano w/ ATmega328
-nano328.cpu=ATmega328
-nano328.container=Arduino Nano
-
-nano328.upload.tool=avrdude
-nano328.upload.protocol=arduino
-nano328.upload.maximum_size=30720
-nano328.upload.speed=57600
-
-nano328.bootloader.tool=avrdude
-nano328.bootloader.low_fuses=0xFF
-nano328.bootloader.high_fuses=0xDA
-nano328.bootloader.extended_fuses=0x05
-nano328.bootloader.file=atmega/ATmegaBOOT_168_atmega328.hex
-nano328.bootloader.unlock_bits=0x3F
-nano328.bootloader.lock_bits=0x0F
-
-nano328.build.mcu=atmega328p
-nano328.build.f_cpu=16000000L
-nano328.build.core=arduino
-nano328.build.variant=eightanaloginputs
-
-##############################################################
-
-nano.name=Arduino Nano w/ ATmega168
-nano.cpu=ATmega168
-nano.container=Arduino Nano
+nano.name=Arduino Nano
 
 nano.upload.tool=avrdude
 nano.upload.protocol=arduino
-nano.upload.maximum_size=14336
-nano.upload.speed=19200
 
 nano.bootloader.tool=avrdude
-nano.bootloader.low_fuses=0xff
-nano.bootloader.high_fuses=0xdd
-nano.bootloader.extended_fuses=0x00
-nano.bootloader.file=atmega/ATmegaBOOT_168_diecimila.hex
-nano.bootloader.unlock_bits=0x3F
-nano.bootloader.lock_bits=0x0F
 
-nano.build.mcu=atmega168
 nano.build.f_cpu=16000000L
 nano.build.core=arduino
 nano.build.variant=eightanaloginputs
+
+#Arduino Nano w/ ATmega328
+menu.cpu.nano.atmega328=ATmega328
+menu.cpu.nano.atmega328.upload.maximum_size=30720
+menu.cpu.nano.atmega328.upload.speed=57600
+
+menu.cpu.nano.atmega328.bootloader.low_fuses=0xFF
+menu.cpu.nano.atmega328.bootloader.high_fuses=0xDA
+menu.cpu.nano.atmega328.bootloader.extended_fuses=0x05
+menu.cpu.nano.atmega328.bootloader.file=atmega/ATmegaBOOT_168_atmega328.hex
+menu.cpu.nano.atmega328.bootloader.unlock_bits=0x3F
+menu.cpu.nano.atmega328.bootloader.lock_bits=0x0F
+
+menu.cpu.nano.atmega328.build.mcu=atmega328p
+
+#Arduino Nano w/ ATmega168
+menu.cpu.nano.atmega168=ATmega168
+menu.cpu.nano.atmega168.upload.maximum_size=14336
+menu.cpu.nano.atmega168.upload.speed=19200
+
+menu.cpu.nano.atmega168.bootloader.low_fuses=0xff
+menu.cpu.nano.atmega168.bootloader.high_fuses=0xdd
+menu.cpu.nano.atmega168.bootloader.extended_fuses=0x00
+menu.cpu.nano.atmega168.bootloader.file=atmega/ATmegaBOOT_168_diecimila.hex
+menu.cpu.nano.atmega168.bootloader.unlock_bits=0x3F
+menu.cpu.nano.atmega168.bootloader.lock_bits=0x0F
+
+menu.cpu.nano.atmega168.build.mcu=atmega168
 
 ##############################################################
 
@@ -190,51 +187,49 @@ leonardo.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid}
 
 ##############################################################
 
-mini328.name=Arduino Mini w/ ATmega328
-mini328.cpu=ATmega328
-mini328.container=Arduino Mini
-
-mini328.upload.tool=avrdude
-mini328.upload.protocol=arduino
-mini328.upload.maximum_size=28672
-mini328.upload.speed=115200
-
-mini328.bootloader.tool=avrdude
-mini328.bootloader.low_fuses=0xff
-mini328.bootloader.high_fuses=0xd8
-mini328.bootloader.extended_fuses=0x05
-mini328.bootloader.file=optiboot/optiboot_atmega328-Mini.hex
-mini328.bootloader.unlock_bits=0x3F
-mini328.bootloader.lock_bits=0x0F
-
-mini328.build.mcu=atmega328p
-mini328.build.f_cpu=16000000L
-mini328.build.core=arduino
-mini328.build.variant=eightanaloginputs
-
-##############################################################
-
-mini.name=Arduino Mini w/ ATmega168
-mini.cpu=ATmega168
-mini.container=Arduino Mini
+mini.name=Arduino Mini
 
 mini.upload.tool=avrdude
 mini.upload.protocol=arduino
-mini.upload.maximum_size=14336
-mini.upload.speed=19200
 
 mini.bootloader.tool=avrdude
 mini.bootloader.low_fuses=0xff
-mini.bootloader.high_fuses=0xdd
-mini.bootloader.extended_fuses=0x00
-mini.bootloader.file=atmega/ATmegaBOOT_168_ng.hex
 mini.bootloader.unlock_bits=0x3F
 mini.bootloader.lock_bits=0x0F
 
-mini.build.mcu=atmega168
 mini.build.f_cpu=16000000L
 mini.build.core=arduino
 mini.build.variant=eightanaloginputs
+
+#Arduino Mini w/ ATmega328
+menu.cpu.mini.atmega328=ATmega328
+
+menu.cpu.mini.atmega328.upload.maximum_size=28672
+menu.cpu.mini.atmega328.upload.speed=115200
+
+menu.cpu.mini.atmega328.bootloader.high_fuses=0xd8
+menu.cpu.mini.atmega328.bootloader.extended_fuses=0x05
+menu.cpu.mini.atmega328.bootloader.file=optiboot/optiboot_atmega328-Mini.hex
+
+menu.cpu.mini.atmega328.build.mcu=atmega328p
+
+#Arduino Mini w/ ATmega168
+menu.cpu.mini.atmega168=ATmega168
+
+menu.cpu.mini.atmega168.upload.maximum_size=14336
+menu.cpu.mini.atmega168.upload.speed=19200
+
+menu.cpu.mini.atmega168.bootloader.high_fuses=0xdd
+menu.cpu.mini.atmega168.bootloader.extended_fuses=0x00
+menu.cpu.mini.atmega168.bootloader.file=atmega/ATmegaBOOT_168_ng.hex
+
+menu.cpu.mini.atmega168.build.mcu=atmega168
+
+#FIXME
+menu.speed.mini.16=16 MHz
+menu.speed.mini.16.build.f_cpu=16000000L
+menu.speed.mini.8=8 MHz
+menu.speed.mini.8.build.f_cpu=8000000L
 
 ##############################################################
 

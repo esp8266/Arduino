@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import processing.app.helpers.PreferencesMap;
+import processing.app.tools.MapWithSubkeys;
 import processing.core.PApplet;
 
 public class TargetPlatform {
@@ -39,6 +40,7 @@ public class TargetPlatform {
   private List<String> boardsOrder;
   private Map<String, PreferencesMap> programmers;
   private PreferencesMap preferences;
+  private MapWithSubkeys customMenus;
 
   public TargetPlatform(String _name, File _folder) {
     System.out.println("TargetPlatform: constructor start, name: " + _name);
@@ -55,9 +57,12 @@ public class TargetPlatform {
         PreferencesMap boardPreferences = new PreferencesMap();
         boardPreferences.load(boardsFile);
         boards = boardPreferences.createFirstLevelMap();
+        customMenus = MapWithSubkeys.createFrom(boards.get("menu"));
+        boards.remove("menu");
         boardsOrder = readBoardsOrder(boardsFile);
       }
     } catch (Exception e) {
+      e.printStackTrace();
       System.err.println("Error loading boards from boards.txt: " + e);
     }
 
@@ -119,7 +124,11 @@ public class TargetPlatform {
   public Map<String, PreferencesMap> getBoards() {
     return boards;
   }
-  
+
+  public MapWithSubkeys getCustomMenus() {
+    return customMenus;
+  }
+
   public List<String> getOrderedBoards() {
     return boardsOrder;
   }
