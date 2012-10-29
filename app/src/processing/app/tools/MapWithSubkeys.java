@@ -1,8 +1,6 @@
 package processing.app.tools;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 public class MapWithSubkeys {
@@ -35,8 +33,8 @@ public class MapWithSubkeys {
   private final Map<String, MapWithSubkeys> maps;
 
   public MapWithSubkeys() {
-    this.values = new HashMap<String, String>();
-    this.maps = new HashMap<String, MapWithSubkeys>();
+    this.values = new LinkedHashMap<String, String>();
+    this.maps = new LinkedHashMap<String, MapWithSubkeys>();
   }
 
   public Collection<String> getKeys() {
@@ -53,8 +51,10 @@ public class MapWithSubkeys {
 
   public MapWithSubkeys get(String key) {
     if (!maps.containsKey(key)) {
-      put(key, null);
       maps.put(key, new MapWithSubkeys());
+    }
+    if (!values.containsKey(key)) {
+      put(key, null);
     }
     return maps.get(key);
   }

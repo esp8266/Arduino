@@ -24,20 +24,16 @@
 package processing.app.debug;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import processing.app.helpers.PreferencesMap;
 import processing.app.tools.MapWithSubkeys;
-import processing.core.PApplet;
 
 public class TargetPlatform {
   private String name;
   private File folder;
   private Map<String, PreferencesMap> boards;
-  private List<String> boardsOrder;
   private Map<String, PreferencesMap> programmers;
   private PreferencesMap preferences;
   private MapWithSubkeys customMenus;
@@ -47,7 +43,6 @@ public class TargetPlatform {
     name = _name;
     folder = _folder;
     boards = new HashMap<String, PreferencesMap>();
-    boardsOrder = new ArrayList<String>();
     programmers = new HashMap<String, PreferencesMap>();
     preferences = new PreferencesMap();
 
@@ -59,7 +54,6 @@ public class TargetPlatform {
         boards = boardPreferences.createFirstLevelMap();
         customMenus = MapWithSubkeys.createFrom(boards.get("menu"));
         boards.remove("menu");
-        boardsOrder = readBoardsOrder(boardsFile);
       }
     } catch (Exception e) {
       e.printStackTrace();
@@ -87,32 +81,6 @@ public class TargetPlatform {
     }
   }
 
-  /**
-   * Loads the ordered list of boards as they appears on the boards.txt file
-   * 
-   * @param boardsFile
-   * @return
-   */
-  private List<String> readBoardsOrder(File boardsFile) {
-    String[] strings = PApplet.loadStrings(boardsFile);
-
-    List<String> res = new ArrayList<String>();
-    String latestBoard = "-";
-    for (String s : strings) {
-      int dot = s.indexOf('.');
-      if (dot == -1)
-        continue;
-      String board = s.substring(0, dot);
-      if (board.equals(latestBoard))
-        continue;
-      if (!boards.containsKey(board))
-        continue;
-      latestBoard = board;
-      res.add(board);
-    }
-    return res;
-  }
-
   public String getName() {
     return name;
   }
@@ -127,10 +95,6 @@ public class TargetPlatform {
 
   public MapWithSubkeys getCustomMenus() {
     return customMenus;
-  }
-
-  public List<String> getOrderedBoards() {
-    return boardsOrder;
   }
 
   public Map<String, PreferencesMap> getProgrammers() {

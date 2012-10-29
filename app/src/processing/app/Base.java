@@ -1146,7 +1146,7 @@ public class Base {
         String platformName = targetPlatform.getName();
         Map<String, PreferencesMap> boards = targetPlatform.getBoards();
 
-        if (targetPlatform.getPreferences().get("name") == null || targetPlatform.getOrderedBoards().isEmpty()) {
+        if (targetPlatform.getPreferences().get("name") == null || targetPlatform.getBoards().isEmpty()) {
           continue;
         }
         
@@ -1161,7 +1161,7 @@ public class Base {
         boardsMenu.add(separator);
         
         // For every platform cycle through all boards
-        for (final String boardID : targetPlatform.getOrderedBoards()) {
+        for (final String boardID : targetPlatform.getBoards().keySet()) {
           
           PreferencesMap boardAttributes = boards.get(boardID);
 
