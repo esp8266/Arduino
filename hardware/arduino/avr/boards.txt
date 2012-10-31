@@ -71,6 +71,8 @@ nano.upload.tool=avrdude
 nano.upload.protocol=arduino
 
 nano.bootloader.tool=avrdude
+nano.bootloader.unlock_bits=0x3F
+nano.bootloader.lock_bits=0x0F
 
 nano.build.f_cpu=16000000L
 nano.build.core=arduino
@@ -86,8 +88,6 @@ menu.cpu.nano.atmega328.bootloader.low_fuses=0xFF
 menu.cpu.nano.atmega328.bootloader.high_fuses=0xDA
 menu.cpu.nano.atmega328.bootloader.extended_fuses=0x05
 menu.cpu.nano.atmega328.bootloader.file=atmega/ATmegaBOOT_168_atmega328.hex
-menu.cpu.nano.atmega328.bootloader.unlock_bits=0x3F
-menu.cpu.nano.atmega328.bootloader.lock_bits=0x0F
 
 menu.cpu.nano.atmega328.build.mcu=atmega328p
 
@@ -101,8 +101,6 @@ menu.cpu.nano.atmega168.bootloader.low_fuses=0xff
 menu.cpu.nano.atmega168.bootloader.high_fuses=0xdd
 menu.cpu.nano.atmega168.bootloader.extended_fuses=0x00
 menu.cpu.nano.atmega168.bootloader.file=atmega/ATmegaBOOT_168_diecimila.hex
-menu.cpu.nano.atmega168.bootloader.unlock_bits=0x3F
-menu.cpu.nano.atmega168.bootloader.lock_bits=0x0F
 
 menu.cpu.nano.atmega168.build.mcu=atmega168
 
