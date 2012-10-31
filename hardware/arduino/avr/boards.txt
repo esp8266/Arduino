@@ -437,6 +437,8 @@ menu.cpu.atmegang.atmega168.bootloader.high_fuses=0xdd
 menu.cpu.atmegang.atmega168.bootloader.extended_fuses=0x00
 menu.cpu.atmegang.atmega168.bootloader.file=atmega/ATmegaBOOT_168_ng.hex
 
+menu.cpu.atmegang.atmega168.build.mcu=atmega168
+
 ## Arduino NG or older w/ ATmega8
 menu.cpu.atmegang.atmega8=ATmega8
 
@@ -445,3 +447,5 @@ menu.cpu.atmegang.atmega8.upload.maximum_size=7168
 menu.cpu.atmegang.atmega8.bootloader.low_fuses=0xdf
 menu.cpu.atmegang.atmega8.bootloader.high_fuses=0xca
 menu.cpu.atmegang.atmega8.bootloader.file=atmegang/ATmegaBOOT.hex
+
+menu.cpu.atmegang.atmega8.build.mcu=atmega8
