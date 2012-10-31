@@ -1,6 +1,8 @@
 /* 
  Keyboard Button test
  
+ For the Arduino Leonardo and Micro.
+ 
  Sends a text string when a button is pressed.
  
  The circuit:

@@ -1,7 +1,7 @@
 /*
   JoystickMouseControl
  
- Controls the mouse from a joystick on an Arduino Leonardo.
+ Controls the mouse from a joystick on an Arduino Leonardo or Micro.
  Uses a pushbutton to turn on and off mouse control, and
  a second pushbutton to click the left mouse button
  

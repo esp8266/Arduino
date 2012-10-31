@@ -1,6 +1,8 @@
 /* 
  Keyboard test
  
+ For the Arduino Leonardo or Micro
+ 
  Reads a byte from the serial port, sends a keystroke back.
  The sent keystroke is one higher than what's received, e.g.
  if you send a, you get b, send A you get B, and so forth.
