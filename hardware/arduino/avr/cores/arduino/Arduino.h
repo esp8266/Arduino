@@ -15,6 +15,8 @@
 extern "C"{
 #endif
 
+#define yield()
+
 #define HIGH 0x1
 #define LOW  0x0
 

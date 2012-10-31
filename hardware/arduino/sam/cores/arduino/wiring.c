@@ -43,19 +43,18 @@ uint32_t micros( void )
     return count * 1000 + (SysTick->LOAD + 1 - ticks) / (SystemCoreClock/1000000) ;
 }
 
-void delay( uint32_t dwMs )
+void delay( uint32_t ms )
 {
-	Wait( dwMs ) ;
+    uint32_t end = GetTickCount() + ms;
+    while (GetTickCount() < end)
+    	yield();
 }
 
-void delayMicroseconds( uint32_t dwUs )
+void delayMicroseconds( uint32_t us )
 {
-	uint32_t dwStartMicros=micros() ;
-
-	while ( (micros() - dwStartMicros) < dwUs )
-	{
-		//	do nothing
-	}
+	uint32_t start = micros();
+	while ((micros() - start) < us)
+		yield();
 }
 
 /*

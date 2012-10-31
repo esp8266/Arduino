@@ -122,12 +122,6 @@ void yield(void) {
 	coopDoYield(cur);
 }
 
-void wait(uint32_t ms) {
-	uint32_t start = millis();
-	while (millis() - start < ms)
-		yield();
-}
-
 }; // extern "C"
 
 SchedulerClass::SchedulerClass() {

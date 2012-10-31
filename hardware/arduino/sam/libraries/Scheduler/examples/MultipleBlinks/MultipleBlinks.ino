@@ -14,9 +14,7 @@
  This example code is in the public domain
  
  http://arduino.cc/en/Tutorial/MultipleBlinks
-
 */
-
 
 // Include Scheduler since we want to manage multiple tasks.
 #include <Scheduler.h>
@@ -44,21 +42,20 @@ void loop() {
   digitalWrite(led1, HIGH);
 
   // IMPORTANT:
-  // We must use 'wait' instead of 'delay' to guarantee
-  // that the other tasks get executed.
-  // ('wait' passes control to other tasks while waiting)
-  wait(1000);
+  // When multiple tasks are running 'delay' passes control to
+  // other tasks while waiting and guarantees they get executed.
+  delay(1000);
 
   digitalWrite(led1, LOW);
-  wait(1000);
+  delay(1000);
 }
 
 // Task no.2: blink LED with 0.1 second delay.
 void loop2() {
   digitalWrite(led2, HIGH);
-  wait(100);
+  delay(100);
   digitalWrite(led2, LOW);
-  wait(100);
+  delay(100);
 }
 
 // Task no.3: accept commands from Serial port

@@ -12,8 +12,6 @@ Scheduler	KEYWORD1
 # Methods and Functions (KEYWORD2)
 #######################################
 
-yield	KEYWORD2
-wait	KEYWORD2
 startLoop	KEYWORD2
 
 #######################################

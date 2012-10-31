@@ -22,9 +22,6 @@
 extern "C" {
 	typedef void (*SchedulerTask)(void);
 	typedef void (*SchedulerParametricTask)(void *);
-
-	void wait(uint32_t ms);
-	void yield();
 }
 
 class SchedulerClass {
@@ -34,7 +31,6 @@ public:
 	static void start(SchedulerTask task, uint32_t stackSize = 1024);
 	static void start(SchedulerParametricTask task, void *data, uint32_t stackSize = 1024);
 
-	static void wait(uint32_t ms) { ::wait(ms); };
 	static void yield() { ::yield(); };
 };
 

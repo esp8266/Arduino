@@ -161,6 +161,7 @@ pulseIn	KEYWORD2	PulseIn
 shiftIn	KEYWORD2	ShiftIn
 shiftOut	KEYWORD2	ShiftOut
 tone	KEYWORD2	Tone
+yield	KEYWORD2	Yield
 
 Serial	KEYWORD3	Serial
 Serial1	KEYWORD3	Serial
