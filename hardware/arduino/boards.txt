@@ -316,6 +316,27 @@ bt.build.variant=eightanaloginputs
 
 ##############################################################
 
+LilyPadUSB.name=LilyPad Arduino USB
+LilyPadUSB.upload.protocol=avr109
+LilyPadUSB.upload.maximum_size=28672
+LilyPadUSB.upload.speed=57600
+LilyPadUSB.upload.disable_flushing=true
+LilyPadUSB.bootloader.low_fuses=0xff
+LilyPadUSB.bootloader.high_fuses=0xd8
+LilyPadUSB.bootloader.extended_fuses=0xce
+LilyPadUSB.bootloader.path=caterina-LilyPadUSB
+LilyPadUSB.bootloader.file=Caterina-LilyPadUSB.hex
+LilyPadUSB.bootloader.unlock_bits=0x3F
+LilyPadUSB.bootloader.lock_bits=0x2F
+LilyPadUSB.build.mcu=atmega32u4
+LilyPadUSB.build.f_cpu=8000000L
+LilyPadUSB.build.vid=0x1B4F
+LilyPadUSB.build.pid=0x9208
+LilyPadUSB.build.core=arduino
+LilyPadUSB.build.variant=leonardo
+
+##############################################################
+
 lilypad328.name=LilyPad Arduino w/ ATmega328
 
 lilypad328.upload.protocol=arduino
