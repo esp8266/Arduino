@@ -20,8 +20,6 @@
 
 typedef void (*interruptCB)(void);
 
-static int pinMapping[EXTERNAL_NUM_INTERRUPTS] = { 2, 3, 4, 5, 6, 7, 8 };
-
 static interruptCB callbacksPioA[32];
 static interruptCB callbacksPioB[32];
 static interruptCB callbacksPioC[32];
@@ -55,11 +53,8 @@ static void __initialize() {
 }
 
 
-void attachInterrupt(uint32_t interruptNum, void (*callback)(void), uint32_t mode)
+void attachInterrupt(uint32_t pin, void (*callback)(void), uint32_t mode)
 {
-	if (interruptNum >= EXTERNAL_NUM_INTERRUPTS)
-		return;
-
 	static int enabled = 0;
 	if (!enabled) {
 		__initialize();
@@ -67,7 +62,6 @@ void attachInterrupt(uint32_t interruptNum, void (*callback)(void), uint32_t mod
 	}
 
 	// Retrieve pin information
-	uint32_t pin = pinMapping[interruptNum];
 	Pio *pio = g_APinDescription[pin].pPort;
 	uint32_t mask = g_APinDescription[pin].ulPin;
 	uint32_t pos = 0;
@@ -115,13 +109,9 @@ void attachInterrupt(uint32_t interruptNum, void (*callback)(void), uint32_t mod
 	pio->PIO_IER = mask;
 }
 
-void detachInterrupt( uint32_t interruptNum )
+void detachInterrupt(uint32_t pin)
 {
-	if (interruptNum >= EXTERNAL_NUM_INTERRUPTS)
-		return;
-
 	// Retrieve pin information
-	uint32_t pin = pinMapping[interruptNum];
 	Pio *pio = g_APinDescription[pin].pPort;
 	uint32_t mask = g_APinDescription[pin].ulPin;
 
