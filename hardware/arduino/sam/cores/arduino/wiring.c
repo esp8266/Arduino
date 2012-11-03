@@ -52,9 +52,9 @@ void delay( uint32_t ms )
 
 void delayMicroseconds( uint32_t us )
 {
-	uint32_t start = micros();
-	while ((micros() - start) < us)
-		yield();
+    uint32_t start = micros();
+    while ((micros() - start) < us)
+        ;
 }
 
 /*
