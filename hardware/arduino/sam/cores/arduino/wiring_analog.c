@@ -206,7 +206,7 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 		EAnalogChannel channel = g_APinDescription[ulPin].ulADCChannelNumber;
 		if (channel == DA0 || channel == DA1) {
 			uint32_t chDACC = ((channel == DA0) ? 0 : 1);
-			if ((dacc_get_channel_status(DACC_INTERFACE) & (1 << chDACC)) == 0) {
+			if (dacc_get_channel_status(DACC_INTERFACE) == 0) {
 				/* Enable clock for DACC_INTERFACE */
 				pmc_enable_periph_clk(DACC_INTERFACE_ID);
 
@@ -228,20 +228,22 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 				 */
 				dacc_set_timing(DACC_INTERFACE, 0x08, 0, 0x10);
 
-				/* Disable TAG and select output channel chDACC */
-				dacc_set_channel_selection(DACC_INTERFACE, chDACC);
-
-				/* Enable output channel chDACC */
-				dacc_enable_channel(DACC_INTERFACE, chDACC);
-
 				/* Set up analog current */
 				dacc_set_analog_control(DACC_INTERFACE, DACC_ACR_IBCTLCH0(0x02) |
 											DACC_ACR_IBCTLCH1(0x02) |
 											DACC_ACR_IBCTLDACCORE(0x01));
 			}
 
+			/* Disable TAG and select output channel chDACC */
+			dacc_set_channel_selection(DACC_INTERFACE, chDACC);
+
+			if ((dacc_get_channel_status(DACC_INTERFACE) & (1 << chDACC)) == 0) {
+				dacc_enable_channel(DACC_INTERFACE, chDACC);
+			}
+
 			// Write user value
 			ulValue = mapResolution(ulValue, _writeResolution, DACC_RESOLUTION);
+			while ((dacc_get_interrupt_status(DACC_INTERFACE) & DACC_ISR_TXRDY) == 0);
 			dacc_write_conversion_data(DACC_INTERFACE, ulValue);
 			return;
 		}
