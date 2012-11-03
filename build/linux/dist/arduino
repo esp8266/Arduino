@@ -1,8 +1,8 @@
 #!/bin/sh
  
-APPDIR="$(dirname -- $(readlink -f -- "${0}") )"
+APPDIR="$(dirname -- "$(readlink -f -- "${0}")" )"
 
-cd $APPDIR
+cd "$APPDIR"
  
 for LIB in \
     java/lib/rt.jar \
