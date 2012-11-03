@@ -28,23 +28,15 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import processing.app.Base;
 import processing.core.PApplet;
 
-public class PreferencesMap extends HashMap<String, String> {
+public class PreferencesMap extends LinkedHashMap<String, String> {
 
-  public PreferencesMap(Hashtable<String, String> table) {
+  public PreferencesMap(Map<String, String> table) {
     super(table);
-  }
-
-  public PreferencesMap(PreferencesMap prefs) {
-    super(prefs);
   }
 
   public PreferencesMap() {
@@ -86,18 +78,18 @@ public class PreferencesMap extends HashMap<String, String> {
     Set<String> keys = new HashSet<String>(keySet());
 
     // Override keys that have OS specific versions
-    for (String k : keys) {
+    for (String key : keys) {
       boolean replace = false;
-      if (Base.isLinux() && k.endsWith(".linux"))
+      if (Base.isLinux() && key.endsWith(".linux"))
         replace = true;
-      if (Base.isWindows() && k.endsWith(".windows"))
+      if (Base.isWindows() && key.endsWith(".windows"))
         replace = true;
-      if (Base.isMacOS() && k.endsWith(".macos"))
+      if (Base.isMacOS() && key.endsWith(".macos"))
         replace = true;
       if (replace) {
-        int dot = k.lastIndexOf('.');
-        String overridenKey = k.substring(0, dot);
-        put(overridenKey, get(k));
+        int dot = key.lastIndexOf('.');
+        String overridenKey = key.substring(0, dot);
+        put(overridenKey, get(key));
       }
     }
   }
@@ -129,7 +121,7 @@ public class PreferencesMap extends HashMap<String, String> {
    * @return
    */
   public Map<String, PreferencesMap> createFirstLevelMap() {
-    Map<String, PreferencesMap> res = new HashMap<String, PreferencesMap>();
+    Map<String, PreferencesMap> res = new LinkedHashMap<String, PreferencesMap>();
     for (String key : keySet()) {
       int dot = key.indexOf('.');
       if (dot == -1)
