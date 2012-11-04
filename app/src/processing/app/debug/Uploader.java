@@ -102,11 +102,11 @@ public abstract class Uploader implements MessageConsumer  {
     int result=0; // pre-initialized to quiet a bogus warning from jikes
     
     try {
+      if (verbose || Preferences.getBoolean("upload.verbose")) {
         for(int i = 0; i < commandArray.length; i++) {
           System.out.print(commandArray[i] + " ");
         }
         System.out.println();
-        if (verbose || Preferences.getBoolean("upload.verbose")) {
       }
       Process process = Runtime.getRuntime().exec(commandArray);
       new MessageSiphon(process.getInputStream(), this);

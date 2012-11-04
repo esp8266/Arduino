@@ -4,7 +4,6 @@
 
 name=Arduino ARM (32-bits) Boards
 compiler.path={runtime.ide.path}/hardware/tools/g++_arm_none_eabi/bin/
-#compiler.path=C:/arm-none-eabi-gcc-4_6/bin/
 compiler.c.cmd=arm-none-eabi-gcc
 compiler.c.flags=-c -g -Os -w -ffunction-sections -fdata-sections -nostdlib --param max-inline-insns-single=500 -Dprintf=iprintf
 compiler.c.elf.cmd=arm-none-eabi-g++
@@ -63,14 +62,4 @@ tools.bossac.path={runtime.ide.path}/hardware/tools
 tools.bossac.upload.params.verbose=-i -d
 tools.bossac.upload.params.quiet=
 tools.bossac.upload.pattern="{path}/{cmd}" {upload.verbose} --port={serial.port.file} -U {upload.native_usb} -e -w -v -b "{build.path}/{build.project_name}.bin" -R
-
-# specialized tool for adk2 to twiddle the erase line before running bossac
-tools.adk2install.cmd=adk2install
-tools.adk2install.cmd.windows=bossac.exe
-tools.adk2install.path={runtime.ide.path}/hardware/tools
-
-tools.adk2install.upload.params.verbose=
-tools.adk2install.upload.params.quiet=
-tools.adk2install.upload.pattern={path}/{cmd} {path}/adk2tool {serial.port.file} {path}/bossac {build.path}/{build.project_name}.bin
-
 
