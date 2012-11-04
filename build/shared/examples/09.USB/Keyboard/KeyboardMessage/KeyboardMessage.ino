@@ -1,7 +1,7 @@
 /* 
  Keyboard Button test
 
- For Leonardo and Due boards only.
+ For the Arduino Leonardo, Micro and Due boards.
  
  Sends a text string when a button is pressed.
  

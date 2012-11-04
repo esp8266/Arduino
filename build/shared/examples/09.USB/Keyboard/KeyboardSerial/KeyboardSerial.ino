@@ -1,7 +1,7 @@
 /* 
  Keyboard test
  
- For Leonardo and Due boards only
+ For the Arduino Leonardo, Micro or Due
  
  Reads a byte from the serial port, sends a keystroke back.
  The sent keystroke is one higher than what's received, e.g.
@@ -14,14 +14,14 @@
  modified 27 Mar 2012
  by Tom Igoe
  
-This example code is in the public domain.
+ This example code is in the public domain.
  
  http://www.arduino.cc/en/Tutorial/KeyboardSerial
  */
 
 void setup() {
   // open the serial port:
-Serial.begin(9600);
+  Serial.begin(9600);
   // initialize control over the keyboard:
   Keyboard.begin();
 }

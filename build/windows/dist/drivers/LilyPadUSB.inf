@@ -86,12 +86,12 @@ ServiceBinary=%12%\%DRIVERFILENAME%.sys
 [SourceDisksFiles]
 [SourceDisksNames]
 [DeviceList]
-%DESCRIPTION%=DriverInstall, USB\VID_2341&PID_0037
-%DESCRIPTION%=DriverInstall, USB\VID_2341&PID_8037&MI_00
+%DESCRIPTION%=DriverInstall, USB\VID_1B4F&PID_9207
+%DESCRIPTION%=DriverInstall, USB\VID_1B4F&PID_9208&MI_00
 
 [DeviceList.NTamd64]
-%DESCRIPTION%=DriverInstall, USB\VID_2341&PID_0037
-%DESCRIPTION%=DriverInstall, USB\VID_2341&PID_8037&MI_00
+%DESCRIPTION%=DriverInstall, USB\VID_1B4F&PID_9207
+%DESCRIPTION%=DriverInstall, USB\VID_1B4F&PID_9208&MI_00
 
 ;------------------------------------------------------------------------------
 ;  String Definitions
@@ -101,7 +101,7 @@ ServiceBinary=%12%\%DRIVERFILENAME%.sys
 [Strings]
 MFGFILENAME="CDC_vista"
 DRIVERFILENAME ="usbser"
-MFGNAME="Arduino LLC (www.arduino.cc)"
-INSTDISK="Arduino Micro Driver Installer"
-DESCRIPTION="Arduino Micro"
+MFGNAME="SparkFun Electronics"
+INSTDISK="SparkFun LilyPadUSB Driver Installer"
+DESCRIPTION="SparkFun LilyPadUSB"
 SERVICE="USB RS-232 Emulation Driver"
