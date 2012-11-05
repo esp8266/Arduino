@@ -1,3 +1,40 @@
+
+ARDUINO BETA 1.5.1 - 2012.11.05
+
+* Merged changes coming from stable release of Arduino IDE 1.0.2.
+
+[arduino core]
+* added support for yield() function in Arduino Core. This is a
+  preliminar step for experimenting with cooperative Schedulers.
+
+[ide]
+* Simplified boards menu selection. (new boards.txt file format with
+  custom sub-menus).
+* Fixed "FAT" (multi-platform) library detection. This bug caused
+  many libraries to be detected as 'invalid'.
+
+[sam arduino core]
+* attachInterrupt() and detachInterrupt() are now working.
+* Fixed macros to query low level GPIO registers:
+  digitalPinToBitMask(), digitalPinToTimer(),
+  portOutputRegister, portInputRegister()
+* Fixed analogWrite() on DAC0/1 when writing on both DACs
+  (thanks to smay4finger)
+
+[firmwares]
+* Added firmware for atmega16u2 on Due Board.
+
+ARDUINO BETA 1.5 - 2012.10.22
+
+* First release for the unified IDE for both AVR 8-bit and ARM 32-bit
+  (SAM3 CPUs) architectures.
+* This release include the SAM Arduino Core used in the Arduino Due 
+  Board.
+* Everything is in beta, most features or libraries are still  missing 
+  or incomplete.
+* For more info refer to this press release:
+  http://arduino.cc/blog/2012/10/22/arduino-1-5-support-for-the-due-and-other-processors-easier-library-installation-simplified-board-menu-etc/
+
 ARDUINO 1.0.2 - 2012.11.05
 
 [hardware]
