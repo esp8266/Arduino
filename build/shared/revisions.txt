@@ -1,3 +1,92 @@
+ARDUINO 1.0.2 - 2012.11.05
+
+[hardware]
+
+* Added support for the Arduino Micro.
+
+* Added support for the LilyPad Arduino USB.
+
+* For Arduino Mega, having avrdude use "wiring" not "stk500v2" for
+  uploads (to improve auto-reset behavior). 
+  http://code.google.com/p/arduino/issues/detail?id=806
+
+[environment]
+
+* Find-In-Reference now works whether or not text is selected.
+  http://code.google.com/p/arduino/issues/detail?id=940
+
+* Not generating prototypes for functions that already have them.
+  (Lars J. Nielsen).
+  http://code.google.com/p/arduino/issues/detail?id=973
+
+* Improved line numbers for error messages. (Paul Stoffregen)
+  http://code.google.com/p/arduino/issues/detail?id=907
+
+* Automatically create libraries folder in the sketchbook.
+  (Paul Stoffregen)
+  http://code.google.com/p/arduino/issues/detail?id=986
+
+* Tutorial on installing libraries (linked from readme.txt in the
+  libraries folder). (Limor Fried)
+
+* Fix to allow selection of Norwegian. (Rune Fauske)
+
+* Fix to race condition / occasional error in compilation. (gandrewstone)
+  http://code.google.com/p/arduino/issues/detail?id=950
+
+* Don't break long C++ comments during auto-format.
+  http://code.google.com/p/arduino/issues/detail?id=255
+
+[core / libraries]
+
+* Included WiFi library and wifi shield firmware.
+
+* Added ability to specify serial configuration (data bits, stop bits
+  and parity check) in Serial.begin(). (Alarus)
+  http://code.google.com/p/arduino/issues/detail?id=770
+
+* Avoided overruns of the incoming serial (CDC) buffer on the Leonardo.
+  (Peter Van Hoyweghen)
+
+* Avoided auto-reset of the Leonardo when opening serial port after
+  upload without specifying a baud rate. (Peter Van Hoyweghen)
+
+* Fix for tone() on the Leonardo. (Shigeru Kanemoto)
+  http://code.google.com/p/arduino/issues/detail?id=960
+
+* Fix for SD library on Leonardo.
+  http://code.google.com/p/arduino/issues/detail?id=931
+
+* Added other write functions on Leonardo.
+  http://code.google.com/p/arduino/issues/detail?id=958
+
+* Added support for Leonardo interrupts 2 and 3. (Kristian Lauszus)
+
+* Print ovf, inf, or nan accordingly in Serial.print(). (Nick Gammon)
+  http://code.google.com/p/arduino/issues/detail?id=946
+  http://code.google.com/p/arduino/issues/detail?id=961
+  http://code.google.com/p/arduino/issues/detail?id=967
+
+* Fix initialization of SPI data lines. (gandrewstone)
+  http://code.google.com/p/arduino/issues/detail?id=888
+
+* Serial.flush() waits for last byte to transmit. (michele.mazzucchi)
+  http://code.google.com/p/arduino/issues/detail?id=871
+
+* Adding overloads so Serial.write(0) works.
+  http://code.google.com/p/arduino/issues/detail?id=1006
+
+[build]
+
+* Fix Linux arduino script when there are spaces in directory name.
+
+* Pass Linux command line arguments from arduino script through to the
+  Java code. (Allows specifying sketch to open on command line.)
+
+[examples]
+
+* Included examples for the starter kit.
+
 ARDUINO 1.0.1 - 2012.05.21
 
 [environment]
