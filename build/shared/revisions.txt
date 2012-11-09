@@ -1,4 +1,11 @@
 
+[ide]
+* Fixed IDE startup bug "Menu has no enabled items"
+
+ARDUINO BETA 1.5.1r2 - 2012.11.06
+
+* Fixed wrong release file for windows.
+
 ARDUINO BETA 1.5.1 - 2012.11.05
 
 * Merged changes coming from stable release of Arduino IDE 1.0.2.
