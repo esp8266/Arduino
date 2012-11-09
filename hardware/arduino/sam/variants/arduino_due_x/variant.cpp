@@ -352,6 +352,12 @@ void init( void )
   for (int i = 0; i < PINS_COUNT; i++)
 	  digitalWrite(i, LOW);
 
+  // Enable parallel access on PIO output data registers
+  PIOA->PIO_OWER = 0xFFFFFFFF;
+  PIOB->PIO_OWER = 0xFFFFFFFF;
+  PIOC->PIO_OWER = 0xFFFFFFFF;
+  PIOD->PIO_OWER = 0xFFFFFFFF;
+
   // Initialize Serial port U(S)ART pins
   PIO_Configure(
     g_APinDescription[PINS_UART].pPort,

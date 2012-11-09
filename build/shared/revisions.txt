@@ -2,6 +2,9 @@
 [ide]
 * Fixed IDE startup bug "Menu has no enabled items"
 
+[arduino core]
+* sam: portOutputRegister() is now writeable.
+
 ARDUINO BETA 1.5.1r2 - 2012.11.06
 
 * Fixed wrong release file for windows.
