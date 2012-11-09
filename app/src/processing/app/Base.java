@@ -1140,7 +1140,6 @@ public class Base {
     // Cycle through all packages
     for (TargetPackage targetPackage : packages.values()) {
       String packageName = targetPackage.getName();
-      
       // For every package cycle through all platform
       for (TargetPlatform targetPlatform : targetPackage.platforms()) {
         String platformName = targetPlatform.getName();
@@ -1247,15 +1246,15 @@ public class Base {
           }
         }
       }
+    }
 
-      if (menuItemsToClickAfterStartup.isEmpty()) {
-        menuItemsToClickAfterStartup.add(selectFirstEnabledMenuItem(boardsMenu));
-      }
+    if (menuItemsToClickAfterStartup.isEmpty()) {
+      menuItemsToClickAfterStartup.add(selectFirstEnabledMenuItem(boardsMenu));
+    }
 
-      for (JMenuItem menuItemToClick : menuItemsToClickAfterStartup) {
-        menuItemToClick.setSelected(true);
-        menuItemToClick.getAction().actionPerformed(new ActionEvent(this, -1, ""));
-      }
+    for (JMenuItem menuItemToClick : menuItemsToClickAfterStartup) {
+      menuItemToClick.setSelected(true);
+      menuItemToClick.getAction().actionPerformed(new ActionEvent(this, -1, ""));
     }
   }
 
