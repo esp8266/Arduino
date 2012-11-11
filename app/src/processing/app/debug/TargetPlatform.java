@@ -23,6 +23,8 @@
  */
 package processing.app.debug;
 
+import static processing.app.I18n._;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,6 +47,12 @@ public class TargetPlatform {
     boards = new HashMap<String, PreferencesMap>();
     programmers = new HashMap<String, PreferencesMap>();
     preferences = new PreferencesMap();
+
+    if (false) {
+      // Hack to extract this word by gettext tool.
+      // This word is actually defined in the "boards.txt".
+      String notused = _("Processor");
+    }
 
     try {
       File boardsFile = new File(_folder, "boards.txt");
