@@ -113,7 +113,7 @@ public class Base {
   Editor activeEditor;
 
 
-  static public void main(String args[]) {
+  static public void main(String args[]) throws Exception {
     try {
       File versionFile = getContentFile("lib/version.txt");
       if (versionFile.exists()) {
@@ -244,7 +244,7 @@ public class Base {
   }
 
 
-  public Base(String[] args) {
+  public Base(String[] args) throws Exception {
     platform.init(this);
 
     // Get the sketchbook path, and make sure it's set properly
@@ -280,11 +280,28 @@ public class Base {
     // Setup board-dependent variables.
     onBoardOrPortChange();
 
-    // Check if there were previously opened sketches to be restored
-    boolean opened = restoreSketches();
-
+    boolean opened = false;
+    boolean doUpload = false;
+    String selectBoard = null;
+    String selectPort = null;
     // Check if any files were passed in on the command line
     for (int i = 0; i < args.length; i++) {
+      if (args[i].equals("--upload")) {
+        doUpload = true;
+        continue;
+      }
+      if (args[i].equals("--board")) {
+        i++;
+        if (i < args.length)
+          selectBoard = args[i];
+        continue;
+      }
+      if (args[i].equals("--port")) {
+        i++;
+        if (i < args.length)
+          selectPort = args[i];
+        continue;
+      }
       String path = args[i];
       // Fix a problem with systems that use a non-ASCII languages. Paths are
       // being passed in with 8.3 syntax, which makes the sketch loader code
@@ -302,6 +319,23 @@ public class Base {
         opened = true;
       }
     }
+
+    if (doUpload) {
+      if (!opened)
+        throw new Exception(_("Can't open source sketch!"));
+      Thread.sleep(2000);
+      Editor editor = editors.get(0);
+      if (selectPort != null)
+        editor.selectSerialPort(selectPort);
+      if (selectBoard != null)
+        selectBoard(selectBoard, editor);
+      editor.exportHandler.run();
+      System.exit(0);
+    }
+
+    // Check if there were previously opened sketches to be restored
+    if (restoreSketches())
+      opened = true;
 
     // Create a new empty window (will be replaced with any files to be opened)
     if (!opened) {
@@ -1162,36 +1196,39 @@ public class Base {
         // For every platform cycle through all boards
         for (final String boardID : targetPlatform.getBoards().keySet()) {
           
-          PreferencesMap boardAttributes = boards.get(boardID);
-
-          AbstractAction action = new AbstractAction(boardAttributes.get("name")) {
-            
-            @Override
-            public void actionPerformed(ActionEvent e) {
-              Preferences.set("target_package", (String) getValue("package"));
-              Preferences.set("target_platform", (String) getValue("platform"));
-              Preferences.set("board", (String) getValue("board"));
-              
-              filterVisibilityOfSubsequentBoardMenus((String) getValue("board"), 1, e);
-
-              onBoardOrPortChange();
-              Sketch.buildSettingChanged();
-              rebuildImportMenu(Editor.importMenu, editor);
-              rebuildExamplesMenu(Editor.examplesMenu);
+//          PreferencesMap boardAttributes = boards.get(boardID);
+//          AbstractAction action = new AbstractAction(boardAttributes.get("name")) {
+//            
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//              Preferences.set("target_package", (String) getValue("package"));
+//              Preferences.set("target_platform", (String) getValue("platform"));
+//              Preferences.set("board", (String) getValue("board"));
+//              
+//              filterVisibilityOfSubsequentBoardMenus((String) getValue("board"), 1);
+//
+//              onBoardOrPortChange();
+//              Sketch.buildSettingChanged();
+//              rebuildImportMenu(Editor.importMenu, editor);
+//              rebuildExamplesMenu(Editor.examplesMenu);
+//=======
+          // Setup a menu item for the current board
+          String boardName = boards.get(boardID).get("name");
+          @SuppressWarnings("serial")
+          AbstractAction action = new AbstractAction(boardName) {
+            public void actionPerformed(ActionEvent actionevent) {
+              selectBoard((String) getValue("b"), editor);
             }
 
           };
-          action.putValue("properties", boardAttributes);
-          action.putValue("board", boardID);
-          action.putValue("package", packageName);
-          action.putValue("platform", platformName);
+          action.putValue("b", packageName + ":" + platformName + ":" + boardID);
           
           JRadioButtonMenuItem item = new JRadioButtonMenuItem(action);
           boardsMenu.add(item);
           boardsButtonGroup.add(item);
 
-          if (selBoard.equals(action.getValue("board")) && selPackage.equals(action.getValue("package"))
-              && selPlatform.equals(action.getValue("platform"))) {
+          if (selBoard.equals(boardID) && selPackage.equals(packageName)
+              && selPlatform.equals(platformName)) {
             menuItemsToClickAfterStartup.add(item);
           }
 
@@ -1214,7 +1251,7 @@ public class Base {
                       Preferences.set("board", (String) getValue("board"));
                       Preferences.set("custom_" + customMenuID, boardID + "_" + (String) getValue("custom_menu_option"));
 
-                      filterVisibilityOfSubsequentBoardMenus((String) getValue("board"), currentIndex, e);
+                      filterVisibilityOfSubsequentBoardMenus((String) getValue("board"), currentIndex);
 
                       onBoardOrPortChange();
                       Sketch.buildSettingChanged();
@@ -1258,7 +1295,7 @@ public class Base {
     }
   }
 
-  private static void filterVisibilityOfSubsequentBoardMenus(String boardID, int fromIndex, ActionEvent originatingEvent) {
+  private static void filterVisibilityOfSubsequentBoardMenus(String boardID, int fromIndex) {
     for (int i = fromIndex; i < Editor.boardsMenus.size(); i++) {
       JMenu menu = Editor.boardsMenus.get(i);
       for (int m = 0; m < menu.getItemCount(); m++) {
@@ -1271,7 +1308,7 @@ public class Base {
         JMenuItem visibleSelectedOrFirstMenuItem = selectVisibleSelectedOrFirstMenuItem(menu);
         if (!visibleSelectedOrFirstMenuItem.isSelected()) {
           visibleSelectedOrFirstMenuItem.setSelected(true);
-          visibleSelectedOrFirstMenuItem.getAction().actionPerformed(originatingEvent);
+          visibleSelectedOrFirstMenuItem.getAction().actionPerformed(null);
         }
       }
     }
@@ -1329,7 +1366,23 @@ public class Base {
     }
     throw new IllegalStateException("Menu has no enabled items");
   }
-  
+
+
+  private void selectBoard(String selectBoard, Editor editor) {
+    String[] split = selectBoard.split(":");
+    Preferences.set("target_package", split[0]);
+    Preferences.set("target_platform", split[1]);
+    Preferences.set("board", split[2]);
+    
+    filterVisibilityOfSubsequentBoardMenus(split[2], 1);
+
+    onBoardOrPortChange();
+    Sketch.buildSettingChanged();
+    rebuildImportMenu(Editor.importMenu, editor);
+    rebuildExamplesMenu(Editor.examplesMenu);
+  }
+
+
   public void rebuildProgrammerMenu(JMenu menu) {
     menu.removeAll();
     ButtonGroup group = new ButtonGroup();
