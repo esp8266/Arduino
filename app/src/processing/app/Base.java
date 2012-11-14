@@ -1158,7 +1158,7 @@ public class Base {
   }
 
   public void rebuildBoardsMenu(JMenu toolsMenu, final Editor editor) {
-    JMenu boardsMenu = makeOrGetBoardMenu(toolsMenu, "Board");
+    JMenu boardsMenu = makeOrGetBoardMenu(toolsMenu, _("Board"));
 
     String selPackage = Preferences.get("target_package");
     String selPlatform = Preferences.get("target_platform");
@@ -1324,13 +1324,12 @@ public class Base {
   }
 
   private JMenu makeOrGetBoardMenu(JMenu toolsMenu, String label) {
-    String i18nLabel = _(label);
     for (JMenu menu : Editor.boardsMenus) {
-      if (i18nLabel.equals(menu.getText())) {
+      if (label.equals(menu.getText())) {
         return menu;
       }
     }
-    JMenu menu = new JMenu(i18nLabel);
+    JMenu menu = new JMenu(label);
     Editor.boardsMenus.add(menu);
     toolsMenu.add(menu);
     return menu;
