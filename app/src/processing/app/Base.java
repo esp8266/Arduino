@@ -1195,31 +1195,13 @@ public class Base {
         
         // For every platform cycle through all boards
         for (final String boardID : targetPlatform.getBoards().keySet()) {
-          
-//          PreferencesMap boardAttributes = boards.get(boardID);
-//          AbstractAction action = new AbstractAction(boardAttributes.get("name")) {
-//            
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//              Preferences.set("target_package", (String) getValue("package"));
-//              Preferences.set("target_platform", (String) getValue("platform"));
-//              Preferences.set("board", (String) getValue("board"));
-//              
-//              filterVisibilityOfSubsequentBoardMenus((String) getValue("board"), 1);
-//
-//              onBoardOrPortChange();
-//              Sketch.buildSettingChanged();
-//              rebuildImportMenu(Editor.importMenu, editor);
-//              rebuildExamplesMenu(Editor.examplesMenu);
-//=======
           // Setup a menu item for the current board
           String boardName = boards.get(boardID).get("name");
           @SuppressWarnings("serial")
-          AbstractAction action = new AbstractAction(boardName) {
+          Action action = new AbstractAction(boardName) {
             public void actionPerformed(ActionEvent actionevent) {
               selectBoard((String) getValue("b"), editor);
             }
-
           };
           action.putValue("b", packageName + ":" + platformName + ":" + boardID);
           
@@ -1242,8 +1224,8 @@ public class Base {
                 MapWithSubkeys boardCustomMenu = customMenu.get(boardID);
                 final int currentIndex = i + 1 + 1; //plus 1 to skip the first board menu, plus 1 to keep the custom menu next to this one
                 for (final String customMenuOption : boardCustomMenu.getKeys()) {
-                  action = new AbstractAction(_(boardCustomMenu.getValueOf(customMenuOption))) {
-
+                  @SuppressWarnings("serial")
+                  Action subAction = new AbstractAction(_(boardCustomMenu.getValueOf(customMenuOption))) {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                       Preferences.set("target_package", (String) getValue("package"));
@@ -1259,17 +1241,16 @@ public class Base {
                       rebuildExamplesMenu(Editor.examplesMenu);
                     }
                   };
-                  action.putValue("properties", boardCustomMenu.getValues());
-                  action.putValue("board", boardID);
-                  action.putValue("custom_menu_option", customMenuOption);
-                  action.putValue("package", packageName);
-                  action.putValue("platform", platformName);
+                  subAction.putValue("board", boardID);
+                  subAction.putValue("custom_menu_option", customMenuOption);
+                  subAction.putValue("package", packageName);
+                  subAction.putValue("platform", platformName);
 
                   if (!buttonGroupsMap.containsKey(customMenuID)) {
                     buttonGroupsMap.put(customMenuID, new ButtonGroup());
                   }
                   
-                  item = new JRadioButtonMenuItem(action);
+                  item = new JRadioButtonMenuItem(subAction);
                   menu.add(item);
                   buttonGroupsMap.get(customMenuID).add(item);
 
