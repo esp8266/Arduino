@@ -9,7 +9,7 @@ For more information, see the website at: http://www.arduino.cc/
 or the forums at: http://arduino.cc/forum/
 
 To report a bug in the software, go to:
-http://code.google.com/p/arduino/issues/list
+http://github.com/arduino/Arduino/issues
 
 For other suggestions, use the forum:
 http://arduino.cc/forum/index.php/board,21.0.html
