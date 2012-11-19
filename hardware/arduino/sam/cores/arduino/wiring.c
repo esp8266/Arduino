@@ -17,7 +17,6 @@
 */
 
 #include "Arduino.h"
-#include "Reset.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,17 +54,6 @@ void delayMicroseconds( uint32_t us )
     uint32_t start = micros();
     while ((micros() - start) < us)
         ;
-}
-
-/*
- * Cortex-M3 Systick IT handler: MOVED TO MAIN DUE TO WEAK SYMBOL ISSUE NOT RESOLVED
- */
-void SysTick_Handler( void )
-{
-	tickReset();
-
-	// Increment tick count each ms
-	TimeTick_Increment() ;
 }
 
 #if defined ( __ICCARM__ ) /* IAR Ewarm 5.41+ */
