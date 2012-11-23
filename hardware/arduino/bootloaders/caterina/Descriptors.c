@@ -195,6 +195,8 @@ const USB_Descriptor_String_t ProductString =
 
 	#if DEVICE_PID == 0x0036
 	.UnicodeString          = L"Arduino Leonardo" 
+	#elif DEVICE_PID == 0x0037
+	.UnicodeString			= L"Arduino Micro   "
 	#else
 	.UnicodeString			= L"USB IO board    "
 	#endif
