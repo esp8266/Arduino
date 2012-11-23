@@ -10,6 +10,9 @@
 * sam: fixed BSoD on some Windows machine (louismdavis)
 * sam: added CANRX1/CANTX1 pins 88/89 (same physical pin for 66/53)
 
+[libraries]
+* sam: Added Servo library
+
 ARDUINO BETA 1.5.1r2 - 2012.11.06
 
 * Fixed wrong release file for windows.
