@@ -1,9 +1,14 @@
 
 [ide]
 * Fixed IDE startup bug "Menu has no enabled items"
+* Command line build.
+* Fixed some language strings (Shigeru KANEMOTO)
 
 [arduino core]
 * sam: portOutputRegister() is now writeable.
+* sam: fixed issue on weak-symbol for some interrupt handlers
+* sam: fixed BSoD on some Windows machine (louismdavis)
+* sam: added CANRX1/CANTX1 pins 88/89 (same physical pin for 66/53)
 
 ARDUINO BETA 1.5.1r2 - 2012.11.06
 
