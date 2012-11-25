@@ -1014,7 +1014,14 @@ public class Base {
       PreferencesMap prefs = getTargetPlatform().getPreferences();
       String targetname = prefs.get("name");
 
-      JMenuItem platformItem = new JMenuItem(targetname);
+      if (false) {
+	// Hack to extract these words by gettext tool.
+	// These phrases are actually defined in the "platform.txt".
+	String notused = _("Arduino AVR Boards");
+	notused = _("Arduino ARM (32-bits) Boards");
+      }
+
+      JMenuItem platformItem = new JMenuItem(_(targetname));
       platformItem.setEnabled(false);
       importMenu.add(platformItem);
       if (ideLibs.size()>0) {
@@ -1189,7 +1196,7 @@ public class Base {
         }
         first = false;
         
-        JMenuItem separator = new JMenuItem(targetPlatform.getPreferences().get("name"));
+        JMenuItem separator = new JMenuItem(_(targetPlatform.getPreferences().get("name")));
         separator.setEnabled(false);
         boardsMenu.add(separator);
         
