@@ -179,6 +179,33 @@ leonardo.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid}
 
 ##############################################################
 
+micro.name=Arduino Micro
+micro.upload.tool=avrdude
+micro.upload.protocol=avr109
+micro.upload.maximum_size=28672
+micro.upload.speed=57600
+micro.upload.disable_flushing=true
+micro.upload.use_1200bps_touch=true
+micro.upload.wait_for_upload_port=true
+
+micro.bootloader.tool=avrdude
+micro.bootloader.low_fuses=0xff
+micro.bootloader.high_fuses=0xd8
+micro.bootloader.extended_fuses=0xcb
+micro.bootloader.file=caterina/Caterina-Micro.hex
+micro.bootloader.unlock_bits=0x3F
+micro.bootloader.lock_bits=0x2F
+
+micro.build.mcu=atmega32u4
+micro.build.f_cpu=16000000L
+micro.build.vid=0x2341
+micro.build.pid=0x8037
+micro.build.core=arduino
+micro.build.variant=micro
+micro.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid}
+
+##############################################################
+
 mini.name=Arduino Mini
 
 mini.upload.tool=avrdude
@@ -315,7 +342,7 @@ LilyPadUSB.bootloader.tool=avrdude
 LilyPadUSB.bootloader.low_fuses=0xff
 LilyPadUSB.bootloader.high_fuses=0xd8
 LilyPadUSB.bootloader.extended_fuses=0xce
-LilyPadUSB.bootloader.file=caterina-LilyPadUSB/ Caterina-LilyPadUSB.hex
+LilyPadUSB.bootloader.file=caterina-LilyPadUSB/Caterina-LilyPadUSB.hex
 LilyPadUSB.bootloader.unlock_bits=0x3F
 LilyPadUSB.bootloader.lock_bits=0x2F
 
