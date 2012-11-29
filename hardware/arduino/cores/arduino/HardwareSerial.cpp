@@ -36,8 +36,7 @@
 
 /*
  * on ATmega8, the uart and its bits are not numbered, so there is no "TXC0"
- * definition.  It is slightly cleaner to define this here instead of having
- * conditional code in the cpp module.
+ * definition.
  */
 #if !defined(TXC0)
 #if defined(TXC)
