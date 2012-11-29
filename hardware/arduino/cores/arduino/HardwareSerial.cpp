@@ -34,6 +34,22 @@
 
 #include "HardwareSerial.h"
 
+/*
+ * on ATmega8, the uart and its bits are not numbered, so there is no "TXC0"
+ * definition.  It is slightly cleaner to define this here instead of having
+ * conditional code in the cpp module.
+ */
+#if !defined(TXC0)
+#if defined(TXC)
+#define TXC0 TXC
+#elif defined(TXC1)
+// Some devices have uart1 but no uart0
+#define TXC0 TXC1
+#else
+#error TXC0 not definable in HardwareSerial.h
+#endif
+#endif
+
 // Define constants and variables for buffering incoming serial data.  We're
 // using a ring buffer (I think), in which head is the index of the location
 // to which to write the next incoming character and tail is the index of the
