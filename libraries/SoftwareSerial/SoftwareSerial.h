@@ -82,7 +82,7 @@ public:
   // public methods
   SoftwareSerial(uint8_t receivePin, uint8_t transmitPin, bool inverse_logic = false);
   ~SoftwareSerial();
-  void begin(long speed);
+  bool begin(long speed);
   bool listen();
   void end();
   bool isListening() { return this == active_object; }
