@@ -493,7 +493,7 @@ atmega8.upload.speed=19200
 atmega8.bootloader.low_fuses=0xdf
 atmega8.bootloader.high_fuses=0xca
 atmega8.bootloader.path=atmega8
-atmega8.bootloader.file=ATmegaBOOT.hex
+atmega8.bootloader.file=ATmegaBOOT-prod-firmware-2009-11-07.hex
 atmega8.bootloader.unlock_bits=0x3F
 atmega8.bootloader.lock_bits=0x0F
 

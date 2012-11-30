@@ -1,0 +1,4 @@
+Configured with: ../src/configure -v --enable-languages=c,c++ --prefix=/usr/lib --infodir=/usr/share/info --mandir=/usr/share/man --bindir=/usr/bin --libexecdir=/usr/lib --libdir=/usr/lib --enable-shared --with-system-zlib --enable-long-long --enable-nls --without-included-gettext --disable-checking --disable-libssp --build=i686-linux-gnu --host=i686-linux-gnu --target=avr
+Thread model: single
+gcc version 4.3.5 (GCC) 
+
