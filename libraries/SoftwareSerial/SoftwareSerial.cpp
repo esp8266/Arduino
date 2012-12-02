@@ -376,15 +376,13 @@ void SoftwareSerial::setRX(uint8_t rx)
 // Public methods
 //
 
-bool SoftwareSerial::begin(long speed)
+void SoftwareSerial::begin(long speed)
 {
   _rx_delay_centering = _rx_delay_intrabit = _rx_delay_stopbit = _tx_delay = 0;
 
-  long baud = 0;
-
   for (unsigned i=0; i<sizeof(table)/sizeof(table[0]); ++i)
   {
-    baud = pgm_read_dword(&table[i].baud);
+    long baud = pgm_read_dword(&table[i].baud);
     if (baud == speed)
     {
       _rx_delay_centering = pgm_read_word(&table[i].rx_delay_centering);
@@ -394,7 +392,6 @@ bool SoftwareSerial::begin(long speed)
       break;
     }
   }
-  if (baud != speed) return false;
 
   // Set up RX interrupts, but only if we have a valid RX baud rate
   if (_rx_delay_stopbit)
@@ -413,8 +410,6 @@ bool SoftwareSerial::begin(long speed)
 #endif
 
   listen();
-
-  return true;
 }
 
 void SoftwareSerial::end()
