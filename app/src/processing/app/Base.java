@@ -1232,7 +1232,7 @@ public class Base {
                 for (final String customMenuOption : boardCustomMenu.getKeys()) {
                   @SuppressWarnings("serial")
                   Action subAction = new AbstractAction(_(boardCustomMenu.getValueOf(customMenuOption))) {
-                    @Override
+
                     public void actionPerformed(ActionEvent e) {
                       Preferences.set("target_package", (String) getValue("package"));
                       Preferences.set("target_platform", (String) getValue("platform"));
