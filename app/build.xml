@@ -3,6 +3,7 @@
 
   <target name="clean" description="Clean the build directories">
     <delete dir="bin" />
+    <delete dir="test-bin" />
     <delete file="pde.jar" />
   </target>
 
@@ -49,7 +50,7 @@
     </copy>
   </target>
 
-  <target name="test" description="Runs the test">
+  <target name="test" depends="compile" description="Runs the test">
     <mkdir dir="test-bin"/>
 
     <javac source="1.5" target="1.5"
@@ -88,7 +89,7 @@
         <pathelement location="test-lib/junit-4.11.jar"/>
       </classpath>
 
-      <formatter type="plain"/>
+      <formatter type="xml"/>
 
       <batchtest fork="yes" todir="test-bin">
         <fileset dir="test">
@@ -99,7 +100,7 @@
 
   </target>
 
-  <target name="build" depends="compile,test" description="Build PDE">
+  <target name="build" depends="test" description="Build PDE">
     <jar basedir="bin" destfile="pde.jar" />
   </target>
 </project>
