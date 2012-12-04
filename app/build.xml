@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <project name="Arduino PDE" default="build">
-  
+
   <target name="clean" description="Clean the build directories">
     <delete dir="bin" />
     <delete file="pde.jar" />
@@ -24,11 +24,11 @@
     <property name="java_home" value="${env.JAVA_HOME}" />
 
     <condition property="linux"><os family="unix" /></condition>
-    <fail if="linux" unless="java_home" 
+    <fail if="linux" unless="java_home"
 	  message="The JAVA_HOME variable must be set to the location of a full JDK. For instance, on Ubuntu Linux, this might be /usr/lib/jvm/java-6-sun." />
 
     <condition property="windows"><os family="windows" /></condition>
-    <fail if="windows" unless="java_home" 
+    <fail if="windows" unless="java_home"
 	  message="The JAVA_HOME variable must be set to the location of a full JDK. For instance, on Windows, this might be c:\jdk1.6.0_18." />
 
 <!--
@@ -38,18 +38,68 @@
     <fail />
 -->
     <javac source="1.5" target="1.5"
-	   srcdir="src" 
-	   destdir="bin" 
+	   srcdir="src"
+	   destdir="bin"
 	   encoding="UTF-8"
 	   includeAntRuntime="false"
 	   debug="true"
-	   classpath="../core/core.jar; ${env.JAVA_HOME}/lib/tools.jar; lib/ant.jar; lib/ant-launcher.jar; lib/apple.jar; lib/ecj.jar; lib/jna.jar; lib/RXTXcomm.jar" />
+	   classpath="../core/core.jar; ${env.JAVA_HOME}/lib/tools.jar; lib/apple.jar; lib/ecj.jar; lib/jna.jar; lib/RXTXcomm.jar" />
     <copy todir="bin" overwrite="true" verbose="true">
       <fileset dir="src" includes="**/*.properties" />
     </copy>
   </target>
-  
-  <target name="build" depends="compile" description="Build PDE">
+
+  <target name="test" description="Runs the test">
+    <mkdir dir="test-bin"/>
+
+    <javac source="1.5" target="1.5"
+           srcdir="test"
+           destdir="test-bin"
+           encoding="UTF-8"
+           includeAntRuntime="false"
+           debug="true">
+      <classpath>
+        <pathelement location="bin"/>
+        <pathelement location="../core/core.jar"/>
+        <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
+        <pathelement location="lib/apple.jar"/>
+        <pathelement location="lib/ecj.jar"/>
+        <pathelement location="lib/jna.jar"/>
+        <pathelement location="lib/RXTXcomm.jar"/>
+        <pathelement location="test-lib/junit-4.11.jar"/>
+      </classpath>
+    </javac>
+
+    <copy todir="test-bin" overwrite="true" verbose="true">
+      <fileset dir="test" includes="**/*.zip" />
+      <fileset dir="test" includes="**/*.txt" />
+    </copy>
+
+    <junit printsummary="yes" haltonfailure="yes">
+      <classpath>
+        <pathelement location="bin"/>
+        <pathelement location="test-bin"/>
+        <pathelement location="../core/core.jar"/>
+        <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
+        <pathelement location="lib/apple.jar"/>
+        <pathelement location="lib/ecj.jar"/>
+        <pathelement location="lib/jna.jar"/>
+        <pathelement location="lib/RXTXcomm.jar"/>
+        <pathelement location="test-lib/junit-4.11.jar"/>
+      </classpath>
+
+      <formatter type="plain"/>
+
+      <batchtest fork="yes" todir="test-bin">
+        <fileset dir="test">
+          <include name="**/*Test.java"/>
+        </fileset>
+      </batchtest>
+    </junit>
+
+  </target>
+
+  <target name="build" depends="compile,test" description="Build PDE">
     <jar basedir="bin" destfile="pde.jar" />
   </target>
 </project>
