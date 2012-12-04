@@ -2424,11 +2424,6 @@ public class Base {
         editor.statusError(mess);
         return;
       }
-      String[] headerFiles = headerListFromIncludePath(libFolder);
-      if (headerFiles == null || headerFiles.length == 0) {
-        editor.statusError(_("Not a valid library: no header files found"));
-        return;
-      }
 
       // copy folder
       File destinationFolder = new File(getSketchbookLibrariesFolder(), sourceFile.getName());
