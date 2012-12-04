@@ -34,7 +34,7 @@ import java.io.*;
  * <A HREF="http://jalopy.sourceforge.net/">Jalopy</A>. This is to replace
  * the buggy code formatter found in previous releases.
  */
-public class AutoFormat {
+  public class AutoFormat {
   Editor editor;
 
 

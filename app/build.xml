@@ -37,10 +37,9 @@
     <echo message="override ${env.JAVA_HOME}/lib/tools.jar" />
     <fail />
 -->
-    <javac target="1.5" 
+    <javac source="1.5" target="1.5"
 	   srcdir="src" 
 	   destdir="bin" 
-	   excludes="**/tools/format/**" 
 	   encoding="UTF-8"
 	   includeAntRuntime="false"
 	   debug="true"
