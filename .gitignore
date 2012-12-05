@@ -16,4 +16,7 @@ hardware/arduino/bootloaders/caterina_LUFA/.dep/
 .gitignore
 build/windows/work/
 build/linux/work/
+build/linux/dist/*.tar.gz
+build/linux/*.tgz
 test-bin
+*.iml
