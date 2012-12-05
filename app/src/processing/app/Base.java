@@ -1052,7 +1052,7 @@ public class Base {
         File folder = ideLibs.get(name);
         addSketchesSubmenu(menu, name, folder, false);
         // Allows "fat" libraries to have examples in the root folder
-        if (folder.getName().equals(Base.getTargetPlatform()))
+        if (folder.getName().equals(Base.getTargetPlatform().getName()))
           addSketchesSubmenu(menu, name, folder.getParentFile(), false);
       }
 
