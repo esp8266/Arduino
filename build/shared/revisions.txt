@@ -1,7 +1,30 @@
 
+ARDUINO 1.0.3 - 2012.12.10
+
 [hardware]
 
 * Added support for the Arduino Esplora
+
+[environment]
+
+* Signed application for MacOSX 10.8
+
+[core]
+
+* Fixed power-up-starts-bootloader in Leonardo (and derivative) 
+  bootloaders. (Kristian Lauszus)
+  (https://github.com/arduino/Arduino/pull/118)
+
+* Fixed digital_pin_to_timer_PGM array in Leonardo variant.
+
+* Published updated Wifi firmware
+
+* Updated source code for atmega8 bootloader
+
+[libraries]
+
+* Added 600 baud support in SoftwareSerial (Sébastien Jean)
+  (http://github.com/arduino/Arduino/issues/1146)
 
 ARDUINO 1.0.2 - 2012.11.05
 
