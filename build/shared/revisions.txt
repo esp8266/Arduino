@@ -1,3 +1,8 @@
+
+[hardware]
+
+* Added support for the Arduino Esplora
+
 ARDUINO 1.0.2 - 2012.11.05
 
 [hardware]

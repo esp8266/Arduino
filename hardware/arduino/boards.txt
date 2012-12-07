@@ -167,6 +167,27 @@ leonardo.build.variant=leonardo
 
 ##############################################################
 
+esplora.name=Arduino Esplora
+esplora.upload.protocol=avr109
+esplora.upload.maximum_size=28672
+esplora.upload.speed=57600
+esplora.upload.disable_flushing=true
+esplora.bootloader.low_fuses=0xff
+esplora.bootloader.high_fuses=0xd8
+esplora.bootloader.extended_fuses=0xcb
+esplora.bootloader.path=caterina
+esplora.bootloader.file=Caterina-Esplora.hex
+esplora.bootloader.unlock_bits=0x3F
+esplora.bootloader.lock_bits=0x2F
+esplora.build.mcu=atmega32u4
+esplora.build.f_cpu=16000000L
+esplora.build.vid=0x2341
+esplora.build.pid=0x803C
+esplora.build.core=arduino
+esplora.build.variant=leonardo
+
+##############################################################
+
 micro.name=Arduino Micro
 micro.upload.protocol=avr109
 micro.upload.maximum_size=28672

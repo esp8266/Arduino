@@ -57,6 +57,8 @@
 # PID = 0x0036
 # official Micro PID
 # PID = 0x0037
+# official Esplora PID
+# PID = 0x003C
 
 # MCU name
 MCU = atmega32u4
