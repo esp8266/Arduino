@@ -102,15 +102,15 @@ void loop() {
         linked to the buttons we're handling.
        */
       if (newState == PRESSED) {
-        Keyboard.press(keystrokes[i]);
+        Keyboard.press(keystrokes[thisButton]);
       }
       else if (newState == RELEASED) {
-        Keyboard.release(keystrokes[i]);
+        Keyboard.release(keystrokes[thisButton]);
       }
     }
 
     // Store the new button state, so you can sense a difference later:
-    buttonStates[i] = newState;
+    buttonStates[thisButton] = newState;
   }
   
   /*
