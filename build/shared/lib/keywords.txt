@@ -48,6 +48,7 @@ null	KEYWORD1
 private	KEYWORD1
 protected	KEYWORD1	
 public	KEYWORD1	
+register	KEYWORD1	
 return	KEYWORD1	Return	
 short	KEYWORD1
 signed	KEYWORD1
