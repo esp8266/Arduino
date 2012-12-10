@@ -7,6 +7,13 @@
  For more on NTP time servers and the messages needed to communicate with them, 
  see http://en.wikipedia.org/wiki/Network_Time_Protocol
  
+ Warning: NTP Servers are subject to temporary failure or IP address change.
+ Plese check 
+
+    http://tf.nist.gov/tf-cgi/servers.cgi
+
+ if the time server used in the example didn't work.
+
  created 4 Sep 2010 
  by Michael Margolis
  modified 9 Apr 2012
@@ -27,7 +34,9 @@ byte mac[] = {
 
 unsigned int localPort = 8888;      // local port to listen for UDP packets
 
-IPAddress timeServer(192, 43, 244, 18); // time.nist.gov NTP server
+IPAddress timeServer(132, 163, 4, 101); // time-a.timefreq.bldrdoc.gov NTP server
+// IPAddress timeServer(132, 163, 4, 102); // time-b.timefreq.bldrdoc.gov NTP server
+// IPAddress timeServer(132, 163, 4, 103); // time-c.timefreq.bldrdoc.gov NTP server
 
 const int NTP_PACKET_SIZE= 48; // NTP time stamp is in the first 48 bytes of the message
 
