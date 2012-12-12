@@ -1128,7 +1128,7 @@ public class Sketch {
    * Add import statements to the current tab for all of packages inside
    * the specified jar file.
    */
-  public void importLibrary(String jarPath) {
+  public void importLibrary(String jarPath) throws IOException {
     // make sure the user didn't hide the sketch folder
     ensureExistence();
 

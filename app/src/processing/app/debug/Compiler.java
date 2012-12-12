@@ -644,14 +644,18 @@ public class Compiler implements MessageConsumer {
    * not the header files in its sub-folders, as those should be included from
    * within the header files at the top-level).
    */
-  static public String[] headerListFromIncludePath(String path) {
+  static public String[] headerListFromIncludePath(String path) throws IOException {
     FilenameFilter onlyHFiles = new FilenameFilter() {
       public boolean accept(File dir, String name) {
         return name.endsWith(".h");
       }
     };
-    
-    return (new File(path)).list(onlyHFiles);
+
+    String[] list = (new File(path)).list(onlyHFiles);
+    if (list == null) {
+      throw new IOException();
+    }
+    return list;
   }
   
   static public ArrayList<File> findFilesInPath(String path, String extension,
