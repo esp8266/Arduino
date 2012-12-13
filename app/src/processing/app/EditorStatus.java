@@ -290,8 +290,8 @@ public class EditorStatus extends JPanel /*implements ActionListener*/ {
 
   protected void setup() {
     if (okButton == null) {
-      cancelButton = new JButton(Preferences.PROMPT_CANCEL);
-      okButton = new JButton(Preferences.PROMPT_OK);
+      cancelButton = new JButton(I18n.PROMPT_CANCEL);
+      okButton = new JButton(I18n.PROMPT_OK);
 
       cancelButton.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
