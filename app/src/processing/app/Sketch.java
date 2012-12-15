@@ -612,7 +612,7 @@ public class Sketch {
 
       } else {
         // delete the file
-        if (!current.deleteFile()) {
+        if (!current.deleteFile(tempBuildFolder)) {
           Base.showMessage(_("Couldn't do it"),
                            I18n.format(_("Could not delete \"{0}\"."), current.getFileName()));
           return;
