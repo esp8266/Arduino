@@ -652,7 +652,10 @@ public class Base {
 
     // Make an empty pde file
     File newbieFile = new File(newbieDir, newbieName + ".ino");
-    new FileOutputStream(newbieFile);  // create the file
+    if (!newbieFile.createNewFile()) {
+      throw new IOException();
+    }
+    FileUtils.copyFile(new File(System.getProperty("user.dir"), "TemplateSketch.ino"), newbieFile);
     return newbieFile.getAbsolutePath();
   }
 

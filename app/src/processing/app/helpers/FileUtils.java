@@ -35,6 +35,27 @@ public class FileUtils {
     return false;
   }
 
+  public static void copyFile(File source, File dest) throws IOException {
+    FileInputStream fis = null;
+    FileOutputStream fos = null;
+    try {
+      fis = new FileInputStream(source);
+      fos = new FileOutputStream(dest);
+      byte[] buf = new byte[4096];
+      int readBytes = -1;
+      while ((readBytes = fis.read(buf, 0, buf.length)) != -1) {
+        fos.write(buf, 0, readBytes);
+      }
+    } finally {
+      if (fis != null) {
+        fis.close();
+      }
+      if (fos != null) {
+        fos.close();
+      }
+    }
+  }
+
   public static void copy(File sourceFolder, File destFolder) throws IOException {
     for (File file : sourceFolder.listFiles()) {
       File destFile = new File(destFolder, file.getName());
@@ -44,24 +65,7 @@ public class FileUtils {
         }
         copy(file, destFile);
       } else {
-        FileInputStream fis = null;
-        FileOutputStream fos = null;
-        try {
-          fis = new FileInputStream(file);
-          fos = new FileOutputStream(destFile);
-          byte[] buf = new byte[4096];
-          int readBytes = -1;
-          while ((readBytes = fis.read(buf, 0, buf.length)) != -1) {
-            fos.write(buf, 0, readBytes);
-          }
-        } finally {
-          if (fis != null) {
-            fis.close();
-          }
-          if (fos != null) {
-            fos.close();
-          }
-        }
+        copyFile(file, destFile);
       }
     }
   }
