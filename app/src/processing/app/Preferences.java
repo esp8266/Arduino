@@ -213,7 +213,6 @@ public class Preferences {
     }
 
     // set some runtime constants (not saved on preferences file)
-    table.put("runtime.os", PConstants.platformNames[PApplet.platform]);
     File hardwareFolder = Base.getHardwareFolder();
     table.put("runtime.hardware.path", hardwareFolder.getAbsolutePath());
     table.put("runtime.ide.path", hardwareFolder.getParentFile().getAbsolutePath());
@@ -276,6 +275,9 @@ public class Preferences {
 
     // load the I18n module for internationalization
     I18n.init(Preferences.get("editor.languages.current"));
+
+    // set some other runtime constants (not saved on preferences file)
+    table.put("runtime.os", PConstants.platformNames[PApplet.platform]);
 
     // other things that have to be set explicitly for the defaults
     setColor("run.window.bgcolor", SystemColor.control);
