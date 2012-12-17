@@ -19,15 +19,29 @@ import java.text.MessageFormat;
 
 public class I18n {
   // start using current locale but still allow using the dropdown list later
-  private static ResourceBundle i18n = ResourceBundle.getBundle("processing.app.Resources");
-  public static Locale locale;
+  private static ResourceBundle i18n;
+
+  // prompt text stuff
+
+  static String PROMPT_YES;
+  static String PROMPT_NO;
+  static String PROMPT_CANCEL;
+  static String PROMPT_OK;
+  static String PROMPT_BROWSE;
 
   static protected void init (String language) {
     // there might be a null pointer exception ... most likely will never happen but the jvm gets mad
     try {
-      if (language == null || language.trim().length() == 0) locale = Locale.getDefault();
-      else locale = new Locale(language);
-      i18n = ResourceBundle.getBundle("processing.app.Resources", locale);
+      if (language != null && language.trim().length() > 0) {
+        Locale.setDefault(new Locale(language));
+      }
+      i18n = ResourceBundle.getBundle("processing.app.Resources", Locale.getDefault());
+
+      PROMPT_YES = _("Yes");
+      PROMPT_NO = _("No");
+      PROMPT_CANCEL = _("Cancel");
+      PROMPT_OK = _("OK");
+      PROMPT_BROWSE = _("Browse");
     } catch (java.lang.NullPointerException e) {
     }
   }

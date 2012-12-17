@@ -27,6 +27,7 @@ import java.io.File;
 import javax.swing.UIManager;
 
 import processing.app.Preferences;
+import processing.core.PConstants;
 
 
 /**
@@ -111,5 +112,10 @@ public class Platform extends processing.app.Platform {
       System.out.println("No launcher set, cannot open " +
                          file.getAbsolutePath());
     }
+  }
+
+  @Override
+  public String getName() {
+    return PConstants.platformNames[PConstants.LINUX];
   }
 }

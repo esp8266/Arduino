@@ -34,6 +34,7 @@ import com.apple.eio.FileManager;
 
 import processing.app.Base;
 import processing.core.PApplet;
+import processing.core.PConstants;
 
 
 /**
@@ -195,4 +196,10 @@ public class Platform extends processing.app.Platform {
   protected String getDocumentsFolder() throws FileNotFoundException {
     return FileManager.findFolder(kUserDomain, kDocumentsFolderType);
   }
+
+  @Override
+  public String getName() {
+    return PConstants.platformNames[PConstants.MACOSX];
+  }
+
 }
