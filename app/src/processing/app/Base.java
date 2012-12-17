@@ -113,6 +113,11 @@ public class Base {
 
 
   static public void main(String args[]) throws Exception {
+    initPlatform();
+
+    // run static initialization that grabs all the prefs
+    Preferences.init(null);
+
     try {
       File versionFile = getContentFile("lib/version.txt");
       if (versionFile.exists()) {
@@ -151,8 +156,6 @@ public class Base {
     }
     */
 
-    initPlatform();
-
 //    // Set the look and feel before opening the window
 //    try {
 //      platform.setLookAndFeel();
@@ -171,12 +174,6 @@ public class Base {
 
     // Make sure a full JDK is installed
     //initRequirements();
-
-    // run static initialization that grabs all the prefs
-    Preferences.init(null);
-
-    // load the I18n module for internationalization
-    I18n.init(Preferences.get("editor.languages.current"));
 
     // setup the theme coloring fun
     Theme.init();

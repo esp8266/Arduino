@@ -29,6 +29,7 @@ import javax.swing.UIManager;
 
 import com.sun.jna.Library;
 import com.sun.jna.Native;
+import processing.core.PConstants;
 
 
 /**
@@ -157,6 +158,10 @@ public class Platform {
   public int unsetenv(String variable) {
     CLibrary clib = CLibrary.INSTANCE;
     return clib.unsetenv(variable);
+  }
+
+  public String getName() {
+    return PConstants.platformNames[PConstants.OTHER];
   }
 
   
