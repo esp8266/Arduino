@@ -10,7 +10,8 @@ uint16_t EthernetClass::_server_port[MAX_SOCK_NUM] = {
 
 int EthernetClass::begin(uint8_t *mac_address)
 {
-  _dhcp = new DhcpClass();
+  static DhcpClass s_dhcp;
+  _dhcp = &s_dhcp;
 
 
   // Initialise the basic info
