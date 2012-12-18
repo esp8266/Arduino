@@ -727,7 +727,10 @@ public class Editor extends JFrame implements RunnerListener {
 
 
   protected void addTools(JMenu menu, File sourceFolder) {
-    HashMap<String, JMenuItem> toolItems = new HashMap<String, JMenuItem>();
+    if (sourceFolder == null)
+      return;
+    
+    Map<String, JMenuItem> toolItems = new HashMap<String, JMenuItem>();
 
     File[] folders = sourceFolder.listFiles(new FileFilter() {
       public boolean accept(File folder) {

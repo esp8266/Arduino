@@ -970,6 +970,8 @@ public class Base {
   }
 
   public Map<String, File> getIDELibs() {
+    if (libraries == null)
+      return new HashMap<String, File>();
     Map<String, File> ideLibs = new HashMap<String, File>(libraries);
     for (String lib : libraries.keySet()) {
       if (FileUtils.isSubDirectory(getSketchbookFolder(), libraries.get(lib)))
@@ -979,6 +981,8 @@ public class Base {
   }
 
   public Map<String, File> getUserLibs() {
+    if (libraries == null)
+      return new HashMap<String, File>();
     Map<String, File> userLibs = new HashMap<String, File>(libraries);
     for (String lib : libraries.keySet()) {
       if (!FileUtils.isSubDirectory(getSketchbookFolder(), libraries.get(lib)))
@@ -1002,34 +1006,37 @@ public class Base {
     importMenu.add(addLibraryMenuItem);
 
     // Split between user supplied libraries and IDE libraries
-    Map<String, File> ideLibs = getIDELibs();
-    Map<String, File> userLibs = getUserLibs();
-    try {
-      // Find the current target. Get the platform, and then select the
-      // correct name and core path.
-      PreferencesMap prefs = getTargetPlatform().getPreferences();
-      String targetname = prefs.get("name");
+    TargetPlatform targetPlatform = getTargetPlatform();
+    if (targetPlatform != null) {
+      Map<String, File> ideLibs = getIDELibs();
+      Map<String, File> userLibs = getUserLibs();
+      try {
+        // Find the current target. Get the platform, and then select the
+        // correct name and core path.
+        PreferencesMap prefs = targetPlatform.getPreferences();
+        String targetname = prefs.get("name");
 
-      if (false) {
-	// Hack to extract these words by gettext tool.
-	// These phrases are actually defined in the "platform.txt".
-	String notused = _("Arduino AVR Boards");
-	notused = _("Arduino ARM (32-bits) Boards");
-      }
+        if (false) {
+          // Hack to extract these words by gettext tool.
+          // These phrases are actually defined in the "platform.txt".
+          String notused = _("Arduino AVR Boards");
+          notused = _("Arduino ARM (32-bits) Boards");
+        }
 
-      JMenuItem platformItem = new JMenuItem(_(targetname));
-      platformItem.setEnabled(false);
-      importMenu.add(platformItem);
-      if (ideLibs.size()>0) {
-        importMenu.addSeparator();
-        addLibraries(importMenu, ideLibs);
+        JMenuItem platformItem = new JMenuItem(_(targetname));
+        platformItem.setEnabled(false);
+        importMenu.add(platformItem);
+        if (ideLibs.size() > 0) {
+          importMenu.addSeparator();
+          addLibraries(importMenu, ideLibs);
+        }
+        if (userLibs.size() > 0) {
+          importMenu.addSeparator();
+          addLibraries(importMenu, userLibs);
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
       }
-      if (userLibs.size()>0) {
-        importMenu.addSeparator();
-        addLibraries(importMenu, userLibs);
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
     }
   }
 
@@ -1132,11 +1139,15 @@ public class Base {
   }
 
   public void onBoardOrPortChange() {
+    TargetPlatform targetPlatform = getTargetPlatform();
+    if (targetPlatform == null)
+      return;
+    
     // Calculate paths for libraries and examples
     examplesFolder = getContentFile("examples");
     toolsFolder = getContentFile("tools");
 
-    File platformFolder = getTargetPlatform().getFolder();
+    File platformFolder = targetPlatform.getFolder();
     librariesFolders = new ArrayList<File>();
     librariesFolders.add(getContentFile("libraries"));
     librariesFolders.add(new File(platformFolder, "libraries"));
@@ -1400,6 +1411,9 @@ public class Base {
    */
   protected boolean addSketches(JMenu menu, File folder,
                                 final boolean replaceExisting) throws IOException {
+    if (folder == null)
+      return false;
+    
     // skip .DS_Store files, etc (this shouldn't actually be necessary)
     if (!folder.isDirectory()) return false;
 
@@ -1846,7 +1860,10 @@ public class Base {
    */
   static public TargetPlatform getTargetPlatform(String packageName,
                                                  String platformName) {
-    return packages.get(packageName).get(platformName);
+    TargetPackage p = packages.get(packageName);
+    if (p == null)
+      return null;
+    return p.get(platformName);
   }
 
   static public TargetPlatform getCurrentTargetPlatformFromPackage(String pack) {
