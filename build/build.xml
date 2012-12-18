@@ -97,9 +97,6 @@
       <fileset dir="shared/examples" />
     </copy>
     
-    <!-- copy shared template -->
-    <copy file="shared/TemplateSketch.ino" todir="${target.path}/" />
-    
     <!-- Unzip documentation -->
     <unzip dest="${target.path}" src="shared/reference.zip" overwrite="false"/>
     

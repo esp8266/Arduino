@@ -655,7 +655,7 @@ public class Base {
     if (!newbieFile.createNewFile()) {
       throw new IOException();
     }
-    FileUtils.copyFile(new File(System.getProperty("user.dir"), "TemplateSketch.ino"), newbieFile);
+    FileUtils.copyFile(new File(System.getProperty("user.dir"), "examples/01.Basics/BareMinimum/BareMinimum.ino"), newbieFile);
     return newbieFile.getAbsolutePath();
   }
 
