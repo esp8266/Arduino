@@ -278,12 +278,22 @@ public class Base {
 
     boolean opened = false;
     boolean doUpload = false;
+    boolean doVerify = false;
+    boolean doVerbose = false;
     String selectBoard = null;
     String selectPort = null;
     // Check if any files were passed in on the command line
     for (int i = 0; i < args.length; i++) {
       if (args[i].equals("--upload")) {
         doUpload = true;
+        continue;
+      }
+      if (args[i].equals("--verify")) {
+        doVerify = true;
+        continue;
+      }
+      if (args[i].equals("--verbose") || args[i].equals("-v")) {
+        doVerbose = true;
         continue;
       }
       if (args[i].equals("--board")) {
@@ -316,16 +326,37 @@ public class Base {
       }
     }
 
-    if (doUpload) {
-      if (!opened)
-        throw new Exception(_("Can't open source sketch!"));
+    if (doUpload || doVerify) {
+      if (!opened) {
+        System.out.println(_("Can't open source sketch!"));
+        System.exit(2);
+      }
       Thread.sleep(2000);
+      // Set verbosity for command line build
+      Preferences.set("build.verbose", "" + doVerbose);
+      Preferences.set("upload.verbose", "" + doVerbose);
+
+      // Do board selection if requested
       Editor editor = editors.get(0);
-      if (selectPort != null)
-        editor.selectSerialPort(selectPort);
       if (selectBoard != null)
         selectBoard(selectBoard, editor);
-      editor.exportHandler.run();
+      
+      if (doUpload) {
+        // Build and upload
+        if (selectPort != null)
+          editor.selectSerialPort(selectPort);
+        editor.exportHandler.run();
+      } else {
+        // Build only
+        editor.runHandler.run();
+      }
+      
+      // Error during build or upload
+      int res = editor.status.mode;
+      if (res == EditorStatus.ERR)
+        System.exit(1);
+      
+      // No errors exit gracefully
       System.exit(0);
     }
 
