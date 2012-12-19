@@ -734,11 +734,10 @@ public class Preferences {
     // Fix for 0163 to properly use Unicode when writing preferences.txt
     PrintWriter writer = PApplet.createWriter(preferencesFile);
 
-    Enumeration e = table.keys(); //properties.propertyNames();
-    while (e.hasMoreElements()) {
-      String key = (String) e.nextElement();
+    String[] keys = (String[])table.keySet().toArray(new String[0]);
+    Arrays.sort(keys);
+    for (String key: keys)
       writer.println(key + "=" + ((String) table.get(key)));
-    }
 
     writer.flush();
     writer.close();
