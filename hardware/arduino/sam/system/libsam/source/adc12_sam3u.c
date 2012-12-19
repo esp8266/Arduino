@@ -386,7 +386,7 @@ Pdc *adc12b_get_pdc_base(const Adc12b *p_adc)
 {
 	return PDC_ADC12B;
 }
-#endif
+#endif // SAM3U_SERIES
 
 //@}
 

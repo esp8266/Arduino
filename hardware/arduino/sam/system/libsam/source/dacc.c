@@ -27,7 +27,7 @@
  * ----------------------------------------------------------------------------
  */
 
-#include "dacc.h"
+#include "../chip.h"
 
 /// @cond 0
 /**INDENT-OFF**/
@@ -36,6 +36,8 @@ extern "C" {
 #endif
 /**INDENT-ON**/
 /// @endcond
+
+#if (SAM3XA_SERIES) || (SAM3N_SERIES) || (SAM3S_SERIES)
 
 /**
  * \defgroup sam_drivers_dacc_group Digital-to-Analog Converter Controller (DACC)
@@ -471,6 +473,9 @@ uint32_t dacc_get_analog_control(Dacc *p_dacc)
 #endif /* (SAM3S_SERIES) || (SAM3XA_SERIES) */
 
 //@}
+
+#endif // SAM3XA_SERIES
+
 
 /// @cond 0
 /**INDENT-OFF**/

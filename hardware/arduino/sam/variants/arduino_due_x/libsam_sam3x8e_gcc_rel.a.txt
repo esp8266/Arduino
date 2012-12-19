@@ -72,7 +72,6 @@ pmc.o:
 00000000 T pmc_switch_udpck_to_upllck
 
 pwmc.o:
-00000000 r C.9.7280
 00000000 t FindClockConfiguration
 00000000 T PWMC_ConfigureChannel
 00000000 T PWMC_ConfigureChannelExt
@@ -100,14 +99,14 @@ pwmc.o:
 00000000 T PWMC_SetSyncChannelUpdateUnlock
 00000000 T PWMC_WriteBuffer
          U __assert_func
-00000000 r __func__.5974
-00000000 r __func__.5985
-00000000 r __func__.6000
-00000000 r __func__.6011
-00000000 r __func__.6022
-00000000 r __func__.6029
-00000000 r __func__.6113
-00000000 r __func__.6119
+00000000 r __func__.6271
+00000000 r __func__.6282
+00000000 r __func__.6297
+00000000 r __func__.6308
+00000000 r __func__.6319
+00000000 r __func__.6326
+00000000 r __func__.6410
+00000000 r __func__.6416
 
 rtc.o:
 00000000 T RTC_ClearSCCR
@@ -123,9 +122,9 @@ rtc.o:
 00000000 T RTC_SetTime
 00000000 T RTC_SetTimeAlarm
          U __assert_func
-00000000 r __func__.5971
-00000000 r __func__.5980
-00000000 r __func__.5985
+00000000 r __func__.6268
+00000000 r __func__.6277
+00000000 r __func__.6282
 
 rtt.o:
 00000000 T RTT_EnableIT
@@ -134,8 +133,8 @@ rtt.o:
 00000000 T RTT_SetAlarm
 00000000 T RTT_SetPrescaler
          U __assert_func
-00000000 r __func__.5978
-00000000 r __func__.5986
+00000000 r __func__.6275
+00000000 r __func__.6283
 
 spi.o:
 00000000 T SPI_Configure
@@ -161,9 +160,9 @@ tc.o:
 00000000 T TC_Start
 00000000 T TC_Stop
          U __assert_func
-00000000 r __func__.5973
-00000000 r __func__.5979
-00000000 r __func__.5985
+00000000 r __func__.6270
+00000000 r __func__.6276
+00000000 r __func__.6282
 
 timetick.o:
 00000000 T GetTickCount
@@ -190,18 +189,18 @@ twi.o:
 00000000 T TWI_TransferComplete
 00000000 T TWI_WriteByte
          U __assert_func
-00000000 r __func__.6346
-00000000 r __func__.6361
-00000000 r __func__.6365
-00000000 r __func__.6372
-00000000 r __func__.6376
-00000000 r __func__.6381
-00000000 r __func__.6389
-00000000 r __func__.6403
-00000000 r __func__.6408
-00000000 r __func__.6412
-00000000 r __func__.6417
-00000000 r __func__.6421
+00000000 r __func__.6635
+00000000 r __func__.6650
+00000000 r __func__.6654
+00000000 r __func__.6661
+00000000 r __func__.6665
+00000000 r __func__.6670
+00000000 r __func__.6678
+00000000 r __func__.6692
+00000000 r __func__.6697
+00000000 r __func__.6701
+00000000 r __func__.6706
+00000000 r __func__.6710
 
 usart.o:
 00000000 T USART_Configure
@@ -220,7 +219,7 @@ usart.o:
 00000000 T USART_Write
 00000000 T USART_WriteBuffer
          U __assert_func
-00000000 r __func__.6267
+00000000 r __func__.6556
 
 wdt.o:
 00000000 T WDT_Disable
@@ -430,3 +429,110 @@ dacc.o:
 00000000 T dacc_set_trigger
 00000000 T dacc_set_writeprotect
 00000000 T dacc_write_conversion_data
+
+can.o:
+00000000 R can_bit_time
+00000000 T can_disable
+00000000 T can_disable_autobaud_listen_mode
+00000000 T can_disable_interrupt
+00000000 T can_disable_low_power_mode
+00000000 T can_disable_overload_frame
+00000000 T can_disable_time_triggered_mode
+00000000 T can_disable_timer_freeze
+00000000 T can_disable_tx_repeat
+00000000 T can_enable
+00000000 T can_enable_autobaud_listen_mode
+00000000 T can_enable_interrupt
+00000000 T can_enable_low_power_mode
+00000000 T can_enable_overload_frame
+00000000 T can_enable_time_triggered_mode
+00000000 T can_enable_timer_freeze
+00000000 T can_enable_tx_repeat
+00000000 T can_get_internal_timer_value
+00000000 T can_get_interrupt_mask
+00000000 T can_get_rx_error_cnt
+00000000 T can_get_status
+00000000 T can_get_timestamp_value
+00000000 T can_get_tx_error_cnt
+00000000 T can_global_send_abort_cmd
+00000000 T can_global_send_transfer_cmd
+00000000 T can_init
+00000000 T can_mailbox_get_status
+00000000 T can_mailbox_init
+00000000 T can_mailbox_read
+00000000 T can_mailbox_send_abort_cmd
+00000000 T can_mailbox_send_transfer_cmd
+00000000 T can_mailbox_set_timemark
+00000000 T can_mailbox_tx_remote_frame
+00000000 T can_mailbox_write
+00000000 T can_reset_all_mailbox
+00000000 T can_reset_internal_timer
+00000000 T can_set_rx_sync_stage
+00000000 T can_set_timestamp_capture_point
+
+efc.o:
+00000000 T efc_disable_frdy_interrupt
+00000000 T efc_enable_frdy_interrupt
+00000000 T efc_get_flash_access_mode
+00000000 T efc_get_result
+00000000 T efc_get_status
+00000000 T efc_get_wait_state
+00000000 T efc_init
+00000000 T efc_perform_command
+0000006c T efc_perform_fcr
+00000000 T efc_perform_read_sequence
+00000000 T efc_set_flash_access_mode
+00000000 T efc_set_wait_state
+00000068 T efc_write_fmr
+00000000 b iap_perform_command.6537
+
+gpbr.o:
+00000000 T gpbr_read
+00000000 T gpbr_write
+
+ssc.o:
+         U memset
+00000000 T ssc_disable_interrupt
+00000000 T ssc_disable_rx
+00000000 T ssc_disable_tx
+00000000 T ssc_disable_tx_frame_sync_data
+00000000 T ssc_enable_interrupt
+00000000 T ssc_enable_rx
+00000000 T ssc_enable_tx
+00000000 T ssc_enable_tx_frame_sync_data
+00000000 T ssc_get_interrupt_mask
+00000000 T ssc_get_rx_access
+00000000 T ssc_get_rx_compare
+00000000 T ssc_get_status
+00000000 T ssc_get_tx_access
+00000000 T ssc_get_writeprotect_status
+00000000 T ssc_i2s_set_receiver
+00000000 T ssc_i2s_set_transmitter
+00000000 T ssc_is_rx_enabled
+00000000 T ssc_is_rx_ready
+00000000 T ssc_is_tx_empty
+00000000 T ssc_is_tx_enabled
+00000000 T ssc_is_tx_ready
+00000000 T ssc_read
+00000000 T ssc_read_sync_data
+00000000 T ssc_reset
+00000000 T ssc_set_clock_divider
+00000000 T ssc_set_loop_mode
+00000000 T ssc_set_normal_mode
+00000000 T ssc_set_receiver
+00000000 T ssc_set_rx_compare
+00000000 T ssc_set_rx_stop_selection
+00000000 T ssc_set_td_default_level
+00000000 T ssc_set_transmitter
+00000000 T ssc_set_writeprotect
+00000000 T ssc_write
+00000000 T ssc_write_sync_data
+
+trng.o:
+00000000 T trng_disable
+00000000 T trng_disable_interrupt
+00000000 T trng_enable
+00000000 T trng_enable_interrupt
+00000000 T trng_get_interrupt_mask
+00000000 T trng_get_interrupt_status
+00000000 T trng_read_output_data
