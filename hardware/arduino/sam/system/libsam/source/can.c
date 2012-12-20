@@ -764,6 +764,22 @@ void can_reset_all_mailbox(Can *p_can)
 	}
 }
 
+// from wilfredo
+void reset_mailbox_conf(can_mb_conf_t *p_mailbox)
+{
+	p_mailbox->ul_mb_idx = 0;
+	p_mailbox->uc_obj_type = 0;
+	p_mailbox->uc_id_ver = 0;
+	p_mailbox->uc_length = 0;
+	p_mailbox->uc_tx_prio = 0;
+	p_mailbox->ul_status = 0;
+	p_mailbox->ul_id_msk = 0;
+	p_mailbox->ul_id = 0;
+	p_mailbox->ul_fid = 0;
+	p_mailbox->ul_datal = 0;
+	p_mailbox->ul_datah = 0;
+}
+
 #endif // SAM3XA_SERIES
 
 

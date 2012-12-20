@@ -153,6 +153,9 @@ uint32_t can_mailbox_write(Can *p_can, can_mb_conf_t *p_mailbox);
 uint32_t can_mailbox_tx_remote_frame(Can *p_can, can_mb_conf_t *p_mailbox);
 void can_reset_all_mailbox(Can *p_can);
 
+// from wilfredo
+void reset_mailbox_conf(can_mb_conf_t *p_mailbox);
+
 /** @} */
 
 /** @cond 0 */
