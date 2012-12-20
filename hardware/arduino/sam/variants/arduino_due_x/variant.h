@@ -166,6 +166,18 @@ static const uint8_t CANTX = 69;
 #define ADC_RESOLUTION		12
 
 /*
+ * Complementary CAN pins
+ */
+static const uint8_t CAN1RX = 88;
+static const uint8_t CAN1TX = 89;
+
+// CAN0
+#define PINS_CAN0            (90u)
+// CAN1
+#define PINS_CAN1            (91u)
+
+
+/*
  * DACC
  */
 #define DACC_INTERFACE		DACC
