@@ -331,13 +331,18 @@ public class Base {
         System.out.println(_("Can't open source sketch!"));
         System.exit(2);
       }
-      Thread.sleep(2000);
+      
       // Set verbosity for command line build
       Preferences.set("build.verbose", "" + doVerbose);
       Preferences.set("upload.verbose", "" + doVerbose);
 
-      // Do board selection if requested
       Editor editor = editors.get(0);
+      
+      // Wait until editor is initialized
+      while (!editor.status.isInitialized())
+        Thread.sleep(10);
+      
+      // Do board selection if requested
       if (selectBoard != null)
         selectBoard(selectBoard, editor);
       
