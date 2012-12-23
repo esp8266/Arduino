@@ -6,7 +6,7 @@
   
   Created on 22 november 2012
   By Enrico Gueli <enrico.gueli@gmail.com>
-  Modified 24 Nov 2012
+  Modified 22 Dec 2012
   by Tom Igoe
 */
 #include <Esplora.h>
@@ -24,7 +24,7 @@ void loop() {
   
   // convert the sensor readings to light levels:
   byte red   = map(xAxis, -512, 512, 0, 255);
-  byte green = map(xAxis, -512, 512, 0, 255);
+  byte green = map(yAxis, -512, 512, 0, 255);
   byte blue  = slider/4;
  
   // print the light levels:
