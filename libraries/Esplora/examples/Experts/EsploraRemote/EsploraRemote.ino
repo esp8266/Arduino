@@ -25,7 +25,7 @@
  
  Created on 22 november 2012
  By Enrico Gueli <enrico.gueli@gmail.com>
- Modified 22 Dec 2012
+ Modified 23 Dec 2012
  by Tom Igoe
  */
 
@@ -68,11 +68,6 @@ void parseCommand() {
 }
 
 void dumpInputs() {  
-  /*
-   * please note: a single row contains two instructions.
-   * one is to print the sensor value, the other to print the
-   * comma symbol.
-   */
   Serial.print(Esplora.readButton(SWITCH_1)); 
   Serial.print(',');
   Serial.print(Esplora.readButton(SWITCH_2)); 
