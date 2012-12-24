@@ -22,22 +22,23 @@
 #include <Esplora.h>
 
 void setup() {
-  Serial.begin(9600); 
+  Serial.begin(9600);     // initialize serial communication
 }
 
 void loop() {
+  // read the slider and three of the buttons
   int slider = Esplora.readSlider();
-  int resetButton = Esplora.readButton(1);
-  int serveButton = Esplora.readButton(3);
-  int switchPlayerButton = Esplora.readButton(4);
+  int resetButton = Esplora.readButton(SWITCH_1);
+  int serveButton = Esplora.readButton(SWITCH_3);
+  int switchPlayerButton = Esplora.readButton(SWITCH_4);
 
-  Serial.print(slider);
-  Serial.print(",");
-  Serial.print(resetButton);
-  Serial.print(",");
-  Serial.print(serveButton);
-  Serial.print(",");
-  Serial.println(switchPlayerButton);
-  delay(10);
+  Serial.print(slider);                // print the slider value
+  Serial.print(",");                   // add a comma
+  Serial.print(resetButton);           // print the reset button value
+  Serial.print(",");                   // add another comma
+  Serial.print(serveButton);           // print the serve button value
+  Serial.print(",");                   // add another comma
+  Serial.println(switchPlayerButton);  // print the last button with a newline
+  delay(10);                           // delay before sending the next set
 }
 
