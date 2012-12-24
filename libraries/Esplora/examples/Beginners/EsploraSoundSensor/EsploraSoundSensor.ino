@@ -1,5 +1,5 @@
 /*
-  Esplora Led calibration
+  Esplora Sound Sensor
  
  This  sketch shows you how to read  the microphone sensor. The microphone
 will range from 0 (total silence) to 1023 (really loud).  
