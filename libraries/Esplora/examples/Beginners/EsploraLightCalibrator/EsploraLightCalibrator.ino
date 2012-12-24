@@ -32,7 +32,7 @@ void setup() {
 
 void loop() {
   // if switch 1 is pressed, go to the calibration function again:
-  if (Esplora.readButton(1) == HIGH) {
+  if (Esplora.readButton(1) == LOW) {
     calibrate();
   }
   // read the sensor into a variable:
@@ -64,7 +64,7 @@ void calibrate() {
   Serial.println("While holding switch 1, shine a light on the light sensor, then cover it.");
 
   // calibrate while switch 1 is pressed:
-  while(Esplora.readButton(1) == HIGH) {
+  while(Esplora.readButton(1) == LOW) {
     // read the sensor value: 
     int light  = Esplora.readLightSensor();
 
