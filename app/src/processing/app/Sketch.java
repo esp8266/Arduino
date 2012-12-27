@@ -1630,7 +1630,7 @@ public class Sketch {
     editor.status.progressUpdate(percent);
   }
 
-  
+
   protected void size(PreferencesMap prefs) throws RunnerException {
     long size = 0;
     String maxsizeString = prefs.get("upload.maximum_size");
@@ -1641,8 +1641,8 @@ public class Sketch {
     try {
       size = sizer.computeSize();
       System.out.println(I18n
-          .format(_("Binary sketch size: {0} bytes (of a {1} byte maximum)"),
-                  size, maxsize));
+              .format(_("Binary sketch size: {0} bytes (of a {1} byte maximum) - {2}% used"),
+                      size, maxsize, size * 100 / maxsize));
     } catch (RunnerException e) {
       System.err.println(I18n.format(_("Couldn't determine program size: {0}"),
                                      e.getMessage()));
