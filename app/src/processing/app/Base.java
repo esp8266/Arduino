@@ -1197,9 +1197,14 @@ public class Base {
     // Populate importToLibraryTable
     importToLibraryTable = new HashMap<String, File>();
     for (File subfolder : libraries.values()) {
-      String packages[] = headerListFromIncludePath(subfolder);
-      for (String pkg : packages)
-        importToLibraryTable.put(pkg, subfolder);
+      try {
+        String packages[] = headerListFromIncludePath(subfolder);
+        for (String pkg : packages) {
+          importToLibraryTable.put(pkg, subfolder);
+        }
+      } catch (IOException e) {
+        showWarning(_("Error"), I18n.format("Unable to list header files in {0}", subfolder), e);
+      }
     }
 
     // Update editors status bar
@@ -1548,8 +1553,13 @@ public class Base {
     Collections.sort(list, String.CASE_INSENSITIVE_ORDER);
 
     ActionListener listener = new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        activeEditor.getSketch().importLibrary(e.getActionCommand());
+      public void actionPerformed(ActionEvent event) {
+        String jarPath = event.getActionCommand();
+        try {
+          activeEditor.getSketch().importLibrary(jarPath);
+        } catch (IOException e) {
+          showWarning(_("Error"), I18n.format("Unable to list header files in {0}", jarPath), e);
+        }
       }
     };
 
@@ -1571,8 +1581,12 @@ public class Base {
    * the header files in its sub-folders, as those should be included from
    * within the header files at the top-level).
    */
-  static public String[] headerListFromIncludePath(File path) {
-    return path.list(new OnlyFilesWithExtension(".h"));
+  static public String[] headerListFromIncludePath(File path) throws IOException {
+    String[] list = path.list(new OnlyFilesWithExtension(".h"));
+    if (list == null) {
+      throw new IOException();
+    }
+    return list;
   }
 
   protected void loadHardware(File folder) {
