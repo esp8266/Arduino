@@ -1,4 +1,20 @@
 
+[core]
+
+* Fixed malloc bug (Paul Stoffregen)
+
+[libraries]
+
+* Fixed memory leak when calling Ethernet.begin() multiple times.
+* Fixed SD example listfiles.ino
+* Fixed a lot of Esplora examples
+
+[environment]
+
+* Sort entries in preferences.txt (Shigeru Kanemoto)
+* Fixed some wrong translations
+* Fixed NPE due to permissions IO error
+
 ARDUINO 1.0.3 - 2012.12.10
 
 [hardware]
