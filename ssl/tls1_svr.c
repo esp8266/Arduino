@@ -122,7 +122,7 @@ static int process_client_hello(SSL *ssl)
     int i, j, cs_len, id_len, offset = 6 + SSL_RANDOM_SIZE;
     int ret = SSL_OK;
     
-    uint8_t version = (record_buf[1] << 4) + record_buf[2];
+    uint8_t version = (buf[4] << 4) + buf[5];
     ssl->version = ssl->client_version = version;
 
     if (version > SSL_PROTOCOL_VERSION_MAX)

@@ -660,7 +660,7 @@ static void add_hmac_digest(SSL *ssl, int mode, uint8_t *hmac_header,
             ssl->cipher_info->digest_size, hmac_buf);
 
 #if 0
-    print_blob("record", ssl->hmac_tx, SSL_RECORD_SIZE);
+    print_blob("record", hmac_header, SSL_RECORD_SIZE);
     print_blob("buf", buf, buf_len);
     if (mode == SSL_SERVER_WRITE || mode == SSL_CLIENT_WRITE)
     {
@@ -1071,7 +1071,6 @@ int send_packet(SSL *ssl, uint8_t protocol, const uint8_t *in, int length)
         /* add the explicit IV for TLS1.1 */
         if (ssl->version >= SSL_PROTOCOL_VERSION1_1 &&
                         ssl->cipher_info->iv_size)
-                        
         {
             uint8_t iv_size = ssl->cipher_info->iv_size;
             uint8_t *t_buf = alloca(msg_length + iv_size);
@@ -1131,7 +1130,7 @@ static int set_key_block(SSL *ssl, int is_write)
             ssl->dc->master_secret, ssl->dc->key_block, 
             ciph_info->key_block_size);
 #if 0
-        print_blob("keyblock", ssl->key_block, ciph_info->key_block_size);
+        print_blob("keyblock", ssl->dc->key_block, ciph_info->key_block_size);
 #endif
     }
 
