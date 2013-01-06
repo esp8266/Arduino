@@ -3,15 +3,27 @@
 * Fixed IDE startup bug "Menu has no enabled items"
 * Command line build.
 * Fixed some language strings (Shigeru KANEMOTO)
+* Fix to boards.txt: added Micro and fixed Lilypad bootloader path
+* Removed check for ".h" existence in libraries.
+* Deleting tab from IDE does not delete from temporary folder
+* Fixed NPE when unknown boards/platforms are selected in preferences
+* Extended command line build flags
 
 [arduino core]
 * sam: portOutputRegister() is now writeable.
 * sam: fixed issue on weak-symbol for some interrupt handlers
 * sam: fixed BSoD on some Windows machine (louismdavis)
 * sam: added CANRX1/CANTX1 pins 88/89 (same physical pin for 66/53)
+* sam: fixed analogWrite when used in very thight write loops (V.Dorrich)
 
 [libraries]
 * sam: Added Servo library
+* sam: Added WiFi library
+* Fixed USBHost MouseController example
+
+[other]
+* Merged all improvements made in Arduino IDE 1.0.3
+* Merged all improvements made in Arduino IDE 1.0.4 (not yet released)
 
 ARDUINO BETA 1.5.1r2 - 2012.11.06
 
@@ -52,6 +64,24 @@ ARDUINO BETA 1.5 - 2012.10.22
   or incomplete.
 * For more info refer to this press release:
   http://arduino.cc/blog/2012/10/22/arduino-1-5-support-for-the-due-and-other-processors-easier-library-installation-simplified-board-menu-etc/
+
+ARDUINO 1.0.4 - Not yet released.
+
+[core]
+
+* Fixed malloc bug (Paul Stoffregen)
+
+[libraries]
+
+* Fixed memory leak when calling Ethernet.begin() multiple times.
+* Fixed SD example listfiles.ino
+* Fixed a lot of Esplora examples
+
+[environment]
+
+* Sort entries in preferences.txt (Shigeru Kanemoto)
+* Fixed some wrong translations
+* Fixed NPE due to permissions IO error
 
 ARDUINO 1.0.3 - 2012.12.10
 
