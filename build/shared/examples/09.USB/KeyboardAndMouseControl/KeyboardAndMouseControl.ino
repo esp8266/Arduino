@@ -67,7 +67,7 @@ void loop() {
       Mouse.move(40, 0);
       break;
     case 'm':
-      // move mouse right
+      // perform the right click
       Mouse.click(MOUSE_LEFT);
       break;
     }
