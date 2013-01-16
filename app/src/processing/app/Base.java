@@ -118,6 +118,11 @@ public class Base {
   static public void main(String args[]) throws Exception {
     initPlatform();
 
+    // Portable folder
+    portableFolder = getContentFile("portable");
+    if (!portableFolder.exists())
+      portableFolder = null;
+
     // run static initialization that grabs all the prefs
     Preferences.init(null);
 
@@ -158,13 +163,6 @@ public class Base {
                      "Please visit java.com to upgrade.", null);
     }
     */
-
-    initPlatform();
-
-    // Portable folder
-    portableFolder = getContentFile("portable");
-    if (!portableFolder.exists())
-      portableFolder = null;
 
 //    // Set the look and feel before opening the window
 //    try {
