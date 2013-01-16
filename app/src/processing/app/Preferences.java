@@ -23,6 +23,7 @@
 
 package processing.app;
 
+import processing.app.helpers.FileUtils;
 import processing.app.syntax.SyntaxStyle;
 import processing.core.PApplet;
 import processing.core.PConstants;
@@ -324,16 +325,16 @@ public class Preferences {
         public void actionPerformed(ActionEvent e) {
           File dflt = new File(sketchbookLocationField.getText());
           File file =
-            Base.selectFolder(_("Select new sketchbook location"), dflt, dialog);
+                  Base.selectFolder(_("Select new sketchbook location"), dflt, dialog);
           if (file != null) {
-	    String path = file.getAbsolutePath();
-	    if (Base.getPortableFolder() != null) {
-	      path = RelativePath.relativePath(Base.getPortableFolder().toString(), path);
-	      if (path == null) {
-		path = Base.getPortableSketchbookFolder();
-	      }
-	    }
-	    sketchbookLocationField.setText(path);
+            String path = file.getAbsolutePath();
+            if (Base.getPortableFolder() != null) {
+              path = FileUtils.relativePath(Base.getPortableFolder().toString(), path);
+              if (path == null) {
+                path = Base.getPortableSketchbookFolder();
+              }
+            }
+            sketchbookLocationField.setText(path);
           }
         }
       });
@@ -449,7 +450,7 @@ public class Preferences {
 
       // If using portable mode, it's bad manner to change PC setting.
       if (Base.getPortableFolder() != null)
-	autoAssociateBox.setEnabled(false);
+        autoAssociateBox.setEnabled(false);
     }
 
     // More preferences are in the ...
@@ -468,7 +469,7 @@ public class Preferences {
         public void mousePressed(MouseEvent e) {
           Base.openFolder(Base.getSettingsFolder());
         }
-        
+
         public void mouseEntered(MouseEvent e) {
           clickable.setForeground(new Color(0, 0, 140));
         }
@@ -604,9 +605,9 @@ public class Preferences {
     String newPath = sketchbookLocationField.getText();
     if (newPath.isEmpty()) {
       if (Base.getPortableFolder() == null)
-	newPath = editor.base.getDefaultSketchbookFolder().toString();
+        newPath = editor.base.getDefaultSketchbookFolder().toString();
       else
-	newPath = Base.getPortableSketchbookFolder();
+        newPath = Base.getPortableSketchbookFolder();
     }
     if (!newPath.equals(oldPath)) {
       editor.base.rebuildSketchbookMenus();

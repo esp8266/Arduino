@@ -259,16 +259,16 @@ public class Base {
     if (sketchbookPath != null) {
       File sketchbookFolder;
       if (portableFolder != null)
-	sketchbookFolder = new File(portableFolder, sketchbookPath);
+        sketchbookFolder = new File(portableFolder, sketchbookPath);
       else
-	sketchbookFolder = new File(sketchbookPath);
+        sketchbookFolder = new File(sketchbookPath);
       if (!sketchbookFolder.exists()) {
         Base.showWarning(_("Sketchbook folder disappeared"),
-                         _("The sketchbook folder no longer exists.\n" +
-                           "Arduino will switch to the default sketchbook\n" +
-                           "location, and create a new sketchbook folder if\n" +
-                           "necessary. Arduino will then stop talking about\n" +
-                           "himself in the third person."), null);
+                _("The sketchbook folder no longer exists.\n" +
+                        "Arduino will switch to the default sketchbook\n" +
+                        "location, and create a new sketchbook folder if\n" +
+                        "necessary. Arduino will then stop talking about\n" +
+                        "himself in the third person."), null);
         sketchbookPath = null;
       }
     }
@@ -277,9 +277,9 @@ public class Base {
     if (sketchbookPath == null) {
       File defaultFolder = getDefaultSketchbookFolder();
       if (portableFolder != null)
-	Preferences.set("sketchbook.path", portableSketchbookFolder);
+        Preferences.set("sketchbook.path", portableSketchbookFolder);
       else
-	Preferences.set("sketchbook.path", defaultFolder.getAbsolutePath());
+        Preferences.set("sketchbook.path", defaultFolder.getAbsolutePath());
       if (!defaultFolder.exists()) {
         defaultFolder.mkdirs();
       }
@@ -438,13 +438,12 @@ public class Base {
     for (int i = 0; i < count; i++) {
       String path = Preferences.get("last.sketch" + i + ".path");
       if (portableFolder != null) {
-	File absolute = new File(portableFolder, path);
-	try {
-	  path = absolute.getCanonicalPath();
-	}
-	catch (IOException e) {
-	  // path unchanged.
-	}
+        File absolute = new File(portableFolder, path);
+        try {
+          path = absolute.getCanonicalPath();
+        } catch (IOException e) {
+          // path unchanged.
+        }
       }
       int[] location;
       if (windowPositionValid) {
@@ -485,9 +484,9 @@ public class Base {
         continue;
       }
       if (portableFolder != null) {
-	path = RelativePath.relativePath(portableFolder.toString(), path);
-	if (path == null)
-	  continue;
+        path = FileUtils.relativePath(portableFolder.toString(), path);
+        if (path == null)
+          continue;
       }
       Preferences.set("last.sketch" + index + ".path", path);
 
@@ -509,9 +508,9 @@ public class Base {
       path = "";
     } else
     if (portableFolder != null) {
-      path = RelativePath.relativePath(portableFolder.toString(), path);
+      path = FileUtils.relativePath(portableFolder.toString(), path);
       if (path == null)
-	path = "";
+        path = "";
     }
     Preferences.set("last.sketch" + index + ".path", path);
   }
@@ -1815,8 +1814,8 @@ public class Base {
     if (!settingsFolder.exists()) {
       if (!settingsFolder.mkdirs()) {
         showError(_("Settings issues"),
-                  _("Arduino cannot run because it could not\n" +
-                    "create a folder to store your settings."), null);
+                _("Arduino cannot run because it could not\n" +
+                        "create a folder to store your settings."), null);
       }
     }
     return settingsFolder;
