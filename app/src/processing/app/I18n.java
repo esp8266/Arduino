@@ -35,7 +35,7 @@ public class I18n {
       if (language != null && language.trim().length() > 0) {
         Locale.setDefault(new Locale(language));
       }
-      i18n = ResourceBundle.getBundle("processing.app.Resources", Locale.getDefault());
+      i18n = ResourceBundle.getBundle("processing.app.i18n.Resources", Locale.getDefault());
 
       PROMPT_YES = _("Yes");
       PROMPT_NO = _("No");
