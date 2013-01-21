@@ -89,7 +89,14 @@
     
     <!-- copy hardware folder -->
     <copy todir="${target.path}/hardware">
-      <fileset dir="../hardware" />
+      <fileset dir="../hardware">
+        <exclude name="arduino/sam/system/CMSIS/Device/ATMEL/*/svd/"/>
+        <exclude name="arduino/sam/system/CMSIS/Device/ATMEL/*/html/"/>
+        <exclude name="arduino/sam/system/CMSIS/CMSIS/Lib/ARM/*M0*"/>
+        <exclude name="arduino/sam/system/CMSIS/CMSIS/Lib/ARM/*M4*"/>
+        <exclude name="arduino/sam/system/CMSIS/CMSIS/Lib/GCC/*M0*"/>
+        <exclude name="arduino/sam/system/CMSIS/CMSIS/Lib/GCC/*M4*"/>
+      </fileset>
     </copy>
     
     <!-- copy shared examples folder -->
