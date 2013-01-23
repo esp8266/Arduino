@@ -63,7 +63,7 @@ public class I18NTest {
       for (Map.Entry<String, List<String>> entry : missingTranslationsPerFile.entrySet()) {
         System.out.println("Following translations in file " + entry.getKey() + " are missing:");
         for (String key : entry.getValue()) {
-          System.out.println("==> '" + key + "'");
+          System.out.println("==> '" + key.replaceAll("\n", "\\\\n").replaceAll(" ", "\\\\ ") + "'");
         }
         System.out.println();
       }
