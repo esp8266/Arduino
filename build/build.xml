@@ -639,6 +639,10 @@
     </chmod>
 
     <antcall target="windows-unzip-arm-toolchain" />
+
+    <delete includeEmptyDirs="true" quiet="true">
+      <fileset dir="windows/work/hardware/tools/avr/doc" />
+    </delete>
   </target>
 
   <target name="windows-run" depends="windows-build"
