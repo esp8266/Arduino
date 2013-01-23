@@ -29,6 +29,7 @@
 
 package processing.app.preproc;
 
+import static processing.app.I18n._;
 import processing.app.*;
 import processing.core.*;
 
@@ -61,38 +62,22 @@ public class PdePreprocessor {
   // than the others, since the imports are auto-generated.
   List<String> codeFolderImports;
 
-  String indent;
-
-  PrintStream stream;
   String program;
-  String buildPath;
-  // starts as sketch name, ends as main class name
-  String name;
 
 
   /**
    * Setup a new preprocessor.
    */
   public PdePreprocessor() { 
-    int tabSize = Preferences.getInteger("editor.tabs.size");
-    char[] indentChars = new char[tabSize];
-    Arrays.fill(indentChars, ' ');
-    indent = new String(indentChars);
   }
 
   /**
    * Writes out the head of the c++ code generated for a sketch. 
    * Called from processing.app.Sketch.
    * @param program the concatenated code from all tabs containing pde-files
-   * @param buildPath the path into which the processed pde-code is to be written
-   * @param name the name of the sketch 
-   * @param codeFolderPackages unused param (leftover from processing)
    */
-  public int writePrefix(String program, String buildPath,
-                         String sketchName, String codeFolderPackages[]) throws FileNotFoundException {
-    this.buildPath = buildPath;
-    this.name = sketchName;
-
+  public int writePrefix(String program)
+      throws FileNotFoundException {
     // if the program ends with no CR or LF an OutOfMemoryError will happen.
     // not gonna track down the bug now, so here's a hack for it:
     // http://dev.processing.org/bugs/show_bug.cgi?id=5
@@ -102,7 +87,7 @@ public class PdePreprocessor {
     // an OutOfMemoryError or NullPointerException will happen.
     // again, not gonna bother tracking this down, but here's a hack.
     // http://dev.processing.org/bugs/show_bug.cgi?id=16
-    Sketch.scrubComments(program);
+    scrubComments(program);
     // If there are errors, an exception is thrown and this fxn exits.
 
     if (Preferences.getBoolean("preproc.substitute_unicode")) {
@@ -133,10 +118,6 @@ public class PdePreprocessor {
   
     // do this after the program gets re-combobulated
     this.program = program;
-    
-    // output the code
-    File streamFile = new File(buildPath, name + ".cpp");
-    stream = new PrintStream(new FileOutputStream(streamFile));
     
     return headerCount + prototypeCount;
   }
@@ -181,17 +162,16 @@ public class PdePreprocessor {
   }
 
   /**
-   * preprocesses a pde file and writes out a java file
-   * @return the classname of the exported Java
+   * preprocesses a pde file and writes out a cpp file into the specified
+   * OutputStream
+   * 
+   * @param output
+   * @throws Exception
    */
-  //public String write(String program, String buildPath, String name,
-  //                  String extraImports[]) throws java.lang.Exception {
-  public String write() throws java.lang.Exception {
+  public void write(OutputStream output) throws Exception {
+    PrintStream stream = new PrintStream(output);
     writeProgram(stream, program, prototypes);
     writeFooter(stream);
-    stream.close();
-    
-    return name;
   }
 
   // Write the pde program to the cpp file
@@ -343,5 +323,57 @@ public class PdePreprocessor {
     }
     
     return functionMatches;
+  }
+
+
+  /**
+   * Replace all commented portions of a given String as spaces.
+   * Utility function used here and in the preprocessor.
+   */
+  static public String scrubComments(String what) {
+    char p[] = what.toCharArray();
+
+    int index = 0;
+    while (index < p.length) {
+      // for any double slash comments, ignore until the end of the line
+      if ((p[index] == '/') &&
+          (index < p.length - 1) &&
+          (p[index+1] == '/')) {
+        p[index++] = ' ';
+        p[index++] = ' ';
+        while ((index < p.length) &&
+               (p[index] != '\n')) {
+          p[index++] = ' ';
+        }
+
+        // check to see if this is the start of a new multiline comment.
+        // if it is, then make sure it's actually terminated somewhere.
+      } else if ((p[index] == '/') &&
+                 (index < p.length - 1) &&
+                 (p[index+1] == '*')) {
+        p[index++] = ' ';
+        p[index++] = ' ';
+        boolean endOfRainbow = false;
+        while (index < p.length - 1) {
+          if ((p[index] == '*') && (p[index+1] == '/')) {
+            p[index++] = ' ';
+            p[index++] = ' ';
+            endOfRainbow = true;
+            break;
+
+          } else {
+            // continue blanking this area
+            p[index++] = ' ';
+          }
+        }
+        if (!endOfRainbow) {
+          throw new RuntimeException(_("Missing the */ from the end of a " +
+                                       "/* comment */"));
+        }
+      } else {  // any old character, move along
+        index++;
+      }
+    }
+    return new String(p);
   }
 }
