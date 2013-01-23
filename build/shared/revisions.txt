@@ -1,5 +1,11 @@
 
+ARDUINO BETA 1.5.2 - 2012.01.23
+
 [ide]
+* Scrollable editor tabs (Shigheru KANEMOTO)
+* Scrollable menus
+* Portable Arduino (Shigeru KANEMOTO)
+* Default sketchbook folder for linux is now "Arduino"
 * Fixed IDE startup bug "Menu has no enabled items"
 * Command line build.
 * Fixed some language strings (Shigeru KANEMOTO)
