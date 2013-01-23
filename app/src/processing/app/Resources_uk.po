@@ -3,55 +3,52 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-#   <kobalt_mstr@yahoo.it>, 2012.
-#   <office@roroid.ro>, 2013.
-# Pop Gheorghe <office@roroid.ro>, 2013.
 msgid ""
 msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2013-01-22 07:54+0000\n"
-"Last-Translator: roroid <office@roroid.ro>\n"
-"Language-Team: Romanian (http://www.transifex.com/projects/p/arduino-ide-15/language/ro/)\n"
+"PO-Revision-Date: 2012-11-05 17:53+0000\n"
+"Last-Translator: gromko <ggromko@mail.ru>\n"
+"Language-Team: Ukrainian (http://www.transifex.com/projects/p/arduino-ide-15/language/uk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ro\n"
-"Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?2:1));\n"
+"Language: uk\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #: Base.java:191
 msgid "Non-fatal error while setting the Look & Feel."
-msgstr "Eroare non-fatala în timpul iniţializării interfeţei cu utilizatorul."
+msgstr "Нефатальна помилка при налаштуванні зовнішнього вигляду."
 
 #: Base.java:192
 msgid "The error message follows, however Arduino should run fine."
-msgstr "Mesajul de eroare ar trebui să apară, totuşi Arduino ar trebuii să funcţioneze fără probleme."
+msgstr "Далі йде повідомлення про помилку, хоча Arduino повино працювати нормально."
 
 #: Base.java:227
 msgid "Problem Setting the Platform"
-msgstr "Probleme la iniţializarea platformei de dezvoltare"
+msgstr "Проблема з установкою платформи"
 
 #: Base.java:228
 msgid ""
 "An unknown error occurred while trying to load\n"
 "platform-specific code for your machine."
-msgstr "O eroare necunoscuta în timp ce se încărca\ncodul specific pentru sistemul dumneavoastră de operare."
+msgstr "Виникла невідома помилка при спробі\nзавантажити код, специфічний для вашої платформи."
 
 #: Base.java:239
 msgid "Please install JDK 1.5 or later"
-msgstr "Te rog instalează JDK 1.5 sau o versiune ulterioară"
+msgstr "Встановіть версію JDK 1.5 або старше."
 
 #: Base.java:240
 msgid ""
 "Arduino requires a full JDK (not just a JRE)\n"
 "to run. Please install JDK 1.5 or later.\n"
 "More information can be found in the reference."
-msgstr "Nu este suficient JRE (Java Runtime Enviroment)\npentru a rula Arduino IDE. Te rog instalează JDK versiunea 1.5 sau o versiune ulterioară.\nMai multe informaţii se pot găsi în zona de referinţe."
+msgstr "Arduino потрібна повна версія JDK (а не тільки JRE).\nВстановіть версію JDK 1.5 або старше.\nДетальну інформацію можна знайти в довідці."
 
 #: Base.java:258
 msgid "Sketchbook folder disappeared"
-msgstr "Dosarul cu schiţe a dispărut"
+msgstr "Тека зі скетчами зникла."
 
 #: Base.java:259
 msgid ""
@@ -60,48 +57,48 @@ msgid ""
 "location, and create a new sketchbook folder if\n"
 "necessary. Arduino will then stop talking about\n"
 "himself in the third person."
-msgstr "Dosarul cu schiţe nu mai exista.\nArduino v-a comuta pe locaţia implicită a directorului\nde schiţe, şi dacă e necesar v-a crea un nou dosar cu schiţe.\nArduino nu va mai vorbi despre el la persoana a trei-a."
+msgstr "Тека зі скетчами більше не існує.\nArduino переключиться на теку за замовчуванням,\nстворивши її при необхідності. А потім Arduino\nперестане говорити про себе в третій особі."
 
 #: Base.java:535
 msgid "Time for a Break"
-msgstr "E timpul pentru o pauză"
+msgstr "Пора зробити перерву."
 
 #: Base.java:536
 msgid ""
 "You've reached the limit for auto naming of new sketches\n"
 "for the day. How about going for a walk instead?"
-msgstr "Ai atins limita la autodenumire a schiţelor noi\npentru ziua de azi. Nu crezi ca ar fi mai bine faci o plimbare decât să continui?"
+msgstr "Ви досягли ліміту автоматичного іменування скетчів\nна сьогодні. Може, краще піти прогулятися?"
 
 #: Base.java:540
 msgid "Sunshine"
-msgstr "Răsăritul"
+msgstr "Сонячне світло"
 
 #: Base.java:541
 msgid "No really, time for some fresh air for you."
-msgstr "Pe bune, e timpul sa ieşi la aer."
+msgstr "Серйозно, вам просто необхідно піти провітритися."
 
 #: Base.java:636
 msgid "Open an Arduino sketch..."
-msgstr "Deschide o schiţa Arduino..."
+msgstr "Відкрити скетч Arduino..."
 
 #: Base.java:773
 msgid ""
 "<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p {"
 " font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Are you "
 "sure you want to Quit?</b><p>Closing the last open sketch will quit Arduino."
-msgstr "<html> <head> <style type=\\\"text/css\\\">b { font: 13pt \\\"Lucida Grande\\\" }p { font: 11pt \\\"Lucida Grande\\\"; margin-top: 8px }</style> </head><b>Doreşti să salvezi modificările aduse acestei schiţe<BR> înainte de a închide?</b><p>Dacă nu salvezi , modificările vor fi pierdute."
+msgstr "<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p { font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Ви впевнені,що хочете вийти? </b><p> Якщо ви закриєте останній скетч, то вийдете з Arduino."
 
 #: Base.java:783 Editor.java:593
 msgid "Quit"
-msgstr "Ieşire"
+msgstr "Вихід"
 
 #: Base.java:903 Editor.java:501
 msgid "Open..."
-msgstr "Deschide..."
+msgstr "Відкрити..."
 
 #: Base.java:963
 msgid "Add Library..."
-msgstr "Adaugă biblioteca"
+msgstr "Додати бібліотеку"
 
 #: Base.java:1054 Base.java:2674
 #, java-format
@@ -109,22 +106,22 @@ msgid ""
 "The library \"{0}\" cannot be used.\n"
 "Library names must contain only basic letters and numbers.\n"
 "(ASCII only and no spaces, and it cannot start with a number)"
-msgstr "Biblioteca \\\"{0}\\\" nu poate fi folosită.\nNumele bibliotecii trebuie să conţină doar litere şi numere.\n(ASCII-fără spatii, şi numele nu poate începe cu un număr)"
+msgstr "Бібліотека \"{0}\" не може бути використана.\nІмена бібліотек повинні містити лише основні букви і цифри.\n(Тільки ASCII, без пропусків, не може починатися з пропуску)."
 
 #: Base.java:1058
 msgid "Ignoring bad library name"
-msgstr "Se ignora biblioteca cu numele greşit"
+msgstr "ігнорую бібліотеку з поганим ім'ям"
 
 #: Base.java:1411
 msgid "Sketch Does Not Exist"
-msgstr "Schiţa nu există"
+msgstr "Скетч не існує"
 
 #: Base.java:1412
 msgid ""
 "The selected sketch no longer exists.\n"
 "You may need to restart Arduino to update\n"
 "the sketchbook menu."
-msgstr "Schiţa selectata nu mai există.\nS-ar putea să fie nevoie sa reporneşti programul\npentru a actualiza meniul dosarului de schiţe."
+msgstr "Обраний скетч більше не існує.\nМожливо, треба перезапустити Arduino, щоб\nоновити меню скетчів."
 
 #: Base.java:1430
 #, java-format
@@ -134,71 +131,71 @@ msgid ""
 "(ASCII-only with no spaces, and it cannot start with a number).\n"
 "To get rid of this message, remove the sketch from\n"
 "{1}"
-msgstr "Schita \\\"{0}\\\" nu poate fi folosită.\nNumele schiţei trebuie să conţină doar litere şi numere\n(ASCII-fără spaţii, iar numele nu poate începe cu un număr).\nPentru a înlătura acest mesaj, eliminaţi schiţa din\n{1}"
+msgstr "Скетч \"{0}\" не може бути використаний.\nІмена скетчів повинні містити лише основні букви і цифри.\n(Тільки ASCII, без пропусків,  не може починатися з пропуску).\nЩоб позбутися цього повідомлення, приберіть скетч з\n{1}"
 
 #: Base.java:1436
 msgid "Ignoring sketch with bad name"
-msgstr "Se ignora schiţa cu nume greşit"
+msgstr "Ігнорую скетч з поганим ім'ям"
 
 #: Base.java:1673
 msgid "Problem getting data folder"
-msgstr "Problema la preluarea directorului de date"
+msgstr "Проблема при зверненні до теки з даними"
 
 #: Base.java:1674
 msgid "Error getting the Arduino data folder."
-msgstr "Eroare la preluarea directorului cu date pentru Arduino"
+msgstr "Проблема при зверненні до теки з даними Arduino"
 
 #: Base.java:1681
 msgid "Settings issues"
-msgstr "Probleme la setări"
+msgstr "Питання, пов'язані з налаштуваннями"
 
 #: Base.java:1682
 msgid ""
 "Arduino cannot run because it could not\n"
 "create a folder to store your settings."
-msgstr "Arduino nu a putut porni deoarece\nnu poate crea un director în care să-şi salveze setările."
+msgstr "Arduino не може запуститися, бо\nне вдається створити теку для зберігання ваших налаштувань."
 
 #: Base.java:1851
 msgid ""
 "For information on installing libraries, see: "
 "http://arduino.cc/en/Guide/Libraries\n"
-msgstr "Mai multe informaţii despre instalarea bibliotecilor Arduino găseşti aici:http://arduino.cc/en/Guide/Libraries\n"
+msgstr "Щодо встановлення бібліотек, перегляньте: http://arduino.cc/en/Guide/Libraries\n"
 
 #: Base.java:1888
 msgid "You forgot your sketchbook"
-msgstr "Ai uitat dosarul cu schiţe"
+msgstr "Ви забули вашу теку зі скетчами"
 
 #: Base.java:1889
 msgid ""
 "Arduino cannot run because it could not\n"
 "create a folder to store your sketchbook."
-msgstr "Arduino nu a putut porni deoarece\nnu poate crea un director în care sa salveze dosarul cu schiţe."
+msgstr "Arduino не може запуститися, бо\nне вдається створити теку для зберігання ваших скетчів."
 
 #: Base.java:1909
 msgid "Select (or create new) folder for sketches..."
-msgstr "Selectează (sau creează un nou) director pentru schiţe..."
+msgstr "Виберіть (або створіть) теку для зберігання скетчів..."
 
 #: Base.java:1933
 msgid "Problem Opening URL"
-msgstr "Problema in deschiderea URL"
+msgstr "Проблема з відкриттям посилання"
 
 #: Base.java:1934
 #, java-format
 msgid ""
 "Could not open the URL\n"
 "{0}"
-msgstr "Nu se poate deschide URL\n{0}"
+msgstr "Не вдалося відкрити посилання\n{0}"
 
 #: Base.java:1957
 msgid "Problem Opening Folder"
-msgstr "Problema la deschiderea directorului"
+msgstr "Проблема з відкриттям теки"
 
 #: Base.java:1958
 #, java-format
 msgid ""
 "Could not open the folder\n"
 "{0}"
-msgstr "Directorul\n{0} nu poate fi deschis"
+msgstr "Не вдалося відкрити теку\n{0}"
 
 #: Base.java:2071
 msgid "Guide_MacOSX.html"
@@ -222,7 +219,7 @@ msgstr "Guide_Environment.html"
 
 #: Base.java:2090
 msgid "environment"
-msgstr "mediu de programare"
+msgstr "середовище розробки"
 
 #: Base.java:2090
 msgid "platforms.html"
@@ -238,62 +235,62 @@ msgstr "FAQ.html"
 
 #: Base.java:2112
 msgid "Message"
-msgstr "Mesaj"
+msgstr "Повідомлення"
 
 #: Base.java:2128
 msgid "Warning"
-msgstr "Avertisment"
+msgstr "Попередження"
 
 #: Base.java:2147 Preferences.java:256 Sketch.java:475 Sketch.java:481
 #: Sketch.java:496 Sketch.java:503 Sketch.java:526 Sketch.java:543
 #: Editor.java:2167 Editor.java:2178 Editor.java:2188 Editor.java:2206
 msgid "Error"
-msgstr "Eroare"
+msgstr "Помилка"
 
 #: Base.java:2482
 #, java-format
 msgid "Could not remove old version of {0}"
-msgstr "Nu se poate înlătura vechea versiune pentru {0}"
+msgstr "Не вдалося видалити стару версію {0}"
 
 #: Base.java:2492
 #, java-format
 msgid "Could not replace {0}"
-msgstr "Nu se poate înlocui {0}"
+msgstr "Не вдалося замінити {0}"
 
 #: Base.java:2533 Base.java:2556
 #, java-format
 msgid "Could not delete {0}"
-msgstr "Nu se poate şterge {0}"
+msgstr "Не вдалося видалити {0}"
 
 #: Base.java:2636
 msgid "Select a zip file or a folder containing the library you'd like to add"
-msgstr "Selectează  arhiva sau un directorul în care se găseşte biblioteca pe care vrei să o adaugi"
+msgstr "Оберіть zip-файл або теку, що містить бібліотеку, яку слід додати"
 
 #: Base.java:2638
 msgid "ZIP files or folders"
-msgstr "Fişiere arhivă sau directoare"
+msgstr "ZIP-файли чи  теки"
 
 #: Base.java:2661
 msgid "Zip doesn't contain a library"
-msgstr "Fişierul arhivă nu conţine o bibliotecă"
+msgstr "ZIP  не містить бібліотеки"
 
 #: Base.java:2683
 msgid "Not a valid library: no header files found"
-msgstr "Bibliotecă invalidă: nu găsesc fişierele header"
+msgstr "Помилка в бібліотеці: не знайдено заголовок"
 
 #: Base.java:2690
 #, java-format
 msgid "A library named {0} already exists"
-msgstr "O bibliotecă cu numele de {0} exista deja"
+msgstr "Вже існує бібліотека з назвою  {0} "
 
 #: Base.java:2699
 msgid "Library added to your libraries. Check \"Import library\" menu"
-msgstr "Biblioteca a fost adăugată. Verifică meniul \"Importă bibliotecă\""
+msgstr "Бібліотеку додано до ваших бібліотек. Перевірте меню \"Імпорт бібліотек\" "
 
 #: SketchCode.java:83
 #, java-format
 msgid "Error while loading code {0}"
-msgstr "Eroare la încărcarea codului {0}"
+msgstr "Помилка при завантаженні коду {0}"
 
 #: SketchCode.java:258
 #, java-format
@@ -302,467 +299,467 @@ msgid ""
 "older version of Processing,you may need to use Tools -> Fix Encoding & "
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
-msgstr "\"{0}\" conţine caractere necunoscute. Dacă acest cod a fost realizat într-o versiune mai veche, încearcă sa foloseşti Instrumente-> Corectare codare & reiniţializează pentru a modifica schiţa şi a folosi codarea UTF-8. În caz contrar e nevoie să ştergi caracterele necunoscute pentru a înlătura acest avertisment."
+msgstr "\"{0}\" містить нерозпізнані символи. Якщо цей код був створений у старій версії Processing, то вам знадобиться використовувати Сервіс ->Виправити кодування, щоб змінити кодування скетчу на UTF-8. Якщо ні, то Вам знадобиться видалити погані символи, щоб уникнути цього попередження."
 
 #: FindReplace.java:80
 msgid "Find:"
-msgstr "Caută:"
+msgstr "Знайти:"
 
 #: FindReplace.java:81
 msgid "Replace with:"
-msgstr "Înlocuire cu:"
+msgstr "Замінити:"
 
 #: FindReplace.java:96
 msgid "Ignore Case"
-msgstr "Ignora majuscule"
+msgstr "Ігнорувати регістр"
 
 #: FindReplace.java:105
 msgid "Wrap Around"
-msgstr "Marchează"
+msgstr "Виділяти"
 
 #: FindReplace.java:120 FindReplace.java:131
 msgid "Replace All"
-msgstr "Înlocuire peste tot"
+msgstr "Замінити все"
 
 #: FindReplace.java:121 FindReplace.java:130 Sketch.java:1046
 msgid "Replace"
-msgstr "Înlocuire"
+msgstr "Замінити"
 
 #: FindReplace.java:122 FindReplace.java:129
 msgid "Replace & Find"
-msgstr "Căutare şi înlocuire"
+msgstr "Замінити і знайти"
 
 #: FindReplace.java:123 FindReplace.java:128
 msgid "Previous"
-msgstr "Anterior"
+msgstr "Попередній"
 
 #: FindReplace.java:124 FindReplace.java:127
 msgid "Find"
-msgstr "Caută"
+msgstr "Знайти"
 
 #: EditorToolbar.java:41 EditorToolbar.java:46
 msgid "Verify"
-msgstr "Verifică"
+msgstr "Перевірити"
 
 #: EditorToolbar.java:41 Editor.java:545
 msgid "Upload"
-msgstr "Incarcă"
+msgstr "Вивантаження"
 
 #: EditorToolbar.java:41 Editor.java:493
 msgid "New"
-msgstr "Nou"
+msgstr "Створити"
 
 #: EditorToolbar.java:41
 msgid "Open"
-msgstr "Deschide"
+msgstr "Відкрити..."
 
 #: EditorToolbar.java:41 EditorToolbar.java:46 Editor.java:529
 #: Editor.java:2064 Editor.java:2468
 msgid "Save"
-msgstr "Salvează"
+msgstr "Зберегти"
 
 #: EditorToolbar.java:41 EditorToolbar.java:46 Editor.java:669
 msgid "Serial Monitor"
-msgstr "Terminal serial"
+msgstr "Монітор порту"
 
 #: EditorToolbar.java:46 Editor.java:553
 msgid "Upload Using Programmer"
-msgstr "Încarcă folosind programatorul"
+msgstr "Вивантажити за допомогою програматора"
 
 #: EditorToolbar.java:46
 msgid "New Editor Window"
-msgstr "Fereastră nouă"
+msgstr "Нове вікно редактора"
 
 #: EditorToolbar.java:46
 msgid "Open in Another Window"
-msgstr "Deschide într-o nouă fereastră"
+msgstr "Відкрити в іншому вікні"
 
 #: Preferences.java:77 UpdateCheck.java:108
 msgid "Yes"
-msgstr "Da"
+msgstr "Так"
 
 #: Preferences.java:78 UpdateCheck.java:108
 msgid "No"
-msgstr "Nu"
+msgstr "Ні"
 
 #: Preferences.java:79 Sketch.java:585 Sketch.java:737 Sketch.java:1042
 #: Editor.java:2064 Editor.java:2145 Editor.java:2465
 msgid "Cancel"
-msgstr "Renunţă"
+msgstr "Скасувати"
 
 #: Preferences.java:80 Sketch.java:585 Sketch.java:737 Sketch.java:1042
 #: Editor.java:2145 Editor.java:2465
 msgid "OK"
-msgstr "OK"
+msgstr "Гаразд"
 
 #: Preferences.java:81
 msgid "Browse"
-msgstr "Răsfoire"
+msgstr "Обрати"
 
 #: Preferences.java:84
 msgid "System Default"
-msgstr "Setări implicite"
+msgstr "типова системна"
 
 #: Preferences.java:85
 msgid "Arabic"
-msgstr "Arabă"
+msgstr "арабська"
 
 #: Preferences.java:86
 msgid "Aragonese"
-msgstr "Aragoneză"
+msgstr "арагонська"
 
 #: Preferences.java:87
 msgid "Catalan"
-msgstr "Catalană"
+msgstr "каталонська"
 
 #: Preferences.java:88
 msgid "Chinese Simplified"
-msgstr "Chineză simplificată"
+msgstr "китайська спрощена"
 
 #: Preferences.java:89
 msgid "Chinese Traditional"
-msgstr "Chineză tradiţională"
+msgstr "китайська традиційна"
 
 #: Preferences.java:90
 msgid "Danish"
-msgstr "Daneză"
+msgstr "данська"
 
 #: Preferences.java:91
 msgid "Dutch"
-msgstr "Olandeză"
+msgstr "голландська"
 
 #: Preferences.java:92
 msgid "English"
-msgstr "Engleză"
+msgstr "англійська"
 
 #: Preferences.java:93
 msgid "Estonian"
-msgstr "Estoniană"
+msgstr "естонська"
 
 #: Preferences.java:94
 msgid "Filipino"
-msgstr "Filipineză"
+msgstr "філіппінська"
 
 #: Preferences.java:95
 msgid "French"
-msgstr "Franceză"
+msgstr "французька"
 
 #: Preferences.java:96
 msgid "Galician"
-msgstr "Galeză"
+msgstr "галісійська"
 
 #: Preferences.java:97
 msgid "German"
-msgstr "Germană"
+msgstr "німецька"
 
 #: Preferences.java:98
 msgid "Greek"
-msgstr "Greacă"
+msgstr "грецька"
 
 #: Preferences.java:99
 msgid "Hindi"
-msgstr "Hindusă"
+msgstr "хінді"
 
 #: Preferences.java:100
 msgid "Hungarian"
-msgstr "Maghiară"
+msgstr "угорська"
 
 #: Preferences.java:101
 msgid "Indonesian"
-msgstr "Indoneziană"
+msgstr "індонезійська"
 
 #: Preferences.java:102
 msgid "Italian"
-msgstr "Italiană"
+msgstr "італійська"
 
 #: Preferences.java:103
 msgid "Japanese"
-msgstr "Japoneză"
+msgstr "японська"
 
 #: Preferences.java:104
 msgid "Korean"
-msgstr "Coreană"
+msgstr "корейська"
 
 #: Preferences.java:105
 msgid "Latvian"
-msgstr "Letonă"
+msgstr "латвійська"
 
 #: Preferences.java:106
 msgid "Lithuaninan"
-msgstr "Lituaniană"
+msgstr "литовська"
 
 #: Preferences.java:107
 msgid "Marathi"
-msgstr "Marathi"
+msgstr "мараті"
 
 #: Preferences.java:108
 msgid "Norwegian"
-msgstr "Norvegiană"
+msgstr "норвезька"
 
 #: Preferences.java:109
 msgid "Persian"
-msgstr "Persană"
+msgstr "перська"
 
 #: Preferences.java:110
 msgid "Polish"
-msgstr "Poloneză"
+msgstr "польська"
 
 #: Preferences.java:111 Preferences.java:112
 msgid "Portuguese"
-msgstr "Portugheză"
+msgstr "португальська"
 
 #: Preferences.java:113
 msgid "Romanian"
-msgstr "Română"
+msgstr "румунська"
 
 #: Preferences.java:114
 msgid "Russian"
-msgstr "Rusă"
+msgstr "російська"
 
 #: Preferences.java:115
 msgid "Spanish"
-msgstr "Spaniolă"
+msgstr "Іспанська"
 
 #: Preferences.java:116
 msgid "Tamil"
-msgstr "Tamilă"
+msgstr "тамільська"
 
 #: Preferences.java:219
 msgid ""
 "Could not read default settings.\n"
 "You'll need to reinstall Arduino."
-msgstr "Nu s-a putut citi setările implicite.\nVa trebui să reinstalezi Arduino IDE."
+msgstr "Налаштування за замовчуванням не читаються.\nВам потрібно перевстановити Arduino."
 
 #: Preferences.java:258
 #, java-format
 msgid "Could not read preferences from {0}"
-msgstr "Nu se pot citi preferinţele din {0}"
+msgstr "Неможливо прочитати налаштування з {0}"
 
 #: Preferences.java:277
 msgid "Error reading preferences"
-msgstr "Eroare la citirea preferinţelor"
+msgstr "Помилка читання налаштувань"
 
 #: Preferences.java:279
 #, java-format
 msgid ""
 "Error reading the preferences file. Please delete (or move)\n"
 "{0} and restart Arduino."
-msgstr "Eroare la citirea fişierului cu preferinţe. Te rog şterge (sau mută) acest fişier\n{0} şi reporneşte Arduino IDE."
+msgstr "Помилка читання файлу налаштувань. Будь ласка вилучіть (або перемістіть) \n{0} і перезавантажте Arduino."
 
 #: Preferences.java:295 Editor.java:583
 msgid "Preferences"
-msgstr "Preferinţe"
+msgstr "Налаштування"
 
 #: Preferences.java:315
 msgid "Sketchbook location:"
-msgstr "Locaţia dosarului cu schiţe:"
+msgstr "Розташування теки зі скетчами:"
 
 #: Preferences.java:330
 msgid "Select new sketchbook location"
-msgstr "Selectează noua locaţie pentru dosarul cu schiţe"
+msgstr "Виберіть нове розташування теки зі скетчами"
 
 #: Preferences.java:353
 msgid "Editor language: "
-msgstr "Limba preferată:"
+msgstr "Мова інтерфейсу"
 
 #: Preferences.java:358 Preferences.java:374
 msgid "  (requires restart of Arduino)"
-msgstr "(este necesară repornirea editorului Arduino)"
+msgstr "  (вимагає перезавантаження Arduino)"
 
 #: Preferences.java:370
 msgid "Editor font size: "
-msgstr "Mărimea caracterelor pentru editor:"
+msgstr "Розмір шрифту редактора: "
 
 #: Preferences.java:387
 msgid "Show verbose output during: "
-msgstr "Detaliază informaţiile de ieşire a compilatorului:"
+msgstr "Показувати докладний висновок при: "
 
 #: Preferences.java:389
 msgid "compilation "
-msgstr "compilare"
+msgstr "компіляції"
 
 #: Preferences.java:391
 msgid "upload"
-msgstr "compilare"
+msgstr "вивантаженні"
 
 #: Preferences.java:400
 msgid "Verify code after upload"
-msgstr "Verifică codul după încarcare"
+msgstr "Перевірка коду після вивантаження"
 
 #: Preferences.java:409
 msgid "Use external editor"
-msgstr "Foloseşte un editor extern"
+msgstr "Використовувати зовнішній редактор"
 
 #: Preferences.java:419
 msgid "Check for updates on startup"
-msgstr "Cauta actualizări la pornirea programului"
+msgstr "Перевіряти оновлення при запуску"
 
 #: Preferences.java:428
 msgid "Update sketch files to new extension on save (.pde -> .ino)"
-msgstr "Se schimba extensia fişierelor schiţă la salvare (.pde -> .ino)"
+msgstr "Оновлювати розширення скетчів на нове при збереженні (.pde -> .ino)"
 
 #: Preferences.java:439
 msgid "Automatically associate .ino files with Arduino"
-msgstr "Asociază automat fişierele .ino cu Arduino"
+msgstr "Автоматично асоціювати .ino файли з Arduino"
 
 #: Preferences.java:449
 msgid "More preferences can be edited directly in the file"
-msgstr "Alte preferinţe pot fi editate direct în fişier"
+msgstr "Більше властивостей може бути відредаговано прямо у файлі"
 
 #: Preferences.java:478
 msgid "(edit only when Arduino is not running)"
-msgstr "(editează doar atunci când Arduino IDE nu funcţionează)"
+msgstr "(редагуйте тільки якщо Arduino не запущено)"
 
 #: Preferences.java:625
 #, java-format
 msgid "ignoring invalid font size {0}"
-msgstr "ignoră dimensiunea incorectă pentru fontul {0}"
+msgstr "ігнорування некоректного розміру шрифту {0}"
 
 #: EditorHeader.java:292
 msgid "New Tab"
-msgstr "Fila nouă"
+msgstr "Нова вкладка"
 
 #: EditorHeader.java:300
 msgid "Rename"
-msgstr "Redenumire"
+msgstr "Перейменувати"
 
 #: EditorHeader.java:314 Sketch.java:591
 msgid "Delete"
-msgstr "Ştergere"
+msgstr "Видалити"
 
 #: EditorHeader.java:326
 msgid "Previous Tab"
-msgstr "Fila precedentă"
+msgstr "Попередня вкладка"
 
 #: EditorHeader.java:340
 msgid "Next Tab"
-msgstr "Fila următoare"
+msgstr "Наступна вкладка"
 
 #: Sketch.java:274 Sketch.java:303 Sketch.java:577 Sketch.java:966
 msgid "Sketch is Read-Only"
-msgstr "Schiţa este doar în citire"
+msgstr "Скетч тільки для читання"
 
 #: Sketch.java:275 Sketch.java:304 Sketch.java:578 Sketch.java:967
 msgid ""
 "Some files are marked \"read-only\", so you'll\n"
 "need to re-save the sketch in another location,\n"
 "and try again."
-msgstr "Unele fişiere sunt \"doar în citire\", va trebui\nsă salvaţi schiţele într-o alta locaţie şi\nsă reîncercaţi."
+msgstr "Деякі файли позначені \"тільки для читання\", \nтому вам знадобиться перезберегти скетч в іншому \nмісці і спробувати ще раз."
 
 #: Sketch.java:282
 msgid "Name for new file:"
-msgstr "Numele noului fişier"
+msgstr "Ім'я для нового файлу:"
 
 #: Sketch.java:294
 msgid "Sketch is Untitled"
-msgstr "Schiţa nu are nume"
+msgstr "Скетч без імені"
 
 #: Sketch.java:295
 msgid ""
 "How about saving the sketch first \n"
 "before trying to rename it?"
-msgstr "Ce zici dacă ai salva întâi schiţa\nşi pe urma să încerci să o redenumeşti?"
+msgstr "Як щодо того, щоб спочатку зберегти скетч, \nперед тим як перейменовувати його?"
 
 #: Sketch.java:355 Sketch.java:362 Sketch.java:373
 msgid "Problem with rename"
-msgstr "Problemă la redenumire"
+msgstr "Проблема з перейменуванням"
 
 #: Sketch.java:356
 msgid "The name cannot start with a period."
-msgstr "Numele nu poate începe cu un spaţiu"
+msgstr "Ім'я не може починатися з крапки."
 
 #: Sketch.java:364
 #, java-format
 msgid "\".{0}\" is not a valid extension."
-msgstr "\".{0}\" nu este o extensie acceptata."
+msgstr "\".{0}\" - неприпустиме розширення."
 
 #: Sketch.java:374
 msgid ""
 "The main file can't use an extension.\n"
 "(It may be time for your to graduate to a\n"
 "\"real\" programming environment)"
-msgstr "Fişierul principal nu poate avea o extensie.\n(Ar fi timpul sa urmezi un curs de programare\n\"adevărat\")"
+msgstr "Основний файл не може використовувати розширення.\n(можливо для вас настав час перейти до \n\"справжнього\" середовища програмування)"
 
 #: Sketch.java:396 Sketch.java:410 Sketch.java:419 Sketch.java:859
 msgid "Nope"
-msgstr "Naaa"
+msgstr "Ні"
 
 #: Sketch.java:398
 #, java-format
 msgid "A file named \"{0}\" already exists in \"{1}\""
-msgstr "Un fişier numit \"{0}\" exista deja în \"{1}\""
+msgstr "Файл з іменем \"{0}\" вже існує в \"{1}\""
 
 #: Sketch.java:411
 msgid "You can't have a .cpp file with the same name as the sketch."
-msgstr "Nu poţi avea un fişier .cpp cu acelaşi nume ca şi schiţa."
+msgstr "Ви не можете використовувати .cpp файл з таким же ім'ям як і у скетчу."
 
 #: Sketch.java:421
 msgid ""
 "You can't rename the sketch to \"{0}\"\n"
 "because the sketch already has a .cpp file with that name."
-msgstr "Nu poţi redenumi schiţa în \"{0}\"\ndeoarece aceasta schiţa are deja un fişier .cpp cu acelaşi nume."
+msgstr "Ви не можете перейменувати скетч в \"{0}\",\nтому що скетч вже має .cpp файл з таким іменем."
 
 #: Sketch.java:455
 msgid "Cannot Rename"
-msgstr "Nu pot redenumi"
+msgstr "Перейменування неможливе"
 
 #: Sketch.java:457
 #, java-format
 msgid "Sorry, a sketch (or folder) named \"{0}\" already exists."
-msgstr "Îmi pare rău, o schiţă (sau director) cu numele de \"{0}\" există deja."
+msgstr "Вибачте, скетч (або тека) з назвою \"{0}\" вже існує"
 
 #: Sketch.java:475
 msgid "Could not rename the sketch. (0)"
-msgstr "Nu pot redenumi schiţa. (0)"
+msgstr "Неможливо перейменувати скетч. (0)"
 
 #: Sketch.java:483 Sketch.java:528
 #, java-format
 msgid "Could not rename \"{0}\" to \"{1}\""
-msgstr "Nu pot redenumi \"{0}\" în \"{1}\""
+msgstr "Неможливо перейменувати \"{0}\" в \"{1}\""
 
 #: Sketch.java:496
 msgid "Could not rename the sketch. (1)"
-msgstr "Nu pot redenumi schiţa. (1)"
+msgstr "Неможливо перейменувати скетч. (1)"
 
 #: Sketch.java:503
 msgid "Could not rename the sketch. (2)"
-msgstr "Nu pot redenumi schiţa. (2)"
+msgstr "Неможливо перейменувати скетч. (2)"
 
 #: Sketch.java:540
 msgid "createNewFile() returned false"
-msgstr "createNewFile() a returnat fals"
+msgstr "createNewFile () повернув false"
 
 #: Sketch.java:587
 msgid "Are you sure you want to delete this sketch?"
-msgstr "Eşti sigur că doreşti să ştergi această schiţa?"
+msgstr "Ви дійсно хочете видалити цей скетч?"
 
 #: Sketch.java:588
 #, java-format
 msgid "Are you sure you want to delete \"{0}\"?"
-msgstr "Eşti sigur ca vrei să ştergi \"{0}\"?"
+msgstr "Ви дійсно хочете видалити \"{0}\"?"
 
 #: Sketch.java:616
 msgid "Couldn't do it"
-msgstr "Nu am putut să o fac"
+msgstr "Неможливо зробити це"
 
 #: Sketch.java:617
 #, java-format
 msgid "Could not delete \"{0}\"."
-msgstr "Nu am putut şterge \"{0}\"."
+msgstr "Неможливо видалити \"{0}\"."
 
 #: Sketch.java:647
 msgid "removeCode: internal error.. could not find code"
-msgstr "removeCode: internal error.. nu am putut găsi codul"
+msgstr "removeCode: внутрішня помилка.. неможливо знайти код"
 
 #: Sketch.java:720
 msgid "Sketch is read-only"
-msgstr "Schiţa este doar în citire"
+msgstr "Скетч тільки для читання"
 
 #: Sketch.java:721
 msgid ""
 "Some files are marked \"read-only\", so you'll\n"
 "need to re-save this sketch to another location."
-msgstr "Unele schiţe sunt \"doar în citire\". Va trebui\nsă salvaţi aceste schiţe într-o locaţie diferită."
+msgstr "Деякі файли відзначені \"тільки для читання\", тому\nвам необхідно перезберегти цей скетч в іншому місці."
 
 #: Sketch.java:739
 msgid ""
@@ -773,7 +770,7 @@ msgid ""
 "disable this in the Preferences dialog.\n"
 "\n"
 "Save sketch and update its extension?"
-msgstr "În Arduino 1.0, extensia implicita pentru fişiere a fost schimbata\ndin .pde în .ino.  Noile schiţe (incluzând cele create\ncu  \"Salvează ca\") vor utiliza noua extensie.  Extensia\nschiţelor existente va fi modificata odată cu salvarea acestor fişiere, dar puteţi\ndezactiva aceasta opţiune în fila cu preferinţe.\nSalvează schiţa şi modifică extensia?"
+msgstr "В Arduino 1.0, розширення файлу за замовчуванням змінилося\nз .pde на .ino. Нові скетчі (включаючи створені через\n\"Зберегти як\") матимуть нове розширення. Розширення\nіснуючих скетчів буде поновлено при збереженні, але ви\nможете вимкнути це в діалозі \"Налаштування\".\n\nЗберегти скетч і оновити його розширення?"
 
 #: Sketch.java:746
 msgid ".pde -> .ino"
@@ -781,162 +778,162 @@ msgstr ".pde -> .ino"
 
 #: Sketch.java:825
 msgid "Save sketch folder as..."
-msgstr "Salvează directorul schiţei ca..."
+msgstr "Зберегти теку скетчу як..."
 
 #: Sketch.java:861
 msgid ""
 "You can't save the sketch as \"{0}\"\n"
 "because the sketch already has a .cpp file with that name."
-msgstr "Nu poţi salva schiţa ca \"{0}\"\ndeoarece schiţa conţine deja un fişier .cpp cu acest nume."
+msgstr "Ви не можете зберегти скетч як \"{0}\",\nтому що скетч вже має .cpp файл з таким іменем."
 
 #: Sketch.java:882
 msgid "How very Borges of you"
-msgstr "Uau, i-ai tras un OZN aici"
+msgstr "Як сюрреалістично!"
 
 #: Sketch.java:883
 msgid ""
 "You cannot save the sketch into a folder\n"
 "inside itself. This would go on forever."
-msgstr "Nu poţi salva o schiă într-o altă schiţă.\nAcest lucru ar putea dura o veşnicie."
+msgstr "Ви не можете зберегти скетч в теку\nвсередині теки скетчу. Це буде тривати вічно."
 
 #: Sketch.java:975
 msgid "Select an image or other data file to copy to your sketch"
-msgstr "Selectează o imagine sau un alt fişier pentru a-l copia în schiţa"
+msgstr "Виберіть зображення або інший файл даних для копіювання в скетч"
 
 #: Sketch.java:992 Editor.java:376
 msgid "One file added to the sketch."
-msgstr "Un fişier a fost adăugat schiţei."
+msgstr "Один файл доданий до скетчу."
 
 #: Sketch.java:1043
 #, java-format
 msgid "Replace the existing version of {0}?"
-msgstr "Înlocuieşte versiunea curenta pentru {0}?"
+msgstr "Замінити наявну версію {0}?"
 
 #: Sketch.java:1065 Sketch.java:1088
 msgid "Error adding file"
-msgstr "Eroare la adăugarea fişierului"
+msgstr "Помилка додавання файлу"
 
 #: Sketch.java:1066
 #, java-format
 msgid "Could not delete the existing ''{0}'' file."
-msgstr "Nu s-a putut şterge fişierul ''{0}''."
+msgstr "Не вдається видалити існуючий файл ''{0}''."
 
 #: Sketch.java:1074
 msgid "You can't fool me"
-msgstr "Nu mă poţi păcăli"
+msgstr "Мене не обдуриш"
 
 #: Sketch.java:1075
 msgid ""
 "This file has already been copied to the\n"
 "location from which where you're trying to add it.\n"
 "I ain't not doin nuthin'."
-msgstr "Acest fişier a fost deja copiat în\nlocaţia în care încerci să-l adaugi.\nMă opresc aici."
+msgstr "Цей файл вже був скопійований в місце,\nз якого ви намагаєтеся його додати."
 
 #: Sketch.java:1089
 #, java-format
 msgid "Could not add ''{0}'' to the sketch."
-msgstr "Nu am putut sa adaug ''{0}'' la schiţă."
+msgstr "Неможливо додати ''{0}'' до скетчу."
 
 #: Sketch.java:1392 Sketch.java:1423
 msgid "Build folder disappeared or could not be written"
-msgstr "Directorul 'build' a dispărut sau nu poate fi scris"
+msgstr "Відсутня або не перезаписується тека збірки"
 
 #: Sketch.java:1407
 msgid "Could not find main class"
-msgstr "Nu am găsit clasa 'main'"
+msgstr "Неможливо знайти головний клас"
 
 #: Sketch.java:1432
 #, java-format
 msgid "Uncaught exception type: {0}"
-msgstr "Excepţie necunoscută: {0}"
+msgstr "Неперехоплений тип виключення: {0}"
 
 #: Sketch.java:1467
 #, java-format
 msgid "Problem moving {0} to the build folder"
-msgstr "Problema la mutarea {0} către directorul 'build'"
+msgstr "{0} не переміщається в теку збірки"
 
 #: Sketch.java:1608 Editor.java:1890
 msgid "Compiling sketch..."
-msgstr "Compilez schiţa..."
+msgstr "Компілювання..."
 
 #: Sketch.java:1622
 msgid "Uploading..."
-msgstr "Încărcare..."
+msgstr "Вивантаження..."
 
 #: Sketch.java:1644
 #, java-format
 msgid "Binary sketch size: {0} bytes (of a {1} byte maximum)"
-msgstr "Dimensiunea schiţei: {0} bytes (din maxim {1} bytes)"
+msgstr "Розмір скетчу в двійковому коді: {0} байт (з {1} байт максимум)"
 
 #: Sketch.java:1647
 msgid "Couldn't determine program size: {0}"
-msgstr "Nu am putut determina dimensiunea programului: {0}"
+msgstr "Не можу визначити розмір програми: {0}"
 
 #: Sketch.java:1653
 msgid ""
 "Sketch too big; see http://www.arduino.cc/en/Guide/Troubleshooting#size for "
 "tips on reducing it."
-msgstr "Schiţa este prea mare; vezi http://www.arduino.cc/en/Guide/Troubleshooting#size pentru ponturi în reducerea acesteia."
+msgstr "Скетч занадто великий; зверніться до http://www.arduino.cc/en/Guide/Troubleshooting#size за порадами по його зменшенню."
 
 #: Sketch.java:1712
 msgid "Missing the */ from the end of a /* comment */"
-msgstr "Lipsa */ de la sfârşitul unui /* comentariu */"
+msgstr "Відсутня */ в кінці /* коментаря */"
 
 #: Sketch.java:1754
 msgid "Sketch Disappeared"
-msgstr "Schiţa a dispărut"
+msgstr "Не вдається знайти скетч"
 
 #: Sketch.java:1755
 msgid ""
 "The sketch folder has disappeared.\n"
 " Will attempt to re-save in the same location,\n"
 "but anything besides the code will be lost."
-msgstr "Directorul schiţei a dispărut.\nVoi încerca să salvez din nou în aceiaşi locaţie,\ndar se vor pierde orice alte informaţii, mai puţin codul."
+msgstr "Не вдається знайти теку скетчу.\nБуде виконана спроба перезберегти його в тому ж місці,\nале все, крім коду, буде втрачено."
 
 #: Sketch.java:1768
 msgid "Could not re-save sketch"
-msgstr "Nu am putut re-salva schiţa."
+msgstr "Не вдалося перезберегти скетч"
 
 #: Sketch.java:1769
 msgid ""
 "Could not properly re-save the sketch. You may be in trouble at this point,\n"
 "and it might be time to copy and paste your code to another text editor."
-msgstr "Nu am putut re-salva schiţa. Pentru a evita problemele,\nîţi recomand sa faci o copiere a codului într-un alt editor de text."
+msgstr "Не вдалося перезберегти скетч. Можливо вам знадобиться скопіювати і вставити\nваш код в інший текстовий редактор."
 
 #: Sketch.java:2018
 msgid ""
 "The sketch name had to be modified. Sketch names can only consist\n"
 "of ASCII characters and numbers (but cannot start with a number).\n"
 "They should also be less less than 64 characters long."
-msgstr "A fost necesar să modific numele schiţei. Numele unei schiţe poate conţine\ndoar caractere ASCII şi numere (dar nu poate începe cu un număr).\nDe asemenea nu poate avea mai mult de 64 caractere."
+msgstr "Ім'я скетчу було змінено. Імена скетчів можуть складатися тільки\nз ASCII символів і чисел (але не можуть починатися з чисел).\nТакож вони повинні мати менше 64 символів у довжину."
 
 #: SerialMonitor.java:93
 msgid "Send"
-msgstr "Trimite"
+msgstr "Надіслати"
 
 #: SerialMonitor.java:110
 msgid "Autoscroll"
-msgstr "Parcurgere automată"
+msgstr "Автопрокрутка"
 
 #: SerialMonitor.java:112
 msgid "No line ending"
-msgstr "Fără editarea liniei"
+msgstr "Без закінчення рядка"
 
 #: SerialMonitor.java:112
 msgid "Newline"
-msgstr "Linie nouă"
+msgstr "Новий рядок (NL)"
 
 #: SerialMonitor.java:112
 msgid "Carriage return"
-msgstr "Revenire cursor (ENTER)"
+msgstr "Повернення каретки (CR)"
 
 #: SerialMonitor.java:112
 msgid "Both NL & CR"
-msgstr "NL & CR (linie noua şi enter)"
+msgstr "NL і CR разом"
 
 #: SerialMonitor.java:130 SerialMonitor.java:133
 msgid "baud"
-msgstr "viteză de transmisie"
+msgstr "бод"
 
 #: debug/Compiler.java:47
 msgid "http://code.google.com/p/arduino/issues/list"
@@ -945,24 +942,24 @@ msgstr "http://code.google.com/p/arduino/issues/list"
 #: debug/Compiler.java:49 debug/Uploader.java:45
 #, java-format
 msgid "Compiler error, please submit this code to {0}"
-msgstr "Eroare de compilator, te rog trimite acest cod către {0}"
+msgstr "Помилка компілятора, будь ласка, перешліть цей код на {0}"
 
 #: debug/Compiler.java:126
 msgid "No board selected; please choose a board from the Tools > Board menu."
-msgstr "Nu este selectată nici o placă de dezvoltare; te rog alege una din meniul  Instrumente>Placă de dezvoltare"
+msgstr "Не обрана модель плати, будь ласка, виберіть її в меню Сервіс > Плати."
 
 #: debug/Compiler.java:365
 #, java-format
 msgid "{0} returned {1}"
-msgstr "{0} a returnat {1}"
+msgstr "{0} повернув {1}"
 
 #: debug/Compiler.java:369
 msgid "Error compiling."
-msgstr "Eroare de compilare"
+msgstr "Помилка при компіляції."
 
 #: debug/Compiler.java:408
 msgid "Please import the SPI library from the Sketch > Import Library menu."
-msgstr "Te rog importa biblioteca SPI din meniul Schiţe > Importă bibliotecă."
+msgstr "Будь ласка, приєднайте бібліотеку SPI в меню Скетч > Підключити бібліотеку."
 
 #: debug/Compiler.java:409
 msgid ""
@@ -970,11 +967,11 @@ msgid ""
 "As of Arduino 0019, the Ethernet library depends on the SPI library.\n"
 "You appear to be using it or another library that depends on the SPI library.\n"
 "\n"
-msgstr "\nÎncepând cu versiunea Arduino 0019, biblioteca Ethernet depinde de biblioteca SPI.\nSe pare ca mai folosiţi o bibliotecă care depinde de biblioteca SPI.\n"
+msgstr "\nПочинаючи з Arduino 0019 бібліотека Ethernet залежить від бібліотеки SPI.\nСхоже, що ви використовуєте саме її, або іншу бібліотеку, що залежитьвід бібліотеки SPI.\n\n"
 
 #: debug/Compiler.java:414
 msgid "The 'BYTE' keyword is no longer supported."
-msgstr "Nu mai puteţi folosi cuvântul cheie 'BYTE'."
+msgstr "Дескриптор 'BYTE' більше не підтримується."
 
 #: debug/Compiler.java:415
 msgid ""
@@ -982,70 +979,70 @@ msgid ""
 "As of Arduino 1.0, the 'BYTE' keyword is no longer supported.\n"
 "Please use Serial.write() instead.\n"
 "\n"
-msgstr "\nÎncepând cu versiunea Arduino 1.0 cuvântul cheie 'BYTE' nu mai poate fi folosit.\nCa alternativă puteţi folosi Serial.write().\n"
+msgstr "\nПочинаючи з версії Arduino 1.0, дескриптор 'BYTE' більше не підтримується.\nБудь ласка, використовуйте Serial.write() замість нього.\n\n"
 
 #: debug/Compiler.java:420
 msgid "The Server class has been renamed EthernetServer."
-msgstr "Clasa Server a fost redenumită în EthernetServer."
+msgstr "Клас Server був перейменований в EternetServer"
 
 #: debug/Compiler.java:421
 msgid ""
 "\n"
 "As of Arduino 1.0, the Server class in the Ethernet library has been renamed to EthernetServer.\n"
 "\n"
-msgstr "\nÎncepând cu versiunea Arduino 1.0, clasa Server, din biblioteca Ethernet, a fost redenumită în EthernetServer.\n"
+msgstr "\nПочинаючи з версії Arduino 1.0, клас Server бібліотеки Ethernet був перейменований в EthernetServer.\n\n"
 
 #: debug/Compiler.java:426
 msgid "The Client class has been renamed EthernetClient."
-msgstr "Clasa Client a fost redenumită în EthernetClient."
+msgstr "Клас Client був перейменований в EternetClient"
 
 #: debug/Compiler.java:427
 msgid ""
 "\n"
 "As of Arduino 1.0, the Client class in the Ethernet library has been renamed to EthernetClient.\n"
 "\n"
-msgstr "\nÎncepând cu versiunea Arduino 1.0, clasa Client, din biblioteca Ethernet, a fost redenumită în EthernetClient.\n"
+msgstr "\nПочинаючи з версії Arduino 1.0, клас Client бібліотеки Ethernet був перейменований в EthernetClient.\n\n"
 
 #: debug/Compiler.java:432
 msgid "The Udp class has been renamed EthernetUdp."
-msgstr "Clasa Udp a fost redenumită în EthernetUdp."
+msgstr "Клас Udp був перейменований в EthernetUdp."
 
 #: debug/Compiler.java:433
 msgid ""
 "\n"
 "As of Arduino 1.0, the Udp class in the Ethernet library has been renamed to EthernetUdp.\n"
 "\n"
-msgstr "\nÎncepând cu versiunea Arduino 1.0, clasa Udp, din biblioteca Ethernet, a fost redenumită în EthernetUdp.\n"
+msgstr "\nПочинаючи з версії Arduino 1.0, клас Udp бібліотеки Ethernet був перейменований в EthernetUdp.\n\n"
 
 #: debug/Compiler.java:438
 msgid "Wire.send() has been renamed Wire.write()."
-msgstr "Wire.send() a fost redenumit în Wire.write()."
+msgstr "Wire.send() була перейменована в Wire.write()."
 
 #: debug/Compiler.java:439
 msgid ""
 "\n"
 "As of Arduino 1.0, the Wire.send() function was renamed to Wire.write() for consistency with other libraries.\n"
 "\n"
-msgstr "\nÎncepând cu versiunea Arduino 1.0, funcţia Wire.send() a fost redenumită în Wire.write() pentru a păstra compatibilitatea cu celelalte biblioteci.\n"
+msgstr "\nПочинаючи з версії Arduino 1.0, функція Wire.send() була перейменована в Wire.write() для узгодженості з іншими бібліотеками.\n\n"
 
 #: debug/Compiler.java:444
 msgid "Wire.receive() has been renamed Wire.read()."
-msgstr "Wire.receive() a fost redenumit in Wire.read()."
+msgstr "Wire.receive() була перейменована в Wire.read()."
 
 #: debug/Compiler.java:445
 msgid ""
 "\n"
 "As of Arduino 1.0, the Wire.receive() function was renamed to Wire.read() for consistency with other libraries.\n"
 "\n"
-msgstr "\nÎncepând cu versiunea Arduino 1.0, funcţia Wire.receive() a fost redenumită în Wire.read() pentru a păstra compatibilitatea cu celelalte biblioteci.\n"
+msgstr "\nПочинаючи з версії Arduino 1.0, функція Wire.receive() була перейменована в Wire.read() для узгодженості з іншими бібліотеками.\n\n"
 
 #: debug/Compiler.java:450
 msgid "'Mouse' only supported on the Arduino Leonardo"
-msgstr "'Mouse' este compatibil doar cu Arduino Leonardo"
+msgstr "'Mouse'  підтримується тільки в Arduino Leonardo"
 
 #: debug/Compiler.java:455
 msgid "'Keyboard' only supported on the Arduino Leonardo"
-msgstr "''Keyboard' este compatibil doar cu Arduino Leonardo"
+msgstr "'Keyboard' підтримується тільки в Arduino Leonardo"
 
 #: debug/Uploader.java:43
 msgid "https://developer.berlios.de/bugs/?group_id=3590"
@@ -1055,79 +1052,79 @@ msgstr "https://developer.berlios.de/bugs/?group_id=3590"
 #, java-format
 msgid ""
 "the selected serial port {0} does not exist or your board is not connected"
-msgstr "portul serial {0} nu există sau placa de dezvoltare nu este conectată"
+msgstr "Обраний послідовний порт {0} не існує або ваша плата не підключена"
 
 #: debug/Uploader.java:199
 msgid ""
 "Device is not responding, check the right serial port is selected or RESET "
 "the board right before exporting"
-msgstr "Dispozitivul nu răspunde, verifică dacă ai selectat portul serial corect sau apasă RESET înainte de a realiza exportul"
+msgstr "Пристрій не відповідає. Перевірте, чи правильно обрано послідовний порт,або перезавантажте плату прямо перед завантаженням"
 
 #: debug/Uploader.java:209
 msgid ""
 "Problem uploading to board.  See "
 "http://www.arduino.cc/en/Guide/Troubleshooting#upload for suggestions."
-msgstr "Probleme la încărcarea aplicaţiei.  Vezi http://www.arduino.cc/en/Guide/Troubleshooting#upload pentru sugestii."
+msgstr "Проблема вивантаження в плату. Зверніться до http://www.arduino.cc/en/Guide/Troubleshooting#upload для пошуку рішення."
 
 #: debug/Uploader.java:213
 msgid ""
 "Wrong microcontroller found.  Did you select the right board from the Tools "
 "> Board menu?"
-msgstr "Microcontrolerul găsit nu este cel corect.  Ai selectat placa de dezvoltare corectă din meniul Instrumente> Placă de dezvoltare?"
+msgstr "Тип мікроконтролера невірний. Ви правильно вибрали плату з меню Сервіс > Плати?"
 
 #: debug/BasicUploader.java:80
 msgid "Forcing reset using 1200bps open/close on port "
-msgstr "Resetare forţată a portului folosind secvenţa open/close la 1200bps"
+msgstr "Forcing reset using 1200bps open/close on port "
 
 #: debug/BasicUploader.java:209
 msgid ""
 "Couldn't find a Board on the selected port. Check that you have the correct "
 "port selected.  If it is correct, try pressing the board's reset button "
 "after initiating the upload."
-msgstr "Nu am găsit nici o placă de dezvoltare pe portul serial ales. Verifică dacă ai selectat corect portul serial. Dacă este corect încearcă să apeşi butonul de reset de pe placa de dezvoltare imediat după iniţierea secvenţei de încărcare."
+msgstr "Не знайдено плату на обраному порту. Перевірте, чи обрано вірний порт.  Якщо це так перезавантажте плату натиском кнопки на ній."
 
 #: Serial.java:121
 #, java-format
 msgid ""
 "Serial port ''{0}'' already in use. Try quitting any programs that may be "
 "using it."
-msgstr "Portul serial ''{0}'' este deja în uz. Verifică ce programe îl folosesc şi încearcă să le închizi."
+msgstr "Послідовний порт ''{0}'' зайнято. Закрийте програми, що можуть його використовувати."
 
 #: Serial.java:125
 #, java-format
 msgid "Error touching serial port ''{0}''."
-msgstr "Eroare la deschiderea portului serial \"{0}\"."
+msgstr "Помилка при відкритті послідовного порту ''{0}''."
 
 #: Serial.java:174
 #, java-format
 msgid ""
 "Serial port ''{0}'' already in use. Try quiting any programs that may be "
 "using it."
-msgstr "Portul serial ''{0}'' este deja în uz. Verifică ce programe îl folosesc şi încearcă să le închizi."
+msgstr "Послідовний порт ''{0}'' зайнято. Закрийте програми, що можуть його використовувати."
 
 #: Serial.java:181
 #, java-format
 msgid "Error opening serial port ''{0}''."
-msgstr "Eroare la deschiderea portului serial ''{0}''."
+msgstr "Помилка при відкритті послідовного порту ''{0}''."
 
 #: Serial.java:194
 #, java-format
 msgid ""
 "Serial port ''{0}'' not found. Did you select the right one from the Tools >"
 " Serial Port menu?"
-msgstr "Nu am găsit portul serial ''{0}''. Ai făcut corect selecţia în meniul Instrumente> Port serial?"
+msgstr "Послідовний порт ''{0}'' не знайдено. Ви вибрали потрібний із меню Сервіс > Послідовний порт?"
 
 #: Serial.java:451
 #, java-format
 msgid ""
 "readBytesUntil() byte buffer is too small for the {0} bytes up to and "
 "including char {1}"
-msgstr "Buferul este prea mic pentru cei {0} bytes specificaţi ca parametru pentru funcţia readBytesUntil() luând în considerare şi caracterul menţionat la {1}"
+msgstr "readBytesUntil() байтовий буфер занадто малий для {0} байтів аж до символу {1}"
 
 #: Serial.java:593
 #, java-format
 msgid "Error inside Serial.{0}()"
-msgstr "Eroare în Serial.{0}()"
+msgstr "Помилка в Serial. {0}()"
 
 #: UpdateCheck.java:53
 msgid "http://www.arduino.cc/latest.txt"
@@ -1137,11 +1134,11 @@ msgstr "http://www.arduino.cc/latest.txt"
 msgid ""
 "A new version of Arduino is available,\n"
 "would you like to visit the Arduino download page?"
-msgstr "O nouă versiune este disponibilă pentru Arduino IDE,\ndoreşti să vizitezi pagina de descărcări Arduino?"
+msgstr "Доступна нова версія Arduino,\nХочете перейти на сторінку завантаження?"
 
 #: UpdateCheck.java:111
 msgid "Update"
-msgstr "Actualizează"
+msgstr "Оновлення"
 
 #: UpdateCheck.java:118
 msgid "http://www.arduino.cc/en/Main/Software"
@@ -1149,120 +1146,120 @@ msgstr "http://www.arduino.cc/en/Main/Software"
 
 #: Editor.java:373
 msgid "No files were added to the sketch."
-msgstr "Nici un fişier nu a fost adăugat schiţei."
+msgstr "Файли не додано."
 
 #: Editor.java:380
 #, java-format
 msgid "{0} files added to the sketch."
-msgstr "{0} fişiere au fost adăugate schiţei."
+msgstr "До скетчу було додано файлів: {0}."
 
 #: Editor.java:491
 msgid "File"
-msgstr "Fişier"
+msgstr "Файл"
 
 #: Editor.java:510
 msgid "Sketchbook"
-msgstr "Dosar cu schiţe"
+msgstr "Тека зі скетчами"
 
 #: Editor.java:516
 msgid "Examples"
-msgstr "Exemple"
+msgstr "Приклади"
 
 #: Editor.java:521 Editor.java:2024
 msgid "Close"
-msgstr "Închide"
+msgstr "Закрити"
 
 #: Editor.java:537
 msgid "Save As..."
-msgstr "Salvează ca..."
+msgstr "Зберегти як..."
 
 #: Editor.java:563
 msgid "Page Setup"
-msgstr "Iniţializare pagină"
+msgstr "Параметри сторінки"
 
 #: Editor.java:571
 msgid "Print"
-msgstr "Tipărire"
+msgstr "Друк"
 
 #: Editor.java:607
 msgid "Sketch"
-msgstr "Schiţă"
+msgstr "Скетч"
 
 #: Editor.java:609
 msgid "Verify / Compile"
-msgstr "Verifica / Compilează"
+msgstr "Перевірити / Компілювати"
 
 #: Editor.java:636
 msgid "Import Library..."
-msgstr "Verifica / Compilează"
+msgstr "Імпортувати бібліотеку..."
 
 #: Editor.java:641
 msgid "Show Sketch Folder"
-msgstr "Arata directorul schiţei"
+msgstr "Показати теку скетчів"
 
 #: Editor.java:650
 msgid "Add File..."
-msgstr "Adaugă fişier..."
+msgstr "Додати файл..."
 
 #: Editor.java:663
 msgid "Tools"
-msgstr "Instrumente"
+msgstr "Інструменти"
 
 #: Editor.java:699
 msgid "Serial Port"
-msgstr "Port serial"
+msgstr "Послідовний порт"
 
 #: Editor.java:704
 msgid "Programmer"
-msgstr "Programator"
+msgstr "Програматор"
 
 #: Editor.java:708
 msgid "Burn Bootloader"
-msgstr "Încărcă Bootloader"
+msgstr "Записати завантажувач"
 
 #: Editor.java:932
 msgid "serialMenu is null"
-msgstr "serialMenu este inexistent"
+msgstr "Меню послідовного порту пусто"
 
 #: Editor.java:936 Editor.java:943
 msgid "name is null"
-msgstr "numele este inexistent"
+msgstr "немає імені"
 
 #: Editor.java:999
 msgid "error retrieving port list"
-msgstr "eroare la încărcarea listei cu porturile disponibile"
+msgstr "помилка отримання списку портів"
 
 #: Editor.java:1015
 msgid "Help"
-msgstr "Ajutor"
+msgstr "Допомога"
 
 #: Editor.java:1054
 msgid "Getting Started"
-msgstr "Primi paşi"
+msgstr "Початок роботи"
 
 #: Editor.java:1062
 msgid "Environment"
-msgstr "Mediul de dezvoltare"
+msgstr "Середовище"
 
 #: Editor.java:1070
 msgid "Troubleshooting"
-msgstr "Depanare"
+msgstr "Пошук неполадок"
 
 #: Editor.java:1078
 msgid "Reference"
-msgstr "Instrucţiuni"
+msgstr "Зміст"
 
 #: Editor.java:1086 Editor.java:2775
 msgid "Find in Reference"
-msgstr "Cauta în instrucţiuni"
+msgstr "Знайти в довідці"
 
 #: Editor.java:1097
 msgid "Frequently Asked Questions"
-msgstr "Întrebări şi răspunsuri"
+msgstr "Часті питання"
 
 #: Editor.java:1105
 msgid "Visit Arduino.cc"
-msgstr "Vizitaţi Arduino.cc"
+msgstr "Перейти на Arduino.cc"
 
 #: Editor.java:1108
 msgid "http://arduino.cc/"
@@ -1270,76 +1267,76 @@ msgstr "http://arduino.cc/"
 
 #: Editor.java:1116
 msgid "About Arduino"
-msgstr "Despre Arduino"
+msgstr "Про програму"
 
 #: Editor.java:1130
 msgid "Edit"
-msgstr "Editare"
+msgstr "Правка"
 
 #: Editor.java:1133 Editor.java:1355
 msgid "Undo"
-msgstr "Anulează"
+msgstr "Вернути"
 
 #: Editor.java:1138 Editor.java:1140 Editor.java:1390
 msgid "Redo"
-msgstr "Refă"
+msgstr "Повернути"
 
 #: Editor.java:1149 Editor.java:2699
 msgid "Cut"
-msgstr "Taie"
+msgstr "Вирізати"
 
 #: Editor.java:1157 Editor.java:2707
 msgid "Copy"
-msgstr "Copiază"
+msgstr "Копіювати"
 
 #: Editor.java:1165 Editor.java:2715
 msgid "Copy for Forum"
-msgstr "Copiază pentru forum"
+msgstr "Копіювати для форуму"
 
 #: Editor.java:1177 Editor.java:2723
 msgid "Copy as HTML"
-msgstr "Copiază ca şi HTML"
+msgstr "Копіювати як HTML"
 
 #: Editor.java:1189 Editor.java:2731
 msgid "Paste"
-msgstr "Lipire"
+msgstr "Вставити"
 
 #: Editor.java:1198 Editor.java:2739
 msgid "Select All"
-msgstr "Selecteză tot"
+msgstr "Виділити все"
 
 #: Editor.java:1208 Editor.java:2749
 msgid "Comment/Uncomment"
-msgstr "Pune comentariu/Elimină comentariu"
+msgstr "Коментувати/розкоментувати"
 
 #: Editor.java:1216 Editor.java:2757
 msgid "Increase Indent"
-msgstr "Creşte spaţiere"
+msgstr "Збільшити відступ"
 
 #: Editor.java:1224 Editor.java:2765
 msgid "Decrease Indent"
-msgstr "Redu spaţiere"
+msgstr "Зменшити відступ"
 
 #: Editor.java:1234
 msgid "Find..."
-msgstr "Căutare..."
+msgstr "Знайти..."
 
 #: Editor.java:1249
 msgid "Find Next"
-msgstr "Următorul găsit"
+msgstr "Знайти наступне"
 
 #: Editor.java:1259
 msgid "Find Previous"
-msgstr "Precedentul găsit"
+msgstr "Знайти попереднє"
 
 #: Editor.java:1269
 msgid "Use Selection For Find"
-msgstr "Foloseşte selecţia pentru căutare"
+msgstr "Знайти вибране"
 
 #: Editor.java:1872
 #, java-format
 msgid "No reference available for \"{0}\""
-msgstr "Nici un rezultat disponibil pentru \"{0}\""
+msgstr "Немає посилань для \"{0}\""
 
 #: Editor.java:1874
 #, java-format
@@ -1348,12 +1345,12 @@ msgstr "{0}.html"
 
 #: Editor.java:1911 Editor.java:1928
 msgid "Done compiling."
-msgstr "Compilare terminata."
+msgstr "Компілювання виконано"
 
 #: Editor.java:2020
 #, java-format
 msgid "Save changes to \"{0}\"?  "
-msgstr "Salvaţi modificările pentru \"{0}\"?"
+msgstr "Зберегти зміни в \"{0}\"?"
 
 #: Editor.java:2053
 msgid ""
@@ -1361,21 +1358,21 @@ msgid ""
 " font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Do you "
 "want to save changes to this sketch<BR> before closing?</b><p>If you don't "
 "save, your changes will be lost."
-msgstr "<html> <head> <style type=\\\"text/css\\\">b { font: 13pt \\\"Lucida Grande\\\" }p { font: 11pt \\\"Lucida Grande\\\"; margin-top: 8px }</style> </head><b>Doreşti să salvezi modificările aduse acestei schiţe<BR> înainte de a închide?</b><p>Dacă nu salvezi, modificările vor fi pierdute."
+msgstr "<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p { font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Ви хочете зберегти зміни в цьому скетчі<BR> перед закриттям? </b><p>Якщо ви не збережете, всі зміни будуть втрачені."
 
 #: Editor.java:2064
 msgid "Don't Save"
-msgstr "Nu salva"
+msgstr "Не зберігати"
 
 #: Editor.java:2136
 msgid "Bad file selected"
-msgstr "Fişierul selectat este invalid"
+msgstr "Вибрано неправильний файл"
 
 #: Editor.java:2137
 msgid ""
 "Processing can only open its own sketches\n"
 "and other files ending in .ino or .pde"
-msgstr "Se pot deschide doar propriile schiţe\nsau alte fişiere cu extensia .ino sau .pde"
+msgstr "Processing може відкривати свої скетчі\nта інші файли, що закінчуються .ino або .pde"
 
 #: Editor.java:2147
 #, java-format
@@ -1383,28 +1380,28 @@ msgid ""
 "The file \"{0}\" needs to be inside\n"
 "a sketch folder named \"{1}\".\n"
 "Create this folder, move the file, and continue?"
-msgstr "Fişierul \"{0}\" trebuie sa fie în interiorul\nunui director numit \"{1}\".\nDoreşti să creez directorul să mut fişierul şi să continui?"
+msgstr "Файл \"{0}\" має бути всередині\nтеки скетчу з іменем \"{1}\".\nСтворити цю теку, перемістити файл і продовжити?"
 
 #: Editor.java:2156
 msgid "Moving"
-msgstr "Mut"
+msgstr "Переміщення"
 
 #: Editor.java:2169
 #, java-format
 msgid "A folder named \"{0}\" already exists. Can't open sketch."
-msgstr "Un director cu numele \"{0}\" exista deja. Nu pot deschide schiţa."
+msgstr "Тека з іменем \"{0}\" вже існує. Неможливо відкрити скетч."
 
 #: Editor.java:2179
 msgid "Could not create the sketch folder."
-msgstr "Nu pot crea directorul pentru schiţe."
+msgstr "Неможливо створити теку скетчу."
 
 #: Editor.java:2188
 msgid "Could not copy to a proper location."
-msgstr "Nu am putut copia către locaţia adecvată."
+msgstr "Неможливо скопіювати в потрібне місце."
 
 #: Editor.java:2206
 msgid "Could not create the sketch."
-msgstr "Nu am putut crea schiţa."
+msgstr "Неможливо створити скетч"
 
 #: Editor.java:2213
 #, java-format
@@ -1413,169 +1410,169 @@ msgstr "{0} | Arduino {1}"
 
 #: Editor.java:2270 Editor.java:2308
 msgid "Saving..."
-msgstr "Salvez..."
+msgstr "Збереження..."
 
 #: Editor.java:2275 Editor.java:2311
 msgid "Done Saving."
-msgstr "Salvare finalizată."
+msgstr "Збереження виконано."
 
 #: Editor.java:2317
 msgid "Save Canceled."
-msgstr "Salvare anulată."
+msgstr "Збереження скасовано."
 
 #: Editor.java:2343
 #, java-format
 msgid ""
 "Serial port {0} not found.\n"
 "Retry the upload with another serial port?"
-msgstr "Portul serial {0} nu a fost găsit.\nDoreşti sa utilizezi un alt port serial?"
+msgstr "Послідовний порт {0} не знайдений.\nПовторити вивантаження з інших послідовних портом?"
 
 #: Editor.java:2378
 msgid "Uploading to I/O Board..."
-msgstr "Se încarcă în placa de dezvoltare..."
+msgstr "Вивантаження на плату введення/виведення..."
 
 #: Editor.java:2395 Editor.java:2431
 msgid "Done uploading."
-msgstr "Încărcare finalizata."
+msgstr "Вивантаження виконано."
 
 #: Editor.java:2403 Editor.java:2439
 msgid "Upload canceled."
-msgstr "Încărcare anulată."
+msgstr "Вивантаження скасовано"
 
 #: Editor.java:2467
 msgid "Save changes before export?"
-msgstr "Salvaţi modificările înainte de export?"
+msgstr "Зберегти зміни перед експортом?"
 
 #: Editor.java:2482
 msgid "Export canceled, changes must first be saved."
-msgstr "Exportul a fost anulat, modificările trebuiesc întâi salvate."
+msgstr "Експорт скасований, спочатку збережіть зміни."
 
 #: Editor.java:2504
 msgid "Burning bootloader to I/O Board (this may take a minute)..."
-msgstr "Se încarcă bootloader-ul în placa de dezvoltare (acest lucru o sa dureze un pic)..."
+msgstr "Запис завантажувача на плату введення/виводу (хвилиночку)..."
 
 #: Editor.java:2510
 msgid "Done burning bootloader."
-msgstr "Încărcarea bootloader-ului a fost finalizată."
+msgstr "Запис завантажувача виконано."
 
 #: Editor.java:2512 Editor.java:2516 Editor.java:2520
 msgid "Error while burning bootloader."
-msgstr "Eroare în timpul încărcării bootloader-ului."
+msgstr "Помилка при записі завантажувача."
 
 #: Editor.java:2547
 msgid "Printing..."
-msgstr "Tiparesc..."
+msgstr "Друк..."
 
 #: Editor.java:2564
 msgid "Done printing."
-msgstr "Tiparire finalizată."
+msgstr "Друк виконано."
 
 #: Editor.java:2567
 msgid "Error while printing."
-msgstr "Eroare în timpul tipăririi."
+msgstr "Помилка під час друку"
 
 #: Editor.java:2571
 msgid "Printing canceled."
-msgstr "Tiparire anulată."
+msgstr "Друк скасовано."
 
 #: Editor.java:2619
 #, java-format
 msgid "Bad error line: {0}"
-msgstr "Linie eronata: {0}"
+msgstr "Рядок з помилкою: {0}"
 
 #: Editor.java:2688
 msgid "Open URL"
-msgstr "Deschide URL"
+msgstr "Відкрити посилання"
 
 #: EditorConsole.java:152
 msgid "Console Error"
-msgstr "Consola de erori"
+msgstr "Помилка консолі"
 
 #: EditorConsole.java:153
 msgid ""
 "A problem occurred while trying to open the\n"
 "files used to store the console output."
-msgstr "O problema a apărut în timp ce încercam sa deschid\nfişierul folosit pentru stocarea datelor din consolă."
+msgstr "Виникла проблема при спробі відкрити файли,\nщо використовуються для зберігання виведу на консоль."
 
 #: Theme.java:52
 msgid ""
 "Could not read color theme settings.\n"
 "You'll need to reinstall Processing."
-msgstr "Nu pot citi setările culorilor pentru tema.\nEste necesara reinstalarea aplicaţiei."
+msgstr "Не вдалося прочитати налаштування колірної теми.\nВам потрібно буде перевстановити Processing."
 
 #: Platform.java:167
 msgid "No launcher available"
-msgstr "Nu este disponibil nici un lansator"
+msgstr "Немає завантажувача"
 
 #: Platform.java:168
 msgid ""
 "Unspecified platform, no launcher available.\n"
 "To enable opening URLs or folders, add a \n"
 "\"launcher=/path/to/app\" line to preferences.txt"
-msgstr "Platformă nespecificată, lansator indisponibil.\nPentru a permite deschiderea URL-urilor sau a directoarelor, adaugaţi următoarea linie\n\"launcher=/path/to/app\" în fişierul preferences.txt"
+msgstr "Не вказана платформа, немає завантажувача.\nЩоб дозволити відкриття посилань або тек, додайте\n\"launcher =/path/to/app\" у preferences.txt"
 
 #: tools/format/src/AutoFormat.java:54 tools/AutoFormat.java:916
 msgid "No changes necessary for Auto Format."
-msgstr "Nu a rezultat nici o modificare în urma auto formatării."
+msgstr "Нічого форматувати."
 
 #: tools/AutoFormat.java:91
 msgid "Auto Format"
-msgstr "Auto formatare"
+msgstr "Автоформатування"
 
 #: tools/AutoFormat.java:922
 msgid "Auto Format Canceled: Too many right parentheses."
-msgstr "Auto formatare anulată: prea multe paranteze de dreapta"
+msgstr "Автоформатування перервано: занадто багато правих круглих дужок."
 
 #: tools/AutoFormat.java:925
 msgid "Auto Format Canceled: Too many left parentheses."
-msgstr "Auto formatare anulată: prea multe paranteze de stânga"
+msgstr "Автоформатування перервано: надто багато лівих круглих дужок."
 
 #: tools/AutoFormat.java:931
 msgid "Auto Format Canceled: Too many right curly braces."
-msgstr "Auto formatare anulată: prea multe acolade de dreapta"
+msgstr "Автоформатування перервано: занадто багато правих фігурних дужок."
 
 #: tools/AutoFormat.java:934
 msgid "Auto Format Canceled: Too many left curly braces."
-msgstr "Auto formatare anulată: prea multe acolade de stânga"
+msgstr "Автоформатування перервано: надто багато лівих фігурних дужок."
 
 #: tools/AutoFormat.java:944
 msgid "Auto Format finished."
-msgstr "Auto formatare terminată"
+msgstr "Автоформатування завершено."
 
 #: tools/FixEncoding.java:41 tools/FixEncoding.java:58
 #: tools/FixEncoding.java:79
 msgid "Fix Encoding & Reload"
-msgstr "Reparare fişier"
+msgstr "Виправити кодування і перезавантажити"
 
 #: tools/FixEncoding.java:57
 msgid "Discard all changes and reload sketch?"
-msgstr "Anulează toate modificările şi reiniţializează schiţa?"
+msgstr "Не зберігати зміни і перезавантажити скетч?"
 
 #: tools/FixEncoding.java:77
 msgid ""
 "An error occurred while trying to fix the file encoding.\n"
 "Do not attempt to save this sketch as it may overwrite\n"
 "the old version. Use Open to re-open the sketch and try again.\n"
-msgstr "A apărut o eroare în timpul corectării codării fişierului.\nNu salva aceasta schiţa deoarece se va suprascrie fişierul vechi.\nRedeschide schiţa şi încearcă din nou.\n"
+msgstr "Виникла помилка при спробі виправити кодування.\nНе намагайтеся зберегти цей скетч, оскільки він може\nперезаписати стару версію. Використовуйте 'Відкрити', щоб\nвідкрити скетч заново.\n"
 
 #: tools/Archiver.java:48
 msgid "Archive Sketch"
-msgstr "Arhivează schiţa"
+msgstr "Архівувати скетч"
 
 #: tools/Archiver.java:74
 msgid "Couldn't archive sketch"
-msgstr "Nu am putut arhiva schiţa"
+msgstr "Скетч не може бути заархівовано"
 
 #: tools/Archiver.java:75
 msgid ""
 "Archiving the sketch has been canceled because\n"
 "the sketch couldn't save properly."
-msgstr "Arhivarea schiţei a fost anulată deoarece\nschiţa nu a putut fi salvată."
+msgstr "Архівування скетчу було перервано, бо\nскетч некоректно зберігся."
 
 #: tools/Archiver.java:109
 msgid "Archive sketch as:"
-msgstr "Arhivez schiţa ca:"
+msgstr "заархівувати скетч як:"
 
 #: tools/Archiver.java:139
 msgid "Archive sketch canceled."
-msgstr "Arhivarea schiţei a fost anulată"
+msgstr "Архівування скетчу скасовано"

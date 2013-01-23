@@ -77,7 +77,10 @@ public class Preferences {
                         _("System Default"),
                         "العربية" + " (" + _("Arabic") + ")",
                         "Aragonés" + " (" + _("Aragonese") + ")",
+                        "български" + " (" + _("Bulgarian") + ")",
                         "Català" + " (" + _("Catalan") + ")",
+                        "Hrvatski" + " (" + _("Croatian") + ")",
+                        "český" + " (" + _("Czech") + ")",
                         "简体中文" + " (" + _("Chinese Simplified") + ")",
                         "繁體中文" + " (" + _("Chinese Traditional") + ")",
                         "Dansk" + " (" + _("Danish") + ")",
@@ -86,7 +89,10 @@ public class Preferences {
                         "Eesti" + " (" + _("Estonian") + ")",
                         "Pilipino" + " (" + _("Filipino") + ")",
                         "Français" + " (" + _("French") + ")",
+                        "Canadienne-français" + " (" + _("Canadian French") + ")",
                         "Galego" + " (" + _("Galician") + ")",
+                        "საქართველოს" + " (" + _("Georgian") + ")",
+                        "עברית" + " (" + _("Hebrew") + ")",
                         "Deutsch" + " (" + _("German") + ")",
                         "ελληνικά" + " (" + _("Greek") + ")",
                         "Magyar" + " (" + _("Hindi") + ")",
@@ -97,8 +103,9 @@ public class Preferences {
                                                                 "한국어" + " (" + _("Korean") + ")",
                         "Latviešu" + " (" + _("Latvian") + ")",
                         "Lietuvių Kalba" + " (" + _("Lithuaninan") + ")",
-                                                 "मराठी" + " (" + _("Marathi") + ")",                        
+                        "मराठी" + " (" + _("Marathi") + ")",
                         "Norsk" + " (" + _("Norwegian") + ")",
+                        "Norsk bokmål" + " (" + _("Norwegian Bokmål") + ")",
                         "فارسی" + " (" + _("Persian") + ")",
                         "Język Polski" + " (" + _("Polish") + ")",
                         "Português" + " (" + _("Portuguese") + " - Brazil)",
@@ -106,12 +113,18 @@ public class Preferences {
                         "Română" + " (" + _("Romanian") + ")",
                         "Русский" + " (" + _("Russian") + ")",
                         "Español" + " (" + _("Spanish") + ")",
-                        "தமிழ்" + " (" + _("Tamil") + ")"};
+                        "தமிழ்" + " (" + _("Tamil") + ")",
+                        "Türk" + " (" + _("Turkish") + ")",
+                        "Український" + " (" + _("Ukrainian") + ")"
+                        };
   String[] languagesISO = {
                         "",
                         "ar",
                         "an",
+                        "bg",
                         "ca",
+                        "hr_hr",
+                        "cs_cz",
                         "zh_cn",
                         "zh_tw",
                         "da",
@@ -120,7 +133,10 @@ public class Preferences {
                         "et",
                         "tl",
                         "fr",
+                        "fr_ca",
                         "gl",
+                        "ka_ge",
+                        "he",
                         "de",
                         "el",
                         "hi",
@@ -133,6 +149,7 @@ public class Preferences {
                         "lt",
                         "mr",
                         "no_nb",
+                        "nb_no",
                         "fa",
                         "pl",
                         "pt_br",
@@ -140,7 +157,10 @@ public class Preferences {
                         "ro",
                         "ru",
                         "es",
-                        "ta"};
+                        "ta",
+                        "tr",
+                        "uk"
+                        };
   
   /**
    * Standardized width for buttons. Mac OS X 10.3 wants 70 as its default,
