@@ -706,12 +706,12 @@
 	 excludes="java/**" />
     -->
 
-    <zip destfile="windows/arduino-${version}-${platform}.zip">
+    <zip destfile="windows/arduino-${version}-${platform}.zip" level="9">
       <zipfileset dir="windows/work" 
 		  prefix="arduino-${version}" />
     </zip>
 
-    <zip destfile="windows/arduino-${version}-${platform}-expert.zip">
+    <zip destfile="windows/arduino-${version}-${platform}-expert.zip" level="9">
       <zipfileset dir="windows/work" 
 		  prefix="arduino-${version}" 
 		  excludes="java/**" />
