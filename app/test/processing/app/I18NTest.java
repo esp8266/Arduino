@@ -5,15 +5,11 @@ import org.junit.Test;
 import java.io.*;
 import java.util.*;
 
-import static org.junit.Assert.assertTrue;
-
 public class I18NTest {
 
-  private Set<String> loadAllI18NKeys() throws IOException {
+  private Set<String> loadReferenceI18NKeys() throws IOException {
     Properties properties = new Properties();
-    for (File file : listPropertiesFiles()) {
-      properties.putAll(loadProperties(file));
-    }
+    properties.putAll(loadProperties(new File(I18NTest.class.getResource("./Resources_en.properties").getFile())));
     Set<String> keys = new HashSet<String>();
     for (Object key : properties.keySet()) {
       keys.add(key.toString());
@@ -46,7 +42,7 @@ public class I18NTest {
 
   @Test
   public void ensureEveryTranslationIsComplete() throws Exception {
-    Set<String> keys = loadAllI18NKeys();
+    Set<String> keys = loadReferenceI18NKeys();
 
     Map<String, List<String>> missingTranslationsPerFile = new HashMap<String, List<String>>();
 
@@ -60,14 +56,17 @@ public class I18NTest {
     }
 
     if (!missingTranslationsPerFile.isEmpty()) {
-      for (Map.Entry<String, List<String>> entry : missingTranslationsPerFile.entrySet()) {
-        System.out.println("Following translations in file " + entry.getKey() + " are missing:");
-        for (String key : entry.getValue()) {
+      List<String> filesWithIncompleteTranslations = new LinkedList<String>(missingTranslationsPerFile.keySet());
+      Collections.sort(filesWithIncompleteTranslations);
+      System.out.println("Following files have missing translations:" + filesWithIncompleteTranslations);
+      for (String file : filesWithIncompleteTranslations) {
+
+        System.out.println("Following translations in file " + file + " are missing:");
+        for (String key : missingTranslationsPerFile.get(file)) {
           System.out.println("==> '" + key.replaceAll("\n", "\\\\n").replaceAll(" ", "\\\\ ") + "'");
         }
         System.out.println();
       }
-      assertTrue(false);
     }
   }
 
