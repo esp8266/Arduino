@@ -1,5 +1,5 @@
 
-ARDUINO BETA 1.5.2 - 2012.01.23
+ARDUINO 1.5.2 BETA - 2012.01.23
 
 [ide]
 * Scrollable editor tabs (Shigheru KANEMOTO)
@@ -31,11 +31,11 @@ ARDUINO BETA 1.5.2 - 2012.01.23
 * Merged all improvements made in Arduino IDE 1.0.3
 * Merged all improvements made in Arduino IDE 1.0.4 (not yet released)
 
-ARDUINO BETA 1.5.1r2 - 2012.11.06
+ARDUINO 1.5.1r2 BETA - 2012.11.06
 
 * Fixed wrong release file for windows.
 
-ARDUINO BETA 1.5.1 - 2012.11.05
+ARDUINO 1.5.1 BETA - 2012.11.05
 
 * Merged changes coming from stable release of Arduino IDE 1.0.2.
 
@@ -60,7 +60,7 @@ ARDUINO BETA 1.5.1 - 2012.11.05
 [firmwares]
 * Added firmware for atmega16u2 on Due Board.
 
-ARDUINO BETA 1.5 - 2012.10.22
+ARDUINO 1.5 BETA - 2012.10.22
 
 * First release for the unified IDE for both AVR 8-bit and ARM 32-bit
   (SAM3 CPUs) architectures.
