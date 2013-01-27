@@ -15,16 +15,11 @@ extern "C" {
 #define SLAVEREADY 	7  // handshake pin
 #define WIFILED 	9  // led on wifi shield
 
-#define DELAY_100NS do { asm volatile("nop"); }while(0);
-#define DELAY_SPI(X) { int ii=0; do {  asm volatile("nop"); }while(++ii<X);}
+#define DELAY_SPI(X) { int ii=0; do { asm volatile("nop"); } while (++ii < X*6); }
 #define DELAY_TRANSFER() DELAY_SPI(10)
 
 void SpiDrv::begin()
 {
-//	  pinMode(SCK, OUTPUT);
-//	  pinMode(MOSI, OUTPUT);
-//	  pinMode(SS, OUTPUT);
-
 	  SPI.begin();
 	  pinMode(SLAVESELECT, OUTPUT);
 	  pinMode(SLAVEREADY, INPUT);
@@ -69,11 +64,6 @@ void SpiDrv::spiSlaveDeselect()
 char SpiDrv::spiTransfer(volatile char data)
 {
 	char result = SPI.transfer(data);
-//    SPDR = data;                    // Start the transmission
-//    while (!(SPSR & (1<<SPIF)))     // Wait the end of the transmission
-//    {
-//    };
-//    char result = SPDR;
     DELAY_TRANSFER();
 
     return result;                    // return the received byte

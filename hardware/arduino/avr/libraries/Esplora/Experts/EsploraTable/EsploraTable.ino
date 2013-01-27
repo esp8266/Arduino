@@ -1,17 +1,16 @@
 /*
   Esplora Table
 
-  Acts like a keyboard that prints some of its sensors'
+  Acts like a keyboard that prints sensor
   data in a table-like text, row by row.
-  It is a sort of "data-logger".
   
-  At startup, it does nothing. It just waits for you to open a
-  spreadsheet (e.g. Google Drive spreadsheet) so it can put its
-  data. Then, by pressing Switch 1, it starts printing the table
+  At startup, it does nothing. It waits for you to open a
+  spreadsheet (e.g. Google Drive spreadsheet) so it can write
+  data. By pressing Switch 1, it starts printing the table
   headers and the first row of data. It waits a bit, then it
   will print another row, and so on.
   
-  The amount of time between each row is given by the slider.
+  The amount of time between each row is determined by the slider.
   If put to full left, the sketch will wait 10 seconds; at
   full right position, it will wait 5 minutes. An intermediate
   position will make the sketch wait for some time in-between.
@@ -175,17 +174,12 @@ void logAndPrint() {
 }
 
 /**
- * Similar to delay(), but allows to do something else
- * in the meanwhile. In particular, it calls waitLoop().
+ * Similar to delay(), but allows the program to do something else
+ * in the meanwhile. In particular, it calls checkSwitchPress().
  * Note 1: it may wait longer than the specified amount, not less;
  * Note 2: beware of data synchronization issues, e.g. if the
- * whileWaiting() function alters some variables used by the
+ * activeDelay() function alters some variables used by the
  * caller of this function.
- *
- * I discovered by chance that there's an ongoing discussion about
- * adding yield() in the Arduino API:
- * http://comments.gmane.org/gmane.comp.hardware.arduino.devel/1381
- * The purpose is the same, but for now I'm using this implementation.
  */
 void activeDelay(unsigned long amount) {
   unsigned long at = millis() + amount;

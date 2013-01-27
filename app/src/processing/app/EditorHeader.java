@@ -22,6 +22,7 @@
 */
 
 package processing.app;
+import processing.app.tools.MenuScroller;
 import static processing.app.I18n._;
 
 import java.awt.*;
@@ -238,6 +239,7 @@ public class EditorHeader extends JComponent {
 
     } else {
       menu = new JMenu();
+      MenuScroller.setScrollerFor(menu);
       popup = menu.getPopupMenu();
       add(popup);
       popup.setLightWeightPopupEnabled(true);

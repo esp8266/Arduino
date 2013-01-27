@@ -41,7 +41,6 @@ public class TargetPlatform {
   private MapWithSubkeys customMenus;
 
   public TargetPlatform(String _name, File _folder) {
-    System.out.println("TargetPlatform: constructor start, name: " + _name);
     name = _name;
     folder = _folder;
     boards = new HashMap<String, PreferencesMap>();

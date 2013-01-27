@@ -6,14 +6,15 @@
 
   Created on 22 november 2012
   By Enrico Gueli <enrico.gueli@gmail.com>
-  modified 24 Nov 2012
+  modified 22 Dec 2012
   by Tom Igoe
 */
 
 
 #include <Esplora.h>
 
-
+// these are the frequencies for the notes from middle C
+// to one octave above middle C:
 const int note[] = {
 262, // C
 277, // C#

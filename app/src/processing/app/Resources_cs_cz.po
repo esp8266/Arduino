@@ -1,0 +1,1581 @@
+# English translations for PACKAGE package.
+# Copyright (C) 2012 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# 
+# Translators:
+# Adam  <horcicaa@gmail.com>, 2012.
+#   <mcha@4makers.cz>, 2012.
+# Michal Kocer <mcha@4makers.cz>, 2012.
+msgid ""
+msgstr ""
+"Project-Id-Version: Arduino IDE 1.5\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-03-29 10:24-0400\n"
+"PO-Revision-Date: 2012-11-27 19:40+0000\n"
+"Last-Translator: McHa <mcha@4makers.cz>\n"
+"Language-Team: Czech (Czech Republic) (http://www.transifex.com/projects/p/arduino-ide-15/language/cs_CZ/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: cs_CZ\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+
+#: Base.java:191
+msgid "Non-fatal error while setting the Look & Feel."
+msgstr "Nezávažná chyba, ke které došlo při nastavení Look & Feel."
+
+#: Base.java:192
+msgid "The error message follows, however Arduino should run fine."
+msgstr "Následuje chybové hlášení, Arduino by mělo běžet v pohodě."
+
+#: Base.java:227
+msgid "Problem Setting the Platform"
+msgstr "Problém s nastavením platformy"
+
+#: Base.java:228
+msgid ""
+"An unknown error occurred while trying to load\n"
+"platform-specific code for your machine."
+msgstr "Vyskytla se chyba během nahrávání kódu \npro vaše zařízení."
+
+#: Base.java:239
+msgid "Please install JDK 1.5 or later"
+msgstr "Nainstalujte si prosím JDK 1.5 či novější."
+
+#: Base.java:240
+msgid ""
+"Arduino requires a full JDK (not just a JRE)\n"
+"to run. Please install JDK 1.5 or later.\n"
+"More information can be found in the reference."
+msgstr "Arduino vyžaduje k běhu plné JDK (nestačí jen JRE)\nNainstalujte si prosím plnou verzi JDK 1.5 či novější.\nVíce informací nalezenete v referenční příručce."
+
+#: Base.java:258
+msgid "Sketchbook folder disappeared"
+msgstr "Zmizel adresář Skicáře."
+
+#: Base.java:259
+msgid ""
+"The sketchbook folder no longer exists.\n"
+"Arduino will switch to the default sketchbook\n"
+"location, and create a new sketchbook folder if\n"
+"necessary. Arduino will then stop talking about\n"
+"himself in the third person."
+msgstr "Adresář skicáře (Sketchbook folder) již neexistuje.\nArduino se pokusí přepnout do defaultního umístění skicáře\na adresář pro skicář (Sketchbook) vytvoří na tomto místě.\nArduino pak o sobě přestane mluvit \nve třetí osobě."
+
+#: Base.java:535
+msgid "Time for a Break"
+msgstr "Čas na přestávku (Break)"
+
+#: Base.java:536
+msgid ""
+"You've reached the limit for auto naming of new sketches\n"
+"for the day. How about going for a walk instead?"
+msgstr "Pro dnešek jste se dostali na limit možných automatických\njmen pro pojmenovávání skic. Co se jít trošku projít?"
+
+#: Base.java:540
+msgid "Sunshine"
+msgstr "Slunceee!"
+
+#: Base.java:541
+msgid "No really, time for some fresh air for you."
+msgstr "Opravdu, přišel váš čas na trošku čerstvého vzduchu."
+
+#: Base.java:636
+msgid "Open an Arduino sketch..."
+msgstr "Otevři Arduino skicu..."
+
+#: Base.java:773
+msgid ""
+"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p {"
+" font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Are you "
+"sure you want to Quit?</b><p>Closing the last open sketch will quit Arduino."
+msgstr "<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p { font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Jste si jisti, že chcete Ukončit?</b><p>Uzavřením poslední skici se uzavře celé Arduino."
+
+#: Base.java:783 Editor.java:593
+msgid "Quit"
+msgstr "Ukončit"
+
+#: Base.java:903 Editor.java:501
+msgid "Open..."
+msgstr "Otevřít..."
+
+#: Base.java:963
+msgid "Add Library..."
+msgstr "Přidat knihovnu..."
+
+#: Base.java:1054 Base.java:2674
+#, java-format
+msgid ""
+"The library \"{0}\" cannot be used.\n"
+"Library names must contain only basic letters and numbers.\n"
+"(ASCII only and no spaces, and it cannot start with a number)"
+msgstr "Knihovnu \"{0}\" nelze použít.\nNázev knihovny smí obsahovat pouze základní písmena a čísla\n(tedy pouze ASCII znaky, bez mezer, název nesmí začínat číslem)."
+
+#: Base.java:1058
+msgid "Ignoring bad library name"
+msgstr "Ignoruji chybný název knihovny"
+
+#: Base.java:1411
+msgid "Sketch Does Not Exist"
+msgstr "Skica neexistuje"
+
+#: Base.java:1412
+msgid ""
+"The selected sketch no longer exists.\n"
+"You may need to restart Arduino to update\n"
+"the sketchbook menu."
+msgstr "Vybraná skica již neexistuje.\nZkuste restartovat Arduino a tím\nse obnoví i položky ve Skicáři."
+
+#: Base.java:1430
+#, java-format
+msgid ""
+"The sketch \"{0}\" cannot be used.\n"
+"Sketch names must contain only basic letters and numbers\n"
+"(ASCII-only with no spaces, and it cannot start with a number).\n"
+"To get rid of this message, remove the sketch from\n"
+"{1}"
+msgstr "Název skici \"{0}\" nelze použít.\nNázev skici může obsahovat jen  základní písmena a čísla\n(tedy pouze ASCII znaky, bez mezer, název nesmí začínat číslem).\nAby se vám tato zpráva nezobrazovala smažte skicu z\n{1}"
+
+#: Base.java:1436
+msgid "Ignoring sketch with bad name"
+msgstr "Ignoruji skicu chybného jména"
+
+#: Base.java:1673
+msgid "Problem getting data folder"
+msgstr "Problém s přístupem do datového adresáře."
+
+#: Base.java:1674
+msgid "Error getting the Arduino data folder."
+msgstr "Chyba v přistupu do datového adresáře Arduina."
+
+#: Base.java:1681
+msgid "Settings issues"
+msgstr "Problém s Nastavením"
+
+#: Base.java:1682
+msgid ""
+"Arduino cannot run because it could not\n"
+"create a folder to store your settings."
+msgstr "Arduino nemůže běžet, jelikož se mu nepodařilo\nvytvořit adresář pro uložení vašich nastavení."
+
+#: Base.java:1851
+msgid ""
+"For information on installing libraries, see: "
+"http://arduino.cc/en/Guide/Libraries\n"
+msgstr "Více informací o tom jak instalovat knihovny naleznete na:\nhttp://arduino.cc/en/Guide/Libraries \\n"
+
+#: Base.java:1888
+msgid "You forgot your sketchbook"
+msgstr "Zapoměli jste si svůj skicář"
+
+#: Base.java:1889
+msgid ""
+"Arduino cannot run because it could not\n"
+"create a folder to store your sketchbook."
+msgstr "Arduino nemůže bežet, protože nemohlo\nvytvořit adresář pro uložení vašeho skicáře (Sketchbook)."
+
+#: Base.java:1909
+msgid "Select (or create new) folder for sketches..."
+msgstr "Vyberte (nebo vytvořte nový) adresář pro skicář..."
+
+#: Base.java:1933
+msgid "Problem Opening URL"
+msgstr "Problém s Otevřením URL"
+
+#: Base.java:1934
+#, java-format
+msgid ""
+"Could not open the URL\n"
+"{0}"
+msgstr "Nemohu otevřít URL\n{0}"
+
+#: Base.java:1957
+msgid "Problem Opening Folder"
+msgstr "Problém s otevřením adresáře"
+
+#: Base.java:1958
+#, java-format
+msgid ""
+"Could not open the folder\n"
+"{0}"
+msgstr "Nemohu otevřít adresář\n{0}"
+
+#: Base.java:2071
+msgid "Guide_MacOSX.html"
+msgstr "Guide_MacOSX.html"
+
+#: Base.java:2073
+msgid "Guide_Windows.html"
+msgstr "Guide_Windows.html"
+
+#: Base.java:2075
+msgid "http://www.arduino.cc/playground/Learning/Linux"
+msgstr "http://www.arduino.cc/playground/Learning/Linux"
+
+#: Base.java:2080
+msgid "index.html"
+msgstr "index.html"
+
+#: Base.java:2085
+msgid "Guide_Environment.html"
+msgstr "Guide_Environment.html"
+
+#: Base.java:2090
+msgid "environment"
+msgstr "prostředí"
+
+#: Base.java:2090
+msgid "platforms.html"
+msgstr "platforms.html"
+
+#: Base.java:2095
+msgid "Guide_Troubleshooting.html"
+msgstr "Guide_Troubleshooting.html"
+
+#: Base.java:2100
+msgid "FAQ.html"
+msgstr "FAQ.html"
+
+#: Base.java:2112
+msgid "Message"
+msgstr "Zpráva"
+
+#: Base.java:2128
+msgid "Warning"
+msgstr "Upozornění"
+
+#: Base.java:2147 Preferences.java:256 Sketch.java:475 Sketch.java:481
+#: Sketch.java:496 Sketch.java:503 Sketch.java:526 Sketch.java:543
+#: Editor.java:2167 Editor.java:2178 Editor.java:2188 Editor.java:2206
+msgid "Error"
+msgstr "Chyba"
+
+#: Base.java:2482
+#, java-format
+msgid "Could not remove old version of {0}"
+msgstr "Nemohu smazat starou verzi {0}"
+
+#: Base.java:2492
+#, java-format
+msgid "Could not replace {0}"
+msgstr "Nemohu změnit {0}"
+
+#: Base.java:2533 Base.java:2556
+#, java-format
+msgid "Could not delete {0}"
+msgstr "Nemohu smazat {0}"
+
+#: Base.java:2636
+msgid "Select a zip file or a folder containing the library you'd like to add"
+msgstr "Vyberte soubor typu ZIP nebo adresář, který obsahuje knihovnu, kterou chcete přidávat"
+
+#: Base.java:2638
+msgid "ZIP files or folders"
+msgstr "ZIP soubory či adresáře"
+
+#: Base.java:2661
+msgid "Zip doesn't contain a library"
+msgstr "ZIP neobsahuje knihovnu pro Arduino"
+
+#: Base.java:2683
+msgid "Not a valid library: no header files found"
+msgstr "Knihovna nevyhovuje: nenalezen hlavičkový soubor"
+
+#: Base.java:2690
+#, java-format
+msgid "A library named {0} already exists"
+msgstr "Knihovna s názvem {0} již existuje"
+
+#: Base.java:2699
+msgid "Library added to your libraries. Check \"Import library\" menu"
+msgstr "Knihovna byla přidána k vašim knihovnám. Zkontrolujte si v menu \"Importovat knihovnu\""
+
+#: SketchCode.java:83
+#, java-format
+msgid "Error while loading code {0}"
+msgstr "Chyba při nahrávání kódu {0}"
+
+#: SketchCode.java:258
+#, java-format
+msgid ""
+"\"{0}\" contains unrecognized characters.If this code was created with an "
+"older version of Processing,you may need to use Tools -> Fix Encoding & "
+"Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
+"todelete the bad characters to get rid of this warning."
+msgstr "\"{0}\" obsahuje nerpoznatelné znaky. V případě, že tento kód byl vytvořenstarší verzí Processing, použij  menu Tools -> Fix Encoding & Reload a kódování skici se překóduje na UTF-8. Když se to nepovede, smažte špatné znaky a toto upozornění se přestane objevovat."
+
+#: FindReplace.java:80
+msgid "Find:"
+msgstr "Najdi:"
+
+#: FindReplace.java:81
+msgid "Replace with:"
+msgstr "Nahraď za:"
+
+#: FindReplace.java:96
+msgid "Ignore Case"
+msgstr "Ignoruj velikost písmen"
+
+#: FindReplace.java:105
+msgid "Wrap Around"
+msgstr "Od začátku"
+
+#: FindReplace.java:120 FindReplace.java:131
+msgid "Replace All"
+msgstr "Nahraď vše"
+
+#: FindReplace.java:121 FindReplace.java:130 Sketch.java:1046
+msgid "Replace"
+msgstr "Nahraď"
+
+#: FindReplace.java:122 FindReplace.java:129
+msgid "Replace & Find"
+msgstr "Nahraď a Najdi"
+
+#: FindReplace.java:123 FindReplace.java:128
+msgid "Previous"
+msgstr "Předchozí"
+
+#: FindReplace.java:124 FindReplace.java:127
+msgid "Find"
+msgstr "Najdi"
+
+#: EditorToolbar.java:41 EditorToolbar.java:46
+msgid "Verify"
+msgstr "Ověřit"
+
+#: EditorToolbar.java:41 Editor.java:545
+msgid "Upload"
+msgstr "Uploadovat"
+
+#: EditorToolbar.java:41 Editor.java:493
+msgid "New"
+msgstr "Nový"
+
+#: EditorToolbar.java:41
+msgid "Open"
+msgstr "Otevřít"
+
+#: EditorToolbar.java:41 EditorToolbar.java:46 Editor.java:529
+#: Editor.java:2064 Editor.java:2468
+msgid "Save"
+msgstr "Uložit"
+
+#: EditorToolbar.java:41 EditorToolbar.java:46 Editor.java:669
+msgid "Serial Monitor"
+msgstr "Seriový monitor"
+
+#: EditorToolbar.java:46 Editor.java:553
+msgid "Upload Using Programmer"
+msgstr "Uploadovat pomocí programátoru"
+
+#: EditorToolbar.java:46
+msgid "New Editor Window"
+msgstr "Nové okno editoru"
+
+#: EditorToolbar.java:46
+msgid "Open in Another Window"
+msgstr "Otevři v novém okně"
+
+#: Preferences.java:77 UpdateCheck.java:108
+msgid "Yes"
+msgstr "Ano"
+
+#: Preferences.java:78 UpdateCheck.java:108
+msgid "No"
+msgstr "Ne"
+
+#: Preferences.java:79 Sketch.java:585 Sketch.java:737 Sketch.java:1042
+#: Editor.java:2064 Editor.java:2145 Editor.java:2465
+msgid "Cancel"
+msgstr "Storno"
+
+#: Preferences.java:80 Sketch.java:585 Sketch.java:737 Sketch.java:1042
+#: Editor.java:2145 Editor.java:2465
+msgid "OK"
+msgstr "OK"
+
+#: Preferences.java:81
+msgid "Browse"
+msgstr "Prohlížet"
+
+#: Preferences.java:84
+msgid "System Default"
+msgstr "Podle operačního systému"
+
+#: Preferences.java:85
+msgid "Arabic"
+msgstr "Arabština"
+
+#: Preferences.java:86
+msgid "Aragonese"
+msgstr "Aragonština"
+
+#: Preferences.java:87
+msgid "Catalan"
+msgstr "Katalánština"
+
+#: Preferences.java:88
+msgid "Chinese Simplified"
+msgstr "Čínština (zjednodušené znaky)"
+
+#: Preferences.java:89
+msgid "Chinese Traditional"
+msgstr "Činština (tradiční znaky)"
+
+#: Preferences.java:90
+msgid "Danish"
+msgstr "Dánština"
+
+#: Preferences.java:91
+msgid "Dutch"
+msgstr "Nizozemština"
+
+#: Preferences.java:92
+msgid "English"
+msgstr "Angličtina"
+
+#: Preferences.java:93
+msgid "Estonian"
+msgstr "Estonština"
+
+#: Preferences.java:94
+msgid "Filipino"
+msgstr "Filipínština"
+
+#: Preferences.java:95
+msgid "French"
+msgstr "Francouština"
+
+#: Preferences.java:96
+msgid "Galician"
+msgstr "Galicijština"
+
+#: Preferences.java:97
+msgid "German"
+msgstr "Němčina"
+
+#: Preferences.java:98
+msgid "Greek"
+msgstr "Řečtina"
+
+#: Preferences.java:99
+msgid "Hindi"
+msgstr "Hindština"
+
+#: Preferences.java:100
+msgid "Hungarian"
+msgstr "Maďarština"
+
+#: Preferences.java:101
+msgid "Indonesian"
+msgstr "Indonéština"
+
+#: Preferences.java:102
+msgid "Italian"
+msgstr "Italština"
+
+#: Preferences.java:103
+msgid "Japanese"
+msgstr "Japonština"
+
+#: Preferences.java:104
+msgid "Korean"
+msgstr "Korejština"
+
+#: Preferences.java:105
+msgid "Latvian"
+msgstr "Lotyština"
+
+#: Preferences.java:106
+msgid "Lithuaninan"
+msgstr "Litevština"
+
+#: Preferences.java:107
+msgid "Marathi"
+msgstr "Maráthština"
+
+#: Preferences.java:108
+msgid "Norwegian"
+msgstr "Norština"
+
+#: Preferences.java:109
+msgid "Persian"
+msgstr "Perština"
+
+#: Preferences.java:110
+msgid "Polish"
+msgstr "Polština"
+
+#: Preferences.java:111 Preferences.java:112
+msgid "Portuguese"
+msgstr "Portugalština"
+
+#: Preferences.java:113
+msgid "Romanian"
+msgstr "Rumunština"
+
+#: Preferences.java:114
+msgid "Russian"
+msgstr "Ruština"
+
+#: Preferences.java:115
+msgid "Spanish"
+msgstr "Španělština"
+
+#: Preferences.java:116
+msgid "Tamil"
+msgstr "Tamilština"
+
+#: Preferences.java:219
+msgid ""
+"Could not read default settings.\n"
+"You'll need to reinstall Arduino."
+msgstr "Nebylo možné načíst systémové nastavení.\nPřeinstalujte Arduino."
+
+#: Preferences.java:258
+#, java-format
+msgid "Could not read preferences from {0}"
+msgstr "Nepodařilo se načíst nastavení z {0}"
+
+#: Preferences.java:277
+msgid "Error reading preferences"
+msgstr "Chyba při čtení nastavení"
+
+#: Preferences.java:279
+#, java-format
+msgid ""
+"Error reading the preferences file. Please delete (or move)\n"
+"{0} and restart Arduino."
+msgstr "Chyba při čtení souboru s nastavením. Prosím smažte (či přesuňte)\n{0} a restartujte program Arduino."
+
+#: Preferences.java:295 Editor.java:583
+msgid "Preferences"
+msgstr "Vlastnosti"
+
+#: Preferences.java:315
+msgid "Sketchbook location:"
+msgstr "Umístění skicáře:"
+
+#: Preferences.java:330
+msgid "Select new sketchbook location"
+msgstr "Vyberte nové umístení skicáře"
+
+#: Preferences.java:353
+msgid "Editor language: "
+msgstr "Jazyk editoru: "
+
+#: Preferences.java:358 Preferences.java:374
+msgid "  (requires restart of Arduino)"
+msgstr " (vyžaduje restart programu Arduino)"
+
+#: Preferences.java:370
+msgid "Editor font size: "
+msgstr "Velikost fontu editoru:"
+
+#: Preferences.java:387
+msgid "Show verbose output during: "
+msgstr "Zobrazit více informací výstupu během: "
+
+#: Preferences.java:389
+msgid "compilation "
+msgstr "kompilace"
+
+#: Preferences.java:391
+msgid "upload"
+msgstr "nahrávání (upload)"
+
+#: Preferences.java:400
+msgid "Verify code after upload"
+msgstr "Ověřit kód po uploadu"
+
+#: Preferences.java:409
+msgid "Use external editor"
+msgstr "Použít externí editor"
+
+#: Preferences.java:419
+msgid "Check for updates on startup"
+msgstr "Při startu vyhledat nové verze"
+
+#: Preferences.java:428
+msgid "Update sketch files to new extension on save (.pde -> .ino)"
+msgstr "Při ukládání aktualizuj příponu souboru se skicou (.pde -> .ino)"
+
+#: Preferences.java:439
+msgid "Automatically associate .ino files with Arduino"
+msgstr "Automaticky asociuj příponu .ino s programem Arduino"
+
+#: Preferences.java:449
+msgid "More preferences can be edited directly in the file"
+msgstr "Další volby mohou být měněny přímo v souboru"
+
+#: Preferences.java:478
+msgid "(edit only when Arduino is not running)"
+msgstr "(editujte pouze když program Arduino není spuštěn)"
+
+#: Preferences.java:625
+#, java-format
+msgid "ignoring invalid font size {0}"
+msgstr "ignoruji nepovolenou velikost fontu {0}"
+
+#: EditorHeader.java:292
+msgid "New Tab"
+msgstr "Nová záložka"
+
+#: EditorHeader.java:300
+msgid "Rename"
+msgstr "Přejmenovat"
+
+#: EditorHeader.java:314 Sketch.java:591
+msgid "Delete"
+msgstr "Smazat"
+
+#: EditorHeader.java:326
+msgid "Previous Tab"
+msgstr "Předchozí Záložka"
+
+#: EditorHeader.java:340
+msgid "Next Tab"
+msgstr "Následující Záložka"
+
+#: Sketch.java:274 Sketch.java:303 Sketch.java:577 Sketch.java:966
+msgid "Sketch is Read-Only"
+msgstr "Tato skica je označena \"Jen pro čtení\" "
+
+#: Sketch.java:275 Sketch.java:304 Sketch.java:578 Sketch.java:967
+msgid ""
+"Some files are marked \"read-only\", so you'll\n"
+"need to re-save the sketch in another location,\n"
+"and try again."
+msgstr "Některé soubory jsou označené \"Jen pro čtení\", proto uložte\nskicu na jíné místo a zkuste tuto akci znovu."
+
+#: Sketch.java:282
+msgid "Name for new file:"
+msgstr "Jméno nového souboru:"
+
+#: Sketch.java:294
+msgid "Sketch is Untitled"
+msgstr "Skyca je Nepojmenovaná"
+
+#: Sketch.java:295
+msgid ""
+"How about saving the sketch first \n"
+"before trying to rename it?"
+msgstr "Co takhle skicu nejprve uložit\nnež mu budeme měnit jméno?"
+
+#: Sketch.java:355 Sketch.java:362 Sketch.java:373
+msgid "Problem with rename"
+msgstr "Problém se změnou jména souboru"
+
+#: Sketch.java:356
+msgid "The name cannot start with a period."
+msgstr "Jméno souboru nesmí začínat tečkou."
+
+#: Sketch.java:364
+#, java-format
+msgid "\".{0}\" is not a valid extension."
+msgstr "\".{0}\" není podporované rozšíření."
+
+#: Sketch.java:374
+msgid ""
+"The main file can't use an extension.\n"
+"(It may be time for your to graduate to a\n"
+"\"real\" programming environment)"
+msgstr "Hlavní soubor nemůže užít rozšíření.\n(Možná přišel čas, abyste začali používat\n\"skutečné\" vývojové prostředí pro programování?)"
+
+#: Sketch.java:396 Sketch.java:410 Sketch.java:419 Sketch.java:859
+msgid "Nope"
+msgstr "Ne"
+
+#: Sketch.java:398
+#, java-format
+msgid "A file named \"{0}\" already exists in \"{1}\""
+msgstr "Soubor nazvaný \"{0}\" v \"{1}\" již existuje"
+
+#: Sketch.java:411
+msgid "You can't have a .cpp file with the same name as the sketch."
+msgstr "Soubor s příponou .cpp nesmí mít stejné jméno jako skica."
+
+#: Sketch.java:421
+msgid ""
+"You can't rename the sketch to \"{0}\"\n"
+"because the sketch already has a .cpp file with that name."
+msgstr "Nelze přejmenovat skicu na \"{0}\"\nprotože soubor stejného jména avšak s příponou .cpp už existuje."
+
+#: Sketch.java:455
+msgid "Cannot Rename"
+msgstr "Nelze zmenit název"
+
+#: Sketch.java:457
+#, java-format
+msgid "Sorry, a sketch (or folder) named \"{0}\" already exists."
+msgstr "Pardon, skica (či adresář) jména \"{0}\" již existuje."
+
+#: Sketch.java:475
+msgid "Could not rename the sketch. (0)"
+msgstr "Nepodařilo se přejmenovat skicu. (0)"
+
+#: Sketch.java:483 Sketch.java:528
+#, java-format
+msgid "Could not rename \"{0}\" to \"{1}\""
+msgstr "Nepodařilo se změnit jméno z \"{0}\" na \"{1}\""
+
+#: Sketch.java:496
+msgid "Could not rename the sketch. (1)"
+msgstr "Nepodařilo se přejmenovat skicu. (1)"
+
+#: Sketch.java:503
+msgid "Could not rename the sketch. (2)"
+msgstr "Nepodařilo se změnit název skici (2)"
+
+#: Sketch.java:540
+msgid "createNewFile() returned false"
+msgstr "funkce createNewFile() navrátila false"
+
+#: Sketch.java:587
+msgid "Are you sure you want to delete this sketch?"
+msgstr "Jste si jistý, že chcete smazat tuto skicu?"
+
+#: Sketch.java:588
+#, java-format
+msgid "Are you sure you want to delete \"{0}\"?"
+msgstr "Jste si jisti, že chcete smazat \"{0}\"?"
+
+#: Sketch.java:616
+msgid "Couldn't do it"
+msgstr "Nemohu to vykonat"
+
+#: Sketch.java:617
+#, java-format
+msgid "Could not delete \"{0}\"."
+msgstr "Nemohu smazat \"{0}\"."
+
+#: Sketch.java:647
+msgid "removeCode: internal error.. could not find code"
+msgstr "removeCode: internal error.. nemohu nalézt kód"
+
+#: Sketch.java:720
+msgid "Sketch is read-only"
+msgstr "Skica je označena \"Jen pro čtení\" "
+
+#: Sketch.java:721
+msgid ""
+"Some files are marked \"read-only\", so you'll\n"
+"need to re-save this sketch to another location."
+msgstr "Některé soubory jsou označené \"Jen pro čtení\", proto\nuložte skicu znovu avčak na jiné místo."
+
+#: Sketch.java:739
+msgid ""
+"In Arduino 1.0, the default file extension has changed\n"
+"from .pde to .ino.  New sketches (including those created\n"
+"by \"Save-As\" will use the new extension.  The extension\n"
+"of existing sketches will be updated on save, but you can\n"
+"disable this in the Preferences dialog.\n"
+"\n"
+"Save sketch and update its extension?"
+msgstr "V Arduino 1.0 se změnila defaultní přípona pro soubory\nz .pde na .ino. Nové skici (a to platí i pro ty, které vznikly\npomocí \"Ulož jako\") budou obsahovat tuto novou příponu.\nPřípona existujících skic se změní při jejich novém uložení,\ntuto vlastnost lze změnit v nastavení.\n\nUložit skeč a změnit jeho příponu na .ino?"
+
+#: Sketch.java:746
+msgid ".pde -> .ino"
+msgstr ".pde -> .ino"
+
+#: Sketch.java:825
+msgid "Save sketch folder as..."
+msgstr "Ulož adresář pro skicu jako..."
+
+#: Sketch.java:861
+msgid ""
+"You can't save the sketch as \"{0}\"\n"
+"because the sketch already has a .cpp file with that name."
+msgstr "Nelze uložit skicu jako \"{0}\"\nprotože skica obsahuje soubor .cpp stejného názvu."
+
+#: Sketch.java:882
+msgid "How very Borges of you"
+msgstr "To je trochu nelogické"
+
+#: Sketch.java:883
+msgid ""
+"You cannot save the sketch into a folder\n"
+"inside itself. This would go on forever."
+msgstr "Nelze ukládat skicu do adresáře uvnitř sebe sama.\nDošlo by k zacyklení do nekonečna."
+
+#: Sketch.java:975
+msgid "Select an image or other data file to copy to your sketch"
+msgstr "Vyberte obrázek a nebo jiný datový soubor k nakopírování do vaší skicy."
+
+#: Sketch.java:992 Editor.java:376
+msgid "One file added to the sketch."
+msgstr "Jeden soubor byl přidán ke skice."
+
+#: Sketch.java:1043
+#, java-format
+msgid "Replace the existing version of {0}?"
+msgstr "Nahraď existující verzi {0}?"
+
+#: Sketch.java:1065 Sketch.java:1088
+msgid "Error adding file"
+msgstr "Chyba při přidávání souboru"
+
+#: Sketch.java:1066
+#, java-format
+msgid "Could not delete the existing ''{0}'' file."
+msgstr "Nepodařilo se smazat existující soubor ''{0}''."
+
+#: Sketch.java:1074
+msgid "You can't fool me"
+msgstr "Mne nepřechytračíš."
+
+#: Sketch.java:1075
+msgid ""
+"This file has already been copied to the\n"
+"location from which where you're trying to add it.\n"
+"I ain't not doin nuthin'."
+msgstr "Tento soubor byl již na toto místo nakopírován\nze kterého jsi jej zkoušel přidat.\nNemohu to udělat."
+
+#: Sketch.java:1089
+#, java-format
+msgid "Could not add ''{0}'' to the sketch."
+msgstr "Nemohu přidat ''{0}'' do skici."
+
+#: Sketch.java:1392 Sketch.java:1423
+msgid "Build folder disappeared or could not be written"
+msgstr "Adresář pro Build zmyzel a nebo do něj nelze zapisovat"
+
+#: Sketch.java:1407
+msgid "Could not find main class"
+msgstr "Nemohu najít hlavní třídu (main class)"
+
+#: Sketch.java:1432
+#, java-format
+msgid "Uncaught exception type: {0}"
+msgstr "Nezachycená výjimka typu: {0}"
+
+#: Sketch.java:1467
+#, java-format
+msgid "Problem moving {0} to the build folder"
+msgstr "Problém při přesunu {0} do adresáře pro build"
+
+#: Sketch.java:1608 Editor.java:1890
+msgid "Compiling sketch..."
+msgstr "Kompiluji skicu..."
+
+#: Sketch.java:1622
+msgid "Uploading..."
+msgstr "Uploaduji..."
+
+#: Sketch.java:1644
+#, java-format
+msgid "Binary sketch size: {0} bytes (of a {1} byte maximum)"
+msgstr "Binární velikost skici: {0} byte (z maxima: {1} byte)"
+
+#: Sketch.java:1647
+msgid "Couldn't determine program size: {0}"
+msgstr "Nemohu určit velikost souboru: {0}"
+
+#: Sketch.java:1653
+msgid ""
+"Sketch too big; see http://www.arduino.cc/en/Guide/Troubleshooting#size for "
+"tips on reducing it."
+msgstr "Skica je moc velká; na http://www.arduino.cc/en/Guide/Troubleshooting#size naleznete typy jak skicu zmenšit."
+
+#: Sketch.java:1712
+msgid "Missing the */ from the end of a /* comment */"
+msgstr "Chybí */ na konci /* komentáře */"
+
+#: Sketch.java:1754
+msgid "Sketch Disappeared"
+msgstr "Skica zmyzela"
+
+#: Sketch.java:1755
+msgid ""
+"The sketch folder has disappeared.\n"
+" Will attempt to re-save in the same location,\n"
+"but anything besides the code will be lost."
+msgstr "Skyca zmyzela.\n Pokusím se znovu uložit na stejné místo,\nale krom kódu bude všechno ostatní ztraceno!"
+
+#: Sketch.java:1768
+msgid "Could not re-save sketch"
+msgstr "Skicu nešlo znovu uložit"
+
+#: Sketch.java:1769
+msgid ""
+"Could not properly re-save the sketch. You may be in trouble at this point,\n"
+"and it might be time to copy and paste your code to another text editor."
+msgstr "Nepodařilo se znovu uložit skicu. Tím jsme se dostali do problémů,\nkteré půjdou vyřešit jen zkopírováním kódu do jiného editoru přes copy&paste."
+
+#: Sketch.java:2018
+msgid ""
+"The sketch name had to be modified. Sketch names can only consist\n"
+"of ASCII characters and numbers (but cannot start with a number).\n"
+"They should also be less less than 64 characters long."
+msgstr "Název skici je potřeba změnit. Název skici je možné složit\npouze s ASCII znaků a čísel (číslem však nemůže začínat).\nNázev musí mít délku méně jak 64 znaků."
+
+#: SerialMonitor.java:93
+msgid "Send"
+msgstr "Pošli"
+
+#: SerialMonitor.java:110
+msgid "Autoscroll"
+msgstr "Automatické scrollování"
+
+#: SerialMonitor.java:112
+msgid "No line ending"
+msgstr "Chybný konec řádky"
+
+#: SerialMonitor.java:112
+msgid "Newline"
+msgstr "Nová řádka (NL)"
+
+#: SerialMonitor.java:112
+msgid "Carriage return"
+msgstr "Návrat vozíku (CR)"
+
+#: SerialMonitor.java:112
+msgid "Both NL & CR"
+msgstr "Obojí NL & CR"
+
+#: SerialMonitor.java:130 SerialMonitor.java:133
+msgid "baud"
+msgstr "baudů"
+
+#: debug/Compiler.java:47
+msgid "http://code.google.com/p/arduino/issues/list"
+msgstr "http://code.google.com/p/arduino/issues/list"
+
+#: debug/Compiler.java:49 debug/Uploader.java:45
+#, java-format
+msgid "Compiler error, please submit this code to {0}"
+msgstr "Chyba kompilace, odešlete  kód do {0}"
+
+#: debug/Compiler.java:126
+msgid "No board selected; please choose a board from the Tools > Board menu."
+msgstr "Nemáte vybrán model vývojové desky (boardu); vyberte model boardu v Nástroje (Tools) > Board"
+
+#: debug/Compiler.java:365
+#, java-format
+msgid "{0} returned {1}"
+msgstr "{0} vrátil {1}"
+
+#: debug/Compiler.java:369
+msgid "Error compiling."
+msgstr "Chyba kompilace."
+
+#: debug/Compiler.java:408
+msgid "Please import the SPI library from the Sketch > Import Library menu."
+msgstr "Prosím importujte knihovnu SPI z Skica (Sketch) > Import knihovny (Import Library)."
+
+#: debug/Compiler.java:409
+msgid ""
+"\n"
+"As of Arduino 0019, the Ethernet library depends on the SPI library.\n"
+"You appear to be using it or another library that depends on the SPI library.\n"
+"\n"
+msgstr "\nOd verze Arduino 0019, knihovna Ethernet závisí na knihovně SPI.\nZdá se, že již vyuzžíváte jiné knihovny, která závisí na knihovně SPI.\n\n"
+
+#: debug/Compiler.java:414
+msgid "The 'BYTE' keyword is no longer supported."
+msgstr "Klíčové slovo 'BYTE' není podporováno."
+
+#: debug/Compiler.java:415
+msgid ""
+"\n"
+"As of Arduino 1.0, the 'BYTE' keyword is no longer supported.\n"
+"Please use Serial.write() instead.\n"
+"\n"
+msgstr "\nOd verze Arduino 1.0, klíčové slovo 'BYTE' přestalo být podporováno.\nUžijte namísto toho funkci Serial.write()\n\n"
+
+#: debug/Compiler.java:420
+msgid "The Server class has been renamed EthernetServer."
+msgstr "U třídy Server byl změněn název na EthernetServer."
+
+#: debug/Compiler.java:421
+msgid ""
+"\n"
+"As of Arduino 1.0, the Server class in the Ethernet library has been renamed to EthernetServer.\n"
+"\n"
+msgstr "\nOd verze Arduino 1.0, byl třídě Server knihovny Ethernet změněn názevna EthernetServer.\n\n"
+
+#: debug/Compiler.java:426
+msgid "The Client class has been renamed EthernetClient."
+msgstr "U třídy Client byl změněn název na EthernetClient."
+
+#: debug/Compiler.java:427
+msgid ""
+"\n"
+"As of Arduino 1.0, the Client class in the Ethernet library has been renamed to EthernetClient.\n"
+"\n"
+msgstr "\nOd verze Arduino 1.0, byl třídě Client knihovny Ethernet změněn názevna EthernetClient.\n\n"
+
+#: debug/Compiler.java:432
+msgid "The Udp class has been renamed EthernetUdp."
+msgstr "U třídy Udp byl změněn název na EthernetUdp."
+
+#: debug/Compiler.java:433
+msgid ""
+"\n"
+"As of Arduino 1.0, the Udp class in the Ethernet library has been renamed to EthernetUdp.\n"
+"\n"
+msgstr "\nOd verze Arduino 1.0, byl třídě Udp knihovny Ethernet změněn název na EthernetUdp.\n\n"
+
+#: debug/Compiler.java:438
+msgid "Wire.send() has been renamed Wire.write()."
+msgstr "Funkci Wire.send() byl změněn název na Wire.write()."
+
+#: debug/Compiler.java:439
+msgid ""
+"\n"
+"As of Arduino 1.0, the Wire.send() function was renamed to Wire.write() for consistency with other libraries.\n"
+"\n"
+msgstr "\nOd verze Arduino 1.0, byl funkci Wire.send() změněn název na Wire.write() aby se zachovala syntax kódu sladila s jinými knihovnami.\n\n"
+
+#: debug/Compiler.java:444
+msgid "Wire.receive() has been renamed Wire.read()."
+msgstr "Funkci Wire.receive() byl změněn název na Wire.read()."
+
+#: debug/Compiler.java:445
+msgid ""
+"\n"
+"As of Arduino 1.0, the Wire.receive() function was renamed to Wire.read() for consistency with other libraries.\n"
+"\n"
+msgstr "\nOd verze Arduino 1.0, se funkce Wire.receive() jmenuje Wire.read() kvůli zachování konzistence s jinými knihovnami.\n\n"
+
+#: debug/Compiler.java:450
+msgid "'Mouse' only supported on the Arduino Leonardo"
+msgstr "'Mouse' je podporováno pouze u Arduino Leonardo!"
+
+#: debug/Compiler.java:455
+msgid "'Keyboard' only supported on the Arduino Leonardo"
+msgstr "'Keyboard' je podporováno pouze u Arduino Leonardo"
+
+#: debug/Uploader.java:43
+msgid "https://developer.berlios.de/bugs/?group_id=3590"
+msgstr "https://developer.berlios.de/bugs/?group_id=3590"
+
+#: debug/Uploader.java:195
+#, java-format
+msgid ""
+"the selected serial port {0} does not exist or your board is not connected"
+msgstr "vybraný seriový port {0} neexistuje a nebo váš board není připojen"
+
+#: debug/Uploader.java:199
+msgid ""
+"Device is not responding, check the right serial port is selected or RESET "
+"the board right before exporting"
+msgstr "Zařízení neodpovídá, zkontrolujte zda je připojen seriový port a nebo RESETujte vývojovou desku (board) před exportem"
+
+#: debug/Uploader.java:209
+msgid ""
+"Problem uploading to board.  See "
+"http://www.arduino.cc/en/Guide/Troubleshooting#upload for suggestions."
+msgstr "Problém s přenosem dat na vývojovou desku (board). Na http://www.arduino.cc/en/Guide/Troubleshooting#upload naleznete další doporučení."
+
+#: debug/Uploader.java:213
+msgid ""
+"Wrong microcontroller found.  Did you select the right board from the Tools "
+"> Board menu?"
+msgstr "Nalezen špatný microcontroler. Vybrali jste správnou desku (board) Nástroje (Tools) > Vývojová deska (Board)?"
+
+#: debug/BasicUploader.java:80
+msgid "Forcing reset using 1200bps open/close on port "
+msgstr "Vynucený reset při užití 1200bps open/close na portu "
+
+#: debug/BasicUploader.java:209
+msgid ""
+"Couldn't find a Board on the selected port. Check that you have the correct "
+"port selected.  If it is correct, try pressing the board's reset button "
+"after initiating the upload."
+msgstr "Na vybraném portu nemohu nalézt příslušný board /vývojovou desku/. Zkontrolujte prosím, zda je vybrán správný port.\\n  V případě, že port je v pořádku, zkuste stisknout tlačítko Reset na prototypové desce ihned poté co zahájíte upload skici."
+
+#: Serial.java:121
+#, java-format
+msgid ""
+"Serial port ''{0}'' already in use. Try quitting any programs that may be "
+"using it."
+msgstr "Seriový port ''{0}'' je již používán. Ukončete všechny programy, kteréby jej mohli používat."
+
+#: Serial.java:125
+#, java-format
+msgid "Error touching serial port ''{0}''."
+msgstr "Chyba v přístupu na seriový port ''{0}''."
+
+#: Serial.java:174
+#, java-format
+msgid ""
+"Serial port ''{0}'' already in use. Try quiting any programs that may be "
+"using it."
+msgstr "Seriový port ''{0}'' je již používán. Ukončete všechny programy, kteréby jej mohli používat."
+
+#: Serial.java:181
+#, java-format
+msgid "Error opening serial port ''{0}''."
+msgstr "Chyba při otevírání seriového portu ''{0}''."
+
+#: Serial.java:194
+#, java-format
+msgid ""
+"Serial port ''{0}'' not found. Did you select the right one from the Tools >"
+" Serial Port menu?"
+msgstr "Seriový port ''{0}'' nebyl nalezen. Vybrali jste správný port v menu Nástroje > Seriový port?"
+
+#: Serial.java:451
+#, java-format
+msgid ""
+"readBytesUntil() byte buffer is too small for the {0} bytes up to and "
+"including char {1}"
+msgstr "Bytový buffer readBytesUntil() je malý pro {0} bytů až do znaku {1} včetně"
+
+#: Serial.java:593
+#, java-format
+msgid "Error inside Serial.{0}()"
+msgstr "Chyba v Serial.{0}()"
+
+#: UpdateCheck.java:53
+msgid "http://www.arduino.cc/latest.txt"
+msgstr "http://www.arduino.cc/latest.txt"
+
+#: UpdateCheck.java:103
+msgid ""
+"A new version of Arduino is available,\n"
+"would you like to visit the Arduino download page?"
+msgstr "K dispozici je nová verze Arduina,\nChcete otevřít stránku s novou verzí Arduina?"
+
+#: UpdateCheck.java:111
+msgid "Update"
+msgstr "Aktualizovat"
+
+#: UpdateCheck.java:118
+msgid "http://www.arduino.cc/en/Main/Software"
+msgstr "http://www.arduino.cc/en/Main/Software"
+
+#: Editor.java:373
+msgid "No files were added to the sketch."
+msgstr "Ke skice nebyly přidány žádné soubory."
+
+#: Editor.java:380
+#, java-format
+msgid "{0} files added to the sketch."
+msgstr "{0} souborů přidáno ke skice"
+
+#: Editor.java:491
+msgid "File"
+msgstr "Soubor"
+
+#: Editor.java:510
+msgid "Sketchbook"
+msgstr "Skicář"
+
+#: Editor.java:516
+msgid "Examples"
+msgstr "Příklady"
+
+#: Editor.java:521 Editor.java:2024
+msgid "Close"
+msgstr "Zavřít"
+
+#: Editor.java:537
+msgid "Save As..."
+msgstr "Uložit jako..."
+
+#: Editor.java:563
+msgid "Page Setup"
+msgstr "Nastavení stránky"
+
+#: Editor.java:571
+msgid "Print"
+msgstr "Tisk"
+
+#: Editor.java:607
+msgid "Sketch"
+msgstr "Skica"
+
+#: Editor.java:609
+msgid "Verify / Compile"
+msgstr "Ověřit / Kompilovat"
+
+#: Editor.java:636
+msgid "Import Library..."
+msgstr "Import knihovny..."
+
+#: Editor.java:641
+msgid "Show Sketch Folder"
+msgstr "Zobraz adresář skici"
+
+#: Editor.java:650
+msgid "Add File..."
+msgstr "Přidat soubor..."
+
+#: Editor.java:663
+msgid "Tools"
+msgstr "Nástroje"
+
+#: Editor.java:699
+msgid "Serial Port"
+msgstr "Seriový port"
+
+#: Editor.java:704
+msgid "Programmer"
+msgstr "Programátor"
+
+#: Editor.java:708
+msgid "Burn Bootloader"
+msgstr "Vypal zavaděč"
+
+#: Editor.java:932
+msgid "serialMenu is null"
+msgstr "serialMenu je null"
+
+#: Editor.java:936 Editor.java:943
+msgid "name is null"
+msgstr "name je null"
+
+#: Editor.java:999
+msgid "error retrieving port list"
+msgstr "error při vyhledání seznamu portů"
+
+#: Editor.java:1015
+msgid "Help"
+msgstr "Nápověda"
+
+#: Editor.java:1054
+msgid "Getting Started"
+msgstr "Úvodní seznámení"
+
+#: Editor.java:1062
+msgid "Environment"
+msgstr "Prostředí"
+
+#: Editor.java:1070
+msgid "Troubleshooting"
+msgstr "Řešení problémů - Troubleshooting"
+
+#: Editor.java:1078
+msgid "Reference"
+msgstr "Reference"
+
+#: Editor.java:1086 Editor.java:2775
+msgid "Find in Reference"
+msgstr "Najdi v referenční příručce"
+
+#: Editor.java:1097
+msgid "Frequently Asked Questions"
+msgstr "Často kladené otázky"
+
+#: Editor.java:1105
+msgid "Visit Arduino.cc"
+msgstr "Navštivte Arduino.cc"
+
+#: Editor.java:1108
+msgid "http://arduino.cc/"
+msgstr "http://arduino.cc/"
+
+#: Editor.java:1116
+msgid "About Arduino"
+msgstr "O Arduinu"
+
+#: Editor.java:1130
+msgid "Edit"
+msgstr "Úpravy"
+
+#: Editor.java:1133 Editor.java:1355
+msgid "Undo"
+msgstr "Zpět"
+
+#: Editor.java:1138 Editor.java:1140 Editor.java:1390
+msgid "Redo"
+msgstr "Znovu"
+
+#: Editor.java:1149 Editor.java:2699
+msgid "Cut"
+msgstr "Vyjmout"
+
+#: Editor.java:1157 Editor.java:2707
+msgid "Copy"
+msgstr "Kopírovat"
+
+#: Editor.java:1165 Editor.java:2715
+msgid "Copy for Forum"
+msgstr "Kopírovat pro užití ve fóru"
+
+#: Editor.java:1177 Editor.java:2723
+msgid "Copy as HTML"
+msgstr "Kopírovat jako HTML"
+
+#: Editor.java:1189 Editor.java:2731
+msgid "Paste"
+msgstr "Vložit"
+
+#: Editor.java:1198 Editor.java:2739
+msgid "Select All"
+msgstr "Vybrat vše"
+
+#: Editor.java:1208 Editor.java:2749
+msgid "Comment/Uncomment"
+msgstr "Zakomentovat/Odkomentovat"
+
+#: Editor.java:1216 Editor.java:2757
+msgid "Increase Indent"
+msgstr "Zvětšit odsazení"
+
+#: Editor.java:1224 Editor.java:2765
+msgid "Decrease Indent"
+msgstr "Zmenšit odsazení"
+
+#: Editor.java:1234
+msgid "Find..."
+msgstr "Najít..."
+
+#: Editor.java:1249
+msgid "Find Next"
+msgstr "Najít další"
+
+#: Editor.java:1259
+msgid "Find Previous"
+msgstr "Najít předchozí"
+
+#: Editor.java:1269
+msgid "Use Selection For Find"
+msgstr "Pro vyhledání užij výběr"
+
+#: Editor.java:1872
+#, java-format
+msgid "No reference available for \"{0}\""
+msgstr "Pro \"{0}\" nelze nalézt odkaz v referenční příručce"
+
+#: Editor.java:1874
+#, java-format
+msgid "{0}.html"
+msgstr "{0}.html"
+
+#: Editor.java:1911 Editor.java:1928
+msgid "Done compiling."
+msgstr "Kompilace ukončena."
+
+#: Editor.java:2020
+#, java-format
+msgid "Save changes to \"{0}\"?  "
+msgstr "Uložit změny do \"{0}\"?  "
+
+#: Editor.java:2053
+msgid ""
+"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p {"
+" font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Do you "
+"want to save changes to this sketch<BR> before closing?</b><p>If you don't "
+"save, your changes will be lost."
+msgstr "<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p { font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Chcete před ukončením uložit změny<BR> provedné ve skice?</b><p>Neuložíte-li je všechny změny budou nenávratně ztraceny."
+
+#: Editor.java:2064
+msgid "Don't Save"
+msgstr "Neukládat"
+
+#: Editor.java:2136
+msgid "Bad file selected"
+msgstr "Vybrán špatný soubor"
+
+#: Editor.java:2137
+msgid ""
+"Processing can only open its own sketches\n"
+"and other files ending in .ino or .pde"
+msgstr "Processing může otevírat pouze skici\na jiné soubory s příponou .ino či .pde"
+
+#: Editor.java:2147
+#, java-format
+msgid ""
+"The file \"{0}\" needs to be inside\n"
+"a sketch folder named \"{1}\".\n"
+"Create this folder, move the file, and continue?"
+msgstr "Soubor \"{0}\" musí být uložen \nv adresáři pro skicu pojmenovaném \"{1}\".\nMám vytvořit adresář, přesunout tam soubor a pokračovat?"
+
+#: Editor.java:2156
+msgid "Moving"
+msgstr "Přesouvám"
+
+#: Editor.java:2169
+#, java-format
+msgid "A folder named \"{0}\" already exists. Can't open sketch."
+msgstr "Adresář \"{0}\" již existuje. Nemohu skicu otevřít."
+
+#: Editor.java:2179
+msgid "Could not create the sketch folder."
+msgstr "Nemohu vytvořit adresát pro skicu."
+
+#: Editor.java:2188
+msgid "Could not copy to a proper location."
+msgstr "Nemohu kopírovat do správného umístění."
+
+#: Editor.java:2206
+msgid "Could not create the sketch."
+msgstr "Nemohu vytvořit skicu."
+
+#: Editor.java:2213
+#, java-format
+msgid "{0} | Arduino {1}"
+msgstr "{0} | Arduino {1}"
+
+#: Editor.java:2270 Editor.java:2308
+msgid "Saving..."
+msgstr "Ukládám..."
+
+#: Editor.java:2275 Editor.java:2311
+msgid "Done Saving."
+msgstr "Uložení dokončeno."
+
+#: Editor.java:2317
+msgid "Save Canceled."
+msgstr "Uložení přerušeno."
+
+#: Editor.java:2343
+#, java-format
+msgid ""
+"Serial port {0} not found.\n"
+"Retry the upload with another serial port?"
+msgstr "Seriový port {0} nenalezen\nMám zkusit upload na jiný seriový port?"
+
+#: Editor.java:2378
+msgid "Uploading to I/O Board..."
+msgstr "Uploaduji na I/O boardu (vývojové desky)..."
+
+#: Editor.java:2395 Editor.java:2431
+msgid "Done uploading."
+msgstr "Konec uploadu."
+
+#: Editor.java:2403 Editor.java:2439
+msgid "Upload canceled."
+msgstr "Upload přerušen."
+
+#: Editor.java:2467
+msgid "Save changes before export?"
+msgstr "Uložit změny před exportem?"
+
+#: Editor.java:2482
+msgid "Export canceled, changes must first be saved."
+msgstr "Export byl přerušen, je třeba nejprve uložit soubor."
+
+#: Editor.java:2504
+msgid "Burning bootloader to I/O Board (this may take a minute)..."
+msgstr "Vypaluji zavaděč na I/O boardu /vývojové desky/ (chvilku to potrvá)..."
+
+#: Editor.java:2510
+msgid "Done burning bootloader."
+msgstr "Vypalování zavaděče ukončeno."
+
+#: Editor.java:2512 Editor.java:2516 Editor.java:2520
+msgid "Error while burning bootloader."
+msgstr "Chyba při vypalování zavaděče."
+
+#: Editor.java:2547
+msgid "Printing..."
+msgstr "Tisk..."
+
+#: Editor.java:2564
+msgid "Done printing."
+msgstr "Tisk ukončen."
+
+#: Editor.java:2567
+msgid "Error while printing."
+msgstr "Chyba během tisku."
+
+#: Editor.java:2571
+msgid "Printing canceled."
+msgstr "Tisk přerušen."
+
+#: Editor.java:2619
+#, java-format
+msgid "Bad error line: {0}"
+msgstr "Chyba na řádce: {0}"
+
+#: Editor.java:2688
+msgid "Open URL"
+msgstr "Otevři URL"
+
+#: EditorConsole.java:152
+msgid "Console Error"
+msgstr "Chyba Konzole"
+
+#: EditorConsole.java:153
+msgid ""
+"A problem occurred while trying to open the\n"
+"files used to store the console output."
+msgstr "Nastal problém během toho co se systém pokoušel\nsoubory k uložení výstupu z konzole."
+
+#: Theme.java:52
+msgid ""
+"Could not read color theme settings.\n"
+"You'll need to reinstall Processing."
+msgstr "Nebylo možné načíst téma s nastavením barev.\nPřeinstalujte Processing."
+
+#: Platform.java:167
+msgid "No launcher available"
+msgstr "Není k dispozici žádný launcher"
+
+#: Platform.java:168
+msgid ""
+"Unspecified platform, no launcher available.\n"
+"To enable opening URLs or folders, add a \n"
+"\"launcher=/path/to/app\" line to preferences.txt"
+msgstr "Nespecifikovaná platforma, není k dispozici launcher.\nAby bylo možné otevření URL či adresáře, přidej do souboru\npreferences.txt \"launcher=/path/to/app\""
+
+#: tools/format/src/AutoFormat.java:54 tools/AutoFormat.java:916
+msgid "No changes necessary for Auto Format."
+msgstr "Pro autoformátování nejsou třeba změny."
+
+#: tools/AutoFormat.java:91
+msgid "Auto Format"
+msgstr "Automatické formátování"
+
+#: tools/AutoFormat.java:922
+msgid "Auto Format Canceled: Too many right parentheses."
+msgstr "Autoformátování přerušeno: Příliš mnoho pravých závorek."
+
+#: tools/AutoFormat.java:925
+msgid "Auto Format Canceled: Too many left parentheses."
+msgstr "Autoformátování přerušeno: Příliš mnoho levých závorek."
+
+#: tools/AutoFormat.java:931
+msgid "Auto Format Canceled: Too many right curly braces."
+msgstr "Autoformátování přerušeno: Příliš mnoho pravých složených závorek."
+
+#: tools/AutoFormat.java:934
+msgid "Auto Format Canceled: Too many left curly braces."
+msgstr "Autoformátování přerušeno: Příliš mnoho levých složených závorek."
+
+#: tools/AutoFormat.java:944
+msgid "Auto Format finished."
+msgstr "Autoformátování dokončeno."
+
+#: tools/FixEncoding.java:41 tools/FixEncoding.java:58
+#: tools/FixEncoding.java:79
+msgid "Fix Encoding & Reload"
+msgstr "Uprav kódování a znovu nahraj"
+
+#: tools/FixEncoding.java:57
+msgid "Discard all changes and reload sketch?"
+msgstr "Zapomenout všechny změny a skicu znovu nahrát?"
+
+#: tools/FixEncoding.java:77
+msgid ""
+"An error occurred while trying to fix the file encoding.\n"
+"Do not attempt to save this sketch as it may overwrite\n"
+"the old version. Use Open to re-open the sketch and try again.\n"
+msgstr "Během opravy kódování souboru se vyskytla chyba.\nNepokoušejte se o uložení této skici, abyste nepřepsali\npůvodní verzi. Užijte Otevřít k znovuotevření skici a zkuste to znovu.\n"
+
+#: tools/Archiver.java:48
+msgid "Archive Sketch"
+msgstr "Archivuj skicu"
+
+#: tools/Archiver.java:74
+msgid "Couldn't archive sketch"
+msgstr "Skicu nebylo možné archivovat"
+
+#: tools/Archiver.java:75
+msgid ""
+"Archiving the sketch has been canceled because\n"
+"the sketch couldn't save properly."
+msgstr "Archivování skici bylo ukončeno, protože\nskicu nešlo uložit."
+
+#: tools/Archiver.java:109
+msgid "Archive sketch as:"
+msgstr "Archivuj skicu jako:"
+
+#: tools/Archiver.java:139
+msgid "Archive sketch canceled."
+msgstr "Archivování skici bylo přerušeno."

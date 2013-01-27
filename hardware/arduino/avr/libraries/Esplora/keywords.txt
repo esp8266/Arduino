@@ -16,6 +16,7 @@ readLightSensor	KEYWORD2
 readTemperature	KEYWORD2
 readMicrophone	KEYWORD2
 readJoystickSwitch	KEYWORD2
+readJoystickButton	KEYWORD2
 readJoystickX	KEYWORD2
 readJoystickY	KEYWORD2
 readAccelerometer	KEYWORD2

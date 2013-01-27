@@ -72,6 +72,7 @@ public class EditorStatus extends JPanel /*implements ActionListener*/ {
   //Thread promptThread;
   int response;
 
+  boolean initialized = false;
 
   public EditorStatus(Editor editor) {
     this.editor = editor;
@@ -237,7 +238,10 @@ public class EditorStatus extends JPanel /*implements ActionListener*/ {
 
   public void paintComponent(Graphics screen) {
     //if (screen == null) return;
-    if (okButton == null) setup();
+    if (!initialized) {
+      setup();
+      initialized = true;
+    }
 
     //System.out.println("status.paintComponent");
 
@@ -290,8 +294,8 @@ public class EditorStatus extends JPanel /*implements ActionListener*/ {
 
   protected void setup() {
     if (okButton == null) {
-      cancelButton = new JButton(Preferences.PROMPT_CANCEL);
-      okButton = new JButton(Preferences.PROMPT_OK);
+      cancelButton = new JButton(I18n.PROMPT_CANCEL);
+      okButton = new JButton(I18n.PROMPT_OK);
 
       cancelButton.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -499,5 +503,9 @@ public class EditorStatus extends JPanel /*implements ActionListener*/ {
         unedit();
       }
     }
+  }
+  
+  public boolean isInitialized() {
+    return initialized;
   }
 }

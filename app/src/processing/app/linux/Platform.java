@@ -27,6 +27,7 @@ import java.io.File;
 import javax.swing.UIManager;
 
 import processing.app.Preferences;
+import processing.core.PConstants;
 
 
 /**
@@ -49,6 +50,12 @@ public class Platform extends processing.app.Platform {
     // be any worse than Metal. (Ocean might also work, but that's for
     // Java 1.5, and we aren't going there yet)
     //UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+  }
+
+
+  public File getDefaultSketchbookFolder() throws Exception {
+    File home = new File(System.getProperty("user.home"));
+    return new File(home, "Arduino");
   }
 
 
@@ -111,5 +118,10 @@ public class Platform extends processing.app.Platform {
       System.out.println("No launcher set, cannot open " +
                          file.getAbsolutePath());
     }
+  }
+
+  @Override
+  public String getName() {
+    return PConstants.platformNames[PConstants.LINUX];
   }
 }

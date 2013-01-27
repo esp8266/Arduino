@@ -21,7 +21,7 @@
 #ifndef ESPLORA_H_
 #define ESPLORA_H_
 
-#include "Arduino.h"
+#include <Arduino.h>
 
 /*
  * The following constants are used internally by the Esplora
@@ -141,6 +141,8 @@ public:
    * LOW if the button is pressed, and HIGH otherwise.
    */
   boolean readButton(byte channel);
+
+  boolean readJoystickButton();
   
   void writeRGB(byte red, byte green, byte blue);
   void writeRed(byte red);

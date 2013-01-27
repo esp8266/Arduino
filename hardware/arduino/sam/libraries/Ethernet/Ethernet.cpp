@@ -10,7 +10,9 @@ uint16_t EthernetClass::_server_port[MAX_SOCK_NUM] = {
 
 int EthernetClass::begin(uint8_t *mac_address)
 {
-  _dhcp = new DhcpClass();
+  static DhcpClass s_dhcp;
+  _dhcp = &s_dhcp;
+
 
   // Initialise the basic info
   W5100.init();
@@ -59,7 +61,6 @@ void EthernetClass::begin(uint8_t *mac_address, IPAddress local_ip, IPAddress dn
 void EthernetClass::begin(uint8_t *mac, IPAddress local_ip, IPAddress dns_server, IPAddress gateway, IPAddress subnet)
 {
   W5100.init();
-
   W5100.setMACAddress(mac);
   W5100.setIPAddress(local_ip._address);
   W5100.setGatewayIp(gateway._address);

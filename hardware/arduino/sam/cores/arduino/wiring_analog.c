@@ -243,8 +243,8 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 
 			// Write user value
 			ulValue = mapResolution(ulValue, _writeResolution, DACC_RESOLUTION);
-			while ((dacc_get_interrupt_status(DACC_INTERFACE) & DACC_ISR_TXRDY) == 0);
 			dacc_write_conversion_data(DACC_INTERFACE, ulValue);
+			while ((dacc_get_interrupt_status(DACC_INTERFACE) & DACC_ISR_EOC) == 0);
 			return;
 		}
 	}

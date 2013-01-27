@@ -76,7 +76,7 @@
       <fileset dir="test" includes="**/*.txt" />
     </copy>
 
-    <junit printsummary="yes" haltonfailure="yes">
+    <junit printsummary="yes">
       <classpath>
         <pathelement location="bin"/>
         <pathelement location="test-bin"/>

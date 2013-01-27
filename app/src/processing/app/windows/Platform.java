@@ -32,6 +32,7 @@ import processing.app.Base;
 import processing.app.Preferences;
 import processing.app.windows.Registry.REGISTRY_ROOT_KEY;
 import processing.core.PApplet;
+import processing.core.PConstants;
 
 
 // http://developer.apple.com/documentation/QuickTime/Conceptual/QT7Win_Update_Guide/Chapter03/chapter_3_section_1.html
@@ -302,4 +303,10 @@ public class Platform extends processing.app.Platform {
     //return 0;
     return clib._putenv(variable + "=");
   }
+
+  @Override
+  public String getName() {
+    return PConstants.platformNames[PConstants.WINDOWS];
+  }
+
 }

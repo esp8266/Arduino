@@ -111,6 +111,15 @@ boolean _Esplora::readButton(byte ch) {
   return (val > 512) ? HIGH : LOW;
 }
 
+boolean _Esplora::readJoystickButton() {
+ if (readChannel(CH_JOYSTICK_SW) == 1023) {
+  return HIGH;
+ } else if (readChannel(CH_JOYSTICK_SW) == 0) {
+  return LOW;
+ }
+}
+
+
 void _Esplora::writeRGB(byte r, byte g, byte b) {
   writeRed(r);
   writeGreen(g);
