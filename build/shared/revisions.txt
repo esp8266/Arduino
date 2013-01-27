@@ -22,6 +22,7 @@ ARDUINO 1.5.2 BETA - 2012.01.23
 * sam: added CANRX1/CANTX1 pins 88/89 (same physical pin for 66/53)
 * sam: fixed analogWrite when used in very thight write loops (V.Dorrich)
 * sam: fixed USBSerial.write() while sending big buffers (Bill Dreschel)
+* sam: USBSerial receive buffer size is now 512 (PeterVH)
 
 [libraries]
 * sam: Added Servo library
