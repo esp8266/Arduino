@@ -35,7 +35,7 @@
 #ifndef _CAN_SN65HVD234_
 #define _CAN_SN65HVD234_
 
-#include "board.h"
+#include "variant.h"
 
 #ifdef __cplusplus
  extern "C" {

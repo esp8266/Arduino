@@ -33,7 +33,7 @@
   *
   */
 
-#include "board.h"
+#include "sn65hvd234.h"
 
 #include <string.h>
 
@@ -69,7 +69,7 @@ extern uint32_t SN65HVD234_SetRs( SSN65HVD234_Data* pComponent, Pio* pPIO_Rs, ui
     pComponent->pPIO_Rs=pPIO_Rs ;
     pComponent->dwPin_Rs=dwPin_Rs ;
 
-    PIO_SetOutput( pPIO_Rs, dwPin_Rs, PIO_PULLUP|PIO_OUTPUT_LOW ) ;
+    PIO_SetOutput( pPIO_Rs, dwPin_Rs, 0, 0, 1 ) ;
 
     return 0u ;
 }
@@ -88,7 +88,7 @@ extern uint32_t SN65HVD234_SetEN( SSN65HVD234_Data* pComponent, Pio* pPIO_EN, ui
     pComponent->pPIO_EN=pPIO_EN ;
     pComponent->dwPin_EN=dwPin_EN ;
 
-    PIO_SetOutput( pPIO_EN, dwPin_EN, PIO_PULLUP|PIO_OUTPUT_LOW ) ;
+    PIO_SetOutput( pPIO_EN, dwPin_EN, 0, 0, 1 ) ;
 
     return 0u ;
 }
