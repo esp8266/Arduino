@@ -116,33 +116,54 @@ typedef struct {
  */
 
 uint32_t can_init(Can *p_can, uint32_t ul_mck, uint32_t ul_baudrate);
+
 void can_enable(Can *p_can);
 void can_disable(Can *p_can);
+
 void can_disable_low_power_mode(Can *p_can);
 void can_enable_low_power_mode(Can *p_can);
+
 void can_disable_autobaud_listen_mode(Can *p_can);
 void can_enable_autobaud_listen_mode(Can *p_can);
+
 void can_disable_overload_frame(Can *p_can);
 void can_enable_overload_frame(Can *p_can);
+
 void can_set_timestamp_capture_point(Can *p_can, uint32_t ul_flag);
+
 void can_disable_time_triggered_mode(Can *p_can);
 void can_enable_time_triggered_mode(Can *p_can);
+
 void can_disable_timer_freeze(Can *p_can);
 void can_enable_timer_freeze(Can *p_can);
+
 void can_disable_tx_repeat(Can *p_can);
 void can_enable_tx_repeat(Can *p_can);
+
 void can_set_rx_sync_stage(Can *p_can, uint32_t ul_stage);
+
 void can_enable_interrupt(Can *p_can, uint32_t dw_mask);
 void can_disable_interrupt(Can *p_can, uint32_t dw_mask);
+
 uint32_t can_get_interrupt_mask(Can *p_can);
+
 uint32_t can_get_status(Can *p_can);
+
 uint32_t can_get_internal_timer_value(Can *p_can);
+
 uint32_t can_get_timestamp_value(Can *p_can);
+
 uint8_t can_get_tx_error_cnt(Can *p_can);
 uint8_t can_get_rx_error_cnt(Can *p_can);
+
 void can_reset_internal_timer(Can *p_can);
+
 void can_global_send_transfer_cmd(Can *p_can, uint8_t uc_mask);
 void can_global_send_abort_cmd(Can *p_can, uint8_t uc_mask);
+
+/*
+ * Mailbox functions
+ */
 void can_mailbox_set_timemark(Can *p_can, uint8_t uc_index, uint16_t us_cnt);
 uint32_t can_mailbox_get_status(Can *p_can, uint8_t uc_index);
 void can_mailbox_send_transfer_cmd(Can *p_can, uint8_t uc_index);
@@ -154,7 +175,7 @@ uint32_t can_mailbox_tx_remote_frame(Can *p_can, can_mb_conf_t *p_mailbox);
 void can_reset_all_mailbox(Can *p_can);
 
 // from wilfredo
-void reset_mailbox_conf(can_mb_conf_t *p_mailbox);
+uint32_t can_reset_mailbox_data(can_mb_conf_t *p_mailbox);
 
 /** @} */
 

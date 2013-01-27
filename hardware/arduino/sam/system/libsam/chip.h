@@ -52,6 +52,7 @@
 #include "include/pio.h"
 #include "include/pmc.h"
 #include "include/pwmc.h"
+#include "include/rstc.h"
 #include "include/rtc.h"
 #include "include/rtt.h"
 #include "include/spi.h"
@@ -67,7 +68,7 @@
 
 #if (SAM3XA_SERIES)
 #include "include/can.h"
-//#include "include/emac.h"
+#include "include/emac.h"
 #include "include/trng.h"
 #include "include/uotghs_device.h"
 #include "include/uotghs_host.h"

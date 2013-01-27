@@ -42,6 +42,7 @@
  */
 
 #include "../chip.h"
+#include <string.h>
 
 /// @cond 0
 /**INDENT-OFF**/
@@ -765,8 +766,14 @@ void can_reset_all_mailbox(Can *p_can)
 }
 
 // from wilfredo
-void reset_mailbox_conf(can_mb_conf_t *p_mailbox)
+uint32_t can_reset_mailbox_data(can_mb_conf_t *p_mailbox)
 {
+   if ( p_mailbox == NULL )
+   {
+     return 1U ;
+   }
+
+#if 0
 	p_mailbox->ul_mb_idx = 0;
 	p_mailbox->uc_obj_type = 0;
 	p_mailbox->uc_id_ver = 0;
@@ -778,6 +785,11 @@ void reset_mailbox_conf(can_mb_conf_t *p_mailbox)
 	p_mailbox->ul_fid = 0;
 	p_mailbox->ul_datal = 0;
 	p_mailbox->ul_datah = 0;
+#else
+  memset( p_mailbox, 0, sizeof( can_mb_conf_t ) ) ;
+#endif
+
+  return 0U ;
 }
 
 #endif // SAM3XA_SERIES

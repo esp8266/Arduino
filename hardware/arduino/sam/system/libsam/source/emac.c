@@ -42,7 +42,7 @@
  */
 
 #include "../chip.h"
-//#include <string.h>
+#include <string.h>
 
 /// @cond 0
 /**INDENT-OFF**/
@@ -68,6 +68,11 @@ extern "C" {
  *
  * @{
  */
+
+#define EMAC_RX_BUFFERS                               16
+#define EMAC_TX_BUFFERS                               8
+#define MAC_PHY_RETRY_MAX                             1000000
+
 
 /** TX descriptor lists */
 #ifdef __ICCARM__ /* IAR */
@@ -283,9 +288,9 @@ static uint8_t emac_init_mem(Emac* p_emac, emac_device_t* p_emac_dev,
 	emac_reset_tx_mem(p_emac_dev);
 
 	/* Enable Rx and Tx, plus the statistics register */
-	emac_enable_transmit(p_emac, true);
-	emac_enable_receive(p_emac, true);
-	emac_enable_statistics_write(p_emac, true);
+	emac_enable_transmit(p_emac, 1);
+	emac_enable_receive(p_emac, 1);
+	emac_enable_statistics_write(p_emac, 1);
 
 	/* Set up the interrupts for transmission and errors */
 	emac_enable_interrupt(p_emac,
