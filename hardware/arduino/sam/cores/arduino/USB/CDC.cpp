@@ -157,7 +157,7 @@ void Serial_::accept(void)
 {
 	ring_buffer *buffer = &cdc_rx_buffer;
 	uint32_t c = USBD_Recv(CDC_RX);
-	uint32_t i = (uint32_t)(buffer->head+1) % SERIAL_BUFFER_SIZE;
+	uint32_t i = (uint32_t)(buffer->head+1) % CDC_SERIAL_BUFFER_SIZE;
 
 	// if we should be storing the received character into the location
 	// just before the tail (meaning that the head would advance to the
@@ -172,7 +172,7 @@ void Serial_::accept(void)
 int Serial_::available(void)
 {
 	ring_buffer *buffer = &cdc_rx_buffer;
-	return (unsigned int)(SERIAL_BUFFER_SIZE + buffer->head - buffer->tail) % SERIAL_BUFFER_SIZE;
+	return (unsigned int)(CDC_SERIAL_BUFFER_SIZE + buffer->head - buffer->tail) % CDC_SERIAL_BUFFER_SIZE;
 }
 
 int Serial_::peek(void)
@@ -201,7 +201,7 @@ int Serial_::read(void)
 	else
 	{
 		unsigned char c = buffer->buffer[buffer->tail];
-		buffer->tail = (unsigned int)(buffer->tail + 1) % SERIAL_BUFFER_SIZE;
+		buffer->tail = (unsigned int)(buffer->tail + 1) % CDC_SERIAL_BUFFER_SIZE;
 		return c;
 	}
 }

@@ -63,15 +63,15 @@ void mousePressed() {
 // This function intercepts mouse button release
 void mouseReleased() {
   Serial.print("Released: ");
-  if (!mouse.getButton(LEFT_BUTTON) && left==true) {
+  if (!mouse.getButton(LEFT_BUTTON) && leftButton == true) {
     Serial.print("L");
     leftButton = false;
   }
-  if (!mouse.getButton(MIDDLE_BUTTON) && middle==true) {
+  if (!mouse.getButton(MIDDLE_BUTTON) && middleButton == true) {
     Serial.print("M");
     middleButton = false;
   }
-  if (!mouse.getButton(RIGHT_BUTTON) && right==true) {
+  if (!mouse.getButton(RIGHT_BUTTON) && rightButton == true) {
     Serial.print("R");
     rightButton = false;
   }

@@ -23,16 +23,18 @@
 
 package processing.app;
 
+import processing.app.helpers.FileUtils;
+import processing.app.syntax.SyntaxStyle;
+import processing.core.PApplet;
+import processing.core.PConstants;
+
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 
-import javax.swing.*;
-
 import processing.app.helpers.PreferencesMap;
-import processing.app.syntax.*;
-import processing.core.*;
 import static processing.app.I18n._;
 
 
@@ -71,20 +73,14 @@ public class Preferences {
 
   static final String PREFS_FILE = "preferences.txt";
 
-
-  // prompt text stuff
-
-  static final String PROMPT_YES     = _("Yes");
-  static final String PROMPT_NO      = _("No");
-  static final String PROMPT_CANCEL  = _("Cancel");
-  static final String PROMPT_OK      = _("OK");
-  static final String PROMPT_BROWSE  = _("Browse");
-
   String[] languages = {
                         _("System Default"),
                         "العربية" + " (" + _("Arabic") + ")",
                         "Aragonés" + " (" + _("Aragonese") + ")",
+                        "български" + " (" + _("Bulgarian") + ")",
                         "Català" + " (" + _("Catalan") + ")",
+                        "Hrvatski" + " (" + _("Croatian") + ")",
+                        "český" + " (" + _("Czech") + ")",
                         "简体中文" + " (" + _("Chinese Simplified") + ")",
                         "繁體中文" + " (" + _("Chinese Traditional") + ")",
                         "Dansk" + " (" + _("Danish") + ")",
@@ -93,7 +89,10 @@ public class Preferences {
                         "Eesti" + " (" + _("Estonian") + ")",
                         "Pilipino" + " (" + _("Filipino") + ")",
                         "Français" + " (" + _("French") + ")",
+                        "Canadienne-français" + " (" + _("Canadian French") + ")",
                         "Galego" + " (" + _("Galician") + ")",
+                        "საქართველოს" + " (" + _("Georgian") + ")",
+                        "עברית" + " (" + _("Hebrew") + ")",
                         "Deutsch" + " (" + _("German") + ")",
                         "ελληνικά" + " (" + _("Greek") + ")",
                         "Magyar" + " (" + _("Hindi") + ")",
@@ -104,8 +103,9 @@ public class Preferences {
                                                                 "한국어" + " (" + _("Korean") + ")",
                         "Latviešu" + " (" + _("Latvian") + ")",
                         "Lietuvių Kalba" + " (" + _("Lithuaninan") + ")",
-                                                 "मराठी" + " (" + _("Marathi") + ")",                        
+                        "मराठी" + " (" + _("Marathi") + ")",
                         "Norsk" + " (" + _("Norwegian") + ")",
+                        "Norsk bokmål" + " (" + _("Norwegian Bokmål") + ")",
                         "فارسی" + " (" + _("Persian") + ")",
                         "Język Polski" + " (" + _("Polish") + ")",
                         "Português" + " (" + _("Portuguese") + " - Brazil)",
@@ -113,12 +113,18 @@ public class Preferences {
                         "Română" + " (" + _("Romanian") + ")",
                         "Русский" + " (" + _("Russian") + ")",
                         "Español" + " (" + _("Spanish") + ")",
-                        "தமிழ்" + " (" + _("Tamil") + ")"};
+                        "தமிழ்" + " (" + _("Tamil") + ")",
+                        "Türk" + " (" + _("Turkish") + ")",
+                        "Український" + " (" + _("Ukrainian") + ")"
+                        };
   String[] languagesISO = {
                         "",
                         "ar",
                         "an",
+                        "bg",
                         "ca",
+                        "hr_hr",
+                        "cs_cz",
                         "zh_cn",
                         "zh_tw",
                         "da",
@@ -127,7 +133,10 @@ public class Preferences {
                         "et",
                         "tl",
                         "fr",
+                        "fr_ca",
                         "gl",
+                        "ka_ge",
+                        "he",
                         "de",
                         "el",
                         "hi",
@@ -140,6 +149,7 @@ public class Preferences {
                         "lt",
                         "mr",
                         "no_nb",
+                        "nb_no",
                         "fa",
                         "pl",
                         "pt_br",
@@ -147,7 +157,10 @@ public class Preferences {
                         "ro",
                         "ru",
                         "es",
-                        "ta"};
+                        "ta",
+                        "tr",
+                        "uk"
+                        };
   
   /**
    * Standardized width for buttons. Mac OS X 10.3 wants 70 as its default,
@@ -221,14 +234,13 @@ public class Preferences {
     }
 
     // set some runtime constants (not saved on preferences file)
-    table.put("runtime.os", PConstants.platformNames[PApplet.platform]);
     File hardwareFolder = Base.getHardwareFolder();
     table.put("runtime.hardware.path", hardwareFolder.getAbsolutePath());
     table.put("runtime.ide.path", hardwareFolder.getParentFile().getAbsolutePath());
     table.put("runtime.ide.version", "" + Base.REVISION);
     
     // check for platform-specific properties in the defaults
-    String platformExt = "." + PConstants.platformNames[PApplet.platform];
+    String platformExt = "." + Base.platform.getName();
     int platformExtLength = platformExt.length();
     Enumeration e = table.keys();
     while (e.hasMoreElements()) {
@@ -243,9 +255,6 @@ public class Preferences {
 
     // clone the hash table
     defaults = (Hashtable) table.clone();
-
-    // other things that have to be set explicitly for the defaults
-    setColor("run.window.bgcolor", SystemColor.control);
 
     // Load a prefs file if specified on the command line
     if (commandLinePrefs != null) {
@@ -283,7 +292,16 @@ public class Preferences {
 			 ), ex);
         }
       }
-    }    
+    }
+
+    // load the I18n module for internationalization
+    I18n.init(Preferences.get("editor.languages.current"));
+
+    // set some other runtime constants (not saved on preferences file)
+    table.put("runtime.os", PConstants.platformNames[PApplet.platform]);
+
+    // other things that have to be set explicitly for the defaults
+    setColor("run.window.bgcolor", SystemColor.control);
   }
 
 
@@ -322,14 +340,21 @@ public class Preferences {
     pain.add(sketchbookLocationField);
     d = sketchbookLocationField.getPreferredSize();
 
-    button = new JButton(PROMPT_BROWSE);
+    button = new JButton(I18n.PROMPT_BROWSE);
     button.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           File dflt = new File(sketchbookLocationField.getText());
           File file =
-            Base.selectFolder(_("Select new sketchbook location"), dflt, dialog);
+                  Base.selectFolder(_("Select new sketchbook location"), dflt, dialog);
           if (file != null) {
-            sketchbookLocationField.setText(file.getAbsolutePath());
+            String path = file.getAbsolutePath();
+            if (Base.getPortableFolder() != null) {
+              path = FileUtils.relativePath(Base.getPortableFolder().toString(), path);
+              if (path == null) {
+                path = Base.getPortableSketchbookFolder();
+              }
+            }
+            sketchbookLocationField.setText(path);
           }
         }
       });
@@ -442,6 +467,10 @@ public class Preferences {
       autoAssociateBox.setBounds(left, top, d.width + 10, d.height);
       right = Math.max(right, left + d.width);
       top += d.height + GUI_BETWEEN;
+
+      // If using portable mode, it's bad manner to change PC setting.
+      if (Base.getPortableFolder() != null)
+        autoAssociateBox.setEnabled(false);
     }
 
     // More preferences are in the ...
@@ -460,7 +489,7 @@ public class Preferences {
         public void mousePressed(MouseEvent e) {
           Base.openFolder(Base.getSettingsFolder());
         }
-        
+
         public void mouseEntered(MouseEvent e) {
           clickable.setForeground(new Color(0, 0, 140));
         }
@@ -486,7 +515,7 @@ public class Preferences {
 
     // [  OK  ] [ Cancel ]  maybe these should be next to the message?
 
-    button = new JButton(PROMPT_OK);
+    button = new JButton(I18n.PROMPT_OK);
     button.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           applyFrame();
@@ -501,7 +530,7 @@ public class Preferences {
     button.setBounds(h, top, BUTTON_WIDTH, BUTTON_HEIGHT);
     h += BUTTON_WIDTH + GUI_SMALL;
 
-    button = new JButton(PROMPT_CANCEL);
+    button = new JButton(I18n.PROMPT_CANCEL);
     button.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           disposeFrame();
@@ -594,6 +623,12 @@ public class Preferences {
     // if the sketchbook path has changed, rebuild the menus
     String oldPath = get("sketchbook.path");
     String newPath = sketchbookLocationField.getText();
+    if (newPath.isEmpty()) {
+      if (Base.getPortableFolder() == null)
+        newPath = editor.base.getDefaultSketchbookFolder().toString();
+      else
+        newPath = Base.getPortableSketchbookFolder();
+    }
     if (!newPath.equals(oldPath)) {
       editor.base.rebuildSketchbookMenus();
       set("sketchbook.path", newPath);
@@ -682,8 +717,8 @@ public class Preferences {
     load(input, table);
   }
   
-  static public void load(InputStream input, Map table) throws IOException {  
-    String[] lines = PApplet.loadStrings(input);  // Reads as UTF-8
+  static public void load(InputStream input, Map table) throws IOException {
+    String[] lines = loadStrings(input);  // Reads as UTF-8
     for (String line : lines) {
       if ((line.length() == 0) ||
           (line.charAt(0) == '#')) continue;
@@ -697,6 +732,41 @@ public class Preferences {
       }
     }
   }
+
+  static public String[] loadStrings(InputStream input) {
+    try {
+      BufferedReader reader =
+              new BufferedReader(new InputStreamReader(input, "UTF-8"));
+
+      String lines[] = new String[100];
+      int lineCount = 0;
+      String line = null;
+      while ((line = reader.readLine()) != null) {
+        if (lineCount == lines.length) {
+          String temp[] = new String[lineCount << 1];
+          System.arraycopy(lines, 0, temp, 0, lineCount);
+          lines = temp;
+        }
+        lines[lineCount++] = line;
+      }
+      reader.close();
+
+      if (lineCount == lines.length) {
+        return lines;
+      }
+
+      // resize array to appropriate amount for these lines
+      String output[] = new String[lineCount];
+      System.arraycopy(lines, 0, output, 0, lineCount);
+      return output;
+
+    } catch (IOException e) {
+      e.printStackTrace();
+      //throw new RuntimeException("Error inside loadStrings()");
+    }
+    return null;
+  }
+
 
 
   // .................................................................
@@ -712,9 +782,9 @@ public class Preferences {
     // Fix for 0163 to properly use Unicode when writing preferences.txt
     PrintWriter writer = PApplet.createWriter(preferencesFile);
 
-    Enumeration e = table.keys(); //properties.propertyNames();
-    while (e.hasMoreElements()) {
-      String key = (String) e.nextElement();
+    String[] keys = (String[])table.keySet().toArray(new String[0]);
+    Arrays.sort(keys);
+    for (String key: keys) {
       if (key.startsWith("runtime."))
         continue;
       writer.println(key + "=" + ((String) table.get(key)));

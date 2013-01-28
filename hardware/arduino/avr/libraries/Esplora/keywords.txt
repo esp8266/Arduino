@@ -1,0 +1,69 @@
+#######################################
+# Syntax Coloring Map For Esplora
+####################################### 
+# Class
+#######################################
+
+Esplora	KEYWORD3
+
+#######################################
+# Methods and Functions 
+#######################################	
+
+begin	KEYWORD2
+readSlider	KEYWORD2
+readLightSensor	KEYWORD2
+readTemperature	KEYWORD2
+readMicrophone	KEYWORD2
+readJoystickSwitch	KEYWORD2
+readJoystickButton	KEYWORD2
+readJoystickX	KEYWORD2
+readJoystickY	KEYWORD2
+readAccelerometer	KEYWORD2
+readButton	KEYWORD2
+writeRGB	KEYWORD2
+writeRed	KEYWORD2
+writeGreen	KEYWORD2
+writeBlue	KEYWORD2
+readRed	KEYWORD2
+readGreen	KEYWORD2
+readBlue	KEYWORD2
+tone	KEYWORD2
+noTone	KEYWORD2
+
+
+#######################################
+# Constants
+#######################################
+ 
+JOYSTICK_BASE	LITERAL1
+MAX_CHANNELS	LITERAL1
+CH_SWITCH_1	LITERAL1
+CH_SWITCH_2	LITERAL1
+CH_SWITCH_3	LITERAL1
+CH_SWITCH_4	LITERAL1
+CH_SLIDER	LITERAL1
+CH_LIGHT	LITERAL1
+CH_TEMPERATURE	LITERAL1
+CH_MIC	LITERAL1
+CH_JOYSTICK_SW	LITERAL1
+CH_JOYSTICK_X	LITERAL1
+CH_JOYSTICK_Y	LITERAL1
+SWITCH_1	LITERAL1
+SWITCH_2	LITERAL1
+SWITCH_3	LITERAL1
+SWITCH_4	LITERAL1
+SWITCH_DOWN	LITERAL1
+SWITCH_LEFT	LITERAL1
+SWITCH_UP	LITERAL1
+SWITCH_RIGHT	LITERAL1
+JOYSTICK_DOWN	LITERAL1
+JOYSTICK_LEFT	LITERAL1
+JOYSTICK_UP	LITERAL1
+PRESSED	LITERAL1
+RELEASED	LITERAL1
+DEGREES_C	LITERAL1
+DEGREES_F	LITERAL1
+X_AXIS	LITERAL1
+Y_AXIS	LITERAL1
+Z_AXIS	LITERAL1

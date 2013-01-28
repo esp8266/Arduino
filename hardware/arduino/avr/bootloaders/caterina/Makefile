@@ -47,6 +47,7 @@
 #----------------------------------------------------------------------------
 
 # USB vendor ID (VID)
+# reuse of this VID by others is forbidden by USB-IF
 # official Arduino LLC VID
 # VID = 0x2341
 
@@ -54,7 +55,10 @@
 # USB product ID (PID)
 # official Leonardo PID
 # PID = 0x0036
-
+# official Micro PID
+# PID = 0x0037
+# official Esplora PID
+# PID = 0x003C
 
 # MCU name
 MCU = atmega32u4
@@ -123,7 +127,7 @@ OBJDIR = .
 
 
 # Path to the LUFA library
-LUFA_PATH = ../../../../../LUFA-111009
+LUFA_PATH = ../../../../../../LUFA/LUFA-111009
 
 
 # LUFA library compile-time options and predefined tokens

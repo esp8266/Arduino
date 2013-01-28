@@ -612,7 +612,7 @@ public class Sketch {
 
       } else {
         // delete the file
-        if (!current.deleteFile()) {
+        if (!current.deleteFile(tempBuildFolder)) {
           Base.showMessage(_("Couldn't do it"),
                            I18n.format(_("Could not delete \"{0}\"."), current.getFileName()));
           return;
@@ -826,7 +826,7 @@ public class Sketch {
                                    FileDialog.SAVE);
     if (isReadOnly() || isUntitled()) {
       // default to the sketchbook folder
-      fd.setDirectory(Preferences.get("sketchbook.path"));
+      fd.setDirectory(Base.getSketchbookFolder().getAbsolutePath());
     } else {
       // default to the parent folder of where this was
       fd.setDirectory(folder.getParent());
@@ -1124,7 +1124,7 @@ public class Sketch {
    * Add import statements to the current tab for all of packages inside
    * the specified jar file.
    */
-  public void importLibrary(String jarPath) {
+  public void importLibrary(String jarPath) throws IOException {
     // make sure the user didn't hide the sketch folder
     ensureExistence();
 
@@ -1339,7 +1339,6 @@ public class Sketch {
     // make sure the user didn't hide the sketch folder
     ensureExistence();
 
-    String[] codeFolderPackages = null;
     classPath = buildPath;
 
 //    // figure out the contents of the code folder to see if there
@@ -1381,12 +1380,8 @@ public class Sketch {
     // Note that the headerOffset isn't applied until compile and run, because
     // it only applies to the code after it's been written to the .java file.
     int headerOffset = 0;
-    //PdePreprocessor preprocessor = new PdePreprocessor();
     try {
-      headerOffset = preprocessor.writePrefix(bigCode.toString(),
-                                              buildPath,
-                                              name,
-                                              codeFolderPackages);
+      headerOffset = preprocessor.writePrefix(bigCode.toString());
     } catch (FileNotFoundException fnfe) {
       fnfe.printStackTrace();
       String msg = _("Build folder disappeared or could not be written");
@@ -1399,24 +1394,14 @@ public class Sketch {
     String primaryClassName = null;
 
     try {
-      // if (i != 0) preproc will fail if a pde file is not
-      // java mode, since that's required
-      String className = preprocessor.write();
-
-      if (className == null) {
-        throw new RunnerException(_("Could not find main class"));
-        // this situation might be perfectly fine,
-        // (i.e. if the file is empty)
-        //System.out.println("No class found in " + code[i].name);
-        //System.out.println("(any code in that file will be ignored)");
-        //System.out.println();
-
-//      } else {
-//        code[0].setPreprocName(className + ".java");
-      }
-
+      // Output file
+      File streamFile = new File(buildPath, name + ".cpp");
+      FileOutputStream outputStream = new FileOutputStream(streamFile);
+      preprocessor.write(outputStream);
+      outputStream.close();
+      
       // store this for the compiler and the runtime
-      primaryClassName = className + ".cpp";
+      primaryClassName = name + ".cpp";
 
     } catch (FileNotFoundException fnfe) {
       fnfe.printStackTrace();
@@ -1630,7 +1615,7 @@ public class Sketch {
     editor.status.progressUpdate(percent);
   }
 
-  
+
   protected void size(PreferencesMap prefs) throws RunnerException {
     long size = 0;
     String maxsizeString = prefs.get("upload.maximum_size");
@@ -1641,8 +1626,8 @@ public class Sketch {
     try {
       size = sizer.computeSize();
       System.out.println(I18n
-          .format(_("Binary sketch size: {0} bytes (of a {1} byte maximum)"),
-                  size, maxsize));
+              .format(_("Binary sketch size: {0} bytes (of a {1} byte maximum) - {2}% used"),
+                      size, maxsize, size * 100 / maxsize));
     } catch (RunnerException e) {
       System.err.println(I18n.format(_("Couldn't determine program size: {0}"),
                                      e.getMessage()));
@@ -1668,58 +1653,7 @@ public class Sketch {
     return success ? suggestedClassName : null;
   }
 
-  /**
-   * Replace all commented portions of a given String as spaces.
-   * Utility function used here and in the preprocessor.
-   */
-  static public String scrubComments(String what) {
-    char p[] = what.toCharArray();
-
-    int index = 0;
-    while (index < p.length) {
-      // for any double slash comments, ignore until the end of the line
-      if ((p[index] == '/') &&
-          (index < p.length - 1) &&
-          (p[index+1] == '/')) {
-        p[index++] = ' ';
-        p[index++] = ' ';
-        while ((index < p.length) &&
-               (p[index] != '\n')) {
-          p[index++] = ' ';
-        }
-
-        // check to see if this is the start of a new multiline comment.
-        // if it is, then make sure it's actually terminated somewhere.
-      } else if ((p[index] == '/') &&
-                 (index < p.length - 1) &&
-                 (p[index+1] == '*')) {
-        p[index++] = ' ';
-        p[index++] = ' ';
-        boolean endOfRainbow = false;
-        while (index < p.length - 1) {
-          if ((p[index] == '*') && (p[index+1] == '/')) {
-            p[index++] = ' ';
-            p[index++] = ' ';
-            endOfRainbow = true;
-            break;
-
-          } else {
-            // continue blanking this area
-            p[index++] = ' ';
-          }
-        }
-        if (!endOfRainbow) {
-          throw new RuntimeException(_("Missing the */ from the end of a " +
-                                       "/* comment */"));
-        }
-      } else {  // any old character, move along
-        index++;
-      }
-    }
-    return new String(p);
-  }
-
-
+  
   public boolean exportApplicationPrompt() throws IOException, RunnerException {
     return false;
   }

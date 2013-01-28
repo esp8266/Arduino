@@ -40,8 +40,8 @@ http://arduiniana.org.
 // 
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
-#include "Arduino.h"
-#include "SoftwareSerial.h"
+#include <Arduino.h>
+#include <SoftwareSerial.h>
 //
 // Lookup table
 //
@@ -70,6 +70,7 @@ static const DELAY_TABLE PROGMEM table[] =
   { 4800,     233,       474,       474,      471,   },
   { 2400,     471,       950,       950,      947,   },
   { 1200,     947,       1902,      1902,     1899,  },
+  { 600,      1902,      3804,      3804,     3800,  },
   { 300,      3804,      7617,      7617,     7614,  },
 };
 
@@ -91,6 +92,7 @@ static const DELAY_TABLE table[] PROGMEM =
   { 4800,     110,        233,       233,    230,    },
   { 2400,     229,        472,       472,    469,    },
   { 1200,     467,        948,       948,    945,    },
+  { 600,      948,        1895,      1895,   1890,   },
   { 300,      1895,       3805,      3805,   3802,   },
 };
 
@@ -115,6 +117,7 @@ static const DELAY_TABLE PROGMEM table[] =
   { 4800,     296,        595,       595,    592,    },
   { 2400,     592,        1189,      1189,   1186,   },
   { 1200,     1187,       2379,      2379,   2376,   },
+  { 600,      2379,       4759,      4759,   4755,   },
   { 300,      4759,       9523,      9523,   9520,   },
 };
 

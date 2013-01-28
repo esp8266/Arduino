@@ -206,6 +206,33 @@ micro.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid}
 
 ##############################################################
 
+esplora.name=Arduino Esplora
+esplora.upload.tool=avrdude
+esplora.upload.protocol=avr109
+esplora.upload.maximum_size=28672
+esplora.upload.speed=57600
+esplora.upload.disable_flushing=true
+esplora.upload.use_1200bps_touch=true
+esplora.upload.wait_for_upload_port=true
+
+esplora.bootloader.tool=avrdude
+esplora.bootloader.low_fuses=0xff
+esplora.bootloader.high_fuses=0xd8
+esplora.bootloader.extended_fuses=0xcb
+esplora.bootloader.file=caterina/Caterina-Esplora.hex
+esplora.bootloader.unlock_bits=0x3F
+esplora.bootloader.lock_bits=0x2F
+
+esplora.build.mcu=atmega32u4
+esplora.build.f_cpu=16000000L
+esplora.build.vid=0x2341
+esplora.build.pid=0x8036
+esplora.build.core=arduino
+esplora.build.variant=leonardo
+esplora.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid}
+
+##############################################################
+
 mini.name=Arduino Mini
 
 mini.upload.tool=avrdude
@@ -501,6 +528,6 @@ menu.cpu.atmegang.atmega8.upload.maximum_size=7168
 
 menu.cpu.atmegang.atmega8.bootloader.low_fuses=0xdf
 menu.cpu.atmegang.atmega8.bootloader.high_fuses=0xca
-menu.cpu.atmegang.atmega8.bootloader.file=atmegang/ATmegaBOOT.hex
+menu.cpu.atmegang.atmega8.bootloader.file=atmega8/ATmegaBOOT-prod-firmware-2009-11-07.hex
 
 menu.cpu.atmegang.atmega8.build.mcu=atmega8

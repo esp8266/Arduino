@@ -107,8 +107,21 @@ public class SketchCode {
   }
   
   
-  protected boolean deleteFile() {
-    return file.delete();
+  protected boolean deleteFile(File tempBuildFolder) {
+    if (!file.delete()) {
+      return false;
+    }
+
+    File[] compiledFiles = tempBuildFolder.listFiles(new FileFilter() {
+      public boolean accept(File pathname) {
+        return pathname.getName().startsWith(getFileName());
+      }
+    });
+    for (File compiledFile : compiledFiles) {
+      compiledFile.delete();
+    }
+
+    return true;
   }
   
   

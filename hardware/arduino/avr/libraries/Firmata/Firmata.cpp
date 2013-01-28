@@ -245,7 +245,7 @@ void FirmataClass::processInput(void)
       break;
     case REPORT_ANALOG:
     case REPORT_DIGITAL:
-      waitForData = 1; // two data bytes needed
+      waitForData = 1; // one data byte needed
       executeMultiByteCommand = command;
       break;
     case START_SYSEX:
