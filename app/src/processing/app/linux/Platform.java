@@ -22,12 +22,6 @@
 
 package processing.app.linux;
 
-import java.io.*;
-import java.util.Map;
-import java.util.Properties;
-
-import javax.swing.UIManager;
-
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteStreamHandler;
@@ -35,6 +29,9 @@ import org.apache.commons.exec.Executor;
 import processing.app.Preferences;
 import processing.app.debug.TargetPackage;
 import processing.core.PConstants;
+
+import java.io.*;
+import java.util.Map;
 
 
 /**
@@ -171,11 +168,15 @@ public class Platform extends processing.app.Platform {
       baos.reset();
       CommandLine commandLine = CommandLine.parse("udevadm info --query=property -p " + devicePath);
       executor.execute(commandLine);
-      Properties properties = new Properties();
-      properties.load(new ByteArrayInputStream(baos.toByteArray()));
-      return super.resolveDeviceByVendorIdProductId(packages, properties.get("ID_VENDOR_ID").toString().toUpperCase(), properties.get("ID_MODEL_ID").toString().toUpperCase());
+      String vidPid = new UDevAdmParser().extractVIDAndPID(new String(baos.toByteArray()));
+
+      if (vidPid == null) {
+        return super.resolveDeviceAttachedTo(serial, packages);
+      }
+
+      return super.resolveDeviceByVendorIdProductId(packages, vidPid);
     } catch (IOException e) {
-      return null;
+      return super.resolveDeviceAttachedTo(serial, packages);
     }
   }
 }

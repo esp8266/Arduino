@@ -22,19 +22,22 @@
 
 package processing.app.macosx;
 
-import java.awt.Insets;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.lang.reflect.Method;
-import java.net.URI;
-
-import javax.swing.UIManager;
-
 import com.apple.eio.FileManager;
-
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.ExecuteStreamHandler;
+import org.apache.commons.exec.Executor;
 import processing.app.Base;
+import processing.app.debug.TargetPackage;
 import processing.core.PApplet;
 import processing.core.PConstants;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.*;
+import java.lang.reflect.Method;
+import java.net.URI;
+import java.util.Map;
 
 
 /**
@@ -202,4 +205,52 @@ public class Platform extends processing.app.Platform {
     return PConstants.platformNames[PConstants.MACOSX];
   }
 
+  @Override
+  public String resolveDeviceAttachedTo(String serial, Map<String, TargetPackage> packages) {
+    Executor executor = new DefaultExecutor();
+
+    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    executor.setStreamHandler(new ExecuteStreamHandler() {
+      @Override
+      public void setProcessInputStream(OutputStream outputStream) throws IOException {
+      }
+
+      @Override
+      public void setProcessErrorStream(InputStream inputStream) throws IOException {
+      }
+
+      @Override
+      public void setProcessOutputStream(InputStream inputStream) throws IOException {
+        byte[] buf = new byte[4096];
+        int bytes = -1;
+        while ((bytes = inputStream.read(buf)) != -1) {
+          baos.write(buf, 0, bytes);
+        }
+      }
+
+      @Override
+      public void start() throws IOException {
+      }
+
+      @Override
+      public void stop() {
+      }
+    });
+
+    try {
+      CommandLine toDevicePath = CommandLine.parse("/usr/sbin/system_profiler SPUSBDataType");
+      executor.execute(toDevicePath);
+      String output = new String(baos.toByteArray());
+
+      String vidPid = new SystemProfilerParser().extractVIDAndPID(output, serial);
+
+      if (vidPid == null) {
+        return super.resolveDeviceAttachedTo(serial, packages);
+      }
+
+      return super.resolveDeviceByVendorIdProductId(packages, vidPid);
+    } catch (IOException e) {
+      return super.resolveDeviceAttachedTo(serial, packages);
+    }
+  }
 }

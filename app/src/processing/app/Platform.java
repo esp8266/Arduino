@@ -134,18 +134,18 @@ public class Platform {
     }
   }
 
-  public String resolveDeviceAttachedTo(String device, Map<String, TargetPackage> packages) {
+  public String resolveDeviceAttachedTo(String serial, Map<String, TargetPackage> packages) {
     return null;
   }
 
-  public String resolveDeviceByVendorIdProductId(Map<String, TargetPackage> packages, String vendorId, String productId) {
+  protected String resolveDeviceByVendorIdProductId(Map<String, TargetPackage> packages, String readVIDPID) {
     for (TargetPackage targetPackage : packages.values()) {
       for (TargetPlatform targetPlatform : targetPackage.getPlatforms().values()) {
         for (PreferencesMap board : targetPlatform.getBoards().values()) {
           if (board.containsKey("vid_pid")) {
             String[] vidPids = board.get("vid_pid").split(",");
             for (String vidPid : vidPids) {
-              if (vidPid.toUpperCase().equals(vendorId + "_" + productId)) {
+              if (vidPid.toUpperCase().equals(readVIDPID)) {
                 return board.get("name");
               }
             }

@@ -1,0 +1,134 @@
+USB:
+
+    USB High-Speed Bus:
+
+      Host Controller Location: Built-in USB
+      Host Controller Driver: AppleUSBEHCI
+      PCI Device ID: 0x1c2d 
+      PCI Revision ID: 0x0005 
+      PCI Vendor ID: 0x8086 
+      Bus Number: 0xfa 
+
+        Hub:
+
+          Product ID: 0x2513
+          Vendor ID: 0x0424  (SMSC)
+          Version:  b.b3
+          Speed: Up to 480 Mb/sec
+          Location ID: 0xfa100000 / 2
+          Current Available (mA): 500
+          Current Required (mA): 2
+
+            Trans-It Drive:
+
+              Capacity: 3.99 GB (3,992,977,408 bytes)
+              Removable Media: Yes
+              Detachable Drive: Yes
+              BSD Name: disk1
+              Product ID: 0x0622
+              Vendor ID: 0x0718  (Imation Corp.)
+              Version: 1.10
+              Serial Number: 0792181A2BDD
+              Speed: Up to 480 Mb/sec
+              Manufacturer: TDKMedia
+              Location ID: 0xfa130000 / 6
+              Current Available (mA): 500
+              Current Required (mA): 300
+              Partition Map Type: MBR (Master Boot Record)
+              S.M.A.R.T. status: Not Supported
+              Volumes:
+                Untitled:
+                  Capacity: 3.99 GB (3,990,379,520 bytes)
+                  Available: 1.99 GB (1,986,838,528 bytes)
+                  Writable: Yes
+                  File System: MS-DOS FAT32
+                  BSD Name: disk1s1
+                  Mount Point: /Volumes/Untitled
+                  Content: Windows_FAT_32
+
+            Arduino Mega ADK:
+
+              Product ID: 0x0044
+              Vendor ID: 0x2341
+              Version: 0.01
+              Serial Number: 64936333936351500000
+              Speed: Up to 12 Mb/sec
+              Manufacturer: Arduino (www.arduino.cc)
+              Location ID: 0xfa120000 / 5
+              Current Available (mA): 500
+              Current Required (mA): 100
+
+            BRCM20702 Hub:
+
+              Product ID: 0x4500
+              Vendor ID: 0x0a5c  (Broadcom Corp.)
+              Version: 1.00
+              Speed: Up to 12 Mb/sec
+              Manufacturer: Apple Inc.
+              Location ID: 0xfa110000 / 3
+              Current Available (mA): 500
+              Current Required (mA): 94
+
+                Bluetooth USB Host Controller:
+
+                  Product ID: 0x8281
+                  Vendor ID: 0x05ac  (Apple Inc.)
+                  Version: 0.97
+                  Speed: Up to 12 Mb/sec
+                  Manufacturer: Apple Inc.
+                  Location ID: 0xfa113000 / 4
+                  Current Available (mA): 500
+                  Current Required (mA): 0
+
+    USB High-Speed Bus:
+
+      Host Controller Location: Built-in USB
+      Host Controller Driver: AppleUSBEHCI
+      PCI Device ID: 0x7ffc00001c26 
+      PCI Revision ID: 0x7ffc00000005 
+      PCI Vendor ID: 0x7ffc00008086 
+      Bus Number: 0xfd 
+
+        Hub:
+
+          Product ID: 0x2513
+          Vendor ID: 0x0424  (SMSC)
+          Version:  b.b3
+          Speed: Up to 480 Mb/sec
+          Location ID: 0xfd100000 / 2
+          Current Available (mA): 500
+          Current Required (mA): 2
+
+            USB Multimedia Keyboard:
+
+              Product ID: 0xc311
+              Vendor ID: 0x046d  (Logitech Inc.)
+              Version: 1.30
+              Speed: Up to 1.5 Mb/sec
+              Manufacturer: BTC
+              Location ID: 0xfd120000 / 5
+              Current Available (mA): 500
+              Current Required (mA): 100
+
+            USB-PS/2 Optical Mouse:
+
+              Product ID: 0xc050
+              Vendor ID: 0x046d  (Logitech Inc.)
+              Version: 27.20
+              Speed: Up to 1.5 Mb/sec
+              Manufacturer: Logitech
+              Location ID: 0xfd130000 / 4
+              Current Available (mA): 500
+              Current Required (mA): 98
+
+            IR Receiver:
+
+              Product ID: 0x8242
+              Vendor ID: 0x05ac  (Apple Inc.)
+              Version: 0.16
+              Speed: Up to 1.5 Mb/sec
+              Manufacturer: Apple Computer, Inc.
+              Location ID: 0xfd110000 / 3
+              Current Available (mA): 500
+              Current Required (mA): 100
+
