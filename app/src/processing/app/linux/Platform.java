@@ -22,11 +22,18 @@
 
 package processing.app.linux;
 
-import java.io.File;
+import java.io.*;
+import java.util.Map;
+import java.util.Properties;
 
 import javax.swing.UIManager;
 
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.ExecuteStreamHandler;
+import org.apache.commons.exec.Executor;
 import processing.app.Preferences;
+import processing.app.debug.TargetPackage;
 import processing.core.PConstants;
 
 
@@ -123,5 +130,52 @@ public class Platform extends processing.app.Platform {
   @Override
   public String getName() {
     return PConstants.platformNames[PConstants.LINUX];
+  }
+
+  @Override
+  public String resolveDeviceAttachedTo(String serial, Map<String, TargetPackage> packages) {
+    Executor executor = new DefaultExecutor();
+
+    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    executor.setStreamHandler(new ExecuteStreamHandler() {
+      @Override
+      public void setProcessInputStream(OutputStream outputStream) throws IOException {
+      }
+
+      @Override
+      public void setProcessErrorStream(InputStream inputStream) throws IOException {
+      }
+
+      @Override
+      public void setProcessOutputStream(InputStream inputStream) throws IOException {
+        byte[] buf = new byte[4096];
+        int bytes = -1;
+        while ((bytes = inputStream.read(buf)) != -1) {
+          baos.write(buf, 0, bytes);
+        }
+      }
+
+      @Override
+      public void start() throws IOException {
+      }
+
+      @Override
+      public void stop() {
+      }
+    });
+
+    try {
+      CommandLine toDevicePath = CommandLine.parse("udevadm info -q path -n " + serial);
+      executor.execute(toDevicePath);
+      String devicePath = new String(baos.toByteArray());
+      baos.reset();
+      CommandLine commandLine = CommandLine.parse("udevadm info --query=property -p " + devicePath);
+      executor.execute(commandLine);
+      Properties properties = new Properties();
+      properties.load(new ByteArrayInputStream(baos.toByteArray()));
+      return super.resolveDeviceByVendorIdProductId(packages, properties.get("ID_VENDOR_ID").toString().toUpperCase(), properties.get("ID_MODEL_ID").toString().toUpperCase());
+    } catch (IOException e) {
+      return null;
+    }
   }
 }

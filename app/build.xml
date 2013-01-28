@@ -76,13 +76,13 @@
       <os family="unix"/>
     </condition>
 
-    <!--
-        <dirname property="blah" file="${java.home}" />
-        <echo message="here! ${java.home}/lib/tools.jar or there: ${blah}" />
-        <echo message="override ${env.JAVA_HOME}/lib/tools.jar" />
-        <fail />
-    -->
-    <javac source="1.5" target="1.5"
+<!--
+    <dirname property="blah" file="${java.home}" />
+    <echo message="here! ${java.home}/lib/tools.jar or there: ${blah}" />
+    <echo message="override ${env.JAVA_HOME}/lib/tools.jar" />
+    <fail />
+-->
+    <javac source="1.6" target="1.6"
 	   srcdir="src"
 	   destdir="bin"
 	   encoding="UTF-8"
@@ -97,7 +97,7 @@
   <target name="test" depends="compile" description="Runs the test">
     <mkdir dir="test-bin"/>
 
-    <javac source="1.5" target="1.5"
+    <javac source="1.6" target="1.6"
            srcdir="test"
            destdir="test-bin"
            encoding="UTF-8"

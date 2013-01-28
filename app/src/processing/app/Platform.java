@@ -24,11 +24,15 @@ package processing.app;
 import static processing.app.I18n._;
 
 import java.io.File;
+import java.util.Map;
 
 import javax.swing.UIManager;
 
 import com.sun.jna.Library;
 import com.sun.jna.Native;
+import processing.app.debug.TargetPackage;
+import processing.app.debug.TargetPlatform;
+import processing.app.helpers.PreferencesMap;
 import processing.core.PConstants;
 
 
@@ -129,10 +133,31 @@ public class Platform {
       showLauncherWarning();
     }
   }
-  
-  
-  // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  
-  
+
+  public String resolveDeviceAttachedTo(String device, Map<String, TargetPackage> packages) {
+    return null;
+  }
+
+  public String resolveDeviceByVendorIdProductId(Map<String, TargetPackage> packages, String vendorId, String productId) {
+    for (TargetPackage targetPackage : packages.values()) {
+      for (TargetPlatform targetPlatform : targetPackage.getPlatforms().values()) {
+        for (PreferencesMap board : targetPlatform.getBoards().values()) {
+          if (board.containsKey("vid_pid")) {
+            String[] vidPids = board.get("vid_pid").split(",");
+            for (String vidPid : vidPids) {
+              if (vidPid.toUpperCase().equals(vendorId + "_" + productId)) {
+                return board.get("name");
+              }
+            }
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 
   public interface CLibrary extends Library {
     CLibrary INSTANCE = (CLibrary)Native.loadLibrary("c", CLibrary.class);

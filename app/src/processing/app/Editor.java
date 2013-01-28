@@ -1002,7 +1002,13 @@ public class Editor extends JFrame implements RunnerListener {
         {
           //System.out.println("Adding port to serial port menu: " + commportidentifier);
           String curr_port = commportidentifier.getName();
-          rbMenuItem = new JCheckBoxMenuItem(curr_port, curr_port.equals(Preferences.get("serial.port")));
+
+          String description = curr_port;
+          String additionalDescription = Base.getPlatform().resolveDeviceAttachedTo(curr_port, Base.packages);
+          if (additionalDescription != null) {
+            description += " (" + additionalDescription + ")";
+          }
+          rbMenuItem = new JCheckBoxMenuItem(description, curr_port.equals(Preferences.get("serial.port")));
           rbMenuItem.addActionListener(serialMenuListener);
           //serialGroup.add(rbMenuItem);
           serialMenu.add(rbMenuItem);
