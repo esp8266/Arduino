@@ -601,10 +601,8 @@ static void USB_ISR(void)
 		udd_ack_out_received(CDC_RX);
 
 		// Handle received bytes
-		while (USBD_Available(CDC_RX))
+		if (USBD_Available(CDC_RX))
 			SerialUSB.accept();
-
-		udd_ack_fifocon(CDC_RX);
 	}
 
 	if (Is_udd_sof())
