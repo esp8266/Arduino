@@ -24,6 +24,8 @@ package processing.app;
 import static processing.app.I18n._;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.UIManager;
@@ -142,9 +144,11 @@ public class Platform {
     for (TargetPackage targetPackage : packages.values()) {
       for (TargetPlatform targetPlatform : targetPackage.getPlatforms().values()) {
         for (PreferencesMap board : targetPlatform.getBoards().values()) {
-          if (board.containsKey("vid_pid")) {
-            String[] vidPids = board.get("vid_pid").split(",");
-            for (String vidPid : vidPids) {
+          List<String> vids = new LinkedList<String>(board.createSubTree("vid").values());
+          if (!vids.isEmpty()) {
+            List<String> pids = new LinkedList<String>(board.createSubTree("pid").values());
+            for (int i = 0; i< vids.size(); i++) {
+              String vidPid = vids.get(i) + "_" + pids.get(i);
               if (vidPid.toUpperCase().equals(readVIDPID)) {
                 return board.get("name");
               }
