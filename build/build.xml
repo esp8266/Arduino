@@ -150,6 +150,9 @@
     <delete dir="macosx/working_dir" />
     <delete dir="macosx/working.dmg" />
     <delete file="macosx/arduino-*.dmg" />
+    <delete>
+      <fileset dir="macosx" includes="arduino-*macosx*.zip"/>
+    </delete>
   </target>
   
   <target name="macosx-checkos" unless="macosx">
@@ -277,7 +280,7 @@
              token="REVISION" value="${revision}" />
     
     <exec executable="zip" dir="macosx/work">
-      <arg line="-q -r ../arduino-${version}-macosx.zip ." />
+      <arg line="-q -r ../arduino-${version}-${platform}.zip ." />
     </exec>
     <!-- <exec executable="ditto" dir="macosx/work">
       <arg line="-c -k -rsrc . ../arduino-${version}-macosx.zip" />
@@ -287,7 +290,7 @@
       =======================================================
       Arduino for Mac OS X was built. Grab the image from   
       
-      macosx/arduino-${version}-macosx.zip
+      macosx/arduino-${version}-${platform}.zip
       =======================================================
     </echo>
   </target>
@@ -352,6 +355,9 @@
   
   <target name="linux-clean" depends="subprojects-clean" description="Clean linux version">
     <delete dir="linux/work" />
+    <delete>
+      <fileset dir="linux" includes="arduino-*linux*.tgz"/>
+    </delete>
   </target>
   
   <target name="linux-checkos" unless="linux">
@@ -513,7 +519,7 @@
       <arg value="-z"/>
       <arg value="-c"/>
       <arg value="-f"/>
-      <arg value="arduino-${version}-linux.tgz"/>
+      <arg value="arduino-${version}-${platform}.tgz"/>
       <arg value="arduino-${version}"/>
     </exec>
 
@@ -523,7 +529,7 @@
       =======================================================
       Arduino for Linux was built. Grab the archive from   
       
-      build/linux/arduino-${version}-linux.tgz
+      build/linux/arduino-${version}-${platform}.tgz
       =======================================================
     </echo>
   </target>
@@ -541,6 +547,9 @@
   <target name="windows-clean" depends="subprojects-clean"
 	  description="Clean windows version">
     <delete dir="windows/work" />
+    <delete>
+      <fileset dir="windows" includes="arduino-*windows*.zip"/>
+    </delete>
   </target>
   
   <target name="windows-checkos" unless="windows">
@@ -680,12 +689,12 @@
 	 excludes="java/**" />
     -->
 
-    <zip destfile="windows/arduino-${version}-windows.zip">
+    <zip destfile="windows/arduino-${version}-${platform}.zip">
       <zipfileset dir="windows/work" 
 		  prefix="arduino-${version}" />
     </zip>
 
-    <zip destfile="windows/arduino-${version}-windows-expert.zip">
+    <zip destfile="windows/arduino-${version}-${platform}-expert.zip">
       <zipfileset dir="windows/work" 
 		  prefix="arduino-${version}" 
 		  excludes="java/**" />
@@ -695,8 +704,8 @@
       =======================================================
       Arduino for Windows was built. Grab the archive from   
       
-      windows/arduino-${version}-windows.zip
-      windows/arduino-${version}-windows-expert.zip
+      windows/arduino-${version}-${platform}.zip
+      windows/arduino-${version}-${platform}-expert.zip
       =======================================================
     </echo>
   </target>
