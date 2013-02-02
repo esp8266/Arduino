@@ -16,6 +16,7 @@ ARDUINO 1.5.2 BETA - 2012.01.23
 * Extended command line build flags
 
 [arduino core]
+* sam: attachInterrupt() now works also on pins that belongs to PORTD
 * sam: portOutputRegister() is now writeable.
 * sam: fixed issue on weak-symbol for some interrupt handlers
 * sam: fixed BSoD on some Windows machine (louismdavis)
