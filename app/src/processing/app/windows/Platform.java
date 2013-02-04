@@ -316,7 +316,26 @@ public class Platform extends processing.app.Platform {
   }
 
   @Override
-  public String resolveDeviceAttachedTo(String serial, Map<String, TargetPackage> packages) {
+  public String resolveDeviceAttachedTo(String serial, Map<String, TargetPackage> packages, String devicesListOutput) {
+    if (devicesListOutput == null) {
+      return super.resolveDeviceAttachedTo(serial, packages, devicesListOutput);
+    }
+
+    try {
+      String vidPid = new ListComPortsParser().extractVIDAndPID(devicesListOutput, serial);
+
+      if (vidPid == null) {
+        return super.resolveDeviceAttachedTo(serial, packages, devicesListOutput);
+      }
+
+      return super.resolveDeviceByVendorIdProductId(packages, vidPid);
+    } catch (IOException e) {
+      return super.resolveDeviceAttachedTo(serial, packages, devicesListOutput);
+    }
+  }
+
+  @Override
+  public String preListAllCandidateDevices() {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     Executor executor = new ExternalProcessExecutor(baos);
 
@@ -325,17 +344,9 @@ public class Platform extends processing.app.Platform {
 
       CommandLine toDevicePath = CommandLine.parse(listComPorts);
       executor.execute(toDevicePath);
-      String vidPid = new ListComPortsParser().extractVIDAndPID(new String(baos.toByteArray()), serial);
-
-      if (vidPid == null) {
-        return super.resolveDeviceAttachedTo(serial, packages);
-      }
-
-      return super.resolveDeviceByVendorIdProductId(packages, vidPid);
+      return new String(baos.toByteArray());
     } catch (IOException e) {
-      return super.resolveDeviceAttachedTo(serial, packages);
+      return super.preListAllCandidateDevices();
     }
   }
-
-
 }

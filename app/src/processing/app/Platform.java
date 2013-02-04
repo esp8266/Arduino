@@ -136,7 +136,11 @@ public class Platform {
     }
   }
 
-  public String resolveDeviceAttachedTo(String serial, Map<String, TargetPackage> packages) {
+  public String resolveDeviceAttachedTo(String serial, Map<String, TargetPackage> packages, String devicesListOutput) {
+    return null;
+  }
+
+  public String preListAllCandidateDevices() {
     return null;
   }
 

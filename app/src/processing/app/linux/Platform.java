@@ -129,7 +129,7 @@ public class Platform extends processing.app.Platform {
   }
 
   @Override
-  public String resolveDeviceAttachedTo(String serial, Map<String, TargetPackage> packages) {
+  public String resolveDeviceAttachedTo(String serial, Map<String, TargetPackage> packages, String devicesListOutput) {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     Executor executor = new ExternalProcessExecutor(baos);
 
@@ -143,12 +143,12 @@ public class Platform extends processing.app.Platform {
       String vidPid = new UDevAdmParser().extractVIDAndPID(new String(baos.toByteArray()));
 
       if (vidPid == null) {
-        return super.resolveDeviceAttachedTo(serial, packages);
+        return super.resolveDeviceAttachedTo(serial, packages, devicesListOutput);
       }
 
       return super.resolveDeviceByVendorIdProductId(packages, vidPid);
     } catch (IOException e) {
-      return super.resolveDeviceAttachedTo(serial, packages);
+      return super.resolveDeviceAttachedTo(serial, packages, devicesListOutput);
     }
   }
 }
