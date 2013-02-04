@@ -23,11 +23,10 @@
 package processing.app.linux;
 
 import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.ExecuteStreamHandler;
 import org.apache.commons.exec.Executor;
 import processing.app.Preferences;
 import processing.app.debug.TargetPackage;
+import processing.app.tools.ExternalProcessExecutor;
 import processing.core.PConstants;
 
 import java.io.*;
@@ -131,35 +130,8 @@ public class Platform extends processing.app.Platform {
 
   @Override
   public String resolveDeviceAttachedTo(String serial, Map<String, TargetPackage> packages) {
-    Executor executor = new DefaultExecutor();
-
-    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    executor.setStreamHandler(new ExecuteStreamHandler() {
-      @Override
-      public void setProcessInputStream(OutputStream outputStream) throws IOException {
-      }
-
-      @Override
-      public void setProcessErrorStream(InputStream inputStream) throws IOException {
-      }
-
-      @Override
-      public void setProcessOutputStream(InputStream inputStream) throws IOException {
-        byte[] buf = new byte[4096];
-        int bytes = -1;
-        while ((bytes = inputStream.read(buf)) != -1) {
-          baos.write(buf, 0, bytes);
-        }
-      }
-
-      @Override
-      public void start() throws IOException {
-      }
-
-      @Override
-      public void stop() {
-      }
-    });
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    Executor executor = new ExternalProcessExecutor(baos);
 
     try {
       CommandLine toDevicePath = CommandLine.parse("udevadm info -q path -n " + serial);
