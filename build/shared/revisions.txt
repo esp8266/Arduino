@@ -14,6 +14,7 @@ ARDUINO 1.5.2 BETA - 2012.01.23
 * Deleting tab from IDE does not delete from temporary folder
 * Fixed NPE when unknown boards/platforms are selected in preferences
 * Extended command line build flags
+* Undo/Redo move cursor and focus to where the code has been undone/redone
 
 [arduino core]
 * sam: attachInterrupt() now works also on pins that belongs to PORTD
