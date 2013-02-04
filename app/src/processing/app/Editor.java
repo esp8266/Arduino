@@ -99,7 +99,6 @@ public class Editor extends JFrame implements RunnerListener {
   static List<JMenu> boardsMenus;
   static JMenu serialMenu;
 
-  static SerialMenuListener serialMenuListener;
   static SerialMonitor serialMonitor;
   
   EditorHeader header;
@@ -709,8 +708,6 @@ public class Editor extends JFrame implements RunnerListener {
       base.rebuildImportMenu(importMenu, this);
     }
     
-    if (serialMenuListener == null)
-      serialMenuListener  = new SerialMenuListener();
     if (serialMenu == null)
       serialMenu = new JMenu(_("Serial Port"));
     populateSerialMenu();
@@ -927,25 +924,20 @@ public class Editor extends JFrame implements RunnerListener {
 
 
   class SerialMenuListener implements ActionListener {
-    //public SerialMenuListener() { }
+
+    private final String serialPort;
+
+    public SerialMenuListener(String serialPort) {
+      this.serialPort = serialPort;
+    }
 
     public void actionPerformed(ActionEvent e) {
-      selectSerialPort(((JCheckBoxMenuItem)e.getSource()).getText());
+      selectSerialPort(serialPort);
       base.onBoardOrPortChange();
     }
 
-    /*
-    public void actionPerformed(ActionEvent e) {
-      System.out.println(e.getSource());
-      String name = e.getActionCommand();
-      PdeBase.properties.put("serial.port", name);
-      System.out.println("set to " + get("serial.port"));
-      //editor.skOpen(path + File.separator + name, name);
-      // need to push "serial.port" into PdeBase.properties
-    }
-    */
   }
-  
+
   protected void selectSerialPort(String name) {
     if(serialMenu == null) {
       System.out.println(_("serialMenu is null"));
@@ -1010,7 +1002,7 @@ public class Editor extends JFrame implements RunnerListener {
             description += " (" + additionalDescription + ")";
           }
           rbMenuItem = new JCheckBoxMenuItem(description, curr_port.equals(Preferences.get("serial.port")));
-          rbMenuItem.addActionListener(serialMenuListener);
+          rbMenuItem.addActionListener(new SerialMenuListener(curr_port));
           //serialGroup.add(rbMenuItem);
           serialMenu.add(rbMenuItem);
           empty = false;
