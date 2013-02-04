@@ -276,6 +276,52 @@
     </exec>
   </target>
 
+  <!-- - - - - - - - - - - - - - - - -->
+  <!-- Sign application for MacOSX.  -->
+  <!-- - - - - - - - - - - - - - - - -->
+  <target name="macosx-signed-dist" if="macosx" depends="macosx-singed-dist-check, dist"
+    description="Create a downloadable and signed .zip for the Mac OS X version">
+    <fail unless="version" message="Please set the property 'version' to correctly sign distribution file" />
+
+    <!-- Remove everything from working folder -->
+    <delete dir="macosx/work/Arduino.app" />
+
+    <!-- Unzip unsigned app into working dir -->
+    <unzip dest="macosx/work" src="macosx/arduino-${version}-${platform}.zip" overwrite="false"/>
+
+    <!-- Unlock keychain file -->
+    <exec executable="security" dir="macosx/work">
+      <arg line="unlock-keychain -p &quot;${macosx-sign-keychain-pass}&quot; &quot;${macosx-sign-keychain}&quot;" />
+    </exec>
+
+    <!-- Sign app -->
+    <exec executable="codesign" dir="macosx/work" failonerror="true">
+      <arg line="--keychain &quot;${macosx-sign-keychain}&quot; -s &quot;${macosx-sign-id}&quot; -v Arduino.app/" />
+    </exec>
+
+    <!-- Create signed zip file -->
+    <exec executable="zip" dir="macosx/work">
+      <arg line="-q -r ../arduino-${version}-${platform}-signed.zip ." />
+    </exec>
+
+    <echo>
+      =======================================================
+      Arduino for Mac OS X built and signed.
+
+      macosx/arduino-${version}-${platform}-signed.zip
+      =======================================================
+    </echo>
+  </target>
+
+  <target name="macosx-singed-dist-check">
+    <fail unless="macosx-sign-keychain" message="Please set the property 'macosx-sign-keychain' to the correct keychain file" />
+    <fail unless="macosx-sign-keychain-pass" message="Please set the property 'macosx-sign-keychain-pass' with the password to unlock the keychain" />
+    <fail unless="macosx-sign-id" message="Please set the property 'macosx-sign-id' to the correct cert identifier" />
+  </target>
+
+  <!-- - - - - - - - - - - - - - - - - - - -->
+  <!-- Build distribution file for MacOSX. -->
+  <!-- - - - - - - - - - - - - - - - - - - -->
   <target name="macosx-dist" if="macosx" depends="macosx-build" description="Create a downloadable .zip for the Mac OS X version">
     <!-- The ant copy command does not preserve permissions. -->
     <chmod file="macosx/work/Arduino.app/Contents/MacOS/JavaApplicationStub" perm="+x" />
