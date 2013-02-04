@@ -669,9 +669,11 @@
     <!-- Copy bossac.exe tool -->
     <copy todir="windows/work/hardware/tools">
       <fileset file="windows/bossac.exe" />
+      <fileset file="windows/listComPorts.exe" />
     </copy>
     <chmod perm="755">
       <fileset file="windows/work/hardware/tools/bossac.exe" />
+      <fileset file="windows/work/hardware/tools/listComPorts.exe" />
     </chmod>
 
     <antcall target="assemble">

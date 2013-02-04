@@ -22,17 +22,23 @@
 
 package processing.app.windows;
 
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-
 import com.sun.jna.Library;
 import com.sun.jna.Native;
-
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.Executor;
 import processing.app.Base;
 import processing.app.Preferences;
+import processing.app.debug.TargetPackage;
+import processing.app.tools.ExternalProcessExecutor;
 import processing.app.windows.Registry.REGISTRY_ROOT_KEY;
 import processing.core.PApplet;
 import processing.core.PConstants;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.Map;
 
 
 // http://developer.apple.com/documentation/QuickTime/Conceptual/QT7Win_Update_Guide/Chapter03/chapter_3_section_1.html
@@ -308,5 +314,28 @@ public class Platform extends processing.app.Platform {
   public String getName() {
     return PConstants.platformNames[PConstants.WINDOWS];
   }
+
+  @Override
+  public String resolveDeviceAttachedTo(String serial, Map<String, TargetPackage> packages) {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    Executor executor = new ExternalProcessExecutor(baos);
+
+    try {
+      String listComPorts = new File(System.getProperty("user.dir"), "hardware/tools/listComPorts.exe").getCanonicalPath();
+
+      CommandLine toDevicePath = CommandLine.parse(listComPorts);
+      executor.execute(toDevicePath);
+      String vidPid = new ListComPortsParser().extractVIDAndPID(new String(baos.toByteArray()), serial);
+
+      if (vidPid == null) {
+        return super.resolveDeviceAttachedTo(serial, packages);
+      }
+
+      return super.resolveDeviceByVendorIdProductId(packages, vidPid);
+    } catch (IOException e) {
+      return super.resolveDeviceAttachedTo(serial, packages);
+    }
+  }
+
 
 }
