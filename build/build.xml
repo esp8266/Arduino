@@ -639,6 +639,8 @@
       <fileset file="shared/revisions.txt" />
     </copy>
 
+    <fixcrlf file="windows/work/revisions.txt" eol="dos"/>
+
     <copy todir="windows/work">
       <fileset dir="windows/dist" includes="*.dll" />
     </copy>
