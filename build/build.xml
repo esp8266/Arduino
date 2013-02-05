@@ -287,7 +287,9 @@
     <delete dir="macosx/work/Arduino.app" />
 
     <!-- Unzip unsigned app into working dir -->
-    <unzip dest="macosx/work" src="macosx/arduino-${version}-${platform}.zip" overwrite="false"/>
+    <exec executable="unzip" dir="macosx/work">
+      <arg line="../arduino-${version}-${platform}.zip" />
+    </exec>
 
     <!-- Unlock keychain file -->
     <exec executable="security" dir="macosx/work">
@@ -299,9 +301,11 @@
       <arg line="--keychain &quot;${macosx-sign-keychain}&quot; -s &quot;${macosx-sign-id}&quot; -v Arduino.app/" />
     </exec>
 
+    <delete file="macosx/arduino-${version}-${platform}.zip" />
+
     <!-- Create signed zip file -->
     <exec executable="zip" dir="macosx/work">
-      <arg line="-q -r ../arduino-${version}-${platform}-signed.zip ." />
+      <arg line="-q -r ../arduino-${version}-${platform}.zip ." />
     </exec>
 
     <echo>
@@ -349,7 +353,7 @@
       =======================================================
       Arduino for Mac OS X was built. Grab the image from
       
-      build/macosx/arduino-${version}-${platform}.zip
+      macosx/arduino-${version}-${platform}.zip
       =======================================================
     </echo>
   </target>
