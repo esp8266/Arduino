@@ -1,0 +1,122 @@
+; Copyright 2012 Blacklabel Development, Inc.
+
+[Strings]
+DriverPackageDisplayName="Arduino Boards"
+ManufacturerName="Arduino LLC (www.arduino.cc)"
+ServiceName="USB RS-232 Emulation Driver"
+due.bossa.name="Bossa Program Port"
+due.programming_port.name="Arduino Due Programming Port"
+due.sketch.name="Arduino Due"
+esplora.bootloader.name="Arduino Esplora bootloader"
+esplora.sketch.name="Arduino Esplora"
+leonardo.bootloader.name="Arduino Leonardo bootloader"
+leonardo.sketch.name="Arduino Leonardo"
+lilypadUSB.bootloader.name="Arduino LilyPad USB bootloader"
+lilypadUSB.sketch.name="Arduino LilyPad USB"
+mega2560rev3.name="Arduino Mega 2560"
+megaADK.name="Arduino Mega ADK"
+megaADKrev3.name="Arduino Mega ADK"
+micro.bootloader.name="Arduino Micro bootloader"
+micro.sketch.name="Arduino Micro"
+uno.name="Arduino Uno"
+unoR3.name="Arduino Uno"
+usbserial.name="Arduino USB Serial Light Adapter"
+
+[DefaultInstall]
+CopyINF=arduino.inf
+
+[Version]
+Class=Ports
+ClassGuid={4D36E978-E325-11CE-BFC1-08002BE10318}
+Signature="$Windows NT$"
+Provider=%ManufacturerName%
+DriverPackageDisplayName=%DriverPackageDisplayName%
+CatalogFile=arduino.cat
+DriverVer=01/01/2013,1.0.0.0
+
+[Manufacturer]
+%ManufacturerName%=DeviceList, NTamd64, NTia64
+
+[DestinationDirs]
+FakeModemCopyFileSection=12
+DefaultDestDir=12
+
+[DeviceList]
+%due.bossa.name%=DriverInstall, USB\VID_03EB&PID_6124
+%due.programming_port.name%=DriverInstall, USB\VID_2341&PID_003D
+%due.sketch.name%=DriverInstall, USB\VID_2341&PID_003E&MI_00
+%esplora.bootloader.name%=DriverInstall, USB\VID_2341&PID_003C
+%esplora.sketch.name%=DriverInstall, USB\VID_2341&PID_803C&MI_00
+%leonardo.bootloader.name%=DriverInstall, USB\VID_2341&PID_0036
+%leonardo.sketch.name%=DriverInstall, USB\VID_2341&PID_8036&MI_00
+%lilypadUSB.bootloader.name%=DriverInstall, USB\VID_1B4F&PID_9207
+%lilypadUSB.sketch.name%=DriverInstall, USB\VID_1B4F&PID_9208&MI_00
+%mega2560rev3.name%=DriverInstall, USB\VID_2341&PID_0042
+%mega2560.name%=DriverInstall, USB\VID_2341&PID_0010
+%megaADK.name%=DriverInstall, USB\VID_2341&PID_003F
+%megaADKrev3.name%=DriverInstall, USB\VID_2341&PID_0044
+%micro.bootloader.name%=DriverInstall, USB\VID_2341&PID_0037
+%micro.sketch.name%=DriverInstall, USB\VID_2341&PID_8037&MI_00
+%uno.name%=DriverInstall, USB\VID_2341&PID_0001
+%unoR3.name%=DriverInstall, USB\VID_2341&PID_0043
+%usbserial.name%=DriverInstall, USB\VID_2341&PID_003B
+
+[DeviceList.NTamd64]
+%due.bossa.name%=DriverInstall, USB\VID_03EB&PID_6124
+%due.programming_port.name%=DriverInstall, USB\VID_2341&PID_003D
+%due.sketch.name%=DriverInstall, USB\VID_2341&PID_003E&MI_00
+%esplora.bootloader.name%=DriverInstall, USB\VID_2341&PID_003C
+%esplora.sketch.name%=DriverInstall, USB\VID_2341&PID_803C&MI_00
+%leonardo.bootloader.name%=DriverInstall, USB\VID_2341&PID_0036
+%leonardo.sketch.name%=DriverInstall, USB\VID_2341&PID_8036&MI_00
+%lilypadUSB.bootloader.name%=DriverInstall, USB\VID_1B4F&PID_9207
+%lilypadUSB.sketch.name%=DriverInstall, USB\VID_1B4F&PID_9208&MI_00
+%mega2560rev3.name%=DriverInstall, USB\VID_2341&PID_0042
+%mega2560.name%=DriverInstall, USB\VID_2341&PID_0010
+%megaADK.name%=DriverInstall, USB\VID_2341&PID_003F
+%megaADKrev3.name%=DriverInstall, USB\VID_2341&PID_0044
+%micro.bootloader.name%=DriverInstall, USB\VID_2341&PID_0037
+%micro.sketch.name%=DriverInstall, USB\VID_2341&PID_8037&MI_00
+%uno.name%=DriverInstall, USB\VID_2341&PID_0001
+%unoR3.name%=DriverInstall, USB\VID_2341&PID_0043
+%usbserial.name%=DriverInstall, USB\VID_2341&PID_003B
+
+[DeviceList.NTia64]
+%esplora.bootloader.name%=DriverInstall, USB\VID_2341&PID_003C
+%esplora.sketch.name%=DriverInstall, USB\VID_2341&PID_803C&MI_00
+%leonardo.bootloader.name%=DriverInstall, USB\VID_2341&PID_0036
+%leonardo.sketch.name%=DriverInstall, USB\VID_2341&PID_8036&MI_00
+%lilypadUSB.bootloader.name%=DriverInstall, USB\VID_1B4F&PID_9207
+%lilypadUSB.sketch.name%=DriverInstall, USB\VID_1B4F&PID_9208&MI_00
+%mega2560rev3.name%=DriverInstall, USB\VID_2341&PID_0042
+%mega2560.name%=DriverInstall, USB\VID_2341&PID_0010
+%megaADK.name%=DriverInstall, USB\VID_2341&PID_003F
+%megaADKrev3.name%=DriverInstall, USB\VID_2341&PID_0044
+%micro.bootloader.name%=DriverInstall, USB\VID_2341&PID_0037
+%micro.sketch.name%=DriverInstall, USB\VID_2341&PID_8037&MI_00
+%uno.name%=DriverInstall, USB\VID_2341&PID_0001
+%unoR3.name%=DriverInstall, USB\VID_2341&PID_0043
+%usbserial.name%=DriverInstall, USB\VID_2341&PID_003B
+
+[DriverInstall]
+include=mdmcpq.inf,usb.inf
+CopyFiles = FakeModemCopyFileSection
+AddReg=DriverAddReg
+
+[DriverAddReg]
+HKR,,DevLoader,,*ntkern 
+HKR,,NTMPDriver,,usbser.sys 
+HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider"
+
+[DriverInstall.Services]
+include=mdmcpq.inf
+AddService=usbser, 0x00000002, DriverService
+
+[DriverService]
+DisplayName=%ServiceName%
+ServiceType=1
+StartType=3
+ErrorControl=1
+ServiceBinary=%12%\usbser.sys
+LoadOrderGroup=Base
+
