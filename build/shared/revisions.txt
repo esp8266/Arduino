@@ -23,8 +23,9 @@ ARDUINO 1.5.2 BETA - 2012.01.23
 * sam: fixed BSoD on some Windows machine (louismdavis)
 * sam: added CANRX1/CANTX1 pins 88/89 (same physical pin for 66/53)
 * sam: fixed analogWrite when used in very thight write loops (V.Dorrich)
-* sam: fixed USBSerial.write() while sending big buffers (Bill Dreschel)
-* sam: USBSerial receive buffer size is now 512 (PeterVH)
+* sam: fixed SerialUSB.write() while sending big buffers (Bill Dreschel)
+* sam: SerialUSB receive buffer size is now 512 (PeterVH)
+* sam: Fixed SerialUSB data handshake when host sends a lot of data (PeterVH, stimmer)
 
 [libraries]
 * sam: Added Servo library
