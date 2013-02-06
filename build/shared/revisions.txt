@@ -1,5 +1,5 @@
 
-ARDUINO 1.5.2 BETA - 2012.01.23
+ARDUINO 1.5.2 BETA - 2013.02.06
 
 [ide]
 * Scrollable editor tabs (Shigheru KANEMOTO)
