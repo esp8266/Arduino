@@ -55,7 +55,7 @@ public class TargetPlatform {
 
     try {
       File boardsFile = new File(_folder, "boards.txt");
-      if (boardsFile.exists()) {
+      if (boardsFile.exists() && boardsFile.canRead()) {
         PreferencesMap boardPreferences = new PreferencesMap();
         boardPreferences.load(boardsFile);
         boards = boardPreferences.createFirstLevelMap();
@@ -69,15 +69,16 @@ public class TargetPlatform {
 
     try {
       File platformsFile = new File(_folder, "platform.txt");
-      if (platformsFile.exists())
+      if (platformsFile.exists() && platformsFile.canRead()) {
         preferences.load(platformsFile);
+      }
     } catch (Exception e) {
       System.err.println("Error loading platforms from platform.txt: " + e);
     }
 
     try {
       File programmersFile = new File(_folder, "programmers.txt");
-      if (programmersFile.exists()) {
+      if (programmersFile.exists() && programmersFile.canRead()) {
         PreferencesMap prefs = new PreferencesMap();
         prefs.load(programmersFile);
         programmers = prefs.createFirstLevelMap();
