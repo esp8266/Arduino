@@ -14,6 +14,7 @@
 * Sort entries in preferences.txt (Shigeru Kanemoto)
 * Fixed some wrong translations
 * Fixed NPE due to permissions IO error
+* Updated drivers for Windows (all-in-one, signature for Win8)
 
 ARDUINO 1.0.3 - 2012.12.10
 
