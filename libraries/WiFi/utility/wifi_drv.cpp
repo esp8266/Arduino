@@ -53,6 +53,26 @@ void WiFiDrv::getNetworkData(uint8_t *ip, uint8_t *mask, uint8_t *gwip)
     SpiDrv::spiSlaveDeselect();
 }
 
+void WiFiDrv::getRemoteData(uint8_t sock, uint8_t *ip, uint8_t *port)
+{
+    tParam params[PARAM_NUMS_2] = { {0, (char*)ip}, {0, (char*)port} };
+
+    WAIT_FOR_SLAVE_SELECT();
+
+    // Send Command
+    SpiDrv::sendCmd(GET_REMOTE_DATA_CMD, PARAM_NUMS_1);
+    SpiDrv::sendParam(&sock, sizeof(sock), LAST_PARAM);
+
+    //Wait the reply elaboration
+    SpiDrv::waitForSlaveReady();
+
+    // Wait for reply
+    SpiDrv::waitResponseParams(GET_REMOTE_DATA_CMD, PARAM_NUMS_2, params);
+
+    SpiDrv::spiSlaveDeselect();
+}
+
+
 // Public Methods
 
 

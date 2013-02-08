@@ -129,6 +129,7 @@ void WiFiClient::stop() {
     return;
 
   ServerDrv::stopClient(_sock);
+  WiFiClass::_state[_sock] = NA_STATE;
 
   unsigned long start = millis();
   
@@ -169,7 +170,7 @@ WiFiClient::operator bool() {
 uint8_t WiFiClient::getFirstSocket()
 {
     for (int i = 0; i < MAX_SOCK_NUM; i++) {
-      if (WiFiClass::_state[i] == 0)
+      if (WiFiClass::_state[i] == NA_STATE)
       {
           return i;
       }

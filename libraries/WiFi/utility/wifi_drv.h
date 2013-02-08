@@ -4,6 +4,7 @@
 #include <inttypes.h>
 #include "wifi_spi.h"
 #include "IPAddress.h"
+#include "../WiFiUdp.h"
 
 // Key index length
 #define KEY_IDX_LEN     1
@@ -39,6 +40,11 @@ private:
     static uint8_t reqHostByName(const char* aHostname);
 
     static int getHostByName(IPAddress& aResult);
+
+    /*
+     * Get remote Data information on UDP socket
+     */
+    static void getRemoteData(uint8_t sock, uint8_t *ip, uint8_t *port);
 
 public:
 
@@ -211,6 +217,8 @@ public:
      * result: version as string with this format a.b.c
      */
     static char* getFwVersion();
+
+    friend class WiFiUDP;
 
 };
 

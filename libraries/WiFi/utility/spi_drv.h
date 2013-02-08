@@ -4,7 +4,7 @@
 #include <inttypes.h>
 #include "wifi_spi.h"
 
-#define SPI_START_CMD_DELAY 	12
+#define SPI_START_CMD_DELAY 	10
 
 #define NO_LAST_PARAM   0
 #define LAST_PARAM      1

@@ -21,6 +21,7 @@ void WiFiServer::begin()
     {
         ServerDrv::startServer(_port, _sock);
         WiFiClass::_server_port[_sock] = _port;
+        WiFiClass::_state[_sock] = _sock;
     }
 }
 
