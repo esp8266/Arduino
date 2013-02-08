@@ -654,7 +654,10 @@ public class Base {
 
     // Make an empty pde file
     File newbieFile = new File(newbieDir, newbieName + ".ino");
-    new FileOutputStream(newbieFile);  // create the file
+    if (!newbieFile.createNewFile()) {
+      throw new IOException();
+    }
+    FileUtils.copyFile(new File(getContentFile("examples"), "01.Basics" + File.separator + "BareMinimum" + File.separator + "BareMinimum.ino"), newbieFile);
     return newbieFile.getAbsolutePath();
   }
 

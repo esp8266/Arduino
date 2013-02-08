@@ -1,5 +1,5 @@
 
-ARDUINO 1.5.2 BETA - 2012.01.23
+ARDUINO 1.5.2 BETA - 2013.02.06
 
 [ide]
 * Scrollable editor tabs (Shigheru KANEMOTO)
@@ -14,15 +14,18 @@ ARDUINO 1.5.2 BETA - 2012.01.23
 * Deleting tab from IDE does not delete from temporary folder
 * Fixed NPE when unknown boards/platforms are selected in preferences
 * Extended command line build flags
+* Undo/Redo move cursor and focus to where the code has been undone/redone
 
 [arduino core]
+* sam: attachInterrupt() now works also on pins that belongs to PORTD
 * sam: portOutputRegister() is now writeable.
 * sam: fixed issue on weak-symbol for some interrupt handlers
 * sam: fixed BSoD on some Windows machine (louismdavis)
 * sam: added CANRX1/CANTX1 pins 88/89 (same physical pin for 66/53)
 * sam: fixed analogWrite when used in very thight write loops (V.Dorrich)
-* sam: fixed USBSerial.write() while sending big buffers (Bill Dreschel)
-* sam: USBSerial receive buffer size is now 512 (PeterVH)
+* sam: fixed SerialUSB.write() while sending big buffers (Bill Dreschel)
+* sam: SerialUSB receive buffer size is now 512 (PeterVH)
+* sam: Fixed SerialUSB data handshake when host sends a lot of data (PeterVH, stimmer)
 
 [libraries]
 * sam: Added Servo library
@@ -90,6 +93,7 @@ ARDUINO 1.0.4 - Not yet released.
 * Sort entries in preferences.txt (Shigeru Kanemoto)
 * Fixed some wrong translations
 * Fixed NPE due to permissions IO error
+* Updated drivers for Windows (all-in-one, signature for Win8)
 
 ARDUINO 1.0.3 - 2012.12.10
 

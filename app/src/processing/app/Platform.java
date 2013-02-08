@@ -76,7 +76,7 @@ public class Platform {
   public File getSettingsFolder() throws Exception {
     // otherwise make a .processing directory int the user's home dir
     File home = new File(System.getProperty("user.home"));
-    File dataFolder = new File(home, ".arduino");
+    File dataFolder = new File(home, ".arduino15");
     return dataFolder;
 
     /*

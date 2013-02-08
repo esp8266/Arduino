@@ -155,18 +155,39 @@ void Serial_::end(void)
 
 void Serial_::accept(void)
 {
+	static uint32_t guard = 0;
+
+	// synchronized access to guard
+	do {
+		if (__LDREXW(&guard) != 0) {
+			__CLREX();
+			return;  // busy
+		}
+	} while (__STREXW(1, &guard) != 0); // retry until write succeed
+
 	ring_buffer *buffer = &cdc_rx_buffer;
-	uint32_t c = USBD_Recv(CDC_RX);
 	uint32_t i = (uint32_t)(buffer->head+1) % CDC_SERIAL_BUFFER_SIZE;
 
 	// if we should be storing the received character into the location
 	// just before the tail (meaning that the head would advance to the
 	// current location of the tail), we're about to overflow the buffer
 	// and so we don't write the character or advance the head.
-	if (i != buffer->tail) {
+	while (i != buffer->tail) {
+		uint32_t c;
+		if (!USBD_Available(CDC_RX)) {
+			udd_ack_fifocon(CDC_RX);
+			break;
+		}
+		c = USBD_Recv(CDC_RX);
+		// c = UDD_Recv8(CDC_RX & 0xF);
 		buffer->buffer[buffer->head] = c;
 		buffer->head = i;
+
+		i = (i + 1) % CDC_SERIAL_BUFFER_SIZE;
 	}
+
+	// release the guard
+	guard = 0;
 }
 
 int Serial_::available(void)
@@ -202,6 +223,8 @@ int Serial_::read(void)
 	{
 		unsigned char c = buffer->buffer[buffer->tail];
 		buffer->tail = (unsigned int)(buffer->tail + 1) % CDC_SERIAL_BUFFER_SIZE;
+		if (USBD_Available(CDC_RX))
+			accept();
 		return c;
 	}
 }

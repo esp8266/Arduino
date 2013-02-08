@@ -50,7 +50,7 @@ public class PreferencesMap extends LinkedHashMap<String, String> {
    * @throws FileNotFoundException
    * @throws IOException
    */
-  public void load(File file) throws FileNotFoundException, IOException {
+  public void load(File file) throws IOException {
     load(new FileInputStream(file));
   }
 
