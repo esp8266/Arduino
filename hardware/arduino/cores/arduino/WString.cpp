@@ -642,4 +642,8 @@ long String::toInt(void) const
 	return 0;
 }
 
+char* String::c_str() const
+{
+	return buffer;
+}
 

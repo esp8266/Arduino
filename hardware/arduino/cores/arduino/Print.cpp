@@ -53,11 +53,8 @@ size_t Print::print(const __FlashStringHelper *ifsh)
 
 size_t Print::print(const String &s)
 {
-  size_t n = 0;
-  for (uint16_t i = 0; i < s.length(); i++) {
-    n += write(s[i]);
-  }
-  return n;
+  write((const uint8_t*)s.c_str(), s.length());
+  return s.length();
 }
 
 size_t Print::print(const char str[])
