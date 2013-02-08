@@ -41,6 +41,7 @@ import processing.app.SketchCode;
 import processing.app.helpers.PreferencesMap;
 import processing.app.helpers.StringReplacer;
 import processing.app.helpers.filefilters.OnlyDirs;
+import processing.app.packages.Library;
 import processing.core.PApplet;
 
 public class Compiler implements MessageConsumer {
@@ -84,8 +85,8 @@ public class Compiler implements MessageConsumer {
     includePaths.add(prefs.get("build.core.path"));
     if (prefs.get("build.variant.path").length() != 0)
       includePaths.add(prefs.get("build.variant.path"));
-    for (File file : sketch.getImportedLibraries())
-      includePaths.add(file.getPath());
+    for (Library lib : sketch.getImportedLibraries())
+      includePaths.add(lib.getRootFolder().getPath());
 
     // 1. compile the sketch (already in the buildPath)
     sketch.setCompilingProgress(30);
@@ -580,11 +581,12 @@ public class Compiler implements MessageConsumer {
   // <buildPath>/<library>/
   void compileLibraries(List<String> includePaths) throws RunnerException {
     File outputPath = new File(prefs.get("build.path"));
-    for (File libraryFolder : sketch.getImportedLibraries()) {
-      if (new File(libraryFolder.getParentFile(), "library.properties").exists()) {
-        recursiveCompileLibrary(outputPath, libraryFolder, includePaths);
+    for (Library lib : sketch.getImportedLibraries()) {
+      File libFolder = lib.getRootFolder();
+      if (lib.isNewLib()) {
+        recursiveCompileLibrary(outputPath, libFolder, includePaths);
       } else {
-        compileLibrary(outputPath, libraryFolder, includePaths);
+        compileLibrary(outputPath, libFolder, includePaths);
       }
     }
   }

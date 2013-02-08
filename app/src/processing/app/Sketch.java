@@ -29,6 +29,8 @@ import processing.app.debug.RunnerException;
 import processing.app.debug.Sizer;
 import processing.app.debug.Uploader;
 import processing.app.helpers.PreferencesMap;
+import processing.app.packages.Library;
+import processing.app.packages.LibraryList;
 import processing.app.preproc.*;
 import processing.core.*;
 import static processing.app.I18n._;
@@ -96,7 +98,7 @@ public class Sketch {
   /**
    * List of library folders. 
    */
-  private ArrayList<File> importedLibraries;
+  private LibraryList importedLibraries;
 
   /**
    * path is location of the main .pde file, because this is also
@@ -1421,18 +1423,18 @@ public class Sketch {
 
     // grab the imports from the code just preproc'd
 
-    importedLibraries = new ArrayList<File>();
+    importedLibraries = new LibraryList();
     //Remember to clear library path before building it.
     libraryPath = "";
     for (String item : preprocessor.getExtraImports()) {
 
-        File libFolder = (File) Base.importToLibraryTable.get(item);
-        //If needed can Debug libraryPath here
+      Library lib = Base.importToLibraryTable.get(item);
+      //If needed can Debug libraryPath here
 
-      if (libFolder != null && !importedLibraries.contains(libFolder)) {
-        importedLibraries.add(libFolder);
+      if (lib != null && !importedLibraries.contains(lib)) {
+        importedLibraries.add(lib);
         //classPath += Compiler.contentsToClassPath(libFolder);
-        libraryPath += File.pathSeparator + libFolder.getAbsolutePath();
+        libraryPath += File.pathSeparator + lib.getRootFolder().getAbsolutePath();
       }
     }
 
@@ -1462,7 +1464,7 @@ public class Sketch {
   }
 
 
-  public ArrayList<File> getImportedLibraries() {
+  public LibraryList getImportedLibraries() {
     return importedLibraries;
   }
 
