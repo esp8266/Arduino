@@ -8,6 +8,7 @@ arduino_due_x_dbg.upload.wait_for_upload_port=false
 arduino_due_x_dbg.upload.native_usb=false
 arduino_due_x_dbg.build.mcu=cortex-m3
 arduino_due_x_dbg.build.f_cpu=84000000L
+arduino_due_x_dbg.build.board=ARDUINO_DUE
 arduino_due_x_dbg.build.core=arduino
 arduino_due_x_dbg.build.extra_flags=-D__SAM3X8E__ -mthumb -DUSB_PID={build.pid} -DUSB_VID={build.vid} -DUSBCON
 arduino_due_x_dbg.build.ldscript=linker_scripts/gcc/flash.ld
@@ -25,6 +26,7 @@ arduino_due_x.upload.wait_for_upload_port=true
 arduino_due_x.upload.native_usb=true
 arduino_due_x.build.mcu=cortex-m3
 arduino_due_x.build.f_cpu=84000000L
+arduino_due_x.build.board=ARDUINO_DUE
 arduino_due_x.build.core=arduino
 arduino_due_x.build.extra_flags=-D__SAM3X8E__ -mthumb -DUSB_PID={build.pid} -DUSB_VID={build.vid} -DUSBCON
 arduino_due_x.build.ldscript=linker_scripts/gcc/flash.ld
