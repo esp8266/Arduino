@@ -142,6 +142,7 @@ public class Compiler implements MessageConsumer {
 
     p.put("build.path", _buildPath);
     p.put("build.project_name", _primaryClassName);
+    p.put("build.arch", targetPlatform.getName().toUpperCase());
     
     if (!p.containsKey("compiler.path"))
       p.put("compiler.path", Base.getAvrBasePath());
