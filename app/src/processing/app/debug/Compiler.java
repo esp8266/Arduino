@@ -86,7 +86,7 @@ public class Compiler implements MessageConsumer {
     if (prefs.get("build.variant.path").length() != 0)
       includePaths.add(prefs.get("build.variant.path"));
     for (Library lib : sketch.getImportedLibraries())
-      includePaths.add(lib.getRootFolder().getPath());
+      includePaths.add(lib.getSrcFolder().getPath());
 
     // 1. compile the sketch (already in the buildPath)
     sketch.setCompilingProgress(30);
@@ -582,11 +582,11 @@ public class Compiler implements MessageConsumer {
   void compileLibraries(List<String> includePaths) throws RunnerException {
     File outputPath = new File(prefs.get("build.path"));
     for (Library lib : sketch.getImportedLibraries()) {
-      File libFolder = lib.getRootFolder();
-      if (lib.isNewLib()) {
-        recursiveCompileLibrary(outputPath, libFolder, includePaths);
-      } else {
+      File libFolder = lib.getSrcFolder();
+      if (lib.isPre15Lib()) {
         compileLibrary(outputPath, libFolder, includePaths);
+      } else {
+        recursiveCompileLibrary(outputPath, libFolder, includePaths);
       }
     }
   }

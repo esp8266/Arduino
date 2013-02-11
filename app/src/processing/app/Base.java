@@ -1044,25 +1044,17 @@ public class Base {
   }
 
   public LibraryList getIDELibs() {
-    LibraryList libs = new LibraryList();
     if (libraries == null)
-      return libs;
-    for (Library lib : libraries) {
-      if (!FileUtils.isSubDirectory(getSketchbookFolder(), lib.getRootFolder()))
-        libs.add(lib);
-    }
-    return libs;
+      return new LibraryList();
+    LibraryList res = new LibraryList(libraries);
+    res.removeAll(getUserLibs());
+    return res;
   }
 
   public LibraryList getUserLibs() {
-    LibraryList libs = new LibraryList();
     if (libraries == null)
-      return libs;
-    for (Library lib : libraries) {
-      if (FileUtils.isSubDirectory(getSketchbookFolder(), lib.getRootFolder()))
-        libs.add(lib);
-    }
-    return libs;
+      return new LibraryList();
+    return libraries.filterLibrariesInSubfolder(getSketchbookFolder());
   }
 
   public void rebuildImportMenu(JMenu importMenu, final Editor editor) {
@@ -1124,28 +1116,16 @@ public class Base {
 
       // Add examples from libraries
       LibraryList ideLibs = getIDELibs();
-      Collections.sort(ideLibs, Library.CASE_INSENSITIVE_ORDER);
-      for (Library lib : ideLibs) {
-        File folder = lib.getRootFolder();
-        String name = lib.getName();
-        addSketchesSubmenu(menu, name, folder, false);
-        // Allows "fat" libraries to have examples in the root folder
-        if (folder.getName().equals(Base.getTargetPlatform().getName()))
-          addSketchesSubmenu(menu, name, folder.getParentFile(), false);
-      }
+      ideLibs.sort();
+      for (Library lib : ideLibs)
+        addSketchesSubmenu(menu, lib, false);
 
       LibraryList userLibs = getUserLibs();
       if (userLibs.size()>0) {
         menu.addSeparator();
-        Collections.sort(userLibs, Library.CASE_INSENSITIVE_ORDER);
-        for (Library lib : userLibs) {
-          File folder = lib.getRootFolder();
-          String name = lib.getName();
-          addSketchesSubmenu(menu, name, folder, false);
-          // Allows "fat" libraries to have examples in the root folder
-          if (folder.getName().equals(Base.getTargetPlatform().getName()))
-            addSketchesSubmenu(menu, name, folder.getParentFile(), false);
-        }
+        userLibs.sort();
+        for (Library lib : userLibs)
+          addSketchesSubmenu(menu, lib, false);
       }
     } catch (IOException e) {
       e.printStackTrace();
@@ -1155,7 +1135,7 @@ public class Base {
   public LibraryList scanLibraries(List<File> folders) {
     LibraryList res = new LibraryList();
     for (File folder : folders)
-      res.addAll(scanLibraries(folder));
+      res.addOrReplaceAll(scanLibraries(folder));
     return res;
   }
 
@@ -1178,8 +1158,7 @@ public class Base {
         continue;
       }
 
-      Library lib = Library.fromFolder(subfolder, Base.getTargetPlatform().getName());
-
+      Library lib = Library.create(subfolder);
       // (also replace previously found libs with the same name) 
       if (lib != null)
         res.addOrReplace(lib);
@@ -1206,18 +1185,20 @@ public class Base {
     // Libraries located in the latest folders on the list can override
     // other libraries with the same name.
     libraries = scanLibraries(librariesFolders);
-
+    String currentArch = Base.getTargetPlatform().getName();
+    libraries = libraries.filterByArchitecture(currentArch);
+    
     // Populate importToLibraryTable
     importToLibraryTable = new HashMap<String, Library>();
     for (Library lib : libraries) {
       try {
-        String headers[] = headerListFromIncludePath(lib.getRootFolder());
+        String headers[] = headerListFromIncludePath(lib.getSrcFolder());
         for (String header : headers) {
           importToLibraryTable.put(header, lib);
         }
       } catch (IOException e) {
         showWarning(_("Error"), I18n
-            .format("Unable to list header files in {0}", lib.getRootFolder()), e);
+            .format("Unable to list header files in {0}", lib.getSrcFolder()), e);
       }
     }
 
@@ -1495,6 +1476,13 @@ public class Base {
     return ifound;  // actually ignored, but..
   }
 
+  private boolean addSketchesSubmenu(JMenu menu, Library lib,
+                                     boolean replaceExisting)
+      throws IOException {
+    return addSketchesSubmenu(menu, lib.getName(), lib.getFolder(),
+                              replaceExisting);
+  }
+
   private boolean addSketchesSubmenu(JMenu menu, String name, File folder,
                          final boolean replaceExisting) throws IOException {
 
@@ -1564,26 +1552,25 @@ public class Base {
   protected void addLibraries(JMenu menu, LibraryList libs) throws IOException {
 
     LibraryList list = new LibraryList(libs);
-    Collections.sort(list, Library.CASE_INSENSITIVE_ORDER);
-
-    ActionListener listener = new ActionListener() {
-      public void actionPerformed(ActionEvent event) {
-        String jarPath = event.getActionCommand();
-        try {
-          activeEditor.getSketch().importLibrary(jarPath);
-        } catch (IOException e) {
-          showWarning(_("Error"), I18n.format("Unable to list header files in {0}", jarPath), e);
-        }
-      }
-    };
+    list.sort();
 
     for (Library lib : list) {
-      File folder = lib.getRootFolder();
-
+      @SuppressWarnings("serial")
+      AbstractAction action = new AbstractAction(lib.getName()) {
+        public void actionPerformed(ActionEvent event) {
+          Library l = (Library) getValue("library");
+          try {
+            activeEditor.getSketch().importLibrary(l);
+          } catch (IOException e) {
+            showWarning(_("Error"), I18n.format("Unable to list header files in {0}", l.getSrcFolder()), e);
+          }
+        }
+      };
+      action.putValue("library", lib);
+      
       // Add new element at the bottom
-      JMenuItem item = new JMenuItem(lib.getName());
-      item.addActionListener(listener);
-      item.setActionCommand(folder.getAbsolutePath());
+      JMenuItem item = new JMenuItem(action);
+      item.putClientProperty("library", lib);
       menu.add(item);
 
       // XXX: DAM: should recurse here so that library folders can be nested

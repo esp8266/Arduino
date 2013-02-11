@@ -90,12 +90,6 @@ public class Sketch {
   private String classPath;
 
   /**
-   * This is *not* the "Processing" libraries path, this is the Java libraries
-   * path, as in java.library.path=BlahBlah, which identifies search paths for
-   * DLLs or JNILIBs.
-   */
-  private String libraryPath;
-  /**
    * List of library folders. 
    */
   private LibraryList importedLibraries;
@@ -1122,15 +1116,19 @@ public class Sketch {
   }
 
 
+  public void importLibrary(Library lib) throws IOException {
+    importLibrary(lib.getSrcFolder());
+  }
+  
   /**
    * Add import statements to the current tab for all of packages inside
    * the specified jar file.
    */
-  public void importLibrary(String jarPath) throws IOException {
+  public void importLibrary(File jarPath) throws IOException {
     // make sure the user didn't hide the sketch folder
     ensureExistence();
 
-    String list[] = Base.headerListFromIncludePath(new File(jarPath));
+    String list[] = Base.headerListFromIncludePath(jarPath);
 
     // import statements into the main sketch file (code[0])
     // if the current code is a .java file, insert into current
@@ -1424,8 +1422,6 @@ public class Sketch {
     // grab the imports from the code just preproc'd
 
     importedLibraries = new LibraryList();
-    //Remember to clear library path before building it.
-    libraryPath = "";
     for (String item : preprocessor.getExtraImports()) {
 
       Library lib = Base.importToLibraryTable.get(item);
@@ -1433,8 +1429,6 @@ public class Sketch {
 
       if (lib != null && !importedLibraries.contains(lib)) {
         importedLibraries.add(lib);
-        //classPath += Compiler.contentsToClassPath(libFolder);
-        libraryPath += File.pathSeparator + lib.getRootFolder().getAbsolutePath();
       }
     }
 
@@ -1886,11 +1880,6 @@ public class Sketch {
 
   public String getClassPath() {
     return classPath;
-  }
-
-
-  public String getLibraryPath() {
-    return libraryPath;
   }
 
 
