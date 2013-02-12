@@ -2043,16 +2043,15 @@ public class Editor extends JFrame implements RunnerListener {
                                       JOptionPane.YES_NO_CANCEL_OPTION,
                                       JOptionPane.QUESTION_MESSAGE);
 
-      if (result == JOptionPane.YES_OPTION) {
+      switch (result) {
+      case JOptionPane.YES_OPTION:
         return handleSave(true);
-
-      } else if (result == JOptionPane.NO_OPTION) {
+      case JOptionPane.NO_OPTION:
         return true;  // ok to continue
-
-      } else if (result == JOptionPane.CANCEL_OPTION) {
-        return false;
-
-      } else {
+      case JOptionPane.CANCEL_OPTION:
+      case JOptionPane.CLOSED_OPTION:	// Escape key pressed
+	return false;
+      default:
         throw new IllegalStateException();
       }
 
