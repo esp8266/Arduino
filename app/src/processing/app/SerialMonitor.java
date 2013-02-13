@@ -121,8 +121,8 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
     lineEndings.setMaximumSize(lineEndings.getMinimumSize());
       
     String[] serialRateStrings = {
-      "300","1200","2400","4800","9600","14400",
-      "19200","28800","38400","57600","115200"
+      "300","1200","2400","4800","9600",
+      "19200","38400","57600","115200"
     };
     
     serialRates = new JComboBox();
