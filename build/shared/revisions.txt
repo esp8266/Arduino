@@ -1,4 +1,8 @@
 
+ARDUINO 1.5.3 BETA
+
+* Removed useless baud rates from serial monitor
+
 ARDUINO 1.5.2 BETA - 2013.02.06
 
 [ide]
