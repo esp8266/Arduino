@@ -20,6 +20,16 @@
 #define _VARIANT_ARDUINO_DUE_X_
 
 /*----------------------------------------------------------------------------
+ *        Definitions
+ *----------------------------------------------------------------------------*/
+
+/** Frequency of the board main oscillator */
+#define VARIANT_MAINOSC		12000000
+
+/** Master clock frequency */
+#define VARIANT_MCK			84000000
+
+/*----------------------------------------------------------------------------
  *        Headers
  *----------------------------------------------------------------------------*/
 
@@ -39,23 +49,6 @@ extern "C"{
 #if defined (  __GNUC__  ) /* GCC CS3 */
 #    include <syscalls.h> /** RedHat Newlib minimal stub */
 #endif
-
-/*----------------------------------------------------------------------------
- *        Definitions
- *----------------------------------------------------------------------------*/
-
-/*----------------------------------------------------------------------------*/
-
-#define ArduinoDueX_DevEd
-
-/** Name of the board */
-#define VARIANT_NAME		"Arduino_DueX_Dev_Ed"
-
-/** Frequency of the board main oscillator */
-#define VARIANT_MAINOSC		12000000
-
-/** Master clock frequency */
-#define VARIANT_MCK			84000000
 
 /*----------------------------------------------------------------------------
  *        Pins

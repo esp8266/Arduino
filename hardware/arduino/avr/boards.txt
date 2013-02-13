@@ -226,7 +226,7 @@ esplora.bootloader.lock_bits=0x2F
 esplora.build.mcu=atmega32u4
 esplora.build.f_cpu=16000000L
 esplora.build.vid=0x2341
-esplora.build.pid=0x8036
+esplora.build.pid=0x803c
 esplora.build.core=arduino
 esplora.build.variant=leonardo
 esplora.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid}

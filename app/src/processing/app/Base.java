@@ -50,9 +50,9 @@ import static processing.app.I18n._;
  * files and images, etc) that comes from that.
  */
 public class Base {
-  public static final int REVISION = 152;
+  public static final int REVISION = 153;
   /** This might be replaced by main() if there's a lib/version.txt file. */
-  static String VERSION_NAME = "0152";
+  static String VERSION_NAME = "0153";
   /** Set true if this a proper release rather than a numbered revision. */
   static public boolean RELEASE = false;
 
@@ -652,7 +652,10 @@ public class Base {
 
     // Make an empty pde file
     File newbieFile = new File(newbieDir, newbieName + ".ino");
-    new FileOutputStream(newbieFile);  // create the file
+    if (!newbieFile.createNewFile()) {
+      throw new IOException();
+    }
+    FileUtils.copyFile(new File(getContentFile("examples"), "01.Basics" + File.separator + "BareMinimum" + File.separator + "BareMinimum.ino"), newbieFile);
     return newbieFile.getAbsolutePath();
   }
 

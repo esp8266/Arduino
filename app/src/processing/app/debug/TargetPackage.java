@@ -32,20 +32,22 @@ import processing.app.helpers.filefilters.OnlyDirs;
 
 public class TargetPackage {
 
-  String name;
-  File folder;
+  private final String name;
 
   Map<String, TargetPlatform> platforms = new HashMap<String, TargetPlatform>();
 
-  public TargetPackage(String _name, File _folder) {
-    name = _name;
-    folder = _folder;
+  public TargetPackage(String name, File folder) {
+    this.name = name;
 
     String[] platformsList = folder.list(new OnlyDirs());
-    for (String platformName : platformsList) {
-      File platformFolder = new File(folder, platformName);
-      TargetPlatform platform = new TargetPlatform(platformName, platformFolder);
-      platforms.put(platformName, platform);
+    if (platformsList != null) {
+      for (String platformName : platformsList) {
+        File platformFolder = new File(folder, platformName);
+        if (platformFolder.exists() && platformFolder.canRead()) {
+          TargetPlatform platform = new TargetPlatform(platformName, platformFolder);
+          platforms.put(platformName, platform);
+        }
+      }
     }
   }
 

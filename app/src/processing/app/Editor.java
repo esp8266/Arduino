@@ -137,7 +137,7 @@ public class Editor extends JFrame implements RunnerListener {
   JMenuItem undoItem, redoItem;
   protected UndoAction undoAction;
   protected RedoAction redoAction;
-  UndoManager undo;
+  LastUndoableEditAwareUndoManager undo;
   // used internally, and only briefly
   CompoundEdit compoundEdit;
 
@@ -476,7 +476,6 @@ public class Editor extends JFrame implements RunnerListener {
 
   protected void buildMenuBar() {
     JMenuBar menubar = new JMenuBar();
-    menubar = new JMenuBar();
     menubar.add(buildFileMenu());
     menubar.add(buildEditMenu());
     menubar.add(buildSketchMenu());
@@ -1344,6 +1343,10 @@ public class Editor extends JFrame implements RunnerListener {
         //System.out.println("Unable to undo: " + ex);
         //ex.printStackTrace();
       }
+      if (undo.getLastUndoableEdit() != null && undo.getLastUndoableEdit() instanceof CaretAwareUndoableEdit) {
+        CaretAwareUndoableEdit undoableEdit = (CaretAwareUndoableEdit) undo.getLastUndoableEdit();
+        textarea.setCaretPosition(undoableEdit.getCaretPosition() - 1);
+      }
       updateUndoState();
       redoAction.updateRedoState();
     }
@@ -1382,6 +1385,10 @@ public class Editor extends JFrame implements RunnerListener {
       } catch (CannotRedoException ex) {
         //System.out.println("Unable to redo: " + ex);
         //ex.printStackTrace();
+      }
+      if (undo.getLastUndoableEdit() != null && undo.getLastUndoableEdit() instanceof CaretAwareUndoableEdit) {
+        CaretAwareUndoableEdit undoableEdit = (CaretAwareUndoableEdit) undo.getLastUndoableEdit();
+        textarea.setCaretPosition(undoableEdit.getCaretPosition());
       }
       updateRedoState();
       undoAction.updateUndoState();
@@ -1664,7 +1671,7 @@ public class Editor extends JFrame implements RunnerListener {
               compoundEdit.addEdit(e.getEdit());
 
             } else if (undo != null) {
-              undo.addEdit(e.getEdit());
+              undo.addEdit(new CaretAwareUndoableEdit(e.getEdit(), textarea));
               undoAction.updateUndoState();
               redoAction.updateRedoState();
             }
