@@ -62,8 +62,16 @@ extern void delay( uint32_t dwMs ) ;
  *
  * \param dwUs the number of microseconds to pause (uint32_t)
  */
-extern void delayMicroseconds( uint32_t dwUs ) ;
-
+static inline void delayMicroseconds(uint32_t) __attribute__((always_inline, unused));
+static inline void delayMicroseconds(uint32_t usec){
+    uint32_t n = usec * (VARIANT_MCK / 3000000);
+    asm volatile(
+        "L_%=_delayMicroseconds:"       "\n\t"
+        "subs   %0, #1"                 "\n\t"
+        "bge    L_%=_delayMicroseconds" "\n"
+        : "+r" (n) :
+    );
+}
 
 #ifdef __cplusplus
 }
