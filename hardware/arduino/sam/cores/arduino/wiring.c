@@ -49,13 +49,6 @@ void delay( uint32_t ms )
     	yield();
 }
 
-void delayMicroseconds( uint32_t us )
-{
-    uint32_t start = micros();
-    while ((micros() - start) < us)
-        ;
-}
-
 #if defined ( __ICCARM__ ) /* IAR Ewarm 5.41+ */
 extern signed int putchar( signed int c ) ;
 /**

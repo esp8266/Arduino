@@ -41,12 +41,6 @@ extern "C"{
 
 void yield(void);
 
-#include "wiring.h"
-#include "wiring_digital.h"
-#include "wiring_analog.h"
-#include "wiring_shift.h"
-#include "WInterrupts.h"
-
 /* sketch */
 extern void setup( void ) ;
 extern void loop( void ) ;
@@ -194,6 +188,12 @@ extern const PinDescription g_APinDescription[] ;
 
 // Include board variant
 #include "variant.h"
+
+#include "wiring.h"
+#include "wiring_digital.h"
+#include "wiring_analog.h"
+#include "wiring_shift.h"
+#include "WInterrupts.h"
 
 // USB Device
 #define USB_VID            0x2341 // arduino LLC vid

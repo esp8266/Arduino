@@ -1,4 +1,12 @@
 
+ARDUINO 1.5.3 BETA
+
+[ide]
+* Removed useless baud rates from serial monitor
+
+[arduino core]
+* sam: Fixed delayMicrosecond() when interrupts are disabled
+
 ARDUINO 1.5.2 BETA - 2013.02.06
 
 [ide]
