@@ -15,9 +15,25 @@ public class Library {
 
   private String name;
   private String version;
-  private File folder, srcFolder;
+  private String author;
+  private String email;
+  private String url;
+  private String sentence;
+  private String paragraph;
+  private List<String> coreDependencies;
+  private List<String> dependencies;
+  private File folder, srcFolder, archFolder;
   private List<String> architectures;
   private boolean pre15Lib;
+
+  private static final List<String> MANDATORY_PROPERTIES = Arrays
+      .asList(new String[] { "architectures", "author", "core-dependencies",
+          "dependencies", "email", "name", "paragraph", "sentence", "url",
+          "version" });
+  private static final List<String> OPTIONAL_FOLDERS = Arrays
+      .asList(new String[] { "arch", "examples", "extras", "src" });
+  private static final List<String> OPTIONAL_FILES = Arrays
+      .asList(new String[] { "keywords.txt", "library.properties" });
 
   /**
    * Scans inside a folder and create a Library object out of it. Automatically
@@ -52,31 +68,49 @@ public class Library {
     // ---------------------
 
     // 1. Check mandatory properties
-    if (!properties.containsKey("name"))
-      return null;
-    if (!properties.containsKey("version"))
-      return null;
-    if (!properties.containsKey("architectures"))
-      return null;
+    for (String p : MANDATORY_PROPERTIES)
+      if (!properties.containsKey(p))
+        return null;
 
     // 2. Check mandatory folders
     File srcFolder = new File(libFolder, "src");
     if (!srcFolder.exists() && !srcFolder.isDirectory())
       return null;
-    
-    // TODO: 3. check if root folder contains prohibited stuff
-    
-    // Extract metadata info
-    // TODO: do for all metadata
-    List<String> archs = new ArrayList<String>();
-    for (String arch : properties.get("architectures").split(","))
-      archs.add(arch.trim());
 
+    // 3. check if root folder contains prohibited stuff
+    for (File file : libFolder.listFiles()) {
+      if (file.isDirectory()) {
+        if (!OPTIONAL_FOLDERS.contains(file.getName()))
+          return null;
+      } else {
+        if (!OPTIONAL_FILES.contains(file.getName()))
+          return null;
+      }
+    }
+
+    // Extract metadata info
     Library res = new Library();
     res.folder = libFolder;
     res.srcFolder = srcFolder;
+    res.archFolder = new File(libFolder, "arch");
     res.name = properties.get("name").trim();
+    res.author = properties.get("author").trim();
+    res.email = properties.get("email").trim();
+    res.sentence = properties.get("sentence").trim();
+    res.paragraph = properties.get("paragraph").trim();
+    res.url = properties.get("url").trim();
+    List<String> archs = new ArrayList<String>();
+    for (String arch : properties.get("architectures").split(","))
+      archs.add(arch.trim());
     res.architectures = archs;
+    List<String> deps = new ArrayList<String>();
+    for (String dep : properties.get("dependencies").split(","))
+      deps.add(dep.trim());
+    res.dependencies = deps;
+    List<String> coreDeps = new ArrayList<String>();
+    for (String dep : properties.get("core-dependencies").split(","))
+      coreDeps.add(dep.trim());
+    res.coreDependencies = coreDeps;
     res.version = properties.get("version").trim();
     res.pre15Lib = false;
     return res;
@@ -98,9 +132,15 @@ public class Library {
       return null;
     List<File> res = new ArrayList<File>();
     res.add(srcFolder);
-    File archSpecificFolder = new File(srcFolder, reqArch);
-    if (archSpecificFolder.exists() && archSpecificFolder.isDirectory())
+    File archSpecificFolder = new File(archFolder, reqArch);
+    if (archSpecificFolder.exists() && archSpecificFolder.isDirectory()) {
       res.add(archSpecificFolder);
+    } else {
+      // If specific architecture folder is not found try with "default"
+      archSpecificFolder = new File(archFolder, "default");
+      if (archSpecificFolder.exists() && archSpecificFolder.isDirectory())
+        res.add(archSpecificFolder);
+    }
     return res;
   }
 
@@ -132,5 +172,57 @@ public class Library {
 
   public File getFolder() {
     return folder;
+  }
+
+  public List<String> getArchitectures() {
+    return architectures;
+  }
+
+  public String getAuthor() {
+    return author;
+  }
+
+  public List<String> getCoreDependencies() {
+    return coreDependencies;
+  }
+
+  public List<String> getDependencies() {
+    return dependencies;
+  }
+
+  public String getEmail() {
+    return email;
+  }
+
+  public String getParagraph() {
+    return paragraph;
+  }
+
+  public String getSentence() {
+    return sentence;
+  }
+
+  public String getUrl() {
+    return url;
+  }
+
+  public String getVersion() {
+    return version;
+  }
+
+  @Override
+  public String toString() {
+    String res = "Library:";
+    res += " (name=" + name + ")";
+    res += " (architectures=" + architectures + ")";
+    res += " (author=" + author + ")";
+    res += " (core-dependencies=" + coreDependencies + ")";
+    res += " (dependencies=" + dependencies + ")";
+    res += " (email=" + email + ")";
+    res += " (paragraph=" + paragraph + ")";
+    res += " (sentence=" + sentence + ")";
+    res += " (url=" + url + ")";
+    res += " (version=" + version + ")";
+    return res;
   }
 }

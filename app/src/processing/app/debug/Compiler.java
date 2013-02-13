@@ -57,7 +57,8 @@ public class Compiler implements MessageConsumer {
   private PreferencesMap prefs;
   private boolean verbose;
   private boolean sketchIsCompiled;
-	
+  private String targetArch;
+  
   private RunnerException exception;
   
   /**
@@ -86,7 +87,8 @@ public class Compiler implements MessageConsumer {
     if (prefs.get("build.variant.path").length() != 0)
       includePaths.add(prefs.get("build.variant.path"));
     for (Library lib : sketch.getImportedLibraries())
-      includePaths.add(lib.getSrcFolder().getPath());
+      for (File folder : lib.getSrcFolders(targetArch))
+        includePaths.add(folder.getPath());
 
     // 1. compile the sketch (already in the buildPath)
     sketch.setCompilingProgress(30);
@@ -131,7 +133,7 @@ public class Compiler implements MessageConsumer {
     }
 
     TargetPlatform targetPlatform = Base.getTargetPlatform();
-
+    
     // Merge all the global preference configuration in order of priority
     PreferencesMap p = new PreferencesMap();
     p.putAll(Preferences.getMap());
@@ -144,7 +146,8 @@ public class Compiler implements MessageConsumer {
 
     p.put("build.path", _buildPath);
     p.put("build.project_name", _primaryClassName);
-    p.put("build.arch", targetPlatform.getName().toUpperCase());
+    targetArch = targetPlatform.getName();
+    p.put("build.arch", targetArch.toUpperCase());
     
     if (!p.containsKey("compiler.path"))
       p.put("compiler.path", Base.getAvrBasePath());
@@ -583,11 +586,12 @@ public class Compiler implements MessageConsumer {
   void compileLibraries(List<String> includePaths) throws RunnerException {
     File outputPath = new File(prefs.get("build.path"));
     for (Library lib : sketch.getImportedLibraries()) {
-      File libFolder = lib.getSrcFolder();
-      if (lib.isPre15Lib()) {
-        compileLibrary(outputPath, libFolder, includePaths);
-      } else {
-        recursiveCompileLibrary(outputPath, libFolder, includePaths);
+      for (File folder : lib.getSrcFolders(targetArch)) {
+        if (lib.isPre15Lib()) {
+          compileLibrary(outputPath, folder, includePaths);
+        } else {
+          recursiveCompileLibrary(outputPath, folder, includePaths);
+        }
       }
     }
   }
