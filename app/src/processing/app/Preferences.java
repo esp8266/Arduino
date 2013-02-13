@@ -308,7 +308,7 @@ public class Preferences {
 
   private static void fixPreferences() {
     String baud = get("serial.debug_rate");
-    if ("14400".equals(baud) || "28800".equals(baud)) {
+    if ("14400".equals(baud) || "28800".equals(baud) || "38400".equals(baud)) {
       set("serial.debug_rate", "9600");
     }
   }
