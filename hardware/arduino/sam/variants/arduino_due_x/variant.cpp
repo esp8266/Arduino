@@ -401,6 +401,18 @@ void init( void )
     g_APinDescription[PINS_USB].ulPin,
     g_APinDescription[PINS_USB].ulPinConfiguration);
 
+  // Initialize CAN pins
+  PIO_Configure(
+    g_APinDescription[PINS_CAN0].pPort,
+    g_APinDescription[PINS_CAN0].ulPinType,
+    g_APinDescription[PINS_CAN0].ulPin,
+    g_APinDescription[PINS_CAN0].ulPinConfiguration);
+  PIO_Configure(
+    g_APinDescription[PINS_CAN1].pPort,
+    g_APinDescription[PINS_CAN1].ulPinType,
+    g_APinDescription[PINS_CAN1].ulPin,
+    g_APinDescription[PINS_CAN1].ulPinConfiguration);
+
   // Initialize Analog Controller
   pmc_enable_periph_clk(ID_ADC);
   adc_init(ADC, SystemCoreClock, ADC_FREQ_MAX, ADC_STARTUP_FAST);
