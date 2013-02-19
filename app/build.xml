@@ -79,6 +79,7 @@
     <copy todir="test-bin" overwrite="true" verbose="true">
       <fileset dir="test" includes="**/*.zip" />
       <fileset dir="test" includes="**/*.txt" />
+      <fileset dir="test" includes="**/*.properties" />
     </copy>
 
     <junit printsummary="yes">
