@@ -1132,14 +1132,14 @@ public class Base {
     }
   }
 
-  public LibraryList scanLibraries(List<File> folders) {
+  public LibraryList scanLibraries(List<File> folders) throws IOException {
     LibraryList res = new LibraryList();
     for (File folder : folders)
       res.addOrReplaceAll(scanLibraries(folder));
     return res;
   }
 
-  public LibraryList scanLibraries(File folder) {
+  public LibraryList scanLibraries(File folder) throws IOException {
     LibraryList res = new LibraryList();
 
     String list[] = folder.list(new OnlyDirs());
@@ -1184,7 +1184,11 @@ public class Base {
     // Scan for libraries in each library folder.
     // Libraries located in the latest folders on the list can override
     // other libraries with the same name.
-    libraries = scanLibraries(librariesFolders);
+    try {
+      libraries = scanLibraries(librariesFolders);
+    } catch (IOException e) {
+      showWarning(_("Error"), _("Error reading preferences"), e);
+    }
     String currentArch = Base.getTargetPlatform().getName();
     libraries = libraries.filterByArchitecture(currentArch);
     
