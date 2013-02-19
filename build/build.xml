@@ -54,6 +54,8 @@
     </java>
   </target>
 
+  <target name="test" depends="subprojects-test"/>
+
   <!-- - - - - - - - - - - - - - - - - - -->
   <!-- Subprojects: Core, App, Libraries -->
   <!-- - - - - - - - - - - - - - - - - - -->
@@ -68,6 +70,9 @@
     <subant buildpath="../app" target="build"/>
   </target>
 
+  <target name="subprojects-test">
+    <subant buildpath="../app" target="test"/>
+  </target>
 
   <!-- - - - - - - - - -->
   <!-- Basic Assembly  -->
@@ -352,7 +357,7 @@
     <echo>
       =======================================================
       Arduino for Mac OS X was built. Grab the image from
-      
+
       macosx/arduino-${version}-${platform}.zip
       =======================================================
     </echo>
@@ -591,7 +596,7 @@
     <echo>
       =======================================================
       Arduino for Linux was built. Grab the archive from
-      
+
       build/linux/arduino-${version}-${platform}.tgz
       =======================================================
     </echo>
@@ -759,20 +764,20 @@
     -->
 
     <zip destfile="windows/arduino-${version}-${platform}.zip" level="9">
-      <zipfileset dir="windows/work" 
+      <zipfileset dir="windows/work"
 		  prefix="arduino-${version}" />
     </zip>
 
     <zip destfile="windows/arduino-${version}-${platform}-expert.zip" level="9">
-      <zipfileset dir="windows/work" 
-		  prefix="arduino-${version}" 
+      <zipfileset dir="windows/work"
+		  prefix="arduino-${version}"
 		  excludes="java/**" />
     </zip>
 
     <echo>
       =======================================================
       Arduino for Windows was built. Grab the archive from
-      
+
       windows/arduino-${version}-${platform}.zip
       windows/arduino-${version}-${platform}-expert.zip
       =======================================================

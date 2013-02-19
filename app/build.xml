@@ -100,7 +100,7 @@
 
   </target>
 
-  <target name="build" depends="test" description="Build PDE">
+  <target name="build" depends="compile" description="Build PDE">
     <jar basedir="bin" destfile="pde.jar" />
   </target>
 </project>
