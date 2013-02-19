@@ -1,6 +1,6 @@
 package processing.app.packages;
 
-import static processing.app.helpers.StringMatchers.wildcardMatch;
+import processing.app.helpers.PreferencesMap;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-import processing.app.helpers.PreferencesMap;
+import static processing.app.helpers.StringMatchers.wildcardMatch;
 
 public class Library {
 
@@ -39,11 +39,11 @@ public class Library {
    * Scans inside a folder and create a Library object out of it. Automatically
    * detects pre-1.5 libraries. Automatically fills metadata from
    * library.properties file if found.
-   * 
+   *
    * @param libFolder
    * @return
    */
-  static public Library create(File libFolder) {
+  static public Library create(File libFolder) throws IOException {
     // A library is considered "new" if it contains a file called
     // "library.properties"
     File check = new File(libFolder, "library.properties");
@@ -53,16 +53,11 @@ public class Library {
       return createLibrary(libFolder);
   }
 
-  private static Library createLibrary(File libFolder) {
+  private static Library createLibrary(File libFolder) throws IOException {
     // Parse metadata
     File propertiesFile = new File(libFolder, "library.properties");
     PreferencesMap properties = new PreferencesMap();
-    try {
-      properties.load(propertiesFile);
-    } catch (IOException e) {
-      e.printStackTrace();
-      return null;
-    }
+    properties.load(propertiesFile);
 
     // Library sanity checks
     // ---------------------
@@ -70,25 +65,41 @@ public class Library {
     // 1. Check mandatory properties
     for (String p : MANDATORY_PROPERTIES)
       if (!properties.containsKey(p))
-        return null;
+        throw new IOException("Missing '" + p + "' from library");
 
     // 2. Check mandatory folders
     File srcFolder = new File(libFolder, "src");
-    if (!srcFolder.exists() && !srcFolder.isDirectory())
-      return null;
+    if (!srcFolder.exists() || !srcFolder.isDirectory())
+      throw new IOException("Missing 'src' folder");
 
     // 3. check if root folder contains prohibited stuff
     for (File file : libFolder.listFiles()) {
       if (file.isDirectory()) {
         if (!OPTIONAL_FOLDERS.contains(file.getName()))
-          return null;
+          throw new IOException("Invalid folder '" + file.getName() + "'.");
       } else {
         if (!OPTIONAL_FILES.contains(file.getName()))
-          return null;
+          throw new IOException("Invalid file '" + file.getName() + "'.");
       }
     }
 
     // Extract metadata info
+    List<String> archs = new ArrayList<String>();
+    for (String arch : properties.get("architectures").split(","))
+      archs.add(arch.trim());
+
+    List<String> coreDeps = new ArrayList<String>();
+    for (String dep : properties.get("core-dependencies").split(","))
+      coreDeps.add(dep.trim());
+
+    List<String> dependencies = new ArrayList<String>();
+    for (String dependency : properties.get("dependencies").split(",")) {
+      dependency = dependency.trim();
+      if (!dependency.equals("")) {
+        dependencies.add(dependency);
+      }
+    }
+
     Library res = new Library();
     res.folder = libFolder;
     res.srcFolder = srcFolder;
@@ -99,18 +110,9 @@ public class Library {
     res.sentence = properties.get("sentence").trim();
     res.paragraph = properties.get("paragraph").trim();
     res.url = properties.get("url").trim();
-    List<String> archs = new ArrayList<String>();
-    for (String arch : properties.get("architectures").split(","))
-      archs.add(arch.trim());
     res.architectures = archs;
-    List<String> deps = new ArrayList<String>();
-    for (String dep : properties.get("dependencies").split(","))
-      deps.add(dep.trim());
-    res.dependencies = deps;
-    List<String> coreDeps = new ArrayList<String>();
-    for (String dep : properties.get("core-dependencies").split(","))
-      coreDeps.add(dep.trim());
     res.coreDependencies = coreDeps;
+    res.dependencies = dependencies;
     res.version = properties.get("version").trim();
     res.pre15Lib = false;
     return res;
@@ -122,7 +124,7 @@ public class Library {
     res.folder = libFolder;
     res.srcFolder = libFolder;
     res.name = libFolder.getName();
-    res.architectures = Arrays.asList(new String[] { "*" });
+    res.architectures = Arrays.asList(new String[]{"*"});
     res.pre15Lib = true;
     return res;
   }
