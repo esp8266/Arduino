@@ -1,6 +1,20 @@
 <?xml version="1.0"?>
 <project name="Arduino PDE" default="build">
 
+  <path id="class.path">
+    <fileset dir="lib">
+      <include name="*.jar"/>
+    </fileset>
+    <pathelement path="${env.JAVA_HOME}/lib/tools.jar"/>
+    <pathelement path="../core/core.jar"/>
+  </path>
+
+  <path id="class.path.test">
+    <path refid="class.path"/>
+    <pathelement location="bin/"/>
+    <pathelement path="test-lib/junit-4.11.jar"/>
+  </path>
+
   <target name="clean" description="Clean the build directories">
     <delete dir="bin" />
     <delete dir="test-bin" />
@@ -44,7 +58,7 @@
 	   encoding="UTF-8"
 	   includeAntRuntime="false"
 	   debug="true"
-	   classpath="../core/core.jar; ${env.JAVA_HOME}/lib/tools.jar; lib/apple.jar; lib/ecj.jar; lib/jna.jar; lib/RXTXcomm.jar" />
+	   classpathref="class.path" />
     <copy todir="bin" overwrite="true" verbose="true">
       <fileset dir="src" includes="**/*.properties" />
     </copy>
@@ -58,17 +72,8 @@
            destdir="test-bin"
            encoding="UTF-8"
            includeAntRuntime="false"
-           debug="true">
-      <classpath>
-        <pathelement location="bin"/>
-        <pathelement location="../core/core.jar"/>
-        <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
-        <pathelement location="lib/apple.jar"/>
-        <pathelement location="lib/ecj.jar"/>
-        <pathelement location="lib/jna.jar"/>
-        <pathelement location="lib/RXTXcomm.jar"/>
-        <pathelement location="test-lib/junit-4.11.jar"/>
-      </classpath>
+           debug="true"
+           classpathref="class.path.test">
     </javac>
 
     <copy todir="test-bin" overwrite="true" verbose="true">
@@ -80,13 +85,7 @@
       <classpath>
         <pathelement location="bin"/>
         <pathelement location="test-bin"/>
-        <pathelement location="../core/core.jar"/>
-        <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
-        <pathelement location="lib/apple.jar"/>
-        <pathelement location="lib/ecj.jar"/>
-        <pathelement location="lib/jna.jar"/>
-        <pathelement location="lib/RXTXcomm.jar"/>
-        <pathelement location="test-lib/junit-4.11.jar"/>
+        <path refid="class.path.test"/>
       </classpath>
 
       <formatter type="xml"/>
