@@ -12,7 +12,9 @@
   <path id="class.path.test">
     <path refid="class.path"/>
     <pathelement location="bin/"/>
-    <pathelement path="test-lib/junit-4.11.jar"/>
+    <fileset dir="test-lib">
+      <include name="*.jar"/>
+    </fileset>
   </path>
 
   <target name="clean" description="Clean the build directories">
@@ -46,12 +48,22 @@
     <fail if="windows" unless="java_home"
 	  message="The JAVA_HOME variable must be set to the location of a full JDK. For instance, on Windows, this might be c:\jdk1.6.0_18." />
 
-<!--
-    <dirname property="blah" file="${java.home}" />
-    <echo message="here! ${java.home}/lib/tools.jar or there: ${blah}" />
-    <echo message="override ${env.JAVA_HOME}/lib/tools.jar" />
-    <fail />
--->
+    <condition property="work.dir" value="../build/linux/work/">
+      <os family="unix"/>
+    </condition>
+    <condition property="work.dir" value="../build/windows/work/">
+      <os family="windows"/>
+    </condition>
+    <condition property="work.dir" value="../build/macosx/work/">
+      <os family="mac"/>
+    </condition>
+
+    <!--
+        <dirname property="blah" file="${java.home}" />
+        <echo message="here! ${java.home}/lib/tools.jar or there: ${blah}" />
+        <echo message="override ${env.JAVA_HOME}/lib/tools.jar" />
+        <fail />
+    -->
     <javac source="1.5" target="1.5"
 	   srcdir="src"
 	   destdir="bin"
@@ -82,7 +94,8 @@
       <fileset dir="test" includes="**/*.properties" />
     </copy>
 
-    <junit printsummary="yes">
+    <junit printsummary="yes" dir="${work.dir}" fork="true">
+      <jvmarg value="-Djava.library.path=lib/"/>
       <classpath>
         <pathelement location="bin"/>
         <pathelement location="test-bin"/>
@@ -94,6 +107,7 @@
       <batchtest fork="yes" todir="test-bin">
         <fileset dir="test">
           <include name="**/*Test.java"/>
+          <exclude name="**/Abstract*.java"/>
         </fileset>
       </batchtest>
     </junit>
