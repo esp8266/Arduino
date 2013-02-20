@@ -232,6 +232,7 @@ public class Editor extends JFrame implements RunnerListener {
     upper.add(header);
 
     textarea = new JEditTextArea(new PdeTextAreaDefaults());
+    textarea.setName("editor");
     textarea.setRightClickPopup(new TextAreaPopup());
     textarea.setHorizontalOffset(6);
 
@@ -1135,9 +1136,11 @@ public class Editor extends JFrame implements RunnerListener {
 
   protected JMenu buildEditMenu() {
     JMenu menu = new JMenu(_("Edit"));
+    menu.setName("menuEdit");
     JMenuItem item;
 
     undoItem = newJMenuItem(_("Undo"), 'Z');
+    undoItem.setName("menuEditUndo");
     undoItem.addActionListener(undoAction = new UndoAction());
     menu.add(undoItem);
 
@@ -1146,6 +1149,7 @@ public class Editor extends JFrame implements RunnerListener {
     } else {
         redoItem = newJMenuItemShift(_("Redo"), 'Z');
     }
+    redoItem.setName("menuEditRedo");
     redoItem.addActionListener(redoAction = new RedoAction());
     menu.add(redoItem);
 
@@ -1345,7 +1349,10 @@ public class Editor extends JFrame implements RunnerListener {
       }
       if (undo.getLastUndoableEdit() != null && undo.getLastUndoableEdit() instanceof CaretAwareUndoableEdit) {
         CaretAwareUndoableEdit undoableEdit = (CaretAwareUndoableEdit) undo.getLastUndoableEdit();
-        textarea.setCaretPosition(undoableEdit.getCaretPosition() - 1);
+        int nextCaretPosition = undoableEdit.getCaretPosition() - 1;
+        if (nextCaretPosition >= 0 && textarea.getDocumentLength() > nextCaretPosition) {
+          textarea.setCaretPosition(nextCaretPosition);
+        }
       }
       updateUndoState();
       redoAction.updateRedoState();
