@@ -51,7 +51,7 @@
     <condition property="work.dir" value="../build/macosx/work/Arduino.app/Contents/Resources/Java/">
       <os family="mac"/>
     </condition>
-    <condition property="java.library.path" value=".">
+    <condition property="java.additional.library.path" value=".">
       <os family="mac"/>
     </condition>
     <condition property="java.additional.jvmargs" value="-d32">
@@ -60,7 +60,7 @@
     <condition property="work.dir" value="../build/windows/work/">
       <os family="windows"/>
     </condition>
-    <condition property="java.library.path" value=".">
+    <condition property="java.additional.library.path" value=".">
       <os family="windows"/>
     </condition>
     <condition property="java.additional.jvmargs" value="-d32">
@@ -69,7 +69,10 @@
     <condition property="work.dir" value="../build/linux/work/">
       <os family="unix"/>
     </condition>
-    <condition property="java.library.path" value="lib">
+    <condition property="java.additional.library.path" value="lib">
+      <os family="unix"/>
+    </condition>
+    <condition property="java.additional.jvmargs" value="-Ddummy=0">
       <os family="unix"/>
     </condition>
 
@@ -110,7 +113,7 @@
     </copy>
 
     <junit printsummary="yes" dir="${work.dir}" fork="true">
-      <jvmarg value="-Djava.library.path=${java.library.path}"/>
+      <jvmarg value="-Djava.library.path=${java.additional.library.path}"/>
       <jvmarg value="${java.additional.jvmargs}"/>
       <classpath>
         <pathelement location="bin"/>
