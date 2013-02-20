@@ -63,7 +63,7 @@
     <condition property="java.additional.library.path" value=".">
       <os family="windows"/>
     </condition>
-    <condition property="java.additional.jvmargs" value="-d32">
+    <condition property="java.additional.jvmargs" value="-Ddummy=0">
       <os family="windows"/>
     </condition>
     <condition property="work.dir" value="../build/linux/work/">
