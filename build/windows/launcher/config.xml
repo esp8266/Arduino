@@ -19,7 +19,7 @@
     <cp>lib/core.jar</cp>
     <cp>lib/jna.jar</cp>
     <cp>lib/ecj.jar</cp>
-    <cp>lib/RXTXcomm.jar</cp>
+    <cp>lib/jssc.jar</cp>
     <cp>lib/commons-exec-1.1.jar</cp>
   </classPath>
   <jre>

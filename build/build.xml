@@ -26,7 +26,7 @@
     <include name="app/pde.jar" />
     <include name="app/lib/ecj.jar" />
     <include name="app/lib/jna.jar" />
-    <include name="app/lib/RXTXcomm.jar" />
+    <include name="app/lib/jssc.jar" />
     <include name="app/lib/ant.jar" />
     <include name="app/lib/ant-launcher.jar" />
   </fileset>
@@ -448,10 +448,6 @@
       <fileset file="shared/revisions.txt" />
     </copy>
 
-    <copy todir="linux/work">
-      <fileset dir="linux/dist" includes="lib/**" />
-    </copy>
-
     <copy todir="linux/work/lib" flatten="true">
       <fileset refid="runtime.jars" />
     </copy>
@@ -489,7 +485,6 @@
 
   <target name="linux64-build" depends="linux-build" description="Build linux (64-bit) version">
     <copy tofile="linux/work/hardware/tools/avrdude" file="linux/dist/tools/avrdude64" overwrite="true" />
-    <copy tofile="linux/work/lib/librxtxSerial.so" file="linux/dist/lib/librxtxSerial64.so" overwrite="true" />
 
     <chmod perm="755" file="linux/work/hardware/tools/avrdude" />
 
