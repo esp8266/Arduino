@@ -11,6 +11,9 @@ ARDUINO 1.5.3 BETA
 [libraries]
 * sam: Added CAN library (still in early stage of development) (Palliser)
 
+[firmwares]
+* Arduino Due: fixed USB2Serial garbage at startup (https://github.com/arduino/Arduino/pull/1267)
+
 ARDUINO 1.5.2 BETA - 2013.02.06
 
 [ide]
