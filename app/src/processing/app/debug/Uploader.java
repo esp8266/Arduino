@@ -34,9 +34,7 @@ import java.util.Collection;
 
 import processing.app.I18n;
 import processing.app.Preferences;
-import processing.app.Serial;
 import processing.app.SerialException;
-import processing.app.SerialNotFoundException;
 
 public abstract class Uploader implements MessageConsumer  {
   static final String BUGS_URL =
@@ -55,7 +53,8 @@ public abstract class Uploader implements MessageConsumer  {
     throws RunnerException, SerialException;
   
   public abstract boolean burnBootloader() throws RunnerException;
-  
+
+  /*
   protected void flushSerialBuffer() throws RunnerException, SerialException {
     // Cleanup the serial buffer
     try {
@@ -85,6 +84,7 @@ public abstract class Uploader implements MessageConsumer  {
       throw new RunnerException(e.getMessage());
     }
   }
+  */
 
   protected boolean executeUploadCommand(Collection<String> commandDownloader)
       throws RunnerException {
