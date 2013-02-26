@@ -185,8 +185,11 @@ public class Serial implements SerialPortEventListener {
       case SerialPortEvent.RXFLAG:
         try {
           byte[] bytes = port.readBytes();
+          if (bytes == null) {
+            return;
+          }
           String bytesAsString = new String(bytes);
-          if(monitor) {
+          if (monitor) {
             System.out.print(bytesAsString);
           }
           if (this.consumer != null) {
@@ -197,7 +200,6 @@ public class Serial implements SerialPortEventListener {
         }
     }
   }
-
 
 
   /**
