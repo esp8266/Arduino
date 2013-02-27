@@ -24,7 +24,7 @@
   </classPath>
   <jre>
     <path>java</path>
-    <minVersion>1.6.0</minVersion>
+    <minVersion>1.5.0</minVersion>
     <maxVersion></maxVersion>
     <jdkPreference>preferJre</jdkPreference>
     <opt>-Xms128m -Xmx128m</opt>
