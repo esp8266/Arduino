@@ -130,7 +130,7 @@ public class EditorListener {
       }
 
       // The char is not control code when CTRL key pressed? It should be a shortcut.
-      if (c >= ' ') {
+      if (!Character.isISOControl(c)) {
         event.consume();
         return true;
       }
@@ -487,7 +487,7 @@ public class EditorListener {
 
     if ((event.getModifiers() & KeyEvent.CTRL_MASK) != 0) {
       // The char is not control code when CTRL key pressed? It should be a shortcut.
-      if (c >= ' ') {
+      if (!Character.isISOControl(c)) {
         event.consume();
         return true;
       }
