@@ -244,6 +244,7 @@ public class Editor extends JFrame implements RunnerListener {
     consolePanel.add(status, BorderLayout.NORTH);
 
     console = new EditorConsole(this);
+    console.setName("console");
     // windows puts an ugly border on this guy
     console.setBorder(null);
     consolePanel.add(console, BorderLayout.CENTER);
