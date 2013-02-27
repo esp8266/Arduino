@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry excluding="processing/app/tools/format/|processing/app/tools/format/src/|processing/app/Trace.java|processing/app/RunnerClassLoader.java" kind="src" path="app/src"/>
+	<classpathentry kind="src" path="app/test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/processing-core"/>
 	<classpathentry kind="lib" path="app/lib/antlr.jar"/>
@@ -8,5 +9,11 @@
 	<classpathentry kind="lib" path="app/lib/ecj.jar"/>
 	<classpathentry kind="lib" path="app/lib/jna.jar"/>
 	<classpathentry kind="lib" path="app/lib/RXTXcomm.jar"/>
+	<classpathentry kind="lib" path="app/test-lib/junit-4.11.jar"/>
+	<classpathentry kind="lib" path="app/test-lib/fest-assert-1.2.jar"/>
+	<classpathentry kind="lib" path="app/test-lib/fest-reflect-1.2.jar"/>
+	<classpathentry kind="lib" path="app/test-lib/fest-swing-1.2.jar" sourcepath="/home/megabug/git/fest-swing-1.2-sources.jar"/>
+	<classpathentry kind="lib" path="app/test-lib/fest-util-1.1.2.jar"/>
+	<classpathentry kind="lib" path="app/test-lib/jcip-annotations-1.0.jar"/>
 	<classpathentry kind="output" path="app/bin"/>
 </classpath>
