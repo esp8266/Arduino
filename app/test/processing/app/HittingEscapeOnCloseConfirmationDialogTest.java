@@ -3,14 +3,11 @@ package processing.app;
 import org.fest.swing.core.KeyPressInfo;
 import org.fest.swing.finder.WindowFinder;
 import org.fest.swing.fixture.DialogFixture;
-import org.fest.swing.fixture.JScrollPaneFixture;
 import org.junit.Test;
 import processing.app.helpers.JEditTextAreaFixture;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 
 import static org.junit.Assert.assertEquals;
 
