@@ -22,7 +22,6 @@
 
 package processing.app;
 
-import jssc.SerialPortList;
 import processing.app.debug.*;
 import processing.app.syntax.*;
 import processing.app.tools.*;
@@ -43,6 +42,8 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
 import javax.swing.undo.*;
+
+import gnu.io.*;
 
 /**
  * Main editor panel for the Processing Development Environment.
@@ -978,19 +979,36 @@ public class Editor extends JFrame implements RunnerListener {
     serialMenu.removeAll();
     boolean empty = true;
 
-    String[] portNames = SerialPortList.getPortNames();
-    for (String curr_port : portNames) {
-      rbMenuItem = new JCheckBoxMenuItem(curr_port, curr_port.equals(Preferences.get("serial.port")));
-      rbMenuItem.addActionListener(serialMenuListener);
-      //serialGroup.add(rbMenuItem);
-      serialMenu.add(rbMenuItem);
-      empty = false;
-    }
-    if (!empty) {
-      //System.out.println("enabling the serialMenu");
-      serialMenu.setEnabled(true);
+    try
+    {
+      for (Enumeration enumeration = CommPortIdentifier.getPortIdentifiers(); enumeration.hasMoreElements();)
+      {
+        CommPortIdentifier commportidentifier = (CommPortIdentifier)enumeration.nextElement();
+        //System.out.println("Found communication port: " + commportidentifier);
+        if (commportidentifier.getPortType() == CommPortIdentifier.PORT_SERIAL)
+        {
+          //System.out.println("Adding port to serial port menu: " + commportidentifier);
+          String curr_port = commportidentifier.getName();
+          rbMenuItem = new JCheckBoxMenuItem(curr_port, curr_port.equals(Preferences.get("serial.port")));
+          rbMenuItem.addActionListener(serialMenuListener);
+          //serialGroup.add(rbMenuItem);
+          serialMenu.add(rbMenuItem);
+          empty = false;
+        }
+      }
+      if (!empty) {
+        //System.out.println("enabling the serialMenu");
+        serialMenu.setEnabled(true);
+      }
+
     }
 
+    catch (Exception exception)
+    {
+      System.out.println(_("error retrieving port list"));
+      exception.printStackTrace();
+    }
+	
     if (serialMenu.getItemCount() == 0) {
       serialMenu.setEnabled(false);
     }
