@@ -4,6 +4,8 @@ ARDUINO 1.5.3 BETA
 [ide]
 * Removed useless baud rates from serial monitor
 * Fixed some minor IDE UI bugs (Shigeru Kanemoto)
+* Added support for new 1.5 Library format (https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5:-Library-specification)
+* Pass board type from boards.txt (https://github.com/arduino/Arduino/issues/308)
 
 [arduino core]
 * sam: Fixed delayMicrosecond() when interrupts are disabled

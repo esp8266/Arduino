@@ -20,6 +20,7 @@ uno.bootloader.file=optiboot/optiboot_atmega328.hex
 
 uno.build.mcu=atmega328p
 uno.build.f_cpu=16000000L
+uno.build.board=ARDUINO_UNO
 uno.build.core=arduino
 uno.build.variant=standard
 
@@ -36,6 +37,7 @@ atmega328diecimila.bootloader.unlock_bits=0x3F
 atmega328diecimila.bootloader.lock_bits=0x0F
 
 atmega328diecimila.build.f_cpu=16000000L
+atmega328diecimila.build.board=ARDUINO_DUEMILANOVE
 atmega328diecimila.build.core=arduino
 atmega328diecimila.build.variant=standard
 
@@ -75,6 +77,7 @@ nano.bootloader.unlock_bits=0x3F
 nano.bootloader.lock_bits=0x0F
 
 nano.build.f_cpu=16000000L
+nano.build.board=ARDUINO_NANO
 nano.build.core=arduino
 nano.build.variant=eightanaloginputs
 
@@ -124,6 +127,7 @@ mega2560.bootloader.lock_bits=0x0F
 
 mega2560.build.mcu=atmega2560
 mega2560.build.f_cpu=16000000L
+mega2560.build.board=ARDUINO_MEGA2560
 mega2560.build.core=arduino
 mega2560.build.variant=mega
 
@@ -147,6 +151,7 @@ mega.bootloader.lock_bits=0x0F
 
 mega.build.mcu=atmega1280
 mega.build.f_cpu=16000000L
+mega.build.board=ARDUINO_MEGA
 mega.build.core=arduino
 mega.build.variant=mega
 
@@ -173,6 +178,7 @@ leonardo.build.mcu=atmega32u4
 leonardo.build.f_cpu=16000000L
 leonardo.build.vid=0x2341
 leonardo.build.pid=0x8036
+leonardo.build.board=ARDUINO_LEONARDO
 leonardo.build.core=arduino
 leonardo.build.variant=leonardo
 leonardo.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid}
@@ -200,6 +206,7 @@ micro.build.mcu=atmega32u4
 micro.build.f_cpu=16000000L
 micro.build.vid=0x2341
 micro.build.pid=0x8037
+micro.build.board=ARDUINO_MICRO
 micro.build.core=arduino
 micro.build.variant=micro
 micro.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid}
@@ -227,6 +234,7 @@ esplora.build.mcu=atmega32u4
 esplora.build.f_cpu=16000000L
 esplora.build.vid=0x2341
 esplora.build.pid=0x803c
+esplora.build.board=ARDUINO_ESPLORA
 esplora.build.core=arduino
 esplora.build.variant=leonardo
 esplora.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid}
@@ -244,6 +252,7 @@ mini.bootloader.unlock_bits=0x3F
 mini.bootloader.lock_bits=0x0F
 
 mini.build.f_cpu=16000000L
+mini.build.board=ARDUINO_MINI
 mini.build.core=arduino
 mini.build.variant=eightanaloginputs
 
@@ -291,6 +300,7 @@ ethernet.bootloader.lock_bits=0x0F
 ethernet.build.variant=standard
 ethernet.build.mcu=atmega328p
 ethernet.build.f_cpu=16000000L
+ethernet.build.board=ARDUINO_ETHERNET
 ethernet.build.core=arduino
 
 ##############################################################
@@ -312,6 +322,7 @@ fio.bootloader.lock_bits=0x0F
 
 fio.build.mcu=atmega328p
 fio.build.f_cpu=8000000L
+fio.build.board=ARDUINO_FIO
 fio.build.core=arduino
 fio.build.variant=eightanaloginputs
 
@@ -330,6 +341,7 @@ bt.bootloader.unlock_bits=0x3F
 bt.bootloader.lock_bits=0x0F
 
 bt.build.f_cpu=16000000L
+bt.build.board=ARDUINO_BT
 bt.build.core=arduino
 bt.build.variant=eightanaloginputs
 
@@ -377,6 +389,7 @@ LilyPadUSB.build.mcu=atmega32u4
 LilyPadUSB.build.f_cpu=8000000L
 LilyPadUSB.build.vid=0x1B4F
 LilyPadUSB.build.pid=0x9208
+LilyPadUSB.build.board=ARDUINO_LILYPAD_USB
 LilyPadUSB.build.core=arduino
 LilyPadUSB.build.variant=leonardo
 LilyPadUSB.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid}
@@ -393,6 +406,7 @@ lilypad.bootloader.unlock_bits=0x3F
 lilypad.bootloader.lock_bits=0x0F
 
 lilypad.build.f_cpu=8000000L
+lilypad.build.board=ARDUINO_LILYPAD
 lilypad.build.core=arduino
 lilypad.build.variant=standard
 
@@ -433,6 +447,7 @@ pro.bootloader.tool=avrdude
 pro.bootloader.unlock_bits=0x3F
 pro.bootloader.lock_bits=0x0F
 
+pro.build.board=ARDUINO_PRO
 pro.build.core=arduino
 pro.build.variant=standard
 
@@ -506,6 +521,7 @@ atmegang.bootloader.lock_bits=0x0F
 
 atmegang.build.mcu=atmegang
 atmegang.build.f_cpu=16000000L
+atmegang.build.board=ARDUINO_NG
 atmegang.build.core=arduino
 atmegang.build.variant=standard
 

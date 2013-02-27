@@ -25,6 +25,7 @@
 package processing.app.syntax;
 
 import processing.app.*;
+import processing.app.packages.Library;
 
 import java.io.*;
 import java.util.*;
@@ -59,8 +60,8 @@ public class PdeKeywords extends CTokenMarker {
         keywordColoring = new KeywordMap(false);
         keywordToReference = new Hashtable();
         getKeywords(Base.getLibStream("keywords.txt"));
-        for (File lib : Base.getLibraries().values()) {
-          File keywords = new File(lib, "keywords.txt");
+        for (Library lib : Base.getLibraries()) {
+          File keywords = new File(lib.getFolder(), "keywords.txt");
           if (keywords.exists()) getKeywords(new FileInputStream(keywords));
         }
       } catch (Exception e) {

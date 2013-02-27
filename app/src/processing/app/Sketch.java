@@ -29,6 +29,8 @@ import processing.app.debug.RunnerException;
 import processing.app.debug.Sizer;
 import processing.app.debug.Uploader;
 import processing.app.helpers.PreferencesMap;
+import processing.app.packages.Library;
+import processing.app.packages.LibraryList;
 import processing.app.preproc.*;
 import processing.core.*;
 import static processing.app.I18n._;
@@ -88,15 +90,9 @@ public class Sketch {
   private String classPath;
 
   /**
-   * This is *not* the "Processing" libraries path, this is the Java libraries
-   * path, as in java.library.path=BlahBlah, which identifies search paths for
-   * DLLs or JNILIBs.
-   */
-  private String libraryPath;
-  /**
    * List of library folders. 
    */
-  private ArrayList<File> importedLibraries;
+  private LibraryList importedLibraries;
 
   /**
    * path is location of the main .pde file, because this is also
@@ -1120,15 +1116,19 @@ public class Sketch {
   }
 
 
+  public void importLibrary(Library lib) throws IOException {
+    importLibrary(lib.getSrcFolder());
+  }
+  
   /**
    * Add import statements to the current tab for all of packages inside
    * the specified jar file.
    */
-  public void importLibrary(String jarPath) throws IOException {
+  public void importLibrary(File jarPath) throws IOException {
     // make sure the user didn't hide the sketch folder
     ensureExistence();
 
-    String list[] = Base.headerListFromIncludePath(new File(jarPath));
+    String list[] = Base.headerListFromIncludePath(jarPath);
 
     // import statements into the main sketch file (code[0])
     // if the current code is a .java file, insert into current
@@ -1421,18 +1421,14 @@ public class Sketch {
 
     // grab the imports from the code just preproc'd
 
-    importedLibraries = new ArrayList<File>();
-    //Remember to clear library path before building it.
-    libraryPath = "";
+    importedLibraries = new LibraryList();
     for (String item : preprocessor.getExtraImports()) {
 
-        File libFolder = (File) Base.importToLibraryTable.get(item);
-        //If needed can Debug libraryPath here
+      Library lib = Base.importToLibraryTable.get(item);
+      //If needed can Debug libraryPath here
 
-      if (libFolder != null && !importedLibraries.contains(libFolder)) {
-        importedLibraries.add(libFolder);
-        //classPath += Compiler.contentsToClassPath(libFolder);
-        libraryPath += File.pathSeparator + libFolder.getAbsolutePath();
+      if (lib != null && !importedLibraries.contains(lib)) {
+        importedLibraries.add(lib);
       }
     }
 
@@ -1462,7 +1458,7 @@ public class Sketch {
   }
 
 
-  public ArrayList<File> getImportedLibraries() {
+  public LibraryList getImportedLibraries() {
     return importedLibraries;
   }
 
@@ -1884,11 +1880,6 @@ public class Sketch {
 
   public String getClassPath() {
     return classPath;
-  }
-
-
-  public String getLibraryPath() {
-    return libraryPath;
   }
 
 
