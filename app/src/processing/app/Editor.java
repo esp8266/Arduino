@@ -1234,6 +1234,7 @@ public class Editor extends JFrame implements RunnerListener {
     menu.add(item);
 
     item = newJMenuItem(_("Decrease Indent"), '[');
+    item.setName("menuDecreaseIndent");
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           handleIndentOutdent(false);

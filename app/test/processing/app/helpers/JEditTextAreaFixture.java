@@ -2,9 +2,8 @@ package processing.app.helpers;
 
 import org.fest.swing.core.Robot;
 import org.fest.swing.fixture.ComponentFixture;
-import processing.app.syntax.JEditTextArea;
 
-import java.awt.*;
+import processing.app.syntax.JEditTextArea;
 
 public class JEditTextAreaFixture extends ComponentFixture {
 
@@ -37,5 +36,10 @@ public class JEditTextAreaFixture extends ComponentFixture {
 
   public String getText() {
     return driver.getText((JEditTextArea) target);
+  }
+
+  public JEditTextAreaFixture selectAll() {
+    driver.selectAll((JEditTextArea) target);
+    return this;
   }
 }

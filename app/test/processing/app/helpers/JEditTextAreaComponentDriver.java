@@ -40,4 +40,15 @@ public class JEditTextAreaComponentDriver extends JComponentDriver {
 
     });
   }
+
+  public JEditTextArea selectAll(final JEditTextArea target) {
+    return GuiActionRunner.execute(new GuiQuery<JEditTextArea>() {
+
+      protected JEditTextArea executeInEDT() {
+        target.selectAll();
+        return target;
+      }
+
+    });
+  }
 }
