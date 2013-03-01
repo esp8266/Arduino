@@ -1082,13 +1082,6 @@ public class Base {
         PreferencesMap prefs = targetPlatform.getPreferences();
         String targetname = prefs.get("name");
 
-        if (false) {
-          // Hack to extract these words by gettext tool.
-          // These phrases are actually defined in the "platform.txt".
-          String notused = _("Arduino AVR Boards");
-          notused = _("Arduino ARM (32-bits) Boards");
-        }
-
         JMenuItem platformItem = new JMenuItem(_(targetname));
         platformItem.setEnabled(false);
         importMenu.add(platformItem);

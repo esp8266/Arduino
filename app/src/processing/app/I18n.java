@@ -14,7 +14,6 @@
 package processing.app;
 
 import java.util.*;
-import java.util.Locale.*;
 import java.text.MessageFormat;
 
 public class I18n {
@@ -57,5 +56,19 @@ public class I18n {
 
   public static String format(String fmt, Object ... args) {
     return MessageFormat.format(fmt, args);
+  }
+  
+  /**
+   * Does nothing.
+   * 
+   * This method is an hack to extract words with gettext tool.
+   */
+  protected static void unusedStrings() {
+    // These phrases are defined in the "platform.txt".
+    _("Arduino AVR Boards");
+    _("Arduino ARM (32-bits) Boards");
+
+    // This word is defined in the "boards.txt".
+    _("Processor");
   }
 }
