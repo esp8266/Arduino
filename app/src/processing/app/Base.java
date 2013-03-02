@@ -30,16 +30,16 @@ import java.util.List;
 
 import javax.swing.*;
 
+import processing.app.debug.TargetBoard;
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
+import processing.app.debug.TargetPlatformException;
 import processing.app.helpers.FileUtils;
-import processing.app.helpers.Maps;
 import processing.app.helpers.PreferencesMap;
 import processing.app.helpers.filefilters.OnlyDirs;
 import processing.app.helpers.filefilters.OnlyFilesWithExtension;
 import processing.app.javax.swing.filechooser.FileNameExtensionFilter;import processing.app.packages.Library;
 import processing.app.packages.LibraryList;
-import processing.app.tools.MapWithSubkeys;
 import processing.app.tools.ZipDeflater;
 import processing.core.*;
 import static processing.app.I18n._;
@@ -115,7 +115,6 @@ public class Base {
 
   static File portableFolder = null;
   static final String portableSketchbookFolder = "sketchbook";
-
 
   static public void main(String args[]) throws Exception {
     initPlatform();
@@ -290,6 +289,11 @@ public class Base {
     packages = new HashMap<String, TargetPackage>();
     loadHardware(getHardwareFolder());
     loadHardware(getSketchbookHardwareFolder());
+    if (packages.size() == 0) {
+      System.out.println(_("No valid configured cores found! Exiting..."));
+      System.exit(3);
+    }
+    
     // Setup board-dependent variables.
     onBoardOrPortChange();
 
@@ -1180,7 +1184,7 @@ public class Base {
     try {
       libraries = scanLibraries(librariesFolders);
     } catch (IOException e) {
-      showWarning(_("Error"), _("Error reading preferences"), e);
+      showWarning(_("Error"), _("Error loading libraries"), e);
     }
     String currentArch = Base.getTargetPlatform().getName();
     libraries = libraries.filterByArchitecture(currentArch);
@@ -1224,16 +1228,15 @@ public class Base {
       // For every package cycle through all platform
       for (TargetPlatform targetPlatform : targetPackage.platforms()) {
         String platformName = targetPlatform.getName();
-        Map<String, PreferencesMap> boards = targetPlatform.getBoards();
+        PreferencesMap customMenus = targetPlatform.getCustomMenus();
 
         if (targetPlatform.getPreferences().get("name") == null || targetPlatform.getBoards().isEmpty()) {
           continue;
         }
 
         // Add a title for each group of boards
-        if (!first) {
+        if (!first)
           boardsMenu.add(new JSeparator());
-        }
         first = false;
 
         JMenuItem separator = new JMenuItem(_(targetPlatform.getPreferences().get("name")));
@@ -1241,70 +1244,70 @@ public class Base {
         boardsMenu.add(separator);
 
         // For every platform cycle through all boards
-        for (final String boardID : targetPlatform.getBoards().keySet()) {
+        for (TargetBoard board : targetPlatform.getBoards().values()) {
           // Setup a menu item for the current board
-          String boardName = boards.get(boardID).get("name");
+          String boardName = board.getName();
+          String boardId = board.getId();
           @SuppressWarnings("serial")
           Action action = new AbstractAction(boardName) {
             public void actionPerformed(ActionEvent actionevent) {
               selectBoard((String) getValue("b"), editor);
             }
           };
-          action.putValue("b", packageName + ":" + platformName + ":" + boardID);
+          action.putValue("b", packageName + ":" + platformName + ":" + boardId);
 
           JRadioButtonMenuItem item = new JRadioButtonMenuItem(action);
           boardsMenu.add(item);
           boardsButtonGroup.add(item);
 
-          if (selBoard.equals(boardID) && selPackage.equals(packageName)
+          if (selBoard.equals(boardId) && selPackage.equals(packageName)
               && selPlatform.equals(platformName)) {
             menuItemsToClickAfterStartup.add(item);
           }
 
-          if (targetPlatform.getCustomMenus() != null) {
-            List<String> customMenuIDs = new LinkedList<String>(targetPlatform.getCustomMenus().getKeys());
-            for (int i = 0; i < customMenuIDs.size(); i++) {
-              final String customMenuID = customMenuIDs.get(i);
-              JMenu menu = makeOrGetBoardMenu(toolsMenu, _(targetPlatform.getCustomMenus().getValueOf(customMenuID)));
-              MapWithSubkeys customMenu = targetPlatform.getCustomMenus().get(customMenuID);
-              if (customMenu.getKeys().contains(boardID)) {
-                MapWithSubkeys boardCustomMenu = customMenu.get(boardID);
-                final int currentIndex = i + 1 + 1; //plus 1 to skip the first board menu, plus 1 to keep the custom menu next to this one
-                for (final String customMenuOption : boardCustomMenu.getKeys()) {
-                  @SuppressWarnings("serial")
-                  Action subAction = new AbstractAction(_(boardCustomMenu.getValueOf(customMenuOption))) {
+          int i = 0;
+          for (final String customMenuId : customMenus.topLevelKeySet()) {
+            String title = customMenus.get(customMenuId);
+            JMenu menu = makeOrGetBoardMenu(toolsMenu, _(title));
+            
+            Map<String, PreferencesMap> customMenu = customMenus.subTree(customMenuId).firstLevelMap();
+            if (customMenu.containsKey(boardId)) {
+              PreferencesMap boardCustomMenu = customMenu.get(boardId);
+              final int currentIndex = i + 1 + 1; //plus 1 to skip the first board menu, plus 1 to keep the custom menu next to this one
+              i++;
+              for (String customMenuOption : boardCustomMenu.topLevelKeySet()) {
+                @SuppressWarnings("serial")
+                Action subAction = new AbstractAction(_(boardCustomMenu.get(customMenuOption))) {
+                  public void actionPerformed(ActionEvent e) {
+                    Preferences.set("target_package", (String) getValue("package"));
+                    Preferences.set("target_platform", (String) getValue("platform"));
+                    Preferences.set("board", (String) getValue("board"));
+                    Preferences.set("custom_" + customMenuId, (String) getValue("board") + "_" + (String) getValue("custom_menu_option"));
 
-                    public void actionPerformed(ActionEvent e) {
-                      Preferences.set("target_package", (String) getValue("package"));
-                      Preferences.set("target_platform", (String) getValue("platform"));
-                      Preferences.set("board", (String) getValue("board"));
-                      Preferences.set("custom_" + customMenuID, boardID + "_" + (String) getValue("custom_menu_option"));
+                    filterVisibilityOfSubsequentBoardMenus((String) getValue("board"), currentIndex);
 
-                      filterVisibilityOfSubsequentBoardMenus((String) getValue("board"), currentIndex);
-
-                      onBoardOrPortChange();
-                      Sketch.buildSettingChanged();
-                      rebuildImportMenu(Editor.importMenu, editor);
-                      rebuildExamplesMenu(Editor.examplesMenu);
-                    }
-                  };
-                  subAction.putValue("board", boardID);
-                  subAction.putValue("custom_menu_option", customMenuOption);
-                  subAction.putValue("package", packageName);
-                  subAction.putValue("platform", platformName);
-
-                  if (!buttonGroupsMap.containsKey(customMenuID)) {
-                    buttonGroupsMap.put(customMenuID, new ButtonGroup());
+                    onBoardOrPortChange();
+                    Sketch.buildSettingChanged();
+                    rebuildImportMenu(Editor.importMenu, editor);
+                    rebuildExamplesMenu(Editor.examplesMenu);
                   }
+                };
+                subAction.putValue("board", boardId);
+                subAction.putValue("custom_menu_option", customMenuOption);
+                subAction.putValue("package", packageName);
+                subAction.putValue("platform", platformName);
 
-                  item = new JRadioButtonMenuItem(subAction);
-                  menu.add(item);
-                  buttonGroupsMap.get(customMenuID).add(item);
+                if (!buttonGroupsMap.containsKey(customMenuId)) {
+                  buttonGroupsMap.put(customMenuId, new ButtonGroup());
+                }
 
-                  String selectedCustomMenuEntry = Preferences.get("custom_" + customMenuID);
-                  if (selBoard.equals(boardID) && (boardID + "_" + customMenuOption).equals(selectedCustomMenuEntry)) {
-                    menuItemsToClickAfterStartup.add(item);
-                  }
+                item = new JRadioButtonMenuItem(subAction);
+                menu.add(item);
+                buttonGroupsMap.get(customMenuId).add(item);
+
+                String selectedCustomMenuEntry = Preferences.get("custom_" + customMenuId);
+                if (selBoard.equals(boardId) && (boardId + "_" + customMenuOption).equals(selectedCustomMenuEntry)) {
+                  menuItemsToClickAfterStartup.add(item);
                 }
               }
             }
@@ -1604,7 +1607,13 @@ public class Base {
       if (target.equals("tools"))
         continue;
       File subfolder = new File(folder, target);
-      packages.put(target, new TargetPackage(target, subfolder));
+      
+      try {
+        packages.put(target, new TargetPackage(target, subfolder));
+      } catch (TargetPlatformException e) {
+        System.out.println("WARNING: Error loading hardware folder " + target);
+        System.out.println("  " + e.getMessage());
+      }
     }
   }
 
@@ -1921,19 +1930,18 @@ public class Base {
     return getTargetPlatform(pack, Preferences.get("target_platform"));
   }
 
-  static public Map<String, String> getBoardPreferences() {
+  static public PreferencesMap getBoardPreferences() {
     TargetPlatform target = getTargetPlatform();
     String board = Preferences.get("board");
-    Map<String, String> boardPreferences = Maps.merge(target.getBoards().get(board), new LinkedHashMap<String, String>());
-    if (target.getCustomMenus() != null) {
-      for (String customMenuID : target.getCustomMenus().getKeys()) {
-        MapWithSubkeys boardCustomMenu = target.getCustomMenus().get(customMenuID).get(board);
-        String selectedCustomMenuEntry = Preferences.get("custom_" + customMenuID);
-        if (boardCustomMenu != null && selectedCustomMenuEntry != null && selectedCustomMenuEntry.startsWith(board)) {
-          String menuEntryId = selectedCustomMenuEntry.substring(selectedCustomMenuEntry.indexOf("_") + 1);
-          Maps.merge(boardCustomMenu.get(menuEntryId).getValues(), boardPreferences);
-          boardPreferences.put("name", boardPreferences.get("name") + ", " + boardCustomMenu.getValueOf(menuEntryId));
-        }
+    PreferencesMap boardPreferences = new PreferencesMap(target.getBoard(board).getPreferences());
+    PreferencesMap customMenus = target.getCustomMenus();
+    for (String customMenuID : customMenus.topLevelKeySet()) {
+      PreferencesMap boardCustomMenu = customMenus.subTree(customMenuID).subTree(board);
+      String selectedCustomMenuEntry = Preferences.get("custom_" + customMenuID);
+      if (boardCustomMenu.size() > 0 && selectedCustomMenuEntry != null && selectedCustomMenuEntry.startsWith(board)) {
+        String menuEntryId = selectedCustomMenuEntry.substring(selectedCustomMenuEntry.indexOf("_") + 1);
+        boardPreferences.putAll(boardCustomMenu.subTree(menuEntryId));
+        boardPreferences.put("name", boardPreferences.get("name") + ", " + boardCustomMenu.get(menuEntryId));
       }
     }
     return boardPreferences;
