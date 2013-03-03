@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 #
 # Extract the text catalog from the source code,
@@ -21,11 +21,22 @@ trap "rm -f '$catalog' '$files'" 0 1 2 15
 find .. -name '*.java' -print > "$files"
 xgettext -L Java --from-code=utf-8 -k_ --output="$catalog" --files-from="$files"
 
-# Then, merge with already translated texts.
-for target in *.po; do
-  echo "Updating $target..."
-  cat "$catalog" | python i18n_update.py "$target"
-  msgcat -p "$target" > $(basename "$target" .po).properties
+update()
+{
+  echo "Updating $1..."
+  cat "$catalog" | python i18n_update.py "$1"
+  msgcat -p "$1" > $(basename "$1" .po).properties
   # msgcat may complain about "CHARSET" if you didn't replace "CHARSET" with
   # your correct charset.
-done
+}
+
+# Then, merge with already translated texts.
+if [ $# = 0 ]; then
+  for target in *.po; do
+    update $target
+  done
+else
+  for target in $*; do
+    update Resources_$target.po
+  done
+fi
