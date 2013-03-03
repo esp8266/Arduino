@@ -28,7 +28,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -153,64 +152,6 @@ public class PreferencesMap extends LinkedHashMap<String, String> {
       res.put(key, get(key));
     }
     return res;
-  }
-
-  /**
-   * Returns the values of all the top level pairs of the current mapping. E.g.
-   * the folowing mapping:<br />
-   * 
-   * <pre>
-   * Map (
-   *     alpha = Alpha
-   *     alpha.some.keys = v1
-   *     alpha.other.keys = v2
-   *     beta = Beta
-   *     beta.some.keys = v3
-   *   )
-   * </pre>
-   * 
-   * will generate the following result:
-   * 
-   * <pre>
-   * Collection (
-   *     Alpha
-   *     Beta
-   *   )
-   * </pre>
-   * 
-   * @return
-   */
-  public Collection<String> topLevelValues() {
-    return topLevelMap().values();
-  }
-
-  /**
-   * Returns a key set of all the top level pairs of the current mapping. E.g.
-   * the folowing mapping:<br />
-   * 
-   * <pre>
-   * Map (
-   *     alpha = Alpha
-   *     alpha.some.keys = v1
-   *     alpha.other.keys = v2
-   *     beta = Beta
-   *     beta.some.keys = v3
-   *   )
-   * </pre>
-   * 
-   * will generate the following result:
-   * 
-   * <pre>
-   * Set (
-   *     alpha
-   *     beta
-   *   )
-   * </pre>
-   * 
-   * @return
-   */
-  public Set<String> topLevelKeySet() {
-    return topLevelMap().keySet();
   }
 
   /**

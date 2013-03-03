@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import processing.app.helpers.PreferencesMap;
 
@@ -129,6 +130,10 @@ public class TargetPlatform {
 
   public PreferencesMap getCustomMenus() {
     return customMenus;
+  }
+
+  public Set<String> getCustomMenusKeys() {
+    return customMenus.keySet();
   }
 
   public Map<String, PreferencesMap> getProgrammers() {

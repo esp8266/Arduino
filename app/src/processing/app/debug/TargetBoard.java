@@ -53,15 +53,52 @@ public class TargetBoard {
     return prefs;
   }
 
-  public void setMenuOptions(String menuId, PreferencesMap _menuOptions) {
-    menuOptions.put(menuId, _menuOptions);
-  }
-
-  public PreferencesMap getMenuOptions(String menuId) {
-    return menuOptions.get(menuId);
-  }
-
-  public boolean hasMenuOptions(String menuId) {
+  /**
+   * Check if the board has a sub menu.
+   * 
+   * @param menuId
+   *          The menu ID to check
+   * @return
+   */
+  public boolean hasMenu(String menuId) {
     return menuOptions.containsKey(menuId);
+  }
+
+  /**
+   * Returns the options available on a specific menu
+   * 
+   * @param menuId
+   *          The menu ID
+   * @return
+   */
+  public PreferencesMap getMenuLabels(String menuId) {
+    return menuOptions.get(menuId).topLevelMap();
+  }
+
+  /**
+   * Returns the label of the specified option in the specified menu
+   * 
+   * @param menuId
+   *          The menu ID
+   * @param selectionId
+   *          The option ID
+   * @return
+   */
+  public String getMenuLabel(String menuId, String selectionId) {
+    return getMenuLabels(menuId).get(selectionId);
+  }
+
+  /**
+   * Returns the configuration parameters to override (as a PreferenceMap) when
+   * the specified option in the specified menu is selected
+   * 
+   * @param menuId
+   *          The menu ID
+   * @param selectionId
+   *          The option ID
+   * @return
+   */
+  public PreferencesMap getMenuConfiguration(String menuId, String selectionId) {
+    return menuOptions.get(menuId).subTree(selectionId);
   }
 }
