@@ -77,35 +77,14 @@ public class TargetPlatform {
 
       // Create custom menus for this platform
       PreferencesMap menus = boardsPreferences.get("menu");
-      boardsPreferences.remove("menu");
       if (menus != null)
         customMenus = menus.topLevelMap();
-
-      // Create maps for every menu option:
-      // - a Map that pairs a specific menu option (e.g. "cpu") to
-      // - a Map that pairs a specific board (e.g. "duemilanove") to
-      // - a PrefenceMap with all the options that overrides default
-      // configuration values
-      Map<String, Map<String, PreferencesMap>> subMenus = new LinkedHashMap<String, Map<String, PreferencesMap>>();
-      for (String id : customMenus.keySet()) {
-        subMenus.put(id, menus.subTree(id).firstLevelMap());
-      }
+      boardsPreferences.remove("menu");
 
       // Create boards
       for (String id : boardsPreferences.keySet()) {
         PreferencesMap preferences = boardsPreferences.get(id);
         TargetBoard board = new TargetBoard(id, preferences);
-
-        if (menus != null) {
-          // Build custom menu for the specified board
-          PreferencesMap boardCustomMenu = new PreferencesMap();
-          for (String menuId : customMenus.keySet()) {
-            // Check if the board has option for this custom menu
-            if (subMenus.get(menuId).containsKey(id))
-              // Add specific custom menu to the board
-              board.setMenuOptions(menuId, subMenus.get(menuId).get(id));
-          }
-        }
         boards.put(id, board);
       }
     } catch (IOException e) {

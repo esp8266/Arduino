@@ -20,6 +20,10 @@ public class TargetBoard {
   public TargetBoard(String _id, PreferencesMap _prefs) {
     id = _id;
     prefs = new PreferencesMap(_prefs);
+
+    PreferencesMap menus = prefs.firstLevelMap().get("menu");
+    if (menus != null)
+      menuOptions = menus.firstLevelMap();
   }
 
   /**

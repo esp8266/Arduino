@@ -42,28 +42,30 @@ atmega328diecimila.build.core=arduino
 atmega328diecimila.build.variant=standard
 
 ## Arduino Duemilanove or Diecimila w/ ATmega328
-menu.cpu.atmega328diecimila.atmega328=ATmega328
+## ---------------------------------------------
+atmega328diecimila.menu.cpu.atmega328=ATmega328
 
-menu.cpu.atmega328diecimila.atmega328.upload.maximum_size=30720
-menu.cpu.atmega328diecimila.atmega328.upload.speed=57600
+atmega328diecimila.menu.cpu.atmega328.upload.maximum_size=30720
+atmega328diecimila.menu.cpu.atmega328.upload.speed=57600
 
-menu.cpu.atmega328diecimila.atmega328.bootloader.high_fuses=0xDA
-menu.cpu.atmega328diecimila.atmega328.bootloader.extended_fuses=0x05
-menu.cpu.atmega328diecimila.atmega328.bootloader.file=atmega/ATmegaBOOT_168_atmega328.hex
+atmega328diecimila.menu.cpu.atmega328.bootloader.high_fuses=0xDA
+atmega328diecimila.menu.cpu.atmega328.bootloader.extended_fuses=0x05
+atmega328diecimila.menu.cpu.atmega328.bootloader.file=atmega/ATmegaBOOT_168_atmega328.hex
 
-menu.cpu.atmega328diecimila.atmega328.build.mcu=atmega328p
+atmega328diecimila.menu.cpu.atmega328.build.mcu=atmega328p
 
 ## Arduino Duemilanove or Diecimila w/ ATmega168
-menu.cpu.atmega328diecimila.atmega168=ATmega168
+## ---------------------------------------------
+atmega328diecimila.menu.cpu.atmega168=ATmega168
 
-menu.cpu.atmega328diecimila.atmega168.upload.maximum_size=14336
-menu.cpu.atmega328diecimila.atmega168.upload.speed=19200
+atmega328diecimila.menu.cpu.atmega168.upload.maximum_size=14336
+atmega328diecimila.menu.cpu.atmega168.upload.speed=19200
 
-menu.cpu.atmega328diecimila.atmega168.bootloader.high_fuses=0xdd
-menu.cpu.atmega328diecimila.atmega168.bootloader.extended_fuses=0x00
-menu.cpu.atmega328diecimila.atmega168.bootloader.file=atmega/ATmegaBOOT_168_diecimila.hex
+atmega328diecimila.menu.cpu.atmega168.bootloader.high_fuses=0xdd
+atmega328diecimila.menu.cpu.atmega168.bootloader.extended_fuses=0x00
+atmega328diecimila.menu.cpu.atmega168.bootloader.file=atmega/ATmegaBOOT_168_diecimila.hex
 
-menu.cpu.atmega328diecimila.atmega168.build.mcu=atmega168
+atmega328diecimila.menu.cpu.atmega168.build.mcu=atmega168
 
 ##############################################################
 
@@ -82,30 +84,32 @@ nano.build.core=arduino
 nano.build.variant=eightanaloginputs
 
 ## Arduino Nano w/ ATmega328
-menu.cpu.nano.atmega328=ATmega328
+## -------------------------
+nano.menu.cpu.atmega328=ATmega328
 
-menu.cpu.nano.atmega328.upload.maximum_size=30720
-menu.cpu.nano.atmega328.upload.speed=57600
+nano.menu.cpu.atmega328.upload.maximum_size=30720
+nano.menu.cpu.atmega328.upload.speed=57600
 
-menu.cpu.nano.atmega328.bootloader.low_fuses=0xFF
-menu.cpu.nano.atmega328.bootloader.high_fuses=0xDA
-menu.cpu.nano.atmega328.bootloader.extended_fuses=0x05
-menu.cpu.nano.atmega328.bootloader.file=atmega/ATmegaBOOT_168_atmega328.hex
+nano.menu.cpu.atmega328.bootloader.low_fuses=0xFF
+nano.menu.cpu.atmega328.bootloader.high_fuses=0xDA
+nano.menu.cpu.atmega328.bootloader.extended_fuses=0x05
+nano.menu.cpu.atmega328.bootloader.file=atmega/ATmegaBOOT_168_atmega328.hex
 
 menu.cpu.nano.atmega328.build.mcu=atmega328p
 
 ## Arduino Nano w/ ATmega168
-menu.cpu.nano.atmega168=ATmega168
+## -------------------------
+nano.menu.cpu.atmega168=ATmega168
 
-menu.cpu.nano.atmega168.upload.maximum_size=14336
-menu.cpu.nano.atmega168.upload.speed=19200
+nano.menu.cpu.atmega168.upload.maximum_size=14336
+nano.menu.cpu.atmega168.upload.speed=19200
 
-menu.cpu.nano.atmega168.bootloader.low_fuses=0xff
-menu.cpu.nano.atmega168.bootloader.high_fuses=0xdd
-menu.cpu.nano.atmega168.bootloader.extended_fuses=0x00
-menu.cpu.nano.atmega168.bootloader.file=atmega/ATmegaBOOT_168_diecimila.hex
+nano.menu.cpu.atmega168.bootloader.low_fuses=0xff
+nano.menu.cpu.atmega168.bootloader.high_fuses=0xdd
+nano.menu.cpu.atmega168.bootloader.extended_fuses=0x00
+nano.menu.cpu.atmega168.bootloader.file=atmega/ATmegaBOOT_168_diecimila.hex
 
-menu.cpu.nano.atmega168.build.mcu=atmega168
+nano.menu.cpu.atmega168.build.mcu=atmega168
 
 ##############################################################
 
@@ -257,28 +261,30 @@ mini.build.core=arduino
 mini.build.variant=eightanaloginputs
 
 ## Arduino Mini w/ ATmega328
-menu.cpu.mini.atmega328=ATmega328
+## -------------------------
+mini.menu.cpu.atmega328=ATmega328
 
-menu.cpu.mini.atmega328.upload.maximum_size=28672
-menu.cpu.mini.atmega328.upload.speed=115200
+mini.menu.cpu.atmega328.upload.maximum_size=28672
+mini.menu.cpu.atmega328.upload.speed=115200
 
-menu.cpu.mini.atmega328.bootloader.high_fuses=0xd8
-menu.cpu.mini.atmega328.bootloader.extended_fuses=0x05
-menu.cpu.mini.atmega328.bootloader.file=optiboot/optiboot_atmega328-Mini.hex
+mini.menu.cpu.atmega328.bootloader.high_fuses=0xd8
+mini.menu.cpu.atmega328.bootloader.extended_fuses=0x05
+mini.menu.cpu.atmega328.bootloader.file=optiboot/optiboot_atmega328-Mini.hex
 
-menu.cpu.mini.atmega328.build.mcu=atmega328p
+mini.menu.cpu.atmega328.build.mcu=atmega328p
 
 ## Arduino Mini w/ ATmega168
-menu.cpu.mini.atmega168=ATmega168
+## -------------------------
+mini.menu.cpu.atmega168=ATmega168
 
-menu.cpu.mini.atmega168.upload.maximum_size=14336
-menu.cpu.mini.atmega168.upload.speed=19200
+mini.menu.cpu.atmega168.upload.maximum_size=14336
+mini.menu.cpu.atmega168.upload.speed=19200
 
-menu.cpu.mini.atmega168.bootloader.high_fuses=0xdd
-menu.cpu.mini.atmega168.bootloader.extended_fuses=0x00
-menu.cpu.mini.atmega168.bootloader.file=atmega/ATmegaBOOT_168_ng.hex
+mini.menu.cpu.atmega168.bootloader.high_fuses=0xdd
+mini.menu.cpu.atmega168.bootloader.extended_fuses=0x00
+mini.menu.cpu.atmega168.bootloader.file=atmega/ATmegaBOOT_168_ng.hex
 
-menu.cpu.mini.atmega168.build.mcu=atmega168
+mini.menu.cpu.atmega168.build.mcu=atmega168
 
 ##############################################################
 
@@ -346,24 +352,26 @@ bt.build.core=arduino
 bt.build.variant=eightanaloginputs
 
 ## Arduino BT w/ ATmega328
-menu.cpu.bt.atmega328=ATmega328
-menu.cpu.bt.atmega328.upload.maximum_size=28672
+## -----------------------
+bt.menu.cpu.atmega328=ATmega328
+bt.menu.cpu.atmega328.upload.maximum_size=28672
 
-menu.cpu.bt.atmega328.bootloader.high_fuses=0xd8
-menu.cpu.bt.atmega328.bootloader.extended_fuses=0x05
-menu.cpu.bt.atmega328.bootloader.file=bt/ATmegaBOOT_168_atmega328_bt.hex
+bt.menu.cpu.atmega328.bootloader.high_fuses=0xd8
+bt.menu.cpu.atmega328.bootloader.extended_fuses=0x05
+bt.menu.cpu.atmega328.bootloader.file=bt/ATmegaBOOT_168_atmega328_bt.hex
 
-menu.cpu.bt.atmega328.build.mcu=atmega328p
+bt.menu.cpu.atmega328.build.mcu=atmega328p
 
 ## Arduino BT w/ ATmega168
-menu.cpu.bt.atmega168=ATmega168
-menu.cpu.bt.atmega168.upload.maximum_size=14336
+## -----------------------
+bt.menu.cpu.atmega168=ATmega168
+bt.menu.cpu.atmega168.upload.maximum_size=14336
 
-menu.cpu.bt.atmega168.bootloader.high_fuses=0xdd
-menu.cpu.bt.atmega168.bootloader.extended_fuses=0x00
-menu.cpu.bt.atmega168.bootloader.file=bt/ATmegaBOOT_168.hex
+bt.menu.cpu.atmega168.bootloader.high_fuses=0xdd
+bt.menu.cpu.atmega168.bootloader.extended_fuses=0x00
+bt.menu.cpu.atmega168.bootloader.file=bt/ATmegaBOOT_168.hex
 
-menu.cpu.bt.atmega168.build.mcu=atmega168
+bt.menu.cpu.atmega168.build.mcu=atmega168
 
 ##############################################################
 
@@ -411,30 +419,32 @@ lilypad.build.core=arduino
 lilypad.build.variant=standard
 
 ## LilyPad Arduino w/ ATmega328
-menu.cpu.lilypad.atmega328=ATmega328
+## ----------------------------
+lilypad.menu.cpu.atmega328=ATmega328
 
-menu.cpu.lilypad.atmega328.upload.maximum_size=30720
-menu.cpu.lilypad.atmega328.upload.speed=57600
+lilypad.menu.cpu.atmega328.upload.maximum_size=30720
+lilypad.menu.cpu.atmega328.upload.speed=57600
 
-menu.cpu.lilypad.atmega328.bootloader.low_fuses=0xFF
-menu.cpu.lilypad.atmega328.bootloader.high_fuses=0xDA
-menu.cpu.lilypad.atmega328.bootloader.extended_fuses=0x05
-menu.cpu.lilypad.atmega328.bootloader.file=atmega/ATmegaBOOT_168_atmega328_pro_8MHz.hex
+lilypad.menu.cpu.atmega328.bootloader.low_fuses=0xFF
+lilypad.menu.cpu.atmega328.bootloader.high_fuses=0xDA
+lilypad.menu.cpu.atmega328.bootloader.extended_fuses=0x05
+lilypad.menu.cpu.atmega328.bootloader.file=atmega/ATmegaBOOT_168_atmega328_pro_8MHz.hex
 
-menu.cpu.lilypad.atmega328.build.mcu=atmega328p
+lilypad.menu.cpu.atmega328.build.mcu=atmega328p
 
 ## LilyPad Arduino w/ ATmega168
-menu.cpu.lilypad.atmega168=ATmega168
+## ----------------------------
+lilypad.menu.cpu.atmega168=ATmega168
 
-menu.cpu.lilypad.atmega168.upload.maximum_size=14336
-menu.cpu.lilypad.atmega168.upload.speed=19200
+lilypad.menu.cpu.atmega168.upload.maximum_size=14336
+lilypad.menu.cpu.atmega168.upload.speed=19200
 
-menu.cpu.lilypad.atmega168.bootloader.low_fuses=0xe2
-menu.cpu.lilypad.atmega168.bootloader.high_fuses=0xdd
-menu.cpu.lilypad.atmega168.bootloader.extended_fuses=0x00
-menu.cpu.lilypad.atmega168.bootloader.file=lilypad/LilyPadBOOT_168.hex
+lilypad.menu.cpu.atmega168.bootloader.low_fuses=0xe2
+lilypad.menu.cpu.atmega168.bootloader.high_fuses=0xdd
+lilypad.menu.cpu.atmega168.bootloader.extended_fuses=0x00
+lilypad.menu.cpu.atmega168.bootloader.file=lilypad/LilyPadBOOT_168.hex
 
-menu.cpu.lilypad.atmega168.build.mcu=atmega168
+lilypad.menu.cpu.atmega168.build.mcu=atmega168
 
 ##############################################################
 
@@ -452,60 +462,64 @@ pro.build.core=arduino
 pro.build.variant=standard
 
 ## Arduino Pro or Pro Mini (5V, 16 MHz) w/ ATmega328
-menu.cpu.pro.16MHzatmega328=ATmega328 (5V, 16 MHz)
+## -------------------------------------------------
+pro.menu.cpu.16MHzatmega328=ATmega328 (5V, 16 MHz)
 
-menu.cpu.pro.16MHzatmega328.upload.maximum_size=30720
-menu.cpu.pro.16MHzatmega328.upload.speed=57600
+pro.menu.cpu.16MHzatmega328.upload.maximum_size=30720
+pro.menu.cpu.16MHzatmega328.upload.speed=57600
 
-menu.cpu.pro.16MHzatmega328.bootloader.low_fuses=0xFF
-menu.cpu.pro.16MHzatmega328.bootloader.high_fuses=0xDA
-menu.cpu.pro.16MHzatmega328.bootloader.extended_fuses=0x05
-menu.cpu.pro.16MHzatmega328.bootloader.file=atmega/ATmegaBOOT_168_atmega328.hex
+pro.menu.cpu.16MHzatmega328.bootloader.low_fuses=0xFF
+pro.menu.cpu.16MHzatmega328.bootloader.high_fuses=0xDA
+pro.menu.cpu.16MHzatmega328.bootloader.extended_fuses=0x05
+pro.menu.cpu.16MHzatmega328.bootloader.file=atmega/ATmegaBOOT_168_atmega328.hex
 
-menu.cpu.pro.16MHzatmega328.build.mcu=atmega328p
-menu.cpu.pro.16MHzatmega328.build.f_cpu=16000000L
+pro.menu.cpu.16MHzatmega328.build.mcu=atmega328p
+pro.menu.cpu.16MHzatmega328.build.f_cpu=16000000L
 
 ## Arduino Pro or Pro Mini (3.3V, 8 MHz) w/ ATmega328
-menu.cpu.pro.8MHzatmega328=ATmega328 (3.3V, 8 MHz)
+## --------------------------------------------------
+pro.menu.cpu.8MHzatmega328=ATmega328 (3.3V, 8 MHz)
 
-menu.cpu.pro.8MHzatmega328.upload.maximum_size=30720
-menu.cpu.pro.8MHzatmega328.upload.speed=57600
+pro.menu.cpu.8MHzatmega328.upload.maximum_size=30720
+pro.menu.cpu.8MHzatmega328.upload.speed=57600
 
-menu.cpu.pro.8MHzatmega328.bootloader.low_fuses=0xFF
-menu.cpu.pro.8MHzatmega328.bootloader.high_fuses=0xDA
-menu.cpu.pro.8MHzatmega328.bootloader.extended_fuses=0x05
-menu.cpu.pro.8MHzatmega328.bootloader.file=atmega/ATmegaBOOT_168_atmega328_pro_8MHz.hex
+pro.menu.cpu.8MHzatmega328.bootloader.low_fuses=0xFF
+pro.menu.cpu.8MHzatmega328.bootloader.high_fuses=0xDA
+pro.menu.cpu.8MHzatmega328.bootloader.extended_fuses=0x05
+pro.menu.cpu.8MHzatmega328.bootloader.file=atmega/ATmegaBOOT_168_atmega328_pro_8MHz.hex
 
-menu.cpu.pro.8MHzatmega328.build.mcu=atmega328p
-menu.cpu.pro.8MHzatmega328.build.f_cpu=8000000L
+pro.menu.cpu.8MHzatmega328.build.mcu=atmega328p
+pro.menu.cpu.8MHzatmega328.build.f_cpu=8000000L
 
 ## Arduino Pro or Pro Mini (5V, 16 MHz) w/ ATmega168
-menu.cpu.pro.16MHzatmega168=ATmega168 (5V, 16 MHz)
+## -------------------------------------------------
+pro.menu.cpu.16MHzatmega168=ATmega168 (5V, 16 MHz)
 
-menu.cpu.pro.16MHzatmega168.upload.maximum_size=14336
-menu.cpu.pro.16MHzatmega168.upload.speed=19200
+pro.menu.cpu.16MHzatmega168.upload.maximum_size=14336
+pro.menu.cpu.16MHzatmega168.upload.speed=19200
 
-menu.cpu.pro.16MHzatmega168.bootloader.low_fuses=0xff
-menu.cpu.pro.16MHzatmega168.bootloader.high_fuses=0xdd
-menu.cpu.pro.16MHzatmega168.bootloader.extended_fuses=0x00
-menu.cpu.pro.16MHzatmega168.bootloader.file=atmega/ATmegaBOOT_168_diecimila.hex
+pro.menu.cpu.16MHzatmega168.bootloader.low_fuses=0xff
+pro.menu.cpu.16MHzatmega168.bootloader.high_fuses=0xdd
+pro.menu.cpu.16MHzatmega168.bootloader.extended_fuses=0x00
+pro.menu.cpu.16MHzatmega168.bootloader.file=atmega/ATmegaBOOT_168_diecimila.hex
 
-menu.cpu.pro.16MHzatmega168.build.mcu=atmega168
-menu.cpu.pro.16MHzatmega168.build.f_cpu=16000000L
+pro.menu.cpu.16MHzatmega168.build.mcu=atmega168
+pro.menu.cpu.16MHzatmega168.build.f_cpu=16000000L
 
 ## Arduino Pro or Pro Mini (3.3V, 8 MHz) w/ ATmega168
-menu.cpu.pro.8MHzatmega168=ATmega168 (3.3V, 8 MHz)
+## --------------------------------------------------
+pro.menu.cpu.8MHzatmega168=ATmega168 (3.3V, 8 MHz)
 
-menu.cpu.pro.8MHzatmega168.upload.maximum_size=14336
-menu.cpu.pro.8MHzatmega168.upload.speed=19200
+pro.menu.cpu.8MHzatmega168.upload.maximum_size=14336
+pro.menu.cpu.8MHzatmega168.upload.speed=19200
 
-menu.cpu.pro.8MHzatmega168.bootloader.low_fuses=0xc6
-menu.cpu.pro.8MHzatmega168.bootloader.high_fuses=0xdd
-menu.cpu.pro.8MHzatmega168.bootloader.extended_fuses=0x00
-menu.cpu.pro.8MHzatmega168.bootloader.file=atmega/ATmegaBOOT_168_pro_8MHz.hex
+pro.menu.cpu.8MHzatmega168.bootloader.low_fuses=0xc6
+pro.menu.cpu.8MHzatmega168.bootloader.high_fuses=0xdd
+pro.menu.cpu.8MHzatmega168.bootloader.extended_fuses=0x00
+pro.menu.cpu.8MHzatmega168.bootloader.file=atmega/ATmegaBOOT_168_pro_8MHz.hex
 
-menu.cpu.pro.8MHzatmega168.build.mcu=atmega168
-menu.cpu.pro.8MHzatmega168.build.f_cpu=8000000L
+pro.menu.cpu.8MHzatmega168.build.mcu=atmega168
+pro.menu.cpu.8MHzatmega168.build.f_cpu=8000000L
 
 ##############################################################
 
@@ -526,24 +540,26 @@ atmegang.build.core=arduino
 atmegang.build.variant=standard
 
 ## Arduino NG or older w/ ATmega168
-menu.cpu.atmegang.atmega168=ATmega168
+## --------------------------------
+atmegang.menu.cpu.atmega168=ATmega168
 
-menu.cpu.atmegang.atmega168.upload.maximum_size=14336
+atmegang.menu.cpu.atmega168.upload.maximum_size=14336
 
-menu.cpu.atmegang.atmega168.bootloader.low_fuses=0xff
-menu.cpu.atmegang.atmega168.bootloader.high_fuses=0xdd
-menu.cpu.atmegang.atmega168.bootloader.extended_fuses=0x00
-menu.cpu.atmegang.atmega168.bootloader.file=atmega/ATmegaBOOT_168_ng.hex
+atmegang.menu.cpu.atmega168.bootloader.low_fuses=0xff
+atmegang.menu.cpu.atmega168.bootloader.high_fuses=0xdd
+atmegang.menu.cpu.atmega168.bootloader.extended_fuses=0x00
+atmegang.menu.cpu.atmega168.bootloader.file=atmega/ATmegaBOOT_168_ng.hex
 
-menu.cpu.atmegang.atmega168.build.mcu=atmega168
+atmegang.menu.cpu.atmega168.build.mcu=atmega168
 
 ## Arduino NG or older w/ ATmega8
-menu.cpu.atmegang.atmega8=ATmega8
+## ------------------------------
+atmegang.menu.cpu.atmega8=ATmega8
 
-menu.cpu.atmegang.atmega8.upload.maximum_size=7168
+atmegang.menu.cpu.atmega8.upload.maximum_size=7168
 
-menu.cpu.atmegang.atmega8.bootloader.low_fuses=0xdf
-menu.cpu.atmegang.atmega8.bootloader.high_fuses=0xca
-menu.cpu.atmegang.atmega8.bootloader.file=atmega8/ATmegaBOOT-prod-firmware-2009-11-07.hex
+atmegang.menu.cpu.atmega8.bootloader.low_fuses=0xdf
+atmegang.menu.cpu.atmega8.bootloader.high_fuses=0xca
+atmegang.menu.cpu.atmega8.bootloader.file=atmega8/ATmegaBOOT-prod-firmware-2009-11-07.hex
 
-menu.cpu.atmegang.atmega8.build.mcu=atmega8
+atmegang.menu.cpu.atmega8.build.mcu=atmega8
