@@ -1,11 +1,15 @@
 package processing.app.debug;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import processing.app.helpers.PreferencesMap;
 
 public class TargetBoard {
 
-  String id;
-  PreferencesMap prefs;
+  private String id;
+  private PreferencesMap prefs;
+  private Map<String, PreferencesMap> menuOptions = new LinkedHashMap<String, PreferencesMap>();
 
   /**
    * Create a TargetBoard based on preferences passed as argument.
@@ -43,5 +47,17 @@ public class TargetBoard {
    */
   public PreferencesMap getPreferences() {
     return prefs;
+  }
+
+  public void setMenuOptions(String menuId, PreferencesMap _menuOptions) {
+    menuOptions.put(menuId, _menuOptions);
+  }
+
+  public PreferencesMap getMenuOptions(String menuId) {
+    return menuOptions.get(menuId);
+  }
+
+  public boolean hasMenuOptions(String menuId) {
+    return menuOptions.containsKey(menuId);
   }
 }

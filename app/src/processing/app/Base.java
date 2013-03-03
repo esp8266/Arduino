@@ -1228,7 +1228,6 @@ public class Base {
       // For every package cycle through all platform
       for (TargetPlatform targetPlatform : targetPackage.platforms()) {
         String platformName = targetPlatform.getName();
-        PreferencesMap customMenus = targetPlatform.getCustomMenus();
 
         if (targetPlatform.getPreferences().get("name") == null || targetPlatform.getBoards().isEmpty()) {
           continue;
@@ -1265,14 +1264,17 @@ public class Base {
             menuItemsToClickAfterStartup.add(item);
           }
 
+          PreferencesMap customMenus = targetPlatform.getCustomMenus();
           int i = 0;
-          for (final String customMenuId : customMenus.topLevelKeySet()) {
-            String title = customMenus.get(customMenuId);
+          for (final String menuId : customMenus.keySet()) {
+            String title = customMenus.get(menuId);
             JMenu menu = makeOrGetBoardMenu(toolsMenu, _(title));
             
-            Map<String, PreferencesMap> customMenu = customMenus.subTree(customMenuId).firstLevelMap();
-            if (customMenu.containsKey(boardId)) {
-              PreferencesMap boardCustomMenu = customMenu.get(boardId);
+            //Map<String, PreferencesMap> customMenu = customMenus.subTree(menuId).firstLevelMap();
+            if (board.hasMenuOptions(menuId)) {
+            //if (customMenu.containsKey(boardId)) {
+              //PreferencesMap boardCustomMenu = customMenu.get(boardId);
+              PreferencesMap boardCustomMenu = board.getMenuOptions(menuId);
               final int currentIndex = i + 1 + 1; //plus 1 to skip the first board menu, plus 1 to keep the custom menu next to this one
               i++;
               for (String customMenuOption : boardCustomMenu.topLevelKeySet()) {
@@ -1282,7 +1284,7 @@ public class Base {
                     Preferences.set("target_package", (String) getValue("package"));
                     Preferences.set("target_platform", (String) getValue("platform"));
                     Preferences.set("board", (String) getValue("board"));
-                    Preferences.set("custom_" + customMenuId, (String) getValue("board") + "_" + (String) getValue("custom_menu_option"));
+                    Preferences.set("custom_" + menuId, (String) getValue("board") + "_" + (String) getValue("custom_menu_option"));
 
                     filterVisibilityOfSubsequentBoardMenus((String) getValue("board"), currentIndex);
 
@@ -1297,15 +1299,15 @@ public class Base {
                 subAction.putValue("package", packageName);
                 subAction.putValue("platform", platformName);
 
-                if (!buttonGroupsMap.containsKey(customMenuId)) {
-                  buttonGroupsMap.put(customMenuId, new ButtonGroup());
+                if (!buttonGroupsMap.containsKey(menuId)) {
+                  buttonGroupsMap.put(menuId, new ButtonGroup());
                 }
 
                 item = new JRadioButtonMenuItem(subAction);
                 menu.add(item);
-                buttonGroupsMap.get(customMenuId).add(item);
+                buttonGroupsMap.get(menuId).add(item);
 
-                String selectedCustomMenuEntry = Preferences.get("custom_" + customMenuId);
+                String selectedCustomMenuEntry = Preferences.get("custom_" + menuId);
                 if (selBoard.equals(boardId) && (boardId + "_" + customMenuOption).equals(selectedCustomMenuEntry)) {
                   menuItemsToClickAfterStartup.add(item);
                 }
@@ -1932,16 +1934,21 @@ public class Base {
 
   static public PreferencesMap getBoardPreferences() {
     TargetPlatform target = getTargetPlatform();
-    String board = Preferences.get("board");
-    PreferencesMap boardPreferences = new PreferencesMap(target.getBoard(board).getPreferences());
+    String boardId = Preferences.get("board");
+    TargetBoard board = target.getBoard(boardId);
+    PreferencesMap boardPreferences = new PreferencesMap(board.getPreferences());
     PreferencesMap customMenus = target.getCustomMenus();
-    for (String customMenuID : customMenus.topLevelKeySet()) {
-      PreferencesMap boardCustomMenu = customMenus.subTree(customMenuID).subTree(board);
-      String selectedCustomMenuEntry = Preferences.get("custom_" + customMenuID);
-      if (boardCustomMenu.size() > 0 && selectedCustomMenuEntry != null && selectedCustomMenuEntry.startsWith(board)) {
-        String menuEntryId = selectedCustomMenuEntry.substring(selectedCustomMenuEntry.indexOf("_") + 1);
+    for (String menuId : customMenus.keySet()) {
+      PreferencesMap boardCustomMenu = board.getMenuOptions(menuId);
+      String selectedCustomMenuEntry = Preferences.get("custom_" + menuId);
+      if (boardCustomMenu != null && boardCustomMenu.size() > 0 &&
+          selectedCustomMenuEntry != null &&
+          selectedCustomMenuEntry.startsWith(boardId)) {
+        String menuEntryId = selectedCustomMenuEntry
+            .substring(selectedCustomMenuEntry.indexOf("_") + 1);
         boardPreferences.putAll(boardCustomMenu.subTree(menuEntryId));
-        boardPreferences.put("name", boardPreferences.get("name") + ", " + boardCustomMenu.get(menuEntryId));
+        boardPreferences.put("name", boardPreferences.get("name") + ", " +
+            boardCustomMenu.get(menuEntryId));
       }
     }
     return boardPreferences;
