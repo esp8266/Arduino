@@ -1,8 +1,9 @@
-# English translations for PACKAGE package.
-# Copyright (C) 2012 THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# 
-# Translators:
+# Japanese language resource for the Arduino IDE.
+# Copyright (C) 2011,2012 switch-science.com
+# This file is distributed under the same license as the Arduino IDE package.
+# Shigeru KANEMOTO <c2drQHN3aXRjaC1zY2llbmNlLmNvbQ==>.
+#
+#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
@@ -132,11 +133,11 @@ msgstr "スケッチを保存できなかったため、スケッチのアーカ
 
 #: ../Base.java:1089
 msgid "Arduino ARM (32-bits) Boards"
-msgstr ""
+msgstr "Arduino ARM（32ビット）ボード"
 
 #: ../Base.java:1088
 msgid "Arduino AVR Boards"
-msgstr ""
+msgstr "Arduino AVRボード"
 
 #: Base.java:1682
 msgid ""
@@ -210,11 +211,11 @@ msgstr "間違ったファイルを開きました。"
 #: ../Sketch.java:1625
 #, java-format
 msgid "Binary sketch size: {0} bytes (of a {1} byte maximum) - {2}% used"
-msgstr ""
+msgstr "バイナリに変換後のスケッチの大きさ：{0}バイト（最大{1}バイト） {2}%使用"
 
 #: ../Base.java:1215
 msgid "Board"
-msgstr ""
+msgstr "マイコンボード"
 
 #: SerialMonitor.java:112
 msgid "Both NL & CR"
@@ -230,7 +231,7 @@ msgstr "ビルド用のフォルダが消えてしまったか、書き込みが
 
 #: ../Preferences.java:80
 msgid "Bulgarian"
-msgstr ""
+msgstr "ブルガリア語"
 
 #: Editor.java:708
 msgid "Burn Bootloader"
@@ -242,11 +243,11 @@ msgstr "マイコンボードにブートローダを書き込んでいます...
 
 #: ../Base.java:348
 msgid "Can't open source sketch!"
-msgstr ""
+msgstr "スケッチが開けません！"
 
 #: ../Preferences.java:92
 msgid "Canadian French"
-msgstr ""
+msgstr "カナダフランス語"
 
 #: Preferences.java:79 Sketch.java:585 Sketch.java:737 Sketch.java:1042
 #: Editor.java:2064 Editor.java:2145 Editor.java:2465
@@ -431,7 +432,7 @@ msgstr "指定されたポートには、マイコンボードが接続されて
 
 #: ../Preferences.java:82
 msgid "Croatian"
-msgstr ""
+msgstr "クロアチア語"
 
 #: Editor.java:1149 Editor.java:2699
 msgid "Cut"
@@ -439,7 +440,7 @@ msgstr "切り取り"
 
 #: ../Preferences.java:83
 msgid "Czech"
-msgstr ""
+msgstr "チェコ語"
 
 #: Preferences.java:90
 msgid "Danish"
@@ -645,7 +646,7 @@ msgstr "ガリシア語"
 
 #: ../Preferences.java:94
 msgid "Georgian"
-msgstr ""
+msgstr "グルジア語"
 
 #: Preferences.java:97
 msgid "German"
@@ -677,7 +678,7 @@ msgstr "Guide_Windows.html"
 
 #: ../Preferences.java:95
 msgid "Hebrew"
-msgstr ""
+msgstr "ヘブライ語"
 
 #: Editor.java:1015
 msgid "Help"
@@ -691,7 +692,8 @@ msgstr "ヒンディー語"
 msgid ""
 "How about saving the sketch first \n"
 "before trying to rename it?"
-msgstr "スケッチの名前を変更する前に、スケッチを保存しますか？"
+msgstr ""
+"スケッチの名前を変更する前に、スケッチを保存してください。"
 
 #: Sketch.java:882
 msgid "How very Borges of you"
@@ -851,7 +853,7 @@ msgstr "ノルウェイ語"
 
 #: ../Preferences.java:108
 msgid "Norwegian Bokmål"
-msgstr ""
+msgstr "ノルウェー・ブークモール"
 
 #: Preferences.java:80 Sketch.java:585 Sketch.java:737 Sketch.java:1042
 #: Editor.java:2145 Editor.java:2465
@@ -973,7 +975,7 @@ msgstr "このIDEは、ファイル名が拡張子.inoまたは.pdeで\n終わ�
 
 #: ../debug/TargetPlatform.java:53
 msgid "Processor"
-msgstr ""
+msgstr "プロセッサ"
 
 #: Editor.java:704
 msgid "Programmer"
@@ -1162,7 +1164,7 @@ msgstr "スケッチブック"
 
 #: Base.java:258
 msgid "Sketchbook folder disappeared"
-msgstr "スケッチブックの保存場所フォルダが無くなってしまいました。"
+msgstr "スケッチブックの保存場所フォルダがありません。"
 
 #: Preferences.java:315
 msgid "Sketchbook location:"
@@ -1271,7 +1273,10 @@ msgid ""
 "The sketch folder has disappeared.\n"
 " Will attempt to re-save in the same location,\n"
 "but anything besides the code will be lost."
-msgstr "スケッチブックの保存場所フォルダが無くなってしまいました。\n環境設定で指定している保存場所に保存し直します。\nこのスケッチと一緒に保存していたファイルは失われるかもしれません。"
+msgstr ""
+"スケッチを保存してあったフォルダが無くなってしまいました。\n"
+"同じ場所に保存しなおしますが、このスケッチと一緒に保存してあった\n"
+"ファイルは無くなるかもしれません。"
 
 #: Sketch.java:2018
 msgid ""
@@ -1310,11 +1315,11 @@ msgstr "トラブルシューティング"
 
 #: ../Preferences.java:117
 msgid "Turkish"
-msgstr ""
+msgstr "トルコ語"
 
 #: ../Preferences.java:118
 msgid "Ukrainian"
-msgstr ""
+msgstr "ウクライナ語"
 
 #: Sketch.java:1432
 #, java-format
@@ -1545,7 +1550,7 @@ msgstr "http://arduino.cc/"
 
 #: ../debug/Compiler.java:49
 msgid "http://github.com/arduino/Arduino/issues"
-msgstr ""
+msgstr "http://github.com/arduino/Arduino/issues"
 
 #: UpdateCheck.java:118
 msgid "http://www.arduino.cc/en/Main/Software"
