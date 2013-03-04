@@ -36,8 +36,9 @@ import processing.app.helpers.PreferencesMap;
 
 public class TargetPlatform {
 
-  private String name;
+  private String id;
   private File folder;
+  private TargetPackage containerPackage;
 
   /**
    * Contains preferences for every defined board
@@ -59,10 +60,12 @@ public class TargetPlatform {
    */
   private PreferencesMap customMenus = new PreferencesMap();
 
-  public TargetPlatform(String _name, File _folder)
+  public TargetPlatform(String _name, File _folder, TargetPackage parent)
       throws TargetPlatformException {
-    name = _name;
+
+    id = _name;
     folder = _folder;
+    containerPackage = parent;
 
     // If there is no boards.txt, this is not a valid 1.5 hardware folder
     File boardsFile = new File(folder, "boards.txt");
@@ -85,7 +88,7 @@ public class TargetPlatform {
       // Create boards
       for (String id : boardsPreferences.keySet()) {
         PreferencesMap preferences = boardsPreferences.get(id);
-        TargetBoard board = new TargetBoard(id, preferences);
+        TargetBoard board = new TargetBoard(id, preferences, this);
         boards.put(id, board);
       }
     } catch (IOException e) {
@@ -116,8 +119,8 @@ public class TargetPlatform {
     }
   }
 
-  public String getName() {
-    return name;
+  public String getId() {
+    return id;
   }
 
   public File getFolder() {
@@ -132,7 +135,7 @@ public class TargetPlatform {
     return customMenus;
   }
 
-  public Set<String> getCustomMenusKeys() {
+  public Set<String> getCustomMenuIds() {
     return customMenus.keySet();
   }
 
@@ -154,5 +157,23 @@ public class TargetPlatform {
 
   public TargetBoard getBoard(String boardId) {
     return boards.get(boardId);
+  }
+
+  public TargetPackage getContainerPackage() {
+    return containerPackage;
+  }
+
+  public void resolveReferencedPlatforms(Map<String, TargetPackage> packages)
+      throws Exception {
+    for (TargetBoard board : getBoards().values())
+      board.resolveReferencedPlatforms(packages);
+  }
+
+  @Override
+  public String toString() {
+    String res = "TargetPlatform: name=" + id + " boards={\n";
+    for (String boardId : boards.keySet())
+      res += "  " + boardId + " = " + boards.get(boardId) + "\n";
+    return res + "}";
   }
 }

@@ -132,12 +132,13 @@ public class Compiler implements MessageConsumer {
       throw re;
     }
 
-    TargetPlatform targetPlatform = Base.getTargetPlatform();
+    TargetBoard targetBoard = Base.getTargetBoard();
+    TargetPlatform targetPlatform = targetBoard.getContainerPlatform();
     
     // Merge all the global preference configuration in order of priority
     PreferencesMap p = new PreferencesMap();
     p.putAll(Preferences.getMap());
-    p.putAll(targetPlatform.getPreferences());
+    p.putAll(targetBoard.getMergedPlatformPreferences());
     p.putAll(Base.getBoardPreferences());
     for (String k : p.keySet()) {
       if (p.get(k) == null)
@@ -146,28 +147,23 @@ public class Compiler implements MessageConsumer {
 
     p.put("build.path", _buildPath);
     p.put("build.project_name", _primaryClassName);
-    targetArch = targetPlatform.getName();
+    targetArch = targetPlatform.getId();
     p.put("build.arch", targetArch.toUpperCase());
     
     if (!p.containsKey("compiler.path"))
       p.put("compiler.path", Base.getAvrBasePath());
 
     // Core folder
-    String core = p.get("build.core");
-    TargetPlatform tp;
-    if (!core.contains(":")) {
-      tp = targetPlatform;
-    } else {
-      String[] split = core.split(":", 2);
-      tp = Base.getTargetPlatform(split[0], Preferences.get("target_platform"));
-      core = split[1];
-    }
+    TargetPlatform tp = targetBoard.getReferencedPlatform();
+    if (tp == null)
+      tp = targetBoard.getContainerPlatform();
     File coreFolder = new File(tp.getFolder(), "cores");
+    String core = p.get("build.core");
     coreFolder = new File(coreFolder, core);
     p.put("build.core.path", coreFolder.getAbsolutePath());
     
     // System Folder
-    File systemFolder = targetPlatform.getFolder();
+    File systemFolder = tp.getFolder();
     systemFolder = new File(systemFolder, "system");
     p.put("build.system.path", systemFolder.getAbsolutePath());
     

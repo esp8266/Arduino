@@ -32,23 +32,22 @@ import processing.app.helpers.filefilters.OnlyDirs;
 
 public class TargetPackage {
 
-  private String name;
+  private String id;
 
   Map<String, TargetPlatform> platforms = new LinkedHashMap<String, TargetPlatform>();
 
-  public TargetPackage(String packageName, File packageFolder)
-      throws TargetPlatformException {
-    name = packageName;
+  public TargetPackage(String _id, File _folder) throws TargetPlatformException {
+    id = _id;
 
-    File[] folders = packageFolder.listFiles(new OnlyDirs());
+    File[] folders = _folder.listFiles(new OnlyDirs());
     if (folders == null)
       return;
 
-    for (File folder : folders) {
-      if (!folder.exists() || !folder.canRead())
+    for (File subFolder : folders) {
+      if (!subFolder.exists() || !subFolder.canRead())
         continue;
-      String arch = folder.getName();
-      TargetPlatform platform = new TargetPlatform(arch, folder);
+      String arch = subFolder.getName();
+      TargetPlatform platform = new TargetPlatform(arch, subFolder, this);
       platforms.put(arch, platform);
     }
   }
@@ -65,7 +64,13 @@ public class TargetPackage {
     return platforms.get(platform);
   }
 
-  public String getName() {
-    return name;
+  public void resolveReferencedPlatforms(Map<String, TargetPackage> packages)
+      throws Exception {
+    for (TargetPlatform platform : getPlatforms().values())
+      platform.resolveReferencedPlatforms(packages);
+  }
+
+  public String getId() {
+    return id;
   }
 }

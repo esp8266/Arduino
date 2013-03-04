@@ -150,7 +150,7 @@ public class Editor extends JFrame implements RunnerListener {
   Runnable exportAppHandler;
 
 
-  public Editor(Base ibase, String path, int[] location) {
+  public Editor(Base ibase, String path, int[] location) throws Exception {
     super("Arduino");
     this.base = ibase;
 
@@ -476,7 +476,7 @@ public class Editor extends JFrame implements RunnerListener {
   // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-  protected void buildMenuBar() {
+  protected void buildMenuBar() throws Exception {
     JMenuBar menubar = new JMenuBar();
     menubar.add(buildFileMenu());
     menubar.add(buildEditMenu());
@@ -494,7 +494,11 @@ public class Editor extends JFrame implements RunnerListener {
     item = newJMenuItem(_("New"), 'N');
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          base.handleNew();
+          try {
+            base.handleNew();
+          } catch (Exception e1) {
+            e1.printStackTrace();
+          }
         }
       });
     fileMenu.add(item);
@@ -502,7 +506,11 @@ public class Editor extends JFrame implements RunnerListener {
     item = Editor.newJMenuItem(_("Open..."), 'O');
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          base.handleOpenPrompt();
+          try {
+            base.handleOpenPrompt();
+          } catch (Exception e1) {
+            e1.printStackTrace();
+          }
         }
       });
     fileMenu.add(item);
@@ -662,7 +670,7 @@ public class Editor extends JFrame implements RunnerListener {
   }
 
 
-  protected JMenu buildToolsMenu() {
+  protected JMenu buildToolsMenu() throws Exception {
     toolsMenu = new JMenu(_("Tools"));
     JMenu menu = toolsMenu;
     JMenuItem item;
@@ -690,6 +698,11 @@ public class Editor extends JFrame implements RunnerListener {
     
     if (boardsMenus == null) {
       boardsMenus = new LinkedList<JMenu>();
+
+      JMenu boardsMenu = new JMenu(_("Board"));
+      Editor.boardsMenus.add(boardsMenu);
+      toolsMenu.add(boardsMenu);
+      
       base.rebuildBoardsMenu(toolsMenu, this);
       //Debug: rebuild imports
       importMenu.removeAll();
