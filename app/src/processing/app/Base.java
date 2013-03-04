@@ -1278,9 +1278,10 @@ public class Base {
               continue;
             boolean firstRefBoardBlock = true;
             for (TargetBoard board : platf.getBoards().values()) {
-              if (board.getReferencedPackageId() == null)
+              String ref = board.getReferencedPackageId();
+              if (ref == null || !ref.equals(targetPackage.getId()))
                 continue;
-
+              
               // Add a separator from the previous platform
               if (firstRefBoardBlock)
                 boardsMenu.add(new JSeparator());
