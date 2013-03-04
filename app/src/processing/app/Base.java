@@ -1229,15 +1229,13 @@ public class Base {
     Map<String, ButtonGroup> buttonGroupsMap = new HashMap<String, ButtonGroup>();
 
     // Generate custom menus for all platforms
+    Set<String> titles = new HashSet<String>();
     for (TargetPackage targetPackage : packages.values()) {
-      for (TargetPlatform targetPlatform : targetPackage.platforms()) {
-        PreferencesMap customMenus = targetPlatform.getCustomMenus();
-        for (String menuId : customMenus.keySet()) {
-          String title = customMenus.get(menuId);
-          makeBoardCustomMenu(toolsMenu, _(title));
-        }
-      }
+      for (TargetPlatform targetPlatform : targetPackage.platforms())
+        titles.addAll(targetPlatform.getCustomMenus().values());
     }
+    for (String title : titles)
+      makeBoardCustomMenu(toolsMenu, _(title));
     
     // Cycle through all packages
     for (TargetPackage targetPackage : packages.values()) {
@@ -1399,9 +1397,9 @@ public class Base {
         JMenuItem menuItem = menu.getItem(m);
         menuItem.setVisible(menuItem.getAction().getValue("board").equals(boardID));
       }
-      menu.setEnabled(ifThereAreVisibleItemsOn(menu));
+      menu.setVisible(ifThereAreVisibleItemsOn(menu));
 
-      if (menu.isEnabled()) {
+      if (menu.isVisible()) {
         JMenuItem visibleSelectedOrFirstMenuItem = selectVisibleSelectedOrFirstMenuItem(menu);
         if (!visibleSelectedOrFirstMenuItem.isSelected()) {
           visibleSelectedOrFirstMenuItem.setSelected(true);
