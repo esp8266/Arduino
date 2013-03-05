@@ -38,7 +38,8 @@ import processing.app.helpers.FileUtils;
 import processing.app.helpers.PreferencesMap;
 import processing.app.helpers.filefilters.OnlyDirs;
 import processing.app.helpers.filefilters.OnlyFilesWithExtension;
-import processing.app.javax.swing.filechooser.FileNameExtensionFilter;import processing.app.packages.Library;
+import processing.app.javax.swing.filechooser.FileNameExtensionFilter;
+import processing.app.packages.Library;
 import processing.app.packages.LibraryList;
 import processing.app.tools.ZipDeflater;
 import processing.core.*;
@@ -1241,10 +1242,6 @@ public class Base {
     for (TargetPackage targetPackage : packages.values()) {
       // For every package cycle through all platform
       for (TargetPlatform targetPlatform : targetPackage.platforms()) {
-        String platformLabel = targetPlatform.getPreferences().get("name"); 
-        if (platformLabel == null || targetPlatform.getBoards().isEmpty()) {
-          continue;
-        }
 
         // Add a separator from the previous platform
         if (!first)
@@ -1252,9 +1249,12 @@ public class Base {
         first = false;
 
         // Add a title for each platform
-        JMenuItem separator = new JMenuItem(_(platformLabel));
-        separator.setEnabled(false);
-        boardsMenu.add(separator);
+        String platformLabel = targetPlatform.getPreferences().get("name"); 
+        if (platformLabel != null && !targetPlatform.getBoards().isEmpty()) {
+          JMenuItem menuLabel = new JMenuItem(_(platformLabel));
+          menuLabel.setEnabled(false);
+          boardsMenu.add(menuLabel);
+        }
 
         // Cycle through all boards of this platform
         for (TargetBoard board : targetPlatform.getBoards().values()) {
@@ -1265,36 +1265,6 @@ public class Base {
                                                           board, targetPlatform, targetPackage);
           boardsMenu.add(item);
           boardsButtonGroup.add(item);
-        }
-        
-        // Cycle through all boards of referenced platforms
-        for (TargetPackage pack : packages.values()) {
-          if (pack == targetPackage)
-            continue;
-          for (TargetPlatform platf : pack.getPlatforms().values()) {
-            if (!platf.getId().equals(targetPlatform.getId()))
-              continue;
-            boolean firstRefBoardBlock = true;
-            for (TargetBoard board : platf.getBoards().values()) {
-              String ref = board.getReferencedPackageId();
-              if (ref == null || !ref.equals(targetPackage.getId()))
-                continue;
-              
-              // Add a separator from the previous platform
-              if (firstRefBoardBlock)
-                boardsMenu.add(new JSeparator());
-              firstRefBoardBlock = false;
-
-              JMenuItem item = createBoardMenusAndCustomMenus(
-                                                              editor,
-                                                              menuItemsToClickAfterStartup,
-                                                              buttonGroupsMap,
-                                                              board, platf,
-                                                              pack);
-              boardsMenu.add(item);
-              boardsButtonGroup.add(item);
-            }
-          }
         }
       }
     }
