@@ -294,8 +294,6 @@ public class Base {
       System.out.println(_("No valid configured cores found! Exiting..."));
       System.exit(3);
     }
-    for (TargetPackage pack : packages.values())
-      pack.resolveReferencedPlatforms(packages);
     
     // Setup board-dependent variables.
     onBoardOrPortChange();
@@ -1087,19 +1085,23 @@ public class Base {
     importMenu.add(addLibraryMenuItem);
 
     // Split between user supplied libraries and IDE libraries
-    TargetBoard board = getTargetBoard();
+    TargetPlatform targetPlatform = getTargetPlatform();
     
-    if (board != null) {
+    if (targetPlatform != null) {
       LibraryList ideLibs = getIDELibs();
       LibraryList userLibs = getUserLibs();
       try {
         // Find the current target. Get the platform, and then select the
         // correct name and core path.
-        PreferencesMap prefs = board.getMergedPlatformPreferences();
-        String platformName = prefs.get("name");
-        JMenuItem platformItem = new JMenuItem(_(platformName));
-        platformItem.setEnabled(false);
-        importMenu.add(platformItem);
+        PreferencesMap prefs = targetPlatform.getPreferences();
+        if (prefs != null) {
+          String platformName = prefs.get("name");
+          if (platformName != null) {
+            JMenuItem platformItem = new JMenuItem(_(platformName));
+            platformItem.setEnabled(false);
+            importMenu.add(platformItem);
+          }
+        }
         if (ideLibs.size() > 0) {
           importMenu.addSeparator();
           addLibraries(importMenu, ideLibs);

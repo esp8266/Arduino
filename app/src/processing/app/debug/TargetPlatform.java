@@ -163,12 +163,6 @@ public class TargetPlatform {
     return containerPackage;
   }
 
-  public void resolveReferencedPlatforms(Map<String, TargetPackage> packages)
-      throws Exception {
-    for (TargetBoard board : getBoards().values())
-      board.resolveReferencedPlatforms(packages);
-  }
-
   @Override
   public String toString() {
     String res = "TargetPlatform: name=" + id + " boards={\n";

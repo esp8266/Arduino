@@ -64,12 +64,6 @@ public class TargetPackage {
     return platforms.get(platform);
   }
 
-  public void resolveReferencedPlatforms(Map<String, TargetPackage> packages)
-      throws Exception {
-    for (TargetPlatform platform : getPlatforms().values())
-      platform.resolveReferencedPlatforms(packages);
-  }
-
   public String getId() {
     return id;
   }

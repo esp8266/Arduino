@@ -132,13 +132,30 @@ public class Compiler implements MessageConsumer {
       throw re;
     }
 
-    TargetBoard targetBoard = Base.getTargetBoard();
-    TargetPlatform targetPlatform = targetBoard.getContainerPlatform();
+    // Check if the board needs a platform from another package 
+    TargetPlatform targetPlatform = Base.getTargetPlatform();
+    TargetPlatform corePlatform = null;
+    PreferencesMap boardPreferences = Base.getBoardPreferences();
+    String core = boardPreferences.get("build.core");
+    if (core.contains(":")) {
+      String[] split = core.split(":");
+      core = split[1];
+      corePlatform = Base.getTargetPlatform(split[0], targetPlatform.getId());
+      if (corePlatform == null) {
+        RunnerException re = new RunnerException(I18n
+            .format(_("Selected board depends on '{0}' core (not installed)."),
+                    split[0]));
+        re.hideStackTrace();
+        throw re;
+      }
+    }
     
     // Merge all the global preference configuration in order of priority
     PreferencesMap p = new PreferencesMap();
     p.putAll(Preferences.getMap());
-    p.putAll(targetBoard.getMergedPlatformPreferences());
+    if (corePlatform != null)
+      p.putAll(corePlatform.getPreferences());
+    p.putAll(targetPlatform.getPreferences());
     p.putAll(Base.getBoardPreferences());
     for (String k : p.keySet()) {
       if (p.get(k) == null)
@@ -154,12 +171,12 @@ public class Compiler implements MessageConsumer {
       p.put("compiler.path", Base.getAvrBasePath());
 
     // Core folder
-    TargetPlatform tp = targetBoard.getReferencedPlatform();
+    TargetPlatform tp = corePlatform;
     if (tp == null)
-      tp = targetBoard.getContainerPlatform();
+      tp = targetPlatform;
     File coreFolder = new File(tp.getFolder(), "cores");
-    String core = p.get("build.core");
     coreFolder = new File(coreFolder, core);
+    p.put("build.core", core);
     p.put("build.core.path", coreFolder.getAbsolutePath());
     
     // System Folder
@@ -175,8 +192,7 @@ public class Compiler implements MessageConsumer {
         t = targetPlatform;
       } else {
         String[] split = variant.split(":", 2);
-        t = Base
-            .getTargetPlatform(split[0], Preferences.get("target_platform"));
+        t = Base.getTargetPlatform(split[0], targetPlatform.getId());
         variant = split[1];
       }
       File variantFolder = new File(t.getFolder(), "variants");
