@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import processing.app.Base;
+import processing.app.I18n;
 import processing.app.Preferences;
 import processing.app.Serial;
 import processing.app.SerialException;
@@ -260,7 +261,13 @@ public class BasicUploader extends Uploader  {
     PreferencesMap prefs = Preferences.getMap();
     prefs.putAll(Base.getBoardPreferences());
     prefs.putAll(targetPlatform.getProgrammer(programmer));
-    prefs.putAll(targetPlatform.getTool(prefs.get("bootloader.tool")));
+    
+    String toolName = prefs.get("bootloader.tool");
+    PreferencesMap toolPrefs = targetPlatform.getTool(toolName);
+    if (toolPrefs.size() == 0)
+      throw new RunnerException(I18n.format(_("Could not find tool {0}"),
+                                            toolName));
+    prefs.putAll(toolPrefs);
     if (verbose) {
       prefs.put("erase.verbose", prefs.get("erase.params.verbose"));
       prefs.put("bootloader.verbose", prefs.get("bootloader.params.verbose"));
