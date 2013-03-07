@@ -1020,24 +1020,15 @@ int main(void)
 						}
 						else
 						{
-						//*	issue 543, this should work, It has not been tested.
-							#if (defined(EEARL) && defined(EEARH)  && defined(EEMWE)  && defined(EEWE)  && defined(EEDR))
+							//*	issue 543, this should work, It has not been tested.
 							uint16_t ii = address >> 1;
 							/* write EEPROM */
-							do {
-								EEARL	=	ii;					// Setup EEPROM address
-								EEARH	=	(ii >> 8);
+							while (size) {
+								eeprom_write_byte((uint8_t*)ii, *p++);
 								address+=2;						// Select next EEPROM byte
 								ii++;
-
-								EEDR	=	*p++;				// get byte from buffer
-								EECR	|=	(1<<EEMWE);			// Write data into EEPROM
-								EECR	|=	(1<<EEWE);
-
-								while (EECR & (1<<EEWE));	// Wait for write operation to finish
-								size--;						// Decrease number of bytes to write
-							} while (size);					// Loop until all bytes written
-							#endif
+								size--;
+							}
 						}
 						msgLength		=	2;
 						msgBuffer[1]	=	STATUS_CMD_OK;
