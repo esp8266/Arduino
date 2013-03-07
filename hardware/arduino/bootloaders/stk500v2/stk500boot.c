@@ -1021,13 +1021,14 @@ int main(void)
 						else
 						{
 						//*	issue 543, this should work, It has not been tested.
-					//	#if (!defined(__AVR_ATmega1280__) && !defined(__AVR_ATmega2560__)  && !defined(__AVR_ATmega2561__)  && !defined(__AVR_ATmega1284P__)  && !defined(__AVR_ATmega640__))
-						#if (defined(EEARL) && defined(EEARH)  && defined(EEMWE)  && defined(EEWE)  && defined(EEDR))
+							#if (defined(EEARL) && defined(EEARH)  && defined(EEMWE)  && defined(EEWE)  && defined(EEDR))
+							uint16_t ii = address >> 1;
 							/* write EEPROM */
 							do {
-								EEARL	=	address;			// Setup EEPROM address
-								EEARH	=	(address >> 8);
-								address++;						// Select next EEPROM byte
+								EEARL	=	ii;					// Setup EEPROM address
+								EEARH	=	(ii >> 8);
+								address+=2;						// Select next EEPROM byte
+								ii++;
 
 								EEDR	=	*p++;				// get byte from buffer
 								EECR	|=	(1<<EEMWE);			// Write data into EEPROM
@@ -1036,9 +1037,9 @@ int main(void)
 								while (EECR & (1<<EEWE));	// Wait for write operation to finish
 								size--;						// Decrease number of bytes to write
 							} while (size);					// Loop until all bytes written
-						#endif
+							#endif
 						}
-							msgLength	=	2;
+						msgLength		=	2;
 						msgBuffer[1]	=	STATUS_CMD_OK;
 					}
 					break;
