@@ -30,11 +30,11 @@ def read_po(fp):
 	rvalue += line
     elif line.startswith('msgid '):
       st = 1
-      key = unquote(line[5:])
+      key = unquote(line[6:])
       rkey = line
     elif line.startswith('msgstr '):
       st = 2
-      value = unquote(line[6:])
+      value = unquote(line[7:])
       rvalue = line
     else:
       raise RuntimeError
@@ -45,34 +45,29 @@ def read_po(fp):
 def main():
   import sys
 
-  # Read the current text catalog.
+  # Read the new text catalog template.
   d = {}
-  firstcomment = ''
-  it = read_po(file(sys.argv[1]))
-  try:
-    (comment, key, value, rkey, rvalue) = it.next()
-    d[key] = rvalue
-    firstcomment = comment		# Preserve the first comment block
-  except StopIteration:
-    pass
-  for (comment, key, value, rkey, rvalue) in it:
-    d[key] = rvalue
+  for (comment, key, value, rkey, rvalue) in read_po(sys.stdin):
+    d[key] = (comment, rkey, rvalue)
 
-  # Read the new text catalog template and output.
-  # The translated values come from the current text catalog read above.
+  # Override existing entries with current text catalog.
+  for (comment, key, value, rkey, rvalue) in read_po(file(sys.argv[1])):
+    if d.has_key(key):
+      d[key] = (comment, rkey, rvalue)
+
   out = file(sys.argv[1], 'w')
-  out.write(firstcomment)
-  it = read_po(sys.stdin)
-  try:
-    (comment, key, value, rkey, rvalue) = it.next()
-    out.write(rkey)
-    out.write(d.get(key, rvalue))
-  except StopIteration:
-    pass
-  for (comment, key, value, rkey, rvalue) in it:
+  if d.has_key(''):
+    (comment, rkey, rvalue) = d['']
     out.write(comment)
     out.write(rkey)
-    out.write(d.get(key, rvalue))
+    out.write(rvalue)
+    del d['']
+
+  for key in sorted(d.keys()):
+    (comment, rkey, rvalue) = d[key]
+    out.write(comment)
+    out.write(rkey)
+    out.write(rvalue)
 
 if __name__ == '__main__':
   main()
