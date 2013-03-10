@@ -35,7 +35,7 @@
 #include <board_init.h>
 #include <usart.h>
 
-#define MAX_CMD_CONSOLE_NUM 12
+#define MAX_CMD_CONSOLE_NUM 15
 struct {
         cmd_cb_t cb;
         const char* str;

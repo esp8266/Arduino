@@ -56,11 +56,14 @@ enum {
 	START_SCAN_NETWORKS	= 0x36,
 	GET_FW_VERSION_CMD	= 0x37,
 	GET_TEST_CMD		= 0x38,
+	SEND_DATA_UDP_CMD	= 0x39,
+	GET_REMOTE_DATA_CMD = 0x3A,
 
     // All command with DATA_FLAG 0x40 send a 16bit Len
 
 	SEND_DATA_TCP_CMD		= 0x44,
     GET_DATABUF_TCP_CMD		= 0x45,
+    INSERT_DATABUF_CMD		= 0x46,
 
 };
 

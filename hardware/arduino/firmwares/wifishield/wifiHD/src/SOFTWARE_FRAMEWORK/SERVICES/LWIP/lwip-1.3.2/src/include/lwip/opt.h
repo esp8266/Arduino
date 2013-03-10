@@ -1226,7 +1226,7 @@
  * in seconds. (does not require sockets.c, and will affect tcp.c)
  */
 #ifndef LWIP_TCP_KEEPALIVE
-#define LWIP_TCP_KEEPALIVE              0
+#define LWIP_TCP_KEEPALIVE              1
 #endif
 
 /**
