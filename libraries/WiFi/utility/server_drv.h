@@ -31,7 +31,7 @@ public:
 
     static bool sendUdpData(uint8_t sock);
 
-    static uint8_t availData(uint8_t sock);
+    static uint16_t availData(uint8_t sock);
 
     static uint8_t checkDataSent(uint8_t sock);
 };

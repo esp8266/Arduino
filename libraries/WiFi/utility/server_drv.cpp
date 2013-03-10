@@ -122,7 +122,7 @@ uint8_t ServerDrv::getClientState(uint8_t sock)
    return _data;
 }
 
-uint8_t ServerDrv::availData(uint8_t sock)
+uint16_t ServerDrv::availData(uint8_t sock)
 {
 	WAIT_FOR_SLAVE_SELECT();
     // Send Command
@@ -133,19 +133,14 @@ uint8_t ServerDrv::availData(uint8_t sock)
     SpiDrv::waitForSlaveReady();
 
     // Wait for reply
-    uint8_t _data = 0;
     uint8_t _dataLen = 0;
-    if (!SpiDrv::waitResponseCmd(AVAIL_DATA_TCP_CMD, PARAM_NUMS_1, &_data, &_dataLen))
-    {
-        WARN("error waitResponse");
-    }
+	uint16_t len = 0;
+
+    SpiDrv::waitResponseCmd(AVAIL_DATA_TCP_CMD, PARAM_NUMS_1, (uint8_t*)&len,  &_dataLen);
+
     SpiDrv::spiSlaveDeselect();
 
-    if (_dataLen!=0)
-    {
-        return (_data == 1);
-    }
-    return false;
+    return len;
 }
 
 bool ServerDrv::getData(uint8_t sock, uint8_t *data, uint8_t peek)
