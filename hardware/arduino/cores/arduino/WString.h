@@ -169,7 +169,6 @@ public:
 
 	// parsing/conversion
 	long toInt(void) const;
-	char* c_str() const;
 
 protected:
 	char *buffer;	        // the actual char array
