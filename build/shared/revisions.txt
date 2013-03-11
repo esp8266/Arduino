@@ -8,6 +8,7 @@
 * Fixed memory leak when calling Ethernet.begin() multiple times.
 * Fixed SD example listfiles.ino
 * Fixed a lot of Esplora examples
+* Added GSM library
 
 [environment]
 

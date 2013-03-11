@@ -1,0 +1,72 @@
+#######################################
+# Syntax Coloring Map For GSM
+####################################### 
+# Class
+#######################################
+
+GSM	KEYWORD3
+GSMVoiceCall	KEYWORD3
+GSM_SMS	KEYWORD3
+GPRS	KEYWORD3
+GSMClient	KEYWORD3
+GSMServer	KEYWORD3
+GSMModem	KEYWORD3
+GSMScanner	KEYWORD3
+GSMPIN	KEYWORD3
+GSMBand KEYWORD3
+
+#######################################
+# Methods and Functions 
+#######################################	
+
+begin	KEYWORD2
+shutdown	KEYWORD2
+gatVoiceCallStatus	KEYWORD2
+ready	KEYWORD2
+voiceCall	KEYWORD2
+answerCall	KEYWORD2
+hangCall	KEYWORD2
+retrieveCallingNumber	KEYWORD2
+beginSMS	KEYWORD2
+endSMS	KEYWORD2
+remoteNumber	KEYWORD2
+attachGPRS	KEYWORD2
+begnWrite	KEYWORD2
+endWrite	KEYWORD2
+getIMEI	KEYWORD2
+getCurrentCarrier	KEYWORD2
+getSignalStrength	KEYWORD2
+readNetworks	KEYWORD2
+isPIN	KEYWORD2
+checkPIN	KEYWORD2
+checkPUK	KEYWORD2
+changePIN	KEYWORD2
+switchPIN	KEYWORD2
+checkReg	KEYWORD2
+getPINUsed	KEYWORD2
+setPINUsed	KEYWORD2
+getBand		KEYWORD2
+setBand		KEYWORD2
+getvoiceCallStatus	KEYWORD2
+
+#######################################
+# Constants
+#######################################
+ 
+ERROR	LITERAL1
+IDLE	LITERAL1
+CONNECTING	LITERAL1
+GSM_READY	LITERAL1
+GPRS_READY	LITERAL1
+TRANSPARENT_CONNECTED	LITERAL1
+IDLE_CALL	LITERAL1
+CALLING	LITERAL1
+RECEIVINGCALL	LITERAL1
+TALKING	LITERAL1
+GSM_MODE_UNDEFINED	LITERAL1
+GSM_MODE_EGSM	LITERAL1
+GSM_MODE_DCS	LITERAL1
+GSM_MODE_PCS	LITERAL1
+GSM_MODE_EGSM_DCS	LITERAL1
+GSM_MODE_GSM850_PCS	LITERAL1
+GSM_MODE_GSM850_EGSM_DCS_PCS	LITERAL1
