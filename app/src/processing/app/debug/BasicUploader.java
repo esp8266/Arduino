@@ -250,18 +250,27 @@ public class BasicUploader extends Uploader  {
   }
   
   public boolean burnBootloader() throws RunnerException {
-    String programmer = Preferences.get("programmer");
     TargetPlatform targetPlatform = Base.getTargetPlatform();
+    
+    // Find preferences for the selected programmer
+    PreferencesMap programmerPrefs;
+    String programmer = Preferences.get("programmer");
     if (programmer.contains(":")) {
       String[] split = programmer.split(":", 2);
-      targetPlatform = Base.getCurrentTargetPlatformFromPackage(split[0]);
+      TargetPlatform platform = Base
+          .getCurrentTargetPlatformFromPackage(split[0]);
       programmer = split[1];
+      programmerPrefs = platform.getProgrammer(programmer);
+    } else {
+      programmerPrefs = targetPlatform.getProgrammer(programmer);
     }
     
+    // Build configuration for the current programmer
     PreferencesMap prefs = Preferences.getMap();
     prefs.putAll(Base.getBoardPreferences());
-    prefs.putAll(targetPlatform.getProgrammer(programmer));
+    prefs.putAll(programmerPrefs);
     
+    // Add configuration for bootloader tool
     String toolName = prefs.get("bootloader.tool");
     PreferencesMap toolPrefs = targetPlatform.getTool(toolName);
     if (toolPrefs.size() == 0)
@@ -277,12 +286,6 @@ public class BasicUploader extends Uploader  {
     }
     
     try {
-      // if (prefs.get("program.disable_flushing") == null
-      // || prefs.get("program.disable_flushing").toLowerCase().equals("false"))
-      // {
-      // flushSerialBuffer();
-      // }
-
       String pattern = prefs.get("erase.pattern");
       String[] cmd = StringReplacer.formatAndSplit(pattern, prefs, true);
       if (!executeUploadCommand(cmd))
