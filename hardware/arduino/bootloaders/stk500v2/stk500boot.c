@@ -79,9 +79,27 @@ LICENSE:
 //*	Jul 29,	2010	<MLS> Added recchar_timeout for timing out on bootloading
 //*	Aug 23,	2010	<MLS> Added support for atmega2561
 //*	Aug 26,	2010	<MLS> Removed support for BOOT_BY_SWITCH
+//*	Sep  8,	2010	<MLS> Added support for atmega16
+//*	Nov  9,	2010	<MLS> Issue 392:Fixed bug that 3 !!! in code would cause it to jump to monitor
+//*	Jun 24,	2011	<MLS> Removed analogRead (was not used)
+//*	Dec 29,	2011	<MLS> Issue 181: added watch dog timmer support
+//*	Dec 29,	2011	<MLS> Issue 505:  bootloader is comparing the seqNum to 1 or the current sequence 
+//*	Jan  1,	2012	<MLS> Issue 543: CMD_CHIP_ERASE_ISP now returns STATUS_CMD_FAILED instead of STATUS_CMD_OK
+//*	Jan  1,	2012	<MLS> Issue 543: Write EEPROM now does something (NOT TESTED)
+//*	Jan  1,	2012	<MLS> Issue 544: stk500v2 bootloader doesn't support reading fuses
 //************************************************************************
 
-
+//************************************************************************
+//*	these are used to test issues
+//*	http://code.google.com/p/arduino/issues/detail?id=505
+//*	Reported by mark.stubbs, Mar 14, 2011
+//*	The STK500V2 bootloader is comparing the seqNum to 1 or the current sequence 
+//*	(IE: Requiring the sequence to be 1 or match seqNum before continuing).  
+//*	The correct behavior is for the STK500V2 to accept the PC's sequence number, and echo it back for the reply message.
+#define	_FIX_ISSUE_505_
+//************************************************************************
+//*	Issue 181: added watch dog timmer support
+#define	_FIX_ISSUE_181_
 
 #include	<inttypes.h>
 #include	<avr/io.h>
@@ -95,9 +113,18 @@ LICENSE:
 #include	"command.h"
 
 
-#if defined(_MEGA_BOARD_) || defined(_BOARD_AMBER128_) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) || defined(__AVR_ATmega2561__)
+#if defined(_MEGA_BOARD_) || defined(_BOARD_AMBER128_) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) \
+	|| defined(__AVR_ATmega2561__) || defined(__AVR_ATmega1284P__) || defined(ENABLE_MONITOR)
+	#undef		ENABLE_MONITOR
 	#define		ENABLE_MONITOR
 	static void	RunMonitor(void);
+#endif
+
+#ifndef EEWE
+	#define EEWE    1
+#endif
+#ifndef EEMWE
+	#define EEMWE   2
 #endif
 
 //#define	_DEBUG_SERIAL_
@@ -131,8 +158,8 @@ LICENSE:
 	#define PROGLED_PORT	PORTD
 	#define PROGLED_DDR		DDRD
 	#define PROGLED_PIN		PINE7
-#elif defined( _CEREBOTPLUS_BOARD_ )
-	//*	this is for the Cerebot 2560 board
+#elif defined( _CEREBOTPLUS_BOARD_ ) || defined(_CEREBOT_II_BOARD_)
+	//*	this is for the Cerebot 2560 board and the Cerebot-ii
 	//*	onbarod leds are on PORTE4-7
 	#define PROGLED_PORT	PORTE
 	#define PROGLED_DDR		DDRE
@@ -149,6 +176,47 @@ LICENSE:
 	#define PROGLED_PORT	PORTA
 	#define PROGLED_DDR		DDRA
 	#define PROGLED_PIN		PINA3
+#elif defined( _BOARD_MEGA16 )
+	//*	onbarod led is PORTA7
+	#define PROGLED_PORT	PORTA
+	#define PROGLED_DDR		DDRA
+	#define PROGLED_PIN		PINA7
+	#define UART_BAUDRATE_DOUBLE_SPEED 0
+
+#elif defined( _BOARD_BAHBOT_ )
+	//*	dosent have an onboard LED but this is what will probably be added to this port
+	#define PROGLED_PORT	PORTB
+	#define PROGLED_DDR		DDRB
+	#define PROGLED_PIN		PINB0
+
+#elif defined( _BOARD_ROBOTX_ )
+	#define PROGLED_PORT	PORTB
+	#define PROGLED_DDR		DDRB
+	#define PROGLED_PIN		PINB6
+#elif defined( _BOARD_CUSTOM1284_BLINK_B0_ )
+	#define PROGLED_PORT	PORTB
+	#define PROGLED_DDR		DDRB
+	#define PROGLED_PIN		PINB0
+#elif defined( _BOARD_CUSTOM1284_ )
+	#define PROGLED_PORT	PORTD
+	#define PROGLED_DDR		DDRD
+	#define PROGLED_PIN		PIND5
+#elif defined( _AVRLIP_ )
+	#define PROGLED_PORT	PORTB
+	#define PROGLED_DDR		DDRB
+	#define PROGLED_PIN		PINB5
+#elif defined( _BOARD_STK500_ )
+	#define PROGLED_PORT	PORTA
+	#define PROGLED_DDR		DDRA
+	#define PROGLED_PIN		PINA7
+#elif defined( _BOARD_STK502_ )
+	#define PROGLED_PORT	PORTB
+	#define PROGLED_DDR		DDRB
+	#define PROGLED_PIN		PINB5
+#elif defined( _BOARD_STK525_ )
+	#define PROGLED_PORT	PORTB
+	#define PROGLED_DDR		DDRB
+	#define PROGLED_PIN		PINB7
 #else
 	#define PROGLED_PORT	PORTG
 	#define PROGLED_DDR		DDRG
@@ -164,6 +232,7 @@ LICENSE:
 	#define F_CPU 16000000UL
 #endif
 
+#define	_BLINK_LOOP_COUNT_	(F_CPU / 2250)
 /*
  * UART Baudrate, AVRStudio AVRISP only accepts 115200 bps
  */
@@ -228,12 +297,33 @@ LICENSE:
 	#define SIGNATURE_BYTES 0x1E9801
 #elif defined (__AVR_ATmega2561__)
 	#define SIGNATURE_BYTES 0x1e9802
+#elif defined (__AVR_ATmega1284P__)
+	#define SIGNATURE_BYTES 0x1e9705
+#elif defined (__AVR_ATmega640__)
+	#define SIGNATURE_BYTES  0x1e9608
+#elif defined (__AVR_ATmega64__)
+	#define SIGNATURE_BYTES  0x1E9602
+#elif defined (__AVR_ATmega169__)
+	#define SIGNATURE_BYTES  0x1e9405
+#elif defined (__AVR_AT90USB1287__)
+	#define SIGNATURE_BYTES  0x1e9782
 #else
 	#error "no signature definition for MCU available"
 #endif
 
 
-#if defined(__AVR_ATmega8__) || defined(__AVR_ATmega16__) || defined(__AVR_ATmega32__) \
+#if defined(_BOARD_ROBOTX_) || defined(__AVR_AT90USB1287__) || defined(__AVR_AT90USB1286__)
+	#define	UART_BAUD_RATE_LOW			UBRR1L
+	#define	UART_STATUS_REG				UCSR1A
+	#define	UART_CONTROL_REG			UCSR1B
+	#define	UART_ENABLE_TRANSMITTER		TXEN1
+	#define	UART_ENABLE_RECEIVER		RXEN1
+	#define	UART_TRANSMIT_COMPLETE		TXC1
+	#define	UART_RECEIVE_COMPLETE		RXC1
+	#define	UART_DATA_REG				UDR1
+	#define	UART_DOUBLE_SPEED			U2X1
+
+#elif defined(__AVR_ATmega8__) || defined(__AVR_ATmega16__) || defined(__AVR_ATmega32__) \
 	|| defined(__AVR_ATmega8515__) || defined(__AVR_ATmega8535__)
 	/* ATMega8 with one USART */
 	#define	UART_BAUD_RATE_LOW			UBRRL
@@ -258,6 +348,28 @@ LICENSE:
 	#define	UART_RECEIVE_COMPLETE		RXC0
 	#define	UART_DATA_REG				UDR0
 	#define	UART_DOUBLE_SPEED			U2X0
+#elif defined(UBRR0L) && defined(UCSR0A) && defined(TXEN0)
+	/* ATMega with two USART, use UART0 */
+	#define	UART_BAUD_RATE_LOW			UBRR0L
+	#define	UART_STATUS_REG				UCSR0A
+	#define	UART_CONTROL_REG			UCSR0B
+	#define	UART_ENABLE_TRANSMITTER		TXEN0
+	#define	UART_ENABLE_RECEIVER		RXEN0
+	#define	UART_TRANSMIT_COMPLETE		TXC0
+	#define	UART_RECEIVE_COMPLETE		RXC0
+	#define	UART_DATA_REG				UDR0
+	#define	UART_DOUBLE_SPEED			U2X0
+#elif defined(UBRRL) && defined(UCSRA) && defined(UCSRB) && defined(TXEN) && defined(RXEN)
+	//* catch all
+	#define	UART_BAUD_RATE_LOW			UBRRL
+	#define	UART_STATUS_REG				UCSRA
+	#define	UART_CONTROL_REG			UCSRB
+	#define	UART_ENABLE_TRANSMITTER		TXEN
+	#define	UART_ENABLE_RECEIVER		RXEN
+	#define	UART_TRANSMIT_COMPLETE		TXC
+	#define	UART_RECEIVE_COMPLETE		RXC
+	#define	UART_DATA_REG				UDR
+	#define	UART_DOUBLE_SPEED			U2X
 #else
 	#error "no UART definition for MCU available"
 #endif
@@ -323,26 +435,16 @@ void __jumpMain(void)
 
 	asm volatile ( ".set __stack, %0" :: "i" (RAMEND) );
 
-//	ldi r16,high(RAMEND)
-//	out SPH,r16 ; Set stack pointer to top of RAM
+//*	set stack pointer to top of RAM
 
-//	asm volatile ( "ldi	16, 0x10");
 	asm volatile ( "ldi	16, %0" :: "i" (RAMEND >> 8) );
-//	asm volatile ( "out 0x3E,16");
-//	asm volatile ( "out %0,16" :: "i" (SPH_REG) );
 	asm volatile ( "out %0,16" :: "i" (AVR_STACK_POINTER_HI_ADDR) );
 
-//	asm volatile ( "ldi	16, 0x00");
 	asm volatile ( "ldi	16, %0" :: "i" (RAMEND & 0x0ff) );
-//	asm volatile ( "out 0x3d,16");
-//	asm volatile ( "out %0,16" :: "i" (SPL_REG) );
 	asm volatile ( "out %0,16" :: "i" (AVR_STACK_POINTER_LO_ADDR) );
-
-
 
 	asm volatile ( "clr __zero_reg__" );									// GCC depends on register r1 set to 0
 	asm volatile ( "out %0, __zero_reg__" :: "I" (_SFR_IO_ADDR(SREG)) );	// set SREG to 0
-//	asm volatile ( "rjmp main");											// jump to main()
 	asm volatile ( "jmp main");												// jump to main()
 }
 
@@ -403,7 +505,7 @@ uint32_t count = 0;
 		if (count > MAX_TIME_COUNT)
 		{
 		unsigned int	data;
-		#if (FLASHEND > 0x0FFFF)
+		#if (FLASHEND > 0x10000)
 			data	=	pgm_read_word_far(0);	//*	get the first word of the user program
 		#else
 			data	=	pgm_read_word_near(0);	//*	get the first word of the user program
@@ -422,6 +524,8 @@ uint32_t count = 0;
 	return UART_DATA_REG;
 }
 
+//*	for watch dog timer startup
+void (*app_start)(void) = 0x0000;
 
 
 //*****************************************************************************
@@ -442,7 +546,36 @@ int main(void)
 	unsigned long	boot_timer;
 	unsigned int	boot_state;
 #ifdef ENABLE_MONITOR
-	unsigned int	exPointCntr	=	0;
+	unsigned int	exPointCntr		=	0;
+	unsigned int	rcvdCharCntr	=	0;
+#endif
+
+	//*	some chips dont set the stack properly
+	asm volatile ( ".set __stack, %0" :: "i" (RAMEND) );
+	asm volatile ( "ldi	16, %0" :: "i" (RAMEND >> 8) );
+	asm volatile ( "out %0,16" :: "i" (AVR_STACK_POINTER_HI_ADDR) );
+	asm volatile ( "ldi	16, %0" :: "i" (RAMEND & 0x0ff) );
+	asm volatile ( "out %0,16" :: "i" (AVR_STACK_POINTER_LO_ADDR) );
+
+#ifdef _FIX_ISSUE_181_
+	//************************************************************************
+	//*	Dec 29,	2011	<MLS> Issue #181, added watch dog timmer support
+	//*	handle the watch dog timer
+	uint8_t	mcuStatusReg;
+	mcuStatusReg	=	MCUSR;
+
+	__asm__ __volatile__ ("cli");
+	__asm__ __volatile__ ("wdr");
+	MCUSR	=	0;
+	WDTCSR	|=	_BV(WDCE) | _BV(WDE);
+	WDTCSR	=	0;
+	__asm__ __volatile__ ("sei");
+	// check if WDT generated the reset, if so, go straight to app
+	if (mcuStatusReg & _BV(WDRF))
+	{
+		app_start();
+	}
+	//************************************************************************
 #endif
 
 
@@ -450,8 +583,9 @@ int main(void)
 	boot_state	=	0;
 
 #ifdef BLINK_LED_WHILE_WAITING
-	boot_timeout	=	 20000;		//*	should be about 1 second
+//	boot_timeout	=	 90000;		//*	should be about 4 seconds
 //	boot_timeout	=	170000;
+	boot_timeout	=	 20000;		//*	should be about 1 second
 #else
 	boot_timeout	=	3500000; // 7 seconds , approx 2us per step when optimize "s"
 #endif
@@ -516,7 +650,7 @@ int main(void)
 				boot_state	=	1; // (after ++ -> boot_state=2 bootloader timeout, jump to main 0x00000 )
 			}
 		#ifdef BLINK_LED_WHILE_WAITING
-			if ((boot_timer % 7000) == 0)
+			if ((boot_timer % _BLINK_LOOP_COUNT_) == 0)
 			{
 				//*	toggle the LED
 				PROGLED_PORT	^=	(1<<PROGLED_PIN);	// turn LED ON
@@ -547,10 +681,13 @@ int main(void)
 				{
 				//	c	=	recchar();
 					c	=	recchar_timeout();
+					
 				}
 
 			#ifdef ENABLE_MONITOR
-				if (c == '!')
+				rcvdCharCntr++;
+
+				if ((c == '!')  && (rcvdCharCntr < 10))
 				{
 					exPointCntr++;
 					if (exPointCntr == 3)
@@ -579,6 +716,11 @@ int main(void)
 						break;
 
 					case ST_GET_SEQ_NUM:
+					#ifdef _FIX_ISSUE_505_
+						seqNum			=	c;
+						msgParseState	=	ST_MSG_SIZE_1;
+						checksum		^=	c;
+					#else
 						if ( (c == 1) || (c == seqNum) )
 						{
 							seqNum			=	c;
@@ -589,6 +731,7 @@ int main(void)
 						{
 							msgParseState	=	ST_START;
 						}
+					#endif
 						break;
 
 					case ST_MSG_SIZE_1:
@@ -655,20 +798,41 @@ int main(void)
 							unsigned char signatureIndex	=	msgBuffer[6];
 
 							if ( signatureIndex == 0 )
-								answerByte	=	(SIGNATURE_BYTES >>16) & 0x000000FF;
+							{
+								answerByte	=	(SIGNATURE_BYTES >> 16) & 0x000000FF;
+							}
 							else if ( signatureIndex == 1 )
+							{
 								answerByte	=	(SIGNATURE_BYTES >> 8) & 0x000000FF;
+							}
 							else
+							{
 								answerByte	=	SIGNATURE_BYTES & 0x000000FF;
+							}
 						}
 						else if ( msgBuffer[4] & 0x50 )
 						{
-							answerByte	=	0; //read fuse/lock bits not implemented, return dummy value
+						//*	Issue 544: 	stk500v2 bootloader doesn't support reading fuses
+						//*	I cant find the docs that say what these are supposed to be but this was figured out by trial and error
+						//	answerByte	=	boot_lock_fuse_bits_get(GET_LOW_FUSE_BITS);
+						//	answerByte	=	boot_lock_fuse_bits_get(GET_HIGH_FUSE_BITS);
+						//	answerByte	=	boot_lock_fuse_bits_get(GET_EXTENDED_FUSE_BITS);
+							if (msgBuffer[4] == 0x50)
+							{
+								answerByte	=	boot_lock_fuse_bits_get(GET_LOW_FUSE_BITS);
+							}
+							else if (msgBuffer[4] == 0x58)
+							{
+								answerByte	=	boot_lock_fuse_bits_get(GET_HIGH_FUSE_BITS);
+							}
+							else
+							{
+								answerByte	=	0;
+							}
 						}
 						else
 						{
 							answerByte	=	0; // for all others command are not implemented, return dummy value for AVRDUDE happy <Worapoht>
-	//						flag	=	1; // Remark this line for AVRDUDE <Worapoht>
 						}
 						if ( !flag )
 						{
@@ -804,7 +968,8 @@ int main(void)
 				case CMD_CHIP_ERASE_ISP:
 					eraseAddress	=	0;
 					msgLength		=	2;
-					msgBuffer[1]	=	STATUS_CMD_OK;
+				//	msgBuffer[1]	=	STATUS_CMD_OK;
+					msgBuffer[1]	=	STATUS_CMD_FAILED;	//*	isue 543, return FAILED instead of OK
 					break;
 
 				case CMD_LOAD_ADDRESS:
@@ -855,23 +1020,17 @@ int main(void)
 						}
 						else
 						{
-						#if (!defined(__AVR_ATmega1280__) && !defined(__AVR_ATmega2560__)  && !defined(__AVR_ATmega2561__))
+							//*	issue 543, this should work, It has not been tested.
+							uint16_t ii = address >> 1;
 							/* write EEPROM */
-							do {
-								EEARL	=	address;			// Setup EEPROM address
-								EEARH	=	(address >> 8);
-								address++;						// Select next EEPROM byte
-
-								EEDR	=	*p++;				// get byte from buffer
-								EECR	|=	(1<<EEMWE);			// Write data into EEPROM
-								EECR	|=	(1<<EEWE);
-
-								while (EECR & (1<<EEWE));	// Wait for write operation to finish
-								size--;						// Decrease number of bytes to write
-							} while (size);					// Loop until all bytes written
-						#endif
+							while (size) {
+								eeprom_write_byte((uint8_t*)ii, *p++);
+								address+=2;						// Select next EEPROM byte
+								ii++;
+								size--;
+							}
 						}
-							msgLength	=	2;
+						msgLength		=	2;
 						msgBuffer[1]	=	STATUS_CMD_OK;
 					}
 					break;
@@ -890,11 +1049,12 @@ int main(void)
 
 							// Read FLASH
 							do {
-	#if defined(RAMPZ)
+						//#if defined(RAMPZ)
+						#if (FLASHEND > 0x10000)
 								data	=	pgm_read_word_far(address);
-	#else
+						#else
 								data	=	pgm_read_word_near(address);
-	#endif
+						#endif
 								*p++	=	(unsigned char)data;		//LSB
 								*p++	=	(unsigned char)(data >> 8);	//MSB
 								address	+=	2;							// Select next word in memory
@@ -1056,16 +1216,10 @@ unsigned long	gEepromIndex;
 #define	true	1
 #define	false	0
 
-#if defined(__AVR_ATmega128__)
-	#define	kCPU_NAME	"ATmega128"
-#elif defined(__AVR_ATmega1280__)
-	#define	kCPU_NAME	"ATmega1280"
-#elif defined(__AVR_ATmega1281__)
-	#define	kCPU_NAME	"ATmega1281"
-#elif defined(__AVR_ATmega2560__)
-	#define	kCPU_NAME	"ATmega2560"
-#elif defined(__AVR_ATmega2561__)
-	#define	kCPU_NAME	"ATmega2561"
+#include	"avr_cpunames.h"
+
+#ifndef _AVR_CPU_NAME_
+	#error cpu name not defined
 #endif
 
 #ifdef _VECTORS_SIZE
@@ -1077,78 +1231,79 @@ unsigned long	gEepromIndex;
 
 void	PrintDecInt(int theNumber, int digitCnt);
 
-#ifdef kCPU_NAME
-	prog_char	gTextMsg_CPU_Name[]			PROGMEM	=	kCPU_NAME;
+#ifdef _AVR_CPU_NAME_
+	const char	gTextMsg_CPU_Name[]			PROGMEM	=	_AVR_CPU_NAME_;
 #else
-	prog_char	gTextMsg_CPU_Name[]			PROGMEM	=	"UNKNOWN";
+	const char	gTextMsg_CPU_Name[]			PROGMEM	=	"UNKNOWN";
 #endif
 
-	prog_char	gTextMsg_Explorer[]			PROGMEM	=	"Arduino explorer stk500V2 by MLS";
-	prog_char	gTextMsg_Prompt[]			PROGMEM	=	"Bootloader>";
-	prog_char	gTextMsg_HUH[]				PROGMEM	=	"Huh?";
-	prog_char	gTextMsg_COMPILED_ON[]		PROGMEM	=	"Compiled on  = ";
-	prog_char	gTextMsg_CPU_Type[]			PROGMEM	=	"CPU Type     = ";
-	prog_char	gTextMsg_AVR_ARCH[]			PROGMEM	=	"__AVR_ARCH__ = ";
-	prog_char	gTextMsg_AVR_LIBC[]			PROGMEM	=	"AVR LibC Ver = ";
-	prog_char	gTextMsg_GCC_VERSION[]		PROGMEM	=	"GCC Version  = ";
-	prog_char	gTextMsg_CPU_SIGNATURE[]	PROGMEM	=	"CPU signature= ";
-	prog_char	gTextMsg_FUSE_BYTE_LOW[]	PROGMEM	=	"Low fuse     = ";
-	prog_char	gTextMsg_FUSE_BYTE_HIGH[]	PROGMEM	=	"High fuse    = ";
-	prog_char	gTextMsg_FUSE_BYTE_EXT[]	PROGMEM	=	"Ext fuse     = ";
-	prog_char	gTextMsg_FUSE_BYTE_LOCK[]	PROGMEM	=	"Lock fuse    = ";
-	prog_char	gTextMsg_GCC_DATE_STR[]		PROGMEM	=	__DATE__;
-	prog_char	gTextMsg_AVR_LIBC_VER_STR[]	PROGMEM	=	__AVR_LIBC_VERSION_STRING__;
-	prog_char	gTextMsg_GCC_VERSION_STR[]	PROGMEM	=	__VERSION__;
-	prog_char	gTextMsg_VECTOR_HEADER[]	PROGMEM	=	"V#   ADDR   op code     instruction addr   Interrupt";
-	prog_char	gTextMsg_noVector[]			PROGMEM	=	"no vector";
-	prog_char	gTextMsg_rjmp[]				PROGMEM	=	"rjmp  ";
-	prog_char	gTextMsg_jmp[]				PROGMEM	=	"jmp ";
-	prog_char	gTextMsg_WHAT_PORT[]		PROGMEM	=	"What port:";
-	prog_char	gTextMsg_PortNotSupported[]	PROGMEM	=	"Port not supported";
-	prog_char	gTextMsg_MustBeLetter[]		PROGMEM	=	"Must be a letter";
-	prog_char	gTextMsg_SPACE[]			PROGMEM	=	" ";
-	prog_char	gTextMsg_WriteToEEprom[]	PROGMEM	=	"Writting EE";
-	prog_char	gTextMsg_ReadingEEprom[]	PROGMEM	=	"Reading EE";
-	prog_char	gTextMsg_EEPROMerrorCnt[]	PROGMEM	=	"eeprom error count=";
-	prog_char	gTextMsg_PORT[]				PROGMEM	=	"PORT";
+	const char	gTextMsg_Explorer[]			PROGMEM	=	"Arduino explorer stk500V2 by MLS";
+	const char	gTextMsg_Prompt[]			PROGMEM	=	"Bootloader>";
+	const char	gTextMsg_HUH[]				PROGMEM	=	"Huh?";
+	const char	gTextMsg_COMPILED_ON[]		PROGMEM	=	"Compiled on = ";
+	const char	gTextMsg_CPU_Type[]			PROGMEM	=	"CPU Type    = ";
+	const char	gTextMsg_AVR_ARCH[]			PROGMEM	=	"__AVR_ARCH__= ";
+	const char	gTextMsg_AVR_LIBC[]			PROGMEM	=	"AVR LibC Ver= ";
+	const char	gTextMsg_GCC_VERSION[]		PROGMEM	=	"GCC Version = ";
+	const char	gTextMsg_CPU_SIGNATURE[]	PROGMEM	=	"CPU ID      = ";
+	const char	gTextMsg_FUSE_BYTE_LOW[]	PROGMEM	=	"Low fuse    = ";
+	const char	gTextMsg_FUSE_BYTE_HIGH[]	PROGMEM	=	"High fuse   = ";
+	const char	gTextMsg_FUSE_BYTE_EXT[]	PROGMEM	=	"Ext fuse    = ";
+	const char	gTextMsg_FUSE_BYTE_LOCK[]	PROGMEM	=	"Lock fuse   = ";
+	const char	gTextMsg_GCC_DATE_STR[]		PROGMEM	=	__DATE__;
+	const char	gTextMsg_AVR_LIBC_VER_STR[]	PROGMEM	=	__AVR_LIBC_VERSION_STRING__;
+	const char	gTextMsg_GCC_VERSION_STR[]	PROGMEM	=	__VERSION__;
+	const char	gTextMsg_VECTOR_HEADER[]	PROGMEM	=	"V#   ADDR   op code     instruction addr   Interrupt";
+	const char	gTextMsg_noVector[]			PROGMEM	=	"no vector";
+	const char	gTextMsg_rjmp[]				PROGMEM	=	"rjmp  ";
+	const char	gTextMsg_jmp[]				PROGMEM	=	"jmp ";
+	const char	gTextMsg_WHAT_PORT[]		PROGMEM	=	"What port:";
+	const char	gTextMsg_PortNotSupported[]	PROGMEM	=	"Port not supported";
+	const char	gTextMsg_MustBeLetter[]		PROGMEM	=	"Must be a letter";
+	const char	gTextMsg_SPACE[]			PROGMEM	=	" ";
+	const char	gTextMsg_WriteToEEprom[]	PROGMEM	=	"Writting EE";
+	const char	gTextMsg_ReadingEEprom[]	PROGMEM	=	"Reading EE";
+	const char	gTextMsg_EEPROMerrorCnt[]	PROGMEM	=	"EE err cnt=";
+	const char	gTextMsg_PORT[]				PROGMEM	=	"PORT";
 
 
 //************************************************************************
 //*	Help messages
-	prog_char	gTextMsg_HELP_MSG_0[]		PROGMEM	=	"0=Zero address ctrs";
-	prog_char	gTextMsg_HELP_MSG_QM[]		PROGMEM	=	"?=CPU stats";
-	prog_char	gTextMsg_HELP_MSG_AT[]		PROGMEM	=	"@=EEPROM test";
-	prog_char	gTextMsg_HELP_MSG_B[]		PROGMEM	=	"B=Blink LED";
-	prog_char	gTextMsg_HELP_MSG_E[]		PROGMEM	=	"E=Dump EEPROM";
-	prog_char	gTextMsg_HELP_MSG_F[]		PROGMEM	=	"F=Dump FLASH";
-	prog_char	gTextMsg_HELP_MSG_H[]		PROGMEM	=	"H=Help";
-	prog_char	gTextMsg_HELP_MSG_L[]		PROGMEM	=	"L=List I/O Ports";
-	prog_char	gTextMsg_HELP_MSG_Q[]		PROGMEM	=	"Q=Quit & jump to user pgm";
-	prog_char	gTextMsg_HELP_MSG_R[]		PROGMEM	=	"R=Dump RAM";
-	prog_char	gTextMsg_HELP_MSG_V[]		PROGMEM	=	"V=show interrupt Vectors";
-	prog_char	gTextMsg_HELP_MSG_Y[]		PROGMEM	=	"Y=Port blink";
+	const char	gTextMsg_HELP_MSG_0[]		PROGMEM	=	"0=Zero addr";
+	const char	gTextMsg_HELP_MSG_QM[]		PROGMEM	=	"?=CPU stats";
+	const char	gTextMsg_HELP_MSG_AT[]		PROGMEM	=	"@=EEPROM test";
+	const char	gTextMsg_HELP_MSG_B[]		PROGMEM	=	"B=Blink LED";
+	const char	gTextMsg_HELP_MSG_E[]		PROGMEM	=	"E=Dump EEPROM";
+	const char	gTextMsg_HELP_MSG_F[]		PROGMEM	=	"F=Dump FLASH";
+	const char	gTextMsg_HELP_MSG_H[]		PROGMEM	=	"H=Help";
+	const char	gTextMsg_HELP_MSG_L[]		PROGMEM	=	"L=List I/O Ports";
+//	const char	gTextMsg_HELP_MSG_Q[]		PROGMEM	=	"Q=Quit & jump to user pgm";
+	const char	gTextMsg_HELP_MSG_Q[]		PROGMEM	=	"Q=Quit";
+	const char	gTextMsg_HELP_MSG_R[]		PROGMEM	=	"R=Dump RAM";
+	const char	gTextMsg_HELP_MSG_V[]		PROGMEM	=	"V=show interrupt Vectors";
+	const char	gTextMsg_HELP_MSG_Y[]		PROGMEM	=	"Y=Port blink";
 
-	prog_char	gTextMsg_END[]				PROGMEM	=	"*";
+	const char	gTextMsg_END[]				PROGMEM	=	"*";
 
 
 //************************************************************************
-void	PrintFromPROGMEM(void *dataPtr, unsigned char offset)
+void	PrintFromPROGMEM(const void *dataPtr, unsigned char offset)
 {
-uint8_t	ii;
 char	theChar;
 
-	ii			=	offset;
-	theChar		=	1;
+	dataPtr		+=	offset;
 
-	while (theChar != 0)
-	{
-		theChar	=	pgm_read_byte_far((uint32_t)dataPtr + ii);
+	do {
+	#if (FLASHEND > 0x10000)
+		theChar	=	pgm_read_byte_far((uint16_t)dataPtr++);
+	#else
+		theChar	=	pgm_read_byte_near((uint16_t)dataPtr++);
+	#endif
 		if (theChar != 0)
 		{
 			sendchar(theChar);
 		}
-		ii++;
-	}
+	} while (theChar != 0);
 }
 
 //************************************************************************
@@ -1160,7 +1315,7 @@ void	PrintNewLine(void)
 
 
 //************************************************************************
-void	PrintFromPROGMEMln(void *dataPtr, unsigned char offset)
+void	PrintFromPROGMEMln(const void *dataPtr, unsigned char offset)
 {
 	PrintFromPROGMEM(dataPtr, offset);
 
@@ -1293,46 +1448,6 @@ unsigned char fuseByte;
 
 }
 
-#ifndef sbi
-	#define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
-#endif
-
-//************************************************************************
-int analogRead(uint8_t pin)
-{
-uint8_t low, high;
-
-	// set the analog reference (high two bits of ADMUX) and select the
-	// channel (low 4 bits).  this also sets ADLAR (left-adjust result)
-	// to 0 (the default).
-//	ADMUX	=	(analog_reference << 6) | (pin & 0x07);
-	ADMUX	=	(1 << 6) | (pin & 0x07);
-
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-	// the MUX5 bit of ADCSRB selects whether we're reading from channels
-	// 0 to 7 (MUX5 low) or 8 to 15 (MUX5 high).
-	ADCSRB	=	(ADCSRB & ~(1 << MUX5)) | (((pin >> 3) & 0x01) << MUX5);
-#endif
-
-	// without a delay, we seem to read from the wrong channel
-	//delay(1);
-
-	// start the conversion
-	sbi(ADCSRA, ADSC);
-
-	// ADSC is cleared when the conversion finishes
-	while (bit_is_set(ADCSRA, ADSC));
-
-	// we have to read ADCL first; doing so locks both ADCL
-	// and ADCH until ADCH is read.  reading ADCL second would
-	// cause the results of each conversion to be discarded,
-	// as ADCL and ADCH would be locked when it completed.
-	low		=	ADCL;
-	high	=	ADCH;
-
-	// combine the two bytes
-	return (high << 8) | low;
-}
 
 //************************************************************************
 static void BlinkLED(void)
@@ -1388,11 +1503,15 @@ unsigned char	*ramPtr;
 			switch(dumpWhat)
 			{
 				case kDUMP_FLASH:
+				#if (FLASHEND > 0x10000)
 					theValue	=	pgm_read_byte_far(myAddressPointer);
+				#else
+					theValue	=	pgm_read_byte_near(myAddressPointer);
+				#endif
 					break;
 
 				case kDUMP_EEPROM:
-					theValue	=	eeprom_read_byte((void *)myAddressPointer);
+					theValue	=	eeprom_read_byte((uint8_t *)(uint16_t)myAddressPointer);
 					break;
 
 				case kDUMP_RAM:
@@ -1435,7 +1554,11 @@ int		errorCount;
 	PrintFromPROGMEMln(gTextMsg_WriteToEEprom, 0);
 	PrintNewLine();
 	ii			=	0;
-	while (((theChar = pgm_read_byte_far(gTextMsg_Explorer + ii)) != '*') && (ii < 512))
+#if (FLASHEND > 0x10000)
+	while (((theChar = pgm_read_byte_far(((uint16_t)gTextMsg_Explorer) + ii)) != '*') && (ii < 512))
+#else
+	while (((theChar = pgm_read_byte_near(((uint16_t)gTextMsg_Explorer) + ii)) != '*') && (ii < 512))
+#endif
 	{
 		eeprom_write_byte((uint8_t *)ii, theChar);
 		if (theChar == 0)
@@ -1456,7 +1579,11 @@ int		errorCount;
 	PrintNewLine();
 	errorCount	=	0;
 	ii			=	0;
-	while (((theChar = pgm_read_byte_far(gTextMsg_Explorer + ii)) != '*') && (ii < 512))
+#if (FLASHEND > 0x10000)
+	while (((theChar = pgm_read_byte_far((uint16_t)gTextMsg_Explorer + ii)) != '*') && (ii < 512))
+#else
+	while (((theChar = pgm_read_byte_near((uint16_t)gTextMsg_Explorer + ii)) != '*') && (ii < 512))
+#endif
 	{
 		theEEPROMchar	=	eeprom_read_byte((uint8_t *)ii);
 		if (theEEPROMchar == 0)
@@ -1487,10 +1614,12 @@ int		errorCount;
 
 
 #if (FLASHEND > 0x08000)
-	#include	"avrinterruptnames.h"
-	#ifndef _INTERRUPT_NAMES_DEFINED_
-		#warning Interrupt vectors not defined
-	#endif
+//*	this includes the interrupt names for the monitor portion. There is no longer enough 
+//*	memory to include this
+//	#include	"avrinterruptnames.h"
+//	#ifndef _INTERRUPT_NAMES_DEFINED_
+//		#warning Interrupt vectors not defined
+//	#endif
 #endif
 
 //************************************************************************
@@ -1534,12 +1663,18 @@ unsigned long	absoluteAddr;
 
 	
 		//*	the AVR is LITTLE ENDIAN, swap the byte order
+	#if (FLASHEND > 0x10000)
 		byte1	=	pgm_read_byte_far(myMemoryPtr++);
 		byte2	=	pgm_read_byte_far(myMemoryPtr++);
-		word1	=	(byte2 << 8) + byte1;
-
 		byte3	=	pgm_read_byte_far(myMemoryPtr++);
 		byte4	=	pgm_read_byte_far(myMemoryPtr++);
+	#else
+		byte1	=	pgm_read_byte_near(myMemoryPtr++);
+		byte2	=	pgm_read_byte_near(myMemoryPtr++);
+		byte3	=	pgm_read_byte_near(myMemoryPtr++);
+		byte4	=	pgm_read_byte_near(myMemoryPtr++);
+	#endif
+		word1	=	(byte2 << 8) + byte1;
 		word2	=	(byte4 << 8) + byte3;
 
 
@@ -1596,7 +1731,11 @@ unsigned long	absoluteAddr;
 
 	#if defined(_INTERRUPT_NAMES_DEFINED_)
 		sendchar(0x20);
+	#if (FLASHEND > 0x10000)
 		stringPointer	=	pgm_read_word_far(&(gInterruptNameTable[vectorIndex]));
+	#else
+		stringPointer	=	pgm_read_word_near(&(gInterruptNameTable[vectorIndex]));
+	#endif
 		PrintFromPROGMEM((char *)stringPointer, 0);
 	#endif
 		PrintNewLine();
@@ -1895,13 +2034,7 @@ int				ii, jj;
 		{
 			theChar	=	theChar & 0x5F;
 		}
-	#if defined( _CEREBOTPLUS_BOARD_ )
-		if (theChar == 0x5F)
-		{
-			
-		}
-		else
-	#endif
+
 		if (theChar >= 0x20)
 		{
 			sendchar(theChar);
@@ -1979,12 +2112,6 @@ int				ii, jj;
 				AVR_PortOutput();
 				break;
 			
-		#if defined( _CEREBOTPLUS_BOARD_ )
-			case 0x5F:
-				//*	do nothing
-				break;
-	 	#endif
-	 	
 			default:
 				PrintFromPROGMEMln(gTextMsg_HUH, 0);
 				break;
