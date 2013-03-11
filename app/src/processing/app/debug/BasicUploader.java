@@ -270,12 +270,25 @@ public class BasicUploader extends Uploader  {
     prefs.putAll(Base.getBoardPreferences());
     prefs.putAll(programmerPrefs);
     
-    // Add configuration for bootloader tool
-    String toolName = prefs.get("bootloader.tool");
-    PreferencesMap toolPrefs = targetPlatform.getTool(toolName);
+    // Create configuration for bootloader tool
+    PreferencesMap toolPrefs = new PreferencesMap();
+    String tool = prefs.get("bootloader.tool");
+    if (tool.contains(":")) {
+      String[] split = tool.split(":", 2);
+      TargetPlatform platform = Base.getCurrentTargetPlatformFromPackage(split[0]);
+      tool = split[1];
+      toolPrefs.putAll(platform.getTool(tool));
+      if (toolPrefs.size() == 0)
+        throw new RunnerException(
+            I18n.format(_("Could not find tool {0} from package {1}"), tool,
+                        split[0]));
+    }
+    toolPrefs.putAll(targetPlatform.getTool(tool));
     if (toolPrefs.size() == 0)
       throw new RunnerException(I18n.format(_("Could not find tool {0}"),
-                                            toolName));
+                                            tool));
+    
+    // Merge tool with global configuration
     prefs.putAll(toolPrefs);
     if (verbose) {
       prefs.put("erase.verbose", prefs.get("erase.params.verbose"));
