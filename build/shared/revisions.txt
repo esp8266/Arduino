@@ -1,4 +1,6 @@
 
+ARDUINO 1.0.4 - 2013.03.11
+
 [core]
 
 * Fixed malloc bug (Paul Stoffregen)
