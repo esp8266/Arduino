@@ -38,7 +38,7 @@ https://github.com/BlueVia/Official-Arduino
 #include <HardwareSerial.h>
 #include <Arduino.h>
 
-#if defined(__AVR_ATmega328__) 
+#if defined(__AVR_ATmega328P__) 
 #define __TXPIN__ 3
 #define __RXPIN__ 2
 #define __RXINT__ 3
