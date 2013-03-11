@@ -19,6 +19,11 @@ ARDUINO 1.0.4 - 2013.03.11
 * Fixed NPE due to permissions IO error
 * Updated drivers for Windows (all-in-one, signature for Win8)
 
+[bootloaders]
+
+* Fixed a bunch of bugs on Mega2560's bootloader (Mark Sproul)
+  (https://github.com/arduino/Arduino/pull/1183)
+
 ARDUINO 1.0.3 - 2012.12.10
 
 [hardware]
