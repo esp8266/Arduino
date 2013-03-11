@@ -9,7 +9,7 @@ public class I18NTest {
 
   private Set<String> loadReferenceI18NKeys() throws IOException {
     Properties properties = new Properties();
-    properties.putAll(loadProperties(new File(I18NTest.class.getResource("./Resources_en.properties").getFile())));
+    properties.putAll(loadProperties(new File(I18NTest.class.getResource("./i18n/Resources_en.properties").getFile())));
     Set<String> keys = new HashSet<String>();
     for (Object key : properties.keySet()) {
       keys.add(key.toString());
