@@ -561,11 +561,10 @@ public class Serial implements SerialPortEventListener {
     try {
       //System.err.println("trying");
       @SuppressWarnings("unchecked")
-      Enumeration portList = CommPortIdentifier.getPortIdentifiers();
+      Enumeration<CommPortIdentifier> portList = CommPortIdentifier.getPortIdentifiers();
       //System.err.println("got port list");
       while (portList.hasMoreElements()) {
-        CommPortIdentifier portId = 
-          (CommPortIdentifier) portList.nextElement();
+        CommPortIdentifier portId = portList.nextElement();
         //System.out.println(portId);
 
         if (portId.getPortType() == CommPortIdentifier.PORT_SERIAL) {
