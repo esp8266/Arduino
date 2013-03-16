@@ -24,6 +24,8 @@
 #define START_CMD   0xE0
 #define END_CMD     0xEE
 #define ERR_CMD   	0xEF
+#define CMD_POS			1		// Position of Command OpCode on SPI stream
+#define PARAM_LEN_POS	2		// Position of Param len on SPI stream
   
 enum {
 	SET_NET_CMD 		= 0x10,

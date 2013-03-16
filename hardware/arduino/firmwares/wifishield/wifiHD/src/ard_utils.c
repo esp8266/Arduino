@@ -78,6 +78,8 @@ uint16_t calcMergeLen(uint8_t sock)
 	if (pBufStore[index][sock].data != NULL)
 	{
 		len += pBufStore[index][sock].len;
+		len -= pBufStore[index][sock].idx;
+		INFO_UTIL_VER(" [%d]: len:%d idx:%d tot:%d\n", sock, pBufStore[index][sock].len, pBufStore[index][sock].idx, len);
 	}
 	++index;
 	if (index == MAX_PBUF_STORED)
