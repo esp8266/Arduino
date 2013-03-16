@@ -690,7 +690,7 @@ static int udp_start(struct ttcp* ttcp) {
 		return -1;
 	}
 
-	printk("%s, upcb:%p %s:%d\n", __FUNCTION__, ttcp->upcb, ip2str(ttcp->addr), ttcp->port);
+	INFO_TCP("%s, upcb:%p %s:%d\n", __FUNCTION__, ttcp->upcb, ip2str(ttcp->addr), ttcp->port);
 	if (ttcp->mode == TTCP_MODE_TRANSMIT) {
 		if (udp_connect(ttcp->upcb, &(ttcp->addr), ttcp->port) != ERR_OK) {
 			WARN("TTCP [%p]: udp connect failed\n", ttcp);
@@ -708,7 +708,7 @@ static int udp_start(struct ttcp* ttcp) {
 		setRemoteClient(ttcp->sock, 0, 0);
 		udp_recv(ttcp->upcb, audp_recv_cb, ttcp);
 	}
-	printk("%s, loc:0x%x-%d rem:0x%x-%d\n", __FUNCTION__, 
+	INFO_TCP("%s, loc:0x%x-%d rem:0x%x-%d\n", __FUNCTION__, 
 		 ttcp->upcb->local_ip.addr, ttcp->upcb->local_port, 
 		 ttcp->upcb->remote_ip.addr, ttcp->upcb->remote_port);
 	return 0;
