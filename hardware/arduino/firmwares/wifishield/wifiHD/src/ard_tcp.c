@@ -696,6 +696,7 @@ static int udp_start(struct ttcp* ttcp) {
 			WARN("TTCP [%p]: udp connect failed\n", ttcp);
 			return -1;
 		}
+		udp_recv(ttcp->upcb, audp_recv_cb, ttcp);
 	} else {
 		/* bind to any IP address on port specified */
 		err = udp_bind(ttcp->upcb, IP_ADDR_ANY, ttcp->port);
