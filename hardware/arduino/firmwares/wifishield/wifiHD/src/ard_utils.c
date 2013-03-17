@@ -181,7 +181,8 @@ void dumpPbuf(uint8_t sock)
 	do {
 	if (pBufStore[index][sock].data != NULL)
 	{
-		printk("Buf: %p Len:%d\n", pBufStore[index][sock].data, pBufStore[index][sock].len);
+		printk("%d] pcb:%p Buf: %p Len:%d\n", pBufStore[index][sock].idx, pBufStore[index][sock].pcb, 
+			pBufStore[index][sock].data, pBufStore[index][sock].len);
 	}
 	++index;
 	if (index == MAX_PBUF_STORED)
@@ -247,7 +248,7 @@ void ack_recved(void* pcb, int len);
 
 void ackAndFreeData(void* pcb, int len, uint8_t sock, uint8_t* data)
 {
-	INFO_UTIL("Ack pcb:%p len:%d sock:%d data:%p\n", pcb, len, sock, data);
+	INFO_TCP("Ack pcb:%p len:%d sock:%d data:%p\n", pcb, len, sock, data);
 	if (!IS_UDP_SOCK(sock))
 		ack_recved(pcb, len);
 	if (data != NULL)
@@ -278,7 +279,7 @@ bool isAvailTcpDataByte(uint8_t sock)
 uint16_t getAvailTcpDataByte(uint8_t sock)
 {
 	uint16_t len = calcMergeLen(sock);
-	INFO_UTIL("Availabled data: %d\n", len);
+	INFO_UTIL_VER("Availabled data: %d\n", len);
 	return len;
 }
 
@@ -298,6 +299,8 @@ bool getTcpDataByte(uint8_t sock, uint8_t* payload, uint8_t peek)
 		else
 			*payload = buf[p->idx++];
 		INFO_UTIL_VER("get:%d %p %d\n",p->idx, p->data, *payload);
+		if (p->idx == p->len)
+			ackAndFreeData(p->pcb, p->len, sock, p->data);
 		return true;
 		}else{
 			ackAndFreeData(p->pcb, p->len, sock, p->data);

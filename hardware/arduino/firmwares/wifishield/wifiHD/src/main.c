@@ -281,6 +281,7 @@ void initShell()
         console_add_cmd("status", cmd_status, NULL);
         console_add_cmd("debug", cmd_debug, NULL);
         console_add_cmd("dumpBuf", cmd_dumpBuf, NULL);
+		console_add_cmd("ipconfig", cmd_set_ip, NULL);
 
 #ifdef ADD_CMDS
         console_add_cmd("powersave", cmd_power, NULL);
