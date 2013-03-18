@@ -734,7 +734,7 @@ public class Sketch {
           int result = JOptionPane.showOptionDialog(editor,
                                                     _("In Arduino 1.0, the default file extension has changed\n" +
                                                       "from .pde to .ino.  New sketches (including those created\n" +
-                                                      "by \"Save-As\" will use the new extension.  The extension\n" +
+                                                      "by \"Save-As\") will use the new extension.  The extension\n" +
                                                       "of existing sketches will be updated on save, but you can\n" +
                                                       "disable this in the Preferences dialog.\n" +
                                                       "\n" +
