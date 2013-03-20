@@ -326,12 +326,8 @@ int write_stream(volatile avr32_spi_t *spi, const char *stream, uint16_t len)
 {
 	uint16_t _len = 0;
 	unsigned short dummy=0;
-    bool streamExit = false;
 
      	do {
-             if (*stream == END_CMD)
-                 streamExit = true;
-
             //SIGN1_DN();
     		if (spi_write(spi, *stream) == SPI_ERROR_TIMEOUT)
     		{
@@ -350,16 +346,7 @@ int write_stream(volatile avr32_spi_t *spi, const char *stream, uint16_t len)
     			spi_read(spi,&dummy);
     		}
     		//SIGN1_UP();
-	}while ((!streamExit)&&(_len <= len));
-
-     if (!streamExit)
-     {
-#ifdef _SPI_STATS_
-    	 statSpi.wrongFrame++;
-    	 statSpi.lastError = SPI_ERROR_ARGUMENT;
-#endif
-    	 return SPI_ERROR_ARGUMENT;
-     }
+    }while (_len < len);
 	return SPI_OK;
 }
 
@@ -1640,6 +1627,7 @@ inline int spi_slaveReceiveInt(volatile avr32_spi_t *spi)
 	int index = 0;
 	int err = SPI_OK;
 	state = SPI_CMD_INPUT;
+	bool endOfFrame = false;
 
 	do {
 		unsigned int timeout = SPI_TIMEOUT;
@@ -1680,7 +1668,31 @@ inline int spi_slaveReceiveInt(volatile avr32_spi_t *spi)
 			err = SPI_ERROR_OVERRUN_AND_MODE_FAULT;
 			break;
 		}
-	} while (_receiveBuffer[index - 1] != END_CMD);
+
+		if (_receiveBuffer[index - 1] == END_CMD)
+		{
+			int8_t numParams = 0;
+			int idx = PARAM_LEN_POS+1;
+			bool islen16bit = _receiveBuffer[CMD_POS] & DATA_FLAG;
+			if (index >= idx)
+			{
+				numParams = _receiveBuffer[PARAM_LEN_POS];					
+				while (((index-1) > idx)&&(numParams>0))
+				{
+					if (islen16bit)
+						idx += (_receiveBuffer[idx]<<8) + _receiveBuffer[idx+1]+2;
+					else
+						idx += _receiveBuffer[idx]+1;
+					--numParams;
+				}
+				if (((index-1) == idx) && (numParams == 0))
+					endOfFrame = true;
+			}
+			if (!endOfFrame){
+				WARN("Wrong termination index:%d nParam:%d idx:%d 16bit:%d\n", index, numParams, idx, islen16bit);
+			}		
+		}
+	} while (!endOfFrame);
 	return err;
 }
 
