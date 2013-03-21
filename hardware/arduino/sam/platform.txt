@@ -1,8 +1,15 @@
 
-# SAM3 compile variables
-# --------------------- 
+# Arduino SAM Core and platform.
+#
+# For more info:
+# https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5---3rd-party-Hardware-specification
 
 name=Arduino ARM (32-bits) Boards
+version=1.5.3
+
+# SAM3 compile variables
+# ----------------------
+
 compiler.path={runtime.ide.path}/hardware/tools/g++_arm_none_eabi/bin/
 compiler.c.cmd=arm-none-eabi-gcc
 compiler.c.flags=-c -g -Os -w -ffunction-sections -fdata-sections -nostdlib --param max-inline-insns-single=500 -Dprintf=iprintf
