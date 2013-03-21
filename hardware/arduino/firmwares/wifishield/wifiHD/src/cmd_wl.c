@@ -182,7 +182,8 @@ cmd_ibss(int argc, char* argv[], void* ctx)
 cmd_state_t 
 cmd_set_ip(int argc, char* argv[], void* ctx)
 {
-        struct net_cfg *ncfg = ctx;
+	struct ctx_server *hs = ctx;
+    struct net_cfg *ncfg = &(hs->net_cfg);
         struct ip_addr lwip_addr;
         struct netif *nif = ncfg->netif;
 
@@ -197,8 +198,10 @@ cmd_set_ip(int argc, char* argv[], void* ctx)
                 printk("  or : ip none (to enable DHCP)\n");
                 return CMD_DONE;
         }
+
         /* IP address */
         lwip_addr = str2ip(argv[1]);
+        INFO_SPI("nif:%p lwip_addr=0x%x\n", nif, lwip_addr.addr);
         netif_set_ipaddr(nif, &lwip_addr);
         /* Netmask */
         lwip_addr = str2ip(argv[2]);

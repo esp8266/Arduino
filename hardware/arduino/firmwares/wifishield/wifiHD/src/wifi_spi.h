@@ -32,6 +32,8 @@ enum {
 	SET_PASSPHRASE_CMD	= 0x11,
 	SET_KEY_CMD	        = 0x12,
 	TEST_CMD	        = 0x13,
+	SET_IP_CONFIG_CMD	= 0x14,
+	SET_DNS_CONFIG_CMD  = 0x15,
 
 	GET_CONN_STATUS_CMD	= 0x20,
 	GET_IPADDR_CMD		= 0x21,
@@ -155,3 +157,4 @@ typedef struct  __attribute__((__packed__))
 }tByteParam;
 
 #endif
+uint8_t param;

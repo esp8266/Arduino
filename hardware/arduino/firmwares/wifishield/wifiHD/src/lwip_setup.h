@@ -7,6 +7,11 @@ struct net_cfg {
         uint8_t dhcp_running;
 };
 
+struct ctx_server {
+	struct net_cfg net_cfg;
+	uint8_t wl_init_complete;
+};
+
 /*! Start the IP stack.
  * If cfg->netif must have been allocated and lwip_init()
  * must have been called before this function is called

@@ -78,11 +78,6 @@ void fw_download_cb(void* ctx, uint8_t** buf, uint32_t* len)
 #endif
 #endif
 
-struct ctx_server {
-	struct net_cfg net_cfg;
-	uint8_t wl_init_complete;
-};
-
 bool ifStatus = false;
 bool scanNetCompleted = false;
 
@@ -122,7 +117,7 @@ wl_cm_conn_cb(struct wl_network_t* net, void* ctx)
             hs->net_cfg.dhcp_running = 1;
     }
     else {
-            netif_set_up(hs->net_cfg.netif);
+        netif_set_up(hs->net_cfg.netif);
     }
 
     INFO_INIT("Start DNS...\n");
@@ -270,7 +265,7 @@ poll(struct ctx_server* hs)
 #endif
 }
 
-void initShell()
+void initShell(void* ctx)
 {
 	/* initialize shell */
 	INFO_INIT("Shell init...\n");
@@ -281,7 +276,7 @@ void initShell()
         console_add_cmd("status", cmd_status, NULL);
         console_add_cmd("debug", cmd_debug, NULL);
         console_add_cmd("dumpBuf", cmd_dumpBuf, NULL);
-		console_add_cmd("ipconfig", cmd_set_ip, NULL);
+		console_add_cmd("ipconfig", cmd_set_ip, ctx);
 
 #ifdef ADD_CMDS
         console_add_cmd("powersave", cmd_power, NULL);
@@ -325,6 +320,7 @@ wl_init_complete_cb(void* ctx)
         
     /* default is dhcp enabled */
     hs->net_cfg.dhcp_enabled = 1;
+
     start_ip_stack(&hs->net_cfg,
                    ipaddr,
                    netmask,
@@ -339,7 +335,7 @@ wl_init_complete_cb(void* ctx)
 
     wl_scan();
 
-    if (initSpi()){
+    if (initSpi(hs)){
     	WARN("Spi not initialized\n");
     }else
     {
@@ -381,8 +377,6 @@ main(void)
 
     tc_init();
 
-    initShell();
-
     delay_init(FOSC0);
 
 #ifdef _TEST_SPI_
@@ -408,7 +402,7 @@ main(void)
 
 	INFO_INIT("hs:%p size:0x%x netif:%p size:0x%x\n", hs, size_ctx_server,
 			hs->net_cfg.netif, size_netif);
-
+    initShell(hs);
 	timer_init(NULL, NULL);
     lwip_init();
         

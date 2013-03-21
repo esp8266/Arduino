@@ -90,6 +90,27 @@ public:
      */
     static int8_t wifiSetKey(char* ssid, uint8_t ssid_len, uint8_t key_idx, const void *key, const uint8_t len);
 
+    /* Set ip configuration disabling dhcp client
+        *
+        * param validParams: set the number of parameters that we want to change
+        * 					 i.e. validParams = 1 means that we'll change only ip address
+        * 					 	  validParams = 3 means that we'll change ip address, gateway and netmask
+        * param local_ip: 	Static ip configuration
+        * param gateway: 	Static gateway configuration
+        * param subnet: 	Static subnet mask configuration
+        */
+    static void config(uint8_t validParams, uint32_t local_ip, uint32_t gateway, uint32_t subnet);
+
+    /* Set DNS ip configuration
+           *
+           * param validParams: set the number of parameters that we want to change
+           * 					 i.e. validParams = 1 means that we'll change only dns_server1
+           * 					 	  validParams = 2 means that we'll change dns_server1 and dns_server2
+           * param dns_server1: Static DNS server1 configuration
+           * param dns_server2: Static DNS server2 configuration
+           */
+    static void setDNS(uint8_t validParams, uint32_t dns_server1, uint32_t dns_server2);
+
     /*
      * Disconnect from the network
      *
