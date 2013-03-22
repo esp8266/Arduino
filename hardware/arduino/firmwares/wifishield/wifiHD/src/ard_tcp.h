@@ -23,11 +23,32 @@ typedef void (ard_tcp_done_cb_t)(void *opaque, int result);
 
 // Maximum number of client connection accepted by server
 #define MAX_CLIENT_ACCEPTED			4
-#define NO_VALID_ID					-1
+#define NO_VALID_ID					0xff
 
 #define GET_FIRST_CLIENT_TCP(TTCP)		getFirstClient(TTCP, 1)
 #define GET_FIRST_CLIENT_TCP_NV(TTCP)	getFirstClient(TTCP, 0)
 #define GET_CLIENT_TCP(TTCP,ID)	(((TTCP!=NULL)&&(ID>=0)&&(ID<MAX_CLIENT_ACCEPTED))?TTCP->tpcb[ID] : NULL)
+#define GET_CLIENT_ID(TTCP, PCB)	uint8_t id = NO_VALID_ID; do {		\
+		id = getNewClientConnId(TTCP, PCB);	\
+		if (id == NO_VALID_ID) return ERR_MEM;		\
+	}while(0);	
+#define GET_IDX_CONN(I) ((I+currConnId)<MAX_CLIENT_ACCEPTED ? (I+currConnId) : (I+currConnId-MAX_CLIENT_ACCEPTED))
+#define GET_CURR_PCB(TTCP) GET_CLIENT_TCP(TTCP,getCurrClientConnId())
+
+#define FREE_PAYLOAD(TTCP) do { \
+	int id = getCurrClientConnId(); \
+	INFO_TCP("Freeing payload %d-%p\n", id, TTCP->payload[id]); \
+	if (TTCP->payload[id]) { \
+		free(TTCP->payload[id]); \
+		TTCP->payload[id] = NULL; } \
+}while(0);		
+
+#define FREE_PAYLOAD_ID(TTCP,ID) do { \
+	INFO_TCP("Freeing payload %d-%p\n", ID, TTCP->payload[ID]); \
+	if (TTCP->payload[ID]) { \
+		free(TTCP->payload[ID]); \
+		TTCP->payload[ID] = NULL; } \
+}while(0);	
 
 
 typedef struct ttcp {
@@ -40,12 +61,12 @@ typedef struct ttcp {
 	int verbose; /* -v */
 	int udp; /* -u */
 	uint8_t sock;
-	uint8_t buff_sent;
+	uint8_t buff_sent[MAX_CLIENT_ACCEPTED];
 
 	/* common */
 	uint16_t print_cnt;
 	uint32_t start_time;
-	uint32_t left;
+	uint32_t left[MAX_CLIENT_ACCEPTED];
 	uint32_t recved;
 	ard_tcp_done_cb_t* done_cb;
 	void* opaque;
@@ -55,8 +76,8 @@ typedef struct ttcp {
 	/* TCP specific */
 	struct tcp_pcb* tpcb[MAX_CLIENT_ACCEPTED];
 	struct tcp_pcb* lpcb;
-	char* payload;
-	uint8_t tcp_poll_retries;
+	char* payload[MAX_CLIENT_ACCEPTED];
+	uint8_t tcp_poll_retries[MAX_CLIENT_ACCEPTED];
 	bool pending_close[MAX_CLIENT_ACCEPTED];
 
 	/* UDP specific */

@@ -538,13 +538,11 @@ int set_passphrase_cmd_cb(int numParam, char* buf, void* ctx) {
 
 int set_ip_config_cmd_cb(int numParam, char* buf, void* ctx) {
     struct ip_addr lwip_addr;
-	uint32_t _ip_addr = 0;
     struct ctx_server *hs = ctx;
     struct net_cfg *ncfg = &(hs->net_cfg);
     struct netif *nif = ncfg->netif;
     uint8_t parmsToChange=0;
     const uint8_t MAX_IP_CONFIG_PARAMS = 3;
-    const uint8_t DNS_SERVER_IDX_CHANG = 2;
 
 	wl_err_t err = WL_SUCCESS;
 	tParam* params = (tParam*) buf;
@@ -607,7 +605,6 @@ int set_dns_config_cmd_cb(int numParam, char* buf, void* ctx) {
     struct netif *nif = ncfg->netif;
     uint8_t parmsToChange=0;
     const uint8_t MAX_DNS_CONFIG_PARAMS = 2;
-    const uint8_t DNS_SERVER_IDX_CHANG = 2;
 
 	wl_err_t err = WL_SUCCESS;
 	tParam* params = (tParam*) buf;
@@ -1787,7 +1784,7 @@ inline int spi_slaveReceiveInt(volatile avr32_spi_t *spi)
 		{
 			int8_t numParams = 0;
 			int idx = PARAM_LEN_POS+1;
-			bool islen16bit = _receiveBuffer[CMD_POS] & DATA_FLAG;
+			bool islen16bit = ((_receiveBuffer[CMD_POS] & DATA_FLAG) == DATA_FLAG);
 			if (index >= idx)
 			{
 				numParams = _receiveBuffer[PARAM_LEN_POS];					
@@ -1804,6 +1801,10 @@ inline int spi_slaveReceiveInt(volatile avr32_spi_t *spi)
 			}
 			if (!endOfFrame){
 				WARN("Wrong termination index:%d nParam:%d idx:%d 16bit:%d\n", index, numParams, idx, islen16bit);
+				#ifdef _DEBUG_
+					dump((char*)_receiveBuffer, receivedChars); 
+					while(0);
+				#endif
 			}		
 		}
 	} while (!endOfFrame);

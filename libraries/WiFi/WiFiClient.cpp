@@ -131,12 +131,11 @@ void WiFiClient::stop() {
   ServerDrv::stopClient(_sock);
   WiFiClass::_state[_sock] = NA_STATE;
 
-  unsigned long start = millis();
-  
+  int count = 0;
+  // wait maximum 5 secs for the connection to close
+  while (status() != CLOSED && ++count < 50)
+    delay(100);
 
-  // wait a second for the connection to close
-  while (status() != CLOSED && millis() - start < 1000)
-    delay(1);
   _sock = 255;
 }
 
@@ -150,7 +149,7 @@ uint8_t WiFiClient::connected() {
     return !(s == LISTEN || s == CLOSED || s == FIN_WAIT_1 ||
     		s == FIN_WAIT_2 || s == TIME_WAIT ||
     		s == SYN_SENT || s== SYN_RCVD ||
-             (s == CLOSE_WAIT && !available()));
+    		(s == CLOSE_WAIT));
   }
 }
 
