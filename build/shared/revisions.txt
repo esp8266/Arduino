@@ -11,6 +11,7 @@ ARDUINO 1.5.3 BETA
 * sam: Fixed delayMicrosecond() when interrupts are disabled
 * sam: Upgraded libsam, and added missing modules (CAN, ETH, etc.) (Thibaut Viard)
 * sam: Added compatibility for avr/pgmspace.h (Paul Stoffregen)
+* sam: Added serialEvent*() support
 
 [libraries]
 * sam: Added CAN library (still in early stage of development) (Palliser)
