@@ -74,7 +74,6 @@
   <avr32gcc.compiler.symbols.DefSymbols>
     <ListValues>
       <Value>BOARD=ARDUINO</Value>
-      <Value>NO_SYS</Value>
       <Value>WITH_KEY</Value>
       <Value>WITH_WPA</Value>
       <Value>WITH_NO_DMA</Value>
@@ -112,12 +111,11 @@
       <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/WIFI/HD</Value>
     </ListValues>
   </avr32gcc.compiler.directories.IncludePaths>
-  <avr32gcc.compiler.optimization.level>Optimize (-O1)</avr32gcc.compiler.optimization.level>
+  <avr32gcc.compiler.optimization.level>Optimize for size (-Os)</avr32gcc.compiler.optimization.level>
   <avr32gcc.compiler.optimization.OtherFlags>-fdata-sections -ffunction-sections</avr32gcc.compiler.optimization.OtherFlags>
   <avr32gcc.compiler.optimization.PrepareFunctionsForGarbageCollection>True</avr32gcc.compiler.optimization.PrepareFunctionsForGarbageCollection>
   <avr32gcc.compiler.optimization.UseAssemblerForPseudoInstructions>True</avr32gcc.compiler.optimization.UseAssemblerForPseudoInstructions>
   <avr32gcc.compiler.optimization.ForceDoubleWordAlignment>True</avr32gcc.compiler.optimization.ForceDoubleWordAlignment>
-  <avr32gcc.compiler.optimization.DebugLevel>Maximum (-g3)</avr32gcc.compiler.optimization.DebugLevel>
   <avr32gcc.compiler.warnings.AllWarnings>True</avr32gcc.compiler.warnings.AllWarnings>
   <avr32gcc.compiler.miscellaneous.OtherFlags>-c -fmessage-length=0</avr32gcc.compiler.miscellaneous.OtherFlags>
   <avr32gcc.linker.general.DoNotUseStandardStartFiles>True</avr32gcc.linker.general.DoNotUseStandardStartFiles>
@@ -138,6 +136,7 @@
   <avr32gcc.linker.optimization.GarbageCollectUnusedSections>True</avr32gcc.linker.optimization.GarbageCollectUnusedSections>
   <avr32gcc.linker.optimization.PutReadOnlyDataInWritableDataSection>True</avr32gcc.linker.optimization.PutReadOnlyDataInWritableDataSection>
   <avr32gcc.linker.optimization.AllowDirectReferencesToDataSection>True</avr32gcc.linker.optimization.AllowDirectReferencesToDataSection>
+  <avr32gcc.linker.miscellaneous.LinkerFlags>-Wl,--gc-sections -Wl,-e,_trampoline -T../src/SOFTWARE_FRAMEWORK/UTILS/LINKER_SCRIPTS/AT32UC3A/1256/GCC/link_uc3a1256.lds</avr32gcc.linker.miscellaneous.LinkerFlags>
   <avr32gcc.assembler.general.IncludePaths>
     <ListValues>
       <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/PDCA</Value>
@@ -163,7 +162,6 @@
       <Value>../src/SOFTWARE_FRAMEWORK/BOARDS</Value>
     </ListValues>
   </avr32gcc.assembler.general.IncludePaths>
-  <avr32gcc.assembler.debugging.DebugLevel>Default (-g)</avr32gcc.assembler.debugging.DebugLevel>
   <avr32gcc.preprocessingassembler.general.AssemblerFlags>-Wa,-g</avr32gcc.preprocessingassembler.general.AssemblerFlags>
   <avr32gcc.preprocessingassembler.general.IncludePaths>
     <ListValues>
@@ -190,7 +188,6 @@
       <Value>../src/SOFTWARE_FRAMEWORK/BOARDS</Value>
     </ListValues>
   </avr32gcc.preprocessingassembler.general.IncludePaths>
-  <avr32gcc.preprocessingassembler.debugging.DebugLevel>Default (-Wa,-g)</avr32gcc.preprocessingassembler.debugging.DebugLevel>
 </Avr32Gcc>
     </ToolchainSettings>
   </PropertyGroup>
