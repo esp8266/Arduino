@@ -277,7 +277,6 @@ void initShell(void* ctx)
         console_add_cmd("debug", cmd_debug, NULL);
         console_add_cmd("dumpBuf", cmd_dumpBuf, NULL);
 		console_add_cmd("ipconfig", cmd_set_ip, ctx);
-
 #ifdef ADD_CMDS
         console_add_cmd("powersave", cmd_power, NULL);
         console_add_cmd("psconf", cmd_psconf, NULL);
@@ -314,12 +313,15 @@ wl_init_complete_cb(void* ctx)
     struct ip_addr ipaddr, netmask, gw;
 	wl_err_t wl_status;
 	
-	IP4_ADDR(&gw, 0,0,0,0);
-    IP4_ADDR(&ipaddr, 0,0,0,0);
-    IP4_ADDR(&netmask, 0,0,0,0);
-        
-    /* default is dhcp enabled */
-    hs->net_cfg.dhcp_enabled = 1;
+	if (hs->net_cfg.dhcp_enabled == INIT_IP_CONFIG)
+	{
+		IP4_ADDR(&gw, 0,0,0,0);
+		IP4_ADDR(&ipaddr, 0,0,0,0);
+		IP4_ADDR(&netmask, 0,0,0,0);
+			
+		/* default is dhcp enabled */
+		hs->net_cfg.dhcp_enabled = DYNAMIC_IP_CONFIG;
+	}
 
     start_ip_stack(&hs->net_cfg,
                    ipaddr,
@@ -358,6 +360,8 @@ void startup_init(void)
 	DEB_PIN_UP(2);
 }
 
+const char timestamp[] = __TIMESTAMP__;
+
 /**
  *
  */
@@ -390,7 +394,7 @@ main(void)
 
      }
 #else
-    printk("Arduino Wifi Startup... [%s]\n", __TIMESTAMP__);
+    printk("Arduino Wifi Startup... [%s]\n", timestamp);
 
     size_t size_ctx_server = sizeof(struct ctx_server);
 	hs = calloc(1, size_ctx_server);
@@ -399,6 +403,7 @@ main(void)
 	size_t size_netif = sizeof(struct netif);
 	hs->net_cfg.netif = calloc(1, size_netif);
 	ASSERT(hs->net_cfg.netif, "out of memory");
+	hs->net_cfg.dhcp_enabled = INIT_IP_CONFIG;
 
 	INFO_INIT("hs:%p size:0x%x netif:%p size:0x%x\n", hs, size_ctx_server,
 			hs->net_cfg.netif, size_netif);

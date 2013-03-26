@@ -565,14 +565,21 @@ static int atcp_start(struct ttcp* ttcp) {
 	atcp_init_pend_flags(ttcp);
 
 	if (ttcp->mode == TTCP_MODE_TRANSMIT) {
-		setNewClientConn(ttcp, p, 0);
-		struct tcp_pcb * pcb = GET_FIRST_CLIENT_TCP(ttcp);
+		int8_t id = insertNewClientConn(ttcp, p);
+		ttcp->payload[id] = malloc(ttcp->buflen);
+		INFO_TCP("Alloc payload %d-%p\n", id, ttcp->payload[id]);
+		if (ttcp->payload[id] == NULL) {
+			WARN("TTCP [%p]: could not allocate payload\n", ttcp);
+			return -1;
+		}
+		
+		struct tcp_pcb * pcb = p;
 		tcp_err(pcb, atcp_conn_cli_err_cb);
 		tcp_recv(pcb, atcp_recv_cb);
 		tcp_sent(pcb, tcp_data_sent);
 		tcp_poll(pcb, atcp_poll_conn, 4);
 		_connected = false;
-		INFO_TCP("[tpcb]-%p payload:%p\n", pcb, ttcp->payload[currConnId]);
+		INFO_TCP("[tpcb]-%p payload:%p\n", pcb, ttcp->payload[id]);
 		DUMP_TCP_STATE(ttcp);
 		if (tcp_connect(pcb, &ttcp->addr, ttcp->port, tcp_connect_cb)
 				!= ERR_OK) {

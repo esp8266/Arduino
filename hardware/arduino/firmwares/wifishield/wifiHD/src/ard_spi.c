@@ -591,7 +591,7 @@ int set_ip_config_cmd_cb(int numParam, char* buf, void* ctx) {
 
     	}
     	/* Disable DHCP */
-    	ncfg->dhcp_enabled = 0;
+    	ncfg->dhcp_enabled = STATIC_IP_CONFIG;
     }else
     	RETURN_ERR(WL_FAILURE)
 		
@@ -635,7 +635,7 @@ int set_dns_config_cmd_cb(int numParam, char* buf, void* ctx) {
     	    }
     	}
     	/* Disable DHCP */
-    	ncfg->dhcp_enabled = 0;
+    	ncfg->dhcp_enabled = STATIC_IP_CONFIG;
     }else
     	RETURN_ERR(WL_FAILURE)
 		
