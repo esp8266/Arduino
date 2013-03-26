@@ -109,7 +109,7 @@ wl_cm_conn_cb(struct wl_network_t* net, void* ctx)
 	INFO_INIT("Connection cb...\n");
 
 	printk("link up, connected to \"%s\"\n", ssid2str(&net->ssid));
-    if ( hs->net_cfg.dhcp_enabled ) {
+    if ( hs->net_cfg.dhcp_enabled == DYNAMIC_IP_CONFIG ) {
 			INFO_INIT("Start DHCP...\n");
 		    printk("requesting dhcp ... ");
             int8_t result = dhcp_start(hs->net_cfg.netif);
@@ -273,7 +273,7 @@ void initShell(void* ctx)
         console_add_cmd("scan", cmd_scan, NULL);
         console_add_cmd("connect", cmd_connect, NULL);
         console_add_cmd("setkey", cmd_setkey, NULL);
-        console_add_cmd("status", cmd_status, NULL);
+        console_add_cmd("status", cmd_status, ctx);
         console_add_cmd("debug", cmd_debug, NULL);
         console_add_cmd("dumpBuf", cmd_dumpBuf, NULL);
 		console_add_cmd("ipconfig", cmd_set_ip, ctx);

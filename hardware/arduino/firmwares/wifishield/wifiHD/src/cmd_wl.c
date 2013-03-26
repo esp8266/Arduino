@@ -466,7 +466,7 @@ cmd_status(int argc, char* argv[], void* ctx)
         else
                 printk("ip interface is down\n");
         printk("dhcp : ");
-        if (ncfg->dhcp_enabled) {
+        if (ncfg->dhcp_enabled == DYNAMIC_IP_CONFIG) {
                 printk("enabled\n");
         }
         else {
