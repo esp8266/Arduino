@@ -43,23 +43,10 @@
 #include "lwip/dns.h"
 #include "debug.h"
 #include "ard_spi.h"
+#include "ard_tcp.h"
+#include "ard_utils.h"
 
 extern void showTTCPstatus();
-
-#define ENABLE_DEBUG_LEVEL 1
-#define VERBOSE_DEBUG_LEVEL 2
-
-#define CHECK_ENA_DEBUG(LEVEL, FLAG)  		\
-	do{										\
-		if (LEVEL >= ENABLE_DEBUG_LEVEL) enableDebug |= FLAG;		\
-		else enableDebug &= ~FLAG;			\
-		}while(0);
-
-#define CHECK_VERB_DEBUG(LEVEL, FLAG)  		\
-	do{										\
-		if (LEVEL >= VERBOSE_DEBUG_LEVEL) verboseDebug |= FLAG;		\
-		else verboseDebug &= ~FLAG;			\
-		}while(0);
 
 #define  _DNS_CMD_
 
@@ -195,23 +182,26 @@ cmd_ibss(int argc, char* argv[], void* ctx)
 cmd_state_t 
 cmd_set_ip(int argc, char* argv[], void* ctx)
 {
-        struct net_cfg *ncfg = ctx;
+	struct ctx_server *hs = ctx;
+    struct net_cfg *ncfg = &(hs->net_cfg);
         struct ip_addr lwip_addr;
         struct netif *nif = ncfg->netif;
 
         if (argc == 2 && 
             (strncmp(argv[1], "none", 4) == 0)) {
-                ncfg->dhcp_enabled = 1;
+                ncfg->dhcp_enabled = DYNAMIC_IP_CONFIG;
                 
                 return CMD_DONE;
         }
         else if (argc != 4 ) {
-                printk("usage: ip <ip> <netmask> <gateway-ip>\n");
-                printk("  or : ip none (to enable DHCP)\n");
+                printk("usage: ipconfig <ip> <netmask> <gateway-ip>\n");
+                printk("  or : ipconfig none (to enable DHCP)\n");
                 return CMD_DONE;
         }
+
         /* IP address */
         lwip_addr = str2ip(argv[1]);
+        INFO_SPI("nif:%p lwip_addr=0x%x\n", nif, lwip_addr.addr);
         netif_set_ipaddr(nif, &lwip_addr);
         /* Netmask */
         lwip_addr = str2ip(argv[2]);
@@ -220,7 +210,7 @@ cmd_set_ip(int argc, char* argv[], void* ctx)
         lwip_addr = str2ip(argv[3]);
         netif_set_gw(nif, &lwip_addr);
         /* Disable DHCP */
-        ncfg->dhcp_enabled = 0;
+        ncfg->dhcp_enabled = STATIC_IP_CONFIG;
 
         return CMD_DONE;
 }
@@ -373,14 +363,15 @@ cmd_setDnsServer(int argc, char* argv[], void* ctx)
  *
  */
 cmd_state_t
-cmd_startTcpSrv(int argc, char* argv[], void* ctx)
+cmd_startSrv(int argc, char* argv[], void* ctx)
 {
-        const char *usage = "usage: startTcpSrv <port> <sock>\n";
+        const char *usage = "usage: startSrv <port> <sock> <tcp(0)/udp(1)>\n";
 
         int port = 0;
         int sock = 0;
+		int protMode = 0;
 
-        if (argc < 3) {
+        if (argc < 4) {
                 printk(usage);
                 return CMD_DONE;
         }
@@ -389,15 +380,50 @@ cmd_startTcpSrv(int argc, char* argv[], void* ctx)
         port = atoi(argv[1]);
         /* socket index */
         sock = atoi(argv[2]);
+		/* Protocol Mode */
+		protMode = atoi(argv[3]);
 
-        printk("Start TCP server on port %d sock %d\n", port, sock);
-        if (start_server_tcp(port, sock) != -1)
+        printk("Start %s server on port %d sock %d\n", ProtMode2Str(protMode), port, sock);
+        if (start_server_tcp(port, sock, protMode) == -1)
         {
-        	printk("Start TCP server on port %d sock %d FAILED\n", port, sock);
+        	WARN("Start %s server on port %d sock %d FAILED\n", ProtMode2Str(protMode), port, sock);
         }
         return CMD_DONE;
 }
 
+/**
+ *
+ */
+cmd_state_t
+cmd_startCli(int argc, char* argv[], void* ctx)
+{
+        const char *usage = "usage: startCli <ipaddr> <port> <sock> <tcp(0)/udp(1)>\n";
+		struct ip_addr addr = {0};
+        int port = 0;
+        int sock = 0;
+		int protMode = 0;
+
+        if (argc < 5) {
+                printk(usage);
+                return CMD_DONE;
+        }
+
+        /* IP address */
+        addr = str2ip(argv[1]);
+        /* TCP port */
+        port = atoi(argv[2]);
+        /* socket index */
+        sock = atoi(argv[3]);
+		/* Protocol Mode */
+		protMode = atoi(argv[4]);
+
+        printk("Start client on addr 0x%x, port %d sock %d mode %d\n", addr, port, sock, protMode);
+        if (start_client_tcp(addr.addr, port, sock, protMode) == -1)
+        {
+        	WARN("Start client on port %d sock %d prot %d mode %d FAILED\n", port, sock, protMode);
+        }
+        return CMD_DONE;
+}
 
 #endif
 
@@ -432,11 +458,15 @@ cmd_status(int argc, char* argv[], void* ctx)
         
         /* print ip address */
         if (netif_is_up(netif_default))
-                printk("ip addr: %s\n", ip2str(netif_default->ip_addr));
+		{
+                printk("ip addr: %s - ", ip2str(netif_default->ip_addr));
+				printk("netmask: %s - ", ip2str(netif_default->netmask));
+				printk("gateway: %s\n", ip2str(netif_default->gw));
+		}					
         else
                 printk("ip interface is down\n");
         printk("dhcp : ");
-        if (ncfg->dhcp_enabled) {
+        if (ncfg->dhcp_enabled == DYNAMIC_IP_CONFIG) {
                 printk("enabled\n");
         }
         else {
@@ -445,8 +475,8 @@ cmd_status(int argc, char* argv[], void* ctx)
         struct ip_addr addr1 = dns_getserver(0);
         struct ip_addr addr2 = dns_getserver(1);
 
-        printk("==> DNS1: %s\n", ip2str(addr1), addr1);
-        printk("==> DNS2: %s\n", ip2str(addr2), addr2);
+        printk("DNS: %s - ", ip2str(addr1));
+		printk("%s\n", ip2str(addr2));
 
         showTTCPstatus();
         return CMD_DONE;
@@ -595,16 +625,14 @@ cmd_debug(int argc, char* argv[], void* ctx)
 
         if (argc == 2 && strcmp(argv[1], "off") == 0) {
                 printk("Debug OFF\n");
-                enableDebug = DEFAULT_INFO_FLAG;
-                verboseDebug = 0;
+                INIT_DEBUG_VARIABLES()
                 return CMD_DONE;
         }else if (argc == 2 && strcmp(argv[1], "print") == 0) {
-            printk("Debug enabled: 0x%x\n", enableDebug);
-            printk("Verbose enabled: 0x%x\n", verboseDebug);
+        	PRINT_DEBUG_VARIABLES()
             return CMD_DONE;
         }else if (argc == 2 && strcmp(argv[1], "on") == 0) {
             printk("Debug ON\n");
-            enableDebug = 0xff;
+            TURNON_DEBUG_VARIABLES();
             return CMD_DONE;
         }
         if (argc < 3) {
@@ -613,23 +641,91 @@ cmd_debug(int argc, char* argv[], void* ctx)
         }
         level = atoi(argv[2]);
         if (argc == 3 && strcmp(argv[1], "init") == 0) {
-        	CHECK_ENA_DEBUG(level, INFO_INIT_FLAG);
-        	CHECK_VERB_DEBUG(level, INFO_INIT_FLAG);
+        	CHECK_DEBUG_LEVEL(level, INFO_INIT_FLAG);
         }else if (argc == 3 && strcmp(argv[1], "spi") == 0) {
-        	CHECK_ENA_DEBUG(level, INFO_SPI_FLAG);
-        	CHECK_VERB_DEBUG(level, INFO_SPI_FLAG);
+        	CHECK_DEBUG_LEVEL(level, INFO_SPI_FLAG);
         }else if (argc == 3 && strcmp(argv[1], "tcp") == 0) {
-        	CHECK_ENA_DEBUG(level, INFO_TCP_FLAG);
-        	CHECK_VERB_DEBUG(level, INFO_TCP_FLAG);
+        	CHECK_DEBUG_LEVEL(level, INFO_TCP_FLAG);
         }else if (argc == 3 && strcmp(argv[1], "cm") == 0) {
-        	CHECK_ENA_DEBUG(level, INFO_CM_FLAG);
-        	CHECK_VERB_DEBUG(level, INFO_CM_FLAG);
+        	CHECK_DEBUG_LEVEL(level, INFO_CM_FLAG);
         }else if (argc == 3 && strcmp(argv[1], "util") == 0) {
-        	CHECK_ENA_DEBUG(level, INFO_UTIL_FLAG);
-        	CHECK_VERB_DEBUG(level, INFO_UTIL_FLAG);
+        	CHECK_DEBUG_LEVEL(level, INFO_UTIL_FLAG);
         }else if (argc == 3 && strcmp(argv[1], "warn") == 0) {
-        	CHECK_ENA_DEBUG(level, INFO_WARN_FLAG);
-        	CHECK_VERB_DEBUG(level, INFO_WARN_FLAG);
+        	CHECK_DEBUG_LEVEL(level, INFO_WARN_FLAG);
         }
         return CMD_DONE;
+}
+
+extern void dumpPbuf(uint8_t sock);
+
+/**
+ *
+ */
+cmd_state_t
+cmd_dumpBuf(int argc, char* argv[], void* ctx)
+{
+    const char *usage = "usage: dumpPbuf [sock]\n\t"\
+    		"sock: socket Number\n";
+
+    if (argc == 2 && strcmp(argv[1], "all") == 0) {
+    	printk("Dump All Buffers\n");
+    	int i = 0;
+    	for (; i<MAX_SOCK_NUM; ++i)
+    	{
+			printk("Socket: %d\n", i);
+    		dumpPbuf(i);
+    	}
+    }else if (argc == 2) {
+    	uint8_t sock = atoi(argv[1]);
+        printk("Socket: %d\n", sock);
+        dumpPbuf(sock);
+    }else {
+		printk(usage);
+	}		
+	return CMD_DONE;
+}
+
+
+
+/**
+ *
+ */
+cmd_state_t
+cmd_sendUdpData(int argc, char* argv[], void* ctx)
+{
+	const char pattern[]={'M', 'I', 'M', 'L', 'F', 'D'};
+	const char* pattern2[]={"Prova", "1234567890","FineTest"};
+    const char *usage = "usage: sendUdp [sock]\n\t"\
+    		"sock: socket Number\n";
+
+    if (argc < 2)
+    	printk(usage);
+
+    if (argc >= 2) {
+
+		uint8_t sock = atoi(argv[1]);
+		printk("Socket: %d\n", sock);
+
+		if (argc >= 3) {
+			uint8_t patternType = atoi(argv[2]);
+			printk("PatternType: %d\n", patternType);
+			if (patternType == 1)
+			{
+				insertBuf(sock, (uint8_t*)pattern2[0], strlen(pattern2[0]));
+				insertBuf(sock, (uint8_t*)pattern2[1], strlen(pattern2[1]));
+				insertBuf(sock, (uint8_t*)pattern2[2], strlen(pattern2[2]));
+			}
+			if (patternType == 2)
+			{
+				mergeBuf(sock, NULL, NULL);
+			}
+		}else{
+			if (sock < MAX_SOCK_NUM)
+			{
+				sendUdpData(getTTCP(sock, TTCP_MODE_TRANSMIT), (uint8_t*)pattern, sizeof(pattern)/sizeof(char));
+			}
+		}
+
+    }
+	return CMD_DONE;
 }

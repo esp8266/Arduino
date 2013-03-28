@@ -8,7 +8,7 @@ extern "C" {
 }
 
 // XXX: don't make assumptions about the value of MAX_SOCK_NUM.
-int16_t 	WiFiClass::_state[MAX_SOCK_NUM] = { 0, 0, 0, 0 };
+int16_t 	WiFiClass::_state[MAX_SOCK_NUM] = { NA_STATE, NA_STATE, NA_STATE, NA_STATE };
 uint16_t 	WiFiClass::_server_port[MAX_SOCK_NUM] = { 0, 0, 0, 0 };
 
 WiFiClass::WiFiClass()
@@ -71,8 +71,7 @@ int WiFiClass::begin(char* ssid, uint8_t key_idx, const char *key)
 	   {
 		   delay(WL_DELAY_START_CONNECTION);
 		   status = WiFiDrv::getConnectionStatus();
-	   }
-	   while ((( status == WL_IDLE_STATUS)||(status == WL_SCAN_COMPLETED))&&(--attempts>0));
+	   }while ((( status == WL_IDLE_STATUS)||(status == WL_SCAN_COMPLETED))&&(--attempts>0));
    }else{
 	   status = WL_CONNECT_FAILED;
    }
@@ -97,6 +96,31 @@ int WiFiClass::begin(char* ssid, const char *passphrase)
     	status = WL_CONNECT_FAILED;
     }
     return status;
+}
+
+void WiFiClass::config(IPAddress local_ip)
+{
+	WiFiDrv::config(1, (uint32_t)local_ip, 0, 0);
+}
+
+void WiFiClass::config(IPAddress local_ip, IPAddress gateway)
+{
+	WiFiDrv::config(2, (uint32_t)local_ip, (uint32_t)gateway, 0);
+}
+
+void WiFiClass::config(IPAddress local_ip, IPAddress gateway, IPAddress subnet)
+{
+	WiFiDrv::config(3, (uint32_t)local_ip, (uint32_t)gateway, (uint32_t)subnet);
+}
+
+void WiFiClass::setDNS(IPAddress dns_server1)
+{
+	WiFiDrv::setDNS(1, (uint32_t)dns_server1, 0);
+}
+
+void WiFiClass::setDNS(IPAddress dns_server1, IPAddress dns_server2)
+{
+	WiFiDrv::setDNS(2, (uint32_t)dns_server1, (uint32_t)dns_server2);
 }
 
 int WiFiClass::disconnect()

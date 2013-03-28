@@ -24,6 +24,9 @@
 #include "timer.h"
 #include "lwip/dns.h"
 #include <board_init.h>
+#include "util.h"
+#include "lwip/udp.h"
+#include "lwip_setup.h"
 
 extern const char* fwVersion;
 
@@ -92,7 +95,7 @@ bool end_write = false;	//TODO only for debug
 // Signal indicating a new command is coming from SPI interface
 static volatile Bool startRecvCmdSignal = FALSE;
 
-#define MAX_CMD_NUM 30
+#define MAX_CMD_NUM 36
 typedef struct sCmd_spi_list{
 	cmd_spi_cb_t cb;
 	char cmd_id;
@@ -136,6 +139,7 @@ void initStatSpi()
 
 void printStatSpi()
 {
+	printk("totSpiCmds\t: 0x%x\n", cmdCorr);
 	printk("lastCmd  \t: 0x%x\n", statSpi.lastCmd);
 	printk("lastErr  \t: 0x%x\n", statSpi.lastError);
 	printk("spiStatus\t: 0x%X\n", statSpi.status);
@@ -169,7 +173,28 @@ cmd_resetStatSpi(int argc, char* argv[], void* ctx)
 
 int result = WL_CONNECT_FAILED; //Store the result of the last operation
 
-void* mapSockTCP[MAX_SOCK_NUM];
+void* mapSockTCP[MAX_SOCK_NUM][MAX_MODE_NUM];
+
+//Udp RemoteIp and remote Port
+static tRemoteClient remoteClients[MAX_SOCK_NUM] = {{0,0}};
+
+void setRemoteClient(uint16_t sock, uint32_t _ipaddr, uint16_t _port)
+{
+	if (sock < MAX_SOCK_NUM)
+	{
+		remoteClients[sock].ipaddr = _ipaddr;
+		remoteClients[sock].port = _port;
+	}
+}
+
+tRemoteClient* getRemoteClient(uint16_t sock)
+{
+	if (sock < MAX_SOCK_NUM)
+	{
+		return &remoteClients[sock];
+	}
+	return NULL;
+}
 
 struct netif* ard_netif = NULL;
 
@@ -180,10 +205,10 @@ struct ip_addr _hostIpAddr;
 
 static bool hostIpAddrFound = false;
 
-void* getTTCP(uint8_t sock)
+void* getTTCP(uint8_t sock, uint8_t mode)
 {
 	if (sock < MAX_SOCK_NUM)
-		return mapSockTCP[sock];
+		return mapSockTCP[sock][mode];
 	return NULL;
 }
 
@@ -194,26 +219,31 @@ int getSock(void * _ttcp)
 		int i = 0;
 		for (; i<MAX_SOCK_NUM; i++)
 		{
-			if (_ttcp == mapSockTCP[i])
+			if (_ttcp == mapSockTCP[i][GET_TCP_MODE(_ttcp)])
 				return i;
 		}
 	}
 	return -1;
 }
 
-void setMapSock(uint8_t sock, void* _ttcp)
+void setMapSockMode(uint8_t sock, void* _ttcp, uint8_t _tcp_mode)
 {
-	if (sock < MAX_SOCK_NUM)
-		mapSockTCP[sock]=_ttcp;
-	INFO_TCP("Map [%d, %p]\n", sock, _ttcp);
+	if ((IS_VALID_SOCK(sock))&&(_ttcp!=NULL))
+		mapSockTCP[sock][_tcp_mode]=_ttcp;
+	INFO_TCP("Map [%d, %p, %s]\n", sock, _ttcp, Mode2Str(_tcp_mode));
 }
 
-void clearMapSockTcp(uint8_t sock)
+void setMapSock(uint8_t sock, void* _ttcp)
+{
+	setMapSockMode(sock, _ttcp, GET_TCP_MODE(_ttcp));
+}
+
+void clearMapSockTcp(uint8_t sock, uint8_t mode)
 {
 	if (sock < MAX_SOCK_NUM)
 	{
 		//printk("UnMap [%d, %p]\n", sock, mapSockTCP[sock]);
-		mapSockTCP[sock] = NULL;
+		mapSockTCP[sock][mode] = NULL;
 	}
 
 }
@@ -223,6 +253,7 @@ void initMapSockTcp()
 	memset(mapSockTCP, 0, sizeof(mapSockTCP));
 }
 
+#if 0
 /**
  * Calculate bitrate based on number of bytes transmitted and elapsed time
  */
@@ -235,10 +266,10 @@ static void ard_tcp_print_stats(struct ttcp *ttcp) {
 		printk("\n");
 
 	printk("TTCP [%p]: %d bytes processed, %d.%d KB/s (%s/%s)\n", ttcp, bytes,
-			bytes / ms, bytes % ms, ttcp->udp ? "udp" : "tcp", ttcp->mode
-					== TTCP_MODE_TRANSMIT ? "tx" : "rx");
+			bytes / ms, bytes % ms, ProtMode2Str(ttcp->udp),
+					Mode2Str(ttcp->mode));
 }
-
+#endif
 
 void showTTCPstatus()
 {
@@ -248,19 +279,45 @@ void showTTCPstatus()
 	int i = 0;
 	for (; i<MAX_SOCK_NUM; i++)
 	{
-		void* p = getTTCP(i);
-		if (p)
+		int ii=0;
+		for (; ii<MAX_MODE_NUM; ii++)
 		{
-			ttcp_t* _ttcp = (ttcp_t* )p;
-			printk("Socket n.:%d addr:0x%x port:%d\n", i, _ttcp->addr, _ttcp->port);
-			if (_ttcp->tpcb){
-				printk("[tpcp-%p]-Status:%d\n", _ttcp->tpcb, _ttcp->tpcb->state);
+			void* p = getTTCP(i, ii);
+			if (p)
+			{
+				ttcp_t* _ttcp = (ttcp_t* )p;
+				printk("Socket n.:%d(%d) [0x%x] %s %s addr:%s port:%d\n", i, ii, _ttcp, 
+					ProtMode2Str(_ttcp->udp), Mode2Str(_ttcp->mode), ip2str(_ttcp->addr), _ttcp->port);
+				if (_ttcp->udp == TCP_MODE)
+				{
+					int j = 0;
+					for (; j<MAX_CLIENT_ACCEPTED; ++j)
+					{
+						if (_ttcp->tpcb[j]){
+							printk("[%d tpcp-%p]-Status:%d\n", j, _ttcp->tpcb[j], _ttcp->tpcb[j]->state);
+						}
+					}
+
+					if (_ttcp->lpcb){
+						printk("[tlcp-%p]-Status:%d\n", _ttcp->lpcb, _ttcp->lpcb->state);
+					}
+				}else{
+					if (_ttcp->upcb){
+						struct ip_addr loc = _ttcp->upcb->local_ip;
+						printk("[upcp-%p] flags:0x%x  local:%s[0x%x]-%d\n", 
+								_ttcp->upcb, _ttcp->upcb->flags,
+								ip2str(loc), loc, _ttcp->upcb->local_port);				
+						tRemoteClient remote = {0,0};;
+						getRemoteData(i, ii, &remote);
+						struct ip_addr ipaddr = { remote.ipaddr };
+						printk("remote:%s(0x%x)-%d\n", ip2str(ipaddr), remote.ipaddr, remote.port);
+						}					
+				}
+				//ard_tcp_print_stats(_ttcp);
+				printk("Data avail:%s\n", isAvailTcpDataByte(i)?"YES":"NO");
+				printk("------------------------------\n");
 			}
-			if (_ttcp->lpcb){
-				printk("[tlcp-%p]-Status:%d\n", _ttcp->lpcb, _ttcp->lpcb->state);
-			}
-			ard_tcp_print_stats(_ttcp);
-		}
+		}			
 	}
 
 	tcp_debug_print_pcbs();
@@ -270,12 +327,8 @@ int write_stream(volatile avr32_spi_t *spi, const char *stream, uint16_t len)
 {
 	uint16_t _len = 0;
 	unsigned short dummy=0;
-    bool streamExit = false;
 
      	do {
-             if (*stream == END_CMD)
-                 streamExit = true;
-
             //SIGN1_DN();
     		if (spi_write(spi, *stream) == SPI_ERROR_TIMEOUT)
     		{
@@ -294,16 +347,7 @@ int write_stream(volatile avr32_spi_t *spi, const char *stream, uint16_t len)
     			spi_read(spi,&dummy);
     		}
     		//SIGN1_UP();
-	}while ((!streamExit)&&(_len <= len));
-
-     if (!streamExit)
-     {
-#ifdef _SPI_STATS_
-    	 statSpi.wrongFrame++;
-    	 statSpi.lastError = SPI_ERROR_ARGUMENT;
-#endif
-    	 return SPI_ERROR_ARGUMENT;
-     }
+    }while (_len < len);
 	return SPI_OK;
 }
 
@@ -323,8 +367,7 @@ void sendError()
 	volatile avr32_spi_t *spi = ARD_SPI;							\
     Bool global_interrupt_enabled = Is_global_interrupt_enabled();	\
     if (global_interrupt_enabled) Disable_global_interrupt();		\
-    spi->IER.rdrf = 1;												\
-    spi->IER.rxbuff = 1;	spi->IER.endrx = 1;						\
+    spi->IER.rdrf = 1; spi->IER.rxbuff = 1;	spi->IER.endrx = 1;		\
     if (global_interrupt_enabled) Enable_global_interrupt();		\
 }while(0);
 
@@ -339,54 +382,6 @@ void sendError()
 #define CLEAR_SPI_INT() do {	\
 		eic_clear_interrupt_line(&AVR32_EIC, AVR32_SPI0_IRQ);	\
 	}while(0);
-
-void dump(char* _buf, uint16_t _count) {
-
-	int i;
-	for (i = 0; i < _count; ++i)
-		printk("0x%x ", _buf[i]);
-	printk("\n");
-}
-#ifdef _APP_DEBUG_
-#define DUMP dump
-#endif
-
-#ifdef _APP_DEBUG_
-#define DUMP_SPI_DATA(BUF, COUNT) do {		\
-	if (verboseDebug & INFO_SPI_FLAG) {		\
-	int i = 0;								\
-	for (; i < COUNT; ++i) 					\
-	{										\
-		printk("0x%x ", BUF[i]);			\
-		if (i % 20 == 0)					\
-			printk("\n");					\
-	}										\
-	printk("\n");							\
-	}										\
-}while(0);
-#else
-#define DUMP_SPI_DATA(BUF, COUNT) do {}while(0);
-#endif
-
-
-#ifdef _APP_DEBUG_
-#define DUMP_SPI_CMD(BUF) do {				\
-	if (verboseDebug & INFO_SPI_FLAG) {		\
-	int i = 0;								\
-	for (; i < CMD_MAX_LEN; ++i) 			\
-	{										\
-		printk("0x%x ", BUF[i]);			\
-		if (BUF[i] == END_CMD)				\
-			break;							\
-	}										\
-	printk("\n");							\
-	}										\
-}while(0);
-#else
-#define DUMP_SPI_CMD(BUF) do {}while(0);
-#endif
-
-
 
 int spi_add_cmd(char _cmd_id, cmd_spi_cb_t cb, cmd_spi_rcb_t rcb, void* ctx,
 		char flag) {
@@ -541,6 +536,114 @@ int set_passphrase_cmd_cb(int numParam, char* buf, void* ctx) {
     RETURN_ERR(err)
 }
 
+int set_ip_config_cmd_cb(int numParam, char* buf, void* ctx) {
+    struct ip_addr lwip_addr;
+    struct ctx_server *hs = ctx;
+    struct net_cfg *ncfg = &(hs->net_cfg);
+    struct netif *nif = ncfg->netif;
+    uint8_t parmsToChange=0;
+    const uint8_t MAX_IP_CONFIG_PARAMS = 3;
+
+	wl_err_t err = WL_SUCCESS;
+	tParam* params = (tParam*) buf;
+
+    if (params->paramLen == 1)
+	{
+		GET_PARAM_NEXT(BYTE, params, _parmsToChange);
+		parmsToChange = _parmsToChange;
+	}		
+    else
+    	RETURN_ERR(WL_FAILURE)
+
+    INFO_SPI("%p numParam=%d parmsToChange=%d\n", ctx, numParam, parmsToChange);
+
+    if (parmsToChange <= MAX_IP_CONFIG_PARAMS)
+    {
+		int i=0;
+    	for (; i<parmsToChange; ++i)
+    	{
+    	    if (params->paramLen == 4)
+    	    {
+				GET_PARAM_NEXT(LONG, params, _ip_addr);
+				lwip_addr.addr = _ip_addr;
+				INFO_SPI("%d] nif:%p lwip_addr=0x%x\n", i, nif, lwip_addr.addr);
+    	    	switch (i)
+    	    	{
+    	    		case 0:	// local_ip
+					{ 	    			
+    	    			netif_set_ipaddr(nif, &lwip_addr);
+    	    			break;
+					}								
+    	    		case 1:	// gateway
+					{
+    	    			netif_set_gw(nif, &lwip_addr);
+    	    			break;
+					}					
+    	    		case 2:	// subnet
+					{
+    	    			netif_set_netmask(nif, &lwip_addr);
+    	    			break;
+					}					
+    	    	}
+    	    }else{
+    	    	RETURN_ERR(WL_FAILURE)
+    	    }
+
+    	}
+    	/* Disable DHCP */
+    	ncfg->dhcp_enabled = STATIC_IP_CONFIG;
+    }else
+    	RETURN_ERR(WL_FAILURE)
+		
+    RETURN_ERR(err)
+}
+
+int set_dns_config_cmd_cb(int numParam, char* buf, void* ctx) {
+    struct ip_addr lwip_addr;
+    struct ctx_server *hs = ctx;
+    struct net_cfg *ncfg = &(hs->net_cfg);
+    struct netif *nif = ncfg->netif;
+    uint8_t parmsToChange=0;
+    const uint8_t MAX_DNS_CONFIG_PARAMS = 2;
+
+	wl_err_t err = WL_SUCCESS;
+	tParam* params = (tParam*) buf;
+
+    if (params->paramLen == 1)
+	{
+		GET_PARAM_NEXT(BYTE, params, _parmsToChange);
+		parmsToChange = _parmsToChange;
+	}		
+    else
+    	RETURN_ERR(WL_FAILURE)
+
+    INFO_SPI("%p numParam=%d parmsToChange=%d\n", ctx, numParam, parmsToChange);
+
+    if (parmsToChange <= MAX_DNS_CONFIG_PARAMS)
+    {
+		int i=0;
+    	for (; i<parmsToChange; ++i)
+    	{
+    	    if (params->paramLen == 4)
+    	    {
+				GET_PARAM_NEXT(LONG, params, _ip_addr);
+				lwip_addr.addr = _ip_addr;
+				INFO_SPI("%d] nif:%p lwip_addr=0x%x\n", i, nif, lwip_addr.addr);
+				dns_setserver(i, &lwip_addr);
+    	    }else{
+    	    	RETURN_ERR(WL_FAILURE)
+    	    }
+    	}
+    	/* Disable DHCP */
+    	ncfg->dhcp_enabled = STATIC_IP_CONFIG;
+    }else
+    	RETURN_ERR(WL_FAILURE)
+		
+    RETURN_ERR(err)
+}
+
+
+
 void set_result(wl_status_t _status)
 {
 	result = _status;
@@ -578,7 +681,7 @@ extern int ttcp_start(struct ip_addr addr, uint16_t port, void *opaque,
            void *done_cb, int mode, uint16_t nbuf, uint16_t buflen, int udp, int verbose);
 
 
-int start_server_tcp(uint16_t port, uint8_t sock)
+int start_server_tcp(uint16_t port, uint8_t sock, uint8_t protMode)
 {
 	struct ip_addr addr = { 0 };
     uint16_t buflen = 1024;
@@ -590,7 +693,7 @@ int start_server_tcp(uint16_t port, uint8_t sock)
 #else
     int verbose = 0;
 #endif
-    int udp = 0;
+    int udp = protMode;
     int mode = 1;   //RECEIVE
     void* _ttcp = NULL;
 
@@ -605,20 +708,20 @@ int start_server_tcp(uint16_t port, uint8_t sock)
 
     if (!ifStatus)
      {
-    	WARN("IF down...wait\n");
+    	WARN_VER("IF down...wait\n");
      	return WIFI_SPI_ERR;
      }
 
 
     if (ard_tcp_start(addr, port, NULL, NULL, mode, nbuf, buflen, udp, verbose, sock, &_ttcp) == 0)
     {
-    	INFO_SPI("Start Server [%d, %d] OK!\n", port, sock);
+    	INFO_SPI("Start Server %s [%d, %d] OK!\n", ProtMode2Str(protMode), port, sock);
     	setMapSock(sock, _ttcp);
         err = WL_SUCCESS;
     }else{
 
-    	WARN("Start Server [%d, %d] FAILED!\n", port, sock);
-    	clearMapSockTcp(sock);
+    	WARN("Start Server %s [%d, %d] FAILED!\n", ProtMode2Str(protMode), port, sock);
+    	clearMapSockTcp(sock, TTCP_MODE_RECEIVE);
     }
     return err;
 }
@@ -627,59 +730,72 @@ int start_server_tcp(uint16_t port, uint8_t sock)
 int start_server_tcp_cmd_cb(int numParam, char* buf, void* ctx) {
 	wl_err_t err = WL_FAILURE;
 	tParam* params = (tParam*) buf;
-    if (numParam == 2)
+    if (numParam == 3)
     {
     	GET_PARAM_NEXT(INT, params, port);
     	GET_PARAM_NEXT(BYTE, params, sock);
-    	err = start_server_tcp(port, sock);
+    	GET_PARAM_NEXT(BYTE, params, protMode);
+    	err = start_server_tcp(port, sock, protMode);
     }
     return (err==WL_SUCCESS) ? WIFI_SPI_ACK : WIFI_SPI_ERR;
 }
 
-int start_client_tcp_cmd_cb(int numParam, char* buf, void* ctx) {
-	wl_err_t err = WL_FAILURE;
-	tParam* params = (tParam*) buf;
-    if (numParam == 3)
-    {
-    	GET_PARAM_NEXT(LONG, params, _addr);
-    	GET_PARAM_NEXT(INT, params, port);
-     	GET_PARAM_NEXT(BYTE, params, sock);
+int start_client_tcp(uint32_t _addr, uint16_t port, uint8_t sock, uint8_t protMode)
+{
+    uint16_t buflen = 1024;
+    uint16_t nbuf = 1024;
+    wl_err_t err = WL_FAILURE;
+    struct ip_addr addr = { .addr = _addr};
 
-        INFO_SPI("Addr:0x%x, port:%d, sock:%d\n", _addr, port, sock);
+    INFO_SPI("Addr:0x%x, port:%d, sock:%d, prot:%s\n", _addr, port, sock,  ProtMode2Str(protMode));
 
-        uint16_t buflen = 1024;
-        uint16_t nbuf = 1024;
-    	struct ip_addr addr = { .addr = _addr};
-#ifdef _APP_DEBUG_
-        int verbose = 1;
-#else
-        int verbose = 0;
-#endif
-        int udp = 0;
-        int mode = 0;   //TRANSMIT
-        void* _ttcp = NULL;
+	#ifdef _APP_DEBUG_
+    int verbose = 1;
+	#else
+    int verbose = 0;
+	#endif
+
+    int udp = protMode;
+    int mode = 0;   //TRANSMIT
+    void* _ttcp = NULL;
 
         if (sock >= MAX_SOCK_NUM)
         	return WIFI_SPI_ERR;
 
-        // Check previous connection
-    	_ttcp = getTTCP(sock);
-    	if (_ttcp != NULL)
-    	{
-    		WARN("Previous client %p not stopped !\n", _ttcp);
-    		ard_tcp_stop(_ttcp);
-    		clearMapSockTcp(sock);
-    	}
+    // Check previous connection
+	_ttcp = getTTCP(sock, TTCP_MODE_TRANSMIT);
+	if (_ttcp != NULL)
+	{
+		WARN("Previous client %p not stopped !\n", _ttcp);
+		ard_tcp_stop(_ttcp);
+		clearMapSockTcp(sock, TTCP_MODE_TRANSMIT);
+	}
 
-        if (ard_tcp_start((struct ip_addr)addr, port, NULL, NULL, mode, nbuf, buflen, udp, verbose, sock, &_ttcp) == 0)
-        {
-        	INFO_SPI("Start Client [0x%x, %d, %d] OK!\n", addr, port, sock);
-        	setMapSock(sock, _ttcp);
-            err = WL_SUCCESS;
-        }else{
-        	INFO_SPI("Start Client [0x%x, %d, %d] FAILED!\n", addr, port, sock);
-        	clearMapSockTcp(sock);
-        }
+	if (ard_tcp_start(addr, port, NULL, NULL, mode, nbuf, buflen, udp, verbose, sock, &_ttcp) == 0)
+	{
+		INFO_SPI("Start Client %s %p [0x%x, %d, %d] OK!\n", ProtMode2Str(protMode),
+				_ttcp, addr, port, sock);
+		setMapSock(sock, _ttcp);
+		err = WL_SUCCESS;
+	}else{
+		INFO_SPI("Start Client %s %p [0x%x, %d, %d] FAILED!\n", ProtMode2Str(protMode), 
+				_ttcp, addr, port, sock);
+		clearMapSockTcp(sock, TTCP_MODE_TRANSMIT);
+	}
+	return err;
+}
+
+
+int start_client_tcp_cmd_cb(int numParam, char* buf, void* ctx) {
+	wl_err_t err = WL_FAILURE;
+	tParam* params = (tParam*) buf;
+    if (numParam == 4)
+    {
+    	GET_PARAM_NEXT(LONG, params, _addr);
+    	GET_PARAM_NEXT(INT, params, port);
+     	GET_PARAM_NEXT(BYTE, params, sock);
+     	GET_PARAM_NEXT(BYTE, params, protMode);
+     	err = start_client_tcp(_addr, port, sock, protMode);
     }
     return (err==WL_SUCCESS) ? WIFI_SPI_ACK : WIFI_SPI_ERR;
 }
@@ -697,13 +813,44 @@ int stop_client_tcp_cmd_cb(int numParam, char* buf, void* ctx) {
 
         if (sock < MAX_SOCK_NUM)
         {
-        	_ttcp = getTTCP(sock);
+        	_ttcp = getTTCP(sock, TTCP_MODE_TRANSMIT);
         	ard_tcp_stop(_ttcp);
             err = WL_SUCCESS;
         }
     }
     return (err==WL_SUCCESS) ? WIFI_SPI_ACK : WIFI_SPI_ERR;
 }
+
+int insert_data_cmd_cb(int numParam, char* buf, void* ctx) {
+
+	tDataParam* msg = (tDataParam*) buf;
+    if ((numParam == 2)&&(msg->dataLen == 1))
+    {
+        GET_DATA_BYTE(sock, buf+2);
+        GET_DATA_INT(len, buf+3);
+        //printk("tcp:%p buf:%p len:%d\n", getTTCP(sock), (uint8_t*)(buf+5), len);
+        insertBuf(sock, (uint8_t*)(buf+5), len);
+    }
+    return WIFI_SPI_ACK;
+}
+
+int send_data_udp_cmd_cb(int numParam, char* buf, void* ctx) {
+	wl_err_t err = WL_FAILURE;
+
+	tParam* params = (tParam*) buf;
+    if ((numParam == 1)&&(params->paramLen == 1))
+    {
+    	GET_PARAM_NEXT(BYTE, params, sock);
+        uint16_t len = 0;
+        uint8_t* p = mergeBuf(sock, NULL, &len);
+        err = sendUdpData(getTTCP(sock, TTCP_MODE_TRANSMIT), p, len);
+		clearBuf(sock);
+        free(p);
+    }
+
+    return (err==WL_SUCCESS) ? WIFI_SPI_ACK : WIFI_SPI_ERR;
+}
+
 
 int send_data_tcp_cmd_cb(int numParam, char* buf, void* ctx) {
 	wl_err_t err = WL_FAILURE;
@@ -714,7 +861,7 @@ int send_data_tcp_cmd_cb(int numParam, char* buf, void* ctx) {
         GET_DATA_BYTE(sock, buf+2);
         GET_DATA_INT(len, buf+3);
         //printk("tcp:%p buf:%p len:%d\n", getTTCP(sock), (uint8_t*)(buf+5), len);
-        err = sendTcpData(getTTCP(sock), (uint8_t*)(buf+5), len);
+        err = sendTcpData(getTTCP(sock, TTCP_MODE_TRANSMIT), (uint8_t*)(buf+5), len);
     }
     DATA_LED_OFF();
     return (err==WL_SUCCESS) ? WIFI_SPI_ACK : WIFI_SPI_ERR;
@@ -726,7 +873,6 @@ int ack_cmd_cb(int numParam, char* buf, void* ctx) {
 
 int get_result_cmd_cb(int numParam, char* buf, void* ctx) {
 	INFO_SPI("ifStatus:%d result:%d\n", ifStatus, result);
-	*buf=(ifStatus)?WL_CONNECTED:result;
 	return WIFI_SPI_ACK;
 }
 
@@ -744,7 +890,7 @@ cmd_spi_state_t get_reply_cb(char* recv, char* reply, void* ctx, uint16_t* count
 	if (ctx != NULL) {
 		reply[4] = (*(uint8_t*)ctx); //param
 	} else {
-		reply[4] = result; //param
+		reply[4] = (ifStatus)?WL_CONNECTED:result; //param
 	}
 
     END_HEADER_REPLY(reply, 5, *count);
@@ -783,6 +929,51 @@ cmd_spi_state_t get_reply_ipaddr_cb(char* recv, char* reply, void* ctx, uint16_t
 
     return SPI_CMD_DONE;
 }
+
+void getRemoteData(uint8_t sock, uint8_t mode, tRemoteClient* remoteData)
+{
+	if ((sock>=0) && (sock<MAX_SOCK_NUM))
+	{
+		void* p = getTTCP(sock, mode);
+		if (p)
+		{
+			ttcp_t* _ttcp = (ttcp_t* )p;
+			if ((_ttcp->udp == UDP_MODE))
+			{
+				if (_ttcp->mode == TTCP_MODE_RECEIVE)
+				{
+					remoteData->ipaddr = getRemoteClient(sock)->ipaddr;
+					remoteData->port = getRemoteClient(sock)->port;
+				}else{
+					remoteData->ipaddr = (_ttcp->upcb) ? _ttcp->upcb->remote_ip.addr : 0;
+					remoteData->port = (_ttcp->upcb) ? _ttcp->upcb->remote_port : 0;
+				}
+			}
+		}
+	}
+}
+
+
+cmd_spi_state_t get_reply_remote_data_cb(char* recv, char* reply, void* ctx, uint16_t* count) {
+
+    CHECK_ARD_NETIF(recv, reply, count);
+    DUMP_SPI_CMD(recv);
+
+    GET_DATA_BYTE(sock, recv+4);
+
+    CREATE_HEADER_REPLY(reply, recv, 2);
+	tRemoteClient remoteData = {0,0};
+	//TODO pass the mode
+	getRemoteData(sock, TTCP_MODE_RECEIVE, &remoteData);
+
+    PUT_LONG_IN_BYTE_NO(remoteData.ipaddr, reply, 3);
+    PUT_DATA_INT(remoteData.port, reply, 8);
+
+    END_HEADER_REPLY(reply, 11, *count);
+
+    return SPI_CMD_DONE;
+}
+
 
 void foundHostByName(const char *name, struct ip_addr *ipaddr, void *callback_arg)
 {
@@ -1071,11 +1262,11 @@ cmd_spi_state_t get_state_tcp_cmd_cb(char* recv, char* reply, void* ctx, uint16_
     uint8_t _state = CLOSED;
     if ((recv[3]==1)&&(recv[4]>=0)&&(recv[4]<MAX_SOCK_NUM))
     {
-    	_state = getStateTcp(getTTCP((uint8_t)recv[4]), 0);
+    	_state = getStateTcp(getTTCP((uint8_t)recv[4], TTCP_MODE_RECEIVE), 0);
     }
     PUT_DATA_BYTE(_state, reply, 3);
     END_HEADER_REPLY(reply, 5, *count);
-    INFO_SPI("state:%d\n", _state);
+    INFO_SPI_POLL("state:%d\n", _state);
 
     return SPI_CMD_DONE;
 }
@@ -1087,33 +1278,20 @@ cmd_spi_state_t get_client_state_tcp_cmd_cb(char* recv, char* reply, void* ctx, 
     CREATE_HEADER_REPLY(reply, recv, PARAM_NUMS_1);
 
     uint8_t _state = CLOSED;
-    if ((recv[3]==1)&&(recv[4]>=0)&&(recv[4]<MAX_SOCK_NUM))
+    uint8_t _sock = recv[4];
+    if ((recv[3]==1)&&(_sock>=0)&&(_sock<MAX_SOCK_NUM))
     {
-    	void * p= getTTCP((uint8_t)recv[4]);
+    	void * p= getTTCP(_sock, TTCP_MODE_TRANSMIT);
     	if (p!=NULL)
     	{
-			// get if we are in server or Transmit mode (0)
-			if (getModeTcp(p) == TTCP_MODE_TRANSMIT)
-			{
-
-				_state = getStateTcp(p, 1);
-				INFO_SPI_VER("CLI> p=%p _ttcp=%p state(tpcb):%d state:%d\n",
-									p, ((struct ttcp*) p)->tpcb,
-									((struct ttcp*) p)->tpcb->state,
-									_state);
-			}else {
-				_state = getStateTcp(p, 1);
-				INFO_SPI_VER("SER> p=%p _ttcp=%p state(tpcb):%d state(lpcb):%d state:%d\n",
-									p, ((struct ttcp*) p)->tpcb,
-									((struct ttcp*) p)->tpcb->state,
-									((struct ttcp*) p)->lpcb->state,
-									_state);
-			}
+			_state = getStateTcp(p, 1);	
+    	}else{
+    		WARN_VER("TTCP not found for sock:%d\n", _sock);
     	}
     }
     PUT_DATA_BYTE(_state, reply, 3);
     END_HEADER_REPLY(reply, 5, *count);
-    INFO_SPI("state:%d\n", _state);
+    INFO_SPI_POLL("sock:%d state:%d\n", _sock, _state);
 
     return SPI_CMD_DONE;
 }
@@ -1123,15 +1301,15 @@ cmd_spi_state_t avail_data_tcp_cmd_cb(char* recv, char* reply, void* ctx, uint16
 	CHECK_ARD_NETIF(recv, reply, count);
 
 	CREATE_HEADER_REPLY(reply, recv, PARAM_NUMS_1);
-	uint8_t dataAvail = 0;
+	uint16_t dataAvail = 0;
     if ((recv[3]==1)&&(recv[4]>=0)&&(recv[4]<MAX_SOCK_NUM))
     {
-    	dataAvail = isAvailTcpDataByte((uint8_t)recv[4]) ? 1 : 0;
+    	dataAvail = getAvailTcpDataByte((uint8_t)recv[4]);
     }
-	PUT_DATA_BYTE(dataAvail, reply, 3);
-	END_HEADER_REPLY(reply, 5, *count);
+	PUT_DATA_INT_NO(dataAvail, reply, 3);
+	END_HEADER_REPLY(reply, 6, *count);
 
-	INFO_SPI("dataAvail:%d\n", dataAvail);
+	INFO_SPI_POLL("dataAvail:%d\n", dataAvail);
 
     return SPI_CMD_DONE;
 }
@@ -1155,7 +1333,7 @@ cmd_spi_state_t data_sent_tcp_cmd_cb(char* recv, char* reply, void* ctx, uint16_
 	uint8_t dataSent = 0;
     if ((recv[3]==1)&&(recv[4]>=0)&&(recv[4]<MAX_SOCK_NUM))
     {
-    	dataSent = isDataSent(getTTCP((uint8_t)recv[4]));
+    	dataSent = isDataSent(getTTCP((uint8_t)recv[4], TTCP_MODE_TRANSMIT));
     }
 	PUT_DATA_BYTE(dataSent, reply, 3);
 	END_HEADER_REPLY(reply, 5, *count);
@@ -1199,14 +1377,15 @@ cmd_spi_state_t get_databuf_tcp_cmd_cb(char* recv, char* reply, void* ctx, uint1
 
     CHECK_ARD_NETIF(recv, reply, count);
 
-    if ((recv[3]==1)&&(recv[4]>=0)&&(recv[4]<MAX_SOCK_NUM))
+    GET_DATA_BYTE(sock, buf+5);
+    if ((sock>=0)&&(sock<MAX_SOCK_NUM))
     {
-    	if (getTcpData((uint8_t)recv[4], (void**)&data, &len))
+    	if (getTcpData((uint8_t)sock, (void**)&data, &len))
     	{
     		CREATE_HEADER_REPLY(reply, recv, PARAM_NUMS_1);
     		PUT_BUFDATA_INT(data, len, reply, 3);
-    		END_HEADER_REPLY(reply, 3+len+2+1, *count);
-    		freeTcpData((uint8_t)recv[4]);
+    		END_HEADER_REPLY(reply, 3+len+2, *count);
+    		freeTcpData((uint8_t)sock);
     	}else{
     		CREATE_HEADER_REPLY(reply, recv, PARAM_NUMS_0);
     		END_HEADER_REPLY(reply, 3, *count);
@@ -1264,16 +1443,17 @@ int sendReply(int cmdIdx, char* recv, char* reply, void* resultCmd)
     AVAIL_FOR_SPI();
     _result = write_stream(ARD_SPI, &reply[0], _count);
 #ifdef _SPI_STATS_
-    if ( result != SPI_OK)
+    if ( _result != SPI_OK)
     {
     	statSpi.lastCmd = cmd_spi_list[cmdIdx].cmd_id;
     }
 #endif
     BUSY_FOR_SPI();
 
-    //unsigned char status = spi_getStatus(ARD_SPI);
-    //INFO_SPI("Status after write: 0x%x\n",status);
-
+    IF_SPI_DUMP(printk("==>"));
+    DUMP_SPI(recv, count);
+    IF_SPI_DUMP(printk("<=="));
+	DUMP_SPI(reply, _count);
     replyCount = _count;
     return _result;
 }
@@ -1282,21 +1462,22 @@ unsigned char* getStartCmdSeq(unsigned char* _recv, int len, int *offset)
 {
 	int i = 0;
 	*offset = 0;
-	DEB_PIN_UP();
+	//DEB_PIN_UP();
 	for (; i<len; ++i)
 	{
 		if (_recv[i]==START_CMD)
 		{
 			if (i!=0)
 			{
-				DEB_PIN_DN();
+				DEB_PIN_TRIGGER();
+				IF_WARN_VER(dump((char*)_recv, (uint16_t)len));
 				WARN("%d] Disall. %d/%d cmd:%d\n", cmdCorr, i, len,_recv[i+1]);
 			}
 			*offset = i;
 			return &_recv[i];
 		}
 	}
-	DEB_PIN_DN();
+	//DEB_PIN_DN();
 	WARN("%d] Disall. %d\n", cmdCorr, i);
 
 	return NULL;
@@ -1330,12 +1511,12 @@ int call_reply_cb(char* recv, char* reply) {
                  {
                 	 tSpiMsg* spiMsg = (tSpiMsg*) recv;
                 	 _result = cmd_spi_list[i].cb(spiMsg->nParam,
-     					(char*) &(spiMsg->params[0]), NULL);
+     					(char*) &(spiMsg->params[0]), cmd_spi_list[i].ctx);
            		 }else
            		 {
            			tSpiMsgData* spiMsg = (tSpiMsgData*) recv;
                    	 _result = cmd_spi_list[i].cb(spiMsg->nParam,
-         					(char*) &(spiMsg->params[0]), NULL);
+         					(char*) &(spiMsg->params[0]), cmd_spi_list[i].ctx);
            		 }
 
                  if (_result != WIFI_SPI_ACK)
@@ -1380,10 +1561,12 @@ int call_reply_cb(char* recv, char* reply) {
 	return REPLY_NO_ERR;
 }
 
-void init_spi_cmds() {
+void init_spi_cmds(void* ctx) {
 	spi_add_cmd(SET_NET_CMD, set_net_cmd_cb, ack_reply_cb, NULL, CMD_SET_FLAG);
 	spi_add_cmd(SET_PASSPHRASE_CMD, set_passphrase_cmd_cb, ack_reply_cb, NULL, CMD_SET_FLAG);
 	spi_add_cmd(SET_KEY_CMD, set_key_cmd_cb, ack_reply_cb, NULL, CMD_SET_FLAG);
+	spi_add_cmd(SET_IP_CONFIG_CMD, set_ip_config_cmd_cb, ack_reply_cb, ctx, CMD_SET_FLAG);
+	spi_add_cmd(SET_DNS_CONFIG_CMD, set_dns_config_cmd_cb, ack_reply_cb, ctx, CMD_SET_FLAG);
 	spi_add_cmd(GET_CONN_STATUS_CMD, get_result_cmd_cb, get_reply_cb, NULL, CMD_GET_FLAG);
 	spi_add_cmd(GET_IPADDR_CMD, ack_cmd_cb, get_reply_ipaddr_cb, NULL, CMD_GET_FLAG);
 	spi_add_cmd(GET_MACADDR_CMD, ack_cmd_cb, get_reply_mac_cb, NULL, CMD_GET_FLAG);
@@ -1411,6 +1594,9 @@ void init_spi_cmds() {
 	spi_add_cmd(GET_CLIENT_STATE_TCP_CMD, ack_cmd_cb, get_client_state_tcp_cmd_cb, NULL, CMD_GET_FLAG);
 	spi_add_cmd(GET_FW_VERSION_CMD, ack_cmd_cb, get_firmware_version_cmd_cb, NULL, CMD_GET_FLAG);
 	spi_add_cmd(GET_TEST_CMD, ack_cmd_cb, get_test_cmd_cb, NULL, CMD_GET_FLAG);
+	spi_add_cmd(INSERT_DATABUF_CMD, insert_data_cmd_cb, ack_reply_cb, NULL, CMD_IMM_SET_FLAG);
+	spi_add_cmd(SEND_DATA_UDP_CMD, send_data_udp_cmd_cb, ack_reply_cb, NULL, CMD_SET_FLAG);
+	spi_add_cmd(GET_REMOTE_DATA_CMD, ack_cmd_cb, get_reply_remote_data_cb, NULL, CMD_GET_FLAG);
 }
 
 
@@ -1452,8 +1638,9 @@ bool checkMsgFormat(uint8_t* _recv, int len, int* offset)
 	unsigned char* recv = getStartCmdSeq(_recv, len, offset);
 	if ((recv == NULL)||(recv!=_recv))
 	{
-		if ((enableDebug & INFO_WARN_FLAG)&&(len < 20))	//TODO stamp only short messages wrong
-			dump((char*)_recv, len);
+		DEB_PIN_TRIGGER();
+
+		IF_WARN_VER(DUMP((char*)_recv, len));
 
 		STATSPI_DISALIGN_ERROR();
 
@@ -1468,7 +1655,7 @@ bool checkMsgFormat(uint8_t* _recv, int len, int* offset)
 			paramLenTot = checkMsgParam8(recv);
 		else
 		{
-			DUMP_SPI_DATA(_recv, len);
+			DUMP_SPI(_recv, len);
 			paramLenTot = checkMsgParam16(recv);
 		}
 
@@ -1512,8 +1699,8 @@ void spi_poll(struct netif* netif) {
 			int err = call_reply_cb(buf, &reply[0]);
 			if (err != REPLY_NO_ERR)
 			{
-				DUMP_SPI_DATA(buf, count);
-				DUMP_SPI_DATA(reply, replyCount);
+				DUMP_SPI(buf, count);
+				DUMP_SPI(reply, replyCount);
 			}
 			receivedChars = 0;
 			count = 0;
@@ -1523,8 +1710,7 @@ void spi_poll(struct netif* netif) {
 		{
 			sendError();
 			WARN("%d] Check format msg failed!\n", cmdCorr);
-			if (enableDebug & INFO_WARN_FLAG)
-				dump((char*)_receiveBuffer, receivedChars);
+			IF_WARN_VER(dump((char*)_receiveBuffer, receivedChars));
 			state = SPI_CMD_IDLE;
 			count=0;
 			//mark as buffer used
@@ -1552,11 +1738,7 @@ inline int spi_slaveReceiveInt(volatile avr32_spi_t *spi)
 	int index = 0;
 	int err = SPI_OK;
 	state = SPI_CMD_INPUT;
-
-	if (_receiveBuffer[0] != 0)
-	{
-		STATSPI_OVERRIDE_ERROR();
-	}
+	bool endOfFrame = false;
 
 	do {
 		unsigned int timeout = SPI_TIMEOUT;
@@ -1569,8 +1751,20 @@ inline int spi_slaveReceiveInt(volatile avr32_spi_t *spi)
 				break;
 			}
 		}
-		_receiveBuffer[index] = (spi->rdr >> AVR32_SPI_RDR_RD_OFFSET) & 0x00ff;
+		//DEB_PIN_TG();
+		#if 0
+#ifdef _SPI_STATS_		
+		if (spi->sr & AVR32_SPI_SR_OVRES_MASK)
+		{
+			STATSPI_OVERRIDE_ERROR();
+		}
+#endif	
+#endif					
 		if (err == SPI_OK) {
+			_receiveBuffer[index] = (spi->rdr >> AVR32_SPI_RDR_RD_OFFSET) & 0x00ff;
+			DEB_PIN_UP(2);
+			if ((index==0) && (_receiveBuffer[index] != START_CMD))
+				DEB_PIN_TRIGGER();
 			++index;
 			++receivedChars;
 		}else{
@@ -1585,7 +1779,35 @@ inline int spi_slaveReceiveInt(volatile avr32_spi_t *spi)
 			err = SPI_ERROR_OVERRUN_AND_MODE_FAULT;
 			break;
 		}
-	} while (_receiveBuffer[index - 1] != END_CMD);
+
+		if (_receiveBuffer[index - 1] == END_CMD)
+		{
+			int8_t numParams = 0;
+			int idx = PARAM_LEN_POS+1;
+			bool islen16bit = ((_receiveBuffer[CMD_POS] & DATA_FLAG) == DATA_FLAG);
+			if (index >= idx)
+			{
+				numParams = _receiveBuffer[PARAM_LEN_POS];					
+				while (((index-1) > idx)&&(numParams>0))
+				{
+					if (islen16bit)
+						idx += (_receiveBuffer[idx]<<8) + _receiveBuffer[idx+1]+2;
+					else
+						idx += _receiveBuffer[idx]+1;
+					--numParams;
+				}
+				if (((index-1) == idx) && (numParams == 0))
+					endOfFrame = true;
+			}
+			if (!endOfFrame){
+				WARN("Wrong termination index:%d nParam:%d idx:%d 16bit:%d\n", index, numParams, idx, islen16bit);
+				#ifdef _DEBUG_
+					dump((char*)_receiveBuffer, receivedChars); 
+					while(0);
+				#endif
+			}		
+		}
+	} while (!endOfFrame);
 	return err;
 }
 
@@ -1597,8 +1819,7 @@ __interrupt
 static void spi_int_handler(void)
 {
 	volatile avr32_spi_t *spi = ARD_SPI;
-	//DEB_PIN_DN();
-	//AVAIL_FOR_SPI();
+	DEB_PIN_DN(2);
 	DISABLE_SPI_INT();
 
 	if ((spi->sr & AVR32_SPI_SR_RDRF_MASK) != 0)
@@ -1610,12 +1831,10 @@ static void spi_int_handler(void)
         	startReply=true;
         	++cmdCorr;
         	//maintain disable interrupt to send the reply command
-        	//DEB_PIN_UP();
         	return;
         }
    	}
 	ENABLE_SPI_INT();
-	//DEB_PIN_UP();
 }
 
 inline spi_status_t spi_read8(volatile avr32_spi_t *spi, unsigned char *data)
@@ -1682,7 +1901,7 @@ void initExtInt()
 	  Enable_global_interrupt();
 }
 
-int initSpi()
+int initSpi(void* ctx)
 {
 	volatile avr32_spi_t *spi = &AVR32_SPI0;
 	gpio_map_t spi_piomap = {          \
@@ -1734,7 +1953,7 @@ int initSpi()
 #ifdef _SPI_STATS_
 	initStatSpi();
 #endif
-	init_spi_cmds();
+	init_spi_cmds(ctx);
 
 	memset(_receiveBuffer, 0, sizeof(_receiveBuffer));
 	memset(buf, 0, sizeof(buf));

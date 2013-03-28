@@ -4,38 +4,144 @@
  *  Created on: Jul 4, 2010
  *      Author: mlf by Metodo2 srl
  */
-#undef _APP_DEBUG_
+//#define _APP_DEBUG_
 
 #include "lwip/pbuf.h"
 #include "wifi_spi.h"
 #include "ard_utils.h"
 #include "debug.h"
+#include "ard_spi.h"
+#include "ard_tcp.h"
 
 #define MAX_PBUF_STORED	30
 
 tData pBufStore[MAX_PBUF_STORED][MAX_SOCK_NUM];
 
-unsigned char headBuf = 0;
-unsigned char tailBuf = 0;
+unsigned char headBuf[MAX_SOCK_NUM] = {0};
+unsigned char tailBuf[MAX_SOCK_NUM] = {0};
 
-#define IS_BUF_AVAIL() (tailBuf!=headBuf)
-#define IS_BUF_EMPTY() ((tailBuf == 0) && (headBuf == 0))
+#define IS_BUF_AVAIL(x) (tailBuf[x] != headBuf[x])
+#define IS_BUF_EMPTY(x) ((tailBuf[x] == 0) && (headBuf[x] == 0))
 
 void init_pBuf()
 {
 	memset(pBufStore, 0, sizeof(pBufStore));
 }
 
-void insert_pBuf(struct pbuf* q, uint8_t sock, void* _pcb)
+uint8_t* insertBuf(uint8_t sock, uint8_t* buf, uint16_t len)
+{
+	DUMP(buf,len);
+	if (sock>= MAX_SOCK_NUM)
+	{
+		WARN("Sock out of range: sock=%d", sock);
+		return NULL;
+	}		
+	if (pBufStore[headBuf[sock]][sock].data != NULL)
+	{
+		WARN("Overwriting buffer %p idx:%d!\n", pBufStore[headBuf[sock]][sock].data, headBuf[sock]);
+		// to avoid memory leak free the oldest buffer
+		freetDataIdx(headBuf[sock], sock);
+	}
+
+	u8_t* p = (u8_t*)calloc(len,sizeof(u8_t));
+    if(p != NULL) {
+    	memcpy(p, buf, len);
+
+    	pBufStore[headBuf[sock]][sock].data = p;
+    	pBufStore[headBuf[sock]][sock].len = len;
+    	pBufStore[headBuf[sock]][sock].idx = 0;
+    	pBufStore[headBuf[sock]][sock].pcb = getTTCP(sock, TTCP_MODE_TRANSMIT);
+    	headBuf[sock]++;
+
+    	if (headBuf[sock] == MAX_PBUF_STORED)
+    		headBuf[sock] = 0;
+    	if (headBuf[sock] == tailBuf[sock])
+    	{
+    		WARN("Avoid to Overwrite data [%d-%d]!\n", headBuf[sock], tailBuf[sock]);
+    		if (headBuf[sock] != 0)
+    			--headBuf[sock];
+    		else
+    			headBuf[sock] = MAX_PBUF_STORED-1;
+    	}
+    	INFO_UTIL("Insert[%d]: %p:%d-%d [%d,%d]\n", sock, p, len, p[0], headBuf[sock], tailBuf[sock]);
+    }
+    return p;
+}
+
+
+uint16_t calcMergeLen(uint8_t sock)
+{
+	uint16_t len = 0;
+
+	unsigned char index = tailBuf[sock];
+	do {
+	if (pBufStore[index][sock].data != NULL)
+	{
+		len += pBufStore[index][sock].len;
+		len -= pBufStore[index][sock].idx;
+		INFO_UTIL_VER(" [%d]: len:%d idx:%d tot:%d\n", sock, pBufStore[index][sock].len, pBufStore[index][sock].idx, len);
+	}
+	++index;
+	if (index == MAX_PBUF_STORED)
+		index = 0;
+	}while (index!=headBuf[sock]);
+	return len;
+}
+
+uint16_t clearBuf(uint8_t sock)
+{
+	uint16_t len = 0;
+
+	unsigned char index = tailBuf[sock];
+	do {
+	if (pBufStore[index][sock].data != NULL)
+	{
+		freetDataIdx(index,sock);
+	}
+	++index;
+	if (index == MAX_PBUF_STORED)
+		index = 0;
+	}while (index!=headBuf[sock]);
+	tailBuf[sock]=index;
+	return len;
+}
+
+uint8_t* mergeBuf(uint8_t sock, uint8_t** buf, uint16_t* _len)
+{
+	uint16_t len = calcMergeLen(sock);
+	uint8_t* p = (u8_t*)calloc(len,sizeof(u8_t));
+	uint8_t* _p = p;
+	if(p != NULL) {
+		unsigned char index = tailBuf[sock];
+		do {
+		if (pBufStore[index][sock].data != NULL)
+		{
+			memcpy(p, pBufStore[index][sock].data, pBufStore[index][sock].len);
+			p += pBufStore[index][sock].len;
+		}
+		++index;
+		if (index == MAX_PBUF_STORED)
+			index = 0;
+		}while (index!=headBuf[sock]);
+	}
+	DUMP(_p,len);
+	if (buf != NULL)
+		*buf = _p;
+	if (_len != NULL)
+		*_len = len;
+	return _p;
+}
+
+uint8_t* insert_pBuf(struct pbuf* q, uint8_t sock, void* _pcb)
 {
 	if (q == NULL)
-		return;
+		return NULL;
 
-	if (pBufStore[headBuf][sock].data != NULL)
+	if (pBufStore[headBuf[sock]][sock].data != NULL)
 	{
-		WARN("Overwriting buffer %p idx:%d!\n", pBufStore[headBuf][sock].data, headBuf);
+		WARN("Overwriting buffer %p idx:%d!\n", pBufStore[headBuf[sock]][sock].data, headBuf[sock]);
 		// to avoid memory leak free the oldest buffer
-		freetDataIdx(headBuf, sock);
+		freetDataIdx(headBuf[sock], sock);
 	}
 
 	u8_t* p = (u8_t*)calloc(q->tot_len,sizeof(u8_t));
@@ -44,32 +150,55 @@ void insert_pBuf(struct pbuf* q, uint8_t sock, void* _pcb)
     	  WARN("pbuf_copy_partial failed: src:%p, dst:%p, len:%d\n", q, p, q->tot_len);
     	  free(p);
     	  p = NULL;
-    	  return;
+    	  return p;
       }
 
-      pBufStore[headBuf][sock].data = p;
-      pBufStore[headBuf][sock].len = q->tot_len;
-      pBufStore[headBuf][sock].idx = 0;
-      pBufStore[headBuf][sock].pcb = _pcb;
-      headBuf++;
+      pBufStore[headBuf[sock]][sock].data = p;
+      pBufStore[headBuf[sock]][sock].len = q->tot_len;
+      pBufStore[headBuf[sock]][sock].idx = 0;
+      pBufStore[headBuf[sock]][sock].pcb = _pcb;
+      headBuf[sock]++;
 
-  	  if (headBuf == MAX_PBUF_STORED)
-  		headBuf = 0;
-  	  if (headBuf == tailBuf)
-  		  WARN("Overwriting data [%d-%d]!\n", headBuf, tailBuf);
-  	  INFO_UTIL("Insert: %p:%d-%d [%d,%d]\n", p, q->tot_len, p[0], headBuf, tailBuf);
+  	  if (headBuf[sock] == MAX_PBUF_STORED)
+  		headBuf[sock] = 0;
+  	  if (headBuf[sock] == tailBuf[sock])
+  	  {
+  		  WARN("Avoid to Overwrite data [%d-%d]!\n", headBuf[sock], tailBuf[sock]);
+  		  if (headBuf[sock] != 0)
+  			  --headBuf[sock];
+  		  else
+  			  headBuf[sock] = MAX_PBUF_STORED-1;
+  	  }
+  	  INFO_UTIL("Insert[%d]: %p:%d-%d [%d,%d]\n", sock, p, q->tot_len, p[0], headBuf[sock], tailBuf[sock]);
     }
+    return p;
+}
+
+void dumpPbuf(uint8_t sock)
+{
+	unsigned char index = tailBuf[sock];
+	printk("headBuf=%d tailBuf=%d\n", headBuf[sock], tailBuf[sock]);
+	do {
+	if (pBufStore[index][sock].data != NULL)
+	{
+		printk("%d] pcb:%p Buf: %p Len:%d\n", pBufStore[index][sock].idx, pBufStore[index][sock].pcb, 
+			pBufStore[index][sock].data, pBufStore[index][sock].len);
+	}
+	++index;
+	if (index == MAX_PBUF_STORED)
+		index = 0;
+	}while (index!=headBuf[sock]);
 }
 
 tData* get_pBuf(uint8_t sock)
 {
-	if (IS_BUF_EMPTY())
+	if (IS_BUF_EMPTY(sock))
 		return NULL;
 
-	if (IS_BUF_AVAIL())
+	if (IS_BUF_AVAIL(sock))
 	{
-		tData* p = &(pBufStore[tailBuf][sock]);
-		INFO_UTIL_VER("%p [%d,%d]\n", p, headBuf, tailBuf);
+		tData* p = &(pBufStore[tailBuf[sock]][sock]);
+		INFO_UTIL_VER("%p [%d,%d]\n", p, headBuf[sock], tailBuf[sock]);
 		return p;
 	}
 	return NULL;
@@ -83,14 +212,14 @@ void freetData(void * buf, uint8_t sock)
 		return;
 	}
 
-    pBufStore[tailBuf][sock].data = NULL;
-    pBufStore[tailBuf][sock].len = 0;
-    pBufStore[tailBuf][sock].idx = 0;
-    pBufStore[tailBuf][sock].pcb = 0;
+    pBufStore[tailBuf[sock]][sock].data = NULL;
+    pBufStore[tailBuf[sock]][sock].len = 0;
+    pBufStore[tailBuf[sock]][sock].idx = 0;
+    pBufStore[tailBuf[sock]][sock].pcb = 0;
 
-	if (++tailBuf == MAX_PBUF_STORED)
-		tailBuf = 0;
-	INFO_UTIL("%p [%d,%d]\n", buf, headBuf, tailBuf);
+	if (++tailBuf[sock] == MAX_PBUF_STORED)
+		tailBuf[sock] = 0;
+	INFO_UTIL("%p [%d,%d]\n", buf, headBuf[sock], tailBuf[sock]);
 	free(buf);
 }
 
@@ -117,6 +246,16 @@ void freetDataIdx(uint8_t idxBuf, uint8_t sock)
 
 void ack_recved(void* pcb, int len);
 
+void ackAndFreeData(void* pcb, int len, uint8_t sock, uint8_t* data)
+{
+	INFO_TCP("Ack pcb:%p len:%d sock:%d data:%p\n", pcb, len, sock, data);
+	if (!IS_UDP_SOCK(sock))
+		ack_recved(pcb, len);
+	if (data != NULL)
+		freetData(data, sock);
+}
+
+
 bool isAvailTcpDataByte(uint8_t sock)
 {
 	tData* p = get_pBuf(sock);
@@ -126,11 +265,10 @@ bool isAvailTcpDataByte(uint8_t sock)
 		INFO_UTIL_VER("check:%d %d %p\n",p->idx, p->len, p->data);
 		if (p->idx == p->len)
 		{
-			freetData(p->data, sock);
-			ack_recved(p->pcb, p->len);
 			INFO_UTIL("Free %p other buf %d tail:%d head:%d\n",
-					p->data, IS_BUF_AVAIL(), tailBuf, headBuf);
-			return (IS_BUF_AVAIL());
+					p->data, IS_BUF_AVAIL(sock), tailBuf[sock], headBuf[sock]);
+			ackAndFreeData(p->pcb, p->len, sock, p->data);						
+			return (IS_BUF_AVAIL(sock));
 		}else{
 			return true;
 		}
@@ -138,6 +276,12 @@ bool isAvailTcpDataByte(uint8_t sock)
 	return false;
 }
 
+uint16_t getAvailTcpDataByte(uint8_t sock)
+{
+	uint16_t len = calcMergeLen(sock);
+	INFO_UTIL_VER("Availabled data: %d\n", len);
+	return len;
+}
 
 
 bool getTcpDataByte(uint8_t sock, uint8_t* payload, uint8_t peek)
@@ -155,12 +299,11 @@ bool getTcpDataByte(uint8_t sock, uint8_t* payload, uint8_t peek)
 		else
 			*payload = buf[p->idx++];
 		INFO_UTIL_VER("get:%d %p %d\n",p->idx, p->data, *payload);
+		if (p->idx == p->len)
+			ackAndFreeData(p->pcb, p->len, sock, p->data);
 		return true;
 		}else{
-			//dealloc current buffer
-			INFO_UTIL("Free %p\n", p->data);
-			freetData(p->data, sock);
-			ack_recved(p->pcb, p->len);
+			ackAndFreeData(p->pcb, p->len, sock, p->data);
 		}
 	}
 	return false;
@@ -185,12 +328,20 @@ bool freeTcpData(uint8_t sock)
 	p = get_pBuf(sock);
 	if (p != NULL)
 	{
-		freetData(p->data, sock);
-		ack_recved(p->pcb, p->len);
+		ackAndFreeData(p->pcb, p->len, sock, p->data);
 		return true;
 	}
 	return false;
 }
 
+void freeAllTcpData(uint8_t sock)
+{
+	tData* p = NULL;
+	do{
+		p = get_pBuf(sock);
+		if (p != NULL)
+			freetData(p->data, sock);
+	}while(p!=NULL);
+}
 
 

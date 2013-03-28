@@ -53,6 +53,26 @@ void WiFiDrv::getNetworkData(uint8_t *ip, uint8_t *mask, uint8_t *gwip)
     SpiDrv::spiSlaveDeselect();
 }
 
+void WiFiDrv::getRemoteData(uint8_t sock, uint8_t *ip, uint8_t *port)
+{
+    tParam params[PARAM_NUMS_2] = { {0, (char*)ip}, {0, (char*)port} };
+
+    WAIT_FOR_SLAVE_SELECT();
+
+    // Send Command
+    SpiDrv::sendCmd(GET_REMOTE_DATA_CMD, PARAM_NUMS_1);
+    SpiDrv::sendParam(&sock, sizeof(sock), LAST_PARAM);
+
+    //Wait the reply elaboration
+    SpiDrv::waitForSlaveReady();
+
+    // Wait for reply
+    SpiDrv::waitResponseParams(GET_REMOTE_DATA_CMD, PARAM_NUMS_2, params);
+
+    SpiDrv::spiSlaveDeselect();
+}
+
+
 // Public Methods
 
 
@@ -131,6 +151,55 @@ int8_t WiFiDrv::wifiSetKey(char* ssid, uint8_t ssid_len, uint8_t key_idx, const 
     SpiDrv::spiSlaveDeselect();
     return _data;
 }
+
+void WiFiDrv::config(uint8_t validParams, uint32_t local_ip, uint32_t gateway, uint32_t subnet)
+{
+	WAIT_FOR_SLAVE_SELECT();
+    // Send Command
+    SpiDrv::sendCmd(SET_IP_CONFIG_CMD, PARAM_NUMS_4);
+    SpiDrv::sendParam((uint8_t*)&validParams, 1, NO_LAST_PARAM);
+    SpiDrv::sendParam((uint8_t*)&local_ip, 4, NO_LAST_PARAM);
+    SpiDrv::sendParam((uint8_t*)&gateway, 4, NO_LAST_PARAM);
+    SpiDrv::sendParam((uint8_t*)&subnet, 4, LAST_PARAM);
+
+    //Wait the reply elaboration
+    SpiDrv::waitForSlaveReady();
+
+    // Wait for reply
+    uint8_t _data = 0;
+    uint8_t _dataLen = 0;
+    if (!SpiDrv::waitResponseCmd(SET_IP_CONFIG_CMD, PARAM_NUMS_1, &_data, &_dataLen))
+    {
+        WARN("error waitResponse");
+        _data = WL_FAILURE;
+    }
+    SpiDrv::spiSlaveDeselect();
+}
+
+void WiFiDrv::setDNS(uint8_t validParams, uint32_t dns_server1, uint32_t dns_server2)
+{
+	WAIT_FOR_SLAVE_SELECT();
+    // Send Command
+    SpiDrv::sendCmd(SET_DNS_CONFIG_CMD, PARAM_NUMS_3);
+    SpiDrv::sendParam((uint8_t*)&validParams, 1, NO_LAST_PARAM);
+    SpiDrv::sendParam((uint8_t*)&dns_server1, 4, NO_LAST_PARAM);
+    SpiDrv::sendParam((uint8_t*)&dns_server2, 4, LAST_PARAM);
+
+    //Wait the reply elaboration
+    SpiDrv::waitForSlaveReady();
+
+    // Wait for reply
+    uint8_t _data = 0;
+    uint8_t _dataLen = 0;
+    if (!SpiDrv::waitResponseCmd(SET_DNS_CONFIG_CMD, PARAM_NUMS_1, &_data, &_dataLen))
+    {
+        WARN("error waitResponse");
+        _data = WL_FAILURE;
+    }
+    SpiDrv::spiSlaveDeselect();
+}
+
+
                         
 int8_t WiFiDrv::disconnect()
 {
