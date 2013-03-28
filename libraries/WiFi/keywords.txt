@@ -18,6 +18,8 @@ status	KEYWORD2
 connect	KEYWORD2
 write	KEYWORD2
 available	KEYWORD2
+config	KEYWORD2
+setDNS	KEYWORD2
 read	KEYWORD2
 flush	KEYWORD2
 stop	KEYWORD2

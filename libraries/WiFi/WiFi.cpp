@@ -103,14 +103,22 @@ void WiFiClass::config(IPAddress local_ip)
 	WiFiDrv::config(1, (uint32_t)local_ip, 0, 0);
 }
 
-void WiFiClass::config(IPAddress local_ip, IPAddress gateway)
+void WiFiClass::config(IPAddress local_ip, IPAddress dns_server)
 {
-	WiFiDrv::config(2, (uint32_t)local_ip, (uint32_t)gateway, 0);
+	WiFiDrv::config(1, (uint32_t)local_ip, 0, 0);
+	WiFiDrv::setDNS(1, (uint32_t)dns_server, 0);
 }
 
-void WiFiClass::config(IPAddress local_ip, IPAddress gateway, IPAddress subnet)
+void WiFiClass::config(IPAddress local_ip, IPAddress dns_server, IPAddress gateway)
+{
+	WiFiDrv::config(2, (uint32_t)local_ip, (uint32_t)gateway, 0);
+	WiFiDrv::setDNS(1, (uint32_t)dns_server, 0);
+}
+
+void WiFiClass::config(IPAddress local_ip, IPAddress dns_server, IPAddress gateway, IPAddress subnet)
 {
 	WiFiDrv::config(3, (uint32_t)local_ip, (uint32_t)gateway, (uint32_t)subnet);
+	WiFiDrv::setDNS(1, (uint32_t)dns_server, 0);
 }
 
 void WiFiClass::setDNS(IPAddress dns_server1)

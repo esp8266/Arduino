@@ -1,5 +1,5 @@
 /*
-  WiFi Web Server
+  Web  Server
  
  A simple web server that shows the value of the analog input pins.
  using a WiFi shield.
@@ -15,9 +15,7 @@
  by dlf (Metodo2 srl)
  modified 31 May 2012
  by Tom Igoe
-
  */
-
 #include <SPI.h>
 #include <WiFi.h>
 
@@ -78,7 +76,7 @@ void loop() {
           // send a standard http response header
           client.println("HTTP/1.1 200 OK");
           client.println("Content-Type: text/html");
-          client.println("Connection: close");
+          client.println("Connnection: close");
           client.println();
           client.println("<!DOCTYPE HTML>");
           client.println("<html>");

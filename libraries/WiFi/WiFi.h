@@ -68,17 +68,26 @@ public:
     /* Change Ip configuration settings disabling the dhcp client
         *
         * param local_ip: 	Static ip configuration
-        * param gateway : 	Static gateway configuration
+	* param dns_server:     IP configuration for DNS server 1
         */
-    void config(IPAddress local_ip, IPAddress gateway);
+    void config(IPAddress local_ip, IPAddress dns_server);
 
     /* Change Ip configuration settings disabling the dhcp client
         *
         * param local_ip: 	Static ip configuration
+	* param dns_server:     IP configuration for DNS server 1
+        * param gateway : 	Static gateway configuration
+        */
+    void config(IPAddress local_ip, IPAddress dns_server, IPAddress gateway);
+
+    /* Change Ip configuration settings disabling the dhcp client
+        *
+        * param local_ip: 	Static ip configuration
+	* param dns_server:     IP configuration for DNS server 1
         * param gateway: 	Static gateway configuration
         * param subnet:		Static Subnet mask
         */
-    void config(IPAddress local_ip, IPAddress gateway, IPAddress subnet);
+    void config(IPAddress local_ip, IPAddress dns_server, IPAddress gateway, IPAddress subnet);
 
     /* Change DNS Ip configuration
      *
