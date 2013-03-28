@@ -2,9 +2,6 @@
    Copyright (c) 2010  Gerben van den Broeke
    All rights reserved.
 
-       malloc, free, realloc from avr-libc 1.7.0
-       with minor modifications, by Paul Stoffregen
-
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are met:
 
@@ -33,20 +30,14 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
  
+ 
+/* $Id: malloc.c 2149 2010-06-09 20:45:37Z joerg_wunsch $ */
 
 #include <stdlib.h>
-#include <inttypes.h>
-#include <string.h>
+#include "sectionname.h"
+#include "stdlib_private.h"
+
 #include <avr/io.h>
-
-
-#define __MALLOC_MARGIN__ 120
-
-
-struct __freelist {
-	size_t sz;
-	struct __freelist *nx;
-};
 
 /*
  * Exported interface:
@@ -59,13 +50,16 @@ struct __freelist {
  * with the data segment.
  */
  
+/* May be changed by the user only before the first malloc() call.  */
 
-#define STACK_POINTER() ((char *)AVR_STACK_POINTER_REG)
-extern char __heap_start;
-char *__brkval = &__heap_start;	// first location not yet allocated
-struct __freelist *__flp;	// freelist pointer (head of freelist)
-char *__brkval_maximum = 100;
+size_t __malloc_margin = 32;
+char *__malloc_heap_start = &__heap_start;
+char *__malloc_heap_end = &__heap_end;
 
+char *__brkval;
+struct __freelist *__flp;
+
+ATTRIBUTE_CLIB_SECTION
 void *
 malloc(size_t len)
 {
@@ -160,7 +154,11 @@ malloc(size_t len)
 	 * Since we don't have an operating system, just make sure
 	 * that we don't collide with the stack.
 	 */
-	cp = STACK_POINTER() - __MALLOC_MARGIN__;
+	if (__brkval == 0)
+		__brkval = __malloc_heap_start;
+	cp = __malloc_heap_end;
+	if (cp == 0)
+		cp = STACK_POINTER() - __malloc_margin;
 	if (cp <= __brkval)
 	  /*
 	   * Memory exhausted.
@@ -173,7 +171,6 @@ malloc(size_t len)
 	if (avail >= len && avail >= len + sizeof(size_t)) {
 		fp1 = (struct __freelist *)__brkval;
 		__brkval += len + sizeof(size_t);
-		__brkval_maximum = __brkval;
 		fp1->sz = len;
 		return &(fp1->nx);
 	}
@@ -184,6 +181,7 @@ malloc(size_t len)
 }
 
 
+ATTRIBUTE_CLIB_SECTION
 void
 free(void *p)
 {
@@ -265,116 +263,5 @@ free(void *p)
 			fp2->nx = NULL;
 		__brkval = cp2 - sizeof(size_t);
 	}
-}
-
-
-
-void *
-realloc(void *ptr, size_t len)
-{
-	struct __freelist *fp1, *fp2, *fp3, *ofp3;
-	char *cp, *cp1;
-	void *memp;
-	size_t s, incr;
-
-	/* Trivial case, required by C standard. */
-	if (ptr == 0)
-		return malloc(len);
-
-	cp1 = (char *)ptr;
-	cp1 -= sizeof(size_t);
-	fp1 = (struct __freelist *)cp1;
-
-	cp = (char *)ptr + len; /* new next pointer */
-	if (cp < cp1)
-		/* Pointer wrapped across top of RAM, fail. */
-		return 0;
-
-	/*
-	 * See whether we are growing or shrinking.  When shrinking,
-	 * we split off a chunk for the released portion, and call
-	 * free() on it.  Therefore, we can only shrink if the new
-	 * size is at least sizeof(struct __freelist) smaller than the
-	 * previous size.
-	 */
-	if (len <= fp1->sz) {
-		/* The first test catches a possible unsigned int
-		 * rollover condition. */
-		if (fp1->sz <= sizeof(struct __freelist) ||
-		    len > fp1->sz - sizeof(struct __freelist))
-			return ptr;
-		fp2 = (struct __freelist *)cp;
-		fp2->sz = fp1->sz - len - sizeof(size_t);
-		fp1->sz = len;
-		free(&(fp2->nx));
-		return ptr;
-	}
-
-	/*
-	 * If we get here, we are growing.  First, see whether there
-	 * is space in the free list on top of our current chunk.
-	 */
-	incr = len - fp1->sz;
-	cp = (char *)ptr + fp1->sz;
-	fp2 = (struct __freelist *)cp;
-	for (s = 0, ofp3 = 0, fp3 = __flp;
-	     fp3;
-	     ofp3 = fp3, fp3 = fp3->nx) {
-		if (fp3 == fp2 && fp3->sz + sizeof(size_t) >= incr) {
-			/* found something that fits */
-			if (fp3->sz + sizeof(size_t) - incr > sizeof(struct __freelist)) {
-				/* split off a new freelist entry */
-				cp = (char *)ptr + len;
-				fp2 = (struct __freelist *)cp;
-				fp2->nx = fp3->nx;
-				fp2->sz = fp3->sz - incr;
-				fp1->sz = len;
-			} else {
-				/* it just fits, so use it entirely */
-				fp1->sz += fp3->sz + sizeof(size_t);
-				fp2 = fp3->nx;
-			}
-			if (ofp3)
-				ofp3->nx = fp2;
-			else
-				__flp = fp2;
-			return ptr;
-		}
-		/*
-		 * Find the largest chunk on the freelist while
-		 * walking it.
-		 */
-		if (fp3->sz > s)
-			s = fp3->sz;
-	}
-	/*
-	 * If we are the topmost chunk in memory, and there was no
-	 * large enough chunk on the freelist that could be re-used
-	 * (by a call to malloc() below), quickly extend the
-	 * allocation area if possible, without need to copy the old
-	 * data.
-	 */
-	if (__brkval == (char *)ptr + fp1->sz && len > s) {
-		cp = (char *)ptr + len;
-		cp1 = STACK_POINTER() - __MALLOC_MARGIN__;
-		if (cp < cp1) {
-			__brkval = cp;
-			__brkval_maximum = cp;
-			fp1->sz = len;
-			return ptr;
-		}
-		/* If that failed, we are out of luck. */
-		return 0;
-	}
-
-	/*
-	 * Call malloc() for a new chunk, then copy over the data, and
-	 * release the old region.
-	 */
-	if ((memp = malloc(len)) == 0)
-		return 0;
-	memcpy(memp, ptr, fp1->sz);
-	free(ptr);
-	return memp;
 }
 
