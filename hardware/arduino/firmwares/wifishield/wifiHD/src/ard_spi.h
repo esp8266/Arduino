@@ -57,7 +57,7 @@ void set_result_cmd(int err) ;
 
 void set_result(wl_status_t _status);
 
-int initSpi(void);
+int initSpi(void* ctx);
 
 void initExtInt();
 

@@ -182,23 +182,26 @@ cmd_ibss(int argc, char* argv[], void* ctx)
 cmd_state_t 
 cmd_set_ip(int argc, char* argv[], void* ctx)
 {
-        struct net_cfg *ncfg = ctx;
+	struct ctx_server *hs = ctx;
+    struct net_cfg *ncfg = &(hs->net_cfg);
         struct ip_addr lwip_addr;
         struct netif *nif = ncfg->netif;
 
         if (argc == 2 && 
             (strncmp(argv[1], "none", 4) == 0)) {
-                ncfg->dhcp_enabled = 1;
+                ncfg->dhcp_enabled = DYNAMIC_IP_CONFIG;
                 
                 return CMD_DONE;
         }
         else if (argc != 4 ) {
-                printk("usage: ip <ip> <netmask> <gateway-ip>\n");
-                printk("  or : ip none (to enable DHCP)\n");
+                printk("usage: ipconfig <ip> <netmask> <gateway-ip>\n");
+                printk("  or : ipconfig none (to enable DHCP)\n");
                 return CMD_DONE;
         }
+
         /* IP address */
         lwip_addr = str2ip(argv[1]);
+        INFO_SPI("nif:%p lwip_addr=0x%x\n", nif, lwip_addr.addr);
         netif_set_ipaddr(nif, &lwip_addr);
         /* Netmask */
         lwip_addr = str2ip(argv[2]);
@@ -207,7 +210,7 @@ cmd_set_ip(int argc, char* argv[], void* ctx)
         lwip_addr = str2ip(argv[3]);
         netif_set_gw(nif, &lwip_addr);
         /* Disable DHCP */
-        ncfg->dhcp_enabled = 0;
+        ncfg->dhcp_enabled = STATIC_IP_CONFIG;
 
         return CMD_DONE;
 }
@@ -455,11 +458,15 @@ cmd_status(int argc, char* argv[], void* ctx)
         
         /* print ip address */
         if (netif_is_up(netif_default))
-                printk("ip addr: %s\n", ip2str(netif_default->ip_addr));
+		{
+                printk("ip addr: %s - ", ip2str(netif_default->ip_addr));
+				printk("netmask: %s - ", ip2str(netif_default->netmask));
+				printk("gateway: %s\n", ip2str(netif_default->gw));
+		}					
         else
                 printk("ip interface is down\n");
         printk("dhcp : ");
-        if (ncfg->dhcp_enabled) {
+        if (ncfg->dhcp_enabled == DYNAMIC_IP_CONFIG) {
                 printk("enabled\n");
         }
         else {
@@ -468,8 +475,8 @@ cmd_status(int argc, char* argv[], void* ctx)
         struct ip_addr addr1 = dns_getserver(0);
         struct ip_addr addr2 = dns_getserver(1);
 
-        printk("==> DNS1: %s\n", ip2str(addr1), addr1);
-        printk("==> DNS2: %s\n", ip2str(addr2), addr2);
+        printk("DNS: %s - ", ip2str(addr1));
+		printk("%s\n", ip2str(addr2));
 
         showTTCPstatus();
         return CMD_DONE;

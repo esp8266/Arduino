@@ -242,10 +242,11 @@
 #endif
 
 #define DUMP_TCP_STATE(TTCP) do {\
-		INFO_TCP("ttcp:%p tpcb:%p state:%d lpcb:%p state:%d left:%d sent:%d\n", \
-			TTCP, TTCP->tpcb[0], (TTCP->tpcb[0])?TTCP->tpcb[0]->state:0, \
+		int i = getCurrClientConnId(); \
+		INFO_TCP("%d] ttcp:%p tpcb:%p state:%d lpcb:%p state:%d left:%d sent:%d\n", \
+			i, TTCP, TTCP->tpcb[i], (TTCP->tpcb[i])?TTCP->tpcb[i]->state:0, \
 			TTCP->lpcb, (TTCP->lpcb)?TTCP->lpcb->state:0, \
-			(TTCP)?TTCP->left:0, (TTCP)?TTCP->buff_sent:0); \
+			(TTCP->tpcb[i])?TTCP->left[i]:0, (TTCP->tpcb[i])?TTCP->buff_sent[i]:0); \
 			} while(0);
 			
 #define Mode2Str(_Mode) ((_Mode==0)?"TRANSMIT":"RECEIVE")			

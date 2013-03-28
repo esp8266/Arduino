@@ -140,8 +140,13 @@ Y;	\
 #define WARN(msg, args...)			IF_DEBUG(WARN,WARN_DEBUG(msg, ##args))
 #define WARN_VER(msg, args...)		IF_DEBUG_VER(WARN,WARN_DEBUG(msg, ##args))
 #define WARN_POLL(msg, args...)		IF_DEBUG_POLL(WARN,WARN_DEBUG(msg, ##args))
+#if 0	// disable to reduce the size of binary
 #define INFO_INIT(msg, args...) 	IF_DEBUG(INIT,PRINT_DEBUG(msg, ##args))
 #define INFO_INIT_VER(msg, args...) IF_DEBUG_VER(INIT,PRINT_DEBUG(msg, ##args))
+#else
+#define INFO_INIT(msg, args...) 	
+#define INFO_INIT_VER(msg, args...) 
+#endif
 #define INFO_TCP(msg, args...) 		IF_DEBUG(TCP,PRINT_DEBUG(msg, ##args))
 #define INFO_TCP_VER(msg, args...) 	IF_DEBUG_VER(TCP,PRINT_DEBUG(msg, ##args))
 #define INFO_TCP_DUMP(msg, args...) IF_DEBUG_DUMP(TCP,PRINT_DEBUG(msg, ##args))

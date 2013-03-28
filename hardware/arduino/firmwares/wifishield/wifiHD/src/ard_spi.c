@@ -26,6 +26,7 @@
 #include <board_init.h>
 #include "util.h"
 #include "lwip/udp.h"
+#include "lwip_setup.h"
 
 extern const char* fwVersion;
 
@@ -94,7 +95,7 @@ bool end_write = false;	//TODO only for debug
 // Signal indicating a new command is coming from SPI interface
 static volatile Bool startRecvCmdSignal = FALSE;
 
-#define MAX_CMD_NUM 34
+#define MAX_CMD_NUM 36
 typedef struct sCmd_spi_list{
 	cmd_spi_cb_t cb;
 	char cmd_id;
@@ -534,6 +535,114 @@ int set_passphrase_cmd_cb(int numParam, char* buf, void* ctx) {
     	printk("OK\n");
     RETURN_ERR(err)
 }
+
+int set_ip_config_cmd_cb(int numParam, char* buf, void* ctx) {
+    struct ip_addr lwip_addr;
+    struct ctx_server *hs = ctx;
+    struct net_cfg *ncfg = &(hs->net_cfg);
+    struct netif *nif = ncfg->netif;
+    uint8_t parmsToChange=0;
+    const uint8_t MAX_IP_CONFIG_PARAMS = 3;
+
+	wl_err_t err = WL_SUCCESS;
+	tParam* params = (tParam*) buf;
+
+    if (params->paramLen == 1)
+	{
+		GET_PARAM_NEXT(BYTE, params, _parmsToChange);
+		parmsToChange = _parmsToChange;
+	}		
+    else
+    	RETURN_ERR(WL_FAILURE)
+
+    INFO_SPI("%p numParam=%d parmsToChange=%d\n", ctx, numParam, parmsToChange);
+
+    if (parmsToChange <= MAX_IP_CONFIG_PARAMS)
+    {
+		int i=0;
+    	for (; i<parmsToChange; ++i)
+    	{
+    	    if (params->paramLen == 4)
+    	    {
+				GET_PARAM_NEXT(LONG, params, _ip_addr);
+				lwip_addr.addr = _ip_addr;
+				INFO_SPI("%d] nif:%p lwip_addr=0x%x\n", i, nif, lwip_addr.addr);
+    	    	switch (i)
+    	    	{
+    	    		case 0:	// local_ip
+					{ 	    			
+    	    			netif_set_ipaddr(nif, &lwip_addr);
+    	    			break;
+					}								
+    	    		case 1:	// gateway
+					{
+    	    			netif_set_gw(nif, &lwip_addr);
+    	    			break;
+					}					
+    	    		case 2:	// subnet
+					{
+    	    			netif_set_netmask(nif, &lwip_addr);
+    	    			break;
+					}					
+    	    	}
+    	    }else{
+    	    	RETURN_ERR(WL_FAILURE)
+    	    }
+
+    	}
+    	/* Disable DHCP */
+    	ncfg->dhcp_enabled = STATIC_IP_CONFIG;
+    }else
+    	RETURN_ERR(WL_FAILURE)
+		
+    RETURN_ERR(err)
+}
+
+int set_dns_config_cmd_cb(int numParam, char* buf, void* ctx) {
+    struct ip_addr lwip_addr;
+    struct ctx_server *hs = ctx;
+    struct net_cfg *ncfg = &(hs->net_cfg);
+    struct netif *nif = ncfg->netif;
+    uint8_t parmsToChange=0;
+    const uint8_t MAX_DNS_CONFIG_PARAMS = 2;
+
+	wl_err_t err = WL_SUCCESS;
+	tParam* params = (tParam*) buf;
+
+    if (params->paramLen == 1)
+	{
+		GET_PARAM_NEXT(BYTE, params, _parmsToChange);
+		parmsToChange = _parmsToChange;
+	}		
+    else
+    	RETURN_ERR(WL_FAILURE)
+
+    INFO_SPI("%p numParam=%d parmsToChange=%d\n", ctx, numParam, parmsToChange);
+
+    if (parmsToChange <= MAX_DNS_CONFIG_PARAMS)
+    {
+		int i=0;
+    	for (; i<parmsToChange; ++i)
+    	{
+    	    if (params->paramLen == 4)
+    	    {
+				GET_PARAM_NEXT(LONG, params, _ip_addr);
+				lwip_addr.addr = _ip_addr;
+				INFO_SPI("%d] nif:%p lwip_addr=0x%x\n", i, nif, lwip_addr.addr);
+				dns_setserver(i, &lwip_addr);
+    	    }else{
+    	    	RETURN_ERR(WL_FAILURE)
+    	    }
+    	}
+    	/* Disable DHCP */
+    	ncfg->dhcp_enabled = STATIC_IP_CONFIG;
+    }else
+    	RETURN_ERR(WL_FAILURE)
+		
+    RETURN_ERR(err)
+}
+
+
 
 void set_result(wl_status_t _status)
 {
@@ -1402,12 +1511,12 @@ int call_reply_cb(char* recv, char* reply) {
                  {
                 	 tSpiMsg* spiMsg = (tSpiMsg*) recv;
                 	 _result = cmd_spi_list[i].cb(spiMsg->nParam,
-     					(char*) &(spiMsg->params[0]), NULL);
+     					(char*) &(spiMsg->params[0]), cmd_spi_list[i].ctx);
            		 }else
            		 {
            			tSpiMsgData* spiMsg = (tSpiMsgData*) recv;
                    	 _result = cmd_spi_list[i].cb(spiMsg->nParam,
-         					(char*) &(spiMsg->params[0]), NULL);
+         					(char*) &(spiMsg->params[0]), cmd_spi_list[i].ctx);
            		 }
 
                  if (_result != WIFI_SPI_ACK)
@@ -1452,10 +1561,12 @@ int call_reply_cb(char* recv, char* reply) {
 	return REPLY_NO_ERR;
 }
 
-void init_spi_cmds() {
+void init_spi_cmds(void* ctx) {
 	spi_add_cmd(SET_NET_CMD, set_net_cmd_cb, ack_reply_cb, NULL, CMD_SET_FLAG);
 	spi_add_cmd(SET_PASSPHRASE_CMD, set_passphrase_cmd_cb, ack_reply_cb, NULL, CMD_SET_FLAG);
 	spi_add_cmd(SET_KEY_CMD, set_key_cmd_cb, ack_reply_cb, NULL, CMD_SET_FLAG);
+	spi_add_cmd(SET_IP_CONFIG_CMD, set_ip_config_cmd_cb, ack_reply_cb, ctx, CMD_SET_FLAG);
+	spi_add_cmd(SET_DNS_CONFIG_CMD, set_dns_config_cmd_cb, ack_reply_cb, ctx, CMD_SET_FLAG);
 	spi_add_cmd(GET_CONN_STATUS_CMD, get_result_cmd_cb, get_reply_cb, NULL, CMD_GET_FLAG);
 	spi_add_cmd(GET_IPADDR_CMD, ack_cmd_cb, get_reply_ipaddr_cb, NULL, CMD_GET_FLAG);
 	spi_add_cmd(GET_MACADDR_CMD, ack_cmd_cb, get_reply_mac_cb, NULL, CMD_GET_FLAG);
@@ -1673,7 +1784,7 @@ inline int spi_slaveReceiveInt(volatile avr32_spi_t *spi)
 		{
 			int8_t numParams = 0;
 			int idx = PARAM_LEN_POS+1;
-			bool islen16bit = _receiveBuffer[CMD_POS] & DATA_FLAG;
+			bool islen16bit = ((_receiveBuffer[CMD_POS] & DATA_FLAG) == DATA_FLAG);
 			if (index >= idx)
 			{
 				numParams = _receiveBuffer[PARAM_LEN_POS];					
@@ -1690,6 +1801,10 @@ inline int spi_slaveReceiveInt(volatile avr32_spi_t *spi)
 			}
 			if (!endOfFrame){
 				WARN("Wrong termination index:%d nParam:%d idx:%d 16bit:%d\n", index, numParams, idx, islen16bit);
+				#ifdef _DEBUG_
+					dump((char*)_receiveBuffer, receivedChars); 
+					while(0);
+				#endif
 			}		
 		}
 	} while (!endOfFrame);
@@ -1786,7 +1901,7 @@ void initExtInt()
 	  Enable_global_interrupt();
 }
 
-int initSpi()
+int initSpi(void* ctx)
 {
 	volatile avr32_spi_t *spi = &AVR32_SPI0;
 	gpio_map_t spi_piomap = {          \
@@ -1838,7 +1953,7 @@ int initSpi()
 #ifdef _SPI_STATS_
 	initStatSpi();
 #endif
-	init_spi_cmds();
+	init_spi_cmds(ctx);
 
 	memset(_receiveBuffer, 0, sizeof(_receiveBuffer));
 	memset(buf, 0, sizeof(buf));
