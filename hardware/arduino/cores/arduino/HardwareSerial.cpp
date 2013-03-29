@@ -104,7 +104,8 @@ inline void store_char(unsigned char c, ring_buffer *buffer)
 #if !defined(USART0_RX_vect) && defined(USART1_RX_vect)
 // do nothing - on the 32u4 the first USART is USART1
 #else
-#if !defined(USART_RX_vect) && !defined(USART0_RX_vect)
+#if !defined(USART_RX_vect) && !defined(USART0_RX_vect) && \
+    !defined(USART_RXC_vect)
   #error "Don't know what the Data Received vector is called for the first UART"
 #else
   void serialEvent() __attribute__((weak));
@@ -114,6 +115,8 @@ inline void store_char(unsigned char c, ring_buffer *buffer)
   ISR(USART_RX_vect)
 #elif defined(USART0_RX_vect)
   ISR(USART0_RX_vect)
+#elif defined(USART_RXC_vect)
+  ISR(USART_RXC_vect) // ATmega8
 #endif
   {
   #if defined(UDR0)
