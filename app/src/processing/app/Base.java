@@ -42,9 +42,9 @@ import static processing.app.I18n._;
  * files and images, etc) that comes from that.
  */
 public class Base {
-  public static final int REVISION = 104;
+  public static final int REVISION = 105;
   /** This might be replaced by main() if there's a lib/version.txt file. */
-  static String VERSION_NAME = "0104";
+  static String VERSION_NAME = "0105";
   /** Set true if this a proper release rather than a numbered revision. */
   static public boolean RELEASE = false;
 
