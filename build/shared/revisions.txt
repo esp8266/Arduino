@@ -3,7 +3,9 @@ ARDUINO 1.0.5
 
 [core]
 
-* malloc bug: backported avr-libc 1.8.0 implementation
+* [avr] malloc bug: backported avr-libc 1.8.0 implementation
+* [avr] removed deprecated interrupt handlers causing compiler issues 
+  with newer avr-gcc.
 
 [libraries]
 
