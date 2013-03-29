@@ -52,7 +52,7 @@
  
 /* May be changed by the user only before the first malloc() call.  */
 
-size_t __malloc_margin = 32;
+size_t __malloc_margin = 128;
 char *__malloc_heap_start = &__heap_start;
 char *__malloc_heap_end = &__heap_end;
 
