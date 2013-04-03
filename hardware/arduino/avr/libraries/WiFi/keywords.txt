@@ -18,6 +18,8 @@ status	KEYWORD2
 connect	KEYWORD2
 write	KEYWORD2
 available	KEYWORD2
+config	KEYWORD2
+setDNS	KEYWORD2
 read	KEYWORD2
 flush	KEYWORD2
 stop	KEYWORD2
@@ -36,6 +38,12 @@ getResult	KEYWORD2
 getSocket	KEYWORD2
 WiFiClient	KEYWORD2
 WiFiServer	KEYWORD2
+WiFiUDP		KEYWORD2
+beginPacket	KEYWORD2
+endPacket	KEYWORD2
+parsePacket	KEYWORD2
+remoteIP	KEYWORD2
+remotePort	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)

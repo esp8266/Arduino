@@ -42,9 +42,9 @@ volatile unsigned long timer0_millis = 0;
 static unsigned char timer0_fract = 0;
 
 #if defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
-SIGNAL(TIM0_OVF_vect)
+ISR(TIM0_OVF_vect)
 #else
-SIGNAL(TIMER0_OVF_vect)
+ISR(TIMER0_OVF_vect)
 #endif
 {
 	// copy these to local variables so they can be stored in registers

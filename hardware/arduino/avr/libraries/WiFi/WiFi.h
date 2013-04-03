@@ -59,6 +59,50 @@ public:
      */
     int begin(char* ssid, const char *passphrase);
 
+    /* Change Ip configuration settings disabling the dhcp client
+        *
+        * param local_ip: 	Static ip configuration
+        */
+    void config(IPAddress local_ip);
+
+    /* Change Ip configuration settings disabling the dhcp client
+        *
+        * param local_ip: 	Static ip configuration
+	* param dns_server:     IP configuration for DNS server 1
+        */
+    void config(IPAddress local_ip, IPAddress dns_server);
+
+    /* Change Ip configuration settings disabling the dhcp client
+        *
+        * param local_ip: 	Static ip configuration
+	* param dns_server:     IP configuration for DNS server 1
+        * param gateway : 	Static gateway configuration
+        */
+    void config(IPAddress local_ip, IPAddress dns_server, IPAddress gateway);
+
+    /* Change Ip configuration settings disabling the dhcp client
+        *
+        * param local_ip: 	Static ip configuration
+	* param dns_server:     IP configuration for DNS server 1
+        * param gateway: 	Static gateway configuration
+        * param subnet:		Static Subnet mask
+        */
+    void config(IPAddress local_ip, IPAddress dns_server, IPAddress gateway, IPAddress subnet);
+
+    /* Change DNS Ip configuration
+     *
+     * param dns_server1: ip configuration for DNS server 1
+     */
+    void setDNS(IPAddress dns_server1);
+
+    /* Change DNS Ip configuration
+     *
+     * param dns_server1: ip configuration for DNS server 1
+     * param dns_server2: ip configuration for DNS server 2
+     *
+     */
+    void setDNS(IPAddress dns_server1, IPAddress dns_server2);
+
     /*
      * Disconnect from the network
      *

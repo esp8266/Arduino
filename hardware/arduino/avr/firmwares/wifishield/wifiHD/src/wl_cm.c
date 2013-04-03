@@ -59,15 +59,9 @@
  */
 #define ROAMING_RSSI_DIFF 10
 
-
-#if 1
 # include "printf-stdarg.h"
 #include "ard_utils.h"
-# define CM_DPRINTF(fmt...) if (enableDebug & INFO_CM_FLAG) printk(fmt)
-#else
-# define CM_DPRINTF(fmt...)
-#endif
-
+#include "debug.h"
 
 /** \defgroup wl_cm Connection Manager
  *

@@ -93,6 +93,7 @@
 #define LED1_GPIO   AVR32_PIN_PB20
 #define LED2_GPIO   AVR32_PIN_PB21
 #define DEB_PIN_GPIO AVR32_PIN_PA20
+#define DEB2_PIN_GPIO AVR32_PIN_PB00
 //! @}
 
 /*! \name PWM Channels of LEDs

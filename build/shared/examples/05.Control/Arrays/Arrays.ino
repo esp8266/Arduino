@@ -27,7 +27,6 @@ int ledPins[] = {
 int pinCount = 6;           // the number of pins (i.e. the length of the array)
 
 void setup() {
-  int thisPin;
   // the array elements are numbered from 0 to (pinCount - 1).
   // use a for loop to initialize each pin as an output:
   for (int thisPin = 0; thisPin < pinCount; thisPin++)  {

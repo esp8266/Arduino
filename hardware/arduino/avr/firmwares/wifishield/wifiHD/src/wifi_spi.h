@@ -24,12 +24,16 @@
 #define START_CMD   0xE0
 #define END_CMD     0xEE
 #define ERR_CMD   	0xEF
+#define CMD_POS			1		// Position of Command OpCode on SPI stream
+#define PARAM_LEN_POS	2		// Position of Param len on SPI stream
   
 enum {
 	SET_NET_CMD 		= 0x10,
 	SET_PASSPHRASE_CMD	= 0x11,
 	SET_KEY_CMD	        = 0x12,
 	TEST_CMD	        = 0x13,
+	SET_IP_CONFIG_CMD	= 0x14,
+	SET_DNS_CONFIG_CMD  = 0x15,
 
 	GET_CONN_STATUS_CMD	= 0x20,
 	GET_IPADDR_CMD		= 0x21,
@@ -56,11 +60,14 @@ enum {
 	START_SCAN_NETWORKS	= 0x36,
 	GET_FW_VERSION_CMD	= 0x37,
 	GET_TEST_CMD		= 0x38,
+	SEND_DATA_UDP_CMD	= 0x39,
+	GET_REMOTE_DATA_CMD = 0x3A,
 
     // All command with DATA_FLAG 0x40 send a 16bit Len
 
 	SEND_DATA_TCP_CMD		= 0x44,
     GET_DATABUF_TCP_CMD		= 0x45,
+    INSERT_DATABUF_CMD		= 0x46,
 
 };
 
@@ -150,3 +157,4 @@ typedef struct  __attribute__((__packed__))
 }tByteParam;
 
 #endif
+uint8_t param;

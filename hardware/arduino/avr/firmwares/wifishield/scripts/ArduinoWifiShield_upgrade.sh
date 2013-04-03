@@ -1,7 +1,10 @@
 #!/bin/sh
 
-WIFI_FW_PATH="/hardware/arduino/firmwares/wifi-shield"
+WIFI_FW_PATH="/hardware/arduino/firmwares/wifishield/binary"
 AVR_TOOLS_PATH="/hardware/tools/avr/bin"
+
+TARGET_MICRO="at32uc3a1256"
+
 
 progname=$0
 
@@ -20,28 +23,49 @@ EOF
 upgradeHDmodule () {
   sleep 1 # Give time to the shield to end the boot
   echo "****Upgrade HD WiFi module firmware****\n"
-  dfu-programmer at32uc3a1256 erase
-  dfu-programmer at32uc3a1256 flash --suppress-bootloader-mem $WIFI_FW_PATH/wifi_dnld.hex
-  dfu-programmer at32uc3a1256 start
-  echo -n "\nRemove the J3 jumper then press the RESET button on the shield then type [ENTER] to upgrade the firmware of the shield..\n"
+  dfu-programmer $TARGET_MICRO erase 
+  dfu-programmer $TARGET_MICRO flash --suppress-bootloader-mem $WIFI_FW_PATH/wifi_dnld.hex
+  dfu-programmer $TARGET_MICRO start
+  
+  if [ $? != 0 ] ; then 
+  echo "\nError during device initialization, please close the J3 jumper and press the reset button.\nTry -h for help\n"
+  exit 1 # if the device is not recognized exit 
+  fi
+
+  echo -n "\nPress the RESET button on the shield then type [ENTER] to upgrade the firmware of the shield..\n"
   read readEnter
 }
 
 upgradeShield () {
   sleep 1 # Give time to the shield to end the boot
   echo "****Upgrade WiFi Shield firmware****\n"
-  dfu-programmer at32uc3a1256 erase
-  dfu-programmer at32uc3a1256 flash --suppress-bootloader-mem $WIFI_FW_PATH/wifiHD.hex
-  dfu-programmer at32uc3a1256 start 
+  dfu-programmer $TARGET_MICRO erase
+  dfu-programmer $TARGET_MICRO flash --suppress-bootloader-mem $WIFI_FW_PATH/wifiHD.hex
+  dfu-programmer $TARGET_MICRO start 
+
+  if [ $? != 0 ] ;  then 
+  echo "\nError during device initialization, please close the J3 jumper and press the reset button.\nTry -h for help\n"
+  exit 1 # if the device is not recognized exit 
+  fi
+
   echo "\nDone. Remove the J3 jumper and press the RESET button on the shield."
   echo "Thank you!\n"
 }
+
 
 cat <<EOF
 
        Arduino WiFi Shield upgrade
 =========================================
-Disclaimer: to access to the USB devices correctly, the dfu-programmer needs to be used as root. Run this script as root.
+Instructions:
+
+To access to the USB devices correctly, the dfu-programmer needs to have the root permissions.
+
+You can upgrade the firmware of the antenna togheter with the shield firmware or only the shield firmware
+if there aren't changes on the antenna firmware.
+
+Use the '-h' parameter for help
+=========================================
 
 EOF
 
@@ -90,7 +114,7 @@ if [ $USER = 'root' ] ; then  #check if the current user is root
 	esac
   done
 else
-  echo "You are not root!\n"
+  echo "Please retry running the script as root.\n"
 fi
 
 shift $(($OPTIND - 1))
