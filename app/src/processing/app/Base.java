@@ -28,6 +28,7 @@ import java.io.*;
 import java.util.*;
 import java.util.List;
 
+import javax.jmdns.ServiceEvent;
 import javax.swing.*;
 
 import processing.app.debug.TargetBoard;
@@ -42,6 +43,8 @@ import processing.app.javax.swing.filechooser.FileNameExtensionFilter;
 import processing.app.packages.Library;
 import processing.app.packages.LibraryList;
 import processing.app.tools.ZipDeflater;
+import processing.app.zeroconf.BoardListener;
+import processing.app.zeroconf.Discovery;
 import processing.core.*;
 import static processing.app.I18n._;
 
@@ -113,6 +116,7 @@ public class Base {
 //  int editorCount;
   List<Editor> editors = Collections.synchronizedList(new ArrayList<Editor>());
   Editor activeEditor;
+  final Map<String, Map<String, Object>> boardsViaNetwork;
 
   static File portableFolder = null;
   static final String portableSketchbookFolder = "sketchbook";
@@ -253,6 +257,8 @@ public class Base {
   public Base(String[] args) throws Exception {
     platform.init(this);
 
+    this.boardsViaNetwork = new HashMap<String, Map<String, Object>>();
+
     // Get the sketchbook path, and make sure it's set properly
     String sketchbookPath = Preferences.get("sketchbook.path");
 
@@ -353,21 +359,21 @@ public class Base {
         System.out.println(_("Can't open source sketch!"));
         System.exit(2);
       }
-      
+
       // Set verbosity for command line build
       Preferences.set("build.verbose", "" + doVerbose);
       Preferences.set("upload.verbose", "" + doVerbose);
 
       Editor editor = editors.get(0);
-      
+
       // Wait until editor is initialized
       while (!editor.status.isInitialized())
         Thread.sleep(10);
-      
+
       // Do board selection if requested
       if (selectBoard != null)
         selectBoard(selectBoard, editor);
-      
+
       if (doUpload) {
         // Build and upload
         if (selectPort != null)
@@ -377,12 +383,12 @@ public class Base {
         // Build only
         editor.runHandler.run();
       }
-      
+
       // Error during build or upload
       int res = editor.status.mode;
       if (res == EditorStatus.ERR)
         System.exit(1);
-      
+
       // No errors exit gracefully
       System.exit(0);
     }
@@ -400,6 +406,21 @@ public class Base {
     if (Preferences.getBoolean("update.check")) {
       new UpdateCheck(this);
     }
+
+    new Discovery(new BoardListener() {
+      @Override
+      public void boardOffline(ServiceEvent serviceEvent) {
+        Base.this.boardsViaNetwork.remove(serviceEvent.getName());
+      }
+
+      @Override
+      public void boardOnline(ServiceEvent serviceEvent) {
+        Map<String, Object> board = new HashMap<String, Object>();
+        board.put("addresses", serviceEvent.getInfo().getInet4Addresses());
+        board.put("type", serviceEvent.getType());
+        Base.this.boardsViaNetwork.put(serviceEvent.getName(), board);
+      }
+    });
   }
 
 
@@ -1180,7 +1201,7 @@ public class Base {
     TargetPlatform targetPlatform = getTargetPlatform();
     if (targetPlatform == null)
       return;
-    
+
     // Calculate paths for libraries and examples
     examplesFolder = getContentFile("examples");
     toolsFolder = getContentFile("tools");
@@ -1201,7 +1222,7 @@ public class Base {
     }
     String currentArch = Base.getTargetPlatform().getId();
     libraries = libraries.filterByArchitecture(currentArch);
-    
+
     // Populate importToLibraryTable
     importToLibraryTable = new HashMap<String, Library>();
     for (Library lib : libraries) {
@@ -1491,7 +1512,7 @@ public class Base {
                                 final boolean replaceExisting) throws IOException {
     if (folder == null)
       return false;
-    
+
     // skip .DS_Store files, etc (this shouldn't actually be necessary)
     if (!folder.isDirectory()) return false;
 
@@ -1613,7 +1634,7 @@ public class Base {
         }
       };
       action.putValue("library", lib);
-      
+
       // Add new element at the bottom
       JMenuItem item = new JMenuItem(action);
       item.putClientProperty("library", lib);
