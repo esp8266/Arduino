@@ -218,7 +218,7 @@ public class Preferences {
   // data model
 
   static Hashtable defaults;
-  static Hashtable table = new Hashtable();;
+  static Hashtable table = new Hashtable();
   static File preferencesFile;
 
 

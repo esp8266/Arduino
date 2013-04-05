@@ -23,11 +23,8 @@
 
 package processing.app;
 
-import processing.app.debug.BasicUploader;
+import processing.app.debug.*;
 import processing.app.debug.Compiler;
-import processing.app.debug.RunnerException;
-import processing.app.debug.Sizer;
-import processing.app.debug.Uploader;
 import processing.app.helpers.PreferencesMap;
 import processing.app.packages.Library;
 import processing.app.packages.LibraryList;
@@ -1659,22 +1656,19 @@ public class Sketch {
 	  System.out.println(_("Low memory available, stability problems may occur"));
   }
 
-  protected String upload(String buildPath, String suggestedClassName, boolean usingProgrammer)
-    throws RunnerException, SerialException {
+  protected String upload(String buildPath, String suggestedClassName, boolean usingProgrammer) throws RunnerException, SerialException {
 
-    Uploader uploader;
+    TargetPlatform target = Base.getTargetPlatform();
+    String board = Preferences.get("board");
 
-    // download the program
-    //
-    uploader = new BasicUploader();
-    boolean success = uploader.uploadUsingPreferences(buildPath,
-                                                      suggestedClassName,
-                                                      usingProgrammer);
+    Uploader uploader = new UploaderFactory().newUploader(target.getBoards().get(board));
+
+    boolean success = uploader.uploadUsingPreferences(buildPath, suggestedClassName, usingProgrammer);
 
     return success ? suggestedClassName : null;
   }
 
-  
+
   public boolean exportApplicationPrompt() throws IOException, RunnerException {
     return false;
   }
