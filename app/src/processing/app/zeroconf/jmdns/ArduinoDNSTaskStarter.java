@@ -18,6 +18,7 @@ public class ArduinoDNSTaskStarter implements DNSTaskStarter.Factory.ClassDelega
 
       public void purgeTimer() {
         delegate.purgeTimer();
+        timer.purge();
       }
 
       public void purgeStateTimer() {

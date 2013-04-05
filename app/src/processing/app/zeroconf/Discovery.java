@@ -2,10 +2,7 @@ package processing.app.zeroconf;
 
 import processing.app.zeroconf.jmdns.ArduinoDNSTaskStarter;
 
-import javax.jmdns.JmDNS;
-import javax.jmdns.NetworkTopologyDiscovery;
-import javax.jmdns.ServiceEvent;
-import javax.jmdns.ServiceListener;
+import javax.jmdns.*;
 import javax.jmdns.impl.DNSTaskStarter;
 import java.io.IOException;
 import java.net.InetAddress;

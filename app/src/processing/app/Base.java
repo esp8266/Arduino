@@ -27,6 +27,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.jmdns.ServiceEvent;
 import javax.swing.*;
@@ -116,7 +117,7 @@ public class Base {
 //  int editorCount;
   List<Editor> editors = Collections.synchronizedList(new ArrayList<Editor>());
   Editor activeEditor;
-  final Map<String, Map<String, Object>> boardsViaNetwork;
+  private final Map<String, Map<String, Object>> boardsViaNetwork;
 
   static File portableFolder = null;
   static final String portableSketchbookFolder = "sketchbook";
@@ -257,7 +258,7 @@ public class Base {
   public Base(String[] args) throws Exception {
     platform.init(this);
 
-    this.boardsViaNetwork = new HashMap<String, Map<String, Object>>();
+    this.boardsViaNetwork = new ConcurrentHashMap<String, Map<String, Object>>();
 
     // Get the sketchbook path, and make sure it's set properly
     String sketchbookPath = Preferences.get("sketchbook.path");
@@ -423,6 +424,9 @@ public class Base {
     });
   }
 
+  public Map<String, Map<String, Object>> getBoardsViaNetwork() {
+    return new HashMap<String, Map<String, Object>>(boardsViaNetwork);
+  }
 
   /**
    * Post-constructor setup for the editor area. Loads the last
