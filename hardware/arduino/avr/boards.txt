@@ -4,6 +4,28 @@ menu.cpu=Processor
 
 ##############################################################
 
+dogstick.name=Arduino Dogstick
+dogstick.upload.tool=avrdude
+dogstick.upload.protocol=arduino
+dogstick.upload.maximum_size=32256
+dogstick.upload.speed=115200
+
+dogstick.bootloader.tool=avrdude
+dogstick.bootloader.low_fuses=0xFF
+dogstick.bootloader.high_fuses=0xDE
+dogstick.bootloader.extended_fuses=0x05
+dogstick.bootloader.unlock_bits=0x3F
+dogstick.bootloader.lock_bits=0x0F
+dogstick.bootloader.file=optiboot/optiboot_atmega328.hex
+
+dogstick.build.mcu=atmega328p
+dogstick.build.f_cpu=16000000L
+dogstick.build.board=ARDUINO_UNO
+dogstick.build.core=arduino
+dogstick.build.variant=standard
+
+##############################################################
+
 uno.name=Arduino Uno
 uno.vid.0=2341
 uno.pid.0=0043
