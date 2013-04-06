@@ -1,5 +1,5 @@
 
-ARDUINO 1.0.5 - 2013.03.29
+ARDUINO 1.0.5 - 2013.04.08
 
 [core]
 
@@ -14,6 +14,10 @@ ARDUINO 1.0.5 - 2013.03.29
 [firmwares]
 
 * Upgrades to WiFi firmwares
+
+[ide]
+
+* Backport from 1.5: install Library from file
 
 ARDUINO 1.0.4 - 2013.03.11
 

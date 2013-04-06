@@ -943,10 +943,20 @@ public class Base {
   }
 
 
-  public void rebuildImportMenu(JMenu importMenu) {
-    //System.out.println("rebuilding import menu");
+  public void rebuildImportMenu(JMenu importMenu, final Editor editor) {
     importMenu.removeAll();
-
+    
+    JMenuItem addLibraryMenuItem = new JMenuItem(_("Add Library..."));
+    addLibraryMenuItem.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        Base.this.handleAddZipLibrary(editor);
+        Base.this.onBoardOrPortChange();
+        Base.this.rebuildImportMenu(Editor.importMenu, editor);
+      }
+    });
+    importMenu.add(addLibraryMenuItem);
+    importMenu.addSeparator();
+    
     // reset the set of libraries
     libraries = new HashSet<File>();
 
@@ -998,7 +1008,7 @@ public class Base {
   }
 
   
-  public void rebuildBoardsMenu(JMenu menu) {
+  public void rebuildBoardsMenu(JMenu menu, final Editor editor) {
     //System.out.println("rebuilding boards menu");
     menu.removeAll();      
     ButtonGroup group = new ButtonGroup();
