@@ -177,7 +177,7 @@ public class Editor extends JFrame implements RunnerListener {
           // re-add the sub-menus that are shared by all windows
           fileMenu.insert(sketchbookMenu, 2);
           fileMenu.insert(examplesMenu, 3);
-          sketchMenu.insert(importMenu, 4);
+          //sketchMenu.insert(importMenu, 4);
           toolsMenu.insert(boardsMenu, numTools);
           toolsMenu.insert(serialMenu, numTools + 1);
         }
@@ -188,7 +188,7 @@ public class Editor extends JFrame implements RunnerListener {
 //          System.err.println("deactivate");  // not coming through
           fileMenu.remove(sketchbookMenu);
           fileMenu.remove(examplesMenu);
-          sketchMenu.remove(importMenu);
+          //sketchMenu.remove(importMenu);
           toolsMenu.remove(boardsMenu);
           toolsMenu.remove(serialMenu);
         }
@@ -630,6 +630,16 @@ public class Editor extends JFrame implements RunnerListener {
       base.rebuildImportMenu(importMenu);
     }
     sketchMenu.add(importMenu);
+
+    item = new JMenuItem(_("Add Library from ZIP"));
+    item.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        base.handleAddZipLibrary(Editor.this);
+        base.onBoardOrPortChange();
+        base.rebuildImportMenu(Editor.importMenu);
+      }
+    });
+    sketchMenu.add(item);
 
     item = newJMenuItem(_("Show Sketch Folder"), 'K');
     item.addActionListener(new ActionListener() {
