@@ -216,7 +216,7 @@ msgstr "Couper"
 
 #: Editor.java:1143 Editor.java:2660
 msgid "Copy"
-msgstr "Coller"
+msgstr "Copier"
 
 #: Editor.java:1151 Editor.java:2668
 msgid "Copy for Forum"
