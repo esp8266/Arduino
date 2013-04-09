@@ -74,6 +74,9 @@ void setup()
     client.print(path);
     client.println(" HTTP/1.0");
     client.println();
+    client.print("HOST: ");
+    client.println(server);
+    client.println();
   } 
   else
   {
