@@ -1,15 +1,14 @@
 package processing.app.debug;
 
-import processing.app.Base;
-import processing.app.Preferences;
-import processing.app.helpers.Maps;
-
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class UploaderFactory {
 
-  public Uploader newUploader(Map<String, String> preferences) {
-    if ("http".equals(preferences.get("upload.tool"))) {
+  private static final Pattern IPV4_ADDRESS = Pattern.compile("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}");
+
+  public Uploader newUploader(Map<String, String> preferences, String port) {
+    if ("true".equals(preferences.get("upload.via_http")) && IPV4_ADDRESS.matcher(port).find()) {
       return new HttpUploader();
     }
 

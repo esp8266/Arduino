@@ -1661,7 +1661,7 @@ public class Sketch {
     TargetPlatform target = Base.getTargetPlatform();
     String board = Preferences.get("board");
 
-    Uploader uploader = new UploaderFactory().newUploader(target.getBoards().get(board));
+    Uploader uploader = new UploaderFactory().newUploader(target.getBoards().get(board), Preferences.get("serial.port"));
 
     boolean success = uploader.uploadUsingPreferences(buildPath, suggestedClassName, usingProgrammer);
 

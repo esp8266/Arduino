@@ -13,17 +13,24 @@ public class UploaderFactoryTest extends AbstractWithPreferencesTest {
   @Test
   public void shouldCreateAnInstanceOfHttpUploader() throws Exception {
     Map<String, String> prefs = new HashMap<String, String>();
-    prefs.put("upload.tool", "http");
-    Uploader uploader = new UploaderFactory().newUploader(prefs);
+    prefs.put("upload.via_http", "true");
+    Uploader uploader = new UploaderFactory().newUploader(prefs, "192.168.0.1 (mydogstick)");
 
     assertTrue(uploader instanceof HttpUploader);
   }
 
   @Test
-  public void shouldCreateAnInstanceOfBasicUploader() throws Exception {
+  public void shouldCreateAnInstanceOfBasicUploaderWhenHTTPIsUnsupported() throws Exception {
     Map<String, String> prefs = new HashMap<String, String>();
-    prefs.put("upload.tool", "whatever");
-    Uploader uploader = new UploaderFactory().newUploader(prefs);
+    Uploader uploader = new UploaderFactory().newUploader(prefs, "192.168.0.1 (mydogstick)");
+
+    assertTrue(uploader instanceof BasicUploader);
+  }
+
+  @Test
+  public void shouldCreateAnInstanceOfBasicUploaderWhenPortIsSerial() throws Exception {
+    Map<String, String> prefs = new HashMap<String, String>();
+    Uploader uploader = new UploaderFactory().newUploader(prefs, "/dev/ttyACM0 (Arduino Leonardo)");
 
     assertTrue(uploader instanceof BasicUploader);
   }
