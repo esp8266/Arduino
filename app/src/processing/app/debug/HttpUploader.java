@@ -6,6 +6,7 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
+import processing.app.Preferences;
 import processing.app.SerialException;
 
 import java.io.File;
@@ -32,6 +33,14 @@ public class HttpUploader extends Uploader {
     this.ipAddress = matcher.group(1);
   }
 
+  public boolean requiresAuthorization() {
+    return true;
+  }
+
+  public String getAuthorizationKey() {
+    return "pwd." + ipAddress;
+  }
+
   @Override
   public boolean uploadUsingPreferences(String buildPath, String className, boolean usingProgrammer) throws RunnerException, SerialException {
     if (usingProgrammer) {
@@ -41,13 +50,14 @@ public class HttpUploader extends Uploader {
 
     FilePart filePart;
     try {
-      filePart = new FilePart("sketch.hex", new File(buildPath, className + ".hex"));
+      filePart = new FilePart("sketch", new File(buildPath, className + ".hex"));
     } catch (FileNotFoundException e) {
       throw new RunnerException(e);
     }
 
     Part[] parts = {filePart};
     PostMethod post = newPostMethod();
+    post.setRequestHeader("Cookie", "pwd=" + Preferences.get(getAuthorizationKey()));
     post.setRequestEntity(new MultipartRequestEntity(parts, post.getParams()));
 
     int statusCode;
@@ -58,7 +68,6 @@ public class HttpUploader extends Uploader {
     }
 
     if (statusCode == HttpStatus.SC_OK) {
-      System.out.println(_("Sketch uploaded"));
       return true;
     }
 
@@ -71,7 +80,7 @@ public class HttpUploader extends Uploader {
   }
 
   protected PostMethod newPostMethod() {
-    return new PostMethod("http://" + ipAddress + ":8000/upload");
+    return new PostMethod("http://" + ipAddress + ":6571/upload");
   }
 
   @Override

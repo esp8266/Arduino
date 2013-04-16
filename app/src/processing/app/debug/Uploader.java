@@ -48,14 +48,22 @@ public abstract class Uploader implements MessageConsumer  {
 
   static InputStream serialInput;
   static OutputStream serialOutput;
-  
+
   boolean verbose;
 
   public abstract boolean uploadUsingPreferences(String buildPath, String className, boolean usingProgrammer)
     throws RunnerException, SerialException;
-  
+
   public abstract boolean burnBootloader() throws RunnerException;
-  
+
+  public boolean requiresAuthorization() {
+    return false;
+  }
+
+  public String getAuthorizationKey() {
+    return null;
+  }
+
   protected void flushSerialBuffer() throws RunnerException, SerialException {
     // Cleanup the serial buffer
     try {
@@ -76,7 +84,7 @@ public abstract class Uploader implements MessageConsumer  {
 
       serialPort.setDTR(true);
       serialPort.setRTS(true);
-      
+
       serialPort.dispose();
     } catch (SerialNotFoundException e) {
       throw e;
@@ -93,14 +101,14 @@ public abstract class Uploader implements MessageConsumer  {
     return executeUploadCommand(commandArray);
   }
 
-  protected boolean executeUploadCommand(String commandArray[]) 
+  protected boolean executeUploadCommand(String commandArray[])
     throws RunnerException
   {
     firstErrorFound = false;  // haven't found any errors yet
     secondErrorFound = false;
     notFoundError = false;
     int result=0; // pre-initialized to quiet a bogus warning from jikes
-    
+
     try {
       if (verbose || Preferences.getBoolean("upload.verbose")) {
         for(int i = 0; i < commandArray.length; i++) {
@@ -122,10 +130,10 @@ public abstract class Uploader implements MessageConsumer  {
           compiling = false;
         } catch (InterruptedException intExc) {
         }
-      } 
+      }
       if(exception!=null) {
         exception.hideStackTrace();
-        throw exception;   
+        throw exception;
       }
       if(result!=0)
         return false;
@@ -171,16 +179,16 @@ public abstract class Uploader implements MessageConsumer  {
 
   public void message(String s) {
   	// selectively suppress a bunch of avrdude output for AVR109/Caterina that should already be quelled but isn't
-	if (!Preferences.getBoolean("upload.verbose") && ( 
+	if (!Preferences.getBoolean("upload.verbose") && (
 		s.indexOf("Connecting to programmer:") != -1 ||
 		s.indexOf("Found programmer: Id = \"CATERIN\"; type = S") != -1 ||
 		s.indexOf("Software Version = 1.0; No Hardware Version given.") != -1 ||
 		s.indexOf("Programmer supports auto addr increment.") != -1 ||
-		s.indexOf("Programmer supports buffered memory access with buffersize=128 bytes.") != -1 || 
-		s.indexOf("Programmer supports the following devices:") != -1 || 
+		s.indexOf("Programmer supports buffered memory access with buffersize=128 bytes.") != -1 ||
+		s.indexOf("Programmer supports the following devices:") != -1 ||
 		s.indexOf("Device code: 0x44") != -1))
-		s = "";	
-    
+		s = "";
+
     System.err.print(s);
 
     // ignore cautions

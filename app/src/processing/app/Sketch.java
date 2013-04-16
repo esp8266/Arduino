@@ -23,8 +23,10 @@
 
 package processing.app;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import processing.app.debug.*;
 import processing.app.debug.Compiler;
+import processing.app.forms.PasswordAuthorizationDialog;
 import processing.app.helpers.PreferencesMap;
 import processing.app.packages.Library;
 import processing.app.packages.LibraryList;
@@ -1598,9 +1600,9 @@ public class Sketch {
 //    }
 
     editor.status.progressNotice(_("Uploading..."));
-    upload(appletPath, foundName, usingProgrammer);
+    boolean success = upload(appletPath, foundName, usingProgrammer);
     editor.status.progressUpdate(100);
-    return true;
+    return success;
   }
 
   
@@ -1656,16 +1658,33 @@ public class Sketch {
 	  System.out.println(_("Low memory available, stability problems may occur"));
   }
 
-  protected String upload(String buildPath, String suggestedClassName, boolean usingProgrammer) throws RunnerException, SerialException {
+  protected boolean upload(String buildPath, String suggestedClassName, boolean usingProgrammer) throws RunnerException, SerialException {
 
     TargetPlatform target = Base.getTargetPlatform();
     String board = Preferences.get("board");
 
     Uploader uploader = new UploaderFactory().newUploader(target.getBoards().get(board), Preferences.get("serial.port"));
 
+    if (uploader.requiresAuthorization() && !Preferences.has(uploader.getAuthorizationKey())) {
+      PasswordAuthorizationDialog dialog = new PasswordAuthorizationDialog(editor);
+      dialog.setLocationRelativeTo(editor);
+      dialog.setVisible(true);
+
+      if (dialog.isCancelled()) {
+        editor.statusNotice(_("Upload cancelled"));
+        return false;
+      }
+
+      Preferences.set(uploader.getAuthorizationKey(), DigestUtils.sha512Hex(dialog.getPassword()));
+    }
+
     boolean success = uploader.uploadUsingPreferences(buildPath, suggestedClassName, usingProgrammer);
 
-    return success ? suggestedClassName : null;
+    if (uploader.requiresAuthorization() && !success) {
+      Preferences.remove(uploader.getAuthorizationKey());
+    }
+
+    return success;
   }
 
 

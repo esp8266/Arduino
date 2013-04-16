@@ -829,6 +829,13 @@ public class Preferences {
     */
   }
 
+  public static boolean has(String key) {
+    return table.containsKey(key);
+  }
+
+  public static void remove(String key) {
+    table.remove(key);
+  }
 
   static public String getDefault(String attribute) {
     return (String) defaults.get(attribute);
@@ -976,5 +983,5 @@ public class Preferences {
   {
     return new PreferencesMap(table);
   }
-  
+
 }
