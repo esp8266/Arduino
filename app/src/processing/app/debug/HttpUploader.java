@@ -6,23 +6,30 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
-import processing.app.Preferences;
 import processing.app.SerialException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static processing.app.I18n._;
 
 public class HttpUploader extends Uploader {
 
+  private static final Pattern IPV4_ADDRESS = Pattern.compile("(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})");
+
   private final HttpClient client;
   private final String ipAddress;
 
-  public HttpUploader() {
+  public HttpUploader(String port) {
     this.client = new HttpClient();
-    this.ipAddress = Preferences.get("serial.port").substring(0, Preferences.get("serial.port").indexOf(" "));
+    Matcher matcher = IPV4_ADDRESS.matcher(port);
+    if (!matcher.find()) {
+      throw new IllegalArgumentException(port);
+    }
+    this.ipAddress = matcher.group(1);
   }
 
   @Override

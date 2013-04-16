@@ -9,7 +9,7 @@ public class UploaderFactory {
 
   public Uploader newUploader(Map<String, String> preferences, String port) {
     if ("true".equals(preferences.get("upload.via_http")) && IPV4_ADDRESS.matcher(port).find()) {
-      return new HttpUploader();
+      return new HttpUploader(port);
     }
 
     return new BasicUploader();
