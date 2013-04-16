@@ -22,15 +22,15 @@
  modified 28 Dec 2012
  by Mike Walters
  
-This example code is in the public domain.
+ This example code is in the public domain.
  
  http://www.arduino.cc/en/Tutorial/Debounce
  */
 
 // constants won't change. They're used here to 
 // set pin numbers:
-const int buttonPin = 2;     // the number of the pushbutton pin
-const int ledPin =  13;      // the number of the LED pin
+const int buttonPin = 2;    // the number of the pushbutton pin
+const int ledPin = 13;      // the number of the LED pin
 
 // Variables will change:
 int ledState = HIGH;         // the current state of the output pin
@@ -75,13 +75,13 @@ void loop() {
       // only toggle the LED if the new button state is HIGH
       if (buttonState == HIGH) {
         ledState = !ledState;
-
-        // set the LED:
-        digitalWrite(ledPin, ledState);
       }
     }
   }
   
+  // set the LED:
+  digitalWrite(ledPin, ledState);
+
   // save the reading.  Next time through the loop,
   // it'll be the lastButtonState:
   lastButtonState = reading;
