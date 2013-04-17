@@ -54,7 +54,6 @@ int analogRead(uint8_t pin)
 #endif
 	
 #if defined(__AVR_ATmega32U4__)
-	pin = analogPinToChannel(pin);
 	ADCSRB = (ADCSRB & ~(1 << MUX5)) | (((pin >> 3) & 0x01) << MUX5);
 #elif defined(ADCSRB) && defined(MUX5)
 	// the MUX5 bit of ADCSRB selects whether we're reading from channels
