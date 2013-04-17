@@ -26,46 +26,46 @@ uno.build.variant=standard
 
 ##############################################################
 
-duemilanove.name=Arduino Duemilanove or Diecimila
+atmega328diecimila.name=Arduino Duemilanove or Diecimila
 
-duemilanove.upload.tool=avrdude
-duemilanove.upload.protocol=arduino
+atmega328diecimila.upload.tool=avrdude
+atmega328diecimila.upload.protocol=arduino
 
-duemilanove.bootloader.tool=avrdude
-duemilanove.bootloader.low_fuses=0xFF
-duemilanove.bootloader.unlock_bits=0x3F
-duemilanove.bootloader.lock_bits=0x0F
+atmega328diecimila.bootloader.tool=avrdude
+atmega328diecimila.bootloader.low_fuses=0xFF
+atmega328diecimila.bootloader.unlock_bits=0x3F
+atmega328diecimila.bootloader.lock_bits=0x0F
 
-duemilanove.build.f_cpu=16000000L
-duemilanove.build.board=AVR_DUEMILANOVE
-duemilanove.build.core=arduino
-duemilanove.build.variant=standard
+atmega328diecimila.build.f_cpu=16000000L
+atmega328diecimila.build.board=AVR_DUEMILANOVE
+atmega328diecimila.build.core=arduino
+atmega328diecimila.build.variant=standard
 
 ## Arduino Duemilanove or Diecimila w/ ATmega328
 ## ---------------------------------------------
-duemilanove.menu.cpu.atmega328=ATmega328
+atmega328diecimila.menu.cpu.atmega328=ATmega328
 
-duemilanove.menu.cpu.atmega328.upload.maximum_size=30720
-duemilanove.menu.cpu.atmega328.upload.speed=57600
+atmega328diecimila.menu.cpu.atmega328.upload.maximum_size=30720
+atmega328diecimila.menu.cpu.atmega328.upload.speed=57600
 
-duemilanove.menu.cpu.atmega328.bootloader.high_fuses=0xDA
-duemilanove.menu.cpu.atmega328.bootloader.extended_fuses=0x05
-duemilanove.menu.cpu.atmega328.bootloader.file=atmega/ATmegaBOOT_168_atmega328.hex
+atmega328diecimila.menu.cpu.atmega328.bootloader.high_fuses=0xDA
+atmega328diecimila.menu.cpu.atmega328.bootloader.extended_fuses=0x05
+atmega328diecimila.menu.cpu.atmega328.bootloader.file=atmega/ATmegaBOOT_168_atmega328.hex
 
-duemilanove.menu.cpu.atmega328.build.mcu=atmega328p
+atmega328diecimila.menu.cpu.atmega328.build.mcu=atmega328p
 
 ## Arduino Duemilanove or Diecimila w/ ATmega168
 ## ---------------------------------------------
-duemilanove.menu.cpu.atmega168=ATmega168
+atmega328diecimila.menu.cpu.atmega168=ATmega168
 
-duemilanove.menu.cpu.atmega168.upload.maximum_size=14336
-duemilanove.menu.cpu.atmega168.upload.speed=19200
+atmega328diecimila.menu.cpu.atmega168.upload.maximum_size=14336
+atmega328diecimila.menu.cpu.atmega168.upload.speed=19200
 
-duemilanove.menu.cpu.atmega168.bootloader.high_fuses=0xdd
-duemilanove.menu.cpu.atmega168.bootloader.extended_fuses=0x00
-duemilanove.menu.cpu.atmega168.bootloader.file=atmega/ATmegaBOOT_168_diecimila.hex
+atmega328diecimila.menu.cpu.atmega168.bootloader.high_fuses=0xdd
+atmega328diecimila.menu.cpu.atmega168.bootloader.extended_fuses=0x00
+atmega328diecimila.menu.cpu.atmega168.bootloader.file=atmega/ATmegaBOOT_168_diecimila.hex
 
-duemilanove.menu.cpu.atmega168.build.mcu=atmega168
+atmega328diecimila.menu.cpu.atmega168.build.mcu=atmega168
 
 ##############################################################
 
@@ -375,32 +375,32 @@ bt.menu.cpu.atmega168.build.mcu=atmega168
 
 ##############################################################
 
-lilypad_usb.name=LilyPad Arduino USB
+LilyPadUSB.name=LilyPad Arduino USB
 
-lilypad_usb.upload.tool=avrdude
-lilypad_usb.upload.protocol=avr109
-lilypad_usb.upload.maximum_size=28672
-lilypad_usb.upload.speed=57600
-lilypad_usb.upload.disable_flushing=true
-lilypad_usb.upload.use_1200bps_touch=true
-lilypad_usb.upload.wait_for_upload_port=true
+LilyPadUSB.upload.tool=avrdude
+LilyPadUSB.upload.protocol=avr109
+LilyPadUSB.upload.maximum_size=28672
+LilyPadUSB.upload.speed=57600
+LilyPadUSB.upload.disable_flushing=true
+LilyPadUSB.upload.use_1200bps_touch=true
+LilyPadUSB.upload.wait_for_upload_port=true
 
-lilypad_usb.bootloader.tool=avrdude
-lilypad_usb.bootloader.low_fuses=0xff
-lilypad_usb.bootloader.high_fuses=0xd8
-lilypad_usb.bootloader.extended_fuses=0xce
-lilypad_usb.bootloader.file=caterina-LilyPadUSB/Caterina-LilyPadUSB.hex
-lilypad_usb.bootloader.unlock_bits=0x3F
-lilypad_usb.bootloader.lock_bits=0x2F
+LilyPadUSB.bootloader.tool=avrdude
+LilyPadUSB.bootloader.low_fuses=0xff
+LilyPadUSB.bootloader.high_fuses=0xd8
+LilyPadUSB.bootloader.extended_fuses=0xce
+LilyPadUSB.bootloader.file=caterina-LilyPadUSB/Caterina-LilyPadUSB.hex
+LilyPadUSB.bootloader.unlock_bits=0x3F
+LilyPadUSB.bootloader.lock_bits=0x2F
 
-lilypad_usb.build.mcu=atmega32u4
-lilypad_usb.build.f_cpu=8000000L
-lilypad_usb.build.vid=0x1B4F
-lilypad_usb.build.pid=0x9208
-lilypad_usb.build.board=AVR_LILYPAD_USB
-lilypad_usb.build.core=arduino
-lilypad_usb.build.variant=leonardo
-lilypad_usb.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid}
+LilyPadUSB.build.mcu=atmega32u4
+LilyPadUSB.build.f_cpu=8000000L
+LilyPadUSB.build.vid=0x1B4F
+LilyPadUSB.build.pid=0x9208
+LilyPadUSB.build.board=AVR_LILYPAD_USB
+LilyPadUSB.build.core=arduino
+LilyPadUSB.build.variant=leonardo
+LilyPadUSB.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid}
 
 ##############################################################
 
@@ -523,44 +523,44 @@ pro.menu.cpu.8MHzatmega168.build.f_cpu=8000000L
 
 ##############################################################
 
-ng.name=Arduino NG or older
+atmegang.name=Arduino NG or older
 
-ng.upload.tool=avrdude
-ng.upload.protocol=arduino
-ng.upload.speed=19200
+atmegang.upload.tool=avrdude
+atmegang.upload.protocol=arduino
+atmegang.upload.speed=19200
 
-ng.bootloader.tool=avrdude
-ng.bootloader.unlock_bits=0x3F
-ng.bootloader.lock_bits=0x0F
+atmegang.bootloader.tool=avrdude
+atmegang.bootloader.unlock_bits=0x3F
+atmegang.bootloader.lock_bits=0x0F
 
-ng.build.mcu=atmegang
-ng.build.f_cpu=16000000L
-ng.build.board=AVR_NG
-ng.build.core=arduino
-ng.build.variant=standard
+atmegang.build.mcu=atmegang
+atmegang.build.f_cpu=16000000L
+atmegang.build.board=AVR_NG
+atmegang.build.core=arduino
+atmegang.build.variant=standard
 
 ## Arduino NG or older w/ ATmega168
 ## --------------------------------
-ng.menu.cpu.atmega168=ATmega168
+atmegang.menu.cpu.atmega168=ATmega168
 
-ng.menu.cpu.atmega168.upload.maximum_size=14336
+atmegang.menu.cpu.atmega168.upload.maximum_size=14336
 
-ng.menu.cpu.atmega168.bootloader.low_fuses=0xff
-ng.menu.cpu.atmega168.bootloader.high_fuses=0xdd
-ng.menu.cpu.atmega168.bootloader.extended_fuses=0x00
-ng.menu.cpu.atmega168.bootloader.file=atmega/ATmegaBOOT_168_ng.hex
+atmegang.menu.cpu.atmega168.bootloader.low_fuses=0xff
+atmegang.menu.cpu.atmega168.bootloader.high_fuses=0xdd
+atmegang.menu.cpu.atmega168.bootloader.extended_fuses=0x00
+atmegang.menu.cpu.atmega168.bootloader.file=atmega/ATmegaBOOT_168_ng.hex
 
-ng.menu.cpu.atmega168.build.mcu=atmega168
+atmegang.menu.cpu.atmega168.build.mcu=atmega168
 
 ## Arduino NG or older w/ ATmega8
 ## ------------------------------
-ng.menu.cpu.atmega8=ATmega8
+atmegang.menu.cpu.atmega8=ATmega8
 
-ng.menu.cpu.atmega8.upload.maximum_size=7168
+atmegang.menu.cpu.atmega8.upload.maximum_size=7168
 
-ng.menu.cpu.atmega8.bootloader.low_fuses=0xdf
-ng.menu.cpu.atmega8.bootloader.high_fuses=0xca
-ng.menu.cpu.atmega8.bootloader.file=atmega8/ATmegaBOOT-prod-firmware-2009-11-07.hex
+atmegang.menu.cpu.atmega8.bootloader.low_fuses=0xdf
+atmegang.menu.cpu.atmega8.bootloader.high_fuses=0xca
+atmegang.menu.cpu.atmega8.bootloader.file=atmega8/ATmegaBOOT-prod-firmware-2009-11-07.hex
 
-ng.menu.cpu.atmega8.build.mcu=atmega8
+atmegang.menu.cpu.atmega8.build.mcu=atmega8
 
