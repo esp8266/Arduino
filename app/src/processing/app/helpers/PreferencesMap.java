@@ -28,15 +28,40 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import processing.app.Base;
 import processing.core.PApplet;
 
+@SuppressWarnings("serial")
 public class PreferencesMap extends LinkedHashMap<String, String> {
 
   public PreferencesMap(Map<String, String> table) {
     super(table);
+  }
+
+  /**
+   * Create a PreferencesMap and load the content of the file passed as
+   * argument.
+   * 
+   * Is equivalent to:
+   * 
+   * <pre>
+   * PreferencesMap map = new PreferencesMap();
+   * map.load(file);
+   * </pre>
+   * 
+   * @param file
+   * @throws IOException
+   */
+  public PreferencesMap(File file) throws IOException {
+    super();
+    load(file);
   }
 
   public PreferencesMap() {
@@ -75,7 +100,7 @@ public class PreferencesMap extends LinkedHashMap<String, String> {
     }
 
     // This is needed to avoid ConcurrentAccessExceptions
-    Set<String> keys = new HashSet<String>(keySet());
+    Set<String> keys = new LinkedHashSet<String>(keySet());
 
     // Override keys that have OS specific versions
     for (String key : keys) {
@@ -95,13 +120,51 @@ public class PreferencesMap extends LinkedHashMap<String, String> {
   }
 
   /**
-   * Create a new Map<String, PreferenceMap> where the keys are the first level
-   * of the current mapping. E.g. the folowing mapping:<br />
+   * Create a new PreferenceMap that contains all the top level pairs of the
+   * current mapping. E.g. the folowing mapping:<br />
    * 
    * <pre>
    * Map (
+   *     alpha = Alpha
    *     alpha.some.keys = v1
    *     alpha.other.keys = v2
+   *     beta = Beta
+   *     beta.some.keys = v3
+   *   )
+   * </pre>
+   * 
+   * will generate the following result:
+   * 
+   * <pre>
+   * Map (
+   *     alpha = Alpha
+   *     beta = Beta
+   *   )
+   * </pre>
+   * 
+   * @return
+   */
+  public PreferencesMap topLevelMap() {
+    PreferencesMap res = new PreferencesMap();
+    for (String key : keySet()) {
+      if (key.contains("."))
+        continue;
+      res.put(key, get(key));
+    }
+    return res;
+  }
+
+  /**
+   * Create a new Map<String, PreferenceMap> where keys are the first level of
+   * the current mapping. Top level pairs are discarded. E.g. the folowing
+   * mapping:<br />
+   * 
+   * <pre>
+   * Map (
+   *     alpha = Alpha
+   *     alpha.some.keys = v1
+   *     alpha.other.keys = v2
+   *     beta = Beta
    *     beta.some.keys = v3
    *   )
    * </pre>
@@ -120,7 +183,7 @@ public class PreferencesMap extends LinkedHashMap<String, String> {
    * 
    * @return
    */
-  public Map<String, PreferencesMap> createFirstLevelMap() {
+  public Map<String, PreferencesMap> firstLevelMap() {
     Map<String, PreferencesMap> res = new LinkedHashMap<String, PreferencesMap>();
     for (String key : keySet()) {
       int dot = key.indexOf('.');
@@ -138,13 +201,15 @@ public class PreferencesMap extends LinkedHashMap<String, String> {
   }
 
   /**
-   * Create a new PreferenceMap using a subtree of the current mapping. E.g.
-   * with the folowing mapping:<br />
+   * Create a new PreferenceMap using a subtree of the current mapping. Top
+   * level pairs are ignored. E.g. with the following mapping:<br />
    * 
    * <pre>
    * Map (
+   *     alpha = Alpha
    *     alpha.some.keys = v1
    *     alpha.other.keys = v2
+   *     beta = Beta
    *     beta.some.keys = v3
    *   )
    * </pre>
@@ -161,7 +226,7 @@ public class PreferencesMap extends LinkedHashMap<String, String> {
    * @param parent
    * @return
    */
-  public PreferencesMap createSubTree(String parent) {
+  public PreferencesMap subTree(String parent) {
     PreferencesMap res = new PreferencesMap();
     parent += ".";
     int parentLen = parent.length();
@@ -172,5 +237,16 @@ public class PreferencesMap extends LinkedHashMap<String, String> {
     return res;
   }
 
-  private static final long serialVersionUID = 2330591567444282843L;
+  public String toString(String indent) {
+    String res = indent + "{\n";
+    SortedSet<String> treeSet = new TreeSet<String>(keySet());
+    for (String k : treeSet)
+      res += indent + k + " = " + get(k) + "\n";
+    return res;
+  }
+
+  @Override
+  public String toString() {
+    return toString("");
+  }
 }

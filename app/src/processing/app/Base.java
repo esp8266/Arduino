@@ -30,16 +30,17 @@ import java.util.List;
 
 import javax.swing.*;
 
+import processing.app.debug.TargetBoard;
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
+import processing.app.debug.TargetPlatformException;
 import processing.app.helpers.FileUtils;
-import processing.app.helpers.Maps;
 import processing.app.helpers.PreferencesMap;
 import processing.app.helpers.filefilters.OnlyDirs;
 import processing.app.helpers.filefilters.OnlyFilesWithExtension;
-import processing.app.javax.swing.filechooser.FileNameExtensionFilter;import processing.app.packages.Library;
+import processing.app.javax.swing.filechooser.FileNameExtensionFilter;
+import processing.app.packages.Library;
 import processing.app.packages.LibraryList;
-import processing.app.tools.MapWithSubkeys;
 import processing.app.tools.ZipDeflater;
 import processing.core.*;
 import static processing.app.I18n._;
@@ -115,7 +116,6 @@ public class Base {
 
   static File portableFolder = null;
   static final String portableSketchbookFolder = "sketchbook";
-
 
   static public void main(String args[]) throws Exception {
     initPlatform();
@@ -290,6 +290,11 @@ public class Base {
     packages = new HashMap<String, TargetPackage>();
     loadHardware(getHardwareFolder());
     loadHardware(getSketchbookHardwareFolder());
+    if (packages.size() == 0) {
+      System.out.println(_("No valid configured cores found! Exiting..."));
+      System.exit(3);
+    }
+    
     // Setup board-dependent variables.
     onBoardOrPortChange();
 
@@ -403,8 +408,9 @@ public class Base {
    * sketch that was used (if any), and restores other Editor settings.
    * The complement to "storePreferences", this is called when the
    * application is first launched.
+   * @throws Exception 
    */
-  protected boolean restoreSketches() {
+  protected boolean restoreSketches() throws Exception {
     // figure out window placement
 
     Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
@@ -664,8 +670,9 @@ public class Base {
 
   /**
    * Create a new untitled document in a new sketch window.
+   * @throws Exception 
    */
-  public void handleNew() {
+  public void handleNew() throws Exception {
     try {
       String path = createNewUntitled();
       if (path != null) {
@@ -733,8 +740,9 @@ public class Base {
 
   /**
    * Prompt for a sketch to open, and open it in a new window.
+   * @throws Exception 
    */
-  public void handleOpenPrompt() {
+  public void handleOpenPrompt() throws Exception {
     // get the frontmost window frame for placing file dialog
     FileDialog fd = new FileDialog(activeEditor,
                                    _("Open an Arduino sketch..."),
@@ -769,13 +777,14 @@ public class Base {
    * @param path Path to the pde file for the sketch in question
    * @return the Editor object, so that properties (like 'untitled')
    *         can be set by the caller
+   * @throws Exception 
    */
-  public Editor handleOpen(String path) {
+  public Editor handleOpen(String path) throws Exception {
     return handleOpen(path, nextEditorLocation());
   }
 
 
-  protected Editor handleOpen(String path, int[] location) {
+  protected Editor handleOpen(String path, int[] location) throws Exception {
 //    System.err.println("entering handleOpen " + path);
 
     File file = new File(path);
@@ -1007,7 +1016,11 @@ public class Base {
     item = Editor.newJMenuItem(_("Open..."), 'O');
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          handleOpenPrompt();
+          try {
+            handleOpenPrompt();
+          } catch (Exception e1) {
+            e1.printStackTrace();
+          }
         }
       });
     menu.add(item);
@@ -1073,6 +1086,7 @@ public class Base {
 
     // Split between user supplied libraries and IDE libraries
     TargetPlatform targetPlatform = getTargetPlatform();
+    
     if (targetPlatform != null) {
       LibraryList ideLibs = getIDELibs();
       LibraryList userLibs = getUserLibs();
@@ -1080,11 +1094,14 @@ public class Base {
         // Find the current target. Get the platform, and then select the
         // correct name and core path.
         PreferencesMap prefs = targetPlatform.getPreferences();
-        String targetname = prefs.get("name");
-
-        JMenuItem platformItem = new JMenuItem(_(targetname));
-        platformItem.setEnabled(false);
-        importMenu.add(platformItem);
+        if (prefs != null) {
+          String platformName = prefs.get("name");
+          if (platformName != null) {
+            JMenuItem platformItem = new JMenuItem(_(platformName));
+            platformItem.setEnabled(false);
+            importMenu.add(platformItem);
+          }
+        }
         if (ideLibs.size() > 0) {
           importMenu.addSeparator();
           addLibraries(importMenu, ideLibs);
@@ -1180,9 +1197,9 @@ public class Base {
     try {
       libraries = scanLibraries(librariesFolders);
     } catch (IOException e) {
-      showWarning(_("Error"), _("Error reading preferences"), e);
+      showWarning(_("Error"), _("Error loading libraries"), e);
     }
-    String currentArch = Base.getTargetPlatform().getName();
+    String currentArch = Base.getTargetPlatform().getId();
     libraries = libraries.filterByArchitecture(currentArch);
     
     // Populate importToLibraryTable
@@ -1204,12 +1221,8 @@ public class Base {
       editor.onBoardOrPortChange();
   }
 
-  public void rebuildBoardsMenu(JMenu toolsMenu, final Editor editor) {
-    JMenu boardsMenu = makeOrGetBoardMenu(toolsMenu, _("Board"));
-
-    String selPackage = Preferences.get("target_package");
-    String selPlatform = Preferences.get("target_platform");
-    String selBoard = Preferences.get("board");
+  public void rebuildBoardsMenu(JMenu toolsMenu, Editor editor) throws Exception {
+    JMenu boardsMenu = getBoardCustomMenu();
 
     boolean first = true;
 
@@ -1218,97 +1231,42 @@ public class Base {
     ButtonGroup boardsButtonGroup = new ButtonGroup();
     Map<String, ButtonGroup> buttonGroupsMap = new HashMap<String, ButtonGroup>();
 
+    // Generate custom menus for all platforms
+    Set<String> titles = new HashSet<String>();
+    for (TargetPackage targetPackage : packages.values()) {
+      for (TargetPlatform targetPlatform : targetPackage.platforms())
+        titles.addAll(targetPlatform.getCustomMenus().values());
+    }
+    for (String title : titles)
+      makeBoardCustomMenu(toolsMenu, _(title));
+    
     // Cycle through all packages
     for (TargetPackage targetPackage : packages.values()) {
-      String packageName = targetPackage.getName();
       // For every package cycle through all platform
       for (TargetPlatform targetPlatform : targetPackage.platforms()) {
-        String platformName = targetPlatform.getName();
-        Map<String, PreferencesMap> boards = targetPlatform.getBoards();
 
-        if (targetPlatform.getPreferences().get("name") == null || targetPlatform.getBoards().isEmpty()) {
-          continue;
-        }
-
-        // Add a title for each group of boards
-        if (!first) {
+        // Add a separator from the previous platform
+        if (!first)
           boardsMenu.add(new JSeparator());
-        }
         first = false;
 
-        JMenuItem separator = new JMenuItem(_(targetPlatform.getPreferences().get("name")));
-        separator.setEnabled(false);
-        boardsMenu.add(separator);
+        // Add a title for each platform
+        String platformLabel = targetPlatform.getPreferences().get("name"); 
+        if (platformLabel != null && !targetPlatform.getBoards().isEmpty()) {
+          JMenuItem menuLabel = new JMenuItem(_(platformLabel));
+          menuLabel.setEnabled(false);
+          boardsMenu.add(menuLabel);
+        }
 
-        // For every platform cycle through all boards
-        for (final String boardID : targetPlatform.getBoards().keySet()) {
-          // Setup a menu item for the current board
-          String boardName = boards.get(boardID).get("name");
-          @SuppressWarnings("serial")
-          Action action = new AbstractAction(boardName) {
-            public void actionPerformed(ActionEvent actionevent) {
-              selectBoard((String) getValue("b"), editor);
-            }
-          };
-          action.putValue("b", packageName + ":" + platformName + ":" + boardID);
-
-          JRadioButtonMenuItem item = new JRadioButtonMenuItem(action);
+        // Cycle through all boards of this platform
+        for (TargetBoard board : targetPlatform.getBoards().values()) {
+          JMenuItem item = createBoardMenusAndCustomMenus(
+                                                          editor,
+                                                          menuItemsToClickAfterStartup,
+                                                          buttonGroupsMap,
+                                                          board, targetPlatform, targetPackage);
           boardsMenu.add(item);
           boardsButtonGroup.add(item);
-
-          if (selBoard.equals(boardID) && selPackage.equals(packageName)
-              && selPlatform.equals(platformName)) {
-            menuItemsToClickAfterStartup.add(item);
-          }
-
-          if (targetPlatform.getCustomMenus() != null) {
-            List<String> customMenuIDs = new LinkedList<String>(targetPlatform.getCustomMenus().getKeys());
-            for (int i = 0; i < customMenuIDs.size(); i++) {
-              final String customMenuID = customMenuIDs.get(i);
-              JMenu menu = makeOrGetBoardMenu(toolsMenu, _(targetPlatform.getCustomMenus().getValueOf(customMenuID)));
-              MapWithSubkeys customMenu = targetPlatform.getCustomMenus().get(customMenuID);
-              if (customMenu.getKeys().contains(boardID)) {
-                MapWithSubkeys boardCustomMenu = customMenu.get(boardID);
-                final int currentIndex = i + 1 + 1; //plus 1 to skip the first board menu, plus 1 to keep the custom menu next to this one
-                for (final String customMenuOption : boardCustomMenu.getKeys()) {
-                  @SuppressWarnings("serial")
-                  Action subAction = new AbstractAction(_(boardCustomMenu.getValueOf(customMenuOption))) {
-
-                    public void actionPerformed(ActionEvent e) {
-                      Preferences.set("target_package", (String) getValue("package"));
-                      Preferences.set("target_platform", (String) getValue("platform"));
-                      Preferences.set("board", (String) getValue("board"));
-                      Preferences.set("custom_" + customMenuID, boardID + "_" + (String) getValue("custom_menu_option"));
-
-                      filterVisibilityOfSubsequentBoardMenus((String) getValue("board"), currentIndex);
-
-                      onBoardOrPortChange();
-                      Sketch.buildSettingChanged();
-                      rebuildImportMenu(Editor.importMenu, editor);
-                      rebuildExamplesMenu(Editor.examplesMenu);
-                    }
-                  };
-                  subAction.putValue("board", boardID);
-                  subAction.putValue("custom_menu_option", customMenuOption);
-                  subAction.putValue("package", packageName);
-                  subAction.putValue("platform", platformName);
-
-                  if (!buttonGroupsMap.containsKey(customMenuID)) {
-                    buttonGroupsMap.put(customMenuID, new ButtonGroup());
-                  }
-
-                  item = new JRadioButtonMenuItem(subAction);
-                  menu.add(item);
-                  buttonGroupsMap.get(customMenuID).add(item);
-
-                  String selectedCustomMenuEntry = Preferences.get("custom_" + customMenuID);
-                  if (selBoard.equals(boardID) && (boardID + "_" + customMenuOption).equals(selectedCustomMenuEntry)) {
-                    menuItemsToClickAfterStartup.add(item);
-                  }
-                }
-              }
-            }
-          }
         }
       }
     }
@@ -1323,6 +1281,87 @@ public class Base {
     }
   }
 
+  private JRadioButtonMenuItem createBoardMenusAndCustomMenus(
+                                              final Editor editor,
+                                              List<JMenuItem> menuItemsToClickAfterStartup,
+                                              Map<String, ButtonGroup> buttonGroupsMap,
+                                              TargetBoard board, TargetPlatform targetPlatform, TargetPackage targetPackage)
+      throws Exception {
+    String selPackage = Preferences.get("target_package");
+    String selPlatform = Preferences.get("target_platform");
+    String selBoard = Preferences.get("board");
+
+    String boardId = board.getId();
+    String packageName = targetPackage.getId();
+    String platformName = targetPlatform.getId();
+    
+    // Setup a menu item for the current board
+    @SuppressWarnings("serial")
+    Action action = new AbstractAction(board.getName()) {
+      public void actionPerformed(ActionEvent actionevent) {
+        selectBoard((String) getValue("b"), editor);
+      }
+    };
+    action.putValue("b", packageName + ":" + platformName + ":" + boardId);
+
+    JRadioButtonMenuItem item = new JRadioButtonMenuItem(action);
+
+    if (selBoard.equals(boardId) && selPackage.equals(packageName)
+        && selPlatform.equals(platformName)) {
+      menuItemsToClickAfterStartup.add(item);
+    }
+
+    int i = 0;
+    PreferencesMap customMenus = targetPlatform.getCustomMenus();
+    for (final String menuId : customMenus.keySet()) {
+      String title = customMenus.get(menuId);
+      JMenu menu = getBoardCustomMenu(_(title));
+      
+      if (board.hasMenu(menuId)) {
+        PreferencesMap boardCustomMenu = board.getMenuLabels(menuId);
+        final int currentIndex = i + 1 + 1; //plus 1 to skip the first board menu, plus 1 to keep the custom menu next to this one
+        i++;
+        for (String customMenuOption : boardCustomMenu.keySet()) {
+          @SuppressWarnings("serial")
+          Action subAction = new AbstractAction(_(boardCustomMenu.get(customMenuOption))) {
+            public void actionPerformed(ActionEvent e) {
+              Preferences.set("target_package", (String) getValue("package"));
+              Preferences.set("target_platform", (String) getValue("platform"));
+              Preferences.set("board", (String) getValue("board"));
+              Preferences.set("custom_" + menuId, (String) getValue("board") + "_" + (String) getValue("custom_menu_option"));
+
+              filterVisibilityOfSubsequentBoardMenus((String) getValue("board"), currentIndex);
+
+              onBoardOrPortChange();
+              Sketch.buildSettingChanged();
+              rebuildImportMenu(Editor.importMenu, editor);
+              rebuildExamplesMenu(Editor.examplesMenu);
+            }
+          };
+          subAction.putValue("board", boardId);
+          subAction.putValue("custom_menu_option", customMenuOption);
+          subAction.putValue("package", packageName);
+          subAction.putValue("platform", platformName);
+
+          if (!buttonGroupsMap.containsKey(menuId)) {
+            buttonGroupsMap.put(menuId, new ButtonGroup());
+          }
+
+          JRadioButtonMenuItem subItem = new JRadioButtonMenuItem(subAction);
+          menu.add(subItem);
+          buttonGroupsMap.get(menuId).add(subItem);
+
+          String selectedCustomMenuEntry = Preferences.get("custom_" + menuId);
+          if (selBoard.equals(boardId) && (boardId + "_" + customMenuOption).equals(selectedCustomMenuEntry)) {
+            menuItemsToClickAfterStartup.add(subItem);
+          }
+        }
+      }
+    }
+    
+    return item;
+  }
+
   private static void filterVisibilityOfSubsequentBoardMenus(String boardID, int fromIndex) {
     for (int i = fromIndex; i < Editor.boardsMenus.size(); i++) {
       JMenu menu = Editor.boardsMenus.get(i);
@@ -1330,9 +1369,9 @@ public class Base {
         JMenuItem menuItem = menu.getItem(m);
         menuItem.setVisible(menuItem.getAction().getValue("board").equals(boardID));
       }
-      menu.setEnabled(ifThereAreVisibleItemsOn(menu));
+      menu.setVisible(ifThereAreVisibleItemsOn(menu));
 
-      if (menu.isEnabled()) {
+      if (menu.isVisible()) {
         JMenuItem visibleSelectedOrFirstMenuItem = selectVisibleSelectedOrFirstMenuItem(menu);
         if (!visibleSelectedOrFirstMenuItem.isSelected()) {
           visibleSelectedOrFirstMenuItem.setSelected(true);
@@ -1351,16 +1390,22 @@ public class Base {
     return false;
   }
 
-  private JMenu makeOrGetBoardMenu(JMenu toolsMenu, String label) {
-    for (JMenu menu : Editor.boardsMenus) {
-      if (label.equals(menu.getText())) {
-        return menu;
-      }
-    }
+  private JMenu makeBoardCustomMenu(JMenu toolsMenu, String label) {
     JMenu menu = new JMenu(label);
     Editor.boardsMenus.add(menu);
     toolsMenu.add(menu);
     return menu;
+  }
+
+  private JMenu getBoardCustomMenu() throws Exception {
+    return getBoardCustomMenu(_("Board"));
+  }
+  
+  private JMenu getBoardCustomMenu(String label) throws Exception {
+    for (JMenu menu : Editor.boardsMenus)
+      if (label.equals(menu.getText()))
+        return menu;
+    throw new Exception("Custom menu not found!");
   }
 
   private static JMenuItem selectVisibleSelectedOrFirstMenuItem(JMenu menu) {
@@ -1416,7 +1461,7 @@ public class Base {
     for (TargetPackage targetPackage : packages.values()) {
       for (TargetPlatform targetPlatform : targetPackage.platforms()) {
         for (String programmer : targetPlatform.getProgrammers().keySet()) {
-          String id = targetPackage.getName() + ":" + programmer;
+          String id = targetPackage.getId() + ":" + programmer;
 
           @SuppressWarnings("serial")
           AbstractAction action = new AbstractAction(targetPlatform
@@ -1494,7 +1539,11 @@ public class Base {
           if (replace) {
             handleOpenReplace(path);
           } else {
-            handleOpen(path);
+            try {
+              handleOpen(path);
+            } catch (Exception e1) {
+              e1.printStackTrace();
+            }
           }
         } else {
           showWarning(_("Sketch Does Not Exist"),
@@ -1604,7 +1653,13 @@ public class Base {
       if (target.equals("tools"))
         continue;
       File subfolder = new File(folder, target);
-      packages.put(target, new TargetPackage(target, subfolder));
+      
+      try {
+        packages.put(target, new TargetPackage(target, subfolder));
+      } catch (TargetPlatformException e) {
+        System.out.println("WARNING: Error loading hardware folder " + target);
+        System.out.println("  " + e.getMessage());
+      }
     }
   }
 
@@ -1921,22 +1976,26 @@ public class Base {
     return getTargetPlatform(pack, Preferences.get("target_platform"));
   }
 
-  static public Map<String, String> getBoardPreferences() {
-    TargetPlatform target = getTargetPlatform();
-    String board = Preferences.get("board");
-    Map<String, String> boardPreferences = Maps.merge(target.getBoards().get(board), new LinkedHashMap<String, String>());
-    if (target.getCustomMenus() != null) {
-      for (String customMenuID : target.getCustomMenus().getKeys()) {
-        MapWithSubkeys boardCustomMenu = target.getCustomMenus().get(customMenuID).get(board);
-        String selectedCustomMenuEntry = Preferences.get("custom_" + customMenuID);
-        if (boardCustomMenu != null && selectedCustomMenuEntry != null && selectedCustomMenuEntry.startsWith(board)) {
-          String menuEntryId = selectedCustomMenuEntry.substring(selectedCustomMenuEntry.indexOf("_") + 1);
-          Maps.merge(boardCustomMenu.get(menuEntryId).getValues(), boardPreferences);
-          boardPreferences.put("name", boardPreferences.get("name") + ", " + boardCustomMenu.getValueOf(menuEntryId));
-        }
+  static public PreferencesMap getBoardPreferences() {
+    TargetBoard board = getTargetBoard();
+    
+    PreferencesMap prefs = new PreferencesMap(board.getPreferences());
+    for (String menuId : board.getMenuIds()) {
+      String entry = Preferences.get("custom_" + menuId);
+      if (board.hasMenu(menuId) && entry != null &&
+          entry.startsWith(board.getId())) {
+        String selectionId = entry.substring(entry.indexOf("_") + 1);
+        prefs.putAll(board.getMenuPreferences(menuId, selectionId));
+        prefs.put("name", prefs.get("name") + ", " +
+            board.getMenuLabel(menuId, selectionId));
       }
     }
-    return boardPreferences;
+    return prefs;
+  }
+
+  public static TargetBoard getTargetBoard() {
+    String boardId = Preferences.get("board");
+    return getTargetPlatform().getBoard(boardId);
   }
 
   static public File getPortableFolder() {

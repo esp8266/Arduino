@@ -24,79 +24,119 @@
 package processing.app.debug;
 
 import static processing.app.I18n._;
+import static processing.app.I18n.format;
 
 import java.io.File;
-import java.util.HashMap;
+import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import processing.app.helpers.PreferencesMap;
-import processing.app.tools.MapWithSubkeys;
 
 public class TargetPlatform {
-  private String name;
+
+  private String id;
   private File folder;
-  private Map<String, PreferencesMap> boards;
-  private Map<String, PreferencesMap> programmers;
-  private PreferencesMap preferences;
-  private MapWithSubkeys customMenus;
+  private TargetPackage containerPackage;
 
-  public TargetPlatform(String _name, File _folder) {
-    name = _name;
+  /**
+   * Contains preferences for every defined board
+   */
+  private Map<String, TargetBoard> boards = new LinkedHashMap<String, TargetBoard>();
+
+  /**
+   * Contains preferences for every defined programmer
+   */
+  private Map<String, PreferencesMap> programmers = new LinkedHashMap<String, PreferencesMap>();
+
+  /**
+   * Contains preferences for platform
+   */
+  private PreferencesMap preferences = new PreferencesMap();
+
+  /**
+   * Contains labels for top level menus
+   */
+  private PreferencesMap customMenus = new PreferencesMap();
+
+  public TargetPlatform(String _name, File _folder, TargetPackage parent)
+      throws TargetPlatformException {
+
+    id = _name;
     folder = _folder;
-    boards = new HashMap<String, PreferencesMap>();
-    programmers = new HashMap<String, PreferencesMap>();
-    preferences = new PreferencesMap();
+    containerPackage = parent;
 
+    // If there is no boards.txt, this is not a valid 1.5 hardware folder
+    File boardsFile = new File(folder, "boards.txt");
+    if (!boardsFile.exists() || !boardsFile.canRead())
+      throw new TargetPlatformException(
+          format(_("Could not find boards.txt in {0}. Is it pre-1.5?"),
+                 boardsFile.getAbsolutePath()));
+
+    // Load boards
     try {
-      File boardsFile = new File(_folder, "boards.txt");
-      if (boardsFile.exists() && boardsFile.canRead()) {
-        PreferencesMap boardPreferences = new PreferencesMap();
-        boardPreferences.load(boardsFile);
-        boards = boardPreferences.createFirstLevelMap();
-        customMenus = MapWithSubkeys.createFrom(boards.get("menu"));
-        boards.remove("menu");
+      Map<String, PreferencesMap> boardsPreferences = new PreferencesMap(
+          boardsFile).firstLevelMap();
+
+      // Create custom menus for this platform
+      PreferencesMap menus = boardsPreferences.get("menu");
+      if (menus != null)
+        customMenus = menus.topLevelMap();
+      boardsPreferences.remove("menu");
+
+      // Create boards
+      for (String id : boardsPreferences.keySet()) {
+        PreferencesMap preferences = boardsPreferences.get(id);
+        TargetBoard board = new TargetBoard(id, preferences, this);
+        boards.put(id, board);
       }
-    } catch (Exception e) {
-      e.printStackTrace();
-      System.err.println("Error loading boards from boards.txt: " + e);
+    } catch (IOException e) {
+      throw new TargetPlatformException(format(_("Error loading {0}"),
+                                               boardsFile.getAbsolutePath()), e);
     }
 
+    File platformsFile = new File(folder, "platform.txt");
     try {
-      File platformsFile = new File(_folder, "platform.txt");
       if (platformsFile.exists() && platformsFile.canRead()) {
         preferences.load(platformsFile);
       }
-    } catch (Exception e) {
-      System.err.println("Error loading platforms from platform.txt: " + e);
+    } catch (IOException e) {
+      throw new TargetPlatformException(
+          format(_("Error loading {0}"), platformsFile.getAbsolutePath()), e);
     }
 
+    File progFile = new File(folder, "programmers.txt");
     try {
-      File programmersFile = new File(_folder, "programmers.txt");
-      if (programmersFile.exists() && programmersFile.canRead()) {
+      if (progFile.exists() && progFile.canRead()) {
         PreferencesMap prefs = new PreferencesMap();
-        prefs.load(programmersFile);
-        programmers = prefs.createFirstLevelMap();
+        prefs.load(progFile);
+        programmers = prefs.firstLevelMap();
       }
-    } catch (Exception e) {
-      System.err
-          .println("Error loading programmers from programmers.txt: " + e);
+    } catch (IOException e) {
+      throw new TargetPlatformException(format(_("Error loading {0}"), progFile
+          .getAbsolutePath()), e);
     }
   }
 
-  public String getName() {
-    return name;
+  public String getId() {
+    return id;
   }
 
   public File getFolder() {
     return folder;
   }
 
-  public Map<String, PreferencesMap> getBoards() {
+  public Map<String, TargetBoard> getBoards() {
     return boards;
   }
 
-  public MapWithSubkeys getCustomMenus() {
+  public PreferencesMap getCustomMenus() {
     return customMenus;
+  }
+
+  public Set<String> getCustomMenuIds() {
+    return customMenus.keySet();
   }
 
   public Map<String, PreferencesMap> getProgrammers() {
@@ -106,12 +146,28 @@ public class TargetPlatform {
   public PreferencesMap getProgrammer(String programmer) {
     return getProgrammers().get(programmer);
   }
-  
+
   public PreferencesMap getTool(String tool) {
-    return getPreferences().createSubTree("tools").createSubTree(tool);
+    return getPreferences().subTree("tools").subTree(tool);
   }
-  
+
   public PreferencesMap getPreferences() {
     return preferences;
+  }
+
+  public TargetBoard getBoard(String boardId) {
+    return boards.get(boardId);
+  }
+
+  public TargetPackage getContainerPackage() {
+    return containerPackage;
+  }
+
+  @Override
+  public String toString() {
+    String res = "TargetPlatform: name=" + id + " boards={\n";
+    for (String boardId : boards.keySet())
+      res += "  " + boardId + " = " + boards.get(boardId) + "\n";
+    return res + "}";
   }
 }

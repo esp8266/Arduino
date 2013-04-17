@@ -25,29 +25,30 @@ package processing.app.debug;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import processing.app.helpers.filefilters.OnlyDirs;
 
 public class TargetPackage {
 
-  private final String name;
+  private String id;
 
-  Map<String, TargetPlatform> platforms = new HashMap<String, TargetPlatform>();
+  Map<String, TargetPlatform> platforms = new LinkedHashMap<String, TargetPlatform>();
 
-  public TargetPackage(String name, File folder) {
-    this.name = name;
+  public TargetPackage(String _id, File _folder) throws TargetPlatformException {
+    id = _id;
 
-    String[] platformsList = folder.list(new OnlyDirs());
-    if (platformsList != null) {
-      for (String platformName : platformsList) {
-        File platformFolder = new File(folder, platformName);
-        if (platformFolder.exists() && platformFolder.canRead()) {
-          TargetPlatform platform = new TargetPlatform(platformName, platformFolder);
-          platforms.put(platformName, platform);
-        }
-      }
+    File[] folders = _folder.listFiles(new OnlyDirs());
+    if (folders == null)
+      return;
+
+    for (File subFolder : folders) {
+      if (!subFolder.exists() || !subFolder.canRead())
+        continue;
+      String arch = subFolder.getName();
+      TargetPlatform platform = new TargetPlatform(arch, subFolder, this);
+      platforms.put(arch, platform);
     }
   }
 
@@ -63,7 +64,7 @@ public class TargetPackage {
     return platforms.get(platform);
   }
 
-  public String getName() {
-    return name;
+  public String getId() {
+    return id;
   }
 }

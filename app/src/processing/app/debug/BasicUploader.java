@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import processing.app.Base;
+import processing.app.I18n;
 import processing.app.Preferences;
 import processing.app.Serial;
 import processing.app.SerialException;
@@ -249,18 +250,46 @@ public class BasicUploader extends Uploader  {
   }
   
   public boolean burnBootloader() throws RunnerException {
-    String programmer = Preferences.get("programmer");
     TargetPlatform targetPlatform = Base.getTargetPlatform();
+    
+    // Find preferences for the selected programmer
+    PreferencesMap programmerPrefs;
+    String programmer = Preferences.get("programmer");
     if (programmer.contains(":")) {
       String[] split = programmer.split(":", 2);
-      targetPlatform = Base.getCurrentTargetPlatformFromPackage(split[0]);
+      TargetPlatform platform = Base
+          .getCurrentTargetPlatformFromPackage(split[0]);
       programmer = split[1];
+      programmerPrefs = platform.getProgrammer(programmer);
+    } else {
+      programmerPrefs = targetPlatform.getProgrammer(programmer);
     }
     
+    // Build configuration for the current programmer
     PreferencesMap prefs = Preferences.getMap();
     prefs.putAll(Base.getBoardPreferences());
-    prefs.putAll(targetPlatform.getProgrammer(programmer));
-    prefs.putAll(targetPlatform.getTool(prefs.get("bootloader.tool")));
+    prefs.putAll(programmerPrefs);
+    
+    // Create configuration for bootloader tool
+    PreferencesMap toolPrefs = new PreferencesMap();
+    String tool = prefs.get("bootloader.tool");
+    if (tool.contains(":")) {
+      String[] split = tool.split(":", 2);
+      TargetPlatform platform = Base.getCurrentTargetPlatformFromPackage(split[0]);
+      tool = split[1];
+      toolPrefs.putAll(platform.getTool(tool));
+      if (toolPrefs.size() == 0)
+        throw new RunnerException(
+            I18n.format(_("Could not find tool {0} from package {1}"), tool,
+                        split[0]));
+    }
+    toolPrefs.putAll(targetPlatform.getTool(tool));
+    if (toolPrefs.size() == 0)
+      throw new RunnerException(I18n.format(_("Could not find tool {0}"),
+                                            tool));
+    
+    // Merge tool with global configuration
+    prefs.putAll(toolPrefs);
     if (verbose) {
       prefs.put("erase.verbose", prefs.get("erase.params.verbose"));
       prefs.put("bootloader.verbose", prefs.get("bootloader.params.verbose"));
@@ -270,12 +299,6 @@ public class BasicUploader extends Uploader  {
     }
     
     try {
-      // if (prefs.get("program.disable_flushing") == null
-      // || prefs.get("program.disable_flushing").toLowerCase().equals("false"))
-      // {
-      // flushSerialBuffer();
-      // }
-
       String pattern = prefs.get("erase.pattern");
       String[] cmd = StringReplacer.formatAndSplit(pattern, prefs, true);
       if (!executeUploadCommand(cmd))
