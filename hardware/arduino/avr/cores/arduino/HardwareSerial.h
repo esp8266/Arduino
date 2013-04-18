@@ -27,13 +27,19 @@
 
 #include "Stream.h"
 
-struct ring_buffer;
+// Define constants and variables for buffering incoming serial data.  We're
+// using a ring buffer (I think), in which head is the index of the location
+// to which to write the next incoming character and tail is the index of the
+// location from which to read.
+#if (RAMEND < 1000)
+  #define SERIAL_BUFFER_SIZE 16
+#else
+  #define SERIAL_BUFFER_SIZE 64
+#endif
 
 class HardwareSerial : public Stream
 {
   private:
-    ring_buffer *_rx_buffer;
-    ring_buffer *_tx_buffer;
     volatile uint8_t *_ubrrh;
     volatile uint8_t *_ubrrl;
     volatile uint8_t *_ucsra;
@@ -46,8 +52,20 @@ class HardwareSerial : public Stream
     uint8_t _udrie;
     uint8_t _u2x;
     bool transmitting;
+
   public:
-    HardwareSerial(ring_buffer *rx_buffer, ring_buffer *tx_buffer,
+    volatile uint8_t _rx_buffer_head;
+    volatile uint8_t _rx_buffer_tail;
+    volatile uint8_t _tx_buffer_head;
+    volatile uint8_t _tx_buffer_tail;
+
+    // Don't put any members after these buffers, since only the first
+    // 32 bytes of this struct can be accessed quickly using the ldd
+    // instruction.
+    unsigned char _rx_buffer[SERIAL_BUFFER_SIZE];
+    unsigned char _tx_buffer[SERIAL_BUFFER_SIZE];
+
+    HardwareSerial(
       volatile uint8_t *ubrrh, volatile uint8_t *ubrrl,
       volatile uint8_t *ucsra, volatile uint8_t *ucsrb,
       volatile uint8_t *ucsrc, volatile uint8_t *udr,
