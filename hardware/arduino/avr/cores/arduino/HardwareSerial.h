@@ -74,7 +74,6 @@ class HardwareSerial : public Stream
     volatile uint8_t *_udr;
     bool transmitting;
 
-  public:
     volatile uint8_t _rx_buffer_head;
     volatile uint8_t _rx_buffer_tail;
     volatile uint8_t _tx_buffer_head;
@@ -86,6 +85,7 @@ class HardwareSerial : public Stream
     unsigned char _rx_buffer[SERIAL_BUFFER_SIZE];
     unsigned char _tx_buffer[SERIAL_BUFFER_SIZE];
 
+  public:
     HardwareSerial(
       volatile uint8_t *ubrrh, volatile uint8_t *ubrrl,
       volatile uint8_t *ucsra, volatile uint8_t *ucsrb,
@@ -104,6 +104,10 @@ class HardwareSerial : public Stream
     inline size_t write(int n) { return write((uint8_t)n); }
     using Print::write; // pull in write(str) and write(buf, size) from Print
     operator bool() { return true; }
+
+    // Interrupt handlers - Not intended to be called externally
+    void _rx_complete_irq(void);
+    void _tx_udr_empty_irq(void);
 };
 
 #if defined(UBRRH) || defined(UBRR0H)

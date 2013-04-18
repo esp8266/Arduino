@@ -84,20 +84,6 @@
 #error "Not all bit positions for UART3 are the same as for UART0"
 #endif
 
-inline void store_char(unsigned char c, HardwareSerial *s)
-{
-  int i = (unsigned int)(s->_rx_buffer_head + 1) % SERIAL_BUFFER_SIZE;
-
-  // if we should be storing the received character into the location
-  // just before the tail (meaning that the head would advance to the
-  // current location of the tail), we're about to overflow the buffer
-  // and so we don't write the character or advance the head.
-  if (i != s->_rx_buffer_tail) {
-    s->_rx_buffer[s->_rx_buffer_head] = c;
-    s->_rx_buffer_head = i;
-  }
-}
-
 #if !defined(USART0_RX_vect) && defined(USART1_RX_vect)
 // do nothing - on the 32u4 the first USART is USART1
 #else
@@ -116,23 +102,7 @@ inline void store_char(unsigned char c, HardwareSerial *s)
   ISR(USART_RXC_vect) // ATmega8
 #endif
   {
-  #if defined(UDR0)
-    if (bit_is_clear(UCSR0A, UPE0)) {
-      unsigned char c = UDR0;
-      store_char(c, &Serial);
-    } else {
-      unsigned char c = UDR0;
-    };
-  #elif defined(UDR)
-    if (bit_is_clear(UCSRA, PE)) {
-      unsigned char c = UDR;
-      store_char(c, &Serial);
-    } else {
-      unsigned char c = UDR;
-    };
-  #else
-    #error UDR not defined
-  #endif
+    Serial._rx_complete_irq();
   }
 #endif
 #endif
@@ -143,12 +113,7 @@ inline void store_char(unsigned char c, HardwareSerial *s)
   #define serialEvent1_implemented
   ISR(USART1_RX_vect)
   {
-    if (bit_is_clear(UCSR1A, UPE1)) {
-      unsigned char c = UDR1;
-      store_char(c, &Serial1);
-    } else {
-      unsigned char c = UDR1;
-    };
+    Serial1._rx_complete_irq();
   }
 #endif
 
@@ -158,12 +123,7 @@ inline void store_char(unsigned char c, HardwareSerial *s)
   #define serialEvent2_implemented
   ISR(USART2_RX_vect)
   {
-    if (bit_is_clear(UCSR2A, UPE2)) {
-      unsigned char c = UDR2;
-      store_char(c, &Serial2);
-    } else {
-      unsigned char c = UDR2;
-    };
+    Serial2._rx_complete_irq();
   }
 #endif
 
@@ -173,12 +133,7 @@ inline void store_char(unsigned char c, HardwareSerial *s)
   #define serialEvent3_implemented
   ISR(USART3_RX_vect)
   {
-    if (bit_is_clear(UCSR3A, UPE3)) {
-      unsigned char c = UDR3;
-      store_char(c, &Serial3);
-    } else {
-      unsigned char c = UDR3;
-    };
+    Serial3._rx_complete_irq();
   }
 #endif
 
@@ -215,27 +170,7 @@ ISR(USART0_UDRE_vect)
 ISR(USART_UDRE_vect)
 #endif
 {
-  if (Serial._tx_buffer_head == Serial._tx_buffer_tail) {
-	// Buffer empty, so disable interrupts
-#if defined(UCSR0B)
-    cbi(UCSR0B, UDRIE0);
-#else
-    cbi(UCSRB, UDRIE);
-#endif
-  }
-  else {
-    // There is more data in the output buffer. Send the next byte
-    unsigned char c = Serial._tx_buffer[Serial._tx_buffer_tail];
-    Serial._tx_buffer_tail = (Serial._tx_buffer_tail + 1) % SERIAL_BUFFER_SIZE;
-	
-  #if defined(UDR0)
-    UDR0 = c;
-  #elif defined(UDR)
-    UDR = c;
-  #else
-    #error UDR not defined
-  #endif
-  }
+  Serial._tx_udr_empty_irq();
 }
 #endif
 #endif
@@ -243,53 +178,63 @@ ISR(USART_UDRE_vect)
 #ifdef USART1_UDRE_vect
 ISR(USART1_UDRE_vect)
 {
-  if (Serial1._tx_buffer_head == Serial1._tx_buffer_tail) {
-	// Buffer empty, so disable interrupts
-    cbi(UCSR1B, UDRIE1);
-  }
-  else {
-    // There is more data in the output buffer. Send the next byte
-    unsigned char c = Serial1._tx_buffer[Serial1._tx_buffer_tail];
-    Serial1._tx_buffer_tail = (Serial1._tx_buffer_tail + 1) % SERIAL_BUFFER_SIZE;
-	
-    UDR1 = c;
-  }
+  Serial1._tx_udr_empty_irq();
 }
 #endif
 
 #ifdef USART2_UDRE_vect
 ISR(USART2_UDRE_vect)
 {
-  if (Serial2._tx_buffer_head == Serial2._tx_buffer_tail) {
-	// Buffer empty, so disable interrupts
-    cbi(UCSR2B, UDRIE2);
-  }
-  else {
-    // There is more data in the output buffer. Send the next byte
-    unsigned char c = Serial2._tx_buffer[Serial2._tx_buffer_tail];
-    Serial2._tx_buffer_tail = (Serial2._tx_buffer_tail + 1) % SERIAL_BUFFER_SIZE;
-	
-    UDR2 = c;
-  }
+  Serial2._tx_udr_empty_irq();
 }
 #endif
 
 #ifdef USART3_UDRE_vect
 ISR(USART3_UDRE_vect)
 {
-  if (Serial3._tx_buffer_head == Serial3._tx_buffer_tail) {
-	// Buffer empty, so disable interrupts
-    cbi(UCSR3B, UDRIE3);
+  Serial3._tx_udr_empty_irq();
+}
+#endif
+
+
+// Actual interrupt handlers //////////////////////////////////////////////////////////////
+
+void HardwareSerial::_rx_complete_irq(void)
+{
+  if (bit_is_clear(*_ucsra, UPE0)) {
+    // No Parity error, read byte and store it in the buffer if there is
+    // room
+    unsigned char c = *_udr;
+    int i = (unsigned int)(_rx_buffer_head + 1) % SERIAL_BUFFER_SIZE;
+
+    // if we should be storing the received character into the location
+    // just before the tail (meaning that the head would advance to the
+    // current location of the tail), we're about to overflow the buffer
+    // and so we don't write the character or advance the head.
+    if (i != _rx_buffer_tail) {
+      _rx_buffer[_rx_buffer_head] = c;
+      _rx_buffer_head = i;
+    }
+  } else {
+    // Parity error, read byte but discard it
+    unsigned char c = *_udr;
+  };
+}
+
+void HardwareSerial::_tx_udr_empty_irq(void)
+{
+  if (_tx_buffer_head == _tx_buffer_tail) {
+    // Buffer empty, so disable interrupts
+    cbi(*_ucsrb, UDRIE0);
   }
   else {
     // There is more data in the output buffer. Send the next byte
-    unsigned char c = Serial3._tx_buffer[Serial3._tx_buffer_tail];
-    Serial3._tx_buffer_tail = (Serial3._tx_buffer_tail + 1) % SERIAL_BUFFER_SIZE;
-	
-    UDR3 = c;
+    unsigned char c = _tx_buffer[_tx_buffer_tail];
+    _tx_buffer_tail = (_tx_buffer_tail + 1) % SERIAL_BUFFER_SIZE;
+
+    *_udr = c;
   }
 }
-#endif
 
 // Constructors ////////////////////////////////////////////////////////////////
 
