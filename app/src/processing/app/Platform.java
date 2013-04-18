@@ -32,6 +32,7 @@ import javax.swing.UIManager;
 
 import com.sun.jna.Library;
 import com.sun.jna.Native;
+import processing.app.debug.TargetBoard;
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
 import processing.app.helpers.PreferencesMap;
@@ -147,14 +148,14 @@ public class Platform {
   protected String resolveDeviceByVendorIdProductId(Map<String, TargetPackage> packages, String readVIDPID) {
     for (TargetPackage targetPackage : packages.values()) {
       for (TargetPlatform targetPlatform : targetPackage.getPlatforms().values()) {
-        for (PreferencesMap board : targetPlatform.getBoards().values()) {
-          List<String> vids = new LinkedList<String>(board.createSubTree("vid").values());
+        for (TargetBoard board : targetPlatform.getBoards().values()) {
+          List<String> vids = new LinkedList<String>(board.getPreferences().subTree("vid").values());
           if (!vids.isEmpty()) {
-            List<String> pids = new LinkedList<String>(board.createSubTree("pid").values());
+            List<String> pids = new LinkedList<String>(board.getPreferences().subTree("pid").values());
             for (int i = 0; i< vids.size(); i++) {
               String vidPid = vids.get(i) + "_" + pids.get(i);
               if (vidPid.toUpperCase().equals(readVIDPID)) {
-                return board.get("name");
+                return board.getName();
               }
             }
           }
