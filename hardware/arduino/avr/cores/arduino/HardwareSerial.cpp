@@ -62,9 +62,13 @@
 struct ring_buffer
 {
   unsigned char buffer[SERIAL_BUFFER_SIZE];
-  volatile unsigned int head;
-  volatile unsigned int tail;
+  volatile uint8_t head;
+  volatile uint8_t tail;
 };
+
+#if SERIAL_BUFFER_SIZE > 256
+#error Serial buffer size too big for head and tail pointers
+#endif
 
 #if defined(USBCON)
   ring_buffer rx_buffer = { { 0 }, 0, 0};
