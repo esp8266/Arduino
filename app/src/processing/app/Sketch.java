@@ -1665,24 +1665,27 @@ public class Sketch {
 
     Uploader uploader = new UploaderFactory().newUploader(target.getBoards().get(board), Preferences.get("serial.port"));
 
-    if (uploader.requiresAuthorization() && !Preferences.has(uploader.getAuthorizationKey())) {
-      PasswordAuthorizationDialog dialog = new PasswordAuthorizationDialog(editor);
-      dialog.setLocationRelativeTo(editor);
-      dialog.setVisible(true);
+    boolean success = false;
+    do {
+      if (uploader.requiresAuthorization() && !Preferences.has(uploader.getAuthorizationKey())) {
+        PasswordAuthorizationDialog dialog = new PasswordAuthorizationDialog(editor);
+        dialog.setLocationRelativeTo(editor);
+        dialog.setVisible(true);
 
-      if (dialog.isCancelled()) {
-        editor.statusNotice(_("Upload cancelled"));
-        return false;
+        if (dialog.isCancelled()) {
+          editor.statusNotice(_("Upload cancelled"));
+          return false;
+        }
+
+        Preferences.set(uploader.getAuthorizationKey(), DigestUtils.sha512Hex(dialog.getPassword()));
       }
 
-      Preferences.set(uploader.getAuthorizationKey(), DigestUtils.sha512Hex(dialog.getPassword()));
-    }
+      success = uploader.uploadUsingPreferences(buildPath, suggestedClassName, usingProgrammer);
 
-    boolean success = uploader.uploadUsingPreferences(buildPath, suggestedClassName, usingProgrammer);
-
-    if (uploader.requiresAuthorization() && !success) {
-      Preferences.remove(uploader.getAuthorizationKey());
-    }
+      if (uploader.requiresAuthorization() && !success) {
+        Preferences.remove(uploader.getAuthorizationKey());
+      }
+    } while (uploader.requiresAuthorization() && !success);
 
     return success;
   }
