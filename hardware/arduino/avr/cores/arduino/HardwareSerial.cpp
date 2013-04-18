@@ -332,7 +332,7 @@ int HardwareSerial::read(void)
 void HardwareSerial::flush()
 {
   // UDR is kept full while the buffer is not empty, so TXC triggers when EMPTY && SENT
-  while (transmitting && ! (*_ucsra & _BV(TXC0)));
+  while (transmitting && bit_is_clear(*_ucsra, TXC0));
   transmitting = false;
 }
 
