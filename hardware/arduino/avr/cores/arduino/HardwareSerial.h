@@ -39,7 +39,7 @@
 
 class HardwareSerial : public Stream
 {
-  private:
+  protected:
     volatile uint8_t *_ubrrh;
     volatile uint8_t *_ubrrl;
     volatile uint8_t *_ucsra;
