@@ -34,19 +34,54 @@
 
 #include "HardwareSerial.h"
 
-/*
- * on ATmega8, the uart and its bits are not numbered, so there is no "TXC0"
- * definition.
- */
+// Ensure that the various bit positions we use are available with a 0
+// postfix, so we can always use the values for UART0 for all UARTs. The
+// alternative, passing the various values for each UART to the
+// HardwareSerial constructor also works, but makes the code bigger and
+// slower.
 #if !defined(TXC0)
 #if defined(TXC)
+// On ATmega8, the uart and its bits are not numbered, so there is no TXC0 etc.
 #define TXC0 TXC
+#define RXEN0 RXEN
+#define TXEN0 TXEN
+#define RXCIE0 RXCIE
+#define UDRIE0 UDRIE
+#define U2X0 U2X
+#define UPE0 UPE
+#define UDRE0 UDRE
 #elif defined(TXC1)
 // Some devices have uart1 but no uart0
 #define TXC0 TXC1
+#define RXEN0 RXEN1
+#define TXEN0 TXEN1
+#define RXCIE0 RXCIE1
+#define UDRIE0 UDRIE1
+#define U2X0 U2X1
+#define UPE0 UPE1
+#define UDRE0 UDRE1
 #else
-#error TXC0 not definable in HardwareSerial.h
+#error No UART found in HardwareSerial.cpp
 #endif
+#endif // !defined TXC0
+
+// Check at compiletime that it is really ok to use the bit positions of
+// UART0 for the other UARTs as well, in case these values ever get
+// changed for future hardware.
+#if defined(TXC1) && (TXC1 != TXC0 || RXEN1 != RXEN0 || RXCIE1 != RXCIE0 || \
+		      UDRIE1 != UDRIE0 || U2X1 != U2X0 || UPE1 != UPE0 || \
+		      UDRE1 != UDRE0)
+#error "Not all bit positions for UART1 are the same as for UART0"
+#endif
+#if defined(TXC2) && (TXC2 != TXC0 || RXEN2 != RXEN0 || RXCIE2 != RXCIE0 || \
+		      UDRIE2 != UDRIE0 || U2X2 != U2X0 || UPE2 != UPE0 || \
+		      UDRE2 != UDRE0)
+#error "Not all bit positions for UART2 are the same as for UART0"
+#endif
+#if defined(TXC3) && (TXC3 != TXC0 || RXEN3 != RXEN0 || RXCIE3 != RXCIE0 || \
+		      UDRIE3 != UDRIE0 || U3X3 != U3X0 || UPE3 != UPE0 || \
+		      UDRE3 != UDRE0)
+#error "Not all bit positions for UART3 are the same as for UART0"
 #endif
 
 inline void store_char(unsigned char c, HardwareSerial *s)
@@ -261,8 +296,7 @@ ISR(USART3_UDRE_vect)
 HardwareSerial::HardwareSerial(
   volatile uint8_t *ubrrh, volatile uint8_t *ubrrl,
   volatile uint8_t *ucsra, volatile uint8_t *ucsrb,
-  volatile uint8_t *ucsrc, volatile uint8_t *udr,
-  uint8_t rxen, uint8_t txen, uint8_t rxcie, uint8_t udrie, uint8_t u2x)
+  volatile uint8_t *ucsrc, volatile uint8_t *udr)
 {
   _tx_buffer_head = _tx_buffer_tail = 0;
   _rx_buffer_head = _rx_buffer_tail = 0;
@@ -272,11 +306,6 @@ HardwareSerial::HardwareSerial(
   _ucsrb = ucsrb;
   _ucsrc = ucsrc;
   _udr = udr;
-  _rxen = rxen;
-  _txen = txen;
-  _rxcie = rxcie;
-  _udrie = udrie;
-  _u2x = u2x;
 }
 
 // Public Methods //////////////////////////////////////////////////////////////
@@ -285,7 +314,7 @@ void HardwareSerial::begin(unsigned long baud, byte config)
 {
   // Try u2x mode first
   uint16_t baud_setting = (F_CPU / 4 / baud - 1) / 2;
-  *_ucsra = 1 << _u2x;
+  *_ucsra = 1 << U2X0;
 
   // hardcoded exception for 57600 for compatibility with the bootloader
   // shipped with the Duemilanove and previous boards and the firmware
@@ -308,10 +337,10 @@ void HardwareSerial::begin(unsigned long baud, byte config)
 #endif
   *_ucsrc = config;
   
-  sbi(*_ucsrb, _rxen);
-  sbi(*_ucsrb, _txen);
-  sbi(*_ucsrb, _rxcie);
-  cbi(*_ucsrb, _udrie);
+  sbi(*_ucsrb, RXEN0);
+  sbi(*_ucsrb, TXEN0);
+  sbi(*_ucsrb, RXCIE0);
+  cbi(*_ucsrb, UDRIE0);
 }
 
 void HardwareSerial::end()
@@ -320,10 +349,10 @@ void HardwareSerial::end()
   while (_tx_buffer_head != _tx_buffer_tail)
     ;
 
-  cbi(*_ucsrb, _rxen);
-  cbi(*_ucsrb, _txen);
-  cbi(*_ucsrb, _rxcie);  
-  cbi(*_ucsrb, _udrie);
+  cbi(*_ucsrb, RXEN0);
+  cbi(*_ucsrb, TXEN0);
+  cbi(*_ucsrb, RXCIE0);
+  cbi(*_ucsrb, UDRIE0);
   
   // clear any received data
   _rx_buffer_head = _rx_buffer_tail;
@@ -375,7 +404,7 @@ size_t HardwareSerial::write(uint8_t c)
   _tx_buffer[_tx_buffer_head] = c;
   _tx_buffer_head = i;
 	
-  sbi(*_ucsrb, _udrie);
+  sbi(*_ucsrb, UDRIE0);
   // clear the TXC bit -- "can be cleared by writing a one to its bit location"
   transmitting = true;
   sbi(*_ucsra, TXC0);
@@ -386,9 +415,9 @@ size_t HardwareSerial::write(uint8_t c)
 // Preinstantiate Objects //////////////////////////////////////////////////////
 
 #if defined(UBRRH) && defined(UBRRL)
-  HardwareSerial Serial(&UBRRH, &UBRRL, &UCSRA, &UCSRB, &UCSRC, &UDR, RXEN, TXEN, RXCIE, UDRIE, U2X);
+  HardwareSerial Serial(&UBRRH, &UBRRL, &UCSRA, &UCSRB, &UCSRC, &UDR);
 #elif defined(UBRR0H) && defined(UBRR0L)
-  HardwareSerial Serial(&UBRR0H, &UBRR0L, &UCSR0A, &UCSR0B, &UCSR0C, &UDR0, RXEN0, TXEN0, RXCIE0, UDRIE0, U2X0);
+  HardwareSerial Serial(&UBRR0H, &UBRR0L, &UCSR0A, &UCSR0B, &UCSR0C, &UDR0);
 #elif defined(USBCON)
   // do nothing - Serial object and buffers are initialized in CDC code
 #else
@@ -396,13 +425,13 @@ size_t HardwareSerial::write(uint8_t c)
 #endif
 
 #if defined(UBRR1H)
-  HardwareSerial Serial1(&UBRR1H, &UBRR1L, &UCSR1A, &UCSR1B, &UCSR1C, &UDR1, RXEN1, TXEN1, RXCIE1, UDRIE1, U2X1);
+  HardwareSerial Serial1(&UBRR1H, &UBRR1L, &UCSR1A, &UCSR1B, &UCSR1C, &UDR1);
 #endif
 #if defined(UBRR2H)
-  HardwareSerial Serial2(&UBRR2H, &UBRR2L, &UCSR2A, &UCSR2B, &UCSR2C, &UDR2, RXEN2, TXEN2, RXCIE2, UDRIE2, U2X2);
+  HardwareSerial Serial2(&UBRR2H, &UBRR2L, &UCSR2A, &UCSR2B, &UCSR2C, &UDR2);
 #endif
 #if defined(UBRR3H)
-  HardwareSerial Serial3(&UBRR3H, &UBRR3L, &UCSR3A, &UCSR3B, &UCSR3C, &UDR3, RXEN3, TXEN3, RXCIE3, UDRIE3, U2X3);
+  HardwareSerial Serial3(&UBRR3H, &UBRR3L, &UCSR3A, &UCSR3B, &UCSR3C, &UDR3);
 #endif
 
 #endif // whole file
