@@ -72,7 +72,8 @@ class HardwareSerial : public Stream
     volatile uint8_t *_ucsrb;
     volatile uint8_t *_ucsrc;
     volatile uint8_t *_udr;
-    bool transmitting;
+    // Has any byte been written to the UART since begin()
+    bool _written;
 
     volatile uint8_t _rx_buffer_head;
     volatile uint8_t _rx_buffer_tail;
