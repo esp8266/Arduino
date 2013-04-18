@@ -709,7 +709,7 @@ public class Editor extends JFrame implements RunnerListener {
     }
 
     if (serialMenu == null)
-      serialMenu = new JMenu(_("Serial Port"));
+      serialMenu = new JMenu(_("Port"));
     populateSerialMenu();
     menu.add(serialMenu);
     menu.addSeparator();
