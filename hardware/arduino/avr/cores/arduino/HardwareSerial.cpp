@@ -223,21 +223,21 @@ void HardwareSerial::_rx_complete_irq(void)
 
 void HardwareSerial::_tx_udr_empty_irq(void)
 {
+  // If interrupts are enabled, there must be more data in the output
+  // buffer. Send the next byte
+  unsigned char c = _tx_buffer[_tx_buffer_tail];
+  _tx_buffer_tail = (_tx_buffer_tail + 1) % SERIAL_BUFFER_SIZE;
+
+  *_udr = c;
+
+  // clear the TXC bit -- "can be cleared by writing a one to its bit
+  // location". This makes sure flush() won't return until the bytes
+  // actually got written
+  sbi(*_ucsra, TXC0);
+
   if (_tx_buffer_head == _tx_buffer_tail) {
     // Buffer empty, so disable interrupts
     cbi(*_ucsrb, UDRIE0);
-  }
-  else {
-    // There is more data in the output buffer. Send the next byte
-    unsigned char c = _tx_buffer[_tx_buffer_tail];
-    _tx_buffer_tail = (_tx_buffer_tail + 1) % SERIAL_BUFFER_SIZE;
-
-    *_udr = c;
-
-    // clear the TXC bit -- "can be cleared by writing a one to its bit
-    // location". This makes sure flush() won't return until the bytes
-    // actually got written
-    sbi(*_ucsra, TXC0);
   }
 }
 
