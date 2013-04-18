@@ -344,7 +344,14 @@ void HardwareSerial::flush()
   if (!_written)
     return;
 
-  while (bit_is_set(*_ucsrb, UDRIE0) || bit_is_clear(*_ucsra, TXC0));
+  while (bit_is_set(*_ucsrb, UDRIE0) || bit_is_clear(*_ucsra, TXC0)) {
+    if (bit_is_clear(SREG, SREG_I) && bit_is_set(*_ucsrb, UDRIE0))
+	// Interrupts are globally disabled, but the DR empty
+	// interrupt should be enabled, so poll the DR empty flag to
+	// prevent deadlock
+	if (bit_is_set(*_ucsra, UDRE0))
+	  _tx_udr_empty_irq();
+  }
   // If we get here, nothing is queued anymore (DRIE is disabled) and
   // the hardware finished tranmission (TXC is set).
 }
@@ -355,10 +362,19 @@ size_t HardwareSerial::write(uint8_t c)
 	
   // If the output buffer is full, there's nothing for it other than to 
   // wait for the interrupt handler to empty it a bit
-  // ???: return 0 here instead?
-  while (i == _tx_buffer_tail)
-    ;
-	
+  while (i == _tx_buffer_tail) {
+    if (bit_is_clear(SREG, SREG_I)) {
+      // Interrupts are disabled, so we'll have to poll the data
+      // register empty flag ourselves. If it is set, pretend an
+      // interrupt has happened and call the handler to free up
+      // space for us.
+      if(bit_is_set(*_ucsra, UDRE0))
+	_tx_udr_empty_irq();
+    } else {
+      // nop, the interrupt handler will free up space for us
+    }
+  }
+
   _tx_buffer[_tx_buffer_head] = c;
   _tx_buffer_head = i;
 	
