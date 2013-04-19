@@ -233,6 +233,11 @@ void HardwareSerial::_tx_udr_empty_irq(void)
     _tx_buffer_tail = (_tx_buffer_tail + 1) % SERIAL_BUFFER_SIZE;
 
     *_udr = c;
+
+    // clear the TXC bit -- "can be cleared by writing a one to its bit
+    // location". This makes sure flush() won't return until the bytes
+    // actually got written
+    sbi(*_ucsra, TXC0);
   }
 }
 
@@ -339,9 +344,9 @@ void HardwareSerial::flush()
   if (!_written)
     return;
 
-  // UDR is kept full while the buffer is not empty, so TXC triggers
-  // when EMPTY && SENT
-  while (bit_is_clear(*_ucsra, TXC0));
+  while (bit_is_set(*_ucsrb, UDRIE0) || bit_is_clear(*_ucsra, TXC0));
+  // If we get here, nothing is queued anymore (DRIE is disabled) and
+  // the hardware finished tranmission (TXC is set).
 }
 
 size_t HardwareSerial::write(uint8_t c)
@@ -359,10 +364,6 @@ size_t HardwareSerial::write(uint8_t c)
 	
   sbi(*_ucsrb, UDRIE0);
   _written = true;
-  // clear the TXC bit -- "can be cleared by writing a one to its bit
-  // location". This makes sure flush() won't return until the bytes
-  // actually got written
-  sbi(*_ucsra, TXC0);
   
   return 1;
 }
