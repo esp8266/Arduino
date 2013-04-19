@@ -283,32 +283,19 @@ HardwareSerial::HardwareSerial(
 
 void HardwareSerial::begin(unsigned long baud, byte config)
 {
-  uint16_t baud_setting;
-  bool use_u2x = true;
+  // Try u2x mode first
+  uint16_t baud_setting = (F_CPU / 4 / baud - 1) / 2;
+  *_ucsra = 1 << _u2x;
 
-#if F_CPU == 16000000UL
-  // hardcoded exception for compatibility with the bootloader shipped
-  // with the Duemilanove and previous boards and the firmware on the 8U2
-  // on the Uno and Mega 2560.
-  if (baud == 57600) {
-    use_u2x = false;
-  }
-#endif
-
-try_again:
-  
-  if (use_u2x) {
-    *_ucsra = 1 << _u2x;
-    baud_setting = (F_CPU / 4 / baud - 1) / 2;
-  } else {
+  // hardcoded exception for 57600 for compatibility with the bootloader
+  // shipped with the Duemilanove and previous boards and the firmware
+  // on the 8U2 on the Uno and Mega 2560. Also, The baud_setting cannot
+  // be > 4095, so switch back to non-u2x mode if the baud rate is too
+  // low.
+  if (((F_CPU == 16000000UL) && (baud == 57600)) || (baud_setting >4095))
+  {
     *_ucsra = 0;
     baud_setting = (F_CPU / 8 / baud - 1) / 2;
-  }
-  
-  if ((baud_setting > 4095) && use_u2x)
-  {
-    use_u2x = false;
-    goto try_again;
   }
 
   // assign the baud_setting, a.k.a. ubbr (USART Baud Rate Register)
