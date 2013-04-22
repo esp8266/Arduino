@@ -34,8 +34,8 @@ dogstick.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid}
 ##############################################################
 
 uno.name=Arduino Uno
-uno.vid.0=2341
-uno.pid.0=0043
+uno.vid.0=0x2341
+uno.pid.0=0x0043
 uno.upload.tool=avrdude
 uno.upload.protocol=arduino
 uno.upload.maximum_size=32256
@@ -150,10 +150,10 @@ nano.menu.cpu.atmega168.build.mcu=atmega168
 ##############################################################
 
 mega2560.name=Arduino Mega 2560 or Mega ADK
-mega2560.vid.0=2341
-mega2560.pid.0=0044
-mega2560.vid.1=2341
-mega2560.pid.1=003f
+mega2560.vid.0=0x2341
+mega2560.pid.0=0x0044
+mega2560.vid.1=0x2341
+mega2560.pid.1=0x003f
 mega2560.cpu=2560 or ADK
 
 mega2560.upload.tool=avrdude
@@ -202,10 +202,10 @@ mega.build.variant=mega
 ##############################################################
 
 leonardo.name=Arduino Leonardo
-leonardo.vid.0=2341
-leonardo.pid.0=0036
-leonardo.vid.1=2341
-leonardo.pid.1=8036
+leonardo.vid.0=0x2341
+leonardo.pid.0=0x0036
+leonardo.vid.1=0x2341
+leonardo.pid.1=0x8036
 leonardo.upload.tool=avrdude
 leonardo.upload.protocol=avr109
 leonardo.upload.maximum_size=28672
@@ -264,10 +264,10 @@ micro.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid}
 ##############################################################
 
 esplora.name=Arduino Esplora
-esplora.vid.0=2341
-esplora.pid.0=003c
-esplora.vid.1=2341
-esplora.pid.1=803c
+esplora.vid.0=0x2341
+esplora.pid.0=0x003c
+esplora.vid.1=0x2341
+esplora.pid.1=0x803c
 esplora.upload.tool=avrdude
 esplora.upload.protocol=avr109
 esplora.upload.maximum_size=28672
