@@ -108,6 +108,8 @@ public class DiscourseFormat {
           // i don't care about ownership
         }
       });
+    Clipboard unixclipboard = Toolkit.getDefaultToolkit().getSystemSelection();
+    if (unixclipboard != null) unixclipboard.setContents(formatted, null);
 
     editor.statusNotice("Code formatted for " +
                         (html ? "HTML" : "the Arduino forum ") +
