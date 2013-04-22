@@ -10,26 +10,34 @@ import java.util.regex.Pattern;
 
 public class SystemProfilerParser {
 
+  private static final String DEVICE_PATH = "device_path";
+  private static final String VID = "vid";
+  private static final String PID = "pid";
+  private static final String SERIAL_NUMBER = "serial_number";
+  private static final String DEV_TTY = "/dev/tty.";
+  private static final String DEV_TTY_USBMODEM = "/dev/tty.usbmodem";
+  private static final String DEV_CU_USBMODEM = "/dev/cu.usbmodem";
+
   private final Pattern vidRegex;
   private final Pattern serialNumberRegex;
   private final Pattern locationRegex;
   private final Pattern pidRegex;
 
   public SystemProfilerParser() {
-    serialNumberRegex = Pattern.compile("^Serial Number: (.+)$");
-    locationRegex = Pattern.compile("^Location ID: (.+)$");
-    pidRegex = Pattern.compile("^Product ID: (.+)$");
-    vidRegex = Pattern.compile("^Vendor ID: (.+)$");
+    this.serialNumberRegex = Pattern.compile("^Serial Number: (.+)$");
+    this.locationRegex = Pattern.compile("^Location ID: (.+)$");
+    this.pidRegex = Pattern.compile("^Product ID: (.+)$");
+    this.vidRegex = Pattern.compile("^Vendor ID: (.+)$");
   }
 
   public String extractVIDAndPID(String output, String serial) throws IOException {
     BufferedReader reader = new BufferedReader(new StringReader(output));
 
     String devicePrefix;
-    if (serial.startsWith("/dev/tty.")) {
-      devicePrefix = "/dev/tty.usbmodem";
+    if (serial.startsWith(DEV_TTY)) {
+      devicePrefix = DEV_TTY_USBMODEM;
     } else {
-      devicePrefix = "/dev/cu.usbmodem";
+      devicePrefix = DEV_CU_USBMODEM;
     }
 
     Map<String, String> device = new HashMap<String, String>();
@@ -41,16 +49,16 @@ public class SystemProfilerParser {
       line = line.replaceAll("\\s+", " ");
 
       if ((matcher = serialNumberRegex.matcher(line)).matches()) {
-        device.put("serial_number", matcher.group(1));
+        device.put(SERIAL_NUMBER, matcher.group(1));
       } else if ((matcher = locationRegex.matcher(line)).matches()) {
-        device.put("device_path", devicePrefix + matcher.group(1).substring(2, 6) + "1");
+        device.put(DEVICE_PATH, devicePrefix + matcher.group(1).substring(2, 6) + "1");
       } else if ((matcher = pidRegex.matcher(line)).matches()) {
-        device.put("pid", matcher.group(1));
+        device.put(PID, matcher.group(1));
       } else if ((matcher = vidRegex.matcher(line)).matches()) {
-        device.put("vid", matcher.group(1));
+        device.put(VID, matcher.group(1));
       } else if (line.equals("")) {
-        if (device.containsKey("serial_number") && device.get("device_path").equals(serial)) {
-          return device.get("vid").substring(2).toUpperCase() + "_" + device.get("pid").substring(2).toUpperCase();
+        if (device.containsKey(DEVICE_PATH) && device.get(DEVICE_PATH).equals(serial)) {
+          return (device.get(VID) + "_" + device.get(PID)).toUpperCase();
         }
         device = new HashMap<String, String>();
       }

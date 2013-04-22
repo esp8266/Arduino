@@ -11,6 +11,6 @@ public class UDevAdmParserTest {
   public void shouldCorrectlyParse() throws Exception {
     String output = TestHelper.inputStreamToString(UDevAdmParserTest.class.getResourceAsStream("udev_output.txt"));
 
-    assertEquals("2341_0036", new UDevAdmParser().extractVIDAndPID(output));
+    assertEquals("0X2341_0X0036", new UDevAdmParser().extractVIDAndPID(output));
   }
 }

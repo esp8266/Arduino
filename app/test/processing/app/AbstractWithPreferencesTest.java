@@ -5,7 +5,7 @@ import org.junit.BeforeClass;
 public abstract class AbstractWithPreferencesTest {
 
   @BeforeClass
-  public static void setUp() throws Exception {
+  public static void init() throws Exception {
     Base.initPlatform();
     Preferences.init(null);
   }

@@ -10,7 +10,7 @@ public class UDevAdmParser {
     Properties properties = new Properties();
     properties.load(new StringReader(output));
 
-    return properties.get("ID_VENDOR_ID").toString().toUpperCase() + "_" + properties.get("ID_MODEL_ID").toString().toUpperCase();
+    return ("0x" + properties.get("ID_VENDOR_ID").toString() + "_0x" + properties.get("ID_MODEL_ID").toString()).toUpperCase();
   }
 
 }

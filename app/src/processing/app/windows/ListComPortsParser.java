@@ -29,7 +29,7 @@ public class ListComPortsParser {
         Matcher vidMatcher = vidRegExp.matcher(line);
         Matcher pidMatcher = pidRegExp.matcher(line);
         if (vidMatcher.find() && pidMatcher.find()) {
-          return vidMatcher.group(1).toUpperCase() + "_" + pidMatcher.group(1).toUpperCase();
+          return ("0x" + vidMatcher.group(1) + "_0x" + pidMatcher.group(1)).toUpperCase();
         }
       }
     }
