@@ -1631,14 +1631,16 @@ public class Sketch {
       System.out.println(I18n
               .format(_("Binary sketch size: {0} bytes (of a {1} byte maximum) - {2}% used"),
                       textSize, maxTextSize, textSize * 100 / maxTextSize));
-      if(maxDataSize > 0) {
-	System.out.println(I18n
-              .format(_("Memory usage: {0} bytes (of a {1} byte maximum) - {2}% used"),
-                      dataSize, maxDataSize, dataSize * 100 / maxDataSize));
-      } else {
-	System.out.println(I18n
-              .format(_("Memory usage: {0} bytes"),
-                      dataSize));
+      if(dataSize >= 0) {
+	if(maxDataSize > 0) {
+	  System.out.println(I18n
+		.format(_("Memory usage: {0} bytes (of a {1} byte maximum) - {2}% used"),
+			dataSize, maxDataSize, dataSize * 100 / maxDataSize));
+	} else {
+	  System.out.println(I18n
+		.format(_("Memory usage: {0} bytes"),
+			dataSize));
+	}
       }
     } catch (RunnerException e) {
       System.err.println(I18n.format(_("Couldn't determine program size: {0}"),
