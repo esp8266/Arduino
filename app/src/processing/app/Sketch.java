@@ -1613,23 +1613,41 @@ public class Sketch {
 
 
   protected void size(PreferencesMap prefs) throws RunnerException {
-    long size = 0;
-    String maxsizeString = prefs.get("upload.maximum_size");
-    if (maxsizeString == null)
+    long textSize = 0;
+    long dataSize = 0;
+    String maxTextSizeString = prefs.get("upload.maximum_size");
+    String maxDataSizeString = prefs.get("upload.maximum_data_size");
+    if (maxTextSizeString == null)
       return;
-    long maxsize = Integer.parseInt(maxsizeString);
+    long maxTextSize = Integer.parseInt(maxTextSizeString);
+    long maxDataSize = -1;
+    if(maxDataSizeString != null)
+      maxDataSize = Integer.parseInt(maxDataSizeString);
     Sizer sizer = new Sizer(prefs);
     try {
-      size = sizer.computeSize();
+      long[] sizes = sizer.computeSize();
+      textSize = sizes[0];
+      dataSize = sizes[1];
       System.out.println(I18n
               .format(_("Binary sketch size: {0} bytes (of a {1} byte maximum) - {2}% used"),
-                      size, maxsize, size * 100 / maxsize));
+                      textSize, maxTextSize, textSize * 100 / maxTextSize));
+      if(maxDataSize > 0) {
+	System.out.println(I18n
+              .format(_("Memory usage: {0} bytes (of a {1} byte maximum) - {2}% used"),
+                      dataSize, maxDataSize, dataSize * 100 / maxDataSize));
+      } else {
+	System.out.println(I18n
+              .format(_("Memory usage: {0} bytes"),
+                      dataSize));
+      }
     } catch (RunnerException e) {
       System.err.println(I18n.format(_("Couldn't determine program size: {0}"),
                                      e.getMessage()));
     }
 
-    if (size > maxsize)
+    /* At least 10% of RAM should be reserved for stack/heap usage */
+    if (textSize > maxTextSize ||
+	(maxDataSize > 0 && dataSize > maxDataSize*9/10))
       throw new RunnerException(
           _("Sketch too big; see http://www.arduino.cc/en/Guide/Troubleshooting#size for tips on reducing it."));
   }

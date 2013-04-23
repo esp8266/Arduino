@@ -8,6 +8,7 @@ uno.name=Arduino Uno
 uno.upload.tool=avrdude
 uno.upload.protocol=arduino
 uno.upload.maximum_size=32256
+uno.upload.maximum_data_size=2048
 uno.upload.speed=115200
 
 uno.bootloader.tool=avrdude
@@ -46,6 +47,7 @@ atmega328diecimila.build.variant=standard
 atmega328diecimila.menu.cpu.atmega328=ATmega328
 
 atmega328diecimila.menu.cpu.atmega328.upload.maximum_size=30720
+atmega328diecimila.menu.cpu.atmega328.upload.maximum_data_size=2048
 atmega328diecimila.menu.cpu.atmega328.upload.speed=57600
 
 atmega328diecimila.menu.cpu.atmega328.bootloader.high_fuses=0xDA
@@ -59,6 +61,7 @@ atmega328diecimila.menu.cpu.atmega328.build.mcu=atmega328p
 atmega328diecimila.menu.cpu.atmega168=ATmega168
 
 atmega328diecimila.menu.cpu.atmega168.upload.maximum_size=14336
+atmega328diecimila.menu.cpu.atmega168.upload.maximum_data_size=1024
 atmega328diecimila.menu.cpu.atmega168.upload.speed=19200
 
 atmega328diecimila.menu.cpu.atmega168.bootloader.high_fuses=0xdd
@@ -88,6 +91,7 @@ nano.build.variant=eightanaloginputs
 nano.menu.cpu.atmega328=ATmega328
 
 nano.menu.cpu.atmega328.upload.maximum_size=30720
+nano.menu.cpu.atmega328.upload.maximum_data_size=2048
 nano.menu.cpu.atmega328.upload.speed=57600
 
 nano.menu.cpu.atmega328.bootloader.low_fuses=0xFF
@@ -102,6 +106,7 @@ menu.cpu.nano.atmega328.build.mcu=atmega328p
 nano.menu.cpu.atmega168=ATmega168
 
 nano.menu.cpu.atmega168.upload.maximum_size=14336
+nano.menu.cpu.atmega168.upload.maximum_data_size=1024
 nano.menu.cpu.atmega168.upload.speed=19200
 
 nano.menu.cpu.atmega168.bootloader.low_fuses=0xff
@@ -165,6 +170,7 @@ leonardo.name=Arduino Leonardo
 leonardo.upload.tool=avrdude
 leonardo.upload.protocol=avr109
 leonardo.upload.maximum_size=28672
+leonardo.upload.maximum_data_size=2560
 leonardo.upload.speed=57600
 leonardo.upload.disable_flushing=true
 leonardo.upload.use_1200bps_touch=true
@@ -193,6 +199,7 @@ micro.name=Arduino Micro
 micro.upload.tool=avrdude
 micro.upload.protocol=avr109
 micro.upload.maximum_size=28672
+micro.upload.maximum_data_size=2560
 micro.upload.speed=57600
 micro.upload.disable_flushing=true
 micro.upload.use_1200bps_touch=true
@@ -221,6 +228,7 @@ esplora.name=Arduino Esplora
 esplora.upload.tool=avrdude
 esplora.upload.protocol=avr109
 esplora.upload.maximum_size=28672
+esplora.upload.maximum_data_size=2560
 esplora.upload.speed=57600
 esplora.upload.disable_flushing=true
 esplora.upload.use_1200bps_touch=true
@@ -265,6 +273,7 @@ mini.build.variant=eightanaloginputs
 mini.menu.cpu.atmega328=ATmega328
 
 mini.menu.cpu.atmega328.upload.maximum_size=28672
+mini.menu.cpu.atmega328.upload.maximum_data_size=2048
 mini.menu.cpu.atmega328.upload.speed=115200
 
 mini.menu.cpu.atmega328.bootloader.high_fuses=0xd8
@@ -278,6 +287,7 @@ mini.menu.cpu.atmega328.build.mcu=atmega328p
 mini.menu.cpu.atmega168=ATmega168
 
 mini.menu.cpu.atmega168.upload.maximum_size=14336
+mini.menu.cpu.atmega168.upload.maximum_data_size=1024
 mini.menu.cpu.atmega168.upload.speed=19200
 
 mini.menu.cpu.atmega168.bootloader.high_fuses=0xdd
@@ -293,6 +303,7 @@ ethernet.name=Arduino Ethernet
 ethernet.upload.tool=avrdude
 ethernet.upload.protocol=arduino
 ethernet.upload.maximum_size=32256
+ethernet.upload.maximum_data_size=2048
 ethernet.upload.speed=115200
 
 ethernet.bootloader.tool=avrdude
@@ -316,6 +327,7 @@ fio.name=Arduino Fio
 fio.upload.tool=avrdude
 fio.upload.protocol=arduino
 fio.upload.maximum_size=30720
+fio.upload.maximum_data_size=2048
 fio.upload.speed=57600
 
 fio.bootloader.tool=avrdude
@@ -355,6 +367,7 @@ bt.build.variant=eightanaloginputs
 ## -----------------------
 bt.menu.cpu.atmega328=ATmega328
 bt.menu.cpu.atmega328.upload.maximum_size=28672
+bt.menu.cpu.atmega328.upload.maximum_data_size=2048
 
 bt.menu.cpu.atmega328.bootloader.high_fuses=0xd8
 bt.menu.cpu.atmega328.bootloader.extended_fuses=0x05
@@ -366,6 +379,7 @@ bt.menu.cpu.atmega328.build.mcu=atmega328p
 ## -----------------------
 bt.menu.cpu.atmega168=ATmega168
 bt.menu.cpu.atmega168.upload.maximum_size=14336
+bt.menu.cpu.atmega168.upload.maximum_data_size=1024
 
 bt.menu.cpu.atmega168.bootloader.high_fuses=0xdd
 bt.menu.cpu.atmega168.bootloader.extended_fuses=0x00
@@ -380,6 +394,7 @@ LilyPadUSB.name=LilyPad Arduino USB
 LilyPadUSB.upload.tool=avrdude
 LilyPadUSB.upload.protocol=avr109
 LilyPadUSB.upload.maximum_size=28672
+LilyPadUSB.upload.maximum_data_size=2560
 LilyPadUSB.upload.speed=57600
 LilyPadUSB.upload.disable_flushing=true
 LilyPadUSB.upload.use_1200bps_touch=true
@@ -423,6 +438,7 @@ lilypad.build.variant=standard
 lilypad.menu.cpu.atmega328=ATmega328
 
 lilypad.menu.cpu.atmega328.upload.maximum_size=30720
+lilypad.menu.cpu.atmega328.upload.maximum_data_size=2048
 lilypad.menu.cpu.atmega328.upload.speed=57600
 
 lilypad.menu.cpu.atmega328.bootloader.low_fuses=0xFF
@@ -437,6 +453,7 @@ lilypad.menu.cpu.atmega328.build.mcu=atmega328p
 lilypad.menu.cpu.atmega168=ATmega168
 
 lilypad.menu.cpu.atmega168.upload.maximum_size=14336
+lilypad.menu.cpu.atmega168.upload.maximum_data_size=1024
 lilypad.menu.cpu.atmega168.upload.speed=19200
 
 lilypad.menu.cpu.atmega168.bootloader.low_fuses=0xe2
@@ -466,6 +483,7 @@ pro.build.variant=standard
 pro.menu.cpu.16MHzatmega328=ATmega328 (5V, 16 MHz)
 
 pro.menu.cpu.16MHzatmega328.upload.maximum_size=30720
+pro.menu.cpu.16MHzatmega328.upload.maximum_data_size=2048
 pro.menu.cpu.16MHzatmega328.upload.speed=57600
 
 pro.menu.cpu.16MHzatmega328.bootloader.low_fuses=0xFF
@@ -481,6 +499,7 @@ pro.menu.cpu.16MHzatmega328.build.f_cpu=16000000L
 pro.menu.cpu.8MHzatmega328=ATmega328 (3.3V, 8 MHz)
 
 pro.menu.cpu.8MHzatmega328.upload.maximum_size=30720
+pro.menu.cpu.8MHzatmega328.upload.maximum_data_size=2048
 pro.menu.cpu.8MHzatmega328.upload.speed=57600
 
 pro.menu.cpu.8MHzatmega328.bootloader.low_fuses=0xFF
@@ -496,6 +515,7 @@ pro.menu.cpu.8MHzatmega328.build.f_cpu=8000000L
 pro.menu.cpu.16MHzatmega168=ATmega168 (5V, 16 MHz)
 
 pro.menu.cpu.16MHzatmega168.upload.maximum_size=14336
+pro.menu.cpu.16MHzatmega168.upload.maximum_data_size=1024
 pro.menu.cpu.16MHzatmega168.upload.speed=19200
 
 pro.menu.cpu.16MHzatmega168.bootloader.low_fuses=0xff
@@ -511,6 +531,7 @@ pro.menu.cpu.16MHzatmega168.build.f_cpu=16000000L
 pro.menu.cpu.8MHzatmega168=ATmega168 (3.3V, 8 MHz)
 
 pro.menu.cpu.8MHzatmega168.upload.maximum_size=14336
+pro.menu.cpu.8MHzatmega168.upload.maximum_data_size=1024
 pro.menu.cpu.8MHzatmega168.upload.speed=19200
 
 pro.menu.cpu.8MHzatmega168.bootloader.low_fuses=0xc6
@@ -544,6 +565,7 @@ atmegang.build.variant=standard
 atmegang.menu.cpu.atmega168=ATmega168
 
 atmegang.menu.cpu.atmega168.upload.maximum_size=14336
+atmegang.menu.cpu.atmega168.upload.maximum_data_size=1024
 
 atmegang.menu.cpu.atmega168.bootloader.low_fuses=0xff
 atmegang.menu.cpu.atmega168.bootloader.high_fuses=0xdd
