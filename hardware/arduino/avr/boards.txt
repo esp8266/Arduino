@@ -192,7 +192,7 @@ leonardo.build.usb_product="Arduino Leonardo"
 leonardo.build.board=AVR_LEONARDO
 leonardo.build.core=arduino
 leonardo.build.variant=leonardo
-leonardo.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid} -DUSB_MANUFACTURER={build.usb_manufacturer} -DUSB_PRODUCT={build.usb_product}
+leonardo.build.extra_flags={build.usb_flags}
 
 ##############################################################
 
@@ -222,7 +222,7 @@ micro.build.usb_product=Arduino Micro
 micro.build.board=AVR_MICRO
 micro.build.core=arduino
 micro.build.variant=micro
-micro.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid} -DUSB_MANUFACTURER={build.usb_manufacturer} -DUSB_PRODUCT={build.usb_product}
+micro.build.extra_flags={build.usb_flags}
 
 ##############################################################
 
@@ -252,7 +252,7 @@ esplora.build.usb_product=Arduino Esplora
 esplora.build.board=AVR_ESPLORA
 esplora.build.core=arduino
 esplora.build.variant=leonardo
-esplora.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid} -DUSB_MANUFACTURER={build.usb_manufacturer} -DUSB_PRODUCT={build.usb_product}
+esplora.build.extra_flags={build.usb_flags}
 
 ##############################################################
 
@@ -418,7 +418,7 @@ LilyPadUSB.build.usb_product=LilyPad USB
 LilyPadUSB.build.board=AVR_LILYPAD_USB
 LilyPadUSB.build.core=arduino
 LilyPadUSB.build.variant=leonardo
-LilyPadUSB.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid} -DUSB_MANUFACTURER={build.usb_manufacturer} -DUSB_PRODUCT={build.usb_product}
+LilyPadUSB.build.extra_flags={build.usb_flags}
 
 ##############################################################
 
