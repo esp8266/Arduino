@@ -44,6 +44,7 @@ File::File(void) {
 }
 
 File::~File(void) {
+ close();
   //  Serial.print("Deleted file object");
 }
 
