@@ -22,7 +22,7 @@
 #include <WiFi.h>
 
 
-char ssid[] = "yourNetwork";      //  your network SSID (name) 
+char ssid[] = "yourNetwork";      // your network SSID (name) 
 char pass[] = "secretPassword";   // your network password
 int keyIndex = 0;                 // your network key Index number (needed only for WEP)
 
@@ -78,12 +78,11 @@ void loop() {
           // send a standard http response header
           client.println("HTTP/1.1 200 OK");
           client.println("Content-Type: text/html");
-          client.println("Connection: close");
+          client.println("Connection: close");  // the connection will be closed after completion of the response
+          client.println("Refresh: 5");  // refresh the page automatically every 5 sec
           client.println();
           client.println("<!DOCTYPE HTML>");
           client.println("<html>");
-          // add a meta refresh tag, so the browser pulls again every 5 seconds:
-          client.println("<meta http-equiv=\"refresh\" content=\"5\">");
           // output the value of each analog input pin
           for (int analogChannel = 0; analogChannel < 6; analogChannel++) {
             int sensorReading = analogRead(analogChannel);
@@ -108,9 +107,10 @@ void loop() {
     }
     // give the web browser time to receive the data
     delay(1);
-      // close the connection:
-      client.stop();
-      Serial.println("client disonnected");
+    
+    // close the connection:
+    client.stop();
+    Serial.println("client disonnected");
   }
 }
 

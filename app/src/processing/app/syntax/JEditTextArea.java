@@ -1187,6 +1187,16 @@ public class JEditTextArea extends JComponent
         selectionEndLine = newEndLine;
         biasLeft = newBias;
 
+        if (newStart != newEnd) {
+          Clipboard unixclipboard = getToolkit().getSystemSelection();
+          if (unixclipboard != null) {
+            String selection = getSelectedText();
+            if (selection != null) {
+              unixclipboard.setContents(new StringSelection(selection), null);
+            }
+          }
+        }
+
         fireCaretEvent();
       }
 
@@ -1649,7 +1659,11 @@ public class JEditTextArea extends JComponent
         for(int i = 0; i < repeatCount; i++)
           buf.append(selection);
 
-        clipboard.setContents(new StringSelection(buf.toString()),null);
+        Transferable t = new StringSelection(buf.toString());
+        clipboard.setContents(t, null);
+
+        Clipboard unixclipboard = getToolkit().getSystemSelection();
+        if (unixclipboard != null) unixclipboard.setContents(t, null);
       }
   }
 
@@ -2204,6 +2218,25 @@ public class JEditTextArea extends JComponent
       if (trigger && (popup != null)) {
         popup.show(painter,evt.getX(),evt.getY());
         return;
+      }
+
+      // on Linux, middle button pastes selected text
+      if ((evt.getModifiers() & InputEvent.BUTTON2_MASK) != 0) {
+        Clipboard unixclipboard = getToolkit().getSystemSelection();
+        if (unixclipboard != null) {
+          Transferable t = unixclipboard.getContents(null);
+          if (t != null && t.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+            try {
+              String s = (String)t.getTransferData(DataFlavor.stringFlavor);
+              s = s.replace('\u00A0', ' ');
+              if (editable) setSelectedText(s);
+            } catch (Exception e) {
+              System.err.println(e);
+              e.printStackTrace();
+            }
+          }
+          return;
+        }
       }
 
       int line = yToLine(evt.getY());

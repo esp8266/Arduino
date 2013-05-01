@@ -19,16 +19,18 @@
  by David A. Mellis
  modified 30 Aug 2011
  by Limor Fried
+ modified 28 Dec 2012
+ by Mike Walters
  
-This example code is in the public domain.
+ This example code is in the public domain.
  
  http://www.arduino.cc/en/Tutorial/Debounce
  */
 
 // constants won't change. They're used here to 
 // set pin numbers:
-const int buttonPin = 2;     // the number of the pushbutton pin
-const int ledPin =  13;      // the number of the LED pin
+const int buttonPin = 2;    // the number of the pushbutton pin
+const int ledPin = 13;      // the number of the LED pin
 
 // Variables will change:
 int ledState = HIGH;         // the current state of the output pin
@@ -43,6 +45,9 @@ long debounceDelay = 50;    // the debounce time; increase if the output flicker
 void setup() {
   pinMode(buttonPin, INPUT);
   pinMode(ledPin, OUTPUT);
+
+  // set initial LED state
+  digitalWrite(ledPin, ledState);
 }
 
 void loop() {
@@ -62,11 +67,20 @@ void loop() {
   if ((millis() - lastDebounceTime) > debounceDelay) {
     // whatever the reading is at, it's been there for longer
     // than the debounce delay, so take it as the actual current state:
-    buttonState = reading;
+
+    // if the button state has changed:
+    if (reading != buttonState) {
+      buttonState = reading;
+
+      // only toggle the LED if the new button state is HIGH
+      if (buttonState == HIGH) {
+        ledState = !ledState;
+      }
+    }
   }
   
-  // set the LED using the state of the button:
-  digitalWrite(ledPin, buttonState);
+  // set the LED:
+  digitalWrite(ledPin, ledState);
 
   // save the reading.  Next time through the loop,
   // it'll be the lastButtonState:
