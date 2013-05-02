@@ -15,8 +15,6 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static processing.app.I18n._;
-
 public class HttpUploader extends Uploader {
 
   private static final Pattern IPV4_ADDRESS = Pattern.compile("(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})");
@@ -67,20 +65,16 @@ public class HttpUploader extends Uploader {
       throw new RunnerException(e);
     }
 
-    if (statusCode == HttpStatus.SC_OK) {
-      return true;
-    }
-
     try {
       System.err.println(post.getResponseBodyAsString());
-      return false;
+      return statusCode == HttpStatus.SC_OK;
     } catch (IOException e) {
       throw new RunnerException(e);
     }
   }
 
   protected PostMethod newPostMethod() {
-    return new PostMethod("http://" + ipAddress + ":6571/upload");
+    return new PostMethod("http://" + ipAddress + "/upload");
   }
 
   @Override
