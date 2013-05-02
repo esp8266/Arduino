@@ -1634,11 +1634,11 @@ public class Sketch {
       if(dataSize >= 0) {
 	if(maxDataSize > 0) {
 	  System.out.println(I18n
-		.format(_("Memory usage: {0} bytes (of a {1} byte maximum) - {2}% used"),
+		.format(_("Minimum Memory usage: {0} bytes (of a {1} byte maximum) - {2}% used"),
 			dataSize, maxDataSize, dataSize * 100 / maxDataSize));
 	} else {
 	  System.out.println(I18n
-		.format(_("Memory usage: {0} bytes"),
+		.format(_("Minimum Memory usage: {0} bytes"),
 			dataSize));
 	}
       }
@@ -1647,11 +1647,17 @@ public class Sketch {
                                      e.getMessage()));
     }
 
-    /* At least 10% of RAM should be reserved for stack/heap usage */
-    if (textSize > maxTextSize ||
-	(maxDataSize > 0 && dataSize > maxDataSize*9/10))
+    if (textSize > maxTextSize)
       throw new RunnerException(
           _("Sketch too big; see http://www.arduino.cc/en/Guide/Troubleshooting#size for tips on reducing it."));
+
+    if (maxDataSize > 0 && dataSize > maxDataSize)
+      throw new RunnerException(
+          _("Not enough memory; see http://www.arduino.cc/en/Guide/Troubleshooting#size for tips on reducing your footprint."));
+
+    int warnDataPercentage = Integer.parseInt(prefs.get("build.warn_data_percentage"));
+    if (maxDataSize > 0 && dataSize > maxDataSize*warnDataPercentage/100)
+	  System.out.println(_("Low memory available, stability problems may occur"));
   }
 
   protected String upload(String buildPath, String suggestedClassName, boolean usingProgrammer)

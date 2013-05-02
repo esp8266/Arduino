@@ -246,6 +246,8 @@ target_package = arduino
 target_platform = avr
 board = uno
 software=ARDUINO
+# Warn when data segment uses greater than this percentage
+build.warn_data_percentage = 75
 
 programmer = arduino:avrispmkii
 
