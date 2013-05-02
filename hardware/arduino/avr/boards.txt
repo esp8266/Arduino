@@ -4,32 +4,52 @@ menu.cpu=Processor
 
 ##############################################################
 
-dogstick.name=Arduino DogStick
-dogstick.upload.via_http=true
-dogstick.upload.tool=avrdude
-dogstick.upload.protocol=avr109
-dogstick.upload.maximum_size=28672
-dogstick.upload.speed=57600
-dogstick.upload.disable_flushing=true
-dogstick.upload.use_1200bps_touch=true
-dogstick.upload.wait_for_upload_port=true
+etheris.name=Arduino Etheris
+etheris.upload.via_http=true
 
-dogstick.bootloader.tool=avrdude
-dogstick.bootloader.low_fuses=0xff
-dogstick.bootloader.high_fuses=0xd8
-dogstick.bootloader.extended_fuses=0xcb
-dogstick.bootloader.file=caterina/Caterina-Leonardo.hex
-dogstick.bootloader.unlock_bits=0x3F
-dogstick.bootloader.lock_bits=0x2F
+etheris.upload.tool=avrdude
+etheris.upload.protocol=arduino
+etheris.upload.maximum_size=32256
+etheris.upload.speed=115200
 
-dogstick.build.mcu=atmega32u4
-dogstick.build.f_cpu=16000000L
-dogstick.build.vid=0x2341
-dogstick.build.pid=0x8036
-dogstick.build.board=ARDUINO_DOGSTICK
-dogstick.build.core=arduino
-dogstick.build.variant=leonardo
-dogstick.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid}
+etheris.bootloader.tool=avrdude
+etheris.bootloader.low_fuses=0xFF
+etheris.bootloader.high_fuses=0xDE
+etheris.bootloader.extended_fuses=0x05
+etheris.bootloader.unlock_bits=0x3F
+etheris.bootloader.lock_bits=0x0F
+etheris.bootloader.file=optiboot/optiboot_atmega328.hex
+
+etheris.build.mcu=atmega328p
+etheris.build.f_cpu=16000000L
+etheris.build.board=AVR_UNO
+etheris.build.core=arduino
+etheris.build.variant=standard
+
+#etheris.upload.tool=avrdude
+#etheris.upload.protocol=avr109
+#etheris.upload.maximum_size=28672
+#etheris.upload.speed=57600
+#etheris.upload.disable_flushing=true
+#etheris.upload.use_1200bps_touch=true
+#etheris.upload.wait_for_upload_port=true
+
+#etheris.bootloader.tool=avrdude
+#etheris.bootloader.low_fuses=0xff
+#etheris.bootloader.high_fuses=0xd8
+#etheris.bootloader.extended_fuses=0xcb
+#etheris.bootloader.file=caterina/Caterina-Leonardo.hex
+#etheris.bootloader.unlock_bits=0x3F
+#etheris.bootloader.lock_bits=0x2F
+
+#etheris.build.mcu=atmega32u4
+#etheris.build.f_cpu=16000000L
+#etheris.build.vid=0x2341
+#etheris.build.pid=0x8036
+#etheris.build.board=ARDUINO_ETHERIS
+#etheris.build.core=arduino
+#etheris.build.variant=leonardo
+#etheris.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid}
 
 ##############################################################
 
