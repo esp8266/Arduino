@@ -26,6 +26,7 @@ package processing.app;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+
 import java.awt.datatransfer.*;
 import static processing.app.I18n._;
 
@@ -447,11 +448,14 @@ public class EditorStatus extends JPanel /*implements ActionListener*/ {
       add(progressBar);
       progressBar.setVisible(false);
       
-      copyErrorButton = new JButton(_("Copy To Clipboard"));
+      copyErrorButton = new JButton(
+         "<html>" + _("Copy error") + "<br>" + _("to clipboard") + "</html>");
+      Font font = copyErrorButton.getFont();
+      font = new Font(font.getName(), font.getStyle(), (int) (font.getSize()*0.7));
+      copyErrorButton.setFont(font);
+      copyErrorButton.setHorizontalAlignment(JLabel.CENTER);
       add(copyErrorButton);
-      //copyErrorButton.setVisible(true);
       copyErrorButton.setVisible(false);
-      System.out.println("create copyErrorButton");
       copyErrorButton.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           String message="";
