@@ -6,6 +6,7 @@ ARDUINO 1.5.3 BETA
 * Fixed some minor IDE UI bugs (Shigeru Kanemoto)
 * Added support for new 1.5 Library format (https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5:-Library-specification)
 * Pass board type from boards.txt (https://github.com/arduino/Arduino/issues/308)
+* Display estimated RAM usage after compile (Loren M. Lang)
 
 [arduino core]
 * sam: Fixed delayMicrosecond() when interrupts are disabled

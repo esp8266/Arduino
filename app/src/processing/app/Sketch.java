@@ -1613,25 +1613,50 @@ public class Sketch {
 
 
   protected void size(PreferencesMap prefs) throws RunnerException {
-    long size = 0;
-    String maxsizeString = prefs.get("upload.maximum_size");
-    if (maxsizeString == null)
+    String maxTextSizeString = prefs.get("upload.maximum_size");
+    String maxDataSizeString = prefs.get("upload.maximum_data_size");
+    if (maxTextSizeString == null)
       return;
-    long maxsize = Integer.parseInt(maxsizeString);
+    long maxTextSize = Integer.parseInt(maxTextSizeString);
+    long maxDataSize = -1;
+    if (maxDataSizeString != null)
+      maxDataSize = Integer.parseInt(maxDataSizeString);
     Sizer sizer = new Sizer(prefs);
+    long[] sizes;
     try {
-      size = sizer.computeSize();
-      System.out.println(I18n
-              .format(_("Binary sketch size: {0} bytes (of a {1} byte maximum) - {2}% used"),
-                      size, maxsize, size * 100 / maxsize));
+      sizes = sizer.computeSize();
     } catch (RunnerException e) {
       System.err.println(I18n.format(_("Couldn't determine program size: {0}"),
                                      e.getMessage()));
+      return;
+    }
+    
+    long textSize = sizes[0];
+    long dataSize = sizes[1];
+    System.out.println(I18n
+                       .format(_("Binary sketch size: {0} bytes (of a {1} byte maximum) - {2}% used"),
+                               textSize, maxTextSize, textSize * 100 / maxTextSize));
+    if (dataSize >= 0) {
+      if (maxDataSize > 0) {
+        System.out.println(I18n.format(
+                        _("Minimum Memory usage: {0} bytes (of a {1} byte maximum) - {2}% used"),
+                        dataSize, maxDataSize, dataSize * 100 / maxDataSize));
+      } else {
+        System.out.println(I18n.format(_("Minimum Memory usage: {0} bytes"), dataSize));
+      }
     }
 
-    if (size > maxsize)
+    if (textSize > maxTextSize)
       throw new RunnerException(
           _("Sketch too big; see http://www.arduino.cc/en/Guide/Troubleshooting#size for tips on reducing it."));
+
+    if (maxDataSize > 0 && dataSize > maxDataSize)
+      throw new RunnerException(
+          _("Not enough memory; see http://www.arduino.cc/en/Guide/Troubleshooting#size for tips on reducing your footprint."));
+
+    int warnDataPercentage = Integer.parseInt(prefs.get("build.warn_data_percentage"));
+    if (maxDataSize > 0 && dataSize > maxDataSize*warnDataPercentage/100)
+	  System.out.println(_("Low memory available, stability problems may occur"));
   }
 
   protected String upload(String buildPath, String suggestedClassName, boolean usingProgrammer)

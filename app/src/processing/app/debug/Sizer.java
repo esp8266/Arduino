@@ -33,18 +33,30 @@ import processing.app.helpers.PreferencesMap;
 import processing.app.helpers.StringReplacer;
 
 public class Sizer implements MessageConsumer {
-  private long size;
+  private long textSize;
+  private long dataSize;
+  private long eepromSize;
   private RunnerException exception;
   private PreferencesMap prefs;
   private String firstLine;
-  private Pattern pattern;
+  private Pattern textPattern;
+  private Pattern dataPattern;
+  private Pattern eepromPattern;
   
   public Sizer(PreferencesMap _prefs) {
     prefs = _prefs;
-    pattern = Pattern.compile(prefs.get("recipe.size.regex"));
+    textPattern = Pattern.compile(prefs.get("recipe.size.regex"));
+    dataPattern = null;
+    String pref = prefs.get("recipe.size.regex.data");
+    if (pref != null)
+      dataPattern = Pattern.compile(pref);
+    eepromPattern = null;
+    pref = prefs.get("recipe.size.regex.eeprom");
+    if (pref != null)
+      eepromPattern = Pattern.compile(pref);
   }
   
-  public long computeSize() throws RunnerException {
+  public long[] computeSize() throws RunnerException {
 
     int r = 0;
     try {
@@ -52,7 +64,9 @@ public class Sizer implements MessageConsumer {
       String cmd[] = StringReplacer.formatAndSplit(pattern, prefs, true);
 
       exception = null;
-      size = -1;
+      textSize = -1;
+      dataSize = -1;
+      eepromSize = -1;
       Process process = Runtime.getRuntime().exec(cmd);
       MessageSiphon in = new MessageSiphon(process.getInputStream(), this);
       MessageSiphon err = new MessageSiphon(process.getErrorStream(), this);
@@ -77,17 +91,36 @@ public class Sizer implements MessageConsumer {
     if (exception != null)
       throw exception;
       
-    if (size == -1)
+    if (textSize == -1)
       throw new RunnerException(firstLine);
       
-    return size;
+    return new long[] { textSize, dataSize, eepromSize };
   }
   
   public void message(String s) {
     if (firstLine == null)
       firstLine = s;
-    Matcher matcher = pattern.matcher(s.trim());
-    if (matcher.matches())
-      size = Long.parseLong(matcher.group(1));
+    Matcher textMatcher = textPattern.matcher(s.trim());
+    if (textMatcher.matches()) {
+      if (textSize < 0)
+        textSize = 0;
+      textSize += Long.parseLong(textMatcher.group(1));
+    }
+    if(dataPattern != null) {
+      Matcher dataMatcher = dataPattern.matcher(s.trim());
+      if (dataMatcher.matches()) {
+        if (dataSize < 0)
+          dataSize = 0;
+        dataSize += Long.parseLong(dataMatcher.group(1));
+      }
+    }
+    if(eepromPattern != null) {
+      Matcher eepromMatcher = eepromPattern.matcher(s.trim());
+      if (eepromMatcher.matches()) {
+        if (eepromSize < 0)
+          eepromSize = 0;
+        eepromSize += Long.parseLong(eepromMatcher.group(1));
+      }
+    }
   }
 }
