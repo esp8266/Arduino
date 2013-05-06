@@ -25,7 +25,11 @@ public class Discovery implements ServiceListener {
 
   @Override
   public void serviceAdded(ServiceEvent serviceEvent) {
-    serviceEvent.getDNS().requestServiceInfo(serviceEvent.getInfo().getServer(), serviceEvent.getName());
+    serviceEvent.getDNS().requestServiceInfo(serviceEvent.getType(), serviceEvent.getName());
+    ServiceInfo serviceInfo = serviceEvent.getDNS().getServiceInfo(serviceEvent.getType(), serviceEvent.getName());
+    if (serviceInfo != null) {
+      serviceEvent.getDNS().requestServiceInfo(serviceEvent.getType(), serviceEvent.getName());
+    }
   }
 
   @Override
