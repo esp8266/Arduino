@@ -6,8 +6,11 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
+import org.apache.commons.httpclient.methods.multipart.StringPart;
+import processing.app.Base;
 import processing.app.Preferences;
 import processing.app.SerialException;
+import processing.app.helpers.PreferencesMap;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,6 +27,7 @@ public class HttpUploader extends Uploader {
 
   public HttpUploader(String port) {
     this.client = new HttpClient();
+    this.client.getHttpConnectionManager().getParams().setConnectionTimeout(5000);
     Matcher matcher = IPV4_ADDRESS.matcher(port);
     if (!matcher.find()) {
       throw new IllegalArgumentException(port);
@@ -46,14 +50,22 @@ public class HttpUploader extends Uploader {
       return false;
     }
 
-    FilePart filePart;
+    FilePart sketch;
     try {
-      filePart = new FilePart("sketch", new File(buildPath, className + ".hex"));
+      sketch = new FilePart("sketch", new File(buildPath, className + ".hex"));
     } catch (FileNotFoundException e) {
       throw new RunnerException(e);
     }
 
-    Part[] parts = {filePart};
+    TargetPlatform targetPlatform = Base.getTargetPlatform();
+    PreferencesMap prefs = Preferences.getMap();
+    prefs.putAll(Base.getBoardPreferences());
+    prefs.putAll(targetPlatform.getTool(prefs.get("upload.tool")));
+    boolean verbose = prefs.containsKey("upload.verbose") && Boolean.parseBoolean(prefs.get("upload.verbose"));
+
+    StringPart params = new StringPart("params", verbose ? prefs.get("upload.params.verbose") : prefs.get("upload.params.quiet"));
+
+    Part[] parts = {sketch, params};
     PostMethod post = newPostMethod();
     post.setRequestHeader("Cookie", "pwd=" + Preferences.get(getAuthorizationKey()));
     post.setRequestEntity(new MultipartRequestEntity(parts, post.getParams()));
@@ -61,15 +73,13 @@ public class HttpUploader extends Uploader {
     int statusCode;
     try {
       statusCode = client.executeMethod(post);
-    } catch (IOException e) {
-      throw new RunnerException(e);
-    }
 
-    try {
       System.err.println(post.getResponseBodyAsString());
       return statusCode == HttpStatus.SC_OK;
     } catch (IOException e) {
       throw new RunnerException(e);
+    } finally {
+      post.releaseConnection();
     }
   }
 

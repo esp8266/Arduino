@@ -32,6 +32,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.jmdns.ServiceEvent;
 import javax.swing.*;
 
+import org.apache.commons.logging.impl.LogFactoryImpl;
+import org.apache.commons.logging.impl.NoOpLog;
 import processing.app.debug.TargetBoard;
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
@@ -123,6 +125,8 @@ public class Base {
   static final String portableSketchbookFolder = "sketchbook";
 
   static public void main(String args[]) throws Exception {
+    System.setProperty(LogFactoryImpl.LOG_PROPERTY, NoOpLog.class.getCanonicalName());
+
     initPlatform();
 
     // Portable folder
