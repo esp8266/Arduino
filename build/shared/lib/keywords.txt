@@ -182,6 +182,8 @@ parseInt	KEYWORD2
 parseFloat	KEYWORD2
 readBytes	KEYWORD2
 readBytesUntil	KEYWORD2
+readString	KEYWORD2
+readStringUntil	KEYWORD2
 
 # USB-related keywords
 
