@@ -627,9 +627,19 @@ public class Editor extends JFrame implements RunnerListener {
 
     if (importMenu == null) {
       importMenu = new JMenu(_("Import Library..."));
-      base.rebuildImportMenu(importMenu, this);
+      base.rebuildImportMenu(importMenu);
     }
     sketchMenu.add(importMenu);
+
+    item = new JMenuItem(_("Add Library from ZIP"));
+    item.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        base.handleAddZipLibrary(Editor.this);
+        base.onBoardOrPortChange();
+        base.rebuildImportMenu(Editor.importMenu);
+      }
+    });
+    sketchMenu.add(item);
 
     item = newJMenuItem(_("Show Sketch Folder"), 'K');
     item.addActionListener(new ActionListener() {
@@ -680,7 +690,7 @@ public class Editor extends JFrame implements RunnerListener {
     
     if (boardsMenu == null) {
       boardsMenu = new JMenu(_("Board"));
-      base.rebuildBoardsMenu(boardsMenu, this);
+      base.rebuildBoardsMenu(boardsMenu);
     }
     menu.add(boardsMenu);
     
