@@ -6,10 +6,13 @@ ARDUINO 1.0.5 - 2013.05.15
 * [avr] malloc bug: backported avr-libc 1.8.0 implementation
 * [avr] removed deprecated interrupt handlers causing compiler issues 
   with newer avr-gcc.
+* [avr] added c_str() method to String
+* [avr] Stream "_timeout" field and related methods are now protected
 
 [libraries]
 
 * Upgrades to WiFi library
+* Fixed a bunch of examples
 
 [firmwares]
 
@@ -18,6 +21,9 @@ ARDUINO 1.0.5 - 2013.05.15
 [ide]
 
 * Backport from 1.5: install Library from .zip file or folder
+* Added button "Copy error to clipboard" (Paul Stoffregen)
+* Updated windows drivers
+* Added Windows installer
 
 ARDUINO 1.0.4 - 2013.03.11
 
