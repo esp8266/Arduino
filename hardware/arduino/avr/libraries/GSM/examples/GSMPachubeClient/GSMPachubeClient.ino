@@ -126,7 +126,7 @@ void sendData(int thisData)
     client.print("PUT /v2/feeds/");
     client.print(FEEDID);
     client.println(".csv HTTP/1.1");
-    client.print("Host: api.pachube.com\n");
+    client.println("Host: api.pachube.com");
     client.print("X-ApiKey: ");
     client.println(APIKEY);
     client.print("User-Agent: ");
@@ -139,7 +139,7 @@ void sendData(int thisData)
     client.println(thisLength);
 
     // last pieces of the HTTP PUT request:
-    client.print("Content-Type: text/csv\n");
+    client.println("Content-Type: text/csv");
     client.println("Connection: close");
     client.println();
     

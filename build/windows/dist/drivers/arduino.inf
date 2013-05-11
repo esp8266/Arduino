@@ -1,7 +1,7 @@
 ; Copyright 2012 Blacklabel Development, Inc.
 
 [Strings]
-DriverPackageDisplayName="Arduino Boards"
+DriverPackageDisplayName="Arduino USB Driver"
 ManufacturerName="Arduino LLC (www.arduino.cc)"
 ServiceName="USB RS-232 Emulation Driver"
 due.bossa.name="Bossa Program Port"

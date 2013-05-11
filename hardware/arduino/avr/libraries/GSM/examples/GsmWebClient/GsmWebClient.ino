@@ -2,8 +2,8 @@
   Web client
  
  This sketch connects to a website through a GSM shield. Specifically,
- this example downloads the URL "http://arduino.cc/" and prints it 
- to the Serial monitor.
+ this example downloads the URL "http://arduino.cc/asciilogo.txt" and 
+ prints it to the Serial monitor.
  
  Circuit:
  * GSM shield attached to an Arduino
@@ -34,7 +34,7 @@ GSM gsmAccess;
 
 // URL, path & port (for example: arduino.cc)
 char server[] = "arduino.cc";
-char path[] = "/";
+char path[] = "/asciilogo.txt";
 int port = 80; // port 80 is the default for HTTP
 
 void setup()
@@ -48,13 +48,13 @@ void setup()
   Serial.println("Starting Arduino web client.");
   // connection state
   boolean notConnected = true;
-  
+
   // After starting the modem with GSM.begin()
   // attach the shield to the GPRS network with the APN, login and password
   while(notConnected)
   {
     if((gsmAccess.begin(PINNUMBER)==GSM_READY) &
-        (gprs.attachGPRS(GPRS_APN, GPRS_LOGIN, GPRS_PASSWORD)==GPRS_READY))
+      (gprs.attachGPRS(GPRS_APN, GPRS_LOGIN, GPRS_PASSWORD)==GPRS_READY))
       notConnected = false;
     else
     {
@@ -72,7 +72,10 @@ void setup()
     // Make a HTTP request:
     client.print("GET ");
     client.print(path);
-    client.println(" HTTP/1.0");
+    client.println(" HTTP/1.1");
+    client.print("Host: ");
+    client.println(server);
+    client.println("Connection: close");
     client.println();
   } 
   else
@@ -91,7 +94,7 @@ void loop()
     char c = client.read();
     Serial.print(c);
   }
-  
+
   // if the server's disconnected, stop the client:
   if (!client.available() && !client.connected())
   {
