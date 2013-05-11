@@ -33,6 +33,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import processing.app.debug.Compiler;
 import processing.app.debug.Target;
 import processing.app.helpers.FileUtils;
+import processing.app.helpers.filefilters.OnlyDirs;
 import processing.app.tools.ZipDeflater;
 import processing.core.*;
 import static processing.app.I18n._;
