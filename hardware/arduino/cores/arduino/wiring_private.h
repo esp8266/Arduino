@@ -57,7 +57,7 @@ extern "C"{
 #elif defined(__AVR_ATmega1284__) || defined(__AVR_ATmega1284P__) || defined(__AVR_ATmega644__) || defined(__AVR_ATmega644A__) || defined(__AVR_ATmega644P__) || defined(__AVR_ATmega644PA__)
 #define EXTERNAL_NUM_INTERRUPTS 3
 #elif defined(__AVR_ATmega32U4__)
-#define EXTERNAL_NUM_INTERRUPTS 4
+#define EXTERNAL_NUM_INTERRUPTS 5
 #else
 #define EXTERNAL_NUM_INTERRUPTS 2
 #endif
