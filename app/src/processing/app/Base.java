@@ -28,9 +28,12 @@ import java.io.*;
 import java.util.*;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import processing.app.debug.Compiler;
 import processing.app.debug.Target;
+import processing.app.helpers.FileUtils;
+import processing.app.helpers.filefilters.OnlyDirs;
 import processing.app.tools.ZipDeflater;
 import processing.core.*;
 import static processing.app.I18n._;
@@ -949,9 +952,10 @@ public class Base {
     JMenuItem addLibraryMenuItem = new JMenuItem(_("Add Library..."));
     addLibraryMenuItem.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        Base.this.handleAddZipLibrary(editor);
+        Base.this.handleAddLibrary(editor);
         Base.this.onBoardOrPortChange();
         Base.this.rebuildImportMenu(Editor.importMenu, editor);
+        Base.this.rebuildExamplesMenu(Editor.examplesMenu);
       }
     });
     importMenu.add(addLibraryMenuItem);
@@ -2374,24 +2378,70 @@ public class Base {
     }
   }
 
+  public void handleAddLibrary(Editor editor) {
+    JFileChooser fileChooser = new JFileChooser(System.getProperty("user.home"));
+    fileChooser.setDialogTitle(_("Select a zip file or a folder containing the library you'd like to add"));
+    fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+    fileChooser.setFileFilter(new FileNameExtensionFilter(_("ZIP files or folders"), "zip"));
 
-  public void handleAddZipLibrary(Editor editor) {
-    String prompt = _("Select a zip file containing the library you'd like to add");
-    FileDialog fd = new FileDialog(editor, prompt, FileDialog.LOAD);
-    fd.setDirectory(System.getProperty("user.home"));
-    fd.setVisible(true);
+    Dimension preferredSize = fileChooser.getPreferredSize();
+    fileChooser.setPreferredSize(new Dimension(preferredSize.width + 200, preferredSize.height + 200));
 
-    String directory = fd.getDirectory();
-    String filename = fd.getFile();
-    if (filename == null) return;
+    int returnVal = fileChooser.showOpenDialog(editor);
 
-    File sourceFile = new File(directory, filename);
+    if (returnVal != JFileChooser.APPROVE_OPTION) {
+      return;
+    }
+
+    File sourceFile = fileChooser.getSelectedFile();
+    File tmpFolder = null;
+
     try {
-      ZipDeflater zipDeflater = new ZipDeflater(sourceFile, getSketchbookLibrariesFolder());
-      zipDeflater.deflate();
+      // unpack ZIP
+      if (!sourceFile.isDirectory()) {
+        try {
+          tmpFolder = FileUtils.createTempFolder();
+          ZipDeflater zipDeflater = new ZipDeflater(sourceFile, tmpFolder);
+          zipDeflater.deflate();
+          File[] foldersInTmpFolder = tmpFolder.listFiles(new OnlyDirs());
+          if (foldersInTmpFolder.length != 1) {
+            throw new IOException(_("Zip doesn't contain a library"));
+          }
+          sourceFile = foldersInTmpFolder[0];
+        } catch (IOException e) {
+          editor.statusError(e);
+          return;
+        }
+      }
+
+      // is there a valid library?
+      File libFolder = sourceFile;
+      String libName = libFolder.getName();
+      if (!Sketch.isSanitaryName(libName)) {
+        String mess = I18n.format(_("The library \"{0}\" cannot be used.\n"
+            + "Library names must contain only basic letters and numbers.\n"
+            + "(ASCII only and no spaces, and it cannot start with a number)"),
+                                  libName);
+        editor.statusError(mess);
+        return;
+      }
+
+      // copy folder
+      File destinationFolder = new File(getSketchbookLibrariesFolder(), sourceFile.getName());
+      if (!destinationFolder.mkdir()) {
+        editor.statusError(I18n.format(_("A library named {0} already exists"), sourceFile.getName()));
+        return;
+      }
+      try {
+        FileUtils.copy(sourceFile, destinationFolder);
+      } catch (IOException e) {
+        editor.statusError(e);
+        return;
+      }
       editor.statusNotice(_("Library added to your libraries. Check \"Import library\" menu"));
-    } catch (IOException e) {
-      editor.statusError(e);      
+    } finally {
+      // delete zip created temp folder, if exists
+      FileUtils.recursiveDelete(tmpFolder);
     }
   }
 }

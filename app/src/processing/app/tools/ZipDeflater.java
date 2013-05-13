@@ -10,30 +10,36 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
+import processing.app.helpers.FileUtils;
+
 public class ZipDeflater {
 
   private final ZipFile zipFile;
   private final File destFolder;
+  private final Random random;
+  private final File file;
 
   public ZipDeflater(File file, File destFolder) throws ZipException, IOException {
+    this.file = file;
     this.destFolder = destFolder;
     this.zipFile = new ZipFile(file);
+    this.random = new Random();
   }
 
   public void deflate() throws IOException {
-    String folderName = tempFolderNameFromZip();
+    String tmpFolderName = folderNameFromZip() + random.nextInt(1000000);
 
-    File folder = new File(destFolder, folderName);
+    File tmpFolder = new File(destFolder, tmpFolderName);
 
-    if (!folder.mkdir()) {
-      throw new IOException("Unable to create folder " + folderName);
+    if (!tmpFolder.mkdir()) {
+      throw new IOException("Unable to create folder " + tmpFolderName);
     }
 
     Enumeration<? extends ZipEntry> entries = zipFile.entries();
     while (entries.hasMoreElements()) {
       ZipEntry entry = entries.nextElement();
-      ensureFoldersOfEntryExist(folder, entry);
-      File entryFile = new File(folder, entry.getName());
+      ensureFoldersOfEntryExist(tmpFolder, entry);
+      File entryFile = new File(tmpFolder, entry.getName());
       if (entry.isDirectory()) {
         entryFile.mkdir();
       } else {
@@ -58,8 +64,20 @@ public class ZipDeflater {
       }
     }
 
-    // Test.zip may or may not contain Test folder. We use zip name to create libraries folder. Therefore, a contained Test folder is useless and must be removed
-    ensureOneLevelFolder(folder);
+    deleteUndesiredFoldersAndFiles(tmpFolder);
+
+    // Test.zip may or may not contain Test folder. If it does, we keep it. If not, we use zip name.
+    ensureOneLevelFolder(tmpFolder);
+  }
+
+  private void deleteUndesiredFoldersAndFiles(File folder) {
+    for (File file : folder.listFiles()) {
+      if (file.isDirectory() && "__MACOSX".equals(file.getName())) {
+        FileUtils.recursiveDelete(file);
+      } else if (file.getName().startsWith(".")) {
+        FileUtils.recursiveDelete(file);
+      }
+    }
   }
 
   private void ensureFoldersOfEntryExist(File folder, ZipEntry entry) {
@@ -73,25 +91,22 @@ public class ZipDeflater {
 
   private void ensureOneLevelFolder(File folder) {
     File[] files = folder.listFiles();
-    if (files.length == 1 && files[0].isDirectory()) {
-      File tempFile = new File(files[0].getPath() + new Random().nextInt(1000));
-      files[0].renameTo(tempFile);
-      for (File file : tempFile.listFiles()) {
-        file.renameTo(new File(folder, file.getName()));
-      }
-      tempFile.delete();
+
+    if (files.length != 1) {
+      folder.renameTo(new File(folder.getParentFile(), folderNameFromZip()));
+      return;
     }
+
+    files[0].renameTo(new File(folder.getParentFile(), files[0].getName()));
+    FileUtils.recursiveDelete(folder);
   }
 
-  private String tempFolderNameFromZip() {
-    String folderName = zipFile.getName();
-    if (folderName.lastIndexOf(".") != -1) {
-      folderName = folderName.substring(0, folderName.lastIndexOf("."));
+  private String folderNameFromZip() {
+    String filename = file.getName();
+    if (filename.lastIndexOf(".") != -1) {
+      filename = filename.substring(0, filename.lastIndexOf("."));
     }
-    if (folderName.lastIndexOf(File.separator) != -1) {
-      folderName = folderName.substring(folderName.lastIndexOf(File.separator) + 1);
-    }
-    return folderName;
+    return filename;
   }
 
 }
