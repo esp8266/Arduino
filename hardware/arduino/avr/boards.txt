@@ -7,49 +7,35 @@ menu.cpu=Processor
 etheris.name=Arduino Etheris
 etheris.upload.via_http=true
 
+etheris.vid.0=0x2341
+etheris.pid.0=0x0036
+etheris.vid.1=0x2341
+etheris.pid.1=0x8036
 etheris.upload.tool=avrdude
-etheris.upload.protocol=arduino
-etheris.upload.maximum_size=32256
-etheris.upload.speed=115200
+etheris.upload.protocol=avr109
+etheris.upload.maximum_size=28672
+etheris.upload.maximum_data_size=2560
+etheris.upload.speed=57600
+etheris.upload.disable_flushing=true
+etheris.upload.use_1200bps_touch=true
+etheris.upload.wait_for_upload_port=true
 
 etheris.bootloader.tool=avrdude
-etheris.bootloader.low_fuses=0xFF
-etheris.bootloader.high_fuses=0xDE
-etheris.bootloader.extended_fuses=0x05
+etheris.bootloader.low_fuses=0xff
+etheris.bootloader.high_fuses=0xd8
+etheris.bootloader.extended_fuses=0xcb
+etheris.bootloader.file=caterina/Caterina-Leonardo.hex
 etheris.bootloader.unlock_bits=0x3F
-etheris.bootloader.lock_bits=0x0F
-etheris.bootloader.file=optiboot/optiboot_atmega328.hex
+etheris.bootloader.lock_bits=0x2F
 
-etheris.build.mcu=atmega328p
+etheris.build.mcu=atmega32u4
 etheris.build.f_cpu=16000000L
-etheris.build.board=AVR_UNO
+etheris.build.vid=0x2341
+etheris.build.pid=0x8036
+etheris.build.board=AVR_LEONARDO
 etheris.build.core=arduino
-etheris.build.variant=standard
-
-#etheris.upload.tool=avrdude
-#etheris.upload.protocol=avr109
-#etheris.upload.maximum_size=28672
-#etheris.upload.speed=57600
-#etheris.upload.disable_flushing=true
-#etheris.upload.use_1200bps_touch=true
-#etheris.upload.wait_for_upload_port=true
-
-#etheris.bootloader.tool=avrdude
-#etheris.bootloader.low_fuses=0xff
-#etheris.bootloader.high_fuses=0xd8
-#etheris.bootloader.extended_fuses=0xcb
-#etheris.bootloader.file=caterina/Caterina-Leonardo.hex
-#etheris.bootloader.unlock_bits=0x3F
-#etheris.bootloader.lock_bits=0x2F
-
-#etheris.build.mcu=atmega32u4
-#etheris.build.f_cpu=16000000L
-#etheris.build.vid=0x2341
-#etheris.build.pid=0x8036
-#etheris.build.board=ARDUINO_ETHERIS
-#etheris.build.core=arduino
-#etheris.build.variant=leonardo
-#etheris.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid}
+etheris.build.variant=leonardo
+etheris.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid}
 
 ##############################################################
 
