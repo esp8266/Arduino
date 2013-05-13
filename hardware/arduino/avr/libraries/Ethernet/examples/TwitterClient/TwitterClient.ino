@@ -127,6 +127,7 @@ void connectToServer() {
     // make HTTP GET request to twitter:
     client.println("GET /1/statuses/user_timeline.xml?screen_name=arduino&count=1 HTTP/1.1");
     client.println("HOST: api.twitter.com");
+    client.println("Connection: close");
     client.println();
   }
   // note the time of this connect attempt:

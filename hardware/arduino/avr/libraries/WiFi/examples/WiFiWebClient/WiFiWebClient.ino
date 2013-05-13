@@ -31,8 +31,8 @@ int keyIndex = 0;            // your network key Index number (needed only for W
 int status = WL_IDLE_STATUS;
 // if you don't want to use DNS (and reduce your sketch size)
 // use the numeric IP instead of the name for the server:
-IPAddress server(173,194,73,105);  // numeric IP for Google (no DNS)
-//char server[] = "www.google.com";    // name address for Google (using DNS)
+//IPAddress server(74,125,232,128);  // numeric IP for Google (no DNS)
+char server[] = "www.google.com";    // name address for Google (using DNS)
 
 // Initialize the Ethernet client library
 // with the IP address and port of the server 
@@ -54,7 +54,7 @@ void setup() {
   } 
   
   // attempt to connect to Wifi network:
-  while ( status != WL_CONNECTED) { 
+  while (status != WL_CONNECTED) { 
     Serial.print("Attempting to connect to SSID: ");
     Serial.println(ssid);
     // Connect to WPA/WPA2 network. Change this line if using open or WEP network:    
@@ -72,7 +72,7 @@ void setup() {
     Serial.println("connected to server");
     // Make a HTTP request:
     client.println("GET /search?q=arduino HTTP/1.1");
-    client.println("Host:www.google.com");
+    client.println("Host: www.google.com");
     client.println("Connection: close");
     client.println();
   }

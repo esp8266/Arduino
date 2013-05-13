@@ -60,7 +60,7 @@ void loop() {
 
 }
 
-int digitalPotWrite(int address, int value) {
+void digitalPotWrite(int address, int value) {
   // take the SS pin low to select the chip:
   digitalWrite(slaveSelectPin,LOW);
   //  send in the address and value via SPI:
