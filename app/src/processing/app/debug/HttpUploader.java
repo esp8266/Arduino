@@ -7,6 +7,7 @@ import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
+import org.apache.commons.httpclient.protocol.Protocol;
 import processing.app.Base;
 import processing.app.Preferences;
 import processing.app.SerialException;
@@ -21,6 +22,10 @@ import java.util.regex.Pattern;
 public class HttpUploader extends Uploader {
 
   private static final Pattern IPV4_ADDRESS = Pattern.compile("(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})");
+
+  static {
+    Protocol.registerProtocol("https", new Protocol("https", new EasySSLProtocolSocketFactory(), 443));
+  }
 
   private final HttpClient client;
   private final String ipAddress;
@@ -84,7 +89,7 @@ public class HttpUploader extends Uploader {
   }
 
   protected PostMethod newPostMethod() {
-    return new PostMethod("http://" + ipAddress + "/upload");
+    return new PostMethod("https://" + ipAddress + "/upload");
   }
 
   @Override
