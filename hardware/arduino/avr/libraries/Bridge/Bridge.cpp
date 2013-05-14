@@ -31,9 +31,9 @@ void BridgeClass::begin() {
   delay(500);
   // Wait for OpenWRT message
   // "Press enter to activate console"
-  print(F("\ncd /root\n"));
+  print(F("\ncd /usr/lib/python2.7/bridge\n"));
   delay(100);
-  print(F("python bridge.py\n"));
+  print(F("python -B bridge.py\n"));
   delay(1000);
   dropAll();
   

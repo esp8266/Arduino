@@ -24,7 +24,7 @@ etheris.bootloader.tool=avrdude
 etheris.bootloader.low_fuses=0xff
 etheris.bootloader.high_fuses=0xd8
 etheris.bootloader.extended_fuses=0xcb
-etheris.bootloader.file=caterina/Caterina-Leonardo.hex
+etheris.bootloader.file=caterina/Caterina-Etheris.hex
 etheris.bootloader.unlock_bits=0x3F
 etheris.bootloader.lock_bits=0x2F
 
