@@ -125,7 +125,7 @@ public class EditorStatus extends JPanel /*implements ActionListener*/ {
   public void error(String message) {
     mode = ERR;
     this.message = message;
-    copyErrorButton.setVisible(true);
+//    copyErrorButton.setVisible(true);
     repaint();
   }
 
@@ -196,7 +196,7 @@ public class EditorStatus extends JPanel /*implements ActionListener*/ {
     progressBar.setIndeterminate(true);
     progressBar.setValue(50);
     progressBar.setVisible(true);
-    copyErrorButton.setVisible(false);
+//    copyErrorButton.setVisible(false);
     setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
     repaint();
   }
