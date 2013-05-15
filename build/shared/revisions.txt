@@ -22,7 +22,6 @@ ARDUINO 1.0.5 - 2013.05.15
 [ide]
 
 * Backport from 1.5: install Library from .zip file or folder
-* Added button "Copy error to clipboard" (Paul Stoffregen)
 * Updated windows drivers
 * Added Windows installer
 
@@ -31,6 +30,7 @@ ARDUINO 1.0.4 - 2013.03.11
 [core]
 
 * Fixed malloc bug (Paul Stoffregen)
+* Added INT6 support for Leonardo (Federico Vanzati)
 
 [libraries]
 
