@@ -18,12 +18,23 @@
 
 #include "Bridge.h"
 
+BridgeClass::BridgeClass(Stream &_stream) : index(0), stream(_stream), started(false) {
+  // Empty
+}
+
 void BridgeClass::begin() {
   if (started)
     return;
   started = true;
   
   // TODO: A more robust restart
+  
+  // Wait for Atheros bootloader to finish startup
+  do {
+    dropAll();
+    delay(1100);
+  } while (available()>0);
+  
   // Bridge startup:
   // - If the bridge is not running starts it safely
   print(CTRL_C);
@@ -88,7 +99,7 @@ unsigned int BridgeClass::readCommandOutput(uint8_t handle,
 }
 
 void BridgeClass::writeCommandInput(uint8_t handle, 
-                                    uint8_t *buff, unsigned int size) {
+                                    const uint8_t *buff, unsigned int size) {
   // TODO: do it in a more efficient way
   uint8_t *tmp = new uint8_t[size+2];
   tmp[0] = 'I';
@@ -96,6 +107,49 @@ void BridgeClass::writeCommandInput(uint8_t handle,
   memcpy(tmp+2, buff, size);
   transfer(tmp, size+2);
   delete[] tmp;
+}
+
+unsigned int BridgeClass::readMessage(uint8_t *buff, unsigned int size) {
+  uint8_t tmp[] = { 'm' };
+  return transfer(tmp, 1, buff, size);
+}
+
+void BridgeClass::writeMessage(const uint8_t *buff, unsigned int size) {
+  // TODO: do it in a more efficient way
+  uint8_t *tmp = new uint8_t[size+1];
+  tmp[0] = 'M';
+  memcpy(tmp+1, buff, size);
+  transfer(tmp, size+1);
+  delete[] tmp;
+}
+
+unsigned int BridgeClass::messageAvailable() {
+  uint8_t tmp[] = { 'n' };
+  uint8_t res[2];
+  transfer(tmp, 1, res, 2);
+  return (res[0] << 8) + res[1];
+}
+
+void BridgeClass::put(const char *key, const char *value) {
+  // TODO: do it in a more efficient way
+  String cmd = "D";
+  cmd += key;
+  cmd += "\xFE";
+  cmd += value;
+  transfer((uint8_t*)cmd.c_str(), cmd.length());
+}
+
+unsigned int BridgeClass::get(const char *key, uint8_t *value, unsigned int maxlen) {
+  // TODO: do it in a more efficient way
+  unsigned int l = strlen(key);
+  uint8_t *tmp = new uint8_t[l+1];
+  tmp[0] = 'd';
+  memcpy(tmp+1, key, strlen(key));
+  l = transfer(tmp, l+1, value, maxlen);
+  if (l<maxlen)
+    value[l] = 0; // Zero-terminate string
+  delete[] tmp;
+  return l;
 }
 
 void BridgeClass::crcUpdate(uint8_t c) {
@@ -116,7 +170,7 @@ bool BridgeClass::crcCheck(uint16_t _CRC) {
   return CRC == _CRC;
 }
 
-uint8_t BridgeClass::transfer(uint8_t *buff, uint8_t len, 
+uint8_t BridgeClass::transfer(const uint8_t *buff, uint8_t len, 
                               uint8_t *rxbuff, uint8_t rxlen) 
 {
   for ( ; ; delay(100), dropAll() /* Delay for retransmission */) {

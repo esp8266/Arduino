@@ -24,17 +24,13 @@
 
 class BridgeClass: public Stream {
 public:
-  BridgeClass(Stream &_stream) : index(0), stream(_stream), started(false) {
-    // Empty
-  }
-
+  BridgeClass(Stream &_stream);
   void begin();
-  uint8_t runCommand(String &command);
-
-  bool commandIsRunning(uint8_t handle);
-
-  unsigned int commandExitValue(uint8_t handle);
   
+  // Methods to handle processes on the linux side
+  uint8_t runCommand(String &command);
+  bool commandIsRunning(uint8_t handle);
+  unsigned int commandExitValue(uint8_t handle);
   void cleanCommand(uint8_t handle);
   
   unsigned int commandOutputAvailable(uint8_t handle);
@@ -42,22 +38,35 @@ public:
   unsigned int readCommandOutput(uint8_t handle, char *buff, unsigned int size)
     { return readCommandOutput(handle, reinterpret_cast<uint8_t *>(buff), size); }
 
-  void writeCommandInput(uint8_t handle, uint8_t *buff, unsigned int size);
-  void writeCommandInput(uint8_t handle, char *buff, unsigned int size)
-    { writeCommandInput(handle, reinterpret_cast<uint8_t *>(buff), size); }
+  void writeCommandInput(uint8_t handle, const uint8_t *buff, unsigned int size);
+  void writeCommandInput(uint8_t handle, const char *buff, unsigned int size)
+    { writeCommandInput(handle, reinterpret_cast<const uint8_t *>(buff), size); }
   
-  // Print methods
+  // Methods to handle mailbox messages
+  unsigned int readMessage(uint8_t *buffer, unsigned int size);
+  void writeMessage(const uint8_t *buffer, unsigned int size);
+  unsigned int messageAvailable();
+  
+  // Methods to handle key/value datastore
+  void put(const char *key, const char *value);
+  unsigned int get(const char *key, uint8_t *buff, unsigned int size);
+  unsigned int get(const char *key, char *value, unsigned int maxlen)
+    { get(key, reinterpret_cast<uint8_t *>(value), maxlen); }
+  
+  // Print methods (proxy to "stream" object) [CM: are these really needed?]
   size_t write(uint8_t c) { return stream.write(c); }
   size_t write(const uint8_t *buffer, size_t size)
     { return stream.write(buffer, size); }
 
-  // Stream methods
+  // Stream methods (proxy to "stream" object) [CM: are these really needed?]
   int available() { return stream.available(); }
   int read() { return stream.read(); }
   int peek() { return stream.peek(); }
   void flush() { stream.flush(); }
 
-  uint8_t transfer(uint8_t *buff, uint8_t len, uint8_t *rxbuff=NULL, uint8_t rxlen=0);
+  // Trasnfer a frame (with error correction and response)
+  uint8_t transfer(const uint8_t *buff, uint8_t len, 
+                   uint8_t *rxbuff=NULL, uint8_t rxlen=0);
 private:
   uint8_t index;
   int timedRead(unsigned int timeout);
@@ -72,7 +81,6 @@ private:
   
 private:
   static const char CTRL_C = 3;
-  static const char CMD_RECV = 0x00;
   Stream &stream;
   bool started;
 };
