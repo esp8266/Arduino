@@ -13,6 +13,7 @@ ARDUINO 1.0.5 - 2013.05.15
 
 * Upgrades to WiFi library
 * Fixed a bunch of examples
+* Added Arduino Robot libraries
 
 [firmwares]
 

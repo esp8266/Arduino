@@ -22,6 +22,10 @@ micro.sketch.name="Arduino Micro"
 uno.name="Arduino Uno"
 unoR3.name="Arduino Uno"
 usbserial.name="Arduino USB Serial Light Adapter"
+robotControl.bootloader.name="Arduino Robot Control bootloader"
+robotControl.sketch.name="Arduino Robot"
+robotMotor.bootloader.name="Arduino Robot Motor bootloader"
+robotMotor.sketch.name="Arduino Robot"
 
 [DefaultInstall]
 CopyINF=arduino.inf
@@ -61,6 +65,10 @@ DefaultDestDir=12
 %uno.name%=DriverInstall, USB\VID_2341&PID_0001
 %unoR3.name%=DriverInstall, USB\VID_2341&PID_0043
 %usbserial.name%=DriverInstall, USB\VID_2341&PID_003B
+%robotControl.bootloader.name%=DriverInstall, USB\VID_2341&PID_0038
+%robotControl.sketch.name%=DriverInstall, USB\VID_2341&PID_8038&MI_00
+%robotMotor.bootloader.name%=DriverInstall, USB\VID_2341&PID_0039
+%robotMotor.sketch.name%=DriverInstall, USB\VID_2341&PID_8039&MI_00
 
 [DeviceList.NTamd64]
 %due.bossa.name%=DriverInstall, USB\VID_03EB&PID_6124
@@ -81,6 +89,10 @@ DefaultDestDir=12
 %uno.name%=DriverInstall, USB\VID_2341&PID_0001
 %unoR3.name%=DriverInstall, USB\VID_2341&PID_0043
 %usbserial.name%=DriverInstall, USB\VID_2341&PID_003B
+%robotControl.bootloader.name%=DriverInstall, USB\VID_2341&PID_0038
+%robotControl.sketch.name%=DriverInstall, USB\VID_2341&PID_8038&MI_00
+%robotMotor.bootloader.name%=DriverInstall, USB\VID_2341&PID_0039
+%robotMotor.sketch.name%=DriverInstall, USB\VID_2341&PID_8039&MI_00
 
 [DeviceList.NTia64]
 %esplora.bootloader.name%=DriverInstall, USB\VID_2341&PID_003C
@@ -98,6 +110,10 @@ DefaultDestDir=12
 %uno.name%=DriverInstall, USB\VID_2341&PID_0001
 %unoR3.name%=DriverInstall, USB\VID_2341&PID_0043
 %usbserial.name%=DriverInstall, USB\VID_2341&PID_003B
+%robotControl.bootloader.name%=DriverInstall, USB\VID_2341&PID_0038
+%robotControl.sketch.name%=DriverInstall, USB\VID_2341&PID_8038&MI_00
+%robotMotor.bootloader.name%=DriverInstall, USB\VID_2341&PID_0039
+%robotMotor.sketch.name%=DriverInstall, USB\VID_2341&PID_8039&MI_00
 
 [DriverInstall]
 include=mdmcpq.inf,usb.inf
