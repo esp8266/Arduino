@@ -33,12 +33,6 @@ void setup() {
   
   Robot.drawBMP("lf.bmp", 0, 0); // display background image
 
-  // These are some general values that work for line following 
-  Robot.lineFollowConfig(11, 5, 50, 10);
-  
-  //set the motor board into line-follow mode
-  Robot.setMode(MODE_LINE_FOLLOW);  
-  
   Robot.playFile("chase.sqm");  // play a song from the SD card
   
   // add the instructions
@@ -46,6 +40,12 @@ void setup() {
   Robot.text("Press the middle\n button to start...", 5, 61);
   Robot.waitContinue();
 
+  // These are some general values that work for line following 
+  Robot.lineFollowConfig(11, 5, 50, 10);
+  
+  //set the motor board into line-follow mode
+  Robot.setMode(MODE_LINE_FOLLOW);  
+  
   // start
   Robot.fill(255, 255, 255);
   Robot.stroke(255, 255, 255);
