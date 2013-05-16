@@ -1,24 +1,25 @@
 #include <Process.h>
 
-void brk() {
-  Bridge.print((char)3);
-  Bridge.find("#");
-}
-
 void setup() {
+  pinMode(13,OUTPUT);
+  digitalWrite(13,LOW);
+
+  Serial.begin(9600);
   Bridge.begin();
+
+  digitalWrite(13,HIGH);
+  delay(2000);
   
   Process p;
   p.begin("curl");
   p.addParameter("http://arduino.cc/asciilogo.txt");
   p.run();
   
-  String res = "";
-  while (p.IO.available()>0) {
-    p.IO.read();
+  while (p.available()>0) {
+    char c = p.read();
+    Serial.print(c);
   }
 }
 
 void loop() {
 }
-
