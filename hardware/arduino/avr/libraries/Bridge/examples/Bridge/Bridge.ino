@@ -41,19 +41,32 @@ void process(uint8_t buff[], int l) {
   // Command selection
   if (l==5 && cmd0=='D' && cmd1=='W') {
     char c = buff[4];
-    if (c=='0' || c=='1')
+    if (c=='0' || c=='1') {
       digitalWrite(pin, c-'0');
+      reportDigitalRead(pin, true, true);
+    }
   } else if (l==4 && cmd0=='D' && cmd1=='R') {
     reportDigitalRead(pin, true, true);
   } else if (l==7 && cmd0=='A' && cmd1=='W') {
     analogWrite(pin, buff[4]);
+    reportAnalogRead(pin);
   } else if (l==4 && cmd0=='A' && cmd1=='R') {
     reportAnalogRead(pin);
   } else if (l==4 && cmd0=='P' && cmd1=='I') {
     pinMode(pin, INPUT);
+    reportPinMode(pin, INPUT);
   } else if (l==4 && cmd0=='P' && cmd1=='O') {
     pinMode(pin, OUTPUT);
+    reportPinMode(pin, OUTPUT);
   }
+}
+
+void reportPinMode(int pin, uint8_t dir) {
+  uint8_t buff[] = { 'P', 'I', '0', '0' };
+  buff[1] = dir == INPUT ? 'I' : 'O';
+  buff[2] += pin/10;
+  buff[3] += pin%10;
+  Bridge.writeMessage(buff, 4);
 }
 
 void reportDigitalRead(int pin, boolean raw, boolean dataset) {
@@ -88,3 +101,4 @@ void reportAnalogRead(int pin) {
   buff[3] += v;
   Bridge.writeMessage(buff, 7);
 }
+
