@@ -148,17 +148,17 @@ void parseCommand(char dir, char duration) {
 // display the song
 void setInterface() {
   Robot.clearScreen();
-  Robot.fill(0, 0, 0);
+  Robot.stroke(0, 0, 0);
   Robot.text(musics[0], 0, 0);
 }
 
 // display the next song
 void select(int seq, boolean onOff) {
   if(onOff){//select
-    Robot.fill(0, 0, 0);
+    Robot.stroke(0, 0, 0);
     Robot.text(musics[seq], 0, 0);
   }else{//deselect
-    Robot.fill(255, 255, 255);
+    Robot.stroke(255, 255, 255);
     Robot.text(musics[seq], 0, 0);
   }
 }
