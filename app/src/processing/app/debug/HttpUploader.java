@@ -2,6 +2,7 @@ package processing.app.debug;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
@@ -29,15 +30,16 @@ public class HttpUploader extends Uploader {
 
   private final HttpClient client;
   private final String ipAddress;
+  private final String baseUrl;
 
   public HttpUploader(String port) {
     this.client = new HttpClient();
-    this.client.getHttpConnectionManager().getParams().setConnectionTimeout(5000);
     Matcher matcher = IPV4_ADDRESS.matcher(port);
     if (!matcher.find()) {
       throw new IllegalArgumentException(port);
     }
     this.ipAddress = matcher.group(1);
+    this.baseUrl = "https://" + ipAddress;
   }
 
   public boolean requiresAuthorization() {
@@ -53,6 +55,21 @@ public class HttpUploader extends Uploader {
     if (usingProgrammer) {
       System.err.println("Http upload using programmer not supported");
       return false;
+    }
+
+    this.client.getHttpConnectionManager().getParams().setConnectionTimeout(5000);
+
+    int sleptTimes = 1;
+    while (boardNotReady()) {
+      try {
+        Thread.sleep(100);
+      } catch (InterruptedException e) {
+        throw new RunnerException(e);
+      }
+      if (sleptTimes >= 3) {
+        throw new RunnerException("The board is not yet ready");
+      }
+      sleptTimes += 1;
     }
 
     FilePart sketch;
@@ -88,8 +105,17 @@ public class HttpUploader extends Uploader {
     }
   }
 
+  protected boolean boardNotReady() {
+    GetMethod get = new GetMethod(baseUrl + "/ready");
+    try {
+      return client.executeMethod(get) != HttpStatus.SC_OK;
+    } catch (IOException e) {
+      return true;
+    }
+  }
+
   protected PostMethod newPostMethod() {
-    return new PostMethod("https://" + ipAddress + "/upload");
+    return new PostMethod(baseUrl + "/upload");
   }
 
   @Override
