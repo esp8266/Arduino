@@ -63,7 +63,7 @@ void setup(){
   Robot.text("Found track", 5, 19);
   // run the rescue sequence a second time
   rescueSequence();
-  Robot.text("Found obstacle", 5, 24);
+  Robot.text("Found obstacle", 5, 26);
   
   // here you could go on ...
  
