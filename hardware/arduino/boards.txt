@@ -541,7 +541,7 @@ robotControl.build.mcu=atmega32u4
 robotControl.build.f_cpu=16000000L
 robotControl.build.vid=0x2341
 robotControl.build.pid=0x8038
-robotControl.build.core=arduino
+robotControl.build.core=robot
 robotControl.build.variant=robot_control
 
 ##############################################################
@@ -562,6 +562,6 @@ robotMotor.build.mcu=atmega32u4
 robotMotor.build.f_cpu=16000000L
 robotMotor.build.vid=0x2341
 robotMotor.build.pid=0x8039
-robotMotor.build.core=arduino
+robotMotor.build.core=robot
 robotMotor.build.variant=robot_motor
 
