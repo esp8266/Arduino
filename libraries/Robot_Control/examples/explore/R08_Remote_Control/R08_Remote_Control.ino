@@ -8,6 +8,15 @@
  ***detailed description of an updated version of this
  ***in a future update
  ***
+ *** For this example to work you need:
+ ***
+ *** - download and install the IR-Remote library by Ken Shirriff
+ ***   to be found at https://github.com/shirriff/Arduino-IRremote
+ *** - get a Sony remote control
+ ***
+ *** This example will be updated soon, come back to the Robot
+ *** page on the Arduino server for updates!!
+ ***
  *******************
  
  If you connect a IR receiver to the robot, 
