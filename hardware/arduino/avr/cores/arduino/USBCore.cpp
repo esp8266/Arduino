@@ -50,18 +50,8 @@ const u16 STRING_LANGUAGE[2] = {
 };
 
 #ifndef USB_PRODUCT
-// Use a hardcoded product name if none is provided
-#if USB_PID == 0x8036
-#define USB_PRODUCT     "Arduino Leonardo"
-#elif USB_PID == 0x8037
-#define USB_PRODUCT 	 "Arduino Micro"
-#elif USB_PID == 0x803C
-#define USB_PRODUCT     "Arduino Esplora"
-#elif USB_PID == 0x9208
-#define USB_PRODUCT  	 "LilyPad USB"
-#else
+// If no product is provided, use USB IO Board
 #define USB_PRODUCT     "USB IO Board"
-#endif
 #endif
 
 const u8 STRING_PRODUCT[] PROGMEM = USB_PRODUCT;
