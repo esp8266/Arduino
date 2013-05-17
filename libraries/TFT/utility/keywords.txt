@@ -1,0 +1,70 @@
+#######################################
+# Syntax Coloring Map For Adafruit_GFX
+# and Adafruit_ST7735
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+Adafruit_GFX	KEYWORD1
+Adafruit_ST7735	KEYWORD1
+PImage	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+drawPixel	KEYWORD2
+invertDisplay	KEYWORD2
+drawLine	KEYWORD2
+drawFastVLine	KEYWORD2
+drawFastHLine	KEYWORD2
+drawRect	KEYWORD2
+fillRect	KEYWORD2
+fillScreen	KEYWORD2
+drawCircle	KEYWORD2
+drawCircleHelper	KEYWORD2
+fillCircle	KEYWORD2
+fillCircleHelper	KEYWORD2
+drawTriangle	KEYWORD2
+fillTriangle	KEYWORD2
+drawRoundRect	KEYWORD2
+fillRoundRect	KEYWORD2
+drawBitmap	KEYWORD2
+drawChar	KEYWORD2
+setCursor	KEYWORD2
+setTextColor	KEYWORD2
+setTextSize	KEYWORD2
+setTextWrap	KEYWORD2
+height	KEYWORD2
+width	KEYWORD2
+setRotation	KEYWORD2
+getRotation	KEYWORD2
+
+
+
+newColor	KEYWORD2
+background	KEYWORD2
+fill	KEYWORD2
+noFill	KEYWORD2
+stroke	KEYWORD2
+noStroke	KEYWORD2
+text	KEYWORD2
+textWrap	KEYWORD2
+textSize	KEYWORD2
+circle	KEYWORD2
+point	KEYWORD2
+quad	KEYWORD2
+rect	KEYWORD2
+triangle	KEYWORD2
+loadImage	KEYWORD2
+image	KEYWORD2
+
+draw	KEYWORD2
+isValid	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
