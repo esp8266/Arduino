@@ -504,22 +504,22 @@ bool SendDescriptor(Setup& setup)
 	}
 	else if (USB_STRING_DESCRIPTOR_TYPE == t)
 	{
-                if (setup.wValueL == 0) {
+		if (setup.wValueL == 0) {
 			desc_addr = (const u8*)&STRING_LANGUAGE;
-                }
+		}
 		else if (setup.wValueL == IPRODUCT) {
-                        return USB_SendStringDescriptor(STRING_PRODUCT, strlen(USB_PRODUCT));
-                }
+			return USB_SendStringDescriptor(STRING_PRODUCT, strlen(USB_PRODUCT));
+		}
 		else if (setup.wValueL == IMANUFACTURER) {
-                        return USB_SendStringDescriptor(STRING_MANUFACTURER, strlen(USB_MANUFACTURER));
-                }
+			return USB_SendStringDescriptor(STRING_MANUFACTURER, strlen(USB_MANUFACTURER));
+		}
 		else
 			return false;
 	}
 
 	if (desc_addr == 0)
 		return false;
-        u8 desc_length = pgm_read_byte(desc_addr);
+	u8 desc_length = pgm_read_byte(desc_addr);
 
 	USB_SendControl(TRANSFER_PGM,desc_addr,desc_length);
 	return true;
