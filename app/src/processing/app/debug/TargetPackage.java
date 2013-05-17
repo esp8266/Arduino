@@ -47,8 +47,16 @@ public class TargetPackage {
       if (!subFolder.exists() || !subFolder.canRead())
         continue;
       String arch = subFolder.getName();
-      TargetPlatform platform = new TargetPlatform(arch, subFolder, this);
-      platforms.put(arch, platform);
+      try {
+        TargetPlatform platform = new TargetPlatform(arch, subFolder, this);
+        platforms.put(arch, platform);
+      } catch (TargetPlatformException e) {
+        continue;
+      }
+    }
+
+    if(platforms.size() == 0) {
+      throw new TargetPlatformException("No architecture directories with boards.txt files were found in hardware folder " + _folder.getName() + ". Is it pre-1.5?");
     }
   }
 
