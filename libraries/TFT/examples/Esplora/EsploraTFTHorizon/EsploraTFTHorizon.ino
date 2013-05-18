@@ -1,6 +1,6 @@
 /*
 
- Esplora TFT Horizion
+ Esplora TFT Horizon
  
  This example for the Arduino TFT and Esplora draws 
  a line on the screen that stays level with the ground
@@ -10,7 +10,7 @@
  
  Created 15 April 2013 by Scott Fitzgerald
  
- http://arduino.cc/en/Tutorial/EsploraTFTHorizion
+ http://arduino.cc/en/Tutorial/EsploraTFTHorizon
  
  */
 
