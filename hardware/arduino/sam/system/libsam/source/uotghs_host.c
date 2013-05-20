@@ -155,7 +155,10 @@ void UHD_Init(void)
 
 	// Signal is active low (because all SAM3X Pins are high after startup)
 	// Hence VBOF must be low after connection request to power up the remote device
-	uhd_set_vbof_active_low();
+	// uhd_set_vbof_active_low();
+
+	// According to the Arduino Due circuit the VBOF must be active high to power up the remote device
+	uhd_set_vbof_active_high();
 
 	otg_enable_pad();
 	otg_enable();
