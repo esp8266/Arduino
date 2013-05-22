@@ -20,14 +20,15 @@
 
 // Default constructor uses global Bridge instance
 ConsoleClass::ConsoleClass() : 
-  bridge(Bridge), buffered(0), readPos(0), buffer(NULL)
+  bridge(Bridge), inBuffered(0), inReadPos(0), inBuffer(NULL),
+  autoFlush(true)
 {
   // Empty
 }
 
 // Constructor with a user provided BridgeClass instance
 ConsoleClass::ConsoleClass(BridgeClass &_b) : 
-  bridge(_b), buffered(0), readPos(0), buffer(NULL),
+  bridge(_b), inBuffered(0), inReadPos(0), inBuffer(NULL),
   autoFlush(true)
 {
   // Empty
@@ -49,18 +50,18 @@ size_t ConsoleClass::write(uint8_t c) {
   }
 }
 
-size_t ConsoleClass::write(const uint8_t *buffer, size_t size) {
+size_t ConsoleClass::write(const uint8_t *buff, size_t size) {
   if (autoFlush) {
     // TODO: do it in a more efficient way
     uint8_t *tmp = new uint8_t[size+1];
     tmp[0] = 'P';
-    memcpy(tmp+1, buffer, size);
+    memcpy(tmp+1, buff, size);
     bridge.transfer(tmp, size+1);
     delete[] tmp;
     return size;
   } else {
     while (size > 0) {
-      outBuffer[outBuffered++] = *buffer++;
+      outBuffer[outBuffered++] = *buff++;
       size--;
       if (outBuffered == outBufferSize)
         flush();
@@ -76,20 +77,22 @@ void ConsoleClass::flush() {
   outBuffered = 1;
 }
 
-void ConsoleClass::setBuffer(uint8_t size) {
-  if (size==0) {
-    if (!autoFlush) {
-      delete[] outBuffer;
-      autoFlush = true;
-    }
-  } else {
-    if (autoFlush)
-      setBuffer(0);
-    outBuffer = new uint8_t[size+1];
-    outBuffer[0] = 'P'; // WRITE tag
-    outBufferSize = size+1;
-    outBuffered = 1;
-  }
+void ConsoleClass::noBuffer() {
+  if (autoFlush)
+	return;
+  delete[] outBuffer;
+  autoFlush = true;
+}
+
+void ConsoleClass::buffer(uint8_t size) {
+  noBuffer();
+  if (size==0)
+	return;
+  outBuffer = new uint8_t[size+1];
+  outBuffer[0] = 'P'; // WRITE tag
+  outBufferSize = size+1;
+  outBuffered = 1;
+  autoFlush = false;
 }
 
 bool ConsoleClass::connected() {
@@ -101,51 +104,49 @@ bool ConsoleClass::connected() {
 int ConsoleClass::available() {
   // Look if there is new data available
   doBuffer();
-  return buffered;
+  return inBuffered;
 }
 
 int ConsoleClass::read() {
   doBuffer();
-  if (buffered == 0)
+  if (inBuffered == 0)
     return -1; // no chars available
   else {
-    buffered--;
-    return buffer[readPos++];
+    inBuffered--;
+    return inBuffer[inReadPos++];
   }
 }
 
 int ConsoleClass::peek() {
   doBuffer();
-  if (buffered == 0)
+  if (inBuffered == 0)
     return -1; // no chars available
   else
-    return buffer[readPos];
+    return inBuffer[inReadPos];
 }
 
 void ConsoleClass::doBuffer() {
   // If there are already char in buffer exit
-  if (buffered > 0)
+  if (inBuffered > 0)
     return;
 
   // Try to buffer up to 32 characters
-  readPos = 0;
+  inReadPos = 0;
   uint8_t tmp[] = { 'p', BUFFER_SIZE };
-  buffered = bridge.transfer(tmp, 2, buffer, BUFFER_SIZE);
+  inBuffered = bridge.transfer(tmp, 2, inBuffer, BUFFER_SIZE);
 }
 
 void ConsoleClass::begin() {
   bridge.begin();
   end();
-  buffer = new uint8_t[BUFFER_SIZE];
+  inBuffer = new uint8_t[BUFFER_SIZE];
 }
 
 void ConsoleClass::end() {
-  if (autoFlush) {
-    setBuffer(0);
-  }
-  if (buffer) {
-    delete[] buffer;
-    buffer = NULL;
+  noBuffer();
+  if (inBuffer) {
+    delete[] inBuffer;
+    inBuffer = NULL;
   }
 }
 

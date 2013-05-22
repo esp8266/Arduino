@@ -32,7 +32,8 @@ public:
   void begin();
   void end();
 
-  void setBuffer(uint8_t size);
+  void buffer(uint8_t size);
+  void noBuffer();
 
   bool connected();
 
@@ -52,10 +53,10 @@ private:
   BridgeClass &bridge;
 
   void doBuffer();
-  uint8_t buffered;
-  uint8_t readPos;
+  uint8_t inBuffered;
+  uint8_t inReadPos;
   static const int BUFFER_SIZE = 32;
-  uint8_t *buffer;
+  uint8_t *inBuffer;
   
   bool autoFlush;
   uint8_t outBuffered;
