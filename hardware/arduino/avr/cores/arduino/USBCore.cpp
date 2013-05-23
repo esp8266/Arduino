@@ -58,7 +58,7 @@ const u16 STRING_IPRODUCT[17] = {
 #elif USB_PID == 0x803C
 	'A','r','d','u','i','n','o',' ','E','s','p','l','o','r','a',' '
 #elif USB_PID == 0x8041
-	'A','r','d','u','i','n','o',' ','E','t','h','e','r','i','s',' '
+	'A','r','d','u','i','n','o',' ','Y','u','n',' ',' ',' ',' ',' '
 #elif USB_PID == 0x9208
 	'L','i','l','y','P','a','d','U','S','B',' ',' ',' ',' ',' ',' '
 #else

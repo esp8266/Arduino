@@ -4,38 +4,38 @@ menu.cpu=Processor
 
 ##############################################################
 
-etheris.name=Arduino Etheris
-etheris.upload.via_http=true
+yun.name=Arduino Yún
+yun.upload.via_http=true
 
-etheris.vid.0=0x2341
-etheris.pid.0=0x0041
-etheris.vid.1=0x2341
-etheris.pid.1=0x8041
-etheris.upload.tool=avrdude
-etheris.upload.protocol=avr109
-etheris.upload.maximum_size=28672
-etheris.upload.maximum_data_size=2560
-etheris.upload.speed=57600
-etheris.upload.disable_flushing=true
-etheris.upload.use_1200bps_touch=true
-etheris.upload.wait_for_upload_port=true
+yun.vid.0=0x2341
+yun.pid.0=0x0041
+yun.vid.1=0x2341
+yun.pid.1=0x8041
+yun.upload.tool=avrdude
+yun.upload.protocol=avr109
+yun.upload.maximum_size=28672
+yun.upload.maximum_data_size=2560
+yun.upload.speed=57600
+yun.upload.disable_flushing=true
+yun.upload.use_1200bps_touch=true
+yun.upload.wait_for_upload_port=true
 
-etheris.bootloader.tool=avrdude
-etheris.bootloader.low_fuses=0xff
-etheris.bootloader.high_fuses=0xd8
-etheris.bootloader.extended_fuses=0xcb
-etheris.bootloader.file=caterina/Caterina-Etheris.hex
-etheris.bootloader.unlock_bits=0x3F
-etheris.bootloader.lock_bits=0x2F
+yun.bootloader.tool=avrdude
+yun.bootloader.low_fuses=0xff
+yun.bootloader.high_fuses=0xd8
+yun.bootloader.extended_fuses=0xcb
+yun.bootloader.file=caterina/Caterina-Yun.hex
+yun.bootloader.unlock_bits=0x3F
+yun.bootloader.lock_bits=0x2F
 
-etheris.build.mcu=atmega32u4
-etheris.build.f_cpu=16000000L
-etheris.build.vid=0x2341
-etheris.build.pid=0x8041
-etheris.build.board=AVR_LEONARDO
-etheris.build.core=arduino
-etheris.build.variant=leonardo
-etheris.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid}
+yun.build.mcu=atmega32u4
+yun.build.f_cpu=16000000L
+yun.build.vid=0x2341
+yun.build.pid=0x8041
+yun.build.board=AVR_LEONARDO
+yun.build.core=arduino
+yun.build.variant=leonardo
+yun.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid}
 
 ##############################################################
 
