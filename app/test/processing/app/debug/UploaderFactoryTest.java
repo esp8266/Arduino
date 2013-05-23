@@ -22,8 +22,8 @@ public class UploaderFactoryTest extends AbstractWithPreferencesTest {
 
   @Test
   public void shouldCreateAnInstanceOfHttpUploader() throws Exception {
-    TargetBoard board = targetPackage.getPlatforms().get("avr").getBoards().get("dogstick");
-    Uploader uploader = new UploaderFactory().newUploader(board, "192.168.0.1 (mydogstick)");
+    TargetBoard board = targetPackage.getPlatforms().get("avr").getBoards().get("yun");
+    Uploader uploader = new UploaderFactory().newUploader(board, "192.168.0.1 (yun)");
 
     assertTrue(uploader instanceof HttpUploader);
   }
@@ -31,7 +31,7 @@ public class UploaderFactoryTest extends AbstractWithPreferencesTest {
   @Test
   public void shouldCreateAnInstanceOfBasicUploaderWhenHTTPIsUnsupported() throws Exception {
     TargetBoard board = targetPackage.getPlatforms().get("avr").getBoards().get("uno");
-    Uploader uploader = new UploaderFactory().newUploader(board, "192.168.0.1 (mydogstick)");
+    Uploader uploader = new UploaderFactory().newUploader(board, "192.168.0.1 (myyun)");
 
     assertTrue(uploader instanceof BasicUploader);
   }
