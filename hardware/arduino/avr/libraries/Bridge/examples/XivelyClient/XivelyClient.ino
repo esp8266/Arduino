@@ -35,6 +35,7 @@
 // set up net client info:
 boolean lastConnected = false;      // state of the connection last time through the main loop
 const unsigned long postingInterval = 60000;  //delay between updates to Pachube.com
+unsigned long lastRequest = 0;      // when you last made a request
 String dataString = "";
 Process xively;
 
@@ -43,7 +44,10 @@ void setup() {
   Serial.begin(9600);
   Bridge.begin();
   delay(2000);
-
+  
+  while(!Serial);    // wait for Serial Monitor to open
+  Serial.println("Xively client");
+  
   // reserve space for dataString:
   dataString.reserve(100);
 }
@@ -70,8 +74,9 @@ void loop() {
 
   // if you're not connected, and the sending interval has passed since
   // your last connection, then connect again and send data:
-  if(now % postingInterval < 5) {
+  if(now - lastRequest >= postingInterval) {
     sendData();
+    lastRequest = now;
   }
 }
 
