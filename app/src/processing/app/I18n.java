@@ -46,15 +46,29 @@ public class I18n {
   }
 
   public static String _(String s) {
+    String res;
     try {
-      return i18n.getString(s);
+      res = i18n.getString(s);
+    } catch (MissingResourceException e) {
+      res = s;
     }
-    catch (MissingResourceException e) {
-      return s;
-    }
+    
+    // The single % is the arguments selector in .PO files.
+    // We must put double %% inside the translations to avoid
+    // getting .PO processing in the way.
+    res = res.replace("%%", "%");
+    
+    return res;
   }
 
   public static String format(String fmt, Object ... args) {
+    // Single quote is used to escape curly bracket arguments.
+    
+    // - Prevents strings fixed at translation time to be fixed again
+    fmt = fmt.replace("''", "'");
+    // - Replace ' with the escaped version ''
+    fmt = fmt.replace("'", "''");
+
     return MessageFormat.format(fmt, args);
   }
   

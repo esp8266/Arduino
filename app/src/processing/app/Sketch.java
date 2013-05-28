@@ -1634,12 +1634,12 @@ public class Sketch {
     long textSize = sizes[0];
     long dataSize = sizes[1];
     System.out.println(I18n
-                       .format(_("Binary sketch size: {0} bytes (of a {1} byte maximum) - {2}% used"),
+                       .format(_("Binary sketch size: {0} bytes (of a {1} byte maximum) - {2}%% used"),
                                textSize, maxTextSize, textSize * 100 / maxTextSize));
     if (dataSize >= 0) {
       if (maxDataSize > 0) {
         System.out.println(I18n.format(
-                        _("Minimum Memory usage: {0} bytes (of a {1} byte maximum) - {2}% used"),
+                        _("Minimum Memory usage: {0} bytes (of a {1} byte maximum) - {2}%% used"),
                         dataSize, maxDataSize, dataSize * 100 / maxDataSize));
       } else {
         System.out.println(I18n.format(_("Minimum Memory usage: {0} bytes"), dataSize));
