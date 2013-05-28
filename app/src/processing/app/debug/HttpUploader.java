@@ -155,14 +155,17 @@ public class HttpUploader extends Uploader {
     }
   }
 
-  protected boolean boardNotReady(String auth) {
+  protected boolean boardNotReady(String auth) throws RunnerException {
     GetMethod get = new GetMethod(baseUrl + "/ready");
     get.setRequestHeader("Authorization", "Basic " + auth);
     try {
       int httpStatus = client.executeMethod(get);
+      if (httpStatus % HttpStatus.SC_BAD_REQUEST < 100 || httpStatus % HttpStatus.SC_INTERNAL_SERVER_ERROR < 100) {
+        System.err.println(get.getResponseBodyAsString());
+        throw new RunnerException("Problem knowing if the board was ready");
+      }
       return httpStatus != HttpStatus.SC_OK;
     } catch (IOException e) {
-      e.printStackTrace();
       return true;
     }
   }
