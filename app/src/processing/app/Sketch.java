@@ -1677,7 +1677,7 @@ public class Sketch {
           return false;
         }
 
-        Preferences.set(uploader.getAuthorizationKey(), DigestUtils.sha512Hex(dialog.getPassword()));
+        Preferences.set(uploader.getAuthorizationKey(), DigestUtils.sha256Hex(dialog.getPassword()));
       }
 
       success = uploader.uploadUsingPreferences(buildPath, suggestedClassName, usingProgrammer);
