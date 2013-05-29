@@ -586,3 +586,61 @@ atmegang.menu.cpu.atmega8.bootloader.file=atmega8/ATmegaBOOT-prod-firmware-2009-
 
 atmegang.menu.cpu.atmega8.build.mcu=atmega8
 
+##############################################################
+
+robotControl.name=Arduino Robot Control
+robotControl.upload.tool=avrdude
+robotControl.upload.protocol=avr109
+robotControl.upload.maximum_size=28672
+robotControl.upload.data_size=2560
+robotControl.upload.speed=57600
+robotControl.upload.disable_flushing=true
+robotControl.upload.use_1200bps_touch=true
+robotControl.upload.wait_for_upload_port=true
+
+robotControl.bootloader.tool=avrdude
+robotControl.bootloader.low_fuses=0xff
+robotControl.bootloader.high_fuses=0xd8
+robotControl.bootloader.extended_fuses=0xcb
+robotControl.bootloader.file=caterina-Arduino_Robot/Caterina-Robot-Control.hex
+robotControl.bootloader.unlock_bits=0x3F
+robotControl.bootloader.lock_bits=0x2F
+
+robotControl.build.mcu=atmega32u4
+robotControl.build.f_cpu=16000000L
+robotControl.build.vid=0x2341
+robotControl.build.pid=0x8038
+robotControl.build.board=AVR_ROBOT_CONTROL
+robotControl.build.core=robot
+robotControl.build.variant=robot_control
+robotControl.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid}
+
+##############################################################
+
+robotMotor.name=Arduino Robot Motor
+robotMotor.upload.tool=avrdude
+robotMotor.upload.protocol=avr109
+robotMotor.upload.maximum_size=28672
+robotMotor.upload.data_size=2560
+robotMotor.upload.speed=57600
+robotMotor.upload.disable_flushing=true
+robotMotor.upload.use_1200bps_touch=true
+robotMotor.upload.wait_for_upload_port=true
+
+robotMotor.bootloader.tool=avrdude
+robotMotor.bootloader.low_fuses=0xff
+robotMotor.bootloader.high_fuses=0xd8
+robotMotor.bootloader.extended_fuses=0xcb
+robotMotor.bootloader.file=caterina-Arduino_Robot/Caterina-Robot-Motor.hex
+robotMotor.bootloader.unlock_bits=0x3F
+robotMotor.bootloader.lock_bits=0x2F
+
+robotMotor.build.mcu=atmega32u4
+robotMotor.build.f_cpu=16000000L
+robotMotor.build.vid=0x2341
+robotMotor.build.pid=0x8039
+robotMotor.build.board=AVR_ROBOT_MOTOR
+robotMotor.build.core=robot
+robotMotor.build.variant=robot_motor
+robotMotor.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid}
+

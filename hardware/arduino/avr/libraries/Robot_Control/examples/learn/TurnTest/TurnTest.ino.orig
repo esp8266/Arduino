@@ -1,0 +1,37 @@
+/*
+ Turn Test
+ 
+ Check if the robot turns a certain amount of degrees.
+ 
+ Circuit:
+ * Arduino Robot
+ 
+ created 1 May 2013
+ by X. Yang
+ modified 12 May 2013
+ by D. Cuartielles
+ 
+ This example is in the public domain
+ */
+
+#include <ArduinoRobot.h>
+
+void setup() {
+  // initialize the robot
+  Robot.begin();
+}
+
+<<<<<<< HEAD
+void loop() {  
+  Robot.turn(50);  //turn 50 degrees to the right
+=======
+void loop(){  
+  Robot.turn(50);//turn 50 degrees to the right
+  Robot.motorsStop();
+>>>>>>> f062f704463222e83390b4a954e211f0f7e6e66f
+  delay(1000);
+
+  Robot.turn(-100);//turn 100 degrees to the left
+  Robot.motorsStop();
+  delay(1000);
+}
