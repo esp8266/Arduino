@@ -3,6 +3,7 @@ package processing.app.debug;
 import org.junit.Before;
 import org.junit.Test;
 import processing.app.AbstractWithPreferencesTest;
+import processing.app.PerPortObjectFactory;
 import processing.app.helpers.PreferencesMap;
 
 import java.io.File;
@@ -23,7 +24,7 @@ public class UploaderFactoryTest extends AbstractWithPreferencesTest {
   @Test
   public void shouldCreateAnInstanceOfHttpUploader() throws Exception {
     TargetBoard board = targetPackage.getPlatforms().get("avr").getBoards().get("yun");
-    Uploader uploader = new UploaderFactory().newUploader(board, "192.168.0.1 (yun)");
+    Uploader uploader = new PerPortObjectFactory().newUploader(board, "192.168.0.1 (yun)");
 
     assertTrue(uploader instanceof HttpUploader);
   }
@@ -31,7 +32,7 @@ public class UploaderFactoryTest extends AbstractWithPreferencesTest {
   @Test
   public void shouldCreateAnInstanceOfBasicUploaderWhenHTTPIsUnsupported() throws Exception {
     TargetBoard board = targetPackage.getPlatforms().get("avr").getBoards().get("uno");
-    Uploader uploader = new UploaderFactory().newUploader(board, "192.168.0.1 (myyun)");
+    Uploader uploader = new PerPortObjectFactory().newUploader(board, "192.168.0.1 (myyun)");
 
     assertTrue(uploader instanceof BasicUploader);
   }
@@ -39,7 +40,7 @@ public class UploaderFactoryTest extends AbstractWithPreferencesTest {
   @Test
   public void shouldCreateAnInstanceOfBasicUploaderWhenPortIsSerial() throws Exception {
     TargetBoard board = targetPackage.getPlatforms().get("avr").getBoards().get("uno");
-    Uploader uploader = new UploaderFactory().newUploader(board, "/dev/ttyACM0 (Arduino Leonardo)");
+    Uploader uploader = new PerPortObjectFactory().newUploader(board, "/dev/ttyACM0 (Arduino Leonardo)");
 
     assertTrue(uploader instanceof BasicUploader);
   }

@@ -20,7 +20,9 @@
 
 package processing.app;
 
-public class SerialException extends Exception {
+import java.io.IOException;
+
+public class SerialException extends IOException {
   public SerialException() {
     super();
   }

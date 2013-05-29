@@ -1580,7 +1580,7 @@ public class Sketch {
    * Handle export to applet.
    */
   public boolean exportApplet(String appletPath, boolean usingProgrammer)
-    throws RunnerException, IOException, SerialException {
+    throws RunnerException, IOException {
 
     prepare();
 
@@ -1658,12 +1658,12 @@ public class Sketch {
 	  System.out.println(_("Low memory available, stability problems may occur"));
   }
 
-  protected boolean upload(String buildPath, String suggestedClassName, boolean usingProgrammer) throws RunnerException, SerialException {
+  protected boolean upload(String buildPath, String suggestedClassName, boolean usingProgrammer) throws RunnerException {
 
     TargetPlatform target = Base.getTargetPlatform();
     String board = Preferences.get("board");
 
-    Uploader uploader = new UploaderFactory().newUploader(target.getBoards().get(board), Preferences.get("serial.port"));
+    Uploader uploader = new PerPortObjectFactory().newUploader(target.getBoards().get(board), Preferences.get("serial.port"));
 
     boolean success = false;
     do {

@@ -45,7 +45,7 @@ public class BasicUploader extends Uploader  {
 
   public boolean uploadUsingPreferences(String buildPath, String className,
                                         boolean usingProgrammer)
-      throws RunnerException, SerialException {
+      throws RunnerException {
     // FIXME: Preferences should be reorganized
     TargetPlatform targetPlatform = Base.getTargetPlatform();
     PreferencesMap prefs = Preferences.getMap();
@@ -152,7 +152,11 @@ public class BasicUploader extends Uploader  {
             Thread.sleep(250);
           }
         } else {
-          Serial.touchPort(uploadPort, 9600);
+          try {
+            Serial.touchPort(uploadPort, 9600);
+          } catch (SerialException e) {
+            throw new RunnerException(e);
+          }
         }
       }
     } catch (InterruptedException ex) {

@@ -7,8 +7,8 @@ import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import processing.app.Base;
+import processing.app.Constants;
 import processing.app.Preferences;
-import processing.app.SerialException;
 import processing.app.helpers.PreferencesMap;
 
 import java.io.*;
@@ -19,7 +19,6 @@ import java.util.regex.Pattern;
 
 public class HttpUploader extends Uploader {
 
-  private static final Pattern IPV4_ADDRESS = Pattern.compile("(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})");
   private static final String PROTOCOL = "http://";
 
   /*
@@ -34,11 +33,11 @@ public class HttpUploader extends Uploader {
 
   public HttpUploader(String port) {
     this.client = new HttpClient();
-    Matcher matcher = IPV4_ADDRESS.matcher(port);
+    Matcher matcher = Constants.IPV4_ADDRESS.matcher(port);
     if (!matcher.find()) {
       throw new IllegalArgumentException(port);
     }
-    this.ipAddress = matcher.group(1);
+    this.ipAddress = matcher.group();
     this.baseUrl = PROTOCOL + ipAddress + "/cgi-bin/luci/arduino";
   }
 
@@ -51,7 +50,7 @@ public class HttpUploader extends Uploader {
   }
 
   @Override
-  public boolean uploadUsingPreferences(String buildPath, String className, boolean usingProgrammer) throws RunnerException, SerialException {
+  public boolean uploadUsingPreferences(String buildPath, String className, boolean usingProgrammer) throws RunnerException {
     if (usingProgrammer) {
       System.err.println("Http upload using programmer not supported");
       return false;

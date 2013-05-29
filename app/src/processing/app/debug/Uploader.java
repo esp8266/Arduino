@@ -52,7 +52,7 @@ public abstract class Uploader implements MessageConsumer  {
   boolean verbose;
 
   public abstract boolean uploadUsingPreferences(String buildPath, String className, boolean usingProgrammer)
-    throws RunnerException, SerialException;
+    throws RunnerException;
 
   public abstract boolean burnBootloader() throws RunnerException;
 

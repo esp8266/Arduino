@@ -99,7 +99,7 @@ public class Editor extends JFrame implements RunnerListener {
   static List<JMenu> boardsMenus;
   static JMenu serialMenu;
 
-  static SerialMonitor serialMonitor;
+  static AbstractMonitor serialMonitor;
 
   EditorHeader header;
   EditorStatus status;
@@ -204,7 +204,7 @@ public class Editor extends JFrame implements RunnerListener {
     //sketchbook = new Sketchbook(this);
 
     if (serialMonitor == null) {
-      serialMonitor = new SerialMonitor(Preferences.get("serial.port"));
+      serialMonitor = new PerPortObjectFactory().newMonitor(Preferences.get("serial.port"), base);
       serialMonitor.setIconImage(getIconImage());
     }
 
@@ -964,9 +964,13 @@ public class Editor extends JFrame implements RunnerListener {
       Preferences.set("serial.port.file", name.substring(5));
     else
       Preferences.set("serial.port.file", name);
-    serialMonitor.closeSerialPort();
+    try {
+      serialMonitor.close();
+    } catch (IOException e) {
+      // ignore
+    }
     serialMonitor.setVisible(false);
-    serialMonitor = new SerialMonitor(Preferences.get("serial.port"));
+    serialMonitor = new PerPortObjectFactory().newMonitor(Preferences.get("serial.port"), base);
 
     onBoardOrPortChange();
 
@@ -2401,7 +2405,7 @@ public class Editor extends JFrame implements RunnerListener {
     public void run() {
 
       try {
-        serialMonitor.closeSerialPort();
+        serialMonitor.close();
         serialMonitor.setVisible(false);
 
         uploading = true;
@@ -2437,7 +2441,7 @@ public class Editor extends JFrame implements RunnerListener {
     public void run() {
 
       try {
-        serialMonitor.closeSerialPort();
+        serialMonitor.close();
         serialMonitor.setVisible(false);
 
         uploading = true;
@@ -2507,9 +2511,11 @@ public class Editor extends JFrame implements RunnerListener {
     if (uploading) return;
 
     try {
-      serialMonitor.openSerialPort();
+      serialMonitor.open();
       serialMonitor.setVisible(true);
-    } catch (SerialException e) {
+    } catch (ConnectException e) {
+      statusError(_("Unable to connect: is the sketch using the bridge?"));
+    } catch (IOException e) {
       statusError(e);
     }
   }

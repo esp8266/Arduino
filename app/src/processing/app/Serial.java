@@ -219,24 +219,15 @@ public class Serial implements SerialPortEventListener {
   //public void key(java.awt.event.KeyEvent e) { }
 
 
-  public void dispose() {
-    try {
-      // do io streams need to be closed first?
-      if (input != null) input.close();
-      if (output != null) output.close();
+  public void dispose() throws IOException {
+    // do io streams need to be closed first?
+    if (input != null) input.close();
+    if (output != null) output.close();
 
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
     input = null;
     output = null;
 
-    try {
-      if (port != null) port.close();  // close the port
-
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+    if (port != null) port.close();  // close the port
     port = null;
   }
   
