@@ -100,6 +100,19 @@ String::String(unsigned long value, unsigned char base)
 	*this = buf;
 }
 
+String::String(float value, int decimalPlaces)
+{
+	init();
+	char buf[33];
+	*this = dtostrf(value, (decimalPlaces + 2), decimalPlaces, buf);
+}
+
+String::String(double value, int decimalPlaces)
+{
+	init();
+	char buf[33];
+	*this = dtostrf(value, (decimalPlaces + 2), decimalPlaces, buf);
+}
 String::~String()
 {
 	free(buffer);
@@ -283,6 +296,20 @@ unsigned char String::concat(unsigned long num)
 	return concat(buf, strlen(buf));
 }
 
+unsigned char String::concat(float num)
+{
+	char buf[20];
+	char* string = dtostrf(num, 8, 6, buf);
+	return concat(string, strlen(string));
+}
+
+unsigned char String::concat(double num)
+{
+	char buf[20];
+	char* string = dtostrf(num, 8, 6, buf);
+	return concat(string, strlen(string));
+}
+
 /*********************************************/
 /*  Concatenate                              */
 /*********************************************/
@@ -343,6 +370,19 @@ StringSumHelper & operator + (const StringSumHelper &lhs, unsigned long num)
 	return a;
 }
 
+StringSumHelper & operator + (const StringSumHelper &lhs, float num)
+{
+	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
+	if (!a.concat(num)) a.invalidate();
+	return a;
+}
+
+StringSumHelper & operator + (const StringSumHelper &lhs, double num)
+{
+	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
+	if (!a.concat(num)) a.invalidate();
+	return a;
+}
 /*********************************************/
 /*  Comparison                               */
 /*********************************************/
@@ -659,3 +699,8 @@ long String::toInt(void) const
 }
 
 
+float String::toFloat(void) const
+{
+	if (buffer) return float(atof(buffer));
+	return 0;
+}
