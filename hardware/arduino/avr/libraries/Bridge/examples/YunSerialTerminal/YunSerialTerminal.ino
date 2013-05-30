@@ -20,7 +20,7 @@
  This example code is in the public domain.
  */
 
-long baud = 115200;
+long baud = 57600;
 
 // Pin 13 has an LED connected on most Arduino boards.
 // give it a name:
@@ -31,8 +31,6 @@ int ledState = HIGH;   // whether the LED is high or low
 void setup() {
   Serial.begin(baud);        // open serial connection to Linino
   Serial1.begin(baud);       // open serial connection via USB-Serial
-  Serial.println("Prova");   // Hello USB
-  Serial1.println("Prova1"); // Hello Linino
 
   // initialize the digital pin as an output.
   pinMode(led, OUTPUT);    
