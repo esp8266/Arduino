@@ -20,7 +20,7 @@
  This example code is in the public domain.
  */
 
-long baud = 115200;
+long baud = 9600;
 
 // Pin 13 has an LED connected on most Arduino boards.
 // give it a name:
