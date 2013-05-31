@@ -24,3 +24,5 @@ build/linux/*.tgz
 test-bin
 *.iml
 .idea
+
+hardware/arduino/avr/libraries/Bridge/examples/XivelyClient/passwords.h
