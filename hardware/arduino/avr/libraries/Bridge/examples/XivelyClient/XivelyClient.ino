@@ -25,11 +25,7 @@
  #define APIKEY        "foo"                  // replace your pachube api key here
  #define FEEDID        0000                   // replace your feed ID
  #define USERAGENT     "my-project"           // user agent is the project name
- 
- char ssid[] = "networkname";      //  your network SSID (name)
- char pass[] = "password";         // your network password
- 
- */
+  */
 
 
 // set up net client info:
@@ -44,12 +40,13 @@ void setup() {
   Serial.begin(9600);
   Bridge.begin();
   delay(2000);
-  
+
   while(!Serial);    // wait for Serial Monitor to open
   Serial.println("Xively client");
-  
+
   // reserve space for dataString:
   dataString.reserve(100);
+  sendData();
 }
 
 void loop() {
@@ -64,9 +61,8 @@ void loop() {
   dataString += random(5) + 100;
 
   // if there's incoming data from the net connection,
-  // send it out the serial port.  This is for debugging
-  // purposes only:
-  while (xively.available()>0) {
+  // send it out the serial port:
+  if (xively.available()>0) {
     char c = xively.read();
     Serial.write(c);
   }
@@ -83,7 +79,6 @@ void loop() {
 // this method makes a HTTP connection to the server:
 void sendData() {
   Serial.println("Sending data");
-  xively.begin("curl");
   dataString = "--data \'" + dataString;
   dataString += "\'";
 
@@ -93,18 +88,25 @@ void sendData() {
   apiString += "\"";
 
   // form the string for the URL parameter:
-  String url =  " https://api.xively.com/v2/feeds/";
+  String url =  " \"https://api.xively.com/v2/feeds/";
   url += FEEDID;
-  url += ".csv";
-
+  url += ".csv\"";
+ 
   // send the HTTP PUT request:
-  xively.addParameter(" -k");
+  xively.begin("curl");
+  xively.addParameter("-k");
   xively.addParameter("--request PUT");
   xively.addParameter(dataString);
   xively.addParameter(apiString); 
   xively.addParameter(url);
   xively.run();
 }
+
+
+
+
+
+
 
 
 
