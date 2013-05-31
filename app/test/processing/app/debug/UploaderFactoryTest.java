@@ -4,11 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 import processing.app.AbstractWithPreferencesTest;
 import processing.app.PerPortObjectFactory;
-import processing.app.helpers.PreferencesMap;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
 
