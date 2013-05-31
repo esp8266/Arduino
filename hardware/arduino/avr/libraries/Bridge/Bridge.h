@@ -105,3 +105,6 @@ private:
 extern SerialBridgeClass Bridge;
 
 #endif /* BRIDGE_H_ */
+
+#include <Console.h>
+#include <Process.h>
