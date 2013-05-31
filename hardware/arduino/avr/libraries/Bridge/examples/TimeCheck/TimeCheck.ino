@@ -74,23 +74,6 @@ void loop() {
     minutes = minString.toInt();
     lastSecond = seconds;          // save to do a time comparison
     seconds = secString.toInt();
-
-    /*
-    NOTE: If the parseInt() and parseFloar() methods from Stream 
-     were included with Process, this would be simpler:
-     
-     hours = date.parseInt();
-     minutes = date.parseInt();
-     seconds = date.parseInt();
-     
-     */
   } 
 
 }
-
-
-
-
-
-
-
