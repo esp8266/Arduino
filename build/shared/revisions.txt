@@ -21,6 +21,9 @@ ARDUINO 1.5.3 BETA
 [firmwares]
 * Arduino Due: fixed USB2Serial garbage at startup (https://github.com/arduino/Arduino/pull/1267)
 
+[other]
+* Merged all improvements made in Arduino IDE 1.0.5
+
 ARDUINO 1.5.2 BETA - 2013.02.06
 
 [ide]
@@ -56,7 +59,7 @@ ARDUINO 1.5.2 BETA - 2013.02.06
 
 [other]
 * Merged all improvements made in Arduino IDE 1.0.3
-* Merged all improvements made in Arduino IDE 1.0.4 (not yet released)
+* Merged all improvements made in Arduino IDE 1.0.4
 
 ARDUINO 1.5.1r2 BETA - 2012.11.06
 
@@ -112,6 +115,8 @@ ARDUINO 1.0.5 - 2013.05.15
 
 * Upgrades to WiFi library
 * Fixed a bunch of examples
+* Added Arduino Robot libraries
+* Added TFT display library
 
 [firmwares]
 
@@ -120,7 +125,6 @@ ARDUINO 1.0.5 - 2013.05.15
 [ide]
 
 * Backport from 1.5: install Library from .zip file or folder
-* Added button "Copy error to clipboard" (Paul Stoffregen)
 * Updated windows drivers
 * Added Windows installer
 
@@ -129,6 +133,7 @@ ARDUINO 1.0.4 - 2013.03.11
 [core]
 
 * Fixed malloc bug (Paul Stoffregen)
+* Added INT6 support for Leonardo (Federico Vanzati)
 
 [libraries]
 
