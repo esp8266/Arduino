@@ -44,6 +44,9 @@ import javax.swing.text.*;
 import javax.swing.undo.*;
 
 import cc.arduino.packages.BoardPort;
+import cc.arduino.packages.Uploader;
+import cc.arduino.packages.UploaderFactory;
+import cc.arduino.packages.uploaders.SerialUploader;
 
 /**
  * Main editor panel for the Processing Development Environment.
@@ -204,7 +207,7 @@ public class Editor extends JFrame implements RunnerListener {
     //sketchbook = new Sketchbook(this);
 
     if (serialMonitor == null) {
-      serialMonitor = new PerPortObjectFactory().newMonitor(Preferences.get("serial.port"), base);
+      serialMonitor = new UploaderFactory().newMonitor(Preferences.get("serial.port"), base);
       serialMonitor.setIconImage(getIconImage());
     }
 
@@ -970,7 +973,7 @@ public class Editor extends JFrame implements RunnerListener {
       // ignore
     }
     serialMonitor.setVisible(false);
-    serialMonitor = new PerPortObjectFactory().newMonitor(Preferences.get("serial.port"), base);
+    serialMonitor = new UploaderFactory().newMonitor(Preferences.get("serial.port"), base);
 
     onBoardOrPortChange();
 
@@ -2507,7 +2510,7 @@ public class Editor extends JFrame implements RunnerListener {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         try {
-          Uploader uploader = new BasicUploader();
+          Uploader uploader = new SerialUploader();
           if (uploader.burnBootloader()) {
             statusNotice(_("Done burning bootloader."));
           } else {

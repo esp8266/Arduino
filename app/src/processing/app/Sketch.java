@@ -24,6 +24,9 @@
 package processing.app;
 
 import org.apache.commons.codec.digest.DigestUtils;
+
+import cc.arduino.packages.Uploader;
+import cc.arduino.packages.UploaderFactory;
 import processing.app.debug.*;
 import processing.app.debug.Compiler;
 import processing.app.forms.PasswordAuthorizationDialog;
@@ -1663,7 +1666,7 @@ public class Sketch {
     TargetPlatform target = Base.getTargetPlatform();
     String board = Preferences.get("board");
 
-    Uploader uploader = new PerPortObjectFactory().newUploader(target.getBoards().get(board), Preferences.get("serial.port"));
+    Uploader uploader = new UploaderFactory().newUploader(target.getBoards().get(board), Preferences.get("serial.port"));
 
     boolean success = false;
     do {

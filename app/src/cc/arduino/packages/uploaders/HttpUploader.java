@@ -1,4 +1,4 @@
-package processing.app.debug;
+package cc.arduino.packages.uploaders;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.httpclient.HttpClient;
@@ -6,9 +6,14 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
+
+import cc.arduino.packages.Uploader;
+
 import processing.app.Base;
 import processing.app.Constants;
 import processing.app.Preferences;
+import processing.app.debug.RunnerException;
+import processing.app.debug.TargetPlatform;
 import processing.app.helpers.PreferencesMap;
 
 import java.io.*;

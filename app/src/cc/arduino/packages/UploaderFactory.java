@@ -1,20 +1,22 @@
-package processing.app;
+package cc.arduino.packages;
 
-import processing.app.debug.BasicUploader;
-import processing.app.debug.HttpUploader;
+import processing.app.AbstractMonitor;
+import processing.app.Base;
+import processing.app.Constants;
+import processing.app.NetworkMonitor;
+import processing.app.SerialMonitor;
 import processing.app.debug.TargetBoard;
-import processing.app.debug.Uploader;
+import cc.arduino.packages.uploaders.HttpUploader;
+import cc.arduino.packages.uploaders.SerialUploader;
 
-import java.util.regex.Pattern;
-
-public class PerPortObjectFactory {
+public class UploaderFactory {
 
   public Uploader newUploader(TargetBoard board, String port) {
     if ("true".equals(board.getPreferences().get("upload.via_http")) && Constants.IPV4_ADDRESS.matcher(port).find()) {
       return new HttpUploader(port);
     }
 
-    return new BasicUploader();
+    return new SerialUploader();
   }
 
   public AbstractMonitor newMonitor(String port, Base base) {

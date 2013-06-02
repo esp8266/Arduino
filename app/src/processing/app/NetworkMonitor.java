@@ -5,23 +5,21 @@ import processing.app.debug.MessageSiphon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.regex.Matcher;
 
+@SuppressWarnings("serial")
 public class NetworkMonitor extends AbstractMonitor {
 
-  private static final int MAX_CONNECT_RETRIES = 3;
-
   private final String ipAddress;
-  private final Base base;
 
   private Socket socket;
   private MessageSiphon consumer;
 
   public NetworkMonitor(String port, Base base) {
     super(port);
-    this.base = base;
 
     Matcher matcher = Constants.IPV4_ADDRESS.matcher(port);
     matcher.find();
@@ -30,9 +28,10 @@ public class NetworkMonitor extends AbstractMonitor {
     onSendCommand(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         try {
-          socket.getOutputStream().write(textField.getText().getBytes());
-          socket.getOutputStream().write('\n');
-          socket.getOutputStream().flush();
+          OutputStream out = socket.getOutputStream();
+          out.write(textField.getText().getBytes());
+          out.write('\n');
+          out.flush();
         } catch (IOException e) {
           e.printStackTrace();
         }
@@ -51,14 +50,6 @@ public class NetworkMonitor extends AbstractMonitor {
     } catch (IOException e) {
       socket = null;
       throw e;
-    }
-  }
-
-  private void sleep(long millis) {
-    try {
-      Thread.sleep(millis);
-    } catch (InterruptedException e) {
-      // ignore
     }
   }
 
