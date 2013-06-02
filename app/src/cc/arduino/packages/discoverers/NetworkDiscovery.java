@@ -21,7 +21,7 @@ public class NetworkDiscovery implements Discovery, ServiceListener {
 
   private JmDNS jmDNS;
   private List<BoardPort> ports = new CopyOnWriteArrayList<BoardPort>();
-  
+
   @Override
   public List<BoardPort> discovery() {
     return ports;
@@ -43,11 +43,13 @@ public class NetworkDiscovery implements Discovery, ServiceListener {
 
   @Override
   public void stop() {
-    try {
-      jmDNS.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    // Removed cleanup: is extremely slow on closing
+    
+    // try {
+    // jmDNS.close();
+    // } catch (IOException e) {
+    // e.printStackTrace();
+    // }
   }
 
   @Override
@@ -74,9 +76,10 @@ public class NetworkDiscovery implements Discovery, ServiceListener {
 
   @Override
   public void serviceResolved(ServiceEvent serviceEvent) {
-    String address = serviceEvent.getInfo().getInet4Addresses()[0].getHostAddress();
+    String address = serviceEvent.getInfo().getInet4Addresses()[0]
+        .getHostAddress();
     String name = serviceEvent.getName();
-    
+
     BoardPort port = new BoardPort();
     port.setAddress(address);
     port.setBoardName(name);
