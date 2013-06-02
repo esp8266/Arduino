@@ -43,7 +43,7 @@ import javax.swing.event.*;
 import javax.swing.text.*;
 import javax.swing.undo.*;
 
-import gnu.io.*;
+import cc.arduino.packages.BoardPort;
 
 /**
  * Main editor panel for the Processing Development Environment.
@@ -710,7 +710,7 @@ public class Editor extends JFrame implements RunnerListener {
 
     if (serialMenu == null)
       serialMenu = new JMenu(_("Port"));
-    populateSerialMenu();
+    populatePortMenu();
     menu.add(serialMenu);
     menu.addSeparator();
 
@@ -731,7 +731,7 @@ public class Editor extends JFrame implements RunnerListener {
       public void menuDeselected(MenuEvent e) {}
       public void menuSelected(MenuEvent e) {
         //System.out.println("Tools menu selected.");
-        populateSerialMenu();
+        populatePortMenu();
       }
     });
 
@@ -978,42 +978,22 @@ public class Editor extends JFrame implements RunnerListener {
   }
 
 
-  protected void populateSerialMenu() {
+  protected void populatePortMenu() {
     serialMenu.removeAll();
+    
+    String selectedPort = Preferences.get("serial.port");
+    
+    List<BoardPort> ports = Base.getDiscoveryManager().discovery();
+    for (BoardPort port : ports) {
+      String address = port.getAddress();
+      String name = port.getBoardName();
 
-    try
-    {
-      String devicesListOutput = Base.getPlatform().preListAllCandidateDevices();
-      for (Enumeration enumeration = CommPortIdentifier.getPortIdentifiers(); enumeration.hasMoreElements();)
-      {
-        CommPortIdentifier commportidentifier = (CommPortIdentifier)enumeration.nextElement();
-        //System.out.println("Found communication port: " + commportidentifier);
-        if (commportidentifier.getPortType() == CommPortIdentifier.PORT_SERIAL) {
-          //System.out.println("Adding port to serial port menu: " + commportidentifier);
-          String curr_port = commportidentifier.getName();
-
-          String description = curr_port;
-          String additionalDescription = Base.getPlatform().resolveDeviceAttachedTo(curr_port, Base.packages, devicesListOutput);
-          if (additionalDescription != null) {
-            description += " (" + additionalDescription + ")";
-          }
-          JCheckBoxMenuItem rbMenuItem = new JCheckBoxMenuItem(description, curr_port.equals(Preferences.get("serial.port")));
-          rbMenuItem.addActionListener(new SerialMenuListener(curr_port));
-          //serialGroup.add(rbMenuItem);
-          serialMenu.add(rbMenuItem);
-        }
-      }
-    } catch (Exception exception) {
-      System.out.println(_("error retrieving port list"));
-      exception.printStackTrace();
-    }
-
-    for (Map.Entry<String, Map<String, Object>> entry : base.getBoardsViaNetwork().entrySet()) {
-      Inet4Address[] addresses = (Inet4Address[]) entry.getValue().get("addresses");
-      String label = addresses[0].getHostAddress() + " (" + entry.getKey() + ")";
-      JCheckBoxMenuItem rbMenuItem = new JCheckBoxMenuItem(label, label.equals(Preferences.get("serial.port")));
-      rbMenuItem.addActionListener(new SerialMenuListener(label));
-      serialMenu.add(rbMenuItem);
+      String label = address;
+      if (name != null)
+        label += " (" + name + ")";
+      JCheckBoxMenuItem item = new JCheckBoxMenuItem(label, address.equals(selectedPort));
+      item.addActionListener(new SerialMenuListener(address));
+      serialMenu.add(item);
     }
 
     serialMenu.setEnabled(serialMenu.getMenuComponentCount() > 0);
@@ -2417,7 +2397,7 @@ public class Editor extends JFrame implements RunnerListener {
           // error message will already be visible
         }
       } catch (SerialNotFoundException e) {
-        populateSerialMenu();
+        populatePortMenu();
         if (serialMenu.getItemCount() == 0) statusError(e);
         else if (serialPrompt()) run();
         else statusNotice(_("Upload canceled."));
@@ -2453,7 +2433,7 @@ public class Editor extends JFrame implements RunnerListener {
           // error message will already be visible
         }
       } catch (SerialNotFoundException e) {
-        populateSerialMenu();
+        populatePortMenu();
         if (serialMenu.getItemCount() == 0) statusError(e);
         else if (serialPrompt()) run();
         else statusNotice(_("Upload canceled."));

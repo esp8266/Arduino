@@ -29,12 +29,13 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.jmdns.ServiceEvent;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.commons.logging.impl.LogFactoryImpl;
 import org.apache.commons.logging.impl.NoOpLog;
+
+import cc.arduino.packages.DiscoveryManager;
 import processing.app.debug.TargetBoard;
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
@@ -46,8 +47,6 @@ import processing.app.helpers.filefilters.OnlyFilesWithExtension;
 import processing.app.packages.Library;
 import processing.app.packages.LibraryList;
 import processing.app.tools.ZipDeflater;
-import processing.app.zeroconf.BoardListener;
-import processing.app.zeroconf.Discovery;
 import processing.core.*;
 import static processing.app.I18n._;
 
@@ -80,6 +79,8 @@ public class Base {
   }
   static Platform platform;
 
+  private static DiscoveryManager discoveryManager = new DiscoveryManager();
+  
   static private boolean commandLine;
 
   // A single instance of the preferences window
@@ -411,21 +412,6 @@ public class Base {
     if (Preferences.getBoolean("update.check")) {
       new UpdateCheck(this);
     }
-
-    new Discovery(new BoardListener() {
-      @Override
-      public void boardOffline(ServiceEvent serviceEvent) {
-        Base.this.boardsViaNetwork.remove(serviceEvent.getName());
-      }
-
-      @Override
-      public void boardOnline(ServiceEvent serviceEvent) {
-        Map<String, Object> board = new HashMap<String, Object>();
-        board.put("addresses", serviceEvent.getInfo().getInet4Addresses());
-        board.put("type", serviceEvent.getType());
-        Base.this.boardsViaNetwork.put(serviceEvent.getName(), board);
-      }
-    });
   }
 
   public Map<String, Map<String, Object>> getBoardsViaNetwork() {
@@ -2911,5 +2897,9 @@ public class Base {
       // delete zip created temp folder, if exists
       FileUtils.recursiveDelete(tmpFolder);
     }
+  }
+
+  public static DiscoveryManager getDiscoveryManager() {
+    return discoveryManager;
   }
 }
