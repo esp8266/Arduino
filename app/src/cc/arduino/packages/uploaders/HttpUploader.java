@@ -1,5 +1,17 @@
 package cc.arduino.packages.uploaders;
 
+import static processing.app.I18n._;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.util.regex.Matcher;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
@@ -7,20 +19,13 @@ import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 
-import cc.arduino.packages.Uploader;
-
 import processing.app.Base;
 import processing.app.Constants;
 import processing.app.Preferences;
 import processing.app.debug.RunnerException;
 import processing.app.debug.TargetPlatform;
 import processing.app.helpers.PreferencesMap;
-
-import java.io.*;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import cc.arduino.packages.Uploader;
 
 public class HttpUploader extends Uploader {
 
@@ -37,13 +42,13 @@ public class HttpUploader extends Uploader {
   private final String baseUrl;
 
   public HttpUploader(String port) {
-    this.client = new HttpClient();
+    client = new HttpClient();
     Matcher matcher = Constants.IPV4_ADDRESS.matcher(port);
     if (!matcher.find()) {
       throw new IllegalArgumentException(port);
     }
-    this.ipAddress = matcher.group();
-    this.baseUrl = PROTOCOL + ipAddress + "/cgi-bin/luci/arduino";
+    ipAddress = matcher.group();
+    baseUrl = PROTOCOL + ipAddress + "/cgi-bin/luci/arduino";
   }
 
   public boolean requiresAuthorization() {
@@ -57,12 +62,13 @@ public class HttpUploader extends Uploader {
   @Override
   public boolean uploadUsingPreferences(String buildPath, String className, boolean usingProgrammer) throws RunnerException {
     if (usingProgrammer) {
-      System.err.println("Http upload using programmer not supported");
+      System.err.println(_("Http upload using programmer not supported"));
       return false;
     }
 
-    this.client.getHttpConnectionManager().getParams().setConnectionTimeout(5000);
-    String auth = Base64.encodeBase64String(("root:" + Preferences.get(getAuthorizationKey())).getBytes());
+    client.getHttpConnectionManager().getParams().setConnectionTimeout(5000);
+    String authKey = Preferences.get(getAuthorizationKey());
+    String auth = Base64.encodeBase64String(("root:" + authKey).getBytes());
 
     int sleptTimes = 1;
     while (boardNotReady(auth)) {
@@ -72,14 +78,15 @@ public class HttpUploader extends Uploader {
         throw new RunnerException(e);
       }
       if (sleptTimes >= 3) {
-        throw new RunnerException("The board is not yet ready");
+        throw new RunnerException(_("The board is not yet ready"));
       }
       sleptTimes += 1;
     }
 
     StringBuilder uploadRequest = new StringBuilder();
 
-    uploadRequest.append(String.format("PWD%1$04d", Preferences.get(getAuthorizationKey()).length())).append(Preferences.get(getAuthorizationKey())).append("\n");
+    uploadRequest.append(String.format("PWD%1$04d", authKey.length()));
+    uploadRequest.append(authKey).append("\n");
     uploadRequest.append("SKETCH\n");
     readSketchFile(buildPath, className, uploadRequest);
     uploadRequest.append("SKETCH_END\n");
@@ -95,7 +102,7 @@ public class HttpUploader extends Uploader {
       BufferedReader isr = new BufferedReader(new InputStreamReader(socket.getInputStream()));
       String ok = isr.readLine();
       if (!"OK".equals(ok)) {
-        throw new RunnerException("Problem uploading sketch");
+        throw new RunnerException(_("Problem uploading sketch"));
       }
     } catch (IOException e) {
       throw new RunnerException(e);
@@ -113,7 +120,6 @@ public class HttpUploader extends Uploader {
     PreferencesMap prefs = Preferences.getMap();
     prefs.putAll(Base.getBoardPreferences());
     prefs.putAll(targetPlatform.getTool(prefs.get("upload.tool")));
-    boolean verbose = prefs.containsKey("upload.verbose") && Boolean.parseBoolean(prefs.get("upload.verbose"));
 
     PostMethod post = new PostMethod(baseUrl + "/flash");
     post.setRequestHeader("Authorization", "Basic " + auth);
