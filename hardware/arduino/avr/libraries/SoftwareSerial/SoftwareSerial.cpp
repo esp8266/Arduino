@@ -418,7 +418,7 @@ void SoftwareSerial::begin(long speed)
 
 void SoftwareSerial::end()
 {
-  if (digitalPinToPCMSK(_receivePin))
+  if (_rx_delay_stopbit)
     *digitalPinToPCMSK(_receivePin) &= ~_BV(digitalPinToPCMSKbit(_receivePin));
 }
 
