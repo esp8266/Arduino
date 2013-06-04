@@ -989,7 +989,6 @@ public class Editor extends JFrame implements RunnerListener {
     List<BoardPort> ports = Base.getDiscoveryManager().discovery();
     for (BoardPort port : ports) {
       String address = port.getAddress();
-      String name = port.getBoardName();
       String label = port.getLabel();
       
       JCheckBoxMenuItem item = new JCheckBoxMenuItem(label, address.equals(selectedPort));
