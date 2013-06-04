@@ -385,9 +385,13 @@ void SoftwareSerial::begin(long speed)
     long baud = pgm_read_dword(&table[i].baud);
     if (baud == speed)
     {
-      _rx_delay_centering = pgm_read_word(&table[i].rx_delay_centering);
-      _rx_delay_intrabit = pgm_read_word(&table[i].rx_delay_intrabit);
-      _rx_delay_stopbit = pgm_read_word(&table[i].rx_delay_stopbit);
+      if (digitalPinToPCICR(_receivePin))
+      {
+        // Only setup rx when we have a valid PCINT for this pin
+        _rx_delay_centering = pgm_read_word(&table[i].rx_delay_centering);
+        _rx_delay_intrabit = pgm_read_word(&table[i].rx_delay_intrabit);
+        _rx_delay_stopbit = pgm_read_word(&table[i].rx_delay_stopbit);
+      }
       _tx_delay = pgm_read_word(&table[i].tx_delay);
       break;
     }
@@ -396,11 +400,8 @@ void SoftwareSerial::begin(long speed)
   // Set up RX interrupts, but only if we have a valid RX baud rate
   if (_rx_delay_stopbit)
   {
-    if (digitalPinToPCICR(_receivePin))
-    {
-      *digitalPinToPCICR(_receivePin) |= _BV(digitalPinToPCICRbit(_receivePin));
-      *digitalPinToPCMSK(_receivePin) |= _BV(digitalPinToPCMSKbit(_receivePin));
-    }
+    *digitalPinToPCICR(_receivePin) |= _BV(digitalPinToPCICRbit(_receivePin));
+    *digitalPinToPCMSK(_receivePin) |= _BV(digitalPinToPCMSKbit(_receivePin));
     tunedDelay(_tx_delay); // if we were low this establishes the end
   }
 
