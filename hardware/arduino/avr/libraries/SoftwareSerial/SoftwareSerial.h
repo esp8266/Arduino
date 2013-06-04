@@ -74,6 +74,7 @@ private:
   void tx_pin_write(uint8_t pin_state);
   void setTX(uint8_t transmitPin);
   void setRX(uint8_t receivePin);
+  void setRxIntMsk(bool enable);
 
   // private static method for timing
   static inline void tunedDelay(uint16_t delay);

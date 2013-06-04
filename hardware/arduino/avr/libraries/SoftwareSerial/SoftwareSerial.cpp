@@ -403,8 +403,11 @@ void SoftwareSerial::begin(long speed)
   // Set up RX interrupts, but only if we have a valid RX baud rate
   if (_rx_delay_stopbit)
   {
+    // Enable the PCINT for the entire port here, but never disable it
+    // (others might also need it, so we disable the interrupt by using
+    // the per-pin PCMSK register).
     *digitalPinToPCICR(_receivePin) |= _BV(digitalPinToPCICRbit(_receivePin));
-    *digitalPinToPCMSK(_receivePin) |= _BV(digitalPinToPCMSKbit(_receivePin));
+    setRxIntMsk(true);
     tunedDelay(_tx_delay); // if we were low this establishes the end
   }
 
@@ -416,10 +419,18 @@ void SoftwareSerial::begin(long speed)
   listen();
 }
 
+void SoftwareSerial::setRxIntMsk(bool enable)
+{
+    if (enable)
+      *digitalPinToPCMSK(_receivePin) |= _BV(digitalPinToPCMSKbit(_receivePin));
+    else
+      *digitalPinToPCMSK(_receivePin) &= ~_BV(digitalPinToPCMSKbit(_receivePin));
+}
+
 void SoftwareSerial::end()
 {
   if (_rx_delay_stopbit)
-    *digitalPinToPCMSK(_receivePin) &= ~_BV(digitalPinToPCMSKbit(_receivePin));
+    setRxIntMsk(false);
 }
 
 
