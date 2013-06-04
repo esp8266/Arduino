@@ -24,7 +24,6 @@ public abstract class AbstractMonitor extends JFrame implements MessageConsumer 
   protected JCheckBox autoscrollBox;
   protected JComboBox lineEndings;
   protected JComboBox serialRates;
-  protected int serialRate;
 
   public AbstractMonitor(String title) {
     super(title);
@@ -110,8 +109,6 @@ public abstract class AbstractMonitor extends JFrame implements MessageConsumer 
     for (int i = 0; i < serialRateStrings.length; i++)
       serialRates.addItem(serialRateStrings[i] + " " + _("baud"));
 
-    serialRate = Preferences.getInteger("serial.debug_rate");
-    serialRates.setSelectedItem(serialRate + " " + _("baud"));
     serialRates.setMaximumSize(serialRates.getMinimumSize());
 
     pane.add(autoscrollBox);
