@@ -178,6 +178,9 @@ inline void SoftwareSerial::tunedDelay(uint16_t delay) {
 // one and returns true if it replaces another 
 bool SoftwareSerial::listen()
 {
+  if (!_rx_delay_stopbit)
+    return false;
+
   if (active_object != this)
   {
     _buffer_overflow = false;
