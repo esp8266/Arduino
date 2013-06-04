@@ -195,6 +195,17 @@ bool SoftwareSerial::listen()
   return false;
 }
 
+// Stop listening. Returns true if we were actually listening.
+bool SoftwareSerial::stopListening()
+{
+  if (active_object == this)
+  {
+    active_object = NULL;
+    return true;
+  }
+  return false;
+}
+
 //
 // The receive routine called by the interrupt handler
 //

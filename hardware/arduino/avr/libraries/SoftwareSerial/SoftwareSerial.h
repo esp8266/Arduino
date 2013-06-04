@@ -87,6 +87,7 @@ public:
   bool listen();
   void end();
   bool isListening() { return this == active_object; }
+  bool stopListening();
   bool overflow() { bool ret = _buffer_overflow; _buffer_overflow = false; return ret; }
   int peek();
 
