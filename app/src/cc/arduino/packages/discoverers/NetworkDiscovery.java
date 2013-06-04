@@ -12,6 +12,7 @@ import javax.jmdns.ServiceInfo;
 import javax.jmdns.ServiceListener;
 import javax.jmdns.impl.DNSTaskStarter;
 
+import processing.app.Base;
 import processing.app.helpers.PreferencesMap;
 import processing.app.zeroconf.jmdns.ArduinoDNSTaskStarter;
 import cc.arduino.packages.BoardPort;
@@ -44,7 +45,7 @@ public class NetworkDiscovery implements Discovery, ServiceListener {
   @Override
   public void stop() {
     // Removed cleanup: is extremely slow on closing
-    
+
     // try {
     // jmDNS.close();
     // } catch (IOException e) {
@@ -76,14 +77,28 @@ public class NetworkDiscovery implements Discovery, ServiceListener {
 
   @Override
   public void serviceResolved(ServiceEvent serviceEvent) {
+    ServiceInfo info = serviceEvent.getInfo();
     String address = serviceEvent.getInfo().getInet4Addresses()[0]
         .getHostAddress();
     String name = serviceEvent.getName();
+
+    PreferencesMap prefs = null;
+    if (info.hasData()) {
+      prefs = new PreferencesMap();
+      prefs.put("id", info.getPropertyString("board"));
+      prefs.put("distro_version", info.getPropertyString("distro_version"));
+    }
+    String boardName = Base.getPlatform()
+        .resolveDeviceByBoardID(Base.packages, prefs.get("id"));
+
+    String label = name + " at " + address + " (" + boardName + ")";
 
     BoardPort port = new BoardPort();
     port.setAddress(address);
     port.setBoardName(name);
     port.setProtocol("network");
+    port.setPrefs(prefs);
+    port.setLabel(label);
     ports.add(port);
   }
 

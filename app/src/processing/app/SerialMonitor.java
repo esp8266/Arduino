@@ -24,6 +24,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 
+import static processing.app.I18n._;
+
 public class SerialMonitor extends AbstractMonitor {
 
   private final String port;
@@ -35,6 +37,8 @@ public class SerialMonitor extends AbstractMonitor {
 
     this.port = port;
 
+    serialRate = Preferences.getInteger("serial.debug_rate");
+    serialRates.setSelectedItem(serialRate + " " + _("baud"));
     onSerialRateChange(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         String wholeString = (String) serialRates.getSelectedItem();

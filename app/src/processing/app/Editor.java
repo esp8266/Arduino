@@ -990,10 +990,8 @@ public class Editor extends JFrame implements RunnerListener {
     for (BoardPort port : ports) {
       String address = port.getAddress();
       String name = port.getBoardName();
-
-      String label = address;
-      if (name != null)
-        label += " (" + name + ")";
+      String label = port.getLabel();
+      
       JCheckBoxMenuItem item = new JCheckBoxMenuItem(label, address.equals(selectedPort));
       item.addActionListener(new SerialMenuListener(address));
       serialMenu.add(item);

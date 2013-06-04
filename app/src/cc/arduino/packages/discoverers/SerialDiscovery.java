@@ -31,10 +31,15 @@ public class SerialDiscovery implements Discovery {
       String address = commPort.getName();
       String boardName = os.resolveDeviceAttachedTo(address, Base.packages,
                                                     devicesListOutput);
+      String label = address;
+      if (boardName != null)
+        label += " (" + boardName + ")";
+
       BoardPort port = new BoardPort();
       port.setAddress(address);
       port.setProtocol("serial");
       port.setBoardName(boardName);
+      port.setLabel(label);
       res.add(port);
     }
     return res;

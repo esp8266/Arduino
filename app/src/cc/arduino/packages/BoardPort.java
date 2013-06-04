@@ -7,6 +7,7 @@ public class BoardPort {
   private String address;
   private String protocol;
   private String boardName;
+  private String label;
   private PreferencesMap prefs;
 
   public String getAddress() {
@@ -39,6 +40,14 @@ public class BoardPort {
 
   public PreferencesMap getPrefs() {
     return prefs;
+  }
+
+  public void setLabel(String label) {
+    this.label = label;
+  }
+
+  public String getLabel() {
+    return label;
   }
 
 }

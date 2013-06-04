@@ -35,7 +35,6 @@ import com.sun.jna.Native;
 import processing.app.debug.TargetBoard;
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
-import processing.app.helpers.PreferencesMap;
 import processing.core.PConstants;
 
 
@@ -158,6 +157,19 @@ public class Platform {
                 return board.getName();
               }
             }
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  public String resolveDeviceByBoardID(Map<String, TargetPackage> packages, String boardId) {
+    for (TargetPackage targetPackage : packages.values()) {
+      for (TargetPlatform targetPlatform : targetPackage.getPlatforms().values()) {
+        for (TargetBoard board : targetPlatform.getBoards().values()) {
+          if (boardId.equals(board.getId())) {
+            return board.getName();
           }
         }
       }
