@@ -183,12 +183,14 @@ bool SoftwareSerial::listen()
 
   if (active_object != this)
   {
+    if (active_object)
+      active_object->stopListening();
+
     _buffer_overflow = false;
-    uint8_t oldSREG = SREG;
-    cli();
     _receive_buffer_head = _receive_buffer_tail = 0;
     active_object = this;
-    SREG = oldSREG;
+
+    setRxIntMsk(true);
     return true;
   }
 
@@ -200,6 +202,7 @@ bool SoftwareSerial::stopListening()
 {
   if (active_object == this)
   {
+    setRxIntMsk(false);
     active_object = NULL;
     return true;
   }
@@ -418,7 +421,6 @@ void SoftwareSerial::begin(long speed)
     // (others might also need it, so we disable the interrupt by using
     // the per-pin PCMSK register).
     *digitalPinToPCICR(_receivePin) |= _BV(digitalPinToPCICRbit(_receivePin));
-    setRxIntMsk(true);
     tunedDelay(_tx_delay); // if we were low this establishes the end
   }
 
