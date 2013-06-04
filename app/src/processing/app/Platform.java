@@ -165,6 +165,19 @@ public class Platform {
     return null;
   }
 
+  public String resolveDeviceByBoardID(Map<String, TargetPackage> packages, String boardId) {
+    for (TargetPackage targetPackage : packages.values()) {
+      for (TargetPlatform targetPlatform : targetPackage.getPlatforms().values()) {
+        for (TargetBoard board : targetPlatform.getBoards().values()) {
+          if (boardId.equals(board.getId())) {
+            return board.getName();
+          }
+        }
+      }
+    }
+    return null;
+  }
+
   // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 

@@ -1008,9 +1008,10 @@ public class Editor extends JFrame implements RunnerListener {
       exception.printStackTrace();
     }
 
-    for (Map.Entry<String, Map<String, Object>> entry : base.getBoardsViaNetwork().entrySet()) {
-      Inet4Address[] addresses = (Inet4Address[]) entry.getValue().get("addresses");
-      String label = addresses[0].getHostAddress() + " (" + entry.getKey() + ")";
+    for (Map<String, Object> board : base.getBoardsViaNetwork().values()) {
+      String boardName = Base.getPlatform().resolveDeviceByBoardID(Base.packages, (String) board.get("id"));
+      Inet4Address[] addresses = (Inet4Address[]) board.get("addresses");
+      String label = board.get("hostname") + "@" + addresses[0].getHostAddress() + " (" + boardName + ")";
       JCheckBoxMenuItem rbMenuItem = new JCheckBoxMenuItem(label, label.equals(Preferences.get("serial.port")));
       rbMenuItem.addActionListener(new SerialMenuListener(label));
       serialMenu.add(rbMenuItem);

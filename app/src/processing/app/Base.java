@@ -421,8 +421,12 @@ public class Base {
       @Override
       public void boardOnline(ServiceEvent serviceEvent) {
         Map<String, Object> board = new HashMap<String, Object>();
+        board.put("hostname", serviceEvent.getName());
         board.put("addresses", serviceEvent.getInfo().getInet4Addresses());
-        board.put("type", serviceEvent.getType());
+        if (serviceEvent.getInfo().hasData()) {
+          board.put("id", serviceEvent.getInfo().getPropertyString("board"));
+          board.put("distro_version", serviceEvent.getInfo().getPropertyString("distro_version"));
+        }
         Base.this.boardsViaNetwork.put(serviceEvent.getName(), board);
       }
     });
