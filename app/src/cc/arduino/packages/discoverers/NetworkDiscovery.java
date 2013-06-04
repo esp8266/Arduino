@@ -2,6 +2,7 @@ package cc.arduino.packages.discoverers;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -25,7 +26,9 @@ public class NetworkDiscovery implements Discovery, ServiceListener {
 
   @Override
   public List<BoardPort> discovery() {
-    return ports;
+    synchronized (this) {
+      return new ArrayList<BoardPort>(ports);
+    }
   }
 
   @Override
@@ -69,37 +72,45 @@ public class NetworkDiscovery implements Discovery, ServiceListener {
   @Override
   public void serviceRemoved(ServiceEvent serviceEvent) {
     String name = serviceEvent.getName();
-    for (BoardPort port : ports) {
-      if (port.getBoardName().equals(name))
-        ports.remove(port);
+    synchronized (this) {
+      for (BoardPort port : ports) {
+        if (port.getBoardName().equals(name))
+          ports.remove(port);
+      }
     }
   }
 
   @Override
   public void serviceResolved(ServiceEvent serviceEvent) {
     ServiceInfo info = serviceEvent.getInfo();
-    String address = serviceEvent.getInfo().getInet4Addresses()[0]
-        .getHostAddress();
+    String address = info.getInet4Addresses()[0].getHostAddress();
     String name = serviceEvent.getName();
 
     PreferencesMap prefs = null;
+    String board = null;
     if (info.hasData()) {
       prefs = new PreferencesMap();
-      prefs.put("id", info.getPropertyString("board"));
+      board = info.getPropertyString("board");
+      prefs.put("board", board);
       prefs.put("distro_version", info.getPropertyString("distro_version"));
     }
-    String boardName = Base.getPlatform()
-        .resolveDeviceByBoardID(Base.packages, prefs.get("id"));
 
-    String label = name + " at " + address + " (" + boardName + ")";
-
+    String label = name + " at " + address;
+    if (board != null) {
+      String boardName = Base.getPlatform()
+          .resolveDeviceByBoardID(Base.packages, board);
+      label += " (" + boardName + ")";
+    }
+    
     BoardPort port = new BoardPort();
     port.setAddress(address);
     port.setBoardName(name);
     port.setProtocol("network");
     port.setPrefs(prefs);
     port.setLabel(label);
-    ports.add(port);
+    synchronized (this) {
+      ports.add(port);
+    }
   }
 
 }
