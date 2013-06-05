@@ -55,10 +55,9 @@ void BridgeClass::begin() {
 }
 
 uint8_t BridgeClass::runCommand(String &command) {
-  // TODO: do it in a more efficient way
-  String cmd = "R" + command;
+  uint8_t cmd[] = {'R'};
   uint8_t res[1];
-  transfer((uint8_t*)cmd.c_str(), cmd.length(), res, 1);
+  transfer(cmd, 1, (uint8_t*)command.c_str(), command.length(), res, 1);
   return res[0];
 }
 
@@ -98,13 +97,8 @@ unsigned int BridgeClass::readCommandOutput(uint8_t handle,
 
 void BridgeClass::writeCommandInput(uint8_t handle, 
                                     const uint8_t *buff, unsigned int size) {
-  // TODO: do it in a more efficient way
-  uint8_t *tmp = new uint8_t[size+2];
-  tmp[0] = 'I';
-  tmp[1] = handle;
-  memcpy(tmp+2, buff, size);
-  transfer(tmp, size+2);
-  delete[] tmp;
+  uint8_t cmd[] = {'I', handle};
+  transfer(cmd, 2, buff, size, NULL, 0);
 }
 
 unsigned int BridgeClass::readMessage(uint8_t *buff, unsigned int size) {
@@ -113,16 +107,12 @@ unsigned int BridgeClass::readMessage(uint8_t *buff, unsigned int size) {
 }
 
 void BridgeClass::writeMessage(const uint8_t *buff, unsigned int size) {
-  // TODO: do it in a more efficient way
-  uint8_t *tmp = new uint8_t[size+1];
-  tmp[0] = 'M';
-  memcpy(tmp+1, buff, size);
-  transfer(tmp, size+1);
-  delete[] tmp;
+  uint8_t cmd[] = {'M'};
+  transfer(cmd, 1, buff, size, NULL, 0);
 }
 
 unsigned int BridgeClass::messageAvailable() {
-  uint8_t tmp[] = { 'n' };
+  uint8_t tmp[] = {'n'};
   uint8_t res[2];
   transfer(tmp, 1, res, 2);
   return (res[0] << 8) + res[1];
@@ -138,15 +128,10 @@ void BridgeClass::put(const char *key, const char *value) {
 }
 
 unsigned int BridgeClass::get(const char *key, uint8_t *value, unsigned int maxlen) {
-  // TODO: do it in a more efficient way
-  unsigned int l = strlen(key);
-  uint8_t *tmp = new uint8_t[l+1];
-  tmp[0] = 'd';
-  memcpy(tmp+1, key, strlen(key));
-  l = transfer(tmp, l+1, value, maxlen);
-  if (l<maxlen)
+  uint8_t cmd[] = {'d'};
+  unsigned int l = transfer(cmd, 1, (uint8_t *)key, strlen(key), value, maxlen);
+  if (l < maxlen)
     value[l] = 0; // Zero-terminate string
-  delete[] tmp;
   return l;
 }
 
@@ -185,15 +170,15 @@ uint8_t BridgeClass::transfer(const uint8_t *buff1, uint16_t len1,
     crcUpdate((len >> 8) & 0xFF);
     write((char)(len & 0xFF));        // Message length (lo)
     crcUpdate(len & 0xFF);
-    for (uint8_t i=0; i<len1; i++) {  // Payload
+    for (uint16_t i=0; i<len1; i++) {  // Payload
       write((char)buff1[i]);
       crcUpdate(buff1[i]);
     }
-    for (uint8_t i=0; i<len2; i++) {  // Payload
+    for (uint16_t i=0; i<len2; i++) {  // Payload
       write((char)buff2[i]);
       crcUpdate(buff2[i]);
     }
-    for (uint8_t i=0; i<len3; i++) {  // Payload
+    for (uint16_t i=0; i<len3; i++) {  // Payload
       write((char)buff3[i]);
       crcUpdate(buff3[i]);
     }
