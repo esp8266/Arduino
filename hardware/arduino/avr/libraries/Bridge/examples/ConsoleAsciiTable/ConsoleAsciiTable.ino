@@ -29,7 +29,7 @@ void setup() {
   Bridge.begin();
   Console.begin(); 
   
-  // Uncomment the followinf line to enable buffering:
+  // Uncomment the following line to enable buffering:
   // - better transmission speed and efficiency
   // - needs to call Console.flush() to ensure that all 
   //   transmitted data is sent
@@ -81,6 +81,9 @@ void loop() {
 
   // if printed last visible character '~' or 126, stop: 
   if(thisByte == 126) {     // you could also use if (thisByte == '~') {
+    // ensure the latest bit of data is sent
+    Console.flush();
+  	
     // This loop loops forever and does nothing
     while(true) { 
       continue; 
