@@ -604,6 +604,22 @@ void String::replace(const String& find, const String& replace)
 	}
 }
 
+void String::remove(unsigned int index){
+	if (index >= len) { return; }
+	int count = len - index;
+	remove(index, count);
+}
+
+void String::remove(unsigned int index, unsigned int count){
+	if (index >= len) { return; }
+	if (count <= 0) { return; }
+	if (index + count > len) { count = len - index; }
+	char *writeTo = buffer + index;
+	len = len - count;
+	strncpy(writeTo, buffer + index + count,len - index);
+	buffer[len] = 0;
+}
+
 void String::toLowerCase(void)
 {
 	if (!buffer) return;
