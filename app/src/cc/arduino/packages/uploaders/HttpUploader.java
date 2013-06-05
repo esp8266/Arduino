@@ -1,41 +1,35 @@
 package cc.arduino.packages.uploaders;
 
-import static processing.app.I18n._;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.util.regex.Matcher;
-
+import cc.arduino.packages.Uploader;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
-
+import org.apache.commons.httpclient.protocol.Protocol;
 import processing.app.Base;
 import processing.app.Constants;
 import processing.app.Preferences;
+import processing.app.debug.EasySSLProtocolSocketFactory;
 import processing.app.debug.RunnerException;
 import processing.app.debug.TargetPlatform;
 import processing.app.helpers.PreferencesMap;
-import cc.arduino.packages.Uploader;
+
+import java.io.*;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.util.regex.Matcher;
+
+import static processing.app.I18n._;
 
 public class HttpUploader extends Uploader {
 
-  private static final String PROTOCOL = "http://";
+  private static final String PROTOCOL = "https://";
 
-  /*
   static {
     Protocol.registerProtocol("https", new Protocol("https", new EasySSLProtocolSocketFactory(), 443));
   }
-  */
 
   private final HttpClient client;
   private final String ipAddress;
