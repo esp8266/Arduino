@@ -168,21 +168,34 @@ bool BridgeClass::crcCheck(uint16_t _CRC) {
   return CRC == _CRC;
 }
 
-uint8_t BridgeClass::transfer(const uint8_t *buff, uint8_t len, 
-                              uint8_t *rxbuff, uint8_t rxlen) 
+uint8_t BridgeClass::transfer(const uint8_t *buff1, uint16_t len1,
+                 const uint8_t *buff2, uint16_t len2,
+                 const uint8_t *buff3, uint16_t len3,
+                 uint8_t *rxbuff, uint16_t rxlen)
 {
+  uint16_t len = len1 + len2 + len3;
   for ( ; ; delay(100), dropAll() /* Delay for retransmission */) {
     // Send packet
     crcReset();
-    write((char)0xFF);              // Start of packet (0xFF)
+    write((char)0xFF);                // Start of packet (0xFF)
     crcUpdate(0xFF);
-    write((char)index);             // Message index
+    write((char)index);               // Message index
     crcUpdate(index);
-    write((char)len);               // Message length
-    crcUpdate(len);
-    for (uint8_t i=0; i<len; i++) { // Payload
-      write((char)buff[i]);
-      crcUpdate(buff[i]);
+    write((char)((len >> 8) & 0xFF)); // Message length (hi)
+    crcUpdate((len >> 8) & 0xFF);
+    write((char)(len & 0xFF));        // Message length (lo)
+    crcUpdate(len & 0xFF);
+    for (uint8_t i=0; i<len1; i++) {  // Payload
+      write((char)buff1[i]);
+      crcUpdate(buff1[i]);
+    }
+    for (uint8_t i=0; i<len2; i++) {  // Payload
+      write((char)buff2[i]);
+      crcUpdate(buff2[i]);
+    }
+    for (uint8_t i=0; i<len3; i++) {  // Payload
+      write((char)buff3[i]);
+      crcUpdate(buff3[i]);
     }
     crcWrite();                     // CRC
   
@@ -198,13 +211,20 @@ uint8_t BridgeClass::transfer(const uint8_t *buff, uint8_t len,
     crcUpdate(index);
     
     // Recv len
-    uint8_t l = timedRead(5);
-    if (l < 0)
+    int lh = timedRead(5);
+    if (lh < 0)
       continue;
-    crcUpdate(l);
+    crcUpdate(lh);
+    int ll = timedRead(5);
+    if (ll < 0)
+      continue;
+    crcUpdate(ll);
+    uint16_t l = lh;
+    l <<= 8;
+    l += ll;
 
     // Recv data
-    for (uint8_t i=0; i<l; i++) {
+    for (uint16_t i=0; i<l; i++) {
       int c = timedRead(5);
       if (c < 0)
         continue;

@@ -65,8 +65,20 @@ public:
   void flush() { stream.flush(); }
 
   // Trasnfer a frame (with error correction and response)
-  uint8_t transfer(const uint8_t *buff, uint8_t len, 
-                   uint8_t *rxbuff=NULL, uint8_t rxlen=0);
+  uint8_t transfer(const uint8_t *buff1, uint16_t len1,
+                   const uint8_t *buff2, uint16_t len2,
+                   const uint8_t *buff3, uint16_t len3,
+                   uint8_t *rxbuff, uint16_t rxlen);
+  // multiple inline versions of the same function to allow efficient frame concatenation
+  uint8_t transfer(const uint8_t *buff1, uint16_t len1)
+  { transfer(buff1, len1, NULL, 0); }
+  uint8_t transfer(const uint8_t *buff1, uint16_t len1,
+                   uint8_t *rxbuff, uint16_t rxlen)
+  { transfer(buff1, len1, NULL, 0, rxbuff, rxlen); }
+  uint8_t transfer(const uint8_t *buff1, uint16_t len1,
+                   const uint8_t *buff2, uint16_t len2,
+                   uint8_t *rxbuff, uint16_t rxlen)
+  { transfer(buff1, len1, buff2, len2, NULL, 0, rxbuff, rxlen); }
 private:
   uint8_t index;
   int timedRead(unsigned int timeout);
