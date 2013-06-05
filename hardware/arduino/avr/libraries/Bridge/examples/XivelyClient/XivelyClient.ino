@@ -38,7 +38,7 @@ void setup() {
   while(!Console);    // wait for Network Console to open
   Console.println("Xively client");
 
-  // Do a first update immediatly
+  // Do a first update immediately
   updateData();
   sendData();
   lastRequest = millis();
@@ -80,7 +80,7 @@ void sendData() {
   // Send the HTTP PUT request
 
   // Is better to declare the Process here, so when the
-  // sendData function finishes the resources are immediatly
+  // sendData function finishes the resources are immediately
   // released. Declaring it global works too, BTW.
   Process xively;
   Console.print("\n\nSending data... ");
