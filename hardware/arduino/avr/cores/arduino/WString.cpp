@@ -106,6 +106,20 @@ String::String(unsigned long value, unsigned char base)
 	*this = buf;
 }
 
+String::String(float value, int decimalPlaces)
+{
+	init();
+	char buf[33];
+	*this = dtostrf(value, (decimalPlaces + 2), decimalPlaces, buf);
+}
+
+String::String(double value, int decimalPlaces)
+{
+	init();
+	char buf[33];
+	*this = dtostrf(value, (decimalPlaces + 2), decimalPlaces, buf);
+}
+
 String::~String()
 {
 	free(buffer);
@@ -308,6 +322,20 @@ unsigned char String::concat(unsigned long num)
 	return concat(buf, strlen(buf));
 }
 
+unsigned char String::concat(float num)
+{
+	char buf[20];
+	char* string = dtostrf(num, 8, 6, buf);
+	return concat(string, strlen(string));
+}
+
+unsigned char String::concat(double num)
+{
+	char buf[20];
+	char* string = dtostrf(num, 8, 6, buf);
+	return concat(string, strlen(string));
+}
+
 unsigned char String::concat(const __FlashStringHelper * str)
 {
 	if (!str) return 0;
@@ -374,6 +402,20 @@ StringSumHelper & operator + (const StringSumHelper &lhs, long num)
 }
 
 StringSumHelper & operator + (const StringSumHelper &lhs, unsigned long num)
+{
+	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
+	if (!a.concat(num)) a.invalidate();
+	return a;
+}
+
+StringSumHelper & operator + (const StringSumHelper &lhs, float num)
+{
+	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
+	if (!a.concat(num)) a.invalidate();
+	return a;
+}
+
+StringSumHelper & operator + (const StringSumHelper &lhs, double num)
 {
 	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
 	if (!a.concat(num)) a.invalidate();
@@ -643,6 +685,22 @@ void String::replace(const String& find, const String& replace)
 	}
 }
 
+void String::remove(unsigned int index){
+	if (index >= len) { return; }
+	int count = len - index;
+	remove(index, count);
+}
+
+void String::remove(unsigned int index, unsigned int count){
+	if (index >= len) { return; }
+	if (count <= 0) { return; }
+	if (index + count > len) { count = len - index; }
+	char *writeTo = buffer + index;
+	len = len - count;
+	strncpy(writeTo, buffer + index + count,len - index);
+	buffer[len] = 0;
+}
+
 void String::toLowerCase(void)
 {
 	if (!buffer) return;
@@ -681,4 +739,8 @@ long String::toInt(void) const
 	return 0;
 }
 
-
+float String::toFloat(void) const
+{
+	if (buffer) return float(atof(buffer));
+	return 0;
+}
