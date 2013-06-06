@@ -296,14 +296,14 @@ unsigned char String::concat(unsigned char num)
 
 unsigned char String::concat(int num)
 {
-	char buf[7];
+	char buf[12];
 	itoa(num, buf, 10);
 	return concat(buf, strlen(buf));
 }
 
 unsigned char String::concat(unsigned int num)
 {
-	char buf[6];
+	char buf[11];
 	utoa(num, buf, 10);
 	return concat(buf, strlen(buf));
 }
