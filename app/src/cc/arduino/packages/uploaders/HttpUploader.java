@@ -16,6 +16,7 @@ import processing.app.debug.RunnerException;
 import processing.app.debug.TargetPlatform;
 import processing.app.helpers.PreferencesMap;
 
+import javax.net.ssl.SSLSocket;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -90,6 +91,10 @@ public class HttpUploader extends Uploader {
     try {
       socket = new Socket();
       socket.connect(new InetSocketAddress(ipAddress, 9876), 5000);
+      socket = new EasySSLProtocolSocketFactory().createSocket(socket, ipAddress, 9876, true);
+      SSLSocket sslSocket = (SSLSocket) socket;
+      sslSocket.setEnabledProtocols(EasySSLProtocolSocketFactory.SSL_PROTOCOLS);
+      sslSocket.setEnabledCipherSuites(EasySSLProtocolSocketFactory.SSL_CYPHER_SUITES);
       OutputStreamWriter osw = new OutputStreamWriter(socket.getOutputStream());
       osw.write(uploadRequest.toString());
       osw.flush();

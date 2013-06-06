@@ -97,6 +97,8 @@ public class EasySSLProtocolSocketFactory implements SecureProtocolSocketFactory
    * Log object for this class.
    */
   private static final Log LOG = LogFactory.getLog(EasySSLProtocolSocketFactory.class);
+  public static final String[] SSL_PROTOCOLS = {"SSLv3", "TLSv1"};
+  public static final String[] SSL_CYPHER_SUITES = {"TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA", "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA", "TLS_RSA_WITH_AES_128_CBC_SHA", "TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA", "TLS_ECDH_RSA_WITH_AES_128_CBC_SHA", "TLS_DHE_RSA_WITH_AES_128_CBC_SHA", "TLS_DHE_DSS_WITH_AES_128_CBC_SHA", "TLS_ECDHE_ECDSA_WITH_RC4_128_SHA", "TLS_ECDHE_RSA_WITH_RC4_128_SHA", "SSL_RSA_WITH_RC4_128_SHA", "TLS_ECDH_ECDSA_WITH_RC4_128_SHA", "TLS_ECDH_RSA_WITH_RC4_128_SHA", "TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA", "TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA", "SSL_RSA_WITH_3DES_EDE_CBC_SHA", "TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA", "TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA", "SSL_DHE_RSA_WITH_3DES_EDE_CBC_SHA", "SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA", "SSL_RSA_WITH_RC4_128_MD5", "TLS_EMPTY_RENEGOTIATION_INFO_SCSV"};
 
   private SSLContext sslcontext = null;
 
@@ -188,9 +190,11 @@ public class EasySSLProtocolSocketFactory implements SecureProtocolSocketFactory
       socket.bind(localaddr);
       socket.connect(remoteaddr, timeout);
     }
+
     SSLSocket sslSocket = (SSLSocket) socket;
-    String[] protocolsWithoutSSLv2Hello = {"SSLv3", "TLSv1"};
-    sslSocket.setEnabledProtocols(protocolsWithoutSSLv2Hello);
+    sslSocket.setEnabledProtocols(SSL_PROTOCOLS);
+    sslSocket.setEnabledCipherSuites(SSL_CYPHER_SUITES);
+
     return socket;
   }
 
