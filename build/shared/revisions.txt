@@ -14,6 +14,7 @@ ARDUINO 1.5.3 BETA
 * sam: Added compatibility for avr/pgmspace.h (Paul Stoffregen)
 * sam: Added serialEvent*() support
 * sam: Fixed micros() to work with inside interrupts. (stimmer)
+* avr: Added support for Flash strings on String class (Jantje)
 
 [libraries]
 * sam: Added CAN library (still in early stage of development) (Palliser)
