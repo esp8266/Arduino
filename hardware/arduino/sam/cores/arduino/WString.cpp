@@ -150,13 +150,13 @@ unsigned char String::changeBuffer(unsigned int maxStrLen)
 /*  Copy and Move                            */
 /*********************************************/
 
-String & String::copy(const char *cstr, unsigned int _length)
+String & String::copy(const char *cstr, unsigned int length)
 {
-	if (!reserve(_length)) {
+	if (!reserve(length)) {
 		invalidate();
 		return *this;
 	}
-	len = _length;
+	len = length;
 	strcpy(buffer, cstr);
 	return *this;
 }
@@ -224,11 +224,11 @@ unsigned char String::concat(const String &s)
 	return concat(s.buffer, s.len);
 }
 
-unsigned char String::concat(const char *cstr, unsigned int _length)
+unsigned char String::concat(const char *cstr, unsigned int length)
 {
-	unsigned int newlen = len + _length;
+	unsigned int newlen = len + length;
 	if (!cstr) return 0;
-	if (_length == 0) return 1;
+	if (length == 0) return 1;
 	if (!reserve(newlen)) return 0;
 	strcpy(buffer + len, cstr);
 	len = newlen;
@@ -549,24 +549,24 @@ String String::substring(unsigned int left, unsigned int right) const
 /*  Modification                             */
 /*********************************************/
 
-void String::replace(char find, char _replace)
+void String::replace(char find, char replace)
 {
 	if (!buffer) return;
 	for (char *p = buffer; *p; p++) {
-		if (*p == find) *p = _replace;
+		if (*p == find) *p = replace;
 	}
 }
 
-void String::replace(const String& find, const String& _replace)
+void String::replace(const String& find, const String& replace)
 {
 	if (len == 0 || find.len == 0) return;
-	int diff = _replace.len - find.len;
+	int diff = replace.len - find.len;
 	char *readFrom = buffer;
 	char *foundAt;
 	if (diff == 0) {
 		while ((foundAt = strstr(readFrom, find.buffer)) != NULL) {
-			memcpy(foundAt, _replace.buffer, _replace.len);
-			readFrom = foundAt + _replace.len;
+			memcpy(foundAt, replace.buffer, replace.len);
+			readFrom = foundAt + replace.len;
 		}
 	} else if (diff < 0) {
 		char *writeTo = buffer;
@@ -574,8 +574,8 @@ void String::replace(const String& find, const String& _replace)
 			unsigned int n = foundAt - readFrom;
 			memcpy(writeTo, readFrom, n);
 			writeTo += n;
-			memcpy(writeTo, _replace.buffer, _replace.len);
-			writeTo += _replace.len;
+			memcpy(writeTo, replace.buffer, replace.len);
+			writeTo += replace.len;
 			readFrom = foundAt + find.len;
 			len += diff;
 		}
@@ -594,7 +594,7 @@ void String::replace(const String& find, const String& _replace)
 			memmove(readFrom + diff, readFrom, len - (readFrom - buffer));
 			len += diff;
 			buffer[len] = 0;
-			memcpy(buffer + index, _replace.buffer, _replace.len);
+			memcpy(buffer + index, replace.buffer, replace.len);
 			index--;
 		}
 	}

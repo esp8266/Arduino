@@ -527,11 +527,6 @@ int String::lastIndexOf(const String &s2, unsigned int fromIndex) const
 	return found;
 }
 
-String String::substring( unsigned int left ) const
-{
-	return substring(left, len);
-}
-
 String String::substring(unsigned int left, unsigned int right) const
 {
 	if (left > right) {

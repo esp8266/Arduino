@@ -158,7 +158,7 @@ public:
 	int lastIndexOf( char ch, unsigned int fromIndex ) const;
 	int lastIndexOf( const String &str ) const;
 	int lastIndexOf( const String &str, unsigned int fromIndex ) const;
-	String substring( unsigned int beginIndex ) const;
+	String substring( unsigned int beginIndex ) const { return substring(beginIndex, len); };
 	String substring( unsigned int beginIndex, unsigned int endIndex ) const;
 
 	// modification
