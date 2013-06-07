@@ -38,12 +38,13 @@ void BridgeClass::begin() {
   // Bridge startup:
   // - If the bridge is not running starts it safely
   print(CTRL_C);
+  delay(250);
   print(F("\n"));
-  delay(500);
+  delay(1000);
   // Wait for OpenWRT message
   // "Press enter to activate console"
   print(F("run-bridge\n"));
-  delay(1000);
+  delay(500);
   dropAll();
   
   // - If the bridge was already running previous commands
