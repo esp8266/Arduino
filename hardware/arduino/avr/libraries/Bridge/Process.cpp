@@ -85,11 +85,13 @@ void Process::addParameter(String &param) {
 }
 
 void Process::runAsynchronously() {
-  handle = bridge.runCommand(*cmdline);
+  uint8_t err;
+  handle = bridge.runCommand(*cmdline, err);
   delete cmdline;
   cmdline = NULL;
   
-  started = true;
+  if (err==0)
+    started = true;
 }
 
 boolean Process::running() {

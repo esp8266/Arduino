@@ -55,11 +55,12 @@ void BridgeClass::begin() {
   transfer(cmd, 2);
 }
 
-uint8_t BridgeClass::runCommand(String &command) {
+uint8_t BridgeClass::runCommand(String &command, uint8_t &err) {
   uint8_t cmd[] = {'R'};
-  uint8_t res[1];
-  transfer(cmd, 1, (uint8_t*)command.c_str(), command.length(), res, 1);
-  return res[0];
+  uint8_t res[2];
+  transfer(cmd, 1, (uint8_t*)command.c_str(), command.length(), res, 2);
+  err = res[0];
+  return res[1];
 }
 
 bool BridgeClass::commandIsRunning(uint8_t handle) {

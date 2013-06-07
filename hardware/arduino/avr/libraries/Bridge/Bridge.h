@@ -28,7 +28,7 @@ public:
   void begin();
   
   // Methods to handle processes on the linux side
-  uint8_t runCommand(String &command);
+  uint8_t runCommand(String &command, uint8_t &err);
   bool commandIsRunning(uint8_t handle);
   unsigned int commandExitValue(uint8_t handle);
   void cleanCommand(uint8_t handle);

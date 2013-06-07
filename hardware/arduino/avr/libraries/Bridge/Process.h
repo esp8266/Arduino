@@ -39,6 +39,8 @@ public:
   unsigned int exitValue();
   void close();
 
+  operator bool () { return started; }
+
   // Stream methods 
   // (read from process stdout)
   int available();
