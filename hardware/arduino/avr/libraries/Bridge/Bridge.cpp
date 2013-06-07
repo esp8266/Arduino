@@ -40,7 +40,9 @@ void BridgeClass::begin() {
   print(CTRL_C);
   delay(250);
   print(F("\n"));
-  delay(1000);
+  delay(500);
+  print(F("\n"));
+  delay(750);
   // Wait for OpenWRT message
   // "Press enter to activate console"
   print(F("run-bridge\n"));
