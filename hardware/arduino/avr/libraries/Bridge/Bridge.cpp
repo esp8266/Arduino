@@ -101,6 +101,53 @@ void BridgeClass::writeCommandInput(uint8_t handle,
   transfer(cmd, 2, buff, size, NULL, 0);
 }
 
+uint8_t BridgeClass::fileOpen(String &file, uint8_t mode, uint8_t &err) {
+  uint8_t cmd[] = {'F', mode};
+  uint8_t res[2];
+  transfer(cmd, 2, (uint8_t*)file.c_str(), file.length(), res, 2);
+  err = res[0];
+  return res[1];
+}
+
+void BridgeClass::fileClose(uint8_t handle) {
+  uint8_t cmd[] = {'f', handle};
+  transfer(cmd, 2);
+}
+
+unsigned int BridgeClass::fileRead(uint8_t handle, uint8_t *buff, unsigned int size, uint8_t &err) {
+  uint8_t s = size > 255 ? 255 : size-1;
+  uint8_t cmd[] = {'G', handle, s};
+  uint8_t l = transfer(cmd, 3, buff, size) - 1;
+  err = buff[0]; // First byte is error code
+  if (l>0) {
+    // Shift the reminder of buffer
+    for (uint8_t i=0; i<l; i++)
+      buff[i] = buff[i+1];
+  }
+  return l;
+}
+
+void BridgeClass::fileWrite(uint8_t handle, const uint8_t *buff, unsigned int size, uint8_t &err) {
+  uint8_t cmd[] = {'g', handle};
+  uint8_t res[1];
+  transfer(cmd, 2, buff, size, res, 1);
+  err = res[0];
+}
+
+void BridgeClass::fileSeek(uint8_t handle, uint32_t position, uint8_t &err) {
+  uint8_t cmd[] = {
+    's',
+    handle,
+    (position >> 24) & 0xFF,
+    (position >> 16) & 0xFF,
+    (position >> 8) & 0xFF,
+    position & 0xFF
+  };
+  uint8_t res[1];
+  transfer(cmd, 6, res, 1);
+  err = res[0];
+}
+
 unsigned int BridgeClass::readMessage(uint8_t *buff, unsigned int size) {
   uint8_t tmp[] = { 'm' };
   return transfer(tmp, 1, buff, size);

@@ -42,6 +42,20 @@ public:
   void writeCommandInput(uint8_t handle, const char *buff, unsigned int size)
     { writeCommandInput(handle, reinterpret_cast<const uint8_t *>(buff), size); }
   
+  // Methods to handle files
+  uint8_t fileOpen(String &file, uint8_t mode, uint8_t &err);
+  void fileClose(uint8_t handle);
+
+  unsigned int fileRead(uint8_t handle, uint8_t *buff, unsigned int size, uint8_t &err);
+  unsigned int fileRead(uint8_t handle, char *buff, unsigned int size, uint8_t &err)
+    { return fileRead(handle, reinterpret_cast<uint8_t *>(buff), size, err); }
+
+  void fileWrite(uint8_t handle, const uint8_t *buff, unsigned int size, uint8_t &err);
+  void fileWrite(uint8_t handle, const char *buff, unsigned int size, uint8_t &err)
+    { fileWrite(handle, reinterpret_cast<const uint8_t *>(buff), size, err); }
+
+  void fileSeek(uint8_t handle, uint32_t position, uint8_t &err);
+
   // Methods to handle mailbox messages
   unsigned int readMessage(uint8_t *buffer, unsigned int size);
   void writeMessage(const uint8_t *buffer, unsigned int size);

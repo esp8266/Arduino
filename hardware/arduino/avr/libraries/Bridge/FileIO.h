@@ -16,8 +16,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
-#ifndef __SD_H__
-#define __SD_H__
+#ifndef __FILEIO_H__
+#define __FILEIO_H__
 
 #include <Process.h>
 
@@ -26,12 +26,13 @@
 
 #define FILE_READ 0
 #define FILE_WRITE 1
+#define FILE_APPEND 2
 
-class File : public Process {
+class File : public Stream {
  
 public:
-  File();
-  File(const char *_filename, uint8_t _mode);
+  File(BridgeClass &b = Bridge);
+  File(const char *_filename, uint8_t _mode, BridgeClass &b = Bridge);
   ~File();
   
   virtual size_t write(uint8_t);
@@ -46,17 +47,26 @@ public:
   uint32_t size();
   void close();
   operator bool();
-  char * name();
+  const char * name();
 
   boolean isDirectory(void);
   //File openNextFile(uint8_t mode = O_RDONLY);
   void rewindDirectory(void);
   
   using Print::write;
+
+private:
+  void doBuffer();
+  uint8_t buffered;
+  uint8_t readPos;
+  static const int BUFFER_SIZE = 64;
+  uint8_t buffer[BUFFER_SIZE];
   
 private:
-  char *filename;
+  BridgeClass &bridge;
+  String filename;
   uint8_t mode;
+  uint8_t handle;
 };
 
 class SDClass {
