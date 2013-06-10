@@ -24,11 +24,15 @@ File::File(BridgeClass &b) : mode(255), bridge(b) {
 
 File::File(const char *_filename, uint8_t _mode, BridgeClass &b) : mode(_mode), bridge(b) {
   filename = _filename;
-  uint8_t err;
   char modes[] = {'r','w','a'};
-  handle = bridge.fileOpen(filename, modes[mode], err);
-  if (err != 0)
+  uint8_t cmd[] = {'F', modes[mode]};
+  uint8_t res[2];
+  bridge.transfer(cmd, 2, (uint8_t*)filename.c_str(), filename.length(), res, 2);
+  if (res[0] != 0) { // res[0] contains error code
     mode = 255; // In case of error keep the file closed
+    return;
+  }
+  handle = res[1];
   buffered = 0;
 }
 
@@ -47,10 +51,11 @@ size_t File::write(uint8_t c) {
 size_t File::write(const uint8_t *buf, size_t size) {
   if (mode == 255)
 	return -1;
-  uint8_t err;
-  bridge.fileWrite(handle, buf, size, err);
-  if (err != 0)
-	return -err;
+  uint8_t cmd[] = {'g', handle};
+  uint8_t res[1];
+  bridge.transfer(cmd, 2, buf, size, res, 1);
+  if (res[0] != 0) // res[0] contains error code
+	return -res[0];
   return size;
 }
 
@@ -72,10 +77,23 @@ int File::peek() {
     return buffer[readPos];
 }
 
-boolean File::seek(uint32_t pos) {
-  uint8_t err;
-  bridge.fileSeek(handle, pos, err);
-  return err==0;
+boolean File::seek(uint32_t position) {
+  uint8_t cmd[] = {
+    's',
+    handle,
+    (position >> 24) & 0xFF,
+    (position >> 16) & 0xFF,
+    (position >> 8) & 0xFF,
+    position & 0xFF
+  };
+  uint8_t res[1];
+  bridge.transfer(cmd, 6, res, 1);
+  if (res[0]==0) {
+    // If seek succeed then flush buffers
+    buffered = 0;
+    return true;
+  }
+  return false;
 }
 
 void File::doBuffer() {
@@ -85,8 +103,14 @@ void File::doBuffer() {
 
   // Try to buffer up to 32 characters
   readPos = 0;
-  uint8_t err;
-  buffered = bridge.fileRead(handle, buffer, sizeof(buffer), err);
+  uint8_t cmd[] = {'G', handle, sizeof(buffer)};
+  buffered = bridge.transfer(cmd, 3, buffer, sizeof(buffer)) - 1;
+  //err = buff[0]; // First byte is error code
+  if (buffered>0) {
+    // Shift the reminder of buffer
+    for (uint8_t i=0; i<buffered; i++)
+      buffer[i] = buffer[i+1];
+  }
 }
 
 int File::available() {
@@ -99,13 +123,15 @@ void File::flush() {
 }
 
 //int read(void *buf, uint16_t nbyte)
+
 //uint32_t position()
 //uint32_t size()
 
 void File::close() {
   if (mode == 255)
     return;
-  bridge.fileClose(handle);
+  uint8_t cmd[] = {'f', handle};
+  bridge.transfer(cmd, 2);
   mode = 255;
 }
 
@@ -127,14 +153,7 @@ boolean SDClass::begin() {
 }
 
 File SDClass::open(const char *filename, uint8_t mode) {
-//  if (mode == FILE_READ) {
-//    if (exists(filename))
-//      return File(filename, mode);
-//  }
-//  if (mode == FILE_WRITE || mode == FILE_APPEND) {
-    return File(filename, mode);
-//  }
-//  return File();
+  return File(filename, mode);
 }
 
 boolean SDClass::exists(const char *filepath) {

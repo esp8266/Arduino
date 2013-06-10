@@ -42,20 +42,6 @@ public:
   void writeCommandInput(uint8_t handle, const char *buff, unsigned int size)
     { writeCommandInput(handle, reinterpret_cast<const uint8_t *>(buff), size); }
   
-  // Methods to handle files
-  uint8_t fileOpen(String &file, uint8_t mode, uint8_t &err);
-  void fileClose(uint8_t handle);
-
-  unsigned int fileRead(uint8_t handle, uint8_t *buff, unsigned int size, uint8_t &err);
-  unsigned int fileRead(uint8_t handle, char *buff, unsigned int size, uint8_t &err)
-    { return fileRead(handle, reinterpret_cast<uint8_t *>(buff), size, err); }
-
-  void fileWrite(uint8_t handle, const uint8_t *buff, unsigned int size, uint8_t &err);
-  void fileWrite(uint8_t handle, const char *buff, unsigned int size, uint8_t &err)
-    { fileWrite(handle, reinterpret_cast<const uint8_t *>(buff), size, err); }
-
-  void fileSeek(uint8_t handle, uint32_t position, uint8_t &err);
-
   // Methods to handle mailbox messages
   unsigned int readMessage(uint8_t *buffer, unsigned int size);
   void writeMessage(const uint8_t *buffer, unsigned int size);
@@ -79,20 +65,20 @@ public:
   void flush() { stream.flush(); }
 
   // Trasnfer a frame (with error correction and response)
-  uint8_t transfer(const uint8_t *buff1, uint16_t len1,
+  uint16_t transfer(const uint8_t *buff1, uint16_t len1,
                    const uint8_t *buff2, uint16_t len2,
                    const uint8_t *buff3, uint16_t len3,
                    uint8_t *rxbuff, uint16_t rxlen);
   // multiple inline versions of the same function to allow efficient frame concatenation
-  uint8_t transfer(const uint8_t *buff1, uint16_t len1)
-  { transfer(buff1, len1, NULL, 0); }
-  uint8_t transfer(const uint8_t *buff1, uint16_t len1,
+  uint16_t transfer(const uint8_t *buff1, uint16_t len1)
+  { return transfer(buff1, len1, NULL, 0); }
+  uint16_t transfer(const uint8_t *buff1, uint16_t len1,
                    uint8_t *rxbuff, uint16_t rxlen)
-  { transfer(buff1, len1, NULL, 0, rxbuff, rxlen); }
-  uint8_t transfer(const uint8_t *buff1, uint16_t len1,
+  { return transfer(buff1, len1, NULL, 0, rxbuff, rxlen); }
+  uint16_t transfer(const uint8_t *buff1, uint16_t len1,
                    const uint8_t *buff2, uint16_t len2,
                    uint8_t *rxbuff, uint16_t rxlen)
-  { transfer(buff1, len1, buff2, len2, NULL, 0, rxbuff, rxlen); }
+  { return transfer(buff1, len1, buff2, len2, NULL, 0, rxbuff, rxlen); }
 private:
   uint8_t index;
   int timedRead(unsigned int timeout);
