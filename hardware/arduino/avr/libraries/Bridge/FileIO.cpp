@@ -96,6 +96,18 @@ boolean File::seek(uint32_t position) {
   return false;
 }
 
+uint32_t File::position() {
+  uint8_t cmd[] = {'S', handle};
+  uint8_t res[5];
+  bridge.transfer(cmd, 2, res, 5);
+  //err = res[0]; // res[0] contains error code
+  uint32_t pos = res[1] << 24;
+  pos += res[2] << 16;
+  pos += res[3] << 8;
+  pos += res[4];
+  return pos - buffered;
+}
+
 void File::doBuffer() {
   // If there are already char in buffer exit
   if (buffered > 0)
@@ -124,7 +136,6 @@ void File::flush() {
 
 //int read(void *buf, uint16_t nbyte)
 
-//uint32_t position()
 //uint32_t size()
 
 void File::close() {
