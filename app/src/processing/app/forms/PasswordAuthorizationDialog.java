@@ -22,7 +22,7 @@ public class PasswordAuthorizationDialog extends JDialog {
   protected boolean cancelled;
   protected String password;
 
-  public PasswordAuthorizationDialog(Frame parent) {
+  public PasswordAuthorizationDialog(Frame parent, String dialogText) {
     super(parent, true);
 
     this.cancelled = false;
@@ -37,7 +37,7 @@ public class PasswordAuthorizationDialog extends JDialog {
 
     setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
-    typePasswordLabel.setText(_("Type board password to upload a new sketch"));
+    typePasswordLabel.setText(dialogText);
 
     icon.setIcon(new ImageIcon(new File(Base.getContentFile("lib"), "theme/lock.png").getAbsolutePath()));
 

@@ -22,7 +22,9 @@
 
 package processing.app;
 
+import com.jcraft.jsch.JSchException;
 import processing.app.debug.*;
+import processing.app.forms.PasswordAuthorizationDialog;
 import processing.app.syntax.*;
 import processing.app.tools.*;
 import processing.core.*;
@@ -704,7 +706,7 @@ public class Editor extends JFrame implements RunnerListener {
       JMenu boardsMenu = new JMenu(_("Board"));
       Editor.boardsMenus.add(boardsMenu);
       toolsMenu.add(boardsMenu);
-      
+
       base.rebuildBoardsMenu(toolsMenu, this);
       //Debug: rebuild imports
       importMenu.removeAll();
@@ -969,7 +971,7 @@ public class Editor extends JFrame implements RunnerListener {
       Preferences.set("serial.port.file", name);
     try {
       serialMonitor.close();
-    } catch (IOException e) {
+    } catch (Exception e) {
       // ignore
     }
     serialMonitor.setVisible(false);
@@ -983,14 +985,14 @@ public class Editor extends JFrame implements RunnerListener {
 
   protected void populatePortMenu() {
     serialMenu.removeAll();
-    
+
     String selectedPort = Preferences.get("serial.port");
-    
+
     List<BoardPort> ports = Base.getDiscoveryManager().discovery();
     for (BoardPort port : ports) {
       String address = port.getAddress();
       String label = port.getLabel();
-      
+
       JCheckBoxMenuItem item = new JCheckBoxMenuItem(label, address.equals(selectedPort));
       item.addActionListener(new SerialMenuListener(address));
       serialMenu.add(item);
@@ -2490,14 +2492,39 @@ public class Editor extends JFrame implements RunnerListener {
   public void handleSerial() {
     if (uploading) return;
 
-    try {
-      serialMonitor.open();
-      serialMonitor.setVisible(true);
-    } catch (ConnectException e) {
-      statusError(_("Unable to connect: is the sketch using the bridge?"));
-    } catch (IOException e) {
-      statusError(e);
-    }
+    boolean success = false;
+    do {
+      if (serialMonitor.requiresAuthorization() && !Preferences.has(serialMonitor.getAuthorizationKey())) {
+        PasswordAuthorizationDialog dialog = new PasswordAuthorizationDialog(this, _("Type board password to access its console"));
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
+
+        if (dialog.isCancelled()) {
+          statusNotice(_("Unable to open serial monitor"));
+          return;
+        }
+
+        Preferences.set(serialMonitor.getAuthorizationKey(), dialog.getPassword());
+      }
+
+      try {
+        serialMonitor.open();
+        serialMonitor.setVisible(true);
+        success = true;
+      } catch (ConnectException e) {
+        statusError(_("Unable to connect: is the sketch using the bridge?"));
+      } catch (JSchException e) {
+        statusError(_("Unable to connect: wrong password?"));
+      } catch (Exception e) {
+        statusError(e);
+      } finally {
+        if (serialMonitor.requiresAuthorization() && !success) {
+          Preferences.remove(serialMonitor.getAuthorizationKey());
+        }
+      }
+
+    } while (serialMonitor.requiresAuthorization() && !success);
+
   }
 
 
@@ -2522,7 +2549,8 @@ public class Editor extends JFrame implements RunnerListener {
           statusError(_("Error while burning bootloader."));
           e.printStackTrace();
         }
-      }});
+      }
+    });
   }
 
 

@@ -1,22 +1,26 @@
 package processing.app;
 
+import com.jcraft.jsch.*;
 import processing.app.debug.MessageSiphon;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.util.regex.Matcher;
+
+import static processing.app.I18n._;
 
 @SuppressWarnings("serial")
 public class NetworkMonitor extends AbstractMonitor {
 
   private final String ipAddress;
 
-  private Socket socket;
-  private MessageSiphon consumer;
+  private MessageSiphon inputConsumer;
+  private Session session;
+  private Channel channel;
+  private MessageSiphon errorConsumer;
 
   public NetworkMonitor(String port, Base base) {
     super(port);
@@ -28,7 +32,7 @@ public class NetworkMonitor extends AbstractMonitor {
     onSendCommand(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         try {
-          OutputStream out = socket.getOutputStream();
+          OutputStream out = channel.getOutputStream();
           out.write(textField.getText().getBytes());
           out.write('\n');
           out.flush();
@@ -41,24 +45,81 @@ public class NetworkMonitor extends AbstractMonitor {
   }
 
   @Override
-  public void open() throws IOException {
-    try {
-      socket = new Socket();
-      socket.connect(new InetSocketAddress(ipAddress, 6571), 5000);
-      consumer = new MessageSiphon(socket.getInputStream(), this);
-      return;
-    } catch (IOException e) {
-      socket = null;
-      throw e;
-    }
+  public boolean requiresAuthorization() {
+    return true;
   }
 
   @Override
-  public void close() throws IOException {
-    if (socket != null) {
-      consumer.stop();
-      socket.close();
+  public String getAuthorizationKey() {
+    return "runtime.pwd." + ipAddress;
+  }
+
+  @Override
+  public void open() throws Exception {
+    JSch jSch = new JSch();
+    session = jSch.getSession("root", ipAddress, 22);
+    session.setPassword(Preferences.get(getAuthorizationKey()));
+
+    session.setUserInfo(new NoInteractionUserInfo());
+    session.connect(30000);
+
+    channel = session.openChannel("exec");
+    ((ChannelExec) channel).setCommand("telnet localhost 6571");
+
+    InputStream inputStream = channel.getInputStream();
+    InputStream errStream = ((ChannelExec) channel).getErrStream();
+
+    channel.connect();
+
+    inputConsumer = new MessageSiphon(inputStream, this);
+    errorConsumer = new MessageSiphon(errStream, this);
+  }
+
+  @Override
+  public void message(String s) {
+    if (s.contains("can't connect")) {
+      s = _("Unable to connect: is the sketch using the bridge?");
+    }
+    super.message(s);    //To change body of overridden methods use File | Settings | File Templates.
+  }
+
+  @Override
+  public void close() throws Exception {
+    if (channel != null) {
+      inputConsumer.stop();
+      channel.disconnect();
       textArea.setText("");
     }
+
+    if (session != null) {
+      session.disconnect();
+    }
+  }
+
+  public static class NoInteractionUserInfo implements UserInfo {
+
+    public String getPassword() {
+      return null;
+    }
+
+    public boolean promptYesNo(String str) {
+      return true;
+    }
+
+    public String getPassphrase() {
+      return null;
+    }
+
+    public boolean promptPassphrase(String message) {
+      return false;
+    }
+
+    public boolean promptPassword(String message) {
+      return false;
+    }
+
+    public void showMessage(String message) {
+    }
+
   }
 }

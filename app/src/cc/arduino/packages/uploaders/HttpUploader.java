@@ -51,7 +51,7 @@ public class HttpUploader extends Uploader {
   }
 
   public String getAuthorizationKey() {
-    return "pwd." + ipAddress;
+    return "runtime.pwd." + ipAddress;
   }
 
   @Override

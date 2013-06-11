@@ -924,7 +924,7 @@ public class Base {
       editors.remove(editor);
       try {
         Editor.serialMonitor.close();
-      } catch (IOException e) {
+      } catch (Exception e) {
         //ignore
       }
       storeSketches();
@@ -966,7 +966,7 @@ public class Base {
     storeSketches();
     try {
       Editor.serialMonitor.close();
-    } catch (IOException e) {
+    } catch (Exception e) {
       // ignore
     }
 

@@ -1671,7 +1671,7 @@ public class Sketch {
     boolean success = false;
     do {
       if (uploader.requiresAuthorization() && !Preferences.has(uploader.getAuthorizationKey())) {
-        PasswordAuthorizationDialog dialog = new PasswordAuthorizationDialog(editor);
+        PasswordAuthorizationDialog dialog = new PasswordAuthorizationDialog(editor, _("Type board password to upload a new sketch"));
         dialog.setLocationRelativeTo(editor);
         dialog.setVisible(true);
 
@@ -1680,7 +1680,7 @@ public class Sketch {
           return false;
         }
 
-        Preferences.set(uploader.getAuthorizationKey(), DigestUtils.sha256Hex(dialog.getPassword()));
+        Preferences.set(uploader.getAuthorizationKey(), dialog.getPassword());
       }
 
       try {

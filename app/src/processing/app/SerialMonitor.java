@@ -22,7 +22,6 @@ import processing.core.PApplet;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 
 import static processing.app.I18n._;
 
@@ -49,10 +48,10 @@ public class SerialMonitor extends AbstractMonitor {
           close();
           Thread.sleep(100); // Wait for serial port to properly close
           open();
-        } catch (IOException e) {
-          System.err.println(e);
         } catch (InterruptedException e) {
-          e.printStackTrace();
+          // noop
+        } catch (Exception e) {
+          System.err.println(e);
         }
       }
     });
@@ -82,14 +81,14 @@ public class SerialMonitor extends AbstractMonitor {
     }
   }
 
-  public void open() throws IOException {
+  public void open() throws Exception {
     if (serial != null) return;
 
     serial = new Serial(port, serialRate);
     serial.addListener(this);
   }
 
-  public void close() throws IOException {
+  public void close() throws Exception {
     if (serial != null) {
       int[] location = getPlacement();
       String locationStr = PApplet.join(PApplet.str(location), ",");
