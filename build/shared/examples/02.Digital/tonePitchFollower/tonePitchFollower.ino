@@ -4,7 +4,7 @@
  Plays a pitch that changes based on a changing analog input
  
  circuit:
- * 8-ohm speaker on digital pin 8
+ * 8-ohm speaker on digital pin 9
  * photoresistor on analog 0 to 5V
  * 4.7K resistor on analog 0 to ground
  
