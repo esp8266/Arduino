@@ -1,6 +1,7 @@
 package cc.arduino.packages.uploaders;
 
 import cc.arduino.packages.Uploader;
+import com.jcraft.jsch.*;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
@@ -10,16 +11,14 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.protocol.Protocol;
 import processing.app.Base;
 import processing.app.Constants;
+import processing.app.NetworkMonitor;
 import processing.app.Preferences;
 import processing.app.debug.EasySSLProtocolSocketFactory;
 import processing.app.debug.RunnerException;
 import processing.app.debug.TargetPlatform;
 import processing.app.helpers.PreferencesMap;
 
-import javax.net.ssl.SSLSocket;
 import java.io.*;
-import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.util.regex.Matcher;
 
 import static processing.app.I18n._;
@@ -62,8 +61,8 @@ public class HttpUploader extends Uploader {
     }
 
     client.getHttpConnectionManager().getParams().setConnectionTimeout(5000);
-    String authKey = Preferences.get(getAuthorizationKey());
-    String auth = Base64.encodeBase64String(("root:" + authKey).getBytes());
+    String password = Preferences.get(getAuthorizationKey());
+    String auth = Base64.encodeBase64String(("root:" + password).getBytes());
 
     int sleptTimes = 1;
     while (boardNotReady(auth)) {
@@ -78,41 +77,10 @@ public class HttpUploader extends Uploader {
       sleptTimes += 1;
     }
 
-    StringBuilder uploadRequest = new StringBuilder();
-
-    uploadRequest.append(String.format("PWD%1$04d", authKey.length()));
-    uploadRequest.append(authKey).append("\n");
-    uploadRequest.append("SKETCH\n");
-    readSketchFile(buildPath, className, uploadRequest);
-    uploadRequest.append("SKETCH_END\n");
-    uploadRequest.append("EOF\n");
-
-    Socket socket = null;
     try {
-      socket = new Socket();
-      socket.connect(new InetSocketAddress(ipAddress, 9876), 5000);
-      socket = new EasySSLProtocolSocketFactory().createSocket(socket, ipAddress, 9876, true);
-      SSLSocket sslSocket = (SSLSocket) socket;
-      sslSocket.setEnabledProtocols(EasySSLProtocolSocketFactory.SSL_PROTOCOLS);
-      sslSocket.setEnabledCipherSuites(EasySSLProtocolSocketFactory.SSL_CYPHER_SUITES);
-      OutputStreamWriter osw = new OutputStreamWriter(socket.getOutputStream());
-      osw.write(uploadRequest.toString());
-      osw.flush();
-      BufferedReader isr = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-      String ok = isr.readLine();
-      if (!"OK".equals(ok)) {
-        throw new RunnerException(_("Problem uploading sketch"));
-      }
-    } catch (IOException e) {
+      scpHexToBoard(buildPath, className);
+    } catch (Exception e) {
       throw new RunnerException(e);
-    } finally {
-      if (socket != null) {
-        try {
-          socket.close();
-        } catch (IOException e) {
-          // ignore
-        }
-      }
     }
 
     TargetPlatform targetPlatform = Base.getTargetPlatform();
@@ -140,28 +108,100 @@ public class HttpUploader extends Uploader {
     }
   }
 
-  private void readSketchFile(String buildPath, String className, StringBuilder uploadRequest) throws RunnerException {
-    BufferedReader sketchReader = null;
+  private void scpHexToBoard(String buildPath, String className) throws JSchException, IOException {
+    Session session = null;
+    Channel channel = null;
+    OutputStream out = null;
+    InputStream in = null;
     try {
-      sketchReader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(buildPath, className + ".hex"))));
-      String line;
-      while ((line = sketchReader.readLine()) != null) {
-        line = line.trim();
-        if (line.length() > 0) {
-          uploadRequest.append(line).append("\n");
-        }
-      }
-    } catch (IOException e) {
-      throw new RunnerException(e);
+      JSch jSch = new JSch();
+      session = jSch.getSession("root", ipAddress, 22);
+      session.setPassword(Preferences.get(getAuthorizationKey()));
+
+      session.setUserInfo(new NetworkMonitor.NoInteractionUserInfo());
+      session.connect(30000);
+
+      channel = session.openChannel("exec");
+      ((ChannelExec) channel).setCommand("scp -t /tmp/sketch.hex");
+
+      out = channel.getOutputStream();
+      in = channel.getInputStream();
+
+      channel.connect();
+
+      ensureAcknowledged(out, in);
+
+      File hex = new File(buildPath, className + ".hex");
+
+      sendFileSizeAndName(out, in, hex);
+      ensureAcknowledged(out, in);
+
+      sendFileContents(out, hex);
+      ensureAcknowledged(out, in);
     } finally {
-      if (sketchReader != null) {
-        try {
-          sketchReader.close();
-        } catch (IOException e) {
-          // ignore
-        }
+      if (out != null) {
+        out.close();
+      }
+      if (channel != null) {
+        channel.disconnect();
+      }
+      if (session != null) {
+        session.disconnect();
       }
     }
+  }
+
+  private void ensureAcknowledged(OutputStream out, InputStream in) throws IOException {
+    out.flush();
+
+    int b = in.read();
+
+    if (b == 0) return;
+    if (b == -1) return;
+
+    if (b == 1 || b == 2) {
+      StringBuilder sb = new StringBuilder();
+      sb.append("SCP error: ");
+
+      int c;
+      do {
+        c = in.read();
+        sb.append((char) c);
+      } while (c != '\n');
+
+      throw new IOException(sb.toString());
+    }
+
+    throw new IOException("Uknown SCP error: " + b);
+  }
+
+  private void sendFileContents(OutputStream out, File hex) throws IOException {
+    // send file contents
+    FileInputStream fis = null;
+    try {
+      fis = new FileInputStream(hex);
+      byte[] buf = new byte[4096];
+      while (true) {
+        int len = fis.read(buf, 0, buf.length);
+        if (len <= 0) break;
+        out.write(buf, 0, len); //out.flush();
+      }
+
+      // send \0 (terminates file)
+      buf[0] = 0;
+      out.write(buf, 0, 1);
+    } finally {
+      if (fis != null) {
+        fis.close();
+      }
+    }
+  }
+
+  private void sendFileSizeAndName(OutputStream out, InputStream in, File hex) throws IOException {
+    // send "C0644 filesize filename"
+    long filesize = hex.length();
+    String command = "C0644 " + filesize + " " + hex.getName() + "\n";
+    out.write(command.getBytes());
   }
 
   protected boolean boardNotReady(String auth) throws RunnerException {
