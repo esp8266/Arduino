@@ -21,9 +21,6 @@
 
 #include <Process.h>
 
-//#define FILE_READ O_READ
-//#define FILE_WRITE (O_READ | O_WRITE | O_CREAT)
-
 #define FILE_READ 0
 #define FILE_WRITE 1
 #define FILE_APPEND 2
@@ -50,10 +47,10 @@ public:
   const char * name();
 
   boolean isDirectory(void);
-  //File openNextFile(uint8_t mode = O_RDONLY);
+  File openNextFile(uint8_t mode = FILE_READ);
   void rewindDirectory(void);
   
-  using Print::write;
+  //using Print::write;
 
 private:
   void doBuffer();
