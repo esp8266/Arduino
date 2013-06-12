@@ -36,6 +36,9 @@ public:
   unsigned int exitValue();
   void close();
 
+  unsigned int runShellCommand(const String &command);
+  void runShellCommandAsynchronously(const String &command);
+
   operator bool () { return started; }
 
   // Stream methods 

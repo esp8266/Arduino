@@ -118,6 +118,20 @@ void Process::close() {
   started = false;
 }
 
+unsigned int Process::runShellCommand(const String &command) {
+  runShellCommandAsynchronously(command);
+  while (running())
+    delay(100);
+  return exitValue();
+}
+
+void Process::runShellCommandAsynchronously(const String &command) {
+  begin("/bin/ash");
+  addParameter("-c");
+  addParameter(command);
+  runAsynchronously();
+}
+
 // This method is currently unused
 //static unsigned int __commandOutputAvailable(uint8_t handle) {
 //  uint8_t cmd[] = {'o', handle};
