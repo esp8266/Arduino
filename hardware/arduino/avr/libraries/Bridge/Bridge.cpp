@@ -27,8 +27,6 @@ void BridgeClass::begin() {
     return;
   started = true;
   
-  // TODO: A more robust restart
-  
   // Wait for Atheros bootloader to finish startup
   do {
     dropAll();
@@ -53,8 +51,11 @@ void BridgeClass::begin() {
   //   are ignored as "invalid packets".
   
   // Reset the brigde
-  uint8_t cmd[] = {'X','X'};
-  transfer(cmd, 2);
+  uint8_t cmd[] = {'X','X', '1','0','0'};
+  uint8_t res[1];
+  transfer(cmd, 5, res, 1);
+  if (res[0] != 0)
+	while (true);
 }
 
 uint8_t BridgeClass::runCommand(String &command, uint8_t &err) {
