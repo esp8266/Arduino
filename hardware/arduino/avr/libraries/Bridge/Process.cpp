@@ -66,22 +66,12 @@ void Process::doBuffer() {
   buffered = bridge.transfer(cmd, 3, buffer, sizeof(buffer));
 }
 
-void Process::begin(String &command) {
+void Process::begin(const String &command) {
   close();
   cmdline = new String(command);
 }
 
-void Process::begin(const char *command) {
-  close();
-  cmdline = new String(command);
-}
-
-void Process::addParameter(const char *param) {
-  *cmdline += "\xFE";
-  *cmdline += param;
-}
-
-void Process::addParameter(String &param) {
+void Process::addParameter(const String &param) {
   *cmdline += "\xFE";
   *cmdline += param;
 }

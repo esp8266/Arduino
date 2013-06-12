@@ -23,16 +23,13 @@
 
 class Process : public Stream {
 public:
-  // Default constructor uses global Bridge instance
-  Process() : bridge(Bridge), started(false), buffered(0), readPos(0) { }
   // Constructor with a user provided BridgeClass instance
-  Process(BridgeClass &_b) : bridge(_b), started(false), buffered(0), readPos(0) { }
+  Process(BridgeClass &_b = Bridge) :
+	  bridge(_b), started(false), buffered(0), readPos(0) { }
   ~Process();
   
-  void begin(String &command);
-  void begin(const char *command);
-  void addParameter(String &param);
-  void addParameter(const char *param);
+  void begin(const String &command);
+  void addParameter(const String &param);
   unsigned int run();
   void runAsynchronously();
   boolean running();
