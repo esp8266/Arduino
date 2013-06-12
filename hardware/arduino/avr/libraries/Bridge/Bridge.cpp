@@ -58,54 +58,6 @@ void BridgeClass::begin() {
 	while (true);
 }
 
-uint8_t BridgeClass::runCommand(String &command, uint8_t &err) {
-  uint8_t cmd[] = {'R'};
-  uint8_t res[2];
-  transfer(cmd, 1, (uint8_t*)command.c_str(), command.length(), res, 2);
-  err = res[0];
-  return res[1];
-}
-
-bool BridgeClass::commandIsRunning(uint8_t handle) {
-  uint8_t cmd[] = {'r', handle};
-  uint8_t res[1];
-  transfer(cmd, 2, res, 1);
-  return (res[0] == 1);
-}
-
-unsigned int BridgeClass::commandExitValue(uint8_t handle) {
-  uint8_t cmd[] = {'W', handle};
-  uint8_t res[2];
-  transfer(cmd, 2, res, 2);
-  return (res[0] << 8) + res[1];
-}
-
-void BridgeClass::cleanCommand(uint8_t handle) {
-  uint8_t cmd[] = {'w', handle};
-  transfer(cmd, 2);
-}
-
-unsigned int BridgeClass::commandOutputAvailable(uint8_t handle) {
-  uint8_t cmd[] = {'o', handle};
-  uint8_t res[1];
-  transfer(cmd, 2, res, 1);
-  return res[0];
-}
-
-unsigned int BridgeClass::readCommandOutput(uint8_t handle, 
-                                            uint8_t *buffer, unsigned int size) {
-  if (size > 255)
-    size = 255;
-  uint8_t cmd[] = {'O', handle, size};
-  return transfer(cmd, 3, buffer, size);
-}
-
-void BridgeClass::writeCommandInput(uint8_t handle, 
-                                    const uint8_t *buff, unsigned int size) {
-  uint8_t cmd[] = {'I', handle};
-  transfer(cmd, 2, buff, size, NULL, 0);
-}
-
 unsigned int BridgeClass::readMessage(uint8_t *buff, unsigned int size) {
   uint8_t tmp[] = { 'm' };
   return transfer(tmp, 1, buff, size);

@@ -23,7 +23,8 @@ Process::~Process() {
 }
 
 size_t Process::write(uint8_t c) {
-  bridge.writeCommandInput(handle, &c, 1);
+  uint8_t cmd[] = {'I', handle, c};
+  bridge.transfer(cmd, 3);
   return 1;
 }
 
@@ -61,7 +62,8 @@ void Process::doBuffer() {
 
   // Try to buffer up to 32 characters
   readPos = 0;
-  buffered = bridge.readCommandOutput(handle, buffer, sizeof(buffer));
+  uint8_t cmd[] = {'O', handle, sizeof(buffer)};
+  buffered = bridge.transfer(cmd, 3, buffer, sizeof(buffer));
 }
 
 void Process::begin(String &command) {
@@ -85,21 +87,30 @@ void Process::addParameter(String &param) {
 }
 
 void Process::runAsynchronously() {
-  uint8_t err;
-  handle = bridge.runCommand(*cmdline, err);
+  uint8_t cmd[] = {'R'};
+  uint8_t res[2];
+  bridge.transfer(cmd, 1, (uint8_t*)cmdline->c_str(), cmdline->length(), res, 2);
+  handle = res[1];
+
   delete cmdline;
   cmdline = NULL;
   
-  if (err==0)
+  if (res[0]==0) // res[0] contains error code
     started = true;
 }
 
 boolean Process::running() {
-  return bridge.commandIsRunning(handle);
+  uint8_t cmd[] = {'r', handle};
+  uint8_t res[1];
+  bridge.transfer(cmd, 2, res, 1);
+  return (res[0] == 1);
 }
 
 unsigned int Process::exitValue() {
-  return bridge.commandExitValue(handle);
+  uint8_t cmd[] = {'W', handle};
+  uint8_t res[2];
+  bridge.transfer(cmd, 2, res, 2);
+  return (res[0] << 8) + res[1];
 }
 
 unsigned int Process::run() {
@@ -110,8 +121,18 @@ unsigned int Process::run() {
 }
 
 void Process::close() {
-  if (started)
-    bridge.cleanCommand(handle);
+  if (started) {
+    uint8_t cmd[] = {'w', handle};
+    bridge.transfer(cmd, 2);
+  }
   started = false;
 }
+
+// This method is currently unused
+//static unsigned int __commandOutputAvailable(uint8_t handle) {
+//  uint8_t cmd[] = {'o', handle};
+//  uint8_t res[1];
+//  Bridge.transfer(cmd, 2, res, 1);
+//  return res[0];
+//}
 

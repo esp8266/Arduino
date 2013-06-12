@@ -49,6 +49,7 @@ public:
   // (write to process stdin)
   size_t write(uint8_t);
   void flush();
+  // TODO: add optimized function for block write
   
 private:
   BridgeClass &bridge;

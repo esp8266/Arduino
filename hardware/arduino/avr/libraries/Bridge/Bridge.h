@@ -27,21 +27,6 @@ public:
   BridgeClass(Stream &_stream);
   void begin();
   
-  // Methods to handle processes on the linux side
-  uint8_t runCommand(String &command, uint8_t &err);
-  bool commandIsRunning(uint8_t handle);
-  unsigned int commandExitValue(uint8_t handle);
-  void cleanCommand(uint8_t handle);
-  
-  unsigned int commandOutputAvailable(uint8_t handle);
-  unsigned int readCommandOutput(uint8_t handle, uint8_t *buff, unsigned int size);
-  unsigned int readCommandOutput(uint8_t handle, char *buff, unsigned int size)
-    { return readCommandOutput(handle, reinterpret_cast<uint8_t *>(buff), size); }
-
-  void writeCommandInput(uint8_t handle, const uint8_t *buff, unsigned int size);
-  void writeCommandInput(uint8_t handle, const char *buff, unsigned int size)
-    { writeCommandInput(handle, reinterpret_cast<const uint8_t *>(buff), size); }
-  
   // Methods to handle mailbox messages
   unsigned int readMessage(uint8_t *buffer, unsigned int size);
   void writeMessage(const uint8_t *buffer, unsigned int size);
