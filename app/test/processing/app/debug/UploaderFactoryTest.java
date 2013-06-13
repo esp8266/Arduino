@@ -1,12 +1,11 @@
 package processing.app.debug;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import cc.arduino.packages.Uploader;
 import cc.arduino.packages.UploaderFactory;
-import cc.arduino.packages.uploaders.HttpUploader;
+import cc.arduino.packages.uploaders.SSHUploader;
 import cc.arduino.packages.uploaders.SerialUploader;
+import org.junit.Before;
+import org.junit.Test;
 import processing.app.AbstractWithPreferencesTest;
 
 import java.io.File;
@@ -23,15 +22,15 @@ public class UploaderFactoryTest extends AbstractWithPreferencesTest {
   }
 
   @Test
-  public void shouldCreateAnInstanceOfHttpUploader() throws Exception {
+  public void shouldCreateAnInstanceOfSSHUploader() throws Exception {
     TargetBoard board = targetPackage.getPlatforms().get("avr").getBoards().get("yun");
     Uploader uploader = new UploaderFactory().newUploader(board, "192.168.0.1 (yun)");
 
-    assertTrue(uploader instanceof HttpUploader);
+    assertTrue(uploader instanceof SSHUploader);
   }
 
   @Test
-  public void shouldCreateAnInstanceOfBasicUploaderWhenHTTPIsUnsupported() throws Exception {
+  public void shouldCreateAnInstanceOfBasicUploaderWhenSSHIsUnsupported() throws Exception {
     TargetBoard board = targetPackage.getPlatforms().get("avr").getBoards().get("uno");
     Uploader uploader = new UploaderFactory().newUploader(board, "192.168.0.1 (myyun)");
 

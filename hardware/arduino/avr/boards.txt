@@ -5,7 +5,7 @@ menu.cpu=Processor
 ##############################################################
 
 yun.name=Arduino Yún
-yun.upload.via_http=true
+yun.upload.via_ssh=true
 
 yun.vid.0=0x2341
 yun.pid.0=0x0041
