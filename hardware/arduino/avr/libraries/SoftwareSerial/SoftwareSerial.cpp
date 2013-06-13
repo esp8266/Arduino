@@ -442,8 +442,7 @@ void SoftwareSerial::setRxIntMsk(bool enable)
 
 void SoftwareSerial::end()
 {
-  if (_rx_delay_stopbit)
-    setRxIntMsk(false);
+  stopListening();
 }
 
 
