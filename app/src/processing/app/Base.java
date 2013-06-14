@@ -28,6 +28,8 @@ import java.io.*;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -127,6 +129,7 @@ public class Base {
 
   static public void main(String args[]) throws Exception {
     System.setProperty(LogFactoryImpl.LOG_PROPERTY, NoOpLog.class.getCanonicalName());
+    Logger.getLogger("javax.jmdns").setLevel(Level.OFF);
 
     initPlatform();
 
