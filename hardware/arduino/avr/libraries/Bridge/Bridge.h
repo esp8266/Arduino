@@ -91,7 +91,7 @@ public:
   }
   
   void begin() {
-    serial.begin(57600);
+    serial.begin(115200);
     BridgeClass::begin();
   }
   
