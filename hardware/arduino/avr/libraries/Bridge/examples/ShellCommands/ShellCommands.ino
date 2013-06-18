@@ -11,8 +11,8 @@ void setup() {
 
 void loop() {
   Process p;
-  // This command line prints the number of bytes received and transmitted from WLAN
-  p.runShellCommand(F("ifconfig wlan0 | grep \"RX bytes\" | tr ':' ' ' | awk \"{ print \\$3 \\\" \\\" \\$8 }\"\n"));
+  // This command line prints the name of the wireless that the board is connected to or that the board has created
+  p.runShellCommand(F("lua /usr/lib/lua/pretty_wifi_info.lua | grep SSID"));
 
   // Read command output
   while (p.available()) {
