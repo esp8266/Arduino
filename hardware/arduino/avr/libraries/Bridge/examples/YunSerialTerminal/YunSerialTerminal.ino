@@ -25,7 +25,7 @@
  This example code is in the public domain.
  */
 
-long lininoBaud = 57600;
+long lininoBaud = 115200;
 
 // Pin 13 has an LED connected on most Arduino boards.
 int led = 13;
