@@ -90,23 +90,23 @@ void modeCommand(String command) {
 }
 
 void reportPinMode(int pin, String mode) {
-  String message = "{\"pin\":";
-  message += pin;
-  message += ", \"mode\": \"";
-  message += mode;
-  message += "\"}";
-  Bridge.writeMessage(message);
+  String json = "{\"pin\":";
+  json += pin;
+  json += ", \"mode\": \"";
+  json += mode;
+  json += "\"}";
+  Bridge.writeJSON(json);
 }
 
 void reportDigitalRead(int pin, boolean dataset) {
   int value = digitalRead(pin);
   
-  String message = "{\"pin\":";
-  message += pin;
-  message += ", \"value\": ";
-  message += value;
-  message += "}";
-  Bridge.writeMessage(message);
+  String json = "{\"pin\":";
+  json += pin;
+  json += ", \"value\": ";
+  json += value;
+  json += "}";
+  Bridge.writeJSON(json);
 
   if (dataset) {
     String key = "D";
@@ -118,12 +118,12 @@ void reportDigitalRead(int pin, boolean dataset) {
 void reportAnalogRead(int pin, boolean dataset) {
   int value = analogRead(pin);
   
-  String message = "{\"pin\":";
-  message += pin;
-  message += ", \"value\": ";
-  message += value;
-  message += "}";
-  Bridge.writeMessage(message);
+  String json = "{\"pin\":";
+  json += pin;
+  json += ", \"value\": ";
+  json += value;
+  json += "}";
+  Bridge.writeJSON(json);
 
   if (dataset) {
     String key = "A";

@@ -72,6 +72,11 @@ void BridgeClass::writeMessage(const String& str) {
   writeMessage((uint8_t*) str.c_str(), str.length());
 }
 
+void BridgeClass::writeJSON(const String& str) {
+  uint8_t cmd[] = {'J'};
+  transfer(cmd, 1, (uint8_t*) str.c_str(), str.length(), NULL, 0);
+}
+
 unsigned int BridgeClass::messageAvailable() {
   uint8_t tmp[] = {'n'};
   uint8_t res[2];

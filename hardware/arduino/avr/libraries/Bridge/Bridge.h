@@ -31,6 +31,7 @@ public:
   unsigned int readMessage(uint8_t *buffer, unsigned int size);
   void writeMessage(const uint8_t *buffer, unsigned int size);
   void writeMessage(const String& str);
+  void writeJSON(const String& str);
   unsigned int messageAvailable();
   
   // Methods to handle key/value datastore
