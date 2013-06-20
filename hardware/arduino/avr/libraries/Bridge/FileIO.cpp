@@ -160,7 +160,13 @@ const char *File::name() {
 
 
 boolean SDClass::begin() {
-  return true;
+  Process chksd;
+  int res = chksd.runShellCommand(F("cat /sys/bus/scsi/drivers/sd/*/block/sda/size"));
+  if (res == 0) {
+    if (chksd.peek() != '0')
+    return true; 
+  }
+  return false;
 }
 
 File SDClass::open(const char *filename, uint8_t mode) {
