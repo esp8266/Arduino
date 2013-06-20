@@ -17,88 +17,117 @@ void loop() {
   delay(100); // Poll every 0.100s
 }
 
-void process(uint8_t buff[], int l) {
-  // "DWppv"   -> digitalWrite(pp, v)
-  // "DRpp"    -> digitalRead(pp)      -> "Dpp0" / "Dpp1"
-  // "AWppvvv" -> analogWrite(pp, vvv)
-  // "ARpp"    -> analogRead(pp)       -> "App0000" - "App1023"
-  // "PIpp"    -> pinMode(pp, INPUT)
-  // "POpp"    -> pinMode(pp, OUTPUT)
+void process(uint8_t buff[], int length) {
+  // "digital/13/1"   -> digitalWrite(13, HIGH)
+  // "digital/13"     -> digitalRead(13)
+  // "analog/2/123"   -> analogWrite(2, 123)
+  // "analog/2"       -> analogRead(2)
+  // "mode/13/input"  -> pinMode(13, INPUT)
+  // "mode/13/output" -> pinMode(13, OUTPUT)
 
   // Sanity check
-  if (l<4 || l>7)
-    return;
-  if (buff[2]<'0' || buff[2]>'9')
-    return;
-  if (buff[3]<'0' || buff[3]>'9')
-    return;
-  char cmd0 = buff[0];
-  char cmd1 = buff[1];
-  int pin = (buff[2]-'0')*10 + (buff[3]-'0');
-  if (pin<0 || pin>13)
+  if (length < 9 || length > 14)
     return;
 
-  // Command selection
-  if (l==5 && cmd0=='D' && cmd1=='W') {
-    char c = buff[4];
-    if (c=='0' || c=='1') {
-      digitalWrite(pin, c-'0');
-      reportDigitalRead(pin, true, true);
-    }
-  } else if (l==4 && cmd0=='D' && cmd1=='R') {
-    reportDigitalRead(pin, true, true);
-  } else if (l==7 && cmd0=='A' && cmd1=='W') {
-    analogWrite(pin, buff[4]);
-    reportAnalogRead(pin);
-  } else if (l==4 && cmd0=='A' && cmd1=='R') {
-    reportAnalogRead(pin);
-  } else if (l==4 && cmd0=='P' && cmd1=='I') {
-    pinMode(pin, INPUT);
-    reportPinMode(pin, INPUT);
-  } else if (l==4 && cmd0=='P' && cmd1=='O') {
+  // string terminator    
+  buff[length] = '\0';
+  
+  String command = String((char*)buff);
+  
+  // digital command
+  if (command.indexOf("digital/") == 0) {
+    command = command.substring(8);
+    digitalCommand(command);
+
+  // analog command  
+  } else if (command.indexOf("analog/") == 0) {
+    command = command.substring(7);
+    analogCommand(command);
+  
+  // mode command
+  } else if (command.indexOf("mode/") == 0) {
+    command = command.substring(5);
+    modeCommand(command);
+  }
+}
+
+void digitalCommand(String command) {
+  int pin, value;
+  if (command.indexOf("/") != -1) {
+    pin = command.substring(0, command.indexOf("/")).toInt();
+    value = command.substring(command.indexOf("/") + 1, command.length()).toInt();
+    digitalWrite(pin, value);
+  } else {
+    pin = command.toInt();
+  }
+  reportDigitalRead(pin, true);
+}
+
+void analogCommand(String command) {
+  int pin, value;
+  if (command.indexOf("/") != -1) {
+    pin = command.substring(0, command.indexOf("/")).toInt();
+    value = command.substring(command.indexOf("/") + 1, command.length()).toInt();
+    analogWrite(pin, value);
+  } else {
+    pin = command.toInt();
+  }
+  reportAnalogRead(pin, true);
+}
+
+void modeCommand(String command) {
+  int pin;
+  String strValue;
+  pin = command.substring(0, command.indexOf("/")).toInt();
+  strValue = command.substring(command.indexOf("/") + 1, command.length());
+  if (strValue == "output") {
     pinMode(pin, OUTPUT);
-    reportPinMode(pin, OUTPUT);
+    reportPinMode(pin, strValue);
+  } else if (strValue == "input") {
+    pinMode(pin, INPUT);
+    reportPinMode(pin, strValue);
   }
 }
 
-void reportPinMode(int pin, uint8_t dir) {
-  uint8_t buff[] = { 'P', 'I', '0', '0' };
-  buff[1] = dir == INPUT ? 'I' : 'O';
-  buff[2] += pin/10;
-  buff[3] += pin%10;
-  Bridge.writeMessage(buff, 4);
+void reportPinMode(int pin, String mode) {
+  String message = "{\"pin\":";
+  message += pin;
+  message += ", \"mode\": \"";
+  message += mode;
+  message += "\"}";
+  Bridge.writeMessage(message);
 }
 
-void reportDigitalRead(int pin, boolean raw, boolean dataset) {
-  // "Dpp0" - "Dpp1"
-  //                  0    1    2    3
-  uint8_t buff[] = { 'D', '0', '0', '0' };
-  buff[1] += pin/10;
-  buff[2] += pin%10;
-  if (digitalRead(pin) == HIGH)
-    buff[3] = '1';
-  if (raw)
-    Bridge.writeMessage(buff, 4);
+void reportDigitalRead(int pin, boolean dataset) {
+  int value = digitalRead(pin);
+  
+  String message = "{\"pin\":";
+  message += pin;
+  message += ", \"value\": ";
+  message += value;
+  message += "}";
+  Bridge.writeMessage(message);
+
   if (dataset) {
-    char *val = "0";
-    val[0] = buff[3];
-    buff[3] = 0;
-    Bridge.put((const char *)buff, val);
+    String key = "D";
+    key += pin;
+    Bridge.put(key.c_str(), String(value).c_str());
   }
 }
 
-void reportAnalogRead(int pin) {
-  // "App0000" - "App1023"
-  //                  0    1    2    3    4    5    6
-  uint8_t buff[] = { 'A', '0', '0', '0', '0', '0', '0' };
-  buff[1] += pin/10;
-  buff[2] += pin%10;
+void reportAnalogRead(int pin, boolean dataset) {
+  int value = analogRead(pin);
+  
+  String message = "{\"pin\":";
+  message += pin;
+  message += ", \"value\": ";
+  message += value;
+  message += "}";
+  Bridge.writeMessage(message);
 
-  int v = analogRead(pin);
-  buff[6] += v%10; v /= 10;
-  buff[5] += v%10; v /= 10;
-  buff[4] += v%10; v /= 10;
-  buff[3] += v;
-  Bridge.writeMessage(buff, 7);
+  if (dataset) {
+    String key = "A";
+    key += pin;
+    Bridge.put(key.c_str(), String(value).c_str());
+  }
 }
-

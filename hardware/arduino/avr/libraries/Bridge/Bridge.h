@@ -30,6 +30,7 @@ public:
   // Methods to handle mailbox messages
   unsigned int readMessage(uint8_t *buffer, unsigned int size);
   void writeMessage(const uint8_t *buffer, unsigned int size);
+  void writeMessage(const String& str);
   unsigned int messageAvailable();
   
   // Methods to handle key/value datastore

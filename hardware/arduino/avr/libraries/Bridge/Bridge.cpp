@@ -68,6 +68,10 @@ void BridgeClass::writeMessage(const uint8_t *buff, unsigned int size) {
   transfer(cmd, 1, buff, size, NULL, 0);
 }
 
+void BridgeClass::writeMessage(const String& str) {
+  writeMessage((uint8_t*) str.c_str(), str.length());
+}
+
 unsigned int BridgeClass::messageAvailable() {
   uint8_t tmp[] = {'n'};
   uint8_t res[2];
