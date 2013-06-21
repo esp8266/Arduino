@@ -16,7 +16,7 @@ void setup() {
 void loop() {
   Process wifiCheck;    // initialize a new process
 
-  wifiCheck.runShellCommand("lua /usr/lib/lua/pretty_wifi_info.lua");        // command you want to run
+  wifiCheck.runShellCommand("lua /arduino/pretty_wifi_info.lua");        // command you want to run
 
   // while there's any characters coming back from the 
   // process, print them to the serial monitor:
