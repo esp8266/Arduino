@@ -13,13 +13,14 @@
 SPIClass::SPIClass(Spi *_spi, uint32_t _id, void(*_initCb)(void)) :
 	spi(_spi), id(_id), initCb(_initCb)
 {
-	initCb();
-
-	SPI_Configure(spi, id, SPI_MR_MSTR | SPI_MR_PS | SPI_MR_MODFDIS);
-	SPI_Enable(spi);
+	// Empty
 }
 
 void SPIClass::begin() {
+	initCb();
+	SPI_Configure(spi, id, SPI_MR_MSTR | SPI_MR_PS | SPI_MR_MODFDIS);
+	SPI_Enable(spi);
+
 	// NPCS control is left to the user
 
 	// Default speed set to 4Mhz
