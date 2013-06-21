@@ -8,8 +8,8 @@
  * analog sensors on analog ins 0, 1, and 2
  * SD card attached to SD card slot of the Arduino Yun
  
- You are allowed to remove the SD card while the Linux and the 
- sketch is running but becareful to don't remove it while
+ You can remove the SD card while the Linux and the 
+ sketch are running but becareful to don't remove it while
  the system is writing on it.
  
  created  24 Nov 2010
@@ -29,19 +29,11 @@ void setup() {
   // Initialize the Bridge and the Console
   Bridge.begin();
   Console.begin();
+  FileSystem.begin();
 
   while(!Console){
     ;  // wait for Console port to connect.
   }
-
-  // see if the card is present and can be initialized:
-  if (!SD.begin()) {
-    Console.println("SD card failed, or not present");
-    // don't do anything more:
-    return;
-  }
-  Console.println("SD card initialized."); 
-
 }
 
 
@@ -62,8 +54,8 @@ void loop () {
 
   // open the file. note that only one file can be open at a time,
   // so you have to close this one before opening another.
-  // The SD card is mounted at the following "/mnt/sda1"
-  File dataFile = SD.open("/mnt/sda1/datalog.txt", FILE_APPEND);
+  // The FileSystem card is mounted at the following "/mnt/FileSystema1"
+  File dataFile = FileSystem.open("/mnt/sda1/datalog.txt", FILE_APPEND);
 
   // if the file is available, write to it:
   if (dataFile) {

@@ -46,7 +46,7 @@ public:
   operator bool();
   const char * name();
 
-  boolean isDirectory(void);
+  boolean iFileSystemirectory(void);
   File openNextFile(uint8_t mode = FILE_READ);
   void rewindDirectory(void);
   
@@ -66,13 +66,11 @@ private:
   uint8_t handle;
 };
 
-class SDClass {
+class FileSystemClass {
 public:
-  SDClass() : bridge(Bridge) { }
-  SDClass(BridgeClass &_b) : bridge(_b) { }
+  FileSystemClass() : bridge(Bridge) { }
+  FileSystemClass(BridgeClass &_b) : bridge(_b) { }
   
-  // This needs to be called to set up the connection to the SD card
-  // before other methods are used.
   boolean begin();
   
   // Open the specified file/directory with the supplied mode (e.g. read or
@@ -98,6 +96,6 @@ private:
   BridgeClass &bridge;
 };
 
-extern SDClass SD;
+extern FileSystemClass FileSystem;
 
 #endif

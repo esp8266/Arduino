@@ -159,21 +159,15 @@ const char *File::name() {
 
 
 
-boolean SDClass::begin() {
-  Process chksd;
-  int res = chksd.runShellCommand(F("cat /sys/bus/scsi/drivers/sd/*/block/sda/size"));
-  if (res == 0) {
-    if (chksd.peek() != '0')
-    return true; 
-  }
-  return false;
+boolean FileSystemClass::begin() {
+  return true;
 }
 
-File SDClass::open(const char *filename, uint8_t mode) {
+File FileSystemClass::open(const char *filename, uint8_t mode) {
   return File(filename, mode);
 }
 
-boolean SDClass::exists(const char *filepath) {
+boolean FileSystemClass::exists(const char *filepath) {
   Process ls;
   ls.begin("ls");
   ls.addParameter(filepath);
@@ -181,7 +175,7 @@ boolean SDClass::exists(const char *filepath) {
   return (res == 0);
 }
 
-boolean SDClass::mkdir(const char *filepath) {
+boolean FileSystemClass::mkdir(const char *filepath) {
   Process mk;
   mk.begin("mkdir");
   mk.addParameter("-p");
@@ -190,7 +184,7 @@ boolean SDClass::mkdir(const char *filepath) {
   return (res == 0);
 }
 
-boolean SDClass::remove(const char *filepath) {
+boolean FileSystemClass::remove(const char *filepath) {
   Process rm;
   rm.begin("rm");
   rm.addParameter(filepath);
@@ -198,7 +192,7 @@ boolean SDClass::remove(const char *filepath) {
   return (res == 0);
 }
 
-boolean SDClass::rmdir(const char *filepath) {
+boolean FileSystemClass::rmdir(const char *filepath) {
   Process rm;
   rm.begin("rmdir");
   rm.addParameter(filepath);
@@ -206,4 +200,4 @@ boolean SDClass::rmdir(const char *filepath) {
   return (res == 0);
 }
 
-SDClass SD;
+FileSystemClass FileSystem;
