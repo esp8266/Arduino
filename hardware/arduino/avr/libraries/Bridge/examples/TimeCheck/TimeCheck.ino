@@ -7,7 +7,7 @@
  using an Arduino Yun. 
  
  created  27 May 2013
- modified 17 June 2013
+ modified 21 June 2013
  By Tom Igoe 
  */
 
@@ -21,15 +21,16 @@ int lastSecond = -1;          // need an impossible value for comparison
 void setup() {
   Serial.begin(9600);    // initialize serial
   Bridge.begin();        // initialize Bridge
-  delay(2000);           // wait 2 seconds
-
+ 
   while(!Serial);                // wait for Serial Monitor to open
   Serial.println("Time Check");  // Title of sketch
 
   // run an initial date process. Should return:
   // hh:mm:ss :
   if (!date.running())  {
-    date.runShellCommand("date +%T");
+    date.begin("date");
+    date.addParameter("+%T");
+    date.run();
   }
 }
 
@@ -48,7 +49,9 @@ void loop() {
 
     // restart the date process:
     if (!date.running())  {
-      date.runShellCommand("date +%T");
+      date.begin("date");
+      date.addParameter("+%T");
+      date.run();
     }
   }
 
@@ -74,4 +77,3 @@ void loop() {
   } 
 
 }
-
