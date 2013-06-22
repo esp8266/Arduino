@@ -2,45 +2,46 @@
   SD card datalogger
  
  This example shows how to log data from three analog sensors 
- to an SD card mounted on the Linux using the Bridge library.
+ to an SD card mounted on the Arduino Yun using the Bridge library.
  	
  The circuit:
  * analog sensors on analog ins 0, 1, and 2
  * SD card attached to SD card slot of the Arduino Yun
  
  You can remove the SD card while the Linux and the 
- sketch are running but becareful to don't remove it while
- the system is writing on it.
+ sketch are running but be careful not to remove it while
+ the system is writing to it.
  
  created  24 Nov 2010
  modified 9 Apr 2012
  by Tom Igoe
  adapted to the Yun Bridge library 20 Jun 2013
  by Federico Vanzati
+ modified  21 Jun 2013
+ by Tom Igoe
  
  This example code is in the public domain.
  	 
  */
 
 #include <FileIO.h>
-#include <Console.h>
+#include <Serial.h>
 
 void setup() {
-  // Initialize the Bridge and the Console
+  // Initialize the Bridge and the Serial
   Bridge.begin();
-  Console.begin();
+  Serial.begin(9600);
   FileSystem.begin();
 
-  while(!Console){
-    ;  // wait for Console port to connect.
-  }
+  while(!Serial);  // wait for Serial port to connect.
+  Serial.println("Filesystem datalogger");
 }
 
 
 void loop () {
   // make a string that start with a timestamp for assembling the data to log:
   String dataString = "";
-  addTimeStamp(dataString);
+  dataString += addTimeStamp();
   dataString += " = ";
 
   // read three sensors and append to the string:
@@ -62,11 +63,11 @@ void loop () {
     dataFile.println(dataString);
     dataFile.close();
     // print to the serial port too:
-    Console.println(dataString);
+    Serial.println(dataString);
   }  
   // if the file isn't open, pop up an error:
   else {
-    Console.println("error opening datalog.txt");
+    Serial.println("error opening datalog.txt");
   } 
   
   delay(15000);
@@ -74,7 +75,8 @@ void loop () {
 }
 
 // This function append a time stamp to the string passed as argument
-void addTimeStamp(String &string) {
+String addTimeStamp() {
+  String result;
   Process time;
   time.begin("date"); 
   time.addParameter("+%D-%T");
@@ -83,6 +85,6 @@ void addTimeStamp(String &string) {
   while(time.available()>0) {
     char c = time.read();
     if(c != '\n')
-      string += c;
+      result += c;
   }
 }
