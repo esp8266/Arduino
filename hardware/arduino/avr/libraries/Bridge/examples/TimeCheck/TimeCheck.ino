@@ -7,6 +7,7 @@
  using an Arduino Yun. 
  
  created  27 May 2013
+ modified 17 June 2013
  By Tom Igoe 
  */
 
@@ -28,9 +29,7 @@ void setup() {
   // run an initial date process. Should return:
   // hh:mm:ss :
   if (!date.running())  {
-    date.begin("date");
-    date.addParameter("+%T");
-    date.run();
+    date.runShellCommand("date +%T");
   }
 }
 
@@ -49,9 +48,7 @@ void loop() {
 
     // restart the date process:
     if (!date.running())  {
-      date.begin("date");
-      date.addParameter("+%T");
-      date.run();
+      date.runShellCommand("date +%T");
     }
   }
 
@@ -77,3 +74,4 @@ void loop() {
   } 
 
 }
+
