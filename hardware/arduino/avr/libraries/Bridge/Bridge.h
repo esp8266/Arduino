@@ -22,7 +22,7 @@
 #include <Arduino.h>
 #include <Stream.h>
 
-class BridgeClass: public Stream {
+class BridgeClass {
 public:
   BridgeClass(Stream &_stream);
   void begin();
@@ -40,17 +40,6 @@ public:
   unsigned int get(const char *key, char *value, unsigned int maxlen)
     { get(key, reinterpret_cast<uint8_t *>(value), maxlen); }
   
-  // Print methods (proxy to "stream" object) [CM: are these really needed?]
-  size_t write(uint8_t c) { return stream.write(c); }
-  size_t write(const uint8_t *buffer, size_t size)
-    { return stream.write(buffer, size); }
-
-  // Stream methods (proxy to "stream" object) [CM: are these really needed?]
-  int available() { return stream.available(); }
-  int read() { return stream.read(); }
-  int peek() { return stream.peek(); }
-  void flush() { stream.flush(); }
-
   // Trasnfer a frame (with error correction and response)
   uint16_t transfer(const uint8_t *buff1, uint16_t len1,
                    const uint8_t *buff2, uint16_t len2,

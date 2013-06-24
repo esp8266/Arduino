@@ -31,19 +31,19 @@ void BridgeClass::begin() {
   do {
     dropAll();
     delay(1100);
-  } while (available()>0);
+  } while (stream.available()>0);
   
   // Bridge startup:
   // - If the bridge is not running starts it safely
-  print(CTRL_C);
+  stream.print(CTRL_C);
   delay(250);
-  print(F("\n"));
+  stream.print(F("\n"));
   delay(500);
-  print(F("\n"));
+  stream.print(F("\n"));
   delay(750);
   // Wait for OpenWRT message
   // "Press enter to activate console"
-  print(F("run-bridge\n"));
+  stream.print(F("run-bridge\n"));
   delay(500);
   dropAll();
   
@@ -111,8 +111,8 @@ void BridgeClass::crcReset() {
 }
 
 void BridgeClass::crcWrite() {
-  write((char)(CRC >> 8));
-  write((char)(CRC & 0xFF));
+  stream.write((char)(CRC >> 8));
+  stream.write((char)(CRC & 0xFF));
 }
 
 bool BridgeClass::crcCheck(uint16_t _CRC) {
@@ -128,24 +128,24 @@ uint16_t BridgeClass::transfer(const uint8_t *buff1, uint16_t len1,
   for ( ; ; delay(100), dropAll() /* Delay for retransmission */) {
     // Send packet
     crcReset();
-    write((char)0xFF);                // Start of packet (0xFF)
+    stream.write((char)0xFF);                // Start of packet (0xFF)
     crcUpdate(0xFF);
-    write((char)index);               // Message index
+    stream.write((char)index);               // Message index
     crcUpdate(index);
-    write((char)((len >> 8) & 0xFF)); // Message length (hi)
+    stream.write((char)((len >> 8) & 0xFF)); // Message length (hi)
     crcUpdate((len >> 8) & 0xFF);
-    write((char)(len & 0xFF));        // Message length (lo)
+    stream.write((char)(len & 0xFF));        // Message length (lo)
     crcUpdate(len & 0xFF);
     for (uint16_t i=0; i<len1; i++) {  // Payload
-      write((char)buff1[i]);
+      stream.write((char)buff1[i]);
       crcUpdate(buff1[i]);
     }
     for (uint16_t i=0; i<len2; i++) {  // Payload
-      write((char)buff2[i]);
+      stream.write((char)buff2[i]);
       crcUpdate(buff2[i]);
     }
     for (uint16_t i=0; i<len3; i++) {  // Payload
-      write((char)buff3[i]);
+      stream.write((char)buff3[i]);
       crcUpdate(buff3[i]);
     }
     crcWrite();                     // CRC
@@ -209,15 +209,15 @@ int BridgeClass::timedRead(unsigned int timeout) {
   int c;
   unsigned long _startMillis = millis();
   do {
-    c = read();
+    c = stream.read();
     if (c >= 0) return c;
   } while(millis() - _startMillis < timeout);
   return -1;     // -1 indicates timeout
 }
 
 void BridgeClass::dropAll() {
-  while (available() > 0) {
-    read();
+  while (stream.available() > 0) {
+    stream.read();
   }
 }
 
