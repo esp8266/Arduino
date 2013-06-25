@@ -2,6 +2,7 @@ package cc.arduino.packages.discoverers;
 
 import cc.arduino.packages.BoardPort;
 import cc.arduino.packages.Discovery;
+import cc.arduino.packages.discoverers.network.NetworkChecker;
 import processing.app.Base;
 import processing.app.helpers.PreferencesMap;
 import processing.app.zeroconf.jmdns.ArduinoDNSTaskStarter;
@@ -12,17 +13,18 @@ import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
-public class NetworkDiscovery implements Discovery, ServiceListener {
+public class NetworkDiscovery implements Discovery, ServiceListener, cc.arduino.packages.discoverers.network.NetworkTopologyListener {
 
+  private Timer timer;
   private List<BoardPort> ports;
+  private final Map<InetAddress, JmDNS> mappedJmDNSs;
 
   public NetworkDiscovery() {
     DNSTaskStarter.Factory.setClassDelegate(new ArduinoDNSTaskStarter());
     this.ports = new ArrayList<BoardPort>();
+    this.mappedJmDNSs = new Hashtable<InetAddress, JmDNS>();
   }
 
   @Override
@@ -56,21 +58,14 @@ public class NetworkDiscovery implements Discovery, ServiceListener {
 
   @Override
   public void start() throws IOException {
-    for (InetAddress addr : NetworkTopologyDiscovery.Factory.getInstance().getInetAddresses()) {
-      JmDNS jmDNS = JmDNS.create(addr);
-      jmDNS.addServiceListener("_arduino._tcp.local.", this);
-    }
+    this.timer = new Timer(this.getClass().getName() + " timer");
+    new NetworkChecker(this, NetworkTopologyDiscovery.Factory.getInstance()).start(timer);
   }
 
   @Override
-  public void stop() {
-    // Removed cleanup: is extremely slow on closing
-
-    // try {
-    // jmDNS.close();
-    // } catch (IOException e) {
-    // e.printStackTrace();
-    // }
+  public void stop() throws IOException {
+    timer.purge();
+    // we don't close each JmDNS instance as it's too slow
   }
 
   @Override
@@ -130,4 +125,29 @@ public class NetworkDiscovery implements Discovery, ServiceListener {
     }
   }
 
+  @Override
+  public void inetAddressAdded(InetAddress address) {
+    if (mappedJmDNSs.containsKey(address)) {
+      return;
+    }
+    try {
+      JmDNS jmDNS = JmDNS.create(address);
+      jmDNS.addServiceListener("_arduino._tcp.local.", this);
+      mappedJmDNSs.put(address, jmDNS);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Override
+  public void inetAddressRemoved(InetAddress address) {
+    JmDNS jmDNS = mappedJmDNSs.remove(address);
+    if (jmDNS != null) {
+      try {
+        jmDNS.close();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+  }
 }
