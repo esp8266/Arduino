@@ -20,6 +20,8 @@ ARDUINO 1.5.3 BETA
 
 [libraries]
 * sam: Added CAN library (still in early stage of development) (Palliser)
+* sam: Bugfix SPI library: begin() after end() now works (stimmer)
+* sam: Bugfix SPI library: incorrent pin configuration in non-extended mode.
 
 [firmwares]
 * Arduino Due: fixed USB2Serial garbage at startup (https://github.com/arduino/Arduino/pull/1267)
