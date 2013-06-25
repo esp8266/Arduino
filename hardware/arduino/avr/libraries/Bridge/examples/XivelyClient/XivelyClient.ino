@@ -33,10 +33,10 @@ String dataString = "";
 void setup() {
   // start serial port:
   Bridge.begin();
-  Console.begin();
+  Serial.begin(9600);
 
-  while(!Console);    // wait for Network Console to open
-  Console.println("Xively client");
+  while(!Serial);    // wait for Network Serial to open
+  Serial.println("Xively client");
 
   // Do a first update immediately
   updateData();
@@ -83,7 +83,7 @@ void sendData() {
   // sendData function finishes the resources are immediately
   // released. Declaring it global works too, BTW.
   Process xively;
-  Console.print("\n\nSending data... ");
+  Serial.print("\n\nSending data... ");
   xively.begin("curl");
   xively.addParameter("-k");
   xively.addParameter("--request");
@@ -94,13 +94,13 @@ void sendData() {
   xively.addParameter(apiString); 
   xively.addParameter(url);
   xively.run();
-  Console.println("done!");
+  Serial.println("done!");
 
   // If there's incoming data from the net connection,
-  // send it out the Console:
+  // send it out the Serial:
   while (xively.available()>0) {
     char c = xively.read();
-    Console.write(c);
+    Serial.write(c);
   }
 
 }

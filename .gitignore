@@ -26,3 +26,5 @@ test-bin
 .idea
 
 hardware/arduino/avr/libraries/Bridge/examples/XivelyClient/passwords.h
+
+hardware/arduino/avr/libraries/Bridge/examples/.DS_Store
