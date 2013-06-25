@@ -23,7 +23,7 @@ public interface Discovery {
   /**
    * Stop discovery service
    */
-  public void stop();
+  public void stop() throws Exception;
 
   /**
    * Return the list of discovered ports.

@@ -1,12 +1,12 @@
 package cc.arduino.packages;
 
-import static processing.app.I18n._;
+import cc.arduino.packages.discoverers.NetworkDiscovery;
+import cc.arduino.packages.discoverers.SerialDiscovery;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import cc.arduino.packages.discoverers.NetworkDiscovery;
-import cc.arduino.packages.discoverers.SerialDiscovery;
+import static processing.app.I18n._;
 
 public class DiscoveryManager {
 
@@ -25,7 +25,7 @@ public class DiscoveryManager {
         e.printStackTrace();
       }
     }
-    
+
     Runtime.getRuntime().addShutdownHook(closeHook);
   }
 
@@ -39,8 +39,13 @@ public class DiscoveryManager {
   private Thread closeHook = new Thread(new Runnable() {
     @Override
     public void run() {
-      for (Discovery d : discoverers)
-        d.stop();
+      for (Discovery d : discoverers) {
+        try {
+          d.stop();
+        } catch (Exception e) {
+          e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+      }
     }
   });
 }
