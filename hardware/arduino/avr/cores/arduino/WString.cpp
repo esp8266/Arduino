@@ -325,14 +325,14 @@ unsigned char String::concat(unsigned long num)
 unsigned char String::concat(float num)
 {
 	char buf[20];
-	char* string = dtostrf(num, 8, 6, buf);
+	char* string = dtostrf(num, 8, 2, buf);
 	return concat(string, strlen(string));
 }
 
 unsigned char String::concat(double num)
 {
 	char buf[20];
-	char* string = dtostrf(num, 8, 6, buf);
+	char* string = dtostrf(num, 8, 2, buf);
 	return concat(string, strlen(string));
 }
 
