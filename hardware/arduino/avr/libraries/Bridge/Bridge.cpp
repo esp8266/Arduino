@@ -58,32 +58,6 @@ void BridgeClass::begin() {
 	while (true);
 }
 
-unsigned int BridgeClass::readMessage(uint8_t *buff, unsigned int size) {
-  uint8_t tmp[] = { 'm' };
-  return transfer(tmp, 1, buff, size);
-}
-
-void BridgeClass::writeMessage(const uint8_t *buff, unsigned int size) {
-  uint8_t cmd[] = {'M'};
-  transfer(cmd, 1, buff, size, NULL, 0);
-}
-
-void BridgeClass::writeMessage(const String& str) {
-  writeMessage((uint8_t*) str.c_str(), str.length());
-}
-
-void BridgeClass::writeJSON(const String& str) {
-  uint8_t cmd[] = {'J'};
-  transfer(cmd, 1, (uint8_t*) str.c_str(), str.length(), NULL, 0);
-}
-
-unsigned int BridgeClass::messageAvailable() {
-  uint8_t tmp[] = {'n'};
-  uint8_t res[2];
-  transfer(tmp, 1, res, 2);
-  return (res[0] << 8) + res[1];
-}
-
 void BridgeClass::put(const char *key, const char *value) {
   // TODO: do it in a more efficient way
   String cmd = "D";

@@ -27,13 +27,6 @@ public:
   BridgeClass(Stream &_stream);
   void begin();
   
-  // Methods to handle mailbox messages
-  unsigned int readMessage(uint8_t *buffer, unsigned int size);
-  void writeMessage(const uint8_t *buffer, unsigned int size);
-  void writeMessage(const String& str);
-  void writeJSON(const String& str);
-  unsigned int messageAvailable();
-  
   // Methods to handle key/value datastore
   void put(const char *key, const char *value);
   unsigned int get(const char *key, uint8_t *buff, unsigned int size);
