@@ -36,7 +36,7 @@ public class SSHUploader extends Uploader {
   }
 
   @Override
-  public boolean uploadUsingPreferences(String buildPath, String className, boolean usingProgrammer) throws RunnerException {
+  public boolean uploadUsingPreferences(File sourcePath, String buildPath, String className, boolean usingProgrammer) throws RunnerException {
     if (usingProgrammer) {
       System.err.println(_("Http upload using programmer not supported"));
       return false;
@@ -51,7 +51,8 @@ public class SSHUploader extends Uploader {
       session.setUserInfo(new NetworkMonitor.NoInteractionUserInfo());
       session.connect(30000);
 
-      String uploadedSketchFile = new SCP(session).scpHexToBoard(buildPath, className);
+      SCP scp = new SCP(session);
+      String uploadedSketchFile = scp.scpHexToBoard(buildPath, className);
 
       TargetPlatform targetPlatform = Base.getTargetPlatform();
       PreferencesMap prefs = Preferences.getMap();
@@ -127,16 +128,9 @@ public class SSHUploader extends Uploader {
     protected int consumeOutputSyncAndReturnExitCode(Channel channel, InputStream stdout, InputStream stderr) throws IOException {
       byte[] tmp = new byte[102400];
       while (true) {
-        while (stdout.available() > 0) {
-          int i = stdout.read(tmp, 0, tmp.length);
-          if (i < 0) break;
-          System.out.print(new String(tmp, 0, i));
-        }
-        while (stderr != null && stderr.available() > 0) {
-          int i = stderr.read(tmp, 0, tmp.length);
-          if (i < 0) break;
-          System.err.print(new String(tmp, 0, i));
-        }
+        consumeStream(tmp, stdout, System.out);
+        consumeStream(tmp, stderr, System.err);
+
         if (channel.isClosed()) {
           return channel.getExitStatus();
         }
@@ -145,6 +139,16 @@ public class SSHUploader extends Uploader {
         } catch (Exception ee) {
           // noop
         }
+      }
+    }
+
+    private void consumeStream(byte[] buffer, InputStream in, PrintStream out) throws IOException {
+      while (in != null && in.available() > 0) {
+        int length = in.read(buffer, 0, buffer.length);
+        if (length < 0) {
+          break;
+        }
+        out.print(new String(buffer, 0, length));
       }
     }
 
@@ -173,13 +177,13 @@ public class SSHUploader extends Uploader {
       super(session);
     }
 
-    public String scpHexToBoard(String buildPath, String className) throws JSchException, IOException {
+    public void scpFile(File from, String absolutePathToDestination) throws JSchException, IOException {
       Channel channel = null;
       OutputStream out = null;
       InputStream in = null;
       try {
         channel = session.openChannel("exec");
-        ((ChannelExec) channel).setCommand("scp -t " + SKETCH_FILE);
+        ((ChannelExec) channel).setCommand("scp -t " + absolutePathToDestination);
 
         out = channel.getOutputStream();
         in = channel.getInputStream();
@@ -188,15 +192,11 @@ public class SSHUploader extends Uploader {
 
         ensureAcknowledged(out, in);
 
-        File hex = new File(buildPath, className + ".hex");
-
-        sendFileSizeAndName(out, in, hex);
+        sendFileSizeAndName(out, in, from);
         ensureAcknowledged(out, in);
 
-        sendFileContents(out, hex);
+        sendFileContents(out, from);
         ensureAcknowledged(out, in);
-
-        return SKETCH_FILE;
       } finally {
         if (out != null) {
           out.close();
@@ -208,6 +208,11 @@ public class SSHUploader extends Uploader {
           channel.disconnect();
         }
       }
+    }
+
+    public String scpHexToBoard(String buildPath, String className) throws JSchException, IOException {
+      scpFile(new File(buildPath, className + ".hex"), SKETCH_FILE);
+      return SKETCH_FILE;
     }
 
     private void ensureAcknowledged(OutputStream out, InputStream in) throws IOException {

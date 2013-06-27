@@ -30,6 +30,7 @@ package cc.arduino.packages.uploaders;
 
 import static processing.app.I18n._;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,9 +48,7 @@ import processing.app.helpers.StringReplacer;
 
 public class SerialUploader extends Uploader  {
 
-  public boolean uploadUsingPreferences(String buildPath, String className,
-                                        boolean usingProgrammer)
-      throws RunnerException {
+  public boolean uploadUsingPreferences(File sourcePath, String buildPath, String className, boolean usingProgrammer) throws RunnerException {
     // FIXME: Preferences should be reorganized
     TargetPlatform targetPlatform = Base.getTargetPlatform();
     PreferencesMap prefs = Preferences.getMap();
@@ -61,7 +60,7 @@ public class SerialUploader extends Uploader  {
     if (usingProgrammer || prefs.get("upload.protocol") == null) {
       return uploadUsingProgrammer(buildPath, className);
     }
-    
+
     // need to do a little dance for Leonardo and derivatives:
     // open then close the port at the magic baudrate (usually 1200 bps) first
     // to signal to the sketch that it should reset into bootloader. after doing
@@ -70,10 +69,10 @@ public class SerialUploader extends Uploader  {
     // sketch.
     String t = prefs.get("upload.use_1200bps_touch");
     boolean doTouch = t != null && t.equals("true");
-    
+
     t = prefs.get("upload.wait_for_upload_port");
     boolean waitForUploadPort = (t != null) && t.equals("true");
-    
+
     if (doTouch) {
       String uploadPort = prefs.get("serial.port");
       try {
@@ -93,7 +92,7 @@ public class SerialUploader extends Uploader  {
           // have already occured before we start scanning.
           if (!Base.isMacOS())
             Thread.sleep(300);
-          
+
           uploadPort = waitForUploadPort(uploadPort, before);
         } else {
           Thread.sleep(400);
@@ -109,7 +108,7 @@ public class SerialUploader extends Uploader  {
       else
         prefs.put("serial.port.file", uploadPort);
     }
-    
+
     prefs.put("build.path", buildPath);
     prefs.put("build.project_name", className);
     if (verbose)
@@ -130,7 +129,7 @@ public class SerialUploader extends Uploader  {
     } catch (Exception e) {
       throw new RunnerException(e);
     }
-    
+
     // Remove the magic baud rate (1200bps) to avoid
     // future unwanted board resets
     try {
@@ -212,7 +211,7 @@ public class SerialUploader extends Uploader  {
         return uploadPort;
       }
     }
-    
+
     // Something happened while detecting port
     throw new RunnerException(
         _("Couldn't find a Board on the selected port. Check that you have the correct port selected.  If it is correct, try pressing the board's reset button after initiating the upload."));
@@ -256,10 +255,10 @@ public class SerialUploader extends Uploader  {
       throw new RunnerException(e);
     }
   }
-  
+
   public boolean burnBootloader() throws RunnerException {
     TargetPlatform targetPlatform = Base.getTargetPlatform();
-    
+
     // Find preferences for the selected programmer
     PreferencesMap programmerPrefs;
     String programmer = Preferences.get("programmer");
@@ -272,12 +271,12 @@ public class SerialUploader extends Uploader  {
     } else {
       programmerPrefs = targetPlatform.getProgrammer(programmer);
     }
-    
+
     // Build configuration for the current programmer
     PreferencesMap prefs = Preferences.getMap();
     prefs.putAll(Base.getBoardPreferences());
     prefs.putAll(programmerPrefs);
-    
+
     // Create configuration for bootloader tool
     PreferencesMap toolPrefs = new PreferencesMap();
     String tool = prefs.get("bootloader.tool");
@@ -295,7 +294,7 @@ public class SerialUploader extends Uploader  {
     if (toolPrefs.size() == 0)
       throw new RunnerException(I18n.format(_("Could not find tool {0}"),
                                             tool));
-    
+
     // Merge tool with global configuration
     prefs.putAll(toolPrefs);
     if (verbose) {
@@ -305,7 +304,7 @@ public class SerialUploader extends Uploader  {
       prefs.put("erase.verbose", prefs.get("erase.params.quiet"));
       prefs.put("bootloader.verbose", prefs.get("bootloader.params.quiet"));
     }
-    
+
     try {
       String pattern = prefs.get("erase.pattern");
       String[] cmd = StringReplacer.formatAndSplit(pattern, prefs, true);

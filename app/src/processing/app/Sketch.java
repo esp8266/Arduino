@@ -1684,7 +1684,7 @@ public class Sketch {
       }
 
       try {
-        success = uploader.uploadUsingPreferences(buildPath, suggestedClassName, usingProgrammer);
+        success = uploader.uploadUsingPreferences(getFolder(), buildPath, suggestedClassName, usingProgrammer);
       } finally {
         if (uploader.requiresAuthorization() && !success) {
           Preferences.remove(uploader.getAuthorizationKey());

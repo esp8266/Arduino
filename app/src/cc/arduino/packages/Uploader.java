@@ -26,24 +26,60 @@
 
 package cc.arduino.packages;
 
-import static processing.app.I18n._;
-
-import java.util.Collection;
-
 import processing.app.I18n;
 import processing.app.Preferences;
 import processing.app.debug.MessageConsumer;
 import processing.app.debug.MessageSiphon;
 import processing.app.debug.RunnerException;
 
-public abstract class Uploader implements MessageConsumer  {
+import java.io.File;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
-  private String error = null;
+import static processing.app.I18n._;
 
-  protected boolean verbose = Preferences.getBoolean("upload.verbose");
+public abstract class Uploader implements MessageConsumer {
 
-  public abstract boolean uploadUsingPreferences(String buildPath, String className, boolean usingProgrammer)
-    throws RunnerException;
+  private static final List<String> STRINGS_TO_SUPPRESS;
+  private static final List<String> AVRDUDE_PROBLEMS;
+
+  static {
+    STRINGS_TO_SUPPRESS = Arrays.asList("Connecting to programmer:",
+            "Found programmer: Id = \"CATERIN\"; type = S",
+            "Software Version = 1.0; No Hardware Version given.",
+            "Programmer supports auto addr increment.",
+            "Programmer supports buffered memory access with buffersize=128 bytes.",
+            "Programmer supports the following devices:", "Device code: 0x44");
+
+    AVRDUDE_PROBLEMS = Arrays.asList("Programmer is not responding",
+            "programmer is not responding",
+            "protocol error", "avrdude: ser_open(): can't open device",
+            "avrdude: ser_drain(): read error",
+            "avrdude: ser_send(): write error",
+            "avrdude: error: buffered memory access not supported.");
+  }
+
+  private static boolean stringContainsOneOf(String input, List<String> listOfStrings) {
+    for (String string : listOfStrings) {
+      if (input.contains(string)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private String error;
+  protected boolean verbose;
+  protected boolean notFoundError;
+
+  protected Uploader() {
+    this.error = null;
+    this.verbose = Preferences.getBoolean("upload.verbose");
+    this.notFoundError = false;
+  }
+
+  public abstract boolean uploadUsingPreferences(File sourcePath, String buildPath, String className, boolean usingProgrammer) throws RunnerException;
 
   public abstract boolean burnBootloader() throws RunnerException;
 
@@ -55,13 +91,11 @@ public abstract class Uploader implements MessageConsumer  {
     return null;
   }
 
-  protected boolean executeUploadCommand(Collection<String> command)
-      throws RunnerException {
+  protected boolean executeUploadCommand(Collection<String> command) throws RunnerException {
     return executeUploadCommand(command.toArray(new String[0]));
   }
 
-  protected boolean executeUploadCommand(String command[])
-      throws RunnerException {
+  protected boolean executeUploadCommand(String command[]) throws RunnerException {
     notFoundError = false;
     int result = -1;
 
@@ -80,29 +114,21 @@ public abstract class Uploader implements MessageConsumer  {
     } catch (Exception e) {
       e.printStackTrace();
     }
-      
+
     if (error != null) {
       RunnerException exception = new RunnerException(error);
       exception.hideStackTrace();
       throw exception;
     }
 
-    return result == 0;      
+    return result == 0;
   }
-
-  boolean notFoundError;
 
   public void message(String s) {
     // selectively suppress a bunch of avrdude output for AVR109/Caterina that should already be quelled but isn't
-    if (!verbose && (
-      s.indexOf("Connecting to programmer:") != -1 ||
-      s.indexOf("Found programmer: Id = \"CATERIN\"; type = S") != -1 ||
-      s.indexOf("Software Version = 1.0; No Hardware Version given.") != -1 ||
-      s.indexOf("Programmer supports auto addr increment.") != -1 ||
-      s.indexOf("Programmer supports buffered memory access with buffersize=128 bytes.") != -1 ||
-      s.indexOf("Programmer supports the following devices:") != -1 ||
-      s.indexOf("Device code: 0x44") != -1))
+    if (!verbose && stringContainsOneOf(s, STRINGS_TO_SUPPRESS)) {
       s = "";
+    }
 
     System.err.print(s);
 
@@ -119,13 +145,7 @@ public abstract class Uploader implements MessageConsumer  {
       error = _("Device is not responding, check the right serial port is selected or RESET the board right before exporting");
       return;
     }
-    if (s.contains("Programmer is not responding") ||
-        s.contains("programmer is not responding") ||
-        s.contains("protocol error") ||
-        s.contains("avrdude: ser_open(): can't open device") ||
-        s.contains("avrdude: ser_drain(): read error") ||
-        s.contains("avrdude: ser_send(): write error") ||
-        s.contains("avrdude: error: buffered memory access not supported.")) {
+    if (stringContainsOneOf(s, AVRDUDE_PROBLEMS)) {
       error = _("Problem uploading to board.  See http://www.arduino.cc/en/Guide/Troubleshooting#upload for suggestions.");
       return;
     }
