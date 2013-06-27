@@ -17,31 +17,6 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-/* 
- 
- A servo is activated by creating an instance of the Servo class passing the desired pin to the attach() method.
- The servos are pulsed in the background using the value most recently written using the write() method
- 
- Note that analogWrite of PWM on pins associated with the timer are disabled when the first servo is attached.
- Timers are seized as needed in groups of 12 servos - 24 servos use two timers, 48 servos will use four.
- 
- The methods are:
- 
- Servo - Class for manipulating servo motors connected to Arduino pins.
- 
- attach(pin )  - Attaches a servo motor to an i/o pin.
- attach(pin, min, max  ) - Attaches to a pin setting min and max values in microseconds
- default min is 544, max is 2400  
- 
- write()     - Sets the servo angle in degrees.  (invalid angle that is valid as pulse in microseconds is treated as microseconds)
- writeMicroseconds() - Sets the servo pulse width in microseconds 
- read()      - Gets the last written servo pulse width as an angle between 0 and 180. 
- readMicroseconds()   - Gets the last written servo pulse width in microseconds. (was read_us() in first release)
- attached()  - Returns true if there is a servo attached. 
- detach()    - Stops an attached servos from pulsing its i/o pin. 
- 
-*/
-
 #include <avr/interrupt.h>
 #include <Arduino.h> 
 
@@ -100,28 +75,28 @@ static inline void handle_interrupts(timer16_Sequence_t timer, volatile uint16_t
 #ifndef WIRING // Wiring pre-defines signal handlers so don't define any if compiling for the Wiring platform
 // Interrupt handlers for Arduino 
 #if defined(_useTimer1)
-ISR(TIMER1_COMPA_vect) 
+SIGNAL (TIMER1_COMPA_vect) 
 { 
   handle_interrupts(_timer1, &TCNT1, &OCR1A); 
 }
 #endif
 
 #if defined(_useTimer3)
-ISR(TIMER3_COMPA_vect) 
+SIGNAL (TIMER3_COMPA_vect) 
 { 
   handle_interrupts(_timer3, &TCNT3, &OCR3A); 
 }
 #endif
 
 #if defined(_useTimer4)
-ISR(TIMER4_COMPA_vect) 
+SIGNAL (TIMER4_COMPA_vect) 
 {
   handle_interrupts(_timer4, &TCNT4, &OCR4A); 
 }
 #endif
 
 #if defined(_useTimer5)
-ISR(TIMER5_COMPA_vect) 
+SIGNAL (TIMER5_COMPA_vect) 
 {
   handle_interrupts(_timer5, &TCNT5, &OCR5A); 
 }
@@ -335,3 +310,4 @@ bool Servo::attached()
 {
   return servos[this->servoIndex].Pin.isActive ;
 }
+
