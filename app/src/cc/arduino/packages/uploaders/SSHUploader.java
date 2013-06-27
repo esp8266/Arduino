@@ -8,6 +8,7 @@ import processing.app.NetworkMonitor;
 import processing.app.Preferences;
 import processing.app.debug.RunnerException;
 import processing.app.debug.TargetPlatform;
+import processing.app.helpers.FileUtils;
 import processing.app.helpers.PreferencesMap;
 
 import java.io.*;
@@ -52,6 +53,15 @@ public class SSHUploader extends Uploader {
       session.connect(30000);
 
       SCP scp = new SCP(session);
+      SSH ssh = new SSH(session);
+
+      File www = new File(sourcePath, "www");
+      if (www.exists() && www.isDirectory() && www.canExecute() && canUploadWebFiles(ssh)) {
+        File destination = new File("/www/sd/" + www.getParentFile().getName());
+        ssh.execSyncCommand("mkdir -p " + FileUtils.getLinuxPathFrom(destination), System.out);
+        copyWebFiles(scp, ssh, www, destination);
+      }
+
       String uploadedSketchFile = scp.scpHexToBoard(buildPath, className);
 
       TargetPlatform targetPlatform = Base.getTargetPlatform();
@@ -74,12 +84,36 @@ public class SSHUploader extends Uploader {
     }
   }
 
+  private void copyWebFiles(SCP scp, SSH ssh, File from, File destination) throws IOException, JSchException {
+    File[] files = from.listFiles();
+    if (files == null) {
+      throw new IOException("Cannot list files in " + from);
+    }
+    for (File file : files) {
+      if (file.isDirectory() && file.canExecute()) {
+        File newDestination = new File(destination, file.getName());
+        ssh.execSyncCommand("mkdir -p " + FileUtils.getLinuxPathFrom(newDestination), System.out);
+        copyWebFiles(scp, ssh, file, newDestination);
+      } else {
+        scp.scpFile(file, FileUtils.getLinuxPathFrom(new File(destination, file.getName())));
+      }
+    }
+  }
+
+  private boolean canUploadWebFiles(SSH ssh) throws JSchException, IOException {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    PrintStream ps = new PrintStream(baos);
+    ssh.execSyncCommand("if [ -L /www/sd ] && [ -d /www/sd ]; then echo 1; else echo 0; fi", ps);
+    String output = new String(baos.toByteArray());
+    return "1".equals(output.trim());
+  }
+
   @Override
   public boolean burnBootloader() throws RunnerException {
     throw new RunnerException("Can't burn bootloader via SSH");
   }
 
-  private static abstract class SSH {
+  private static class SSH {
 
     protected final Session session;
 
@@ -87,11 +121,11 @@ public class SSHUploader extends Uploader {
       this.session = session;
     }
 
-    protected boolean execSyncCommand(String command) throws JSchException, IOException {
-      return execSyncCommand(command, false);
+    protected boolean execSyncCommand(String command, PrintStream stdoutConsumer) throws JSchException, IOException {
+      return execSyncCommand(command, stdoutConsumer, null);
     }
 
-    protected boolean execSyncCommand(String command, boolean ignoreError) throws JSchException, IOException {
+    protected boolean execSyncCommand(String command, PrintStream stdoutConsumer, PrintStream stderrConsumer) throws JSchException, IOException {
       InputStream stdout = null;
       InputStream stderr = null;
       Channel channel = null;
@@ -102,15 +136,15 @@ public class SSHUploader extends Uploader {
         channel.setInputStream(null);
 
         stdout = channel.getInputStream();
-        if (!ignoreError) {
+        if (stderrConsumer != null) {
           stderr = ((ChannelExec) channel).getErrStream();
         }
 
         channel.connect();
 
-        int exitCode = consumeOutputSyncAndReturnExitCode(channel, stdout, stderr);
+        int exitCode = consumeOutputSyncAndReturnExitCode(channel, stdout, stdoutConsumer, stderr, stderrConsumer);
 
-        return ignoreError || exitCode == 0;
+        return stderrConsumer == null || exitCode == 0;
 
       } finally {
         if (stdout != null) {
@@ -125,11 +159,11 @@ public class SSHUploader extends Uploader {
       }
     }
 
-    protected int consumeOutputSyncAndReturnExitCode(Channel channel, InputStream stdout, InputStream stderr) throws IOException {
+    protected int consumeOutputSyncAndReturnExitCode(Channel channel, InputStream stdout, PrintStream stdoutConsumer, InputStream stderr, PrintStream stderrConsumer) throws IOException {
       byte[] tmp = new byte[102400];
       while (true) {
-        consumeStream(tmp, stdout, System.out);
-        consumeStream(tmp, stderr, System.err);
+        consumeStream(tmp, stdout, stdoutConsumer);
+        consumeStream(tmp, stderr, stderrConsumer);
 
         if (channel.isClosed()) {
           return channel.getExitStatus();
@@ -161,9 +195,9 @@ public class SSHUploader extends Uploader {
     }
 
     public boolean runAVRDude(String sketchFile, String additionalParams) throws IOException, JSchException {
-      boolean success = execSyncCommand("merge-sketch-with-bootloader " + sketchFile);
-      success = success && execSyncCommand("kill-bridge", true);
-      success = success && execSyncCommand("run-avrdude " + sketchFile + " '" + additionalParams + "'");
+      boolean success = execSyncCommand("merge-sketch-with-bootloader " + sketchFile, System.out, System.err);
+      success = success && execSyncCommand("kill-bridge", System.out);
+      success = success && execSyncCommand("run-avrdude " + sketchFile + " '" + additionalParams + "'", System.out, System.err);
       return success;
     }
 
