@@ -14,6 +14,8 @@
  
  '~' followed by '0' -> Set the UART speed to 57600 baud
  '~' followed by '1' -> Set the UART speed to 115200 baud
+ '~' followed by '2' -> Set the UART speed to 250000 baud
+ '~' followed by '3' -> Set the UART speed to 500000 baud
  
  The circuit:
  * Arduino Yun
@@ -25,22 +27,12 @@
  This example code is in the public domain.
  */
 
-long lininoBaud = 115200;
-
-// Pin 13 has an LED connected on most Arduino boards.
-int led = 13;
-int ledState = HIGH;   // whether the LED is high or low      
-
+long lininoBaud = 250000;
 
 void setup() {
   Serial.begin(115200);      // open serial connection via USB-Serial
   Serial1.begin(lininoBaud); // open serial connection to Linino
-
-  // initialize the digital pin as an output.
-  pinMode(led, OUTPUT);    
-  digitalWrite(led, ledState);   // turn the LED on (HIGH is the voltage level)
 }
-
 
 boolean commandMode = false;
 
@@ -61,22 +53,21 @@ void loop() {
       } else if (c == '1') {          //     '1' key pressed?
         Serial1.begin(115200);        //        set speed to 115200
         Serial.println("Speed set to 115200");
+      } else if (c == '2') {          //     '2' key pressed?
+        Serial1.begin(250000);        //        set speed to 250000
+        Serial.println("Speed set to 250000");
+      } else if (c == '3') {          //     '3' key pressed?
+        Serial1.begin(500000);        //        set speed to 500000
+        Serial.println("Speed set to 500000");
       } else {                        //     any other key pressed?
         Serial1.write('~');           //        write '~' to Linino
         Serial1.write(c);             //        write char to Linino
       }
       commandMode = false;            //     in all cases exit from command mode
     }
-    ledState=!ledState;               // invert LED state
-    digitalWrite(led, ledState);      // toggle the LED
   }
   if (Serial1.available()) {          // got anything from Linino?         
     char c = (char)Serial1.read();    // read from Linino  
     Serial.write(c);                  // write to USB-serial
   }
 }
-
-
-
-
-
