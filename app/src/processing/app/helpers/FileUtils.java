@@ -5,16 +5,17 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 public class FileUtils {
 
+  private static final Pattern BACKSLASH = Pattern.compile("\\\\");
+
   /**
    * Checks, whether the child directory is a subdirectory of the base directory.
-   * 
-   * @param base
-   *          the base directory.
-   * @param child
-   *          the suspected child directory.
+   *
+   * @param base  the base directory.
+   * @param child the suspected child directory.
    * @return true, if the child is a subdirectory of the base directory.
    */
   public static boolean isSubDirectory(File base, File child) {
@@ -157,5 +158,9 @@ public class FileUtils {
     }
 
     return relative + target.substring(origin.length() + 1);
+  }
+
+  public static String getLinuxPathFrom(File file) {
+    return BACKSLASH.matcher(file.getAbsolutePath()).replaceAll("/");
   }
 }
