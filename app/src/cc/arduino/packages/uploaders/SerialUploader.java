@@ -141,7 +141,7 @@ public class SerialUploader extends Uploader  {
           // sketch serial port reconnects (or timeout after a few seconds if the
           // sketch port never comes back). Doing this saves users from accidentally
           // opening Serial Monitor on the soon-to-be-orphaned bootloader port.
-          Thread.sleep(500);
+          Thread.sleep(1000);
           long timeout = System.currentTimeMillis() + 2000;
           while (timeout > System.currentTimeMillis()) {
             List<String> portList = Serial.list();
