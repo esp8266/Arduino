@@ -13,14 +13,19 @@ import processing.app.Preferences;
 import processing.app.debug.RunnerException;
 import processing.app.debug.TargetPlatform;
 import processing.app.helpers.PreferencesMap;
+import processing.app.helpers.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 
 import static processing.app.I18n._;
 
 public class SSHUploader extends Uploader {
+
+  private static final List<String> FILES_NOT_TO_COPY = Arrays.asList(".DS_Store", ".Trash", "Thumbs.db", "__MACOSX");
 
   private final String ipAddress;
 
@@ -142,12 +147,14 @@ public class SSHUploader extends Uploader {
     }
 
     for (File file : files) {
-      if (file.isDirectory() && file.canExecute()) {
-        scp.startFolder(file.getName());
-        recursiveSCP(file, scp);
-        scp.endFolder();
-      } else if (file.isFile() && file.canRead()) {
-        scp.sendFile(file);
+      if (!StringUtils.stringContainsOneOf(file.getName(), FILES_NOT_TO_COPY)) {
+        if (file.isDirectory() && file.canExecute()) {
+          scp.startFolder(file.getName());
+          recursiveSCP(file, scp);
+          scp.endFolder();
+        } else if (file.isFile() && file.canRead()) {
+          scp.sendFile(file);
+        }
       }
     }
   }

@@ -31,6 +31,7 @@ import processing.app.Preferences;
 import processing.app.debug.MessageConsumer;
 import processing.app.debug.MessageSiphon;
 import processing.app.debug.RunnerException;
+import processing.app.helpers.StringUtils;
 
 import java.io.File;
 import java.util.Arrays;
@@ -58,15 +59,6 @@ public abstract class Uploader implements MessageConsumer {
             "avrdude: ser_drain(): read error",
             "avrdude: ser_send(): write error",
             "avrdude: error: buffered memory access not supported.");
-  }
-
-  private static boolean stringContainsOneOf(String input, List<String> listOfStrings) {
-    for (String string : listOfStrings) {
-      if (input.contains(string)) {
-        return true;
-      }
-    }
-    return false;
   }
 
   private String error;
@@ -126,7 +118,7 @@ public abstract class Uploader implements MessageConsumer {
 
   public void message(String s) {
     // selectively suppress a bunch of avrdude output for AVR109/Caterina that should already be quelled but isn't
-    if (!verbose && stringContainsOneOf(s, STRINGS_TO_SUPPRESS)) {
+    if (!verbose && StringUtils.stringContainsOneOf(s, STRINGS_TO_SUPPRESS)) {
       s = "";
     }
 
@@ -145,7 +137,7 @@ public abstract class Uploader implements MessageConsumer {
       error = _("Device is not responding, check the right serial port is selected or RESET the board right before exporting");
       return;
     }
-    if (stringContainsOneOf(s, AVRDUDE_PROBLEMS)) {
+    if (StringUtils.stringContainsOneOf(s, AVRDUDE_PROBLEMS)) {
       error = _("Problem uploading to board.  See http://www.arduino.cc/en/Guide/Troubleshooting#upload for suggestions.");
       return;
     }

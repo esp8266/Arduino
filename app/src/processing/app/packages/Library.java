@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-import static processing.app.helpers.StringMatchers.wildcardMatch;
+import static processing.app.helpers.StringUtils.wildcardMatch;
 
 public class Library {
 
