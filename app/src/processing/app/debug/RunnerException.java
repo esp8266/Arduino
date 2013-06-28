@@ -29,7 +29,7 @@ package processing.app.debug;
  * during either compile time or run time.
  */
 @SuppressWarnings("serial")
-public class RunnerException extends Exception /*RuntimeException*/ {
+public class RunnerException extends Exception {
   protected String message;
   protected int codeIndex;
   protected int codeLine;
@@ -66,7 +66,8 @@ public class RunnerException extends Exception /*RuntimeException*/ {
   
   
   public RunnerException(Exception e) {
-    this(e.getMessage(), true);
+    super(e);
+    this.showStackTrace = true;
   }
 
   /** 
