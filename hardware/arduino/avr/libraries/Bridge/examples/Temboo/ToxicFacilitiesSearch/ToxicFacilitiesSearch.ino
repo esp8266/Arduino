@@ -1,0 +1,174 @@
+/*
+  ToxicFacilitiesSearch
+  
+  Demonstrates making a request to the Envirofacts API using the Temboo Arduino Yun SDK.
+  This example retrieves the names and addresses of EPA-regulated facilities in the 
+  Toxins Release Inventory (TRI) database within a given zip code.
+  
+  Check out the latest Arduino & Temboo examples and support docs at http://www.temboo.com/arduino
+
+  A Temboo account and application key are necessary to run all Temboo examples. 
+  If you don't already have one, you can register for a free Temboo account at 
+  http://www.temboo.com
+  
+  This example assumes basic familiarity with Arduino sketches, and that your Yun is connected
+  to the Internet.
+
+  Looking for another API? We've got over 100 in our Library!
+  
+  This example code is in the public domain.
+*/
+
+#include <Bridge.h>
+#include <Console.h>
+#include <FileIO.h>
+#include <HttpClient.h>
+#include <Process.h>
+#include "TembooAccount.h" // contains Temboo account information
+                           // as described in the footer comment below
+
+// the zip code to search
+const String US_ZIP_CODE = "11215";
+
+int numRuns = 1;   // execution count, so that this doesn't run forever
+int maxRuns = 10;  // max number of times the Envirofacts FacilitiesSearch Choreo should be run
+
+void setup() {
+  Serial.begin(9600);
+    
+  // for debugging, wait until a serial console is connected
+  delay(4000);
+  while(!Serial);
+  Bridge.begin();
+}
+
+void loop()
+{
+  // while we haven't reached the max number of runs...
+  if (numRuns <= maxRuns) {
+      
+    // print status
+    Serial.println("Running ToxicFacilitiesSearch - Run #" + String(numRuns++) + "...");
+
+    // we need a Process object to send a Choreo request to Temboo
+    Process FacilitiesSearchByZipChoreo;
+
+    // invoke the Temboo client
+    FacilitiesSearchByZipChoreo.begin("temboo");
+        
+    // set Temboo account credentials
+    FacilitiesSearchByZipChoreo.addParameter("-a");
+    FacilitiesSearchByZipChoreo.addParameter(TEMBOO_ACCOUNT);
+    FacilitiesSearchByZipChoreo.addParameter("-u");
+    FacilitiesSearchByZipChoreo.addParameter(TEMBOO_APP_KEY_NAME);
+    FacilitiesSearchByZipChoreo.addParameter("-p");
+    FacilitiesSearchByZipChoreo.addParameter(TEMBOO_APP_KEY);
+  
+    // identify the Temboo Library choreo to run (EnviroFacts > Toxins > FacilitiesSearchByZip)
+    FacilitiesSearchByZipChoreo.addParameter("-c");
+    FacilitiesSearchByZipChoreo.addParameter("/Library/EnviroFacts/Toxins/FacilitiesSearchByZip");
+        
+    // set choreo inputs; in this case, the US zip code for which to retrieve toxin release data
+    // the Temboo client provides standardized calls to 100+ cloud APIs
+    FacilitiesSearchByZipChoreo.addParameter("-i");
+    FacilitiesSearchByZipChoreo.addParameter("Zip:" + US_ZIP_CODE);
+    
+    // specify two output filters, to help simplify the Envirofacts API results.
+    // see the tutorials on using Temboo SDK output filters at http://www.temboo.com/arduino
+    FacilitiesSearchByZipChoreo.addParameter("-o");
+    FacilitiesSearchByZipChoreo.addParameter("fac:FACILITY_NAME:Response");
+
+    FacilitiesSearchByZipChoreo.addParameter("-o");
+    FacilitiesSearchByZipChoreo.addParameter("addr:STREET_ADDRESS:Response");
+
+    // run the choreo 
+    FacilitiesSearchByZipChoreo.run();
+    
+    String facs;
+    String addrs;
+
+    // when the choreo results are available, process them.
+    // the output filters we specified will return comma delimited
+    // lists containing the name and street address of the facilities
+    // located in the specified zip code.
+    while(FacilitiesSearchByZipChoreo.available()) {
+      String name = FacilitiesSearchByZipChoreo.readStringUntil('\x1F');
+      name.trim();
+
+      String data = FacilitiesSearchByZipChoreo.readStringUntil('\x1E');
+      data.trim();
+
+      if (name == "fac") {
+        facs = data;
+      } else if (name == "addr") {
+        addrs = data;
+      }
+    }
+    FacilitiesSearchByZipChoreo.close();
+    
+    // parse the comma delimited lists of facilities to join the 
+    // name with the address and print it to the serial monitor
+    if (facs.length() > 0) {
+      int i = -1;
+      int fstart = 0;
+      int astart = 0;
+      String f;
+      String a;
+      do {
+        i = facs.indexOf(',', fstart);
+        if (i >= 0) {
+          f = facs.substring(fstart, i);
+          fstart = i + 1;
+        }
+
+        i = addrs.indexOf(',', astart);
+        if (i >= 0) {
+          a = addrs.substring(astart, i);
+          astart = i + 1;
+        }
+        
+        if (i >= 0) {
+          printResult(f, a);
+        }
+
+      }while (i >= 0);
+      f = facs.substring(fstart);
+      a = addrs.substring(astart);
+      printResult(f, a);
+    } else {
+      Serial.println("No facilities found in zip code " + US_ZIP_CODE);
+    }
+  }
+
+  Serial.println("Sleeping...");
+  Serial.println("");
+  delay(30000); // sleep 30 seconds between calls
+}
+
+// a simple utility function, to output the facility name and address in the serial monitor.
+void printResult(String fac, String addr) {
+  Serial.print(fac);
+  Serial.print(" - ");
+  Serial.println(addr);
+}
+
+/*
+  IMPORTANT NOTE: TembooAccount.h:
+
+  TembooAccount.h is a file referenced by this sketch that contains your Temboo account information. 
+  You need to create this file. To do so, make a new tab in Arduino, call it TembooAccount.h, and 
+  include the following variables and constants:
+
+  #define TEMBOO_ACCOUNT "myTembooAccountName"  // your Temboo account name 
+  #define TEMBOO_APP_KEY_NAME "myFirstApp"  // your Temboo app key name
+  #define TEMBOO_APP_KEY  "xxx-xxx-xxx-xx-xxx"  // your Temboo app key
+
+  The same TembooAccount.h file settings can be used for all Temboo SDK sketches.
+
+  You can find your Temboo App Key information on the Temboo website, 
+  under My Account > Application Keys
+  
+  Keeping your account information in a separate file means you can save it once, 
+  then just distribute the main .ino file without worrying that you forgot to delete your credentials.
+*/
+

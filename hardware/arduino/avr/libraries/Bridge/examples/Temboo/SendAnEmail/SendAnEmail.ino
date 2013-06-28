@@ -1,8 +1,9 @@
 /*
   SendAnEmail
 
-  Demonstrates sending an email via a Google Gmail account 
-  using the Temboo Arduino Yun SDK.
+  Demonstrates sending an email via a Google Gmail account using the Temboo Arduino Yun SDK.
+
+  Check out the latest Arduino & Temboo examples and support docs at http://www.temboo.com/arduino
 
   A Temboo account and application key are necessary to run all Temboo examples. 
   If you don't already have one, you can register for a free Temboo account at 
@@ -13,9 +14,10 @@
   to log into your Gmail account: substitute the placeholders below for these values.
 
   This example assumes basic familiarity with Arduino sketches, and that your Yun is connected
-  to the Internet. For more tutorials on using the Temboo Library and Temboo Arduino Yun SDK, visit 
-  http://www.temboo.com/arduino
+  to the Internet.
   
+  Looking for another API? We've got over 100 in our Library!
+
   This example code is in the public domain.
 */
 
@@ -24,7 +26,19 @@
 #include <FileIO.h>
 #include <HttpClient.h>
 #include <Process.h>
-#include "TembooAccount.h" // contains Temboo account information, as described below
+#include "TembooAccount.h" // contains Temboo account information
+                           // as described in the footer comment below
+
+/*** SUBSTITUTE YOUR VALUES BELOW: ***/
+
+// your Gmail address, eg "bob.smith@gmail.com"
+const String GMAIL_USER_NAME = "xxxxxxxxxx";
+
+// your Gmail password
+const String GMAIL_PASSWORD = "xxxxxxxxxx";
+
+// the email address you want to send the email to, eg "jane.doe@temboo.com"
+const String TO_EMAIL_ADDRESS = "xxxxxxxxxx";
 
 
 boolean success = false; // a flag to indicate whether we've sent the email yet or not
@@ -44,7 +58,7 @@ void loop()
   // only try to send the email if we haven't already sent it successfully
   if (!success) {
 
-    Serial.println("Running SendEmail ...");
+    Serial.println("Running SendAnEmail...");
     
     // we need a Process object to send a Choreo request to Temboo
     Process SendEmailChoreo;
@@ -69,15 +83,17 @@ void loop()
     // for complete details about the inputs for this Choreo
 
     // the first input is a your Gmail user name. 
-    // NOTE: substitute your own value, retaining the "Username:" prefix.
     SendEmailChoreo.addParameter("-i");
-    SendEmailChoreo.addParameter("Username:your-gmail-username");
+    SendEmailChoreo.addParameter("Username:" + GMAIL_USER_NAME);
     
     // next is your Gmail password.
-    // NOTE: substitute your own value, retaining the "Password:" prefix
     SendEmailChoreo.addParameter("-i");
-    SendEmailChoreo.addParameter("Password:your-gmail-password");
- 
+    SendEmailChoreo.addParameter("Password:" + GMAIL_PASSWORD);
+
+    // who to send the email to
+    SendEmailChoreo.addParameter("-i");
+    SendEmailChoreo.addParameter("ToAddress:" + TO_EMAIL_ADDRESS);
+        
     // then a subject line
     SendEmailChoreo.addParameter("-i");
     SendEmailChoreo.addParameter("Subject:ALERT: Greenhouse Temperature");
@@ -86,16 +102,6 @@ void loop()
     SendEmailChoreo.addParameter("-i");
     SendEmailChoreo.addParameter("MessageBody:Hey! The greenhouse is too cold!");
 
-    // next is the email address of who the email is from.
-    // NOTE: substitute your Gmail address, retaining the "FromAddress:" prefix.
-    SendEmailChoreo.addParameter("-i");
-    SendEmailChoreo.addParameter("FromAddress:your-gmail-email-address");
-
-    // who to send the email to
-    // NOTE: substitute your desired recipient, retaining the "ToAddress:" prefix
-    SendEmailChoreo.addParameter("-i");
-    SendEmailChoreo.addParameter("ToAddress:recipient-email-address");
-    
     // tell the Process to run and wait for the results. The 
     // return code (rc) will tell us whether the Temboo client 
     // was able to send our request to the Temboo servers
@@ -132,11 +138,10 @@ void loop()
 
   The same TembooAccount.h file settings can be used for all Temboo SDK sketches.
 
-  Visit https://www.temboo.com/account to access your Temboo account credentials. 
+  You can find your Temboo App Key information on the Temboo website, 
+  under My Account > Application Keys
 
   Keeping your account information in a separate file means you can save it once, 
   then just distribute the main .ino file without worrying that you forgot to delete your credentials.
-
-  (Be sure to delete this comment after creating your TembooAccount.h file!)
 */
 

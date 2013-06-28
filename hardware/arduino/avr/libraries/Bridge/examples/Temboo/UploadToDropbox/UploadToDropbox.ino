@@ -1,0 +1,212 @@
+/*
+  UploadToDropbox
+  
+  Demonstrates uploading a file to Dropbox using the Temboo Arduino Yun SDK.
+
+  Check out the latest Arduino & Temboo examples and support docs at http://www.temboo.com/arduino
+
+  A Temboo account and application key are necessary to run all Temboo examples. 
+  If you don't already have one, you can register for a free Temboo account at 
+  http://www.temboo.com
+
+  You'll also need a valid Dropbox account, and OAuth credentials for Dropbox. To
+  obtain OAuth credentials for Dropbox, you'll need to register a Dropbox app at 
+  https://www.dropbox.com/developers/apps and then follow the instructions at 
+  https://www.temboo.com/library/Library/Dropbox/OAuth/ to run the Initialize and Finalize
+  OAuth Choreos to complete the OAuth handshake and retrieve your Access Token information.
+
+  This example assumes basic familiarity with Arduino sketches, and that your Yun is connected
+  to the Internet.
+
+  Looking for another API? We've got over 100 in our Library!
+  
+  This example code is in the public domain.
+*/
+
+#include <Bridge.h>
+#include <Console.h>
+#include <FileIO.h>
+#include <HttpClient.h>
+#include <Process.h>
+#include "TembooAccount.h" // contains Temboo account information
+                           // as described in the footer comment below
+
+
+/*** SUBSTITUTE YOUR VALUES BELOW: ***/
+
+// your Dropbox app key, available on the Dropbox developer console after registering an app
+const String DROPBOX_APP_KEY = "xxxxxxxxxx";
+
+// your Dropbox app secret, available on the Dropbox developer console after registering an app 
+const String DROPBOX_APP_SECRET = "xxxxxxxxxx";
+
+// your Dropbox access token, which is returned by the FinalizeOAuth Choreo
+const String DROPBOX_ACCESS_TOKEN = "xxxxxxxxxx";
+
+// your Dropbox access token secret, which is returned by the FinalizeOAuth Choreo
+const String DROPBOX_ACCESS_TOKEN_SECRET = "xxxxxxxxxx";
+
+
+boolean success = false; // a flag to indicate whether we've uploaded the file yet
+
+void setup() {
+  Serial.begin(9600);
+  
+  // For debugging, wait until a serial console is connected.
+  delay(4000);
+  while(!Serial);
+  Bridge.begin();
+}
+
+void loop()
+{
+  // only try to upload the file if we haven't already done so
+  if (!success) {
+    
+    Serial.println("Base64 encoding data to upload...");
+    
+    // base64 encode the data to upload
+    String base64EncodedData = base64Encode("Hello, Arduino!");
+
+
+    Serial.println("Uploading data to Dropbox...");
+
+    // we need a Process object to send a Choreo request to Temboo    
+    Process UploadFileChoreo;
+
+    // invoke the Temboo client
+    UploadFileChoreo.begin("temboo");
+    
+    // set Temboo account credentials
+    UploadFileChoreo.addParameter("-a");
+    UploadFileChoreo.addParameter(TEMBOO_ACCOUNT);
+    UploadFileChoreo.addParameter("-u");
+    UploadFileChoreo.addParameter(TEMBOO_APP_KEY_NAME);
+    UploadFileChoreo.addParameter("-p");
+    UploadFileChoreo.addParameter(TEMBOO_APP_KEY);
+
+    // identify the Temboo Library choreo to run (Dropbox > FilesAndMetadata > UploadFile)
+    UploadFileChoreo.addParameter("-c");
+    UploadFileChoreo.addParameter("/Library/Dropbox/FilesAndMetadata/UploadFile");
+    
+    // set the required choreo inputs
+    // see https://www.temboo.com/library/Library/Dropbox/FilesAndMetadata/UploadFile/
+    // for complete details about the inputs for this Choreo
+
+    // first specify the name of the file to create/update on Dropbox
+    UploadFileChoreo.addParameter("-i");
+    UploadFileChoreo.addParameter("FileName:ArduinoTest.txt");
+
+    // next, the root folder on Dropbox relative to which the file path is specified.
+    // unless you're using an in-production Dropbox app, this should be left as "sandbox"
+    UploadFileChoreo.addParameter("-i");
+    UploadFileChoreo.addParameter("Root:sandbox");
+
+    // next, the Base64 encoded file data to upload
+    UploadFileChoreo.addParameter("-i");
+    UploadFileChoreo.addParameter("FileContents:" + base64EncodedData);
+   
+    // finally, the Dropbox OAuth credentials defined above
+    UploadFileChoreo.addParameter("-i");
+    UploadFileChoreo.addParameter("AppSecret:" + DROPBOX_APP_SECRET);
+    UploadFileChoreo.addParameter("-i");
+    UploadFileChoreo.addParameter("AccessToken:" + DROPBOX_ACCESS_TOKEN);
+    UploadFileChoreo.addParameter("-i");
+    UploadFileChoreo.addParameter("AccessTokenSecret:" + DROPBOX_ACCESS_TOKEN_SECRET);
+    UploadFileChoreo.addParameter("-i");
+    UploadFileChoreo.addParameter("AppKey:" + DROPBOX_APP_KEY);
+
+    // tell the Process to run and wait for the results. The 
+    // return code (rc) will tell us whether the Temboo client 
+    // was able to send our request to the Temboo servers
+    unsigned int rc = UploadFileChoreo.run();
+
+    // a return code of zero (0) means everything worked
+    if (rc == 0) {
+        Serial.println("Success! File uploaded!");
+        success = true;
+    } else {
+      // a non-zero return code means there was an error
+      Serial.println("Uh-oh! Something went wrong!");
+    }
+    
+    // print out the full response to the serial monitor in all
+    // cases, just for debugging
+    while (UploadFileChoreo.available()) {
+      Serial.print((char)UploadFileChoreo.read());
+    }
+    UploadFileChoreo.close();
+
+    Serial.println("Sleeping...");
+  }
+
+  delay(30000); // sleep 30 seconds between upload attempts
+}
+
+
+/*
+  A utility function to Base64 encode the specified string
+  by calling a Temboo Utilities Choreo.
+*/
+String base64Encode(String toEncode) {
+  
+    // we need a Process object to send a Choreo request to Temboo
+    Process Base64EncodeChoreo;
+
+    // invoke the Temboo client
+    Base64EncodeChoreo.begin("temboo");
+    
+    // set Temboo account credentials
+    Base64EncodeChoreo.addParameter("-a");
+    Base64EncodeChoreo.addParameter(TEMBOO_ACCOUNT);
+    Base64EncodeChoreo.addParameter("-u");
+    Base64EncodeChoreo.addParameter(TEMBOO_APP_KEY_NAME);
+    Base64EncodeChoreo.addParameter("-p");
+    Base64EncodeChoreo.addParameter(TEMBOO_APP_KEY);
+
+    // identify the Temboo Library choreo to run (Utilities > Encoding > Base64Encode)
+    Base64EncodeChoreo.addParameter("-c");
+    Base64EncodeChoreo.addParameter("/Library/Utilities/Encoding/Base64Encode");
+ 
+     // set choreo inputs
+    Base64EncodeChoreo.addParameter("-i");
+    Base64EncodeChoreo.addParameter("Text:" + toEncode);
+    
+    // run the choreo
+    Base64EncodeChoreo.run();
+    
+    // read in the choreo results, and return the "Base64EncodedText" output value.
+    // see http://www.temboo.com/arduino for more details on using choreo outputs.
+    while(Base64EncodeChoreo.available()) {
+      // read the name of the output item
+      String name = Base64EncodeChoreo.readStringUntil('\x1F');
+      name.trim();
+
+      // read the value of the output item
+      String data = Base64EncodeChoreo.readStringUntil('\x1E');
+      data.trim();
+
+      if(name == "Base64EncodedText") {
+        return data;
+      }
+    }
+}
+
+/*
+  IMPORTANT NOTE About TembooAccount.h:
+
+  TembooAccount.h is not included with this example because it contains your account information.
+  You need to create it for your own version of this application.  To do so, make
+  a new tab in Arduino, call it TembooAccount.h, and include the following variables and constants:
+
+  #define TEMBOO_ACCOUNT "matthew-yun"  // your Temboo account name 
+  #define TEMBOO_APP_KEY_NAME "someKey"  // your Temboo app key name
+  #define TEMBOO_APP_KEY  "fveIrkjAVIkuNUUPE6df"  // your Temboo app key
+  The same TembooAccount.h file settings can be used for all Temboo SDK sketches.
+
+  You can find your Temboo App Key information on the Temboo website, 
+  under My Account > Application Keys
+
+  Keeping your account information in a separate file means you can save it once, 
+  then just distribute the main .ino file without worrying that you forgot to delete your credentials.
+*/

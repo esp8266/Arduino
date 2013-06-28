@@ -4,6 +4,8 @@
   Demonstrates retrieving the most recent Tweet from a user's home timeline 
   using the Temboo Arduino Yun SDK.
 
+  Check out the latest Arduino & Temboo examples and support docs at http://www.temboo.com/arduino
+
   A Temboo account and application key are necessary to run all Temboo examples. 
   If you don't already have one, you can register for a free Temboo account at 
   http://www.temboo.com
@@ -14,8 +16,9 @@
   Substitute these values for the placeholders below. 
 
   This example assumes basic familiarity with Arduino sketches, and that your Yun 
-  is connected to the Internet. For more tutorials on using the Temboo Library and 
-  Temboo Arduino Yun SDK, visit http://www.temboo.com/arduino
+  is connected to the Internet.
+
+  Looking for social APIs? We've got Facebook, Google+, Instagram, Tumblr and more.
   
   This example code is in the public domain.
 */
@@ -25,7 +28,15 @@
 #include <FileIO.h>
 #include <HttpClient.h>
 #include <Process.h>
-#include "TembooAccount.h" // contains Temboo account information, as described below
+#include "TembooAccount.h" // contains Temboo account information
+                           // as described in the footer comment below
+
+/*** SUBSTITUTE YOUR VALUES BELOW: ***/
+
+const String TWITTER_ACCESS_TOKEN = "your-twitter-access-token";
+const String TWITTER_ACCESS_TOKEN_SECRET = "your-twitter-access-token-secret";
+const String TWITTER_CONSUMER_KEY = "your-twitter-consumer-key";
+const String TWITTER_CONSUMER_SECRET = "your-twitter-consumer-secret";
 
 int numRuns = 0;   // execution count, so this sketch doesn't run forever
 int maxRuns = 10;  // the max number of times the Twitter HomeTimeline Choreo should run
@@ -45,7 +56,7 @@ void loop()
   if (numRuns < maxRuns) {
 
     // print status
-    Serial.println("Running HomeTimeline - Run #" + String(numRuns++));
+    Serial.println("Running ReadATweet - Run #" + String(numRuns++) + "...");
 
     // define the Process that will be used to call the "temboo" client            
     Process HomeTimelineChoreo;
@@ -71,18 +82,16 @@ void loop()
 
     HomeTimelineChoreo.addParameter("-i");
     HomeTimelineChoreo.addParameter("Count:1");  // the max number of Tweets to return from each request
-    
-    // IMPORTANT! You'll need to substitute your own Access Token, Access Token Secret, 
-    // Consumer Secret, and Consumer Key from the Twitter dev console into the method calls
-    // below. (Make sure not to delete the "AccessToken:" etc prefixes!)
+   
+    // add the Twitter account information
     HomeTimelineChoreo.addParameter("-i");
-    HomeTimelineChoreo.addParameter("AccessToken:your-twitter-access-token");
+    HomeTimelineChoreo.addParameter("AccessToken:" + TWITTER_ACCESS_TOKEN);
     HomeTimelineChoreo.addParameter("-i");
-    HomeTimelineChoreo.addParameter("AccessTokenSecret:your-twitter-access-token-secret");
+    HomeTimelineChoreo.addParameter("AccessTokenSecret:" + TWITTER_ACCESS_TOKEN_SECRET);
     HomeTimelineChoreo.addParameter("-i");
-    HomeTimelineChoreo.addParameter("ConsumerSecret:your-twitter-consumer-secret");
+    HomeTimelineChoreo.addParameter("ConsumerSecret:" + TWITTER_CONSUMER_SECRET);
     HomeTimelineChoreo.addParameter("-i");
-    HomeTimelineChoreo.addParameter("ConsumerKey:your-twitter-consumer-key");
+    HomeTimelineChoreo.addParameter("ConsumerKey:" + TWITTER_CONSUMER_KEY);
    
     // next, we'll define two output filters that let us specify the 
     // elements of the response from Twitter that we want to receive.
@@ -151,6 +160,7 @@ void loop()
   }
 
   Serial.println("Sleeping...");
+  Serial.println("");
   delay(90000); // sleep 90 seconds between HomeTimeline calls
 }
 
@@ -167,7 +177,8 @@ void loop()
 
   The same TembooAccount.h file settings can be used for all Temboo SDK sketches.
 
-  Visit https://www.temboo.com/account to access your Temboo account credentials. 
+  You can find your Temboo App Key information on the Temboo website, 
+  under My Account > Application Keys
 
   Keeping your account information in a separate file means you can save it once, 
   then just distribute the main .ino file without worrying that you forgot to delete your credentials.
