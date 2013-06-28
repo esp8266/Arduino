@@ -120,8 +120,20 @@ public class NetworkDiscovery implements Discovery, ServiceListener, cc.arduino.
     port.setProtocol("network");
     port.setPrefs(prefs);
     port.setLabel(label);
+
     synchronized (this) {
+      removeDuplicateBoards(port);
       ports.add(port);
+    }
+  }
+
+  private void removeDuplicateBoards(BoardPort newBoard) {
+    Iterator<BoardPort> iterator = ports.iterator();
+    while (iterator.hasNext()) {
+      BoardPort board = iterator.next();
+      if (newBoard.getAddress().equals(board.getAddress()) && newBoard.getBoardName().equals(board.getBoardName())) {
+        iterator.remove();
+      }
     }
   }
 
