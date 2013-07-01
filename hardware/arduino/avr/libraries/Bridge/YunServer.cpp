@@ -19,7 +19,7 @@
 #include <YunServer.h>
 
 YunServer::YunServer(uint16_t _p, BridgeClass &_b) :
-  bridge(_b), port(_p), listening(false) {
+  bridge(_b), port(_p), listening(false), useLocalhost(false) {
 }
 
 void YunServer::begin() {
@@ -29,7 +29,10 @@ void YunServer::begin() {
     port & 0xFF
   };
   uint8_t res[1];
-  bridge.transfer(tmp, 3, (const uint8_t *)"0.0.0.0", 7, res, 1);
+  String address = F("127.0.0.1");
+  if (!useLocalhost)
+    address = F("0.0.0.0");
+  bridge.transfer(tmp, 3, (const uint8_t *)address.c_str(), address.length(), res, 1);
   listening = (res[0] == 1);
 }
 

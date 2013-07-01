@@ -35,9 +35,13 @@ public:
 
   virtual size_t write(uint8_t c) { /* TODO */ }
 
+  void listenOnLocalhost()   { useLocalhost = true; }
+  void noListenOnLocalhost() { useLocalhost = false; }
+
 private:
   uint16_t port;
   bool listening;
+  bool useLocalhost;
   BridgeClass &bridge;
 };
 
