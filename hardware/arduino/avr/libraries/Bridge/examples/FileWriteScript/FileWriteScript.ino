@@ -7,6 +7,8 @@
  created 7 June 2010
  by Cristian Maglie 
  
+ This example code is in the public domain.
+
  */
  
 #include <FileIO.h>
