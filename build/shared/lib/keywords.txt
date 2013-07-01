@@ -186,6 +186,25 @@ readBytes	KEYWORD2
 readBytesUntil	KEYWORD2
 readString	KEYWORD2
 readStringUntil	KEYWORD2
+trim	KEYWORD2
+toUpperCase	KEYWORD2
+toLowerCase	KEYWORD2
+charAt	KEYWORD2
+compareTo	KEYWORD2
+concat	KEYWORD2
+endsWith	KEYWORD2
+startsWith	KEYWORD2
+equals	KEYWORD2
+equalsIgnoreCase	KEYWORD2
+getBytes	KEYWORD2
+indexOf	KEYWORD2
+lastIndexOf	KEYWORD2
+length	KEYWORD2
+replace	KEYWORD2
+setCharAt	KEYWORD2
+substring	KEYWORD2
+toCharArray	KEYWORD2
+toInt	KEYWORD2
 
 # USB-related keywords
 
