@@ -8,6 +8,7 @@
 
 Bridge	KEYWORD3
 FileIO	KEYWORD3
+FileSystem	KEYWORD3
 Console	KEYWORD3
 Process	KEYWORD3
 MailBox	KEYWORD3
