@@ -29,6 +29,8 @@ public:
   
   // Methods to handle key/value datastore
   void put(const char *key, const char *value);
+  void put(const String &key, const String &value)
+    { put(key.c_str(), value.c_str()); }
   unsigned int get(const char *key, uint8_t *buff, unsigned int size);
   unsigned int get(const char *key, char *value, unsigned int maxlen)
     { get(key, reinterpret_cast<uint8_t *>(value), maxlen); }
