@@ -4,11 +4,14 @@
  
  Gets the time from the linino processor via Bridge
  then parses out hours, minutes and seconds for the Arduino
- using an Arduino Yun. 
+ using an Arduino Yún. 
  
  created  27 May 2013
  modified 21 June 2013
  By Tom Igoe 
+
+ This example code is in the public domain.
+
  */
 
 
@@ -19,10 +22,10 @@ int hours, minutes, seconds;  // for the results
 int lastSecond = -1;          // need an impossible value for comparison
 
 void setup() {
-  Serial.begin(9600);    // initialize serial
   Bridge.begin();        // initialize Bridge
+  Serial.begin(9600);    // initialize serial  
  
-  while(!Serial);                // wait for Serial Monitor to open
+  while(!Serial);               // wait for Serial Monitor to open
   Serial.println("Time Check");  // Title of sketch
 
   // run an initial date process. Should return:
