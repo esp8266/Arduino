@@ -7,22 +7,21 @@
  created 5 Jun 2013
  by Cristian Maglie
  
+ This example code is in the public domain.
+
  */
 
 #include <Process.h>
 
 void setup() {
-  // Setup Bridge (needed every time we communicate with the Arduino Yún)
+  // Initialize Bridge
   Bridge.begin();
   
-  // Setup Console
-  Console.begin();
-  // Buffering improves Console performance, but we must remember to
-  // finish sending using the Console.flush() command.
-  Console.buffer(64);
+  // Initialize Serial
+  Serial.begin(9600);
   
-  // Wait until a Network Monitor is connected.
-  while (!Console);
+  // Wait until a Serial Monitor is connected.
+  while (!Serial);
 
   // run various example processes
   runCurl();
@@ -34,37 +33,38 @@ void loop() {
 }
 
 void runCurl() {
-  // Launch "curl" command and get Arduino asciilogo from the network
-  
-  Process p;                 // Create a process and call it "p"
-  p.begin("curl");           // Process should launch the "curl" command
+  // Launch "curl" command and get Arduino ascii art logo from the network
+  // curl is command line program for transferring data using different internet protocols
+  Process p;		// Create a process and call it "p"
+  p.begin("curl");	// Process that launch the "curl" command
   p.addParameter("http://arduino.cc/asciilogo.txt"); // Add the URL parameter to "curl"
-  p.run();                   // Run the process and wait for its termination
+  p.run();		// Run the process and wait for its termination
 
-  // Print arduino logo over the console.
+  // Print arduino logo over the Serial
   // A process output can be read with the stream methods
   while (p.available()>0) {
     char c = p.read();
-    Console.print(c);
+    Serial.print(c);
   }
-  // Ensure the latest bit of data is sent.
-  Console.flush();
+  // Ensure the last bit of data is sent.
+  Serial.flush();
 }
 
 void runCpuInfo() {
   // Launch "cat /proc/cpuinfo" command (shows info on Atheros CPU)
-  Process p;
-  p.begin("cat");
-  p.addParameter("/proc/cpuinfo");
-  p.run();
+  // cat is a command line utility that shows the content of a file
+  Process p;		// Create a process and call it "p"
+  p.begin("cat");	// Process that launch the "cat" command
+  p.addParameter("/proc/cpuinfo"); // Add the cpuifo file path as parameter to cut
+  p.run();		// Run the process and wait for its termination
 
-  // Print command output on the Console.
+  // Print command output on the Serial.
   // A process output can be read with the stream methods
   while (p.available()>0) {
     char c = p.read();
-    Console.print(c);
+    Serial.print(c);
   }
-  // Ensure the latest bit of data is sent.
-  Console.flush();
+  // Ensure the last bit of data is sent.
+  Serial.flush();
 }
 
