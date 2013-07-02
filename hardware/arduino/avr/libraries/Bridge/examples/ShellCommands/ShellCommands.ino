@@ -1,6 +1,6 @@
 
 /*
- Running shell coommands using Process class. 
+  Running shell commands using Process class. 
  
  This sketch demonstrate how to run linux shell commands
  using an Arduino Yún. It runs the wifiCheck script on the linino side
@@ -23,9 +23,11 @@
 #include <Process.h>
 
 void setup() {
-  // initialize the Bridge and Serial connections:
-  Bridge.begin();
-  Serial.begin(9600);
+  Bridge.begin();	// Initialize the Bridge
+  Serial.begin(9600);	// Initialize the Serial
+
+  // Wait until a Serial Monitor is connected.
+  while(!Serial);
 }
 
 void loop() {
@@ -40,12 +42,12 @@ void loop() {
 
   // Read command output. runShellCommand() should have passed "Signal: xx&":
   while (p.available()) {
-    int result = p.parseInt();                // look for an integer
-    int signal = map(result, 0, 100, 0, 255); // map result from 0-100 range to 0-255
-    analogWrite(9, signal);                   // set the brightness of LED on pin 9
-    Serial.println(result);                   // print the number as well
+    int result = p.parseInt();			// look for an integer
+    int signal = map(result, 0, 100, 0, 255);	// map result from 0-100 range to 0-255
+    analogWrite(9, signal);			// set the brightness of LED on pin 9
+    Serial.println(result);			// print the number as well
   } 
-  delay(5000);    // wait 5 seconds before you do it again
+  delay(5000);  // wait 5 seconds before you do it again
 }
 
 

@@ -6,7 +6,7 @@
  it receives the character 'H', and turns off the LED when it
  receives the character 'L'.
  
- To see the Console, pick your Yun's name and IP address in the Port menu
+ To see the Console, pick your Yún's name and IP address in the Port menu
  then open the Port Monitor. You can also see it by opening a terminal window
  and typing 
  ssh root@ yourYunsName.local 'telnet localhost 6571'
@@ -24,17 +24,21 @@
  This example code is in the public domain.
  
  */
+
 #include <Console.h>
 
 const int ledPin = 13; // the pin that the LED is attached to
 char incomingByte;      // a variable to read incoming Console data into
 
 void setup() {
-  // initialize Console communication:
-  Bridge.begin();
-  Console.begin();
-  while(!Console);  // wait for the Console to open from the remote side
+  Bridge.begin();   // Initialize Bridge
+  Console.begin();  // Initialize Console
+
+  // Wait for the Console port to connect
+  while(!Console);
+
   Console.println("type H or L to turn pin 13 on or off");
+
   // initialize the LED pin as an output:
   pinMode(ledPin, OUTPUT);
 }
