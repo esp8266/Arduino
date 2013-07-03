@@ -63,7 +63,7 @@ String GSM3ShieldV1ScanNetworks::getCurrentCarrier()
 		String final_result = ptr_token;
 		return final_result;
 	}else{
-		return NULL;
+		return String(NULL);
 	}
 }
 
@@ -82,7 +82,7 @@ String GSM3ShieldV1ScanNetworks::getSignalStrength()
 		final_result.trim();
 		return final_result;
 	}else{
-		return NULL;
+		return String(NULL);
 	}
 }
 
