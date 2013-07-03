@@ -28,7 +28,7 @@ class YunClient;
 class YunServer : public Server {
 public:
   // Constructor with a user provided BridgeClass instance
-  YunServer(uint16_t port, BridgeClass &_b = Bridge);
+  YunServer(uint16_t port = 5555, BridgeClass &_b = Bridge);
 
   void begin();
   YunClient accept();

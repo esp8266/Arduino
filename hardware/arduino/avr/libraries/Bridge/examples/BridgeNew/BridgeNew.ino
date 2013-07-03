@@ -11,9 +11,9 @@
 #include <Bridge.h>
 #include <YunServer.h>
 
-// Listen on port 5555, the webserver on the Yun
+// Listen on default port 5555, the webserver on the Yun
 // will forward there all the HTTP requests for us.
-YunServer server(5555);
+YunServer server;
 
 void setup() {
   Serial.begin(9600);
