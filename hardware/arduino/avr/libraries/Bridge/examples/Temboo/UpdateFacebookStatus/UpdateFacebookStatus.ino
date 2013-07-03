@@ -10,7 +10,7 @@
   http://www.temboo.com
 
   In order to run this sketch, you'll need to register an application using
-  the Facebook dev console at https://developers.facebook.com/apps. After creating
+  the Facebook dev console at https://developers.facebook.com/apps -- after creating
   the app, log in to Temboo and visit https://www.temboo.com/library/Library/Facebook/Publishing/SetStatus/
   to use our OAuth Wizard (or OAuth Choreos) to obtain a Facebook access token.
   Substitute your access token for the placeholder value of FACEBOOK_ACCESS_TOKEN below.
@@ -32,6 +32,9 @@
                            // as described in the footer comment below
 
 /*** SUBSTITUTE YOUR VALUES BELOW: ***/
+
+// Note that for additional security and reusability, you could
+// use a #define statement to specify this value in a .h file.
 
 // the Facebook Access Token, which can be obtained using the Temboo OAuth Wizard or Choreos
 const String FACEBOOK_ACCESS_TOKEN = "xxxxxxxxxx";
@@ -89,44 +92,46 @@ void loop() {
 
 
     // tell the Process to run and wait for the results. The 
-    // return code (rc) will tell us whether the Temboo client 
+    // return code (returnCode) will tell us whether the Temboo client 
     // was able to send our request to the Temboo servers
-    unsigned int rc = SetStatusChoreo.run();
+    unsigned int returnCode = SetStatusChoreo.run();
     
     // print the response code and API response.
-    Serial.println("Resonse code: " + String(rc));
+    Serial.println("Response code: " + String(returnCode));
 
     // note that in this case, we're just printing the raw response from Facebook.
     // see the examples on using Temboo SDK output filters at http://www.temboo.com/arduino
     // for information on how to filter this data    
     while(SetStatusChoreo.available()) {
-      Serial.print((char)SetStatusChoreo.read());
+      char c = SetStatusChoreo.read();
+      Serial.print(c);
     }
 
     SetStatusChoreo.close();
   }
 
-  Serial.println("Sleeping...");
+  Serial.println("Waiting...");
   Serial.println("");
 
-  delay(30000); // sleep 30 seconds between SetStatus calls  
+  delay(30000); // wait 30 seconds between SetStatus calls  
 }
 
 /*
   IMPORTANT NOTE: TembooAccount.h:
 
-  TembooAccount.h is a file referenced by this sketch that contains your Temboo account information. 
-  You need to create this file. To do so, make a new tab in Arduino, call it TembooAccount.h, and 
-  include the following variables and constants:
+  TembooAccount.h is a file referenced by this sketch that contains your Temboo account information.
+  You'll need to edit the placeholder version of TembooAccount.h included with this example sketch,
+  by inserting your own Temboo account name and app key information. The contents of the file should
+  look like:
 
   #define TEMBOO_ACCOUNT "myTembooAccountName"  // your Temboo account name 
   #define TEMBOO_APP_KEY_NAME "myFirstApp"  // your Temboo app key name
   #define TEMBOO_APP_KEY  "xxx-xxx-xxx-xx-xxx"  // your Temboo app key
 
-  The same TembooAccount.h file settings can be used for all Temboo SDK sketches.
-
   You can find your Temboo App Key information on the Temboo website, 
   under My Account > Application Keys
+
+  The same TembooAccount.h file settings can be used for all Temboo SDK sketches.
 
   Keeping your account information in a separate file means you can save it once, 
   then just distribute the main .ino file without worrying that you forgot to delete your credentials.

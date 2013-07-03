@@ -33,12 +33,14 @@
 
 /*** SUBSTITUTE YOUR VALUES BELOW: ***/
 
+// Note that for additional security and reusability, you could
+// use #define statements to specify these values in a .h file.
 const String TWITTER_ACCESS_TOKEN = "your-twitter-access-token";
 const String TWITTER_ACCESS_TOKEN_SECRET = "your-twitter-access-token-secret";
 const String TWITTER_CONSUMER_KEY = "your-twitter-consumer-key";
 const String TWITTER_CONSUMER_SECRET = "your-twitter-consumer-secret";
 
-int numRuns = 0;   // execution count, so this sketch doesn't run forever
+int numRuns = 1;   // execution count, so this sketch doesn't run forever
 int maxRuns = 10;  // the max number of times the Twitter HomeTimeline Choreo should run
 
 void setup() {
@@ -53,7 +55,7 @@ void setup() {
 void loop()
 {
   // while we haven't reached the max number of runs...
-  if (numRuns < maxRuns) {
+  if (numRuns <= maxRuns) {
 
     // print status
     Serial.println("Running ReadATweet - Run #" + String(numRuns++) + "...");
@@ -108,12 +110,12 @@ void loop()
 
 
     // tell the Process to run and wait for the results. The 
-    // return code (rc) will tell us whether the Temboo client 
+    // return code will tell us whether the Temboo client 
     // was able to send our request to the Temboo servers
-    unsigned int rc = HomeTimelineChoreo.run();
+    unsigned int returnCode = HomeTimelineChoreo.run();
     
     // a response code of 0 means success; print the API response
-    if(rc == 0) {
+    if(returnCode == 0) {
       
       String author; // a String to hold the tweet author's name
       String tweet; // a String to hold the text of the tweet
@@ -152,33 +154,35 @@ void loop()
       // there was an error
       // print the raw output from the choreo
       while(HomeTimelineChoreo.available()) {
-        Serial.print((char)HomeTimelineChoreo.read());
+        char c = HomeTimelineChoreo.read();
+        Serial.print(c);
       }
     }
 
     HomeTimelineChoreo.close();
   }
 
-  Serial.println("Sleeping...");
+  Serial.println("Waiting...");
   Serial.println("");
-  delay(90000); // sleep 90 seconds between HomeTimeline calls
+  delay(90000); // wait 90 seconds between HomeTimeline calls
 }
 
 /*
   IMPORTANT NOTE: TembooAccount.h:
 
-  TembooAccount.h is a file referenced by this sketch that contains your Temboo account information. 
-  You need to create this file. To do so, make a new tab in Arduino, call it TembooAccount.h, and 
-  include the following variables and constants:
+  TembooAccount.h is a file referenced by this sketch that contains your Temboo account information.
+  You'll need to edit the placeholder version of TembooAccount.h included with this example sketch,
+  by inserting your own Temboo account name and app key information. The contents of the file should
+  look like:
 
   #define TEMBOO_ACCOUNT "myTembooAccountName"  // your Temboo account name 
   #define TEMBOO_APP_KEY_NAME "myFirstApp"  // your Temboo app key name
   #define TEMBOO_APP_KEY  "xxx-xxx-xxx-xx-xxx"  // your Temboo app key
 
-  The same TembooAccount.h file settings can be used for all Temboo SDK sketches.
-
   You can find your Temboo App Key information on the Temboo website, 
   under My Account > Application Keys
+
+  The same TembooAccount.h file settings can be used for all Temboo SDK sketches.
 
   Keeping your account information in a separate file means you can save it once, 
   then just distribute the main .ino file without worrying that you forgot to delete your credentials.

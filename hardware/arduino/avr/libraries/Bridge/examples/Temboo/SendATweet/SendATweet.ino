@@ -10,8 +10,10 @@
   http://www.temboo.com
 
   In order to run this sketch, you'll need to register an application using
-  the Twitter dev console at https://dev.twitter.com. After creating the 
-  app, you'll find OAuth credentials for that application under the "OAuth Tool" tab. 
+  the Twitter dev console at https://dev.twitter.com. Note that since this 
+  sketch creates a new tweet, your application will need to be configured with
+  read+write permissions. After creating the app, you'll find OAuth credentials 
+  for that application under the "OAuth Tool" tab. 
   Substitute these values for the placeholders below. 
 
   This example assumes basic familiarity with Arduino sketches, and that your Yun is connected
@@ -33,6 +35,8 @@
 
 /*** SUBSTITUTE YOUR VALUES BELOW: ***/
 
+// Note that for additional security and reusability, you could
+// use #define statements to specify these values in a .h file.
 const String TWITTER_ACCESS_TOKEN = "your-twitter-access-token";
 const String TWITTER_ACCESS_TOKEN_SECRET = "your-twitter-access-token-secret";
 const String TWITTER_CONSUMER_KEY = "your-twitter-consumer-key";
@@ -72,7 +76,7 @@ void loop()
     StatusesUpdateChoreo.addParameter("-p");
     StatusesUpdateChoreo.addParameter(TEMBOO_APP_KEY);
 
-   	// identify the Temboo Library choreo to run (Twitter > Tweets > StatusesUpdate)
+    // identify the Temboo Library choreo to run (Twitter > Tweets > StatusesUpdate)
     StatusesUpdateChoreo.addParameter("-c");
     StatusesUpdateChoreo.addParameter("/Library/Twitter/Tweets/StatusesUpdate");
 
@@ -96,24 +100,25 @@ void loop()
     StatusesUpdateChoreo.addParameter("StatusUpdate:" + tweet);
 
     // tell the Process to run and wait for the results. The 
-    // return code (rc) will tell us whether the Temboo client 
+    // return code (returnCode) will tell us whether the Temboo client 
     // was able to send our request to the Temboo servers
-    unsigned int rc = StatusesUpdateChoreo.run();
+    unsigned int returnCode = StatusesUpdateChoreo.run();
 
     // a return code of zero (0) means everything worked
-    if (rc == 0) {
+    if (returnCode == 0) {
         Serial.println("Success! Tweet sent!");
     } else {
       // a non-zero return code means there was an error
       // read and print the error message
       while (StatusesUpdateChoreo.available()) {
-        Serial.print((char)StatusesUpdateChoreo.read());
+        char c = StatusesUpdateChoreo.read();
+        Serial.print(c);
       }
     } 
     StatusesUpdateChoreo.close();
 
     // do nothing for the next 90 seconds
-    Serial.println("Sleeping...");
+    Serial.println("Waiting...");
     delay(90000);
   }
 }
@@ -121,22 +126,22 @@ void loop()
 /*
   IMPORTANT NOTE: TembooAccount.h:
 
-  TembooAccount.h is a file referenced by this sketch that contains your Temboo account information. 
-  You need to create this file. To do so, make a new tab in Arduino, call it TembooAccount.h, and 
-  include the following variables and constants:
+  TembooAccount.h is a file referenced by this sketch that contains your Temboo account information.
+  You'll need to edit the placeholder version of TembooAccount.h included with this example sketch,
+  by inserting your own Temboo account name and app key information. The contents of the file should
+  look like:
 
   #define TEMBOO_ACCOUNT "myTembooAccountName"  // your Temboo account name 
   #define TEMBOO_APP_KEY_NAME "myFirstApp"  // your Temboo app key name
   #define TEMBOO_APP_KEY  "xxx-xxx-xxx-xx-xxx"  // your Temboo app key
 
-  The same TembooAccount.h file settings can be used for all Temboo SDK sketches.
-
   You can find your Temboo App Key information on the Temboo website, 
   under My Account > Application Keys
+
+  The same TembooAccount.h file settings can be used for all Temboo SDK sketches.
 
   Keeping your account information in a separate file means you can save it once, 
   then just distribute the main .ino file without worrying that you forgot to delete your credentials.
 */
-
 
 

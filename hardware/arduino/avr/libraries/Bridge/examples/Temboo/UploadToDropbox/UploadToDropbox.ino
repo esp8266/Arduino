@@ -11,7 +11,8 @@
 
   You'll also need a valid Dropbox account, and OAuth credentials for Dropbox. To
   obtain OAuth credentials for Dropbox, you'll need to register a Dropbox app at 
-  https://www.dropbox.com/developers/apps and then follow the instructions at 
+  https://www.dropbox.com/developers/apps -- the app name and domain can be whatever
+  you'd like. After registering the app, follow the instructions at 
   https://www.temboo.com/library/Library/Dropbox/OAuth/ to run the Initialize and Finalize
   OAuth Choreos to complete the OAuth handshake and retrieve your Access Token information.
 
@@ -33,6 +34,9 @@
 
 
 /*** SUBSTITUTE YOUR VALUES BELOW: ***/
+
+// Note that for additional security and reusability, you could
+// use #define statements to specify these values in a .h file.
 
 // your Dropbox app key, available on the Dropbox developer console after registering an app
 const String DROPBOX_APP_KEY = "xxxxxxxxxx";
@@ -117,12 +121,12 @@ void loop()
     UploadFileChoreo.addParameter("AppKey:" + DROPBOX_APP_KEY);
 
     // tell the Process to run and wait for the results. The 
-    // return code (rc) will tell us whether the Temboo client 
+    // return code (returnCode) will tell us whether the Temboo client 
     // was able to send our request to the Temboo servers
-    unsigned int rc = UploadFileChoreo.run();
+    unsigned int returnCode = UploadFileChoreo.run();
 
     // a return code of zero (0) means everything worked
-    if (rc == 0) {
+    if (returnCode == 0) {
         Serial.println("Success! File uploaded!");
         success = true;
     } else {
@@ -133,14 +137,15 @@ void loop()
     // print out the full response to the serial monitor in all
     // cases, just for debugging
     while (UploadFileChoreo.available()) {
-      Serial.print((char)UploadFileChoreo.read());
+      char c = UploadFileChoreo.read();
+      Serial.print(c);
     }
     UploadFileChoreo.close();
 
-    Serial.println("Sleeping...");
+    Serial.println("Waiting...");
   }
 
-  delay(30000); // sleep 30 seconds between upload attempts
+  delay(30000); // wait 30 seconds between upload attempts
 }
 
 
@@ -193,19 +198,21 @@ String base64Encode(String toEncode) {
 }
 
 /*
-  IMPORTANT NOTE About TembooAccount.h:
+  IMPORTANT NOTE: TembooAccount.h:
 
-  TembooAccount.h is not included with this example because it contains your account information.
-  You need to create it for your own version of this application.  To do so, make
-  a new tab in Arduino, call it TembooAccount.h, and include the following variables and constants:
+  TembooAccount.h is a file referenced by this sketch that contains your Temboo account information.
+  You'll need to edit the placeholder version of TembooAccount.h included with this example sketch,
+  by inserting your own Temboo account name and app key information. The contents of the file should
+  look like:
 
-  #define TEMBOO_ACCOUNT "matthew-yun"  // your Temboo account name 
-  #define TEMBOO_APP_KEY_NAME "someKey"  // your Temboo app key name
-  #define TEMBOO_APP_KEY  "fveIrkjAVIkuNUUPE6df"  // your Temboo app key
-  The same TembooAccount.h file settings can be used for all Temboo SDK sketches.
+  #define TEMBOO_ACCOUNT "myTembooAccountName"  // your Temboo account name 
+  #define TEMBOO_APP_KEY_NAME "myFirstApp"  // your Temboo app key name
+  #define TEMBOO_APP_KEY  "xxx-xxx-xxx-xx-xxx"  // your Temboo app key
 
   You can find your Temboo App Key information on the Temboo website, 
   under My Account > Application Keys
+
+  The same TembooAccount.h file settings can be used for all Temboo SDK sketches.
 
   Keeping your account information in a separate file means you can save it once, 
   then just distribute the main .ino file without worrying that you forgot to delete your credentials.

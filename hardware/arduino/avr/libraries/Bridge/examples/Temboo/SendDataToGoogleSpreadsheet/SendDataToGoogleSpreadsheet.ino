@@ -20,9 +20,8 @@
   work properly. It doesn't matter what the column labels actually are,
   but there must be text in the first row of each column. This example
   assumes there are two columns. The first column is the time (in milliseconds)
-  that the row was appended, and the second column is a sensor value
-  (simulated in this example via a random number). In other words, your spreadsheet
-  should look like:
+  that the row was appended, and the second column is a sensor value.
+  In other words, your spreadsheet should look like:
   
   Time  |  Sensor Value  |     
   ------+-----------------
@@ -48,12 +47,17 @@
 
 /*** SUBSTITUTE YOUR VALUES BELOW: ***/
 
+// Note that for additional security and reusability, you could
+// use #define statements to specify these values in a .h file.
+
 const String GOOGLE_USERNAME = "your-google-username";
 const String GOOGLE_PASSWORD = "your-google-password";
 
 // the title of the spreadsheet you want to send data to
+// (Note that this must actually be the title of a Google spreadsheet
+// that exists in your Google Drive/Docs account, and is configured
+// as described above.)
 const String SPREADSHEET_TITLE = "your-spreadsheet-title";
-
 
 const unsigned long RUN_INTERVAL_MILLIS = 60000; // how often to run the Choreo (in milliseconds)
 
@@ -137,18 +141,19 @@ void loop()
     AppendRowChoreo.addParameter("RowData:" + rowData);
 
     // run the Choreo and wait for the results
-    // The return code (rc) will indicate success or failure 
-    unsigned int rc = AppendRowChoreo.run();
+    // The return code (returnCode) will indicate success or failure 
+    unsigned int returnCode = AppendRowChoreo.run();
 
     // return code of zero (0) means success
-    if (rc == 0) {
+    if (returnCode == 0) {
       Serial.println("Success! Appended " + rowData);
       Serial.println("");
     } else {
       // return code of anything other than zero means failure  
       // read and display any error messages
       while (AppendRowChoreo.available()) {
-        Serial.print((char)AppendRowChoreo.read());
+        char c = AppendRowChoreo.read();
+        Serial.print(c);
       }
     }
 
@@ -157,28 +162,27 @@ void loop()
 }
 
 // this function simulates reading the value of a sensor 
-// in this example, we're generating a random number
 unsigned long getSensorValue() {
-  return (unsigned long)random(0, 256);
+  return analogRead(A0);
 }
 
 /*
   IMPORTANT NOTE: TembooAccount.h:
 
-  TembooAccount.h is a file referenced by this sketch that contains your Temboo account information. 
-  You need to create this file. To do so, make a new tab in Arduino, call it TembooAccount.h, and 
-  include the following variables and constants:
+  TembooAccount.h is a file referenced by this sketch that contains your Temboo account information.
+  You'll need to edit the placeholder version of TembooAccount.h included with this example sketch,
+  by inserting your own Temboo account name and app key information. The contents of the file should
+  look like:
 
   #define TEMBOO_ACCOUNT "myTembooAccountName"  // your Temboo account name 
   #define TEMBOO_APP_KEY_NAME "myFirstApp"  // your Temboo app key name
   #define TEMBOO_APP_KEY  "xxx-xxx-xxx-xx-xxx"  // your Temboo app key
 
-  The same TembooAccount.h file settings can be used for all Temboo SDK sketches.
-
   You can find your Temboo App Key information on the Temboo website, 
   under My Account > Application Keys
+
+  The same TembooAccount.h file settings can be used for all Temboo SDK sketches.
 
   Keeping your account information in a separate file means you can save it once, 
   then just distribute the main .ino file without worrying that you forgot to delete your credentials.
 */
-

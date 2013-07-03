@@ -27,8 +27,8 @@
 #include "TembooAccount.h" // contains Temboo account information
                            // as described in the footer comment below
 
-// the zip code to search
-const String US_ZIP_CODE = "11215";
+// the zip code to search for toxin-emitting facilities
+String US_ZIP_CODE = "11215";
 
 int numRuns = 1;   // execution count, so that this doesn't run forever
 int maxRuns = 10;  // max number of times the Envirofacts FacilitiesSearch Choreo should be run
@@ -82,93 +82,98 @@ void loop()
     FacilitiesSearchByZipChoreo.addParameter("addr:STREET_ADDRESS:Response");
 
     // run the choreo 
-    FacilitiesSearchByZipChoreo.run();
-    
-    String facs;
-    String addrs;
+    unsigned int returnCode = FacilitiesSearchByZipChoreo.run();
+    if (returnCode == 0) {
+      String facilities;
+      String addresses;
 
-    // when the choreo results are available, process them.
-    // the output filters we specified will return comma delimited
-    // lists containing the name and street address of the facilities
-    // located in the specified zip code.
-    while(FacilitiesSearchByZipChoreo.available()) {
-      String name = FacilitiesSearchByZipChoreo.readStringUntil('\x1F');
-      name.trim();
+      // when the choreo results are available, process them.
+      // the output filters we specified will return comma delimited
+      // lists containing the name and street address of the facilities
+      // located in the specified zip code.
+      while(FacilitiesSearchByZipChoreo.available()) {
+        String name = FacilitiesSearchByZipChoreo.readStringUntil('\x1F');
+        name.trim();
 
-      String data = FacilitiesSearchByZipChoreo.readStringUntil('\x1E');
-      data.trim();
+        String data = FacilitiesSearchByZipChoreo.readStringUntil('\x1E');
+        data.trim();
 
-      if (name == "fac") {
-        facs = data;
-      } else if (name == "addr") {
-        addrs = data;
+        if (name == "fac") {
+          facilities = data;
+        } else if (name == "addr") {
+          addresses = data;
+        }
+      }
+      FacilitiesSearchByZipChoreo.close();
+      
+      // parse the comma delimited lists of facilities to join the 
+      // name with the address and print it to the serial monitor
+      if (facilities.length() > 0) {
+        int i = -1;
+        int facilityStart = 0;
+        int addressStart = 0;
+        String facility;
+        String address;
+        do {
+          i = facilities.indexOf(',', facilityStart);
+          if (i >= 0) {
+            facility = facilities.substring(facilityStart, i);
+            facilityStart = i + 1;
+          }
+
+          i = addresses.indexOf(',', addressStart);
+          if (i >= 0) {
+            address = addresses.substring(addressStart, i);
+            addressStart = i + 1;
+          }
+          
+          if (i >= 0) {
+            printResult(facility, address);
+          }
+
+        }while (i >= 0);
+        facility = facilities.substring(facilityStart);
+        address = addresses.substring(addressStart);
+        printResult(facility, address);
+      } else {
+        Serial.println("No facilities found in zip code " + US_ZIP_CODE);
+      }
+    } else {
+      while(FacilitiesSearchByZipChoreo.available()) {
+        char c = FacilitiesSearchByZipChoreo.read();
+        Serial.print(c);
       }
     }
-    FacilitiesSearchByZipChoreo.close();
-    
-    // parse the comma delimited lists of facilities to join the 
-    // name with the address and print it to the serial monitor
-    if (facs.length() > 0) {
-      int i = -1;
-      int fstart = 0;
-      int astart = 0;
-      String f;
-      String a;
-      do {
-        i = facs.indexOf(',', fstart);
-        if (i >= 0) {
-          f = facs.substring(fstart, i);
-          fstart = i + 1;
-        }
-
-        i = addrs.indexOf(',', astart);
-        if (i >= 0) {
-          a = addrs.substring(astart, i);
-          astart = i + 1;
-        }
-        
-        if (i >= 0) {
-          printResult(f, a);
-        }
-
-      }while (i >= 0);
-      f = facs.substring(fstart);
-      a = addrs.substring(astart);
-      printResult(f, a);
-    } else {
-      Serial.println("No facilities found in zip code " + US_ZIP_CODE);
-    }
   }
-
-  Serial.println("Sleeping...");
+  Serial.println("Waiting...");
   Serial.println("");
-  delay(30000); // sleep 30 seconds between calls
+  delay(30000); // wait 30 seconds between calls
 }
 
 // a simple utility function, to output the facility name and address in the serial monitor.
-void printResult(String fac, String addr) {
-  Serial.print(fac);
+void printResult(String facility, String address) {
+  Serial.print(facility);
   Serial.print(" - ");
-  Serial.println(addr);
+  Serial.println(address);
 }
 
 /*
   IMPORTANT NOTE: TembooAccount.h:
 
-  TembooAccount.h is a file referenced by this sketch that contains your Temboo account information. 
-  You need to create this file. To do so, make a new tab in Arduino, call it TembooAccount.h, and 
-  include the following variables and constants:
+  TembooAccount.h is a file referenced by this sketch that contains your Temboo account information.
+  You'll need to edit the placeholder version of TembooAccount.h included with this example sketch,
+  by inserting your own Temboo account name and app key information. The contents of the file should
+  look like:
 
   #define TEMBOO_ACCOUNT "myTembooAccountName"  // your Temboo account name 
   #define TEMBOO_APP_KEY_NAME "myFirstApp"  // your Temboo app key name
   #define TEMBOO_APP_KEY  "xxx-xxx-xxx-xx-xxx"  // your Temboo app key
 
-  The same TembooAccount.h file settings can be used for all Temboo SDK sketches.
-
   You can find your Temboo App Key information on the Temboo website, 
   under My Account > Application Keys
-  
+
+  The same TembooAccount.h file settings can be used for all Temboo SDK sketches.
+
   Keeping your account information in a separate file means you can save it once, 
   then just distribute the main .ino file without worrying that you forgot to delete your credentials.
 */
-

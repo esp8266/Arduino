@@ -42,6 +42,9 @@
 
 /*** SUBSTITUTE YOUR VALUES BELOW: ***/
 
+// Note that for additional security and reusability, you could
+// use #define statements to specify these values in a .h file.
+
 // the Account SID from your Twilio account
 const String TWILIO_ACCOUNT_SID = "xxxxxxxxxx";
 
@@ -116,25 +119,26 @@ void loop()
     SendSMSChoreo.addParameter("Body:Hey, there! This is a message from your Arduino Yun!");
     
     // tell the Process to run and wait for the results. The 
-    // return code (rc) will tell us whether the Temboo client 
+    // return code (returnCode) will tell us whether the Temboo client 
     // was able to send our request to the Temboo servers
-    unsigned int rc = SendSMSChoreo.run();
+    unsigned int returnCode = SendSMSChoreo.run();
 
     // a return code of zero (0) means everything worked
-    if (rc == 0) {
+    if (returnCode == 0) {
         Serial.println("Success! SMS sent!");
         success = true;
     } else {
       // a non-zero return code means there was an error
       // read and print the error message
       while (SendSMSChoreo.available()) {
-        Serial.print((char)SendSMSChoreo.read());
+        char c = SendSMSChoreo.read();
+        Serial.print(c);
       }
     } 
     SendSMSChoreo.close();
 
     // do nothing for the next 60 seconds
-    Serial.println("Sleeping...");
+    Serial.println("Waiting...");
     delay(60000);
   }
 }
@@ -142,18 +146,19 @@ void loop()
 /*
   IMPORTANT NOTE: TembooAccount.h:
 
-  TembooAccount.h is a file referenced by this sketch that contains your Temboo account information. 
-  You need to create this file. To do so, make a new tab in Arduino, call it TembooAccount.h, and 
-  include the following variables and constants:
+  TembooAccount.h is a file referenced by this sketch that contains your Temboo account information.
+  You'll need to edit the placeholder version of TembooAccount.h included with this example sketch,
+  by inserting your own Temboo account name and app key information. The contents of the file should
+  look like:
 
   #define TEMBOO_ACCOUNT "myTembooAccountName"  // your Temboo account name 
   #define TEMBOO_APP_KEY_NAME "myFirstApp"  // your Temboo app key name
   #define TEMBOO_APP_KEY  "xxx-xxx-xxx-xx-xxx"  // your Temboo app key
 
-  The same TembooAccount.h file settings can be used for all Temboo SDK sketches.
-
   You can find your Temboo App Key information on the Temboo website, 
   under My Account > Application Keys
+
+  The same TembooAccount.h file settings can be used for all Temboo SDK sketches.
 
   Keeping your account information in a separate file means you can save it once, 
   then just distribute the main .ino file without worrying that you forgot to delete your credentials.
