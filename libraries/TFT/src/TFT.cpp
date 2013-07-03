@@ -1,6 +1,6 @@
 #include "TFT.h"
 
-#if (USB_VID == 0x2341) && (USB_PID == 0x803C) // are we building for Esplora?
+#if ARDUINO_AVR_ESPLORA // are we building for Esplora?
 TFT EsploraTFT(7, 0, 1);
 #endif
 
