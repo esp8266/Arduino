@@ -47,9 +47,6 @@ void loop() {
 }
 
 void process(YunClient client) {
-  // discard the first slash '/' character from the URL
-  client.read();
-
   // read the command
   String command = client.readStringUntil('/');
 
