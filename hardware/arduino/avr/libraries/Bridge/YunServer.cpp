@@ -46,3 +46,9 @@ YunClient YunServer::accept() {
   return YunClient(res[0]);
 }
 
+size_t YunServer::write(uint8_t c) {
+  uint8_t cmd[] = { 'b', c };
+  bridge.transfer(cmd, 2);
+  return 1;
+}
+

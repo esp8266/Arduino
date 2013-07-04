@@ -32,7 +32,7 @@ public:
   void begin();
   YunClient accept();
 
-  virtual size_t write(uint8_t c) { /* TODO */ }
+  virtual size_t write(uint8_t c);
 
   void listenOnLocalhost()   { useLocalhost = true; }
   void noListenOnLocalhost() { useLocalhost = false; }
