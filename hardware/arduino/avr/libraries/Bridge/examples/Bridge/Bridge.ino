@@ -1,150 +1,174 @@
 
-//#include <Bridge.h>
-#include <Mailbox.h>
+// Possible commands are listed here:
+//
+// "digital/13"     -> digitalRead(13)
+// "digital/13/1"   -> digitalWrite(13, HIGH)
+// "analog/2/123"   -> analogWrite(2, 123)
+// "analog/2"       -> analogRead(2)
+// "mode/13/input"  -> pinMode(13, INPUT)
+// "mode/13/output" -> pinMode(13, OUTPUT)
+
+#include <Bridge.h>
+#include <YunServer.h>
+
+// Listen on default port 5555, the webserver on the Yun
+// will forward there all the HTTP requests for us.
+YunServer server;
 
 void setup() {
+  Serial.begin(9600);
+
+  // Bridge startup
   pinMode(13,OUTPUT);
   digitalWrite(13, LOW);
   Bridge.begin();
   digitalWrite(13, HIGH);
-  Serial.begin(9600);
+
+  // Listen for incoming connection only from localhost
+  // (no one from the external network could connect)
+  server.listenOnLocalhost();
+  server.begin();
 }
 
 void loop() {
-  while (Mailbox.messageAvailable()) {
-    String msg;
-    Mailbox.readMessage(msg);
-    process(msg);
+  // Get clients coming from server
+  YunClient client = server.accept();
+
+  // There is a new client?
+  if (client) {
+    // Process request
+    process(client);
+
+    // Close connection and free resources.
+    client.stop();
   }
-  delay(100); // Poll every 0.100s
+
+  delay(50); // Poll every 50ms
 }
 
-void process(String command) {
-  Serial.println(command);
-  // "digital/13"     -> digitalRead(13)
-  // "digital/13/1"   -> digitalWrite(13, HIGH)
-  // "analog/2/123"   -> analogWrite(2, 123)
-  // "analog/2"       -> analogRead(2)
-  // "mode/13/input"  -> pinMode(13, INPUT)
-  // "mode/13/output" -> pinMode(13, OUTPUT)
+void process(YunClient client) {
+  // read the command
+  String command = client.readStringUntil('/');
 
-  // is digital command?
-  if (command.startsWith("digital/")) {
-    // extract subcommand (after the "/")
-    command = command.substring(8);
-    digitalCommand(command);
+  // is "digital" command?
+  if (command == "digital") {
+    digitalCommand(client);
+  }
 
-  } 
-  // is analog command?
-  else if (command.startsWith("analog/")) {
-    // extract subcommand (after the "/")
-    command = command.substring(7);
-    analogCommand(command);
+  // is "analog" command?
+  if (command == "analog") {
+    analogCommand(client);
+  }
 
-  } 
-  // is mode command?
-  else if (command.startsWith("mode/")) {
-    // extract subcommand (after the "/")
-    command = command.substring(5);
-    modeCommand(command);
+  // is "mode" command?
+  if (command == "mode") {
+    modeCommand(client);
   }
 }
 
-void digitalCommand(String command) {
+void digitalCommand(YunClient client) {
   int pin, value;
 
-  // Find the position of the "/" inside the command
-  int slashIndex = command.indexOf("/");
+  // Read pin number
+  pin = client.parseInt();
 
-  // If there are no slashes
-  if (slashIndex == -1) {
-    // then we are in the following case:
-    // "digital/13"     -> digitalRead(13)
-
-    // so we can extract the pin number from the remainder of the command string
-    pin = command.toInt();
-  } 
-  else {
-    // else, we found a slash, so we are in the following case:
-    // "digital/13/1"   -> digitalWrite(13, HIGH)
-    
-    // we must estract pin number before the "/"
-    pin = command.substring(0, slashIndex).toInt();
-    // and value after the "/"
-    value = command.substring(slashIndex+1).toInt();
+  // If the next character is a '/' it means we have an URL
+  // with a value like: "/digital/13/1"
+  if (client.read() == '/') {
+    value = client.parseInt();
     digitalWrite(pin, value);
-  }
-  reportDigitalRead(pin, true);
-}
-
-void analogCommand(String command) {
-  int pin, value;
-  if (command.indexOf("/") != -1) {
-    pin = command.substring(0, command.indexOf("/")).toInt();
-    value = command.substring(command.indexOf("/") + 1, command.length()).toInt();
-    analogWrite(pin, value);
   } 
   else {
-    pin = command.toInt();
+    value = digitalRead(pin);
   }
-  reportAnalogRead(pin, true);
+
+  // Send feedback to client
+  client.print(F("Pin D"));
+  client.print(pin);
+  client.print(F(" set to "));
+  client.println(value);
+
+  // Update datastore key with the current pin value
+  String key = "D";
+  key += pin;
+  Bridge.put(key, String(value));
 }
 
-void modeCommand(String command) {
-  int pin;
-  String strValue;
-  pin = command.substring(0, command.indexOf("/")).toInt();
-  strValue = command.substring(command.indexOf("/") + 1, command.length());
-  if (strValue == "output") {
-    pinMode(pin, OUTPUT);
-    reportPinMode(pin, strValue);
-  } 
-  else if (strValue == "input") {
-    pinMode(pin, INPUT);
-    reportPinMode(pin, strValue);
-  }
-}
+void analogCommand(YunClient client) {
+  int pin, value;
 
-void reportPinMode(int pin, String mode) {
-  String json = "{\"pin\":";
-  json += pin;
-  json += ", \"mode\": \"";
-  json += mode;
-  json += "\"}";
-  Mailbox.writeJSON(json);
-}
+  // Read pin number
+  pin = client.parseInt();
 
-void reportDigitalRead(int pin, boolean dataset) {
-  int value = digitalRead(pin);
+  // If the next character is a '/' it means we have an URL
+  // with a value like: "/analog/5/120"
+  if (client.read() == '/') {
+    // Read value and execute command
+    value = client.parseInt();
+    analogWrite(pin, value);
 
-  String json = "{\"pin\":";
-  json += pin;
-  json += ", \"value\": ";
-  json += value;
-  json += "}";
-  Mailbox.writeJSON(json);
+    // Send feedback to client
+    client.print(F("Pin D"));
+    client.print(pin);
+    client.print(F(" set to analog "));
+    client.println(value);
 
-  if (dataset) {
+    // Update datastore key with the current pin value
     String key = "D";
     key += pin;
-    Bridge.put(key.c_str(), String(value).c_str());
+    Bridge.put(key, String(value));
   }
-}
+  else {
+    // Read analog pin
+    value = analogRead(pin);
 
-void reportAnalogRead(int pin, boolean dataset) {
-  int value = analogRead(pin);
+    // Send feedback to client
+    client.print(F("Pin A"));
+    client.print(pin);
+    client.print(F(" reads analog "));
+    client.println(value);
 
-  String json = "{\"pin\":";
-  json += pin;
-  json += ", \"value\": ";
-  json += value;
-  json += "}";
-  Mailbox.writeJSON(json);
-
-  if (dataset) {
+    // Update datastore key with the current pin value
     String key = "A";
     key += pin;
-    Bridge.put(key.c_str(), String(value).c_str());
+    Bridge.put(key, String(value));
   }
 }
+
+void modeCommand(YunClient client) {
+  int pin;
+
+  // Read pin number
+  pin = client.parseInt();
+
+  // If the next character is not a '/' we have a malformed URL
+  if (client.read() != '/') {
+    client.println(F("error"));
+    return;
+  }
+
+  String mode = client.readStringUntil('\r');
+
+  if (mode == "input") {
+    pinMode(pin, INPUT);
+    // Send feedback to client
+    client.print(F("Pin D"));
+    client.print(pin);
+    client.print(F(" configured as INPUT!"));
+    return;
+  }
+
+  if (mode == "output") {
+    pinMode(pin, OUTPUT);
+    // Send feedback to client
+    client.print(F("Pin D"));
+    client.print(pin);
+    client.print(F(" configured as OUTPUT!"));
+    return;
+  }
+
+  client.print(F("error: invalid mode "));
+  client.print(mode);
+}
+
 
