@@ -15,8 +15,6 @@
  */
 #include <Firmata.h>
 
-byte analogPin;
-
 void stringCallback(char *myString)
 {
     Firmata.sendString(myString);

@@ -99,7 +99,11 @@ void readAndReportData(byte address, int theRegister, byte numBytes) {
     Wire.send((byte)theRegister);
     #endif
     Wire.endTransmission();
-    delayMicroseconds(i2cReadDelayTime);  // delay is necessary for some devices such as WiiNunchuck
+    // do not set a value of 0
+    if (i2cReadDelayTime > 0) {
+      // delay is necessary for some devices such as WiiNunchuck
+      delayMicroseconds(i2cReadDelayTime);
+    }
   } else {
     theRegister = 0;  // fill the register with a dummy value
   }
@@ -455,57 +459,57 @@ void sysexCallback(byte command, byte argc, byte *argv)
     }
     break;
   case CAPABILITY_QUERY:
-    Serial.write(START_SYSEX);
-    Serial.write(CAPABILITY_RESPONSE);
+    Firmata.write(START_SYSEX);
+    Firmata.write(CAPABILITY_RESPONSE);
     for (byte pin=0; pin < TOTAL_PINS; pin++) {
       if (IS_PIN_DIGITAL(pin)) {
-        Serial.write((byte)INPUT);
-        Serial.write(1);
-        Serial.write((byte)OUTPUT);
-        Serial.write(1);
+        Firmata.write((byte)INPUT);
+        Firmata.write(1);
+        Firmata.write((byte)OUTPUT);
+        Firmata.write(1);
       }
       if (IS_PIN_ANALOG(pin)) {
-        Serial.write(ANALOG);
-        Serial.write(10);
+        Firmata.write(ANALOG);
+        Firmata.write(10);
       }
       if (IS_PIN_PWM(pin)) {
-        Serial.write(PWM);
-        Serial.write(8);
+        Firmata.write(PWM);
+        Firmata.write(8);
       }
       if (IS_PIN_SERVO(pin)) {
-        Serial.write(SERVO);
-        Serial.write(14);
+        Firmata.write(SERVO);
+        Firmata.write(14);
       }
       if (IS_PIN_I2C(pin)) {
-        Serial.write(I2C);
-        Serial.write(1);  // to do: determine appropriate value 
+        Firmata.write(I2C);
+        Firmata.write(1);  // to do: determine appropriate value 
       }
-      Serial.write(127);
+      Firmata.write(127);
     }
-    Serial.write(END_SYSEX);
+    Firmata.write(END_SYSEX);
     break;
   case PIN_STATE_QUERY:
     if (argc > 0) {
       byte pin=argv[0];
-      Serial.write(START_SYSEX);
-      Serial.write(PIN_STATE_RESPONSE);
-      Serial.write(pin);
+      Firmata.write(START_SYSEX);
+      Firmata.write(PIN_STATE_RESPONSE);
+      Firmata.write(pin);
       if (pin < TOTAL_PINS) {
-        Serial.write((byte)pinConfig[pin]);
-	Serial.write((byte)pinState[pin] & 0x7F);
-	if (pinState[pin] & 0xFF80) Serial.write((byte)(pinState[pin] >> 7) & 0x7F);
-	if (pinState[pin] & 0xC000) Serial.write((byte)(pinState[pin] >> 14) & 0x7F);
+        Firmata.write((byte)pinConfig[pin]);
+	Firmata.write((byte)pinState[pin] & 0x7F);
+	if (pinState[pin] & 0xFF80) Firmata.write((byte)(pinState[pin] >> 7) & 0x7F);
+	if (pinState[pin] & 0xC000) Firmata.write((byte)(pinState[pin] >> 14) & 0x7F);
       }
-      Serial.write(END_SYSEX);
+      Firmata.write(END_SYSEX);
     }
     break;
   case ANALOG_MAPPING_QUERY:
-    Serial.write(START_SYSEX);
-    Serial.write(ANALOG_MAPPING_RESPONSE);
+    Firmata.write(START_SYSEX);
+    Firmata.write(ANALOG_MAPPING_RESPONSE);
     for (byte pin=0; pin < TOTAL_PINS; pin++) {
-      Serial.write(IS_PIN_ANALOG(pin) ? PIN_TO_ANALOG(pin) : 127);
+      Firmata.write(IS_PIN_ANALOG(pin) ? PIN_TO_ANALOG(pin) : 127);
     }
-    Serial.write(END_SYSEX);
+    Firmata.write(END_SYSEX);
     break;
   }
 }
