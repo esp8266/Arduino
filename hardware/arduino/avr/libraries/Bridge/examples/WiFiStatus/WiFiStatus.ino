@@ -3,7 +3,7 @@
   WiFi Status 
  
  This sketch run a script already present on your Yún in the
- /arduino directory called "pretty_wifi_info.lua" that takes 
+ /usr/bin directory called "pretty-wifi-info.lua" that takes 
  the informations of the WiFi interface and print it on the
  Serial monitor.
  

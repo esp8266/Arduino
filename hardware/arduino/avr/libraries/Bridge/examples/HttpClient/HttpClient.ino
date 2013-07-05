@@ -5,17 +5,19 @@ void setup() {
   pinMode(13, OUTPUT);
   digitalWrite(13, LOW);
   Bridge.begin();
+  Serial.begin(9600);
+  while(!Serial);
 }
 
 void loop() {
   HttpClient client;
-  client.get("http://my.server.address/file.php");
+  client.get("http://arduino.cc/asciilogo.txt");
   
-  char c = client.read();
-  if (c=='1')
-    digitalWrite(13, HIGH);
-  if (c=='0')
-    digitalWrite(13, LOW);
+  while (client.available()) {
+    char c = client.read();
+    Serial.print(c);
+  }
+  Serial.flush();
   
   delay(5000);
 }

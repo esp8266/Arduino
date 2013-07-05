@@ -1,4 +1,3 @@
-
 /*
   Running shell commands using Process class. 
  
@@ -32,10 +31,10 @@ void setup() {
 
 void loop() {
   Process p;
-  // This command line runs the wifiCheck script, (lua /arduino/pretty...), then 
+  // This command line runs the WifiStatus script, (/usr/bin/pretty-wifi-info.lua), then 
   // sends the result to the grep command to look for a line containing the word
   // "Signal:"  the result is passed to this sketch:
-  p.runShellCommand("lua /arduino/pretty_wifi_info.lua | grep Signal");
+  p.runShellCommand("/usr/bin/pretty-wifi-info.lua | grep Signal");
 
   // do nothing until the process finishes, so you get the whole output:
   while(p.running());  
