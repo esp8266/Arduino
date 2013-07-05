@@ -97,7 +97,7 @@ public class SSHUploader extends Uploader {
 
     String additionalParams = verbose ? prefs.get("upload.params.verbose") : prefs.get("upload.params.quiet");
 
-    boolean success = ssh.execSyncCommand("merge-sketch-with-bootloader /tmp/sketch.hex", System.out, System.err);
+    boolean success = ssh.execSyncCommand("merge-sketch-with-bootloader.lua /tmp/sketch.hex", System.out, System.err);
     ssh.execSyncCommand("kill-bridge");
     success = success && ssh.execSyncCommand("run-avrdude /tmp/sketch.hex '" + additionalParams + "'", System.out, System.err);
     return success;
