@@ -105,8 +105,9 @@ public abstract class AbstractMonitor extends JFrame implements MessageConsumer 
     };
 
     serialRates = new JComboBox();
-    for (int i = 0; i < serialRateStrings.length; i++)
-      serialRates.addItem(serialRateStrings[i] + " " + _("baud"));
+    for (String rate : serialRateStrings) {
+      serialRates.addItem(rate + " " + _("baud"));
+    }
 
     serialRates.setMaximumSize(serialRates.getMinimumSize());
 

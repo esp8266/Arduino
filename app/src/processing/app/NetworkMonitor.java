@@ -3,6 +3,7 @@ package processing.app;
 import com.jcraft.jsch.*;
 import processing.app.debug.MessageSiphon;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -15,12 +16,15 @@ import static processing.app.I18n._;
 @SuppressWarnings("serial")
 public class NetworkMonitor extends AbstractMonitor {
 
+  private static final int MAX_CONNECTION_ATTEMPTS = 5;
+
   private final String ipAddress;
 
   private MessageSiphon inputConsumer;
   private Session session;
   private Channel channel;
   private MessageSiphon errorConsumer;
+  private int connectionAttempts;
 
   public NetworkMonitor(String port, Base base) {
     super(port);
@@ -56,12 +60,28 @@ public class NetworkMonitor extends AbstractMonitor {
 
   @Override
   public void open() throws Exception {
+    this.connectionAttempts = 0;
+
     JSch jSch = new JSch();
     session = jSch.getSession("root", ipAddress, 22);
     session.setPassword(Preferences.get(getAuthorizationKey()));
 
     session.setUserInfo(new NoInteractionUserInfo());
     session.connect(30000);
+
+    tryConnect();
+  }
+
+  private void tryConnect() throws JSchException, IOException {
+    connectionAttempts++;
+
+    if (connectionAttempts > 1) {
+      try {
+        Thread.sleep(2000);
+      } catch (InterruptedException e) {
+        // ignored
+      }
+    }
 
     channel = session.openChannel("exec");
     ((ChannelExec) channel).setCommand("telnet localhost 6571");
@@ -73,14 +93,56 @@ public class NetworkMonitor extends AbstractMonitor {
 
     inputConsumer = new MessageSiphon(inputStream, this);
     errorConsumer = new MessageSiphon(errStream, this);
+
+    if (connectionAttempts > 1) {
+      SwingUtilities.invokeLater(new Runnable() {
+
+        @Override
+        public void run() {
+          try {
+            Thread.sleep(500);
+          } catch (InterruptedException e) {
+            // ignore
+          }
+          if (channel.isConnected()) {
+            NetworkMonitor.this.message(_("Connected!"));
+          }
+        }
+
+      });
+    }
   }
 
   @Override
-  public void message(String s) {
+  public synchronized void message(String s) {
     if (s.contains("can't connect")) {
-      s = _("Unable to connect: is the sketch using the bridge?");
+      while (!channel.isClosed()) {
+        try {
+          Thread.sleep(100);
+        } catch (InterruptedException e) {
+          // ignore
+        }
+      }
+      if (connectionAttempts < MAX_CONNECTION_ATTEMPTS) {
+        s = _("Unable to connect: retrying (" + connectionAttempts + ")...") + "\n";
+
+        SwingUtilities.invokeLater(new Runnable() {
+          @Override
+          public void run() {
+            try {
+              NetworkMonitor.this.tryConnect();
+            } catch (JSchException e) {
+              e.printStackTrace();
+            } catch (IOException e) {
+              e.printStackTrace();
+            }
+          }
+        });
+      } else {
+        s = _("Unable to connect: is the sketch using the bridge?") + "\n";
+      }
     }
-    super.message(s);    //To change body of overridden methods use File | Settings | File Templates.
+    super.message(s);
   }
 
   @Override
