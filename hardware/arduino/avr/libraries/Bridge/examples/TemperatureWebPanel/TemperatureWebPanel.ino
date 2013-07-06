@@ -38,6 +38,7 @@
 // will forward there all the HTTP requests for us.
 YunServer server;
 String startString;
+long hits = 0;
 
 void setup() {
   Serial.begin(9600);
@@ -103,10 +104,13 @@ void loop() {
       client.print(" degrees C");
       client.print("<br>This sketch has been running since ");
       client.print(startString);
+      client.print("<br>Hits so far: ");
+      client.print(hits);
     }
 
     // Close connection and free resources.
     client.stop();
+    hits++;
   }
 
   delay(50); // Poll every 50ms
