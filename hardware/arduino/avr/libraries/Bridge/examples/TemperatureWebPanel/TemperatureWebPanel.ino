@@ -2,7 +2,7 @@
   Temperature web interface
  
  This example shows how to serve data from an analog input  
-via the Arduino Yún's built-in webserver using the Bridge library.
+ via the Arduino Yún's built-in webserver using the Bridge library.
  	
  The circuit:
  * TMP36 temperature sensor on analog pin A1
@@ -26,7 +26,7 @@ via the Arduino Yún's built-in webserver using the Bridge library.
  
  created  6 July 2013
  by Tom Igoe
-
+ 
  
  This example code is in the public domain.
  	 
@@ -37,6 +37,7 @@ via the Arduino Yún's built-in webserver using the Bridge library.
 // Listen on default port 5555, the webserver on the Yun
 // will forward there all the HTTP requests for us.
 YunServer server;
+String startString;
 
 void setup() {
   Serial.begin(9600);
@@ -57,6 +58,14 @@ void setup() {
   // (no one from the external network could connect)
   server.listenOnLocalhost();
   server.begin();
+
+  // get the time that this sketch started:
+  Process startTime;
+  startTime.runShellCommand("date");
+  while(startTime.available()) {
+    char c = startTime.read();
+    startString += c;
+  }
 }
 
 void loop() {
@@ -71,16 +80,29 @@ void loop() {
     Serial.println(command);
     // is "temperature" command?
     if (command == "temperature") {
+
+      // get the time from the server:
+      Process time;
+      time.runShellCommand("date");
+      String timeString = "";
+      while(time.available()) {
+        char c = time.read();
+        timeString += c;
+      }
+      Serial.println(timeString);
       int sensorValue = analogRead(A1);
       // convert the reading to millivolts:
       float voltage = sensorValue *  (5000/ 1024); 
       // convert the millivolts to temperature celsius:
       float temperature = (voltage - 500)/10;
       // print the temperature:
-      client.print("Current temperature: ");
+      client.print("Current time on the Yún: ");
+      client.println(timeString);
+      client.print("<br>Current temperature: ");
       client.print(temperature);
       client.print(" degrees C");
-
+      client.print("<br>This sketch has been running since ");
+      client.print(startString);
     }
 
     // Close connection and free resources.
@@ -89,4 +111,6 @@ void loop() {
 
   delay(50); // Poll every 50ms
 }
+
+
 
