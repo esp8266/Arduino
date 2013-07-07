@@ -1,4 +1,5 @@
 
+#include <Bridge.h>
 #include <HttpClient.h>
 
 void setup() {
