@@ -100,12 +100,12 @@ public class NetworkMonitor extends AbstractMonitor {
         @Override
         public void run() {
           try {
-            Thread.sleep(500);
+            Thread.sleep(1000);
           } catch (InterruptedException e) {
             // ignore
           }
           if (channel.isConnected()) {
-            NetworkMonitor.this.message(_("Connected!"));
+            NetworkMonitor.this.message(_("connected!"));
           }
         }
 
@@ -124,7 +124,7 @@ public class NetworkMonitor extends AbstractMonitor {
         }
       }
       if (connectionAttempts < MAX_CONNECTION_ATTEMPTS) {
-        s = _("Unable to connect: retrying (" + connectionAttempts + ")...") + "\n";
+        s = "\n" + _("Unable to connect: retrying (" + connectionAttempts + ")... ");
 
         SwingUtilities.invokeLater(new Runnable() {
           @Override
@@ -139,7 +139,7 @@ public class NetworkMonitor extends AbstractMonitor {
           }
         });
       } else {
-        s = _("Unable to connect: is the sketch using the bridge?") + "\n";
+        s = "\n" + _("Unable to connect: is the sketch using the bridge?");
       }
     }
     super.message(s);
