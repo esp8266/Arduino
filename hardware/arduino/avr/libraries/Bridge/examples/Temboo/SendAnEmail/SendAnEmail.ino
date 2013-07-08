@@ -22,10 +22,7 @@
 */
 
 #include <Bridge.h>
-#include <Console.h>
-#include <FileIO.h>
-#include <HttpClient.h>
-#include <Process.h>
+#include <Temboo.h>
 #include "TembooAccount.h" // contains Temboo account information
                            // as described in the footer comment below
 
@@ -34,7 +31,7 @@
 // Note that for additional security and reusability, you could
 // use #define statements to specify these values in a .h file.
 
-// your Gmail address, eg "bob.smith@gmail.com"
+// your Gmail username, formatted as a complete email address, eg "bob.smith@gmail.com"
 const String GMAIL_USER_NAME = "xxxxxxxxxx";
 
 // your Gmail password
@@ -62,50 +59,40 @@ void loop()
   if (!success) {
 
     Serial.println("Running SendAnEmail...");
-    
-    // we need a Process object to send a Choreo request to Temboo
-    Process SendEmailChoreo;
+  
+    TembooChoreo SendEmailChoreo;
 
     // invoke the Temboo client
-    SendEmailChoreo.begin("temboo");
+    // NOTE that the client must be reinvoked, and repopulated with
+    // appropriate arguments, each time its run() method is called.
+    SendEmailChoreo.begin();
     
     // set Temboo account credentials
-    SendEmailChoreo.addParameter("-a");
-    SendEmailChoreo.addParameter(TEMBOO_ACCOUNT);
-    SendEmailChoreo.addParameter("-u");
-    SendEmailChoreo.addParameter(TEMBOO_APP_KEY_NAME);
-    SendEmailChoreo.addParameter("-p");
-    SendEmailChoreo.addParameter(TEMBOO_APP_KEY);
+    SendEmailChoreo.setAccountName(TEMBOO_ACCOUNT);
+    SendEmailChoreo.setAppKeyName(TEMBOO_APP_KEY_NAME);
+    SendEmailChoreo.setAppKey(TEMBOO_APP_KEY);
 
     // identify the Temboo Library choreo to run (Google > Gmail > SendEmail)
-    SendEmailChoreo.addParameter("-c");
-    SendEmailChoreo.addParameter("/Library/Google/Gmail/SendEmail");
+    SendEmailChoreo.setChoreo("/Library/Google/Gmail/SendEmail");
+ 
 
     // set the required choreo inputs
     // see https://www.temboo.com/library/Library/Google/Gmail/SendEmail/ 
     // for complete details about the inputs for this Choreo
 
-    // the first input is a your Gmail user name. 
-    SendEmailChoreo.addParameter("-i");
-    SendEmailChoreo.addParameter("Username:" + GMAIL_USER_NAME);
-    
+    // the first input is your Gmail email address.     
+    SendEmailChoreo.addInput("Username", GMAIL_USER_NAME);
     // next is your Gmail password.
-    SendEmailChoreo.addParameter("-i");
-    SendEmailChoreo.addParameter("Password:" + GMAIL_PASSWORD);
-
+    SendEmailChoreo.addInput("Password", GMAIL_PASSWORD);
     // who to send the email to
-    SendEmailChoreo.addParameter("-i");
-    SendEmailChoreo.addParameter("ToAddress:" + TO_EMAIL_ADDRESS);
-        
+    SendEmailChoreo.addInput("ToAddress", TO_EMAIL_ADDRESS);
     // then a subject line
-    SendEmailChoreo.addParameter("-i");
-    SendEmailChoreo.addParameter("Subject:ALERT: Greenhouse Temperature");
-    
-    // next comes the message body, the main content of the email
-    SendEmailChoreo.addParameter("-i");
-    SendEmailChoreo.addParameter("MessageBody:Hey! The greenhouse is too cold!");
+    SendEmailChoreo.addInput("Subject", "ALERT: Greenhouse Temperature");
 
-    // tell the Process to run and wait for the results. The 
+     // next comes the message body, the main content of the email   
+    SendEmailChoreo.addInput("MessageBody", "Hey! The greenhouse is too cold!");
+
+    // tell the Choreo to run and wait for the results. The 
     // return code (returnCode) will tell us whether the Temboo client 
     // was able to send our request to the Temboo servers
     unsigned int returnCode = SendEmailChoreo.run();

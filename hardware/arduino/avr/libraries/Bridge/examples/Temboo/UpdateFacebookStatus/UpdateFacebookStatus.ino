@@ -24,10 +24,7 @@
 */
 
 #include <Bridge.h>
-#include <Console.h>
-#include <FileIO.h>
-#include <HttpClient.h>
-#include <Process.h>
+#include <Temboo.h>
 #include "TembooAccount.h" // contains Temboo account information, 
                            // as described in the footer comment below
 
@@ -40,7 +37,7 @@
 const String FACEBOOK_ACCESS_TOKEN = "xxxxxxxxxx";
 
 
-int numRuns = 0;   // execution count, so this sketch doesn't run forever
+int numRuns = 1;   // execution count, so this sketch doesn't run forever
 int maxRuns = 10;  // the max number of times the Facebook SetStatus Choreo should run
 
 void setup() {
@@ -54,7 +51,7 @@ void setup() {
 
 void loop() {
   // while we haven't reached the max number of runs...
-  if (numRuns < maxRuns) {
+  if (numRuns <= maxRuns) {
 
     // print status
     Serial.println("Running UpdateFacebookStatus - Run #" + String(numRuns++) + "...");
@@ -64,31 +61,27 @@ void loop() {
     String statusMsg = "My Arduino Yun has been running for " + String(millis()) + " milliseconds!";
 
     // define the Process that will be used to call the "temboo" client                
-    Process SetStatusChoreo;
+    TembooChoreo SetStatusChoreo;
 
     // invoke the Temboo client
-    SetStatusChoreo.begin("temboo");
+    // NOTE that the client must be reinvoked and repopulated with
+    // appropriate arguments each time its run() method is called.
+    SetStatusChoreo.begin();
     
     // set Temboo account credentials
-    SetStatusChoreo.addParameter("-a");
-    SetStatusChoreo.addParameter(TEMBOO_ACCOUNT);
-    SetStatusChoreo.addParameter("-u");
-    SetStatusChoreo.addParameter(TEMBOO_APP_KEY_NAME);
-    SetStatusChoreo.addParameter("-p");
-    SetStatusChoreo.addParameter(TEMBOO_APP_KEY);
+    SetStatusChoreo.setAccountName(TEMBOO_ACCOUNT);
+    SetStatusChoreo.setAppKeyName(TEMBOO_APP_KEY_NAME);
+    SetStatusChoreo.setAppKey(TEMBOO_APP_KEY);
 
     // tell the Temboo client which Choreo to run (Facebook > Publishing > SetStatus)
-    SetStatusChoreo.addParameter("-c");
-    SetStatusChoreo.addParameter("/Library/Facebook/Publishing/SetStatus");
+    SetStatusChoreo.setChoreo("/Library/Facebook/Publishing/SetStatus");
 
     // set the required choreo inputs
     // see  https://www.temboo.com/library/Library/Facebook/Publishing/SetStatus/
     // for complete details about the inputs for this Choreo
     
-    SetStatusChoreo.addParameter("-i");
-    SetStatusChoreo.addParameter("AccessToken:" + FACEBOOK_ACCESS_TOKEN);    
-    SetStatusChoreo.addParameter("-i");
-    SetStatusChoreo.addParameter("Message:" + statusMsg);
+    SetStatusChoreo.addInput("AccessToken", FACEBOOK_ACCESS_TOKEN);    
+    SetStatusChoreo.addInput("Message", statusMsg);
 
 
     // tell the Process to run and wait for the results. The 

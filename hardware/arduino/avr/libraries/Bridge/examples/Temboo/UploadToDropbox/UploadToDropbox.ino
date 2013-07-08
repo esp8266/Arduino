@@ -25,10 +25,7 @@
 */
 
 #include <Bridge.h>
-#include <Console.h>
-#include <FileIO.h>
-#include <HttpClient.h>
-#include <Process.h>
+#include <Temboo.h>
 #include "TembooAccount.h" // contains Temboo account information
                            // as described in the footer comment below
 
@@ -76,49 +73,40 @@ void loop()
     Serial.println("Uploading data to Dropbox...");
 
     // we need a Process object to send a Choreo request to Temboo    
-    Process UploadFileChoreo;
+    TembooChoreo UploadFileChoreo;
 
     // invoke the Temboo client
-    UploadFileChoreo.begin("temboo");
+    // NOTE that the client must be reinvoked and repopulated with
+    // appropriate arguments each time its run() method is called.
+    UploadFileChoreo.begin();
     
     // set Temboo account credentials
-    UploadFileChoreo.addParameter("-a");
-    UploadFileChoreo.addParameter(TEMBOO_ACCOUNT);
-    UploadFileChoreo.addParameter("-u");
-    UploadFileChoreo.addParameter(TEMBOO_APP_KEY_NAME);
-    UploadFileChoreo.addParameter("-p");
-    UploadFileChoreo.addParameter(TEMBOO_APP_KEY);
+    UploadFileChoreo.setAccountName(TEMBOO_ACCOUNT);
+    UploadFileChoreo.setAppKeyName(TEMBOO_APP_KEY_NAME);
+    UploadFileChoreo.setAppKey(TEMBOO_APP_KEY);
 
     // identify the Temboo Library choreo to run (Dropbox > FilesAndMetadata > UploadFile)
-    UploadFileChoreo.addParameter("-c");
-    UploadFileChoreo.addParameter("/Library/Dropbox/FilesAndMetadata/UploadFile");
+    UploadFileChoreo.setChoreo("/Library/Dropbox/FilesAndMetadata/UploadFile");
     
     // set the required choreo inputs
     // see https://www.temboo.com/library/Library/Dropbox/FilesAndMetadata/UploadFile/
     // for complete details about the inputs for this Choreo
 
     // first specify the name of the file to create/update on Dropbox
-    UploadFileChoreo.addParameter("-i");
-    UploadFileChoreo.addParameter("FileName:ArduinoTest.txt");
+    UploadFileChoreo.addInput("FileName", "ArduinoTest.txt");
 
     // next, the root folder on Dropbox relative to which the file path is specified.
     // unless you're using an in-production Dropbox app, this should be left as "sandbox"
-    UploadFileChoreo.addParameter("-i");
-    UploadFileChoreo.addParameter("Root:sandbox");
+    UploadFileChoreo.addInput("Root","sandbox");
 
     // next, the Base64 encoded file data to upload
-    UploadFileChoreo.addParameter("-i");
-    UploadFileChoreo.addParameter("FileContents:" + base64EncodedData);
+    UploadFileChoreo.addInput("FileContents", base64EncodedData);
    
     // finally, the Dropbox OAuth credentials defined above
-    UploadFileChoreo.addParameter("-i");
-    UploadFileChoreo.addParameter("AppSecret:" + DROPBOX_APP_SECRET);
-    UploadFileChoreo.addParameter("-i");
-    UploadFileChoreo.addParameter("AccessToken:" + DROPBOX_ACCESS_TOKEN);
-    UploadFileChoreo.addParameter("-i");
-    UploadFileChoreo.addParameter("AccessTokenSecret:" + DROPBOX_ACCESS_TOKEN_SECRET);
-    UploadFileChoreo.addParameter("-i");
-    UploadFileChoreo.addParameter("AppKey:" + DROPBOX_APP_KEY);
+    UploadFileChoreo.addInput("AppSecret", DROPBOX_APP_SECRET);
+    UploadFileChoreo.addInput("AccessToken", DROPBOX_ACCESS_TOKEN);
+    UploadFileChoreo.addInput("AccessTokenSecret", DROPBOX_ACCESS_TOKEN_SECRET);
+    UploadFileChoreo.addInput("AppKey", DROPBOX_APP_KEY);
 
     // tell the Process to run and wait for the results. The 
     // return code (returnCode) will tell us whether the Temboo client 
@@ -156,26 +144,21 @@ void loop()
 String base64Encode(String toEncode) {
   
     // we need a Process object to send a Choreo request to Temboo
-    Process Base64EncodeChoreo;
+    TembooChoreo Base64EncodeChoreo;
 
     // invoke the Temboo client
-    Base64EncodeChoreo.begin("temboo");
+    Base64EncodeChoreo.begin();
     
     // set Temboo account credentials
-    Base64EncodeChoreo.addParameter("-a");
-    Base64EncodeChoreo.addParameter(TEMBOO_ACCOUNT);
-    Base64EncodeChoreo.addParameter("-u");
-    Base64EncodeChoreo.addParameter(TEMBOO_APP_KEY_NAME);
-    Base64EncodeChoreo.addParameter("-p");
-    Base64EncodeChoreo.addParameter(TEMBOO_APP_KEY);
+    Base64EncodeChoreo.setAccountName(TEMBOO_ACCOUNT);
+    Base64EncodeChoreo.setAppKeyName(TEMBOO_APP_KEY_NAME);
+    Base64EncodeChoreo.setAppKey(TEMBOO_APP_KEY);
 
     // identify the Temboo Library choreo to run (Utilities > Encoding > Base64Encode)
-    Base64EncodeChoreo.addParameter("-c");
-    Base64EncodeChoreo.addParameter("/Library/Utilities/Encoding/Base64Encode");
+    Base64EncodeChoreo.setChoreo("/Library/Utilities/Encoding/Base64Encode");
  
      // set choreo inputs
-    Base64EncodeChoreo.addParameter("-i");
-    Base64EncodeChoreo.addParameter("Text:" + toEncode);
+    Base64EncodeChoreo.addInput("Text", toEncode);
     
     // run the choreo
     Base64EncodeChoreo.run();

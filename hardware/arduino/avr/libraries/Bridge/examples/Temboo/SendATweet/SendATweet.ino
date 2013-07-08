@@ -25,10 +25,7 @@
 */
 
 #include <Bridge.h>
-#include <Console.h>
-#include <FileIO.h>
-#include <HttpClient.h>
-#include <Process.h>
+#include <Temboo.h>
 #include "TembooAccount.h" // contains Temboo account information
                            // as described in the footer comment below
 
@@ -43,7 +40,7 @@ const String TWITTER_CONSUMER_KEY = "your-twitter-consumer-key";
 const String TWITTER_CONSUMER_SECRET = "your-twitter-consumer-secret";
 
 int numRuns = 1;   // execution count, so this sketch doesn't run forever
-int maxRuns = 10;  // the max number of times the Twitter HomeTimeline Choreo should run
+int maxRuns = 3;  // the max number of times the Twitter Update Choreo should run
 
 void setup() {
   Serial.begin(9600);
@@ -61,43 +58,38 @@ void loop()
   if (numRuns <= maxRuns) {
 
     Serial.println("Running SendATweet - Run #" + String(numRuns++) + "...");
+  
+    // define the text of the tweet we want to send
+    String tweetText("My Arduino Yun has been running for " + String(millis()) + " milliseconds.");
+
     
-    // we need a Process object to send a Choreo request to Temboo
-    Process StatusesUpdateChoreo;
+    TembooChoreo StatusesUpdateChoreo;
 
     // invoke the Temboo client
-    StatusesUpdateChoreo.begin("temboo");
+    // NOTE that the client must be reinvoked, and repopulated with
+    // appropriate arguments, each time its run() method is called.
+    StatusesUpdateChoreo.begin();
     
     // set Temboo account credentials
-    StatusesUpdateChoreo.addParameter("-a");
-    StatusesUpdateChoreo.addParameter(TEMBOO_ACCOUNT);
-    StatusesUpdateChoreo.addParameter("-u");
-    StatusesUpdateChoreo.addParameter(TEMBOO_APP_KEY_NAME);
-    StatusesUpdateChoreo.addParameter("-p");
-    StatusesUpdateChoreo.addParameter(TEMBOO_APP_KEY);
+    StatusesUpdateChoreo.setAccountName(TEMBOO_ACCOUNT);
+    StatusesUpdateChoreo.setAppKeyName(TEMBOO_APP_KEY_NAME);
+    StatusesUpdateChoreo.setAppKey(TEMBOO_APP_KEY);
 
     // identify the Temboo Library choreo to run (Twitter > Tweets > StatusesUpdate)
-    StatusesUpdateChoreo.addParameter("-c");
-    StatusesUpdateChoreo.addParameter("/Library/Twitter/Tweets/StatusesUpdate");
+    StatusesUpdateChoreo.setChoreo("/Library/Twitter/Tweets/StatusesUpdate");
 
     // set the required choreo inputs
     // see https://www.temboo.com/library/Library/Twitter/Tweets/StatusesUpdate/ 
     // for complete details about the inputs for this Choreo
-    
+ 
     // add the Twitter account information
-    StatusesUpdateChoreo.addParameter("-i");
-    StatusesUpdateChoreo.addParameter("AccessToken:" + TWITTER_ACCESS_TOKEN);
-    StatusesUpdateChoreo.addParameter("-i");
-    StatusesUpdateChoreo.addParameter("AccessTokenSecret:" + TWITTER_ACCESS_TOKEN_SECRET);
-    StatusesUpdateChoreo.addParameter("-i");
-    StatusesUpdateChoreo.addParameter("ConsumerSecret:" + TWITTER_CONSUMER_SECRET);
-    StatusesUpdateChoreo.addParameter("-i");
-    StatusesUpdateChoreo.addParameter("ConsumerKey:" + TWITTER_CONSUMER_KEY);
+    StatusesUpdateChoreo.addInput("AccessToken", TWITTER_ACCESS_TOKEN);
+    StatusesUpdateChoreo.addInput("AccessTokenSecret", TWITTER_ACCESS_TOKEN_SECRET);
+    StatusesUpdateChoreo.addInput("ConsumerKey", TWITTER_CONSUMER_KEY);    
+    StatusesUpdateChoreo.addInput("ConsumerSecret", TWITTER_CONSUMER_SECRET);
 
-    String tweet("My Arduino Yun has been running for " + String(millis()) + " milliseconds.");
-
-    StatusesUpdateChoreo.addParameter("-i");
-    StatusesUpdateChoreo.addParameter("StatusUpdate:" + tweet);
+    // and the tweet we want to send
+    StatusesUpdateChoreo.addInput("StatusUpdate", tweetText);
 
     // tell the Process to run and wait for the results. The 
     // return code (returnCode) will tell us whether the Temboo client 

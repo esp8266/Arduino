@@ -18,10 +18,7 @@
 */
 
 #include <Bridge.h>
-#include <Console.h>
-#include <FileIO.h>
-#include <HttpClient.h>
-#include <Process.h>
+#include <Temboo.h>
 #include "TembooAccount.h" // contains Temboo account information
                            // as described in the footer comment below
 
@@ -29,8 +26,9 @@
 // the address for which a weather forecast will be retrieved
 String ADDRESS_FOR_FORECAST = "104 Franklin St., New York NY 10013";
 
-int numRuns = 0;   // execution count, so that this doesn't run forever
+int numRuns = 1;   // execution count, so that this doesn't run forever
 int maxRuns = 10;  // max number of times the Yahoo WeatherByAddress Choreo should be run
+
 
 void setup() {
   Serial.begin(9600);
@@ -39,48 +37,50 @@ void setup() {
   delay(4000);
   while(!Serial);
   Bridge.begin();
+
 }
 
 void loop()
 {
   // while we haven't reached the max number of runs...
-  if (numRuns < maxRuns) {
+  if (numRuns <= maxRuns) {
       
     // print status
     Serial.println("Running GetWeatherByAddress - Run #" + String(numRuns++) + "...");
 
-    // we need a Process object to send a Choreo request to Temboo
-    Process GetWeatherByAddressChoreo;
-
+    // create a TembooChoreo object to send a Choreo request to Temboo
+    TembooChoreo GetWeatherByAddressChoreo;
+    
     // invoke the Temboo client
-    GetWeatherByAddressChoreo.begin("temboo");
-        
-    // set Temboo account credentials
-    GetWeatherByAddressChoreo.addParameter("-a");
-    GetWeatherByAddressChoreo.addParameter(TEMBOO_ACCOUNT);
-    GetWeatherByAddressChoreo.addParameter("-u");
-    GetWeatherByAddressChoreo.addParameter(TEMBOO_APP_KEY_NAME);
-    GetWeatherByAddressChoreo.addParameter("-p");
-    GetWeatherByAddressChoreo.addParameter(TEMBOO_APP_KEY);
-  
-    // identify the Temboo Library choreo to run (Yahoo > Weather > GetWeatherByAddress)
-    GetWeatherByAddressChoreo.addParameter("-c");
-    GetWeatherByAddressChoreo.addParameter("/Library/Yahoo/Weather/GetWeatherByAddress");
-        
+    GetWeatherByAddressChoreo.begin();
+
+    // add your temboo account info
+    GetWeatherByAddressChoreo.setAccountName(TEMBOO_ACCOUNT);
+    GetWeatherByAddressChoreo.setAppKeyName(TEMBOO_APP_KEY_NAME);
+    GetWeatherByAddressChoreo.setAppKey(TEMBOO_APP_KEY);
+    
+    // set the name of the choreo we want to run
+    GetWeatherByAddressChoreo.setChoreo("/Library/Yahoo/Weather/GetWeatherByAddress");
+    
     // set choreo inputs; in this case, the address for which to retrieve weather data
     // the Temboo client provides standardized calls to 100+ cloud APIs
-    GetWeatherByAddressChoreo.addParameter("-i");
-    GetWeatherByAddressChoreo.addParameter("Address:" + ADDRESS_FOR_FORECAST);
-            
+    GetWeatherByAddressChoreo.addInput("Address", ADDRESS_FOR_FORECAST);
+
+    // add an output filter to extract the name of the city.
+    GetWeatherByAddressChoreo.addOutputFilter("city", "/rss/channel/yweather:location/@city", "Response");
+    
+    // add an output filter to extract the current temperature
+    GetWeatherByAddressChoreo.addOutputFilter("temperature", "/rss/channel/item/yweather:condition/@temp", "Response");
+
+    // add an output filter to extract the date and time of the last report.
+    GetWeatherByAddressChoreo.addOutputFilter("date", "/rss/channel/item/yweather:condition/@date", "Response");
+
     // run the choreo 
     GetWeatherByAddressChoreo.run();
         
     // when the choreo results are available, print them to the serial monitor
     while(GetWeatherByAddressChoreo.available()) {
           
-      // note that in this example, we just print the raw XML response from Yahoo
-      // see the examples on using Temboo SDK output filters at http://www.temboo.com/arduino
-      // for information on how to filter this data
       char c = GetWeatherByAddressChoreo.read();    
       Serial.print(c);
     }

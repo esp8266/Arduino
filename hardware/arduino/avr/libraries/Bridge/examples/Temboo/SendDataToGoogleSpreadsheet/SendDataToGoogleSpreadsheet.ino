@@ -37,10 +37,7 @@
 */
 
 #include <Bridge.h>
-#include <Console.h>
-#include <FileIO.h>
-#include <HttpClient.h>
-#include <Process.h>
+#include <Temboo.h>
 #include "TembooAccount.h" // contains Temboo account information, 
                            // as described in the footer comment below
 
@@ -97,39 +94,34 @@ void loop()
     Serial.println("Appending value to spreadsheet...");
 
     // we need a Process object to send a Choreo request to Temboo
-    Process AppendRowChoreo;
+    TembooChoreo AppendRowChoreo;
 
     // invoke the Temboo client
-    AppendRowChoreo.begin("temboo");
+    // NOTE that the client must be reinvoked and repopulated with
+    // appropriate arguments each time its run() method is called.
+    AppendRowChoreo.begin();
     
     // set Temboo account credentials
-    AppendRowChoreo.addParameter("-a");
-    AppendRowChoreo.addParameter(TEMBOO_ACCOUNT);
-    AppendRowChoreo.addParameter("-u");
-    AppendRowChoreo.addParameter(TEMBOO_APP_KEY_NAME);
-    AppendRowChoreo.addParameter("-p");
-    AppendRowChoreo.addParameter(TEMBOO_APP_KEY);
+    AppendRowChoreo.setAccountName(TEMBOO_ACCOUNT);
+    AppendRowChoreo.setAppKeyName(TEMBOO_APP_KEY_NAME);
+    AppendRowChoreo.setAppKey(TEMBOO_APP_KEY);
     
     // identify the Temboo Library choreo to run (Google > Spreadsheets > AppendRow)
-    AppendRowChoreo.addParameter("-c");
-    AppendRowChoreo.addParameter("/Library/Google/Spreadsheets/AppendRow");
+    AppendRowChoreo.setChoreo("/Library/Google/Spreadsheets/AppendRow");
     
     // set the required Choreo inputs
     // see https://www.temboo.com/library/Library/Google/Spreadsheets/AppendRow/ 
     // for complete details about the inputs for this Choreo
     
     // your Google username (usually your email address)
-    AppendRowChoreo.addParameter("-i");
-    AppendRowChoreo.addParameter("Username:" + GOOGLE_USERNAME);
+    AppendRowChoreo.addInput("Username", GOOGLE_USERNAME);
 
     // your Google account password
-    AppendRowChoreo.addParameter("-i");
-    AppendRowChoreo.addParameter("Password:" + GOOGLE_PASSWORD);
+    AppendRowChoreo.addInput("Password", GOOGLE_PASSWORD);
 
     // the title of the spreadsheet you want to append to
     // NOTE: substitute your own value, retaining the "SpreadsheetTitle:" prefix.
-    AppendRowChoreo.addParameter("-i");
-    AppendRowChoreo.addParameter("SpreadsheetTitle:" + SPREADSHEET_TITLE);
+    AppendRowChoreo.addInput("SpreadsheetTitle", SPREADSHEET_TITLE);
 
     // convert the time and sensor values to a comma separated string
     String rowData(now);
@@ -137,8 +129,7 @@ void loop()
     rowData += sensorValue;
 
     // add the RowData input item
-    AppendRowChoreo.addParameter("-i");
-    AppendRowChoreo.addParameter("RowData:" + rowData);
+    AppendRowChoreo.addInput("RowData", rowData);
 
     // run the Choreo and wait for the results
     // The return code (returnCode) will indicate success or failure 

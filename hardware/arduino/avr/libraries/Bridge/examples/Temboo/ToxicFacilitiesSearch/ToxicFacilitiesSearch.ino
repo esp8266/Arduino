@@ -20,10 +20,7 @@
 */
 
 #include <Bridge.h>
-#include <Console.h>
-#include <FileIO.h>
-#include <HttpClient.h>
-#include <Process.h>
+#include <Temboo.h>
 #include "TembooAccount.h" // contains Temboo account information
                            // as described in the footer comment below
 
@@ -51,35 +48,30 @@ void loop()
     Serial.println("Running ToxicFacilitiesSearch - Run #" + String(numRuns++) + "...");
 
     // we need a Process object to send a Choreo request to Temboo
-    Process FacilitiesSearchByZipChoreo;
+    TembooChoreo FacilitiesSearchByZipChoreo;
 
     // invoke the Temboo client
-    FacilitiesSearchByZipChoreo.begin("temboo");
+    // NOTE that the client must be reinvoked and repopulated with
+    // appropriate arguments each time its run() method is called.
+    FacilitiesSearchByZipChoreo.begin();
         
     // set Temboo account credentials
-    FacilitiesSearchByZipChoreo.addParameter("-a");
-    FacilitiesSearchByZipChoreo.addParameter(TEMBOO_ACCOUNT);
-    FacilitiesSearchByZipChoreo.addParameter("-u");
-    FacilitiesSearchByZipChoreo.addParameter(TEMBOO_APP_KEY_NAME);
-    FacilitiesSearchByZipChoreo.addParameter("-p");
-    FacilitiesSearchByZipChoreo.addParameter(TEMBOO_APP_KEY);
+    FacilitiesSearchByZipChoreo.setAccountName(TEMBOO_ACCOUNT);
+    FacilitiesSearchByZipChoreo.setAppKeyName(TEMBOO_APP_KEY_NAME);
+    FacilitiesSearchByZipChoreo.setAppKey(TEMBOO_APP_KEY);
   
     // identify the Temboo Library choreo to run (EnviroFacts > Toxins > FacilitiesSearchByZip)
-    FacilitiesSearchByZipChoreo.addParameter("-c");
-    FacilitiesSearchByZipChoreo.addParameter("/Library/EnviroFacts/Toxins/FacilitiesSearchByZip");
+    FacilitiesSearchByZipChoreo.setChoreo("/Library/EnviroFacts/Toxins/FacilitiesSearchByZip");
         
     // set choreo inputs; in this case, the US zip code for which to retrieve toxin release data
     // the Temboo client provides standardized calls to 100+ cloud APIs
-    FacilitiesSearchByZipChoreo.addParameter("-i");
-    FacilitiesSearchByZipChoreo.addParameter("Zip:" + US_ZIP_CODE);
+    FacilitiesSearchByZipChoreo.addInput("Zip", US_ZIP_CODE);
     
     // specify two output filters, to help simplify the Envirofacts API results.
     // see the tutorials on using Temboo SDK output filters at http://www.temboo.com/arduino
-    FacilitiesSearchByZipChoreo.addParameter("-o");
-    FacilitiesSearchByZipChoreo.addParameter("fac:FACILITY_NAME:Response");
+    FacilitiesSearchByZipChoreo.addOutputFilter("fac", "FACILITY_NAME", "Response");
 
-    FacilitiesSearchByZipChoreo.addParameter("-o");
-    FacilitiesSearchByZipChoreo.addParameter("addr:STREET_ADDRESS:Response");
+    FacilitiesSearchByZipChoreo.addOutputFilter("addr", "STREET_ADDRESS", "Response");
 
     // run the choreo 
     unsigned int returnCode = FacilitiesSearchByZipChoreo.run();

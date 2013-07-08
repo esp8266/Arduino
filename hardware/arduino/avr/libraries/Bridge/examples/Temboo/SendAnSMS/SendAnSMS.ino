@@ -31,10 +31,7 @@
 */
 
 #include <Bridge.h>
-#include <Console.h>
-#include <FileIO.h>
-#include <HttpClient.h>
-#include <Process.h>
+#include <Temboo.h>
 #include "TembooAccount.h" // contains Temboo account information
                            // as described in the footer comment below
 
@@ -77,46 +74,39 @@ void loop()
     Serial.println("Running SendAnSMS...");
     
     // we need a Process object to send a Choreo request to Temboo
-    Process SendSMSChoreo;
+    TembooChoreo SendSMSChoreo;
 
     // invoke the Temboo client
-    SendSMSChoreo.begin("temboo");
+    // NOTE that the client must be reinvoked and repopulated with
+    // appropriate arguments each time its run() method is called.
+    SendSMSChoreo.begin();
     
     // set Temboo account credentials
-    SendSMSChoreo.addParameter("-a");
-    SendSMSChoreo.addParameter(TEMBOO_ACCOUNT);
-    SendSMSChoreo.addParameter("-u");
-    SendSMSChoreo.addParameter(TEMBOO_APP_KEY_NAME);
-    SendSMSChoreo.addParameter("-p");
-    SendSMSChoreo.addParameter(TEMBOO_APP_KEY);
+    SendSMSChoreo.setAccountName(TEMBOO_ACCOUNT);
+    SendSMSChoreo.setAppKeyName(TEMBOO_APP_KEY_NAME);
+    SendSMSChoreo.setAppKey(TEMBOO_APP_KEY);
 
     // identify the Temboo Library choreo to run (Twilio > SMSMessages > SendSMS)
-    SendSMSChoreo.addParameter("-c");
-    SendSMSChoreo.addParameter("/Library/Twilio/SMSMessages/SendSMS");
+    SendSMSChoreo.setChoreo("/Library/Twilio/SMSMessages/SendSMS");
 
     // set the required choreo inputs
     // see https://www.temboo.com/library/Library/Twilio/SMSMessages/SendSMS/ 
     // for complete details about the inputs for this Choreo
 
     // the first input is a your AccountSID
-    SendSMSChoreo.addParameter("-i");
-    SendSMSChoreo.addParameter("AccountSID:" + TWILIO_ACCOUNT_SID);
+    SendSMSChoreo.addInput("AccountSID", TWILIO_ACCOUNT_SID);
     
     // next is your Auth Token
-    SendSMSChoreo.addParameter("-i");
-    SendSMSChoreo.addParameter("AuthToken:" + TWILIO_AUTH_TOKEN);
+    SendSMSChoreo.addInput("AuthToken", TWILIO_AUTH_TOKEN);
  
     // next is your Twilio phone number
-    SendSMSChoreo.addParameter("-i");
-    SendSMSChoreo.addParameter("From:" + TWILIO_NUMBER);
+    SendSMSChoreo.addInput("From", TWILIO_NUMBER);
     
     // next, what number to send the SMS to
-    SendSMSChoreo.addParameter("-i");
-    SendSMSChoreo.addParameter("To:" + RECIPIENT_NUMBER);
+    SendSMSChoreo.addInput("To", RECIPIENT_NUMBER);
 
     // finally, the text of the message to send
-    SendSMSChoreo.addParameter("-i");
-    SendSMSChoreo.addParameter("Body:Hey, there! This is a message from your Arduino Yun!");
+    SendSMSChoreo.addInput("Body", "Hey, there! This is a message from your Arduino Yun!");
     
     // tell the Process to run and wait for the results. The 
     // return code (returnCode) will tell us whether the Temboo client 
