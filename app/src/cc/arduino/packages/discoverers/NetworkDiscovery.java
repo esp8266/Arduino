@@ -131,7 +131,7 @@ public class NetworkDiscovery implements Discovery, ServiceListener, cc.arduino.
     Iterator<BoardPort> iterator = ports.iterator();
     while (iterator.hasNext()) {
       BoardPort board = iterator.next();
-      if (newBoard.getAddress().equals(board.getAddress()) && newBoard.getBoardName().equals(board.getBoardName())) {
+      if (newBoard.getAddress().equals(board.getAddress())) {
         iterator.remove();
       }
     }
