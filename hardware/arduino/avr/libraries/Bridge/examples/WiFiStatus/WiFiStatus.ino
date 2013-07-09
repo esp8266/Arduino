@@ -1,17 +1,19 @@
 
 /*
-  WiFi Status 
+ WiFi Status 
  
- This sketch run a script already present on your Yún in the
- /usr/bin directory called "pretty-wifi-info.lua" that takes 
- the informations of the WiFi interface and print it on the
- Serial monitor.
- 
+ This sketch runs a script called "pretty-wifi-info.lua"
+ installed on your Yún in folder /usr/bin.
+ It prints information about the status of your wifi connection.
+
+ It uses Serial to print, so you need to connect your Yún to your
+ computer using a USB cable and select the appropriate port from
+ the Port menu
+
  created  18 June 2013
  By Federico Fissore
  
  This example code is in the public domain.
- 
  */
 
 #include <Process.h>
