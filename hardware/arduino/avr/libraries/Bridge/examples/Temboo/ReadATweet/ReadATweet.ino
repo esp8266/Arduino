@@ -149,3 +149,24 @@ void loop()
   Serial.println("Waiting...");
   delay(90000); // wait 90 seconds between HomeTimeline calls
 }
+
+/*
+  IMPORTANT NOTE: TembooAccount.h:
+
+  TembooAccount.h is a file referenced by this sketch that contains your Temboo account information.
+  You'll need to edit the placeholder version of TembooAccount.h included with this example sketch,
+  by inserting your own Temboo account name and app key information. The contents of the file should
+  look like:
+
+  #define TEMBOO_ACCOUNT "myTembooAccountName"  // your Temboo account name 
+  #define TEMBOO_APP_KEY_NAME "myFirstApp"  // your Temboo app key name
+  #define TEMBOO_APP_KEY  "xxx-xxx-xxx-xx-xxx"  // your Temboo app key
+
+  You can find your Temboo App Key information on the Temboo website, 
+  under My Account > Application Keys
+
+  The same TembooAccount.h file settings can be used for all Temboo SDK sketches.
+
+  Keeping your account information in a separate file means you can share the main .ino file without worrying 
+  that you forgot to delete your credentials.
+*/
