@@ -16,7 +16,9 @@
  '~' followed by '1' -> Set the UART speed to 115200 baud
  '~' followed by '2' -> Set the UART speed to 250000 baud
  '~' followed by '3' -> Set the UART speed to 500000 baud
- 
+ '~' followeb by '~' -> Sends the bridge's shutdown command to
+                        obtain the console.
+                        
  The circuit:
  * Arduino Yun
  
@@ -59,6 +61,9 @@ void loop() {
       } else if (c == '3') {          //     '3' key pressed?
         Serial1.begin(500000);        //        set speed to 500000
         Serial.println("Speed set to 500000");
+      } else if (c == '~') {
+        Serial1.write((uint8_t *)"\xff\0\0\x05XXXXX\x0d\xaf", 11);
+        Serial.println("Sending bridge's shutdown command");
       } else {                        //     any other key pressed?
         Serial1.write('~');           //        write '~' to Linino
         Serial1.write(c);             //        write char to Linino
