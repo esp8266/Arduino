@@ -10,9 +10,10 @@ import static processing.app.I18n._;
 
 public class DiscoveryManager {
 
-  private List<Discovery> discoverers = new ArrayList<Discovery>();
+  private final List<Discovery> discoverers;
 
   public DiscoveryManager() {
+    discoverers = new ArrayList<Discovery>();
     discoverers.add(new SerialDiscovery());
     discoverers.add(new NetworkDiscovery());
 
@@ -26,6 +27,18 @@ public class DiscoveryManager {
       }
     }
 
+    Thread closeHook = new Thread(new Runnable() {
+      @Override
+      public void run() {
+        for (Discovery d : discoverers) {
+          try {
+            d.stop();
+          } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+          }
+        }
+      }
+    });
     Runtime.getRuntime().addShutdownHook(closeHook);
   }
 
@@ -36,16 +49,4 @@ public class DiscoveryManager {
     return res;
   }
 
-  private Thread closeHook = new Thread(new Runnable() {
-    @Override
-    public void run() {
-      for (Discovery d : discoverers) {
-        try {
-          d.stop();
-        } catch (Exception e) {
-          e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-      }
-    }
-  });
 }

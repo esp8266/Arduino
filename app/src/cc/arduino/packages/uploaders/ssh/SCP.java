@@ -17,7 +17,7 @@ public class SCP extends SSH {
     super(session);
   }
 
-  public void open() throws JSchException, IOException {
+  public void open() throws IOException {
     try {
       channel = session.openChannel("exec");
       ((ChannelExec) channel).setCommand("scp -t -r -d /");

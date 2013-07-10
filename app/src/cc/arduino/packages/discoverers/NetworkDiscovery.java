@@ -18,7 +18,7 @@ import java.util.*;
 public class NetworkDiscovery implements Discovery, ServiceListener, cc.arduino.packages.discoverers.network.NetworkTopologyListener {
 
   private Timer timer;
-  private List<BoardPort> ports;
+  private final List<BoardPort> ports;
   private final Map<InetAddress, JmDNS> mappedJmDNSs;
 
   public NetworkDiscovery() {
