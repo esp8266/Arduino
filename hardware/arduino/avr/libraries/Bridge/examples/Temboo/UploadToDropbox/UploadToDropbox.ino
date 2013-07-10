@@ -9,12 +9,17 @@
   If you don't already have one, you can register for a free Temboo account at 
   http://www.temboo.com
 
-  You'll also need a valid Dropbox account, and OAuth credentials for Dropbox. To
-  obtain OAuth credentials for Dropbox, you'll need to register a Dropbox app at 
-  https://www.dropbox.com/developers/apps -- the app name and domain can be whatever
-  you'd like. After registering the app, follow the instructions at 
+  You'll also need a valid Dropbox app and accompanying OAuth credentials. 
+  To create a Dropbox app, visit https://www.dropbox.com/developers/apps and 
+  do the following:
+  
+  1. Create a "Dropbox API app"
+  2. Select "Files and datastores"
+  3. Select "Yes - my app only needs access to the files it creates."
+  
+  Once you've created your app, follow the instructions at 
   https://www.temboo.com/library/Library/Dropbox/OAuth/ to run the Initialize and Finalize
-  OAuth Choreos to complete the OAuth handshake and retrieve your Access Token information.
+  OAuth Choreos. These Choreos complete the OAuth handshake and retrieve your Dropbox OAuth access tokens.
 
   This example assumes basic familiarity with Arduino sketches, and that your Yun is connected
   to the Internet.
@@ -96,7 +101,8 @@ void loop()
     UploadFileChoreo.addInput("FileName", "ArduinoTest.txt");
 
     // next, the root folder on Dropbox relative to which the file path is specified.
-    // unless you're using an in-production Dropbox app, this should be left as "sandbox"
+    // to work with the Dropbox app you created earlier, this should be left as "sandbox"
+    // if your Dropbox app has full access to your files, specify "dropbox"
     UploadFileChoreo.addInput("Root","sandbox");
 
     // next, the Base64 encoded file data to upload
