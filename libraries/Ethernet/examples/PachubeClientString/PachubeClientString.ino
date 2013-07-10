@@ -30,7 +30,7 @@
 #include <Ethernet.h>
 
 
-/#define APIKEY         "YOUR API KEY GOES HERE" // replace your Cosm api key here
+#define APIKEY         "YOUR API KEY GOES HERE" // replace your Cosm api key here
 #define FEEDID         00000 // replace your feed ID
 #define USERAGENT      "My Project" // user agent is the project name
 
