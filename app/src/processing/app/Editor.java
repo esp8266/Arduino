@@ -22,6 +22,7 @@
 
 package processing.app;
 
+import cc.arduino.packages.UploaderAndMonitorFactory;
 import com.jcraft.jsch.JSchException;
 import processing.app.debug.*;
 import processing.app.forms.PasswordAuthorizationDialog;
@@ -47,7 +48,6 @@ import javax.swing.undo.*;
 
 import cc.arduino.packages.BoardPort;
 import cc.arduino.packages.Uploader;
-import cc.arduino.packages.UploaderFactory;
 import cc.arduino.packages.uploaders.SerialUploader;
 
 /**
@@ -209,7 +209,7 @@ public class Editor extends JFrame implements RunnerListener {
     //sketchbook = new Sketchbook(this);
 
     if (serialMonitor == null) {
-      serialMonitor = new UploaderFactory().newMonitor(Preferences.get("serial.port"), base);
+      serialMonitor = new UploaderAndMonitorFactory().newMonitor(Preferences.get("serial.port"), base);
       serialMonitor.setIconImage(getIconImage());
     }
 
@@ -975,7 +975,7 @@ public class Editor extends JFrame implements RunnerListener {
       // ignore
     }
     serialMonitor.setVisible(false);
-    serialMonitor = new UploaderFactory().newMonitor(Preferences.get("serial.port"), base);
+    serialMonitor = new UploaderAndMonitorFactory().newMonitor(Preferences.get("serial.port"), base);
 
     onBoardOrPortChange();
 

@@ -46,10 +46,9 @@ public class SSHUploader extends Uploader {
   }
 
   @Override
-  public boolean uploadUsingPreferences(File sourcePath, String buildPath, String className, boolean usingProgrammer) throws RunnerException {
+  public boolean uploadUsingPreferences(File sourcePath, String buildPath, String className, boolean usingProgrammer, List<String> warningsAccumulator) throws RunnerException {
     if (usingProgrammer) {
-      System.err.println(_("Http upload using programmer not supported"));
-      return false;
+      throw new RunnerException(_("Network upload using programmer not supported"));
     }
 
     Session session = null;
@@ -65,7 +64,7 @@ public class SSHUploader extends Uploader {
       scp = new SCP(session);
       SSH ssh = new SSH(session);
 
-      scpFiles(scp, ssh, sourcePath, buildPath, className, session);
+      scpFiles(scp, ssh, sourcePath, buildPath, className, warningsAccumulator);
 
       return runAVRDude(ssh);
     } catch (JSchException e) {
@@ -103,14 +102,14 @@ public class SSHUploader extends Uploader {
     return success;
   }
 
-  private void scpFiles(SCP scp, SSH ssh, File sourcePath, String buildPath, String className, Session session) throws JSchException, IOException {
+  private void scpFiles(SCP scp, SSH ssh, File sourcePath, String buildPath, String className, List<String> warningsAccumulator) throws JSchException, IOException {
     try {
       scp.open();
       scp.startFolder("tmp");
       scp.sendFile(new File(buildPath, className + ".hex"), "sketch.hex");
       scp.endFolder();
 
-      if (canUploadWWWFiles(sourcePath, ssh)) {
+      if (canUploadWWWFiles(sourcePath, ssh, warningsAccumulator)) {
         scp.startFolder("www");
         scp.startFolder("sd");
         scp.startFolder(sourcePath.getName());
@@ -124,17 +123,17 @@ public class SSHUploader extends Uploader {
     }
   }
 
-  private boolean canUploadWWWFiles(File sourcePath, SSH ssh) throws IOException, JSchException {
+  private boolean canUploadWWWFiles(File sourcePath, SSH ssh, List<String> warningsAccumulator) throws IOException, JSchException {
     File www = new File(sourcePath, "www");
     if (!www.exists() || !www.isDirectory()) {
       return false;
     }
     if (!www.canExecute()) {
-      System.out.println("Problem accessing files in folder " + www);
+      warningsAccumulator.add(_("Problem accessing files in folder ") + www);
       return false;
     }
     if (!ssh.execSyncCommand("special-storage-available")) {
-      System.out.println("Problem accessing board folder /www/sd");
+      warningsAccumulator.add(_("Problem accessing board folder /www/sd"));
       return false;
     }
     return true;

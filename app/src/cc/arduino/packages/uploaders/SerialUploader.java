@@ -28,27 +28,22 @@
 
 package cc.arduino.packages.uploaders;
 
-import static processing.app.I18n._;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import cc.arduino.packages.Uploader;
-
-import processing.app.Base;
-import processing.app.I18n;
-import processing.app.Preferences;
-import processing.app.Serial;
-import processing.app.SerialException;
+import processing.app.*;
 import processing.app.debug.RunnerException;
 import processing.app.debug.TargetPlatform;
 import processing.app.helpers.PreferencesMap;
 import processing.app.helpers.StringReplacer;
 
-public class SerialUploader extends Uploader  {
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
-  public boolean uploadUsingPreferences(File sourcePath, String buildPath, String className, boolean usingProgrammer) throws RunnerException {
+import static processing.app.I18n._;
+
+public class SerialUploader extends Uploader {
+
+  public boolean uploadUsingPreferences(File sourcePath, String buildPath, String className, boolean usingProgrammer, List<String> warningsAccumulator) throws RunnerException {
     // FIXME: Preferences should be reorganized
     TargetPlatform targetPlatform = Base.getTargetPlatform();
     PreferencesMap prefs = Preferences.getMap();
@@ -80,9 +75,7 @@ public class SerialUploader extends Uploader  {
         List<String> before = Serial.list();
         if (before.contains(uploadPort)) {
           if (verbose)
-            System.out
-                .println(_("Forcing reset using 1200bps open/close on port ") +
-                    uploadPort);
+            System.out.println(_("Forcing reset using 1200bps open/close on port ") + uploadPort);
           Serial.touchPort(uploadPort, 1200);
         }
         if (waitForUploadPort) {
@@ -163,12 +156,12 @@ public class SerialUploader extends Uploader  {
         }
       }
     } catch (InterruptedException ex) {
+      // noop
     }
     return uploadResult;
   }
 
-  private String waitForUploadPort(String uploadPort, List<String> before)
-      throws InterruptedException, RunnerException {
+  private String waitForUploadPort(String uploadPort, List<String> before) throws InterruptedException, RunnerException {
     // Wait for a port to appear on the list
     int elapsed = 0;
     while (elapsed < 10000) {
@@ -203,22 +196,18 @@ public class SerialUploader extends Uploader  {
       // come back, so use a longer time out before assuming that the
       // selected
       // port is the bootloader (not the sketch).
-      if (((!Base.isWindows() && elapsed >= 500) || elapsed >= 5000) &&
-          now.contains(uploadPort)) {
+      if (((!Base.isWindows() && elapsed >= 500) || elapsed >= 5000) && now.contains(uploadPort)) {
         if (verbose)
-          System.out.println("Uploading using selected port: " +
-              uploadPort);
+          System.out.println("Uploading using selected port: " + uploadPort);
         return uploadPort;
       }
     }
 
     // Something happened while detecting port
-    throw new RunnerException(
-        _("Couldn't find a Board on the selected port. Check that you have the correct port selected.  If it is correct, try pressing the board's reset button after initiating the upload."));
+    throw new RunnerException(_("Couldn't find a Board on the selected port. Check that you have the correct port selected.  If it is correct, try pressing the board's reset button after initiating the upload."));
   }
 
-  public boolean uploadUsingProgrammer(String buildPath, String className)
-      throws RunnerException {
+  public boolean uploadUsingProgrammer(String buildPath, String className) throws RunnerException {
 
     TargetPlatform targetPlatform = Base.getTargetPlatform();
     String programmer = Preferences.get("programmer");
@@ -264,8 +253,7 @@ public class SerialUploader extends Uploader  {
     String programmer = Preferences.get("programmer");
     if (programmer.contains(":")) {
       String[] split = programmer.split(":", 2);
-      TargetPlatform platform = Base
-          .getCurrentTargetPlatformFromPackage(split[0]);
+      TargetPlatform platform = Base.getCurrentTargetPlatformFromPackage(split[0]);
       programmer = split[1];
       programmerPrefs = platform.getProgrammer(programmer);
     } else {
@@ -286,14 +274,11 @@ public class SerialUploader extends Uploader  {
       tool = split[1];
       toolPrefs.putAll(platform.getTool(tool));
       if (toolPrefs.size() == 0)
-        throw new RunnerException(
-            I18n.format(_("Could not find tool {0} from package {1}"), tool,
-                        split[0]));
+        throw new RunnerException(I18n.format(_("Could not find tool {0} from package {1}"), tool, split[0]));
     }
     toolPrefs.putAll(targetPlatform.getTool(tool));
     if (toolPrefs.size() == 0)
-      throw new RunnerException(I18n.format(_("Could not find tool {0}"),
-                                            tool));
+      throw new RunnerException(I18n.format(_("Could not find tool {0}"), tool));
 
     // Merge tool with global configuration
     prefs.putAll(toolPrefs);

@@ -23,10 +23,10 @@
 
 package processing.app;
 
+import cc.arduino.packages.UploaderAndMonitorFactory;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import cc.arduino.packages.Uploader;
-import cc.arduino.packages.UploaderFactory;
 import processing.app.debug.*;
 import processing.app.debug.Compiler;
 import processing.app.forms.PasswordAuthorizationDialog;
@@ -1519,8 +1519,8 @@ public class Sketch {
    * Map an error from a set of processed .java files back to its location
    * in the actual sketch.
    * @param message The error message.
-   * @param filename The .java file where the exception was found.
-   * @param line Line number of the .java file for the exception (0-indexed!)
+   * @param dotJavaFilename The .java file where the exception was found.
+   * @param dotJavaLine Line number of the .java file for the exception (0-indexed!)
    * @return A RunnerException to be sent to the editor, or null if it wasn't
    *         possible to place the exception to the sketch code.
    */
@@ -1666,7 +1666,7 @@ public class Sketch {
     TargetPlatform target = Base.getTargetPlatform();
     String board = Preferences.get("board");
 
-    Uploader uploader = new UploaderFactory().newUploader(target.getBoards().get(board), Preferences.get("serial.port"));
+    Uploader uploader = new UploaderAndMonitorFactory().newUploader(target.getBoards().get(board), Preferences.get("serial.port"));
 
     boolean success = false;
     do {
@@ -1683,12 +1683,19 @@ public class Sketch {
         Preferences.set(uploader.getAuthorizationKey(), dialog.getPassword());
       }
 
+      List<String> warningsAccumulator = new LinkedList<String>();
       try {
-        success = uploader.uploadUsingPreferences(getFolder(), buildPath, suggestedClassName, usingProgrammer);
+        success = uploader.uploadUsingPreferences(getFolder(), buildPath, suggestedClassName, usingProgrammer, warningsAccumulator);
       } finally {
         if (uploader.requiresAuthorization() && !success) {
           Preferences.remove(uploader.getAuthorizationKey());
         }
+      }
+
+      for (String warning : warningsAccumulator) {
+        System.out.print(_("Warning"));
+        System.out.print(": ");
+        System.out.println(warning);
       }
 
     } while (uploader.requiresAuthorization() && !success);

@@ -61,8 +61,9 @@ public abstract class Uploader implements MessageConsumer {
             "avrdude: error: buffered memory access not supported.");
   }
 
+  protected final boolean verbose;
+
   private String error;
-  protected boolean verbose;
   protected boolean notFoundError;
 
   protected Uploader() {
@@ -71,7 +72,7 @@ public abstract class Uploader implements MessageConsumer {
     this.notFoundError = false;
   }
 
-  public abstract boolean uploadUsingPreferences(File sourcePath, String buildPath, String className, boolean usingProgrammer) throws RunnerException;
+  public abstract boolean uploadUsingPreferences(File sourcePath, String buildPath, String className, boolean usingProgrammer, List<String> warningsAccumulator) throws RunnerException;
 
   public abstract boolean burnBootloader() throws RunnerException;
 
@@ -84,7 +85,7 @@ public abstract class Uploader implements MessageConsumer {
   }
 
   protected boolean executeUploadCommand(Collection<String> command) throws RunnerException {
-    return executeUploadCommand(command.toArray(new String[0]));
+    return executeUploadCommand(command.toArray(new String[command.size()]));
   }
 
   protected boolean executeUploadCommand(String command[]) throws RunnerException {
