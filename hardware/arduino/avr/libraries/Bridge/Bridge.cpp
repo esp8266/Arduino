@@ -18,7 +18,8 @@
 
 #include "Bridge.h"
 
-BridgeClass::BridgeClass(Stream &_stream) : index(0), stream(_stream), started(false) {
+BridgeClass::BridgeClass(Stream &_stream) :
+  index(0), stream(_stream), started(false), max_retries(0) {
   // Empty
 }
 
@@ -27,35 +28,52 @@ void BridgeClass::begin() {
     return;
   started = true;
   
-  // Wait for Atheros bootloader to finish startup
+  // Wait for U-boot to finish startup
   do {
     dropAll();
-    delay(1100);
+    delay(1000);
   } while (stream.available()>0);
+
+  while (true) {
+    // Bridge interrupt:
+    // - Ask the bridge to close itself
+    uint8_t quit_cmd[] = {'X','X','X','X','X'};
+    max_retries = 1;
+    transfer(quit_cmd, 5);
+
+    // Bridge startup:
+    // - If the bridge is not running starts it safely
+    stream.print(CTRL_C);
+    delay(250);
+    stream.print(F("\n"));
+    delay(250);
+    stream.print(F("\n"));
+    delay(500);
+    // Wait for OpenWRT message
+    // "Press enter to activate console"
+    stream.print(F("run-bridge\n"));
+    delay(500);
+    dropAll();
   
-  // Bridge startup:
-  // - If the bridge is not running starts it safely
-  stream.print(CTRL_C);
-  delay(250);
-  stream.print(F("\n"));
-  delay(500);
-  stream.print(F("\n"));
-  delay(750);
-  // Wait for OpenWRT message
-  // "Press enter to activate console"
-  stream.print(F("run-bridge\n"));
-  delay(500);
-  dropAll();
-  
-  // - If the bridge was already running previous commands
-  //   are ignored as "invalid packets".
-  
-  // Reset the brigde
-  uint8_t cmd[] = {'X','X', '1','0','0'};
-  uint8_t res[1];
-  transfer(cmd, 5, res, 1);
-  if (res[0] != 0)
-	while (true);
+    // Reset the brigde to check if it is running
+    uint8_t cmd[] = {'X','X', '1','0','0'};
+    uint8_t res[1];
+    max_retries = 20;
+    uint16_t l = transfer(cmd, 5, res, 1);
+    if (l == TRANSFER_TIMEOUT) {
+      // Bridge didn't start...
+      // Maybe the board is starting-up?
+
+      // Wait and retry
+      delay(1000);
+      continue;
+    }
+    if (res[0] != 0)
+	  while (true);
+
+    max_retries = 50;
+    return;
+  }
 }
 
 void BridgeClass::put(const char *key, const char *value) {
@@ -99,7 +117,8 @@ uint16_t BridgeClass::transfer(const uint8_t *buff1, uint16_t len1,
                  uint8_t *rxbuff, uint16_t rxlen)
 {
   uint16_t len = len1 + len2 + len3;
-  for ( ; ; delay(100), dropAll() /* Delay for retransmission */) {
+  uint8_t retries = 0;
+  for ( ; retries<max_retries; retries++, delay(100), dropAll() /* Delay for retransmission */) {
     // Send packet
     crcReset();
     stream.write((char)0xFF);                // Start of packet (0xFF)
@@ -177,6 +196,9 @@ uint16_t BridgeClass::transfer(const uint8_t *buff1, uint16_t len1,
       return rxlen;
     return l;
   }
+
+  // Max retries exceeded
+  return TRANSFER_TIMEOUT;
 }
 
 int BridgeClass::timedRead(unsigned int timeout) {

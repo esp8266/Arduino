@@ -50,6 +50,9 @@ public:
                    const uint8_t *buff2, uint16_t len2,
                    uint8_t *rxbuff, uint16_t rxlen)
   { return transfer(buff1, len1, buff2, len2, NULL, 0, rxbuff, rxlen); }
+
+  static const int TRANSFER_TIMEOUT = 0xFFFF;
+
 private:
   uint8_t index;
   int timedRead(unsigned int timeout);
@@ -66,6 +69,7 @@ private:
   static const char CTRL_C = 3;
   Stream &stream;
   bool started;
+  uint8_t max_retries;
 };
 
 // This subclass uses a serial port Stream
