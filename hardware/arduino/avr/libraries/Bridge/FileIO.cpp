@@ -18,6 +18,8 @@
 
 #include <FileIO.h>
 
+
+
 File::File(BridgeClass &b) : mode(255), bridge(b) {
   // Empty
 }
@@ -27,6 +29,7 @@ File::File(const char *_filename, uint8_t _mode, BridgeClass &b) : mode(_mode), 
   char modes[] = {'r','w','a'};
   uint8_t cmd[] = {'F', modes[mode]};
   uint8_t res[2];
+  dirPosition = 1;
   bridge.transfer(cmd, 2, (uint8_t*)filename.c_str(), filename.length(), res, 2);
   if (res[0] != 0) { // res[0] contains error code
     mode = 255; // In case of error keep the file closed
@@ -161,9 +164,42 @@ boolean File::isDirectory() {
   bridge.transfer(cmd, 1, (uint8_t *)filename.c_str(), filename.length(), res, 1);
   return res[0];
 }
-//boolean isDirectory(void)
-//File openNextFile(uint8_t mode = O_RDONLY);
-//void rewindDirectory(void)
+
+
+File File::openNextFile(uint8_t mode){
+  Process awk;
+  char tmp;
+  String command;
+  String filepath;
+  if (dirPosition == 0xFFFF) return File();
+
+  command = "ls ";
+  command += filename;
+  command += " | awk 'NR==";
+  command += dirPosition;
+  command += "'";
+  
+  awk.runShellCommand(command);
+
+  while(awk.running()); 
+
+  command = "";
+
+  while (awk.available()){
+    tmp = awk.read();
+    if (tmp!='\n') command += tmp;
+  }
+  if (command.length() == 0)
+    return File();
+  dirPosition++;
+  filepath = filename + "/" + command;
+  return File(filepath.c_str(),mode);
+  
+} 
+
+void File::rewindDirectory(void){
+  dirPosition = 1;
+}
 
 
 

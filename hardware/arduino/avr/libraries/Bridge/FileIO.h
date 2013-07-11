@@ -55,14 +55,17 @@ private:
   void doBuffer();
   uint8_t buffered;
   uint8_t readPos;
+  uint16_t dirPosition;
   static const int BUFFER_SIZE = 64;
   uint8_t buffer[BUFFER_SIZE];
+  
   
 private:
   BridgeClass &bridge;
   String filename;
   uint8_t mode;
   uint8_t handle;
+  
 };
 
 class FileSystemClass {
