@@ -1,7 +1,7 @@
 /*
   SendATweet
 
-  Demonstrates sending a tweet via a Twitter account using the Temboo Arduino Yun SDK.
+  Demonstrates sending a tweet via a Twitter account using Temboo from an Arduino Yun.
 
   Check out the latest Arduino & Temboo examples and support docs at http://www.temboo.com/arduino
 
@@ -13,13 +13,14 @@
   the Twitter dev console at https://dev.twitter.com. Note that since this 
   sketch creates a new tweet, your application will need to be configured with
   read+write permissions. After creating the app, you'll find OAuth credentials 
-  for that application under the "OAuth Tool" tab. 
-  Substitute these values for the placeholders below. 
+  for that application under the "OAuth Tool" tab. Substitute these values for 
+  the placeholders below. 
 
   This example assumes basic familiarity with Arduino sketches, and that your Yun is connected
   to the Internet.
 
-  Looking for social APIs? We've got Facebook, Google+, Instagram, Tumblr and more.
+  Want to use another social API with your Arduino Yun? We've got Facebook, 
+  Google+, Instagram, Tumblr and more in our Library!
   
   This example code is in the public domain.
 */

@@ -2,7 +2,7 @@
   ReadATweet
 
   Demonstrates retrieving the most recent Tweet from a user's home timeline 
-  using the Temboo Arduino Yun SDK.
+  using Temboo from an Arduino Yun.
 
   Check out the latest Arduino & Temboo examples and support docs at http://www.temboo.com/arduino
 
@@ -18,7 +18,8 @@
   This example assumes basic familiarity with Arduino sketches, and that your Yun 
   is connected to the Internet.
 
-  Looking for social APIs? We've got Facebook, Google+, Instagram, Tumblr and more.
+  Want to use another social API with your Arduino Yun? We've got Facebook, 
+  Google+, Instagram, Tumblr and more in our Library!
   
   This example code is in the public domain.
 */
