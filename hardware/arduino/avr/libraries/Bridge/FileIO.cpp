@@ -150,6 +150,17 @@ const char *File::name() {
   return filename.c_str();
 }
 
+
+boolean File::isDirectory() {
+  uint8_t res[1];
+  uint8_t lenght;
+  uint8_t cmd[] = {'i'};
+  if (mode != 255)
+    return 0;
+
+  bridge.transfer(cmd, 1, (uint8_t *)filename.c_str(), filename.length(), res, 1);
+  return res[0];
+}
 //boolean isDirectory(void)
 //File openNextFile(uint8_t mode = O_RDONLY);
 //void rewindDirectory(void)
