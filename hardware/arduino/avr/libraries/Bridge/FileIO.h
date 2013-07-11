@@ -46,7 +46,6 @@ public:
   operator bool();
   const char * name();
   boolean isDirectory();
-  boolean iFileSystemirectory(void);
   File openNextFile(uint8_t mode = FILE_READ);
   void rewindDirectory(void);
   
