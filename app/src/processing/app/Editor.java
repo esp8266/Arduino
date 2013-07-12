@@ -23,6 +23,7 @@
 package processing.app;
 
 import processing.app.debug.*;
+import processing.app.helpers.PreferencesMapException;
 import processing.app.syntax.*;
 import processing.app.tools.*;
 import processing.core.*;
@@ -2543,9 +2544,10 @@ public class Editor extends JFrame implements RunnerListener {
             statusError(_("Error while burning bootloader."));
             // error message will already be visible
           }
-        } catch (RunnerException e) {
-          statusError(_("Error while burning bootloader."));
-          e.printStackTrace();
+        } catch (PreferencesMapException e) {
+          statusError(I18n.format(
+                      _("Error while burning bootloader: missing '{0}' configuration parameter"),
+                      e.getMessage()));
           //statusError(e);
         } catch (Exception e) {
           statusError(_("Error while burning bootloader."));
