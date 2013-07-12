@@ -1169,10 +1169,15 @@ public class Base {
         continue;
       }
 
-      Library lib = Library.create(subfolder);
-      // (also replace previously found libs with the same name) 
-      if (lib != null)
-        res.addOrReplace(lib);
+      try {
+        Library lib = Library.create(subfolder);
+        // (also replace previously found libs with the same name)
+        if (lib != null)
+          res.addOrReplace(lib);
+      } catch (IOException e) {
+        System.out.println(I18n.format(_("Invalid library found in {0}: {1}"),
+                                       subfolder, e.getMessage()));
+      }
     }
     return res;
   }
