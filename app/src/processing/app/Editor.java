@@ -2433,6 +2433,10 @@ public class Editor extends JFrame implements RunnerListener {
         if (serialMenu.getItemCount() == 0) statusError(e);
         else if (serialPrompt()) run();
         else statusNotice(_("Upload canceled."));
+      } catch (PreferencesMapException e) {
+        statusError(I18n.format(
+                    _("Error while uploading: missing '{0}' configuration parameter"),
+                    e.getMessage()));
       } catch (RunnerException e) {
         //statusError("Error during upload.");
         //e.printStackTrace();
@@ -2469,6 +2473,10 @@ public class Editor extends JFrame implements RunnerListener {
         if (serialMenu.getItemCount() == 0) statusError(e);
         else if (serialPrompt()) run();
         else statusNotice(_("Upload canceled."));
+      } catch (PreferencesMapException e) {
+        statusError(I18n.format(
+                    _("Error while uploading: missing '{0}' configuration parameter"),
+                    e.getMessage()));
       } catch (RunnerException e) {
         //statusError("Error during upload.");
         //e.printStackTrace();

@@ -51,7 +51,7 @@ public class BasicUploader extends Uploader  {
     TargetPlatform targetPlatform = Base.getTargetPlatform();
     PreferencesMap prefs = Preferences.getMap();
     prefs.putAll(Base.getBoardPreferences());
-    prefs.putAll(targetPlatform.getTool(prefs.get("upload.tool")));
+    prefs.putAll(targetPlatform.getTool(prefs.getOrExcept("upload.tool")));
 
     // if no protocol is specified for this board, assume it lacks a 
     // bootloader and upload using the selected programmer.
