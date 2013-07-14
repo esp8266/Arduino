@@ -33,6 +33,7 @@ import processing.app.*;
 import processing.app.debug.RunnerException;
 import processing.app.debug.TargetPlatform;
 import processing.app.helpers.PreferencesMap;
+import processing.app.helpers.PreferencesMapException;
 import processing.app.helpers.StringReplacer;
 
 import java.io.File;
@@ -43,12 +44,12 @@ import static processing.app.I18n._;
 
 public class SerialUploader extends Uploader {
 
-  public boolean uploadUsingPreferences(File sourcePath, String buildPath, String className, boolean usingProgrammer, List<String> warningsAccumulator) throws RunnerException {
+  public boolean uploadUsingPreferences(File sourcePath, String buildPath, String className, boolean usingProgrammer, List<String> warningsAccumulator) throws Exception {
     // FIXME: Preferences should be reorganized
     TargetPlatform targetPlatform = Base.getTargetPlatform();
     PreferencesMap prefs = Preferences.getMap();
     prefs.putAll(Base.getBoardPreferences());
-    prefs.putAll(targetPlatform.getTool(prefs.get("upload.tool")));
+    prefs.putAll(targetPlatform.getTool(prefs.getOrExcept("upload.tool")));
 
     // if no protocol is specified for this board, assume it lacks a 
     // bootloader and upload using the selected programmer.
@@ -69,7 +70,7 @@ public class SerialUploader extends Uploader {
     boolean waitForUploadPort = (t != null) && t.equals("true");
 
     if (doTouch) {
-      String uploadPort = prefs.get("serial.port");
+      String uploadPort = prefs.getOrExcept("serial.port");
       try {
         // Toggle 1200 bps on selected serial port to force board reset.
         List<String> before = Serial.list();
@@ -105,9 +106,9 @@ public class SerialUploader extends Uploader {
     prefs.put("build.path", buildPath);
     prefs.put("build.project_name", className);
     if (verbose)
-      prefs.put("upload.verbose", prefs.get("upload.params.verbose"));
+      prefs.put("upload.verbose", prefs.getOrExcept("upload.params.verbose"));
     else
-      prefs.put("upload.verbose", prefs.get("upload.params.quiet"));
+      prefs.put("upload.verbose", prefs.getOrExcept("upload.params.quiet"));
 
     boolean uploadResult;
     try {
@@ -116,7 +117,7 @@ public class SerialUploader extends Uploader {
 //        flushSerialBuffer();
 //      }
 
-      String pattern = prefs.get("upload.pattern");
+      String pattern = prefs.getOrExcept("upload.pattern");
       String[] cmd = StringReplacer.formatAndSplit(pattern, prefs, true);
       uploadResult = executeUploadCommand(cmd);
     } catch (Exception e) {
@@ -207,7 +208,7 @@ public class SerialUploader extends Uploader {
     throw new RunnerException(_("Couldn't find a Board on the selected port. Check that you have the correct port selected.  If it is correct, try pressing the board's reset button after initiating the upload."));
   }
 
-  public boolean uploadUsingProgrammer(String buildPath, String className) throws RunnerException {
+  public boolean uploadUsingProgrammer(String buildPath, String className) throws Exception {
 
     TargetPlatform targetPlatform = Base.getTargetPlatform();
     String programmer = Preferences.get("programmer");
@@ -220,15 +221,15 @@ public class SerialUploader extends Uploader {
     PreferencesMap prefs = Preferences.getMap();
     prefs.putAll(Base.getBoardPreferences());
     prefs.putAll(targetPlatform.getProgrammer(programmer));
-    prefs.putAll(targetPlatform.getTool(prefs.get("program.tool")));
+    prefs.putAll(targetPlatform.getTool(prefs.getOrExcept("program.tool")));
 
     prefs.put("build.path", buildPath);
     prefs.put("build.project_name", className);
 
     if (verbose)
-      prefs.put("program.verbose", prefs.get("program.params.verbose"));
+      prefs.put("program.verbose", prefs.getOrExcept("program.params.verbose"));
     else
-      prefs.put("program.verbose", prefs.get("program.params.quiet"));
+      prefs.put("program.verbose", prefs.getOrExcept("program.params.quiet"));
 
     try {
       // if (prefs.get("program.disable_flushing") == null
@@ -237,7 +238,7 @@ public class SerialUploader extends Uploader {
       // flushSerialBuffer();
       // }
 
-      String pattern = prefs.get("program.pattern");
+      String pattern = prefs.getOrExcept("program.pattern");
       String[] cmd = StringReplacer.formatAndSplit(pattern, prefs, true);
       return executeUploadCommand(cmd);
     } catch (Exception e) {
@@ -245,7 +246,7 @@ public class SerialUploader extends Uploader {
     }
   }
 
-  public boolean burnBootloader() throws RunnerException {
+  public boolean burnBootloader() throws Exception {
     TargetPlatform targetPlatform = Base.getTargetPlatform();
 
     // Find preferences for the selected programmer
@@ -267,7 +268,7 @@ public class SerialUploader extends Uploader {
 
     // Create configuration for bootloader tool
     PreferencesMap toolPrefs = new PreferencesMap();
-    String tool = prefs.get("bootloader.tool");
+    String tool = prefs.getOrExcept("bootloader.tool");
     if (tool.contains(":")) {
       String[] split = tool.split(":", 2);
       TargetPlatform platform = Base.getCurrentTargetPlatformFromPackage(split[0]);
@@ -283,20 +284,20 @@ public class SerialUploader extends Uploader {
     // Merge tool with global configuration
     prefs.putAll(toolPrefs);
     if (verbose) {
-      prefs.put("erase.verbose", prefs.get("erase.params.verbose"));
-      prefs.put("bootloader.verbose", prefs.get("bootloader.params.verbose"));
+      prefs.put("erase.verbose", prefs.getOrExcept("erase.params.verbose"));
+      prefs.put("bootloader.verbose", prefs.getOrExcept("bootloader.params.verbose"));
     } else {
-      prefs.put("erase.verbose", prefs.get("erase.params.quiet"));
-      prefs.put("bootloader.verbose", prefs.get("bootloader.params.quiet"));
+      prefs.put("erase.verbose", prefs.getOrExcept("erase.params.quiet"));
+      prefs.put("bootloader.verbose", prefs.getOrExcept("bootloader.params.quiet"));
     }
 
     try {
-      String pattern = prefs.get("erase.pattern");
+      String pattern = prefs.getOrExcept("erase.pattern");
       String[] cmd = StringReplacer.formatAndSplit(pattern, prefs, true);
       if (!executeUploadCommand(cmd))
         return false;
 
-      pattern = prefs.get("bootloader.pattern");
+      pattern = prefs.getOrExcept("bootloader.pattern");
       cmd = StringReplacer.formatAndSplit(pattern, prefs, true);
       return executeUploadCommand(cmd);
     } catch (Exception e) {

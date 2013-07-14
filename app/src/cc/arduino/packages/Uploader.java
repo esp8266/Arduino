@@ -72,9 +72,9 @@ public abstract class Uploader implements MessageConsumer {
     this.notFoundError = false;
   }
 
-  public abstract boolean uploadUsingPreferences(File sourcePath, String buildPath, String className, boolean usingProgrammer, List<String> warningsAccumulator) throws RunnerException;
+  public abstract boolean uploadUsingPreferences(File sourcePath, String buildPath, String className, boolean usingProgrammer, List<String> warningsAccumulator) throws Exception;
 
-  public abstract boolean burnBootloader() throws RunnerException;
+  public abstract boolean burnBootloader() throws Exception;
 
   public boolean requiresAuthorization() {
     return false;
@@ -84,11 +84,11 @@ public abstract class Uploader implements MessageConsumer {
     return null;
   }
 
-  protected boolean executeUploadCommand(Collection<String> command) throws RunnerException {
+  protected boolean executeUploadCommand(Collection<String> command) throws Exception {
     return executeUploadCommand(command.toArray(new String[command.size()]));
   }
 
-  protected boolean executeUploadCommand(String command[]) throws RunnerException {
+  protected boolean executeUploadCommand(String command[]) throws Exception {
     notFoundError = false;
     int result = -1;
 

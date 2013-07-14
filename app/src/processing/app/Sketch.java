@@ -24,7 +24,6 @@
 package processing.app;
 
 import cc.arduino.packages.UploaderAndMonitorFactory;
-import org.apache.commons.codec.digest.DigestUtils;
 
 import cc.arduino.packages.Uploader;
 import processing.app.debug.*;
@@ -1583,7 +1582,7 @@ public class Sketch {
    * Handle export to applet.
    */
   public boolean exportApplet(String appletPath, boolean usingProgrammer)
-    throws RunnerException, IOException {
+    throws Exception {
 
     prepare();
 
@@ -1661,7 +1660,7 @@ public class Sketch {
 	  System.out.println(_("Low memory available, stability problems may occur"));
   }
 
-  protected boolean upload(String buildPath, String suggestedClassName, boolean usingProgrammer) throws RunnerException {
+  protected boolean upload(String buildPath, String suggestedClassName, boolean usingProgrammer) throws Exception {
 
     TargetPlatform target = Base.getTargetPlatform();
     String board = Preferences.get("board");
