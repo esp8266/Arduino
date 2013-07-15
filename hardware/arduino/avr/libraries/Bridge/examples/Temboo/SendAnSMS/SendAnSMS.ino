@@ -54,7 +54,8 @@ const String TWILIO_NUMBER = "xxxxxxxxxx";
 // the number to which the SMS should be sent, e.g., "+1 555-222-1212"
 const String RECIPIENT_NUMBER = "xxxxxxxxxx";
 
-boolean success = false; // a flag to indicate whether we've sent the SMS yet or not
+// a flag to indicate whether we've attempted to send the SMS yet or not
+boolean attempted = false; 
 
 void setup() {
   Serial.begin(9600);
@@ -69,7 +70,7 @@ void setup() {
 void loop()
 {
   // only try to send the SMS if we haven't already sent it successfully
-  if (!success) {
+  if (!attempted) {
 
     Serial.println("Running SendAnSMS...");
     
@@ -116,7 +117,6 @@ void loop()
     // a return code of zero (0) means everything worked
     if (returnCode == 0) {
         Serial.println("Success! SMS sent!");
-        success = true;
     } else {
       // a non-zero return code means there was an error
       // read and print the error message
@@ -126,10 +126,9 @@ void loop()
       }
     } 
     SendSMSChoreo.close();
-
-    // do nothing for the next 60 seconds
-    Serial.println("Waiting...");
-    delay(60000);
+    
+    // set the flag indicatine we've tried once.
+    attempted=true;
   }
 }
 

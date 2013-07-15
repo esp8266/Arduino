@@ -40,8 +40,8 @@ const String GMAIL_PASSWORD = "xxxxxxxxxx";
 // the email address you want to send the email to, eg "jane.doe@temboo.com"
 const String TO_EMAIL_ADDRESS = "xxxxxxxxxx";
 
-
-boolean success = false; // a flag to indicate whether we've sent the email yet or not
+// a flag to indicate whether we've tried to send the email yet or not
+boolean attempted = false; 
 
 void setup() {
   Serial.begin(9600);
@@ -55,8 +55,8 @@ void setup() {
 
 void loop()
 {
-  // only try to send the email if we haven't already sent it successfully
-  if (!success) {
+  // only try to send the email if we haven't already tried
+  if (!attempted) {
 
     Serial.println("Running SendAnEmail...");
   
@@ -100,7 +100,6 @@ void loop()
     // a return code of zero (0) means everything worked
     if (returnCode == 0) {
         Serial.println("Success! Email sent!");
-        success = true;
     } else {
       // a non-zero return code means there was an error
       // read and print the error message
@@ -110,9 +109,9 @@ void loop()
       }
     } 
     SendEmailChoreo.close();
-
-    // do nothing for the next 60 seconds
-    delay(60000);
+    
+    // set the flag showing we've tried
+    attempted = true;
   }
 }
 
