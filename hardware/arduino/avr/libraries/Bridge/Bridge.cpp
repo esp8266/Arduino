@@ -17,6 +17,7 @@
 */
 
 #include "Bridge.h"
+#include <util/crc16.h>
 
 BridgeClass::BridgeClass(Stream &_stream) :
   index(0), stream(_stream), started(false), max_retries(0) {
@@ -94,12 +95,14 @@ unsigned int BridgeClass::get(const char *key, uint8_t *value, unsigned int maxl
 }
 
 void BridgeClass::crcUpdate(uint8_t c) {
-  CRC = CRC ^ c;
-  CRC = (CRC >> 8) + (CRC << 8);
+  
+  CRC = _crc_ccitt_update(CRC, c);
+  //CRC = CRC ^ c;
+  //CRC = (CRC >> 8) + (CRC << 8);
 }
 
 void BridgeClass::crcReset() {
-  CRC = 0xAAAA;
+  CRC = 0xFFFF;
 }
 
 void BridgeClass::crcWrite() {
