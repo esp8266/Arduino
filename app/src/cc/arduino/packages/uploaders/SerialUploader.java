@@ -49,7 +49,13 @@ public class SerialUploader extends Uploader {
     TargetPlatform targetPlatform = Base.getTargetPlatform();
     PreferencesMap prefs = Preferences.getMap();
     prefs.putAll(Base.getBoardPreferences());
-    prefs.putAll(targetPlatform.getTool(prefs.getOrExcept("upload.tool")));
+    String tool = prefs.getOrExcept("upload.tool");
+    if (tool.contains(":")) {
+      String[] split = tool.split(":", 2);
+      targetPlatform = Base.getCurrentTargetPlatformFromPackage(split[0]);
+      tool = split[1];
+    }
+    prefs.putAll(targetPlatform.getTool(tool));
 
     // if no protocol is specified for this board, assume it lacks a 
     // bootloader and upload using the selected programmer.

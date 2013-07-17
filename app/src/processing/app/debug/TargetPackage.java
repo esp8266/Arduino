@@ -23,11 +23,14 @@
  */
 package processing.app.debug;
 
+import static processing.app.I18n._;
+
 import java.io.File;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import processing.app.I18n;
 import processing.app.helpers.filefilters.OnlyDirs;
 
 public class TargetPackage {
@@ -47,8 +50,18 @@ public class TargetPackage {
       if (!subFolder.exists() || !subFolder.canRead())
         continue;
       String arch = subFolder.getName();
-      TargetPlatform platform = new TargetPlatform(arch, subFolder, this);
-      platforms.put(arch, platform);
+      try {
+        TargetPlatform platform = new TargetPlatform(arch, subFolder, this);
+        platforms.put(arch, platform);
+      } catch (TargetPlatformException e) {
+        System.out.println(e.getMessage());
+      }
+    }
+
+    if (platforms.size() == 0) {
+      throw new TargetPlatformException(I18n
+          .format(_("No valid hardware definitions found in folder {0}."),
+                  _folder.getName()));
     }
   }
 
