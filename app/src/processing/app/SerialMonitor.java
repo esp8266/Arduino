@@ -20,6 +20,7 @@ package processing.app;
 
 import processing.core.PApplet;
 
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -76,6 +77,10 @@ public class SerialMonitor extends AbstractMonitor {
         case 3:
           s += "\r\n";
           break;
+      }
+      if ("".equals(s) && lineEndings.getSelectedIndex() == 0 && !Preferences.has("runtime.line.ending.alert.notified")) {
+        noLineEndingAlert.setForeground(Color.RED);
+        Preferences.set("runtime.line.ending.alert.notified", "true");
       }
       serial.write(s);
     }

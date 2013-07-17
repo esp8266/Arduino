@@ -16,6 +16,7 @@ import static processing.app.I18n._;
 
 public abstract class AbstractMonitor extends JFrame implements MessageConsumer {
 
+  protected final JLabel noLineEndingAlert;
   protected JTextArea textArea;
   protected JScrollPane scrollPane;
   protected JTextField textField;
@@ -69,29 +70,33 @@ public abstract class AbstractMonitor extends JFrame implements MessageConsumer 
 
     getContentPane().add(scrollPane, BorderLayout.CENTER);
 
-    JPanel pane = new JPanel();
-    pane.setLayout(new BoxLayout(pane, BoxLayout.X_AXIS));
-    pane.setBorder(new EmptyBorder(4, 4, 4, 4));
+    JPanel upperPane = new JPanel();
+    upperPane.setLayout(new BoxLayout(upperPane, BoxLayout.X_AXIS));
+    upperPane.setBorder(new EmptyBorder(4, 4, 4, 4));
 
     textField = new JTextField(40);
     sendButton = new JButton(_("Send"));
 
-    pane.add(textField);
-    pane.add(Box.createRigidArea(new Dimension(4, 0)));
-    pane.add(sendButton);
+    upperPane.add(textField);
+    upperPane.add(Box.createRigidArea(new Dimension(4, 0)));
+    upperPane.add(sendButton);
 
-    getContentPane().add(pane, BorderLayout.NORTH);
+    getContentPane().add(upperPane, BorderLayout.NORTH);
 
-    pane = new JPanel();
+    final JPanel pane = new JPanel();
     pane.setLayout(new BoxLayout(pane, BoxLayout.X_AXIS));
     pane.setBorder(new EmptyBorder(4, 4, 4, 4));
 
     autoscrollBox = new JCheckBox(_("Autoscroll"), true);
 
+    noLineEndingAlert = new JLabel(I18n.format(_("You've pressed {0} but nothing was sent. Should you select a line ending?"), _("Send")));
+    noLineEndingAlert.setForeground(pane.getBackground());
+
     lineEndings = new JComboBox(new String[]{_("No line ending"), _("Newline"), _("Carriage return"), _("Both NL & CR")});
     lineEndings.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         Preferences.setInteger("serial.line_ending", lineEndings.getSelectedIndex());
+        noLineEndingAlert.setForeground(pane.getBackground());
       }
     });
     if (Preferences.get("serial.line_ending") != null) {
@@ -113,6 +118,8 @@ public abstract class AbstractMonitor extends JFrame implements MessageConsumer 
 
     pane.add(autoscrollBox);
     pane.add(Box.createHorizontalGlue());
+    pane.add(noLineEndingAlert);
+    pane.add(Box.createRigidArea(new Dimension(8, 0)));
     pane.add(lineEndings);
     pane.add(Box.createRigidArea(new Dimension(8, 0)));
     pane.add(serialRates);
