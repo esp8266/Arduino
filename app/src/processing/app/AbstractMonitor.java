@@ -90,7 +90,11 @@ public abstract class AbstractMonitor extends JFrame implements MessageConsumer 
     autoscrollBox = new JCheckBox(_("Autoscroll"), true);
 
     noLineEndingAlert = new JLabel(I18n.format(_("You've pressed {0} but nothing was sent. Should you select a line ending?"), _("Send")));
+    noLineEndingAlert.setToolTipText(noLineEndingAlert.getText());
     noLineEndingAlert.setForeground(pane.getBackground());
+    Dimension minimumSize = new Dimension(noLineEndingAlert.getMinimumSize());
+    minimumSize.setSize(minimumSize.getWidth() / 3, minimumSize.getHeight());
+    noLineEndingAlert.setMinimumSize(minimumSize);
 
     lineEndings = new JComboBox(new String[]{_("No line ending"), _("Newline"), _("Carriage return"), _("Both NL & CR")});
     lineEndings.addActionListener(new ActionListener() {
@@ -123,6 +127,8 @@ public abstract class AbstractMonitor extends JFrame implements MessageConsumer 
     pane.add(lineEndings);
     pane.add(Box.createRigidArea(new Dimension(8, 0)));
     pane.add(serialRates);
+
+    this.setMinimumSize(new Dimension(pane.getMinimumSize().width, this.getPreferredSize().height));
 
     getContentPane().add(pane, BorderLayout.SOUTH);
 
