@@ -91,4 +91,4 @@ tools.avrdude.bootloader.pattern="{cmd.path}" "-C{config.path}" {bootloader.verb
 # Default blank usb manufacturer will be filled it at compile time
 # - from numeric vendor ID, set to Unknown otherwise
 build.usb_manufacturer=
-build.usb_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid} -DUSB_MANUFACTURER={build.usb_manufacturer} -DUSB_PRODUCT={build.usb_product}
+build.usb_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid} -DUSB_MANUFACTURER={build.usb_manufacturer} '-DUSB_PRODUCT={build.usb_product}'
