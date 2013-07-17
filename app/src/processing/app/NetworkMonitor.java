@@ -83,6 +83,9 @@ public class NetworkMonitor extends AbstractMonitor {
       }
     }
 
+    if (!session.isConnected()) {
+      return;
+    }
     channel = session.openChannel("exec");
     ((ChannelExec) channel).setCommand("telnet localhost 6571");
 
