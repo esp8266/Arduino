@@ -4,13 +4,13 @@ import cc.arduino.packages.BoardPort;
 import cc.arduino.packages.Discovery;
 import cc.arduino.packages.discoverers.network.NetworkChecker;
 import processing.app.Base;
+import processing.app.helpers.NetUtils;
 import processing.app.helpers.PreferencesMap;
 import processing.app.zeroconf.jmdns.ArduinoDNSTaskStarter;
 
 import javax.jmdns.*;
 import javax.jmdns.impl.DNSTaskStarter;
 import java.io.IOException;
-import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
@@ -33,13 +33,10 @@ public class NetworkDiscovery implements Discovery, ServiceListener, cc.arduino.
     Iterator<BoardPort> iterator = ports.iterator();
     while (iterator.hasNext()) {
       try {
-        InetAddress address = Inet4Address.getByName(iterator.next().getAddress());
-        if (!address.isReachable(100)) {
+        if (!NetUtils.isReachable(InetAddress.getByName(iterator.next().getAddress()))) {
           iterator.remove();
         }
       } catch (UnknownHostException e) {
-        iterator.remove();
-      } catch (IOException e) {
         iterator.remove();
       }
     }
