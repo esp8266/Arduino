@@ -46,6 +46,10 @@ void setup() {
     // don't continue:
     while(true);
   } 
+
+  String fv = WiFi.firmwareVersion();
+  if( fv != "1.1.0" )
+    Serial.println("Please upgrade the firmware");
   
   // attempt to connect to Wifi network:
   while ( status != WL_CONNECTED) { 
@@ -57,6 +61,7 @@ void setup() {
     // wait 10 seconds for connection:
     delay(10000);
   } 
+
   // start the server:
   server.begin();
   // you're connected now, so print out the status:

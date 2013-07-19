@@ -51,6 +51,9 @@ void setup()
     while(true);
   } 
 
+  String fv = WiFi.firmwareVersion();
+  if( fv != "1.1.0" )
+    Serial.println("Please upgrade the firmware");
 
   // attempt to connect to Wifi network:
   while ( status != WL_CONNECTED) { 

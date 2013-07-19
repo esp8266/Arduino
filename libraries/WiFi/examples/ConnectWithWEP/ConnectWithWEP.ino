@@ -43,6 +43,10 @@ void setup() {
     while(true);
   } 
 
+  String fv = WiFi.firmwareVersion();
+  if( fv != "1.1.0" )
+    Serial.println("Please upgrade the firmware");
+
   // attempt to connect to Wifi network:
   while ( status != WL_CONNECTED) { 
     Serial.print("Attempting to connect to WEP network, SSID: ");
@@ -52,7 +56,7 @@ void setup() {
     // wait 10 seconds for connection:
     delay(10000);
   }
-
+  
   // once you are connected :
   Serial.print("You're connected to the network");
   printCurrentNet();
