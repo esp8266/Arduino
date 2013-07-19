@@ -245,6 +245,22 @@ public class PreferencesMap extends LinkedHashMap<String, String> {
     return res;
   }
 
+  /**
+   * Returns the value to which the specified key is mapped, or throws a
+   * PreferencesMapException if not found
+   * 
+   * @param k
+   *          the key whose associated value is to be returned
+   * @return the value to which the specified key is mapped
+   * @throws PreferencesMapException
+   */
+  public String getOrExcept(String k) throws PreferencesMapException {
+    String r = get(k);
+    if (r == null)
+      throw new PreferencesMapException(k);
+    return r;
+  }
+
   @Override
   public String toString() {
     return toString("");

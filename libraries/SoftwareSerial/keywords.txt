@@ -1,6 +1,6 @@
 #######################################
 # Syntax Coloring Map for SoftwareSerial
-# (formely NewSoftSerial)
+# (formerly NewSoftSerial)
 #######################################
 
 #######################################
