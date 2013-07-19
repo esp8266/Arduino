@@ -57,8 +57,10 @@ public class StringReplacer {
     for (String i : src.split(" ")) {
       if (escapingChar == null) {
         // If the first char is not an escape char..
-        String first = i.substring(0, 1);
-        if (!quoteChars.contains(first)) {
+        String first = null;
+        if (i.length() > 0)
+          first = i.substring(0, 1);
+        if (first == null || !quoteChars.contains(first)) {
           if (i.trim().length() != 0 || acceptEmptyArguments)
             res.add(i);
           continue;
