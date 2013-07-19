@@ -59,7 +59,7 @@ void BridgeClass::begin() {
     // Reset the brigde to check if it is running
     uint8_t cmd[] = {'X','X', '1','0','0'};
     uint8_t res[1];
-    max_retries = 20;
+    max_retries = 50;
     uint16_t l = transfer(cmd, 5, res, 1);
     if (l == TRANSFER_TIMEOUT) {
       // Bridge didn't start...
