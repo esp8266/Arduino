@@ -1,0 +1,1291 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>6.0</ProjectVersion>
+    <ToolchainName>com.Atmel.AVRGCC32</ToolchainName>
+    <ProjectGuid>417e15db-488a-4b56-8d4e-fbe832b2b649</ProjectGuid>
+    <Name>wifiHD</Name>
+    <avrdevice>AT32uc3a1256</avrdevice>
+    <avrdeviceseries>none</avrdeviceseries>
+    <AvrProjectType>Importer</AvrProjectType>
+    <OutputType>Executable</OutputType>
+    <Language>C</Language>
+    <OutputFileName>wifiHD</OutputFileName>
+    <OutputFileExtension>.elf</OutputFileExtension>
+    <OutputDirectory>$(MSBuildProjectDirectory)\$(Configuration)</OutputDirectory>
+    <ToolchainFlavour>Native</ToolchainFlavour>
+    <avrtool>com.atmel.avrdbg.tool.jtagicemk3</avrtool>
+    <KeepTimersRunning>true</KeepTimersRunning>
+    <AsfFrameworkConfig>
+      <framework-data>
+        <options />
+        <configurations>
+          <configuration key="config.avr32.utils.trampoline" value="yes" default="yes" content-id="Atmel.ASF" />
+          <configuration key="config.avr32.utils.gccstartup" value="yes" default="yes" content-id="Atmel.ASF" />
+          <configuration key="config.utils.interrupt.intc" value="yes" default="yes" content-id="Atmel.ASF" />
+          <configuration key="config.avr32.drivers.intc.exception" value="yes" default="yes" content-id="Atmel.ASF" />
+        </configurations>
+        <files />
+        <documentation help="" />
+      </framework-data>
+    </AsfFrameworkConfig>
+    <avrtoolinterface>JTAG</avrtoolinterface>
+    <com_atmel_avrdbg_tool_jtagicemk3>
+      <ToolType>com.atmel.avrdbg.tool.jtagicemk3</ToolType>
+      <ToolName>JTAGICE3</ToolName>
+      <ToolNumber>J30200003078</ToolNumber>
+      <KeepTimersRunning>true</KeepTimersRunning>
+      <OverrideVtor>false</OverrideVtor>
+      <OverrideVtorValue>
+      </OverrideVtorValue>
+      <Channel>
+        <host>127.0.0.1</host>
+        <port>51999</port>
+        <ssl>False</ssl>
+      </Channel>
+      <ToolOptions>
+        <InterfaceName>JTAG</InterfaceName>
+        <InterfaceProperties>
+          <JtagDbgClock>250000</JtagDbgClock>
+          <JtagProgClock>1000000</JtagProgClock>
+          <IspClock>150000</IspClock>
+          <JtagInChain>false</JtagInChain>
+          <JtagEnableExtResetOnStartSession>false</JtagEnableExtResetOnStartSession>
+          <JtagDevicesBefore>0</JtagDevicesBefore>
+          <JtagDevicesAfter>0</JtagDevicesAfter>
+          <JtagInstrBitsBefore>0</JtagInstrBitsBefore>
+          <JtagInstrBitsAfter>0</JtagInstrBitsAfter>
+        </InterfaceProperties>
+      </ToolOptions>
+    </com_atmel_avrdbg_tool_jtagicemk3>
+    <AsfVersion>3.5.0</AsfVersion>
+    <OverrideVtor>false</OverrideVtor>
+    <OverrideVtorValue />
+    <eraseonlaunchrule>0</eraseonlaunchrule>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <ToolchainSettings>
+      <Avr32Gcc>
+  <avr32gcc.common.outputfiles.hex>True</avr32gcc.common.outputfiles.hex>
+  <avr32gcc.common.outputfiles.lss>True</avr32gcc.common.outputfiles.lss>
+  <avr32gcc.common.outputfiles.eep>True</avr32gcc.common.outputfiles.eep>
+  <avr32gcc.common.outputfiles.srec>True</avr32gcc.common.outputfiles.srec>
+  <avr32gcc.compiler.symbols.DefSymbols>
+    <ListValues>
+      <Value>BOARD=ARDUINO</Value>
+      <Value>WITH_KEY</Value>
+      <Value>WITH_WPA</Value>
+      <Value>WITH_NO_DMA</Value>
+      <Value>DATAFLASH=1</Value>
+      <Value>_INFO_DEBUG_=1</Value>
+    </ListValues>
+  </avr32gcc.compiler.symbols.DefSymbols>
+  <avr32gcc.compiler.directories.IncludePaths>
+    <ListValues>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/PDCA</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/TC</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/MEMORY/CTRL_ACCESS</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/FLASHC</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/EBI/SMC</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/UTILS/DEBUG</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/DELAY</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USART</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/SPI</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/RTC</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/PM</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/GPIO</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/EIC</Value>
+      <Value>../src/CONFIG</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/CPU/CYCLE_COUNTER</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS/INCLUDE</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/UTILS/PREPROCESSOR</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/UTILS</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/INTC</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/BOARDS</Value>
+      <Value>../src</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/LWIP/lwip-1.3.2/src/include</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/LWIP/lwip-1.3.2/src/include/ipv4</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/LWIP/lwip-port-1.3.2/HD/if/include</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/WIFI/HD</Value>
+    </ListValues>
+  </avr32gcc.compiler.directories.IncludePaths>
+  <avr32gcc.compiler.optimization.level>Optimize for size (-Os)</avr32gcc.compiler.optimization.level>
+  <avr32gcc.compiler.optimization.OtherFlags>-fdata-sections -ffunction-sections</avr32gcc.compiler.optimization.OtherFlags>
+  <avr32gcc.compiler.optimization.PrepareFunctionsForGarbageCollection>True</avr32gcc.compiler.optimization.PrepareFunctionsForGarbageCollection>
+  <avr32gcc.compiler.optimization.UseAssemblerForPseudoInstructions>True</avr32gcc.compiler.optimization.UseAssemblerForPseudoInstructions>
+  <avr32gcc.compiler.optimization.ForceDoubleWordAlignment>True</avr32gcc.compiler.optimization.ForceDoubleWordAlignment>
+  <avr32gcc.compiler.warnings.AllWarnings>True</avr32gcc.compiler.warnings.AllWarnings>
+  <avr32gcc.compiler.miscellaneous.OtherFlags>-c -fmessage-length=0</avr32gcc.compiler.miscellaneous.OtherFlags>
+  <avr32gcc.linker.general.DoNotUseStandardStartFiles>True</avr32gcc.linker.general.DoNotUseStandardStartFiles>
+  <avr32gcc.linker.libraries.Libraries>
+    <ListValues>
+      <Value>newlib_addons-at32ucr2-speed_opt</Value>
+      <Value>_ucr2_hd_spi_v2.7.0</Value>
+      <Value>_ucr2_hd_wl_sta_intwpa_v2.7.0</Value>
+    </ListValues>
+  </avr32gcc.linker.libraries.Libraries>
+  <avr32gcc.linker.libraries.LibrarySearchPaths>
+    <ListValues>
+      <Value>../src/SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/BOARDS</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/WIFI/HD/v2.7.0/UCR2/GCC</Value>
+    </ListValues>
+  </avr32gcc.linker.libraries.LibrarySearchPaths>
+  <avr32gcc.linker.optimization.GarbageCollectUnusedSections>True</avr32gcc.linker.optimization.GarbageCollectUnusedSections>
+  <avr32gcc.linker.optimization.PutReadOnlyDataInWritableDataSection>True</avr32gcc.linker.optimization.PutReadOnlyDataInWritableDataSection>
+  <avr32gcc.linker.optimization.AllowDirectReferencesToDataSection>True</avr32gcc.linker.optimization.AllowDirectReferencesToDataSection>
+  <avr32gcc.linker.miscellaneous.LinkerFlags>-Wl,--gc-sections -Wl,-e,_trampoline -T../src/SOFTWARE_FRAMEWORK/UTILS/LINKER_SCRIPTS/AT32UC3A/1256/GCC/link_uc3a1256.lds</avr32gcc.linker.miscellaneous.LinkerFlags>
+  <avr32gcc.assembler.general.IncludePaths>
+    <ListValues>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/PDCA</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/TC</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/MEMORY/CTRL_ACCESS</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/FLASHC</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/EBI/SMC</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/UTILS/DEBUG</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/DELAY</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USART</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/SPI</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/RTC</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/PM</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/GPIO</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/EIC</Value>
+      <Value>../src/CONFIG</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/CPU/CYCLE_COUNTER</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS/INCLUDE</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/UTILS/PREPROCESSOR</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/UTILS</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/INTC</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/BOARDS</Value>
+    </ListValues>
+  </avr32gcc.assembler.general.IncludePaths>
+  <avr32gcc.preprocessingassembler.general.AssemblerFlags>-Wa,-g</avr32gcc.preprocessingassembler.general.AssemblerFlags>
+  <avr32gcc.preprocessingassembler.general.IncludePaths>
+    <ListValues>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/PDCA</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/TC</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/MEMORY/CTRL_ACCESS</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/FLASHC</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/EBI/SMC</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/UTILS/DEBUG</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/DELAY</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USART</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/SPI</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/RTC</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/PM</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/GPIO</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/EIC</Value>
+      <Value>../src/CONFIG</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/CPU/CYCLE_COUNTER</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS/INCLUDE</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/UTILS/PREPROCESSOR</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/UTILS</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/INTC</Value>
+      <Value>../src/SOFTWARE_FRAMEWORK/BOARDS</Value>
+    </ListValues>
+  </avr32gcc.preprocessingassembler.general.IncludePaths>
+</Avr32Gcc>
+    </ToolchainSettings>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <ToolchainSettings>
+      <Avr32Gcc>
+        <avr32gcc.common.outputfiles.hex>True</avr32gcc.common.outputfiles.hex>
+        <avr32gcc.common.outputfiles.lss>True</avr32gcc.common.outputfiles.lss>
+        <avr32gcc.common.outputfiles.eep>True</avr32gcc.common.outputfiles.eep>
+        <avr32gcc.common.outputfiles.srec>True</avr32gcc.common.outputfiles.srec>
+        <avr32gcc.compiler.preprocessor.DoNotSearchSystemDirectories>false</avr32gcc.compiler.preprocessor.DoNotSearchSystemDirectories>
+        <avr32gcc.compiler.preprocessor.PreprocessOnly>false</avr32gcc.compiler.preprocessor.PreprocessOnly>
+        <avr32gcc.compiler.symbols.DefSymbols>
+          <ListValues>
+            <Value>BOARD=ARDUINO</Value>
+            <Value>NO_SYS</Value>
+            <Value>_DEBUG_</Value>
+            <Value>_ASSERT_ENABLE_</Value>
+            <Value>WITH_KEY</Value>
+            <Value>WITH_WPA</Value>
+            <Value>WITH_NO_DMA</Value>
+            <Value>DATAFLASH=1</Value>
+            <Value>_INFO_DEBUG_=1</Value>
+          </ListValues>
+        </avr32gcc.compiler.symbols.DefSymbols>
+        <avr32gcc.compiler.directories.IncludePaths>
+          <ListValues>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/PDCA</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/TC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/MEMORY/CTRL_ACCESS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/FLASHC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/EBI/SMC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/DEBUG</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/DELAY</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USART</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/SPI</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/RTC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/PM</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/GPIO</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/EIC</Value>
+            <Value>../src/CONFIG</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/CPU/CYCLE_COUNTER</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS/INCLUDE</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/PREPROCESSOR</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/INTC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/BOARDS</Value>
+            <Value>../src</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/LWIP/lwip-1.3.2/src/include</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/LWIP/lwip-1.3.2/src/include/ipv4</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/LWIP/lwip-port-1.3.2/HD/if/include</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/WIFI/HD</Value>
+          </ListValues>
+        </avr32gcc.compiler.directories.IncludePaths>
+        <avr32gcc.compiler.optimization.level>Optimize (-O1)</avr32gcc.compiler.optimization.level>
+        <avr32gcc.compiler.optimization.OtherFlags>-fdata-sections -ffunction-sections</avr32gcc.compiler.optimization.OtherFlags>
+        <avr32gcc.compiler.optimization.PrepareFunctionsForGarbageCollection>true</avr32gcc.compiler.optimization.PrepareFunctionsForGarbageCollection>
+        <avr32gcc.compiler.optimization.EnableFastFloatingPointLibrary>false</avr32gcc.compiler.optimization.EnableFastFloatingPointLibrary>
+        <avr32gcc.compiler.optimization.EnableUnsafeMatchOptimizations>false</avr32gcc.compiler.optimization.EnableUnsafeMatchOptimizations>
+        <avr32gcc.compiler.optimization.EnableFastMath>false</avr32gcc.compiler.optimization.EnableFastMath>
+        <avr32gcc.compiler.optimization.GeneratePositionIndependentCode>false</avr32gcc.compiler.optimization.GeneratePositionIndependentCode>
+        <avr32gcc.compiler.optimization.UseAssemblerForPseudoInstructions>true</avr32gcc.compiler.optimization.UseAssemblerForPseudoInstructions>
+        <avr32gcc.compiler.optimization.ForceDoubleWordAlignment>true</avr32gcc.compiler.optimization.ForceDoubleWordAlignment>
+        <avr32gcc.compiler.optimization.PutLargeImmediatesInConstPool>false</avr32gcc.compiler.optimization.PutLargeImmediatesInConstPool>
+        <avr32gcc.compiler.optimization.DoNotInitializeGotRegisterBeforeUsing>false</avr32gcc.compiler.optimization.DoNotInitializeGotRegisterBeforeUsing>
+        <avr32gcc.compiler.optimization.UseSectionRoDataForReadOnlyData>false</avr32gcc.compiler.optimization.UseSectionRoDataForReadOnlyData>
+        <avr32gcc.compiler.optimization.DebugLevel>Maximum (-g3)</avr32gcc.compiler.optimization.DebugLevel>
+        <avr32gcc.compiler.optimization.GenerateGprofInformation>false</avr32gcc.compiler.optimization.GenerateGprofInformation>
+        <avr32gcc.compiler.optimization.GenerateProfInformation>false</avr32gcc.compiler.optimization.GenerateProfInformation>
+        <avr32gcc.compiler.warnings.AllWarnings>true</avr32gcc.compiler.warnings.AllWarnings>
+        <avr32gcc.compiler.warnings.CheckSyntaxOnly>false</avr32gcc.compiler.warnings.CheckSyntaxOnly>
+        <avr32gcc.compiler.warnings.Pedantic>false</avr32gcc.compiler.warnings.Pedantic>
+        <avr32gcc.compiler.warnings.PedanticWarningsAsErrors>false</avr32gcc.compiler.warnings.PedanticWarningsAsErrors>
+        <avr32gcc.compiler.warnings.InhibitAllWarnings>false</avr32gcc.compiler.warnings.InhibitAllWarnings>
+        <avr32gcc.compiler.miscellaneous.OtherFlags>-c -fmessage-length=0</avr32gcc.compiler.miscellaneous.OtherFlags>
+        <avr32gcc.compiler.miscellaneous.SupportAnsiPrograms>false</avr32gcc.compiler.miscellaneous.SupportAnsiPrograms>
+        <avr32gcc.linker.general.DoNotUseStandardStartFiles>true</avr32gcc.linker.general.DoNotUseStandardStartFiles>
+        <avr32gcc.linker.general.DoNotUseDefaultLibraries>false</avr32gcc.linker.general.DoNotUseDefaultLibraries>
+        <avr32gcc.linker.general.NoStartupOrDefaultLibs>false</avr32gcc.linker.general.NoStartupOrDefaultLibs>
+        <avr32gcc.linker.general.OmitAllSymbolInformation>false</avr32gcc.linker.general.OmitAllSymbolInformation>
+        <avr32gcc.linker.general.NoSharedLibraries>false</avr32gcc.linker.general.NoSharedLibraries>
+        <avr32gcc.linker.libraries.Libraries>
+          <ListValues>
+            <Value>newlib_addons-at32ucr2-speed_opt</Value>
+            <Value>_ucr2_hd_spi_v2.7.0</Value>
+            <Value>_ucr2_hd_wl_sta_intwpa_v2.7.0</Value>
+          </ListValues>
+        </avr32gcc.linker.libraries.Libraries>
+        <avr32gcc.linker.libraries.LibrarySearchPaths>
+          <ListValues>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/BOARDS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/WIFI/HD/v2.7.0/UCR2/GCC</Value>
+          </ListValues>
+        </avr32gcc.linker.libraries.LibrarySearchPaths>
+        <avr32gcc.linker.optimization.GarbageCollectUnusedSections>true</avr32gcc.linker.optimization.GarbageCollectUnusedSections>
+        <avr32gcc.linker.optimization.EnableFastFloatingPointLibrary>false</avr32gcc.linker.optimization.EnableFastFloatingPointLibrary>
+        <avr32gcc.linker.optimization.EnableUnsafeMatchOptimizations>false</avr32gcc.linker.optimization.EnableUnsafeMatchOptimizations>
+        <avr32gcc.linker.optimization.EnableFastMath>false</avr32gcc.linker.optimization.EnableFastMath>
+        <avr32gcc.linker.optimization.GeneratePositionIndependentCode>false</avr32gcc.linker.optimization.GeneratePositionIndependentCode>
+        <avr32gcc.linker.optimization.PutReadOnlyDataInWritableDataSection>true</avr32gcc.linker.optimization.PutReadOnlyDataInWritableDataSection>
+        <avr32gcc.linker.optimization.AllowDirectReferencesToDataSection>true</avr32gcc.linker.optimization.AllowDirectReferencesToDataSection>
+        <avr32gcc.assembler.general.IncludePaths>
+          <ListValues>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/PDCA</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/TC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/MEMORY/CTRL_ACCESS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/FLASHC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/EBI/SMC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/DEBUG</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/DELAY</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USART</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/SPI</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/RTC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/PM</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/GPIO</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/EIC</Value>
+            <Value>../src/CONFIG</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/CPU/CYCLE_COUNTER</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS/INCLUDE</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/PREPROCESSOR</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/INTC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/BOARDS</Value>
+          </ListValues>
+        </avr32gcc.assembler.general.IncludePaths>
+        <avr32gcc.assembler.general.AnounceVersion>false</avr32gcc.assembler.general.AnounceVersion>
+        <avr32gcc.assembler.debugging.DebugLevel>Default (-g)</avr32gcc.assembler.debugging.DebugLevel>
+        <avr32gcc.preprocessingassembler.general.AssemblerFlags>-Wa,-g</avr32gcc.preprocessingassembler.general.AssemblerFlags>
+        <avr32gcc.preprocessingassembler.general.IncludePaths>
+          <ListValues>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/PDCA</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/TC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/MEMORY/CTRL_ACCESS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/FLASHC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/EBI/SMC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/DEBUG</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/DELAY</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USART</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/SPI</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/RTC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/PM</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/GPIO</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/EIC</Value>
+            <Value>../src/CONFIG</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/CPU/CYCLE_COUNTER</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS/INCLUDE</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/PREPROCESSOR</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/INTC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/BOARDS</Value>
+          </ListValues>
+        </avr32gcc.preprocessingassembler.general.IncludePaths>
+        <avr32gcc.preprocessingassembler.general.SuppressWarnings>false</avr32gcc.preprocessingassembler.general.SuppressWarnings>
+        <avr32gcc.preprocessingassembler.general.AnounceVersion>false</avr32gcc.preprocessingassembler.general.AnounceVersion>
+        <avr32gcc.preprocessingassembler.debugging.DebugLevel>Default (-Wa,-g)</avr32gcc.preprocessingassembler.debugging.DebugLevel>
+      </Avr32Gcc>
+    </ToolchainSettings>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug_512' ">
+    <OutputPath>bin\Debug_512\</OutputPath>
+    <ToolchainSettings>
+      <Avr32Gcc>
+        <avr32gcc.common.outputfiles.hex>True</avr32gcc.common.outputfiles.hex>
+        <avr32gcc.common.outputfiles.lss>True</avr32gcc.common.outputfiles.lss>
+        <avr32gcc.common.outputfiles.eep>True</avr32gcc.common.outputfiles.eep>
+        <avr32gcc.common.outputfiles.srec>True</avr32gcc.common.outputfiles.srec>
+        <avr32gcc.compiler.preprocessor.DoNotSearchSystemDirectories>false</avr32gcc.compiler.preprocessor.DoNotSearchSystemDirectories>
+        <avr32gcc.compiler.preprocessor.PreprocessOnly>false</avr32gcc.compiler.preprocessor.PreprocessOnly>
+        <avr32gcc.compiler.symbols.DefSymbols>
+          <ListValues>
+            <Value>BOARD=ARDUINO</Value>
+            <Value>_APP_DEBUG_</Value>
+            <Value>_DEBUG_</Value>
+            <Value>_ASSERT_ENABLE_</Value>
+            <Value>EXT_BOARD=SPB104</Value>
+            <Value>WITH_KEY</Value>
+            <Value>WITH_WPA</Value>
+            <Value>WITH_NO_DMA</Value>
+            <Value>LWIP_DEBUG</Value>
+            <Value>_INFO_DEBUG_=1</Value>
+          </ListValues>
+        </avr32gcc.compiler.symbols.DefSymbols>
+        <avr32gcc.compiler.directories.IncludePaths>
+          <ListValues>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/PDCA</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/TC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/MEMORY/CTRL_ACCESS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/FLASHC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/EBI/SMC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/DEBUG</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/DELAY</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USART</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/SPI</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/RTC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/PM</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/GPIO</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/EIC</Value>
+            <Value>../src/CONFIG</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/CPU/CYCLE_COUNTER</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS/INCLUDE</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/PREPROCESSOR</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/INTC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/BOARDS</Value>
+            <Value>../src</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/LWIP/lwip-1.3.2/src/include</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/LWIP/lwip-1.3.2/src/include/ipv4</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/LWIP/lwip-port-1.3.2/HD/if/include</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/WIFI/HD</Value>
+          </ListValues>
+        </avr32gcc.compiler.directories.IncludePaths>
+        <avr32gcc.compiler.optimization.level>Optimize (-O1)</avr32gcc.compiler.optimization.level>
+        <avr32gcc.compiler.optimization.OtherFlags>-fdata-sections</avr32gcc.compiler.optimization.OtherFlags>
+        <avr32gcc.compiler.optimization.PrepareFunctionsForGarbageCollection>true</avr32gcc.compiler.optimization.PrepareFunctionsForGarbageCollection>
+        <avr32gcc.compiler.optimization.EnableFastFloatingPointLibrary>false</avr32gcc.compiler.optimization.EnableFastFloatingPointLibrary>
+        <avr32gcc.compiler.optimization.EnableUnsafeMatchOptimizations>false</avr32gcc.compiler.optimization.EnableUnsafeMatchOptimizations>
+        <avr32gcc.compiler.optimization.EnableFastMath>false</avr32gcc.compiler.optimization.EnableFastMath>
+        <avr32gcc.compiler.optimization.GeneratePositionIndependentCode>false</avr32gcc.compiler.optimization.GeneratePositionIndependentCode>
+        <avr32gcc.compiler.optimization.UseAssemblerForPseudoInstructions>true</avr32gcc.compiler.optimization.UseAssemblerForPseudoInstructions>
+        <avr32gcc.compiler.optimization.ForceDoubleWordAlignment>false</avr32gcc.compiler.optimization.ForceDoubleWordAlignment>
+        <avr32gcc.compiler.optimization.PutLargeImmediatesInConstPool>false</avr32gcc.compiler.optimization.PutLargeImmediatesInConstPool>
+        <avr32gcc.compiler.optimization.DoNotInitializeGotRegisterBeforeUsing>false</avr32gcc.compiler.optimization.DoNotInitializeGotRegisterBeforeUsing>
+        <avr32gcc.compiler.optimization.UseSectionRoDataForReadOnlyData>false</avr32gcc.compiler.optimization.UseSectionRoDataForReadOnlyData>
+        <avr32gcc.compiler.optimization.DebugLevel>Maximum (-g3)</avr32gcc.compiler.optimization.DebugLevel>
+        <avr32gcc.compiler.optimization.GenerateGprofInformation>false</avr32gcc.compiler.optimization.GenerateGprofInformation>
+        <avr32gcc.compiler.optimization.GenerateProfInformation>false</avr32gcc.compiler.optimization.GenerateProfInformation>
+        <avr32gcc.compiler.warnings.AllWarnings>true</avr32gcc.compiler.warnings.AllWarnings>
+        <avr32gcc.compiler.warnings.CheckSyntaxOnly>false</avr32gcc.compiler.warnings.CheckSyntaxOnly>
+        <avr32gcc.compiler.warnings.Pedantic>false</avr32gcc.compiler.warnings.Pedantic>
+        <avr32gcc.compiler.warnings.PedanticWarningsAsErrors>false</avr32gcc.compiler.warnings.PedanticWarningsAsErrors>
+        <avr32gcc.compiler.warnings.InhibitAllWarnings>false</avr32gcc.compiler.warnings.InhibitAllWarnings>
+        <avr32gcc.compiler.miscellaneous.OtherFlags>-c -fmessage-length=0</avr32gcc.compiler.miscellaneous.OtherFlags>
+        <avr32gcc.compiler.miscellaneous.SupportAnsiPrograms>false</avr32gcc.compiler.miscellaneous.SupportAnsiPrograms>
+        <avr32gcc.linker.general.DoNotUseStandardStartFiles>true</avr32gcc.linker.general.DoNotUseStandardStartFiles>
+        <avr32gcc.linker.general.DoNotUseDefaultLibraries>false</avr32gcc.linker.general.DoNotUseDefaultLibraries>
+        <avr32gcc.linker.general.NoStartupOrDefaultLibs>false</avr32gcc.linker.general.NoStartupOrDefaultLibs>
+        <avr32gcc.linker.general.OmitAllSymbolInformation>false</avr32gcc.linker.general.OmitAllSymbolInformation>
+        <avr32gcc.linker.general.NoSharedLibraries>false</avr32gcc.linker.general.NoSharedLibraries>
+        <avr32gcc.linker.libraries.Libraries>
+          <ListValues>
+            <Value>newlib_addons-at32ucr2-speed_opt</Value>
+            <Value>_ucr2_hd_spi_standalone_v2.1.1</Value>
+            <Value>_ucr2_hd_wl_standalone_v2.1.1</Value>
+          </ListValues>
+        </avr32gcc.linker.libraries.Libraries>
+        <avr32gcc.linker.libraries.LibrarySearchPaths>
+          <ListValues>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/BOARDS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/WIFI/HD/v2.1.1/UCR2/GCC</Value>
+          </ListValues>
+        </avr32gcc.linker.libraries.LibrarySearchPaths>
+        <avr32gcc.linker.optimization.GarbageCollectUnusedSections>true</avr32gcc.linker.optimization.GarbageCollectUnusedSections>
+        <avr32gcc.linker.optimization.EnableFastFloatingPointLibrary>false</avr32gcc.linker.optimization.EnableFastFloatingPointLibrary>
+        <avr32gcc.linker.optimization.EnableUnsafeMatchOptimizations>false</avr32gcc.linker.optimization.EnableUnsafeMatchOptimizations>
+        <avr32gcc.linker.optimization.EnableFastMath>false</avr32gcc.linker.optimization.EnableFastMath>
+        <avr32gcc.linker.optimization.GeneratePositionIndependentCode>false</avr32gcc.linker.optimization.GeneratePositionIndependentCode>
+        <avr32gcc.linker.optimization.PutReadOnlyDataInWritableDataSection>true</avr32gcc.linker.optimization.PutReadOnlyDataInWritableDataSection>
+        <avr32gcc.linker.optimization.AllowDirectReferencesToDataSection>true</avr32gcc.linker.optimization.AllowDirectReferencesToDataSection>
+        <avr32gcc.assembler.general.IncludePaths>
+          <ListValues>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/PDCA</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/TC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/MEMORY/CTRL_ACCESS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/FLASHC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/EBI/SMC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/DEBUG</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/DELAY</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USART</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/SPI</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/RTC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/PM</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/GPIO</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/EIC</Value>
+            <Value>../src/CONFIG</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/CPU/CYCLE_COUNTER</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS/INCLUDE</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/PREPROCESSOR</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/INTC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/BOARDS</Value>
+          </ListValues>
+        </avr32gcc.assembler.general.IncludePaths>
+        <avr32gcc.assembler.general.AnounceVersion>false</avr32gcc.assembler.general.AnounceVersion>
+        <avr32gcc.assembler.debugging.DebugLevel>Default (-g)</avr32gcc.assembler.debugging.DebugLevel>
+        <avr32gcc.preprocessingassembler.general.AssemblerFlags>-Wa,-g</avr32gcc.preprocessingassembler.general.AssemblerFlags>
+        <avr32gcc.preprocessingassembler.general.IncludePaths>
+          <ListValues>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/PDCA</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/TC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/MEMORY/CTRL_ACCESS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/FLASHC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/EBI/SMC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/DEBUG</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/DELAY</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USART</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/SPI</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/RTC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/PM</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/GPIO</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/EIC</Value>
+            <Value>../src/CONFIG</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/CPU/CYCLE_COUNTER</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS/INCLUDE</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/PREPROCESSOR</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/INTC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/BOARDS</Value>
+          </ListValues>
+        </avr32gcc.preprocessingassembler.general.IncludePaths>
+        <avr32gcc.preprocessingassembler.general.SuppressWarnings>false</avr32gcc.preprocessingassembler.general.SuppressWarnings>
+        <avr32gcc.preprocessingassembler.general.AnounceVersion>false</avr32gcc.preprocessingassembler.general.AnounceVersion>
+        <avr32gcc.preprocessingassembler.debugging.DebugLevel>Default (-Wa,-g)</avr32gcc.preprocessingassembler.debugging.DebugLevel>
+      </Avr32Gcc>
+    </ToolchainSettings>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release_512' ">
+    <OutputPath>bin\Release_512\</OutputPath>
+    <ToolchainSettings>
+      <Avr32Gcc>
+        <avr32gcc.common.outputfiles.hex>True</avr32gcc.common.outputfiles.hex>
+        <avr32gcc.common.outputfiles.lss>True</avr32gcc.common.outputfiles.lss>
+        <avr32gcc.common.outputfiles.eep>True</avr32gcc.common.outputfiles.eep>
+        <avr32gcc.common.outputfiles.srec>True</avr32gcc.common.outputfiles.srec>
+        <avr32gcc.compiler.preprocessor.DoNotSearchSystemDirectories>false</avr32gcc.compiler.preprocessor.DoNotSearchSystemDirectories>
+        <avr32gcc.compiler.preprocessor.PreprocessOnly>false</avr32gcc.compiler.preprocessor.PreprocessOnly>
+        <avr32gcc.compiler.symbols.DefSymbols>
+          <ListValues>
+            <Value>BOARD=ARDUINO</Value>
+            <Value>_ASSERT_ENABLE_</Value>
+            <Value>EXT_BOARD=SPB104</Value>
+            <Value>WITH_KEY</Value>
+            <Value>WITH_WPA</Value>
+            <Value>WITH_NO_DMA</Value>
+            <Value>LWIP_DEBUG</Value>
+            <Value>_INFO_DEBUG_=1</Value>
+          </ListValues>
+        </avr32gcc.compiler.symbols.DefSymbols>
+        <avr32gcc.compiler.directories.IncludePaths>
+          <ListValues>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/PDCA</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/TC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/MEMORY/CTRL_ACCESS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/FLASHC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/EBI/SMC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/DEBUG</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/DELAY</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USART</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/SPI</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/RTC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/PM</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/GPIO</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/EIC</Value>
+            <Value>../src/CONFIG</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/CPU/CYCLE_COUNTER</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS/INCLUDE</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/PREPROCESSOR</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/INTC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/BOARDS</Value>
+            <Value>../src</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/LWIP/lwip-1.3.2/src/include</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/LWIP/lwip-1.3.2/src/include/ipv4</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/LWIP/lwip-port-1.3.2/HD/if/include</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/WIFI/HD</Value>
+          </ListValues>
+        </avr32gcc.compiler.directories.IncludePaths>
+        <avr32gcc.compiler.optimization.OtherFlags>-fdata-sections</avr32gcc.compiler.optimization.OtherFlags>
+        <avr32gcc.compiler.optimization.PrepareFunctionsForGarbageCollection>true</avr32gcc.compiler.optimization.PrepareFunctionsForGarbageCollection>
+        <avr32gcc.compiler.optimization.EnableFastFloatingPointLibrary>false</avr32gcc.compiler.optimization.EnableFastFloatingPointLibrary>
+        <avr32gcc.compiler.optimization.EnableUnsafeMatchOptimizations>false</avr32gcc.compiler.optimization.EnableUnsafeMatchOptimizations>
+        <avr32gcc.compiler.optimization.EnableFastMath>false</avr32gcc.compiler.optimization.EnableFastMath>
+        <avr32gcc.compiler.optimization.GeneratePositionIndependentCode>false</avr32gcc.compiler.optimization.GeneratePositionIndependentCode>
+        <avr32gcc.compiler.optimization.UseAssemblerForPseudoInstructions>true</avr32gcc.compiler.optimization.UseAssemblerForPseudoInstructions>
+        <avr32gcc.compiler.optimization.ForceDoubleWordAlignment>false</avr32gcc.compiler.optimization.ForceDoubleWordAlignment>
+        <avr32gcc.compiler.optimization.PutLargeImmediatesInConstPool>false</avr32gcc.compiler.optimization.PutLargeImmediatesInConstPool>
+        <avr32gcc.compiler.optimization.DoNotInitializeGotRegisterBeforeUsing>false</avr32gcc.compiler.optimization.DoNotInitializeGotRegisterBeforeUsing>
+        <avr32gcc.compiler.optimization.UseSectionRoDataForReadOnlyData>false</avr32gcc.compiler.optimization.UseSectionRoDataForReadOnlyData>
+        <avr32gcc.compiler.optimization.GenerateGprofInformation>false</avr32gcc.compiler.optimization.GenerateGprofInformation>
+        <avr32gcc.compiler.optimization.GenerateProfInformation>false</avr32gcc.compiler.optimization.GenerateProfInformation>
+        <avr32gcc.compiler.warnings.AllWarnings>true</avr32gcc.compiler.warnings.AllWarnings>
+        <avr32gcc.compiler.warnings.CheckSyntaxOnly>false</avr32gcc.compiler.warnings.CheckSyntaxOnly>
+        <avr32gcc.compiler.warnings.Pedantic>false</avr32gcc.compiler.warnings.Pedantic>
+        <avr32gcc.compiler.warnings.PedanticWarningsAsErrors>false</avr32gcc.compiler.warnings.PedanticWarningsAsErrors>
+        <avr32gcc.compiler.warnings.InhibitAllWarnings>false</avr32gcc.compiler.warnings.InhibitAllWarnings>
+        <avr32gcc.compiler.miscellaneous.OtherFlags>-c -fmessage-length=0</avr32gcc.compiler.miscellaneous.OtherFlags>
+        <avr32gcc.compiler.miscellaneous.SupportAnsiPrograms>false</avr32gcc.compiler.miscellaneous.SupportAnsiPrograms>
+        <avr32gcc.linker.general.DoNotUseStandardStartFiles>true</avr32gcc.linker.general.DoNotUseStandardStartFiles>
+        <avr32gcc.linker.general.DoNotUseDefaultLibraries>false</avr32gcc.linker.general.DoNotUseDefaultLibraries>
+        <avr32gcc.linker.general.NoStartupOrDefaultLibs>false</avr32gcc.linker.general.NoStartupOrDefaultLibs>
+        <avr32gcc.linker.general.OmitAllSymbolInformation>false</avr32gcc.linker.general.OmitAllSymbolInformation>
+        <avr32gcc.linker.general.NoSharedLibraries>false</avr32gcc.linker.general.NoSharedLibraries>
+        <avr32gcc.linker.libraries.Libraries>
+          <ListValues>
+            <Value>newlib_addons-at32ucr2-speed_opt</Value>
+            <Value>_ucr2_hd_spi_standalone_v2.1.1</Value>
+            <Value>_ucr2_hd_wl_standalone_v2.1.1</Value>
+          </ListValues>
+        </avr32gcc.linker.libraries.Libraries>
+        <avr32gcc.linker.libraries.LibrarySearchPaths>
+          <ListValues>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/BOARDS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/WIFI/HD/v2.1.1/UCR2/GCC</Value>
+          </ListValues>
+        </avr32gcc.linker.libraries.LibrarySearchPaths>
+        <avr32gcc.linker.optimization.GarbageCollectUnusedSections>true</avr32gcc.linker.optimization.GarbageCollectUnusedSections>
+        <avr32gcc.linker.optimization.EnableFastFloatingPointLibrary>false</avr32gcc.linker.optimization.EnableFastFloatingPointLibrary>
+        <avr32gcc.linker.optimization.EnableUnsafeMatchOptimizations>false</avr32gcc.linker.optimization.EnableUnsafeMatchOptimizations>
+        <avr32gcc.linker.optimization.EnableFastMath>false</avr32gcc.linker.optimization.EnableFastMath>
+        <avr32gcc.linker.optimization.GeneratePositionIndependentCode>false</avr32gcc.linker.optimization.GeneratePositionIndependentCode>
+        <avr32gcc.linker.optimization.PutReadOnlyDataInWritableDataSection>true</avr32gcc.linker.optimization.PutReadOnlyDataInWritableDataSection>
+        <avr32gcc.linker.optimization.AllowDirectReferencesToDataSection>true</avr32gcc.linker.optimization.AllowDirectReferencesToDataSection>
+        <avr32gcc.assembler.general.IncludePaths>
+          <ListValues>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/PDCA</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/TC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/MEMORY/CTRL_ACCESS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/FLASHC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/EBI/SMC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/DEBUG</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/DELAY</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USART</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/SPI</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/RTC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/PM</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/GPIO</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/EIC</Value>
+            <Value>../src/CONFIG</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/CPU/CYCLE_COUNTER</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS/INCLUDE</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/PREPROCESSOR</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/INTC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/BOARDS</Value>
+          </ListValues>
+        </avr32gcc.assembler.general.IncludePaths>
+        <avr32gcc.assembler.general.AnounceVersion>false</avr32gcc.assembler.general.AnounceVersion>
+        <avr32gcc.preprocessingassembler.general.AssemblerFlags>-Wa,-g</avr32gcc.preprocessingassembler.general.AssemblerFlags>
+        <avr32gcc.preprocessingassembler.general.IncludePaths>
+          <ListValues>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/PDCA</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/TC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/MEMORY/CTRL_ACCESS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/COMPONENTS/MEMORY/DATA_FLASH/AT45DBX</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/FLASHC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/EBI/SMC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/DEBUG</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/SERVICES/DELAY</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/USART</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/SPI</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/RTC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/PM</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/GPIO</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/EIC</Value>
+            <Value>../src/CONFIG</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/CPU/CYCLE_COUNTER</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/LIBS/NEWLIB_ADDONS/INCLUDE</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS/PREPROCESSOR</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/UTILS</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/DRIVERS/INTC</Value>
+            <Value>../src/SOFTWARE_FRAMEWORK/BOARDS</Value>
+          </ListValues>
+        </avr32gcc.preprocessingassembler.general.IncludePaths>
+        <avr32gcc.preprocessingassembler.general.SuppressWarnings>false</avr32gcc.preprocessingassembler.general.SuppressWarnings>
+        <avr32gcc.preprocessingassembler.general.AnounceVersion>false</avr32gcc.preprocessingassembler.general.AnounceVersion>
+      </Avr32Gcc>
+    </ToolchainSettings>
+  </PropertyGroup>
+  <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
+  <ItemGroup>
+    <Folder Include="src" />
+    <Compile Include="src\ard_spi.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\ard_spi.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\ard_tcp.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\ard_tcp.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\ard_utils.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\ard_utils.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\avr32_spi.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\board_init.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\board_init.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\cmd_wl.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\cmd_wl.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\CONFIG\conf_access.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\CONFIG\conf_at45dbx.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\console.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\console.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\debug.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\fw_download.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\fw_download_extflash.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <None Include="src\license.txt">
+      <SubType>compile</SubType>
+    </None>
+    <Compile Include="src\lwipopts.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\lwip_setup.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\lwip_setup.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\main.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\nvram.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\nvram.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\owl_os.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\ping.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\ping.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\printf-stdarg.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\printf-stdarg.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\MEMORY\DATA_FLASH\AT45DBX\at45dbx.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\MEMORY\DATA_FLASH\AT45DBX\at45dbx_mem.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\timer.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\timer.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\top_defs.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\trace.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\util.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\util.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\wifi_spi.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\wl_cm.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\wl_cm.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\wl_definitions.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\CONFIG" />
+    <Compile Include="src\CONFIG\conf_ebi.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\CONFIG\conf_sd_mmc_spi.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\ASM" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\ASM\trampoline.x">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\BOARDS" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\BOARDS\board.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <None Include="src\SOFTWARE_FRAMEWORK\BOARDS\board.h.my">
+      <SubType>compile</SubType>
+    </None>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\BOARDS\ARDUINO" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\BOARDS\ARDUINO\arduino.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\BOARDS\ARDUINO\led.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\BOARDS\ARDUINO\led.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\COMPONENTS" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\MEMORY" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\MEMORY\DATA_FLASH" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\MEMORY\DATA_FLASH\AT45DBX" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\WIFI" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\WIFI\HD" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\WIFI\HD\wlap_api.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\WIFI\HD\wl_api.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\WIFI\HD\wl_os.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\WIFI\HD\wl_sdio.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\WIFI\HD\wl_spi.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\WIFI\HD\v2.7.0" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\MEMORY\DATA_FLASH\AT45DBX\at45dbx.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\MEMORY\DATA_FLASH\AT45DBX\at45dbx_mem.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <None Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\WIFI\HD\v2.7.0\revision.txt">
+      <SubType>compile</SubType>
+    </None>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\WIFI\HD\v2.7.0\UCR1" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\WIFI\HD\v2.7.0\UCR1\GCC" />
+    <None Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\WIFI\HD\v2.7.0\UCR1\GCC\lib_ucr1_hd_sdio_v2.7.0.a">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\WIFI\HD\v2.7.0\UCR1\GCC\lib_ucr1_hd_spi_v2.7.0.a">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\WIFI\HD\v2.7.0\UCR1\GCC\lib_ucr1_hd_wl_sta_intwpa_v2.7.0.a">
+      <SubType>compile</SubType>
+    </None>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\WIFI\HD\v2.7.0\UCR2" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\WIFI\HD\v2.7.0\UCR2\GCC" />
+    <None Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\WIFI\HD\v2.7.0\UCR2\GCC\lib_ucr2_hd_sdio_v2.7.0.a">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\WIFI\HD\v2.7.0\UCR2\GCC\lib_ucr2_hd_spi_v2.7.0.a">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="src\SOFTWARE_FRAMEWORK\COMPONENTS\WIFI\HD\v2.7.0\UCR2\GCC\lib_ucr2_hd_wl_sta_intwpa_v2.7.0.a">
+      <SubType>compile</SubType>
+    </None>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\DRIVERS" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\DRIVERS\CPU" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\DRIVERS\CPU\CYCLE_COUNTER" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\CPU\CYCLE_COUNTER\cycle_counter.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\DRIVERS\EBI" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\DRIVERS\EIC" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\EIC\eic.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\EIC\eic.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\DRIVERS\FLASHC" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\FLASHC\flashc.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\FLASHC\flashc.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\DRIVERS\GPIO" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\GPIO\gpio.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\GPIO\gpio.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\DRIVERS\INTC" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\INTC\exception.x">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\INTC\intc.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\INTC\intc.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\DRIVERS\PDCA" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\PDCA\pdca.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\PDCA\pdca.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\DRIVERS\PM" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\PM\pm.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\PM\pm.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\PM\pm_conf_clocks.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\PM\power_clocks_lib.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\PM\power_clocks_lib.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\DRIVERS\RTC" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\RTC\rtc.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\RTC\rtc.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\DRIVERS\SPI" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\SPI\spi.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\SPI\spi.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\DRIVERS\TC" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\TC\tc.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\TC\tc.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\DRIVERS\USART" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\USART\usart.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\DRIVERS\USART\usart.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\DELAY" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\DELAY\delay.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\DELAY\delay.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\core" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\core\dhcp.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\core\dns.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\core\init.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\core\mem.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\core\memp.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\core\netif.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\core\pbuf.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\core\raw.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\core\stats.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\core\tcp.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\core\tcp_in.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\core\tcp_out.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\core\udp.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\core\ipv4" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\core\ipv4\autoip.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\core\ipv4\icmp.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\core\ipv4\igmp.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\core\ipv4\inet.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\core\ipv4\inet_chksum.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\core\ipv4\ip.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\core\ipv4\ip_addr.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\core\ipv4\ip_frag.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\ipv4" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\ipv4\lwip" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\ipv4\lwip\autoip.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\ipv4\lwip\icmp.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\ipv4\lwip\igmp.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\ipv4\lwip\inet.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\ipv4\lwip\inet_chksum.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\ipv4\lwip\ip.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\ipv4\lwip\ip_addr.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\ipv4\lwip\ip_frag.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\api.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\api_msg.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\arch.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\debug.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\def.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\dhcp.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\dns.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\err.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\init.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\mem.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\memp.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\memp_std.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\netbuf.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\netdb.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\netif.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\netifapi.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\opt.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\pbuf.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\raw.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\sio.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\snmp.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\snmp_asn1.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\snmp_msg.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\snmp_structs.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\sockets.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\stats.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\sys.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\tcp.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\tcpip.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\udp.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\netif" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\netif\etharp.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\netif\loopif.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\netif\ppp_oe.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\netif\slipif.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\netif" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\netif\etharp.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\netif\loopif.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-port-1.3.2" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-port-1.3.2\HD" />
+    <None Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-port-1.3.2\HD\readme.txt">
+      <SubType>compile</SubType>
+    </None>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-port-1.3.2\HD\if" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-port-1.3.2\HD\if\include" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-port-1.3.2\HD\if\include\lwipopts.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-port-1.3.2\HD\if\include\arch" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-port-1.3.2\HD\if\include\arch\cc.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-port-1.3.2\HD\if\include\arch\perf.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-port-1.3.2\HD\if\include\netif" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-port-1.3.2\HD\if\include\netif\wlif.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-port-1.3.2\HD\if\netif" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-port-1.3.2\HD\if\netif\wlif.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\MEMORY" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\SERVICES\MEMORY\CTRL_ACCESS" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\MEMORY\CTRL_ACCESS\ctrl_access.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\SERVICES\MEMORY\CTRL_ACCESS\ctrl_access.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\UTILS" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\compiler.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\conf_isp.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\parts.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\UTILS\DEBUG" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\DEBUG\debug.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\DEBUG\debug.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\DEBUG\print_funcs.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\DEBUG\print_funcs.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\UTILS\LIBS" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\UTILS\LIBS\NEWLIB_ADDONS" />
+    <None Include="src\SOFTWARE_FRAMEWORK\UTILS\LIBS\NEWLIB_ADDONS\libnewlib_addons-at32ucr2-speed_opt.a">
+      <SubType>compile</SubType>
+    </None>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\UTILS\LIBS\NEWLIB_ADDONS\INCLUDE" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\LIBS\NEWLIB_ADDONS\INCLUDE\nlao_cpu.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\LIBS\NEWLIB_ADDONS\INCLUDE\nlao_exceptions.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\LIBS\NEWLIB_ADDONS\INCLUDE\nlao_interrupts.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\LIBS\NEWLIB_ADDONS\INCLUDE\nlao_io.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\LIBS\NEWLIB_ADDONS\INCLUDE\nlao_usart.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\UTILS\LINKER_SCRIPTS" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\UTILS\LINKER_SCRIPTS\AT32UC3A" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\UTILS\LINKER_SCRIPTS\AT32UC3A\0512" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\UTILS\LINKER_SCRIPTS\AT32UC3A\0512\GCC" />
+    <None Include="src\SOFTWARE_FRAMEWORK\UTILS\LINKER_SCRIPTS\AT32UC3A\0512\GCC\link_uc3a0512.lds">
+      <SubType>compile</SubType>
+    </None>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\UTILS\LINKER_SCRIPTS\AT32UC3A\1256" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\UTILS\LINKER_SCRIPTS\AT32UC3A\1256\GCC" />
+    <None Include="src\SOFTWARE_FRAMEWORK\UTILS\LINKER_SCRIPTS\AT32UC3A\1256\GCC\link_uc3a1256.lds">
+      <SubType>compile</SubType>
+    </None>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\UTILS\PREPROCESSOR" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\PREPROCESSOR\mrepeat.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\PREPROCESSOR\preprocessor.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\PREPROCESSOR\stringz.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\PREPROCESSOR\tpaste.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Folder Include="src\SOFTWARE_FRAMEWORK\UTILS\STARTUP_FILES" />
+    <Folder Include="src\SOFTWARE_FRAMEWORK\UTILS\STARTUP_FILES\GCC" />
+    <Compile Include="src\SOFTWARE_FRAMEWORK\UTILS\STARTUP_FILES\GCC\crt0.x">
+      <SubType>compile</SubType>
+    </Compile>
+  </ItemGroup>
+</Project>
