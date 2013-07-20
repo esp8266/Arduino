@@ -108,7 +108,7 @@ public class NetworkMonitor extends AbstractMonitor {
             // ignore
           }
           if (channel.isConnected()) {
-            NetworkMonitor.this.message(_("connected!"));
+            NetworkMonitor.this.message(_("connected!") + '\n');
           }
         }
 
