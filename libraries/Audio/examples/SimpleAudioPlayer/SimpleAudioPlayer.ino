@@ -6,7 +6,8 @@
  Hardware required :
  * Arduino shield with a SD card on CS4
  * A sound file named "test.wav" in the root directory of the SD card 
- * Speaker attched to ground and DAC0
+ * An audio amplifier to connect to the DAC0 and ground
+ * A speaker to connect to the audio amplifier 
 
  Original by Massimo Banzi September 20, 2012
  Modified by Scott Fitzgerald October 19, 2012
