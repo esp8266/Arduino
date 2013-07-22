@@ -93,34 +93,36 @@ public class NetworkDiscovery implements Discovery, ServiceListener, cc.arduino.
   @Override
   public void serviceResolved(ServiceEvent serviceEvent) {
     ServiceInfo info = serviceEvent.getInfo();
-    String address = info.getInet4Addresses()[0].getHostAddress();
-    String name = serviceEvent.getName();
+    for (InetAddress inetAddress : info.getInet4Addresses()) {
+      String address = inetAddress.getHostAddress();
+      String name = serviceEvent.getName();
 
-    PreferencesMap prefs = null;
-    String board = null;
-    if (info.hasData()) {
-      prefs = new PreferencesMap();
-      board = info.getPropertyString("board");
-      prefs.put("board", board);
-      prefs.put("distro_version", info.getPropertyString("distro_version"));
-    }
+      PreferencesMap prefs = null;
+      String board = null;
+      if (info.hasData()) {
+        prefs = new PreferencesMap();
+        board = info.getPropertyString("board");
+        prefs.put("board", board);
+        prefs.put("distro_version", info.getPropertyString("distro_version"));
+      }
 
-    String label = name + " at " + address;
-    if (board != null) {
-      String boardName = Base.getPlatform().resolveDeviceByBoardID(Base.packages, board);
-      label += " (" + boardName + ")";
-    }
+      String label = name + " at " + address;
+      if (board != null) {
+        String boardName = Base.getPlatform().resolveDeviceByBoardID(Base.packages, board);
+        label += " (" + boardName + ")";
+      }
 
-    BoardPort port = new BoardPort();
-    port.setAddress(address);
-    port.setBoardName(name);
-    port.setProtocol("network");
-    port.setPrefs(prefs);
-    port.setLabel(label);
+      BoardPort port = new BoardPort();
+      port.setAddress(address);
+      port.setBoardName(name);
+      port.setProtocol("network");
+      port.setPrefs(prefs);
+      port.setLabel(label);
 
-    synchronized (this) {
-      removeDuplicateBoards(port);
-      ports.add(port);
+      synchronized (this) {
+        removeDuplicateBoards(port);
+        ports.add(port);
+      }
     }
   }
 
