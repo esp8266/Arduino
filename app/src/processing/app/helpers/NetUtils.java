@@ -7,11 +7,11 @@ import java.net.Socket;
 
 public abstract class NetUtils {
 
-  public static boolean isReachable(InetAddress address) {
+  public static boolean isReachable(InetAddress address, int port) {
     Socket socket = null;
     try {
       socket = new Socket();
-      socket.connect(new InetSocketAddress(address, 80), 100);
+      socket.connect(new InetSocketAddress(address, port), 100);
       return true;
     } catch (IOException e) {
       return false;

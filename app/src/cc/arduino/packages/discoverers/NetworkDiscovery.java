@@ -33,7 +33,8 @@ public class NetworkDiscovery implements Discovery, ServiceListener, cc.arduino.
     Iterator<BoardPort> iterator = ports.iterator();
     while (iterator.hasNext()) {
       try {
-        if (!NetUtils.isReachable(InetAddress.getByName(iterator.next().getAddress()))) {
+        BoardPort board = iterator.next();
+        if (!NetUtils.isReachable(InetAddress.getByName(board.getAddress()), Integer.parseInt(board.getPrefs().get("port")))) {
           iterator.remove();
         }
       } catch (UnknownHostException e) {
@@ -93,34 +94,38 @@ public class NetworkDiscovery implements Discovery, ServiceListener, cc.arduino.
   @Override
   public void serviceResolved(ServiceEvent serviceEvent) {
     ServiceInfo info = serviceEvent.getInfo();
-    String address = info.getInet4Addresses()[0].getHostAddress();
-    String name = serviceEvent.getName();
+    for (InetAddress inetAddress : info.getInet4Addresses()) {
+      String address = inetAddress.getHostAddress();
+      String name = serviceEvent.getName();
 
-    PreferencesMap prefs = null;
-    String board = null;
-    if (info.hasData()) {
-      prefs = new PreferencesMap();
-      board = info.getPropertyString("board");
-      prefs.put("board", board);
-      prefs.put("distro_version", info.getPropertyString("distro_version"));
-    }
+      PreferencesMap prefs = null;
+      String board = null;
+      if (info.hasData()) {
+        prefs = new PreferencesMap();
+        board = info.getPropertyString("board");
+        prefs.put("board", board);
+        prefs.put("distro_version", info.getPropertyString("distro_version"));
+      }
 
-    String label = name + " at " + address;
-    if (board != null) {
-      String boardName = Base.getPlatform().resolveDeviceByBoardID(Base.packages, board);
-      label += " (" + boardName + ")";
-    }
+      prefs.put("port", "" + info.getPort());
 
-    BoardPort port = new BoardPort();
-    port.setAddress(address);
-    port.setBoardName(name);
-    port.setProtocol("network");
-    port.setPrefs(prefs);
-    port.setLabel(label);
+      String label = name + " at " + address;
+      if (board != null) {
+        String boardName = Base.getPlatform().resolveDeviceByBoardID(Base.packages, board);
+        label += " (" + boardName + ")";
+      }
 
-    synchronized (this) {
-      removeDuplicateBoards(port);
-      ports.add(port);
+      BoardPort port = new BoardPort();
+      port.setAddress(address);
+      port.setBoardName(name);
+      port.setProtocol("network");
+      port.setPrefs(prefs);
+      port.setLabel(label);
+
+      synchronized (this) {
+        removeDuplicateBoards(port);
+        ports.add(port);
+      }
     }
   }
 
