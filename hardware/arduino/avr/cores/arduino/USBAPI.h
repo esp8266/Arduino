@@ -25,6 +25,8 @@ extern USBDevice_ USBDevice;
 //================================================================================
 //	Serial over CDC (Serial1 is the physical port)
 
+struct ring_buffer;
+
 class Serial_ : public Stream
 {
 private:
