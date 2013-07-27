@@ -132,7 +132,7 @@ public class Base {
       File versionFile = getContentFile("lib/version.txt");
       if (versionFile.exists()) {
         String version = PApplet.loadStrings(versionFile)[0];
-        if (!version.equals(VERSION_NAME)) {
+        if (!version.equals(VERSION_NAME) && !version.equals("${version}")) {
           VERSION_NAME = version;
           RELEASE = true;
         }
@@ -140,6 +140,10 @@ public class Base {
     } catch (Exception e) {
       e.printStackTrace();
     }
+
+    // help 3rd party installers find the correct hardware path
+    Preferences.set("last.ide." + VERSION_NAME + ".hardwarepath", getHardwarePath());
+    Preferences.set("last.ide." + VERSION_NAME + ".daterun", "" + (new Date()).getTime() / 1000);
 
 //    if (System.getProperty("mrj.version") != null) {
 //      //String jv = System.getProperty("java.version");
