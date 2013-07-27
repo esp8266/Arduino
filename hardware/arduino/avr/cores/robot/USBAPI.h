@@ -27,10 +27,14 @@ extern USBDevice_ USBDevice;
 
 struct ring_buffer;
 
+#if (RAMEND < 1000)
+#define SERIAL_BUFFER_SIZE 16
+#else
+#define SERIAL_BUFFER_SIZE 64
+#endif
+
 class Serial_ : public Stream
 {
-private:
-	ring_buffer *_cdc_rx_buffer;
 public:
 	void begin(uint16_t baud_count);
 	void end(void);
@@ -43,6 +47,10 @@ public:
 	virtual size_t write(uint8_t);
 	using Print::write; // pull in write(str) and write(buf, size) from Print
 	operator bool();
+
+	volatile uint8_t _rx_buffer_head;
+	volatile uint8_t _rx_buffer_tail;
+	unsigned char _rx_buffer[SERIAL_BUFFER_SIZE];
 };
 extern Serial_ Serial;
 
