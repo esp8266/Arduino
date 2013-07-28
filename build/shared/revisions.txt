@@ -7,6 +7,8 @@ ARDUINO 1.5.3 BETA
 * Added support for new 1.5 Library format (https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5:-Library-specification)
 * Pass board type from boards.txt (https://github.com/arduino/Arduino/issues/308)
 * Display estimated RAM usage after compile (Loren M. Lang)
+* Updated arm gcc to 4.7.4 for linux
+* ARM gcc doesn't require ia32-libs anymore on 64 bits linux systems
 
 [arduino core]
 * sam: Fixed delayMicrosecond() when interrupts are disabled

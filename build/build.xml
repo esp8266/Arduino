@@ -11,14 +11,10 @@
   <condition property="linux32"><os family="unix" arch="i386" /></condition>
   <condition property="linux64"><os family="unix" arch="amd64" /></condition>
 
-  <condition property="platform"
-	     value="macosx"><os family="mac" /></condition>
-  <condition property="platform"
-	     value="windows"><os family="windows" /></condition>
-  <condition property="platform"
-	     value="linux32"><os family="unix" arch="i386" /></condition>
-  <condition property="platform"
-	     value="linux64"><os family="unix" arch="amd64" /></condition>
+  <condition property="platform" value="macosx"><os family="mac" /></condition>
+  <condition property="platform" value="windows"><os family="windows" /></condition>
+  <condition property="platform" value="linux32"><os family="unix" arch="i386" /></condition>
+  <condition property="platform" value="linux64"><os family="unix" arch="amd64" /></condition>
 
   <!-- Libraries required for running arduino -->
   <fileset dir=".." id="runtime.jars">
@@ -440,7 +436,7 @@
     <fail message="wrong platform (${os.name})" />
   </target>
 
-  <target name="linux-build" depends="revision-check, linux-checkos, subprojects-build, linux-check-arm-toolchain" description="Build linux version">
+  <target name="linux-build" depends="revision-check, linux-checkos, subprojects-build" description="Build linux version">
     <mkdir dir="linux/work" />
 
     <copy todir="linux/work">
@@ -475,11 +471,16 @@
 
     <copy todir="linux/work" file="linux/dist/arduino" />
     <chmod perm="755" file="linux/work/arduino" />
-
-    <antcall target="linux-unzip-arm-toolchain" />
   </target>
 
   <target name="linux32-build" depends="linux-build" description="Build linux (32-bit) version">
+    <!-- Unzip ARM tools -->
+    <antcall target="linux-unzip-arm-toolchain">
+      <param name="dist_file" value="gcc-arm-none-eabi-4.7.4-2013q2-linux32.tar.gz" />
+      <param name="dist_url" value="http://arduino.googlecode.com/files/gcc-arm-none-eabi-4.7.4-2013q2-linux32.tar.gz" />
+      <param name="dist_check_file" value="gcc-arm-none-eabi-4.7.4-2013q2" />
+    </antcall>
+
     <!-- Unzip AVR tools -->
     <exec executable="tar" dir="linux/work/hardware">
       <arg value="-xjf"/>
@@ -493,6 +494,13 @@
 
     <chmod perm="755" file="linux/work/hardware/tools/avrdude" />
 
+    <!-- Unzip ARM tools -->
+    <antcall target="linux-unzip-arm-toolchain">
+      <param name="dist_file" value="gcc-arm-none-eabi-4.7.4-2013q2-linux64.tar.gz" />
+      <param name="dist_url" value="http://arduino.googlecode.com/files/gcc-arm-none-eabi-4.7.4-2013q2-linux64.tar.gz" />
+      <param name="dist_check_file" value="gcc-arm-none-eabi-4.7.4-2013q2" />
+    </antcall>
+
     <!-- Unzip AVR tools -->
     <exec executable="tar" dir="linux/work/hardware">
       <arg value="-xjf"/>
@@ -500,58 +508,45 @@
     </exec>
   </target>
 
-  <target name="linux32-run" depends="linux32-build"
-	  description="Run Linux (32-bit) version">
+  <target name="linux32-run" depends="linux32-build" description="Run Linux (32-bit) version">
     <exec executable="./linux/work/arduino" spawn="false"/>
   </target>
 
-  <target name="linux64-run" depends="linux64-build"
-	  description="Run Linux (64-bit) version">
+  <target name="linux64-run" depends="linux64-build" description="Run Linux (64-bit) version">
     <exec executable="./linux/work/arduino" spawn="false"/>
   </target>
 
-  <target name="linux-check-arm-toolchain-distfile">
-    <available file="linux/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-linux32.tar.gz" property="arm_distfile_available" />
-  </target>
-
-  <target name="linux-get-arm-toolchain" depends="linux-check-arm-toolchain-distfile" unless="arm_distfile_available">
-    <!-- Retrieve ARM toolchain -->
-    <get
-      src="http://arduino.googlecode.com/files/gcc-arm-none-eabi-4.4.1-2010q1-188-linux32.tar.gz"
-      dest="linux/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-linux32.tar.gz"
-      verbose="true" />
-  </target>
-
+  <!-- Set 'arm_disfile_available' property if ARM toolchain dist_file is downloaded -->
+  <!-- Set 'arm_toolchain_installed' property if ARM toolchain is installed in working directory -->
   <target name="linux-check-arm-toolchain">
-    <available file="linux/work/hardware/tools/g++_arm_none_eabi" property="arm_available" />
+    <available file="linux/dist/${dist_file}" property="arm_distfile_available" />
+    <available file="linux/work/hardware/tools/${dist_check_file}" property="arm_toolchain_installed" />
   </target>
 
-  <target name="linux-unzip-arm-toolchain" depends="linux-get-arm-toolchain, linux-check-arm-toolchain" unless="arm_available">
-    <checksum file="linux/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-linux32.tar.gz" algorithm="sha"
+  <!-- Retrieve ARM toolchain -->
+  <target name="linux-get-arm-toolchain" depends="linux-check-arm-toolchain" unless="arm_distfile_available">
+    <get src="${dist_url}" dest="linux/dist/${dist_file}" verbose="true" />
+  </target>
+
+  <target name="linux-unzip-arm-toolchain" depends="linux-get-arm-toolchain, linux-check-arm-toolchain"
+      unless="arm_toolchain_installed">
+    <checksum file="linux/dist/${dist_file}" algorithm="sha"
       fileext=".sha" verifyproperty="checksum.matches"/>
     <condition property="checksum.matches.fail">
       <equals arg1="${checksum.matches}" arg2="false"/>
     </condition>
     <fail if="checksum.matches.fail">Checksum failed.
 
-      File gcc-arm-none-eabi-4.4.1-2010q1-188-linux32.tar.gz failed checksum.
-      Please remove "linux/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-linux32.tar.gz" to download it again.
+      File ${dist_file} failed checksum.
+      Please remove "linux/dist/${dist_file}" to download it again.
     </fail>
 
     <!-- Unzip toolchain to the destination folder -->
     <exec executable="tar" output="/dev/null" os="Linux">
       <arg value="xfz"/>
-      <arg value="linux/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-linux32.tar.gz"/>
+      <arg value="linux/dist/${dist_file}"/>
       <arg value="--directory=linux/work/hardware/tools"/>
     </exec>
-  </target>
-
-  <target name="linux64-get-arm-toolchain" depends="linux-check-arm-toolchain-distfile" unless="arm_distfile_available">
-    <antcall target="linux-get-arm-toolchain" />
-  </target>
-
-  <target name="linux64-unzip-arm-toolchain" depends="linux-get-arm-toolchain" unless="arm_available">
-    <antcall target="linux-unzip-arm-toolchain" />
   </target>
 
   <target name="linux-dist" depends="build"
