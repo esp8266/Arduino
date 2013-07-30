@@ -20,6 +20,13 @@
   <condition property="platform"
 	     value="linux64"><os family="unix" arch="amd64" /></condition>
 
+  <condition property="arch-bits" value="32">
+    <equals arg1="${platform}" arg2="linux32"/>
+  </condition>
+  <condition property="arch-bits" value="64">
+    <equals arg1="${platform}" arg2="linux64"/>
+  </condition>
+
   <!-- Libraries required for running arduino -->
   <fileset dir=".." id="runtime.jars">
     <include name="core/core.jar" />
@@ -463,13 +470,15 @@
     <copy todir="linux/work" file="linux/dist/arduino" />
     <chmod perm="755" file="linux/work/arduino" />
 
-    <copy todir="linux/work/hardware">
-      <fileset dir="linux/dist" includes="tools/**" />
-    </copy>
+    <mkdir dir="linux/work/hardware/tools" />
+    <copy file="linux/dist/tools/adk2install" todir="linux/work/hardware/tools" />
+    <copy file="linux/dist/tools/adk2tool" todir="linux/work/hardware/tools" />
+    <copy file="linux/dist/tools/avrdude${arch-bits}" tofile="linux/work/hardware/tools/avrdude" />
+    <copy file="linux/dist/tools/avrdude.conf" todir="linux/work/hardware/tools" />
+    <copy file="linux/dist/tools/bossac${arch-bits}" tofile="linux/work/hardware/tools/bossac" />
 
     <chmod perm="755" file="linux/work/hardware/tools/avrdude" />
     <chmod perm="755" file="linux/work/hardware/tools/bossac" />
-    <chmod perm="755" file="linux/work/hardware/tools/bossac64" />
     <chmod perm="755" file="linux/work/hardware/tools/adk2tool" />
     <chmod perm="755" file="linux/work/hardware/tools/adk2install" />
 
