@@ -23,21 +23,6 @@
 #if defined(USBCON)
 #ifdef CDC_ENABLED
 
-#if (RAMEND < 1000)
-#define SERIAL_BUFFER_SIZE 16
-#else
-#define SERIAL_BUFFER_SIZE 64
-#endif
-
-struct ring_buffer
-{
-	unsigned char buffer[SERIAL_BUFFER_SIZE];
-	volatile int head;
-	volatile int tail;
-};
-
-ring_buffer cdc_rx_buffer = { { 0 }, 0, 0};
-
 typedef struct
 {
 	u32	dwDTERate;
@@ -140,8 +125,7 @@ void Serial_::end(void)
 
 void Serial_::accept(void) 
 {
-	ring_buffer *buffer = &cdc_rx_buffer;
-	int i = (unsigned int)(buffer->head+1) % SERIAL_BUFFER_SIZE;
+	int i = (unsigned int)(_rx_buffer_head+1) % SERIAL_BUFFER_SIZE;
 	
 	// if we should be storing the received character into the location
 	// just before the tail (meaning that the head would advance to the
@@ -149,42 +133,39 @@ void Serial_::accept(void)
 	// and so we don't write the character or advance the head.
 
 	// while we have room to store a byte
-	while (i != buffer->tail) {
+	while (i != _rx_buffer_tail) {
 		int c = USB_Recv(CDC_RX);
 		if (c == -1)
 			break;	// no more data
-		buffer->buffer[buffer->head] = c;
-		buffer->head = i;
+		_rx_buffer[_rx_buffer_head] = c;
+		_rx_buffer_head = i;
 
-		i = (unsigned int)(buffer->head+1) % SERIAL_BUFFER_SIZE;
+		i = (unsigned int)(_rx_buffer_head+1) % SERIAL_BUFFER_SIZE;
 	}
 }
 
 int Serial_::available(void)
 {
-	ring_buffer *buffer = &cdc_rx_buffer;
-	return (unsigned int)(SERIAL_BUFFER_SIZE + buffer->head - buffer->tail) % SERIAL_BUFFER_SIZE;
+	return (unsigned int)(SERIAL_BUFFER_SIZE + _rx_buffer_head - _rx_buffer_tail) % SERIAL_BUFFER_SIZE;
 }
 
 int Serial_::peek(void)
 {
-	ring_buffer *buffer = &cdc_rx_buffer;
-	if (buffer->head == buffer->tail) {
+	if (_rx_buffer_head == _rx_buffer_tail) {
 		return -1;
 	} else {
-		return buffer->buffer[buffer->tail];
+		return _rx_buffer[_rx_buffer_tail];
 	}
 }
 
 int Serial_::read(void)
 {
-	ring_buffer *buffer = &cdc_rx_buffer;
 	// if the head isn't ahead of the tail, we don't have any characters
-	if (buffer->head == buffer->tail) {
+	if (_rx_buffer_head == _rx_buffer_tail) {
 		return -1;
 	} else {
-		unsigned char c = buffer->buffer[buffer->tail];
-		buffer->tail = (unsigned int)(buffer->tail + 1) % SERIAL_BUFFER_SIZE;
+		unsigned char c = _rx_buffer[_rx_buffer_tail];
+		_rx_buffer_tail = (unsigned int)(_rx_buffer_tail + 1) % SERIAL_BUFFER_SIZE;
 		return c;
 	}	
 }

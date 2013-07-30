@@ -233,10 +233,11 @@ leonardo.build.mcu=atmega32u4
 leonardo.build.f_cpu=16000000L
 leonardo.build.vid=0x2341
 leonardo.build.pid=0x8036
+leonardo.build.usb_product="Arduino Leonardo"
 leonardo.build.board=AVR_LEONARDO
 leonardo.build.core=arduino
 leonardo.build.variant=leonardo
-leonardo.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid}
+leonardo.build.extra_flags={build.usb_flags}
 
 ##############################################################
 
@@ -262,10 +263,11 @@ micro.build.mcu=atmega32u4
 micro.build.f_cpu=16000000L
 micro.build.vid=0x2341
 micro.build.pid=0x8037
+micro.build.usb_product="Arduino Micro"
 micro.build.board=AVR_MICRO
 micro.build.core=arduino
 micro.build.variant=micro
-micro.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid}
+micro.build.extra_flags={build.usb_flags}
 
 ##############################################################
 
@@ -295,10 +297,11 @@ esplora.build.mcu=atmega32u4
 esplora.build.f_cpu=16000000L
 esplora.build.vid=0x2341
 esplora.build.pid=0x803c
+esplora.build.usb_product="Arduino Esplora"
 esplora.build.board=AVR_ESPLORA
 esplora.build.core=arduino
 esplora.build.variant=leonardo
-esplora.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid}
+esplora.build.extra_flags={build.usb_flags}
 
 ##############################################################
 
@@ -456,15 +459,15 @@ LilyPadUSB.bootloader.extended_fuses=0xce
 LilyPadUSB.bootloader.file=caterina-LilyPadUSB/Caterina-LilyPadUSB.hex
 LilyPadUSB.bootloader.unlock_bits=0x3F
 LilyPadUSB.bootloader.lock_bits=0x2F
-
 LilyPadUSB.build.mcu=atmega32u4
 LilyPadUSB.build.f_cpu=8000000L
 LilyPadUSB.build.vid=0x1B4F
 LilyPadUSB.build.pid=0x9208
+LilyPadUSB.build.usb_product="LilyPad USB"
 LilyPadUSB.build.board=AVR_LILYPAD_USB
 LilyPadUSB.build.core=arduino
 LilyPadUSB.build.variant=leonardo
-LilyPadUSB.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid}
+LilyPadUSB.build.extra_flags={build.usb_flags}
 
 ##############################################################
 

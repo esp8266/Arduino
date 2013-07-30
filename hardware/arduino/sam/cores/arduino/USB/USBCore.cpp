@@ -47,8 +47,8 @@ static char isEndpointHalt = 0;
 //==================================================================
 
 extern const uint16_t STRING_LANGUAGE[];
-extern const uint16_t STRING_IPRODUCT[];
-extern const uint16_t STRING_IMANUFACTURER[];
+extern const uint8_t STRING_PRODUCT[];
+extern const uint8_t STRING_MANUFACTURER[];
 extern const DeviceDescriptor USB_DeviceDescriptor;
 extern const DeviceDescriptor USB_DeviceDescriptorA;
 
@@ -57,23 +57,25 @@ const uint16_t STRING_LANGUAGE[2] = {
 	0x0409	// English
 };
 
-const uint16_t STRING_IPRODUCT[17] = {
-	(3<<8) | (2+2*16),
-#if USB_PID == USB_PID_LEONARDO
-	'A','r','d','u','i','n','o',' ','L','e','o','n','a','r','d','o'
-#elif USB_PID == USB_PID_MICRO
-	'A','r','d','u','i','n','o',' ','M','i','c','r','o',' ',' ',' '
-#elif USB_PID == USB_PID_DUE
-	'A','r','d','u','i','n','o',' ','D','u','e',' ',' ',' ',' ',' '
+#ifndef USB_PRODUCT
+// Use a hardcoded product name if none is provided
+#if USB_PID == USB_PID_DUE
+#define USB_PRODUCT "Arduino Due"
 #else
-#error "Need an USB PID"
+#define USB_PRODUCT "USB IO Board"
 #endif
-};
+#endif
 
-const uint16_t STRING_IMANUFACTURER[12] = {
-	(3<<8) | (2+2*11),
-	'A','r','d','u','i','n','o',' ','L','L','C'
-};
+const uint8_t STRING_PRODUCT[] = USB_PRODUCT;
+
+#if USB_VID == 0x2341
+#define USB_MANUFACTURER "Arduino LLC"
+#elif !defined(USB_MANUFACTURER)
+// Fall through to unknown if no manufacturer name was provided in a macro
+#define USB_MANUFACTURER "Unknown"
+#endif
+
+const uint8_t STRING_MANUFACTURER[12] = USB_MANUFACTURER;
 
 #ifdef CDC_ENABLED
 #define DEVICE_CLASS 0x02
@@ -241,6 +243,21 @@ int USBD_SendControl(uint8_t flags, const void* d, uint32_t len)
 	return length;
 }
 
+// Send a USB descriptor string. The string is stored as a
+// plain ASCII string but is sent out as UTF-16 with the
+// correct 2-byte prefix
+static bool USB_SendStringDescriptor(const uint8_t *string, int wLength) {
+	uint16_t buff[64];
+	int l = 1;
+	wLength-=2;
+	while (*string && wLength>0) {
+		buff[l++] = (uint8_t)(*string++);
+		wLength-=2;
+	}
+	buff[0] = (3<<8) | (l*2);
+	return USBD_SendControl(0, (uint8_t*)buff, l*2);
+}
+
 //	Does not timeout or cross fifo boundaries
 //	Will only work for transfers <= 64 bytes
 //	TODO
@@ -400,19 +417,19 @@ static bool USBD_SendDescriptor(Setup& setup)
 		TRACE_CORE(puts("=> USBD_SendDescriptor : USB_STRING_DESCRIPTOR_TYPE\r\n");)
 		if (setup.wValueL == 0) {
 			desc_addr = (const uint8_t*)&STRING_LANGUAGE;
-     }
+		}
 		else if (setup.wValueL == IPRODUCT) {
-			desc_addr = (const uint8_t*)&STRING_IPRODUCT;
-        }
+			return USB_SendStringDescriptor(STRING_PRODUCT, setup.wLength);
+		}
 		else if (setup.wValueL == IMANUFACTURER) {
-			desc_addr = (const uint8_t*)&STRING_IMANUFACTURER;
-     }
+			return USB_SendStringDescriptor(STRING_MANUFACTURER, setup.wLength);
+		}
 		else {
 			return false;
-        }
-        if( *desc_addr > setup.wLength ) {
-            desc_length = setup.wLength;
-        }
+		}
+		if( *desc_addr > setup.wLength ) {
+			desc_length = setup.wLength;
+		}
 	}
 	else if (USB_DEVICE_QUALIFIER == t)
 	{

@@ -34,7 +34,7 @@ public class StringReplacer {
     String res;
 
     // Recursive replace with a max depth of 10 levels.
-    for (int i=0; i<10; i++) {
+    for (int i = 0; i < 10; i++) {
       // Do a replace with dictionary
       res = StringReplacer.replaceFromMapping(src, dict);
       if (!recursive)
@@ -45,30 +45,33 @@ public class StringReplacer {
     }
 
     // Split the resulting string in arguments
-    return quotedSplit(src, '"', false);
+    return quotedSplit(src, "\"'", false);
   }
 
-  public static String[] quotedSplit(String src, char escapeChar,
+  public static String[] quotedSplit(String src, String quoteChars,
                                      boolean acceptEmptyArguments)
       throws Exception {
-    String quote = "" + escapeChar;
     List<String> res = new ArrayList<String>();
     String escapedArg = null;
-    boolean escaping = false;
+    String escapingChar = null;
     for (String i : src.split(" ")) {
-      if (!escaping) {
-        if (!i.startsWith(quote)) {
+      if (escapingChar == null) {
+        // If the first char is not an escape char..
+        String first = null;
+        if (i.length() > 0)
+          first = i.substring(0, 1);
+        if (first == null || !quoteChars.contains(first)) {
           if (i.trim().length() != 0 || acceptEmptyArguments)
             res.add(i);
           continue;
         }
 
-        escaping = true;
+        escapingChar = first;
         i = i.substring(1);
         escapedArg = "";
       }
 
-      if (!i.endsWith(quote)) {
+      if (!i.endsWith(escapingChar)) {
         escapedArg += i + " ";
         continue;
       }
@@ -76,11 +79,11 @@ public class StringReplacer {
       escapedArg += i.substring(0, i.length() - 1);
       if (escapedArg.trim().length() != 0 || acceptEmptyArguments)
         res.add(escapedArg);
-      escaping = false;
+      escapingChar = null;
     }
-    if (escaping)
-      throw new Exception("Invalid quoting: no closing '" + escapeChar +
-          "' char found.");
+    if (escapingChar != null)
+      throw new Exception("Invalid quoting: no closing [" + escapingChar +
+          "] char found.");
     return res.toArray(new String[0]);
   }
 
