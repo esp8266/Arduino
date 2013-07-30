@@ -32,10 +32,11 @@ yun.build.mcu=atmega32u4
 yun.build.f_cpu=16000000L
 yun.build.vid=0x2341
 yun.build.pid=0x8041
-yun.build.board=AVR_LEONARDO
+yun.build.usb_product="Arduino Yun"
+yun.build.board=AVR_YUN
 yun.build.core=arduino
 yun.build.variant=leonardo
-yun.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid}
+yun.build.extra_flags={build.usb_flags}
 
 ##############################################################
 
