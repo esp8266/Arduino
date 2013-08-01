@@ -18,6 +18,8 @@ ARDUINO 1.5.3 BETA
 * Added support for floating point numbers in String class (Tevin Zhang, SebiTimeWaster)
 * sam: Fixed String buffer overflows (Paul Stoffregen)
 * avr: Added recipe for assembly files (C. A. Church)
+* avr: Use analogPinToChannel if it's defined (Kristian Sloth Lauszus)
+* avr: Optimized HardwareSerial buffer (Matthijs Kooijman)
 
 [libraries]
 * sam: Added CAN library (still in early stage of development) (Palliser)
