@@ -16,6 +16,16 @@
   <condition property="platform" value="linux32"><os family="unix" arch="i386" /></condition>
   <condition property="platform" value="linux64"><os family="unix" arch="amd64" /></condition>
 
+  <condition property="staging_folder" value="macosx"><os family="mac" /></condition>
+  <condition property="staging_folder" value="windows"><os family="windows" /></condition>
+  <condition property="staging_folder" value="linux"><os family="unix" arch="i386" /></condition>
+  <condition property="staging_folder" value="linux"><os family="unix" arch="amd64" /></condition>
+
+  <condition property="staging_hardware_folder" value="Arduino.app/Contents/Resources/Java/hardware"><os family="mac" /></condition>
+  <condition property="staging_hardware_folder" value="hardware"><os family="windows" /></condition>
+  <condition property="staging_hardware_folder" value="hardware"><os family="unix" arch="i386" /></condition>
+  <condition property="staging_hardware_folder" value="hardware"><os family="unix" arch="amd64" /></condition>
+
   <!-- Libraries required for running arduino -->
   <fileset dir=".." id="runtime.jars">
     <include name="core/core.jar" />
@@ -174,7 +184,7 @@
     <fail message="wrong platform (${os.name})" />
   </target>
 
-  <target name="macosx-build" if="macosx" depends="revision-check, macosx-checkos, subprojects-build, macosx-check-arm-toolchain" description="Build Mac OS X version">
+  <target name="macosx-build" if="macosx" depends="revision-check, macosx-checkos, subprojects-build" description="Build Mac OS X version">
     <mkdir dir="macosx/work" />
 
     <!-- assemble the pde -->
@@ -223,7 +233,11 @@
       <param name="target.path" value="macosx/work/Arduino.app/Contents/Resources/Java" />
     </antcall>
 
-    <antcall target="macosx-unzip-arm-toolchain" />
+    <antcall target="unzip-arm-toolchain">
+      <param name="dist_file" value="gcc-arm-none-eabi-4.7.4-2013q2-mac.tar.gz" />
+      <param name="dist_url" value="http://arduino.googlecode.com/files/gcc-arm-none-eabi-4.7.4-2013q2-mac.tar.gz" />
+      <param name="dist_check_file" value="gcc-arm-none-eabi-4.7.4-2013q2" />
+    </antcall>
 
     <delete includeEmptyDirs="true" quiet="true">
       <fileset dir="macosx/work/Arduino.app/Contents/Resources/Java/hardware/tools" includes="**/3.4.6/**/*"/>
@@ -239,42 +253,6 @@
 
   <target name="macosx-debug" depends="macosx-build" description="Run Mac OS X version">
     <exec executable="macosx/work/Arduino.app/Contents/MacOS/JavaApplicationStub" spawn="false"/>
-  </target>
-
-  <target name="macosx-check-arm-toolchain-distfile">
-    <available file="macosx/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-macos.tar.gz" property="arm_distfile_available" />
-  </target>
-
-  <target name="macosx-get-arm-toolchain" depends="macosx-check-arm-toolchain-distfile" unless="arm_distfile_available">
-    <!-- Retrieve ARM toolchain -->
-    <get
-      src="http://arduino.googlecode.com/files/gcc-arm-none-eabi-4.4.1-2010q1-188-macos.tar.gz"
-      dest="macosx/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-macos.tar.gz" verbose="true" />
-  </target>
-
-  <target name="macosx-check-arm-toolchain">
-    <available file="macosx/work/Arduino.app/Contents/Resources/Java/hardware/tools/g++_arm_none_eabi"
-      property="arm_available" />
-  </target>
-
-  <target name="macosx-unzip-arm-toolchain" depends="macosx-get-arm-toolchain, macosx-check-arm-toolchain" unless="arm_available">
-    <checksum file="macosx/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-macos.tar.gz" algorithm="sha"
-      fileext=".sha" verifyproperty="checksum.matches"/>
-    <condition property="checksum.matches.fail">
-      <equals arg1="${checksum.matches}" arg2="false"/>
-    </condition>
-    <fail if="checksum.matches.fail">Checksum failed.
-
-      File gcc-arm-none-eabi-4.4.1-2010q1-188-macos.tar.gz failed checksum.
-      Please remove "macosx/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-macos.tar.gz" to download it again.
-    </fail>
-
-    <!-- ...and unzip on the destination folder -->
-    <exec executable="tar" output="/dev/null">
-      <arg value="xfz"/>
-      <arg value="macosx/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-macos.tar.gz"/>
-      <arg value="--directory=macosx/work/Arduino.app/Contents/Resources/Java/hardware/tools/"/>
-    </exec>
   </target>
 
   <!-- - - - - - - - - - - - - - - - -->
@@ -475,7 +453,7 @@
 
   <target name="linux32-build" depends="linux-build" description="Build linux (32-bit) version">
     <!-- Unzip ARM tools -->
-    <antcall target="linux-unzip-arm-toolchain">
+    <antcall target="unzip-arm-toolchain">
       <param name="dist_file" value="gcc-arm-none-eabi-4.7.4-2013q2-linux32.tar.gz" />
       <param name="dist_url" value="http://arduino.googlecode.com/files/gcc-arm-none-eabi-4.7.4-2013q2-linux32.tar.gz" />
       <param name="dist_check_file" value="gcc-arm-none-eabi-4.7.4-2013q2" />
@@ -495,7 +473,7 @@
     <chmod perm="755" file="linux/work/hardware/tools/avrdude" />
 
     <!-- Unzip ARM tools -->
-    <antcall target="linux-unzip-arm-toolchain">
+    <antcall target="unzip-arm-toolchain">
       <param name="dist_file" value="gcc-arm-none-eabi-4.7.4-2013q2-linux64.tar.gz" />
       <param name="dist_url" value="http://arduino.googlecode.com/files/gcc-arm-none-eabi-4.7.4-2013q2-linux64.tar.gz" />
       <param name="dist_check_file" value="gcc-arm-none-eabi-4.7.4-2013q2" />
@@ -516,21 +494,21 @@
     <exec executable="./linux/work/arduino" spawn="false"/>
   </target>
 
-  <!-- Set 'arm_disfile_available' property if ARM toolchain dist_file is downloaded -->
+  <!-- Set 'arm_disfile_available' property if ARM toolchain dist_file is downloaded             -->
   <!-- Set 'arm_toolchain_installed' property if ARM toolchain is installed in working directory -->
-  <target name="linux-check-arm-toolchain">
-    <available file="linux/dist/${dist_file}" property="arm_distfile_available" />
-    <available file="linux/work/hardware/tools/${dist_check_file}" property="arm_toolchain_installed" />
+  <target name="check-arm-toolchain">
+    <available file="${staging_folder}/dist/${dist_file}" property="arm_distfile_available" />
+    <available file="${staging_folder}/work/hardware/tools/${dist_check_file}" property="arm_toolchain_installed" />
   </target>
 
   <!-- Retrieve ARM toolchain -->
-  <target name="linux-get-arm-toolchain" depends="linux-check-arm-toolchain" unless="arm_distfile_available">
-    <get src="${dist_url}" dest="linux/dist/${dist_file}" verbose="true" />
+  <target name="get-arm-toolchain" depends="check-arm-toolchain" unless="arm_distfile_available">
+    <get src="${dist_url}" dest="${staging_folder}/dist/${dist_file}" verbose="true" />
   </target>
 
-  <target name="linux-unzip-arm-toolchain" depends="linux-get-arm-toolchain, linux-check-arm-toolchain"
+  <target name="unzip-arm-toolchain" depends="get-arm-toolchain, check-arm-toolchain"
       unless="arm_toolchain_installed">
-    <checksum file="linux/dist/${dist_file}" algorithm="sha"
+    <checksum file="${staging_folder}/dist/${dist_file}" algorithm="sha"
       fileext=".sha" verifyproperty="checksum.matches"/>
     <condition property="checksum.matches.fail">
       <equals arg1="${checksum.matches}" arg2="false"/>
@@ -538,14 +516,14 @@
     <fail if="checksum.matches.fail">Checksum failed.
 
       File ${dist_file} failed checksum.
-      Please remove "linux/dist/${dist_file}" to download it again.
+      Please remove "${staging_folder}/dist/${dist_file}" to download it again.
     </fail>
 
     <!-- Unzip toolchain to the destination folder -->
     <exec executable="tar" output="/dev/null" os="Linux">
       <arg value="xfz"/>
-      <arg value="linux/dist/${dist_file}"/>
-      <arg value="--directory=linux/work/hardware/tools"/>
+      <arg value="${staging_folder}/dist/${dist_file}"/>
+      <arg value="--directory=${staging_folder}/work/${staging_hardware_folder}/tools/"/>
     </exec>
   </target>
 
@@ -690,7 +668,12 @@
       <fileset dir="windows/work" includes="**/*.html, **/*.dll, **/*.exe" />
     </chmod>
 
-    <antcall target="windows-unzip-arm-toolchain" />
+    <!-- Unzip ARM toolchain -->
+    <antcall target="unzip-arm-toolchain">
+      <param name="dist_file" value="gcc-arm-none-eabi-4.7.4-2013q2-windows.tar.gz" />
+      <param name="dist_url" value="http://arduino.googlecode.com/files/gcc-arm-none-eabi-4.7.4-2013q2-windows.tar.gz" />
+      <param name="dist_check_file" value="gcc-arm-none-eabi-4.7.4-2013q2" />
+    </antcall>
 
     <delete includeEmptyDirs="true" quiet="true">
       <fileset dir="windows/work/hardware/tools/avr/doc" />
@@ -701,42 +684,6 @@
 	  description="Run windows version">
     <exec executable="windows/work/arduino.exe"
 	  dir="windows/work" spawn="true"/>
-  </target>
-
-  <target name="windows-check-arm-toolchain-distfile">
-    <available file="windows/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-win32.tar.gz" property="arm_distfile_available" />
-  </target>
-
-  <target name="windows-get-arm-toolchain" depends="windows-check-arm-toolchain-distfile" unless="arm_distfile_available">
-    <!-- Retrieve ARM toolchain -->
-    <get
-      src="http://arduino.googlecode.com/files/gcc-arm-none-eabi-4.4.1-2010q1-188-win32.tar.gz"
-      dest="windows/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-win32.tar.gz"
-      verbose="true" />
-  </target>
-
-  <target name="windows-check-arm-toolchain">
-    <available file="windows/work/hardware/tools/g++_arm_none_eabi" property="arm_available" />
-  </target>
-
-  <target name="windows-unzip-arm-toolchain" depends="windows-get-arm-toolchain, windows-check-arm-toolchain" unless="arm_available">
-    <checksum file="windows/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-win32.tar.gz" algorithm="sha"
-      fileext=".sha" verifyproperty="checksum.matches"/>
-    <condition property="checksum.matches.fail">
-      <equals arg1="${checksum.matches}" arg2="false"/>
-    </condition>
-    <fail if="checksum.matches.fail">Checksum failed.
-
-      File gcc-arm-none-eabi-4.4.1-2010q1-188-win32.tar.gz failed checksum.
-      Please remove "windows/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-win32.tar.gz" to download it again.
-    </fail>
-
-    <!-- Unzip toolchain to the destination folder -->
-    <exec executable="tar">
-      <arg value="xfz"/>
-      <arg value="windows/dist/gcc-arm-none-eabi-4.4.1-2010q1-188-win32.tar.gz"/>
-      <arg value="--directory=windows/work/hardware/tools"/>
-    </exec>
   </target>
 
   <target name="windows-dist" depends="windows-build"
