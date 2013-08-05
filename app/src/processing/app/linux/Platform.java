@@ -105,9 +105,9 @@ public class Platform extends processing.app.Platform {
 
   public void openFolder(File file) throws Exception {
     if (openFolderAvailable()) {
-      String lunch = Preferences.get("launcher");
+      String launcher = Preferences.get("launcher");
       try {
-        String[] params = new String[] { lunch, file.getAbsolutePath() };
+        String[] params = new String[] { launcher, file.getAbsolutePath() };
         //processing.core.PApplet.println(params);
         /*Process p =*/ Runtime.getRuntime().exec(params);
         /*int result =*/ //p.waitFor();
