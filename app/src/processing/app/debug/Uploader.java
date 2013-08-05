@@ -36,6 +36,7 @@ import processing.app.I18n;
 import processing.app.Preferences;
 import processing.app.Serial;
 import processing.app.SerialNotFoundException;
+import processing.app.helpers.ProcessUtils;
 
 public abstract class Uploader implements MessageConsumer  {
   static final String BUGS_URL =
@@ -107,7 +108,7 @@ public abstract class Uploader implements MessageConsumer  {
         }
         System.out.println();
       }
-      Process process = Runtime.getRuntime().exec(commandArray);
+      Process process = ProcessUtils.exec(commandArray);
       new MessageSiphon(process.getInputStream(), this);
       new MessageSiphon(process.getErrorStream(), this);
 

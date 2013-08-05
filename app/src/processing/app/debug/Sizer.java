@@ -30,6 +30,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import processing.app.helpers.PreferencesMap;
+import processing.app.helpers.ProcessUtils;
 import processing.app.helpers.StringReplacer;
 
 public class Sizer implements MessageConsumer {
@@ -67,7 +68,7 @@ public class Sizer implements MessageConsumer {
       textSize = -1;
       dataSize = -1;
       eepromSize = -1;
-      Process process = Runtime.getRuntime().exec(cmd);
+      Process process = ProcessUtils.exec(cmd);
       MessageSiphon in = new MessageSiphon(process.getInputStream(), this);
       MessageSiphon err = new MessageSiphon(process.getErrorStream(), this);
 
