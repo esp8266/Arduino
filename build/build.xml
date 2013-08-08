@@ -5,26 +5,27 @@
   <!--echo message="os.version = ${os.version}" /-->
 
   <!-- Sets properties for macosx/windows/linux depending on current system -->
-  <condition property="macosx"><os family="mac" /></condition>
-  <condition property="windows"><os family="windows" /></condition>
-  <condition property="linux"><os family="unix" /></condition>
-  <condition property="linux32"><os family="unix" arch="i386" /></condition>
-  <condition property="linux64"><os family="unix" arch="amd64" /></condition>
-
   <condition property="platform" value="macosx"><os family="mac" /></condition>
   <condition property="platform" value="windows"><os family="windows" /></condition>
   <condition property="platform" value="linux32"><os family="unix" arch="i386" /></condition>
   <condition property="platform" value="linux64"><os family="unix" arch="amd64" /></condition>
 
-  <condition property="staging_folder" value="macosx"><os family="mac" /></condition>
-  <condition property="staging_folder" value="windows"><os family="windows" /></condition>
-  <condition property="staging_folder" value="linux"><os family="unix" arch="i386" /></condition>
-  <condition property="staging_folder" value="linux"><os family="unix" arch="amd64" /></condition>
+  <condition property="macosx"><equals arg1="${platform}" arg2="macosx" /></condition>
+  <condition property="windows"><equals arg1="${platform}" arg2="windows" /></condition>
+  <condition property="linux32"><equals arg1="${platform}" arg2="linux32" /></condition>
+  <condition property="linux64"><equals arg1="${platform}" arg2="linux64" /></condition>
+  <condition property="linux"><equals arg1="${platform}" arg2="linux32" /></condition>
+  <condition property="linux"><equals arg1="${platform}" arg2="linux64" /></condition>
 
-  <condition property="staging_hardware_folder" value="Arduino.app/Contents/Resources/Java/hardware"><os family="mac" /></condition>
-  <condition property="staging_hardware_folder" value="hardware"><os family="windows" /></condition>
-  <condition property="staging_hardware_folder" value="hardware"><os family="unix" arch="i386" /></condition>
-  <condition property="staging_hardware_folder" value="hardware"><os family="unix" arch="amd64" /></condition>
+  <condition property="staging_folder" value="macosx"><equals arg1="${platform}" arg2="macosx" /></condition>
+  <condition property="staging_folder" value="windows"><equals arg1="${platform}" arg2="windows" /></condition>
+  <condition property="staging_folder" value="linux"><equals arg1="${platform}" arg2="linux32" /></condition>
+  <condition property="staging_folder" value="linux"><equals arg1="${platform}" arg2="linux64" /></condition>
+
+  <condition property="staging_hardware_folder" value="Arduino.app/Contents/Resources/Java/hardware"><equals arg1="${platform}" arg2="macosx" /></condition>
+  <condition property="staging_hardware_folder" value="hardware"><equals arg1="${platform}" arg2="windows" /></condition>
+  <condition property="staging_hardware_folder" value="hardware"><equals arg1="${platform}" arg2="linux32" /></condition>
+  <condition property="staging_hardware_folder" value="hardware"><equals arg1="${platform}" arg2="linux64" /></condition>
 
   <!-- Libraries required for running arduino -->
   <fileset dir=".." id="runtime.jars">
