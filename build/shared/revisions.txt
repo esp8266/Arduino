@@ -22,6 +22,7 @@ ARDUINO 1.5.3 BETA
 * avr: Added recipe for assembly files (C. A. Church)
 * avr: Use analogPinToChannel if it's defined (Kristian Sloth Lauszus)
 * avr: Optimized HardwareSerial buffer (Matthijs Kooijman)
+* removed unused flags from String (free 1 byte of SRAM)
 
 [libraries]
 * sam: Added CAN library (still in early stage of development) (Palliser)

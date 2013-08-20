@@ -113,7 +113,7 @@ public:
 	String & operator += (const String &rhs)	{concat(rhs); return (*this);}
 	String & operator += (const char *cstr)		{concat(cstr); return (*this);}
 	String & operator += (char c)			{concat(c); return (*this);}
-	String & operator += (unsigned char num)		{concat(num); return (*this);}
+	String & operator += (unsigned char num)	{concat(num); return (*this);}
 	String & operator += (int num)			{concat(num); return (*this);}
 	String & operator += (unsigned int num)		{concat(num); return (*this);}
 	String & operator += (long num)			{concat(num); return (*this);}
@@ -191,7 +191,6 @@ protected:
 	char *buffer;	        // the actual char array
 	unsigned int capacity;  // the array length minus one (for the '\0')
 	unsigned int len;       // the String length (not counting the '\0')
-	unsigned char flags;    // unused, for future features
 protected:
 	void init(void);
 	void invalidate(void);
