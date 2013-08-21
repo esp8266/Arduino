@@ -457,15 +457,16 @@ public class EditorStatus extends JPanel /*implements ActionListener*/ {
       copyErrorButton.setVisible(false);
       copyErrorButton.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          String message="";
+          String message = "";
+          message += _("Arduino: ") + Base.VERSION_NAME + " (" + System.getProperty("os.name") + "), ";
+          message += _("Board: ") + "\"" + Base.getBoardPreferences().get("name") + "\"\n\n";
+          message += editor.console.consoleTextPane.getText().trim();
           if ((Preferences.getBoolean("build.verbose")) == false) {
-            message = "  " + _("This report would have more information with") + "\n";
+            message += "\n\n";
+            message += "  " + _("This report would have more information with") + "\n";
             message += "  \"" + _("Show verbose output during compilation") + "\"\n";
             message += "  " + _("enabled in File > Preferences.") + "\n";
           }
-          message += _("Arduino: ") + Base.VERSION_NAME + " (" + System.getProperty("os.name") + "), ";
-          message += _("Board: ") + "\"" + Base.getBoardPreferences().get("name") + "\"\n";
-          message += editor.console.consoleTextPane.getText().trim();
           Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
           StringSelection data = new StringSelection(message);
           clipboard.setContents(data, null);
