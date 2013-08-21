@@ -10,6 +10,7 @@ ARDUINO 1.5.3 BETA
 * Updated arm gcc to 4.7.4 and simplified build.xml
 * ARM gcc doesn't require ia32-libs anymore on 64 bits linux systems
 * Import library menu is now scrollable
+* Scrollable menus can now be scrolled with the mouse wheel
 
 [arduino core]
 * sam: Fixed delayMicrosecond() when interrupts are disabled

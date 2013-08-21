@@ -3,12 +3,16 @@
  */
 package processing.app.tools;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
@@ -20,7 +24,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
-import javax.swing.plaf.*;
+import javax.swing.plaf.ButtonUI;
 
 /**
  * A class that provides scrolling capabilities to a long menu dropdown or
@@ -42,6 +46,7 @@ public class MenuScroller {
   private MenuScrollItem upItem;
   private MenuScrollItem downItem;
   private final MenuScrollListener menuListener = new MenuScrollListener();
+  private final MouseScrollListener mouseWheelListener = new MouseScrollListener();
   private int scrollCount;
   private int interval;
   private int topFixedCount;
@@ -320,6 +325,7 @@ public class MenuScroller {
 
     this.menu = menu;
     menu.addPopupMenuListener(menuListener);
+    menu.addMouseWheelListener(mouseWheelListener);
   }
 
   /**
@@ -446,6 +452,7 @@ public class MenuScroller {
   public void dispose() {
     if (menu != null) {
       menu.removePopupMenuListener(menuListener);
+      menu.removeMouseWheelListener(mouseWheelListener);
       menu = null;
     }
   }
@@ -497,6 +504,14 @@ public class MenuScroller {
     }
   }
 
+  private class MouseScrollListener implements MouseWheelListener {
+    public void mouseWheelMoved(MouseWheelEvent mwe) {
+      firstIndex += mwe.getWheelRotation();
+      refreshMenu();
+      mwe.consume();
+    }
+  }
+  
   private class MenuScrollListener implements PopupMenuListener {
 
     @Override
@@ -555,6 +570,7 @@ public class MenuScroller {
     }
   }
 
+  @SuppressWarnings("serial")
   private class MenuScrollTimer extends Timer {
 
     public MenuScrollTimer(final int increment, int interval) {
@@ -569,6 +585,7 @@ public class MenuScroller {
     }
   }
 
+  @SuppressWarnings("serial")
   private class MenuScrollItem extends JMenuItem
           implements ChangeListener {
 
