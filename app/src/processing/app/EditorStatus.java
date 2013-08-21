@@ -452,12 +452,7 @@ public class EditorStatus extends JPanel /*implements ActionListener*/ {
       add(progressBar);
       progressBar.setVisible(false);
       
-      copyErrorButton = new JButton(
-         "<html>" + _("Copy error") + "<br>" + _("to clipboard") + "</html>");
-      Font font = copyErrorButton.getFont();
-      font = new Font(font.getName(), font.getStyle(), (int) (font.getSize()*0.7));
-      copyErrorButton.setFont(font);
-      copyErrorButton.setHorizontalAlignment(JLabel.CENTER);
+      copyErrorButton = new JButton(_("Copy error"));
       add(copyErrorButton);
       copyErrorButton.setVisible(false);
       copyErrorButton.addActionListener(new ActionListener() {
