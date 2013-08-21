@@ -55,7 +55,7 @@ void setup(){
   // use this to calibrate the line following algorithm
   // uncomment one or the other to see the different behaviors of the robot
   // Robot.lineFollowConfig(11, 5, 50, 10);
-  Robot.lineFollowConfig(14, 9, 50, 10);
+  Robot.lineFollowConfig(11, 7, 60, 5);
   
   // run the rescue sequence  
   rescueSequence();

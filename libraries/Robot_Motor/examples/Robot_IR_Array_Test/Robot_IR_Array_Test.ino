@@ -19,7 +19,7 @@ void setup(){
 void loop(){
   bar=String(""); // empty the string
   // read the sensors and add them to the string
-  bar=bar+RobotMotor.readIR(0)+' '+RobotMotor.readIR(1)+' '+RobotMotor.readIR(2)+' '+RobotMotor.readIR(3)+' '+RobotMotor.readIR(4);
+  bar=bar+RobotMotor.IRread(1)+' '+RobotMotor.IRread(2)+' '+RobotMotor.IRread(3)+' '+RobotMotor.IRread(4)+' '+RobotMotor.IRread(5);
   // print out the values
   Serial.println(bar);
   delay(100);

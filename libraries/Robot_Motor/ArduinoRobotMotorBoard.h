@@ -105,6 +105,7 @@ class RobotMotorBoard:public LineFollow{
 		void _digitalWrite(uint8_t codename, bool value);
 		void _analogRead(uint8_t codename);
 		void _digitalRead(uint8_t codename);
+		int _IRread(uint8_t num);
 		void _readIR();
 		void _readTrim();
 		

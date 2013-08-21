@@ -4,7 +4,7 @@
  distance sensor, it's capable of detecting and avoiding
  obstacles, never bumping into walls again!
   
- You'll need to attach an untrasonic range finder to TK1.
+ You'll need to attach an untrasonic range finder to M1.
 
  Circuit:
  * Arduino Robot
@@ -21,7 +21,7 @@
 // include the robot library
 #include <ArduinoRobot.h>
 
-int sensorPin = TK1;  // pin is used by the sensor
+int sensorPin = M1;  // pin is used by the sensor
 
 void setup() {
   // initialize the Robot, SD card, and display

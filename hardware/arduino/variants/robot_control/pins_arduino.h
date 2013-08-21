@@ -36,6 +36,13 @@
 #define RXLED0			PORTB |= (1<<0)
 #define RXLED1			PORTB &= ~(1<<0)
 
+#define D0 TKD0
+#define D1 TKD1
+#define D2 TKD2
+#define D3 TKD3
+#define D4 TKD4
+#define D5 TKD5
+
 static const uint8_t RX  = 0;
 static const uint8_t TX  = 1;
 static const uint8_t SDA = 2;

@@ -230,16 +230,20 @@ void RobotMotorBoard::_analogRead(uint8_t codename){
 	messageOut.sendData();
 }
 int RobotMotorBoard::IRread(uint8_t num){
-	IRs.selectPin(num-1); //To make consistant with the pins labeled on the board
+	return _IRread(num-1); //To make consistant with the pins labeled on the board
+}
+
+int RobotMotorBoard::_IRread(uint8_t num){
+	IRs.selectPin(num); 
 	return IRs.getAnalogValue();
 }
 
+
 void RobotMotorBoard::_readIR(){
-	//Serial.println("readIR");
 	int value;
 	messageOut.writeByte(COMMAND_READ_IR_RE);
-	for(int i=1;i<6;i++){
-		value=IRread(i);
+	for(int i=0;i<5;i++){
+		value=_IRread(i);
 		messageOut.writeInt(value);
 	}
 	messageOut.sendData();

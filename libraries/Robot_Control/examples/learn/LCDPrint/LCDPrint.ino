@@ -23,7 +23,7 @@ void setup() {
   Robot.begin();
 
   // initialize the robot's screen
-  Robot.beginLCD();
+  Robot.beginTFT();
 }
 
 void loop() {
@@ -31,14 +31,14 @@ void loop() {
   value=Robot.analogRead(TK4);
 
   // write the sensor value on the screen
-  Robot.fill(0, 255, 0);
+  Robot.stroke(0, 255, 0);
   Robot.textSize(1);
   Robot.text(value, 0, 0);  
 
   delay(500);
 
   // erase the previous text on the screen
-  Robot.fill(255, 255, 255);
+  Robot.stroke(255, 255, 255);
   Robot.textSize(1);
   Robot.text(value, 0, 0);  
 }

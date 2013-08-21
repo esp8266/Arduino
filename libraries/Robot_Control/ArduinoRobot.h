@@ -85,11 +85,25 @@
 #define TK6 106
 #define TK7 107
 
+#define M0 TK0
+#define M1 TK1
+#define M2 TK2
+#define M3 TK3
+#define M4 TK4
+#define M5 TK5
+#define M6 TK6
+#define M7 TK7
+
 //bottom TKs, just for communication purpose
 #define B_TK1 201
 #define B_TK2 202
 #define B_TK3 203
 #define B_TK4 204
+
+#define D10 B_TK1
+#define D9 B_TK2
+#define D8 B_TK4
+#define D7 B_TK3
 
 //bottom IRs, for communication purpose
 #define B_IR0 210

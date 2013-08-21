@@ -79,7 +79,7 @@ void LineFollow::calibIRs(){
 void LineFollow::runLineFollow(){
   for(int count=0; count<5; count++)
   {
-    lectura_sensor[count]=map(IRread(count),sensor_negro[count],sensor_blanco[count],0,127);
+    lectura_sensor[count]=map(_IRread(count),sensor_negro[count],sensor_blanco[count],0,127);
     acu+=lectura_sensor[count];
   }
 
@@ -135,7 +135,7 @@ void LineFollow::ajusta_niveles()
 	int lectura=0;
 
 	for(int count=0; count<5; count++){
-		lectura=IRread(count);
+		lectura=_IRread(count);
 
 		if (lectura > sensor_blanco[count])
 			sensor_blanco[count]=lectura;
