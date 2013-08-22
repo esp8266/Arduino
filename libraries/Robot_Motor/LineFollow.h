@@ -19,7 +19,7 @@ class LineFollow{
 		//virtual void motorsWrite(int speedL, int speedR)=0;
 		virtual void motorsWritePct(int speedLpct, int speedRpct)=0;
 		virtual void motorsStop()=0;
-		virtual int IRread(uint8_t num)=0;
+		virtual int _IRread(uint8_t num)=0;
 	protected:
 		virtual	void reportActionDone()=0;
 		

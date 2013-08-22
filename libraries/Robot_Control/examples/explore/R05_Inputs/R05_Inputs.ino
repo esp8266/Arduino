@@ -56,7 +56,10 @@ void renderUI() {
   Robot.rect(73, 38, 13, 13); // up
   Robot.circle(79, 64, 6); // middle
   Robot.rect(73, 78, 13, 13); // down
-  Robot.circle(26, 116, 18); // knob
+  
+  //draw the knob
+  Robot.noFill();
+  Robot.circle(26, 116, 17); // knob
 
   //draw the vertical bargraph
   int fullPart=map(pitch, 200, 2000, 0, 58);  //length of filled bargraph
@@ -136,31 +139,27 @@ void keyDown(int keyCode) {
   oldKey = keyCode;
 }
 
+//Draw a circle according to value
+//of the knob. 
 void drawKnob(int val) {
-  static int x = 0, y = 0, val_old = 0;
-  // radian number, -3.14 to 3.14
-  float ang = map(val, 0, 1023, -PI*1000, PI*1000) / 1000.0;
-
-  // erase the old line  
-  if (val_old != val) {
-    Robot.stroke(255, 255, 255);
-    Robot.line(26, 116, x, y);
-  }
+  static int val_old;
+  int r=map(val,0,1023,1,15);
   
-  // the following lines avoid a glitch in the TFT library
-  // that seems to appear when drawing a vertical line 
-  if (val < 1011 && val > 265 || val < 253) { 
-    //a bit math for drawing the hand inside the clock
-    x = 16*sin(ang)+26;
-    y = 16*cos(ang)+116;
-  } 
-  if (val > 265 && val < 253) {
-    x = 10; y = 116; 
-  }    
-  if (val >= 1011) {
-    x = 27; y = 100; 
-  }    
-  Robot.stroke(0, 0, 0);
-  Robot.line(26, 116, x, y); 
-  val_old = val;
+  //Only updates when the 
+  //value changes.
+  if(val_old!=r){
+    Robot.noFill();
+    
+    //erase the old circle
+    Robot.stroke(255, 255, 255);
+    Robot.circle(26,116,r+1);
+    
+    //draw the new circle
+    Robot.stroke(255, 0, 255);
+    Robot.circle(26,116,r);
+
+    Robot.stroke(0, 0, 0);
+    
+    val_old=r;
+  }
 }
