@@ -31,6 +31,7 @@ ARDUINO 1.5.3 BETA
 * sam: Bugfix SPI library: begin() after end() now works (stimmer)
 * sam: Bugfix SPI library: incorrent pin configuration in non-extended mode.
 * Ported all libraries to new 1.5 format
+* Updated Firmata to version 2.3.6 (Jeff Hoefs)
 
 [firmwares]
 * Arduino Due: fixed USB2Serial garbage at startup (https://github.com/arduino/Arduino/pull/1267)
