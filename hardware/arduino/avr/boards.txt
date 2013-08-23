@@ -663,10 +663,11 @@ robotControl.build.mcu=atmega32u4
 robotControl.build.f_cpu=16000000L
 robotControl.build.vid=0x2341
 robotControl.build.pid=0x8038
+robotControl.build.usb_product="Robot Control"
 robotControl.build.board=AVR_ROBOT_CONTROL
-robotControl.build.core=robot
+robotControl.build.core=arduino
 robotControl.build.variant=robot_control
-robotControl.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid}
+robotControl.build.extra_flags={build.usb_flags}
 
 ##############################################################
 
@@ -692,8 +693,9 @@ robotMotor.build.mcu=atmega32u4
 robotMotor.build.f_cpu=16000000L
 robotMotor.build.vid=0x2341
 robotMotor.build.pid=0x8039
+robotMotor.build.usb_product="Robot Motor"
 robotMotor.build.board=AVR_ROBOT_MOTOR
-robotMotor.build.core=robot
+robotMotor.build.core=arduino
 robotMotor.build.variant=robot_motor
-robotMotor.build.extra_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid}
+robotMotor.build.extra_flags={build.usb_flags}
 

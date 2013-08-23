@@ -10,7 +10,7 @@ version=1.5.3
 # SAM3 compile variables
 # ----------------------
 
-compiler.path={runtime.ide.path}/hardware/tools/g++_arm_none_eabi/bin/
+compiler.path={runtime.ide.path}/hardware/tools/gcc-arm-none-eabi-4.7.4-2013q2/bin/
 compiler.c.cmd=arm-none-eabi-gcc
 compiler.c.flags=-c -g -Os -w -ffunction-sections -fdata-sections -nostdlib --param max-inline-insns-single=500 -Dprintf=iprintf
 compiler.c.elf.cmd=arm-none-eabi-g++
@@ -35,7 +35,7 @@ compiler.libsam.c.flags="-I{build.system.path}/libsam" "-I{build.system.path}/CM
 
 # USB Flags
 # ---------
-build.usb_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid} -DUSBCON -DUSB_MANUFACTURER={build.usb_manufacturer} '-DUSB_PRODUCT={build.usb_product}'
+build.usb_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid} -DUSBCON '-DUSB_MANUFACTURER={build.usb_manufacturer}' '-DUSB_PRODUCT={build.usb_product}'
 
 # Default usb manufacturer will be replaced at compile time using
 # numeric vendor ID if available or by board's specific value. 

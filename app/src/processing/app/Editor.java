@@ -650,6 +650,7 @@ public class Editor extends JFrame implements RunnerListener {
 
     if (importMenu == null) {
       importMenu = new JMenu(_("Import Library..."));
+      MenuScroller.setScrollerFor(importMenu);
       base.rebuildImportMenu(importMenu, this);
     }
     sketchMenu.add(importMenu);

@@ -31,6 +31,7 @@ import processing.app.Preferences;
 import processing.app.debug.MessageConsumer;
 import processing.app.debug.MessageSiphon;
 import processing.app.debug.RunnerException;
+import processing.app.helpers.ProcessUtils;
 import processing.app.helpers.StringUtils;
 
 import java.io.File;
@@ -98,7 +99,7 @@ public abstract class Uploader implements MessageConsumer {
           System.out.print(c + " ");
         System.out.println();
       }
-      Process process = Runtime.getRuntime().exec(command);
+      Process process = ProcessUtils.exec(command);
       new MessageSiphon(process.getInputStream(), this);
       new MessageSiphon(process.getErrorStream(), this);
 

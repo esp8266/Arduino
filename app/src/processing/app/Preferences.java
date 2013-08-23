@@ -218,7 +218,7 @@ public class Preferences {
   // data model
 
   static Hashtable defaults;
-  static Hashtable table = new Hashtable();
+  static Hashtable<String, String> table = new Hashtable<String, String>();
   static File preferencesFile;
 
 
@@ -242,9 +242,8 @@ public class Preferences {
     // check for platform-specific properties in the defaults
     String platformExt = "." + Base.platform.getName();
     int platformExtLength = platformExt.length();
-    Enumeration e = table.keys();
-    while (e.hasMoreElements()) {
-      String key = (String) e.nextElement();
+    Set<String> keySet = new HashSet<String>(table.keySet());
+    for (String key : keySet) {
       if (key.endsWith(platformExt)) {
         // this is a key specific to a particular platform
         String actualKey = key.substring(0, key.length() - platformExtLength);
@@ -791,12 +790,12 @@ public class Preferences {
     // Fix for 0163 to properly use Unicode when writing preferences.txt
     PrintWriter writer = PApplet.createWriter(preferencesFile);
 
-    String[] keys = (String[])table.keySet().toArray(new String[0]);
+    String[] keys = table.keySet().toArray(new String[0]);
     Arrays.sort(keys);
     for (String key: keys) {
       if (key.startsWith("runtime."))
         continue;
-      writer.println(key + "=" + ((String) table.get(key)));
+      writer.println(key + "=" + table.get(key));
     }
 
     writer.flush();
@@ -818,7 +817,7 @@ public class Preferences {
   //}
   
   static public String get(String attribute /*, String defaultValue */) {
-    return (String) table.get(attribute);
+    return table.get(attribute);
     /*
     //String value = (properties != null) ?
     //properties.getProperty(attribute) : applet.getParameter(attribute);

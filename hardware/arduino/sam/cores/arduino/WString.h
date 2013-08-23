@@ -191,7 +191,6 @@ protected:
 	char *buffer;	        // the actual char array
 	unsigned int capacity;  // the array length minus one (for the '\0')
 	unsigned int len;       // the String length (not counting the '\0')
-	unsigned char flags;    // unused, for future features
 protected:
 	void init(void);
 	void invalidate(void);
