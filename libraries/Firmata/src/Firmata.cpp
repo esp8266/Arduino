@@ -67,14 +67,18 @@ void FirmataClass::begin(void)
 void FirmataClass::begin(long speed)
 {
   Serial.begin(speed);
-  begin(Serial);
-  blinkVersion();  
+  FirmataSerial = &Serial;
+  blinkVersion();
+  printVersion();
+  printFirmwareVersion();
 }
 
 /* begin method for overriding default stream */
 void FirmataClass::begin(Stream &s)
 {
   FirmataSerial = &s;
+  // do not call blinkVersion() here because some hardware such as the
+  // Ethernet shield use pin 13
   printVersion();
   printFirmwareVersion();
 }
