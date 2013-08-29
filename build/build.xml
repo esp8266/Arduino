@@ -297,7 +297,7 @@
 
     <!-- Create signed zip file -->
     <exec executable="zip" dir="macosx/work">
-      <arg line="-q -r ../arduino-${version}-${platform}.zip ." />
+      <arg line="-q -r ../arduino-${version}-${platform}-signed.zip ." />
     </exec>
 
     <echo>
