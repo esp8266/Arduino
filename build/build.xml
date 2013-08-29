@@ -535,7 +535,7 @@
     </fail>
 
     <!-- Unzip toolchain to the destination folder -->
-    <exec executable="tar" output="/dev/null" os="Linux">
+    <exec executable="tar" output="/dev/null">
       <arg value="xfz"/>
       <arg value="${staging_folder}/dist/${dist_file}"/>
       <arg value="--directory=${staging_folder}/work/${staging_hardware_folder}/tools/"/>
