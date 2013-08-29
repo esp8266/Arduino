@@ -284,8 +284,13 @@
     </exec>
 
     <!-- Sign app -->
-    <exec executable="codesign" dir="macosx/work" failonerror="true">
+    <exec executable="codesign" dir="macosx/work">
       <arg line="--keychain &quot;${macosx-sign-keychain}&quot; --force -s &quot;${macosx-sign-id}&quot; -v Arduino.app/" />
+    </exec>
+
+    <!-- Check for successful signing -->
+    <exec executable="codesign" dir="macosx/work" failonerror="true">
+      <arg line="-vvvv Arduino.app/" />
     </exec>
 
     <delete file="macosx/arduino-${version}-${platform}.zip" />
