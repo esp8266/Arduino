@@ -291,7 +291,7 @@
 
     <!-- Sign app -->
     <exec executable="codesign" dir="macosx/work" failonerror="true">
-      <arg line="--keychain &quot;${macosx-sign-keychain}&quot; -s &quot;${macosx-sign-id}&quot; -v Arduino.app/" />
+      <arg line="--keychain &quot;${macosx-sign-keychain}&quot; --force -s &quot;${macosx-sign-id}&quot; -v Arduino.app/" />
     </exec>
 
     <delete file="macosx/arduino-${version}-${platform}.zip" />
