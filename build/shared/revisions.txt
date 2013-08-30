@@ -1,5 +1,5 @@
 
-ARDUINO 1.5.3 BETA
+ARDUINO 1.5.3 BETA 2013.08.30
 
 [ide]
 * Removed useless baud rates from serial monitor
