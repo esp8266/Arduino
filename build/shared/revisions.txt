@@ -2,7 +2,9 @@ ARDUINO 1.5.7 BETA
 
 [core]
 * Upgraded AVR toolchain: gcc 4.8.1, avr-libc 1.8.0
+* Upgraded ARM toolchain: gcc 4.7.4
 * Upgraded avrdude to version 6.0.1
+* ARM gcc doesn't require ia32-libs anymore on 64 bits linux systems
 * avr: Improved USB-CDC write speed (Justin Rajewski)
 * avr: fixed typo in SerialEvent3 handling (Matthijs Kooijman)
 * avr: HardwareSerial support for different size of TX and RX buffer sizes (Jan Baeyens)
