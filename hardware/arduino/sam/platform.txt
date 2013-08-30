@@ -10,7 +10,7 @@ version=1.5.3
 # SAM3 compile variables
 # ----------------------
 
-compiler.path={runtime.ide.path}/hardware/tools/gcc-arm-none-eabi-4.7.4-2013q2/bin/
+compiler.path={runtime.ide.path}/hardware/tools/g++_arm_none_eabi/bin/
 compiler.c.cmd=arm-none-eabi-gcc
 compiler.c.flags=-c -g -Os -w -ffunction-sections -fdata-sections -nostdlib --param max-inline-insns-single=500 -Dprintf=iprintf
 compiler.c.elf.cmd=arm-none-eabi-g++
