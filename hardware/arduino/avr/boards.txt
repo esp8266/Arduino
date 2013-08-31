@@ -99,7 +99,7 @@ nano.menu.cpu.atmega328.bootloader.high_fuses=0xDA
 nano.menu.cpu.atmega328.bootloader.extended_fuses=0x05
 nano.menu.cpu.atmega328.bootloader.file=atmega/ATmegaBOOT_168_atmega328.hex
 
-menu.cpu.nano.atmega328.build.mcu=atmega328p
+nano.menu.cpu.atmega328.build.mcu=atmega328p
 
 ## Arduino Nano w/ ATmega168
 ## -------------------------
