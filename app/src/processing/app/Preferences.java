@@ -73,95 +73,68 @@ public class Preferences {
 
   static final String PREFS_FILE = "preferences.txt";
 
-  String[] languages = {
-                        _("System Default"),
-                        "العربية" + " (" + _("Arabic") + ")",
-                        "Aragonés" + " (" + _("Aragonese") + ")",
-                        "български" + " (" + _("Bulgarian") + ")",
-                        "Català" + " (" + _("Catalan") + ")",
-                        "Hrvatski" + " (" + _("Croatian") + ")",
-                        "český" + " (" + _("Czech") + ")",
-                        "简体中文" + " (" + _("Chinese Simplified") + ")",
-                        "繁體中文" + " (" + _("Chinese Traditional") + ")",
-                        "Dansk" + " (" + _("Danish") + ")",
-                        "Nederlands" + " (" + _("Dutch") + ")",
-                        "English" + " (" + _("English") + ")",
-                        "Eesti" + " (" + _("Estonian") + ")",
-                        "Pilipino" + " (" + _("Filipino") + ")",
-                        "Français" + " (" + _("French") + ")",
-                        "Canadienne-français" + " (" + _("Canadian French") + ")",
-                        "Galego" + " (" + _("Galician") + ")",
-                        "საქართველოს" + " (" + _("Georgian") + ")",
-                        "עברית" + " (" + _("Hebrew") + ")",
-                        "Deutsch" + " (" + _("German") + ")",
-                        "ελληνικά" + " (" + _("Greek") + ")",
-                        "Magyar" + " (" + _("Hindi") + ")",
-                        "Magyar" + " (" + _("Hungarian") + ")",
-                        "Bahasa Indonesia" + " (" + _("Indonesian") + ")",
-                        "Italiano" + " (" + _("Italian") + ")",
-                        "日本語" + " (" + _("Japanese") + ")",
-                                                                "한국어" + " (" + _("Korean") + ")",
-                        "Latviešu" + " (" + _("Latvian") + ")",
-                        "Lietuvių Kalba" + " (" + _("Lithuaninan") + ")",
-                        "मराठी" + " (" + _("Marathi") + ")",
-                        "Norsk" + " (" + _("Norwegian") + ")",
-                        "Norsk bokmål" + " (" + _("Norwegian Bokmål") + ")",
-                        "فارسی" + " (" + _("Persian") + ")",
-                        "Język Polski" + " (" + _("Polish") + ")",
-                        "Português" + " (" + _("Portuguese") + " - Brazil)",
-                        "Português" + " (" + _("Portuguese") + " - Portugal)",
-                        "Română" + " (" + _("Romanian") + ")",
-                        "Русский" + " (" + _("Russian") + ")",
-                        "Español" + " (" + _("Spanish") + ")",
-                        "தமிழ்" + " (" + _("Tamil") + ")",
-                        "Türk" + " (" + _("Turkish") + ")",
-                        "Український" + " (" + _("Ukrainian") + ")"
-                        };
-  String[] languagesISO = {
-                        "",
-                        "ar",
-                        "an",
-                        "bg",
-                        "ca",
-                        "hr_hr",
-                        "cs_cz",
-                        "zh_cn",
-                        "zh_tw",
-                        "da",
-                        "nl",
-                        "en",
-                        "et",
-                        "tl",
-                        "fr",
-                        "fr_ca",
-                        "gl",
-                        "ka_ge",
-                        "he",
-                        "de",
-                        "el",
-                        "hi",
-                        "hu",
-                        "id",
-                        "it",
-                        "ja",
-                        "ko",
-                        "lv",
-                        "lt",
-                        "mr",
-                        "no_nb",
-                        "nb_no",
-                        "fa",
-                        "pl",
-                        "pt_br",
-                        "pt_pt",
-                        "ro",
-                        "ru",
-                        "es",
-                        "ta",
-                        "tr",
-                        "uk"
-                        };
-  
+  class Language {
+    Language(String _name, String _originalName, String _isoCode) {
+      name = _name;
+      originalName = _originalName;
+      isoCode = _isoCode;
+    }
+
+    public String toString() {
+      if (originalName.length() == 0)
+        return name;
+      return originalName + " (" + name + ")";
+    };
+
+    String name;
+    String originalName;
+    String isoCode;
+  }
+
+  Language languages[] = {
+      new Language(_("System Default"), "", ""),
+      new Language(_("Arabic"), "العربية", "ar"),
+      new Language(_("Aragonese"), "Aragonés", "an"),
+      new Language(_("Bulgarian"), "български", "bg"),
+      new Language(_("Catalan"), "Català", "ca"),
+      new Language(_("Croatian"), "Hrvatski", "hr_hr"),
+      new Language(_("Czech"), "český", "cs_cz"),
+      new Language(_("Chinese Simplified"), "简体中文", "zh_cn"),
+      new Language(_("Chinese Traditional"), "繁體中文", "zh_tw"),
+      new Language(_("Danish"), "Dansk", "da"),
+      new Language(_("Dutch"), "Nederlands", "nl"),
+      new Language(_("English"), "English", "en"),
+      new Language(_("Estonian"), "Eesti", "et"),
+      new Language(_("Filipino"), "Pilipino", "tl"),
+      new Language(_("French"), "Français", "fr"),
+      new Language(_("Canadian French"), "Canadienne-français", "fr_ca"),
+      new Language(_("Galician"), "Galego", "gl"),
+      new Language(_("Georgian"), "საქართველოს", "ka_ge"),
+      new Language(_("German"), "Deutsch", "de"),
+      new Language(_("Greek"), "ελληνικά", "el"),
+      new Language(_("Hebrew"), "עברית", "he"),
+      new Language(_("Hindi"), "हिंदी", "hi"),
+      new Language(_("Hungarian"), "Magyar", "hu"),
+      new Language(_("Indonesian"), "Bahasa Indonesia", "id"),
+      new Language(_("Italian"), "Italiano", "it"),
+      new Language(_("Japanese"), "日本語", "ja"),
+      new Language(_("Korean"), "한국어", "ko"),
+      new Language(_("Latvian"), "Latviešu", "lv"),
+      new Language(_("Lithuaninan"), "Lietuvių Kalba", "lt"),
+      new Language(_("Marathi"), "मराठी", "mr"),
+      new Language(_("Norwegian"), "Norsk", "no_nb"),
+      new Language(_("Norwegian Bokmål"), "Norsk bokmål", "nb_no"),
+      new Language(_("Persian"), "فارسی", "fa"),
+      new Language(_("Polish"), "Język Polski", "pl"),
+      new Language(_("Portuguese (Brazil)"), "Português (Brazil)", "pt_br"),
+      new Language(_("Portuguese (Portugal)"), "Português (Portugal)", "pt_pt"),
+      new Language(_("Romanian"), "Română", "ro"),
+      new Language(_("Russian"), "Русский", "ru"),
+      new Language(_("Spanish"), "Español", "es"),
+      new Language(_("Tamil"), "தமிழ்", "ta"),
+      new Language(_("Turkish"), "Türk", "tr"),
+      new Language(_("Ukrainian"), "Український", "uk"), };
+
   /**
    * Standardized width for buttons. Mac OS X 10.3 wants 70 as its default,
    * Windows XP needs 66, and my Ubuntu machine needs 80+, so 80 seems proper.
@@ -386,7 +359,11 @@ public class Preferences {
     label = new JLabel(_("Editor language: "));
     box.add(label);
     comboLanguage = new JComboBox(languages);
-    comboLanguage.setSelectedIndex((Arrays.asList(languagesISO)).indexOf(Preferences.get("editor.languages.current")));
+    String currentLanguage = Preferences.get("editor.languages.current");
+    for (Language language : languages) {
+      if (language.isoCode.equals(currentLanguage))
+        comboLanguage.setSelectedItem(language);
+    }
     box.add(comboLanguage);
     label = new JLabel(_("  (requires restart of Arduino)"));
     box.add(label);
@@ -676,9 +653,8 @@ public class Preferences {
     setBoolean("editor.update_extension", updateExtensionBox.isSelected());
 
     // adds the selected language to the preferences file
-    Object newItem = comboLanguage.getSelectedItem();
-    int pos = (Arrays.asList(languages)).indexOf(newItem.toString());  // position in the languages array
-    set("editor.languages.current",(Arrays.asList(languagesISO)).get(pos));        
+    Language newLanguage = (Language) comboLanguage.getSelectedItem();
+    set("editor.languages.current", newLanguage.isoCode);
 
     editor.applyPreferences();
   }
