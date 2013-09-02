@@ -31,6 +31,7 @@ private:
 	ring_buffer *_cdc_rx_buffer;
 public:
 	void begin(unsigned long);
+	void begin(unsigned long, uint8_t);
 	void end(void);
 
 	virtual int available(void);

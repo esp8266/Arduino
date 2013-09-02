@@ -134,6 +134,10 @@ void Serial_::begin(unsigned long baud_count)
 {
 }
 
+void Serial_::begin(unsigned long baud_count, byte config)
+{
+}
+
 void Serial_::end(void)
 {
 }
