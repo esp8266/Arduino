@@ -69,8 +69,8 @@ public:
 	explicit String(unsigned int, unsigned char base=10);
 	explicit String(long, unsigned char base=10);
 	explicit String(unsigned long, unsigned char base=10);
-	explicit String(float, int decimalPlaces=2);
-	explicit String(double, int decimalPlaces=2);
+	explicit String(float, unsigned char decimalPlaces=2);
+	explicit String(double, unsigned char decimalPlaces=2);
 	~String(void);
 
 	// memory management
@@ -113,7 +113,7 @@ public:
 	String & operator += (const String &rhs)	{concat(rhs); return (*this);}
 	String & operator += (const char *cstr)		{concat(cstr); return (*this);}
 	String & operator += (char c)			{concat(c); return (*this);}
-	String & operator += (unsigned char num)	{concat(num); return (*this);}
+	String & operator += (unsigned char num)		{concat(num); return (*this);}
 	String & operator += (int num)			{concat(num); return (*this);}
 	String & operator += (unsigned int num)		{concat(num); return (*this);}
 	String & operator += (long num)			{concat(num); return (*this);}
