@@ -1,4 +1,9 @@
 
+ARDUINO 1.5.4 BETA
+
+[libraries]
+* sam: fixed wrong SPI initialization (noblepepper)
+
 ARDUINO 1.5.3 BETA 2013.08.30
 
 [ide]
