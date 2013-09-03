@@ -25,8 +25,9 @@
 
 
 // Constructor when using software SPI.  All output pins are configurable.
-Arduino_LCD::Arduino_LCD(uint8_t cs, uint8_t rs, uint8_t sid,
- uint8_t sclk, uint8_t rst) {
+Arduino_LCD::Arduino_LCD(uint8_t cs, uint8_t rs, uint8_t sid, uint8_t sclk,
+  uint8_t rst) : Adafruit_GFX(ILI9163C_TFTWIDTH, ILI9163C_TFTHEIGHT)
+{
   _cs   = cs;
   _rs   = rs;
   _sid  = sid;
@@ -38,7 +39,8 @@ Arduino_LCD::Arduino_LCD(uint8_t cs, uint8_t rs, uint8_t sid,
 
 // Constructor when using hardware SPI.  Faster, but must use SPI pins
 // specific to each board type (e.g. 11,13 for Uno, 51,52 for Mega, etc.)
-Arduino_LCD::Arduino_LCD(uint8_t cs, uint8_t rs, uint8_t rst) {
+Arduino_LCD::Arduino_LCD(uint8_t cs, uint8_t rs, uint8_t rst) :
+    Adafruit_GFX(ILI9163C_TFTWIDTH, ILI9163C_TFTHEIGHT) {
   _cs   = cs;
   _rs   = rs;
   _rst  = rst;
@@ -325,8 +327,7 @@ void Arduino_LCD::commandList(uint8_t *addr) {
 //void Arduino_LCD::commonInit(prog_uchar *cmdList) {
 void Arduino_LCD::commonInit(uint8_t *cmdList) {
 
-  constructor(ILI9163C_TFTWIDTH, ILI9163C_TFTHEIGHT);
-  colstart  = rowstart = 0; // May be overridden in init func
+  colstart = rowstart = 0; // May be overridden in init func
 
   pinMode(_rs, OUTPUT);
   pinMode(_cs, OUTPUT);
