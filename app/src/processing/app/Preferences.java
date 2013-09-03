@@ -190,7 +190,7 @@ public class Preferences {
 
   // data model
 
-  static Hashtable defaults;
+  static Hashtable<String, String> defaults;
   static Hashtable<String, String> table = new Hashtable<String, String>();
   static File preferencesFile;
 
@@ -226,7 +226,7 @@ public class Preferences {
     }
 
     // clone the hash table
-    defaults = (Hashtable) table.clone();
+    defaults = new Hashtable<String, String>(table);
 
     // Load a prefs file if specified on the command line
     if (commandLinePrefs != null) {
@@ -701,7 +701,7 @@ public class Preferences {
     load(input, table);
   }
   
-  static public void load(InputStream input, Map table) throws IOException {
+  static public void load(InputStream input, Map<String, String> table) throws IOException {
     String[] lines = loadStrings(input);  // Reads as UTF-8
     for (String line : lines) {
       if ((line.length() == 0) ||
@@ -806,7 +806,7 @@ public class Preferences {
 
 
   static public String getDefault(String attribute) {
-    return (String) defaults.get(attribute);
+    return defaults.get(attribute);
   }
 
 
