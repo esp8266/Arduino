@@ -267,7 +267,12 @@ public class Preferences {
     }
 
     // load the I18n module for internationalization
-    I18n.init(Preferences.get("editor.languages.current"));
+    try {
+      I18n.init(Preferences.get("editor.languages.current"));
+    } catch (MissingResourceException e) {
+      I18n.init("");
+      Preferences.set("editor.languages.current", "");
+    }
 
     // set some other runtime constants (not saved on preferences file)
     table.put("runtime.os", PConstants.platformNames[PApplet.platform]);

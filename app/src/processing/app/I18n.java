@@ -28,14 +28,16 @@ public class I18n {
   static String PROMPT_OK;
   static String PROMPT_BROWSE;
 
-  static protected void init (String language) {
+  static protected void init (String language) throws MissingResourceException {
     // there might be a null pointer exception ... most likely will never happen but the jvm gets mad
     try {
       if (language != null && language.trim().length() > 0) {
-        Locale.setDefault(new Locale(language));
+        Locale locale = new Locale(language);
+        i18n = ResourceBundle.getBundle("processing.app.i18n.Resources", locale);
+        Locale.setDefault(locale);
+      } else {
+        i18n = ResourceBundle.getBundle("processing.app.i18n.Resources", Locale.getDefault());
       }
-      i18n = ResourceBundle.getBundle("processing.app.i18n.Resources", Locale.getDefault());
-
       PROMPT_YES = _("Yes");
       PROMPT_NO = _("No");
       PROMPT_CANCEL = _("Cancel");
