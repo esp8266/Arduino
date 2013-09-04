@@ -30,7 +30,8 @@ ARDUINO 1.5.3 BETA 2013.08.30
 * removed unused flags from String (free 1 byte of SRAM)
 
 [libraries]
-* sam: Added CAN library (still in early stage of development) (Palliser)
+* sam: Removed CAN library, you can find an updated version here:  
+       https://github.com/collin80/due_can
 * sam: Bugfix SPI library: begin() after end() now works (stimmer)
 * sam: Bugfix SPI library: incorrent pin configuration in non-extended mode.
 * Ported all libraries to new 1.5 format
