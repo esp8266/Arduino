@@ -30,7 +30,8 @@ inline uint16_t swapcolor(uint16_t x) {
 
 // Constructor when using software SPI.  All output pins are configurable.
 Adafruit_ST7735::Adafruit_ST7735(uint8_t cs, uint8_t rs, uint8_t sid,
- uint8_t sclk, uint8_t rst) {
+ uint8_t sclk, uint8_t rst) : Adafruit_GFX(ST7735_TFTWIDTH, ST7735_TFTHEIGHT)
+{
   _cs   = cs;
   _rs   = rs;
   _sid  = sid;
@@ -42,7 +43,9 @@ Adafruit_ST7735::Adafruit_ST7735(uint8_t cs, uint8_t rs, uint8_t sid,
 
 // Constructor when using hardware SPI.  Faster, but must use SPI pins
 // specific to each board type (e.g. 11,13 for Uno, 51,52 for Mega, etc.)
-Adafruit_ST7735::Adafruit_ST7735(uint8_t cs, uint8_t rs, uint8_t rst) {
+Adafruit_ST7735::Adafruit_ST7735(uint8_t cs, uint8_t rs, uint8_t rst) : 
+Adafruit_GFX(ST7735_TFTWIDTH, ST7735_TFTHEIGHT)
+{
   _cs   = cs;
   _rs   = rs;
   _rst  = rst;
@@ -258,8 +261,7 @@ void Adafruit_ST7735::commandList(uint8_t *addr) {
 // Initialization code common to both 'B' and 'R' type displays
 void Adafruit_ST7735::commonInit(uint8_t *cmdList) {
 
-  constructor(ST7735_TFTWIDTH, ST7735_TFTHEIGHT);
-  colstart  = rowstart = 0; // May be overridden in init func
+  colstart = rowstart = 0; // May be overridden in init func
 
   pinMode(_rs, OUTPUT);
   pinMode(_cs, OUTPUT);

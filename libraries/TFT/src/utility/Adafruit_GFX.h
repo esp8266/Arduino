@@ -55,9 +55,9 @@
  */
 
 #if defined(__SD_H__)  // Arduino SD library
-#  include "PImage.h"
+ #include "PImage.h"
 #else
-#  warning "The SD library was not found. loadImage() and image() won't be supported."
+ #warning "The SD library was not found. loadImage() and image() won't be supported."
 #endif
 
 #define swap(a, b) { int16_t t = a; a = b; b = t; }
@@ -76,61 +76,68 @@ typedef uint16_t color;
 class Adafruit_GFX : public Print {
  public:
 
-  //Adafruit_GFX();
-  // i have no idea why we have to formally call the constructor. kinda sux
-  void constructor(int16_t w, int16_t h);
+  Adafruit_GFX(int16_t w, int16_t h); // Constructor
 
-  // this must be defined by the subclass
-  virtual void drawPixel(int16_t x, int16_t y, uint16_t color);
-  virtual void invertDisplay(boolean i);
+  // This MUST be defined by the subclass
+  virtual void drawPixel(int16_t x, int16_t y, uint16_t color) = 0;
 
-  // these are 'generic' drawing functions, so we can share them!
-  virtual void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, 
-		uint16_t color);
-  virtual void drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color);
-  virtual void drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color);
-  virtual void drawRect(int16_t x, int16_t y, int16_t w, int16_t h, 
-		uint16_t color);
-  virtual void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, 
-		uint16_t color);
-  virtual void fillScreen(uint16_t color);
+  
 
-  void drawCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color);
-  void drawCircleHelper(int16_t x0, int16_t y0,
-			int16_t r, uint8_t cornername, uint16_t color);
-  void fillCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color);
-  void fillCircleHelper(int16_t x0, int16_t y0, int16_t r,
-		      uint8_t cornername, int16_t delta, uint16_t color);
+  // These MAY be overridden by the subclass to provide device-specific
+  // optimized code.  Otherwise 'generic' versions are used.
+  virtual void 
+	drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, 
+		uint16_t color),
+  	drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color),
+	drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color),
+	drawRect(int16_t x, int16_t y, int16_t w, int16_t h, 
+		uint16_t color),
+	fillRect(int16_t x, int16_t y, int16_t w, int16_t h, 
+		uint16_t color),
+	fillScreen(uint16_t color),
+	invertDisplay(boolean i);
 
-  void drawTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1,
-		    int16_t x2, int16_t y2, uint16_t color);
-  void fillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1,
-		    int16_t x2, int16_t y2, uint16_t color);
-  void drawRoundRect(int16_t x0, int16_t y0, int16_t w, int16_t h,
-		     int16_t radius, uint16_t color);
-  void fillRoundRect(int16_t x0, int16_t y0, int16_t w, int16_t h,
-		     int16_t radius, uint16_t color);
+// These exist only with Adafruit_GFX (no subclass overrides)
+  void
+	drawCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color),
+	drawCircleHelper(int16_t x0, int16_t y0,
+			int16_t r, uint8_t cornername, uint16_t color),
+	fillCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color),
+	fillCircleHelper(int16_t x0, int16_t y0, int16_t r,
+		      uint8_t cornername, int16_t delta, uint16_t color),
 
-  void drawBitmap(int16_t x, int16_t y, 
+	drawTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1,
+		    int16_t x2, int16_t y2, uint16_t color),
+	fillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1,
+		    int16_t x2, int16_t y2, uint16_t color),
+	drawRoundRect(int16_t x0, int16_t y0, int16_t w, int16_t h,
+		     int16_t radius, uint16_t color),
+	fillRoundRect(int16_t x0, int16_t y0, int16_t w, int16_t h,
+		     int16_t radius, uint16_t color),
+
+	drawBitmap(int16_t x, int16_t y, 
 		  const uint8_t *bitmap, int16_t w, int16_t h,
-		  uint16_t color);
-  void drawChar(int16_t x, int16_t y, unsigned char c,
-		uint16_t color, uint16_t bg, uint8_t size);
+		  uint16_t color),
+	drawChar(int16_t x, int16_t y, unsigned char c,
+		uint16_t color, uint16_t bg, uint8_t size),
+	setCursor(int16_t x, int16_t y),
+	setTextColor(uint16_t c),
+	setTextColor(uint16_t c, uint16_t bg),
+	setTextSize(uint8_t s),
+	setTextWrap(boolean w),
+	setRotation(uint8_t r);
+
 #if ARDUINO >= 100
   virtual size_t write(uint8_t);
 #else
   virtual void   write(uint8_t);
 #endif
-  void setCursor(int16_t x, int16_t y);
-  void setTextColor(uint16_t c);
-  void setTextColor(uint16_t c, uint16_t bg);
-  void setTextSize(uint8_t s);
-  void setTextWrap(boolean w);
 
-  int16_t height(void);
-  int16_t width(void);
+  int16_t 
+	height(void),
+	width(void);
 
-  void setRotation(uint8_t r);
+
   uint8_t getRotation(void);
 
   
@@ -145,45 +152,40 @@ class Adafruit_GFX : public Print {
   virtual uint16_t newColor(uint8_t red, uint8_t green, uint8_t blue);
   
   
-  // http://processing.org/reference/background_.html
-  void background(uint8_t red, uint8_t green, uint8_t blue);
-  void background(color c);
+  void
+	// http://processing.org/reference/background_.html
+	background(uint8_t red, uint8_t green, uint8_t blue),
+	background(color c),
 
-  // http://processing.org/reference/fill_.html
-  void fill(uint8_t red, uint8_t green, uint8_t blue);
-  void fill(color c);
+	// http://processing.org/reference/fill_.html
+	fill(uint8_t red, uint8_t green, uint8_t blue),
+	fill(color c),
 
-  // http://processing.org/reference/noFill_.html
-  void noFill();
+	// http://processing.org/reference/noFill_.html
+	noFill(),
 
-  // http://processing.org/reference/stroke_.html
-  void stroke(uint8_t red, uint8_t green, uint8_t blue);
-  void stroke(color c);
+	// http://processing.org/reference/stroke_.html
+	stroke(uint8_t red, uint8_t green, uint8_t blue),
+	stroke(color c),
 
-  // http://processing.org/reference/noStroke_.html
-  void noStroke();
+	// http://processing.org/reference/noStroke_.html
+	noStroke(),
   
-  void text    (const char * text, int16_t x, int16_t y);
-  void textWrap(const char * text, int16_t x, int16_t y);
+	text(const char * text, int16_t x, int16_t y),
+	textWrap(const char * text, int16_t x, int16_t y),
 
-  void textSize(uint8_t size);
+	textSize(uint8_t size),
   
-  // similar to ellipse() in Processing, but with
-  // a single radius.
-  // http://processing.org/reference/ellipse_.html
-  void circle(int16_t x, int16_t y, int16_t r);
-  
-  void point(int16_t x, int16_t y);
-  
-  void line(int16_t x1, int16_t y1, int16_t x2, int16_t y2);
-  
-  void quad(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3, int16_t x4, int16_t y4);
-  
-  void rect(int16_t x, int16_t y, int16_t width, int16_t height);
-
-  void rect(int16_t x, int16_t y, int16_t width, int16_t height, int16_t radius);
-  
-  void triangle(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3);
+	// similar to ellipse() in Processing, but with
+	// a single radius.
+	// http://processing.org/reference/ellipse_.html
+	circle(int16_t x, int16_t y, int16_t r),
+	point(int16_t x, int16_t y),
+	line(int16_t x1, int16_t y1, int16_t x2, int16_t y2),
+	quad(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3, int16_t x4, int16_t y4),
+rect(int16_t x, int16_t y, int16_t width, int16_t height),
+	rect(int16_t x, int16_t y, int16_t width, int16_t height, int16_t radius),
+	triangle(int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3);
   
   /* TODO
   void rectMode(RectMode mode);
@@ -199,13 +201,18 @@ class Adafruit_GFX : public Print {
 #endif
   
  protected:
-  int16_t  WIDTH, HEIGHT;   // this is the 'raw' display w/h - never changes
-  int16_t  _width, _height; // dependent on rotation
-  int16_t  cursor_x, cursor_y;
-  uint16_t textcolor, textbgcolor;
-  uint8_t  textsize;
-  uint8_t  rotation;
-  boolean  wrap; // If set, 'wrap' text at right edge of display
+  int16_t
+	WIDTH, HEIGHT;   // this is the 'raw' display w/h - never changes
+  int16_t
+	_width, _height, // dependent on rotation
+	cursor_x, cursor_y;
+  uint16_t
+	textcolor, textbgcolor;
+  uint8_t
+	textsize,
+	rotation;
+  boolean
+	wrap; // If set, 'wrap' text at right edge of display
   
   /*
    * Processing-style graphics state
@@ -362,6 +369,4 @@ PImage PImage::loadImage(const char * fileName) {
 
 #endif
 
-
-
-#endif
+#endif // _ADAFRUIT_GFX_H
