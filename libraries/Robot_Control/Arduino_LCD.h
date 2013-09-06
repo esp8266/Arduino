@@ -25,7 +25,7 @@
 #else
  #include "WProgram.h"
 #endif
-#include "Adafruit_GFX.h"
+#include "utility/Adafruit_GFX.h"
 //#include <avr/pgmspace.h>
 
 // some flags for initR() :(
