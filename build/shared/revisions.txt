@@ -6,6 +6,7 @@ ARDUINO 1.5.4 BETA
 
 [libraries]
 * sam: fixed wrong SPI initialization (noblepepper)
+* updated all instances of Adafruit_GFX to the latest version
 
 ARDUINO 1.5.3 BETA 2013.08.30
 
