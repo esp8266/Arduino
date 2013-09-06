@@ -1,6 +1,9 @@
 
 ARDUINO 1.5.4 BETA
 
+[ide]
+* Revert to English locale if the system default is not available
+
 [libraries]
 * sam: fixed wrong SPI initialization (noblepepper)
 

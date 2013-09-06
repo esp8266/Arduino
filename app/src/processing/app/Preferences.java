@@ -270,8 +270,8 @@ public class Preferences {
     try {
       I18n.init(Preferences.get("editor.languages.current"));
     } catch (MissingResourceException e) {
-      I18n.init("");
-      Preferences.set("editor.languages.current", "");
+      I18n.init("en");
+      Preferences.set("editor.languages.current", "en");
     }
 
     // set some other runtime constants (not saved on preferences file)
