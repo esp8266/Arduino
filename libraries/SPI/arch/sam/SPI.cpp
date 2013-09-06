@@ -30,6 +30,10 @@ void SPIClass::begin() {
 }
 
 void SPIClass::begin(uint8_t _pin) {
+	initCb();
+	SPI_Configure(spi, id, SPI_MR_MSTR | SPI_MR_PS | SPI_MR_MODFDIS);
+	SPI_Enable(spi);
+
 	uint32_t spiPin = BOARD_PIN_TO_SPI_PIN(_pin);
 	PIO_Configure(
 		g_APinDescription[spiPin].pPort,

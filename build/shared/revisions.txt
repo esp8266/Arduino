@@ -1,5 +1,10 @@
 
-ARDUINO 1.5.3 BETA
+ARDUINO 1.5.4 BETA
+
+[libraries]
+* sam: fixed wrong SPI initialization (noblepepper)
+
+ARDUINO 1.5.3 BETA 2013.08.30
 
 [ide]
 * Removed useless baud rates from serial monitor
@@ -7,8 +12,6 @@ ARDUINO 1.5.3 BETA
 * Added support for new 1.5 Library format (https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5:-Library-specification)
 * Pass board type from boards.txt (https://github.com/arduino/Arduino/issues/308)
 * Display estimated RAM usage after compile (Loren M. Lang)
-* Updated arm gcc to 4.7.4 and simplified build.xml
-* ARM gcc doesn't require ia32-libs anymore on 64 bits linux systems
 * Import library menu is now scrollable
 * Scrollable menus can now be scrolled with the mouse wheel
 
@@ -27,7 +30,8 @@ ARDUINO 1.5.3 BETA
 * removed unused flags from String (free 1 byte of SRAM)
 
 [libraries]
-* sam: Added CAN library (still in early stage of development) (Palliser)
+* sam: Removed CAN library, you can find an updated version here:  
+       https://github.com/collin80/due_can
 * sam: Bugfix SPI library: begin() after end() now works (stimmer)
 * sam: Bugfix SPI library: incorrent pin configuration in non-extended mode.
 * Ported all libraries to new 1.5 format
