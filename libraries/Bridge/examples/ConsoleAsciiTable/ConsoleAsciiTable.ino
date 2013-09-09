@@ -10,15 +10,16 @@
  The circuit:  No external hardware needed.
  
  created 2006
- by Nicholas Zambetti 
+ by Nicholas Zambetti  
+ http://www.zambetti.com
  modified 9 Apr 2012
  by Tom Igoe
  modified 22 May 2013
  by Cristian Maglie
  
  This example code is in the public domain.
-
- <http://www.zambetti.com> 
+ 
+ http://arduino.cc/en/Tutorial/ConsoleAsciiTable
  
  */
  

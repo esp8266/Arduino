@@ -27,10 +27,12 @@
  created  6 July 2013
  by Tom Igoe
  
- 
  This example code is in the public domain.
- 	 
+ 
+ http://arduino.cc/en/Tutorial/TemperatureWebPanel	 
+ 
  */
+
 #include <Bridge.h>
 #include <YunServer.h>
 #include <YunClient.h> 

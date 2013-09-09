@@ -14,7 +14,10 @@
  By Federico Fissore
  
  This example code is in the public domain.
- */
+ 
+ http://arduino.cc/en/Tutorial/YunWiFiStatus
+ 
+*/
 
 #include <Process.h>
 

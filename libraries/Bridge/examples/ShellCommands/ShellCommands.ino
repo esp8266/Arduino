@@ -17,6 +17,8 @@
  
  This example code is in the public domain.
  
+ http://arduino.cc/en/Tutorial/ShellCommands
+ 
  */
 
 #include <Process.h>

@@ -1,32 +1,25 @@
 /*
-  Bridge
+ Arduino Yun Bridge example
  
- This example shows how to use the Bridge library to access the digital 
- and analog pins on the board through REST calls. 
- It demonstrates how you can create your own API when using REST style 
+ This example for the Arduino Yun shows how to use the 
+ Bridge library to access the digital and analog pins 
+ on the board through REST calls. It demonstrates how 
+ you can create your own API when using REST style 
  calls through the browser.
  
- Example of possible commands are listed here:
+ Possible commands created in this shetch:
 
- "/arduino/digital/13"     -> digitalRead(13)
- "/arduino/digital/13/1"   -> digitalWrite(13, HIGH)
- "/arduino/analog/2/123"   -> analogWrite(2, 123)
- "/arduino/analog/2"       -> analogRead(2)
- "/arduino/mode/13/input"  -> pinMode(13, INPUT)
- "/arduino/mode/13/output" -> pinMode(13, OUTPUT)
-
- The circuit:
- there is no need of a particular circuit, you can connect:
- * some analog sensors to the analog inputs
- * LEDs to digital or analog outputs
- * digital sensors such as buttos to the digital inputs
+ * "digital/13"     -> digitalRead(13)
+ * "digital/13/1"   -> digitalWrite(13, HIGH)
+ * "analog/2/123"   -> analogWrite(2, 123)
+ * "analog/2"       -> analogRead(2)
+ * "mode/13/input"  -> pinMode(13, INPUT)
+ * "mode/13/output" -> pinMode(13, OUTPUT)
  
- created April 2013
- by Cristian Maglie
+ http://arduino.cc/en/Tutorial/Bridge
  
- This example code is in the public domain.
- 
- */
+ This example code is part of the public domain
+*/
 
 #include <Bridge.h>
 #include <YunServer.h>
