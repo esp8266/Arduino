@@ -124,6 +124,7 @@ mega2560.cpu=2560 or ADK
 mega2560.upload.tool=avrdude
 mega2560.upload.protocol=wiring
 mega2560.upload.maximum_size=258048
+mega2560.upload.maximum_data_size=8192
 mega2560.upload.speed=115200
 
 mega2560.bootloader.tool=avrdude
@@ -148,6 +149,7 @@ mega.cpu=ATmega1280
 mega.upload.tool=avrdude
 mega.upload.protocol=arduino
 mega.upload.maximum_size=126976
+mega.upload.maximum_data_size=8192
 mega.upload.speed=57600
 
 mega.bootloader.tool=avrdude
@@ -410,6 +412,7 @@ LilyPadUSB.bootloader.extended_fuses=0xce
 LilyPadUSB.bootloader.file=caterina-LilyPadUSB/Caterina-LilyPadUSB.hex
 LilyPadUSB.bootloader.unlock_bits=0x3F
 LilyPadUSB.bootloader.lock_bits=0x2F
+
 LilyPadUSB.build.mcu=atmega32u4
 LilyPadUSB.build.f_cpu=8000000L
 LilyPadUSB.build.vid=0x1B4F
@@ -582,6 +585,7 @@ atmegang.menu.cpu.atmega168.build.mcu=atmega168
 atmegang.menu.cpu.atmega8=ATmega8
 
 atmegang.menu.cpu.atmega8.upload.maximum_size=7168
+atmegang.menu.cpu.atmega8.upload.maximum_data_size=1024
 
 atmegang.menu.cpu.atmega8.bootloader.low_fuses=0xdf
 atmegang.menu.cpu.atmega8.bootloader.high_fuses=0xca
