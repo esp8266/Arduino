@@ -8,6 +8,9 @@ ARDUINO 1.5.4 BETA
 * sam: fixed wrong SPI initialization (noblepepper)
 * updated all instances of Adafruit_GFX to the latest version
 
+[core]
+* avr: fixed bug introduced with recent optimizations in HardwareSerial (atmega8 cpu) (darryl)
+
 ARDUINO 1.5.3 BETA 2013.08.30
 
 [ide]

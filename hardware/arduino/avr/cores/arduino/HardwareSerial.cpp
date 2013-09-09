@@ -91,7 +91,7 @@ inline void store_char(unsigned char c, HardwareSerial *s)
   #elif defined(UDR)
     if (bit_is_clear(UCSRA, PE)) {
       unsigned char c = UDR;
-      store_char(c, &rx_buffer);
+      store_char(c, &Serial);
     } else {
       unsigned char c = UDR;
     };
