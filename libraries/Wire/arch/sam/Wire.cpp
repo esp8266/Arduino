@@ -22,7 +22,7 @@ extern "C" {
 #include <string.h>
 }
 
-#include "Wire.h"
+#include "Wire_Class.h"
 
 static inline bool TWI_FailedAcknowledge(Twi *pTwi) {
 	return pTwi->TWI_SR & TWI_SR_NACK;
