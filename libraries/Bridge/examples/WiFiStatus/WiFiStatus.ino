@@ -1,6 +1,5 @@
-
 /*
- WiFi Status 
+  WiFi Status 
  
  This sketch runs a script called "pretty-wifi-info.lua"
  installed on your Yún in folder /usr/bin.
@@ -17,7 +16,7 @@
  
  http://arduino.cc/en/Tutorial/YunWiFiStatus
  
-*/
+ */
 
 #include <Process.h>
 

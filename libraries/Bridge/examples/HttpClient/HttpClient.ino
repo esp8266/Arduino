@@ -1,6 +1,5 @@
 /*
-
- Yun HTTP Client
+  Yun HTTP Client
  
  This example for the Arduino Yún shows how create a basic 
  HTTP client that connects to the internet and downloads 
@@ -12,9 +11,9 @@
 
  This example code is in the public domain.
 
-  http://arduino.cc/en/Tutorial/HttpClient
-  
-*/
+ http://arduino.cc/en/Tutorial/HttpClient
+
+ */
 
 #include <Bridge.h>
 #include <HttpClient.h>

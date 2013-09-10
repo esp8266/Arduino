@@ -29,7 +29,7 @@
  
  This example code is in the public domain.
  
- http://arduino.cc/en/Tutorial/TemperatureWebPanel	 
+ http://arduino.cc/en/Tutorial/TemperatureWebPanel
  
  */
 
