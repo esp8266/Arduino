@@ -127,7 +127,7 @@ public class NetworkMonitor extends AbstractMonitor {
         }
       }
       if (connectionAttempts < MAX_CONNECTION_ATTEMPTS) {
-        s = "\n" + _("Unable to connect: retrying (" + connectionAttempts + ")... ");
+        s = "\n" + _("Unable to connect: retrying") + " (" + connectionAttempts + ")... ";
 
         SwingUtilities.invokeLater(new Runnable() {
           @Override
