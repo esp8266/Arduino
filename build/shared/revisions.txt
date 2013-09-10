@@ -1,12 +1,19 @@
 
-ARDUINO 1.5.4 BETA
+ARDUINO 1.5.4 BETA 2013.09.10
 
 [ide]
 * Revert to English locale if the system default is not available
+* Added support for Arduino Yun
+* Autodetect of boards connected to each serial port
+* Network upload and discovery for Arduino Yun
 
 [libraries]
 * sam: fixed wrong SPI initialization (noblepepper)
 * updated all instances of Adafruit_GFX to the latest version
+* added libraries for Arduino Yun
+
+[core]
+* avr: fixed bug introduced with recent optimizations in HardwareSerial (atmega8 cpu) (darryl)
 
 ARDUINO 1.5.3 BETA 2013.08.30
 
