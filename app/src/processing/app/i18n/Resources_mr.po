@@ -5,7 +5,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: 1.5.4\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-04-04 10:24-0400\n"
 "PO-Revision-Date: 2012-04-04 13:24-0400\n"
@@ -916,7 +916,7 @@ msgstr ""
 #: Editor.java:1823
 #, java-format
 msgid "No reference available for \"{0}\""
-msgstr "साठी संदर्भ उपलब्ध नाही"
+msgstr "साठी संदर्भ उपलब्ध नाही {0}"
 
 #: ../../../processing/app/Base.java:309
 msgid "No valid configured cores found! Exiting..."
@@ -1151,7 +1151,7 @@ msgstr ""
 #: Editor.java:1973
 #, java-format
 msgid "Save changes to \"{0}\"?  "
-msgstr "येथे बदल जतन करा"
+msgstr "येथे बदल जतन करा {0}"
 
 #: Sketch.java:829
 msgid "Save sketch folder as..."
@@ -1768,7 +1768,7 @@ msgstr ""
 #: Editor.java:373
 #, java-format
 msgid "{0} files added to the sketch."
-msgstr "फाईल्स स्केच मध्ये सामील केल्या"
+msgstr "{0} फाईल्स स्केच मध्ये सामील केल्या"
 
 #: debug/Compiler.java:422
 #, java-format

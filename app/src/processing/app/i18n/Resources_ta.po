@@ -5,7 +5,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: 1.5.4\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
 "PO-Revision-Date: 2012-05-04 10:24-0400\n"
@@ -1895,7 +1895,7 @@ msgstr "பதிவேற்று"
 #: Editor.java:373
 #, java-format
 msgid "{0} files added to the sketch."
-msgstr "கோப்புகள் வரைவில் சேர்கப்பட்டுள்ளன."
+msgstr "{0} கோப்புகள் வரைவில் சேர்கப்பட்டுள்ளன."
 
 #: debug/Compiler.java:422
 #, java-format

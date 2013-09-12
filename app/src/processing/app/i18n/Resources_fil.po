@@ -14,7 +14,7 @@ msgstr ""
 "Language-Team: Filipino <mharkus[at]gmail[dot]com>\n\n"
 "Language: tl\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=ASCII\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
@@ -56,10 +56,10 @@ msgid ""
 "save, your changes will be lost."
 msgstr "<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p { font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Nais mo bang I-save ang iyong mga nagawa<BR> bago isara?</b><p>Mawawala ang lahat ng ginawa kapag hindi mo I-sesave."
 
-#: Sketch.java:402
+#: ../../../processing/app/Sketch.java:395
 #, java-format
 msgid "A file named \"{0}\" already exists in \"{1}\""
-msgstr "Mayroon ng file na nagngangalang \"{0}\""
+msgstr ""
 
 #: Editor.java:2122
 #, java-format
@@ -192,6 +192,14 @@ msgstr "Nais mo bang burahin ang \"{0}\"?"
 msgid "Are you sure you want to delete this sketch?"
 msgstr "Nais mo bang burahin ang sketch na ito?"
 
+#: ../../../processing/app/Preferences.java:145
+msgid "Armenian"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:146
+msgid "Asturian"
+msgstr ""
+
 #: tools/AutoFormat.java:91
 msgid "Auto Format"
 msgstr "Auto Format"
@@ -233,9 +241,8 @@ msgstr "May mali sa linya: {0}"
 msgid "Bad file selected"
 msgstr "Mali ang File na napili"
 
-#: ../../../processing/app/Sketch.java:1638
-#, java-format
-msgid "Binary sketch size: {0} bytes (of a {1} byte maximum) - {2}%% used"
+#: ../../../processing/app/Preferences.java:98
+msgid "Belarusian"
 msgstr ""
 
 #: Editor.java:682
@@ -253,6 +260,10 @@ msgstr ""
 msgid "Board: "
 msgstr ""
 
+#: ../../../processing/app/Preferences.java:147
+msgid "Bosnian"
+msgstr ""
+
 #: SerialMonitor.java:112
 msgid "Both NL & CR"
 msgstr "Parehong NL at CR"
@@ -267,6 +278,10 @@ msgstr "Nawawala ang build folder o hindi sya masulatan"
 
 #: ../../../processing/app/Preferences.java:80
 msgid "Bulgarian"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:148
+msgid "Burmese (Myanmar)"
 msgstr ""
 
 #: Editor.java:699
@@ -305,6 +320,22 @@ msgstr "Catalan"
 #: Preferences.java:403
 msgid "Check for updates on startup"
 msgstr "Suriin ang updates tuwing magsisimula"
+
+#: ../../../processing/app/Preferences.java:149
+msgid "Chinese (China)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:150
+msgid "Chinese (Hong Kong)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:151
+msgid "Chinese (Taiwan)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:152
+msgid "Chinese (Taiwan) (Big5)"
+msgstr ""
 
 #: Preferences.java:87
 msgid "Chinese Simplified"
@@ -559,6 +590,10 @@ msgstr "Tapos na ang pagupload."
 msgid "Dutch"
 msgstr "Dutch"
 
+#: ../../../processing/app/Preferences.java:153
+msgid "Dutch (Netherlands)"
+msgstr ""
+
 #: Editor.java:1116
 msgid "Edit"
 msgstr "Baguhin"
@@ -574,6 +609,10 @@ msgstr ""
 #: Preferences.java:91
 msgid "English"
 msgstr "Ingles"
+
+#: ../../../processing/app/Preferences.java:154
+msgid "English (United Kingdom)"
+msgstr ""
 
 #: Editor.java:1049
 msgid "Environment"
@@ -666,6 +705,10 @@ msgstr ""
 msgid "Estonian"
 msgstr ""
 
+#: ../../../processing/app/Preferences.java:109
+msgid "Estonian (Estonia)"
+msgstr ""
+
 #: Editor.java:509
 msgid "Examples"
 msgstr "Mga Halimbawa"
@@ -710,6 +753,10 @@ msgstr "Hanapin..."
 msgid "Find:"
 msgstr "Hanapin:"
 
+#: ../../../processing/app/Preferences.java:111
+msgid "Finnish"
+msgstr ""
+
 #: tools/FixEncoding.java:41 tools/FixEncoding.java:58
 #: tools/FixEncoding.java:79
 msgid "Fix Encoding & Reload"
@@ -749,6 +796,18 @@ msgstr "German"
 msgid "Getting Started"
 msgstr "Mga Patnubay sa Pagsisimula"
 
+#: ../../../processing/app/Sketch.java:1646
+#, java-format
+msgid ""
+"Global variables use {0} bytes ({2}%%) of dynamic memory, leaving {3} bytes "
+"for local variables. Maximum is {1} bytes."
+msgstr ""
+
+#: ../../../processing/app/Sketch.java:1651
+#, java-format
+msgid "Global variables use {0} bytes of dynamic memory."
+msgstr ""
+
 #: Preferences.java:97
 msgid "Greek"
 msgstr "Greek"
@@ -776,10 +835,6 @@ msgstr ""
 #: Editor.java:1002
 msgid "Help"
 msgstr "Tulong"
-
-#: ../../../processing/app/Preferences.java:98
-msgid "Hindi"
-msgstr ""
 
 #: Sketch.java:299
 msgid ""
@@ -865,23 +920,9 @@ msgstr ""
 msgid "Low memory available, stability problems may occur"
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:106
-msgid "Marathi"
-msgstr ""
-
 #: Base.java:1826
 msgid "Message"
 msgstr "Mensahe"
-
-#: ../../../processing/app/Sketch.java:1646
-#, java-format
-msgid "Minimum Memory usage: {0} bytes"
-msgstr ""
-
-#: ../../../processing/app/Sketch.java:1643
-#, java-format
-msgid "Minimum Memory usage: {0} bytes (of a {1} byte maximum) - {2}%% used"
-msgstr ""
 
 #: Sketch.java:1754
 msgid "Missing the */ from the end of a /* comment */"
@@ -898,6 +939,10 @@ msgstr "Inililipat"
 #: Sketch.java:286
 msgid "Name for new file:"
 msgstr "Pangalan para sa bagong file:"
+
+#: ../../../processing/app/Preferences.java:155
+msgid "Nepali"
+msgstr ""
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:51
 msgid "Network upload using programmer not supported"
@@ -960,6 +1005,11 @@ msgstr "Walang sanggunian para sa \"{0}\""
 msgid "No valid configured cores found! Exiting..."
 msgstr ""
 
+#: ../../../processing/app/debug/TargetPackage.java:63
+#, java-format
+msgid "No valid hardware definitions found in folder {0}."
+msgstr ""
+
 #: Base.java:184
 msgid "Non-fatal error while setting the Look & Feel."
 msgstr "Non-fatal error habang nagseset ng Look & Feel"
@@ -968,11 +1018,7 @@ msgstr "Non-fatal error habang nagseset ng Look & Feel"
 msgid "Nope"
 msgstr "Hindi"
 
-#: ../../../processing/app/Preferences.java:107
-msgid "Norwegian"
-msgstr ""
-
-#: ../../../processing/app/Preferences.java:108
+#: ../../../processing/app/Preferences.java:128
 msgid "Norwegian Bokmål"
 msgstr ""
 
@@ -1043,8 +1089,16 @@ msgstr ""
 msgid "Port"
 msgstr ""
 
-#: Preferences.java:107 Preferences.java:108
-msgid "Portuguese"
+#: ../../../processing/app/Preferences.java:157
+msgid "Portugese"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:131
+msgid "Portuguese (Brazil)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:132
+msgid "Portuguese (Portugal)"
 msgstr ""
 
 #: Editor.java:576 Preferences.java:279
@@ -1315,6 +1369,12 @@ msgstr ""
 "Masyadong malaki ang sketch; Tignan ang http://www.arduino.cc/en/Guide/Troubleshooting#size para "
 "sa mga patnubay para mapaliit ito."
 
+#: ../../../processing/app/Sketch.java:1639
+#, java-format
+msgid ""
+"Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} bytes."
+msgstr ""
+
 #: Editor.java:503
 msgid "Sketchbook"
 msgstr "Sketchbook"
@@ -1326,6 +1386,10 @@ msgstr "Nawala ang folder ng sketchbook"
 #: Preferences.java:299
 msgid "Sketchbook location:"
 msgstr "Lokasyon ng Sketchbook:"
+
+#: ../../../processing/app/Preferences.java:135
+msgid "Slovenian"
+msgstr ""
 
 #: Sketch.java:279 Sketch.java:308 Sketch.java:582 Sketch.java:971
 msgid ""
@@ -1358,12 +1422,12 @@ msgstr "Spanish"
 msgid "Sunshine"
 msgstr "Sinag ng araw"
 
-#: Preferences.java:83
-msgid "System Default"
+#: ../../../processing/app/Preferences.java:137
+msgid "Swedish"
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:116
-msgid "Tamil"
+#: Preferences.java:83
+msgid "System Default"
 msgstr ""
 
 #: debug/Compiler.java:471
@@ -1529,7 +1593,7 @@ msgid "Unable to connect: is the sketch using the bridge?"
 msgstr ""
 
 #: ../../../processing/app/NetworkMonitor.java:130
-msgid "Unable to connect: retrying ("
+msgid "Unable to connect: retrying"
 msgstr ""
 
 #: ../../../processing/app/Editor.java:2526
@@ -1610,6 +1674,10 @@ msgstr "Beripikahin / I-compile"
 #: Preferences.java:384
 msgid "Verify code after upload"
 msgstr "I-verify ang code pagkatapos mai-upload"
+
+#: ../../../processing/app/Preferences.java:141
+msgid "Vietnamese"
+msgstr ""
 
 #: Editor.java:1091
 msgid "Visit Arduino.cc"
@@ -1884,10 +1952,6 @@ msgid ""
 "the selected serial port {0} does not exist or your board is not connected"
 msgstr ""
 "hindi makita ang napiling serial port {0}  o kaya naman ay hindi kunektado ang iyong board"
-
-#: ../../../processing/app/EditorStatus.java:456
-msgid "to clipboard"
-msgstr ""
 
 #: Preferences.java:375
 msgid "upload"

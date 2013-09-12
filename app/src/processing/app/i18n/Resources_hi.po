@@ -6,7 +6,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: 1.5.4 VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-04-04 15:20+0530\n"
 "PO-Revision-Date: 2012-05-11 13:15+0530\n"
@@ -110,13 +110,13 @@ msgid ""
 msgstr ""
 "फाइल एन्कोडिंग फिक्स करते समय प्रॉब्लम हो गयी \n"
 "स्केत्च को सेव मत  करिए क्यूंकि वो पुराणी फाइल को बदल देगी \n"
-"ओपन आप्शन को इस्तेमाल कीजिये और फिर से कोशिश कीजिये "
+"ओपन आप्शन को इस्तेमाल कीजिये और फिर से कोशिश कीजिये \n"
 
 #: Base.java:221
 msgid ""
 "An unknown error occurred while trying to load\n"
 "platform-specific code for your machine."
-msgstr "मशीन के लिए विशिष्ट कोड लोड करने का प्रयास करते समय एक अज्ञात त्रुटि हुई\n"
+msgstr "मशीन के लिए विशिष्ट कोड लोड करने का प्रयास करते समय एक अज्ञात त्रुटि हुई"
 
 #: Preferences.java:84
 msgid "Arabic"
@@ -187,6 +187,14 @@ msgstr "क्या आप सुनिश्चित करतें है�
 msgid "Are you sure you want to delete this sketch?"
 msgstr "क्या आप सुनिश्चित करते हैं की यह स्केत्च मिटा दिया जाये ?"
 
+#: ../../../processing/app/Preferences.java:145
+msgid "Armenian"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:146
+msgid "Asturian"
+msgstr ""
+
 #: tools/AutoFormat.java:91
 msgid "Auto Format"
 msgstr "स्वत: स्वरूप"
@@ -228,9 +236,8 @@ msgstr "Bad error line: {0}"
 msgid "Bad file selected"
 msgstr "खराब फाइल चुनी गई"
 
-#: ../../../processing/app/Sketch.java:1638
-#, java-format
-msgid "Binary sketch size: {0} bytes (of a {1} byte maximum) - {2}%% used"
+#: ../../../processing/app/Preferences.java:98
+msgid "Belarusian"
 msgstr ""
 
 #: Editor.java:682
@@ -248,6 +255,10 @@ msgstr ""
 msgid "Board: "
 msgstr ""
 
+#: ../../../processing/app/Preferences.java:147
+msgid "Bosnian"
+msgstr ""
+
 #: SerialMonitor.java:112
 msgid "Both NL & CR"
 msgstr "दोनों  NL और CR"
@@ -262,6 +273,10 @@ msgstr "बिल्ड पुस्तिका गायब हो गयी �
 
 #: ../../../processing/app/Preferences.java:80
 msgid "Bulgarian"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:148
+msgid "Burmese (Myanmar)"
 msgstr ""
 
 #: Editor.java:699
@@ -300,6 +315,22 @@ msgstr ""
 #: Preferences.java:403
 msgid "Check for updates on startup"
 msgstr "शुरुआत  में अद्यतन के लिए जांचें "
+
+#: ../../../processing/app/Preferences.java:149
+msgid "Chinese (China)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:150
+msgid "Chinese (Hong Kong)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:151
+msgid "Chinese (Taiwan)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:152
+msgid "Chinese (Taiwan) (Big5)"
+msgstr ""
 
 #: Preferences.java:87
 msgid "Chinese Simplified"
@@ -371,7 +402,7 @@ msgstr "हटाया नहीं जा सका \"{0}\""
 #: Sketch.java:1070
 #, java-format
 msgid "Could not delete the existing ''{0}'' file."
-msgstr "इस \"{०}\"मौजूदा फाइल को मिटाया नहीं जा सका "
+msgstr "इस \"{0}\"मौजूदा फाइल को मिटाया नहीं जा सका "
 
 #: Base.java:2247 Base.java:2270
 #, java-format
@@ -438,7 +469,7 @@ msgstr ""
 #: Preferences.java:242
 #, java-format
 msgid "Could not read preferences from {0}"
-msgstr "{०} से प्रेफेरेंसस पढ़ी नहीं जा सकी "
+msgstr "{0} से प्रेफेरेंसस पढ़ी नहीं जा सकी "
 
 #: Base.java:2196
 #, java-format
@@ -548,6 +579,10 @@ msgstr "उपलोड हो गया "
 msgid "Dutch"
 msgstr ""
 
+#: ../../../processing/app/Preferences.java:153
+msgid "Dutch (Netherlands)"
+msgstr ""
+
 #: Editor.java:1116
 msgid "Edit"
 msgstr "संपादित करें"
@@ -562,6 +597,10 @@ msgstr ""
 
 #: Preferences.java:91
 msgid "English"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:154
+msgid "English (United Kingdom)"
 msgstr ""
 
 #: Editor.java:1049
@@ -640,7 +679,7 @@ msgstr ""
 #: SketchCode.java:83
 #, java-format
 msgid "Error while loading code {0}"
-msgstr "कोड लोड करते समय त्रुटी"
+msgstr "कोड लोड करते समय त्रुटी {0}"
 
 #: Editor.java:2520
 msgid "Error while printing."
@@ -653,6 +692,10 @@ msgstr ""
 
 #: Preferences.java:92
 msgid "Estonian"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:109
+msgid "Estonian (Estonia)"
 msgstr ""
 
 #: Editor.java:509
@@ -699,6 +742,10 @@ msgstr "ढूँढिये"
 msgid "Find:"
 msgstr "खोजें:"
 
+#: ../../../processing/app/Preferences.java:111
+msgid "Finnish"
+msgstr ""
+
 #: tools/FixEncoding.java:41 tools/FixEncoding.java:58
 #: tools/FixEncoding.java:79
 msgid "Fix Encoding & Reload"
@@ -737,6 +784,18 @@ msgstr ""
 #: Editor.java:1041
 msgid "Getting Started"
 msgstr "प्रारंभ करना"
+
+#: ../../../processing/app/Sketch.java:1646
+#, java-format
+msgid ""
+"Global variables use {0} bytes ({2}%%) of dynamic memory, leaving {3} bytes "
+"for local variables. Maximum is {1} bytes."
+msgstr ""
+
+#: ../../../processing/app/Sketch.java:1651
+#, java-format
+msgid "Global variables use {0} bytes of dynamic memory."
+msgstr ""
 
 #: Preferences.java:97
 msgid "Greek"
@@ -854,23 +913,9 @@ msgstr ""
 msgid "Low memory available, stability problems may occur"
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:106
-msgid "Marathi"
-msgstr ""
-
 #: Base.java:1826
 msgid "Message"
 msgstr "संदेश"
-
-#: ../../../processing/app/Sketch.java:1646
-#, java-format
-msgid "Minimum Memory usage: {0} bytes"
-msgstr ""
-
-#: ../../../processing/app/Sketch.java:1643
-#, java-format
-msgid "Minimum Memory usage: {0} bytes (of a {1} byte maximum) - {2}%% used"
-msgstr ""
 
 #: Sketch.java:1754
 msgid "Missing the */ from the end of a /* comment */"
@@ -887,6 +932,10 @@ msgstr "गतिशील"
 #: Sketch.java:286
 msgid "Name for new file:"
 msgstr "नयी फाइल का नाम "
+
+#: ../../../processing/app/Preferences.java:155
+msgid "Nepali"
+msgstr ""
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:51
 msgid "Network upload using programmer not supported"
@@ -949,6 +998,11 @@ msgstr "\"{0}\" के लिये कोई सन्दर्भ उपलब
 msgid "No valid configured cores found! Exiting..."
 msgstr ""
 
+#: ../../../processing/app/debug/TargetPackage.java:63
+#, java-format
+msgid "No valid hardware definitions found in folder {0}."
+msgstr ""
+
 #: Base.java:184
 msgid "Non-fatal error while setting the Look & Feel."
 msgstr "रूप और महसूस है की स्थापना करते हुए गैर घातक त्रुटि"
@@ -956,10 +1010,6 @@ msgstr "रूप और महसूस है की स्थापना क
 #: Sketch.java:400 Sketch.java:414 Sketch.java:423 Sketch.java:863
 msgid "Nope"
 msgstr "नहीं "
-
-#: ../../../processing/app/Preferences.java:107
-msgid "Norwegian"
-msgstr ""
 
 #: ../../../processing/app/Preferences.java:108
 msgid "Norwegian Bokmål"
@@ -1032,8 +1082,16 @@ msgstr ""
 msgid "Port"
 msgstr ""
 
-#: Preferences.java:107 Preferences.java:108
-msgid "Portuguese"
+#: ../../../processing/app/Preferences.java:157
+msgid "Portugese"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:131
+msgid "Portuguese (Brazil)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:132
+msgid "Portuguese (Portugal)"
 msgstr ""
 
 #: Editor.java:576 Preferences.java:279
@@ -1087,7 +1145,7 @@ msgstr "डेटा फ़ोल्डर को लेने में सम�
 #: Sketch.java:1465
 #, java-format
 msgid "Problem moving {0} to the build folder"
-msgstr "{०} को बिल्ड पुस्तिका में डालने में समस्या "
+msgstr "{0} को बिल्ड पुस्तिका में डालने में समस्या "
 
 #: debug/Uploader.java:209
 msgid ""
@@ -1303,6 +1361,12 @@ msgid ""
 "tips on reducing it."
 msgstr "स्केत्च बहुत बड़ी है -> http://www.arduino.cc/en/Guide/Troubleshooting#size देखिये इसे छोटा करने के उपाए के लिए "
 
+#: ../../../processing/app/Sketch.java:1639
+#, java-format
+msgid ""
+"Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} bytes."
+msgstr ""
+
 #: Editor.java:503
 msgid "Sketchbook"
 msgstr "स्केत्चबुक"
@@ -1314,6 +1378,10 @@ msgstr "स्केत्चबुक फोल्डर गायब हो �
 #: Preferences.java:299
 msgid "Sketchbook location:"
 msgstr "स्केत्च  किताब का स्थान "
+
+#: ../../../processing/app/Preferences.java:135
+msgid "Slovenian"
+msgstr ""
 
 #: Sketch.java:279 Sketch.java:308 Sketch.java:582 Sketch.java:971
 msgid ""
@@ -1345,12 +1413,12 @@ msgstr ""
 msgid "Sunshine"
 msgstr "सूर्य किरन"
 
-#: Preferences.java:83
-msgid "System Default"
+#: ../../../processing/app/Preferences.java:137
+msgid "Swedish"
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:116
-msgid "Tamil"
+#: Preferences.java:83
+msgid "System Default"
 msgstr ""
 
 #: debug/Compiler.java:471
@@ -1431,6 +1499,7 @@ msgstr ""
 "स्केच नामों में केवल मूल अक्षरों और संख्याओं को शामिल होना चाहिए\n"
 "(कोई स्पेस के बिना केवल ASCII, और यह एक संख्या के साथ शुरू नहीं कर सकते)\n"
 "इस संदेश से छुटकारा पाने के लिए स्केच को {1} से हटायें\n"
+"{1}"
 
 #: Sketch.java:1797
 msgid ""
@@ -1509,7 +1578,7 @@ msgid "Unable to connect: is the sketch using the bridge?"
 msgstr ""
 
 #: ../../../processing/app/NetworkMonitor.java:130
-msgid "Unable to connect: retrying ("
+msgid "Unable to connect: retrying"
 msgstr ""
 
 #: ../../../processing/app/Editor.java:2526
@@ -1588,6 +1657,10 @@ msgstr "वेरिफाय/कम्पाइल"
 
 #: Preferences.java:384
 msgid "Verify code after upload"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:141
+msgid "Vietnamese"
 msgstr ""
 
 #: Editor.java:1091
@@ -1713,7 +1786,7 @@ msgid ""
 "As of Arduino 1.0, the 'BYTE' keyword is no longer supported.\n"
 "Please use Serial.write() instead.\n"
 "\n"
-msgstr "कृपया  Serial.write() का उपयोग करें"
+msgstr "\nकृपया  Serial.write() का उपयोग करें\n"
 
 #: debug/Compiler.java:484
 msgid ""
@@ -1721,7 +1794,7 @@ msgid ""
 "As of Arduino 1.0, the Client class in the Ethernet library has been renamed "
 "to EthernetClient.\n"
 "\n"
-msgstr "आर्दुइनो 1.0 से, ईथरनेट  लायब्रेरी की क्लाइंट क्लास का नामकरण ईथरनेट क्लाइंट हो गया है"
+msgstr "\nआर्दुइनो 1.0 से, ईथरनेट  लायब्रेरी की क्लाइंट क्लास का नामकरण ईथरनेट क्लाइंट हो गया है\n"
 
 #: debug/Compiler.java:478
 msgid ""
@@ -1729,7 +1802,7 @@ msgid ""
 "As of Arduino 1.0, the Server class in the Ethernet library has been renamed "
 "to EthernetServer.\n"
 "\n"
-msgstr "आर्दुइनो एक तक, ईथरनेट  लायब्रेरी मे सर्वर वर्ग का पुनः नामकरण ईथरनेटसर्वर किया गया है"
+msgstr "\nआर्दुइनो एक तक, ईथरनेट  लायब्रेरी मे सर्वर वर्ग का पुनः नामकरण ईथरनेटसर्वर किया गया है\n"
 
 #: ../../../processing/app/debug/Compiler.java:451
 msgid ""
@@ -1745,7 +1818,7 @@ msgid ""
 "As of Arduino 1.0, the Wire.receive() function was renamed to Wire.read() "
 "for consistency with other libraries.\n"
 "\n"
-msgstr "आर्दुइनो 1.0 से, Wire.receive() फ़ंक्शन का नामकरण Wire.read() दूसरी लायब्रेरीज़ के साथ स्थिरता के लिये किया गया था"
+msgstr "\nआर्दुइनो 1.0 से, Wire.receive() फ़ंक्शन का नामकरण Wire.read() दूसरी लायब्रेरीज़ के साथ स्थिरता के लिये किया गया था\n"
 
 #: debug/Compiler.java:496
 msgid ""
@@ -1753,7 +1826,7 @@ msgid ""
 "As of Arduino 1.0, the Wire.send() function was renamed to Wire.write() for "
 "consistency with other libraries.\n"
 "\n"
-msgstr "आर्दुइनो 1.0 से, Wire.send() फ़ंक्शन का नामकरण Wire.write() दूसरी लायब्रेरीज़ के साथ स्थिरता के लिये किया गया था"
+msgstr "\nआर्दुइनो 1.0 से, Wire.send() फ़ंक्शन का नामकरण Wire.write() दूसरी लायब्रेरीज़ के साथ स्थिरता के लिये किया गया था\n"
 
 #: ../../../processing/app/SerialMonitor.java:41
 #: ../../../processing/app/AbstractMonitor.java:118
@@ -1803,7 +1876,7 @@ msgstr "http://www.arduino.cc/playground/Learning/Linux"
 #: Preferences.java:609
 #, java-format
 msgid "ignoring invalid font size {0}"
-msgstr "अवैध फॉण्ट आकार को नज़रंदाज़ करें "
+msgstr "अवैध फॉण्ट आकार को नज़रंदाज़ करें  {0}"
 
 #: Base.java:1794
 msgid "index.html"
@@ -1839,10 +1912,6 @@ msgstr "सीरियलमेनू मे कुछ नही है"
 msgid ""
 "the selected serial port {0} does not exist or your board is not connected"
 msgstr "चुना गया सीरियल पोर्ट {0} मौजूद नहीं है या बोर्ड नहीं जुड़ा हुआ है"
-
-#: ../../../processing/app/EditorStatus.java:456
-msgid "to clipboard"
-msgstr ""
 
 #: Preferences.java:375
 msgid "upload"
