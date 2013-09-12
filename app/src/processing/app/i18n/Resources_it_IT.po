@@ -173,6 +173,14 @@ msgstr "Sei sicuro di voler eliminare \"{0}\"?"
 msgid "Are you sure you want to delete this sketch?"
 msgstr "Sei sicuro di voler eliminare questo sketch?"
 
+#: ../../../processing/app/Preferences.java:145
+msgid "Armenian"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:146
+msgid "Asturian"
+msgstr ""
+
 #: tools/AutoFormat.java:91
 msgid "Auto Format"
 msgstr "Formattazione automatica"
@@ -214,9 +222,8 @@ msgstr "Errore alla linea: {0}"
 msgid "Bad file selected"
 msgstr "Selezionato file errato"
 
-#: ../../../processing/app/Sketch.java:1638
-#, java-format
-msgid "Binary sketch size: {0} bytes (of a {1} byte maximum) - {2}%% used"
+#: ../../../processing/app/Preferences.java:98
+msgid "Belarusian"
 msgstr ""
 
 #: ../../../processing/app/Base.java:1433
@@ -235,6 +242,10 @@ msgstr ""
 msgid "Board: "
 msgstr ""
 
+#: ../../../processing/app/Preferences.java:147
+msgid "Bosnian"
+msgstr ""
+
 #: SerialMonitor.java:112
 msgid "Both NL & CR"
 msgstr "Entrambi (NL & CR)"
@@ -249,6 +260,10 @@ msgstr "La cartella di generazione è scomparsa o non può essere scritta"
 
 #: ../../../processing/app/Preferences.java:80
 msgid "Bulgarian"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:148
+msgid "Burmese (Myanmar)"
 msgstr ""
 
 #: Editor.java:708
@@ -287,6 +302,22 @@ msgstr "Catalano"
 #: Preferences.java:419
 msgid "Check for updates on startup"
 msgstr "Controlla aggiornamenti all'avvio"
+
+#: ../../../processing/app/Preferences.java:149
+msgid "Chinese (China)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:150
+msgid "Chinese (Hong Kong)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:151
+msgid "Chinese (Taiwan)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:152
+msgid "Chinese (Taiwan) (Big5)"
+msgstr ""
 
 #: Preferences.java:88
 msgid "Chinese Simplified"
@@ -529,6 +560,10 @@ msgstr "Caricamento completato"
 msgid "Dutch"
 msgstr "Olandese"
 
+#: ../../../processing/app/Preferences.java:153
+msgid "Dutch (Netherlands)"
+msgstr ""
+
 #: Editor.java:1130
 msgid "Edit"
 msgstr "Modifica"
@@ -544,6 +579,10 @@ msgstr "Lingua dell'editor:"
 #: Preferences.java:92
 msgid "English"
 msgstr "Inglese"
+
+#: ../../../processing/app/Preferences.java:154
+msgid "English (United Kingdom)"
+msgstr ""
 
 #: Editor.java:1062
 msgid "Environment"
@@ -634,6 +673,10 @@ msgstr ""
 msgid "Estonian"
 msgstr "Estone"
 
+#: ../../../processing/app/Preferences.java:109
+msgid "Estonian (Estonia)"
+msgstr ""
+
 #: Editor.java:516
 msgid "Examples"
 msgstr "Esempi"
@@ -678,6 +721,10 @@ msgstr "Trova..."
 msgid "Find:"
 msgstr "Trova:"
 
+#: ../../../processing/app/Preferences.java:111
+msgid "Finnish"
+msgstr ""
+
 #: tools/FixEncoding.java:41 tools/FixEncoding.java:58
 #: tools/FixEncoding.java:79
 msgid "Fix Encoding & Reload"
@@ -716,6 +763,18 @@ msgstr "Tedesco"
 #: Editor.java:1054
 msgid "Getting Started"
 msgstr "Primi passi"
+
+#: ../../../processing/app/Sketch.java:1646
+#, java-format
+msgid ""
+"Global variables use {0} bytes ({2}%%) of dynamic memory, leaving {3} bytes "
+"for local variables. Maximum is {1} bytes."
+msgstr ""
+
+#: ../../../processing/app/Sketch.java:1651
+#, java-format
+msgid "Global variables use {0} bytes of dynamic memory."
+msgstr ""
 
 #: Preferences.java:98
 msgid "Greek"
@@ -839,16 +898,6 @@ msgstr "Marathi"
 msgid "Message"
 msgstr "Messaggio"
 
-#: ../../../processing/app/Sketch.java:1646
-#, java-format
-msgid "Minimum Memory usage: {0} bytes"
-msgstr ""
-
-#: ../../../processing/app/Sketch.java:1643
-#, java-format
-msgid "Minimum Memory usage: {0} bytes (of a {1} byte maximum) - {2}%% used"
-msgstr ""
-
 #: Sketch.java:1712
 msgid "Missing the */ from the end of a /* comment */"
 msgstr "Manca */ alla fine di un /* commento */"
@@ -864,6 +913,10 @@ msgstr "Sto spostando"
 #: Sketch.java:282
 msgid "Name for new file:"
 msgstr "Nome del nuovo file:"
+
+#: ../../../processing/app/Preferences.java:155
+msgid "Nepali"
+msgstr ""
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:51
 msgid "Network upload using programmer not supported"
@@ -926,6 +979,11 @@ msgstr "Nessuna voce disponibile per \"{0}\" nella guida"
 msgid "No valid configured cores found! Exiting..."
 msgstr ""
 
+#: ../../../processing/app/debug/TargetPackage.java:63
+#, java-format
+msgid "No valid hardware definitions found in folder {0}."
+msgstr ""
+
 #: Base.java:191
 msgid "Non-fatal error while setting the Look & Feel."
 msgstr "Errore non fatale durante la configurazione dell'aspetto grafico"
@@ -933,10 +991,6 @@ msgstr "Errore non fatale durante la configurazione dell'aspetto grafico"
 #: Sketch.java:396 Sketch.java:410 Sketch.java:419 Sketch.java:859
 msgid "Nope"
 msgstr "Per niente"
-
-#: Preferences.java:108
-msgid "Norwegian"
-msgstr "Norvegese"
 
 #: ../../../processing/app/Preferences.java:108
 msgid "Norwegian Bokmål"
@@ -1009,9 +1063,17 @@ msgstr "Polacco"
 msgid "Port"
 msgstr ""
 
-#: Preferences.java:111 Preferences.java:112
-msgid "Portuguese"
-msgstr "Portoghese"
+#: ../../../processing/app/Preferences.java:157
+msgid "Portugese"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:130
+msgid "Portuguese (Brazil)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:131
+msgid "Portuguese (Portugal)"
+msgstr ""
 
 #: Preferences.java:295 Editor.java:583
 msgid "Preferences"
@@ -1271,6 +1333,12 @@ msgid ""
 "tips on reducing it."
 msgstr "Sketch troppo grande; vedi http://www.arduino.cc/en/Guide/Troubleshooting#size per consigli su come ridurne la dimensione"
 
+#: ../../../processing/app/Sketch.java:1639
+#, java-format
+msgid ""
+"Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} bytes."
+msgstr ""
+
 #: Editor.java:510
 msgid "Sketchbook"
 msgstr "Cartella degli sketch"
@@ -1282,6 +1350,10 @@ msgstr "La cartella degli sketch è scomparsa"
 #: Preferences.java:315
 msgid "Sketchbook location:"
 msgstr "Percorso della cartella degli sketch:"
+
+#: ../../../processing/app/Preferences.java:134
+msgid "Slovenian"
+msgstr ""
 
 #: Sketch.java:275 Sketch.java:304 Sketch.java:578 Sketch.java:967
 msgid ""
@@ -1308,6 +1380,10 @@ msgstr "Spagnolo"
 #: Base.java:540
 msgid "Sunshine"
 msgstr "Sole splendente"
+
+#: ../../../processing/app/Preferences.java:136
+msgid "Swedish"
+msgstr ""
 
 #: Preferences.java:84
 msgid "System Default"
@@ -1449,7 +1525,7 @@ msgid "Unable to connect: is the sketch using the bridge?"
 msgstr ""
 
 #: ../../../processing/app/NetworkMonitor.java:130
-msgid "Unable to connect: retrying ("
+msgid "Unable to connect: retrying"
 msgstr ""
 
 #: ../../../processing/app/Editor.java:2526
@@ -1527,6 +1603,10 @@ msgstr "Verifica e compila"
 #: Preferences.java:400
 msgid "Verify code after upload"
 msgstr "Verifica il codice dopo il caricamento"
+
+#: ../../../processing/app/Preferences.java:140
+msgid "Vietnamese"
+msgstr ""
 
 #: Editor.java:1105
 msgid "Visit Arduino.cc"
@@ -1753,10 +1833,6 @@ msgstr "serialMenu è nullo"
 msgid ""
 "the selected serial port {0} does not exist or your board is not connected"
 msgstr "La porta seriale selezionata {0} non esiste o la scheda non è connessa"
-
-#: ../../../processing/app/EditorStatus.java:456
-msgid "to clipboard"
-msgstr ""
 
 #: Preferences.java:391
 msgid "upload"

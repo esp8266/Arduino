@@ -913,6 +913,10 @@ msgstr ""
 msgid "Low memory available, stability problems may occur"
 msgstr ""
 
+#: ../../../processing/app/Preferences.java:156
+msgid "Marathi"
+msgstr ""
+
 #: Base.java:1826
 msgid "Message"
 msgstr "संदेश"
@@ -1419,6 +1423,10 @@ msgstr ""
 
 #: Preferences.java:83
 msgid "System Default"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:137
+msgid "Tamil"
 msgstr ""
 
 #: debug/Compiler.java:471

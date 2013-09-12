@@ -174,6 +174,14 @@ msgstr "\"{0}\" ı silmek istediğinize emin misiniz?"
 msgid "Are you sure you want to delete this sketch?"
 msgstr "Bu taslağı silmek istediğinizden emin misiniz?"
 
+#: ../../../processing/app/Preferences.java:145
+msgid "Armenian"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:146
+msgid "Asturian"
+msgstr ""
+
 #: tools/AutoFormat.java:91
 msgid "Auto Format"
 msgstr "Otomatik Düzenle"
@@ -215,9 +223,8 @@ msgstr "Hatalı satır: {0}"
 msgid "Bad file selected"
 msgstr "Seçilen dosya uygun değil"
 
-#: ../../../processing/app/Sketch.java:1638
-#, java-format
-msgid "Binary sketch size: {0} bytes (of a {1} byte maximum) - {2}%% used"
+#: ../../../processing/app/Preferences.java:98
+msgid "Belarusian"
 msgstr ""
 
 #: ../../../processing/app/Base.java:1433
@@ -236,6 +243,10 @@ msgstr ""
 msgid "Board: "
 msgstr ""
 
+#: ../../../processing/app/Preferences.java:147
+msgid "Bosnian"
+msgstr ""
+
 #: SerialMonitor.java:112
 msgid "Both NL & CR"
 msgstr "NL & CR birlikte"
@@ -250,6 +261,10 @@ msgstr "Derleme klasörü kayıp yada yazmaya karşı korumalı"
 
 #: ../../../processing/app/Preferences.java:80
 msgid "Bulgarian"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:148
+msgid "Burmese (Myanmar)"
 msgstr ""
 
 #: Editor.java:708
@@ -288,6 +303,22 @@ msgstr "Katalan dili"
 #: Preferences.java:419
 msgid "Check for updates on startup"
 msgstr "Açılışta güncellemeleri kontrol et"
+
+#: ../../../processing/app/Preferences.java:149
+msgid "Chinese (China)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:150
+msgid "Chinese (Hong Kong)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:151
+msgid "Chinese (Taiwan)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:152
+msgid "Chinese (Taiwan) (Big5)"
+msgstr ""
 
 #: Preferences.java:88
 msgid "Chinese Simplified"
@@ -530,6 +561,10 @@ msgstr "Yükleme tamamlandı."
 msgid "Dutch"
 msgstr "Hollandaca"
 
+#: ../../../processing/app/Preferences.java:153
+msgid "Dutch (Netherlands)"
+msgstr ""
+
 #: Editor.java:1130
 msgid "Edit"
 msgstr "Düzenle"
@@ -545,6 +580,10 @@ msgstr "Editör dili:"
 #: Preferences.java:92
 msgid "English"
 msgstr "İngilizce"
+
+#: ../../../processing/app/Preferences.java:154
+msgid "English (United Kingdom)"
+msgstr ""
 
 #: Editor.java:1062
 msgid "Environment"
@@ -635,6 +674,10 @@ msgstr ""
 msgid "Estonian"
 msgstr "Estonca"
 
+#: ../../../processing/app/Preferences.java:109
+msgid "Estonian (Estonia)"
+msgstr ""
+
 #: Editor.java:516
 msgid "Examples"
 msgstr "Örnekler"
@@ -679,6 +722,10 @@ msgstr "Bul..."
 msgid "Find:"
 msgstr "Bul:"
 
+#: ../../../processing/app/Preferences.java:111
+msgid "Finnish"
+msgstr ""
+
 #: tools/FixEncoding.java:41 tools/FixEncoding.java:58
 #: tools/FixEncoding.java:79
 msgid "Fix Encoding & Reload"
@@ -717,6 +764,18 @@ msgstr "Almanca"
 #: Editor.java:1054
 msgid "Getting Started"
 msgstr "Başlarken..."
+
+#: ../../../processing/app/Sketch.java:1646
+#, java-format
+msgid ""
+"Global variables use {0} bytes ({2}%%) of dynamic memory, leaving {3} bytes "
+"for local variables. Maximum is {1} bytes."
+msgstr ""
+
+#: ../../../processing/app/Sketch.java:1651
+#, java-format
+msgid "Global variables use {0} bytes of dynamic memory."
+msgstr ""
 
 #: Preferences.java:98
 msgid "Greek"
@@ -840,16 +899,6 @@ msgstr "Marati"
 msgid "Message"
 msgstr "Mesaj"
 
-#: ../../../processing/app/Sketch.java:1646
-#, java-format
-msgid "Minimum Memory usage: {0} bytes"
-msgstr ""
-
-#: ../../../processing/app/Sketch.java:1643
-#, java-format
-msgid "Minimum Memory usage: {0} bytes (of a {1} byte maximum) - {2}%% used"
-msgstr ""
-
 #: Sketch.java:1712
 msgid "Missing the */ from the end of a /* comment */"
 msgstr "/* yorum */ sonunda */ eksik"
@@ -865,6 +914,10 @@ msgstr "Taşınıyor"
 #: Sketch.java:282
 msgid "Name for new file:"
 msgstr "Yeni dosya için isim:"
+
+#: ../../../processing/app/Preferences.java:155
+msgid "Nepali"
+msgstr ""
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:51
 msgid "Network upload using programmer not supported"
@@ -927,6 +980,11 @@ msgstr "\"{0}\" için referans bulunmuyor"
 msgid "No valid configured cores found! Exiting..."
 msgstr ""
 
+#: ../../../processing/app/debug/TargetPackage.java:63
+#, java-format
+msgid "No valid hardware definitions found in folder {0}."
+msgstr ""
+
 #: Base.java:191
 msgid "Non-fatal error while setting the Look & Feel."
 msgstr "Görünüm ayarlanırken önemsiz hata oluştu."
@@ -934,10 +992,6 @@ msgstr "Görünüm ayarlanırken önemsiz hata oluştu."
 #: Sketch.java:396 Sketch.java:410 Sketch.java:419 Sketch.java:859
 msgid "Nope"
 msgstr "Yok"
-
-#: Preferences.java:108
-msgid "Norwegian"
-msgstr "Norveççe"
 
 #: ../../../processing/app/Preferences.java:108
 msgid "Norwegian Bokmål"
@@ -1010,9 +1064,17 @@ msgstr "Polonyaca"
 msgid "Port"
 msgstr ""
 
-#: Preferences.java:111 Preferences.java:112
-msgid "Portuguese"
-msgstr "Portekizce"
+#: ../../../processing/app/Preferences.java:157
+msgid "Portugese"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:130
+msgid "Portuguese (Brazil)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:131
+msgid "Portuguese (Portugal)"
+msgstr ""
 
 #: Preferences.java:295 Editor.java:583
 msgid "Preferences"
@@ -1272,6 +1334,12 @@ msgid ""
 "tips on reducing it."
 msgstr "Taslak çok büyük; boyutunu azaltma ipuçları için şu adresi ziyaret edin: http://www.arduino.cc/en/Guide/Troubleshooting#size"
 
+#: ../../../processing/app/Sketch.java:1639
+#, java-format
+msgid ""
+"Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} bytes."
+msgstr ""
+
 #: Editor.java:510
 msgid "Sketchbook"
 msgstr "Taslak defteri"
@@ -1283,6 +1351,10 @@ msgstr "Çalışma klasörü yok oldu"
 #: Preferences.java:315
 msgid "Sketchbook location:"
 msgstr "Taslak defteri konumu:"
+
+#: ../../../processing/app/Preferences.java:134
+msgid "Slovenian"
+msgstr ""
 
 #: Sketch.java:275 Sketch.java:304 Sketch.java:578 Sketch.java:967
 msgid ""
@@ -1309,6 +1381,10 @@ msgstr "İspanyolca"
 #: Base.java:540
 msgid "Sunshine"
 msgstr "Gün Işığı"
+
+#: ../../../processing/app/Preferences.java:136
+msgid "Swedish"
+msgstr ""
 
 #: Preferences.java:84
 msgid "System Default"
@@ -1450,7 +1526,7 @@ msgid "Unable to connect: is the sketch using the bridge?"
 msgstr ""
 
 #: ../../../processing/app/NetworkMonitor.java:130
-msgid "Unable to connect: retrying ("
+msgid "Unable to connect: retrying"
 msgstr ""
 
 #: ../../../processing/app/Editor.java:2526
@@ -1528,6 +1604,10 @@ msgstr "Doğrulanıyor/Derleniyor"
 #: Preferences.java:400
 msgid "Verify code after upload"
 msgstr "Yükledikten sonra kodu doğrula"
+
+#: ../../../processing/app/Preferences.java:140
+msgid "Vietnamese"
+msgstr ""
 
 #: Editor.java:1105
 msgid "Visit Arduino.cc"
@@ -1754,10 +1834,6 @@ msgstr "serialMenu değeri boş"
 msgid ""
 "the selected serial port {0} does not exist or your board is not connected"
 msgstr "Seçilen seri port \"{0}\" bağlı olan kartınızda mevcut değil"
-
-#: ../../../processing/app/EditorStatus.java:456
-msgid "to clipboard"
-msgstr ""
 
 #: Preferences.java:391
 msgid "upload"

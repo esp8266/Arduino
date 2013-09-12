@@ -171,6 +171,14 @@ msgstr "Vai tiešām vēlaties izdzēst \"{0}\"?"
 msgid "Are you sure you want to delete this sketch?"
 msgstr "Vai tiešām vēlaties izdzēst šo skici?"
 
+#: ../../../processing/app/Preferences.java:145
+msgid "Armenian"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:146
+msgid "Asturian"
+msgstr ""
+
 #: tools/AutoFormat.java:91
 msgid "Auto Format"
 msgstr "Automātiskā formatēšana"
@@ -212,9 +220,8 @@ msgstr "Kļūdas rinda: {0}"
 msgid "Bad file selected"
 msgstr "Izvēlētais fails nav derīgs"
 
-#: ../../../processing/app/Sketch.java:1638
-#, java-format
-msgid "Binary sketch size: {0} bytes (of a {1} byte maximum) - {2}%% used"
+#: ../../../processing/app/Preferences.java:98
+msgid "Belarusian"
 msgstr ""
 
 #: ../../../processing/app/Base.java:1433
@@ -233,6 +240,10 @@ msgstr ""
 msgid "Board: "
 msgstr ""
 
+#: ../../../processing/app/Preferences.java:147
+msgid "Bosnian"
+msgstr ""
+
 #: SerialMonitor.java:112
 msgid "Both NL & CR"
 msgstr "Abi - jauna rinda un kursora atgriešanās"
@@ -247,6 +258,10 @@ msgstr "Būvējamā mape pazuda, vai nevarēja tajā ierakstīt"
 
 #: ../../../processing/app/Preferences.java:80
 msgid "Bulgarian"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:148
+msgid "Burmese (Myanmar)"
 msgstr ""
 
 #: Editor.java:708
@@ -285,6 +300,22 @@ msgstr "Catalan"
 #: Preferences.java:419
 msgid "Check for updates on startup"
 msgstr "Pārbaudīt atjauninājumus palaišanas laikā"
+
+#: ../../../processing/app/Preferences.java:149
+msgid "Chinese (China)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:150
+msgid "Chinese (Hong Kong)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:151
+msgid "Chinese (Taiwan)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:152
+msgid "Chinese (Taiwan) (Big5)"
+msgstr ""
 
 #: Preferences.java:88
 msgid "Chinese Simplified"
@@ -527,6 +558,10 @@ msgstr "Augšupielādēšana pabeigta."
 msgid "Dutch"
 msgstr "Dutch"
 
+#: ../../../processing/app/Preferences.java:153
+msgid "Dutch (Netherlands)"
+msgstr ""
+
 #: Editor.java:1130
 msgid "Edit"
 msgstr "Rediģēt"
@@ -542,6 +577,10 @@ msgstr "Redaktora valoda:"
 #: Preferences.java:92
 msgid "English"
 msgstr "English"
+
+#: ../../../processing/app/Preferences.java:154
+msgid "English (United Kingdom)"
+msgstr ""
 
 #: Editor.java:1062
 msgid "Environment"
@@ -632,6 +671,10 @@ msgstr ""
 msgid "Estonian"
 msgstr "Estonian"
 
+#: ../../../processing/app/Preferences.java:109
+msgid "Estonian (Estonia)"
+msgstr ""
+
 #: Editor.java:516
 msgid "Examples"
 msgstr "Piemēri"
@@ -676,6 +719,10 @@ msgstr "Meklēt..."
 msgid "Find:"
 msgstr "Meklēt:"
 
+#: ../../../processing/app/Preferences.java:111
+msgid "Finnish"
+msgstr ""
+
 #: tools/FixEncoding.java:41 tools/FixEncoding.java:58
 #: tools/FixEncoding.java:79
 msgid "Fix Encoding & Reload"
@@ -714,6 +761,18 @@ msgstr "German"
 #: Editor.java:1054
 msgid "Getting Started"
 msgstr "Pirmie soļi"
+
+#: ../../../processing/app/Sketch.java:1646
+#, java-format
+msgid ""
+"Global variables use {0} bytes ({2}%%) of dynamic memory, leaving {3} bytes "
+"for local variables. Maximum is {1} bytes."
+msgstr ""
+
+#: ../../../processing/app/Sketch.java:1651
+#, java-format
+msgid "Global variables use {0} bytes of dynamic memory."
+msgstr ""
 
 #: Preferences.java:98
 msgid "Greek"
@@ -837,16 +896,6 @@ msgstr "Marathi"
 msgid "Message"
 msgstr "Ziņojums"
 
-#: ../../../processing/app/Sketch.java:1646
-#, java-format
-msgid "Minimum Memory usage: {0} bytes"
-msgstr ""
-
-#: ../../../processing/app/Sketch.java:1643
-#, java-format
-msgid "Minimum Memory usage: {0} bytes (of a {1} byte maximum) - {2}%% used"
-msgstr ""
-
 #: Sketch.java:1712
 msgid "Missing the */ from the end of a /* comment */"
 msgstr "Trūkst */ no /* komentārs */ beigām"
@@ -862,6 +911,10 @@ msgstr "Pārvieto"
 #: Sketch.java:282
 msgid "Name for new file:"
 msgstr "Jaunā faila nosaukums:"
+
+#: ../../../processing/app/Preferences.java:155
+msgid "Nepali"
+msgstr ""
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:51
 msgid "Network upload using programmer not supported"
@@ -924,6 +977,11 @@ msgstr "Nevar atrast atsauci priekš \"{0}\""
 msgid "No valid configured cores found! Exiting..."
 msgstr ""
 
+#: ../../../processing/app/debug/TargetPackage.java:63
+#, java-format
+msgid "No valid hardware definitions found in folder {0}."
+msgstr ""
+
 #: Base.java:191
 msgid "Non-fatal error while setting the Look & Feel."
 msgstr "Radās nefatāla kļūda, mēģinot iestatīt Skatu un sajūtu."
@@ -931,10 +989,6 @@ msgstr "Radās nefatāla kļūda, mēģinot iestatīt Skatu un sajūtu."
 #: Sketch.java:396 Sketch.java:410 Sketch.java:419 Sketch.java:859
 msgid "Nope"
 msgstr "Vēl ne"
-
-#: Preferences.java:108
-msgid "Norwegian"
-msgstr "Norwegian"
 
 #: ../../../processing/app/Preferences.java:108
 msgid "Norwegian Bokmål"
@@ -1007,9 +1061,17 @@ msgstr "Polish"
 msgid "Port"
 msgstr ""
 
-#: Preferences.java:111 Preferences.java:112
-msgid "Portuguese"
-msgstr "Portuguese"
+#: ../../../processing/app/Preferences.java:157
+msgid "Portugese"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:130
+msgid "Portuguese (Brazil)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:131
+msgid "Portuguese (Portugal)"
+msgstr ""
 
 #: Preferences.java:295 Editor.java:583
 msgid "Preferences"
@@ -1269,6 +1331,12 @@ msgid ""
 "tips on reducing it."
 msgstr "Skice ir pārāk liela; apmeklējiet http://www.arduino.cc/en/Guide/Troubleshooting#size padomiem, kā to samazināt."
 
+#: ../../../processing/app/Sketch.java:1639
+#, java-format
+msgid ""
+"Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} bytes."
+msgstr ""
+
 #: Editor.java:510
 msgid "Sketchbook"
 msgstr "Skiču burtnīca"
@@ -1280,6 +1348,10 @@ msgstr "Skiču burtnīcas mape ir pazudusi"
 #: Preferences.java:315
 msgid "Sketchbook location:"
 msgstr "Skiču burtnīcas atrašanās vieta:"
+
+#: ../../../processing/app/Preferences.java:134
+msgid "Slovenian"
+msgstr ""
 
 #: Sketch.java:275 Sketch.java:304 Sketch.java:578 Sketch.java:967
 msgid ""
@@ -1306,6 +1378,10 @@ msgstr "Spanish"
 #: Base.java:540
 msgid "Sunshine"
 msgstr "Saules gaisma"
+
+#: ../../../processing/app/Preferences.java:136
+msgid "Swedish"
+msgstr ""
 
 #: Preferences.java:84
 msgid "System Default"
@@ -1447,7 +1523,7 @@ msgid "Unable to connect: is the sketch using the bridge?"
 msgstr ""
 
 #: ../../../processing/app/NetworkMonitor.java:130
-msgid "Unable to connect: retrying ("
+msgid "Unable to connect: retrying"
 msgstr ""
 
 #: ../../../processing/app/Editor.java:2526
@@ -1525,6 +1601,10 @@ msgstr "Pārbaudīt un kompilēt"
 #: Preferences.java:400
 msgid "Verify code after upload"
 msgstr "Pārbaudīt kodu pēc augšupielādes"
+
+#: ../../../processing/app/Preferences.java:140
+msgid "Vietnamese"
+msgstr ""
 
 #: Editor.java:1105
 msgid "Visit Arduino.cc"
@@ -1751,10 +1831,6 @@ msgstr "serialMenu ir tukšs"
 msgid ""
 "the selected serial port {0} does not exist or your board is not connected"
 msgstr "izvēlētais seriālais ports {0} neeksistē, vai arī jūsu plate nav pievienota"
-
-#: ../../../processing/app/EditorStatus.java:456
-msgid "to clipboard"
-msgstr ""
 
 #: Preferences.java:391
 msgid "upload"

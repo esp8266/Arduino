@@ -836,6 +836,10 @@ msgstr ""
 msgid "Help"
 msgstr "Tulong"
 
+#: ../../../processing/app/Preferences.java:119
+msgid "Hindi"
+msgstr ""
+
 #: Sketch.java:299
 msgid ""
 "How about saving the sketch first \n"
@@ -918,6 +922,10 @@ msgstr ""
 
 #: ../../../processing/app/Sketch.java:1660
 msgid "Low memory available, stability problems may occur"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:156
+msgid "Marathi"
 msgstr ""
 
 #: Base.java:1826
@@ -1428,6 +1436,10 @@ msgstr ""
 
 #: Preferences.java:83
 msgid "System Default"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:137
+msgid "Tamil"
 msgstr ""
 
 #: debug/Compiler.java:471

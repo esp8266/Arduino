@@ -131,7 +131,7 @@ public class Preferences {
       new Language(_("Portuguese (Portugal)"), "Português (Portugal)", "pt_PT"),
       new Language(_("Romanian"), "Română", "ro"),
       new Language(_("Russian"), "Русский", "ru"),
-      new Language(_("Slovenian"), "Slovenščina", "sl_SL"),
+      new Language(_("Slovenian"), "Slovenščina", "sl_SI"),
       new Language(_("Spanish"), "Español", "es"),
       new Language(_("Swedish"), "Svenska", "sv"),
       new Language(_("Tamil"), "தமிழ்", "ta"),
