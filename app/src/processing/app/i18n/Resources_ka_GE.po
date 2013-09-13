@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2012-11-12 19:16+0000\n"
-"Last-Translator: DrAcid <acidlabz@gmail.com>\n"
+"PO-Revision-Date: 2013-09-10 10:35+0000\n"
+"Last-Translator: cmaglie <c.maglie@arduino.cc>\n"
 "Language-Team: Georgian (Georgia) (http://www.transifex.com/projects/p/arduino-ide-15/language/ka_GE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -133,11 +133,11 @@ msgstr "ჩანახატის არქივში გადატან�
 
 #: ../../../processing/app/I18n.java:83
 msgid "Arduino ARM (32-bits) Boards"
-msgstr ""
+msgstr "Arduino ARM (32-ბიტი) დაფები"
 
 #: ../../../processing/app/I18n.java:82
 msgid "Arduino AVR Boards"
-msgstr ""
+msgstr "Arduino AVR დაფები"
 
 #: Base.java:1682
 msgid ""
@@ -171,11 +171,11 @@ msgstr "ნამდვილად გსურთ \"{0}\"-ის წაშლ�
 msgid "Are you sure you want to delete this sketch?"
 msgstr "ნამდვილად გსურთ მოცემული ჩანახატის წაშლა?"
 
-#: ../../../processing/app/Preferences.java:145
+#: ../../../processing/app/Preferences.java:137
 msgid "Armenian"
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:146
+#: ../../../processing/app/Preferences.java:138
 msgid "Asturian"
 msgstr ""
 
@@ -220,33 +220,33 @@ msgstr "ცუდი შეცდომის ხაზი:{0}"
 msgid "Bad file selected"
 msgstr "არჩეულია არასწორი ფაილი"
 
-#: ../../../processing/app/Preferences.java:98
+#: ../../../processing/app/Preferences.java:139
 msgid "Belarusian"
 msgstr ""
 
 #: ../../../processing/app/Base.java:1433
 #: ../../../processing/app/Editor.java:707
 msgid "Board"
-msgstr ""
+msgstr "დაფა"
 
 #: ../../../processing/app/debug/TargetBoard.java:42
 #, java-format
 msgid ""
-"Board {0}:{1}:{2} doesn''t define a ''build.board'' preference. Auto-set to: "
-"{3}"
+"Board {0}:{1}:{2} doesn''t define a ''build.board'' preference. Auto-set to:"
+" {3}"
 msgstr ""
 
 #: ../../../processing/app/EditorStatus.java:472
 msgid "Board: "
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:147
+#: ../../../processing/app/Preferences.java:140
 msgid "Bosnian"
 msgstr ""
 
 #: SerialMonitor.java:112
 msgid "Both NL & CR"
-msgstr "ორივე NL & CR"
+msgstr "ორივე NL და CR"
 
 #: Preferences.java:81
 msgid "Browse"
@@ -258,9 +258,9 @@ msgstr "ასაწყობი საქაღალდი არ მოიძ
 
 #: ../../../processing/app/Preferences.java:80
 msgid "Bulgarian"
-msgstr ""
+msgstr "ბულგარული"
 
-#: ../../../processing/app/Preferences.java:148
+#: ../../../processing/app/Preferences.java:141
 msgid "Burmese (Myanmar)"
 msgstr ""
 
@@ -274,11 +274,11 @@ msgstr "ჩამტვირთველის ჩაწერა I/O დაფ
 
 #: ../../../processing/app/Base.java:368
 msgid "Can't open source sketch!"
-msgstr ""
+msgstr "ვერ მოხერხდა პირველწყაროს ჩანახატის გახსნა!"
 
 #: ../../../processing/app/Preferences.java:92
 msgid "Canadian French"
-msgstr ""
+msgstr "კანადური ფრანგული"
 
 #: Preferences.java:79 Sketch.java:585 Sketch.java:737 Sketch.java:1042
 #: Editor.java:2064 Editor.java:2145 Editor.java:2465
@@ -301,19 +301,19 @@ msgstr "კატალონიური"
 msgid "Check for updates on startup"
 msgstr "გაშვებისას განახლებებზე შემოწმება"
 
-#: ../../../processing/app/Preferences.java:149
+#: ../../../processing/app/Preferences.java:142
 msgid "Chinese (China)"
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:150
+#: ../../../processing/app/Preferences.java:142
 msgid "Chinese (Hong Kong)"
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:151
+#: ../../../processing/app/Preferences.java:144
 msgid "Chinese (Taiwan)"
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:152
+#: ../../../processing/app/Preferences.java:143
 msgid "Chinese (Taiwan) (Big5)"
 msgstr ""
 
@@ -498,7 +498,7 @@ msgstr "არჩეულ პორტზე არ მოძებნა დ�
 
 #: ../../../processing/app/Preferences.java:82
 msgid "Croatian"
-msgstr ""
+msgstr "ხორვატული"
 
 #: Editor.java:1149 Editor.java:2699
 msgid "Cut"
@@ -506,7 +506,7 @@ msgstr "ამოჭრა"
 
 #: ../../../processing/app/Preferences.java:83
 msgid "Czech"
-msgstr ""
+msgstr "ჩეხური"
 
 #: Preferences.java:90
 msgid "Danish"
@@ -558,7 +558,7 @@ msgstr "ატვირთვა დასრულებულია."
 msgid "Dutch"
 msgstr "ნიდერლანდური"
 
-#: ../../../processing/app/Preferences.java:153
+#: ../../../processing/app/Preferences.java:144
 msgid "Dutch (Netherlands)"
 msgstr ""
 
@@ -578,7 +578,7 @@ msgstr "რედაქტორის ენა:"
 msgid "English"
 msgstr "ინგლისური"
 
-#: ../../../processing/app/Preferences.java:154
+#: ../../../processing/app/Preferences.java:145
 msgid "English (United Kingdom)"
 msgstr ""
 
@@ -671,7 +671,7 @@ msgstr ""
 msgid "Estonian"
 msgstr "ესტონური"
 
-#: ../../../processing/app/Preferences.java:109
+#: ../../../processing/app/Preferences.java:146
 msgid "Estonian (Estonia)"
 msgstr ""
 
@@ -719,7 +719,7 @@ msgstr "ძიება..."
 msgid "Find:"
 msgstr "ძიება:"
 
-#: ../../../processing/app/Preferences.java:111
+#: ../../../processing/app/Preferences.java:147
 msgid "Finnish"
 msgstr ""
 
@@ -752,7 +752,7 @@ msgstr "გალისიური"
 
 #: ../../../processing/app/Preferences.java:94
 msgid "Georgian"
-msgstr ""
+msgstr "ქართული"
 
 #: Preferences.java:97
 msgid "German"
@@ -796,7 +796,7 @@ msgstr "Guide_Windows.html"
 
 #: ../../../processing/app/Preferences.java:95
 msgid "Hebrew"
-msgstr ""
+msgstr "ებრაული"
 
 #: Editor.java:1015
 msgid "Help"
@@ -912,7 +912,7 @@ msgstr "გადაიტანება"
 msgid "Name for new file:"
 msgstr "ახალი ფაილის სახელი:"
 
-#: ../../../processing/app/Preferences.java:155
+#: ../../../processing/app/Preferences.java:149
 msgid "Nepali"
 msgstr ""
 
@@ -984,7 +984,7 @@ msgstr ""
 
 #: Base.java:191
 msgid "Non-fatal error while setting the Look & Feel."
-msgstr "შეცდომა გაფორმების დაყენებისას"
+msgstr "შეცდომა გაფორმების დაყენებისას."
 
 #: Sketch.java:396 Sketch.java:410 Sketch.java:419 Sketch.java:859
 msgid "Nope"
@@ -992,7 +992,7 @@ msgstr "არა"
 
 #: ../../../processing/app/Preferences.java:108
 msgid "Norwegian Bokmål"
-msgstr ""
+msgstr "ნორვეგიული ბუკმოლი"
 
 #: ../../../processing/app/Sketch.java:1656
 msgid ""
@@ -1061,15 +1061,15 @@ msgstr "პოლონური"
 msgid "Port"
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:157
+#: ../../../processing/app/Preferences.java:151
 msgid "Portugese"
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:130
+#: ../../../processing/app/Preferences.java:127
 msgid "Portuguese (Brazil)"
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:131
+#: ../../../processing/app/Preferences.java:128
 msgid "Portuguese (Portugal)"
 msgstr ""
 
@@ -1107,7 +1107,7 @@ msgstr "შეცდომა URL მისამართის გახსნ
 
 #: Base.java:227
 msgid "Problem Setting the Platform"
-msgstr "შეცდომა პლატფორმის მინიჭების დროს"
+msgstr "შეცდომა პლატფორმის მინიჭებისას"
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:136
 msgid "Problem accessing board folder /www/sd"
@@ -1144,7 +1144,7 @@ msgstr "Processing-ს შეუძლია გახსნას მხოლ�
 
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
-msgstr ""
+msgstr "პროცესორი"
 
 #: Editor.java:704
 msgid "Programmer"
@@ -1334,7 +1334,8 @@ msgstr "ჩანახატი მეტისმეტად დიდია;
 #: ../../../processing/app/Sketch.java:1639
 #, java-format
 msgid ""
-"Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} bytes."
+"Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} "
+"bytes."
 msgstr ""
 
 #: Editor.java:510
@@ -1343,13 +1344,13 @@ msgstr "ალბომი"
 
 #: Base.java:258
 msgid "Sketchbook folder disappeared"
-msgstr "ალბომის საქაღლდე გაქრა"
+msgstr "ალბომის საქაღლდე არ მოიძებნა"
 
 #: Preferences.java:315
 msgid "Sketchbook location:"
 msgstr "ალბომის მდებარეობა:"
 
-#: ../../../processing/app/Preferences.java:134
+#: ../../../processing/app/Preferences.java:152
 msgid "Slovenian"
 msgstr ""
 
@@ -1379,7 +1380,7 @@ msgstr "ესპანური"
 msgid "Sunshine"
 msgstr "მზიანი ამინდია"
 
-#: ../../../processing/app/Preferences.java:136
+#: ../../../processing/app/Preferences.java:153
 msgid "Swedish"
 msgstr ""
 
@@ -1409,7 +1410,7 @@ msgstr "Udp კლასის ახალი სახელია EthernetUdp
 
 #: Base.java:192
 msgid "The error message follows, however Arduino should run fine."
-msgstr "შეცდომის აღწერა მოყვანილი იქნება, თუმცა Arduino ჩვეულებრივად უნდა გაიშვას."
+msgstr "შეცდომის აღწერა მოყვანილია, თუმცა Arduino ჩვეულებრივად უნდა გაიშვას."
 
 #: Editor.java:2147
 #, java-format
@@ -1443,7 +1444,7 @@ msgid ""
 "The selected sketch no longer exists.\n"
 "You may need to restart Arduino to update\n"
 "the sketchbook menu."
-msgstr "არჩეული ჩანახატი აღარ არსებობს.\nგადატვირთეთ Arduino იმისთვის, რომ\nშესრულდეს ალბომის განახლება."
+msgstr "არჩეული ჩანახატი აღარ არსებობს.\nგადატვირთეთ Arduino იმისთვის, რომ\nშესრულდეს ალბომის მენიუს განახლება."
 
 #: Base.java:1430
 #, java-format
@@ -1503,7 +1504,7 @@ msgstr "შესაძლო დაბრკოლებები"
 
 #: ../../../processing/app/Preferences.java:117
 msgid "Turkish"
-msgstr ""
+msgstr "თურქული"
 
 #: ../../../processing/app/Editor.java:2507
 msgid "Type board password to access its console"
@@ -1515,7 +1516,7 @@ msgstr ""
 
 #: ../../../processing/app/Preferences.java:118
 msgid "Ukrainian"
-msgstr ""
+msgstr "უკრაინული"
 
 #: ../../../processing/app/Editor.java:2524
 #: ../../../processing/app/NetworkMonitor.java:145
@@ -1602,7 +1603,7 @@ msgstr "შემოწმება / დაკომპილება"
 msgid "Verify code after upload"
 msgstr "კოდის შემოწმება ატვირთვის შემდეგ"
 
-#: ../../../processing/app/Preferences.java:140
+#: ../../../processing/app/Preferences.java:154
 msgid "Vietnamese"
 msgstr ""
 
@@ -1675,7 +1676,7 @@ msgstr ""
 msgid ""
 "You've reached the limit for auto naming of new sketches\n"
 "for the day. How about going for a walk instead?"
-msgstr "ამჟამად ჩანახატების ავტოდარქმევის ფუნქცია\nდაიღალა. არ გსურთ გაისეირნოთ?"
+msgstr "ამჟამად ჩანახატების ავტოდარქმევის ფუნქცია\nდაღლილია. არ გსურთ გაისეირნოთ?"
 
 #: Base.java:2638
 msgid "ZIP files or folders"
@@ -1780,7 +1781,7 @@ msgstr "http://arduino.cc/"
 
 #: ../../../processing/app/debug/Compiler.java:49
 msgid "http://github.com/arduino/Arduino/issues"
-msgstr ""
+msgstr "http://github.com/arduino/Arduino/issues"
 
 #: UpdateCheck.java:118
 msgid "http://www.arduino.cc/en/Main/Software"

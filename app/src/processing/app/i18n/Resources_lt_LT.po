@@ -6,72 +6,64 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-07 08:00 +0100\n"
-"PO-Revision-Date: 2012-04-09 21:25 +0100\n"
-"Last-Translator: Laimutis Palivonas <justiruotojas@yahoo.com>\n"
-"Language-Team: Lithuanian\n"
-"Language: lt\n"
+"POT-Creation-Date: 2012-03-29 10:24-0400\n"
+"PO-Revision-Date: 2013-09-10 10:35+0000\n"
+"Last-Translator: cmaglie <c.maglie@arduino.cc>\n"
+"Language-Team: Lithuanian (Lithuania) (http://www.transifex.com/projects/p/arduino-ide-15/language/lt_LT/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: lt_LT\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: Preferences.java:342 Preferences.java:358
+#: Preferences.java:358 Preferences.java:374
 msgid "  (requires restart of Arduino)"
-msgstr " (reikalauja perleisti Arduino)"
+msgstr ""
 
-#: ../../../processing/app/debug/Compiler.java:473
+#: debug/Compiler.java:455
 msgid "'Keyboard' only supported on the Arduino Leonardo"
 msgstr ""
 
-#: ../../../processing/app/debug/Compiler.java:468
+#: debug/Compiler.java:450
 msgid "'Mouse' only supported on the Arduino Leonardo"
 msgstr ""
 
-#: Preferences.java:462
+#: Preferences.java:478
 msgid "(edit only when Arduino is not running)"
-msgstr "(redaguoti tik tada, kai Arduino išjungtas)"
-
-#: Sketch.java:750
-msgid ".pde -> .ino"
-msgstr ".pde -> .ino"
-
-#: Base.java:772
-msgid ""
-"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p "
-"{ font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Are you "
-"sure you want to Quit?</b><p>Closing the last open sketch will quit Arduino."
 msgstr ""
-"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p "
-"{ font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Ar \n"
-"tikrai norite išeiti?</b><p>Uždarant paskutinijį atdarą projektą išsijungs Arduino \n"
-"programa."
 
-#: Editor.java:2006
+#: Sketch.java:746
+msgid ".pde -> .ino"
+msgstr ""
+
+#: Base.java:773
 msgid ""
-"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p "
-"{ font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Do you "
+"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p {"
+" font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Are you "
+"sure you want to Quit?</b><p>Closing the last open sketch will quit Arduino."
+msgstr "<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p { font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Ar tikrai norite išeiti?</b><p>Uždarius paskutini atidarytą eskizą Arduino baigs darbą."
+
+#: Editor.java:2053
+msgid ""
+"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p {"
+" font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Do you "
 "want to save changes to this sketch<BR> before closing?</b><p>If you don't "
 "save, your changes will be lost."
-msgstr ""
-"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p "
-"{ font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Ar "
-"norite išsaugoti šio projekto pakeitimus<BR> prieš išeinant?</b><p>Jei neišsaugosite, "
-"jūsų pakeitimai bus prarasti."
+msgstr "<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p { font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Ar norite išsaugoti pakeitimus šiame eskize<BR> prieš uždarant?</b><p>Jeigu ne išsaugosit, visi pakeitimai bus prarasti."
 
-#: Sketch.java:402
+#: Sketch.java:398
 #, java-format
 msgid "A file named \"{0}\" already exists in \"{1}\""
-msgstr "Failas \"{0}\" jau egzistuoja \"{1}\""
+msgstr ""
 
-#: Editor.java:2122
+#: Editor.java:2169
 #, java-format
 msgid "A folder named \"{0}\" already exists. Can't open sketch."
-msgstr "Aplankas \"{0}\" jau egzistuoja. Negalima atidaryti projekto."
+msgstr ""
 
-#: ../../../processing/app/Base.java:2894
+#: Base.java:2690
 #, java-format
 msgid "A library named {0} already exists"
 msgstr ""
@@ -81,28 +73,24 @@ msgid ""
 "A new version of Arduino is available,\n"
 "would you like to visit the Arduino download page?"
 msgstr ""
-"Yra nauja Arduino programos versija,\n"
-"ar norite eiti į Arduino atsisiuntimų tinklapį?"
 
 #: EditorConsole.java:153
 msgid ""
 "A problem occurred while trying to open the\n"
 "files used to store the console output."
 msgstr ""
-"Klaida bandant atidaryti failą,\n"
-"naudojamą konsolės išvesties saugojimui."
 
-#: Editor.java:1102
+#: Editor.java:1116
 msgid "About Arduino"
-msgstr "Apie Arduino"
-
-#: Editor.java:643
-msgid "Add File..."
-msgstr "Pridėti failą..."
-
-#: ../../../processing/app/Base.java:1102
-msgid "Add Library..."
 msgstr ""
+
+#: Editor.java:650
+msgid "Add File..."
+msgstr ""
+
+#: Base.java:963
+msgid "Add Library..."
+msgstr "Pridėti bibleoteką..."
 
 #: tools/FixEncoding.java:77
 msgid ""
@@ -110,44 +98,38 @@ msgid ""
 "Do not attempt to save this sketch as it may overwrite\n"
 "the old version. Use Open to re-open the sketch and try again.\n"
 msgstr ""
-"Klaida bandant pataisyti failo kodavimą.\n"
-"Nebandykite išsaugoti projekto, nes tai gali panaikinti seną\n"
-"versiją. Naudokite Atidaryti, kad įkelti projektą iš naujo ir bandyti dar kartą.\n"
 
-#: Base.java:221
+#: Base.java:228
 msgid ""
 "An unknown error occurred while trying to load\n"
 "platform-specific code for your machine."
-msgstr "Nežinoma klaida bandant atidaryti\n"
-"specifinį jūsų įrenginiui kodą."
-
-#: Preferences.java:84
-msgid "Arabic"
 msgstr ""
 
 #: Preferences.java:85
+msgid "Arabic"
+msgstr ""
+
+#: Preferences.java:86
 msgid "Aragonese"
 msgstr ""
 
 #: tools/Archiver.java:48
 msgid "Archive Sketch"
-msgstr "Archyvuoti projektą"
+msgstr ""
 
 #: tools/Archiver.java:109
 msgid "Archive sketch as:"
-msgstr "Archyvuoti projektą kaip:"
+msgstr ""
 
 #: tools/Archiver.java:139
 msgid "Archive sketch canceled."
-msgstr "Projekto archyvavimas atšauktas."
+msgstr ""
 
 #: tools/Archiver.java:75
 msgid ""
 "Archiving the sketch has been canceled because\n"
 "the sketch couldn't save properly."
-msgstr "" 
-"Projekto archyvavimas atšauktas, nes neimanoma\n"
-"jo tinkamai išsaugoti."
+msgstr ""
 
 #: ../../../processing/app/I18n.java:83
 msgid "Arduino ARM (32-bits) Boards"
@@ -157,144 +139,138 @@ msgstr ""
 msgid "Arduino AVR Boards"
 msgstr ""
 
-#: Base.java:1441
+#: Base.java:1682
 msgid ""
 "Arduino cannot run because it could not\n"
 "create a folder to store your settings."
 msgstr ""
-"Arduino negali veikti, nes neįmanoma\n"
-"sukurti aplanko jūsų nustatymų saugojimui."
 
-#: Base.java:1603
+#: Base.java:1889
 msgid ""
 "Arduino cannot run because it could not\n"
 "create a folder to store your sketchbook."
 msgstr ""
-"Arduino negali veikti, nes neįmanoma\n"
-"sukurti aplanko jūsų projektų saugojimui."
 
-#: Base.java:233
+#: Base.java:240
 msgid ""
 "Arduino requires a full JDK (not just a JRE)\n"
 "to run. Please install JDK 1.5 or later.\n"
 "More information can be found in the reference."
 msgstr ""
-"Arduino reikalingas pilnas JDK (nevien tik JRE).\n"
-"Prašome instaliuoti JDL 1.5 arba vėlesnį.\n"
-"Daugiau informacijos galima rasti žinyne."
 
 #: ../../../processing/app/EditorStatus.java:471
 msgid "Arduino: "
 msgstr ""
 
-#: Sketch.java:592
+#: Sketch.java:588
 #, java-format
 msgid "Are you sure you want to delete \"{0}\"?"
-msgstr "Ar tikrai norite ištrinti \"{0}\"?"
+msgstr ""
 
-#: Sketch.java:591
+#: Sketch.java:587
 msgid "Are you sure you want to delete this sketch?"
-msgstr "Ar tikrai norite ištrinti projektą?"
+msgstr ""
 
-#: ../../../processing/app/Preferences.java:145
+#: ../../../processing/app/Preferences.java:137
 msgid "Armenian"
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:146
+#: ../../../processing/app/Preferences.java:138
 msgid "Asturian"
 msgstr ""
 
 #: tools/AutoFormat.java:91
 msgid "Auto Format"
-msgstr "Automatinis formatavimas"
+msgstr ""
+
+#: tools/AutoFormat.java:934
+msgid "Auto Format Canceled: Too many left curly braces."
+msgstr ""
+
+#: tools/AutoFormat.java:925
+msgid "Auto Format Canceled: Too many left parentheses."
+msgstr ""
 
 #: tools/AutoFormat.java:931
-msgid "Auto Format Canceled: Too many left curly braces."
-msgstr "Automatinis formatavimas atšauktas: perdaug kairiųjų figūrinių skliaustų."
+msgid "Auto Format Canceled: Too many right curly braces."
+msgstr ""
 
 #: tools/AutoFormat.java:922
-msgid "Auto Format Canceled: Too many left parentheses."
-msgstr "Automatinis formatavims atšauktas: perdaug kairiųjų skliaustų."
-
-#: tools/AutoFormat.java:928
-msgid "Auto Format Canceled: Too many right curly braces."
-msgstr "Automatinis formatavimas atšauktas: perdaug dešiniųjų figūrinių skliaustų."
-
-#: tools/AutoFormat.java:919
 msgid "Auto Format Canceled: Too many right parentheses."
-msgstr "Automatinis formatavims atšauktas: perdaug dešiniųjų skliaustų."
+msgstr ""
 
-#: tools/AutoFormat.java:941
+#: tools/AutoFormat.java:944
 msgid "Auto Format finished."
-msgstr "Automatinis formatavimas baigtas."
+msgstr ""
 
-#: Preferences.java:423
+#: Preferences.java:439
 msgid "Automatically associate .ino files with Arduino"
-msgstr "Automatiškai asocijuoti .ino failus su Arduino"
+msgstr ""
 
 #: SerialMonitor.java:110
 msgid "Autoscroll"
-msgstr "Automatinis teksto slinkimas"
+msgstr ""
 
-#: Editor.java:2572
+#: Editor.java:2619
 #, java-format
 msgid "Bad error line: {0}"
-msgstr "Eilutė su klaida: {0}"
+msgstr ""
 
-#: Editor.java:2089
+#: Editor.java:2136
 msgid "Bad file selected"
-msgstr "Pasirinktas netinkamas failas"
+msgstr ""
 
-#: ../../../processing/app/Preferences.java:98
+#: ../../../processing/app/Preferences.java:139
 msgid "Belarusian"
 msgstr ""
 
-#: Editor.java:682
+#: ../../../processing/app/Base.java:1433
+#: ../../../processing/app/Editor.java:707
 msgid "Board"
-msgstr "Plokštė"
+msgstr ""
 
 #: ../../../processing/app/debug/TargetBoard.java:42
 #, java-format
 msgid ""
-"Board {0}:{1}:{2} doesn''t define a ''build.board'' preference. Auto-set to: "
-"{3}"
+"Board {0}:{1}:{2} doesn''t define a ''build.board'' preference. Auto-set to:"
+" {3}"
 msgstr ""
 
 #: ../../../processing/app/EditorStatus.java:472
 msgid "Board: "
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:147
+#: ../../../processing/app/Preferences.java:140
 msgid "Bosnian"
 msgstr ""
 
 #: SerialMonitor.java:112
 msgid "Both NL & CR"
-msgstr "Naudoti NL & CR"
+msgstr ""
 
-#: Preferences.java:80
+#: Preferences.java:81
 msgid "Browse"
-msgstr "Naršyti"
+msgstr ""
 
-#: Sketch.java:1393 Sketch.java:1424
+#: Sketch.java:1392 Sketch.java:1423
 msgid "Build folder disappeared or could not be written"
-msgstr "Programos aplankas nerastas arba neįmanoma į jį rašyti"
+msgstr ""
 
 #: ../../../processing/app/Preferences.java:80
 msgid "Bulgarian"
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:148
+#: ../../../processing/app/Preferences.java:141
 msgid "Burmese (Myanmar)"
 msgstr ""
 
-#: Editor.java:699
+#: Editor.java:708
 msgid "Burn Bootloader"
-msgstr "Įrašyti įkrovos programą"
+msgstr ""
 
-#: Editor.java:2457
+#: Editor.java:2504
 msgid "Burning bootloader to I/O Board (this may take a minute)..."
-msgstr "Į I/O plokštę įkeliama įkrovos programa (tai gali užtrukti kelias minutes)..."
+msgstr ""
 
 #: ../../../processing/app/Base.java:368
 msgid "Can't open source sketch!"
@@ -304,77 +280,77 @@ msgstr ""
 msgid "Canadian French"
 msgstr ""
 
-#: Editor.java:2017 Editor.java:2098 Editor.java:2418 Sketch.java:589
-#: Sketch.java:741 Sketch.java:1046 Preferences.java:78
+#: Preferences.java:79 Sketch.java:585 Sketch.java:737 Sketch.java:1042
+#: Editor.java:2064 Editor.java:2145 Editor.java:2465
 msgid "Cancel"
-msgstr "Atšaukti"
+msgstr ""
 
-#: Sketch.java:459
+#: Sketch.java:455
 msgid "Cannot Rename"
-msgstr "Neįmanoma pervadinti"
+msgstr ""
 
 #: SerialMonitor.java:112
 msgid "Carriage return"
-msgstr "Grįžimas (CR)"
-
-#: Preferences.java:86
-msgid "Catalan"
-msgstr "Katalonų"
-
-#: Preferences.java:403
-msgid "Check for updates on startup"
-msgstr "Paleidžiant programą tikrinti atnaujinimus"
-
-#: ../../../processing/app/Preferences.java:149
-msgid "Chinese (China)"
-msgstr ""
-
-#: ../../../processing/app/Preferences.java:150
-msgid "Chinese (Hong Kong)"
-msgstr ""
-
-#: ../../../processing/app/Preferences.java:151
-msgid "Chinese (Taiwan)"
-msgstr ""
-
-#: ../../../processing/app/Preferences.java:152
-msgid "Chinese (Taiwan) (Big5)"
 msgstr ""
 
 #: Preferences.java:87
-msgid "Chinese Simplified"
-msgstr "Kinų (supaprastinta)"
+msgid "Catalan"
+msgstr ""
+
+#: Preferences.java:419
+msgid "Check for updates on startup"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:142
+msgid "Chinese (China)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:142
+msgid "Chinese (Hong Kong)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:144
+msgid "Chinese (Taiwan)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:143
+msgid "Chinese (Taiwan) (Big5)"
+msgstr ""
 
 #: Preferences.java:88
+msgid "Chinese Simplified"
+msgstr ""
+
+#: Preferences.java:89
 msgid "Chinese Traditional"
 msgstr ""
 
-#: Editor.java:514 Editor.java:1977
+#: Editor.java:521 Editor.java:2024
 msgid "Close"
-msgstr "Uždaryti"
+msgstr ""
 
-#: Editor.java:1194 Editor.java:2702
+#: Editor.java:1208 Editor.java:2749
 msgid "Comment/Uncomment"
-msgstr "Komentuoti/Nekomentuoti"
+msgstr ""
 
-#: debug/Uploader.java:54 debug/Compiler.java:43
+#: debug/Compiler.java:49 debug/Uploader.java:45
 #, java-format
 msgid "Compiler error, please submit this code to {0}"
-msgstr "Kompiliatoriaus klaida, prašome perkelti šį kodą į {0}"
+msgstr ""
 
-#: Editor.java:1843 Sketch.java:1647
+#: Sketch.java:1608 Editor.java:1890
 msgid "Compiling sketch..."
-msgstr "Projektas kompiliuojamas..."
+msgstr ""
 
 #: EditorConsole.java:152
 msgid "Console Error"
-msgstr "Konsolės klaida"
+msgstr ""
 
-#: Editor.java:1143 Editor.java:2660
+#: Editor.java:1157 Editor.java:2707
 msgid "Copy"
-msgstr "Kopijuoti"
+msgstr ""
 
-#: Editor.java:1163 Editor.java:2676
+#: Editor.java:1177 Editor.java:2723
 msgid "Copy as HTML"
 msgstr "Kopijuoti kaip HTML"
 
@@ -382,41 +358,41 @@ msgstr "Kopijuoti kaip HTML"
 msgid "Copy error"
 msgstr ""
 
-#: Editor.java:1151 Editor.java:2668
+#: Editor.java:1165 Editor.java:2715
 msgid "Copy for Forum"
-msgstr "Kopijuoti forumui"
+msgstr ""
 
-#: Sketch.java:1093
+#: Sketch.java:1089
 #, java-format
 msgid "Could not add ''{0}'' to the sketch."
-msgstr "''{0}'' neįmanoma pridėti į projektą."
+msgstr ""
 
-#: Editor.java:2141
+#: Editor.java:2188
 msgid "Could not copy to a proper location."
-msgstr "Nepavyko nukopijuoti projekto į reikiamą aplanką."
+msgstr ""
 
-#: Editor.java:2132
+#: Editor.java:2179
 msgid "Could not create the sketch folder."
-msgstr "Nepavyko sukurti projekto aplanko."
+msgstr ""
 
-#: Editor.java:2159
+#: Editor.java:2206
 msgid "Could not create the sketch."
-msgstr "Nepavyko sukurti projekto."
+msgstr ""
 
-#: Sketch.java:621
+#: Sketch.java:617
 #, java-format
 msgid "Could not delete \"{0}\"."
-msgstr "Neįmanoma ištrinti \"{0}\"."
+msgstr ""
 
-#: Sketch.java:1070
+#: Sketch.java:1066
 #, java-format
 msgid "Could not delete the existing ''{0}'' file."
-msgstr "Neįmanoma ištrinti esamo ''{0}'' failo."
+msgstr ""
 
-#: Base.java:2247 Base.java:2270
+#: Base.java:2533 Base.java:2556
 #, java-format
 msgid "Could not delete {0}"
-msgstr "Neįmanoma ištrinti {0}"
+msgstr ""
 
 #: ../../../processing/app/debug/TargetPlatform.java:74
 #, java-format
@@ -433,97 +409,87 @@ msgstr ""
 msgid "Could not find tool {0} from package {1}"
 msgstr ""
 
-#: Base.java:1648
+#: Base.java:1934
 #, java-format
 msgid ""
 "Could not open the URL\n"
 "{0}"
-msgstr ""
-"Neįmanoma atidaryti nuorodos\n"
-"{0}"
+msgstr "Neįmanoma atidaryti nuorodą\n{0}"
 
-#: Base.java:1672
+#: Base.java:1958
 #, java-format
 msgid ""
 "Could not open the folder\n"
 "{0}"
-msgstr ""
-"Neįmanoma atidaryti aplanko\n"
-"{0}"
+msgstr "Neįmanoma atidaryti aplanką\n{0}"
 
-#: Sketch.java:1811
+#: Sketch.java:1769
 msgid ""
 "Could not properly re-save the sketch. You may be in trouble at this point,\n"
 "and it might be time to copy and paste your code to another text editor."
 msgstr ""
-"Neįmanoma iš naujo išsaugoti projekto. Pabandykite nukopijuoti programos \n"
-"kodą į kitą tekstinį redaktorių."
 
-#: Sketch.java:1810
+#: Sketch.java:1768
 msgid "Could not re-save sketch"
-msgstr "Neįmanoma išnaujo išsaugoti projekto."
+msgstr ""
 
 #: Theme.java:52
 msgid ""
 "Could not read color theme settings.\n"
 "You'll need to reinstall Processing."
 msgstr ""
-"Neįmanoma nuskaityti spalvų nustatymų."
-"Turėsite perinstaliuoti Processing."
 
-#: Preferences.java:210
+#: Preferences.java:219
 msgid ""
 "Could not read default settings.\n"
 "You'll need to reinstall Arduino."
 msgstr ""
-"Neįmanoma nuskaityti nustatymų pagal nutylėjimą.\n"
-"Turėsite perinstaliuoti Arduino programą."
 
-#: Preferences.java:242
+#: Preferences.java:258
 #, java-format
 msgid "Could not read preferences from {0}"
-msgstr "Neįmanoma nuskaityti nustatymų iš {0}"
+msgstr ""
 
-#: Base.java:2196
+#: Base.java:2482
 #, java-format
 msgid "Could not remove old version of {0}"
-msgstr "Neįmanoma panaikinti senos {0} versijos"
+msgstr ""
 
-#: Sketch.java:487 Sketch.java:532
+#: Sketch.java:483 Sketch.java:528
 #, java-format
 msgid "Could not rename \"{0}\" to \"{1}\""
-msgstr "Neįmanoma pervadinti \"{0}\" į \"{1}\""
+msgstr ""
 
-#: Sketch.java:479
+#: Sketch.java:475
 msgid "Could not rename the sketch. (0)"
-msgstr "Neįmanoma pervadinti projekto. (0)"
+msgstr ""
 
-#: Sketch.java:500
+#: Sketch.java:496
 msgid "Could not rename the sketch. (1)"
-msgstr "Neįmanoma pervadinti projekto. (1)"
+msgstr ""
 
-#: Sketch.java:507
+#: Sketch.java:503
 msgid "Could not rename the sketch. (2)"
-msgstr "Neįmanoma pervadinti projekto. (2)"
+msgstr ""
 
-#: Base.java:2206
+#: Base.java:2492
 #, java-format
 msgid "Could not replace {0}"
-msgstr "Neįmanoma pakeisti {0}"
+msgstr ""
 
 #: tools/Archiver.java:74
 msgid "Couldn't archive sketch"
-msgstr "Neįmanoma archyvuoti projekto"
+msgstr ""
 
-#: Sketch.java:1689
+#: Sketch.java:1647
 msgid "Couldn't determine program size: {0}"
-msgstr "Neįmanoma nustatyti programos dydžio: {0}"
+msgstr ""
 
-#: Sketch.java:620
+#: Sketch.java:616
 msgid "Couldn't do it"
-msgstr "Neįmanoma to padaryti"
+msgstr ""
 
-#: ../../../cc/arduino/packages/uploaders/SerialUploader.java:208
+#: debug/BasicUploader.java:209
 msgid ""
 "Couldn't find a Board on the selected port. Check that you have the correct "
 "port selected.  If it is correct, try pressing the board's reset button "
@@ -534,116 +500,114 @@ msgstr ""
 msgid "Croatian"
 msgstr ""
 
-#: Editor.java:1135 Editor.java:2652
+#: Editor.java:1149 Editor.java:2699
 msgid "Cut"
-msgstr "Iškirpti"
+msgstr ""
 
 #: ../../../processing/app/Preferences.java:83
 msgid "Czech"
 msgstr ""
 
-#: Preferences.java:89
+#: Preferences.java:90
 msgid "Danish"
-msgstr "Danų"
+msgstr ""
 
-#: Editor.java:1210 Editor.java:2718
+#: Editor.java:1224 Editor.java:2765
 msgid "Decrease Indent"
-msgstr "Sumažinti teksto postumį"
+msgstr ""
 
-#: Sketch.java:595 EditorHeader.java:314
+#: EditorHeader.java:314 Sketch.java:591
 msgid "Delete"
-msgstr "Ištrinti"
+msgstr ""
 
-#: debug/Uploader.java:203
+#: debug/Uploader.java:199
 msgid ""
 "Device is not responding, check the right serial port is selected or RESET "
 "the board right before exporting"
 msgstr ""
-"Įrenginys neatsako, patikrinkite ar pasirinktas tinkamas nuoseklusis portas"
-"arba perkraukite plokštę prieš įkrovą"
 
 #: tools/FixEncoding.java:57
 msgid "Discard all changes and reload sketch?"
-msgstr "Atšaukti pakeitimus ir įkelti iš naujo??"
-
-#: Editor.java:2017
-msgid "Don't Save"
-msgstr "Neišsaugoti"
-
-#: Editor.java:2228 Editor.java:2264
-msgid "Done Saving."
-msgstr "Išsaugota."
-
-#: Editor.java:2463
-msgid "Done burning bootloader."
-msgstr "Įkrovos programa įkelta."
-
-#: Editor.java:1864 Editor.java:1881
-msgid "Done compiling."
-msgstr "Kompiliacija baigta."
-
-#: Editor.java:2517
-msgid "Done printing."
-msgstr "Spausdinimas baigtas."
-
-#: Editor.java:2348 Editor.java:2384
-msgid "Done uploading."
-msgstr "Įkėlimas baigtas."
-
-#: Preferences.java:90
-msgid "Dutch"
-msgstr "Olandų"
-
-#: ../../../processing/app/Preferences.java:153
-msgid "Dutch (Netherlands)"
 msgstr ""
 
-#: Editor.java:1116
-msgid "Edit"
-msgstr "Redaguoti"
+#: Editor.java:2064
+msgid "Don't Save"
+msgstr ""
 
-#: Preferences.java:354
-msgid "Editor font size: "
-msgstr "Redaktoriaus šrifto dydis: "
+#: Editor.java:2275 Editor.java:2311
+msgid "Done Saving."
+msgstr ""
 
-#: Preferences.java:337
-msgid "Editor language: "
+#: Editor.java:2510
+msgid "Done burning bootloader."
+msgstr ""
+
+#: Editor.java:1911 Editor.java:1928
+msgid "Done compiling."
+msgstr ""
+
+#: Editor.java:2564
+msgid "Done printing."
+msgstr ""
+
+#: Editor.java:2395 Editor.java:2431
+msgid "Done uploading."
 msgstr ""
 
 #: Preferences.java:91
-msgid "English"
-msgstr "Anglų"
+msgid "Dutch"
+msgstr ""
 
-#: ../../../processing/app/Preferences.java:154
+#: ../../../processing/app/Preferences.java:144
+msgid "Dutch (Netherlands)"
+msgstr ""
+
+#: Editor.java:1130
+msgid "Edit"
+msgstr ""
+
+#: Preferences.java:370
+msgid "Editor font size: "
+msgstr ""
+
+#: Preferences.java:353
+msgid "Editor language: "
+msgstr ""
+
+#: Preferences.java:92
+msgid "English"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:145
 msgid "English (United Kingdom)"
 msgstr ""
 
-#: Editor.java:1049
+#: Editor.java:1062
 msgid "Environment"
-msgstr "Programos aplinka"
+msgstr ""
 
-#: Editor.java:2120 Editor.java:2131 Editor.java:2141 Editor.java:2159
-#: Sketch.java:479 Sketch.java:485 Sketch.java:500 Sketch.java:507
-#: Sketch.java:530 Sketch.java:547 Base.java:1861 Preferences.java:240
+#: Base.java:2147 Preferences.java:256 Sketch.java:475 Sketch.java:481
+#: Sketch.java:496 Sketch.java:503 Sketch.java:526 Sketch.java:543
+#: Editor.java:2167 Editor.java:2178 Editor.java:2188 Editor.java:2206
 msgid "Error"
-msgstr "Klaida"
+msgstr ""
 
-#: Sketch.java:1069 Sketch.java:1092
+#: Sketch.java:1065 Sketch.java:1088
 msgid "Error adding file"
-msgstr "Klaida pridedant failą"
+msgstr ""
 
-#: debug/Compiler.java:426
+#: debug/Compiler.java:369
 msgid "Error compiling."
-msgstr "Klaida kompiliuojant."
+msgstr ""
 
-#: Base.java:1433
+#: Base.java:1674
 msgid "Error getting the Arduino data folder."
-msgstr "Klaida kreipiantis į Arduino duomenų aplanką."
+msgstr ""
 
-#: Serial.java:567
+#: Serial.java:593
 #, java-format
 msgid "Error inside Serial.{0}()"
-msgstr "Klaida Serial.{0}()"
+msgstr ""
 
 #: ../../../processing/app/Base.java:1232
 msgid "Error loading libraries"
@@ -656,36 +620,34 @@ msgstr ""
 msgid "Error loading {0}"
 msgstr ""
 
-#: Serial.java:154
+#: Serial.java:181
 #, java-format
 msgid "Error opening serial port ''{0}''."
-msgstr "Klaida atidarant nuoseklujį portą ''{0}''."
+msgstr ""
 
-#: Preferences.java:261
+#: Preferences.java:277
 msgid "Error reading preferences"
-msgstr "Klaida nuskaitant nustatymus"
+msgstr ""
 
-#: Preferences.java:263
+#: Preferences.java:279
 #, java-format
 msgid ""
 "Error reading the preferences file. Please delete (or move)\n"
 "{0} and restart Arduino."
 msgstr ""
-"Klaida nuskaitant nustatymų failą. Prašome ištrinti (arba perkelti)\n"
-"{0} ir perleisti Arduino."
 
 #: ../../../cc/arduino/packages/DiscoveryManager.java:25
 msgid "Error starting discovery method: "
 msgstr ""
 
-#: ../../../processing/app/Serial.java:125
+#: Serial.java:125
 #, java-format
 msgid "Error touching serial port ''{0}''."
 msgstr ""
 
-#: Editor.java:2465 Editor.java:2469 Editor.java:2473
+#: Editor.java:2512 Editor.java:2516 Editor.java:2520
 msgid "Error while burning bootloader."
-msgstr "Klaida įkeliant įkrovos programą."
+msgstr ""
 
 #: ../../../processing/app/Editor.java:2555
 msgid "Error while burning bootloader: missing '{0}' configuration parameter"
@@ -694,111 +656,111 @@ msgstr ""
 #: SketchCode.java:83
 #, java-format
 msgid "Error while loading code {0}"
-msgstr "Klaida įkeliant kodą {0}"
+msgstr ""
 
-#: Editor.java:2520
+#: Editor.java:2567
 msgid "Error while printing."
-msgstr "Klaida spausdinant."
+msgstr ""
 
 #: ../../../processing/app/Editor.java:2409
 #: ../../../processing/app/Editor.java:2449
 msgid "Error while uploading: missing '{0}' configuration parameter"
 msgstr ""
 
-#: Preferences.java:92
+#: Preferences.java:93
 msgid "Estonian"
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:109
+#: ../../../processing/app/Preferences.java:146
 msgid "Estonian (Estonia)"
 msgstr ""
 
-#: Editor.java:509
+#: Editor.java:516
 msgid "Examples"
-msgstr "Pavyzdžiai"
+msgstr ""
 
-#: Editor.java:2435
+#: Editor.java:2482
 msgid "Export canceled, changes must first be saved."
-msgstr "Eksportavimas atšauktas, pirmiausia turi būti išsaugoti pakeitimai."
+msgstr ""
 
-#: Base.java:1814
+#: Base.java:2100
 msgid "FAQ.html"
 msgstr "FAQ.html"
 
-#: Editor.java:484
+#: Editor.java:491
 msgid "File"
-msgstr "Failai"
+msgstr ""
 
 #: Preferences.java:94
 msgid "Filipino"
-msgstr "Filipinų"
+msgstr ""
 
 #: FindReplace.java:124 FindReplace.java:127
 msgid "Find"
-msgstr "Ieškoti"
+msgstr ""
 
-#: Editor.java:1235
+#: Editor.java:1249
 msgid "Find Next"
-msgstr "Ieškoti sekančio"
+msgstr ""
 
-#: Editor.java:1245
+#: Editor.java:1259
 msgid "Find Previous"
-msgstr "Ieškoti ankstesnio"
+msgstr ""
 
-#: Editor.java:1073 Editor.java:2728
+#: Editor.java:1086 Editor.java:2775
 msgid "Find in Reference"
-msgstr "Ieškoti žinyne"
+msgstr ""
 
-#: Editor.java:1220
+#: Editor.java:1234
 msgid "Find..."
-msgstr "Ieškoti..."
+msgstr ""
 
 #: FindReplace.java:80
 msgid "Find:"
-msgstr "Ieškoti:"
+msgstr ""
 
-#: ../../../processing/app/Preferences.java:111
+#: ../../../processing/app/Preferences.java:147
 msgid "Finnish"
 msgstr ""
 
 #: tools/FixEncoding.java:41 tools/FixEncoding.java:58
 #: tools/FixEncoding.java:79
 msgid "Fix Encoding & Reload"
-msgstr "Pataisyti kodavimą ir įkelti iš naujo."
-
-#: ../../../processing/app/Base.java:2057
-msgid ""
-"For information on installing libraries, see: http://arduino.cc/en/Guide/"
-"Libraries\n"
 msgstr ""
 
-#: ../../../cc/arduino/packages/uploaders/SerialUploader.java:79
+#: Base.java:1851
+msgid ""
+"For information on installing libraries, see: "
+"http://arduino.cc/en/Guide/Libraries\n"
+msgstr "Daugiau informacijos apie bibliotekų diegimą, žiurėkite: http://arduino.cc/en/Guide/Libraries\n"
+
+#: debug/BasicUploader.java:80
 msgid "Forcing reset using 1200bps open/close on port "
 msgstr ""
 
-#: Preferences.java:93
-msgid "French"
-msgstr "Prancūzų"
-
-#: Editor.java:1083
-msgid "Frequently Asked Questions"
-msgstr "Dažniausiai užduodami klausimai"
-
 #: Preferences.java:95
+msgid "French"
+msgstr ""
+
+#: Editor.java:1097
+msgid "Frequently Asked Questions"
+msgstr ""
+
+#: Preferences.java:96
 msgid "Galician"
-msgstr "Galų"
+msgstr ""
 
 #: ../../../processing/app/Preferences.java:94
 msgid "Georgian"
 msgstr ""
 
-#: Preferences.java:96
+#: Preferences.java:97
 msgid "German"
-msgstr "Vokiečių"
+msgstr ""
 
-#: Editor.java:1041
+#: Editor.java:1054
 msgid "Getting Started"
-msgstr "Pradedantiesiems"
+msgstr ""
 
 #: ../../../processing/app/Sketch.java:1646
 #, java-format
@@ -812,23 +774,23 @@ msgstr ""
 msgid "Global variables use {0} bytes of dynamic memory."
 msgstr ""
 
-#: Preferences.java:97
+#: Preferences.java:98
 msgid "Greek"
-msgstr "Graikų"
+msgstr ""
 
-#: Base.java:1799
+#: Base.java:2085
 msgid "Guide_Environment.html"
 msgstr "Guide_Environment.html"
 
-#: Base.java:1785
+#: Base.java:2071
 msgid "Guide_MacOSX.html"
 msgstr "Guide_MacOSX.html"
 
-#: Base.java:1809
+#: Base.java:2095
 msgid "Guide_Troubleshooting.html"
 msgstr "Guide_Troubleshooting.html"
 
-#: Base.java:1787
+#: Base.java:2073
 msgid "Guide_Windows.html"
 msgstr "Guide_Windows.html"
 
@@ -836,45 +798,43 @@ msgstr "Guide_Windows.html"
 msgid "Hebrew"
 msgstr ""
 
-#: Editor.java:1002
+#: Editor.java:1015
 msgid "Help"
-msgstr "Pagalba"
+msgstr ""
 
-#: ../../../processing/app/Preferences.java:98
+#: Preferences.java:99
 msgid "Hindi"
 msgstr ""
 
-#: Sketch.java:299
+#: Sketch.java:295
 msgid ""
 "How about saving the sketch first \n"
 "before trying to rename it?"
 msgstr ""
-"Pirmiausia išsaugoti projektą \n"
-"prieš bandant jį pervadinti?"
 
-#: Sketch.java:886
+#: Sketch.java:882
 msgid "How very Borges of you"
-msgstr "Kaip siurrealu"
+msgstr ""
 
-#: Preferences.java:98
+#: Preferences.java:100
 msgid "Hungarian"
-msgstr "Vengrų"
+msgstr ""
 
 #: FindReplace.java:96
 msgid "Ignore Case"
-msgstr "Ignoruoti kapitaliaciją"
+msgstr ""
 
-#: Base.java:1207
+#: Base.java:1058
 msgid "Ignoring bad library name"
-msgstr "Ignoruojamas netinkamas bibliotekos pavadinimas"
+msgstr "Ignoruojamas blogas bibleotekos pavadinimas"
 
-#: Base.java:1132
+#: Base.java:1436
 msgid "Ignoring sketch with bad name"
-msgstr "Ignoruojamas projektas su netinkamu pavadinimu"
+msgstr ""
 
-#: Editor.java:629
+#: Editor.java:636
 msgid "Import Library..."
-msgstr "Pridėti biblioteką..."
+msgstr ""
 
 #: ../../../processing/app/Sketch.java:736
 msgid ""
@@ -887,11 +847,11 @@ msgid ""
 "Save sketch and update its extension?"
 msgstr ""
 
-#: Editor.java:1202 Editor.java:2710
+#: Editor.java:1216 Editor.java:2757
 msgid "Increase Indent"
-msgstr "Padidinti teksto postumį"
+msgstr ""
 
-#: Preferences.java:99
+#: Preferences.java:101
 msgid "Indonesian"
 msgstr ""
 
@@ -900,27 +860,27 @@ msgstr ""
 msgid "Invalid library found in {0}: {1}"
 msgstr ""
 
-#: Preferences.java:100
-msgid "Italian"
-msgstr "Italų"
-
-#: Preferences.java:101
-msgid "Japanese"
-msgstr "Japonų"
-
 #: Preferences.java:102
-msgid "Korean"
+msgid "Italian"
 msgstr ""
 
 #: Preferences.java:103
-msgid "Latvian"
-msgstr "Latvių"
-
-#: ../../../processing/app/Base.java:2903
-msgid "Library added to your libraries. Check \"Import library\" menu"
+msgid "Japanese"
 msgstr ""
 
 #: Preferences.java:104
+msgid "Korean"
+msgstr ""
+
+#: Preferences.java:105
+msgid "Latvian"
+msgstr ""
+
+#: Base.java:2699
+msgid "Library added to your libraries. Check \"Import library\" menu"
+msgstr ""
+
+#: Preferences.java:106
 msgid "Lithuaninan"
 msgstr ""
 
@@ -928,31 +888,31 @@ msgstr ""
 msgid "Low memory available, stability problems may occur"
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:106
+#: Preferences.java:107
 msgid "Marathi"
 msgstr ""
 
-#: Base.java:1826
+#: Base.java:2112
 msgid "Message"
-msgstr "Pranešimas"
+msgstr ""
 
-#: Sketch.java:1754
+#: Sketch.java:1712
 msgid "Missing the */ from the end of a /* comment */"
-msgstr "Trūksta */ komentarų /* pabaigoje */"
+msgstr ""
 
-#: Preferences.java:433
+#: Preferences.java:449
 msgid "More preferences can be edited directly in the file"
-msgstr "Daugiau nustatymų galima pakeisti tiesiogiai faile"
+msgstr ""
 
-#: Editor.java:2109
+#: Editor.java:2156
 msgid "Moving"
-msgstr "Perkėlimas"
+msgstr ""
 
-#: Sketch.java:286
+#: Sketch.java:282
 msgid "Name for new file:"
-msgstr "Naujo failo pavadinimas:"
+msgstr ""
 
-#: ../../../processing/app/Preferences.java:155
+#: ../../../processing/app/Preferences.java:149
 msgid "Nepali"
 msgstr ""
 
@@ -960,59 +920,58 @@ msgstr ""
 msgid "Network upload using programmer not supported"
 msgstr ""
 
-#: Editor.java:486 EditorToolbar.java:41
+#: EditorToolbar.java:41 Editor.java:493
 msgid "New"
-msgstr "Naujas"
+msgstr ""
 
 #: EditorToolbar.java:46
 msgid "New Editor Window"
-msgstr "Naujas redaktoriaus langas"
+msgstr ""
 
 #: EditorHeader.java:292
 msgid "New Tab"
-msgstr "Naujas skirtukas"
+msgstr ""
 
 #: SerialMonitor.java:112
 msgid "Newline"
-msgstr "Nauja eilutė"
+msgstr ""
 
 #: EditorHeader.java:340
 msgid "Next Tab"
-msgstr "Sekantis skirtukas"
+msgstr ""
 
-#: UpdateCheck.java:108 Preferences.java:77
+#: Preferences.java:78 UpdateCheck.java:108
 msgid "No"
-msgstr "Ne"
+msgstr ""
 
-#: debug/Compiler.java:79
+#: debug/Compiler.java:126
 msgid "No board selected; please choose a board from the Tools > Board menu."
-msgstr "Nepasirinkta plokštė; prašome ją pasirinkti iš Įrankiai > Plokštė \n"
-"meniu."
+msgstr ""
 
-#: tools/AutoFormat.java:913 tools/format/src/AutoFormat.java:54
+#: tools/format/src/AutoFormat.java:54 tools/AutoFormat.java:916
 msgid "No changes necessary for Auto Format."
-msgstr "Automatiniam formatavimui pakeitimai nereikalingi."
+msgstr ""
 
-#: Editor.java:366
+#: Editor.java:373
 msgid "No files were added to the sketch."
-msgstr "Į projektą nebuvo pridėta jokių failų."
+msgstr ""
 
 #: Platform.java:167
 msgid "No launcher available"
-msgstr "Nerasta jokio paleidėjo"
+msgstr ""
 
 #: SerialMonitor.java:112
 msgid "No line ending"
-msgstr "Be eilutės pabaigos"
+msgstr ""
 
-#: Base.java:538
+#: Base.java:541
 msgid "No really, time for some fresh air for you."
-msgstr "Ištikrųjų, jums laikas įkvėpti gryno oro."
+msgstr "Na tikrai, tau laikas įkvėpti gryno oro."
 
-#: Editor.java:1823
+#: Editor.java:1872
 #, java-format
 msgid "No reference available for \"{0}\""
-msgstr "Įrašas nerastas apie \"{0}\""
+msgstr ""
 
 #: ../../../processing/app/Base.java:309
 msgid "No valid configured cores found! Exiting..."
@@ -1023,13 +982,13 @@ msgstr ""
 msgid "No valid hardware definitions found in folder {0}."
 msgstr ""
 
-#: Base.java:184
+#: Base.java:191
 msgid "Non-fatal error while setting the Look & Feel."
-msgstr "Nekritinė klaida nustatant bendrają išvaizdą."
+msgstr ""
 
-#: Sketch.java:400 Sketch.java:414 Sketch.java:423 Sketch.java:863
+#: Sketch.java:396 Sketch.java:410 Sketch.java:419 Sketch.java:859
 msgid "Nope"
-msgstr "Ne"
+msgstr ""
 
 #: ../../../processing/app/Preferences.java:108
 msgid "Norwegian Bokmål"
@@ -1041,60 +1000,60 @@ msgid ""
 "for tips on reducing your footprint."
 msgstr ""
 
-#: Editor.java:2098 Editor.java:2418 Sketch.java:589 Sketch.java:741
-#: Sketch.java:1046 Preferences.java:79
+#: Preferences.java:80 Sketch.java:585 Sketch.java:737 Sketch.java:1042
+#: Editor.java:2145 Editor.java:2465
 msgid "OK"
-msgstr "Gerai"
+msgstr ""
 
-#: Editor.java:369 Sketch.java:996
+#: Sketch.java:992 Editor.java:376
 msgid "One file added to the sketch."
-msgstr "Į projektą pridėtas vienas failas."
+msgstr ""
 
 #: EditorToolbar.java:41
 msgid "Open"
-msgstr "Atidaryti"
+msgstr ""
 
-#: Editor.java:2641
+#: Editor.java:2688
 msgid "Open URL"
-msgstr "Atidaryti nuorodą"
+msgstr ""
 
-#: Base.java:633
+#: Base.java:636
 msgid "Open an Arduino sketch..."
-msgstr "Atidaryti Arduino projektą..."
+msgstr ""
 
 #: EditorToolbar.java:46
 msgid "Open in Another Window"
-msgstr "Atidaryti naujame lange"
+msgstr ""
 
-#: Editor.java:494 Base.java:903
+#: Base.java:903 Editor.java:501
 msgid "Open..."
 msgstr "Atidaryti..."
 
-#: Editor.java:556
+#: Editor.java:563
 msgid "Page Setup"
-msgstr "Puslapio nustatymai"
+msgstr ""
 
 #: ../../../processing/app/forms/PasswordAuthorizationDialog.java:44
 msgid "Password:"
 msgstr ""
 
-#: Editor.java:1175 Editor.java:2684
+#: Editor.java:1189 Editor.java:2731
 msgid "Paste"
-msgstr "Įterpti"
+msgstr ""
 
-#: Preferences.java:105
+#: Preferences.java:109
 msgid "Persian"
-msgstr "Persų"
+msgstr ""
 
-#: debug/Compiler.java:465
+#: debug/Compiler.java:408
 msgid "Please import the SPI library from the Sketch > Import Library menu."
-msgstr "Prašome pridėti SPI biblioteką iš Projektas > Pridėti biblioteką meniu."
+msgstr ""
 
-#: Base.java:232
+#: Base.java:239
 msgid "Please install JDK 1.5 or later"
-msgstr "Prašome instaliuoti JDK 1.5 arba vėlesnį"
+msgstr ""
 
-#: Preferences.java:106
+#: Preferences.java:110
 msgid "Polish"
 msgstr ""
 
@@ -1102,53 +1061,53 @@ msgstr ""
 msgid "Port"
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:157
+#: ../../../processing/app/Preferences.java:151
 msgid "Portugese"
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:130
+#: ../../../processing/app/Preferences.java:127
 msgid "Portuguese (Brazil)"
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:131
+#: ../../../processing/app/Preferences.java:128
 msgid "Portuguese (Portugal)"
 msgstr ""
 
-#: Editor.java:576 Preferences.java:279
+#: Preferences.java:295 Editor.java:583
 msgid "Preferences"
-msgstr "Nustatymai"
+msgstr ""
 
 #: FindReplace.java:123 FindReplace.java:128
 msgid "Previous"
-msgstr "Ankstesnis"
+msgstr ""
 
 #: EditorHeader.java:326
 msgid "Previous Tab"
-msgstr "Ankstesnis skirtukas"
+msgstr ""
 
-#: Editor.java:564
+#: Editor.java:571
 msgid "Print"
-msgstr "Spausdinti"
+msgstr ""
 
-#: Editor.java:2524
+#: Editor.java:2571
 msgid "Printing canceled."
-msgstr "Spausdinimas atšauktas."
+msgstr ""
 
-#: Editor.java:2500
+#: Editor.java:2547
 msgid "Printing..."
-msgstr "Spausdinama..."
+msgstr ""
 
-#: Base.java:1671
+#: Base.java:1957
 msgid "Problem Opening Folder"
-msgstr "Klaida atidarant aplanką"
+msgstr "Problema atidarant aplanką"
 
-#: Base.java:1647
+#: Base.java:1933
 msgid "Problem Opening URL"
-msgstr "Klaida atidarant nuorodą"
+msgstr "Problema atidarant nuorodą"
 
-#: Base.java:220
+#: Base.java:227
 msgid "Problem Setting the Platform"
-msgstr "Problema nustatant platformą."
+msgstr ""
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:136
 msgid "Problem accessing board folder /www/sd"
@@ -1158,137 +1117,133 @@ msgstr ""
 msgid "Problem accessing files in folder "
 msgstr ""
 
-#: Base.java:1432
+#: Base.java:1673
 msgid "Problem getting data folder"
-msgstr "Klaida kreipiantis į duomenų aplanką"
+msgstr ""
 
-#: Sketch.java:1465
+#: Sketch.java:1467
 #, java-format
 msgid "Problem moving {0} to the build folder"
-msgstr "Klaida perkeliant {0} į programos aplanką"
+msgstr ""
 
 #: debug/Uploader.java:209
 msgid ""
-"Problem uploading to board.  See http://www.arduino.cc/en/Guide/"
-"Troubleshooting#upload for suggestions."
+"Problem uploading to board.  See "
+"http://www.arduino.cc/en/Guide/Troubleshooting#upload for suggestions."
 msgstr ""
-"Klaida įkeliant į plokštę. Ieškokite http://www.arduino.cc/en/Guide/"
-"Troubleshooting#upload klaidos sprendimo."
 
-#: Sketch.java:359 Sketch.java:366 Sketch.java:377
+#: Sketch.java:355 Sketch.java:362 Sketch.java:373
 msgid "Problem with rename"
-msgstr "Klaida pervadinant"
+msgstr ""
 
-#: Editor.java:2090
+#: Editor.java:2137
 msgid ""
 "Processing can only open its own sketches\n"
 "and other files ending in .ino or .pde"
 msgstr ""
-"Programa gali atidaryti tik savo projektus\n"
-"ir failus su plėtiniais .ino ir .pde"
 
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
 msgstr ""
 
-#: Editor.java:695
+#: Editor.java:704
 msgid "Programmer"
-msgstr "Programatorius"
+msgstr ""
 
-#: Editor.java:586 Base.java:782
+#: Base.java:783 Editor.java:593
 msgid "Quit"
 msgstr "Išeiti"
 
-#: Editor.java:1124 Editor.java:1126 Editor.java:1376
+#: Editor.java:1138 Editor.java:1140 Editor.java:1390
 msgid "Redo"
-msgstr "Perdaryti"
+msgstr ""
 
-#: Editor.java:1065
+#: Editor.java:1078
 msgid "Reference"
-msgstr "Žinynas"
+msgstr ""
 
 #: EditorHeader.java:300
 msgid "Rename"
-msgstr "Pervadinti"
+msgstr ""
 
-#: FindReplace.java:121 FindReplace.java:130 Sketch.java:1050
+#: FindReplace.java:121 FindReplace.java:130 Sketch.java:1046
 msgid "Replace"
-msgstr "Pakeisti"
+msgstr ""
 
 #: FindReplace.java:122 FindReplace.java:129
 msgid "Replace & Find"
-msgstr "Pakeisti ir surasti"
+msgstr ""
 
 #: FindReplace.java:120 FindReplace.java:131
 msgid "Replace All"
-msgstr "Pakeisti viską"
+msgstr ""
 
-#: Sketch.java:1047
+#: Sketch.java:1043
 #, java-format
 msgid "Replace the existing version of {0}?"
-msgstr "Pakeisti esamą {0} versiją?"
+msgstr ""
 
 #: FindReplace.java:81
 msgid "Replace with:"
-msgstr "Pakeisti į:"
+msgstr ""
 
-#: Preferences.java:109
+#: Preferences.java:113
 msgid "Romanian"
-msgstr "Rumunų"
+msgstr ""
 
-#: Preferences.java:110
+#: Preferences.java:114
 msgid "Russian"
 msgstr ""
 
-#: Editor.java:522 Editor.java:2017 Editor.java:2421 EditorToolbar.java:41
-#: EditorToolbar.java:46
+#: EditorToolbar.java:41 EditorToolbar.java:46 Editor.java:529
+#: Editor.java:2064 Editor.java:2468
 msgid "Save"
-msgstr "Išsaugoti"
+msgstr ""
 
-#: Editor.java:530
+#: Editor.java:537
 msgid "Save As..."
-msgstr "Išsaugoti kaip..."
+msgstr ""
 
-#: Editor.java:2270
+#: Editor.java:2317
 msgid "Save Canceled."
-msgstr "Išsaugojimas atšauktas."
+msgstr ""
 
-#: Editor.java:2420
+#: Editor.java:2467
 msgid "Save changes before export?"
-msgstr "Įšsaugoti pakeitimus prieš eksportuojant?"
+msgstr ""
 
-#: Editor.java:1973
+#: Editor.java:2020
 #, java-format
 msgid "Save changes to \"{0}\"?  "
-msgstr "Išsaugoti pakeitimus \"{0}\"?  "
+msgstr ""
 
-#: Sketch.java:829
+#: Sketch.java:825
 msgid "Save sketch folder as..."
-msgstr "Išsaugoti projekto aplanką kaip..."
+msgstr ""
 
-#: Editor.java:2223 Editor.java:2261
+#: Editor.java:2270 Editor.java:2308
 msgid "Saving..."
-msgstr "Išsaugoma..."
+msgstr ""
 
-#: Base.java:1623
+#: Base.java:1909
 msgid "Select (or create new) folder for sketches..."
-msgstr "Pasirinkite (arba sukurkite naują) projektų aplanką ..."
+msgstr ""
 
-#: Editor.java:1184 Editor.java:2692
+#: Editor.java:1198 Editor.java:2739
 msgid "Select All"
-msgstr "Pažymėti viską"
+msgstr ""
 
-#: ../../../processing/app/Base.java:2845
+#: Base.java:2636
 msgid "Select a zip file or a folder containing the library you'd like to add"
 msgstr ""
 
-#: Sketch.java:979
+#: Sketch.java:975
 msgid "Select an image or other data file to copy to your sketch"
-msgstr "Pasirinkite atvaizdą arba kitą duomenų failą, kad įkelti į jūsų projektą"
+msgstr ""
 
-#: Preferences.java:314
+#: Preferences.java:330
 msgid "Select new sketchbook location"
-msgstr "Pasirinkite naują vietą projektams"
+msgstr ""
 
 #: ../../../processing/app/debug/Compiler.java:146
 msgid "Selected board depends on '{0}' core (not installed)."
@@ -1296,226 +1251,202 @@ msgstr ""
 
 #: SerialMonitor.java:93
 msgid "Send"
-msgstr "Siųsti"
+msgstr ""
 
-#: Editor.java:662 EditorToolbar.java:41 EditorToolbar.java:46
+#: EditorToolbar.java:41 EditorToolbar.java:46 Editor.java:669
 msgid "Serial Monitor"
-msgstr "Nuosekliojo porto monitorius"
+msgstr ""
 
-#: Serial.java:147
+#: Serial.java:174
 #, java-format
 msgid ""
 "Serial port ''{0}'' already in use. Try quiting any programs that may be "
 "using it."
 msgstr ""
-"Nuoseklusis portas ''{0}'' naudojamas. Pabandykite išjungti programą, kuri "
-"gali jį naudoti."
 
-#: ../../../processing/app/Serial.java:121
+#: Serial.java:121
 #, java-format
 msgid ""
 "Serial port ''{0}'' already in use. Try quitting any programs that may be "
 "using it."
 msgstr ""
 
-#: Serial.java:167
+#: Serial.java:194
 #, java-format
 msgid ""
-"Serial port ''{0}'' not found. Did you select the right one from the Tools > "
-"Serial Port menu?"
+"Serial port ''{0}'' not found. Did you select the right one from the Tools >"
+" Serial Port menu?"
 msgstr ""
-"Nuoseklusis portas ''{0}'' nerastas. Ar pasirinkote tinkamą iš Įrankiai > "
-"Nuoseklusis portas meniu?"
 
-#: Editor.java:2296
+#: Editor.java:2343
 #, java-format
 msgid ""
 "Serial port {0} not found.\n"
 "Retry the upload with another serial port?"
 msgstr ""
-"Nuoseklusis portas {0} nerastas.\n"
-"Tęsti įkėlimą naudojant kitą nuoseklujį portą?"
 
-#: Base.java:1440
+#: Base.java:1681
 msgid "Settings issues"
-msgstr "Nustatymų klaidos"
+msgstr ""
 
-#: Editor.java:634
+#: Editor.java:641
 msgid "Show Sketch Folder"
-msgstr "Parodyti projekto aplanką"
+msgstr ""
 
 #: ../../../processing/app/EditorStatus.java:468
 msgid "Show verbose output during compilation"
 msgstr ""
 
-#: Preferences.java:371
+#: Preferences.java:387
 msgid "Show verbose output during: "
-msgstr "Parodyti išsamius rezultatus: "
+msgstr ""
 
-#: Editor.java:600
+#: Editor.java:607
 msgid "Sketch"
-msgstr "Projektas"
+msgstr ""
 
-#: Sketch.java:1796
+#: Sketch.java:1754
 msgid "Sketch Disappeared"
-msgstr "Projektas nerastas"
+msgstr ""
 
-#: Base.java:1095
+#: Base.java:1411
 msgid "Sketch Does Not Exist"
-msgstr "Projektas neegzistuoja"
+msgstr ""
 
-#: Sketch.java:278 Sketch.java:307 Sketch.java:581 Sketch.java:970
+#: Sketch.java:274 Sketch.java:303 Sketch.java:577 Sketch.java:966
 msgid "Sketch is Read-Only"
-msgstr "Projektas skirtas tik skaitymui"
+msgstr ""
 
-#: Sketch.java:298
+#: Sketch.java:294
 msgid "Sketch is Untitled"
-msgstr "Projektas be pavadinimo"
+msgstr ""
 
-#: Sketch.java:724
+#: Sketch.java:720
 msgid "Sketch is read-only"
-msgstr "Projektas skirtas tik skaitymui"
+msgstr ""
 
-#: Sketch.java:1694
+#: Sketch.java:1653
 msgid ""
 "Sketch too big; see http://www.arduino.cc/en/Guide/Troubleshooting#size for "
 "tips on reducing it."
-msgstr ""
-"Projektas per dydelis; ieškokite http://www.arduino.cc/en/Guide/Troubleshooting#size "
-"patarimų, ją mažinant."
+msgstr "Eskizas per didelis; žiūrėkite http://www.arduino.cc/en/Guide/Troubleshooting#size patarimams kaip jį sumažinti."
 
 #: ../../../processing/app/Sketch.java:1639
 #, java-format
 msgid ""
-"Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} bytes."
+"Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} "
+"bytes."
 msgstr ""
 
-#: Editor.java:503
+#: Editor.java:510
 msgid "Sketchbook"
-msgstr "Projektai"
+msgstr ""
 
-#: Base.java:257
+#: Base.java:258
 msgid "Sketchbook folder disappeared"
-msgstr "Nerandamas projekto aplankas"
+msgstr ""
 
-#: Preferences.java:299
+#: Preferences.java:315
 msgid "Sketchbook location:"
-msgstr "Projektų vieta:"
+msgstr ""
 
-#: ../../../processing/app/Preferences.java:134
+#: ../../../processing/app/Preferences.java:152
 msgid "Slovenian"
 msgstr ""
 
-#: Sketch.java:279 Sketch.java:308 Sketch.java:582 Sketch.java:971
+#: Sketch.java:275 Sketch.java:304 Sketch.java:578 Sketch.java:967
 msgid ""
 "Some files are marked \"read-only\", so you'll\n"
 "need to re-save the sketch in another location,\n"
 "and try again."
 msgstr ""
-"Kaikurie failai pažymėti kaip \"tik skaitymui\",\n"
-"todėl turėtumėte išsaugoti projektą į kitą vietą,\n"
-"ir bandyti iš naujo."
 
-#: Sketch.java:725
+#: Sketch.java:721
 msgid ""
 "Some files are marked \"read-only\", so you'll\n"
 "need to re-save this sketch to another location."
 msgstr ""
-"Kaikurie failai pažymėti kaip \"tik skaitymui\",\n"
-"turėtumėte išsaugoti projektą i kitą vietą."
 
-#: Sketch.java:461
+#: Sketch.java:457
 #, java-format
 msgid "Sorry, a sketch (or folder) named \"{0}\" already exists."
-msgstr "Atsiprašome, projektas (arba aplankas) pavadinimu \"{0}\" jau egzistuoja."
+msgstr ""
 
-#: Preferences.java:111
+#: Preferences.java:115
 msgid "Spanish"
-msgstr "Ispanų"
+msgstr ""
 
-#: Base.java:537
+#: Base.java:540
 msgid "Sunshine"
-msgstr "Saulėta"
+msgstr "Saulės šviesa"
 
-#: ../../../processing/app/Preferences.java:136
+#: ../../../processing/app/Preferences.java:153
 msgid "Swedish"
 msgstr ""
 
-#: Preferences.java:83
+#: Preferences.java:84
 msgid "System Default"
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:116
+#: Preferences.java:116
 msgid "Tamil"
 msgstr ""
 
-#: debug/Compiler.java:471
+#: debug/Compiler.java:414
 msgid "The 'BYTE' keyword is no longer supported."
-msgstr "Raktažodis 'BYTE' daugiau nebepalaikomas."
+msgstr ""
 
-#: debug/Compiler.java:483
+#: debug/Compiler.java:426
 msgid "The Client class has been renamed EthernetClient."
-msgstr "Klasė Client buvo pervardinta į EthernetClient."
+msgstr ""
 
-#: debug/Compiler.java:477
+#: debug/Compiler.java:420
 msgid "The Server class has been renamed EthernetServer."
-msgstr "Klasė Server buvo pervardinta į EthernetServer."
+msgstr ""
 
-#: debug/Compiler.java:489
+#: debug/Compiler.java:432
 msgid "The Udp class has been renamed EthernetUdp."
-msgstr "Klasė Udp buvo pervardinta į EthernetUdp."
+msgstr ""
 
-#: Base.java:185
+#: Base.java:192
 msgid "The error message follows, however Arduino should run fine."
-msgstr "Klaida neišnyksta, tačiau Arduino turėtų veikti gerai."
+msgstr ""
 
-#: Editor.java:2100
+#: Editor.java:2147
 #, java-format
 msgid ""
 "The file \"{0}\" needs to be inside\n"
 "a sketch folder named \"{1}\".\n"
 "Create this folder, move the file, and continue?"
 msgstr ""
-"Failas \"{0}\" turi būti\n"
-"projekto aplanke, pavadinimu \"{1}\".\n"
-"Sukurti šį aplanką, perkelti failą ir testi??"
 
-#: Base.java:1202
+#: Base.java:1054 Base.java:2674
 #, java-format
 msgid ""
 "The library \"{0}\" cannot be used.\n"
 "Library names must contain only basic letters and numbers.\n"
 "(ASCII only and no spaces, and it cannot start with a number)"
 msgstr ""
-"Biblioteka \"{0}\" negali būti naudojama.\n"
-"Bibliotekų pavadinimus turi sudaryti tik raidės ir skaičiai.\n"
-"(Tik ASCII be tarpų, ir negali prasidėti skaičiumi).\n"
 
-#: Sketch.java:378
+#: Sketch.java:374
 msgid ""
 "The main file can't use an extension.\n"
 "(It may be time for your to graduate to a\n"
 "\"real\" programming environment)"
 msgstr ""
-"Pagrindinis failas negali turėti plėtinio.\n"
-"(Turbūt laikas jums pereiti prie\n"
-"\"tikros\" programavimo aplinkos)"
 
-#: Sketch.java:360
+#: Sketch.java:356
 msgid "The name cannot start with a period."
-msgstr "Pavadinimas negali prasidėti tašku."
+msgstr ""
 
-#: Base.java:1096
+#: Base.java:1412
 msgid ""
 "The selected sketch no longer exists.\n"
 "You may need to restart Arduino to update\n"
 "the sketchbook menu."
 msgstr ""
-"Pasirinktas projektas nebeegzistuoja.\n"
-"Turbūt turėtumėte perleisti Arduino, kad atnaujinti\n"
-"projektų meniu."
 
-#: Base.java:1125
+#: Base.java:1430
 #, java-format
 msgid ""
 "The sketch \"{0}\" cannot be used.\n"
@@ -1524,33 +1455,22 @@ msgid ""
 "To get rid of this message, remove the sketch from\n"
 "{1}"
 msgstr ""
-"Projektas \"{0}\" negali būti naudojamas.\n"
-"Projekto pavadinimą turi sudaryti tik raidės ir skaičiai\n"
-"(tik ASCII be tarpų, ir negali prasidėti skaičiumi).\n"
-"Kad panaikinti šį pranešimą, ištrinkite projektą iš\n"
-"{1}"
 
-#: Sketch.java:1797
+#: Sketch.java:1755
 msgid ""
 "The sketch folder has disappeared.\n"
 " Will attempt to re-save in the same location,\n"
 "but anything besides the code will be lost."
 msgstr ""
-"Nerastas projekto aplankas.\n"
-" Bus bandoma jį išsaugoti į tą pačią vietą,\n"
-"bet viskas, išskyrus kodą, bus prarasta."
 
-#: Sketch.java:2060
+#: Sketch.java:2018
 msgid ""
 "The sketch name had to be modified. Sketch names can only consist\n"
 "of ASCII characters and numbers (but cannot start with a number).\n"
 "They should also be less less than 64 characters long."
 msgstr ""
-"Projekto pavadinimas turi būti pakeistas. Projektų pavadinimai turi būti\n"
-"sudaryti tik iš ASCII simbolių ir skaičių (bet negali prasidėti\n"
-"skaičiumi). Taip pat turi būti ne ilgesni nei 64 simboliai.\n"
 
-#: Base.java:258
+#: Base.java:259
 msgid ""
 "The sketchbook folder no longer exists.\n"
 "Arduino will switch to the default sketchbook\n"
@@ -1558,35 +1478,29 @@ msgid ""
 "necessary. Arduino will then stop talking about\n"
 "himself in the third person."
 msgstr ""
-"Projekto aplankas nebeegzistuoja.\n"
-"Arduino pereis i projekto aplanką pagal nutylėjimą ir, \n"
-"jei tas reikalinga, sukurs naują projekto aplanką.\n"
-"Tada Arduino liausis kalbėti apie save trečiuoju asmeniu.\n"
 
-#: Sketch.java:1079
+#: Sketch.java:1075
 msgid ""
 "This file has already been copied to the\n"
 "location from which where you're trying to add it.\n"
 "I ain't not doin nuthin'."
 msgstr ""
-"Šis failas jau buvo nokipijuotas i aplanką, iš\n"
-"kurio bandote jį pridėti.\n"
 
 #: ../../../processing/app/EditorStatus.java:467
 msgid "This report would have more information with"
 msgstr ""
 
-#: Base.java:532
+#: Base.java:535
 msgid "Time for a Break"
 msgstr "Laikas pertraukai"
 
-#: Editor.java:656
+#: Editor.java:663
 msgid "Tools"
-msgstr "Įrankiai"
+msgstr ""
 
-#: Editor.java:1057
+#: Editor.java:1070
 msgid "Troubleshooting"
-msgstr "Klaidų diagnostika"
+msgstr ""
 
 #: ../../../processing/app/Preferences.java:117
 msgid "Turkish"
@@ -1621,14 +1535,14 @@ msgstr ""
 msgid "Unable to open serial monitor"
 msgstr ""
 
-#: Sketch.java:1433
+#: Sketch.java:1432
 #, java-format
 msgid "Uncaught exception type: {0}"
-msgstr "Nežinomas išimties tipas: {0}"
+msgstr ""
 
-#: Editor.java:1119 Editor.java:1341
+#: Editor.java:1133 Editor.java:1355
 msgid "Undo"
-msgstr "Atšaukti"
+msgstr ""
 
 #: Platform.java:168
 msgid ""
@@ -1636,159 +1550,146 @@ msgid ""
 "To enable opening URLs or folders, add a \n"
 "\"launcher=/path/to/app\" line to preferences.txt"
 msgstr ""
-"Neatpažinta platforma, nerasta jokio paleidėjo.\n"
-"Kad galėtumėte atidaryti nuorodas arba aplankus, pridėkite \n"
-"\"launcher=/kelias/į/programą\" į failą preferences.txt"
 
 #: UpdateCheck.java:111
 msgid "Update"
-msgstr "Atnaujinti"
+msgstr ""
 
-#: Preferences.java:412
+#: Preferences.java:428
 msgid "Update sketch files to new extension on save (.pde -> .ino)"
-msgstr "Išsaugant atnaujinti projektų failų plėtinius (.pde -> .ino)"
+msgstr ""
 
-#: Editor.java:538 EditorToolbar.java:41
+#: EditorToolbar.java:41 Editor.java:545
 msgid "Upload"
-msgstr "Įkelti"
+msgstr ""
 
-#: Editor.java:546 EditorToolbar.java:46
+#: EditorToolbar.java:46 Editor.java:553
 msgid "Upload Using Programmer"
-msgstr "Įkelti naudojant programatorių"
+msgstr ""
 
-#: Editor.java:2356 Editor.java:2392
+#: Editor.java:2403 Editor.java:2439
 msgid "Upload canceled."
-msgstr "Įkėlimas atšauktas."
+msgstr ""
 
 #: ../../../processing/app/Sketch.java:1678
 msgid "Upload cancelled"
 msgstr ""
 
-#: Editor.java:2331
+#: Editor.java:2378
 msgid "Uploading to I/O Board..."
-msgstr "Įkeliama į I/O plokštę..."
+msgstr ""
 
-#: Sketch.java:1661
+#: Sketch.java:1622
 msgid "Uploading..."
-msgstr "Įkeliama..."
+msgstr ""
 
-#: Editor.java:1255
+#: Editor.java:1269
 msgid "Use Selection For Find"
-msgstr "Naudoti žymėjimą ieškant"
+msgstr ""
 
-#: Preferences.java:393
+#: Preferences.java:409
 msgid "Use external editor"
-msgstr "Naudoti išorinį redaktorių"
+msgstr ""
 
 #: EditorToolbar.java:41 EditorToolbar.java:46
 msgid "Verify"
-msgstr "Patvirtinti"
+msgstr ""
 
-#: Editor.java:602
+#: Editor.java:609
 msgid "Verify / Compile"
-msgstr "Patikrinti / Kompiliuoti"
+msgstr ""
 
-#: Preferences.java:384
+#: Preferences.java:400
 msgid "Verify code after upload"
-msgstr "Po įkėlimo patvirtinti kodą"
+msgstr ""
 
-#: ../../../processing/app/Preferences.java:140
+#: ../../../processing/app/Preferences.java:154
 msgid "Vietnamese"
 msgstr ""
 
-#: Editor.java:1091
+#: Editor.java:1105
 msgid "Visit Arduino.cc"
-msgstr "Eiti į Arduino.cc"
+msgstr ""
 
-#: Base.java:1842
+#: Base.java:2128
 msgid "Warning"
-msgstr "Perspėjimas"
+msgstr ""
 
-#: debug/Compiler.java:501
+#: debug/Compiler.java:444
 msgid "Wire.receive() has been renamed Wire.read()."
-msgstr "Wire.receive() buvo pervardinta į Wire.read()."
+msgstr ""
 
-#: debug/Compiler.java:495
+#: debug/Compiler.java:438
 msgid "Wire.send() has been renamed Wire.write()."
-msgstr "Wire.send() buvo pervardinta į Wire.write()."
+msgstr ""
 
 #: FindReplace.java:105
 msgid "Wrap Around"
-msgstr "Laužyti tekstą"
+msgstr ""
 
 #: debug/Uploader.java:213
 msgid ""
 "Wrong microcontroller found.  Did you select the right board from the Tools "
 "> Board menu?"
 msgstr ""
-"Rastas netinkamas mokrokontroleris. Ar pasirinkote tinkamą plokštę \n"
-"iš Įrankiai > Plokštė meniu?"
 
-#: UpdateCheck.java:108 Preferences.java:76
+#: Preferences.java:77 UpdateCheck.java:108
 msgid "Yes"
-msgstr "Taip"
+msgstr ""
 
-#: Sketch.java:1078
+#: Sketch.java:1074
 msgid "You can't fool me"
-msgstr "Manęs neapgausi"
+msgstr ""
 
-#: Sketch.java:415
+#: Sketch.java:411
 msgid "You can't have a .cpp file with the same name as the sketch."
-msgstr "Failas .cpp negali būti tuo pačiu pavadinimu kaip ir projektas."
+msgstr ""
 
-#: Sketch.java:425
+#: Sketch.java:421
 msgid ""
 "You can't rename the sketch to \"{0}\"\n"
 "because the sketch already has a .cpp file with that name."
 msgstr ""
-"Negalite pervadinti projekto į \"{0}\"\n"
-"nes projektas jau turi .cpp failą tokiu pavadinimu."
 
-#: Sketch.java:865
+#: Sketch.java:861
 msgid ""
 "You can't save the sketch as \"{0}\"\n"
 "because the sketch already has a .cpp file with that name."
 msgstr ""
-"Negalite išsaugoti projekto kaip \"{0}\"\n"
-"nes projektas jau turi .cpp failą tokiu pavadinimu."
 
-#: Sketch.java:887
+#: Sketch.java:883
 msgid ""
 "You cannot save the sketch into a folder\n"
 "inside itself. This would go on forever."
 msgstr ""
-"Negalite išsaugoti į aplanką, projekto\n"
-"aplanko viduje. Tai tęstusi amžinai."
 
-#: Base.java:1602
+#: Base.java:1888
 msgid "You forgot your sketchbook"
-msgstr "Pamiršote savo projektų segtuvą"
+msgstr ""
 
 #: ../../../processing/app/AbstractMonitor.java:92
 msgid ""
 "You've pressed {0} but nothing was sent. Should you select a line ending?"
 msgstr ""
 
-#: Base.java:533
+#: Base.java:536
 msgid ""
 "You've reached the limit for auto naming of new sketches\n"
 "for the day. How about going for a walk instead?"
 msgstr ""
-"Pasiektas automatinio projekto vardų suteikimo limitas šiai dienai.\n"
-"Ką manote apie pasivaikščiojimą?"
 
-#: ../../../processing/app/Base.java:2847
+#: Base.java:2638
 msgid "ZIP files or folders"
 msgstr ""
 
-#: ../../../processing/app/Base.java:2870
+#: Base.java:2661
 msgid "Zip doesn't contain a library"
 msgstr ""
 
-#: Sketch.java:368
+#: Sketch.java:364
 #, java-format
 msgid "\".{0}\" is not a valid extension."
-msgstr "\".{0}\" yra klaidingas plėtinys."
+msgstr ""
 
 #: SketchCode.java:258
 #, java-format
@@ -1798,123 +1699,89 @@ msgid ""
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
 msgstr ""
-"\"{0}\" sudaro nežinomi simboliai. Jei šis kodas buvo sukurtas naudojant senesnę "
-"programos versiją, turėtumėte naudoti Įrankiai -> Pataisyti kodavimą ir įkelti iš naujo, "
-"kad atnaujinti projektą naudojant UTF-8 kodavimą. Arba turėtumėte ištrinti "
-"nežinomus simbolius kad panaikinti šią klaidą."
 
-#: debug/Compiler.java:466
+#: debug/Compiler.java:409
 msgid ""
 "\n"
 "As of Arduino 0019, the Ethernet library depends on the SPI library.\n"
-"You appear to be using it or another library that depends on the SPI "
-"library.\n"
+"You appear to be using it or another library that depends on the SPI library.\n"
 "\n"
 msgstr ""
-"Nuo Arduino 0019, Ethernet biblioteka priklausoma nuo SPI bibliotekos.\n"
-"Panašu, kad naudojate šią arba kitą biblioteką, kuri priklausoma nuo "
-"SPI bibliotekos."
 
-#: debug/Compiler.java:472
+#: debug/Compiler.java:415
 msgid ""
 "\n"
 "As of Arduino 1.0, the 'BYTE' keyword is no longer supported.\n"
 "Please use Serial.write() instead.\n"
 "\n"
 msgstr ""
-"\n"
-"Nuo Arduino 1.0, raktažodis 'BYTE' nebepalaikomas.\n"
-"Vietoje jo prašome naudoti Serial.write().\n"
-"\n"
 
-#: debug/Compiler.java:484
+#: debug/Compiler.java:427
 msgid ""
 "\n"
-"As of Arduino 1.0, the Client class in the Ethernet library has been renamed "
-"to EthernetClient.\n"
-"\n"
-msgstr ""
-"\n"
-"Nuo Arduino 1.0, Ethernet bibliotekos klasė Client buvo pervardinta\n"
-"į EthernetClient.\n"
-"\n"
-
-#: debug/Compiler.java:478
-msgid ""
-"\n"
-"As of Arduino 1.0, the Server class in the Ethernet library has been renamed "
-"to EthernetServer.\n"
-"\n"
-msgstr ""
-"\n"
-"Nuo Arduino 1.0, Ethernet bibliotekos klasė Server buvo pervardinta "
-"į EthernetServer.\n"
-"\n"
-
-#: ../../../processing/app/debug/Compiler.java:451
-msgid ""
-"\n"
-"As of Arduino 1.0, the Udp class in the Ethernet library has been renamed to "
-"EthernetUdp.\n"
+"As of Arduino 1.0, the Client class in the Ethernet library has been renamed to EthernetClient.\n"
 "\n"
 msgstr ""
 
-#: debug/Compiler.java:502
+#: debug/Compiler.java:421
 msgid ""
 "\n"
-"As of Arduino 1.0, the Wire.receive() function was renamed to Wire.read() "
-"for consistency with other libraries.\n"
+"As of Arduino 1.0, the Server class in the Ethernet library has been renamed to EthernetServer.\n"
 "\n"
 msgstr ""
-"\n"
-"Nuo Arduino 1.0, funkcija Wire.receive() buvo pervardinta į Wire.read() dėl"
-"geresnio derėjimo su kitomis bibliotekomis.\n"
-"\n"
 
-#: debug/Compiler.java:496
+#: debug/Compiler.java:433
 msgid ""
 "\n"
-"As of Arduino 1.0, the Wire.send() function was renamed to Wire.write() for "
-"consistency with other libraries.\n"
+"As of Arduino 1.0, the Udp class in the Ethernet library has been renamed to EthernetUdp.\n"
 "\n"
 msgstr ""
-"\n"
-"Nuo Arduino 1.0, funkcija Wire.send() buvo pervardinta į Wire.write() dėl"
-"geresnio derėjimo su kitomis bibliotekomis.\n"
-"\n"
 
-#: ../../../processing/app/SerialMonitor.java:41
-#: ../../../processing/app/AbstractMonitor.java:118
+#: debug/Compiler.java:445
+msgid ""
+"\n"
+"As of Arduino 1.0, the Wire.receive() function was renamed to Wire.read() for consistency with other libraries.\n"
+"\n"
+msgstr ""
+
+#: debug/Compiler.java:439
+msgid ""
+"\n"
+"As of Arduino 1.0, the Wire.send() function was renamed to Wire.write() for consistency with other libraries.\n"
+"\n"
+msgstr ""
+
+#: SerialMonitor.java:130 SerialMonitor.java:133
 msgid "baud"
 msgstr ""
 
-#: Preferences.java:373
+#: Preferences.java:389
 msgid "compilation "
-msgstr "kompiliacija "
+msgstr ""
 
 #: ../../../processing/app/NetworkMonitor.java:111
 msgid "connected!"
 msgstr ""
 
-#: Sketch.java:544
+#: Sketch.java:540
 msgid "createNewFile() returned false"
-msgstr "createNewFile() grąžino klaidą (false)"
+msgstr ""
 
 #: ../../../processing/app/EditorStatus.java:469
 msgid "enabled in File > Preferences."
 msgstr ""
 
-#: Base.java:1804
+#: Base.java:2090
 msgid "environment"
-msgstr "darbinė aplinka"
+msgstr ""
 
-#: Editor.java:1094
+#: Editor.java:1108
 msgid "http://arduino.cc/"
 msgstr "http://arduino.cc/"
 
 #: ../../../processing/app/debug/Compiler.java:49
 msgid "http://github.com/arduino/Arduino/issues"
-msgstr ""
+msgstr "http://github.com/arduino/Arduino/issues"
 
 #: UpdateCheck.java:118
 msgid "http://www.arduino.cc/en/Main/Software"
@@ -1924,71 +1791,68 @@ msgstr "http://www.arduino.cc/en/Main/Software"
 msgid "http://www.arduino.cc/latest.txt"
 msgstr "http://www.arduino.cc/latest.txt"
 
-#: Base.java:1789
+#: Base.java:2075
 msgid "http://www.arduino.cc/playground/Learning/Linux"
 msgstr "http://www.arduino.cc/playground/Learning/Linux"
 
-#: Preferences.java:609
+#: Preferences.java:625
 #, java-format
 msgid "ignoring invalid font size {0}"
-msgstr "ignoruojamas netinkamas šrifto dydis {0}"
+msgstr ""
 
-#: Base.java:1794
+#: Base.java:2080
 msgid "index.html"
 msgstr "index.html"
 
-#: Editor.java:927 Editor.java:934
+#: Editor.java:936 Editor.java:943
 msgid "name is null"
-msgstr "nėra pavadinimo"
+msgstr ""
 
-#: Base.java:1804
+#: Base.java:2090
 msgid "platforms.html"
 msgstr "platforms.html"
 
-#: Serial.java:424
+#: Serial.java:451
 #, java-format
 msgid ""
 "readBytesUntil() byte buffer is too small for the {0} bytes up to and "
 "including char {1}"
 msgstr ""
-"readBytesUntil() baitų buferis yra per mažas {0} baitams(-ų) ir "
-"įskaitant simbolį {1}"
 
-#: Sketch.java:651
+#: Sketch.java:647
 msgid "removeCode: internal error.. could not find code"
-msgstr "removeCode: vidinė klaida... kodas nerastas"
+msgstr ""
 
-#: Editor.java:923
+#: Editor.java:932
 msgid "serialMenu is null"
-msgstr "Nuosekliojo porto meniu tuščias"
+msgstr ""
 
-#: debug/Uploader.java:199
+#: debug/Uploader.java:195
 #, java-format
 msgid ""
 "the selected serial port {0} does not exist or your board is not connected"
 msgstr ""
-"pasirinktas nuoseklusis portas {0} neegzistuoja arba jūsų plokštė nepajungta"
 
-#: Preferences.java:375
+#: Preferences.java:391
 msgid "upload"
-msgstr "įkelti"
+msgstr ""
 
-#: Editor.java:373
+#: Editor.java:380
 #, java-format
 msgid "{0} files added to the sketch."
-msgstr "Į projektą pridėtas(-i) {0} failas(-ai)."
+msgstr ""
 
-#: debug/Compiler.java:422
+#: debug/Compiler.java:365
 #, java-format
 msgid "{0} returned {1}"
-msgstr "{0} grąžino {1}"
+msgstr ""
 
-#: Editor.java:2166
+#: Editor.java:2213
 #, java-format
 msgid "{0} | Arduino {1}"
-msgstr "{0} | Arduino {1}"
+msgstr ""
 
-#: Editor.java:1826
+#: Editor.java:1874
 #, java-format
 msgid "{0}.html"
 msgstr "{0}.html"

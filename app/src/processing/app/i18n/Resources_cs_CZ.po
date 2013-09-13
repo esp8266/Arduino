@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2012-11-27 19:40+0000\n"
+"PO-Revision-Date: 2013-09-10 11:35+0000\n"
 "Last-Translator: McHa <mcha@4makers.cz>\n"
 "Language-Team: Czech (Czech Republic) (http://www.transifex.com/projects/p/arduino-ide-15/language/cs_CZ/)\n"
 "MIME-Version: 1.0\n"
@@ -135,11 +135,11 @@ msgstr "Archivování skici bylo ukončeno, protože\nskicu nešlo uložit."
 
 #: ../../../processing/app/I18n.java:83
 msgid "Arduino ARM (32-bits) Boards"
-msgstr ""
+msgstr "Desky Arduino ARM (32-bits)"
 
 #: ../../../processing/app/I18n.java:82
 msgid "Arduino AVR Boards"
-msgstr ""
+msgstr "Desky Arduino AVR"
 
 #: Base.java:1682
 msgid ""
@@ -162,7 +162,7 @@ msgstr "Arduino vyžaduje k běhu plné JDK (nestačí jen JRE)\nNainstalujte si
 
 #: ../../../processing/app/EditorStatus.java:471
 msgid "Arduino: "
-msgstr ""
+msgstr "Arduino: "
 
 #: Sketch.java:588
 #, java-format
@@ -173,13 +173,13 @@ msgstr "Jste si jisti, že chcete smazat \"{0}\"?"
 msgid "Are you sure you want to delete this sketch?"
 msgstr "Jste si jistý, že chcete smazat tuto skicu?"
 
-#: ../../../processing/app/Preferences.java:145
+#: ../../../processing/app/Preferences.java:137
 msgid "Armenian"
-msgstr ""
+msgstr "Arménština"
 
-#: ../../../processing/app/Preferences.java:146
+#: ../../../processing/app/Preferences.java:138
 msgid "Asturian"
-msgstr ""
+msgstr "Asturština"
 
 #: tools/AutoFormat.java:91
 msgid "Auto Format"
@@ -222,29 +222,29 @@ msgstr "Chyba na řádce: {0}"
 msgid "Bad file selected"
 msgstr "Vybrán špatný soubor"
 
-#: ../../../processing/app/Preferences.java:98
+#: ../../../processing/app/Preferences.java:139
 msgid "Belarusian"
-msgstr ""
+msgstr "Běloruština"
 
 #: ../../../processing/app/Base.java:1433
 #: ../../../processing/app/Editor.java:707
 msgid "Board"
-msgstr ""
+msgstr "Vývojová deska"
 
 #: ../../../processing/app/debug/TargetBoard.java:42
 #, java-format
 msgid ""
-"Board {0}:{1}:{2} doesn''t define a ''build.board'' preference. Auto-set to: "
-"{3}"
-msgstr ""
+"Board {0}:{1}:{2} doesn''t define a ''build.board'' preference. Auto-set to:"
+" {3}"
+msgstr "Vývojová deska {0}:{1}:{2} nedefinuje volbu ''build.board''. Automaticky nastaveno na: {3}"
 
 #: ../../../processing/app/EditorStatus.java:472
 msgid "Board: "
-msgstr ""
+msgstr "Vývojová deska: "
 
-#: ../../../processing/app/Preferences.java:147
+#: ../../../processing/app/Preferences.java:140
 msgid "Bosnian"
-msgstr ""
+msgstr "Bosenština"
 
 #: SerialMonitor.java:112
 msgid "Both NL & CR"
@@ -256,19 +256,19 @@ msgstr "Prohlížet"
 
 #: Sketch.java:1392 Sketch.java:1423
 msgid "Build folder disappeared or could not be written"
-msgstr "Adresář pro Build zmyzel a nebo do něj nelze zapisovat"
+msgstr "Adresář pro Build zmizel a nebo do něj nelze zapisovat"
 
 #: ../../../processing/app/Preferences.java:80
 msgid "Bulgarian"
-msgstr ""
+msgstr "Bulharština"
 
-#: ../../../processing/app/Preferences.java:148
+#: ../../../processing/app/Preferences.java:141
 msgid "Burmese (Myanmar)"
-msgstr ""
+msgstr "Barmština (Myanmar)"
 
 #: Editor.java:708
 msgid "Burn Bootloader"
-msgstr "Vypal zavaděč"
+msgstr "Vypálit zavaděč"
 
 #: Editor.java:2504
 msgid "Burning bootloader to I/O Board (this may take a minute)..."
@@ -276,11 +276,11 @@ msgstr "Vypaluji zavaděč na I/O boardu /vývojové desky/ (chvilku to potrvá)
 
 #: ../../../processing/app/Base.java:368
 msgid "Can't open source sketch!"
-msgstr ""
+msgstr "Nelze otevřít zdrojovou skicu!"
 
 #: ../../../processing/app/Preferences.java:92
 msgid "Canadian French"
-msgstr ""
+msgstr "Kanadská francouština"
 
 #: Preferences.java:79 Sketch.java:585 Sketch.java:737 Sketch.java:1042
 #: Editor.java:2064 Editor.java:2145 Editor.java:2465
@@ -303,21 +303,21 @@ msgstr "Katalánština"
 msgid "Check for updates on startup"
 msgstr "Při startu vyhledat nové verze"
 
-#: ../../../processing/app/Preferences.java:149
+#: ../../../processing/app/Preferences.java:142
 msgid "Chinese (China)"
-msgstr ""
+msgstr "Čínština (Čína)"
 
-#: ../../../processing/app/Preferences.java:150
+#: ../../../processing/app/Preferences.java:142
 msgid "Chinese (Hong Kong)"
-msgstr ""
+msgstr "Čínština (Hong Kong)"
 
-#: ../../../processing/app/Preferences.java:151
+#: ../../../processing/app/Preferences.java:144
 msgid "Chinese (Taiwan)"
-msgstr ""
+msgstr "Čínština (Taiwan)"
 
-#: ../../../processing/app/Preferences.java:152
+#: ../../../processing/app/Preferences.java:143
 msgid "Chinese (Taiwan) (Big5)"
-msgstr ""
+msgstr "Čínština (Taiwan) (Big5)"
 
 #: Preferences.java:88
 msgid "Chinese Simplified"
@@ -358,7 +358,7 @@ msgstr "Kopírovat jako HTML"
 
 #: ../../../processing/app/EditorStatus.java:456
 msgid "Copy error"
-msgstr ""
+msgstr "Chyba při kopírování"
 
 #: Editor.java:1165 Editor.java:2715
 msgid "Copy for Forum"
@@ -399,17 +399,17 @@ msgstr "Nemohu smazat {0}"
 #: ../../../processing/app/debug/TargetPlatform.java:74
 #, java-format
 msgid "Could not find boards.txt in {0}. Is it pre-1.5?"
-msgstr ""
+msgstr "Nemohu najít boards.txt in {0}. Není z doby před verzí-1.5?"
 
 #: ../../../cc/arduino/packages/uploaders/SerialUploader.java:282
 #, java-format
 msgid "Could not find tool {0}"
-msgstr ""
+msgstr "Nemohu najít nástroj {0}"
 
 #: ../../../cc/arduino/packages/uploaders/SerialUploader.java:278
 #, java-format
 msgid "Could not find tool {0} from package {1}"
-msgstr ""
+msgstr "Nemohu najít nástroj {0} z balíku {1}"
 
 #: Base.java:1934
 #, java-format
@@ -500,7 +500,7 @@ msgstr "Na vybraném portu nemohu nalézt příslušný board /vývojovou desku/
 
 #: ../../../processing/app/Preferences.java:82
 msgid "Croatian"
-msgstr ""
+msgstr "Chorvatština"
 
 #: Editor.java:1149 Editor.java:2699
 msgid "Cut"
@@ -508,7 +508,7 @@ msgstr "Vyjmout"
 
 #: ../../../processing/app/Preferences.java:83
 msgid "Czech"
-msgstr ""
+msgstr "Čeština"
 
 #: Preferences.java:90
 msgid "Danish"
@@ -560,9 +560,9 @@ msgstr "Konec uploadu."
 msgid "Dutch"
 msgstr "Nizozemština"
 
-#: ../../../processing/app/Preferences.java:153
+#: ../../../processing/app/Preferences.java:144
 msgid "Dutch (Netherlands)"
-msgstr ""
+msgstr "Nizozemština (Nizozemí)"
 
 #: Editor.java:1130
 msgid "Edit"
@@ -580,9 +580,9 @@ msgstr "Jazyk editoru: "
 msgid "English"
 msgstr "Angličtina"
 
-#: ../../../processing/app/Preferences.java:154
+#: ../../../processing/app/Preferences.java:145
 msgid "English (United Kingdom)"
-msgstr ""
+msgstr "Angličtina (Velká Británie)"
 
 #: Editor.java:1062
 msgid "Environment"
@@ -613,14 +613,14 @@ msgstr "Chyba v Serial.{0}()"
 
 #: ../../../processing/app/Base.java:1232
 msgid "Error loading libraries"
-msgstr ""
+msgstr "Chyba při přidávání knihoven"
 
 #: ../../../processing/app/debug/TargetPlatform.java:95
 #: ../../../processing/app/debug/TargetPlatform.java:106
 #: ../../../processing/app/debug/TargetPlatform.java:117
 #, java-format
 msgid "Error loading {0}"
-msgstr ""
+msgstr "Chyba při nahrávání {0}"
 
 #: Serial.java:181
 #, java-format
@@ -640,7 +640,7 @@ msgstr "Chyba při čtení souboru s nastavením. Prosím smažte (či přesuňt
 
 #: ../../../cc/arduino/packages/DiscoveryManager.java:25
 msgid "Error starting discovery method: "
-msgstr ""
+msgstr "Chyba na počátku discovery metody: "
 
 #: Serial.java:125
 #, java-format
@@ -653,7 +653,7 @@ msgstr "Chyba při vypalování zavaděče."
 
 #: ../../../processing/app/Editor.java:2555
 msgid "Error while burning bootloader: missing '{0}' configuration parameter"
-msgstr ""
+msgstr "Chyba při vypalování bootloaderu: chybí konfigurační parametr '{0}'"
 
 #: SketchCode.java:83
 #, java-format
@@ -667,15 +667,15 @@ msgstr "Chyba během tisku."
 #: ../../../processing/app/Editor.java:2409
 #: ../../../processing/app/Editor.java:2449
 msgid "Error while uploading: missing '{0}' configuration parameter"
-msgstr ""
+msgstr "Chyba běheme uploadu: chybí konfigurační parametr '{0}'"
 
 #: Preferences.java:93
 msgid "Estonian"
 msgstr "Estonština"
 
-#: ../../../processing/app/Preferences.java:109
+#: ../../../processing/app/Preferences.java:146
 msgid "Estonian (Estonia)"
-msgstr ""
+msgstr "Estónština (Estónsko)"
 
 #: Editor.java:516
 msgid "Examples"
@@ -721,9 +721,9 @@ msgstr "Najít..."
 msgid "Find:"
 msgstr "Najdi:"
 
-#: ../../../processing/app/Preferences.java:111
+#: ../../../processing/app/Preferences.java:147
 msgid "Finnish"
-msgstr ""
+msgstr "Finština"
 
 #: tools/FixEncoding.java:41 tools/FixEncoding.java:58
 #: tools/FixEncoding.java:79
@@ -754,7 +754,7 @@ msgstr "Galicijština"
 
 #: ../../../processing/app/Preferences.java:94
 msgid "Georgian"
-msgstr ""
+msgstr "Gruzínština"
 
 #: Preferences.java:97
 msgid "German"
@@ -769,12 +769,12 @@ msgstr "Úvodní seznámení"
 msgid ""
 "Global variables use {0} bytes ({2}%%) of dynamic memory, leaving {3} bytes "
 "for local variables. Maximum is {1} bytes."
-msgstr ""
+msgstr "Globální proměnné zabírají {0} bytů ({2}%%)  dynamické paměti, {3} bytů zůstává pro lokální proměnné. Maximum je {1} bytů."
 
 #: ../../../processing/app/Sketch.java:1651
 #, java-format
 msgid "Global variables use {0} bytes of dynamic memory."
-msgstr ""
+msgstr "Globalní proměnné využívají {0} bytů dynamické paměti."
 
 #: Preferences.java:98
 msgid "Greek"
@@ -798,7 +798,7 @@ msgstr "Guide_Windows.html"
 
 #: ../../../processing/app/Preferences.java:95
 msgid "Hebrew"
-msgstr ""
+msgstr "Hebrejština"
 
 #: Editor.java:1015
 msgid "Help"
@@ -847,7 +847,7 @@ msgid ""
 "disable this in the Preferences dialog.\n"
 "\n"
 "Save sketch and update its extension?"
-msgstr ""
+msgstr "V Arduino 1.0 se změnila defaultní přípona pro soubory\nz .pde na .ino. Nové skici (a to platí i pro ty, které vznikly\npomocí \"Ulož jako\") budou obsahovat tuto novou příponu.\nPřípona existujících skic se změní při jejich novém uložení,\ntuto vlastnost lze změnit v nastavení.\n\nUložit skicu a změnit její příponu na .ino?"
 
 #: Editor.java:1216 Editor.java:2757
 msgid "Increase Indent"
@@ -860,7 +860,7 @@ msgstr "Indonéština"
 #: ../../../processing/app/Base.java:1204
 #, java-format
 msgid "Invalid library found in {0}: {1}"
-msgstr ""
+msgstr "Nalezena neplatná knihovna v {0}: {1}"
 
 #: Preferences.java:102
 msgid "Italian"
@@ -888,7 +888,7 @@ msgstr "Litevština"
 
 #: ../../../processing/app/Sketch.java:1660
 msgid "Low memory available, stability problems may occur"
-msgstr ""
+msgstr "Není k dispozici dostatek paměti, mohou se projevit problémy se stabilitou."
 
 #: Preferences.java:107
 msgid "Marathi"
@@ -914,13 +914,13 @@ msgstr "Přesouvám"
 msgid "Name for new file:"
 msgstr "Jméno nového souboru:"
 
-#: ../../../processing/app/Preferences.java:155
+#: ../../../processing/app/Preferences.java:149
 msgid "Nepali"
-msgstr ""
+msgstr "Nepálština"
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:51
 msgid "Network upload using programmer not supported"
-msgstr ""
+msgstr "Uploadovaní po síti pomocí programátoru není podporováno"
 
 #: EditorToolbar.java:41 Editor.java:493
 msgid "New"
@@ -977,12 +977,12 @@ msgstr "Pro \"{0}\" nelze nalézt odkaz v referenční příručce"
 
 #: ../../../processing/app/Base.java:309
 msgid "No valid configured cores found! Exiting..."
-msgstr ""
+msgstr "Nenalezena správná jádra (cores)! Ukončuji..."
 
 #: ../../../processing/app/debug/TargetPackage.java:63
 #, java-format
 msgid "No valid hardware definitions found in folder {0}."
-msgstr ""
+msgstr "V adresáři {0} byla nalezena neplatná definice hardware."
 
 #: Base.java:191
 msgid "Non-fatal error while setting the Look & Feel."
@@ -994,13 +994,13 @@ msgstr "Ne"
 
 #: ../../../processing/app/Preferences.java:108
 msgid "Norwegian Bokmål"
-msgstr ""
+msgstr "Norwegian Bokmål"
 
 #: ../../../processing/app/Sketch.java:1656
 msgid ""
 "Not enough memory; see http://www.arduino.cc/en/Guide/Troubleshooting#size "
 "for tips on reducing your footprint."
-msgstr ""
+msgstr "Nedostatek peměti; na http://www.arduino.cc/en/Guide/Troubleshooting#size naleznete typy jak velikost redukovat."
 
 #: Preferences.java:80 Sketch.java:585 Sketch.java:737 Sketch.java:1042
 #: Editor.java:2145 Editor.java:2465
@@ -1037,7 +1037,7 @@ msgstr "Nastavení stránky"
 
 #: ../../../processing/app/forms/PasswordAuthorizationDialog.java:44
 msgid "Password:"
-msgstr ""
+msgstr "Heslo"
 
 #: Editor.java:1189 Editor.java:2731
 msgid "Paste"
@@ -1061,19 +1061,19 @@ msgstr "Polština"
 
 #: ../../../processing/app/Editor.java:718
 msgid "Port"
-msgstr ""
+msgstr "Port"
 
-#: ../../../processing/app/Preferences.java:157
+#: ../../../processing/app/Preferences.java:151
 msgid "Portugese"
-msgstr ""
+msgstr "Portugalština"
 
-#: ../../../processing/app/Preferences.java:130
+#: ../../../processing/app/Preferences.java:127
 msgid "Portuguese (Brazil)"
-msgstr ""
+msgstr "Portugalština (Brazílie)"
 
-#: ../../../processing/app/Preferences.java:131
+#: ../../../processing/app/Preferences.java:128
 msgid "Portuguese (Portugal)"
-msgstr ""
+msgstr "Portugalština (Portugalsko)"
 
 #: Preferences.java:295 Editor.java:583
 msgid "Preferences"
@@ -1113,11 +1113,11 @@ msgstr "Problém s nastavením platformy"
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:136
 msgid "Problem accessing board folder /www/sd"
-msgstr ""
+msgstr "Problém s přístupem do adresáře vývojové desky /www/sd"
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:132
 msgid "Problem accessing files in folder "
-msgstr ""
+msgstr "Problém s přístupem k souborům v adresáři"
 
 #: Base.java:1673
 msgid "Problem getting data folder"
@@ -1146,7 +1146,7 @@ msgstr "Processing může otevírat pouze skici\na jiné soubory s příponou .i
 
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
-msgstr ""
+msgstr "Procesor"
 
 #: Editor.java:704
 msgid "Programmer"
@@ -1241,7 +1241,7 @@ msgstr "Vyberte soubor typu ZIP nebo adresář, který obsahuje knihovnu, kterou
 
 #: Sketch.java:975
 msgid "Select an image or other data file to copy to your sketch"
-msgstr "Vyberte obrázek a nebo jiný datový soubor k nakopírování do vaší skicy."
+msgstr "Vyberte obrázek a nebo jiný datový soubor k nakopírování do vaší skici."
 
 #: Preferences.java:330
 msgid "Select new sketchbook location"
@@ -1249,7 +1249,7 @@ msgstr "Vyberte nové umístení skicáře"
 
 #: ../../../processing/app/debug/Compiler.java:146
 msgid "Selected board depends on '{0}' core (not installed)."
-msgstr ""
+msgstr "Vybraná vývojová deska závisí na jádře '{0}'  (neinstalováno)."
 
 #: SerialMonitor.java:93
 msgid "Send"
@@ -1297,7 +1297,7 @@ msgstr "Zobraz adresář skici"
 
 #: ../../../processing/app/EditorStatus.java:468
 msgid "Show verbose output during compilation"
-msgstr ""
+msgstr "Zobrazit více informací během kompilace"
 
 #: Preferences.java:387
 msgid "Show verbose output during: "
@@ -1309,7 +1309,7 @@ msgstr "Skica"
 
 #: Sketch.java:1754
 msgid "Sketch Disappeared"
-msgstr "Skica zmyzela"
+msgstr "Skica zmizela"
 
 #: Base.java:1411
 msgid "Sketch Does Not Exist"
@@ -1321,7 +1321,7 @@ msgstr "Tato skica je označena \"Jen pro čtení\" "
 
 #: Sketch.java:294
 msgid "Sketch is Untitled"
-msgstr "Skyca je Nepojmenovaná"
+msgstr "Skica je Nepojmenovaná"
 
 #: Sketch.java:720
 msgid "Sketch is read-only"
@@ -1336,8 +1336,9 @@ msgstr "Skica je moc velká; na http://www.arduino.cc/en/Guide/Troubleshooting#s
 #: ../../../processing/app/Sketch.java:1639
 #, java-format
 msgid ""
-"Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} bytes."
-msgstr ""
+"Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} "
+"bytes."
+msgstr "Skica zabírá {0} bytů ({2}%%)  úložného místa pro program. Maximum je {1} bytů."
 
 #: Editor.java:510
 msgid "Sketchbook"
@@ -1351,9 +1352,9 @@ msgstr "Zmizel adresář Skicáře."
 msgid "Sketchbook location:"
 msgstr "Umístění skicáře:"
 
-#: ../../../processing/app/Preferences.java:134
+#: ../../../processing/app/Preferences.java:152
 msgid "Slovenian"
-msgstr ""
+msgstr "Slovinština"
 
 #: Sketch.java:275 Sketch.java:304 Sketch.java:578 Sketch.java:967
 msgid ""
@@ -1381,9 +1382,9 @@ msgstr "Španělština"
 msgid "Sunshine"
 msgstr "Slunceee!"
 
-#: ../../../processing/app/Preferences.java:136
+#: ../../../processing/app/Preferences.java:153
 msgid "Swedish"
-msgstr ""
+msgstr "Švédština"
 
 #: Preferences.java:84
 msgid "System Default"
@@ -1462,7 +1463,7 @@ msgid ""
 "The sketch folder has disappeared.\n"
 " Will attempt to re-save in the same location,\n"
 "but anything besides the code will be lost."
-msgstr "Skyca zmyzela.\n Pokusím se znovu uložit na stejné místo,\nale krom kódu bude všechno ostatní ztraceno!"
+msgstr "Skica zmizela.\n Pokusím se znovu uložit na stejné místo,\nale krom kódu bude všechno ostatní ztraceno!"
 
 #: Sketch.java:2018
 msgid ""
@@ -1489,7 +1490,7 @@ msgstr "Tento soubor byl již na toto místo nakopírován\nze kterého jsi jej 
 
 #: ../../../processing/app/EditorStatus.java:467
 msgid "This report would have more information with"
-msgstr ""
+msgstr "Tento výpis by měl více informací s"
 
 #: Base.java:535
 msgid "Time for a Break"
@@ -1505,36 +1506,36 @@ msgstr "Řešení problémů - Troubleshooting"
 
 #: ../../../processing/app/Preferences.java:117
 msgid "Turkish"
-msgstr ""
+msgstr "Turečtina"
 
 #: ../../../processing/app/Editor.java:2507
 msgid "Type board password to access its console"
-msgstr ""
+msgstr "Zadejte přístupové heslo ke konsoli  vývojové desky"
 
 #: ../../../processing/app/Sketch.java:1673
 msgid "Type board password to upload a new sketch"
-msgstr ""
+msgstr "Zadejte heslo pro upload skici na vývojovou desku"
 
 #: ../../../processing/app/Preferences.java:118
 msgid "Ukrainian"
-msgstr ""
+msgstr "Ukrajinština"
 
 #: ../../../processing/app/Editor.java:2524
 #: ../../../processing/app/NetworkMonitor.java:145
 msgid "Unable to connect: is the sketch using the bridge?"
-msgstr ""
+msgstr "Nemohu se připojit: využívá skica bridge?"
 
 #: ../../../processing/app/NetworkMonitor.java:130
 msgid "Unable to connect: retrying"
-msgstr ""
+msgstr "Nemohu se připojit: zkouším znovu"
 
 #: ../../../processing/app/Editor.java:2526
 msgid "Unable to connect: wrong password?"
-msgstr ""
+msgstr "Nemohu se připojit: špatné heslo?"
 
 #: ../../../processing/app/Editor.java:2512
 msgid "Unable to open serial monitor"
-msgstr ""
+msgstr "Nemohu otevřít seriový monitor"
 
 #: Sketch.java:1432
 #, java-format
@@ -1574,7 +1575,7 @@ msgstr "Upload přerušen."
 
 #: ../../../processing/app/Sketch.java:1678
 msgid "Upload cancelled"
-msgstr ""
+msgstr "Upload přerušen"
 
 #: Editor.java:2378
 msgid "Uploading to I/O Board..."
@@ -1604,9 +1605,9 @@ msgstr "Ověřit / Kompilovat"
 msgid "Verify code after upload"
 msgstr "Ověřit kód po uploadu"
 
-#: ../../../processing/app/Preferences.java:140
+#: ../../../processing/app/Preferences.java:154
 msgid "Vietnamese"
-msgstr ""
+msgstr "Vietnamština"
 
 #: Editor.java:1105
 msgid "Visit Arduino.cc"
@@ -1671,7 +1672,7 @@ msgstr "Zapoměli jste si svůj skicář"
 #: ../../../processing/app/AbstractMonitor.java:92
 msgid ""
 "You've pressed {0} but nothing was sent. Should you select a line ending?"
-msgstr ""
+msgstr "Stiskli jste {0}, avšak nic nebylo posláno. Neměli byste nastavit natavení konce řádku?"
 
 #: Base.java:536
 msgid ""
@@ -1762,7 +1763,7 @@ msgstr "kompilace"
 
 #: ../../../processing/app/NetworkMonitor.java:111
 msgid "connected!"
-msgstr ""
+msgstr "připojeno!"
 
 #: Sketch.java:540
 msgid "createNewFile() returned false"
@@ -1770,7 +1771,7 @@ msgstr "funkce createNewFile() navrátila false"
 
 #: ../../../processing/app/EditorStatus.java:469
 msgid "enabled in File > Preferences."
-msgstr ""
+msgstr "povoleno v Soubor > Vlastnosti"
 
 #: Base.java:2090
 msgid "environment"
@@ -1782,7 +1783,7 @@ msgstr "http://arduino.cc/"
 
 #: ../../../processing/app/debug/Compiler.java:49
 msgid "http://github.com/arduino/Arduino/issues"
-msgstr ""
+msgstr "http://github.com/arduino/Arduino/issues"
 
 #: UpdateCheck.java:118
 msgid "http://www.arduino.cc/en/Main/Software"

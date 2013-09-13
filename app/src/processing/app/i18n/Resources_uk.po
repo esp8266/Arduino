@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2012-11-05 17:53+0000\n"
-"Last-Translator: gromko <ggromko@mail.ru>\n"
+"PO-Revision-Date: 2013-09-10 10:35+0000\n"
+"Last-Translator: cmaglie <c.maglie@arduino.cc>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/projects/p/arduino-ide-15/language/uk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -170,11 +170,11 @@ msgstr "Ви дійсно хочете видалити \"{0}\"?"
 msgid "Are you sure you want to delete this sketch?"
 msgstr "Ви дійсно хочете видалити цей скетч?"
 
-#: ../../../processing/app/Preferences.java:145
+#: ../../../processing/app/Preferences.java:137
 msgid "Armenian"
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:146
+#: ../../../processing/app/Preferences.java:138
 msgid "Asturian"
 msgstr ""
 
@@ -219,7 +219,7 @@ msgstr "Рядок з помилкою: {0}"
 msgid "Bad file selected"
 msgstr "Вибрано неправильний файл"
 
-#: ../../../processing/app/Preferences.java:98
+#: ../../../processing/app/Preferences.java:139
 msgid "Belarusian"
 msgstr ""
 
@@ -231,15 +231,15 @@ msgstr ""
 #: ../../../processing/app/debug/TargetBoard.java:42
 #, java-format
 msgid ""
-"Board {0}:{1}:{2} doesn''t define a ''build.board'' preference. Auto-set to: "
-"{3}"
+"Board {0}:{1}:{2} doesn''t define a ''build.board'' preference. Auto-set to:"
+" {3}"
 msgstr ""
 
 #: ../../../processing/app/EditorStatus.java:472
 msgid "Board: "
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:147
+#: ../../../processing/app/Preferences.java:140
 msgid "Bosnian"
 msgstr ""
 
@@ -259,7 +259,7 @@ msgstr "Відсутня або не перезаписується тека з�
 msgid "Bulgarian"
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:148
+#: ../../../processing/app/Preferences.java:141
 msgid "Burmese (Myanmar)"
 msgstr ""
 
@@ -300,19 +300,19 @@ msgstr "каталонська"
 msgid "Check for updates on startup"
 msgstr "Перевіряти оновлення при запуску"
 
-#: ../../../processing/app/Preferences.java:149
+#: ../../../processing/app/Preferences.java:142
 msgid "Chinese (China)"
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:150
+#: ../../../processing/app/Preferences.java:142
 msgid "Chinese (Hong Kong)"
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:151
+#: ../../../processing/app/Preferences.java:144
 msgid "Chinese (Taiwan)"
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:152
+#: ../../../processing/app/Preferences.java:143
 msgid "Chinese (Taiwan) (Big5)"
 msgstr ""
 
@@ -557,7 +557,7 @@ msgstr "Вивантаження виконано."
 msgid "Dutch"
 msgstr "голландська"
 
-#: ../../../processing/app/Preferences.java:153
+#: ../../../processing/app/Preferences.java:144
 msgid "Dutch (Netherlands)"
 msgstr ""
 
@@ -577,7 +577,7 @@ msgstr "Мова інтерфейсу"
 msgid "English"
 msgstr "англійська"
 
-#: ../../../processing/app/Preferences.java:154
+#: ../../../processing/app/Preferences.java:145
 msgid "English (United Kingdom)"
 msgstr ""
 
@@ -670,7 +670,7 @@ msgstr ""
 msgid "Estonian"
 msgstr "естонська"
 
-#: ../../../processing/app/Preferences.java:109
+#: ../../../processing/app/Preferences.java:146
 msgid "Estonian (Estonia)"
 msgstr ""
 
@@ -718,7 +718,7 @@ msgstr "Знайти..."
 msgid "Find:"
 msgstr "Знайти:"
 
-#: ../../../processing/app/Preferences.java:111
+#: ../../../processing/app/Preferences.java:147
 msgid "Finnish"
 msgstr ""
 
@@ -911,7 +911,7 @@ msgstr "Переміщення"
 msgid "Name for new file:"
 msgstr "Ім'я для нового файлу:"
 
-#: ../../../processing/app/Preferences.java:155
+#: ../../../processing/app/Preferences.java:149
 msgid "Nepali"
 msgstr ""
 
@@ -1060,15 +1060,15 @@ msgstr "польська"
 msgid "Port"
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:157
+#: ../../../processing/app/Preferences.java:151
 msgid "Portugese"
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:130
+#: ../../../processing/app/Preferences.java:127
 msgid "Portuguese (Brazil)"
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:131
+#: ../../../processing/app/Preferences.java:128
 msgid "Portuguese (Portugal)"
 msgstr ""
 
@@ -1333,7 +1333,8 @@ msgstr "Скетч занадто великий; зверніться до http
 #: ../../../processing/app/Sketch.java:1639
 #, java-format
 msgid ""
-"Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} bytes."
+"Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} "
+"bytes."
 msgstr ""
 
 #: Editor.java:510
@@ -1348,7 +1349,7 @@ msgstr "Тека зі скетчами зникла."
 msgid "Sketchbook location:"
 msgstr "Розташування теки зі скетчами:"
 
-#: ../../../processing/app/Preferences.java:134
+#: ../../../processing/app/Preferences.java:152
 msgid "Slovenian"
 msgstr ""
 
@@ -1378,7 +1379,7 @@ msgstr "Іспанська"
 msgid "Sunshine"
 msgstr "Сонячне світло"
 
-#: ../../../processing/app/Preferences.java:136
+#: ../../../processing/app/Preferences.java:153
 msgid "Swedish"
 msgstr ""
 
@@ -1601,7 +1602,7 @@ msgstr "Перевірити / Компілювати"
 msgid "Verify code after upload"
 msgstr "Перевірка коду після вивантаження"
 
-#: ../../../processing/app/Preferences.java:140
+#: ../../../processing/app/Preferences.java:154
 msgid "Vietnamese"
 msgstr ""
 
