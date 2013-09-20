@@ -1,4 +1,9 @@
 
+ARDUINO 1.5.5 BETA
+
+[libraries]
+* avr: Fixed buffer overflow in File::doBuffer() (dreggy)
+
 ARDUINO 1.5.4 BETA 2013.09.10
 
 [ide]

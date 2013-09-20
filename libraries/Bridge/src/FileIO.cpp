@@ -116,10 +116,10 @@ void File::doBuffer() {
   if (buffered > 0)
     return;
 
-  // Try to buffer up to 32 characters
+  // Try to buffer up to BUFFER_SIZE characters
   readPos = 0;
-  uint8_t cmd[] = {'G', handle, sizeof(buffer)};
-  buffered = bridge.transfer(cmd, 3, buffer, sizeof(buffer)) - 1;
+  uint8_t cmd[] = {'G', handle, BUFFER_SIZE - 1};
+  buffered = bridge.transfer(cmd, 3, buffer, BUFFER_SIZE) - 1;
   //err = buff[0]; // First byte is error code
   if (buffered>0) {
     // Shift the reminder of buffer
