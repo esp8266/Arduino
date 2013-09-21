@@ -158,11 +158,11 @@ uint16_t BridgeClass::transfer(const uint8_t *buff1, uint16_t len1,
     crcUpdate(index);
     
     // Recv len
-    int lh = timedRead(5);
+    int lh = timedRead(10);
     if (lh < 0)
       continue;
     crcUpdate(lh);
-    int ll = timedRead(5);
+    int ll = timedRead(10);
     if (ll < 0)
       continue;
     crcUpdate(ll);
