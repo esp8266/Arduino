@@ -81,7 +81,12 @@ public:
   }
   
   void begin() {
-    serial.begin(250000);
+    serial.begin(250000);    // for Yun
+    BridgeClass::begin();
+  }
+  
+  void begin(int baudrate) {
+    serial.begin(baudrate);  // for other linux-systems
     BridgeClass::begin();
   }
   
