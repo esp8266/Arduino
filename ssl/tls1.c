@@ -1447,6 +1447,9 @@ int send_change_cipher_spec(SSL *ssl)
     
     if (ssl->cipher_info)
         SET_SSL_FLAG(SSL_TX_ENCRYPTED);
+    if (ssl->cipher_info)
+        SET_SSL_FLAG(SSL_TX_ENCRYPTED);
+
     memset(ssl->write_sequence, 0, 8);
     return ret;
 }
@@ -2161,7 +2164,7 @@ EXP_FUNC void STDCALL ssl_display_error(int error_code) {}
 EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, int client_fd, const
         uint8_t *session_id, uint8_t sess_id_size)
 {
-    printf(unsupported_str);
+    printf("%s", unsupported_str);
     return NULL;
 }
 #endif
@@ -2169,20 +2172,20 @@ EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, int client_fd, const
 #if !defined(CONFIG_SSL_CERT_VERIFICATION)
 EXP_FUNC int STDCALL ssl_verify_cert(const SSL *ssl)
 {
-    printf(unsupported_str);
+    printf("%s", unsupported_str);
     return -1;
 }
 
 
 EXP_FUNC const char * STDCALL ssl_get_cert_dn(const SSL *ssl, int component)
 {
-    printf(unsupported_str);
+    printf("%s", unsupported_str);
     return NULL;
 }
 
 EXP_FUNC const char * STDCALL ssl_get_cert_subject_alt_dnsname(const SSL *ssl, int index)
 {
-    printf(unsupported_str);
+    printf("%s", unsupported_str);
     return NULL;
 }
 

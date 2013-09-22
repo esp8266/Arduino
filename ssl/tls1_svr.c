@@ -117,7 +117,6 @@ int do_svr_handshake(SSL *ssl, int handshake_type, uint8_t *buf, int hs_len)
 static int process_client_hello(SSL *ssl)
 {
     uint8_t *buf = ssl->bm_data;
-    uint8_t *record_buf = ssl->hmac_header;
     int pkt_size = ssl->bm_index;
     int i, j, cs_len, id_len, offset = 6 + SSL_RANDOM_SIZE;
     int ret = SSL_OK;
