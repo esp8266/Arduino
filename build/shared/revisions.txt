@@ -4,6 +4,7 @@ ARDUINO 1.5.5 BETA
 [libraries]
 * avr: Fixed buffer overflow in File::doBuffer() (dreggy)
 * avr: Fixed timeout in Bridge::transfer()
+* avr: Fixed behavior of EthernetClient::flush()
 
 ARDUINO 1.5.4 BETA 2013.09.10
 
