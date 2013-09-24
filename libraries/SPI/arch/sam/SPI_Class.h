@@ -54,12 +54,15 @@ class SPIClass {
 	void setClockDivider(uint8_t _div) { setClockDivider(BOARD_SPI_DEFAULT_SS, _div); };
 
   private:
+	void init();
+
 	Spi *spi;
 	uint32_t id;
 	BitOrder bitOrder[SPI_CHANNELS_NUM];
 	uint32_t divider[SPI_CHANNELS_NUM];
 	uint32_t mode[SPI_CHANNELS_NUM];
 	void (*initCb)(void);
+	bool initialized;
 };
 
 #if SPI_INTERFACES_COUNT > 0

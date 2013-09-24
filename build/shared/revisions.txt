@@ -4,6 +4,7 @@ ARDUINO 1.5.5 BETA
 [libraries]
 * avr: Fixed buffer overflow in File::doBuffer() (dreggy)
 * avr: Fixed timeout in Bridge::transfer()
+* sam: Fixed SPI initialization (when using extended API and multiple CS)
 
 ARDUINO 1.5.4 BETA 2013.09.10
 
