@@ -7,6 +7,10 @@ ARDUINO 1.5.5 BETA
 * sam: Fixed SPI initialization (when using extended API and multiple CS)
 * avr: Fixed behavior of EthernetClient::flush()
 
+[core]
+* sam: Fixed wrong initialization for ADC timings (analogRead speed Arduino DUE improved by a factor x10)
+       (http://www.djerickson.com/arduino/)
+
 ARDUINO 1.5.4 BETA 2013.09.10
 
 [ide]
