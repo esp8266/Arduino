@@ -98,7 +98,7 @@ void W5100Class::recv_data_processing(SOCKET s, uint8_t *data, uint16_t len, uin
 {
   uint16_t ptr;
   ptr = readSnRX_RD(s);
-  read_data(s, (uint8_t *)ptr, data, len);
+  read_data(s, ptr, data, len);
   if (!peek)
   {
     ptr += len;
@@ -106,13 +106,13 @@ void W5100Class::recv_data_processing(SOCKET s, uint8_t *data, uint16_t len, uin
   }
 }
 
-void W5100Class::read_data(SOCKET s, volatile uint8_t *src, volatile uint8_t *dst, uint16_t len)
+void W5100Class::read_data(SOCKET s, volatile uint16_t src, volatile uint8_t *dst, uint16_t len)
 {
   uint16_t size;
   uint16_t src_mask;
   uint16_t src_ptr;
 
-  src_mask = (uint16_t)src & RMASK;
+  src_mask = src & RMASK;
   src_ptr = RBASE[s] + src_mask;
 
   if( (src_mask + len) > RSIZE ) 
