@@ -6,6 +6,8 @@ ARDUINO 1.5.5 BETA
 * avr: Fixed timeout in Bridge::transfer()
 * sam: Fixed SPI initialization (when using extended API and multiple CS)
 * avr: Fixed behavior of EthernetClient::flush()
+* avr: Fixed wrong extended fuses on Arduino Yún when using external programmer
+* Added missing YunServer and YunClient keywords
 
 [core]
 * sam: Fixed wrong initialization for ADC timings (analogRead speed Arduino DUE improved by a factor x10)
