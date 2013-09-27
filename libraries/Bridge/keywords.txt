@@ -13,6 +13,8 @@ Console	KEYWORD3
 Process	KEYWORD3
 Mailbox	KEYWORD3
 HttpClient	KEYWORD3
+YunServer	KEYWORD3
+YunClient	KEYWORD3
 
 #######################################
 # Methods and Functions (KEYWORD2)
