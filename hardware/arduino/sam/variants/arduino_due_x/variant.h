@@ -56,6 +56,11 @@ extern "C"{
 
 // Number of pins defined in PinDescription array
 #define PINS_COUNT           (79u)
+#define NUM_DIGITAL_PINS     (53u)
+#define NUM_ANALOG_INPUTS    (12u)
+
+// Interrupts
+#define digitalPinToInterrupt(p)  ((p) < NUM_DIGITAL_PINS ? (p) : -1)
 
 // LEDs
 #define PIN_LED_13           (13u)
