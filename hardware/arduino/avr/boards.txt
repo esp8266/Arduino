@@ -35,7 +35,7 @@ yun.build.pid=0x8041
 yun.build.usb_product="Arduino Yun"
 yun.build.board=AVR_YUN
 yun.build.core=arduino
-yun.build.variant=leonardo
+yun.build.variant=yun
 yun.build.extra_flags={build.usb_flags}
 
 ##############################################################
