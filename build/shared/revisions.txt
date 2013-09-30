@@ -2,7 +2,7 @@
 ARDUINO 1.5.5 BETA
 
 [ide]
-* Added missing YunServer and YunClient keywords
+* Added missing keywords: YunServer, YunClient, pow
 
 [libraries]
 * avr: Fixed buffer overflow in File::doBuffer() (dreggy)
@@ -14,6 +14,7 @@ ARDUINO 1.5.5 BETA
 * sam: Fixed wrong initialization for ADC timings (analogRead speed Arduino DUE improved by a factor x10)
        (http://www.djerickson.com/arduino/)
 * avr: Fixed wrong extended fuses on Arduino Yún when using external programmer
+* avr: Added yun variant with LED_BUILTIN definition
 
 ARDUINO 1.5.4 BETA 2013.09.10
 
