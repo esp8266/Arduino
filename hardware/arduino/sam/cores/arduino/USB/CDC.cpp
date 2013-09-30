@@ -149,6 +149,10 @@ void Serial_::begin(uint32_t baud_count)
 {
 }
 
+void Serial_::begin(uint32_t baud_count, uint8_t config)
+{
+}
+
 void Serial_::end(void)
 {
 }
