@@ -65,6 +65,8 @@ extern void loop( void ) ;
 //#define NOT_A_PIN 0  // defined in pio.h/EPioType
 #define NOT_A_PORT           0
 
+#define NOT_AN_INTERRUPT -1
+
 typedef enum _EExt_Interrupts
 {
   EXTERNAL_INT_0=0,

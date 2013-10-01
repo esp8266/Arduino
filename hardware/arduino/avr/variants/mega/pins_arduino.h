@@ -83,7 +83,7 @@ static const uint8_t A15 = 69;
                                 ( (((p) >= 62) && ((p) <= 69)) ? ((p) - 62) : \
                                 0 ) ) ) ) ) )
 
-#define digitalPinToInterrupt(p) ((p) == 2 ? 0 : ((p) == 3 ? 1 : ((p) >= 18 && (p) <= 21 ? 23 - (p) : -1)))
+#define digitalPinToInterrupt(p) ((p) == 2 ? 0 : ((p) == 3 ? 1 : ((p) >= 18 && (p) <= 21 ? 23 - (p) : NOT_AN_INTERRUPT)))
 
 #ifdef ARDUINO_MAIN
 
