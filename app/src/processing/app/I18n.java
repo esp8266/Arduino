@@ -31,27 +31,23 @@ public class I18n {
   static String PROMPT_BROWSE;
 
   static protected void init(String language) throws MissingResourceException {
-    // there might be a null pointer exception ... most likely will never happen but the jvm gets mad
-    try {
-      String[] languageParts = language.split("_");
-      Locale locale = Locale.getDefault();
-      // both language and country
-      if (languageParts.length == 2) {
-        locale = new Locale(languageParts[0], languageParts[1]);
-        // just language
-      } else if (languageParts.length == 1 && !"".equals(languageParts[0])) {
-        locale = new Locale(languageParts[0]);
-      }
-      // there might be a null pointer exception ... most likely will never happen but the jvm gets mad
-      Locale.setDefault(locale);
-      i18n = ResourceBundle.getBundle("processing.app.i18n.Resources", Locale.getDefault());
-      PROMPT_YES = _("Yes");
-      PROMPT_NO = _("No");
-      PROMPT_CANCEL = _("Cancel");
-      PROMPT_OK = _("OK");
-      PROMPT_BROWSE = _("Browse");
-    } catch (java.lang.NullPointerException e) {
+    String[] languageParts = language.split("_");
+    Locale locale = Locale.getDefault();
+    // both language and country
+    if (languageParts.length == 2) {
+      locale = new Locale(languageParts[0], languageParts[1]);
+      // just language
+    } else if (languageParts.length == 1 && !"".equals(languageParts[0])) {
+      locale = new Locale(languageParts[0]);
     }
+    // there might be a null pointer exception ... most likely will never happen but the jvm gets mad
+    Locale.setDefault(locale);
+    i18n = ResourceBundle.getBundle("processing.app.i18n.Resources", Locale.getDefault());
+    PROMPT_YES = _("Yes");
+    PROMPT_NO = _("No");
+    PROMPT_CANCEL = _("Cancel");
+    PROMPT_OK = _("OK");
+    PROMPT_BROWSE = _("Browse");
   }
 
   public static String _(String s) {
