@@ -156,57 +156,54 @@ nano.menu.cpu.atmega168.build.mcu=atmega168
 
 ##############################################################
 
-mega2560.name=Arduino Mega 2560 or Mega ADK
-mega2560.vid.0=0x2341
-mega2560.pid.0=0x0044
-mega2560.vid.1=0x2341
-mega2560.pid.1=0x003f
-mega2560.cpu=2560 or ADK
-
-mega2560.upload.tool=avrdude
-mega2560.upload.protocol=wiring
-mega2560.upload.maximum_size=258048
-mega2560.upload.maximum_data_size=8192
-mega2560.upload.speed=115200
-
-mega2560.bootloader.tool=avrdude
-mega2560.bootloader.low_fuses=0xFF
-mega2560.bootloader.high_fuses=0xD8
-mega2560.bootloader.extended_fuses=0xFD
-mega2560.bootloader.file=stk500v2/stk500boot_v2_mega2560.hex
-mega2560.bootloader.unlock_bits=0x3F
-mega2560.bootloader.lock_bits=0x0F
-
-mega2560.build.mcu=atmega2560
-mega2560.build.f_cpu=16000000L
-mega2560.build.board=AVR_MEGA2560
-mega2560.build.core=arduino
-mega2560.build.variant=mega
-
-##############################################################
-
-mega.name=Arduino Mega (ATmega1280)
-mega.cpu=ATmega1280
+mega.name=Arduino Mega
 
 mega.upload.tool=avrdude
-mega.upload.protocol=arduino
-mega.upload.maximum_size=126976
 mega.upload.maximum_data_size=8192
-mega.upload.speed=57600
 
 mega.bootloader.tool=avrdude
 mega.bootloader.low_fuses=0xFF
-mega.bootloader.high_fuses=0xDA
-mega.bootloader.extended_fuses=0xF5
-mega.bootloader.file=atmega/ATmegaBOOT_168_atmega1280.hex
 mega.bootloader.unlock_bits=0x3F
 mega.bootloader.lock_bits=0x0F
 
-mega.build.mcu=atmega1280
 mega.build.f_cpu=16000000L
-mega.build.board=AVR_MEGA
 mega.build.core=arduino
 mega.build.variant=mega
+
+## Arduino Mega w/ ATmega2560
+## -------------------------
+mega.menu.cpu.atmega2560=ATmega2560 (Mega 2560)
+
+mega.menu.cpu.atmega2560.vid.0=0x2341
+mega.menu.cpu.atmega2560.pid.0=0x0010
+mega.menu.cpu.atmega2560.vid.1=0x2341
+mega.menu.cpu.atmega2560.pid.1=0x0042
+
+mega.menu.cpu.atmega2560.upload.protocol=wiring
+mega.menu.cpu.atmega2560.upload.maximum_size=258048
+mega.menu.cpu.atmega2560.upload.speed=115200
+
+mega.menu.cpu.atmega2560.bootloader.high_fuses=0xD8
+mega.menu.cpu.atmega2560.bootloader.extended_fuses=0xFD
+mega.menu.cpu.atmega2560.bootloader.file=stk500v2/stk500boot_v2_mega2560.hex
+
+mega.menu.cpu.atmega2560.build.mcu=atmega2560
+mega.menu.cpu.atmega2560.build.board=AVR_MEGA2560
+
+## Arduino Mega w/ ATmega1280
+## -------------------------
+mega.menu.cpu.atmega1280=ATmega1280
+
+mega.menu.cpu.atmega1280.upload.protocol=arduino
+mega.menu.cpu.atmega1280.upload.maximum_size=126976
+mega.menu.cpu.atmega1280.upload.speed=57600
+
+mega.menu.cpu.atmega1280.bootloader.high_fuses=0xDA
+mega.menu.cpu.atmega1280.bootloader.extended_fuses=0xF5
+mega.menu.cpu.atmega1280.bootloader.file=atmega/ATmegaBOOT_168_atmega1280.hex
+
+mega.menu.cpu.atmega1280.build.mcu=atmega1280
+mega.menu.cpu.atmega1280.build.board=AVR_MEGA
 
 ##############################################################
 
