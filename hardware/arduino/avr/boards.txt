@@ -210,6 +210,35 @@ mega.build.variant=mega
 
 ##############################################################
 
+megaADK.name=Arduino Mega ADK
+
+megaADK.vid.0=0x2341
+megaADK.pid.0=0x003f
+megaADK.vid.1=0x2341
+megaADK.pid.1=0x0044
+
+megaADK.upload.tool=avrdude
+megaADK.upload.protocol=wiring
+megaADK.upload.maximum_size=258048
+megaADK.upload.maximum_data_size=8192
+megaADK.upload.speed=115200
+
+megaADK.bootloader.tool=avrdude
+megaADK.bootloader.low_fuses=0xFF
+megaADK.bootloader.high_fuses=0xD8
+megaADK.bootloader.extended_fuses=0xFD
+megaADK.bootloader.file=stk500v2/stk500boot_v2_mega2560.hex
+megaADK.bootloader.unlock_bits=0x3F
+megaADK.bootloader.lock_bits=0x0F
+
+megaADK.build.mcu=atmega2560
+megaADK.build.f_cpu=16000000L
+megaADK.build.board=AVR_ADK
+megaADK.build.core=arduino
+megaADK.build.variant=mega
+
+##############################################################
+
 leonardo.name=Arduino Leonardo
 leonardo.vid.0=0x2341
 leonardo.pid.0=0x0036
