@@ -97,7 +97,7 @@ public class SerialUploader extends Uploader {
           Thread.sleep(400);
         }
       } catch (SerialException e) {
-        throw new RunnerException(e.getMessage());
+        throw new RunnerException(e);
       } catch (InterruptedException e) {
         throw new RunnerException(e.getMessage());
       }
