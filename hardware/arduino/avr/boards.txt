@@ -156,7 +156,12 @@ nano.menu.cpu.atmega168.build.mcu=atmega168
 
 ##############################################################
 
-mega.name=Arduino Mega
+mega.name=Arduino Mega or Mega 2560
+
+mega.vid.0=0x2341
+mega.pid.0=0x0010
+mega.vid.1=0x2341
+mega.pid.1=0x0042
 
 mega.upload.tool=avrdude
 mega.upload.maximum_data_size=8192
@@ -169,15 +174,12 @@ mega.bootloader.lock_bits=0x0F
 mega.build.f_cpu=16000000L
 mega.build.core=arduino
 mega.build.variant=mega
+# default board  may be overridden by the cpu menu
+mega.build.board=AVR_MEGA2560
 
 ## Arduino Mega w/ ATmega2560
 ## -------------------------
 mega.menu.cpu.atmega2560=ATmega2560 (Mega 2560)
-
-mega.menu.cpu.atmega2560.vid.0=0x2341
-mega.menu.cpu.atmega2560.pid.0=0x0010
-mega.menu.cpu.atmega2560.vid.1=0x2341
-mega.menu.cpu.atmega2560.pid.1=0x0042
 
 mega.menu.cpu.atmega2560.upload.protocol=wiring
 mega.menu.cpu.atmega2560.upload.maximum_size=258048
