@@ -950,10 +950,10 @@ char getch(void)
 			count++;
 			if (count > MAX_TIME_COUNT)
 				app_start();
-			}
-
-			return UDR0;
 		}
+
+		return UDR0;
+	}
 	else if(bootuart == 2) {
 		while(!(UCSR1A & _BV(RXC1))) {
 			/* 20060803 DojoCorp:: Addon coming from the previous Bootloader*/               
