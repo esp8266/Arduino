@@ -433,7 +433,7 @@ void init( void )
 
   // Initialize Analog Controller
   pmc_enable_periph_clk(ID_ADC);
-  adc_init(ADC, SystemCoreClock, ADC_FREQ_MAX, /*ADC_STARTUP_FAST*/ 3);
+  adc_init(ADC, SystemCoreClock, ADC_FREQ_MAX, ADC_STARTUP_FAST);
   adc_configure_timing(ADC, 0, ADC_SETTLING_TIME_3, 1);
   adc_configure_trigger(ADC, ADC_TRIG_SW, 0); // Disable hardware trigger.
   adc_disable_interrupt(ADC, 0xFFFFFFFF); // Disable all ADC interrupts.
