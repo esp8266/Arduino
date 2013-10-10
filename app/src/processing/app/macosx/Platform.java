@@ -232,7 +232,7 @@ public class Platform extends processing.app.Platform {
       CommandLine toDevicePath = CommandLine.parse("/usr/sbin/system_profiler SPUSBDataType");
       executor.execute(toDevicePath);
       return new String(baos.toByteArray());
-    } catch (IOException e) {
+    } catch (Throwable e) {
       return super.preListAllCandidateDevices();
     }
   }

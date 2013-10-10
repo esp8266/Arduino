@@ -3,15 +3,13 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Eli Ganem <eli.ganem@gmail.com>, 2012.
-#   <logme3@gmail.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2012-11-18 22:03+0000\n"
-"Last-Translator: Eli Ganem <eli.ganem@gmail.com>\n"
+"PO-Revision-Date: 2013-09-10 10:35+0000\n"
+"Last-Translator: cmaglie <c.maglie@arduino.cc>\n"
 "Language-Team: Hebrew (http://www.transifex.com/projects/p/arduino-ide-15/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -134,11 +132,11 @@ msgstr "הכנסת הסקיצה לארכיון בוטלה בגלל שלא נית
 
 #: ../../../processing/app/I18n.java:83
 msgid "Arduino ARM (32-bits) Boards"
-msgstr ""
+msgstr "לוחות ARM ארדווינו (32 - סיביות)"
 
 #: ../../../processing/app/I18n.java:82
 msgid "Arduino AVR Boards"
-msgstr ""
+msgstr "לוחות ארדווינו AVR"
 
 #: Base.java:1682
 msgid ""
@@ -171,6 +169,14 @@ msgstr "האם אתה בטוח שאתה רוצה למחוק את \"{0}\"?"
 #: Sketch.java:587
 msgid "Are you sure you want to delete this sketch?"
 msgstr "האם אתה בטוח שאתה רוצה למחוק את הסקיצה הזו?"
+
+#: ../../../processing/app/Preferences.java:137
+msgid "Armenian"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:138
+msgid "Asturian"
+msgstr ""
 
 #: tools/AutoFormat.java:91
 msgid "Auto Format"
@@ -213,25 +219,28 @@ msgstr "שגיאה חמורה בשורה: {0}"
 msgid "Bad file selected"
 msgstr "נבחר קובץ לא תקין"
 
-#: ../../../processing/app/Sketch.java:1638
-#, java-format
-msgid "Binary sketch size: {0} bytes (of a {1} byte maximum) - {2}%% used"
+#: ../../../processing/app/Preferences.java:139
+msgid "Belarusian"
 msgstr ""
 
 #: ../../../processing/app/Base.java:1433
 #: ../../../processing/app/Editor.java:707
 msgid "Board"
-msgstr ""
+msgstr "לוח"
 
 #: ../../../processing/app/debug/TargetBoard.java:42
 #, java-format
 msgid ""
-"Board {0}:{1}:{2} doesn''t define a ''build.board'' preference. Auto-set to: "
-"{3}"
+"Board {0}:{1}:{2} doesn''t define a ''build.board'' preference. Auto-set to:"
+" {3}"
 msgstr ""
 
 #: ../../../processing/app/EditorStatus.java:472
 msgid "Board: "
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:140
+msgid "Bosnian"
 msgstr ""
 
 #: SerialMonitor.java:112
@@ -248,6 +257,10 @@ msgstr "ספריה ה-build נמחקה או שלא ניתן לכתוב לתוכ�
 
 #: ../../../processing/app/Preferences.java:80
 msgid "Bulgarian"
+msgstr "בולגרית"
+
+#: ../../../processing/app/Preferences.java:141
+msgid "Burmese (Myanmar)"
 msgstr ""
 
 #: Editor.java:708
@@ -260,11 +273,11 @@ msgstr "צורב תוכנת הפעלה ללוח I\\O (זה יימשך כדקה).
 
 #: ../../../processing/app/Base.java:368
 msgid "Can't open source sketch!"
-msgstr ""
+msgstr "לא ניתו לפתוח את מקור הסקיצה"
 
 #: ../../../processing/app/Preferences.java:92
 msgid "Canadian French"
-msgstr ""
+msgstr "צרפת הקנדית"
 
 #: Preferences.java:79 Sketch.java:585 Sketch.java:737 Sketch.java:1042
 #: Editor.java:2064 Editor.java:2145 Editor.java:2465
@@ -286,6 +299,22 @@ msgstr "קטלונית"
 #: Preferences.java:419
 msgid "Check for updates on startup"
 msgstr "בדוק עדכונים בהפעלה"
+
+#: ../../../processing/app/Preferences.java:142
+msgid "Chinese (China)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:142
+msgid "Chinese (Hong Kong)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:144
+msgid "Chinese (Taiwan)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:143
+msgid "Chinese (Taiwan) (Big5)"
+msgstr ""
 
 #: Preferences.java:88
 msgid "Chinese Simplified"
@@ -468,7 +497,7 @@ msgstr "לא מצליח למצוא לוח בפורט שנבחר. יש לבדוק
 
 #: ../../../processing/app/Preferences.java:82
 msgid "Croatian"
-msgstr ""
+msgstr "קרואטיה"
 
 #: Editor.java:1149 Editor.java:2699
 msgid "Cut"
@@ -476,7 +505,7 @@ msgstr "גזור"
 
 #: ../../../processing/app/Preferences.java:83
 msgid "Czech"
-msgstr ""
+msgstr "קזחסטן"
 
 #: Preferences.java:90
 msgid "Danish"
@@ -528,6 +557,10 @@ msgstr "העלאה הסתיימה."
 msgid "Dutch"
 msgstr "הולנדית"
 
+#: ../../../processing/app/Preferences.java:144
+msgid "Dutch (Netherlands)"
+msgstr ""
+
 #: Editor.java:1130
 msgid "Edit"
 msgstr "ערוך"
@@ -543,6 +576,10 @@ msgstr "שפת העורך:"
 #: Preferences.java:92
 msgid "English"
 msgstr "אנגלית"
+
+#: ../../../processing/app/Preferences.java:145
+msgid "English (United Kingdom)"
+msgstr ""
 
 #: Editor.java:1062
 msgid "Environment"
@@ -633,9 +670,13 @@ msgstr ""
 msgid "Estonian"
 msgstr "אסטונית"
 
+#: ../../../processing/app/Preferences.java:146
+msgid "Estonian (Estonia)"
+msgstr ""
+
 #: Editor.java:516
 msgid "Examples"
-msgstr "דוגמא"
+msgstr "דוגמאות"
 
 #: Editor.java:2482
 msgid "Export canceled, changes must first be saved."
@@ -677,6 +718,10 @@ msgstr "חפש..."
 msgid "Find:"
 msgstr "חפש:"
 
+#: ../../../processing/app/Preferences.java:147
+msgid "Finnish"
+msgstr ""
+
 #: tools/FixEncoding.java:41 tools/FixEncoding.java:58
 #: tools/FixEncoding.java:79
 msgid "Fix Encoding & Reload"
@@ -706,7 +751,7 @@ msgstr "גאלית"
 
 #: ../../../processing/app/Preferences.java:94
 msgid "Georgian"
-msgstr ""
+msgstr "גרגוריאנית"
 
 #: Preferences.java:97
 msgid "German"
@@ -715,6 +760,18 @@ msgstr "גרמנית"
 #: Editor.java:1054
 msgid "Getting Started"
 msgstr "מתחילים"
+
+#: ../../../processing/app/Sketch.java:1646
+#, java-format
+msgid ""
+"Global variables use {0} bytes ({2}%%) of dynamic memory, leaving {3} bytes "
+"for local variables. Maximum is {1} bytes."
+msgstr ""
+
+#: ../../../processing/app/Sketch.java:1651
+#, java-format
+msgid "Global variables use {0} bytes of dynamic memory."
+msgstr ""
 
 #: Preferences.java:98
 msgid "Greek"
@@ -738,7 +795,7 @@ msgstr "Guide_Windows.html"
 
 #: ../../../processing/app/Preferences.java:95
 msgid "Hebrew"
-msgstr ""
+msgstr "עברית"
 
 #: Editor.java:1015
 msgid "Help"
@@ -838,16 +895,6 @@ msgstr "מארית"
 msgid "Message"
 msgstr "הודעה"
 
-#: ../../../processing/app/Sketch.java:1646
-#, java-format
-msgid "Minimum Memory usage: {0} bytes"
-msgstr ""
-
-#: ../../../processing/app/Sketch.java:1643
-#, java-format
-msgid "Minimum Memory usage: {0} bytes (of a {1} byte maximum) - {2}%% used"
-msgstr ""
-
 #: Sketch.java:1712
 msgid "Missing the */ from the end of a /* comment */"
 msgstr "חסר /* בסוף ה- /* הערה */"
@@ -863,6 +910,10 @@ msgstr "מעביר"
 #: Sketch.java:282
 msgid "Name for new file:"
 msgstr "שם קובץ חדש:"
+
+#: ../../../processing/app/Preferences.java:149
+msgid "Nepali"
+msgstr ""
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:51
 msgid "Network upload using programmer not supported"
@@ -925,6 +976,11 @@ msgstr "אין ייחוס זמין ל \"{0}\""
 msgid "No valid configured cores found! Exiting..."
 msgstr ""
 
+#: ../../../processing/app/debug/TargetPackage.java:63
+#, java-format
+msgid "No valid hardware definitions found in folder {0}."
+msgstr ""
+
 #: Base.java:191
 msgid "Non-fatal error while setting the Look & Feel."
 msgstr "ארעה שגיאה לא קריטית בזמן שינוי המראה."
@@ -933,13 +989,9 @@ msgstr "ארעה שגיאה לא קריטית בזמן שינוי המראה."
 msgid "Nope"
 msgstr "לא"
 
-#: Preferences.java:108
-msgid "Norwegian"
-msgstr "נורווגית"
-
 #: ../../../processing/app/Preferences.java:108
 msgid "Norwegian Bokmål"
-msgstr ""
+msgstr "נרווגית"
 
 #: ../../../processing/app/Sketch.java:1656
 msgid ""
@@ -1008,9 +1060,17 @@ msgstr "פולנית"
 msgid "Port"
 msgstr ""
 
-#: Preferences.java:111 Preferences.java:112
-msgid "Portuguese"
-msgstr "פורטוגזית"
+#: ../../../processing/app/Preferences.java:151
+msgid "Portugese"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:127
+msgid "Portuguese (Brazil)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:128
+msgid "Portuguese (Portugal)"
+msgstr ""
 
 #: Preferences.java:295 Editor.java:583
 msgid "Preferences"
@@ -1083,7 +1143,7 @@ msgstr "העיבוד יכול לפתוח רק את הסקיצות של עצמו\
 
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
-msgstr ""
+msgstr "מעבד"
 
 #: Editor.java:704
 msgid "Programmer"
@@ -1270,6 +1330,13 @@ msgid ""
 "tips on reducing it."
 msgstr "הסקיצה גדולה מידי; בקר ב http://www.arduino.cc/en/Guide/Troubleshooting#size\nלקבלת טיפים להקטנת הסקיצה."
 
+#: ../../../processing/app/Sketch.java:1639
+#, java-format
+msgid ""
+"Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} "
+"bytes."
+msgstr ""
+
 #: Editor.java:510
 msgid "Sketchbook"
 msgstr "חוברת סקיצות"
@@ -1281,6 +1348,10 @@ msgstr "הספריה של ספר הסקיצות נעלמה"
 #: Preferences.java:315
 msgid "Sketchbook location:"
 msgstr "מיקום חוברת הסקיצות:"
+
+#: ../../../processing/app/Preferences.java:152
+msgid "Slovenian"
+msgstr ""
 
 #: Sketch.java:275 Sketch.java:304 Sketch.java:578 Sketch.java:967
 msgid ""
@@ -1307,6 +1378,10 @@ msgstr "ספרדית"
 #: Base.java:540
 msgid "Sunshine"
 msgstr "אור שמש"
+
+#: ../../../processing/app/Preferences.java:153
+msgid "Swedish"
+msgstr ""
 
 #: Preferences.java:84
 msgid "System Default"
@@ -1428,7 +1503,7 @@ msgstr "פתרון בעיות"
 
 #: ../../../processing/app/Preferences.java:117
 msgid "Turkish"
-msgstr ""
+msgstr "טורקית"
 
 #: ../../../processing/app/Editor.java:2507
 msgid "Type board password to access its console"
@@ -1440,7 +1515,7 @@ msgstr ""
 
 #: ../../../processing/app/Preferences.java:118
 msgid "Ukrainian"
-msgstr ""
+msgstr "אוקראינית"
 
 #: ../../../processing/app/Editor.java:2524
 #: ../../../processing/app/NetworkMonitor.java:145
@@ -1448,7 +1523,7 @@ msgid "Unable to connect: is the sketch using the bridge?"
 msgstr ""
 
 #: ../../../processing/app/NetworkMonitor.java:130
-msgid "Unable to connect: retrying ("
+msgid "Unable to connect: retrying"
 msgstr ""
 
 #: ../../../processing/app/Editor.java:2526
@@ -1526,6 +1601,10 @@ msgstr "אמת / בצע קומפילציה"
 #: Preferences.java:400
 msgid "Verify code after upload"
 msgstr "אמת את הקוד בסיום ההעלאה"
+
+#: ../../../processing/app/Preferences.java:154
+msgid "Vietnamese"
+msgstr ""
 
 #: Editor.java:1105
 msgid "Visit Arduino.cc"
@@ -1701,7 +1780,7 @@ msgstr "http://arduino.cc/"
 
 #: ../../../processing/app/debug/Compiler.java:49
 msgid "http://github.com/arduino/Arduino/issues"
-msgstr ""
+msgstr "http://github.com/arduino/Arduino/issues"
 
 #: UpdateCheck.java:118
 msgid "http://www.arduino.cc/en/Main/Software"
@@ -1752,10 +1831,6 @@ msgstr "תפריט סיריאלי ריק"
 msgid ""
 "the selected serial port {0} does not exist or your board is not connected"
 msgstr "הפורט הסיריאלי שנבחר {0} אינו קיים או שהלוח אינו מחובר"
-
-#: ../../../processing/app/EditorStatus.java:456
-msgid "to clipboard"
-msgstr ""
 
 #: Preferences.java:391
 msgid "upload"

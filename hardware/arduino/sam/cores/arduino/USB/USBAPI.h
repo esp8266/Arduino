@@ -49,6 +49,7 @@ private:
 	RingBuffer *_cdc_rx_buffer;
 public:
 	void begin(uint32_t baud_count);
+	void begin(uint32_t baud_count, uint8_t config);
 	void end(void);
 
 	virtual int available(void);

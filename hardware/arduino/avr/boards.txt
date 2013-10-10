@@ -23,7 +23,7 @@ yun.upload.wait_for_upload_port=true
 yun.bootloader.tool=avrdude
 yun.bootloader.low_fuses=0xff
 yun.bootloader.high_fuses=0xd8
-yun.bootloader.extended_fuses=0xcb
+yun.bootloader.extended_fuses=0xfb
 yun.bootloader.file=caterina/Caterina-Yun.hex
 yun.bootloader.unlock_bits=0x3F
 yun.bootloader.lock_bits=0x2F
@@ -35,7 +35,7 @@ yun.build.pid=0x8041
 yun.build.usb_product="Arduino Yun"
 yun.build.board=AVR_YUN
 yun.build.core=arduino
-yun.build.variant=leonardo
+yun.build.variant=yun
 yun.build.extra_flags={build.usb_flags}
 
 ##############################################################
@@ -156,57 +156,85 @@ nano.menu.cpu.atmega168.build.mcu=atmega168
 
 ##############################################################
 
-mega2560.name=Arduino Mega 2560 or Mega ADK
-mega2560.vid.0=0x2341
-mega2560.pid.0=0x0044
-mega2560.vid.1=0x2341
-mega2560.pid.1=0x003f
-mega2560.cpu=2560 or ADK
+mega.name=Arduino Mega or Mega 2560
 
-mega2560.upload.tool=avrdude
-mega2560.upload.protocol=wiring
-mega2560.upload.maximum_size=258048
-mega2560.upload.maximum_data_size=8192
-mega2560.upload.speed=115200
-
-mega2560.bootloader.tool=avrdude
-mega2560.bootloader.low_fuses=0xFF
-mega2560.bootloader.high_fuses=0xD8
-mega2560.bootloader.extended_fuses=0xFD
-mega2560.bootloader.file=stk500v2/stk500boot_v2_mega2560.hex
-mega2560.bootloader.unlock_bits=0x3F
-mega2560.bootloader.lock_bits=0x0F
-
-mega2560.build.mcu=atmega2560
-mega2560.build.f_cpu=16000000L
-mega2560.build.board=AVR_MEGA2560
-mega2560.build.core=arduino
-mega2560.build.variant=mega
-
-##############################################################
-
-mega.name=Arduino Mega (ATmega1280)
-mega.cpu=ATmega1280
+mega.vid.0=0x2341
+mega.pid.0=0x0010
+mega.vid.1=0x2341
+mega.pid.1=0x0042
 
 mega.upload.tool=avrdude
-mega.upload.protocol=arduino
-mega.upload.maximum_size=126976
 mega.upload.maximum_data_size=8192
-mega.upload.speed=57600
 
 mega.bootloader.tool=avrdude
 mega.bootloader.low_fuses=0xFF
-mega.bootloader.high_fuses=0xDA
-mega.bootloader.extended_fuses=0xF5
-mega.bootloader.file=atmega/ATmegaBOOT_168_atmega1280.hex
 mega.bootloader.unlock_bits=0x3F
 mega.bootloader.lock_bits=0x0F
 
-mega.build.mcu=atmega1280
 mega.build.f_cpu=16000000L
-mega.build.board=AVR_MEGA
 mega.build.core=arduino
 mega.build.variant=mega
+# default board  may be overridden by the cpu menu
+mega.build.board=AVR_MEGA2560
+
+## Arduino Mega w/ ATmega2560
+## -------------------------
+mega.menu.cpu.atmega2560=ATmega2560 (Mega 2560)
+
+mega.menu.cpu.atmega2560.upload.protocol=wiring
+mega.menu.cpu.atmega2560.upload.maximum_size=258048
+mega.menu.cpu.atmega2560.upload.speed=115200
+
+mega.menu.cpu.atmega2560.bootloader.high_fuses=0xD8
+mega.menu.cpu.atmega2560.bootloader.extended_fuses=0xFD
+mega.menu.cpu.atmega2560.bootloader.file=stk500v2/stk500boot_v2_mega2560.hex
+
+mega.menu.cpu.atmega2560.build.mcu=atmega2560
+mega.menu.cpu.atmega2560.build.board=AVR_MEGA2560
+
+## Arduino Mega w/ ATmega1280
+## -------------------------
+mega.menu.cpu.atmega1280=ATmega1280
+
+mega.menu.cpu.atmega1280.upload.protocol=arduino
+mega.menu.cpu.atmega1280.upload.maximum_size=126976
+mega.menu.cpu.atmega1280.upload.speed=57600
+
+mega.menu.cpu.atmega1280.bootloader.high_fuses=0xDA
+mega.menu.cpu.atmega1280.bootloader.extended_fuses=0xF5
+mega.menu.cpu.atmega1280.bootloader.file=atmega/ATmegaBOOT_168_atmega1280.hex
+
+mega.menu.cpu.atmega1280.build.mcu=atmega1280
+mega.menu.cpu.atmega1280.build.board=AVR_MEGA
+
+##############################################################
+
+megaADK.name=Arduino Mega ADK
+
+megaADK.vid.0=0x2341
+megaADK.pid.0=0x003f
+megaADK.vid.1=0x2341
+megaADK.pid.1=0x0044
+
+megaADK.upload.tool=avrdude
+megaADK.upload.protocol=wiring
+megaADK.upload.maximum_size=258048
+megaADK.upload.maximum_data_size=8192
+megaADK.upload.speed=115200
+
+megaADK.bootloader.tool=avrdude
+megaADK.bootloader.low_fuses=0xFF
+megaADK.bootloader.high_fuses=0xD8
+megaADK.bootloader.extended_fuses=0xFD
+megaADK.bootloader.file=stk500v2/stk500boot_v2_mega2560.hex
+megaADK.bootloader.unlock_bits=0x3F
+megaADK.bootloader.lock_bits=0x0F
+
+megaADK.build.mcu=atmega2560
+megaADK.build.f_cpu=16000000L
+megaADK.build.board=AVR_ADK
+megaADK.build.core=arduino
+megaADK.build.variant=mega
 
 ##############################################################
 
@@ -649,7 +677,7 @@ robotControl.name=Arduino Robot Control
 robotControl.upload.tool=avrdude
 robotControl.upload.protocol=avr109
 robotControl.upload.maximum_size=28672
-robotControl.upload.data_size=2560
+robotControl.upload.maximum_data_size=2560
 robotControl.upload.speed=57600
 robotControl.upload.disable_flushing=true
 robotControl.upload.use_1200bps_touch=true
@@ -679,7 +707,7 @@ robotMotor.name=Arduino Robot Motor
 robotMotor.upload.tool=avrdude
 robotMotor.upload.protocol=avr109
 robotMotor.upload.maximum_size=28672
-robotMotor.upload.data_size=2560
+robotMotor.upload.maximum_data_size=2560
 robotMotor.upload.speed=57600
 robotMotor.upload.disable_flushing=true
 robotMotor.upload.use_1200bps_touch=true

@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2013-01-08 08:27+0000\n"
+"PO-Revision-Date: 2013-09-10 11:16+0000\n"
 "Last-Translator: Valentin Laskov <laskov@festa.bg>\n"
 "Language-Team: Bulgarian (http://www.transifex.com/projects/p/arduino-ide-15/language/bg/)\n"
 "MIME-Version: 1.0\n"
@@ -133,11 +133,11 @@ msgstr "Архивирането на скицата беше прекратен
 
 #: ../../../processing/app/I18n.java:83
 msgid "Arduino ARM (32-bits) Boards"
-msgstr ""
+msgstr "Arduino ARM (32-битови) платки"
 
 #: ../../../processing/app/I18n.java:82
 msgid "Arduino AVR Boards"
-msgstr ""
+msgstr "Arduino AVR платки"
 
 #: Base.java:1682
 msgid ""
@@ -160,7 +160,7 @@ msgstr "Ардуино изисква пълен JDK (не само JRE) за д
 
 #: ../../../processing/app/EditorStatus.java:471
 msgid "Arduino: "
-msgstr ""
+msgstr "Ардуино:"
 
 #: Sketch.java:588
 #, java-format
@@ -170,6 +170,14 @@ msgstr "Сигурни ли сте, че искате да изтриете \"{0
 #: Sketch.java:587
 msgid "Are you sure you want to delete this sketch?"
 msgstr "Сигурни ли сте, че искате да изтриете скицата?"
+
+#: ../../../processing/app/Preferences.java:137
+msgid "Armenian"
+msgstr "Арменски"
+
+#: ../../../processing/app/Preferences.java:138
+msgid "Asturian"
+msgstr "Астурийски"
 
 #: tools/AutoFormat.java:91
 msgid "Auto Format"
@@ -212,26 +220,29 @@ msgstr "Недопустима грешка на ред: {0}"
 msgid "Bad file selected"
 msgstr "Избран е грешен файл"
 
-#: ../../../processing/app/Sketch.java:1638
-#, java-format
-msgid "Binary sketch size: {0} bytes (of a {1} byte maximum) - {2}%% used"
-msgstr ""
+#: ../../../processing/app/Preferences.java:139
+msgid "Belarusian"
+msgstr "Беларуски"
 
 #: ../../../processing/app/Base.java:1433
 #: ../../../processing/app/Editor.java:707
 msgid "Board"
-msgstr ""
+msgstr "Платка"
 
 #: ../../../processing/app/debug/TargetBoard.java:42
 #, java-format
 msgid ""
-"Board {0}:{1}:{2} doesn''t define a ''build.board'' preference. Auto-set to: "
-"{3}"
-msgstr ""
+"Board {0}:{1}:{2} doesn''t define a ''build.board'' preference. Auto-set to:"
+" {3}"
+msgstr "Платката {0}:{1}:{2} не определя ''build.board'' характеристика. Автоматично зададено: {3}"
 
 #: ../../../processing/app/EditorStatus.java:472
 msgid "Board: "
-msgstr ""
+msgstr "Платка:"
+
+#: ../../../processing/app/Preferences.java:140
+msgid "Bosnian"
+msgstr "Босненски"
 
 #: SerialMonitor.java:112
 msgid "Both NL & CR"
@@ -247,7 +258,11 @@ msgstr "Работната папка изчезна или не може да �
 
 #: ../../../processing/app/Preferences.java:80
 msgid "Bulgarian"
-msgstr ""
+msgstr "Български"
+
+#: ../../../processing/app/Preferences.java:141
+msgid "Burmese (Myanmar)"
+msgstr "Бирмански (Мианмар)"
 
 #: Editor.java:708
 msgid "Burn Bootloader"
@@ -259,11 +274,11 @@ msgstr "Записвам буутлоудъра на I/O платка (може 
 
 #: ../../../processing/app/Base.java:368
 msgid "Can't open source sketch!"
-msgstr ""
+msgstr "Не мога да отворя скицата източник!"
 
 #: ../../../processing/app/Preferences.java:92
 msgid "Canadian French"
-msgstr ""
+msgstr "Канадски френски"
 
 #: Preferences.java:79 Sketch.java:585 Sketch.java:737 Sketch.java:1042
 #: Editor.java:2064 Editor.java:2145 Editor.java:2465
@@ -285,6 +300,22 @@ msgstr "Каталонски"
 #: Preferences.java:419
 msgid "Check for updates on startup"
 msgstr "Проверявай за обновления при стартиране"
+
+#: ../../../processing/app/Preferences.java:142
+msgid "Chinese (China)"
+msgstr "Китайски (Китай)"
+
+#: ../../../processing/app/Preferences.java:142
+msgid "Chinese (Hong Kong)"
+msgstr "Китайски (Хонг Конг)"
+
+#: ../../../processing/app/Preferences.java:144
+msgid "Chinese (Taiwan)"
+msgstr "Китайски (Тайван)"
+
+#: ../../../processing/app/Preferences.java:143
+msgid "Chinese (Taiwan) (Big5)"
+msgstr "Китайски (Тайван) (Big5)"
 
 #: Preferences.java:88
 msgid "Chinese Simplified"
@@ -325,7 +356,7 @@ msgstr "Копиране като HTML"
 
 #: ../../../processing/app/EditorStatus.java:456
 msgid "Copy error"
-msgstr ""
+msgstr "Грешка при копиране"
 
 #: Editor.java:1165 Editor.java:2715
 msgid "Copy for Forum"
@@ -366,17 +397,17 @@ msgstr "Не мога да изтрия {0}"
 #: ../../../processing/app/debug/TargetPlatform.java:74
 #, java-format
 msgid "Could not find boards.txt in {0}. Is it pre-1.5?"
-msgstr ""
+msgstr "Не можах да намеря boards.txt в {0}. Това да не е pre-1.5?"
 
 #: ../../../cc/arduino/packages/uploaders/SerialUploader.java:282
 #, java-format
 msgid "Could not find tool {0}"
-msgstr ""
+msgstr "Не можах да намеря инструмента {0}"
 
 #: ../../../cc/arduino/packages/uploaders/SerialUploader.java:278
 #, java-format
 msgid "Could not find tool {0} from package {1}"
-msgstr ""
+msgstr "Не можах да намеря инструмента {0} от пакета {1}"
 
 #: Base.java:1934
 #, java-format
@@ -467,7 +498,7 @@ msgstr "Не намерих платка на избрания порт. Про�
 
 #: ../../../processing/app/Preferences.java:82
 msgid "Croatian"
-msgstr ""
+msgstr "Хърватски"
 
 #: Editor.java:1149 Editor.java:2699
 msgid "Cut"
@@ -475,7 +506,7 @@ msgstr "Изрязване"
 
 #: ../../../processing/app/Preferences.java:83
 msgid "Czech"
-msgstr ""
+msgstr "Чешки"
 
 #: Preferences.java:90
 msgid "Danish"
@@ -527,6 +558,10 @@ msgstr "Качването завърши."
 msgid "Dutch"
 msgstr "Холандски"
 
+#: ../../../processing/app/Preferences.java:144
+msgid "Dutch (Netherlands)"
+msgstr "Холандски (Холандия)"
+
 #: Editor.java:1130
 msgid "Edit"
 msgstr "Редактиране"
@@ -542,6 +577,10 @@ msgstr "Език на редактора:"
 #: Preferences.java:92
 msgid "English"
 msgstr "Английски"
+
+#: ../../../processing/app/Preferences.java:145
+msgid "English (United Kingdom)"
+msgstr "Английски (Великобритания)"
 
 #: Editor.java:1062
 msgid "Environment"
@@ -572,14 +611,14 @@ msgstr "Грешка в Serial.{0}()"
 
 #: ../../../processing/app/Base.java:1232
 msgid "Error loading libraries"
-msgstr ""
+msgstr "Грешка при зареждане на библиотеки"
 
 #: ../../../processing/app/debug/TargetPlatform.java:95
 #: ../../../processing/app/debug/TargetPlatform.java:106
 #: ../../../processing/app/debug/TargetPlatform.java:117
 #, java-format
 msgid "Error loading {0}"
-msgstr ""
+msgstr "Грешка при зареждане на {0}"
 
 #: Serial.java:181
 #, java-format
@@ -599,7 +638,7 @@ msgstr "Грешка при четене на файла с предпочита
 
 #: ../../../cc/arduino/packages/DiscoveryManager.java:25
 msgid "Error starting discovery method: "
-msgstr ""
+msgstr "Грешка при стартиране метод за откриване: "
 
 #: Serial.java:125
 #, java-format
@@ -612,7 +651,7 @@ msgstr "Грешка при записа на буутлоудъра."
 
 #: ../../../processing/app/Editor.java:2555
 msgid "Error while burning bootloader: missing '{0}' configuration parameter"
-msgstr ""
+msgstr "Грешка при запис на буутлоудъра: липсващ '{0}' конфигурационен параметър"
 
 #: SketchCode.java:83
 #, java-format
@@ -626,11 +665,15 @@ msgstr "Грешка при отпечатването."
 #: ../../../processing/app/Editor.java:2409
 #: ../../../processing/app/Editor.java:2449
 msgid "Error while uploading: missing '{0}' configuration parameter"
-msgstr ""
+msgstr "Грешка при качване: липсващ '{0}' конфигурационен параметър"
 
 #: Preferences.java:93
 msgid "Estonian"
 msgstr "Естонски"
+
+#: ../../../processing/app/Preferences.java:146
+msgid "Estonian (Estonia)"
+msgstr "Естонски (Естония)"
 
 #: Editor.java:516
 msgid "Examples"
@@ -676,6 +719,10 @@ msgstr "Търсене..."
 msgid "Find:"
 msgstr "Търси:"
 
+#: ../../../processing/app/Preferences.java:147
+msgid "Finnish"
+msgstr "Фински"
+
 #: tools/FixEncoding.java:41 tools/FixEncoding.java:58
 #: tools/FixEncoding.java:79
 msgid "Fix Encoding & Reload"
@@ -705,7 +752,7 @@ msgstr "Галицийски"
 
 #: ../../../processing/app/Preferences.java:94
 msgid "Georgian"
-msgstr ""
+msgstr "Грузински"
 
 #: Preferences.java:97
 msgid "German"
@@ -714,6 +761,18 @@ msgstr "Немски"
 #: Editor.java:1054
 msgid "Getting Started"
 msgstr "Първи стъпки"
+
+#: ../../../processing/app/Sketch.java:1646
+#, java-format
+msgid ""
+"Global variables use {0} bytes ({2}%%) of dynamic memory, leaving {3} bytes "
+"for local variables. Maximum is {1} bytes."
+msgstr "Глобалните променливи ползват {0} байта ({2}%%) от динамичната памет, оставяйки {3} байта за локални променливи. Максимумът е {1} байта."
+
+#: ../../../processing/app/Sketch.java:1651
+#, java-format
+msgid "Global variables use {0} bytes of dynamic memory."
+msgstr "Глобалните променливи ползват {0} байта от динамичната памет."
 
 #: Preferences.java:98
 msgid "Greek"
@@ -737,7 +796,7 @@ msgstr "Guide_Windows.html"
 
 #: ../../../processing/app/Preferences.java:95
 msgid "Hebrew"
-msgstr ""
+msgstr "Иврит"
 
 #: Editor.java:1015
 msgid "Help"
@@ -786,7 +845,7 @@ msgid ""
 "disable this in the Preferences dialog.\n"
 "\n"
 "Save sketch and update its extension?"
-msgstr ""
+msgstr "В Ардуйно 1.0, разширението по подразбиране беше сменено\nот .pde на .ino.  Новите скици (включително създадените чрез\n\"Запиши като\") ще са с новото разширение.  Разширението на\nсъществуващите скици ще се обновява при запис, но Вие\nможете да забраните това в диалога Предпочитания.\n\nЗапис на скицата и обновяване на разширението и?"
 
 #: Editor.java:1216 Editor.java:2757
 msgid "Increase Indent"
@@ -799,7 +858,7 @@ msgstr "Индонезийски"
 #: ../../../processing/app/Base.java:1204
 #, java-format
 msgid "Invalid library found in {0}: {1}"
-msgstr ""
+msgstr "Намерена невалидна библиотека в {0}: {1}"
 
 #: Preferences.java:102
 msgid "Italian"
@@ -827,7 +886,7 @@ msgstr "Литовски"
 
 #: ../../../processing/app/Sketch.java:1660
 msgid "Low memory available, stability problems may occur"
-msgstr ""
+msgstr "Достъпна е малко памет. Възможни са проблеми"
 
 #: Preferences.java:107
 msgid "Marathi"
@@ -836,16 +895,6 @@ msgstr "Маратхи"
 #: Base.java:2112
 msgid "Message"
 msgstr "Съобщение"
-
-#: ../../../processing/app/Sketch.java:1646
-#, java-format
-msgid "Minimum Memory usage: {0} bytes"
-msgstr ""
-
-#: ../../../processing/app/Sketch.java:1643
-#, java-format
-msgid "Minimum Memory usage: {0} bytes (of a {1} byte maximum) - {2}%% used"
-msgstr ""
 
 #: Sketch.java:1712
 msgid "Missing the */ from the end of a /* comment */"
@@ -863,13 +912,17 @@ msgstr "Преместване"
 msgid "Name for new file:"
 msgstr "Име за нов файл:"
 
+#: ../../../processing/app/Preferences.java:149
+msgid "Nepali"
+msgstr "Непалски"
+
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:51
 msgid "Network upload using programmer not supported"
-msgstr ""
+msgstr "Качване по мрежата чрез програматор не се поддържа"
 
 #: EditorToolbar.java:41 Editor.java:493
 msgid "New"
-msgstr "Нов"
+msgstr "Нова"
 
 #: EditorToolbar.java:46
 msgid "New Editor Window"
@@ -922,7 +975,12 @@ msgstr "Не е налично описание за \"{0}\""
 
 #: ../../../processing/app/Base.java:309
 msgid "No valid configured cores found! Exiting..."
-msgstr ""
+msgstr "Няма конфигурирани валидни ядра! Излизам..."
+
+#: ../../../processing/app/debug/TargetPackage.java:63
+#, java-format
+msgid "No valid hardware definitions found in folder {0}."
+msgstr "Няма намерени валидни дефиниции за хардуер в папка {0}."
 
 #: Base.java:191
 msgid "Non-fatal error while setting the Look & Feel."
@@ -932,19 +990,15 @@ msgstr "Не-фатална грешка при установяването н�
 msgid "Nope"
 msgstr "Няма"
 
-#: Preferences.java:108
-msgid "Norwegian"
-msgstr "Норвежки"
-
 #: ../../../processing/app/Preferences.java:108
 msgid "Norwegian Bokmål"
-msgstr ""
+msgstr "Норвежки Bokmål"
 
 #: ../../../processing/app/Sketch.java:1656
 msgid ""
 "Not enough memory; see http://www.arduino.cc/en/Guide/Troubleshooting#size "
 "for tips on reducing your footprint."
-msgstr ""
+msgstr "Няма достатъчно памет; вижте http://www.arduino.cc/en/Guide/Troubleshooting#size за съвети как да намалите обема на това, което правите."
 
 #: Preferences.java:80 Sketch.java:585 Sketch.java:737 Sketch.java:1042
 #: Editor.java:2145 Editor.java:2465
@@ -981,7 +1035,7 @@ msgstr "Настройка на страницата"
 
 #: ../../../processing/app/forms/PasswordAuthorizationDialog.java:44
 msgid "Password:"
-msgstr ""
+msgstr "Парола:"
 
 #: Editor.java:1189 Editor.java:2731
 msgid "Paste"
@@ -1005,11 +1059,19 @@ msgstr "Полски"
 
 #: ../../../processing/app/Editor.java:718
 msgid "Port"
-msgstr ""
+msgstr "Порт"
 
-#: Preferences.java:111 Preferences.java:112
-msgid "Portuguese"
+#: ../../../processing/app/Preferences.java:151
+msgid "Portugese"
 msgstr "Португалски"
+
+#: ../../../processing/app/Preferences.java:127
+msgid "Portuguese (Brazil)"
+msgstr "Португалски (Бразилия)"
+
+#: ../../../processing/app/Preferences.java:128
+msgid "Portuguese (Portugal)"
+msgstr "Португалски (Португалия)"
 
 #: Preferences.java:295 Editor.java:583
 msgid "Preferences"
@@ -1049,11 +1111,11 @@ msgstr "Проблем при установяването на платформ
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:136
 msgid "Problem accessing board folder /www/sd"
-msgstr ""
+msgstr "Проблем при достъп до папка /www/sd на платката"
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:132
 msgid "Problem accessing files in folder "
-msgstr ""
+msgstr "Проблем при достъп до файлове в папка "
 
 #: Base.java:1673
 msgid "Problem getting data folder"
@@ -1082,7 +1144,7 @@ msgstr "Processing може да отваря само негови скици\n
 
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
-msgstr ""
+msgstr "Процесор"
 
 #: Editor.java:704
 msgid "Programmer"
@@ -1185,7 +1247,7 @@ msgstr "Изберете ново местоположение на скицни
 
 #: ../../../processing/app/debug/Compiler.java:146
 msgid "Selected board depends on '{0}' core (not installed)."
-msgstr ""
+msgstr "Избраната платка изисква '{0}' ядро (не е инсталирано)."
 
 #: SerialMonitor.java:93
 msgid "Send"
@@ -1233,7 +1295,7 @@ msgstr "Покажи папката на скицата"
 
 #: ../../../processing/app/EditorStatus.java:468
 msgid "Show verbose output during compilation"
-msgstr ""
+msgstr "Показвай подробна информация при компилиране"
 
 #: Preferences.java:387
 msgid "Show verbose output during: "
@@ -1269,6 +1331,13 @@ msgid ""
 "tips on reducing it."
 msgstr "Скицата е твърде голяма; вижте http://www.arduino.cc/en/Guide/Troubleshooting#size за съвети как да я намалите."
 
+#: ../../../processing/app/Sketch.java:1639
+#, java-format
+msgid ""
+"Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} "
+"bytes."
+msgstr "Скицата използва {0} байта ({2}%%) от пространството за програми. Максимумът е {1} байта."
+
 #: Editor.java:510
 msgid "Sketchbook"
 msgstr "Скицник"
@@ -1280,6 +1349,10 @@ msgstr "Папката със скици изчезна"
 #: Preferences.java:315
 msgid "Sketchbook location:"
 msgstr "Местоположение на скицника:"
+
+#: ../../../processing/app/Preferences.java:152
+msgid "Slovenian"
+msgstr "Словенски"
 
 #: Sketch.java:275 Sketch.java:304 Sketch.java:578 Sketch.java:967
 msgid ""
@@ -1306,6 +1379,10 @@ msgstr "Испански"
 #: Base.java:540
 msgid "Sunshine"
 msgstr "Слънчева светлина"
+
+#: ../../../processing/app/Preferences.java:153
+msgid "Swedish"
+msgstr "Шведски"
 
 #: Preferences.java:84
 msgid "System Default"
@@ -1411,7 +1488,7 @@ msgstr "Този файл вече е копиран на място, от\nкъ
 
 #: ../../../processing/app/EditorStatus.java:467
 msgid "This report would have more information with"
-msgstr ""
+msgstr "Този доклад ще има повече информация с"
 
 #: Base.java:535
 msgid "Time for a Break"
@@ -1427,36 +1504,36 @@ msgstr "Отстраняване на проблеми"
 
 #: ../../../processing/app/Preferences.java:117
 msgid "Turkish"
-msgstr ""
+msgstr "Турски"
 
 #: ../../../processing/app/Editor.java:2507
 msgid "Type board password to access its console"
-msgstr ""
+msgstr "Въведете парола за платката за достъп до конзола"
 
 #: ../../../processing/app/Sketch.java:1673
 msgid "Type board password to upload a new sketch"
-msgstr ""
+msgstr "Въведете парола за платката, за да качите нова скица"
 
 #: ../../../processing/app/Preferences.java:118
 msgid "Ukrainian"
-msgstr ""
+msgstr "Украински"
 
 #: ../../../processing/app/Editor.java:2524
 #: ../../../processing/app/NetworkMonitor.java:145
 msgid "Unable to connect: is the sketch using the bridge?"
-msgstr ""
+msgstr "Свързването невъзможно: използва ли скицата bridge-а?"
 
 #: ../../../processing/app/NetworkMonitor.java:130
-msgid "Unable to connect: retrying ("
-msgstr ""
+msgid "Unable to connect: retrying"
+msgstr "Свързването неуспешно: опитвам отново"
 
 #: ../../../processing/app/Editor.java:2526
 msgid "Unable to connect: wrong password?"
-msgstr ""
+msgstr "Свързването невъзможно: грешна парола?"
 
 #: ../../../processing/app/Editor.java:2512
 msgid "Unable to open serial monitor"
-msgstr ""
+msgstr "Невъзможно отварянето на сериен монитор"
 
 #: Sketch.java:1432
 #, java-format
@@ -1496,7 +1573,7 @@ msgstr "Качването прекратено."
 
 #: ../../../processing/app/Sketch.java:1678
 msgid "Upload cancelled"
-msgstr ""
+msgstr "Качването прекратено"
 
 #: Editor.java:2378
 msgid "Uploading to I/O Board..."
@@ -1525,6 +1602,10 @@ msgstr "Проверка / Компилиране"
 #: Preferences.java:400
 msgid "Verify code after upload"
 msgstr "Проверка на кода след качването"
+
+#: ../../../processing/app/Preferences.java:154
+msgid "Vietnamese"
+msgstr "Виетнамски"
 
 #: Editor.java:1105
 msgid "Visit Arduino.cc"
@@ -1589,7 +1670,7 @@ msgstr "Забравили сте Вашия скицник"
 #: ../../../processing/app/AbstractMonitor.java:92
 msgid ""
 "You've pressed {0} but nothing was sent. Should you select a line ending?"
-msgstr ""
+msgstr "Натиснали сте {0}, но не беше изпратено нищо. Трябва ли да изберете завършване на ред?"
 
 #: Base.java:536
 msgid ""
@@ -1680,7 +1761,7 @@ msgstr "компилиране"
 
 #: ../../../processing/app/NetworkMonitor.java:111
 msgid "connected!"
-msgstr ""
+msgstr "свързан!"
 
 #: Sketch.java:540
 msgid "createNewFile() returned false"
@@ -1688,7 +1769,7 @@ msgstr "createNewFile() върна false"
 
 #: ../../../processing/app/EditorStatus.java:469
 msgid "enabled in File > Preferences."
-msgstr ""
+msgstr "разрешено във Файл > Предпочитания."
 
 #: Base.java:2090
 msgid "environment"
@@ -1700,7 +1781,7 @@ msgstr "http://arduino.cc/"
 
 #: ../../../processing/app/debug/Compiler.java:49
 msgid "http://github.com/arduino/Arduino/issues"
-msgstr ""
+msgstr "http://github.com/arduino/Arduino/issues"
 
 #: UpdateCheck.java:118
 msgid "http://www.arduino.cc/en/Main/Software"
@@ -1751,10 +1832,6 @@ msgstr "serialMenu е null"
 msgid ""
 "the selected serial port {0} does not exist or your board is not connected"
 msgstr "избраният сериен порт {0} не съществува или платката Ви не е свързана"
-
-#: ../../../processing/app/EditorStatus.java:456
-msgid "to clipboard"
-msgstr ""
 
 #: Preferences.java:391
 msgid "upload"

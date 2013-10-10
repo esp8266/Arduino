@@ -5,70 +5,64 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2012-05-04 10:24-0400\n"
-"Last-Translator: Ram Kumar.Y <vaalgatamilram@gmail.com>\n"
-"Language-Team: Tamil\n"
-"Language: ta\n"
+"PO-Revision-Date: 2013-09-12 15:08+0000\n"
+"Last-Translator: cmaglie <c.maglie@arduino.cc>\n"
+"Language-Team: Tamil (http://www.transifex.com/projects/p/arduino-ide-15/language/ta/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: ta\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: Preferences.java:342 Preferences.java:358
+#: Preferences.java:358 Preferences.java:374
 msgid "  (requires restart of Arduino)"
 msgstr "  (Arduino மறுதுவக்கம் தேவைப்படுகிறது)"
 
-#: ../../../processing/app/debug/Compiler.java:473
+#: debug/Compiler.java:455
 msgid "'Keyboard' only supported on the Arduino Leonardo"
 msgstr ""
 
-#: ../../../processing/app/debug/Compiler.java:468
+#: debug/Compiler.java:450
 msgid "'Mouse' only supported on the Arduino Leonardo"
 msgstr ""
 
-#: Preferences.java:462
+#: Preferences.java:478
 msgid "(edit only when Arduino is not running)"
 msgstr "(Arduino செயல்படாதபோது மாற்றம் மட்டுமே முடியும்)"
 
-#: Sketch.java:750
+#: Sketch.java:746
 msgid ".pde -> .ino"
 msgstr ".pde -> .ino"
 
-#: Base.java:772
+#: Base.java:773
 msgid ""
-"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p "
-"{ font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Are you "
+"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p {"
+" font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Are you "
 "sure you want to Quit?</b><p>Closing the last open sketch will quit Arduino."
-msgstr ""
-"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p "
-"{ font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>நீங்கள் நிச்சயமாக "
-"வெளியேற விரும்புகிறீர்களா?</b><p>கடைசியாக திறந்த வரைவை மூடினால் Arduino அணைந்துவிடும்."
+msgstr "<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p { font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>நீங்கள் நிச்சயமாக வெளியேற விரும்புகிறீர்களா?</b><p>கடைசியாக திறந்த வரைவை மூடினால் Arduino அணைந்துவிடும்."
 
-#: Editor.java:2006
+#: Editor.java:2053
 msgid ""
-"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p "
-"{ font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Do you "
+"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p {"
+" font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Do you "
 "want to save changes to this sketch<BR> before closing?</b><p>If you don't "
 "save, your changes will be lost."
-msgstr ""
-"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p "
-"{ font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b> நீங்கள் "
-"மாற்றங்களை<BR> வரைவில் சேமிக்க விரும்புகிறீர்களா?</b><p>இல்லையென்றால் "
-"நீங்கள் மாற்றியவை அனைத்தையும் இழந்துவிடுவீர்கள்."
+msgstr "<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p { font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b> நீங்கள் மாற்றங்களை<BR> வரைவில் சேமிக்க விரும்புகிறீர்களா?</b><p>இல்லையென்றால் நீங்கள் மாற்றியவை அனைத்தையும் இழந்துவிடுவீர்கள்."
 
-#: Sketch.java:402
+#: Sketch.java:398
 #, java-format
 msgid "A file named \"{0}\" already exists in \"{1}\""
 msgstr "\"{1}\"ல் ஏற்கனவே \"{0}\" என்ற பேரில் கோப்பு உள்ளது"
 
-#: Editor.java:2122
+#: Editor.java:2169
 #, java-format
 msgid "A folder named \"{0}\" already exists. Can't open sketch."
 msgstr "\"{0}\" என்ற உறை ஏற்கனவே இருக்கிறது. வரைவை திறக்க முடியவில்லை."
 
-#: ../../../processing/app/Base.java:2894
+#: Base.java:2690
 #, java-format
 msgid "A library named {0} already exists"
 msgstr ""
@@ -77,27 +71,23 @@ msgstr ""
 msgid ""
 "A new version of Arduino is available,\n"
 "would you like to visit the Arduino download page?"
-msgstr ""
-"Arduinoவின் புதிய பதிப்பு கிடைக்கிறது,\n"
-"நீங்கள் Arduino பதிவிறக்க பக்கத்தை காண விரும்புகிறீர்களா?"
+msgstr "Arduinoவின் புதிய பதிப்பு கிடைக்கிறது,\nநீங்கள் Arduino பதிவிறக்க பக்கத்தை காண விரும்புகிறீர்களா?"
 
 #: EditorConsole.java:153
 msgid ""
 "A problem occurred while trying to open the\n"
 "files used to store the console output."
-msgstr ""
-"பணியக வெளிப்பாடுகலை சேமிக்க பயன்படும் கோப்புகளை திறக்க \n"
-"முயற்சிக்கும்போது பிரச்சனை ஏற்பட்டுவிட்டது."
+msgstr "பணியக வெளிப்பாடுகலை சேமிக்க பயன்படும் கோப்புகளை திறக்க \nமுயற்சிக்கும்போது பிரச்சனை ஏற்பட்டுவிட்டது."
 
-#: Editor.java:1102
+#: Editor.java:1116
 msgid "About Arduino"
 msgstr "Arduino பற்றி"
 
-#: Editor.java:643
+#: Editor.java:650
 msgid "Add File..."
 msgstr "கோப்பை சேர்"
 
-#: ../../../processing/app/Base.java:1102
+#: Base.java:963
 msgid "Add Library..."
 msgstr ""
 
@@ -106,24 +96,19 @@ msgid ""
 "An error occurred while trying to fix the file encoding.\n"
 "Do not attempt to save this sketch as it may overwrite\n"
 "the old version. Use Open to re-open the sketch and try again.\n"
-msgstr ""
-"கோப்பு குறியீட்டை சரிசெய்ய முயலும்போது ஒரு பிழை ஏற்பட்டுவிட்டது.\n"
-"இந்திய வரைவை சேமிக்க முயலவேண்டாம். ஏனென்றால், அது பழைய பதிப்பை \n"
-"மற்றியமைத்துவிடும். வரைவை மறுபடியும் திறந்து முயற்சித்துப்பார்க்கவும்.\n"
+msgstr "கோப்பு குறியீட்டை சரிசெய்ய முயலும்போது ஒரு பிழை ஏற்பட்டுவிட்டது.\nஇந்திய வரைவை சேமிக்க முயலவேண்டாம். ஏனென்றால், அது பழைய பதிப்பை \nமற்றியமைத்துவிடும். வரைவை மறுபடியும் திறந்து முயற்சித்துப்பார்க்கவும்.\n"
 
-#: Base.java:221
+#: Base.java:228
 msgid ""
 "An unknown error occurred while trying to load\n"
 "platform-specific code for your machine."
-msgstr ""
-"உங்கள் கணினிக்கு இயங்குதளம்-குறிப்பிட்ட குறியீட்டை ஏற்ற \n"
-"முயற்சிக்கும்போது ஒரு அறியப்படாத பிழை ஏற்பட்டது."
+msgstr "உங்கள் கணினிக்கு இயங்குதளம்-குறிப்பிட்ட குறியீட்டை ஏற்ற \nமுயற்சிக்கும்போது ஒரு அறியப்படாத பிழை ஏற்பட்டது."
 
-#: Preferences.java:84
+#: Preferences.java:85
 msgid "Arabic"
 msgstr ""
 
-#: Preferences.java:85
+#: Preferences.java:86
 msgid "Aragonese"
 msgstr ""
 
@@ -143,9 +128,7 @@ msgstr "வரைவை ஆவணப்படுத்துவது ரத்�
 msgid ""
 "Archiving the sketch has been canceled because\n"
 "the sketch couldn't save properly."
-msgstr ""
-"வரைவை ஆவணப்படுத்துவது ரத்து செய்யப்பட்டது. ஏனென்றால், \n"
-"அந்த வரைவை சரியாக சேமிக்க முடியவில்லை."
+msgstr "வரைவை ஆவணப்படுத்துவது ரத்து செய்யப்பட்டது. ஏனென்றால், \nஅந்த வரைவை சரியாக சேமிக்க முடியவில்லை."
 
 #: ../../../processing/app/I18n.java:83
 msgid "Arduino ARM (32-bits) Boards"
@@ -155,70 +138,71 @@ msgstr ""
 msgid "Arduino AVR Boards"
 msgstr ""
 
-#: Base.java:1441
+#: Base.java:1682
 msgid ""
 "Arduino cannot run because it could not\n"
 "create a folder to store your settings."
-msgstr ""
-"Arduino இயங்க முடியவில்லை, ஏனென்றால் உங்கள் \n"
-"அமைப்புகளை சேமிக்க ஒரு உறையை உருவாக்க முடியவில்லை."
+msgstr "Arduino இயங்க முடியவில்லை, ஏனென்றால் உங்கள் \nஅமைப்புகளை சேமிக்க ஒரு உறையை உருவாக்க முடியவில்லை."
 
-#: Base.java:1603
+#: Base.java:1889
 msgid ""
 "Arduino cannot run because it could not\n"
 "create a folder to store your sketchbook."
-msgstr ""
-"Arduino இயங்கமுடியவில்லை ஏனென்றால்,\n"
-"வரைவுப்புத்தகத்தை சேமிக்க உறையை உருவாக்கமுடியவில்லை."
+msgstr "Arduino இயங்கமுடியவில்லை ஏனென்றால்,\nவரைவுப்புத்தகத்தை சேமிக்க உறையை உருவாக்கமுடியவில்லை."
 
-#: Base.java:233
+#: Base.java:240
 msgid ""
 "Arduino requires a full JDK (not just a JRE)\n"
 "to run. Please install JDK 1.5 or later.\n"
 "More information can be found in the reference."
-msgstr ""
-"Arduinoவிற்கு முழு JDK தேவை (JRE மற்றும் கூடாது). \n"
-"JDK 1.5 (அ) புதியதை நிறுவவும்.\n"
-"மேலும் விவரங்களை குறிப்பில் காணலாம்."
+msgstr "Arduinoவிற்கு முழு JDK தேவை (JRE மற்றும் கூடாது). \nJDK 1.5 (அ) புதியதை நிறுவவும்.\nமேலும் விவரங்களை குறிப்பில் காணலாம்."
 
 #: ../../../processing/app/EditorStatus.java:471
 msgid "Arduino: "
 msgstr ""
 
-#: Sketch.java:592
+#: Sketch.java:588
 #, java-format
 msgid "Are you sure you want to delete \"{0}\"?"
 msgstr "நீங்கள் \"{0}\"ஐ நீக்க வேண்டும் என்பதில் உறுதியாக இருக்கிறீர்களா?"
 
-#: Sketch.java:591
+#: Sketch.java:587
 msgid "Are you sure you want to delete this sketch?"
 msgstr "நீங்கள் இந்த வரைவை நீக்க வேண்டும் என்பதில் உறுதியாக இருக்கிறீர்களா?"
+
+#: ../../../processing/app/Preferences.java:137
+msgid "Armenian"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:138
+msgid "Asturian"
+msgstr ""
 
 #: tools/AutoFormat.java:91
 msgid "Auto Format"
 msgstr "சுய வடிவம்"
 
-#: tools/AutoFormat.java:931
+#: tools/AutoFormat.java:934
 msgid "Auto Format Canceled: Too many left curly braces."
 msgstr "சுய வடிவம் ரத்து செய்யப்பட்டது: மிக அதிகமான இடது வளைவு குறியீடுகள்."
 
-#: tools/AutoFormat.java:922
+#: tools/AutoFormat.java:925
 msgid "Auto Format Canceled: Too many left parentheses."
 msgstr "சுய வடிவம் ரத்து செய்யப்பட்டது: மிக அதிகமான இடது குறியீடுகள்."
 
-#: tools/AutoFormat.java:928
+#: tools/AutoFormat.java:931
 msgid "Auto Format Canceled: Too many right curly braces."
 msgstr "சுய வடிவம் ரத்து செய்யப்பட்டது: மிக அதிகமான வலது வளைவு குறியீடுகள்."
 
-#: tools/AutoFormat.java:919
+#: tools/AutoFormat.java:922
 msgid "Auto Format Canceled: Too many right parentheses."
 msgstr "சுய வடிவம் ரத்து செய்யப்பட்டது: மிக அதிகமான வலது குறியீடுகள்."
 
-#: tools/AutoFormat.java:941
+#: tools/AutoFormat.java:944
 msgid "Auto Format finished."
 msgstr "சுய வடிவம் முடிந்தது."
 
-#: Preferences.java:423
+#: Preferences.java:439
 msgid "Automatically associate .ino files with Arduino"
 msgstr "தானாகவே .ino கோப்புகளை Arduinoவுடன் தொடர்பு படுத்தவும்"
 
@@ -226,44 +210,48 @@ msgstr "தானாகவே .ino கோப்புகளை Arduinoவுட�
 msgid "Autoscroll"
 msgstr "சுய உருள்"
 
-#: Editor.java:2572
+#: Editor.java:2619
 #, java-format
 msgid "Bad error line: {0}"
 msgstr "பிழையின் வரிசை: {0}"
 
-#: Editor.java:2089
+#: Editor.java:2136
 msgid "Bad file selected"
 msgstr "தவறான கோப்பு தேர்வுசெய்யப்பட்டுள்ளது "
 
-#: ../../../processing/app/Sketch.java:1638
-#, java-format
-msgid "Binary sketch size: {0} bytes (of a {1} byte maximum) - {2}%% used"
+#: ../../../processing/app/Preferences.java:139
+msgid "Belarusian"
 msgstr ""
 
-#: Editor.java:682
+#: ../../../processing/app/Base.java:1433
+#: ../../../processing/app/Editor.java:707
 msgid "Board"
 msgstr "பலகை"
 
 #: ../../../processing/app/debug/TargetBoard.java:42
 #, java-format
 msgid ""
-"Board {0}:{1}:{2} doesn''t define a ''build.board'' preference. Auto-set to: "
-"{3}"
+"Board {0}:{1}:{2} doesn''t define a ''build.board'' preference. Auto-set to:"
+" {3}"
 msgstr ""
 
 #: ../../../processing/app/EditorStatus.java:472
 msgid "Board: "
 msgstr ""
 
+#: ../../../processing/app/Preferences.java:140
+msgid "Bosnian"
+msgstr ""
+
 #: SerialMonitor.java:112
 msgid "Both NL & CR"
 msgstr "NL மற்றும் CR"
 
-#: Preferences.java:80
+#: Preferences.java:81
 msgid "Browse"
 msgstr "உலவு"
 
-#: Sketch.java:1393 Sketch.java:1424
+#: Sketch.java:1392 Sketch.java:1423
 msgid "Build folder disappeared or could not be written"
 msgstr "கட்டுமான கோப்புறையை காணவில்லை (அ) எழுதப்பட்ட முடியவில்லை"
 
@@ -271,11 +259,15 @@ msgstr "கட்டுமான கோப்புறையை காணவி�
 msgid "Bulgarian"
 msgstr ""
 
-#: Editor.java:699
+#: ../../../processing/app/Preferences.java:141
+msgid "Burmese (Myanmar)"
+msgstr ""
+
+#: Editor.java:708
 msgid "Burn Bootloader"
 msgstr "துவக்கு நிரல் பதிவேற்று"
 
-#: Editor.java:2457
+#: Editor.java:2504
 msgid "Burning bootloader to I/O Board (this may take a minute)..."
 msgstr "துவக்கு நிரலை உள்ளீடு/வெளியீடு பலகையில் பதிவேற்றப்படுகிறது (இது சில நிமிடங்கள் நடக்கும்)..."
 
@@ -287,12 +279,12 @@ msgstr ""
 msgid "Canadian French"
 msgstr ""
 
-#: Editor.java:2017 Editor.java:2098 Editor.java:2418 Sketch.java:589
-#: Sketch.java:741 Sketch.java:1046 Preferences.java:78
+#: Preferences.java:79 Sketch.java:585 Sketch.java:737 Sketch.java:1042
+#: Editor.java:2064 Editor.java:2145 Editor.java:2465
 msgid "Cancel"
 msgstr "இரத்து செய்"
 
-#: Sketch.java:459
+#: Sketch.java:455
 msgid "Cannot Rename"
 msgstr "மறுபெயரிட முடியாது"
 
@@ -300,36 +292,52 @@ msgstr "மறுபெயரிட முடியாது"
 msgid "Carriage return"
 msgstr "புதுவரி திரும்பி"
 
-#: Preferences.java:86
+#: Preferences.java:87
 msgid "Catalan"
 msgstr "கடாலன்"
 
-#: Preferences.java:403
+#: Preferences.java:419
 msgid "Check for updates on startup"
 msgstr "துவக்கும் போது புதுப்பிப்புகள் உள்ளதா என பார்"
 
-#: Preferences.java:87
+#: ../../../processing/app/Preferences.java:142
+msgid "Chinese (China)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:142
+msgid "Chinese (Hong Kong)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:144
+msgid "Chinese (Taiwan)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:143
+msgid "Chinese (Taiwan) (Big5)"
+msgstr ""
+
+#: Preferences.java:88
 msgid "Chinese Simplified"
 msgstr "இலகு நடை சீனம் "
 
-#: Preferences.java:88
+#: Preferences.java:89
 msgid "Chinese Traditional"
 msgstr ""
 
-#: Editor.java:514 Editor.java:1977
+#: Editor.java:521 Editor.java:2024
 msgid "Close"
 msgstr "மூடு"
 
-#: Editor.java:1194 Editor.java:2702
+#: Editor.java:1208 Editor.java:2749
 msgid "Comment/Uncomment"
 msgstr "கருத்துரைக/கருத்தை நீக்குக"
 
-#: debug/Uploader.java:54 debug/Compiler.java:43
+#: debug/Compiler.java:49 debug/Uploader.java:45
 #, java-format
 msgid "Compiler error, please submit this code to {0}"
 msgstr "தொகுப்பு பிழை, தயவு செய்து குறியீட்டை {0}க்கு சமர்பிக்கவும்"
 
-#: Editor.java:1843 Sketch.java:1647
+#: Sketch.java:1608 Editor.java:1890
 msgid "Compiling sketch..."
 msgstr "வரைவை தொகுக்கிறது..."
 
@@ -337,11 +345,11 @@ msgstr "வரைவை தொகுக்கிறது..."
 msgid "Console Error"
 msgstr "பணியக பிழை"
 
-#: Editor.java:1143 Editor.java:2660
+#: Editor.java:1157 Editor.java:2707
 msgid "Copy"
 msgstr "நகல்"
 
-#: Editor.java:1163 Editor.java:2676
+#: Editor.java:1177 Editor.java:2723
 msgid "Copy as HTML"
 msgstr "HTML ஆக நகலெடு"
 
@@ -349,38 +357,38 @@ msgstr "HTML ஆக நகலெடு"
 msgid "Copy error"
 msgstr ""
 
-#: Editor.java:1151 Editor.java:2668
+#: Editor.java:1165 Editor.java:2715
 msgid "Copy for Forum"
 msgstr "பொது மன்றத்திற்காக நகலெடு"
 
-#: Sketch.java:1093
+#: Sketch.java:1089
 #, java-format
 msgid "Could not add ''{0}'' to the sketch."
 msgstr "''{0}''ஐ வரைவில் சேர்க்க முடியவில்லை."
 
-#: Editor.java:2141
+#: Editor.java:2188
 msgid "Could not copy to a proper location."
 msgstr "சரியான இடத்திற்கு பிரதி எடுக்க முடியவில்லை."
 
-#: Editor.java:2132
+#: Editor.java:2179
 msgid "Could not create the sketch folder."
 msgstr "வரைவு உறையை உருவாக்க முடியவில்லை."
 
-#: Editor.java:2159
+#: Editor.java:2206
 msgid "Could not create the sketch."
 msgstr "வரைவை உருவாக்க முடியவில்லை."
 
-#: Sketch.java:621
+#: Sketch.java:617
 #, java-format
 msgid "Could not delete \"{0}\"."
 msgstr "\"{0}\"ஐ நீக்க முடியவில்லை."
 
-#: Sketch.java:1070
+#: Sketch.java:1066
 #, java-format
 msgid "Could not delete the existing ''{0}'' file."
 msgstr "தற்போதுள்ள ''{0}'' கோப்பை நீக்க முடியவில்லை."
 
-#: Base.java:2247 Base.java:2270
+#: Base.java:2533 Base.java:2556
 #, java-format
 msgid "Could not delete {0}"
 msgstr "{0}ஐ நீக்க முடியவில்லை"
@@ -400,33 +408,27 @@ msgstr ""
 msgid "Could not find tool {0} from package {1}"
 msgstr ""
 
-#: Base.java:1648
+#: Base.java:1934
 #, java-format
 msgid ""
 "Could not open the URL\n"
 "{0}"
-msgstr ""
-"URLஐ திறக்க முடியவில்லை\n"
-"{0}"
+msgstr "URLஐ திறக்க முடியவில்லை\n{0}"
 
-#: Base.java:1672
+#: Base.java:1958
 #, java-format
 msgid ""
 "Could not open the folder\n"
 "{0}"
-msgstr ""
-"கோப்புறையை திறக்க முடியவில்லை\n"
-"{0}"
+msgstr "கோப்புறையை திறக்க முடியவில்லை\n{0}"
 
-#: Sketch.java:1811
+#: Sketch.java:1769
 msgid ""
 "Could not properly re-save the sketch. You may be in trouble at this point,\n"
 "and it might be time to copy and paste your code to another text editor."
-msgstr ""
-"சரியாக வரைவை மீண்டும் சேமிக்க முடியவில்லை. நீங்கள் இந்த இடத்தில் பிரச்சனையில் இருக்கலாம்,\n"
-"இதுவே உங்கள் குறியீட்டை நகலெடுத்து மற்றொரு உரை திருத்தியில் ஓட்டுவதற்கான சரியான நேரம்."
+msgstr "சரியாக வரைவை மீண்டும் சேமிக்க முடியவில்லை. நீங்கள் இந்த இடத்தில் பிரச்சனையில் இருக்கலாம்,\nஇதுவே உங்கள் குறியீட்டை நகலெடுத்து மற்றொரு உரை திருத்தியில் ஓட்டுவதற்கான சரியான நேரம்."
 
-#: Sketch.java:1810
+#: Sketch.java:1768
 msgid "Could not re-save sketch"
 msgstr "வரைவை மறுபடியும் சேமிக்க இயலவில்லை"
 
@@ -434,46 +436,42 @@ msgstr "வரைவை மறுபடியும் சேமிக்க இ
 msgid ""
 "Could not read color theme settings.\n"
 "You'll need to reinstall Processing."
-msgstr ""
-"வண்ண கரு அமைப்புகளை படிக்க முடியவில்லை.\n"
-"நீங்கள் செயல்முறையை மீண்டும் நிறுவ வேண்டும்."
+msgstr "வண்ண கரு அமைப்புகளை படிக்க முடியவில்லை.\nநீங்கள் செயல்முறையை மீண்டும் நிறுவ வேண்டும்."
 
-#: Preferences.java:210
+#: Preferences.java:219
 msgid ""
 "Could not read default settings.\n"
 "You'll need to reinstall Arduino."
-msgstr ""
-"இயல்புநிலை அமைப்புகளை படிக்க முடியவில்லை.\n"
-"நீங்கள் Arduinoவை மீண்டும் நிறுவ வேண்டும்."
+msgstr "இயல்புநிலை அமைப்புகளை படிக்க முடியவில்லை.\nநீங்கள் Arduinoவை மீண்டும் நிறுவ வேண்டும்."
 
-#: Preferences.java:242
+#: Preferences.java:258
 #, java-format
 msgid "Could not read preferences from {0}"
 msgstr "{0}ல் இருந்து விருப்பங்களை படிக்க முடியவில்லை"
 
-#: Base.java:2196
+#: Base.java:2482
 #, java-format
 msgid "Could not remove old version of {0}"
 msgstr "{0}வின் பழைய பதிப்பை அகற்ற முடியவில்லை"
 
-#: Sketch.java:487 Sketch.java:532
+#: Sketch.java:483 Sketch.java:528
 #, java-format
 msgid "Could not rename \"{0}\" to \"{1}\""
 msgstr "\"{0}\"ஐ \"{1}\"என மருபெயரிட முடியவில்லை "
 
-#: Sketch.java:479
+#: Sketch.java:475
 msgid "Could not rename the sketch. (0)"
 msgstr "வரைவை மருபெயரிட முடியவில்லை. (0)"
 
-#: Sketch.java:500
+#: Sketch.java:496
 msgid "Could not rename the sketch. (1)"
 msgstr "வரைவை மருபெயரிட முடியவில்லை. (1)"
 
-#: Sketch.java:507
+#: Sketch.java:503
 msgid "Could not rename the sketch. (2)"
 msgstr "வரைவை மருபெயரிட முடியவில்லை. (2)"
 
-#: Base.java:2206
+#: Base.java:2492
 #, java-format
 msgid "Could not replace {0}"
 msgstr "{0}வை மாற்ற முடியவில்லை"
@@ -482,15 +480,15 @@ msgstr "{0}வை மாற்ற முடியவில்லை"
 msgid "Couldn't archive sketch"
 msgstr "வரைவை ஆவணப்படுத்த முடியவில்லை"
 
-#: Sketch.java:1689
+#: Sketch.java:1647
 msgid "Couldn't determine program size: {0}"
 msgstr "நிரல் அளவை தீர்மானிக்க முடியவில்லை: {0}"
 
-#: Sketch.java:620
+#: Sketch.java:616
 msgid "Couldn't do it"
 msgstr "அதை செய்ய முடியவில்லை"
 
-#: ../../../cc/arduino/packages/uploaders/SerialUploader.java:208
+#: debug/BasicUploader.java:209
 msgid ""
 "Couldn't find a Board on the selected port. Check that you have the correct "
 "port selected.  If it is correct, try pressing the board's reset button "
@@ -501,7 +499,7 @@ msgstr ""
 msgid "Croatian"
 msgstr ""
 
-#: Editor.java:1135 Editor.java:2652
+#: Editor.java:1149 Editor.java:2699
 msgid "Cut"
 msgstr "வெட்டுக"
 
@@ -509,97 +507,103 @@ msgstr "வெட்டுக"
 msgid "Czech"
 msgstr ""
 
-#: Preferences.java:89
+#: Preferences.java:90
 msgid "Danish"
 msgstr "டானியம்"
 
-#: Editor.java:1210 Editor.java:2718
+#: Editor.java:1224 Editor.java:2765
 msgid "Decrease Indent"
 msgstr "உள்தள்ளலை குறைக்க"
 
-#: Sketch.java:595 EditorHeader.java:314
+#: EditorHeader.java:314 Sketch.java:591
 msgid "Delete"
 msgstr "நீக்கு"
 
-#: debug/Uploader.java:203
+#: debug/Uploader.java:199
 msgid ""
 "Device is not responding, check the right serial port is selected or RESET "
 "the board right before exporting"
-msgstr ""
-"சாதனம் பதிலளிக்கவில்லை, சரியான தொடர் துறையை தேர்வு செய்யவும் (அ)     ஏற்றுமதி செய்யும் முன்"
-"பலகையை மீட்டமைக்கவும்"
+msgstr "சாதனம் பதிலளிக்கவில்லை, சரியான தொடர் துறையை தேர்வு செய்யவும் (அ)     ஏற்றுமதி செய்யும் முன்பலகையை மீட்டமைக்கவும்"
 
 #: tools/FixEncoding.java:57
 msgid "Discard all changes and reload sketch?"
 msgstr "அணைத்து மாற்றங்களையும் ஒதிக்கிவிட்டு வரைவை ஏற்றவா?"
 
-#: Editor.java:2017
+#: Editor.java:2064
 msgid "Don't Save"
 msgstr "சேமிக்காதே"
 
-#: Editor.java:2228 Editor.java:2264
+#: Editor.java:2275 Editor.java:2311
 msgid "Done Saving."
 msgstr "செமித்துவிட்டது."
 
-#: Editor.java:2463
+#: Editor.java:2510
 msgid "Done burning bootloader."
 msgstr "துவக்கு நிரலை பதிவேற்றிவிட்டது."
 
-#: Editor.java:1864 Editor.java:1881
+#: Editor.java:1911 Editor.java:1928
 msgid "Done compiling."
 msgstr "தொகுத்துவிட்டது."
 
-#: Editor.java:2517
+#: Editor.java:2564
 msgid "Done printing."
 msgstr "அச்சிட்டுவிட்டது."
 
-#: Editor.java:2348 Editor.java:2384
+#: Editor.java:2395 Editor.java:2431
 msgid "Done uploading."
 msgstr "மேலேற்றி முடித்துவிட்டது."
 
-#: Preferences.java:90
+#: Preferences.java:91
 msgid "Dutch"
 msgstr "உலாந்தியம்"
 
-#: Editor.java:1116
+#: ../../../processing/app/Preferences.java:144
+msgid "Dutch (Netherlands)"
+msgstr ""
+
+#: Editor.java:1130
 msgid "Edit"
 msgstr "தொகு"
 
-#: Preferences.java:354
+#: Preferences.java:370
 msgid "Editor font size: "
 msgstr "திருத்தி எழுத்துரு அளவு: "
 
-#: Preferences.java:337
+#: Preferences.java:353
 msgid "Editor language: "
 msgstr ""
 
-#: Preferences.java:91
+#: Preferences.java:92
 msgid "English"
 msgstr "ஆங்கிலம்"
 
-#: Editor.java:1049
+#: ../../../processing/app/Preferences.java:145
+msgid "English (United Kingdom)"
+msgstr ""
+
+#: Editor.java:1062
 msgid "Environment"
 msgstr "சூழல்"
 
-#: Editor.java:2120 Editor.java:2131 Editor.java:2141 Editor.java:2159
-#: Sketch.java:479 Sketch.java:485 Sketch.java:500 Sketch.java:507
-#: Sketch.java:530 Sketch.java:547 Base.java:1861 Preferences.java:240
+#: Base.java:2147 Preferences.java:256 Sketch.java:475 Sketch.java:481
+#: Sketch.java:496 Sketch.java:503 Sketch.java:526 Sketch.java:543
+#: Editor.java:2167 Editor.java:2178 Editor.java:2188 Editor.java:2206
 msgid "Error"
 msgstr "பிழை"
 
-#: Sketch.java:1069 Sketch.java:1092
+#: Sketch.java:1065 Sketch.java:1088
 msgid "Error adding file"
 msgstr "கோப்பை சேர்ப்பதில் பிழை"
 
-#: debug/Compiler.java:426
+#: debug/Compiler.java:369
 msgid "Error compiling."
 msgstr "தொகுப்பதில் பிழை."
 
-#: Base.java:1433
+#: Base.java:1674
 msgid "Error getting the Arduino data folder."
 msgstr "Arduino தரவு கோப்புறையை பெறுவதில் பிழை."
 
-#: Serial.java:567
+#: Serial.java:593
 #, java-format
 msgid "Error inside Serial.{0}()"
 msgstr "தொடர்நிலை.{0}()க்குள் பிழை உள்ளது"
@@ -615,34 +619,32 @@ msgstr ""
 msgid "Error loading {0}"
 msgstr ""
 
-#: Serial.java:154
+#: Serial.java:181
 #, java-format
 msgid "Error opening serial port ''{0}''."
 msgstr "தொடர்நிலை துறை ''{0}''யை திறப்பதில் பிழை ஏற்பட்டுவிட்டது."
 
-#: Preferences.java:261
+#: Preferences.java:277
 msgid "Error reading preferences"
 msgstr "விருப்பங்களை படிப்பதில் பிழை"
 
-#: Preferences.java:263
+#: Preferences.java:279
 #, java-format
 msgid ""
 "Error reading the preferences file. Please delete (or move)\n"
 "{0} and restart Arduino."
-msgstr ""
-"விருப்பக் கோப்பை படிப்பதில் பிழை. தயவு செய்து {0}வை அகற்றவும்((அ) நகற்றவும்)\n"
-"பின்பு Arduinoவை மறுதொடக்கம் செய்யவும்."
+msgstr "விருப்பக் கோப்பை படிப்பதில் பிழை. தயவு செய்து {0}வை அகற்றவும்((அ) நகற்றவும்)\nபின்பு Arduinoவை மறுதொடக்கம் செய்யவும்."
 
 #: ../../../cc/arduino/packages/DiscoveryManager.java:25
 msgid "Error starting discovery method: "
 msgstr ""
 
-#: ../../../processing/app/Serial.java:125
+#: Serial.java:125
 #, java-format
 msgid "Error touching serial port ''{0}''."
 msgstr ""
 
-#: Editor.java:2465 Editor.java:2469 Editor.java:2473
+#: Editor.java:2512 Editor.java:2516 Editor.java:2520
 msgid "Error while burning bootloader."
 msgstr "துவக்கு நிரலை பதிவேற்றும்போது பிழை ஏற்பட்டுவிட்டது."
 
@@ -655,7 +657,7 @@ msgstr ""
 msgid "Error while loading code {0}"
 msgstr "குறியீடு {0}ஐ மேலேற்றும்போது பிழை ஏற்பட்டுவிட்டது "
 
-#: Editor.java:2520
+#: Editor.java:2567
 msgid "Error while printing."
 msgstr "அச்சிடும்போது பிழை ஏற்பட்டுவிட்டது."
 
@@ -664,23 +666,27 @@ msgstr "அச்சிடும்போது பிழை ஏற்பட்�
 msgid "Error while uploading: missing '{0}' configuration parameter"
 msgstr ""
 
-#: Preferences.java:92
+#: Preferences.java:93
 msgid "Estonian"
 msgstr ""
 
-#: Editor.java:509
+#: ../../../processing/app/Preferences.java:146
+msgid "Estonian (Estonia)"
+msgstr ""
+
+#: Editor.java:516
 msgid "Examples"
 msgstr "எடுத்துக்காட்டுகள்"
 
-#: Editor.java:2435
+#: Editor.java:2482
 msgid "Export canceled, changes must first be saved."
 msgstr "ஏற்றுமதி ரத்து செய்யப்பட்டது, மாற்றங்களை முதலில் சேமிக்க வேண்டும்."
 
-#: Base.java:1814
+#: Base.java:2100
 msgid "FAQ.html"
 msgstr "FAQ.html"
 
-#: Editor.java:484
+#: Editor.java:491
 msgid "File"
 msgstr "கோப்பு"
 
@@ -692,19 +698,19 @@ msgstr "ஃபிலிபினோ"
 msgid "Find"
 msgstr "கண்டுபிடி"
 
-#: Editor.java:1235
+#: Editor.java:1249
 msgid "Find Next"
 msgstr "அடுத்ததை தேடு"
 
-#: Editor.java:1245
+#: Editor.java:1259
 msgid "Find Previous"
 msgstr "முந்தியதை தேடு"
 
-#: Editor.java:1073 Editor.java:2728
+#: Editor.java:1086 Editor.java:2775
 msgid "Find in Reference"
 msgstr "குறிப்பில் கண்டுபிடி"
 
-#: Editor.java:1220
+#: Editor.java:1234
 msgid "Find..."
 msgstr "தேடு..."
 
@@ -712,30 +718,34 @@ msgstr "தேடு..."
 msgid "Find:"
 msgstr "கண்டுபிடி:"
 
+#: ../../../processing/app/Preferences.java:147
+msgid "Finnish"
+msgstr ""
+
 #: tools/FixEncoding.java:41 tools/FixEncoding.java:58
 #: tools/FixEncoding.java:79
 msgid "Fix Encoding & Reload"
 msgstr "குறியீட்டை சரி செய்துவிட்டு ஏற்றவும்"
 
-#: ../../../processing/app/Base.java:2057
+#: Base.java:1851
 msgid ""
-"For information on installing libraries, see: http://arduino.cc/en/Guide/"
-"Libraries\n"
+"For information on installing libraries, see: "
+"http://arduino.cc/en/Guide/Libraries\n"
 msgstr ""
 
-#: ../../../cc/arduino/packages/uploaders/SerialUploader.java:79
+#: debug/BasicUploader.java:80
 msgid "Forcing reset using 1200bps open/close on port "
 msgstr ""
 
-#: Preferences.java:93
+#: Preferences.java:95
 msgid "French"
 msgstr "பிரஞ்சு"
 
-#: Editor.java:1083
+#: Editor.java:1097
 msgid "Frequently Asked Questions"
 msgstr "அடிக்கடி கேட்கப்படும் கேள்விகள்"
 
-#: Preferences.java:95
+#: Preferences.java:96
 msgid "Galician"
 msgstr "காலிசியன்"
 
@@ -743,31 +753,43 @@ msgstr "காலிசியன்"
 msgid "Georgian"
 msgstr ""
 
-#: Preferences.java:96
+#: Preferences.java:97
 msgid "German"
 msgstr "ஜெர்மானியம்"
 
-#: Editor.java:1041
+#: Editor.java:1054
 msgid "Getting Started"
 msgstr "தொடங்குதல்"
 
-#: Preferences.java:97
+#: ../../../processing/app/Sketch.java:1646
+#, java-format
+msgid ""
+"Global variables use {0} bytes ({2}%%) of dynamic memory, leaving {3} bytes "
+"for local variables. Maximum is {1} bytes."
+msgstr ""
+
+#: ../../../processing/app/Sketch.java:1651
+#, java-format
+msgid "Global variables use {0} bytes of dynamic memory."
+msgstr ""
+
+#: Preferences.java:98
 msgid "Greek"
 msgstr "கிரேக்கம்"
 
-#: Base.java:1799
+#: Base.java:2085
 msgid "Guide_Environment.html"
 msgstr "Guide_Environment.html"
 
-#: Base.java:1785
+#: Base.java:2071
 msgid "Guide_MacOSX.html"
 msgstr "Guide_MacOSX.html"
 
-#: Base.java:1809
+#: Base.java:2095
 msgid "Guide_Troubleshooting.html"
 msgstr "Guide_Troubleshooting.html"
 
-#: Base.java:1787
+#: Base.java:2073
 msgid "Guide_Windows.html"
 msgstr "Guide_Windows.html"
 
@@ -775,27 +797,25 @@ msgstr "Guide_Windows.html"
 msgid "Hebrew"
 msgstr ""
 
-#: Editor.java:1002
+#: Editor.java:1015
 msgid "Help"
 msgstr "உதவி"
 
-#: ../../../processing/app/Preferences.java:98
+#: Preferences.java:99
 msgid "Hindi"
 msgstr ""
 
-#: Sketch.java:299
+#: Sketch.java:295
 msgid ""
 "How about saving the sketch first \n"
 "before trying to rename it?"
-msgstr ""
-"பெயரை மாற்றும் முன் வரைவை \n"
-"சேமிப்பது பற்றி என்ன நினைக்கிறீர்கள்?"
+msgstr "பெயரை மாற்றும் முன் வரைவை \nசேமிப்பது பற்றி என்ன நினைக்கிறீர்கள்?"
 
-#: Sketch.java:886
+#: Sketch.java:882
 msgid "How very Borges of you"
 msgstr "நீங்கள் மிகவும் திறமைசாலி"
 
-#: Preferences.java:98
+#: Preferences.java:100
 msgid "Hungarian"
 msgstr "ஹங்கேரியன்"
 
@@ -803,15 +823,15 @@ msgstr "ஹங்கேரியன்"
 msgid "Ignore Case"
 msgstr "வேற்றுமையை அலட்சியப்படுத்து"
 
-#: Base.java:1207
+#: Base.java:1058
 msgid "Ignoring bad library name"
 msgstr "தவறான நூலகப்பெயரை அலட்சியப்படுத்துகிறது"
 
-#: Base.java:1132
+#: Base.java:1436
 msgid "Ignoring sketch with bad name"
 msgstr "தவறான பெயர் கொண்ட வரைவை அளச்சியப்படுத்துகிறது"
 
-#: Editor.java:629
+#: Editor.java:636
 msgid "Import Library..."
 msgstr "நூலகத்தை இறக்குமதி செய்..."
 
@@ -826,11 +846,11 @@ msgid ""
 "Save sketch and update its extension?"
 msgstr ""
 
-#: Editor.java:1202 Editor.java:2710
+#: Editor.java:1216 Editor.java:2757
 msgid "Increase Indent"
 msgstr "உள்தள்ளலை அதிகப்படுத்துக"
 
-#: Preferences.java:99
+#: Preferences.java:101
 msgid "Indonesian"
 msgstr ""
 
@@ -839,27 +859,27 @@ msgstr ""
 msgid "Invalid library found in {0}: {1}"
 msgstr ""
 
-#: Preferences.java:100
+#: Preferences.java:102
 msgid "Italian"
 msgstr "இத்தாலியன்"
 
-#: Preferences.java:101
+#: Preferences.java:103
 msgid "Japanese"
 msgstr "ஜப்பனீஸ்"
 
-#: Preferences.java:102
+#: Preferences.java:104
 msgid "Korean"
 msgstr ""
 
-#: Preferences.java:103
+#: Preferences.java:105
 msgid "Latvian"
 msgstr "லேட்வியன்"
 
-#: ../../../processing/app/Base.java:2903
+#: Base.java:2699
 msgid "Library added to your libraries. Check \"Import library\" menu"
 msgstr ""
 
-#: Preferences.java:104
+#: Preferences.java:106
 msgid "Lithuaninan"
 msgstr ""
 
@@ -867,45 +887,39 @@ msgstr ""
 msgid "Low memory available, stability problems may occur"
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:106
+#: Preferences.java:107
 msgid "Marathi"
 msgstr ""
 
-#: Base.java:1826
+#: Base.java:2112
 msgid "Message"
 msgstr "தகவல்"
 
-#: ../../../processing/app/Sketch.java:1646
-#, java-format
-msgid "Minimum Memory usage: {0} bytes"
-msgstr ""
-
-#: ../../../processing/app/Sketch.java:1643
-#, java-format
-msgid "Minimum Memory usage: {0} bytes (of a {1} byte maximum) - {2}%% used"
-msgstr ""
-
-#: Sketch.java:1754
+#: Sketch.java:1712
 msgid "Missing the */ from the end of a /* comment */"
 msgstr "/* comment */ல் */ஐ காணவில்லை"
 
-#: Preferences.java:433
+#: Preferences.java:449
 msgid "More preferences can be edited directly in the file"
 msgstr "மேலும் விருப்பத்தேர்வுகளை நேரடியாக கோப்பில் திருத்தலாம்"
 
-#: Editor.java:2109
+#: Editor.java:2156
 msgid "Moving"
 msgstr "நகற்றுகிறது"
 
-#: Sketch.java:286
+#: Sketch.java:282
 msgid "Name for new file:"
 msgstr "புதிய கோப்பின் பெயர்:"
+
+#: ../../../processing/app/Preferences.java:149
+msgid "Nepali"
+msgstr ""
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:51
 msgid "Network upload using programmer not supported"
 msgstr ""
 
-#: Editor.java:486 EditorToolbar.java:41
+#: EditorToolbar.java:41 Editor.java:493
 msgid "New"
 msgstr "புதிய"
 
@@ -925,19 +939,19 @@ msgstr "புது வரி"
 msgid "Next Tab"
 msgstr "அடுத்த தாவல்"
 
-#: UpdateCheck.java:108 Preferences.java:77
+#: Preferences.java:78 UpdateCheck.java:108
 msgid "No"
 msgstr "இல்லை"
 
-#: debug/Compiler.java:79
+#: debug/Compiler.java:126
 msgid "No board selected; please choose a board from the Tools > Board menu."
 msgstr "பலகை தேர்வு செய்யப்படவில்லை; ஒரு பலகையை கருவிகள் > பலகை பட்டியலில் தேர்வு செய்யவும்."
 
-#: tools/AutoFormat.java:913 tools/format/src/AutoFormat.java:54
+#: tools/format/src/AutoFormat.java:54 tools/AutoFormat.java:916
 msgid "No changes necessary for Auto Format."
 msgstr "சுய வடிவத்திற்கு எந்த மாற்றங்களும் தேவையில்லை."
 
-#: Editor.java:366
+#: Editor.java:373
 msgid "No files were added to the sketch."
 msgstr "வரைவில் இன்னும் கோப்புகள் சேர்க்கப்படவில்லை."
 
@@ -949,11 +963,11 @@ msgstr "எந்த ஏவுதிரையும் கிட்டவில�
 msgid "No line ending"
 msgstr "வரி முடிவு இல்லை"
 
-#: Base.java:538
+#: Base.java:541
 msgid "No really, time for some fresh air for you."
 msgstr "இல்லை உண்மையாகவே, இது நீங்கள் புத்துணர்ச்சி பெறவேண்டிய நேரம்."
 
-#: Editor.java:1823
+#: Editor.java:1872
 #, java-format
 msgid "No reference available for \"{0}\""
 msgstr "\"{0}\" க்கு எந்த குறிப்பும் இல்லை"
@@ -962,17 +976,18 @@ msgstr "\"{0}\" க்கு எந்த குறிப்பும் இல�
 msgid "No valid configured cores found! Exiting..."
 msgstr ""
 
-#: Base.java:184
+#: ../../../processing/app/debug/TargetPackage.java:63
+#, java-format
+msgid "No valid hardware definitions found in folder {0}."
+msgstr ""
+
+#: Base.java:191
 msgid "Non-fatal error while setting the Look & Feel."
 msgstr "தோற்றம் & உருவத்தை அமைக்கும்போது அபாயமில்லாத பிழை ஏற்பட்டுவிட்டது."
 
-#: Sketch.java:400 Sketch.java:414 Sketch.java:423 Sketch.java:863
+#: Sketch.java:396 Sketch.java:410 Sketch.java:419 Sketch.java:859
 msgid "Nope"
 msgstr "இல்லை"
-
-#: ../../../processing/app/Preferences.java:107
-msgid "Norwegian"
-msgstr ""
 
 #: ../../../processing/app/Preferences.java:108
 msgid "Norwegian Bokmål"
@@ -984,12 +999,12 @@ msgid ""
 "for tips on reducing your footprint."
 msgstr ""
 
-#: Editor.java:2098 Editor.java:2418 Sketch.java:589 Sketch.java:741
-#: Sketch.java:1046 Preferences.java:79
+#: Preferences.java:80 Sketch.java:585 Sketch.java:737 Sketch.java:1042
+#: Editor.java:2145 Editor.java:2465
 msgid "OK"
 msgstr "சரி"
 
-#: Editor.java:369 Sketch.java:996
+#: Sketch.java:992 Editor.java:376
 msgid "One file added to the sketch."
 msgstr "வரைவில் ஒரு கோப்பு சேர்க்கப்பட்டுள்ளன."
 
@@ -997,11 +1012,11 @@ msgstr "வரைவில் ஒரு கோப்பு சேர்க்க
 msgid "Open"
 msgstr "திற"
 
-#: Editor.java:2641
+#: Editor.java:2688
 msgid "Open URL"
 msgstr "URLஐ திற"
 
-#: Base.java:633
+#: Base.java:636
 msgid "Open an Arduino sketch..."
 msgstr "ஒரு Arduino வரைவை திறக்கவும்..."
 
@@ -1009,11 +1024,11 @@ msgstr "ஒரு Arduino வரைவை திறக்கவும்..."
 msgid "Open in Another Window"
 msgstr "மற்றொரு சாளரத்தில் திற"
 
-#: Editor.java:494 Base.java:903
+#: Base.java:903 Editor.java:501
 msgid "Open..."
 msgstr "திற..."
 
-#: Editor.java:556
+#: Editor.java:563
 msgid "Page Setup"
 msgstr "பக்கத்தை நிறுவுக"
 
@@ -1021,23 +1036,23 @@ msgstr "பக்கத்தை நிறுவுக"
 msgid "Password:"
 msgstr ""
 
-#: Editor.java:1175 Editor.java:2684
+#: Editor.java:1189 Editor.java:2731
 msgid "Paste"
 msgstr "ஒட்டு"
 
-#: Preferences.java:105
+#: Preferences.java:109
 msgid "Persian"
 msgstr "பர்ஸியன்"
 
-#: debug/Compiler.java:465
+#: debug/Compiler.java:408
 msgid "Please import the SPI library from the Sketch > Import Library menu."
 msgstr "SPI நூலகத்தை வரைவு > நூலக இறக்குமதி பட்டியலில் இருந்து இறக்குமதி செய்யவும்."
 
-#: Base.java:232
+#: Base.java:239
 msgid "Please install JDK 1.5 or later"
 msgstr "தயவுசெய்து JDK 1.5 (அ) புதியதை நிறுவவும்"
 
-#: Preferences.java:106
+#: Preferences.java:110
 msgid "Polish"
 msgstr ""
 
@@ -1045,11 +1060,19 @@ msgstr ""
 msgid "Port"
 msgstr ""
 
-#: Preferences.java:107 Preferences.java:108
-msgid "Portuguese"
+#: ../../../processing/app/Preferences.java:151
+msgid "Portugese"
 msgstr ""
 
-#: Editor.java:576 Preferences.java:279
+#: ../../../processing/app/Preferences.java:127
+msgid "Portuguese (Brazil)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:128
+msgid "Portuguese (Portugal)"
+msgstr ""
+
+#: Preferences.java:295 Editor.java:583
 msgid "Preferences"
 msgstr "விருப்பத்தேர்வுகள்"
 
@@ -1061,27 +1084,27 @@ msgstr "முந்திய"
 msgid "Previous Tab"
 msgstr "முந்தைய தாவல்"
 
-#: Editor.java:564
+#: Editor.java:571
 msgid "Print"
 msgstr "அச்சிடுக"
 
-#: Editor.java:2524
+#: Editor.java:2571
 msgid "Printing canceled."
 msgstr "அச்சிடுவது ரத்து செய்யப்பட்டது."
 
-#: Editor.java:2500
+#: Editor.java:2547
 msgid "Printing..."
 msgstr "அச்சிடுகிறது..."
 
-#: Base.java:1671
+#: Base.java:1957
 msgid "Problem Opening Folder"
 msgstr "கோப்புறையை திறப்பதில் பிரச்சனை எழுந்துள்ளது"
 
-#: Base.java:1647
+#: Base.java:1933
 msgid "Problem Opening URL"
 msgstr "URLஐ திறப்பதில் பிரச்சனை எழுந்துள்ளது"
 
-#: Base.java:220
+#: Base.java:227
 msgid "Problem Setting the Platform"
 msgstr "இயங்குதளம் அமைப்பதில் பிரச்சினை"
 
@@ -1093,52 +1116,48 @@ msgstr ""
 msgid "Problem accessing files in folder "
 msgstr ""
 
-#: Base.java:1432
+#: Base.java:1673
 msgid "Problem getting data folder"
 msgstr "தரவு கோப்புறையை பெறுவதில் பிரச்சினை"
 
-#: Sketch.java:1465
+#: Sketch.java:1467
 #, java-format
 msgid "Problem moving {0} to the build folder"
 msgstr "{0}ஐ கட்டுமான உறைக்குள் நகற்றுவதில் பிரச்சினை"
 
 #: debug/Uploader.java:209
 msgid ""
-"Problem uploading to board.  See http://www.arduino.cc/en/Guide/"
-"Troubleshooting#upload for suggestions."
-msgstr ""
-"பலகைக்கு பதிவேற்றம் செய்வதில் பிரச்சனை எழுந்துள்ளது. http://www.arduino.cc/en/Guide/"
-"Troubleshooting#upload ஐ பரிந்துரைகளுக்கு பார்க்கவும்."
+"Problem uploading to board.  See "
+"http://www.arduino.cc/en/Guide/Troubleshooting#upload for suggestions."
+msgstr "பலகைக்கு பதிவேற்றம் செய்வதில் பிரச்சனை எழுந்துள்ளது. http://www.arduino.cc/en/Guide/Troubleshooting#upload ஐ பரிந்துரைகளுக்கு பார்க்கவும்."
 
-#: Sketch.java:359 Sketch.java:366 Sketch.java:377
+#: Sketch.java:355 Sketch.java:362 Sketch.java:373
 msgid "Problem with rename"
 msgstr "பெயர்மாற்றத்தில் பிரச்சனை எழுந்துள்ளது"
 
-#: Editor.java:2090
+#: Editor.java:2137
 msgid ""
 "Processing can only open its own sketches\n"
 "and other files ending in .ino or .pde"
-msgstr ""
-"செயலாக்கத்தால் அதனுடைய வரைவுகள் மற்றும்\n"
-".ino அல்லது .pde நீட்டுதல் கொண்ட கோப்புகளை மட்டுமே திறக்க முடியும்"
+msgstr "செயலாக்கத்தால் அதனுடைய வரைவுகள் மற்றும்\n.ino அல்லது .pde நீட்டுதல் கொண்ட கோப்புகளை மட்டுமே திறக்க முடியும்"
 
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
 msgstr ""
 
-#: Editor.java:695
+#: Editor.java:704
 msgid "Programmer"
 msgstr "நிரலர்"
 
-#: Editor.java:586 Base.java:782
+#: Base.java:783 Editor.java:593
 msgid "Quit"
 msgstr "வெளியேறுக"
 
-#: Editor.java:1124 Editor.java:1126 Editor.java:1376
+#: Editor.java:1138 Editor.java:1140 Editor.java:1390
 msgid "Redo"
 msgstr "திரும்பச்செய்க"
 
-#: Editor.java:1065
+#: Editor.java:1078
 msgid "Reference"
 msgstr "குறிப்பு"
 
@@ -1146,7 +1165,7 @@ msgstr "குறிப்பு"
 msgid "Rename"
 msgstr "மருபெயரிடுக"
 
-#: FindReplace.java:121 FindReplace.java:130 Sketch.java:1050
+#: FindReplace.java:121 FindReplace.java:130 Sketch.java:1046
 msgid "Replace"
 msgstr "மாற்று"
 
@@ -1158,7 +1177,7 @@ msgstr "மாற்றிவிட்டு தேடு"
 msgid "Replace All"
 msgstr "அனைத்தையும் மாற்றிடு"
 
-#: Sketch.java:1047
+#: Sketch.java:1043
 #, java-format
 msgid "Replace the existing version of {0}?"
 msgstr "{0}வின் தற்போதைய பதிப்பை மாற்றவா?"
@@ -1167,61 +1186,61 @@ msgstr "{0}வின் தற்போதைய பதிப்பை மாற
 msgid "Replace with:"
 msgstr "இதாக மாற்று:"
 
-#: Preferences.java:109
+#: Preferences.java:113
 msgid "Romanian"
 msgstr "ரோமானியம்"
 
-#: Preferences.java:110
+#: Preferences.java:114
 msgid "Russian"
 msgstr ""
 
-#: Editor.java:522 Editor.java:2017 Editor.java:2421 EditorToolbar.java:41
-#: EditorToolbar.java:46
+#: EditorToolbar.java:41 EditorToolbar.java:46 Editor.java:529
+#: Editor.java:2064 Editor.java:2468
 msgid "Save"
 msgstr "சேமி"
 
-#: Editor.java:530
+#: Editor.java:537
 msgid "Save As..."
 msgstr "எனச் சேமி..."
 
-#: Editor.java:2270
+#: Editor.java:2317
 msgid "Save Canceled."
 msgstr "சேமிப்பு ரத்து செய்யப்பட்டது."
 
-#: Editor.java:2420
+#: Editor.java:2467
 msgid "Save changes before export?"
 msgstr "ஏற்றுமதி செய்யும் முன் மாற்றங்களை செமிக்கவா?"
 
-#: Editor.java:1973
+#: Editor.java:2020
 #, java-format
 msgid "Save changes to \"{0}\"?  "
 msgstr "மாறுதல்களை \"{0}\"?  ல் சேமிக்கவும்"
 
-#: Sketch.java:829
+#: Sketch.java:825
 msgid "Save sketch folder as..."
 msgstr "என வரைவை கொப்புரையில் சேமிக்கவும்..."
 
-#: Editor.java:2223 Editor.java:2261
+#: Editor.java:2270 Editor.java:2308
 msgid "Saving..."
 msgstr "சேமிக்கிறது..."
 
-#: Base.java:1623
+#: Base.java:1909
 msgid "Select (or create new) folder for sketches..."
 msgstr "வரைவுகளுக்கு உறையை தேர்வு செய்யவும் (அல்லது உருவாக்கவும்)..."
 
-#: Editor.java:1184 Editor.java:2692
+#: Editor.java:1198 Editor.java:2739
 msgid "Select All"
 msgstr "அனைத்தும் தேர்ந்தெடு"
 
-#: ../../../processing/app/Base.java:2845
+#: Base.java:2636
 msgid "Select a zip file or a folder containing the library you'd like to add"
 msgstr ""
 
-#: Sketch.java:979
+#: Sketch.java:975
 msgid "Select an image or other data file to copy to your sketch"
 msgstr "உங்கள் வரைவுக்குள் நகலெடுக்க ஒரு படத்தை அல்லது தரவு கோப்பை தேர்வு செய்யவும்"
 
-#: Preferences.java:314
+#: Preferences.java:330
 msgid "Select new sketchbook location"
 msgstr "புதிய வரைவுப்புத்தக இடத்தை தேர்வு செய்யவும்"
 
@@ -1233,48 +1252,43 @@ msgstr ""
 msgid "Send"
 msgstr "அனுப்பு"
 
-#: Editor.java:662 EditorToolbar.java:41 EditorToolbar.java:46
+#: EditorToolbar.java:41 EditorToolbar.java:46 Editor.java:669
 msgid "Serial Monitor"
 msgstr "தொடர்நிலை கண்காணிப்புத்திரை"
 
-#: Serial.java:147
+#: Serial.java:174
 #, java-format
 msgid ""
 "Serial port ''{0}'' already in use. Try quiting any programs that may be "
 "using it."
-msgstr ""
-"தொடர்நிலை துறை ''{0}'' ஏற்கனவே பயன்பாட்டிலுள்ளது. அதை பயன்படுத்தும் வேறு நிரலை அணைத்துவிட்டு  "
-"முயற்சிக்கவும்."
+msgstr "தொடர்நிலை துறை ''{0}'' ஏற்கனவே பயன்பாட்டிலுள்ளது. அதை பயன்படுத்தும் வேறு நிரலை அணைத்துவிட்டு  முயற்சிக்கவும்."
 
-#: ../../../processing/app/Serial.java:121
+#: Serial.java:121
 #, java-format
 msgid ""
 "Serial port ''{0}'' already in use. Try quitting any programs that may be "
 "using it."
 msgstr ""
 
-#: Serial.java:167
+#: Serial.java:194
 #, java-format
 msgid ""
-"Serial port ''{0}'' not found. Did you select the right one from the Tools > "
-"Serial Port menu?"
-msgstr "" 
-"தொடர்நிலை துறை ''{0}''யை காணவில்லை. நீங்கள் சரியானதை கருவிகள் > தொடர்நிலை துறை பட்டியலில் தேர்வு செய்தீர்களா?"
+"Serial port ''{0}'' not found. Did you select the right one from the Tools >"
+" Serial Port menu?"
+msgstr "தொடர்நிலை துறை ''{0}''யை காணவில்லை. நீங்கள் சரியானதை கருவிகள் > தொடர்நிலை துறை பட்டியலில் தேர்வு செய்தீர்களா?"
 
-#: Editor.java:2296
+#: Editor.java:2343
 #, java-format
 msgid ""
 "Serial port {0} not found.\n"
 "Retry the upload with another serial port?"
-msgstr ""
-"தொடர்நிலை துறை {0} காணவில்லை.\n"
-"வேறு தொடர்நிலை துறை கொண்டு மேலேற்ற முயற்சிக்கவும்?"
+msgstr "தொடர்நிலை துறை {0} காணவில்லை.\nவேறு தொடர்நிலை துறை கொண்டு மேலேற்ற முயற்சிக்கவும்?"
 
-#: Base.java:1440
+#: Base.java:1681
 msgid "Settings issues"
 msgstr "அமைப்பு சிக்கல்கள்"
 
-#: Editor.java:634
+#: Editor.java:641
 msgid "Show Sketch Folder"
 msgstr "வரைவு உறையை காட்டுக"
 
@@ -1282,160 +1296,156 @@ msgstr "வரைவு உறையை காட்டுக"
 msgid "Show verbose output during compilation"
 msgstr ""
 
-#: Preferences.java:371
+#: Preferences.java:387
 msgid "Show verbose output during: "
 msgstr "இதன் போது வேர்போசு வெளியீட்டை காண்பிக்கவும்:"
 
-#: Editor.java:600
+#: Editor.java:607
 msgid "Sketch"
 msgstr "வரைவு"
 
-#: Sketch.java:1796
+#: Sketch.java:1754
 msgid "Sketch Disappeared"
 msgstr "வரைவு மறைந்துவிட்டது"
 
-#: Base.java:1095
+#: Base.java:1411
 msgid "Sketch Does Not Exist"
 msgstr "வரைவு இல்லை"
 
-#: Sketch.java:278 Sketch.java:307 Sketch.java:581 Sketch.java:970
+#: Sketch.java:274 Sketch.java:303 Sketch.java:577 Sketch.java:966
 msgid "Sketch is Read-Only"
 msgstr "வாசிப்பு வரைவு"
 
-#: Sketch.java:298
+#: Sketch.java:294
 msgid "Sketch is Untitled"
 msgstr "வரைவு பெயரிடப்படவில்லை"
 
-#: Sketch.java:724
+#: Sketch.java:720
 msgid "Sketch is read-only"
 msgstr "வரைவை வாசிக்க மட்டுமே முடியும்"
 
-#: Sketch.java:1694
+#: Sketch.java:1653
 msgid ""
 "Sketch too big; see http://www.arduino.cc/en/Guide/Troubleshooting#size for "
 "tips on reducing it."
-msgstr ""
-"வரைவின் பெரியதாக உள்ளது; அதை குறைப்பது பற்றிய வழிமுறைகளுக்கு,\n"
-"http://www.arduino.cc/en/Guide/Troubleshooting#size ஐ பார்க்கவும்."
+msgstr "வரைவின் பெரியதாக உள்ளது; அதை குறைப்பது பற்றிய வழிமுறைகளுக்கு,\nhttp://www.arduino.cc/en/Guide/Troubleshooting#size ஐ பார்க்கவும்."
 
-#: Editor.java:503
+#: ../../../processing/app/Sketch.java:1639
+#, java-format
+msgid ""
+"Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} "
+"bytes."
+msgstr ""
+
+#: Editor.java:510
 msgid "Sketchbook"
 msgstr "வரைவு புத்தகம்"
 
-#: Base.java:257
+#: Base.java:258
 msgid "Sketchbook folder disappeared"
 msgstr "வரைவுப்புத்தக உறை மறைந்துவிட்டது"
 
-#: Preferences.java:299
+#: Preferences.java:315
 msgid "Sketchbook location:"
 msgstr "வரைவுப்புத்தக இடம்:"
 
-#: Sketch.java:279 Sketch.java:308 Sketch.java:582 Sketch.java:971
+#: ../../../processing/app/Preferences.java:152
+msgid "Slovenian"
+msgstr ""
+
+#: Sketch.java:275 Sketch.java:304 Sketch.java:578 Sketch.java:967
 msgid ""
 "Some files are marked \"read-only\", so you'll\n"
 "need to re-save the sketch in another location,\n"
 "and try again."
-msgstr ""
-"சில கோப்புகள் \"read-only\" என குறிக்கப்பட்டுள்ளது,எனவே நீங்கள் \n"
-"வேறு இடத்தில வரைவை மறுபடியும் சேமிக்கவும்,\n"
-"பின்பு முயற்சிக்கவும்."
+msgstr "சில கோப்புகள் \"read-only\" என குறிக்கப்பட்டுள்ளது,எனவே நீங்கள் \nவேறு இடத்தில வரைவை மறுபடியும் சேமிக்கவும்,\nபின்பு முயற்சிக்கவும்."
 
-#: Sketch.java:725
+#: Sketch.java:721
 msgid ""
 "Some files are marked \"read-only\", so you'll\n"
 "need to re-save this sketch to another location."
-msgstr ""
-"சில கோப்புகள் \"read-only\" என குறிப்பிடப்பட்டுள்ளது, எனவே \n"
-"நீங்கள் மற்றொரு இடத்தில் இந்த வரைவை மீண்டும் சேமிக்க வேண்டும்."
+msgstr "சில கோப்புகள் \"read-only\" என குறிப்பிடப்பட்டுள்ளது, எனவே \nநீங்கள் மற்றொரு இடத்தில் இந்த வரைவை மீண்டும் சேமிக்க வேண்டும்."
 
-#: Sketch.java:461
+#: Sketch.java:457
 #, java-format
 msgid "Sorry, a sketch (or folder) named \"{0}\" already exists."
 msgstr "மன்னிக்கவும், \"{0}\"என்று ஏற்கனவே ஒரு வரைவு (அல்லது உறை) உள்ளது."
 
-#: Preferences.java:111
+#: Preferences.java:115
 msgid "Spanish"
 msgstr "ஸ்பானியம்"
 
-#: Base.java:537
+#: Base.java:540
 msgid "Sunshine"
 msgstr "சூர்யோதயம்"
 
-#: Preferences.java:83
+#: ../../../processing/app/Preferences.java:153
+msgid "Swedish"
+msgstr ""
+
+#: Preferences.java:84
 msgid "System Default"
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:116
+#: Preferences.java:116
 msgid "Tamil"
 msgstr ""
 
-#: debug/Compiler.java:471
+#: debug/Compiler.java:414
 msgid "The 'BYTE' keyword is no longer supported."
 msgstr "'BYTE' குறிச்சொல் இனிமேல் உபயோகப்படாது."
 
-#: debug/Compiler.java:483
+#: debug/Compiler.java:426
 msgid "The Client class has been renamed EthernetClient."
 msgstr "Client class, EthernetClient என பெயர்மாற்றப்பட்டுள்ளது."
 
-#: debug/Compiler.java:477
+#: debug/Compiler.java:420
 msgid "The Server class has been renamed EthernetServer."
 msgstr "Server class, EthernetServer என பெயர்மாற்றப்பட்டுள்ளது."
 
-#: debug/Compiler.java:489
+#: debug/Compiler.java:432
 msgid "The Udp class has been renamed EthernetUdp."
 msgstr "Udp class, EthernetUdp என பெயர்மாற்றப்பட்டுள்ளது."
 
-#: Base.java:185
+#: Base.java:192
 msgid "The error message follows, however Arduino should run fine."
 msgstr "பிழை செய்திகள் வரும், ஆனாலும் Arduino நன்றாகவே இயங்கும்."
 
-#: Editor.java:2100
+#: Editor.java:2147
 #, java-format
 msgid ""
 "The file \"{0}\" needs to be inside\n"
 "a sketch folder named \"{1}\".\n"
 "Create this folder, move the file, and continue?"
-msgstr ""
-"\"{0}\" கோப்பு \"{1}\" என்ற பெயர் கொண்ட\n"
-"வரைவு உறையில் மட்டுமே இருக்க முடியும்.\n"
-"இந்த உறையை உருவாக்கி, கோப்பை நகற்றி, முன்னேரவா?"
+msgstr "\"{0}\" கோப்பு \"{1}\" என்ற பெயர் கொண்ட\nவரைவு உறையில் மட்டுமே இருக்க முடியும்.\nஇந்த உறையை உருவாக்கி, கோப்பை நகற்றி, முன்னேரவா?"
 
-#: Base.java:1202
+#: Base.java:1054 Base.java:2674
 #, java-format
 msgid ""
 "The library \"{0}\" cannot be used.\n"
 "Library names must contain only basic letters and numbers.\n"
 "(ASCII only and no spaces, and it cannot start with a number)"
-msgstr ""
-"\"{0}\" நூலகத்தை பயன்படுத்த முடியவில்லை.\n"
-"நூலக பெயர்களில் அடிப்படை எழுத்துக்கள் மற்றும் எண்கள் மட்டுமே இருக்க வேண்டும்.\n"
-"(இடைவெளி இல்லாமல் ASCII மட்டும், இது எண்னில் ஆரம்பமாகக் கூடாது)"
+msgstr "\"{0}\" நூலகத்தை பயன்படுத்த முடியவில்லை.\nநூலக பெயர்களில் அடிப்படை எழுத்துக்கள் மற்றும் எண்கள் மட்டுமே இருக்க வேண்டும்.\n(இடைவெளி இல்லாமல் ASCII மட்டும், இது எண்னில் ஆரம்பமாகக் கூடாது)"
 
-#: Sketch.java:378
+#: Sketch.java:374
 msgid ""
 "The main file can't use an extension.\n"
 "(It may be time for your to graduate to a\n"
 "\"real\" programming environment)"
-msgstr ""
-"முக்கிய கோப்பு ஒரு நீட்டிப்பை பயன்படுத்த முடியாது.\n"
-"(இந்த நேரம் நீங்கள் நிரலாக்க சூழல்\n"
-"\"real\"ஐ பயன்படுத்த ஏதுவானது)"
+msgstr "முக்கிய கோப்பு ஒரு நீட்டிப்பை பயன்படுத்த முடியாது.\n(இந்த நேரம் நீங்கள் நிரலாக்க சூழல்\n\"real\"ஐ பயன்படுத்த ஏதுவானது)"
 
-#: Sketch.java:360
+#: Sketch.java:356
 msgid "The name cannot start with a period."
 msgstr "பெயர் முற்றுப்புள்ளி கொண்டு ஆரம்பிக்கக்கூடாது."
 
-#: Base.java:1096
+#: Base.java:1412
 msgid ""
 "The selected sketch no longer exists.\n"
 "You may need to restart Arduino to update\n"
 "the sketchbook menu."
-msgstr ""
-"தேர்ந்தெடுக்கப்பட்ட வரைவு இல்லை.\n"
-"வரைவுப்புத்தக பட்டியலை புதுப்பிக்க Arduinoவை \n"
-"மறுதுவக்கம் செய்யவும்."
+msgstr "தேர்ந்தெடுக்கப்பட்ட வரைவு இல்லை.\nவரைவுப்புத்தக பட்டியலை புதுப்பிக்க Arduinoவை \nமறுதுவக்கம் செய்யவும்."
 
-#: Base.java:1125
+#: Base.java:1430
 #, java-format
 msgid ""
 "The sketch \"{0}\" cannot be used.\n"
@@ -1443,69 +1453,51 @@ msgid ""
 "(ASCII-only with no spaces, and it cannot start with a number).\n"
 "To get rid of this message, remove the sketch from\n"
 "{1}"
-msgstr ""
-"\"{0}\" வரைவை பயன்படுத்த முடியாது.\n"
-"வரைவுப்பெயர்களில் அடிப்படை எழுத்துக்கள் மற்றும் எண்கள் மட்டுமே இருக்க வேண்டும்\n"
-"(இடைவெளி இல்லாமல் ASCII மட்டும், இது எண்னில் ஆரம்பமாகக் கூடாது).\n"
-"இந்த செய்தியில் இருந்து விடிவு பெற, {1}ல் இருந்து வரைவை நீக்கு"
+msgstr "\"{0}\" வரைவை பயன்படுத்த முடியாது.\nவரைவுப்பெயர்களில் அடிப்படை எழுத்துக்கள் மற்றும் எண்கள் மட்டுமே இருக்க வேண்டும்\n(இடைவெளி இல்லாமல் ASCII மட்டும், இது எண்னில் ஆரம்பமாகக் கூடாது).\nஇந்த செய்தியில் இருந்து விடிவு பெற, {1}ல் இருந்து வரைவை நீக்கு"
 
-#: Sketch.java:1797
+#: Sketch.java:1755
 msgid ""
 "The sketch folder has disappeared.\n"
 " Will attempt to re-save in the same location,\n"
 "but anything besides the code will be lost."
-msgstr ""
-"வரைவு உறை மறைந்துவிட்டது.\n"
-" அதே இடத்தில சேமிக்க மறுபடியும் முயற்சிக்கிறேன்,\n"
-"ஆனால், குறியீட்டை தவிர மற்றவைகளை இழந்துவிடுவீர்கள்."
+msgstr "வரைவு உறை மறைந்துவிட்டது.\n அதே இடத்தில சேமிக்க மறுபடியும் முயற்சிக்கிறேன்,\nஆனால், குறியீட்டை தவிர மற்றவைகளை இழந்துவிடுவீர்கள்."
 
-#: Sketch.java:2060
+#: Sketch.java:2018
 msgid ""
 "The sketch name had to be modified. Sketch names can only consist\n"
 "of ASCII characters and numbers (but cannot start with a number).\n"
 "They should also be less less than 64 characters long."
-msgstr ""
-"வரைவின் பெயர் மாற்றப்பட்டுள்ளது. வரைவுப்பெயர்கள் ASCII எழுத்துக்கள் \n"
-"மற்றும் எண்களை கொண்டிருக்கலாம்(ஆனால் எண்ணில் ஆரம்பமாகக்கூடாது).\n"
-"அவை 64 எழுத்துகளுக்கு மேல் இருக்கக்கூடாது."
+msgstr "வரைவின் பெயர் மாற்றப்பட்டுள்ளது. வரைவுப்பெயர்கள் ASCII எழுத்துக்கள் \nமற்றும் எண்களை கொண்டிருக்கலாம்(ஆனால் எண்ணில் ஆரம்பமாகக்கூடாது).\nஅவை 64 எழுத்துகளுக்கு மேல் இருக்கக்கூடாது."
 
-#: Base.java:258
+#: Base.java:259
 msgid ""
 "The sketchbook folder no longer exists.\n"
 "Arduino will switch to the default sketchbook\n"
 "location, and create a new sketchbook folder if\n"
 "necessary. Arduino will then stop talking about\n"
 "himself in the third person."
-msgstr ""
-"வரைவுறை இல்லை.\n"
-"Arduino இயல்பான வரைவுப்புத்தக இடத்திற்கு மாறியபின்,\n"
-"தேவைப்பட்டால் புதிய வரைவுப்புத்தக உறையை உருவாக்கும். \n"
-"Arduino தன்னைபற்றியே மூன்றாவது மனிதன் போல \n"
-"பேசுவதை நிறுத்திக்கொள்ளும்."
+msgstr "வரைவுறை இல்லை.\nArduino இயல்பான வரைவுப்புத்தக இடத்திற்கு மாறியபின்,\nதேவைப்பட்டால் புதிய வரைவுப்புத்தக உறையை உருவாக்கும். \nArduino தன்னைபற்றியே மூன்றாவது மனிதன் போல \nபேசுவதை நிறுத்திக்கொள்ளும்."
 
-#: Sketch.java:1079
+#: Sketch.java:1075
 msgid ""
 "This file has already been copied to the\n"
 "location from which where you're trying to add it.\n"
 "I ain't not doin nuthin'."
-msgstr ""
-"இந்த கோப்பு நீங்கள் நகலெடுக்க முயலும் இடத்தில் \n"
-"ஏற்கனவே செர்கப்பட்டுவிட்டது.\n"
-"நான் என்னால் முடிந்த அனைத்தையும் செய்துவிட்டேன்."
+msgstr "இந்த கோப்பு நீங்கள் நகலெடுக்க முயலும் இடத்தில் \nஏற்கனவே செர்கப்பட்டுவிட்டது.\nநான் என்னால் முடிந்த அனைத்தையும் செய்துவிட்டேன்."
 
 #: ../../../processing/app/EditorStatus.java:467
 msgid "This report would have more information with"
 msgstr ""
 
-#: Base.java:532
+#: Base.java:535
 msgid "Time for a Break"
 msgstr "இடைவேளைக்கான நேரம்"
 
-#: Editor.java:656
+#: Editor.java:663
 msgid "Tools"
 msgstr "கருவிகள்"
 
-#: Editor.java:1057
+#: Editor.java:1070
 msgid "Troubleshooting"
 msgstr "சரிப்படுத்துதல்"
 
@@ -1531,7 +1523,7 @@ msgid "Unable to connect: is the sketch using the bridge?"
 msgstr ""
 
 #: ../../../processing/app/NetworkMonitor.java:130
-msgid "Unable to connect: retrying ("
+msgid "Unable to connect: retrying"
 msgstr ""
 
 #: ../../../processing/app/Editor.java:2526
@@ -1542,12 +1534,12 @@ msgstr ""
 msgid "Unable to open serial monitor"
 msgstr ""
 
-#: Sketch.java:1433
+#: Sketch.java:1432
 #, java-format
 msgid "Uncaught exception type: {0}"
 msgstr "பிடிக்கமுடியாத விதிவிலக்கு வகை: {0}"
 
-#: Editor.java:1119 Editor.java:1341
+#: Editor.java:1133 Editor.java:1355
 msgid "Undo"
 msgstr "திரும்பப்பெறுக"
 
@@ -1556,28 +1548,25 @@ msgid ""
 "Unspecified platform, no launcher available.\n"
 "To enable opening URLs or folders, add a \n"
 "\"launcher=/path/to/app\" line to preferences.txt"
-msgstr ""
-"குறிப்பிடப்படாத இயங்குதளம், எந்த எவுதிரையும் இல்லை.\n"
-"URL (அ) உரைகளை திறக்க, \n"
-"\"launcher=/path/to/app\" என்ற வரியை preferences.txtல் சேர்க்கவும்"
+msgstr "குறிப்பிடப்படாத இயங்குதளம், எந்த எவுதிரையும் இல்லை.\nURL (அ) உரைகளை திறக்க, \n\"launcher=/path/to/app\" என்ற வரியை preferences.txtல் சேர்க்கவும்"
 
 #: UpdateCheck.java:111
 msgid "Update"
 msgstr "புதிய பதிப்பை தேடு"
 
-#: Preferences.java:412
+#: Preferences.java:428
 msgid "Update sketch files to new extension on save (.pde -> .ino)"
 msgstr "சேமிக்கும் பொது வரைவு கோப்புகளை புதிய நீட்டிப்புகளுக்கு புதுப்பிக்கவும் (.pde -> .ino)"
 
-#: Editor.java:538 EditorToolbar.java:41
+#: EditorToolbar.java:41 Editor.java:545
 msgid "Upload"
 msgstr "பதிவேற்று"
 
-#: Editor.java:546 EditorToolbar.java:46
+#: EditorToolbar.java:46 Editor.java:553
 msgid "Upload Using Programmer"
 msgstr "நிரலரை பயன்படுத்தி பதிவேற்று"
 
-#: Editor.java:2356 Editor.java:2392
+#: Editor.java:2403 Editor.java:2439
 msgid "Upload canceled."
 msgstr "மேலேற்றம் ரத்து செய்யப்பட்டது."
 
@@ -1585,19 +1574,19 @@ msgstr "மேலேற்றம் ரத்து செய்யப்பட�
 msgid "Upload cancelled"
 msgstr ""
 
-#: Editor.java:2331
+#: Editor.java:2378
 msgid "Uploading to I/O Board..."
 msgstr "உள்ளீட்டு/வெளியீட்டு பலகைக்கு மேலேற்றுகிறது..."
 
-#: Sketch.java:1661
+#: Sketch.java:1622
 msgid "Uploading..."
 msgstr "பதிவேற்றுகிறது..."
 
-#: Editor.java:1255
+#: Editor.java:1269
 msgid "Use Selection For Find"
 msgstr "தேடுதலுக்கு தெரிவுகளை பயன்படுத்தவும்"
 
-#: Preferences.java:393
+#: Preferences.java:409
 msgid "Use external editor"
 msgstr "புற திருத்தியை பயன்படுத்துக"
 
@@ -1605,27 +1594,31 @@ msgstr "புற திருத்தியை பயன்படுத்த�
 msgid "Verify"
 msgstr "சரிபார்க்க"
 
-#: Editor.java:602
+#: Editor.java:609
 msgid "Verify / Compile"
 msgstr "உறுதிப்படுத்து / தொகுப்பி"
 
-#: Preferences.java:384
+#: Preferences.java:400
 msgid "Verify code after upload"
 msgstr "பதிவேற்றியவுடன் குறியீட்டை சரிபார்க்கவும்"
 
-#: Editor.java:1091
+#: ../../../processing/app/Preferences.java:154
+msgid "Vietnamese"
+msgstr ""
+
+#: Editor.java:1105
 msgid "Visit Arduino.cc"
 msgstr "Arduino.cc செல்க"
 
-#: Base.java:1842
+#: Base.java:2128
 msgid "Warning"
 msgstr "எச்சரிக்கை"
 
-#: debug/Compiler.java:501
+#: debug/Compiler.java:444
 msgid "Wire.receive() has been renamed Wire.read()."
 msgstr "Wire.receive(), Wire.read() என பெயர்மாற்றப்பட்டுள்ளது"
 
-#: debug/Compiler.java:495
+#: debug/Compiler.java:438
 msgid "Wire.send() has been renamed Wire.write()."
 msgstr "Wire.send(), Wire.write() என பெயர்மாற்றப்பட்டுள்ளது."
 
@@ -1637,47 +1630,39 @@ msgstr "சுற்றி கட்டு"
 msgid ""
 "Wrong microcontroller found.  Did you select the right board from the Tools "
 "> Board menu?"
-msgstr ""
-"தவறான நுண் கட்டுப்பாட்டுக் கருவி கண்டறியப்பட்டது.நீங்கள் சரியான பலகையை கருவிகள்"
-"> பலகை பட்டியலில் தேர்வு செய்தீர்களா?"
+msgstr "தவறான நுண் கட்டுப்பாட்டுக் கருவி கண்டறியப்பட்டது.நீங்கள் சரியான பலகையை கருவிகள்> பலகை பட்டியலில் தேர்வு செய்தீர்களா?"
 
-#: UpdateCheck.java:108 Preferences.java:76
+#: Preferences.java:77 UpdateCheck.java:108
 msgid "Yes"
 msgstr "ஆம்"
 
-#: Sketch.java:1078
+#: Sketch.java:1074
 msgid "You can't fool me"
 msgstr "நீங்கள் என்னை ஏமாற்ற முடியாது"
 
-#: Sketch.java:415
+#: Sketch.java:411
 msgid "You can't have a .cpp file with the same name as the sketch."
 msgstr "நீங்கள் வரைவின் பெயரிலேயே .cpp கோப்பை உருவாக்க முடியாது."
 
-#: Sketch.java:425
+#: Sketch.java:421
 msgid ""
 "You can't rename the sketch to \"{0}\"\n"
 "because the sketch already has a .cpp file with that name."
-msgstr ""
-"நீங்கள்  \"{0}\" என்று வரைவை பெயர்மாற்றம் செய்ய முடியாது\n"
-"ஏனென்றால் அந்த வரைவு ஏற்கனவே அதே பெயரில் ஒரு .cpp கோப்பை கொண்டுள்ளது."
+msgstr "நீங்கள்  \"{0}\" என்று வரைவை பெயர்மாற்றம் செய்ய முடியாது\nஏனென்றால் அந்த வரைவு ஏற்கனவே அதே பெயரில் ஒரு .cpp கோப்பை கொண்டுள்ளது."
 
-#: Sketch.java:865
+#: Sketch.java:861
 msgid ""
 "You can't save the sketch as \"{0}\"\n"
 "because the sketch already has a .cpp file with that name."
-msgstr ""
-"\"{0}\" என வரைவை நீங்கள் சேமிக்க முடியாது\n"
-"ஏனென்றால், ஏற்கனவே அந்தப்பெயரில் .cpp கோப்பு உள்ளது."
+msgstr "\"{0}\" என வரைவை நீங்கள் சேமிக்க முடியாது\nஏனென்றால், ஏற்கனவே அந்தப்பெயரில் .cpp கோப்பு உள்ளது."
 
-#: Sketch.java:887
+#: Sketch.java:883
 msgid ""
 "You cannot save the sketch into a folder\n"
 "inside itself. This would go on forever."
-msgstr ""
-"நீங்கள் வரைவுக்குள் உள்ள உறையிலேயே அந்த வரைவை சேமிக்க\n"
-"முடியாது. இது நீண்டுகொண்டே போகும்."
+msgstr "நீங்கள் வரைவுக்குள் உள்ள உறையிலேயே அந்த வரைவை சேமிக்க\nமுடியாது. இது நீண்டுகொண்டே போகும்."
 
-#: Base.java:1602
+#: Base.java:1888
 msgid "You forgot your sketchbook"
 msgstr "நீங்கள் உங்கள் வரைவுப்புத்தகத்தை மறந்துவிட்டீர்கள்"
 
@@ -1686,23 +1671,21 @@ msgid ""
 "You've pressed {0} but nothing was sent. Should you select a line ending?"
 msgstr ""
 
-#: Base.java:533
+#: Base.java:536
 msgid ""
 "You've reached the limit for auto naming of new sketches\n"
 "for the day. How about going for a walk instead?"
-msgstr ""
-"நீங்கள் புதிய வரைவுகளை தானாக பெயரிடும் இன்றைய உச்சவரம்பை எட்டிவிட்டீர்கள்.\n"
-" சிறிது நடைபயிற்சி மேற்கொள்ளலாமே!?"
+msgstr "நீங்கள் புதிய வரைவுகளை தானாக பெயரிடும் இன்றைய உச்சவரம்பை எட்டிவிட்டீர்கள்.\n சிறிது நடைபயிற்சி மேற்கொள்ளலாமே!?"
 
-#: ../../../processing/app/Base.java:2847
+#: Base.java:2638
 msgid "ZIP files or folders"
 msgstr ""
 
-#: ../../../processing/app/Base.java:2870
+#: Base.java:2661
 msgid "Zip doesn't contain a library"
 msgstr ""
 
-#: Sketch.java:368
+#: Sketch.java:364
 #, java-format
 msgid "\".{0}\" is not a valid extension."
 msgstr "\".{0}\" சரியான நீடிப்பு கிடையாது."
@@ -1716,94 +1699,62 @@ msgid ""
 "todelete the bad characters to get rid of this warning."
 msgstr ""
 
-#: debug/Compiler.java:466
+#: debug/Compiler.java:409
 msgid ""
 "\n"
 "As of Arduino 0019, the Ethernet library depends on the SPI library.\n"
-"You appear to be using it or another library that depends on the SPI "
-"library.\n"
+"You appear to be using it or another library that depends on the SPI library.\n"
 "\n"
-msgstr ""
-"\n"
-"Arduino 0019வின் படி, ஈதர்நெட் நூலகம் SPI நூலகத்தையே சார்ந்துள்ளது.\n"
-"நீங்கள் அந்த நூலகம் (அ) அதை சார்ந்துள்ள நூலகத்தையே "
-"பயன்படுத்துகிறீர்கள்.\n"
-"\n"
+msgstr "\nArduino 0019வின் படி, ஈதர்நெட் நூலகம் SPI நூலகத்தையே சார்ந்துள்ளது.\nநீங்கள் அந்த நூலகம் (அ) அதை சார்ந்துள்ள நூலகத்தையே பயன்படுத்துகிறீர்கள்.\n\n"
 
-#: debug/Compiler.java:472
+#: debug/Compiler.java:415
 msgid ""
 "\n"
 "As of Arduino 1.0, the 'BYTE' keyword is no longer supported.\n"
 "Please use Serial.write() instead.\n"
 "\n"
-msgstr ""
-"\n"
-"Arduino 1.0ன் படி, 'BYTE' குறிச்சொல் இனிமேல் உபயோகப்படாது.\n"
-" Serial.write()ஐ அதற்கு மாற்றாக பயன்படுத்தவும்.\n"
-"\n"
+msgstr "\nArduino 1.0ன் படி, 'BYTE' குறிச்சொல் இனிமேல் உபயோகப்படாது.\n Serial.write()ஐ அதற்கு மாற்றாக பயன்படுத்தவும்.\n\n"
 
-#: debug/Compiler.java:484
+#: debug/Compiler.java:427
 msgid ""
 "\n"
-"As of Arduino 1.0, the Client class in the Ethernet library has been renamed "
-"to EthernetClient.\n"
+"As of Arduino 1.0, the Client class in the Ethernet library has been renamed to EthernetClient.\n"
 "\n"
-msgstr ""
-"\n"
-"Arduino 1.0ன் படி, ஈதர்நெட் நூலகத்தில் உள்ள Client class, EthernetClient என \n"
-"பெயர்மாற்றப்பட்டுள்ளது.\n"
-"\n"
+msgstr "\nArduino 1.0ன் படி, ஈதர்நெட் நூலகத்தில் உள்ள Client class, EthernetClient என \nபெயர்மாற்றப்பட்டுள்ளது.\n\n"
 
-#: debug/Compiler.java:478
+#: debug/Compiler.java:421
 msgid ""
 "\n"
-"As of Arduino 1.0, the Server class in the Ethernet library has been renamed "
-"to EthernetServer.\n"
+"As of Arduino 1.0, the Server class in the Ethernet library has been renamed to EthernetServer.\n"
 "\n"
-msgstr ""
-"\n"
-"Arduino 1.0ன் படி, ஈதர்நெட் நூலகத்தில் உள்ள Server class, EthernetServer என \n"
-"பெயர்மாற்றப்பட்டுள்ளது.\n"
-"\n"
+msgstr "\nArduino 1.0ன் படி, ஈதர்நெட் நூலகத்தில் உள்ள Server class, EthernetServer என \nபெயர்மாற்றப்பட்டுள்ளது.\n\n"
 
-#: ../../../processing/app/debug/Compiler.java:451
+#: debug/Compiler.java:433
 msgid ""
 "\n"
-"As of Arduino 1.0, the Udp class in the Ethernet library has been renamed to "
-"EthernetUdp.\n"
+"As of Arduino 1.0, the Udp class in the Ethernet library has been renamed to EthernetUdp.\n"
 "\n"
 msgstr ""
 
-#: debug/Compiler.java:502
+#: debug/Compiler.java:445
 msgid ""
 "\n"
-"As of Arduino 1.0, the Wire.receive() function was renamed to Wire.read() "
-"for consistency with other libraries.\n"
+"As of Arduino 1.0, the Wire.receive() function was renamed to Wire.read() for consistency with other libraries.\n"
 "\n"
-msgstr ""
-"\n"
-"Arduino 1.0ன் படி, Wire.receive() செயல்கூறு, Wire.read() என \n"
-"நிலைத்தன்மைக்காக பெயர்மாற்றப்பட்டுள்ளது.\n"
-"\n"
+msgstr "\nArduino 1.0ன் படி, Wire.receive() செயல்கூறு, Wire.read() என \nநிலைத்தன்மைக்காக பெயர்மாற்றப்பட்டுள்ளது.\n\n"
 
-#: debug/Compiler.java:496
+#: debug/Compiler.java:439
 msgid ""
 "\n"
-"As of Arduino 1.0, the Wire.send() function was renamed to Wire.write() for "
-"consistency with other libraries.\n"
+"As of Arduino 1.0, the Wire.send() function was renamed to Wire.write() for consistency with other libraries.\n"
 "\n"
-msgstr ""
-"\n"
-"Arduino 1.0ன் படி, Wire.send() செயல்கூறு, Wire.write() என \n"
-"நிலைத்தன்மைக்காக பெயர்மாற்றப்பட்டுள்ளது.\n"
-"\n"
+msgstr "\nArduino 1.0ன் படி, Wire.send() செயல்கூறு, Wire.write() என \nநிலைத்தன்மைக்காக பெயர்மாற்றப்பட்டுள்ளது.\n\n"
 
-#: ../../../processing/app/SerialMonitor.java:41
-#: ../../../processing/app/AbstractMonitor.java:118
+#: SerialMonitor.java:130 SerialMonitor.java:133
 msgid "baud"
 msgstr ""
 
-#: Preferences.java:373
+#: Preferences.java:389
 msgid "compilation "
 msgstr "தொகுப்பு"
 
@@ -1811,7 +1762,7 @@ msgstr "தொகுப்பு"
 msgid "connected!"
 msgstr ""
 
-#: Sketch.java:544
+#: Sketch.java:540
 msgid "createNewFile() returned false"
 msgstr "createNewFile() தவறென கூறுகிறது"
 
@@ -1819,11 +1770,11 @@ msgstr "createNewFile() தவறென கூறுகிறது"
 msgid "enabled in File > Preferences."
 msgstr ""
 
-#: Base.java:1804
+#: Base.java:2090
 msgid "environment"
 msgstr "சுற்றுச்சூழல்"
 
-#: Editor.java:1094
+#: Editor.java:1108
 msgid "http://arduino.cc/"
 msgstr "http://arduino.cc/"
 
@@ -1839,75 +1790,68 @@ msgstr "http://www.arduino.cc/en/Main/Software"
 msgid "http://www.arduino.cc/latest.txt"
 msgstr "http://www.arduino.cc/latest.txt"
 
-#: Base.java:1789
+#: Base.java:2075
 msgid "http://www.arduino.cc/playground/Learning/Linux"
 msgstr "http://www.arduino.cc/playground/Learning/Linux"
 
-#: Preferences.java:609
+#: Preferences.java:625
 #, java-format
 msgid "ignoring invalid font size {0}"
 msgstr "தவறான எழுத்துரு அளவை {0} அளச்சியப்படுத்துகிறது"
 
-#: Base.java:1794
+#: Base.java:2080
 msgid "index.html"
 msgstr "index.html"
 
-#: Editor.java:927 Editor.java:934
+#: Editor.java:936 Editor.java:943
 msgid "name is null"
 msgstr "பெயர் வெற்றாக உள்ளது"
 
-#: Base.java:1804
+#: Base.java:2090
 msgid "platforms.html"
 msgstr "platforms.html"
 
-#: Serial.java:424
+#: Serial.java:451
 #, java-format
 msgid ""
 "readBytesUntil() byte buffer is too small for the {0} bytes up to and "
 "including char {1}"
-msgstr ""
-"readBytesUntil() எண்பிட்டு அணை  {0} எண்பிட்டுகளுக்கு மிக குறைவாக உள்ளது "
-"char {1} உடன் சேற்று"
+msgstr "readBytesUntil() எண்பிட்டு அணை  {0} எண்பிட்டுகளுக்கு மிக குறைவாக உள்ளது char {1} உடன் சேற்று"
 
-#: Sketch.java:651
+#: Sketch.java:647
 msgid "removeCode: internal error.. could not find code"
 msgstr "removeCode: உள் பிழை .. குறியீட்டை கண்டுபிடிக்க முடியவில்லை"
 
-#: Editor.java:923
+#: Editor.java:932
 msgid "serialMenu is null"
 msgstr "தொடர் தெரிவுதிரை வெற்றாக உள்ளது"
 
-#: debug/Uploader.java:199
+#: debug/Uploader.java:195
 #, java-format
 msgid ""
 "the selected serial port {0} does not exist or your board is not connected"
-msgstr ""
-"தேர்வு செய்த தொடர் துறை {0} இல்லை (அ)உங்கள் பலகை இணைக்கப்படவில்லை"
+msgstr "தேர்வு செய்த தொடர் துறை {0} இல்லை (அ)உங்கள் பலகை இணைக்கப்படவில்லை"
 
-#: ../../../processing/app/EditorStatus.java:456
-msgid "to clipboard"
-msgstr ""
-
-#: Preferences.java:375
+#: Preferences.java:391
 msgid "upload"
 msgstr "பதிவேற்று"
 
-#: Editor.java:373
+#: Editor.java:380
 #, java-format
 msgid "{0} files added to the sketch."
-msgstr "கோப்புகள் வரைவில் சேர்கப்பட்டுள்ளன."
+msgstr "{0} கோப்புகள் வரைவில் சேர்கப்பட்டுள்ளன."
 
-#: debug/Compiler.java:422
+#: debug/Compiler.java:365
 #, java-format
 msgid "{0} returned {1}"
 msgstr "{0},{1}என திருப்பியது"
 
-#: Editor.java:2166
+#: Editor.java:2213
 #, java-format
 msgid "{0} | Arduino {1}"
 msgstr "{0} | Arduino {1}"
 
-#: Editor.java:1826
+#: Editor.java:1874
 #, java-format
 msgid "{0}.html"
 msgstr "{0}.html"

@@ -11,8 +11,8 @@ msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2012-11-24 04:14+0000\n"
-"Last-Translator: belalmc <belal@eshtre.com>\n"
+"PO-Revision-Date: 2013-09-10 10:35+0000\n"
+"Last-Translator: cmaglie <c.maglie@arduino.cc>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/arduino-ide-15/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -173,6 +173,14 @@ msgstr "هل انت متأكد انك تريد حذف \"{0}\"؟"
 msgid "Are you sure you want to delete this sketch?"
 msgstr "هل انت متأكد انك تريد حذف الشيفرة البرمجية ؟"
 
+#: ../../../processing/app/Preferences.java:137
+msgid "Armenian"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:138
+msgid "Asturian"
+msgstr ""
+
 #: tools/AutoFormat.java:91
 msgid "Auto Format"
 msgstr "تنسيق تلقائي"
@@ -214,9 +222,8 @@ msgstr "خطأ سيئ السطر : {0}"
 msgid "Bad file selected"
 msgstr "الملف المحدد غير صالح"
 
-#: ../../../processing/app/Sketch.java:1638
-#, java-format
-msgid "Binary sketch size: {0} bytes (of a {1} byte maximum) - {2}%% used"
+#: ../../../processing/app/Preferences.java:139
+msgid "Belarusian"
 msgstr ""
 
 #: ../../../processing/app/Base.java:1433
@@ -227,12 +234,16 @@ msgstr ""
 #: ../../../processing/app/debug/TargetBoard.java:42
 #, java-format
 msgid ""
-"Board {0}:{1}:{2} doesn''t define a ''build.board'' preference. Auto-set to: "
-"{3}"
+"Board {0}:{1}:{2} doesn''t define a ''build.board'' preference. Auto-set to:"
+" {3}"
 msgstr ""
 
 #: ../../../processing/app/EditorStatus.java:472
 msgid "Board: "
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:140
+msgid "Bosnian"
 msgstr ""
 
 #: SerialMonitor.java:112
@@ -249,6 +260,10 @@ msgstr "مجلد البناء \"Build folder\" اختفى او انه لايمك
 
 #: ../../../processing/app/Preferences.java:80
 msgid "Bulgarian"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:141
+msgid "Burmese (Myanmar)"
 msgstr ""
 
 #: Editor.java:708
@@ -287,6 +302,22 @@ msgstr "Català"
 #: Preferences.java:419
 msgid "Check for updates on startup"
 msgstr "افحص التحديثات عند التشغيل"
+
+#: ../../../processing/app/Preferences.java:142
+msgid "Chinese (China)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:142
+msgid "Chinese (Hong Kong)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:144
+msgid "Chinese (Taiwan)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:143
+msgid "Chinese (Taiwan) (Big5)"
+msgstr ""
 
 #: Preferences.java:88
 msgid "Chinese Simplified"
@@ -529,6 +560,10 @@ msgstr "انتهى التحميل"
 msgid "Dutch"
 msgstr "Dutch"
 
+#: ../../../processing/app/Preferences.java:144
+msgid "Dutch (Netherlands)"
+msgstr ""
+
 #: Editor.java:1130
 msgid "Edit"
 msgstr "عدل"
@@ -544,6 +579,10 @@ msgstr "لغة المحرر:"
 #: Preferences.java:92
 msgid "English"
 msgstr "English"
+
+#: ../../../processing/app/Preferences.java:145
+msgid "English (United Kingdom)"
+msgstr ""
 
 #: Editor.java:1062
 msgid "Environment"
@@ -634,6 +673,10 @@ msgstr ""
 msgid "Estonian"
 msgstr "Eesti"
 
+#: ../../../processing/app/Preferences.java:146
+msgid "Estonian (Estonia)"
+msgstr ""
+
 #: Editor.java:516
 msgid "Examples"
 msgstr "أمثلة"
@@ -678,6 +721,10 @@ msgstr "...ابحث"
 msgid "Find:"
 msgstr "ابحث :"
 
+#: ../../../processing/app/Preferences.java:147
+msgid "Finnish"
+msgstr ""
+
 #: tools/FixEncoding.java:41 tools/FixEncoding.java:58
 #: tools/FixEncoding.java:79
 msgid "Fix Encoding & Reload"
@@ -716,6 +763,18 @@ msgstr "Deutsch"
 #: Editor.java:1054
 msgid "Getting Started"
 msgstr "الشروع في البدء"
+
+#: ../../../processing/app/Sketch.java:1646
+#, java-format
+msgid ""
+"Global variables use {0} bytes ({2}%%) of dynamic memory, leaving {3} bytes "
+"for local variables. Maximum is {1} bytes."
+msgstr ""
+
+#: ../../../processing/app/Sketch.java:1651
+#, java-format
+msgid "Global variables use {0} bytes of dynamic memory."
+msgstr ""
 
 #: Preferences.java:98
 msgid "Greek"
@@ -839,16 +898,6 @@ msgstr "Marathi"
 msgid "Message"
 msgstr "رسالة"
 
-#: ../../../processing/app/Sketch.java:1646
-#, java-format
-msgid "Minimum Memory usage: {0} bytes"
-msgstr ""
-
-#: ../../../processing/app/Sketch.java:1643
-#, java-format
-msgid "Minimum Memory usage: {0} bytes (of a {1} byte maximum) - {2}%% used"
-msgstr ""
-
 #: Sketch.java:1712
 msgid "Missing the */ from the end of a /* comment */"
 msgstr "نهاية التعليق /* غير موجود /* تعليق*/"
@@ -864,6 +913,10 @@ msgstr "نقل"
 #: Sketch.java:282
 msgid "Name for new file:"
 msgstr "اسم لملف جديد:"
+
+#: ../../../processing/app/Preferences.java:149
+msgid "Nepali"
+msgstr ""
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:51
 msgid "Network upload using programmer not supported"
@@ -926,6 +979,11 @@ msgstr "\"{0}\"لا يوجد مرجع متاح ل "
 msgid "No valid configured cores found! Exiting..."
 msgstr ""
 
+#: ../../../processing/app/debug/TargetPackage.java:63
+#, java-format
+msgid "No valid hardware definitions found in folder {0}."
+msgstr ""
+
 #: Base.java:191
 msgid "Non-fatal error while setting the Look & Feel."
 msgstr "خطأ-غير-ضار اثناء اعداد واجة البرنامج"
@@ -933,10 +991,6 @@ msgstr "خطأ-غير-ضار اثناء اعداد واجة البرنامج"
 #: Sketch.java:396 Sketch.java:410 Sketch.java:419 Sketch.java:859
 msgid "Nope"
 msgstr "لا يا صديقي"
-
-#: Preferences.java:108
-msgid "Norwegian"
-msgstr "Norsk"
 
 #: ../../../processing/app/Preferences.java:108
 msgid "Norwegian Bokmål"
@@ -1009,9 +1063,17 @@ msgstr "Polish"
 msgid "Port"
 msgstr ""
 
-#: Preferences.java:111 Preferences.java:112
-msgid "Portuguese"
-msgstr "Português"
+#: ../../../processing/app/Preferences.java:151
+msgid "Portugese"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:127
+msgid "Portuguese (Brazil)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:128
+msgid "Portuguese (Portugal)"
+msgstr ""
 
 #: Preferences.java:295 Editor.java:583
 msgid "Preferences"
@@ -1271,6 +1333,13 @@ msgid ""
 "tips on reducing it."
 msgstr " الشيفرة البرمجية كبير جدا; راجع http://www.arduino.cc/en/Guide/Troubleshooting#size\nلنصائح لاختصارها."
 
+#: ../../../processing/app/Sketch.java:1639
+#, java-format
+msgid ""
+"Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} "
+"bytes."
+msgstr ""
+
 #: Editor.java:510
 msgid "Sketchbook"
 msgstr "كتاب شيفرة البرمجية "
@@ -1282,6 +1351,10 @@ msgstr "مجلد كتاب الشيفرة البرمجية \"سكتش بوك\" م
 #: Preferences.java:315
 msgid "Sketchbook location:"
 msgstr "مكان كتاب الشيفرة البرمجية \"سكتش بوك\""
+
+#: ../../../processing/app/Preferences.java:152
+msgid "Slovenian"
+msgstr ""
 
 #: Sketch.java:275 Sketch.java:304 Sketch.java:578 Sketch.java:967
 msgid ""
@@ -1308,6 +1381,10 @@ msgstr "Spanish"
 #: Base.java:540
 msgid "Sunshine"
 msgstr "شروق الشمس"
+
+#: ../../../processing/app/Preferences.java:153
+msgid "Swedish"
+msgstr ""
 
 #: Preferences.java:84
 msgid "System Default"
@@ -1449,7 +1526,7 @@ msgid "Unable to connect: is the sketch using the bridge?"
 msgstr ""
 
 #: ../../../processing/app/NetworkMonitor.java:130
-msgid "Unable to connect: retrying ("
+msgid "Unable to connect: retrying"
 msgstr ""
 
 #: ../../../processing/app/Editor.java:2526
@@ -1527,6 +1604,10 @@ msgstr "تدقيق / ترجم"
 #: Preferences.java:400
 msgid "Verify code after upload"
 msgstr "التأكد من الكود بعد الرفع"
+
+#: ../../../processing/app/Preferences.java:154
+msgid "Vietnamese"
+msgstr ""
 
 #: Editor.java:1105
 msgid "Visit Arduino.cc"
@@ -1753,10 +1834,6 @@ msgstr "قائمة-المنفد التلسلسي فارغة"
 msgid ""
 "the selected serial port {0} does not exist or your board is not connected"
 msgstr "رقم المنفذ serial port{0} المختار غير موجود او ان اللوحة غير موصولة"
-
-#: ../../../processing/app/EditorStatus.java:456
-msgid "to clipboard"
-msgstr ""
 
 #: Preferences.java:391
 msgid "upload"

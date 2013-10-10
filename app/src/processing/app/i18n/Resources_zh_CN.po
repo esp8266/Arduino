@@ -5,102 +5,91 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2012-03-29 10:24-0400\n"
-"Last-Translator: ledong <>\n"
-"Language-Team: Chinese\n"
-"Language: zh_cn\n"
+"PO-Revision-Date: 2013-09-10 10:35+0000\n"
+"Last-Translator: cmaglie <c.maglie@arduino.cc>\n"
+"Language-Team: Chinese (China) (http://www.transifex.com/projects/p/arduino-ide-15/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
-#: Preferences.java:342 Preferences.java:358
+#: Preferences.java:358 Preferences.java:374
 msgid "  (requires restart of Arduino)"
-msgstr "  （需要重启Arduino）"
+msgstr "（需要重启Arduino）"
 
-#: ../../../processing/app/debug/Compiler.java:473
+#: debug/Compiler.java:455
 msgid "'Keyboard' only supported on the Arduino Leonardo"
 msgstr ""
 
-#: ../../../processing/app/debug/Compiler.java:468
+#: debug/Compiler.java:450
 msgid "'Mouse' only supported on the Arduino Leonardo"
 msgstr ""
 
-#: Preferences.java:462
+#: Preferences.java:478
 msgid "(edit only when Arduino is not running)"
-msgstr "（只在Arduino不能运行时编辑）"
+msgstr "（只能在Arduino未运行时进行编辑）"
 
-#: Sketch.java:750
+#: Sketch.java:746
 msgid ".pde -> .ino"
-msgstr ".pde -> .ino"
+msgstr ".pde-> .ino"
 
-#: Base.java:772
+#: Base.java:773
 msgid ""
-"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p "
-"{ font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Are you "
+"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p {"
+" font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Are you "
 "sure you want to Quit?</b><p>Closing the last open sketch will quit Arduino."
-msgstr ""
-"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p "
-"{ font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>确定 "
-"退出么?</b><p>关闭最后一个打开的程序将退出Arduino。"
+msgstr "<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p { font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>你确定要关闭吗?</b><p>关闭最后一个草稿码后将关闭Arduino。"
 
-#: Editor.java:2006
+#: Editor.java:2053
 msgid ""
-"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p "
-"{ font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Do you "
+"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p {"
+" font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Do you "
 "want to save changes to this sketch<BR> before closing?</b><p>If you don't "
 "save, your changes will be lost."
 msgstr ""
-"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p "
-"{ font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>你要 "
-"在关闭这个程序之前保存<BR>修改的内容么?</b><p>如果不保存， "
-"更改的部分将会丢失。"
 
-#: Sketch.java:402
+#: Sketch.java:398
 #, java-format
 msgid "A file named \"{0}\" already exists in \"{1}\""
-msgstr "名为\"{0}\"的文件已经存在于\"{1}\""
+msgstr "名为{0}的文件已存在于{1}"
 
-#: Editor.java:2122
+#: Editor.java:2169
 #, java-format
 msgid "A folder named \"{0}\" already exists. Can't open sketch."
-msgstr "名为\"{0}\"的文件夹已经存在。不能打开程序。"
+msgstr ""
 
-#: ../../../processing/app/Base.java:2894
+#: Base.java:2690
 #, java-format
 msgid "A library named {0} already exists"
-msgstr ""
+msgstr "名为{0}的库已存在"
 
 #: UpdateCheck.java:103
 msgid ""
 "A new version of Arduino is available,\n"
 "would you like to visit the Arduino download page?"
 msgstr ""
-"Arduino有新版本了，\n"
-"需要访问Arduino的下载页面么？"
 
 #: EditorConsole.java:153
 msgid ""
 "A problem occurred while trying to open the\n"
 "files used to store the console output."
 msgstr ""
-"尝试保存命令行输出的文件时\n"
-"出现了一个问题。"
 
-#: Editor.java:1102
+#: Editor.java:1116
 msgid "About Arduino"
-msgstr "关于Arduino"
-
-#: Editor.java:643
-msgid "Add File..."
-msgstr "加入文件..."
-
-#: ../../../processing/app/Base.java:1102
-msgid "Add Library..."
 msgstr ""
+
+#: Editor.java:650
+msgid "Add File..."
+msgstr ""
+
+#: Base.java:963
+msgid "Add Library..."
+msgstr "添加库"
 
 #: tools/FixEncoding.java:77
 msgid ""
@@ -108,44 +97,38 @@ msgid ""
 "Do not attempt to save this sketch as it may overwrite\n"
 "the old version. Use Open to re-open the sketch and try again.\n"
 msgstr ""
-"尝试修复文件编码时发生了错误。\n"
-"请不要尝试在可能覆盖旧版本的情况下保存这个程序。\n"
-"使用 打开 菜单重新打开程序再试一次。\n"
 
-#: Base.java:221
+#: Base.java:228
 msgid ""
 "An unknown error occurred while trying to load\n"
 "platform-specific code for your machine."
-msgstr "在尝试为你的机器载入平台代码\n"
-"时发生未知错误"
-
-#: Preferences.java:84
-msgid "Arabic"
-msgstr ""
+msgstr "载入特定平台代码时\n发生未知错误。"
 
 #: Preferences.java:85
+msgid "Arabic"
+msgstr "阿拉伯语"
+
+#: Preferences.java:86
 msgid "Aragonese"
-msgstr ""
+msgstr "阿拉贡语"
 
 #: tools/Archiver.java:48
 msgid "Archive Sketch"
-msgstr "打包程序"
+msgstr ""
 
 #: tools/Archiver.java:109
 msgid "Archive sketch as:"
-msgstr "打包程序为："
+msgstr ""
 
 #: tools/Archiver.java:139
 msgid "Archive sketch canceled."
-msgstr "打包程序取消了。"
+msgstr ""
 
 #: tools/Archiver.java:75
 msgid ""
 "Archiving the sketch has been canceled because\n"
 "the sketch couldn't save properly."
 msgstr ""
-"打包程序被取消了,\n"
-"因为程序不能被正确的保存。"
 
 #: ../../../processing/app/I18n.java:83
 msgid "Arduino ARM (32-bits) Boards"
@@ -155,129 +138,138 @@ msgstr ""
 msgid "Arduino AVR Boards"
 msgstr ""
 
-#: Base.java:1441
+#: Base.java:1682
 msgid ""
 "Arduino cannot run because it could not\n"
 "create a folder to store your settings."
-msgstr ""
-"Arduino不能运行，因为他无法创建保存\n"
-"你的设置的文件夹。"
+msgstr "Arduino无法运行，因为无法\n建立文件夹存储你的设置。"
 
-#: Base.java:1603
+#: Base.java:1889
 msgid ""
 "Arduino cannot run because it could not\n"
 "create a folder to store your sketchbook."
-msgstr ""
-"Arduino不能运行，因为他无法创建保存\n"
-"你的程序库的文件夹。"
+msgstr "Arduino无法运行，因为无法\n建立文件夹存储你的草稿码。"
 
-#: Base.java:233
+#: Base.java:240
 msgid ""
 "Arduino requires a full JDK (not just a JRE)\n"
 "to run. Please install JDK 1.5 or later.\n"
 "More information can be found in the reference."
-msgstr ""
-"Arudino 需要完整的JDK（不只是JRE）才能运行,\n"
-"请安装JDK1.5 或者更新版本。\n"
-"更多的信息可以在参考文件中找到。"
+msgstr "Arduino需要完整的JDK（不仅是JRE)\n才能运行，请安装JDK 1.5或更新版本，\n更多信息详见参考文件。"
 
 #: ../../../processing/app/EditorStatus.java:471
 msgid "Arduino: "
 msgstr ""
 
-#: Sketch.java:592
+#: Sketch.java:588
 #, java-format
 msgid "Are you sure you want to delete \"{0}\"?"
-msgstr "你确定删除\"{0}\"？"
+msgstr "确定要删除\"{0}\"?"
 
-#: Sketch.java:591
+#: Sketch.java:587
 msgid "Are you sure you want to delete this sketch?"
-msgstr "你确定删除这个程序？"
+msgstr "确定要删除此草稿码？"
+
+#: ../../../processing/app/Preferences.java:137
+msgid "Armenian"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:138
+msgid "Asturian"
+msgstr ""
 
 #: tools/AutoFormat.java:91
 msgid "Auto Format"
-msgstr "自动格式化"
+msgstr ""
+
+#: tools/AutoFormat.java:934
+msgid "Auto Format Canceled: Too many left curly braces."
+msgstr ""
+
+#: tools/AutoFormat.java:925
+msgid "Auto Format Canceled: Too many left parentheses."
+msgstr ""
 
 #: tools/AutoFormat.java:931
-msgid "Auto Format Canceled: Too many left curly braces."
-msgstr "自动格式化取消：过多的左大括号。"
+msgid "Auto Format Canceled: Too many right curly braces."
+msgstr ""
 
 #: tools/AutoFormat.java:922
-msgid "Auto Format Canceled: Too many left parentheses."
-msgstr "自动格式化取消：过多的左括号。"
-
-#: tools/AutoFormat.java:928
-msgid "Auto Format Canceled: Too many right curly braces."
-msgstr "自动格式化取消：过多的右大括号。"
-
-#: tools/AutoFormat.java:919
 msgid "Auto Format Canceled: Too many right parentheses."
-msgstr "自动格式化取消：过多的右括号。"
+msgstr ""
 
-#: tools/AutoFormat.java:941
+#: tools/AutoFormat.java:944
 msgid "Auto Format finished."
-msgstr "自动格式化完成。"
+msgstr ""
 
-#: Preferences.java:423
+#: Preferences.java:439
 msgid "Automatically associate .ino files with Arduino"
-msgstr "自动关联.ino文件至Arduino"
+msgstr "自动将.ino文件与Arduino关联"
 
 #: SerialMonitor.java:110
 msgid "Autoscroll"
-msgstr "自动滚动"
-
-#: Editor.java:2572
-#, java-format
-msgid "Bad error line: {0}"
-msgstr "错误行：{0}"
-
-#: Editor.java:2089
-msgid "Bad file selected"
-msgstr "选择了错误文件"
-
-#: ../../../processing/app/Sketch.java:1638
-#, java-format
-msgid "Binary sketch size: {0} bytes (of a {1} byte maximum) - {2}%% used"
 msgstr ""
 
-#: Editor.java:682
+#: Editor.java:2619
+#, java-format
+msgid "Bad error line: {0}"
+msgstr ""
+
+#: Editor.java:2136
+msgid "Bad file selected"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:139
+msgid "Belarusian"
+msgstr ""
+
+#: ../../../processing/app/Base.java:1433
+#: ../../../processing/app/Editor.java:707
 msgid "Board"
-msgstr "板卡"
+msgstr ""
 
 #: ../../../processing/app/debug/TargetBoard.java:42
 #, java-format
 msgid ""
-"Board {0}:{1}:{2} doesn''t define a ''build.board'' preference. Auto-set to: "
-"{3}"
+"Board {0}:{1}:{2} doesn''t define a ''build.board'' preference. Auto-set to:"
+" {3}"
 msgstr ""
 
 #: ../../../processing/app/EditorStatus.java:472
 msgid "Board: "
 msgstr ""
 
+#: ../../../processing/app/Preferences.java:140
+msgid "Bosnian"
+msgstr ""
+
 #: SerialMonitor.java:112
 msgid "Both NL & CR"
-msgstr "换行和回车"
+msgstr ""
 
-#: Preferences.java:80
+#: Preferences.java:81
 msgid "Browse"
 msgstr "浏览"
 
-#: Sketch.java:1393 Sketch.java:1424
+#: Sketch.java:1392 Sketch.java:1423
 msgid "Build folder disappeared or could not be written"
-msgstr "构建目录消失了或者不能被写入"
+msgstr ""
 
 #: ../../../processing/app/Preferences.java:80
 msgid "Bulgarian"
 msgstr ""
 
-#: Editor.java:699
-msgid "Burn Bootloader"
-msgstr "烧写Bootloader"
+#: ../../../processing/app/Preferences.java:141
+msgid "Burmese (Myanmar)"
+msgstr ""
 
-#: Editor.java:2457
+#: Editor.java:708
+msgid "Burn Bootloader"
+msgstr ""
+
+#: Editor.java:2504
 msgid "Burning bootloader to I/O Board (this may take a minute)..."
-msgstr "烧写bootloader至I/O板中（这将花费一会时间）..."
+msgstr ""
 
 #: ../../../processing/app/Base.java:368
 msgid "Can't open source sketch!"
@@ -287,103 +279,119 @@ msgstr ""
 msgid "Canadian French"
 msgstr ""
 
-#: Editor.java:2017 Editor.java:2098 Editor.java:2418 Sketch.java:589
-#: Sketch.java:741 Sketch.java:1046 Preferences.java:78
+#: Preferences.java:79 Sketch.java:585 Sketch.java:737 Sketch.java:1042
+#: Editor.java:2064 Editor.java:2145 Editor.java:2465
 msgid "Cancel"
 msgstr "取消"
 
-#: Sketch.java:459
+#: Sketch.java:455
 msgid "Cannot Rename"
-msgstr "不能重命名"
+msgstr "无法重命名"
 
 #: SerialMonitor.java:112
 msgid "Carriage return"
-msgstr "回车（CR）"
-
-#: Preferences.java:86
-msgid "Catalan"
 msgstr ""
 
-#: Preferences.java:403
+#: Preferences.java:87
+msgid "Catalan"
+msgstr "加泰罗尼亚语"
+
+#: Preferences.java:419
 msgid "Check for updates on startup"
 msgstr "启动时检查更新"
 
-#: Preferences.java:87
-msgid "Chinese Simplified"
+#: ../../../processing/app/Preferences.java:142
+msgid "Chinese (China)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:142
+msgid "Chinese (Hong Kong)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:144
+msgid "Chinese (Taiwan)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:143
+msgid "Chinese (Taiwan) (Big5)"
 msgstr ""
 
 #: Preferences.java:88
+msgid "Chinese Simplified"
+msgstr "简体中文"
+
+#: Preferences.java:89
 msgid "Chinese Traditional"
+msgstr "繁体中文"
+
+#: Editor.java:521 Editor.java:2024
+msgid "Close"
 msgstr ""
 
-#: Editor.java:514 Editor.java:1977
-msgid "Close"
-msgstr "关闭"
-
-#: Editor.java:1194 Editor.java:2702
+#: Editor.java:1208 Editor.java:2749
 msgid "Comment/Uncomment"
-msgstr "注释/取消注释"
+msgstr ""
 
-#: debug/Uploader.java:54 debug/Compiler.java:43
+#: debug/Compiler.java:49 debug/Uploader.java:45
 #, java-format
 msgid "Compiler error, please submit this code to {0}"
-msgstr "编译错误，请将代码提交给{0}"
+msgstr ""
 
-#: Editor.java:1843 Sketch.java:1647
+#: Sketch.java:1608 Editor.java:1890
 msgid "Compiling sketch..."
-msgstr "编译程序中..."
+msgstr ""
 
 #: EditorConsole.java:152
 msgid "Console Error"
-msgstr "命令行错误"
+msgstr ""
 
-#: Editor.java:1143 Editor.java:2660
+#: Editor.java:1157 Editor.java:2707
 msgid "Copy"
-msgstr "复制"
+msgstr ""
 
-#: Editor.java:1163 Editor.java:2676
+#: Editor.java:1177 Editor.java:2723
 msgid "Copy as HTML"
-msgstr "复制为HTML"
+msgstr ""
 
 #: ../../../processing/app/EditorStatus.java:456
 msgid "Copy error"
 msgstr ""
 
-#: Editor.java:1151 Editor.java:2668
+#: Editor.java:1165 Editor.java:2715
 msgid "Copy for Forum"
-msgstr "复制到论坛"
+msgstr ""
 
-#: Sketch.java:1093
+#: Sketch.java:1089
 #, java-format
 msgid "Could not add ''{0}'' to the sketch."
-msgstr "不能加入''{0}''到程序中"
+msgstr ""
 
-#: Editor.java:2141
+#: Editor.java:2188
 msgid "Could not copy to a proper location."
-msgstr "无法复制到合适的位置。"
+msgstr ""
 
-#: Editor.java:2132
+#: Editor.java:2179
 msgid "Could not create the sketch folder."
-msgstr "不能创建程序文件夹。"
+msgstr ""
 
-#: Editor.java:2159
+#: Editor.java:2206
 msgid "Could not create the sketch."
-msgstr "不能创建程序。"
+msgstr ""
 
-#: Sketch.java:621
+#: Sketch.java:617
 #, java-format
 msgid "Could not delete \"{0}\"."
-msgstr "不能删除\"{0}\"。"
+msgstr "无法删除\"{0}\""
 
-#: Sketch.java:1070
+#: Sketch.java:1066
 #, java-format
 msgid "Could not delete the existing ''{0}'' file."
-msgstr "不能删除存在的''{0}''文件。"
+msgstr ""
 
-#: Base.java:2247 Base.java:2270
+#: Base.java:2533 Base.java:2556
 #, java-format
 msgid "Could not delete {0}"
-msgstr "不能删除{0}"
+msgstr "无法删除{0}"
 
 #: ../../../processing/app/debug/TargetPlatform.java:74
 #, java-format
@@ -400,97 +408,87 @@ msgstr ""
 msgid "Could not find tool {0} from package {1}"
 msgstr ""
 
-#: Base.java:1648
+#: Base.java:1934
 #, java-format
 msgid ""
 "Could not open the URL\n"
 "{0}"
-msgstr ""
-"无法打开这个URL\n"
-"{0}"
+msgstr "无法打开网址\n{0}"
 
-#: Base.java:1672
+#: Base.java:1958
 #, java-format
 msgid ""
 "Could not open the folder\n"
 "{0}"
-msgstr ""
-"不能打开文件夹\n"
-"{0}"
+msgstr "无法打开文件夹"
 
-#: Sketch.java:1811
+#: Sketch.java:1769
 msgid ""
 "Could not properly re-save the sketch. You may be in trouble at this point,\n"
 "and it might be time to copy and paste your code to another text editor."
 msgstr ""
-"无法正确重新保存程序。你在这点上可能遇到了问题，\n"
-"是时候将你的代码复制粘贴到另外一个字符编辑器中了。"
 
-#: Sketch.java:1810
+#: Sketch.java:1768
 msgid "Could not re-save sketch"
-msgstr "不能重新保存程序"
+msgstr ""
 
 #: Theme.java:52
 msgid ""
 "Could not read color theme settings.\n"
 "You'll need to reinstall Processing."
 msgstr ""
-"无法读取颜色主题设置。\n"
-"你需要重新安装Processing。"
 
-#: Preferences.java:210
+#: Preferences.java:219
 msgid ""
 "Could not read default settings.\n"
 "You'll need to reinstall Arduino."
-msgstr ""
-"不能读取默认设置。\n"
-"你需要重新安装Arduino"
+msgstr "无法读取预设设置。\n你必须重新安装Arduino。"
 
-#: Preferences.java:242
+#: Preferences.java:258
 #, java-format
 msgid "Could not read preferences from {0}"
-msgstr "不能读取{0}的参数设定"
+msgstr "无法从{0}读取首选项"
 
-#: Base.java:2196
+#: Base.java:2482
 #, java-format
 msgid "Could not remove old version of {0}"
-msgstr "无法卸载{0}的早期版本"
+msgstr "无法移除{0}的旧版本"
 
-#: Sketch.java:487 Sketch.java:532
+#: Sketch.java:483 Sketch.java:528
 #, java-format
 msgid "Could not rename \"{0}\" to \"{1}\""
-msgstr "不能重命名\"{0}\"为\"{1}\""
+msgstr "无法将\"{0}\"重命名为\"{1}\""
 
-#: Sketch.java:479
+#: Sketch.java:475
 msgid "Could not rename the sketch. (0)"
-msgstr "不能重命名程序。(0)"
+msgstr "无法重命名草稿码。(0)"
 
-#: Sketch.java:500
+#: Sketch.java:496
 msgid "Could not rename the sketch. (1)"
-msgstr "不能重命名程序。（1）"
+msgstr "无法重命名草稿码。(1)"
 
-#: Sketch.java:507
+#: Sketch.java:503
 msgid "Could not rename the sketch. (2)"
-msgstr "不能重命名程序。(2)"
+msgstr "无法重命名草稿码。(2)"
 
-#: Base.java:2206
+#: Base.java:2492
 #, java-format
 msgid "Could not replace {0}"
-msgstr "不能覆盖{0}"
+msgstr "无法替换{0}"
 
 #: tools/Archiver.java:74
 msgid "Couldn't archive sketch"
-msgstr "不能打包程序"
+msgstr ""
 
-#: Sketch.java:1689
+#: Sketch.java:1647
 msgid "Couldn't determine program size: {0}"
-msgstr "不能判断程序大小：{0}"
+msgstr ""
 
-#: Sketch.java:620
+#: Sketch.java:616
 msgid "Couldn't do it"
-msgstr "不能执行。"
+msgstr "无法完成动作"
 
-#: ../../../cc/arduino/packages/uploaders/SerialUploader.java:208
+#: debug/BasicUploader.java:209
 msgid ""
 "Couldn't find a Board on the selected port. Check that you have the correct "
 "port selected.  If it is correct, try pressing the board's reset button "
@@ -501,108 +499,114 @@ msgstr ""
 msgid "Croatian"
 msgstr ""
 
-#: Editor.java:1135 Editor.java:2652
+#: Editor.java:1149 Editor.java:2699
 msgid "Cut"
-msgstr "剪切"
+msgstr ""
 
 #: ../../../processing/app/Preferences.java:83
 msgid "Czech"
 msgstr ""
 
-#: Preferences.java:89
+#: Preferences.java:90
 msgid "Danish"
+msgstr "丹麦语"
+
+#: Editor.java:1224 Editor.java:2765
+msgid "Decrease Indent"
 msgstr ""
 
-#: Editor.java:1210 Editor.java:2718
-msgid "Decrease Indent"
-msgstr "减小缩进"
-
-#: Sketch.java:595 EditorHeader.java:314
+#: EditorHeader.java:314 Sketch.java:591
 msgid "Delete"
 msgstr "删除"
 
-#: debug/Uploader.java:203
+#: debug/Uploader.java:199
 msgid ""
 "Device is not responding, check the right serial port is selected or RESET "
 "the board right before exporting"
 msgstr ""
-"设备无响应，检查选择了正确的串口号或者"
-"在输出前重置板卡"
 
 #: tools/FixEncoding.java:57
 msgid "Discard all changes and reload sketch?"
-msgstr "放弃所有修改并重载程序"
-
-#: Editor.java:2017
-msgid "Don't Save"
-msgstr "不保存"
-
-#: Editor.java:2228 Editor.java:2264
-msgid "Done Saving."
-msgstr "保存完毕。"
-
-#: Editor.java:2463
-msgid "Done burning bootloader."
-msgstr "烧写bootloader完毕。"
-
-#: Editor.java:1864 Editor.java:1881
-msgid "Done compiling."
-msgstr "编译完毕。"
-
-#: Editor.java:2517
-msgid "Done printing."
-msgstr "打印完成。"
-
-#: Editor.java:2348 Editor.java:2384
-msgid "Done uploading."
-msgstr "下载完毕。"
-
-#: Preferences.java:90
-msgid "Dutch"
 msgstr ""
 
-#: Editor.java:1116
-msgid "Edit"
-msgstr "编辑"
+#: Editor.java:2064
+msgid "Don't Save"
+msgstr ""
 
-#: Preferences.java:354
-msgid "Editor font size: "
-msgstr "编辑器字体大小："
+#: Editor.java:2275 Editor.java:2311
+msgid "Done Saving."
+msgstr ""
 
-#: Preferences.java:337
-msgid "Editor language: "
+#: Editor.java:2510
+msgid "Done burning bootloader."
+msgstr ""
+
+#: Editor.java:1911 Editor.java:1928
+msgid "Done compiling."
+msgstr ""
+
+#: Editor.java:2564
+msgid "Done printing."
+msgstr ""
+
+#: Editor.java:2395 Editor.java:2431
+msgid "Done uploading."
 msgstr ""
 
 #: Preferences.java:91
-msgid "English"
+msgid "Dutch"
+msgstr "荷兰语"
+
+#: ../../../processing/app/Preferences.java:144
+msgid "Dutch (Netherlands)"
 msgstr ""
 
-#: Editor.java:1049
-msgid "Environment"
-msgstr "环境"
+#: Editor.java:1130
+msgid "Edit"
+msgstr ""
 
-#: Editor.java:2120 Editor.java:2131 Editor.java:2141 Editor.java:2159
-#: Sketch.java:479 Sketch.java:485 Sketch.java:500 Sketch.java:507
-#: Sketch.java:530 Sketch.java:547 Base.java:1861 Preferences.java:240
+#: Preferences.java:370
+msgid "Editor font size: "
+msgstr "编辑器字体大小"
+
+#: Preferences.java:353
+msgid "Editor language: "
+msgstr "编辑器语言"
+
+#: Preferences.java:92
+msgid "English"
+msgstr "英语"
+
+#: ../../../processing/app/Preferences.java:145
+msgid "English (United Kingdom)"
+msgstr ""
+
+#: Editor.java:1062
+msgid "Environment"
+msgstr ""
+
+#: Base.java:2147 Preferences.java:256 Sketch.java:475 Sketch.java:481
+#: Sketch.java:496 Sketch.java:503 Sketch.java:526 Sketch.java:543
+#: Editor.java:2167 Editor.java:2178 Editor.java:2188 Editor.java:2206
 msgid "Error"
 msgstr "错误"
 
-#: Sketch.java:1069 Sketch.java:1092
+#: Sketch.java:1065 Sketch.java:1088
 msgid "Error adding file"
-msgstr "加入文件时出现错误"
+msgstr ""
 
-#: debug/Compiler.java:426
+#: debug/Compiler.java:369
 msgid "Error compiling."
-msgstr "编译出错。"
+msgstr ""
 
-#: Base.java:1433
+#: Base.java:1674
 msgid "Error getting the Arduino data folder."
-msgstr "获得Arduino数据文件夹时发生错误"
+msgstr "取得Arduino资料文件夹时发生错误。"
 
-#: Serial.java:567
+#: Serial.java:593
 #, java-format
 msgid "Error inside Serial.{0}()"
-msgstr "Serial.{0}()中出现错误"
+msgstr ""
 
 #: ../../../processing/app/Base.java:1232
 msgid "Error loading libraries"
@@ -615,36 +619,34 @@ msgstr ""
 msgid "Error loading {0}"
 msgstr ""
 
-#: Serial.java:154
+#: Serial.java:181
 #, java-format
 msgid "Error opening serial port ''{0}''."
-msgstr "打开串口''{0}''时出现错误。"
+msgstr ""
 
-#: Preferences.java:261
+#: Preferences.java:277
 msgid "Error reading preferences"
-msgstr "读取参数设定错误"
+msgstr "读取首选项出错"
 
-#: Preferences.java:263
+#: Preferences.java:279
 #, java-format
 msgid ""
 "Error reading the preferences file. Please delete (or move)\n"
 "{0} and restart Arduino."
-msgstr ""
-"读取参数设置文件错误，请删除（或移动）"
-"{0}并重启Arduino。"
+msgstr "读取首选项时出错。请删除（或移除）\n{0}并重启Arduino。"
 
 #: ../../../cc/arduino/packages/DiscoveryManager.java:25
 msgid "Error starting discovery method: "
 msgstr ""
 
-#: ../../../processing/app/Serial.java:125
+#: Serial.java:125
 #, java-format
 msgid "Error touching serial port ''{0}''."
 msgstr ""
 
-#: Editor.java:2465 Editor.java:2469 Editor.java:2473
+#: Editor.java:2512 Editor.java:2516 Editor.java:2520
 msgid "Error while burning bootloader."
-msgstr "烧写bootloader时出错。"
+msgstr ""
 
 #: ../../../processing/app/Editor.java:2555
 msgid "Error while burning bootloader: missing '{0}' configuration parameter"
@@ -653,121 +655,141 @@ msgstr ""
 #: SketchCode.java:83
 #, java-format
 msgid "Error while loading code {0}"
-msgstr "载入代码{0}时出现错误"
+msgstr "载入代码{0}时发生错误"
 
-#: Editor.java:2520
+#: Editor.java:2567
 msgid "Error while printing."
-msgstr "打印时出现错误。"
+msgstr ""
 
 #: ../../../processing/app/Editor.java:2409
 #: ../../../processing/app/Editor.java:2449
 msgid "Error while uploading: missing '{0}' configuration parameter"
 msgstr ""
 
-#: Preferences.java:92
+#: Preferences.java:93
 msgid "Estonian"
+msgstr "爱沙尼亚语"
+
+#: ../../../processing/app/Preferences.java:146
+msgid "Estonian (Estonia)"
 msgstr ""
 
-#: Editor.java:509
+#: Editor.java:516
 msgid "Examples"
-msgstr "示例"
+msgstr ""
 
-#: Editor.java:2435
+#: Editor.java:2482
 msgid "Export canceled, changes must first be saved."
-msgstr "导出取消了，修改必须先被保存。"
+msgstr ""
 
-#: Base.java:1814
+#: Base.java:2100
 msgid "FAQ.html"
 msgstr "FAQ.html"
 
-#: Editor.java:484
+#: Editor.java:491
 msgid "File"
-msgstr "文件"
+msgstr ""
 
 #: Preferences.java:94
 msgid "Filipino"
-msgstr ""
+msgstr "菲律宾语"
 
 #: FindReplace.java:124 FindReplace.java:127
 msgid "Find"
-msgstr "查找"
+msgstr "寻找："
 
-#: Editor.java:1235
+#: Editor.java:1249
 msgid "Find Next"
-msgstr "查找下一个"
+msgstr ""
 
-#: Editor.java:1245
+#: Editor.java:1259
 msgid "Find Previous"
-msgstr "查找上一个"
+msgstr ""
 
-#: Editor.java:1073 Editor.java:2728
+#: Editor.java:1086 Editor.java:2775
 msgid "Find in Reference"
-msgstr "在手册中查找"
+msgstr ""
 
-#: Editor.java:1220
+#: Editor.java:1234
 msgid "Find..."
-msgstr "查找.."
+msgstr ""
 
 #: FindReplace.java:80
 msgid "Find:"
-msgstr "查找："
+msgstr "寻找："
+
+#: ../../../processing/app/Preferences.java:147
+msgid "Finnish"
+msgstr ""
 
 #: tools/FixEncoding.java:41 tools/FixEncoding.java:58
 #: tools/FixEncoding.java:79
 msgid "Fix Encoding & Reload"
-msgstr "修复编码并重载"
-
-#: ../../../processing/app/Base.java:2057
-msgid ""
-"For information on installing libraries, see: http://arduino.cc/en/Guide/"
-"Libraries\n"
 msgstr ""
 
-#: ../../../cc/arduino/packages/uploaders/SerialUploader.java:79
+#: Base.java:1851
+msgid ""
+"For information on installing libraries, see: "
+"http://arduino.cc/en/Guide/Libraries\n"
+msgstr ""
+
+#: debug/BasicUploader.java:80
 msgid "Forcing reset using 1200bps open/close on port "
 msgstr ""
 
-#: Preferences.java:93
-msgid "French"
-msgstr ""
-
-#: Editor.java:1083
-msgid "Frequently Asked Questions"
-msgstr "常见问题"
-
 #: Preferences.java:95
-msgid "Galician"
+msgid "French"
+msgstr "法语"
+
+#: Editor.java:1097
+msgid "Frequently Asked Questions"
 msgstr ""
+
+#: Preferences.java:96
+msgid "Galician"
+msgstr "加利西亚语"
 
 #: ../../../processing/app/Preferences.java:94
 msgid "Georgian"
 msgstr ""
 
-#: Preferences.java:96
-msgid "German"
-msgstr ""
-
-#: Editor.java:1041
-msgid "Getting Started"
-msgstr "快速入门"
-
 #: Preferences.java:97
-msgid "Greek"
+msgid "German"
+msgstr "德语"
+
+#: Editor.java:1054
+msgid "Getting Started"
 msgstr ""
 
-#: Base.java:1799
+#: ../../../processing/app/Sketch.java:1646
+#, java-format
+msgid ""
+"Global variables use {0} bytes ({2}%%) of dynamic memory, leaving {3} bytes "
+"for local variables. Maximum is {1} bytes."
+msgstr ""
+
+#: ../../../processing/app/Sketch.java:1651
+#, java-format
+msgid "Global variables use {0} bytes of dynamic memory."
+msgstr ""
+
+#: Preferences.java:98
+msgid "Greek"
+msgstr "希腊语"
+
+#: Base.java:2085
 msgid "Guide_Environment.html"
 msgstr "Guide_Environment.html"
 
-#: Base.java:1785
+#: Base.java:2071
 msgid "Guide_MacOSX.html"
 msgstr "Guide_MacOSX.html"
 
-#: Base.java:1809
+#: Base.java:2095
 msgid "Guide_Troubleshooting.html"
 msgstr "Guide_Troubleshooting.html"
 
-#: Base.java:1787
+#: Base.java:2073
 msgid "Guide_Windows.html"
 msgstr "Guide_Windows.html"
 
@@ -775,45 +797,43 @@ msgstr "Guide_Windows.html"
 msgid "Hebrew"
 msgstr ""
 
-#: Editor.java:1002
+#: Editor.java:1015
 msgid "Help"
-msgstr "帮助"
-
-#: ../../../processing/app/Preferences.java:98
-msgid "Hindi"
 msgstr ""
 
-#: Sketch.java:299
+#: Preferences.java:99
+msgid "Hindi"
+msgstr "印度语"
+
+#: Sketch.java:295
 msgid ""
 "How about saving the sketch first \n"
 "before trying to rename it?"
-msgstr ""
-"在重命名程序前\n"
-"先保存它么？"
+msgstr "在试着重命名前\n要不要先保存草稿码？"
 
-#: Sketch.java:886
+#: Sketch.java:882
 msgid "How very Borges of you"
-msgstr "你太有想象力了"
-
-#: Preferences.java:98
-msgid "Hungarian"
 msgstr ""
+
+#: Preferences.java:100
+msgid "Hungarian"
+msgstr "匈牙利语"
 
 #: FindReplace.java:96
 msgid "Ignore Case"
 msgstr "忽略大小写"
 
-#: Base.java:1207
+#: Base.java:1058
 msgid "Ignoring bad library name"
-msgstr "忽略错误的库名称"
+msgstr "忽略糟糕的库名称"
 
-#: Base.java:1132
+#: Base.java:1436
 msgid "Ignoring sketch with bad name"
-msgstr "忽略名称错误的程序"
+msgstr "忽略名称糟糕的草稿码"
 
-#: Editor.java:629
+#: Editor.java:636
 msgid "Import Library..."
-msgstr "导入库..."
+msgstr ""
 
 #: ../../../processing/app/Sketch.java:736
 msgid ""
@@ -826,92 +846,86 @@ msgid ""
 "Save sketch and update its extension?"
 msgstr ""
 
-#: Editor.java:1202 Editor.java:2710
+#: Editor.java:1216 Editor.java:2757
 msgid "Increase Indent"
-msgstr "增加缩进"
-
-#: Preferences.java:99
-msgid "Indonesian"
 msgstr ""
+
+#: Preferences.java:101
+msgid "Indonesian"
+msgstr "印尼语"
 
 #: ../../../processing/app/Base.java:1204
 #, java-format
 msgid "Invalid library found in {0}: {1}"
 msgstr ""
 
-#: Preferences.java:100
-msgid "Italian"
-msgstr ""
-
-#: Preferences.java:101
-msgid "Japanese"
-msgstr ""
-
 #: Preferences.java:102
-msgid "Korean"
-msgstr ""
+msgid "Italian"
+msgstr "意大利语"
 
 #: Preferences.java:103
-msgid "Latvian"
-msgstr ""
-
-#: ../../../processing/app/Base.java:2903
-msgid "Library added to your libraries. Check \"Import library\" menu"
-msgstr ""
+msgid "Japanese"
+msgstr "日语"
 
 #: Preferences.java:104
+msgid "Korean"
+msgstr "韩语"
+
+#: Preferences.java:105
+msgid "Latvian"
+msgstr "拉脱维亚语"
+
+#: Base.java:2699
+msgid "Library added to your libraries. Check \"Import library\" menu"
+msgstr "库已经加入，请检查“导入库”菜单"
+
+#: Preferences.java:106
 msgid "Lithuaninan"
-msgstr ""
+msgstr "立陶宛语"
 
 #: ../../../processing/app/Sketch.java:1660
 msgid "Low memory available, stability problems may occur"
 msgstr ""
 
-#: ../../../processing/app/Preferences.java:106
+#: Preferences.java:107
 msgid "Marathi"
-msgstr ""
+msgstr "马拉地语"
 
-#: Base.java:1826
+#: Base.java:2112
 msgid "Message"
 msgstr "信息"
 
-#: ../../../processing/app/Sketch.java:1646
-#, java-format
-msgid "Minimum Memory usage: {0} bytes"
-msgstr ""
-
-#: ../../../processing/app/Sketch.java:1643
-#, java-format
-msgid "Minimum Memory usage: {0} bytes (of a {1} byte maximum) - {2}%% used"
-msgstr ""
-
-#: Sketch.java:1754
+#: Sketch.java:1712
 msgid "Missing the */ from the end of a /* comment */"
-msgstr " /* comment */ 中丢失了结束的 */"
+msgstr ""
 
-#: Preferences.java:433
+#: Preferences.java:449
 msgid "More preferences can be edited directly in the file"
-msgstr "更多的参数设置可以直接在文件中编辑"
+msgstr "在首选项中还有更多选项可以直接编辑"
 
-#: Editor.java:2109
+#: Editor.java:2156
 msgid "Moving"
-msgstr "移动中"
+msgstr ""
 
-#: Sketch.java:286
+#: Sketch.java:282
 msgid "Name for new file:"
-msgstr "新文件名："
+msgstr "新文件的名字"
+
+#: ../../../processing/app/Preferences.java:149
+msgid "Nepali"
+msgstr ""
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:51
 msgid "Network upload using programmer not supported"
 msgstr ""
 
-#: Editor.java:486 EditorToolbar.java:41
+#: EditorToolbar.java:41 Editor.java:493
 msgid "New"
 msgstr "新建"
 
 #: EditorToolbar.java:46
 msgid "New Editor Window"
-msgstr "新编辑窗口"
+msgstr "新编辑器窗口"
 
 #: EditorHeader.java:292
 msgid "New Tab"
@@ -919,59 +933,60 @@ msgstr "新建标签"
 
 #: SerialMonitor.java:112
 msgid "Newline"
-msgstr "换行（NL）"
+msgstr ""
 
 #: EditorHeader.java:340
 msgid "Next Tab"
-msgstr "下一标签"
+msgstr "下一个标签"
 
-#: UpdateCheck.java:108 Preferences.java:77
+#: Preferences.java:78 UpdateCheck.java:108
 msgid "No"
 msgstr "否"
 
-#: debug/Compiler.java:79
+#: debug/Compiler.java:126
 msgid "No board selected; please choose a board from the Tools > Board menu."
-msgstr "没有选择板卡；请从 工具->板卡 菜单中选择板卡"
+msgstr ""
 
-#: tools/AutoFormat.java:913 tools/format/src/AutoFormat.java:54
+#: tools/format/src/AutoFormat.java:54 tools/AutoFormat.java:916
 msgid "No changes necessary for Auto Format."
-msgstr "没有需要自动格式化的修改。"
+msgstr ""
 
-#: Editor.java:366
+#: Editor.java:373
 msgid "No files were added to the sketch."
-msgstr "没有文件加入到程序中"
+msgstr ""
 
 #: Platform.java:167
 msgid "No launcher available"
-msgstr "没有可用的加载程序"
+msgstr ""
 
 #: SerialMonitor.java:112
 msgid "No line ending"
-msgstr "没有行结束符"
+msgstr ""
 
-#: Base.java:538
+#: Base.java:541
 msgid "No really, time for some fresh air for you."
-msgstr "事实上不是这样，该是呼吸一些新鲜空气的时间了。"
+msgstr "说真的，你该出去呼吸新鲜空气了。"
 
-#: Editor.java:1823
+#: Editor.java:1872
 #, java-format
 msgid "No reference available for \"{0}\""
-msgstr "手册中没有关于\"{0}\"的内容"
+msgstr ""
 
 #: ../../../processing/app/Base.java:309
 msgid "No valid configured cores found! Exiting..."
 msgstr ""
 
-#: Base.java:184
+#: ../../../processing/app/debug/TargetPackage.java:63
+#, java-format
+msgid "No valid hardware definitions found in folder {0}."
+msgstr ""
+
+#: Base.java:191
 msgid "Non-fatal error while setting the Look & Feel."
-msgstr "设定外观时发生非致命的错误"
+msgstr "设定外观和感觉时发生非重大的错误。"
 
-#: Sketch.java:400 Sketch.java:414 Sketch.java:423 Sketch.java:863
+#: Sketch.java:396 Sketch.java:410 Sketch.java:419 Sketch.java:859
 msgid "Nope"
-msgstr "不要"
-
-#: ../../../processing/app/Preferences.java:107
-msgid "Norwegian"
 msgstr ""
 
 #: ../../../processing/app/Preferences.java:108
@@ -984,106 +999,114 @@ msgid ""
 "for tips on reducing your footprint."
 msgstr ""
 
-#: Editor.java:2098 Editor.java:2418 Sketch.java:589 Sketch.java:741
-#: Sketch.java:1046 Preferences.java:79
+#: Preferences.java:80 Sketch.java:585 Sketch.java:737 Sketch.java:1042
+#: Editor.java:2145 Editor.java:2465
 msgid "OK"
-msgstr "确定"
+msgstr "好"
 
-#: Editor.java:369 Sketch.java:996
+#: Sketch.java:992 Editor.java:376
 msgid "One file added to the sketch."
-msgstr "一个文件加入到程序中"
+msgstr ""
 
 #: EditorToolbar.java:41
 msgid "Open"
 msgstr "打开"
 
-#: Editor.java:2641
+#: Editor.java:2688
 msgid "Open URL"
-msgstr "打开URL"
+msgstr ""
 
-#: Base.java:633
+#: Base.java:636
 msgid "Open an Arduino sketch..."
-msgstr "打开一个Arduino程序..."
+msgstr "打开Arduino草稿码"
 
 #: EditorToolbar.java:46
 msgid "Open in Another Window"
-msgstr "在其他的窗口中打开"
+msgstr "在新窗口打开"
 
-#: Editor.java:494 Base.java:903
+#: Base.java:903 Editor.java:501
 msgid "Open..."
-msgstr "打开..."
+msgstr "打开"
 
-#: Editor.java:556
+#: Editor.java:563
 msgid "Page Setup"
-msgstr "页面设置"
+msgstr ""
 
 #: ../../../processing/app/forms/PasswordAuthorizationDialog.java:44
 msgid "Password:"
 msgstr ""
 
-#: Editor.java:1175 Editor.java:2684
+#: Editor.java:1189 Editor.java:2731
 msgid "Paste"
-msgstr "粘贴"
+msgstr ""
 
-#: Preferences.java:105
+#: Preferences.java:109
 msgid "Persian"
-msgstr ""
+msgstr "波斯语"
 
-#: debug/Compiler.java:465
+#: debug/Compiler.java:408
 msgid "Please import the SPI library from the Sketch > Import Library menu."
-msgstr "请从 程序>导入库 菜单导入SPI库。"
-
-#: Base.java:232
-msgid "Please install JDK 1.5 or later"
-msgstr "请安装JDK1.5或更新的版本"
-
-#: Preferences.java:106
-msgid "Polish"
 msgstr ""
+
+#: Base.java:239
+msgid "Please install JDK 1.5 or later"
+msgstr "请安装JDK 1.5或更新的版本"
+
+#: Preferences.java:110
+msgid "Polish"
+msgstr "波兰语"
 
 #: ../../../processing/app/Editor.java:718
 msgid "Port"
 msgstr ""
 
-#: Preferences.java:107 Preferences.java:108
-msgid "Portuguese"
+#: ../../../processing/app/Preferences.java:151
+msgid "Portugese"
 msgstr ""
 
-#: Editor.java:576 Preferences.java:279
+#: ../../../processing/app/Preferences.java:127
+msgid "Portuguese (Brazil)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:128
+msgid "Portuguese (Portugal)"
+msgstr ""
+
+#: Preferences.java:295 Editor.java:583
 msgid "Preferences"
-msgstr "参数设置"
+msgstr "首选项"
 
 #: FindReplace.java:123 FindReplace.java:128
 msgid "Previous"
-msgstr "上一个"
+msgstr "前一个"
 
 #: EditorHeader.java:326
 msgid "Previous Tab"
-msgstr "上一标签"
+msgstr "上一个标签"
 
-#: Editor.java:564
+#: Editor.java:571
 msgid "Print"
-msgstr "打印"
+msgstr ""
 
-#: Editor.java:2524
+#: Editor.java:2571
 msgid "Printing canceled."
-msgstr "打印取消了。"
+msgstr ""
 
-#: Editor.java:2500
+#: Editor.java:2547
 msgid "Printing..."
-msgstr "打印中..."
+msgstr ""
 
-#: Base.java:1671
+#: Base.java:1957
 msgid "Problem Opening Folder"
 msgstr "打开文件夹时出现问题"
 
-#: Base.java:1647
+#: Base.java:1933
 msgid "Problem Opening URL"
-msgstr "打开URL时出现问题"
+msgstr "打开网址时出现问题"
 
-#: Base.java:220
+#: Base.java:227
 msgid "Problem Setting the Platform"
-msgstr "设置时发生了问题"
+msgstr "设定平台时发生问题。"
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:136
 msgid "Problem accessing board folder /www/sd"
@@ -1093,137 +1116,133 @@ msgstr ""
 msgid "Problem accessing files in folder "
 msgstr ""
 
-#: Base.java:1432
+#: Base.java:1673
 msgid "Problem getting data folder"
-msgstr "获取数据目录时出现问题"
+msgstr "取得资料文件夹时出现问题"
 
-#: Sketch.java:1465
+#: Sketch.java:1467
 #, java-format
 msgid "Problem moving {0} to the build folder"
-msgstr "移动{0}至构建文件夹时出现错误"
+msgstr ""
 
 #: debug/Uploader.java:209
 msgid ""
-"Problem uploading to board.  See http://www.arduino.cc/en/Guide/"
-"Troubleshooting#upload for suggestions."
+"Problem uploading to board.  See "
+"http://www.arduino.cc/en/Guide/Troubleshooting#upload for suggestions."
 msgstr ""
-"下载程序到板卡时出现问题，"
-"请在http://www.arduino.cc/en/Guide/Troubleshooting#upload寻找解决办法"
 
-#: Sketch.java:359 Sketch.java:366 Sketch.java:377
+#: Sketch.java:355 Sketch.java:362 Sketch.java:373
 msgid "Problem with rename"
-msgstr "重命名发生问题"
+msgstr "重命名时出现问题"
 
-#: Editor.java:2090
+#: Editor.java:2137
 msgid ""
 "Processing can only open its own sketches\n"
 "and other files ending in .ino or .pde"
 msgstr ""
-"Processing只能打开他自己的程序,\n"
-"和其他以.ino或者.pde为扩展名的文件。"
 
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
 msgstr ""
 
-#: Editor.java:695
+#: Editor.java:704
 msgid "Programmer"
-msgstr "编程器"
+msgstr ""
 
-#: Editor.java:586 Base.java:782
+#: Base.java:783 Editor.java:593
 msgid "Quit"
-msgstr "退出"
+msgstr "关闭"
 
-#: Editor.java:1124 Editor.java:1126 Editor.java:1376
+#: Editor.java:1138 Editor.java:1140 Editor.java:1390
 msgid "Redo"
-msgstr "重做"
+msgstr ""
 
-#: Editor.java:1065
+#: Editor.java:1078
 msgid "Reference"
-msgstr "参考手册"
+msgstr ""
 
 #: EditorHeader.java:300
 msgid "Rename"
 msgstr "重命名"
 
-#: FindReplace.java:121 FindReplace.java:130 Sketch.java:1050
+#: FindReplace.java:121 FindReplace.java:130 Sketch.java:1046
 msgid "Replace"
 msgstr "替换"
 
 #: FindReplace.java:122 FindReplace.java:129
 msgid "Replace & Find"
-msgstr "查找与替换"
+msgstr "替换 & 寻找"
 
 #: FindReplace.java:120 FindReplace.java:131
 msgid "Replace All"
 msgstr "全部替换"
 
-#: Sketch.java:1047
+#: Sketch.java:1043
 #, java-format
 msgid "Replace the existing version of {0}?"
-msgstr "替换已存在的的版本{0}么？"
+msgstr ""
 
 #: FindReplace.java:81
 msgid "Replace with:"
 msgstr "替换为："
 
-#: Preferences.java:109
+#: Preferences.java:113
 msgid "Romanian"
-msgstr ""
+msgstr "罗马尼亚语"
 
-#: Preferences.java:110
+#: Preferences.java:114
 msgid "Russian"
-msgstr ""
+msgstr "俄语"
 
-#: Editor.java:522 Editor.java:2017 Editor.java:2421 EditorToolbar.java:41
-#: EditorToolbar.java:46
+#: EditorToolbar.java:41 EditorToolbar.java:46 Editor.java:529
+#: Editor.java:2064 Editor.java:2468
 msgid "Save"
 msgstr "保存"
 
-#: Editor.java:530
+#: Editor.java:537
 msgid "Save As..."
-msgstr "另存为..."
-
-#: Editor.java:2270
-msgid "Save Canceled."
-msgstr "保存取消了。"
-
-#: Editor.java:2420
-msgid "Save changes before export?"
-msgstr "导出前保存更改？"
-
-#: Editor.java:1973
-#, java-format
-msgid "Save changes to \"{0}\"?  "
-msgstr "保存更改到\"{0}\"中？ "
-
-#: Sketch.java:829
-msgid "Save sketch folder as..."
-msgstr "程序文件夹另存为"
-
-#: Editor.java:2223 Editor.java:2261
-msgid "Saving..."
-msgstr "保存中..."
-
-#: Base.java:1623
-msgid "Select (or create new) folder for sketches..."
-msgstr "选择（或创建新的）程序文件夹..."
-
-#: Editor.java:1184 Editor.java:2692
-msgid "Select All"
-msgstr "全选"
-
-#: ../../../processing/app/Base.java:2845
-msgid "Select a zip file or a folder containing the library you'd like to add"
 msgstr ""
 
-#: Sketch.java:979
-msgid "Select an image or other data file to copy to your sketch"
-msgstr "选择一个镜像或者其他数据文件复制到你的程序中"
+#: Editor.java:2317
+msgid "Save Canceled."
+msgstr ""
 
-#: Preferences.java:314
+#: Editor.java:2467
+msgid "Save changes before export?"
+msgstr ""
+
+#: Editor.java:2020
+#, java-format
+msgid "Save changes to \"{0}\"?  "
+msgstr ""
+
+#: Sketch.java:825
+msgid "Save sketch folder as..."
+msgstr "草稿码文件夹另存为"
+
+#: Editor.java:2270 Editor.java:2308
+msgid "Saving..."
+msgstr ""
+
+#: Base.java:1909
+msgid "Select (or create new) folder for sketches..."
+msgstr "为草稿码选取（或新增）文件夹..."
+
+#: Editor.java:1198 Editor.java:2739
+msgid "Select All"
+msgstr ""
+
+#: Base.java:2636
+msgid "Select a zip file or a folder containing the library you'd like to add"
+msgstr "选取你想加入并含有库的zip文件或文件夹"
+
+#: Sketch.java:975
+msgid "Select an image or other data file to copy to your sketch"
+msgstr ""
+
+#: Preferences.java:330
 msgid "Select new sketchbook location"
-msgstr "选择新的程序库位置："
+msgstr "为草稿码目录选取新位置"
 
 #: ../../../processing/app/debug/Compiler.java:146
 msgid "Selected board depends on '{0}' core (not installed)."
@@ -1231,212 +1250,202 @@ msgstr ""
 
 #: SerialMonitor.java:93
 msgid "Send"
-msgstr "发送"
+msgstr ""
 
-#: Editor.java:662 EditorToolbar.java:41 EditorToolbar.java:46
+#: EditorToolbar.java:41 EditorToolbar.java:46 Editor.java:669
 msgid "Serial Monitor"
 msgstr "串口监视器"
 
-#: Serial.java:147
+#: Serial.java:174
 #, java-format
 msgid ""
 "Serial port ''{0}'' already in use. Try quiting any programs that may be "
 "using it."
 msgstr ""
-"串口''{0}''在使用中。尝试退出任何可能在"
-"使用它的其他程序。"
 
-#: ../../../processing/app/Serial.java:121
+#: Serial.java:121
 #, java-format
 msgid ""
 "Serial port ''{0}'' already in use. Try quitting any programs that may be "
 "using it."
 msgstr ""
 
-#: Serial.java:167
+#: Serial.java:194
 #, java-format
 msgid ""
-"Serial port ''{0}'' not found. Did you select the right one from the Tools > "
-"Serial Port menu?"
+"Serial port ''{0}'' not found. Did you select the right one from the Tools >"
+" Serial Port menu?"
 msgstr ""
-"未找到串口''{0}''。你在菜单 工具->串口 中选择了"
-"正确的串口号了么？"
 
-#: Editor.java:2296
+#: Editor.java:2343
 #, java-format
 msgid ""
 "Serial port {0} not found.\n"
 "Retry the upload with another serial port?"
 msgstr ""
-"未找到串口{0}。\n"
-"重试下载到另外的串口中么？"
 
-#: Base.java:1440
+#: Base.java:1681
 msgid "Settings issues"
-msgstr "设定问题"
+msgstr "设置议题"
 
-#: Editor.java:634
+#: Editor.java:641
 msgid "Show Sketch Folder"
-msgstr "显示程序文件夹"
+msgstr ""
 
 #: ../../../processing/app/EditorStatus.java:468
 msgid "Show verbose output during compilation"
 msgstr ""
 
-#: Preferences.java:371
+#: Preferences.java:387
 msgid "Show verbose output during: "
-msgstr "输出时显示详细信息："
+msgstr "显示详细输出："
 
-#: Editor.java:600
+#: Editor.java:607
 msgid "Sketch"
-msgstr "程序"
+msgstr ""
 
-#: Sketch.java:1796
+#: Sketch.java:1754
 msgid "Sketch Disappeared"
-msgstr "程序丢失"
+msgstr ""
 
-#: Base.java:1095
+#: Base.java:1411
 msgid "Sketch Does Not Exist"
-msgstr "程序不存在"
+msgstr "草稿码不存在"
 
-#: Sketch.java:278 Sketch.java:307 Sketch.java:581 Sketch.java:970
+#: Sketch.java:274 Sketch.java:303 Sketch.java:577 Sketch.java:966
 msgid "Sketch is Read-Only"
-msgstr "程序是只读的"
+msgstr "草稿码为只读状态"
 
-#: Sketch.java:298
+#: Sketch.java:294
 msgid "Sketch is Untitled"
-msgstr "程序没有标题"
+msgstr "未命名草稿码"
 
-#: Sketch.java:724
+#: Sketch.java:720
 msgid "Sketch is read-only"
-msgstr "程序是只读的"
+msgstr "草稿码为只读状态"
 
-#: Sketch.java:1694
+#: Sketch.java:1653
 msgid ""
 "Sketch too big; see http://www.arduino.cc/en/Guide/Troubleshooting#size for "
 "tips on reducing it."
 msgstr ""
-"程序太大了;查看 http://www.arduino.cc/en/Guide/Troubleshooting#size 中 "
-"的窍门来减小它。"
 
-#: Editor.java:503
+#: ../../../processing/app/Sketch.java:1639
+#, java-format
+msgid ""
+"Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} "
+"bytes."
+msgstr ""
+
+#: Editor.java:510
 msgid "Sketchbook"
-msgstr "程序库"
+msgstr ""
 
-#: Base.java:257
+#: Base.java:258
 msgid "Sketchbook folder disappeared"
-msgstr "不存在程序目录"
+msgstr "代码草稿箱消失"
 
-#: Preferences.java:299
+#: Preferences.java:315
 msgid "Sketchbook location:"
-msgstr "程序库位置："
+msgstr "草稿码位置"
 
-#: Sketch.java:279 Sketch.java:308 Sketch.java:582 Sketch.java:971
+#: ../../../processing/app/Preferences.java:152
+msgid "Slovenian"
+msgstr ""
+
+#: Sketch.java:275 Sketch.java:304 Sketch.java:578 Sketch.java:967
 msgid ""
 "Some files are marked \"read-only\", so you'll\n"
 "need to re-save the sketch in another location,\n"
 "and try again."
-msgstr ""
-"一些文件被标记为\"只读\"属性，你需要\n"
-"在其他位置重新保存程序，\n"
-"然后重试。"
+msgstr "某些文件设置为”只读“，因此你必须\n另存草稿码到別的位置，\n然后再试一次。"
 
-#: Sketch.java:725
+#: Sketch.java:721
 msgid ""
 "Some files are marked \"read-only\", so you'll\n"
 "need to re-save this sketch to another location."
-msgstr ""
-"一些文件被标记为\"只读\"属性，必须\n"
-"重新保存程序到其他位置。"
+msgstr "某些文件为只读状态，因此你需要\n将草稿码保存于其他位置。"
 
-#: Sketch.java:461
+#: Sketch.java:457
 #, java-format
 msgid "Sorry, a sketch (or folder) named \"{0}\" already exists."
-msgstr "对不起，名为\"{0}\"的程序（或文件夹）已存在。"
+msgstr "抱歉，已存在名为{0}的草稿码（或文件夹）。"
 
-#: Preferences.java:111
+#: Preferences.java:115
 msgid "Spanish"
-msgstr ""
+msgstr "西班牙语"
 
-#: Base.java:537
+#: Base.java:540
 msgid "Sunshine"
-msgstr "晴天"
+msgstr "阳光"
 
-#: Preferences.java:83
+#: ../../../processing/app/Preferences.java:153
+msgid "Swedish"
+msgstr ""
+
+#: Preferences.java:84
 msgid "System Default"
-msgstr ""
+msgstr "系统预设"
 
-#: ../../../processing/app/Preferences.java:116
+#: Preferences.java:116
 msgid "Tamil"
+msgstr "泰米尔语"
+
+#: debug/Compiler.java:414
+msgid "The 'BYTE' keyword is no longer supported."
 msgstr ""
 
-#: debug/Compiler.java:471
-msgid "The 'BYTE' keyword is no longer supported."
-msgstr "关键字'字节'不再受到支持。"
-
-#: debug/Compiler.java:483
+#: debug/Compiler.java:426
 msgid "The Client class has been renamed EthernetClient."
-msgstr "Client类被重命名为EthernetClient。"
+msgstr ""
 
-#: debug/Compiler.java:477
+#: debug/Compiler.java:420
 msgid "The Server class has been renamed EthernetServer."
-msgstr "Server类被重命名为EthernetServer。"
+msgstr ""
 
-#: debug/Compiler.java:489
+#: debug/Compiler.java:432
 msgid "The Udp class has been renamed EthernetUdp."
-msgstr "Udp类被重命名为EthernetUdp。"
+msgstr ""
 
-#: Base.java:185
+#: Base.java:192
 msgid "The error message follows, however Arduino should run fine."
-msgstr "下面有错误信息，但Arduino可以良好运行"
+msgstr "虽然有错误信息，但Arduino应可正常运行。"
 
-#: Editor.java:2100
+#: Editor.java:2147
 #, java-format
 msgid ""
 "The file \"{0}\" needs to be inside\n"
 "a sketch folder named \"{1}\".\n"
 "Create this folder, move the file, and continue?"
 msgstr ""
-"文件 \"{0}\" 需要在一个名称为\n"
-" \"{1}\"的文件夹中。\n"
-"创建这个文件夹，移动文件，然后继续?"
 
-#: Base.java:1202
+#: Base.java:1054 Base.java:2674
 #, java-format
 msgid ""
 "The library \"{0}\" cannot be used.\n"
 "Library names must contain only basic letters and numbers.\n"
 "(ASCII only and no spaces, and it cannot start with a number)"
-msgstr ""
-"程序库\"{0}\"无法使用。\n"
-"程序库名称只能包含记不得字母和数字。\n"
-"（只能使用不包含空格的ASCII码，并且不能以数字开头。）\n"
+msgstr "无法使用库\"{0}\"。\n库的名称只能含有基本字母与数字。\n（只能是ASCII，不能有空白字符，也不能以數字開頭）"
 
-#: Sketch.java:378
+#: Sketch.java:374
 msgid ""
 "The main file can't use an extension.\n"
 "(It may be time for your to graduate to a\n"
 "\"real\" programming environment)"
-msgstr ""
-"主文件不能使用扩展名。\n"
-"(也许是你升级到\n"
-"\"真正\"的编程环境的时候了）"
+msgstr "主文件不能使用扩展。\n（或许是時候开始使用\n“真正”的编程环境了）"
 
-#: Sketch.java:360
+#: Sketch.java:356
 msgid "The name cannot start with a period."
-msgstr "名称不能以点号开始。"
+msgstr "名称不能以”.”开头"
 
-#: Base.java:1096
+#: Base.java:1412
 msgid ""
 "The selected sketch no longer exists.\n"
 "You may need to restart Arduino to update\n"
 "the sketchbook menu."
-msgstr ""
-"选择的程序不存在。\n"
-"需要重新启动Arduion"
-"来更新程序库菜单"
+msgstr "选取的草稿码已不存在。\n你或许需要重新启动Arduino\n以便更新草稿码菜单。"
 
-#: Base.java:1125
+#: Base.java:1430
 #, java-format
 msgid ""
 "The sketch \"{0}\" cannot be used.\n"
@@ -1444,70 +1453,53 @@ msgid ""
 "(ASCII-only with no spaces, and it cannot start with a number).\n"
 "To get rid of this message, remove the sketch from\n"
 "{1}"
-msgstr ""
-"程序 \"{0}\" 不能使用。\n"
-"程序名称必须只包含基本的字母和数字\n"
-"(只有不包含空格的ASCII码, 并且不能以数字开头)。\n"
-"去掉这条消息，请从{1}中移除此程序\n"
+msgstr "无法使用草稿码\"{0}\"。\n草稿码的名称只能含有基本字母与数字\n（只能是ASCII，不能含有空白字符，也不能以数字开头）。\n若不想看到此信息，请从{1}移除该草稿码。"
 
-#: Sketch.java:1797
+#: Sketch.java:1755
 msgid ""
 "The sketch folder has disappeared.\n"
 " Will attempt to re-save in the same location,\n"
 "but anything besides the code will be lost."
 msgstr ""
-"程序目录丢失了。\n"
-"将会尝试重新保存在同样的位置，\n"
-"但除代码外其他内容都将丢失。"
 
-#: Sketch.java:2060
+#: Sketch.java:2018
 msgid ""
 "The sketch name had to be modified. Sketch names can only consist\n"
 "of ASCII characters and numbers (but cannot start with a number).\n"
 "They should also be less less than 64 characters long."
 msgstr ""
-"程序名称改变了。程序名只能由\n"
-"ASCII码组成（但不能艺术字开头）。\n"
-"而且它必须短于64个字符。"
 
-#: Base.java:258
+#: Base.java:259
 msgid ""
 "The sketchbook folder no longer exists.\n"
 "Arduino will switch to the default sketchbook\n"
 "location, and create a new sketchbook folder if\n"
 "necessary. Arduino will then stop talking about\n"
 "himself in the third person."
-msgstr ""
-"程序库目录不存在。\n"
-"Arduino将切换到默认的程序库目录,\n"
-"如果必要的话将创建新目录。\n"
-"之后Arduino将不在用第三人称讨论它自己。"
+msgstr "草稿码文件夹已不存在，\nArduino将使用预设的文件夹位置，\n并视需要新增文件夹。\n然后Arduino将停止以第三人称提及自己。"
 
-#: Sketch.java:1079
+#: Sketch.java:1075
 msgid ""
 "This file has already been copied to the\n"
 "location from which where you're trying to add it.\n"
 "I ain't not doin nuthin'."
 msgstr ""
-"这个文件已经被复制到\n"
-"你正在试图加入的位置中。\n"
-"我神马都不会做地"
 
 #: ../../../processing/app/EditorStatus.java:467
 msgid "This report would have more information with"
 msgstr ""
 
-#: Base.java:532
+#: Base.java:535
 msgid "Time for a Break"
-msgstr "休息的时间到了噢"
+msgstr "休息时间"
 
-#: Editor.java:656
+#: Editor.java:663
 msgid "Tools"
-msgstr "工具"
+msgstr ""
 
-#: Editor.java:1057
+#: Editor.java:1070
 msgid "Troubleshooting"
-msgstr "问题排除"
+msgstr ""
 
 #: ../../../processing/app/Preferences.java:117
 msgid "Turkish"
@@ -1531,7 +1523,7 @@ msgid "Unable to connect: is the sketch using the bridge?"
 msgstr ""
 
 #: ../../../processing/app/NetworkMonitor.java:130
-msgid "Unable to connect: retrying ("
+msgid "Unable to connect: retrying"
 msgstr ""
 
 #: ../../../processing/app/Editor.java:2526
@@ -1542,14 +1534,14 @@ msgstr ""
 msgid "Unable to open serial monitor"
 msgstr ""
 
-#: Sketch.java:1433
+#: Sketch.java:1432
 #, java-format
 msgid "Uncaught exception type: {0}"
-msgstr "未捕获的意外类型：{0}"
+msgstr ""
 
-#: Editor.java:1119 Editor.java:1341
+#: Editor.java:1133 Editor.java:1355
 msgid "Undo"
-msgstr "恢复"
+msgstr ""
 
 #: Platform.java:168
 msgid ""
@@ -1557,154 +1549,146 @@ msgid ""
 "To enable opening URLs or folders, add a \n"
 "\"launcher=/path/to/app\" line to preferences.txt"
 msgstr ""
-"不确定的平台，没有可用的加载程序\n"
-"若要打开URL或者文件夹，增加这一行：\n"
-"\"launcher=/path/to/app\" 至preferences.txt文件中。"
 
 #: UpdateCheck.java:111
 msgid "Update"
-msgstr "更新"
+msgstr ""
 
-#: Preferences.java:412
+#: Preferences.java:428
 msgid "Update sketch files to new extension on save (.pde -> .ino)"
-msgstr "保存时更新程序文件的扩展名（.pde ->.ino）"
+msgstr "保存时更新草稿码文件的扩展名（.pde -> .ino）"
 
-#: Editor.java:538 EditorToolbar.java:41
+#: EditorToolbar.java:41 Editor.java:545
 msgid "Upload"
-msgstr "下载"
+msgstr "上传"
 
-#: Editor.java:546 EditorToolbar.java:46
+#: EditorToolbar.java:46 Editor.java:553
 msgid "Upload Using Programmer"
-msgstr "使用编程器下载"
+msgstr "以编程器上传"
 
-#: Editor.java:2356 Editor.java:2392
+#: Editor.java:2403 Editor.java:2439
 msgid "Upload canceled."
-msgstr "下载被取消了。"
+msgstr ""
 
 #: ../../../processing/app/Sketch.java:1678
 msgid "Upload cancelled"
 msgstr ""
 
-#: Editor.java:2331
+#: Editor.java:2378
 msgid "Uploading to I/O Board..."
-msgstr "下载到I/O板卡中..."
+msgstr ""
 
-#: Sketch.java:1661
+#: Sketch.java:1622
 msgid "Uploading..."
-msgstr "下载中..."
+msgstr ""
 
-#: Editor.java:1255
+#: Editor.java:1269
 msgid "Use Selection For Find"
-msgstr "查找选择内容"
+msgstr ""
 
-#: Preferences.java:393
+#: Preferences.java:409
 msgid "Use external editor"
 msgstr "使用外部编辑器"
 
 #: EditorToolbar.java:41 EditorToolbar.java:46
 msgid "Verify"
-msgstr "校验"
+msgstr "验证"
 
-#: Editor.java:602
+#: Editor.java:609
 msgid "Verify / Compile"
-msgstr "校验/编译"
-
-#: Preferences.java:384
-msgid "Verify code after upload"
 msgstr ""
 
-#: Editor.java:1091
-msgid "Visit Arduino.cc"
-msgstr "访问Arduino.cc"
+#: Preferences.java:400
+msgid "Verify code after upload"
+msgstr "上传后验证代码"
 
-#: Base.java:1842
+#: ../../../processing/app/Preferences.java:154
+msgid "Vietnamese"
+msgstr ""
+
+#: Editor.java:1105
+msgid "Visit Arduino.cc"
+msgstr ""
+
+#: Base.java:2128
 msgid "Warning"
 msgstr "警告"
 
-#: debug/Compiler.java:501
+#: debug/Compiler.java:444
 msgid "Wire.receive() has been renamed Wire.read()."
-msgstr "Wire.receive()被重命名为Wire.read()。"
+msgstr ""
 
-#: debug/Compiler.java:495
+#: debug/Compiler.java:438
 msgid "Wire.send() has been renamed Wire.write()."
-msgstr "Wire.send()被重命名为Wire.write()。"
+msgstr ""
 
 #: FindReplace.java:105
 msgid "Wrap Around"
-msgstr "高亮"
+msgstr "环绕"
 
 #: debug/Uploader.java:213
 msgid ""
 "Wrong microcontroller found.  Did you select the right board from the Tools "
 "> Board menu?"
 msgstr ""
-"找到错误的单片机。你在 工具->板卡 菜单里选择正确的板卡了么？"
 
-#: UpdateCheck.java:108 Preferences.java:76
+#: Preferences.java:77 UpdateCheck.java:108
 msgid "Yes"
 msgstr "是"
 
-#: Sketch.java:1078
+#: Sketch.java:1074
 msgid "You can't fool me"
-msgstr "你瞒不了我"
+msgstr ""
 
-#: Sketch.java:415
+#: Sketch.java:411
 msgid "You can't have a .cpp file with the same name as the sketch."
-msgstr ".cpp文件不能和程序的文件名相同。"
+msgstr "草稿码和.cpp文件名不能相同。"
 
-#: Sketch.java:425
+#: Sketch.java:421
 msgid ""
 "You can't rename the sketch to \"{0}\"\n"
 "because the sketch already has a .cpp file with that name."
-msgstr ""
-"你可以重命名程序为\"{0}\"\n"
-"因为已经有名为.cpp的文件在程序中。"
+msgstr "草稿码不能重命名为{0}\n因为草稿码中已有相同命名的.cpp文件。"
 
-#: Sketch.java:865
+#: Sketch.java:861
 msgid ""
 "You can't save the sketch as \"{0}\"\n"
 "because the sketch already has a .cpp file with that name."
-msgstr ""
-"你不能将程序另存为\"{0}\"\n"
-"，因为程序已经有相同名称的.cpp文件了。"
+msgstr "你不能将草稿码存为{0}\n因为草稿码中已有相同命名的.cpp文件。"
 
-#: Sketch.java:887
+#: Sketch.java:883
 msgid ""
 "You cannot save the sketch into a folder\n"
 "inside itself. This would go on forever."
 msgstr ""
-"你不能保存程序在他自己的文件夹中，\n"
-"这样它会无尽进行保存。"
 
-#: Base.java:1602
+#: Base.java:1888
 msgid "You forgot your sketchbook"
-msgstr "你忘记你的程序库了"
+msgstr "你忘记你的草稿码了"
 
 #: ../../../processing/app/AbstractMonitor.java:92
 msgid ""
 "You've pressed {0} but nothing was sent. Should you select a line ending?"
 msgstr ""
 
-#: Base.java:533
+#: Base.java:536
 msgid ""
 "You've reached the limit for auto naming of new sketches\n"
 "for the day. How about going for a walk instead?"
-msgstr ""
-"你已经到了一天中自动命名新程序的上限了，\n"
-"外出散散步，休息一下怎么样？"
+msgstr "你已经达到一天内可自动命名新草稿码的限制了，\n为何不出去散散步呢？"
 
-#: ../../../processing/app/Base.java:2847
+#: Base.java:2638
 msgid "ZIP files or folders"
-msgstr ""
+msgstr "ZIP文件或文件夹"
 
-#: ../../../processing/app/Base.java:2870
+#: Base.java:2661
 msgid "Zip doesn't contain a library"
-msgstr ""
+msgstr "Zip并不包含库"
 
-#: Sketch.java:368
+#: Sketch.java:364
 #, java-format
 msgid "\".{0}\" is not a valid extension."
-msgstr "\".{0}\"不是合法的扩展名。"
+msgstr "“.{0}”不是合法的扩展名"
 
 #: SketchCode.java:258
 #, java-format
@@ -1713,99 +1697,64 @@ msgid ""
 "older version of Processing,you may need to use Tools -> Fix Encoding & "
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
-msgstr ""
-"\"{0}\"包含无法识别的字符。如果这份代码是由早期版本的Processing"
-"建立的话，你需要使用 工具->修正编码并重新载入 菜单将程序"
-"更新为UTF-8编码，如果不这样做，你需要"
-"删除错误的字符来去除这个警告。"
+msgstr "”{0}“含有无法识别的字符，若该代码为旧版Processing所建立，你或许需要利用”工具->修正代码并重新载入“以UTF-8编码來更新草稿码，如不行，请刪除非法字符摆脱此警告信息。"
 
-#: debug/Compiler.java:466
+#: debug/Compiler.java:409
 msgid ""
 "\n"
 "As of Arduino 0019, the Ethernet library depends on the SPI library.\n"
-"You appear to be using it or another library that depends on the SPI "
-"library.\n"
+"You appear to be using it or another library that depends on the SPI library.\n"
 "\n"
 msgstr ""
-"\n"
-"从Arduino0019开始，Ethernet库决定于SPI库。\n"
-"你正在使用Ehternet库或者另外一个决定于SPI库。\n"
-"\n"
 
-#: debug/Compiler.java:472
+#: debug/Compiler.java:415
 msgid ""
 "\n"
 "As of Arduino 1.0, the 'BYTE' keyword is no longer supported.\n"
 "Please use Serial.write() instead.\n"
 "\n"
 msgstr ""
-"\n"
-"从Arduino 1.0开始，关键字'BYTE'不再受到支持。\n"
-"请改用Serial.write()代替它。\n"
-"\n"
 
-#: debug/Compiler.java:484
+#: debug/Compiler.java:427
 msgid ""
 "\n"
-"As of Arduino 1.0, the Client class in the Ethernet library has been renamed "
-"to EthernetClient.\n"
-"\n"
-msgstr ""
-"\n"
-"在Arduino 1.0中，Ethernet库中的Client类已经"
-"重命名为EthernetClient。\n"
-"\n"
-
-#: debug/Compiler.java:478
-msgid ""
-"\n"
-"As of Arduino 1.0, the Server class in the Ethernet library has been renamed "
-"to EthernetServer.\n"
-"\n"
-msgstr ""
-"\n"
-"从Arduino 1.0开始，Ethernet库中的Server类已经"
-"重命名为EthernetServer。\n"
-"\n"
-
-#: ../../../processing/app/debug/Compiler.java:451
-msgid ""
-"\n"
-"As of Arduino 1.0, the Udp class in the Ethernet library has been renamed to "
-"EthernetUdp.\n"
+"As of Arduino 1.0, the Client class in the Ethernet library has been renamed to EthernetClient.\n"
 "\n"
 msgstr ""
 
-#: debug/Compiler.java:502
+#: debug/Compiler.java:421
 msgid ""
 "\n"
-"As of Arduino 1.0, the Wire.receive() function was renamed to Wire.read() "
-"for consistency with other libraries.\n"
+"As of Arduino 1.0, the Server class in the Ethernet library has been renamed to EthernetServer.\n"
 "\n"
 msgstr ""
-"\n"
-"在Arduino 1.0中，Wire.receive()功能已经"
-"重命名为Wire.read()以和其他库保持一致。\n"
-"\n"
 
-#: debug/Compiler.java:496
+#: debug/Compiler.java:433
 msgid ""
 "\n"
-"As of Arduino 1.0, the Wire.send() function was renamed to Wire.write() for "
-"consistency with other libraries.\n"
+"As of Arduino 1.0, the Udp class in the Ethernet library has been renamed to EthernetUdp.\n"
 "\n"
 msgstr ""
-"\n"
-"在Arduino 1.0中，Wire.send()功能已经"
-"重命名为Wire.write()以和其他库保持一致。\n"
-"\n"
 
-#: ../../../processing/app/SerialMonitor.java:41
-#: ../../../processing/app/AbstractMonitor.java:118
+#: debug/Compiler.java:445
+msgid ""
+"\n"
+"As of Arduino 1.0, the Wire.receive() function was renamed to Wire.read() for consistency with other libraries.\n"
+"\n"
+msgstr ""
+
+#: debug/Compiler.java:439
+msgid ""
+"\n"
+"As of Arduino 1.0, the Wire.send() function was renamed to Wire.write() for consistency with other libraries.\n"
+"\n"
+msgstr ""
+
+#: SerialMonitor.java:130 SerialMonitor.java:133
 msgid "baud"
 msgstr ""
 
-#: Preferences.java:373
+#: Preferences.java:389
 msgid "compilation "
 msgstr "编译"
 
@@ -1813,21 +1762,21 @@ msgstr "编译"
 msgid "connected!"
 msgstr ""
 
-#: Sketch.java:544
+#: Sketch.java:540
 msgid "createNewFile() returned false"
-msgstr "createNewFile()返回了错误"
+msgstr "createNewFile()返回false"
 
 #: ../../../processing/app/EditorStatus.java:469
 msgid "enabled in File > Preferences."
 msgstr ""
 
-#: Base.java:1804
+#: Base.java:2090
 msgid "environment"
 msgstr "环境"
 
-#: Editor.java:1094
+#: Editor.java:1108
 msgid "http://arduino.cc/"
-msgstr "http://arduino.cc/"
+msgstr ""
 
 #: ../../../processing/app/debug/Compiler.java:49
 msgid "http://github.com/arduino/Arduino/issues"
@@ -1835,81 +1784,74 @@ msgstr ""
 
 #: UpdateCheck.java:118
 msgid "http://www.arduino.cc/en/Main/Software"
-msgstr "http://www.arduino.cc/en/Main/Software"
+msgstr ""
 
 #: UpdateCheck.java:53
 msgid "http://www.arduino.cc/latest.txt"
-msgstr "http://www.arduino.cc/latest.txt"
+msgstr ""
 
-#: Base.java:1789
+#: Base.java:2075
 msgid "http://www.arduino.cc/playground/Learning/Linux"
 msgstr "http://www.arduino.cc/playground/Learning/Linux"
 
-#: Preferences.java:609
+#: Preferences.java:625
 #, java-format
 msgid "ignoring invalid font size {0}"
-msgstr "忽略无效的字符大小{0}"
+msgstr "忽略无效的字体大小{0}"
 
-#: Base.java:1794
+#: Base.java:2080
 msgid "index.html"
 msgstr "index.html"
 
-#: Editor.java:927 Editor.java:934
+#: Editor.java:936 Editor.java:943
 msgid "name is null"
-msgstr "名称为空"
+msgstr ""
 
-#: Base.java:1804
+#: Base.java:2090
 msgid "platforms.html"
 msgstr "platforms.html"
 
-#: Serial.java:424
+#: Serial.java:451
 #, java-format
 msgid ""
 "readBytesUntil() byte buffer is too small for the {0} bytes up to and "
 "including char {1}"
 msgstr ""
-"readBytesUntil() 字节缓存对{0}字节来说太小了， "
-"包含字符 {1}"
 
-#: Sketch.java:651
+#: Sketch.java:647
 msgid "removeCode: internal error.. could not find code"
-msgstr "移除代码: 内部错误.. 找不到代码"
+msgstr "removeCode: 内部错误...找不到代码"
 
-#: Editor.java:923
+#: Editor.java:932
 msgid "serialMenu is null"
-msgstr "串口菜单是空的"
+msgstr ""
 
-#: debug/Uploader.java:199
+#: debug/Uploader.java:195
 #, java-format
 msgid ""
 "the selected serial port {0} does not exist or your board is not connected"
 msgstr ""
-"你选择的串口{0}不存在，或是板卡没有连接。"
 
-#: ../../../processing/app/EditorStatus.java:456
-msgid "to clipboard"
-msgstr ""
-
-#: Preferences.java:375
+#: Preferences.java:391
 msgid "upload"
-msgstr "下载"
+msgstr "上传"
 
-#: Editor.java:373
+#: Editor.java:380
 #, java-format
 msgid "{0} files added to the sketch."
-msgstr "{0}个文件加入到程序中"
+msgstr ""
 
-#: debug/Compiler.java:422
+#: debug/Compiler.java:365
 #, java-format
 msgid "{0} returned {1}"
-msgstr "{0}返回了{1}"
+msgstr ""
 
-#: Editor.java:2166
+#: Editor.java:2213
 #, java-format
 msgid "{0} | Arduino {1}"
-msgstr "{0} | Arduino {1}"
+msgstr ""
 
-#: Editor.java:1826
+#: Editor.java:1874
 #, java-format
 msgid "{0}.html"
-msgstr "{0}.html"
+msgstr ""

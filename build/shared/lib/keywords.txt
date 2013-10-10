@@ -134,6 +134,7 @@ sin	KEYWORD2	Sin
 sq	KEYWORD2	Sq
 sqrt	KEYWORD2	Sqrt
 tan	KEYWORD2	Tan
+pow	KEYWORD2	Pow
 
 bitRead	KEYWORD2	BitRead
 bitWrite	KEYWORD2	BitWrite

@@ -1,4 +1,23 @@
 
+ARDUINO 1.5.5 BETA
+
+[ide]
+* Added missing keywords: YunServer, YunClient, pow
+
+[libraries]
+* avr: Fixed buffer overflow in File::doBuffer() (dreggy)
+* avr: Fixed timeout in Bridge::transfer()
+* sam: Fixed SPI initialization (when using extended API and multiple CS)
+* avr: Fixed behavior of EthernetClient::flush()
+
+[core]
+* sam: Fixed wrong initialization for ADC timings (analogRead speed Arduino DUE improved by a factor x10)
+       https://github.com/arduino/Arduino/issues/1418
+       (http://www.djerickson.com/arduino/)
+* avr: Fixed wrong extended fuses on Arduino Yún when using external programmer
+* avr: Added yun variant with LED_BUILTIN definition
+* avr: Refactored Mega* variants definitions in boards.txt (Kristian Sloth Lauszus)
+
 ARDUINO 1.5.4 BETA 2013.09.10
 
 [ide]

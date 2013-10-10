@@ -120,8 +120,7 @@ int EthernetClient::peek() {
 }
 
 void EthernetClient::flush() {
-  while (available())
-    read();
+  ::flush(_sock);
 }
 
 void EthernetClient::stop() {

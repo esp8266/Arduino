@@ -712,9 +712,7 @@
   <target name="windows-dist" depends="windows-build"
 	  description="Create .zip files of windows version">
 
-    <!--get src="http://dev.processing.org/build/jre-tools-6u18-windows-i586.zip" 
-	 dest="windows/jre.zip" 
-	 usetimestamp="true" /-->
+    <get src="http://downloads.arduino.cc/jre_7u40_windows_i586.zip" dest="windows/jre.zip" usetimestamp="true" />
 
     <unzip dest="windows/work" src="windows/jre.zip" overwrite="false"/>
 

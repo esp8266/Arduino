@@ -1424,10 +1424,7 @@ public class Sketch {
 
     importedLibraries = new LibraryList();
     for (String item : preprocessor.getExtraImports()) {
-
       Library lib = Base.importToLibraryTable.get(item);
-      //If needed can Debug libraryPath here
-
       if (lib != null && !importedLibraries.contains(lib)) {
         importedLibraries.add(lib);
       }

@@ -75,7 +75,7 @@ public class Compiler implements MessageConsumer {
                          String _primaryClassName, boolean _verbose)
       throws RunnerException {
     sketch = _sketch;
-    verbose = _verbose;
+    verbose = _verbose || Preferences.getBoolean("build.verbose");
     sketchIsCompiled = false;
     objectFiles = new ArrayList<File>();
 
@@ -87,10 +87,17 @@ public class Compiler implements MessageConsumer {
     includePaths.add(prefs.get("build.core.path"));
     if (prefs.get("build.variant.path").length() != 0)
       includePaths.add(prefs.get("build.variant.path"));
-    for (Library lib : sketch.getImportedLibraries())
+    for (Library lib : sketch.getImportedLibraries()) {
+      if (verbose)
+        System.out.println(I18n
+            .format(_("Using library {0} in folder: {1} {2}"), lib.getName(),
+                    lib.getFolder(), lib.isPre15Lib() ? "(pre-1.5)" : ""));
       for (File folder : lib.getSrcFolders(targetArch))
         includePaths.add(folder.getPath());
-
+    }
+    if (verbose)
+      System.out.println();
+    
     // 1. compile the sketch (already in the buildPath)
     sketch.setCompilingProgress(30);
     compileSketch(includePaths);
@@ -308,8 +315,8 @@ public class Compiler implements MessageConsumer {
     } catch (Exception e) {
       return false;  // any error reading dep file = recompile it
     }
-    if (ret && (verbose || Preferences.getBoolean("build.verbose"))) {
-      System.out.println("  Using previously compiled: " + obj.getPath());
+    if (ret && verbose) {
+      System.out.println(I18n.format(_("Using previously compiled file: {0}"), obj.getPath()));
     }
     return ret;
   }
@@ -334,7 +341,7 @@ public class Compiler implements MessageConsumer {
       return;
     int result = 0;
 
-    if (verbose || Preferences.getBoolean("build.verbose")) {
+    if (verbose) {
       for (String c : command)
         System.out.print(c + " ");
       System.out.println();

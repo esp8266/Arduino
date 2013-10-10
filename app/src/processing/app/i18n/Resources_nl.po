@@ -10,8 +10,8 @@ msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2012-11-08 10:50+0000\n"
-"Last-Translator: MrWhammy <brecht@yperman.eu>\n"
+"PO-Revision-Date: 2013-09-10 10:35+0000\n"
+"Last-Translator: cmaglie <c.maglie@arduino.cc>\n"
 "Language-Team: Dutch (http://www.transifex.com/projects/p/arduino-ide-15/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -161,7 +161,7 @@ msgstr "Arduino vereist een volledige JDK (niet enkel een JRE)\nom op te kunnen 
 
 #: ../../../processing/app/EditorStatus.java:471
 msgid "Arduino: "
-msgstr ""
+msgstr "Arduino: "
 
 #: Sketch.java:588
 #, java-format
@@ -171,6 +171,14 @@ msgstr "Ben je zeker dat je \"{0}\" wil verwijderen?"
 #: Sketch.java:587
 msgid "Are you sure you want to delete this sketch?"
 msgstr "Ben je zeker dat je deze schets wil verwijderen?"
+
+#: ../../../processing/app/Preferences.java:137
+msgid "Armenian"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:138
+msgid "Asturian"
+msgstr ""
 
 #: tools/AutoFormat.java:91
 msgid "Auto Format"
@@ -213,9 +221,8 @@ msgstr "Ernstige fout regel: {0}"
 msgid "Bad file selected"
 msgstr "Foutief bestand geselecteerd"
 
-#: ../../../processing/app/Sketch.java:1638
-#, java-format
-msgid "Binary sketch size: {0} bytes (of a {1} byte maximum) - {2}%% used"
+#: ../../../processing/app/Preferences.java:139
+msgid "Belarusian"
 msgstr ""
 
 #: ../../../processing/app/Base.java:1433
@@ -226,12 +233,16 @@ msgstr ""
 #: ../../../processing/app/debug/TargetBoard.java:42
 #, java-format
 msgid ""
-"Board {0}:{1}:{2} doesn''t define a ''build.board'' preference. Auto-set to: "
-"{3}"
+"Board {0}:{1}:{2} doesn''t define a ''build.board'' preference. Auto-set to:"
+" {3}"
 msgstr ""
 
 #: ../../../processing/app/EditorStatus.java:472
 msgid "Board: "
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:140
+msgid "Bosnian"
 msgstr ""
 
 #: SerialMonitor.java:112
@@ -248,6 +259,10 @@ msgstr "De map met bouwpogingen is verdwenen of er kon niet naar geschreven word
 
 #: ../../../processing/app/Preferences.java:80
 msgid "Bulgarian"
+msgstr "Bulgaars"
+
+#: ../../../processing/app/Preferences.java:141
+msgid "Burmese (Myanmar)"
 msgstr ""
 
 #: Editor.java:708
@@ -264,7 +279,7 @@ msgstr ""
 
 #: ../../../processing/app/Preferences.java:92
 msgid "Canadian French"
-msgstr ""
+msgstr "Canadees Frans"
 
 #: Preferences.java:79 Sketch.java:585 Sketch.java:737 Sketch.java:1042
 #: Editor.java:2064 Editor.java:2145 Editor.java:2465
@@ -286,6 +301,22 @@ msgstr "Catalaans"
 #: Preferences.java:419
 msgid "Check for updates on startup"
 msgstr "Controleer op updates tijdens het opstarten"
+
+#: ../../../processing/app/Preferences.java:142
+msgid "Chinese (China)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:142
+msgid "Chinese (Hong Kong)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:144
+msgid "Chinese (Taiwan)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:143
+msgid "Chinese (Taiwan) (Big5)"
+msgstr ""
 
 #: Preferences.java:88
 msgid "Chinese Simplified"
@@ -326,7 +357,7 @@ msgstr "Kopieer als HTML"
 
 #: ../../../processing/app/EditorStatus.java:456
 msgid "Copy error"
-msgstr ""
+msgstr "Fout bij het kopiëren"
 
 #: Editor.java:1165 Editor.java:2715
 msgid "Copy for Forum"
@@ -468,7 +499,7 @@ msgstr "Kan geen Board vinden op de geselecteerde poort. Kijk na of je de correc
 
 #: ../../../processing/app/Preferences.java:82
 msgid "Croatian"
-msgstr ""
+msgstr "Kroatisch"
 
 #: Editor.java:1149 Editor.java:2699
 msgid "Cut"
@@ -476,7 +507,7 @@ msgstr "Knippen"
 
 #: ../../../processing/app/Preferences.java:83
 msgid "Czech"
-msgstr ""
+msgstr "Tsjechisch"
 
 #: Preferences.java:90
 msgid "Danish"
@@ -528,6 +559,10 @@ msgstr "Uploaden voltooid."
 msgid "Dutch"
 msgstr "Nederlands"
 
+#: ../../../processing/app/Preferences.java:144
+msgid "Dutch (Netherlands)"
+msgstr ""
+
 #: Editor.java:1130
 msgid "Edit"
 msgstr "Bewerken"
@@ -543,6 +578,10 @@ msgstr "Taal voor editor:"
 #: Preferences.java:92
 msgid "English"
 msgstr "Engels"
+
+#: ../../../processing/app/Preferences.java:145
+msgid "English (United Kingdom)"
+msgstr ""
 
 #: Editor.java:1062
 msgid "Environment"
@@ -573,14 +612,14 @@ msgstr "Fout is Serial.{0}()"
 
 #: ../../../processing/app/Base.java:1232
 msgid "Error loading libraries"
-msgstr ""
+msgstr "Fout bij het inlezen van de bibliotheken"
 
 #: ../../../processing/app/debug/TargetPlatform.java:95
 #: ../../../processing/app/debug/TargetPlatform.java:106
 #: ../../../processing/app/debug/TargetPlatform.java:117
 #, java-format
 msgid "Error loading {0}"
-msgstr ""
+msgstr "Fout bij het laden van {0}"
 
 #: Serial.java:181
 #, java-format
@@ -633,6 +672,10 @@ msgstr ""
 msgid "Estonian"
 msgstr "Ests"
 
+#: ../../../processing/app/Preferences.java:146
+msgid "Estonian (Estonia)"
+msgstr ""
+
 #: Editor.java:516
 msgid "Examples"
 msgstr "Voorbeelden"
@@ -677,6 +720,10 @@ msgstr "Zoeken..."
 msgid "Find:"
 msgstr "Zoeken:"
 
+#: ../../../processing/app/Preferences.java:147
+msgid "Finnish"
+msgstr ""
+
 #: tools/FixEncoding.java:41 tools/FixEncoding.java:58
 #: tools/FixEncoding.java:79
 msgid "Fix Encoding & Reload"
@@ -706,7 +753,7 @@ msgstr "Galicisch"
 
 #: ../../../processing/app/Preferences.java:94
 msgid "Georgian"
-msgstr ""
+msgstr "Georgisch"
 
 #: Preferences.java:97
 msgid "German"
@@ -715,6 +762,18 @@ msgstr "Duits"
 #: Editor.java:1054
 msgid "Getting Started"
 msgstr "Aan de slag"
+
+#: ../../../processing/app/Sketch.java:1646
+#, java-format
+msgid ""
+"Global variables use {0} bytes ({2}%%) of dynamic memory, leaving {3} bytes "
+"for local variables. Maximum is {1} bytes."
+msgstr ""
+
+#: ../../../processing/app/Sketch.java:1651
+#, java-format
+msgid "Global variables use {0} bytes of dynamic memory."
+msgstr ""
 
 #: Preferences.java:98
 msgid "Greek"
@@ -738,7 +797,7 @@ msgstr "Guide_Windows.html"
 
 #: ../../../processing/app/Preferences.java:95
 msgid "Hebrew"
-msgstr ""
+msgstr "Hebreeuws"
 
 #: Editor.java:1015
 msgid "Help"
@@ -787,7 +846,7 @@ msgid ""
 "disable this in the Preferences dialog.\n"
 "\n"
 "Save sketch and update its extension?"
-msgstr ""
+msgstr "In Arduino 1.0 is de standaard bestandsextensie veranderd van .pde naar .ino. Nieuwe schetsen (inclusief degene aangemaakt door \"Opslaan als\") zullen de nieuwe extensie gebruiken. De extensie van bestaande schetsen zal veranderd worden bij opslaan, maar dit kan worden afgezet in het Voorkeuren scherm. Schets opslaan en de extensie veranderen?"
 
 #: Editor.java:1216 Editor.java:2757
 msgid "Increase Indent"
@@ -800,7 +859,7 @@ msgstr "Indonesisch"
 #: ../../../processing/app/Base.java:1204
 #, java-format
 msgid "Invalid library found in {0}: {1}"
-msgstr ""
+msgstr "Ongeldige bibliotheek gevonden in {0}: {1}"
 
 #: Preferences.java:102
 msgid "Italian"
@@ -828,7 +887,7 @@ msgstr "Litouws"
 
 #: ../../../processing/app/Sketch.java:1660
 msgid "Low memory available, stability problems may occur"
-msgstr ""
+msgstr "Weinig geheugen beschikbaar, er kunnen zich stabiliteitsproblemen voordoen"
 
 #: Preferences.java:107
 msgid "Marathi"
@@ -837,16 +896,6 @@ msgstr "Marathi"
 #: Base.java:2112
 msgid "Message"
 msgstr "Boodschap"
-
-#: ../../../processing/app/Sketch.java:1646
-#, java-format
-msgid "Minimum Memory usage: {0} bytes"
-msgstr ""
-
-#: ../../../processing/app/Sketch.java:1643
-#, java-format
-msgid "Minimum Memory usage: {0} bytes (of a {1} byte maximum) - {2}%% used"
-msgstr ""
 
 #: Sketch.java:1712
 msgid "Missing the */ from the end of a /* comment */"
@@ -863,6 +912,10 @@ msgstr "Bezig met verplaatsen"
 #: Sketch.java:282
 msgid "Name for new file:"
 msgstr "Naam voor het nieuwe bestand:"
+
+#: ../../../processing/app/Preferences.java:149
+msgid "Nepali"
+msgstr ""
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:51
 msgid "Network upload using programmer not supported"
@@ -925,6 +978,11 @@ msgstr "Geen naslagwerk beschikbaar voor \"{0}\""
 msgid "No valid configured cores found! Exiting..."
 msgstr ""
 
+#: ../../../processing/app/debug/TargetPackage.java:63
+#, java-format
+msgid "No valid hardware definitions found in folder {0}."
+msgstr ""
+
 #: Base.java:191
 msgid "Non-fatal error while setting the Look & Feel."
 msgstr "Niet-fatale fout bij het instellen van de Look & Feel"
@@ -932,10 +990,6 @@ msgstr "Niet-fatale fout bij het instellen van de Look & Feel"
 #: Sketch.java:396 Sketch.java:410 Sketch.java:419 Sketch.java:859
 msgid "Nope"
 msgstr "Neen"
-
-#: Preferences.java:108
-msgid "Norwegian"
-msgstr "Noors"
 
 #: ../../../processing/app/Preferences.java:108
 msgid "Norwegian Bokmål"
@@ -945,7 +999,7 @@ msgstr ""
 msgid ""
 "Not enough memory; see http://www.arduino.cc/en/Guide/Troubleshooting#size "
 "for tips on reducing your footprint."
-msgstr ""
+msgstr "Niet genoeg geheugen: ga naar http://www.arduino.cc/en/Guide/Troubleshooting#size voor tips over het verkleinen van de voetafdruk."
 
 #: Preferences.java:80 Sketch.java:585 Sketch.java:737 Sketch.java:1042
 #: Editor.java:2145 Editor.java:2465
@@ -1008,9 +1062,17 @@ msgstr "Pools"
 msgid "Port"
 msgstr ""
 
-#: Preferences.java:111 Preferences.java:112
-msgid "Portuguese"
-msgstr "Portugees"
+#: ../../../processing/app/Preferences.java:151
+msgid "Portugese"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:127
+msgid "Portuguese (Brazil)"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:128
+msgid "Portuguese (Portugal)"
+msgstr ""
 
 #: Preferences.java:295 Editor.java:583
 msgid "Preferences"
@@ -1234,7 +1296,7 @@ msgstr "Toon Schets folder"
 
 #: ../../../processing/app/EditorStatus.java:468
 msgid "Show verbose output during compilation"
-msgstr ""
+msgstr "Toon uitgebreide uitvoer gedurende compilatie"
 
 #: Preferences.java:387
 msgid "Show verbose output during: "
@@ -1270,6 +1332,13 @@ msgid ""
 "tips on reducing it."
 msgstr "Schets is te groot; ga naar http://www.arduino.cc/en/Guide/Troubleshooting#size voor tips over het verkleinen van de schets."
 
+#: ../../../processing/app/Sketch.java:1639
+#, java-format
+msgid ""
+"Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} "
+"bytes."
+msgstr ""
+
 #: Editor.java:510
 msgid "Sketchbook"
 msgstr "Schetsboek"
@@ -1281,6 +1350,10 @@ msgstr "De map met schetsboeken is verdwenen"
 #: Preferences.java:315
 msgid "Sketchbook location:"
 msgstr "Schetsboek locatie:"
+
+#: ../../../processing/app/Preferences.java:152
+msgid "Slovenian"
+msgstr ""
 
 #: Sketch.java:275 Sketch.java:304 Sketch.java:578 Sketch.java:967
 msgid ""
@@ -1307,6 +1380,10 @@ msgstr "Spaans"
 #: Base.java:540
 msgid "Sunshine"
 msgstr "Zonneschijn"
+
+#: ../../../processing/app/Preferences.java:153
+msgid "Swedish"
+msgstr ""
 
 #: Preferences.java:84
 msgid "System Default"
@@ -1412,7 +1489,7 @@ msgstr "Dit bestand is reeds gekopieërd naar de locatie\nwaar je het aan probee
 
 #: ../../../processing/app/EditorStatus.java:467
 msgid "This report would have more information with"
-msgstr ""
+msgstr "Dit rapport zou meer informatie hebben met"
 
 #: Base.java:535
 msgid "Time for a Break"
@@ -1428,7 +1505,7 @@ msgstr "Problemen oplossen"
 
 #: ../../../processing/app/Preferences.java:117
 msgid "Turkish"
-msgstr ""
+msgstr "Turks"
 
 #: ../../../processing/app/Editor.java:2507
 msgid "Type board password to access its console"
@@ -1440,7 +1517,7 @@ msgstr ""
 
 #: ../../../processing/app/Preferences.java:118
 msgid "Ukrainian"
-msgstr ""
+msgstr "Oekraïens"
 
 #: ../../../processing/app/Editor.java:2524
 #: ../../../processing/app/NetworkMonitor.java:145
@@ -1448,7 +1525,7 @@ msgid "Unable to connect: is the sketch using the bridge?"
 msgstr ""
 
 #: ../../../processing/app/NetworkMonitor.java:130
-msgid "Unable to connect: retrying ("
+msgid "Unable to connect: retrying"
 msgstr ""
 
 #: ../../../processing/app/Editor.java:2526
@@ -1526,6 +1603,10 @@ msgstr "Verifieer / Compileer"
 #: Preferences.java:400
 msgid "Verify code after upload"
 msgstr "Verifieer code na uploaden"
+
+#: ../../../processing/app/Preferences.java:154
+msgid "Vietnamese"
+msgstr ""
 
 #: Editor.java:1105
 msgid "Visit Arduino.cc"
@@ -1689,7 +1770,7 @@ msgstr "createNewFile() heeft false teruggegeven"
 
 #: ../../../processing/app/EditorStatus.java:469
 msgid "enabled in File > Preferences."
-msgstr ""
+msgstr "ingeschakeld in Bestand > Voorkeuren."
 
 #: Base.java:2090
 msgid "environment"
@@ -1701,7 +1782,7 @@ msgstr "http://arduino.cc/"
 
 #: ../../../processing/app/debug/Compiler.java:49
 msgid "http://github.com/arduino/Arduino/issues"
-msgstr ""
+msgstr "http://github.com/arduino/Arduino/issues"
 
 #: UpdateCheck.java:118
 msgid "http://www.arduino.cc/en/Main/Software"
@@ -1752,10 +1833,6 @@ msgstr "serialMenu is null"
 msgid ""
 "the selected serial port {0} does not exist or your board is not connected"
 msgstr "de geselecteerde seriële poort {0} bestaat niet of je board is niet aangesloten."
-
-#: ../../../processing/app/EditorStatus.java:456
-msgid "to clipboard"
-msgstr ""
 
 #: Preferences.java:391
 msgid "upload"
