@@ -31,7 +31,7 @@ package cc.arduino.packages.discoverers;
 
 import cc.arduino.packages.BoardPort;
 import cc.arduino.packages.Discovery;
-import cc.arduino.packages.discoverers.network.NetworkChecker;
+import cc.arduino.packages.discoverers.network.*;
 import processing.app.Base;
 import processing.app.helpers.NetUtils;
 import processing.app.helpers.PreferencesMap;

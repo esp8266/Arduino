@@ -18,6 +18,7 @@
 
 package processing.app;
 
+import cc.arduino.packages.BoardPort;
 import processing.core.PApplet;
 
 import java.awt.*;
@@ -32,10 +33,10 @@ public class SerialMonitor extends AbstractMonitor {
   private Serial serial;
   private int serialRate;
 
-  public SerialMonitor(String port) {
-    super(port);
+  public SerialMonitor(BoardPort port) {
+    super(port.getLabel());
 
-    this.port = port;
+    this.port = port.getAddress();
 
     serialRate = Preferences.getInteger("serial.debug_rate");
     serialRates.setSelectedItem(serialRate + " " + _("baud"));

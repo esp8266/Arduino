@@ -27,11 +27,10 @@
  * Copyright 2013 Arduino LLC (http://www.arduino.cc/)
  */
 
-package cc.arduino.packages.uploaders.ssh;
+package cc.arduino.packages.ssh;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
 import java.io.*;

@@ -31,21 +31,24 @@ package cc.arduino.packages;
 
 import cc.arduino.packages.uploaders.SSHUploader;
 import cc.arduino.packages.uploaders.SerialUploader;
-import processing.app.*;
+import processing.app.AbstractMonitor;
+import processing.app.Base;
+import processing.app.NetworkMonitor;
+import processing.app.SerialMonitor;
 import processing.app.debug.TargetBoard;
 
 public class UploaderAndMonitorFactory {
 
-  public Uploader newUploader(TargetBoard board, String port) {
-    if ("true".equals(board.getPreferences().get("upload.via_ssh")) && Constants.IPV4_ADDRESS.matcher(port).find()) {
+  public Uploader newUploader(TargetBoard board, BoardPort port) {
+    if ("true".equals(board.getPreferences().get("upload.via_ssh")) && "network".equals(port.getProtocol())) {
       return new SSHUploader(port);
     }
 
     return new SerialUploader();
   }
 
-  public AbstractMonitor newMonitor(String port, Base base) {
-    if (Constants.IPV4_ADDRESS.matcher(port).find()) {
+  public AbstractMonitor newMonitor(BoardPort port, Base base) {
+    if ("network".equals(port.getProtocol())) {
       return new NetworkMonitor(port, base);
     }
 

@@ -29,15 +29,13 @@
 
 package cc.arduino.packages.uploaders;
 
+import cc.arduino.packages.BoardPort;
 import cc.arduino.packages.Uploader;
-import cc.arduino.packages.uploaders.ssh.SCP;
-import cc.arduino.packages.uploaders.ssh.SSH;
+import cc.arduino.packages.ssh.*;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import processing.app.Base;
-import processing.app.Constants;
-import processing.app.NetworkMonitor;
 import processing.app.Preferences;
 import processing.app.debug.RunnerException;
 import processing.app.debug.TargetPlatform;
@@ -48,7 +46,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
 
 import static processing.app.I18n._;
 
@@ -56,22 +53,19 @@ public class SSHUploader extends Uploader {
 
   private static final List<String> FILES_NOT_TO_COPY = Arrays.asList(".DS_Store", ".Trash", "Thumbs.db", "__MACOSX");
 
-  private final String ipAddress;
+  private final BoardPort port;
 
-  public SSHUploader(String port) {
-    Matcher matcher = Constants.IPV4_ADDRESS.matcher(port);
-    if (!matcher.find()) {
-      throw new IllegalArgumentException(port);
-    }
-    ipAddress = matcher.group();
+  public SSHUploader(BoardPort port) {
+    this.port = port;
   }
 
   public boolean requiresAuthorization() {
     return true;
   }
 
+  @Override
   public String getAuthorizationKey() {
-    return "runtime.pwd." + ipAddress;
+    return "runtime.pwd." + port.getAddress();
   }
 
   @Override
@@ -84,10 +78,10 @@ public class SSHUploader extends Uploader {
     SCP scp = null;
     try {
       JSch jSch = new JSch();
-      session = jSch.getSession("root", ipAddress, 22);
-      session.setPassword(Preferences.get(getAuthorizationKey()));
+      SSHClientSetupChainRing sshClientSetupChain = new SSHConfigFileSetup(new SSHPwdSetup());
+      session = sshClientSetupChain.setup(port, jSch);
 
-      session.setUserInfo(new NetworkMonitor.NoInteractionUserInfo());
+      session.setUserInfo(new NoInteractionUserInfo(Preferences.get("runtime.pwd." + port.getAddress())));
       session.connect(30000);
 
       scp = new SCP(session);
@@ -97,7 +91,8 @@ public class SSHUploader extends Uploader {
 
       return runAVRDude(ssh);
     } catch (JSchException e) {
-      if ("Auth cancel".equals(e.getMessage())) {
+      String message = e.getMessage();
+      if ("Auth cancel".equals(message) || "Auth fail".equals(message)) {
         return false;
       }
       throw new RunnerException(e);

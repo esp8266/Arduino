@@ -73,9 +73,19 @@ public class DiscoveryManager {
 
   public List<BoardPort> discovery() {
     List<BoardPort> res = new ArrayList<BoardPort>();
-    for (Discovery d : discoverers)
+    for (Discovery d : discoverers) {
       res.addAll(d.discovery());
+    }
     return res;
+  }
+
+  public BoardPort find(String address) {
+    for (BoardPort boardPort : discovery()) {
+      if (boardPort.getAddress().equals(address)) {
+        return boardPort;
+      }
+    }
+    return null;
   }
 
 }

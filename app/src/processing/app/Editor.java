@@ -209,11 +209,6 @@ public class Editor extends JFrame implements RunnerListener {
     //PdeKeywords keywords = new PdeKeywords();
     //sketchbook = new Sketchbook(this);
 
-    if (serialMonitor == null) {
-      serialMonitor = new UploaderAndMonitorFactory().newMonitor(Preferences.get("serial.port"), base);
-      serialMonitor.setIconImage(getIconImage());
-    }
-
     buildMenuBar();
 
     // For rev 0120, placing things inside a JPanel
@@ -971,13 +966,14 @@ public class Editor extends JFrame implements RunnerListener {
       Preferences.set("serial.port.file", name.substring(5));
     else
       Preferences.set("serial.port.file", name);
-    try {
-      serialMonitor.close();
-    } catch (Exception e) {
-      // ignore
+    if (serialMonitor != null) {
+      try {
+        serialMonitor.close();
+        serialMonitor.setVisible(false);
+      } catch (Exception e) {
+        // ignore
+      }
     }
-    serialMonitor.setVisible(false);
-    serialMonitor = new UploaderAndMonitorFactory().newMonitor(Preferences.get("serial.port"), base);
 
     onBoardOrPortChange();
 
@@ -2389,8 +2385,10 @@ public class Editor extends JFrame implements RunnerListener {
     public void run() {
 
       try {
-        serialMonitor.close();
-        serialMonitor.setVisible(false);
+        if (serialMonitor != null) {
+          serialMonitor.close();
+          serialMonitor.setVisible(false);
+        }
 
         uploading = true;
 
@@ -2429,8 +2427,10 @@ public class Editor extends JFrame implements RunnerListener {
     public void run() {
 
       try {
-        serialMonitor.close();
-        serialMonitor.setVisible(false);
+        if (serialMonitor != null) {
+          serialMonitor.close();
+          serialMonitor.setVisible(false);
+        }
 
         uploading = true;
 
@@ -2501,6 +2501,19 @@ public class Editor extends JFrame implements RunnerListener {
 
   public void handleSerial() {
     if (uploading) return;
+
+    if (serialMonitor != null) {
+      try {
+        serialMonitor.close();
+        serialMonitor.setVisible(false);
+      } catch (Exception e) {
+        // noop
+      }
+    }
+
+    BoardPort port = Base.getDiscoveryManager().find(Preferences.get("serial.port"));
+    serialMonitor = new UploaderAndMonitorFactory().newMonitor(port, base);
+    serialMonitor.setIconImage(getIconImage());
 
     boolean success = false;
     do {
