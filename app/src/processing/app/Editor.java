@@ -2512,6 +2512,12 @@ public class Editor extends JFrame implements RunnerListener {
     }
 
     BoardPort port = Base.getDiscoveryManager().find(Preferences.get("serial.port"));
+
+    if (port == null) {
+      statusError(I18n.format("Board at {0} is not available", Preferences.get("serial.port")));
+      return;
+    }
+
     serialMonitor = new UploaderAndMonitorFactory().newMonitor(port, base);
     serialMonitor.setIconImage(getIconImage());
 

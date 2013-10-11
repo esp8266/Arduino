@@ -1670,6 +1670,11 @@ public class Sketch {
 
     BoardPort boardPort = Base.getDiscoveryManager().find(Preferences.get("serial.port"));
 
+    if (boardPort == null) {
+      editor.statusError(I18n.format("Board at {0} is not available", Preferences.get("serial.port")));
+      return false;
+    }
+
     Uploader uploader = new UploaderAndMonitorFactory().newUploader(target.getBoards().get(board), boardPort);
 
     boolean success = false;
