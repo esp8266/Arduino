@@ -32,7 +32,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.commons.logging.impl.LogFactoryImpl;
 import org.apache.commons.logging.impl.NoOpLog;
@@ -46,6 +45,7 @@ import processing.app.helpers.FileUtils;
 import processing.app.helpers.PreferencesMap;
 import processing.app.helpers.filefilters.OnlyDirs;
 import processing.app.helpers.filefilters.OnlyFilesWithExtension;
+import processing.app.javax.swing.filechooser.FileNameExtensionFilter;
 import processing.app.packages.Library;
 import processing.app.packages.LibraryList;
 import processing.app.tools.ZipDeflater;
