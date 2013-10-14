@@ -654,6 +654,7 @@
     </copy>
 
     <fixcrlf file="windows/work/revisions.txt" eol="dos"/>
+    <fixcrlf file="windows/work/lib/formatter.conf" eol="dos"/>
 
     <copy todir="windows/work">
       <fileset dir="windows/dist" includes="*.dll" />
