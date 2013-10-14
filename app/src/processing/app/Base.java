@@ -32,7 +32,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.commons.logging.impl.LogFactoryImpl;
 import org.apache.commons.logging.impl.NoOpLog;
@@ -46,6 +45,7 @@ import processing.app.helpers.FileUtils;
 import processing.app.helpers.PreferencesMap;
 import processing.app.helpers.filefilters.OnlyDirs;
 import processing.app.helpers.filefilters.OnlyFilesWithExtension;
+import processing.app.javax.swing.filechooser.FileNameExtensionFilter;
 import processing.app.packages.Library;
 import processing.app.packages.LibraryList;
 import processing.app.tools.ZipDeflater;
@@ -1523,35 +1523,39 @@ public class Base {
    * should replace the sketch in the current window, or false when the
    * sketch should open in a new window.
    */
-  protected boolean addSketches(JMenu menu, File folder,
-                                final boolean replaceExisting) throws IOException {
+  protected boolean addSketches(JMenu menu, File folder, final boolean replaceExisting) throws IOException {
     if (folder == null)
       return false;
 
-    // skip .DS_Store files, etc (this shouldn't actually be necessary)
     if (!folder.isDirectory()) return false;
 
-    String[] list = folder.list();
+    File[] files = folder.listFiles();
     // If a bad folder or unreadable or whatever, this will come back null
-    if (list == null) return false;
+    if (files == null) return false;
 
-    // Alphabetize list, since it's not always alpha order
-    Arrays.sort(list, String.CASE_INSENSITIVE_ORDER);
+    // Alphabetize files, since it's not always alpha order
+    Arrays.sort(files, new Comparator<File>() {
+      @Override
+      public int compare(File file, File file2) {
+        return file.getName().compareToIgnoreCase(file2.getName());
+      }
+    });
 
     boolean ifound = false;
 
-    for (String name : list) {
-      if ((name.charAt(0) == '.') ||
-          name.equals("CVS")) continue;
+    for (File subfolder : files) {
+      if (FileUtils.isSCCSOrHiddenFile(subfolder)) {
+        continue;
+      }
 
-      File subfolder = new File(folder, name);
       if (!subfolder.isDirectory()) continue;
 
-      if (addSketchesSubmenu(menu, name, subfolder, replaceExisting))
+      if (addSketchesSubmenu(menu, subfolder.getName(), subfolder, replaceExisting)) {
         ifound = true;
+      }
     }
 
-    return ifound;  // actually ignored, but..
+    return ifound;
   }
 
   private boolean addSketchesSubmenu(JMenu menu, Library lib,

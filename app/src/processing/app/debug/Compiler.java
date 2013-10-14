@@ -38,6 +38,7 @@ import processing.app.I18n;
 import processing.app.Preferences;
 import processing.app.Sketch;
 import processing.app.SketchCode;
+import processing.app.helpers.FileUtils;
 import processing.app.helpers.PreferencesMap;
 import processing.app.helpers.ProcessUtils;
 import processing.app.helpers.StringReplacer;
@@ -235,7 +236,7 @@ public class Compiler implements MessageConsumer {
       File objectFile = new File(objectPath);
       File dependFile = new File(dependPath);
       objectPaths.add(objectFile);
-      if (is_already_compiled(file, objectFile, dependFile, prefs))
+      if (isAlreadyCompiled(file, objectFile, dependFile, prefs))
         continue;
       String[] cmd = getCommandCompilerC(includePaths, file.getAbsolutePath(),
                                          objectPath);
@@ -248,7 +249,7 @@ public class Compiler implements MessageConsumer {
       File objectFile = new File(objectPath);
       File dependFile = new File(dependPath);
       objectPaths.add(objectFile);
-      if (is_already_compiled(file, objectFile, dependFile, prefs))
+      if (isAlreadyCompiled(file, objectFile, dependFile, prefs))
         continue;
       String[] cmd = getCommandCompilerCPP(includePaths,
                                            file.getAbsolutePath(), objectPath);
@@ -258,10 +259,10 @@ public class Compiler implements MessageConsumer {
     return objectPaths;
   }
 
-  private boolean is_already_compiled(File src, File obj, File dep, Map<String, String> prefs) {
+  private boolean isAlreadyCompiled(File src, File obj, File dep, Map<String, String> prefs) {
     boolean ret=true;
     try {
-      //System.out.println("\n  is_already_compiled: begin checks: " + obj.getPath());
+      //System.out.println("\n  isAlreadyCompiled: begin checks: " + obj.getPath());
       if (!obj.exists()) return false;  // object file (.o) does not exist
       if (!dep.exists()) return false;  // dep file (.d) does not exist
       long src_modified = src.lastModified();
@@ -284,8 +285,8 @@ public class Compiler implements MessageConsumer {
             String objpath = obj.getCanonicalPath();
             File linefile = new File(line);
             String linepath = linefile.getCanonicalPath();
-            //System.out.println("  is_already_compiled: obj =  " + objpath);
-            //System.out.println("  is_already_compiled: line = " + linepath);
+            //System.out.println("  isAlreadyCompiled: obj =  " + objpath);
+            //System.out.println("  isAlreadyCompiled: line = " + linepath);
             if (objpath.compareTo(linepath) == 0) {
               need_obj_parse = false;
               continue;
@@ -308,7 +309,7 @@ public class Compiler implements MessageConsumer {
             ret = false;  // prerequisite modified since object was compiled
             break;
           }
-          //System.out.println("  is_already_compiled:  prerequisite ok");
+          //System.out.println("  isAlreadyCompiled:  prerequisite ok");
         }
       }
       reader.close();
@@ -575,12 +576,19 @@ public class Compiler implements MessageConsumer {
                                              boolean recurse) {
     List<File> files = new ArrayList<File>();
 
-    if (folder.listFiles() == null)
+    if (FileUtils.isSCCSOrHiddenFile(folder)) {
       return files;
+    }
 
-    for (File file : folder.listFiles()) {
-      if (file.getName().startsWith("."))
+    File[] listFiles = folder.listFiles();
+    if (listFiles == null) {
+      return files;
+    }
+
+    for (File file : listFiles) {
+      if (FileUtils.isSCCSOrHiddenFile(file)) {
         continue; // skip hidden files
+      }
 
       if (file.getName().endsWith("." + extension))
         files.add(file);

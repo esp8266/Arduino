@@ -1,5 +1,6 @@
 package processing.app.packages;
 
+import processing.app.helpers.FileUtils;
 import processing.app.helpers.PreferencesMap;
 
 import java.io.File;
@@ -34,6 +35,7 @@ public class Library {
       .asList(new String[] { "arch", "examples", "extras", "src" });
   private static final List<String> OPTIONAL_FILES = Arrays
       .asList(new String[] { "keywords.txt", "library.properties" });
+
 
   /**
    * Scans inside a folder and create a Library object out of it. Automatically
@@ -75,6 +77,10 @@ public class Library {
     // 3. check if root folder contains prohibited stuff
     for (File file : libFolder.listFiles()) {
       if (file.isDirectory()) {
+        if (FileUtils.isSCCSOrHiddenFile(file)) {
+          System.out.println("WARNING: Ignoring spurious " + file.getName() + " folder in '" + properties.get("name") + "' library");
+          continue;
+        }
         if (!OPTIONAL_FOLDERS.contains(file.getName()))
           throw new IOException("Invalid folder '" + file.getName() + "'.");
       } else {
@@ -124,7 +130,7 @@ public class Library {
     res.folder = libFolder;
     res.srcFolder = libFolder;
     res.name = libFolder.getName();
-    res.architectures = Arrays.asList(new String[]{"*"});
+    res.architectures = Arrays.asList("*");
     res.pre15Lib = true;
     return res;
   }
