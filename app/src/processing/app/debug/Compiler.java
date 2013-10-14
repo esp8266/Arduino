@@ -38,6 +38,7 @@ import processing.app.I18n;
 import processing.app.Preferences;
 import processing.app.Sketch;
 import processing.app.SketchCode;
+import processing.app.helpers.FileUtils;
 import processing.app.helpers.PreferencesMap;
 import processing.app.helpers.ProcessUtils;
 import processing.app.helpers.StringReplacer;
@@ -575,16 +576,19 @@ public class Compiler implements MessageConsumer {
                                              boolean recurse) {
     List<File> files = new ArrayList<File>();
 
-    if (Library.SOURCE_CONTROL_FOLDERS.contains(folder.getName())) {
+    if (FileUtils.isSCCSOrHiddenFile(folder)) {
       return files;
     }
 
-    if (folder.listFiles() == null)
+    File[] listFiles = folder.listFiles();
+    if (listFiles == null) {
       return files;
+    }
 
-    for (File file : folder.listFiles()) {
-      if (file.getName().startsWith("."))
+    for (File file : listFiles) {
+      if (FileUtils.isSCCSOrHiddenFile(file)) {
         continue; // skip hidden files
+      }
 
       if (file.getName().endsWith("." + extension))
         files.add(file);

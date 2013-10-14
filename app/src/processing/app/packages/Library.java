@@ -1,5 +1,6 @@
 package processing.app.packages;
 
+import processing.app.helpers.FileUtils;
 import processing.app.helpers.PreferencesMap;
 
 import java.io.File;
@@ -35,7 +36,6 @@ public class Library {
   private static final List<String> OPTIONAL_FILES = Arrays
       .asList(new String[] { "keywords.txt", "library.properties" });
 
-  public static final List<String> SOURCE_CONTROL_FOLDERS = Arrays.asList(new String[]{"CSV", "RCS", ".git", ".svn", ".hq", ".bzr"});
 
   /**
    * Scans inside a folder and create a Library object out of it. Automatically
@@ -77,7 +77,7 @@ public class Library {
     // 3. check if root folder contains prohibited stuff
     for (File file : libFolder.listFiles()) {
       if (file.isDirectory()) {
-        if (SOURCE_CONTROL_FOLDERS.contains(file.getName())) {
+        if (FileUtils.isSCCSOrHiddenFile(file)) {
           System.out.println("WARNING: Ignoring spurious " + file.getName() + " folder in '" + properties.get("name") + "' library");
           continue;
         }
@@ -130,7 +130,7 @@ public class Library {
     res.folder = libFolder;
     res.srcFolder = libFolder;
     res.name = libFolder.getName();
-    res.architectures = Arrays.asList(new String[]{"*"});
+    res.architectures = Arrays.asList("*");
     res.pre15Lib = true;
     return res;
   }
