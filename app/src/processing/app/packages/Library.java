@@ -77,7 +77,11 @@ public class Library {
     // 3. check if root folder contains prohibited stuff
     for (File file : libFolder.listFiles()) {
       if (file.isDirectory()) {
-        if (!SOURCE_CONTROL_FOLDERS.contains(file.getName()) && !OPTIONAL_FOLDERS.contains(file.getName()))
+        if (SOURCE_CONTROL_FOLDERS.contains(file.getName())) {
+          System.out.println("WARNING: Ignoring spurious " + file.getName() + " folder in '" + properties.get("name") + "' library");
+          continue;
+        }
+        if (!OPTIONAL_FOLDERS.contains(file.getName()))
           throw new IOException("Invalid folder '" + file.getName() + "'.");
       } else {
         if (!OPTIONAL_FILES.contains(file.getName()))
