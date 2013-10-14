@@ -907,7 +907,7 @@ public class Editor extends JFrame implements RunnerListener {
   protected JMenu addInternalTools(JMenu menu) {
     JMenuItem item;
 
-    item = createToolMenuItem("processing.app.tools.AutoFormat");
+    item = createToolMenuItem("cc.arduino.packages.formatter.AStyle");
     int modifiers = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
     item.setAccelerator(KeyStroke.getKeyStroke('T', modifiers));
     menu.add(item);

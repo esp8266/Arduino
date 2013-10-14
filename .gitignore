@@ -14,13 +14,17 @@ hardware/arduino/bootloaders/caterina_LUFA/Caterina.elf
 hardware/arduino/bootloaders/caterina_LUFA/Caterina.eep
 hardware/arduino/bootloaders/caterina_LUFA/.dep/
 build/windows/work/
+build/windows/jre.zip
+build/windows/libastylej*
 build/windows/arduino-*.zip
 build/windows/dist/gcc-*.tar.gz
 build/macosx/arduino-*.zip
 build/macosx/dist/gcc-*.tar.gz
+build/macosx/libastylej*
 build/linux/work/
 build/linux/dist/*.tar.gz
 build/linux/*.tgz
+build/linux/libastylej*
 test-bin
 *.iml
 .idea

@@ -1,9 +1,6 @@
 package processing.app.helpers;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -169,5 +166,26 @@ public class FileUtils {
 
   public static boolean isSCCSOrHiddenFile(File file) {
     return file.isHidden() || file.getName().charAt(0) == '.' || (file.isDirectory() && SOURCE_CONTROL_FOLDERS.contains(file.getName()));
+  }
+
+  public static String readFileToString(File file) throws IOException {
+    BufferedReader reader = null;
+    try {
+      reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+      StringBuilder sb = new StringBuilder();
+      String line;
+      while ((line = reader.readLine()) != null) {
+        sb.append(line).append("\n");
+      }
+      return sb.toString();
+    } finally {
+      if (reader != null) {
+        try {
+          reader.close();
+        } catch (IOException e) {
+          // noop
+        }
+      }
+    }
   }
 }
