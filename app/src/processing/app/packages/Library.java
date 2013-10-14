@@ -35,6 +35,8 @@ public class Library {
   private static final List<String> OPTIONAL_FILES = Arrays
       .asList(new String[] { "keywords.txt", "library.properties" });
 
+  public static final List<String> SOURCE_CONTROL_FOLDERS = Arrays.asList(new String[]{"CSV", "RCS", ".git", ".svn", ".hq", ".bzr"});
+
   /**
    * Scans inside a folder and create a Library object out of it. Automatically
    * detects pre-1.5 libraries. Automatically fills metadata from
@@ -75,7 +77,7 @@ public class Library {
     // 3. check if root folder contains prohibited stuff
     for (File file : libFolder.listFiles()) {
       if (file.isDirectory()) {
-        if (!OPTIONAL_FOLDERS.contains(file.getName()))
+        if (!SOURCE_CONTROL_FOLDERS.contains(file.getName()) && !OPTIONAL_FOLDERS.contains(file.getName()))
           throw new IOException("Invalid folder '" + file.getName() + "'.");
       } else {
         if (!OPTIONAL_FILES.contains(file.getName()))
