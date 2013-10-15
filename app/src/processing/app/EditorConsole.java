@@ -175,13 +175,18 @@ public class EditorConsole extends JScrollPane {
     // should the interval come from the preferences file?
     new javax.swing.Timer(250, new ActionListener() {
       public void actionPerformed(ActionEvent evt) {
-        // only if new text has been added
-        if (consoleDoc.hasAppendage) {
-          // insert the text that's been added in the meantime
-          consoleDoc.insertAll();
-          // always move to the end of the text as it's added
-          consoleTextPane.setCaretPosition(consoleDoc.getLength());
-        }
+        SwingUtilities.invokeLater(new Runnable() {
+          @Override
+          public void run() {
+            // only if new text has been added
+            if (consoleDoc.hasAppendage) {
+              // insert the text that's been added in the meantime
+              consoleDoc.insertAll();
+              // always move to the end of the text as it's added
+              consoleTextPane.setCaretPosition(consoleDoc.getLength());
+            }
+          }
+        });
       }
     }).start();
   }

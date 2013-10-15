@@ -1998,9 +1998,14 @@ public class JEditTextArea extends JComponent
   {
     public void actionPerformed(ActionEvent evt)
     {
-      if(focusedComponent != null
-         && focusedComponent.hasFocus())
-        focusedComponent.blinkCaret();
+      SwingUtilities.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          if(focusedComponent != null
+                  && focusedComponent.hasFocus())
+            focusedComponent.blinkCaret();
+        }
+      });
     }
   }
 
