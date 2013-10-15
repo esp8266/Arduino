@@ -19,6 +19,7 @@ ARDUINO 1.5.5 BETA
 * avr: Fixed wrong extended fuses on Arduino Yún when using external programmer
 * avr: Added yun variant with LED_BUILTIN definition
 * avr: Refactored Mega* variants definitions in boards.txt (Kristian Sloth Lauszus)
+* avr: Removed File object destructor. In order to free memory allocated by a File object the safest way is to call its close() method
 
 ARDUINO 1.5.4 BETA 2013.09.10
 

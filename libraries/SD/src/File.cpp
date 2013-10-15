@@ -43,11 +43,6 @@ File::File(void) {
   //Serial.print("Created empty file object");
 }
 
-File::~File(void) {
- close();
-  //  Serial.print("Deleted file object");
-}
-
 // returns a pointer to the file name
 char *File::name(void) {
   return _name;
