@@ -36,6 +36,7 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import processing.app.Base;
+import processing.app.I18n;
 import processing.app.Preferences;
 import processing.app.debug.RunnerException;
 import processing.app.debug.TargetPlatform;
@@ -94,6 +95,9 @@ public class SSHUploader extends Uploader {
       String message = e.getMessage();
       if ("Auth cancel".equals(message) || "Auth fail".equals(message)) {
         return false;
+      }
+      if (e.getMessage().contains("Connection refused")) {
+        throw new RunnerException(I18n.format("Unable to connect to {0}", port.getAddress()));
       }
       throw new RunnerException(e);
     } catch (Exception e) {
