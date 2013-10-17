@@ -48,6 +48,7 @@ import processing.app.helpers.filefilters.OnlyFilesWithExtension;
 import processing.app.javax.swing.filechooser.FileNameExtensionFilter;
 import processing.app.packages.Library;
 import processing.app.packages.LibraryList;
+import processing.app.tools.MenuScroller;
 import processing.app.tools.ZipDeflater;
 import processing.core.*;
 import static processing.app.I18n._;
@@ -1632,8 +1633,10 @@ public class Base {
     // not a sketch folder, but maybe a subfolder containing sketches
     JMenu submenu = new JMenu(name);
     boolean found = addSketches(submenu, folder, replaceExisting);
-    if (found)
+    if (found) {
       menu.add(submenu);
+      MenuScroller.setScrollerFor(submenu);
+    }
     return found;
   }
 
