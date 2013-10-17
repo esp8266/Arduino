@@ -470,38 +470,46 @@ public class MenuScroller {
   }
 
   private void refreshMenu() {
-    if (menuItems != null && menuItems.length > 0) {
-      firstIndex = Math.max(topFixedCount, firstIndex);
-      firstIndex = Math.min(menuItems.length - bottomFixedCount - scrollCount, firstIndex);
+    if (menuItems == null || menuItems.length == 0) {
+      return;
+    }
 
-      upItem.setEnabled(firstIndex > topFixedCount);
-      downItem.setEnabled(firstIndex + scrollCount < menuItems.length - bottomFixedCount);
+    int newFirstIndex = Math.max(topFixedCount, firstIndex);
+    newFirstIndex = Math.min(menuItems.length - bottomFixedCount - scrollCount, newFirstIndex);
 
-      menu.removeAll();
-      for (int i = 0; i < topFixedCount; i++) {
-        menu.add(menuItems[i]);
-      }
+    if (newFirstIndex < 0) {
+      return;
+    }
+
+    firstIndex = newFirstIndex;
+
+    upItem.setEnabled(firstIndex > topFixedCount);
+    downItem.setEnabled(firstIndex + scrollCount < menuItems.length - bottomFixedCount);
+
+    menu.removeAll();
+    for (int i = 0; i < topFixedCount; i++) {
+      menu.add(menuItems[i]);
+    }
       /*if (topFixedCount > 0) {
         menu.addSeparator();
       }*/
 
-      menu.add(upItem);
-      for (int i = firstIndex; i < scrollCount + firstIndex; i++) {
-        menu.add(menuItems[i]);
-      }
-      menu.add(downItem);
+    menu.add(upItem);
+    for (int i = firstIndex; i < scrollCount + firstIndex; i++) {
+      menu.add(menuItems[i]);
+    }
+    menu.add(downItem);
 
       /*if (bottomFixedCount > 0) {
         menu.addSeparator();
       }*/
-      for (int i = menuItems.length - bottomFixedCount; i < menuItems.length; i++) {
-        menu.add(menuItems[i]);
-      }
-
-      JComponent parent = (JComponent) upItem.getParent();
-      parent.revalidate();
-      parent.repaint();
+    for (int i = menuItems.length - bottomFixedCount; i < menuItems.length; i++) {
+      menu.add(menuItems[i]);
     }
+
+    JComponent parent = (JComponent) upItem.getParent();
+    parent.revalidate();
+    parent.repaint();
   }
 
   private class MouseScrollListener implements MouseWheelListener {
