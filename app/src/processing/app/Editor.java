@@ -701,6 +701,7 @@ public class Editor extends JFrame implements RunnerListener {
       boardsMenus = new LinkedList<JMenu>();
 
       JMenu boardsMenu = new JMenu(_("Board"));
+      MenuScroller.setScrollerFor(boardsMenu);
       Editor.boardsMenus.add(boardsMenu);
       toolsMenu.add(boardsMenu);
 
