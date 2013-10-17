@@ -581,11 +581,11 @@ public class Base {
 
 
   protected int[] nextEditorLocation() {
-    Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
     int defaultWidth = Preferences.getInteger("editor.window.width.default");
     int defaultHeight = Preferences.getInteger("editor.window.height.default");
 
     if (activeEditor == null) {
+      Rectangle screen = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().getBounds();
       // If no current active editor, use default placement
       return new int[] {
           (screen.width - defaultWidth) / 2,
@@ -594,13 +594,15 @@ public class Base {
       };
 
     } else {
+      Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+
       // With a currently active editor, open the new window
       // using the same dimensions, but offset slightly.
       synchronized (editors) {
         final int OVER = 50;
         // In release 0160, don't
         //location = activeEditor.getPlacement();
-        Editor lastOpened = editors.get(editors.size() - 1);
+        Editor lastOpened = activeEditor;
         int[] location = lastOpened.getPlacement();
         // Just in case the bounds for that window are bad
         location[0] += OVER;
