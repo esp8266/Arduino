@@ -1100,15 +1100,15 @@ public class Base {
     return libraries.filterLibrariesInSubfolder(getSketchbookFolder());
   }
 
-  public void rebuildImportMenu(JMenu importMenu, final Editor editor) {
+  public void rebuildImportMenu(JMenu importMenu) {
     importMenu.removeAll();
 
     JMenuItem addLibraryMenuItem = new JMenuItem(_("Add Library..."));
     addLibraryMenuItem.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        Base.this.handleAddLibrary(editor);
+        Base.this.handleAddLibrary();
         Base.this.onBoardOrPortChange();
-        Base.this.rebuildImportMenu(Editor.importMenu, editor);
+        Base.this.rebuildImportMenu(Editor.importMenu);
         Base.this.rebuildExamplesMenu(Editor.examplesMenu);
       }
     });
@@ -1370,7 +1370,7 @@ public class Base {
 
               onBoardOrPortChange();
               Sketch.buildSettingChanged();
-              rebuildImportMenu(Editor.importMenu, editor);
+              rebuildImportMenu(Editor.importMenu);
               rebuildExamplesMenu(Editor.examplesMenu);
             }
           };
@@ -1486,7 +1486,7 @@ public class Base {
 
     onBoardOrPortChange();
     Sketch.buildSettingChanged();
-    rebuildImportMenu(Editor.importMenu, editor);
+    rebuildImportMenu(Editor.importMenu);
     rebuildExamplesMenu(Editor.examplesMenu);
   }
 
@@ -2848,7 +2848,7 @@ public class Base {
     }
   }
 
-  public void handleAddLibrary(Editor editor) {
+  public void handleAddLibrary() {
     JFileChooser fileChooser = new JFileChooser(System.getProperty("user.home"));
     fileChooser.setDialogTitle(_("Select a zip file or a folder containing the library you'd like to add"));
     fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -2857,7 +2857,7 @@ public class Base {
     Dimension preferredSize = fileChooser.getPreferredSize();
     fileChooser.setPreferredSize(new Dimension(preferredSize.width + 200, preferredSize.height + 200));
 
-    int returnVal = fileChooser.showOpenDialog(editor);
+    int returnVal = fileChooser.showOpenDialog(activeEditor);
 
     if (returnVal != JFileChooser.APPROVE_OPTION) {
       return;
@@ -2879,7 +2879,7 @@ public class Base {
           }
           sourceFile = foldersInTmpFolder[0];
         } catch (IOException e) {
-          editor.statusError(e);
+          activeEditor.statusError(e);
           return;
         }
       }
@@ -2892,23 +2892,23 @@ public class Base {
             + "Library names must contain only basic letters and numbers.\n"
             + "(ASCII only and no spaces, and it cannot start with a number)"),
                                   libName);
-        editor.statusError(mess);
+        activeEditor.statusError(mess);
         return;
       }
 
       // copy folder
       File destinationFolder = new File(getSketchbookLibrariesFolder(), sourceFile.getName());
       if (!destinationFolder.mkdir()) {
-        editor.statusError(I18n.format(_("A library named {0} already exists"), sourceFile.getName()));
+        activeEditor.statusError(I18n.format(_("A library named {0} already exists"), sourceFile.getName()));
         return;
       }
       try {
         FileUtils.copy(sourceFile, destinationFolder);
       } catch (IOException e) {
-        editor.statusError(e);
+        activeEditor.statusError(e);
         return;
       }
-      editor.statusNotice(_("Library added to your libraries. Check \"Import library\" menu"));
+      activeEditor.statusNotice(_("Library added to your libraries. Check \"Import library\" menu"));
     } finally {
       // delete zip created temp folder, if exists
       FileUtils.recursiveDelete(tmpFolder);
