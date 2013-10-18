@@ -6,6 +6,7 @@ ARDUINO 1.5.5 BETA
 * Improved folder ignore: now hidden, starting with a dot, and SCCS folders are ignored
 * Improved auto format: now handled by Artistic Style http://astyle.sourceforge.net/
 * Improved SSH uploader (Arduino Yun): uses file ~/.ssh/config if available. Allows public key only authentication and ssh servers listening on ports other than 22.
+* Font anti-aliasing now ON by default (users will have to either delete or manually edit their preferences.txt file)
 
 [libraries]
 * avr: Fixed buffer overflow in File::doBuffer() (dreggy)
