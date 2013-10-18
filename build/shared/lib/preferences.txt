@@ -93,7 +93,7 @@ editor.font=Monospaced,plain,12
 editor.font.macosx = Monaco,plain,10
 
 # anti-aliased text, turned off by default
-editor.antialias=false
+editor.antialias=true
 
 # color to be used for background when 'external editor' enabled
 editor.external=false
