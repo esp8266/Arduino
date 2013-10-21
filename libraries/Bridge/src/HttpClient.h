@@ -22,14 +22,14 @@
 #include <Process.h>
 
 class HttpClient : public Process {
-public:
+  public:
 
-  unsigned int get(String &url);
-  unsigned int get(const char * url);
-  void getAsynchronously(String &url);
-  void getAsynchronously(const char * url);
-  boolean ready();
-  unsigned int getResult();
+    unsigned int get(String &url);
+    unsigned int get(const char * url);
+    void getAsynchronously(String &url);
+    void getAsynchronously(const char * url);
+    boolean ready();
+    unsigned int getResult();
 
 };
 

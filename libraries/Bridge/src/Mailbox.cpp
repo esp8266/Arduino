@@ -26,7 +26,7 @@ unsigned int MailboxClass::readMessage(uint8_t *buff, unsigned int size) {
 void MailboxClass::readMessage(String &str, unsigned int maxLength) {
   uint8_t tmp[] = { 'm' };
   // XXX: Is there a better way to create the string?
-  uint8_t buff[maxLength+1];
+  uint8_t buff[maxLength + 1];
   int l = bridge.transfer(tmp, 1, buff, maxLength);
   buff[l] = 0;
   str = (const char *)buff;

@@ -22,46 +22,48 @@
 #include <Bridge.h>
 
 class ConsoleClass : public Stream {
-public:
-  // Default constructor uses global Bridge instance
-  ConsoleClass();
-  // Constructor with a user provided BridgeClass instance
-  ConsoleClass(BridgeClass &_b);
-  ~ConsoleClass();
-  
-  void begin();
-  void end();
+  public:
+    // Default constructor uses global Bridge instance
+    ConsoleClass();
+    // Constructor with a user provided BridgeClass instance
+    ConsoleClass(BridgeClass &_b);
+    ~ConsoleClass();
 
-  void buffer(uint8_t size);
-  void noBuffer();
+    void begin();
+    void end();
 
-  bool connected();
+    void buffer(uint8_t size);
+    void noBuffer();
 
-  // Stream methods 
-  // (read from console socket)
-  int available();
-  int read();
-  int peek();
-  // (write to console socket)
-  size_t write(uint8_t);
-  size_t write(const uint8_t *buffer, size_t size);
-  void flush();
-  
-  operator bool () { return connected(); }
-  
-private:
-  BridgeClass &bridge;
+    bool connected();
 
-  void doBuffer();
-  uint8_t inBuffered;
-  uint8_t inReadPos;
-  static const int BUFFER_SIZE = 32;
-  uint8_t *inBuffer;
-  
-  bool autoFlush;
-  uint8_t outBuffered;
-  uint8_t outBufferSize;
-  uint8_t *outBuffer;
+    // Stream methods
+    // (read from console socket)
+    int available();
+    int read();
+    int peek();
+    // (write to console socket)
+    size_t write(uint8_t);
+    size_t write(const uint8_t *buffer, size_t size);
+    void flush();
+
+    operator bool () {
+      return connected();
+    }
+
+  private:
+    BridgeClass &bridge;
+
+    void doBuffer();
+    uint8_t inBuffered;
+    uint8_t inReadPos;
+    static const int BUFFER_SIZE = 32;
+    uint8_t *inBuffer;
+
+    bool autoFlush;
+    uint8_t outBuffered;
+    uint8_t outBufferSize;
+    uint8_t *outBuffer;
 };
 
 extern ConsoleClass Console;

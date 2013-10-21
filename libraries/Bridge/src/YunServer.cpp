@@ -41,7 +41,7 @@ YunClient YunServer::accept() {
   uint8_t cmd[] = {'k'};
   uint8_t res[1];
   unsigned int l = bridge.transfer(cmd, 1, res, 1);
-  if (l==0)
+  if (l == 0)
     return YunClient();
   return YunClient(res[0]);
 }

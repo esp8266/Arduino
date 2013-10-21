@@ -25,23 +25,27 @@
 class YunClient;
 
 class YunServer : public Server {
-public:
-  // Constructor with a user provided BridgeClass instance
-  YunServer(uint16_t port = 5555, BridgeClass &_b = Bridge);
+  public:
+    // Constructor with a user provided BridgeClass instance
+    YunServer(uint16_t port = 5555, BridgeClass &_b = Bridge);
 
-  void begin();
-  YunClient accept();
+    void begin();
+    YunClient accept();
 
-  virtual size_t write(uint8_t c);
+    virtual size_t write(uint8_t c);
 
-  void listenOnLocalhost()   { useLocalhost = true; }
-  void noListenOnLocalhost() { useLocalhost = false; }
+    void listenOnLocalhost()   {
+      useLocalhost = true;
+    }
+    void noListenOnLocalhost() {
+      useLocalhost = false;
+    }
 
-private:
-  uint16_t port;
-  bool listening;
-  bool useLocalhost;
-  BridgeClass &bridge;
+  private:
+    uint16_t port;
+    bool listening;
+    bool useLocalhost;
+    BridgeClass &bridge;
 };
 
 #endif // _YUN_SERVER_H_

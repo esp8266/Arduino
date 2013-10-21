@@ -22,48 +22,50 @@
 #include <Bridge.h>
 
 class Process : public Stream {
-public:
-  // Constructor with a user provided BridgeClass instance
-  Process(BridgeClass &_b = Bridge) :
-	  bridge(_b), started(false), buffered(0), readPos(0) { }
-  ~Process();
-  
-  void begin(const String &command);
-  void addParameter(const String &param);
-  unsigned int run();
-  void runAsynchronously();
-  boolean running();
-  unsigned int exitValue();
-  void close();
+  public:
+    // Constructor with a user provided BridgeClass instance
+    Process(BridgeClass &_b = Bridge) :
+      bridge(_b), started(false), buffered(0), readPos(0) { }
+    ~Process();
 
-  unsigned int runShellCommand(const String &command);
-  void runShellCommandAsynchronously(const String &command);
+    void begin(const String &command);
+    void addParameter(const String &param);
+    unsigned int run();
+    void runAsynchronously();
+    boolean running();
+    unsigned int exitValue();
+    void close();
 
-  operator bool () { return started; }
+    unsigned int runShellCommand(const String &command);
+    void runShellCommandAsynchronously(const String &command);
 
-  // Stream methods 
-  // (read from process stdout)
-  int available();
-  int read();
-  int peek();
-  // (write to process stdin)
-  size_t write(uint8_t);
-  void flush();
-  // TODO: add optimized function for block write
-  
-private:
-  BridgeClass &bridge;
-  unsigned int handle;
-  String *cmdline;
-  boolean started;
+    operator bool () {
+      return started;
+    }
 
-private:
-  void doBuffer();
-  uint8_t buffered;
-  uint8_t readPos;
-  static const int BUFFER_SIZE = 64;
-  uint8_t buffer[BUFFER_SIZE];
-  
+    // Stream methods
+    // (read from process stdout)
+    int available();
+    int read();
+    int peek();
+    // (write to process stdin)
+    size_t write(uint8_t);
+    void flush();
+    // TODO: add optimized function for block write
+
+  private:
+    BridgeClass &bridge;
+    unsigned int handle;
+    String *cmdline;
+    boolean started;
+
+  private:
+    void doBuffer();
+    uint8_t buffered;
+    uint8_t readPos;
+    static const int BUFFER_SIZE = 64;
+    uint8_t buffer[BUFFER_SIZE];
+
 };
 
 #endif

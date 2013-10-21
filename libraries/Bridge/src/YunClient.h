@@ -23,46 +23,48 @@
 #include <Client.h>
 
 class YunClient : public Client {
-public:
-  // Constructor with a user provided BridgeClass instance
-  YunClient(int _h, BridgeClass &_b = Bridge);
-  YunClient(BridgeClass &_b = Bridge);
-  ~YunClient();
-  
-  // Stream methods 
-  // (read message)
-  virtual int available();
-  virtual int read();
-  virtual int read(uint8_t *buf, size_t size);
-  virtual int peek();
-  // (write response)
-  virtual size_t write(uint8_t);
-  virtual size_t write(const uint8_t *buf, size_t size);
-  virtual void flush();
-  // TODO: add optimized function for block write
-  
-  virtual operator bool () { return opened; }
+  public:
+    // Constructor with a user provided BridgeClass instance
+    YunClient(int _h, BridgeClass &_b = Bridge);
+    YunClient(BridgeClass &_b = Bridge);
+    ~YunClient();
 
-  YunClient& operator=(const YunClient &_x);
+    // Stream methods
+    // (read message)
+    virtual int available();
+    virtual int read();
+    virtual int read(uint8_t *buf, size_t size);
+    virtual int peek();
+    // (write response)
+    virtual size_t write(uint8_t);
+    virtual size_t write(const uint8_t *buf, size_t size);
+    virtual void flush();
+    // TODO: add optimized function for block write
 
-  virtual void stop();
-  virtual uint8_t connected();
+    virtual operator bool () {
+      return opened;
+    }
 
-  virtual int connect(IPAddress ip, uint16_t port);
-  virtual int connect(const char *host, uint16_t port);
+    YunClient& operator=(const YunClient &_x);
 
-private:
-  BridgeClass &bridge;
-  unsigned int handle;
-  boolean opened;
+    virtual void stop();
+    virtual uint8_t connected();
 
-private:
-  void doBuffer();
-  uint8_t buffered;
-  uint8_t readPos;
-  static const int BUFFER_SIZE = 64;
-  uint8_t buffer[BUFFER_SIZE];
-  
+    virtual int connect(IPAddress ip, uint16_t port);
+    virtual int connect(const char *host, uint16_t port);
+
+  private:
+    BridgeClass &bridge;
+    unsigned int handle;
+    boolean opened;
+
+  private:
+    void doBuffer();
+    uint8_t buffered;
+    uint8_t readPos;
+    static const int BUFFER_SIZE = 64;
+    uint8_t buffer[BUFFER_SIZE];
+
 };
 
 #endif // _YUN_CLIENT_H_

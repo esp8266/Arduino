@@ -22,30 +22,30 @@
 #include <Bridge.h>
 
 class MailboxClass {
-public:
-  MailboxClass(BridgeClass &b = Bridge) : bridge(b) { }
+  public:
+    MailboxClass(BridgeClass &b = Bridge) : bridge(b) { }
 
-  void begin() { }
-  void end() { }
+    void begin() { }
+    void end() { }
 
-  // Receive a message and store it inside a buffer
-  unsigned int readMessage(uint8_t *buffer, unsigned int size);
-  // Receive a message and store it inside a String
-  void readMessage(String &str, unsigned int maxLength=128);
+    // Receive a message and store it inside a buffer
+    unsigned int readMessage(uint8_t *buffer, unsigned int size);
+    // Receive a message and store it inside a String
+    void readMessage(String &str, unsigned int maxLength = 128);
 
-  // Send a message
-  void writeMessage(const uint8_t *buffer, unsigned int size);
-  // Send a message
-  void writeMessage(const String& str);
-  // Send a JSON message
-  void writeJSON(const String& str);
+    // Send a message
+    void writeMessage(const uint8_t *buffer, unsigned int size);
+    // Send a message
+    void writeMessage(const String& str);
+    // Send a JSON message
+    void writeJSON(const String& str);
 
-  // Return the size of the next available message, 0 if there are
-  // no messages in queue.
-  unsigned int messageAvailable();
+    // Return the size of the next available message, 0 if there are
+    // no messages in queue.
+    unsigned int messageAvailable();
 
-private:
-  BridgeClass &bridge;
+  private:
+    BridgeClass &bridge;
 };
 
 extern MailboxClass Mailbox;

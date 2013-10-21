@@ -30,9 +30,9 @@ YunClient::~YunClient() {
 }
 
 YunClient& YunClient::operator=(const YunClient &_x) {
-	opened = _x.opened;
-	handle = _x.handle;
-	return *this;
+  opened = _x.opened;
+  handle = _x.handle;
+  return *this;
 }
 
 void YunClient::stop() {
@@ -73,13 +73,13 @@ int YunClient::read() {
 int YunClient::read(uint8_t *buff, size_t size) {
   int readed = 0;
   do {
-	if (buffered == 0) {
-	  doBuffer();
+    if (buffered == 0) {
+      doBuffer();
       if (buffered == 0)
         return readed;
-	}
-	buff[readed++] = buffer[readPos++];
-	buffered--;
+    }
+    buff[readed++] = buffer[readPos++];
+    buffered--;
   } while (readed < size);
   return readed;
 }
@@ -141,7 +141,7 @@ int YunClient::connect(const char *host, uint16_t port) {
   };
   uint8_t res[1];
   int l = bridge.transfer(tmp, 3, (const uint8_t *)host, strlen(host), res, 1);
-  if (l==0)
+  if (l == 0)
     return 0;
   handle = res[0];
 

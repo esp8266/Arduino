@@ -19,7 +19,7 @@
 #include <Console.h>
 
 // Default constructor uses global Bridge instance
-ConsoleClass::ConsoleClass() : 
+ConsoleClass::ConsoleClass() :
   bridge(Bridge), inBuffered(0), inReadPos(0), inBuffer(NULL),
   autoFlush(true)
 {
@@ -27,7 +27,7 @@ ConsoleClass::ConsoleClass() :
 }
 
 // Constructor with a user provided BridgeClass instance
-ConsoleClass::ConsoleClass(BridgeClass &_b) : 
+ConsoleClass::ConsoleClass(BridgeClass &_b) :
   bridge(_b), inBuffered(0), inReadPos(0), inBuffer(NULL),
   autoFlush(true)
 {
@@ -53,10 +53,10 @@ size_t ConsoleClass::write(uint8_t c) {
 size_t ConsoleClass::write(const uint8_t *buff, size_t size) {
   if (autoFlush) {
     // TODO: do it in a more efficient way
-    uint8_t *tmp = new uint8_t[size+1];
+    uint8_t *tmp = new uint8_t[size + 1];
     tmp[0] = 'P';
-    memcpy(tmp+1, buff, size);
-    bridge.transfer(tmp, size+1);
+    memcpy(tmp + 1, buff, size);
+    bridge.transfer(tmp, size + 1);
     delete[] tmp;
     return size;
   } else {
@@ -72,25 +72,25 @@ size_t ConsoleClass::write(const uint8_t *buff, size_t size) {
 void ConsoleClass::flush() {
   if (autoFlush)
     return;
-  
+
   bridge.transfer(outBuffer, outBuffered);
   outBuffered = 1;
 }
 
 void ConsoleClass::noBuffer() {
   if (autoFlush)
-	return;
+    return;
   delete[] outBuffer;
   autoFlush = true;
 }
 
 void ConsoleClass::buffer(uint8_t size) {
   noBuffer();
-  if (size==0)
-	return;
-  outBuffer = new uint8_t[size+1];
+  if (size == 0)
+    return;
+  outBuffer = new uint8_t[size + 1];
   outBuffer[0] = 'P'; // WRITE tag
-  outBufferSize = size+1;
+  outBufferSize = size + 1;
   outBuffered = 1;
   autoFlush = false;
 }
@@ -98,7 +98,7 @@ void ConsoleClass::buffer(uint8_t size) {
 bool ConsoleClass::connected() {
   uint8_t tmp = 'a';
   bridge.transfer(&tmp, 1, &tmp, 1);
-  return tmp==1;
+  return tmp == 1;
 }
 
 int ConsoleClass::available() {

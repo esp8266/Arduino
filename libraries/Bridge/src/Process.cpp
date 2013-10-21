@@ -84,8 +84,8 @@ void Process::runAsynchronously() {
 
   delete cmdline;
   cmdline = NULL;
-  
-  if (res[0]==0) // res[0] contains error code
+
+  if (res[0] == 0) // res[0] contains error code
     started = true;
 }
 
