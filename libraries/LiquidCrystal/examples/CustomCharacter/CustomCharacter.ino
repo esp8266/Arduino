@@ -112,9 +112,9 @@ void setup() {
   lcd.begin(16, 2);
   // Print a message to the lcd.
   lcd.print("I ");
-  lcd.write(0);
+  lcd.write((byte) 0);
   lcd.print(" Arduino! ");
-  lcd.write(1);
+  lcd.write((byte) 1);
 
 }
 
