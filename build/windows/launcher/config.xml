@@ -19,7 +19,7 @@
     <cp>lib/core.jar</cp>
     <cp>lib/jna.jar</cp>
     <cp>lib/ecj.jar</cp>
-    <cp>lib/RXTXcomm.jar</cp>
+    <cp>lib/jssc-2.6.0.jar</cp>
     <cp>lib/commons-codec-1.7.jar</cp>
     <cp>lib/commons-exec-1.1.jar</cp>
     <cp>lib/commons-httpclient-3.1.jar</cp>
