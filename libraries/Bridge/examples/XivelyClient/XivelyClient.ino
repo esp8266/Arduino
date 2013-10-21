@@ -1,15 +1,15 @@
 /*
-  Xively sensor client with Strings 
- 
+  Xively sensor client with Strings
+
  This sketch connects an analog sensor to Xively,
- using an Arduino Yún. 
- 
+ using an Arduino Yún.
+
  created 15 March 2010
  updated 27 May 2013
  by Tom Igoe
-   
+
  http://arduino.cc/en/Tutorial/YunXivelyClient
- 
+
  */
 
 
@@ -21,7 +21,7 @@
   NOTE: passwords.h is not included with this repo because it contains my passwords.
  You need to create it for your own version of this application.  To do so, make
  a new tab in Arduino, call it passwords.h, and include the following variables and constants:
- 
+
  #define APIKEY        "foo"                  // replace your pachube api key here
  #define FEEDID        0000                   // replace your feed ID
  #define USERAGENT     "my-project"           // user agent is the project name
@@ -38,7 +38,7 @@ void setup() {
   Bridge.begin();
   Serial.begin(9600);
 
-  while(!Serial);    // wait for Network Serial to open
+  while (!Serial);   // wait for Network Serial to open
   Serial.println("Xively client");
 
   // Do a first update immediately
@@ -94,14 +94,14 @@ void sendData() {
   xively.addParameter("--data");
   xively.addParameter(dataString);
   xively.addParameter("--header");
-  xively.addParameter(apiString); 
+  xively.addParameter(apiString);
   xively.addParameter(url);
   xively.run();
   Serial.println("done!");
 
   // If there's incoming data from the net connection,
   // send it out the Serial:
-  while (xively.available()>0) {
+  while (xively.available() > 0) {
     char c = xively.read();
     Serial.write(c);
   }

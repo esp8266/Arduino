@@ -1,8 +1,8 @@
 /*
  Melody
- 
- Plays a melody stored in a string. 
- 
+
+ Plays a melody stored in a string.
+
  The notes and durations are encoded as follows:
 
  NOTES:
@@ -31,12 +31,12 @@
 
  Circuit:
  * Arduino Robot
- 
+
  created 1 May 2013
  by X. Yang
  modified 12 May 2013
  by D. Cuartielles
- 
+
  This example is in the public domain
 
  This code uses the Squawk sound library designed by STG. For

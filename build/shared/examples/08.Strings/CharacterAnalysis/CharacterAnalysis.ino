@@ -1,13 +1,13 @@
 /*
-  Character analysis operators 
- 
+  Character analysis operators
+
  Examples using the character analysis operators.
  Send any byte and the sketch will tell you about it.
- 
+
  created 29 Nov 2010
  modified 2 Apr 2012
  by Tom Igoe
- 
+
  This example code is in the public domain.
  */
 
@@ -35,40 +35,40 @@ void loop() {
     Serial.println(thisChar);
 
     // analyze what was sent:
-    if(isAlphaNumeric(thisChar)) {
+    if (isAlphaNumeric(thisChar)) {
       Serial.println("it's alphanumeric");
     }
-    if(isAlpha(thisChar)) {
+    if (isAlpha(thisChar)) {
       Serial.println("it's alphabetic");
     }
-    if(isAscii(thisChar)) {
+    if (isAscii(thisChar)) {
       Serial.println("it's ASCII");
     }
-    if(isWhitespace(thisChar)) {
+    if (isWhitespace(thisChar)) {
       Serial.println("it's whitespace");
     }
-    if(isControl(thisChar)) {
+    if (isControl(thisChar)) {
       Serial.println("it's a control character");
     }
-    if(isDigit(thisChar)) {
+    if (isDigit(thisChar)) {
       Serial.println("it's a numeric digit");
     }
-    if(isGraph(thisChar)) {
+    if (isGraph(thisChar)) {
       Serial.println("it's a printable character that's not whitespace");
     }
-    if(isLowerCase(thisChar)) {
+    if (isLowerCase(thisChar)) {
       Serial.println("it's lower case");
     }
-    if(isPrintable(thisChar)) {
+    if (isPrintable(thisChar)) {
       Serial.println("it's printable");
     }
-    if(isPunct(thisChar)) {
+    if (isPunct(thisChar)) {
       Serial.println("it's punctuation");
     }
-    if(isSpace(thisChar)) {
+    if (isSpace(thisChar)) {
       Serial.println("it's a space character");
     }
-    if(isUpperCase(thisChar)) {
+    if (isUpperCase(thisChar)) {
       Serial.println("it's upper case");
     }
     if (isHexadecimalDigit(thisChar)) {

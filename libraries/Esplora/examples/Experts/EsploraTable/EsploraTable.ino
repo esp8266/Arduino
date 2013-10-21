@@ -3,18 +3,18 @@
 
   Acts like a keyboard that prints sensor
   data in a table-like text, row by row.
-  
+
   At startup, it does nothing. It waits for you to open a
   spreadsheet (e.g. Google Drive spreadsheet) so it can write
   data. By pressing Switch 1, it starts printing the table
   headers and the first row of data. It waits a bit, then it
   will print another row, and so on.
-  
+
   The amount of time between each row is determined by the slider.
   If put to full left, the sketch will wait 10 seconds; at
   full right position, it will wait 5 minutes. An intermediate
   position will make the sketch wait for some time in-between.
-  
+
   Clicking the Switch 1 at any time will stop the logging.
 
   The color LED shows what the sketch is doing:
@@ -87,7 +87,7 @@ void loop() {
    * check for button presses often enough to not miss any event.
    */
   activeDelay(50);
- 
+
   /*
    * the justActivated variable may be set to true in the
    * checkSwitchPress() function. Here we check its status to
@@ -99,7 +99,7 @@ void loop() {
     // do next sampling ASAP
     nextSampleAt = startedAt = millis();
   }
-  
+
   if (active == true) {
     if (nextSampleAt < millis()) {
       // it's time to sample!
@@ -108,24 +108,24 @@ void loop() {
       // 10 and 290 seconds.
       int sampleInterval = map(slider, 0, 1023, 10, 290);
       nextSampleAt = millis() + sampleInterval * 1000;
-      
+
       logAndPrint();
     }
-    
+
     // let the RGB led blink green once per second, for 200ms.
     unsigned int ms = millis() % 1000;
     if (ms < 200)
       Esplora.writeGreen(50);
     else
       Esplora.writeGreen(0);
-    
+
     Esplora.writeBlue(0);
-  } 
+  }
   else
     // while not active, keep a reassuring blue color coming
     // from the Esplora...
     Esplora.writeBlue(20);
-    
+
 }
 
 /*
@@ -135,7 +135,7 @@ void printHeaders() {
   Keyboard.print("Time");
   Keyboard.write(KEY_TAB);
   activeDelay(300); // Some spreadsheets are slow, e.g. Google
-                    // Drive that wants to save every edit.
+  // Drive that wants to save every edit.
   Keyboard.print("Accel X");
   Keyboard.write(KEY_TAB);
   activeDelay(300);
@@ -149,13 +149,13 @@ void printHeaders() {
 
 void logAndPrint() {
   // do all the samplings at once, because keystrokes have delays
-  unsigned long timeSecs = (millis() - startedAt) /1000;
+  unsigned long timeSecs = (millis() - startedAt) / 1000;
   int xAxis = Esplora.readAccelerometer(X_AXIS);
   int yAxis = Esplora.readAccelerometer(Y_AXIS);
   int zAxis = Esplora.readAccelerometer(Z_AXIS);
-  
+
   Esplora.writeRed(100);
-  
+
   Keyboard.print(timeSecs);
   Keyboard.write(KEY_TAB);
   activeDelay(300);
@@ -169,7 +169,7 @@ void logAndPrint() {
   Keyboard.println();
   activeDelay(300);
   Keyboard.write(KEY_HOME);
-  
+
   Esplora.writeRed(0);
 }
 
@@ -204,9 +204,9 @@ void checkSwitchPress() {
     if (startBtn == HIGH) { // button released
       active = !active;
       if (active)
-        justActivated = true;    
+        justActivated = true;
     }
-    
+
     lastStartBtn = startBtn;
   }
 }

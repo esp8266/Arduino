@@ -1,14 +1,14 @@
 /*
  Keyboard Controller Example
- 
- Shows the output of a USB Keyboard connected to 
+
+ Shows the output of a USB Keyboard connected to
  the Native USB port on an Arduino Due Board.
- 
+
  created 8 Oct 2012
  by Cristian Maglie
- 
+
  http://arduino.cc/en/Tutorial/KeyboardController
- 
+
  This sample code is part of the public domain.
  */
 

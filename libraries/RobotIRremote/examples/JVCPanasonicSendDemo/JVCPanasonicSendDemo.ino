@@ -7,7 +7,7 @@
  * JVC and Panasonic protocol added by Kristian Lauszus (Thanks to zenwheel and other people at the original blog post)
  */
 #include <IRremote.h>
- 
+
 #define PanasonicAddress      0x4004     // Panasonic address (Pre data) 
 #define PanasonicPower        0x100BCBD  // Panasonic Power button
 
@@ -20,10 +20,10 @@ void setup()
 }
 
 void loop() {
-  irsend.sendPanasonic(PanasonicAddress,PanasonicPower); // This should turn your TV on and off
-  
-  irsend.sendJVC(JVCPower, 16,0); // hex value, 16 bits, no repeat
+  irsend.sendPanasonic(PanasonicAddress, PanasonicPower); // This should turn your TV on and off
+
+  irsend.sendJVC(JVCPower, 16, 0); // hex value, 16 bits, no repeat
   delayMicroseconds(50); // see http://www.sbprojects.com/knowledge/ir/jvc.php for information
-  irsend.sendJVC(JVCPower, 16,1); // hex value, 16 bits, repeat
+  irsend.sendJVC(JVCPower, 16, 1); // hex value, 16 bits, repeat
   delayMicroseconds(50);
 }

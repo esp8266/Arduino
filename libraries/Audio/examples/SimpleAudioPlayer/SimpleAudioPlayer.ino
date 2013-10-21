@@ -2,18 +2,18 @@
   Simple Audio Player
 
  Demonstrates the use of the Audio library for the Arduino Due
- 
+
  Hardware required :
  * Arduino shield with a SD card on CS4
- * A sound file named "test.wav" in the root directory of the SD card 
+ * A sound file named "test.wav" in the root directory of the SD card
  * An audio amplifier to connect to the DAC0 and ground
- * A speaker to connect to the audio amplifier 
+ * A speaker to connect to the audio amplifier
 
  Original by Massimo Banzi September 20, 2012
  Modified by Scott Fitzgerald October 19, 2012
- 
+
  This example code is in the public domain
- 
+
  http://arduino.cc/en/Tutorial/SimpleAudioPlayer
 
 */
@@ -44,7 +44,7 @@ void setup()
 
 void loop()
 {
-  int count=0;
+  int count = 0;
 
   // open wave file from sdcard
   File myFile = SD.open("test.wav");
@@ -54,7 +54,7 @@ void loop()
     while (true);
   }
 
-  const int S=1024; // Number of samples to read in block
+  const int S = 1024; // Number of samples to read in block
   short buffer[S];
 
   Serial.print("Playing");

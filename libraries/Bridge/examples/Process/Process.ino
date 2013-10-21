@@ -1,14 +1,14 @@
 /*
-  Running process using Process class. 
- 
+  Running process using Process class.
+
  This sketch demonstrate how to run linux processes
- using an Arduino Yún. 
- 
+ using an Arduino Yún.
+
  created 5 Jun 2013
  by Cristian Maglie
- 
+
  This example code is in the public domain.
- 
+
  http://arduino.cc/en/Tutorial/Process
 
  */
@@ -18,10 +18,10 @@
 void setup() {
   // Initialize Bridge
   Bridge.begin();
-  
+
   // Initialize Serial
   Serial.begin(9600);
-  
+
   // Wait until a Serial Monitor is connected.
   while (!Serial);
 
@@ -44,7 +44,7 @@ void runCurl() {
 
   // Print arduino logo over the Serial
   // A process output can be read with the stream methods
-  while (p.available()>0) {
+  while (p.available() > 0) {
     char c = p.read();
     Serial.print(c);
   }
@@ -62,7 +62,7 @@ void runCpuInfo() {
 
   // Print command output on the Serial.
   // A process output can be read with the stream methods
-  while (p.available()>0) {
+  while (p.available() > 0) {
     char c = p.read();
     Serial.print(c);
   }

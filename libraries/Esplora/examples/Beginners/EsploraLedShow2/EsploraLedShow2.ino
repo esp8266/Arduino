@@ -22,7 +22,7 @@ void setup() {
 }
 
 int lowLight = 400;   // the light sensor reading when it's covered
-int highLight = 1023; // the maximum light sensor reading 
+int highLight = 1023; // the maximum light sensor reading
 int minGreen = 0;     // minimum brightness of the green LED
 int maxGreen = 100;   // maximum brightness of the green LED
 
@@ -31,13 +31,13 @@ void loop() {
   int mic = Esplora.readMicrophone();
   int light = Esplora.readLightSensor();
   int slider = Esplora.readSlider();
-  
+
   // convert the sensor readings to light levels:
   byte red   = constrain(mic, 0, 255);
   byte green = constrain(
-                  map(light, lowLight, highLight, minGreen, maxGreen),
-                  0, 255);
-  byte blue  = slider/4;
+                 map(light, lowLight, highLight, minGreen, maxGreen),
+                 0, 255);
+  byte blue  = slider / 4;
 
   // print the light levels (to see what's going on):
   Serial.print(red);
@@ -46,10 +46,10 @@ void loop() {
   Serial.print(' ');
   Serial.println(blue);
 
-  // write the light levels to the LED. 
+  // write the light levels to the LED.
   // note that the green value is always 0:
   Esplora.writeRGB(red, green, blue);
-  
+
   // add a delay to keep the LED from flickering:
-  delay(10); 
+  delay(10);
 }

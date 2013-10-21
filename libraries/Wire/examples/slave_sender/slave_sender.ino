@@ -28,5 +28,5 @@ void loop()
 void requestEvent()
 {
   Wire.write("hello "); // respond with message of 6 bytes
-                       // as expected by master
+  // as expected by master
 }

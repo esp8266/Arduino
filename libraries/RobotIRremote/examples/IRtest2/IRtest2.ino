@@ -20,7 +20,7 @@
  * The test software automatically decides which board is the sender and which is
  * the receiver by looking for an input on the send pin, which will indicate
  * the sender.  You should hook the serial port to the receiver for debugging.
- *  
+ *
  * Copyright 2010 Ken Shirriff
  * http://arcfn.com
  */
@@ -51,7 +51,7 @@ void setup()
     pinMode(LED_PIN, OUTPUT);
     digitalWrite(LED_PIN, LOW);
     Serial.println("Receiver mode");
-  } 
+  }
   else {
     mode = SENDER;
     Serial.println("Sender mode");
@@ -64,7 +64,7 @@ void setup()
 void waitForGap(int gap) {
   Serial.println("Waiting for gap");
   while (1) {
-    while (digitalRead(RECV_PIN) == LOW) { 
+    while (digitalRead(RECV_PIN) == LOW) {
     }
     unsigned long time = millis();
     while (digitalRead(RECV_PIN) == HIGH) {
@@ -81,17 +81,17 @@ void dump(decode_results *results) {
   int count = results->rawlen;
   if (results->decode_type == UNKNOWN) {
     Serial.println("Could not decode message");
-  } 
+  }
   else {
     if (results->decode_type == NEC) {
       Serial.print("Decoded NEC: ");
-    } 
+    }
     else if (results->decode_type == SONY) {
       Serial.print("Decoded SONY: ");
-    } 
+    }
     else if (results->decode_type == RC5) {
       Serial.print("Decoded RC5: ");
-    } 
+    }
     else if (results->decode_type == RC6) {
       Serial.print("Decoded RC6: ");
     }
@@ -107,7 +107,7 @@ void dump(decode_results *results) {
   for (int i = 0; i < count; i++) {
     if ((i % 2) == 1) {
       Serial.print(results->rawbuf[i]*USECPERTICK, DEC);
-    } 
+    }
     else {
       Serial.print(-(int)results->rawbuf[i]*USECPERTICK, DEC);
     }
@@ -130,22 +130,22 @@ void test(char *label, int type, unsigned long value, int bits) {
     Serial.println(label);
     if (type == NEC) {
       irsend.sendNEC(value, bits);
-    } 
+    }
     else if (type == SONY) {
       irsend.sendSony(value, bits);
-    } 
+    }
     else if (type == RC5) {
       irsend.sendRC5(value, bits);
-    } 
+    }
     else if (type == RC6) {
       irsend.sendRC6(value, bits);
-    } 
+    }
     else {
       Serial.print(label);
       Serial.println("Bad type!");
     }
     delay(200);
-  } 
+  }
   else if (mode == RECEIVER) {
     irrecv.resume(); // Receive the next value
     unsigned long max_time = millis() + 30000;
@@ -164,7 +164,7 @@ void test(char *label, int type, unsigned long value, int bits) {
       digitalWrite(LED_PIN, HIGH);
       delay(20);
       digitalWrite(LED_PIN, LOW);
-    } 
+    }
     else {
       Serial.println(": BAD");
       dump(&results);
@@ -180,7 +180,7 @@ void testRaw(char *label, unsigned int *rawbuf, int rawlen) {
     Serial.println(label);
     irsend.sendRaw(rawbuf, rawlen, 38 /* kHz */);
     delay(200);
-  } 
+  }
   else if (mode == RECEIVER ) {
     irrecv.resume(); // Receive the next value
     unsigned long max_time = millis() + 30000;
@@ -203,11 +203,11 @@ void testRaw(char *label, unsigned int *rawbuf, int rawlen) {
       return;
     }
     for (int i = 0; i < rawlen; i++) {
-      long got = results.rawbuf[i+1] * USECPERTICK;
+      long got = results.rawbuf[i + 1] * USECPERTICK;
       // Adjust for extra duration of marks
-      if (i % 2 == 0) { 
+      if (i % 2 == 0) {
         got -= MARK_EXCESS;
-      } 
+      }
       else {
         got += MARK_EXCESS;
       }
@@ -225,7 +225,7 @@ void testRaw(char *label, unsigned int *rawbuf, int rawlen) {
     delay(20);
     digitalWrite(LED_PIN, LOW);
   }
-}   
+}
 
 // This is the raw data corresponding to NEC 0x12345678
 unsigned int sendbuf[] = { /* NEC format */
@@ -238,15 +238,16 @@ unsigned int sendbuf[] = { /* NEC format */
   560, 560, 560, 1690, 560, 1690, 560, 560, /* 6 */
   560, 560, 560, 1690, 560, 1690, 560, 1690, /* 7 */
   560, 1690, 560, 560, 560, 560, 560, 560, /* 8 */
-  560};
+  560
+};
 
 void loop() {
   if (mode == SENDER) {
     delay(2000);  // Delay for more than gap to give receiver a better chance to sync.
-  } 
+  }
   else if (mode == RECEIVER) {
     waitForGap(1000);
-  } 
+  }
   else if (mode == ERROR) {
     // Light up for 5 seconds for error
     digitalWrite(LED_PIN, HIGH);
@@ -282,7 +283,7 @@ void loop() {
   if (mode == SENDER) {
     testRaw("RAW2", sendbuf, 67);
     test("RAW3", NEC, 0x12345678, 32);
-  } 
+  }
   else {
     test("RAW2", NEC, 0x12345678, 32);
     testRaw("RAW3", sendbuf, 67);

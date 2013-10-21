@@ -1,21 +1,21 @@
 /*
   SD card datalogger
- 
- This example shows how to log data from three analog sensors 
+
+ This example shows how to log data from three analog sensors
  to an SD card mounted on the Arduino Yún using the Bridge library.
- 	
+
  The circuit:
  * analog sensors on analog pins 0, 1 and 2
  * SD card attached to SD card slot of the Arduino Yún
- 
- Prepare your SD card creating an empty folder in the SD root 
- named "arduino". This will ensure that the Yún will create a link 
+
+ Prepare your SD card creating an empty folder in the SD root
+ named "arduino". This will ensure that the Yún will create a link
  to the SD to the "/mnt/sd" path.
- 
- You can remove the SD card while the Linux and the 
+
+ You can remove the SD card while the Linux and the
  sketch are running but be careful not to remove it while
  the system is writing to it.
- 
+
  created  24 Nov 2010
  modified 9 Apr 2012
  by Tom Igoe
@@ -23,11 +23,11 @@
  by Federico Vanzati
  modified  21 Jun 2013
  by Tom Igoe
- 
+
  This example code is in the public domain.
- 
+
  http://arduino.cc/en/Tutorial/YunDatalogger
- 	 
+
  */
 
 #include <FileIO.h>
@@ -38,7 +38,7 @@ void setup() {
   Serial.begin(9600);
   FileSystem.begin();
 
-  while(!Serial);  // wait for Serial port to connect.
+  while (!Serial); // wait for Serial port to connect.
   Serial.println("Filesystem datalogger\n");
 }
 
@@ -69,12 +69,12 @@ void loop () {
     dataFile.close();
     // print to the serial port too:
     Serial.println(dataString);
-  }  
+  }
   // if the file isn't open, pop up an error:
   else {
     Serial.println("error opening datalog.txt");
-  } 
-  
+  }
+
   delay(15000);
 
 }
@@ -83,19 +83,19 @@ void loop () {
 String getTimeStamp() {
   String result;
   Process time;
-  // date is a command line utility to get the date and the time 
-  // in different formats depending on the additional parameter 
+  // date is a command line utility to get the date and the time
+  // in different formats depending on the additional parameter
   time.begin("date");
   time.addParameter("+%D-%T");  // parameters: D for the complete date mm/dd/yy
-                                //             T for the time hh:mm:ss    
+  //             T for the time hh:mm:ss
   time.run();  // run the command
 
   // read the output of the command
-  while(time.available()>0) {
+  while (time.available() > 0) {
     char c = time.read();
-    if(c != '\n')
+    if (c != '\n')
       result += c;
   }
-  
+
   return result;
 }

@@ -1,20 +1,20 @@
 /*
  Chat  Server
- 
+
  A simple server that distributes any incoming messages to all
  connected clients.  To use telnet to  your device's IP address and type.
  You can see the client's input in the serial monitor as well.
- Using an Arduino Wiznet Ethernet shield. 
- 
+ Using an Arduino Wiznet Ethernet shield.
+
  Circuit:
  * Ethernet shield attached to pins 10, 11, 12, 13
  * Analog inputs attached to pins A0 through A5 (optional)
- 
+
  created 18 Dec 2009
  by David A. Mellis
  modified 9 Apr 2012
  by Tom Igoe
- 
+
  */
 
 #include <SPI.h>
@@ -23,10 +23,11 @@
 // Enter a MAC address and IP address for your controller below.
 // The IP address will be dependent on your local network.
 // gateway and subnet are optional:
-byte mac[] = { 
-  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-IPAddress ip(192,168,1, 177);
-IPAddress gateway(192,168,1, 1);
+byte mac[] = {
+  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
+};
+IPAddress ip(192, 168, 1, 177);
+IPAddress gateway(192, 168, 1, 1);
 IPAddress subnet(255, 255, 0, 0);
 
 
@@ -39,9 +40,9 @@ void setup() {
   Ethernet.begin(mac, ip, gateway, subnet);
   // start listening for clients
   server.begin();
- // Open serial communications and wait for port to open:
+  // Open serial communications and wait for port to open:
   Serial.begin(9600);
-   while (!Serial) {
+  while (!Serial) {
     ; // wait for serial port to connect. Needed for Leonardo only
   }
 
@@ -58,11 +59,11 @@ void loop() {
   if (client) {
     if (!alreadyConnected) {
       // clead out the input buffer:
-      client.flush();    
+      client.flush();
       Serial.println("We have a new client");
-      client.println("Hello, client!"); 
+      client.println("Hello, client!");
       alreadyConnected = true;
-    } 
+    }
 
     if (client.available() > 0) {
       // read the bytes incoming from the client:

@@ -1,35 +1,35 @@
 /*
   Arduino Yun USB-to-Serial
- 
+
  Allows you to use the Yun's 32U4 processor as a
  serial terminal for the linino processor.
- 
- Upload this to an Arduino Yun via serial (not WiFi) 
+
+ Upload this to an Arduino Yun via serial (not WiFi)
  then open the serial monitor at 115200 to see the boot process
  of the linino processor. You can also use the serial monitor
- as a basic command line interface for the linino processor using 
+ as a basic command line interface for the linino processor using
  this sketch.
- 
+
  From the serial monitor the following commands can be issued:
- 
+
  '~' followed by '0' -> Set the UART speed to 57600 baud
  '~' followed by '1' -> Set the UART speed to 115200 baud
  '~' followed by '2' -> Set the UART speed to 250000 baud
  '~' followed by '3' -> Set the UART speed to 500000 baud
  '~' followeb by '~' -> Sends the bridge's shutdown command to
                         obtain the console.
-                        
+
  The circuit:
  * Arduino Yun
- 
+
  created March 2013
  by Massimo Banzi
  modified by Cristian Maglie
- 
+
  This example code is in the public domain.
-  
+
  http://arduino.cc/en/Tutorial/YunSerialTerminal
- 
+
  */
 
 
@@ -75,8 +75,8 @@ void loop() {
       commandMode = false;            //     in all cases exit from command mode
     }
   }
-  if (Serial1.available()) {          // got anything from Linino?         
-    char c = (char)Serial1.read();    // read from Linino  
+  if (Serial1.available()) {          // got anything from Linino?
+    char c = (char)Serial1.read();    // read from Linino
     Serial.write(c);                  // write to USB-serial
   }
 }

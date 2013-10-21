@@ -1,12 +1,12 @@
 /*
   Esplora Temperature Sensor
- 
+
  This  sketch shows you how to read the Esplora's temperature sensor
  You can read the temperature sensor in Farhenheit or Celsius.
- 
+
  Created on 22 Dec 2012
  by Tom Igoe
- 
+
  This example is in the public domain.
  */
 #include <Esplora.h>
@@ -14,7 +14,7 @@
 void setup()
 {
   Serial.begin(9600);      // initialize serial communications with your computer
-} 
+}
 
 void loop()
 {

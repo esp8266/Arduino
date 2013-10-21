@@ -1,14 +1,14 @@
 /*
   Appending to Strings using the += operator and concat()
- 
+
  Examples of how to append different data types to strings
- 
+
  created 27 July 2010
  modified 2 Apr 2012
  by Tom Igoe
- 
+
  http://arduino.cc/en/Tutorial/StringAppendOperator
- 
+
  This example code is in the public domain.
  */
 
@@ -68,6 +68,6 @@ void loop() {
   Serial.println(stringTwo); // prints "The millis(): 43534" or whatever the value of the millis() is
 
   // do nothing while true:
-  while(true);
+  while (true);
 }
 

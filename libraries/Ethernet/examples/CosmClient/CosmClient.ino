@@ -1,27 +1,27 @@
 /*
   Cosm sensor client
- 
+
  This sketch connects an analog sensor to Cosm (http://www.cosm.com)
  using a Wiznet Ethernet shield. You can use the Arduino Ethernet shield, or
  the Adafruit Ethernet shield, either one will work, as long as it's got
  a Wiznet Ethernet module on board.
- 
- This example has been updated to use version 2.0 of the cosm.com API. 
+
+ This example has been updated to use version 2.0 of the cosm.com API.
  To make it work, create a feed with a datastream, and give it the ID
  sensor1. Or change the code below to match your feed.
- 
- 
+
+
  Circuit:
  * Analog sensor attached to analog in 0
  * Ethernet shield attached to pins 10, 11, 12, 13
- 
+
  created 15 March 2010
  updated 14 May 2012
  by Tom Igoe with input from Usman Haque and Joe Saavedra
- 
+
 http://arduino.cc/en/Tutorial/CosmClient
  This code is in the public domain.
- 
+
  */
 
 #include <SPI.h>
@@ -34,12 +34,13 @@ http://arduino.cc/en/Tutorial/CosmClient
 // assign a MAC address for the ethernet controller.
 // Newer Ethernet shields have a MAC address printed on a sticker on the shield
 // fill in your address here:
-byte mac[] = { 
-  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
+byte mac[] = {
+  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
+};
 
 // fill in an available IP address on your network here,
 // for manual configuration:
-IPAddress ip(10,0,1,20);
+IPAddress ip(10, 0, 1, 20);
 
 // initialize the library instance:
 EthernetClient client;
@@ -51,14 +52,14 @@ char server[] = "api.cosm.com";   // name address for cosm API
 
 unsigned long lastConnectionTime = 0;             // last time you connected to the server, in milliseconds
 boolean lastConnected = false;                    // state of the connection last time through the main loop
-const unsigned long postingInterval = 10L*1000L;  // delay between updates to cosm.com
-						  // the "L" is needed to use long type numbers
+const unsigned long postingInterval = 10L * 1000L; // delay between updates to cosm.com
+// the "L" is needed to use long type numbers
 
 
 void setup() {
   // start serial port:
   Serial.begin(9600);
- // start the Ethernet connection:
+  // start the Ethernet connection:
   if (Ethernet.begin(mac) == 0) {
     Serial.println("Failed to configure Ethernet using DHCP");
     // DHCP failed, so use a fixed IP address:
@@ -68,7 +69,7 @@ void setup() {
 
 void loop() {
   // read the analog sensor:
-  int sensorReading = analogRead(A0);   
+  int sensorReading = analogRead(A0);
 
   // if there's incoming data from the net connection.
   // send it out the serial port.  This is for debugging
@@ -88,7 +89,7 @@ void loop() {
 
   // if you're not connected, and ten seconds have passed since
   // your last connection, then connect again and send data:
-  if(!client.connected() && (millis() - lastConnectionTime > postingInterval)) {
+  if (!client.connected() && (millis() - lastConnectionTime > postingInterval)) {
     sendData(sensorReading);
   }
   // store the state of the connection for next time through
@@ -125,8 +126,8 @@ void sendData(int thisData) {
     // here's the actual content of the PUT request:
     client.print("sensor1,");
     client.println(thisData);
-  
-  } 
+
+  }
   else {
     // if you couldn't make a connection:
     Serial.println("connection failed");
@@ -134,7 +135,7 @@ void sendData(int thisData) {
     Serial.println("disconnecting.");
     client.stop();
   }
-   // note the time that the connection was made or attempted:
+  // note the time that the connection was made or attempted:
   lastConnectionTime = millis();
 }
 
@@ -147,12 +148,12 @@ void sendData(int thisData) {
 int getLength(int someValue) {
   // there's at least one byte:
   int digits = 1;
-  // continually divide the value by ten, 
+  // continually divide the value by ten,
   // adding one to the digit count for each
   // time you divide, until you're at 0:
-  int dividend = someValue /10;
+  int dividend = someValue / 10;
   while (dividend > 0) {
-    dividend = dividend /10;
+    dividend = dividend / 10;
     digits++;
   }
   // return the number of digits:

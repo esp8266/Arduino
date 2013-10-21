@@ -1,14 +1,14 @@
 /*
  Mouse Controller Example
- 
- Shows the output of a USB Mouse connected to 
+
+ Shows the output of a USB Mouse connected to
  the Native USB port on an Arduino Due Board.
- 
+
  created 8 Oct 2012
  by Cristian Maglie
- 
+
  http://arduino.cc/en/Tutorial/MouseController
- 
+
  This sample code is part of the public domain.
  */
 
@@ -45,15 +45,15 @@ void mouseDragged() {
 // This function intercepts mouse button press
 void mousePressed() {
   Serial.print("Pressed: ");
-  if (mouse.getButton(LEFT_BUTTON)){
+  if (mouse.getButton(LEFT_BUTTON)) {
     Serial.print("L");
     leftButton = true;
   }
-  if (mouse.getButton(MIDDLE_BUTTON)){
+  if (mouse.getButton(MIDDLE_BUTTON)) {
     Serial.print("M");
     middleButton = true;
   }
-  if (mouse.getButton(RIGHT_BUTTON)){
+  if (mouse.getButton(RIGHT_BUTTON)) {
     Serial.print("R");
     Serial.println();
     rightButton = true;

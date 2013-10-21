@@ -1,7 +1,7 @@
 /*
  * EEPROM Read
  *
- * Reads the value of each byte of the EEPROM and prints it 
+ * Reads the value of each byte of the EEPROM and prints it
  * to the computer.
  * This example code is in the public domain.
  */
@@ -25,19 +25,19 @@ void loop()
 {
   // read a byte from the current address of the EEPROM
   value = EEPROM.read(address);
-  
+
   Serial.print(address);
   Serial.print("\t");
   Serial.print(value, DEC);
   Serial.println();
-  
+
   // advance to the next address of the EEPROM
   address = address + 1;
-  
+
   // there are only 512 bytes of EEPROM, from 0 to 511, so if we're
   // on address 512, wrap around to address 0
   if (address == 512)
     address = 0;
-    
+
   delay(500);
 }

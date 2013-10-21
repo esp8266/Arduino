@@ -1,28 +1,28 @@
 /*
  Chat  Server
- 
+
  A simple server that distributes any incoming messages to all
  connected clients.  To use telnet to  your device's IP address and type.
  You can see the client's input in the serial monitor as well.
- 
- This example is written for a network using WPA encryption. For 
+
+ This example is written for a network using WPA encryption. For
  WEP or WPA, change the Wifi.begin() call accordingly.
- 
- 
+
+
  Circuit:
  * WiFi shield attached
- 
+
  created 18 Dec 2009
  by David A. Mellis
  modified 31 May 2012
  by Tom Igoe
- 
+
  */
 
 #include <SPI.h>
 #include <WiFi.h>
 
-char ssid[] = "yourNetwork"; //  your network SSID (name) 
+char ssid[] = "yourNetwork"; //  your network SSID (name)
 char pass[] = "secretPassword";    // your network password (use for WPA, or use as key for WEP)
 
 int keyIndex = 0;            // your network key Index number (needed only for WEP)
@@ -35,38 +35,38 @@ boolean alreadyConnected = false; // whether or not the client was connected pre
 
 void setup() {
   //Initialize serial and wait for port to open:
-  Serial.begin(9600); 
+  Serial.begin(9600);
   while (!Serial) {
     ; // wait for serial port to connect. Needed for Leonardo only
   }
-  
+
   // check for the presence of the shield:
   if (WiFi.status() == WL_NO_SHIELD) {
-    Serial.println("WiFi shield not present"); 
+    Serial.println("WiFi shield not present");
     // don't continue:
-    while(true);
-  } 
+    while (true);
+  }
 
   String fv = WiFi.firmwareVersion();
-  if( fv != "1.1.0" )
+  if ( fv != "1.1.0" )
     Serial.println("Please upgrade the firmware");
-  
+
   // attempt to connect to Wifi network:
-  while ( status != WL_CONNECTED) { 
+  while ( status != WL_CONNECTED) {
     Serial.print("Attempting to connect to SSID: ");
     Serial.println(ssid);
-    // Connect to WPA/WPA2 network. Change this line if using open or WEP network:    
+    // Connect to WPA/WPA2 network. Change this line if using open or WEP network:
     status = WiFi.begin(ssid, pass);
 
     // wait 10 seconds for connection:
     delay(10000);
-  } 
+  }
 
   // start the server:
   server.begin();
   // you're connected now, so print out the status:
   printWifiStatus();
- }
+}
 
 
 void loop() {
@@ -78,11 +78,11 @@ void loop() {
   if (client) {
     if (!alreadyConnected) {
       // clead out the input buffer:
-      client.flush();    
+      client.flush();
       Serial.println("We have a new client");
-      client.println("Hello, client!"); 
+      client.println("Hello, client!");
       alreadyConnected = true;
-    } 
+    }
 
     if (client.available() > 0) {
       // read the bytes incoming from the client:

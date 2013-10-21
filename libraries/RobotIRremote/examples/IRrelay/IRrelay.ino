@@ -23,17 +23,17 @@ void dump(decode_results *results) {
   int count = results->rawlen;
   if (results->decode_type == UNKNOWN) {
     Serial.println("Could not decode message");
-  } 
+  }
   else {
     if (results->decode_type == NEC) {
       Serial.print("Decoded NEC: ");
-    } 
+    }
     else if (results->decode_type == SONY) {
       Serial.print("Decoded SONY: ");
-    } 
+    }
     else if (results->decode_type == RC5) {
       Serial.print("Decoded RC5: ");
-    } 
+    }
     else if (results->decode_type == RC6) {
       Serial.print("Decoded RC6: ");
     }
@@ -49,7 +49,7 @@ void dump(decode_results *results) {
   for (int i = 0; i < count; i++) {
     if ((i % 2) == 1) {
       Serial.print(results->rawbuf[i]*USECPERTICK, DEC);
-    } 
+    }
     else {
       Serial.print(-(int)results->rawbuf[i]*USECPERTICK, DEC);
     }
@@ -62,7 +62,7 @@ void setup()
 {
   pinMode(RELAY_PIN, OUTPUT);
   pinMode(13, OUTPUT);
-    Serial.begin(9600);
+  Serial.begin(9600);
   irrecv.enableIRIn(); // Start the receiver
 }
 
@@ -79,7 +79,7 @@ void loop() {
       digitalWrite(13, on ? HIGH : LOW);
       dump(&results);
     }
-    last = millis();      
+    last = millis();
     irrecv.resume(); // Receive the next value
   }
 }

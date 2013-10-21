@@ -1,14 +1,14 @@
 /*
   String length() and trim()
- 
+
  Examples of how to use length() and trim() in a String
- 
+
  created 27 July 2010
  modified 2 Apr 2012
  by Tom Igoe
- 
+
  http://arduino.cc/en/Tutorial/StringLengthTrim
- 
+
  This example code is in the public domain.
  */
 
@@ -38,5 +38,5 @@ void loop() {
   Serial.println(stringOne.length());
 
   // do nothing while true:
-  while(true);
+  while (true);
 }

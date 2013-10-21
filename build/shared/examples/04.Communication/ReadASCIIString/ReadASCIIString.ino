@@ -1,19 +1,19 @@
 /*
   Reading a serial ASCII-encoded string.
- 
+
  This sketch demonstrates the Serial parseInt() function.
  It looks for an ASCII string of comma-separated values.
  It parses them into ints, and uses those to fade an RGB LED.
- 
+
  Circuit: Common-anode RGB LED wired like so:
  * Red cathode: digital pin 3
  * Green cathode: digital pin 5
  * blue cathode: digital pin 6
  * anode: +5V
- 
+
  created 13 Apr 2012
  by Tom Igoe
- 
+
  This example code is in the public domain.
  */
 
@@ -26,9 +26,9 @@ void setup() {
   // initialize serial:
   Serial.begin(9600);
   // make the pins outputs:
-  pinMode(redPin, OUTPUT); 
-  pinMode(greenPin, OUTPUT); 
-  pinMode(bluePin, OUTPUT); 
+  pinMode(redPin, OUTPUT);
+  pinMode(greenPin, OUTPUT);
+  pinMode(bluePin, OUTPUT);
 
 }
 
@@ -37,11 +37,11 @@ void loop() {
   while (Serial.available() > 0) {
 
     // look for the next valid integer in the incoming serial stream:
-    int red = Serial.parseInt(); 
+    int red = Serial.parseInt();
     // do it again:
-    int green = Serial.parseInt(); 
+    int green = Serial.parseInt();
     // do it again:
-    int blue = Serial.parseInt(); 
+    int blue = Serial.parseInt();
 
     // look for the newline. That's the end of your
     // sentence:
@@ -52,7 +52,7 @@ void loop() {
       green = 255 - constrain(green, 0, 255);
       blue = 255 - constrain(blue, 0, 255);
 
-      // fade the red, green, and blue legs of the LED: 
+      // fade the red, green, and blue legs of the LED:
       analogWrite(redPin, red);
       analogWrite(greenPin, green);
       analogWrite(bluePin, blue);

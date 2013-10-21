@@ -1,33 +1,33 @@
-/* 
+/*
  Debounce
- 
+
  Each time the input pin goes from LOW to HIGH (e.g. because of a push-button
  press), the output pin is toggled from LOW to HIGH or HIGH to LOW.  There's
  a minimum delay between toggles to debounce the circuit (i.e. to ignore
- noise).  
- 
+ noise).
+
  The circuit:
  * LED attached from pin 13 to ground
  * pushbutton attached from pin 2 to +5V
  * 10K resistor attached from pin 2 to ground
- 
+
  * Note: On most Arduino boards, there is already an LED on the board
  connected to pin 13, so you don't need any extra components for this example.
- 
- 
+
+
  created 21 November 2006
  by David A. Mellis
  modified 30 Aug 2011
  by Limor Fried
  modified 28 Dec 2012
  by Mike Walters
- 
+
  This example code is in the public domain.
- 
+
  http://www.arduino.cc/en/Tutorial/Debounce
  */
 
-// constants won't change. They're used here to 
+// constants won't change. They're used here to
 // set pin numbers:
 const int buttonPin = 2;    // the number of the pushbutton pin
 const int ledPin = 13;      // the number of the LED pin
@@ -54,16 +54,16 @@ void loop() {
   // read the state of the switch into a local variable:
   int reading = digitalRead(buttonPin);
 
-  // check to see if you just pressed the button 
-  // (i.e. the input went from LOW to HIGH),  and you've waited 
-  // long enough since the last press to ignore any noise:  
+  // check to see if you just pressed the button
+  // (i.e. the input went from LOW to HIGH),  and you've waited
+  // long enough since the last press to ignore any noise:
 
   // If the switch changed, due to noise or pressing:
   if (reading != lastButtonState) {
     // reset the debouncing timer
     lastDebounceTime = millis();
-  } 
-  
+  }
+
   if ((millis() - lastDebounceTime) > debounceDelay) {
     // whatever the reading is at, it's been there for longer
     // than the debounce delay, so take it as the actual current state:
@@ -78,7 +78,7 @@ void loop() {
       }
     }
   }
-  
+
   // set the LED:
   digitalWrite(ledPin, ledState);
 

@@ -1,26 +1,26 @@
 /*
  GSM Pachube client
- 
+
  This sketch connects an analog sensor to Pachube (http://www.pachube.com)
  using a Telefonica GSM/GPRS shield.
 
- This example has been updated to use version 2.0 of the Pachube.com API. 
+ This example has been updated to use version 2.0 of the Pachube.com API.
  To make it work, create a feed with a datastream, and give it the ID
  sensor1. Or change the code below to match your feed.
- 
+
  Circuit:
  * Analog sensor attached to analog in 0
  * GSM shield attached to an Arduino
  * SIM card with a data plan
- 
+
  created 4 March 2012
  by Tom Igoe
  and adapted for GSM shield by David Del Peral
- 
+
  This code is in the public domain.
- 
+
  http://arduino.cc/en/Tutorial/GSMExamplesPachubeClient
- 
+
  */
 
 // libraries
@@ -51,7 +51,7 @@ char server[] = "api.pachube.com";      // name address for pachube API
 
 unsigned long lastConnectionTime = 0;         // last time you connected to the server, in milliseconds
 boolean lastConnected = false;                  // state of the connection last time through the main loop
-const unsigned long postingInterval = 10*1000;  //delay between updates to Pachube.com
+const unsigned long postingInterval = 10 * 1000; //delay between updates to Pachube.com
 
 void setup()
 {
@@ -60,16 +60,16 @@ void setup()
   while (!Serial) {
     ; // wait for serial port to connect. Needed for Leonardo only
   }
-  
+
   // connection state
   boolean notConnected = true;
-  
+
   // After starting the modem with GSM.begin()
   // attach the shield to the GPRS network with the APN, login and password
-  while(notConnected)
+  while (notConnected)
   {
-    if((gsmAccess.begin(PINNUMBER)==GSM_READY) &
-        (gprs.attachGPRS(GPRS_APN, GPRS_LOGIN, GPRS_PASSWORD)==GPRS_READY))
+    if ((gsmAccess.begin(PINNUMBER) == GSM_READY) &
+        (gprs.attachGPRS(GPRS_APN, GPRS_LOGIN, GPRS_PASSWORD) == GPRS_READY))
       notConnected = false;
     else
     {
@@ -80,17 +80,17 @@ void setup()
 }
 
 void loop()
-{  
+{
   // read the analog sensor:
-  int sensorReading = analogRead(A0);   
+  int sensorReading = analogRead(A0);
 
   // if there's incoming data from the net connection.
   // send it out the serial port.  This is for debugging
   // purposes only:
   if (client.available())
   {
-     char c = client.read();
-     Serial.print(c);
+    char c = client.read();
+    Serial.print(c);
   }
 
   // if there's no net connection, but there was one last time
@@ -99,14 +99,14 @@ void loop()
   {
     client.stop();
   }
-  
+
   // if you're not connected, and ten seconds have passed since
   // your last connection, then connect again and send data:
-  if(!client.connected() && ((millis() - lastConnectionTime) > postingInterval))
+  if (!client.connected() && ((millis() - lastConnectionTime) > postingInterval))
   {
-  sendData(sensorReading);
+    sendData(sensorReading);
   }
-  
+
   // store the state of the connection for next time through
   // the loop:
   lastConnected = client.connected();
@@ -121,7 +121,7 @@ void sendData(int thisData)
   if (client.connect(server, 80))
   {
     Serial.println("connecting...");
-    
+
     // send the HTTP PUT request:
     client.print("PUT /v2/feeds/");
     client.print(FEEDID);
@@ -142,11 +142,11 @@ void sendData(int thisData)
     client.println("Content-Type: text/csv");
     client.println("Connection: close");
     client.println();
-    
+
     // here's the actual content of the PUT request:
     client.print("sensor1,");
     client.println(thisData);
-  } 
+  }
   else
   {
     // if you couldn't make a connection:
@@ -169,17 +169,17 @@ int getLength(int someValue)
 {
   // there's at least one byte:
   int digits = 1;
-  
-  // continually divide the value by ten, 
+
+  // continually divide the value by ten,
   // adding one to the digit count for each
   // time you divide, until you're at 0:
-  int dividend = someValue /10;
+  int dividend = someValue / 10;
   while (dividend > 0)
   {
-    dividend = dividend /10;
+    dividend = dividend / 10;
     digits++;
   }
-  
+
   // return the number of digits:
   return digits;
 }

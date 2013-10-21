@@ -1,21 +1,21 @@
 /*
- 
- This example tests to see if the modem of the 
- GSM shield is working correctly. You do not need 
+
+ This example tests to see if the modem of the
+ GSM shield is working correctly. You do not need
  a SIM card for this example.
- 
+
  Circuit:
- * GSM shield attached 
- 
+ * GSM shield attached
+
  Created 12 Jun 2012
  by David del Peral
  modified 21 Nov 2012
  by Tom Igoe
- 
+
  http://arduino.cc/en/Tutorial/GSMToolsTestModem
- 
+
  This sample code is part of the public domain
- 
+
  */
 
 // libraries
@@ -34,10 +34,10 @@ void setup()
   while (!Serial) {
     ; // wait for serial port to connect. Needed for Leonardo only
   }
-  
+
   // start modem test (reset and check response)
   Serial.print("Starting modem test...");
-  if(modem.begin()) 
+  if (modem.begin())
     Serial.println("modem.begin() succeeded");
   else
     Serial.println("ERROR, no modem answer.");
@@ -48,9 +48,9 @@ void loop()
   // get modem IMEI
   Serial.print("Checking IMEI...");
   IMEI = modem.getIMEI();
-  
+
   // check IMEI response
-  if(IMEI != NULL)
+  if (IMEI != NULL)
   {
     // show IMEI in serial monitor
     Serial.println("Modem's IMEI: " + IMEI);
@@ -58,7 +58,7 @@ void loop()
     Serial.print("Resetting modem...");
     modem.begin();
     // get and check IMEI one more time
-    if(modem.getIMEI() != NULL)
+    if (modem.getIMEI() != NULL)
     {
       Serial.println("Modem is functoning properly");
     }
@@ -72,6 +72,6 @@ void loop()
     Serial.println("Error: Could not get IMEI");
   }
   // do nothing:
-  while(true);
+  while (true);
 }
 

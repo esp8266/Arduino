@@ -1,18 +1,18 @@
 /*
   Write to file using FileIO classes.
- 
+
  This sketch demonstrate how to write file into the Yún filesystem.
  A shell script file is created in /tmp, and it is executed afterwards.
 
  created 7 June 2010
- by Cristian Maglie 
- 
+ by Cristian Maglie
+
  This example code is in the public domain.
- 
+
  http://arduino.cc/en/Tutorial/FileWriteScript
 
  */
- 
+
 #include <FileIO.h>
 
 void setup() {
@@ -20,16 +20,16 @@ void setup() {
   Bridge.begin();
   // Initialize the Serial
   Serial.begin(9600);
-  
-  while(!Serial);  // wait for Serial port to connect.
+
+  while (!Serial); // wait for Serial port to connect.
   Serial.println("File Write Script example\n\n");
-  
+
   // Setup File IO
   FileSystem.begin();
 
-  // Upload script used to gain network statistics  
+  // Upload script used to gain network statistics
   uploadScript();
-}  
+}
 
 void loop() {
   // Run stats script every 5 secs.
@@ -41,10 +41,10 @@ void loop() {
 // to check the network traffic of the WiFi interface
 void uploadScript() {
   // Write our shell script in /tmp
-  // Using /tmp stores the script in RAM this way we can preserve 
+  // Using /tmp stores the script in RAM this way we can preserve
   // the limited amount of FLASH erase/write cycles
   File script = FileSystem.open("/tmp/wlan-stats.sh", FILE_WRITE);
-  // Shell script header 
+  // Shell script header
   script.print("#!/bin/sh\n");
   // shell commands:
   // ifconfig: is a command line utility for controlling the network interfaces.
@@ -53,7 +53,7 @@ void uploadScript() {
   //       and extract the line that contains it
   script.print("ifconfig wlan0 | grep 'RX bytes'\n");
   script.close();  // close the file
-  
+
   // Make the script executable
   Process chmod;
   chmod.begin("chmod");      // chmod: change mode
@@ -69,9 +69,9 @@ void runScript() {
   Process myscript;
   myscript.begin("/tmp/wlan-stats.sh");
   myscript.run();
-  
+
   String output = "";
-  
+
   // read the output of the script
   while (myscript.available()) {
     output += (char)myscript.read();

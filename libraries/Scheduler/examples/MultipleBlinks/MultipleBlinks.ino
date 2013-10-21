@@ -2,17 +2,17 @@
  Multiple Blinks
 
  Demonstrates the use of the Scheduler library for the Arduino Due
- 
+
  Hardware required :
  * LEDs connected to pins 11, 12, and 13
 
  created 8 Oct 2012
  by Cristian Maglie
- Modified by 
+ Modified by
  Scott Fitzgerald 19 Oct 2012
- 
+
  This example code is in the public domain
- 
+
  http://arduino.cc/en/Tutorial/MultipleBlinks
 */
 
@@ -64,11 +64,11 @@ void loop2() {
 void loop3() {
   if (Serial.available()) {
     char c = Serial.read();
-    if (c=='0') {
+    if (c == '0') {
       digitalWrite(led3, LOW);
       Serial.println("Led turned off!");
     }
-    if (c=='1') {
+    if (c == '1') {
       digitalWrite(led3, HIGH);
       Serial.println("Led turned on!");
     }

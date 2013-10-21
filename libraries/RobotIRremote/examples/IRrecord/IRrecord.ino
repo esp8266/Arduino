@@ -1,5 +1,5 @@
 /*
- * IRrecord: record and play back IR signals as a minimal 
+ * IRrecord: record and play back IR signals as a minimal
  * An IR detector/demodulator must be connected to the input RECV_PIN.
  * An IR LED must be connected to the output PWM pin 3.
  * A button must be connected to the input BUTTON_PIN; this is the
@@ -56,12 +56,12 @@ void storeCode(decode_results *results) {
     for (int i = 1; i <= codeLen; i++) {
       if (i % 2) {
         // Mark
-        rawCodes[i - 1] = results->rawbuf[i]*USECPERTICK - MARK_EXCESS;
+        rawCodes[i - 1] = results->rawbuf[i] * USECPERTICK - MARK_EXCESS;
         Serial.print(" m");
-      } 
+      }
       else {
         // Space
-        rawCodes[i - 1] = results->rawbuf[i]*USECPERTICK + MARK_EXCESS;
+        rawCodes[i - 1] = results->rawbuf[i] * USECPERTICK + MARK_EXCESS;
         Serial.print(" s");
       }
       Serial.print(rawCodes[i - 1], DEC);
@@ -76,16 +76,16 @@ void storeCode(decode_results *results) {
         Serial.println("repeat; ignoring.");
         return;
       }
-    } 
+    }
     else if (codeType == SONY) {
       Serial.print("Received SONY: ");
-    } 
+    }
     else if (codeType == RC5) {
       Serial.print("Received RC5: ");
-    } 
+    }
     else if (codeType == RC6) {
       Serial.print("Received RC6: ");
-    } 
+    }
     else {
       Serial.print("Unexpected codeType ");
       Serial.print(codeType, DEC);
@@ -102,18 +102,18 @@ void sendCode(int repeat) {
     if (repeat) {
       irsend.sendNEC(REPEAT, codeLen);
       Serial.println("Sent NEC repeat");
-    } 
+    }
     else {
       irsend.sendNEC(codeValue, codeLen);
       Serial.print("Sent NEC ");
       Serial.println(codeValue, HEX);
     }
-  } 
+  }
   else if (codeType == SONY) {
     irsend.sendSony(codeValue, codeLen);
     Serial.print("Sent Sony ");
     Serial.println(codeValue, HEX);
-  } 
+  }
   else if (codeType == RC5 || codeType == RC6) {
     if (!repeat) {
       // Flip the toggle bit for a new button press
@@ -126,13 +126,13 @@ void sendCode(int repeat) {
       Serial.print("Sent RC5 ");
       Serial.println(codeValue, HEX);
       irsend.sendRC5(codeValue, codeLen);
-    } 
+    }
     else {
       irsend.sendRC6(codeValue, codeLen);
       Serial.print("Sent RC6 ");
       Serial.println(codeValue, HEX);
     }
-  } 
+  }
   else if (codeType == UNKNOWN /* i.e. raw */) {
     // Assume 38 KHz
     irsend.sendRaw(rawCodes, codeLen, 38);
@@ -156,7 +156,7 @@ void loop() {
     sendCode(lastButtonState == buttonState);
     digitalWrite(STATUS_PIN, LOW);
     delay(50); // Wait a bit between retransmissions
-  } 
+  }
   else if (irrecv.decode(&results)) {
     digitalWrite(STATUS_PIN, HIGH);
     storeCode(&results);

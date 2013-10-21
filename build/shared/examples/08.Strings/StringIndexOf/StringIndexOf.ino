@@ -1,15 +1,15 @@
 /*
   String indexOf() and lastIndexOf() functions
- 
+
  Examples of how to evaluate, look for, and replace characters in a String
- 
+
  created 27 July 2010
  modified 2 Apr 2012
  by Tom Igoe
- 
+
  http://arduino.cc/en/Tutorial/StringIndexOf
- 
- This example code is in the public domain. 
+
+ This example code is in the public domain.
  */
 
 void setup() {
@@ -61,6 +61,6 @@ void loop() {
   Serial.println("The index of the second last paragraph tag " + stringOne + " is " + secondLastGraf);
 
   // do nothing while true:
-  while(true);
+  while (true);
 }
 

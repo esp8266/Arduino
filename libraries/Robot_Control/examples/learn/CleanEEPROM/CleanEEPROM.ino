@@ -1,6 +1,6 @@
 /*
  Clean EEPROM
- 
+
  This example erases the user information stored on the
  external EEPROM memory chip on your robot.
 
@@ -11,21 +11,21 @@
 
  EEPROMs shouldn't be rewritten too often, therefore the
  code runs only during setup and not inside loop.
- 
+
  Circuit:
  * Arduino Robot
- 
+
  created 1 May 2013
  by X. Yang
  modified 12 May 2013
  by D. Cuartielles
- 
+
  This example is in the public domain
  */
 
 #include <ArduinoRobot.h>
 
-void setup(){
+void setup() {
   // initialize the robot
   Robot.begin();
 
@@ -33,9 +33,9 @@ void setup(){
   Robot.userNameWrite("");
   Robot.robotNameWrite("");
   Robot.cityNameWrite("");
-  Robot.countryNameWrite(""); 
+  Robot.countryNameWrite("");
 }
 
-void loop(){
-  // do nothing  
+void loop() {
+  // do nothing
 }

@@ -1,21 +1,21 @@
-/* 
+/*
  Keyboard Button test
 
  For the Arduino Leonardo, Micro and Due boards.
- 
+
  Sends a text string when a button is pressed.
- 
+
  The circuit:
- * pushbutton attached from pin 2 to +5V on AVR boards 
+ * pushbutton attached from pin 2 to +5V on AVR boards
    and to +3.3V to the Arduino Due
  * 10-kilohm resistor attached from pin 2 to ground
- 
+
  created 24 Oct 2011
  modified 27 Mar 2012
  by Tom Igoe
- 
+
  This example code is in the public domain.
- 
+
  http://www.arduino.cc/en/Tutorial/KeyboardButton
  */
 
@@ -33,18 +33,18 @@ void setup() {
 void loop() {
   // read the pushbutton:
   int buttonState = digitalRead(buttonPin);
-  // if the button state has changed, 
-  if ((buttonState != previousButtonState) 
-    // and it's currently pressed:
-  && (buttonState == HIGH)) {
+  // if the button state has changed,
+  if ((buttonState != previousButtonState)
+      // and it's currently pressed:
+      && (buttonState == HIGH)) {
     // increment the button counter
     counter++;
     // type out a message
     Keyboard.print("You pressed the button ");
-    Keyboard.print(counter); 
+    Keyboard.print(counter);
     Keyboard.println(" times.");
   }
   // save the current button state for comparison next time:
-  previousButtonState = buttonState; 
+  previousButtonState = buttonState;
 }
 

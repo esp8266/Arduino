@@ -1,27 +1,27 @@
 /*
  Pachube client with Strings
- 
+
  This sketch connects two analog sensors to Pachube (http://www.pachube.com)
  through a Telefonica GSM/GPRS shield.
- 
- This example has been updated to use version 2.0 of the Pachube.com API. 
+
+ This example has been updated to use version 2.0 of the Pachube.com API.
  To make it work, create a feed with two datastreams, and give them the IDs
  sensor1 and sensor2. Or change the code below to match your feed.
- 
+
  This example uses the String library, which is part of the Arduino core from
- version 0019.  
- 
+ version 0019.
+
  Circuit:
  * Analog sensors attached to A0 and A1
  * GSM shield attached to an Arduino
  * SIM card with a data plan
- 
+
  created 8 March 2012
  by Tom Igoe
  and adapted for GSM shield by David Del Peral
- 
+
  This code is in the public domain.
- 
+
  */
 
 // Include the GSM library
@@ -52,7 +52,7 @@ char server[] = "api.pachube.com";       // name address for Pachube API
 
 unsigned long lastConnectionTime = 0;           // last time you connected to the server, in milliseconds
 boolean lastConnected = false;                  // state of the connection last time through the main loop
-const unsigned long postingInterval = 10*1000;  // delay between updates to Pachube.com
+const unsigned long postingInterval = 10 * 1000; // delay between updates to Pachube.com
 
 void setup()
 {
@@ -61,16 +61,16 @@ void setup()
   while (!Serial) {
     ; // wait for serial port to connect. Needed for Leonardo only
   }
-  
+
   // connection state
   boolean notConnected = true;
-  
+
   // After starting the modem with GSM.begin()
-  // attach the shield to the GPRS network with the APN, login and password 
-  while(notConnected)
+  // attach the shield to the GPRS network with the APN, login and password
+  while (notConnected)
   {
-    if((gsmAccess.begin(PINNUMBER)==GSM_READY) &
-        (gprs.attachGPRS(GPRS_APN, GPRS_LOGIN, GPRS_PASSWORD)==GPRS_READY))
+    if ((gsmAccess.begin(PINNUMBER) == GSM_READY) &
+        (gprs.attachGPRS(GPRS_APN, GPRS_LOGIN, GPRS_PASSWORD) == GPRS_READY))
       notConnected = false;
     else
     {
@@ -85,13 +85,13 @@ void setup()
 void loop()
 {
   // read the sensor on A0
-  int sensorReading = analogRead(A0); 
-  
+  int sensorReading = analogRead(A0);
+
   // convert the data to a String
   String dataString = "sensor1,";
   dataString += sensorReading;
 
-  // you can append multiple readings to this String to 
+  // you can append multiple readings to this String to
   // send the pachube feed multiple values
   int otherSensorReading = analogRead(A1);
   dataString += "\nsensor2,";
@@ -117,7 +117,7 @@ void loop()
 
   // if you're not connected, and ten seconds have passed since
   // your last connection, then connect again and send data
-  if(!client.connected() && (millis() - lastConnectionTime > postingInterval))
+  if (!client.connected() && (millis() - lastConnectionTime > postingInterval))
   {
     sendData(dataString);
   }
@@ -133,7 +133,7 @@ void sendData(String thisData)
   if (client.connect(server, 80))
   {
     Serial.println("connecting...");
-    
+
     // send the HTTP PUT request:
     client.print("PUT /v2/feeds/");
     client.print(FEEDID);
@@ -150,10 +150,10 @@ void sendData(String thisData)
     client.println("Content-Type: text/csv");
     client.println("Connection: close");
     client.println();
-    
+
     // here's the actual content of the PUT request
     client.println(thisData);
-  } 
+  }
   else
   {
     // if you couldn't make a connection
