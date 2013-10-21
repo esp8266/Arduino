@@ -26,12 +26,17 @@ public class SystemProfilerParserTest {
 
     output = TestHelper.inputStreamToString(SystemProfilerParserTest.class.getResourceAsStream("system_profiler_output4.txt"));
 
-    assertEquals("0X2341_0X0041", new SystemProfilerParser().extractVIDAndPID(output, "/dev/cu.usbmodem04101"));
-    assertEquals("0X2341_0X0041", new SystemProfilerParser().extractVIDAndPID(output, "/dev/tty.usbmodem04101"));
+    assertEquals("0X2341_0X0041", new SystemProfilerParser().extractVIDAndPID(output, "/dev/cu.usbmodem411"));
+    assertEquals("0X2341_0X0041", new SystemProfilerParser().extractVIDAndPID(output, "/dev/tty.usbmodem411"));
 
     output = TestHelper.inputStreamToString(SystemProfilerParserTest.class.getResourceAsStream("system_profiler_output5.txt"));
 
-    assertEquals("0X2341_0X8041", new SystemProfilerParser().extractVIDAndPID(output, "/dev/cu.usbmodem06201"));
-    assertEquals("0X2341_0X8041", new SystemProfilerParser().extractVIDAndPID(output, "/dev/tty.usbmodem06201"));
+    assertEquals("0X2341_0X8041", new SystemProfilerParser().extractVIDAndPID(output, "/dev/cu.usbmodem621"));
+    assertEquals("0X2341_0X8041", new SystemProfilerParser().extractVIDAndPID(output, "/dev/tty.usbmodem621"));
+
+    output = TestHelper.inputStreamToString(SystemProfilerParserTest.class.getResourceAsStream("system_profiler_output6.txt"));
+
+    assertEquals("0X2341_0X8041", new SystemProfilerParser().extractVIDAndPID(output, "/dev/cu.usbmodem1421"));
+    assertEquals("0X2341_0X8041", new SystemProfilerParser().extractVIDAndPID(output, "/dev/tty.usbmodem1421"));
   }
 }
