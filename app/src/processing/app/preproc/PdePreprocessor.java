@@ -112,13 +112,13 @@ public class PdePreprocessor {
 //    }
 
     prototypes = prototypes(program);
-    
+
     // store # of prototypes so that line number reporting can be adjusted
     prototypeCount = prototypes.size();
   
     // do this after the program gets re-combobulated
     this.program = program;
-    
+
     return headerCount + prototypeCount;
   }
 
@@ -244,7 +244,9 @@ public class PdePreprocessor {
     // XXX: doesn't properly handle special single-quoted characters
     // single-quoted character
     String p = "('.')";
-    
+
+    p += "|('\\\\\"')";
+
     // double-quoted string
     p += "|(\"(?:[^\"\\\\]|\\\\.)*\")";
     
@@ -294,7 +296,7 @@ public class PdePreprocessor {
   
   public ArrayList<String> prototypes(String in) {
     in = collapseBraces(strip(in));
-    
+
     // XXX: doesn't handle ... varargs
     // XXX: doesn't handle function pointers
     Pattern prototypePattern = Pattern.compile("[\\w\\[\\]\\*]+\\s+[&\\[\\]\\*\\w\\s]+\\([&,\\[\\]\\*\\w\\s]*\\)(?=\\s*;)");
