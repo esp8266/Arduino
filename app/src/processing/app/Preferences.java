@@ -818,17 +818,15 @@ public class Preferences {
   //static public String get(String attribute) {
   //return get(attribute, null);
   //}
-  
-  static public String get(String attribute /*, String defaultValue */) {
-    return table.get(attribute);
-    /*
-    //String value = (properties != null) ?
-    //properties.getProperty(attribute) : applet.getParameter(attribute);
-    String value = properties.getProperty(attribute);
 
-    return (value == null) ?
-      defaultValue : value;
-    */
+  static public String get(String attribute) {
+    return table.get(attribute);
+  }
+
+  static public String get(String attribute, String defaultValue) {
+    String value = get(attribute);
+
+    return (value == null) ? defaultValue : value;
   }
 
   public static boolean has(String key) {

@@ -769,30 +769,23 @@ public class Base {
    */
   public void handleOpenPrompt() throws Exception {
     // get the frontmost window frame for placing file dialog
-    FileDialog fd = new FileDialog(activeEditor,
-                                   _("Open an Arduino sketch..."),
-                                   FileDialog.LOAD);
-    // This was annoying people, so disabled it in 0125.
-    //fd.setDirectory(Preferences.get("sketchbook.path"));
-    //fd.setDirectory(getSketchbookPath());
+    JFileChooser fd = new JFileChooser(Preferences.get("last.folder", Base.getSketchbookFolder().getAbsolutePath()));
+    fd.setDialogTitle(_("Open an Arduino sketch..."));
+    fd.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    fd.setFileFilter(new FileNameExtensionFilter(_("Sketches (*.ino, *.pde)"), "ino", "pde"));
 
-    // Only show .pde files as eligible bachelors
-    fd.setFilenameFilter(new FilenameFilter() {
-        public boolean accept(File dir, String name) {
-          return name.toLowerCase().endsWith(".ino")
-              || name.toLowerCase().endsWith(".pde");
-        }
-      });
+    Dimension preferredSize = fd.getPreferredSize();
+    fd.setPreferredSize(new Dimension(preferredSize.width + 200, preferredSize.height + 200));
 
-    fd.setVisible(true);
+    int returnVal = fd.showOpenDialog(activeEditor);
 
-    String directory = fd.getDirectory();
-    String filename = fd.getFile();
+    if (returnVal != JFileChooser.APPROVE_OPTION) {
+      return;
+    }
 
-    // User canceled selection
-    if (filename == null) return;
+    File inputFile = fd.getSelectedFile();
 
-    File inputFile = new File(directory, filename);
+    Preferences.set("last.folder", inputFile.getAbsolutePath());
     handleOpen(inputFile.getAbsolutePath());
   }
 
@@ -2185,43 +2178,17 @@ public class Base {
   // .................................................................
 
 
-  /**
-   * Prompt for a fodler and return it as a File object (or null).
-   * Implementation for choosing directories that handles both the
-   * Mac OS X hack to allow the native AWT file dialog, or uses
-   * the JFileChooser on other platforms. Mac AWT trick obtained from
-   * <A HREF="http://lists.apple.com/archives/java-dev/2003/Jul/msg00243.html">this post</A>
-   * on the OS X Java dev archive which explains the cryptic note in
-   * Apple's Java 1.4 release docs about the special System property.
-   */
   static public File selectFolder(String prompt, File folder, Frame frame) {
-    if (Base.isMacOS()) {
-      if (frame == null) frame = new Frame(); //.pack();
-      FileDialog fd = new FileDialog(frame, prompt, FileDialog.LOAD);
-      if (folder != null) {
-        fd.setDirectory(folder.getParent());
-        //fd.setFile(folder.getName());
-      }
-      System.setProperty("apple.awt.fileDialogForDirectories", "true");
-      fd.setVisible(true);
-      System.setProperty("apple.awt.fileDialogForDirectories", "false");
-      if (fd.getFile() == null) {
-        return null;
-      }
-      return new File(fd.getDirectory(), fd.getFile());
+    JFileChooser fc = new JFileChooser();
+    fc.setDialogTitle(prompt);
+    if (folder != null) {
+      fc.setSelectedFile(folder);
+    }
+    fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
-    } else {
-      JFileChooser fc = new JFileChooser();
-      fc.setDialogTitle(prompt);
-      if (folder != null) {
-        fc.setSelectedFile(folder);
-      }
-      fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-
-      int returned = fc.showOpenDialog(new JDialog());
-      if (returned == JFileChooser.APPROVE_OPTION) {
-        return fc.getSelectedFile();
-      }
+    int returned = fc.showOpenDialog(new JDialog());
+    if (returned == JFileChooser.APPROVE_OPTION) {
+      return fc.getSelectedFile();
     }
     return null;
   }
