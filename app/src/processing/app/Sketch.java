@@ -187,6 +187,8 @@ public class Sketch {
           if (Sketch.isSanitaryName(base)) {
             code[codeCount++] =
               new SketchCode(new File(folder, filename), extension);
+          } else {
+            editor.console.message(I18n.format("File name {0} is invalid: ignored", filename), true, false);
           }
         }
       }
