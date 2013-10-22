@@ -110,6 +110,7 @@
       <fileset dir="test" includes="**/*.zip" />
       <fileset dir="test" includes="**/*.txt" />
       <fileset dir="test" includes="**/*.properties" />
+      <fileset dir="test" includes="**/*.ino" />
     </copy>
 
     <junit printsummary="yes" dir="${work.dir}" fork="true">
