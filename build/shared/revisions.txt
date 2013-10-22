@@ -8,6 +8,8 @@ ARDUINO 1.5.5 BETA
 * Improved SSH uploader (Arduino Yun): uses file ~/.ssh/config if available. Allows public key only authentication and ssh servers listening on ports other than 22.
 * Font anti-aliasing now ON by default (users will have to either delete or manually edit their preferences.txt file)
 * Added warning message when opening sketches with additional files with illegal names
+* (windows) Upgraded embedded Java runtime to version 7: much faster startup
+* Improved files open/save dialogs
 
 [libraries]
 * avr: Fixed buffer overflow in File::doBuffer() (dreggy)
