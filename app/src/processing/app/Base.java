@@ -386,7 +386,7 @@ public class Base {
 
       // Do board selection if requested
       if (selectBoard != null)
-        selectBoard(selectBoard, editor);
+        selectBoard(selectBoard);
 
       if (doUpload) {
         // Build and upload
@@ -1292,9 +1292,7 @@ public class Base {
 
         // Cycle through all boards of this platform
         for (TargetBoard board : targetPlatform.getBoards().values()) {
-          JMenuItem item = createBoardMenusAndCustomMenus(
-                                                          editor,
-                                                          menuItemsToClickAfterStartup,
+          JMenuItem item = createBoardMenusAndCustomMenus(menuItemsToClickAfterStartup,
                                                           buttonGroupsMap,
                                                           board, targetPlatform, targetPackage);
           boardsMenu.add(item);
@@ -1314,10 +1312,9 @@ public class Base {
   }
 
   private JRadioButtonMenuItem createBoardMenusAndCustomMenus(
-                                              final Editor editor,
-                                              List<JMenuItem> menuItemsToClickAfterStartup,
-                                              Map<String, ButtonGroup> buttonGroupsMap,
-                                              TargetBoard board, TargetPlatform targetPlatform, TargetPackage targetPackage)
+          List<JMenuItem> menuItemsToClickAfterStartup,
+          Map<String, ButtonGroup> buttonGroupsMap,
+          TargetBoard board, TargetPlatform targetPlatform, TargetPackage targetPackage)
       throws Exception {
     String selPackage = Preferences.get("target_package");
     String selPlatform = Preferences.get("target_platform");
@@ -1331,7 +1328,7 @@ public class Base {
     @SuppressWarnings("serial")
     Action action = new AbstractAction(board.getName()) {
       public void actionPerformed(ActionEvent actionevent) {
-        selectBoard((String) getValue("b"), editor);
+        selectBoard((String) getValue("b"));
       }
     };
     action.putValue("b", packageName + ":" + platformName + ":" + boardId);
@@ -1360,7 +1357,7 @@ public class Base {
               Preferences.set("target_package", (String) getValue("package"));
               Preferences.set("target_platform", (String) getValue("platform"));
               Preferences.set("board", (String) getValue("board"));
-              Preferences.set("custom_" + menuId, (String) getValue("board") + "_" + (String) getValue("custom_menu_option"));
+              Preferences.set("custom_" + menuId, getValue("board") + "_" + getValue("custom_menu_option"));
 
               filterVisibilityOfSubsequentBoardMenus((String) getValue("board"), currentIndex);
 
@@ -1472,7 +1469,7 @@ public class Base {
   }
 
 
-  private void selectBoard(String selectBoard, Editor editor) {
+  private void selectBoard(String selectBoard) {
     String[] split = selectBoard.split(":");
     Preferences.set("target_package", split[0]);
     Preferences.set("target_platform", split[1]);
