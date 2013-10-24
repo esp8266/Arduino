@@ -1473,9 +1473,18 @@ public class Base {
     String[] split = selectBoard.split(":");
     Preferences.set("target_package", split[0]);
     Preferences.set("target_platform", split[1]);
-    Preferences.set("board", split[2]);
+    String boardId = split[2];
+    Preferences.set("board", boardId);
 
-    filterVisibilityOfSubsequentBoardMenus(split[2], 1);
+    if (split.length > 3) {
+      String[] customsParts = split[3].split(",");
+      for (String customParts : customsParts) {
+        String[] keyValue = customParts.split("=");
+        Preferences.set("custom_" + keyValue[0].trim(), boardId + "_" + keyValue[1].trim());
+      }
+    }
+
+    filterVisibilityOfSubsequentBoardMenus(boardId, 1);
 
     onBoardOrPortChange();
     Sketch.buildSettingChanged();
