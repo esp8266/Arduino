@@ -318,7 +318,6 @@ public class Base {
     // Setup board-dependent variables.
     onBoardOrPortChange();
 
-    boolean opened = false;
     boolean doUpload = false;
     boolean doVerify = false;
     boolean doVerbose = false;
@@ -365,6 +364,9 @@ public class Base {
       filenames.add(args[i]);
     }
 
+    if ((doUpload || doVerify) && filenames.size() != 1)
+        showError(null, _("Must specify exactly one sketch file"), null);
+
     for (String path: filenames) {
       // Fix a problem with systems that use a non-ASCII languages. Paths are
       // being passed in with 8.3 syntax, which makes the sketch loader code
@@ -378,20 +380,22 @@ public class Base {
           e.printStackTrace();
         }
       }
+
       if (!new File(path).isAbsolute()) {
         path = new File(currentDirectory, path).getAbsolutePath();
       }
-      if (handleOpen(path) != null) {
-        opened = true;
+
+      if (handleOpen(path) == null) {
+        String mess = I18n.format(_("Failed to open sketch: \"{0}\""), path);
+        // Open failure is fatal in upload/verify mode
+        if (doUpload || doVerify)
+          showError(null, mess, null);
+        else
+          showWarning(null, mess, null);
       }
     }
 
     if (doUpload || doVerify) {
-      if (!opened) {
-        System.out.println(_("Can't open source sketch!"));
-        System.exit(2);
-      }
-
       // Set verbosity for command line build
       Preferences.set("build.verbose", "" + doVerbose);
       Preferences.set("upload.verbose", "" + doVerbose);
@@ -425,11 +429,10 @@ public class Base {
     }
 
     // Check if there were previously opened sketches to be restored
-    if (restoreSketches())
-      opened = true;
+    restoreSketches();
 
     // Create a new empty window (will be replaced with any files to be opened)
-    if (!opened) {
+    if (editors.isEmpty()) {
       handleNew();
     }
 
