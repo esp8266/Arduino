@@ -395,8 +395,20 @@ public class Base {
         Thread.sleep(10);
 
       // Do board selection if requested
-      if (selectBoard != null)
-        selectBoard(selectBoard);
+      if (selectBoard != null) {
+        String[] split = selectBoard.split(":");
+
+        TargetBoard targetBoard = getTargetPlatform(split[0], split[1]).getBoard(split[2]);
+        selectBoard(targetBoard);
+
+        if (split.length > 3) {
+          String[] customsParts = split[3].split(",");
+          for (String customParts : customsParts) {
+            String[] keyValue = customParts.split("=");
+            Preferences.set("custom_" + keyValue[0].trim(), targetBoard.getId() + "_" + keyValue[1].trim());
+          }
+        }
+      }
 
       if (doUpload) {
         // Build and upload
@@ -1347,10 +1359,10 @@ public class Base {
     @SuppressWarnings("serial")
     Action action = new AbstractAction(board.getName()) {
       public void actionPerformed(ActionEvent actionevent) {
-        selectBoard((String) getValue("b"));
+        selectBoard((TargetBoard)getValue("b"));
       }
     };
-    action.putValue("b", packageName + ":" + platformName + ":" + boardId);
+    action.putValue("b", board);
 
     JRadioButtonMenuItem item = new JRadioButtonMenuItem(action);
 
@@ -1373,11 +1385,11 @@ public class Base {
           @SuppressWarnings("serial")
           Action subAction = new AbstractAction(_(boardCustomMenu.get(customMenuOption))) {
             public void actionPerformed(ActionEvent e) {
-              Preferences.set("custom_" + menuId, getValue("board") + "_" + getValue("custom_menu_option"));
+              Preferences.set("custom_" + menuId, ((TargetBoard)getValue("board")).getId() + "_" + getValue("custom_menu_option"));
               Sketch.buildSettingChanged();
             }
           };
-          subAction.putValue("board", boardId);
+          subAction.putValue("board", board);
           subAction.putValue("custom_menu_option", customMenuOption);
 
           if (!buttonGroupsMap.containsKey(menuId)) {
@@ -1399,12 +1411,12 @@ public class Base {
     return item;
   }
 
-  private static void filterVisibilityOfSubsequentBoardMenus(String boardID, int fromIndex) {
+  private static void filterVisibilityOfSubsequentBoardMenus(TargetBoard board, int fromIndex) {
     for (int i = fromIndex; i < Editor.boardsMenus.size(); i++) {
       JMenu menu = Editor.boardsMenus.get(i);
       for (int m = 0; m < menu.getItemCount(); m++) {
         JMenuItem menuItem = menu.getItem(m);
-        menuItem.setVisible(menuItem.getAction().getValue("board").equals(boardID));
+        menuItem.setVisible(menuItem.getAction().getValue("board").equals(board));
       }
       menu.setVisible(ifThereAreVisibleItemsOn(menu));
 
@@ -1477,22 +1489,15 @@ public class Base {
   }
 
 
-  private void selectBoard(String selectBoard) {
-    String[] split = selectBoard.split(":");
-    Preferences.set("target_package", split[0]);
-    Preferences.set("target_platform", split[1]);
-    String boardId = split[2];
-    Preferences.set("board", boardId);
+  private void selectBoard(TargetBoard targetBoard) {
+    TargetPlatform targetPlatform = targetBoard.getContainerPlatform();
+    TargetPackage targetPackage = targetPlatform.getContainerPackage();
 
-    if (split.length > 3) {
-      String[] customsParts = split[3].split(",");
-      for (String customParts : customsParts) {
-        String[] keyValue = customParts.split("=");
-        Preferences.set("custom_" + keyValue[0].trim(), boardId + "_" + keyValue[1].trim());
-      }
-    }
+    Preferences.set("target_package", targetPackage.getId());
+    Preferences.set("target_platform", targetPlatform.getId());
+    Preferences.set("board", targetBoard.getId());
 
-    filterVisibilityOfSubsequentBoardMenus(boardId, 1);
+    filterVisibilityOfSubsequentBoardMenus(targetBoard, 1);
 
     onBoardOrPortChange();
     Sketch.buildSettingChanged();
