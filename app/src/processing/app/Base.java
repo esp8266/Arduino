@@ -395,21 +395,8 @@ public class Base {
         Thread.sleep(10);
 
       // Do board selection if requested
-      if (selectBoard != null) {
-        String[] split = selectBoard.split(":");
-
-        TargetBoard targetBoard = getTargetPlatform(split[0], split[1]).getBoard(split[2]);
-        selectBoard(targetBoard);
-
-        if (split.length > 3) {
-          String[] customsParts = split[3].split(",");
-          for (String customParts : customsParts) {
-            String[] keyValue = customParts.split("=");
-            Preferences.set("custom_" + keyValue[0].trim(), targetBoard.getId() + "_" + keyValue[1].trim());
-          }
-        }
-      }
-
+      processBoardArgument(selectBoard);
+    
       if (doUpload) {
         // Build and upload
         if (selectPort != null)
@@ -441,6 +428,54 @@ public class Base {
     // Check for updates
     if (Preferences.getBoolean("update.check")) {
       new UpdateCheck(this);
+    }
+  }
+
+  protected void processBoardArgument(String selectBoard) {
+    // No board selected? Nothing to do
+    if (selectBoard == null)
+        return;
+
+    String[] split = selectBoard.split(":", 4);
+
+    if (split.length < 3) {
+      showError(null, I18n.format(_("{0}: Invalid board name, it should be of the form \"package:arch:board\" or \"package:arch:board:options\""), selectBoard), null);
+    }
+
+    TargetPackage targetPackage = getTargetPackage(split[0]);
+    if (targetPackage == null) {
+      showError(null, I18n.format(_("{0}: Unknown package"), split[0]), null);
+    }
+
+    TargetPlatform targetPlatform = targetPackage.get(split[1]);
+    if (targetPlatform == null) {
+      showError(null, I18n.format(_("{0}: Unknown architecture"), split[1]), null);
+    }
+
+    TargetBoard targetBoard = targetPlatform.getBoard(split[2]);
+    if (targetBoard == null) {
+      showError(null, I18n.format(_("{0}: Unknown board"), split[2]), null);
+    }
+
+    selectBoard(targetBoard);
+
+    if (split.length > 3) {
+      String[] options = split[3].split(",");
+      for (String option : options) {
+        String[] keyValue = option.split("=", 2);
+
+        if (keyValue.length != 2)
+            showError(null, I18n.format(_("{0}: Invalid option, should be of the form \"name=value\""), option, targetBoard.getId()), null);
+        String key = keyValue[0].trim();
+        String value = keyValue[1].trim();
+
+        if (!targetBoard.hasMenu(key))
+          showError(null, I18n.format(_("{0}: Invalid option for board \"{1}\""), key, targetBoard.getId()), null);
+        if (targetBoard.getMenuLabel(key, value) == null)
+          showError(null, I18n.format(_("{0}: Invalid option for \"{1}\" option for board \"{2}\""), value, key, targetBoard.getId()), null);
+
+        Preferences.set("custom_" + key, targetBoard.getId() + "_" + value);
+      }
     }
   }
 
@@ -2002,6 +2037,15 @@ public class Base {
     return path;
   }
 
+  /**
+   * Returns a specific TargetPackage
+   *
+   * @param packageName
+   * @return
+   */
+  static public TargetPackage getTargetPackage(String packageName) {
+    return packages.get(packageName);
+  }
 
   /**
    * Returns the currently selected TargetPlatform.
