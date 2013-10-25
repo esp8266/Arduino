@@ -325,6 +325,8 @@ public class Base {
     String selectBoard = null;
     String selectPort = null;
     String currentDirectory = System.getProperty("user.dir");
+    List<String> filenames = new LinkedList<String>();
+
     // Check if any files were passed in on the command line
     for (int i = 0; i < args.length; i++) {
       if (args[i].equals("--upload")) {
@@ -360,14 +362,17 @@ public class Base {
       if (args[i].startsWith("--"))
         showError(null, I18n.format(_("unknown option: {0}"), args[i]), null);
 
-      String path = args[i];
+      filenames.add(args[i]);
+    }
+
+    for (String path: filenames) {
       // Fix a problem with systems that use a non-ASCII languages. Paths are
       // being passed in with 8.3 syntax, which makes the sketch loader code
       // unhappy, since the sketch folder naming doesn't match up correctly.
       // http://dev.processing.org/bugs/show_bug.cgi?id=1089
       if (isWindows()) {
         try {
-          File file = new File(args[i]);
+          File file = new File(path);
           path = file.getCanonicalPath();
         } catch (IOException e) {
           e.printStackTrace();
