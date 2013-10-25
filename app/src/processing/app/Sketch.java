@@ -151,7 +151,7 @@ public class Sketch {
    * Another exception is when an external editor is in use,
    * in which case the load happens each time "run" is hit.
    */
-  protected void load() {
+  protected void load() throws IOException {
     codeFolder = new File(folder, "code");
     dataFolder = new File(folder, "data");
 
@@ -193,6 +193,10 @@ public class Sketch {
         }
       }
     }
+
+    if (codeCount == 0)
+      throw new IOException(_("No valid code files found"));
+
     // Remove any code that wasn't proper
     code = (SketchCode[]) PApplet.subset(code, 0, codeCount);
 
@@ -1258,7 +1262,7 @@ public class Sketch {
    * When running from the editor, take care of preparations before running
    * the build.
    */
-  public void prepare() {
+  public void prepare() throws IOException {
     // make sure the user didn't hide the sketch folder
     ensureExistence();
 
