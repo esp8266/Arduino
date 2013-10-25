@@ -357,6 +357,9 @@ public class Base {
           currentDirectory = args[i];
         continue;
       }
+      if (args[i].startsWith("--"))
+        showError(null, I18n.format(_("unknown option: {0}"), args[i]), null);
+
       String path = args[i];
       // Fix a problem with systems that use a non-ASCII languages. Paths are
       // being passed in with 8.3 syntax, which makes the sketch loader code
