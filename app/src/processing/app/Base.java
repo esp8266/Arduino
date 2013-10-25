@@ -1373,23 +1373,12 @@ public class Base {
           @SuppressWarnings("serial")
           Action subAction = new AbstractAction(_(boardCustomMenu.get(customMenuOption))) {
             public void actionPerformed(ActionEvent e) {
-              Preferences.set("target_package", (String) getValue("package"));
-              Preferences.set("target_platform", (String) getValue("platform"));
-              Preferences.set("board", (String) getValue("board"));
               Preferences.set("custom_" + menuId, getValue("board") + "_" + getValue("custom_menu_option"));
-
-              filterVisibilityOfSubsequentBoardMenus((String) getValue("board"), currentIndex);
-
-              onBoardOrPortChange();
               Sketch.buildSettingChanged();
-              rebuildImportMenu(Editor.importMenu);
-              rebuildExamplesMenu(Editor.examplesMenu);
             }
           };
           subAction.putValue("board", boardId);
           subAction.putValue("custom_menu_option", customMenuOption);
-          subAction.putValue("package", packageName);
-          subAction.putValue("platform", platformName);
 
           if (!buttonGroupsMap.containsKey(menuId)) {
             buttonGroupsMap.put(menuId, new ButtonGroup());
