@@ -364,6 +364,14 @@ public class Base {
 	  showError(null, "Argument required for --curdir", null);
         continue;
       }
+      if (args[i].equals("--pref")) {
+        i++;
+        if (i < args.length)
+          processPrefArgument(args[i]);
+	else
+	  showError(null, "Argument required for --pref", null);
+        continue;
+      }
       if (args[i].startsWith("--"))
         showError(null, I18n.format(_("unknown option: {0}"), args[i]), null);
 
@@ -494,6 +502,14 @@ public class Base {
         Preferences.set("custom_" + key, targetBoard.getId() + "_" + value);
       }
     }
+  }
+
+  protected void processPrefArgument(String arg) {
+    String[] split = arg.split("=", 2);
+    if (split.length != 2 || split[0].isEmpty())
+      showError(null, I18n.format(_("{0}: Invalid argument to --pref, should be of the form \"pref=value\""), arg), null);
+
+    Preferences.set(split[0], split[1]);
   }
 
   public Map<String, Map<String, Object>> getBoardsViaNetwork() {
