@@ -344,18 +344,24 @@ public class Base {
         i++;
         if (i < args.length)
           selectBoard = args[i];
+	else
+	  showError(null, "Argument required for --board", null);
         continue;
       }
       if (args[i].equals("--port")) {
         i++;
         if (i < args.length)
           selectPort = args[i];
+	else
+	  showError(null, "Argument required for --port", null);
         continue;
       }
       if (args[i].equals("--curdir")) {
         i++;
         if (i < args.length)
           currentDirectory = args[i];
+	else
+	  showError(null, "Argument required for --curdir", null);
         continue;
       }
       if (args[i].startsWith("--"))
