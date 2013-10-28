@@ -324,6 +324,7 @@ public class Base {
     boolean doVerbose = false;
     String selectBoard = null;
     String selectPort = null;
+    String currentDirectory = System.getProperty("user.dir");
     // Check if any files were passed in on the command line
     for (int i = 0; i < args.length; i++) {
       if (args[i].equals("--upload")) {
@@ -350,6 +351,12 @@ public class Base {
           selectPort = args[i];
         continue;
       }
+      if (args[i].equals("--curdir")) {
+        i++;
+        if (i < args.length)
+          currentDirectory = args[i];
+        continue;
+      }
       String path = args[i];
       // Fix a problem with systems that use a non-ASCII languages. Paths are
       // being passed in with 8.3 syntax, which makes the sketch loader code
@@ -362,6 +369,9 @@ public class Base {
         } catch (IOException e) {
           e.printStackTrace();
         }
+      }
+      if (!new File(path).exists()) {
+        path = new File(currentDirectory, path).getAbsolutePath();
       }
       if (handleOpen(path) != null) {
         opened = true;

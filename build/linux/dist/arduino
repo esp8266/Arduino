@@ -1,9 +1,10 @@
 #!/bin/sh
- 
+
+CURDIR=`pwd`
 APPDIR="$(dirname -- "$(readlink -f -- "${0}")" )"
 
 cd "$APPDIR"
- 
+
 for LIB in \
     java/lib/rt.jar \
     java/lib/tools.jar \
@@ -19,4 +20,5 @@ export LD_LIBRARY_PATH
 
 export PATH="${APPDIR}/java/bin:${PATH}"
 
-java -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel processing.app.Base "$@"
+java -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel processing.app.Base --curdir $CURDIR "$@"
+
