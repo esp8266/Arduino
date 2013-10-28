@@ -370,7 +370,7 @@ public class Base {
           e.printStackTrace();
         }
       }
-      if (!new File(path).exists()) {
+      if (!new File(path).isAbsolute()) {
         path = new File(currentDirectory, path).getAbsolutePath();
       }
       if (handleOpen(path) != null) {
