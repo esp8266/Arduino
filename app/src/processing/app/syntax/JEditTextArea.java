@@ -87,7 +87,7 @@ public class JEditTextArea extends JComponent
 
     // Initialize some misc. stuff
     painter = new TextAreaPainter(this,defaults);
-    editorLineNumbers = new TextAreaLineNumbers(defaults.font, defaults.bgcolor, defaults.fgcolor, (int) painter.getPreferredSize().getHeight());
+    editorLineNumbers = new TextAreaLineNumbers(defaults, (int) painter.getPreferredSize().getHeight());
     documentHandler = new DocumentHandler();
     eventListenerList = new EventListenerList();
     caretEvent = new MutableCaretEvent();
@@ -2426,5 +2426,13 @@ public class JEditTextArea extends JComponent
     caretTimer = new Timer(500,new CaretBlinker());
     caretTimer.setInitialDelay(500);
     caretTimer.start();
+  }
+
+  public void setDisplayLineNumbers(boolean displayLineNumbers) {
+    editorLineNumbers.setDisplayLineNumbers(displayLineNumbers);
+  }
+
+  public void setLineNumbersFont(Font font) {
+    editorLineNumbers.setTextFont(font);
   }
 }

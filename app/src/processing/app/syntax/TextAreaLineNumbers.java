@@ -16,8 +16,11 @@ import java.awt.Rectangle;
 
 import javax.swing.JTextPane;
 import javax.swing.border.MatteBorder;
+import javax.swing.text.AttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
+
+import processing.app.Preferences;
 
 public class TextAreaLineNumbers extends JTextPane {
   
@@ -34,25 +37,29 @@ public class TextAreaLineNumbers extends JTextPane {
   private int currEndNum = 0;
   private int currNumDigits = MIN_NUM_DIGITS;
   
-  public TextAreaLineNumbers(Font font, Color bgcolor, Color fgcolor, int preferredHeight) {
-    setFont(font);
-    setBackground(bgcolor);
-    setForeground(fgcolor);
+  public TextAreaLineNumbers(TextAreaDefaults defaults, int preferredHeight) {
+    setBackground(defaults.bgcolor);
+    setForeground(defaults.fgcolor);
     setOpaque(true);
     setEditable(false);
     setEnabled(false);
     setBorder(new MatteBorder(0, 0, 0, 1, new Color(240, 240, 240)));
-
-    SimpleAttributeSet attribs = new SimpleAttributeSet();  
-    StyleConstants.setAlignment(attribs , StyleConstants.ALIGN_RIGHT);
-    StyleConstants.setLeftIndent(attribs , 6);
-    StyleConstants.setRightIndent(attribs , 6);  
-    setParagraphAttributes(attribs,true); 
+    setTextFont(Preferences.getFont("editor.font")); 
     
     DIGIT_WIDTH = getFontMetrics(getFont()).stringWidth("0");
     MIN_WIDTH = DIGIT_WIDTH * MIN_NUM_DIGITS + PADDING_WIDTH;
     
     setPreferredSize(new Dimension(MIN_WIDTH, preferredHeight));
+  }
+
+  public void setTextFont(Font font) {
+    setFont(font);
+    SimpleAttributeSet attribs = new SimpleAttributeSet();  
+    StyleConstants.setAlignment(attribs , StyleConstants.ALIGN_RIGHT);
+    StyleConstants.setLeftIndent(attribs , 6);
+    StyleConstants.setRightIndent(attribs , 6);
+    StyleConstants.setFontSize(attribs, getFont().getSize());
+    setParagraphAttributes(attribs,true);
   }
   
   public void updateLineNumbers(int startNum, int endNum) {
@@ -68,7 +75,7 @@ public class TextAreaLineNumbers extends JTextPane {
     }
     sb.append(endNum);
     setText(sb.toString());
-    
+
     invalidate();
   }
   
@@ -78,8 +85,21 @@ public class TextAreaLineNumbers extends JTextPane {
     }
     currNumDigits = numDigits;
     
-    setBounds(new Rectangle(Math.max(MIN_WIDTH, DIGIT_WIDTH * numDigits + PADDING_WIDTH), getHeight()));
+    updateBounds();
+    invalidate();
+  }
+
+  public void setDisplayLineNumbers(boolean displayLineNumbers) {
+    setVisible(displayLineNumbers);
+    if (displayLineNumbers) {
+      updateBounds();
+    } else {
+      setBounds(new Rectangle(0, getHeight()));
+    }
     invalidate();
   }
   
+  private void updateBounds() {
+    setBounds(new Rectangle(Math.max(MIN_WIDTH, DIGIT_WIDTH * currNumDigits + PADDING_WIDTH), getHeight()));
+  }
 }
