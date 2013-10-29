@@ -113,7 +113,8 @@ public class EditorStatus extends JPanel /*implements ActionListener*/ {
   public void notice(String message) {
     mode = NOTICE;
     this.message = message;
-    copyErrorButton.setVisible(false);
+    if (copyErrorButton != null)
+      copyErrorButton.setVisible(false);
     //update();
     repaint();
   }
@@ -126,7 +127,8 @@ public class EditorStatus extends JPanel /*implements ActionListener*/ {
   public void error(String message) {
     mode = ERR;
     this.message = message;
-    copyErrorButton.setVisible(true);
+    if (copyErrorButton != null)
+      copyErrorButton.setVisible(true);
     repaint();
   }
 

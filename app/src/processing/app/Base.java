@@ -399,7 +399,7 @@ public class Base {
         path = new File(currentDirectory, path).getAbsolutePath();
       }
 
-      if (handleOpen(path) == null) {
+      if (handleOpen(path, nextEditorLocation(), !(doUpload || doVerify)) == null) {
         String mess = I18n.format(_("Failed to open sketch: \"{0}\""), path);
         // Open failure is fatal in upload/verify mode
         if (doUpload || doVerify)
@@ -415,10 +415,6 @@ public class Base {
       Preferences.set("upload.verbose", "" + doVerbose);
 
       Editor editor = editors.get(0);
-
-      // Wait until editor is initialized
-      while (!editor.status.isInitialized())
-        Thread.sleep(10);
 
       // Do board selection if requested
       processBoardArgument(selectBoard);
@@ -574,7 +570,7 @@ public class Base {
         location = nextEditorLocation();
       }
       // If file did not exist, null will be returned for the Editor
-      if (handleOpen(path, location) != null) {
+      if (handleOpen(path, location, true) != null) {
         opened++;
       }
     }
@@ -888,11 +884,11 @@ public class Base {
    * @throws Exception 
    */
   public Editor handleOpen(String path) throws Exception {
-    return handleOpen(path, nextEditorLocation());
+    return handleOpen(path, nextEditorLocation(), true);
   }
 
 
-  protected Editor handleOpen(String path, int[] location) throws Exception {
+  protected Editor handleOpen(String path, int[] location, boolean showEditor) throws Exception {
 //    System.err.println("entering handleOpen " + path);
 
     File file = new File(path);
@@ -960,7 +956,8 @@ public class Base {
 
     // now that we're ready, show the window
     // (don't do earlier, cuz we might move it based on a window being closed)
-    editor.setVisible(true);
+    if (showEditor)
+	    editor.setVisible(true);
 
 //    System.err.println("exiting handleOpen");
 
