@@ -1312,11 +1312,11 @@ public class Sketch {
    * @param buildPath Location to copy all the .java files
    * @return null if compilation failed, main class name if not
    */
-  public String preprocess(String buildPath) throws RunnerException {
-    return preprocess(buildPath, new PdePreprocessor());
+  public void preprocess(String buildPath) throws RunnerException {
+    preprocess(buildPath, new PdePreprocessor());
   }
 
-  public String preprocess(String buildPath, PdePreprocessor preprocessor) throws RunnerException {
+  public void preprocess(String buildPath, PdePreprocessor preprocessor) throws RunnerException {
     // make sure the user didn't hide the sketch folder
     ensureExistence();
 
@@ -1372,18 +1372,12 @@ public class Sketch {
     // 2. run preproc on that code using the sugg class name
     //    to create a single .java file and write to buildpath
 
-    String primaryClassName = null;
-
     try {
       // Output file
       File streamFile = new File(buildPath, name + ".cpp");
       FileOutputStream outputStream = new FileOutputStream(streamFile);
       preprocessor.write(outputStream);
       outputStream.close();
-
-      // store this for the compiler and the runtime
-      primaryClassName = name + ".cpp";
-
     } catch (FileNotFoundException fnfe) {
       fnfe.printStackTrace();
       String msg = _("Build folder disappeared or could not be written");
@@ -1432,7 +1426,6 @@ public class Sketch {
         sc.addPreprocOffset(headerOffset);
       }
     }
-    return primaryClassName;
   }
 
 
@@ -1538,7 +1531,8 @@ public class Sketch {
   public String build(String buildPath, boolean verbose) throws RunnerException {
     // run the preprocessor
     editor.status.progressUpdate(20);
-    String primaryClassName = preprocess(buildPath);
+    String primaryClassName = name + ".cpp";
+    preprocess(buildPath);
 
     // compile the program. errors will happen as a RunnerException
     // that will bubble up to whomever called build().
