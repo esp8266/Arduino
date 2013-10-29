@@ -1454,7 +1454,6 @@ public class Base {
           Action subAction = new AbstractAction(_(boardCustomMenu.get(customMenuOption))) {
             public void actionPerformed(ActionEvent e) {
               Preferences.set("custom_" + menuId, ((TargetBoard)getValue("board")).getId() + "_" + getValue("custom_menu_option"));
-              Sketch.buildSettingChanged();
             }
           };
           subAction.putValue("board", board);
@@ -1568,7 +1567,6 @@ public class Base {
     filterVisibilityOfSubsequentBoardMenus(targetBoard, 1);
 
     onBoardOrPortChange();
-    Sketch.buildSettingChanged();
     rebuildImportMenu(Editor.importMenu);
     rebuildExamplesMenu(Editor.examplesMenu);
   }

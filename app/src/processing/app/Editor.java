@@ -2007,8 +2007,6 @@ public class Editor extends JFrame implements RunnerListener {
     try {
       stopHandler.run();
     } catch (Exception e) { }
-
-    sketch.cleanup();
   }
 
 
