@@ -62,25 +62,29 @@ public class Compiler implements MessageConsumer {
   private String targetArch;
   
   private RunnerException exception;
-  
+
   /**
-   * Compile sketch.
-   *
+   * Create a new Compiler
    * @param _sketch Sketch object to be compiled.
    * @param _buildPath Where the temporary files live and will be built from.
    * @param _primaryClassName the name of the combined sketch file w/ extension
+   */
+  public Compiler(Sketch _sketch, String _buildPath, String _primaryClassName)
+      throws RunnerException {
+    sketch = _sketch;
+    prefs = createBuildPreferences(_buildPath, _primaryClassName);
+  }
+
+  /**
+   * Compile sketch.
+   *
    * @return true if successful.
    * @throws RunnerException Only if there's a problem. Only then.
    */
-  public boolean compile(Sketch _sketch, String _buildPath,
-                         String _primaryClassName, boolean _verbose)
-      throws RunnerException {
-    sketch = _sketch;
+  public boolean compile(boolean _verbose) throws RunnerException {
     verbose = _verbose || Preferences.getBoolean("build.verbose");
     sketchIsCompiled = false;
     objectFiles = new ArrayList<File>();
-
-    prefs = createBuildPreferences(_buildPath, _primaryClassName);
 
     // 0. include paths for core + all libraries
     sketch.setCompilingProgress(20);

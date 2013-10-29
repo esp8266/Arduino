@@ -1542,8 +1542,8 @@ public class Sketch {
 
     // compile the program. errors will happen as a RunnerException
     // that will bubble up to whomever called build().
-    Compiler compiler = new Compiler();
-    if (compiler.compile(this, buildPath, primaryClassName, verbose)) {
+    Compiler compiler = new Compiler(this, buildPath, primaryClassName);
+    if (compiler.compile(verbose)) {
       size(compiler.getBuildPreferences());
       return primaryClassName;
     }
