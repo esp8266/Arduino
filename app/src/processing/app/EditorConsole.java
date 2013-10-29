@@ -333,13 +333,11 @@ public class EditorConsole extends JScrollPane {
       if (currentConsole != null) {
         currentConsole.write(b, offset, length, err);
       } else {
-        try {
-          if (err) {
-            systemErr.write(b);
-          } else {
-            systemOut.write(b);
-          }
-        } catch (IOException e) { }  // just ignore, where would we write?
+        if (err) {
+          systemErr.write(b, offset, length);
+        } else {
+          systemOut.write(b, offset, length);
+        }
       }
 
       OutputStream echo = err ? stderrFile : stdoutFile;
