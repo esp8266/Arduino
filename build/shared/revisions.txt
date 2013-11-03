@@ -26,6 +26,7 @@ ARDUINO 1.5.5 BETA
 * avr: Refactored Mega* variants definitions in boards.txt (Kristian Sloth Lauszus)
 * avr: Removed File object destructor. In order to free memory allocated by a File object the safest way is to call its close() method
 * Added digitalPinToInterrupt variant macro (Paul Stoffregen)
+* avr: added variant file for Arduino Ethernet
 
 ARDUINO 1.5.4 BETA 2013.09.10
 
