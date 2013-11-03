@@ -265,7 +265,7 @@ ethernet.bootloader.file=optiboot_atmega328.hex
 ethernet.bootloader.unlock_bits=0x3F
 ethernet.bootloader.lock_bits=0x0F
 
-ethernet.build.variant=standard
+ethernet.build.variant=ethernet
 ethernet.build.mcu=atmega328p
 ethernet.build.f_cpu=16000000L
 ethernet.build.core=arduino
