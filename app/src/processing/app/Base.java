@@ -1230,6 +1230,15 @@ public class Base {
     File platformFolder = targetPlatform.getFolder();
     librariesFolders = new ArrayList<File>();
     librariesFolders.add(getContentFile("libraries"));
+    String core = getBoardPreferences().get("build.core");
+    if (core.contains(":")) {
+      String referencedCore = core.split(":")[0];
+      TargetPlatform referencedPlatform = Base.getTargetPlatform(referencedCore, targetPlatform.getId());
+      if (referencedPlatform != null) {
+      File referencedPlatformFolder = referencedPlatform.getFolder();
+        librariesFolders.add(new File(referencedPlatformFolder, "libraries"));
+      }
+    }
     librariesFolders.add(new File(platformFolder, "libraries"));
     librariesFolders.add(getSketchbookLibrariesFolder());
 
