@@ -39,7 +39,7 @@ static const uint8_t SCK  = 52;
 
 static const uint8_t SDA = 20;
 static const uint8_t SCL = 21;
-static const uint8_t LED_BUILTIN = 13;
+#define LED_BUILTIN 13
 
 static const uint8_t A0 = 54;
 static const uint8_t A1 = 55;
