@@ -101,7 +101,7 @@
 
 static const uint8_t SDA = 2;
 static const uint8_t SCL = 3;
-static const uint8_t LED_BUILTIN = 13;
+#define LED_BUILTIN 13
 
 // Map SPI port to 'new' pins D14..D17
 static const uint8_t SS   = 17;
