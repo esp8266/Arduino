@@ -87,7 +87,7 @@ public class JEditTextArea extends JComponent
 
     // Initialize some misc. stuff
     painter = new TextAreaPainter(this,defaults);
-    editorLineNumbers = new TextAreaLineNumbers(defaults, (int) painter.getPreferredSize().getHeight());
+    editorLineNumbers = new TextAreaLineNumbers(this,defaults);
     documentHandler = new DocumentHandler();
     eventListenerList = new EventListenerList();
     caretEvent = new MutableCaretEvent();
@@ -321,8 +321,10 @@ public class JEditTextArea extends JComponent
   }
 
   private void updateLineNumbers() {
-    editorLineNumbers.updateLineNumbers(getFirstLine() + 1, Math.min(getFirstLine() + getVisibleLines() + 1, getLineCount()));
-    editorLineNumbers.updateWidthForNumDigits(String.valueOf(getLineCount()).length());
+    if (editorLineNumbers != null) {
+      editorLineNumbers.updateLineNumbers(getFirstLine() + 1, Math.min(getFirstLine() + getVisibleLines() + 1, getLineCount()));
+      editorLineNumbers.updateWidthForNumDigits(String.valueOf(getLineCount()).length());
+    }
   }
 
   /**
@@ -803,7 +805,11 @@ public class JEditTextArea extends JComponent
    */
   public final int getLineCount()
   {
-    return document.getDefaultRootElement().getElementCount();
+    if (document != null) {
+      return document.getDefaultRootElement().getElementCount();
+    } else {
+      return 0;
+    }
   }
 
   /**
@@ -2430,9 +2436,5 @@ public class JEditTextArea extends JComponent
 
   public void setDisplayLineNumbers(boolean displayLineNumbers) {
     editorLineNumbers.setDisplayLineNumbers(displayLineNumbers);
-  }
-
-  public void setLineNumbersFont(Font font) {
-    editorLineNumbers.setTextFont(font);
   }
 }

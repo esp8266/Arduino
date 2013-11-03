@@ -452,7 +452,6 @@ public class Editor extends JFrame implements RunnerListener {
     // apply changes to the font size for the editor
     //TextAreaPainter painter = textarea.getPainter();
     painter.setFont(Preferences.getFont("editor.font"));
-    textarea.setLineNumbersFont(Preferences.getFont("editor.font"));
     //Font font = painter.getFont();
     //textarea.getPainter().setFont(new Font("Courier", Font.PLAIN, 36));
 

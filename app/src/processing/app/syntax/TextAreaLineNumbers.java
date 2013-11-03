@@ -10,19 +10,12 @@
 package processing.app.syntax;
 
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Rectangle;
 
-import javax.swing.JTextPane;
 import javax.swing.border.MatteBorder;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
 
-import processing.app.Preferences;
-
-public class TextAreaLineNumbers extends JTextPane {
+public class TextAreaLineNumbers extends TextAreaPainter {
   
   private final int LEFT_INDENT = 6;
   private final int RIGHT_INDENT = 6;
@@ -37,29 +30,14 @@ public class TextAreaLineNumbers extends JTextPane {
   private int currEndNum = 0;
   private int currNumDigits = MIN_NUM_DIGITS;
   
-  public TextAreaLineNumbers(TextAreaDefaults defaults, int preferredHeight) {
-    setBackground(defaults.bgcolor);
-    setForeground(defaults.fgcolor);
-    setOpaque(true);
-    setEditable(false);
-    setEnabled(false);
-    setBorder(new MatteBorder(0, 0, 0, 1, new Color(240, 240, 240)));
-    setTextFont(Preferences.getFont("editor.font")); 
-    
+  
+  
+  public TextAreaLineNumbers(JEditTextArea textArea, TextAreaDefaults defaults) {
+    super(textArea, defaults);
     DIGIT_WIDTH = getFontMetrics(getFont()).stringWidth("0");
     MIN_WIDTH = DIGIT_WIDTH * MIN_NUM_DIGITS + PADDING_WIDTH;
-    
-    setPreferredSize(new Dimension(MIN_WIDTH, preferredHeight));
-  }
-
-  public void setTextFont(Font font) {
-    setFont(font);
-    SimpleAttributeSet attribs = new SimpleAttributeSet();  
-    StyleConstants.setAlignment(attribs , StyleConstants.ALIGN_RIGHT);
-    StyleConstants.setLeftIndent(attribs , 6);
-    StyleConstants.setRightIndent(attribs , 6);
-    StyleConstants.setFontSize(attribs, getFont().getSize());
-    setParagraphAttributes(attribs,true);
+    setEnabled(false);
+    setBorder(new MatteBorder(0, 0, 0, RIGHT_BORDER_WIDTH, new Color(240, 240, 240)));
   }
   
   public void updateLineNumbers(int startNum, int endNum) {
@@ -69,14 +47,30 @@ public class TextAreaLineNumbers extends JTextPane {
     currStartNum = startNum;
     currEndNum = endNum;
     
-    StringBuilder sb = new StringBuilder();
-    for (int i = startNum; i < endNum; i++) {
-      sb.append(i).append("\n");
-    }
-    sb.append(endNum);
-    setText(sb.toString());
-
     invalidate();
+    repaint();
+  }
+  
+  @Override
+  public void paint(Graphics gfx) {
+    super.paint(gfx);
+    getBorder().paintBorder(this, gfx, 0, 0, getSize().width, getSize().height);
+  }
+
+  @Override
+  protected void paintLine(Graphics gfx, TokenMarker tokenMarker,
+                           int line, int x)
+  {
+    currentLineIndex = line;
+    gfx.setFont(getFont());
+    gfx.setColor(Color.GRAY);
+    int y = textArea.lineToY(line);
+    int startX = getBounds().x + getBounds().width;
+    if (line >= 0 && line < textArea.getLineCount()) {
+      String lineNumberString = String.valueOf(line+1);
+      int lineStartX = startX - RIGHT_BORDER_WIDTH - RIGHT_INDENT - fm.stringWidth(lineNumberString);
+      gfx.drawString(lineNumberString,lineStartX,y + fm.getHeight());
+    }
   }
   
   public void updateWidthForNumDigits(int numDigits) {
@@ -85,8 +79,11 @@ public class TextAreaLineNumbers extends JTextPane {
     }
     currNumDigits = numDigits;
     
-    updateBounds();
-    invalidate();
+    if (isVisible()) {
+      updateBounds();
+      invalidate();
+      repaint();
+    }
   }
 
   public void setDisplayLineNumbers(boolean displayLineNumbers) {
@@ -97,9 +94,13 @@ public class TextAreaLineNumbers extends JTextPane {
       setBounds(new Rectangle(0, getHeight()));
     }
     invalidate();
+    repaint();
   }
   
   private void updateBounds() {
-    setBounds(new Rectangle(Math.max(MIN_WIDTH, DIGIT_WIDTH * currNumDigits + PADDING_WIDTH), getHeight()));
+    if (isVisible()) {
+      setBounds(new Rectangle(Math.max(MIN_WIDTH, DIGIT_WIDTH * currNumDigits + PADDING_WIDTH), getHeight()));
+      textArea.validate();
+    }
   }
 }
