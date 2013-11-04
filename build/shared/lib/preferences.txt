@@ -104,6 +104,9 @@ editor.caret.blink=true
 # area that's not in use by the text (replaced with tildes)
 editor.invalid=false
 
+# show line numbers in editor
+editor.linenumbers = false
+
 # enable ctrl-ins, shift-ins, shift-delete for cut/copy/paste
 # on windows and linux, but disable on the mac
 editor.keys.alternative_cut_copy_paste = true
