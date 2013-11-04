@@ -10,6 +10,7 @@ ARDUINO 1.5.5 BETA
 * Added warning message when opening sketches with additional files with illegal names
 * (windows) Upgraded embedded Java runtime to version 7: much faster startup
 * Improved files open/save dialogs
+* Added line numbers, can be enabled/disabled from preferences (Cayci Gorlitsky)
 
 [libraries]
 * avr: Fixed buffer overflow in File::doBuffer() (dreggy)
