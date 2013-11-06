@@ -243,23 +243,21 @@ public class PdePreprocessor {
   public String strip(String in) {
     // XXX: doesn't properly handle special single-quoted characters
     // single-quoted character
-    String p = "('.')";
+    Pattern[] patterns = new Pattern[6];
+    patterns[5] = Pattern.compile("(\"(?:[^\"\\\\]|\\\\.)*\")", Pattern.MULTILINE);
+    patterns[4] = Pattern.compile("(^\\s*#.*?$)", Pattern.MULTILINE);
+    patterns[3] = Pattern.compile("(/\\*[^*]*(?:\\*(?!/)[^*]*)*\\*/)", Pattern.MULTILINE);
+    patterns[2] = Pattern.compile("(//.*?$)", Pattern.MULTILINE);
+    patterns[1] = Pattern.compile("('\\\\\"')", Pattern.MULTILINE);
+    patterns[0] = Pattern.compile("('.')", Pattern.MULTILINE);
 
-    p += "|('\\\\\"')";
+    String code = in;
+    for (Pattern p : patterns) {
+      Matcher matcher = p.matcher(code);
+      code = matcher.replaceAll(" ");
+    }
 
-    // double-quoted string
-    p += "|(\"(?:[^\"\\\\]|\\\\.)*\")";
-    
-    // single and multi-line comment
-    //p += "|" + "(//\\s*?$)|(/\\*\\s*?\\*/)";
-    p += "|(//.*?$)|(/\\*[^*]*(?:\\*(?!/)[^*]*)*\\*/)";
-    
-    // pre-processor directive
-    p += "|" + "(^\\s*#.*?$)";
-
-    Pattern pattern = Pattern.compile(p, Pattern.MULTILINE);
-    Matcher matcher = pattern.matcher(in);
-    return matcher.replaceAll(" ");
+    return code;
   }
   
   /**
