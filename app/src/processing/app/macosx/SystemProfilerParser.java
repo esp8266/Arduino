@@ -52,12 +52,8 @@ public class SystemProfilerParser {
         device.put(SERIAL_NUMBER, matcher.group(1));
       } else if ((matcher = locationRegex.matcher(line)).matches()) {
         String devicePath = devicePrefix;
-        String suffix = matcher.group(1).substring(2, 6);
-        try {
-          devicePath = devicePath + (Integer.parseInt(suffix) + 1);
-        } catch (NumberFormatException e) {
-          devicePath = devicePath + suffix + "1";
-        }
+        String suffix = matcher.group(1).substring(2, 6).replaceAll("0", "");
+        devicePath = devicePath + suffix + "1";
         device.put(DEVICE_PATH, devicePath);
       } else if ((matcher = pidRegex.matcher(line)).matches()) {
         device.put(PID, matcher.group(1));
