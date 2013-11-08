@@ -1,10 +1,10 @@
 /*
- GSM Pachube client
+ GSM Xively client
  
- This sketch connects an analog sensor to Pachube (http://www.pachube.com)
+ This sketch connects an analog sensor to Xively (http://www.xively.com)
  using a Telefonica GSM/GPRS shield.
 
- This example has been updated to use version 2.0 of the Pachube.com API. 
+ This example has been updated to use version 2.0 of the Xively.com API. 
  To make it work, create a feed with a datastream, and give it the ID
  sensor1. Or change the code below to match your feed.
  
@@ -19,15 +19,15 @@
  
  This code is in the public domain.
  
- http://arduino.cc/en/Tutorial/GSMExamplesPachubeClient
+ http://arduino.cc/en/Tutorial/GSMExamplesXivelyClient
  
  */
 
 // libraries
 #include <GSM.h>
 
-// Pachube Client data
-#define APIKEY         "YOUR API KEY GOES HERE"  // replace your pachube api key here
+// Xively Client data
+#define APIKEY         "YOUR API KEY GOES HERE"  // replace your xively api key here
 #define FEEDID         00000                     // replace your feed ID
 #define USERAGENT      "My Project"              // user agent is the project name
 
@@ -46,12 +46,12 @@ GSM gsmAccess;
 
 // if you don't want to use DNS (and reduce your sketch size)
 // use the numeric IP instead of the name for the server:
-// IPAddress server(216,52,233,121);    // numeric IP for api.pachube.com
-char server[] = "api.pachube.com";      // name address for pachube API
+// IPAddress server(216,52,233,121);    // numeric IP for api.xively.com
+char server[] = "api.xively.com";      // name address for xively API
 
 unsigned long lastConnectionTime = 0;         // last time you connected to the server, in milliseconds
 boolean lastConnected = false;                  // state of the connection last time through the main loop
-const unsigned long postingInterval = 10*1000;  //delay between updates to Pachube.com
+const unsigned long postingInterval = 10*1000;  //delay between updates to Xively.com
 
 void setup()
 {
@@ -126,7 +126,7 @@ void sendData(int thisData)
     client.print("PUT /v2/feeds/");
     client.print(FEEDID);
     client.println(".csv HTTP/1.1");
-    client.println("Host: api.pachube.com");
+    client.println("Host: api.xively.com");
     client.print("X-ApiKey: ");
     client.println(APIKEY);
     client.print("User-Agent: ");

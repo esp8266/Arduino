@@ -1,83 +1,79 @@
 /*
-  Wifi Pachube sensor client with Strings
+  Xively sensor client with Strings
  
- This sketch connects an analog sensor to Pachube (http://www.pachube.com)
- using a Arduino Wifi shield.
+ This sketch connects an analog sensor to Xively (http://www.xively.com)
+ using a Wiznet Ethernet shield. You can use the Arduino Ethernet shield, or
+ the Adafruit Ethernet shield, either one will work, as long as it's got
+ a Wiznet Ethernet module on board.
  
- This example is written for a network using WPA encryption. For 
- WEP or WPA, change the Wifi.begin() call accordingly.
- 
- This example has been updated to use version 2.0 of the pachube.com API. 
- To make it work, create a feed with a datastream, and give it the ID
- sensor1. Or change the code below to match your feed.
+ This example has been updated to use version 2.0 of the xively.com API. 
+ To make it work, create a feed with two datastreams, and give them the IDs
+ sensor1 and sensor2. Or change the code below to match your feed.
  
  This example uses the String library, which is part of the Arduino core from
  version 0019.  
  
  Circuit:
  * Analog sensor attached to analog in 0
- * Wifi shield attached to pins 10, 11, 12, 13
+ * Ethernet shield attached to pins 10, 11, 12, 13
  
- created 16 Mar 2012
- modified 31 May 2012
- by Tom Igoe
- modified 8 Sept 2012
+ created 15 March 2010
+ modified 9 Apr 2012
+ by Tom Igoe with input from Usman Haque and Joe Saavedra
+ modified 8 September 2012
  by Scott Fitzgerald
  
+ http://arduino.cc/en/Tutorial/XivelyClientString
  This code is in the public domain.
  
  */
 
 #include <SPI.h>
-#include <WiFi.h>
+#include <Ethernet.h>
 
-#define APIKEY         "YOUR API KEY GOES HERE" // replace your pachube api key here
-#define FEEDID         00000                    // replace your feed ID
-#define USERAGENT      "My Arduino Project"     // user agent is the project name
 
-char ssid[] = "yourNetwork";      //  your network SSID (name) 
-char pass[] = "secretPassword";   // your network password
+#define APIKEY         "YOUR API KEY GOES HERE" // replace your Xively api key here
+#define FEEDID         00000 // replace your feed ID
+#define USERAGENT      "My Project" // user agent is the project name
 
-int status = WL_IDLE_STATUS;
+
+// assign a MAC address for the ethernet controller.
+// fill in your address here:
+  byte mac[] = { 
+  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
+
+// fill in an available IP address on your network here,
+// for manual configuration:
+IPAddress ip(10,0,1,20);
 
 // initialize the library instance:
-WiFiClient client;
+EthernetClient client;
 
 // if you don't want to use DNS (and reduce your sketch size)
 // use the numeric IP instead of the name for the server:
-//IPAddress server(216,52,233,121);      // numeric IP for api.pachube.com
-char server[] = "api.pachube.com";   // name address for pachube API
+IPAddress server(216,52,233,121);      // numeric IP for api.xively.com
+//char server[] = "api.xively.com";   // name address for xively API
 
 unsigned long lastConnectionTime = 0;          // last time you connected to the server, in milliseconds
 boolean lastConnected = false;                 // state of the connection last time through the main loop
-const unsigned long postingInterval = 10*1000;  //delay between updates to pachube.com
+const unsigned long postingInterval = 10*1000;  //delay between updates to xively.com
 
 void setup() {
-  //Initialize serial and wait for port to open:
-  Serial.begin(9600); 
+ // Open serial communications and wait for port to open:
+  Serial.begin(9600);
   while (!Serial) {
     ; // wait for serial port to connect. Needed for Leonardo only
   }
-  
-  // check for the presence of the shield:
-  if (WiFi.status() == WL_NO_SHIELD) {
-    Serial.println("WiFi shield not present"); 
-    // don't continue:
-    while(true);
-  } 
-  
-  // attempt to connect to Wifi network:
-  while ( status != WL_CONNECTED) { 
-    Serial.print("Attempting to connect to SSID: ");
-    Serial.println(ssid);
-    // Connect to WPA/WPA2 network. Change this line if using open or WEP network:    
-    status = WiFi.begin(ssid, pass);
 
-    // wait 10 seconds for connection:
-    delay(10000);
-  } 
-  // you're connected now, so print out the status:
-  printWifiStatus();
+
+  // give the ethernet module time to boot up:
+  delay(1000);
+  // start the Ethernet connection:
+  if (Ethernet.begin(mac) == 0) {
+    Serial.println("Failed to configure Ethernet using DHCP");
+    // DHCP failed, so use a fixed IP address:
+    Ethernet.begin(mac, ip);
+  }
 }
 
 void loop() {
@@ -89,7 +85,7 @@ void loop() {
   dataString += sensorReading;
 
   // you can append multiple readings to this String if your
-  // pachube feed is set up to handle multiple values:
+  // xively feed is set up to handle multiple values:
   int otherSensorReading = analogRead(A1);
   dataString += "\nsensor2,";
   dataString += otherSensorReading;
@@ -97,7 +93,7 @@ void loop() {
   // if there's incoming data from the net connection.
   // send it out the serial port.  This is for debugging
   // purposes only:
-  while (client.available()) {
+  if (client.available()) {
     char c = client.read();
     Serial.print(c);
   }
@@ -129,8 +125,8 @@ void sendData(String thisData) {
     client.print("PUT /v2/feeds/");
     client.print(FEEDID);
     client.println(".csv HTTP/1.1");
-    client.println("Host: api.pachube.com");
-    client.print("X-ApiKey: ");
+    client.println("Host: api.xively.com");
+    client.print("X-xivelyApiKey: ");
     client.println(APIKEY);
     client.print("User-Agent: ");
     client.println(USERAGENT);
@@ -155,23 +151,4 @@ void sendData(String thisData) {
   // note the time that the connection was made or attempted:
   lastConnectionTime = millis();
 }
-
-
-void printWifiStatus() {
-  // print the SSID of the network you're attached to:
-  Serial.print("SSID: ");
-  Serial.println(WiFi.SSID());
-
-  // print your WiFi shield's IP address:
-  IPAddress ip = WiFi.localIP();
-  Serial.print("IP Address: ");
-  Serial.println(ip);
-
-  // print the received signal strength:
-  long rssi = WiFi.RSSI();
-  Serial.print("signal strength (RSSI):");
-  Serial.print(rssi);
-  Serial.println(" dBm");
-}
-
 

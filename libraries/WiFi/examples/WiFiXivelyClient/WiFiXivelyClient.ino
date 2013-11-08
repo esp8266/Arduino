@@ -1,72 +1,80 @@
 /*
-  Pachube sensor client
+  Wifi Xively sensor client
  
- This sketch connects an analog sensor to Pachube (http://www.pachube.com)
- using a Wiznet Ethernet shield. You can use the Arduino Ethernet shield, or
- the Adafruit Ethernet shield, either one will work, as long as it's got
- a Wiznet Ethernet module on board.
+ This sketch connects an analog sensor to Xively (http://www.xively.com)
+ using an Arduino Wifi shield.
  
- This example has been updated to use version 2.0 of the Pachube.com API. 
+ This example is written for a network using WPA encryption. For 
+ WEP or WPA, change the Wifi.begin() call accordingly.
+ 
+ This example has been updated to use version 2.0 of the Xively API. 
  To make it work, create a feed with a datastream, and give it the ID
  sensor1. Or change the code below to match your feed.
  
- 
  Circuit:
  * Analog sensor attached to analog in 0
- * Ethernet shield attached to pins 10, 11, 12, 13
+ * Wifi shield attached to pins 10, 11, 12, 13
  
- created 15 March 2010
- modified 9 Apr 2012
- by Tom Igoe with input from Usman Haque and Joe Saavedra
+ created 13 Mar 2012
+ modified 31 May 2012
+ by Tom Igoe
+ modified 8 Nov 2013
+ by Scott Fitzgerald
  
-http://arduino.cc/en/Tutorial/PachubeClient
  This code is in the public domain.
  
  */
-
 #include <SPI.h>
-#include <Ethernet.h>
+#include <WiFi.h>
 
-#define APIKEY         "YOUR API KEY GOES HERE" // replace your pachube api key here
-#define FEEDID         00000 // replace your feed ID
-#define USERAGENT      "My Project" // user agent is the project name
+#define APIKEY         "YOUR API KEY GOES HERE" // replace your xively api key here
+#define FEEDID         00000                    // replace your feed ID
+#define USERAGENT      "My Arduino Project"     // user agent is the project name
 
-// assign a MAC address for the ethernet controller.
-// Newer Ethernet shields have a MAC address printed on a sticker on the shield
-// fill in your address here:
-byte mac[] = { 
-  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
+char ssid[] = "yourNetwork";      //  your network SSID (name) 
+char pass[] = "secretPassword";   // your network password
 
-// fill in an available IP address on your network here,
-// for manual configuration:
-IPAddress ip(10,0,1,20);
+int status = WL_IDLE_STATUS;
+
 // initialize the library instance:
-EthernetClient client;
-
+WiFiClient client;
 // if you don't want to use DNS (and reduce your sketch size)
 // use the numeric IP instead of the name for the server:
-IPAddress server(216,52,233,122);      // numeric IP for api.pachube.com
-//char server[] = "api.pachube.com";   // name address for pachube API
+IPAddress server(216,52,233,121);      // numeric IP for api.xively.com
+//char server[] = "api.xively.com";   // name address for xively API
 
 unsigned long lastConnectionTime = 0;          // last time you connected to the server, in milliseconds
 boolean lastConnected = false;                 // state of the connection last time through the main loop
-const unsigned long postingInterval = 10*1000; //delay between updates to Pachube.com
+const unsigned long postingInterval = 10*1000; //delay between updates to xively.com
 
 void setup() {
- // Open serial communications and wait for port to open:
-  Serial.begin(9600);
-   while (!Serial) {
+  //Initialize serial and wait for port to open:
+  Serial.begin(9600); 
+  while (!Serial) {
     ; // wait for serial port to connect. Needed for Leonardo only
   }
+  
+  // check for the presence of the shield:
+  if (WiFi.status() == WL_NO_SHIELD) {
+    Serial.println("WiFi shield not present"); 
+    // don't continue:
+    while(true);
+  } 
+  
+  // attempt to connect to Wifi network:
+  while ( status != WL_CONNECTED) { 
+    Serial.print("Attempting to connect to SSID: ");
+    Serial.println(ssid);
+    // Connect to WPA/WPA2 network. Change this line if using open or WEP network:    
+    status = WiFi.begin(ssid, pass);
 
-
- // start the Ethernet connection:
-  if (Ethernet.begin(mac) == 0) {
-    Serial.println("Failed to configure Ethernet using DHCP");
-    // DHCP failed, so use a fixed IP address:
-    Ethernet.begin(mac, ip);
-  }
+    // wait 10 seconds for connection:
+    delay(10000);
+  } 
+  // you're connected now, so print out the status:
+  printWifiStatus();
 }
+
 
 void loop() {
   // read the analog sensor:
@@ -75,7 +83,7 @@ void loop() {
   // if there's incoming data from the net connection.
   // send it out the serial port.  This is for debugging
   // purposes only:
-  if (client.available()) {
+  while (client.available()) {
     char c = client.read();
     Serial.print(c);
   }
@@ -107,8 +115,8 @@ void sendData(int thisData) {
     client.print("PUT /v2/feeds/");
     client.print(FEEDID);
     client.println(".csv HTTP/1.1");
-    client.println("Host: api.pachube.com");
-    client.print("X-PachubeApiKey: ");
+    client.println("Host: api.xively.com");
+    client.print("X-ApiKey: ");
     client.println(APIKEY);
     client.print("User-Agent: ");
     client.println(USERAGENT);
@@ -160,4 +168,23 @@ int getLength(int someValue) {
   // return the number of digits:
   return digits;
 }
+
+void printWifiStatus() {
+  // print the SSID of the network you're attached to:
+  Serial.print("SSID: ");
+  Serial.println(WiFi.SSID());
+
+  // print your WiFi shield's IP address:
+  IPAddress ip = WiFi.localIP();
+  Serial.print("IP Address: ");
+  Serial.println(ip);
+
+  // print the received signal strength:
+  long rssi = WiFi.RSSI();
+  Serial.print("signal strength (RSSI):");
+  Serial.print(rssi);
+  Serial.println(" dBm");
+}
+
+
 
