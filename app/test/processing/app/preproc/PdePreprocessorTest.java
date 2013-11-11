@@ -18,4 +18,14 @@ public class PdePreprocessorTest {
 
     assertEquals(actualOutput, expectedOutput);
   }
+
+  @Test
+  public void testIncludeInsideMultilineComment() throws Exception {
+    String s = FileUtils.readFileToString(new File(PdePreprocessorTest.class.getResource("IncludeBetweenMultilineComment.ino").getFile()));
+
+    PdePreprocessor pdePreprocessor = new PdePreprocessor();
+    pdePreprocessor.writePrefix(s);
+    assertEquals(1, pdePreprocessor.getExtraImports().size());
+    assertEquals("CapacitiveSensorDue.h", pdePreprocessor.getExtraImports().get(0));
+  }
 }

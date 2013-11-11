@@ -87,7 +87,7 @@ public class PdePreprocessor {
     // an OutOfMemoryError or NullPointerException will happen.
     // again, not gonna bother tracking this down, but here's a hack.
     // http://dev.processing.org/bugs/show_bug.cgi?id=16
-    scrubComments(program);
+    program = scrubComments(program);
     // If there are errors, an exception is thrown and this fxn exits.
 
     if (Preferences.getBoolean("preproc.substitute_unicode")) {
@@ -242,14 +242,17 @@ public class PdePreprocessor {
    */
   public String strip(String in) {
     // XXX: doesn't properly handle special single-quoted characters
+    List<Pattern> patterns = new ArrayList<Pattern>();
     // single-quoted character
-    Pattern[] patterns = new Pattern[6];
-    patterns[5] = Pattern.compile("(\"(?:[^\"\\\\]|\\\\.)*\")", Pattern.MULTILINE);
-    patterns[4] = Pattern.compile("(^\\s*#.*?$)", Pattern.MULTILINE);
-    patterns[3] = Pattern.compile("(/\\*[^*]*(?:\\*(?!/)[^*]*)*\\*/)", Pattern.MULTILINE);
-    patterns[2] = Pattern.compile("(//.*?$)", Pattern.MULTILINE);
-    patterns[1] = Pattern.compile("('\\\\\"')", Pattern.MULTILINE);
-    patterns[0] = Pattern.compile("('.')", Pattern.MULTILINE);
+    patterns.add(Pattern.compile("('.')", Pattern.MULTILINE));
+    // single and multi-line comment
+    patterns.add(Pattern.compile("('\\\\\"')", Pattern.MULTILINE));
+    patterns.add(Pattern.compile("(//.*?$)", Pattern.MULTILINE));
+    patterns.add(Pattern.compile("(/\\*[^*]*(?:\\*(?!/)[^*]*)*\\*/)", Pattern.MULTILINE));
+    // pre-processor directive
+    patterns.add(Pattern.compile("(^\\s*#.*?$)", Pattern.MULTILINE));
+    // double-quoted string
+    patterns.add(Pattern.compile("(\"(?:[^\"\\\\]|\\\\.)*\")", Pattern.MULTILINE));
 
     String code = in;
     for (Pattern p : patterns) {
@@ -259,7 +262,7 @@ public class PdePreprocessor {
 
     return code;
   }
-  
+
   /**
    * Removes the contents of all top-level curly brace pairs {}.
    * @param in the String to collapse
