@@ -87,7 +87,7 @@ public class PdePreprocessor {
     // an OutOfMemoryError or NullPointerException will happen.
     // again, not gonna bother tracking this down, but here's a hack.
     // http://dev.processing.org/bugs/show_bug.cgi?id=16
-    scrubComments(program);
+    program = scrubComments(program);
     // If there are errors, an exception is thrown and this fxn exits.
 
     if (Preferences.getBoolean("preproc.substitute_unicode")) {
@@ -242,26 +242,27 @@ public class PdePreprocessor {
    */
   public String strip(String in) {
     // XXX: doesn't properly handle special single-quoted characters
+    List<Pattern> patterns = new ArrayList<Pattern>();
     // single-quoted character
-    String p = "('.')";
-
-    p += "|('\\\\\"')";
-
-    // double-quoted string
-    p += "|(\"(?:[^\"\\\\]|\\\\.)*\")";
-    
+    patterns.add(Pattern.compile("('.')", Pattern.MULTILINE));
     // single and multi-line comment
-    //p += "|" + "(//\\s*?$)|(/\\*\\s*?\\*/)";
-    p += "|(//.*?$)|(/\\*[^*]*(?:\\*(?!/)[^*]*)*\\*/)";
-    
+    patterns.add(Pattern.compile("('\\\\\"')", Pattern.MULTILINE));
+    patterns.add(Pattern.compile("(//.*?$)", Pattern.MULTILINE));
+    patterns.add(Pattern.compile("(/\\*[^*]*(?:\\*(?!/)[^*]*)*\\*/)", Pattern.MULTILINE));
     // pre-processor directive
-    p += "|" + "(^\\s*#.*?$)";
+    patterns.add(Pattern.compile("(^\\s*#.*?$)", Pattern.MULTILINE));
+    // double-quoted string
+    patterns.add(Pattern.compile("(\"(?:[^\"\\\\]|\\\\.)*\")", Pattern.MULTILINE));
 
-    Pattern pattern = Pattern.compile(p, Pattern.MULTILINE);
-    Matcher matcher = pattern.matcher(in);
-    return matcher.replaceAll(" ");
+    String code = in;
+    for (Pattern p : patterns) {
+      Matcher matcher = p.matcher(code);
+      code = matcher.replaceAll(" ");
+    }
+
+    return code;
   }
-  
+
   /**
    * Removes the contents of all top-level curly brace pairs {}.
    * @param in the String to collapse
@@ -333,49 +334,16 @@ public class PdePreprocessor {
    * Utility function used here and in the preprocessor.
    */
   static public String scrubComments(String what) {
-    char p[] = what.toCharArray();
+    List<Pattern> patterns = new ArrayList<Pattern>();
+    patterns.add(Pattern.compile("('\\\\\"')", Pattern.MULTILINE));
+    patterns.add(Pattern.compile("(//.*?$)", Pattern.MULTILINE));
+    patterns.add(Pattern.compile("(/\\*[^*]*(?:\\*(?!/)[^*]*)*\\*/)", Pattern.MULTILINE));
 
-    int index = 0;
-    while (index < p.length) {
-      // for any double slash comments, ignore until the end of the line
-      if ((p[index] == '/') &&
-          (index < p.length - 1) &&
-          (p[index+1] == '/')) {
-        p[index++] = ' ';
-        p[index++] = ' ';
-        while ((index < p.length) &&
-               (p[index] != '\n')) {
-          p[index++] = ' ';
-        }
-
-        // check to see if this is the start of a new multiline comment.
-        // if it is, then make sure it's actually terminated somewhere.
-      } else if ((p[index] == '/') &&
-                 (index < p.length - 1) &&
-                 (p[index+1] == '*')) {
-        p[index++] = ' ';
-        p[index++] = ' ';
-        boolean endOfRainbow = false;
-        while (index < p.length - 1) {
-          if ((p[index] == '*') && (p[index+1] == '/')) {
-            p[index++] = ' ';
-            p[index++] = ' ';
-            endOfRainbow = true;
-            break;
-
-          } else {
-            // continue blanking this area
-            p[index++] = ' ';
-          }
-        }
-        if (!endOfRainbow) {
-          throw new RuntimeException(_("Missing the */ from the end of a " +
-                                       "/* comment */"));
-        }
-      } else {  // any old character, move along
-        index++;
-      }
+    String result = what;
+    for (Pattern p : patterns) {
+      result = p.matcher(result).replaceAll("");
     }
-    return new String(p);
+
+    return result;
   }
 }
