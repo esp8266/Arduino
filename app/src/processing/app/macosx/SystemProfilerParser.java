@@ -14,7 +14,8 @@ public class SystemProfilerParser {
   private static final String VID = "vid";
   private static final String PID = "pid";
   private static final String SERIAL_NUMBER = "serial_number";
-  private static final String DEV_TTY = "/dev/tty.";
+  private static final String DEV_TTY_USBSERIAL = "/dev/tty.usbserial-";
+  private static final String DEV_CU_USBSERIAL = "/dev/cu.usbserial-";
   private static final String DEV_TTY_USBMODEM = "/dev/tty.usbmodem";
   private static final String DEV_CU_USBMODEM = "/dev/cu.usbmodem";
 
@@ -34,7 +35,11 @@ public class SystemProfilerParser {
     BufferedReader reader = new BufferedReader(new StringReader(output));
 
     String devicePrefix;
-    if (serial.startsWith(DEV_TTY)) {
+    if (serial.startsWith(DEV_TTY_USBSERIAL)) {
+      devicePrefix = DEV_TTY_USBSERIAL;
+    } else if (serial.startsWith(DEV_CU_USBSERIAL)) {
+      devicePrefix = DEV_CU_USBSERIAL;
+    } else if (serial.startsWith(DEV_TTY_USBMODEM)) {
       devicePrefix = DEV_TTY_USBMODEM;
     } else {
       devicePrefix = DEV_CU_USBMODEM;
@@ -50,19 +55,24 @@ public class SystemProfilerParser {
 
       if ((matcher = serialNumberRegex.matcher(line)).matches()) {
         device.put(SERIAL_NUMBER, matcher.group(1));
-      } else if ((matcher = locationRegex.matcher(line)).matches()) {
-        String devicePath = devicePrefix;
-        String suffix = matcher.group(1).substring(2, 6);
-        try {
-          devicePath = devicePath + (Integer.parseInt(suffix) + 1);
-        } catch (NumberFormatException e) {
-          devicePath = devicePath + suffix + "1";
+        if ((serial.startsWith(DEV_TTY_USBSERIAL) || serial.startsWith(DEV_CU_USBSERIAL))) {
+          String devicePath = devicePrefix + matcher.group(1);
+          device.put(DEVICE_PATH, devicePath);
         }
+      } else if ((serial.startsWith(DEV_TTY_USBMODEM) || serial.startsWith(DEV_CU_USBMODEM)) && (matcher = locationRegex.matcher(line)).matches()) {
+        String suffix = matcher.group(1).substring(2, 6).replaceAll("0", "");
+        String devicePath = devicePrefix + suffix + "1";
         device.put(DEVICE_PATH, devicePath);
       } else if ((matcher = pidRegex.matcher(line)).matches()) {
-        device.put(PID, matcher.group(1));
+        String pid = matcher.group(1);
+        if (pid.indexOf(" ") > 0)
+          pid = pid.substring(0, pid.indexOf(" ")); // Remove any text after the hex number
+        device.put(PID, pid);
       } else if ((matcher = vidRegex.matcher(line)).matches()) {
-        device.put(VID, matcher.group(1));
+        String vid = matcher.group(1);
+        if (vid.indexOf(" ") > 0)
+          vid = vid.substring(0, vid.indexOf(" ")); // Remove any text after the hex number
+        device.put(VID, vid);
       } else if (line.equals("")) {
         if (device.containsKey(DEVICE_PATH) && device.get(DEVICE_PATH).equals(serial)) {
           return (device.get(VID) + "_" + device.get(PID)).toUpperCase();
