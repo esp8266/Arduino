@@ -16,7 +16,7 @@ public class PdePreprocessorTest {
     String actualOutput = new PdePreprocessor().strip(s);
     String expectedOutput = FileUtils.readFileToString(new File(PdePreprocessorTest.class.getResource("RemoteCallLogger_v1e0.stripped.ino").getFile()));
 
-    assertEquals(actualOutput, expectedOutput);
+    assertEquals(expectedOutput, actualOutput);
   }
 
   @Test
