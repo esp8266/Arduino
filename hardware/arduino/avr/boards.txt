@@ -41,8 +41,12 @@ yun.build.extra_flags={build.usb_flags}
 ##############################################################
 
 uno.name=Arduino Uno
+
 uno.vid.0=0x2341
 uno.pid.0=0x0043
+uno.vid.1=0x2341
+uno.pid.1=0x0001
+
 uno.upload.tool=avrdude
 uno.upload.protocol=arduino
 uno.upload.maximum_size=32256
