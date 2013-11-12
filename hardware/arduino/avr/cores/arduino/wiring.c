@@ -119,17 +119,41 @@ void delay(unsigned long ms)
 	}
 }
 
-/* Delay for the given number of microseconds.  Assumes a 8 or 16 MHz clock. */
+/* Delay for the given number of microseconds.  Assumes a 1, 8, 12, 16, 20 or 24 MHz clock. */
 void delayMicroseconds(unsigned int us)
 {
+  // call = 4 cycles + 2 to 4 cycles to init us(2 for constant delay, 4 for variable)
 	// calling avrlib's delay_us() function with low values (e.g. 1 or
 	// 2 microseconds) gives delays longer than desired.
 	//delay_us(us);
-#if F_CPU >= 20000000L
+#if F_CPU >= 24000000L
+	// for the 24 MHz clock for the aventurous ones, trying to overclock
+
+	// for a one-microsecond delay, simply wait 6 cycles and return. The overhead
+	// of the function call yields a delay of exactly one microsecond.
+	__asm__ __volatile__ (
+		"nop" "\n\t"
+		"nop" "\n\t"
+		"nop" "\n\t"
+		"nop" "\n\t"
+		"nop" "\n\t"
+		"nop"); //just waiting 6 cycles
+	if (--us == 0)
+		return;
+
+	// the following loop takes a 1/6 of a microsecond (4 cycles)
+	// per iteration, so execute it six times for each microsecond of
+	// delay requested.
+	us *= 6; // x6 us
+
+	// account for the time taken in the preceeding commands.
+	us -= 2;
+
+#elif F_CPU >= 20000000L
 	// for the 20 MHz clock on rare Arduino boards
 
-	// for a one-microsecond delay, simply wait 2 cycle and return. The overhead
-	// of the function call yields a delay of exactly a one microsecond.
+	// for a one-microsecond delay, simply wait 2 cycles and return. The overhead
+	// of the function call yields a delay of exactly one microsecond.
 	__asm__ __volatile__ (
 		"nop" "\n\t"
 		"nop"); //just waiting 2 cycle
@@ -152,15 +176,31 @@ void delayMicroseconds(unsigned int us)
 	if (--us == 0)
 		return;
 
-	// the following loop takes a quarter of a microsecond (4 cycles)
+	// the following loop takes 1/4 of a microsecond (4 cycles)
 	// per iteration, so execute it four times for each microsecond of
 	// delay requested.
-	us <<= 2;
+	us <<= 2; // x4 us
 
 	// account for the time taken in the preceeding commands.
 	us -= 2;
-#else
-	// for the 8 MHz internal clock on the ATmega168
+
+#elif F_CPU >= 12000000L
+	// for the 12 MHz clock if somebody is working with USB
+
+	// for a one-microsecond delay, simply return.  the overhead
+	// of the function call yields a delay of approximately 1.5 us.
+	if (--us == 0)
+		return;
+
+	// the following loop takes 1/3 of a microsecond (4 cycles)
+	// per iteration, so execute it three times for each microsecond of
+	// delay requested.
+	us = (us << 1) + us; // x3 us
+
+	// account for the time taken in the preceeding commands.
+	us -= 2;
+#elif F_CPU >= 8000000L
+	// for the 8 MHz internal clock
 
 	// for a one- or two-microsecond delay, simply return.  the overhead of
 	// the function calls takes more than two microseconds.  can't just
@@ -170,14 +210,31 @@ void delayMicroseconds(unsigned int us)
 	if (--us == 0)
 		return;
 
-	// the following loop takes half of a microsecond (4 cycles)
+	// the following loop takes 1/2 of a microsecond (4 cycles)
 	// per iteration, so execute it twice for each microsecond of
 	// delay requested.
-	us <<= 1;
+	us <<= 1; //x2 us
     
 	// partially compensate for the time taken by the preceeding commands.
 	// we can't subtract any more than this or we'd overflow w/ small delays.
 	us--;
+
+#else
+	// for the 1 MHz internal clock (default settings for common Atmega microcontrollers)
+
+	// the overhead of the function calls takes about 16 microseconds.
+	if (us <= 16) //4 cycles spent here
+		return;
+	if (us <= 22) { //4 cycles spent here
+    return;
+	}
+	
+	// compensate for the time taken by the preceeding and next commands.
+	us -= 22;
+
+	// the following loop takes 4 microseconds (4 cycles)
+	// per iteration, so execute it us/4 times
+	us >>= 2; // us div 4
 #endif
 
 	// busy wait
@@ -185,6 +242,7 @@ void delayMicroseconds(unsigned int us)
 		"1: sbiw %0,1" "\n\t" // 2 cycles
 		"brne 1b" : "=w" (us) : "0" (us) // 2 cycles
 	);
+	// return = 4 cycles
 }
 
 void init()
