@@ -24,8 +24,6 @@
 
 #include "../leonardo/pins_arduino.h"
 
-#define LED_BUILTIN 13
-
 // These serial port names are intended to allow libraries and architecture-neutral
 // sketches to automatically default to the correct port name for a particular type
 // of use.  For example, a GPS module would normally connect to SERIAL_PORT_HARDWARE_OPEN,
