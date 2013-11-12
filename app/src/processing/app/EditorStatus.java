@@ -452,7 +452,7 @@ public class EditorStatus extends JPanel /*implements ActionListener*/ {
       add(progressBar);
       progressBar.setVisible(false);
       
-      copyErrorButton = new JButton(_("Copy error"));
+      copyErrorButton = new JButton(_("Copy error messages"));
       add(copyErrorButton);
       copyErrorButton.setVisible(false);
       copyErrorButton.addActionListener(new ActionListener() {
