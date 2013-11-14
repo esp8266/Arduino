@@ -17,7 +17,6 @@
 */
 
 #include "Bridge.h"
-#include <util/crc16.h>
 
 BridgeClass::BridgeClass(Stream &_stream) :
   index(0), stream(_stream), started(false), max_retries(0) {
@@ -94,11 +93,23 @@ unsigned int BridgeClass::get(const char *key, uint8_t *value, unsigned int maxl
   return l;
 }
 
-void BridgeClass::crcUpdate(uint8_t c) {
+#if defined(ARDUINO_ARCH_AVR)
+// AVR use an optimized implementation of CRC
+#include <util/crc16.h>
+#else
+// Generic implementation for non-AVR architectures
+uint16_t _crc_ccitt_update(uint16_t crc, uint8_t data)
+{
+  data ^= crc & 0xff;
+  data ^= data << 4;
+  return ((((uint16_t)data << 8) | ((crc >> 8) & 0xff)) ^
+          (uint8_t)(data >> 4) ^
+          ((uint16_t)data << 3));
+}
+#endif
 
+void BridgeClass::crcUpdate(uint8_t c) {
   CRC = _crc_ccitt_update(CRC, c);
-  //CRC = CRC ^ c;
-  //CRC = (CRC >> 8) + (CRC << 8);
 }
 
 void BridgeClass::crcReset() {
