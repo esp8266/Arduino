@@ -52,10 +52,10 @@ import processing.core.PApplet;
  */
 public class DiscourseFormat {
 
-  Editor editor;
+  private Editor editor;
   // JTextArea of the actual Editor
-  JEditTextArea textarea;
-  boolean html;
+  private JEditTextArea textarea;
+  private boolean html;
 
 
   /**
@@ -75,7 +75,7 @@ public class DiscourseFormat {
    */
   public void show() {
     // [code] tag cancels other tags, using [quote]
-    StringBuffer cf = new StringBuffer(html ? "<pre>\n" : "[quote]\n");
+    StringBuilder cf = new StringBuilder(html ? "<pre>\n" : "[code]\n");
 
     int selStart = textarea.getSelectionStart();
     int selStop = textarea.getSelectionStop();
@@ -99,7 +99,7 @@ public class DiscourseFormat {
       appendFormattedLine(cf, i);
     }
 
-    cf.append(html ? "\n</pre>" : "\n[/quote]");
+    cf.append(html ? "\n</pre>" : "\n[/code]");
 
     StringSelection formatted = new StringSelection(cf.toString());
     Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -111,17 +111,15 @@ public class DiscourseFormat {
     Clipboard unixclipboard = Toolkit.getDefaultToolkit().getSystemSelection();
     if (unixclipboard != null) unixclipboard.setContents(formatted, null);
 
-    editor.statusNotice("Code formatted for " +
-                        (html ? "HTML" : "the Arduino forum ") +
-                        " has been copied to the clipboard.");
+    editor.statusNotice("Code formatted for " + (html ? "HTML" : "the Arduino forum") + " has been copied to the clipboard.");
   }
 
   /**
-    * Append a char to a stringbuffer while escaping for proper display in HTML.
+    * Append a char to a StringBuilder while escaping for proper display in HTML.
     * @param c input char to escape
-    * @param buffer StringBuffer to append html-safe version of c to.
+    * @param buffer StringBuilder to append html-safe version of c to.
     */
-  private void appendToHTML(char c, StringBuffer buffer) {
+  private void appendToHTML(char c, StringBuilder buffer) {
     if (!html) {
       buffer.append(c);
     } else if (c == '<') {
@@ -138,7 +136,7 @@ public class DiscourseFormat {
   }
 
   // A terrible headache...
-  public void appendFormattedLine(StringBuffer cf, int line) {
+  public void appendFormattedLine(StringBuilder cf, int line) {
     Segment segment = new Segment();
 
     TextAreaPainter painter = textarea.getPainter();
@@ -203,12 +201,14 @@ public class DiscourseFormat {
 //          fm = painter.getFontMetrics();
         } else {
           // Place open tags []
-          cf.append(html ? "<span style=\"color: #" : "[color=#");
-          cf.append(PApplet.hex(styles[id].getColor().getRGB() & 0xFFFFFF, 6));
-          cf.append(html ? ";\">" : "]");
+          if (html) {
+            cf.append("<span style=\"color: #");
+            cf.append(PApplet.hex(styles[id].getColor().getRGB() & 0xFFFFFF, 6));
+            cf.append(";\">");
+          }
 
-          if (styles[id].isBold())
-            cf.append(html ? "<b>" : "[b]");
+          if (html && styles[id].isBold())
+            cf.append("<b>");
 
 //          fm = styles[id].getFontMetrics(defaultFont);
         }
@@ -228,10 +228,10 @@ public class DiscourseFormat {
             appendToHTML(c, cf);
           }
           // Place close tags [/]
-          if (j == (length - 1) && id != Token.NULL && styles[id].isBold())
-            cf.append(html ? "</b>" : "[/b]");
-          if (j == (length - 1) && id != Token.NULL)
-            cf.append(html ? "</span>" : "[/color]");
+          if (html && j == (length - 1) && id != Token.NULL && styles[id].isBold())
+            cf.append("</b>");
+          if (html && j == (length - 1) && id != Token.NULL)
+            cf.append("</span>");
 //          int charWidth;
 //          if (c == '\t') {
 //            charWidth = (int) painter
