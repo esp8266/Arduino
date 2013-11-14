@@ -205,30 +205,64 @@ int asn1_get_private_key(const uint8_t *buf, int len, RSA_CTX **rsa_ctx)
  */
 static int asn1_get_utc_time(const uint8_t *buf, int *offset, time_t *t)
 {
-    int ret = X509_NOT_OK, len, t_offset;
+    int ret = X509_NOT_OK, len, t_offset, abs_year;
     struct tm tm;
 
-    if (buf[(*offset)++] != ASN1_UTC_TIME)
-        goto end_utc_time;
-
-    len = get_asn1_length(buf, offset);
-    t_offset = *offset;
-
-    memset(&tm, 0, sizeof(struct tm));
-    tm.tm_year = (buf[t_offset] - '0')*10 + (buf[t_offset+1] - '0');
-
-    if (tm.tm_year <= 50)    /* 1951-2050 thing */
+    /* see http://tools.ietf.org/html/rfc5280#section-4.1.2.5 */
+    if (buf[*offset] == ASN1_UTC_TIME)
     {
-        tm.tm_year += 100;
+        (*offset)++;
+
+        len = get_asn1_length(buf, offset);
+        t_offset = *offset;
+
+        memset(&tm, 0, sizeof(struct tm));
+        tm.tm_year = (buf[t_offset] - '0')*10 + (buf[t_offset+1] - '0');
+
+        if (tm.tm_year <= 50)    /* 1951-2050 thing */
+        {
+            tm.tm_year += 100;
+        }
+
+        tm.tm_mon = (buf[t_offset+2] - '0')*10 + (buf[t_offset+3] - '0') - 1;
+        tm.tm_mday = (buf[t_offset+4] - '0')*10 + (buf[t_offset+5] - '0');
+        *t = mktime(&tm);
+        *offset += len;
+        ret = X509_OK;
+    }
+    else if (buf[*offset] == ASN1_GENERALIZED_TIME)
+    {
+        (*offset)++;
+
+        len = get_asn1_length(buf, offset);
+        t_offset = *offset;
+
+        memset(&tm, 0, sizeof(struct tm));
+        abs_year = ((buf[t_offset] - '0')*1000 +
+                (buf[t_offset+1] - '0')*100 + (buf[t_offset+2] - '0')*10 +
+                (buf[t_offset+3] - '0'));
+
+        if (abs_year <= 1901)
+        {
+          tm.tm_year = 1;
+          tm.tm_mon = 0;
+          tm.tm_mday = 1;
+        }
+        else
+        {
+          tm.tm_year = abs_year - 1900;
+          tm.tm_mon = (buf[t_offset+4] - '0')*10 + (buf[t_offset+5] - '0') - 1;
+          tm.tm_mday = (buf[t_offset+6] - '0')*10 + (buf[t_offset+7] - '0');
+          tm.tm_hour = (buf[t_offset+8] - '0')*10 + (buf[t_offset+9] - '0');
+          tm.tm_min = (buf[t_offset+10] - '0')*10 + (buf[t_offset+11] - '0');
+          tm.tm_sec = (buf[t_offset+12] - '0')*10 + (buf[t_offset+13] - '0');
+          *t = mktime(&tm);
+        }
+
+        *offset += len;
+        ret = X509_OK;
     }
 
-    tm.tm_mon = (buf[t_offset+2] - '0')*10 + (buf[t_offset+3] - '0') - 1;
-    tm.tm_mday = (buf[t_offset+4] - '0')*10 + (buf[t_offset+5] - '0');
-    *t = mktime(&tm);
-    *offset += len;
-    ret = X509_OK;
-
-end_utc_time:
     return ret;
 }
 
