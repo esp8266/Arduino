@@ -59,19 +59,14 @@ void setup() {
 
   // run the rescue sequence
   rescueSequence();
-  Robot.text("Found obstacle", 5, 12);
   // find the track again
   goToNext();
-  Robot.text("Found track", 5, 19);
   // run the rescue sequence a second time
   rescueSequence();
-  Robot.text("Found obstacle", 5, 26);
-
+  
   // here you could go on ...
-
-  // write status on the screen
-  Robot.stroke(0, 0, 0);
-  Robot.text("Done!", 5, 25);
+ 
+  
 }
 
 void loop() {
