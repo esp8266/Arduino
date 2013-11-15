@@ -1,7 +1,7 @@
 
 arduino_due_x_dbg.name=Arduino Due (Programming Port)
 arduino_due_x_dbg.vid.0=0x2341
-arduino_due_x_dbg.pid.1=0x003d
+arduino_due_x_dbg.pid.0=0x003d
 arduino_due_x_dbg.upload.tool=bossac
 arduino_due_x_dbg.upload.protocol=sam-ba
 arduino_due_x_dbg.upload.maximum_size=524288
