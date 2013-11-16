@@ -242,25 +242,24 @@ public class PdePreprocessor {
    */
   public String strip(String in) {
     // XXX: doesn't properly handle special single-quoted characters
-    List<Pattern> patterns = new ArrayList<Pattern>();
     // single-quoted character
-    patterns.add(Pattern.compile("('.')", Pattern.MULTILINE));
-    // single and multi-line comment
-    patterns.add(Pattern.compile("('\\\\\"')", Pattern.MULTILINE));
-    patterns.add(Pattern.compile("(//.*?$)", Pattern.MULTILINE));
-    patterns.add(Pattern.compile("(/\\*[^*]*(?:\\*(?!/)[^*]*)*\\*/)", Pattern.MULTILINE));
-    // pre-processor directive
-    patterns.add(Pattern.compile("(^\\s*#.*?$)", Pattern.MULTILINE));
+    String p = "('.')";
+
+    p += "|('\\\\\"')";
+
     // double-quoted string
-    patterns.add(Pattern.compile("(\"(?:[^\"\\\\]|\\\\.)*\")", Pattern.MULTILINE));
+    p += "|(\"(?:[^\"\\\\]|\\\\.)*\")";
 
-    String code = in;
-    for (Pattern p : patterns) {
-      Matcher matcher = p.matcher(code);
-      code = matcher.replaceAll(" ");
-    }
+    // single and multi-line comment
+    //p += "|" + "(//\\s*?$)|(/\\*\\s*?\\*/)";
+    p += "|(//.*?$)|(/\\*[^*]*(?:\\*(?!/)[^*]*)*\\*/)";
 
-    return code;
+    // pre-processor directive
+    p += "|" + "(^\\s*#.*?$)";
+
+    Pattern pattern = Pattern.compile(p, Pattern.MULTILINE);
+    Matcher matcher = pattern.matcher(in);
+    return matcher.replaceAll(" ");
   }
 
   /**
@@ -333,17 +332,54 @@ public class PdePreprocessor {
    * Replace all commented portions of a given String as spaces.
    * Utility function used here and in the preprocessor.
    */
-  static public String scrubComments(String what) {
-    List<Pattern> patterns = new ArrayList<Pattern>();
-    patterns.add(Pattern.compile("('\\\\\"')", Pattern.MULTILINE));
-    patterns.add(Pattern.compile("(//.*?$)", Pattern.MULTILINE));
-    patterns.add(Pattern.compile("(/\\*[^*]*(?:\\*(?!/)[^*]*)*\\*/)", Pattern.MULTILINE));
+  public String scrubComments(String what) {
+    char p[] = what.toCharArray();
 
-    String result = what;
-    for (Pattern p : patterns) {
-      result = p.matcher(result).replaceAll("");
+    int index = 0;
+    boolean insideString = false;
+    while (index < p.length) {
+      if (p[index] == '\"') {
+        insideString = !insideString;
+      }
+      // for any double slash comments, ignore until the end of the line
+      if (!insideString && (p[index] == '/') &&
+          (index < p.length - 1) &&
+          (p[index+1] == '/')) {
+        p[index++] = ' ';
+        p[index++] = ' ';
+        while ((index < p.length) &&
+               (p[index] != '\n')) {
+          p[index++] = ' ';
+        }
+
+        // check to see if this is the start of a new multiline comment.
+        // if it is, then make sure it's actually terminated somewhere.
+      } else if (!insideString && (p[index] == '/') &&
+                 (index < p.length - 1) &&
+                 (p[index+1] == '*')) {
+        p[index++] = ' ';
+        p[index++] = ' ';
+        boolean endOfRainbow = false;
+        while (index < p.length - 1) {
+          if ((p[index] == '*') && (p[index+1] == '/')) {
+            p[index++] = ' ';
+            p[index++] = ' ';
+            endOfRainbow = true;
+            break;
+
+          } else {
+            // continue blanking this area
+            p[index++] = ' ';
+          }
+        }
+        if (!endOfRainbow) {
+          throw new RuntimeException(_("Missing the */ from the end of a " +
+                                       "/* comment */"));
+        }
+      } else {  // any old character, move along
+        index++;
+      }
     }
-
-    return result;
+    return new String(p);
   }
 }

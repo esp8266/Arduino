@@ -328,7 +328,3 @@ void loop()
   gprsListen();  
   getTime();     
 }
-
-
-
-
