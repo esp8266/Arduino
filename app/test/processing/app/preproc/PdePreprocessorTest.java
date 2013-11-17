@@ -93,4 +93,18 @@ public class PdePreprocessorTest {
     assertEquals("Wire.h", pdePreprocessor.getExtraImports().get(1));
   }
 
+  @Test
+  public void testLineContinuations() throws Exception {
+    String s = FileUtils.readFileToString(new File(PdePreprocessorTest.class.getResource("LineContinuations.ino").getFile()));
+
+    PdePreprocessor pdePreprocessor = new PdePreprocessor();
+    String actualOutput = pdePreprocessor.strip(s);
+    String expectedOutput = FileUtils.readFileToString(new File(PdePreprocessorTest.class.getResource("LineContinuations.stripped.ino").getFile()));
+
+    assertEquals(expectedOutput, actualOutput);
+
+    pdePreprocessor.writePrefix(s);
+    assertEquals(0, pdePreprocessor.getExtraImports().size());
+  }
+
 }

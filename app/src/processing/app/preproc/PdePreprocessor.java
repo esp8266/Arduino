@@ -257,7 +257,7 @@ public class PdePreprocessor {
     // pre-processor directive
     p += "|" + "(^\\s*#.*?$)";
 
-    Pattern pattern = Pattern.compile(p, Pattern.MULTILINE);
+    Pattern pattern = Pattern.compile(p, Pattern.MULTILINE | Pattern.DOTALL);
     Matcher matcher = pattern.matcher(in);
     return matcher.replaceAll(" ");
   }
