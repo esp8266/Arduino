@@ -58,6 +58,9 @@
  * _Nbr_16timers indicates how many 16 bit timers are available.
  */
 
+// Architecture specific include
+#include <ServoTimers.h>
+
 #define Servo_VERSION           2     // software version of this library
 
 #define MIN_PULSE_WIDTH       544     // the shortest pulse sent to a servo  

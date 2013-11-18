@@ -19,7 +19,6 @@
 
 #include <Arduino.h> 
 #include <Servo.h>
-#include "ServoTimers.h"
 
 #define usToTicks(_us)    (( clockCyclesPerMicrosecond() * _us) / 32)     // converts microseconds to tick
 #define ticksToUs(_ticks) (( (unsigned)_ticks * 32)/ clockCyclesPerMicrosecond() ) // converts from ticks back to microseconds
