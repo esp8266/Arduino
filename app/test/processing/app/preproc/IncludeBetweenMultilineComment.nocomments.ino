@@ -1,4 +1,4 @@
-                                
+#include <CapacitiveSensorDue.h>
   
                  
   
@@ -13,3 +13,4 @@ void loop()
 	Serial.println(total1);
 	delay(100);
 }
+

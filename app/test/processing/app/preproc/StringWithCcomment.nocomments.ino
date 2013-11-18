@@ -2,12 +2,13 @@ void setup() {
                                            
                                  
                                           
-  Serial.println(             );
-  Serial.println(                );
-  Serial.println(            );          
+  Serial.println("Accept: */*");
+  Serial.println("Accept: \" */*");
+  Serial.println("Accept: \\"); // */*");
 }
 
 void loop() {
                                                 
 
 }
+

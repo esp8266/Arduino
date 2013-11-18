@@ -10,80 +10,80 @@
    
 
                                                           
-                    
-                  
-                  
-                  
-                   
-                  
+#define ENABLE_TOOLS
+#define ENABLE_SPP
+#define ENABLE_PS3
+#define ENABLE_WII
+#define ENABLE_XBOX
+#define ENABLE_ADK
 
-                       
-                                                  
-                                                         
+#include "Balanduino.h"
+#include <Wire.h>                                 
+#include <usbhub.h>                                      
 
-                 
-                
-      
+#ifdef ENABLE_ADK
+#include <adk.h>
+#endif
 
                                                                                    
                                                                                                     
-                                                                                                                                                        
+#include <Kalman.h>                                                                                                                                     
 
-                  
-                     
-      
-                 
-                
-      
-                 
-                  
-      
-                 
-                
-      
+#ifdef ENABLE_XBOX
+#include <XBOXRECV.h>
+#endif
+#ifdef ENABLE_SPP
+#include <SPP.h>
+#endif
+#ifdef ENABLE_PS3
+#include <PS3BT.h>
+#endif
+#ifdef ENABLE_WII
+#include <Wii.h>
+#endif
 
                                      
 Kalman kalman;                                                                      
 
-                                                                                                                    
-                  
+#if defined(ENABLE_SPP) || defined(ENABLE_PS3) || defined(ENABLE_WII) || defined(ENABLE_XBOX) || defined(ENABLE_ADK)
+#define ENABLE_USB
 USB Usb;                                                
-      
+#endif
 
-                 
+#ifdef ENABLE_ADK
                                                                                                                         
-ADK adk(&Usb,                  ,                     
-                          ,              
-                                          ,                                     
-                     ,                              
-                                                                                           ,                                                                      
-                    );                                    
-      
+ADK adk(&Usb, "TKJ Electronics",                     
+              "Balanduino",              
+              "Android App for Balanduino",                                     
+              "0.5.0",                              
+              "https://play.google.com/store/apps/details?id=com.tkjelectronics.balanduino",                                                                      
+              "1234");                                    
+#endif
 
-                  
+#ifdef ENABLE_XBOX
 XBOXRECV Xbox(&Usb);                                                                                                             
-      
+#endif
 
-                                                                     
+#if defined(ENABLE_SPP) || defined(ENABLE_PS3) || defined(ENABLE_WII)
 USBHub Hub(&Usb);                                  
 BTD Btd(&Usb);                                                                                                                        
-      
+#endif
 
-                 
-SPP SerialBT(&Btd,             ,       );                                                                                                                         
-      
+#ifdef ENABLE_SPP
+SPP SerialBT(&Btd, "Balanduino", "0000");                                                                                                                         
+#endif
 
-                 
+#ifdef ENABLE_PS3
 PS3BT PS3(&Btd);                                                                                                            
-      
+#endif
 
-                 
+#ifdef ENABLE_WII
 WII Wii(&Btd);                                                                                                                                 
                                                                                                                                           
                                                         
                                                                           
                                                                     
-      
+#endif
 
 void setup() {
                        
@@ -130,32 +130,32 @@ void setup() {
                         
   pinMode(buzzer, OUTPUT);
 
-                 
+#ifdef ENABLE_USB
   if (Usb.Init() == -1) {                                
-    Serial.print(F(                   ));
+    Serial.print(F("OSC did not start"));
     digitalWrite(buzzer, HIGH);
     while (1);        
   }
-      
+#endif
 
                               
                                                                                                                           
-                 
+#ifdef ENABLE_PS3
   PS3.attachOnInit(onInit);
-      
-                 
+#endif
+#ifdef ENABLE_WII
   Wii.attachOnInit(onInit);
-      
-                  
+#endif
+#ifdef ENABLE_XBOX
   Xbox.attachOnInit(onInit);
-      
+#endif
 
                  
   Wire.begin();
 
   while (i2cRead(0x75, i2cBuffer, 1));
   if (i2cBuffer[0] != 0x68) {                            
-    Serial.print(F(                      ));
+    Serial.print(F("Error reading sensor"));
     digitalWrite(buzzer, HIGH);
     while (1);        
   }
@@ -202,10 +202,10 @@ void setup() {
 }
 
 void loop() {
-                 
+#ifdef ENABLE_WII
   if (Wii.wiimoteConnected)                                                                        
     Usb.Task();
-      
+#endif
 
                        
   while (i2cRead(0x3D, i2cBuffer, 8));
@@ -234,10 +234,10 @@ void loop() {
   kalmanTimer = timer;
                                                                                                                
 
-                 
+#ifdef ENABLE_WII
   if (Wii.wiimoteConnected)                                                                        
     Usb.Task();
-      
+#endif
 
                     
   timer = micros();
@@ -277,17 +277,17 @@ void loop() {
   }
 
                                                              
-                 
+#ifdef ENABLE_USB
   readUsb();
-      
-                   
+#endif
+#ifdef ENABLE_TOOLS
   checkSerialData();
-      
-                                                
+#endif
+#if defined(ENABLE_TOOLS) || defined(ENABLE_SPP)
   printValues();
-      
+#endif
 
-                                                                     
+#if defined(ENABLE_SPP) || defined(ENABLE_PS3) || defined(ENABLE_WII)
   if (Btd.isReady()) {
     timer = millis();
     if ((Btd.watingForConnection && timer - blinkTimer > 1000) || (!Btd.watingForConnection && timer - blinkTimer > 100)) {
@@ -299,5 +299,6 @@ void loop() {
     ledState = !ledState;
     digitalWrite(LED_BUILTIN, ledState);                         
   }
-      
+#endif
 }
+

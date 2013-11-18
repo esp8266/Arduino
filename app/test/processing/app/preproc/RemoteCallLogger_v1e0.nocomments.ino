@@ -1,21 +1,22 @@
-                                                                                            
-                                                                
+
+#include <SoftwareSerial.h>                                                                 
+#include <Wire.h>                                               
 
                       
-                                                         
-                                             
-                                             
-                                             
-                                             
-                                             
+#define DS3231_I2C_ADDRESS 104                           
+#define DS3231_TIME_CAL_ADDR        0        
+#define DS3231_ALARM1_ADDR          7        
+#define DS3231_ALARM2_ADDR         11        
+#define DS3231_CONTROL_ADDR        14        
+#define DS3231_STATUS_ADDR         15        
                                                
-                                             
+#define DS3231_TEMPERATURE_ADDR    17        
 
                                
 SoftwareSerial GPRS( 7, 8 );                                                        
 byte buffer[ 64 ];                                                                         
 int count = 0, e = 0, count2 = 0, t = 0, q;
-char temp, lastCaller[13] =        ;
+char temp, lastCaller[13] = "blank";
 boolean callIncoming = false, done;
 
                        
@@ -39,23 +40,23 @@ char telescopeNames[6][4];
 void setPowerStateTo( int newState )
 {
   if( newState != 1 && newState != 0 ) {                                                                            
-    Serial.print(                                                    );
+    Serial.print( "Error: Invalid powerstate. Current powerstate = " );
     Serial.print( getPowerState() );
-    Serial.print(      );
+    Serial.print( "\n" );
   }
   else  {
     if( newState == getPowerState() )  {                                                                        
-      Serial.print(                 );
+      Serial.print( "Powerstate = " );
       Serial.print( newState );
-      Serial.print(                         );
+      Serial.print( " remains unchanged.\n" );
     }
     else  {
       powerUpOrDown();                                                          
-      Serial.print(                            );
+      Serial.print( "Powerstate changed from " );
       Serial.print( 1 - newState );
-      Serial.print(        );
+      Serial.print( " to " );
       Serial.print( newState );
-      Serial.print(      );
+      Serial.print( "\n" );
     }
   }
   delay( 5000 );               
@@ -96,27 +97,27 @@ void clearBufferArray()
 void makeMissedCall( char num[] )
 {
   int i;
-  char in[ 18 ] =      ;
+  char in[ 18 ] = "ATD";
   for( i = 3; i <= 14; i++ )                                                             
     in[ i ] = num[ i - 3] ;
-  in[ 15 ] =    ;
+  in[ 15 ] = ';';
   in[ 16 ] = '\r';
   in[ 17 ] = '\0';
   GPRS.write( in );                                      
   delay( 10000 );                                                                   
-  GPRS.write(           );                                        
+  GPRS.write( "ATH\r\0" );                                        
   delay( 1000 );
 }
 
 void sendTextMessage( char number[], char messg[] )
 {
-  char temp[ 27 ] =                 ;
+  char temp[ 27 ] = "AT + CMGS = \"";
   for( q = 0; q < 12; q++ )                                                                                          
       temp[ q + 13 ] = number[ q ];
-  temp[ 25 ] =     ;
+  temp[ 25 ] = '\"';
   temp[ 26 ] = '\0';
 
-  GPRS.println(               );                                                     
+  GPRS.println( "AT+CMGF=1\r" );                                                     
   delay( 1000 );
   GPRS.println( temp );                                                             
   delay( 1000 );
@@ -133,24 +134,24 @@ void analise(byte incoming[], int length)
   while( e < length && !done){                                                                   
     temp = char( incoming[e] );                                                      
     switch( temp ){                            
-    case    : 
+    case 'R': 
       {
         if( length > e + 3 && !callIncoming ) {                                
-          if(char( incoming[e + 1] ) ==     
-            && char( incoming[e + 2] ) ==    
-            && char( incoming[e + 3] ) ==    ){
-            GPRS.write(           );                                            
+          if(char( incoming[e + 1] ) == 'I' 
+            && char( incoming[e + 2] ) == 'N'
+            && char( incoming[e + 3] ) == 'G'){
+            GPRS.write("AT+CLCC\r");                                            
             delay(500);                                     
-            GPRS.write(       );                        
+            GPRS.write("ATH\r");                        
             callIncoming = true;                                                                                    
             done = true;                                                             
           }
         }
       }
       break;
-    case    : 
+    case '+': 
       {
-        if(char( buffer[ e + 1]) ==     && length > e + 11 && callIncoming){                                                                                                          
+        if(char( buffer[ e + 1]) == '2' && length > e + 11 && callIncoming){                                                                                                          
           for(t = 0; t < 12; t++)                                                                                                                                                
             lastCaller[t] = char( buffer[ e + t ]);                                                        
           lastCaller[12] = '\0';
@@ -159,7 +160,7 @@ void analise(byte incoming[], int length)
         }
       }
       break;
-    case    : 
+    case 'l': 
       Serial.println(lastCaller);                                                                                                       
       break;
     }
@@ -295,17 +296,17 @@ void printTime()
 {
   getTime();
   Serial.print( int( time[ 3 ] ) );       
-  Serial.print(     );
+  Serial.print( ' ' );
   Serial.print( int( time[ 2 ] ) );        
-  Serial.print(     );
+  Serial.print( ':' );
   Serial.print( int( time[ 1 ] ) );          
-  Serial.print(     );
+  Serial.print( ':' );
   Serial.print( int( time[ 0 ] ) );          
-  Serial.print(     );
+  Serial.print( ' ' );
   Serial.print( int( time[ 4 ] ) );       
-  Serial.print(     );
+  Serial.print( '/' );
   Serial.print( int( time[ 5 ] ) );         
-  Serial.print(       );
+  Serial.print( "/20" );
   Serial.print( int( time[ 6 ]  ) );        
   Serial.println();
 }
@@ -336,3 +337,8 @@ void loop()
   gprsListen();                                                   
   getTime();                                                  
 }
+
+
+
+
+

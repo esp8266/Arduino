@@ -1,6 +1,6 @@
-const char *foo =   
-       
-        ;
+const char *foo = "\
+hello \
+world\n";
 
                                                           
 
@@ -32,3 +32,4 @@ void loop()
                                                                              
                                                                              
   
+

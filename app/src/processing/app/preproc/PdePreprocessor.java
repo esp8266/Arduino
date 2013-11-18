@@ -257,9 +257,23 @@ public class PdePreprocessor {
     // pre-processor directive
     p += "|" + "(^\\s*#.*?$)";
 
+    StringBuilder sb = new StringBuilder(in);
     Pattern pattern = Pattern.compile(p, Pattern.MULTILINE | Pattern.DOTALL);
-    Matcher matcher = pattern.matcher(in);
-    return matcher.replaceAll(" ");
+    Matcher matcher = pattern.matcher(sb);
+    while (matcher.find()) {
+      String replacement = composeReplacementString(new StringBuilder(sb.subSequence(matcher.start(), matcher.end())));
+      sb.replace(matcher.start(), matcher.end(), replacement);
+    }
+    return sb.toString();
+  }
+
+  private String composeReplacementString(StringBuilder sb) {
+    for (int i = 0; i < sb.length(); i++) {
+      if (sb.charAt(i) != '\n') {
+        sb.setCharAt(i, ' ');
+      }
+    }
+    return sb.toString();
   }
 
   /**
@@ -388,7 +402,10 @@ public class PdePreprocessor {
 
           } else {
             // continue blanking this area
-            p[index++] = ' ';
+            if (p[index] != '\n') {
+              p[index] = ' ';
+            }
+            index++;
           }
         }
         if (!endOfRainbow) {
