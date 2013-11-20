@@ -1,7 +1,6 @@
 package processing.app.packages;
 
-import processing.app.helpers.FileUtils;
-import processing.app.helpers.PreferencesMap;
+import static processing.app.helpers.StringUtils.wildcardMatch;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,7 +9,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-import static processing.app.helpers.StringUtils.wildcardMatch;
+import processing.app.helpers.FileUtils;
+import processing.app.helpers.PreferencesMap;
 
 public class Library {
 
@@ -36,7 +36,7 @@ public class Library {
    * Scans inside a folder and create a Library object out of it. Automatically
    * detects pre-1.5 libraries. Automatically fills metadata from
    * library.properties file if found.
-   *
+   * 
    * @param libFolder
    * @return
    */
@@ -68,6 +68,17 @@ public class Library {
     File srcFolder = new File(libFolder, "src");
     if (!srcFolder.exists() || !srcFolder.isDirectory())
       throw new IOException("Missing 'src' folder");
+
+    // 3. Warn if root folder contains development leftovers
+    for (File file : libFolder.listFiles()) {
+      if (file.isDirectory()) {
+        if (FileUtils.isSCCSOrHiddenFile(file)) {
+          System.out.println("WARNING: Spurious " + file.getName() +
+              " folder in '" + properties.get("name") + "' library");
+          continue;
+        }
+      }
+    }
 
     // Extract metadata info
     List<String> archs = new ArrayList<String>();

@@ -1,6 +1,10 @@
 
 ARDUINO 1.5.5 BETA
 
+NOTICE:
+The 1.5 library format is under heavy review on the Arduino Developers mailing list.
+We suggest to delay the adoption of the new format until a stable 1.5.x is released.
+
 [ide]
 * Added missing keywords: YunServer, YunClient, pow
 * Improved folder ignore: now hidden, starting with a dot, and SCCS folders are ignored
@@ -11,6 +15,7 @@ ARDUINO 1.5.5 BETA
 * (windows) Upgraded embedded Java runtime to version 7: much faster startup
 * Improved files open/save dialogs
 * Added line numbers, can be enabled/disabled from preferences (Cayci Gorlitsky)
+* Removed check on forbidden file in 1.5 formatted libraries (#1692)
 
 [libraries]
 * avr: Fixed buffer overflow in File::doBuffer() (dreggy)
