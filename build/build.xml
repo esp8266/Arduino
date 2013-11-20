@@ -665,7 +665,8 @@
     </copy>
 
     <!-- Unzip AVR tools -->
-    <unzip dest="windows/work/hardware" src="windows/avr_tools.zip" overwrite="false"/>
+    <get src="http://downloads.arduino.cc/WinAVR-20081205-arduino-2.zip" dest="windows" usetimestamp="true" skipexisting="true" verbose="true" />
+    <unzip dest="windows/work/hardware" src="windows/WinAVR-20081205-arduino-2.zip" overwrite="false"/>
 
     <copy todir="windows/work/hardware/tools/avr/avr/include/avr">
       <fileset file="windows/eeprom.h" />
