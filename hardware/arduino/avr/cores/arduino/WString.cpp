@@ -186,7 +186,7 @@ String & String::copy(const __FlashStringHelper *pstr, unsigned int length)
 		return *this;
 	}
 	len = length;
-	strcpy_P(buffer, (const prog_char *)pstr);
+	strcpy_P(buffer, (PGM_P)pstr);
 	return *this;
 }
 
@@ -246,7 +246,7 @@ String & String::operator = (const char *cstr)
 
 String & String::operator = (const __FlashStringHelper *pstr)
 {
-	if (pstr) copy(pstr, strlen_P((const prog_char *)pstr));
+	if (pstr) copy(pstr, strlen_P((PGM_P)pstr));
 	else invalidate();
 
 	return *this;
