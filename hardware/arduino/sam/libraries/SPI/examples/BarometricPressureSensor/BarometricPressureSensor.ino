@@ -1,5 +1,5 @@
 /*
-  SCP1000 Barometric Pressure Sensor Display
+ SCP1000 Barometric Pressure Sensor Display
 
  Shows the output of a Barometric Pressure Sensor on a
  Uses the SPI library. For details on the sensor, see:
@@ -29,8 +29,9 @@
 const int PRESSURE = 0x1F;      //3 most significant bits of pressure
 const int PRESSURE_LSB = 0x20;  //16 least significant bits of pressure
 const int TEMPERATURE = 0x21;   //16 bit temperature reading
-cont byte READ = 0b00000000;     // SCP1000's read command
+const byte READ = 0b11111100;     // SCP1000's read command
 const byte WRITE = 0b00000010;   // SCP1000's write command
+
 // pins used for the connection with the sensor
 // the other you need are controlled by the SPI library):
 const int dataReadyPin = 6;
@@ -87,13 +88,14 @@ void loop() {
 unsigned int readRegister(byte thisRegister, int bytesToRead ) {
   byte inByte = 0;           // incoming byte from the SPI
   unsigned int result = 0;   // result to return
-
+  Serial.print(thisRegister, BIN);
+  Serial.print("\t");
   // SCP1000 expects the register name in the upper 6 bits
   // of the byte. So shift the bits left by two bits:
   thisRegister = thisRegister << 2;
   // now combine the address and the command into one byte
-  dataToSend = thisRegister & READ;
-
+  byte dataToSend = thisRegister & READ;
+  Serial.println(thisRegister, BIN);
   // take the chip select low to select the device:
   digitalWrite(chipSelectPin, LOW);
   // send the device the register you want to read:
@@ -127,7 +129,7 @@ void writeRegister(byte thisRegister, byte thisValue) {
   // of the byte. So shift the bits left by two bits:
   thisRegister = thisRegister << 2;
   // now combine the register address and the command into one byte:
-  dataToSend = thisRegister | WRITE;
+  byte dataToSend = thisRegister | WRITE;
 
   // take the chip select low to select the device:
   digitalWrite(chipSelectPin, LOW);
@@ -138,6 +140,4 @@ void writeRegister(byte thisRegister, byte thisValue) {
   // take the chip select high to de-select:
   digitalWrite(chipSelectPin, HIGH);
 }
-
-
 

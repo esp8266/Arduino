@@ -8,7 +8,7 @@
  * published by the Free Software Foundation.
  */
 
-#include "SPI_Class.h"
+#include "SPI.h"
 
 SPIClass::SPIClass(Spi *_spi, uint32_t _id, void(*_initCb)(void)) :
 	spi(_spi), id(_id), initCb(_initCb), initialized(false)

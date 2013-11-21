@@ -9,7 +9,7 @@
  */
 
 #include "pins_arduino.h"
-#include "SPI_Class.h"
+#include "SPI.h"
 
 SPIClass SPI;
 
