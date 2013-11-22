@@ -57,9 +57,9 @@ void BridgeClass::begin() {
 
     // Reset the brigde to check if it is running
     uint8_t cmd[] = {'X', 'X', '1', '0', '0'};
-    uint8_t res[1];
+    uint8_t res[4];
     max_retries = 50;
-    uint16_t l = transfer(cmd, 5, res, 1);
+    uint16_t l = transfer(cmd, 5, res, 4);
     if (l == TRANSFER_TIMEOUT) {
       // Bridge didn't start...
       // Maybe the board is starting-up?
@@ -70,6 +70,14 @@ void BridgeClass::begin() {
     }
     if (res[0] != 0)
       while (true);
+
+    // Detect bridge version
+    if (l == 4) {
+      bridgeVersion = (res[1]-'0')*100 + (res[2]-'0')*10 + (res[3]-'0');
+    } else {
+      // Bridge v1.0.0 didn't send any version info
+      bridgeVersion = 100;
+    }
 
     max_retries = 50;
     return;
