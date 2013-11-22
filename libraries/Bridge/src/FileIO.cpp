@@ -139,7 +139,19 @@ void File::flush() {
 
 //int read(void *buf, uint16_t nbyte)
 
-//uint32_t size()
+uint32_t File::size() {
+  if (bridge.getBridgeVersion() < 101)
+	return 0;
+  uint8_t cmd[] = {'t', handle};
+  uint8_t buff[5];
+  bridge.transfer(cmd, 2, buff, 5);
+  //err = res[0]; // First byte is error code
+  uint32_t res = buff[1] << 24;
+  res += buff[2] << 16;
+  res += buff[3] << 8;
+  res += buff[4];
+  return res;
+}
 
 void File::close() {
   if (mode == 255)
