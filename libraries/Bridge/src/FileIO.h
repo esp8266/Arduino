@@ -83,7 +83,7 @@ class FileSystemClass {
     // Methods to determine if the requested file path exists.
     boolean exists(const char *filepath);
 
-    // Create the requested directory heirarchy--if intermediate directories
+    // Create the requested directory hierarchy--if intermediate directories
     // do not exist they will be created.
     boolean mkdir(const char *filepath);
 
