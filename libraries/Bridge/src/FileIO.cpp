@@ -137,7 +137,21 @@ int File::available() {
 void File::flush() {
 }
 
-//int read(void *buf, uint16_t nbyte)
+int File::read(void *buff, uint16_t nbyte) {
+  uint16_t n = 0;
+  uint8_t *p = reinterpret_cast<uint8_t *>(buff);
+  while (n < nbyte) {
+    if (buffered == 0) {
+      doBuffer();
+      if (buffered == 0)
+        break;
+    }
+    *p++ = buffer[readPos++];
+    buffered--;
+    n++;
+  }
+  return n;
+}
 
 uint32_t File::size() {
   if (bridge.getBridgeVersion() < 101)
