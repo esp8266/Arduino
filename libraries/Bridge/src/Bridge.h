@@ -36,7 +36,7 @@ class BridgeClass {
     unsigned int get(const char *key, uint8_t *buff, unsigned int size);
     unsigned int get(const char *key, char *value, unsigned int maxlen)
     {
-      get(key, reinterpret_cast<uint8_t *>(value), maxlen);
+      return get(key, reinterpret_cast<uint8_t *>(value), maxlen);
     }
 
     // Trasnfer a frame (with error correction and response)

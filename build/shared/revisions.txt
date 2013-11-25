@@ -22,6 +22,7 @@ We suggest to delay the adoption of the new format until a stable 1.5.x is relea
 * avr: Fixed timeout in Bridge::transfer()
 * sam: Fixed SPI initialization (when using extended API and multiple CS)
 * avr: Fixed behavior of EthernetClient::flush()
+* avr: Fixed return value of Bridge::get(..) (returning 0 with valid data len >0)
 
 [core]
 * sam: Fixed wrong initialization for ADC timings (analogRead speed Arduino DUE improved by a factor x10)
