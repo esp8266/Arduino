@@ -163,3 +163,25 @@ uint8_t EthernetClient::status() {
 EthernetClient::operator bool() {
   return _sock != MAX_SOCK_NUM;
 }
+
+bool EthernetClient::operator==(const EthernetClient& rhs) {
+  if (_sock == MAX_SOCK_NUM || rhs._sock == MAX_SOCK_NUM) return false;
+  if (W5100.readSnDPORT(_sock)!=W5100.readSnDPORT(rhs._sock)) return false;
+  uint32_t a1;
+  uint32_t a2;
+  W5100.readSnDIPR(_sock,(uint8_t*) &a1);
+  W5100.readSnDIPR(rhs._sock,(uint8_t*) &a2);
+  return a1==a2;
+}
+
+IPAddress EthernetClient::remoteIP() {
+  if (_sock == MAX_SOCK_NUM) return IPAddress(0,0,0,0);
+  uint32_t _destaddress;
+  W5100.readSnDIPR(_sock,(uint8_t*) &_destaddress);
+  return IPAddress(_destaddress);
+}
+
+uint16_t EthernetClient::remotePort() {
+  if (_sock == MAX_SOCK_NUM) return 0;
+  return W5100.readSnDPORT(_sock);
+}
