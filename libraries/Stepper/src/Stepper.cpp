@@ -5,6 +5,7 @@
   Two-wire modifications   (0.2) by Sebastian Gassner
   Combination version   (0.3) by Tom Igoe and David Mellis
   Bug fix for four-wire   (0.4) by Tom Igoe, bug fix from Noah Shibley  
+  High-speed stepping mod and timer rollover fix   (0.5) by Eugene Kozlenko
 
   Drives a unipolar or bipolar stepper motor using  2 wires or 4 wires
 
@@ -18,7 +19,8 @@
   A slightly modified circuit around a Darlington transistor array or an L293 H-bridge
   connects to only 2 microcontroler pins, inverts the signals received,
   and delivers the 4 (2 plus 2 inverted ones) output signals required
-  for driving a stepper motor.
+  for driving a stepper motor. Similarly the Arduino motor shields 2 direction pins
+  may be used.
 
   The sequence of control signals for 4 control wires is as follows:
 
@@ -70,7 +72,7 @@ Stepper::Stepper(int number_of_steps, int motor_pin_1, int motor_pin_2)
   this->step_number = 0;      // which step the motor is on
   this->speed = 0;        // the motor speed, in revolutions per minute
   this->direction = 0;      // motor direction
-  this->last_step_time = 0;    // time stamp in ms of the last step taken
+  this->last_step_time = 0;    // time stamp in us of the last step taken
   this->number_of_steps = number_of_steps;    // total number of steps for this motor
   
   // Arduino pins for the motor control connection:
@@ -100,7 +102,7 @@ Stepper::Stepper(int number_of_steps, int motor_pin_1, int motor_pin_2, int moto
   this->step_number = 0;      // which step the motor is on
   this->speed = 0;        // the motor speed, in revolutions per minute
   this->direction = 0;      // motor direction
-  this->last_step_time = 0;    // time stamp in ms of the last step taken
+  this->last_step_time = 0;    // time stamp in us of the last step taken
   this->number_of_steps = number_of_steps;    // total number of steps for this motor
   
   // Arduino pins for the motor control connection:
@@ -125,7 +127,7 @@ Stepper::Stepper(int number_of_steps, int motor_pin_1, int motor_pin_2, int moto
 */
 void Stepper::setSpeed(long whatSpeed)
 {
-  this->step_delay = 60L * 1000L / this->number_of_steps / whatSpeed;
+  this->step_delay = 60L * 1000L * 1000L / this->number_of_steps / whatSpeed;
 }
 
 /*
@@ -144,9 +146,9 @@ void Stepper::step(int steps_to_move)
   // decrement the number of steps, moving one step each time:
   while(steps_left > 0) {
   // move only if the appropriate delay has passed:
-  if (millis() - this->last_step_time >= this->step_delay) {
+  if (micros() - this->last_step_time >= this->step_delay || micros() - this->last_step_time < 0) {
       // get the timeStamp of when you stepped:
-      this->last_step_time = millis();
+      this->last_step_time = micros();
       // increment or decrement the step number,
       // depending on direction:
       if (this->direction == 1) {
@@ -229,5 +231,5 @@ void Stepper::stepMotor(int thisStep)
 */
 int Stepper::version(void)
 {
-  return 4;
+  return 5;
 }
