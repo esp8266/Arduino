@@ -62,6 +62,7 @@ void loop() {
 
     boolean newClient = true;
     for (byte i=0;i<4;i++) {
+      //check whether this client refers to the same socket as one of the existing instances:
       if (clients[i]==client) {
         newClient = false;
         break;
@@ -69,8 +70,9 @@ void loop() {
     }
 
     if (newClient) {
+      //check which of the existing clients can be overridden:
       for (byte i=0;i<4;i++) {
-        if (clients[i]!=client) {
+        if (!clients[i] && clients[i]!=client) {
           clients[i] = client;
           break;
         }
@@ -89,7 +91,7 @@ void loop() {
     if (client.available() > 0) {
       // read the bytes incoming from the client:
       char thisChar = client.read();
-      // echo the bytes back to the client:
+      // echo the bytes back to all other connected clients:
       for (byte i=0;i<4;i++) {
         if (!clients[i] || (clients[i]==client)) {
           continue;
@@ -102,8 +104,8 @@ void loop() {
   }
   for (byte i=0;i<4;i++) {
     if (!(clients[i].connected())) {
+      // client.stop() invalidates the internal socket-descriptor, so next use of == will allways return false;
       clients[i].stop();
-      clients[i]=EthernetClient();
     }
   }
 }
