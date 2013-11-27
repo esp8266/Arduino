@@ -9,31 +9,43 @@ We suggest to delay the adoption of the new format until a stable 1.5.x is relea
 * Added missing keywords: YunServer, YunClient, pow
 * Improved folder ignore: now hidden, starting with a dot, and SCCS folders are ignored
 * Improved auto format: now handled by Artistic Style http://astyle.sourceforge.net/
-* Improved SSH uploader (Arduino Yun): uses file ~/.ssh/config if available. Allows public key only authentication and ssh servers listening on ports other than 22.
+* Improved SSH uploader (Arduino Yun): uses file ~/.ssh/config if available. 
+  Allows public key only authentication and ssh servers listening on ports other than 22.
 * Font anti-aliasing now ON by default (users will have to either delete or manually edit their preferences.txt file)
 * Added warning message when opening sketches with additional files with illegal names
 * (windows) Upgraded embedded Java runtime to version 7: much faster startup
 * Improved files open/save dialogs
 * Added line numbers, can be enabled/disabled from preferences (Cayci Gorlitsky)
 * Removed check on forbidden file in 1.5 formatted libraries (#1692)
+* Updated msys-1.0.dll to the latest version (Windows 8.1 compatibility)
+* Using [code] tag instead of [quote] in "Copy for forum". Removed color coding.
+* When an hardware addon reference another core also the libraries are referenced.
+* It's now possible to specify additional custom board parameters from command line.
+* Example and Boards are now scrollable.
+* Fixed localization issues that sometimes prevented the IDE to start.
+* Added "Using library..." debugging message in verbose compile.
 
 [libraries]
-* avr: Fixed buffer overflow in File::doBuffer() (dreggy)
-* avr: Fixed timeout in Bridge::transfer()
+* Bridge: Fixed buffer overflow in File::doBuffer() (dreggy)
+* Bridge: Fixed timeout in Bridge::transfer()
 * sam: Fixed SPI initialization (when using extended API and multiple CS)
-* avr: Fixed behavior of EthernetClient::flush()
-* avr: Fixed return value of Bridge::get(..) (returning 0 with valid data len >0)
+* Partially fixed the behavior of EthernetClient::flush(), now it doesn't discard 
+  incoming data BUT it doesn't wait for outgoing data to be successfully transmitted.
+* Bridge: Fixed return value of Bridge::get(..) (returning 0 with valid data len >0)
+* Bridge: Implemented multi-byte File::read(..)
+* Esplora: Added support for display GREENTAB_L
 
 [core]
 * sam: Fixed wrong initialization for ADC timings (analogRead speed Arduino DUE improved by a factor x10)
        https://github.com/arduino/Arduino/issues/1418
        (http://www.djerickson.com/arduino/)
 * avr: Fixed wrong extended fuses on Arduino Yún when using external programmer
-* avr: Added yun variant with LED_BUILTIN definition
+* Added LED_BUILTIN metadata in variant files
 * avr: Refactored Mega* variants definitions in boards.txt (Kristian Sloth Lauszus)
 * avr: Removed File object destructor. In order to free memory allocated by a File object the safest way is to call its close() method
 * Added digitalPinToInterrupt variant macro (Paul Stoffregen)
 * avr: added variant file for Arduino Ethernet
+* Added SERIAL_* metadata in variants files (Paul Stoffregen)
 
 ARDUINO 1.5.4 BETA 2013.09.10
 
