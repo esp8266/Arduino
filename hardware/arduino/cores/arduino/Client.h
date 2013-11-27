@@ -19,6 +19,7 @@ public:
   virtual void stop() = 0;
   virtual uint8_t connected() = 0;
   virtual operator bool() = 0;
+  virtual uint16_t localPort() = 0;
   virtual IPAddress remoteIP() = 0;
   virtual uint16_t remotePort() = 0;
 protected:

@@ -72,8 +72,6 @@ void loop() {
       for (byte i=0;i<4;i++) {
         if (clients[i]!=client) {
           clients[i] = client;
-          Serial.print("found slot: ");
-          Serial.println(i);
           break;
         }
       }
@@ -81,7 +79,7 @@ void loop() {
       // clead out the input buffer:
       client.flush();    
       Serial.println("We have a new client");
-      client.println("Hello, client!"); 
+      client.println("Hello, client!");
       client.print("your IP: ");
       client.println(client.remoteIP());
       client.print("your port: ");
@@ -105,7 +103,6 @@ void loop() {
   for (byte i=0;i<4;i++) {
     if (!(clients[i].connected())) {
       clients[i].stop();
-      ~clients[i];
       clients[i]=EthernetClient();
     }
   }
