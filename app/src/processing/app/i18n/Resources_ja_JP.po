@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2013-09-10 10:35+0000\n"
-"Last-Translator: cmaglie <c.maglie@arduino.cc>\n"
+"PO-Revision-Date: 2013-11-20 10:43+0000\n"
+"Last-Translator: Masanori Ohgita <mp@ohgita.info>\n"
 "Language-Team: Japanese (Japan) (http://www.transifex.com/projects/p/arduino-ide-15/language/ja_JP/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -133,11 +133,11 @@ msgstr "スケッチを保存できなかったため、スケッチのアーカ
 
 #: ../../../processing/app/I18n.java:83
 msgid "Arduino ARM (32-bits) Boards"
-msgstr ""
+msgstr "Arduino ARM (32ビット) ボード"
 
 #: ../../../processing/app/I18n.java:82
 msgid "Arduino AVR Boards"
-msgstr ""
+msgstr "Arduino AVR ボード"
 
 #: Base.java:1682
 msgid ""
@@ -160,7 +160,7 @@ msgstr "Arduino IDEを実行するにはJDKが必要です。\nJREでは動作�
 
 #: ../../../processing/app/EditorStatus.java:471
 msgid "Arduino: "
-msgstr ""
+msgstr "Arduino: "
 
 #: Sketch.java:588
 #, java-format
@@ -227,7 +227,7 @@ msgstr ""
 #: ../../../processing/app/Base.java:1433
 #: ../../../processing/app/Editor.java:707
 msgid "Board"
-msgstr ""
+msgstr "ボード"
 
 #: ../../../processing/app/debug/TargetBoard.java:42
 #, java-format
@@ -238,7 +238,7 @@ msgstr ""
 
 #: ../../../processing/app/EditorStatus.java:472
 msgid "Board: "
-msgstr ""
+msgstr "ボード:"
 
 #: ../../../processing/app/Preferences.java:140
 msgid "Bosnian"
@@ -258,7 +258,7 @@ msgstr "ビルド用のフォルダが消えてしまったか、書き込みが
 
 #: ../../../processing/app/Preferences.java:80
 msgid "Bulgarian"
-msgstr ""
+msgstr "ブルガリア語"
 
 #: ../../../processing/app/Preferences.java:141
 msgid "Burmese (Myanmar)"
@@ -274,7 +274,7 @@ msgstr "マイコンボードにブートローダを書き込んでいます...
 
 #: ../../../processing/app/Base.java:368
 msgid "Can't open source sketch!"
-msgstr ""
+msgstr "ソーススケッチを開けません！"
 
 #: ../../../processing/app/Preferences.java:92
 msgid "Canadian French"
@@ -402,12 +402,12 @@ msgstr ""
 #: ../../../cc/arduino/packages/uploaders/SerialUploader.java:282
 #, java-format
 msgid "Could not find tool {0}"
-msgstr ""
+msgstr "ツール {0} が見つかりませんでした"
 
 #: ../../../cc/arduino/packages/uploaders/SerialUploader.java:278
 #, java-format
 msgid "Could not find tool {0} from package {1}"
-msgstr ""
+msgstr "ツール {0} が パッケージ {1} から 見つかりませんでした"
 
 #: Base.java:1934
 #, java-format
@@ -611,14 +611,14 @@ msgstr "Serial.{0}()でエラー"
 
 #: ../../../processing/app/Base.java:1232
 msgid "Error loading libraries"
-msgstr ""
+msgstr "ライブラリの読み込みエラー"
 
 #: ../../../processing/app/debug/TargetPlatform.java:95
 #: ../../../processing/app/debug/TargetPlatform.java:106
 #: ../../../processing/app/debug/TargetPlatform.java:117
 #, java-format
 msgid "Error loading {0}"
-msgstr ""
+msgstr "{0}の読み込みエラー"
 
 #: Serial.java:181
 #, java-format
@@ -638,7 +638,7 @@ msgstr "初期設定ファイルを読み込む際にエラーが発生しまし
 
 #: ../../../cc/arduino/packages/DiscoveryManager.java:25
 msgid "Error starting discovery method: "
-msgstr ""
+msgstr "検出メソッドの開始中にエラー"
 
 #: Serial.java:125
 #, java-format
@@ -651,7 +651,7 @@ msgstr "ブートローダの書き込み中にエラーが発生しました。
 
 #: ../../../processing/app/Editor.java:2555
 msgid "Error while burning bootloader: missing '{0}' configuration parameter"
-msgstr ""
+msgstr "ブートローダの書き込み中にエラー: 設定パラメータ '{0}' が見つかりません"
 
 #: SketchCode.java:83
 #, java-format
@@ -665,7 +665,7 @@ msgstr "印刷中にエラーが発生しました。"
 #: ../../../processing/app/Editor.java:2409
 #: ../../../processing/app/Editor.java:2449
 msgid "Error while uploading: missing '{0}' configuration parameter"
-msgstr ""
+msgstr "アップロード中にエラーが発生しました: '{0}' 設定パラメータが見つかりません"
 
 #: Preferences.java:93
 msgid "Estonian"
@@ -767,12 +767,12 @@ msgstr "初心者向けガイド"
 msgid ""
 "Global variables use {0} bytes ({2}%%) of dynamic memory, leaving {3} bytes "
 "for local variables. Maximum is {1} bytes."
-msgstr ""
+msgstr "グローバル変数が {0}バイト ({2}%%) の 動的メモリを使用しており、ローカル変数に {3} バイトが残っています。最高は {1}バイトです。"
 
 #: ../../../processing/app/Sketch.java:1651
 #, java-format
 msgid "Global variables use {0} bytes of dynamic memory."
-msgstr ""
+msgstr "グローバル変数は {0}バイトの動的メモリを使用しています"
 
 #: Preferences.java:98
 msgid "Greek"
@@ -845,7 +845,7 @@ msgid ""
 "disable this in the Preferences dialog.\n"
 "\n"
 "Save sketch and update its extension?"
-msgstr ""
+msgstr "Arduino 1.0 において、デフォルトのファイル拡張子が .pde から .ino へ変更されました。\n新しいスケッチ (\"名前を付けて保存\"して作成した場合を含む) には、新しい拡張子が使われます。\n既存のスケッチも保存する際に拡張子が更新されます。但し、この動作は 設定 ダイアログで無効化できます。\n\nスケッチを保存してその拡張子を更新しますか？"
 
 #: Editor.java:1216 Editor.java:2757
 msgid "Increase Indent"
@@ -858,7 +858,7 @@ msgstr "インドネシア語"
 #: ../../../processing/app/Base.java:1204
 #, java-format
 msgid "Invalid library found in {0}: {1}"
-msgstr ""
+msgstr "無効なライブラリが {0} に見つかりました: {1}"
 
 #: Preferences.java:102
 msgid "Italian"
@@ -886,7 +886,7 @@ msgstr "リトアニア語"
 
 #: ../../../processing/app/Sketch.java:1660
 msgid "Low memory available, stability problems may occur"
-msgstr ""
+msgstr "利用可能なメモリが少なくなっています。\n安定性に問題が生じる恐れがあります。"
 
 #: Preferences.java:107
 msgid "Marathi"
@@ -975,12 +975,12 @@ msgstr "リファレンスマニュアルに「{0}」はありません。"
 
 #: ../../../processing/app/Base.java:309
 msgid "No valid configured cores found! Exiting..."
-msgstr ""
+msgstr "有効な構成されたコアが見つかりません！ 終了しています..."
 
 #: ../../../processing/app/debug/TargetPackage.java:63
 #, java-format
 msgid "No valid hardware definitions found in folder {0}."
-msgstr ""
+msgstr "有効なハードウェア定義が フォルダ {0} に見つかりません。"
 
 #: Base.java:191
 msgid "Non-fatal error while setting the Look & Feel."
@@ -998,7 +998,7 @@ msgstr ""
 msgid ""
 "Not enough memory; see http://www.arduino.cc/en/Guide/Troubleshooting#size "
 "for tips on reducing your footprint."
-msgstr ""
+msgstr "十分なメモリがありません。\nhttp://www.arduino.cc/en/Guide/Troubleshooting#size\nにてフットプリントを節約するための方法を閲覧できます。"
 
 #: Preferences.java:80 Sketch.java:585 Sketch.java:737 Sketch.java:1042
 #: Editor.java:2145 Editor.java:2465
@@ -1035,7 +1035,7 @@ msgstr "プリンタの設定..."
 
 #: ../../../processing/app/forms/PasswordAuthorizationDialog.java:44
 msgid "Password:"
-msgstr ""
+msgstr "パスワード:"
 
 #: Editor.java:1189 Editor.java:2731
 msgid "Paste"
@@ -1059,7 +1059,7 @@ msgstr "ポーランド語"
 
 #: ../../../processing/app/Editor.java:718
 msgid "Port"
-msgstr ""
+msgstr "ポート"
 
 #: ../../../processing/app/Preferences.java:151
 msgid "Portugese"
@@ -1111,11 +1111,11 @@ msgstr "プラットフォームを設定する際に問題が発生しました
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:136
 msgid "Problem accessing board folder /www/sd"
-msgstr ""
+msgstr "ボードのフォルダ /www/sd へのアクセスに問題"
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:132
 msgid "Problem accessing files in folder "
-msgstr ""
+msgstr "フォルダのファイルへのアクセスに問題"
 
 #: Base.java:1673
 msgid "Problem getting data folder"
@@ -1144,7 +1144,7 @@ msgstr "このIDEは、ファイル名が拡張子.inoまたは.pdeで\n終わ�
 
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
-msgstr ""
+msgstr "プロセッサ"
 
 #: Editor.java:704
 msgid "Programmer"
@@ -1247,7 +1247,7 @@ msgstr "スケッチブックの保存場所を決める"
 
 #: ../../../processing/app/debug/Compiler.java:146
 msgid "Selected board depends on '{0}' core (not installed)."
-msgstr ""
+msgstr "選択されたボードは '{0}' コア (未インストール) に依存しています。"
 
 #: SerialMonitor.java:93
 msgid "Send"
@@ -1295,7 +1295,7 @@ msgstr "スケッチのフォルダを表示"
 
 #: ../../../processing/app/EditorStatus.java:468
 msgid "Show verbose output during compilation"
-msgstr ""
+msgstr "コンパイル中の詳細な出力を表示する"
 
 #: Preferences.java:387
 msgid "Show verbose output during: "
@@ -1336,7 +1336,7 @@ msgstr "スケッチが大きすぎます。http://www.arduino.cc/en/Guide/Troub
 msgid ""
 "Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} "
 "bytes."
-msgstr ""
+msgstr "スケッチが プログラムストレージ領域の {0}バイト ({2}%%) を使用しています。最大は {1}バイト です。"
 
 #: Editor.java:510
 msgid "Sketchbook"
@@ -1508,11 +1508,11 @@ msgstr ""
 
 #: ../../../processing/app/Editor.java:2507
 msgid "Type board password to access its console"
-msgstr ""
+msgstr "コンソールへアクセスするためにボードのパスワードを入力"
 
 #: ../../../processing/app/Sketch.java:1673
 msgid "Type board password to upload a new sketch"
-msgstr ""
+msgstr "新しいスケッチをアップロードするためにボードのパスワードを入力"
 
 #: ../../../processing/app/Preferences.java:118
 msgid "Ukrainian"
@@ -1525,15 +1525,15 @@ msgstr ""
 
 #: ../../../processing/app/NetworkMonitor.java:130
 msgid "Unable to connect: retrying"
-msgstr ""
+msgstr "接続出来ません：再試行中"
 
 #: ../../../processing/app/Editor.java:2526
 msgid "Unable to connect: wrong password?"
-msgstr ""
+msgstr "接続できません: パスワードが間違っていませんか？"
 
 #: ../../../processing/app/Editor.java:2512
 msgid "Unable to open serial monitor"
-msgstr ""
+msgstr "シリアルモニタを開けません"
 
 #: Sketch.java:1432
 #, java-format
@@ -1573,7 +1573,7 @@ msgstr "書き込みを中止しました。"
 
 #: ../../../processing/app/Sketch.java:1678
 msgid "Upload cancelled"
-msgstr ""
+msgstr "アップロードがキャンセルされました"
 
 #: Editor.java:2378
 msgid "Uploading to I/O Board..."
@@ -1761,7 +1761,7 @@ msgstr "コンパイル "
 
 #: ../../../processing/app/NetworkMonitor.java:111
 msgid "connected!"
-msgstr ""
+msgstr "接続しました！"
 
 #: Sketch.java:540
 msgid "createNewFile() returned false"
@@ -1769,7 +1769,7 @@ msgstr "createNewFile()がfalseを返しました。"
 
 #: ../../../processing/app/EditorStatus.java:469
 msgid "enabled in File > Preferences."
-msgstr ""
+msgstr "ファイル > 設定 で有効にする"
 
 #: Base.java:2090
 msgid "environment"
@@ -1781,7 +1781,7 @@ msgstr "http://arduino.cc/"
 
 #: ../../../processing/app/debug/Compiler.java:49
 msgid "http://github.com/arduino/Arduino/issues"
-msgstr ""
+msgstr "http://github.com/arduino/Arduino/issues"
 
 #: UpdateCheck.java:118
 msgid "http://www.arduino.cc/en/Main/Software"

@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2013-09-10 10:35+0000\n"
+"PO-Revision-Date: 2013-11-20 10:43+0000\n"
 "Last-Translator: cmaglie <c.maglie@arduino.cc>\n"
 "Language-Team: Romanian (http://www.transifex.com/projects/p/arduino-ide-15/language/ro/)\n"
 "MIME-Version: 1.0\n"
@@ -162,7 +162,7 @@ msgstr "Nu este suficient JRE (Java Runtime Enviroment)\npentru a rula Arduino I
 
 #: ../../../processing/app/EditorStatus.java:471
 msgid "Arduino: "
-msgstr ""
+msgstr "Arduino: "
 
 #: Sketch.java:588
 #, java-format
@@ -175,11 +175,11 @@ msgstr "Eşti sigur că doreşti să ştergi această schiţa?"
 
 #: ../../../processing/app/Preferences.java:137
 msgid "Armenian"
-msgstr ""
+msgstr "Armeană"
 
 #: ../../../processing/app/Preferences.java:138
 msgid "Asturian"
-msgstr ""
+msgstr "Asturiană"
 
 #: tools/AutoFormat.java:91
 msgid "Auto Format"
@@ -224,7 +224,7 @@ msgstr "Fişierul selectat este invalid"
 
 #: ../../../processing/app/Preferences.java:139
 msgid "Belarusian"
-msgstr ""
+msgstr "Belarusă"
 
 #: ../../../processing/app/Base.java:1433
 #: ../../../processing/app/Editor.java:707
@@ -236,15 +236,15 @@ msgstr "Placă"
 msgid ""
 "Board {0}:{1}:{2} doesn''t define a ''build.board'' preference. Auto-set to:"
 " {3}"
-msgstr ""
+msgstr "Placa {0}:{1}:{2} nu are definită nici o preferinţă ''build.board'' . Trec implicit pe : {3}"
 
 #: ../../../processing/app/EditorStatus.java:472
 msgid "Board: "
-msgstr ""
+msgstr "Placă"
 
 #: ../../../processing/app/Preferences.java:140
 msgid "Bosnian"
-msgstr ""
+msgstr "Bosniacă"
 
 #: SerialMonitor.java:112
 msgid "Both NL & CR"
@@ -264,7 +264,7 @@ msgstr "Bulgară"
 
 #: ../../../processing/app/Preferences.java:141
 msgid "Burmese (Myanmar)"
-msgstr ""
+msgstr "Birmană (Myanmar)"
 
 #: Editor.java:708
 msgid "Burn Bootloader"
@@ -305,19 +305,19 @@ msgstr "Cauta actualizări la pornirea programului"
 
 #: ../../../processing/app/Preferences.java:142
 msgid "Chinese (China)"
-msgstr ""
+msgstr "Chineză (China)"
 
 #: ../../../processing/app/Preferences.java:142
 msgid "Chinese (Hong Kong)"
-msgstr ""
+msgstr "Chineză (Hong Kong)"
 
 #: ../../../processing/app/Preferences.java:144
 msgid "Chinese (Taiwan)"
-msgstr ""
+msgstr "Chineză (Taiwan)"
 
 #: ../../../processing/app/Preferences.java:143
 msgid "Chinese (Taiwan) (Big5)"
-msgstr ""
+msgstr "Chineză (Taiwan) (Big5)"
 
 #: Preferences.java:88
 msgid "Chinese Simplified"
@@ -399,17 +399,17 @@ msgstr "Nu se poate şterge {0}"
 #: ../../../processing/app/debug/TargetPlatform.java:74
 #, java-format
 msgid "Could not find boards.txt in {0}. Is it pre-1.5?"
-msgstr ""
+msgstr "Nu am putut găsi boards.txt în {0}. Este fişierul pre-1.5?"
 
 #: ../../../cc/arduino/packages/uploaders/SerialUploader.java:282
 #, java-format
 msgid "Could not find tool {0}"
-msgstr ""
+msgstr "Imposibil de găsit unealta {0}"
 
 #: ../../../cc/arduino/packages/uploaders/SerialUploader.java:278
 #, java-format
 msgid "Could not find tool {0} from package {1}"
-msgstr ""
+msgstr "Nu am putut găsi unealtă {0} din pachetul {1}"
 
 #: Base.java:1934
 #, java-format
@@ -562,7 +562,7 @@ msgstr "Olandeză"
 
 #: ../../../processing/app/Preferences.java:144
 msgid "Dutch (Netherlands)"
-msgstr ""
+msgstr "Olandeză (Netherlands)"
 
 #: Editor.java:1130
 msgid "Edit"
@@ -582,7 +582,7 @@ msgstr "Engleză"
 
 #: ../../../processing/app/Preferences.java:145
 msgid "English (United Kingdom)"
-msgstr ""
+msgstr "Engleză (United Kingdom)"
 
 #: Editor.java:1062
 msgid "Environment"
@@ -613,14 +613,14 @@ msgstr "Eroare în Serial.{0}()"
 
 #: ../../../processing/app/Base.java:1232
 msgid "Error loading libraries"
-msgstr ""
+msgstr "Eroare la încărcarea bibliotecii"
 
 #: ../../../processing/app/debug/TargetPlatform.java:95
 #: ../../../processing/app/debug/TargetPlatform.java:106
 #: ../../../processing/app/debug/TargetPlatform.java:117
 #, java-format
 msgid "Error loading {0}"
-msgstr ""
+msgstr "Eroare la încărcarea {0}"
 
 #: Serial.java:181
 #, java-format
@@ -640,7 +640,7 @@ msgstr "Eroare la citirea fişierului cu preferinţe. Te rog şterge (sau mută)
 
 #: ../../../cc/arduino/packages/DiscoveryManager.java:25
 msgid "Error starting discovery method: "
-msgstr ""
+msgstr "Eroare la pornire metoda de descoperire:"
 
 #: Serial.java:125
 #, java-format
@@ -653,7 +653,7 @@ msgstr "Eroare în timpul încărcării bootloader-ului."
 
 #: ../../../processing/app/Editor.java:2555
 msgid "Error while burning bootloader: missing '{0}' configuration parameter"
-msgstr ""
+msgstr "Eroare în timpul încărcării bootloader-ului: lipseşte parametrul de configurare '{0}'"
 
 #: SketchCode.java:83
 #, java-format
@@ -667,7 +667,7 @@ msgstr "Eroare în timpul tipăririi."
 #: ../../../processing/app/Editor.java:2409
 #: ../../../processing/app/Editor.java:2449
 msgid "Error while uploading: missing '{0}' configuration parameter"
-msgstr ""
+msgstr "Eroare în timpul încărcării: lipseşte parametrul de configurare '{0}'"
 
 #: Preferences.java:93
 msgid "Estonian"
@@ -675,7 +675,7 @@ msgstr "Estoniană"
 
 #: ../../../processing/app/Preferences.java:146
 msgid "Estonian (Estonia)"
-msgstr ""
+msgstr "Estonă (Estonia)"
 
 #: Editor.java:516
 msgid "Examples"
@@ -723,7 +723,7 @@ msgstr "Caută:"
 
 #: ../../../processing/app/Preferences.java:147
 msgid "Finnish"
-msgstr ""
+msgstr "Finlandeză"
 
 #: tools/FixEncoding.java:41 tools/FixEncoding.java:58
 #: tools/FixEncoding.java:79
@@ -769,12 +769,12 @@ msgstr "Primi paşi"
 msgid ""
 "Global variables use {0} bytes ({2}%%) of dynamic memory, leaving {3} bytes "
 "for local variables. Maximum is {1} bytes."
-msgstr ""
+msgstr "Variabilele globale folosesc {0} bytes ({2}%%) din memoria dinamică, lăsând {3} bytes pentru variabilele locale. Maximul este de {1} bytes."
 
 #: ../../../processing/app/Sketch.java:1651
 #, java-format
 msgid "Global variables use {0} bytes of dynamic memory."
-msgstr ""
+msgstr "Variabila globală foloseşte {0} bytes din memoria dinamică."
 
 #: Preferences.java:98
 msgid "Greek"
@@ -847,7 +847,7 @@ msgid ""
 "disable this in the Preferences dialog.\n"
 "\n"
 "Save sketch and update its extension?"
-msgstr ""
+msgstr "În Arduino 1.0, extensia implicita pentru fişiere a fost schimbata\ndin .pde în .ino.  Noile schiţe (incluzând cele create\ncu  \"Salvează ca\") vor utiliza noua extensie.  Extensia\nschiţelor existente va fi modificata odată cu salvarea acestor fişiere, dar puteţi\ndezactiva aceasta opţiune în fila cu preferinţe.\nSalvează schiţa şi modifică extensia?"
 
 #: Editor.java:1216 Editor.java:2757
 msgid "Increase Indent"
@@ -860,7 +860,7 @@ msgstr "Indoneziană"
 #: ../../../processing/app/Base.java:1204
 #, java-format
 msgid "Invalid library found in {0}: {1}"
-msgstr ""
+msgstr "Bibliotecă invalidă în {0}: {1}"
 
 #: Preferences.java:102
 msgid "Italian"
@@ -888,7 +888,7 @@ msgstr "Lituaniană"
 
 #: ../../../processing/app/Sketch.java:1660
 msgid "Low memory available, stability problems may occur"
-msgstr ""
+msgstr "Memoria disponibilă este foarte redusă, pot apărea probleme de stabilitate"
 
 #: Preferences.java:107
 msgid "Marathi"
@@ -916,11 +916,11 @@ msgstr "Numele noului fişier"
 
 #: ../../../processing/app/Preferences.java:149
 msgid "Nepali"
-msgstr ""
+msgstr "Nepaleză"
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:51
 msgid "Network upload using programmer not supported"
-msgstr ""
+msgstr "Încărcarea prin reţea folosind programatorul nu este suportată"
 
 #: EditorToolbar.java:41 Editor.java:493
 msgid "New"
@@ -977,16 +977,16 @@ msgstr "Nici un rezultat disponibil pentru \"{0}\""
 
 #: ../../../processing/app/Base.java:309
 msgid "No valid configured cores found! Exiting..."
-msgstr ""
+msgstr "Nu s-au gasit nuclee configurate valid! Anulare..."
 
 #: ../../../processing/app/debug/TargetPackage.java:63
 #, java-format
 msgid "No valid hardware definitions found in folder {0}."
-msgstr ""
+msgstr "Nu s-a găsit nici o definiție hardware valabilă în dosarul {0}."
 
 #: Base.java:191
 msgid "Non-fatal error while setting the Look & Feel."
-msgstr "Eroare non-fatala în timpul iniţializării interfeţei cu utilizatorul."
+msgstr "Eroare non-critica in timpul setarii Look & Feel."
 
 #: Sketch.java:396 Sketch.java:410 Sketch.java:419 Sketch.java:859
 msgid "Nope"
@@ -1000,7 +1000,7 @@ msgstr "Norvegiană (Malabo)"
 msgid ""
 "Not enough memory; see http://www.arduino.cc/en/Guide/Troubleshooting#size "
 "for tips on reducing your footprint."
-msgstr ""
+msgstr "Schiţa este prea mare; vezi http://www.arduino.cc/en/Guide/Troubleshooting#size pentru ponturi în reducerea acesteia."
 
 #: Preferences.java:80 Sketch.java:585 Sketch.java:737 Sketch.java:1042
 #: Editor.java:2145 Editor.java:2465
@@ -1021,7 +1021,7 @@ msgstr "Deschide URL"
 
 #: Base.java:636
 msgid "Open an Arduino sketch..."
-msgstr "Deschide o schiţa Arduino..."
+msgstr "Deschideți o schiță Arduino..."
 
 #: EditorToolbar.java:46
 msgid "Open in Another Window"
@@ -1037,7 +1037,7 @@ msgstr "Iniţializare pagină"
 
 #: ../../../processing/app/forms/PasswordAuthorizationDialog.java:44
 msgid "Password:"
-msgstr ""
+msgstr "Parola:"
 
 #: Editor.java:1189 Editor.java:2731
 msgid "Paste"
@@ -1061,19 +1061,19 @@ msgstr "Poloneză"
 
 #: ../../../processing/app/Editor.java:718
 msgid "Port"
-msgstr ""
+msgstr "Port"
 
 #: ../../../processing/app/Preferences.java:151
 msgid "Portugese"
-msgstr ""
+msgstr "Portugheză"
 
 #: ../../../processing/app/Preferences.java:127
 msgid "Portuguese (Brazil)"
-msgstr ""
+msgstr "Portugheză (Brazil)"
 
 #: ../../../processing/app/Preferences.java:128
 msgid "Portuguese (Portugal)"
-msgstr ""
+msgstr "Portugheză (Portugal)"
 
 #: Preferences.java:295 Editor.java:583
 msgid "Preferences"
@@ -1113,11 +1113,11 @@ msgstr "Probleme la iniţializarea platformei de dezvoltare"
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:136
 msgid "Problem accessing board folder /www/sd"
-msgstr ""
+msgstr "Nu se poate accesa folderul /www/sd"
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:132
 msgid "Problem accessing files in folder "
-msgstr ""
+msgstr "Problemă la accesarea fişierelor din folder"
 
 #: Base.java:1673
 msgid "Problem getting data folder"
@@ -1249,7 +1249,7 @@ msgstr "Selectează noua locaţie pentru dosarul cu schiţe"
 
 #: ../../../processing/app/debug/Compiler.java:146
 msgid "Selected board depends on '{0}' core (not installed)."
-msgstr ""
+msgstr "Placa selectată depinde de nucleul '{0}' (neinstalat)."
 
 #: SerialMonitor.java:93
 msgid "Send"
@@ -1297,7 +1297,7 @@ msgstr "Deschide directorul schiţei"
 
 #: ../../../processing/app/EditorStatus.java:468
 msgid "Show verbose output during compilation"
-msgstr ""
+msgstr "Detaliază informaţiile de ieşire a compilatorului:"
 
 #: Preferences.java:387
 msgid "Show verbose output during: "
@@ -1338,7 +1338,7 @@ msgstr "Schiţa este prea mare; vezi http://www.arduino.cc/en/Guide/Troubleshoot
 msgid ""
 "Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} "
 "bytes."
-msgstr ""
+msgstr "Schiţa foloseşte {0} bytes ({2}%%) din spațiul de stocare a programului. Maximul este de {1} bytes."
 
 #: Editor.java:510
 msgid "Sketchbook"
@@ -1354,7 +1354,7 @@ msgstr "Locaţia dosarului cu schiţe:"
 
 #: ../../../processing/app/Preferences.java:152
 msgid "Slovenian"
-msgstr ""
+msgstr "Slovenă"
 
 #: Sketch.java:275 Sketch.java:304 Sketch.java:578 Sketch.java:967
 msgid ""
@@ -1384,7 +1384,7 @@ msgstr "Răsăritul"
 
 #: ../../../processing/app/Preferences.java:153
 msgid "Swedish"
-msgstr ""
+msgstr "Suedeză"
 
 #: Preferences.java:84
 msgid "System Default"
@@ -1490,7 +1490,7 @@ msgstr "Acest fişier a fost deja copiat în\nlocaţia în care încerci să-l a
 
 #: ../../../processing/app/EditorStatus.java:467
 msgid "This report would have more information with"
-msgstr ""
+msgstr "Acest raport ar avea mai multe informații cu"
 
 #: Base.java:535
 msgid "Time for a Break"
@@ -1510,11 +1510,11 @@ msgstr "Turcă"
 
 #: ../../../processing/app/Editor.java:2507
 msgid "Type board password to access its console"
-msgstr ""
+msgstr "Introduceţi parola pentru a accesa consola"
 
 #: ../../../processing/app/Sketch.java:1673
 msgid "Type board password to upload a new sketch"
-msgstr ""
+msgstr "Introduceţi parola pentru a încărca o nouă schiţă"
 
 #: ../../../processing/app/Preferences.java:118
 msgid "Ukrainian"
@@ -1523,19 +1523,19 @@ msgstr "Ucrainiană"
 #: ../../../processing/app/Editor.java:2524
 #: ../../../processing/app/NetworkMonitor.java:145
 msgid "Unable to connect: is the sketch using the bridge?"
-msgstr ""
+msgstr "Imposibil de realizat conexiunea: foloseste schița biblioteca \"bridge\"?"
 
 #: ../../../processing/app/NetworkMonitor.java:130
 msgid "Unable to connect: retrying"
-msgstr ""
+msgstr "Conexiune imposibilă: reâncercare"
 
 #: ../../../processing/app/Editor.java:2526
 msgid "Unable to connect: wrong password?"
-msgstr ""
+msgstr "Imposibil de realizat conexiunea: parola greșită?"
 
 #: ../../../processing/app/Editor.java:2512
 msgid "Unable to open serial monitor"
-msgstr ""
+msgstr "Nu pot deschide monitorizarea serială"
 
 #: Sketch.java:1432
 #, java-format
@@ -1575,7 +1575,7 @@ msgstr "Încărcare anulată."
 
 #: ../../../processing/app/Sketch.java:1678
 msgid "Upload cancelled"
-msgstr ""
+msgstr "Încărcare anulată."
 
 #: Editor.java:2378
 msgid "Uploading to I/O Board..."
@@ -1607,7 +1607,7 @@ msgstr "Verifică codul după încarcare"
 
 #: ../../../processing/app/Preferences.java:154
 msgid "Vietnamese"
-msgstr ""
+msgstr "Vietnameză"
 
 #: Editor.java:1105
 msgid "Visit Arduino.cc"
@@ -1672,7 +1672,7 @@ msgstr "Ai uitat dosarul cu schiţe"
 #: ../../../processing/app/AbstractMonitor.java:92
 msgid ""
 "You've pressed {0} but nothing was sent. Should you select a line ending?"
-msgstr ""
+msgstr "Ai apăsat {0}, dar nimic nu a fost trimis. Nu ar trebui să bifezi transmiterea unui final linie?"
 
 #: Base.java:536
 msgid ""
@@ -1763,7 +1763,7 @@ msgstr "compilare"
 
 #: ../../../processing/app/NetworkMonitor.java:111
 msgid "connected!"
-msgstr ""
+msgstr "conectat!"
 
 #: Sketch.java:540
 msgid "createNewFile() returned false"
@@ -1771,7 +1771,7 @@ msgstr "createNewFile() a returnat fals"
 
 #: ../../../processing/app/EditorStatus.java:469
 msgid "enabled in File > Preferences."
-msgstr ""
+msgstr "Activat în Fişier > Preferinţe."
 
 #: Base.java:2090
 msgid "environment"

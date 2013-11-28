@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2013-09-10 10:35+0000\n"
+"PO-Revision-Date: 2013-11-28 10:04+0000\n"
 "Last-Translator: cmaglie <c.maglie@arduino.cc>\n"
 "Language-Team: Slovenian (Slovenia) (http://www.transifex.com/projects/p/arduino-ide-15/language/sl_SI/)\n"
 "MIME-Version: 1.0\n"
@@ -172,11 +172,11 @@ msgstr "Si prepričan/a, da želiš izbrisati to skico?"
 
 #: ../../../processing/app/Preferences.java:137
 msgid "Armenian"
-msgstr ""
+msgstr "Armensko"
 
 #: ../../../processing/app/Preferences.java:138
 msgid "Asturian"
-msgstr ""
+msgstr "Astursko "
 
 #: tools/AutoFormat.java:91
 msgid "Auto Format"
@@ -221,7 +221,7 @@ msgstr "Izbrana napačna datoteka"
 
 #: ../../../processing/app/Preferences.java:139
 msgid "Belarusian"
-msgstr ""
+msgstr "Belorusko"
 
 #: ../../../processing/app/Base.java:1433
 #: ../../../processing/app/Editor.java:707
@@ -241,7 +241,7 @@ msgstr "Plošča:"
 
 #: ../../../processing/app/Preferences.java:140
 msgid "Bosnian"
-msgstr ""
+msgstr "Bosansko"
 
 #: SerialMonitor.java:112
 msgid "Both NL & CR"
@@ -261,7 +261,7 @@ msgstr "Bolgarsko"
 
 #: ../../../processing/app/Preferences.java:141
 msgid "Burmese (Myanmar)"
-msgstr ""
+msgstr "Burmansko (Mjanmar)"
 
 #: Editor.java:708
 msgid "Burn Bootloader"
@@ -286,7 +286,7 @@ msgstr "Prekliči"
 
 #: Sketch.java:455
 msgid "Cannot Rename"
-msgstr "Ni mogoče preimenovati"
+msgstr "Preimenovanje ni mogoče"
 
 #: SerialMonitor.java:112
 msgid "Carriage return"
@@ -302,19 +302,19 @@ msgstr "Preveri za posodobitvami ob zagonu"
 
 #: ../../../processing/app/Preferences.java:142
 msgid "Chinese (China)"
-msgstr ""
+msgstr "Kitajsko (Kitajska)"
 
 #: ../../../processing/app/Preferences.java:142
 msgid "Chinese (Hong Kong)"
-msgstr ""
+msgstr "Kitajsko (Hong Kong)"
 
 #: ../../../processing/app/Preferences.java:144
 msgid "Chinese (Taiwan)"
-msgstr ""
+msgstr "Kitajsko (Tajvan)"
 
 #: ../../../processing/app/Preferences.java:143
 msgid "Chinese (Taiwan) (Big5)"
-msgstr ""
+msgstr "Kitajsko (Tajvan) (Big5)"
 
 #: Preferences.java:88
 msgid "Chinese Simplified"
@@ -335,7 +335,7 @@ msgstr "Komentiraj/Odkomentiraj "
 #: debug/Compiler.java:49 debug/Uploader.java:45
 #, java-format
 msgid "Compiler error, please submit this code to {0}"
-msgstr "Napaka prevajalnika, prosim predloži to kodo sem {0}"
+msgstr "Napaka prevajalnika, prosim predloži to kodo v {0}"
 
 #: Sketch.java:1608 Editor.java:1890
 msgid "Compiling sketch..."
@@ -452,7 +452,7 @@ msgstr "Iz {0} ni bilo mogoče prebrati nastavitev"
 #: Base.java:2482
 #, java-format
 msgid "Could not remove old version of {0}"
-msgstr "Ni mogoče izbrisati stare različice {0}"
+msgstr "Stare različice {0} ni mogoče izbrisati"
 
 #: Sketch.java:483 Sketch.java:528
 #, java-format
@@ -535,7 +535,7 @@ msgstr "Ne shrani"
 
 #: Editor.java:2275 Editor.java:2311
 msgid "Done Saving."
-msgstr "Shranjevanje zaključeno."
+msgstr "Shranjevanje končano."
 
 #: Editor.java:2510
 msgid "Done burning bootloader."
@@ -559,7 +559,7 @@ msgstr "Nizozemsko"
 
 #: ../../../processing/app/Preferences.java:144
 msgid "Dutch (Netherlands)"
-msgstr ""
+msgstr "Nizozemsko (Nizozemska)"
 
 #: Editor.java:1130
 msgid "Edit"
@@ -579,7 +579,7 @@ msgstr "Angleško"
 
 #: ../../../processing/app/Preferences.java:145
 msgid "English (United Kingdom)"
-msgstr ""
+msgstr "Angleško (Združeno Kraljestvo)"
 
 #: Editor.java:1062
 msgid "Environment"
@@ -637,7 +637,7 @@ msgstr "Napaka pri branju datoteke z nastavitvami. Prosim izbriši⏎ (ali prema
 
 #: ../../../cc/arduino/packages/DiscoveryManager.java:25
 msgid "Error starting discovery method: "
-msgstr ""
+msgstr "Napaka pri zagonu metode odkrivanja: "
 
 #: Serial.java:125
 #, java-format
@@ -650,7 +650,7 @@ msgstr "Napaka pri pečenju zagonskega nalagalnika."
 
 #: ../../../processing/app/Editor.java:2555
 msgid "Error while burning bootloader: missing '{0}' configuration parameter"
-msgstr ""
+msgstr "Napaka pri pečenju zagonskega nalagalnika: manjka '{0}' nastavitveni parameter"
 
 #: SketchCode.java:83
 #, java-format
@@ -664,7 +664,7 @@ msgstr "Napaka pri tiskanju."
 #: ../../../processing/app/Editor.java:2409
 #: ../../../processing/app/Editor.java:2449
 msgid "Error while uploading: missing '{0}' configuration parameter"
-msgstr ""
+msgstr "Napaka pri nalaganju: manjka '{0}' nastavitveni parameter"
 
 #: Preferences.java:93
 msgid "Estonian"
@@ -672,7 +672,7 @@ msgstr "Estonsko"
 
 #: ../../../processing/app/Preferences.java:146
 msgid "Estonian (Estonia)"
-msgstr ""
+msgstr "Estonsko (Estonija)"
 
 #: Editor.java:516
 msgid "Examples"
@@ -720,7 +720,7 @@ msgstr "Išči:"
 
 #: ../../../processing/app/Preferences.java:147
 msgid "Finnish"
-msgstr ""
+msgstr "Finsko"
 
 #: tools/FixEncoding.java:41 tools/FixEncoding.java:58
 #: tools/FixEncoding.java:79
@@ -766,12 +766,12 @@ msgstr "Kako začeti"
 msgid ""
 "Global variables use {0} bytes ({2}%%) of dynamic memory, leaving {3} bytes "
 "for local variables. Maximum is {1} bytes."
-msgstr ""
+msgstr "Globalna spremenljivka uporablja {0} bajtov, kar je ({2}%%) dinamičnega spomina in pušča {3} bajtov za lokalne spremenljivke. Maksimum je {1} bajtov."
 
 #: ../../../processing/app/Sketch.java:1651
 #, java-format
 msgid "Global variables use {0} bytes of dynamic memory."
-msgstr ""
+msgstr "Globalne spremenljivke uporabljajo {0} bajtov dinamičnega spomina."
 
 #: Preferences.java:98
 msgid "Greek"
@@ -913,11 +913,11 @@ msgstr "Ime nove datoteke:"
 
 #: ../../../processing/app/Preferences.java:149
 msgid "Nepali"
-msgstr ""
+msgstr "Nepalsko"
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:51
 msgid "Network upload using programmer not supported"
-msgstr ""
+msgstr "Nalaganje prek mreže s programatorjem ni mogoče"
 
 #: EditorToolbar.java:41 Editor.java:493
 msgid "New"
@@ -957,7 +957,7 @@ msgstr "Skici ni bila dodana nobena datoteka."
 
 #: Platform.java:167
 msgid "No launcher available"
-msgstr "Noben zaganjalnik na na voljo"
+msgstr "Noben zaganjalnik ni na voljo"
 
 #: SerialMonitor.java:112
 msgid "No line ending"
@@ -979,7 +979,7 @@ msgstr "Veljavnih konfiguriranih jeder ni bilo mogoče najti! Prekinjam..."
 #: ../../../processing/app/debug/TargetPackage.java:63
 #, java-format
 msgid "No valid hardware definitions found in folder {0}."
-msgstr ""
+msgstr "V mapi {0} ni veljavnih definicij za strojno opremo"
 
 #: Base.java:191
 msgid "Non-fatal error while setting the Look & Feel."
@@ -1034,7 +1034,7 @@ msgstr "Postavitev strani"
 
 #: ../../../processing/app/forms/PasswordAuthorizationDialog.java:44
 msgid "Password:"
-msgstr ""
+msgstr "Geslo:"
 
 #: Editor.java:1189 Editor.java:2731
 msgid "Paste"
@@ -1058,19 +1058,19 @@ msgstr "Poljsko"
 
 #: ../../../processing/app/Editor.java:718
 msgid "Port"
-msgstr ""
+msgstr "Vrata"
 
 #: ../../../processing/app/Preferences.java:151
 msgid "Portugese"
-msgstr ""
+msgstr "Portugalsko"
 
 #: ../../../processing/app/Preferences.java:127
 msgid "Portuguese (Brazil)"
-msgstr ""
+msgstr "Portugalsko (Brazilija)"
 
 #: ../../../processing/app/Preferences.java:128
 msgid "Portuguese (Portugal)"
-msgstr ""
+msgstr "Portugalsko (Portugalska)"
 
 #: Preferences.java:295 Editor.java:583
 msgid "Preferences"
@@ -1110,11 +1110,11 @@ msgstr "Težava z nastavitvijo platforme"
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:136
 msgid "Problem accessing board folder /www/sd"
-msgstr ""
+msgstr "Težava pri dostopu do mape /www/sd na plošči"
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:132
 msgid "Problem accessing files in folder "
-msgstr ""
+msgstr "Težava pri dostopu do datotek v mapi"
 
 #: Base.java:1673
 msgid "Problem getting data folder"
@@ -1230,7 +1230,7 @@ msgstr "Izberi (ali ustvari novo) mapo za skice..."
 
 #: Editor.java:1198 Editor.java:2739
 msgid "Select All"
-msgstr "Izberi Vse"
+msgstr "Izberi vse"
 
 #: Base.java:2636
 msgid "Select a zip file or a folder containing the library you'd like to add"
@@ -1242,7 +1242,7 @@ msgstr "Izberi sliko ali drugo podatkovno datoteko za kopiranje v tvojo skico"
 
 #: Preferences.java:330
 msgid "Select new sketchbook location"
-msgstr "Izberi novo lokacija za skicirko"
+msgstr "Izberi novo lokacijo skicirke"
 
 #: ../../../processing/app/debug/Compiler.java:146
 msgid "Selected board depends on '{0}' core (not installed)."
@@ -1335,7 +1335,7 @@ msgstr "Prevelika skica; poglej http://www.arduino.cc/en/Guide/Troubleshooting#s
 msgid ""
 "Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} "
 "bytes."
-msgstr ""
+msgstr "Skica uporablja {0} bajtov, kar je ({2}%%) prostora namenjenega programu. Maksimum je {1} bajtov."
 
 #: Editor.java:510
 msgid "Sketchbook"
@@ -1351,7 +1351,7 @@ msgstr "Lokacija skicirke:"
 
 #: ../../../processing/app/Preferences.java:152
 msgid "Slovenian"
-msgstr ""
+msgstr "Slovensko"
 
 #: Sketch.java:275 Sketch.java:304 Sketch.java:578 Sketch.java:967
 msgid ""
@@ -1381,7 +1381,7 @@ msgstr "Sonce sije"
 
 #: ../../../processing/app/Preferences.java:153
 msgid "Swedish"
-msgstr ""
+msgstr "Švedsko"
 
 #: Preferences.java:84
 msgid "System Default"
@@ -1393,7 +1393,7 @@ msgstr "Tamilsko"
 
 #: debug/Compiler.java:414
 msgid "The 'BYTE' keyword is no longer supported."
-msgstr "Ključna beseda \"BYTE\" več ni podprta."
+msgstr "Ključna beseda \"BYTE\" ni več podprta."
 
 #: debug/Compiler.java:426
 msgid "The Client class has been renamed EthernetClient."
@@ -1507,11 +1507,11 @@ msgstr "Turško"
 
 #: ../../../processing/app/Editor.java:2507
 msgid "Type board password to access its console"
-msgstr ""
+msgstr "Vnesi geslo plošče za dostop do konzole"
 
 #: ../../../processing/app/Sketch.java:1673
 msgid "Type board password to upload a new sketch"
-msgstr ""
+msgstr "Za nalaganje nove skice vpiši geslo plošče"
 
 #: ../../../processing/app/Preferences.java:118
 msgid "Ukrainian"
@@ -1520,19 +1520,19 @@ msgstr "Ukrajinsko"
 #: ../../../processing/app/Editor.java:2524
 #: ../../../processing/app/NetworkMonitor.java:145
 msgid "Unable to connect: is the sketch using the bridge?"
-msgstr ""
+msgstr "Povezave ni mogoče vzpostaviti: ali skica uporablja most - bridge?"
 
 #: ../../../processing/app/NetworkMonitor.java:130
 msgid "Unable to connect: retrying"
-msgstr ""
+msgstr "Povezave ni mogoče vzpostaviti: poskušam znova"
 
 #: ../../../processing/app/Editor.java:2526
 msgid "Unable to connect: wrong password?"
-msgstr ""
+msgstr "Povezavi ni mogoče vzpostaviti: napačno geslo? "
 
 #: ../../../processing/app/Editor.java:2512
 msgid "Unable to open serial monitor"
-msgstr ""
+msgstr "Serijskega vmesnika ni mogoče odpreti"
 
 #: Sketch.java:1432
 #, java-format
@@ -1541,7 +1541,7 @@ msgstr "Neujeta izjema tipa: {0}"
 
 #: Editor.java:1133 Editor.java:1355
 msgid "Undo"
-msgstr "Raveljavi "
+msgstr "Razveljavi"
 
 #: Platform.java:168
 msgid ""
@@ -1572,7 +1572,7 @@ msgstr "Nalaganje prekinjeno. "
 
 #: ../../../processing/app/Sketch.java:1678
 msgid "Upload cancelled"
-msgstr ""
+msgstr "Nalaganje preklicano"
 
 #: Editor.java:2378
 msgid "Uploading to I/O Board..."
@@ -1604,7 +1604,7 @@ msgstr "Preveri kodo po nalaganju"
 
 #: ../../../processing/app/Preferences.java:154
 msgid "Vietnamese"
-msgstr ""
+msgstr "Vietnamsko"
 
 #: Editor.java:1105
 msgid "Visit Arduino.cc"
@@ -1669,7 +1669,7 @@ msgstr "Pozabil si svojo skicirko"
 #: ../../../processing/app/AbstractMonitor.java:92
 msgid ""
 "You've pressed {0} but nothing was sent. Should you select a line ending?"
-msgstr ""
+msgstr "Pritisnil/a si {0}, vendar se ni nič zgodilo. Poskusi izbrati končnico vrstice / line ending"
 
 #: Base.java:536
 msgid ""
@@ -1760,7 +1760,7 @@ msgstr "prevajanje"
 
 #: ../../../processing/app/NetworkMonitor.java:111
 msgid "connected!"
-msgstr ""
+msgstr "povezano!"
 
 #: Sketch.java:540
 msgid "createNewFile() returned false"

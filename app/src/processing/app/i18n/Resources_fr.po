@@ -15,9 +15,9 @@ msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2013-09-10 10:35+0000\n"
-"Last-Translator: cmaglie <c.maglie@arduino.cc>\n"
-"Language-Team: French <arduino@traduc.org>\n"
+"PO-Revision-Date: 2013-11-20 10:43+0000\n"
+"Last-Translator: dbarbier <bouzim@gmail.com>\n"
+"Language-Team: French (http://www.transifex.com/projects/p/arduino-ide-15/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -166,7 +166,7 @@ msgstr "Arduino nécessite le JDK complet (pas seulement un JRE)\nafin de s'exé
 
 #: ../../../processing/app/EditorStatus.java:471
 msgid "Arduino: "
-msgstr "Arduino :"
+msgstr "Arduino : "
 
 #: Sketch.java:588
 #, java-format
@@ -179,11 +179,11 @@ msgstr "Êtes-vous certain de vouloir supprimer ce croquis ?"
 
 #: ../../../processing/app/Preferences.java:137
 msgid "Armenian"
-msgstr ""
+msgstr "arménien"
 
 #: ../../../processing/app/Preferences.java:138
 msgid "Asturian"
-msgstr ""
+msgstr "asturien"
 
 #: tools/AutoFormat.java:91
 msgid "Auto Format"
@@ -228,7 +228,7 @@ msgstr "Mauvais fichier sélectionné"
 
 #: ../../../processing/app/Preferences.java:139
 msgid "Belarusian"
-msgstr ""
+msgstr "biélorusse"
 
 #: ../../../processing/app/Base.java:1433
 #: ../../../processing/app/Editor.java:707
@@ -240,15 +240,15 @@ msgstr "Type de carte"
 msgid ""
 "Board {0}:{1}:{2} doesn''t define a ''build.board'' preference. Auto-set to:"
 " {3}"
-msgstr "La carte {0}:{1}:{2} ne définit pas d'option « build.board ». Elle est mise automatiquement à : {3}"
+msgstr "La carte {0}:{1}:{2} ne définit pas d''option « build.board ». Elle est mise automatiquement à : {3}"
 
 #: ../../../processing/app/EditorStatus.java:472
 msgid "Board: "
-msgstr "Carte :"
+msgstr "Carte : "
 
 #: ../../../processing/app/Preferences.java:140
 msgid "Bosnian"
-msgstr ""
+msgstr "bosniaque"
 
 #: SerialMonitor.java:112
 msgid "Both NL & CR"
@@ -268,7 +268,7 @@ msgstr "bulgare"
 
 #: ../../../processing/app/Preferences.java:141
 msgid "Burmese (Myanmar)"
-msgstr ""
+msgstr "birman (Myanmar)"
 
 #: Editor.java:708
 msgid "Burn Bootloader"
@@ -309,19 +309,19 @@ msgstr "Vérifier les mises à jour au démarrage"
 
 #: ../../../processing/app/Preferences.java:142
 msgid "Chinese (China)"
-msgstr ""
+msgstr "chinois (Chine)"
 
 #: ../../../processing/app/Preferences.java:142
 msgid "Chinese (Hong Kong)"
-msgstr ""
+msgstr "chinois (Hong Kong)"
 
 #: ../../../processing/app/Preferences.java:144
 msgid "Chinese (Taiwan)"
-msgstr ""
+msgstr "chinois (Taïwan)"
 
 #: ../../../processing/app/Preferences.java:143
 msgid "Chinese (Taiwan) (Big5)"
-msgstr ""
+msgstr "chinois (Taïwan) (Big5)"
 
 #: Preferences.java:88
 msgid "Chinese Simplified"
@@ -566,7 +566,7 @@ msgstr "néerlandais"
 
 #: ../../../processing/app/Preferences.java:144
 msgid "Dutch (Netherlands)"
-msgstr ""
+msgstr "néerlandais (Pays-Bas)"
 
 #: Editor.java:1130
 msgid "Edit"
@@ -586,7 +586,7 @@ msgstr "anglais"
 
 #: ../../../processing/app/Preferences.java:145
 msgid "English (United Kingdom)"
-msgstr ""
+msgstr "anglais (Royaume-Uni)"
 
 #: Editor.java:1062
 msgid "Environment"
@@ -644,7 +644,7 @@ msgstr "Erreur pendant la lecture du fichier de préférences.\nVeuillez supprim
 
 #: ../../../cc/arduino/packages/DiscoveryManager.java:25
 msgid "Error starting discovery method: "
-msgstr ""
+msgstr "Erreur au démarrage de la méthode de découverte : "
 
 #: Serial.java:125
 #, java-format
@@ -657,7 +657,7 @@ msgstr "Erreur lors de la gravure de la séquence d'initialisation."
 
 #: ../../../processing/app/Editor.java:2555
 msgid "Error while burning bootloader: missing '{0}' configuration parameter"
-msgstr ""
+msgstr "Erreur lors de la gravure de la séquence d'initialisation : le paramètre de configuration « {0} » est manquant"
 
 #: SketchCode.java:83
 #, java-format
@@ -671,7 +671,7 @@ msgstr "Erreur d'impression."
 #: ../../../processing/app/Editor.java:2409
 #: ../../../processing/app/Editor.java:2449
 msgid "Error while uploading: missing '{0}' configuration parameter"
-msgstr ""
+msgstr "Erreur lors du téléversement : le paramètre de configuration « {0} » est manquant"
 
 #: Preferences.java:93
 msgid "Estonian"
@@ -679,7 +679,7 @@ msgstr "estonien"
 
 #: ../../../processing/app/Preferences.java:146
 msgid "Estonian (Estonia)"
-msgstr ""
+msgstr "estonien (Estonie)"
 
 #: Editor.java:516
 msgid "Examples"
@@ -727,7 +727,7 @@ msgstr "Trouver :"
 
 #: ../../../processing/app/Preferences.java:147
 msgid "Finnish"
-msgstr ""
+msgstr "finnois"
 
 #: tools/FixEncoding.java:41 tools/FixEncoding.java:58
 #: tools/FixEncoding.java:79
@@ -773,12 +773,12 @@ msgstr "Aide pour débuter"
 msgid ""
 "Global variables use {0} bytes ({2}%%) of dynamic memory, leaving {3} bytes "
 "for local variables. Maximum is {1} bytes."
-msgstr ""
+msgstr "Les variables globales utilisent {0} octets ({2}%%) de mémoire dynamique, ce qui laisse {3} octets pour les variables locales. Le maximum est de {1} octets."
 
 #: ../../../processing/app/Sketch.java:1651
 #, java-format
 msgid "Global variables use {0} bytes of dynamic memory."
-msgstr ""
+msgstr "Les variables globales utilisent {0} octets de mémoire dynamique."
 
 #: Preferences.java:98
 msgid "Greek"
@@ -851,7 +851,7 @@ msgid ""
 "disable this in the Preferences dialog.\n"
 "\n"
 "Save sketch and update its extension?"
-msgstr "Dans Arduino 1.0, l'extension par défaut des fichiers est\npassée de .pde en .ino. Les nouveaux croquis (y compris\nceux crées par « Enregistrer sous ») utiliseront cette nouvelle\nextension. L'extension des anciens croquis sera mise à jour\nlors de l'écriture, mais vous pouvez désactiver cette option\ndans le menu Préférences."
+msgstr "Dans Arduino 1.0, l'extension par défaut des fichiers est\npassée de .pde en .ino. Les nouveaux croquis (y compris\nceux crées par « Enregistrer sous ») utiliseront cette nouvelle\nextension. L'extension des anciens croquis sera mise à jour\nlors de l'écriture, mais vous pouvez désactiver cette option\ndans le menu Préférences.\n\nEnregistrer le croquis et mettre à jour son extension ?"
 
 #: Editor.java:1216 Editor.java:2757
 msgid "Increase Indent"
@@ -920,11 +920,11 @@ msgstr "Nom du nouveau fichier :"
 
 #: ../../../processing/app/Preferences.java:149
 msgid "Nepali"
-msgstr ""
+msgstr "népalais"
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:51
 msgid "Network upload using programmer not supported"
-msgstr ""
+msgstr "Le téléversement par réseau en utilisant le programmateur n'est pas pris en charge"
 
 #: EditorToolbar.java:41 Editor.java:493
 msgid "New"
@@ -981,12 +981,12 @@ msgstr "Aucune référence disponible pour « {0} »"
 
 #: ../../../processing/app/Base.java:309
 msgid "No valid configured cores found! Exiting..."
-msgstr ""
+msgstr "Aucun cœur configuré valide n'a été trouvé ! On quitte..."
 
 #: ../../../processing/app/debug/TargetPackage.java:63
 #, java-format
 msgid "No valid hardware definitions found in folder {0}."
-msgstr ""
+msgstr "Aucune définition de matériel valide n''a été trouvée dans le dossier {0}."
 
 #: Base.java:191
 msgid "Non-fatal error while setting the Look & Feel."
@@ -1041,7 +1041,7 @@ msgstr "Mise en page"
 
 #: ../../../processing/app/forms/PasswordAuthorizationDialog.java:44
 msgid "Password:"
-msgstr ""
+msgstr "Mot de passe :"
 
 #: Editor.java:1189 Editor.java:2731
 msgid "Paste"
@@ -1065,19 +1065,19 @@ msgstr "polonais"
 
 #: ../../../processing/app/Editor.java:718
 msgid "Port"
-msgstr ""
+msgstr "Port"
 
 #: ../../../processing/app/Preferences.java:151
 msgid "Portugese"
-msgstr ""
+msgstr "portugais"
 
 #: ../../../processing/app/Preferences.java:127
 msgid "Portuguese (Brazil)"
-msgstr ""
+msgstr "portugais (Brésil)"
 
 #: ../../../processing/app/Preferences.java:128
 msgid "Portuguese (Portugal)"
-msgstr ""
+msgstr "portugais (Portugal)"
 
 #: Preferences.java:295 Editor.java:583
 msgid "Preferences"
@@ -1117,11 +1117,11 @@ msgstr "Problème à configurer la plate-forme"
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:136
 msgid "Problem accessing board folder /www/sd"
-msgstr ""
+msgstr "Problème lors de l'accès au dossier des cartes /www/sd"
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:132
 msgid "Problem accessing files in folder "
-msgstr ""
+msgstr "Problème lors de l'accès aux fichiers du dossier "
 
 #: Base.java:1673
 msgid "Problem getting data folder"
@@ -1253,7 +1253,7 @@ msgstr "Sélectionner un nouvel emplacement pour le carnet de croquis"
 
 #: ../../../processing/app/debug/Compiler.java:146
 msgid "Selected board depends on '{0}' core (not installed)."
-msgstr ""
+msgstr "La carte sélectionnée dépend du cœur « {0} » (non installé)."
 
 #: SerialMonitor.java:93
 msgid "Send"
@@ -1342,7 +1342,7 @@ msgstr "Croquis trop gros ; vois http://www.arduino.cc/en/Guide/Troubleshooting
 msgid ""
 "Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} "
 "bytes."
-msgstr ""
+msgstr "Le croquis utilise {0} octets ({2}%%) de l''espace de stockage de programmes. Le maximum est de {1} octets."
 
 #: Editor.java:510
 msgid "Sketchbook"
@@ -1358,7 +1358,7 @@ msgstr "Emplacement du carnet de croquis"
 
 #: ../../../processing/app/Preferences.java:152
 msgid "Slovenian"
-msgstr ""
+msgstr "slovène"
 
 #: Sketch.java:275 Sketch.java:304 Sketch.java:578 Sketch.java:967
 msgid ""
@@ -1388,7 +1388,7 @@ msgstr "Soleil"
 
 #: ../../../processing/app/Preferences.java:153
 msgid "Swedish"
-msgstr ""
+msgstr "suédois"
 
 #: Preferences.java:84
 msgid "System Default"
@@ -1514,11 +1514,11 @@ msgstr "turc"
 
 #: ../../../processing/app/Editor.java:2507
 msgid "Type board password to access its console"
-msgstr ""
+msgstr "Tapez le mot de passe de la carte pour accéder à sa console"
 
 #: ../../../processing/app/Sketch.java:1673
 msgid "Type board password to upload a new sketch"
-msgstr ""
+msgstr "Tapez le mot de passe de la carte pour téléverser un nouveau croquis"
 
 #: ../../../processing/app/Preferences.java:118
 msgid "Ukrainian"
@@ -1527,19 +1527,19 @@ msgstr "ukrainien"
 #: ../../../processing/app/Editor.java:2524
 #: ../../../processing/app/NetworkMonitor.java:145
 msgid "Unable to connect: is the sketch using the bridge?"
-msgstr ""
+msgstr "Connexion impossible : le croquis utilise-t-il le pont ?"
 
 #: ../../../processing/app/NetworkMonitor.java:130
 msgid "Unable to connect: retrying"
-msgstr ""
+msgstr "Connexion impossible : nouvelle tentative"
 
 #: ../../../processing/app/Editor.java:2526
 msgid "Unable to connect: wrong password?"
-msgstr ""
+msgstr "Connexion impossible : mauvais mot de passe ?"
 
 #: ../../../processing/app/Editor.java:2512
 msgid "Unable to open serial monitor"
-msgstr ""
+msgstr "Impossible d'ouvrir le moniteur série"
 
 #: Sketch.java:1432
 #, java-format
@@ -1579,7 +1579,7 @@ msgstr "Téléversement annulé."
 
 #: ../../../processing/app/Sketch.java:1678
 msgid "Upload cancelled"
-msgstr ""
+msgstr "Téléversement annulé"
 
 #: Editor.java:2378
 msgid "Uploading to I/O Board..."
@@ -1611,7 +1611,7 @@ msgstr "Vérifier le code après téléversement"
 
 #: ../../../processing/app/Preferences.java:154
 msgid "Vietnamese"
-msgstr ""
+msgstr "vietnamien"
 
 #: Editor.java:1105
 msgid "Visit Arduino.cc"
@@ -1676,7 +1676,7 @@ msgstr "Vous avez oublié votre carnet de croquis"
 #: ../../../processing/app/AbstractMonitor.java:92
 msgid ""
 "You've pressed {0} but nothing was sent. Should you select a line ending?"
-msgstr ""
+msgstr "Vous avez appuyé sur « {0} » mais rien n'a été envoyé. Peut-être devez-vous choisir un mode de fin de ligne ?"
 
 #: Base.java:536
 msgid ""
@@ -1767,7 +1767,7 @@ msgstr "compilation "
 
 #: ../../../processing/app/NetworkMonitor.java:111
 msgid "connected!"
-msgstr ""
+msgstr "connecté !"
 
 #: Sketch.java:540
 msgid "createNewFile() returned false"

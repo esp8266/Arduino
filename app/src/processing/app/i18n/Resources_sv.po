@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2013-09-10 10:35+0000\n"
+"PO-Revision-Date: 2013-11-20 10:43+0000\n"
 "Last-Translator: cmaglie <c.maglie@arduino.cc>\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/arduino-ide-15/language/sv/)\n"
 "MIME-Version: 1.0\n"
@@ -159,7 +159,7 @@ msgstr "Arduino kräver full JDK (inte bara JRE) för att kunna köra. Var vänl
 
 #: ../../../processing/app/EditorStatus.java:471
 msgid "Arduino: "
-msgstr ""
+msgstr "Arduino:"
 
 #: Sketch.java:588
 #, java-format
@@ -172,11 +172,11 @@ msgstr "Är du säker att du vill ta bort den här sketchen?"
 
 #: ../../../processing/app/Preferences.java:137
 msgid "Armenian"
-msgstr ""
+msgstr "Armeniska"
 
 #: ../../../processing/app/Preferences.java:138
 msgid "Asturian"
-msgstr ""
+msgstr "Österrikiska"
 
 #: tools/AutoFormat.java:91
 msgid "Auto Format"
@@ -221,7 +221,7 @@ msgstr ""
 
 #: ../../../processing/app/Preferences.java:139
 msgid "Belarusian"
-msgstr ""
+msgstr "Vitryska"
 
 #: ../../../processing/app/Base.java:1433
 #: ../../../processing/app/Editor.java:707
@@ -241,7 +241,7 @@ msgstr ""
 
 #: ../../../processing/app/Preferences.java:140
 msgid "Bosnian"
-msgstr ""
+msgstr "Bosniska"
 
 #: SerialMonitor.java:112
 msgid "Both NL & CR"
@@ -257,7 +257,7 @@ msgstr "Byggmappen försvann eller kunde inte skrivas till"
 
 #: ../../../processing/app/Preferences.java:80
 msgid "Bulgarian"
-msgstr ""
+msgstr "Bulgariska"
 
 #: ../../../processing/app/Preferences.java:141
 msgid "Burmese (Myanmar)"
@@ -497,7 +497,7 @@ msgstr ""
 
 #: ../../../processing/app/Preferences.java:82
 msgid "Croatian"
-msgstr ""
+msgstr "Kroatiska"
 
 #: Editor.java:1149 Editor.java:2699
 msgid "Cut"
@@ -505,7 +505,7 @@ msgstr "Klipp ut"
 
 #: ../../../processing/app/Preferences.java:83
 msgid "Czech"
-msgstr ""
+msgstr "Tjeckisk"
 
 #: Preferences.java:90
 msgid "Danish"
@@ -795,7 +795,7 @@ msgstr "Guide_Windows.html"
 
 #: ../../../processing/app/Preferences.java:95
 msgid "Hebrew"
-msgstr ""
+msgstr "Hebreiska"
 
 #: Editor.java:1015
 msgid "Help"
@@ -1143,7 +1143,7 @@ msgstr ""
 
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
-msgstr ""
+msgstr "Processor"
 
 #: Editor.java:704
 msgid "Programmer"
@@ -1503,7 +1503,7 @@ msgstr "Felsökning"
 
 #: ../../../processing/app/Preferences.java:117
 msgid "Turkish"
-msgstr ""
+msgstr "Turkiska"
 
 #: ../../../processing/app/Editor.java:2507
 msgid "Type board password to access its console"
@@ -1515,7 +1515,7 @@ msgstr ""
 
 #: ../../../processing/app/Preferences.java:118
 msgid "Ukrainian"
-msgstr ""
+msgstr "Ukrainska"
 
 #: ../../../processing/app/Editor.java:2524
 #: ../../../processing/app/NetworkMonitor.java:145
@@ -1524,7 +1524,7 @@ msgstr ""
 
 #: ../../../processing/app/NetworkMonitor.java:130
 msgid "Unable to connect: retrying"
-msgstr ""
+msgstr "Kan inte ansluta: försöker igen"
 
 #: ../../../processing/app/Editor.java:2526
 msgid "Unable to connect: wrong password?"
@@ -1572,7 +1572,7 @@ msgstr "Uppladdning avbruten."
 
 #: ../../../processing/app/Sketch.java:1678
 msgid "Upload cancelled"
-msgstr ""
+msgstr "Uppladdning avbruten"
 
 #: Editor.java:2378
 msgid "Uploading to I/O Board..."
@@ -1604,7 +1604,7 @@ msgstr "Verifiera kod efter uppladdning"
 
 #: ../../../processing/app/Preferences.java:154
 msgid "Vietnamese"
-msgstr ""
+msgstr "Vietnamesiska"
 
 #: Editor.java:1105
 msgid "Visit Arduino.cc"
@@ -1760,7 +1760,7 @@ msgstr "Kompilation"
 
 #: ../../../processing/app/NetworkMonitor.java:111
 msgid "connected!"
-msgstr ""
+msgstr "ansluten!"
 
 #: Sketch.java:540
 msgid "createNewFile() returned false"
@@ -1780,7 +1780,7 @@ msgstr "http://arduino.cc/"
 
 #: ../../../processing/app/debug/Compiler.java:49
 msgid "http://github.com/arduino/Arduino/issues"
-msgstr ""
+msgstr "http://github.com/arduino/Arduino/issues"
 
 #: UpdateCheck.java:118
 msgid "http://www.arduino.cc/en/Main/Software"

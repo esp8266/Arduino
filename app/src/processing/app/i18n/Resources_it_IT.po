@@ -11,8 +11,8 @@ msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2013-09-12 16:04+0000\n"
-"Last-Translator: cmaglie <c.maglie@arduino.cc>\n"
+"PO-Revision-Date: 2013-11-20 10:43+0000\n"
+"Last-Translator: mmichielin <michele.michielin@gmail.com>\n"
 "Language-Team: Italian (Italy) (http://www.transifex.com/projects/p/arduino-ide-15/language/it_IT/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -264,7 +264,7 @@ msgstr "Bulgaro"
 
 #: ../../../processing/app/Preferences.java:141
 msgid "Burmese (Myanmar)"
-msgstr "Birmano (Myanmar)"
+msgstr "Birmano"
 
 #: Editor.java:708
 msgid "Burn Bootloader"
@@ -317,7 +317,7 @@ msgstr "Cinese (Taiwan)"
 
 #: ../../../processing/app/Preferences.java:143
 msgid "Chinese (Taiwan) (Big5)"
-msgstr "Cinese (Taiwan) (Big5)"
+msgstr "Cinese (Taiwan - Big5)"
 
 #: Preferences.java:88
 msgid "Chinese Simplified"
@@ -562,7 +562,7 @@ msgstr "Olandese"
 
 #: ../../../processing/app/Preferences.java:144
 msgid "Dutch (Netherlands)"
-msgstr "Olandese (Olanda)"
+msgstr "Olandese"
 
 #: Editor.java:1130
 msgid "Edit"
@@ -582,7 +582,7 @@ msgstr "Inglese"
 
 #: ../../../processing/app/Preferences.java:145
 msgid "English (United Kingdom)"
-msgstr "Inglese (Inghilterra)"
+msgstr "Inglese (Regno Unito)"
 
 #: Editor.java:1062
 msgid "Environment"
@@ -653,7 +653,7 @@ msgstr "Errore durante la scrittura del bootloader"
 
 #: ../../../processing/app/Editor.java:2555
 msgid "Error while burning bootloader: missing '{0}' configuration parameter"
-msgstr "Errore durante la scrittura del bootloader: manca il parametro '{0}' nella configurazione"
+msgstr "Errore durante la scrittura del bootloader: manca il parametro di configurazione '{0}'"
 
 #: SketchCode.java:83
 #, java-format
@@ -675,7 +675,7 @@ msgstr "Estone"
 
 #: ../../../processing/app/Preferences.java:146
 msgid "Estonian (Estonia)"
-msgstr "Estone (Estonia)"
+msgstr "Estone"
 
 #: Editor.java:516
 msgid "Examples"
@@ -769,12 +769,12 @@ msgstr "Primi passi"
 msgid ""
 "Global variables use {0} bytes ({2}%%) of dynamic memory, leaving {3} bytes "
 "for local variables. Maximum is {1} bytes."
-msgstr "Le variabili globali usano {0} bytes ({2}%%) di memoria dinamica, restano {3} bytes per le variabili locali. Il massimo è {1} bytes."
+msgstr "Le variabili globali usano {0} byte ({2}%%) di memoria dinamica, lasciando {3} byte liberi per le variabili locali. Il massimo è {1} byte."
 
 #: ../../../processing/app/Sketch.java:1651
 #, java-format
 msgid "Global variables use {0} bytes of dynamic memory."
-msgstr "Le variabili globali usano {0} bytes di memoria dinamica."
+msgstr "Le variabili globali usano {0} byte di memoria dinamica."
 
 #: Preferences.java:98
 msgid "Greek"
@@ -920,7 +920,7 @@ msgstr "Nepalese"
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:51
 msgid "Network upload using programmer not supported"
-msgstr "Il caricamento via rete con programmatore non è supportato"
+msgstr "Il caricamento tramite un programmatore via rete non è supportato"
 
 #: EditorToolbar.java:41 Editor.java:493
 msgid "New"
@@ -982,7 +982,7 @@ msgstr "Nessun core configurato valido trovato! Esco..."
 #: ../../../processing/app/debug/TargetPackage.java:63
 #, java-format
 msgid "No valid hardware definitions found in folder {0}."
-msgstr "Non ho trovato definizioni di hardware valide nella cartella {0}."
+msgstr "Nessuna definizione di hardware valida trovata nella cartella {0}."
 
 #: Base.java:191
 msgid "Non-fatal error while setting the Look & Feel."
@@ -1113,11 +1113,11 @@ msgstr "Problemi durante la configurazione della piattaforma"
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:136
 msgid "Problem accessing board folder /www/sd"
-msgstr "Ho problemi ad accedere alla cartella /www/sd"
+msgstr "Problemi nell'accesso alla cartella /www/sd della scheda"
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:132
 msgid "Problem accessing files in folder "
-msgstr "Ho problemi ad accere ai file nella cartella"
+msgstr "Problemi nell'accesso ai file nella cartella"
 
 #: Base.java:1673
 msgid "Problem getting data folder"
@@ -1338,7 +1338,7 @@ msgstr "Sketch troppo grande; guarda http://www.arduino.cc/en/Guide/Troubleshoot
 msgid ""
 "Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} "
 "bytes."
-msgstr "Lo sketch usa {0} bytes ({2}%%) di spazio per il programma. Il totale è {1} bytes."
+msgstr "Lo sketch usa {0} byte ({2}%%) dello spazio disponibile per i programmi. Il massimo è {1} byte."
 
 #: Editor.java:510
 msgid "Sketchbook"
@@ -1523,11 +1523,11 @@ msgstr "Ucraino"
 #: ../../../processing/app/Editor.java:2524
 #: ../../../processing/app/NetworkMonitor.java:145
 msgid "Unable to connect: is the sketch using the bridge?"
-msgstr "Impossibile connettersi: lo sketch sta usando il bridge?"
+msgstr "Impossibile connettersi: forse lo sketch sta usando il bridge?"
 
 #: ../../../processing/app/NetworkMonitor.java:130
 msgid "Unable to connect: retrying"
-msgstr "Non riesco a connettermi: riprovo"
+msgstr "Impossibile connettersi: riprovo..."
 
 #: ../../../processing/app/Editor.java:2526
 msgid "Unable to connect: wrong password?"
@@ -1819,7 +1819,7 @@ msgstr "platforms.html"
 msgid ""
 "readBytesUntil() byte buffer is too small for the {0} bytes up to and "
 "including char {1}"
-msgstr "Il buffer readBytesUntil() è troppo piccolo per i {0} bytes fino al\ncarattere {1} incluso"
+msgstr "Il buffer readBytesUntil() è troppo piccolo per i {0} byte fino al\ncarattere {1} incluso"
 
 #: Sketch.java:647
 msgid "removeCode: internal error.. could not find code"
