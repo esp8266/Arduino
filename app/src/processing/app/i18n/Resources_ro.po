@@ -356,8 +356,8 @@ msgstr "Copiază"
 msgid "Copy as HTML"
 msgstr "Copiază ca şi HTML"
 
-#: ../../../processing/app/EditorStatus.java:456
-msgid "Copy error"
+#: ../../../processing/app/EditorStatus.java:455
+msgid "Copy error messages"
 msgstr ""
 
 #: Editor.java:1165 Editor.java:2715
@@ -531,6 +531,10 @@ msgstr "Dispozitivul nu răspunde, verifică dacă ai selectat portul serial cor
 #: tools/FixEncoding.java:57
 msgid "Discard all changes and reload sketch?"
 msgstr "Anulează toate modificările şi reiniţializează schiţa?"
+
+#: ../../../processing/app/Preferences.java:438
+msgid "Display line numbers"
+msgstr ""
 
 #: Editor.java:2064
 msgid "Don't Save"
@@ -1352,6 +1356,10 @@ msgstr "Dosarul cu schiţe a dispărut"
 msgid "Sketchbook location:"
 msgstr "Locaţia dosarului cu schiţe:"
 
+#: ../../../processing/app/Base.java:785
+msgid "Sketches (*.ino, *.pde)"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:152
 msgid "Slovenian"
 msgstr "Slovenă"
@@ -1592,6 +1600,16 @@ msgstr "Foloseşte selecţia pentru căutare"
 #: Preferences.java:409
 msgid "Use external editor"
 msgstr "Foloseşte un editor extern"
+
+#: ../../../processing/app/debug/Compiler.java:94
+#, java-format
+msgid "Using library {0} in folder: {1} {2}"
+msgstr ""
+
+#: ../../../processing/app/debug/Compiler.java:320
+#, java-format
+msgid "Using previously compiled file: {0}"
+msgstr ""
 
 #: EditorToolbar.java:41 EditorToolbar.java:46
 msgid "Verify"

@@ -359,9 +359,9 @@ msgstr "Copiar"
 msgid "Copy as HTML"
 msgstr "Copiar como HTML"
 
-#: ../../../processing/app/EditorStatus.java:456
-msgid "Copy error"
-msgstr "Erro ao copiar"
+#: ../../../processing/app/EditorStatus.java:455
+msgid "Copy error messages"
+msgstr ""
 
 #: Editor.java:1165 Editor.java:2715
 msgid "Copy for Forum"
@@ -534,6 +534,10 @@ msgstr "O dispositivo não está respondendo.  Confira se a porta serial é a co
 #: tools/FixEncoding.java:57
 msgid "Discard all changes and reload sketch?"
 msgstr "Descartar todas as alterações e recarregar o sketch?"
+
+#: ../../../processing/app/Preferences.java:438
+msgid "Display line numbers"
+msgstr ""
 
 #: Editor.java:2064
 msgid "Don't Save"
@@ -1355,6 +1359,10 @@ msgstr "A pasta de sketchbooks desapareceu"
 msgid "Sketchbook location:"
 msgstr "Local do Sketchbook:"
 
+#: ../../../processing/app/Base.java:785
+msgid "Sketches (*.ino, *.pde)"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:152
 msgid "Slovenian"
 msgstr "Esloveno"
@@ -1595,6 +1603,16 @@ msgstr "Usar Seleção Para Localizar"
 #: Preferences.java:409
 msgid "Use external editor"
 msgstr "Usar editor externo"
+
+#: ../../../processing/app/debug/Compiler.java:94
+#, java-format
+msgid "Using library {0} in folder: {1} {2}"
+msgstr ""
+
+#: ../../../processing/app/debug/Compiler.java:320
+#, java-format
+msgid "Using previously compiled file: {0}"
+msgstr ""
 
 #: EditorToolbar.java:41 EditorToolbar.java:46
 msgid "Verify"

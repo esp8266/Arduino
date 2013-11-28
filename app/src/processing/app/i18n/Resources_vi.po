@@ -353,9 +353,9 @@ msgstr "Sao chép"
 msgid "Copy as HTML"
 msgstr "Sao chép dưới dạng HTML"
 
-#: ../../../processing/app/EditorStatus.java:456
-msgid "Copy error"
-msgstr "Lỗi khi sao chép"
+#: ../../../processing/app/EditorStatus.java:455
+msgid "Copy error messages"
+msgstr ""
 
 #: Editor.java:1165 Editor.java:2715
 msgid "Copy for Forum"
@@ -528,6 +528,10 @@ msgstr "Thiết bị không phản hồi tín hiệu, kiểm tra cổng tín hi�
 #: tools/FixEncoding.java:57
 msgid "Discard all changes and reload sketch?"
 msgstr "Hủy bỏ tất cả các thay đổi và tải lại sketch?"
+
+#: ../../../processing/app/Preferences.java:438
+msgid "Display line numbers"
+msgstr ""
 
 #: Editor.java:2064
 msgid "Don't Save"
@@ -1349,6 +1353,10 @@ msgstr "Thư mục Sketchbook đã biến mất"
 msgid "Sketchbook location:"
 msgstr "Địa điểm Sketchbook;"
 
+#: ../../../processing/app/Base.java:785
+msgid "Sketches (*.ino, *.pde)"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:152
 msgid "Slovenian"
 msgstr "Slovenian"
@@ -1589,6 +1597,16 @@ msgstr "Sử dụng vùng lựa chọn cho tìm kiếm"
 #: Preferences.java:409
 msgid "Use external editor"
 msgstr "Sử dụng trình biên soạn bổ sung"
+
+#: ../../../processing/app/debug/Compiler.java:94
+#, java-format
+msgid "Using library {0} in folder: {1} {2}"
+msgstr ""
+
+#: ../../../processing/app/debug/Compiler.java:320
+#, java-format
+msgid "Using previously compiled file: {0}"
+msgstr ""
 
 #: EditorToolbar.java:41 EditorToolbar.java:46
 msgid "Verify"

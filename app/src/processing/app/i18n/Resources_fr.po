@@ -360,9 +360,9 @@ msgstr "Copier"
 msgid "Copy as HTML"
 msgstr "Copier en tant qu'HTML"
 
-#: ../../../processing/app/EditorStatus.java:456
-msgid "Copy error"
-msgstr "Erreur lors de la copie"
+#: ../../../processing/app/EditorStatus.java:455
+msgid "Copy error messages"
+msgstr ""
 
 #: Editor.java:1165 Editor.java:2715
 msgid "Copy for Forum"
@@ -535,6 +535,10 @@ msgstr "L'appareil ne répond pas, vérifiez que le bon port série est sélecti
 #: tools/FixEncoding.java:57
 msgid "Discard all changes and reload sketch?"
 msgstr "Laisser tomber les changements et recharger le croquis ?"
+
+#: ../../../processing/app/Preferences.java:438
+msgid "Display line numbers"
+msgstr ""
 
 #: Editor.java:2064
 msgid "Don't Save"
@@ -1356,6 +1360,10 @@ msgstr "Le dossier contenant les croquis a disparu"
 msgid "Sketchbook location:"
 msgstr "Emplacement du carnet de croquis"
 
+#: ../../../processing/app/Base.java:785
+msgid "Sketches (*.ino, *.pde)"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:152
 msgid "Slovenian"
 msgstr "slovène"
@@ -1596,6 +1604,16 @@ msgstr "Utiliser la sélection pour trouver"
 #: Preferences.java:409
 msgid "Use external editor"
 msgstr "Utiliser un éditeur externe"
+
+#: ../../../processing/app/debug/Compiler.java:94
+#, java-format
+msgid "Using library {0} in folder: {1} {2}"
+msgstr ""
+
+#: ../../../processing/app/debug/Compiler.java:320
+#, java-format
+msgid "Using previously compiled file: {0}"
+msgstr ""
 
 #: EditorToolbar.java:41 EditorToolbar.java:46
 msgid "Verify"

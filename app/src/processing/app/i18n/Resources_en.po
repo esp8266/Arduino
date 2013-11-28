@@ -899,6 +899,10 @@ msgstr "Marathi"
 msgid "Message"
 msgstr "Message"
 
+#: ../../../processing/app/preproc/PdePreprocessor.java:412
+msgid "Missing the */ from the end of a /* comment */"
+msgstr ""
+
 #: Preferences.java:449
 msgid "More preferences can be edited directly in the file"
 msgstr "More preferences can be edited directly in the file"

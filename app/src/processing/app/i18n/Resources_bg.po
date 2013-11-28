@@ -354,9 +354,9 @@ msgstr "Копиране"
 msgid "Copy as HTML"
 msgstr "Копиране като HTML"
 
-#: ../../../processing/app/EditorStatus.java:456
-msgid "Copy error"
-msgstr "Грешка при копиране"
+#: ../../../processing/app/EditorStatus.java:455
+msgid "Copy error messages"
+msgstr ""
 
 #: Editor.java:1165 Editor.java:2715
 msgid "Copy for Forum"
@@ -529,6 +529,10 @@ msgstr "Устройството не отговаря, проверете да�
 #: tools/FixEncoding.java:57
 msgid "Discard all changes and reload sketch?"
 msgstr "Отхвърли всички промени и презареди скицата?"
+
+#: ../../../processing/app/Preferences.java:438
+msgid "Display line numbers"
+msgstr ""
 
 #: Editor.java:2064
 msgid "Don't Save"
@@ -1350,6 +1354,10 @@ msgstr "Папката със скици изчезна"
 msgid "Sketchbook location:"
 msgstr "Местоположение на скицника:"
 
+#: ../../../processing/app/Base.java:785
+msgid "Sketches (*.ino, *.pde)"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:152
 msgid "Slovenian"
 msgstr "Словенски"
@@ -1590,6 +1598,16 @@ msgstr "Търси маркираното"
 #: Preferences.java:409
 msgid "Use external editor"
 msgstr "Ползвай външен редактор"
+
+#: ../../../processing/app/debug/Compiler.java:94
+#, java-format
+msgid "Using library {0} in folder: {1} {2}"
+msgstr ""
+
+#: ../../../processing/app/debug/Compiler.java:320
+#, java-format
+msgid "Using previously compiled file: {0}"
+msgstr ""
 
 #: EditorToolbar.java:41 EditorToolbar.java:46
 msgid "Verify"

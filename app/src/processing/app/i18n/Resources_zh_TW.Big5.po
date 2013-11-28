@@ -353,9 +353,9 @@ msgstr "複製"
 msgid "Copy as HTML"
 msgstr "當做HTML進行複製"
 
-#: ../../../processing/app/EditorStatus.java:456
-msgid "Copy error"
-msgstr "複製錯誤"
+#: ../../../processing/app/EditorStatus.java:455
+msgid "Copy error messages"
+msgstr ""
 
 #: Editor.java:1165 Editor.java:2715
 msgid "Copy for Forum"
@@ -528,6 +528,10 @@ msgstr "裝置無回應，請檢查是否選取正確的序列埠，或是在匯
 #: tools/FixEncoding.java:57
 msgid "Discard all changes and reload sketch?"
 msgstr "放棄所有變更並重新載入草稿碼？"
+
+#: ../../../processing/app/Preferences.java:438
+msgid "Display line numbers"
+msgstr ""
 
 #: Editor.java:2064
 msgid "Don't Save"
@@ -1349,6 +1353,10 @@ msgstr "草稿碼簿資料夾不見了"
 msgid "Sketchbook location:"
 msgstr "草稿碼簿的位置："
 
+#: ../../../processing/app/Base.java:785
+msgid "Sketches (*.ino, *.pde)"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:152
 msgid "Slovenian"
 msgstr ""
@@ -1589,6 +1597,16 @@ msgstr "以選取字串進行尋找"
 #: Preferences.java:409
 msgid "Use external editor"
 msgstr "使用外部編輯器"
+
+#: ../../../processing/app/debug/Compiler.java:94
+#, java-format
+msgid "Using library {0} in folder: {1} {2}"
+msgstr ""
+
+#: ../../../processing/app/debug/Compiler.java:320
+#, java-format
+msgid "Using previously compiled file: {0}"
+msgstr ""
 
 #: EditorToolbar.java:41 EditorToolbar.java:46
 msgid "Verify"
