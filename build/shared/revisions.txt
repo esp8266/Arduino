@@ -17,22 +17,27 @@ We suggest to delay the adoption of the new format until a stable 1.5.x is relea
 * Improved files open/save dialogs
 * Added line numbers, can be enabled/disabled from preferences (Cayci Gorlitsky)
 * Removed check on forbidden file in 1.5 formatted libraries (#1692)
-* Updated msys-1.0.dll to the latest version (Windows 8.1 compatibility)
+* (windows) Updated msys-1.0.dll to the latest version (Windows 8.1 compatibility)
 * Using [code] tag instead of [quote] in "Copy for forum". Removed color coding.
 * When an hardware addon reference another core also the libraries are referenced.
 * It's now possible to specify additional custom board parameters from command line.
+* Sketches path can be relative (#1493)
 * Example and Boards are now scrollable.
 * Fixed localization issues that sometimes prevented the IDE to start.
 * Added "Using library..." debugging message in verbose compile.
+* Improved preprocessor (fixes #1653, #1687, #817, #1293, #1245)
+* Fixed StringStartsWithEndsWith, KeyboardMessage, LCD CustomCharacter, Blink without delay, SD List files, Arduino Robot examples
+* Added PID/VID for older Arduinos
+* (mac) Improved board autodetection on Mac OS X
 
 [libraries]
 * Bridge: Fixed buffer overflow in File::doBuffer() (dreggy)
 * Bridge: Fixed timeout in Bridge::transfer()
+* Bridge: Fixed return value of Bridge::get(..) (returning 0 with valid data len >0)
+* Bridge: Implemented multi-byte File::read(..)
 * sam: Fixed SPI initialization (when using extended API and multiple CS)
 * Partially fixed the behavior of EthernetClient::flush(), now it doesn't discard 
   incoming data BUT it doesn't wait for outgoing data to be successfully transmitted.
-* Bridge: Fixed return value of Bridge::get(..) (returning 0 with valid data len >0)
-* Bridge: Implemented multi-byte File::read(..)
 * Esplora: Added support for display GREENTAB_L
 
 [core]
