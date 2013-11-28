@@ -1,5 +1,5 @@
 
-ARDUINO 1.5.5 BETA
+ARDUINO 1.5.5 BETA 2013.11.28
 
 NOTICE:
 The 1.5 library format is under heavy review on the Arduino Developers mailing list.

@@ -5,7 +5,7 @@
 # https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5---3rd-party-Hardware-specification
 
 name=Arduino ARM (32-bits) Boards
-version=1.5.4
+version=1.5.5
 
 # SAM3 compile variables
 # ----------------------
