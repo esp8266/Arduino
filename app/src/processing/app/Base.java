@@ -345,7 +345,7 @@ public class Base {
         if (i < args.length)
           selectBoard = args[i];
 	else
-	  showError(null, "Argument required for --board", null);
+	  showError(null, "Argument required for --board", 3);
         continue;
       }
       if (args[i].equals("--port")) {
@@ -353,7 +353,7 @@ public class Base {
         if (i < args.length)
           selectPort = args[i];
 	else
-	  showError(null, "Argument required for --port", null);
+	  showError(null, "Argument required for --port", 3);
         continue;
       }
       if (args[i].equals("--curdir")) {
@@ -361,7 +361,7 @@ public class Base {
         if (i < args.length)
           currentDirectory = args[i];
 	else
-	  showError(null, "Argument required for --curdir", null);
+	  showError(null, "Argument required for --curdir", 3);
         continue;
       }
       if (args[i].equals("--pref")) {
@@ -369,17 +369,17 @@ public class Base {
         if (i < args.length)
           processPrefArgument(args[i]);
 	else
-	  showError(null, "Argument required for --pref", null);
+	  showError(null, "Argument required for --pref", 3);
         continue;
       }
       if (args[i].startsWith("--"))
-        showError(null, I18n.format(_("unknown option: {0}"), args[i]), null);
+        showError(null, I18n.format(_("unknown option: {0}"), args[i]), 3);
 
       filenames.add(args[i]);
     }
 
     if ((doUpload || doVerify) && filenames.size() != 1)
-        showError(null, _("Must specify exactly one sketch file"), null);
+        showError(null, _("Must specify exactly one sketch file"), 3);
 
     for (String path: filenames) {
       // Fix a problem with systems that use a non-ASCII languages. Paths are
@@ -403,7 +403,7 @@ public class Base {
         String mess = I18n.format(_("Failed to open sketch: \"{0}\""), path);
         // Open failure is fatal in upload/verify mode
         if (doUpload || doVerify)
-          showError(null, mess, null);
+          showError(null, mess, 2);
         else
           showWarning(null, mess, null);
       }
@@ -460,22 +460,22 @@ public class Base {
     String[] split = selectBoard.split(":", 4);
 
     if (split.length < 3) {
-      showError(null, I18n.format(_("{0}: Invalid board name, it should be of the form \"package:arch:board\" or \"package:arch:board:options\""), selectBoard), null);
+      showError(null, I18n.format(_("{0}: Invalid board name, it should be of the form \"package:arch:board\" or \"package:arch:board:options\""), selectBoard), 3);
     }
 
     TargetPackage targetPackage = getTargetPackage(split[0]);
     if (targetPackage == null) {
-      showError(null, I18n.format(_("{0}: Unknown package"), split[0]), null);
+      showError(null, I18n.format(_("{0}: Unknown package"), split[0]), 3);
     }
 
     TargetPlatform targetPlatform = targetPackage.get(split[1]);
     if (targetPlatform == null) {
-      showError(null, I18n.format(_("{0}: Unknown architecture"), split[1]), null);
+      showError(null, I18n.format(_("{0}: Unknown architecture"), split[1]), 3);
     }
 
     TargetBoard targetBoard = targetPlatform.getBoard(split[2]);
     if (targetBoard == null) {
-      showError(null, I18n.format(_("{0}: Unknown board"), split[2]), null);
+      showError(null, I18n.format(_("{0}: Unknown board"), split[2]), 3);
     }
 
     selectBoard(targetBoard);
@@ -486,14 +486,14 @@ public class Base {
         String[] keyValue = option.split("=", 2);
 
         if (keyValue.length != 2)
-            showError(null, I18n.format(_("{0}: Invalid option, should be of the form \"name=value\""), option, targetBoard.getId()), null);
+            showError(null, I18n.format(_("{0}: Invalid option, should be of the form \"name=value\""), option, targetBoard.getId()), 3);
         String key = keyValue[0].trim();
         String value = keyValue[1].trim();
 
         if (!targetBoard.hasMenu(key))
-          showError(null, I18n.format(_("{0}: Invalid option for board \"{1}\""), key, targetBoard.getId()), null);
+          showError(null, I18n.format(_("{0}: Invalid option for board \"{1}\""), key, targetBoard.getId()), 3);
         if (targetBoard.getMenuLabel(key, value) == null)
-          showError(null, I18n.format(_("{0}: Invalid option for \"{1}\" option for board \"{2}\""), value, key, targetBoard.getId()), null);
+          showError(null, I18n.format(_("{0}: Invalid option for \"{1}\" option for board \"{2}\""), value, key, targetBoard.getId()), 3);
 
         Preferences.set("custom_" + key, targetBoard.getId() + "_" + value);
       }
@@ -503,7 +503,7 @@ public class Base {
   protected void processPrefArgument(String arg) {
     String[] split = arg.split("=", 2);
     if (split.length != 2 || split[0].isEmpty())
-      showError(null, I18n.format(_("{0}: Invalid argument to --pref, should be of the form \"pref=value\""), arg), null);
+      showError(null, I18n.format(_("{0}: Invalid argument to --pref, should be of the form \"pref=value\""), arg), 3);
 
     Preferences.set(split[0], split[1]);
   }
@@ -2418,12 +2418,20 @@ public class Base {
   }
 
 
+  static public void showError(String title, String message, Throwable e) {
+    showError(title, message, e, 1);
+  }
+
+  static public void showError(String title, String message, int exit_code) {
+    showError(title, message, null, exit_code);
+  }
+
   /**
    * Show an error message that's actually fatal to the program.
    * This is an error that can't be recovered. Use showWarning()
    * for errors that allow P5 to continue running.
    */
-  static public void showError(String title, String message, Throwable e) {
+  static public void showError(String title, String message, Throwable e, int exit_code) {
     if (title == null) title = _("Error");
 
     if (commandLine) {
@@ -2434,7 +2442,7 @@ public class Base {
                                     JOptionPane.ERROR_MESSAGE);
     }
     if (e != null) e.printStackTrace();
-    System.exit(1);
+    System.exit(exit_code);
   }
 
 
