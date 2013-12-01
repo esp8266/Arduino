@@ -28,11 +28,11 @@
 #include "Arduino.h"
 #include "wiring_private.h"
 
+#include "HardwareSerial.h"
+
 // this next line disables the entire HardwareSerial.cpp, 
 // this is so I can support Attiny series and any other chip without a uart
-#if defined(UBRRH) || defined(UBRR0H) || defined(UBRR1H) || defined(UBRR2H) || defined(UBRR3H)
-
-#include "HardwareSerial.h"
+#if defined(HAVE_HWSERIAL0) || defined(HAVE_HWSERIAL1) || defined(HAVE_HWSERIAL2) || defined(HAVE_HWSERIAL3)
 
 // Ensure that the various bit positions we use are available with a 0
 // postfix, so we can always use the values for UART0 for all UARTs. The
@@ -84,53 +84,44 @@
 #error "Not all bit positions for UART3 are the same as for UART0"
 #endif
 
-#if !defined(USART0_RX_vect) && defined(USART1_RX_vect)
-// do nothing - on the 32u4 the first USART is USART1
-#else
-#if !defined(USART_RX_vect) && !defined(USART0_RX_vect) && \
-    !defined(USART_RXC_vect)
-  #error "Don't know what the Data Received vector is called for the first UART"
-#else
+#if defined(HAVE_HWSERIAL0)
   void serialEvent() __attribute__((weak));
   void serialEvent() {}
-  #define serialEvent_implemented
 #if defined(USART_RX_vect)
   ISR(USART_RX_vect)
 #elif defined(USART0_RX_vect)
   ISR(USART0_RX_vect)
 #elif defined(USART_RXC_vect)
   ISR(USART_RXC_vect) // ATmega8
+#else
+  #error "Don't know what the Data Received vector is called for the first UART"
 #endif
   {
     Serial._rx_complete_irq();
   }
 #endif
-#endif
 
-#if defined(USART1_RX_vect)
+#if defined(HAVE_HWSERIAL1)
   void serialEvent1() __attribute__((weak));
   void serialEvent1() {}
-  #define serialEvent1_implemented
   ISR(USART1_RX_vect)
   {
     Serial1._rx_complete_irq();
   }
 #endif
 
-#if defined(USART2_RX_vect) && defined(UDR2)
+#if defined(HAVE_HWSERIAL2)
   void serialEvent2() __attribute__((weak));
   void serialEvent2() {}
-  #define serialEvent2_implemented
   ISR(USART2_RX_vect)
   {
     Serial2._rx_complete_irq();
   }
 #endif
 
-#if defined(USART3_RX_vect) && defined(UDR3)
+#if defined(HAVE_HWSERIAL3)
   void serialEvent3() __attribute__((weak));
   void serialEvent3() {}
-  #define serialEvent3_implemented
   ISR(USART3_RX_vect)
   {
     Serial3._rx_complete_irq();
@@ -139,27 +130,22 @@
 
 void serialEventRun(void)
 {
-#ifdef serialEvent_implemented
+#if defined(HAVE_HWSERIAL0)
   if (Serial.available()) serialEvent();
 #endif
-#ifdef serialEvent1_implemented
+#if defined(HAVE_HWSERIAL1)
   if (Serial1.available()) serialEvent1();
 #endif
-#ifdef serialEvent2_implemented
+#if defined(HAVE_HWSERIAL2)
   if (Serial2.available()) serialEvent2();
 #endif
-#ifdef serialEvent3_implemented
+#if defined(HAVE_HWSERIAL3)
   if (Serial3.available()) serialEvent3();
 #endif
 }
 
 
-#if !defined(USART0_UDRE_vect) && defined(USART1_UDRE_vect)
-// do nothing - on the 32u4 the first USART is USART1
-#else
-#if !defined(UART0_UDRE_vect) && !defined(UART_UDRE_vect) && !defined(USART0_UDRE_vect) && !defined(USART_UDRE_vect)
-  #error "Don't know what the Data Register Empty vector is called for the first UART"
-#else
+#if defined(HAVE_HWSERIAL0)
 #if defined(UART0_UDRE_vect)
 ISR(UART0_UDRE_vect)
 #elif defined(UART_UDRE_vect)
@@ -168,28 +154,29 @@ ISR(UART_UDRE_vect)
 ISR(USART0_UDRE_vect)
 #elif defined(USART_UDRE_vect)
 ISR(USART_UDRE_vect)
+#else
+  #error "Don't know what the Data Register Empty vector is called for the first UART"
 #endif
 {
   Serial._tx_udr_empty_irq();
 }
 #endif
-#endif
 
-#ifdef USART1_UDRE_vect
+#if defined(HAVE_HWSERIAL1)
 ISR(USART1_UDRE_vect)
 {
   Serial1._tx_udr_empty_irq();
 }
 #endif
 
-#ifdef USART2_UDRE_vect
+#if defined(HAVE_HWSERIAL2)
 ISR(USART2_UDRE_vect)
 {
   Serial2._tx_udr_empty_irq();
 }
 #endif
 
-#ifdef USART3_UDRE_vect
+#if defined(HAVE_HWSERIAL3)
 ISR(USART3_UDRE_vect)
 {
   Serial3._tx_udr_empty_irq();
@@ -386,23 +373,21 @@ size_t HardwareSerial::write(uint8_t c)
 
 // Preinstantiate Objects //////////////////////////////////////////////////////
 
+#if defined(HAVE_HWSERIAL0)
 #if defined(UBRRH) && defined(UBRRL)
   HardwareSerial Serial(&UBRRH, &UBRRL, &UCSRA, &UCSRB, &UCSRC, &UDR);
-#elif defined(UBRR0H) && defined(UBRR0L)
-  HardwareSerial Serial(&UBRR0H, &UBRR0L, &UCSR0A, &UCSR0B, &UCSR0C, &UDR0);
-#elif defined(USBCON)
-  // do nothing - Serial object and buffers are initialized in CDC code
 #else
-  #error no serial port defined  (port 0)
+  HardwareSerial Serial(&UBRR0H, &UBRR0L, &UCSR0A, &UCSR0B, &UCSR0C, &UDR0);
+#endif
 #endif
 
-#if defined(UBRR1H)
+#if defined(HAVE_HWSERIAL1)
   HardwareSerial Serial1(&UBRR1H, &UBRR1L, &UCSR1A, &UCSR1B, &UCSR1C, &UDR1);
 #endif
-#if defined(UBRR2H)
+#if defined(HAVE_HWSERIAL2)
   HardwareSerial Serial2(&UBRR2H, &UBRR2L, &UCSR2A, &UCSR2B, &UCSR2C, &UDR2);
 #endif
-#if defined(UBRR3H)
+#if defined(HAVE_HWSERIAL3)
   HardwareSerial Serial3(&UBRR3H, &UBRR3L, &UCSR3A, &UCSR3B, &UCSR3C, &UDR3);
 #endif
 

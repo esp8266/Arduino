@@ -113,18 +113,19 @@ class HardwareSerial : public Stream
 
 #if defined(UBRRH) || defined(UBRR0H)
   extern HardwareSerial Serial;
-#elif defined(USBCON)
-  #include "USBAPI.h"
-//  extern HardwareSerial Serial_;  
+  #define HAVE_HWSERIAL0
 #endif
 #if defined(UBRR1H)
   extern HardwareSerial Serial1;
+  #define HAVE_HWSERIAL1
 #endif
 #if defined(UBRR2H)
   extern HardwareSerial Serial2;
+  #define HAVE_HWSERIAL2
 #endif
 #if defined(UBRR3H)
   extern HardwareSerial Serial3;
+  #define HAVE_HWSERIAL3
 #endif
 
 extern void serialEventRun(void) __attribute__((weak));
