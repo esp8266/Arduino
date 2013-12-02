@@ -1,10 +1,11 @@
 /*
-  Stepper.h - - Stepper library for Wiring/Arduino - Version 0.4
+  Stepper.h - - Stepper library for Wiring/Arduino - Version 0.5
   
   Original library     (0.1) by Tom Igoe.
   Two-wire modifications   (0.2) by Sebastian Gassner
   Combination version   (0.3) by Tom Igoe and David Mellis
   Bug fix for four-wire   (0.4) by Tom Igoe, bug fix from Noah Shibley
+  High-speed stepping mod and timer rollover fix   (0.5) by Eugene Kozlenko
 
   Drives a unipolar or bipolar stepper motor using  2 wires or 4 wires
 
@@ -18,7 +19,8 @@
   A slightly modified circuit around a Darlington transistor array or an L293 H-bridge
   connects to only 2 microcontroler pins, inverts the signals received,
   and delivers the 4 (2 plus 2 inverted ones) output signals required
-  for driving a stepper motor.
+  for driving a stepper motor.  Similarly the Arduino motor shields 2 direction pins
+  may be used.
 
   The sequence of control signals for 4 control wires is as follows:
 
@@ -79,7 +81,7 @@ class Stepper {
     
     int direction;        // Direction of rotation
     int speed;          // Speed in RPMs
-    unsigned long step_delay;    // delay between steps, in ms, based on speed
+    unsigned long step_delay;    // delay between steps, in us, based on speed
     int number_of_steps;      // total number of steps this motor can take
     int pin_count;        // whether you're driving the motor with 2 or 4 pins
     int step_number;        // which step the motor is on
@@ -90,7 +92,7 @@ class Stepper {
     int motor_pin_3;
     int motor_pin_4;
     
-    long last_step_time;      // time stamp in ms of when the last step was taken
+    unsigned long last_step_time;      // time stamp in us of when the last step was taken
 };
 
 #endif

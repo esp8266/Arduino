@@ -1,5 +1,5 @@
 /*
-  Stepper.cpp - - Stepper library for Wiring/Arduino - Version 0.4
+  Stepper.cpp - - Stepper library for Wiring/Arduino - Version 0.5
   
   Original library     (0.1) by Tom Igoe.
   Two-wire modifications   (0.2) by Sebastian Gassner
@@ -146,7 +146,7 @@ void Stepper::step(int steps_to_move)
   // decrement the number of steps, moving one step each time:
   while(steps_left > 0) {
   // move only if the appropriate delay has passed:
-  if (micros() - this->last_step_time >= this->step_delay || micros() - this->last_step_time < 0) {
+  if (micros() - this->last_step_time >= this->step_delay || micros() < this->last_step_time) {
       // get the timeStamp of when you stepped:
       this->last_step_time = micros();
       // increment or decrement the step number,
