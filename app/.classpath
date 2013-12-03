@@ -7,6 +7,6 @@
 	<classpathentry kind="lib" path="lib/ecj.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/processing-core"/>
 	<classpathentry kind="lib" path="lib/apple.jar"/>
-	<classpathentry kind="lib" path="lib/RXTXcomm.jar"/>
+	<classpathentry kind="lib" path="lib/jssc-2.6.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

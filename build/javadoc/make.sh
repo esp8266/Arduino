@@ -9,7 +9,7 @@ javadoc -public -notimestamp -d core \
 # setting this up right, so if anyone knows how to do it without specifying
 # all the directories like this, please let us know.
 javadoc -public -notimestamp -d everything \
-    -classpath ../../app/lib/antlr.jar:../../app/lib/jna.jar:../../serial/library/RXTXcomm.jar:../../opengl/library/jogl.jar:../../pdf/library/itext.jar:../../app/lib/ecj.jar \
+    -classpath ../../app/lib/antlr.jar:../../app/lib/jna.jar:../../serial/library/jssc-2.6.0.jar:../../opengl/library/jogl.jar:../../pdf/library/itext.jar:../../app/lib/ecj.jar \
     ../../core/src/processing/core/*.java \
     ../../core/src/processing/xml/*.java \
     ../../app/src/antlr/*.java \
