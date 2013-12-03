@@ -342,34 +342,30 @@ public class Base {
       }
       if (args[i].equals("--board")) {
         i++;
-        if (i < args.length)
-          selectBoard = args[i];
-	else
-	  showError(null, "Argument required for --board", 3);
+        if (i >= args.length)
+          showError(null, "Argument required for --board", 3);
+        selectBoard = args[i];
         continue;
       }
       if (args[i].equals("--port")) {
         i++;
-        if (i < args.length)
-          selectPort = args[i];
-	else
-	  showError(null, "Argument required for --port", 3);
+        if (i >= args.length)
+          showError(null, "Argument required for --port", 3);
+        selectPort = args[i];
         continue;
       }
       if (args[i].equals("--curdir")) {
         i++;
-        if (i < args.length)
-          currentDirectory = args[i];
-	else
-	  showError(null, "Argument required for --curdir", 3);
+        if (i >= args.length)
+          showError(null, "Argument required for --curdir", 3);
+        currentDirectory = args[i];
         continue;
       }
       if (args[i].equals("--pref")) {
         i++;
-        if (i < args.length)
-          processPrefArgument(args[i]);
-	else
-	  showError(null, "Argument required for --pref", 3);
+        if (i >= args.length)
+          showError(null, "Argument required for --pref", 3);
+        processPrefArgument(args[i]);
         continue;
       }
       if (args[i].startsWith("--"))
@@ -379,7 +375,7 @@ public class Base {
     }
 
     if ((doUpload || doVerify) && filenames.size() != 1)
-        showError(null, _("Must specify exactly one sketch file"), 3);
+      showError(null, _("Must specify exactly one sketch file"), 3);
 
     for (String path: filenames) {
       // Fix a problem with systems that use a non-ASCII languages. Paths are
@@ -957,7 +953,7 @@ public class Base {
     // now that we're ready, show the window
     // (don't do earlier, cuz we might move it based on a window being closed)
     if (showEditor)
-	    editor.setVisible(true);
+      editor.setVisible(true);
 
 //    System.err.println("exiting handleOpen");
 
