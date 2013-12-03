@@ -1432,7 +1432,6 @@ public class Base {
       menuItemsToClickAfterStartup.add(item);
     }
 
-    int i = 0;
     PreferencesMap customMenus = targetPlatform.getCustomMenus();
     for (final String menuId : customMenus.keySet()) {
       String title = customMenus.get(menuId);
@@ -1440,8 +1439,6 @@ public class Base {
       
       if (board.hasMenu(menuId)) {
         PreferencesMap boardCustomMenu = board.getMenuLabels(menuId);
-        final int currentIndex = i + 1 + 1; //plus 1 to skip the first board menu, plus 1 to keep the custom menu next to this one
-        i++;
         for (String customMenuOption : boardCustomMenu.keySet()) {
           @SuppressWarnings("serial")
           Action subAction = new AbstractAction(_(boardCustomMenu.get(customMenuOption))) {
