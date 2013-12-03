@@ -84,105 +84,46 @@
 #error "Not all bit positions for UART3 are the same as for UART0"
 #endif
 
+// SerialEvent functions are weak, so when the user doesn't define them,
+// the linker just sets their address to 0 (which is checked below).
+// The Serialx_available is just a wrapper around Serialx.available(),
+// but we can refer to it weakly so we don't pull in the entire
+// HardwareSerial instance if the user doesn't also refer to it.
 #if defined(HAVE_HWSERIAL0)
   void serialEvent() __attribute__((weak));
-  void serialEvent() {}
-#if defined(USART_RX_vect)
-  ISR(USART_RX_vect)
-#elif defined(USART0_RX_vect)
-  ISR(USART0_RX_vect)
-#elif defined(USART_RXC_vect)
-  ISR(USART_RXC_vect) // ATmega8
-#else
-  #error "Don't know what the Data Received vector is called for the first UART"
-#endif
-  {
-    Serial._rx_complete_irq();
-  }
+  bool Serial0_available() __attribute__((weak));
 #endif
 
 #if defined(HAVE_HWSERIAL1)
   void serialEvent1() __attribute__((weak));
-  void serialEvent1() {}
-  ISR(USART1_RX_vect)
-  {
-    Serial1._rx_complete_irq();
-  }
+  bool Serial1_available() __attribute__((weak));
 #endif
 
 #if defined(HAVE_HWSERIAL2)
   void serialEvent2() __attribute__((weak));
-  void serialEvent2() {}
-  ISR(USART2_RX_vect)
-  {
-    Serial2._rx_complete_irq();
-  }
+  bool Serial2_available() __attribute__((weak));
 #endif
 
 #if defined(HAVE_HWSERIAL3)
   void serialEvent3() __attribute__((weak));
-  void serialEvent3() {}
-  ISR(USART3_RX_vect)
-  {
-    Serial3._rx_complete_irq();
-  }
+  bool Serial3_available() __attribute__((weak));
 #endif
 
 void serialEventRun(void)
 {
 #if defined(HAVE_HWSERIAL0)
-  if (Serial.available()) serialEvent();
+  if (Serial0_available && serialEvent && Serial0_available()) serialEvent();
 #endif
 #if defined(HAVE_HWSERIAL1)
-  if (Serial1.available()) serialEvent1();
+  if (Serial1_available && serialEvent1 && Serial1_available()) serialEvent1();
 #endif
 #if defined(HAVE_HWSERIAL2)
-  if (Serial2.available()) serialEvent2();
+  if (Serial2_available && serialEvent2 && Serial2_available()) serialEvent2();
 #endif
 #if defined(HAVE_HWSERIAL3)
-  if (Serial3.available()) serialEvent3();
+  if (Serial3_available && serialEvent2 && Serial3_available()) serialEvent3();
 #endif
 }
-
-
-#if defined(HAVE_HWSERIAL0)
-#if defined(UART0_UDRE_vect)
-ISR(UART0_UDRE_vect)
-#elif defined(UART_UDRE_vect)
-ISR(UART_UDRE_vect)
-#elif defined(USART0_UDRE_vect)
-ISR(USART0_UDRE_vect)
-#elif defined(USART_UDRE_vect)
-ISR(USART_UDRE_vect)
-#else
-  #error "Don't know what the Data Register Empty vector is called for the first UART"
-#endif
-{
-  Serial._tx_udr_empty_irq();
-}
-#endif
-
-#if defined(HAVE_HWSERIAL1)
-ISR(USART1_UDRE_vect)
-{
-  Serial1._tx_udr_empty_irq();
-}
-#endif
-
-#if defined(HAVE_HWSERIAL2)
-ISR(USART2_UDRE_vect)
-{
-  Serial2._tx_udr_empty_irq();
-}
-#endif
-
-#if defined(HAVE_HWSERIAL3)
-ISR(USART3_UDRE_vect)
-{
-  Serial3._tx_udr_empty_irq();
-}
-#endif
-
 
 // Actual interrupt handlers //////////////////////////////////////////////////////////////
 
@@ -371,25 +312,5 @@ size_t HardwareSerial::write(uint8_t c)
   return 1;
 }
 
-// Preinstantiate Objects //////////////////////////////////////////////////////
-
-#if defined(HAVE_HWSERIAL0)
-#if defined(UBRRH) && defined(UBRRL)
-  HardwareSerial Serial(&UBRRH, &UBRRL, &UCSRA, &UCSRB, &UCSRC, &UDR);
-#else
-  HardwareSerial Serial(&UBRR0H, &UBRR0L, &UCSR0A, &UCSR0B, &UCSR0C, &UDR0);
-#endif
-#endif
-
-#if defined(HAVE_HWSERIAL1)
-  HardwareSerial Serial1(&UBRR1H, &UBRR1L, &UCSR1A, &UCSR1B, &UCSR1C, &UDR1);
-#endif
-#if defined(HAVE_HWSERIAL2)
-  HardwareSerial Serial2(&UBRR2H, &UBRR2L, &UCSR2A, &UCSR2B, &UCSR2C, &UDR2);
-#endif
-#if defined(HAVE_HWSERIAL3)
-  HardwareSerial Serial3(&UBRR3H, &UBRR3L, &UCSR3A, &UCSR3B, &UCSR3C, &UDR3);
-#endif
 
 #endif // whole file
-
