@@ -2638,6 +2638,7 @@ public class Editor extends JFrame implements RunnerListener {
    * Show an error int the status bar.
    */
   public void statusError(String what) {
+    System.err.println(what);
     status.error(what);
     //new Exception("deactivating RUN").printStackTrace();
     toolbar.deactivate(EditorToolbar.RUN);
