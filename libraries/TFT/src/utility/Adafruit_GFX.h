@@ -316,7 +316,7 @@ PImage PImage::loadImage(const char * fileName) {
 
   // Open requested file on SD card
   if ((bmpFile = SD.open(fileName)) == NULL) {
-    Serial.print("loadImage: file not found: ");
+    Serial.print(F("loadImage: file not found: "));
     Serial.println(fileName);
     return PImage(); // load error
   }
@@ -325,31 +325,31 @@ PImage PImage::loadImage(const char * fileName) {
   
   // Parse BMP header
   if(read16(bmpFile) != 0x4D42) { // BMP signature
-    Serial.println("loadImage: file doesn't look like a BMP");
+    Serial.println(F("loadImage: file doesn't look like a BMP"));
     return PImage();
   }
   
-  Serial.print("File size: "); Serial.println(read32(bmpFile));
+  Serial.print(F("File size: ")); Serial.println(read32(bmpFile));
   (void)read32(bmpFile); // Read & ignore creator bytes
   bmpImageoffset = read32(bmpFile); // Start of image data
-  Serial.print("Image Offset: "); Serial.println(bmpImageoffset, DEC);
+  Serial.print(F("Image Offset: ")); Serial.println(bmpImageoffset, DEC);
   // Read DIB header
-  Serial.print("Header size: "); Serial.println(read32(bmpFile));
+  Serial.print(F("Header size: ")); Serial.println(read32(bmpFile));
   bmpWidth  = read32(bmpFile);
   bmpHeight = read32(bmpFile);
   if(read16(bmpFile) != 1) { // # planes -- must be '1'
-    Serial.println("loadImage: invalid n. of planes");
+    Serial.println(F("loadImage: invalid n. of planes"));
     return PImage();
   }
   
   bmpDepth = read16(bmpFile); // bits per pixel
-  Serial.print("Bit Depth: "); Serial.println(bmpDepth);
+  Serial.print(F("Bit Depth: ")); Serial.println(bmpDepth);
   if((bmpDepth != 24) || (read32(bmpFile) != 0)) { // 0 = uncompressed {
-    Serial.println("loadImage: invalid pixel format");
+    Serial.println(F("loadImage: invalid pixel format"));
     return PImage();
   }
 
-  Serial.print("Image size: ");
+  Serial.print(F("Image size: "));
   Serial.print(bmpWidth);
   Serial.print('x');
   Serial.println(bmpHeight);
