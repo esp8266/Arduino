@@ -25,6 +25,7 @@ public:
   virtual uint8_t connected();
   virtual operator bool();
   virtual bool operator==(const EthernetClient&);
+  virtual bool operator!=(const EthernetClient& rhs) { return !this->operator==(rhs); };
 
   friend class EthernetServer;
   

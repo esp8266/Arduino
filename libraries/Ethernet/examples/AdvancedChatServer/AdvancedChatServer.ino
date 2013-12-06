@@ -75,22 +75,15 @@ void loop() {
       for (byte i=0;i<4;i++) {
         if (!clients[i] && clients[i]!=client) {
           clients[i] = client;
+          // clead out the input buffer:
+          client.flush();
+          Serial.println("We have a new client");
+          client.print("Hello, client number: ");
+          client.print(i);
+          client.println();
           break;
         }
       }
-
-      // clead out the input buffer:
-      client.flush();
-      Serial.println("We have a new client");
-      client.println("Hello, client!");
-      client.print("my IP: ");
-      client.println(Ethernet.localIP());
-      client.print("my port: ");
-      client.println(client.localPort());
-      client.print("your IP: ");
-      client.println(client.remoteIP());
-      client.print("your port: ");
-      client.println(client.remotePort());
     }
 
     if (client.available() > 0) {
