@@ -25,9 +25,6 @@ public:
   virtual uint8_t connected();
   virtual operator bool();
   virtual bool operator==(const EthernetClient&);
-  virtual uint16_t localPort();
-  virtual IPAddress remoteIP();
-  virtual uint16_t remotePort();
 
   friend class EthernetServer;
   
