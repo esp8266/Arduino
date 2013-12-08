@@ -48,10 +48,6 @@ import processing.app.packages.Library;
 import processing.core.PApplet;
 
 public class Compiler implements MessageConsumer {
-  static final String BUGS_URL =
-    _("http://github.com/arduino/Arduino/issues");
-  static final String SUPER_BADNESS =
-    I18n.format(_("Compiler error, please submit this code to {0}"), BUGS_URL);
 
   private Sketch sketch;
 
