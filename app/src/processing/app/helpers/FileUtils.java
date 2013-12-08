@@ -1,6 +1,7 @@
 package processing.app.helpers;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -188,4 +189,71 @@ public class FileUtils {
       }
     }
   }
+
+  /**
+   * Returns true if the given file has any of the given extensions.
+   * @param file
+   *          File whose name to look at
+   * @param extensions
+   *          Extensions to consider (just the extension, without the
+   *          dot). Should all be lowercase, case insensitive matching
+   *          is used.
+   */
+  public static boolean hasExtension(File file, String... extensions) {
+    return hasExtension(file, Arrays.asList(extensions));
+  }
+
+  public static boolean hasExtension(File file, List<String> extensions) {
+      String pieces[] = file.getName().split("\\.");
+      if (pieces.length < 2)
+        return false;
+
+      String extension = pieces[pieces.length - 1];
+
+      return extensions.contains(extension.toLowerCase());
+
+  }
+
+  /**
+   * Recursively find all files in a folder with the specified
+   * extension. Excludes hidden files and folders and
+   * source control folders.
+   *
+   * @param folder
+   *          Folder to look into
+   * @param recursive
+   *          <b>true</b> will recursively find all files in sub-folders
+   * @param extensions
+   *          A list of file extensions to search (just the extension,
+   *          without the dot). Should all be lowercase, case
+   *          insensitive matching is used. If no extensions are
+   *          passed, all files are returned.
+   * @return
+   */
+  public static List<File> listFiles(File folder, boolean recursive,
+                                     String... extensions) {
+    return listFiles(folder, recursive, Arrays.asList(extensions));
+  }
+
+  public static List<File> listFiles(File folder, boolean recursive,
+                                     List<String> extensions) {
+    List<File> result = new ArrayList<File>();
+
+    for (File file : folder.listFiles()) {
+      if (isSCCSOrHiddenFile(file))
+        continue;
+
+      if (file.isDirectory()) {
+        if (recursive)
+          result.addAll(listFiles(file, true, extensions));
+        continue;
+      }
+
+      if (extensions.isEmpty() || hasExtension(file, extensions))
+        result.add(file);
+    }
+    return result;
+  }
+
+
 }
