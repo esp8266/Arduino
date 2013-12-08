@@ -69,48 +69,48 @@ uno.build.variant=standard
 
 ##############################################################
 
-atmega328diecimila.name=Arduino Duemilanove or Diecimila
+diecimila.name=Arduino Duemilanove or Diecimila
 
-atmega328diecimila.upload.tool=avrdude
-atmega328diecimila.upload.protocol=arduino
+diecimila.upload.tool=avrdude
+diecimila.upload.protocol=arduino
 
-atmega328diecimila.bootloader.tool=avrdude
-atmega328diecimila.bootloader.low_fuses=0xFF
-atmega328diecimila.bootloader.unlock_bits=0x3F
-atmega328diecimila.bootloader.lock_bits=0x0F
+diecimila.bootloader.tool=avrdude
+diecimila.bootloader.low_fuses=0xFF
+diecimila.bootloader.unlock_bits=0x3F
+diecimila.bootloader.lock_bits=0x0F
 
-atmega328diecimila.build.f_cpu=16000000L
-atmega328diecimila.build.board=AVR_DUEMILANOVE
-atmega328diecimila.build.core=arduino
-atmega328diecimila.build.variant=standard
+diecimila.build.f_cpu=16000000L
+diecimila.build.board=AVR_DUEMILANOVE
+diecimila.build.core=arduino
+diecimila.build.variant=standard
 
 ## Arduino Duemilanove or Diecimila w/ ATmega328
 ## ---------------------------------------------
-atmega328diecimila.menu.cpu.atmega328=ATmega328
+diecimila.menu.cpu.atmega328=ATmega328
 
-atmega328diecimila.menu.cpu.atmega328.upload.maximum_size=30720
-atmega328diecimila.menu.cpu.atmega328.upload.maximum_data_size=2048
-atmega328diecimila.menu.cpu.atmega328.upload.speed=57600
+diecimila.menu.cpu.atmega328.upload.maximum_size=30720
+diecimila.menu.cpu.atmega328.upload.maximum_data_size=2048
+diecimila.menu.cpu.atmega328.upload.speed=57600
 
-atmega328diecimila.menu.cpu.atmega328.bootloader.high_fuses=0xDA
-atmega328diecimila.menu.cpu.atmega328.bootloader.extended_fuses=0x05
-atmega328diecimila.menu.cpu.atmega328.bootloader.file=atmega/ATmegaBOOT_168_atmega328.hex
+diecimila.menu.cpu.atmega328.bootloader.high_fuses=0xDA
+diecimila.menu.cpu.atmega328.bootloader.extended_fuses=0x05
+diecimila.menu.cpu.atmega328.bootloader.file=atmega/ATmegaBOOT_168_atmega328.hex
 
-atmega328diecimila.menu.cpu.atmega328.build.mcu=atmega328p
+diecimila.menu.cpu.atmega328.build.mcu=atmega328p
 
 ## Arduino Duemilanove or Diecimila w/ ATmega168
 ## ---------------------------------------------
-atmega328diecimila.menu.cpu.atmega168=ATmega168
+diecimila.menu.cpu.atmega168=ATmega168
 
-atmega328diecimila.menu.cpu.atmega168.upload.maximum_size=14336
-atmega328diecimila.menu.cpu.atmega168.upload.maximum_data_size=1024
-atmega328diecimila.menu.cpu.atmega168.upload.speed=19200
+diecimila.menu.cpu.atmega168.upload.maximum_size=14336
+diecimila.menu.cpu.atmega168.upload.maximum_data_size=1024
+diecimila.menu.cpu.atmega168.upload.speed=19200
 
-atmega328diecimila.menu.cpu.atmega168.bootloader.high_fuses=0xdd
-atmega328diecimila.menu.cpu.atmega168.bootloader.extended_fuses=0x00
-atmega328diecimila.menu.cpu.atmega168.bootloader.file=atmega/ATmegaBOOT_168_diecimila.hex
+diecimila.menu.cpu.atmega168.bootloader.high_fuses=0xdd
+diecimila.menu.cpu.atmega168.bootloader.extended_fuses=0x00
+diecimila.menu.cpu.atmega168.bootloader.file=atmega/ATmegaBOOT_168_diecimila.hex
 
-atmega328diecimila.menu.cpu.atmega168.build.mcu=atmega168
+diecimila.menu.cpu.atmega168.build.mcu=atmega168
 
 ##############################################################
 
