@@ -1,0 +1,209 @@
+// Generate a manpage with: a2x -f manpage manpage.adoc
+// or HTML with: a2x -f xhtml manpage.adoc
+//
+// This file uses {empty}:: in some places, to allow putting multiple
+// paragraphs inside a single label list item. This is a bit ugly and
+// non-semantic, but it seems this is the best way to do this. Asciidoc
+// also supports putting a plus sign on a line by itself to join two
+// paragraphs into a single list item. However, the indentation on the
+// second paragraph makes that formatted with a fixed-size font.
+// Removing the indentation completely makes the asciidoc source very
+// unreadable. Also, for the --board option, there is a a paragraph,
+// followed by a list, followed by another paragraph. The + approach can
+// only put the latter paragraph into the inner list, not the outer
+// one...
+
+ARDUINO(1)
+==========
+:doctype: manpage
+
+NAME
+----
+arduino - Integrated development environment for Arduino boards
+
+SYNOPSIS
+--------
+*arduino* ['FILE.ino'...]
+
+*arduino* [*--verify*|*--upload*] [*--board* __package__:__arch__:__board__[:__parameters__]] [*--port* __portname__] [*--pref* __name__=__value__] [*-v*|*--verbose*] [__FILE.ino__]
+
+DESCRIPTION
+-----------
+The 'arduino' integrated development environment allows editing,
+compiling and uploading sketches (programs) for Arduino
+(and compatible) microcontroller boards.
+
+Normally, running the arduino command starts the IDE, optionally loading
+any .ino files specified on the commandline.
+
+Alternatively, if *--verify* or *--upload* is given, no graphical
+interface will be shown and instead a one-off verify (compile) or upload
+will be done. A single .ino file should be given. If the sketch contains
+multiple .ino files, any one can be specified on the commandline, but
+the entire sketch will be compiled.
+
+When running in a one-off mode, it might be useful to set the
+*build.path* preference to allow keeping intermediate build results
+between multiple runs and only recompile the files that changed.
+
+Note that on MacOS X, the main executable is
+'Arduino.app/Contents/MacOS/JavaApplicationStub' instead of 'arduino'.
+
+OPTIONS
+-------
+*--board* __package__:__arch__:__board__[:__parameters__]::
+	Select the board to compile for.
+
+	 * __package__ is the identifier of the vendor (the first
+	   level folders inside the 'hardware' directory). Default
+	   arduino boards use 'arduino'.
+	 * __architecture__ is the architecture of the board (second level folders
+	   inside the 'hardware' directory). Default arduino boards use
+	   either *arduino:avr* for all AVR-based boards (like Uno, Mega
+	   or Leonardo) or *arduino:sam* for 32bit SAM-based boards
+	   (like Arduino Due).
+	 * __board__ is the actual board to use, as defined in 'boards.txt'
+	   contained in the architecture folder selected. For example,
+	   *arduino:avr:uno* for the Arduino Uno,
+	   *arduino:avr:diecimila* for the Arduino Duemilanove or
+	   Diecimila, or *arduino:avr:mega* for the Arduino Mega.
+	 * __parameters__ is a comma-separated list of boards specific parameters
+	   that are normally shown under submenus of the "Tools" menu. For
+	   example *arduino:avr:nano:cpu=atmega168* to Select the mega168
+	   variant of the Arduino Nano board.
+
+{empty}::
+	If this option is not passed, the value from the current
+	preferences is used (e.g., the last board selected in the IDE).
+
+*--port* __portname__::
+	Select the serial port to perform upload of the sketch.
+	On linux and MacOS X, this should be the path to a device file (e.g.,
+	*/dev/ttyACM0*). On Windows, this should be the name of the serial
+	port (e.g., *COM3*).
+
+{empty}::
+	If this option is not passed, the value from the current
+	preferences is used (e.g., the last port selected in the IDE).
+
+*-v, --verbose*::
+
+	Enable verbose mode during build and upload. If this option is
+	not given, verbose mode is disabled regardless of the current
+	preferences.
+
+*--pref* __name__=__value__::
+	Sets the preference __name__ to the given __value__.
+
+{empty}::
+	Currently the preferences set are saved to 'preferences.txt', but
+	this might change in the future (making them only active during
+	the current invocation).
+
+{empty}::
+	Note that the preferences you set with this option are not
+	validated: Invalid names will be set but never used, invalid
+	values might lead to an error later on.
+
+*--upload*::
+	Build and upload the sketch.
+
+*--verify*::
+	Build the sketch.
+
+PREFERENCES
+-----------
+Arduino keeps a list of preferences, as simple name and value pairs.
+Below, a few of them are documented but a lot more are available.
+
+*sketchbook.path*::
+	The path where sketches are (usually) stored. This path can also
+	contain some special subdirectories (see FILES below).
+
+*update.check*::
+	When set to true, the IDE checks for a new version on startup.
+
+*editor.external*::
+	When set to true, use an external editor (the IDE does not allow
+	editing and reloads each file before verifying).
+
+*build.path*::
+	The path to use for building. This is where things like the
+	preprocessed .cpp file, compiled .o files and the final .hex
+	file go.
+
+{empty}::
+	If set, this directory should already exist before running the
+	arduino command.
+
+{empty}::
+	If this preference is not set (which is normally the case), a
+	new temporary build folder is created on every run and deleted
+	again when the application is closed.
+
+EXIT STATUS
+-----------
+*0*:: Success
+*1*:: Build failed or upload failed
+*2*:: Sketch not found
+*3*:: Invalid (argument for) commandline option
+
+FILES
+-----
+*~/.arduino15/preferences.txt*::
+	This file stores the preferences used for the IDE, building and
+	uploading sketches.
+
+*My Documents/Arduino/* (Windows)::
+*~/Documents/Arduino/* (Mac OS X)::
+*~/Arduino/* (Linux)::
+	This directory is referred to as the "Sketchbook" and contains
+	the user's sketches. The path can be changed through the
+	*sketchbook.path* preference.
+
+{empty}::
+	Apart from sketches, three special directories can be inside the
+	sketchbook:
+
+	*libraries*:::
+		Libraries can be put inside this directory, one library
+		per subdirectory.
+
+	*hardware*:::
+		Support for third-party hardware can be added through
+		this directory.
+
+	*tools*:::
+		External code-processing tools (that can be run through
+		the Tools menu of the IDE) can be added here.
+
+EXAMPLES
+--------
+
+Start the Arduino IDE, with two files open:
+
+     arduino /path/to/sketch/sketch.ino /path/to/sketch/extra.ino
+
+Compile and upload a sketch using the last selected board and serial port
+
+     arduino --upload /path/to/sketch/sketch.ino
+
+Compile and upload a sketch to an Arduino Nano, with an Atmega168 CPU,
+connected on port '/dev/ttyACM0':
+
+     arduino --board arduino:avr:nano:cpu=atmega168 --port /dev/ttyACM0 --upload /path/to/sketch/sketch.ino
+
+Compile a sketch, put the build results in the 'build' directory an
+re-use any previous build results in that directory.
+
+     arduino --pref build.path=/path/to/sketch/build --verify /path/to/sketch/sketch.ino
+
+RESOURCES
+---------
+Web site: <http://arduino.cc/>
+
+Help on projects and programming: <http://forum.arduino.cc/>
+
+Report bugs: <http://github.com/arduino/Arduino/issues>
+
+IDE and framework development mailing list: <https://groups.google.com/a/arduino.cc/forum/#!forum/developers>
