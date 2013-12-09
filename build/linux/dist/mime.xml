@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+    <mime-type type="text/x-arduino">
+        <comment>Arduino source code</comment>
+	<comment xml:lang="ara">شفرة مصدر Arduino</comment>
+	<comment xml:lang="be@latin">Kryničny kod Arduino</comment>
+	<comment xml:lang="bg">Изходен код на Arduino</comment>
+	<comment xml:lang="ca">codi font en Arduino</comment>
+	<comment xml:lang="da">Arduinokildekode</comment>
+	<comment xml:lang="de">Arduino-Quelltext</comment>
+	<comment xml:lang="el">πηγαίος κώδικας Arduino</comment>
+	<comment xml:lang="en_GB">Arduino source code</comment>
+	<comment xml:lang="eo">Arduino-fontkodo</comment>
+	<comment xml:lang="es">código fuente en Arduino</comment>
+	<comment xml:lang="eu">Arduino iturburu-kodea</comment>
+	<comment xml:lang="fi">Arduino-lähdekoodi</comment>
+	<comment xml:lang="fr">code source Arduino</comment>
+	<comment xml:lang="ga">cód foinseach Arduino</comment>
+	<comment xml:lang="hu">Arduino-forráskód</comment>
+	<comment xml:lang="id">Kode program Arduino</comment>
+	<comment xml:lang="it">Codice sorgente Arduino</comment>
+	<comment xml:lang="ja">Arduino ソースコード</comment>
+	<comment xml:lang="lt">Arduino pradinis kodas</comment>
+	<comment xml:lang="lv">Arduino pirmkods</comment>
+	<comment xml:lang="ms">Kod sumber Arduino</comment>
+	<comment xml:lang="nb">Arduino-kildekode</comment>
+	<comment xml:lang="nl">Arduino-broncode</comment>
+	<comment xml:lang="nn">Arduino-kjeldekode</comment>
+	<comment xml:lang="pl">Kod źródłowy Arduino</comment>
+	<comment xml:lang="pt">código fonte Arduino</comment>
+	<comment xml:lang="pt_BR">Código fonte Arduino</comment>
+	<comment xml:lang="ru">исходный код Arduino</comment>
+	<comment xml:lang="sq">Kod burues Arduino</comment>
+	<comment xml:lang="sv">Arduino-källkod</comment>
+	<comment xml:lang="uk">Вихідний код на мові Arduino</comment>
+	<comment xml:lang="vi">Mã nguồn Arduino</comment>
+	<comment xml:lang="zh_CN">Arduino 源代码</comment>
+	<comment xml:lang="zh_TW">Arduino 源代碼</comment>
+        <sub-class-of type="text/x-c++src"/>
+        <glob pattern="*.ino"/>
+    </mime-type>
+</mime-info>
