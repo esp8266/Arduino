@@ -15,7 +15,7 @@ extern "C" {
 #define SLAVEREADY  7  // handshake pin
 #define WIFILED     9  // led on wifi shield
 
-#define DELAY_SPI(X) { int ii=0; do { asm volatile("nop"); } while (++ii < X*6); }
+#define DELAY_SPI(X) { int ii=0; do { asm volatile("nop"); } while (++ii < (X*F_CPU/16000000)); }
 #define DELAY_TRANSFER() DELAY_SPI(10)
 
 void SpiDrv::begin()
