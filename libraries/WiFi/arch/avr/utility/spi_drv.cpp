@@ -8,15 +8,14 @@ extern "C" {
 #include "utility/debug.h"
 }
 
-#define DATAOUT 	11 // MOSI
-#define DATAIN  	12 // MISO
-#define SPICLOCK  	13 // sck
-#define SLAVESELECT 	10 // ss
-#define SLAVEREADY 	7  // handshake pin
-#define WIFILED 	9  // led on wifi shield
+#define DATAOUT     11 // MOSI
+#define DATAIN      12 // MISO
+#define SPICLOCK    13 // sck
+#define SLAVESELECT 10 // ss
+#define SLAVEREADY  7  // handshake pin
+#define WIFILED     9  // led on wifi shield
 
-#define DELAY_100NS do { asm volatile("nop"); }while(0);
-#define DELAY_SPI(X) { int ii=0; do {  asm volatile("nop"); }while(++ii<X);}
+#define DELAY_SPI(X) { int ii=0; do { asm volatile("nop"); } while (++ii < X); }
 #define DELAY_TRANSFER() DELAY_SPI(10)
 
 void SpiDrv::begin()
@@ -52,17 +51,6 @@ void SpiDrv::spiSlaveDeselect()
     digitalWrite(SLAVESELECT,HIGH);
 }
 
-/*
-void delaySpi()
-{
-	int i = 0;
-	const int DELAY = 1000;
-	for (;i<DELAY;++i)
-	{
-		int a =a+1;
-	}
-}
-*/
 
 char SpiDrv::spiTransfer(volatile char data)
 {

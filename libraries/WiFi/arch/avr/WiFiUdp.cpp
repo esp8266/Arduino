@@ -115,7 +115,7 @@ int WiFiUDP::read(unsigned char* buffer, size_t len)
 {
   if (available())
   {
-	  size_t size = 0;
+	  uint16_t size = 0;
 	  if (!ServerDrv::getDataBuf(_sock, buffer, &size))
 		  return -1;
 	  // TODO check if the buffer is too smal respect to buffer size

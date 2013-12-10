@@ -104,6 +104,8 @@ int WiFiClient::read() {
 
 
 int WiFiClient::read(uint8_t* buf, size_t size) {
+  // sizeof(size_t) is architecture dependent
+  // but we need a 16 bit data type here
   uint16_t _size = size;
   if (!ServerDrv::getDataBuf(_sock, buf, &_size))
       return -1;
