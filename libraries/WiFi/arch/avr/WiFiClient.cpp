@@ -1,7 +1,6 @@
 extern "C" {
   #include "utility/wl_definitions.h"
   #include "utility/wl_types.h"
-  #include "utility/socket.h"
   #include "string.h"
   #include "utility/debug.h"
 }
