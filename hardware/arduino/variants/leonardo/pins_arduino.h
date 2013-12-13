@@ -99,30 +99,30 @@
 #define RXLED0			PORTB |= (1<<0)
 #define RXLED1			PORTB &= ~(1<<0)
 
-static const uint8_t SDA = 2;
-static const uint8_t SCL = 3;
+#define SDA 2
+#define SCL 3
 #define LED_BUILTIN 13
 
 // Map SPI port to 'new' pins D14..D17
-static const uint8_t SS   = 17;
-static const uint8_t MOSI = 16;
-static const uint8_t MISO = 14;
-static const uint8_t SCK  = 15;
+#define SS   17
+#define MOSI 16
+#define MISO 14
+#define SCK  15
 
 // Mapping of analog pins as digital I/O
 // A6-A11 share with digital pins
-static const uint8_t A0 = 18;
-static const uint8_t A1 = 19;
-static const uint8_t A2 = 20;
-static const uint8_t A3 = 21;
-static const uint8_t A4 = 22;
-static const uint8_t A5 = 23;
-static const uint8_t A6 = 24;	// D4
-static const uint8_t A7 = 25;	// D6
-static const uint8_t A8 = 26;	// D8
-static const uint8_t A9 = 27;	// D9
-static const uint8_t A10 = 28;	// D10
-static const uint8_t A11 = 29;	// D12
+#define A0 18
+#define A1 19
+#define A2 20
+#define A3 21
+#define A4 22
+#define A5 23
+#define A6 24	// D4
+#define A7 25	// D6
+#define A8 26	// D8
+#define A9 27	// D9
+#define A10 28	// D10
+#define A11 29	// D12
 
 #define digitalPinToPCICR(p)    ((((p) >= 8 && (p) <= 11) || ((p) >= 14 && (p) <= 17) || ((p) >= A8 && (p) <= A10)) ? (&PCICR) : ((uint8_t *)0))
 #define digitalPinToPCICRbit(p) 0

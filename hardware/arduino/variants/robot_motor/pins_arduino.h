@@ -41,49 +41,49 @@
 #define D8 TK4
 #define D7 TK3
 
-static const uint8_t RX  = 0;
-static const uint8_t TX  = 1;
-static const uint8_t SDA = 2;
-static const uint8_t SCL = 3;
+#define RX  0
+#define TX  1
+#define SDA 2
+#define SCL 3
 
 // Map SPI port to 'new' pins D14..D17
-static const uint8_t SS   = 17;
-static const uint8_t MOSI = 16;
-static const uint8_t MISO = 14;
-static const uint8_t SCK  = 15;
+#define SS   17
+#define MOSI 16
+#define MISO 14
+#define SCK  15
 
 // Mapping of analog pins as digital I/O
 // A6-A11 share with digital pins
-static const uint8_t A0 = 18;
-static const uint8_t A1 = 19;
-static const uint8_t A2 = 20;
-static const uint8_t A3 = 21;
-static const uint8_t A4 = 22;
-static const uint8_t A5 = 23;
-static const uint8_t A6 = 24;	// D4
-static const uint8_t A7 = 25;	// D6
-static const uint8_t A8 = 26;	// D8
-static const uint8_t A9 = 27;	// D9
-static const uint8_t A10 = 28;	// D10
-static const uint8_t A11 = 29;	// D12
+#define A0  18
+#define A1  19
+#define A2  20
+#define A3  21
+#define A4  22
+#define A5  23
+#define A6  24 // D4
+#define A7  25 // D6
+#define A8  26 // D8
+#define A9  27 // D9
+#define A10 28 // D10
+#define A11 29 // D12
 
 // Specific Mapping for the Motor Board
-static const uint8_t MUX_IN = 20;  	// A2
-static const uint8_t MUXA = 7;  	// D7
-static const uint8_t MUXB = 8;  	// D8
-static const uint8_t MUXC = 11;  	// D11
-static const uint8_t MUXI = 13;   	// D13
-static const uint8_t TRIM = 21;  	// A3
-static const uint8_t SENSE_A = 22; 	// A4
-static const uint8_t SENSE_B = 23; 	// A5
-static const uint8_t IN_A1 = 6;  	// D6 - A7
-static const uint8_t IN_A2 = 5;  	// D5
-static const uint8_t IN_B1 = 10;  	// D10
-static const uint8_t IN_B2 = 9;  	// D9
-static const uint8_t TK1 = 18;  	// A0
-static const uint8_t TK2 = 19;  	// A1
-static const uint8_t TK3 = 4;  		// A6
-static const uint8_t TK4 = 12;   	// A11
+#define MUX_IN  20 // A2
+#define MUXA    7  // D7
+#define MUXB    8  // D8
+#define MUXC    11 // D11
+#define MUXI    13 // D13
+#define TRIM    21 // A3
+#define SENSE_A 22 // A4
+#define SENSE_B 23 // A5
+#define IN_A1   6  // D6 - A7
+#define IN_A2   5  // D5
+#define IN_B1   10 // D10
+#define IN_B2   9  // D9
+#define TK1     18 // A0
+#define TK2     19 // A1
+#define TK3     4  // A6
+#define TK4     12 // A11
 
 //	__AVR_ATmega32U4__ has an unusual mapping of pins to channels
 extern const uint8_t PROGMEM analog_pin_to_channel_PGM[];
