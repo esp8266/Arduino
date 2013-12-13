@@ -25,7 +25,7 @@ extern "C" {
 uint32_t millis( void )
 {
 // todo: ensure no interrupts
-	return GetTickCount() ;
+    return GetTickCount() ;
 }
 
 // Interrupt-compatible version of micros
@@ -74,9 +74,12 @@ uint32_t micros( void )
 
 void delay( uint32_t ms )
 {
-    uint32_t end = GetTickCount() + ms;
-    while (GetTickCount() < end)
-    	yield();
+    if (ms == 0)
+        return;
+    uint32_t start = GetTickCount();
+    do {
+        yield();
+    } while (GetTickCount() - start < ms);
 }
 
 #if defined ( __ICCARM__ ) /* IAR Ewarm 5.41+ */
