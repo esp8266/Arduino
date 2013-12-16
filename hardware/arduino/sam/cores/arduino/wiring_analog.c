@@ -149,8 +149,10 @@ uint32_t analogRead(uint32_t ulPin)
 
 			// Enable the corresponding channel
 			if (ulChannel != latestSelectedChannel) {
-			  adc_enable_channel( ADC, ulChannel );
-			  latestSelectedChannel = ulChannel;
+				if ( latestSelectedChannel != -1 )
+					adc_disable_channel( ADC, latestSelectedChannel );
+				adc_enable_channel( ADC, ulChannel );
+				latestSelectedChannel = ulChannel;
 			}
 
 			// Start the ADC
@@ -163,9 +165,6 @@ uint32_t analogRead(uint32_t ulPin)
 			// Read the value
 			ulValue = adc_get_latest_value(ADC);
 			ulValue = mapResolution(ulValue, ADC_RESOLUTION, _readResolution);
-
-			// Disable the corresponding channel
-			//adc_disable_channel(ADC, ulChannel);
 
 			break;
 
