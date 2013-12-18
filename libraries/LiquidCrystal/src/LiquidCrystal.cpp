@@ -182,6 +182,10 @@ void LiquidCrystal::home()
 
 void LiquidCrystal::setCursor(uint8_t col, uint8_t row)
 {
+  const size_t max_lines = sizeof(_row_offsets) / sizeof(*_row_offsets);
+  if ( row >= max_lines ) {
+    row = max_lines - 1;    // we count rows starting w/0
+  }
   if ( row >= _numlines ) {
     row = _numlines - 1;    // we count rows starting w/0
   }
