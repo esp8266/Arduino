@@ -92,7 +92,7 @@ void LiquidCrystal::begin(uint8_t cols, uint8_t lines, uint8_t dotsize) {
   setRowOffsets(0x00, 0x40, 0x00 + cols, 0x40 + cols);  
 
   // for some 1 line displays you can select a 10 pixel high font
-  if ((dotsize != 0) && (lines == 1)) {
+  if ((dotsize != LCD_5x8DOTS) && (lines == 1)) {
     _displayfunction |= LCD_5x10DOTS;
   }
 
