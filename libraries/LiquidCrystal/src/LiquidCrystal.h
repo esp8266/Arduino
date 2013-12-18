@@ -102,7 +102,7 @@ private:
   uint8_t _initialized;
 
   uint8_t _numlines,_currline;
-  int _row_offsets[4];
+  uint8_t _row_offsets[4];
 };
 
 #endif
