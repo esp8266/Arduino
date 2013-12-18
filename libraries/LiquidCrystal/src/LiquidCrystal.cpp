@@ -87,7 +87,6 @@ void LiquidCrystal::begin(uint8_t cols, uint8_t lines, uint8_t dotsize) {
     _displayfunction |= LCD_2LINE;
   }
   _numlines = lines;
-  _currline = 0;
 
   setRowOffsets(0x00, 0x40, 0x00 + cols, 0x40 + cols);  
 
