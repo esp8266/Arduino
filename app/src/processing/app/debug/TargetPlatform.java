@@ -44,6 +44,7 @@ public class TargetPlatform {
    * Contains preferences for every defined board
    */
   private Map<String, TargetBoard> boards = new LinkedHashMap<String, TargetBoard>();
+  private TargetBoard defaultBoard;
 
   /**
    * Contains preferences for every defined programmer
@@ -86,10 +87,15 @@ public class TargetPlatform {
       boardsPreferences.remove("menu");
 
       // Create boards
-      for (String id : boardsPreferences.keySet()) {
+      Set<String> boardIDs = boardsPreferences.keySet();
+      for (String id : boardIDs) {
         PreferencesMap preferences = boardsPreferences.get(id);
         TargetBoard board = new TargetBoard(id, preferences, this);
         boards.put(id, board);
+      }
+      if (!boardIDs.isEmpty()) {
+        PreferencesMap preferences = boardsPreferences.get(boardIDs.iterator().next());
+        defaultBoard = new TargetBoard(id, preferences, this);
       }
     } catch (IOException e) {
       throw new TargetPlatformException(format(_("Error loading {0}"),
@@ -156,7 +162,10 @@ public class TargetPlatform {
   }
 
   public TargetBoard getBoard(String boardId) {
-    return boards.get(boardId);
+    if (boards.containsKey(boardId)) {
+      return boards.get(boardId);
+    }
+    return defaultBoard;
   }
 
   public TargetPackage getContainerPackage() {
