@@ -11,6 +11,7 @@ ARDUINO 1.5.6 BETA
 [core]
 * sam: Fixed wrap-around bug in delay() (Mark Tillotson)
 * sam: Fixed regression in analogRead() (fails to read multiple channels) (Mark Tillotson)
+* Optimized Print::print(String&) method, now uses internal string buffer to perform block write
 
 ARDUINO 1.5.5 BETA 2013.11.28
 
