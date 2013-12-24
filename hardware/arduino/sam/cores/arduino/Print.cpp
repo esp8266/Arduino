@@ -46,7 +46,7 @@ size_t Print::print(const __FlashStringHelper *ifsh)
 
 size_t Print::print(const String &s)
 {
-  return write(reinterpret_cast<const uint8_t*>(s.c_str()), s.length());
+  return write(s.c_str(), s.length());
 }
 
 size_t Print::print(const char str[])
