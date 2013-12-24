@@ -96,9 +96,8 @@ public class Compiler implements MessageConsumer {
       if (verbose)
         System.out.println(I18n
             .format(_("Using library {0} in folder: {1} {2}"), lib.getName(),
-                    lib.getFolder(), lib.isPre15Lib() ? "(pre-1.5)" : ""));
-      for (File folder : lib.getSrcFolders(targetArch))
-        includePaths.add(folder.getPath());
+                    lib.getFolder(), lib.isLegacy() ? "(legacy)" : ""));
+      includePaths.add(lib.getSrcFolder().getPath());
     }
     if (verbose)
       System.out.println();
@@ -615,47 +614,50 @@ public class Compiler implements MessageConsumer {
   // 2. compile the libraries, outputting .o files to:
   // <buildPath>/<library>/
   void compileLibraries(List<String> includePaths) throws RunnerException {
-    File outputPath = new File(prefs.get("build.path"));
     for (Library lib : sketch.getImportedLibraries()) {
-      for (File folder : lib.getSrcFolders(targetArch)) {
-        if (lib.isPre15Lib()) {
-          compileLibrary(outputPath, folder, includePaths);
-        } else {
-          recursiveCompileLibrary(outputPath, folder, includePaths);
-        }
-      }
+      compileLibrary(lib, includePaths);
     }
   }
 
-  private void recursiveCompileLibrary(File outputPath, File libraryFolder, List<String> includePaths) throws RunnerException {
-    File newOutputPath = compileFilesInFolder(outputPath, libraryFolder, includePaths);
-    for (File subFolder : libraryFolder.listFiles(new OnlyDirs())) {
-      recursiveCompileLibrary(newOutputPath, subFolder, includePaths);
+  private void compileLibrary(Library lib, List<String> includePaths)
+      throws RunnerException {
+    File libFolder = lib.getSrcFolder();
+    File libBuildFolder = new File(prefs.get("build.path"), lib.getName());
+
+    if (lib.useRecursion()) {
+      // libBuildFolder == {build.path}/LibName
+      // libFolder      == {lib.path}/src
+      recursiveCompileFilesInFolder(libBuildFolder, libFolder, includePaths);
+
+    } else {
+      // libFolder          == {lib.path}/
+      // utilityFolder      == {lib.path}/utility
+      // libBuildFolder     == {build.path}/LibName
+      // utilityBuildFolder == {build.path}/LibName/utility
+      File utilityFolder = new File(libFolder, "utility");
+      File utilityBuildFolder = new File(libBuildFolder, "utility");
+
+      includePaths.add(utilityFolder.getAbsolutePath());
+      compileFilesInFolder(libBuildFolder, libFolder, includePaths);
+      compileFilesInFolder(utilityBuildFolder, utilityFolder, includePaths);
+
+      // other libraries should not see this library's utility/ folder
+      includePaths.remove(utilityFolder.getAbsolutePath());
     }
   }
 
-  private File compileFilesInFolder(File outputPath, File libraryFolder, List<String> includePaths) throws RunnerException {
-    File outputFolder = new File(outputPath, libraryFolder.getName());
-    createFolder(outputFolder);
-    objectFiles.addAll(compileFiles(outputFolder.getAbsolutePath(), libraryFolder, false, includePaths));
-    return outputFolder;
+  private void recursiveCompileFilesInFolder(File srcBuildFolder, File srcFolder, List<String> includePaths) throws RunnerException {
+    compileFilesInFolder(srcBuildFolder, srcFolder, includePaths);
+    for (File subFolder : srcFolder.listFiles(new OnlyDirs())) {
+      File subBuildFolder = new File(srcBuildFolder, subFolder.getName());
+      recursiveCompileFilesInFolder(subBuildFolder, subFolder, includePaths);
+    }
   }
 
-  private void compileLibrary(File outputPath, File libraryFolder, List<String> includePaths) throws RunnerException {
-    File outputFolder = new File(outputPath, libraryFolder.getName());
-    File utilityFolder = new File(libraryFolder, "utility");
-    createFolder(outputFolder);
-    // this library can use includes in its utility/ folder
-    includePaths.add(utilityFolder.getAbsolutePath());
-
-    objectFiles.addAll(compileFiles(outputFolder.getAbsolutePath(),
-            libraryFolder, false, includePaths));
-    outputFolder = new File(outputFolder, "utility");
-    createFolder(outputFolder);
-    objectFiles.addAll(compileFiles(outputFolder.getAbsolutePath(),
-            utilityFolder, false, includePaths));
-    // other libraries should not see this library's utility/ folder
-    includePaths.remove(includePaths.size() - 1);
+  private void compileFilesInFolder(File buildFolder, File srcFolder, List<String> includePaths) throws RunnerException {
+    createFolder(buildFolder);
+    List<File> objects = compileFiles(buildFolder.getAbsolutePath(), srcFolder, false, includePaths);
+    objectFiles.addAll(objects);
   }
 
   // 3. compile the core, outputting .o files to <buildPath> and then

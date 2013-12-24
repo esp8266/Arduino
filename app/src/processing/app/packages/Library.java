@@ -17,24 +17,23 @@ public class Library {
   private String name;
   private String version;
   private String author;
-  private String email;
-  private String url;
+  private String maintainer;
   private String sentence;
   private String paragraph;
-  private List<String> coreDependencies;
-  private List<String> dependencies;
-  private File folder, srcFolder, archFolder;
+  private String url;
   private List<String> architectures;
-  private boolean pre15Lib;
+  private File folder;
+  private File srcFolder;
+  private boolean useRecursion;
+  private boolean isLegacy;
 
   private static final List<String> MANDATORY_PROPERTIES = Arrays
-      .asList(new String[] { "architectures", "author", "core-dependencies",
-          "dependencies", "email", "name", "paragraph", "sentence", "url",
-          "version" });
+      .asList(new String[] { "name", "version", "author", "maintainer",
+          "sentence", "paragraph", "url" });
 
   /**
    * Scans inside a folder and create a Library object out of it. Automatically
-   * detects pre-1.5 libraries. Automatically fills metadata from
+   * detects legacy libraries. Automatically fills metadata from
    * library.properties file if found.
    * 
    * @param libFolder
@@ -45,7 +44,7 @@ public class Library {
     // "library.properties"
     File check = new File(libFolder, "library.properties");
     if (!check.exists() || !check.isFile())
-      return createPre15Library(libFolder);
+      return createLegacyLibrary(libFolder);
     else
       return createLibrary(libFolder);
   }
@@ -60,14 +59,34 @@ public class Library {
     // ---------------------
 
     // 1. Check mandatory properties
+
+    // provide compatibility with 1.5 rev.1 libs
+    // ("email" field changed to "maintainer")
+    if (!properties.containsKey("maintainer"))
+      properties.put("maintainer", properties.get("email"));
+
     for (String p : MANDATORY_PROPERTIES)
       if (!properties.containsKey(p))
         throw new IOException("Missing '" + p + "' from library");
 
-    // 2. Check mandatory folders
+    // 2. Check layout
+    boolean useRecursion;
     File srcFolder = new File(libFolder, "src");
-    if (!srcFolder.exists() || !srcFolder.isDirectory())
-      throw new IOException("Missing 'src' folder");
+
+    if (srcFolder.exists() && srcFolder.isDirectory()) {
+      // Layout with a single "src" folder and recursive compilation
+      useRecursion = true;
+
+      File utilFolder = new File(libFolder, "utility");
+      if (utilFolder.exists() && utilFolder.isDirectory()) {
+        throw new IOException(
+            "Library can't use both 'src' and 'utility' folders.");
+      }
+    } else {
+      // Layout with source code on library's root and "utility" folders
+      srcFolder = libFolder;
+      useRecursion = false;
+    }
 
     // 3. Warn if root folder contains development leftovers
     for (File file : libFolder.listFiles()) {
@@ -81,65 +100,38 @@ public class Library {
     }
 
     // Extract metadata info
+    String architectures = properties.get("architectures");
+    if (architectures == null)
+      architectures = "*"; // defaults to "any"
     List<String> archs = new ArrayList<String>();
-    for (String arch : properties.get("architectures").split(","))
+    for (String arch : architectures.split(","))
       archs.add(arch.trim());
-
-    List<String> coreDeps = new ArrayList<String>();
-    for (String dep : properties.get("core-dependencies").split(","))
-      coreDeps.add(dep.trim());
-
-    List<String> dependencies = new ArrayList<String>();
-    for (String dependency : properties.get("dependencies").split(",")) {
-      dependency = dependency.trim();
-      if (!dependency.equals("")) {
-        dependencies.add(dependency);
-      }
-    }
 
     Library res = new Library();
     res.folder = libFolder;
     res.srcFolder = srcFolder;
-    res.archFolder = new File(libFolder, "arch");
     res.name = properties.get("name").trim();
+    res.version = properties.get("version").trim();
     res.author = properties.get("author").trim();
-    res.email = properties.get("email").trim();
+    res.maintainer = properties.get("maintainer").trim();
     res.sentence = properties.get("sentence").trim();
     res.paragraph = properties.get("paragraph").trim();
     res.url = properties.get("url").trim();
     res.architectures = archs;
-    res.coreDependencies = coreDeps;
-    res.dependencies = dependencies;
-    res.version = properties.get("version").trim();
-    res.pre15Lib = false;
+    res.useRecursion = useRecursion;
+    res.isLegacy = false;
     return res;
   }
 
-  private static Library createPre15Library(File libFolder) {
+  private static Library createLegacyLibrary(File libFolder) {
     // construct an old style library
     Library res = new Library();
     res.folder = libFolder;
     res.srcFolder = libFolder;
+    res.useRecursion = false;
     res.name = libFolder.getName();
     res.architectures = Arrays.asList("*");
-    res.pre15Lib = true;
-    return res;
-  }
-
-  public List<File> getSrcFolders(String reqArch) {
-    if (!supportsArchitecture(reqArch))
-      return null;
-    List<File> res = new ArrayList<File>();
-    res.add(srcFolder);
-    File archSpecificFolder = new File(archFolder, reqArch);
-    if (archSpecificFolder.exists() && archSpecificFolder.isDirectory()) {
-      res.add(archSpecificFolder);
-    } else {
-      // If specific architecture folder is not found try with "default"
-      archSpecificFolder = new File(archFolder, "default");
-      if (archSpecificFolder.exists() && archSpecificFolder.isDirectory())
-        res.add(archSpecificFolder);
-    }
+    res.isLegacy = true;
     return res;
   }
 
@@ -157,16 +149,8 @@ public class Library {
     }
   };
 
-  public File getSrcFolder() {
-    return srcFolder;
-  }
-
   public String getName() {
     return name;
-  }
-
-  public boolean isPre15Lib() {
-    return pre15Lib;
   }
 
   public File getFolder() {
@@ -179,18 +163,6 @@ public class Library {
 
   public String getAuthor() {
     return author;
-  }
-
-  public List<String> getCoreDependencies() {
-    return coreDependencies;
-  }
-
-  public List<String> getDependencies() {
-    return dependencies;
-  }
-
-  public String getEmail() {
-    return email;
   }
 
   public String getParagraph() {
@@ -209,19 +181,33 @@ public class Library {
     return version;
   }
 
+  public String getMaintainer() {
+    return maintainer;
+  }
+
+  public boolean useRecursion() {
+    return useRecursion;
+  }
+
+  public File getSrcFolder() {
+    return srcFolder;
+  }
+
+  public boolean isLegacy() {
+    return isLegacy;
+  }
+
   @Override
   public String toString() {
     String res = "Library:";
     res += " (name=" + name + ")";
-    res += " (architectures=" + architectures + ")";
-    res += " (author=" + author + ")";
-    res += " (core-dependencies=" + coreDependencies + ")";
-    res += " (dependencies=" + dependencies + ")";
-    res += " (email=" + email + ")";
-    res += " (paragraph=" + paragraph + ")";
-    res += " (sentence=" + sentence + ")";
-    res += " (url=" + url + ")";
     res += " (version=" + version + ")";
+    res += " (author=" + author + ")";
+    res += " (maintainer=" + maintainer + ")";
+    res += " (sentence=" + sentence + ")";
+    res += " (paragraph=" + paragraph + ")";
+    res += " (url=" + url + ")";
+    res += " (architectures=" + architectures + ")";
     return res;
   }
 }
