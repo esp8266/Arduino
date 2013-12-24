@@ -58,18 +58,24 @@ public class Library {
     // Library sanity checks
     // ---------------------
 
-    // 1. Check mandatory properties
-
-    // provide compatibility with 1.5 rev.1 libs
-    // ("email" field changed to "maintainer")
+    // Compatibility with 1.5 rev.1 libraries:
+    // "email" field changed to "maintainer"
     if (!properties.containsKey("maintainer"))
       properties.put("maintainer", properties.get("email"));
 
+    // Compatibility with 1.5 rev.1 libraries:
+    // "arch" folder no longer supported
+    File archFolder = new File(libFolder, "arch");
+    if (archFolder.isDirectory())
+      throw new IOException("'arch' folder is no longer supported! See "
+          + "http://goo.gl/gfFJzU for more information");
+
+    // Check mandatory properties
     for (String p : MANDATORY_PROPERTIES)
       if (!properties.containsKey(p))
         throw new IOException("Missing '" + p + "' from library");
 
-    // 2. Check layout
+    // Check layout
     boolean useRecursion;
     File srcFolder = new File(libFolder, "src");
 
@@ -88,7 +94,7 @@ public class Library {
       useRecursion = false;
     }
 
-    // 3. Warn if root folder contains development leftovers
+    // Warn if root folder contains development leftovers
     for (File file : libFolder.listFiles()) {
       if (file.isDirectory()) {
         if (FileUtils.isSCCSOrHiddenFile(file)) {
