@@ -101,6 +101,18 @@ public class Compiler implements MessageConsumer {
     }
     if (verbose)
       System.out.println();
+
+    String arch = Base.getTargetPlatform().getId();
+    for (Library lib : sketch.getImportedLibraries()) {
+      if (!lib.supportsArchitecture(arch)) {
+        System.err.println(I18n
+            .format(_("WARNING: library {0} claims to run on {1} "
+                + "architecture(s) and may be incompatible with your"
+                + " current board which runs on [{2}] architecture."), lib
+                .getName(), lib.getArchitectures(), arch));
+        System.err.println();
+      }
+    }
     
     // 1. compile the sketch (already in the buildPath)
     sketch.setCompilingProgress(30);
