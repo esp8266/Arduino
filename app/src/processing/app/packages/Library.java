@@ -21,6 +21,7 @@ public class Library {
   private String sentence;
   private String paragraph;
   private String url;
+  private String category;
   private List<String> architectures;
   private File folder;
   private File srcFolder;
@@ -30,6 +31,11 @@ public class Library {
   private static final List<String> MANDATORY_PROPERTIES = Arrays
       .asList(new String[] { "name", "version", "author", "maintainer",
           "sentence", "paragraph", "url" });
+
+  private static final List<String> CATEGORIES = Arrays.asList(new String[] {
+      "Display", "Communication", "Signal Input/Output", "Sensors",
+      "Device Control", "Timing", "Data Storage", "Data Processing", "Other",
+      "Uncategorized" });
 
   /**
    * Scans inside a folder and create a Library object out of it. Automatically
@@ -113,6 +119,12 @@ public class Library {
     for (String arch : architectures.split(","))
       archs.add(arch.trim());
 
+    String category = properties.get("category");
+    if (category == null)
+      category = "Uncategorized";
+    if (!CATEGORIES.contains(category))
+      category = "Uncategorized";
+
     Library res = new Library();
     res.folder = libFolder;
     res.srcFolder = srcFolder;
@@ -123,6 +135,7 @@ public class Library {
     res.sentence = properties.get("sentence").trim();
     res.paragraph = properties.get("paragraph").trim();
     res.url = properties.get("url").trim();
+    res.category = category.trim();
     res.architectures = archs;
     res.useRecursion = useRecursion;
     res.isLegacy = false;
@@ -181,6 +194,14 @@ public class Library {
 
   public String getUrl() {
     return url;
+  }
+
+  public String getCategory() {
+    return category;
+  }
+
+  public static List<String> getCategories() {
+    return CATEGORIES;
   }
 
   public String getVersion() {
