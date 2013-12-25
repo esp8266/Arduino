@@ -22,6 +22,7 @@ public class Library {
   private String paragraph;
   private String url;
   private String category;
+  private String license;
   private List<String> architectures;
   private File folder;
   private File srcFolder;
@@ -125,6 +126,10 @@ public class Library {
     if (!CATEGORIES.contains(category))
       category = "Uncategorized";
 
+    String license = properties.get("license");
+    if (license == null)
+      license = "Unspecified";
+
     Library res = new Library();
     res.folder = libFolder;
     res.srcFolder = srcFolder;
@@ -136,6 +141,7 @@ public class Library {
     res.paragraph = properties.get("paragraph").trim();
     res.url = properties.get("url").trim();
     res.category = category.trim();
+    res.license = license.trim();
     res.architectures = archs;
     res.useRecursion = useRecursion;
     res.isLegacy = false;
@@ -198,6 +204,10 @@ public class Library {
 
   public String getCategory() {
     return category;
+  }
+
+  public String getLicense() {
+    return license;
   }
 
   public static List<String> getCategories() {
