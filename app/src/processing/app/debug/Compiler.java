@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -102,14 +103,19 @@ public class Compiler implements MessageConsumer {
     if (verbose)
       System.out.println();
 
-    String arch = Base.getTargetPlatform().getId();
+    List<String> archs = new ArrayList<String>();
+    archs.add(Base.getTargetPlatform().getId());
+    if (prefs.containsKey("architecture.override_check")) {
+      String[] overrides = prefs.get("architecture.override_check").split(",");
+      archs.addAll(Arrays.asList(overrides));
+    }
     for (Library lib : sketch.getImportedLibraries()) {
-      if (!lib.supportsArchitecture(arch)) {
+      if (!lib.supportsArchitecture(archs)) {
         System.err.println(I18n
             .format(_("WARNING: library {0} claims to run on {1} "
                 + "architecture(s) and may be incompatible with your"
-                + " current board which runs on [{2}] architecture."), lib
-                .getName(), lib.getArchitectures(), arch));
+                + " current board which runs on {2} architecture(s)."), lib
+                .getName(), lib.getArchitectures(), archs));
         System.err.println();
       }
     }

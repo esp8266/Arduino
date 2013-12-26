@@ -1,7 +1,5 @@
 package processing.app.packages;
 
-import static processing.app.helpers.StringUtils.wildcardMatch;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -160,9 +158,30 @@ public class Library {
     return res;
   }
 
+  /**
+   * Returns <b>true</b> if the library declares to support the specified
+   * architecture (through the "architectures" property field).
+   * 
+   * @param reqArch
+   * @return
+   */
   public boolean supportsArchitecture(String reqArch) {
-    for (String arch : architectures)
-      if (wildcardMatch(reqArch, arch))
+    return architectures.contains(reqArch) || architectures.contains("*");
+  }
+
+  /**
+   * Returns <b>true</b> if the library declares to support at least one of the
+   * specified architectures.
+   * 
+   * @param reqArchs
+   *          A List of architectures to check
+   * @return
+   */
+  public boolean supportsArchitecture(List<String> reqArchs) {
+    if (reqArchs.contains("*"))
+      return true;
+    for (String reqArch : reqArchs)
+      if (supportsArchitecture(reqArch))
         return true;
     return false;
   }
