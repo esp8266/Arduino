@@ -41,7 +41,7 @@ size_t Print::write(const uint8_t *buffer, size_t size)
 
 size_t Print::print(const __FlashStringHelper *ifsh)
 {
-  const char PROGMEM *p = (const char PROGMEM *)ifsh;
+  const char *p = reinterpret_cast<const char *>(ifsh);
   size_t n = 0;
   while (1) {
     unsigned char c = pgm_read_byte(p++);
