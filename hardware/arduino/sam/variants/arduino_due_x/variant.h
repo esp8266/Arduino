@@ -66,6 +66,7 @@ extern "C"{
 #define portOutputRegister(port)   ( &(port->PIO_ODSR) )
 #define portInputRegister(port)    ( &(port->PIO_PDSR) )
 //#define portModeRegister(P)        (  )
+#define digitalPinHasPWM(P)        ( g_APinDescription[P].ulPWMChannel != NOT_ON_PWM || g_APinDescription[P].ulTCChannel != NOT_ON_TIMER )
 
 // Interrupts
 #define digitalPinToInterrupt(p)  ((p) < NUM_DIGITAL_PINS ? (p) : -1)
