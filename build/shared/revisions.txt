@@ -13,6 +13,7 @@ ARDUINO 1.5.6 BETA
 * sam: Fixed regression in analogRead() (fails to read multiple channels) (Mark Tillotson)
 * sam: Optimized delayMicroseconds() (Rob Tillaart) #1121
 * Optimized Print::print(String&) method, now uses internal string buffer to perform block write
+* Improved portability of String class (maniacbug) #695
 
 ARDUINO 1.5.5 BETA 2013.11.28
 
