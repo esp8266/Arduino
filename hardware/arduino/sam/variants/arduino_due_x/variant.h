@@ -59,6 +59,14 @@ extern "C"{
 #define NUM_DIGITAL_PINS     (54u)
 #define NUM_ANALOG_INPUTS    (12u)
 
+#define digitalPinToPort(P)        ( g_APinDescription[P].pPort )
+#define digitalPinToBitMask(P)     ( g_APinDescription[P].ulPin )
+#define digitalPinToTimer(P)       (  )
+//#define analogInPinToBit(P)        ( )
+#define portOutputRegister(port)   ( &(port->PIO_ODSR) )
+#define portInputRegister(port)    ( &(port->PIO_PDSR) )
+//#define portModeRegister(P)        (  )
+
 // Interrupts
 #define digitalPinToInterrupt(p)  ((p) < NUM_DIGITAL_PINS ? (p) : -1)
 
