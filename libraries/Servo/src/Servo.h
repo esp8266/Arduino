@@ -59,7 +59,13 @@
  */
 
 // Architecture specific include
-#include <ServoTimers.h>
+#if defined(ARDUINO_ARCH_AVR)
+#include "avr/ServoTimers.h"
+#elif defined(ARDUINO_ARCH_SAM)
+#include "sam/ServoTimers.h"
+#else
+#error "This library only supports boards with an AVR or SAM processor."
+#endif
 
 #define Servo_VERSION           2     // software version of this library
 
