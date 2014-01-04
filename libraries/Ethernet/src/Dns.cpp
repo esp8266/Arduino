@@ -4,7 +4,7 @@
 
 #include "utility/w5100.h"
 #include "EthernetUdp.h"
-#include "util.h"
+#include "utility/util.h"
 
 #include "Dns.h"
 #include <string.h>
