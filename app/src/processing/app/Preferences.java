@@ -231,7 +231,6 @@ public class Preferences {
 
     // set some runtime constants (not saved on preferences file)
     File hardwareFolder = Base.getHardwareFolder();
-    table.put("runtime.hardware.path", hardwareFolder.getAbsolutePath());
     table.put("runtime.ide.path", hardwareFolder.getParentFile().getAbsolutePath());
     table.put("runtime.ide.version", "" + Base.REVISION);
     
