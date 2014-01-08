@@ -1,4 +1,11 @@
 
+ARDUINO 1.0.5-r2 - 2014.01.08
+
+* Signed drivers for Windows 8.1
+* Fixed Windows drivers signature (that prevented installation on
+  some Windows 8.x OS). Now the signature is timestamped and should
+  not expire.
+
 ARDUINO 1.0.5 - 2013.05.15
 
 [core]
