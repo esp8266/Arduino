@@ -38,7 +38,6 @@ import processing.app.preproc.*;
 import processing.core.*;
 import static processing.app.I18n._;
 
-import java.awt.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;

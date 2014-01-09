@@ -1323,8 +1323,6 @@ public class Base {
     } catch (IOException e) {
       showWarning(_("Error"), _("Error loading libraries"), e);
     }
-    String currentArch = Base.getTargetPlatform().getId();
-    libraries = libraries.filterByArchitecture(currentArch);
 
     // Populate importToLibraryTable
     importToLibraryTable = new HashMap<String, Library>();

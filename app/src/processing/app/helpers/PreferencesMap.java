@@ -265,4 +265,37 @@ public class PreferencesMap extends LinkedHashMap<String, String> {
   public String toString() {
     return toString("");
   }
+
+  /**
+   * Creates a new File instance by converting the value of the key into an
+   * abstract pathname. If the the given key doesn't exists or his value is the
+   * empty string, the result is <b>null</b>.
+   * 
+   * @param key
+   * @return
+   */
+  public File getFile(String key) {
+    if (!containsKey(key))
+      return null;
+    String path = get(key).trim();
+    if (path.length() == 0)
+      return null;
+    return new File(path);
+  }
+
+  /**
+   * Creates a new File instance by converting the value of the key into an
+   * abstract pathname with the specified sub folder. If the the given key
+   * doesn't exists or his value is the empty string, the result is <b>null</b>.
+   * 
+   * @param key
+   * @param subFolder
+   * @return
+   */
+  public File getFile(String key, String subFolder) {
+    File file = getFile(key);
+    if (file == null)
+      return null;
+    return new File(file, subFolder);
+  }
 }
