@@ -39,7 +39,7 @@ Signature="$Windows NT$"
 Provider=%ManufacturerName%
 DriverPackageDisplayName=%DriverPackageDisplayName%
 CatalogFile=arduino.cat
-DriverVer=01/01/2013,1.0.0.0
+DriverVer=01/04/2013,1.0.0.0
 
 [Manufacturer]
 %ManufacturerName%=DeviceList, NTamd64, NTia64
