@@ -281,11 +281,6 @@ HardwareSerial::HardwareSerial(
 
 // Public Methods //////////////////////////////////////////////////////////////
 
-void HardwareSerial::begin(unsigned long baud)
-{
-  begin(baud, SERIAL_8N1);
-}
-
 void HardwareSerial::begin(unsigned long baud, byte config)
 {
   uint16_t baud_setting;
@@ -400,10 +395,6 @@ size_t HardwareSerial::write(uint8_t c)
   sbi(*_ucsra, TXC0);
   
   return 1;
-}
-
-HardwareSerial::operator bool() {
-	return true;
 }
 
 // Preinstantiate Objects //////////////////////////////////////////////////////
