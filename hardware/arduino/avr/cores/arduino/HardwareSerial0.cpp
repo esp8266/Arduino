@@ -1,5 +1,6 @@
 #include "Arduino.h"
 #include "HardwareSerial.h"
+#include "HardwareSerial_private.h"
 
 // Each HardwareSerial is defined in its own file, sine the linker pulls
 // in the entire file when any element inside is used. --gc-sections can

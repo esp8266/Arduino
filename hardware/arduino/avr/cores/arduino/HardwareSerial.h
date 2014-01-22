@@ -66,12 +66,12 @@
 class HardwareSerial : public Stream
 {
   protected:
-    volatile uint8_t *_ubrrh;
-    volatile uint8_t *_ubrrl;
-    volatile uint8_t *_ucsra;
-    volatile uint8_t *_ucsrb;
-    volatile uint8_t *_ucsrc;
-    volatile uint8_t *_udr;
+    volatile uint8_t * const _ubrrh;
+    volatile uint8_t * const _ubrrl;
+    volatile uint8_t * const _ucsra;
+    volatile uint8_t * const _ucsrb;
+    volatile uint8_t * const _ucsrc;
+    volatile uint8_t * const _udr;
     // Has any byte been written to the UART since begin()
     bool _written;
 
@@ -87,7 +87,7 @@ class HardwareSerial : public Stream
     unsigned char _tx_buffer[SERIAL_BUFFER_SIZE];
 
   public:
-    HardwareSerial(
+    inline HardwareSerial(
       volatile uint8_t *ubrrh, volatile uint8_t *ubrrl,
       volatile uint8_t *ucsra, volatile uint8_t *ucsrb,
       volatile uint8_t *ucsrc, volatile uint8_t *udr);
@@ -107,7 +107,7 @@ class HardwareSerial : public Stream
     operator bool() { return true; }
 
     // Interrupt handlers - Not intended to be called externally
-    void _rx_complete_irq(void);
+    inline void _rx_complete_irq(void);
     void _tx_udr_empty_irq(void);
 };
 
