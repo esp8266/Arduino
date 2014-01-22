@@ -547,7 +547,7 @@ public class Compiler implements MessageConsumer {
       avrBasePath + "avr-gcc",
       "-c", // compile, don't link
       "-g", // include debugging info (so errors include line numbers)
-      "-assembler-with-cpp",
+      "-x","assembler-with-cpp",
       "-mmcu=" + boardPreferences.get("build.mcu"),
       "-DF_CPU=" + boardPreferences.get("build.f_cpu"),      
       "-DARDUINO=" + Base.REVISION,
