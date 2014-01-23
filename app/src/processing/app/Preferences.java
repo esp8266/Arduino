@@ -218,7 +218,7 @@ public class Preferences {
   static File preferencesFile;
 
 
-  static protected void init(String commandLinePrefs) {
+  static protected void init(String args[]) {
 
     // start by loading the defaults, in case something
     // important was deleted from the user prefs
@@ -250,41 +250,31 @@ public class Preferences {
     // clone the hash table
     defaults = new Hashtable<String, String>(table);
 
-    // Load a prefs file if specified on the command line
-    if (commandLinePrefs != null) {
-      try {
-        load(new FileInputStream(commandLinePrefs));
+    // next load user preferences file
+    preferencesFile = Base.getSettingsFile(PREFS_FILE);
 
-      } catch (Exception poe) {
-        Base.showError(_("Error"),
-                       I18n.format(
-			 _("Could not read preferences from {0}"),
-			 commandLinePrefs
-		       ), poe);
+    // load a preferences file if specified on the command line
+    if (args != null) {
+      for (int i = 0; i < args.length - 1; i++) {
+        if (args[i].equals("--preferences-file"))
+          preferencesFile = new File(args[i + 1]);
       }
-    } else if (!Base.isCommandLine()) {
-      // next load user preferences file
-      preferencesFile = Base.getSettingsFile(PREFS_FILE);
-      if (!preferencesFile.exists()) {
-        // create a new preferences file if none exists
-        // saves the defaults out to the file
-        save();
+    }
 
-      } else {
-        // load the previous preferences file
-
-        try {
-          load(new FileInputStream(preferencesFile));
-
-        } catch (Exception ex) {
-          Base.showError(_("Error reading preferences"),
-			 I18n.format(
-			   _("Error reading the preferences file. " +
-			     "Please delete (or move)\n" +
-			     "{0} and restart Arduino."),
-			   preferencesFile.getAbsolutePath()
-			 ), ex);
-        }
+    if (!preferencesFile.exists()) {
+      // create a new preferences file if none exists
+      // saves the defaults out to the file
+      save();
+    } else {
+      // load the previous preferences file
+      try {
+        load(new FileInputStream(preferencesFile));
+      } catch (Exception ex) {
+        Base.showError(_("Error reading preferences"),
+                       I18n.format(_("Error reading the preferences file. "
+                                       + "Please delete (or move)\n"
+                                       + "{0} and restart Arduino."),
+                                   preferencesFile.getAbsolutePath()), ex);
       }
     }
 
