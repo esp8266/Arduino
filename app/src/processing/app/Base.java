@@ -343,35 +343,35 @@ public class Base {
       if (args[i].equals("--board")) {
         i++;
         if (i >= args.length)
-          showError(null, "Argument required for --board", 3);
+          showError(null, _("Argument required for --board"), 3);
         selectBoard = args[i];
         continue;
       }
       if (args[i].equals("--port")) {
         i++;
         if (i >= args.length)
-          showError(null, "Argument required for --port", 3);
+          showError(null, _("Argument required for --port"), 3);
         selectPort = args[i];
         continue;
       }
       if (args[i].equals("--curdir")) {
         i++;
         if (i >= args.length)
-          showError(null, "Argument required for --curdir", 3);
+          showError(null, _("Argument required for --curdir"), 3);
         currentDirectory = args[i];
         continue;
       }
       if (args[i].equals("--pref")) {
         i++;
         if (i >= args.length)
-          showError(null, "Argument required for --pref", 3);
+          showError(null, _("Argument required for --pref"), 3);
         processPrefArgument(args[i]);
         continue;
       }
       if (args[i].equals("--preferences-file")) {
         i++;
         if (i >= args.length)
-          showError(null, "Argument required for --preferences-file", 3);
+          showError(null, _("Argument required for --preferences-file"), 3);
         // Argument should be already processed by Preferences.init(...) 
         continue;
       }
