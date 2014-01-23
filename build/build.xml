@@ -46,7 +46,7 @@
     <include name="app/lib/jmdns-3.4.1.jar" />
     <include name="app/lib/jna.jar" />
     <include name="app/lib/jsch-0.1.50.jar" />
-    <include name="app/lib/jssc-2.6.0.jar" />
+    <include name="app/lib/jssc-2.8.0.jar" />
     <include name="app/lib/ant.jar" />
     <include name="app/lib/ant-launcher.jar" />
   </fileset>
