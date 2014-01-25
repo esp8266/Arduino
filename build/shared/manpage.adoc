@@ -92,6 +92,10 @@ OPTIONS
 	not given, verbose mode is disabled regardless of the current
 	preferences.
 
+*--preferences-file* __filename__::
+	Read and store preferences from the specified __filename__ instead
+	of the default one.
+
 *--pref* __name__=__value__::
 	Sets the preference __name__ to the given __value__.
 
