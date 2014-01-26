@@ -194,7 +194,7 @@ public class Sketch {
             code[codeCount++] =
               new SketchCode(new File(folder, filename));
           } else {
-            editor.console.message(I18n.format("File name {0} is invalid: ignored", filename), true, false);
+            System.err.println(I18n.format("File name {0} is invalid: ignored", filename));
           }
         }
       }

@@ -21,19 +21,12 @@
 
 package processing.app;
 
-import static processing.app.I18n._;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,24 +58,9 @@ public class EditorConsole extends JScrollPane {
   SimpleAttributeSet stdStyle;
   SimpleAttributeSet errStyle;
 
-  static File errFile;
-  static File outFile;
-  static File tempFolder;
-
   // Single static instance shared because there's only one real System.out.
   // Within the input handlers, the currentConsole variable will be used to
   // echo things to the correct location.
-  
-  static public PrintStream systemOut;
-  static public PrintStream systemErr;
-
-  static PrintStream consoleOut;
-  static PrintStream consoleErr;
-
-  static OutputStream stdoutFile;
-  static OutputStream stderrFile;
-
-  static EditorConsole currentConsole;
   
   public EditorConsole(Editor _editor) {
     editor = _editor;
@@ -136,47 +114,7 @@ public class EditorConsole extends JScrollPane {
     setPreferredSize(new Dimension(1024, (height * lines) + sizeFudge));
     setMinimumSize(new Dimension(1024, (height * 4) + sizeFudge));
 
-    if (systemOut == null) {
-      systemOut = System.out;
-      systemErr = System.err;
-
-      // Create a temporary folder which will have a randomized name. Has to
-      // be randomized otherwise another instance of Processing (or one of its
-      // sister IDEs) might collide with the file causing permissions problems.
-      // The files and folders are not deleted on exit because they may be
-      // needed for debugging or bug reporting.
-      tempFolder = Base.createTempFolder("console");
-      tempFolder.deleteOnExit();
-      try {
-        String outFileName = Preferences.get("console.output.file");
-        if (outFileName != null) {
-          outFile = new File(tempFolder, outFileName);
-          outFile.deleteOnExit();
-          stdoutFile = new FileOutputStream(outFile);
-        }
-
-        String errFileName = Preferences.get("console.error.file");
-        if (errFileName != null) {
-          errFile = new File(tempFolder, errFileName);
-          errFile.deleteOnExit();
-          stderrFile = new FileOutputStream(errFile);
-        }
-      } catch (IOException e) {
-        Base.showWarning(_("Console Error"),
-                         _("A problem occurred while trying to open the\nfiles used to store the console output."), e);
-      }
-      consoleOut = new PrintStream(new EditorConsoleStream(false));
-      consoleErr = new PrintStream(new EditorConsoleStream(true));
-
-      if (Preferences.getBoolean("console")) {
-        try {
-          System.setOut(consoleOut);
-          System.setErr(consoleErr);
-        } catch (Exception e) {
-          e.printStackTrace(systemOut);
-        }
-      }
-    }
+    EditorConsoleStream.init();
 
     // to fix ugliness.. normally macosx java 1.3 puts an
     // ugly white border around this object, so turn it off.
@@ -204,70 +142,6 @@ public class EditorConsole extends JScrollPane {
     }).start();
   }
 
-  
-  static public void setEditor(Editor editor) {
-    currentConsole = editor.console;
-  }
-  
-
-  /**
-   * Close the streams so that the temporary files can be deleted.
-   * <p/>
-   * File.deleteOnExit() cannot be used because the stdout and stderr
-   * files are inside a folder, and have to be deleted before the
-   * folder itself is deleted, which can't be guaranteed when using
-   * the deleteOnExit() method.
-   */
-  public void handleQuit() {
-    // replace original streams to remove references to console's streams
-    System.setOut(systemOut);
-    System.setErr(systemErr);
-
-    // close the PrintStream
-    consoleOut.close();
-    consoleErr.close();
-
-    // also have to close the original FileOutputStream
-    // otherwise it won't be shut down completely
-    try {
-      stdoutFile.close();
-      stderrFile.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-
-    outFile.delete();
-    errFile.delete();
-    tempFolder.delete();
-  }
-
-
-  public void write(byte b[], int offset, int length, boolean err) {
-    // we could do some cross platform CR/LF mangling here before outputting
-    // add text to output document
-    message(new String(b, offset, length), err, false);
-  }
-
-
-  // added sync for 0091.. not sure if it helps or hinders
-  synchronized public void message(String what, boolean err, boolean advance) {
-    if (err) {
-      systemErr.print(what);
-      if (advance)
-        systemErr.println();
-    } else {
-      systemOut.print(what);
-      if (advance)
-        systemOut.println();
-    }
-
-    // to console display
-    appendText(what, err);
-    if (advance)
-      appendText("\n", err);
-    // moved down here since something is punting
-  }
-
 
   /**
    * Append a piece of text to the console.
@@ -281,7 +155,7 @@ public class EditorConsole extends JScrollPane {
    * Updates are buffered to the console and displayed at regular
    * intervals on Swing's event-dispatching thread. (patch by David Mellis)
    */
-  synchronized private void appendText(String txt, boolean e) {
+  synchronized void appendText(String txt, boolean e) {
     consoleDoc.appendString(txt, e ? errStyle : stdStyle);
   }
 
@@ -292,57 +166,6 @@ public class EditorConsole extends JScrollPane {
     } catch (BadLocationException e) {
       // ignore the error otherwise this will cause an infinite loop
       // maybe not a good idea in the long run?
-    }
-  }
-  
-  
-  // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-  
-  
-  private static class EditorConsoleStream extends OutputStream {
-    final boolean err; // whether stderr or stdout
-    PrintStream system;
-    OutputStream file;
-    
-    public EditorConsoleStream(boolean _err) {
-      err = _err;
-      if (err) {
-        system = systemErr;
-        file = stderrFile;
-      } else {
-        system = systemOut;
-        file = stdoutFile;
-      }
-    }
-
-    public void close() { }
-
-    public void flush() { }
-
-    public void write(int b) {
-      write(new byte[] { (byte) b });
-    }
-
-    public void write(byte b[]) {  // appears never to be used
-      write(b, 0, b.length);
-    }
-
-    public void write(byte b[], int offset, int length) {
-      if (currentConsole != null) {
-        currentConsole.write(b, offset, length, err);
-      } else {
-        system.write(b, offset, length);
-      }
-
-      if (file != null) {
-        try {
-          file.write(b, offset, length);
-          file.flush();
-        } catch (IOException e) {
-          e.printStackTrace();
-          file = null;
-        }
-      }
     }
   }
 }
