@@ -339,10 +339,9 @@ public class Editor extends JFrame implements RunnerListener {
           new DataFlavor("text/uri-list;class=java.lang.String");
 
         if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-          java.util.List list = (java.util.List)
+          List<File> list = (List<File>)
             transferable.getTransferData(DataFlavor.javaFileListFlavor);
-          for (int i = 0; i < list.size(); i++) {
-            File file = (File) list.get(i);
+          for (File file : list) {
             if (sketch.addFile(file)) {
               successful++;
             }
@@ -853,8 +852,9 @@ public class Editor extends JFrame implements RunnerListener {
     // Class file to search for
     String classFileName = "/" + base + ".class";
 
+    ZipFile zipFile = null;
     try {
-      ZipFile zipFile = new ZipFile(file);
+      zipFile = new ZipFile(file);
       Enumeration<?> entries = zipFile.entries();
       while (entries.hasMoreElements()) {
         ZipEntry entry = (ZipEntry) entries.nextElement();
@@ -874,6 +874,12 @@ public class Editor extends JFrame implements RunnerListener {
     } catch (IOException e) {
       //System.err.println("Ignoring " + filename + " (" + e.getMessage() + ")");
       e.printStackTrace();
+    } finally {
+      if (zipFile != null)
+        try {
+          zipFile.close();
+        } catch (IOException e) {
+        }
     }
     return null;
   }
@@ -1861,9 +1867,8 @@ public class Editor extends JFrame implements RunnerListener {
 
 		} catch (BadLocationException bl) {
 			bl.printStackTrace();
-		} finally {
-			return text;
-		}
+		} 
+		return text;
 	}
 
 	protected void handleFindReference() {
