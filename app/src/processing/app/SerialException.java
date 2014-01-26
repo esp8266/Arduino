@@ -22,6 +22,7 @@ package processing.app;
 
 import java.io.IOException;
 
+@SuppressWarnings("serial")
 public class SerialException extends IOException {
   public SerialException() {
     super();

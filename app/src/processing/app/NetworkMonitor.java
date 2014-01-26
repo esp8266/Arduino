@@ -28,7 +28,6 @@ public class NetworkMonitor extends AbstractMonitor {
   private MessageSiphon inputConsumer;
   private Session session;
   private Channel channel;
-  private MessageSiphon errorConsumer;
   private int connectionAttempts;
 
   public NetworkMonitor(BoardPort port, Base base) {
@@ -98,7 +97,7 @@ public class NetworkMonitor extends AbstractMonitor {
     channel.connect();
 
     inputConsumer = new MessageSiphon(inputStream, this);
-    errorConsumer = new MessageSiphon(errStream, this);
+    new MessageSiphon(errStream, this);
 
     if (connectionAttempts > 1) {
       SwingUtilities.invokeLater(new Runnable() {

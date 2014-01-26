@@ -27,6 +27,7 @@ import java.awt.event.ActionListener;
 
 import static processing.app.I18n._;
 
+@SuppressWarnings("serial")
 public class SerialMonitor extends AbstractMonitor {
 
   private final String port;

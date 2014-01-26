@@ -1,5 +1,3 @@
-/* -*- mode: jde; c-basic-offset: 2; indent-tabs-mode: nil -*- */
-
 /*
   Copyright (c) 2007 David A. Mellis
 
@@ -20,6 +18,7 @@
 
 package processing.app;
 
+@SuppressWarnings("serial")
 public class SerialNotFoundException extends SerialException {
   public SerialNotFoundException() {
     super();

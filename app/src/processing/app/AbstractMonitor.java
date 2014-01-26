@@ -14,6 +14,7 @@ import java.awt.event.WindowEvent;
 
 import static processing.app.I18n._;
 
+@SuppressWarnings("serial")
 public abstract class AbstractMonitor extends JFrame implements MessageConsumer {
 
   protected final JLabel noLineEndingAlert;
