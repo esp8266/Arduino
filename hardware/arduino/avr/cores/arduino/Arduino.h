@@ -88,6 +88,10 @@ void yield(void);
 #define bitClear(value, bit) ((value) &= ~(1UL << (bit)))
 #define bitWrite(value, bit, bitvalue) (bitvalue ? bitSet(value, bit) : bitClear(value, bit))
 
+// avr-libc defines _NOP() since 1.6.2
+#ifndef _NOP
+#define _NOP() do { __asm__ volatile ("nop"); } while (0)
+#endif
 
 typedef unsigned int word;
 
@@ -196,6 +200,10 @@ extern const uint8_t PROGMEM digital_pin_to_timer_PGM[];
 #include "WCharacter.h"
 #include "WString.h"
 #include "HardwareSerial.h"
+#include "USBAPI.h"
+#if defined(HAVE_HWSERIAL0) && defined(HAVE_CDCSERIAL)
+#error "Targets with both UART0 and CDC serial not supported"
+#endif
 
 uint16_t makeWord(uint16_t w);
 uint16_t makeWord(byte h, byte l);

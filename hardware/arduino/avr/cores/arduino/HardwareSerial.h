@@ -37,55 +37,6 @@
   #define SERIAL_BUFFER_SIZE 64
 #endif
 
-class HardwareSerial : public Stream
-{
-  protected:
-    volatile uint8_t *_ubrrh;
-    volatile uint8_t *_ubrrl;
-    volatile uint8_t *_ucsra;
-    volatile uint8_t *_ucsrb;
-    volatile uint8_t *_ucsrc;
-    volatile uint8_t *_udr;
-    uint8_t _rxen;
-    uint8_t _txen;
-    uint8_t _rxcie;
-    uint8_t _udrie;
-    uint8_t _u2x;
-    bool transmitting;
-
-  public:
-    volatile uint8_t _rx_buffer_head;
-    volatile uint8_t _rx_buffer_tail;
-    volatile uint8_t _tx_buffer_head;
-    volatile uint8_t _tx_buffer_tail;
-
-    // Don't put any members after these buffers, since only the first
-    // 32 bytes of this struct can be accessed quickly using the ldd
-    // instruction.
-    unsigned char _rx_buffer[SERIAL_BUFFER_SIZE];
-    unsigned char _tx_buffer[SERIAL_BUFFER_SIZE];
-
-    HardwareSerial(
-      volatile uint8_t *ubrrh, volatile uint8_t *ubrrl,
-      volatile uint8_t *ucsra, volatile uint8_t *ucsrb,
-      volatile uint8_t *ucsrc, volatile uint8_t *udr,
-      uint8_t rxen, uint8_t txen, uint8_t rxcie, uint8_t udrie, uint8_t u2x);
-    void begin(unsigned long);
-    void begin(unsigned long, uint8_t);
-    void end();
-    virtual int available(void);
-    virtual int peek(void);
-    virtual int read(void);
-    virtual void flush(void);
-    virtual size_t write(uint8_t);
-    inline size_t write(unsigned long n) { return write((uint8_t)n); }
-    inline size_t write(long n) { return write((uint8_t)n); }
-    inline size_t write(unsigned int n) { return write((uint8_t)n); }
-    inline size_t write(int n) { return write((uint8_t)n); }
-    using Print::write; // pull in write(str) and write(buf, size) from Print
-    operator bool();
-};
-
 // Define config for Serial.begin(baud, config);
 #define SERIAL_5N1 0x00
 #define SERIAL_6N1 0x02
@@ -112,20 +63,69 @@ class HardwareSerial : public Stream
 #define SERIAL_7O2 0x3C
 #define SERIAL_8O2 0x3E
 
+class HardwareSerial : public Stream
+{
+  protected:
+    volatile uint8_t * const _ubrrh;
+    volatile uint8_t * const _ubrrl;
+    volatile uint8_t * const _ucsra;
+    volatile uint8_t * const _ucsrb;
+    volatile uint8_t * const _ucsrc;
+    volatile uint8_t * const _udr;
+    // Has any byte been written to the UART since begin()
+    bool _written;
+
+    volatile uint8_t _rx_buffer_head;
+    volatile uint8_t _rx_buffer_tail;
+    volatile uint8_t _tx_buffer_head;
+    volatile uint8_t _tx_buffer_tail;
+
+    // Don't put any members after these buffers, since only the first
+    // 32 bytes of this struct can be accessed quickly using the ldd
+    // instruction.
+    unsigned char _rx_buffer[SERIAL_BUFFER_SIZE];
+    unsigned char _tx_buffer[SERIAL_BUFFER_SIZE];
+
+  public:
+    inline HardwareSerial(
+      volatile uint8_t *ubrrh, volatile uint8_t *ubrrl,
+      volatile uint8_t *ucsra, volatile uint8_t *ucsrb,
+      volatile uint8_t *ucsrc, volatile uint8_t *udr);
+    void begin(unsigned long baud) { begin(baud, SERIAL_8N1); }
+    void begin(unsigned long, uint8_t);
+    void end();
+    virtual int available(void);
+    virtual int peek(void);
+    virtual int read(void);
+    virtual void flush(void);
+    virtual size_t write(uint8_t);
+    inline size_t write(unsigned long n) { return write((uint8_t)n); }
+    inline size_t write(long n) { return write((uint8_t)n); }
+    inline size_t write(unsigned int n) { return write((uint8_t)n); }
+    inline size_t write(int n) { return write((uint8_t)n); }
+    using Print::write; // pull in write(str) and write(buf, size) from Print
+    operator bool() { return true; }
+
+    // Interrupt handlers - Not intended to be called externally
+    inline void _rx_complete_irq(void);
+    void _tx_udr_empty_irq(void);
+};
+
 #if defined(UBRRH) || defined(UBRR0H)
   extern HardwareSerial Serial;
-#elif defined(USBCON)
-  #include "USBAPI.h"
-//  extern HardwareSerial Serial_;  
+  #define HAVE_HWSERIAL0
 #endif
 #if defined(UBRR1H)
   extern HardwareSerial Serial1;
+  #define HAVE_HWSERIAL1
 #endif
 #if defined(UBRR2H)
   extern HardwareSerial Serial2;
+  #define HAVE_HWSERIAL2
 #endif
 #if defined(UBRR3H)
   extern HardwareSerial Serial3;
+  #define HAVE_HWSERIAL3
 #endif
 
 extern void serialEventRun(void) __attribute__((weak));
