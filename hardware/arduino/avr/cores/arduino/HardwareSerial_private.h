@@ -88,7 +88,7 @@ void HardwareSerial::_rx_complete_irq(void)
     }
   } else {
     // Parity error, read byte but discard it
-    unsigned char c = *_udr;
+    *_udr;
   };
 }
 
