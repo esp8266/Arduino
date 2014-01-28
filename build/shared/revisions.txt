@@ -13,6 +13,17 @@ ARDUINO 1.5.6 BETA
 * Ethernet: added operator == for EthernetClient class (Norbert Truchsess)
 
 [core]
+* avr: Pile of HardwareSerial improvements (Matthijs Kooijman)
+  - Remove duplicate code from HardwareSerial::begin() methods
+  - Simplify HardwareSerial::begin() (Rob Tillaart)
+  - Use constants for register bit positions in HardwareSerial
+  - Fix HardwareSerial::flush() when interrupts are kept disabled for a while
+  - Fix lockup when writing to HardwareSerial with interrupts disabled
+  - Disable the UDRE interrupt sooner in HardwareSerial (Nathan Blackwell)
+  - Put each HardwareSerial instance in its own .cpp file in order to save memory
+    for unused UARTS
+  - In HardwareSerial::write, bypass the queue when it's empty in order to
+    improve throughput when using high baudrates (KurtE)
 * sam: Fixed wrap-around bug in delay() (Mark Tillotson)
 * sam: Fixed regression in analogRead() (fails to read multiple channels) (Mark Tillotson)
 * sam: Optimized delayMicroseconds() (Rob Tillaart) #1121
