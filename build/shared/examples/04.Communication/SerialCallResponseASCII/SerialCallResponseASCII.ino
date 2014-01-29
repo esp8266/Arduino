@@ -91,6 +91,7 @@ void setup() {
   size(640,480);
 
   // List all the available serial ports
+ // if using Processing 2.1 or later, use Serial.printArray()
   println(Serial.list());
 
   // I know that the first port in the serial list on my mac

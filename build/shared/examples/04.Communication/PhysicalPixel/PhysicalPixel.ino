@@ -84,6 +84,7 @@ void loop() {
  // You will need to choose the port that the Arduino board is 
  // connected to from this list. The first port in the list is 
  // port #0 and the third port in the list is port #2. 
+ // if using Processing 2.1 or later, use Serial.printArray()
  println(Serial.list()); 
  
  // Open the port that the Arduino board is connected to (in this case #0) 

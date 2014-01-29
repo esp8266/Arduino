@@ -92,7 +92,8 @@ void setup() {
   xpos = width/2;
   ypos = height/2;
 
-  // Print a list of the serial ports, for debugging purposes:
+  // Print a list of the serial ports for debugging purposes
+  // if using Processing 2.1 or later, use Serial.printArray()
   println(Serial.list());
 
   // I know that the first port in the serial list on my mac

@@ -55,6 +55,7 @@ void loop() {
  size(256, 150);
  
  println("Available serial ports:");
+ // if using Processing 2.1 or later, use Serial.printArray()
  println(Serial.list());
  
  // Uses the first port in this list (number 0).  Change this to
