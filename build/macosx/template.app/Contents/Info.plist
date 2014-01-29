@@ -76,7 +76,7 @@
       <!-- In 0149, removed /System/Library/Java from the CLASSPATH because
            it can cause problems if users have installed weird files there.
            http://dev.processing.org/bugs/show_bug.cgi?id=1045 -->
-      <string>$JAVAROOT/pde.jar:$JAVAROOT/core.jar:$JAVAROOT/antlr.jar:$JAVAROOT/ecj.jar:$JAVAROOT/registry.jar:$JAVAROOT/quaqua.jar:$JAVAROOT/jssc-2.6.0.jar:$JAVAROOT/commons-codec-1.7.jar:$JAVAROOT/commons-exec-1.1.jar:$JAVAROOT/commons-httpclient-3.1.jar:$JAVAROOT/commons-logging-1.0.4.jar:$JAVAROOT/jmdns-3.4.1.jar:$JAVAROOT/jsch-0.1.50.jar</string>
+      <string>$JAVAROOT/pde.jar:$JAVAROOT/core.jar:$JAVAROOT/antlr.jar:$JAVAROOT/ecj.jar:$JAVAROOT/registry.jar:$JAVAROOT/quaqua.jar:$JAVAROOT/jssc-2.8.0.jar:$JAVAROOT/commons-codec-1.7.jar:$JAVAROOT/commons-exec-1.1.jar:$JAVAROOT/commons-httpclient-3.1.jar:$JAVAROOT/commons-logging-1.0.4.jar:$JAVAROOT/jmdns-3.4.1.jar:$JAVAROOT/jsch-0.1.50.jar</string>
 
       <key>JVMArchs</key>  
       <array>  
