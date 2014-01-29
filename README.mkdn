@@ -25,12 +25,13 @@ giving your work a higher chance of being integrated into the official release
 https://groups.google.com/a/arduino.cc/forum/#!forum/developers
 
 INSTALLATION
-----------
+------------
 Detailed instructions are in reference/Guide_Windows.html and
 reference/Guide_MacOSX.html.  For Linux, see the Arduino playground:
 http://www.arduino.cc/playground/Learning/Linux
 
 CREDITS
+--------
 Arduino is an open source project, supported by many.
 
 The Arduino team is composed of Massimo Banzi, David Cuartielles, Tom Igoe,
