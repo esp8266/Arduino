@@ -40,7 +40,6 @@ import static processing.app.I18n._;
 
 import java.io.*;
 import java.util.*;
-import java.util.List;
 
 import javax.swing.*;
 
@@ -75,7 +74,9 @@ public class Sketch {
   private File codeFolder;
 
   private SketchCode current;
+  private SketchCodeDocument currentCodeDoc;
   private int currentIndex;
+
   /**
    * Number of sketchCode objects (tabs) in the current sketch. Note that this
    * will be the same as code.length, because the getCode() method returns
@@ -84,8 +85,8 @@ public class Sketch {
    * http://dev.processing.org/bugs/show_bug.cgi?id=940
    */
   private int codeCount;
-  private SketchCode[] code;
-
+  private SketchCodeDocument[] codeDocs;
+  
   /** Class name for the PApplet, as determined by the preprocessor. */
   private String appletClassName;
   /** Class path determined during build. */
@@ -168,7 +169,7 @@ public class Sketch {
     // external editor event. (fix for 0099)
     codeCount = 0;
 
-    code = new SketchCode[list.length];
+    codeDocs = new SketchCodeDocument[list.length];
 
     List<String> extensions = getExtensions();
 
@@ -191,8 +192,8 @@ public class Sketch {
           // Don't allow people to use files with invalid names, since on load,
           // it would be otherwise possible to sneak in nasty filenames. [0116]
           if (Sketch.isSanitaryName(base)) {
-            code[codeCount++] =
-              new SketchCode(new File(folder, filename));
+            codeDocs[codeCount++] =
+              new SketchCodeDocument(new File(folder, filename));
           } else {
             System.err.println(I18n.format("File name {0} is invalid: ignored", filename));
           }
@@ -204,16 +205,16 @@ public class Sketch {
       throw new IOException(_("No valid code files found"));
 
     // Remove any code that wasn't proper
-    code = (SketchCode[]) PApplet.subset(code, 0, codeCount);
+    codeDocs = (SketchCodeDocument[]) PApplet.subset(codeDocs, 0, codeCount);
 
     // move the main class to the first tab
     // start at 1, if it's at zero, don't bother
     for (int i = 1; i < codeCount; i++) {
       //if (code[i].file.getName().equals(mainFilename)) {
-      if (code[i].getFile().equals(primaryFile)) {
-        SketchCode temp = code[0];
-        code[0] = code[i];
-        code[i] = temp;
+      if (codeDocs[i].getCode().getFile().equals(primaryFile)) {
+        SketchCodeDocument temp = codeDocs[0];
+        codeDocs[0] = codeDocs[i];
+        codeDocs[i] = temp;
         break;
       }
     }
@@ -230,8 +231,8 @@ public class Sketch {
 
   protected void replaceCode(SketchCode newCode) {
     for (int i = 0; i < codeCount; i++) {
-      if (code[i].getFileName().equals(newCode.getFileName())) {
-        code[i] = newCode;
+      if (codeDocs[i].getCode().getFileName().equals(newCode.getFileName())) {
+        codeDocs[i].setCode(newCode);
         break;
       }
     }
@@ -244,7 +245,7 @@ public class Sketch {
 
     // add file to the code/codeCount list, resort the list
     //if (codeCount == code.length) {
-      code = (SketchCode[]) PApplet.append(code, newCode);
+      codeDocs = (SketchCodeDocument[]) PApplet.append(codeDocs, newCode);
     codeCount++;
     //}
     //code[codeCount++] = newCode;
@@ -257,14 +258,14 @@ public class Sketch {
     for (int i = 1; i < codeCount; i++) {
       int who = i;
       for (int j = i + 1; j < codeCount; j++) {
-        if (code[j].getFileName().compareTo(code[who].getFileName()) < 0) {
+        if (codeDocs[j].getCode().getFileName().compareTo(codeDocs[who].getCode().getFileName()) < 0) {
           who = j;  // this guy is earlier in the alphabet
         }
       }
       if (who != i) {  // swap with someone if changes made
-        SketchCode temp = code[who];
-        code[who] = code[i];
-        code[i] = temp;
+        SketchCodeDocument temp = codeDocs[who];
+        codeDocs[who] = codeDocs[i];
+        codeDocs[i] = temp;
       }
     }
   }
@@ -379,7 +380,7 @@ public class Sketch {
     // Don't let the user create the main tab as a .java file instead of .pde
     if (!isDefaultExtension(newExtension)) {
       if (renamingCode) {  // If creating a new tab, don't show this error
-        if (current == code[0]) {  // If this is the main tab, disallow
+        if (current == codeDocs[0].getCode()) {  // If this is the main tab, disallow
           Base.showWarning(_("Problem with rename"),
                            _("The main file can't use an extension.\n" +
                              "(It may be time for your to graduate to a\n" +
@@ -401,12 +402,12 @@ public class Sketch {
     // In Arduino, we want to allow files with the same name but different
     // extensions, so compare the full names (including extensions).  This
     // might cause problems: http://dev.processing.org/bugs/show_bug.cgi?id=543
-    for (SketchCode c : code) {
-      if (newName.equalsIgnoreCase(c.getFileName())) {
+    for (SketchCodeDocument c : codeDocs) {
+      if (newName.equalsIgnoreCase(c.getCode().getFileName())) {
         Base.showMessage(_("Nope"),
                          I18n.format(
 			   _("A file named \"{0}\" already exists in \"{1}\""),
-			   c.getFileName(),
+			   c.getCode().getFileName(),
 			   folder.getAbsolutePath()
 			 ));
         return;
@@ -424,8 +425,8 @@ public class Sketch {
 
     if (renamingCode && currentIndex == 0) {
       for (int i = 1; i < codeCount; i++) {
-        if (sanitaryName.equalsIgnoreCase(code[i].getPrettyName()) &&
-          code[i].isExtension("cpp")) {
+        if (sanitaryName.equalsIgnoreCase(codeDocs[i].getCode().getPrettyName()) &&
+          codeDocs[i].getCode().isExtension("cpp")) {
           Base.showMessage(_("Nope"),
                            I18n.format(
 			     _("You can't rename the sketch to \"{0}\"\n" +
@@ -500,7 +501,7 @@ public class Sketch {
         // save each of the other tabs because this is gonna be re-opened
         try {
           for (int i = 1; i < codeCount; i++) {
-            code[i].save();
+            codeDocs[i].getCode().save();
           }
         } catch (Exception e) {
           Base.showWarning(_("Error"), _("Could not rename the sketch. (1)"), e);
@@ -644,12 +645,12 @@ public class Sketch {
     // remove it from the internal list of files
     // resort internal list of files
     for (int i = 0; i < codeCount; i++) {
-      if (code[i] == which) {
+      if (codeDocs[i].getCode() == which) {
         for (int j = i; j < codeCount-1; j++) {
-          code[j] = code[j+1];
+          codeDocs[j] = codeDocs[j+1];
         }
         codeCount--;
-        code = (SketchCode[]) PApplet.shorten(code);
+        codeDocs = (SketchCodeDocument[]) PApplet.shorten(codeDocs);
         return;
       }
     }
@@ -689,7 +690,7 @@ public class Sketch {
   protected void calcModified() {
     modified = false;
     for (int i = 0; i < codeCount; i++) {
-      if (code[i].isModified()) {
+      if (codeDocs[i].getCode().isModified()) {
         modified = true;
         break;
       }
@@ -773,8 +774,8 @@ public class Sketch {
     }
 
     for (int i = 0; i < codeCount; i++) {
-      if (code[i].isModified())
-        code[i].save();
+      if (codeDocs[i].getCode().isModified())
+        codeDocs[i].getCode().save();
     }
     calcModified();
     return true;
@@ -782,13 +783,13 @@ public class Sketch {
 
 
   protected boolean renameCodeToInoExtension(File pdeFile) {
-    for (SketchCode c : code) {
-      if (!c.getFile().equals(pdeFile))
+    for (SketchCodeDocument c : codeDocs) {
+      if (!c.getCode().getFile().equals(pdeFile))
         continue;
 
       String pdeName = pdeFile.getPath();
       pdeName = pdeName.substring(0, pdeName.length() - 4) + ".ino";
-      return c.renameTo(new File(pdeName));
+      return c.getCode().renameTo(new File(pdeName));
     }
     return false;
   }
@@ -834,8 +835,8 @@ public class Sketch {
     // but ignore this situation for the first tab, since it's probably being
     // resaved (with the same name) to another location/folder.
     for (int i = 1; i < codeCount; i++) {
-      if (newName.equalsIgnoreCase(code[i].getPrettyName()) &&
-        code[i].isExtension("cpp")) {
+      if (newName.equalsIgnoreCase(codeDocs[i].getCode().getPrettyName()) &&
+        codeDocs[i].getCode().isExtension("cpp")) {
         Base.showMessage(_("Nope"),
 			 I18n.format(
                            _("You can't save the sketch as \"{0}\"\n" +
@@ -886,8 +887,8 @@ public class Sketch {
 
     // save the other tabs to their new location
     for (int i = 1; i < codeCount; i++) {
-      File newFile = new File(newFolder, code[i].getFileName());
-      code[i].saveAs(newFile);
+      File newFile = new File(newFolder, codeDocs[i].getCode().getFileName());
+      codeDocs[i].getCode().saveAs(newFile);
     }
 
     // re-copy the data folder (this may take a while.. add progress bar?)
@@ -912,7 +913,7 @@ public class Sketch {
 
     // save the main tab with its new name
     File newFile = new File(newFolder, newName + ".ino");
-    code[0].saveAs(newFile);
+    codeDocs[0].getCode().saveAs(newFile);
 
     editor.handleOpenUnchecked(newFile,
                                currentIndex,
@@ -1095,7 +1096,7 @@ public class Sketch {
       if (editor.untitled) {  // TODO probably not necessary? problematic?
         // If a file has been added, mark the main code as modified so
         // that the sketch is properly saved.
-        code[0].setModified(true);
+        codeDocs[0].getCode().setModified(true);
       }
     }
     return true;
@@ -1155,16 +1156,18 @@ public class Sketch {
 
     // get the text currently being edited
     if (current != null) {
-      current.setState(editor.getText(),
-                       editor.getSelectionStart(),
-                       editor.getSelectionStop(),
-                       editor.getScrollPosition());
+      current.setProgram(editor.getText());
+      currentCodeDoc.setSelectionStart(editor.getSelectionStart());
+      currentCodeDoc.setSelectionStop(editor.getSelectionStop());
+      currentCodeDoc.setScrollPosition(editor.getScrollPosition());
     }
 
-    current = code[which];
+    currentCodeDoc = codeDocs[which];
+    current = currentCodeDoc.getCode();
     currentIndex = which;
 
-    editor.setCode(current);
+    editor.setCode(currentCodeDoc);
+
     editor.header.rebuild();
   }
 
@@ -1175,8 +1178,8 @@ public class Sketch {
    */
   protected void setCurrentCode(String findName) {
     for (int i = 0; i < codeCount; i++) {
-      if (findName.equals(code[i].getFileName()) ||
-          findName.equals(code[i].getPrettyName())) {
+      if (findName.equals(codeDocs[i].getCode().getFileName()) ||
+          findName.equals(codeDocs[i].getCode().getPrettyName())) {
         setCurrentCode(i);
         return;
       }
@@ -1336,7 +1339,8 @@ public class Sketch {
 
     StringBuffer bigCode = new StringBuffer();
     int bigCount = 0;
-    for (SketchCode sc : code) {
+    for (SketchCodeDocument scd : codeDocs) {
+      SketchCode sc = scd.getCode();
       if (sc.isExtension("ino") || sc.isExtension("pde")) {
         sc.setPreprocOffset(bigCount);
         // These #line directives help the compiler report errors with
@@ -1396,7 +1400,8 @@ public class Sketch {
 
     // 3. then loop over the code[] and save each .java file
 
-    for (SketchCode sc : code) {
+    for (SketchCodeDocument scd : codeDocs) {
+      SketchCode sc = scd.getCode();
       if (sc.isExtension("c") || sc.isExtension("cpp") || sc.isExtension("h")) {
         // no pre-processing services necessary for java files
         // just write the the contents of 'program' to a .java file
@@ -1769,7 +1774,7 @@ public class Sketch {
       modified = true;
 
       for (int i = 0; i < codeCount; i++) {
-        code[i].save();  // this will force a save
+        codeDocs[i].getCode().save();  // this will force a save
       }
       calcModified();
 
@@ -1804,8 +1809,8 @@ public class Sketch {
 
     // check to see if each modified code file can be written to
     for (int i = 0; i < codeCount; i++) {
-      if (code[i].isModified() && code[i].fileReadOnly() &&
-          code[i].fileExists()) {
+      if (codeDocs[i].getCode().isModified() && codeDocs[i].getCode().fileReadOnly() &&
+          codeDocs[i].getCode().fileExists()) {
         // System.err.println("found a read-only file " + code[i].file);
         return true;
       }
@@ -1948,8 +1953,8 @@ public class Sketch {
   }
 
 
-  public SketchCode[] getCode() {
-    return code;
+  public SketchCodeDocument[] getCodeDocs() {
+    return codeDocs;
   }
 
 
@@ -1959,13 +1964,13 @@ public class Sketch {
 
 
   public SketchCode getCode(int index) {
-    return code[index];
+    return codeDocs[index].getCode();
   }
 
 
   public int getCodeIndex(SketchCode who) {
     for (int i = 0; i < codeCount; i++) {
-      if (who == code[i]) {
+      if (who == codeDocs[i].getCode()) {
         return i;
       }
     }

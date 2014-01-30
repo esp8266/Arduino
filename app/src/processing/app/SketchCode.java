@@ -28,8 +28,6 @@ import java.io.*;
 import java.util.List;
 import java.util.Arrays;
 
-import javax.swing.text.Document;
-
 import static processing.app.I18n._;
 import processing.app.helpers.FileUtils;
 
@@ -46,21 +44,6 @@ public class SketchCode {
 
   /** Text of the program text for this tab */
   private String program;
-
-  /** Document object for this tab. Currently this is a SyntaxDocument. */
-  private Document document;
-
-  /**
-   * Undo Manager for this tab, each tab keeps track of their own
-   * Editor.undo will be set to this object when this code is the tab
-   * that's currently the front.
-   */
-  private LastUndoableEditAwareUndoManager undo = new LastUndoableEditAwareUndoManager();
-
-  // saved positions from last time this tab was used
-  private int selectionStart;
-  private int selectionStop;
-  private int scrollPosition;
 
   private boolean modified;
 
@@ -183,16 +166,6 @@ public class SketchCode {
   }
 
 
-//  public void setPreprocName(String preprocName) {
-//    this.preprocName = preprocName;
-//  }
-//
-//
-//  public String getPreprocName() {
-//    return preprocName;
-//  }
-
-
   public void setPreprocOffset(int preprocOffset) {
     this.preprocOffset = preprocOffset;
   }
@@ -208,51 +181,6 @@ public class SketchCode {
   }
 
 
-  public Document getDocument() {
-    return document;
-  }
-  
-  
-  public void setDocument(Document d) {
-    document = d;
-  }
-  
-  
-  public LastUndoableEditAwareUndoManager getUndo() {
-    return undo;
-  }
-  
-  
-  // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
-
-  
-  // TODO these could probably be handled better, since it's a general state
-  // issue that's read/write from only one location in Editor (on tab switch.)
-  
-  
-  public int getSelectionStart() {
-    return selectionStart;
-  }
-  
-  
-  public int getSelectionStop() {
-    return selectionStop;
-  }
-  
-  
-  public int getScrollPosition() {
-    return scrollPosition;
-  }
-  
-  
-  protected void setState(String p, int start, int stop, int pos) {
-    program = p;
-    selectionStart = start;
-    selectionStop = stop;
-    scrollPosition = pos;
-  }
-  
-  
   // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
   
   

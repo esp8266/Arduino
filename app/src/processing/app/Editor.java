@@ -1637,19 +1637,19 @@ public class Editor extends JFrame implements RunnerListener {
    * Switch between tabs, this swaps out the Document object
    * that's currently being manipulated.
    */
-  protected void setCode(SketchCode code) {
-    SyntaxDocument document = (SyntaxDocument) code.getDocument();
+  protected void setCode(SketchCodeDocument codeDoc) {
+    SyntaxDocument document = (SyntaxDocument) codeDoc.getDocument();
 
     if (document == null) {  // this document not yet inited
       document = new SyntaxDocument();
-      code.setDocument(document);
-
+      codeDoc.setDocument(document);
+      
       // turn on syntax highlighting
       document.setTokenMarker(new PdeKeywords());
 
       // insert the program text into the document object
       try {
-        document.insertString(0, code.getProgram(), null);
+        document.insertString(0, codeDoc.getCode().getProgram(), null);
       } catch (BadLocationException bl) {
         bl.printStackTrace();
       }
@@ -1674,12 +1674,12 @@ public class Editor extends JFrame implements RunnerListener {
 
     // update the document object that's in use
     textarea.setDocument(document,
-                         code.getSelectionStart(), code.getSelectionStop(),
-                         code.getScrollPosition());
+                         codeDoc.getSelectionStart(), codeDoc.getSelectionStop(),
+                         codeDoc.getScrollPosition());
 
     textarea.requestFocus();  // get the caret blinking
 
-    this.undo = code.getUndo();
+    this.undo = codeDoc.getUndo();
     undoAction.updateUndoState();
     redoAction.updateRedoState();
   }
