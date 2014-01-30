@@ -105,7 +105,7 @@ public class Base {
   static private LibraryList libraries;
 
   // maps #included files to their library folder
-  static Map<String, Library> importToLibraryTable;
+  public static Map<String, Library> importToLibraryTable;
 
   // classpath for all known libraries for p5
   // (both those in the p5/libs folder and those with lib subfolders

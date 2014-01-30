@@ -1,5 +1,3 @@
-/* -*- mode: java; c-basic-offset: 2; indent-tabs-mode: nil -*- */
-
 /*
   SketchCode - data class for a single file inside a sketch
   Part of the Processing project - http://processing.org
@@ -31,11 +29,11 @@ import java.util.Arrays;
 import static processing.app.I18n._;
 import processing.app.helpers.FileUtils;
 
-
 /**
  * Represents a single tab of a sketch. 
  */
 public class SketchCode {
+  
   /** Pretty name (no extension), not the full file name */
   private String prettyName;
 
@@ -47,8 +45,6 @@ public class SketchCode {
 
   private boolean modified;
 
-  /** name of .java file after preproc */
-//  private String preprocName; 
   /** where this code starts relative to the concat'd code */
   private int preprocOffset;  
 

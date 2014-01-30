@@ -27,6 +27,8 @@ import static processing.app.I18n._;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,28 +39,39 @@ import java.util.Map;
 import processing.app.Base;
 import processing.app.I18n;
 import processing.app.Preferences;
-import processing.app.Sketch;
 import processing.app.SketchCode;
+import processing.app.SketchCodeDocument;
+import processing.app.SketchData;
 import processing.app.helpers.FileUtils;
 import processing.app.helpers.PreferencesMap;
 import processing.app.helpers.ProcessUtils;
 import processing.app.helpers.StringReplacer;
 import processing.app.helpers.filefilters.OnlyDirs;
 import processing.app.packages.Library;
+import processing.app.packages.LibraryList;
+import processing.app.preproc.PdePreprocessor;
 import processing.core.PApplet;
 
 public class Compiler implements MessageConsumer {
 
-  private Sketch sketch;
+  private SketchData sketch;
+  private PreferencesMap prefs;
+  private boolean verbose;
 
   private List<File> objectFiles;
 
-  private PreferencesMap prefs;
-  private boolean verbose;
   private boolean sketchIsCompiled;
-  private String targetArch;
   
   private RunnerException exception;
+
+  /**
+   * Listener interface for progress update on the GUI
+   */
+  public interface ProgressListener {
+    public void progress(int percent);
+  }
+
+  private ProgressListener progressListener;
 
   /**
    * Create a new Compiler
@@ -66,30 +79,44 @@ public class Compiler implements MessageConsumer {
    * @param _buildPath Where the temporary files live and will be built from.
    * @param _primaryClassName the name of the combined sketch file w/ extension
    */
-  public Compiler(Sketch _sketch, String _buildPath, String _primaryClassName)
+  public Compiler(SketchData _sketch, String _buildPath, String _primaryClassName)
       throws RunnerException {
     sketch = _sketch;
     prefs = createBuildPreferences(_buildPath, _primaryClassName);
+
+    // Start with an empty progress listener
+    progressListener = new ProgressListener() {
+      @Override
+      public void progress(int percent) {
+      }
+    };
   }
 
+  public void setProgressListener(ProgressListener _progressListener) {
+    progressListener = _progressListener;
+  }
+  
   /**
    * Compile sketch.
+   * @param buildPath 
    *
    * @return true if successful.
    * @throws RunnerException Only if there's a problem. Only then.
    */
   public boolean compile(boolean _verbose) throws RunnerException {
+    preprocess(prefs.get("build.path"));
+    
     verbose = _verbose || Preferences.getBoolean("build.verbose");
     sketchIsCompiled = false;
     objectFiles = new ArrayList<File>();
 
     // 0. include paths for core + all libraries
-    sketch.setCompilingProgress(20);
+    progressListener.progress(20);
     List<File> includeFolders = new ArrayList<File>();
     includeFolders.add(prefs.getFile("build.core.path"));
     if (prefs.getFile("build.variant.path") != null)
       includeFolders.add(prefs.getFile("build.variant.path"));
-    for (Library lib : sketch.getImportedLibraries()) {
+    for (Library lib : importedLibraries) {
       if (verbose)
         System.out.println(I18n
             .format(_("Using library {0} in folder: {1} {2}"), lib.getName(),
@@ -105,7 +132,7 @@ public class Compiler implements MessageConsumer {
       String[] overrides = prefs.get("architecture.override_check").split(",");
       archs.addAll(Arrays.asList(overrides));
     }
-    for (Library lib : sketch.getImportedLibraries()) {
+    for (Library lib : importedLibraries) {
       if (!lib.supportsArchitecture(archs)) {
         System.err.println(I18n
             .format(_("WARNING: library {0} claims to run on {1} "
@@ -117,33 +144,33 @@ public class Compiler implements MessageConsumer {
     }
     
     // 1. compile the sketch (already in the buildPath)
-    sketch.setCompilingProgress(30);
+    progressListener.progress(30);
     compileSketch(includeFolders);
     sketchIsCompiled = true;
 
     // 2. compile the libraries, outputting .o files to: <buildPath>/<library>/
     // Doesn't really use configPreferences
-    sketch.setCompilingProgress(40);
+    progressListener.progress(40);
     compileLibraries(includeFolders);
 
     // 3. compile the core, outputting .o files to <buildPath> and then
     // collecting them into the core.a library file.
-    sketch.setCompilingProgress(50);
+    progressListener.progress(50);
     compileCore();
 
     // 4. link it all together into the .elf file
-    sketch.setCompilingProgress(60);
+    progressListener.progress(60);
     compileLink();
 
     // 5. extract EEPROM data (from EEMEM directive) to .eep file.
-    sketch.setCompilingProgress(70);
+    progressListener.progress(70);
     compileEep();
 
     // 6. build the .hex file
-    sketch.setCompilingProgress(80);
+    progressListener.progress(80);
     compileHex();
 
-    sketch.setCompilingProgress(90);
+    progressListener.progress(90);
     return true;
   }
 
@@ -190,8 +217,7 @@ public class Compiler implements MessageConsumer {
 
     p.put("build.path", _buildPath);
     p.put("build.project_name", _primaryClassName);
-    targetArch = targetPlatform.getId();
-    p.put("build.arch", targetArch.toUpperCase());
+    p.put("build.arch", targetPlatform.getId().toUpperCase());
     
     // Platform.txt should define its own compiler.path. For
     // compatibility with earlier 1.5 versions, we define a (ugly,
@@ -356,8 +382,6 @@ public class Compiler implements MessageConsumer {
     return ret;
   }
 
-  boolean firstErrorFound;
-  boolean secondErrorFound;
 
   /**
    * Either succeeds or throws a RunnerException fit for public consumption.
@@ -381,9 +405,6 @@ public class Compiler implements MessageConsumer {
         System.out.print(c + " ");
       System.out.println();
     }
-
-    firstErrorFound = false;  // haven't found any errors yet
-    secondErrorFound = false;
 
     Process process;
     try {
@@ -520,7 +541,7 @@ public class Compiler implements MessageConsumer {
       if (!sketchIsCompiled) {
         // Place errors when compiling the sketch, but never while compiling libraries
         // or the core.  The user's sketch might contain the same filename!
-        e = sketch.placeException(error, pieces[1], PApplet.parseInt(pieces[2]) - 1);
+        e = placeException(error, pieces[1], PApplet.parseInt(pieces[2]) - 1);
       }
 
       // replace full file path with the name of the sketch tab (unless we're
@@ -656,7 +677,7 @@ public class Compiler implements MessageConsumer {
   // 2. compile the libraries, outputting .o files to:
   // <buildPath>/<library>/
   void compileLibraries(List<File> includeFolders) throws RunnerException {
-    for (Library lib : sketch.getImportedLibraries()) {
+    for (Library lib : importedLibraries) {
       compileLibrary(lib, includeFolders);
     }
   }
@@ -853,4 +874,144 @@ public class Compiler implements MessageConsumer {
   public PreferencesMap getBuildPreferences() {
     return prefs;
   }
+  
+  /**
+   * Build all the code for this sketch.
+   *
+   * In an advanced program, the returned class name could be different,
+   * which is why the className is set based on the return value.
+   * A compilation error will burp up a RunnerException.
+   *
+   * Setting purty to 'true' will cause exception line numbers to be incorrect.
+   * Unless you know the code compiles, you should first run the preprocessor
+   * with purty set to false to make sure there are no errors, then once
+   * successful, re-export with purty set to true.
+   *
+   * @param buildPath Location to copy all the .java files
+   * @return null if compilation failed, main class name if not
+   */
+  public void preprocess(String buildPath) throws RunnerException {
+    preprocess(buildPath, new PdePreprocessor());
+  }
+
+  public void preprocess(String buildPath, PdePreprocessor preprocessor) throws RunnerException {
+
+    // 1. concatenate all .pde files to the 'main' pde
+    //    store line number for starting point of each code bit
+
+    StringBuffer bigCode = new StringBuffer();
+    int bigCount = 0;
+    for (SketchCodeDocument scd : sketch.getCodeDocs()) {
+      SketchCode sc = scd.getCode();
+      if (sc.isExtension("ino") || sc.isExtension("pde")) {
+        sc.setPreprocOffset(bigCount);
+        // These #line directives help the compiler report errors with
+        // correct the filename and line number (issue 281 & 907)
+        bigCode.append("#line 1 \"" + sc.getFileName() + "\"\n");
+        bigCode.append(sc.getProgram());
+        bigCode.append('\n');
+        bigCount += sc.getLineCount();
+      }
+    }
+
+    // Note that the headerOffset isn't applied until compile and run, because
+    // it only applies to the code after it's been written to the .java file.
+    int headerOffset = 0;
+    try {
+      headerOffset = preprocessor.writePrefix(bigCode.toString());
+    } catch (FileNotFoundException fnfe) {
+      fnfe.printStackTrace();
+      String msg = _("Build folder disappeared or could not be written");
+      throw new RunnerException(msg);
+    }
+
+    // 2. run preproc on that code using the sugg class name
+    //    to create a single .java file and write to buildpath
+
+    try {
+      // Output file
+      File streamFile = new File(buildPath, sketch.getName() + ".cpp");
+      FileOutputStream outputStream = new FileOutputStream(streamFile);
+      preprocessor.write(outputStream);
+      outputStream.close();
+    } catch (FileNotFoundException fnfe) {
+      fnfe.printStackTrace();
+      String msg = _("Build folder disappeared or could not be written");
+      throw new RunnerException(msg);
+    } catch (RunnerException pe) {
+      // RunnerExceptions are caught here and re-thrown, so that they don't
+      // get lost in the more general "Exception" handler below.
+      throw pe;
+
+    } catch (Exception ex) {
+      // TODO better method for handling this?
+      System.err.println(I18n.format(_("Uncaught exception type: {0}"), ex.getClass()));
+      ex.printStackTrace();
+      throw new RunnerException(ex.toString());
+    }
+
+    // grab the imports from the code just preproc'd
+
+    importedLibraries = new LibraryList();
+    for (String item : preprocessor.getExtraImports()) {
+      Library lib = Base.importToLibraryTable.get(item);
+      if (lib != null && !importedLibraries.contains(lib)) {
+        importedLibraries.add(lib);
+      }
+    }
+
+    // 3. then loop over the code[] and save each .java file
+
+    for (SketchCodeDocument scd : sketch.getCodeDocs()) {
+      SketchCode sc = scd.getCode();
+      if (sc.isExtension("c") || sc.isExtension("cpp") || sc.isExtension("h")) {
+        // no pre-processing services necessary for java files
+        // just write the the contents of 'program' to a .java file
+        // into the build directory. uses byte stream and reader/writer
+        // shtuff so that unicode bunk is properly handled
+        String filename = sc.getFileName(); //code[i].name + ".java";
+        try {
+          Base.saveFile(sc.getProgram(), new File(buildPath, filename));
+        } catch (IOException e) {
+          e.printStackTrace();
+          throw new RunnerException(I18n.format(_("Problem moving {0} to the build folder"), filename));
+        }
+
+      } else if (sc.isExtension("ino") || sc.isExtension("pde")) {
+        // The compiler and runner will need this to have a proper offset
+        sc.addPreprocOffset(headerOffset);
+      }
+    }
+  }
+
+
+  /**
+   * List of library folders.
+   */
+  private LibraryList importedLibraries;
+
+  /**
+   * Map an error from a set of processed .java files back to its location
+   * in the actual sketch.
+   * @param message The error message.
+   * @param dotJavaFilename The .java file where the exception was found.
+   * @param dotJavaLine Line number of the .java file for the exception (0-indexed!)
+   * @return A RunnerException to be sent to the editor, or null if it wasn't
+   *         possible to place the exception to the sketch code.
+   */
+  public RunnerException placeException(String message,
+                                        String dotJavaFilename,
+                                        int dotJavaLine) {
+     // Placing errors is simple, because we inserted #line directives
+     // into the preprocessed source.  The compiler gives us correct
+     // the file name and line number.  :-)
+     for (SketchCodeDocument codeDoc : sketch.getCodeDocs()) {
+       SketchCode code = codeDoc.getCode();
+       if (dotJavaFilename.equals(code.getFileName())) {
+         return new RunnerException(message, sketch.indexOfCode(code), dotJavaLine);
+       }
+     }
+     return null;
+  }
+
 }
