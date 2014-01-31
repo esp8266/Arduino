@@ -1,5 +1,3 @@
-/* -*- mode: java; c-basic-offset: 2; indent-tabs-mode: nil -*- */
-
 /*
   Part of the Processing project - http://processing.org
 
@@ -23,21 +21,47 @@
 
 package processing.app;
 
+import static processing.app.I18n._;
+
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Insets;
+import java.awt.SystemColor;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.MissingResourceException;
+import java.util.StringTokenizer;
+
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
+
 import processing.app.helpers.FileUtils;
+import processing.app.helpers.PreferencesMap;
 import processing.app.syntax.SyntaxStyle;
 import processing.core.PApplet;
 import processing.core.PConstants;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.util.*;
-
-import processing.app.helpers.PreferencesMap;
-import static processing.app.I18n._;
-
-
 
 
 /**
@@ -68,8 +92,6 @@ import static processing.app.I18n._;
  * or to reset the preferences by simply deleting the preferences.txt file.
  */
 public class Preferences {
-
-  // what to call the feller
 
   static final String PREFS_FILE = "preferences.txt";
 
@@ -218,8 +240,8 @@ public class Preferences {
 
   // data model
 
-  static Hashtable<String, String> defaults;
-  static Hashtable<String, String> table = new Hashtable<String, String>();
+  static PreferencesMap defaults;
+  static PreferencesMap prefs = new PreferencesMap();
   static File preferencesFile;
   static boolean doSave = true;
 
@@ -233,38 +255,25 @@ public class Preferences {
     // start by loading the defaults, in case something
     // important was deleted from the user prefs
     try {
-      load(Base.getLibStream("preferences.txt"));
-    } catch (Exception e) {
+      prefs.load(Base.getLibStream("preferences.txt"));
+    } catch (IOException e) {
       Base.showError(null, _("Could not read default settings.\n" +
                              "You'll need to reinstall Arduino."), e);
     }
 
     // set some runtime constants (not saved on preferences file)
     File hardwareFolder = Base.getHardwareFolder();
-    table.put("runtime.ide.path", hardwareFolder.getParentFile().getAbsolutePath());
-    table.put("runtime.ide.version", "" + Base.REVISION);
+    prefs.put("runtime.ide.path", hardwareFolder.getParentFile().getAbsolutePath());
+    prefs.put("runtime.ide.version", "" + Base.REVISION);
     
-    // check for platform-specific properties in the defaults
-    String platformExt = "." + Base.platform.getName();
-    int platformExtLength = platformExt.length();
-    Set<String> keySet = new HashSet<String>(table.keySet());
-    for (String key : keySet) {
-      if (key.endsWith(platformExt)) {
-        // this is a key specific to a particular platform
-        String actualKey = key.substring(0, key.length() - platformExtLength);
-        String value = get(key);
-        table.put(actualKey, value);
-      }
-    }
-
     // clone the hash table
-    defaults = new Hashtable<String, String>(table);
+    defaults = new PreferencesMap(prefs);
 
     if (preferencesFile.exists()) {
       // load the previous preferences file
       try {
-        load(new FileInputStream(preferencesFile));
-      } catch (Exception ex) {
+        prefs.load(preferencesFile);
+      } catch (IOException ex) {
         Base.showError(_("Error reading preferences"),
                        I18n.format(_("Error reading the preferences file. "
                                        + "Please delete (or move)\n"
@@ -275,14 +284,14 @@ public class Preferences {
 
     // load the I18n module for internationalization
     try {
-      I18n.init(Preferences.get("editor.languages.current"));
+      I18n.init(get("editor.languages.current"));
     } catch (MissingResourceException e) {
       I18n.init("en");
-      Preferences.set("editor.languages.current", "en");
+      set("editor.languages.current", "en");
     }
 
     // set some other runtime constants (not saved on preferences file)
-    table.put("runtime.os", PConstants.platformNames[PApplet.platform]);
+    set("runtime.os", PConstants.platformNames[PApplet.platform]);
 
     // other things that have to be set explicitly for the defaults
     setColor("run.window.bgcolor", SystemColor.control);
@@ -604,11 +613,6 @@ public class Preferences {
   }
 
 
-  public Dimension getPreferredSize() {
-    return new Dimension(wide, high);
-  }
-
-
   // .................................................................
 
 
@@ -733,26 +737,6 @@ public class Preferences {
   // .................................................................
 
 
-  static protected void load(InputStream input) throws IOException {
-    load(input, table);
-  }
-  
-  static public void load(InputStream input, Map<String, String> table) throws IOException {
-    String[] lines = loadStrings(input);  // Reads as UTF-8
-    for (String line : lines) {
-      if ((line.length() == 0) ||
-          (line.charAt(0) == '#')) continue;
-
-      // this won't properly handle = signs being in the text
-      int equals = line.indexOf('=');
-      if (equals != -1) {
-        String key = line.substring(0, equals).trim();
-        String value = line.substring(equals + 1).trim();
-        table.put(key, value);
-      }
-    }
-  }
-
   static public String[] loadStrings(InputStream input) {
     try {
       BufferedReader reader =
@@ -803,48 +787,36 @@ public class Preferences {
     // Fix for 0163 to properly use Unicode when writing preferences.txt
     PrintWriter writer = PApplet.createWriter(preferencesFile);
 
-    String[] keys = table.keySet().toArray(new String[0]);
+    String[] keys = prefs.keySet().toArray(new String[0]);
     Arrays.sort(keys);
     for (String key: keys) {
       if (key.startsWith("runtime."))
         continue;
-      writer.println(key + "=" + table.get(key));
+      writer.println(key + "=" + prefs.get(key));
     }
 
     writer.flush();
     writer.close();
-
-//    } catch (Exception ex) {
-//      Base.showWarning(null, "Error while saving the settings file", ex);
-//    }
   }
 
 
   // .................................................................
 
-
-  // all the information from preferences.txt
-
-  //static public String get(String attribute) {
-  //return get(attribute, null);
-  //}
-
   static public String get(String attribute) {
-    return table.get(attribute);
+    return prefs.get(attribute);
   }
 
   static public String get(String attribute, String defaultValue) {
     String value = get(attribute);
-
     return (value == null) ? defaultValue : value;
   }
 
   public static boolean has(String key) {
-    return table.containsKey(key);
+    return prefs.containsKey(key);
   }
 
   public static void remove(String key) {
-    table.remove(key);
+    prefs.remove(key);
   }
 
   static public String getDefault(String attribute) {
@@ -853,57 +825,27 @@ public class Preferences {
 
 
   static public void set(String attribute, String value) {
-    table.put(attribute, value);
+    prefs.put(attribute, value);
   }
 
 
   static public void unset(String attribute) {
-    table.remove(attribute);
+    prefs.remove(attribute);
   }
 
 
   static public boolean getBoolean(String attribute) {
-    String value = get(attribute); //, null);
-    return (new Boolean(value)).booleanValue();
-
-    /*
-      supposedly not needed, because anything besides 'true'
-      (ignoring case) will just be false.. so if malformed -> false
-    if (value == null) return defaultValue;
-
-    try {
-      return (new Boolean(value)).booleanValue();
-    } catch (NumberFormatException e) {
-      System.err.println("expecting an integer: " + attribute + " = " + value);
-    }
-    return defaultValue;
-    */
+    return prefs.getBoolean(attribute);
   }
 
 
   static public void setBoolean(String attribute, boolean value) {
-    set(attribute, value ? "true" : "false");
+    prefs.putBoolean(attribute, value);
   }
 
 
-  static public int getInteger(String attribute /*, int defaultValue*/) {
+  static public int getInteger(String attribute) {
     return Integer.parseInt(get(attribute));
-
-    /*
-    String value = get(attribute, null);
-    if (value == null) return defaultValue;
-
-    try {
-      return Integer.parseInt(value);
-    } catch (NumberFormatException e) {
-      // ignored will just fall through to returning the default
-      System.err.println("expecting an integer: " + attribute + " = " + value);
-    }
-    return defaultValue;
-    //if (value == null) return defaultValue;
-    //return (value == null) ? defaultValue :
-    //Integer.parseInt(value);
-    */
   }
 
 
@@ -913,62 +855,31 @@ public class Preferences {
 
 
   static public Color getColor(String name) {
-    Color parsed = Color.GRAY;  // set a default
-    String s = get(name);
-    if ((s != null) && (s.indexOf("#") == 0)) {
-      try {
-        parsed = new Color(Integer.parseInt(s.substring(1), 16));
-      } catch (Exception e) { }
-    }
-    return parsed;
+    Color parsed = prefs.getColor(name);
+    if (parsed != null)
+      return parsed;
+    return Color.GRAY; // set a default
   }
 
 
   static public void setColor(String attr, Color what) {
-    set(attr, "#" + PApplet.hex(what.getRGB() & 0xffffff, 6));
+    prefs.putColor(attr, what);
   }
 
 
   static public Font getFont(String attr) {
-    boolean replace = false;
-    String value = get(attr);
-    if (value == null) {
-      //System.out.println("reset 1");
-      value = getDefault(attr);
-      replace = true;
+    Font font = prefs.getFont(attr);
+    if (font == null) {
+      String value = defaults.get(attr);
+      prefs.put(attr, value);
+      font = prefs.getFont(attr);
     }
-
-    String[] pieces = PApplet.split(value, ',');
-    if (pieces.length != 3) {
-      value = getDefault(attr);
-      //System.out.println("reset 2 for " + attr);
-      pieces = PApplet.split(value, ',');
-      //PApplet.println(pieces);
-      replace = true;
-    }
-
-    String name = pieces[0];
-    int style = Font.PLAIN;  // equals zero
-    if (pieces[1].indexOf("bold") != -1) {
-      style |= Font.BOLD;
-    }
-    if (pieces[1].indexOf("italic") != -1) {
-      style |= Font.ITALIC;
-    }
-    int size = PApplet.parseInt(pieces[2], 12);
-    Font font = new Font(name, style, size);
-
-    // replace bad font with the default
-    if (replace) {
-      set(attr, value);
-    }
-
     return font;
   }
 
 
-  static public SyntaxStyle getStyle(String what /*, String dflt*/) {
-    String str = get("editor." + what + ".style"); //, dflt);
+  static public SyntaxStyle getStyle(String what) {
+    String str = get("editor." + what + ".style");
 
     StringTokenizer st = new StringTokenizer(str, ",");
 
@@ -983,7 +894,6 @@ public class Preferences {
     boolean bold = (s.indexOf("bold") != -1);
     boolean italic = (s.indexOf("italic") != -1);
     boolean underlined = (s.indexOf("underlined") != -1);
-    //System.out.println(what + " = " + str + " " + bold + " " + italic);
 
     return new SyntaxStyle(color, italic, bold, underlined);
   }
@@ -991,7 +901,7 @@ public class Preferences {
   // get a copy of the Preferences
   static public PreferencesMap getMap() 
   {
-    return new PreferencesMap(table);
+    return new PreferencesMap(prefs);
   }
 
   // Decide wether changed preferences will be saved. When value is

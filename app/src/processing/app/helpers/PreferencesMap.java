@@ -3,7 +3,7 @@
  to handle preferences.
  Part of the Arduino project - http://www.arduino.cc/
 
- Copyright (c) 2011 Cristian Maglie
+ Copyright (c) 2014 Cristian Maglie
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@
  */
 package processing.app.helpers;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -296,4 +298,87 @@ public class PreferencesMap extends LinkedHashMap<String, String> {
       return null;
     return new File(file, subFolder);
   }
+
+  /**
+   * Return the value of the specified key as boolean.
+   * 
+   * @param key
+   * @return <b>true</b> if the value of the key is the string "true" (case
+   *         insensitive compared), <b>false</b> in any other case
+   */
+  public boolean getBoolean(String key) {
+    return new Boolean(get(key));
+  }
+
+  /**
+   * Sets the value of the specified key to the string <b>"true"</b> or
+   * <b>"false"</b> based on value of the boolean parameter
+   * 
+   * @param key
+   * @param value
+   * @return <b>true</b> if the previous value of the key was the string "true"
+   *         (case insensitive compared), <b>false</b> in any other case
+   */
+  public boolean putBoolean(String key, boolean value) {
+    String prev = put(key, value ? "true" : "false");
+    return new Boolean(prev);
+  }
+
+  /**
+   * Create a Color with the value of the specified key. The format of the color
+   * should be an hexadecimal number of 6 digit, eventually prefixed with a '#'.
+   * 
+   * @param name
+   * @return A Color object or <b>null</b> if the key is not found or the format
+   *         is wrong
+   */
+  public Color getColor(String name) {
+    return parseColor(get(name));
+  }
+
+  /**
+   * Set the value of the specified key based on the Color passed as parameter.
+   * 
+   * @param attr
+   * @param color
+   */
+  public void putColor(String attr, Color color) {
+    put(attr, "#" + String.format("%06x", color.getRGB() & 0xffffff));
+  }
+
+  public static Color parseColor(String v) {
+    try {
+      if (v.indexOf("#") == 0)
+        v = v.substring(1);
+      return new Color(Integer.parseInt(v, 16));
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
+  public Font getFont(String key) {
+    String value = get(key);
+    if (value == null)
+      return null;
+    String[] split = value.split(",");
+    if (split.length != 3)
+      return null;
+
+    String name = split[0];
+    int style = Font.PLAIN;
+    if (split[1].contains("bold"))
+      style |= Font.BOLD;
+    if (split[1].contains("italic"))
+      style |= Font.ITALIC;
+    int size;
+    try {
+      // ParseDouble handle numbers with decimals too
+      size = (int) Double.parseDouble(split[2]);
+    } catch (NumberFormatException e) {
+      // for wrong formatted size pick the default
+      size = 12;
+    }
+    return new Font(name, style, size);
+  }
+
 }

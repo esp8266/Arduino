@@ -70,11 +70,11 @@ public class Theme {
   }
 
   static public boolean getBoolean(String attribute) {
-    return new Boolean(get(attribute));
+    return table.getBoolean(attribute);
   }
 
   static public void setBoolean(String attribute, boolean value) {
-    set(attribute, value ? "true" : "false");
+    table.putBoolean(attribute, value);
   }
 
   static public int getInteger(String attribute) {
@@ -86,46 +86,27 @@ public class Theme {
   }
 
   static public Color getColor(String name) {
-    return parseColor(get(name));
+    return PreferencesMap.parseColor(get(name));
   }
 
-  static public void setColor(String attr, Color what) {
-    set(attr, "#" + String.format("%06x", what.getRGB() & 0xffffff));
+  static public void setColor(String attr, Color color) {
+    table.putColor(attr, color);
   }
 
   static public Font getFont(String attr) {
-    String value = get(attr);
-    if (value == null) {
-      value = getDefault(attr);
+    Font font = table.getFont(attr);
+    if (font == null) {
+      String value = getDefault(attr);
       set(attr, value);
+      font = table.getFont(attr);
     }
-
-    String[] split = value.split(",");
-    if (split.length != 3) {
-      value = getDefault(attr);
-      set(attr, value);
-      split = value.split(",");
-    }
-
-    String name = split[0];
-    int style = Font.PLAIN;
-    if (split[1].contains("bold"))
-      style |= Font.BOLD;
-    if (split[1].contains("italic"))
-      style |= Font.ITALIC;
-    int size = 12; // Default
-    try {
-      // (parseDouble handle numbers with decimals too)
-      size = (int) Double.parseDouble(split[2]);
-    } catch (NumberFormatException e) {
-    }
-    return new Font(name, style, size);
+    return font;
   }
 
   static public SyntaxStyle getStyle(String what) {
     String split[] = get("editor." + what + ".style").split(",");
 
-    Color color = parseColor(split[0]);
+    Color color = PreferencesMap.parseColor(split[0]);
 
     String style = split[1];
     boolean bold = style.contains("bold");
@@ -133,15 +114,5 @@ public class Theme {
     boolean underlined = style.contains("underlined");
 
     return new SyntaxStyle(color, italic, bold, underlined);
-  }
-
-  private static Color parseColor(String v) {
-    try {
-      if (v.indexOf("#") == 0)
-        v = v.substring(1);
-      return new Color(Integer.parseInt(v, 16));
-    } catch (Exception e) {
-      return null;
-    }
   }
 }
