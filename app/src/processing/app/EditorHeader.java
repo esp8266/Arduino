@@ -34,6 +34,7 @@ import javax.swing.*;
 /**
  * Sketch tabs at the top of the editor window.
  */
+@SuppressWarnings("serial")
 public class EditorHeader extends JComponent {
   static Color backgroundColor;
   static Color textColor[] = new Color[2];
@@ -326,30 +327,27 @@ public class EditorHeader extends JComponent {
     //  KeyEvent.VK_LEFT and VK_RIGHT will make Windows beep
 
     item = new JMenuItem(_("Previous Tab"));
-    KeyStroke ctrlAltLeft =
-      KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, Editor.SHORTCUT_ALT_KEY_MASK);
+    KeyStroke ctrlAltLeft = KeyStroke
+        .getKeyStroke(KeyEvent.VK_LEFT, Editor.SHORTCUT_ALT_KEY_MASK);
     item.setAccelerator(ctrlAltLeft);
-    // this didn't want to work consistently
-    /*
     item.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          editor.sketch.prevCode();
-        }
-      });
-    */
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        editor.sketch.handlePrevCode();
+      }
+    });
     menu.add(item);
 
     item = new JMenuItem(_("Next Tab"));
-    KeyStroke ctrlAltRight =
-      KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, Editor.SHORTCUT_ALT_KEY_MASK);
+    KeyStroke ctrlAltRight = KeyStroke
+        .getKeyStroke(KeyEvent.VK_RIGHT, Editor.SHORTCUT_ALT_KEY_MASK);
     item.setAccelerator(ctrlAltRight);
-    /*
     item.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          editor.sketch.nextCode();
-        }
-      });
-    */
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        editor.sketch.handleNextCode();
+      }
+    });
     menu.add(item);
 
     Sketch sketch = editor.getSketch();
