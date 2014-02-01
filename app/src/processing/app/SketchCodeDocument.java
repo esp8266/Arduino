@@ -4,18 +4,23 @@ import java.io.File;
 
 import javax.swing.text.Document;
 
-public class SketchCodeDocument {
+public class SketchCodeDocument extends SketchCode {
 
-  SketchCode code;
-  
   private Document document;
 
-  /**
-   * Undo Manager for this tab, each tab keeps track of their own
-   * Editor.undo will be set to this object when this code is the tab
-   * that's currently the front.
-   */
+  // Undo Manager for this tab, each tab keeps track of their own Editor.undo
+  // will be set to this object when this code is the tab that's currently the
+  // front.
   private LastUndoableEditAwareUndoManager undo = new LastUndoableEditAwareUndoManager();
+
+  // saved positions from last time this tab was used
+  private int selectionStart;
+  private int selectionStop;
+  private int scrollPosition;
+
+  public SketchCodeDocument(File file) {
+    super(file);
+  }
 
   public LastUndoableEditAwareUndoManager getUndo() {
     return undo;
@@ -47,29 +52,6 @@ public class SketchCodeDocument {
 
   public void setScrollPosition(int scrollPosition) {
     this.scrollPosition = scrollPosition;
-  }
-
-  // saved positions from last time this tab was used
-  private int selectionStart;
-  private int selectionStop;
-  private int scrollPosition;
-
-
-  public SketchCodeDocument(SketchCode sketchCode, Document doc) {
-    code = sketchCode;
-    document = doc;
-  }
-
-  public SketchCodeDocument(File file) {
-    code = new SketchCode(file);
-  }
-
-  public SketchCode getCode() {
-    return code;
-  }
-
-  public void setCode(SketchCode code) {
-    this.code = code;
   }
 
   public Document getDocument() {

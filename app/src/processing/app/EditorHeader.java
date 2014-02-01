@@ -359,8 +359,7 @@ public class EditorHeader extends JComponent {
             editor.getSketch().setCurrentCode(e.getActionCommand());
           }
         };
-      for (SketchCodeDocument codeDoc : sketch.getCodeDocs()) {
-        SketchCode code = codeDoc.getCode();
+      for (SketchCode code : sketch.getCodes()) {
         item = new JMenuItem(code.isExtension(sketch.getDefaultExtension()) ? 
                              code.getPrettyName() : code.getFileName());
         item.setActionCommand(code.getFileName());

@@ -40,7 +40,6 @@ import processing.app.Base;
 import processing.app.I18n;
 import processing.app.Preferences;
 import processing.app.SketchCode;
-import processing.app.SketchCodeDocument;
 import processing.app.SketchData;
 import processing.app.helpers.FileUtils;
 import processing.app.helpers.PreferencesMap;
@@ -50,7 +49,6 @@ import processing.app.helpers.filefilters.OnlyDirs;
 import processing.app.packages.Library;
 import processing.app.packages.LibraryList;
 import processing.app.preproc.PdePreprocessor;
-import processing.core.PApplet;
 
 public class Compiler implements MessageConsumer {
 
@@ -901,8 +899,7 @@ public class Compiler implements MessageConsumer {
 
     StringBuffer bigCode = new StringBuffer();
     int bigCount = 0;
-    for (SketchCodeDocument scd : sketch.getCodeDocs()) {
-      SketchCode sc = scd.getCode();
+    for (SketchCode sc : sketch.getCodes()) {
       if (sc.isExtension("ino") || sc.isExtension("pde")) {
         sc.setPreprocOffset(bigCount);
         // These #line directives help the compiler report errors with
@@ -962,8 +959,7 @@ public class Compiler implements MessageConsumer {
 
     // 3. then loop over the code[] and save each .java file
 
-    for (SketchCodeDocument scd : sketch.getCodeDocs()) {
-      SketchCode sc = scd.getCode();
+    for (SketchCode sc : sketch.getCodes()) {
       if (sc.isExtension("c") || sc.isExtension("cpp") || sc.isExtension("h")) {
         // no pre-processing services necessary for java files
         // just write the the contents of 'program' to a .java file
@@ -1005,8 +1001,7 @@ public class Compiler implements MessageConsumer {
      // Placing errors is simple, because we inserted #line directives
      // into the preprocessed source.  The compiler gives us correct
      // the file name and line number.  :-)
-     for (SketchCodeDocument codeDoc : sketch.getCodeDocs()) {
-       SketchCode code = codeDoc.getCode();
+     for (SketchCode code : sketch.getCodes()) {
        if (dotJavaFilename.equals(code.getFileName())) {
          return new RunnerException(message, sketch.indexOfCode(code), dotJavaLine);
        }

@@ -65,8 +65,7 @@ public class Sketch {
   /** code folder location for this sketch (may not exist yet) */
   private File codeFolder;
 
-  private SketchCode current;
-  private SketchCodeDocument currentCodeDoc;
+  private SketchCodeDocument current;
   private int currentIndex;
 
   private SketchData data;
@@ -167,7 +166,7 @@ public class Sketch {
           // Don't allow people to use files with invalid names, since on load,
           // it would be otherwise possible to sneak in nasty filenames. [0116]
           if (Sketch.isSanitaryName(base)) {
-            data.addCodeDoc(new SketchCodeDocument(new File(folder, filename)));
+            data.addCode(new SketchCodeDocument(new File(folder, filename)));
           } else {
             System.err.println(I18n.format("File name {0} is invalid: ignored", filename));
           }
@@ -180,10 +179,10 @@ public class Sketch {
 
     // move the main class to the first tab
     // start at 1, if it's at zero, don't bother
-    for (SketchCodeDocument codeDoc : data.getCodeDocs()) {
+    for (SketchCode code : data.getCodes()) {
       //if (code[i].file.getName().equals(mainFilename)) {
-      if (codeDoc.getCode().getFile().equals(primaryFile)) {
-        data.moveCodeDocToFront(codeDoc);
+      if (code.getFile().equals(primaryFile)) {
+        data.moveCodeToFront(code);
         break;
       }
     }
@@ -308,7 +307,7 @@ public class Sketch {
     // Don't let the user create the main tab as a .java file instead of .pde
     if (!isDefaultExtension(newExtension)) {
       if (renamingCode) {  // If creating a new tab, don't show this error
-        if (current == data.getCodeDoc(0).getCode()) {  // If this is the main tab, disallow
+        if (current == data.getCode(0)) {  // If this is the main tab, disallow
           Base.showWarning(_("Problem with rename"),
                            _("The main file can't use an extension.\n" +
                              "(It may be time for your to graduate to a\n" +
@@ -330,12 +329,12 @@ public class Sketch {
     // In Arduino, we want to allow files with the same name but different
     // extensions, so compare the full names (including extensions).  This
     // might cause problems: http://dev.processing.org/bugs/show_bug.cgi?id=543
-    for (SketchCodeDocument c : data.getCodeDocs()) {
-      if (newName.equalsIgnoreCase(c.getCode().getFileName())) {
+    for (SketchCode c : data.getCodes()) {
+      if (newName.equalsIgnoreCase(c.getFileName())) {
         Base.showMessage(_("Nope"),
                          I18n.format(
 			   _("A file named \"{0}\" already exists in \"{1}\""),
-			   c.getCode().getFileName(),
+			   c.getFileName(),
 			   folder.getAbsolutePath()
 			 ));
         return;
@@ -352,15 +351,13 @@ public class Sketch {
     }
 
     if (renamingCode && currentIndex == 0) {
-      for (SketchCodeDocument codeDoc : data.getCodeDocs()) {
-        if (sanitaryName.equalsIgnoreCase(codeDoc.getCode().getPrettyName()) &&
-          codeDoc.getCode().isExtension("cpp")) {
+      for (SketchCode code : data.getCodes()) {
+        if (sanitaryName.equalsIgnoreCase(code.getPrettyName()) &&
+          code.isExtension("cpp")) {
           Base.showMessage(_("Nope"),
-                           I18n.format(
-			     _("You can't rename the sketch to \"{0}\"\n" +
-			       "because the sketch already has a .cpp file with that name."),
-			     sanitaryName
-			   ));
+                           I18n.format(_("You can't rename the sketch to \"{0}\"\n"
+                                           + "because the sketch already has a .cpp file with that name."),
+                                       sanitaryName));
           return;
         }
       }
@@ -428,8 +425,8 @@ public class Sketch {
 
         // save each of the other tabs because this is gonna be re-opened
         try {
-          for (SketchCodeDocument codeDoc : data.getCodeDocs()) {
-            codeDoc.getCode().save();
+          for (SketchCode code : data.getCodes()) {
+            code.save();
           }
         } catch (Exception e) {
           Base.showWarning(_("Error"), _("Could not rename the sketch. (1)"), e);
@@ -486,10 +483,8 @@ public class Sketch {
 			 ), e);
         return;
       }
-      SketchCode newCode = new SketchCode(newFile);
-      //System.out.println("new code is named " + newCode.getPrettyName() + " " + newCode.getFile());
       ensureExistence();
-      data.insertCode(newCode);
+      data.addCode(new SketchCodeDocument(newFile));
     }
 
     // sort the entries
@@ -601,8 +596,8 @@ public class Sketch {
 
   protected void calcModified() {
     modified = false;
-    for (SketchCodeDocument codeDoc : data.getCodeDocs()) {
-      if (codeDoc.getCode().isModified()) {
+    for (SketchCode code : data.getCodes()) {
+      if (code.isModified()) {
         modified = true;
         break;
       }
@@ -685,9 +680,9 @@ public class Sketch {
       }
     }
 
-    for (SketchCodeDocument codeDoc : data.getCodeDocs()) {
-      if (codeDoc.getCode().isModified())
-        codeDoc.getCode().save();
+    for (SketchCode code : data.getCodes()) {
+      if (code.isModified())
+        code.save();
     }
     calcModified();
     return true;
@@ -695,13 +690,13 @@ public class Sketch {
 
 
   protected boolean renameCodeToInoExtension(File pdeFile) {
-    for (SketchCodeDocument c : data.getCodeDocs()) {
-      if (!c.getCode().getFile().equals(pdeFile))
+    for (SketchCode c : data.getCodes()) {
+      if (!c.getFile().equals(pdeFile))
         continue;
 
       String pdeName = pdeFile.getPath();
       pdeName = pdeName.substring(0, pdeName.length() - 4) + ".ino";
-      return c.getCode().renameTo(new File(pdeName));
+      return c.renameTo(new File(pdeName));
     }
     return false;
   }
@@ -746,9 +741,9 @@ public class Sketch {
     // make sure there doesn't exist a .cpp file with that name already
     // but ignore this situation for the first tab, since it's probably being
     // resaved (with the same name) to another location/folder.
-    for (SketchCodeDocument codeDoc : data.getCodeDocs()) {
-      if (newName.equalsIgnoreCase(codeDoc.getCode().getPrettyName()) &&
-        codeDoc.getCode().isExtension("cpp")) {
+    for (SketchCode code : data.getCodes()) {
+      if (newName.equalsIgnoreCase(code.getPrettyName()) &&
+        code.isExtension("cpp")) {
         Base.showMessage(_("Nope"),
 			 I18n.format(
                            _("You can't save the sketch as \"{0}\"\n" +
@@ -798,10 +793,10 @@ public class Sketch {
     }
 
     // save the other tabs to their new location
-    for (SketchCodeDocument codeDoc : data.getCodeDocs()) {
-      if (data.indexOfCodeDoc(codeDoc) == 0) continue;
-      File newFile = new File(newFolder, codeDoc.getCode().getFileName());
-      codeDoc.getCode().saveAs(newFile);
+    for (SketchCode code : data.getCodes()) {
+      if (data.indexOfCode(code) == 0) continue;
+      File newFile = new File(newFolder, code.getFileName());
+      code.saveAs(newFile);
     }
 
     // re-copy the data folder (this may take a while.. add progress bar?)
@@ -826,7 +821,7 @@ public class Sketch {
 
     // save the main tab with its new name
     File newFile = new File(newFolder, newName + ".ino");
-    data.getCodeDoc(0).getCode().saveAs(newFile);
+    data.getCode(0).saveAs(newFile);
 
     editor.handleOpenUnchecked(newFile,
                                currentIndex,
@@ -989,14 +984,14 @@ public class Sketch {
     }
 
     if (codeExtension != null) {
-      SketchCode newCode = new SketchCode(destFile);
+      SketchCode newCode = new SketchCodeDocument(destFile);
 
       if (replacement) {
         data.replaceCode(newCode);
 
       } else {
         ensureExistence();
-        data.insertCode(newCode);
+        data.addCode(newCode);
         data.sortCode();
       }
       setCurrentCode(filename);
@@ -1010,7 +1005,7 @@ public class Sketch {
       if (editor.untitled) {  // TODO probably not necessary? problematic?
         // If a file has been added, mark the main code as modified so
         // that the sketch is properly saved.
-        data.getCodeDoc(0).getCode().setModified(true);
+        data.getCode(0).setModified(true);
       }
     }
     return true;
@@ -1071,16 +1066,15 @@ public class Sketch {
     // get the text currently being edited
     if (current != null) {
       current.setProgram(editor.getText());
-      currentCodeDoc.setSelectionStart(editor.getSelectionStart());
-      currentCodeDoc.setSelectionStop(editor.getSelectionStop());
-      currentCodeDoc.setScrollPosition(editor.getScrollPosition());
+      current.setSelectionStart(editor.getSelectionStart());
+      current.setSelectionStop(editor.getSelectionStop());
+      current.setScrollPosition(editor.getScrollPosition());
     }
 
-    currentCodeDoc = data.getCodeDoc(which);
-    current = currentCodeDoc.getCode();
+    current = (SketchCodeDocument) data.getCode(which);
     currentIndex = which;
 
-    editor.setCode(currentCodeDoc);
+    editor.setCode(current);
 
     editor.header.rebuild();
   }
@@ -1091,10 +1085,10 @@ public class Sketch {
    * @param findName the file name (not pretty name) to be shown
    */
   protected void setCurrentCode(String findName) {
-    for (SketchCodeDocument codeDoc : data.getCodeDocs()) {
-      if (findName.equals(codeDoc.getCode().getFileName()) ||
-          findName.equals(codeDoc.getCode().getPrettyName())) {
-        setCurrentCode(data.indexOfCodeDoc(codeDoc));
+    for (SketchCode code : data.getCodes()) {
+      if (findName.equals(code.getFileName()) ||
+          findName.equals(code.getPrettyName())) {
+        setCurrentCode(data.indexOfCode(code));
         return;
       }
     }
@@ -1527,8 +1521,8 @@ public class Sketch {
       folder.mkdirs();
       modified = true;
 
-      for (SketchCodeDocument codeDoc : data.getCodeDocs()) {
-        codeDoc.getCode().save();  // this will force a save
+      for (SketchCode code : data.getCodes()) {
+        code.save();  // this will force a save
       }
       calcModified();
 
@@ -1562,9 +1556,8 @@ public class Sketch {
     // } else if (!folder.canWrite()) {
 
     // check to see if each modified code file can be written to
-    for (SketchCodeDocument codeDoc : data.getCodeDocs()) {
-      if (codeDoc.getCode().isModified() && codeDoc.getCode().fileReadOnly() &&
-          codeDoc.getCode().fileExists()) {
+    for (SketchCode code : data.getCodes()) {
+      if (code.isModified() && code.fileReadOnly() && code.fileExists()) {
         // System.err.println("found a read-only file " + code[i].file);
         return true;
       }
@@ -1702,8 +1695,8 @@ public class Sketch {
   }
 
 
-  public SketchCodeDocument[] getCodeDocs() {
-    return data.getCodeDocs();
+  public SketchCode[] getCodes() {
+    return data.getCodes();
   }
 
 
@@ -1713,7 +1706,7 @@ public class Sketch {
 
 
   public SketchCode getCode(int index) {
-    return data.getCodeDoc(index).getCode();
+    return data.getCode(index);
   }
 
 
