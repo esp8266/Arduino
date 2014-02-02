@@ -15,6 +15,8 @@
  by David A. Mellis
  modified 9 Apr 2012
  by Tom Igoe
+ modified 2 Feb 2014
+ by Scott Fitzgerald
  
  This example code is in the public domain.
  	 
@@ -38,7 +40,7 @@ void setup()
   // or the SD library functions will not work. 
   pinMode(10, OUTPUT);
 
-  if (!SD.begin(10)) {
+  if (!SD.begin(4)) {
     Serial.println("initialization failed!");
     return;
   }
