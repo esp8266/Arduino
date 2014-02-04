@@ -345,7 +345,7 @@
     <chmod perm="+x">
       <fileset dir="macosx/work/Arduino.app/Contents/Resources/Java/hardware/tools/avr/bin" includes="**/*" />
       <fileset dir="macosx/work/Arduino.app/Contents/Resources/Java/hardware/tools/avr/avr/bin" includes="**/*" />
-      <fileset dir="macosx/work/Arduino.app/Contents/Resources/Java/hardware/tools/avr/libexec/gcc/avr/4.3.2/" includes="*" />
+      <fileset dir="macosx/work/Arduino.app/Contents/Resources/Java/hardware/tools/avr/libexec/gcc/avr/4.8.1/" includes="*" />
     </chmod>
 
     <replace file="macosx/work/Arduino.app/Contents/Info.plist"
