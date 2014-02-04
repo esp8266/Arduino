@@ -524,16 +524,16 @@
   </target>
 
   <target name="unzip-avr-toolchain">
-    <get src="http://downloads.arduino.cc/avr-toolchain-${file_arch}-gcc-4.3.2.zip" dest="${staging_folder}" usetimestamp="true" ignoreerrors="true" />
+    <get src="http://downloads.arduino.cc/avr-toolchain-${file_arch}-gcc-4.8.1.zip" dest="${staging_folder}" usetimestamp="true" ignoreerrors="true" verbose="true" />
 
-    <checksum file="${staging_folder}/avr-toolchain-${file_arch}-gcc-4.3.2.zip" algorithm="sha" fileext=".sha" verifyproperty="checksum.matches"/>
+    <checksum file="${staging_folder}/avr-toolchain-${file_arch}-gcc-4.8.1.zip" algorithm="sha" fileext=".sha" verifyproperty="checksum.matches"/>
     <condition property="checksum.matches.fail">
       <equals arg1="${checksum.matches}" arg2="false"/>
     </condition>
     <fail if="checksum.matches.fail">Checksum failed.
 
-      File avr-toolchain-${file_arch}-gcc-4.3.2.zip failed checksum.
-      Please remove "${staging_folder}/avr-toolchain-${file_arch}-gcc-4.3.2.zip" and download it again.
+      File avr-toolchain-${file_arch}-gcc-4.8.1.zip failed checksum.
+      Please remove "${staging_folder}/avr-toolchain-${file_arch}-gcc-4.8.1.zip" and download it again.
     </fail>
 
     <mkdir dir="${staging_folder}/work/${staging_hardware_folder}/tools/avr" />
@@ -542,7 +542,7 @@
       <arg value="-n" />
       <arg value="-d" />
       <arg value="${staging_folder}/work/${staging_hardware_folder}/tools/avr" />
-      <arg value="${staging_folder}/avr-toolchain-${file_arch}-gcc-4.3.2.zip" />
+      <arg value="${staging_folder}/avr-toolchain-${file_arch}-gcc-4.8.1.zip" />
     </exec>
   </target>
 
