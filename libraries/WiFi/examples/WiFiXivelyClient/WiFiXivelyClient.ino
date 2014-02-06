@@ -3,26 +3,26 @@
  
  This sketch connects an analog sensor to Xively (http://www.xively.com)
  using an Arduino Wifi shield.
- 
- This example is written for a network using WPA encryption. For 
+
+ This example is written for a network using WPA encryption. For
  WEP or WPA, change the Wifi.begin() call accordingly.
  
  This example has been updated to use version 2.0 of the Xively API. 
  To make it work, create a feed with a datastream, and give it the ID
  sensor1. Or change the code below to match your feed.
- 
+
  Circuit:
  * Analog sensor attached to analog in 0
  * Wifi shield attached to pins 10, 11, 12, 13
- 
+
  created 13 Mar 2012
  modified 31 May 2012
  by Tom Igoe
  modified 8 Nov 2013
  by Scott Fitzgerald
- 
+
  This code is in the public domain.
- 
+
  */
 #include <SPI.h>
 #include <WiFi.h>
@@ -31,7 +31,7 @@
 #define FEEDID         00000                    // replace your feed ID
 #define USERAGENT      "My Arduino Project"     // user agent is the project name
 
-char ssid[] = "yourNetwork";      //  your network SSID (name) 
+char ssid[] = "yourNetwork";      //  your network SSID (name)
 char pass[] = "secretPassword";   // your network password
 
 int status = WL_IDLE_STATUS;
@@ -49,28 +49,32 @@ const unsigned long postingInterval = 10*1000; //delay between updates to xively
 
 void setup() {
   //Initialize serial and wait for port to open:
-  Serial.begin(9600); 
+  Serial.begin(9600);
   while (!Serial) {
     ; // wait for serial port to connect. Needed for Leonardo only
   }
-  
+
   // check for the presence of the shield:
   if (WiFi.status() == WL_NO_SHIELD) {
-    Serial.println("WiFi shield not present"); 
+    Serial.println("WiFi shield not present");
     // don't continue:
-    while(true);
-  } 
-  
+    while (true);
+  }
+
+  String fv = WiFi.firmwareVersion();
+  if ( fv != "1.1.0" )
+    Serial.println("Please upgrade the firmware");
+
   // attempt to connect to Wifi network:
-  while ( status != WL_CONNECTED) { 
+  while ( status != WL_CONNECTED) {
     Serial.print("Attempting to connect to SSID: ");
     Serial.println(ssid);
-    // Connect to WPA/WPA2 network. Change this line if using open or WEP network:    
+    // Connect to WPA/WPA2 network. Change this line if using open or WEP network:
     status = WiFi.begin(ssid, pass);
 
     // wait 10 seconds for connection:
     delay(10000);
-  } 
+  }
   // you're connected now, so print out the status:
   printWifiStatus();
 }
@@ -78,7 +82,7 @@ void setup() {
 
 void loop() {
   // read the analog sensor:
-  int sensorReading = analogRead(A0);   
+  int sensorReading = analogRead(A0);
 
   // if there's incoming data from the net connection.
   // send it out the serial port.  This is for debugging
@@ -98,7 +102,7 @@ void loop() {
 
   // if you're not connected, and ten seconds have passed since
   // your last connection, then connect again and send data:
-  if(!client.connected() && (millis() - lastConnectionTime > postingInterval)) {
+  if (!client.connected() && (millis() - lastConnectionTime > postingInterval)) {
     sendData(sensorReading);
   }
   // store the state of the connection for next time through
@@ -135,8 +139,8 @@ void sendData(int thisData) {
     // here's the actual content of the PUT request:
     client.print("sensor1,");
     client.println(thisData);
-  
-  } 
+
+  }
   else {
     // if you couldn't make a connection:
     Serial.println("connection failed");
@@ -144,7 +148,7 @@ void sendData(int thisData) {
     Serial.println("disconnecting.");
     client.stop();
   }
-   // note the time that the connection was made or attempted:
+  // note the time that the connection was made or attempted:
   lastConnectionTime = millis();
 }
 
@@ -157,12 +161,12 @@ void sendData(int thisData) {
 int getLength(int someValue) {
   // there's at least one byte:
   int digits = 1;
-  // continually divide the value by ten, 
+  // continually divide the value by ten,
   // adding one to the digit count for each
   // time you divide, until you're at 0:
-  int dividend = someValue /10;
+  int dividend = someValue / 10;
   while (dividend > 0) {
-    dividend = dividend /10;
+    dividend = dividend / 10;
     digits++;
   }
   // return the number of digits:
