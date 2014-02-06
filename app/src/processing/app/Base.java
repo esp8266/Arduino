@@ -320,7 +320,8 @@ public class Base {
 
     boolean doUpload = false;
     boolean doVerify = false;
-    boolean doVerbose = false;
+    boolean doVerboseBuild = false;
+    boolean doVerboseUpload = false;;
     String selectBoard = null;
     String selectPort = null;
     String currentDirectory = System.getProperty("user.dir");
@@ -337,7 +338,16 @@ public class Base {
         continue;
       }
       if (args[i].equals("--verbose") || args[i].equals("-v")) {
-        doVerbose = true;
+        doVerboseBuild = true;
+        doVerboseUpload = true;
+        continue;
+      }
+      if (args[i].equals("--verbose-build")) {
+        doVerboseBuild = true;
+        continue;
+      }
+      if (args[i].equals("--verbose-upload")) {
+        doVerboseUpload = true;
         continue;
       }
       if (args[i].equals("--board")) {
@@ -414,8 +424,8 @@ public class Base {
 
     if (doUpload || doVerify) {
       // Set verbosity for command line build
-      Preferences.set("build.verbose", "" + doVerbose);
-      Preferences.set("upload.verbose", "" + doVerbose);
+      Preferences.set("build.verbose", "" + doVerboseBuild);
+      Preferences.set("upload.verbose", "" + doVerboseUpload);
 
       Editor editor = editors.get(0);
 

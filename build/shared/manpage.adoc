@@ -86,11 +86,20 @@ OPTIONS
 	If this option is not passed, the value from the current
 	preferences is used (e.g., the last port selected in the IDE).
 
-*-v, --verbose*::
+*--verbose-build*::
+    Enable verbose mode during build. If this option is not given,
+    verbose mode during build is disabled regardless of the current
+    preferences.
 
-	Enable verbose mode during build and upload. If this option is
-	not given, verbose mode is disabled regardless of the current
-	preferences.
+*--verbose-upload*::
+    Enable verbose mode during upload. If this option is not given,
+    verbose mode during upload is disabled regardless of the current
+    preferences.
+
+*-v, --verbose*::
+	Enable verbose mode during build and upload.
+    This option has the same effect of using both *--verbose-build*
+    and *--verbose-upload*.
 
 *--preferences-file* __filename__::
 	Read and store preferences from the specified __filename__ instead
