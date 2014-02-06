@@ -14,10 +14,10 @@ public class PdePreprocessorTest {
     String s = FileUtils.readFileToString(new File(PdePreprocessorTest.class.getResource("RemoteCallLogger_v1e0.ino").getFile()));
 
     PdePreprocessor pdePreprocessor = new PdePreprocessor();
-    String stippedOutput = pdePreprocessor.strip(s);
+    String strippedOutput = pdePreprocessor.strip(s);
     String expectedStrippedOutput = FileUtils.readFileToString(new File(PdePreprocessorTest.class.getResource("RemoteCallLogger_v1e0.stripped.ino").getFile()));
 
-    assertEquals(expectedStrippedOutput, stippedOutput);
+    assertEquals(expectedStrippedOutput, strippedOutput);
 
     pdePreprocessor.writePrefix(s);
 
@@ -36,10 +36,10 @@ public class PdePreprocessorTest {
     String s = FileUtils.readFileToString(new File(PdePreprocessorTest.class.getResource("IncludeBetweenMultilineComment.ino").getFile()));
 
     PdePreprocessor pdePreprocessor = new PdePreprocessor();
-    String stippedOutput = pdePreprocessor.strip(s);
+    String strippedOutput = pdePreprocessor.strip(s);
     String expectedStrippedOutput = FileUtils.readFileToString(new File(PdePreprocessorTest.class.getResource("IncludeBetweenMultilineComment.stripped.ino").getFile()));
 
-    assertEquals(expectedStrippedOutput, stippedOutput);
+    assertEquals(expectedStrippedOutput, strippedOutput);
 
     pdePreprocessor.writePrefix(s);
 
@@ -57,10 +57,10 @@ public class PdePreprocessorTest {
     String s = FileUtils.readFileToString(new File(PdePreprocessorTest.class.getResource("Baladuino.ino").getFile()));
 
     PdePreprocessor pdePreprocessor = new PdePreprocessor();
-    String stippedOutput = pdePreprocessor.strip(s);
+    String strippedOutput = pdePreprocessor.strip(s);
     String expectedStrippedOutput = FileUtils.readFileToString(new File(PdePreprocessorTest.class.getResource("Baladuino.stripped.ino").getFile()));
 
-    assertEquals(expectedStrippedOutput, stippedOutput);
+    assertEquals(expectedStrippedOutput, strippedOutput);
 
     pdePreprocessor.writePrefix(s);
 
@@ -86,10 +86,10 @@ public class PdePreprocessorTest {
     String s = FileUtils.readFileToString(new File(PdePreprocessorTest.class.getResource("StringWithCcomment.ino").getFile()));
 
     PdePreprocessor pdePreprocessor = new PdePreprocessor();
-    String stippedOutput = pdePreprocessor.strip(s);
+    String strippedOutput = pdePreprocessor.strip(s);
     String expectedStrippedOutput = FileUtils.readFileToString(new File(PdePreprocessorTest.class.getResource("StringWithCcomment.stripped.ino").getFile()));
 
-    assertEquals(expectedStrippedOutput, stippedOutput);
+    assertEquals(expectedStrippedOutput, strippedOutput);
 
     pdePreprocessor.writePrefix(s);
 
@@ -106,10 +106,10 @@ public class PdePreprocessorTest {
     String s = FileUtils.readFileToString(new File(PdePreprocessorTest.class.getResource("CharWithEscapedDoubleQuote.ino").getFile()));
 
     PdePreprocessor pdePreprocessor = new PdePreprocessor();
-    String stippedOutput = pdePreprocessor.strip(s);
+    String strippedOutput = pdePreprocessor.strip(s);
     String expectedStrippedOutput = FileUtils.readFileToString(new File(PdePreprocessorTest.class.getResource("CharWithEscapedDoubleQuote.stripped.ino").getFile()));
 
-    assertEquals(expectedStrippedOutput, stippedOutput);
+    assertEquals(expectedStrippedOutput, strippedOutput);
 
     pdePreprocessor.writePrefix(s);
 
@@ -128,10 +128,10 @@ public class PdePreprocessorTest {
     String s = FileUtils.readFileToString(new File(PdePreprocessorTest.class.getResource("LineContinuations.ino").getFile()));
 
     PdePreprocessor pdePreprocessor = new PdePreprocessor();
-    String stippedOutput = pdePreprocessor.strip(s);
+    String strippedOutput = pdePreprocessor.strip(s);
     String expectedStrippedOutput = FileUtils.readFileToString(new File(PdePreprocessorTest.class.getResource("LineContinuations.stripped.ino").getFile()));
 
-    assertEquals(expectedStrippedOutput, stippedOutput);
+    assertEquals(expectedStrippedOutput, strippedOutput);
 
     pdePreprocessor.writePrefix(s);
 
