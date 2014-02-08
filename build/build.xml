@@ -503,7 +503,7 @@
 
   <target name="linux64-build" depends="linux-build" description="Build linux (64-bit) version">
     <!-- Unzip ARM tools -->
-    <antcall target="unzip-arm-toolchain">
+    <antcall target="unzip-tool">
       <param name="dist_file" value="gcc-arm-none-eabi-4.4.1-2010q1-188-linux32.tar.gz" />
       <param name="dist_url" value="http://arduino.googlecode.com/files/gcc-arm-none-eabi-4.4.1-2010q1-188-linux32.tar.gz" />
       <param name="dist_check_file" value="g++_arm_none_eabi" />
@@ -545,6 +545,45 @@
       <arg value="${staging_folder}/avr-toolchain-${file_arch}-gcc-4.8.1.zip" />
     </exec>
   </target>
+
+
+
+  <!-- Set '${dist_file}_available' property if toolchain dist_file is downloaded              -->
+  <!-- Set '${dist_file}_installed' property if toolchain is installed in working directory    -->
+  <!--                              hardware/tools/${dist_check_file} is checked for existence -->
+  <target name="check-tool">
+    <available file="${staging_folder}/dist/${dist_file}" property="${dist_file}_available" />
+    <available file="${staging_folder}/work/hardware/tools/${dist_check_file}" property="${dist_file}_installed" />
+  </target>
+
+  <!-- Retrieve tool -->
+  <target name="get-tool" depends="check-tool" unless="${dist_file}_available">
+    <get src="${dist_url}" dest="${staging_folder}/dist/${dist_file}" verbose="true" ignoreerrors="true" />
+  </target>
+
+  <!-- Ensure that the tool is downloaded and test checksums, if everything's ok unzip it on the tools folder  -->
+  <target name="unzip-tool" depends="get-tool, check-tool" unless="${dist_file}_installed">
+    <echo>Testing checksum of "${staging_folder}/dist/${dist_file}"</echo>
+    <checksum file="${staging_folder}/dist/${dist_file}" algorithm="sha" fileext=".sha" verifyproperty="checksum.matches"/>
+    <condition property="checksum.matches.fail">
+      <equals arg1="${checksum.matches}" arg2="false"/>
+    </condition>
+    <fail if="checksum.matches.fail">Checksum failed.
+
+      File ${dist_file} failed checksum.
+      Please remove "${staging_folder}/dist/${dist_file}" to download it again.
+    </fail>
+
+    <!-- Unzip tool to the destination folder -->
+    <echo>Unzipping into folder ${staging_folder}/dist/${dist_file}</echo>
+    <exec executable="tar">
+      <arg value="xfz"/>
+      <arg value="${staging_folder}/dist/${dist_file}"/>
+      <arg value="--directory=${staging_folder}/work/${staging_hardware_folder}/tools/"/>
+    </exec>
+  </target>
+
+
 
   <!-- Set 'arm_disfile_available' property if ARM toolchain dist_file is downloaded             -->
   <!-- Set 'arm_toolchain_installed' property if ARM toolchain is installed in working directory -->
