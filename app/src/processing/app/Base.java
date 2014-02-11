@@ -1245,6 +1245,13 @@ public class Base {
         String packages[] =
           Compiler.headerListFromIncludePath(subfolder.getAbsolutePath());
         for (String pkg : packages) {
+          File old = importToLibraryTable.get(pkg);
+          if (old != null) {
+            // If a library was already found with this header, keep it if
+            // the library's directory name matches the header name.
+            String name = pkg.substring(0, pkg.length() - 2);
+            if (old.getPath().endsWith(name)) continue;
+          }
           importToLibraryTable.put(pkg, subfolder);
         }
       } catch (IOException e) {
