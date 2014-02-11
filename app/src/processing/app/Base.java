@@ -1347,6 +1347,14 @@ public class Base {
       try {
         String headers[] = headerListFromIncludePath(lib.getSrcFolder());
         for (String header : headers) {
+          Library old = importToLibraryTable.get(header);
+          if (old != null) {
+            // If a library was already found with this header, keep
+            // it if the library's name matches the header name.
+            String name = header.substring(0, header.length() - 2);
+            if (old.getFolder().getPath().endsWith(name))
+              continue;
+          }
           importToLibraryTable.put(header, lib);
         }
       } catch (IOException e) {
