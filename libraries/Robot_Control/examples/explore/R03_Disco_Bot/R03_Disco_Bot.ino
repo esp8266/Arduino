@@ -17,6 +17,8 @@
  */
 
 #include <ArduinoRobot.h> // include the robot library
+#include <Wire.h>
+#include <SPI.h>
 
 /* Dancing steps:
   S: stop

@@ -170,20 +170,20 @@ void RobotMotorBoard::motorsWrite(int speedL, int speedR){
 		speedL*=(1-motorAdjustment);
 	}
 	
-	if(speedL>0){
-		analogWrite(IN_A1,speedL);
+	if(speedR>0){
+		analogWrite(IN_A1,speedR);
 		analogWrite(IN_A2,0);
 	}else{
 		analogWrite(IN_A1,0);
-		analogWrite(IN_A2,-speedL);
+		analogWrite(IN_A2,-speedR);
 	}
 	
-	if(speedR>0){
-		analogWrite(IN_B1,speedR);
+	if(speedL>0){
+		analogWrite(IN_B1,speedL);
 		analogWrite(IN_B2,0);
 	}else{
 		analogWrite(IN_B1,0);
-		analogWrite(IN_B2,-speedR);
+		analogWrite(IN_B2,-speedL);
 	}
 }
 void RobotMotorBoard::motorsWritePct(int speedLpct, int speedRpct){
