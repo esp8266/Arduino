@@ -20,6 +20,8 @@
  */
 
 #include <ArduinoRobot.h>
+#include <Wire.h>
+#include <SPI.h>
 
 // default tempo and pitch of the music
 int tempo = 60;
