@@ -536,6 +536,18 @@ public class Compiler implements MessageConsumer {
       }      
     }
     
+		if (s.contains("undefined reference to `SPIClass::begin()'")
+				&& s.contains("libraries/Robot_Control")) {
+			String error = _("Please import the SPI library from the Sketch > Import Library menu.");
+			exception = new RunnerException(error);
+		}
+    
+		if (s.contains("undefined reference to `Wire'")
+				&& s.contains("libraries/Robot_Control")) {
+			String error = _("Please import the Wire library from the Sketch > Import Library menu.");
+			exception = new RunnerException(error);
+		}
+		
     System.err.print(s);
   }
 
