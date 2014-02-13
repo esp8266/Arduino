@@ -110,13 +110,13 @@ extern "C"{
 	(x==BOARD_SPI_SS1 ? 1 : \
 	(x==BOARD_SPI_SS2 ? 2 : 3)))
 
-#define SS   BOARD_SPI_SS0
-#define SS1  BOARD_SPI_SS1
-#define SS2  BOARD_SPI_SS2
-#define SS3  BOARD_SPI_SS3
-#define MOSI PIN_SPI_MOSI
-#define MISO PIN_SPI_MISO
-#define SCK  PIN_SPI_SCK
+static const uint8_t SS   = BOARD_SPI_SS0;
+static const uint8_t SS1  = BOARD_SPI_SS1;
+static const uint8_t SS2  = BOARD_SPI_SS2;
+static const uint8_t SS3  = BOARD_SPI_SS3;
+static const uint8_t MOSI = PIN_SPI_MOSI;
+static const uint8_t MISO = PIN_SPI_MISO;
+static const uint8_t SCK  = PIN_SPI_SCK;
 
 /*
  * Wire Interfaces
@@ -155,29 +155,29 @@ extern "C"{
 /*
  * Analog pins
  */
-#define A0    54
-#define A1    55
-#define A2    56
-#define A3    57
-#define A4    58
-#define A5    59
-#define A6    60
-#define A7    61
-#define A8    62
-#define A9    63
-#define A10   64
-#define A11   65
-#define DAC0  66
-#define DAC1  67
-#define CANRX 68
-#define CANTX 69
+static const uint8_t A0  = 54;
+static const uint8_t A1  = 55;
+static const uint8_t A2  = 56;
+static const uint8_t A3  = 57;
+static const uint8_t A4  = 58;
+static const uint8_t A5  = 59;
+static const uint8_t A6  = 60;
+static const uint8_t A7  = 61;
+static const uint8_t A8  = 62;
+static const uint8_t A9  = 63;
+static const uint8_t A10 = 64;
+static const uint8_t A11 = 65;
+static const uint8_t DAC0 = 66;
+static const uint8_t DAC1 = 67;
+static const uint8_t CANRX = 68;
+static const uint8_t CANTX = 69;
 #define ADC_RESOLUTION		12
 
 /*
  * Complementary CAN pins
  */
-#define CAN1RX 88
-#define CAN1TX 89
+static const uint8_t CAN1RX = 88;
+static const uint8_t CAN1TX = 89;
 
 // CAN0
 #define PINS_CAN0            (90u)
