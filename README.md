@@ -24,21 +24,21 @@ to work on them. That way you can coordinate with the Arduino Team and others,
 giving your work a higher chance of being integrated into the official release
 https://groups.google.com/a/arduino.cc/forum/#!forum/developers
 
-INSTALLATION
+Installation
 ------------
 Detailed instructions are in reference/Guide_Windows.html and
 reference/Guide_MacOSX.html.  For Linux, see the Arduino playground:
 http://www.arduino.cc/playground/Learning/Linux
 
-CREDITS
+Credits
 --------
 Arduino is an open source project, supported by many.
 
 The Arduino team is composed of Massimo Banzi, David Cuartielles, Tom Igoe,
 Gianluca Martino, Daniela Antonietti, and David A. Mellis.
 
-Arduino uses the GNU avr-gcc toolchain, avrdude, avr-libc, and code from
-Processing and Wiring.
+Arduino uses the [GNU avr-gcc toolchain](http://gcc.gnu.org/wiki/avr-gcc), [avrdude](http://www.nongnu.org/avrdude/), [avr-libc](http://www.nongnu.org/avr-libc/), and code from
+[Processing](http://www.processing.org) and [Wiring](http://wiring.org.co).
 
 Icon and about image designed by ToDo: http://www.todo.to.it/
 
