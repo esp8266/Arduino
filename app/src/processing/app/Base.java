@@ -1212,34 +1212,17 @@ public class Base {
 
     for (String potentialName : list) {
       File libFolder = new File(folder, potentialName);
-//      File libraryFolder = new File(subfolder, "library");
-//      File libraryJar = new File(libraryFolder, potentialName + ".jar");
-//      // If a .jar file of the same prefix as the folder exists
-//      // inside the 'library' subfolder of the sketch
-//      if (libraryJar.exists()) {
-        String sanityCheck = Sketch.sanitizeName(potentialName);
-        if (!sanityCheck.equals(potentialName)) {
-          String mess = I18n.format(
-            _("The library \"{0}\" cannot be used.\n" +
-              "Library names must contain only basic letters and numbers.\n" +
-              "(ASCII only and no spaces, and it cannot start with a number)"),
-	    potentialName
-	  );
-          Base.showMessage(_("Ignoring bad library name"), mess);
-          continue;
-        }
+      String sanityCheck = Sketch.sanitizeName(potentialName);
+      if (!sanityCheck.equals(potentialName)) {
+        String mess = I18n.format(_("The library \"{0}\" cannot be used.\n"
+            + "Library names must contain only basic letters and numbers.\n"
+            + "(ASCII only and no spaces, and it cannot start with a number)"),
+            potentialName);
+        Base.showMessage(_("Ignoring bad library name"), mess);
+        continue;
+      }
 
-        String libraryName = potentialName;
-//        // get the path for all .jar files in this code folder
-//        String libraryClassPath =
-//          Compiler.contentsToClassPath(libraryFolder);
-//        // grab all jars and classes from this folder,
-//        // and append them to the library classpath
-//        librariesClassPath +=
-//          File.pathSeparatorChar + libraryClassPath;
-//        // need to associate each import with a library folder
-//        String packages[] =
-//          Compiler.packageListFromClassPath(libraryClassPath);
+      String libraryName = potentialName;
       libraries.add(libFolder);
       String libFolderPath = libFolder.getAbsolutePath();
       try {
@@ -1268,22 +1251,11 @@ public class Base {
             "Unable to list header files in {0}", libFolder), e);
       }
 
-        JMenuItem item = new JMenuItem(libraryName);
-        item.addActionListener(listener);
-        item.setActionCommand(libFolderPath);
-        menu.add(item);
-        ifound = true;
-
-// XXX: DAM: should recurse here so that library folders can be nested
-//      } else {  // not a library, but is still a folder, so recurse
-//        JMenu submenu = new JMenu(libraryName);
-//        // needs to be separate var, otherwise would set ifound to false
-//        boolean found = addLibraries(submenu, subfolder);
-//        if (found) {
-//          menu.add(submenu);
-//          ifound = true;
-//        }
-//      }
+      JMenuItem item = new JMenuItem(libraryName);
+      item.addActionListener(listener);
+      item.setActionCommand(libFolderPath);
+      menu.add(item);
+      ifound = true;
     }
     return ifound;
   }
