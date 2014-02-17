@@ -1211,7 +1211,7 @@ public class Base {
     boolean ifound = false;
 
     for (String potentialName : list) {
-      File subfolder = new File(folder, potentialName);
+      File libFolder = new File(folder, potentialName);
 //      File libraryFolder = new File(subfolder, "library");
 //      File libraryJar = new File(libraryFolder, potentialName + ".jar");
 //      // If a .jar file of the same prefix as the folder exists
@@ -1240,27 +1240,37 @@ public class Base {
 //        // need to associate each import with a library folder
 //        String packages[] =
 //          Compiler.packageListFromClassPath(libraryClassPath);
-        libraries.add(subfolder);
+      libraries.add(libFolder);
+      String libFolderPath = libFolder.getAbsolutePath();
       try {
-        String packages[] =
-          Compiler.headerListFromIncludePath(subfolder.getAbsolutePath());
-        for (String pkg : packages) {
-          File old = importToLibraryTable.get(pkg);
-          if (old != null) {
-            // If a library was already found with this header, keep it if
-            // the library's directory name matches the header name.
-            String name = pkg.substring(0, pkg.length() - 2);
-            if (old.getPath().endsWith(name)) continue;
+        String headers[] = Compiler.headerListFromIncludePath(libFolderPath);
+        for (String header : headers) {
+          // Extract file name (without extension ".h")
+          String name = header.substring(0, header.length() - 2);
+
+          // If the header name equals to the current library folder use it
+          if (libFolderPath.endsWith(name)) {
+            importToLibraryTable.put(header, libFolder);
+            continue;
           }
-          importToLibraryTable.put(pkg, subfolder);
+
+          // If a library was already found with this header, keep it if
+          // the library's directory name matches the header name.
+          File old = importToLibraryTable.get(header);
+          if (old != null) {
+            if (old.getPath().endsWith(name))
+              continue;
+          }
+          importToLibraryTable.put(header, libFolder);
         }
       } catch (IOException e) {
-        showWarning(_("Error"), I18n.format("Unable to list header files in {0}", subfolder), e);
+        showWarning(_("Error"), I18n.format(
+            "Unable to list header files in {0}", libFolder), e);
       }
 
         JMenuItem item = new JMenuItem(libraryName);
         item.addActionListener(listener);
-        item.setActionCommand(subfolder.getAbsolutePath());
+        item.setActionCommand(libFolderPath);
         menu.add(item);
         ifound = true;
 
