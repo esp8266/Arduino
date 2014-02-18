@@ -31,12 +31,12 @@ void banzai() {
 	// Set bootflag to run SAM-BA bootloader at restart
 	const int EEFC_FCMD_CGPB = 0x0C;
 	const int EEFC_KEY = 0x5A;
-	while (EFC0->EEFC_FSR & EEFC_FSR_FRDY == 0);
+	while ((EFC0->EEFC_FSR & EEFC_FSR_FRDY) == 0);
 	EFC0->EEFC_FCR =
 		EEFC_FCR_FCMD(EEFC_FCMD_CGPB) |
 		EEFC_FCR_FARG(1) |
 		EEFC_FCR_FKEY(EEFC_KEY);
-	while (EFC0->EEFC_FSR & EEFC_FSR_FRDY == 0);
+	while ((EFC0->EEFC_FSR & EEFC_FSR_FRDY) == 0);
 
 	// From here flash memory is no more available.
 
