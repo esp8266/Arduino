@@ -40,11 +40,6 @@ void banzai() {
 
 	// From here flash memory is no more available.
 
-	// Memory swap needs some time to stabilize
-	for (uint32_t i=0; i<1000000; i++)
-		// force compiler to not optimize this
-		__asm__ __volatile__("");
-
 	// BANZAIIIIIII!!!
 	const int RSTC_KEY = 0xA5;
 	RSTC->RSTC_CR =

@@ -26,6 +26,7 @@ ARDUINO 1.5.6 BETA
     improve throughput when using high baudrates (KurtE)
 * sam: Fixed wrap-around bug in delay() (Mark Tillotson)
 * sam: Fixed regression in analogRead() (fails to read multiple channels) (Mark Tillotson)
+* sam: Fixed loops in Reset.cpp (Matthijs Kooijman)
 * sam: Optimized delayMicroseconds() (Rob Tillaart) #1121
 * Optimized Print::print(String&) method, now uses internal string buffer to perform block write
 * Improved portability of String class (maniacbug) #695
