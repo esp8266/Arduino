@@ -26,8 +26,8 @@
 class HardwareSerial : public Stream
 {
   public:
-    void begin(unsigned long);
-    void end();
+    virtual void begin(unsigned long);
+    virtual void end();
     virtual int available(void) = 0;
     virtual int peek(void) = 0;
     virtual int read(void) = 0;
