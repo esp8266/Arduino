@@ -260,7 +260,7 @@
       <fileset dir="macosx/work/Arduino.app/Contents/Resources/Java/hardware/tools" includes="**/man"/>
     </delete>
 
-    <get src="http://downloads.arduino.cc/libastylej-2.03.zip" dest="macosx" usetimestamp="true" />
+    <get src="http://downloads.arduino.cc/libastylej-2.03.zip" dest="macosx" usetimestamp="true" skipexisting="true"/>
     <unzip src="macosx/libastylej-2.03.zip" dest="macosx" overwrite="true"/>
     <copy file="macosx/libastylej/libastylej.jnilib" todir="macosx/work/Arduino.app/Contents/Resources/Java/lib/" />
     <chmod perm="755" file="macosx/work/Arduino.app/Contents/Resources/Java/lib/libastylej.jnilib" />
@@ -476,7 +476,7 @@
     <copy todir="linux/work" file="linux/dist/arduino" />
     <chmod perm="755" file="linux/work/arduino" />
 
-    <get src="http://downloads.arduino.cc/libastylej-2.03.zip" dest="linux" usetimestamp="true" />
+    <get src="http://downloads.arduino.cc/libastylej-2.03.zip" dest="linux" usetimestamp="true" skipexisting="true" />
     <unzip src="linux/libastylej-2.03.zip" dest="linux" overwrite="true"/>
     <copy file="linux/libastylej/libastylej${arch-bits}.so" tofile="linux/work/lib/libastylej.so" />
     <chmod perm="755" file="linux/work/lib/libastylej.so" />
@@ -671,7 +671,7 @@
       <fileset file="windows/eeprom.h" />
     </copy>
 
-    <get src="http://downloads.arduino.cc/libastylej-2.03.zip" dest="windows" usetimestamp="true" />
+    <get src="http://downloads.arduino.cc/libastylej-2.03.zip" dest="windows" usetimestamp="true" skipexisting="true" />
     <unzip src="windows/libastylej-2.03.zip" dest="windows" overwrite="true"/>
     <copy file="windows/libastylej/AStylej.dll" todir="windows/work/lib" />
 
@@ -728,7 +728,7 @@
   <target name="windows-dist" depends="windows-build"
 	  description="Create .zip files of windows version">
 
-    <get src="http://downloads.arduino.cc/jre_7u40_windows_i586.zip" dest="windows/jre.zip" usetimestamp="true" />
+    <get src="http://downloads.arduino.cc/jre_7u40_windows_i586.zip" dest="windows/jre.zip" usetimestamp="true" skipexisting="true" />
 
     <unzip dest="windows/work" src="windows/jre.zip" overwrite="false"/>
 
