@@ -380,7 +380,7 @@ void init( void )
   __libc_init_array();
 
   // Disable pull-up on every pin
-  for (int i = 0; i < PINS_COUNT; i++)
+  for (unsigned i = 0; i < PINS_COUNT; i++)
 	  digitalWrite(i, LOW);
 
   // Enable parallel access on PIO output data registers

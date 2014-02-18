@@ -150,7 +150,7 @@ uint32_t analogRead(uint32_t ulPin)
 			// Enable the corresponding channel
 			if (ulChannel != latestSelectedChannel) {
 				adc_enable_channel( ADC, ulChannel );
-				if ( latestSelectedChannel != -1 )
+				if ( latestSelectedChannel != (uint32_t)-1 )
 					adc_disable_channel( ADC, latestSelectedChannel );
 				latestSelectedChannel = ulChannel;
 			}
