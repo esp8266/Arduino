@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2013-11-20 10:43+0000\n"
+"PO-Revision-Date: 2014-02-19 14:46+0000\n"
 "Last-Translator: cmaglie <c.maglie@arduino.cc>\n"
 "Language-Team: Norwegian Bokmål (Norway) (http://www.transifex.com/projects/p/arduino-ide-15/language/nb_NO/)\n"
 "MIME-Version: 1.0\n"
@@ -160,7 +160,7 @@ msgstr "Arduino er avhengig av JDK (ikke bare JRE)\nfor å kjøre. Vennligst inn
 
 #: ../../../processing/app/EditorStatus.java:471
 msgid "Arduino: "
-msgstr ""
+msgstr "Arduino:"
 
 #: Sketch.java:588
 #, java-format
@@ -234,15 +234,15 @@ msgstr "Kort"
 msgid ""
 "Board {0}:{1}:{2} doesn''t define a ''build.board'' preference. Auto-set to:"
 " {3}"
-msgstr ""
+msgstr "Kort {0}:{1}:{2} definerer ikke en ''build.board'' innstilling. Automatisk satt til: {3}"
 
 #: ../../../processing/app/EditorStatus.java:472
 msgid "Board: "
-msgstr ""
+msgstr "Kort"
 
 #: ../../../processing/app/Preferences.java:140
 msgid "Bosnian"
-msgstr ""
+msgstr "Bosnisk"
 
 #: SerialMonitor.java:112
 msgid "Both NL & CR"
@@ -303,19 +303,19 @@ msgstr "Se etter oppdateringer ved oppstart"
 
 #: ../../../processing/app/Preferences.java:142
 msgid "Chinese (China)"
-msgstr ""
+msgstr "Kinesisk (Kina)"
 
 #: ../../../processing/app/Preferences.java:142
 msgid "Chinese (Hong Kong)"
-msgstr ""
+msgstr "Kinesisk (Hong Kong)"
 
 #: ../../../processing/app/Preferences.java:144
 msgid "Chinese (Taiwan)"
-msgstr ""
+msgstr "Kinesisk (Taiwan)"
 
 #: ../../../processing/app/Preferences.java:143
 msgid "Chinese (Taiwan) (Big5)"
-msgstr ""
+msgstr "Kinesisk (Taiwan) (Big5)"
 
 #: Preferences.java:88
 msgid "Chinese Simplified"
@@ -397,12 +397,12 @@ msgstr "Kunne ikke slette {0}"
 #: ../../../processing/app/debug/TargetPlatform.java:74
 #, java-format
 msgid "Could not find boards.txt in {0}. Is it pre-1.5?"
-msgstr ""
+msgstr "Fant ikke boards.txt i {0}. Er filen pre-1.5?"
 
 #: ../../../cc/arduino/packages/uploaders/SerialUploader.java:282
 #, java-format
 msgid "Could not find tool {0}"
-msgstr ""
+msgstr "Fant ikke verktøyet {0}"
 
 #: ../../../cc/arduino/packages/uploaders/SerialUploader.java:278
 #, java-format
@@ -564,7 +564,7 @@ msgstr "Nederlandsk"
 
 #: ../../../processing/app/Preferences.java:144
 msgid "Dutch (Netherlands)"
-msgstr ""
+msgstr "Nederlandsk (Nederland)"
 
 #: Editor.java:1130
 msgid "Edit"
@@ -584,7 +584,7 @@ msgstr "Engelsk"
 
 #: ../../../processing/app/Preferences.java:145
 msgid "English (United Kingdom)"
-msgstr ""
+msgstr "Engelsk (Storbrittania)"
 
 #: Editor.java:1062
 msgid "Environment"
@@ -615,14 +615,14 @@ msgstr "Feil i Serial.{0}()"
 
 #: ../../../processing/app/Base.java:1232
 msgid "Error loading libraries"
-msgstr ""
+msgstr "Feil ved innlasting av bibliotekene"
 
 #: ../../../processing/app/debug/TargetPlatform.java:95
 #: ../../../processing/app/debug/TargetPlatform.java:106
 #: ../../../processing/app/debug/TargetPlatform.java:117
 #, java-format
 msgid "Error loading {0}"
-msgstr ""
+msgstr "Feil ved innlasting {0}"
 
 #: Serial.java:181
 #, java-format
@@ -677,7 +677,7 @@ msgstr "Estisk"
 
 #: ../../../processing/app/Preferences.java:146
 msgid "Estonian (Estonia)"
-msgstr ""
+msgstr "Estlandsk (Estland)"
 
 #: Editor.java:516
 msgid "Examples"
@@ -725,7 +725,7 @@ msgstr "Finn:"
 
 #: ../../../processing/app/Preferences.java:147
 msgid "Finnish"
-msgstr ""
+msgstr "Finsk"
 
 #: tools/FixEncoding.java:41 tools/FixEncoding.java:58
 #: tools/FixEncoding.java:79
@@ -862,7 +862,7 @@ msgstr "Indonesisk"
 #: ../../../processing/app/Base.java:1204
 #, java-format
 msgid "Invalid library found in {0}: {1}"
-msgstr ""
+msgstr "Ugyldig bibliotek i {0}: {1}"
 
 #: Preferences.java:102
 msgid "Italian"
@@ -890,7 +890,7 @@ msgstr "Litauisk"
 
 #: ../../../processing/app/Sketch.java:1660
 msgid "Low memory available, stability problems may occur"
-msgstr ""
+msgstr "Lite minne tilgjengelig, stabilitetsproblemer kan forekomme"
 
 #: Preferences.java:107
 msgid "Marathi"
@@ -900,9 +900,9 @@ msgstr "Marathi"
 msgid "Message"
 msgstr "Melding"
 
-#: Sketch.java:1712
+#: ../../../processing/app/preproc/PdePreprocessor.java:412
 msgid "Missing the */ from the end of a /* comment */"
-msgstr "/* mangler fra enden til en /* kommentar */"
+msgstr ""
 
 #: Preferences.java:449
 msgid "More preferences can be edited directly in the file"
@@ -918,11 +918,11 @@ msgstr "Navn på ny fil:"
 
 #: ../../../processing/app/Preferences.java:149
 msgid "Nepali"
-msgstr ""
+msgstr "Nepalsk"
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:51
 msgid "Network upload using programmer not supported"
-msgstr ""
+msgstr "Nettverksopplasting ved bruk av Programmerer er ikke supportert"
 
 #: EditorToolbar.java:41 Editor.java:493
 msgid "New"
@@ -950,7 +950,7 @@ msgstr "Nei"
 
 #: debug/Compiler.java:126
 msgid "No board selected; please choose a board from the Tools > Board menu."
-msgstr "Ingen kort valgt, vennligs velg et kort fra Verktøy > Kort menyen."
+msgstr "Ingen kort valgt, vennligst velg et kort fra Verktøy > Kort menyen."
 
 #: tools/format/src/AutoFormat.java:54 tools/AutoFormat.java:916
 msgid "No changes necessary for Auto Format."
@@ -1002,7 +1002,7 @@ msgstr "Norsk bokmål"
 msgid ""
 "Not enough memory; see http://www.arduino.cc/en/Guide/Troubleshooting#size "
 "for tips on reducing your footprint."
-msgstr ""
+msgstr "Ikke nok minne; se\nhttp://www.arduino.cc/en/Guide/Troubleshooting#size for tips til hvordan man kan redusere størrelsen"
 
 #: Preferences.java:80 Sketch.java:585 Sketch.java:737 Sketch.java:1042
 #: Editor.java:2145 Editor.java:2465
@@ -1039,7 +1039,7 @@ msgstr "Sideoppsett"
 
 #: ../../../processing/app/forms/PasswordAuthorizationDialog.java:44
 msgid "Password:"
-msgstr ""
+msgstr "Passord:"
 
 #: Editor.java:1189 Editor.java:2731
 msgid "Paste"
@@ -1299,7 +1299,7 @@ msgstr "Vis skissemappe"
 
 #: ../../../processing/app/EditorStatus.java:468
 msgid "Show verbose output during compilation"
-msgstr ""
+msgstr "Vis detaljert informasjon under kompilering"
 
 #: Preferences.java:387
 msgid "Show verbose output during: "
@@ -1496,7 +1496,7 @@ msgstr "Denne filen har allerede blitt kopiert til den\nlokasjonen som du prøve
 
 #: ../../../processing/app/EditorStatus.java:467
 msgid "This report would have more information with"
-msgstr ""
+msgstr "Denne rapporten vil inkludere mer informasjon med"
 
 #: Base.java:535
 msgid "Time for a Break"

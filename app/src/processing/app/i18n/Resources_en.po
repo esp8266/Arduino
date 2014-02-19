@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2013-11-20 10:43+0000\n"
+"PO-Revision-Date: 2014-02-19 14:46+0000\n"
 "Last-Translator: cmaglie <c.maglie@arduino.cc>\n"
 "Language-Team: English\n"
 "MIME-Version: 1.0\n"
@@ -91,6 +91,10 @@ msgstr "Add File..."
 msgid "Add Library..."
 msgstr "Add Library..."
 
+#: ../../../processing/app/Preferences.java:96
+msgid "Albanian"
+msgstr "Albanian"
+
 #: tools/FixEncoding.java:77
 msgid ""
 "An error occurred while trying to fix the file encoding.\n"
@@ -170,6 +174,26 @@ msgstr "Are you sure you want to delete \"{0}\"?"
 msgid "Are you sure you want to delete this sketch?"
 msgstr "Are you sure you want to delete this sketch?"
 
+#: ../../../processing/app/Base.java:356
+msgid "Argument required for --board"
+msgstr "Argument required for --board"
+
+#: ../../../processing/app/Base.java:370
+msgid "Argument required for --curdir"
+msgstr "Argument required for --curdir"
+
+#: ../../../processing/app/Base.java:363
+msgid "Argument required for --port"
+msgstr "Argument required for --port"
+
+#: ../../../processing/app/Base.java:377
+msgid "Argument required for --pref"
+msgstr "Argument required for --pref"
+
+#: ../../../processing/app/Base.java:384
+msgid "Argument required for --preferences-file"
+msgstr "Argument required for --preferences-file"
+
 #: ../../../processing/app/Preferences.java:137
 msgid "Armenian"
 msgstr "Armenian"
@@ -219,6 +243,10 @@ msgstr "Bad error line: {0}"
 msgid "Bad file selected"
 msgstr "Bad file selected"
 
+#: ../../../processing/app/Preferences.java:149
+msgid "Basque"
+msgstr "Basque"
+
 #: ../../../processing/app/Preferences.java:139
 msgid "Belarusian"
 msgstr "Belarusian"
@@ -255,6 +283,10 @@ msgstr "Browse"
 msgid "Build folder disappeared or could not be written"
 msgstr "Build folder disappeared or could not be written"
 
+#: ../../../processing/app/Sketch.java:1530
+msgid "Build options changed, rebuilding all"
+msgstr "Build options changed, rebuilding all"
+
 #: ../../../processing/app/Preferences.java:80
 msgid "Bulgarian"
 msgstr "Bulgarian"
@@ -270,10 +302,6 @@ msgstr "Burn Bootloader"
 #: Editor.java:2504
 msgid "Burning bootloader to I/O Board (this may take a minute)..."
 msgstr "Burning bootloader to I/O Board (this may take a minute)..."
-
-#: ../../../processing/app/Base.java:368
-msgid "Can't open source sketch!"
-msgstr "Can't open source sketch!"
 
 #: ../../../processing/app/Preferences.java:92
 msgid "Canadian French"
@@ -444,10 +472,9 @@ msgid ""
 "You'll need to reinstall Arduino."
 msgstr "Could not read default settings.\nYou'll need to reinstall Arduino."
 
-#: Preferences.java:258
-#, java-format
-msgid "Could not read preferences from {0}"
-msgstr "Could not read preferences from {0}"
+#: ../../../processing/app/Sketch.java:1525
+msgid "Could not read prevous build preferences file, rebuilding all"
+msgstr "Could not read prevous build preferences file, rebuilding all"
 
 #: Base.java:2482
 #, java-format
@@ -475,6 +502,10 @@ msgstr "Could not rename the sketch. (2)"
 #, java-format
 msgid "Could not replace {0}"
 msgstr "Could not replace {0}"
+
+#: ../../../processing/app/Sketch.java:1579
+msgid "Could not write build preferences file"
+msgstr "Could not write build preferences file"
 
 #: tools/Archiver.java:74
 msgid "Couldn't archive sketch"
@@ -690,6 +721,11 @@ msgstr "Export canceled, changes must first be saved."
 msgid "FAQ.html"
 msgstr "FAQ.html"
 
+#: ../../../processing/app/Base.java:416
+#, java-format
+msgid "Failed to open sketch: \"{0}\""
+msgstr "Failed to open sketch: \"{0}\""
+
 #: Editor.java:491
 msgid "File"
 msgstr "File"
@@ -901,7 +937,7 @@ msgstr "Message"
 
 #: ../../../processing/app/preproc/PdePreprocessor.java:412
 msgid "Missing the */ from the end of a /* comment */"
-msgstr ""
+msgstr "Missing the */ from the end of a /* comment */"
 
 #: Preferences.java:449
 msgid "More preferences can be edited directly in the file"
@@ -910,6 +946,14 @@ msgstr "More preferences can be edited directly in the file"
 #: Editor.java:2156
 msgid "Moving"
 msgstr "Moving"
+
+#: ../../../processing/app/Base.java:395
+msgid "Must specify exactly one sketch file"
+msgstr "Must specify exactly one sketch file"
+
+#: ../../../processing/app/Preferences.java:158
+msgid "N'Ko"
+msgstr "N'Ko"
 
 #: Sketch.java:282
 msgid "Name for new file:"
@@ -975,6 +1019,10 @@ msgstr "No really, time for some fresh air for you."
 #, java-format
 msgid "No reference available for \"{0}\""
 msgstr "No reference available for \"{0}\""
+
+#: ../../../processing/app/Sketch.java:204
+msgid "No valid code files found"
+msgstr "No valid code files found"
 
 #: ../../../processing/app/Base.java:309
 msgid "No valid configured cores found! Exiting..."
@@ -1048,9 +1096,17 @@ msgstr "Paste"
 msgid "Persian"
 msgstr "Persian"
 
+#: ../../../processing/app/Preferences.java:161
+msgid "Persian (Iran)"
+msgstr "Persian (Iran)"
+
 #: debug/Compiler.java:408
 msgid "Please import the SPI library from the Sketch > Import Library menu."
 msgstr "Please import the SPI library from the Sketch > Import Library menu."
+
+#: ../../../processing/app/debug/Compiler.java:529
+msgid "Please import the Wire library from the Sketch > Import Library menu."
+msgstr "Please import the Wire library from the Sketch > Import Library menu."
 
 #: Base.java:239
 msgid "Please install JDK 1.5 or later"
@@ -1260,20 +1316,6 @@ msgstr "Send"
 msgid "Serial Monitor"
 msgstr "Serial Monitor"
 
-#: Serial.java:174
-#, java-format
-msgid ""
-"Serial port ''{0}'' already in use. Try quiting any programs that may be "
-"using it."
-msgstr "Serial port ''{0}'' already in use. Try quiting any programs that may be using it."
-
-#: Serial.java:121
-#, java-format
-msgid ""
-"Serial port ''{0}'' already in use. Try quitting any programs that may be "
-"using it."
-msgstr "Serial port ''{0}'' already in use. Try quitting any programs that may be using it."
-
 #: Serial.java:194
 #, java-format
 msgid ""
@@ -1470,12 +1512,12 @@ msgid ""
 "but anything besides the code will be lost."
 msgstr "The sketch folder has disappeared.\n Will attempt to re-save in the same location,\nbut anything besides the code will be lost."
 
-#: Sketch.java:2018
+#: ../../../processing/app/Sketch.java:2028
 msgid ""
 "The sketch name had to be modified. Sketch names can only consist\n"
 "of ASCII characters and numbers (but cannot start with a number).\n"
-"They should also be less less than 64 characters long."
-msgstr "The sketch name had to be modified. Sketch names can only consist\nof ASCII characters and numbers (but cannot start with a number).\nThey should also be less less than 64 characters long."
+"They should also be less than 64 characters long."
+msgstr "The sketch name had to be modified. Sketch names can only consist\nof ASCII characters and numbers (but cannot start with a number).\nThey should also be less than 64 characters long."
 
 #: Base.java:259
 msgid ""
@@ -1627,6 +1669,13 @@ msgstr "Vietnamese"
 #: Editor.java:1105
 msgid "Visit Arduino.cc"
 msgstr "Visit Arduino.cc"
+
+#: ../../../processing/app/debug/Compiler.java:115
+#, java-format
+msgid ""
+"WARNING: library {0} claims to run on {1} architecture(s) and may be "
+"incompatible with your current board which runs on {2} architecture(s)."
+msgstr "WARNING: library {0} claims to run on {1} architecture(s) and may be incompatible with your current board which runs on {2} architecture(s)."
 
 #: Base.java:2128
 msgid "Warning"
@@ -1850,6 +1899,11 @@ msgid ""
 "the selected serial port {0} does not exist or your board is not connected"
 msgstr "the selected serial port {0} does not exist or your board is not connected"
 
+#: ../../../processing/app/Base.java:389
+#, java-format
+msgid "unknown option: {0}"
+msgstr "unknown option: {0}"
+
 #: Preferences.java:391
 msgid "upload"
 msgstr "upload"
@@ -1873,3 +1927,45 @@ msgstr "{0} | Arduino {1}"
 #, java-format
 msgid "{0}.html"
 msgstr "{0}.html"
+
+#: ../../../processing/app/Base.java:519
+#, java-format
+msgid "{0}: Invalid argument to --pref, should be of the form \"pref=value\""
+msgstr "{0}: Invalid argument to --pref, should be of the form \"pref=value\""
+
+#: ../../../processing/app/Base.java:476
+#, java-format
+msgid ""
+"{0}: Invalid board name, it should be of the form \"package:arch:board\" or "
+"\"package:arch:board:options\""
+msgstr "{0}: Invalid board name, it should be of the form \"package:arch:board\" or \"package:arch:board:options\""
+
+#: ../../../processing/app/Base.java:509
+#, java-format
+msgid "{0}: Invalid option for \"{1}\" option for board \"{2}\""
+msgstr "{0}: Invalid option for \"{1}\" option for board \"{2}\""
+
+#: ../../../processing/app/Base.java:507
+#, java-format
+msgid "{0}: Invalid option for board \"{1}\""
+msgstr "{0}: Invalid option for board \"{1}\""
+
+#: ../../../processing/app/Base.java:502
+#, java-format
+msgid "{0}: Invalid option, should be of the form \"name=value\""
+msgstr "{0}: Invalid option, should be of the form \"name=value\""
+
+#: ../../../processing/app/Base.java:486
+#, java-format
+msgid "{0}: Unknown architecture"
+msgstr "{0}: Unknown architecture"
+
+#: ../../../processing/app/Base.java:491
+#, java-format
+msgid "{0}: Unknown board"
+msgstr "{0}: Unknown board"
+
+#: ../../../processing/app/Base.java:481
+#, java-format
+msgid "{0}: Unknown package"
+msgstr "{0}: Unknown package"

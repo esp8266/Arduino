@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2013-11-20 10:43+0000\n"
+"PO-Revision-Date: 2014-02-19 14:46+0000\n"
 "Last-Translator: cmaglie <c.maglie@arduino.cc>\n"
 "Language-Team: Belarusian (http://www.transifex.com/projects/p/arduino-ide-15/language/be/)\n"
 "MIME-Version: 1.0\n"
@@ -188,7 +188,7 @@ msgstr "Аўтафармат скасаваны: занадта шмат '{'-д�
 
 #: tools/AutoFormat.java:925
 msgid "Auto Format Canceled: Too many left parentheses."
-msgstr ""
+msgstr "Аўта Фармат Адменены: занадта шмат левых дужак."
 
 #: tools/AutoFormat.java:931
 msgid "Auto Format Canceled: Too many right curly braces."
@@ -196,7 +196,7 @@ msgstr "Аўтафармат скасаваны: занадта шмат '}'-д�
 
 #: tools/AutoFormat.java:922
 msgid "Auto Format Canceled: Too many right parentheses."
-msgstr ""
+msgstr "Аўта Фармат адменены: занадта шмат правых дужак."
 
 #: tools/AutoFormat.java:944
 msgid "Auto Format finished."
@@ -306,7 +306,7 @@ msgstr "Кітайская (Кітай)"
 
 #: ../../../processing/app/Preferences.java:142
 msgid "Chinese (Hong Kong)"
-msgstr "Кітайская (Гон-Конг)"
+msgstr "Кітайская (Hong Kong)"
 
 #: ../../../processing/app/Preferences.java:144
 msgid "Chinese (Taiwan)"
@@ -355,7 +355,7 @@ msgstr "Капіяваць як HTML"
 
 #: ../../../processing/app/EditorStatus.java:455
 msgid "Copy error messages"
-msgstr ""
+msgstr "Капіяваць паведамленне аб памылцы"
 
 #: Editor.java:1165 Editor.java:2715
 msgid "Copy for Forum"
@@ -436,7 +436,7 @@ msgstr "Немагчыма перазахаваць скетч"
 msgid ""
 "Could not read color theme settings.\n"
 "You'll need to reinstall Processing."
-msgstr ""
+msgstr "Немагчыма прчытаць налажкі колернай тэмы.\nПатрэбна пераінсталяваць Processing."
 
 #: Preferences.java:219
 msgid ""
@@ -531,7 +531,7 @@ msgstr "Акінуць усе змены і перазагрузіць скет�
 
 #: ../../../processing/app/Preferences.java:438
 msgid "Display line numbers"
-msgstr ""
+msgstr "Паказваць нумары радкоў"
 
 #: Editor.java:2064
 msgid "Don't Save"
@@ -729,7 +729,7 @@ msgstr "Фінская"
 #: tools/FixEncoding.java:41 tools/FixEncoding.java:58
 #: tools/FixEncoding.java:79
 msgid "Fix Encoding & Reload"
-msgstr ""
+msgstr "Выправіць кадыроўку & Перазагрузіць"
 
 #: Base.java:1851
 msgid ""
@@ -899,9 +899,9 @@ msgstr "Маратхі"
 msgid "Message"
 msgstr "Паведамленне"
 
-#: Sketch.java:1712
+#: ../../../processing/app/preproc/PdePreprocessor.java:412
 msgid "Missing the */ from the end of a /* comment */"
-msgstr "Адсутнічаюць сімвалы */  канца  /* каментара */"
+msgstr ""
 
 #: Preferences.java:449
 msgid "More preferences can be edited directly in the file"
@@ -965,7 +965,7 @@ msgstr "launcher недаступны"
 
 #: SerialMonitor.java:112
 msgid "No line ending"
-msgstr ""
+msgstr "Няма канца радка"
 
 #: Base.java:541
 msgid "No really, time for some fresh air for you."
@@ -983,7 +983,7 @@ msgstr "Не знойдзена годных канфігурацыйных ка
 #: ../../../processing/app/debug/TargetPackage.java:63
 #, java-format
 msgid "No valid hardware definitions found in folder {0}."
-msgstr ""
+msgstr "Не знойдзена апаратных вызначэнняў у каталозе {0}."
 
 #: Base.java:191
 msgid "Non-fatal error while setting the Look & Feel."
@@ -1114,11 +1114,11 @@ msgstr "Праблема выбару платформы."
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:136
 msgid "Problem accessing board folder /www/sd"
-msgstr ""
+msgstr "Праблема дуступу да каталога платы /www/sd"
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:132
 msgid "Problem accessing files in folder "
-msgstr "Немагчыма дабрацца да файлаў у каталоге"
+msgstr "Немагчыма дабрацца да файлаў у каталозе"
 
 #: Base.java:1673
 msgid "Problem getting data folder"
@@ -1279,7 +1279,7 @@ msgstr "Паслядоўны порт ''{0}'' ужо ўжываецца. Пас�
 msgid ""
 "Serial port ''{0}'' not found. Did you select the right one from the Tools >"
 " Serial Port menu?"
-msgstr "Паслядоўны порт ''{0}'' ня знойдзены. Ці выбралі вы патрэбны ў меню Tools > Serial Port ?"
+msgstr "Паслядоўны порт ''{0}'' не знойдзены. Ці выбралі вы патрэбны ў меню Tools > Serial Port ?"
 
 #: Editor.java:2343
 #, java-format
@@ -1355,7 +1355,7 @@ msgstr "Месцазнаходжанне каталогу скетчаў"
 
 #: ../../../processing/app/Base.java:785
 msgid "Sketches (*.ino, *.pde)"
-msgstr ""
+msgstr "Скетчы (*.ino, *.pde)"
 
 #: ../../../processing/app/Preferences.java:152
 msgid "Slovenian"
@@ -1528,7 +1528,7 @@ msgstr "Украінская"
 #: ../../../processing/app/Editor.java:2524
 #: ../../../processing/app/NetworkMonitor.java:145
 msgid "Unable to connect: is the sketch using the bridge?"
-msgstr "НЕмагчыма злучыцца: скетч ужывае bridge ?"
+msgstr "Немагчыма злучыцца: скетч ужывае bridge ?"
 
 #: ../../../processing/app/NetworkMonitor.java:130
 msgid "Unable to connect: retrying"
@@ -1556,7 +1556,7 @@ msgid ""
 "Unspecified platform, no launcher available.\n"
 "To enable opening URLs or folders, add a \n"
 "\"launcher=/path/to/app\" line to preferences.txt"
-msgstr "Нявызначаная платформа, launcher недаступны.\nКаб дазволіць адчыняць URL як каталогі, дадайце\nрадок \"launcher=/path/to/app\" у файь preferences.txt"
+msgstr "Нявызначаная платформа, launcher недаступны.\nКаб дазволіць адчыняць URL як каталогі, дадайце\nрадок \"launcher=/path/to/app\" у файл preferences.txt"
 
 #: UpdateCheck.java:111
 msgid "Update"
@@ -1601,12 +1601,12 @@ msgstr "Карыстацца вонкавым рэдактарам"
 #: ../../../processing/app/debug/Compiler.java:94
 #, java-format
 msgid "Using library {0} in folder: {1} {2}"
-msgstr ""
+msgstr "Ужываецца бібліятэка {0} у каталозе: {1} {2}"
 
 #: ../../../processing/app/debug/Compiler.java:320
 #, java-format
 msgid "Using previously compiled file: {0}"
-msgstr ""
+msgstr "Ужываецца раней скампіляваны файл: {0}"
 
 #: EditorToolbar.java:41 EditorToolbar.java:46
 msgid "Verify"
@@ -1687,7 +1687,7 @@ msgstr ""
 #: ../../../processing/app/AbstractMonitor.java:92
 msgid ""
 "You've pressed {0} but nothing was sent. Should you select a line ending?"
-msgstr ""
+msgstr "Вы націснулі {0} але нічога не было даслана. Ці не выдзеліце вы канец радка?"
 
 #: Base.java:536
 msgid ""
@@ -1842,7 +1842,7 @@ msgstr "removeCode: internal error.. немагчыма знайсці код"
 
 #: Editor.java:932
 msgid "serialMenu is null"
-msgstr ""
+msgstr "serialMenu is null"
 
 #: debug/Uploader.java:195
 #, java-format

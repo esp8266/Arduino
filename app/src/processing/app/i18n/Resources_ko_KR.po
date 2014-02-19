@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2013-11-20 10:43+0000\n"
-"Last-Translator: jbkim <jinbuhm.kim@gmail.com>\n"
+"PO-Revision-Date: 2014-02-19 14:46+0000\n"
+"Last-Translator: cmaglie <c.maglie@arduino.cc>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/projects/p/arduino-ide-15/language/ko_KR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -355,7 +355,7 @@ msgstr "HTML로 복사"
 
 #: ../../../processing/app/EditorStatus.java:455
 msgid "Copy error messages"
-msgstr ""
+msgstr " 복사 오류 메시지"
 
 #: Editor.java:1165 Editor.java:2715
 msgid "Copy for Forum"
@@ -531,7 +531,7 @@ msgstr "모든 변경을 취소하고 스케치를 다시 로드하나요?"
 
 #: ../../../processing/app/Preferences.java:438
 msgid "Display line numbers"
-msgstr ""
+msgstr "줄 번호 표시"
 
 #: Editor.java:2064
 msgid "Don't Save"
@@ -899,9 +899,9 @@ msgstr "마라티어"
 msgid "Message"
 msgstr "메시지"
 
-#: Sketch.java:1712
+#: ../../../processing/app/preproc/PdePreprocessor.java:412
 msgid "Missing the */ from the end of a /* comment */"
-msgstr "/* 주석 */의 끝에 */ 누락"
+msgstr ""
 
 #: Preferences.java:449
 msgid "More preferences can be edited directly in the file"
@@ -1355,7 +1355,7 @@ msgstr "스케치북 위치: "
 
 #: ../../../processing/app/Base.java:785
 msgid "Sketches (*.ino, *.pde)"
-msgstr ""
+msgstr "스케치 (*.ino, *.pde)"
 
 #: ../../../processing/app/Preferences.java:152
 msgid "Slovenian"
@@ -1601,12 +1601,12 @@ msgstr "외부 에디터 사용"
 #: ../../../processing/app/debug/Compiler.java:94
 #, java-format
 msgid "Using library {0} in folder: {1} {2}"
-msgstr ""
+msgstr "폴더:{1} {2}의 라이브러리 {0} 사용"
 
 #: ../../../processing/app/debug/Compiler.java:320
 #, java-format
 msgid "Using previously compiled file: {0}"
-msgstr ""
+msgstr "이전에 컴파일된 파일: {0} 사용"
 
 #: EditorToolbar.java:41 EditorToolbar.java:46
 msgid "Verify"

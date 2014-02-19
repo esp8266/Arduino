@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2013-11-20 10:43+0000\n"
+"PO-Revision-Date: 2014-02-19 14:46+0000\n"
 "Last-Translator: cmaglie <c.maglie@arduino.cc>\n"
 "Language-Team: Chinese (Taiwan) (Big5)  (http://www.transifex.com/projects/p/arduino-ide-15/language/zh_TW.Big5/)\n"
 "MIME-Version: 1.0\n"
@@ -310,7 +310,7 @@ msgstr ""
 
 #: ../../../processing/app/Preferences.java:144
 msgid "Chinese (Taiwan)"
-msgstr ""
+msgstr "中文(台灣)"
 
 #: ../../../processing/app/Preferences.java:143
 msgid "Chinese (Taiwan) (Big5)"
@@ -355,7 +355,7 @@ msgstr "當做HTML進行複製"
 
 #: ../../../processing/app/EditorStatus.java:455
 msgid "Copy error messages"
-msgstr ""
+msgstr "複制錯誤訊息"
 
 #: Editor.java:1165 Editor.java:2715
 msgid "Copy for Forum"
@@ -724,7 +724,7 @@ msgstr "尋找:"
 
 #: ../../../processing/app/Preferences.java:147
 msgid "Finnish"
-msgstr ""
+msgstr "完成"
 
 #: tools/FixEncoding.java:41 tools/FixEncoding.java:58
 #: tools/FixEncoding.java:79
@@ -899,9 +899,9 @@ msgstr "馬拉地語"
 msgid "Message"
 msgstr "訊息"
 
-#: Sketch.java:1712
+#: ../../../processing/app/preproc/PdePreprocessor.java:412
 msgid "Missing the */ from the end of a /* comment */"
-msgstr "在/*註解*/之後沒看到*/"
+msgstr ""
 
 #: Preferences.java:449
 msgid "More preferences can be edited directly in the file"
@@ -1038,7 +1038,7 @@ msgstr "頁面設定"
 
 #: ../../../processing/app/forms/PasswordAuthorizationDialog.java:44
 msgid "Password:"
-msgstr ""
+msgstr "密碼:"
 
 #: Editor.java:1189 Editor.java:2731
 msgid "Paste"
@@ -1532,7 +1532,7 @@ msgstr ""
 
 #: ../../../processing/app/NetworkMonitor.java:130
 msgid "Unable to connect: retrying"
-msgstr ""
+msgstr "連接不成功: 正在重試"
 
 #: ../../../processing/app/Editor.java:2526
 msgid "Unable to connect: wrong password?"
@@ -1778,7 +1778,7 @@ msgstr "編譯"
 
 #: ../../../processing/app/NetworkMonitor.java:111
 msgid "connected!"
-msgstr ""
+msgstr "已連接!"
 
 #: Sketch.java:540
 msgid "createNewFile() returned false"

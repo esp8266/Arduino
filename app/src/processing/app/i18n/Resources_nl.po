@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2013-11-20 10:43+0000\n"
+"PO-Revision-Date: 2014-02-19 14:46+0000\n"
 "Last-Translator: cmaglie <c.maglie@arduino.cc>\n"
 "Language-Team: Dutch (http://www.transifex.com/projects/p/arduino-ide-15/language/nl/)\n"
 "MIME-Version: 1.0\n"
@@ -565,7 +565,7 @@ msgstr "Nederlands"
 
 #: ../../../processing/app/Preferences.java:144
 msgid "Dutch (Netherlands)"
-msgstr ""
+msgstr "Nederlands (NL)"
 
 #: Editor.java:1130
 msgid "Edit"
@@ -585,7 +585,7 @@ msgstr "Engels"
 
 #: ../../../processing/app/Preferences.java:145
 msgid "English (United Kingdom)"
-msgstr ""
+msgstr "Engels (GB)"
 
 #: Editor.java:1062
 msgid "Environment"
@@ -901,9 +901,9 @@ msgstr "Marathi"
 msgid "Message"
 msgstr "Boodschap"
 
-#: Sketch.java:1712
+#: ../../../processing/app/preproc/PdePreprocessor.java:412
 msgid "Missing the */ from the end of a /* comment */"
-msgstr "De */ ontbreekt op het einde van een /* commentaar */"
+msgstr ""
 
 #: Preferences.java:449
 msgid "More preferences can be edited directly in the file"
@@ -980,7 +980,7 @@ msgstr "Geen naslagwerk beschikbaar voor \"{0}\""
 
 #: ../../../processing/app/Base.java:309
 msgid "No valid configured cores found! Exiting..."
-msgstr ""
+msgstr "Geen geldige geconfigureerde kernen gevonden! Opwindend..."
 
 #: ../../../processing/app/debug/TargetPackage.java:63
 #, java-format
@@ -1040,7 +1040,7 @@ msgstr "Pagina-instelling"
 
 #: ../../../processing/app/forms/PasswordAuthorizationDialog.java:44
 msgid "Password:"
-msgstr ""
+msgstr "Wachtwoord:"
 
 #: Editor.java:1189 Editor.java:2731
 msgid "Paste"
@@ -1064,19 +1064,19 @@ msgstr "Pools"
 
 #: ../../../processing/app/Editor.java:718
 msgid "Port"
-msgstr ""
+msgstr "Poort"
 
 #: ../../../processing/app/Preferences.java:151
 msgid "Portugese"
-msgstr ""
+msgstr "Portugees"
 
 #: ../../../processing/app/Preferences.java:127
 msgid "Portuguese (Brazil)"
-msgstr ""
+msgstr "Portugees (Brazilië)"
 
 #: ../../../processing/app/Preferences.java:128
 msgid "Portuguese (Portugal)"
-msgstr ""
+msgstr "Portugees (Portugal)"
 
 #: Preferences.java:295 Editor.java:583
 msgid "Preferences"
@@ -1120,7 +1120,7 @@ msgstr ""
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:132
 msgid "Problem accessing files in folder "
-msgstr ""
+msgstr "Probleem met het ophalen van bestanden uit de map"
 
 #: Base.java:1673
 msgid "Problem getting data folder"
@@ -1391,7 +1391,7 @@ msgstr "Zonneschijn"
 
 #: ../../../processing/app/Preferences.java:153
 msgid "Swedish"
-msgstr ""
+msgstr "Zweeds"
 
 #: Preferences.java:84
 msgid "System Default"
@@ -1538,7 +1538,7 @@ msgstr ""
 
 #: ../../../processing/app/Editor.java:2526
 msgid "Unable to connect: wrong password?"
-msgstr ""
+msgstr "Kan niet verbinden: verkeerde wachtwoord?"
 
 #: ../../../processing/app/Editor.java:2512
 msgid "Unable to open serial monitor"
@@ -1582,7 +1582,7 @@ msgstr "Uploaden geannuleerd."
 
 #: ../../../processing/app/Sketch.java:1678
 msgid "Upload cancelled"
-msgstr ""
+msgstr "Upload geannuleerd"
 
 #: Editor.java:2378
 msgid "Uploading to I/O Board..."
@@ -1780,7 +1780,7 @@ msgstr "compilatie"
 
 #: ../../../processing/app/NetworkMonitor.java:111
 msgid "connected!"
-msgstr ""
+msgstr "verbonden!"
 
 #: Sketch.java:540
 msgid "createNewFile() returned false"

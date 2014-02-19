@@ -93,6 +93,7 @@ public class Preferences {
 
   Language languages[] = {
       new Language(_("System Default"), "", ""),
+      new Language(_("Albanian"), "shqip", "sq"),
       new Language(_("Arabic"), "العربية", "ar"),
       new Language(_("Aragonese"), "Aragonés", "an"),
       new Language(_("Belarusian"), "Беларуская мова", "be"),
@@ -145,6 +146,7 @@ public class Preferences {
   Language missingLanguages[] = {
       new Language(_("Armenian"), "Հայերեն", "hy"),
       new Language(_("Asturian"), "Asturianu", "ast"),
+      new Language(_("Basque"), "Euskara", "eu"),
       new Language(_("Bosnian"), "Bosanski", "bs"),
       new Language(_("Burmese (Myanmar)"), "ဗမာစကား", "my_MM"),
       new Language(_("Chinese (China)"), "", "zh_CN"),
@@ -153,8 +155,10 @@ public class Preferences {
       new Language(_("Chinese (Taiwan) (Big5)"), "", "zh_TW.Big5"),
       new Language(_("Dutch (Netherlands)"), "Nederlands", "nl_NL"),
       new Language(_("Nepali"), "नेपाली", "ne"),
+      new Language(_("N'Ko"), "ߒߞߏ", "nqo"),
       new Language(_("Marathi"), "मराठी", "mr"),
       new Language(_("Portugese"), "Português", "pt"),
+      new Language(_("Persian (Iran)"), "فارسی (Iran)", "fa_IR"),
       };
 
   /**

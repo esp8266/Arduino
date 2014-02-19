@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2013-11-20 10:43+0000\n"
+"PO-Revision-Date: 2014-02-19 14:46+0000\n"
 "Last-Translator: cmaglie <c.maglie@arduino.cc>\n"
 "Language-Team: Finnish (http://www.transifex.com/projects/p/arduino-ide-15/language/fi/)\n"
 "MIME-Version: 1.0\n"
@@ -31,7 +31,7 @@ msgstr "'Mouse' on tuettu vain Arduino Leonardossa."
 
 #: Preferences.java:478
 msgid "(edit only when Arduino is not running)"
-msgstr "(editointi vain Arduino suljettuna)"
+msgstr "(Muokkaa vain kun Arduino on suljettuna)"
 
 #: Sketch.java:746
 msgid ".pde -> .ino"
@@ -42,7 +42,7 @@ msgid ""
 "<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p {"
 " font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Are you "
 "sure you want to Quit?</b><p>Closing the last open sketch will quit Arduino."
-msgstr "<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p { font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Oletko varma että haluat lopettaa?</b><p>Viimeisen sketsin sulkeminen sulkee Arduinon."
+msgstr "<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p { font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Oletko varma että haluat lopettaa?</b><p>Viimeisen ikkunan sulkeminen sulkee Arduinon."
 
 #: Editor.java:2053
 msgid ""
@@ -55,7 +55,7 @@ msgstr "<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" 
 #: Sketch.java:398
 #, java-format
 msgid "A file named \"{0}\" already exists in \"{1}\""
-msgstr "Tiedosto nimeltä \"{0}\" on jo paikassa \"{1}\""
+msgstr "Tiedosto \"{0}\" on jo olemassa paikassa \"{1}\""
 
 #: Editor.java:2169
 #, java-format
@@ -148,7 +148,7 @@ msgstr "Arduino ei voi käynnistyä, koska\nse ei voi luoda kansiota asetuksille
 msgid ""
 "Arduino cannot run because it could not\n"
 "create a folder to store your sketchbook."
-msgstr "Arduino ei voi käynnistyä, koska se ei voinut\nluoda kansiota sketsikirjallesi."
+msgstr "Arduino ei voi käynnistyä, koska se ei voinut\nluoda kansiota ohjelmillesi."
 
 #: Base.java:240
 msgid ""
@@ -204,7 +204,7 @@ msgstr "Jäsennys valmis."
 
 #: Preferences.java:439
 msgid "Automatically associate .ino files with Arduino"
-msgstr "Assosioi .ino tiedostot Arduinoon"
+msgstr "Avaa .ino-tiedostot Arduinolla"
 
 #: SerialMonitor.java:110
 msgid "Autoscroll"
@@ -286,7 +286,7 @@ msgstr "Peruuta"
 
 #: Sketch.java:455
 msgid "Cannot Rename"
-msgstr "Ei voi uudelleennimetä"
+msgstr "Nimeä ei voi muuttaa"
 
 #: SerialMonitor.java:112
 msgid "Carriage return"
@@ -355,7 +355,7 @@ msgstr "Kopioi HTML:nä"
 
 #: ../../../processing/app/EditorStatus.java:455
 msgid "Copy error messages"
-msgstr ""
+msgstr "Kopiointivirheviestit"
 
 #: Editor.java:1165 Editor.java:2715
 msgid "Copy for Forum"
@@ -413,7 +413,7 @@ msgstr "Työkalua {0} ei löytynyt paketista {1}"
 msgid ""
 "Could not open the URL\n"
 "{0}"
-msgstr "Ei voitu avata URL:ia\n{0}"
+msgstr "URL:ia {0} ei voitu avata"
 
 #: Base.java:1958
 #, java-format
@@ -452,16 +452,16 @@ msgstr "Ei voitu lukea asetuksia paikasta {0}"
 #: Base.java:2482
 #, java-format
 msgid "Could not remove old version of {0}"
-msgstr "Ei voitu poistaa vanhaa versiota {0}"
+msgstr "{0}:n vanhaa versiota ei voitu poistaa"
 
 #: Sketch.java:483 Sketch.java:528
 #, java-format
 msgid "Could not rename \"{0}\" to \"{1}\""
-msgstr "\"{0}\" ei voitu nimetä \"{1}\""
+msgstr "Nimeä \"{0}\" ei voitu korvata \"{1}\":lla"
 
 #: Sketch.java:475
 msgid "Could not rename the sketch. (0)"
-msgstr "Sketsiä ei voitu uudelleennimetä. (0)"
+msgstr "Ohjelman nimeä ei voitu muuttaa. (0)"
 
 #: Sketch.java:496
 msgid "Could not rename the sketch. (1)"
@@ -474,7 +474,7 @@ msgstr "Sketsiä ei voitu uudelleennimetä. (2)"
 #: Base.java:2492
 #, java-format
 msgid "Could not replace {0}"
-msgstr "{0} ei voitu korvata"
+msgstr "{0}:aa ei voitu korvata"
 
 #: tools/Archiver.java:74
 msgid "Couldn't archive sketch"
@@ -531,7 +531,7 @@ msgstr "Hylkää muutokset ja avaa sketsi uudelleen?"
 
 #: ../../../processing/app/Preferences.java:438
 msgid "Display line numbers"
-msgstr ""
+msgstr "Näytä rivinumerot"
 
 #: Editor.java:2064
 msgid "Don't Save"
@@ -605,7 +605,7 @@ msgstr "Virhe käännettäessä."
 
 #: Base.java:1674
 msgid "Error getting the Arduino data folder."
-msgstr "Virhe noudettaessa Arduinon datakansiota"
+msgstr "Arduinon datakansiota haettaessa tapahtui virhe."
 
 #: Serial.java:593
 #, java-format
@@ -735,7 +735,7 @@ msgstr "Korjaa koodaus ja avaa uudelleen"
 msgid ""
 "For information on installing libraries, see: "
 "http://arduino.cc/en/Guide/Libraries\n"
-msgstr "Tietoa kirjastojen asentamisesta: http://arduino.cc/en/Guide/Libraries\n"
+msgstr "Jos haluat tietää, kuinka kirjastoja asennetaan, katso: http://arduino.cc/en/Guide/Libraries\n"
 
 #: debug/BasicUploader.java:80
 msgid "Forcing reset using 1200bps open/close on port "
@@ -813,7 +813,7 @@ msgstr "hindi"
 msgid ""
 "How about saving the sketch first \n"
 "before trying to rename it?"
-msgstr "Mitäpä jos tallentaisit sketsin ennen \nkuin uudelleennimeät?"
+msgstr "Tallenna ohjelma ennen uudelleennimeämistä."
 
 #: Sketch.java:882
 msgid "How very Borges of you"
@@ -829,11 +829,11 @@ msgstr "Sivuuta koko"
 
 #: Base.java:1058
 msgid "Ignoring bad library name"
-msgstr "Sivuutetaan väärän niminen kirjasto"
+msgstr "Sivuutetaan huononniminen kirjasto"
 
 #: Base.java:1436
 msgid "Ignoring sketch with bad name"
-msgstr "Sivuutetaan väärän niminen sketsi."
+msgstr "Sivuutetaan huononniminen ohjelma"
 
 #: Editor.java:636
 msgid "Import Library..."
@@ -899,13 +899,13 @@ msgstr "marathi"
 msgid "Message"
 msgstr "Viesti"
 
-#: Sketch.java:1712
+#: ../../../processing/app/preproc/PdePreprocessor.java:412
 msgid "Missing the */ from the end of a /* comment */"
-msgstr "*/ puuttuu /*kommentin*/ lopusta"
+msgstr ""
 
 #: Preferences.java:449
 msgid "More preferences can be edited directly in the file"
-msgstr "Lisää asetuksia voi muokata suoraan tiedostosta"
+msgstr "Lisää asetuksia voi muokata suoraan tiedostossa"
 
 #: Editor.java:2156
 msgid "Moving"
@@ -929,7 +929,7 @@ msgstr "Uusi"
 
 #: EditorToolbar.java:46
 msgid "New Editor Window"
-msgstr "Uusi editointi-ikkuna"
+msgstr "Uusi ikkuna"
 
 #: EditorHeader.java:292
 msgid "New Tab"
@@ -969,7 +969,7 @@ msgstr "Ei rivipäätettä"
 
 #: Base.java:541
 msgid "No really, time for some fresh air for you."
-msgstr "Ei kun oikeesti, nyt haukkaan raitista ilmaa."
+msgstr "Nyt on aika lähteä raittiiseen ilmaan."
 
 #: Editor.java:1872
 #, java-format
@@ -987,7 +987,7 @@ msgstr "Validia laitteistokonfiguraatiota ei löytynyt kansiosta {0}."
 
 #: Base.java:191
 msgid "Non-fatal error while setting the Look & Feel."
-msgstr "Pikku virhe asetettaessa ulkonäköä."
+msgstr "Ulkonäköä asetettaessa tapahtui pieni virhe."
 
 #: Sketch.java:396 Sketch.java:410 Sketch.java:419 Sketch.java:859
 msgid "Nope"
@@ -1022,11 +1022,11 @@ msgstr "Avaa URL"
 
 #: Base.java:636
 msgid "Open an Arduino sketch..."
-msgstr "Avaa Arduino sketsi..."
+msgstr "Avaa Arduino-ohjelma..."
 
 #: EditorToolbar.java:46
 msgid "Open in Another Window"
-msgstr "Avaa toisessa ikkunassa"
+msgstr "Avaa uudessa ikkunassa"
 
 #: Base.java:903 Editor.java:501
 msgid "Open..."
@@ -1106,7 +1106,7 @@ msgstr "Ongelma avatessa kansiota"
 
 #: Base.java:1933
 msgid "Problem Opening URL"
-msgstr "Ongelma avatessa URL:ia"
+msgstr "URL:ää avatessa tapahtui ongelma"
 
 #: Base.java:227
 msgid "Problem Setting the Platform"
@@ -1122,7 +1122,7 @@ msgstr "Ongelma avatessa tiedostoja kansiosta"
 
 #: Base.java:1673
 msgid "Problem getting data folder"
-msgstr "Ongelma noudettaessa datakansiota"
+msgstr "Datakansiota haettaessa tapahtui ongelma."
 
 #: Sketch.java:1467
 #, java-format
@@ -1137,7 +1137,7 @@ msgstr "Ongelma lähetettäessä levylle. Katsohttp://www.arduino.cc/en/Guide/Tr
 
 #: Sketch.java:355 Sketch.java:362 Sketch.java:373
 msgid "Problem with rename"
-msgstr "Ongelma nimettäessä uudelleen"
+msgstr "Nimeä ei voi muuttaa"
 
 #: Editor.java:2137
 msgid ""
@@ -1230,7 +1230,7 @@ msgstr "Tallennetaan..."
 
 #: Base.java:1909
 msgid "Select (or create new) folder for sketches..."
-msgstr "Valitse (tai luo uusi) kansio sketseille..."
+msgstr "Valitse kansio ohjelmillesi (tai luo uusi)"
 
 #: Editor.java:1198 Editor.java:2739
 msgid "Select All"
@@ -1246,7 +1246,7 @@ msgstr "Valitse kuva- tai datatiedosto sketsiisi kopioitavaksi"
 
 #: Preferences.java:330
 msgid "Select new sketchbook location"
-msgstr "Valitse uusi sijainti sketsikirjalle"
+msgstr "Valitse uusi paikka ohjelmakansiolle"
 
 #: ../../../processing/app/debug/Compiler.java:146
 msgid "Selected board depends on '{0}' core (not installed)."
@@ -1290,7 +1290,7 @@ msgstr "Sarjaporttia {0} ei löydy.\nKokeile lähettämistä toisella sarjaporti
 
 #: Base.java:1681
 msgid "Settings issues"
-msgstr "Asetusongelma"
+msgstr "Asetuksissa on ongelmia"
 
 #: Editor.java:641
 msgid "Show Sketch Folder"
@@ -1314,15 +1314,15 @@ msgstr "Sketsi hävisi"
 
 #: Base.java:1411
 msgid "Sketch Does Not Exist"
-msgstr "Sketsiä ei ole olemassa"
+msgstr "Ohjelmaa ei ole olemassa"
 
 #: Sketch.java:274 Sketch.java:303 Sketch.java:577 Sketch.java:966
 msgid "Sketch is Read-Only"
-msgstr "Sketsi on vain luku"
+msgstr "Ohjelma on vain luettavissa"
 
 #: Sketch.java:294
 msgid "Sketch is Untitled"
-msgstr "Nimeämätön sketsi"
+msgstr "Ohjelmalla ei ole nimeä"
 
 #: Sketch.java:720
 msgid "Sketch is read-only"
@@ -1347,15 +1347,15 @@ msgstr "Sketsikirja"
 
 #: Base.java:258
 msgid "Sketchbook folder disappeared"
-msgstr "Sketsikansio hävisi."
+msgstr "Ohjelmakansio katosi."
 
 #: Preferences.java:315
 msgid "Sketchbook location:"
-msgstr "Sketsikirjan sijainti:"
+msgstr "Ohjelmakansion sijainti:"
 
 #: ../../../processing/app/Base.java:785
 msgid "Sketches (*.ino, *.pde)"
-msgstr ""
+msgstr "Ohjelmat (.ino, .pde)"
 
 #: ../../../processing/app/Preferences.java:152
 msgid "Slovenian"
@@ -1366,7 +1366,7 @@ msgid ""
 "Some files are marked \"read-only\", so you'll\n"
 "need to re-save the sketch in another location,\n"
 "and try again."
-msgstr "Jotkin tiedostot on merkitty \"vain luku\", joten\nvalitse jokin toinen sijainti ja tallenna uudelleen."
+msgstr "Jotkin tiedostot ovat vain luettavissa, joten\nvalitse jokin toinen sijainti ja tallenna uudelleen."
 
 #: Sketch.java:721
 msgid ""
@@ -1377,7 +1377,7 @@ msgstr "Jotkin tiedostot on merkitty \"vain luku\", joten\nvalitse jokin toinen 
 #: Sketch.java:457
 #, java-format
 msgid "Sorry, a sketch (or folder) named \"{0}\" already exists."
-msgstr "Valitan, sketsi (tai kansio) nimellä \"{0}\" on jo olemassa."
+msgstr "Valitan, ohjelma tai kansio \"{0}\" on jo olemassa."
 
 #: Preferences.java:115
 msgid "Spanish"
@@ -1417,7 +1417,7 @@ msgstr "Udp luokka on nimetty EthernetUdp:ksi."
 
 #: Base.java:192
 msgid "The error message follows, however Arduino should run fine."
-msgstr "Virheilmoitus seuraa perästä, mutta Arduinon pitäisi toimia hyvin."
+msgstr "Virheilmoituksesta huolimatta Arduinon pitäisi toimia hyvin."
 
 #: Editor.java:2147
 #, java-format
@@ -1433,7 +1433,7 @@ msgid ""
 "The library \"{0}\" cannot be used.\n"
 "Library names must contain only basic letters and numbers.\n"
 "(ASCII only and no spaces, and it cannot start with a number)"
-msgstr "Kirjastoa \"{0}\" ei voida käyttää.\nKirjaston nimessä saa olla vain kirjaimia ja numeroita.\n(vain ASCII, ei välilyöntiä, eikä numeroa ensimmäisenä)"
+msgstr "Kirjastoa \"{0}\" ei voida käyttää.\nKirjaston nimessä saa olla vain kirjaimia ja numeroita.\n(vain ASCII, ei välilyöntejä, eikä se saa alkaa numerolla.)"
 
 #: Sketch.java:374
 msgid ""
@@ -1451,7 +1451,7 @@ msgid ""
 "The selected sketch no longer exists.\n"
 "You may need to restart Arduino to update\n"
 "the sketchbook menu."
-msgstr "Valittua sketsiä ei enää ole olemassa.\nSinun täyty käynnistää Arduino uudelleen\npäivittääksesi sketsivalikon."
+msgstr "Tätä ohjelmaa ei enää ole olemassa. Kokeile käynnistää Arduino uudestaan päivittääksesi ohjelmaluettelon."
 
 #: Base.java:1430
 #, java-format
@@ -1461,7 +1461,7 @@ msgid ""
 "(ASCII-only with no spaces, and it cannot start with a number).\n"
 "To get rid of this message, remove the sketch from\n"
 "{1}"
-msgstr "Sketsiä \"{0}\" ei voida käyttää.\nSketsin nimessä saa olla vain kirjaimia ja numeroita\n(vain ASCII, ei välilyöntiä eikä numeroa ewnsimmäisenä).\nPäästäksesi eroon tästä ilmoituksesta, poista sketsi\npaikasta{1}"
+msgstr "Ohjelmaa \"{0}\" ei voida käyttää.\nOhjelman nimessä saa olla vain kirjaimia ja numeroita\n(vain ASCII, ei välilyöntejä, eikä se saa alkaa numerolla).\nPäästäksesi eroon tästä ilmoituksesta, poista ohjelma\ntäältä ({1})."
 
 #: Sketch.java:1755
 msgid ""
@@ -1484,7 +1484,7 @@ msgid ""
 "location, and create a new sketchbook folder if\n"
 "necessary. Arduino will then stop talking about\n"
 "himself in the third person."
-msgstr "Sketsikansiota ei enää ole olemassa.\nArduino vaihtaa oletussketsikansioon ja luo\ntarvittaessa uuden. Sen jälkeen Arduino lopettaa\nitsestään puhumisen kolmannessa persoonassa."
+msgstr "Ohjelmakansiota ei enää ole olemassa. Arduino vaihtaa oletuskansioon, luo tarvittaessa uuden ja lopettaa itsestään puhumisen kolmannessa persoonassa."
 
 #: Sketch.java:1075
 msgid ""
@@ -1499,7 +1499,7 @@ msgstr "Tässä raportissa olisi enemmän tietoa"
 
 #: Base.java:535
 msgid "Time for a Break"
-msgstr "Tauon paikka"
+msgstr "Tauon aika"
 
 #: Editor.java:663
 msgid "Tools"
@@ -1564,7 +1564,7 @@ msgstr "Päivitä"
 
 #: Preferences.java:428
 msgid "Update sketch files to new extension on save (.pde -> .ino)"
-msgstr "Päivitä sketsien pääte (.pde -> .ino) tallennettaessa"
+msgstr "Päivitä ohjelmien pääte (.pde -> .ino) tallennettaessa"
 
 #: EditorToolbar.java:41 Editor.java:545
 msgid "Upload"
@@ -1572,7 +1572,7 @@ msgstr "Lähetä"
 
 #: EditorToolbar.java:46 Editor.java:553
 msgid "Upload Using Programmer"
-msgstr "Lähetä käyttäen ohjelmoijaa"
+msgstr "Lähetä ohjelmointilaitteella"
 
 #: Editor.java:2403 Editor.java:2439
 msgid "Upload canceled."
@@ -1601,12 +1601,12 @@ msgstr "Käytä ulkoista editoria"
 #: ../../../processing/app/debug/Compiler.java:94
 #, java-format
 msgid "Using library {0} in folder: {1} {2}"
-msgstr ""
+msgstr "Kirjastoa {0} käytetään kansiossa: {1} {2}"
 
 #: ../../../processing/app/debug/Compiler.java:320
 #, java-format
 msgid "Using previously compiled file: {0}"
-msgstr ""
+msgstr "Käytetään aikaisemmin käännettyä tiedostoa: {0}"
 
 #: EditorToolbar.java:41 EditorToolbar.java:46
 msgid "Verify"
@@ -1660,13 +1660,13 @@ msgstr "Et voi huijata minua"
 
 #: Sketch.java:411
 msgid "You can't have a .cpp file with the same name as the sketch."
-msgstr "Sinulla ei voi olla samannimistä .cpp tiedostoa kuin sketsisi."
+msgstr "Sinulla ei voi olla samannimistä .cpp tiedostoa kuin ohjelmasi."
 
 #: Sketch.java:421
 msgid ""
 "You can't rename the sketch to \"{0}\"\n"
 "because the sketch already has a .cpp file with that name."
-msgstr "Et voi uudelleennimetä sketsiäsi \"{0}\"\nkoska sketsillä on jo samanniminen .cpp tiedosto."
+msgstr "Et voi nimetä ohjelmaasi \"{0}\" uudelleen,\nkoska samanniminen .cpp tiedosto on jo olemassa."
 
 #: Sketch.java:861
 msgid ""
@@ -1682,7 +1682,7 @@ msgstr "Et voi tallentaa sketsia kansioon kansion\nitsensä sisällä. Tämähä
 
 #: Base.java:1888
 msgid "You forgot your sketchbook"
-msgstr "Unohdit sketsikirjasi"
+msgstr "Unohdit ohjelmakansiosi"
 
 #: ../../../processing/app/AbstractMonitor.java:92
 msgid ""
@@ -1693,11 +1693,11 @@ msgstr "Olet painanut {0} mutta mitään ei ole lähetetty. Pitäisikö valita r
 msgid ""
 "You've reached the limit for auto naming of new sketches\n"
 "for the day. How about going for a walk instead?"
-msgstr "Olet saavuttanut automaattisen sketsien nimeämisrajan\ntälle päivälle. Mitäpä jos kävisit vaikka kävelyllä välillä?"
+msgstr "Olet tehnyt niin monta ohjelmaa, että uudet nimet loppuivat tältä päivältä. Mitä jos lähtisit vaikka kävelylle?"
 
 #: Base.java:2638
 msgid "ZIP files or folders"
-msgstr "ZIP tiedostot tai kansiot"
+msgstr "ZIP-tiedostot tai kansiot"
 
 #: Base.java:2661
 msgid "Zip doesn't contain a library"
@@ -1706,7 +1706,7 @@ msgstr "ZIP ei sisällä kirjastoa"
 #: Sketch.java:364
 #, java-format
 msgid "\".{0}\" is not a valid extension."
-msgstr "\".{0}\" ei ole validi pääte."
+msgstr "\".{0}\" ei ole sopiva pääte."
 
 #: SketchCode.java:258
 #, java-format
