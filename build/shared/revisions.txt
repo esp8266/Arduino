@@ -1,16 +1,21 @@
 
-ARDUINO 1.5.6 BETA
+ARDUINO 1.5.6 BETA 2014.02.19
 
 [ide]
 * Implemented 1.5 library specification Rev.2
   (https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5:-Library-specification)
 * Replaced RXTX library with JSSC (Alexey Sokolov)
   http://code.google.com/p/java-simple-serial-connector/
+* If two libraries provides the same .h file prioritize the library with tha same folder name
 * Improved command-line parsing (Matthijs Kooijman)
 
 [libraries]
 * TFT: warning messages in PImage class and strings inside examples now stored in flash to save RAM. 
 * Ethernet: added operator == for EthernetClient class (Norbert Truchsess)
+* Robot_Control: removed embedded copies of Wire and SPI to allow their use in sketch.
+  Old sketches using Robot_Control now must include Wire.h and SPI.h.
+* Robot_Control: fixed issues about motor turning algorithm
+* Bridge: optimized FileIO.doBuffer() (bobh66)
 
 [core]
 * avr: Pile of HardwareSerial improvements (Matthijs Kooijman)
@@ -28,9 +33,11 @@ ARDUINO 1.5.6 BETA
 * sam: Fixed regression in analogRead() (fails to read multiple channels) (Mark Tillotson)
 * sam: Fixed loops in Reset.cpp (Matthijs Kooijman)
 * sam: Optimized delayMicroseconds() (Rob Tillaart) #1121
+* sam: added itoa() and related functions
 * Optimized Print::print(String&) method, now uses internal string buffer to perform block write
 * Improved portability of String class (maniacbug) #695
 * Make some operators in IPAddress const (Matthijs Kooijman)
+* Fix for compiling assembler files with newer gcc
 
 ARDUINO 1.5.5-r2 BETA 2014.01.10
 
