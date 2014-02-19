@@ -2027,7 +2027,7 @@ public class Sketch {
       String msg =
         _("The sketch name had to be modified. Sketch names can only consist\n" +
           "of ASCII characters and numbers (but cannot start with a number).\n" +
-          "They should also be less less than 64 characters long.");
+          "They should also be less than 64 characters long.");
       System.out.println(msg);
     }
     return newName;
