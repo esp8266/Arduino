@@ -27,6 +27,9 @@
   <condition property="staging_hardware_folder" value="hardware"><equals arg1="${platform}" arg2="linux32" /></condition>
   <condition property="staging_hardware_folder" value="hardware"><equals arg1="${platform}" arg2="linux64" /></condition>
 
+  <condition property="launch4j-download-unpack-target-name" value="launch4j-windows"><os family="windows" /></condition>
+  <property name="launch4j-download-unpack-target-name" value="launch4j-linux"/>
+
   <condition property="arch-bits" value="32">
     <equals arg1="${platform}" arg2="linux32"/>
   </condition>
@@ -636,6 +639,20 @@
     <fail message="wrong platform (${os.name})" />
   </target>
 
+  <target name="download-launch4j-windows">
+    <get src="http://switch.dl.sourceforge.net/project/launch4j/launch4j-3/3.0.2/launch4j-3.0.2-win32.zip" dest="windows" usetimestamp="true" skipexisting="true" verbose="true" />
+    <unzip dest="windows/launcher/" src="windows/launch4j-3.0.2-win32.zip" overwrite="true"/>
+  </target>
+
+  <target name="download-launch4j-linux">
+    <get src="http://switch.dl.sourceforge.net/project/launch4j/launch4j-3/3.0.2/launch4j-3.0.2-linux.tgz" dest="windows" usetimestamp="true" skipexisting="true" verbose="true" />
+
+    <exec executable="tar" dir="windows/launcher">
+      <arg value="-xzf"/>
+      <arg value="../launch4j-3.0.2-linux.tgz"/>
+    </exec>
+  </target>
+
   <target name="windows-build"
 	  depends="revision-check, windows-checkos, subprojects-build"
 	  description="Build windows version">
@@ -688,6 +705,8 @@
     <antcall target="assemble">
       <param name="target.path" value="windows/work" />
     </antcall>
+
+    <antcall target="download-${launch4j-download-unpack-target-name}" />
 
     <property name="launch4j.dir" value="windows/launcher/launch4j/" />
     <taskdef name="launch4j"

@@ -18,6 +18,9 @@ build/windows/jre.zip
 build/windows/libastylej*
 build/windows/arduino-*.zip
 build/windows/dist/gcc-*.tar.gz
+build/windows/launch4j-*
+build/windows/launcher/launch4j
+build/windows/WinAVR-*.zip
 build/macosx/arduino-*.zip
 build/macosx/dist/gcc-*.tar.gz
 build/macosx/libastylej*
@@ -30,5 +33,5 @@ test-bin
 .idea
 
 hardware/arduino/avr/libraries/Bridge/examples/XivelyClient/passwords.h
+.DS_Store
 
-hardware/arduino/avr/libraries/Bridge/examples/.DS_Store
