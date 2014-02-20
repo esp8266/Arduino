@@ -696,11 +696,12 @@
 
     <copy todir="windows/work">
       <fileset dir="windows/launcher"
-	       includes="about.bmp, application.ico, config.xml"/>
+	       includes="about.bmp, application.ico, config.xml, config_debug.xml"/>
     </copy>
     <launch4j configFile="windows/work/config.xml" />
+    <launch4j configFile="windows/work/config_debug.xml" />
     <delete dir="windows/work"
-	    includes="about.bmp, application.ico, config.xml" />
+	    includes="about.bmp, application.ico, config.xml, config_debug.xml" />
 
     <!-- cygwin requires html, dll, and exe to have the +x flag -->
     <chmod perm="755">
