@@ -1,5 +1,5 @@
 
-ARDUINO 1.5.6 BETA 2014.02.19
+ARDUINO 1.5.6 BETA 2014.02.20
 
 [ide]
 * Implemented 1.5 library specification Rev.2
@@ -8,6 +8,7 @@ ARDUINO 1.5.6 BETA 2014.02.19
   http://code.google.com/p/java-simple-serial-connector/
 * If two libraries provides the same .h file prioritize the library with tha same folder name
 * Improved command-line parsing (Matthijs Kooijman)
+* Windows: added arduino_debug.exe to help debugging errors when launch4j fails to start IDE
 
 [libraries]
 * TFT: warning messages in PImage class and strings inside examples now stored in flash to save RAM. 
