@@ -29,15 +29,15 @@
 
 package cc.arduino.packages.discoverers;
 
-import cc.arduino.packages.BoardPort;
-import cc.arduino.packages.Discovery;
-import jssc.SerialPortList;
-import processing.app.Base;
-import processing.app.Platform;
-import processing.app.helpers.PreferencesMap;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import processing.app.Base;
+import processing.app.Platform;
+import processing.app.Serial;
+import processing.app.helpers.PreferencesMap;
+import cc.arduino.packages.BoardPort;
+import cc.arduino.packages.Discovery;
 
 public class SerialDiscovery implements Discovery {
 
@@ -48,7 +48,7 @@ public class SerialDiscovery implements Discovery {
 
     List<BoardPort> res = new ArrayList<BoardPort>();
 
-    String[] ports = SerialPortList.getPortNames();
+    List<String> ports = Serial.list();
 
     for (String port : ports) {
       String boardName = os.resolveDeviceAttachedTo(port, Base.packages, devicesListOutput);
