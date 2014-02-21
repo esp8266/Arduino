@@ -21,7 +21,6 @@ import javax.swing.JComponent;
  * A simple text style class. It can specify the color, italic flag,
  * and bold flag of a run of text.
  * @author Slava Pestov
- * @version $Id: SyntaxStyle.java 4824 2008-10-11 23:41:40Z fry $
  */
 public class SyntaxStyle
 {

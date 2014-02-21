@@ -55,7 +55,6 @@ import processing.app.syntax.im.InputMethodSupport;
  *     + "}");</pre>
  *
  * @author Slava Pestov
- * @version $Id: JEditTextArea.java 6123 2010-02-16 21:43:44Z fry $
  */
 public class JEditTextArea extends JComponent
 {
