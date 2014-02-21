@@ -20,7 +20,6 @@ import java.util.regex.Pattern;
  * subsystem.
  *
  * @author Slava Pestov
- * @version $Id: SyntaxUtilities.java 1268 2005-04-09 02:30:37Z benfry $
  */
 public class SyntaxUtilities
 {
