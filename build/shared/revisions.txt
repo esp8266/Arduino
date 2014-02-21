@@ -1,4 +1,9 @@
 
+ARDUINO 1.5.6-r2 BETA 2014.02.21
+
+[ide]
+* JSSC: Fixed NPE when RXCHAR event with no bytes (José Pereda)
+
 ARDUINO 1.5.6 BETA 2014.02.20
 
 [ide]

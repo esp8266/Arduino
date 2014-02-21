@@ -175,7 +175,7 @@ public class Serial implements SerialPortEventListener {
   public synchronized void serialEvent(SerialPortEvent serialEvent) {
     if (serialEvent.isRXCHAR()) {
       try {
-        byte[] buf = port.readBytes();
+        byte[] buf = port.readBytes(serialEvent.getEventValue());
         if (buf.length > 0) {
           if (bufferLast == buffer.length) {
             byte temp[] = new byte[bufferLast << 1];
