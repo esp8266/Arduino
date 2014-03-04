@@ -20,6 +20,9 @@
   <condition property="platform" 
 	     value="linux64"><os family="unix" arch="amd64" /></condition>
 
+  <condition property="launch4j-download-unpack-target-name" value="launch4j-windows"><os family="windows" /></condition>
+  <property name="launch4j-download-unpack-target-name" value="launch4j-linux"/>
+
   <!-- Libraries required for running arduino -->
   <fileset dir=".." id="runtime.jars">
     <include name="core/core.jar" />
@@ -457,8 +460,22 @@
     
     <fail message="wrong platform (${os.name})" />
   </target>
-  
-  <target name="windows-build" 
+
+  <target name="download-launch4j-windows">
+    <get src="http://switch.dl.sourceforge.net/project/launch4j/launch4j-3/3.0.2/launch4j-3.0.2-win32.zip" dest="windows" usetimestamp="true" skipexisting="true" verbose="true" />
+    <unzip dest="windows/launcher/" src="windows/launch4j-3.0.2-win32.zip" overwrite="true"/>
+  </target>
+
+  <target name="download-launch4j-linux">
+    <get src="http://switch.dl.sourceforge.net/project/launch4j/launch4j-3/3.0.2/launch4j-3.0.2-linux.tgz" dest="windows" usetimestamp="true" skipexisting="true" verbose="true" />
+
+    <exec executable="tar" dir="windows/launcher">
+      <arg value="-xzf"/>
+      <arg value="../launch4j-3.0.2-linux.tgz"/>
+    </exec>
+  </target>
+
+  <target name="windows-build"
 	  depends="revision-check, windows-checkos, subprojects-build" 
 	  description="Build windows version">
     <mkdir dir="windows/work" />
@@ -492,19 +509,22 @@
     <antcall target="assemble">
       <param name="target.path" value="windows/work" />
     </antcall>
-    
+
+    <antcall target="download-${launch4j-download-unpack-target-name}" />
+
     <property name="launch4j.dir" value="windows/launcher/launch4j/" />
     <taskdef name="launch4j" 
 	     classname="net.sf.launch4j.ant.Launch4jTask" 
 	     classpath="${launch4j.dir}/launch4j.jar; ${launch4j.dir}/lib/xstream.jar" />
 
     <copy todir="windows/work">
-      <fileset dir="windows/launcher" 
-	       includes="about.bmp, application.ico, config.xml"/>
+      <fileset dir="windows/launcher"
+	       includes="about.bmp, application.ico, config.xml, config_debug.xml"/>
     </copy>
     <launch4j configFile="windows/work/config.xml" />
-    <delete dir="windows/work" 
-	    includes="about.bmp, application.ico, config.xml" />
+    <launch4j configFile="windows/work/config_debug.xml" />
+    <delete dir="windows/work"
+	    includes="about.bmp, application.ico, config.xml, config_debug.xml" />
 
     <!-- cygwin requires html, dll, and exe to have the +x flag -->
     <chmod perm="755">
