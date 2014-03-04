@@ -19,3 +19,6 @@ build/linux/dist/*.tar.gz
 build/linux/*.tgz
 test-bin
 *.iml
+build/windows/launch4j-*
+build/windows/launcher/launch4j
+build/windows/WinAVR-*.zip
