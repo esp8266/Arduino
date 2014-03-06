@@ -49,6 +49,7 @@ class TwoWire : public Stream
     void begin();
     void begin(uint8_t);
     void begin(int);
+    void setClock(uint32_t);
     void beginTransmission(uint8_t);
     void beginTransmission(int);
     uint8_t endTransmission(void);
@@ -62,10 +63,10 @@ class TwoWire : public Stream
     virtual int available(void);
     virtual int read(void);
     virtual int peek(void);
-	virtual void flush(void);
+    virtual void flush(void);
     void onReceive( void (*)(int) );
     void onRequest( void (*)(void) );
-  
+
     inline size_t write(unsigned long n) { return write((uint8_t)n); }
     inline size_t write(long n) { return write((uint8_t)n); }
     inline size_t write(unsigned int n) { return write((uint8_t)n); }
