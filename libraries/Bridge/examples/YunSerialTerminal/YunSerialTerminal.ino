@@ -66,7 +66,7 @@ void loop() {
         Serial1.begin(500000);        //        set speed to 500000
         Serial.println("Speed set to 500000");
       } else if (c == '~') {
-        Serial1.write((uint8_t *)"\xff\0\0\x05XXXXX\x0d\xaf", 11);
+        Serial1.write((uint8_t *)"\xff\0\0\x05XXXXX\x7f\xf9", 11);
         Serial.println("Sending bridge's shutdown command");
       } else {                        //     any other key pressed?
         Serial1.write('~');           //        write '~' to Linino
