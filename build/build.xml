@@ -37,6 +37,9 @@
     <equals arg1="${platform}" arg2="linux64"/>
   </condition>
 
+  <condition property="launch4j-download-unpack-target-name" value="launch4j-windows"><os family="windows" /></condition>
+  <property name="launch4j-download-unpack-target-name" value="launch4j-linux"/>
+
   <!-- Libraries required for running arduino -->
   <fileset dir=".." id="runtime.jars">
     <include name="core/core.jar" />
@@ -655,6 +658,7 @@
 
   <target name="windows-build"
 	  depends="revision-check, windows-checkos, subprojects-build"
+	  depends="revision-check, windows-checkos, subprojects-build" 
 	  description="Build windows version">
     <mkdir dir="windows/work" />
 

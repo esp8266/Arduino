@@ -32,7 +32,7 @@ build/linux/libastylej*
 test-bin
 *.iml
 .idea
-
-hardware/arduino/avr/libraries/Bridge/examples/XivelyClient/passwords.h
 .DS_Store
-
+build/windows/launch4j-*
+build/windows/launcher/launch4j
+build/windows/WinAVR-*.zip

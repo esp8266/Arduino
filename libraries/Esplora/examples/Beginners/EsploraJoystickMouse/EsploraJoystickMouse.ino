@@ -17,6 +17,10 @@
 
  Created on 22 Dec 2012
  by Tom Igoe
+ Updated 8 March 2014
+ by Scott Fitzgerald
+ 
+ http://arduino.cc/en/Reference/EsploraReadJoystickSwitch
 
  This example is in the public domain.
  */
@@ -41,9 +45,15 @@ void loop()
   Serial.print("\tButton: ");                  // print a tab character and a label for the button
   Serial.print(button);                        // print the button value
 
-  int mouseX = map( xValue, -512, 512, 10, -10); // map the X value to a range of movement for the mouse X
-  int mouseY = map( yValue, -512, 512, -10, 10); // map the Y value to a range of movement for the mouse Y
+  int mouseX = map(xValue, -512, 512, 10, -10);  // map the X value to a range of movement for the mouse X
+  int mouseY = map(yValue, -512, 512, -10, 10);  // map the Y value to a range of movement for the mouse Y
   Mouse.move(mouseX, mouseY, 0);                 // move the mouse
+
+  if (button == 0) {                           // if the joystick button is pressed
+    Mouse.press();                             // send a mouse click
+  } else {
+    Mouse.release();                           // if it's not pressed, release the mouse button 
+  }
 
   delay(10);                                  // a short delay before moving again
 }
