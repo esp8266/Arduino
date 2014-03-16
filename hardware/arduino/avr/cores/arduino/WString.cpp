@@ -684,8 +684,10 @@ void String::replace(const String& find, const String& replace)
 }
 
 void String::remove(unsigned int index){
-	int count = len - index;
-	remove(index, count);
+	// Pass the biggest integer as the count. The remove method
+	// below will take care of truncating it at the end of the
+	// string.
+	remove(index, (unsigned int)-1);
 }
 
 void String::remove(unsigned int index, unsigned int count){
