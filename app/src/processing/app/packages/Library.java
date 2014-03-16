@@ -65,7 +65,8 @@ public class Library {
 
     // Compatibility with 1.5 rev.1 libraries:
     // "email" field changed to "maintainer"
-    if (!properties.containsKey("maintainer"))
+    if (!properties.containsKey("maintainer") &&
+        properties.containsKey("email"))
       properties.put("maintainer", properties.get("email"));
 
     // Compatibility with 1.5 rev.1 libraries:
@@ -121,8 +122,11 @@ public class Library {
     String category = properties.get("category");
     if (category == null)
       category = "Uncategorized";
-    if (!CATEGORIES.contains(category))
+    if (!CATEGORIES.contains(category)) {
       category = "Uncategorized";
+      System.out.println("WARNING: Category '" + category + "' in library " +
+          properties.get("name") + " is not valid. Setting to 'Uncategorized'");
+    }
 
     String license = properties.get("license");
     if (license == null)
