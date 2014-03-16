@@ -684,7 +684,6 @@ void String::replace(const String& find, const String& replace)
 }
 
 void String::remove(unsigned int index){
-	if (index >= len) { return; }
 	int count = len - index;
 	remove(index, count);
 }
