@@ -125,8 +125,6 @@ public class SerialUploader extends Uploader {
       throw new RunnerException(e);
     }
 
-    // Remove the magic baud rate (1200bps) to avoid
-    // future unwanted board resets
     try {
       if (uploadResult && doTouch) {
         String uploadPort = Preferences.get("serial.port");
@@ -136,24 +134,12 @@ public class SerialUploader extends Uploader {
           // sketch port never comes back). Doing this saves users from accidentally
           // opening Serial Monitor on the soon-to-be-orphaned bootloader port.
           Thread.sleep(1000);
-          long timeout = System.currentTimeMillis() + 2000;
-          while (timeout > System.currentTimeMillis()) {
+          long started = System.currentTimeMillis();
+          while (System.currentTimeMillis() - started < 2000) {
             List<String> portList = Serial.list();
-            if (portList.contains(uploadPort)) {
-              try {
-                Serial.touchPort(uploadPort, 9600);
-                break;
-              } catch (SerialException e) {
-                // Port already in use
-              }
-            }
+            if (portList.contains(uploadPort))
+              break;
             Thread.sleep(250);
-          }
-        } else {
-          try {
-            Serial.touchPort(uploadPort, 9600);
-          } catch (SerialException e) {
-            throw new RunnerException(e);
           }
         }
       }
