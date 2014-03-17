@@ -658,7 +658,6 @@
 
   <target name="windows-build"
 	  depends="revision-check, windows-checkos, subprojects-build"
-	  depends="revision-check, windows-checkos, subprojects-build" 
 	  description="Build windows version">
     <mkdir dir="windows/work" />
 
