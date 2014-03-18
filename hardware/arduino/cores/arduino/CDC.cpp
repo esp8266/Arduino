@@ -200,6 +200,11 @@ void Serial_::flush(void)
 
 size_t Serial_::write(uint8_t c)
 {
+	return write(&c, 1);
+}
+
+size_t Serial_::write(const uint8_t *buffer, size_t size)
+{
 	/* only try to send bytes if the high-level CDC connection itself 
 	 is open (not just the pipe) - the OS should set lineState when the port
 	 is opened and clear lineState when the port is closed.
@@ -210,7 +215,7 @@ size_t Serial_::write(uint8_t c)
 	// open connection isn't broken cleanly (cable is yanked out, host dies
 	// or locks up, or host virtual serial port hangs)
 	if (_usbLineInfo.lineState > 0)	{
-		int r = USB_Send(CDC_TX,&c,1);
+		int r = USB_Send(CDC_TX,buffer,size);
 		if (r > 0) {
 			return r;
 		} else {
