@@ -29,6 +29,7 @@ import processing.app.Sketch;
 import processing.app.SketchCode;
 import processing.core.*;
 import processing.app.I18n;
+import processing.app.helpers.filefilters.OnlyDirs;
 import static processing.app.I18n._;
 
 import java.io.*;
@@ -119,8 +120,14 @@ public class Compiler implements MessageConsumer {
    List includePaths = new ArrayList();
    includePaths.add(corePath);
    if (variantPath != null) includePaths.add(variantPath);
-   for (File file : sketch.getImportedLibraries()) {
-     includePaths.add(file.getPath());
+   for (File libFolder : sketch.getImportedLibraries()) {
+     // Forward compatibility with 1.5 library format
+     File propertiesFile = new File(libFolder, "library.properties");
+     File srcFolder = new File(libFolder, "src");
+     if (propertiesFile.isFile() && srcFolder.isDirectory())
+       includePaths.add(srcFolder.getPath());
+     else
+       includePaths.add(libFolder.getPath());
    }
 
    // 1. compile the sketch (already in the buildPath)
@@ -139,8 +146,26 @@ public class Compiler implements MessageConsumer {
    sketch.setCompilingProgress(40);
    for (File libraryFolder : sketch.getImportedLibraries()) {
      File outputFolder = new File(buildPath, libraryFolder.getName());
-     File utilityFolder = new File(libraryFolder, "utility");
      createFolder(outputFolder);
+     
+     // Forward compatibility with 1.5 library format
+     File propertiesFile = new File(libraryFolder, "library.properties");
+     File srcFolder = new File(libraryFolder, "src");
+     if (propertiesFile.exists() && srcFolder.isDirectory()) {
+       // Is an 1.5 library with "src" folder layout
+       includePaths.add(srcFolder.getAbsolutePath());
+
+       // Recursively compile "src" folder
+        objectFiles.addAll(recursiveCompile(avrBasePath, srcFolder,
+            outputFolder, includePaths, boardPreferences));
+       
+       includePaths.remove(includePaths.size() - 1);
+       continue;
+     }
+     
+     // Otherwise fallback to 1.0 library layout...
+     
+     File utilityFolder = new File(libraryFolder, "utility");
      // this library can use includes in its utility/ folder
      includePaths.add(utilityFolder.getAbsolutePath());
      objectFiles.addAll(
@@ -251,6 +276,26 @@ public class Compiler implements MessageConsumer {
     return true;
   }
 
+  private List<File> recursiveCompile(String avrBasePath, File srcFolder,
+      File outputFolder, List<File> includePaths,
+      Map<String, String> boardPreferences) throws RunnerException {
+    List<File> objectFiles = new ArrayList<File>();
+    objectFiles.addAll(compileFiles(avrBasePath, outputFolder.getAbsolutePath(), includePaths,
+        findFilesInFolder(srcFolder, "S", false),
+        findFilesInFolder(srcFolder, "c", false),
+        findFilesInFolder(srcFolder, "cpp", false),
+        boardPreferences));
+
+    // Recursively compile sub-folders
+    for (File srcSubfolder : srcFolder.listFiles(new OnlyDirs())) {
+      File outputSubfolder = new File(outputFolder, srcSubfolder.getName());
+      createFolder(outputSubfolder);
+      objectFiles.addAll(recursiveCompile(avrBasePath, srcSubfolder,
+          outputSubfolder, includePaths, boardPreferences));
+    }
+
+    return objectFiles;
+  }
 
   private List<File> compileFiles(String avrBasePath,
                                   String buildPath, List<File> includePaths,
@@ -662,8 +707,19 @@ public class Compiler implements MessageConsumer {
         return name.endsWith(".h");
       }
     };
+    File libFolder = new File(path);
 
-    String[] list = (new File(path)).list(onlyHFiles);
+    // Forward compatibility with 1.5 library format
+    File propertiesFile = new File(libFolder, "library.properties");
+    File srcFolder = new File(libFolder, "src");
+    String[] list;
+    if (propertiesFile.isFile() && srcFolder.isDirectory()) {
+      // Is an 1.5 library with "src" folder
+      list = srcFolder.list(onlyHFiles);
+    } else {
+      // Fallback to 1.0 library layout
+      list = libFolder.list(onlyHFiles);
+    }
     if (list == null) {
       throw new IOException();
     }
