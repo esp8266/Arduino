@@ -28,14 +28,13 @@ extern USBDevice_ USBDevice;
 class Serial_ : public Stream
 {
 private:
-	ring_buffer *_cdc_rx_buffer;
+	int peek_buffer;
 public:
 	void begin(unsigned long);
 	void begin(unsigned long, uint8_t);
 	void end(void);
 
 	virtual int available(void);
-	virtual void accept(void);
 	virtual int peek(void);
 	virtual int read(void);
 	virtual void flush(void);

@@ -23,21 +23,6 @@
 #if defined(USBCON)
 #ifdef CDC_ENABLED
 
-#if (RAMEND < 1000)
-#define SERIAL_BUFFER_SIZE 16
-#else
-#define SERIAL_BUFFER_SIZE 64
-#endif
-
-struct ring_buffer
-{
-	unsigned char buffer[SERIAL_BUFFER_SIZE];
-	volatile int head;
-	volatile int tail;
-};
-
-ring_buffer cdc_rx_buffer = { { 0 }, 0, 0};
-
 typedef struct
 {
 	u32	dwDTERate;
@@ -129,7 +114,6 @@ bool WEAK CDC_Setup(Setup& setup)
 }
 
 
-int _serialPeek = -1;
 void Serial_::begin(unsigned long baud_count)
 {
 }
@@ -142,55 +126,29 @@ void Serial_::end(void)
 {
 }
 
-void Serial_::accept(void) 
-{
-	ring_buffer *buffer = &cdc_rx_buffer;
-	int i = (unsigned int)(buffer->head+1) % SERIAL_BUFFER_SIZE;
-	
-	// if we should be storing the received character into the location
-	// just before the tail (meaning that the head would advance to the
-	// current location of the tail), we're about to overflow the buffer
-	// and so we don't write the character or advance the head.
-
-	// while we have room to store a byte
-	while (i != buffer->tail) {
-		int c = USB_Recv(CDC_RX);
-		if (c == -1)
-			break;	// no more data
-		buffer->buffer[buffer->head] = c;
-		buffer->head = i;
-
-		i = (unsigned int)(buffer->head+1) % SERIAL_BUFFER_SIZE;
-	}
-}
-
 int Serial_::available(void)
 {
-	ring_buffer *buffer = &cdc_rx_buffer;
-	return (unsigned int)(SERIAL_BUFFER_SIZE + buffer->head - buffer->tail) % SERIAL_BUFFER_SIZE;
+	if (peek_buffer >= 0) {
+		return 1;
+	}
+	return USB_Available(CDC_RX);
 }
 
 int Serial_::peek(void)
 {
-	ring_buffer *buffer = &cdc_rx_buffer;
-	if (buffer->head == buffer->tail) {
-		return -1;
-	} else {
-		return buffer->buffer[buffer->tail];
-	}
+	if (peek_buffer < 0)
+		peek_buffer = USB_Recv(CDC_RX);
+	return peek_buffer;
 }
 
 int Serial_::read(void)
 {
-	ring_buffer *buffer = &cdc_rx_buffer;
-	// if the head isn't ahead of the tail, we don't have any characters
-	if (buffer->head == buffer->tail) {
-		return -1;
-	} else {
-		unsigned char c = buffer->buffer[buffer->tail];
-		buffer->tail = (unsigned int)(buffer->tail + 1) % SERIAL_BUFFER_SIZE;
+	if (peek_buffer >= 0) {
+		int c = peek_buffer;
+		peek_buffer = -1;
 		return c;
-	}	
+	}
+	return USB_Recv(CDC_RX);
 }
 
 void Serial_::flush(void)
