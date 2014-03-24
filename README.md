@@ -40,5 +40,5 @@ Gianluca Martino, Daniela Antonietti, and David A. Mellis.
 Arduino uses the [GNU avr-gcc toolchain](http://gcc.gnu.org/wiki/avr-gcc), [avrdude](http://www.nongnu.org/avrdude/), [avr-libc](http://www.nongnu.org/avr-libc/), and code from
 [Processing](http://www.processing.org) and [Wiring](http://wiring.org.co).
 
-Icon and about image designed by ToDo: http://www.todo.to.it/
+Icon and about image designed by [ToDo](http://www.todo.to.it/)
 
