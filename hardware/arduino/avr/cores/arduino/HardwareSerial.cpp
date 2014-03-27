@@ -72,7 +72,7 @@ void serialEventRun(void)
   if (Serial2_available && serialEvent2 && Serial2_available()) serialEvent2();
 #endif
 #if defined(HAVE_HWSERIAL3)
-  if (Serial3_available && serialEvent2 && Serial3_available()) serialEvent3();
+  if (Serial3_available && serialEvent3 && Serial3_available()) serialEvent3();
 #endif
 }
 
