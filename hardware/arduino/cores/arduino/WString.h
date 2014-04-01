@@ -68,8 +68,8 @@ public:
 	explicit String(unsigned int, unsigned char base=10);
 	explicit String(long, unsigned char base=10);
 	explicit String(unsigned long, unsigned char base=10);
-    explicit String(float, int decimalPlaces=6);
-    explicit String(double, int decimalPlaces=6);
+    explicit String(float, unsigned char decimalPlaces=6);
+    explicit String(double, unsigned char decimalPlaces=6);
 	~String(void);
 
 	// memory management
