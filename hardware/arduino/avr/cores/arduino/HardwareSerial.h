@@ -32,10 +32,24 @@
 // using a ring buffer (I think), in which head is the index of the location
 // to which to write the next incoming character and tail is the index of the
 // location from which to read.
+#if !(defined(SERIAL_TX_BUFFER_SIZE) && defined(SERIAL_RX_BUFFER_SIZE))
 #if (RAMEND < 1000)
-  #define SERIAL_BUFFER_SIZE 16
+#define SERIAL_TX_BUFFER_SIZE 16
+#define SERIAL_RX_BUFFER_SIZE 16
 #else
-  #define SERIAL_BUFFER_SIZE 64
+#define SERIAL_TX_BUFFER_SIZE 64
+#define SERIAL_RX_BUFFER_SIZE 64
+#endif
+#endif
+#if (SERIAL_TX_BUFFER_SIZE>256)
+typedef uint16_t tx_buffer_index_t;
+#else
+typedef uint8_t tx_buffer_index_t;
+#endif
+#if  (SERIAL_RX_BUFFER_SIZE>256)
+typedef uint16_t rx_buffer_index_t;
+#else
+typedef uint8_t rx_buffer_index_t;
 #endif
 
 // Define config for Serial.begin(baud, config);
@@ -76,16 +90,16 @@ class HardwareSerial : public Stream
     // Has any byte been written to the UART since begin()
     bool _written;
 
-    volatile uint8_t _rx_buffer_head;
-    volatile uint8_t _rx_buffer_tail;
-    volatile uint8_t _tx_buffer_head;
-    volatile uint8_t _tx_buffer_tail;
+    volatile rx_buffer_index_t _rx_buffer_head;
+    volatile rx_buffer_index_t _rx_buffer_tail;
+    volatile tx_buffer_index_t _tx_buffer_head;
+    volatile tx_buffer_index_t _tx_buffer_tail;
 
     // Don't put any members after these buffers, since only the first
     // 32 bytes of this struct can be accessed quickly using the ldd
     // instruction.
-    unsigned char _rx_buffer[SERIAL_BUFFER_SIZE];
-    unsigned char _tx_buffer[SERIAL_BUFFER_SIZE];
+    unsigned char _rx_buffer[SERIAL_RX_BUFFER_SIZE];
+    unsigned char _tx_buffer[SERIAL_TX_BUFFER_SIZE];
 
   public:
     inline HardwareSerial(
