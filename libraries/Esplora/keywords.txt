@@ -28,6 +28,9 @@ writeBlue	KEYWORD2
 readRed	KEYWORD2
 readGreen	KEYWORD2
 readBlue	KEYWORD2
+readTinkerkitInput     KEYWORD2
+readTinkerkitInputA     KEYWORD2
+readTinkerkitInputB     KEYWORD2
 tone	KEYWORD2
 noTone	KEYWORD2
 
