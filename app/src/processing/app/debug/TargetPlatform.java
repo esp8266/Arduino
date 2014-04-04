@@ -110,6 +110,20 @@ public class TargetPlatform {
           format(_("Error loading {0}"), platformsFile.getAbsolutePath()), e);
     }
 
+    // Allow overriding values in platform.txt. This allows changing
+    // platform.txt (e.g. to use a system-wide toolchain), without
+    // having to modify platform.txt (which, when running from git,
+    // prevents files being marked as changed).
+    File localPlatformsFile = new File(folder, "platform.local.txt");
+    try {
+      if (localPlatformsFile.exists() && localPlatformsFile.canRead()) {
+        preferences.load(localPlatformsFile);
+      }
+    } catch (IOException e) {
+      throw new TargetPlatformException(
+          format(_("Error loading {0}"), localPlatformsFile.getAbsolutePath()), e);
+    }
+
     File progFile = new File(folder, "programmers.txt");
     try {
       if (progFile.exists() && progFile.canRead()) {
