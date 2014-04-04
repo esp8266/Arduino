@@ -12,7 +12,7 @@ version=1.5.6
 # --------------------- 
 
 # Default "compiler.path" is correct, change only if you want to overidde the initial value
-#compiler.path={ide.path}/tools/avr/bin/..
+compiler.path={runtime.ide.path}/hardware/tools/avr/bin/
 compiler.c.cmd=avr-gcc
 compiler.c.flags=-c -g -Os -w -ffunction-sections -fdata-sections -MMD
 compiler.c.elf.flags=-Os -Wl,--gc-sections

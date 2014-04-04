@@ -197,8 +197,14 @@ public class Compiler implements MessageConsumer {
     targetArch = targetPlatform.getId();
     p.put("build.arch", targetArch.toUpperCase());
     
-    if (!p.containsKey("compiler.path"))
+    // Platform.txt should define its own compiler.path. For
+    // compatibility with earlier 1.5 versions, we define a (ugly,
+    // avr-specific) default for it, but this should be removed at some
+    // point.
+    if (!p.containsKey("compiler.path")) {
+      System.err.println(_("Third-party platform.txt does not define compiler.path. Please report this to the third-party hardware maintainer."));
       p.put("compiler.path", Base.getAvrBasePath());
+    }
 
     // Core folder
     TargetPlatform tp = corePlatform;
