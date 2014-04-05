@@ -90,7 +90,7 @@ public class PdePreprocessor {
     program = scrubComments(program);
     // If there are errors, an exception is thrown and this fxn exits.
 
-    if (Preferences.getBoolean("preproc.substitute_unicode")) {
+    if (PreferencesData.getBoolean("preproc.substitute_unicode")) {
       program = substituteUnicode(program);
     }
 

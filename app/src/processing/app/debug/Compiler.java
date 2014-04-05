@@ -38,7 +38,7 @@ import java.util.Map;
 
 import processing.app.Base;
 import processing.app.I18n;
-import processing.app.Preferences;
+import processing.app.PreferencesData;
 import processing.app.SketchCode;
 import processing.app.SketchData;
 import processing.app.helpers.FileUtils;
@@ -49,6 +49,7 @@ import processing.app.helpers.filefilters.OnlyDirs;
 import processing.app.packages.Library;
 import processing.app.packages.LibraryList;
 import processing.app.preproc.PdePreprocessor;
+import processing.core.PApplet;
 
 public class Compiler implements MessageConsumer {
 
@@ -104,7 +105,7 @@ public class Compiler implements MessageConsumer {
   public boolean compile(boolean _verbose) throws RunnerException {
     preprocess(prefs.get("build.path"));
     
-    verbose = _verbose || Preferences.getBoolean("build.verbose");
+    verbose = _verbose || PreferencesData.getBoolean("build.verbose");
     sketchIsCompiled = false;
     objectFiles = new ArrayList<File>();
 
@@ -203,7 +204,7 @@ public class Compiler implements MessageConsumer {
     
     // Merge all the global preference configuration in order of priority
     PreferencesMap p = new PreferencesMap();
-    p.putAll(Preferences.getMap());
+    p.putAll(PreferencesData.getMap());
     if (corePlatform != null)
       p.putAll(corePlatform.getPreferences());
     p.putAll(targetPlatform.getPreferences());

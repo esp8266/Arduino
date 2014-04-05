@@ -27,6 +27,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.SystemColor;
 
+import processing.app.helpers.PreferencesHelper;
 import processing.app.helpers.PreferencesMap;
 import processing.app.syntax.SyntaxStyle;
 
@@ -86,19 +87,19 @@ public class Theme {
   }
 
   static public Color getColor(String name) {
-    return PreferencesMap.parseColor(get(name));
+    return PreferencesHelper.parseColor(get(name));
   }
 
   static public void setColor(String attr, Color color) {
-    table.putColor(attr, color);
+    PreferencesHelper.putColor(table, attr, color);
   }
 
   static public Font getFont(String attr) {
-    Font font = table.getFont(attr);
+    Font font = PreferencesHelper.getFont(table, attr);
     if (font == null) {
       String value = getDefault(attr);
       set(attr, value);
-      font = table.getFont(attr);
+      font = PreferencesHelper.getFont(table, attr);
     }
     return font;
   }
@@ -106,7 +107,7 @@ public class Theme {
   static public SyntaxStyle getStyle(String what) {
     String split[] = get("editor." + what + ".style").split(",");
 
-    Color color = PreferencesMap.parseColor(split[0]);
+    Color color = PreferencesHelper.parseColor(split[0]);
 
     String style = split[1];
     boolean bold = style.contains("bold");

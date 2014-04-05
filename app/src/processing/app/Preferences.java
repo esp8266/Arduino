@@ -38,15 +38,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.MissingResourceException;
-import java.util.StringTokenizer;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -58,10 +50,9 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
 import processing.app.helpers.FileUtils;
+import processing.app.helpers.PreferencesHelper;
 import processing.app.helpers.PreferencesMap;
-import processing.app.syntax.SyntaxStyle;
 import processing.core.PApplet;
-import processing.core.PConstants;
 
 
 /**
@@ -93,7 +84,7 @@ import processing.core.PConstants;
  */
 public class Preferences {
 
-  static final String PREFS_FILE = "preferences.txt";
+  static final String PREFS_FILE = PreferencesData.PREFS_FILE;
 
   class Language {
     Language(String _name, String _originalName, String _isoCode) {
@@ -238,72 +229,12 @@ public class Preferences {
   Editor editor;
 
 
-  // data model
-
-  static PreferencesMap defaults;
-  static PreferencesMap prefs = new PreferencesMap();
-  static File preferencesFile;
-  static boolean doSave = true;
-
-
   static protected void init(File file) {
-    if (file != null)
-      preferencesFile = file;
-    else
-      preferencesFile = Base.getSettingsFile(Preferences.PREFS_FILE);
 
-    // start by loading the defaults, in case something
-    // important was deleted from the user prefs
-    try {
-      prefs.load(Base.getLibStream("preferences.txt"));
-    } catch (IOException e) {
-      Base.showError(null, _("Could not read default settings.\n" +
-                             "You'll need to reinstall Arduino."), e);
-    }
-
-    // set some runtime constants (not saved on preferences file)
-    File hardwareFolder = Base.getHardwareFolder();
-    prefs.put("runtime.ide.path", hardwareFolder.getParentFile().getAbsolutePath());
-    prefs.put("runtime.ide.version", "" + Base.REVISION);
-    
-    // clone the hash table
-    defaults = new PreferencesMap(prefs);
-
-    if (preferencesFile.exists()) {
-      // load the previous preferences file
-      try {
-        prefs.load(preferencesFile);
-      } catch (IOException ex) {
-        Base.showError(_("Error reading preferences"),
-                       I18n.format(_("Error reading the preferences file. "
-                                       + "Please delete (or move)\n"
-                                       + "{0} and restart Arduino."),
-                                   preferencesFile.getAbsolutePath()), ex);
-      }
-    }
-
-    // load the I18n module for internationalization
-    try {
-      I18n.init(get("editor.languages.current"));
-    } catch (MissingResourceException e) {
-      I18n.init("en");
-      set("editor.languages.current", "en");
-    }
-
-    // set some other runtime constants (not saved on preferences file)
-    set("runtime.os", PConstants.platformNames[PApplet.platform]);
+  	PreferencesData.init(file);
 
     // other things that have to be set explicitly for the defaults
-    setColor("run.window.bgcolor", SystemColor.control);
-
-    fixPreferences();
-  }
-
-  private static void fixPreferences() {
-    String baud = get("serial.debug_rate");
-    if ("14400".equals(baud) || "28800".equals(baud) || "38400".equals(baud)) {
-      set("serial.debug_rate", "9600");
-    }
+    PreferencesHelper.putColor(PreferencesData.prefs, "run.window.bgcolor", SystemColor.control);
   }
 
 
@@ -380,7 +311,7 @@ public class Preferences {
     label = new JLabel(_("Editor language: "));
     box.add(label);
     comboLanguage = new JComboBox(languages);
-    String currentLanguage = Preferences.get("editor.languages.current");
+    String currentLanguage = PreferencesData.get("editor.languages.current");
     for (Language language : languages) {
       if (language.isoCode.equals(currentLanguage))
         comboLanguage.setSelectedItem(language);
@@ -507,11 +438,11 @@ public class Preferences {
     right = Math.max(right, left + d.width);
     top += d.height; // + GUI_SMALL;
 
-    label = new JLabel(preferencesFile.getAbsolutePath());
+    label = new JLabel(PreferencesData.preferencesFile.getAbsolutePath());
     final JLabel clickable = label;
     label.addMouseListener(new MouseAdapter() {
         public void mousePressed(MouseEvent e) {
-          Base.openFolder(preferencesFile.getParentFile());
+          Base.openFolder(PreferencesData.preferencesFile.getParentFile());
         }
 
         public void mouseEntered(MouseEvent e) {
@@ -630,19 +561,19 @@ public class Preferences {
    */
   protected void applyFrame() {
     // put each of the settings into the table
-    setBoolean("build.verbose", verboseCompilationBox.isSelected());
-    setBoolean("upload.verbose", verboseUploadBox.isSelected());
-    setBoolean("editor.linenumbers", displayLineNumbersBox.isSelected());
-    setBoolean("upload.verify", verifyUploadBox.isSelected());
-    setBoolean("editor.save_on_verify", saveVerifyUploadBox.isSelected());
-
+    PreferencesData.setBoolean("build.verbose", verboseCompilationBox.isSelected());
+    PreferencesData.setBoolean("upload.verbose", verboseUploadBox.isSelected());
+    PreferencesData.setBoolean("editor.linenumbers", displayLineNumbersBox.isSelected());
+    PreferencesData.setBoolean("upload.verify", verifyUploadBox.isSelected());
+    PreferencesData.setBoolean("editor.save_on_verify", saveVerifyUploadBox.isSelected());
+    
 //    setBoolean("sketchbook.closing_last_window_quits",
 //               closingLastQuitsBox.isSelected());
     //setBoolean("sketchbook.prompt", sketchPromptBox.isSelected());
     //setBoolean("sketchbook.auto_clean", sketchCleanBox.isSelected());
 
     // if the sketchbook path has changed, rebuild the menus
-    String oldPath = get("sketchbook.path");
+    String oldPath = PreferencesData.get("sketchbook.path");
     String newPath = sketchbookLocationField.getText();
     if (newPath.isEmpty()) {
       if (Base.getPortableFolder() == null)
@@ -652,12 +583,12 @@ public class Preferences {
     }
     if (!newPath.equals(oldPath)) {
       editor.base.rebuildSketchbookMenus();
-      set("sketchbook.path", newPath);
+      PreferencesData.set("sketchbook.path", newPath);
     }
 
-    setBoolean("editor.external", externalEditorBox.isSelected());
-    setBoolean("update.check", checkUpdatesBox.isSelected());
-    setBoolean("editor.save_on_verify", saveVerifyUploadBox.isSelected());
+    PreferencesData.setBoolean("editor.external", externalEditorBox.isSelected());
+    PreferencesData.setBoolean("update.check", checkUpdatesBox.isSelected());
+    PreferencesData.setBoolean("editor.save_on_verify", saveVerifyUploadBox.isSelected());
 
     /*
       // was gonna use this to check memory settings,
@@ -674,24 +605,24 @@ public class Preferences {
     String newSizeText = fontSizeField.getText();
     try {
       int newSize = Integer.parseInt(newSizeText.trim());
-      String pieces[] = PApplet.split(get("editor.font"), ',');
+      String pieces[] = PApplet.split(PreferencesData.get("editor.font"), ',');
       pieces[2] = String.valueOf(newSize);
-      set("editor.font", PApplet.join(pieces, ','));
+      PreferencesData.set("editor.font", PApplet.join(pieces, ','));
 
     } catch (Exception e) {
       System.err.println(I18n.format(_("ignoring invalid font size {0}"), newSizeText));
     }
 
     if (autoAssociateBox != null) {
-      setBoolean("platform.auto_file_type_associations",
+      PreferencesData.setBoolean("platform.auto_file_type_associations",
                  autoAssociateBox.isSelected());
     }
     
-    setBoolean("editor.update_extension", updateExtensionBox.isSelected());
+    PreferencesData.setBoolean("editor.update_extension", updateExtensionBox.isSelected());
 
     // adds the selected language to the preferences file
     Language newLanguage = (Language) comboLanguage.getSelectedItem();
-    set("editor.languages.current", newLanguage.isoCode);
+    PreferencesData.set("editor.languages.current", newLanguage.isoCode);
 
     editor.applyPreferences();
   }
@@ -701,10 +632,10 @@ public class Preferences {
     this.editor = editor;
 
     // set all settings entry boxes to their actual status
-    verboseCompilationBox.setSelected(getBoolean("build.verbose"));
-    verboseUploadBox.setSelected(getBoolean("upload.verbose"));
-    displayLineNumbersBox.setSelected(getBoolean("editor.linenumbers"));
-    verifyUploadBox.setSelected(getBoolean("upload.verify"));
+    verboseCompilationBox.setSelected(PreferencesData.getBoolean("build.verbose"));
+    verboseUploadBox.setSelected(PreferencesData.getBoolean("upload.verbose"));
+    displayLineNumbersBox.setSelected(PreferencesData.getBoolean("editor.linenumbers"));
+    verifyUploadBox.setSelected(PreferencesData.getBoolean("upload.verify"));
 
     //closingLastQuitsBox.
     //  setSelected(getBoolean("sketchbook.closing_last_window_quits"));
@@ -714,200 +645,95 @@ public class Preferences {
     //  setSelected(getBoolean("sketchbook.auto_clean"));
 
     sketchbookLocationField.
-      setText(get("sketchbook.path"));
+      setText(PreferencesData.get("sketchbook.path"));
     externalEditorBox.
-      setSelected(getBoolean("editor.external"));
+      setSelected(PreferencesData.getBoolean("editor.external"));
     checkUpdatesBox.
-      setSelected(getBoolean("update.check"));
+      setSelected(PreferencesData.getBoolean("update.check"));
     saveVerifyUploadBox.
-      setSelected(getBoolean("editor.save_on_verify"));
+      setSelected(PreferencesData.getBoolean("editor.save_on_verify"));
 
     if (autoAssociateBox != null) {
       autoAssociateBox.
-        setSelected(getBoolean("platform.auto_file_type_associations"));
+        setSelected(PreferencesData.getBoolean("platform.auto_file_type_associations"));
     }
     
-    updateExtensionBox.setSelected(get("editor.update_extension") == null ||
-                                   getBoolean("editor.update_extension"));
+    updateExtensionBox.setSelected(PreferencesData.get("editor.update_extension") == null ||
+                                   PreferencesData.getBoolean("editor.update_extension"));
 
     dialog.setVisible(true);
   }
 
 
-  // .................................................................
-
-
-  static public String[] loadStrings(InputStream input) {
-    try {
-      BufferedReader reader =
-              new BufferedReader(new InputStreamReader(input, "UTF-8"));
-
-      String lines[] = new String[100];
-      int lineCount = 0;
-      String line = null;
-      while ((line = reader.readLine()) != null) {
-        if (lineCount == lines.length) {
-          String temp[] = new String[lineCount << 1];
-          System.arraycopy(lines, 0, temp, 0, lineCount);
-          lines = temp;
-        }
-        lines[lineCount++] = line;
-      }
-      reader.close();
-
-      if (lineCount == lines.length) {
-        return lines;
-      }
-
-      // resize array to appropriate amount for these lines
-      String output[] = new String[lineCount];
-      System.arraycopy(lines, 0, output, 0, lineCount);
-      return output;
-
-    } catch (IOException e) {
-      e.printStackTrace();
-      //throw new RuntimeException("Error inside loadStrings()");
-    }
-    return null;
-  }
-
-
-
-  // .................................................................
-
-
   static protected void save() {
-    if (!doSave) return;
-//    try {
-    // on startup, don't worry about it
-    // this is trying to update the prefs for who is open
-    // before Preferences.init() has been called.
-    if (preferencesFile == null) return;
-
-    // Fix for 0163 to properly use Unicode when writing preferences.txt
-    PrintWriter writer = PApplet.createWriter(preferencesFile);
-
-    String[] keys = prefs.keySet().toArray(new String[0]);
-    Arrays.sort(keys);
-    for (String key: keys) {
-      if (key.startsWith("runtime."))
-        continue;
-      writer.println(key + "=" + prefs.get(key));
-    }
-
-    writer.flush();
-    writer.close();
+    PreferencesData.save();
   }
 
 
   // .................................................................
 
   static public String get(String attribute) {
-    return prefs.get(attribute);
+    return PreferencesData.get(attribute);
   }
 
   static public String get(String attribute, String defaultValue) {
-    String value = get(attribute);
-    return (value == null) ? defaultValue : value;
+    return PreferencesData.get(attribute, defaultValue);
   }
 
   public static boolean has(String key) {
-    return prefs.containsKey(key);
+    return PreferencesData.has(key);
   }
 
   public static void remove(String key) {
-    prefs.remove(key);
-  }
-
-  static public String getDefault(String attribute) {
-    return defaults.get(attribute);
+    PreferencesData.remove(key);
   }
 
 
   static public void set(String attribute, String value) {
-    prefs.put(attribute, value);
-  }
-
-
-  static public void unset(String attribute) {
-    prefs.remove(attribute);
+    PreferencesData.set(attribute, value);
   }
 
 
   static public boolean getBoolean(String attribute) {
-    return prefs.getBoolean(attribute);
+    return PreferencesData.getBoolean(attribute);
   }
 
 
   static public void setBoolean(String attribute, boolean value) {
-    prefs.putBoolean(attribute, value);
+    PreferencesData.setBoolean(attribute, value);
   }
 
 
   static public int getInteger(String attribute) {
-    return Integer.parseInt(get(attribute));
+    return PreferencesData.getInteger(attribute);
   }
 
 
   static public void setInteger(String key, int value) {
-    set(key, String.valueOf(value));
-  }
-
-
-  static public Color getColor(String name) {
-    Color parsed = prefs.getColor(name);
-    if (parsed != null)
-      return parsed;
-    return Color.GRAY; // set a default
-  }
-
-
-  static public void setColor(String attr, Color what) {
-    prefs.putColor(attr, what);
+    PreferencesData.setInteger(key, value);
   }
 
 
   static public Font getFont(String attr) {
-    Font font = prefs.getFont(attr);
+    Font font = PreferencesHelper.getFont(PreferencesData.prefs, attr);
     if (font == null) {
-      String value = defaults.get(attr);
-      prefs.put(attr, value);
-      font = prefs.getFont(attr);
+      String value = PreferencesData.defaults.get(attr);
+      PreferencesData.prefs.put(attr, value);
+      font = PreferencesHelper.getFont(PreferencesData.prefs, attr);
     }
     return font;
   }
 
-
-  static public SyntaxStyle getStyle(String what) {
-    String str = get("editor." + what + ".style");
-
-    StringTokenizer st = new StringTokenizer(str, ",");
-
-    String s = st.nextToken();
-    if (s.indexOf("#") == 0) s = s.substring(1);
-    Color color = Color.DARK_GRAY;
-    try {
-      color = new Color(Integer.parseInt(s, 16));
-    } catch (Exception e) { }
-
-    s = st.nextToken();
-    boolean bold = (s.indexOf("bold") != -1);
-    boolean italic = (s.indexOf("italic") != -1);
-    boolean underlined = (s.indexOf("underlined") != -1);
-
-    return new SyntaxStyle(color, italic, bold, underlined);
-  }
-  
   // get a copy of the Preferences
   static public PreferencesMap getMap() 
   {
-    return new PreferencesMap(prefs);
+    return PreferencesData.getMap();
   }
 
   // Decide wether changed preferences will be saved. When value is
   // false, Preferences.save becomes a no-op.
   static public void setDoSave(boolean value)
   {
-    doSave = value;
+    PreferencesData.setDoSave(value);
   }
 }
