@@ -266,11 +266,7 @@ public class Preferences {
       }
     }
 
-    if (!preferencesFile.exists()) {
-      // create a new preferences file if none exists
-      // saves the defaults out to the file
-      save();
-    } else {
+    if (preferencesFile.exists()) {
       // load the previous preferences file
       try {
         load(new FileInputStream(preferencesFile));
