@@ -42,12 +42,11 @@ void loop() {
   String sensorReading = "sensor = ";
   sensorReading += analogRead(A0);
   Serial.print (sensorReading);
-  if (sensorReading.endsWith(0)) {
+  if (sensorReading.endsWith("0")) {
     Serial.println(". This reading is divisible by ten"); 
   } 
   else {
     Serial.println(". This reading is not divisible by ten"); 
-
   }
 
   // do nothing while true:
