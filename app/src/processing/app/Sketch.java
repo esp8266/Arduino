@@ -50,20 +50,8 @@ public class Sketch {
 
   private Editor editor;
 
-  /** main pde file for this sketch. */
-  private File primaryFile;
-
   /** true if any of the files have been modified. */
   private boolean modified;
-
-  /** folder that contains this sketch */
-  private File folder;
-
-  /** data folder location for this sketch (may not exist yet) */
-  private File dataFolder;
-
-  /** code folder location for this sketch (may not exist yet) */
-  private File codeFolder;
 
   private SketchCodeDocument current;
   private int currentIndex;
@@ -85,14 +73,7 @@ public class Sketch {
    */
   public Sketch(Editor _editor, File file) throws IOException {
     editor = _editor;
-    data = new SketchData();
-    primaryFile = file;
-
-    // get the name of the sketch by chopping .pde or .java
-    // off of the main file name
-    String mainFilename = primaryFile.getName();
-    int suffixLength = getDefaultExtension().length() + 1;
-    data.setName(mainFilename.substring(0, mainFilename.length() - suffixLength));
+    data = new SketchData(file);
 
     // lib/build must exist when the application is started
     // it is added to the CLASSPATH by default, but if it doesn't
@@ -113,9 +94,6 @@ public class Sketch {
     tempBuildFolder = Base.getBuildFolder();
     //Base.addBuildFolderToClassPath();
 
-    folder = new File(file.getParent());
-    //System.out.println("sketch dir is " + folder);
-
     load();
   }
 
@@ -135,60 +113,7 @@ public class Sketch {
    * in which case the load happens each time "run" is hit.
    */
   protected void load() throws IOException {
-    codeFolder = new File(folder, "code");
-    dataFolder = new File(folder, "data");
-
-    // get list of files in the sketch folder
-    String list[] = folder.list();
-
-    // reset these because load() may be called after an
-    // external editor event. (fix for 0099)
-    data.clearCodeDocs();
-
-    List<String> extensions = getExtensions();
-
-    for (String filename : list) {
-      // Ignoring the dot prefix files is especially important to avoid files
-      // with the ._ prefix on Mac OS X. (You'll see this with Mac files on
-      // non-HFS drives, i.e. a thumb drive formatted FAT32.)
-      if (filename.startsWith(".")) continue;
-
-      // Don't let some wacko name a directory blah.pde or bling.java.
-      if (new File(folder, filename).isDirectory()) continue;
-
-      // figure out the name without any extension
-      String base = filename;
-      // now strip off the .pde and .java extensions
-      for (String extension : extensions) {
-        if (base.toLowerCase().endsWith("." + extension)) {
-          base = base.substring(0, base.length() - (extension.length() + 1));
-
-          // Don't allow people to use files with invalid names, since on load,
-          // it would be otherwise possible to sneak in nasty filenames. [0116]
-          if (Sketch.isSanitaryName(base)) {
-            data.addCode(new SketchCodeDocument(new File(folder, filename)));
-          } else {
-            System.err.println(I18n.format("File name {0} is invalid: ignored", filename));
-          }
-        }
-      }
-    }
-
-    if (data.getCodeCount() == 0)
-      throw new IOException(_("No valid code files found"));
-
-    // move the main class to the first tab
-    // start at 1, if it's at zero, don't bother
-    for (SketchCode code : data.getCodes()) {
-      //if (code[i].file.getName().equals(mainFilename)) {
-      if (code.getFile().equals(primaryFile)) {
-        data.moveCodeToFront(code);
-        break;
-      }
-    }
-
-    // sort the entries at the top
-    data.sortCode();
+    data.load();
 
     // set the main file to be the current tab
     if (editor != null) {
@@ -335,7 +260,7 @@ public class Sketch {
                          I18n.format(
 			   _("A file named \"{0}\" already exists in \"{1}\""),
 			   c.getFileName(),
-			   folder.getAbsolutePath()
+			   data.getFolder().getAbsolutePath()
 			 ));
         return;
       }
@@ -364,7 +289,7 @@ public class Sketch {
     }
 
 
-    File newFile = new File(folder, newName);
+    File newFile = new File(data.getFolder(), newName);
 //    if (newFile.exists()) {  // yay! users will try anything
 //      Base.showMessage("Nope",
 //                       "A file named \"" + newFile + "\" already exists\n" +
@@ -386,7 +311,7 @@ public class Sketch {
       if (currentIndex == 0) {
         // get the new folder name/location
         String folderName = newName.substring(0, newName.indexOf('.'));
-        File newFolder = new File(folder.getParentFile(), folderName);
+        File newFolder = new File(data.getFolder().getParentFile(), folderName);
         if (newFolder.exists()) {
           Base.showWarning(_("Cannot Rename"),
                            I18n.format(
@@ -434,7 +359,7 @@ public class Sketch {
         }
 
         // now rename the sketch folder and re-open
-        boolean success = folder.renameTo(newFolder);
+        boolean success = data.getFolder().renameTo(newFolder);
         if (!success) {
           Base.showWarning(_("Error"), _("Could not rename the sketch. (2)"), null);
           return;
@@ -479,7 +404,7 @@ public class Sketch {
 			 I18n.format(
                            "Could not create the file \"{0}\" in \"{1}\"",
 			   newFile,
-			   folder.getAbsolutePath()
+			   data.getFolder().getAbsolutePath()
 			 ), e);
         return;
       }
@@ -534,7 +459,7 @@ public class Sketch {
         // to do a save on the handleNew()
 
         // delete the entire sketch
-        Base.removeDir(folder);
+        Base.removeDir(data.getFolder());
 
         // get the changes into the sketchbook menu
         //sketchbook.rebuildMenus();
@@ -680,10 +605,7 @@ public class Sketch {
       }
     }
 
-    for (SketchCode code : data.getCodes()) {
-      if (code.isModified())
-        code.save();
-    }
+    data.save();
     calcModified();
     return true;
   }
@@ -720,10 +642,10 @@ public class Sketch {
 
     if (isReadOnly() || isUntitled()) {
       // default to the sketchbook folder
-      fd.setSelectedFile(new File(Base.getSketchbookFolder().getAbsolutePath(), folder.getName()));
+      fd.setSelectedFile(new File(Base.getSketchbookFolder().getAbsolutePath(), data.getFolder().getName()));
     } else {
       // default to the parent folder of where this was
-      fd.setSelectedFile(folder);
+      fd.setSelectedFile(data.getFolder());
     }
 
     int returnVal = fd.showSaveDialog(editor);
@@ -755,7 +677,7 @@ public class Sketch {
     }
 
     // check if the paths are identical
-    if (newFolder.equals(folder)) {
+    if (newFolder.equals(data.getFolder())) {
       // just use "save" here instead, because the user will have received a
       // message (from the operating system) about "do you want to replace?"
       return save();
@@ -764,7 +686,7 @@ public class Sketch {
     // check to see if the user is trying to save this sketch inside itself
     try {
       String newPath = newFolder.getCanonicalPath() + File.separator;
-      String oldPath = folder.getCanonicalPath() + File.separator;
+      String oldPath = data.getFolder().getCanonicalPath() + File.separator;
 
       if (newPath.indexOf(oldPath) == 0) {
         Base.showWarning(_("How very Borges of you"),
@@ -800,20 +722,20 @@ public class Sketch {
     }
 
     // re-copy the data folder (this may take a while.. add progress bar?)
-    if (dataFolder.exists()) {
+    if (data.getDataFolder().exists()) {
       File newDataFolder = new File(newFolder, "data");
-      Base.copyDir(dataFolder, newDataFolder);
+      Base.copyDir(data.getDataFolder(), newDataFolder);
     }
 
     // re-copy the code folder
-    if (codeFolder.exists()) {
+    if (data.getCodeFolder().exists()) {
       File newCodeFolder = new File(newFolder, "code");
-      Base.copyDir(codeFolder, newCodeFolder);
+      Base.copyDir(data.getCodeFolder(), newCodeFolder);
     }
 
     // copy custom applet.html file if one exists
     // http://dev.processing.org/bugs/show_bug.cgi?id=485
-    File customHtml = new File(folder, "applet.html");
+    File customHtml = new File(data.getFolder(), "applet.html");
     if (customHtml.exists()) {
       File newHtml = new File(newFolder, "applet.html");
       Base.copyFile(customHtml, newHtml);
@@ -912,19 +834,19 @@ public class Sketch {
 
       //if (!codeFolder.exists()) codeFolder.mkdirs();
       prepareCodeFolder();
-      destFile = new File(codeFolder, filename);
+      destFile = new File(data.getCodeFolder(), filename);
 
     } else {
-      for (String extension : getExtensions()) {
+      for (String extension : data.getExtensions()) {
         String lower = filename.toLowerCase();
         if (lower.endsWith("." + extension)) {
-          destFile = new File(this.folder, filename);
+          destFile = new File(data.getFolder(), filename);
           codeExtension = extension;
         }
       }
       if (codeExtension == null) {
         prepareDataFolder();
-        destFile = new File(dataFolder, filename);
+        destFile = new File(data.getDataFolder(), filename);
       }
     }
 
@@ -1511,14 +1433,14 @@ public class Sketch {
    * but not its contents.
    */
   protected void ensureExistence() {
-    if (folder.exists()) return;
+    if (data.getFolder().exists()) return;
 
     Base.showWarning(_("Sketch Disappeared"),
                      _("The sketch folder has disappeared.\n " +
                        "Will attempt to re-save in the same location,\n" +
                        "but anything besides the code will be lost."), null);
     try {
-      folder.mkdirs();
+      data.getFolder().mkdirs();
       modified = true;
 
       for (SketchCode code : data.getCodes()) {
@@ -1542,7 +1464,7 @@ public class Sketch {
    * volumes or folders without appropriate permissions.
    */
   public boolean isReadOnly() {
-    String apath = folder.getAbsolutePath();
+    String apath = data.getFolder().getAbsolutePath();
     for (File folder : Base.getLibrariesPath()) {
       if (apath.startsWith(folder.getAbsolutePath()))
         return true;
@@ -1591,7 +1513,7 @@ public class Sketch {
    * extensions.
    */
   public boolean validExtension(String what) {
-    return getExtensions().contains(what);
+    return data.getExtensions().contains(what);
   }
 
 
@@ -1599,20 +1521,13 @@ public class Sketch {
    * Returns the default extension for this editor setup.
    */
   public String getDefaultExtension() {
-    return "ino";
+    return data.getDefaultExtension();
   }
 
   static private List<String> hiddenExtensions = Arrays.asList("ino", "pde");
 
   public List<String> getHiddenExtensions() {
     return hiddenExtensions;
-  }
-
-  /**
-   * Returns a String[] array of proper extensions.
-   */
-  public List<String> getExtensions() {
-    return Arrays.asList("ino", "pde", "c", "cpp", "h");
   }
 
 
@@ -1631,19 +1546,10 @@ public class Sketch {
 
 
   /**
-   * Returns a file object for the primary .pde of this sketch.
-   */
-  public File getPrimaryFile() {
-    return primaryFile;
-  }
-
-
-  /**
    * Returns path to the main .pde file for this sketch.
    */
   public String getMainFilePath() {
-    return primaryFile.getAbsolutePath();
-    //return code[0].file.getAbsolutePath();
+    return data.getMainFilePath();
   }
 
 
@@ -1651,15 +1557,7 @@ public class Sketch {
    * Returns the sketch folder.
    */
   public File getFolder() {
-    return folder;
-  }
-
-
-  /**
-   * Returns the location of the sketch's data folder. (It may not exist yet.)
-   */
-  public File getDataFolder() {
-    return dataFolder;
+    return data.getFolder();
   }
 
 
@@ -1668,18 +1566,10 @@ public class Sketch {
    * it also returns the data folder, since it's likely about to be used.
    */
   public File prepareDataFolder() {
-    if (!dataFolder.exists()) {
-      dataFolder.mkdirs();
+    if (!data.getDataFolder().exists()) {
+      data.getDataFolder().mkdirs();
     }
-    return dataFolder;
-  }
-
-
-  /**
-   * Returns the location of the sketch's code folder. (It may not exist yet.)
-   */
-  public File getCodeFolder() {
-    return codeFolder;
+    return data.getDataFolder();
   }
 
 
@@ -1688,10 +1578,10 @@ public class Sketch {
    * it also returns the code folder, since it's likely about to be used.
    */
   public File prepareCodeFolder() {
-    if (!codeFolder.exists()) {
-      codeFolder.mkdirs();
+    if (!data.getCodeFolder().exists()) {
+      data.getCodeFolder().mkdirs();
     }
-    return codeFolder;
+    return data.getCodeFolder();
   }
 
 
