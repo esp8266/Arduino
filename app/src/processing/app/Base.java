@@ -268,7 +268,7 @@ public class Base {
   }
 
 
-  protected static enum ACTION { GUI, VERIFY, UPLOAD };
+  protected static enum ACTION { GUI, VERIFY, UPLOAD, NOOP };
   public Base(String[] args) throws Exception {
     platform.init(this);
 
@@ -331,6 +331,7 @@ public class Base {
     final Map<String, ACTION> actions = new HashMap<String, ACTION>();
     actions.put("--verify", ACTION.VERIFY);
     actions.put("--upload", ACTION.UPLOAD);
+    actions.put("--noop", ACTION.NOOP);
 
     // Check if any files were passed in on the command line
     for (int i = 0; i < args.length; i++) {
@@ -404,6 +405,9 @@ public class Base {
 
     if ((action == ACTION.UPLOAD || action == ACTION.VERIFY) && filenames.size() != 1)
       showError(null, _("Must specify exactly one sketch file"), 3);
+
+    if (action == ACTION.NOOP && filenames.size() != 0)
+      showError(null, _("Cannot specify any sketch files"), 3);
 
     if ((action != ACTION.UPLOAD && action != ACTION.VERIFY) && (doVerboseBuild || doVerboseUpload))
       showError(null, _("--verbose, --verbose-upload and --verbose-build can only be used together with --verify or --upload"), 3);
@@ -484,6 +488,10 @@ public class Base {
         if (Preferences.getBoolean("update.check")) {
           new UpdateCheck(this);
         }
+        break;
+      case NOOP:
+        // Do nothing (intended for only changing preferences)
+        System.exit(0);
         break;
     }
   }

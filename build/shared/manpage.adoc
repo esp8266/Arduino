@@ -145,6 +145,10 @@ OPTIONS
 *--verify*::
 	Build the sketch.
 
+*--noop*::
+	Immediately quit after processing the commandline. This can be
+	used to just set preferences with *--pref*.
+
 PREFERENCES
 -----------
 Arduino keeps a list of preferences, as simple name and value pairs.
@@ -232,6 +236,10 @@ re-use any previous build results in that directory.
 
      arduino --pref build.path=/path/to/sketch/build --verify /path/to/sketch/sketch.ino
 
+Change the selected board and build path and do nothing else.
+
+     arduino --pref build.path=/path/to/sketch/build --board arduino:avr:uno --noop
+
 HISTORY
 -------
 1.5.2::
@@ -259,7 +267,7 @@ HISTORY
 	Windows, the splash screen is still shown.
 
 1.5.7::
-	Introduced *--no-save-prefs*.
+	Introduced *--no-save-prefs* and *--noop*.
 
 {empty}::
 	*--board* and *--port* options are now saved to the preferences
