@@ -361,14 +361,14 @@ public class Base {
         i++;
         if (i >= args.length)
           showError(null, _("Argument required for --board"), 3);
-        selectBoard = args[i];
+        processBoardArgument(args[i]);
         continue;
       }
       if (args[i].equals("--port")) {
         i++;
         if (i >= args.length)
           showError(null, _("Argument required for --port"), 3);
-        selectPort = args[i];
+        Base.selectSerialPort(args[i]);
         continue;
       }
       if (args[i].equals("--curdir")) {
@@ -439,13 +439,8 @@ public class Base {
 
         Editor editor = editors.get(0);
 
-        // Do board selection if requested
-        processBoardArgument(selectBoard);
-
         if (action == ACTION.UPLOAD) {
           // Build and upload
-          if (selectPort != null)
-            editor.selectSerialPort(selectPort);
           editor.exportHandler.run();
         } else {
           // Build only
@@ -1456,6 +1451,11 @@ public class Base {
     Action action = new AbstractAction(board.getName()) {
       public void actionPerformed(ActionEvent actionevent) {
         selectBoard((TargetBoard)getValue("b"));
+        filterVisibilityOfSubsequentBoardMenus((TargetBoard)getValue("b"), 1);
+
+        onBoardOrPortChange();
+        rebuildImportMenu(Editor.importMenu);
+        rebuildExamplesMenu(Editor.examplesMenu);
       }
     };
     action.putValue("b", board);
@@ -1592,12 +1592,6 @@ public class Base {
     File platformFolder = targetPlatform.getFolder();
     Preferences.set("runtime.platform.path", platformFolder.getAbsolutePath());
     Preferences.set("runtime.hardware.path", platformFolder.getParentFile().getAbsolutePath());
-    
-    filterVisibilityOfSubsequentBoardMenus(targetBoard, 1);
-
-    onBoardOrPortChange();
-    rebuildImportMenu(Editor.importMenu);
-    rebuildExamplesMenu(Editor.examplesMenu);
   }
 
   public static void selectSerialPort(String port) {

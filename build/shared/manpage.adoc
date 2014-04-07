@@ -75,6 +75,8 @@ OPTIONS
 {empty}::
 	If this option is not passed, the value from the current
 	preferences is used (e.g., the last board selected in the IDE).
+	If this option is given, the value passed is written to the
+	preferences file and rememberd for subsequent runs.
 
 *--port* __portname__::
 	Select the serial port to perform upload of the sketch.
@@ -85,6 +87,8 @@ OPTIONS
 {empty}::
 	If this option is not passed, the value from the current
 	preferences is used (e.g., the last port selected in the IDE).
+	If this option is given, the value passed is written to the
+	preferences file and rememberd for subsequent runs.
 
 *--verbose-build*::
 	Enable verbose mode during build. If this option is not given,
@@ -109,14 +113,13 @@ OPTIONS
 	Sets the preference __name__ to the given __value__.
 
 {empty}::
-	Currently the preferences set are saved to 'preferences.txt', but
-	this might change in the future (making them only active during
-	the current invocation).
-
-{empty}::
 	Note that the preferences you set with this option are not
 	validated: Invalid names will be set but never used, invalid
 	values might lead to an error later on.
+
+{empty}::
+	If this option is given, the value passed is written to the
+	preferences file and rememberd for subsequent runs.
 
 *--upload*::
 	Build and upload the sketch.
@@ -236,6 +239,11 @@ HISTORY
 	When running with *--verify* or *--upload*, the full GUI is no
 	longer shown. Error messages still use a graphical popup and on
 	Windows, the splash screen is still shown.
+
+1.5.7::
+	*--board* and *--port* options are now saved to the preferences
+	file, just like *--pref*. The *--verbose* options still only
+	apply to the current run.
 
 RESOURCES
 ---------
