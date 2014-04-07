@@ -47,7 +47,6 @@ void loop() {
   }
   else {
     Serial.println(". This reading is not divisible by ten");
-
   }
 
   // do nothing while true:
