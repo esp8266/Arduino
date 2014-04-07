@@ -433,6 +433,11 @@ public class Base {
       }
     }
 
+    // Save the preferences. For GUI mode, this happens in the quit
+    // handler, but for other modes we should also make sure to save
+    // them.
+    Preferences.save();
+
     switch (action) {
       case VERIFY:
       case UPLOAD:
