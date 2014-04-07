@@ -149,6 +149,11 @@ OPTIONS
 	Immediately quit after processing the commandline. This can be
 	used to just set preferences with *--pref*.
 
+*--get-pref __preference__*::
+	Prints the value of the given preference to the standard output
+	stream. When the value does not exist, nothing is printed and
+	the exit status is set (see EXIT STATUS below).
+
 PREFERENCES
 -----------
 Arduino keeps a list of preferences, as simple name and value pairs.
@@ -185,6 +190,7 @@ EXIT STATUS
 *1*:: Build failed or upload failed
 *2*:: Sketch not found
 *3*:: Invalid (argument for) commandline option
+*4*:: Preference passed to *--get-pref* does not exist
 
 FILES
 -----

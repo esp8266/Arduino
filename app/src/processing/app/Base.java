@@ -268,7 +268,7 @@ public class Base {
   }
 
 
-  protected static enum ACTION { GUI, VERIFY, UPLOAD, NOOP };
+  protected static enum ACTION { GUI, VERIFY, UPLOAD, NOOP, GET_PREF };
   public Base(String[] args) throws Exception {
     platform.init(this);
 
@@ -322,6 +322,7 @@ public class Base {
     ACTION action = ACTION.GUI;
     boolean doVerboseBuild = false;
     boolean doVerboseUpload = false;;
+    String getPref = null;
     String selectBoard = null;
     String selectPort = null;
     String currentDirectory = System.getProperty("user.dir");
@@ -332,6 +333,7 @@ public class Base {
     actions.put("--verify", ACTION.VERIFY);
     actions.put("--upload", ACTION.UPLOAD);
     actions.put("--noop", ACTION.NOOP);
+    actions.put("--get-pref", ACTION.GET_PREF);
 
     // Check if any files were passed in on the command line
     for (int i = 0; i < args.length; i++) {
@@ -341,6 +343,12 @@ public class Base {
           String[] valid = actions.keySet().toArray(new String[0]);
           String mess = I18n.format(_("Can only pass one of: {0}"), PApplet.join(valid, ", "));
           showError(null, mess, 3);
+        }
+        if (a == ACTION.GET_PREF) {
+          i++;
+          if (i >= args.length)
+            showError(null, _("Argument required for --get-pref"), 3);
+          getPref = args[i];
         }
         action = a;
         continue;
@@ -406,7 +414,7 @@ public class Base {
     if ((action == ACTION.UPLOAD || action == ACTION.VERIFY) && filenames.size() != 1)
       showError(null, _("Must specify exactly one sketch file"), 3);
 
-    if (action == ACTION.NOOP && filenames.size() != 0)
+    if ((action == ACTION.NOOP || action == ACTION.GET_PREF) && filenames.size() != 0)
       showError(null, _("Cannot specify any sketch files"), 3);
 
     if ((action != ACTION.UPLOAD && action != ACTION.VERIFY) && (doVerboseBuild || doVerboseUpload))
@@ -492,6 +500,15 @@ public class Base {
       case NOOP:
         // Do nothing (intended for only changing preferences)
         System.exit(0);
+        break;
+      case GET_PREF:
+        String value = Preferences.get(getPref, null);
+        if (value != null) {
+          System.out.println(value);
+          System.exit(0);
+        } else {
+          System.exit(4);
+        }
         break;
     }
   }
