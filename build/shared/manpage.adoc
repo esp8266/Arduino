@@ -211,6 +211,32 @@ re-use any previous build results in that directory.
 
      arduino --pref build.path=/path/to/sketch/build --verify /path/to/sketch/sketch.ino
 
+HISTORY
+-------
+1.5.2::
+	Added initial commandline support. This introduced *--verify*,
+	*--upload*, *--board*, *--port*, *--verbose* and *-v*.
+
+1.5.5::
+	Added support for board-specific parameters to *--board*.
+
+{empty}::
+	Sketch filenames are now interpreted relative to the current
+	directory instead of the location of the arduino command itself.
+
+1.5.6::
+	Introduced *--pref*, *--preferences-file*, *--verbose-build* and
+	*--verbose-upload*.
+
+{empty}::
+	Preferences set through --pref are remembered, preferences set
+	through *--board*, *--port* or the *--verbose* options are not.
+
+{empty}::
+	When running with *--verify* or *--upload*, the full GUI is no
+	longer shown. Error messages still use a graphical popup and on
+	Windows, the splash screen is still shown.
+
 RESOURCES
 ---------
 Web site: <http://arduino.cc/>
