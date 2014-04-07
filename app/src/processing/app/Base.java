@@ -419,7 +419,8 @@ public class Base {
         path = new File(currentDirectory, path).getAbsolutePath();
       }
 
-      if (handleOpen(path, nextEditorLocation(), !(action == ACTION.UPLOAD || action == ACTION.VERIFY)) == null) {
+      boolean showEditor = (action == ACTION.GUI);
+      if (handleOpen(path, nextEditorLocation(), showEditor) == null) {
         String mess = I18n.format(_("Failed to open sketch: \"{0}\""), path);
         // Open failure is fatal in upload/verify mode
         if (action == ACTION.VERIFY || action == ACTION.UPLOAD)
