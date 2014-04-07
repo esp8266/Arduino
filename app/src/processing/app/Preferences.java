@@ -220,6 +220,7 @@ public class Preferences {
   static Hashtable<String, String> defaults;
   static Hashtable<String, String> table = new Hashtable<String, String>();
   static File preferencesFile;
+  static boolean doSave = true;
 
 
   static protected void init(String args[]) {
@@ -789,6 +790,7 @@ public class Preferences {
 
 
   static protected void save() {
+    if (!doSave) return;
 //    try {
     // on startup, don't worry about it
     // this is trying to update the prefs for who is open
@@ -989,4 +991,10 @@ public class Preferences {
     return new PreferencesMap(table);
   }
 
+  // Decide wether changed preferences will be saved. When value is
+  // false, Preferences.save becomes a no-op.
+  static public void setDoSave(boolean value)
+  {
+    doSave = value;
+  }
 }

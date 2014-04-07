@@ -76,7 +76,8 @@ OPTIONS
 	If this option is not passed, the value from the current
 	preferences is used (e.g., the last board selected in the IDE).
 	If this option is given, the value passed is written to the
-	preferences file and rememberd for subsequent runs.
+	preferences file and rememberd for subsequent runs (except when
+	*--no-save-prefs* is passed).
 
 *--port* __portname__::
 	Select the serial port to perform upload of the sketch.
@@ -88,7 +89,8 @@ OPTIONS
 	If this option is not passed, the value from the current
 	preferences is used (e.g., the last port selected in the IDE).
 	If this option is given, the value passed is written to the
-	preferences file and rememberd for subsequent runs.
+	preferences file and rememberd for subsequent runs (except when
+	*--no-save-prefs* is passed).
 
 *--verbose-build*::
 	Enable verbose mode during build. If this option is not given,
@@ -131,7 +133,11 @@ OPTIONS
 
 {empty}::
 	If this option is given, the value passed is written to the
-	preferences file and rememberd for subsequent runs.
+	preferences file and rememberd for subsequent runs (except when
+	*--no-save-prefs* is passed).
+
+*--no-save-prefs*::
+	Do not save any (changed) preferences to *preferences.txt*.
 
 *--upload*::
 	Build and upload the sketch.
@@ -253,6 +259,9 @@ HISTORY
 	Windows, the splash screen is still shown.
 
 1.5.7::
+	Introduced *--no-save-prefs*.
+
+{empty}::
 	*--board* and *--port* options are now saved to the preferences
 	file, just like *--pref*. The *--verbose* options still only
 	apply to the current run.

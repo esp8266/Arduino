@@ -385,6 +385,10 @@ public class Base {
         processPrefArgument(args[i]);
         continue;
       }
+      if (args[i].equals("--no-save-prefs")) {
+        Preferences.setDoSave(false);
+        continue;
+      }
       if (args[i].equals("--preferences-file")) {
         i++;
         if (i >= args.length)
