@@ -268,6 +268,7 @@ public class Base {
   }
 
 
+  protected static enum ACTION { GUI, VERIFY, UPLOAD };
   public Base(String[] args) throws Exception {
     platform.init(this);
 
@@ -318,8 +319,7 @@ public class Base {
     // Setup board-dependent variables.
     onBoardOrPortChange();
 
-    boolean doUpload = false;
-    boolean doVerify = false;
+    ACTION action = ACTION.GUI;
     boolean doVerboseBuild = false;
     boolean doVerboseUpload = false;;
     String selectBoard = null;
@@ -327,14 +327,21 @@ public class Base {
     String currentDirectory = System.getProperty("user.dir");
     List<String> filenames = new LinkedList<String>();
 
+    // Map of possible actions and corresponding options
+    final Map<String, ACTION> actions = new HashMap<String, ACTION>();
+    actions.put("--verify", ACTION.VERIFY);
+    actions.put("--upload", ACTION.UPLOAD);
+
     // Check if any files were passed in on the command line
     for (int i = 0; i < args.length; i++) {
-      if (args[i].equals("--upload")) {
-        doUpload = true;
-        continue;
-      }
-      if (args[i].equals("--verify")) {
-        doVerify = true;
+      ACTION a = actions.get(args[i]);
+      if (a != null) {
+        if (action != ACTION.GUI) {
+          String[] valid = actions.keySet().toArray(new String[0]);
+          String mess = I18n.format(_("Can only pass one of: {0}"), PApplet.join(valid, ", "));
+          showError(null, mess, 3);
+        }
+        action = a;
         continue;
       }
       if (args[i].equals("--verbose") || args[i].equals("-v")) {
@@ -391,7 +398,7 @@ public class Base {
       filenames.add(args[i]);
     }
 
-    if ((doUpload || doVerify) && filenames.size() != 1)
+    if ((action == ACTION.UPLOAD || action == ACTION.VERIFY) && filenames.size() != 1)
       showError(null, _("Must specify exactly one sketch file"), 3);
 
     for (String path: filenames) {
@@ -412,17 +419,17 @@ public class Base {
         path = new File(currentDirectory, path).getAbsolutePath();
       }
 
-      if (handleOpen(path, nextEditorLocation(), !(doUpload || doVerify)) == null) {
+      if (handleOpen(path, nextEditorLocation(), !(action == ACTION.UPLOAD || action == ACTION.VERIFY)) == null) {
         String mess = I18n.format(_("Failed to open sketch: \"{0}\""), path);
         // Open failure is fatal in upload/verify mode
-        if (doUpload || doVerify)
+        if (action == ACTION.VERIFY || action == ACTION.UPLOAD)
           showError(null, mess, 2);
         else
           showWarning(null, mess, null);
       }
     }
 
-    if (doUpload || doVerify) {
+    if (action == ACTION.UPLOAD || action == ACTION.VERIFY) {
       // Set verbosity for command line build
       Preferences.set("build.verbose", "" + doVerboseBuild);
       Preferences.set("upload.verbose", "" + doVerboseUpload);
@@ -432,7 +439,7 @@ public class Base {
       // Do board selection if requested
       processBoardArgument(selectBoard);
     
-      if (doUpload) {
+      if (action == ACTION.UPLOAD) {
         // Build and upload
         if (selectPort != null)
           editor.selectSerialPort(selectPort);
