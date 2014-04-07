@@ -449,6 +449,10 @@ public class Base {
         Preferences.set("build.verbose", "" + doVerboseBuild);
         Preferences.set("upload.verbose", "" + doVerboseUpload);
 
+        // Make sure these verbosity preferences are only for the
+        // current session
+        Preferences.setDoSave(false);
+
         Editor editor = editors.get(0);
 
         if (action == ACTION.UPLOAD) {
