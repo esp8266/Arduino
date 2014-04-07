@@ -1600,6 +1600,13 @@ public class Base {
     rebuildExamplesMenu(Editor.examplesMenu);
   }
 
+  public static void selectSerialPort(String port) {
+    Preferences.set("serial.port", port);
+    if (port.startsWith("/dev/"))
+      Preferences.set("serial.port.file", port.substring(5));
+    else
+      Preferences.set("serial.port.file", port);
+  }
 
   public void rebuildProgrammerMenu(JMenu menu) {
     menu.removeAll();

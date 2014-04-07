@@ -965,11 +965,7 @@ public class Editor extends JFrame implements RunnerListener {
     }
     if (selection != null) selection.setState(true);
     //System.out.println(item.getLabel());
-    Preferences.set("serial.port", name);
-    if (name.startsWith("/dev/"))
-      Preferences.set("serial.port.file", name.substring(5));
-    else
-      Preferences.set("serial.port.file", name);
+    Base.selectSerialPort(name);
     if (serialMonitor != null) {
       try {
         serialMonitor.close();
