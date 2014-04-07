@@ -430,46 +430,50 @@ public class Base {
       }
     }
 
-    if (action == ACTION.UPLOAD || action == ACTION.VERIFY) {
-      // Set verbosity for command line build
-      Preferences.set("build.verbose", "" + doVerboseBuild);
-      Preferences.set("upload.verbose", "" + doVerboseUpload);
+    switch (action) {
+      case VERIFY:
+      case UPLOAD:
+        // Set verbosity for command line build
+        Preferences.set("build.verbose", "" + doVerboseBuild);
+        Preferences.set("upload.verbose", "" + doVerboseUpload);
 
-      Editor editor = editors.get(0);
+        Editor editor = editors.get(0);
 
-      // Do board selection if requested
-      processBoardArgument(selectBoard);
-    
-      if (action == ACTION.UPLOAD) {
-        // Build and upload
-        if (selectPort != null)
-          editor.selectSerialPort(selectPort);
-        editor.exportHandler.run();
-      } else {
-        // Build only
-        editor.runHandler.run();
-      }
+        // Do board selection if requested
+        processBoardArgument(selectBoard);
 
-      // Error during build or upload
-      int res = editor.status.mode;
-      if (res == EditorStatus.ERR)
-        System.exit(1);
+        if (action == ACTION.UPLOAD) {
+          // Build and upload
+          if (selectPort != null)
+            editor.selectSerialPort(selectPort);
+          editor.exportHandler.run();
+        } else {
+          // Build only
+          editor.runHandler.run();
+        }
 
-      // No errors exit gracefully
-      System.exit(0);
-    }
+        // Error during build or upload
+        int res = editor.status.mode;
+        if (res == EditorStatus.ERR)
+          System.exit(1);
 
-    // Check if there were previously opened sketches to be restored
-    restoreSketches();
+        // No errors exit gracefully
+        System.exit(0);
+        break;
+      case GUI:
+        // Check if there were previously opened sketches to be restored
+        restoreSketches();
 
-    // Create a new empty window (will be replaced with any files to be opened)
-    if (editors.isEmpty()) {
-      handleNew();
-    }
+        // Create a new empty window (will be replaced with any files to be opened)
+        if (editors.isEmpty()) {
+          handleNew();
+        }
 
-    // Check for updates
-    if (Preferences.getBoolean("update.check")) {
-      new UpdateCheck(this);
+        // Check for updates
+        if (Preferences.getBoolean("update.check")) {
+          new UpdateCheck(this);
+        }
+        break;
     }
   }
 
