@@ -40,6 +40,8 @@ const byte CH_SLIDER      = 4;
 const byte CH_LIGHT       = 5;
 const byte CH_TEMPERATURE = 6;
 const byte CH_MIC         = 7;
+const byte CH_TINKERKIT_A = 8;
+const byte CH_TINKERKIT_B = 9;
 const byte CH_JOYSTICK_SW = 10;
 const byte CH_JOYSTICK_X  = 11;
 const byte CH_JOYSTICK_Y  = 12;
@@ -156,6 +158,16 @@ public:
   void tone(unsigned int freq);
   void tone(unsigned int freq, unsigned long duration);
   void noTone();
+  
+  inline unsigned int readTinkerkitInput(byte whichInput) {
+    return readChannel(whichInput + CH_TINKERKIT_A);
+  }
+  inline unsigned int readTinkerkitInputA() {
+    return readChannel(CH_TINKERKIT_A);
+  }
+  inline unsigned int readTinkerkitInputB() {
+    return readChannel(CH_TINKERKIT_B);
+  }
 };
 
 
