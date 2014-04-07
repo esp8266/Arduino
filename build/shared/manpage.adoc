@@ -95,15 +95,27 @@ OPTIONS
 	verbose mode during build is disabled regardless of the current
 	preferences.
 
+{empty}::
+	This option is only valid together with *--verify* or
+	*--upload*.
+
 *--verbose-upload*::
 	Enable verbose mode during upload. If this option is not given,
 	verbose mode during upload is disabled regardless of the current
 	preferences.
 
+{empty}::
+	This option is only valid together with *--verify* or
+	*--upload*.
+
 *-v, --verbose*::
 	Enable verbose mode during build and upload.
 	This option has the same effect of using both *--verbose-build*
 	and *--verbose-upload*.
+
+{empty}::
+	This option is only valid together with *--verify* or
+	*--upload*.
 
 *--preferences-file* __filename__::
 	Read and store preferences from the specified __filename__ instead
