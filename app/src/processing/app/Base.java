@@ -117,6 +117,10 @@ public class Base {
   // Location for untitled items
   static File untitledFolder;
 
+  // Current directory to use for relative paths specified on the
+  // commandline
+  static String currentDirectory = System.getProperty("user.dir");
+
   // p5 icon for the window
 //  static Image icon;
 
@@ -150,6 +154,12 @@ public class Base {
       if (args[i].equals("--preferences-file")) {
         ++i;
         preferencesFile = new File(args[i]);
+        continue;
+      }
+      if (args[i].equals("--curdir")) {
+        i++;
+        currentDirectory = args[i];
+        continue;
       }
     }
 
@@ -339,7 +349,6 @@ public class Base {
     String getPref = null;
     String selectBoard = null;
     String selectPort = null;
-    String currentDirectory = System.getProperty("user.dir");
     List<String> filenames = new LinkedList<String>();
 
     // Map of possible actions and corresponding options
@@ -398,7 +407,7 @@ public class Base {
         i++;
         if (i >= args.length)
           showError(null, _("Argument required for --curdir"), 3);
-        currentDirectory = args[i];
+        // Argument should be already processed by Base.main(...)
         continue;
       }
       if (args[i].equals("--pref")) {
