@@ -139,8 +139,20 @@ public class Base {
     if (!portableFolder.exists())
       portableFolder = null;
 
+    File preferencesFile = null;
+
+    // Do a first pass over the commandline arguments, the rest of them
+    // will be processed by the Base constructor. Note that this loop
+    // does not look at the last element of args, to prevent crashing
+    // when no parameter was specified to an option. Later, Base() will
+    // then show an error for these.
+    for (int i = 0; i < args.length - 1; i++) {
+      if (args[i].equals("--preferences-file"))
+        preferencesFile = new File(args[i + 1]);
+    }
+
     // run static initialization that grabs all the prefs
-    Preferences.init(args);
+    Preferences.init(preferencesFile);
 
     try {
       File versionFile = getContentFile("lib/version.txt");
@@ -402,7 +414,7 @@ public class Base {
         i++;
         if (i >= args.length)
           showError(null, _("Argument required for --preferences-file"), 3);
-        // Argument should be already processed by Preferences.init(...) 
+        // Argument should be already processed by Base.main(...)
         continue;
       }
       if (args[i].startsWith("--"))

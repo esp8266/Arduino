@@ -223,7 +223,11 @@ public class Preferences {
   static boolean doSave = true;
 
 
-  static protected void init(String args[]) {
+  static protected void init(File file) {
+    if (file != null)
+      preferencesFile = file;
+    else
+      preferencesFile = Base.getSettingsFile(Preferences.PREFS_FILE);
 
     // start by loading the defaults, in case something
     // important was deleted from the user prefs
@@ -254,17 +258,6 @@ public class Preferences {
 
     // clone the hash table
     defaults = new Hashtable<String, String>(table);
-
-    // next load user preferences file
-    preferencesFile = Base.getSettingsFile(PREFS_FILE);
-
-    // load a preferences file if specified on the command line
-    if (args != null) {
-      for (int i = 0; i < args.length - 1; i++) {
-        if (args[i].equals("--preferences-file"))
-          preferencesFile = new File(args[i + 1]);
-      }
-    }
 
     if (preferencesFile.exists()) {
       // load the previous preferences file
