@@ -106,10 +106,10 @@ public class Sketch {
    * path is location of the main .pde file, because this is also
    * simplest to use when opening the file from the finder/explorer.
    */
-  public Sketch(Editor editor, String path) throws IOException {
+  public Sketch(Editor editor, File file) throws IOException {
     this.editor = editor;
 
-    primaryFile = new File(path);
+    primaryFile = file;
 
     // get the name of the sketch by chopping .pde or .java
     // off of the main file name
@@ -136,7 +136,7 @@ public class Sketch {
     tempBuildFolder = Base.getBuildFolder();
     //Base.addBuildFolderToClassPath();
 
-    folder = new File(new File(path).getParent());
+    folder = new File(file.getParent());
     //System.out.println("sketch dir is " + folder);
 
     load();
@@ -516,12 +516,11 @@ public class Sketch {
         // if successful, set base properties for the sketch
 
         File newMainFile = new File(newFolder, newName + ".ino");
-        String newMainFilePath = newMainFile.getAbsolutePath();
 
         // having saved everything and renamed the folder and the main .pde,
         // use the editor to re-open the sketch to re-init state
         // (unfortunately this will kill positions for carets etc)
-        editor.handleOpenUnchecked(newMainFilePath,
+        editor.handleOpenUnchecked(newMainFile,
                                    currentIndex,
                                    editor.getSelectionStart(),
                                    editor.getSelectionStop(),
@@ -915,7 +914,7 @@ public class Sketch {
     File newFile = new File(newFolder, newName + ".ino");
     code[0].saveAs(newFile);
 
-    editor.handleOpenUnchecked(newFile.getPath(),
+    editor.handleOpenUnchecked(newFile,
                                currentIndex,
                                editor.getSelectionStart(),
                                editor.getSelectionStop(),

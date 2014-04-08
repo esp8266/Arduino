@@ -462,7 +462,7 @@ public class Base {
       }
 
       boolean showEditor = (action == ACTION.GUI);
-      if (handleOpen(path, nextEditorLocation(), showEditor) == null) {
+      if (handleOpen(new File(path), nextEditorLocation(), showEditor) == null) {
         String mess = I18n.format(_("Failed to open sketch: \"{0}\""), path);
         // Open failure is fatal in upload/verify mode
         if (action == ACTION.VERIFY || action == ACTION.UPLOAD)
@@ -654,7 +654,7 @@ public class Base {
         location = nextEditorLocation();
       }
       // If file did not exist, null will be returned for the Editor
-      if (handleOpen(path, location, true) != null) {
+      if (handleOpen(new File(path), location, true) != null) {
         opened++;
       }
     }
@@ -812,7 +812,7 @@ public class Base {
    * @param shift whether shift is pressed, which will invert prompt setting
    * @param noPrompt disable prompt, no matter the setting
    */
-  protected String createNewUntitled() throws IOException {
+  protected File createNewUntitled() throws IOException {
     File newbieDir = null;
     String newbieName = null;
 
@@ -859,7 +859,7 @@ public class Base {
       throw new IOException();
     }
     FileUtils.copyFile(new File(getContentFile("examples"), "01.Basics" + File.separator + "BareMinimum" + File.separator + "BareMinimum.ino"), newbieFile);
-    return newbieFile.getAbsolutePath();
+    return newbieFile;
   }
 
 
@@ -869,9 +869,9 @@ public class Base {
    */
   public void handleNew() throws Exception {
     try {
-      String path = createNewUntitled();
-      if (path != null) {
-        Editor editor = handleOpen(path);
+      File file = createNewUntitled();
+      if (file != null) {
+        Editor editor = handleOpen(file);
         editor.untitled = true;
       }
 
@@ -900,9 +900,9 @@ public class Base {
 
   protected void handleNewReplaceImpl() {
     try {
-      String path = createNewUntitled();
-      if (path != null) {
-        activeEditor.handleOpenInternal(path);
+      File file = createNewUntitled();
+      if (file != null) {
+        activeEditor.handleOpenInternal(file);
         activeEditor.untitled = true;
       }
 //      return true;
@@ -918,14 +918,14 @@ public class Base {
    * Open a sketch, replacing the sketch in the current window.
    * @param path Location of the primary pde file for the sketch.
    */
-  public void handleOpenReplace(String path) {
+  public void handleOpenReplace(File file) {
     if (!activeEditor.checkModified()) {
       return;  // sketch was modified, and user canceled
     }
     // Close the running window, avoid window boogers with multiple sketches
     activeEditor.internalCloseRunner();
 
-    boolean loaded = activeEditor.handleOpenInternal(path);
+    boolean loaded = activeEditor.handleOpenInternal(file);
     if (!loaded) {
       // replace the document without checking if that's ok
       handleNewReplaceImpl();
@@ -956,30 +956,30 @@ public class Base {
     File inputFile = fd.getSelectedFile();
 
     Preferences.set("last.folder", inputFile.getAbsolutePath());
-    handleOpen(inputFile.getAbsolutePath());
+    handleOpen(inputFile);
   }
 
 
   /**
    * Open a sketch in a new window.
-   * @param path Path to the pde file for the sketch in question
+   * @param file File to open
    * @return the Editor object, so that properties (like 'untitled')
    *         can be set by the caller
    * @throws Exception 
    */
-  public Editor handleOpen(String path) throws Exception {
-    return handleOpen(path, nextEditorLocation(), true);
+  public Editor handleOpen(File file) throws Exception {
+    return handleOpen(file, nextEditorLocation(), true);
   }
 
 
-  protected Editor handleOpen(String path, int[] location, boolean showEditor) throws Exception {
+  protected Editor handleOpen(File file, int[] location, boolean showEditor) throws Exception {
 //    System.err.println("entering handleOpen " + path);
 
-    File file = new File(path);
     if (!file.exists()) return null;
 
 //    System.err.println("  editors: " + editors);
     // Cycle through open windows to make sure that it's not already open.
+    String path = file.getAbsolutePath();
     for (Editor editor : editors) {
       if (editor.getSketch().getMainFilePath().equals(path)) {
         editor.toFront();
@@ -1003,7 +1003,7 @@ public class Base {
 //    }
 
 //    System.err.println("  creating new editor");
-    Editor editor = new Editor(this, path, location);
+    Editor editor = new Editor(this, file, location);
 //    Editor editor = null;
 //    try {
 //      editor = new Editor(this, path, location);
@@ -1746,16 +1746,17 @@ public class Base {
     ActionListener listener = new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         String path = e.getActionCommand();
-        if (new File(path).exists()) {
+        File file = new File(path);
+        if (file.exists()) {
           boolean replace = replaceExisting;
           if ((e.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
             replace = !replace;
           }
           if (replace) {
-            handleOpenReplace(path);
+            handleOpenReplace(file);
           } else {
             try {
-              handleOpen(path);
+              handleOpen(file);
             } catch (Exception e1) {
               e1.printStackTrace();
             }
