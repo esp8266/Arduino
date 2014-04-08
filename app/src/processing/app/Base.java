@@ -147,8 +147,10 @@ public class Base {
     // when no parameter was specified to an option. Later, Base() will
     // then show an error for these.
     for (int i = 0; i < args.length - 1; i++) {
-      if (args[i].equals("--preferences-file"))
-        preferencesFile = new File(args[i + 1]);
+      if (args[i].equals("--preferences-file")) {
+        ++i;
+        preferencesFile = new File(args[i]);
+      }
     }
 
     // run static initialization that grabs all the prefs
