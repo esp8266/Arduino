@@ -2120,7 +2120,7 @@ public class Editor extends JFrame implements RunnerListener {
     String pdeName = parentName + ".pde";
     File altPdeFile = new File(parent, pdeName);
     String inoName = parentName + ".ino";
-    File altInoFile = new File(parent, pdeName);
+    File altInoFile = new File(parent, inoName);
 
     if (pdeName.equals(fileName) || inoName.equals(fileName)) {
       // no beef with this guy
