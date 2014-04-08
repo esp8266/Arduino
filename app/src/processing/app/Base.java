@@ -291,6 +291,18 @@ public class Base {
     }
   }
 
+  // Returns a File object for the given pathname. If the pathname
+  // is not absolute, it is interpreted relative to the current
+  // directory when starting the IDE (which is not the same as the
+  // current working directory!).
+  static public File absoluteFile(String path) {
+    File file = new File(path);
+    if (!file.isAbsolute()) {
+      file = new File(currentDirectory, path);
+    }
+    return file;
+  }
+
 
   protected static enum ACTION { GUI, VERIFY, UPLOAD, NOOP, GET_PREF };
   public Base(String[] args) throws Exception {
@@ -457,12 +469,11 @@ public class Base {
         }
       }
 
-      if (!new File(path).isAbsolute()) {
-        path = new File(currentDirectory, path).getAbsolutePath();
-      }
+      // Correctly resolve relative paths
+      File file = absoluteFile(path);
 
       boolean showEditor = (action == ACTION.GUI);
-      if (handleOpen(new File(path), nextEditorLocation(), showEditor) == null) {
+      if (handleOpen(file, nextEditorLocation(), showEditor) == null) {
         String mess = I18n.format(_("Failed to open sketch: \"{0}\""), path);
         // Open failure is fatal in upload/verify mode
         if (action == ACTION.VERIFY || action == ACTION.UPLOAD)
