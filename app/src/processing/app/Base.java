@@ -456,21 +456,20 @@ public class Base {
       showError(null, _("--verbose, --verbose-upload and --verbose-build can only be used together with --verify or --upload"), 3);
 
     for (String path: filenames) {
+      // Correctly resolve relative paths
+      File file = absoluteFile(path);
+
       // Fix a problem with systems that use a non-ASCII languages. Paths are
       // being passed in with 8.3 syntax, which makes the sketch loader code
       // unhappy, since the sketch folder naming doesn't match up correctly.
       // http://dev.processing.org/bugs/show_bug.cgi?id=1089
       if (isWindows()) {
         try {
-          File file = new File(path);
-          path = file.getCanonicalPath();
+          file = file.getCanonicalFile();
         } catch (IOException e) {
           e.printStackTrace();
         }
       }
-
-      // Correctly resolve relative paths
-      File file = absoluteFile(path);
 
       boolean showEditor = (action == ACTION.GUI);
       if (handleOpen(file, nextEditorLocation(), showEditor) == null) {
