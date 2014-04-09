@@ -280,6 +280,13 @@ HISTORY
 	file, just like *--pref*. The *--verbose* options still only
 	apply to the current run.
 
+{empty}::
+	A path passed to *--preferences-file*, or set in the
+	*build.path*, *preferences.path* or *settings.path* is now
+	interpreted relative to the current directory instead of the
+	location of the arduino command itself.
+
+
 RESOURCES
 ---------
 Web site: <http://arduino.cc/>

@@ -143,7 +143,7 @@ public class Base {
     if (!portableFolder.exists())
       portableFolder = null;
 
-    File preferencesFile = null;
+    String preferencesFile = null;
 
     // Do a first pass over the commandline arguments, the rest of them
     // will be processed by the Base constructor. Note that this loop
@@ -153,7 +153,7 @@ public class Base {
     for (int i = 0; i < args.length - 1; i++) {
       if (args[i].equals("--preferences-file")) {
         ++i;
-        preferencesFile = new File(args[i]);
+        preferencesFile = args[i];
         continue;
       }
       if (args[i].equals("--curdir")) {
@@ -164,7 +164,7 @@ public class Base {
     }
 
     // run static initialization that grabs all the prefs
-    Preferences.init(preferencesFile);
+    Preferences.init(absoluteFile(preferencesFile));
 
     try {
       File versionFile = getContentFile("lib/version.txt");
@@ -296,6 +296,8 @@ public class Base {
   // directory when starting the IDE (which is not the same as the
   // current working directory!).
   static public File absoluteFile(String path) {
+    if (path == null) return null;
+
     File file = new File(path);
     if (!file.isAbsolute()) {
       file = new File(currentDirectory, path);
@@ -320,7 +322,7 @@ public class Base {
       if (portableFolder != null)
         sketchbookFolder = new File(portableFolder, sketchbookPath);
       else
-        sketchbookFolder = new File(sketchbookPath);
+        sketchbookFolder = Base.absoluteFile(sketchbookPath);
       if (!sketchbookFolder.exists()) {
         Base.showWarning(_("Sketchbook folder disappeared"),
                 _("The sketchbook folder no longer exists.\n" +
@@ -2047,7 +2049,7 @@ public class Base {
 
     String preferencesPath = Preferences.get("settings.path");
     if (preferencesPath != null) {
-      settingsFolder = new File(preferencesPath);
+      settingsFolder = absoluteFile(preferencesPath);
 
     } else {
       try {
@@ -2086,8 +2088,7 @@ public class Base {
     if (buildFolder == null) {
       String buildPath = Preferences.get("build.path");
       if (buildPath != null) {
-        buildFolder = new File(buildPath);
-
+        buildFolder = Base.absoluteFile(buildPath);
       } else {
         //File folder = new File(getTempFolder(), "build");
         //if (!folder.exists()) folder.mkdirs();
@@ -2248,7 +2249,7 @@ public class Base {
   static public File getSketchbookFolder() {
     if (portableFolder != null)
       return new File(portableFolder, Preferences.get("sketchbook.path"));
-    return new File(Preferences.get("sketchbook.path"));
+    return absoluteFile(Preferences.get("sketchbook.path"));
   }
 
 
