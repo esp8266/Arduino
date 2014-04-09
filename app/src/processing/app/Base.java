@@ -2089,6 +2089,8 @@ public class Base {
       String buildPath = Preferences.get("build.path");
       if (buildPath != null) {
         buildFolder = Base.absoluteFile(buildPath);
+        if (!buildFolder.exists())
+          buildFolder.mkdirs();
       } else {
         //File folder = new File(getTempFolder(), "build");
         //if (!folder.exists()) folder.mkdirs();
