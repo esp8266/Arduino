@@ -711,21 +711,26 @@ public class Compiler implements MessageConsumer {
     // Delete the .a file, to prevent any previous code from lingering
     afile.delete();
 
-    for (File file : coreObjectFiles) {
+    try {
+      for (File file : coreObjectFiles) {
 
-      PreferencesMap dict = new PreferencesMap(prefs);
-      dict.put("ide_version", "" + Base.REVISION);
-      dict.put("archive_file", afile.getName());
-      dict.put("object_file", file.getAbsolutePath());
+        PreferencesMap dict = new PreferencesMap(prefs);
+        dict.put("ide_version", "" + Base.REVISION);
+        dict.put("archive_file", afile.getName());
+        dict.put("object_file", file.getAbsolutePath());
 
-      String[] cmdArray;
-      try {
-        String cmd = prefs.get("recipe.ar.pattern");
-        cmdArray = StringReplacer.formatAndSplit(cmd, dict, true);
-      } catch (Exception e) {
-        throw new RunnerException(e);
+        String[] cmdArray;
+        try {
+          String cmd = prefs.get("recipe.ar.pattern");
+          cmdArray = StringReplacer.formatAndSplit(cmd, dict, true);
+        } catch (Exception e) {
+          throw new RunnerException(e);
+        }
+        execAsynchronously(cmdArray);
       }
-      execAsynchronously(cmdArray);
+    } catch (RunnerException e) {
+      afile.delete();
+      throw e;
     }
 
     if (variantFolder != null)
