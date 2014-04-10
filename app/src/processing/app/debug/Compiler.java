@@ -703,10 +703,38 @@ public class Compiler implements MessageConsumer {
     if (variantFolder != null)
       includeFolders.add(variantFolder);
 
+
+    if (variantFolder != null)
+      objectFiles.addAll(compileFiles(buildFolder, variantFolder, true,
+                                      includeFolders));
+
     File afile = new File(buildFolder, "core.a");
 
     List<File> coreObjectFiles = compileFiles(buildFolder, coreFolder, true,
                                               includeFolders);
+
+    // See if the .a file is already uptodate
+    if (afile.exists()) {
+      boolean changed = false;
+      for (File file : coreObjectFiles) {
+        if (file.lastModified() > afile.lastModified()) {
+          changed = true;
+          break;
+        }
+      }
+
+      // If none of the object files is newer than the .a file, don't
+      // bother rebuilding the .a file. There is a small corner case
+      // here: If a source file was removed, but no other source file
+      // was modified, this will not rebuild core.a even when it
+      // should. It's hard to fix and not a realistic case, so it
+      // shouldn't be a problem.
+      if (!changed) {
+        if (verbose)
+          System.out.println(I18n.format(_("Using previously compiled file: {0}"), afile.getPath()));
+        return;
+      }
+    }
 
     // Delete the .a file, to prevent any previous code from lingering
     afile.delete();
@@ -732,10 +760,6 @@ public class Compiler implements MessageConsumer {
       afile.delete();
       throw e;
     }
-
-    if (variantFolder != null)
-      objectFiles.addAll(compileFiles(buildFolder, variantFolder, true,
-                                      includeFolders));
   }
 			
   // 4. link it all together into the .elf file
