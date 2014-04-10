@@ -703,13 +703,19 @@ public class Compiler implements MessageConsumer {
     if (variantFolder != null)
       includeFolders.add(variantFolder);
 
+    File afile = new File(buildFolder, "core.a");
+
     List<File> coreObjectFiles = compileFiles(buildFolder, coreFolder, true,
                                               includeFolders);
+
+    // Delete the .a file, to prevent any previous code from lingering
+    afile.delete();
+
     for (File file : coreObjectFiles) {
 
       PreferencesMap dict = new PreferencesMap(prefs);
       dict.put("ide_version", "" + Base.REVISION);
-      dict.put("archive_file", "core.a");
+      dict.put("archive_file", afile.getName());
       dict.put("object_file", file.getAbsolutePath());
 
       String[] cmdArray;
