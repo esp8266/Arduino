@@ -492,7 +492,7 @@ public class Preferences {
     final JLabel clickable = label;
     label.addMouseListener(new MouseAdapter() {
         public void mousePressed(MouseEvent e) {
-          Base.openFolder(Base.getSettingsFolder());
+          Base.openFolder(preferencesFile.getParentFile());
         }
 
         public void mouseEntered(MouseEvent e) {
