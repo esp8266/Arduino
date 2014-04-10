@@ -36,6 +36,11 @@ USARTClass::USARTClass( Usart* pUsart, IRQn_Type dwIrq, uint32_t dwId, RingBuffe
 
 void USARTClass::begin( const uint32_t dwBaudRate )
 {
+	begin( dwBaudRate, SERIAL_8N1 );
+}
+
+void USARTClass::begin( const uint32_t dwBaudRate, const uint32_t config )
+{
   // Configure PMC
   pmc_enable_periph_clk( _dwId ) ;
 
@@ -46,8 +51,8 @@ void USARTClass::begin( const uint32_t dwBaudRate )
   _pUsart->US_CR = US_CR_RSTRX | US_CR_RSTTX | US_CR_RXDIS | US_CR_TXDIS ;
 
   // Configure mode
-  _pUsart->US_MR = US_MR_USART_MODE_NORMAL | US_MR_USCLKS_MCK | US_MR_CHRL_8_BIT | US_MR_PAR_NO |
-                   US_MR_NBSTOP_1_BIT | US_MR_CHMODE_NORMAL;
+  _pUsart->US_MR = config;
+
 
   // Configure baudrate, asynchronous no oversampling
   _pUsart->US_BRGR = (SystemCoreClock / dwBaudRate) / 16 ;
