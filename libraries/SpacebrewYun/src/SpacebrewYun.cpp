@@ -127,7 +127,7 @@ void SpacebrewYun::addSubscribe(const String& name, const String& type) {
 }
 
 void SpacebrewYun::connect(String _server, int _port) {
-	Serial.print(F("NEW LIB"));
+	Serial.println(F("v2.3"));
 	_started = true;
 	server = _server;
 	port = _port; 
@@ -214,9 +214,9 @@ void SpacebrewYun::monitor() {
 
 		if (c == char(CONNECTION_START) && _started && !_connected) {
 			if (_verbose) {
-				Serial.print(F("Connected to spacebrew server at: "));
+				Serial.print(F("Connected to: "));
 				Serial.println(server);
-				Serial.print(F("Application name set to: "));
+				Serial.print(F("Application name: "));
 				Serial.println(name);
 			}
 			if (_onOpen != NULL){
@@ -228,7 +228,7 @@ void SpacebrewYun::monitor() {
 		else if (c == char(CONNECTION_END) && _connected) {
 			_connected = false;
 			if (_verbose) {
-				Serial.print(F("Disconnected from spacebrew server at: "));
+				Serial.print(F("Disconnected from: "));
 				Serial.println(server);
 			}
 			if (_onClose != NULL){
@@ -239,7 +239,7 @@ void SpacebrewYun::monitor() {
 		if (_verbose) {
 			if (c == char(CONNECTION_ERROR)) {
 				_error_msg = true;
-					Serial.println(F("ERROR :: with Spacebrew.py Connection ::"));
+				Serial.println(F("ERROR :: Spacebrew.py ::"));
 			}
 			else if (_error_msg && c == char(MSG_END)) {
 				_error_msg = false;
@@ -251,24 +251,39 @@ void SpacebrewYun::monitor() {
 		}
 
 		if (_connected) {
+			// set flag to read data message name
 			if (c == char(MSG_START)) {
 				read_name = true;
+
+			// set flag to read data message payload
 			} else if (c == char(MSG_DIV) || sub_name.length() > sub_name_max) {
 				read_name = false;
 				read_msg = true;
+
+			// set flag to read confirm message
+			} else if (c == char(MSG_CONFIRM)) {
+				read_confirm = true;
+
+			// process data or confirm message, or reset message
 			} else if (c == char(MSG_END) || sub_msg.length() > sub_msg_str_max) {
 				if (read_msg == true) {
-					read_msg = false;
 					onMessage();
-					// delay(2);
 				}
 				if (read_confirm == true) {
-					read_confirm = false;
 					onConfirm();
 					delay(2);
 				}
-			} else if (c == char(MSG_CONFIRM)) {
-				read_confirm = true;
+
+				read_confirm = false;
+				read_msg = false;
+				sub_name = "";
+				sub_msg = "";
+				sub_type = "";
+
+				// send a message received confirmation
+				Console.print(char(7));
+
+			// read message body
 			} else {
 				if (read_name == true) {
 					sub_name += c;
@@ -300,6 +315,8 @@ void SpacebrewYun::monitor() {
 		}
 	}
 
+	// Serial.println(F(" - END monitor"));
+
 }
 
 void SpacebrewYun::onConfirm() {
@@ -313,10 +330,6 @@ void SpacebrewYun::onConfirm() {
 			curr = curr->next;
 		}
 	}
-
-	sub_name = "";
-	sub_msg = "";
-	sub_type = "";
 }
 
 boolean SpacebrewYun::connected() {
@@ -328,9 +341,14 @@ void SpacebrewYun::verbose(boolean verbose = true) {
 }
 
 void SpacebrewYun::onMessage() {
-	if (subscribers != NULL) {
+	Serial.print(F("onMessage: name "));
+	Serial.print(sub_name);
+	Serial.print(F(", value "));
+	Serial.print(sub_msg);
+
+	if (subscribers != NULL && sub_name.equals("") == false) {
 		struct Subscriber *curr = subscribers;
-		while((curr != NULL) && (sub_type == "")){
+		while((curr != NULL) && (sub_type.equals("") == true)){
 			if (sub_name.equals(curr->name) == true) {
 				sub_type = curr->type;
 			}
@@ -338,35 +356,35 @@ void SpacebrewYun::onMessage() {
 		}
 	}
 
+	Serial.print(F(", type "));
+	Serial.println(sub_type);
+
 	if ( sub_type.equals("range") ) {
 		if (_onRangeMessage != NULL) {
 			_onRangeMessage( sub_name, int(sub_msg.toInt()) );
 		} else {
-			Serial.println(F("ERROR :: Range message received, no callback method is registered"));
+			Serial.println(F("ERROR :: Range message, no callback"));
 		}
 	} else if ( sub_type.equals("boolean") ) {
 		if (_onBooleanMessage != NULL) {
 			_onBooleanMessage( sub_name, ( sub_msg.equals("false") ? false : true ) );
 		} else {
-			Serial.println(F("ERROR :: Boolean message received, no callback method is registered"));
+			Serial.println(F("ERROR :: Boolean message, no callback"));
 		}
 	} else if ( sub_type.equals("string") ) {
 		if (_onStringMessage != NULL) {
 			_onStringMessage( sub_name, sub_msg );	
 		} else {
-			Serial.println(F("ERROR :: String message received, no callback method is registered"));
+			Serial.println(F("ERROR :: String message, no callback"));
 		}
-	} else {
+	} else if ( sub_type.equals("custom") )  {
 		if (_onCustomMessage != NULL) {
 			_onCustomMessage( sub_name, sub_msg, sub_type );
 		} else {
-			Serial.println(F("ERROR :: Custom message received, no callback method is registered"));
+			Serial.println(F("ERROR :: Custom message, no callback"));
 		}
 	}
 
-	sub_name = "";
-	sub_msg = "";
-	sub_type = "";
 }
 
 
@@ -414,7 +432,7 @@ void SpacebrewYun::getPids() {
 	pids.run();
 
 	if (_verbose) {
-		Serial.println(F("Checking if spacebrew process already running"));
+		Serial.println(F("Checking if spacebrew running"));
 	}
 
 	int sbPidsIndex = 0;
@@ -455,7 +473,7 @@ void SpacebrewYun::killPids() {
 			char * newPID = itoa(sbPids[i], pid, 10);
 
 			if (_verbose) {
-				Serial.print(F("Stopping existing spacebrew processes with pids: "));
+				Serial.print(F("Stopping existing processes: "));
 				Serial.println(newPID);
 			}
 
