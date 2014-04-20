@@ -274,7 +274,6 @@ int USB_Send(u8 ep, const void* d, int len)
 
 	int r = len;
 	const u8* data = (const u8*)d;
-	u8 zero = ep & TRANSFER_ZERO;
 	u8 timeout = 250;		// 250ms timeout on send? TODO
 	while (len)
 	{
