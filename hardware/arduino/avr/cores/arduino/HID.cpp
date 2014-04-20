@@ -151,7 +151,7 @@ int WEAK HID_GetInterface(u8* interfaceNum)
 	return USB_SendControl(TRANSFER_PGM,&_hidInterface,sizeof(_hidInterface));
 }
 
-int WEAK HID_GetDescriptor(int i)
+int WEAK HID_GetDescriptor(int /* i */)
 {
 	return USB_SendControl(TRANSFER_PGM,_hidReportDescriptor,sizeof(_hidReportDescriptor));
 }

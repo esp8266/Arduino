@@ -94,7 +94,8 @@ volatile u8 _usbConfiguration = 0;
 
 static inline void WaitIN(void)
 {
-	while (!(UEINTX & (1<<TXINI)));
+	while (!(UEINTX & (1<<TXINI)))
+		;
 }
 
 static inline void ClearIN(void)
