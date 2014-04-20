@@ -139,7 +139,7 @@ uint32_t USBD_Available(uint32_t ep)
 //	Return number of bytes read
 uint32_t USBD_Recv(uint32_t ep, void* d, uint32_t len)
 {
-	if (!_usbConfiguration || len < 0)
+	if (!_usbConfiguration)
 		return -1;
 
 	LockEP lock(ep);

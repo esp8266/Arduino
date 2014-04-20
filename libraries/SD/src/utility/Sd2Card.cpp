@@ -30,7 +30,8 @@
 static void spiSend(uint8_t b) {
 #ifndef USE_SPI_LIB
   SPDR = b;
-  while (!(SPSR & (1 << SPIF)));
+  while (!(SPSR & (1 << SPIF)))
+    ;
 #else
   SPI.transfer(b);
 #endif
@@ -124,7 +125,8 @@ uint8_t Sd2Card::cardCommand(uint8_t cmd, uint32_t arg) {
   spiSend(crc);
 
   // wait for response
-  for (uint8_t i = 0; ((status_ = spiRec()) & 0X80) && i != 0XFF; i++);
+  for (uint8_t i = 0; ((status_ = spiRec()) & 0X80) && i != 0XFF; i++)
+    ;
   return status_;
 }
 //------------------------------------------------------------------------------
@@ -383,18 +385,21 @@ uint8_t Sd2Card::readData(uint32_t block,
 
   // skip data before offset
   for (;offset_ < offset; offset_++) {
-    while (!(SPSR & (1 << SPIF)));
+    while (!(SPSR & (1 << SPIF)))
+      ;
     SPDR = 0XFF;
   }
   // transfer data
   n = count - 1;
   for (uint16_t i = 0; i < n; i++) {
-    while (!(SPSR & (1 << SPIF)));
+    while (!(SPSR & (1 << SPIF)))
+      ;
     dst[i] = SPDR;
     SPDR = 0XFF;
   }
   // wait for last byte
-  while (!(SPSR & (1 << SPIF)));
+  while (!(SPSR & (1 << SPIF)))
+    ;
   dst[n] = SPDR;
 
 #else  // OPTIMIZE_HARDWARE_SPI
@@ -429,11 +434,13 @@ void Sd2Card::readEnd(void) {
     // optimize skip for hardware
     SPDR = 0XFF;
     while (offset_++ < 513) {
-      while (!(SPSR & (1 << SPIF)));
+      while (!(SPSR & (1 << SPIF)))
+        ;
       SPDR = 0XFF;
     }
     // wait for last crc byte
-    while (!(SPSR & (1 << SPIF)));
+    while (!(SPSR & (1 << SPIF)))
+      ;
 #else  // OPTIMIZE_HARDWARE_SPI
     while (offset_++ < 514) spiRec();
 #endif  // OPTIMIZE_HARDWARE_SPI
@@ -602,14 +609,17 @@ uint8_t Sd2Card::writeData(uint8_t token, const uint8_t* src) {
 
   // send two byte per iteration
   for (uint16_t i = 0; i < 512; i += 2) {
-    while (!(SPSR & (1 << SPIF)));
+    while (!(SPSR & (1 << SPIF)))
+      ;
     SPDR = src[i];
-    while (!(SPSR & (1 << SPIF)));
+    while (!(SPSR & (1 << SPIF)))
+      ;
     SPDR = src[i+1];
   }
 
   // wait for last data byte
-  while (!(SPSR & (1 << SPIF)));
+  while (!(SPSR & (1 << SPIF)))
+    ;
 
 #else  // OPTIMIZE_HARDWARE_SPI
   spiSend(token);

@@ -147,10 +147,15 @@ bool WEAK CDC_Setup(Setup& setup)
 int _serialPeek = -1;
 void Serial_::begin(uint32_t baud_count)
 {
+	// suppress "unused parameter" warning
+	(void)baud_count;
 }
 
 void Serial_::begin(uint32_t baud_count, uint8_t config)
 {
+	// suppress "unused parameter" warning
+	(void)baud_count;
+	(void)config;
 }
 
 void Serial_::end(void)

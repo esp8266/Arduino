@@ -176,7 +176,7 @@ float Stream::parseFloat(char skipChar){
   boolean isNegative = false;
   boolean isFraction = false;
   long value = 0;
-  char c;
+  int c;
   float fraction = 1.0;
 
   c = peekNextDigit();

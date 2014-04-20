@@ -150,7 +150,7 @@ uint32_t analogRead(uint32_t ulPin)
 			// Enable the corresponding channel
 			if (ulChannel != latestSelectedChannel) {
 				adc_enable_channel( ADC, ulChannel );
-				if ( latestSelectedChannel != -1 )
+				if ( latestSelectedChannel != (uint32_t)-1 )
 					adc_disable_channel( ADC, latestSelectedChannel );
 				latestSelectedChannel = ulChannel;
 			}
@@ -293,7 +293,7 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 		ETCChannel channel = g_APinDescription[ulPin].ulTCChannel;
 		static const uint32_t channelToChNo[] = { 0, 0, 1, 1, 2, 2, 0, 0, 1, 1, 2, 2, 0, 0, 1, 1, 2, 2 };
 		static const uint32_t channelToAB[]   = { 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0 };
-		static const Tc *channelToTC[] = {
+		static Tc *channelToTC[] = {
 			TC0, TC0, TC0, TC0, TC0, TC0,
 			TC1, TC1, TC1, TC1, TC1, TC1,
 			TC2, TC2, TC2, TC2, TC2, TC2 };
