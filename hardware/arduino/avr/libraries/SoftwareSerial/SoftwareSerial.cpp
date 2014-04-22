@@ -486,33 +486,20 @@ size_t SoftwareSerial::write(uint8_t b)
 
   // Write each of the 8 bits
   if (_inverse_logic)
-  {
-    for (byte mask = 0x01; mask; mask <<= 1)
-    {
-      if (b & mask) // choose bit
-        tx_pin_write(LOW); // send 1
-      else
-        tx_pin_write(HIGH); // send 0
-    
-      tunedDelay(_tx_delay);
-    }
+    b = ~b;
 
-    tx_pin_write(LOW); // restore pin to natural state
-  }
-  else
+  for (byte mask = 0x01; mask; mask <<= 1)
   {
-    for (byte mask = 0x01; mask; mask <<= 1)
-    {
-      if (b & mask) // choose bit
-        tx_pin_write(HIGH); // send 1
-      else
-        tx_pin_write(LOW); // send 0
-    
-      tunedDelay(_tx_delay);
-    }
+    if (b & mask) // choose bit
+      tx_pin_write(HIGH); // send 1
+    else
+      tx_pin_write(LOW); // send 0
 
-    tx_pin_write(HIGH); // restore pin to natural state
+    tunedDelay(_tx_delay);
   }
+
+  // restore pin to natural state
+  tx_pin_write(_inverse_logic ? LOW : HIGH);
 
   SREG = oldSREG; // turn interrupts back on
   tunedDelay(_tx_delay);
