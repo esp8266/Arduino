@@ -292,14 +292,6 @@ void SoftwareSerial::recv()
 #endif
 }
 
-void SoftwareSerial::tx_pin_write(uint8_t pin_state)
-{
-  if (pin_state == LOW)
-    *_transmitPortRegister &= ~_transmitBitMask;
-  else
-    *_transmitPortRegister |= _transmitBitMask;
-}
-
 uint8_t SoftwareSerial::rx_pin_read()
 {
   return *_receivePortRegister & _receiveBitMask;
@@ -477,29 +469,47 @@ size_t SoftwareSerial::write(uint8_t b)
     return 0;
   }
 
+  // By declaring these as local variables, the compiler will put them
+  // in registers _before_ disabling interrupts and entering the
+  // critical timing sections below, which makes it a lot easier to
+  // verify the cycle timings
+  volatile uint8_t *reg = _transmitPortRegister;
+  uint8_t reg_mask = _transmitBitMask;
+  uint8_t inv_mask = ~_transmitBitMask;
   uint8_t oldSREG = SREG;
+  bool inv = _inverse_logic;
+  uint16_t delay = _tx_delay;
+
+  if (inv)
+    b = ~b;
+
   cli();  // turn off interrupts for a clean txmit
 
   // Write the start bit
-  tx_pin_write(_inverse_logic ? HIGH : LOW);
-  tunedDelay(_tx_delay + XMIT_START_ADJUSTMENT);
+  if (inv)
+    *reg |= reg_mask;
+  else
+    *reg &= inv_mask;
+
+  tunedDelay(delay);
 
   // Write each of the 8 bits
-  if (_inverse_logic)
-    b = ~b;
-
-  for (byte mask = 0x01; mask; mask <<= 1)
+  for (uint8_t i = 8; i > 0; --i)
   {
-    if (b & mask) // choose bit
-      tx_pin_write(HIGH); // send 1
+    if (b & 1) // choose bit
+      *reg |= reg_mask; // send 1
     else
-      tx_pin_write(LOW); // send 0
+      *reg &= inv_mask; // send 0
 
-    tunedDelay(_tx_delay);
+    tunedDelay(delay);
+    b >>= 1;
   }
 
   // restore pin to natural state
-  tx_pin_write(_inverse_logic ? LOW : HIGH);
+  if (inv)
+    *reg &= inv_mask;
+  else
+    *reg |= reg_mask;
 
   SREG = oldSREG; // turn interrupts back on
   tunedDelay(_tx_delay);
