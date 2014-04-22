@@ -242,15 +242,13 @@ void SoftwareSerial::recv()
     DebugPulse(_DEBUG_PIN2, 1);
 
     // Read each of the 8 bits
-    for (uint8_t i=0x1; i; i <<= 1)
+    for (uint8_t i=8; i > 0; --i)
     {
       tunedDelay(_rx_delay_intrabit);
+      d >>= 1;
       DebugPulse(_DEBUG_PIN2, 1);
-      uint8_t noti = ~i;
       if (rx_pin_read())
-        d |= i;
-      else // else clause added to ensure function timing is ~balanced
-        d &= noti;
+        d |= 0x80;
     }
 
     // skip the stop bit
