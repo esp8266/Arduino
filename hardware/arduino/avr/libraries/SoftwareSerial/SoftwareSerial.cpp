@@ -403,6 +403,11 @@ void SoftwareSerial::begin(long speed)
     // (others might also need it, so we disable the interrupt by using
     // the per-pin PCMSK register).
     *digitalPinToPCICR(_receivePin) |= _BV(digitalPinToPCICRbit(_receivePin));
+    // Precalculate the pcint mask register and value, so setRxIntMask
+    // can be used inside the ISR without costing too much time.
+    _pcint_maskreg = digitalPinToPCMSK(_receivePin);
+    _pcint_maskvalue = _BV(digitalPinToPCMSKbit(_receivePin));
+
     tunedDelay(_tx_delay); // if we were low this establishes the end
   }
 
@@ -417,9 +422,9 @@ void SoftwareSerial::begin(long speed)
 void SoftwareSerial::setRxIntMsk(bool enable)
 {
     if (enable)
-      *digitalPinToPCMSK(_receivePin) |= _BV(digitalPinToPCMSKbit(_receivePin));
+      *_pcint_maskreg |= _pcint_maskvalue;
     else
-      *digitalPinToPCMSK(_receivePin) &= ~_BV(digitalPinToPCMSKbit(_receivePin));
+      *_pcint_maskreg &= ~_pcint_maskvalue;
 }
 
 void SoftwareSerial::end()

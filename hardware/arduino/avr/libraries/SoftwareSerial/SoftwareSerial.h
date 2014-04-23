@@ -53,6 +53,8 @@ private:
   volatile uint8_t *_receivePortRegister;
   uint8_t _transmitBitMask;
   volatile uint8_t *_transmitPortRegister;
+  volatile uint8_t *_pcint_maskreg;
+  uint8_t _pcint_maskvalue;
 
   uint16_t _rx_delay_centering;
   uint16_t _rx_delay_intrabit;
