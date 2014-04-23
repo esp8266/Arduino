@@ -316,24 +316,15 @@ ISR(PCINT0_vect)
 #endif
 
 #if defined(PCINT1_vect)
-ISR(PCINT1_vect)
-{
-  SoftwareSerial::handle_interrupt();
-}
+ISR(PCINT1_vect, ISR_ALIASOF(PCINT0_vect));
 #endif
 
 #if defined(PCINT2_vect)
-ISR(PCINT2_vect)
-{
-  SoftwareSerial::handle_interrupt();
-}
+ISR(PCINT2_vect, ISR_ALIASOF(PCINT0_vect));
 #endif
 
 #if defined(PCINT3_vect)
-ISR(PCINT3_vect)
-{
-  SoftwareSerial::handle_interrupt();
-}
+ISR(PCINT3_vect, ISR_ALIASOF(PCINT0_vect));
 #endif
 
 //
