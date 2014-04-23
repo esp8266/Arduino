@@ -259,11 +259,12 @@ void SoftwareSerial::recv()
       d = ~d;
 
     // if buffer full, set the overflow flag and return
-    if ((_receive_buffer_tail + 1) % _SS_MAX_RX_BUFF != _receive_buffer_head) 
+    uint8_t next = (_receive_buffer_tail + 1) % _SS_MAX_RX_BUFF;
+    if (next != _receive_buffer_head)
     {
       // save new data in buffer: tail points to where byte goes
       _receive_buffer[_receive_buffer_tail] = d; // save new byte
-      _receive_buffer_tail = (_receive_buffer_tail + 1) % _SS_MAX_RX_BUFF;
+      _receive_buffer_tail = next;
     } 
     else 
     {
