@@ -69,7 +69,7 @@ private:
   static SoftwareSerial *active_object;
 
   // private methods
-  void recv();
+  void recv() __attribute__((__always_inline__));
   uint8_t rx_pin_read();
   void tx_pin_write(uint8_t pin_state) __attribute__((__always_inline__));
   void setTX(uint8_t transmitPin);
@@ -99,7 +99,7 @@ public:
   using Print::write;
 
   // public only for easy access by interrupt handlers
-  static inline void handle_interrupt();
+  static inline void handle_interrupt() __attribute__((__always_inline__));
 };
 
 // Arduino 0012 workaround
