@@ -237,6 +237,11 @@ void SoftwareSerial::recv()
   // so interrupt is probably not for us
   if (_inverse_logic ? rx_pin_read() : !rx_pin_read())
   {
+    // Disable further interrupts during reception, this prevents
+    // triggering another interrupt directly after we return, which can
+    // cause problems at higher baudrates.
+    setRxIntMsk(false);
+
     // Wait approximately 1/2 of a bit width to "center" the sample
     tunedDelay(_rx_delay_centering);
     DebugPulse(_DEBUG_PIN2, 1);
@@ -255,6 +260,8 @@ void SoftwareSerial::recv()
     tunedDelay(_rx_delay_stopbit);
     DebugPulse(_DEBUG_PIN2, 1);
 
+    // Re-enable interrupts when we're sure to be inside the stop bit
+    setRxIntMsk(true);
     if (_inverse_logic)
       d = ~d;
 
