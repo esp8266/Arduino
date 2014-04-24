@@ -619,7 +619,7 @@ String String::substring(unsigned int left, unsigned int right) const
 		left = temp;
 	}
 	String out;
-	if (left > len) return out;
+	if (left >= len) return out;
 	if (right > len) right = len;
 	char temp = buffer[right];  // save the replaced character
 	buffer[right] = '\0';	
