@@ -1,8 +1,9 @@
 package processing.app.helpers;
 
-import java.io.IOException;
-
 import processing.app.Base;
+
+import java.io.IOException;
+import java.util.Map;
 
 public class ProcessUtils {
 
@@ -20,6 +21,10 @@ public class ProcessUtils {
     String[] cmdLine = new String[command.length];
     for (int i = 0; i < command.length; i++)
       cmdLine[i] = command[i].replace("\"", "\\\"");
-    return Runtime.getRuntime().exec(cmdLine);
+
+    ProcessBuilder pb = new ProcessBuilder(cmdLine);
+    Map<String, String> env = pb.environment();
+    env.put("CYGWIN", "nodosfilewarning");
+    return pb.start();
   }
 }
