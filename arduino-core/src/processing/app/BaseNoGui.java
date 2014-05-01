@@ -152,6 +152,8 @@ public class BaseNoGui {
 
   static public PreferencesMap getBoardPreferences() {
     TargetBoard board = getTargetBoard();
+    if (board == null)
+      return null;
     
     PreferencesMap prefs = new PreferencesMap(board.getPreferences());
     for (String menuId : board.getMenuIds()) {
@@ -343,8 +345,11 @@ public class BaseNoGui {
   }
 
   public static TargetBoard getTargetBoard() {
+    TargetPlatform targetPlatform = getTargetPlatform();
+    if (targetPlatform == null)
+      return null;
     String boardId = PreferencesData.get("board");
-    return getTargetPlatform().getBoard(boardId);
+    return targetPlatform.getBoard(boardId);
   }
 
   /**
@@ -669,28 +674,27 @@ public class BaseNoGui {
   }
 
   static public void onBoardOrPortChange() {
-    TargetPlatform targetPlatform = getTargetPlatform();
-    if (targetPlatform == null)
-      return;
-
-    // Calculate paths for libraries and examples
     examplesFolder = getContentFile("examples");
     toolsFolder = getContentFile("tools");
-
-    File platformFolder = targetPlatform.getFolder();
     librariesFolders = new ArrayList<File>();
     librariesFolders.add(getContentFile("libraries"));
-    String core = getBoardPreferences().get("build.core");
-    if (core.contains(":")) {
-      String referencedCore = core.split(":")[0];
-      TargetPlatform referencedPlatform = getTargetPlatform(referencedCore, targetPlatform.getId());
-      if (referencedPlatform != null) {
-      File referencedPlatformFolder = referencedPlatform.getFolder();
-        librariesFolders.add(new File(referencedPlatformFolder, "libraries"));
+
+    // Add library folder for the current selected platform
+    TargetPlatform targetPlatform = getTargetPlatform();
+    if (targetPlatform != null) {
+      String core = getBoardPreferences().get("build.core");
+      if (core.contains(":")) {
+        String referencedCore = core.split(":")[0];
+        TargetPlatform referencedPlatform = getTargetPlatform(referencedCore, targetPlatform.getId());
+        if (referencedPlatform != null) {
+          File referencedPlatformFolder = referencedPlatform.getFolder();
+          librariesFolders.add(new File(referencedPlatformFolder, "libraries"));
+        }
       }
+      File platformFolder = targetPlatform.getFolder();
+      librariesFolders.add(new File(platformFolder, "libraries"));
+      librariesFolders.add(getSketchbookLibrariesFolder());
     }
-    librariesFolders.add(new File(platformFolder, "libraries"));
-    librariesFolders.add(getSketchbookLibrariesFolder());
 
     // Scan for libraries in each library folder.
     // Libraries located in the latest folders on the list can override

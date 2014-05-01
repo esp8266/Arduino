@@ -1,5 +1,3 @@
-/* -*- mode: java; c-basic-offset: 2; indent-tabs-mode: nil -*- */
-
 /*
   Part of the Processing project - http://processing.org
 
@@ -23,18 +21,23 @@
 package processing.app;
 
 import processing.app.helpers.OSUtils;
-import processing.app.syntax.*;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.geom.Rectangle2D;
-import java.util.Map;
 
-import javax.swing.*;
+import javax.swing.JComponent;
 
+import processing.app.helpers.PreferencesMap;
+import processing.app.syntax.JEditTextArea;
 
 /**
  * Li'l status bar fella that shows the line number.
  */
+@SuppressWarnings("serial")
 public class EditorLineStatus extends JComponent {
   JEditTextArea textarea;
   int start = -1, stop;
@@ -52,7 +55,6 @@ public class EditorLineStatus extends JComponent {
   String name = "";
   String serialport = "";
 
-
   public EditorLineStatus(JEditTextArea textarea) {
     this.textarea = textarea;
     textarea.editorLineStatus = this;
@@ -69,7 +71,6 @@ public class EditorLineStatus extends JComponent {
     //linestatus.font    = SansSerif,plain,10
     //linestatus.color   = #FFFFFF
   }
-
 
   public void set(int newStart, int newStop) {
     if ((newStart == start) && (newStop == stop)) return;
@@ -93,11 +94,10 @@ public class EditorLineStatus extends JComponent {
     repaint();
   }
 
-
   public void paintComponent(Graphics g) {
-    if (name=="" && serialport=="") {
-      Map<String, String> boardPreferences =  Base.getBoardPreferences();
-      if (boardPreferences!=null)
+    if (name == "" && serialport == "") {
+      PreferencesMap boardPreferences = Base.getBoardPreferences();
+      if (boardPreferences != null)
         setBoardName(boardPreferences.get("name"));
       else
         setBoardName("-");
@@ -124,8 +124,13 @@ public class EditorLineStatus extends JComponent {
     }
   }
 
-  public void setBoardName(String name) { this.name = name; }
-  public void setSerialPort(String serialport) { this.serialport = serialport; }
+  public void setBoardName(String name) {
+    this.name = name;
+  }
+
+  public void setSerialPort(String serialport) {
+    this.serialport = serialport;
+  }
 
   public Dimension getPreferredSize() {
     return new Dimension(300, high);
