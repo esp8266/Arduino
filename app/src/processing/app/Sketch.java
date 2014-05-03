@@ -1682,7 +1682,7 @@ public class Sketch {
 
     int warnDataPercentage = Integer.parseInt(prefs.get("build.warn_data_percentage"));
     if (maxDataSize > 0 && dataSize > maxDataSize*warnDataPercentage/100)
-	  System.out.println(_("Low memory available, stability problems may occur"));
+      System.err.println(_("Low memory available, stability problems may occur."));
   }
 
   protected boolean upload(String buildPath, String suggestedClassName, boolean usingProgrammer) throws Exception {
