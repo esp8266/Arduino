@@ -11,12 +11,14 @@
  a final key combination (CTRL-U).
  
  Circuit:
- * Arduino Leonardo or Micro
+ * Arduino Leonardo, Micro, Due, LilyPad USB, or Yun 
  * wire to connect D2 to ground.
  
  created 5 Mar 2012
  modified 29 Mar 2012
  by Tom Igoe
+ modified 3 May 2014
+ by Scott Fitzgerald
  
  This example is in the public domain
  
@@ -54,6 +56,18 @@ void loop() {
   // wait for new window to open:
   delay(1000);
 
+  // versions of the Arduino IDE after 1.5 pre-populate  
+  // new sketches with setup() and loop() functions
+  // let's clear the window before typing anything new
+  //  select all
+  Keyboard.press(ctrlKey);
+  Keyboard.press('a');
+  delay(500);
+  Keyboard.releaseAll();
+  // delete the selected text
+  Keyboard.write(KEY_BACKSPACE);
+  delay(500);
+
   // Type out "blink":
   Keyboard.println("void setup() {");
   Keyboard.println("pinMode(13, OUTPUT);");
@@ -87,6 +101,7 @@ void loop() {
   // wait for the sweet oblivion of reprogramming:
   while(true);
 }
+
 
 
 
