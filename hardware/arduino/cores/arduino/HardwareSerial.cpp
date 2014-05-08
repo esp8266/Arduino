@@ -426,7 +426,7 @@ void HardwareSerial::end()
 
 int HardwareSerial::available(void)
 {
-  return (unsigned int)(SERIAL_BUFFER_SIZE + _rx_buffer->head - _rx_buffer->tail) % SERIAL_BUFFER_SIZE;
+  return (int)(SERIAL_BUFFER_SIZE + _rx_buffer->head - _rx_buffer->tail) % SERIAL_BUFFER_SIZE;
 }
 
 int HardwareSerial::peek(void)
