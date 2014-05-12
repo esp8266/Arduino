@@ -43,7 +43,7 @@ void HttpClient::getAsynchronously(const char *url) {
 }
 
 boolean HttpClient::ready() {
-  return running();
+  return !running();
 }
 
 unsigned int HttpClient::getResult() {
