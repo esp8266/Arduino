@@ -297,6 +297,9 @@ public class Compiler implements MessageConsumer {
           line = line.substring(0, line.length() - 1);
         }
         line = line.trim();
+        // Strip backslash escape sequences. This replaces \\ with \ and
+        // removes all other backslashes
+        line = line.replaceAll("\\\\(.)", "$1");
         if (line.length() == 0) continue; // ignore blank lines
         if (need_obj_parse) {
           // line is supposed to be the object file - make sure it really is!
