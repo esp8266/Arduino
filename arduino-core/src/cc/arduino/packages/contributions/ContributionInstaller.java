@@ -234,4 +234,39 @@ public class ContributionInstaller {
       }
     }
   }
+
+  public void updateIndex() throws Exception {
+    final String statusText = _("Downloading platforms index...");
+    updateProgress(0, statusText);
+
+    URL url = new URL("http://arduino.cc/package_index.json");
+    File tmpFile = File.createTempFile("package_index", ".json");
+    FileDownloader downloader = new FileDownloader(url, tmpFile);
+    downloader.addObserver(new Observer() {
+      @Override
+      public void update(Observable o, Object arg) {
+        FileDownloader me = (FileDownloader) o;
+        String msg = "";
+        if (me.getDownloadSize() != null) {
+          long downloaded = me.getInitialSize() + me.getDownloaded() / 1000;
+          long total = me.getInitialSize() + me.getDownloadSize() / 1000;
+          msg = format(_("Downloaded {0}kb of {1}kb."), downloaded, total);
+        }
+        updateProgress((int) progress + progressStepsDelta * me.getProgress() /
+            100.0, statusText + " " + msg);
+      }
+    });
+    downloader.download();
+    if (!downloader.isCompleted())
+      throw new Exception("Error dowloading " + url, downloader.getError());
+
+    // TODO: Check downloaded index
+
+    // Replace old index with the updated one
+    File outputFile = indexer.getIndexFile();
+    if (outputFile.exists())
+      outputFile.delete();
+    if (!tmpFile.renameTo(outputFile))
+      throw new Exception("An error occurred while updating platforms index!");
+  }
 }

@@ -1110,7 +1110,15 @@ public class Base {
 
   private void openInstallBoardDialog() {
     // Create dialog for contribution manager
-    ContributionManagerUI managerUI = new ContributionManagerUI(activeEditor, BaseNoGui.indexer);
+    @SuppressWarnings("serial")
+    ContributionManagerUI managerUI = new ContributionManagerUI(activeEditor) {
+      @Override
+      protected void onIndexesUpdated() throws Exception {
+        BaseNoGui.reloadAllHardware();
+        setIndexer(BaseNoGui.indexer);
+      }
+    };
+    managerUI.setIndexer(BaseNoGui.indexer);
     managerUI.setVisible(true);
   }
 

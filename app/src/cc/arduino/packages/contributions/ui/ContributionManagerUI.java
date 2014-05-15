@@ -91,7 +91,7 @@ public class ContributionManagerUI extends JDialog {
   private String category;
   private String[] filters;
 
-  public ContributionManagerUI(Frame parent, ContributionsIndexer indexer) {
+  public ContributionManagerUI(Frame parent) {
     super(parent, "Boards Manager", Dialog.ModalityType.APPLICATION_MODAL);
 
     setResizable(true);
@@ -238,7 +238,9 @@ public class ContributionManagerUI extends JDialog {
         });
       }
     });
+  }
 
+  public void setIndexer(ContributionsIndexer indexer) {
     contribModel.setIndex(indexer.getIndex());
     setCategories(indexer.getIndex().getCategories());
 
@@ -305,11 +307,6 @@ public class ContributionManagerUI extends JDialog {
       progressBar.setString(text);
   }
 
-  public void onUpdatePressed() {
-    // TODO Auto-generated method stub
-    System.out.println("Update pressed");
-  }
-
   /*
    * Installer methods follows
    */
@@ -320,6 +317,25 @@ public class ContributionManagerUI extends JDialog {
   public void onCancelPressed() {
     if (installerThread != null)
       installerThread.interrupt();
+  }
+
+  public void onUpdatePressed() {
+    installerThread = new Thread(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          setProgressVisible(true);
+          installer.updateIndex();
+          onIndexesUpdated();
+        } catch (Exception e) {
+          // TODO Show ERROR
+          e.printStackTrace();
+        } finally {
+          setProgressVisible(false);
+        }
+      }
+    });
+    installerThread.start();
   }
 
   public void onInstallPressed(final ContributedPlatform platform) {
@@ -356,6 +372,10 @@ public class ContributionManagerUI extends JDialog {
       }
     });
     installerThread.start();
+  }
+
+  protected void onIndexesUpdated() throws Exception {
+    // Empty
   }
 
 }

@@ -5,6 +5,7 @@ import static processing.app.I18n._;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -19,6 +20,7 @@ import cc.arduino.packages.DiscoveryManager;
 import cc.arduino.packages.Uploader;
 import processing.app.debug.Compiler;
 import cc.arduino.packages.contributions.ContributionsIndexer;
+import cc.arduino.utils.ArchiveExtractor;
 import processing.app.debug.TargetBoard;
 import processing.app.debug.LegacyTargetPackage;
 import processing.app.debug.TargetPackage;
@@ -585,14 +587,34 @@ public class BaseNoGui {
   }
 
   static public void initPackages() throws Exception {
+    reloadAllHardware();
+  }
+
+  static public void reloadAllHardware() throws Exception {
     indexer = new ContributionsIndexer(BaseNoGui.getSettingsFolder());
-    if (!indexer.getIndexFile().isFile())
-      // TODO: run first setup
-      ;
+    File indexFile = indexer.getIndexFile();
+    if (!indexFile.isFile()) {
+      try {
+        File distFile = getContentFile("dist/default_package.tar.bz2");
+        if (distFile.isFile()) {
+          // If present, unpack distribution file into preferences folder
+          ArchiveExtractor.extract(distFile, BaseNoGui.getSettingsFolder(), 1);
+
+          // TODO: The first distribution file may be removed after extraction?
+        } else {
+          // Otherwise create an empty packages index
+          FileOutputStream out = new FileOutputStream(indexFile);
+          out.write("{ \"packages\" : [ ] }".getBytes());
+          out.close();
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
     indexer.parseIndex();
     indexer.syncWithFilesystem();
     System.out.println(indexer);
-    
+
     packages = new HashMap<String, TargetPackage>();
     loadHardware(getHardwareFolder());
     loadHardware(getSketchbookHardwareFolder());
