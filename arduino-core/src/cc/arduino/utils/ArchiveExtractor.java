@@ -1,0 +1,273 @@
+/*
+ * This file is part of Arduino.
+ *
+ * Copyright 2014 Arduino LLC (http://www.arduino.cc/)
+ *
+ * Arduino is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * As a special exception, you may use this file as part of a free software
+ * library without restriction.  Specifically, if other files instantiate
+ * templates or use macros or inline functions from this file, or you compile
+ * this file and link it with other files to produce an executable, this
+ * file does not by itself cause the resulting executable to be covered by
+ * the GNU General Public License.  This exception does not however
+ * invalidate any other reasons why the executable file might be covered by
+ * the GNU General Public License.
+ */
+package cc.arduino.utils;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.ArchiveInputStream;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+
+import cc.arduino.os.FileNativeUtils;
+
+public class ArchiveExtractor {
+
+  /**
+   * Extract <b>source</b> into <b>destFolder</b>. <b>source</b> file archive
+   * format is autodetected from file extension.
+   * 
+   * @param archiveFile
+   * @param destFolder
+   * @throws IOException
+   */
+  public static void extract(File archiveFile, File destFolder)
+      throws IOException {
+    extract(archiveFile, destFolder, 0);
+  }
+
+  /**
+   * Extract <b>source</b> into <b>destFolder</b>. <b>source</b> file archive
+   * format is autodetected from file extension.
+   * 
+   * @param archiveFile
+   *          Archive file to extract
+   * @param destFolder
+   *          Destination folder
+   * @param stripPath
+   *          Number of path elements to strip from the paths contained in the
+   *          archived files
+   * @throws IOException
+   */
+  public static void extract(File archiveFile, File destFolder, int stripPath)
+      throws IOException {
+
+    // Folders timestamps must be set at the end of archive extraction
+    // (because creating a file in a folder alters the folder's timestamp)
+    Map<File, Long> foldersTimestamps = new HashMap<File, Long>();
+
+    ArchiveInputStream in = null;
+    try {
+
+      // Create an ArchiveInputStream with the correct archiving algorithm
+      if (archiveFile.getName().endsWith("tar.bz2")) {
+        InputStream fin = new FileInputStream(archiveFile);
+        fin = new BZip2CompressorInputStream(fin);
+        in = new TarArchiveInputStream(fin);
+      } else if (archiveFile.getName().endsWith("zip")) {
+        InputStream fin = new FileInputStream(archiveFile);
+        in = new ZipArchiveInputStream(fin);
+      } else if (archiveFile.getName().endsWith("tar.gz")) {
+        InputStream fin = new FileInputStream(archiveFile);
+        fin = new GzipCompressorInputStream(fin);
+        in = new TarArchiveInputStream(fin);
+      } else if (archiveFile.getName().endsWith("tar")) {
+        InputStream fin = new FileInputStream(archiveFile);
+        in = new TarArchiveInputStream(fin);
+      } else {
+        throw new IOException("Archive format not supported.");
+      }
+
+      String pathPrefix = "";
+
+      // Cycle through all the archive entries
+      while (true) {
+        ArchiveEntry entry = in.getNextEntry();
+        if (entry == null)
+          break;
+
+        // Extract entry info
+        long size = entry.getSize();
+        String name = entry.getName();
+        boolean isDirectory = entry.isDirectory();
+        boolean isLink = false;
+        boolean isSymLink = false;
+        String linkName = null;
+        Integer mode = null;
+        long modifiedTime = entry.getLastModifiedDate().getTime();
+
+        {
+          // Skip MacOSX metadata
+          // http://superuser.com/questions/61185/why-do-i-get-files-like-foo-in-my-tarball-on-os-x
+          int slash = name.lastIndexOf('/');
+          if (slash == -1) {
+            if (name.startsWith("._"))
+              continue;
+          } else {
+            if (name.substring(slash + 1).startsWith("._"))
+              continue;
+          }
+        }
+
+        // Skip git metadata
+        // http://www.unix.com/unix-for-dummies-questions-and-answers/124958-file-pax_global_header-means-what.html
+        if (name.contains("pax_global_header"))
+          continue;
+
+        if (entry instanceof TarArchiveEntry) {
+          TarArchiveEntry tarEntry = (TarArchiveEntry) entry;
+          mode = tarEntry.getMode();
+          isLink = tarEntry.isLink();
+          isSymLink = tarEntry.isSymbolicLink();
+          linkName = tarEntry.getLinkName();
+        }
+
+        // On the first archive entry, if requested, detect the common path
+        // prefix to be stripped from filenames
+        if (stripPath > 0 && pathPrefix.isEmpty()) {
+          int slash = 0;
+          while (stripPath > 0) {
+            slash = name.indexOf("/", slash);
+            if (slash == -1)
+              throw new IOException(
+                  "Invalid archive: it must contains a single root folder");
+            slash++;
+            stripPath--;
+          }
+          pathPrefix = name.substring(0, slash);
+        }
+
+        // Strip the common path prefix when requested
+        if (!name.startsWith(pathPrefix))
+          throw new IOException(
+              "Invalid archive: it must contains a single root folder while file "
+                  + name + " is outside " + pathPrefix);
+        name = name.substring(pathPrefix.length());
+        if (name.isEmpty())
+          continue;
+        File outputFile = new File(destFolder, name);
+
+        File outputLinkFile = null;
+        if (isLink) {
+          if (!linkName.startsWith(pathPrefix)) {
+            throw new IOException(
+                "Invalid archive: it must contains a single root folder while file "
+                    + linkName + " is outside " + pathPrefix);
+          }
+          linkName = linkName.substring(pathPrefix.length());
+          outputLinkFile = new File(destFolder, linkName);
+        }
+        if (isSymLink) {
+          // Symbolic links are referenced with relative paths
+          outputLinkFile = new File(linkName);
+          if (outputLinkFile.isAbsolute())
+            throw new IOException(
+                "Invalid archive: it contains a symbolic link with absolute path '"
+                    + outputLinkFile + "'");
+        }
+
+        // Safety check
+        if (isDirectory) {
+          if (outputFile.isFile())
+            throw new IOException("Can't create folder " + outputFile
+                                  + ", a file with the same name exists!");
+        } else {
+          // - isLink
+          // - isSymLink
+          // - anything else
+          if (outputFile.exists())
+            throw new IOException("Can't extract file " + outputFile
+                                  + ", file already exists!");
+        }
+
+        // Extract the entry
+        if (isDirectory) {
+          if (!outputFile.exists())
+            if (!outputFile.mkdirs())
+              throw new IOException("Could not create folder: " + outputFile);
+          foldersTimestamps.put(outputFile, modifiedTime);
+        } else if (isLink) {
+          FileNativeUtils.link(outputLinkFile, outputFile);
+        } else if (isSymLink) {
+          FileNativeUtils.symlink(outputLinkFile, outputFile);
+          outputFile.setLastModified(modifiedTime);
+        } else {
+          // Create the containing folder if not exists
+          if (!outputFile.getParentFile().isDirectory())
+            outputFile.getParentFile().mkdirs();
+          copyStreamToFile(in, size, outputFile);
+          outputFile.setLastModified(modifiedTime);
+        }
+
+        // Set file/folder permission
+        if (mode != null && !isSymLink)
+          FileNativeUtils.chmod(outputFile, mode);
+      }
+    } finally {
+      if (in != null)
+        in.close();
+    }
+
+    // Set folders timestamps
+    for (File folder : foldersTimestamps.keySet()) {
+      folder.setLastModified(foldersTimestamps.get(folder));
+    }
+  }
+
+  private static void copyStreamToFile(InputStream in, long size,
+                                       File outputFile)
+      throws FileNotFoundException, IOException {
+    FileOutputStream fos = new FileOutputStream(outputFile);
+    try {
+      // if size is not available, copy until EOF...
+      if (size == -1) {
+        byte buffer[] = new byte[4096];
+        int l;
+        while ((l = in.read(buffer)) != -1) {
+          fos.write(buffer, 0, l);
+        }
+        return;
+      }
+
+      // ...else copy just the needed amount of bytes
+      byte buffer[] = new byte[4096];
+      while (size > 0) {
+        int l = in.read(buffer);
+        if (l <= 0)
+          throw new IOException("Error while extracting file "
+                                + outputFile.getAbsolutePath());
+        fos.write(buffer, 0, l);
+        size -= l;
+      }
+    } finally {
+      fos.close();
+    }
+  }
+
+}
