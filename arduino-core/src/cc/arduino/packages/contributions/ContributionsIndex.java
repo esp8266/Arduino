@@ -67,6 +67,13 @@ public abstract class ContributionsIndex {
     }
   }
 
+  public ContributedPackage getPackage(String packager) {
+    for (ContributedPackage pack : getPackages())
+      if (pack.getName().equals(packager))
+        return pack;
+    return null;
+  }
+
   @Override
   public String toString() {
     String res = "";
