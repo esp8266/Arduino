@@ -197,4 +197,16 @@ public class ContributionsIndexer {
     }
     return res;
   }
+
+  public ContributionsIndex getIndex() {
+    return index;
+  }
+
+  public void install(ContributedPlatform platform) {
+    // TODO Auto-generated method stub
+  }
+
+  public void remove(ContributedPlatform platform) {
+    // TODO Auto-generated method stub
+  }
 }

@@ -69,8 +69,9 @@ public class BaseNoGui {
   static Platform platform;
 
   static File portableFolder = null;
-
   static final String portableSketchbookFolder = "sketchbook";
+
+  static ContributionsIndexer indexer;
 
   // Returns a File object for the given pathname. If the pathname
   // is not absolute, it is interpreted relative to the current
@@ -584,7 +585,7 @@ public class BaseNoGui {
   }
 
   static public void initPackages() throws Exception {
-    ContributionsIndexer indexer = new ContributionsIndexer(BaseNoGui.getSettingsFolder());
+    indexer = new ContributionsIndexer(BaseNoGui.getSettingsFolder());
     indexer.parseIndex();
     indexer.syncWithFilesystem();
     System.out.println(indexer);

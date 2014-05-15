@@ -23,6 +23,9 @@
 package processing.app;
 
 import cc.arduino.packages.DiscoveryManager;
+import cc.arduino.packages.contributions.ContributedPlatform;
+import cc.arduino.packages.contributions.ui.JContributionManagerDialog;
+import cc.arduino.packages.contributions.ui.JContributionManagerDialogListener;
 import cc.arduino.view.SplashScreenHelper;
 import processing.app.debug.TargetBoard;
 import processing.app.debug.TargetPackage;
@@ -1107,13 +1110,48 @@ public class Base {
       editor.onBoardOrPortChange();
   }
 
+  private void openInstallBoardDialog() {
+    JContributionManagerDialog dialog = new JContributionManagerDialog(
+        activeEditor);
+    dialog.setListener(new JContributionManagerDialogListener() {
+      @Override
+      public void onCategoryChange(String category) {
+        System.out.println("Selected " + category);
+      }
+      
+      @Override
+      public void onInstall(ContributedPlatform platform) {
+        BaseNoGui.indexer.install(platform);
+      }
+
+      @Override
+      public void onRemove(ContributedPlatform platform) {
+        BaseNoGui.indexer.remove(platform);
+      }
+    });
+    dialog.setCategories(Arrays.asList("Arduino", "Arduino Certified",
+                                       "Arduino@Heart"));
+    dialog.addContributions(BaseNoGui.indexer.getIndex());
+    dialog.setVisible(true);
+  }
+
   public void rebuildBoardsMenu(JMenu toolsMenu, Editor editor) throws Exception {
+    JMenu boardsMenu = getBoardCustomMenu();
+
+    @SuppressWarnings("serial")
+    Action runInstaller = new AbstractAction("Install boards...") {
+      public void actionPerformed(ActionEvent actionevent) {
+        openInstallBoardDialog();
+      }
+    };
+    boardsMenu.add(new JMenuItem(runInstaller));
+
     // If there are no platforms installed skip menu creation
     if (BaseNoGui.packages.size() == 0)
       return;
 
-    JMenu boardsMenu = getBoardCustomMenu();
-
+    boardsMenu.add(new JSeparator());
+    
     boolean first = true;
 
     List<JMenuItem> menuItemsToClickAfterStartup = new LinkedList<JMenuItem>();
@@ -1308,7 +1346,7 @@ public class Base {
   }
 
   private static JMenuItem selectFirstEnabledMenuItem(JMenu menu) {
-    for (int i = 0; i < menu.getItemCount(); i++) {
+    for (int i = 1; i < menu.getItemCount(); i++) {
       JMenuItem item = menu.getItem(i);
       if (item != null && item.isEnabled()) {
         return item;
