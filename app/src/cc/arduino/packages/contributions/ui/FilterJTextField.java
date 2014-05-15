@@ -83,12 +83,20 @@ public class FilterJTextField extends JTextField {
     });
   }
 
+  private String lastFilter = "";
+
   private void applyFilter() {
     String filter = showingHint ? "" : getText();
     filter = filter.toLowerCase();
 
     // Replace anything but 0-9, a-z, or : with a space
     filter = filter.replaceAll("[^\\x30-\\x39^\\x61-\\x7a^\\x3a]", " ");
+
+    // Fire event only if the filter is changed
+    if (filter.equals(lastFilter))
+      return;
+
+    lastFilter = filter;
     onFilter(filter.split(" "));
   }
 

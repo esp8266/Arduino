@@ -39,7 +39,6 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.swing.Box;
@@ -108,24 +107,13 @@ public class ContributionManagerUI extends JDialog {
 
       categoryChooser = new JComboBox();
       categoryChooser.setMaximumRowCount(20);
-      categoryChooser.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent arg0) {
-          String selected = (String) categoryChooser.getSelectedItem();
-          if (category == null || !category.equals(selected)) {
-            category = selected;
-            cellEditor.stopCellEditing();
-            contribModel.updateIndexFilter(category, filters);
-          }
-        }
-      });
-
-      setCategories(new ArrayList<String>());
+      categoryChooser.setEnabled(false);
 
       filterField = new FilterJTextField(_("Filter your search...")) {
         @Override
         protected void onFilter(String[] _filters) {
           filters = _filters;
+          cellEditor.stopCellEditing();
           contribModel.updateIndexFilter(category, filters);
         }
       };
@@ -223,28 +211,44 @@ public class ContributionManagerUI extends JDialog {
       }
     }
 
-    setMinimumSize(new Dimension(500, 400));
-
-    doLayout();
-
-    contribModel.addTableModelListener(new TableModelListener() {
-      @Override
-      public void tableChanged(final TableModelEvent arg0) {
-        SwingUtilities.invokeLater(new Runnable() {
-          @Override
-          public void run() {
-            updateCellsHeight(arg0);
-          }
-        });
-      }
-    });
+    setMinimumSize(new Dimension(600, 450));
   }
 
-  public void setIndexer(ContributionsIndexer indexer) {
-    contribModel.setIndex(indexer.getIndex());
-    setCategories(indexer.getIndex().getCategories());
+  private TableModelListener tableModelListener = new TableModelListener() {
+    @Override
+    public void tableChanged(final TableModelEvent arg0) {
+      SwingUtilities.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          updateCellsHeight(arg0);
+        }
+      });
+    }
+  };
 
-    // Create installer with his dialog
+  public void setIndexer(ContributionsIndexer indexer) {
+    contribModel.removeTableModelListener(tableModelListener);
+    categoryChooser.removeActionListener(categoryChooserActionListener);
+
+    contribModel.setIndex(indexer.getIndex());
+
+    category = null;
+    categoryChooser.removeAllItems();
+
+    filterField.setEnabled(contribModel.getRowCount() > 0);
+
+    contribModel.addTableModelListener(tableModelListener);
+    categoryChooser.addActionListener(categoryChooserActionListener);
+
+    // Enable categories combo only if there are two or more choices
+    Collection<String> categories = indexer.getIndex().getCategories();
+    int count = categories.size();
+    categoryChooser.setEnabled(count > 1);
+
+    for (String s : categories)
+      categoryChooser.addItem(s);
+
+    // Create ConstributionInstaller tied with the provided index
     installer = new ContributionInstaller(indexer);
     installer.setListener(new ContributionInstaller.Listener() {
       @Override
@@ -254,24 +258,17 @@ public class ContributionManagerUI extends JDialog {
     });
   }
 
-  public void setCategories(Collection<String> categories) {
-    category = null;
-    categoryChooser.removeAllItems();
-    for (String s : categories)
-      categoryChooser.addItem(s);
-
-    // Disable if only one possible choice
-    boolean single = categories.size() == 1;
-    categoryChooser.setEnabled(!single);
-
-    // Show if there is at lease one possible choice
-    boolean show = !categories.isEmpty();
-    categoryStrut1.setVisible(show);
-    categoryLabel.setVisible(show);
-    categoryStrut2.setVisible(show);
-    categoryChooser.setVisible(show);
-    categoryStrut3.setVisible(show);
-  }
+  ActionListener categoryChooserActionListener = new ActionListener() {
+    @Override
+    public void actionPerformed(ActionEvent arg0) {
+      String selected = (String) categoryChooser.getSelectedItem();
+      if (category == null || !category.equals(selected)) {
+        category = selected;
+        cellEditor.stopCellEditing();
+        contribModel.updateIndexFilter(category, filters);
+      }
+    }
+  };
 
   public void setProgressVisible(boolean visible) {
     progressBox.setVisible(visible);

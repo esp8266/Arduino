@@ -121,7 +121,6 @@ public class ContributionIndexTableModel extends AbstractTableModel {
 
   public void setIndex(ContributionsIndex _index) {
     index = _index;
-    updateIndexFilter(null, null);
   }
 
   public void updateIndexFilter(String category, String filters[]) {
