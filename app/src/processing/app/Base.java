@@ -988,6 +988,8 @@ public class Base {
   }
 
   public void rebuildImportMenu(JMenu importMenu) {
+    if (importMenu == null)
+      return;
     importMenu.removeAll();
 
     JMenuItem addLibraryMenuItem = new JMenuItem(_("Add Library..."));
@@ -1035,6 +1037,8 @@ public class Base {
   }
 
   public void rebuildExamplesMenu(JMenu menu) {
+    if (menu == null)
+      return;
     try {
       menu.removeAll();
 
