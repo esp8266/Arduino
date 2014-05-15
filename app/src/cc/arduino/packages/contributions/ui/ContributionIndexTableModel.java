@@ -41,8 +41,6 @@ import cc.arduino.packages.contributions.ContributionsIndex;
 public class ContributionIndexTableModel extends AbstractTableModel {
 
   public final static int DESCRIPTION_COL = 0;
-  public final static int VERSION_COL = 1;
-  public final static int INSTALLED_COL = 2;
 
   public static class ContributedPlatformReleases {
     public ContributedPackage packager;
@@ -83,6 +81,7 @@ public class ContributionIndexTableModel extends AbstractTableModel {
       for (ContributedPlatform plat : releases) {
         if (latest == null)
           latest = plat;
+        // TODO a better version compare
         if (plat.getVersion().compareTo(latest.getVersion()) > 0)
           latest = plat;
       }
@@ -101,14 +100,22 @@ public class ContributionIndexTableModel extends AbstractTableModel {
         }
       }
     }
+
+    public void select(ContributedPlatform value) {
+      for (ContributedPlatform plat : releases) {
+        if (plat == value) {
+          selected = plat;
+          return;
+        }
+      }
+    }
   }
 
   private List<ContributedPlatformReleases> contributions = new ArrayList<ContributedPlatformReleases>();
 
-  private String[] m_colNames = { "Description", "Available", "Installed" };
+  private String[] columnNames = { "Description" };
 
-  private Class<?>[] m_colTypes = { ContributedPlatform.class, Object[].class,
-      String.class };
+  private Class<?>[] columnTypes = { ContributedPlatform.class };
 
   public void updateIndex(ContributionsIndex index) {
     contributions.clear();
@@ -117,6 +124,7 @@ public class ContributionIndexTableModel extends AbstractTableModel {
         addContribution(platform);
       }
     }
+    fireTableDataChanged();
   }
 
   private void addContribution(ContributedPlatform platform) {
@@ -132,7 +140,7 @@ public class ContributionIndexTableModel extends AbstractTableModel {
 
   @Override
   public int getColumnCount() {
-    return m_colNames.length;
+    return columnNames.length;
   }
 
   @Override
@@ -142,18 +150,17 @@ public class ContributionIndexTableModel extends AbstractTableModel {
 
   @Override
   public String getColumnName(int column) {
-    return m_colNames[column];
+    return columnNames[column];
   }
 
   @Override
-  public Class<?> getColumnClass(int col) {
-    return m_colTypes[col];
+  public Class<?> getColumnClass(int colum) {
+    return columnTypes[colum];
   }
 
   @Override
   public void setValueAt(Object value, int row, int col) {
-    if (col == VERSION_COL) {
-      contributions.get(row).selectVersion((String) value);
+    if (col == DESCRIPTION_COL) {
       fireTableCellUpdated(row, col);
     }
   }
@@ -161,22 +168,15 @@ public class ContributionIndexTableModel extends AbstractTableModel {
   @Override
   public Object getValueAt(int row, int col) {
     ContributedPlatformReleases contribution = contributions.get(row);
-    ContributedPlatform installed = contribution.getInstalled();
     if (col == DESCRIPTION_COL) {
-      return contribution.getSelected();
-    }
-    if (col == VERSION_COL) {
-      return contribution.getSelected().getVersion();
-    }
-    if (col == INSTALLED_COL) {
-      return installed == null ? "-" : installed.getVersion();
+      return contribution;// .getSelected();
     }
     return null;
   }
 
   @Override
   public boolean isCellEditable(int row, int col) {
-    return col == VERSION_COL || col == INSTALLED_COL;
+    return col == DESCRIPTION_COL;
   }
 
   public List<String> getReleasesVersions(int row) {
@@ -191,4 +191,7 @@ public class ContributionIndexTableModel extends AbstractTableModel {
     return contributions.get(row).getSelected();
   }
 
+  public void update() {
+    fireTableDataChanged();
+  }
 }

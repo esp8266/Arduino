@@ -29,26 +29,18 @@
 package cc.arduino.packages.contributions.ui;
 
 import static cc.arduino.packages.contributions.ui.ContributionIndexTableModel.DESCRIPTION_COL;
-import static cc.arduino.packages.contributions.ui.ContributionIndexTableModel.INSTALLED_COL;
-import static cc.arduino.packages.contributions.ui.ContributionIndexTableModel.VERSION_COL;
 import static processing.app.I18n._;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -60,13 +52,14 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.UIManager;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
@@ -76,7 +69,7 @@ import cc.arduino.packages.contributions.ContributionsIndex;
 @SuppressWarnings("serial")
 public class ContributionManagerUI extends JDialog {
 
-  private FilterField filterField;
+  private FilterJTextField filterField;
 
   private ContributionManagerUIListener listener = null;
 
@@ -93,6 +86,8 @@ public class ContributionManagerUI extends JDialog {
 
   private Box progressBox;
   private Box updateBox;
+
+  private ContributedPlatformTableCell cellEditor;
 
   public ContributionManagerUI(Frame parent) {
     super(parent, "Boards Manager", Dialog.ModalityType.APPLICATION_MODAL);
@@ -119,7 +114,7 @@ public class ContributionManagerUI extends JDialog {
 
       setCategories(new ArrayList<String>());
 
-      filterField = new FilterField();
+      filterField = new FilterJTextField(_("Filter your search..."));
 
       JPanel panel = new JPanel();
       panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
@@ -152,54 +147,31 @@ public class ContributionManagerUI extends JDialog {
     // int col = contribTable.columnAtPoint(point);
     // }
     // });
-    TableColumnModel tcm = contribTable.getColumnModel();
     {
-      TableColumn descriptionCol = tcm.getColumn(DESCRIPTION_COL);
-      descriptionCol
-          .setCellRenderer(new ContributedPlatformTableCellRenderer());
-      descriptionCol.setResizable(true);
-    }
-
-    {
-      TableColumn versionCol = tcm.getColumn(VERSION_COL);
-      versionCol.setCellRenderer(new VersionSelectorTableCellRenderer());
-      VersionSelectorTableCellEditor editor = new VersionSelectorTableCellEditor();
-      editor.setListener(new VersionSelectorTableCellEditor.Listener() {
+      TableColumnModel tcm = contribTable.getColumnModel();
+      TableColumn col = tcm.getColumn(DESCRIPTION_COL);
+      col.setCellRenderer(new ContributedPlatformTableCell());
+      cellEditor = new ContributedPlatformTableCell() {
         @Override
-        public void onInstallEvent(int row) {
+        protected void onInstall(ContributedPlatform selectedPlatform) {
           if (listener == null)
             return;
-          ContributedPlatform selected = contribModel.getSelectedRelease(row);
-          listener.onInstall(selected);
+          listener.onInstall(selectedPlatform);
         }
-      });
-      versionCol.setCellEditor(editor);
-      versionCol.setResizable(false);
-      versionCol.setWidth(140);
-    }
 
-    {
-      TableColumn installedCol = tcm.getColumn(INSTALLED_COL);
-      installedCol.setCellRenderer(new VersionInstalledTableCellRenderer());
-      VersionInstalledTableCellEditor editor = new VersionInstalledTableCellEditor();
-      editor.setListener(new VersionInstalledTableCellEditor.Listener() {
         @Override
-        public void onRemoveEvent(int row) {
+        protected void onRemove(ContributedPlatform installedPlatform) {
           if (listener == null)
             return;
-          ContributedPlatform installed = contribModel.getReleases(row)
-              .getInstalled();
-          listener.onRemove(installed);
+          listener.onRemove(installedPlatform);
         }
-      });
-      installedCol.setCellEditor(editor);
-      installedCol.setResizable(false);
-      installedCol.setMaxWidth(70);
+      };
+      col.setCellEditor(cellEditor);
+      col.setResizable(true);
     }
 
     {
       JScrollPane s = new JScrollPane();
-      s.setPreferredSize(new Dimension(300, 300));
       s.setViewportView(contribTable);
       s.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
       s.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -255,6 +227,20 @@ public class ContributionManagerUI extends JDialog {
     }
 
     setMinimumSize(new Dimension(500, 400));
+
+    doLayout();
+
+    contribModel.addTableModelListener(new TableModelListener() {
+      @Override
+      public void tableChanged(final TableModelEvent arg0) {
+        SwingUtilities.invokeLater(new Runnable() {
+          @Override
+          public void run() {
+            updateCellsHeight(arg0);
+          }
+        });
+      }
+    });
   }
 
   public void setListener(ContributionManagerUIListener listener) {
@@ -290,76 +276,6 @@ public class ContributionManagerUI extends JDialog {
     }
   }
 
-  class FilterField extends JTextField {
-    final static String filterHint = "Filter your search...";
-    boolean showingHint;
-    List<String> filters;
-
-    public FilterField() {
-      super(filterHint);
-
-      showingHint = true;
-      filters = new ArrayList<String>();
-      updateStyle();
-
-      addFocusListener(new FocusListener() {
-        public void focusLost(FocusEvent focusEvent) {
-          if (filterField.getText().isEmpty()) {
-            showingHint = true;
-          }
-          updateStyle();
-        }
-
-        public void focusGained(FocusEvent focusEvent) {
-          if (showingHint) {
-            showingHint = false;
-            filterField.setText("");
-          }
-          updateStyle();
-        }
-      });
-
-      getDocument().addDocumentListener(new DocumentListener() {
-        public void removeUpdate(DocumentEvent e) {
-          applyFilter();
-        }
-
-        public void insertUpdate(DocumentEvent e) {
-          applyFilter();
-        }
-
-        public void changedUpdate(DocumentEvent e) {
-          applyFilter();
-        }
-      });
-    }
-
-    public void applyFilter() {
-      String filter = filterField.getFilterText();
-      filter = filter.toLowerCase();
-
-      // Replace anything but 0-9, a-z, or : with a space
-      filter = filter.replaceAll("[^\\x30-\\x39^\\x61-\\x7a^\\x3a]", " ");
-      filters = Arrays.asList(filter.split(" "));
-      // filterLibraries(category, filters);
-    }
-
-    public String getFilterText() {
-      return showingHint ? "" : getText();
-    }
-
-    public void updateStyle() {
-      if (showingHint) {
-        setText(filterHint);
-        setForeground(Color.gray);
-        setFont(getFont().deriveFont(Font.ITALIC));
-      } else {
-        setForeground(UIManager.getColor("TextField.foreground"));
-        setFont(getFont().deriveFont(Font.PLAIN));
-      }
-    }
-  }
-
   public void addContributions(ContributionsIndex index) {
     contribModel.updateIndex(index);
   }
@@ -372,6 +288,24 @@ public class ContributionManagerUI extends JDialog {
     contribTable.setEnabled(!visible);
     updateBox.setVisible(!visible);
     updateBox.setEnabled(!visible);
+    cellEditor.setEnabled(!visible);
+
+    if (visible && contribTable.isEditing()) {
+      TableCellEditor editor = contribTable.getCellEditor();
+      if (editor != null)
+        editor.stopCellEditing();
+    }
+  }
+
+  private void updateCellsHeight(TableModelEvent e) {
+    int first = e.getFirstRow();
+    int last = Math.min(e.getLastRow(), contribTable.getRowCount() - 1);
+    for (int row = first; row <= last; row++) {
+      TableCellRenderer editor = new ContributedPlatformTableCell();
+      Component comp = contribTable.prepareRenderer(editor, row, 0);
+      int height = comp.getPreferredSize().height;
+      contribTable.setRowHeight(row, height);
+    }
   }
 
   public void setProgress(int progress, String text) {
