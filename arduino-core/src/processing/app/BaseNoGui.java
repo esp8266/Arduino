@@ -17,9 +17,10 @@ import org.apache.commons.logging.impl.NoOpLog;
 
 import cc.arduino.packages.DiscoveryManager;
 import cc.arduino.packages.Uploader;
-
 import processing.app.debug.Compiler;
+import cc.arduino.packages.contributions.ContributionsIndexer;
 import processing.app.debug.TargetBoard;
+import processing.app.debug.LegacyTargetPackage;
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
 import processing.app.debug.TargetPlatformException;
@@ -421,7 +422,7 @@ public class BaseNoGui {
     return list;
   }
 
-  static public void init(String[] args) {
+  static public void init(String[] args) throws Exception {
     getPlatform().init();
   
     String sketchbookPath = getSketchbookPath();
@@ -582,14 +583,16 @@ public class BaseNoGui {
     Logger.getLogger("javax.jmdns").setLevel(Level.OFF);
   }
 
-  static public void initPackages() {
+  static public void initPackages() throws Exception {
+    ContributionsIndexer indexer = new ContributionsIndexer(BaseNoGui.getSettingsFolder());
+    indexer.parseIndex();
+    indexer.syncWithFilesystem();
+    System.out.println(indexer);
+    
     packages = new HashMap<String, TargetPackage>();
     loadHardware(getHardwareFolder());
     loadHardware(getSketchbookHardwareFolder());
-    if (packages.size() == 0) {
-      System.out.println(_("No valid configured cores found! Exiting..."));
-      System.exit(3);
-    }
+    loadContributedHardware(indexer);
   }
 
   static protected void initPlatform() {
@@ -649,7 +652,7 @@ public class BaseNoGui {
       File subfolder = new File(folder, target);
       
       try {
-        packages.put(target, new TargetPackage(target, subfolder));
+        packages.put(target, new LegacyTargetPackage(target, subfolder));
       } catch (TargetPlatformException e) {
         System.out.println("WARNING: Error loading hardware folder " + target);
         System.out.println("  " + e.getMessage());
@@ -714,6 +717,12 @@ public class BaseNoGui {
     populateImportToLibraryTable();
   }
 
+  static protected void loadContributedHardware(ContributionsIndexer indexer) {
+    for (TargetPackage pack : indexer.createTargetPackages()) {
+      packages.put(pack.getId(), pack);
+    }
+  }
+  
   static public void populateImportToLibraryTable() {
     // Populate importToLibraryTable
     importToLibraryTable = new HashMap<String, Library>();

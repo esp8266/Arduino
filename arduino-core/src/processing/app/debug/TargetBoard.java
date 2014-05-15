@@ -1,76 +1,51 @@
+/*
+ TargetBoard - Represents a hardware board
+ Part of the Arduino project - http://www.arduino.cc/
+
+ Copyright (c) 2014 Cristian Maglie
+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software Foundation,
+ Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 package processing.app.debug;
 
-import static processing.app.I18n._;
-import static processing.app.I18n.format;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Set;
 
 import processing.app.helpers.PreferencesMap;
 
-public class TargetBoard {
-
-  private String id;
-  private PreferencesMap prefs;
-  private Map<String, PreferencesMap> menuOptions = new LinkedHashMap<String, PreferencesMap>();
-  private TargetPlatform containerPlatform;
-
-  /**
-   * Create a TargetBoard based on preferences passed as argument.
-   * 
-   * @param _prefs
-   * @return
-   */
-  public TargetBoard(String _id, PreferencesMap _prefs, TargetPlatform parent) {
-    containerPlatform = parent;
-    id = _id;
-    prefs = new PreferencesMap(_prefs);
-
-    // Setup sub-menus
-    PreferencesMap menus = prefs.firstLevelMap().get("menu");
-    if (menus != null)
-      menuOptions = menus.firstLevelMap();
-
-    // Auto generate build.board if not set
-    if (!prefs.containsKey("build.board")) {
-      String board = containerPlatform.getId() + "_" + id;
-      board = board.toUpperCase();
-      prefs.put("build.board", board);
-      System.out
-          .println(format(
-                          _("Board {0}:{1}:{2} doesn''t define a ''build.board'' preference. Auto-set to: {3}"),
-                          containerPlatform.getContainerPackage().getId(),
-                          containerPlatform.getId(), id, board));
-    }
-  }
+public interface TargetBoard {
 
   /**
    * Get the name of the board.
    * 
    * @return
    */
-  public String getName() {
-    return prefs.get("name");
-  }
+  public String getName();
 
   /**
    * Get the identifier of the board
    * 
    * @return
    */
-  public String getId() {
-    return id;
-  }
+  public String getId();
 
   /**
-   * Get the full preferences map of the board with a given identifier
+   * Get the full preferences map of the board
    * 
    * @return
    */
-  public PreferencesMap getPreferences() {
-    return prefs;
-  }
+  public PreferencesMap getPreferences();
 
   /**
    * Check if the board has a sub menu.
@@ -79,9 +54,7 @@ public class TargetBoard {
    *          The menu ID to check
    * @return
    */
-  public boolean hasMenu(String menuId) {
-    return menuOptions.containsKey(menuId);
-  }
+  public boolean hasMenu(String menuId);
 
   /**
    * Returns the options available on a specific menu
@@ -90,9 +63,7 @@ public class TargetBoard {
    *          The menu ID
    * @return
    */
-  public PreferencesMap getMenuLabels(String menuId) {
-    return menuOptions.get(menuId).topLevelMap();
-  }
+  public PreferencesMap getMenuLabels(String menuId);
 
   /**
    * Returns the label of the specified option in the specified menu
@@ -103,13 +74,9 @@ public class TargetBoard {
    *          The option ID
    * @return
    */
-  public String getMenuLabel(String menuId, String selectionId) {
-    return getMenuLabels(menuId).get(selectionId);
-  }
+  public String getMenuLabel(String menuId, String selectionId);
 
-  public Set<String> getMenuIds() {
-    return menuOptions.keySet();
-  }
+  public Set<String> getMenuIds();
 
   /**
    * Returns the configuration parameters to override (as a PreferenceMap) when
@@ -121,12 +88,8 @@ public class TargetBoard {
    *          The option ID
    * @return
    */
-  public PreferencesMap getMenuPreferences(String menuId, String selectionId) {
-    return menuOptions.get(menuId).subTree(selectionId);
-  }
+  public PreferencesMap getMenuPreferences(String menuId, String selectionId);
 
-  public TargetPlatform getContainerPlatform() {
-    return containerPlatform;
-  }
+  public TargetPlatform getContainerPlatform();
 
 }

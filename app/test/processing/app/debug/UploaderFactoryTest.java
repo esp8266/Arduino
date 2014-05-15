@@ -19,7 +19,7 @@ public class UploaderFactoryTest extends AbstractWithPreferencesTest {
 
   @Before
   public void setUp() throws Exception {
-    targetPackage = new TargetPackage("arduino", new File(".", "hardware/arduino/"));
+    targetPackage = new LegacyTargetPackage("arduino", new File(".", "hardware/arduino/"));
   }
 
   @Test

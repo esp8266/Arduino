@@ -1,9 +1,8 @@
-/* -*- mode: jde; c-basic-offset: 2; indent-tabs-mode: nil -*- */
 /*
  TargetPlatform - Represents a hardware platform
  Part of the Arduino project - http://www.arduino.cc/
 
- Copyright (c) 2009 David A. Mellis
+ Copyright (c) 2014 Arduino
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -21,174 +20,78 @@
  */
 package processing.app.debug;
 
-import static processing.app.I18n._;
-import static processing.app.I18n.format;
-
 import java.io.File;
-import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
 import processing.app.helpers.PreferencesMap;
 
-public class TargetPlatform {
+public interface TargetPlatform {
 
-  private String id;
-  private File folder;
-  private TargetPackage containerPackage;
+  public String getId();
 
-  /**
-   * Contains preferences for every defined board
-   */
-  private Map<String, TargetBoard> boards = new LinkedHashMap<String, TargetBoard>();
-  private TargetBoard defaultBoard;
+  public File getFolder();
 
   /**
-   * Contains preferences for every defined programmer
+   * Get TargetBoards under this TargetPlatform into a Map that maps the board
+   * id with the corresponding TargetBoard
+   * 
+   * @return a Map<String, TargetBoard>
    */
-  private Map<String, PreferencesMap> programmers = new LinkedHashMap<String, PreferencesMap>();
+  public Map<String, TargetBoard> getBoards();
+
+  public PreferencesMap getCustomMenus();
 
   /**
-   * Contains preferences for platform
+   * Return ids for top level menus
+   * 
+   * @return a Set<String> with the ids of the top level custom menus
    */
-  private PreferencesMap preferences = new PreferencesMap();
+  public Set<String> getCustomMenuIds();
 
   /**
-   * Contains labels for top level menus
+   * Get preferences for all programmers
+   * 
+   * @return
    */
-  private PreferencesMap customMenus = new PreferencesMap();
+  public Map<String, PreferencesMap> getProgrammers();
 
-  public TargetPlatform(String _name, File _folder, TargetPackage parent)
-      throws TargetPlatformException {
+  /**
+   * Get preferences for a specific programmer
+   * 
+   * @param programmer
+   * @return
+   */
+  public PreferencesMap getProgrammer(String programmer);
 
-    id = _name;
-    folder = _folder;
-    containerPackage = parent;
+  /**
+   * Get preferences for a specific tool
+   * 
+   * @param tool
+   * @return
+   */
+  public PreferencesMap getTool(String tool);
 
-    // If there is no boards.txt, this is not a valid 1.5 hardware folder
-    File boardsFile = new File(folder, "boards.txt");
-    if (!boardsFile.exists() || !boardsFile.canRead())
-      throw new TargetPlatformException(
-          format(_("Could not find boards.txt in {0}. Is it pre-1.5?"),
-                 folder.getAbsolutePath()));
+  /**
+   * Return TargetPlatform preferences
+   * 
+   * @return
+   */
+  public PreferencesMap getPreferences();
 
-    // Load boards
-    try {
-      Map<String, PreferencesMap> boardsPreferences = new PreferencesMap(
-          boardsFile).firstLevelMap();
+  /**
+   * Get a target board
+   * 
+   * @param boardId
+   * @return
+   */
+  public TargetBoard getBoard(String boardId);
 
-      // Create custom menus for this platform
-      PreferencesMap menus = boardsPreferences.get("menu");
-      if (menus != null)
-        customMenus = menus.topLevelMap();
-      boardsPreferences.remove("menu");
+  /**
+   * Get the TargetPackage that contains this TargetPlatform
+   * 
+   * @return
+   */
+  public TargetPackage getContainerPackage();
 
-      // Create boards
-      Set<String> boardIds = boardsPreferences.keySet();
-      for (String boardId : boardIds) {
-        PreferencesMap preferences = boardsPreferences.get(boardId);
-        TargetBoard board = new TargetBoard(boardId, preferences, this);
-        boards.put(boardId, board);
-
-        // Pick the first board as default
-        if (defaultBoard == null)
-          defaultBoard = board;
-      }
-    } catch (IOException e) {
-      throw new TargetPlatformException(format(_("Error loading {0}"),
-                                               boardsFile.getAbsolutePath()), e);
-    }
-
-    File platformsFile = new File(folder, "platform.txt");
-    try {
-      if (platformsFile.exists() && platformsFile.canRead()) {
-        preferences.load(platformsFile);
-      }
-    } catch (IOException e) {
-      throw new TargetPlatformException(
-          format(_("Error loading {0}"), platformsFile.getAbsolutePath()), e);
-    }
-
-    // Allow overriding values in platform.txt. This allows changing
-    // platform.txt (e.g. to use a system-wide toolchain), without
-    // having to modify platform.txt (which, when running from git,
-    // prevents files being marked as changed).
-    File localPlatformsFile = new File(folder, "platform.local.txt");
-    try {
-      if (localPlatformsFile.exists() && localPlatformsFile.canRead()) {
-        preferences.load(localPlatformsFile);
-      }
-    } catch (IOException e) {
-      throw new TargetPlatformException(
-          format(_("Error loading {0}"), localPlatformsFile.getAbsolutePath()), e);
-    }
-
-    File progFile = new File(folder, "programmers.txt");
-    try {
-      if (progFile.exists() && progFile.canRead()) {
-        PreferencesMap prefs = new PreferencesMap();
-        prefs.load(progFile);
-        programmers = prefs.firstLevelMap();
-      }
-    } catch (IOException e) {
-      throw new TargetPlatformException(format(_("Error loading {0}"), progFile
-          .getAbsolutePath()), e);
-    }
-  }
-
-  public String getId() {
-    return id;
-  }
-
-  public File getFolder() {
-    return folder;
-  }
-
-  public Map<String, TargetBoard> getBoards() {
-    return boards;
-  }
-
-  public PreferencesMap getCustomMenus() {
-    return customMenus;
-  }
-
-  public Set<String> getCustomMenuIds() {
-    return customMenus.keySet();
-  }
-
-  public Map<String, PreferencesMap> getProgrammers() {
-    return programmers;
-  }
-
-  public PreferencesMap getProgrammer(String programmer) {
-    return getProgrammers().get(programmer);
-  }
-
-  public PreferencesMap getTool(String tool) {
-    return getPreferences().subTree("tools").subTree(tool);
-  }
-
-  public PreferencesMap getPreferences() {
-    return preferences;
-  }
-
-  public TargetBoard getBoard(String boardId) {
-    if (boards.containsKey(boardId)) {
-      return boards.get(boardId);
-    }
-    return defaultBoard;
-  }
-
-  public TargetPackage getContainerPackage() {
-    return containerPackage;
-  }
-
-  @Override
-  public String toString() {
-    String res = "TargetPlatform: name=" + id + " boards={\n";
-    for (String boardId : boards.keySet())
-      res += "  " + boardId + " = " + boards.get(boardId) + "\n";
-    return res + "}";
-  }
 }

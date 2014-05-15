@@ -91,6 +91,15 @@ public class Base {
 
     splashScreenHelper.splashText(_("Loading configuration..."));
 
+    try {
+      guardedMain(args);
+    } catch (Throwable e) {
+      e.printStackTrace(System.err);
+      System.exit(255);
+    }
+  }
+  
+  static public void guardedMain(String args[]) throws Exception {
     BaseNoGui.initLogger();
     
     BaseNoGui.notifier = new GUIUserNotifier();
