@@ -587,10 +587,6 @@ public class BaseNoGui {
   }
 
   static public void initPackages() throws Exception {
-    reloadAllHardware();
-  }
-
-  static public void reloadAllHardware() throws Exception {
     indexer = new ContributionsIndexer(BaseNoGui.getSettingsFolder());
     File indexFile = indexer.getIndexFile();
     if (!indexFile.isFile()) {

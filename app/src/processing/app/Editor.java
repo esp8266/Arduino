@@ -109,10 +109,6 @@ public class Editor extends JFrame implements RunnerListener {
   static JMenu examplesMenu;
   static JMenu importMenu;
 
-  // these menus are shared so that the board and serial port selections
-  // are the same for all windows (since the board and serial port that are
-  // actually used are determined by the preferences, which are shared)
-  static List<JMenu> boardsMenus;
   static JMenu serialMenu;
 
   static AbstractMonitor serialMonitor;
@@ -195,7 +191,7 @@ public class Editor extends JFrame implements RunnerListener {
           fileMenu.insert(examplesMenu, 3);
           sketchMenu.insert(importMenu, 4);
           int offset = 0;
-          for (JMenu menu : boardsMenus) {
+          for (JMenu menu : Base.getBoardsCustomMenus()) {
             toolsMenu.insert(menu, numTools + offset);
             offset++;
           }
@@ -209,7 +205,7 @@ public class Editor extends JFrame implements RunnerListener {
           fileMenu.remove(sketchbookMenu);
           fileMenu.remove(examplesMenu);
           sketchMenu.remove(importMenu);
-          for (JMenu menu : boardsMenus) {
+          for (JMenu menu : Base.getBoardsCustomMenus()) {
             toolsMenu.remove(menu);
           }
           toolsMenu.remove(serialMenu);
@@ -684,53 +680,41 @@ public class Editor extends JFrame implements RunnerListener {
 
   protected JMenu buildToolsMenu() throws Exception {
     toolsMenu = new JMenu(_("Tools"));
-    JMenu menu = toolsMenu;
-    JMenuItem item;
 
-    addInternalTools(menu);
+    addInternalTools(toolsMenu);
 
-    item = newJMenuItemShift(_("Serial Monitor"), 'M');
+    JMenuItem item = newJMenuItemShift(_("Serial Monitor"), 'M');
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           handleSerial();
         }
       });
-    menu.add(item);
+    toolsMenu.add(item);
 
-    addTools(menu, Base.getToolsFolder());
+    addTools(toolsMenu, Base.getToolsFolder());
     File sketchbookTools = new File(Base.getSketchbookFolder(), "tools");
-    addTools(menu, sketchbookTools);
+    addTools(toolsMenu, sketchbookTools);
 
-    menu.addSeparator();
+    toolsMenu.addSeparator();
 
-    numTools = menu.getItemCount();
+    numTools = toolsMenu.getItemCount();
 
     // XXX: DAM: these should probably be implemented using the Tools plugin
     // API, if possible (i.e. if it supports custom actions, etc.)
 
-    if (boardsMenus == null) {
-      boardsMenus = new LinkedList<JMenu>();
-
-      JMenu boardsMenu = new JMenu(_("Board"));
-      MenuScroller.setScrollerFor(boardsMenu);
-      Editor.boardsMenus.add(boardsMenu);
-      toolsMenu.add(boardsMenu);
-
-      base.rebuildBoardsMenu(toolsMenu, this);
-      //Debug: rebuild imports
-      importMenu.removeAll();
-      base.rebuildImportMenu(importMenu);
+    for (JMenu menu : Base.getBoardsCustomMenus()) {
+      toolsMenu.add(menu);
     }
 
     if (serialMenu == null)
       serialMenu = new JMenu(_("Port"));
     populatePortMenu();
-    menu.add(serialMenu);
-    menu.addSeparator();
+    toolsMenu.add(serialMenu);
+    toolsMenu.addSeparator();
 
     JMenu programmerMenu = new JMenu(_("Programmer"));
     base.rebuildProgrammerMenu(programmerMenu);
-    menu.add(programmerMenu);
+    toolsMenu.add(programmerMenu);
 
     item = new JMenuItem(_("Burn Bootloader"));
     item.addActionListener(new ActionListener() {
@@ -738,9 +722,9 @@ public class Editor extends JFrame implements RunnerListener {
         handleBurnBootloader();
       }
     });
-    menu.add(item);
+    toolsMenu.add(item);
 
-    menu.addMenuListener(new MenuListener() {
+    toolsMenu.addMenuListener(new MenuListener() {
       public void menuCanceled(MenuEvent e) {}
       public void menuDeselected(MenuEvent e) {}
       public void menuSelected(MenuEvent e) {
@@ -749,7 +733,7 @@ public class Editor extends JFrame implements RunnerListener {
       }
     });
 
-    return menu;
+    return toolsMenu;
   }
 
 

@@ -86,6 +86,11 @@ public class Base {
   List<Editor> editors = Collections.synchronizedList(new ArrayList<Editor>());
   Editor activeEditor;
 
+  // these menus are shared so that the board and serial port selections
+  // are the same for all windows (since the board and serial port that are
+  // actually used are determined by the preferences, which are shared)
+  static List<JMenu> boardsCustomMenus;
+
   static public void main(String args[]) throws Exception {
     System.setProperty("awt.useSystemAAFontSettings", "on");
     System.setProperty("swing.aatext", "true");
@@ -238,7 +243,8 @@ public class Base {
     splashScreenHelper.splashText(_("Initializing packages..."));
     BaseNoGui.initPackages();
     splashScreenHelper.splashText(_("Preparing boards..."));
-
+    rebuildBoardsMenu();
+    
     // Setup board-dependent variables.
     onBoardOrPortChange();
 
@@ -1114,37 +1120,47 @@ public class Base {
     ContributionManagerUI managerUI = new ContributionManagerUI(activeEditor) {
       @Override
       protected void onIndexesUpdated() throws Exception {
-        BaseNoGui.reloadAllHardware();
+        BaseNoGui.initPackages();
+        rebuildBoardsMenu();
         setIndexer(BaseNoGui.indexer);
       }
     };
     managerUI.setIndexer(BaseNoGui.indexer);
     managerUI.setVisible(true);
+    // Installer dialog is modal, waits here until closed
+
+    // Reload all boards (that may have been installed/updated/removed)
+    try {
+      BaseNoGui.initPackages();
+      rebuildBoardsMenu();
+      onBoardOrPortChange();
+    } catch (Exception e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
   }
 
-  public void rebuildBoardsMenu(JMenu toolsMenu, Editor editor) throws Exception {
-    JMenu boardsMenu = getBoardCustomMenu();
+  public void rebuildBoardsMenu() throws Exception {
+    boardsCustomMenus = new LinkedList<JMenu>();
 
+    // The first custom menu is the "Board" selection submenu
+    JMenu boardMenu = new JMenu(_("Board"));
+    MenuScroller.setScrollerFor(boardMenu);
     @SuppressWarnings("serial")
     Action runInstaller = new AbstractAction("Install boards...") {
       public void actionPerformed(ActionEvent actionevent) {
         openInstallBoardDialog();
       }
     };
-    boardsMenu.add(new JMenuItem(runInstaller));
+    boardMenu.add(new JMenuItem(runInstaller));
+    boardsCustomMenus.add(boardMenu);
 
-    // If there are no platforms installed skip menu creation
+    // If there are no platforms installed we are done
     if (BaseNoGui.packages.size() == 0)
       return;
-
-    boardsMenu.add(new JSeparator());
     
-    boolean first = true;
-
-    List<JMenuItem> menuItemsToClickAfterStartup = new LinkedList<JMenuItem>();
-
-    ButtonGroup boardsButtonGroup = new ButtonGroup();
-    Map<String, ButtonGroup> buttonGroupsMap = new HashMap<String, ButtonGroup>();
+    // Separate "Install boards..." command from installed boards
+    boardMenu.add(new JSeparator());
 
     // Generate custom menus for all platforms
     Set<String> titles = new HashSet<String>();
@@ -1152,25 +1168,32 @@ public class Base {
       for (TargetPlatform targetPlatform : targetPackage.platforms())
         titles.addAll(targetPlatform.getCustomMenus().values());
     }
-    for (String title : titles)
-      makeBoardCustomMenu(toolsMenu, _(title));
-    
+    for (String title : titles) {
+      boardsCustomMenus.add(new JMenu(_(title)));
+    }
+
+    List<JMenuItem> menuItemsToClickAfterStartup = new LinkedList<JMenuItem>();
+
+    ButtonGroup boardsButtonGroup = new ButtonGroup();
+    Map<String, ButtonGroup> buttonGroupsMap = new HashMap<String, ButtonGroup>();
+
     // Cycle through all packages
+    boolean first = true;
     for (TargetPackage targetPackage : BaseNoGui.packages.values()) {
       // For every package cycle through all platform
       for (TargetPlatform targetPlatform : targetPackage.platforms()) {
 
         // Add a separator from the previous platform
         if (!first)
-          boardsMenu.add(new JSeparator());
+          boardMenu.add(new JSeparator());
         first = false;
 
         // Add a title for each platform
-        String platformLabel = targetPlatform.getPreferences().get("name"); 
+        String platformLabel = targetPlatform.getPreferences().get("name");
         if (platformLabel != null && !targetPlatform.getBoards().isEmpty()) {
           JMenuItem menuLabel = new JMenuItem(_(platformLabel));
           menuLabel.setEnabled(false);
-          boardsMenu.add(menuLabel);
+          boardMenu.add(menuLabel);
         }
 
         // Cycle through all boards of this platform
@@ -1178,14 +1201,14 @@ public class Base {
           JMenuItem item = createBoardMenusAndCustomMenus(menuItemsToClickAfterStartup,
                                                           buttonGroupsMap,
                                                           board, targetPlatform, targetPackage);
-          boardsMenu.add(item);
+          boardMenu.add(item);
           boardsButtonGroup.add(item);
         }
       }
     }
 
     if (menuItemsToClickAfterStartup.isEmpty()) {
-      menuItemsToClickAfterStartup.add(selectFirstEnabledMenuItem(boardsMenu));
+      menuItemsToClickAfterStartup.add(selectFirstEnabledMenuItem(boardMenu));
     }
 
     for (JMenuItem menuItemToClick : menuItemsToClickAfterStartup) {
@@ -1265,9 +1288,10 @@ public class Base {
     return item;
   }
 
-  private static void filterVisibilityOfSubsequentBoardMenus(TargetBoard board, int fromIndex) {
-    for (int i = fromIndex; i < Editor.boardsMenus.size(); i++) {
-      JMenu menu = Editor.boardsMenus.get(i);
+  private static void filterVisibilityOfSubsequentBoardMenus(TargetBoard board,
+                                                             int fromIndex) {
+    for (int i = fromIndex; i < boardsCustomMenus.size(); i++) {
+      JMenu menu = boardsCustomMenus.get(i);
       for (int m = 0; m < menu.getItemCount(); m++) {
         JMenuItem menuItem = menu.getItem(m);
         menuItem.setVisible(menuItem.getAction().getValue("board").equals(board));
@@ -1293,19 +1317,8 @@ public class Base {
     return false;
   }
 
-  private JMenu makeBoardCustomMenu(JMenu toolsMenu, String label) {
-    JMenu menu = new JMenu(label);
-    Editor.boardsMenus.add(menu);
-    toolsMenu.add(menu);
-    return menu;
-  }
-
-  private JMenu getBoardCustomMenu() throws Exception {
-    return getBoardCustomMenu(_("Board"));
-  }
-  
   private JMenu getBoardCustomMenu(String label) throws Exception {
-    for (JMenu menu : Editor.boardsMenus)
+    for (JMenu menu : boardsCustomMenus)
       if (label.equals(menu.getText()))
         return menu;
     throw new Exception("Custom menu not found!");
@@ -1758,6 +1771,10 @@ public class Base {
 
   static public PreferencesMap getBoardPreferences() {
     return BaseNoGui.getBoardPreferences();
+  }
+
+  public static List<JMenu> getBoardsCustomMenus() {
+    return boardsCustomMenus;
   }
 
   static public File getPortableFolder() {
