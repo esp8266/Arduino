@@ -64,14 +64,13 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 import cc.arduino.packages.contributions.ContributedPlatform;
-import cc.arduino.packages.contributions.ContributionsIndex;
+import cc.arduino.packages.contributions.ContributionInstaller;
+import cc.arduino.packages.contributions.ContributionsIndexer;
 
 @SuppressWarnings("serial")
 public class ContributionManagerUI extends JDialog {
 
   private FilterJTextField filterField;
-
-  private ContributionManagerUIListener listener = null;
 
   private JLabel categoryLabel;
   private JComboBox categoryChooser;
@@ -92,8 +91,9 @@ public class ContributionManagerUI extends JDialog {
   private String category;
   private String[] filters;
 
-  public ContributionManagerUI(Frame parent) {
+  public ContributionManagerUI(Frame parent, ContributionsIndexer indexer) {
     super(parent, "Boards Manager", Dialog.ModalityType.APPLICATION_MODAL);
+
     setResizable(true);
 
     Container pane = getContentPane();
@@ -144,23 +144,12 @@ public class ContributionManagerUI extends JDialog {
 
     contribTable = new JTable(contribModel);
     contribTable.setTableHeader(null);
-    // contribTable.getTableHeader().setEnabled(false);
-    // contribTable.setRowSelectionAllowed(false);
     contribTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     contribTable.setColumnSelectionAllowed(false);
     contribTable.setDragEnabled(false);
     contribTable.setIntercellSpacing(new Dimension(0, 1));
     contribTable.setShowVerticalLines(false);
-    // contribTable.addMouseListener(new MouseAdapter() {
-    // @Override
-    // public void mousePressed(MouseEvent e) {
-    // if (listener == null)
-    // return;
-    // Point point = e.getPoint();
-    // int row = contribTable.rowAtPoint(point);
-    // int col = contribTable.columnAtPoint(point);
-    // }
-    // });
+
     {
       TableColumnModel tcm = contribTable.getColumnModel();
       TableColumn col = tcm.getColumn(DESCRIPTION_COL);
@@ -168,16 +157,12 @@ public class ContributionManagerUI extends JDialog {
       cellEditor = new ContributedPlatformTableCell() {
         @Override
         protected void onInstall(ContributedPlatform selectedPlatform) {
-          if (listener == null)
-            return;
-          listener.onInstall(selectedPlatform);
+          onInstallPressed(selectedPlatform);
         }
 
         @Override
         protected void onRemove(ContributedPlatform installedPlatform) {
-          if (listener == null)
-            return;
-          listener.onRemove(installedPlatform);
+          onRemovePressed(installedPlatform);
         }
       };
       col.setCellEditor(cellEditor);
@@ -205,8 +190,7 @@ public class ContributionManagerUI extends JDialog {
       cancelButton.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent arg0) {
-          if (listener != null)
-            listener.onCancelPressed();
+          onCancelPressed();
         }
       });
 
@@ -214,8 +198,7 @@ public class ContributionManagerUI extends JDialog {
       updateButton.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent arg0) {
-          if (listener != null)
-            listener.onUpdatePressed();
+          onUpdatePressed();
         }
       });
 
@@ -255,10 +238,18 @@ public class ContributionManagerUI extends JDialog {
         });
       }
     });
-  }
 
-  public void setListener(ContributionManagerUIListener listener) {
-    this.listener = listener;
+    contribModel.setIndex(indexer.getIndex());
+    setCategories(indexer.getIndex().getCategories());
+
+    // Create installer with his dialog
+    installer = new ContributionInstaller(indexer);
+    installer.setListener(new ContributionInstaller.Listener() {
+      @Override
+      public void onProgress(double progress, String message) {
+        setProgress((int) progress, message);
+      }
+    });
   }
 
   public void setCategories(Collection<String> categories) {
@@ -278,11 +269,6 @@ public class ContributionManagerUI extends JDialog {
     categoryStrut2.setVisible(show);
     categoryChooser.setVisible(show);
     categoryStrut3.setVisible(show);
-  }
-
-  public void setContributions(ContributionsIndex index) {
-    contribModel.setIndex(index);
-    setCategories(index.getCategories());
   }
 
   public void setProgressVisible(boolean visible) {
@@ -318,4 +304,58 @@ public class ContributionManagerUI extends JDialog {
     if (text != null)
       progressBar.setString(text);
   }
+
+  public void onUpdatePressed() {
+    // TODO Auto-generated method stub
+    System.out.println("Update pressed");
+  }
+
+  /*
+   * Installer methods follows
+   */
+
+  private ContributionInstaller installer;
+  private Thread installerThread = null;
+
+  public void onCancelPressed() {
+    if (installerThread != null)
+      installerThread.interrupt();
+  }
+
+  public void onInstallPressed(final ContributedPlatform platform) {
+    installerThread = new Thread(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          setProgressVisible(true);
+          installer.install(platform);
+        } catch (Exception e) {
+          // TODO Show ERROR
+          e.printStackTrace();
+        } finally {
+          setProgressVisible(false);
+        }
+      }
+    });
+    installerThread.start();
+  }
+
+  public void onRemovePressed(final ContributedPlatform platform) {
+    installerThread = new Thread(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          setProgressVisible(true);
+          installer.remove(platform);
+        } catch (Exception e) {
+          // TODO Show ERROR
+          e.printStackTrace();
+        } finally {
+          setProgressVisible(false);
+        }
+      }
+    });
+    installerThread.start();
+  }
+
 }

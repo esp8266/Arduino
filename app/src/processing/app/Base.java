@@ -23,11 +23,7 @@
 package processing.app;
 
 import cc.arduino.packages.DiscoveryManager;
-import cc.arduino.packages.contributions.ContributedPlatform;
-import cc.arduino.packages.contributions.ContributionInstaller;
-import cc.arduino.packages.contributions.ContributionInstaller.Listener;
 import cc.arduino.packages.contributions.ui.ContributionManagerUI;
-import cc.arduino.packages.contributions.ui.ContributionManagerUIListener;
 import cc.arduino.view.SplashScreenHelper;
 import processing.app.debug.TargetBoard;
 import processing.app.debug.TargetPackage;
@@ -1114,73 +1110,7 @@ public class Base {
 
   private void openInstallBoardDialog() {
     // Create dialog for contribution manager
-    final ContributionManagerUI managerUI = new ContributionManagerUI(activeEditor);
-    final Listener installerListener = new ContributionInstaller.Listener() {
-      @Override
-      public void onProgress(double progress, String message) {
-        managerUI.setProgress((int) progress, message);
-      }
-    };
-    managerUI.setListener(new ContributionManagerUIListener() {
-
-      @Override
-      public void onUpdatePressed() {
-        // TODO Auto-generated method stub
-        System.out.println("Update pressed");
-      }
-
-      Thread task = null;
-      
-      @Override
-      public void onCancelPressed() {
-        if (task != null)
-          task.interrupt();
-      }
-      
-      @Override
-      public void onInstall(final ContributedPlatform platform) {
-        final ContributionInstaller installer = new ContributionInstaller(BaseNoGui.indexer);
-        installer.setListener(installerListener);
-        task = new Thread(new Runnable() {
-          @Override
-          public void run() {
-            try {
-              managerUI.setProgressVisible(true);
-              installer.install(platform);
-            } catch (Exception e) {
-              // TODO Show ERROR
-              e.printStackTrace();
-            } finally {
-              managerUI.setProgressVisible(false);
-            }
-          }
-        });
-        task.start();
-      }
-      
-      @Override
-      public void onRemove(final ContributedPlatform platform) {
-        // Create installer with his dialog
-        final ContributionInstaller installer = new ContributionInstaller(BaseNoGui.indexer);
-        installer.setListener(installerListener);
-        task = new Thread(new Runnable() {
-          @Override
-          public void run() {
-            try {
-              managerUI.setProgressVisible(true);
-              installer.remove(platform);
-            } catch (Exception e) {
-              // TODO Show ERROR
-              e.printStackTrace();
-            } finally {
-              managerUI.setProgressVisible(false);
-            }
-          }
-        });
-        task.start();
-      }
-    });
-    managerUI.setContributions(BaseNoGui.indexer.getIndex());
+    ContributionManagerUI managerUI = new ContributionManagerUI(activeEditor, BaseNoGui.indexer);
     managerUI.setVisible(true);
   }
 

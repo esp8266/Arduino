@@ -586,6 +586,9 @@ public class BaseNoGui {
 
   static public void initPackages() throws Exception {
     indexer = new ContributionsIndexer(BaseNoGui.getSettingsFolder());
+    if (!indexer.getIndexFile().isFile())
+      // TODO: run first setup
+      ;
     indexer.parseIndex();
     indexer.syncWithFilesystem();
     System.out.println(indexer);

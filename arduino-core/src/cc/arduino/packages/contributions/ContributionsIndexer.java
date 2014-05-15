@@ -48,15 +48,16 @@ import com.fasterxml.jackson.module.mrbean.MrBeanModule;
 
 public class ContributionsIndexer {
 
-  private File preferencesFolder;
   private File packagesFolder;
   private File stagingFolder;
+  private File indexFile;
   private ContributionsIndex index;
 
-  public ContributionsIndexer(File _preferencesFolder) {
-    preferencesFolder = _preferencesFolder;
+  public ContributionsIndexer(File preferencesFolder) {
     packagesFolder = new File(preferencesFolder, "packages");
-    stagingFolder = new File(preferencesFolder, "staging");
+    stagingFolder = new File(preferencesFolder, "staging" + File.separator +
+        "packages");
+    indexFile = new File(preferencesFolder, "package_index.json");
   }
 
   // public static void main(String args[]) throws Exception {
@@ -75,7 +76,7 @@ public class ContributionsIndexer {
 
   public void parseIndex() throws JsonParseException, IOException {
     // Parse index file
-    parseIndex(new File(preferencesFolder, "package_index.json"));
+    parseIndex(indexFile);
 
     List<ContributedPackage> packages = index.getPackages();
     for (ContributedPackage pack : packages) {
@@ -224,16 +225,16 @@ public class ContributionsIndexer {
     return index;
   }
 
-  public File getPreferencesFolder() {
-    return preferencesFolder;
-  }
-
   public File getPackagesFolder() {
     return packagesFolder;
   }
 
   public File getStagingFolder() {
     return stagingFolder;
+  }
+
+  public File getIndexFile() {
+    return indexFile;
   }
 
 }
