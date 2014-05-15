@@ -64,6 +64,7 @@ public class BaseNoGui {
   // maps library name to their library folder
   static private LibraryList libraries;
 
+  // XXX: Remove this field
   static private List<File> librariesFolders;
 
   static UserNotifier notifier = new BasicUserNotifier();
@@ -410,9 +411,8 @@ public class BaseNoGui {
   }
 
   static public LibraryList getUserLibs() {
-    if (libraries == null)
-      return new LibraryList();
-    return libraries.filterLibrariesInSubfolder(getSketchbookFolder());
+    LibraryList libs = BaseNoGui.librariesIndexer.getInstalledLibraries();
+    return libs.filterLibrariesInSubfolder(getSketchbookFolder());
   }
 
   /**
@@ -727,12 +727,14 @@ public class BaseNoGui {
         if (referencedPlatform != null) {
           File referencedPlatformFolder = referencedPlatform.getFolder();
           // Add libraries folder for the referenced platform
-          librariesFolders.add(new File(referencedPlatformFolder, "libraries"));
+          File folder = new File(referencedPlatformFolder, "libraries");
+          librariesFolders.add(folder);
         }
       }
       File platformFolder = targetPlatform.getFolder();
       // Add libraries folder for the selected platform
-      librariesFolders.add(new File(platformFolder, "libraries"));
+      File folder = new File(platformFolder, "libraries");
+      librariesFolders.add(folder);
     }
 
     // Add libraries folder for the sketchbook
@@ -742,7 +744,9 @@ public class BaseNoGui {
     // Libraries located in the latest folders on the list can override
     // other libraries with the same name.
     try {
-      scanAndUpdateLibraries(librariesFolders);
+      BaseNoGui.librariesIndexer.setSketchbookLibrariesFolder(getSketchbookLibrariesFolder());
+      BaseNoGui.librariesIndexer.setLibrariesFolders(librariesFolders);
+      BaseNoGui.librariesIndexer.rescanLibraries();
     } catch (IOException e) {
       showWarning(_("Error"), _("Error loading libraries"), e);
     }
@@ -759,7 +763,7 @@ public class BaseNoGui {
   static public void populateImportToLibraryTable() {
     // Populate importToLibraryTable
     importToLibraryTable = new HashMap<String, UserLibrary>();
-    for (UserLibrary lib : getLibraries()) {
+    for (UserLibrary lib : librariesIndexer.getInstalledLibraries()) {
       try {
         String headers[] = headerListFromIncludePath(lib.getSrcFolder());
         for (String header : headers) {
@@ -966,14 +970,6 @@ public class BaseNoGui {
       _("Could not replace {0}"),
       file.getAbsolutePath()));
     }
-  }
-
-  static public void scanAndUpdateLibraries(List<File> folders) throws IOException {
-    libraries = scanLibraries(folders);
-  }
-
-  static public LibraryList scanLibraries(List<File> folders) throws IOException {
-    return librariesIndexer.scanLibraries(folders);
   }
 
   static public void selectBoard(TargetBoard targetBoard) {

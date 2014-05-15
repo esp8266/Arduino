@@ -26,7 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  */
-package cc.arduino.packages.contributions.ui;
+package cc.arduino.ui;
 
 import java.awt.Color;
 import java.awt.Font;

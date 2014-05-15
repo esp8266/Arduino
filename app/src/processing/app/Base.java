@@ -22,15 +22,7 @@
 
 package processing.app;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.util.*;
-import java.util.List;
-
-import javax.swing.*;
-
-import cc.arduino.libraries.contributions.LibrariesIndexer;
+import cc.arduino.libraries.contributions.ui.LibraryManagerUI;
 import cc.arduino.packages.DiscoveryManager;
 import cc.arduino.packages.contributions.ui.ContributionManagerUI;
 import cc.arduino.view.SplashScreenHelper;
@@ -43,7 +35,6 @@ import processing.app.helpers.filefilters.OnlyFilesWithExtension;
 import processing.app.javax.swing.filechooser.FileNameExtensionFilter;
 import processing.app.legacy.PApplet;
 import processing.app.macosx.ThinkDifferent;
-import processing.app.legacy.PConstants;
 import processing.app.packages.LibraryList;
 import processing.app.packages.UserLibrary;
 import processing.app.tools.MenuScroller;
@@ -1020,9 +1011,7 @@ public class Base {
   }
 
   public LibraryList getIDELibs() {
-    if (getLibraries() == null)
-      return new LibraryList();
-    LibraryList res = new LibraryList(getLibraries());
+    LibraryList res = new LibraryList(BaseNoGui.librariesIndexer.getInstalledLibraries());
     res.removeAll(getUserLibs());
     return res;
   }
@@ -1036,16 +1025,13 @@ public class Base {
       return;
     importMenu.removeAll();
 
-    JMenuItem addLibraryMenuItem = new JMenuItem(_("Add Library..."));
-    addLibraryMenuItem.addActionListener(new ActionListener() {
+    JMenuItem menu = new JMenuItem(_("Manage libraries..."));
+    menu.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        Base.this.handleAddLibrary();
-        Base.this.onBoardOrPortChange();
-        Base.this.rebuildImportMenu(Editor.importMenu);
-        Base.this.rebuildExamplesMenu(Editor.examplesMenu);
+        openManageLibrariesDialog();
       }
     });
-    importMenu.add(addLibraryMenuItem);
+    importMenu.add(menu);
     importMenu.addSeparator();
     
     // Split between user supplied libraries and IDE libraries
@@ -1114,6 +1100,27 @@ public class Base {
     // Update editors status bar
     for (Editor editor : editors)
       editor.onBoardOrPortChange();
+  }
+
+  private void openManageLibrariesDialog() {
+    @SuppressWarnings("serial")
+    LibraryManagerUI managerUI = new LibraryManagerUI(activeEditor) {
+      @Override
+      protected void onIndexesUpdated() throws Exception {
+        BaseNoGui.initPackages();
+        rebuildBoardsMenu();
+        onBoardOrPortChange();
+        setIndexer(BaseNoGui.librariesIndexer);
+      }
+    };
+    managerUI.setIndexer(BaseNoGui.librariesIndexer);
+    managerUI.setVisible(true);
+    // Manager dialog is modal, waits here until closed
+    
+    //handleAddLibrary();
+    onBoardOrPortChange();
+    rebuildImportMenu(Editor.importMenu);
+    rebuildExamplesMenu(Editor.examplesMenu);
   }
 
   private void openInstallBoardDialog() {
@@ -1693,8 +1700,9 @@ public class Base {
   }
 
 
+  // XXX: Remove this method and make librariesIndexer non-static
   static public LibraryList getLibraries() {
-    return BaseNoGui.getLibraries();
+    return BaseNoGui.librariesIndexer.getInstalledLibraries();
   }
 
 

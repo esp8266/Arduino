@@ -42,41 +42,14 @@ import java.util.Observer;
 import processing.app.helpers.FileUtils;
 import cc.arduino.utils.ArchiveExtractor;
 import cc.arduino.utils.FileHash;
+import cc.arduino.utils.MultiStepProgress;
+import cc.arduino.utils.Progress;
 import cc.arduino.utils.network.FileDownloader;
 
 public class ContributionInstaller {
 
-  /**
-   * Listener for installation progress.
-   */
-  public static interface Listener {
-    /**
-     * Receive the latest progress update.
-     * 
-     * @param progress
-     *          Actual progress in the range 0...100
-     * @param message
-     *          A verbose description message of the actual operation
-     */
-    void onProgress(double progress, String message);
-  }
-
-  private Listener listener = null;
-
   private File stagingFolder;
   private ContributionsIndexer indexer;
-
-  private double progress;
-  private double progressStepsDelta;
-
-  public void setListener(Listener listener) {
-    this.listener = listener;
-  }
-
-  private void updateProgress(double progress, String message) {
-    if (listener != null)
-      listener.onProgress(progress, message);
-  }
 
   public ContributionInstaller(ContributionsIndexer contributionsIndexer) {
     stagingFolder = contributionsIndexer.getStagingFolder();
@@ -102,19 +75,18 @@ public class ContributionInstaller {
     }
 
     // Calculate progress increases
-    progress = 0.0;
-    progressStepsDelta = 100.0 / (tools.size() + 1) / 2.0;
+    MultiStepProgress progress = new MultiStepProgress((tools.size() + 1) * 2);
 
     // Download all
     try {
       // Download platform
-      download(platform, _("Downloading boards definitions."));
+      download(platform, progress, _("Downloading boards definitions."));
 
       // Download tools
       int i = 1;
       for (ContributedTool tool : tools) {
         String msg = format(_("Downloading tools ({0}/{1})."), i, tools.size());
-        download(tool.getDownloadableContribution(), msg);
+        download(tool.getDownloadableContribution(), progress, msg);
         i++;
       }
     } catch (InterruptedException e) {
@@ -133,8 +105,9 @@ public class ContributionInstaller {
     File toolsFolder = new File(packageFolder, "tools");
     int i = 1;
     for (ContributedTool tool : platform.getResolvedTools()) {
-      String msg = format(_("Installing tools ({0}/{1})..."), i, tools.size());
-      updateProgress(progress, msg);
+      progress.setStatus(format(_("Installing tools ({0}/{1})..."), i,
+                                tools.size()));
+      onProgress(progress);
       i++;
       DownloadableContribution toolContrib = tool.getDownloadableContribution();
       File destFolder = new File(toolsFolder, tool.getName() + File.separator +
@@ -144,11 +117,12 @@ public class ContributionInstaller {
       ArchiveExtractor.extract(toolContrib.getDownloadedFile(), destFolder, 1);
       toolContrib.setInstalled(true);
       toolContrib.setInstalledFolder(destFolder);
-      progress += progressStepsDelta;
+      progress.stepDone();
     }
 
     // Unpack platform on the correct location
-    updateProgress(progress, _("Installing boards..."));
+    progress.setStatus(_("Installing boards..."));
+    onProgress(progress);
     File platformFolder = new File(packageFolder, "hardware" + File.separator +
         platform.getArchitecture());
     File destFolder = new File(platformFolder, platform.getVersion());
@@ -156,13 +130,15 @@ public class ContributionInstaller {
     ArchiveExtractor.extract(platform.getDownloadedFile(), destFolder, 1);
     platform.setInstalled(true);
     platform.setInstalledFolder(destFolder);
-    progress += progressStepsDelta;
+    progress.stepDone();
 
-    updateProgress(100.0, _("Installation completed!"));
+    progress.setStatus(_("Installation completed!"));
+    onProgress(progress);
   }
 
   public File download(DownloadableContribution contribution,
-                       final String statusText) throws Exception {
+                       final MultiStepProgress progress, final String statusText)
+      throws Exception {
     URL url = new URL(contribution.getUrl());
     String path = url.getPath();
     String fileName = path.substring(path.lastIndexOf('/') + 1);
@@ -186,18 +162,20 @@ public class ContributionInstaller {
             long total = me.getInitialSize() + me.getDownloadSize() / 1000;
             msg = format(_("Downloaded {0}kb of {1}kb."), downloaded, total);
           }
-          updateProgress((int) progress + progressStepsDelta *
-              me.getProgress() / 100.0, statusText + " " + msg);
+          progress.setStatus(statusText + " " + msg);
+          progress.setProgress(me.getProgress());
+          onProgress(progress);
         }
       });
       downloader.download();
       if (!downloader.isCompleted())
         throw new Exception("Error dowloading " + url, downloader.getError());
     }
-    progress += progressStepsDelta;
+    progress.stepDone();
 
     // Test checksum
-    updateProgress(progress, _("Verifying archive integrity..."));
+    progress.setStatus(_("Verifying archive integrity..."));
+    onProgress(progress);
     String checksum = contribution.getChecksum();
     String algo = checksum.split(":")[0];
     if (!FileHash.hash(outputFile, algo).equals(checksum))
@@ -236,8 +214,8 @@ public class ContributionInstaller {
   }
 
   public void updateIndex() throws Exception {
+    final MultiStepProgress progress = new MultiStepProgress(2);
     final String statusText = _("Downloading platforms index...");
-    updateProgress(0, statusText);
 
     URL url = new URL("http://arduino.cc/package_index.json");
     File tmpFile = File.createTempFile("package_index", ".json");
@@ -252,13 +230,15 @@ public class ContributionInstaller {
           long total = me.getInitialSize() + me.getDownloadSize() / 1000;
           msg = format(_("Downloaded {0}kb of {1}kb."), downloaded, total);
         }
-        updateProgress((int) progress + progressStepsDelta * me.getProgress() /
-            100.0, statusText + " " + msg);
+        progress.setStatus(statusText + " " + msg);
+        progress.setProgress(me.getProgress());
+        onProgress(progress);
       }
     });
     downloader.download();
     if (!downloader.isCompleted())
       throw new Exception("Error dowloading " + url, downloader.getError());
+    progress.stepDone();
 
     // TODO: Check downloaded index
 
@@ -268,5 +248,9 @@ public class ContributionInstaller {
       outputFile.delete();
     if (!tmpFile.renameTo(outputFile))
       throw new Exception("An error occurred while updating platforms index!");
+  }
+
+  protected void onProgress(Progress progress) {
+    // Empty
   }
 }

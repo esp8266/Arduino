@@ -26,7 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  */
-package cc.arduino.packages.contributions.ui;
+package cc.arduino.libraries.contributions.ui;
 
 import static cc.arduino.packages.contributions.ui.ContributionIndexTableModel.DESCRIPTION_COL;
 import static processing.app.I18n._;
@@ -61,15 +61,15 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import cc.arduino.packages.contributions.ContributedPlatform;
-import cc.arduino.packages.contributions.ContributionInstaller;
-import cc.arduino.packages.contributions.ContributionsIndexer;
+import processing.app.Theme;
+import cc.arduino.libraries.contributions.ContributedLibrary;
+import cc.arduino.libraries.contributions.LibrariesIndexer;
 import cc.arduino.ui.FilterJTextField;
 import cc.arduino.ui.ProgressJProgressBar;
 import cc.arduino.utils.Progress;
 
 @SuppressWarnings("serial")
-public class ContributionManagerUI extends JDialog {
+public class LibraryManagerUI extends JDialog {
 
   private FilterJTextField filterField;
 
@@ -79,21 +79,21 @@ public class ContributionManagerUI extends JDialog {
   private Component categoryStrut2;
   private Component categoryStrut3;
 
-  private ContributionIndexTableModel contribModel = new ContributionIndexTableModel();
+  private LibrariesIndexTableModel contribModel = new LibrariesIndexTableModel();
   private JTable contribTable;
   private ProgressJProgressBar progressBar;
 
   private Box progressBox;
   private Box updateBox;
 
-  private ContributedPlatformTableCell cellEditor;
+  private ContributedLibraryTableCell cellEditor;
 
   // Currently selected category and filters
   private String category;
   private String[] filters;
 
-  public ContributionManagerUI(Frame parent) {
-    super(parent, "Boards Manager", Dialog.ModalityType.APPLICATION_MODAL);
+  public LibraryManagerUI(Frame parent) {
+    super(parent, "Library Manager", Dialog.ModalityType.APPLICATION_MODAL);
 
     setResizable(true);
 
@@ -139,19 +139,19 @@ public class ContributionManagerUI extends JDialog {
     contribTable.setDragEnabled(false);
     contribTable.setIntercellSpacing(new Dimension(0, 1));
     contribTable.setShowVerticalLines(false);
-
+    contribTable.setSelectionBackground(Theme.getColor("status.notice.bgcolor"));
     {
       TableColumnModel tcm = contribTable.getColumnModel();
       TableColumn col = tcm.getColumn(DESCRIPTION_COL);
-      col.setCellRenderer(new ContributedPlatformTableCell());
-      cellEditor = new ContributedPlatformTableCell() {
+      col.setCellRenderer(new ContributedLibraryTableCell());
+      cellEditor = new ContributedLibraryTableCell() {
         @Override
-        protected void onInstall(ContributedPlatform selectedPlatform) {
+        protected void onInstall(ContributedLibrary selectedPlatform) {
           onInstallPressed(selectedPlatform);
         }
 
         @Override
-        protected void onRemove(ContributedPlatform installedPlatform) {
+        protected void onRemove(ContributedLibrary installedPlatform) {
           onRemovePressed(installedPlatform);
         }
       };
@@ -228,30 +228,32 @@ public class ContributionManagerUI extends JDialog {
     }
   };
 
-  public void setIndexer(ContributionsIndexer indexer) {
+  public void setIndexer(LibrariesIndexer indexer) {
     contribModel.removeTableModelListener(tableModelListener);
     categoryChooser.removeActionListener(categoryChooserActionListener);
 
-    contribModel.setIndex(indexer.getIndex());
+    contribModel.setIndexer(indexer);
 
     category = null;
     categoryChooser.removeAllItems();
 
-    filterField.setEnabled(contribModel.getRowCount() > 0);
-
     contribModel.addTableModelListener(tableModelListener);
     categoryChooser.addActionListener(categoryChooserActionListener);
 
-    // Enable categories combo only if there are two or more choices
+    // Load categories
     Collection<String> categories = indexer.getIndex().getCategories();
-    int count = categories.size();
-    categoryChooser.setEnabled(count > 1);
-
+    categoryChooser.addItem("");
     for (String s : categories)
       categoryChooser.addItem(s);
 
-    // Create ConstributionInstaller tied with the provided index
-    installer = new ContributionInstaller(indexer) {
+    // Enable categories combo only if there are two or more choices
+    int count = categoryChooser.getItemCount();
+    categoryChooser.setEnabled(count > 1);
+
+    filterField.setEnabled(contribModel.getRowCount() > 0);
+
+    // Create LibrariesInstaller tied with the provided index
+    installer = new LibraryInstaller(indexer) {
       @Override
       public void onProgress(Progress progress) {
         setProgress(progress);
@@ -292,7 +294,7 @@ public class ContributionManagerUI extends JDialog {
     int first = e.getFirstRow();
     int last = Math.min(e.getLastRow(), contribTable.getRowCount() - 1);
     for (int row = first; row <= last; row++) {
-      TableCellRenderer editor = new ContributedPlatformTableCell();
+      TableCellRenderer editor = new ContributedLibraryTableCell();
       Component comp = contribTable.prepareRenderer(editor, row, 0);
       int height = comp.getPreferredSize().height;
       contribTable.setRowHeight(row, height);
@@ -307,7 +309,7 @@ public class ContributionManagerUI extends JDialog {
    * Installer methods follows
    */
 
-  private ContributionInstaller installer;
+  private LibraryInstaller installer;
   private Thread installerThread = null;
 
   public void onCancelPressed() {
@@ -334,13 +336,14 @@ public class ContributionManagerUI extends JDialog {
     installerThread.start();
   }
 
-  public void onInstallPressed(final ContributedPlatform platform) {
+  public void onInstallPressed(final ContributedLibrary lib) {
     installerThread = new Thread(new Runnable() {
       @Override
       public void run() {
         try {
           setProgressVisible(true);
-          installer.install(platform);
+          installer.install(lib);
+          contribModel.updateLibrary(lib);
         } catch (Exception e) {
           // TODO Show ERROR
           e.printStackTrace();
@@ -352,13 +355,14 @@ public class ContributionManagerUI extends JDialog {
     installerThread.start();
   }
 
-  public void onRemovePressed(final ContributedPlatform platform) {
+  public void onRemovePressed(final ContributedLibrary lib) {
     installerThread = new Thread(new Runnable() {
       @Override
       public void run() {
         try {
           setProgressVisible(true);
-          installer.remove(platform);
+          installer.remove(lib);
+          contribModel.updateLibrary(lib);
         } catch (Exception e) {
           // TODO Show ERROR
           e.printStackTrace();

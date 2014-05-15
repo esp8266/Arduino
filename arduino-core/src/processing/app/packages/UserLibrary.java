@@ -257,15 +257,14 @@ public class UserLibrary extends ContributedLibrary {
 
   @Override
   public String toString() {
-    String res = "Library:";
-    res += " (name=" + name + ")";
-    res += " (version=" + version + ")";
-    res += " (author=" + author + ")";
-    res += " (maintainer=" + maintainer + ")";
-    res += " (sentence=" + sentence + ")";
-    res += " (paragraph=" + paragraph + ")";
-    res += " (url=" + website + ")";
-    res += " (architectures=" + architectures + ")";
+    String res = "Library: " + name + "\n";
+    res += "         (version=" + version + ")\n";
+    res += "         (author=" + author + ")\n";
+    res += "         (maintainer=" + maintainer + ")\n";
+    res += "         (sentence=" + sentence + ")\n";
+    res += "         (paragraph=" + paragraph + ")\n";
+    res += "         (url=" + website + ")\n";
+    res += "         (architectures=" + architectures + ")\n";
     return res;
   }
 

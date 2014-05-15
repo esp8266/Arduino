@@ -38,6 +38,7 @@ import java.util.List;
 
 import processing.app.BaseNoGui;
 import processing.app.I18n;
+import processing.app.helpers.FileUtils;
 import processing.app.helpers.filefilters.OnlyDirs;
 import processing.app.packages.LegacyUserLibrary;
 import processing.app.packages.LibraryList;
@@ -51,16 +52,23 @@ import com.fasterxml.jackson.module.mrbean.MrBeanModule;
 public class LibrariesIndexer {
 
   private LibrariesIndex index;
+  private LibraryList installedLibraries = new LibraryList();
+  private List<File> librariesFolders;
   private File indexFile;
+  private File stagingFolder;
+  private File sketchbookLibrariesFolder;
 
-  public LibrariesIndexer(File _settingsFolder) {
-    indexFile = new File(_settingsFolder, "library_index.json");
+  public LibrariesIndexer(File preferencesFolder) {
+    indexFile = new File(preferencesFolder, "library_index.json");
+    stagingFolder = new File(preferencesFolder, "staging" + File.separator +
+        "libraries");
   }
 
   public void parseIndex() throws JsonParseException, IOException {
     parseIndex(indexFile);
     System.out.println(index);
 
+    index.fillCategories();
     // TODO: resolve libraries inner references
   }
 
@@ -75,75 +83,108 @@ public class LibrariesIndexer {
     index = mapper.readValue(indexIn, LibrariesIndex.class);
   }
 
-  public LibraryList scanLibraries(List<File> folders) throws IOException {
-    LibraryList res = new LibraryList();
-    for (File folder : folders)
-      res.addOrReplaceAll(scanLibraries(folder));
-    return res;
+  public void setLibrariesFolders(List<File> _librariesFolders)
+      throws IOException {
+    librariesFolders = _librariesFolders;
+    rescanLibraries();
   }
 
-  private LibraryList scanLibraries(File folder) throws IOException {
-    LibraryList res = new LibraryList();
+  public void rescanLibraries() throws IOException {
+    // Clear all installed flags
+    installedLibraries.clear();
+    for (ContributedLibrary lib : index.getLibraries())
+      lib.setInstalled(false);
 
-    File list[] = folder.listFiles(new OnlyDirs());
+    // Rescan libraries
+    for (File folder : librariesFolders)
+      scanInstalledLibraries(folder);
+  }
+
+  private void scanInstalledLibraries(File folder) {
+    File list[] = folder.listFiles(OnlyDirs.ONLY_DIRS);
     // if a bad folder or something like that, this might come back null
     if (list == null)
-      return res;
+      return;
 
     for (File subfolder : list) {
       if (!BaseNoGui.isSanitaryName(subfolder.getName())) {
-        String mess = I18n
-            .format(_("The library \"{0}\" cannot be used.\n"
-                        + "Library names must contain only basic letters and numbers.\n"
-                        + "(ASCII only and no spaces, and it cannot start with a number)"),
-                    subfolder.getName());
+        String mess = I18n.format(_("The library \"{0}\" cannot be used.\n"
+            + "Library names must contain only basic letters and numbers.\n"
+            + "(ASCII only and no spaces, and it cannot start with a number)"),
+                                  subfolder.getName());
         BaseNoGui.showMessage(_("Ignoring bad library name"), mess);
         continue;
       }
 
       try {
-        ContributedLibrary lib = scanLibrary(subfolder);
-
-        // (also replace previously found libs with the same name)
-        if (lib != null)
-          res.addOrReplace(lib);
+        scanLibrary(subfolder);
       } catch (IOException e) {
         System.out.println(I18n.format(_("Invalid library found in {0}: {1}"),
                                        subfolder, e.getMessage()));
       }
     }
-    return res;
   }
 
-  private ContributedLibrary scanLibrary(File subfolder) throws IOException {
-    // A library is considered non-Legacy if it contains
-    // a file called "library.properties"
-    File check = new File(subfolder, "library.properties");
-    if (!check.exists() || !check.isFile())
-      return LegacyUserLibrary.create(subfolder);
+  private void scanLibrary(File folder) throws IOException {
+    boolean readOnly = !FileUtils
+        .isSubDirectory(sketchbookLibrariesFolder, folder);
 
-    ContributedLibrary lib = UserLibrary.create(subfolder);
+    // A library is considered "legacy" if it doesn't contains
+    // a file called "library.properties"
+    File check = new File(folder, "library.properties");
+    if (!check.exists() || !check.isFile()) {
+
+      // Create a legacy library and exit
+      LegacyUserLibrary lib = LegacyUserLibrary.create(folder);
+      lib.setReadOnly(readOnly);
+      installedLibraries.addOrReplace(lib);
+      return;
+    }
+
+    // Create a regular library
+    UserLibrary lib = UserLibrary.create(folder);
+    lib.setReadOnly(readOnly);
+    installedLibraries.addOrReplace(lib);
 
     // Check if we can find the same library in the index
-    // String libName = subfolder.getName(); // XXX: lib.getName()?
-    // ContributedLibrary foundLib = index.find(libName, lib.getVersion());
-    // if (foundLib != null) {
-    // foundLib.setInstalled(true);
-    // foundLib.setInstalledFolder(subfolder);
-    // return foundLib;
-    // }
-
-    return lib;
+    // and mark it as installed
+    String libName = folder.getName(); // XXX: lib.getName()?
+    ContributedLibrary foundLib = index.find(libName, lib.getVersion());
+    if (foundLib != null) {
+      foundLib.setInstalled(true);
+      foundLib.setInstalledFolder(folder);
+      foundLib.setReadOnly(readOnly);
+    }
   }
 
-  public static void main(String[] args) throws JsonParseException, IOException {
-    LibrariesIndexer indexer = new LibrariesIndexer(new File(
-        "/home/megabug/.arduino15"));
-    indexer.parseIndex();
-    LibraryList libs = indexer.scanLibraries(new File(
-        "/home/megabug/sketchbook/libraries"));
-    for (ContributedLibrary lib : libs) {
-      System.out.println(lib);
-    }
+  public LibrariesIndex getIndex() {
+    return index;
+  }
+
+  public LibraryList getInstalledLibraries() {
+    return installedLibraries;
+  }
+
+  public File getStagingFolder() {
+    return stagingFolder;
+  }
+
+  /**
+   * Set the sketchbook library folder. <br />
+   * New libraries will be installed here. <br />
+   * Libraries not found on this folder will be marked as read-only.
+   * 
+   * @param folder
+   */
+  public void setSketchbookLibrariesFolder(File folder) {
+    this.sketchbookLibrariesFolder = folder;
+  }
+
+  public File getSketchbookLibrariesFolder() {
+    return sketchbookLibrariesFolder;
+  }
+
+  public File getIndexFile() {
+    return indexFile;
   }
 }

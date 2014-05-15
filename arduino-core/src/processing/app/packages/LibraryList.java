@@ -30,7 +30,6 @@ package processing.app.packages;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 
 import processing.app.helpers.FileUtils;
@@ -54,15 +53,14 @@ public class LibraryList extends ArrayList<UserLibrary> {
   }
 
   public void addOrReplace(UserLibrary lib) {
-    UserLibrary l = getByName(lib.getName());
-    if (l != null)
-      remove(l);
+    remove(lib);
     add(lib);
   }
-
-  public void addOrReplaceAll(Collection<? extends UserLibrary> c) {
-    for (UserLibrary l : c)
-      addOrReplace(l);
+  
+  public void remove(UserLibrary lib) {
+    UserLibrary l = getByName(lib.getName());
+    if (l != null)
+      super.remove(l);
   }
 
   public void sort() {

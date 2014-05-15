@@ -28,6 +28,8 @@
  */
 package cc.arduino.libraries.contributions;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class LibrariesIndex {
@@ -48,5 +50,20 @@ public abstract class LibrariesIndex {
     for (ContributedLibrary l : getLibraries())
       res += l.toString();
     return res;
+  }
+
+  private List<String> categories = new ArrayList<String>();
+
+  public List<String> getCategories() {
+    return categories;
+  }
+
+  public void fillCategories() {
+    categories.clear();
+    for (ContributedLibrary lib : getLibraries()) {
+      if (!categories.contains(lib.getCategory()))
+        categories.add(lib.getCategory());
+    }
+    Collections.sort(categories);
   }
 }

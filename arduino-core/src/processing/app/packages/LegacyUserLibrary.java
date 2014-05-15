@@ -120,9 +120,7 @@ public class LegacyUserLibrary extends UserLibrary {
 
   @Override
   public String toString() {
-    String res = "LegacyLibrary:";
-    res += " (name=" + name + ")";
-    return res;
+    return "LegacyLibrary:" + name + "\n";
   }
 
   @Override
