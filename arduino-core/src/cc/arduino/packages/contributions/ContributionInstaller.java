@@ -28,40 +28,114 @@
  */
 package cc.arduino.packages.contributions;
 
+import static processing.app.I18n._;
+import static processing.app.I18n.format;
+
 import java.io.File;
 import java.net.URL;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import processing.app.helpers.FileUtils;
-
 import cc.arduino.utils.ArchiveExtractor;
 import cc.arduino.utils.FileHash;
+import cc.arduino.utils.network.FileDownloader;
 
 public class ContributionInstaller {
 
-  private File preferencesFolder;
+  /**
+   * Listener for installation progress.
+   */
+  public static interface Listener {
+    /**
+     * Receive the latest progress update.
+     * 
+     * @param progress
+     *          Actual progress in the range 0...100
+     * @param message
+     *          A verbose description message of the actual operation
+     */
+    void onProgress(double progress, String message);
+  }
+
+  private Listener listener = null;
+
   private File stagingFolder;
   private ContributionsIndexer indexer;
 
-  public ContributionInstaller(File _preferencesFolder,
-                               ContributionsIndexer contributionsIndexer) {
-    preferencesFolder = _preferencesFolder;
-    stagingFolder = new File(preferencesFolder, "staging");
+  private double progress;
+  private double progressStepsDelta;
+
+  public void setListener(Listener listener) {
+    this.listener = listener;
+  }
+
+  private void updateProgress(double progress, String message) {
+    if (listener != null)
+      listener.onProgress(progress, message);
+  }
+
+  public ContributionInstaller(ContributionsIndexer contributionsIndexer) {
+    stagingFolder = contributionsIndexer.getStagingFolder();
     indexer = contributionsIndexer;
   }
 
   public void install(ContributedPlatform platform) throws Exception {
-    // Download all files and dependencies
-    download(platform);
-    for (ContributedTool tool : platform.getResolvedTools()) {
-      download(tool.getDownloadableContribution());
+    if (platform.isInstalled())
+      throw new Exception("Platform is already installed!");
+
+    // Do not download already installed tools
+    List<ContributedTool> tools = new LinkedList<ContributedTool>(platform.getResolvedTools());
+    Iterator<ContributedTool> toolsIterator = tools.iterator();
+    while (toolsIterator.hasNext()) {
+      ContributedTool tool = toolsIterator.next();
+      DownloadableContribution downloadable = tool.getDownloadableContribution();
+      if (downloadable == null) {
+        throw new Exception(format(_("Tool {0} is not available for your operating system."), tool.getName()));
+      }
+      if (downloadable.isInstalled()) {
+        toolsIterator.remove();
+      }
+    }
+
+    // Calculate progress increases
+    progress = 0.0;
+    progressStepsDelta = 100.0 / (tools.size() + 1) / 2.0;
+
+    // Download all
+    try {
+      // Download platform
+      download(platform, _("Downloading boards definitions."));
+
+      // Download tools
+      int i = 1;
+      for (ContributedTool tool : tools) {
+        String msg = format(_("Downloading tools ({0}/{1})."), i, tools.size());
+        download(tool.getDownloadableContribution(), msg);
+        i++;
+      }
+    } catch (InterruptedException e) {
+      // Download interrupted... just exit
+      return;
     }
 
     ContributedPackage pack = platform.getParentPackage();
     File packageFolder = new File(indexer.getPackagesFolder(), pack.getName());
 
+    // TODO: Extract to temporary folders and move to the final destination only
+    // once everything is successfully unpacked. If the operation fails remove
+    // all the temporary folders and abort installation.
+
     // Unzip tools on the correct location
     File toolsFolder = new File(packageFolder, "tools");
+    int i = 1;
     for (ContributedTool tool : platform.getResolvedTools()) {
+      String msg = format(_("Installing tools ({0}/{1})..."), i, tools.size());
+      updateProgress(progress, msg);
+      i++;
       DownloadableContribution toolContrib = tool.getDownloadableContribution();
       File destFolder = new File(toolsFolder, tool.getName() + File.separator +
           tool.getVersion());
@@ -70,9 +144,11 @@ public class ContributionInstaller {
       ArchiveExtractor.extract(toolContrib.getDownloadedFile(), destFolder, 1);
       toolContrib.setInstalled(true);
       toolContrib.setInstalledFolder(destFolder);
+      progress += progressStepsDelta;
     }
 
-    // Unzip platform on the correct location
+    // Unpack platform on the correct location
+    updateProgress(progress, _("Installing boards..."));
     File platformFolder = new File(packageFolder, "hardware" + File.separator +
         platform.getArchitecture());
     File destFolder = new File(platformFolder, platform.getVersion());
@@ -80,29 +156,48 @@ public class ContributionInstaller {
     ArchiveExtractor.extract(platform.getDownloadedFile(), destFolder, 1);
     platform.setInstalled(true);
     platform.setInstalledFolder(destFolder);
+    progress += progressStepsDelta;
 
-    // TODO: Update index
+    updateProgress(100.0, _("Installation completed!"));
   }
 
-  public File download(DownloadableContribution contribution) throws Exception {
-    contribution.setDownloaded(false);
-
-    System.out.println("Downloading " + contribution.getUrl());
-
+  public File download(DownloadableContribution contribution,
+                       final String statusText) throws Exception {
     URL url = new URL(contribution.getUrl());
     String path = url.getPath();
     String fileName = path.substring(path.lastIndexOf('/') + 1);
-    File outputFile = new File(stagingFolder, fileName);
+    final File outputFile = new File(stagingFolder, fileName);
 
-    if (outputFile.isFile()) {
-      if (outputFile.length() != contribution.getSize()) {
-        // TODO: RESUME DOWNLOAD
-      }
-    } else {
-      // TODO: DOWNLOAD
+    // Ensure the existence of staging folder
+    stagingFolder.mkdirs();
+
+    // Need to download or resume downloading?
+    if (!outputFile.isFile() || (outputFile.length() < contribution.getSize())) {
+
+      // Use FileDownloader to retrieve the file
+      FileDownloader downloader = new FileDownloader(url, outputFile);
+      downloader.addObserver(new Observer() {
+        @Override
+        public void update(Observable o, Object arg) {
+          FileDownloader me = (FileDownloader) o;
+          String msg = "";
+          if (me.getDownloadSize() != null) {
+            long downloaded = me.getInitialSize() + me.getDownloaded() / 1000;
+            long total = me.getInitialSize() + me.getDownloadSize() / 1000;
+            msg = format(_("Downloaded {0}kb of {1}kb."), downloaded, total);
+          }
+          updateProgress((int) progress + progressStepsDelta *
+              me.getProgress() / 100.0, statusText + " " + msg);
+        }
+      });
+      downloader.download();
+      if (!downloader.isCompleted())
+        throw new Exception("Error dowloading " + url, downloader.getError());
     }
+    progress += progressStepsDelta;
 
     // Test checksum
+    updateProgress(progress, _("Verifying archive integrity..."));
     String checksum = contribution.getChecksum();
     String algo = checksum.split(":")[0];
     if (!FileHash.hash(outputFile, algo).equals(checksum))

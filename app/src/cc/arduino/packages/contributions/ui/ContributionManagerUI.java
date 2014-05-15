@@ -52,10 +52,12 @@ import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -72,13 +74,11 @@ import cc.arduino.packages.contributions.ContributedPlatform;
 import cc.arduino.packages.contributions.ContributionsIndex;
 
 @SuppressWarnings("serial")
-public class JContributionManagerDialog extends JDialog {
+public class ContributionManagerUI extends JDialog {
 
   private FilterField filterField;
-  private JScrollPane scrollPane;
-  private StatusPanel status;
 
-  private JContributionManagerDialogListener listener = null;
+  private ContributionManagerUIListener listener = null;
 
   private String category;
   private JLabel categoryLabel;
@@ -89,53 +89,59 @@ public class JContributionManagerDialog extends JDialog {
 
   private ContributionIndexTableModel contribModel = new ContributionIndexTableModel();
   private JTable contribTable;
+  private JProgressBar progressBar;
 
-  public JContributionManagerDialog(Frame parent) {
+  private Box progressBox;
+  private Box updateBox;
+
+  public ContributionManagerUI(Frame parent) {
     super(parent, "Boards Manager", Dialog.ModalityType.APPLICATION_MODAL);
     setResizable(true);
 
     Container pane = getContentPane();
     pane.setLayout(new BorderLayout());
 
-    categoryStrut1 = Box.createHorizontalStrut(5);
-    categoryStrut2 = Box.createHorizontalStrut(5);
-    categoryStrut3 = Box.createHorizontalStrut(5);
+    {
+      categoryStrut1 = Box.createHorizontalStrut(5);
+      categoryStrut2 = Box.createHorizontalStrut(5);
+      categoryStrut3 = Box.createHorizontalStrut(5);
 
-    categoryLabel = new JLabel(_("Category:"));
+      categoryLabel = new JLabel(_("Category:"));
 
-    categoryChooser = new JComboBox();
-    categoryChooser.setMaximumRowCount(20);
-    categoryChooser.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent arg0) {
-        notifyCategoryChange();
-      }
-    });
+      categoryChooser = new JComboBox();
+      categoryChooser.setMaximumRowCount(20);
+      categoryChooser.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+          notifyCategoryChange();
+        }
+      });
 
-    setCategories(new ArrayList<String>());
+      setCategories(new ArrayList<String>());
 
-    filterField = new FilterField();
+      filterField = new FilterField();
 
-    JPanel filterPanel = new JPanel();
-    filterPanel.setLayout(new BoxLayout(filterPanel, BoxLayout.X_AXIS));
-    pane.add(filterPanel, BorderLayout.NORTH);
-    filterPanel.add(categoryStrut1);
-    filterPanel.add(categoryLabel);
-    filterPanel.add(categoryStrut2);
-    filterPanel.add(categoryChooser);
-    filterPanel.add(categoryStrut3);
-    filterPanel.add(filterField);
-    filterPanel.setBorder(new EmptyBorder(7, 7, 7, 7));
+      JPanel panel = new JPanel();
+      panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+      panel.add(categoryStrut1);
+      panel.add(categoryLabel);
+      panel.add(categoryStrut2);
+      panel.add(categoryChooser);
+      panel.add(categoryStrut3);
+      panel.add(filterField);
+      panel.setBorder(new EmptyBorder(7, 7, 7, 7));
+      pane.add(panel, BorderLayout.NORTH);
+    }
 
     contribTable = new JTable(contribModel);
-    // contribTable.setTableHeader(null);
+    contribTable.setTableHeader(null);
+    // contribTable.getTableHeader().setEnabled(false);
     // contribTable.setRowSelectionAllowed(false);
     contribTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     contribTable.setColumnSelectionAllowed(false);
     contribTable.setDragEnabled(false);
     contribTable.setIntercellSpacing(new Dimension(0, 1));
     contribTable.setShowVerticalLines(false);
-    contribTable.getTableHeader().setEnabled(false);
     // contribTable.addMouseListener(new MouseAdapter() {
     // @Override
     // public void mousePressed(MouseEvent e) {
@@ -147,14 +153,15 @@ public class JContributionManagerDialog extends JDialog {
     // }
     // });
     TableColumnModel tcm = contribTable.getColumnModel();
-    TableColumn descriptionCol = tcm.getColumn(DESCRIPTION_COL);
-    TableColumn versionCol = tcm.getColumn(VERSION_COL);
-    TableColumn installedCol = tcm.getColumn(INSTALLED_COL);
-
-    descriptionCol.setCellRenderer(new ContributedPlatformTableCellRenderer());
-    descriptionCol.setResizable(true);
+    {
+      TableColumn descriptionCol = tcm.getColumn(DESCRIPTION_COL);
+      descriptionCol
+          .setCellRenderer(new ContributedPlatformTableCellRenderer());
+      descriptionCol.setResizable(true);
+    }
 
     {
+      TableColumn versionCol = tcm.getColumn(VERSION_COL);
       versionCol.setCellRenderer(new VersionSelectorTableCellRenderer());
       VersionSelectorTableCellEditor editor = new VersionSelectorTableCellEditor();
       editor.setListener(new VersionSelectorTableCellEditor.Listener() {
@@ -172,6 +179,7 @@ public class JContributionManagerDialog extends JDialog {
     }
 
     {
+      TableColumn installedCol = tcm.getColumn(INSTALLED_COL);
       installedCol.setCellRenderer(new VersionInstalledTableCellRenderer());
       VersionInstalledTableCellEditor editor = new VersionInstalledTableCellEditor();
       editor.setListener(new VersionInstalledTableCellEditor.Listener() {
@@ -189,26 +197,67 @@ public class JContributionManagerDialog extends JDialog {
       installedCol.setMaxWidth(70);
     }
 
-    scrollPane = new JScrollPane();
-    scrollPane.setPreferredSize(new Dimension(300, 300));
-    scrollPane.setViewportView(contribTable);
-    scrollPane
-        .setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-    scrollPane
-        .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-    pane.add(scrollPane, BorderLayout.CENTER);
+    {
+      JScrollPane s = new JScrollPane();
+      s.setPreferredSize(new Dimension(300, 300));
+      s.setViewportView(contribTable);
+      s.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+      s.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+      pane.add(s, BorderLayout.CENTER);
+    }
 
     pane.add(Box.createHorizontalStrut(10), BorderLayout.WEST);
     pane.add(Box.createHorizontalStrut(10), BorderLayout.EAST);
 
-    status = new StatusPanel();
-    status.setBorder(new EmptyBorder(7, 7, 7, 7));
-    pane.add(status, BorderLayout.SOUTH);
+    {
+      progressBar = new JProgressBar();
+      progressBar.setStringPainted(true);
+      progressBar.setString(" ");
+      progressBar.setVisible(true);
 
-    setMinimumSize(new Dimension(450, 400));
+      JButton cancelButton = new JButton(_("Cancel"));
+      cancelButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+          if (listener != null)
+            listener.onCancelPressed();
+        }
+      });
+
+      JButton updateButton = new JButton(_("Update list"));
+      updateButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+          if (listener != null)
+            listener.onUpdatePressed();
+        }
+      });
+
+      {
+        progressBox = Box.createHorizontalBox();
+        progressBox.add(progressBar);
+        progressBox.add(Box.createHorizontalStrut(5));
+        progressBox.add(cancelButton);
+
+        updateBox = Box.createHorizontalBox();
+        updateBox.add(Box.createHorizontalGlue());
+        updateBox.add(updateButton);
+
+        JPanel progressPanel = new JPanel();
+        progressPanel.setBorder(new EmptyBorder(7, 7, 7, 7));
+        progressPanel.setLayout(new BoxLayout(progressPanel, BoxLayout.Y_AXIS));
+        progressPanel.add(progressBox);
+        progressPanel.add(updateBox);
+        pane.add(progressPanel, BorderLayout.SOUTH);
+
+        setProgressVisible(false);
+      }
+    }
+
+    setMinimumSize(new Dimension(500, 400));
   }
 
-  public void setListener(JContributionManagerDialogListener listener) {
+  public void setListener(ContributionManagerUIListener listener) {
     this.listener = listener;
   }
 
@@ -315,4 +364,19 @@ public class JContributionManagerDialog extends JDialog {
     contribModel.updateIndex(index);
   }
 
+  public void setProgressVisible(boolean visible) {
+    progressBox.setVisible(visible);
+
+    filterField.setEnabled(!visible);
+    categoryChooser.setEnabled(!visible);
+    contribTable.setEnabled(!visible);
+    updateBox.setVisible(!visible);
+    updateBox.setEnabled(!visible);
+  }
+
+  public void setProgress(int progress, String text) {
+    progressBar.setValue(progress);
+    if (text != null)
+      progressBar.setString(text);
+  }
 }

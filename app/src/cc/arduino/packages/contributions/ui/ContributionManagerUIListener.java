@@ -30,12 +30,16 @@ package cc.arduino.packages.contributions.ui;
 
 import cc.arduino.packages.contributions.ContributedPlatform;
 
-public interface JContributionManagerDialogListener {
+public interface ContributionManagerUIListener {
   
   void onCategoryChange(String category);
 
   void onInstall(ContributedPlatform selected);
 
   void onRemove(ContributedPlatform selected);
+
+  void onCancelPressed();
+
+  void onUpdatePressed();
   
 }

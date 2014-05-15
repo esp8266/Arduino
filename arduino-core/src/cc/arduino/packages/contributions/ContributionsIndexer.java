@@ -50,11 +50,13 @@ public class ContributionsIndexer {
 
   private File preferencesFolder;
   private File packagesFolder;
+  private File stagingFolder;
   private ContributionsIndex index;
 
   public ContributionsIndexer(File _preferencesFolder) {
     preferencesFolder = _preferencesFolder;
     packagesFolder = new File(preferencesFolder, "packages");
+    stagingFolder = new File(preferencesFolder, "staging");
   }
 
   // public static void main(String args[]) throws Exception {
@@ -198,26 +200,6 @@ public class ContributionsIndexer {
     return res;
   }
 
-  public ContributionsIndex getIndex() {
-    return index;
-  }
-
-  public void install(ContributedPlatform platform) throws Exception {
-    ContributionInstaller installer = new ContributionInstaller(
-        preferencesFolder, this);
-    installer.install(platform);
-  }
-
-  public void remove(ContributedPlatform platform) {
-    ContributionInstaller installer = new ContributionInstaller(
-        preferencesFolder, this);
-    installer.remove(platform);
-  }
-
-  public File getPackagesFolder() {
-    return packagesFolder;
-  }
-
   /**
    * Check if a ContributedTool is currently in use by an installed platform
    * 
@@ -237,4 +219,21 @@ public class ContributionsIndexer {
     }
     return false;
   }
+
+  public ContributionsIndex getIndex() {
+    return index;
+  }
+
+  public File getPreferencesFolder() {
+    return preferencesFolder;
+  }
+
+  public File getPackagesFolder() {
+    return packagesFolder;
+  }
+
+  public File getStagingFolder() {
+    return stagingFolder;
+  }
+
 }
