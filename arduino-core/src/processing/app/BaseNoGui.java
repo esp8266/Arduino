@@ -620,6 +620,17 @@ public class BaseNoGui {
     loadContributedHardware(indexer);
 
     librariesIndexer = new LibrariesIndexer(BaseNoGui.getSettingsFolder());
+    File librariesIndexFile = librariesIndexer.getIndexFile();
+    if (!librariesIndexFile.isFile()) {
+      try {
+        // Otherwise create an empty packages index
+        FileOutputStream out = new FileOutputStream(librariesIndexFile);
+        out.write("{ \"libraries\" : [ ] }".getBytes());
+        out.close();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
     librariesIndexer.parseIndex();
   }
 
