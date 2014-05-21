@@ -23,6 +23,7 @@
 
 class HttpClient : public Process {
   public:
+    HttpClient();
 
     unsigned int get(String &url);
     unsigned int get(const char * url);
@@ -30,6 +31,11 @@ class HttpClient : public Process {
     void getAsynchronously(const char * url);
     boolean ready();
     unsigned int getResult();
+    void noCheckSSL();
+    void checkSSL();
+
+  private:
+    boolean insecure;
 
 };
 

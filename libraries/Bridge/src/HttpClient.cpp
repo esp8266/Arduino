@@ -18,26 +18,43 @@
 
 #include "HttpClient.h"
 
+HttpClient::HttpClient() :
+  insecure(false) {
+  // Empty
+}
+
 unsigned int HttpClient::get(String &url) {
   begin("curl");
+  if (insecure) {
+    addParameter("-k");
+  }
   addParameter(url);
   return run();
 }
 
 unsigned int HttpClient::get(const char *url) {
   begin("curl");
+  if (insecure) {
+    addParameter("-k");
+  }
   addParameter(url);
   return run();
 }
 
 void HttpClient::getAsynchronously(String &url) {
   begin("curl");
+  if (insecure) {
+    addParameter("-k");
+  }
   addParameter(url);
   runAsynchronously();
 }
 
 void HttpClient::getAsynchronously(const char *url) {
   begin("curl");
+  if (insecure) {
+    addParameter("-k");
+  }
   addParameter(url);
   runAsynchronously();
 }
@@ -50,4 +67,11 @@ unsigned int HttpClient::getResult() {
   return exitValue();
 }
 
+void HttpClient::noCheckSSL() {
+  insecure = true;
+}
+
+void HttpClient::checkSSL() {
+  insecure = false;
+}
 
