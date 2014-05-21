@@ -20,24 +20,28 @@
 
 unsigned int HttpClient::get(String &url) {
   begin("curl");
+  addParameter("-k");
   addParameter(url);
   return run();
 }
 
 unsigned int HttpClient::get(const char *url) {
   begin("curl");
+  addParameter("-k");
   addParameter(url);
   return run();
 }
 
 void HttpClient::getAsynchronously(String &url) {
   begin("curl");
+  addParameter("-k");
   addParameter(url);
   runAsynchronously();
 }
 
 void HttpClient::getAsynchronously(const char *url) {
   begin("curl");
+  addParameter("-k");
   addParameter(url);
   runAsynchronously();
 }
