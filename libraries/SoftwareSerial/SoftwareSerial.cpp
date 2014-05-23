@@ -355,7 +355,7 @@ SoftwareSerial::~SoftwareSerial()
 void SoftwareSerial::setTX(uint8_t tx)
 {
   pinMode(tx, OUTPUT);
-  digitalWrite(tx, HIGH);
+  digitalWrite(tx, _inverse_logic ? LOW : HIGH);
   _transmitBitMask = digitalPinToBitMask(tx);
   uint8_t port = digitalPinToPort(tx);
   _transmitPortRegister = portOutputRegister(port);
