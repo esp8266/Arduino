@@ -44,7 +44,7 @@ void loop() {
   switchstate = digitalRead(2);
 
   // if the button is not pressed
-  // blink the red LEDs
+  // turn on the green LED and off the red LEDs  
   if (switchstate == LOW) {
     digitalWrite(3, HIGH); // turn the green LED on pin 3 on
     digitalWrite(4, LOW);  // turn the red LED on pin 4 off
@@ -52,7 +52,7 @@ void loop() {
   }
   // this else is part of the above if() statement.
   // if the switch is not LOW (the button is pressed)
-  // the code below will run
+  // turn off the green LED and blink alternatively the red LEDs 
   else {
     digitalWrite(3, LOW);  // turn the green LED on pin 3 off
     digitalWrite(4, LOW);  // turn the red LED on pin 4 off
