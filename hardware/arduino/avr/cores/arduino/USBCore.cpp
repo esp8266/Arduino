@@ -289,9 +289,12 @@ int USB_Send(u8 ep, const void* d, int len)
 
 		if (n > len)
 			n = len;
-		len -= n;
 		{
 			LockEP lock(ep);
+			// Frame may have been released by the SOF interrupt handler
+			if (!ReadWriteAllowed())
+				continue;
+			len -= n;
 			if (ep & TRANSFER_ZERO)
 			{
 				while (n--)
@@ -627,8 +630,6 @@ ISR(USB_GEN_vect)
 	{
 #ifdef CDC_ENABLED
 		USB_Flush(CDC_TX);				// Send a tx frame if found
-		if (USB_Available(CDC_RX))	// Handle received bytes (if any)
-			Serial.accept();
 #endif
 		
 		// check whether the one-shot period has elapsed.  if so, turn off the LED
