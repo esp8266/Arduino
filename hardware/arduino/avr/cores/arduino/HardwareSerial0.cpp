@@ -43,7 +43,7 @@
 #elif defined(USART_RXC_vect)
   ISR(USART_RXC_vect) // ATmega8
 #else
-  #error "Don't know what the Data Received vector is called for the first UART"
+  #error "Don't know what the Data Received vector is called for Serial"
 #endif
   {
     Serial._rx_complete_irq();
@@ -58,7 +58,7 @@ ISR(USART0_UDRE_vect)
 #elif defined(USART_UDRE_vect)
 ISR(USART_UDRE_vect)
 #else
-  #error "Don't know what the Data Register Empty vector is called for the first UART"
+  #error "Don't know what the Data Register Empty vector is called for Serial"
 #endif
 {
   Serial._tx_udr_empty_irq();
