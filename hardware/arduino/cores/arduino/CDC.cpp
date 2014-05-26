@@ -129,7 +129,7 @@ void Serial_::end(void)
 int Serial_::available(void)
 {
 	if (peek_buffer >= 0) {
-		return 1;
+		return 1 + USB_Available(CDC_RX);
 	}
 	return USB_Available(CDC_RX);
 }
