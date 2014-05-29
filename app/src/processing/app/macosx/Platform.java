@@ -52,6 +52,11 @@ public class Platform extends processing.app.Platform {
     UIManager.put("Component.visualMargin", new Insets(1, 1, 1, 1));
   }
 
+  public Platform() {
+    // For more information see:
+    // http://mail.openjdk.java.net/pipermail/macosx-port-dev/2013-January/005261.html
+    Toolkit.getDefaultToolkit();
+  }
 
   public void init(Base base) {
     System.setProperty("apple.laf.useScreenMenuBar", "true");
