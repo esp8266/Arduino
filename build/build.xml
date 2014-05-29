@@ -155,7 +155,7 @@
         <tokenfilter>
           <linetokenizer includeDelims="false" />
           <!-- grab the thing from the first line that's 4 digits -->
-          <containsregex pattern="ARDUINO (.*) " />
+          <containsregex pattern="ARDUINO ([^ ]*)" />
           <replaceregex pattern="ARDUINO ([^ ]*).*" replace="\1" />
         </tokenfilter>
         <tokenfilter>
