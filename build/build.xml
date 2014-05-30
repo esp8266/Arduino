@@ -22,7 +22,7 @@
   <condition property="staging_folder" value="linux"><equals arg1="${platform}" arg2="linux32" /></condition>
   <condition property="staging_folder" value="linux"><equals arg1="${platform}" arg2="linux64" /></condition>
 
-  <condition property="staging_hardware_folder" value="Arduino.app/Contents/Resources/Java/hardware"><equals arg1="${platform}" arg2="macosx" /></condition>
+  <condition property="staging_hardware_folder" value="Arduino.app/Contents/Java/hardware"><equals arg1="${platform}" arg2="macosx" /></condition>
   <condition property="staging_hardware_folder" value="hardware"><equals arg1="${platform}" arg2="windows" /></condition>
   <condition property="staging_hardware_folder" value="hardware"><equals arg1="${platform}" arg2="linux32" /></condition>
   <condition property="staging_hardware_folder" value="hardware"><equals arg1="${platform}" arg2="linux64" /></condition>
@@ -260,17 +260,17 @@
       <arg value="-q" />
       <arg value="-n" />
       <arg value="-d" />
-      <arg value="macosx/work/Arduino.app/Contents/Java/hardware" />
+      <arg value="macosx/work/${staging_hardware_folder}" />
       <arg value="macosx/dist/tools-universal.zip" />
     </exec>
 
-    <copy todir="macosx/work/Arduino.app/Contents/Java/hardware/tools/">
+    <copy todir="macosx/work/${staging_hardware_folder}/tools/">
       <fileset file="macosx/dist/bossac" />
     </copy>
 
-    <chmod file="macosx/work/Arduino.app/Contents/Java/hardware/tools/bossac" perm="+x" />
+    <chmod file="macosx/work/${staging_hardware_folder}/tools/bossac" perm="+x" />
 
-    <copy todir="macosx/work/Arduino.app/Contents/Java/hardware/tools/avr/avr/include/avr">
+    <copy todir="macosx/work/${staging_hardware_folder}/tools/avr/avr/include/avr">
       <fileset file="macosx/dist/eeprom.h" />
     </copy>
 
@@ -285,10 +285,10 @@
     </antcall>
 
     <delete includeEmptyDirs="true" quiet="true">
-      <fileset dir="macosx/work/Arduino.app/Contents/Java/hardware/tools" includes="**/3.4.6/**/*"/>
-      <fileset dir="macosx/work/Arduino.app/Contents/Java/hardware/tools" includes="**/3.4.6"/>
-      <fileset dir="macosx/work/Arduino.app/Contents/Java/hardware/tools" includes="**/man/**/*"/>
-      <fileset dir="macosx/work/Arduino.app/Contents/Java/hardware/tools" includes="**/man"/>
+      <fileset dir="macosx/work/${staging_hardware_folder}/tools" includes="**/3.4.6/**/*"/>
+      <fileset dir="macosx/work/${staging_hardware_folder}/tools" includes="**/3.4.6"/>
+      <fileset dir="macosx/work/${staging_hardware_folder}/tools" includes="**/man/**/*"/>
+      <fileset dir="macosx/work/${staging_hardware_folder}/tools" includes="**/man"/>
     </delete>
 
     <get src="http://downloads.arduino.cc/libastylej-2.03.zip" dest="macosx" usetimestamp="true" skipexisting="true"/>
@@ -304,7 +304,9 @@
   </target>
 
   <target name="macosx-debug" depends="macosx-build" description="Run Mac OS X version">
-    <exec executable="macosx/work/Arduino.app/Contents/MacOS/JavaApplicationStub" spawn="false"/>
+    <exec executable="open" dir="macosx/work" spawn="false">
+      <arg value="Arduino.app"/>
+    </exec>
   </target>
 
   <!-- - - - - - - - - - - - - - - - -->
@@ -366,11 +368,11 @@
     <!-- The ant copy command does not preserve permissions. -->
     <chmod file="macosx/work/Arduino.app/Contents/MacOS/JavaApplicationStub" perm="+x" />
     <chmod perm="+x">
-      <fileset dir="macosx/work/Arduino.app/Contents/Java/hardware/tools/avr/bin" includes="**/*" />
-      <fileset dir="macosx/work/Arduino.app/Contents/Java/hardware/tools/avr/avr/bin" includes="**/*" />
-      <fileset dir="macosx/work/Arduino.app/Contents/Java/hardware/tools/avr/avr-3/bin" includes="**/*" />
-      <fileset dir="macosx/work/Arduino.app/Contents/Java/hardware/tools/avr/avr-4/bin" includes="**/*" />
-      <fileset dir="macosx/work/Arduino.app/Contents/Java/hardware/tools/avr/libexec/gcc/avr/4.3.2/" includes="**/cc1*" />
+      <fileset dir="macosx/work/${staging_hardware_folder}/tools/avr/bin" includes="**/*" />
+      <fileset dir="macosx/work/${staging_hardware_folder}/tools/avr/avr/bin" includes="**/*" />
+      <fileset dir="macosx/work/${staging_hardware_folder}/tools/avr/avr-3/bin" includes="**/*" />
+      <fileset dir="macosx/work/${staging_hardware_folder}/tools/avr/avr-4/bin" includes="**/*" />
+      <fileset dir="macosx/work/${staging_hardware_folder}/tools/avr/libexec/gcc/avr/4.3.2/" includes="**/cc1*" />
     </chmod>
 
     <exec executable="zip" dir="macosx/work">
