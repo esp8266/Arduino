@@ -43,14 +43,14 @@ void setup() {
 boolean commandMode = false;
 
 void loop() {
-  // copy from virtual serial line to uart and vice versa
-  if (Serial.available()) {           // got anything from USB-Serial?
-    char c = (char)Serial.read();     // read from USB-serial
+  // copy from USB-CDC to UART
+  int c = Serial.read();              // read from USB-CDC
+  if (c != -1) {                      // got anything?
     if (commandMode == false) {       // if we aren't in command mode...
       if (c == '~') {                 //    Tilde '~' key pressed?
         commandMode = true;           //       enter in command mode
       } else {
-        Serial1.write(c);             //    otherwise write char to Linino
+        Serial1.write(c);             //    otherwise write char to UART
       }
     } else {                          // if we are in command mode...
       if (c == '0') {                 //     '0' key pressed?
@@ -65,18 +65,21 @@ void loop() {
       } else if (c == '3') {          //     '3' key pressed?
         Serial1.begin(500000);        //        set speed to 500000
         Serial.println("Speed set to 500000");
-      } else if (c == '~') {
+      } else if (c == '~') {          //     '~` key pressed?
+                                      //        send "bridge shutdown" command
         Serial1.write((uint8_t *)"\xff\0\0\x05XXXXX\x7f\xf9", 11);
         Serial.println("Sending bridge's shutdown command");
       } else {                        //     any other key pressed?
-        Serial1.write('~');           //        write '~' to Linino
-        Serial1.write(c);             //        write char to Linino
+        Serial1.write('~');           //        write '~' to UART
+        Serial1.write(c);             //        write char to UART
       }
       commandMode = false;            //     in all cases exit from command mode
     }
   }
-  if (Serial1.available()) {          // got anything from Linino?
-    char c = (char)Serial1.read();    // read from Linino
-    Serial.write(c);                  // write to USB-serial
+
+  // copy from UART to USB-CDC
+  c = Serial1.read();                 // read from UART
+  if (c != -1) {                      // got anything?
+    Serial.write(c);                  //    write to USB-CDC
   }
 }
