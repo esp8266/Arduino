@@ -1,7 +1,7 @@
 /*
 ###############################################################################
 #
-# Temboo Arduino Yun library
+# Temboo Arduino Yún library
 #
 # Copyright 2013, Temboo Inc.
 # 

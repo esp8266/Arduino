@@ -13,7 +13,7 @@
  a final key combination (CTRL-U).
 
  Circuit:
- * Arduino Leonardo, Micro, Due, LilyPad USB, or Yun 
+ * Arduino Leonardo, Micro, Due, LilyPad USB, or Yún
  * wire to connect D2 to ground.
 
  created 5 Mar 2012

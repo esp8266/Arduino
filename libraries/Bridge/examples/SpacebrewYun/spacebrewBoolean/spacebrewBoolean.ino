@@ -7,11 +7,11 @@
  is sent. The sketch also accepts analog range messages from 
  other Spacebrew apps.
 
- Make sure that your Yun is connected to the internet for this example 
+ Make sure that your Yún is connected to the internet for this example
  to function properly.
  
  The circuit:
- - Button connected to Yun, using the Arduino's internal pullup resistor.
+ - Button connected to Yún, using the Arduino's internal pullup resistor.
  
  created 2013
  by Julio Terra

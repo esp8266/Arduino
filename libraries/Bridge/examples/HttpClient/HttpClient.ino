@@ -1,5 +1,5 @@
 /*
-  Yun HTTP Client
+  Yún HTTP Client
 
  This example for the Arduino Yún shows how create a basic
  HTTP client that connects to the internet and downloads

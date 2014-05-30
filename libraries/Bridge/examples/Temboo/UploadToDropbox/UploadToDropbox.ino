@@ -1,7 +1,7 @@
 /*
   UploadToDropbox
   
-  Demonstrates uploading a file to a Dropbox account using Temboo from an Arduino Yun.
+  Demonstrates uploading a file to a Dropbox account using Temboo from an Arduino Yún.
   
   Check out the latest Arduino & Temboo examples and support docs at http://www.temboo.com/arduino
 
@@ -21,10 +21,10 @@
   https://www.temboo.com/library/Library/Dropbox/OAuth/ to run the Initialize and Finalize
   OAuth Choreos. These Choreos complete the OAuth handshake and retrieve your Dropbox OAuth access tokens.
 
-  This example assumes basic familiarity with Arduino sketches, and that your Yun is connected
+  This example assumes basic familiarity with Arduino sketches, and that your Yún is connected
   to the Internet.
 
-  Looking for another API to use with your Arduino Yun? We've got over 100 in our Library!
+  Looking for another API to use with your Arduino Yún? We've got over 100 in our Library!
   
   This example code is in the public domain.
 */

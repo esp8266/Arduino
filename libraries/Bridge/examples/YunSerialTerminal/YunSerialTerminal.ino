@@ -1,14 +1,13 @@
 /*
-  Arduino Yun USB-to-Serial
+  Arduino Yún USB-to-Serial
 
- Allows you to use the Yun's 32U4 processor as a
- serial terminal for the linino processor.
+ Allows you to use the Yún's 32U4 processor as a
+ serial terminal for the Linux side on the Yún.
 
- Upload this to an Arduino Yun via serial (not WiFi)
- then open the serial monitor at 115200 to see the boot process
- of the linino processor. You can also use the serial monitor
- as a basic command line interface for the linino processor using
- this sketch.
+ Upload this to an Arduino Yún via serial (not WiFi) then open
+ the serial monitor at 115200 to see the boot process of Linux.
+ You can also use the serial monitor as a basic command line
+ interface for Linux using this sketch.
 
  From the serial monitor the following commands can be issued:
 
@@ -20,7 +19,7 @@
                         obtain the console.
 
  The circuit:
- * Arduino Yun
+ * Arduino Yún
 
  created March 2013
  by Massimo Banzi
@@ -33,11 +32,11 @@
  */
 
 
-long lininoBaud = 250000;
+long linuxBaud = 250000;
 
 void setup() {
   Serial.begin(115200);      // open serial connection via USB-Serial
-  Serial1.begin(lininoBaud); // open serial connection to Linino
+  Serial1.begin(linuxBaud);  // open serial connection to Linux
 }
 
 boolean commandMode = false;

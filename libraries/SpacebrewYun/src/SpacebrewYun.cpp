@@ -299,7 +299,7 @@ void SpacebrewYun::monitor() {
 		}
 	}	
 
-	// check if received confirmation that linino received messages 
+	// check if received confirmation that Linux received messages
 	if (publishers != NULL && _connected) {
 		struct Publisher *curr = publishers;
 		while((curr != NULL)){
@@ -421,7 +421,7 @@ void SpacebrewYun::send(const String& name, const String& value){
 
 
 /**
- * method that gets the pid of all spacebrew.py instances running on the linino.
+ * method that gets the pid of all spacebrew.py instances running on Linux.
  */
 void SpacebrewYun::getPids() {
 
@@ -462,7 +462,7 @@ void SpacebrewYun::getPids() {
 
 /**
  * method that kills all of the spacebrew.py instances that are running 
- * on the linino.
+ * on Linux.
  */
 void SpacebrewYun::killPids() {
 	getPids();

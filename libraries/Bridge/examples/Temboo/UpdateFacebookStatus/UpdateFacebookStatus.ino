@@ -1,7 +1,7 @@
 /*
   UpdateFacebookStatus
 
-  Demonstrates sending a Facebook status update using Temboo from an Arduino Yun.
+  Demonstrates sending a Facebook status update using Temboo from an Arduino Yún.
 
   Check out the latest Arduino & Temboo examples and support docs at http://www.temboo.com/arduino
   
@@ -15,10 +15,10 @@
   to use our OAuth Wizard (or OAuth Choreos) to obtain a Facebook access token.
   Substitute your access token for the placeholder value of FACEBOOK_ACCESS_TOKEN below.
 
-  This example assumes basic familiarity with Arduino sketches, and that your Yun 
+  This example assumes basic familiarity with Arduino sketches, and that your Yún
   is connected to the Internet.
   
-  Want to use another social API with your Arduino Yun? We've got Twitter, Google+, 
+  Want to use another social API with your Arduino Yún? We've got Twitter, Google+,
   Instagram, Tumblr and more in our Library!
 
   This example code is in the public domain. 

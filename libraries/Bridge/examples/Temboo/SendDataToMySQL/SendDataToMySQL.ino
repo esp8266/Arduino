@@ -2,8 +2,8 @@
   SendDataToMySQL
 
   Demonstrates storing and reading values in a MySQL database using
-  the Temboo Arduino Yun SDK. This example will periodically
-  update a MySQL instance with dummy sensor values from the Yun, and
+  the Temboo Arduino Yún SDK. This example will periodically
+  update a MySQL instance with dummy sensor values from the Yún, and
   then read those values back from the database.
 
   Check out the latest Arduino & Temboo examples and support docs at http://www.temboo.com/arduino
@@ -68,10 +68,10 @@
   database if it doesn't already exist. The table contains two columns: an unsigned INT 
   column named "cpu_time" and an INT column named "sensor_value".
 
-  This example assumes basic familiarity with Arduino sketches, and that your Yun is connected
+  This example assumes basic familiarity with Arduino sketches, and that your Yún is connected
   to the Internet.
 
-  Looking for another API to use with your Arduino Yun? We've got over 100 in our Library!
+  Looking for another API to use with your Arduino Yún? We've got over 100 in our Library!
 
   This example code is in the public domain.
 
@@ -167,9 +167,9 @@ unsigned int createTable() {
   Serial.print("Creating table '" + DATABASE_TABLE_NAME + "' (if needed)...");
 
   // We need a table with columns to contain the cpu time and the sensor value.
-  // cpu time is an 'unsigned long' which is 4 bytes on the Yun, 
+  // cpu time is an 'unsigned long' which is 4 bytes on the Yún,
   // so an INT UNSIGNED in MySQL will hold any possible value.
-  // Our sensor values are 'int' values on the Yun, 
+  // Our sensor values are 'int' values on the Yún,
   // so an INT in MySQL will hold all possible values.
 
   // Create a String containing the SQL statement to create the table.

@@ -2,9 +2,9 @@
   ControlBySMS
 
   Demonstrates using an SMS message to a Twilio account to turn an LED
-  on the Yun board on and off using the Temboo Arduino Yun SDK.
+  on the Yún board on and off using the Temboo Arduino Yún SDK.
   Sending a SMS with the text "LED ON" to your Twilio phone number
-  will turn on the LED on the Yun.  Sending "LED OFF" will turn it off.
+  will turn on the LED on the Yún.  Sending "LED OFF" will turn it off.
 
   Check out the latest Arduino & Temboo examples and support docs at http://www.temboo.com/arduino
 
@@ -44,7 +44,7 @@
 
   Your account will now receive SMS messages, but won't send any responses.
 
-  This example assumes basic familiarity with Arduino sketches, and that your Yun is connected
+  This example assumes basic familiarity with Arduino sketches, and that your Yún is connected
   to the Internet.
 
   Looking for another API? We've got over 100 in our Library!
@@ -85,7 +85,7 @@ unsigned long lastSMSCheckTime = -SMS_CHECK_PERIOD;
 // (we only need to process newer messages)
 String lastSid;
 
-// we'll be turning the LED built in to the Yun on and off 
+// we'll be turning the LED built in to the Yún on and off
 // to simulate controlling some device.  That LED is on pin 13.
 int LED_PIN = 13;
 
@@ -106,7 +106,7 @@ void setup() {
   // start with the LED off
   digitalWrite(LED_PIN, LOW);
 
-  // initialize the connection to the Linino processor.
+  // initialize the connection to Linux.
   Bridge.begin();
 
   // Twilio will report old SMS messages.  We want to 
@@ -183,7 +183,7 @@ void checkForMessages(bool ignoreCommands) {
   // this account receives lots of messages in quick succession, 
   // (more than 3 per minute in this case), we might miss some control
   // messages.  But if we request too many messages, we might run out of 
-  // memory on the Arduino side of the Yun.
+  // memory on the Arduino side of the Yún.
   ListMessagesChoreo.addInput("PageSize", "3");
 
   // We want the response in XML format to process with our 

@@ -1,7 +1,7 @@
 /*
   ToxicFacilitiesSearch
   
-  Demonstrates making a request to the Envirofacts API using Temboo from an Arduino Yun.
+  Demonstrates making a request to the Envirofacts API using Temboo from an Arduino Yún.
   This example retrieves the names and addresses of EPA-regulated facilities in the 
   Toxins Release Inventory (TRI) database within a given zip code.
   
@@ -11,10 +11,10 @@
   If you don't already have one, you can register for a free Temboo account at 
   http://www.temboo.com
   
-  This example assumes basic familiarity with Arduino sketches, and that your Yun is connected
+  This example assumes basic familiarity with Arduino sketches, and that your Yún is connected
   to the Internet.
 
-  Looking for another API to use with your Arduino Yun? We've got over 100 in our Library!
+  Looking for another API to use with your Arduino Yún? We've got over 100 in our Library!
   
   This example code is in the public domain.
 */

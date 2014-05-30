@@ -1,7 +1,7 @@
 /*
   SendAnEmail
 
-  Demonstrates sending an email via a Google Gmail account using Temboo from an Arduino Yun.
+  Demonstrates sending an email via a Google Gmail account using Temboo from an Arduino Yún.
 
   Check out the latest Arduino & Temboo examples and support docs at http://www.temboo.com/arduino
 
@@ -13,10 +13,10 @@
   Google Gmail account. The sketch needs the username and password you use 
   to log into your Gmail account - substitute the placeholders below for these values.
 
-  This example assumes basic familiarity with Arduino sketches, and that your Yun is connected
+  This example assumes basic familiarity with Arduino sketches, and that your Yún is connected
   to the Internet.
   
-  Looking for another API to use with your Arduino Yun? We've got over 100 in our Library!
+  Looking for another API to use with your Arduino Yún? We've got over 100 in our Library!
 
   This example code is in the public domain.
 */

@@ -1,9 +1,8 @@
 /*
   Time Check
 
- Gets the time from the linino processor via Bridge
- then parses out hours, minutes and seconds for the Arduino
- using an Arduino Yún.
+ Gets the time from Linux via Bridge then parses out hours,
+ minutes and seconds for the Arduino using an Arduino Yún.
 
  created  27 May 2013
  modified 21 June 2013

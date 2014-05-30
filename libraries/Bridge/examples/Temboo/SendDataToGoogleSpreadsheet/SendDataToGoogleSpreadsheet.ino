@@ -1,7 +1,7 @@
 /*
   SendDataToGoogleSpreadsheet
 
-  Demonstrates appending a row of data to a Google spreadsheet using Temboo from an Arduino Yun.
+  Demonstrates appending a row of data to a Google spreadsheet using Temboo from an Arduino Yún.
 
   Check out the latest Arduino & Temboo examples and support docs at http://www.temboo.com/arduino
 
@@ -13,7 +13,7 @@
   Google account: substitute the placeholders below for your Google account values.
 
   This example assumes basic familiarity with Arduino sketches, and that your 
-  Yun is connected to the Internet.
+  Yún is connected to the Internet.
 
   The columns in your spreadsheet must have labels for the Choreo to
   work properly. It doesn't matter what the column labels actually are,
@@ -29,7 +29,7 @@
   NOTE that the first time you run this sketch, you may receive a warning from
   Google, prompting you to authorize access from a 3rd party system.
   
-  Looking for another API to use with your Arduino Yun? We've got over 100 in our Library!
+  Looking for another API to use with your Arduino Yún? We've got over 100 in our Library!
 
   This example code is in the public domain.
 

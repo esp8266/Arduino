@@ -7,11 +7,11 @@
  message is sent. The sketch also accepts analog range messages from 
  other Spacebrew apps.
 
- Make sure that your Yun is connected to the internet for this example 
+ Make sure that your Yún is connected to the internet for this example
  to function properly.
  
  The circuit:
- - Potentiometer connected to Yun. Middle pin connected to analog pin A0, 
+ - Potentiometer connected to Yún. Middle pin connected to analog pin A0,
    other pins connected to 5v and GND pins.
  
  created 2013

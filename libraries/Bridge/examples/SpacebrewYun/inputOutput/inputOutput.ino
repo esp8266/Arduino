@@ -5,7 +5,7 @@
  spacebrew data types, and a custom data type. Every time data is 
  received it is output to the Serial monitor.
 
- Make sure that your Yun is connected to the internet for this example 
+ Make sure that your Yún is connected to the internet for this example
  to function properly.
  
  The circuit:
