@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2013 Arduino LLC. All right reserved.
+  Copyright (c) 2013-2014 Arduino LLC. All right reserved.
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -28,6 +28,7 @@ unsigned int HttpClient::get(String &url) {
   if (insecure) {
     addParameter("-k");
   }
+  addHeader();
   addParameter(url);
   return run();
 }
@@ -37,6 +38,7 @@ unsigned int HttpClient::get(const char *url) {
   if (insecure) {
     addParameter("-k");
   }
+  addHeader();
   addParameter(url);
   return run();
 }
@@ -46,6 +48,7 @@ void HttpClient::getAsynchronously(String &url) {
   if (insecure) {
     addParameter("-k");
   }
+  addHeader();
   addParameter(url);
   runAsynchronously();
 }
@@ -55,6 +58,43 @@ void HttpClient::getAsynchronously(const char *url) {
   if (insecure) {
     addParameter("-k");
   }
+  addHeader();
+  addParameter(url);
+  runAsynchronously();
+}
+
+unsigned int HttpClient::post(String &url, String &data) {
+    return post(url.c_str(), data.c_str());
+}
+
+unsigned int HttpClient::post(const char *url, const char *data) {
+  begin("curl");
+  if (insecure) {
+    addParameter("-k");
+  }
+  addParameter("--request");
+  addParameter("POST");
+  addParameter("--data");
+  addParameter(data);
+  addHeader();
+  addParameter(url);
+  return run();
+}
+
+void HttpClient::postAsynchronously(String &url, String &data) {
+  postAsynchronously(url.c_str(), data.c_str());
+}
+
+void HttpClient::postAsynchronously(const char *url, const char *data) {
+  begin("curl");
+  if (insecure) {
+    addParameter("-k");
+  }
+  addParameter("--request");
+  addParameter("POST");
+  addParameter("--data");
+  addParameter(data);
+  addHeader();
   addParameter(url);
   runAsynchronously();
 }
@@ -73,5 +113,20 @@ void HttpClient::noCheckSSL() {
 
 void HttpClient::checkSSL() {
   insecure = false;
+}
+
+void HttpClient::setHeader(String &header) {
+  this->header = header;
+}
+
+void HttpClient::setHeader(const char * header) {
+  this->header = String(header);
+}
+
+void HttpClient::addHeader() {
+  if (header.length() > 0) {
+    addParameter("--header");
+    addParameter(header);
+  }
 }
 
