@@ -121,6 +121,8 @@ public class SerialUploader extends Uploader {
       String pattern = prefs.getOrExcept("upload.pattern");
       String[] cmd = StringReplacer.formatAndSplit(pattern, prefs, true);
       uploadResult = executeUploadCommand(cmd);
+    } catch (RunnerException e) {
+      throw e;
     } catch (Exception e) {
       throw new RunnerException(e);
     }
@@ -228,6 +230,8 @@ public class SerialUploader extends Uploader {
       String pattern = prefs.getOrExcept("program.pattern");
       String[] cmd = StringReplacer.formatAndSplit(pattern, prefs, true);
       return executeUploadCommand(cmd);
+    } catch (RunnerException e) {
+      throw e;
     } catch (Exception e) {
       throw new RunnerException(e);
     }
@@ -287,6 +291,8 @@ public class SerialUploader extends Uploader {
       pattern = prefs.getOrExcept("bootloader.pattern");
       cmd = StringReplacer.formatAndSplit(pattern, prefs, true);
       return executeUploadCommand(cmd);
+    } catch (RunnerException e) {
+      throw e;
     } catch (Exception e) {
       throw new RunnerException(e);
     }
