@@ -36,7 +36,7 @@ struct ring_buffer;
 class Serial_ : public Stream
 {
 private:
-	int peek_buffer;
+	int peek_buffer = -1;
 public:
 	void begin(unsigned long);
 	void begin(unsigned long, uint8_t);
