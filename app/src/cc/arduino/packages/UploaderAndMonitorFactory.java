@@ -40,7 +40,7 @@ import processing.app.debug.TargetBoard;
 public class UploaderAndMonitorFactory {
 
   public Uploader newUploader(TargetBoard board, BoardPort port) {
-    if ("true".equals(board.getPreferences().get("upload.via_ssh")) && "network".equals(port.getProtocol())) {
+    if ("true".equals(board.getPreferences().get("upload.via_ssh")) && port != null && "network".equals(port.getProtocol())) {
       return new SSHUploader(port);
     }
 
