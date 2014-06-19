@@ -28,8 +28,9 @@ extern USBDevice_ USBDevice;
 class Serial_ : public Stream
 {
 private:
-	int peek_buffer = -1;
+	int peek_buffer;
 public:
+	Serial_() { peek_buffer = -1; };
 	void begin(unsigned long);
 	void begin(unsigned long, uint8_t);
 	void end(void);

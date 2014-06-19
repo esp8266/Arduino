@@ -116,10 +116,12 @@ bool WEAK CDC_Setup(Setup& setup)
 
 void Serial_::begin(unsigned long baud_count)
 {
+	peek_buffer = -1;
 }
 
 void Serial_::begin(unsigned long baud_count, byte config)
 {
+	peek_buffer = -1;
 }
 
 void Serial_::end(void)
