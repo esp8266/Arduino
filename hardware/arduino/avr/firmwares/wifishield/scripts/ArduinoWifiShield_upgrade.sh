@@ -1,6 +1,6 @@
 #!/bin/sh
 
-WIFI_FW_PATH="/hardware/arduino/firmwares/wifishield/binary"
+WIFI_FW_PATH="/hardware/arduino/avr/firmwares/wifishield/binary"
 AVR_TOOLS_PATH="/hardware/tools/avr/bin"
 
 TARGET_MICRO="at32uc3a1256"
