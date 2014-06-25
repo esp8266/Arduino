@@ -71,7 +71,7 @@ public class TargetPlatform {
     if (!boardsFile.exists() || !boardsFile.canRead())
       throw new TargetPlatformException(
           format(_("Could not find boards.txt in {0}. Is it pre-1.5?"),
-                 boardsFile.getAbsolutePath()));
+                 folder.getAbsolutePath()));
 
     // Load boards
     try {
