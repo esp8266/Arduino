@@ -34,6 +34,11 @@
 // slower.
 #if !defined(TXC0)
 #if defined(TXC)
+// Some chips like ATmega8 don't have UPE, only PE. The other bits are
+// named as expected.
+#if !defined(UPE) && defined(PE)
+#define UPE PE
+#endif
 // On ATmega8, the uart and its bits are not numbered, so there is no TXC0 etc.
 #define TXC0 TXC
 #define RXEN0 RXEN
