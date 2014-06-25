@@ -25,6 +25,7 @@ ARDUINO 1.5.7 BETA
 * Explicitly define compiler.path in avr/platform.txt (Matthijs Kooijman)
 * Make the low available memory message a warning (Matt Robinson)
 * Proceed with upload even if port can't be found (David Mellis)
+* Added support for ArduinoISP
 
 [libraries]
 * Updated SpaceBrew library
