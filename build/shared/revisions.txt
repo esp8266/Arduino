@@ -15,6 +15,8 @@ ARDUINO 1.5.7 BETA
 * sam: Fix to Wire usage of TWI status register (bluesign2k)
 
 [ide]
+* Moved to appbundler for building releases for MacOSX. (Haavar Valeur)
+  This should remove dependency from Java 1.6 on recent MacOSX.
 * Added support for '-' and '.' in filenames (Georg von Zengen)
 * (re)Added 'arduino_debug.exe' in Windows build for debugging purposes
 * Magic baudrate is no longer removed (it was a workaround for RXTX)
