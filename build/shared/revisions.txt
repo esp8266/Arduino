@@ -33,6 +33,25 @@ ARDUINO 1.5.7 BETA
 * Fixed CRC of shutdown command on YunSerialTerminal example
 * Updates/Fix to various examples
 
+The following changes are included also in the (not yet released) Arduino IDE 1.0.6:
+
+[core]
+* avr: Improved USB-CDC write speed (Justin Rajewski)
+* avr: Improved USB-CDC read code (Paul Brook)
+* avr: Fixed race condition in USB-CDC transmit (Paul Brook)
+* Fixed wrong NULL pointer handling in Stream class (Amulya Kumar Sahoo)
+
+[ide]
+* Fix toolchain command line to compile assembler files (Jimmy Hedman)
+* If two libraries have the same header file use the lib with the same folder name (Paul Stoffregen)
+
+[libraries]
+* Robot_Control: removed duplicated SPI and Wire (Xun Yang)
+* Robot_Control: fixed issue on motors being opposite (Xun Yang)
+* Robot_Control: updated turning algorithm (Xun Yang)
+* Esplora: added reading form Tinkerkit inputs
+* SoftwareSerial: Fix idle level when initializing with inverted logic (Jens-Christian Skibakk)
+
 ARDUINO 1.5.6-r2 BETA 2014.02.21
 
 [ide]
@@ -270,6 +289,28 @@ ARDUINO 1.5 BETA - 2012.10.22
   or incomplete.
 * For more info refer to this press release:
   http://arduino.cc/blog/2012/10/22/arduino-1-5-support-for-the-due-and-other-processors-easier-library-installation-simplified-board-menu-etc/
+
+ARDUINO 1.0.6 - not yet released
+
+[core]
+* avr: Improved USB-CDC write speed (Justin Rajewski)
+* avr: Improved USB-CDC read code (Paul Brook)
+* avr: Fixed race condition in USB-CDC transmit (Paul Brook)
+* Fixed wrong NULL pointer handling in Stream class (Amulya Kumar Sahoo)
+* Backported String class from IDE 1.5.x (Matt Jenkins)
+* Backported Print class from IDE 1.5.x
+
+[ide]
+* Added compatibility for IDE 1.5.x libraries layout
+* Fix toolchain command line to compile assembler files (Jimmy Hedman)
+* If two libraries have the same header file use the lib with the same folder name (Paul Stoffregen)
+
+[libraries]
+* Robot_Control: removed duplicated SPI and Wire (Xun Yang)
+* Robot_Control: fixed issue on motors being opposite (Xun Yang)
+* Robot_Control: updated turning algorithm (Xun Yang)
+* Esplora: added reading form Tinkerkit inputs
+* SoftwareSerial: Fix idle level when initializing with inverted logic (Jens-Christian Skibakk)
 
 ARDUINO 1.0.5-r2 - 2014.01.08
 
