@@ -24,6 +24,7 @@ build/windows/WinAVR-*.zip
 build/macosx/arduino-*.zip
 build/macosx/dist/gcc-*.tar.gz
 build/macosx/libastylej*
+build/macosx/appbundler*.jar
 build/linux/work/
 build/linux/dist/*.tar.gz
 build/linux/*.tgz
