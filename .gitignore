@@ -36,3 +36,5 @@ test-bin
 build/windows/launch4j-*
 build/windows/launcher/launch4j
 build/windows/WinAVR-*.zip
+hardware/arduino/avr/libraries/Bridge/examples/XivelyClient/passwords.h
+avr-toolchain-*.zip

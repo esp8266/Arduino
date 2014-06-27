@@ -1,7 +1,37 @@
-ARDUINO 1.5.7
+ARDUINO 1.5.7 BETA
 
 [core]
-* [fix] Bridge HttpClient had wrong implementation of running() function
+* Upgraded AVR toolchain: gcc 4.8.1, avr-libc 1.8.0
+* Upgraded ARM toolchain: gcc 4.8.3-2014q1
+* Upgraded avrdude to version 6.0.1
+* ARM gcc doesn't require ia32-libs anymore on 64 bits linux systems
+* avr: fixed typo in SerialEvent3 handling (Matthijs Kooijman)
+* avr: HardwareSerial support for different size of TX and RX buffer sizes (Jan Baeyens)
+* avr: HardwareSerial support for buffer sizes bigger than 256 bytes (Jan Baeyens)
+* sam: Added configuration (parity, data bits, stop bits) to Serial1/2/3 of Arduino Due (bluesign2k)
+* Removed a lot of compiler warnings from Arduino core
+* avr: Fix EXTERNAL_NUM_INTERRUPTS for atmega128rfa1 and atmega256rfr2 (Matthijs Kooijman)
+* sam: Fix to Wire::endTransmisson() return value (bluesign2k)
+* sam: Fix to Wire usage of TWI status register (bluesign2k)
+
+[ide]
+* Added support for '-' and '.' in filenames (Georg von Zengen)
+* (re)Added 'arduino_debug.exe' in Windows build for debugging purposes
+* Magic baudrate is no longer removed (it was a workaround for RXTX)
+  (for more info see github issues: #1203 and #995)
+* Allow overriding platform.txt using platform.local.txt (Matthijs Kooijman)
+* Explicitly define compiler.path in avr/platform.txt (Matthijs Kooijman)
+* Make the low available memory message a warning (Matt Robinson)
+* Proceed with upload even if port can't be found (David Mellis)
+
+[libraries]
+* Updated SpaceBrew library
+* Fixed HttpClient::running() function
+* Fixed HttpClient::ready() function (Manuel Rabade)
+* Added HttpClient::noCheckSSL() method
+* Improved speed of YunSerialTerminal
+* Fixed CRC of shutdown command on YunSerialTerminal example
+* Updates/Fix to various examples
 
 ARDUINO 1.5.6-r2 BETA 2014.02.21
 
