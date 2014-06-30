@@ -8,6 +8,7 @@ ARDUINO 1.0.6 - not yet released
 * Fixed wrong NULL pointer handling in Stream class (Amulya Kumar Sahoo)
 * Backported String class from IDE 1.5.x (Matt Jenkins)
 * Backported Print class from IDE 1.5.x
+* Backported digitalPinToInterrupt macro from IDE 1.5.x
 
 [ide]
 * Added compatibility for IDE 1.5.x libraries layout
