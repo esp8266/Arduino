@@ -186,19 +186,28 @@ public class Compiler implements MessageConsumer {
      includePaths.remove(includePaths.size() - 1);
    }
 
-   // 3. compile the core, outputting .o files to <buildPath> and then
-   // collecting them into the core.a library file.
+    // 3. compile the core, outputting .o files to <buildPath> and then
+    // collecting them into the core.a library file.
 
-   sketch.setCompilingProgress(50);
-  includePaths.clear();
-  includePaths.add(corePath);  // include path for core only
-  if (variantPath != null) includePaths.add(variantPath);
-  List<File> coreObjectFiles =
-    compileFiles(avrBasePath, buildPath, includePaths,
-              findFilesInPath(corePath, "S", true),
-              findFilesInPath(corePath, "c", true),
-              findFilesInPath(corePath, "cpp", true),
-              boardPreferences);
+    sketch.setCompilingProgress(50);
+    includePaths.clear();
+    includePaths.add(corePath); // include path for core only
+    if (variantPath != null)
+      includePaths.add(variantPath);
+    List<File> coreObjectFiles = compileFiles( //
+        avrBasePath, buildPath, includePaths, //
+        findFilesInPath(corePath, "S", true), //
+        findFilesInPath(corePath, "c", true), //
+        findFilesInPath(corePath, "cpp", true), //
+        boardPreferences);
+
+    if (variantPath != null)
+      objectFiles.addAll(compileFiles( //
+          avrBasePath, buildPath, includePaths, //
+          findFilesInPath(variantPath, "S", true), //
+          findFilesInPath(variantPath, "c", true), //
+          findFilesInPath(variantPath, "cpp", true), //
+          boardPreferences));
 
    String runtimeLibraryName = buildPath + File.separator + "core.a";
    List baseCommandAR = new ArrayList(Arrays.asList(new String[] {
