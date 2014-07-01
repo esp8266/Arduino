@@ -23,6 +23,9 @@ ARDUINO 1.0.6 - not yet released
 * Esplora: added reading form Tinkerkit inputs
 * SoftwareSerial: Fix idle level when initializing with inverted logic (Jens-Christian Skibakk)
 
+[firmware]
+* Wifishield: fixed paths on firmware upgrade scripts
+
 ARDUINO 1.0.5-r2 - 2014.01.08
 
 * Signed drivers for Windows 8.1
