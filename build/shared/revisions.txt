@@ -42,6 +42,7 @@ The following changes are included also in the (not yet released) Arduino IDE 1.
 * avr: Improved USB-CDC read code (Paul Brook)
 * avr: Fixed race condition in USB-CDC transmit (Paul Brook)
 * Fixed wrong NULL pointer handling in Stream class (Amulya Kumar Sahoo)
+* Added initVariant() hook to allow 3rd party variant-specific initialization
 
 [ide]
 * Fix toolchain command line to compile assembler files (Jimmy Hedman)
@@ -302,6 +303,7 @@ ARDUINO 1.0.6 - not yet released
 * Backported String class from IDE 1.5.x (Matt Jenkins)
 * Backported Print class from IDE 1.5.x
 * Backported digitalPinToInterrupt macro from IDE 1.5.x
+* Added initVariant() hook to allow 3rd party variant-specific initialization
 
 [ide]
 * Added compatibility for IDE 1.5.x libraries layout

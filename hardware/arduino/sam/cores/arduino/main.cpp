@@ -31,12 +31,19 @@ extern void SysTick_Handler( void )
 }
 */
 
+// Weak empty variant initialization function.
+// May be redefined by variant files.
+void initVariant() __attribute__((weak));
+void initVariant() { }
+
 /*
  * \brief Main entry point of Arduino application
  */
 int main( void )
 {
 	init();
+
+	initVariant();
 
 	delay(1);
 

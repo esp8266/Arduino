@@ -26,6 +26,7 @@ extern "C" {
 /**
  *
  */
+extern void initVariant( void ) ;
 extern void init( void ) ;
 
 /**
