@@ -55,6 +55,9 @@ The following changes are included also in the (not yet released) Arduino IDE 1.
 * Esplora: added reading form Tinkerkit inputs
 * SoftwareSerial: Fix idle level when initializing with inverted logic (Jens-Christian Skibakk)
 
+[firmware]
+* Wifishield: fixed paths on firmware upgrade scripts
+
 ARDUINO 1.5.6-r2 BETA 2014.02.21
 
 [ide]
@@ -316,6 +319,9 @@ ARDUINO 1.0.6 - not yet released
 * Robot_Control: updated turning algorithm (Xun Yang)
 * Esplora: added reading form Tinkerkit inputs
 * SoftwareSerial: Fix idle level when initializing with inverted logic (Jens-Christian Skibakk)
+
+[firmware]
+* Wifishield: fixed paths on firmware upgrade scripts
 
 ARDUINO 1.0.5-r2 - 2014.01.08
 
