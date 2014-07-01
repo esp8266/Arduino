@@ -693,6 +693,8 @@ public class Compiler implements MessageConsumer {
 
   // 3. compile the core, outputting .o files to <buildPath> and then
   // collecting them into the core.a library file.
+  // Also compiles the variant (if it supplies actual source files),
+  // which are included in the link directly (not through core.a)
   void compileCore()
       throws RunnerException {
 
@@ -705,13 +707,9 @@ public class Compiler implements MessageConsumer {
     if (variantFolder != null)
       includeFolders.add(variantFolder);
 
-    List<File> objectFiles = compileFiles(buildFolder, coreFolder, true,
-                                          includeFolders);
-    if (variantFolder != null)
-      objectFiles.addAll(compileFiles(buildFolder, variantFolder, true,
-                                      includeFolders));
-
-    for (File file : objectFiles) {
+    List<File> coreObjectFiles = compileFiles(buildFolder, coreFolder, true,
+                                              includeFolders);
+    for (File file : coreObjectFiles) {
 
       PreferencesMap dict = new PreferencesMap(prefs);
       dict.put("ide_version", "" + Base.REVISION);
@@ -727,6 +725,10 @@ public class Compiler implements MessageConsumer {
       }
       execAsynchronously(cmdArray);
     }
+
+    if (variantFolder != null)
+      objectFiles.addAll(compileFiles(buildFolder, variantFolder, true,
+                                      includeFolders));
   }
 			
   // 4. link it all together into the .elf file

@@ -118,6 +118,7 @@ typedef uint8_t boolean;
 typedef uint8_t byte;
 
 void init(void);
+void initVariant(void);
 
 void pinMode(uint8_t, uint8_t);
 void digitalWrite(uint8_t, uint8_t);
@@ -194,20 +195,21 @@ extern const uint8_t PROGMEM digital_pin_to_timer_PGM[];
 #define TIMER0B 2
 #define TIMER1A 3
 #define TIMER1B 4
-#define TIMER2  5
-#define TIMER2A 6
-#define TIMER2B 7
+#define TIMER1C 5
+#define TIMER2  6
+#define TIMER2A 7
+#define TIMER2B 8
 
-#define TIMER3A 8
-#define TIMER3B 9
-#define TIMER3C 10
-#define TIMER4A 11
-#define TIMER4B 12
-#define TIMER4C 13
-#define TIMER4D 14	
-#define TIMER5A 15
-#define TIMER5B 16
-#define TIMER5C 17
+#define TIMER3A 9
+#define TIMER3B 10
+#define TIMER3C 11
+#define TIMER4A 12
+#define TIMER4B 13
+#define TIMER4C 14
+#define TIMER4D 15
+#define TIMER5A 16
+#define TIMER5B 17
+#define TIMER5C 18
 
 #ifdef __cplusplus
 } // extern "C"
