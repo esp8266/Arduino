@@ -1,6 +1,6 @@
 #!/bin/sh
 
-WIFI_FW_PATH="/hardware/arduino/firmwares/wifi-shield"
+WIFI_FW_PATH="/hardware/arduino/firmwares/wifishield/binary"
 AVR_TOOLS_PATH="/hardware/tools/avr/bin"
 
 progname=$0
