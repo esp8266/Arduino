@@ -564,7 +564,7 @@ pro.bootloader.lock_bits=0x0F
 
 pro.build.board=AVR_PRO
 pro.build.core=arduino
-pro.build.variant=standard
+pro.build.variant=eightanaloginputs
 
 ## Arduino Pro or Pro Mini (5V, 16 MHz) w/ ATmega328
 ## -------------------------------------------------
