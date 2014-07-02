@@ -36,6 +36,7 @@ ARDUINO 1.5.7 BETA
 * Improved speed of YunSerialTerminal
 * Fixed CRC of shutdown command on YunSerialTerminal example
 * Updates/Fix to various examples
+* avr: Added Wire.setClock(..) method (Kristian Sloth Lauszus)
 
 The following changes are included also in the (not yet released) Arduino IDE 1.0.6:
 
