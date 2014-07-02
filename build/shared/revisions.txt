@@ -26,6 +26,7 @@ ARDUINO 1.5.7 BETA
 * Make the low available memory message a warning (Matt Robinson)
 * Proceed with upload even if port can't be found (David Mellis)
 * Added support for ArduinoISP
+* Windows: added board detection on serial port menu
 
 [libraries]
 * Updated SpaceBrew library
