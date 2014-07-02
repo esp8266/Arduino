@@ -11,6 +11,7 @@
 #######################################
 
 begin	KEYWORD2
+setClock	KEYWORD2
 beginTransmission	KEYWORD2
 endTransmission	KEYWORD2
 requestFrom	KEYWORD2
