@@ -53,7 +53,10 @@ public class I18n {
   public static String _(String s) {
     String res;
     try {
-      res = i18n.getString(s);
+      if (i18n == null)
+        res = s;
+      else
+        res = i18n.getString(s);
     } catch (MissingResourceException e) {
       res = s;
     }
