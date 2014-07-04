@@ -13,6 +13,7 @@ ARDUINO 1.5.7 BETA
 * avr: Fix EXTERNAL_NUM_INTERRUPTS for atmega128rfa1 and atmega256rfr2 (Matthijs Kooijman)
 * sam: Fix to Wire::endTransmisson() return value (bluesign2k)
 * sam: Fix to Wire usage of TWI status register (bluesign2k)
+* avr: Fixed PROGMEM statements to be compatible with newer avr gcc (Scott Howard)
 
 [ide]
 * Moved to appbundler for building releases for MacOSX. (Haavar Valeur)
