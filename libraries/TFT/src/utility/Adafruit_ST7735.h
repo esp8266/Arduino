@@ -130,8 +130,8 @@ class Adafruit_ST7735 : public Adafruit_GFX {
   void     spiwrite(uint8_t),
            writecommand(uint8_t c),
            writedata(uint8_t d),
-           commandList(uint8_t *addr),
-           commonInit(uint8_t *cmdList);
+           commandList(const uint8_t *addr),
+           commonInit(const uint8_t *cmdList);
 //uint8_t  spiread(void);
 
   boolean  hwSPI;
