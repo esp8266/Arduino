@@ -22,7 +22,7 @@
   <condition property="staging_folder" value="linux"><equals arg1="${platform}" arg2="linux32" /></condition>
   <condition property="staging_folder" value="linux"><equals arg1="${platform}" arg2="linux64" /></condition>
 
-  <condition property="staging_hardware_folder" value="Arduino.app/Contents/Java/hardware"><equals arg1="${platform}" arg2="macosx" /></condition>
+  <condition property="staging_hardware_folder" value="Arduino.app/Contents/Resources/Java/hardware"><equals arg1="${platform}" arg2="macosx" /></condition>
   <condition property="staging_hardware_folder" value="hardware"><equals arg1="${platform}" arg2="windows" /></condition>
   <condition property="staging_hardware_folder" value="hardware"><equals arg1="${platform}" arg2="linux32" /></condition>
   <condition property="staging_hardware_folder" value="hardware"><equals arg1="${platform}" arg2="linux64" /></condition>
@@ -207,48 +207,18 @@
   <target name="macosx-build" if="macosx" depends="revision-check, macosx-checkos, subprojects-build" description="Build Mac OS X version">
     <mkdir dir="macosx/work" />
 
-    <get src="http://downloads.arduino.cc/appbundler-1.0-arduino.jar" dest="macosx" usetimestamp="true" skipexisting="true" />
+    <!-- assemble the pde -->
+    <copy todir="macosx/work/Arduino.app">
+      <fileset dir="macosx/template.app" includes="**"/>
+    </copy>
 
-    <taskdef name="bundleapp" classname="com.oracle.appbundler.AppBundlerTask" classpath="macosx/appbundler-1.0-arduino.jar" />
+    <chmod file="macosx/work/Arduino.app/Contents/MacOS/JavaApplicationStub" perm="755" />
 
-    <bundleapp outputdirectory="macosx/work"
-      name="Arduino"
-      displayname="Arduino"
-      shortversion="${version}"
-      icon="macosx/template.app/Contents/Resources/processing.icns"
-      identifier="cc.arduino.Arduino"
-      mainclassname="processing.app.Base">
+    <copy todir="macosx/work/Arduino.app/Contents/Resources/Java" flatten="true">
+      <fileset refid="runtime.jars"/>
+    </copy>
 
-      <documentType name="Arduino Source File"
-        icon="macosx/template.app/Contents/Resources/pde.icns"
-        role="Editor">
-        <extension>ino</extension>
-        <extension>c</extension>
-        <extension>cpp</extension>
-        <extension>h</extension>
-        <mimeType>text/plain</mimeType>
-        <osType>TEXT</osType>
-      </documentType>
-
-      <classpath file="../app/pde.jar" />
-      <classpath file="../core/core.jar" />
-      <classpath dir="../app/lib" includes="*.jar"/>
-
-      <option value="-Djavaroot=$APP_ROOT/Contents/Java"/>
-      <option value="-Xms128M"/>
-      <option value="-Xmx256M"/>
-      <option value="-Dapple.laf.useScreenMenuBar=true"/>
-      <option value="-Dapple.awt.showGrowBox=false"/>
-      <option value="-Dcom.apple.smallTabs=true"/>
-      <option value="-Dapple.awt.Antialiasing=false"/>
-      <option value="-Dapple.awt.TextAntialiasing=true"/>
-      <option value="-Dcom.apple.hwaccel=true"/>
-      <option value="-Dapple.awt.use-file-dialog-packages=false"/>
-      <option value="-Dapple.awt.graphics.UseQuartz=true"/>
-      <option value="-Dapple.awt.application.name=Arduino"/>
-    </bundleapp>
-
-    <copy todir="macosx/work/Arduino.app/Contents/Java">
+    <copy todir="macosx/work/Arduino.app/Contents/Resources/Java">
       <fileset dir="shared" includes="lib/**" />
       <fileset file="shared/revisions.txt" />
     </copy>
@@ -279,7 +249,7 @@
     <chmod file="macosx/work/${staging_hardware_folder}/tools/bossac" perm="+x" />
 
     <antcall target="assemble">
-      <param name="target.path" value="macosx/work/Arduino.app/Contents/Java" />
+      <param name="target.path" value="macosx/work/Arduino.app/Contents/Resources/Java" />
     </antcall>
 
     <antcall target="unzip-arm-toolchain">
@@ -297,8 +267,8 @@
 
     <get src="http://downloads.arduino.cc/libastylej-2.03.zip" dest="macosx" usetimestamp="true" skipexisting="true"/>
     <unzip src="macosx/libastylej-2.03.zip" dest="macosx" overwrite="true"/>
-    <copy file="macosx/libastylej/libastylej.jnilib" todir="macosx/work/Arduino.app/Contents/Java/lib/" />
-    <chmod perm="755" file="macosx/work/Arduino.app/Contents/Java/lib/libastylej.jnilib" />
+    <copy file="macosx/libastylej/libastylej.jnilib" todir="macosx/work/Arduino.app/Contents/Resources/Java/lib/" />
+    <chmod perm="755" file="macosx/work/Arduino.app/Contents/Resources/Java/lib/libastylej.jnilib" />
   </target>
 
   <target name="macosx-run" depends="macosx-build" description="Run Mac OS X version">
@@ -376,6 +346,11 @@
       <fileset dir="macosx/work/${staging_hardware_folder}/tools/avr/avr/bin" includes="**/*" />
       <fileset dir="macosx/work/${staging_hardware_folder}/tools/avr/libexec/gcc/avr/4.8.1/" includes="*" />
     </chmod>
+
+    <replace file="macosx/work/Arduino.app/Contents/Info.plist"
+             token="VERSION" value="${version}" />
+    <replace file="macosx/work/Arduino.app/Contents/Info.plist"
+             token="REVISION" value="${revision}" />
 
     <exec executable="zip" dir="macosx/work">
       <arg line="-q -r ../arduino-${version}-${platform}.zip ." />
