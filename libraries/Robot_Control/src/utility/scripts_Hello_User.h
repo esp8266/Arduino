@@ -4,20 +4,20 @@
 //as the ram of Arduino is very tiny, keeping too many string in it
 //can kill the program
 
-prog_char hello_user_script1[] PROGMEM="What's your name?";
-prog_char hello_user_script2[] PROGMEM="Give me a name!";
-prog_char hello_user_script3[] PROGMEM="And the country?";
-prog_char hello_user_script4[] PROGMEM="The city you're in?";
-prog_char hello_user_script5[] PROGMEM="  Plug me to\n\n  your computer\n\n  and start coding!";
+const char hello_user_script1[] PROGMEM="What's your name?";
+const char hello_user_script2[] PROGMEM="Give me a name!";
+const char hello_user_script3[] PROGMEM="And the country?";
+const char hello_user_script4[] PROGMEM="The city you're in?";
+const char hello_user_script5[] PROGMEM="  Plug me to\n\n  your computer\n\n  and start coding!";
 
-prog_char hello_user_script6[] PROGMEM="     Hello User!\n\n It's me, your robot\n\n    I'm alive! <3";
-prog_char hello_user_script7[] PROGMEM="  First I need some\n\n   input from you!";
-prog_char hello_user_script8[] PROGMEM="     Use the knob\n\n   to select letters";
-prog_char hello_user_script9[] PROGMEM="   Use L/R button\n\n to move the cursor,\n\n  middle to confirm";
-prog_char hello_user_script10[] PROGMEM="  Press middle key\n   to continue...";
-prog_char hello_user_script11[] PROGMEM="  Choose \"enter\" to\n\n  finish the input";
+const char hello_user_script6[] PROGMEM="     Hello User!\n\n It's me, your robot\n\n    I'm alive! <3";
+const char hello_user_script7[] PROGMEM="  First I need some\n\n   input from you!";
+const char hello_user_script8[] PROGMEM="     Use the knob\n\n   to select letters";
+const char hello_user_script9[] PROGMEM="   Use L/R button\n\n to move the cursor,\n\n  middle to confirm";
+const char hello_user_script10[] PROGMEM="  Press middle key\n   to continue...";
+const char hello_user_script11[] PROGMEM="  Choose \"enter\" to\n\n  finish the input";
 
-PROGMEM const char *scripts_Hello_User[]={
+const char * const scripts_Hello_User[] PROGMEM = {
   hello_user_script1,
   hello_user_script2,
   hello_user_script3,

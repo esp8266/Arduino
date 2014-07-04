@@ -81,7 +81,7 @@ osc_t osc[4];
 uint8_t pcm = 128;
 
 // ProTracker period tables
-uint16_t period_tbl[84] PROGMEM = {
+const uint16_t period_tbl[84] PROGMEM = {
   3424, 3232, 3048, 2880, 2712, 2560, 2416, 2280, 2152, 2032, 1920, 1814,
   1712, 1616, 1524, 1440, 1356, 1280, 1208, 1140, 1076, 1016,  960,  907,
    856,  808,  762,  720,  678,  640,  604,  570,  538,  508,  480,  453,
@@ -92,7 +92,7 @@ uint16_t period_tbl[84] PROGMEM = {
 };
 
 // ProTracker sine table
-int8_t sine_tbl[32] PROGMEM = {
+const int8_t sine_tbl[32] PROGMEM = {
   0x00, 0x0C, 0x18, 0x25, 0x30, 0x3C, 0x47, 0x51, 0x5A, 0x62, 0x6A, 0x70, 0x76, 0x7A, 0x7D, 0x7F,
   0x7F, 0x7F, 0x7D, 0x7A, 0x76, 0x70, 0x6A, 0x62, 0x5A, 0x51, 0x47, 0x3C, 0x30, 0x25, 0x18, 0x0C,
 };

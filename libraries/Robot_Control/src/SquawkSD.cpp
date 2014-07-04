@@ -13,7 +13,7 @@ class StreamFile : public SquawkStream {
 
 static StreamFile file;
 
-extern uint16_t period_tbl[84] PROGMEM;
+extern const uint16_t period_tbl[84] PROGMEM;
 
 void SquawkSynthSD::play(Fat16 melody) {
 	SquawkSynth::pause();
