@@ -6,8 +6,8 @@
 #define __TOUTMODEMCONFIGURATION__ 5000//equivalent to 30000 because of time in interrupt routine.
 #define __TOUTAT__ 1000
 
-char _command_AT[] PROGMEM = "AT";
-char _command_CGREG[] PROGMEM = "AT+CGREG?";
+const char _command_AT[] PROGMEM = "AT";
+const char _command_CGREG[] PROGMEM = "AT+CGREG?";
 
 
 GSM3ShieldV1AccessProvider::GSM3ShieldV1AccessProvider(bool debug)
