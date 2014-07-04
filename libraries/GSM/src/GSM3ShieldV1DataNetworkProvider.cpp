@@ -1,8 +1,8 @@
 #include <GSM3ShieldV1DataNetworkProvider.h>
 #include <Arduino.h>
 
-char _command_CGATT[] PROGMEM = "AT+CGATT=";
-char _command_SEPARATOR[] PROGMEM = "\",\"";
+const char _command_CGATT[] PROGMEM = "AT+CGATT=";
+const char _command_SEPARATOR[] PROGMEM = "\",\"";
 
 //Attach GPRS main function.	
 GSM3_NetworkStatus_t GSM3ShieldV1DataNetworkProvider::attachGPRS(char* apn, char* user_name, char* password, bool synchronous)

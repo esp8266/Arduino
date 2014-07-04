@@ -4,7 +4,7 @@
 
 #define __NCLIENTS_MAX__ 3
 
-char _command_QILOCIP[] PROGMEM = "AT+QILOCIP";
+const char _command_QILOCIP[] PROGMEM = "AT+QILOCIP";
 
 GSM3ShieldV1MultiServerProvider::GSM3ShieldV1MultiServerProvider()
 {

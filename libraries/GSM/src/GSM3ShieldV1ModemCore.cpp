@@ -75,7 +75,7 @@ void GSM3ShieldV1ModemCore::closeCommand(int code)
 }
 
 //Generic command (stored in flash).
-void GSM3ShieldV1ModemCore::genericCommand_rq(PROGMEM prog_char str[], bool addCR)
+void GSM3ShieldV1ModemCore::genericCommand_rq(PGM_P str, bool addCR)
 {
 	theBuffer().flush();
 	writePGM(str, addCR);	
@@ -157,7 +157,7 @@ void GSM3ShieldV1ModemCore::openCommand(GSM3ShieldV1BaseProvider* provider, GSM3
 
 };
 
-size_t GSM3ShieldV1ModemCore::writePGM(PROGMEM prog_char str[], bool CR)
+size_t GSM3ShieldV1ModemCore::writePGM(PGM_P str, bool CR)
 {
 	int i=0;
 	char c;

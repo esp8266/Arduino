@@ -12,7 +12,7 @@ int GSM3ShieldV1BaseProvider::ready()
 	return theGSM3ShieldV1ModemCore.getCommandError();
 };
 
-void GSM3ShieldV1BaseProvider::prepareAuxLocate(PROGMEM prog_char str[], char auxLocate[])
+void GSM3ShieldV1BaseProvider::prepareAuxLocate(PGM_P str, char auxLocate[])
 {
 	int i=0;
 	char c;
