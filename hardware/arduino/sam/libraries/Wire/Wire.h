@@ -100,6 +100,7 @@ private:
 	TwoWireStatus status;
 
 	// TWI clock frequency
+	static const uint32_t TWI_CLOCK = 100000;
 	uint32_t twiClock;
 
 	// Timeouts (

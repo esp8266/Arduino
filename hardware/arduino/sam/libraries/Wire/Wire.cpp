@@ -95,8 +95,7 @@ static inline bool TWI_STATUS_NACK(uint32_t status) {
 TwoWire::TwoWire(Twi *_twi, void(*_beginCb)(void)) :
 	twi(_twi), rxBufferIndex(0), rxBufferLength(0), txAddress(0),
 			txBufferLength(0), srvBufferIndex(0), srvBufferLength(0), status(
-					UNINITIALIZED), onBeginCallback(_beginCb) {
-	setClock(100000); // Set clock frequency to 100000 Hz
+					UNINITIALIZED), onBeginCallback(_beginCb), twiClock(TWI_CLOCK) {
 }
 
 void TwoWire::begin(void) {
@@ -129,6 +128,7 @@ void TwoWire::begin(int address) {
 
 void TwoWire::setClock(uint32_t frequency) {
 	twiClock = frequency;
+	TWI_SetClock(twi, twiClock, VARIANT_MCK);
 }
 
 uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity, uint8_t sendStop) {

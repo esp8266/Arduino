@@ -96,10 +96,6 @@
  */
 void TWI_ConfigureMaster( Twi* pTwi, uint32_t dwTwCk, uint32_t dwMCk )
 {
-    uint32_t dwCkDiv = 0 ;
-    uint32_t dwClDiv ;
-    uint32_t dwOk = 0 ;
-
     assert( pTwi ) ;
 
     /* SVEN: TWI Slave Mode Enabled */
@@ -114,6 +110,19 @@ void TWI_ConfigureMaster( Twi* pTwi, uint32_t dwTwCk, uint32_t dwMCk )
 
     /* Set master mode */
     pTwi->TWI_CR = TWI_CR_MSEN ;
+
+    /* Configure clock */
+    TWI_SetClock(pTwi, dwTwCk, dwMCk);
+}
+
+
+void TWI_SetClock( Twi *pTwi, uint32_t dwTwCk, uint32_t dwMCk )
+{
+    assert( pTwi ) ;
+
+    uint32_t dwCkDiv = 0 ;
+    uint32_t dwClDiv ;
+    uint32_t dwOk = 0 ;
 
     /* Configure clock */
     while ( !dwOk )
@@ -136,6 +145,7 @@ void TWI_ConfigureMaster( Twi* pTwi, uint32_t dwTwCk, uint32_t dwMCk )
     pTwi->TWI_CWGR = 0 ;
     pTwi->TWI_CWGR = (dwCkDiv << 16) | (dwClDiv << 8) | dwClDiv ;
 }
+
 
 /**
  * \brief Configures a TWI peripheral to operate in slave mode.
