@@ -1,4 +1,4 @@
-ARDUINO 1.5.7 BETA
+ARDUINO 1.5.7 BETA - 2014.07.07
 
 [core]
 * Upgraded AVR toolchain: gcc 4.8.1, avr-libc 1.8.0
@@ -37,7 +37,7 @@ ARDUINO 1.5.7 BETA
 * Improved speed of YunSerialTerminal
 * Fixed CRC of shutdown command on YunSerialTerminal example
 * Updates/Fix to various examples
-* avr: Added Wire.setClock(..) method (Kristian Sloth Lauszus)
+* Added Wire.setClock(..) method (Kristian Sloth Lauszus)
 
 The following changes are included also in the (not yet released) Arduino IDE 1.0.6:
 
@@ -62,12 +62,12 @@ The following changes are included also in the (not yet released) Arduino IDE 1.
 [firmware]
 * Wifishield: fixed paths on firmware upgrade scripts
 
-ARDUINO 1.5.6-r2 BETA 2014.02.21
+ARDUINO 1.5.6-r2 BETA - 2014.02.21
 
 [ide]
 * JSSC: Fixed NPE when RXCHAR event with no bytes (José Pereda)
 
-ARDUINO 1.5.6 BETA 2014.02.20
+ARDUINO 1.5.6 BETA - 2014.02.20
 
 [ide]
 * Implemented 1.5 library specification Rev.2
@@ -108,14 +108,14 @@ ARDUINO 1.5.6 BETA 2014.02.20
 * Make some operators in IPAddress const (Matthijs Kooijman)
 * Fix for compiling assembler files with newer gcc
 
-ARDUINO 1.5.5-r2 BETA 2014.01.10
+ARDUINO 1.5.5-r2 BETA - 2014.01.10
 
 * Signed drivers for Windows 8.1
 * Fixed Windows drivers signature (that prevented installation on
   some Windows 8.x OS). Now the signature is timestamped and should
   not expire.
 
-ARDUINO 1.5.5 BETA 2013.11.28
+ARDUINO 1.5.5 BETA - 2013.11.28
 
 NOTICE:
 The 1.5 library format is under heavy review on the Arduino Developers mailing list.
@@ -168,7 +168,7 @@ We suggest to delay the adoption of the new format until a stable 1.5.x is relea
 * avr: added variant file for Arduino Ethernet
 * Added SERIAL_* metadata in variants files (Paul Stoffregen)
 
-ARDUINO 1.5.4 BETA 2013.09.10
+ARDUINO 1.5.4 BETA - 2013.09.10
 
 [ide]
 * Revert to English locale if the system default is not available
@@ -184,7 +184,7 @@ ARDUINO 1.5.4 BETA 2013.09.10
 [core]
 * avr: fixed bug introduced with recent optimizations in HardwareSerial (atmega8 cpu) (darryl)
 
-ARDUINO 1.5.3 BETA 2013.08.30
+ARDUINO 1.5.3 BETA - 2013.08.30
 
 [ide]
 * Removed useless baud rates from serial monitor
