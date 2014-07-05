@@ -35,6 +35,7 @@ public:
 	void begin();
 	void begin(uint8_t);
 	void begin(int);
+	void setClock(uint32_t);
 	void beginTransmission(uint8_t);
 	void beginTransmission(int);
 	uint8_t endTransmission(void);
@@ -100,6 +101,7 @@ private:
 
 	// TWI clock frequency
 	static const uint32_t TWI_CLOCK = 100000;
+	uint32_t twiClock;
 
 	// Timeouts (
 	static const uint32_t RECV_TIMEOUT = 100000;

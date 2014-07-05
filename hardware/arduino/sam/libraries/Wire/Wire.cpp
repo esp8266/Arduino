@@ -95,8 +95,7 @@ static inline bool TWI_STATUS_NACK(uint32_t status) {
 TwoWire::TwoWire(Twi *_twi, void(*_beginCb)(void)) :
 	twi(_twi), rxBufferIndex(0), rxBufferLength(0), txAddress(0),
 			txBufferLength(0), srvBufferIndex(0), srvBufferLength(0), status(
-					UNINITIALIZED), onBeginCallback(_beginCb) {
-	// Empty
+					UNINITIALIZED), onBeginCallback(_beginCb), twiClock(TWI_CLOCK) {
 }
 
 void TwoWire::begin(void) {
@@ -106,7 +105,7 @@ void TwoWire::begin(void) {
 	// Disable PDC channel
 	twi->TWI_PTCR = UART_PTCR_RXTDIS | UART_PTCR_TXTDIS;
 
-	TWI_ConfigureMaster(twi, TWI_CLOCK, VARIANT_MCK);
+	TWI_ConfigureMaster(twi, twiClock, VARIANT_MCK);
 	status = MASTER_IDLE;
 }
 
@@ -125,6 +124,11 @@ void TwoWire::begin(uint8_t address) {
 
 void TwoWire::begin(int address) {
 	begin((uint8_t) address);
+}
+
+void TwoWire::setClock(uint32_t frequency) {
+	twiClock = frequency;
+	TWI_SetClock(twi, twiClock, VARIANT_MCK);
 }
 
 uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity, uint8_t sendStop) {
