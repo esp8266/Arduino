@@ -23,9 +23,10 @@ public class Library {
   private String license;
   private List<String> architectures;
   private File folder;
-  private File srcFolder;
-  private boolean useRecursion;
   private boolean isLegacy;
+
+  private enum LibraryLayout { FLAT, RECURSIVE };
+  private LibraryLayout layout;
 
   private static final List<String> MANDATORY_PROPERTIES = Arrays
       .asList(new String[] { "name", "version", "author", "maintainer",
@@ -82,12 +83,12 @@ public class Library {
         throw new IOException("Missing '" + p + "' from library");
 
     // Check layout
-    boolean useRecursion;
+    LibraryLayout layout;
     File srcFolder = new File(libFolder, "src");
 
     if (srcFolder.exists() && srcFolder.isDirectory()) {
       // Layout with a single "src" folder and recursive compilation
-      useRecursion = true;
+      layout = LibraryLayout.RECURSIVE;
 
       File utilFolder = new File(libFolder, "utility");
       if (utilFolder.exists() && utilFolder.isDirectory()) {
@@ -96,8 +97,7 @@ public class Library {
       }
     } else {
       // Layout with source code on library's root and "utility" folders
-      srcFolder = libFolder;
-      useRecursion = false;
+      layout = LibraryLayout.FLAT;
     }
 
     // Warn if root folder contains development leftovers
@@ -134,7 +134,6 @@ public class Library {
 
     Library res = new Library();
     res.folder = libFolder;
-    res.srcFolder = srcFolder;
     res.name = properties.get("name").trim();
     res.version = properties.get("version").trim();
     res.author = properties.get("author").trim();
@@ -145,8 +144,8 @@ public class Library {
     res.category = category.trim();
     res.license = license.trim();
     res.architectures = archs;
-    res.useRecursion = useRecursion;
     res.isLegacy = false;
+    res.layout = layout;
     return res;
   }
 
@@ -154,8 +153,7 @@ public class Library {
     // construct an old style library
     Library res = new Library();
     res.folder = libFolder;
-    res.srcFolder = libFolder;
-    res.useRecursion = false;
+    res.layout = LibraryLayout.FLAT;
     res.name = libFolder.getName();
     res.architectures = Arrays.asList("*");
     res.isLegacy = true;
@@ -246,11 +244,18 @@ public class Library {
   }
 
   public boolean useRecursion() {
-    return useRecursion;
+    return (layout == LibraryLayout.RECURSIVE);
   }
 
   public File getSrcFolder() {
-    return srcFolder;
+    switch (layout) {
+      case FLAT:
+        return folder;
+      case RECURSIVE:
+        return new File(folder, "src");
+      default:
+        return null; // Keep compiler happy :-(
+    }
   }
 
   public boolean isLegacy() {
