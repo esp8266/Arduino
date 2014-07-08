@@ -170,7 +170,7 @@ public class Sketch {
 
     code = new SketchCode[list.length];
 
-    String[] extensions = getExtensions();
+    List<String> extensions = getExtensions();
 
     for (String filename : list) {
       // Ignoring the dot prefix files is especially important to avoid files
@@ -1849,11 +1849,7 @@ public class Sketch {
    * extensions.
    */
   public boolean validExtension(String what) {
-    String[] ext = getExtensions();
-    for (int i = 0; i < ext.length; i++) {
-      if (ext[i].equals(what)) return true;
-    }
-    return false;
+    return getExtensions().contains(what);
   }
 
 
@@ -1873,8 +1869,8 @@ public class Sketch {
   /**
    * Returns a String[] array of proper extensions.
    */
-  public String[] getExtensions() {
-    return new String[] { "ino", "pde", "c", "cpp", "h" };
+  public List<String> getExtensions() {
+    return Arrays.asList("ino", "pde", "c", "cpp", "h");
   }
 
 
