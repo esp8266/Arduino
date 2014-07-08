@@ -192,7 +192,7 @@ public class Sketch {
           // it would be otherwise possible to sneak in nasty filenames. [0116]
           if (Sketch.isSanitaryName(base)) {
             code[codeCount++] =
-              new SketchCode(new File(folder, filename), extension);
+              new SketchCode(new File(folder, filename));
           } else {
             editor.console.message(I18n.format("File name {0} is invalid: ignored", filename), true, false);
           }
@@ -487,7 +487,7 @@ public class Sketch {
           }
         }
 
-        if (!current.renameTo(newFile, newExtension)) {
+        if (!current.renameTo(newFile)) {
           Base.showWarning(_("Error"),
                            I18n.format(
 			     _("Could not rename \"{0}\" to \"{1}\""),
@@ -531,7 +531,7 @@ public class Sketch {
         editor.base.rebuildSketchbookMenus();
 
       } else {  // else if something besides code[0]
-        if (!current.renameTo(newFile, newExtension)) {
+        if (!current.renameTo(newFile)) {
           Base.showWarning(_("Error"),
                            I18n.format(
 			     _("Could not rename \"{0}\" to \"{1}\""),
@@ -557,7 +557,7 @@ public class Sketch {
 			 ), e);
         return;
       }
-      SketchCode newCode = new SketchCode(newFile, newExtension);
+      SketchCode newCode = new SketchCode(newFile);
       //System.out.println("new code is named " + newCode.getPrettyName() + " " + newCode.getFile());
       insertCode(newCode);
     }
@@ -788,7 +788,7 @@ public class Sketch {
 
       String pdeName = pdeFile.getPath();
       pdeName = pdeName.substring(0, pdeName.length() - 4) + ".ino";
-      return c.renameTo(new File(pdeName), "ino");
+      return c.renameTo(new File(pdeName));
     }
     return false;
   }
@@ -1075,7 +1075,7 @@ public class Sketch {
     }
 
     if (codeExtension != null) {
-      SketchCode newCode = new SketchCode(destFile, codeExtension);
+      SketchCode newCode = new SketchCode(destFile);
 
       if (replacement) {
         replaceCode(newCode);
