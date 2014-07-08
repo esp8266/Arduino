@@ -8,7 +8,7 @@
  * TMP36 temperature sensor on analog pin A1
  * SD card attached to SD card slot of the Arduino Yún
 
- This sketch must be uploaded via wifi.
+ This sketch must be uploaded via wifi. REST API must be set to "open".
 
  Prepare your SD card with an empty folder in the SD root
  named "arduino" and a subfolder of that named "www".
