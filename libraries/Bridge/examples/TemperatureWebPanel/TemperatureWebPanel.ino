@@ -8,6 +8,8 @@
  * TMP36 temperature sensor on analog pin A1
  * SD card attached to SD card slot of the Arduino Yún
 
+ This sketch must be uploaded via wifi.
+
  Prepare your SD card with an empty folder in the SD root
  named "arduino" and a subfolder of that named "www".
  This will ensure that the Yún will create a link
