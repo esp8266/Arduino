@@ -425,7 +425,7 @@ public class Sketch {
     if (renamingCode && currentIndex == 0) {
       for (int i = 1; i < codeCount; i++) {
         if (sanitaryName.equalsIgnoreCase(code[i].getPrettyName()) &&
-          code[i].getExtension().equalsIgnoreCase("cpp")) {
+          code[i].isExtension("cpp")) {
           Base.showMessage(_("Nope"),
                            I18n.format(
 			     _("You can't rename the sketch to \"{0}\"\n" +
@@ -835,7 +835,7 @@ public class Sketch {
     // resaved (with the same name) to another location/folder.
     for (int i = 1; i < codeCount; i++) {
       if (newName.equalsIgnoreCase(code[i].getPrettyName()) &&
-        code[i].getExtension().equalsIgnoreCase("cpp")) {
+        code[i].isExtension("cpp")) {
         Base.showMessage(_("Nope"),
 			 I18n.format(
                            _("You can't save the sketch as \"{0}\"\n" +
@@ -1818,21 +1818,11 @@ public class Sketch {
   // Breaking out extension types in order to clean up the code, and make it
   // easier for other environments (like Arduino) to incorporate changes.
 
-
-  /**
-   * True if the specified extension should be hidden when shown on a tab.
-   * For Processing, this is true for .pde files. (Broken out for subclasses.)
-   */
-  public boolean hideExtension(String what) {
-    return getHiddenExtensions().contains(what);
-  }
-
-
   /**
    * True if the specified code has the default file extension.
    */
   public boolean hasDefaultExtension(SketchCode code) {
-    return code.getExtension().equals(getDefaultExtension());
+    return code.isExtension(getDefaultExtension());
   }
 
 

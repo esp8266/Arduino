@@ -176,7 +176,7 @@ public class EditorHeader extends JComponent {
     for (int i = 0; i < sketch.getCodeCount(); i++) {
       SketchCode code = sketch.getCode(i);
 
-      String codeName = sketch.hideExtension(code.getExtension()) ? 
+      String codeName = code.isExtension(sketch.getHiddenExtensions()) ?
         code.getPrettyName() : code.getFileName();
 
       // if modified, add the li'l glyph next to the name
