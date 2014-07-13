@@ -44,6 +44,8 @@ public abstract class AbstractMonitor extends JFrame implements ActionListener {
   protected JCheckBox autoscrollBox;
   protected JComboBox lineEndings;
   protected JComboBox serialRates;
+  private boolean monitorEnabled;
+  private boolean closed;
 
   private Timer updateTimer;
   private StringBuffer updateBuffer;
@@ -54,6 +56,7 @@ public abstract class AbstractMonitor extends JFrame implements ActionListener {
     addWindowListener(new WindowAdapter() {
       public void windowClosing(WindowEvent event) {
         try {
+          closed = true;
           close();
         } catch (Exception e) {
           // ignore
@@ -173,10 +176,57 @@ public abstract class AbstractMonitor extends JFrame implements ActionListener {
         }
       }
     }
-    
+
     updateBuffer = new StringBuffer(1048576);
     updateTimer = new Timer(33, this);  // redraw serial monitor at 30 Hz
     updateTimer.start();
+
+    monitorEnabled = true;
+    closed = false;
+  }
+
+  public void enableWindow(boolean enable)
+  {
+    textArea.setEnabled(enable);
+    scrollPane.setEnabled(enable);
+    textField.setEnabled(enable);
+    sendButton.setEnabled(enable);
+    autoscrollBox.setEnabled(enable);
+    lineEndings.setEnabled(enable);
+    serialRates.setEnabled(enable);
+
+    monitorEnabled = enable;
+  }
+
+  // Puts the window in suspend state, closing the serial port
+  // to allow other entity (the programmer) to use it
+  public void suspend()
+  {
+   enableWindow(false);
+
+   try {
+        close();
+      }
+   catch(Exception e) {
+       //throw new SerialException("Failed closing the port");
+   }
+
+  }
+
+  public void resume() throws SerialException
+  {
+    // Enable the window
+    enableWindow(true);
+
+    // If the window is visible, try to open the serial port
+    if (isVisible())
+      try {
+        open();
+      }
+      catch(Exception e) {
+	  throw new SerialException("Failed opening the port");
+      }
+
   }
 
   public void onSerialRateChange(ActionListener listener) {
@@ -224,10 +274,14 @@ public abstract class AbstractMonitor extends JFrame implements ActionListener {
     return null;
   }
 
+  public boolean isClosed() {
+      return closed;
+  }
+
   public abstract void open() throws Exception;
 
   public abstract void close() throws Exception;
-  
+
   public synchronized void addToUpdateBuffer(char buff[], int n) {
     updateBuffer.append(buff, 0, n);
   }
