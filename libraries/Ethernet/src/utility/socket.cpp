@@ -319,7 +319,6 @@ void flush(SOCKET s) {
 
 uint16_t igmpsend(SOCKET s, const uint8_t * buf, uint16_t len)
 {
-  uint8_t status=0;
   uint16_t ret=0;
 
   if (len > W5100.SSIZE) 
@@ -335,7 +334,6 @@ uint16_t igmpsend(SOCKET s, const uint8_t * buf, uint16_t len)
 
   while ( (W5100.readSnIR(s) & SnIR::SEND_OK) != SnIR::SEND_OK ) 
   {
-    status = W5100.readSnSR(s);
     if (W5100.readSnIR(s) & SnIR::TIMEOUT)
     {
       /* in case of igmp, if send fails, then socket closed */
