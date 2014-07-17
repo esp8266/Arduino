@@ -77,20 +77,35 @@ public class FindReplace extends JFrame implements ActionListener {
     setResizable(false);
     this.editor = editor;
 
+    
+    FlowLayout searchLayout = new FlowLayout(FlowLayout.RIGHT,5,0);
     Container pain = getContentPane();
-    pain.setLayout(null);
+    pain.setLayout(searchLayout);
 
     JLabel findLabel = new JLabel(_("Find:"));
     JLabel replaceLabel = new JLabel(_("Replace with:"));
     Dimension labelDimension = replaceLabel.getPreferredSize();
+    
+    JPanel find = new JPanel();
 
-    pain.add(findLabel);
-    pain.add(replaceLabel);
+    find.add(findLabel);
+    
+    find.add(findField = new JTextField(20));
+    
+    pain.add(find);
+    
+    JPanel replace = new JPanel();
+    
+    replace.add(replaceLabel);
 
-    pain.add(findField = new JTextField(20));
-    pain.add(replaceField = new JTextField(20));
+    replace.add(replaceField = new JTextField(20));
+    
+    pain.add(replace);
+    
     int fieldHeight = findField.getPreferredSize().height;
 
+    JPanel checkbox = new JPanel();
+    
     // Fill the findString with selected text if no previous value
 	if(editor.getSelectedText()!=null && editor.getSelectedText().length()>0)
 		findString = editor.getSelectedText();
@@ -107,7 +122,7 @@ public class FindReplace extends JFrame implements ActionListener {
         }
       });
     ignoreCaseBox.setSelected(ignoreCase);
-    pain.add(ignoreCaseBox);
+    checkbox.add(ignoreCaseBox);
 
     wrapAroundBox = new JCheckBox(_("Wrap Around"));
     wrapAroundBox.addActionListener(new ActionListener() {
@@ -116,7 +131,7 @@ public class FindReplace extends JFrame implements ActionListener {
         }
       });
     wrapAroundBox.setSelected(wrapAround);
-    pain.add(wrapAroundBox);
+    checkbox.add(wrapAroundBox);
     
     searchAllFilesBox = new JCheckBox(_("Search all Sketch Tabs"));
     searchAllFilesBox.addActionListener(new ActionListener() {
@@ -125,11 +140,13 @@ public class FindReplace extends JFrame implements ActionListener {
         }
       });
     searchAllFilesBox.setSelected(searchAllFiles);
-    pain.add(searchAllFilesBox);
+    checkbox.add(searchAllFilesBox);
 
+    pain.add(checkbox);
+    
     JPanel buttons = new JPanel();
     
-    buttons.setLayout(new FlowLayout(FlowLayout.CENTER,BUTTONGAP,0));
+      buttons.setLayout(new FlowLayout(FlowLayout.CENTER,BUTTONGAP,0));
 
     // ordering is different on mac versus pc
     if (Base.isMacOS()) {
@@ -211,7 +228,7 @@ public class FindReplace extends JFrame implements ActionListener {
     buttons.setBounds(EDGE-BUTTONGAP, ypos,
                       buttonsDimension.width, buttonsDimension.height);
 
-    ypos += buttonsDimension.height + EDGE;
+    ypos += buttonsDimension.height;
 
 //    Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 
