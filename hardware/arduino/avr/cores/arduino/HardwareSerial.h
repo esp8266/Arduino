@@ -112,6 +112,7 @@ class HardwareSerial : public Stream
     virtual int available(void);
     virtual int peek(void);
     virtual int read(void);
+    int availableForWrite(void);
     virtual void flush(void);
     virtual size_t write(uint8_t);
     inline size_t write(unsigned long n) { return write((uint8_t)n); }

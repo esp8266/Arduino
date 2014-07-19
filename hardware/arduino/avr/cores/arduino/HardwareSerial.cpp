@@ -176,6 +176,21 @@ int HardwareSerial::read(void)
   }
 }
 
+int HardwareSerial::availableForWrite(void)
+{
+#if (SERIAL_TX_BUFFER_SIZE>256)
+  uint8_t oldSREG = SREG;
+  cli();
+#endif
+  tx_buffer_index_t head = _tx_buffer_head;
+  tx_buffer_index_t tail = _tx_buffer_tail;
+#if (SERIAL_TX_BUFFER_SIZE>256)
+  SREG = oldSREG;
+#endif
+  if (head >= tail) return SERIAL_TX_BUFFER_SIZE - 1 - head + tail;
+  return tail - head - 1;
+}
+
 void HardwareSerial::flush()
 {
   // If we have never written a byte, no need to flush. This special
