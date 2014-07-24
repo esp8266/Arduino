@@ -208,6 +208,7 @@ public class Preferences {
   JCheckBox updateExtensionBox;
   JCheckBox autoAssociateBox;
   JComboBox comboLanguage;
+  JCheckBox saveVerifyUploadBox;
 
 
   // the calling editor, so updates can be applied
@@ -478,6 +479,15 @@ public class Preferences {
         autoAssociateBox.setEnabled(false);
     }
 
+    // [ ] save when verifying or uploading
+
+    saveVerifyUploadBox = new JCheckBox(_("Save when verifying or uploading"));
+    pain.add(saveVerifyUploadBox);
+    d = saveVerifyUploadBox.getPreferredSize();
+    saveVerifyUploadBox.setBounds(left, top, d.width + 10, d.height);
+    right = Math.max(right, left + d.width);
+    top += d.height + GUI_BETWEEN;
+
     // More preferences are in the ...
 
     label = new JLabel(_("More preferences can be edited directly in the file"));
@@ -620,7 +630,8 @@ public class Preferences {
     setBoolean("upload.verbose", verboseUploadBox.isSelected());
     setBoolean("editor.linenumbers", displayLineNumbersBox.isSelected());
     setBoolean("upload.verify", verifyUploadBox.isSelected());
-    
+    setBoolean("save.verifyUpload", saveVerifyUploadBox.isSelected());
+
 //    setBoolean("sketchbook.closing_last_window_quits",
 //               closingLastQuitsBox.isSelected());
     //setBoolean("sketchbook.prompt", sketchPromptBox.isSelected());
@@ -642,6 +653,7 @@ public class Preferences {
 
     setBoolean("editor.external", externalEditorBox.isSelected());
     setBoolean("update.check", checkUpdatesBox.isSelected());
+    setBoolean("save.verifyUpload", saveVerifyUploadBox.isSelected());
 
     /*
       // was gonna use this to check memory settings,
@@ -703,6 +715,8 @@ public class Preferences {
       setSelected(getBoolean("editor.external"));
     checkUpdatesBox.
       setSelected(getBoolean("update.check"));
+    saveVerifyUploadBox.
+      setSelected(getBoolean("save.verifyUpload"));
 
     if (autoAssociateBox != null) {
       autoAssociateBox.
