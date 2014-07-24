@@ -426,8 +426,23 @@ public class FindReplace extends JFrame implements ActionListener {
   public void replace() {
 	if(findField.getText().length()==0)
 		return;
-    editor.setSelectedText(replaceField.getText());
-    editor.getSketch().setModified(true);  // TODO is this necessary?
+   
+	int newpos = editor.getSelectionStart() - findField.getText().length();
+	if (newpos < 0) newpos = 0; 
+	editor.setSelection(newpos, newpos);
+
+    boolean foundAtLeastOne = false;
+
+      if ( find(false,false,searchAllFiles,-1)) {
+        foundAtLeastOne = true;
+        editor.setSelectedText(replaceField.getText());
+        editor.getSketch().setModified(true);  // TODO is this necessary?
+     }
+      
+    if ( !foundAtLeastOne ) {
+      Toolkit.getDefaultToolkit().beep();
+    }	
+
   }
 
   /**
@@ -453,7 +468,8 @@ public class FindReplace extends JFrame implements ActionListener {
     while ( true ) {
       if ( find(false,false,searchAllFiles,-1)) {
         foundAtLeastOne = true;
-        replace();
+        editor.setSelectedText(replaceField.getText());
+        editor.getSketch().setModified(true);  // TODO is this necessary?
      } else {
         break;
       }
