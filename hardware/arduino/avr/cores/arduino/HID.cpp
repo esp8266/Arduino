@@ -106,7 +106,7 @@ const u8 _hidReportDescriptor[] = {
     0x81, 0x00,                    //   INPUT (Data,Ary,Abs)
     0xc0,                          // END_COLLECTION
 
-#if RAWHID_ENABLED
+#ifdef RAWHID_ENABLED
 	//	RAW HID
 	0x06, LSB(RAWHID_USAGE_PAGE), MSB(RAWHID_USAGE_PAGE),	// 30
 	0x0A, LSB(RAWHID_USAGE), MSB(RAWHID_USAGE),
