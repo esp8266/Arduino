@@ -163,10 +163,11 @@ uint32_t File::size() {
   uint8_t buff[5];
   bridge.transfer(cmd, 2, buff, 5);
   //err = res[0]; // First byte is error code
-  uint32_t res = buff[1] << 24;
-  res += buff[2] << 16;
-  res += buff[3] << 8;
-  res += buff[4];
+  uint32_t res;
+  res  = ((uint32_t)buff[1]) << 24;
+  res |= ((uint32_t)buff[2]) << 16;
+  res |= ((uint32_t)buff[3]) << 8;
+  res |= ((uint32_t)buff[4]);
   return res;
 }
 
