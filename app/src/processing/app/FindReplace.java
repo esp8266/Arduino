@@ -44,6 +44,7 @@ import javax.swing.*;
  * <A HREF="http://dev.processing.org/bugs/show_bug.cgi?id=244"> Bug 244</A>
  * should anyone have clues about how to fix.
  */
+@SuppressWarnings("serial")
 public class FindReplace extends JFrame implements ActionListener {
 
   static final int EDGE = Base.isMacOS() ? 20 : 13;
@@ -76,39 +77,33 @@ public class FindReplace extends JFrame implements ActionListener {
     super("Find");
     setResizable(false);
     this.editor = editor;
-
     
     FlowLayout searchLayout = new FlowLayout(FlowLayout.RIGHT,5,0);
-    Container pain = getContentPane();
-    pain.setLayout(searchLayout);
+    Container pane = getContentPane();
+    pane.setLayout(searchLayout);
 
     JLabel findLabel = new JLabel(_("Find:"));
     JLabel replaceLabel = new JLabel(_("Replace with:"));
     Dimension labelDimension = replaceLabel.getPreferredSize();
     
     JPanel find = new JPanel();
-
     find.add(findLabel);
-    
     find.add(findField = new JTextField(20));
-    
-    pain.add(find);
+    pane.add(find);
     
     JPanel replace = new JPanel();
-    
     replace.add(replaceLabel);
-
     replace.add(replaceField = new JTextField(20));
-    
-    pain.add(replace);
+    pane.add(replace);
     
     int fieldHeight = findField.getPreferredSize().height;
 
     JPanel checkbox = new JPanel();
     
     // Fill the findString with selected text if no previous value
-	if(editor.getSelectedText()!=null && editor.getSelectedText().length()>0)
-		findString = editor.getSelectedText();
+    if (editor.getSelectedText() != null &&
+        editor.getSelectedText().length() > 0)
+      findString = editor.getSelectedText();
     
     if (findString != null) findField.setText(findString);
     if (replaceString != null) replaceField.setText(replaceString);
@@ -142,11 +137,10 @@ public class FindReplace extends JFrame implements ActionListener {
     searchAllFilesBox.setSelected(searchAllFiles);
     checkbox.add(searchAllFilesBox);
 
-    pain.add(checkbox);
+    pane.add(checkbox);
     
     JPanel buttons = new JPanel();
-    
-      buttons.setLayout(new FlowLayout(FlowLayout.CENTER,BUTTONGAP,0));
+    buttons.setLayout(new FlowLayout(FlowLayout.CENTER, BUTTONGAP, 0));
 
     // ordering is different on mac versus pc
     if (Base.isMacOS()) {
@@ -163,7 +157,7 @@ public class FindReplace extends JFrame implements ActionListener {
       buttons.add(replaceButton = new JButton(_("Replace")));
       buttons.add(replaceAllButton = new JButton(_("Replace All")));
     }
-    pain.add(buttons);
+    pane.add(buttons);
 
     // to fix ugliness.. normally macosx java 1.3 puts an
     // ugly white border around this object, so turn it off.
@@ -369,45 +363,40 @@ public class FindReplace extends JFrame implements ActionListener {
     }
 
     if (nextIndex == -1) {
-      //Nothing found on this tab: Search other tabs if required
-      if(searchTabs)
-      {
-      	//editor.
-      	Sketch sketch = editor.getSketch();
-      	if(sketch.getCodeCount()>1)
-      	{
-      		int realCurrentTab = sketch.getCodeIndex(sketch.getCurrentCode());
-      		
-      		if(originTab!=realCurrentTab)
-      		{
-	      		if(originTab <0)
-	      			originTab = realCurrentTab;
+      // Nothing found on this tab: Search other tabs if required
+      if (searchTabs) {
+        // editor.
+        Sketch sketch = editor.getSketch();
+        if (sketch.getCodeCount() > 1) {
+          int realCurrentTab = sketch.getCodeIndex(sketch.getCurrentCode());
 
-				if(!wrap)
-					if((!backwards && realCurrentTab+1 >= sketch.getCodeCount()) || (backwards && realCurrentTab-1 < 0))
-						return false; // Can't continue without wrap
-				
-				if(backwards)
-				{
-	      			sketch.handlePrevCode();
-	      			this.setVisible(true);
-	      			int l = editor.getText().length()-1;
-	      			editor.setSelection(l,l);
-				}
-	      		else
-	      		{
-	      			sketch.handleNextCode();
-	      			this.setVisible(true);
-	      			editor.setSelection(0,0);
-	      		}
-	      				
-	      		return find(wrap,backwards,searchTabs,originTab);
-      		}
-      	}
+          if (originTab != realCurrentTab) {
+            if (originTab < 0)
+              originTab = realCurrentTab;
+
+            if (!wrap)
+              if ((!backwards && realCurrentTab + 1 >= sketch.getCodeCount()) ||
+                  (backwards && realCurrentTab - 1 < 0))
+                return false; // Can't continue without wrap
+
+            if (backwards) {
+              sketch.handlePrevCode();
+              this.setVisible(true);
+              int l = editor.getText().length() - 1;
+              editor.setSelection(l, l);
+            } else {
+              sketch.handleNextCode();
+              this.setVisible(true);
+              editor.setSelection(0, 0);
+            }
+
+            return find(wrap, backwards, searchTabs, originTab);
+          }
+        }
       }
       
-      if(wrapNeeded)
-      		nextIndex = backwards? text.lastIndexOf(search):text.indexOf(search, 0);
+      if (wrapNeeded)
+        nextIndex = backwards ? text.lastIndexOf(search) : text.indexOf(search, 0);
     }
    	
    	if (nextIndex != -1) {
@@ -424,24 +413,25 @@ public class FindReplace extends JFrame implements ActionListener {
    * replacement text field.
    */
   public void replace() {
-	if(findField.getText().length()==0)
-		return;
-   
-	int newpos = editor.getSelectionStart() - findField.getText().length();
-	if (newpos < 0) newpos = 0; 
-	editor.setSelection(newpos, newpos);
+    if (findField.getText().length() == 0)
+      return;
+
+    int newpos = editor.getSelectionStart() - findField.getText().length();
+    if (newpos < 0)
+      newpos = 0;
+    editor.setSelection(newpos, newpos);
 
     boolean foundAtLeastOne = false;
 
-      if ( find(false,false,searchAllFiles,-1)) {
-        foundAtLeastOne = true;
-        editor.setSelectedText(replaceField.getText());
-        editor.getSketch().setModified(true);  // TODO is this necessary?
-     }
-      
-    if ( !foundAtLeastOne ) {
+    if (find(false, false, searchAllFiles, -1)) {
+      foundAtLeastOne = true;
+      editor.setSelectedText(replaceField.getText());
+      editor.getSketch().setModified(true); // TODO is this necessary?
+    }
+
+    if (!foundAtLeastOne) {
       Toolkit.getDefaultToolkit().beep();
-    }	
+    }
 
   }
 
@@ -459,22 +449,22 @@ public class FindReplace extends JFrame implements ActionListener {
    * alternately until nothing more found.
    */
   public void replaceAll() {
-    if(findField.getText().length()==0)
-    	return;
+    if (findField.getText().length() == 0)
+      return;
     // move to the beginning
     editor.setSelection(0, 0);
 
     boolean foundAtLeastOne = false;
-    while ( true ) {
-      if ( find(false,false,searchAllFiles,-1)) {
+    while (true) {
+      if (find(false, false, searchAllFiles, -1)) {
         foundAtLeastOne = true;
         editor.setSelectedText(replaceField.getText());
-        editor.getSketch().setModified(true);  // TODO is this necessary?
-     } else {
+        editor.getSketch().setModified(true); // TODO is this necessary?
+      } else {
         break;
       }
     }
-    if ( !foundAtLeastOne ) {
+    if (!foundAtLeastOne) {
       Toolkit.getDefaultToolkit().beep();
     }
   }
