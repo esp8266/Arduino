@@ -44,6 +44,7 @@ import javax.swing.*;
  * <A HREF="http://dev.processing.org/bugs/show_bug.cgi?id=244"> Bug 244</A>
  * should anyone have clues about how to fix.
  */
+@SuppressWarnings("serial")
 public class FindReplace extends JFrame implements ActionListener {
 
   static final int EDGE = Base.isMacOS() ? 20 : 13;
@@ -69,25 +70,41 @@ public class FindReplace extends JFrame implements ActionListener {
   JCheckBox wrapAroundBox;
   static boolean wrapAround = true;
 
+  JCheckBox searchAllFilesBox;
+  static boolean searchAllFiles = false;
+
   public FindReplace(Editor editor) {
     super("Find");
     setResizable(false);
     this.editor = editor;
-
-    Container pain = getContentPane();
-    pain.setLayout(null);
+    
+    FlowLayout searchLayout = new FlowLayout(FlowLayout.RIGHT,5,0);
+    Container pane = getContentPane();
+    pane.setLayout(searchLayout);
 
     JLabel findLabel = new JLabel(_("Find:"));
     JLabel replaceLabel = new JLabel(_("Replace with:"));
     Dimension labelDimension = replaceLabel.getPreferredSize();
-
-    pain.add(findLabel);
-    pain.add(replaceLabel);
-
-    pain.add(findField = new JTextField(20));
-    pain.add(replaceField = new JTextField(20));
+    
+    JPanel find = new JPanel();
+    find.add(findLabel);
+    find.add(findField = new JTextField(20));
+    pane.add(find);
+    
+    JPanel replace = new JPanel();
+    replace.add(replaceLabel);
+    replace.add(replaceField = new JTextField(20));
+    pane.add(replace);
+    
     int fieldHeight = findField.getPreferredSize().height;
 
+    JPanel checkbox = new JPanel();
+    
+    // Fill the findString with selected text if no previous value
+    if (editor.getSelectedText() != null &&
+        editor.getSelectedText().length() > 0)
+      findString = editor.getSelectedText();
+    
     if (findString != null) findField.setText(findString);
     if (replaceString != null) replaceField.setText(replaceString);
     //System.out.println("setting find str to " + findString);
@@ -100,7 +117,7 @@ public class FindReplace extends JFrame implements ActionListener {
         }
       });
     ignoreCaseBox.setSelected(ignoreCase);
-    pain.add(ignoreCaseBox);
+    checkbox.add(ignoreCaseBox);
 
     wrapAroundBox = new JCheckBox(_("Wrap Around"));
     wrapAroundBox.addActionListener(new ActionListener() {
@@ -109,11 +126,21 @@ public class FindReplace extends JFrame implements ActionListener {
         }
       });
     wrapAroundBox.setSelected(wrapAround);
-    pain.add(wrapAroundBox);
-
-    JPanel buttons = new JPanel();
+    checkbox.add(wrapAroundBox);
     
-    buttons.setLayout(new FlowLayout(FlowLayout.CENTER,BUTTONGAP,0));
+    searchAllFilesBox = new JCheckBox(_("Search all Sketch Tabs"));
+    searchAllFilesBox.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          searchAllFiles = searchAllFilesBox.isSelected();
+        }
+      });
+    searchAllFilesBox.setSelected(searchAllFiles);
+    checkbox.add(searchAllFilesBox);
+
+    pane.add(checkbox);
+    
+    JPanel buttons = new JPanel();
+    buttons.setLayout(new FlowLayout(FlowLayout.CENTER, BUTTONGAP, 0));
 
     // ordering is different on mac versus pc
     if (Base.isMacOS()) {
@@ -130,7 +157,7 @@ public class FindReplace extends JFrame implements ActionListener {
       buttons.add(replaceButton = new JButton(_("Replace")));
       buttons.add(replaceAllButton = new JButton(_("Replace All")));
     }
-    pain.add(buttons);
+    pane.add(buttons);
 
     // to fix ugliness.. normally macosx java 1.3 puts an
     // ugly white border around this object, so turn it off.
@@ -180,9 +207,13 @@ public class FindReplace extends JFrame implements ActionListener {
 
     ignoreCaseBox.setBounds(EDGE + labelDimension.width + SMALL,
                             ypos,
-                            (fieldWidth-SMALL)/2, fieldHeight);
+                            (fieldWidth-SMALL)/4, fieldHeight);
 
-    wrapAroundBox.setBounds(EDGE + labelDimension.width + SMALL + (fieldWidth-SMALL)/2 + SMALL,
+    wrapAroundBox.setBounds(EDGE + labelDimension.width + SMALL + (fieldWidth-SMALL)/4 + SMALL,
+                            ypos,
+                            (fieldWidth-SMALL)/4, fieldHeight);
+
+	searchAllFilesBox.setBounds(EDGE + labelDimension.width + SMALL + (int)((fieldWidth-SMALL)/1.9) + SMALL,
                             ypos,
                             (fieldWidth-SMALL)/2, fieldHeight);
 
@@ -191,7 +222,7 @@ public class FindReplace extends JFrame implements ActionListener {
     buttons.setBounds(EDGE-BUTTONGAP, ypos,
                       buttonsDimension.width, buttonsDimension.height);
 
-    ypos += buttonsDimension.height + EDGE;
+    ypos += buttonsDimension.height;
 
 //    Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 
@@ -291,8 +322,9 @@ public class FindReplace extends JFrame implements ActionListener {
   // look for the next instance of the find string to be found
   // once found, select it (and go to that line)
 
-  private boolean find(boolean wrap,boolean backwards ) {
-
+  private boolean find(boolean wrap,boolean backwards,boolean searchTabs,int originTab) {
+    //System.out.println("Find: " + originTab);
+	boolean wrapNeeded = false;
     String search = findField.getText();
     //System.out.println("finding for " + search + " " + findString);
     // this will catch "find next" being called when no search yet
@@ -313,7 +345,7 @@ public class FindReplace extends JFrame implements ActionListener {
       nextIndex = text.indexOf(search, selectionEnd);
       if (wrap && nextIndex == -1) {
         // if wrapping, a second chance is ok, start from beginning
-        nextIndex = text.indexOf(search, 0);
+        wrapNeeded = true;
       }
     } else {
       //int selectionStart = editor.textarea.getSelectionStart();
@@ -326,16 +358,53 @@ public class FindReplace extends JFrame implements ActionListener {
       }
       if (wrap && nextIndex == -1) {
         // if wrapping, a second chance is ok, start from the end
-        nextIndex = text.lastIndexOf(search);
+        wrapNeeded = true;
       }
     }
 
-    if (nextIndex != -1) {
-      editor.setSelection(nextIndex, nextIndex + search.length());
-    } else {
-      //Toolkit.getDefaultToolkit().beep();
+    if (nextIndex == -1) {
+      // Nothing found on this tab: Search other tabs if required
+      if (searchTabs) {
+        // editor.
+        Sketch sketch = editor.getSketch();
+        if (sketch.getCodeCount() > 1) {
+          int realCurrentTab = sketch.getCodeIndex(sketch.getCurrentCode());
+
+          if (originTab != realCurrentTab) {
+            if (originTab < 0)
+              originTab = realCurrentTab;
+
+            if (!wrap)
+              if ((!backwards && realCurrentTab + 1 >= sketch.getCodeCount()) ||
+                  (backwards && realCurrentTab - 1 < 0))
+                return false; // Can't continue without wrap
+
+            if (backwards) {
+              sketch.handlePrevCode();
+              this.setVisible(true);
+              int l = editor.getText().length() - 1;
+              editor.setSelection(l, l);
+            } else {
+              sketch.handleNextCode();
+              this.setVisible(true);
+              editor.setSelection(0, 0);
+            }
+
+            return find(wrap, backwards, searchTabs, originTab);
+          }
+        }
+      }
+      
+      if (wrapNeeded)
+        nextIndex = backwards ? text.lastIndexOf(search) : text.indexOf(search, 0);
     }
-    return nextIndex != -1;
+   	
+   	if (nextIndex != -1) {
+      editor.setSelection(nextIndex, nextIndex + search.length());
+      return true;
+   	}
+   
+    return false;
   }
 
 
@@ -344,8 +413,26 @@ public class FindReplace extends JFrame implements ActionListener {
    * replacement text field.
    */
   public void replace() {
-    editor.setSelectedText(replaceField.getText());
-    editor.getSketch().setModified(true);  // TODO is this necessary?
+    if (findField.getText().length() == 0)
+      return;
+
+    int newpos = editor.getSelectionStart() - findField.getText().length();
+    if (newpos < 0)
+      newpos = 0;
+    editor.setSelection(newpos, newpos);
+
+    boolean foundAtLeastOne = false;
+
+    if (find(false, false, searchAllFiles, -1)) {
+      foundAtLeastOne = true;
+      editor.setSelectedText(replaceField.getText());
+      editor.getSketch().setModified(true); // TODO is this necessary?
+    }
+
+    if (!foundAtLeastOne) {
+      Toolkit.getDefaultToolkit().beep();
+    }
+
   }
 
   /**
@@ -362,19 +449,22 @@ public class FindReplace extends JFrame implements ActionListener {
    * alternately until nothing more found.
    */
   public void replaceAll() {
+    if (findField.getText().length() == 0)
+      return;
     // move to the beginning
     editor.setSelection(0, 0);
 
     boolean foundAtLeastOne = false;
-    while ( true ) {
-      if ( find(false,false) ) {
+    while (true) {
+      if (find(false, false, searchAllFiles, -1)) {
         foundAtLeastOne = true;
-        replace();
-     } else {
+        editor.setSelectedText(replaceField.getText());
+        editor.getSketch().setModified(true); // TODO is this necessary?
+      } else {
         break;
       }
     }
-    if ( !foundAtLeastOne ) {
+    if (!foundAtLeastOne) {
       Toolkit.getDefaultToolkit().beep();
     }
   }
@@ -385,13 +475,13 @@ public class FindReplace extends JFrame implements ActionListener {
   }
 
   public void findNext() {
-    if ( !find( wrapAround, false ) ) {
+    if ( !find( wrapAround, false, searchAllFiles,-1 ) ) {
       Toolkit.getDefaultToolkit().beep();
     }
   }
 
   public void findPrevious() {
-    if ( !find( wrapAround, true ) ) {
+    if ( !find( wrapAround, true, searchAllFiles,-1 ) ) {
       Toolkit.getDefaultToolkit().beep();
     }
   }

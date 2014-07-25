@@ -1,5 +1,9 @@
 ARDUINO 1.5.8 BETA - not yet release
 
+[ide]
+* Find/Replace over multiple tabs (Erwin Ried, Fulvio Ieva)
+* Fix wrong "Replace" behavior with empty "Find" field (Fulvio Ieva)
+
 [libraries]
 * FileIO bridge: fixed wrong return value in File::size() for size >32768
 
