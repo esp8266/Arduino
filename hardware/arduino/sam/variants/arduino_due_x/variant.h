@@ -232,6 +232,25 @@ static const uint8_t CAN1TX = 89;
 #define TC_MIN_DUTY_CYCLE   0
 #define TC_RESOLUTION		8
 
+// Watchdog routines
+
+#define WDTO_15MS	WDT_MR_WDRSTEN | WDT_MR_WDRPROC | WDT_MR_WDV(4) | WDT_MR_WDD(4)
+#define WDTO_30MS	WDT_MR_WDRSTEN | WDT_MR_WDRPROC | WDT_MR_WDV(8) | WDT_MR_WDD(8)
+#define WDTO_60MS 	WDT_MR_WDRSTEN | WDT_MR_WDRPROC | WDT_MR_WDV(15) | WDT_MR_WDD(15)
+#define WDTO_120MS	WDT_MR_WDRSTEN | WDT_MR_WDRPROC | WDT_MR_WDV(31) | WDT_MR_WDD(31)
+#define WDTO_250MS	WDT_MR_WDRSTEN | WDT_MR_WDRPROC | WDT_MR_WDV(64) | WDT_MR_WDD(64)
+#define WDTO_500MS	WDT_MR_WDRSTEN | WDT_MR_WDRPROC | WDT_MR_WDV(128) | WDT_MR_WDD(128)
+#define WDTO_1S		WDT_MR_WDRSTEN | WDT_MR_WDRPROC | WDT_MR_WDV(256) | WDT_MR_WDD(256)
+#define WDTO_2S		WDT_MR_WDRSTEN | WDT_MR_WDRPROC | WDT_MR_WDV(512) | WDT_MR_WDD(512)
+#define WDTO_4S		WDT_MR_WDRSTEN | WDT_MR_WDRPROC | WDT_MR_WDV(1024) | WDT_MR_WDD(1024)
+#define WDTO_8S		WDT_MR_WDRSTEN | WDT_MR_WDRPROC | WDT_MR_WDV(2048) | WDT_MR_WDD(2048)
+
+void wdt_enable (uint32_t mode);
+
+void wdt_disable(void);
+
+void wdt_reset(void);
+
 #ifdef __cplusplus
 }
 #endif
@@ -273,6 +292,7 @@ extern USARTClass Serial3;
 #define SERIAL_PORT_HARDWARE1       Serial1
 #define SERIAL_PORT_HARDWARE2       Serial2
 #define SERIAL_PORT_HARDWARE3       Serial3
+
 
 #endif /* _VARIANT_ARDUINO_DUE_X_ */
 

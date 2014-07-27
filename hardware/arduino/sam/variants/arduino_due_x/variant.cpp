@@ -359,6 +359,52 @@ void serialEventRun(void)
 }
 
 // ----------------------------------------------------------------------------
+extern "C" {
+
+/**
+ * Watchdog enable
+ *
+ * Enable the watchdog timer with the specified settings.
+ * WDTO_xxx macros provide standard settings.
+ * Should only be called once.
+ */
+void wdt_enable (uint32_t mode)
+{
+	WDT_Enable (WDT, mode);
+}
+
+/**
+ * Watchdog disable
+ *
+ * Disable the watchdog timer.
+ * Should only be called once.
+ */
+void wdt_disable(void)
+{
+	WDT_Disable (WDT);
+}
+
+/**
+ * Watchdog reset
+ *
+ * Resets the watchdog counter
+ */
+void wdt_reset(void)
+{
+	WDT_Restart (WDT);
+}
+
+}  // extern "C"
+
+/**
+ * Watchdog initialize hook
+ *
+ * This function is called from init().
+ * Default action is to disable watchdog.
+ */
+void wdt_initialize(void) __attribute__ ((weak, alias("wdt_disable")));
+
+// ----------------------------------------------------------------------------
 
 #ifdef __cplusplus
 extern "C" {
@@ -377,8 +423,8 @@ void init( void )
     while (true);
   }
 
-  // Disable watchdog
-  WDT_Disable(WDT);
+  // Initialize watchdog
+  wdt_initialize();
 
   // Initialize C library
   __libc_init_array();
