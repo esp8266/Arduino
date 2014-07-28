@@ -88,6 +88,10 @@ public abstract class Uploader implements MessageConsumer {
   }
 
   protected boolean executeUploadCommand(String command[]) throws Exception {
+    // Skip empty commands
+    if (command == null || command.length == 0)
+      return true;
+
     notFoundError = false;
     int result = -1;
 
