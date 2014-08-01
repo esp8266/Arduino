@@ -15,6 +15,10 @@
 #include "variant.h"
 #include <stdio.h>
 
+// SPI_HAS_TRANSACTION means SPI has beginTransaction(), endTransaction(),
+// usingInterrupt(), and SPISetting(clock, bitOrder, dataMode)
+#define SPI_HAS_TRANSACTION 1
+
 #define SPI_MODE0 0x02
 #define SPI_MODE1 0x00
 #define SPI_MODE2 0x03
