@@ -24,6 +24,7 @@ setAppKeyName	KEYWORD2
 setAppKey	KEYWORD2
 setChoreo	KEYWORD2
 setCredential	KEYWORD2
+setSavedInputs	KEYWORD2
 addInput	KEYWORD2
 addOutputFilter	KEYWORD2
 setSettingsFileToWrite	KEYWORD2
