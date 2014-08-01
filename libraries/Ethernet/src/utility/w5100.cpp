@@ -35,9 +35,11 @@ void W5100Class::init(void)
   SPI.setClockDivider(SPI_CS, 21);
   SPI.setDataMode(SPI_CS, SPI_MODE0);
 #endif
+  SPI.beginTransaction(SPI_ETHERNET_SETTINGS);
   writeMR(1<<RST);
   writeTMSR(0x55);
   writeRMSR(0x55);
+  SPI.endTransaction();
 
   for (int i=0; i<MAX_SOCK_NUM; i++) {
     SBASE[i] = TXBUF_BASE + SSIZE * i;
