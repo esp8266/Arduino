@@ -47,8 +47,11 @@ void SPIClass::init() {
 	if (initialized)
 		return;
 	interruptMode = 0;
-	interruptMask = 0;
 	interruptSave = 0;
+	interruptMask[0] = 0;
+	interruptMask[1] = 0;
+	interruptMask[2] = 0;
+	interruptMask[3] = 0;
 	initCb();
 	SPI_Configure(spi, id, SPI_MR_MSTR | SPI_MR_PS | SPI_MR_MODFDIS);
 	SPI_Enable(spi);
@@ -59,9 +62,11 @@ void SPIClass::init() {
 #define interruptsStatus() __interruptsStatus()
 static inline unsigned char __interruptsStatus(void) __attribute__((always_inline, unused));
 static inline unsigned char __interruptsStatus(void) {
-  unsigned int primask;
+  unsigned int primask, faultmask;
   asm volatile ("mrs %0, primask" : "=r" (primask));
   if (primask) return 0;
+  asm volatile ("mrs %0, faultmask" : "=r" (faultmask));
+  if (faultmask) return 0;
   return 1;
 }
 #endif
@@ -72,23 +77,27 @@ void SPIClass::usingInterrupt(uint8_t interruptNumber)
 
 	irestore = interruptsStatus();
 	noInterrupts();
-	if (interruptMode < 2) {
+	if (interruptMode < 16) {
 		if (interruptNumber > NUM_DIGITAL_PINS) {
-			interruptMode = 2;
+			interruptMode = 16;
 		} else {
-			uint8_t imask = interruptMask;
 			Pio *pio = g_APinDescription[interruptNumber].pPort;
+			uint32_t mask = g_APinDescription[interruptNumber].ulPin;
 			if (pio == PIOA) {
-				imask |= 1;
+				interruptMode |= 1;
+				interruptMask[0] |= mask;
 			} else if (pio == PIOB) {
-				imask |= 2;
+				interruptMode |= 2;
+				interruptMask[1] |= mask;
 			} else if (pio == PIOC) {
-				imask |= 4;
+				interruptMode |= 4;
+				interruptMask[2] |= mask;
 			} else if (pio == PIOD) {
-				imask |= 8;
+				interruptMode |= 8;
+				interruptMask[3] |= mask;
+			} else {
+				interruptMode = 16;
 			}
-			interruptMask = imask;
-			interruptMode = 1;
 		}
 	}
 	if (irestore) interrupts();
@@ -96,13 +105,13 @@ void SPIClass::usingInterrupt(uint8_t interruptNumber)
 
 void SPIClass::beginTransaction(uint8_t pin, SPISettings settings)
 {
-	if (interruptMode > 0) {
-		if (interruptMode == 1) {
-			uint8_t imask = interruptMask;
-			if (imask & 1) NVIC_DisableIRQ(PIOA_IRQn);
-			if (imask & 2) NVIC_DisableIRQ(PIOB_IRQn);
-			if (imask & 4) NVIC_DisableIRQ(PIOC_IRQn);
-			if (imask & 8) NVIC_DisableIRQ(PIOD_IRQn);
+	uint8_t mode = interruptMode;
+	if (mode > 0) {
+		if (mode < 16) {
+			if (mode & 1) PIOA->PIO_IDR = interruptMask[0];
+			if (mode & 2) PIOB->PIO_IDR = interruptMask[1];
+			if (mode & 4) PIOC->PIO_IDR = interruptMask[2];
+			if (mode & 8) PIOD->PIO_IDR = interruptMask[3];
 		} else {
 			interruptSave = interruptsStatus();
 			noInterrupts();
@@ -111,17 +120,20 @@ void SPIClass::beginTransaction(uint8_t pin, SPISettings settings)
 	uint32_t ch = BOARD_PIN_TO_SPI_CHANNEL(pin);
 	bitOrder[ch] = settings.border;
 	SPI_ConfigureNPCS(spi, ch, settings.config);
+	//setBitOrder(pin, settings.border);
+	//setDataMode(pin, settings.datamode);
+	//setClockDivider(pin, settings.clockdiv);
 }
 
 void SPIClass::endTransaction(void)
 {
-	if (interruptMode > 0) {
-		if (interruptMode == 1) {
-			uint8_t imask = interruptMask;
-			if (imask & 1) NVIC_EnableIRQ(PIOA_IRQn);
-			if (imask & 2) NVIC_EnableIRQ(PIOB_IRQn);
-			if (imask & 4) NVIC_EnableIRQ(PIOC_IRQn);
-			if (imask & 8) NVIC_EnableIRQ(PIOD_IRQn);
+	uint8_t mode = interruptMode;
+	if (mode > 0) {
+		if (mode < 16) {
+			if (mode & 1) PIOA->PIO_IER = interruptMask[0];
+			if (mode & 2) PIOB->PIO_IER = interruptMask[1];
+			if (mode & 4) PIOC->PIO_IER = interruptMask[2];
+			if (mode & 8) PIOD->PIO_IER = interruptMask[3];
 		} else {
 			if (interruptSave) interrupts();
 		}

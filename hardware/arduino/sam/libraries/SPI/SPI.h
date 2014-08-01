@@ -316,8 +316,11 @@ private:
 			}
 		}
 		config = (dataMode & 3) | SPI_CSR_CSAAT | SPI_CSR_SCBR(div) | SPI_CSR_DLYBCT(1);
+		//clockdiv = div;
+		//datamode = dataMode;
 	}
 	uint32_t config;
+	//uint8_t clockdiv, datamode;
 	BitOrder border;
 	friend class SPIClass;
 };
@@ -370,9 +373,9 @@ class SPIClass {
 	uint32_t mode[SPI_CHANNELS_NUM];
 	void (*initCb)(void);
 	bool initialized;
-	uint8_t interruptMode;  // 0=none, 1=mask, 2=global
-	uint8_t interruptMask;  // bits 0:3=pin change
-	uint8_t interruptSave;  // temp storage, to restore state
+	uint8_t interruptMode;    // 0=none, 1-15=mask, 16=global
+	uint8_t interruptSave;    // temp storage, to restore state
+	uint32_t interruptMask[4];
 };
 
 #if SPI_INTERFACES_COUNT > 0
