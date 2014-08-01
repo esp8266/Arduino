@@ -24,6 +24,7 @@
 #ifndef SOFTWARE_SPI
 #ifdef USE_SPI_LIB
 #include <SPI.h>
+static SPISettings settings;
 #endif
 // functions for hardware SPI
 /** Send a byte to the card */
@@ -158,9 +159,15 @@ uint32_t Sd2Card::cardSize(void) {
 //------------------------------------------------------------------------------
 void Sd2Card::chipSelectHigh(void) {
   digitalWrite(chipSelectPin_, HIGH);
+#ifdef USE_SPI_LIB
+  SPI.endTransaction();
+#endif
 }
 //------------------------------------------------------------------------------
 void Sd2Card::chipSelectLow(void) {
+#ifdef USE_SPI_LIB
+  SPI.beginTransaction(settings);
+#endif
   digitalWrite(chipSelectPin_, LOW);
 }
 //------------------------------------------------------------------------------
@@ -233,7 +240,7 @@ uint8_t Sd2Card::init(uint8_t sckRateID, uint8_t chipSelectPin) {
 
   // set pin modes
   pinMode(chipSelectPin_, OUTPUT);
-  chipSelectHigh();
+  digitalWrite(chipSelectPin_, HIGH);
 #ifndef USE_SPI_LIB
   pinMode(SPI_MISO_PIN, INPUT);
   pinMode(SPI_MOSI_PIN, OUTPUT);
@@ -251,16 +258,18 @@ uint8_t Sd2Card::init(uint8_t sckRateID, uint8_t chipSelectPin) {
   SPSR &= ~(1 << SPI2X);
 #else // USE_SPI_LIB
   SPI.begin();
-#ifdef SPI_CLOCK_DIV128
-    SPI.setClockDivider(SPI_CLOCK_DIV128);
-#else
-    SPI.setClockDivider(255);
-#endif
+  settings = SPISettings(250000, MSBFIRST, SPI_MODE0);
 #endif // USE_SPI_LIB
 #endif // SOFTWARE_SPI
 
   // must supply min of 74 clock cycles with CS high.
+#ifdef USE_SPI_LIB
+  SPI.beginTransaction(settings);
+#endif
   for (uint8_t i = 0; i < 10; i++) spiSend(0XFF);
+#ifdef USE_SPI_LIB
+  SPI.endTransaction();
+#endif
 
   chipSelectLow();
 
@@ -497,21 +506,15 @@ uint8_t Sd2Card::setSckRate(uint8_t sckRateID) {
   SPCR |= (sckRateID & 4 ? (1 << SPR1) : 0)
     | (sckRateID & 2 ? (1 << SPR0) : 0);
 #else // USE_SPI_LIB
-  int v;
-#ifdef SPI_CLOCK_DIV128
   switch (sckRateID) {
-    case 0: v=SPI_CLOCK_DIV2; break;
-    case 1: v=SPI_CLOCK_DIV4; break;
-    case 2: v=SPI_CLOCK_DIV8; break;
-    case 3: v=SPI_CLOCK_DIV16; break;
-    case 4: v=SPI_CLOCK_DIV32; break;
-    case 5: v=SPI_CLOCK_DIV64; break;
-    case 6: v=SPI_CLOCK_DIV128; break;
+    case 0:  settings = SPISettings(25000000, MSBFIRST, SPI_MODE0); break;
+    case 1:  settings = SPISettings(4000000, MSBFIRST, SPI_MODE0); break;
+    case 2:  settings = SPISettings(2000000, MSBFIRST, SPI_MODE0); break;
+    case 3:  settings = SPISettings(1000000, MSBFIRST, SPI_MODE0); break;
+    case 4:  settings = SPISettings(500000, MSBFIRST, SPI_MODE0); break;
+    case 5:  settings = SPISettings(250000, MSBFIRST, SPI_MODE0); break;
+    default: settings = SPISettings(125000, MSBFIRST, SPI_MODE0);
   }
-#else // SPI_CLOCK_DIV128
-  v = 2 << sckRateID;
-#endif // SPI_CLOCK_DIV128
-  SPI.setClockDivider(v);
 #endif // USE_SPI_LIB
   return true;
 }
