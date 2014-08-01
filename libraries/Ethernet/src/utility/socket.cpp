@@ -30,6 +30,12 @@ uint8_t socket(SOCKET s, uint8_t protocol, uint16_t port, uint8_t flag)
 }
 
 
+uint8_t socketStatus(SOCKET s)
+{
+  return W5100.readSnSR(s);
+}
+
+
 /**
  * @brief	This function close the socket and parameter is "s" which represent the socket number
  */
@@ -173,6 +179,12 @@ int16_t recv(SOCKET s, uint8_t *buf, int16_t len)
     W5100.execCmdSn(s, Sock_RECV);
   }
   return ret;
+}
+
+
+int16_t recvAvailable(SOCKET s)
+{
+  return W5100.getRXReceivedSize(s);
 }
 
 
