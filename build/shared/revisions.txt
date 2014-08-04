@@ -5,6 +5,7 @@ ARDUINO 1.0.6 - not yet released
 * avr: Improved USB-CDC write speed (Justin Rajewski)
 * avr: Improved USB-CDC read code (Paul Brook)
 * avr: Fixed race condition in USB-CDC transmit (Paul Brook)
+* avr: Added replacement stub for cstdlib atexit() funciton (Christopher Andrews)
 * Fixed wrong NULL pointer handling in Stream class (Amulya Kumar Sahoo)
 * Backported String class from IDE 1.5.x (Matt Jenkins)
 * Backported Print class from IDE 1.5.x
