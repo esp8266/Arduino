@@ -6,6 +6,7 @@ ARDUINO 1.5.8 BETA - not yet release
 
 [libraries]
 * FileIO bridge: fixed wrong return value in File::size() for size >32768
+* Updated Temboo to latest version
 
 ARDUINO 1.5.7 BETA - 2014.07.07
 
