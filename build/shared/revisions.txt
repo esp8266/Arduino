@@ -1,4 +1,4 @@
-ARDUINO 1.5.8 BETA - not yet release
+ARDUINO 1.5.8 BETA - not yet released
 
 [ide]
 * Find/Replace over multiple tabs (Erwin Ried, Fulvio Ieva)
@@ -10,6 +10,11 @@ ARDUINO 1.5.8 BETA - not yet release
   https://groups.google.com/a/arduino.cc/forum/#!msg/developers/TuZLfjeZjDI/6deNjw3Y9m4J
 * FileIO bridge: fixed wrong return value in File::size() for size >32768
 * Updated Temboo to latest version
+
+The following changes are included also in the (not yet released) Arduino IDE 1.0.6:
+
+[core]
+* avr: Added replacement stub for cstdlib atexit() funciton (Christopher Andrews)
 
 ARDUINO 1.5.7 BETA - 2014.07.07
 
@@ -319,6 +324,7 @@ ARDUINO 1.0.6 - not yet released
 * avr: Improved USB-CDC write speed (Justin Rajewski)
 * avr: Improved USB-CDC read code (Paul Brook)
 * avr: Fixed race condition in USB-CDC transmit (Paul Brook)
+* avr: Added replacement stub for cstdlib atexit() funciton (Christopher Andrews)
 * Fixed wrong NULL pointer handling in Stream class (Amulya Kumar Sahoo)
 * Backported String class from IDE 1.5.x (Matt Jenkins)
 * Backported Print class from IDE 1.5.x
