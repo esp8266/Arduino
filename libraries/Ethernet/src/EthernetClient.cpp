@@ -40,7 +40,7 @@ int EthernetClient::connect(IPAddress ip, uint16_t port) {
     return 0;
 
   for (int i = 0; i < MAX_SOCK_NUM; i++) {
-    uint8_t s = W5100.readSnSR(i);
+    uint8_t s = socketStatus(i);
     if (s == SnSR::CLOSED || s == SnSR::FIN_WAIT || s == SnSR::CLOSE_WAIT) {
       _sock = i;
       break;
@@ -88,7 +88,7 @@ size_t EthernetClient::write(const uint8_t *buf, size_t size) {
 
 int EthernetClient::available() {
   if (_sock != MAX_SOCK_NUM)
-    return W5100.getRXReceivedSize(_sock);
+    return recvAvailable(_sock);
   return 0;
 }
 
@@ -153,7 +153,7 @@ uint8_t EthernetClient::connected() {
 
 uint8_t EthernetClient::status() {
   if (_sock == MAX_SOCK_NUM) return SnSR::CLOSED;
-  return W5100.readSnSR(_sock);
+  return socketStatus(_sock);
 }
 
 // the next function allows us to use the client returned by

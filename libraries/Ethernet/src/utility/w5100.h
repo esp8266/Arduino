@@ -12,6 +12,14 @@
 
 #include <SPI.h>
 
+#define SPI_CS 10
+
+#if defined(ARDUINO_ARCH_AVR)
+#define SPI_ETHERNET_SETTINGS SPISettings(4000000, MSBFIRST, SPI_MODE0)
+#else
+#define SPI_ETHERNET_SETTINGS SPI_CS,SPISettings(4000000, MSBFIRST, SPI_MODE0)
+#endif
+
 #define MAX_SOCK_NUM 4
 
 typedef uint8_t SOCKET;

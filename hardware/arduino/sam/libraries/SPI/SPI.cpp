@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2010 by Cristian Maglie <c.maglie@bug.st>
+ * Copyright (c) 2014 by Paul Stoffregen <paul@pjrc.com> (Transaction API)
  * SPI Master library for arduino.
  *
  * This file is free software; you can redistribute it and/or modify
@@ -18,7 +19,6 @@ SPIClass::SPIClass(Spi *_spi, uint32_t _id, void(*_initCb)(void)) :
 
 void SPIClass::begin() {
 	init();
-
 	// NPCS control is left to the user
 
 	// Default speed set to 4Mhz
@@ -46,10 +46,98 @@ void SPIClass::begin(uint8_t _pin) {
 void SPIClass::init() {
 	if (initialized)
 		return;
+	interruptMode = 0;
+	interruptSave = 0;
+	interruptMask[0] = 0;
+	interruptMask[1] = 0;
+	interruptMask[2] = 0;
+	interruptMask[3] = 0;
 	initCb();
 	SPI_Configure(spi, id, SPI_MR_MSTR | SPI_MR_PS | SPI_MR_MODFDIS);
 	SPI_Enable(spi);
 	initialized = true;
+}
+
+#ifndef interruptsStatus
+#define interruptsStatus() __interruptsStatus()
+static inline unsigned char __interruptsStatus(void) __attribute__((always_inline, unused));
+static inline unsigned char __interruptsStatus(void) {
+  unsigned int primask, faultmask;
+  asm volatile ("mrs %0, primask" : "=r" (primask));
+  if (primask) return 0;
+  asm volatile ("mrs %0, faultmask" : "=r" (faultmask));
+  if (faultmask) return 0;
+  return 1;
+}
+#endif
+
+void SPIClass::usingInterrupt(uint8_t interruptNumber)
+{
+	uint8_t irestore;
+
+	irestore = interruptsStatus();
+	noInterrupts();
+	if (interruptMode < 16) {
+		if (interruptNumber > NUM_DIGITAL_PINS) {
+			interruptMode = 16;
+		} else {
+			Pio *pio = g_APinDescription[interruptNumber].pPort;
+			uint32_t mask = g_APinDescription[interruptNumber].ulPin;
+			if (pio == PIOA) {
+				interruptMode |= 1;
+				interruptMask[0] |= mask;
+			} else if (pio == PIOB) {
+				interruptMode |= 2;
+				interruptMask[1] |= mask;
+			} else if (pio == PIOC) {
+				interruptMode |= 4;
+				interruptMask[2] |= mask;
+			} else if (pio == PIOD) {
+				interruptMode |= 8;
+				interruptMask[3] |= mask;
+			} else {
+				interruptMode = 16;
+			}
+		}
+	}
+	if (irestore) interrupts();
+}
+
+void SPIClass::beginTransaction(uint8_t pin, SPISettings settings)
+{
+	uint8_t mode = interruptMode;
+	if (mode > 0) {
+		if (mode < 16) {
+			if (mode & 1) PIOA->PIO_IDR = interruptMask[0];
+			if (mode & 2) PIOB->PIO_IDR = interruptMask[1];
+			if (mode & 4) PIOC->PIO_IDR = interruptMask[2];
+			if (mode & 8) PIOD->PIO_IDR = interruptMask[3];
+		} else {
+			interruptSave = interruptsStatus();
+			noInterrupts();
+		}
+	}
+	uint32_t ch = BOARD_PIN_TO_SPI_CHANNEL(pin);
+	bitOrder[ch] = settings.border;
+	SPI_ConfigureNPCS(spi, ch, settings.config);
+	//setBitOrder(pin, settings.border);
+	//setDataMode(pin, settings.datamode);
+	//setClockDivider(pin, settings.clockdiv);
+}
+
+void SPIClass::endTransaction(void)
+{
+	uint8_t mode = interruptMode;
+	if (mode > 0) {
+		if (mode < 16) {
+			if (mode & 1) PIOA->PIO_IER = interruptMask[0];
+			if (mode & 2) PIOB->PIO_IER = interruptMask[1];
+			if (mode & 4) PIOC->PIO_IER = interruptMask[2];
+			if (mode & 8) PIOD->PIO_IER = interruptMask[3];
+		} else {
+			if (interruptSave) interrupts();
+		}
+	}
 }
 
 void SPIClass::end(uint8_t _pin) {
@@ -95,12 +183,12 @@ byte SPIClass::transfer(byte _pin, uint8_t _data, SPITransferMode _mode) {
 
 	// SPI_Write(spi, _channel, _data);
     while ((spi->SPI_SR & SPI_SR_TDRE) == 0)
-    	;
+	;
     spi->SPI_TDR = d;
 
     // return SPI_Read(spi);
     while ((spi->SPI_SR & SPI_SR_RDRF) == 0)
-    	;
+	;
     d = spi->SPI_RDR;
 	// Reverse bit order
 	if (bitOrder[ch] == LSBFIRST)
@@ -137,3 +225,4 @@ static void SPI_0_Init(void) {
 
 SPIClass SPI(SPI_INTERFACE, SPI_INTERFACE_ID, SPI_0_Init);
 #endif
+
