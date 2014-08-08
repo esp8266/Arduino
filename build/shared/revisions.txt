@@ -5,6 +5,9 @@ ARDUINO 1.5.8 BETA - not yet release
 * Fix wrong "Replace" behavior with empty "Find" field (Fulvio Ieva)
 
 [libraries]
+* SPI: added transaction API (Paul Stoffregen)
+  https://github.com/arduino/Arduino/pull/2223
+  https://groups.google.com/a/arduino.cc/forum/#!msg/developers/TuZLfjeZjDI/6deNjw3Y9m4J
 * FileIO bridge: fixed wrong return value in File::size() for size >32768
 * Updated Temboo to latest version
 
