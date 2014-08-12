@@ -36,24 +36,27 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
 import processing.app.helpers.FileUtils;
 import cc.arduino.utils.ArchiveExtractor;
-import cc.arduino.utils.FileHash;
 import cc.arduino.utils.MultiStepProgress;
 import cc.arduino.utils.Progress;
-import cc.arduino.utils.network.FileDownloader;
 
 public class ContributionInstaller {
 
   private File stagingFolder;
   private ContributionsIndexer indexer;
+  private DownloadableContributionsDownloader downloader;
 
   public ContributionInstaller(ContributionsIndexer contributionsIndexer) {
     stagingFolder = contributionsIndexer.getStagingFolder();
     indexer = contributionsIndexer;
+    downloader = new DownloadableContributionsDownloader(stagingFolder) {
+      @Override
+      protected void onProgress(Progress progress) {
+        ContributionInstaller.this.onProgress(progress);
+      };
+    };
   }
 
   public void install(ContributedPlatform platform) throws Exception {
@@ -80,14 +83,17 @@ public class ContributionInstaller {
     // Download all
     try {
       // Download platform
-      download(platform, progress, _("Downloading boards definitions."));
+      downloader.download(platform, progress,
+                          _("Downloading boards definitions."));
+      progress.stepDone();
 
       // Download tools
       int i = 1;
       for (ContributedTool tool : tools) {
         String msg = format(_("Downloading tools ({0}/{1})."), i, tools.size());
-        download(tool.getDownloadableContribution(), progress, msg);
         i++;
+        downloader.download(tool.getDownloadableContribution(), progress, msg);
+        progress.stepDone();
       }
     } catch (InterruptedException e) {
       // Download interrupted... just exit
@@ -136,56 +142,6 @@ public class ContributionInstaller {
     onProgress(progress);
   }
 
-  public File download(DownloadableContribution contribution,
-                       final MultiStepProgress progress, final String statusText)
-      throws Exception {
-    URL url = new URL(contribution.getUrl());
-    String path = url.getPath();
-    String fileName = path.substring(path.lastIndexOf('/') + 1);
-    final File outputFile = new File(stagingFolder, fileName);
-
-    // Ensure the existence of staging folder
-    stagingFolder.mkdirs();
-
-    // Need to download or resume downloading?
-    if (!outputFile.isFile() || (outputFile.length() < contribution.getSize())) {
-
-      // Use FileDownloader to retrieve the file
-      FileDownloader downloader = new FileDownloader(url, outputFile);
-      downloader.addObserver(new Observer() {
-        @Override
-        public void update(Observable o, Object arg) {
-          FileDownloader me = (FileDownloader) o;
-          String msg = "";
-          if (me.getDownloadSize() != null) {
-            long downloaded = me.getInitialSize() + me.getDownloaded() / 1000;
-            long total = me.getInitialSize() + me.getDownloadSize() / 1000;
-            msg = format(_("Downloaded {0}kb of {1}kb."), downloaded, total);
-          }
-          progress.setStatus(statusText + " " + msg);
-          progress.setProgress(me.getProgress());
-          onProgress(progress);
-        }
-      });
-      downloader.download();
-      if (!downloader.isCompleted())
-        throw new Exception("Error dowloading " + url, downloader.getError());
-    }
-    progress.stepDone();
-
-    // Test checksum
-    progress.setStatus(_("Verifying archive integrity..."));
-    onProgress(progress);
-    String checksum = contribution.getChecksum();
-    String algo = checksum.split(":")[0];
-    if (!FileHash.hash(outputFile, algo).equals(checksum))
-      throw new Exception("CRC doesn't match. File is corrupted.");
-
-    contribution.setDownloaded(true);
-    contribution.setDownloadedFile(outputFile);
-    return outputFile;
-  }
-
   public void remove(ContributedPlatform platform) {
     FileUtils.recursiveDelete(platform.getInstalledFolder());
     platform.setInstalled(false);
@@ -214,36 +170,18 @@ public class ContributionInstaller {
   }
 
   public void updateIndex() throws Exception {
-    final MultiStepProgress progress = new MultiStepProgress(2);
+    final MultiStepProgress progress = new MultiStepProgress(1);
     final String statusText = _("Downloading platforms index...");
 
     URL url = new URL("http://arduino.cc/package_index.json");
-    File tmpFile = File.createTempFile("package_index", ".json");
-    FileDownloader downloader = new FileDownloader(url, tmpFile);
-    downloader.addObserver(new Observer() {
-      @Override
-      public void update(Observable o, Object arg) {
-        FileDownloader me = (FileDownloader) o;
-        String msg = "";
-        if (me.getDownloadSize() != null) {
-          long downloaded = me.getInitialSize() + me.getDownloaded() / 1000;
-          long total = me.getInitialSize() + me.getDownloadSize() / 1000;
-          msg = format(_("Downloaded {0}kb of {1}kb."), downloaded, total);
-        }
-        progress.setStatus(statusText + " " + msg);
-        progress.setProgress(me.getProgress());
-        onProgress(progress);
-      }
-    });
-    downloader.download();
-    if (!downloader.isCompleted())
-      throw new Exception("Error dowloading " + url, downloader.getError());
+    File outputFile = indexer.getIndexFile();
+    File tmpFile = new File(outputFile.getAbsolutePath() + ".tmp");
+    downloader.download(url, tmpFile, progress, statusText);
     progress.stepDone();
 
     // TODO: Check downloaded index
 
     // Replace old index with the updated one
-    File outputFile = indexer.getIndexFile();
     if (outputFile.exists())
       outputFile.delete();
     if (!tmpFile.renameTo(outputFile))
