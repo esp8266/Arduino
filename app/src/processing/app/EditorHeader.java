@@ -22,6 +22,7 @@
 */
 
 package processing.app;
+import processing.app.helpers.OSUtils;
 import processing.app.tools.MenuScroller;
 import static processing.app.I18n._;
 
@@ -381,7 +382,7 @@ public class EditorHeader extends JComponent {
 
 
   public Dimension getMinimumSize() {
-    if (Base.isMacOS()) {
+    if (OSUtils.isMacOS()) {
       return new Dimension(300, Preferences.GRID_SIZE);
     }
     return new Dimension(300, Preferences.GRID_SIZE - 1);
@@ -389,7 +390,7 @@ public class EditorHeader extends JComponent {
 
 
   public Dimension getMaximumSize() {
-    if (Base.isMacOS()) {
+    if (OSUtils.isMacOS()) {
       return new Dimension(3000, Preferences.GRID_SIZE);
     }
     return new Dimension(3000, Preferences.GRID_SIZE - 1);

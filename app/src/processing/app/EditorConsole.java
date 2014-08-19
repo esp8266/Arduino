@@ -40,6 +40,8 @@ import javax.swing.text.Element;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
+import processing.app.helpers.OSUtils;
+
 
 /**
  * Message console that sits below the editing area.
@@ -118,7 +120,7 @@ public class EditorConsole extends JScrollPane {
 
     // to fix ugliness.. normally macosx java 1.3 puts an
     // ugly white border around this object, so turn it off.
-    if (Base.isMacOS()) {
+    if (OSUtils.isMacOS()) {
       setBorder(null);
     }
 

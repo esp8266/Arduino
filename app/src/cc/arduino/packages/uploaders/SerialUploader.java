@@ -39,6 +39,7 @@ import processing.app.Serial;
 import processing.app.SerialException;
 import processing.app.debug.RunnerException;
 import processing.app.debug.TargetPlatform;
+import processing.app.helpers.OSUtils;
 import processing.app.helpers.PreferencesMap;
 import processing.app.helpers.StringReplacer;
 import cc.arduino.packages.Uploader;
@@ -188,7 +189,7 @@ public class SerialUploader extends Uploader {
       // come back, so use a longer time out before assuming that the
       // selected
       // port is the bootloader (not the sketch).
-      if (((!Base.isWindows() && elapsed >= 500) || elapsed >= 5000) && now.contains(uploadPort)) {
+      if (((!OSUtils.isWindows() && elapsed >= 500) || elapsed >= 5000) && now.contains(uploadPort)) {
         if (verbose)
           System.out.println("Uploading using selected port: " + uploadPort);
         return uploadPort;

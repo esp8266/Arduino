@@ -50,6 +50,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
 import processing.app.helpers.FileUtils;
+import processing.app.helpers.OSUtils;
 import processing.app.helpers.PreferencesHelper;
 import processing.app.helpers.PreferencesMap;
 import processing.app.legacy.PApplet;
@@ -405,7 +406,7 @@ public class Preferences {
 
     // [ ] Automatically associate .pde files with Processing
 
-    if (Base.isWindows()) {
+    if (OSUtils.isWindows()) {
       autoAssociateBox =
         new JCheckBox(_("Automatically associate .ino files with Arduino"));
       pain.add(autoAssociateBox);

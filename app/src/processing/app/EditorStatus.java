@@ -25,9 +25,13 @@ package processing.app;
 
 import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.*;
 
+import processing.app.helpers.OSUtils;
+
 import java.awt.datatransfer.*;
+
 import static processing.app.I18n._;
 
 
@@ -331,7 +335,7 @@ public class EditorStatus extends JPanel /*implements ActionListener*/ {
 
       // !@#(* aqua ui #($*(( that turtle-neck wearing #(** (#$@)(
       // os9 seems to work if bg of component is set, but x still a bastard
-      if (Base.isMacOS()) {
+      if (OSUtils.isMacOS()) {
         //yesButton.setBackground(bgcolor[EDIT]);
         //noButton.setBackground(bgcolor[EDIT]);
         cancelButton.setBackground(bgcolor[EDIT]);
@@ -444,7 +448,7 @@ public class EditorStatus extends JPanel /*implements ActionListener*/ {
 
       progressBar = new JProgressBar(JScrollBar.HORIZONTAL);
       progressBar.setIndeterminate(false);
-      if (Base.isMacOS()) {
+      if (OSUtils.isMacOS()) {
         //progressBar.setBackground(bgcolor[PROGRESS]);
         //progressBar.putClientProperty("JProgressBar.style", "circular");
       }

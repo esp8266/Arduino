@@ -28,6 +28,7 @@ import com.jcraft.jsch.JSchException;
 
 import processing.app.debug.*;
 import processing.app.forms.PasswordAuthorizationDialog;
+import processing.app.helpers.OSUtils;
 import processing.app.helpers.PreferencesMapException;
 import processing.app.legacy.PApplet;
 import processing.app.syntax.*;
@@ -591,7 +592,7 @@ public class Editor extends JFrame implements RunnerListener {
     fileMenu.add(item);
 
     // macosx already has its own preferences and quit menu
-    if (!Base.isMacOS()) {
+    if (!OSUtils.isMacOS()) {
       fileMenu.addSeparator();
 
       item = newJMenuItem(_("Preferences"), ',');
@@ -1110,7 +1111,7 @@ public class Editor extends JFrame implements RunnerListener {
     menu.add(item);
 
     // macosx already has its own about menu
-    if (!Base.isMacOS()) {
+    if (!OSUtils.isMacOS()) {
       menu.addSeparator();
       item = new JMenuItem(_("About Arduino"));
       item.addActionListener(new ActionListener() {
@@ -1135,7 +1136,7 @@ public class Editor extends JFrame implements RunnerListener {
     undoItem.addActionListener(undoAction = new UndoAction());
     menu.add(undoItem);
 
-    if (!Base.isMacOS()) {
+    if (!OSUtils.isMacOS()) {
         redoItem = newJMenuItem(_("Redo"), 'Y');
     } else {
         redoItem = newJMenuItemShift(_("Redo"), 'Z');
@@ -2031,7 +2032,7 @@ public class Editor extends JFrame implements RunnerListener {
 
     String prompt = I18n.format(_("Save changes to \"{0}\"?  "), sketch.getName());
 
-    if (!Base.isMacOS()) {
+    if (!OSUtils.isMacOS()) {
       int result =
         JOptionPane.showConfirmDialog(this, prompt, _("Close"),
                                       JOptionPane.YES_NO_CANCEL_OPTION,

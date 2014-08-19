@@ -25,12 +25,12 @@ package processing.app;
 
 import cc.arduino.packages.BoardPort;
 import cc.arduino.packages.UploaderAndMonitorFactory;
-
 import cc.arduino.packages.Uploader;
 import processing.app.debug.*;
 import processing.app.debug.Compiler;
 import processing.app.debug.Compiler.ProgressListener;
 import processing.app.forms.PasswordAuthorizationDialog;
+import processing.app.helpers.OSUtils;
 import processing.app.helpers.PreferencesMap;
 import processing.app.helpers.FileUtils;
 import processing.app.packages.Library;
@@ -529,7 +529,7 @@ public class Sketch {
     }
     editor.header.repaint();
 
-    if (Base.isMacOS()) {
+    if (OSUtils.isMacOS()) {
       // http://developer.apple.com/qa/qa2001/qa1146.html
       Object modifiedParam = modified ? Boolean.TRUE : Boolean.FALSE;
       editor.getRootPane().putClientProperty("windowModified", modifiedParam);

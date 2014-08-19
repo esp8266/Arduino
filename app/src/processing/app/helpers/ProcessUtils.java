@@ -1,7 +1,5 @@
 package processing.app.helpers;
 
-import processing.app.Base;
-
 import java.io.IOException;
 import java.util.Map;
 
@@ -9,7 +7,7 @@ public class ProcessUtils {
 
   public static Process exec(String[] command) throws IOException {
     // No problems on linux and mac
-    if (!Base.isWindows()) {
+    if (!OSUtils.isWindows()) {
       return Runtime.getRuntime().exec(command);
     }
 

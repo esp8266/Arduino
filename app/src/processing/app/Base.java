@@ -42,12 +42,12 @@ import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
 import processing.app.debug.TargetPlatformException;
 import processing.app.helpers.FileUtils;
+import processing.app.helpers.OSUtils;
 import processing.app.helpers.PreferencesMap;
 import processing.app.helpers.filefilters.OnlyDirs;
 import processing.app.helpers.filefilters.OnlyFilesWithExtension;
 import processing.app.javax.swing.filechooser.FileNameExtensionFilter;
 import processing.app.legacy.PApplet;
-import processing.app.legacy.PConstants;
 import processing.app.packages.Library;
 import processing.app.packages.LibraryList;
 import processing.app.tools.MenuScroller;
@@ -68,19 +68,6 @@ public class Base {
   /** Set true if this a proper release rather than a numbered revision. */
   static public boolean RELEASE = false;
 
-  static Map<Integer, String> platformNames = new HashMap<Integer, String>();
-  static {
-    platformNames.put(PConstants.WINDOWS, "windows");
-    platformNames.put(PConstants.MACOSX, "macosx");
-    platformNames.put(PConstants.LINUX, "linux");
-  }
-
-  static HashMap<String, Integer> platformIndices = new HashMap<String, Integer>();
-  static {
-    platformIndices.put("windows", PConstants.WINDOWS);
-    platformIndices.put("macosx", PConstants.MACOSX);
-    platformIndices.put("linux", PConstants.LINUX);
-  }
   static Platform platform;
 
   private static DiscoveryManager discoveryManager = new DiscoveryManager();
@@ -263,11 +250,11 @@ public class Base {
   static protected void initPlatform() {
     try {
       Class<?> platformClass = Class.forName("processing.app.Platform");
-      if (Base.isMacOS()) {
+      if (OSUtils.isMacOS()) {
         platformClass = Class.forName("processing.app.macosx.Platform");
-      } else if (Base.isWindows()) {
+      } else if (OSUtils.isWindows()) {
         platformClass = Class.forName("processing.app.windows.Platform");
-      } else if (Base.isLinux()) {
+      } else if (OSUtils.isLinux()) {
         platformClass = Class.forName("processing.app.linux.Platform");
       }
       platform = (Platform) platformClass.newInstance();
@@ -473,7 +460,7 @@ public class Base {
       // being passed in with 8.3 syntax, which makes the sketch loader code
       // unhappy, since the sketch folder naming doesn't match up correctly.
       // http://dev.processing.org/bugs/show_bug.cgi?id=1089
-      if (isWindows()) {
+      if (OSUtils.isWindows()) {
         try {
           file = file.getCanonicalFile();
         } catch (IOException e) {
@@ -1087,7 +1074,7 @@ public class Base {
       // untitled sketch, just give up and let the user quit.
 //      if (Preferences.getBoolean("sketchbook.closing_last_window_quits") ||
 //          (editor.untitled && !editor.getSketch().isModified())) {
-      if (Base.isMacOS()) {
+      if (OSUtils.isMacOS()) {
         Object[] options = { "OK", "Cancel" };
         String prompt =
           _("<html> " +
@@ -1170,7 +1157,7 @@ public class Base {
       // Save out the current prefs state
       Preferences.save();
 
-      if (!Base.isMacOS()) {
+      if (!OSUtils.isMacOS()) {
         // If this was fired from the menu or an AppleEvent (the Finder),
         // then Mac OS X will send the terminate signal itself.
         System.exit(0);
@@ -1996,54 +1983,6 @@ public class Base {
   }
 
 
-  /**
-   * Map a platform constant to its name.
-   * @param which PConstants.WINDOWS, PConstants.MACOSX, PConstants.LINUX
-   * @return one of "windows", "macosx", or "linux"
-   */
-  static public String getPlatformName(int which) {
-    return platformNames.get(which);
-  }
-
-
-  static public int getPlatformIndex(String what) {
-    Integer entry = platformIndices.get(what);
-    return (entry == null) ? -1 : entry.intValue();
-  }
-
-
-  // These were changed to no longer rely on PApplet and PConstants because
-  // of conflicts that could happen with older versions of core.jar, where
-  // the MACOSX constant would instead read as the LINUX constant.
-
-
-  /**
-   * returns true if Processing is running on a Mac OS X machine.
-   */
-  static public boolean isMacOS() {
-    //return PApplet.platform == PConstants.MACOSX;
-    return System.getProperty("os.name").indexOf("Mac") != -1;
-  }
-
-
-  /**
-   * returns true if running on windows.
-   */
-  static public boolean isWindows() {
-    //return PApplet.platform == PConstants.WINDOWS;
-    return System.getProperty("os.name").indexOf("Windows") != -1;
-  }
-
-
-  /**
-   * true if running on linux.
-   */
-  static public boolean isLinux() {
-    //return PApplet.platform == PConstants.LINUX;
-    return System.getProperty("os.name").indexOf("Linux") != -1;
-  }
-
-
   // .................................................................
 
 
@@ -2176,7 +2115,7 @@ public class Base {
   static public String getAvrBasePath() {
     String path = getHardwarePath() + File.separator + "tools" +
                   File.separator + "avr" + File.separator + "bin" + File.separator;
-    if (Base.isLinux() && !(new File(path)).exists()) {
+    if (OSUtils.isLinux() && !(new File(path)).exists()) {
       return "";  // use distribution provided avr tools if bundled tools missing
     }
     return path;
@@ -2411,7 +2350,7 @@ public class Base {
   static public void setIcon(Frame frame) {
     // don't use the low-res icon on Mac OS X; the window should
     // already have the right icon from the .app file.
-    if (Base.isMacOS()) return;
+    if (OSUtils.isMacOS()) return;
 
     Image image = Toolkit.getDefaultToolkit().createImage(PApplet.ICON_IMAGE);
     frame.setIconImage(image);
@@ -2464,9 +2403,9 @@ public class Base {
   }
 
   static public void showGettingStarted() {
-    if (Base.isMacOS()) {
+    if (OSUtils.isMacOS()) {
       Base.showReference(_("Guide_MacOSX.html"));
-    } else if (Base.isWindows()) {
+    } else if (OSUtils.isWindows()) {
       Base.showReference(_("Guide_Windows.html"));
     } else {
       Base.openURL(_("http://www.arduino.cc/playground/Learning/Linux"));
@@ -2570,7 +2509,7 @@ public class Base {
   // incomplete
   static public int showYesNoCancelQuestion(Editor editor, String title,
                                             String primary, String secondary) {
-    if (!Base.isMacOS()) {
+    if (!OSUtils.isMacOS()) {
       int result =
         JOptionPane.showConfirmDialog(null, primary + "\n" + secondary, title,
                                       JOptionPane.YES_NO_CANCEL_OPTION,
@@ -2646,7 +2585,7 @@ public class Base {
 
   static public int showYesNoQuestion(Frame editor, String title,
                                             String primary, String secondary) {
-    if (!Base.isMacOS()) {
+    if (!OSUtils.isMacOS()) {
       return JOptionPane.showConfirmDialog(editor,
                                            "<html><body>" +
                                            "<b>" + primary + "</b>" +
@@ -2730,7 +2669,7 @@ public class Base {
     String path = System.getProperty("user.dir");
 
     // Get a path to somewhere inside the .app folder
-    if (Base.isMacOS()) {
+    if (OSUtils.isMacOS()) {
 //      <key>javaroot</key>
 //      <string>$JAVAROOT</string>
       String javaroot = System.getProperty("javaroot");
