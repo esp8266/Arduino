@@ -28,8 +28,8 @@ import org.apache.commons.exec.Executor;
 import processing.app.Base;
 import processing.app.debug.TargetPackage;
 import processing.app.tools.ExternalProcessExecutor;
-import processing.core.PApplet;
-import processing.core.PConstants;
+import processing.app.legacy.PApplet;
+import processing.app.legacy.PConstants;
 
 import javax.swing.*;
 import java.awt.*;
@@ -129,7 +129,7 @@ public class Platform extends processing.app.Platform {
       } else {
       // Assume this is a file instead, and just open it.
       // Extension of http://dev.processing.org/bugs/show_bug.cgi?id=1010
-      processing.core.PApplet.open(url);
+      PApplet.open(url);
       }
     } else {
       try {
@@ -162,7 +162,7 @@ public class Platform extends processing.app.Platform {
 
   public void openFolder(File file) throws Exception {
     //openURL(file.getAbsolutePath());  // handles char replacement, etc
-    processing.core.PApplet.open(file.getAbsolutePath());
+    PApplet.open(file.getAbsolutePath());
   }
 
 

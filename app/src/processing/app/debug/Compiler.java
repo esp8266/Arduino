@@ -49,7 +49,7 @@ import processing.app.helpers.filefilters.OnlyDirs;
 import processing.app.packages.Library;
 import processing.app.packages.LibraryList;
 import processing.app.preproc.PdePreprocessor;
-import processing.core.PApplet;
+import processing.app.legacy.PApplet;
 
 public class Compiler implements MessageConsumer {
 

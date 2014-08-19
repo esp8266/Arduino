@@ -19,7 +19,7 @@
 package processing.app;
 
 import cc.arduino.packages.BoardPort;
-import processing.core.PApplet;
+import processing.app.legacy.PApplet;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;

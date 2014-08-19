@@ -25,6 +25,7 @@
 package processing.app.syntax;
 
 import processing.app.*;
+import processing.app.legacy.PApplet;
 import processing.app.packages.Library;
 
 import java.io.*;
@@ -84,7 +85,7 @@ public class PdeKeywords extends CTokenMarker {
       // in case there's any garbage on the line
       //if (line.trim().length() == 0) continue;
 
-      String pieces[] = processing.core.PApplet.split(line, '\t');
+      String pieces[] = PApplet.split(line, '\t');
       if (pieces.length >= 2) {
         //int tab = line.indexOf('\t');
         // any line with no tab is ignored

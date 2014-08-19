@@ -35,7 +35,7 @@ import com.sun.jna.Native;
 import processing.app.debug.TargetBoard;
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
-import processing.core.PConstants;
+import processing.app.legacy.PConstants;
 
 
 /**

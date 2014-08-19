@@ -31,7 +31,7 @@ import java.util.Random;
 
 import javax.swing.JOptionPane;
 
-import processing.core.PApplet;
+import processing.app.legacy.PApplet;
 import static processing.app.I18n._;
 
 

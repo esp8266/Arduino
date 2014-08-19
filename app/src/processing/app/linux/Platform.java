@@ -27,7 +27,7 @@ import org.apache.commons.exec.Executor;
 import processing.app.Preferences;
 import processing.app.debug.TargetPackage;
 import processing.app.tools.ExternalProcessExecutor;
-import processing.core.PConstants;
+import processing.app.legacy.PConstants;
 
 import java.io.*;
 import java.util.Map;

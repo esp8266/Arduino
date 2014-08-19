@@ -23,13 +23,15 @@
 package processing.app;
 
 import cc.arduino.packages.UploaderAndMonitorFactory;
+
 import com.jcraft.jsch.JSchException;
+
 import processing.app.debug.*;
 import processing.app.forms.PasswordAuthorizationDialog;
 import processing.app.helpers.PreferencesMapException;
+import processing.app.legacy.PApplet;
 import processing.app.syntax.*;
 import processing.app.tools.*;
-import processing.core.*;
 import static processing.app.I18n._;
 
 import java.awt.*;

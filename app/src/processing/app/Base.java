@@ -46,11 +46,12 @@ import processing.app.helpers.PreferencesMap;
 import processing.app.helpers.filefilters.OnlyDirs;
 import processing.app.helpers.filefilters.OnlyFilesWithExtension;
 import processing.app.javax.swing.filechooser.FileNameExtensionFilter;
+import processing.app.legacy.PApplet;
+import processing.app.legacy.PConstants;
 import processing.app.packages.Library;
 import processing.app.packages.LibraryList;
 import processing.app.tools.MenuScroller;
 import processing.app.tools.ZipDeflater;
-import processing.core.*;
 import static processing.app.I18n._;
 
 

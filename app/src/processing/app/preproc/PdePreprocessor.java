@@ -31,11 +31,10 @@ package processing.app.preproc;
 
 import static processing.app.I18n._;
 import processing.app.*;
-import processing.core.*;
+import processing.app.legacy.PApplet;
 
 import java.io.*;
 import java.util.*;
-
 import java.util.regex.*;
 
 

@@ -25,7 +25,7 @@
 package processing.app.tools;
 
 import processing.app.*;
-import processing.core.PApplet;
+import processing.app.legacy.PApplet;
 import static processing.app.I18n._;
 
 import java.io.*;

@@ -52,7 +52,7 @@ import javax.swing.KeyStroke;
 import processing.app.helpers.FileUtils;
 import processing.app.helpers.PreferencesHelper;
 import processing.app.helpers.PreferencesMap;
-import processing.core.PApplet;
+import processing.app.legacy.PApplet;
 
 
 /**

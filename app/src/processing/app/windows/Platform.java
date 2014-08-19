@@ -24,15 +24,17 @@ package processing.app.windows;
 
 import com.sun.jna.Library;
 import com.sun.jna.Native;
+
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
+
 import processing.app.Base;
 import processing.app.Preferences;
 import processing.app.debug.TargetPackage;
+import processing.app.legacy.PApplet;
+import processing.app.legacy.PConstants;
 import processing.app.tools.ExternalProcessExecutor;
 import processing.app.windows.Registry.REGISTRY_ROOT_KEY;
-import processing.core.PApplet;
-import processing.core.PConstants;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

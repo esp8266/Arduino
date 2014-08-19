@@ -12,8 +12,8 @@ import java.util.Arrays;
 import java.util.MissingResourceException;
 
 import processing.app.helpers.PreferencesMap;
-import processing.core.PApplet;
-import processing.core.PConstants;
+import processing.app.legacy.PApplet;
+import processing.app.legacy.PConstants;
 
 
 public class PreferencesData {

@@ -27,14 +27,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import processing.app.Base;
-import processing.core.PApplet;
+import processing.app.legacy.PApplet;
 
 @SuppressWarnings("serial")
 public class PreferencesMap extends LinkedHashMap<String, String> {

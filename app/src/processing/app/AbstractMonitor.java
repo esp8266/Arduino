@@ -1,7 +1,7 @@
 package processing.app;
 
 import processing.app.debug.MessageConsumer;
-import processing.core.PApplet;
+import processing.app.legacy.PApplet;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
