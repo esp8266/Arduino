@@ -2532,7 +2532,7 @@ public class Editor extends JFrame implements RunnerListener {
       return;
     }
 
-    serialMonitor = new UploaderAndMonitorFactory().newMonitor(port, base);
+    serialMonitor = new UploaderAndMonitorFactory().newMonitor(port);
     serialMonitor.setIconImage(getIconImage());
 
     boolean success = false;

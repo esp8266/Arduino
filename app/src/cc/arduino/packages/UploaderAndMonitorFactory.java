@@ -32,7 +32,6 @@ package cc.arduino.packages;
 import cc.arduino.packages.uploaders.SSHUploader;
 import cc.arduino.packages.uploaders.SerialUploader;
 import processing.app.AbstractMonitor;
-import processing.app.Base;
 import processing.app.NetworkMonitor;
 import processing.app.SerialMonitor;
 import processing.app.debug.TargetBoard;
@@ -47,9 +46,9 @@ public class UploaderAndMonitorFactory {
     return new SerialUploader();
   }
 
-  public AbstractMonitor newMonitor(BoardPort port, Base base) {
+  public AbstractMonitor newMonitor(BoardPort port) {
     if ("network".equals(port.getProtocol())) {
-      return new NetworkMonitor(port, base);
+      return new NetworkMonitor(port);
     }
 
     return new SerialMonitor(port);
