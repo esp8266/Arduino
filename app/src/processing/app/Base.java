@@ -2096,10 +2096,7 @@ public class Base {
 
 
   static public File getHardwareFolder() {
-    // calculate on the fly because it's needed by Preferences.init() to find
-    // the boards.txt and programmers.txt preferences files (which happens
-    // before the other folders / paths get cached).
-    return getContentFile("hardware");
+    return BaseNoGui.getHardwareFolder();
   }
 
   //Get the core libraries
@@ -2108,17 +2105,12 @@ public class Base {
   }
 
   static public String getHardwarePath() {
-    return getHardwareFolder().getAbsolutePath();
+    return BaseNoGui.getHardwarePath();
   }
 
 
   static public String getAvrBasePath() {
-    String path = getHardwarePath() + File.separator + "tools" +
-                  File.separator + "avr" + File.separator + "bin" + File.separator;
-    if (OSUtils.isLinux() && !(new File(path)).exists()) {
-      return "";  // use distribution provided avr tools if bundled tools missing
-    }
-    return path;
+    return BaseNoGui.getAvrBasePath();
   }
 
   /**
@@ -2666,19 +2658,7 @@ public class Base {
   */
 
   static public File getContentFile(String name) {
-    String path = System.getProperty("user.dir");
-
-    // Get a path to somewhere inside the .app folder
-    if (OSUtils.isMacOS()) {
-//      <key>javaroot</key>
-//      <string>$JAVAROOT</string>
-      String javaroot = System.getProperty("javaroot");
-      if (javaroot != null) {
-        path = javaroot;
-      }
-    }
-    File working = new File(path);
-    return new File(working, name);
+    return BaseNoGui.getContentFile(name);
   }
 
 

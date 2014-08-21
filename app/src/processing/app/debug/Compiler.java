@@ -225,7 +225,7 @@ public class Compiler implements MessageConsumer {
     // point.
     if (!p.containsKey("compiler.path")) {
       System.err.println(_("Third-party platform.txt does not define compiler.path. Please report this to the third-party hardware maintainer."));
-      p.put("compiler.path", Base.getAvrBasePath());
+      p.put("compiler.path", BaseNoGui.getAvrBasePath());
     }
 
     // Core folder
