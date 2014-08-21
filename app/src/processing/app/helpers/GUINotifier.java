@@ -26,4 +26,16 @@ public class GUINotifier implements UserNotifier {
     if (e != null) e.printStackTrace();
     System.exit(exit_code);
   }
+
+  /**
+   * "No cookie for you" type messages. Nothing fatal or all that
+   * much of a bummer, but something to notify the user about.
+   */
+  public void showMessage(String title, String message) {
+    if (title == null) title = _("Message");
+
+    JOptionPane.showMessageDialog(new Frame(), message, title,
+                                  JOptionPane.INFORMATION_MESSAGE);
+  }
+
 }

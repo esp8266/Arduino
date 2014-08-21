@@ -22,4 +22,10 @@ public class BasicNotifier implements UserNotifier {
     System.exit(exit_code);
   }
 
+  public void showMessage(String title, String message) {
+    if (title == null) title = _("Message");
+
+    System.out.println(title + ": " + message);
+  }
+
 }

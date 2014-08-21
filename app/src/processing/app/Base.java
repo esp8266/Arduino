@@ -2257,15 +2257,7 @@ public class Base {
    * much of a bummer, but something to notify the user about.
    */
   static public void showMessage(String title, String message) {
-    if (title == null) title = _("Message");
-
-    if (commandLine) {
-      System.out.println(title + ": " + message);
-
-    } else {
-      JOptionPane.showMessageDialog(new Frame(), message, title,
-                                    JOptionPane.INFORMATION_MESSAGE);
-    }
+    BaseNoGui.showMessage(title, message);
   }
 
 

@@ -275,9 +275,9 @@ public class BaseNoGui {
       }
       platform = (Platform) platformClass.newInstance();
     } catch (Exception e) {
-      Base.showError(_("Problem Setting the Platform"),
-                     _("An unknown error occurred while trying to load\n" +
-                       "platform-specific code for your machine."), e);
+      showError(_("Problem Setting the Platform"),
+                _("An unknown error occurred while trying to load\n" +
+                  "platform-specific code for your machine."), e);
     }
   }
 
@@ -413,7 +413,7 @@ public class BaseNoGui {
             + "Library names must contain only basic letters and numbers.\n"
             + "(ASCII only and no spaces, and it cannot start with a number)"),
                                   libName);
-        Base.showMessage(_("Ignoring bad library name"), mess);
+        showMessage(_("Ignoring bad library name"), mess);
         continue;
       }
 
@@ -443,4 +443,11 @@ public class BaseNoGui {
     notifier.showError(title, message, e, exit_code);
   }
 
+  /**
+   * "No cookie for you" type messages. Nothing fatal or all that
+   * much of a bummer, but something to notify the user about.
+   */
+  static public void showMessage(String title, String message) {
+    notifier.showMessage(title, message);
+  }
 }
