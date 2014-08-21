@@ -2,7 +2,7 @@ package processing.app.helpers;
 
 import static processing.app.I18n._;
 
-public class BasicNotifier implements UserNotifier {
+public class BasicUserNotifier implements UserNotifier {
 
   public void showError(String title, String message, Throwable e) {
     showError(title, message, e, 1);

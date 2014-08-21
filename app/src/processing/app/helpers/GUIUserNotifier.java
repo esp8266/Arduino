@@ -6,7 +6,7 @@ import java.awt.Frame;
 
 import javax.swing.JOptionPane;
 
-public class GUINotifier implements UserNotifier {
+public class GUIUserNotifier implements UserNotifier {
 
   public void showError(String title, String message, Throwable e) {
     showError(title, message, e, 1);

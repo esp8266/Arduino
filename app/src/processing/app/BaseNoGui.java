@@ -21,7 +21,7 @@ import processing.app.debug.TargetBoard;
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
 import processing.app.debug.TargetPlatformException;
-import processing.app.helpers.BasicNotifier;
+import processing.app.helpers.BasicUserNotifier;
 import processing.app.helpers.OSUtils;
 import processing.app.helpers.PreferencesMap;
 import processing.app.helpers.UserNotifier;
@@ -49,7 +49,7 @@ public class BaseNoGui {
   // maps library name to their library folder
   static private LibraryList libraries;
 
-  static UserNotifier notifier = new BasicNotifier();
+  static UserNotifier notifier = new BasicUserNotifier();
 
   static public Map<String, TargetPackage> packages;
 

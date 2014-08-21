@@ -36,7 +36,7 @@ import processing.app.debug.TargetBoard;
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
 import processing.app.helpers.FileUtils;
-import processing.app.helpers.GUINotifier;
+import processing.app.helpers.GUIUserNotifier;
 import processing.app.helpers.OSUtils;
 import processing.app.helpers.PreferencesMap;
 import processing.app.helpers.filefilters.OnlyDirs;
@@ -106,7 +106,7 @@ public class Base {
   static public void main(String args[]) throws Exception {
     BaseNoGui.initLogger();
     
-    BaseNoGui.notifier = new GUINotifier();
+    BaseNoGui.notifier = new GUIUserNotifier();
 
     initPlatform();
 
