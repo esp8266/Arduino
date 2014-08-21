@@ -24,7 +24,7 @@ package processing.app.linux;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
-import processing.app.Preferences;
+import processing.app.PreferencesData;
 import processing.app.debug.TargetPackage;
 import processing.app.tools.ExternalProcessExecutor;
 import processing.app.legacy.PConstants;
@@ -64,7 +64,7 @@ public class Platform extends processing.app.Platform {
 
   public void openURL(String url) throws Exception {
     if (openFolderAvailable()) {
-      String launcher = Preferences.get("launcher");
+      String launcher = PreferencesData.get("launcher");
       if (launcher != null) {
         Runtime.getRuntime().exec(new String[] { launcher, url });
       }
@@ -73,7 +73,7 @@ public class Platform extends processing.app.Platform {
 
 
   public boolean openFolderAvailable() {
-    if (Preferences.get("launcher") != null) {
+    if (PreferencesData.get("launcher") != null) {
       return true;
     }
 
@@ -81,7 +81,7 @@ public class Platform extends processing.app.Platform {
     try {
       Process p = Runtime.getRuntime().exec(new String[] { "xdg-open" });
       p.waitFor();
-      Preferences.set("launcher", "xdg-open");
+      PreferencesData.set("launcher", "xdg-open");
       return true;
     } catch (Exception e) { }
 
@@ -90,7 +90,7 @@ public class Platform extends processing.app.Platform {
       Process p = Runtime.getRuntime().exec(new String[] { "gnome-open" });
       p.waitFor();
       // Not installed will throw an IOException (JDK 1.4.2, Ubuntu 7.04)
-      Preferences.set("launcher", "gnome-open");
+      PreferencesData.set("launcher", "gnome-open");
       return true;
     } catch (Exception e) { }
 
@@ -98,7 +98,7 @@ public class Platform extends processing.app.Platform {
     try {
       Process p = Runtime.getRuntime().exec(new String[] { "kde-open" });
       p.waitFor();
-      Preferences.set("launcher", "kde-open");
+      PreferencesData.set("launcher", "kde-open");
       return true;
     } catch (Exception e) { }
 
@@ -108,7 +108,7 @@ public class Platform extends processing.app.Platform {
 
   public void openFolder(File file) throws Exception {
     if (openFolderAvailable()) {
-      String launcher = Preferences.get("launcher");
+      String launcher = PreferencesData.get("launcher");
       try {
         String[] params = new String[] { launcher, file.getAbsolutePath() };
         //processing.core.PApplet.println(params);

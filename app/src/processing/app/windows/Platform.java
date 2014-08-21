@@ -29,7 +29,7 @@ import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
 
 import processing.app.Base;
-import processing.app.Preferences;
+import processing.app.PreferencesData;
 import processing.app.debug.TargetPackage;
 import processing.app.legacy.PApplet;
 import processing.app.legacy.PConstants;
@@ -74,13 +74,13 @@ public class Platform extends processing.app.Platform {
         Registry.getStringValue(REGISTRY_ROOT_KEY.CLASSES_ROOT,
                                 DOC + "\\shell\\open\\command", "");
       if (knownCommand == null) {
-        if (Preferences.getBoolean("platform.auto_file_type_associations")) {
+        if (PreferencesData.getBoolean("platform.auto_file_type_associations")) {
           setAssociations();
         }
 
       } else if (!knownCommand.equals(openCommand)) {
         // If the value is set differently, just change the registry setting.
-        if (Preferences.getBoolean("platform.auto_file_type_associations")) {
+        if (PreferencesData.getBoolean("platform.auto_file_type_associations")) {
           setAssociations();
         }
       }
@@ -116,7 +116,7 @@ public class Platform extends processing.app.Platform {
       // hooray!
 
     } else {
-      Preferences.setBoolean("platform.auto_file_type_associations", false);
+      PreferencesData.setBoolean("platform.auto_file_type_associations", false);
     }
   }
 
