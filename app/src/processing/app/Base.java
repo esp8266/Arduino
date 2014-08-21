@@ -2265,16 +2265,7 @@ public class Base {
    * Non-fatal error message with optional stack trace side dish.
    */
   static public void showWarning(String title, String message, Exception e) {
-    if (title == null) title = _("Warning");
-
-    if (commandLine) {
-      System.out.println(title + ": " + message);
-
-    } else {
-      JOptionPane.showMessageDialog(new Frame(), message, title,
-                                    JOptionPane.WARNING_MESSAGE);
-    }
-    if (e != null) e.printStackTrace();
+    BaseNoGui.showWarning(title, message, e);
   }
 
 

@@ -450,4 +450,12 @@ public class BaseNoGui {
   static public void showMessage(String title, String message) {
     notifier.showMessage(title, message);
   }
+
+  /**
+   * Non-fatal error message with optional stack trace side dish.
+   */
+  static public void showWarning(String title, String message, Exception e) {
+    notifier.showWarning(title, message, e);
+  }
+
 }
