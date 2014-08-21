@@ -28,13 +28,8 @@ import java.io.*;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.*;
-
-import org.apache.commons.logging.impl.LogFactoryImpl;
-import org.apache.commons.logging.impl.NoOpLog;
 
 import cc.arduino.packages.DiscoveryManager;
 import processing.app.debug.TargetBoard;
@@ -108,52 +103,17 @@ public class Base {
   static final String portableSketchbookFolder = "sketchbook";
 
   static public void main(String args[]) throws Exception {
-    System.setProperty(LogFactoryImpl.LOG_PROPERTY, NoOpLog.class.getCanonicalName());
-    Logger.getLogger("javax.jmdns").setLevel(Level.OFF);
+    BaseNoGui.initLogger();
 
     initPlatform();
 
     BaseNoGui.initPortableFolder();
 
-    String preferencesFile = null;
-
-    // Do a first pass over the commandline arguments, the rest of them
-    // will be processed by the Base constructor. Note that this loop
-    // does not look at the last element of args, to prevent crashing
-    // when no parameter was specified to an option. Later, Base() will
-    // then show an error for these.
-    for (int i = 0; i < args.length - 1; i++) {
-      if (args[i].equals("--preferences-file")) {
-        ++i;
-        preferencesFile = args[i];
-        continue;
-      }
-      if (args[i].equals("--curdir")) {
-        i++;
-        currentDirectory = args[i];
-        continue;
-      }
-    }
-
-    // run static initialization that grabs all the prefs
-    Preferences.init(absoluteFile(preferencesFile));
-
-    try {
-      File versionFile = getContentFile("lib/version.txt");
-      if (versionFile.exists()) {
-        String version = PApplet.loadStrings(versionFile)[0];
-        if (!version.equals(VERSION_NAME) && !version.equals("${version}")) {
-          VERSION_NAME = version;
-          RELEASE = true;
-        }
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
-    // help 3rd party installers find the correct hardware path
-    Preferences.set("last.ide." + VERSION_NAME + ".hardwarepath", getHardwarePath());
-    Preferences.set("last.ide." + VERSION_NAME + ".daterun", "" + (new Date()).getTime() / 1000);
+    BaseNoGui.prescanParameters(args);
+    
+    BaseNoGui.initVersion();
+    VERSION_NAME = BaseNoGui.VERSION_NAME;
+    RELEASE = BaseNoGui.RELEASE;
 
 //    if (System.getProperty("mrj.version") != null) {
 //      //String jv = System.getProperty("java.version");
@@ -204,7 +164,7 @@ public class Base {
 
     // Set the look and feel before opening the window
     try {
-      BaseNoGui.getPlatform().setLookAndFeel();
+      getPlatform().setLookAndFeel();
     } catch (Exception e) {
       String mess = e.getMessage();
       if (mess.indexOf("ch.randelshofer.quaqua.QuaquaLookAndFeel") == -1) {
@@ -260,7 +220,7 @@ public class Base {
   protected static enum ACTION { GUI, NOOP, VERIFY, UPLOAD, GET_PREF };
 
   public Base(String[] args) throws Exception {
-    BaseNoGui.getPlatform().init(this);
+    getPlatform().init(this);
 
     // Get the sketchbook path, and make sure it's set properly
     String sketchbookPath = Preferences.get("sketchbook.path");
@@ -1901,7 +1861,7 @@ public class Base {
 
     } else {
       try {
-        settingsFolder = BaseNoGui.getPlatform().getSettingsFolder();
+        settingsFolder = getPlatform().getSettingsFolder();
       } catch (Exception e) {
         showError(_("Problem getting data folder"),
                   _("Error getting the Arduino data folder."), e);
@@ -2108,7 +2068,7 @@ public class Base {
 
     File sketchbookFolder = null;
     try {
-      sketchbookFolder = BaseNoGui.getPlatform().getDefaultSketchbookFolder();
+      sketchbookFolder = getPlatform().getDefaultSketchbookFolder();
     } catch (Exception e) { }
 
     if (sketchbookFolder == null) {
@@ -2164,7 +2124,7 @@ public class Base {
    */
   static public void openURL(String url) {
     try {
-      BaseNoGui.getPlatform().openURL(url);
+      getPlatform().openURL(url);
 
     } catch (Exception e) {
       showWarning(_("Problem Opening URL"),

@@ -5,9 +5,15 @@ import static processing.app.I18n._;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.apache.commons.logging.impl.LogFactoryImpl;
+import org.apache.commons.logging.impl.NoOpLog;
 
 import processing.app.debug.TargetBoard;
 import processing.app.debug.TargetPackage;
@@ -184,6 +190,11 @@ public class BaseNoGui {
     return list;
   }
 
+  static public void initLogger() {
+    System.setProperty(LogFactoryImpl.LOG_PROPERTY, NoOpLog.class.getCanonicalName());
+    Logger.getLogger("javax.jmdns").setLevel(Level.OFF);
+  }
+
   static public void initPackages() {
     packages = new HashMap<String, TargetPackage>();
     loadHardware(getHardwareFolder());
@@ -219,6 +230,25 @@ public class BaseNoGui {
       portableFolder = null;
   }
 
+  static public void initVersion() {
+    try {
+      File versionFile = getContentFile("lib/version.txt");
+      if (versionFile.exists()) {
+        String version = PApplet.loadStrings(versionFile)[0];
+        if (!version.equals(VERSION_NAME) && !version.equals("${version}")) {
+          VERSION_NAME = version;
+          RELEASE = true;
+        }
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    // help 3rd party installers find the correct hardware path
+    Preferences.set("last.ide." + VERSION_NAME + ".hardwarepath", getHardwarePath());
+    Preferences.set("last.ide." + VERSION_NAME + ".daterun", "" + (new Date()).getTime() / 1000);
+  }
+
   static protected void loadHardware(File folder) {
     if (!folder.isDirectory()) return;
 
@@ -248,6 +278,31 @@ public class BaseNoGui {
 
   static public void newImportToLibraryTable() {
     importToLibraryTable = new HashMap<String, Library>();
+  }
+
+  static public void prescanParameters(String args[]) {
+    String preferencesFile = null;
+
+    // Do a first pass over the commandline arguments, the rest of them
+    // will be processed by the Base constructor. Note that this loop
+    // does not look at the last element of args, to prevent crashing
+    // when no parameter was specified to an option. Later, Base() will
+    // then show an error for these.
+    for (int i = 0; i < args.length - 1; i++) {
+      if (args[i].equals("--preferences-file")) {
+        ++i;
+        preferencesFile = args[i];
+        continue;
+      }
+      if (args[i].equals("--curdir")) {
+        i++;
+        currentDirectory = args[i];
+        continue;
+      }
+    }
+
+    // run static initialization that grabs all the prefs
+    Preferences.init(absoluteFile(preferencesFile));
   }
 
   /**
