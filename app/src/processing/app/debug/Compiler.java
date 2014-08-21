@@ -969,7 +969,7 @@ public class Compiler implements MessageConsumer {
         // shtuff so that unicode bunk is properly handled
         String filename = sc.getFileName(); //code[i].name + ".java";
         try {
-          Base.saveFile(sc.getProgram(), new File(buildPath, filename));
+          BaseNoGui.saveFile(sc.getProgram(), new File(buildPath, filename));
         } catch (IOException e) {
           e.printStackTrace();
           throw new RunnerException(I18n.format(_("Problem moving {0} to the build folder"), filename));

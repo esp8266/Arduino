@@ -2718,28 +2718,7 @@ public class Base {
    * Spew the contents of a String object out to a file.
    */
   static public void saveFile(String str, File file) throws IOException {
-    File temp = File.createTempFile(file.getName(), null, file.getParentFile());
-    PApplet.saveStrings(temp, new String[] { str });
-    if (file.exists()) {
-      boolean result = file.delete();
-      if (!result) {
-        throw new IOException(
-	  I18n.format(
-	    _("Could not remove old version of {0}"),
-	    file.getAbsolutePath()
-	  )
-	);
-    }
-  }
-    boolean result = temp.renameTo(file);
-    if (!result) {
-      throw new IOException(
-	I18n.format(
-	  _("Could not replace {0}"),
-	  file.getAbsolutePath()
-	)
-      );
-    }
+    BaseNoGui.saveFile(str, file);
   }
 
 

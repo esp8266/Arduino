@@ -3,6 +3,7 @@ package processing.app;
 import static processing.app.I18n._;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,6 +15,7 @@ import processing.app.debug.TargetPlatformException;
 import processing.app.helpers.OSUtils;
 import processing.app.helpers.PreferencesMap;
 import processing.app.helpers.filefilters.OnlyDirs;
+import processing.app.legacy.PApplet;
 
 public class BaseNoGui {
 
@@ -208,6 +210,30 @@ public class BaseNoGui {
         System.out.println("WARNING: Error loading hardware folder " + target);
         System.out.println("  " + e.getMessage());
       }
+    }
+  }
+
+  /**
+   * Spew the contents of a String object out to a file.
+   */
+  static public void saveFile(String str, File file) throws IOException {
+    File temp = File.createTempFile(file.getName(), null, file.getParentFile());
+    PApplet.saveStrings(temp, new String[] { str });
+    if (file.exists()) {
+      boolean result = file.delete();
+      if (!result) {
+        throw new IOException(
+      I18n.format(
+        _("Could not remove old version of {0}"),
+        file.getAbsolutePath()));
+      }
+    }
+    boolean result = temp.renameTo(file);
+    if (!result) {
+      throw new IOException(
+    I18n.format(
+      _("Could not replace {0}"),
+      file.getAbsolutePath()));
     }
   }
 
