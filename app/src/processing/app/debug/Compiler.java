@@ -127,7 +127,7 @@ public class Compiler implements MessageConsumer {
       System.out.println();
 
     List<String> archs = new ArrayList<String>();
-    archs.add(Base.getTargetPlatform().getId());
+    archs.add(BaseNoGui.getTargetPlatform().getId());
     if (prefs.containsKey("architecture.override_check")) {
       String[] overrides = prefs.get("architecture.override_check").split(",");
       archs.addAll(Arrays.asList(overrides));
@@ -186,7 +186,7 @@ public class Compiler implements MessageConsumer {
     }
 
     // Check if the board needs a platform from another package 
-    TargetPlatform targetPlatform = Base.getTargetPlatform();
+    TargetPlatform targetPlatform = BaseNoGui.getTargetPlatform();
     TargetPlatform corePlatform = null;
     PreferencesMap boardPreferences = Base.getBoardPreferences();
     String core = boardPreferences.get("build.core");

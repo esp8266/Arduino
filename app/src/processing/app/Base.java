@@ -40,7 +40,6 @@ import cc.arduino.packages.DiscoveryManager;
 import processing.app.debug.TargetBoard;
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
-import processing.app.debug.TargetPlatformException;
 import processing.app.helpers.FileUtils;
 import processing.app.helpers.OSUtils;
 import processing.app.helpers.PreferencesMap;
@@ -100,14 +99,12 @@ public class Base {
   // found in the sketchbook)
   static public String librariesClassPath;
 
-  static public Map<String, TargetPackage> packages;
-
   // Location for untitled items
   static File untitledFolder;
 
   // Current directory to use for relative paths specified on the
   // commandline
-  static String currentDirectory = System.getProperty("user.dir");
+  static String currentDirectory = BaseNoGui.currentDirectory;
 
   // p5 icon for the window
 //  static Image icon;
@@ -116,7 +113,6 @@ public class Base {
   List<Editor> editors = Collections.synchronizedList(new ArrayList<Editor>());
   Editor activeEditor;
 
-  static File portableFolder = null;
   static final String portableSketchbookFolder = "sketchbook";
 
   static public void main(String args[]) throws Exception {
@@ -125,10 +121,7 @@ public class Base {
 
     initPlatform();
 
-    // Portable folder
-    portableFolder = getContentFile("portable");
-    if (!portableFolder.exists())
-      portableFolder = null;
+    BaseNoGui.initPortableFolder();
 
     String preferencesFile = null;
 
@@ -283,13 +276,7 @@ public class Base {
   // directory when starting the IDE (which is not the same as the
   // current working directory!).
   static public File absoluteFile(String path) {
-    if (path == null) return null;
-
-    File file = new File(path);
-    if (!file.isAbsolute()) {
-      file = new File(currentDirectory, path);
-    }
-    return file;
+    return BaseNoGui.absoluteFile(path);
   }
 
   protected static enum ACTION { GUI, NOOP, VERIFY, UPLOAD, GET_PREF };
@@ -304,8 +291,8 @@ public class Base {
     // If it doesn't, warn the user that the sketchbook folder is being reset.
     if (sketchbookPath != null) {
       File sketchbookFolder;
-      if (portableFolder != null)
-        sketchbookFolder = new File(portableFolder, sketchbookPath);
+      if (BaseNoGui.getPortableFolder() != null)
+        sketchbookFolder = new File(BaseNoGui.getPortableFolder(), sketchbookPath);
       else
         sketchbookFolder = Base.absoluteFile(sketchbookPath);
       if (!sketchbookFolder.exists()) {
@@ -322,7 +309,7 @@ public class Base {
     // If no path is set, get the default sketchbook folder for this platform
     if (sketchbookPath == null) {
       File defaultFolder = getDefaultSketchbookFolder();
-      if (portableFolder != null)
+      if (BaseNoGui.getPortableFolder() != null)
         Preferences.set("sketchbook.path", portableSketchbookFolder);
       else
         Preferences.set("sketchbook.path", defaultFolder.getAbsolutePath());
@@ -331,13 +318,7 @@ public class Base {
       }
     }
 
-    packages = new HashMap<String, TargetPackage>();
-    loadHardware(getHardwareFolder());
-    loadHardware(getSketchbookHardwareFolder());
-    if (packages.size() == 0) {
-      System.out.println(_("No valid configured cores found! Exiting..."));
-      System.exit(3);
-    }
+    BaseNoGui.initPackages();
     
     // Setup board-dependent variables.
     onBoardOrPortChange();
@@ -643,8 +624,8 @@ public class Base {
     int opened = 0;
     for (int i = 0; i < count; i++) {
       String path = Preferences.get("last.sketch" + i + ".path");
-      if (portableFolder != null) {
-        File absolute = new File(portableFolder, path);
+      if (BaseNoGui.getPortableFolder() != null) {
+        File absolute = new File(BaseNoGui.getPortableFolder(), path);
         try {
           path = absolute.getCanonicalPath();
         } catch (IOException e) {
@@ -689,8 +670,8 @@ public class Base {
           !editor.getSketch().isModified()) {
         continue;
       }
-      if (portableFolder != null) {
-        path = FileUtils.relativePath(portableFolder.toString(), path);
+      if (BaseNoGui.getPortableFolder() != null) {
+        path = FileUtils.relativePath(BaseNoGui.getPortableFolder().toString(), path);
         if (path == null)
           continue;
       }
@@ -713,8 +694,8 @@ public class Base {
     if (path.startsWith(untitledPath)) {
       path = "";
     } else
-    if (portableFolder != null) {
-      path = FileUtils.relativePath(portableFolder.toString(), path);
+    if (BaseNoGui.getPortableFolder() != null) {
+      path = FileUtils.relativePath(BaseNoGui.getPortableFolder().toString(), path);
       if (path == null)
         path = "";
     }
@@ -1456,7 +1437,7 @@ public class Base {
 
     // Generate custom menus for all platforms
     Set<String> titles = new HashSet<String>();
-    for (TargetPackage targetPackage : packages.values()) {
+    for (TargetPackage targetPackage : BaseNoGui.packages.values()) {
       for (TargetPlatform targetPlatform : targetPackage.platforms())
         titles.addAll(targetPlatform.getCustomMenus().values());
     }
@@ -1464,7 +1445,7 @@ public class Base {
       makeBoardCustomMenu(toolsMenu, _(title));
     
     // Cycle through all packages
-    for (TargetPackage targetPackage : packages.values()) {
+    for (TargetPackage targetPackage : BaseNoGui.packages.values()) {
       // For every package cycle through all platform
       for (TargetPlatform targetPlatform : targetPackage.platforms()) {
 
@@ -1674,7 +1655,7 @@ public class Base {
   public void rebuildProgrammerMenu(JMenu menu) {
     menu.removeAll();
     ButtonGroup group = new ButtonGroup();
-    for (TargetPackage targetPackage : packages.values()) {
+    for (TargetPackage targetPackage : BaseNoGui.packages.values()) {
       for (TargetPlatform targetPlatform : targetPackage.platforms()) {
         for (String programmer : targetPlatform.getProgrammers().keySet()) {
           String id = targetPackage.getId() + ":" + programmer;
@@ -1860,30 +1841,7 @@ public class Base {
   }
 
   protected void loadHardware(File folder) {
-    if (!folder.isDirectory()) return;
-
-    String list[] = folder.list(new OnlyDirs());
-
-    // if a bad folder or something like that, this might come back null
-    if (list == null) return;
-
-    // alphabetize list, since it's not always alpha order
-    // replaced hella slow bubble sort with this feller for 0093
-    Arrays.sort(list, String.CASE_INSENSITIVE_ORDER);
-
-    for (String target : list) {
-      // Skip reserved 'tools' folder.
-      if (target.equals("tools"))
-        continue;
-      File subfolder = new File(folder, target);
-      
-      try {
-        packages.put(target, new TargetPackage(target, subfolder));
-      } catch (TargetPlatformException e) {
-        System.out.println("WARNING: Error loading hardware folder " + target);
-        System.out.println("  " + e.getMessage());
-      }
-    }
+    BaseNoGui.loadHardware(folder);
   }
 
 
@@ -1987,8 +1945,8 @@ public class Base {
 
 
   static public File getSettingsFolder() {
-    if (portableFolder != null)
-      return portableFolder;
+    if (BaseNoGui.getPortableFolder() != null)
+      return BaseNoGui.getPortableFolder();
 
     File settingsFolder = null;
 
@@ -2120,7 +2078,7 @@ public class Base {
    * @return
    */
   static public TargetPackage getTargetPackage(String packageName) {
-    return packages.get(packageName);
+    return BaseNoGui.packages.get(packageName);
   }
 
   /**
@@ -2129,9 +2087,7 @@ public class Base {
    * @return
    */
   static public TargetPlatform getTargetPlatform() {
-    String packageName = Preferences.get("target_package");
-    String platformName = Preferences.get("target_platform");
-    return getTargetPlatform(packageName, platformName);
+    return BaseNoGui.getTargetPlatform();
   }
 
   /**
@@ -2143,10 +2099,7 @@ public class Base {
    */
   static public TargetPlatform getTargetPlatform(String packageName,
                                                  String platformName) {
-    TargetPackage p = packages.get(packageName);
-    if (p == null)
-      return null;
-    return p.get(platformName);
+    return BaseNoGui.getTargetPlatform(packageName, platformName);
   }
 
   static public TargetPlatform getCurrentTargetPlatformFromPackage(String pack) {
@@ -2176,7 +2129,7 @@ public class Base {
   }
 
   static public File getPortableFolder() {
-    return portableFolder;
+    return BaseNoGui.getPortableFolder();
   }
 
 
@@ -2186,9 +2139,7 @@ public class Base {
 
 
   static public File getSketchbookFolder() {
-    if (portableFolder != null)
-      return new File(portableFolder, Preferences.get("sketchbook.path"));
-    return absoluteFile(Preferences.get("sketchbook.path"));
+    return BaseNoGui.getSketchbookFolder();
   }
 
 
@@ -2215,13 +2166,13 @@ public class Base {
 
 
   static public File getSketchbookHardwareFolder() {
-    return new File(getSketchbookFolder(), "hardware");
+    return BaseNoGui.getSketchbookHardwareFolder();
   }
 
 
   protected File getDefaultSketchbookFolder() {
-    if (portableFolder != null)
-      return new File(portableFolder, portableSketchbookFolder);
+    if (BaseNoGui.getPortableFolder() != null)
+      return new File(BaseNoGui.getPortableFolder(), portableSketchbookFolder);
 
     File sketchbookFolder = null;
     try {

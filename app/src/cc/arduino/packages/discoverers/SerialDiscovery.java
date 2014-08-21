@@ -32,7 +32,7 @@ package cc.arduino.packages.discoverers;
 import java.util.ArrayList;
 import java.util.List;
 
-import processing.app.Base;
+import processing.app.BaseNoGui;
 import processing.app.Platform;
 import processing.app.Serial;
 import processing.app.helpers.PreferencesMap;
@@ -51,7 +51,7 @@ public class SerialDiscovery implements Discovery {
     List<String> ports = Serial.list();
 
     for (String port : ports) {
-      String boardName = os.resolveDeviceAttachedTo(port, Base.packages, devicesListOutput);
+      String boardName = os.resolveDeviceAttachedTo(port, BaseNoGui.packages, devicesListOutput);
       String label = port;
       if (boardName != null)
         label += " (" + boardName + ")";
