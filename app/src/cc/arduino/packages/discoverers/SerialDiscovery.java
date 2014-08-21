@@ -43,7 +43,7 @@ public class SerialDiscovery implements Discovery {
 
   @Override
   public List<BoardPort> discovery() {
-    Platform os = Base.getPlatform();
+    Platform os = BaseNoGui.getPlatform();
     String devicesListOutput = os.preListAllCandidateDevices();
 
     List<BoardPort> res = new ArrayList<BoardPort>();

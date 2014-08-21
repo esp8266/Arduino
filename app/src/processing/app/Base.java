@@ -67,8 +67,6 @@ public class Base {
   /** Set true if this a proper release rather than a numbered revision. */
   static public boolean RELEASE = BaseNoGui.RELEASE;
 
-  static Platform platform;
-
   private static DiscoveryManager discoveryManager = new DiscoveryManager();
   
   static private boolean commandLine;
@@ -212,7 +210,7 @@ public class Base {
 
     // Set the look and feel before opening the window
     try {
-      platform.setLookAndFeel();
+      BaseNoGui.getPlatform().setLookAndFeel();
     } catch (Exception e) {
       String mess = e.getMessage();
       if (mess.indexOf("ch.randelshofer.quaqua.QuaquaLookAndFeel") == -1) {
@@ -241,21 +239,7 @@ public class Base {
 
 
   static protected void initPlatform() {
-    try {
-      Class<?> platformClass = Class.forName("processing.app.Platform");
-      if (OSUtils.isMacOS()) {
-        platformClass = Class.forName("processing.app.macosx.Platform");
-      } else if (OSUtils.isWindows()) {
-        platformClass = Class.forName("processing.app.windows.Platform");
-      } else if (OSUtils.isLinux()) {
-        platformClass = Class.forName("processing.app.linux.Platform");
-      }
-      platform = (Platform) platformClass.newInstance();
-    } catch (Exception e) {
-      Base.showError(_("Problem Setting the Platform"),
-                     _("An unknown error occurred while trying to load\n" +
-                       "platform-specific code for your machine."), e);
-    }
+    BaseNoGui.initPlatform();
   }
 
 
@@ -282,7 +266,7 @@ public class Base {
   protected static enum ACTION { GUI, NOOP, VERIFY, UPLOAD, GET_PREF };
 
   public Base(String[] args) throws Exception {
-    platform.init(this);
+    BaseNoGui.getPlatform().init(this);
 
     // Get the sketchbook path, and make sure it's set properly
     String sketchbookPath = Preferences.get("sketchbook.path");
@@ -1919,7 +1903,7 @@ public class Base {
 
 
   static public Platform getPlatform() {
-    return platform;
+    return BaseNoGui.getPlatform();
   }
 
 
@@ -1956,7 +1940,7 @@ public class Base {
 
     } else {
       try {
-        settingsFolder = platform.getSettingsFolder();
+        settingsFolder = BaseNoGui.getPlatform().getSettingsFolder();
       } catch (Exception e) {
         showError(_("Problem getting data folder"),
                   _("Error getting the Arduino data folder."), e);
@@ -2176,7 +2160,7 @@ public class Base {
 
     File sketchbookFolder = null;
     try {
-      sketchbookFolder = platform.getDefaultSketchbookFolder();
+      sketchbookFolder = BaseNoGui.getPlatform().getDefaultSketchbookFolder();
     } catch (Exception e) { }
 
     if (sketchbookFolder == null) {
@@ -2232,7 +2216,7 @@ public class Base {
    */
   static public void openURL(String url) {
     try {
-      platform.openURL(url);
+      BaseNoGui.getPlatform().openURL(url);
 
     } catch (Exception e) {
       showWarning(_("Problem Opening URL"),
@@ -2246,7 +2230,7 @@ public class Base {
    * @return true If a means of opening a folder is known to be available.
    */
   static protected boolean openFolderAvailable() {
-    return platform.openFolderAvailable();
+    return BaseNoGui.getPlatform().openFolderAvailable();
   }
 
 
@@ -2256,7 +2240,7 @@ public class Base {
    */
   static public void openFolder(File file) {
     try {
-      platform.openFolder(file);
+      BaseNoGui.getPlatform().openFolder(file);
 
     } catch (Exception e) {
       showWarning(_("Problem Opening Folder"),

@@ -27,6 +27,8 @@ public class BaseNoGui {
 
   static public Map<String, TargetPackage> packages;
 
+  static Platform platform;
+
   static File portableFolder = null;
 
   // Returns a File object for the given pathname. If the pathname
@@ -79,6 +81,10 @@ public class BaseNoGui {
     return getHardwareFolder().getAbsolutePath();
   }
 
+  static public Platform getPlatform() {
+    return platform;
+  }
+
   static public File getPortableFolder() {
     return portableFolder;
   }
@@ -126,6 +132,24 @@ public class BaseNoGui {
     if (packages.size() == 0) {
       System.out.println(_("No valid configured cores found! Exiting..."));
       System.exit(3);
+    }
+  }
+
+  static protected void initPlatform() {
+    try {
+      Class<?> platformClass = Class.forName("processing.app.Platform");
+      if (OSUtils.isMacOS()) {
+        platformClass = Class.forName("processing.app.macosx.Platform");
+      } else if (OSUtils.isWindows()) {
+        platformClass = Class.forName("processing.app.windows.Platform");
+      } else if (OSUtils.isLinux()) {
+        platformClass = Class.forName("processing.app.linux.Platform");
+      }
+      platform = (Platform) platformClass.newInstance();
+    } catch (Exception e) {
+      Base.showError(_("Problem Setting the Platform"),
+                     _("An unknown error occurred while trying to load\n" +
+                       "platform-specific code for your machine."), e);
     }
   }
 

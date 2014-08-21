@@ -140,7 +140,7 @@ public class NetworkDiscovery implements Discovery, ServiceListener, cc.arduino.
 
       String label = name + " at " + address;
       if (board != null) {
-        String boardName = Base.getPlatform().resolveDeviceByBoardID(BaseNoGui.packages, board);
+        String boardName = BaseNoGui.getPlatform().resolveDeviceByBoardID(BaseNoGui.packages, board);
         label += " (" + boardName + ")";
       }
 
