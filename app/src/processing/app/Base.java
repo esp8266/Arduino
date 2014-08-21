@@ -2008,7 +2008,7 @@ public class Base {
   }
 
   static public TargetPlatform getCurrentTargetPlatformFromPackage(String pack) {
-    return getTargetPlatform(pack, Preferences.get("target_platform"));
+    return BaseNoGui.getCurrentTargetPlatformFromPackage(pack);
   }
 
   static public PreferencesMap getBoardPreferences() {

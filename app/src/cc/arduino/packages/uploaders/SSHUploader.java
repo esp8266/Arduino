@@ -35,7 +35,7 @@ import cc.arduino.packages.ssh.*;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-import processing.app.Base;
+import processing.app.BaseNoGui;
 import processing.app.I18n;
 import processing.app.Preferences;
 import processing.app.debug.RunnerException;
@@ -117,9 +117,9 @@ public class SSHUploader extends Uploader {
   }
 
   private boolean runAVRDude(SSH ssh) throws IOException, JSchException {
-    TargetPlatform targetPlatform = Base.getTargetPlatform();
+    TargetPlatform targetPlatform = BaseNoGui.getTargetPlatform();
     PreferencesMap prefs = Preferences.getMap();
-    prefs.putAll(Base.getBoardPreferences());
+    prefs.putAll(BaseNoGui.getBoardPreferences());
     prefs.putAll(targetPlatform.getTool(prefs.get("upload.tool")));
 
     String additionalParams = verbose ? prefs.get("upload.params.verbose") : prefs.get("upload.params.quiet");

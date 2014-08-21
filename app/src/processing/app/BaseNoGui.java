@@ -107,6 +107,10 @@ public class BaseNoGui {
     return new File(working, name);
   }
 
+  static public TargetPlatform getCurrentTargetPlatformFromPackage(String pack) {
+    return getTargetPlatform(pack, Preferences.get("target_platform"));
+  }
+
   static public File getHardwareFolder() {
     // calculate on the fly because it's needed by Preferences.init() to find
     // the boards.txt and programmers.txt preferences files (which happens
