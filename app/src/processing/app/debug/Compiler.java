@@ -178,7 +178,7 @@ public class Compiler implements MessageConsumer {
                                                 String _primaryClassName)
       throws RunnerException {
     
-    if (Base.getBoardPreferences() == null) {
+    if (BaseNoGui.getBoardPreferences() == null) {
       RunnerException re = new RunnerException(
           _("No board selected; please choose a board from the Tools > Board menu."));
       re.hideStackTrace();
@@ -188,12 +188,12 @@ public class Compiler implements MessageConsumer {
     // Check if the board needs a platform from another package 
     TargetPlatform targetPlatform = BaseNoGui.getTargetPlatform();
     TargetPlatform corePlatform = null;
-    PreferencesMap boardPreferences = Base.getBoardPreferences();
+    PreferencesMap boardPreferences = BaseNoGui.getBoardPreferences();
     String core = boardPreferences.get("build.core");
     if (core.contains(":")) {
       String[] split = core.split(":");
       core = split[1];
-      corePlatform = Base.getTargetPlatform(split[0], targetPlatform.getId());
+      corePlatform = BaseNoGui.getTargetPlatform(split[0], targetPlatform.getId());
       if (corePlatform == null) {
         RunnerException re = new RunnerException(I18n
             .format(_("Selected board depends on '{0}' core (not installed)."),
@@ -209,7 +209,7 @@ public class Compiler implements MessageConsumer {
     if (corePlatform != null)
       p.putAll(corePlatform.getPreferences());
     p.putAll(targetPlatform.getPreferences());
-    p.putAll(Base.getBoardPreferences());
+    p.putAll(BaseNoGui.getBoardPreferences());
     for (String k : p.keySet()) {
       if (p.get(k) == null)
         p.put(k, "");
@@ -250,7 +250,7 @@ public class Compiler implements MessageConsumer {
         t = targetPlatform;
       } else {
         String[] split = variant.split(":", 2);
-        t = Base.getTargetPlatform(split[0], targetPlatform.getId());
+        t = BaseNoGui.getTargetPlatform(split[0], targetPlatform.getId());
         variant = split[1];
       }
       File variantFolder = new File(t.getFolder(), "variants");

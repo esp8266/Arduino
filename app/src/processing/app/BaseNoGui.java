@@ -7,10 +7,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import processing.app.debug.TargetBoard;
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
 import processing.app.debug.TargetPlatformException;
 import processing.app.helpers.OSUtils;
+import processing.app.helpers.PreferencesMap;
 import processing.app.helpers.filefilters.OnlyDirs;
 
 public class BaseNoGui {
@@ -52,6 +54,23 @@ public class BaseNoGui {
       return "";  // use distribution provided avr tools if bundled tools missing
     }
     return path;
+  }
+
+  static public PreferencesMap getBoardPreferences() {
+    TargetBoard board = getTargetBoard();
+    
+    PreferencesMap prefs = new PreferencesMap(board.getPreferences());
+    for (String menuId : board.getMenuIds()) {
+      String entry = Preferences.get("custom_" + menuId);
+      if (board.hasMenu(menuId) && entry != null &&
+          entry.startsWith(board.getId())) {
+        String selectionId = entry.substring(entry.indexOf("_") + 1);
+        prefs.putAll(board.getMenuPreferences(menuId, selectionId));
+        prefs.put("name", prefs.get("name") + ", " +
+            board.getMenuLabel(menuId, selectionId));
+      }
+    }
+    return prefs;
   }
 
   static public File getContentFile(String name) {
@@ -97,6 +116,11 @@ public class BaseNoGui {
 
   static public File getSketchbookHardwareFolder() {
     return new File(getSketchbookFolder(), "hardware");
+  }
+
+  public static TargetBoard getTargetBoard() {
+    String boardId = Preferences.get("board");
+    return getTargetPlatform().getBoard(boardId);
   }
 
   /**

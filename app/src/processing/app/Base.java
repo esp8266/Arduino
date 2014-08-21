@@ -2091,20 +2091,7 @@ public class Base {
   }
 
   static public PreferencesMap getBoardPreferences() {
-    TargetBoard board = getTargetBoard();
-    
-    PreferencesMap prefs = new PreferencesMap(board.getPreferences());
-    for (String menuId : board.getMenuIds()) {
-      String entry = Preferences.get("custom_" + menuId);
-      if (board.hasMenu(menuId) && entry != null &&
-          entry.startsWith(board.getId())) {
-        String selectionId = entry.substring(entry.indexOf("_") + 1);
-        prefs.putAll(board.getMenuPreferences(menuId, selectionId));
-        prefs.put("name", prefs.get("name") + ", " +
-            board.getMenuLabel(menuId, selectionId));
-      }
-    }
-    return prefs;
+    return BaseNoGui.getBoardPreferences();
   }
 
   public static TargetBoard getTargetBoard() {
