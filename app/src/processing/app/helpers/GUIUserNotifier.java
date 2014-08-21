@@ -6,11 +6,7 @@ import java.awt.Frame;
 
 import javax.swing.JOptionPane;
 
-public class GUIUserNotifier implements UserNotifier {
-
-  public void showError(String title, String message, Throwable e) {
-    showError(title, message, e, 1);
-  }
+public class GUIUserNotifier extends UserNotifier {
 
   /**
    * Show an error message that's actually fatal to the program.
@@ -36,6 +32,18 @@ public class GUIUserNotifier implements UserNotifier {
 
     JOptionPane.showMessageDialog(new Frame(), message, title,
                                   JOptionPane.INFORMATION_MESSAGE);
+  }
+
+  /**
+   * Non-fatal error message with optional stack trace side dish.
+   */
+  public void showWarning(String title, String message, Exception e) {
+    if (title == null) title = _("Warning");
+
+    JOptionPane.showMessageDialog(new Frame(), message, title,
+                                  JOptionPane.WARNING_MESSAGE);
+
+    if (e != null) e.printStackTrace();
   }
 
 }

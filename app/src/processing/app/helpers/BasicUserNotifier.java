@@ -2,11 +2,7 @@ package processing.app.helpers;
 
 import static processing.app.I18n._;
 
-public class BasicUserNotifier implements UserNotifier {
-
-  public void showError(String title, String message, Throwable e) {
-    showError(title, message, e, 1);
-  }
+public class BasicUserNotifier extends UserNotifier {
 
   /**
    * Show an error message that's actually fatal to the program.
@@ -26,6 +22,17 @@ public class BasicUserNotifier implements UserNotifier {
     if (title == null) title = _("Message");
 
     System.out.println(title + ": " + message);
+  }
+
+  /**
+   * Non-fatal error message with optional stack trace side dish.
+   */
+  public void showWarning(String title, String message, Exception e) {
+    if (title == null) title = _("Warning");
+
+    System.out.println(title + ": " + message);
+
+    if (e != null) e.printStackTrace();
   }
 
 }
