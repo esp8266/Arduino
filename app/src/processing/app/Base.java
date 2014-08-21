@@ -86,12 +86,6 @@ public class Base {
 
   static private List<File> librariesFolders;
 
-  // maps library name to their library folder
-  static private LibraryList libraries;
-
-  // maps #included files to their library folder
-  public static Map<String, Library> importToLibraryTable;
-
   // classpath for all known libraries for p5
   // (both those in the p5/libs folder and those with lib subfolders
   // found in the sketchbook)
@@ -1224,17 +1218,15 @@ public class Base {
   }
 
   public LibraryList getIDELibs() {
-    if (libraries == null)
+    if (getLibraries() == null)
       return new LibraryList();
-    LibraryList res = new LibraryList(libraries);
+    LibraryList res = new LibraryList(getLibraries());
     res.removeAll(getUserLibs());
     return res;
   }
 
   public LibraryList getUserLibs() {
-    if (libraries == null)
-      return new LibraryList();
-    return libraries.filterLibrariesInSubfolder(getSketchbookFolder());
+    return BaseNoGui.getUserLibs();
   }
 
   public void rebuildImportMenu(JMenu importMenu) {
@@ -1311,42 +1303,11 @@ public class Base {
   }
 
   public LibraryList scanLibraries(List<File> folders) throws IOException {
-    LibraryList res = new LibraryList();
-    for (File folder : folders)
-      res.addOrReplaceAll(scanLibraries(folder));
-    return res;
+    return BaseNoGui.scanLibraries(folders);
   }
 
   public LibraryList scanLibraries(File folder) throws IOException {
-    LibraryList res = new LibraryList();
-
-    String list[] = folder.list(new OnlyDirs());
-    // if a bad folder or something like that, this might come back null
-    if (list == null)
-      return res;
-
-    for (String libName : list) {
-      File subfolder = new File(folder, libName);
-      if (!Sketch.isSanitaryName(libName)) {
-        String mess = I18n.format(_("The library \"{0}\" cannot be used.\n"
-            + "Library names must contain only basic letters and numbers.\n"
-            + "(ASCII only and no spaces, and it cannot start with a number)"),
-                                  libName);
-        Base.showMessage(_("Ignoring bad library name"), mess);
-        continue;
-      }
-
-      try {
-        Library lib = Library.create(subfolder);
-        // (also replace previously found libs with the same name)
-        if (lib != null)
-          res.addOrReplace(lib);
-      } catch (IOException e) {
-        System.out.println(I18n.format(_("Invalid library found in {0}: {1}"),
-                                       subfolder, e.getMessage()));
-      }
-    }
-    return res;
+    return BaseNoGui.scanLibraries(folder);
   }
 
   public void onBoardOrPortChange() {
@@ -1377,18 +1338,18 @@ public class Base {
     // Libraries located in the latest folders on the list can override
     // other libraries with the same name.
     try {
-      libraries = scanLibraries(librariesFolders);
+      BaseNoGui.scanAndUpdateLibraries(librariesFolders);
     } catch (IOException e) {
       showWarning(_("Error"), _("Error loading libraries"), e);
     }
 
     // Populate importToLibraryTable
-    importToLibraryTable = new HashMap<String, Library>();
-    for (Library lib : libraries) {
+    BaseNoGui.newImportToLibraryTable();
+    for (Library lib : getLibraries()) {
       try {
         String headers[] = headerListFromIncludePath(lib.getSrcFolder());
         for (String header : headers) {
-          Library old = importToLibraryTable.get(header);
+          Library old = BaseNoGui.importToLibraryTable.get(header);
           if (old != null) {
             // If a library was already found with this header, keep
             // it if the library's name matches the header name.
@@ -1396,7 +1357,7 @@ public class Base {
             if (old.getFolder().getPath().endsWith(name))
               continue;
           }
-          importToLibraryTable.put(header, lib);
+          BaseNoGui.importToLibraryTable.put(header, lib);
         }
       } catch (IOException e) {
         showWarning(_("Error"), I18n
@@ -2013,7 +1974,7 @@ public class Base {
 
 
   static public LibraryList getLibraries() {
-    return libraries;
+    return BaseNoGui.getLibraries();
   }
 
 

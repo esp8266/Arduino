@@ -953,7 +953,7 @@ public class Compiler implements MessageConsumer {
 
     importedLibraries = new LibraryList();
     for (String item : preprocessor.getExtraImports()) {
-      Library lib = Base.importToLibraryTable.get(item);
+      Library lib = BaseNoGui.importToLibraryTable.get(item);
       if (lib != null && !importedLibraries.contains(lib)) {
         importedLibraries.add(lib);
       }

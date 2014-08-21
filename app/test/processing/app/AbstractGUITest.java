@@ -21,7 +21,7 @@ public abstract class AbstractGUITest {
     Preferences.init(null);
     JPopupMenu.setDefaultLightWeightPopupEnabled(false);
     Theme.init();
-    Base.platform.setLookAndFeel();
+    Base.getPlatform().setLookAndFeel();
     Base.untitledFolder = Base.createTempFolder("untitled");
     Base.untitledFolder.deleteOnExit();
 

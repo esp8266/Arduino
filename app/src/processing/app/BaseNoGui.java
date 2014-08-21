@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import processing.app.debug.TargetBoard;
@@ -15,7 +16,10 @@ import processing.app.debug.TargetPlatformException;
 import processing.app.helpers.OSUtils;
 import processing.app.helpers.PreferencesMap;
 import processing.app.helpers.filefilters.OnlyDirs;
+import processing.app.helpers.filefilters.OnlyFilesWithExtension;
 import processing.app.legacy.PApplet;
+import processing.app.packages.Library;
+import processing.app.packages.LibraryList;
 
 public class BaseNoGui {
 
@@ -28,6 +32,12 @@ public class BaseNoGui {
   // Current directory to use for relative paths specified on the
   // commandline
   static String currentDirectory = System.getProperty("user.dir");
+
+  // maps #included files to their library folder
+  public static Map<String, Library> importToLibraryTable;
+
+  // maps library name to their library folder
+  static private LibraryList libraries;
 
   static public Map<String, TargetPackage> packages;
 
@@ -102,6 +112,10 @@ public class BaseNoGui {
     return getHardwareFolder().getAbsolutePath();
   }
 
+  static public LibraryList getLibraries() {
+    return libraries;
+  }
+
   static public Platform getPlatform() {
     return platform;
   }
@@ -149,6 +163,25 @@ public class BaseNoGui {
     if (p == null)
       return null;
     return p.get(platformName);
+  }
+
+  static public LibraryList getUserLibs() {
+    if (libraries == null)
+      return new LibraryList();
+    return libraries.filterLibrariesInSubfolder(getSketchbookFolder());
+  }
+
+  /**
+   * Given a folder, return a list of the header files in that folder (but not
+   * the header files in its sub-folders, as those should be included from
+   * within the header files at the top-level).
+   */
+  static public String[] headerListFromIncludePath(File path) throws IOException {
+    String[] list = path.list(new OnlyFilesWithExtension(".h"));
+    if (list == null) {
+      throw new IOException();
+    }
+    return list;
   }
 
   static public void initPackages() {
@@ -213,6 +246,10 @@ public class BaseNoGui {
     }
   }
 
+  static public void newImportToLibraryTable() {
+    importToLibraryTable = new HashMap<String, Library>();
+  }
+
   /**
    * Spew the contents of a String object out to a file.
    */
@@ -235,6 +272,49 @@ public class BaseNoGui {
       _("Could not replace {0}"),
       file.getAbsolutePath()));
     }
+  }
+
+  static public void scanAndUpdateLibraries(List<File> folders) throws IOException {
+    libraries = scanLibraries(folders);
+  }
+
+  static public LibraryList scanLibraries(List<File> folders) throws IOException {
+    LibraryList res = new LibraryList();
+    for (File folder : folders)
+      res.addOrReplaceAll(scanLibraries(folder));
+    return res;
+  }
+
+  static public LibraryList scanLibraries(File folder) throws IOException {
+    LibraryList res = new LibraryList();
+
+    String list[] = folder.list(new OnlyDirs());
+    // if a bad folder or something like that, this might come back null
+    if (list == null)
+      return res;
+
+    for (String libName : list) {
+      File subfolder = new File(folder, libName);
+      if (!Sketch.isSanitaryName(libName)) {
+        String mess = I18n.format(_("The library \"{0}\" cannot be used.\n"
+            + "Library names must contain only basic letters and numbers.\n"
+            + "(ASCII only and no spaces, and it cannot start with a number)"),
+                                  libName);
+        Base.showMessage(_("Ignoring bad library name"), mess);
+        continue;
+      }
+
+      try {
+        Library lib = Library.create(subfolder);
+        // (also replace previously found libs with the same name)
+        if (lib != null)
+          res.addOrReplace(lib);
+      } catch (IOException e) {
+        System.out.println(I18n.format(_("Invalid library found in {0}: {1}"),
+                                       subfolder, e.getMessage()));
+      }
+    }
+    return res;
   }
 
 }
