@@ -3,7 +3,9 @@ package processing.app;
 import static processing.app.I18n._;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,8 +21,10 @@ import processing.app.debug.TargetBoard;
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
 import processing.app.debug.TargetPlatformException;
+import processing.app.helpers.BasicNotifier;
 import processing.app.helpers.OSUtils;
 import processing.app.helpers.PreferencesMap;
+import processing.app.helpers.UserNotifier;
 import processing.app.helpers.filefilters.OnlyDirs;
 import processing.app.helpers.filefilters.OnlyFilesWithExtension;
 import processing.app.legacy.PApplet;
@@ -44,6 +48,8 @@ public class BaseNoGui {
 
   // maps library name to their library folder
   static private LibraryList libraries;
+
+  static UserNotifier notifier = new BasicNotifier();
 
   static public Map<String, TargetPackage> packages;
 
@@ -126,12 +132,60 @@ public class BaseNoGui {
     return libraries;
   }
 
+  /**
+   * Return an InputStream for a file inside the Processing lib folder.
+   */
+  static public InputStream getLibStream(String filename) throws IOException {
+    return new FileInputStream(new File(getContentFile("lib"), filename));
+  }
+
   static public Platform getPlatform() {
     return platform;
   }
 
   static public File getPortableFolder() {
     return portableFolder;
+  }
+
+  /**
+   * Convenience method to get a File object for the specified filename inside
+   * the settings folder.
+   * For now, only used by Preferences to get the preferences.txt file.
+   * @param filename A file inside the settings folder.
+   * @return filename wrapped as a File object inside the settings folder
+   */
+  static public File getSettingsFile(String filename) {
+    return new File(getSettingsFolder(), filename);
+  }
+
+  static public File getSettingsFolder() {
+    if (BaseNoGui.getPortableFolder() != null)
+      return BaseNoGui.getPortableFolder();
+
+    File settingsFolder = null;
+
+    String preferencesPath = Preferences.get("settings.path");
+    if (preferencesPath != null) {
+      settingsFolder = absoluteFile(preferencesPath);
+
+    } else {
+      try {
+        settingsFolder = getPlatform().getSettingsFolder();
+      } catch (Exception e) {
+        showError(_("Problem getting data folder"),
+                  _("Error getting the Arduino data folder."), e);
+      }
+    }
+
+    // create the folder if it doesn't exist already
+    if (!settingsFolder.exists()) {
+      if (!settingsFolder.mkdirs()) {
+        showError(_("Settings issues"),
+                _("Arduino cannot run because it could not\n" +
+                        "create a folder to store your settings."), null);
+      }
+    }
+    return settingsFolder;
   }
 
   static public File getSketchbookFolder() {
@@ -374,6 +428,19 @@ public class BaseNoGui {
       }
     }
     return res;
+  }
+
+  static public void showError(String title, String message, Throwable e) {
+    notifier.showError(title, message, e, 1);
+  }
+
+  /**
+   * Show an error message that's actually fatal to the program.
+   * This is an error that can't be recovered. Use showWarning()
+   * for errors that allow P5 to continue running.
+   */
+  static public void showError(String title, String message, Throwable e, int exit_code) {
+    notifier.showError(title, message, e, exit_code);
   }
 
 }

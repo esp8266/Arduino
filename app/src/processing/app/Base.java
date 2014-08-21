@@ -36,6 +36,7 @@ import processing.app.debug.TargetBoard;
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
 import processing.app.helpers.FileUtils;
+import processing.app.helpers.GUINotifier;
 import processing.app.helpers.OSUtils;
 import processing.app.helpers.PreferencesMap;
 import processing.app.helpers.filefilters.OnlyDirs;
@@ -104,6 +105,8 @@ public class Base {
 
   static public void main(String args[]) throws Exception {
     BaseNoGui.initLogger();
+    
+    BaseNoGui.notifier = new GUINotifier();
 
     initPlatform();
 
@@ -1850,33 +1853,7 @@ public class Base {
 
 
   static public File getSettingsFolder() {
-    if (BaseNoGui.getPortableFolder() != null)
-      return BaseNoGui.getPortableFolder();
-
-    File settingsFolder = null;
-
-    String preferencesPath = Preferences.get("settings.path");
-    if (preferencesPath != null) {
-      settingsFolder = absoluteFile(preferencesPath);
-
-    } else {
-      try {
-        settingsFolder = getPlatform().getSettingsFolder();
-      } catch (Exception e) {
-        showError(_("Problem getting data folder"),
-                  _("Error getting the Arduino data folder."), e);
-      }
-    }
-
-    // create the folder if it doesn't exist already
-    if (!settingsFolder.exists()) {
-      if (!settingsFolder.mkdirs()) {
-        showError(_("Settings issues"),
-                _("Arduino cannot run because it could not\n" +
-                        "create a folder to store your settings."), null);
-      }
-    }
-    return settingsFolder;
+    return BaseNoGui.getSettingsFolder();
   }
 
 
@@ -1888,7 +1865,7 @@ public class Base {
    * @return filename wrapped as a File object inside the settings folder
    */
   static public File getSettingsFile(String filename) {
-    return new File(getSettingsFolder(), filename);
+    return BaseNoGui.getSettingsFile(filename);
   }
 
 
@@ -2323,17 +2300,7 @@ public class Base {
    * for errors that allow P5 to continue running.
    */
   static public void showError(String title, String message, Throwable e, int exit_code) {
-    if (title == null) title = _("Error");
-
-    if (commandLine) {
-      System.err.println(title + ": " + message);
-
-    } else {
-      JOptionPane.showMessageDialog(new Frame(), message, title,
-                                    JOptionPane.ERROR_MESSAGE);
-    }
-    if (e != null) e.printStackTrace();
-    System.exit(exit_code);
+    BaseNoGui.showError(title, message, e, exit_code);
   }
 
 
@@ -2535,7 +2502,7 @@ public class Base {
    * Return an InputStream for a file inside the Processing lib folder.
    */
   static public InputStream getLibStream(String filename) throws IOException {
-    return new FileInputStream(new File(getContentFile("lib"), filename));
+    return BaseNoGui.getLibStream(filename);
   }
 
 

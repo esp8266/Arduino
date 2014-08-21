@@ -32,21 +32,21 @@ public class PreferencesData {
     if (file != null)
       preferencesFile = file;
     else
-      preferencesFile = Base.getSettingsFile(Preferences.PREFS_FILE);
+      preferencesFile = BaseNoGui.getSettingsFile(PREFS_FILE);
 
     // start by loading the defaults, in case something
     // important was deleted from the user prefs
     try {
-      prefs.load(Base.getLibStream("preferences.txt"));
+      prefs.load(BaseNoGui.getLibStream("preferences.txt"));
     } catch (IOException e) {
-      Base.showError(null, _("Could not read default settings.\n" +
-                             "You'll need to reinstall Arduino."), e);
+      BaseNoGui.showError(null, _("Could not read default settings.\n" +
+                                  "You'll need to reinstall Arduino."), e);
     }
 
     // set some runtime constants (not saved on preferences file)
-    File hardwareFolder = Base.getHardwareFolder();
+    File hardwareFolder = BaseNoGui.getHardwareFolder();
     prefs.put("runtime.ide.path", hardwareFolder.getParentFile().getAbsolutePath());
-    prefs.put("runtime.ide.version", "" + Base.REVISION);
+    prefs.put("runtime.ide.version", "" + BaseNoGui.REVISION);
     
     // clone the hash table
     defaults = new PreferencesMap(prefs);
@@ -56,11 +56,11 @@ public class PreferencesData {
       try {
         prefs.load(preferencesFile);
       } catch (IOException ex) {
-        Base.showError(_("Error reading preferences"),
-                       I18n.format(_("Error reading the preferences file. "
-                                       + "Please delete (or move)\n"
-                                       + "{0} and restart Arduino."),
-                                   preferencesFile.getAbsolutePath()), ex);
+        BaseNoGui.showError(_("Error reading preferences"),
+                            I18n.format(_("Error reading the preferences file. "
+                                            + "Please delete (or move)\n"
+                                            + "{0} and restart Arduino."),
+                                        preferencesFile.getAbsolutePath()), ex);
       }
     }
 
