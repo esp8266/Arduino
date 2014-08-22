@@ -34,7 +34,7 @@ import java.util.List;
 
 import processing.app.BaseNoGui;
 import processing.app.I18n;
-import processing.app.Preferences;
+import processing.app.PreferencesData;
 import processing.app.Serial;
 import processing.app.SerialException;
 import processing.app.debug.RunnerException;
@@ -49,7 +49,7 @@ public class SerialUploader extends Uploader {
   public boolean uploadUsingPreferences(File sourcePath, String buildPath, String className, boolean usingProgrammer, List<String> warningsAccumulator) throws Exception {
     // FIXME: Preferences should be reorganized
     TargetPlatform targetPlatform = BaseNoGui.getTargetPlatform();
-    PreferencesMap prefs = Preferences.getMap();
+    PreferencesMap prefs = PreferencesData.getMap();
     prefs.putAll(BaseNoGui.getBoardPreferences());
     String tool = prefs.getOrExcept("upload.tool");
     if (tool.contains(":")) {
@@ -132,7 +132,7 @@ public class SerialUploader extends Uploader {
 
     try {
       if (uploadResult && doTouch) {
-        String uploadPort = Preferences.get("serial.port");
+        String uploadPort = PreferencesData.get("serial.port");
         if (waitForUploadPort) {
           // For Due/Leonardo wait until the bootloader serial port disconnects and the
           // sketch serial port reconnects (or timeout after a few seconds if the
@@ -203,14 +203,14 @@ public class SerialUploader extends Uploader {
   public boolean uploadUsingProgrammer(String buildPath, String className) throws Exception {
 
     TargetPlatform targetPlatform = BaseNoGui.getTargetPlatform();
-    String programmer = Preferences.get("programmer");
+    String programmer = PreferencesData.get("programmer");
     if (programmer.contains(":")) {
       String[] split = programmer.split(":", 2);
       targetPlatform = BaseNoGui.getCurrentTargetPlatformFromPackage(split[0]);
       programmer = split[1];
     }
 
-    PreferencesMap prefs = Preferences.getMap();
+    PreferencesMap prefs = PreferencesData.getMap();
     prefs.putAll(BaseNoGui.getBoardPreferences());
     PreferencesMap programmerPrefs = targetPlatform.getProgrammer(programmer);
     if (programmerPrefs == null)
@@ -249,7 +249,7 @@ public class SerialUploader extends Uploader {
 
     // Find preferences for the selected programmer
     PreferencesMap programmerPrefs;
-    String programmer = Preferences.get("programmer");
+    String programmer = PreferencesData.get("programmer");
     if (programmer.contains(":")) {
       String[] split = programmer.split(":", 2);
       TargetPlatform platform = BaseNoGui.getCurrentTargetPlatformFromPackage(split[0]);
@@ -263,7 +263,7 @@ public class SerialUploader extends Uploader {
           _("Please select a programmer from Tools->Programmer menu"));
 
     // Build configuration for the current programmer
-    PreferencesMap prefs = Preferences.getMap();
+    PreferencesMap prefs = PreferencesData.getMap();
     prefs.putAll(BaseNoGui.getBoardPreferences());
     prefs.putAll(programmerPrefs);
 

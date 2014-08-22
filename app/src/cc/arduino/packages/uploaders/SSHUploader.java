@@ -37,7 +37,7 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import processing.app.BaseNoGui;
 import processing.app.I18n;
-import processing.app.Preferences;
+import processing.app.PreferencesData;
 import processing.app.debug.RunnerException;
 import processing.app.debug.TargetPlatform;
 import processing.app.helpers.PreferencesMap;
@@ -82,7 +82,7 @@ public class SSHUploader extends Uploader {
       SSHClientSetupChainRing sshClientSetupChain = new SSHConfigFileSetup(new SSHPwdSetup());
       session = sshClientSetupChain.setup(port, jSch);
 
-      session.setUserInfo(new NoInteractionUserInfo(Preferences.get("runtime.pwd." + port.getAddress())));
+      session.setUserInfo(new NoInteractionUserInfo(PreferencesData.get("runtime.pwd." + port.getAddress())));
       session.connect(30000);
 
       scp = new SCP(session);
@@ -118,7 +118,7 @@ public class SSHUploader extends Uploader {
 
   private boolean runAVRDude(SSH ssh) throws IOException, JSchException {
     TargetPlatform targetPlatform = BaseNoGui.getTargetPlatform();
-    PreferencesMap prefs = Preferences.getMap();
+    PreferencesMap prefs = PreferencesData.getMap();
     prefs.putAll(BaseNoGui.getBoardPreferences());
     prefs.putAll(targetPlatform.getTool(prefs.get("upload.tool")));
 

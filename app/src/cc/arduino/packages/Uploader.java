@@ -25,7 +25,7 @@
 package cc.arduino.packages;
 
 import processing.app.I18n;
-import processing.app.Preferences;
+import processing.app.PreferencesData;
 import processing.app.debug.MessageConsumer;
 import processing.app.debug.MessageSiphon;
 import processing.app.debug.RunnerException;
@@ -67,7 +67,7 @@ public abstract class Uploader implements MessageConsumer {
 
   protected Uploader() {
     this.error = null;
-    this.verbose = Preferences.getBoolean("upload.verbose");
+    this.verbose = PreferencesData.getBoolean("upload.verbose");
     this.notFoundError = false;
   }
 

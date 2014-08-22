@@ -68,7 +68,7 @@ public class NetworkMonitor extends AbstractMonitor {
     SSHClientSetupChainRing sshClientSetupChain = new SSHConfigFileSetup(new SSHPwdSetup());
     session = sshClientSetupChain.setup(port, jSch);
 
-    session.setUserInfo(new NoInteractionUserInfo(Preferences.get(getAuthorizationKey())));
+    session.setUserInfo(new NoInteractionUserInfo(PreferencesData.get(getAuthorizationKey())));
     session.connect(30000);
 
     tryConnect();

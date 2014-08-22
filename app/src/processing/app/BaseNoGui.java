@@ -85,7 +85,7 @@ public class BaseNoGui {
     
     PreferencesMap prefs = new PreferencesMap(board.getPreferences());
     for (String menuId : board.getMenuIds()) {
-      String entry = Preferences.get("custom_" + menuId);
+      String entry = PreferencesData.get("custom_" + menuId);
       if (board.hasMenu(menuId) && entry != null &&
           entry.startsWith(board.getId())) {
         String selectionId = entry.substring(entry.indexOf("_") + 1);
@@ -114,7 +114,7 @@ public class BaseNoGui {
   }
 
   static public TargetPlatform getCurrentTargetPlatformFromPackage(String pack) {
-    return getTargetPlatform(pack, Preferences.get("target_platform"));
+    return getTargetPlatform(pack, PreferencesData.get("target_platform"));
   }
 
   static public File getHardwareFolder() {
@@ -164,7 +164,7 @@ public class BaseNoGui {
 
     File settingsFolder = null;
 
-    String preferencesPath = Preferences.get("settings.path");
+    String preferencesPath = PreferencesData.get("settings.path");
     if (preferencesPath != null) {
       settingsFolder = absoluteFile(preferencesPath);
 
@@ -190,8 +190,8 @@ public class BaseNoGui {
 
   static public File getSketchbookFolder() {
     if (portableFolder != null)
-      return new File(portableFolder, Preferences.get("sketchbook.path"));
-    return absoluteFile(Preferences.get("sketchbook.path"));
+      return new File(portableFolder, PreferencesData.get("sketchbook.path"));
+    return absoluteFile(PreferencesData.get("sketchbook.path"));
   }
 
   static public File getSketchbookHardwareFolder() {
@@ -199,7 +199,7 @@ public class BaseNoGui {
   }
 
   public static TargetBoard getTargetBoard() {
-    String boardId = Preferences.get("board");
+    String boardId = PreferencesData.get("board");
     return getTargetPlatform().getBoard(boardId);
   }
 
@@ -209,8 +209,8 @@ public class BaseNoGui {
    * @return
    */
   static public TargetPlatform getTargetPlatform() {
-    String packageName = Preferences.get("target_package");
-    String platformName = Preferences.get("target_platform");
+    String packageName = PreferencesData.get("target_package");
+    String platformName = PreferencesData.get("target_platform");
     return getTargetPlatform(packageName, platformName);
   }
 
@@ -303,8 +303,8 @@ public class BaseNoGui {
     }
 
     // help 3rd party installers find the correct hardware path
-    Preferences.set("last.ide." + VERSION_NAME + ".hardwarepath", getHardwarePath());
-    Preferences.set("last.ide." + VERSION_NAME + ".daterun", "" + (new Date()).getTime() / 1000);
+    PreferencesData.set("last.ide." + VERSION_NAME + ".hardwarepath", getHardwarePath());
+    PreferencesData.set("last.ide." + VERSION_NAME + ".daterun", "" + (new Date()).getTime() / 1000);
   }
 
   static protected void loadHardware(File folder) {
@@ -360,7 +360,7 @@ public class BaseNoGui {
     }
 
     // run static initialization that grabs all the prefs
-    Preferences.init(absoluteFile(preferencesFile));
+    PreferencesData.init(absoluteFile(preferencesFile));
   }
 
   /**

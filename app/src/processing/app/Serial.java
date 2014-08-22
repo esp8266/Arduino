@@ -63,40 +63,40 @@ public class Serial implements SerialPortEventListener {
   MessageConsumer consumer;
 
   public Serial(boolean monitor) throws SerialException {
-    this(Preferences.get("serial.port"),
-            Preferences.getInteger("serial.debug_rate"),
-            Preferences.get("serial.parity").charAt(0),
-            Preferences.getInteger("serial.databits"),
-            new Float(Preferences.get("serial.stopbits")).floatValue());
+    this(PreferencesData.get("serial.port"),
+            PreferencesData.getInteger("serial.debug_rate"),
+            PreferencesData.get("serial.parity").charAt(0),
+            PreferencesData.getInteger("serial.databits"),
+            new Float(PreferencesData.get("serial.stopbits")).floatValue());
     this.monitor = monitor;
   }
 
   public Serial() throws SerialException {
-    this(Preferences.get("serial.port"),
-            Preferences.getInteger("serial.debug_rate"),
-            Preferences.get("serial.parity").charAt(0),
-            Preferences.getInteger("serial.databits"),
-            new Float(Preferences.get("serial.stopbits")).floatValue());
+    this(PreferencesData.get("serial.port"),
+            PreferencesData.getInteger("serial.debug_rate"),
+            PreferencesData.get("serial.parity").charAt(0),
+            PreferencesData.getInteger("serial.databits"),
+            new Float(PreferencesData.get("serial.stopbits")).floatValue());
   }
 
   public Serial(int irate) throws SerialException {
-    this(Preferences.get("serial.port"), irate,
-            Preferences.get("serial.parity").charAt(0),
-            Preferences.getInteger("serial.databits"),
-            new Float(Preferences.get("serial.stopbits")).floatValue());
+    this(PreferencesData.get("serial.port"), irate,
+            PreferencesData.get("serial.parity").charAt(0),
+            PreferencesData.getInteger("serial.databits"),
+            new Float(PreferencesData.get("serial.stopbits")).floatValue());
   }
 
   public Serial(String iname, int irate) throws SerialException {
-    this(iname, irate, Preferences.get("serial.parity").charAt(0),
-            Preferences.getInteger("serial.databits"),
-            new Float(Preferences.get("serial.stopbits")).floatValue());
+    this(iname, irate, PreferencesData.get("serial.parity").charAt(0),
+            PreferencesData.getInteger("serial.databits"),
+            new Float(PreferencesData.get("serial.stopbits")).floatValue());
   }
 
   public Serial(String iname) throws SerialException {
-    this(iname, Preferences.getInteger("serial.debug_rate"),
-            Preferences.get("serial.parity").charAt(0),
-            Preferences.getInteger("serial.databits"),
-            new Float(Preferences.get("serial.stopbits")).floatValue());
+    this(iname, PreferencesData.getInteger("serial.debug_rate"),
+            PreferencesData.get("serial.parity").charAt(0),
+            PreferencesData.getInteger("serial.databits"),
+            new Float(PreferencesData.get("serial.stopbits")).floatValue());
   }
 
   public static boolean touchPort(String iname, int irate) throws SerialException {

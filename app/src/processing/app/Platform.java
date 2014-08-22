@@ -110,7 +110,7 @@ public class Platform {
   
   
   public void openURL(String url) throws Exception {
-    String launcher = Preferences.get("launcher");
+    String launcher = PreferencesData.get("launcher");
     if (launcher != null) {
       Runtime.getRuntime().exec(new String[] { launcher, url });
     } else {
@@ -120,12 +120,12 @@ public class Platform {
 
 
   public boolean openFolderAvailable() {
-    return Preferences.get("launcher") != null;
+    return PreferencesData.get("launcher") != null;
   }
   
   
   public void openFolder(File file) throws Exception {
-    String launcher = Preferences.get("launcher");
+    String launcher = PreferencesData.get("launcher");
     if (launcher != null) {
       String folder = file.getAbsolutePath();
       Runtime.getRuntime().exec(new String[] { launcher, folder });
