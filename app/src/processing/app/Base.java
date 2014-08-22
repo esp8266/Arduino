@@ -205,11 +205,11 @@ public class Base {
     try {
       Class.forName("com.sun.jdi.VirtualMachine");
     } catch (ClassNotFoundException cnfe) {
-      Base.showPlatforms();
-      Base.showError(_("Please install JDK 1.5 or later"),
-                     _("Arduino requires a full JDK (not just a JRE)\n" +
-                       "to run. Please install JDK 1.5 or later.\n" +
-                       "More information can be found in the reference."), cnfe);
+      showPlatforms();
+      showError(_("Please install JDK 1.5 or later"),
+                _("Arduino requires a full JDK (not just a JRE)\n" +
+                  "to run. Please install JDK 1.5 or later.\n" +
+                  "More information can be found in the reference."), cnfe);
     }
   }
 
@@ -238,14 +238,14 @@ public class Base {
       if (BaseNoGui.getPortableFolder() != null)
         sketchbookFolder = new File(BaseNoGui.getPortableFolder(), sketchbookPath);
       else
-        sketchbookFolder = Base.absoluteFile(sketchbookPath);
+        sketchbookFolder = absoluteFile(sketchbookPath);
       if (!sketchbookFolder.exists()) {
-        Base.showWarning(_("Sketchbook folder disappeared"),
-                _("The sketchbook folder no longer exists.\n" +
-                        "Arduino will switch to the default sketchbook\n" +
-                        "location, and create a new sketchbook folder if\n" +
-                        "necessary. Arduino will then stop talking about\n" +
-                        "himself in the third person."), null);
+        showWarning(_("Sketchbook folder disappeared"),
+                    _("The sketchbook folder no longer exists.\n" +
+                      "Arduino will switch to the default sketchbook\n" +
+                      "location, and create a new sketchbook folder if\n" +
+                      "necessary. Arduino will then stop talking about\n" +
+                      "himself in the third person."), null);
         sketchbookPath = null;
       }
     }
@@ -330,7 +330,7 @@ public class Base {
         i++;
         if (i >= args.length)
           showError(null, _("Argument required for --port"), 3);
-        Base.selectSerialPort(args[i]);
+        selectSerialPort(args[i]);
         if (action == ACTION.GUI)
           action = ACTION.NOOP;
         continue;
@@ -764,13 +764,13 @@ public class Base {
       if (index == 26) {
         // In 0159, avoid running past z by sending people outdoors.
         if (!breakTime) {
-          Base.showWarning(_("Time for a Break"),
-                           _("You've reached the limit for auto naming of new sketches\n" +
-                             "for the day. How about going for a walk instead?"), null);
+          showWarning(_("Time for a Break"),
+                      _("You've reached the limit for auto naming of new sketches\n" +
+                        "for the day. How about going for a walk instead?"), null);
           breakTime = true;
         } else {
-          Base.showWarning(_("Sunshine"),
-                           _("No really, time for some fresh air for you."), null);
+          showWarning(_("Sunshine"),
+                      _("No really, time for some fresh air for you."), null);
         }
         return null;
       }
@@ -869,7 +869,7 @@ public class Base {
    */
   public void handleOpenPrompt() throws Exception {
     // get the frontmost window frame for placing file dialog
-    JFileChooser fd = new JFileChooser(Preferences.get("last.folder", Base.getSketchbookFolder().getAbsolutePath()));
+    JFileChooser fd = new JFileChooser(Preferences.get("last.folder", getSketchbookFolder().getAbsolutePath()));
     fd.setDialogTitle(_("Open an Arduino sketch..."));
     fd.setFileSelectionMode(JFileChooser.FILES_ONLY);
     fd.setFileFilter(new FileNameExtensionFilter(_("Sketches (*.ino, *.pde)"), "ino", "pde"));
@@ -1291,7 +1291,7 @@ public class Base {
     String core = getBoardPreferences().get("build.core");
     if (core.contains(":")) {
       String referencedCore = core.split(":")[0];
-      TargetPlatform referencedPlatform = Base.getTargetPlatform(referencedCore, targetPlatform.getId());
+      TargetPlatform referencedPlatform = getTargetPlatform(referencedCore, targetPlatform.getId());
       if (referencedPlatform != null) {
       File referencedPlatformFolder = referencedPlatform.getFolder();
         librariesFolders.add(new File(referencedPlatformFolder, "libraries"));
@@ -1684,7 +1684,7 @@ public class Base {
                           + "and it cannot start with a number).\n"
                           + "To get rid of this message, remove the sketch from\n"
                           + "{1}"), name, entry.getAbsolutePath());
-          Base.showMessage(_("Ignoring sketch with bad name"), complaining);
+          showMessage(_("Ignoring sketch with bad name"), complaining);
         }
         return false;
       }
@@ -1764,7 +1764,7 @@ public class Base {
    */
   @SuppressWarnings("serial")
   public void handleAbout() {
-    final Image image = Base.getLibImage("about.jpg", activeEditor);
+    final Image image = getLibImage("about.jpg", activeEditor);
     final Window window = new Window(activeEditor) {
         public void paint(Graphics g) {
           g.drawImage(image, 0, 0, null);
@@ -1775,7 +1775,7 @@ public class Base {
 
           g.setFont(new Font("SansSerif", Font.PLAIN, 11));
           g.setColor(Color.white);
-          g.drawString(Base.VERSION_NAME, 50, 30);
+          g.drawString(VERSION_NAME, 50, 30);
         }
       };
     window.addMouseListener(new MouseAdapter() {
@@ -1876,7 +1876,7 @@ public class Base {
     if (buildFolder == null) {
       String buildPath = Preferences.get("build.path");
       if (buildPath != null) {
-        buildFolder = Base.absoluteFile(buildPath);
+        buildFolder = absoluteFile(buildPath);
         if (!buildFolder.exists())
           buildFolder.mkdirs();
       } else {
@@ -2084,7 +2084,7 @@ public class Base {
     }
 
     String prompt = _("Select (or create new) folder for sketches...");
-    folder = Base.selectFolder(prompt, null, null);
+    folder = selectFolder(prompt, null, null);
     if (folder == null) {
       System.exit(0);
     }
@@ -2212,18 +2212,18 @@ public class Base {
 
 
   static public void showReference(String filename) {
-    File referenceFolder = Base.getContentFile("reference");
+    File referenceFolder = getContentFile("reference");
     File referenceFile = new File(referenceFolder, filename);
     openURL(referenceFile.getAbsolutePath());
   }
 
   static public void showGettingStarted() {
     if (OSUtils.isMacOS()) {
-      Base.showReference(_("Guide_MacOSX.html"));
+      showReference(_("Guide_MacOSX.html"));
     } else if (OSUtils.isWindows()) {
-      Base.showReference(_("Guide_Windows.html"));
+      showReference(_("Guide_Windows.html"));
     } else {
-      Base.openURL(_("http://www.arduino.cc/playground/Learning/Linux"));
+      openURL(_("http://www.arduino.cc/playground/Learning/Linux"));
     }
   }
 
