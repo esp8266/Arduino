@@ -305,8 +305,8 @@ public class Base {
     return file;
   }
 
+  protected static enum ACTION { GUI, NOOP, VERIFY, UPLOAD, GET_PREF };
 
-  protected static enum ACTION { GUI, VERIFY, UPLOAD, NOOP, GET_PREF };
   public Base(String[] args) throws Exception {
     platform.init(this);
 
@@ -359,10 +359,8 @@ public class Base {
 
     ACTION action = ACTION.GUI;
     boolean doVerboseBuild = false;
-    boolean doVerboseUpload = false;;
+    boolean doVerboseUpload = false;
     String getPref = null;
-    String selectBoard = null;
-    String selectPort = null;
     List<String> filenames = new LinkedList<String>();
 
     // Map of possible actions and corresponding options
