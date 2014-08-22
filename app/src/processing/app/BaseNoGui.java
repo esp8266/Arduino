@@ -17,6 +17,8 @@ import java.util.logging.Logger;
 import org.apache.commons.logging.impl.LogFactoryImpl;
 import org.apache.commons.logging.impl.NoOpLog;
 
+import cc.arduino.packages.DiscoveryManager;
+
 import processing.app.debug.TargetBoard;
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
@@ -43,6 +45,8 @@ public class BaseNoGui {
   // commandline
   static String currentDirectory = System.getProperty("user.dir");
 
+  private static DiscoveryManager discoveryManager = new DiscoveryManager();
+  
   // maps #included files to their library folder
   public static Map<String, Library> importToLibraryTable;
 
@@ -115,6 +119,10 @@ public class BaseNoGui {
 
   static public TargetPlatform getCurrentTargetPlatformFromPackage(String pack) {
     return getTargetPlatform(pack, PreferencesData.get("target_platform"));
+  }
+
+  public static DiscoveryManager getDiscoveryManager() {
+    return discoveryManager;
   }
 
   static public File getHardwareFolder() {

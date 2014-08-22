@@ -64,8 +64,6 @@ public class Base {
   /** Set true if this a proper release rather than a numbered revision. */
   static public boolean RELEASE = BaseNoGui.RELEASE;
 
-  private static DiscoveryManager discoveryManager = new DiscoveryManager();
-  
   static private boolean commandLine;
 
   // A single instance of the preferences window
@@ -2778,6 +2776,6 @@ public class Base {
   }
 
   public static DiscoveryManager getDiscoveryManager() {
-    return discoveryManager;
+    return BaseNoGui.getDiscoveryManager();
   }
 }
