@@ -213,8 +213,8 @@ public class Platform {
 
 
   protected void showLauncherWarning() {
-    Base.showWarning(_("No launcher available"), 
-                     _("Unspecified platform, no launcher available.\nTo enable opening URLs or folders, add a \n\"launcher=/path/to/app\" line to preferences.txt"),
-                     null);
+    BaseNoGui.showWarning(_("No launcher available"), 
+                          _("Unspecified platform, no launcher available.\nTo enable opening URLs or folders, add a \n\"launcher=/path/to/app\" line to preferences.txt"),
+                          null);
   }
 }
