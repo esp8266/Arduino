@@ -83,6 +83,10 @@ public class Compiler implements MessageConsumer {
   private ProgressListener progressListener;
 
   static public String build(SketchData data, String buildPath, File tempBuildFolder, ProgressListener progListener, boolean verbose) throws RunnerException {
+    if (!SketchData.checkSketchFile(data.getPrimaryFile()))
+      BaseNoGui.showError(_("Bad file selected"),
+                          _("Bad sketch primary file or bad sketck directory structure"), null);
+
     String primaryClassName = data.getName() + ".cpp";
     Compiler compiler = new Compiler(data, buildPath, primaryClassName);
     File buildPrefsFile = new File(buildPath, BUILD_PREFS_FILE);
