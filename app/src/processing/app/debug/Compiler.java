@@ -31,10 +31,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import processing.app.Base;
 import processing.app.BaseNoGui;
@@ -53,6 +56,12 @@ import processing.app.preproc.PdePreprocessor;
 import processing.app.legacy.PApplet;
 
 public class Compiler implements MessageConsumer {
+
+  /**
+   * File inside the build directory that contains the build options
+   * used for the last build.
+   */
+  static final public String BUILD_PREFS_FILE = "buildprefs.txt";
 
   private SketchData sketch;
   private PreferencesMap prefs;
@@ -73,6 +82,38 @@ public class Compiler implements MessageConsumer {
 
   private ProgressListener progressListener;
 
+  static public String build(SketchData data, String buildPath, File tempBuildFolder, ProgressListener progListener, boolean verbose) throws RunnerException {
+    String primaryClassName = data.getName() + ".cpp";
+    Compiler compiler = new Compiler(data, buildPath, primaryClassName);
+    File buildPrefsFile = new File(buildPath, BUILD_PREFS_FILE);
+    String newBuildPrefs = compiler.buildPrefsString();
+
+    // Do a forced cleanup (throw everything away) if the previous
+    // build settings do not match the previous ones
+    boolean prefsChanged = compiler.buildPreferencesChanged(buildPrefsFile, newBuildPrefs);
+    compiler.cleanup(prefsChanged, tempBuildFolder);
+
+    if (prefsChanged) {
+      try {
+        PrintWriter out = new PrintWriter(buildPrefsFile);
+        out.print(newBuildPrefs);
+        out.close();
+      } catch (IOException e) {
+        System.err.println(_("Could not write build preferences file"));
+      }
+    }
+
+    compiler.setProgressListener(progListener);
+    
+    // compile the program. errors will happen as a RunnerException
+    // that will bubble up to whomever called build().
+    if (compiler.compile(verbose)) {
+      compiler.size(compiler.getBuildPreferences());
+      return primaryClassName;
+    }
+    return null;
+  }
+  
   /**
    * Create a new Compiler
    * @param _sketch Sketch object to be compiled.
@@ -92,10 +133,144 @@ public class Compiler implements MessageConsumer {
     };
   }
 
-  public void setProgressListener(ProgressListener _progressListener) {
+  /**
+   * Check if the build preferences used on the previous build in
+   * buildPath match the ones given.
+   */
+  protected boolean buildPreferencesChanged(File buildPrefsFile, String newBuildPrefs) {
+    // No previous build, so no match
+    if (!buildPrefsFile.exists())
+      return true;
+
+    String previousPrefs;
+    try {
+      previousPrefs = FileUtils.readFileToString(buildPrefsFile);
+    } catch (IOException e) {
+      System.err.println(_("Could not read prevous build preferences file, rebuilding all"));
+      return true;
+    }
+
+    if (!previousPrefs.equals(newBuildPrefs)) {
+      System.out.println(_("Build options changed, rebuilding all"));
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Returns the build preferences of the given compiler as a string.
+   * Only includes build-specific preferences, to make sure unrelated
+   * preferences don't cause a rebuild (in particular preferences that
+   * change on every start, like last.ide.xxx.daterun). */
+  protected String buildPrefsString() {
+    PreferencesMap buildPrefs = getBuildPreferences();
+    String res = "";
+    SortedSet<String> treeSet = new TreeSet<String>(buildPrefs.keySet());
+    for (String k : treeSet) {
+      if (k.startsWith("build.") || k.startsWith("compiler.") || k.startsWith("recipes."))
+        res += k + " = " + buildPrefs.get(k) + "\n";
+    }
+    return res;
+  }
+
+  protected void setProgressListener(ProgressListener _progressListener) {
     progressListener = _progressListener;
   }
   
+  /**
+   * Cleanup temporary files used during a build/run.
+   */
+  protected void cleanup(boolean force, File tempBuildFolder) {
+    // if the java runtime is holding onto any files in the build dir, we
+    // won't be able to delete them, so we need to force a gc here
+    System.gc();
+
+    if (force) {
+      // delete the entire directory and all contents
+      // when we know something changed and all objects
+      // need to be recompiled, or if the board does not
+      // use setting build.dependency
+      //Base.removeDir(tempBuildFolder);
+
+      // note that we can't remove the builddir itself, otherwise
+      // the next time we start up, internal runs using Runner won't
+      // work because the build dir won't exist at startup, so the classloader
+      // will ignore the fact that that dir is in the CLASSPATH in run.sh
+      Base.removeDescendants(tempBuildFolder);
+    } else {
+      // delete only stale source files, from the previously
+      // compiled sketch.  This allows multiple windows to be
+      // used.  Keep everything else, which might be reusable
+      if (tempBuildFolder.exists()) {
+        String files[] = tempBuildFolder.list();
+        for (String file : files) {
+          if (file.endsWith(".c") || file.endsWith(".cpp") || file.endsWith(".s")) {
+            File deleteMe = new File(tempBuildFolder, file);
+            if (!deleteMe.delete()) {
+              System.err.println("Could not delete " + deleteMe);
+            }
+          }
+        }
+      }
+    }
+
+    // Create a fresh applet folder (needed before preproc is run below)
+    //tempBuildFolder.mkdirs();
+  }
+
+  protected void size(PreferencesMap prefs) throws RunnerException {
+    String maxTextSizeString = prefs.get("upload.maximum_size");
+    String maxDataSizeString = prefs.get("upload.maximum_data_size");
+    if (maxTextSizeString == null)
+      return;
+    long maxTextSize = Integer.parseInt(maxTextSizeString);
+    long maxDataSize = -1;
+    if (maxDataSizeString != null)
+      maxDataSize = Integer.parseInt(maxDataSizeString);
+    Sizer sizer = new Sizer(prefs);
+    long[] sizes;
+    try {
+      sizes = sizer.computeSize();
+    } catch (RunnerException e) {
+      System.err.println(I18n.format(_("Couldn't determine program size: {0}"),
+                                     e.getMessage()));
+      return;
+    }
+
+    long textSize = sizes[0];
+    long dataSize = sizes[1];
+    System.out.println();
+    System.out.println(I18n
+                       .format(_("Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} bytes."),
+                               textSize, maxTextSize, textSize * 100 / maxTextSize));
+    if (dataSize >= 0) {
+      if (maxDataSize > 0) {
+        System.out
+            .println(I18n
+                .format(
+                        _("Global variables use {0} bytes ({2}%%) of dynamic memory, leaving {3} bytes for local variables. Maximum is {1} bytes."),
+                        dataSize, maxDataSize, dataSize * 100 / maxDataSize,
+                        maxDataSize - dataSize));
+      } else {
+        System.out.println(I18n
+            .format(_("Global variables use {0} bytes of dynamic memory."), dataSize));
+      }
+    }
+
+    if (textSize > maxTextSize)
+      throw new RunnerException(
+          _("Sketch too big; see http://www.arduino.cc/en/Guide/Troubleshooting#size for tips on reducing it."));
+
+    if (maxDataSize > 0 && dataSize > maxDataSize)
+      throw new RunnerException(
+          _("Not enough memory; see http://www.arduino.cc/en/Guide/Troubleshooting#size for tips on reducing your footprint."));
+
+    int warnDataPercentage = Integer.parseInt(prefs.get("build.warn_data_percentage"));
+    if (maxDataSize > 0 && dataSize > maxDataSize*warnDataPercentage/100)
+      System.err.println(_("Low memory available, stability problems may occur."));
+  }
+
   /**
    * Compile sketch.
    * @param buildPath 
