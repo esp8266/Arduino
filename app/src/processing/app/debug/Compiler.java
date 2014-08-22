@@ -83,7 +83,7 @@ public class Compiler implements MessageConsumer {
   private ProgressListener progressListener;
 
   static public String build(SketchData data, String buildPath, File tempBuildFolder, ProgressListener progListener, boolean verbose) throws RunnerException {
-    if (!SketchData.checkSketchFile(data.getPrimaryFile()))
+    if (SketchData.checkSketchFile(data.getPrimaryFile()) == null)
       BaseNoGui.showError(_("Bad file selected"),
                           _("Bad sketch primary file or bad sketck directory structure"), null);
 

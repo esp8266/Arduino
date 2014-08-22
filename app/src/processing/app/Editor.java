@@ -2124,15 +2124,14 @@ public class Editor extends JFrame implements RunnerListener {
    * Second stage of open, occurs after having checked to see if the
    * modifications (if any) to the previous sketch need to be saved.
    */
-  protected boolean handleOpenInternal(File file) {
+  protected boolean handleOpenInternal(File sketchFile) {
     // check to make sure that this .pde file is
     // in a folder of the same name
-    String fileName = file.getName();
+    String fileName = sketchFile.getName();
 
-    if (SketchData.checkSketchFile(file)) {
-      // no beef with this guy
+    File file = SketchData.checkSketchFile(sketchFile);
 
-    } else if (!fileName.endsWith(".ino") && !fileName.endsWith(".pde")) {
+    if ((file == null) && !fileName.endsWith(".ino") && !fileName.endsWith(".pde")) {
       Base.showWarning(_("Bad file selected"),
                        _("Arduino can only open its own sketches\n" +
                          "and other files ending in .ino or .pde"), null);
