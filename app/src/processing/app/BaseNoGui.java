@@ -315,6 +315,13 @@ public class BaseNoGui {
     PreferencesData.set("last.ide." + VERSION_NAME + ".daterun", "" + (new Date()).getTime() / 1000);
   }
 
+  /**
+   * Return true if the name is valid for a Processing sketch.
+   */
+  static public boolean isSanitaryName(String name) {
+    return sanitizeName(name).equals(name);
+  }
+
   static protected void loadHardware(File folder) {
     if (!folder.isDirectory()) return;
 
@@ -405,7 +412,7 @@ public class BaseNoGui {
       if (files[i].equals(".") || files[i].equals("..")) continue;
       File dead = new File(dir, files[i]);
       if (!dead.isDirectory()) {
-        if (!Preferences.getBoolean("compiler.save_build_files")) {
+        if (!PreferencesData.getBoolean("compiler.save_build_files")) {
           if (!dead.delete()) {
             // temporarily disabled
         System.err.println(I18n.format(_("Could not delete {0}"), dead));
@@ -428,6 +435,50 @@ public class BaseNoGui {
         System.err.println(I18n.format(_("Could not delete {0}"), dir));
       }
     }
+  }
+
+  /**
+   * Produce a sanitized name that fits our standards for likely to work.
+   * <p/>
+   * Java classes have a wider range of names that are technically allowed
+   * (supposedly any Unicode name) than what we support. The reason for
+   * going more narrow is to avoid situations with text encodings and
+   * converting during the process of moving files between operating
+   * systems, i.e. uploading from a Windows machine to a Linux server,
+   * or reading a FAT32 partition in OS X and using a thumb drive.
+   * <p/>
+   * This helper function replaces everything but A-Z, a-z, and 0-9 with
+   * underscores. Also disallows starting the sketch name with a digit.
+   */
+  static public String sanitizeName(String origName) {
+    char c[] = origName.toCharArray();
+    StringBuffer buffer = new StringBuffer();
+
+    // can't lead with a digit, so start with an underscore
+    if ((c[0] >= '0') && (c[0] <= '9')) {
+      buffer.append('_');
+    }
+    for (int i = 0; i < c.length; i++) {
+      if (((c[i] >= '0') && (c[i] <= '9')) ||
+          ((c[i] >= 'a') && (c[i] <= 'z')) ||
+          ((c[i] >= 'A') && (c[i] <= 'Z')) ||
+          ((i > 0) && (c[i] == '-')) ||
+          ((i > 0) && (c[i] == '.'))) {
+        buffer.append(c[i]);
+      } else {
+        buffer.append('_');
+      }
+    }
+    // let's not be ridiculous about the length of filenames.
+    // in fact, Mac OS 9 can handle 255 chars, though it can't really
+    // deal with filenames longer than 31 chars in the Finder.
+    // but limiting to that for sketches would mean setting the
+    // upper-bound on the character limit here to 25 characters
+    // (to handle the base name + ".class")
+    if (buffer.length() > 63) {
+      buffer.setLength(63);
+    }
+    return buffer.toString();
   }
 
   /**
@@ -475,7 +526,7 @@ public class BaseNoGui {
 
     for (String libName : list) {
       File subfolder = new File(folder, libName);
-      if (!Sketch.isSanitaryName(libName)) {
+      if (!isSanitaryName(libName)) {
         String mess = I18n.format(_("The library \"{0}\" cannot be used.\n"
             + "Library names must contain only basic letters and numbers.\n"
             + "(ASCII only and no spaces, and it cannot start with a number)"),

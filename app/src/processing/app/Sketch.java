@@ -239,7 +239,7 @@ public class Sketch {
     // make sure the user didn't name things poo.time.pde
     // or something like that (nothing against poo time)
     String shortName = newName.substring(0, dot);
-    String sanitaryName = Sketch.sanitizeName(shortName);
+    String sanitaryName = BaseNoGui.sanitizeName(shortName);
     if (!shortName.equals(sanitaryName)) {
       newName = sanitaryName + "." + newExtension;
     }
@@ -1465,7 +1465,7 @@ public class Sketch {
    * if changes were made.
    */
   static public String checkName(String origName) {
-    String newName = sanitizeName(origName);
+    String newName = BaseNoGui.sanitizeName(origName);
 
     if (!newName.equals(origName)) {
       String msg =
@@ -1478,55 +1478,4 @@ public class Sketch {
   }
 
 
-  /**
-   * Return true if the name is valid for a Processing sketch.
-   */
-  static public boolean isSanitaryName(String name) {
-    return sanitizeName(name).equals(name);
-  }
-
-
-  /**
-   * Produce a sanitized name that fits our standards for likely to work.
-   * <p/>
-   * Java classes have a wider range of names that are technically allowed
-   * (supposedly any Unicode name) than what we support. The reason for
-   * going more narrow is to avoid situations with text encodings and
-   * converting during the process of moving files between operating
-   * systems, i.e. uploading from a Windows machine to a Linux server,
-   * or reading a FAT32 partition in OS X and using a thumb drive.
-   * <p/>
-   * This helper function replaces everything but A-Z, a-z, and 0-9 with
-   * underscores. Also disallows starting the sketch name with a digit.
-   */
-  static public String sanitizeName(String origName) {
-    char c[] = origName.toCharArray();
-    StringBuffer buffer = new StringBuffer();
-
-    // can't lead with a digit, so start with an underscore
-    if ((c[0] >= '0') && (c[0] <= '9')) {
-      buffer.append('_');
-    }
-    for (int i = 0; i < c.length; i++) {
-      if (((c[i] >= '0') && (c[i] <= '9')) ||
-          ((c[i] >= 'a') && (c[i] <= 'z')) ||
-          ((c[i] >= 'A') && (c[i] <= 'Z')) ||
-          ((i > 0) && (c[i] == '-')) ||
-          ((i > 0) && (c[i] == '.'))) {
-        buffer.append(c[i]);
-      } else {
-        buffer.append('_');
-      }
-    }
-    // let's not be ridiculous about the length of filenames.
-    // in fact, Mac OS 9 can handle 255 chars, though it can't really
-    // deal with filenames longer than 31 chars in the Finder.
-    // but limiting to that for sketches would mean setting the
-    // upper-bound on the character limit here to 25 characters
-    // (to handle the base name + ".class")
-    if (buffer.length() > 63) {
-      buffer.setLength(63);
-    }
-    return buffer.toString();
-  }
 }

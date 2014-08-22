@@ -1652,7 +1652,7 @@ public class Base {
     // if a .pde file of the same prefix as the folder exists..
     if (entry.exists()) {
 
-      if (!Sketch.isSanitaryName(name)) {
+      if (!BaseNoGui.isSanitaryName(name)) {
         if (!builtOnce) {
           String complaining = I18n
               .format(
@@ -2725,7 +2725,7 @@ public class Base {
       // is there a valid library?
       File libFolder = sourceFile;
       String libName = libFolder.getName();
-      if (!Sketch.isSanitaryName(libName)) {
+      if (!BaseNoGui.isSanitaryName(libName)) {
         String mess = I18n.format(_("The library \"{0}\" cannot be used.\n"
             + "Library names must contain only basic letters and numbers.\n"
             + "(ASCII only and no spaces, and it cannot start with a number)"),
