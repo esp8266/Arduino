@@ -36,7 +36,7 @@ compiling and uploading sketches (programs) for Arduino
 Normally, running the arduino command starts the IDE, optionally loading
 any .ino files specified on the commandline.
 
-Alternatively, if *--verify* or *--upload* is given, no graphical
+Alternatively, if any of the following command line options is given, no graphical
 interface will be shown and instead a one-off verify (compile) or upload
 will be done. A single .ino file should be given. If the sketch contains
 multiple .ino files, any one can be specified on the commandline, but
@@ -75,9 +75,6 @@ OPTIONS
 {empty}::
 	If this option is not passed, the value from the current
 	preferences is used (e.g., the last board selected in the IDE).
-	If this option is given, the value passed is written to the
-	preferences file and rememberd for subsequent runs (except when
-	*--no-save-prefs* is passed).
 
 *--port* __portname__::
 	Select the serial port to perform upload of the sketch.
@@ -88,13 +85,10 @@ OPTIONS
 {empty}::
 	If this option is not passed, the value from the current
 	preferences is used (e.g., the last port selected in the IDE).
-	If this option is given, the value passed is written to the
-	preferences file and rememberd for subsequent runs (except when
-	*--no-save-prefs* is passed).
 
 *--verbose-build*::
 	Enable verbose mode during build. If this option is not given,
-	verbose mode during build is disabled regardless of the current
+	verbose mode during build is *disabled* regardless of the current
 	preferences.
 
 {empty}::
@@ -103,7 +97,7 @@ OPTIONS
 
 *--verbose-upload*::
 	Enable verbose mode during upload. If this option is not given,
-	verbose mode during upload is disabled regardless of the current
+	verbose mode during upload is *disabled* regardless of the current
 	preferences.
 
 {empty}::
@@ -131,23 +125,16 @@ OPTIONS
 	validated: Invalid names will be set but never used, invalid
 	values might lead to an error later on.
 
-{empty}::
-	If this option is given, the value passed is written to the
-	preferences file and rememberd for subsequent runs (except when
-	*--no-save-prefs* is passed).
-
-*--no-save-prefs*::
-	Do not save any (changed) preferences to *preferences.txt*.
+*--save-prefs*::
+	Save any (changed) preferences to *preferences.txt*. In particular
+	*--board*, *--port*, *--pref*, *--verbose*, *--verbose-build* and
+	*--verbose-upload* may alter the current preferences.
 
 *--upload*::
 	Build and upload the sketch.
 
 *--verify*::
 	Build the sketch.
-
-*--noop*::
-	Immediately quit after processing the commandline. This can be
-	used to just set preferences with *--pref*.
 
 *--get-pref __preference__*::
 	Prints the value of the given preference to the standard output
@@ -244,7 +231,7 @@ re-use any previous build results in that directory.
 
 Change the selected board and build path and do nothing else.
 
-     arduino --pref build.path=/path/to/sketch/build --board arduino:avr:uno --noop
+     arduino --pref build.path=/path/to/sketch/build --board arduino:avr:uno --save-prefs
 
 HISTORY
 -------
@@ -272,13 +259,12 @@ HISTORY
 	longer shown. Error messages still use a graphical popup and on
 	Windows, the splash screen is still shown.
 
-1.5.7::
-	Introduced *--no-save-prefs* and *--noop*.
+1.5.8::
+	Introduced *--save-prefs*.
 
 {empty}::
-	*--board* and *--port* options are now saved to the preferences
-	file, just like *--pref*. The *--verbose* options still only
-	apply to the current run.
+	*--pref* options are now not saved to the preferences file, just
+	like *--board* and *--port*, unless *--save-prefs* is specified.
 
 {empty}::
 	A path passed to *--preferences-file*, or set in the

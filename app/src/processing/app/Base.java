@@ -360,6 +360,7 @@ public class Base {
     ACTION action = ACTION.GUI;
     boolean doVerboseBuild = false;
     boolean doVerboseUpload = false;
+    boolean forceSavePrefs = false;
     String getPref = null;
     List<String> filenames = new LinkedList<String>();
 
@@ -367,14 +368,13 @@ public class Base {
     final Map<String, ACTION> actions = new HashMap<String, ACTION>();
     actions.put("--verify", ACTION.VERIFY);
     actions.put("--upload", ACTION.UPLOAD);
-    actions.put("--noop", ACTION.NOOP);
     actions.put("--get-pref", ACTION.GET_PREF);
 
     // Check if any files were passed in on the command line
     for (int i = 0; i < args.length; i++) {
       ACTION a = actions.get(args[i]);
       if (a != null) {
-        if (action != ACTION.GUI) {
+        if (action != ACTION.GUI && action != ACTION.NOOP) {
           String[] valid = actions.keySet().toArray(new String[0]);
           String mess = I18n.format(_("Can only pass one of: {0}"), PApplet.join(valid, ", "));
           showError(null, mess, 3);
@@ -391,14 +391,20 @@ public class Base {
       if (args[i].equals("--verbose") || args[i].equals("-v")) {
         doVerboseBuild = true;
         doVerboseUpload = true;
+        if (action == ACTION.GUI)
+          action = ACTION.NOOP;
         continue;
       }
       if (args[i].equals("--verbose-build")) {
         doVerboseBuild = true;
+        if (action == ACTION.GUI)
+          action = ACTION.NOOP;
         continue;
       }
       if (args[i].equals("--verbose-upload")) {
         doVerboseUpload = true;
+        if (action == ACTION.GUI)
+          action = ACTION.NOOP;
         continue;
       }
       if (args[i].equals("--board")) {
@@ -406,6 +412,8 @@ public class Base {
         if (i >= args.length)
           showError(null, _("Argument required for --board"), 3);
         processBoardArgument(args[i]);
+        if (action == ACTION.GUI)
+          action = ACTION.NOOP;
         continue;
       }
       if (args[i].equals("--port")) {
@@ -413,6 +421,8 @@ public class Base {
         if (i >= args.length)
           showError(null, _("Argument required for --port"), 3);
         Base.selectSerialPort(args[i]);
+        if (action == ACTION.GUI)
+          action = ACTION.NOOP;
         continue;
       }
       if (args[i].equals("--curdir")) {
@@ -427,10 +437,12 @@ public class Base {
         if (i >= args.length)
           showError(null, _("Argument required for --pref"), 3);
         processPrefArgument(args[i]);
+        if (action == ACTION.GUI)
+          action = ACTION.NOOP;
         continue;
       }
-      if (args[i].equals("--no-save-prefs")) {
-        Preferences.setDoSave(false);
+      if (args[i].equals("--save-prefs")) {
+        forceSavePrefs = true;
         continue;
       }
       if (args[i].equals("--preferences-file")) {
@@ -472,6 +484,8 @@ public class Base {
       }
 
       boolean showEditor = (action == ACTION.GUI);
+      if (!forceSavePrefs)
+        Preferences.setDoSave(showEditor);
       if (handleOpen(file, nextEditorLocation(), showEditor) == null) {
         String mess = I18n.format(_("Failed to open sketch: \"{0}\""), path);
         // Open failure is fatal in upload/verify mode
