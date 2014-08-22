@@ -54,7 +54,6 @@ import processing.app.legacy.PConstants;
  * know if name is proper Java package syntax.)
  */
 public class Platform {
-  Base base;
   
   
   /**
@@ -74,8 +73,7 @@ public class Platform {
   }
   
   
-  public void init(Base base) {
-    this.base = base;
+  public void init() {
   }
   
   

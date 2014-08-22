@@ -43,6 +43,7 @@ import processing.app.helpers.filefilters.OnlyDirs;
 import processing.app.helpers.filefilters.OnlyFilesWithExtension;
 import processing.app.javax.swing.filechooser.FileNameExtensionFilter;
 import processing.app.legacy.PApplet;
+import processing.app.macosx.ThinkDifferent;
 import processing.app.packages.Library;
 import processing.app.packages.LibraryList;
 import processing.app.tools.MenuScroller;
@@ -223,7 +224,9 @@ public class Base {
   protected static enum ACTION { GUI, NOOP, VERIFY, UPLOAD, GET_PREF };
 
   public Base(String[] args) throws Exception {
-    getPlatform().init(this);
+    getPlatform().init();
+    if (OSUtils.isMacOS())
+      ThinkDifferent.init(this);
 
     // Get the sketchbook path, and make sure it's set properly
     String sketchbookPath = Preferences.get("sketchbook.path");

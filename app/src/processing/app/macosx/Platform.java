@@ -25,7 +25,6 @@ package processing.app.macosx;
 import com.apple.eio.FileManager;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
-import processing.app.Base;
 import processing.app.debug.TargetPackage;
 import processing.app.tools.ExternalProcessExecutor;
 import processing.app.legacy.PApplet;
@@ -58,9 +57,8 @@ public class Platform extends processing.app.Platform {
     Toolkit.getDefaultToolkit();
   }
 
-  public void init(Base base) {
+  public void init() {
     System.setProperty("apple.laf.useScreenMenuBar", "true");
-    ThinkDifferent.init(base);
     /*
     try {
       String name = "processing.app.macosx.ThinkDifferent";

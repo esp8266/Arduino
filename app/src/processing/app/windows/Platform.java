@@ -28,7 +28,6 @@ import com.sun.jna.Native;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
 
-import processing.app.Base;
 import processing.app.PreferencesData;
 import processing.app.debug.TargetPackage;
 import processing.app.legacy.PApplet;
@@ -56,8 +55,8 @@ public class Platform extends processing.app.Platform {
     "\\arduino.exe \"%1\"";
   static final String DOC = "Arduino.Document";
 
-  public void init(Base base) {
-    super.init(base);
+  public void init() {
+    super.init();
 
     checkAssociations();
     checkQuickTime();
