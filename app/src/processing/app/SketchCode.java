@@ -114,7 +114,7 @@ public class SketchCode {
   
   
   protected void copyTo(File dest) throws IOException {
-    Base.saveFile(program, dest);
+    BaseNoGui.saveFile(program, dest);
   }
   
 
@@ -148,7 +148,7 @@ public class SketchCode {
   
   
   public int getLineCount() {
-    return Base.countLines(program);
+    return BaseNoGui.countLines(program);
   }
   
   
@@ -184,7 +184,7 @@ public class SketchCode {
    * Load this piece of code from a file.
    */
   public void load() throws IOException {
-    program = Base.loadFile(file);
+    program = BaseNoGui.loadFile(file);
 
     if (program.indexOf('\uFFFD') != -1) {
       System.err.println(
@@ -212,7 +212,7 @@ public class SketchCode {
     // TODO re-enable history
     //history.record(s, SketchHistory.SAVE);
 
-    Base.saveFile(program, file);
+    BaseNoGui.saveFile(program, file);
     setModified(false);
   }
 
@@ -221,6 +221,6 @@ public class SketchCode {
    * Save this file to another location, used by Sketch.saveAs()
    */
   public void saveAs(File newFile) throws IOException {
-    Base.saveFile(program, newFile);
+    BaseNoGui.saveFile(program, newFile);
   }
 }

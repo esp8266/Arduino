@@ -2478,11 +2478,7 @@ public class Base {
    * characters inside a String (and adding 1).
    */
   static public int countLines(String what) {
-    int count = 1;
-    for (char c : what.toCharArray()) {
-      if (c == '\n') count++;
-    }
-    return count;
+    return BaseNoGui.countLines(what);
   }
 
 
@@ -2560,10 +2556,8 @@ public class Base {
    * Grab the contents of a file as a string.
    */
   static public String loadFile(File file) throws IOException {
-    String[] contents = PApplet.loadStrings(file);
-    if (contents == null) return null;
-    return PApplet.join(contents, "\n");
-    }
+    return BaseNoGui.loadFile(file);
+  }
 
 
   /**

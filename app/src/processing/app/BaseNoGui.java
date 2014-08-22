@@ -75,6 +75,18 @@ public class BaseNoGui {
     return file;
   }
 
+  /**
+   * Get the number of lines in a file by counting the number of newline
+   * characters inside a String (and adding 1).
+   */
+  static public int countLines(String what) {
+    int count = 1;
+    for (char c : what.toCharArray()) {
+      if (c == '\n') count++;
+    }
+    return count;
+  }
+
   static public String getAvrBasePath() {
     String path = getHardwarePath() + File.separator + "tools" +
                   File.separator + "avr" + File.separator + "bin" + File.separator;
@@ -347,6 +359,15 @@ public class BaseNoGui {
         System.out.println("  " + e.getMessage());
       }
     }
+  }
+
+  /**
+   * Grab the contents of a file as a string.
+   */
+  static public String loadFile(File file) throws IOException {
+    String[] contents = PApplet.loadStrings(file);
+    if (contents == null) return null;
+    return PApplet.join(contents, "\n");
   }
 
   static public void populateImportToLibraryTable() {
