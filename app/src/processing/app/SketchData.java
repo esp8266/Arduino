@@ -52,6 +52,20 @@ public class SketchData {
     //System.out.println("sketch dir is " + folder);
   }
 
+  static public boolean checkSketchFile(File file) {
+    // check to make sure that this .pde file is
+    // in a folder of the same name
+    String fileName = file.getName();
+    File parent = file.getParentFile();
+    String parentName = parent.getName();
+    String pdeName = parentName + ".pde";
+    File altPdeFile = new File(parent, pdeName);
+    String inoName = parentName + ".ino";
+    File altInoFile = new File(parent, inoName);
+
+    return pdeName.equals(fileName) || inoName.equals(fileName) || altPdeFile.exists() || altInoFile.exists();
+  }
+
   /**
    * Build the list of files.
    * <P>

@@ -2128,21 +2128,10 @@ public class Editor extends JFrame implements RunnerListener {
     // check to make sure that this .pde file is
     // in a folder of the same name
     String fileName = file.getName();
-    File parent = file.getParentFile();
-    String parentName = parent.getName();
-    String pdeName = parentName + ".pde";
-    File altPdeFile = new File(parent, pdeName);
-    String inoName = parentName + ".ino";
-    File altInoFile = new File(parent, inoName);
 
-    if (pdeName.equals(fileName) || inoName.equals(fileName)) {
+    if (SketchData.checkSketchFile(file)) {
       // no beef with this guy
 
-    } else if (altPdeFile.exists()) {
-      // user selected a .java from the same sketch, but open the .pde instead
-      file = altPdeFile;
-    } else if (altInoFile.exists()) {
-      file = altInoFile;
     } else if (!fileName.endsWith(".ino") && !fileName.endsWith(".pde")) {
       Base.showWarning(_("Bad file selected"),
                        _("Arduino can only open its own sketches\n" +
@@ -2154,13 +2143,11 @@ public class Editor extends JFrame implements RunnerListener {
         fileName.substring(0, fileName.length() - 4);
 
       Object[] options = { _("OK"), _("Cancel") };
-      String prompt = I18n.format(
-	_("The file \"{0}\" needs to be inside\n" +
-	  "a sketch folder named \"{1}\".\n" +
-	  "Create this folder, move the file, and continue?"),
-	fileName,
-	properParent
-      );
+      String prompt = I18n.format(_("The file \"{0}\" needs to be inside\n" +
+	                                "a sketch folder named \"{1}\".\n" +
+	                                "Create this folder, move the file, and continue?"),
+	                              fileName,
+	                              properParent);
 
       int result = JOptionPane.showOptionDialog(this,
                                                 prompt,
