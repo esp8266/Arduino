@@ -159,8 +159,8 @@ public class BaseNoGui {
   }
 
   static public File getSettingsFolder() {
-    if (BaseNoGui.getPortableFolder() != null)
-      return BaseNoGui.getPortableFolder();
+    if (getPortableFolder() != null)
+      return getPortableFolder();
 
     File settingsFolder = null;
 
@@ -326,7 +326,7 @@ public class BaseNoGui {
       File subfolder = new File(folder, target);
       
       try {
-        BaseNoGui.packages.put(target, new TargetPackage(target, subfolder));
+        packages.put(target, new TargetPackage(target, subfolder));
       } catch (TargetPlatformException e) {
         System.out.println("WARNING: Error loading hardware folder " + target);
         System.out.println("  " + e.getMessage());
@@ -334,8 +334,28 @@ public class BaseNoGui {
     }
   }
 
-  static public void newImportToLibraryTable() {
+  static public void populateImportToLibraryTable() {
+    // Populate importToLibraryTable
     importToLibraryTable = new HashMap<String, Library>();
+    for (Library lib : getLibraries()) {
+      try {
+        String headers[] = headerListFromIncludePath(lib.getSrcFolder());
+        for (String header : headers) {
+          Library old = importToLibraryTable.get(header);
+          if (old != null) {
+            // If a library was already found with this header, keep
+            // it if the library's name matches the header name.
+            String name = header.substring(0, header.length() - 2);
+            if (old.getFolder().getPath().endsWith(name))
+              continue;
+          }
+          importToLibraryTable.put(header, lib);
+        }
+      } catch (IOException e) {
+        showWarning(_("Error"), I18n
+            .format("Unable to list header files in {0}", lib.getSrcFolder()), e);
+      }
+    }
   }
 
   static public void prescanParameters(String args[]) {

@@ -1309,27 +1309,7 @@ public class Base {
       showWarning(_("Error"), _("Error loading libraries"), e);
     }
 
-    // Populate importToLibraryTable
-    BaseNoGui.newImportToLibraryTable();
-    for (Library lib : getLibraries()) {
-      try {
-        String headers[] = headerListFromIncludePath(lib.getSrcFolder());
-        for (String header : headers) {
-          Library old = BaseNoGui.importToLibraryTable.get(header);
-          if (old != null) {
-            // If a library was already found with this header, keep
-            // it if the library's name matches the header name.
-            String name = header.substring(0, header.length() - 2);
-            if (old.getFolder().getPath().endsWith(name))
-              continue;
-          }
-          BaseNoGui.importToLibraryTable.put(header, lib);
-        }
-      } catch (IOException e) {
-        showWarning(_("Error"), I18n
-            .format("Unable to list header files in {0}", lib.getSrcFolder()), e);
-      }
-    }
+    BaseNoGui.populateImportToLibraryTable();
 
     // Update editors status bar
     for (Editor editor : editors)
