@@ -39,7 +39,6 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import processing.app.Base;
 import processing.app.BaseNoGui;
 import processing.app.I18n;
 import processing.app.PreferencesData;
@@ -201,7 +200,7 @@ public class Compiler implements MessageConsumer {
       // the next time we start up, internal runs using Runner won't
       // work because the build dir won't exist at startup, so the classloader
       // will ignore the fact that that dir is in the CLASSPATH in run.sh
-      Base.removeDescendants(tempBuildFolder);
+      BaseNoGui.removeDescendants(tempBuildFolder);
     } else {
       // delete only stale source files, from the previously
       // compiled sketch.  This allows multiple windows to be
