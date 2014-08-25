@@ -23,13 +23,10 @@
 
 package processing.app;
 
-import cc.arduino.packages.BoardPort;
-import cc.arduino.packages.UploaderFactory;
 import cc.arduino.packages.Uploader;
 import processing.app.debug.Compiler;
 import processing.app.debug.Compiler.ProgressListener;
 import processing.app.debug.RunnerException;
-import processing.app.debug.TargetPlatform;
 import processing.app.forms.PasswordAuthorizationDialog;
 import processing.app.helpers.OSUtils;
 import processing.app.packages.Library;
@@ -1193,12 +1190,7 @@ public class Sketch {
 
   protected boolean upload(String buildPath, String suggestedClassName, boolean usingProgrammer) throws Exception {
 
-    TargetPlatform target = Base.getTargetPlatform();
-    String board = Preferences.get("board");
-
-    BoardPort boardPort = Base.getDiscoveryManager().find(Preferences.get("serial.port"));
-
-    Uploader uploader = new UploaderFactory().newUploader(target.getBoards().get(board), boardPort);
+    Uploader uploader = Compiler.getUploaderByPreferences();
 
     boolean success = false;
     do {
@@ -1217,7 +1209,7 @@ public class Sketch {
 
       List<String> warningsAccumulator = new LinkedList<String>();
       try {
-        success = uploader.uploadUsingPreferences(getFolder(), buildPath, suggestedClassName, usingProgrammer, warningsAccumulator);
+        success = Compiler.upload(data, uploader, buildPath, suggestedClassName, usingProgrammer, warningsAccumulator);
       } finally {
         if (uploader.requiresAuthorization() && !success) {
           Preferences.remove(uploader.getAuthorizationKey());

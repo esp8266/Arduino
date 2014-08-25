@@ -34,10 +34,15 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
+import cc.arduino.packages.BoardPort;
+import cc.arduino.packages.Uploader;
+import cc.arduino.packages.UploaderFactory;
 
 import processing.app.BaseNoGui;
 import processing.app.I18n;
@@ -117,6 +122,52 @@ public class Compiler implements MessageConsumer {
     return null;
   }
   
+  static public Uploader getUploaderByPreferences() {
+    TargetPlatform target = BaseNoGui.getTargetPlatform();
+    String board = PreferencesData.get("board");
+
+    BoardPort boardPort = BaseNoGui.getDiscoveryManager().find(PreferencesData.get("serial.port"));
+
+    return new UploaderFactory().newUploader(target.getBoards().get(board), boardPort);
+  }
+
+  static public boolean upload(SketchData data, Uploader uploader, String buildPath, String suggestedClassName, boolean usingProgrammer, List<String> warningsAccumulator) throws Exception {
+
+    if (uploader == null)
+      uploader = getUploaderByPreferences();
+
+    boolean success = false;
+
+    if (uploader.requiresAuthorization() && !PreferencesData.has(uploader.getAuthorizationKey())) {
+      BaseNoGui.showError(_("Authorization required"),
+                          _("No athorization data found"), null);
+    }
+
+    boolean useNewWarningsAccumulator = false;
+    if (warningsAccumulator == null) {
+      warningsAccumulator = new LinkedList<String>();
+      useNewWarningsAccumulator = true;
+    }
+
+    try {
+      success = uploader.uploadUsingPreferences(data.getFolder(), buildPath, suggestedClassName, usingProgrammer, warningsAccumulator);
+    } finally {
+      if (uploader.requiresAuthorization() && !success) {
+        PreferencesData.remove(uploader.getAuthorizationKey());
+      }
+    }
+
+    if (useNewWarningsAccumulator) {
+      for (String warning : warningsAccumulator) {
+        System.out.print(_("Warning"));
+        System.out.print(": ");
+        System.out.println(warning);
+      }
+    }
+
+    return success;
+  }
+
   /**
    * Create a new Compiler
    * @param _sketch Sketch object to be compiled.
