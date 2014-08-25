@@ -123,7 +123,7 @@ public class SketchData {
           // Don't allow people to use files with invalid names, since on load,
           // it would be otherwise possible to sneak in nasty filenames. [0116]
           if (BaseNoGui.isSanitaryName(base)) {
-            addCode(new SketchCodeDocument(new File(folder, filename)));
+            addCode(new SketchCode(new File(folder, filename)));
           } else {
             System.err.println(I18n.format("File name {0} is invalid: ignored", filename));
           }
