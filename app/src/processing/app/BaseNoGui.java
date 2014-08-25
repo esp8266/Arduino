@@ -569,6 +569,10 @@ public class BaseNoGui {
     return res;
   }
 
+  static public void showError(String title, String message, int exit_code) {
+    showError(title, message, null, exit_code);
+  }
+
   static public void showError(String title, String message, Throwable e) {
     notifier.showError(title, message, e, 1);
   }
