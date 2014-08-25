@@ -31,12 +31,9 @@ package cc.arduino.packages;
 
 import cc.arduino.packages.uploaders.SSHUploader;
 import cc.arduino.packages.uploaders.SerialUploader;
-import processing.app.AbstractMonitor;
-import processing.app.NetworkMonitor;
-import processing.app.SerialMonitor;
 import processing.app.debug.TargetBoard;
 
-public class UploaderAndMonitorFactory {
+public class UploaderFactory {
 
   public Uploader newUploader(TargetBoard board, BoardPort port) {
     if ("true".equals(board.getPreferences().get("upload.via_ssh")) && port != null && "network".equals(port.getProtocol())) {
@@ -44,14 +41,6 @@ public class UploaderAndMonitorFactory {
     }
 
     return new SerialUploader();
-  }
-
-  public AbstractMonitor newMonitor(BoardPort port) {
-    if ("network".equals(port.getProtocol())) {
-      return new NetworkMonitor(port);
-    }
-
-    return new SerialMonitor(port);
   }
 
 }

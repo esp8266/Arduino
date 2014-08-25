@@ -2,7 +2,7 @@ package processing.app.debug;
 
 import cc.arduino.packages.BoardPort;
 import cc.arduino.packages.Uploader;
-import cc.arduino.packages.UploaderAndMonitorFactory;
+import cc.arduino.packages.UploaderFactory;
 import cc.arduino.packages.uploaders.SSHUploader;
 import cc.arduino.packages.uploaders.SerialUploader;
 import org.junit.Before;
@@ -29,7 +29,7 @@ public class UploaderFactoryTest extends AbstractWithPreferencesTest {
     boardPort.setBoardName("yun");
     boardPort.setAddress("192.168.0.1");
     boardPort.setProtocol("network");
-    Uploader uploader = new UploaderAndMonitorFactory().newUploader(board, boardPort);
+    Uploader uploader = new UploaderFactory().newUploader(board, boardPort);
 
     assertTrue(uploader instanceof SSHUploader);
   }
@@ -41,7 +41,7 @@ public class UploaderFactoryTest extends AbstractWithPreferencesTest {
     boardPort.setBoardName("myyun");
     boardPort.setAddress("192.168.0.1");
     boardPort.setProtocol("network");
-    Uploader uploader = new UploaderAndMonitorFactory().newUploader(board, boardPort);
+    Uploader uploader = new UploaderFactory().newUploader(board, boardPort);
 
     assertTrue(uploader instanceof SerialUploader);
   }
@@ -53,7 +53,7 @@ public class UploaderFactoryTest extends AbstractWithPreferencesTest {
     boardPort.setBoardName("Arduino Leonardo");
     boardPort.setAddress("/dev/ttyACM0");
     boardPort.setProtocol("serial");
-    Uploader uploader = new UploaderAndMonitorFactory().newUploader(board, boardPort);
+    Uploader uploader = new UploaderFactory().newUploader(board, boardPort);
 
     assertTrue(uploader instanceof SerialUploader);
   }

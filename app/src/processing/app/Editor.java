@@ -22,7 +22,7 @@
 
 package processing.app;
 
-import cc.arduino.packages.UploaderAndMonitorFactory;
+import cc.arduino.packages.MonitorFactory;
 
 import com.jcraft.jsch.JSchException;
 
@@ -2518,7 +2518,7 @@ public class Editor extends JFrame implements RunnerListener {
       return;
     }
 
-    serialMonitor = new UploaderAndMonitorFactory().newMonitor(port);
+    serialMonitor = new MonitorFactory().newMonitor(port);
     serialMonitor.setIconImage(getIconImage());
 
     boolean success = false;

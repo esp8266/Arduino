@@ -24,7 +24,7 @@
 package processing.app;
 
 import cc.arduino.packages.BoardPort;
-import cc.arduino.packages.UploaderAndMonitorFactory;
+import cc.arduino.packages.UploaderFactory;
 import cc.arduino.packages.Uploader;
 import processing.app.debug.Compiler;
 import processing.app.debug.Compiler.ProgressListener;
@@ -1198,7 +1198,7 @@ public class Sketch {
 
     BoardPort boardPort = Base.getDiscoveryManager().find(Preferences.get("serial.port"));
 
-    Uploader uploader = new UploaderAndMonitorFactory().newUploader(target.getBoards().get(board), boardPort);
+    Uploader uploader = new UploaderFactory().newUploader(target.getBoards().get(board), boardPort);
 
     boolean success = false;
     do {
