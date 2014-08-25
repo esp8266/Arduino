@@ -75,12 +75,6 @@ public class Base {
 
   static File buildFolder;
 
-  // these are static because they're used by Sketch
-  static private File examplesFolder;
-  static private File toolsFolder;
-
-  static private List<File> librariesFolders;
-
   // classpath for all known libraries for p5
   // (both those in the p5/libs folder and those with lib subfolders
   // found in the sketchbook)
@@ -1161,7 +1155,7 @@ public class Base {
 
     // Add each of the subfolders of examples directly to the menu
     try {
-      boolean found = addSketches(menu, examplesFolder, true);
+      boolean found = addSketches(menu, BaseNoGui.getExamplesFolder(), true);
       if (found) menu.addSeparator();
     } catch (IOException e) {
       e.printStackTrace();
@@ -1245,7 +1239,7 @@ public class Base {
       menu.removeAll();
 
       // Add examples from distribution "example" folder
-      boolean found = addSketches(menu, examplesFolder, false);
+      boolean found = addSketches(menu, BaseNoGui.getExamplesFolder(), false);
       if (found) menu.addSeparator();
 
       // Add examples from libraries
@@ -1275,39 +1269,7 @@ public class Base {
   }
 
   public void onBoardOrPortChange() {
-    TargetPlatform targetPlatform = getTargetPlatform();
-    if (targetPlatform == null)
-      return;
-
-    // Calculate paths for libraries and examples
-    examplesFolder = getContentFile("examples");
-    toolsFolder = getContentFile("tools");
-
-    File platformFolder = targetPlatform.getFolder();
-    librariesFolders = new ArrayList<File>();
-    librariesFolders.add(getContentFile("libraries"));
-    String core = getBoardPreferences().get("build.core");
-    if (core.contains(":")) {
-      String referencedCore = core.split(":")[0];
-      TargetPlatform referencedPlatform = getTargetPlatform(referencedCore, targetPlatform.getId());
-      if (referencedPlatform != null) {
-      File referencedPlatformFolder = referencedPlatform.getFolder();
-        librariesFolders.add(new File(referencedPlatformFolder, "libraries"));
-      }
-    }
-    librariesFolders.add(new File(platformFolder, "libraries"));
-    librariesFolders.add(getSketchbookLibrariesFolder());
-
-    // Scan for libraries in each library folder.
-    // Libraries located in the latest folders on the list can override
-    // other libraries with the same name.
-    try {
-      BaseNoGui.scanAndUpdateLibraries(librariesFolders);
-    } catch (IOException e) {
-      showWarning(_("Error"), _("Error loading libraries"), e);
-    }
-
-    BaseNoGui.populateImportToLibraryTable();
+    BaseNoGui.onBoardOrPortChange();
 
     // Update editors status bar
     for (Editor editor : editors)
@@ -1897,22 +1859,22 @@ public class Base {
 
 
   static public String getExamplesPath() {
-    return examplesFolder.getAbsolutePath();
+    return BaseNoGui.getExamplesPath();
   }
 
 
   static public List<File> getLibrariesPath() {
-    return librariesFolders;
+    return BaseNoGui.getLibrariesPath();
   }
 
 
   static public File getToolsFolder() {
-    return toolsFolder;
+    return BaseNoGui.getToolsFolder();
   }
 
 
   static public String getToolsPath() {
-    return toolsFolder.getAbsolutePath();
+    return BaseNoGui.getToolsPath();
   }
 
 
@@ -1994,19 +1956,7 @@ public class Base {
 
 
   static public File getSketchbookLibrariesFolder() {
-    File libdir = new File(getSketchbookFolder(), "libraries");
-    if (!libdir.exists()) {
-      try {
-        libdir.mkdirs();
-        File readme = new File(libdir, "readme.txt");
-        FileWriter freadme = new FileWriter(readme);
-        freadme.write(_("For information on installing libraries, see: " +
-                        "http://arduino.cc/en/Guide/Libraries\n"));
-        freadme.close();
-      } catch (Exception e) {
-      }
-    }
-    return libdir;
+    return BaseNoGui.getSketchbookLibrariesFolder();
   }
 
 

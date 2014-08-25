@@ -4,8 +4,10 @@ import static processing.app.I18n._;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -47,11 +49,17 @@ public class BaseNoGui {
 
   private static DiscoveryManager discoveryManager = new DiscoveryManager();
   
+  // these are static because they're used by Sketch
+  static private File examplesFolder;
+  static private File toolsFolder;
+
   // maps #included files to their library folder
   public static Map<String, Library> importToLibraryTable;
 
   // maps library name to their library folder
   static private LibraryList libraries;
+
+  static private List<File> librariesFolders;
 
   static UserNotifier notifier = new BasicUserNotifier();
 
@@ -137,6 +145,14 @@ public class BaseNoGui {
     return discoveryManager;
   }
 
+  static public File getExamplesFolder() {
+    return examplesFolder;
+  }
+
+  static public String getExamplesPath() {
+    return examplesFolder.getAbsolutePath();
+  }
+
   static public File getHardwareFolder() {
     // calculate on the fly because it's needed by Preferences.init() to find
     // the boards.txt and programmers.txt preferences files (which happens
@@ -150,6 +166,10 @@ public class BaseNoGui {
 
   static public LibraryList getLibraries() {
     return libraries;
+  }
+
+  static public List<File> getLibrariesPath() {
+    return librariesFolders;
   }
 
   /**
@@ -218,6 +238,22 @@ public class BaseNoGui {
     return new File(getSketchbookFolder(), "hardware");
   }
 
+  static public File getSketchbookLibrariesFolder() {
+    File libdir = new File(getSketchbookFolder(), "libraries");
+    if (!libdir.exists()) {
+      try {
+        libdir.mkdirs();
+        File readme = new File(libdir, "readme.txt");
+        FileWriter freadme = new FileWriter(readme);
+        freadme.write(_("For information on installing libraries, see: " +
+                        "http://arduino.cc/en/Guide/Libraries\n"));
+        freadme.close();
+      } catch (Exception e) {
+      }
+    }
+    return libdir;
+  }
+
   public static TargetBoard getTargetBoard() {
     String boardId = PreferencesData.get("board");
     return getTargetPlatform().getBoard(boardId);
@@ -247,6 +283,14 @@ public class BaseNoGui {
     if (p == null)
       return null;
     return p.get(platformName);
+  }
+
+  static public File getToolsFolder() {
+    return toolsFolder;
+  }
+
+  static public String getToolsPath() {
+    return toolsFolder.getAbsolutePath();
   }
 
   static public LibraryList getUserLibs() {
@@ -368,6 +412,42 @@ public class BaseNoGui {
     String[] contents = PApplet.loadStrings(file);
     if (contents == null) return null;
     return PApplet.join(contents, "\n");
+  }
+
+  static public void onBoardOrPortChange() {
+    TargetPlatform targetPlatform = getTargetPlatform();
+    if (targetPlatform == null)
+      return;
+
+    // Calculate paths for libraries and examples
+    examplesFolder = getContentFile("examples");
+    toolsFolder = getContentFile("tools");
+
+    File platformFolder = targetPlatform.getFolder();
+    librariesFolders = new ArrayList<File>();
+    librariesFolders.add(getContentFile("libraries"));
+    String core = getBoardPreferences().get("build.core");
+    if (core.contains(":")) {
+      String referencedCore = core.split(":")[0];
+      TargetPlatform referencedPlatform = getTargetPlatform(referencedCore, targetPlatform.getId());
+      if (referencedPlatform != null) {
+      File referencedPlatformFolder = referencedPlatform.getFolder();
+        librariesFolders.add(new File(referencedPlatformFolder, "libraries"));
+      }
+    }
+    librariesFolders.add(new File(platformFolder, "libraries"));
+    librariesFolders.add(getSketchbookLibrariesFolder());
+
+    // Scan for libraries in each library folder.
+    // Libraries located in the latest folders on the list can override
+    // other libraries with the same name.
+    try {
+      scanAndUpdateLibraries(librariesFolders);
+    } catch (IOException e) {
+      showWarning(_("Error"), _("Error loading libraries"), e);
+    }
+
+    populateImportToLibraryTable();
   }
 
   static public void populateImportToLibraryTable() {
