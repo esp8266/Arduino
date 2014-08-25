@@ -13,7 +13,7 @@ then
 	exit $ERRORS
 fi
 
-VERSION="PR-${ghprbPullId}"
+VERSION="PR-${ghprbPullId}-BUILD-${BUILD_NUMBER}"
 
 ant -Djava.net.preferIPv4Stack=true -Dplatform=linux32 -Dlinux32=1 -Dversion="${VERSION}" dist
 ant -Djava.net.preferIPv4Stack=true -Dplatform=linux64 -Dlinux64=1 -Dversion="${VERSION}" dist
