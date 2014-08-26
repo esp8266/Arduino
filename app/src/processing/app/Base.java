@@ -94,8 +94,6 @@ public class Base {
   List<Editor> editors = Collections.synchronizedList(new ArrayList<Editor>());
   Editor activeEditor;
 
-  static final String portableSketchbookFolder = "sketchbook";
-
   static public void main(String args[]) throws Exception {
     BaseNoGui.initLogger();
     
@@ -226,7 +224,7 @@ public class Base {
     if (sketchbookPath == null) {
       File defaultFolder = getDefaultSketchbookFolder();
       if (BaseNoGui.getPortableFolder() != null)
-        Preferences.set("sketchbook.path", portableSketchbookFolder);
+        Preferences.set("sketchbook.path", BaseNoGui.getPortableSketchbookFolder());
       else
         Preferences.set("sketchbook.path", defaultFolder.getAbsolutePath());
       if (!defaultFolder.exists()) {
@@ -1865,7 +1863,7 @@ public class Base {
 
 
   static public String getPortableSketchbookFolder() {
-    return portableSketchbookFolder;
+    return BaseNoGui.getPortableSketchbookFolder();
   }
 
 
@@ -1891,7 +1889,7 @@ public class Base {
 
   protected File getDefaultSketchbookFolder() {
     if (BaseNoGui.getPortableFolder() != null)
-      return new File(BaseNoGui.getPortableFolder(), portableSketchbookFolder);
+      return new File(BaseNoGui.getPortableFolder(), BaseNoGui.getPortableSketchbookFolder());
 
     File sketchbookFolder = null;
     try {

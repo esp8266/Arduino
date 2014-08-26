@@ -69,6 +69,8 @@ public class BaseNoGui {
 
   static File portableFolder = null;
 
+  static final String portableSketchbookFolder = "sketchbook";
+
   // Returns a File object for the given pathname. If the pathname
   // is not absolute, it is interpreted relative to the current
   // directory when starting the IDE (which is not the same as the
@@ -185,6 +187,10 @@ public class BaseNoGui {
 
   static public File getPortableFolder() {
     return portableFolder;
+  }
+
+  static public String getPortableSketchbookFolder() {
+    return portableSketchbookFolder;
   }
 
   /**
