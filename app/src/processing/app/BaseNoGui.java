@@ -553,62 +553,6 @@ public class BaseNoGui {
     PreferencesData.init(absoluteFile(preferencesFile));
   }
 
-  static protected void processBoardArgument(String selectBoard) {
-    // No board selected? Nothing to do
-    if (selectBoard == null)
-        return;
-
-    String[] split = selectBoard.split(":", 4);
-
-    if (split.length < 3) {
-      showError(null, I18n.format(_("{0}: Invalid board name, it should be of the form \"package:arch:board\" or \"package:arch:board:options\""), selectBoard), 3);
-    }
-
-    TargetPackage targetPackage = getTargetPackage(split[0]);
-    if (targetPackage == null) {
-      showError(null, I18n.format(_("{0}: Unknown package"), split[0]), 3);
-    }
-
-    TargetPlatform targetPlatform = targetPackage.get(split[1]);
-    if (targetPlatform == null) {
-      showError(null, I18n.format(_("{0}: Unknown architecture"), split[1]), 3);
-    }
-
-    TargetBoard targetBoard = targetPlatform.getBoard(split[2]);
-    if (targetBoard == null) {
-      showError(null, I18n.format(_("{0}: Unknown board"), split[2]), 3);
-    }
-
-    selectBoard(targetBoard);
-
-    if (split.length > 3) {
-      String[] options = split[3].split(",");
-      for (String option : options) {
-        String[] keyValue = option.split("=", 2);
-
-        if (keyValue.length != 2)
-            showError(null, I18n.format(_("{0}: Invalid option, should be of the form \"name=value\""), option, targetBoard.getId()), 3);
-        String key = keyValue[0].trim();
-        String value = keyValue[1].trim();
-
-        if (!targetBoard.hasMenu(key))
-          showError(null, I18n.format(_("{0}: Invalid option for board \"{1}\""), key, targetBoard.getId()), 3);
-        if (targetBoard.getMenuLabel(key, value) == null)
-          showError(null, I18n.format(_("{0}: Invalid option for \"{1}\" option for board \"{2}\""), value, key, targetBoard.getId()), 3);
-
-        PreferencesData.set("custom_" + key, targetBoard.getId() + "_" + value);
-      }
-    }
-  }
-
-  static protected void processPrefArgument(String arg) {
-    String[] split = arg.split("=", 2);
-    if (split.length != 2 || split[0].isEmpty())
-      showError(null, I18n.format(_("{0}: Invalid argument to --pref, should be of the form \"pref=value\""), arg), 3);
-
-    PreferencesData.set(split[0], split[1]);
-  }
-
   /**
    * Recursively remove all files within a directory,
    * used with removeDir(), or when the contents of a dir
@@ -759,7 +703,7 @@ public class BaseNoGui {
     return res;
   }
 
-  static protected void selectBoard(TargetBoard targetBoard) {
+  static public void selectBoard(TargetBoard targetBoard) {
     TargetPlatform targetPlatform = targetBoard.getContainerPlatform();
     TargetPackage targetPackage = targetPlatform.getContainerPackage();
 

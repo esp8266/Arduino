@@ -35,6 +35,7 @@ import cc.arduino.packages.DiscoveryManager;
 import processing.app.debug.TargetBoard;
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
+import processing.app.helpers.CommandlineParser;
 import processing.app.helpers.FileUtils;
 import processing.app.helpers.GUIUserNotifier;
 import processing.app.helpers.OSUtils;
@@ -211,8 +212,6 @@ public class Base {
     return BaseNoGui.absoluteFile(path);
   }
 
-  protected static enum ACTION { GUI, NOOP, VERIFY, UPLOAD, GET_PREF };
-
   public Base(String[] args) throws Exception {
     getPlatform().init();
     if (OSUtils.isMacOS())
@@ -237,117 +236,9 @@ public class Base {
     // Setup board-dependent variables.
     onBoardOrPortChange();
 
-    ACTION action = ACTION.GUI;
-    boolean doVerboseBuild = false;
-    boolean doVerboseUpload = false;
-    boolean forceSavePrefs = false;
-    String getPref = null;
-    List<String> filenames = new LinkedList<String>();
+    CommandlineParser parser = CommandlineParser.newCommandlineParser(args);
 
-    // Map of possible actions and corresponding options
-    final Map<String, ACTION> actions = new HashMap<String, ACTION>();
-    actions.put("--verify", ACTION.VERIFY);
-    actions.put("--upload", ACTION.UPLOAD);
-    actions.put("--get-pref", ACTION.GET_PREF);
-
-    // Check if any files were passed in on the command line
-    for (int i = 0; i < args.length; i++) {
-      ACTION a = actions.get(args[i]);
-      if (a != null) {
-        if (action != ACTION.GUI && action != ACTION.NOOP) {
-          String[] valid = actions.keySet().toArray(new String[0]);
-          String mess = I18n.format(_("Can only pass one of: {0}"), PApplet.join(valid, ", "));
-          showError(null, mess, 3);
-        }
-        if (a == ACTION.GET_PREF) {
-          i++;
-          if (i >= args.length)
-            showError(null, _("Argument required for --get-pref"), 3);
-          getPref = args[i];
-        }
-        action = a;
-        continue;
-      }
-      if (args[i].equals("--verbose") || args[i].equals("-v")) {
-        doVerboseBuild = true;
-        doVerboseUpload = true;
-        if (action == ACTION.GUI)
-          action = ACTION.NOOP;
-        continue;
-      }
-      if (args[i].equals("--verbose-build")) {
-        doVerboseBuild = true;
-        if (action == ACTION.GUI)
-          action = ACTION.NOOP;
-        continue;
-      }
-      if (args[i].equals("--verbose-upload")) {
-        doVerboseUpload = true;
-        if (action == ACTION.GUI)
-          action = ACTION.NOOP;
-        continue;
-      }
-      if (args[i].equals("--board")) {
-        i++;
-        if (i >= args.length)
-          showError(null, _("Argument required for --board"), 3);
-        processBoardArgument(args[i]);
-        if (action == ACTION.GUI)
-          action = ACTION.NOOP;
-        continue;
-      }
-      if (args[i].equals("--port")) {
-        i++;
-        if (i >= args.length)
-          showError(null, _("Argument required for --port"), 3);
-        selectSerialPort(args[i]);
-        if (action == ACTION.GUI)
-          action = ACTION.NOOP;
-        continue;
-      }
-      if (args[i].equals("--curdir")) {
-        i++;
-        if (i >= args.length)
-          showError(null, _("Argument required for --curdir"), 3);
-        // Argument should be already processed by Base.main(...)
-        continue;
-      }
-      if (args[i].equals("--pref")) {
-        i++;
-        if (i >= args.length)
-          showError(null, _("Argument required for --pref"), 3);
-        processPrefArgument(args[i]);
-        if (action == ACTION.GUI)
-          action = ACTION.NOOP;
-        continue;
-      }
-      if (args[i].equals("--save-prefs")) {
-        forceSavePrefs = true;
-        continue;
-      }
-      if (args[i].equals("--preferences-file")) {
-        i++;
-        if (i >= args.length)
-          showError(null, _("Argument required for --preferences-file"), 3);
-        // Argument should be already processed by Base.main(...)
-        continue;
-      }
-      if (args[i].startsWith("--"))
-        showError(null, I18n.format(_("unknown option: {0}"), args[i]), 3);
-
-      filenames.add(args[i]);
-    }
-
-    if ((action == ACTION.UPLOAD || action == ACTION.VERIFY) && filenames.size() != 1)
-      showError(null, _("Must specify exactly one sketch file"), 3);
-
-    if ((action == ACTION.NOOP || action == ACTION.GET_PREF) && filenames.size() != 0)
-      showError(null, _("Cannot specify any sketch files"), 3);
-
-    if ((action != ACTION.UPLOAD && action != ACTION.VERIFY) && (doVerboseBuild || doVerboseUpload))
-      showError(null, _("--verbose, --verbose-upload and --verbose-build can only be used together with --verify or --upload"), 3);
-
-    for (String path: filenames) {
+    for (String path: parser.getFilenames()) {
       // Correctly resolve relative paths
       File file = absoluteFile(path);
 
@@ -363,13 +254,13 @@ public class Base {
         }
       }
 
-      boolean showEditor = (action == ACTION.GUI);
-      if (!forceSavePrefs)
+      boolean showEditor = parser.isGuiMode();
+      if (!parser.isForceSavePrefs())
         Preferences.setDoSave(showEditor);
       if (handleOpen(file, nextEditorLocation(), showEditor) == null) {
         String mess = I18n.format(_("Failed to open sketch: \"{0}\""), path);
         // Open failure is fatal in upload/verify mode
-        if (action == ACTION.VERIFY || action == ACTION.UPLOAD)
+        if (parser.isVerifyOrUploadMode())
           showError(null, mess, 2);
         else
           showWarning(null, mess, null);
@@ -381,12 +272,10 @@ public class Base {
     // them.
     Preferences.save();
 
-    switch (action) {
-      case VERIFY:
-      case UPLOAD:
+      if (parser.isVerifyOrUploadMode()) {
         // Set verbosity for command line build
-        Preferences.set("build.verbose", "" + doVerboseBuild);
-        Preferences.set("upload.verbose", "" + doVerboseUpload);
+        Preferences.set("build.verbose", "" + parser.isDoVerboseBuild());
+        Preferences.set("upload.verbose", "" + parser.isDoVerboseUpload());
 
         // Make sure these verbosity preferences are only for the
         // current session
@@ -394,7 +283,7 @@ public class Base {
 
         Editor editor = editors.get(0);
 
-        if (action == ACTION.UPLOAD) {
+        if (parser.isUploadMode()) {
           // Build and upload
           editor.exportHandler.run();
         } else {
@@ -409,8 +298,8 @@ public class Base {
 
         // No errors exit gracefully
         System.exit(0);
-        break;
-      case GUI:
+      }
+      else if (parser.isGuiMode()) {
         // Check if there were previously opened sketches to be restored
         restoreSketches();
 
@@ -423,29 +312,20 @@ public class Base {
         if (Preferences.getBoolean("update.check")) {
           new UpdateCheck(this);
         }
-        break;
-      case NOOP:
+      }
+      else if (parser.isNoOpMode()) {
         // Do nothing (intended for only changing preferences)
         System.exit(0);
-        break;
-      case GET_PREF:
-        String value = Preferences.get(getPref, null);
+      }
+      else if (parser.isGetPrefMode()) {
+        String value = Preferences.get(parser.getGetPref(), null);
         if (value != null) {
           System.out.println(value);
           System.exit(0);
         } else {
           System.exit(4);
         }
-        break;
-    }
-  }
-
-  protected void processBoardArgument(String selectBoard) {
-    BaseNoGui.processBoardArgument(selectBoard);
-  }
-
-  protected void processPrefArgument(String arg) {
-    BaseNoGui.processPrefArgument(arg);
+      }
   }
 
   /**
