@@ -220,27 +220,7 @@ public class Base {
     if (OSUtils.isMacOS())
       ThinkDifferent.init(this);
 
-    // Get the sketchbook path, and make sure it's set properly
-    String sketchbookPath = Preferences.get("sketchbook.path");
-
-    // If a value is at least set, first check to see if the folder exists.
-    // If it doesn't, warn the user that the sketchbook folder is being reset.
-    if (sketchbookPath != null) {
-      File sketchbookFolder;
-      if (BaseNoGui.getPortableFolder() != null)
-        sketchbookFolder = new File(BaseNoGui.getPortableFolder(), sketchbookPath);
-      else
-        sketchbookFolder = absoluteFile(sketchbookPath);
-      if (!sketchbookFolder.exists()) {
-        showWarning(_("Sketchbook folder disappeared"),
-                    _("The sketchbook folder no longer exists.\n" +
-                      "Arduino will switch to the default sketchbook\n" +
-                      "location, and create a new sketchbook folder if\n" +
-                      "necessary. Arduino will then stop talking about\n" +
-                      "himself in the third person."), null);
-        sketchbookPath = null;
-      }
-    }
+    String sketchbookPath = BaseNoGui.getSketchbookPath();
 
     // If no path is set, get the default sketchbook folder for this platform
     if (sketchbookPath == null) {

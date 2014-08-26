@@ -254,6 +254,32 @@ public class BaseNoGui {
     return libdir;
   }
 
+  static public String getSketchbookPath() {
+    // Get the sketchbook path, and make sure it's set properly
+    String sketchbookPath = Preferences.get("sketchbook.path");
+
+    // If a value is at least set, first check to see if the folder exists.
+    // If it doesn't, warn the user that the sketchbook folder is being reset.
+    if (sketchbookPath != null) {
+      File sketchbookFolder;
+      if (BaseNoGui.getPortableFolder() != null)
+        sketchbookFolder = new File(BaseNoGui.getPortableFolder(), sketchbookPath);
+      else
+        sketchbookFolder = absoluteFile(sketchbookPath);
+      if (!sketchbookFolder.exists()) {
+        showWarning(_("Sketchbook folder disappeared"),
+                    _("The sketchbook folder no longer exists.\n" +
+                      "Arduino will switch to the default sketchbook\n" +
+                      "location, and create a new sketchbook folder if\n" +
+                      "necessary. Arduino will then stop talking about\n" +
+                      "himself in the third person."), null);
+        sketchbookPath = null;
+      }
+    }
+
+    return sketchbookPath;
+  }
+
   public static TargetBoard getTargetBoard() {
     String boardId = PreferencesData.get("board");
     return getTargetPlatform().getBoard(boardId);
@@ -552,7 +578,7 @@ public class BaseNoGui {
         if (targetBoard.getMenuLabel(key, value) == null)
           showError(null, I18n.format(_("{0}: Invalid option for \"{1}\" option for board \"{2}\""), value, key, targetBoard.getId()), 3);
 
-        Preferences.set("custom_" + key, targetBoard.getId() + "_" + value);
+        PreferencesData.set("custom_" + key, targetBoard.getId() + "_" + value);
       }
     }
   }
