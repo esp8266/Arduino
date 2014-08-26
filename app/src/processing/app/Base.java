@@ -222,7 +222,7 @@ public class Base {
 
     // If no path is set, get the default sketchbook folder for this platform
     if (sketchbookPath == null) {
-      File defaultFolder = getDefaultSketchbookFolder();
+      File defaultFolder = getDefaultSketchbookFolderOrPromptForIt();
       if (BaseNoGui.getPortableFolder() != null)
         Preferences.set("sketchbook.path", BaseNoGui.getPortableSketchbookFolder());
       else
@@ -1895,6 +1895,14 @@ public class Base {
     try {
       sketchbookFolder = getPlatform().getDefaultSketchbookFolder();
     } catch (Exception e) { }
+
+    return sketchbookFolder;
+  }
+
+
+  protected File getDefaultSketchbookFolderOrPromptForIt() {
+
+    File sketchbookFolder = getDefaultSketchbookFolder();
 
     if (sketchbookFolder == null) {
       sketchbookFolder = promptSketchbookLocation();
