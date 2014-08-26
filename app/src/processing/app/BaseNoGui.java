@@ -143,6 +143,18 @@ public class BaseNoGui {
     return getTargetPlatform(pack, PreferencesData.get("target_platform"));
   }
 
+  static public  File getDefaultSketchbookFolder() {
+    if (getPortableFolder() != null)
+      return new File(getPortableFolder(), getPortableSketchbookFolder());
+
+    File sketchbookFolder = null;
+    try {
+      sketchbookFolder = getPlatform().getDefaultSketchbookFolder();
+    } catch (Exception e) { }
+
+    return sketchbookFolder;
+  }
+
   public static DiscoveryManager getDiscoveryManager() {
     return discoveryManager;
   }
@@ -262,14 +274,14 @@ public class BaseNoGui {
 
   static public String getSketchbookPath() {
     // Get the sketchbook path, and make sure it's set properly
-    String sketchbookPath = Preferences.get("sketchbook.path");
+    String sketchbookPath = PreferencesData.get("sketchbook.path");
 
     // If a value is at least set, first check to see if the folder exists.
     // If it doesn't, warn the user that the sketchbook folder is being reset.
     if (sketchbookPath != null) {
       File sketchbookFolder;
-      if (BaseNoGui.getPortableFolder() != null)
-        sketchbookFolder = new File(BaseNoGui.getPortableFolder(), sketchbookPath);
+      if (getPortableFolder() != null)
+        sketchbookFolder = new File(getPortableFolder(), sketchbookPath);
       else
         sketchbookFolder = absoluteFile(sketchbookPath);
       if (!sketchbookFolder.exists()) {

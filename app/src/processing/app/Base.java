@@ -1887,22 +1887,9 @@ public class Base {
   }
 
 
-  protected File getDefaultSketchbookFolder() {
-    if (BaseNoGui.getPortableFolder() != null)
-      return new File(BaseNoGui.getPortableFolder(), BaseNoGui.getPortableSketchbookFolder());
-
-    File sketchbookFolder = null;
-    try {
-      sketchbookFolder = getPlatform().getDefaultSketchbookFolder();
-    } catch (Exception e) { }
-
-    return sketchbookFolder;
-  }
-
-
   protected File getDefaultSketchbookFolderOrPromptForIt() {
 
-    File sketchbookFolder = getDefaultSketchbookFolder();
+    File sketchbookFolder = BaseNoGui.getDefaultSketchbookFolder();
 
     if (sketchbookFolder == null) {
       sketchbookFolder = promptSketchbookLocation();
