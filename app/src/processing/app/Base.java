@@ -127,7 +127,6 @@ public class Base {
 //  int editorCount;
   List<Editor> editors = Collections.synchronizedList(new ArrayList<Editor>());
   Editor activeEditor;
-  private final Map<String, Map<String, Object>> boardsViaNetwork;
 
   static File portableFolder = null;
   static final String portableSketchbookFolder = "sketchbook";
@@ -309,8 +308,6 @@ public class Base {
 
   public Base(String[] args) throws Exception {
     platform.init(this);
-
-    this.boardsViaNetwork = new ConcurrentHashMap<String, Map<String, Object>>();
 
     // Get the sketchbook path, and make sure it's set properly
     String sketchbookPath = Preferences.get("sketchbook.path");
@@ -614,10 +611,6 @@ public class Base {
       showError(null, I18n.format(_("{0}: Invalid argument to --pref, should be of the form \"pref=value\""), arg), 3);
 
     Preferences.set(split[0], split[1]);
-  }
-
-  public Map<String, Map<String, Object>> getBoardsViaNetwork() {
-    return new HashMap<String, Map<String, Object>>(boardsViaNetwork);
   }
 
   /**
