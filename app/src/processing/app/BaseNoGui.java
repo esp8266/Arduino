@@ -43,6 +43,8 @@ public class BaseNoGui {
   /** Set true if this a proper release rather than a numbered revision. */
   static public boolean RELEASE = false;
 
+  static File buildFolder;
+
   // Current directory to use for relative paths specified on the
   // commandline
   static String currentDirectory = System.getProperty("user.dir");
@@ -97,6 +99,28 @@ public class BaseNoGui {
     return count;
   }
 
+  /**
+   * Get the path to the platform's temporary folder, by creating
+   * a temporary temporary file and getting its parent folder.
+   * <br/>
+   * Modified for revision 0094 to actually make the folder randomized
+   * to avoid conflicts in multi-user environments. (Bug 177)
+   */
+  static public File createTempFolder(String name) {
+    try {
+      File folder = File.createTempFile(name, null);
+      //String tempPath = ignored.getParent();
+      //return new File(tempPath);
+      folder.delete();
+      folder.mkdirs();
+      return folder;
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+
   static public String getAvrBasePath() {
     String path = getHardwarePath() + File.separator + "tools" +
                   File.separator + "avr" + File.separator + "bin" + File.separator;
@@ -104,6 +128,23 @@ public class BaseNoGui {
       return "";  // use distribution provided avr tools if bundled tools missing
     }
     return path;
+  }
+
+  static public File getBuildFolder() {
+    if (buildFolder == null) {
+      String buildPath = Preferences.get("build.path");
+      if (buildPath != null) {
+        buildFolder = absoluteFile(buildPath);
+        if (!buildFolder.exists())
+          buildFolder.mkdirs();
+      } else {
+        //File folder = new File(getTempFolder(), "build");
+        //if (!folder.exists()) folder.mkdirs();
+        buildFolder = createTempFolder("build");
+        buildFolder.deleteOnExit();
+      }
+    }
+    return buildFolder;
   }
 
   static public PreferencesMap getBoardPreferences() {

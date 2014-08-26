@@ -27,7 +27,6 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.*;
 
@@ -73,8 +72,6 @@ public class Base {
   // set to true after the first time the menu is built.
   // so that the errors while building don't show up again.
   boolean builtOnce;
-
-  static File buildFolder;
 
   // classpath for all known libraries for p5
   // (both those in the p5/libs folder and those with lib subfolders
@@ -1610,20 +1607,7 @@ public class Base {
 
 
   static public File getBuildFolder() {
-    if (buildFolder == null) {
-      String buildPath = Preferences.get("build.path");
-      if (buildPath != null) {
-        buildFolder = absoluteFile(buildPath);
-        if (!buildFolder.exists())
-          buildFolder.mkdirs();
-      } else {
-        //File folder = new File(getTempFolder(), "build");
-        //if (!folder.exists()) folder.mkdirs();
-        buildFolder = createTempFolder("build");
-        buildFolder.deleteOnExit();
-      }
-    }
-    return buildFolder;
+    return BaseNoGui.getBuildFolder();
   }
 
 
@@ -1635,18 +1619,7 @@ public class Base {
    * to avoid conflicts in multi-user environments. (Bug 177)
    */
   static public File createTempFolder(String name) {
-    try {
-      File folder = File.createTempFile(name, null);
-      //String tempPath = ignored.getParent();
-      //return new File(tempPath);
-      folder.delete();
-      folder.mkdirs();
-      return folder;
-
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    return null;
+    return BaseNoGui.createTempFolder(name);
   }
 
 
