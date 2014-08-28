@@ -53,6 +53,8 @@ void loop() {
     else {  	 // if the buffer is empty Cosole.read() returns -1
       name += c; // append the read char from Console to the name string
     }
+  } else {
+    delay(100);
   }
 }
 
