@@ -31,14 +31,13 @@ package cc.arduino.packages.contributions.ui;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.table.AbstractTableModel;
-
 import cc.arduino.packages.contributions.ContributedPackage;
 import cc.arduino.packages.contributions.ContributedPlatform;
 import cc.arduino.packages.contributions.ContributionsIndex;
+import cc.arduino.ui.FilteredAbstractTableModel;
 
 @SuppressWarnings("serial")
-public class ContributionIndexTableModel extends AbstractTableModel {
+public class ContributionIndexTableModel extends FilteredAbstractTableModel {
 
   public final static int DESCRIPTION_COL = 0;
 

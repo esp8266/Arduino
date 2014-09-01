@@ -39,7 +39,6 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.AbstractCellEditor;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -49,8 +48,6 @@ import javax.swing.JTextPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.html.HTMLDocument;
@@ -59,10 +56,10 @@ import javax.swing.text.html.StyleSheet;
 import processing.app.Base;
 import cc.arduino.libraries.contributions.ContributedLibrary;
 import cc.arduino.libraries.contributions.ui.LibrariesIndexTableModel.ContributedLibraryReleases;
+import cc.arduino.ui.InstallerTableCell;
 
 @SuppressWarnings("serial")
-public class ContributedLibraryTableCell extends AbstractCellEditor implements
-    TableCellEditor, TableCellRenderer {
+public class ContributedLibraryTableCell extends InstallerTableCell {
 
   private JPanel panel;
   private JTextPane description;
@@ -281,7 +278,8 @@ public class ContributedLibraryTableCell extends AbstractCellEditor implements
     return panel;
   }
 
-  void setEnabled(boolean enabled) {
+  @Override
+  public void setEnabled(boolean enabled) {
     installButton.setEnabled(enabled);
     removeButton.setEnabled(enabled);
   }

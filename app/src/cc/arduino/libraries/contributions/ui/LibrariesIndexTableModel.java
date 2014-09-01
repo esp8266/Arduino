@@ -34,15 +34,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.swing.table.AbstractTableModel;
-
 import cc.arduino.libraries.contributions.ContributedLibrary;
 import cc.arduino.libraries.contributions.LibrariesIndexer;
 import cc.arduino.packages.contributions.ContributedPackage;
 import cc.arduino.packages.contributions.ContributedPlatform;
+import cc.arduino.ui.FilteredAbstractTableModel;
 
 @SuppressWarnings("serial")
-public class LibrariesIndexTableModel extends AbstractTableModel {
+public class LibrariesIndexTableModel extends FilteredAbstractTableModel {
 
   public final static int DESCRIPTION_COL = 0;
 

@@ -28,216 +28,65 @@
  */
 package cc.arduino.libraries.contributions.ui;
 
-import static cc.arduino.packages.contributions.ui.ContributionIndexTableModel.DESCRIPTION_COL;
-import static processing.app.I18n._;
-
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dialog;
-import java.awt.Dimension;
 import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Collection;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
-
-import processing.app.Theme;
 import cc.arduino.libraries.contributions.ContributedLibrary;
 import cc.arduino.libraries.contributions.LibrariesIndexer;
-import cc.arduino.ui.FilterJTextField;
-import cc.arduino.ui.ProgressJProgressBar;
+import cc.arduino.ui.FilteredAbstractTableModel;
+import cc.arduino.ui.InstallerJDialog;
+import cc.arduino.ui.InstallerTableCell;
 import cc.arduino.utils.Progress;
 
 @SuppressWarnings("serial")
-public class LibraryManagerUI extends JDialog {
+public class LibraryManagerUI extends InstallerJDialog {
 
-  private FilterJTextField filterField;
+  @Override
+  protected FilteredAbstractTableModel createContribModel() {
+    return new LibrariesIndexTableModel();
+  }
+  
+  private LibrariesIndexTableModel getContribModel() {
+    return (LibrariesIndexTableModel) contribModel;
+  }
 
-  private JLabel categoryLabel;
-  private JComboBox categoryChooser;
-  private Component categoryStrut1;
-  private Component categoryStrut2;
-  private Component categoryStrut3;
+  @Override
+  protected InstallerTableCell createCellRenderer() {
+    return new ContributedLibraryTableCell();
+  }
 
-  private LibrariesIndexTableModel contribModel = new LibrariesIndexTableModel();
-  private JTable contribTable;
-  private ProgressJProgressBar progressBar;
+  @Override
+  protected InstallerTableCell createCellEditor() {
+    return new ContributedLibraryTableCell() {
+      @Override
+      protected void onInstall(ContributedLibrary selectedPlatform) {
+        onInstallPressed(selectedPlatform);
+      }
 
-  private Box progressBox;
-  private Box updateBox;
-
-  private ContributedLibraryTableCell cellEditor;
-
-  // Currently selected category and filters
-  private String category;
-  private String[] filters;
+      @Override
+      protected void onRemove(ContributedLibrary installedPlatform) {
+        onRemovePressed(installedPlatform);
+      }
+    };
+  }
 
   public LibraryManagerUI(Frame parent) {
     super(parent, "Library Manager", Dialog.ModalityType.APPLICATION_MODAL);
-
-    setResizable(true);
-
-    Container pane = getContentPane();
-    pane.setLayout(new BorderLayout());
-
-    {
-      categoryStrut1 = Box.createHorizontalStrut(5);
-      categoryStrut2 = Box.createHorizontalStrut(5);
-      categoryStrut3 = Box.createHorizontalStrut(5);
-
-      categoryLabel = new JLabel(_("Category:"));
-
-      categoryChooser = new JComboBox();
-      categoryChooser.setMaximumRowCount(20);
-      categoryChooser.setEnabled(false);
-
-      filterField = new FilterJTextField(_("Filter your search...")) {
-        @Override
-        protected void onFilter(String[] _filters) {
-          filters = _filters;
-          cellEditor.stopCellEditing();
-          contribModel.updateIndexFilter(category, filters);
-        }
-      };
-
-      JPanel panel = new JPanel();
-      panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-      panel.add(categoryStrut1);
-      panel.add(categoryLabel);
-      panel.add(categoryStrut2);
-      panel.add(categoryChooser);
-      panel.add(categoryStrut3);
-      panel.add(filterField);
-      panel.setBorder(new EmptyBorder(7, 7, 7, 7));
-      pane.add(panel, BorderLayout.NORTH);
-    }
-
-    contribTable = new JTable(contribModel);
-    contribTable.setTableHeader(null);
-    contribTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    contribTable.setColumnSelectionAllowed(false);
-    contribTable.setDragEnabled(false);
-    contribTable.setIntercellSpacing(new Dimension(0, 1));
-    contribTable.setShowVerticalLines(false);
-    contribTable.setSelectionBackground(Theme.getColor("status.notice.bgcolor"));
-    {
-      TableColumnModel tcm = contribTable.getColumnModel();
-      TableColumn col = tcm.getColumn(DESCRIPTION_COL);
-      col.setCellRenderer(new ContributedLibraryTableCell());
-      cellEditor = new ContributedLibraryTableCell() {
-        @Override
-        protected void onInstall(ContributedLibrary selectedPlatform) {
-          onInstallPressed(selectedPlatform);
-        }
-
-        @Override
-        protected void onRemove(ContributedLibrary installedPlatform) {
-          onRemovePressed(installedPlatform);
-        }
-      };
-      col.setCellEditor(cellEditor);
-      col.setResizable(true);
-    }
-
-    {
-      JScrollPane s = new JScrollPane();
-      s.setViewportView(contribTable);
-      s.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-      s.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-      pane.add(s, BorderLayout.CENTER);
-    }
-
-    pane.add(Box.createHorizontalStrut(10), BorderLayout.WEST);
-    pane.add(Box.createHorizontalStrut(10), BorderLayout.EAST);
-
-    {
-      progressBar = new ProgressJProgressBar();
-      progressBar.setStringPainted(true);
-      progressBar.setString(" ");
-      progressBar.setVisible(true);
-
-      JButton cancelButton = new JButton(_("Cancel"));
-      cancelButton.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent arg0) {
-          onCancelPressed();
-        }
-      });
-
-      JButton updateButton = new JButton(_("Update list"));
-      updateButton.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent arg0) {
-          onUpdatePressed();
-        }
-      });
-
-      {
-        progressBox = Box.createHorizontalBox();
-        progressBox.add(progressBar);
-        progressBox.add(Box.createHorizontalStrut(5));
-        progressBox.add(cancelButton);
-
-        updateBox = Box.createHorizontalBox();
-        updateBox.add(Box.createHorizontalGlue());
-        updateBox.add(updateButton);
-
-        JPanel progressPanel = new JPanel();
-        progressPanel.setBorder(new EmptyBorder(7, 7, 7, 7));
-        progressPanel.setLayout(new BoxLayout(progressPanel, BoxLayout.Y_AXIS));
-        progressPanel.add(progressBox);
-        progressPanel.add(updateBox);
-        pane.add(progressPanel, BorderLayout.SOUTH);
-
-        setProgressVisible(false);
-      }
-    }
-
-    setMinimumSize(new Dimension(600, 450));
   }
 
-  private TableModelListener tableModelListener = new TableModelListener() {
-    @Override
-    public void tableChanged(final TableModelEvent arg0) {
-      SwingUtilities.invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          updateCellsHeight(arg0);
-        }
-      });
-    }
-  };
-
   public void setIndexer(LibrariesIndexer indexer) {
-    contribModel.removeTableModelListener(tableModelListener);
+    getContribModel().removeTableModelListener(tableModelListener);
     categoryChooser.removeActionListener(categoryChooserActionListener);
 
-    contribModel.setIndexer(indexer);
+    // TODO: Remove setIndexer and make getContribModel 
+    // return a FilteredAbstractTableModel
+    getContribModel().setIndexer(indexer);
 
     category = null;
     categoryChooser.removeAllItems();
 
-    contribModel.addTableModelListener(tableModelListener);
+    getContribModel().addTableModelListener(tableModelListener);
     categoryChooser.addActionListener(categoryChooserActionListener);
 
     // Load categories
@@ -261,46 +110,6 @@ public class LibraryManagerUI extends JDialog {
     };
   }
 
-  ActionListener categoryChooserActionListener = new ActionListener() {
-    @Override
-    public void actionPerformed(ActionEvent arg0) {
-      String selected = (String) categoryChooser.getSelectedItem();
-      if (category == null || !category.equals(selected)) {
-        category = selected;
-        cellEditor.stopCellEditing();
-        contribModel.updateIndexFilter(category, filters);
-      }
-    }
-  };
-
-  public void setProgressVisible(boolean visible) {
-    progressBox.setVisible(visible);
-
-    filterField.setEnabled(!visible);
-    categoryChooser.setEnabled(!visible);
-    contribTable.setEnabled(!visible);
-    updateBox.setVisible(!visible);
-    updateBox.setEnabled(!visible);
-    cellEditor.setEnabled(!visible);
-
-    if (visible && contribTable.isEditing()) {
-      TableCellEditor editor = contribTable.getCellEditor();
-      if (editor != null)
-        editor.stopCellEditing();
-    }
-  }
-
-  private void updateCellsHeight(TableModelEvent e) {
-    int first = e.getFirstRow();
-    int last = Math.min(e.getLastRow(), contribTable.getRowCount() - 1);
-    for (int row = first; row <= last; row++) {
-      TableCellRenderer editor = new ContributedLibraryTableCell();
-      Component comp = contribTable.prepareRenderer(editor, row, 0);
-      int height = comp.getPreferredSize().height;
-      contribTable.setRowHeight(row, height);
-    }
-  }
-
   public void setProgress(Progress progress) {
     progressBar.setValue(progress);
   }
@@ -312,12 +121,14 @@ public class LibraryManagerUI extends JDialog {
   private LibraryInstaller installer;
   private Thread installerThread = null;
 
-  public void onCancelPressed() {
+  @Override
+  protected void onCancelPressed() {
     if (installerThread != null)
       installerThread.interrupt();
   }
 
-  public void onUpdatePressed() {
+  @Override
+  protected void onUpdatePressed() {
     installerThread = new Thread(new Runnable() {
       @Override
       public void run() {
@@ -343,7 +154,7 @@ public class LibraryManagerUI extends JDialog {
         try {
           setProgressVisible(true);
           installer.install(lib);
-          contribModel.updateLibrary(lib);
+          getContribModel().updateLibrary(lib);
         } catch (Exception e) {
           // TODO Show ERROR
           e.printStackTrace();
@@ -362,7 +173,7 @@ public class LibraryManagerUI extends JDialog {
         try {
           setProgressVisible(true);
           installer.remove(lib);
-          contribModel.updateLibrary(lib);
+          getContribModel().updateLibrary(lib);
         } catch (Exception e) {
           // TODO Show ERROR
           e.printStackTrace();
