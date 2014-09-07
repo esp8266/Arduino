@@ -15,9 +15,23 @@
 #include "variant.h"
 #include <stdio.h>
 
-// SPI_HAS_TRANSACTION means SPI has beginTransaction(), endTransaction(),
-// usingInterrupt(), and SPISetting(clock, bitOrder, dataMode)
+// SPI_HAS_TRANSACTION means SPI has
+//   - beginTransaction()
+//   - endTransaction()
+//   - usingInterrupt()
+//   - SPISetting(clock, bitOrder, dataMode)
 #define SPI_HAS_TRANSACTION 1
+
+// SPI_HAS_EXTENDED_CS_PIN_HANDLING means SPI has automatic 
+// CS pin handling and provides the following methods:
+//   - begin(pin)
+//   - end(pin)
+//   - setBitOrder(pin, bitorder)
+//   - setDataMode(pin, datamode)
+//   - setClockDivider(pin, clockdiv)
+//   - transfer(pin, data, SPI_LAST/SPI_CONTINUE)
+//   - beginTransaction(pin, SPISettings settings) (if transactions are available)
+#define SPI_HAS_EXTENDED_CS_PIN_HANDLING 1
 
 #define SPI_MODE0 0x02
 #define SPI_MODE1 0x00
