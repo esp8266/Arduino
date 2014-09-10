@@ -336,10 +336,8 @@ class SPIClass {
 
 	// Transaction Functions
 	void usingInterrupt(uint8_t interruptNumber);
+	void beginTransaction(SPISettings settings) { beginTransaction(BOARD_SPI_DEFAULT_SS, settings); }
 	void beginTransaction(uint8_t pin, SPISettings settings);
-	void beginTransaction(SPISettings settings) {
-		beginTransaction(BOARD_SPI_DEFAULT_SS, settings);
-	}
 	void endTransaction(void);
 
 	// SPI Configuration methods

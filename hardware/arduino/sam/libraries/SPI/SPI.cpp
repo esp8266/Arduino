@@ -62,12 +62,12 @@ void SPIClass::init() {
 #define interruptsStatus() __interruptsStatus()
 static inline unsigned char __interruptsStatus(void) __attribute__((always_inline, unused));
 static inline unsigned char __interruptsStatus(void) {
-  unsigned int primask, faultmask;
-  asm volatile ("mrs %0, primask" : "=r" (primask));
-  if (primask) return 0;
-  asm volatile ("mrs %0, faultmask" : "=r" (faultmask));
-  if (faultmask) return 0;
-  return 1;
+	unsigned int primask, faultmask;
+	asm volatile ("mrs %0, primask" : "=r" (primask));
+	if (primask) return 0;
+	asm volatile ("mrs %0, faultmask" : "=r" (faultmask));
+	if (faultmask) return 0;
+	return 1;
 }
 #endif
 
@@ -182,18 +182,18 @@ byte SPIClass::transfer(byte _pin, uint8_t _data, SPITransferMode _mode) {
 		d |= SPI_TDR_LASTXFER;
 
 	// SPI_Write(spi, _channel, _data);
-    while ((spi->SPI_SR & SPI_SR_TDRE) == 0)
-	;
-    spi->SPI_TDR = d;
+	while ((spi->SPI_SR & SPI_SR_TDRE) == 0)
+		;
+	spi->SPI_TDR = d;
 
-    // return SPI_Read(spi);
-    while ((spi->SPI_SR & SPI_SR_RDRF) == 0)
-	;
-    d = spi->SPI_RDR;
+	// return SPI_Read(spi);
+	while ((spi->SPI_SR & SPI_SR_RDRF) == 0)
+		;
+	d = spi->SPI_RDR;
 	// Reverse bit order
 	if (bitOrder[ch] == LSBFIRST)
 		d = __REV(__RBIT(d));
-    return d & 0xFF;
+	return d & 0xFF;
 }
 
 void SPIClass::attachInterrupt(void) {
