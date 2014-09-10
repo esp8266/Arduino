@@ -229,7 +229,12 @@ public class Compiler implements MessageConsumer {
   }
 
   protected void setProgressListener(ProgressListener _progressListener) {
-    progressListener = _progressListener;
+    progressListener = (_progressListener == null ?
+                        new ProgressListener() {
+                          @Override
+                          public void progress(int percent) {
+                          }
+                        } : _progressListener);
   }
   
   /**

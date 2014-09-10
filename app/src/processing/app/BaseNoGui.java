@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -20,12 +21,15 @@ import org.apache.commons.logging.impl.LogFactoryImpl;
 import org.apache.commons.logging.impl.NoOpLog;
 
 import cc.arduino.packages.DiscoveryManager;
+import cc.arduino.packages.Uploader;
 
+import processing.app.debug.Compiler;
 import processing.app.debug.TargetBoard;
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
 import processing.app.debug.TargetPlatformException;
 import processing.app.helpers.BasicUserNotifier;
+import processing.app.helpers.CommandlineParser;
 import processing.app.helpers.OSUtils;
 import processing.app.helpers.PreferencesMap;
 import processing.app.helpers.UserNotifier;
@@ -132,7 +136,7 @@ public class BaseNoGui {
 
   static public File getBuildFolder() {
     if (buildFolder == null) {
-      String buildPath = Preferences.get("build.path");
+      String buildPath = PreferencesData.get("build.path");
       if (buildPath != null) {
         buildFolder = absoluteFile(buildPath);
         if (!buildFolder.exists())
@@ -407,6 +411,159 @@ public class BaseNoGui {
     return list;
   }
 
+  static public void init(String[] args) {
+    getPlatform().init();
+  
+    String sketchbookPath = getSketchbookPath();
+  
+    // If no path is set, get the default sketchbook folder for this platform
+    if (sketchbookPath == null) {
+      if (BaseNoGui.getPortableFolder() != null)
+        PreferencesData.set("sketchbook.path", getPortableSketchbookFolder());
+      else
+        showError(_("No sketchbook"), _("Sketchbook path not defined"), null);
+    }
+  
+    BaseNoGui.initPackages();
+    
+    // Setup board-dependent variables.
+    onBoardOrPortChange();
+  
+    CommandlineParser parser = CommandlineParser.newCommandlineParser(args);
+
+    for (String path: parser.getFilenames()) {
+      // Correctly resolve relative paths
+      File file = absoluteFile(path);
+  
+      // Fix a problem with systems that use a non-ASCII languages. Paths are
+      // being passed in with 8.3 syntax, which makes the sketch loader code
+      // unhappy, since the sketch folder naming doesn't match up correctly.
+      // http://dev.processing.org/bugs/show_bug.cgi?id=1089
+      if (OSUtils.isWindows()) {
+        try {
+          file = file.getCanonicalFile();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+
+      if (!parser.isVerifyOrUploadMode() && !parser.isGetPrefMode())
+        showError(_("Mode not supported"), _("Only --verify, --upload or --get-pref are supported"), null);
+
+      if (!parser.isForceSavePrefs())
+        PreferencesData.setDoSave(false);
+      if (!file.exists()) {
+        String mess = I18n.format(_("Failed to open sketch: \"{0}\""), path);
+        // Open failure is fatal in upload/verify mode
+        showError(null, mess, 2);
+      }
+    }
+  
+    // Save the preferences. For GUI mode, this happens in the quit
+    // handler, but for other modes we should also make sure to save
+    // them.
+    PreferencesData.save();
+
+    if (parser.isVerifyOrUploadMode()) {
+      // Set verbosity for command line build
+      PreferencesData.set("build.verbose", "" + parser.isDoVerboseBuild());
+      PreferencesData.set("upload.verbose", "" + parser.isDoVerboseUpload());
+
+      // Make sure these verbosity preferences are only for the
+      // current session
+      PreferencesData.setDoSave(false);
+
+      if (parser.isUploadMode()) {
+
+        if (parser.getFilenames().size() != 1)
+        {
+          showError(_("Multiple files not supported"), _("Only one file at time suported with --upload option"), null);
+        }
+
+        List<String> warningsAccumulator = new LinkedList<String>();
+        boolean success = false;
+        try {
+          // costruttore di Editor carica lo sketch usando handleOpenInternal() che fa
+          // la new di Sketch che chiama load() nel suo costruttore
+          // In questo punto questo si traduce in:
+          //   SketchData data = new SketchData(file);
+          //   File tempBuildFolder = getBuildFolder();
+          //   data.load();
+          SketchData data = new SketchData(absoluteFile(parser.getFilenames().get(0)));
+          File tempBuildFolder = getBuildFolder();
+          data.load();
+
+          // Sketch.exportApplet()
+          //  - chiama Sketch.prepare() che chiama Sketch.ensureExistence()
+          //  - chiama Sketch.build(verbose=false) che chiama Sketch.ensureExistence(), imposta il progressListener e chiama Compiler.build()
+          //  - chiama Sketch.upload() (cfr. dopo...)
+          if (!data.getFolder().exists()) showError(_("No sketch"), _("Can't find the sketch in the specified path"), null);
+          String suggestedClassName = Compiler.build(data, tempBuildFolder.getAbsolutePath(), tempBuildFolder, null, false);
+          if (suggestedClassName == null) showError(_("Error while verifying"), _("An error occurred while verifying the sketch"), null);
+          
+          //  - chiama Sketch.upload() ... to be continued ...        
+          Uploader uploader = Compiler.getUploaderByPreferences();
+          if (uploader.requiresAuthorization() && !PreferencesData.has(uploader.getAuthorizationKey())) showError(_("..."), _("..."), null);
+          try {
+            success = Compiler.upload(data, uploader, tempBuildFolder.getAbsolutePath(), suggestedClassName, false, warningsAccumulator);
+          } finally {
+            if (uploader.requiresAuthorization() && !success) {
+              PreferencesData.remove(uploader.getAuthorizationKey());
+            }
+          }
+        } catch (Exception e) {
+          showError(_("Error while verifying/uploading"), _("An error occurred while verifying/uploading the sketch"), e);
+        }
+        for (String warning : warningsAccumulator) {
+          System.out.print(_("Warning"));
+          System.out.print(": ");
+          System.out.println(warning);
+        }
+        if (!success) showError(_("Error while uploading"), _("An error occurred while uploading the sketch"), null);
+      } else {
+
+        for (String path : parser.getFilenames())
+        {
+          try {
+            // costruttore di Editor carica lo sketch usando handleOpenInternal() che fa
+            // la new di Sketch che chiama load() nel suo costruttore
+            // In questo punto questo si traduce in:
+            //   SketchData data = new SketchData(file);
+            //   File tempBuildFolder = getBuildFolder();
+            //   data.load();
+            SketchData data = new SketchData(absoluteFile(path));
+            File tempBuildFolder = getBuildFolder();
+            data.load();
+
+            // metodo Sketch.prepare() chiama Sketch.ensureExistence()
+            // Sketch.build(verbose) chiama Sketch.ensureExistence() e poi imposta il progressListener e, finalmente, chiama Compiler.build()
+            // In questo punto questo si traduce in:
+            //    if (!data.getFolder().exists()) showError(...);
+            //    String ... = Compiler.build(data, tempBuildFolder.getAbsolutePath(), tempBuildFolder, null, verbose);
+            if (!data.getFolder().exists()) showError(_("No sketch"), _("Can't find the sketch in the specified path"), null);
+            String suggestedClassName = Compiler.build(data, tempBuildFolder.getAbsolutePath(), tempBuildFolder, null, parser.isDoVerboseBuild());
+            if (suggestedClassName == null) showError(_("Error while verifying"), _("An error occurred while verifying the sketch"), null);
+          } catch (Exception e) {
+            showError(_("Error while verifying"), _("An error occurred while verifying the sketch"), e);
+          }
+        }
+
+      }
+
+      // No errors exit gracefully
+      System.exit(0);
+    }
+    else if (parser.isGetPrefMode()) {
+      String value = PreferencesData.get(parser.getGetPref(), null);
+      if (value != null) {
+        System.out.println(value);
+        System.exit(0);
+      } else {
+        System.exit(4);
+      }
+    }
+  }
+
   static public void initLogger() {
     System.setProperty(LogFactoryImpl.LOG_PROPERTY, NoOpLog.class.getCanonicalName());
     Logger.getLogger("javax.jmdns").setLevel(Level.OFF);
@@ -507,6 +664,18 @@ public class BaseNoGui {
     String[] contents = PApplet.loadStrings(file);
     if (contents == null) return null;
     return PApplet.join(contents, "\n");
+  }
+
+  static public void main(String args[]) throws Exception {
+    initPlatform();
+    
+    initPortableFolder();
+    
+    PreferencesData.init(null);
+    
+    prescanParameters(args);
+    
+    init(args);
   }
 
   static public void onBoardOrPortChange() {
