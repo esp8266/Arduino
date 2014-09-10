@@ -196,6 +196,58 @@ byte SPIClass::transfer(byte _pin, uint8_t _data, SPITransferMode _mode) {
 	return d & 0xFF;
 }
 
+void SPIClass::transfer(byte _pin, void *_buf, size_t _count, SPITransferMode _mode) {
+	if (_count == 0)
+		return;
+
+	uint8_t *buffer = (uint8_t *)_buf;
+	if (_count == 1) {
+		*buffer = transfer(_pin, *buffer, _mode);
+		return;
+	}
+
+	uint32_t ch = BOARD_PIN_TO_SPI_CHANNEL(_pin);
+	bool reverse = (bitOrder[ch] == LSBFIRST);
+
+	// Send the first byte
+	uint32_t d = *buffer;
+	if (reverse)
+		d = __REV(__RBIT(d));
+	while ((spi->SPI_SR & SPI_SR_TDRE) == 0)
+		;
+	spi->SPI_TDR = d | SPI_PCS(ch);
+
+	while (_count > 1) {
+		// Prepare next byte
+		d = *(buffer+1);
+		if (reverse)
+			d = __REV(__RBIT(d));
+		if (_count == 2 && _mode == SPI_LAST)
+			d |= SPI_TDR_LASTXFER;
+
+		// Read transferred byte and send next one straight away
+		while ((spi->SPI_SR & SPI_SR_RDRF) == 0)
+			;
+		uint8_t r = spi->SPI_RDR;
+		spi->SPI_TDR = d | SPI_PCS(ch);
+
+		// Save read byte
+		if (reverse)
+			r = __REV(__RBIT(r));
+		*buffer = r;
+		buffer++;
+		_count--;
+	}
+
+	// Receive the last transferred byte
+	while ((spi->SPI_SR & SPI_SR_RDRF) == 0)
+		;
+	uint8_t r = spi->SPI_RDR;
+	if (reverse)
+		r = __REV(__RBIT(r));
+	*buffer = r;
+}
+
 void SPIClass::attachInterrupt(void) {
 	// Should be enableInterrupt()
 }

@@ -80,8 +80,12 @@ class SPIClass {
   public:
 	SPIClass(Spi *_spi, uint32_t _id, void(*_initCb)(void));
 
+	// Transfer functions
+	byte transfer(byte _pin, uint8_t _data, SPITransferMode _mode = SPI_LAST);
+	void transfer(byte _pin, void *_buf, size_t _count, SPITransferMode _mode = SPI_LAST);
+	// Transfer functions on default pin BOARD_SPI_DEFAULT_SS
 	byte transfer(uint8_t _data, SPITransferMode _mode = SPI_LAST) { return transfer(BOARD_SPI_DEFAULT_SS, _data, _mode); }
-	byte transfer(byte _channel, uint8_t _data, SPITransferMode _mode = SPI_LAST);
+	void transfer(void *_buf, size_t _count, SPITransferMode _mode = SPI_LAST) { transfer(BOARD_SPI_DEFAULT_SS, _buf, _count, _mode); }
 
 	// Transaction Functions
 	void usingInterrupt(uint8_t interruptNumber);
