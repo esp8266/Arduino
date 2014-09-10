@@ -80,35 +80,39 @@ bool WEAK CDC_Setup(Setup& setup)
 		if (CDC_SET_LINE_CODING == r)
 		{
 			USB_RecvControl((void*)&_usbLineInfo,7);
-			return true;
 		}
 
 		if (CDC_SET_CONTROL_LINE_STATE == r)
 		{
 			_usbLineInfo.lineState = setup.wValueL;
+		}
 
+		if (CDC_SET_LINE_CODING == r || CDC_SET_CONTROL_LINE_STATE == r)
+		{
 			// auto-reset into the bootloader is triggered when the port, already 
 			// open at 1200 bps, is closed.  this is the signal to start the watchdog
 			// with a relatively long period so it can finish housekeeping tasks
 			// like servicing endpoints before the sketch ends
-			if (1200 == _usbLineInfo.dwDTERate) {
-				// We check DTR state to determine if host port is open (bit 0 of lineState).
-				if ((_usbLineInfo.lineState & 0x01) == 0) {
-					*(uint16_t *)0x0800 = 0x7777;
-					wdt_enable(WDTO_120MS);
-				} else {
-					// Most OSs do some intermediate steps when configuring ports and DTR can
-					// twiggle more than once before stabilizing.
-					// To avoid spurious resets we set the watchdog to 250ms and eventually
-					// cancel if DTR goes back high.
-	
-					wdt_disable();
-					wdt_reset();
-					*(uint16_t *)0x0800 = 0x0;
-				}
+
+			// We check DTR state to determine if host port is open (bit 0 of lineState).
+			if (1200 == _usbLineInfo.dwDTERate && (_usbLineInfo.lineState & 0x01) == 0)
+			{
+				*(uint16_t *)0x0800 = 0x7777;
+				wdt_enable(WDTO_120MS);
 			}
-			return true;
+			else
+			{
+				// Most OSs do some intermediate steps when configuring ports and DTR can
+				// twiggle more than once before stabilizing.
+				// To avoid spurious resets we set the watchdog to 250ms and eventually
+				// cancel if DTR goes back high.
+
+				wdt_disable();
+				wdt_reset();
+				*(uint16_t *)0x0800 = 0x0;
+			}
 		}
+		return true;
 	}
 	return false;
 }

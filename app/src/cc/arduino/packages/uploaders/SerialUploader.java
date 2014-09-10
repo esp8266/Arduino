@@ -86,15 +86,13 @@ public class SerialUploader extends Uploader {
             System.out.println(_("Forcing reset using 1200bps open/close on port ") + uploadPort);
           Serial.touchPort(uploadPort, 1200);
         }
+        Thread.sleep(400);
         if (waitForUploadPort) {
           // Scanning for available ports seems to open the port or
           // otherwise assert DTR, which would cancel the WDT reset if
           // it happened within 250 ms. So we wait until the reset should
           // have already occured before we start scanning.
-          Thread.sleep(300);
           uploadPort = waitForUploadPort(uploadPort, before);
-        } else {
-          Thread.sleep(400);
         }
       } catch (SerialException e) {
         throw new RunnerException(e);
