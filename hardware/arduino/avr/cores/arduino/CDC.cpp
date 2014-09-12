@@ -16,7 +16,6 @@
 ** SOFTWARE.  
 */
 
-#include "Platform.h"
 #include "USBAPI.h"
 #include <avr/wdt.h>
 
