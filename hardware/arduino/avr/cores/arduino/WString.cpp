@@ -619,7 +619,7 @@ String String::substring(unsigned int left, unsigned int right) const
 		left = temp;
 	}
 	String out;
-	if (left > len) return out;
+	if (left >= len) return out;
 	if (right > len) right = len;
 	char temp = buffer[right];  // save the replaced character
 	buffer[right] = '\0';	
@@ -684,15 +684,16 @@ void String::replace(const String& find, const String& replace)
 }
 
 void String::remove(unsigned int index){
-	if (index >= len) { return; }
-	int count = len - index;
-	remove(index, count);
+	// Pass the biggest integer as the count. The remove method
+	// below will take care of truncating it at the end of the
+	// string.
+	remove(index, (unsigned int)-1);
 }
 
 void String::remove(unsigned int index, unsigned int count){
 	if (index >= len) { return; }
 	if (count <= 0) { return; }
-	if (index + count > len) { count = len - index; }
+	if (count > len - index) { count = len - index; }
 	char *writeTo = buffer + index;
 	len = len - count;
 	strncpy(writeTo, buffer + index + count,len - index);
