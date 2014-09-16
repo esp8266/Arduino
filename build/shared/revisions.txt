@@ -3,6 +3,7 @@ ARDUINO 1.5.8 BETA - not yet released
 [ide]
 * Find/Replace over multiple tabs (Erwin Ried, Fulvio Ieva)
 * Fix wrong "Replace" behavior with empty "Find" field (Fulvio Ieva)
+* A lot of command-line improvements (Matthijs Kooijman)
 
 [libraries]
 * SPI: added transaction API (Paul Stoffregen)
@@ -10,6 +11,12 @@ ARDUINO 1.5.8 BETA - not yet released
   https://groups.google.com/a/arduino.cc/forum/#!msg/developers/TuZLfjeZjDI/6deNjw3Y9m4J
 * FileIO bridge: fixed wrong return value in File::size() for size >32768
 * Updated Temboo to latest version
+
+[core]
+* sam: "new" and "delete" do not bring in 50Kb of stdclib anymore
+* Correct implementation of gcc specific internal functions (__cxa_guard_*) (Alexey Guseynov)
+* Fix for upload problems on Leonardo (and derivative boards based on mega32u4)
+* Small improvements on String class (Matthijs Kooijman)
 
 The following changes are included also in the (not yet released) Arduino IDE 1.0.6:
 
