@@ -214,7 +214,7 @@ ARDUINO 1.5.3 BETA - 2013.08.30
 * Scrollable menus can now be scrolled with the mouse wheel
 
 [arduino core]
-* sam: Fixed delayMicrosecond() when interrupts are disabled
+* sam: Fixed delayMicrosecond() when interrupts are disabled (Paul Stoffregen)
 * sam: Upgraded libsam, and added missing modules (CAN, ETH, etc.) (Thibaut Viard)
 * sam: Added compatibility for avr/pgmspace.h (Paul Stoffregen)
 * sam: Added serialEvent*() support

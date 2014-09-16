@@ -1,5 +1,6 @@
 /*
   Copyright (c) 2011 Arduino.  All right reserved.
+  Copyright (c) 2013 by Paul Stoffregen <paul@pjrc.com> (delayMicroseconds)
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -65,6 +66,10 @@ extern void delay( uint32_t dwMs ) ;
  */
 static inline void delayMicroseconds(uint32_t) __attribute__((always_inline, unused));
 static inline void delayMicroseconds(uint32_t usec){
+    /*
+     * Based on Paul Stoffregen's implementation
+     * for Teensy 3.0 (http://www.pjrc.com/)
+     */
     if (usec == 0) return;
     uint32_t n = usec * (VARIANT_MCK / 3000000);
     asm volatile(
