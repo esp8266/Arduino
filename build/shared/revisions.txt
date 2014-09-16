@@ -1,5 +1,5 @@
 
-ARDUINO 1.0.6 - not yet released
+ARDUINO 1.0.6 - 2014.09.16
 
 [core]
 * avr: Improved USB-CDC write speed (Justin Rajewski)
@@ -11,6 +11,7 @@ ARDUINO 1.0.6 - not yet released
 * Backported Print class from IDE 1.5.x
 * Backported digitalPinToInterrupt macro from IDE 1.5.x
 * Added initVariant() hook to allow 3rd party variant-specific initialization
+* Added replacement stub for cstdlib atexit() function (Christopher Andrews)
 
 [ide]
 * Added compatibility for IDE 1.5.x libraries layout
@@ -23,6 +24,7 @@ ARDUINO 1.0.6 - not yet released
 * Robot_Control: updated turning algorithm (Xun Yang)
 * Esplora: added reading form Tinkerkit inputs
 * SoftwareSerial: Fix idle level when initializing with inverted logic (Jens-Christian Skibakk)
+* fixed a bunch of examples
 
 [firmware]
 * Wifishield: fixed paths on firmware upgrade scripts
