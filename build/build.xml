@@ -112,42 +112,23 @@
   <!-- Revision check  -->
   <!-- - - - - - - - - -->
   <target name="revision-check">
-    <!-- figure out the revision number -->
-    <loadfile srcfile="../todo.txt" property="revision">
-      <filterchain>
-	<headfilter lines="1"/>
-	<tokenfilter>
-	  <stringtokenizer suppressdelims="true"/>
-	  <!-- grab the thing from the first line that's 4 digits -->
-	  <containsregex pattern="(\d\d\d\d)" />
-	</tokenfilter>
-      </filterchain>
-    </loadfile>
-    <!-- <echo message="revision is ${revision}." /> -->
-    
     <!-- figure out the revision number in base.java -->
     <loadfile srcfile="../app/src/processing/app/Base.java" 
-	      property="revision.base">
+	      property="revision">
       <filterchain>
 	<tokenfilter>
 	  <linetokenizer />
 	  <containsregex pattern="String VERSION_NAME = "/>
 	  <replaceregex pattern="[^0-9]*" flags="g" replace=""/>
 	</tokenfilter>
+        <tokenfilter>
+          <stringtokenizer suppressdelims="true"/>
+          <!-- grab the thing that's 4 digits -->
+          <containsregex pattern="(\d\d\d\d)" />
+        </tokenfilter>
       </filterchain>
     </loadfile>
-    <!-- <echo message="base revision is ${revision.base}." /> -->
-    
-    <condition property="revision.correct">
-      <!-- Using contains because I can't figure out how to get rid of the
-	   LF in revision.base. Please file a bug if you have a fix. -->
-      <contains string="${revision.base}" substring="${revision}"/>
-    </condition>
-    
-    <!-- the revision.base property won't be set
-	 if $revision wasn't found... -->
-    <fail unless="revision.correct" 
-	  message="Fix revision number in Base.java" />
+    <echo message="base revision is ${revision}." />
   </target>
   
   
