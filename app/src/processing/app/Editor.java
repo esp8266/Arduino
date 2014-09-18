@@ -1652,7 +1652,7 @@ public class Editor extends JFrame implements RunnerListener {
 
       // insert the program text into the document object
       try {
-        document.insertString(0, codeDoc.getProgram(), null);
+        document.insertString(0, codeDoc.getCode().getProgram(), null);
       } catch (BadLocationException bl) {
         bl.printStackTrace();
       }

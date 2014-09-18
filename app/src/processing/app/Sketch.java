@@ -105,6 +105,11 @@ public class Sketch {
   protected void load() throws IOException {
     data.load();
 
+    for (SketchCode code : data.getCodes()) {
+      if (code.getMetadata() == null)
+        code.setMetadata(new SketchCodeDocument(code));
+    }
+
     // set the main file to be the current tab
     if (editor != null) {
       setCurrentCode(0);
@@ -165,8 +170,8 @@ public class Sketch {
     renamingCode = true;
     String prompt = (currentIndex == 0) ?
       "New name for sketch:" : "New name for file:";
-    String oldName = (current.isExtension("ino")) ?
-      current.getPrettyName() : current.getFileName();
+    String oldName = (current.getCode().isExtension("ino")) ?
+      current.getCode().getPrettyName() : current.getCode().getFileName();
     editor.status.edit(prompt, oldName);
   }
 
@@ -193,7 +198,7 @@ public class Sketch {
     // (osx is case insensitive but preserving, windows insensitive,
     // *nix is sensitive and preserving.. argh)
     if (renamingCode) {
-      if (newName.equalsIgnoreCase(current.getFileName())) {
+      if (newName.equalsIgnoreCase(current.getCode().getFileName())) {
         // exit quietly for the 'rename' case.
         // if it's a 'new' then an error will occur down below
         return;
@@ -222,7 +227,7 @@ public class Sketch {
     // Don't let the user create the main tab as a .java file instead of .pde
     if (!isDefaultExtension(newExtension)) {
       if (renamingCode) {  // If creating a new tab, don't show this error
-        if (current == data.getCode(0)) {  // If this is the main tab, disallow
+        if (current.getCode() == data.getCode(0)) {  // If this is the main tab, disallow
           Base.showWarning(_("Problem with rename"),
                            _("The main file can't use an extension.\n" +
                              "(It may be time for your to graduate to a\n" +
@@ -317,22 +322,22 @@ public class Sketch {
         // however this *will* first save the sketch, then rename
 
         // first get the contents of the editor text area
-        if (current.isModified()) {
-          current.setProgram(editor.getText());
+        if (current.getCode().isModified()) {
+          current.getCode().setProgram(editor.getText());
           try {
             // save this new SketchCode
-            current.save();
+            current.getCode().save();
           } catch (Exception e) {
             Base.showWarning(_("Error"), _("Could not rename the sketch. (0)"), e);
             return;
           }
         }
 
-        if (!current.renameTo(newFile)) {
+        if (!current.getCode().renameTo(newFile)) {
           Base.showWarning(_("Error"),
                            I18n.format(
 			     _("Could not rename \"{0}\" to \"{1}\""),
-			     current.getFileName(),
+			     current.getCode().getFileName(),
 			     newFile.getName()
 			   ), null);
           return;
@@ -372,11 +377,11 @@ public class Sketch {
         editor.base.rebuildSketchbookMenus();
 
       } else {  // else if something besides code[0]
-        if (!current.renameTo(newFile)) {
+        if (!current.getCode().renameTo(newFile)) {
           Base.showWarning(_("Error"),
                            I18n.format(
 			     _("Could not rename \"{0}\" to \"{1}\""),
-			     current.getFileName(),
+			     current.getCode().getFileName(),
 			     newFile.getName()
 			   ), null);
           return;
@@ -399,7 +404,7 @@ public class Sketch {
         return;
       }
       ensureExistence();
-      data.addCode(new SketchCodeDocument(newFile));
+      data.addCode((new SketchCodeDocument(newFile)).getCode());
     }
 
     // sort the entries
@@ -434,7 +439,7 @@ public class Sketch {
     Object[] options = { _("OK"), _("Cancel") };
     String prompt = (currentIndex == 0) ?
       _("Are you sure you want to delete this sketch?") :
-      I18n.format(_("Are you sure you want to delete \"{0}\"?"), current.getPrettyName());
+      I18n.format(_("Are you sure you want to delete \"{0}\"?"), current.getCode().getPrettyName());
     int result = JOptionPane.showOptionDialog(editor,
                                               prompt,
                                               _("Delete"),
@@ -461,14 +466,14 @@ public class Sketch {
 
       } else {
         // delete the file
-        if (!current.deleteFile(tempBuildFolder)) {
+        if (!current.getCode().deleteFile(tempBuildFolder)) {
           Base.showMessage(_("Couldn't do it"),
-                           I18n.format(_("Could not delete \"{0}\"."), current.getFileName()));
+                           I18n.format(_("Could not delete \"{0}\"."), current.getCode().getFileName()));
           return;
         }
 
         // remove code from the list
-        data.removeCode(current);
+        data.removeCode(current.getCode());
 
         // just set current tab to the main tab
         setCurrentCode(0);
@@ -504,7 +509,7 @@ public class Sketch {
   public void setModified(boolean state) {
     //System.out.println("setting modified to " + state);
     //new Exception().printStackTrace();
-    current.setModified(state);
+    current.getCode().setModified(state);
     calcModified();
   }
 
@@ -540,8 +545,8 @@ public class Sketch {
     ensureExistence();
 
     // first get the contents of the editor text area
-    if (current.isModified()) {
-      current.setProgram(editor.getText());
+    if (current.getCode().isModified()) {
+      current.getCode().setProgram(editor.getText());
     }
 
     // don't do anything if not actually modified
@@ -700,8 +705,8 @@ public class Sketch {
 
     // grab the contents of the current tab before saving
     // first get the contents of the editor text area
-    if (current.isModified()) {
-      current.setProgram(editor.getText());
+    if (current.getCode().isModified()) {
+      current.getCode().setProgram(editor.getText());
     }
 
     // save the other tabs to their new location
@@ -896,7 +901,7 @@ public class Sketch {
     }
 
     if (codeExtension != null) {
-      SketchCode newCode = new SketchCodeDocument(destFile);
+      SketchCode newCode = (new SketchCodeDocument(destFile)).getCode();
 
       if (replacement) {
         data.replaceCode(newCode);
@@ -910,7 +915,7 @@ public class Sketch {
       editor.header.repaint();
       if (editor.untitled) {  // TODO probably not necessary? problematic?
         // Mark the new code as modified so that the sketch is saved
-        current.setModified(true);
+        current.getCode().setModified(true);
       }
 
     } else {
@@ -941,7 +946,7 @@ public class Sketch {
     // import statements into the main sketch file (code[0])
     // if the current code is a .java file, insert into current
     //if (current.flavor == PDE) {
-    if (hasDefaultExtension(current)) {
+    if (hasDefaultExtension(current.getCode())) {
       setCurrentCode(0);
     }
     // could also scan the text in the file to see if each import
@@ -977,13 +982,13 @@ public class Sketch {
 
     // get the text currently being edited
     if (current != null) {
-      current.setProgram(editor.getText());
+      current.getCode().setProgram(editor.getText());
       current.setSelectionStart(editor.getSelectionStart());
       current.setSelectionStop(editor.getSelectionStop());
       current.setScrollPosition(editor.getScrollPosition());
     }
 
-    current = (SketchCodeDocument) data.getCode(which);
+    current = (SketchCodeDocument) data.getCode(which).getMetadata();
     currentIndex = which;
 
     editor.setCode(current);
@@ -1043,7 +1048,7 @@ public class Sketch {
     // make sure the user didn't hide the sketch folder
     ensureExistence();
 
-    current.setProgram(editor.getText());
+    current.getCode().setProgram(editor.getText());
 
     // TODO record history here
     //current.history.record(program, SketchHistory.RUN);
@@ -1430,7 +1435,7 @@ public class Sketch {
 
 
   public SketchCode getCurrentCode() {
-    return current;
+    return current.getCode();
   }
 
 

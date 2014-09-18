@@ -4,8 +4,9 @@ import java.io.File;
 
 import javax.swing.text.Document;
 
-public class SketchCodeDocument extends SketchCode {
+public class SketchCodeDocument{
 
+  private SketchCode code;
   private Document document;
 
   // Undo Manager for this tab, each tab keeps track of their own Editor.undo
@@ -18,8 +19,13 @@ public class SketchCodeDocument extends SketchCode {
   private int selectionStop;
   private int scrollPosition;
 
+  public SketchCodeDocument(SketchCode code) {
+    this.code = code;
+    this.code.setMetadata(this);
+  }
+
   public SketchCodeDocument(File file) {
-    super(file);
+    this.code = new SketchCode(file, this);
   }
 
   public LastUndoableEditAwareUndoManager getUndo() {
@@ -52,6 +58,14 @@ public class SketchCodeDocument extends SketchCode {
 
   public void setScrollPosition(int scrollPosition) {
     this.scrollPosition = scrollPosition;
+  }
+
+  public SketchCode getCode() {
+    return code;
+  }
+
+  public void setCode(SketchCode code) {
+    this.code = code;
   }
 
   public Document getDocument() {

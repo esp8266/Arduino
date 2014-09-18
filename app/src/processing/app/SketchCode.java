@@ -48,9 +48,19 @@ public class SketchCode {
   /** where this code starts relative to the concat'd code */
   private int preprocOffset;  
 
+  private Object metadata;
 
   public SketchCode(File file) {
+    init(file, null);
+  }
+
+  public SketchCode(File file, Object metadata) {
+    init(file, metadata);
+  }
+
+  private void init(File file, Object metadata) {
     this.file = file;
+    this.metadata = metadata;
 
     makePrettyName();
 
@@ -222,5 +232,15 @@ public class SketchCode {
    */
   public void saveAs(File newFile) throws IOException {
     BaseNoGui.saveFile(program, newFile);
+  }
+
+
+  public Object getMetadata() {
+    return metadata;
+  }
+
+
+  public void setMetadata(Object metadata) {
+    this.metadata = metadata;
   }
 }
