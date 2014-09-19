@@ -35,7 +35,10 @@ import processing.app.debug.TargetBoard;
 
 public class UploaderFactory {
 
-  public Uploader newUploader(TargetBoard board, BoardPort port) {
+  public Uploader newUploader(TargetBoard board, BoardPort port, boolean noUploadPort) {
+    if (noUploadPort)
+      return new SerialUploader(noUploadPort);
+
     if ("true".equals(board.getPreferences().get("upload.via_ssh")) && port != null && "network".equals(port.getProtocol())) {
       return new SSHUploader(port);
     }

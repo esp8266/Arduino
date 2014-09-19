@@ -2,6 +2,7 @@ package processing.app.helpers;
 
 import static processing.app.I18n._;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,6 +23,8 @@ public class CommandlineParser {
   private ACTION action = ACTION.GUI;
   private boolean doVerboseBuild = false;
   private boolean doVerboseUpload = false;
+  private boolean doUseProgrammer = false;
+  private boolean noUploadPort = false;
   private boolean forceSavePrefs = false;
   private String getPref = null;
   private List<String> filenames = new LinkedList<String>();
@@ -79,6 +82,18 @@ public class CommandlineParser {
           action = ACTION.NOOP;
         continue;
       }
+      if (args[i].equals("--useprogrammer")) {
+        doUseProgrammer = true;
+        if (action == ACTION.GUI)
+          action = ACTION.NOOP;
+        continue;
+      }
+      if (args[i].equals("--nouploadport")) {
+        noUploadPort = true;
+        if (action == ACTION.GUI)
+          action = ACTION.NOOP;
+        continue;
+      }
       if (args[i].equals("--board")) {
         i++;
         if (i >= args.length)
@@ -102,6 +117,21 @@ public class CommandlineParser {
         if (i >= args.length)
           BaseNoGui.showError(null, _("Argument required for --curdir"), 3);
         // Argument should be already processed by Base.main(...)
+        continue;
+      }
+      if (args[i].equals("--buildpath")) {
+        i++;
+        if (i >= args.length) {
+          BaseNoGui.showError(null, "Argument required for --buildpath", 3);
+        }
+        File buildFolder = new File(args[i]);
+        if (!buildFolder.exists()) {
+          BaseNoGui.showError(null, "The build path doesn't exist", 3);
+        }
+        if (!buildFolder.isDirectory()) {
+          BaseNoGui.showError(null, "The build path is not a folder", 3);
+        }
+        BaseNoGui.setBuildFolder(buildFolder);
         continue;
       }
       if (args[i].equals("--pref")) {
@@ -240,6 +270,14 @@ public class CommandlineParser {
   
   public boolean isVerifyOrUploadMode() {
     return isVerifyMode() || isUploadMode();
+  }
+
+  public boolean isDoUseProgrammer() {
+    return doUseProgrammer;
+  }
+
+  public boolean isNoUploadPort() {
+    return noUploadPort;
   }
 
 }

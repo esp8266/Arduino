@@ -46,6 +46,16 @@ import cc.arduino.packages.Uploader;
 
 public class SerialUploader extends Uploader {
 
+  public SerialUploader()
+  {
+    super();
+  }
+
+  public SerialUploader(boolean noUploadPort)
+  {
+    super(noUploadPort);
+  }
+
   public boolean uploadUsingPreferences(File sourcePath, String buildPath, String className, boolean usingProgrammer, List<String> warningsAccumulator) throws Exception {
     // FIXME: Preferences should be reorganized
     TargetPlatform targetPlatform = BaseNoGui.getTargetPlatform();
@@ -63,6 +73,26 @@ public class SerialUploader extends Uploader {
     // bootloader and upload using the selected programmer.
     if (usingProgrammer || prefs.get("upload.protocol") == null) {
       return uploadUsingProgrammer(buildPath, className);
+    }
+
+    if (noUploadPort)
+    {
+      prefs.put("build.path", buildPath);
+      prefs.put("build.project_name", className);
+      if (verbose)
+        prefs.put("upload.verbose", prefs.getOrExcept("upload.params.verbose"));
+      else
+        prefs.put("upload.verbose", prefs.getOrExcept("upload.params.quiet"));
+
+      boolean uploadResult;
+      try {
+        String pattern = prefs.getOrExcept("upload.pattern");
+        String[] cmd = StringReplacer.formatAndSplit(pattern, prefs, true);
+        uploadResult = executeUploadCommand(cmd);
+      } catch (Exception e) {
+        throw new RunnerException(e);
+      }
+      return uploadResult;
     }
 
     // need to do a little dance for Leonardo and derivatives:

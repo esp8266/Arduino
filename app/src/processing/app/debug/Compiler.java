@@ -122,19 +122,25 @@ public class Compiler implements MessageConsumer {
     return null;
   }
   
-  static public Uploader getUploaderByPreferences() {
+  static public Uploader getUploaderByPreferences(boolean noUploadPort) {
     TargetPlatform target = BaseNoGui.getTargetPlatform();
     String board = PreferencesData.get("board");
 
-    BoardPort boardPort = BaseNoGui.getDiscoveryManager().find(PreferencesData.get("serial.port"));
-
-    return new UploaderFactory().newUploader(target.getBoards().get(board), boardPort);
+    if (noUploadPort)
+    {
+      return new UploaderFactory().newUploader(target.getBoards().get(board), null, noUploadPort);
+    }
+    else
+    {
+      BoardPort boardPort = BaseNoGui.getDiscoveryManager().find(PreferencesData.get("serial.port"));
+      return new UploaderFactory().newUploader(target.getBoards().get(board), boardPort, noUploadPort);
+    }
   }
 
-  static public boolean upload(SketchData data, Uploader uploader, String buildPath, String suggestedClassName, boolean usingProgrammer, List<String> warningsAccumulator) throws Exception {
+  static public boolean upload(SketchData data, Uploader uploader, String buildPath, String suggestedClassName, boolean usingProgrammer, boolean noUploadPort, List<String> warningsAccumulator) throws Exception {
 
     if (uploader == null)
-      uploader = getUploaderByPreferences();
+      uploader = getUploaderByPreferences(noUploadPort);
 
     boolean success = false;
 

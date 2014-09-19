@@ -64,11 +64,22 @@ public abstract class Uploader implements MessageConsumer {
 
   private String error;
   protected boolean notFoundError;
+  protected boolean noUploadPort;
 
   protected Uploader() {
-    this.error = null;
     this.verbose = PreferencesData.getBoolean("upload.verbose");
+    init(false);
+  }
+
+  protected Uploader(boolean nup) {
+    this.verbose = PreferencesData.getBoolean("upload.verbose");
+    init(nup);
+  }
+
+  private void init(boolean nup) {
+    this.error = null;
     this.notFoundError = false;
+    this.noUploadPort = nup;
   }
 
   public abstract boolean uploadUsingPreferences(File sourcePath, String buildPath, String className, boolean usingProgrammer, List<String> warningsAccumulator) throws Exception;

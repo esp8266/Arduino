@@ -1195,7 +1195,7 @@ public class Sketch {
 
   protected boolean upload(String buildPath, String suggestedClassName, boolean usingProgrammer) throws Exception {
 
-    Uploader uploader = Compiler.getUploaderByPreferences();
+    Uploader uploader = Compiler.getUploaderByPreferences(false);
 
     boolean success = false;
     do {
@@ -1214,7 +1214,7 @@ public class Sketch {
 
       List<String> warningsAccumulator = new LinkedList<String>();
       try {
-        success = Compiler.upload(data, uploader, buildPath, suggestedClassName, usingProgrammer, warningsAccumulator);
+        success = Compiler.upload(data, uploader, buildPath, suggestedClassName, usingProgrammer, false, warningsAccumulator);
       } finally {
         if (uploader.requiresAuthorization() && !success) {
           Preferences.remove(uploader.getAuthorizationKey());

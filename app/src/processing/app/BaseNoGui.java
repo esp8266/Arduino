@@ -477,7 +477,7 @@ public class BaseNoGui {
 
         if (parser.getFilenames().size() != 1)
         {
-          showError(_("Multiple files not supported"), _("Only one file at time suported with --upload option"), null);
+          showError(_("Multiple files not supported"), _("The --upload option supports only one file at a time"), null);
         }
 
         List<String> warningsAccumulator = new LinkedList<String>();
@@ -498,14 +498,16 @@ public class BaseNoGui {
           //  - chiama Sketch.build(verbose=false) che chiama Sketch.ensureExistence(), imposta il progressListener e chiama Compiler.build()
           //  - chiama Sketch.upload() (cfr. dopo...)
           if (!data.getFolder().exists()) showError(_("No sketch"), _("Can't find the sketch in the specified path"), null);
-          String suggestedClassName = Compiler.build(data, tempBuildFolder.getAbsolutePath(), tempBuildFolder, null, false);
+          String suggestedClassName = Compiler.build(data, tempBuildFolder.getAbsolutePath(), tempBuildFolder, null, parser.isDoVerboseBuild());
           if (suggestedClassName == null) showError(_("Error while verifying"), _("An error occurred while verifying the sketch"), null);
-          
+          showMessage(_("Done compiling"), _("Done compiling"));
+
           //  - chiama Sketch.upload() ... to be continued ...        
-          Uploader uploader = Compiler.getUploaderByPreferences();
+          Uploader uploader = Compiler.getUploaderByPreferences(parser.isNoUploadPort());
           if (uploader.requiresAuthorization() && !PreferencesData.has(uploader.getAuthorizationKey())) showError(_("..."), _("..."), null);
           try {
-            success = Compiler.upload(data, uploader, tempBuildFolder.getAbsolutePath(), suggestedClassName, false, warningsAccumulator);
+            success = Compiler.upload(data, uploader, tempBuildFolder.getAbsolutePath(), suggestedClassName, parser.isDoUseProgrammer(), parser.isNoUploadPort(), warningsAccumulator);
+            showMessage(_("Done uploading"), _("Done uploading"));
           } finally {
             if (uploader.requiresAuthorization() && !success) {
               PreferencesData.remove(uploader.getAuthorizationKey());
@@ -543,6 +545,7 @@ public class BaseNoGui {
             if (!data.getFolder().exists()) showError(_("No sketch"), _("Can't find the sketch in the specified path"), null);
             String suggestedClassName = Compiler.build(data, tempBuildFolder.getAbsolutePath(), tempBuildFolder, null, parser.isDoVerboseBuild());
             if (suggestedClassName == null) showError(_("Error while verifying"), _("An error occurred while verifying the sketch"), null);
+            showMessage(_("Done compiling"), _("Done compiling"));
           } catch (Exception e) {
             showError(_("Error while verifying"), _("An error occurred while verifying the sketch"), e);
           }
@@ -667,6 +670,9 @@ public class BaseNoGui {
   }
 
   static public void main(String args[]) throws Exception {
+    if (args.length == 0)
+      showError(_("No parameters"), _("No command line parameters found"), null);
+
     initPlatform();
     
     initPortableFolder();
@@ -932,6 +938,10 @@ public class BaseNoGui {
       PreferencesData.set("serial.port.file", port.substring(5));
     else
       PreferencesData.set("serial.port.file", port);
+  }
+
+  public static void setBuildFolder(File newBuildFolder) {
+    buildFolder = newBuildFolder;
   }
 
   static public void showError(String title, String message, int exit_code) {
