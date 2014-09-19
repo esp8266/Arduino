@@ -186,7 +186,7 @@ mega.build.board=AVR_MEGA2560
 mega.menu.cpu.atmega2560=ATmega2560 (Mega 2560)
 
 mega.menu.cpu.atmega2560.upload.protocol=wiring
-mega.menu.cpu.atmega2560.upload.maximum_size=258048
+mega.menu.cpu.atmega2560.upload.maximum_size=253952
 mega.menu.cpu.atmega2560.upload.speed=115200
 
 mega.menu.cpu.atmega2560.bootloader.high_fuses=0xD8
@@ -222,7 +222,7 @@ megaADK.pid.1=0x0044
 
 megaADK.upload.tool=avrdude
 megaADK.upload.protocol=wiring
-megaADK.upload.maximum_size=258048
+megaADK.upload.maximum_size=253952
 megaADK.upload.maximum_data_size=8192
 megaADK.upload.speed=115200
 
