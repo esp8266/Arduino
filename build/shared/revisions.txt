@@ -17,8 +17,9 @@ ARDUINO 1.5.8 BETA - not yet released
 * Correct implementation of gcc specific internal functions (__cxa_guard_*) (Alexey Guseynov)
 * Fix for upload problems on Leonardo (and derivative boards based on mega32u4)
 * Small improvements on String class (Matthijs Kooijman)
+* Fixed size of available flash for mega2560 boards (Leonardo Milani, Arnav Gupta)
 
-The following changes are included also in the (not yet released) Arduino IDE 1.0.6:
+The following changes are included also in the Arduino IDE 1.0.6:
 
 [core]
 * avr: Added replacement stub for cstdlib atexit() funciton (Christopher Andrews)
@@ -64,7 +65,7 @@ ARDUINO 1.5.7 BETA - 2014.07.07
 * Updates/Fix to various examples
 * Added Wire.setClock(..) method (Kristian Sloth Lauszus)
 
-The following changes are included also in the (not yet released) Arduino IDE 1.0.6:
+The following changes are included also in the Arduino IDE 1.0.6:
 
 [core]
 * avr: Improved USB-CDC write speed (Justin Rajewski)
