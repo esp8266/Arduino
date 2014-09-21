@@ -61,12 +61,28 @@ extern "C"{
 
 #define digitalPinToPort(P)        ( g_APinDescription[P].pPort )
 #define digitalPinToBitMask(P)     ( g_APinDescription[P].ulPin )
-#define digitalPinToTimer(P)       (  )
 //#define analogInPinToBit(P)        ( )
 #define portOutputRegister(port)   ( &(port->PIO_ODSR) )
 #define portInputRegister(port)    ( &(port->PIO_PDSR) )
-//#define portModeRegister(P)        (  )
 #define digitalPinHasPWM(P)        ( g_APinDescription[P].ulPWMChannel != NOT_ON_PWM || g_APinDescription[P].ulTCChannel != NOT_ON_TIMER )
+
+/*
+ * portModeRegister(..) should return a register to set pin mode
+ * INPUT or OUTPUT by setting the corresponding bit to 0 or 1.
+ * Unfortunately on SAM architecture the PIO_OSR register is
+ * read-only and can be set only through the enable/disable registers
+ * pair PIO_OER/PIO_ODR.
+ */
+// #define portModeRegister(port)   ( &(port->PIO_OSR) )
+
+/*
+ * digitalPinToTimer(..) is AVR-specific and is not defined for SAM
+ * architecture. If you need to check if a pin supports PWM you must
+ * use digitalPinHasPWM(..).
+ *
+ * https://github.com/arduino/Arduino/issues/1833
+ */
+// #define digitalPinToTimer(P)
 
 // Interrupts
 #define digitalPinToInterrupt(p)  ((p) < NUM_DIGITAL_PINS ? (p) : -1)
