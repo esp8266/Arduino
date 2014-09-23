@@ -677,9 +677,7 @@ public class BaseNoGui {
     
     initPortableFolder();
     
-    PreferencesData.init(null);
-    
-    prescanParameters(args);
+    initParameters(args);
     
     init(args);
   }
@@ -744,7 +742,7 @@ public class BaseNoGui {
     }
   }
 
-  static public void prescanParameters(String args[]) {
+  static public void initParameters(String args[]) {
     String preferencesFile = null;
 
     // Do a first pass over the commandline arguments, the rest of them

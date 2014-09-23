@@ -101,7 +101,7 @@ public class Base {
 
     BaseNoGui.initPortableFolder();
 
-    BaseNoGui.prescanParameters(args);
+    BaseNoGui.initParameters(args);
     
     BaseNoGui.initVersion();
     VERSION_NAME = BaseNoGui.VERSION_NAME;
