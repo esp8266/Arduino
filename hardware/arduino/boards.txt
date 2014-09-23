@@ -107,7 +107,7 @@ nano.build.variant=eightanaloginputs
 mega2560.name=Arduino Mega 2560 or Mega ADK
 
 mega2560.upload.protocol=wiring
-mega2560.upload.maximum_size=258048
+mega2560.upload.maximum_size=253952
 mega2560.upload.speed=115200
 
 mega2560.bootloader.low_fuses=0xFF
