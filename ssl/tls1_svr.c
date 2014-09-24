@@ -198,13 +198,13 @@ int process_sslv23_client_hello(SSL *ssl)
 
     DISPLAY_BYTES(ssl, "received %d bytes", buf, read_len, read_len);
     
-    add_packet(ssl, buf, read_len);
-
     /* connection has gone, so die */
-    if (bytes_needed < 0)
+    if (read_len < 0)
     {
         return SSL_ERROR_CONN_LOST;
     }
+
+    add_packet(ssl, buf, read_len);
 
     /* now work out what cipher suite we are going to use */
     for (j = 0; j < NUM_PROTOCOLS; j++)
