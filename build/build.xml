@@ -39,6 +39,7 @@
 
   <!-- Libraries required for running arduino -->
   <fileset dir=".." id="runtime.jars">
+    <include name="arduino-core/arduino-core.jar" />
     <include name="app/pde.jar" />
     <include name="app/lib/commons-codec-1.7.jar" />
     <include name="app/lib/commons-exec-1.1.jar" />
@@ -83,10 +84,12 @@
   <!-- - - - - - - - - - - - - - - - - - -->
 
   <target name="subprojects-clean">
+    <subant buildpath="../arduino-core" target="clean"/>
     <subant buildpath="../app" target="clean"/>
   </target>
 
   <target name="subprojects-build">
+    <subant buildpath="../arduino-core" target="build"/>
     <subant buildpath="../app" target="build"/>
   </target>
 
@@ -160,7 +163,7 @@
     <echo message="Latest revision detected in shared/revision.txt is: ${revision}" />
 
     <!-- figure out the revision number in base.java -->
-    <loadfile srcfile="../app/src/processing/app/Base.java"
+    <loadfile srcfile="../arduino-core/src/processing/app/BaseNoGui.java"
 	      property="revision.base">
       <filterchain>
         <tokenfilter>
@@ -170,7 +173,7 @@
         </tokenfilter>
       </filterchain>
     </loadfile>
-    <echo message="Revision in Base.java is: ${revision.base}" />
+    <echo message="Revision in BaseNoGui.java is: ${revision.base}" />
   </target>
 
   <!-- - - - - - - - -->

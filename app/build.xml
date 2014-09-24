@@ -6,7 +6,7 @@
       <include name="*.jar"/>
     </fileset>
     <pathelement path="${env.JAVA_HOME}/lib/tools.jar"/>
-    <pathelement path="../core/core.jar"/>
+    <pathelement path="../arduino-core/arduino-core.jar"/>
   </path>
 
   <path id="class.path.test">
@@ -24,6 +24,11 @@
   </target>
 
   <target name="compile" description="Compile sources">
+    <condition property="core-built">
+      <available file="../arduino-core/arduino-core.jar" />
+    </condition>
+    <fail unless="core-built" message="Please build the Arduino-core library first and make sure it sits in ../arduino-core/arduino-core.jar" />
+
     <mkdir dir="bin" />
 
     <!-- ant seems to nuke ${java.home} for some reason, pointing at the JRE
@@ -75,9 +80,6 @@
 	   includeAntRuntime="false"
 	   debug="true"
 	   classpathref="class.path" />
-    <copy todir="bin" overwrite="true" verbose="true">
-      <fileset dir="src" includes="**/*.properties" />
-    </copy>
   </target>
 
   <target name="test" depends="compile" description="Runs the test">
