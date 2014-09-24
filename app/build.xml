@@ -24,11 +24,6 @@
   </target>
 
   <target name="compile" description="Compile sources">
-    <condition property="core-built">
-      <available file="../core/core.jar" />
-    </condition>
-    <fail unless="core-built" message="Please build the core library first and make sure it sits in ../core/core.jar" />
-
     <mkdir dir="bin" />
 
     <!-- ant seems to nuke ${java.home} for some reason, pointing at the JRE

@@ -39,7 +39,6 @@
 
   <!-- Libraries required for running arduino -->
   <fileset dir=".." id="runtime.jars">
-    <include name="core/core.jar" />
     <include name="app/pde.jar" />
     <include name="app/lib/commons-codec-1.7.jar" />
     <include name="app/lib/commons-exec-1.1.jar" />
@@ -84,12 +83,10 @@
   <!-- - - - - - - - - - - - - - - - - - -->
 
   <target name="subprojects-clean">
-    <subant buildpath="../core" target="clean"/>
     <subant buildpath="../app" target="clean"/>
   </target>
 
   <target name="subprojects-build">
-    <subant buildpath="../core" target="build"/>
     <subant buildpath="../app" target="build"/>
   </target>
 
