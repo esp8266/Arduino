@@ -26,9 +26,9 @@ byte mac[] = {
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
 };
 
-unsigned int localPort = 8888;      // local port to listen for UDP packets
+unsigned int localPort = 8888;       // local port to listen for UDP packets
 
-IPAddress timeServer(192, 43, 244, 18); // time.nist.gov NTP server
+char timeServer[] = "time.nist.gov"; // time.nist.gov NTP server
 
 const int NTP_PACKET_SIZE = 48; // NTP time stamp is in the first 48 bytes of the message
 
@@ -108,7 +108,7 @@ void loop()
 }
 
 // send an NTP request to the time server at the given address
-unsigned long sendNTPpacket(IPAddress& address)
+unsigned long sendNTPpacket(char* address)
 {
   // set all bytes in the buffer to 0
   memset(packetBuffer, 0, NTP_PACKET_SIZE);
