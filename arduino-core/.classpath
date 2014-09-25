@@ -8,5 +8,6 @@
 	<classpathentry kind="lib" path="lib/jmdns-3.4.1.jar"/>
 	<classpathentry kind="lib" path="lib/jssc-2.8.0.jar"/>
 	<classpathentry kind="lib" path="lib/jsch-0.1.50.jar"/>
+	<classpathentry kind="lib" path="lib/commons-exec-1.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
