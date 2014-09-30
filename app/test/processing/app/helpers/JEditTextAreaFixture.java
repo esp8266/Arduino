@@ -2,7 +2,6 @@ package processing.app.helpers;
 
 import org.fest.swing.core.Robot;
 import org.fest.swing.fixture.ComponentFixture;
-
 import processing.app.syntax.JEditTextArea;
 
 public class JEditTextAreaFixture extends ComponentFixture {
@@ -41,5 +40,13 @@ public class JEditTextAreaFixture extends ComponentFixture {
   public JEditTextAreaFixture selectAll() {
     driver.selectAll((JEditTextArea) target);
     return this;
+  }
+
+  public int getCaretPosition() {
+    return driver.getCaretPosition((JEditTextArea) target);
+  }
+
+  public void setCaretPosition(int caretPosition) {
+    driver.setCaretPosition((JEditTextArea) target, caretPosition);
   }
 }

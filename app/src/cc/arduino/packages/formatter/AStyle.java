@@ -3,6 +3,7 @@ package cc.arduino.packages.formatter;
 import processing.app.Base;
 import processing.app.Editor;
 import processing.app.helpers.FileUtils;
+import processing.app.syntax.JEditTextArea;
 import processing.app.tools.Tool;
 
 import java.io.File;
@@ -54,8 +55,13 @@ public class AStyle implements Tool {
       return;
     }
 
+    JEditTextArea textArea = editor.getTextArea();
+    int line = textArea.getLineOfOffset(textArea.getCaretPosition());
+    int lineOffset = textArea.getCaretPosition() - textArea.getLineStartOffset(line);
+
     editor.setText(formattedText);
     editor.getSketch().setModified(true);
+    textArea.setCaretPosition(Math.min(textArea.getLineStartOffset(line) + lineOffset, textArea.getSafeLineStopOffset(line) - 1));
     // mark as finished
     editor.statusNotice(_("Auto Format finished."));
   }

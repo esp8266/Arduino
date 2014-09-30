@@ -51,4 +51,29 @@ public class JEditTextAreaComponentDriver extends JComponentDriver {
 
     });
   }
+
+  public Integer getCaretPosition(final JEditTextArea target) {
+    focusAndWaitForFocusGain(target);
+    return GuiActionRunner.execute(new GuiQuery<Integer>() {
+
+      protected Integer executeInEDT() {
+        return target.getCaretPosition();
+      }
+
+    });
+  }
+
+  public void setCaretPosition(final JEditTextArea target, final int caretPosition) {
+    focusAndWaitForFocusGain(target);
+    GuiActionRunner.execute(new GuiQuery<JEditTextArea>() {
+
+      protected JEditTextArea executeInEDT() {
+        target.setCaretPosition(caretPosition);
+        return target;
+      }
+
+    });
+    robot.waitForIdle();
+  }
+
 }
