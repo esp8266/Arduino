@@ -65,7 +65,7 @@ void loop() {
       Keyboard.press(KEY_DELETE);
       delay(100);
       Keyboard.releaseAll();
-      //ALT-s:
+      //ALT-l:
       delay(2000);
       Keyboard.press(KEY_LEFT_ALT);
       Keyboard.press('l');

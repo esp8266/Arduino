@@ -1,9 +1,10 @@
-ARDUINO 1.5.8 BETA - not yet released
+ARDUINO 1.5.8 BETA - 2014.10.01
 
 [ide]
 * Find/Replace over multiple tabs (Erwin Ried, Fulvio Ieva)
 * Fix wrong "Replace" behavior with empty "Find" field (Fulvio Ieva)
 * A lot of command-line improvements (Matthijs Kooijman)
+* Cursor is not moved when invoking autoformat
 
 [libraries]
 * SPI: added transaction API (Paul Stoffregen)
@@ -11,6 +12,7 @@ ARDUINO 1.5.8 BETA - not yet released
   https://groups.google.com/a/arduino.cc/forum/#!msg/developers/TuZLfjeZjDI/6deNjw3Y9m4J
 * FileIO bridge: fixed wrong return value in File::size() for size >32768
 * Updated Temboo to latest version
+* Updates/Fix to various examples
 
 [core]
 * sam: "new" and "delete" do not bring in 50Kb of stdclib anymore
@@ -18,6 +20,7 @@ ARDUINO 1.5.8 BETA - not yet released
 * Fix for upload problems on Leonardo (and derivative boards based on mega32u4)
 * Small improvements on String class (Matthijs Kooijman)
 * Fixed size of available flash for mega2560 boards (Leonardo Milani, Arnav Gupta)
+* sam: removed useless empty digitalPinToTimer(..) macro stub (Bill Perry)
 
 The following changes are included also in the Arduino IDE 1.0.6:
 
