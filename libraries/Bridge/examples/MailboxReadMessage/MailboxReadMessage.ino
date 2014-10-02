@@ -1,8 +1,8 @@
 /*
   Read Messages from the Mailbox
 
- This example for the Arduino Yún sdemonstrate how to
- read the messages queue, called Mailbox using the
+ This example for the Arduino Yún shows how to
+ read the messages queue, called Mailbox, using the
  Bridge library.
  The messages can be sent to the queue through REST calls.
  Appen the message in the URL after the keyword "/mailbox".
