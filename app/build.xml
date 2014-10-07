@@ -54,25 +54,16 @@
     <condition property="java.additional.library.path" value=".">
       <os family="mac"/>
     </condition>
-    <condition property="java.additional.jvmargs" value="-d32">
-      <os family="mac"/>
-    </condition>
     <condition property="work.dir" value="../build/windows/work/">
       <os family="windows"/>
     </condition>
     <condition property="java.additional.library.path" value=".">
       <os family="windows"/>
     </condition>
-    <condition property="java.additional.jvmargs" value="-Ddummy=0">
-      <os family="windows"/>
-    </condition>
     <condition property="work.dir" value="../build/linux/work/">
       <os family="unix"/>
     </condition>
     <condition property="java.additional.library.path" value="lib">
-      <os family="unix"/>
-    </condition>
-    <condition property="java.additional.jvmargs" value="-Ddummy=0">
       <os family="unix"/>
     </condition>
 
@@ -115,7 +106,6 @@
 
     <junit printsummary="yes" dir="${work.dir}" fork="true">
       <jvmarg value="-Djava.library.path=${java.additional.library.path}"/>
-      <jvmarg value="${java.additional.jvmargs}"/>
       <classpath>
         <pathelement location="bin"/>
         <pathelement location="test-bin"/>
