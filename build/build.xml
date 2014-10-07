@@ -265,8 +265,8 @@
       <fileset dir="macosx/work/${staging_hardware_folder}/tools" includes="**/man"/>
     </delete>
 
-    <get src="http://downloads.arduino.cc/libastylej-2.03.zip" dest="macosx" usetimestamp="true" skipexisting="true"/>
-    <unzip src="macosx/libastylej-2.03.zip" dest="macosx" overwrite="true"/>
+    <get src="http://downloads.arduino.cc/libastylej-2.04.zip" dest="macosx" usetimestamp="true" skipexisting="true"/>
+    <unzip src="macosx/libastylej-2.04.zip" dest="macosx" overwrite="true"/>
     <copy file="macosx/libastylej/libastylej.jnilib" todir="macosx/work/Arduino.app/Contents/Resources/Java/lib/" />
     <chmod perm="755" file="macosx/work/Arduino.app/Contents/Resources/Java/lib/libastylej.jnilib" />
   </target>
@@ -480,8 +480,8 @@
     <copy todir="linux/work" file="linux/dist/arduino" />
     <chmod perm="755" file="linux/work/arduino" />
 
-    <get src="http://downloads.arduino.cc/libastylej-2.03.zip" dest="linux" usetimestamp="true" skipexisting="true" />
-    <unzip src="linux/libastylej-2.03.zip" dest="linux" overwrite="true"/>
+    <get src="http://downloads.arduino.cc/libastylej-2.04.zip" dest="linux" usetimestamp="true" skipexisting="true" />
+    <unzip src="linux/libastylej-2.04.zip" dest="linux" overwrite="true"/>
     <copy file="linux/libastylej/libastylej${arch-bits}.so" tofile="linux/work/lib/libastylej.so" />
     <chmod perm="755" file="linux/work/lib/libastylej.so" />
   </target>
@@ -741,8 +741,8 @@
       <param name="file_arch" value="win32" />
     </antcall>
 
-    <get src="http://downloads.arduino.cc/libastylej-2.03.zip" dest="windows" usetimestamp="true" skipexisting="true" />
-    <unzip src="windows/libastylej-2.03.zip" dest="windows" overwrite="true"/>
+    <get src="http://downloads.arduino.cc/libastylej-2.04.zip" dest="windows" usetimestamp="true" skipexisting="true" />
+    <unzip src="windows/libastylej-2.04.zip" dest="windows" overwrite="true"/>
     <copy file="windows/libastylej/AStylej.dll" todir="windows/work/lib" />
 
     <!-- Copy bossac.exe tool -->
