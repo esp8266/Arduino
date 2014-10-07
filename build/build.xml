@@ -265,8 +265,7 @@
       <fileset dir="macosx/work/${staging_hardware_folder}/tools" includes="**/man"/>
     </delete>
 
-    <get src="http://downloads.arduino.cc/libastylej-2.04.zip" dest="macosx" usetimestamp="true" skipexisting="true"/>
-    <unzip src="macosx/libastylej-2.04.zip" dest="macosx" overwrite="true"/>
+    <antcall target="unzip-libastyle" />
     <copy file="macosx/libastylej/libastylej.jnilib" todir="macosx/work/Arduino.app/Contents/Resources/Java/lib/" />
     <chmod perm="755" file="macosx/work/Arduino.app/Contents/Resources/Java/lib/libastylej.jnilib" />
   </target>
@@ -480,8 +479,7 @@
     <copy todir="linux/work" file="linux/dist/arduino" />
     <chmod perm="755" file="linux/work/arduino" />
 
-    <get src="http://downloads.arduino.cc/libastylej-2.04.zip" dest="linux" usetimestamp="true" skipexisting="true" />
-    <unzip src="linux/libastylej-2.04.zip" dest="linux" overwrite="true"/>
+    <antcall target="unzip-libastyle" />
     <copy file="linux/libastylej/libastylej${arch-bits}.so" tofile="linux/work/lib/libastylej.so" />
     <chmod perm="755" file="linux/work/lib/libastylej.so" />
   </target>
@@ -545,7 +543,21 @@
     </exec>
   </target>
 
+  <target name="unzip-libastyle">
+    <get src="http://downloads.arduino.cc/libastylej-2.04.zip" dest="." usetimestamp="true" ignoreerrors="true" verbose="true" />
 
+    <checksum file="libastylej-2.04.zip" algorithm="sha" fileext=".sha" verifyproperty="checksum.matches"/>
+    <condition property="checksum.matches.fail">
+      <equals arg1="${checksum.matches}" arg2="false"/>
+    </condition>
+    <fail if="checksum.matches.fail">Checksum failed.
+
+      File libastylej-2.04.zip failed checksum.
+      Please remove "libastylej-2.04.zip" and download it again.
+    </fail>
+
+    <unzip src="libastylej-2.04.zip" dest="${staging_folder}" overwrite="true"/>
+  </target>
 
   <!-- Set '${dist_file}_available' property if toolchain dist_file is downloaded              -->
   <!-- Set '${dist_file}_installed' property if toolchain is installed in working directory    -->
@@ -741,8 +753,7 @@
       <param name="file_arch" value="win32" />
     </antcall>
 
-    <get src="http://downloads.arduino.cc/libastylej-2.04.zip" dest="windows" usetimestamp="true" skipexisting="true" />
-    <unzip src="windows/libastylej-2.04.zip" dest="windows" overwrite="true"/>
+    <antcall target="unzip-libastyle" />
     <copy file="windows/libastylej/AStylej.dll" todir="windows/work/lib" />
 
     <!-- Copy bossac.exe tool -->
