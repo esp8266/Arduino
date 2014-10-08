@@ -252,7 +252,7 @@
       <param name="target.path" value="macosx/work/Arduino.app/Contents/Resources/Java" />
     </antcall>
 
-    <antcall target="unzip-tool">
+    <antcall target="untar-tool">
       <param name="dist_file" value="gcc-arm-none-eabi-4.8.3-2014q1-mac.tar.gz" />
       <param name="dist_url" value="http://downloads.arduino.cc/gcc-arm-none-eabi-4.8.3-2014q1-mac.tar.gz" />
       <param name="dist_check_file" value="gcc-arm-none-eabi-4.8.3-2014q1" />
@@ -486,7 +486,7 @@
 
   <target name="linux32-build" depends="linux-build" description="Build linux (32-bit) version">
     <!-- Unzip ARM tools -->
-    <antcall target="unzip-tool">
+    <antcall target="untar-tool">
       <param name="dist_file" value="gcc-arm-none-eabi-4.8.3-2014q1-linux32.tar.gz" />
       <param name="dist_url" value="http://downloads.arduino.cc/gcc-arm-none-eabi-4.8.3-2014q1-linux32.tar.gz" />
       <param name="dist_check_file" value="gcc-arm-none-eabi-4.8.3-2014q1" />
@@ -500,7 +500,7 @@
 
   <target name="linux64-build" depends="linux-build" description="Build linux (64-bit) version">
     <!-- Unzip ARM tools -->
-    <antcall target="unzip-tool">
+    <antcall target="untar-tool">
       <param name="dist_file" value="gcc-arm-none-eabi-4.8.3-2014q1-linux64.tar.gz" />
       <param name="dist_url" value="http://downloads.arduino.cc/gcc-arm-none-eabi-4.8.3-2014q1-linux64.tar.gz" />
       <param name="dist_check_file" value="gcc-arm-none-eabi-4.8.3-2014q1" />
@@ -573,7 +573,7 @@
   </target>
 
   <!-- Ensure that the tool is downloaded and test checksums, if everything's ok unzip it on the tools folder  -->
-  <target name="unzip-tool" depends="get-tool, check-tool" unless="${dist_file}_installed">
+  <target name="untar-tool" depends="get-tool, check-tool" unless="${dist_file}_installed">
     <echo>Testing checksum of "${staging_folder}/dist/${dist_file}"</echo>
     <checksum file="${staging_folder}/dist/${dist_file}" algorithm="sha" fileext=".sha" verifyproperty="checksum.matches"/>
     <condition property="checksum.matches.fail">
@@ -771,7 +771,7 @@
     </chmod>
 
     <!-- Unzip ARM toolchain -->
-    <antcall target="unzip-tool">
+    <antcall target="untar-tool">
       <param name="dist_file" value="gcc-arm-none-eabi-4.8.3-2014q1-windows.tar.gz" />
       <param name="dist_url" value="http://downloads.arduino.cc/gcc-arm-none-eabi-4.8.3-2014q1-windows.tar.gz" />
       <param name="dist_check_file" value="gcc-arm-none-eabi-4.8.3-2014q1" />
