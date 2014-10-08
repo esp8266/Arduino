@@ -569,7 +569,7 @@
   <target name="untar" depends="untar-unzip-checksum" unless="${archive_file}_installed">
     <echo>Unzipping into folder ${dest_folder}</echo>
     <exec executable="tar">
-      <arg value="xfz"/>
+      <arg value="xf"/>
       <arg value="${archive_file}"/>
       <arg value="--directory=${dest_folder}"/>
     </exec>
@@ -617,7 +617,6 @@
     <move file="linux/work" tofile="linux/arduino-${version}" />
 
     <exec executable="tar" dir="linux">
-      <arg value="-z"/>
       <arg value="-c"/>
       <arg value="-f"/>
       <arg value="arduino-${version}-${platform}.tgz"/>
@@ -674,7 +673,7 @@
     <get src="http://switch.dl.sourceforge.net/project/launch4j/launch4j-3/3.0.2/launch4j-3.0.2-linux.tgz" dest="windows" usetimestamp="true" skipexisting="true" verbose="true" />
 
     <exec executable="tar" dir="windows/launcher">
-      <arg value="-xzf"/>
+      <arg value="-xf"/>
       <arg value="../launch4j-3.0.2-linux.tgz"/>
     </exec>
   </target>
