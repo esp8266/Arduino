@@ -436,7 +436,7 @@ msgstr ""
 #: Theme.java:52
 msgid ""
 "Could not read color theme settings.\n"
-"You'll need to reinstall Processing."
+"You'll need to reinstall Arduino."
 msgstr ""
 
 #: Preferences.java:219
@@ -1142,9 +1142,9 @@ msgstr ""
 
 #: Editor.java:2137
 msgid ""
-"Processing can only open its own sketches\n"
+"Arduino can only open its own sketches\n"
 "and other files ending in .ino or .pde"
-msgstr "Processing només pot obrir els seus propis sketches\ni altres fitxers acabats en .ino o .pde"
+msgstr "Arduino només pot obrir els seus propis sketches\ni altres fitxers acabats en .ino o .pde"
 
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
@@ -1713,10 +1713,10 @@ msgstr "\".{0}\" no és una extensió vàlida."
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Processing,you may need to use Tools -> Fix Encoding & "
+"older version of Arduino,you may need to use Tools -> Fix Encoding & "
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
-msgstr "\"{0}\" conté caràcters desconeguts. Si aquest codi va ser creat amb una versió antiga de Processing, podria utilitzar el menú Eines > Arregla la codificació i recarrega per actualitzar el sketch per tal d’usar una codificació UTF-8. Si no, haurà de suprimir els caràcters incorrectes per desfer-se del avis."
+msgstr "\"{0}\" conté caràcters desconeguts. Si aquest codi va ser creat amb una versió antiga de Arduino, podria utilitzar el menú Eines > Arregla la codificació i recarrega per actualitzar el sketch per tal d’usar una codificació UTF-8. Si no, haurà de suprimir els caràcters incorrectes per desfer-se del avis."
 
 #: debug/Compiler.java:409
 msgid ""

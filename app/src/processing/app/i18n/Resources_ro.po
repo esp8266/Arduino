@@ -438,7 +438,7 @@ msgstr "Nu am putut re-salva schiţa."
 #: Theme.java:52
 msgid ""
 "Could not read color theme settings.\n"
-"You'll need to reinstall Processing."
+"You'll need to reinstall Arduino."
 msgstr "Nu pot citi setările culorilor pentru tema.\nEste necesara reinstalarea aplicaţiei."
 
 #: Preferences.java:219
@@ -1144,7 +1144,7 @@ msgstr "Problemă la redenumire"
 
 #: Editor.java:2137
 msgid ""
-"Processing can only open its own sketches\n"
+"Arduino can only open its own sketches\n"
 "and other files ending in .ino or .pde"
 msgstr "Se pot deschide doar propriile schiţe\nsau alte fişiere cu extensia .ino sau .pde"
 
@@ -1715,7 +1715,7 @@ msgstr "\".{0}\" nu este o extensie acceptata."
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Processing,you may need to use Tools -> Fix Encoding & "
+"older version of Arduino,you may need to use Tools -> Fix Encoding & "
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
 msgstr "\"{0}\" conţine caractere necunoscute. Dacă acest cod a fost realizat într-o versiune mai veche, încearcă sa foloseşti Instrumente-> Corectare codare & reiniţializează pentru a modifica schiţa şi a folosi codarea UTF-8. În caz contrar e nevoie să ştergi caracterele necunoscute pentru a înlătura acest avertisment."

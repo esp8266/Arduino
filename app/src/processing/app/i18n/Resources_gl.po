@@ -435,8 +435,8 @@ msgstr "Non foi posíbel gardar de novo o sketch"
 #: Theme.java:52
 msgid ""
 "Could not read color theme settings.\n"
-"You'll need to reinstall Processing."
-msgstr "Non se pode ler a configuración do esquema de cor.\nNecesitarás volver a instalar Processing."
+"You'll need to reinstall Arduino."
+msgstr "Non se pode ler a configuración do esquema de cor.\nNecesitarás volver a instalar Arduino."
 
 #: Preferences.java:219
 msgid ""
@@ -1141,9 +1141,9 @@ msgstr "Problema ao cambiar o nome"
 
 #: Editor.java:2137
 msgid ""
-"Processing can only open its own sketches\n"
+"Arduino can only open its own sketches\n"
 "and other files ending in .ino or .pde"
-msgstr "Processing só pode abrir os seus propios sketches\ne outros ficheiros rematados en .ino ou .pde"
+msgstr "Arduino só pode abrir os seus propios sketches\ne outros ficheiros rematados en .ino ou .pde"
 
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
@@ -1712,10 +1712,10 @@ msgstr "«.{0}» non é unha extensión válida."
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Processing,you may need to use Tools -> Fix Encoding & "
+"older version of Arduino,you may need to use Tools -> Fix Encoding & "
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
-msgstr "«{0}» contén caracteres irrecoñecíbeis. Se este código foi creado cunha versión antiga de Processing poida que necesites usar Utilidades -> Corrixir a codificación e recargar para actualizar o sketch para usar a codificación UTF-8. Senón, poida que necesites borrar os caracteres erróneos para desfacerte deste aviso."
+msgstr "«{0}» contén caracteres irrecoñecíbeis. Se este código foi creado cunha versión antiga de Arduino poida que necesites usar Utilidades -> Corrixir a codificación e recargar para actualizar o sketch para usar a codificación UTF-8. Senón, poida que necesites borrar os caracteres erróneos para desfacerte deste aviso."
 
 #: debug/Compiler.java:409
 msgid ""

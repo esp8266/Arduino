@@ -436,7 +436,7 @@ msgstr "Der Sketch konnte nicht neu gespeichert werden"
 #: Theme.java:52
 msgid ""
 "Could not read color theme settings.\n"
-"You'll need to reinstall Processing."
+"You'll need to reinstall Arduino."
 msgstr "Die Einstellungen für das Farbschema konnten nicht gelesen werden.\nArduino muss neu installiert werden."
 
 #: Preferences.java:219
@@ -1142,7 +1142,7 @@ msgstr "Problem beim Umbenennen"
 
 #: Editor.java:2137
 msgid ""
-"Processing can only open its own sketches\n"
+"Arduino can only open its own sketches\n"
 "and other files ending in .ino or .pde"
 msgstr "Arduino kann nur seine eigenen Dateien öffnen,\nsowie Dateien mit der Endung .ino oder .pde"
 
@@ -1713,7 +1713,7 @@ msgstr "\".{0}\" ist keine zulässige Dateiendung"
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Processing,you may need to use Tools -> Fix Encoding & "
+"older version of Arduino,you may need to use Tools -> Fix Encoding & "
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
 msgstr "\"{0}\" enthält unzulässige Zeichen. Wenn dieser Code mit einer älteren Version\nvon Arduino erstellt wurde, können Sie den Sketch über Werkzeuge -> Kodierung korrigieren\n& neu laden auf UTF-8-Kodierung umstellen.\nWenn das nicht funktioniert, müssen Sie die unzulässigen Zeichen von Hand löschen,\num diese Warnung abzuschalten."

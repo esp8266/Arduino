@@ -442,8 +442,8 @@ msgstr "Não foi possível voltar a guardar o rascunho"
 #: Theme.java:52
 msgid ""
 "Could not read color theme settings.\n"
-"You'll need to reinstall Processing."
-msgstr "Não foi possível ler as definições de tema de cor.\nTerá de reinstalar o Processing."
+"You'll need to reinstall Arduino."
+msgstr "Não foi possível ler as definições de tema de cor.\nTerá de reinstalar o Arduino."
 
 #: Preferences.java:219
 msgid ""
@@ -1148,9 +1148,9 @@ msgstr "Problema com a mudança de nome"
 
 #: Editor.java:2137
 msgid ""
-"Processing can only open its own sketches\n"
+"Arduino can only open its own sketches\n"
 "and other files ending in .ino or .pde"
-msgstr "O Processing só consegue abrir os seus próprios rascunhos\ne outros ficheiros com extensão  .ino ou .pde"
+msgstr "O Arduino só consegue abrir os seus próprios rascunhos\ne outros ficheiros com extensão  .ino ou .pde"
 
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
@@ -1719,10 +1719,10 @@ msgstr "\".{0}\" não é uma extensão válida."
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Processing,you may need to use Tools -> Fix Encoding & "
+"older version of Arduino,you may need to use Tools -> Fix Encoding & "
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
-msgstr "\"{0}\" contém caracteres desconhecidos. Se este código tiver sido criado com uma versão mais antiga do Processing, poderá ser necessário usar \"Ferramentas -> Corrigir Codificação e Recarregar para atualizar o rascunho para UTF-8. Caso contrário, terá que eliminar os caracteres desconhecidos para deixar de ver este aviso."
+msgstr "\"{0}\" contém caracteres desconhecidos. Se este código tiver sido criado com uma versão mais antiga do Arduino, poderá ser necessário usar \"Ferramentas -> Corrigir Codificação e Recarregar para atualizar o rascunho para UTF-8. Caso contrário, terá que eliminar os caracteres desconhecidos para deixar de ver este aviso."
 
 #: debug/Compiler.java:409
 msgid ""

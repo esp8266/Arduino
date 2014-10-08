@@ -442,8 +442,8 @@ msgstr "Impossible de réenregistrer le croquis"
 #: Theme.java:52
 msgid ""
 "Could not read color theme settings.\n"
-"You'll need to reinstall Processing."
-msgstr "Impossible de lire les paramètres du thème de couleurs.\nVous devrez réinstaller Processing."
+"You'll need to reinstall Arduino."
+msgstr "Impossible de lire les paramètres du thème de couleurs.\nVous devrez réinstaller Arduino."
 
 #: Preferences.java:219
 msgid ""
@@ -1148,9 +1148,9 @@ msgstr "Problème lors du renommage"
 
 #: Editor.java:2137
 msgid ""
-"Processing can only open its own sketches\n"
+"Arduino can only open its own sketches\n"
 "and other files ending in .ino or .pde"
-msgstr "Processing ne peut ouvrir que ses propres croquis\nou les fichiers se terminant par .ino ou .pde"
+msgstr "Arduino ne peut ouvrir que ses propres croquis\nou les fichiers se terminant par .ino ou .pde"
 
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
@@ -1719,10 +1719,10 @@ msgstr "« .{0} » n''est pas une extension valide."
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Processing,you may need to use Tools -> Fix Encoding & "
+"older version of Arduino,you may need to use Tools -> Fix Encoding & "
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
-msgstr "« {0} » contient des caractères non reconnus. Si le code a été créé avec une vieille version de Processing, vous pouvez utiliser « Outils -> Réparer encodage & recharger » pour mettre le croquis à jour en UTF-8. Sinon, vous devrez supprimer les caractères invalides pour supprimer cet avertissement."
+msgstr "« {0} » contient des caractères non reconnus. Si le code a été créé avec une vieille version de Arduino, vous pouvez utiliser « Outils -> Réparer encodage & recharger » pour mettre le croquis à jour en UTF-8. Sinon, vous devrez supprimer les caractères invalides pour supprimer cet avertissement."
 
 #: debug/Compiler.java:409
 msgid ""

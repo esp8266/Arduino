@@ -435,7 +435,7 @@ msgstr "Nie można ponownie zapisać szkicu"
 #: Theme.java:52
 msgid ""
 "Could not read color theme settings.\n"
-"You'll need to reinstall Processing."
+"You'll need to reinstall Arduino."
 msgstr "Nie można odczytać ustawień tematu kolorów.\nMusisz przeinstalować Procesowanie."
 
 #: Preferences.java:219
@@ -1141,7 +1141,7 @@ msgstr "Problem z zmianą nazwy"
 
 #: Editor.java:2137
 msgid ""
-"Processing can only open its own sketches\n"
+"Arduino can only open its own sketches\n"
 "and other files ending in .ino or .pde"
 msgstr "Procesowanie może otwierać tylko własne szkice\ni inne pliki kończące się na .ino lub .pde"
 
@@ -1712,7 +1712,7 @@ msgstr "\".{0}\" nie jest poprawnym rozszerzeniem."
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Processing,you may need to use Tools -> Fix Encoding & "
+"older version of Arduino,you may need to use Tools -> Fix Encoding & "
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
 msgstr "\"{0}\" zawiera nierozpoznany symbol. Jeśli kod był stworzony w starszej wersji programu, musisz użyć Narzędzia > Napraw kodowanie i Wgraj ponownie w celu aktualizacji szkicu do kodowania UTF-8. Jeśli nie, musisz usunąć zły symbol żeby pozbyć się ostrzeżenia. "

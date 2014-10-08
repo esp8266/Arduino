@@ -435,7 +435,7 @@ msgstr "不能重新保存 sketch"
 #: Theme.java:52
 msgid ""
 "Could not read color theme settings.\n"
-"You'll need to reinstall Processing."
+"You'll need to reinstall Arduino."
 msgstr ""
 
 #: Preferences.java:219
@@ -1141,7 +1141,7 @@ msgstr "重命名时出现问题"
 
 #: Editor.java:2137
 msgid ""
-"Processing can only open its own sketches\n"
+"Arduino can only open its own sketches\n"
 "and other files ending in .ino or .pde"
 msgstr ""
 
@@ -1712,10 +1712,10 @@ msgstr "“.{0}”不是合法的扩展名"
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Processing,you may need to use Tools -> Fix Encoding & "
+"older version of Arduino,you may need to use Tools -> Fix Encoding & "
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
-msgstr "”{0}“含有无法识别的字符，若该代码为旧版Processing所建立，你或许需要利用”工具->修正代码并重新载入“以UTF-8编码來更新草稿码，如不行，请刪除非法字符摆脱此警告信息。"
+msgstr "”{0}“含有无法识别的字符，若该代码为旧版Arduino所建立，你或许需要利用”工具->修正代码并重新载入“以UTF-8编码來更新草稿码，如不行，请刪除非法字符摆脱此警告信息。"
 
 #: debug/Compiler.java:409
 msgid ""

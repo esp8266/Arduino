@@ -438,7 +438,7 @@ msgstr "لا يمكن اعادة نسخ الشيفرة البرمجية"
 #: Theme.java:52
 msgid ""
 "Could not read color theme settings.\n"
-"You'll need to reinstall Processing."
+"You'll need to reinstall Arduino."
 msgstr "لا يمكن قراءة اعتدادات ثيمات الالوان.\nيجب عليك اعادة تنصيب العملية"
 
 #: Preferences.java:219
@@ -1144,7 +1144,7 @@ msgstr "مشكلة في اعادة التسمية"
 
 #: Editor.java:2137
 msgid ""
-"Processing can only open its own sketches\n"
+"Arduino can only open its own sketches\n"
 "and other files ending in .ino or .pde"
 msgstr "المعالجة يمكن فقط ان تفتح الشيفرة البرمجيةات الخاصة بها\nوالملفات التي تعدل في .pde او .ino"
 
@@ -1715,7 +1715,7 @@ msgstr "\".{0}\" امتداد غير صالح"
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Processing,you may need to use Tools -> Fix Encoding & "
+"older version of Arduino,you may need to use Tools -> Fix Encoding & "
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
 msgstr "\"{0}\" يحتوي على احرف غير معرفة . اذا انشئ الكود مع اصدار اقدم من المعالجة , يلزمك ان تستخدم ادوات -> اصلاح الترميز واعد التحميل لتحديث الشيفرة البرمجية ليستخدم ترميز UTF-8 . غير ذلك يمكنك ان تحذف الاحرف الغير معرفة للتخلص من هذا التحذير."

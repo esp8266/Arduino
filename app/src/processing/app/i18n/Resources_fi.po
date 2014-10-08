@@ -435,8 +435,8 @@ msgstr "Sketsiä ei voitu tallentaa uudelleen"
 #: Theme.java:52
 msgid ""
 "Could not read color theme settings.\n"
-"You'll need to reinstall Processing."
-msgstr "Väriteeman asetuksia ei voitu lukea.\nAsenna Processing uudelleen."
+"You'll need to reinstall Arduino."
+msgstr "Väriteeman asetuksia ei voitu lukea.\nAsenna Arduino uudelleen."
 
 #: Preferences.java:219
 msgid ""
@@ -1141,9 +1141,9 @@ msgstr "Nimeä ei voi muuttaa"
 
 #: Editor.java:2137
 msgid ""
-"Processing can only open its own sketches\n"
+"Arduino can only open its own sketches\n"
 "and other files ending in .ino or .pde"
-msgstr "Processing voi avata vain omia sketsejään ja\nmuita tiedostoja, joiden pääte on .ino tai .pde"
+msgstr "Arduino voi avata vain omia sketsejään ja\nmuita tiedostoja, joiden pääte on .ino tai .pde"
 
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
@@ -1712,10 +1712,10 @@ msgstr "\".{0}\" ei ole sopiva pääte."
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Processing,you may need to use Tools -> Fix Encoding & "
+"older version of Arduino,you may need to use Tools -> Fix Encoding & "
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
-msgstr "\"{0}\" sisältää tuntemattomia merkkejä. Mikäli tämä koodi luotiin vanhemmalla Processing versiolla, valitse Työkalut -> Korjaa koodaus ja avaa uudelleen, jotta sketsi käyttäisi UTF-8 koodausta. Mikäli tämä ei toimi, poista virheelliset merkit käsin päästäksesi eroon tästä varoituksesta."
+msgstr "\"{0}\" sisältää tuntemattomia merkkejä. Mikäli tämä koodi luotiin vanhemmalla Arduino versiolla, valitse Työkalut -> Korjaa koodaus ja avaa uudelleen, jotta sketsi käyttäisi UTF-8 koodausta. Mikäli tämä ei toimi, poista virheelliset merkit käsin päästäksesi eroon tästä varoituksesta."
 
 #: debug/Compiler.java:409
 msgid ""

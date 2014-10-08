@@ -435,7 +435,7 @@ msgstr "재 저장을 할 수 없습니다"
 #: Theme.java:52
 msgid ""
 "Could not read color theme settings.\n"
-"You'll need to reinstall Processing."
+"You'll need to reinstall Arduino."
 msgstr "컬러 테마를 읽을 수 없습니다.\n프로세싱을 다시 설치해야 합니다."
 
 #: Preferences.java:219
@@ -1141,7 +1141,7 @@ msgstr "이름 바꾸기 문제"
 
 #: Editor.java:2137
 msgid ""
-"Processing can only open its own sketches\n"
+"Arduino can only open its own sketches\n"
 "and other files ending in .ino or .pde"
 msgstr "프로세싱은 자체 스케치와 .ino 나 .pde로 끝나는 파일을\n열수 있습니니다.  "
 
@@ -1712,7 +1712,7 @@ msgstr "\".{0}\" 는 확장자로 사용할 수 없습니다."
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Processing,you may need to use Tools -> Fix Encoding & "
+"older version of Arduino,you may need to use Tools -> Fix Encoding & "
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
 msgstr "\"{0}\"에 인식할 수 없는 문자가 포함되어 있습니다. 만약 이 코드가이전 버전의 프로세싱으로 만들어졌다면, 툴 -> 인코딩 수정 & 다시 로드 로 UTF-8 인토딩으로 업데이트 할 수 있습니다.아니면 잘못된 문자를 삭제하여 이 경고를 제거할 수 있습니다."

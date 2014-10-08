@@ -435,8 +435,8 @@ msgstr "無法重新儲存草稿碼"
 #: Theme.java:52
 msgid ""
 "Could not read color theme settings.\n"
-"You'll need to reinstall Processing."
-msgstr "無法讀取配色設定，\n你將需要重新安裝Processing。"
+"You'll need to reinstall Arduino."
+msgstr "無法讀取配色設定，\n你將需要重新安裝Arduino。"
 
 #: Preferences.java:219
 msgid ""
@@ -1141,9 +1141,9 @@ msgstr "重新命名時的問題"
 
 #: Editor.java:2137
 msgid ""
-"Processing can only open its own sketches\n"
+"Arduino can only open its own sketches\n"
 "and other files ending in .ino or .pde"
-msgstr "Processing只能開啟它自己的草稿碼，\n以及其他.ino或.pde檔。"
+msgstr "Arduino只能開啟它自己的草稿碼，\n以及其他.ino或.pde檔。"
 
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
@@ -1712,10 +1712,10 @@ msgstr "\".{0}\"不是合法的副檔名。"
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Processing,you may need to use Tools -> Fix Encoding & "
+"older version of Arduino,you may need to use Tools -> Fix Encoding & "
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
-msgstr "\"{0}\"含有無法辨識的字元，若這份程式碼是以舊版Processing所建立，你或許需要利用「工具->修正編碼並重新載入」以UTF-8編碼來更新草稿碼，若不行，請刪除非法字元擺脫此警告訊息。"
+msgstr "\"{0}\"含有無法辨識的字元，若這份程式碼是以舊版Arduino所建立，你或許需要利用「工具->修正編碼並重新載入」以UTF-8編碼來更新草稿碼，若不行，請刪除非法字元擺脫此警告訊息。"
 
 #: debug/Compiler.java:409
 msgid ""

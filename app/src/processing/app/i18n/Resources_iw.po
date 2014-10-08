@@ -435,7 +435,7 @@ msgstr "לא ניתן לשמור מחדש את הסקיצה"
 #: Theme.java:52
 msgid ""
 "Could not read color theme settings.\n"
-"You'll need to reinstall Processing."
+"You'll need to reinstall Arduino."
 msgstr "לא נית לקרוא את הגדרות ערכת הצבעים.\nצריך להתקין מחדש עיבוד."
 
 #: Preferences.java:219
@@ -1141,7 +1141,7 @@ msgstr "בעיה בשינוי שם"
 
 #: Editor.java:2137
 msgid ""
-"Processing can only open its own sketches\n"
+"Arduino can only open its own sketches\n"
 "and other files ending in .ino or .pde"
 msgstr "העיבוד יכול לפתוח רק את הסקיצות של עצמו\nוקבצים שמסתיימים ב ino. או pde."
 
@@ -1712,7 +1712,7 @@ msgstr "\".{0}\" היא לא סיומת חוקית"
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Processing,you may need to use Tools -> Fix Encoding & "
+"older version of Arduino,you may need to use Tools -> Fix Encoding & "
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
 msgstr "\"{0}\" מכיל תווים לא מזוהים. אם הקוד נכתב בגירסה ישנה יותר, ייתכן שתצטרך להשתמש ב- כלים -> \"תקן קידוד וטען מחדש\" כדי לעדכן את הסקיצה לשימוש בקידוד UTF-8. אם לא, ייתכן ותצטרך למחוק את התווים הלא מזוהים כדי להיפטר מהערה זו."

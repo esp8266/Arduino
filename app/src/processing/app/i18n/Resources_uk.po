@@ -435,8 +435,8 @@ msgstr "Не вдалося перезберегти скетч"
 #: Theme.java:52
 msgid ""
 "Could not read color theme settings.\n"
-"You'll need to reinstall Processing."
-msgstr "Не вдалося прочитати налаштування колірної теми.\nВам потрібно буде перевстановити Processing."
+"You'll need to reinstall Arduino."
+msgstr "Не вдалося прочитати налаштування колірної теми.\nВам потрібно буде перевстановити Arduino."
 
 #: Preferences.java:219
 msgid ""
@@ -1141,9 +1141,9 @@ msgstr "Проблема з перейменуванням"
 
 #: Editor.java:2137
 msgid ""
-"Processing can only open its own sketches\n"
+"Arduino can only open its own sketches\n"
 "and other files ending in .ino or .pde"
-msgstr "Processing може відкривати свої скетчі\nта інші файли, що закінчуються .ino або .pde"
+msgstr "Arduino може відкривати свої скетчі\nта інші файли, що закінчуються .ino або .pde"
 
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
@@ -1712,10 +1712,10 @@ msgstr "\".{0}\" - неприпустиме розширення."
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Processing,you may need to use Tools -> Fix Encoding & "
+"older version of Arduino,you may need to use Tools -> Fix Encoding & "
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
-msgstr "\"{0}\" містить нерозпізнані символи. Якщо цей код був створений у старій версії Processing, то вам знадобиться використовувати Сервіс ->Виправити кодування, щоб змінити кодування скетчу на UTF-8. Якщо ні, то Вам знадобиться видалити погані символи, щоб уникнути цього попередження."
+msgstr "\"{0}\" містить нерозпізнані символи. Якщо цей код був створений у старій версії Arduino, то вам знадобиться використовувати Сервіс ->Виправити кодування, щоб змінити кодування скетчу на UTF-8. Якщо ні, то Вам знадобиться видалити погані символи, щоб уникнути цього попередження."
 
 #: debug/Compiler.java:409
 msgid ""

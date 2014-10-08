@@ -437,7 +437,7 @@ msgstr "No se pudo salvar de nuevo el programa."
 #: Theme.java:52
 msgid ""
 "Could not read color theme settings.\n"
-"You'll need to reinstall Processing."
+"You'll need to reinstall Arduino."
 msgstr "No se pudieron leer las preferencias de color.\nNecesitarás reinstalar Procesamiento."
 
 #: Preferences.java:219
@@ -1143,7 +1143,7 @@ msgstr "Problema al renombrar"
 
 #: Editor.java:2137
 msgid ""
-"Processing can only open its own sketches\n"
+"Arduino can only open its own sketches\n"
 "and other files ending in .ino or .pde"
 msgstr "El procesador sólo puede abrir sus propios programas\ny otros ficheros terminados en .ino o .pde"
 
@@ -1714,7 +1714,7 @@ msgstr "\".{0}\" no es una extensión válida"
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Processing,you may need to use Tools -> Fix Encoding & "
+"older version of Arduino,you may need to use Tools -> Fix Encoding & "
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
 msgstr "\"{0}\" contiene caracteres irreconocibles. Si este código fue creado con una versión anterior del procesador, necesitará usar  Herramientas > Reparar Codificación & Recargar  para actualizar el programa para usar la codificación UTF-8. Sino, necesitará borrar los caracteres erróneos para eliminar este aviso."

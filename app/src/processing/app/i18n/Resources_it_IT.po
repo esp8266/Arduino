@@ -438,8 +438,8 @@ msgstr "Impossibile salvare nuovamente lo sketch"
 #: Theme.java:52
 msgid ""
 "Could not read color theme settings.\n"
-"You'll need to reinstall Processing."
-msgstr "Impossibile leggere le impostazioni del tema dei colori.\nDevi reinstallare Processing"
+"You'll need to reinstall Arduino."
+msgstr "Impossibile leggere le impostazioni del tema dei colori.\nDevi reinstallare Arduino"
 
 #: Preferences.java:219
 msgid ""
@@ -1144,9 +1144,9 @@ msgstr "Problemi con il cambio di nome"
 
 #: Editor.java:2137
 msgid ""
-"Processing can only open its own sketches\n"
+"Arduino can only open its own sketches\n"
 "and other files ending in .ino or .pde"
-msgstr "Processing può aprire solo i propri sketch\ne i file con estensione .ino o .pde"
+msgstr "Arduino può aprire solo i propri sketch\ne i file con estensione .ino o .pde"
 
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
@@ -1715,10 +1715,10 @@ msgstr "\".{0}\" non è un'estensione valida"
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Processing,you may need to use Tools -> Fix Encoding & "
+"older version of Arduino,you may need to use Tools -> Fix Encoding & "
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
-msgstr "{0} contiene caratteri non riconosciuti. Se il codice è stato creato con una versione\nprecedente di Processing, potrebbe essere necessario usare \"Strumenti -> Correggi codifica e\nricarica\" per aggiornare lo sketch alla codifica UTF-8. In alternativa devi cancellare i caratteri errati per sbarazzarti questo avviso"
+msgstr "{0} contiene caratteri non riconosciuti. Se il codice è stato creato con una versione\nprecedente di Arduino, potrebbe essere necessario usare \"Strumenti -> Correggi codifica e\nricarica\" per aggiornare lo sketch alla codifica UTF-8. In alternativa devi cancellare i caratteri errati per sbarazzarti questo avviso"
 
 #: debug/Compiler.java:409
 msgid ""

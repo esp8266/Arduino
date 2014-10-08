@@ -435,8 +435,8 @@ msgstr "نمی‌تواند طرح را مجدداً ذخیره نمود"
 #: Theme.java:52
 msgid ""
 "Could not read color theme settings.\n"
-"You'll need to reinstall Processing."
-msgstr "نمی‌توان تنظیمات رنگ را خواند.\nشما می‌بایست که Processing را مجدداً نصب نمایید."
+"You'll need to reinstall Arduino."
+msgstr "نمی‌توان تنظیمات رنگ را خواند.\nشما می‌بایست که Arduino را مجدداً نصب نمایید."
 
 #: Preferences.java:219
 msgid ""
@@ -1141,9 +1141,9 @@ msgstr "مشکل با نام‌گذاری مجدد"
 
 #: Editor.java:2137
 msgid ""
-"Processing can only open its own sketches\n"
+"Arduino can only open its own sketches\n"
 "and other files ending in .ino or .pde"
-msgstr "Processing فقط می‌تواند طرح‌های خودش را باز کند\nو سایر پرونده‌هایی که با .ino یا .pde پایان می‌پذیرند"
+msgstr "Arduino فقط می‌تواند طرح‌های خودش را باز کند\nو سایر پرونده‌هایی که با .ino یا .pde پایان می‌پذیرند"
 
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
@@ -1712,10 +1712,10 @@ msgstr "\".{0}\" پسوند نامعتبری است."
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Processing,you may need to use Tools -> Fix Encoding & "
+"older version of Arduino,you may need to use Tools -> Fix Encoding & "
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
-msgstr "\"{0}\" شامل نویسه‌های ناشناخته‌است. اگر این کد با نسخه‌های قدیمی‌تر Processing درست‌شده‌است، شما احتمالاً نیازمند هستید که از Tools -> Fix Enconding & Reload برای به‌روزرسانی برای استفاده از کدگذاری UTF-8 استفاده کنید. وگرنه، شما ممکن‌است نیازمند حذف نویسه‌های نامناسب و برای رهایی از این اخطار شوید."
+msgstr "\"{0}\" شامل نویسه‌های ناشناخته‌است. اگر این کد با نسخه‌های قدیمی‌تر Arduino درست‌شده‌است، شما احتمالاً نیازمند هستید که از Tools -> Fix Enconding & Reload برای به‌روزرسانی برای استفاده از کدگذاری UTF-8 استفاده کنید. وگرنه، شما ممکن‌است نیازمند حذف نویسه‌های نامناسب و برای رهایی از این اخطار شوید."
 
 #: debug/Compiler.java:409
 msgid ""

@@ -437,8 +437,8 @@ msgstr "De schets kon niet opnieuw worden opgeslagen."
 #: Theme.java:52
 msgid ""
 "Could not read color theme settings.\n"
-"You'll need to reinstall Processing."
-msgstr "Kan kleurenschema instellingen niet lezen.\nHerinstallatie van Processing is noodzakelijk."
+"You'll need to reinstall Arduino."
+msgstr "Kan kleurenschema instellingen niet lezen.\nHerinstallatie van Arduino is noodzakelijk."
 
 #: Preferences.java:219
 msgid ""
@@ -1143,9 +1143,9 @@ msgstr "Probleem bij het hernoemen"
 
 #: Editor.java:2137
 msgid ""
-"Processing can only open its own sketches\n"
+"Arduino can only open its own sketches\n"
 "and other files ending in .ino or .pde"
-msgstr "Processing kan enkel zijn eigen schetsen en andere \nbestanden eindigend op .ino of .pde openen."
+msgstr "Arduino kan enkel zijn eigen schetsen en andere \nbestanden eindigend op .ino of .pde openen."
 
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
@@ -1714,10 +1714,10 @@ msgstr "\".{0}\" is geen geldige extensie."
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Processing,you may need to use Tools -> Fix Encoding & "
+"older version of Arduino,you may need to use Tools -> Fix Encoding & "
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
-msgstr "\"{0}\" bevat onherkenbare karakters. Indien deze code met een oudere versie van Processing is aangemaakt, moet je misschien Extra -> Fix Encoding & Reload gebruiken om de schets UTF-8 te laten gebruiken. Indien niet, wis dan de verkeerde karakters om deze waarschuwing te vermijden."
+msgstr "\"{0}\" bevat onherkenbare karakters. Indien deze code met een oudere versie van Arduino is aangemaakt, moet je misschien Extra -> Fix Encoding & Reload gebruiken om de schets UTF-8 te laten gebruiken. Indien niet, wis dan de verkeerde karakters om deze waarschuwing te vermijden."
 
 #: debug/Compiler.java:409
 msgid ""

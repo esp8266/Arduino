@@ -435,8 +435,8 @@ msgstr "Visandi uuesti salvestamine ebaõnnestus"
 #: Theme.java:52
 msgid ""
 "Could not read color theme settings.\n"
-"You'll need to reinstall Processing."
-msgstr "Ei saa avada värviteema seadeid.\nProcessing tuleb uuesti paigaldada."
+"You'll need to reinstall Arduino."
+msgstr "Ei saa avada värviteema seadeid.\nArduino tuleb uuesti paigaldada."
 
 #: Preferences.java:219
 msgid ""
@@ -1141,7 +1141,7 @@ msgstr "Probleem nime muutmisega"
 
 #: Editor.java:2137
 msgid ""
-"Processing can only open its own sketches\n"
+"Arduino can only open its own sketches\n"
 "and other files ending in .ino or .pde"
 msgstr "Avada saab ainult oma visandeid ning .ino või .pde laienditega faile."
 
@@ -1712,7 +1712,7 @@ msgstr "\".{0}\" pole lubatud laiend."
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Processing,you may need to use Tools -> Fix Encoding & "
+"older version of Arduino,you may need to use Tools -> Fix Encoding & "
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
 msgstr "\"{0}\" sisaldab tundmatuid tähemärke. Kui see kood on loodud vanema versiooniga, saab selle teisendada UTF-8'ks menüüst Tööriistad -> Paranda kooditabel ning laadi uuesti. Teine variant on vigased märgid käsitsi kustutada."

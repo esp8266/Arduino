@@ -435,7 +435,7 @@ msgstr "வரைவை மறுபடியும் சேமிக்க இ
 #: Theme.java:52
 msgid ""
 "Could not read color theme settings.\n"
-"You'll need to reinstall Processing."
+"You'll need to reinstall Arduino."
 msgstr "வண்ண கரு அமைப்புகளை படிக்க முடியவில்லை.\nநீங்கள் செயல்முறையை மீண்டும் நிறுவ வேண்டும்."
 
 #: Preferences.java:219
@@ -1141,7 +1141,7 @@ msgstr "பெயர்மாற்றத்தில் பிரச்சன�
 
 #: Editor.java:2137
 msgid ""
-"Processing can only open its own sketches\n"
+"Arduino can only open its own sketches\n"
 "and other files ending in .ino or .pde"
 msgstr "செயலாக்கத்தால் அதனுடைய வரைவுகள் மற்றும்\n.ino அல்லது .pde நீட்டுதல் கொண்ட கோப்புகளை மட்டுமே திறக்க முடியும்"
 
@@ -1712,7 +1712,7 @@ msgstr "\".{0}\" சரியான நீடிப்பு கிடையா�
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Processing,you may need to use Tools -> Fix Encoding & "
+"older version of Arduino,you may need to use Tools -> Fix Encoding & "
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
 msgstr ""

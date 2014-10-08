@@ -436,7 +436,7 @@ msgstr "आपकी स्केत्च री-सेव नहीं हो 
 #: Theme.java:52
 msgid ""
 "Could not read color theme settings.\n"
-"You'll need to reinstall Processing."
+"You'll need to reinstall Arduino."
 msgstr "आपको processing इन्स्टाल करनी पड़ेगा "
 
 #: Preferences.java:219
@@ -1142,7 +1142,7 @@ msgstr "नाम बदलने में मुश्किल "
 
 #: Editor.java:2137
 msgid ""
-"Processing can only open its own sketches\n"
+"Arduino can only open its own sketches\n"
 "and other files ending in .ino or .pde"
 msgstr "प्रोसेसिंग  केवल अपने ही स्केचेस खोल सकता है\nऔर दूसरी फाइल्स जिनका अंत .ino अथवा .pde से होता है"
 
@@ -1713,7 +1713,7 @@ msgstr "\".{0}\" एक वैध एक्ष्तेन्सिओन नह
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Processing,you may need to use Tools -> Fix Encoding & "
+"older version of Arduino,you may need to use Tools -> Fix Encoding & "
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
 msgstr "\"{0}\"अपरिचित अक्षर ,अगर कोड प्रोसस्सिंग के पुराने संकरण में लिखा गया है आपको टूल्स खोलना पड़ेगा उसमे  ->  फिक्स एन्कोडिंग और रीलोड कीजिये ताकि UTF-8 एन्कोडिंग इस्तेमाल हो सके अगर ये सब नहीं करना तो आपको वो अक्षर मिटाने होंगे ताकि यह चेतावनी ना आये "

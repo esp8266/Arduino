@@ -435,7 +435,7 @@ msgstr "Skice ni bilo mogoče ponovno shraniti"
 #: Theme.java:52
 msgid ""
 "Could not read color theme settings.\n"
-"You'll need to reinstall Processing."
+"You'll need to reinstall Arduino."
 msgstr "Privzeti nastavitev ni bilo mogoče prebrati.⏎\nMoral/a boš ponovno naložiti Arduino."
 
 #: Preferences.java:219
@@ -1141,7 +1141,7 @@ msgstr "Problem pri preimenovanju"
 
 #: Editor.java:2137
 msgid ""
-"Processing can only open its own sketches\n"
+"Arduino can only open its own sketches\n"
 "and other files ending in .ino or .pde"
 msgstr "Arduino lahko odpre le lastne skice⏎ in ostale datoteke, ki se končajo na .ino ali .pde"
 
@@ -1712,10 +1712,10 @@ msgstr "\".{0}\" ni veljavna končnica."
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Processing,you may need to use Tools -> Fix Encoding & "
+"older version of Arduino,you may need to use Tools -> Fix Encoding & "
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
-msgstr "\"{0}\" vsebuje nepoznane znake. Če je ta koda bila ustvarjena s starejšo različico Arduina/Processinga, uporabi Orodja -> Popravi kodiranje in ponovno naloži za po posodobitev skice v UTF-8 kodiranje. Druga možnost je da izbrišeš neveljavne znake, če se želiš znebiti tega opozorila."
+msgstr "\"{0}\" vsebuje nepoznane znake. Če je ta koda bila ustvarjena s starejšo različico Arduina, uporabi Orodja -> Popravi kodiranje in ponovno naloži za po posodobitev skice v UTF-8 kodiranje. Druga možnost je da izbrišeš neveljavne znake, če se želiš znebiti tega opozorila."
 
 #: debug/Compiler.java:409
 msgid ""

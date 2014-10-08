@@ -436,8 +436,8 @@ msgstr "Neizdevās pa jaunam saglabāt skici."
 #: Theme.java:52
 msgid ""
 "Could not read color theme settings.\n"
-"You'll need to reinstall Processing."
-msgstr "Nevar nolasīt krāsu tēmas iestatījumus.\nJums vajadzēs pārinstalēt Processing."
+"You'll need to reinstall Arduino."
+msgstr "Nevar nolasīt krāsu tēmas iestatījumus.\nJums vajadzēs pārinstalēt Arduino."
 
 #: Preferences.java:219
 msgid ""
@@ -1142,9 +1142,9 @@ msgstr "Problēma ar pārsaukšanu"
 
 #: Editor.java:2137
 msgid ""
-"Processing can only open its own sketches\n"
+"Arduino can only open its own sketches\n"
 "and other files ending in .ino or .pde"
-msgstr "\"Processing\" var atvērt tikai paša skices\nun citus failus, kas beidzas ar .ino vai .pde"
+msgstr "\"Arduino\" var atvērt tikai paša skices\nun citus failus, kas beidzas ar .ino vai .pde"
 
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
@@ -1713,10 +1713,10 @@ msgstr "\".{0}\" nav derīgs paplašinājums."
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Processing,you may need to use Tools -> Fix Encoding & "
+"older version of Arduino,you may need to use Tools -> Fix Encoding & "
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
-msgstr "\"{0}\" satur nezināmas rakstzīmes. Ja šis kods tika izveidots ar vecāku Processing versiju, jums var vajadzēt izmantot Rīki > Salabot kodējumu un pārlādēt funkciju, lai atjauninātu skici, lai izmantotu UTF-8 kodējumu. Ja ne, jums var vajadzēt izdzēst nekorektās rakstzīmes, lai atbrīvotos no šī ziņojuma."
+msgstr "\"{0}\" satur nezināmas rakstzīmes. Ja šis kods tika izveidots ar vecāku Arduino versiju, jums var vajadzēt izmantot Rīki > Salabot kodējumu un pārlādēt funkciju, lai atjauninātu skici, lai izmantotu UTF-8 kodējumu. Ja ne, jums var vajadzēt izdzēst nekorektās rakstzīmes, lai atbrīvotos no šī ziņojuma."
 
 #: debug/Compiler.java:409
 msgid ""

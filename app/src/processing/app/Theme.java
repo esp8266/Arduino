@@ -50,7 +50,7 @@ public class Theme {
       load(Base.getLibStream("theme/theme.txt"));
     } catch (Exception te) {
       Base.showError(null, _("Could not read color theme settings.\n" +
-                             "You'll need to reinstall Processing."), te);
+                             "You'll need to reinstall Arduino."), te);
     }
 
     // check for platform-specific properties in the defaults

@@ -269,7 +269,7 @@ public class SketchCode {
       System.err.println(
         I18n.format(
           _("\"{0}\" contains unrecognized characters." +
-            "If this code was created with an older version of Processing," +
+            "If this code was created with an older version of Arduino," +
             "you may need to use Tools -> Fix Encoding & Reload to update" +
             "the sketch to use UTF-8 encoding. If not, you may need to" +
             "delete the bad characters to get rid of this warning."),

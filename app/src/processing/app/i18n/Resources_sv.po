@@ -435,8 +435,8 @@ msgstr "Kunde ej spara om sketchen"
 #: Theme.java:52
 msgid ""
 "Could not read color theme settings.\n"
-"You'll need to reinstall Processing."
-msgstr "Kunde ej läsa färginställningarna för temat.\nDu måste ominstallera Processing."
+"You'll need to reinstall Arduino."
+msgstr "Kunde ej läsa färginställningarna för temat.\nDu måste ominstallera Arduino."
 
 #: Preferences.java:219
 msgid ""
@@ -1141,7 +1141,7 @@ msgstr "Problem med namnbyte"
 
 #: Editor.java:2137
 msgid ""
-"Processing can only open its own sketches\n"
+"Arduino can only open its own sketches\n"
 "and other files ending in .ino or .pde"
 msgstr ""
 
@@ -1712,10 +1712,10 @@ msgstr "\".{0}\" är inte en godkänd filändelse."
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Processing,you may need to use Tools -> Fix Encoding & "
+"older version of Arduino,you may need to use Tools -> Fix Encoding & "
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
-msgstr "\"{0}\" innehåller okända tecken. Om detta programmet var skapat med en äldre version av Processing behöver du kanske använda Verktyg -> Fixa teckenkodning & Ladda om för att uppdatera skissen till att använda UTF-8. Om inte behöver du kanske ta bort okända tecken för att bli kvitt detta felmeddelande."
+msgstr "\"{0}\" innehåller okända tecken. Om detta programmet var skapat med en äldre version av Arduino behöver du kanske använda Verktyg -> Fixa teckenkodning & Ladda om för att uppdatera skissen till att använda UTF-8. Om inte behöver du kanske ta bort okända tecken för att bli kvitt detta felmeddelande."
 
 #: debug/Compiler.java:409
 msgid ""

@@ -435,7 +435,7 @@ msgstr "Không thể lưu lại sketch lần nữa"
 #: Theme.java:52
 msgid ""
 "Could not read color theme settings.\n"
-"You'll need to reinstall Processing."
+"You'll need to reinstall Arduino."
 msgstr "Không thể đọc được thiết lập giao diện màu sắc.\nBạn cần phải cài đặt lại tiến trình xử lý này."
 
 #: Preferences.java:219
@@ -1141,7 +1141,7 @@ msgstr "Xảy ra lỗi khi đặt tên"
 
 #: Editor.java:2137
 msgid ""
-"Processing can only open its own sketches\n"
+"Arduino can only open its own sketches\n"
 "and other files ending in .ino or .pde"
 msgstr "Tiến trình xử lý chỉ có thể mở các sketch của chính tiến trình\nđó và các tập tin có phần mở rộng tận cùng là .ino hoặc .pde"
 
@@ -1712,7 +1712,7 @@ msgstr "\".{0}\" không phải là một định dạng hợp lệ."
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Processing,you may need to use Tools -> Fix Encoding & "
+"older version of Arduino,you may need to use Tools -> Fix Encoding & "
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
 msgstr "\"{0}\" chứa các ký tự không hợp lệ.Nếu ký tự này được tạo ra từ một phiên bản trước đó cũ hơn, thì bạn nên sử dụng Công cụ -> Sửa Giải Mã & Tải lại để cập nhật sketch theo chuẩn mã hóa UTF-8. Nếu không, bạn cần xóa các ký tự lạ không hợp lệ này để không hiển thị thông báo này lần nữa."

@@ -436,8 +436,8 @@ msgstr "Не можах да презапиша скицата"
 #: Theme.java:52
 msgid ""
 "Could not read color theme settings.\n"
-"You'll need to reinstall Processing."
-msgstr "Не можах да прочета цветовите настройки на темата.\nЩе трябва да преинсталирате Processing."
+"You'll need to reinstall Arduino."
+msgstr "Не можах да прочета цветовите настройки на темата.\nЩе трябва да преинсталирате Arduino."
 
 #: Preferences.java:219
 msgid ""
@@ -1142,9 +1142,9 @@ msgstr "Проблем с преименуването"
 
 #: Editor.java:2137
 msgid ""
-"Processing can only open its own sketches\n"
+"Arduino can only open its own sketches\n"
 "and other files ending in .ino or .pde"
-msgstr "Processing може да отваря само негови скици\nи други файлове с разширение .ino или .pde"
+msgstr "Arduino може да отваря само негови скици\nи други файлове с разширение .ino или .pde"
 
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
@@ -1713,10 +1713,10 @@ msgstr "\".{0}\" е невалидно разширение."
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Processing,you may need to use Tools -> Fix Encoding & "
+"older version of Arduino,you may need to use Tools -> Fix Encoding & "
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
-msgstr "\"{0}\" съдържа непознат символ. Ако този код е създаден с по-стара версия на Processing, може да е нужно да ползвате Инструменти -> Корекция на кодирането & Презареждане, за да обновите скицата с ползване на UTF-8 кодиране. Ако не, може да е нужно да изтриете грешния символ, за да се избавите от това предупреждение."
+msgstr "\"{0}\" съдържа непознат символ. Ако този код е създаден с по-стара версия на Arduino, може да е нужно да ползвате Инструменти -> Корекция на кодирането & Презареждане, за да обновите скицата с ползване на UTF-8 кодиране. Ако не, може да е нужно да изтриете грешния символ, за да се избавите от това предупреждение."
 
 #: debug/Compiler.java:409
 msgid ""

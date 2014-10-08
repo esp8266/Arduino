@@ -67,7 +67,7 @@ public class PdeKeywords extends CTokenMarker {
       } catch (Exception e) {
         Base.showError("Problem loading keywords",
                           "Could not load keywords.txt,\n" +
-                          "please re-install Processing.", e);
+                          "please re-install Arduino.", e);
         System.exit(1);
       }
     }

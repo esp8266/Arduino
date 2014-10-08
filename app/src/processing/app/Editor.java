@@ -2132,7 +2132,7 @@ public class Editor extends JFrame implements RunnerListener {
       file = altInoFile;
     } else if (!fileName.endsWith(".ino") && !fileName.endsWith(".pde")) {
       Base.showWarning(_("Bad file selected"),
-                       _("Processing can only open its own sketches\n" +
+                       _("Arduino can only open its own sketches\n" +
                          "and other files ending in .ino or .pde"), null);
       return false;
 

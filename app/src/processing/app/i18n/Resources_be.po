@@ -435,8 +435,8 @@ msgstr "Немагчыма перазахаваць скетч"
 #: Theme.java:52
 msgid ""
 "Could not read color theme settings.\n"
-"You'll need to reinstall Processing."
-msgstr "Немагчыма прчытаць налажкі колернай тэмы.\nПатрэбна пераінсталяваць Processing."
+"You'll need to reinstall Arduino."
+msgstr "Немагчыма прчытаць налажкі колернай тэмы.\nПатрэбна пераінсталяваць Arduino."
 
 #: Preferences.java:219
 msgid ""
@@ -1141,7 +1141,7 @@ msgstr "Немагчыма перайменаваць"
 
 #: Editor.java:2137
 msgid ""
-"Processing can only open its own sketches\n"
+"Arduino can only open its own sketches\n"
 "and other files ending in .ino or .pde"
 msgstr ""
 
@@ -1712,10 +1712,10 @@ msgstr "пашырэнне .{0} не падыходзіць"
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Processing,you may need to use Tools -> Fix Encoding & "
+"older version of Arduino,you may need to use Tools -> Fix Encoding & "
 "Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
 "todelete the bad characters to get rid of this warning."
-msgstr "\"{0}\" утрымлівае незразумелыя сімвалы. Калі гэты код быў створаны ў старой версіі Processing, вам варта ўжыць Tools -> Fix Encoding & Reload для абнаўлення скетча на кадыроўку UTF-8. Калі гэта не вырашыць праблему, спатрэбіцца выдаліць кепскія сімвалы ўручную, каб пазбавіцца ад гэтага паведамлення."
+msgstr "\"{0}\" утрымлівае незразумелыя сімвалы. Калі гэты код быў створаны ў старой версіі Arduino, вам варта ўжыць Tools -> Fix Encoding & Reload для абнаўлення скетча на кадыроўку UTF-8. Калі гэта не вырашыць праблему, спатрэбіцца выдаліць кепскія сімвалы ўручную, каб пазбавіцца ад гэтага паведамлення."
 
 #: debug/Compiler.java:409
 msgid ""
