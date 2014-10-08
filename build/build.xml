@@ -27,9 +27,6 @@
   <condition property="staging_hardware_folder" value="hardware"><equals arg1="${platform}" arg2="linux32" /></condition>
   <condition property="staging_hardware_folder" value="hardware"><equals arg1="${platform}" arg2="linux64" /></condition>
 
-  <condition property="launch4j-download-unpack-target-name" value="launch4j-windows"><os family="windows" /></condition>
-  <property name="launch4j-download-unpack-target-name" value="launch4j-linux"/>
-
   <condition property="arch-bits" value="32">
     <equals arg1="${platform}" arg2="linux32"/>
   </condition>
@@ -224,8 +221,11 @@
     </copy>
 
     <!-- Unzip AVR tools -->
-    <antcall target="unzip-avr-toolchain">
-      <param name="file_arch" value="mac32" />
+    <antcall target="unzip">
+      <param name="archive_file" value="${staging_folder}/avr-toolchain-mac32-gcc-4.8.1.zip" />
+      <param name="archive_url" value="http://downloads.arduino.cc/avr-toolchain-mac32-gcc-4.8.1.zip" />
+      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/avr" />
+      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/avr" />
     </antcall>
 
 <!--
@@ -266,7 +266,12 @@
       <fileset dir="macosx/work/${staging_hardware_folder}/tools" includes="**/man"/>
     </delete>
 
-    <antcall target="unzip-libastyle" />
+    <antcall target="unzip">
+      <param name="archive_file" value="./libastylej-2.04.zip" />
+      <param name="archive_url" value="http://downloads.arduino.cc/libastylej-2.04.zip" />
+      <param name="final_folder" value="${staging_folder}/libastylej" />
+      <param name="dest_folder" value="${staging_folder}" />
+    </antcall>
     <copy file="macosx/libastylej/libastylej.jnilib" todir="macosx/work/Arduino.app/Contents/Resources/Java/lib/" />
     <chmod perm="755" file="macosx/work/Arduino.app/Contents/Resources/Java/lib/libastylej.jnilib" />
   </target>
@@ -480,7 +485,12 @@
     <copy todir="linux/work" file="linux/dist/arduino" />
     <chmod perm="755" file="linux/work/arduino" />
 
-    <antcall target="unzip-libastyle" />
+    <antcall target="unzip">
+      <param name="archive_file" value="./libastylej-2.04.zip" />
+      <param name="archive_url" value="http://downloads.arduino.cc/libastylej-2.04.zip" />
+      <param name="final_folder" value="${staging_folder}/libastylej" />
+      <param name="dest_folder" value="${staging_folder}" />
+    </antcall>
     <copy file="linux/libastylej/libastylej${arch-bits}.so" tofile="linux/work/lib/libastylej.so" />
     <chmod perm="755" file="linux/work/lib/libastylej.so" />
   </target>
@@ -495,8 +505,11 @@
     </antcall>
 
     <!-- Unzip AVR tools -->
-    <antcall target="unzip-avr-toolchain">
-      <param name="file_arch" value="linux32" />
+    <antcall target="unzip">
+      <param name="archive_file" value="${staging_folder}/avr-toolchain-linux32-gcc-4.8.1.zip" />
+      <param name="archive_url" value="http://downloads.arduino.cc/avr-toolchain-linux32-gcc-4.8.1.zip" />
+      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/avr" />
+      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/avr" />
     </antcall>
   </target>
 
@@ -510,8 +523,11 @@
     </antcall>
 
     <!-- Unzip AVR tools -->
-    <antcall target="unzip-avr-toolchain">
-      <param name="file_arch" value="linux64" />
+    <antcall target="unzip">
+      <param name="archive_file" value="${staging_folder}/avr-toolchain-linux64-gcc-4.8.1.zip" />
+      <param name="archive_url" value="http://downloads.arduino.cc/avr-toolchain-linux64-gcc-4.8.1.zip" />
+      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/avr" />
+      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/avr" />
     </antcall>
   </target>
 
@@ -521,45 +537,6 @@
 
   <target name="linux64-run" depends="linux64-build" description="Run Linux (64-bit) version">
     <exec executable="./linux/work/arduino" spawn="false"/>
-  </target>
-
-  <target name="unzip-avr-toolchain">
-    <get src="http://downloads.arduino.cc/avr-toolchain-${file_arch}-gcc-4.8.1.zip" dest="${staging_folder}" usetimestamp="true" ignoreerrors="true" verbose="true" />
-
-    <checksum file="${staging_folder}/avr-toolchain-${file_arch}-gcc-4.8.1.zip" algorithm="sha" fileext=".sha" verifyproperty="checksum.matches"/>
-    <condition property="checksum.matches.fail">
-      <equals arg1="${checksum.matches}" arg2="false"/>
-    </condition>
-    <fail if="checksum.matches.fail">Checksum failed.
-
-      File avr-toolchain-${file_arch}-gcc-4.8.1.zip failed checksum.
-      Please remove "${staging_folder}/avr-toolchain-${file_arch}-gcc-4.8.1.zip" and download it again.
-    </fail>
-
-    <mkdir dir="${staging_folder}/work/${staging_hardware_folder}/tools/avr" />
-    <exec executable="unzip">
-      <arg value="-q" />
-      <arg value="-n" />
-      <arg value="-d" />
-      <arg value="${staging_folder}/work/${staging_hardware_folder}/tools/avr" />
-      <arg value="${staging_folder}/avr-toolchain-${file_arch}-gcc-4.8.1.zip" />
-    </exec>
-  </target>
-
-  <target name="unzip-libastyle">
-    <get src="http://downloads.arduino.cc/libastylej-2.04.zip" dest="." usetimestamp="true" ignoreerrors="true" verbose="true" />
-
-    <checksum file="libastylej-2.04.zip" algorithm="sha" fileext=".sha" verifyproperty="checksum.matches"/>
-    <condition property="checksum.matches.fail">
-      <equals arg1="${checksum.matches}" arg2="false"/>
-    </condition>
-    <fail if="checksum.matches.fail">Checksum failed.
-
-      File libastylej-2.04.zip failed checksum.
-      Please remove "libastylej-2.04.zip" and download it again.
-    </fail>
-
-    <unzip src="libastylej-2.04.zip" dest="${staging_folder}" overwrite="true"/>
   </target>
 
   <!-- Set '${dist_file}_available' property if toolchain dist_file is downloaded              -->
@@ -576,7 +553,7 @@
   </target>
 
   <!-- Ensure that the tool is downloaded and test checksums, if everything's ok unzip it on the tools folder  -->
-  <target name="untar" depends="untar-unzip-download" unless="${dist_file}_installed">
+  <target name="untar" depends="untar-unzip-download" unless="${archive_file}_installed">
     <echo>Testing checksum of "${archive_file}"</echo>
     <checksum file="${archive_file}" algorithm="sha" fileext=".sha" verifyproperty="checksum.matches"/>
     <condition property="checksum.matches.fail">
@@ -597,18 +574,28 @@
     </exec>
   </target>
 
+  <target name="unzip" depends="untar-unzip-download" unless="${archive_file}_installed">
+    <echo>Testing checksum of "${archive_file}"</echo>
+    <checksum file="${archive_file}" algorithm="sha" fileext=".sha" verifyproperty="checksum.matches"/>
+    <condition property="checksum.matches.fail">
+      <equals arg1="${checksum.matches}" arg2="false"/>
+    </condition>
+    <fail if="checksum.matches.fail">Checksum failed.
 
+      File ${archive_file} failed checksum.
+      Please remove "${archive_file}" to download it again.
+    </fail>
 
-  <!-- Set 'arm_disfile_available' property if ARM toolchain dist_file is downloaded             -->
-  <!-- Set 'arm_toolchain_installed' property if ARM toolchain is installed in working directory -->
-  <target name="check-arm-toolchain">
-    <available file="${staging_folder}/dist/${dist_file}" property="arm_distfile_available" />
-    <available file="${staging_folder}/work/hardware/tools/${dist_check_file}" property="arm_toolchain_installed" />
-  </target>
-
-  <!-- Retrieve ARM toolchain -->
-  <target name="get-arm-toolchain" depends="check-arm-toolchain" unless="arm_distfile_available">
-    <get src="${dist_url}" dest="${staging_folder}/dist/${dist_file}" verbose="true" ignoreerrors="true" />
+    <!-- Unzip tool to the destination folder -->
+    <echo>Unzipping into folder ${dest_folder}</echo>
+    <mkdir dir="${dest_folder}" />
+    <exec executable="unzip">
+      <arg value="-q" />
+      <arg value="-n" />
+      <arg value="-d" />
+      <arg value="${dest_folder}" />
+      <arg value="${archive_file}" />
+    </exec>
   </target>
 
   <target name="linux-dist" depends="build"
@@ -731,11 +718,19 @@
     </copy>
 
     <!-- Unzip AVR tools -->
-    <antcall target="unzip-avr-toolchain">
-      <param name="file_arch" value="win32" />
+    <antcall target="unzip">
+      <param name="archive_file" value="${staging_folder}/avr-toolchain-win32-gcc-4.8.1.zip" />
+      <param name="archive_url" value="http://downloads.arduino.cc/avr-toolchain-win32-gcc-4.8.1.zip" />
+      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/avr" />
+      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/avr" />
     </antcall>
 
-    <antcall target="unzip-libastyle" />
+    <antcall target="unzip">
+      <param name="archive_file" value="./libastylej-2.04.zip" />
+      <param name="archive_url" value="http://downloads.arduino.cc/libastylej-2.04.zip" />
+      <param name="final_folder" value="${staging_folder}/libastylej" />
+      <param name="dest_folder" value="${staging_folder}" />
+    </antcall>
     <copy file="windows/libastylej/AStylej.dll" todir="windows/work/lib" />
 
     <!-- Copy bossac.exe tool -->
