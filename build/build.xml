@@ -252,7 +252,7 @@
       <param name="target.path" value="macosx/work/Arduino.app/Contents/Resources/Java" />
     </antcall>
 
-    <antcall target="unzip-arm-toolchain">
+    <antcall target="unzip-tool">
       <param name="dist_file" value="gcc-arm-none-eabi-4.8.3-2014q1-mac.tar.gz" />
       <param name="dist_url" value="http://downloads.arduino.cc/gcc-arm-none-eabi-4.8.3-2014q1-mac.tar.gz" />
       <param name="dist_check_file" value="gcc-arm-none-eabi-4.8.3-2014q1" />
@@ -486,7 +486,7 @@
 
   <target name="linux32-build" depends="linux-build" description="Build linux (32-bit) version">
     <!-- Unzip ARM tools -->
-    <antcall target="unzip-arm-toolchain">
+    <antcall target="unzip-tool">
       <param name="dist_file" value="gcc-arm-none-eabi-4.8.3-2014q1-linux32.tar.gz" />
       <param name="dist_url" value="http://downloads.arduino.cc/gcc-arm-none-eabi-4.8.3-2014q1-linux32.tar.gz" />
       <param name="dist_check_file" value="gcc-arm-none-eabi-4.8.3-2014q1" />
@@ -606,27 +606,6 @@
   <!-- Retrieve ARM toolchain -->
   <target name="get-arm-toolchain" depends="check-arm-toolchain" unless="arm_distfile_available">
     <get src="${dist_url}" dest="${staging_folder}/dist/${dist_file}" verbose="true" ignoreerrors="true" />
-  </target>
-
-  <target name="unzip-arm-toolchain" depends="get-arm-toolchain, check-arm-toolchain"
-      unless="arm_toolchain_installed">
-    <checksum file="${staging_folder}/dist/${dist_file}" algorithm="sha"
-      fileext=".sha" verifyproperty="checksum.matches"/>
-    <condition property="checksum.matches.fail">
-      <equals arg1="${checksum.matches}" arg2="false"/>
-    </condition>
-    <fail if="checksum.matches.fail">Checksum failed.
-
-      File ${dist_file} failed checksum.
-      Please remove "${staging_folder}/dist/${dist_file}" to download it again.
-    </fail>
-
-    <!-- Unzip toolchain to the destination folder -->
-    <exec executable="tar">
-      <arg value="xfz"/>
-      <arg value="${staging_folder}/dist/${dist_file}"/>
-      <arg value="--directory=${staging_folder}/work/${staging_hardware_folder}/tools/"/>
-    </exec>
   </target>
 
   <target name="linux-dist" depends="build"
@@ -792,7 +771,7 @@
     </chmod>
 
     <!-- Unzip ARM toolchain -->
-    <antcall target="unzip-arm-toolchain">
+    <antcall target="unzip-tool">
       <param name="dist_file" value="gcc-arm-none-eabi-4.8.3-2014q1-windows.tar.gz" />
       <param name="dist_url" value="http://downloads.arduino.cc/gcc-arm-none-eabi-4.8.3-2014q1-windows.tar.gz" />
       <param name="dist_check_file" value="gcc-arm-none-eabi-4.8.3-2014q1" />
