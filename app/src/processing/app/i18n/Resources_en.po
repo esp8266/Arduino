@@ -33,6 +33,12 @@ msgstr "'Mouse' only supported on the Arduino Leonardo"
 msgid "(edit only when Arduino is not running)"
 msgstr "(edit only when Arduino is not running)"
 
+#: ../../../processing/app/Base.java:468
+msgid ""
+"--verbose, --verbose-upload and --verbose-build can only be used together "
+"with --verify or --upload"
+msgstr ""
+
 #: Sketch.java:746
 msgid ".pde -> .ino"
 msgstr ".pde -> .ino"
@@ -142,6 +148,12 @@ msgstr "Arduino ARM (32-bits) Boards"
 msgid "Arduino AVR Boards"
 msgstr "Arduino AVR Boards"
 
+#: Editor.java:2137
+msgid ""
+"Arduino can only open its own sketches\n"
+"and other files ending in .ino or .pde"
+msgstr "Arduino can only open its own sketches\nand other files ending in .ino or .pde"
+
 #: Base.java:1682
 msgid ""
 "Arduino cannot run because it could not\n"
@@ -181,6 +193,10 @@ msgstr "Argument required for --board"
 #: ../../../processing/app/Base.java:370
 msgid "Argument required for --curdir"
 msgstr "Argument required for --curdir"
+
+#: ../../../processing/app/Base.java:385
+msgid "Argument required for --get-pref"
+msgstr ""
 
 #: ../../../processing/app/Base.java:363
 msgid "Argument required for --port"
@@ -303,6 +319,11 @@ msgstr "Burn Bootloader"
 msgid "Burning bootloader to I/O Board (this may take a minute)..."
 msgstr "Burning bootloader to I/O Board (this may take a minute)..."
 
+#: ../../../processing/app/Base.java:379
+#, java-format
+msgid "Can only pass one of: {0}"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:92
 msgid "Canadian French"
 msgstr "Canadian French"
@@ -315,6 +336,10 @@ msgstr "Cancel"
 #: Sketch.java:455
 msgid "Cannot Rename"
 msgstr "Cannot Rename"
+
+#: ../../../processing/app/Base.java:465
+msgid "Cannot specify any sketch files"
+msgstr ""
 
 #: SerialMonitor.java:112
 msgid "Carriage return"
@@ -359,11 +384,6 @@ msgstr "Close"
 #: Editor.java:1208 Editor.java:2749
 msgid "Comment/Uncomment"
 msgstr "Comment/Uncomment"
-
-#: debug/Compiler.java:49 debug/Uploader.java:45
-#, java-format
-msgid "Compiler error, please submit this code to {0}"
-msgstr "Compiler error, please submit this code to {0}"
 
 #: Sketch.java:1608 Editor.java:1890
 msgid "Compiling sketch..."
@@ -923,9 +943,9 @@ msgstr "Library added to your libraries. Check \"Import library\" menu"
 msgid "Lithuaninan"
 msgstr "Lithuaninan"
 
-#: ../../../processing/app/Sketch.java:1660
-msgid "Low memory available, stability problems may occur"
-msgstr "Low memory available, stability problems may occur"
+#: ../../../processing/app/Sketch.java:1684
+msgid "Low memory available, stability problems may occur."
+msgstr ""
 
 #: Preferences.java:107
 msgid "Marathi"
@@ -1112,6 +1132,11 @@ msgstr "Please import the Wire library from the Sketch > Import Library menu."
 msgid "Please install JDK 1.5 or later"
 msgstr "Please install JDK 1.5 or later"
 
+#: ../../../cc/arduino/packages/uploaders/SerialUploader.java:217
+#: ../../../cc/arduino/packages/uploaders/SerialUploader.java:262
+msgid "Please select a programmer from Tools->Programmer menu"
+msgstr ""
+
 #: Preferences.java:110
 msgid "Polish"
 msgstr "Polish"
@@ -1195,12 +1220,6 @@ msgstr "Problem uploading to board.  See http://www.arduino.cc/en/Guide/Troubles
 msgid "Problem with rename"
 msgstr "Problem with rename"
 
-#: Editor.java:2137
-msgid ""
-"Arduino can only open its own sketches\n"
-"and other files ending in .ino or .pde"
-msgstr "Arduino can only open its own sketches\nand other files ending in .ino or .pde"
-
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
 msgstr "Processor"
@@ -1283,6 +1302,10 @@ msgstr "Save sketch folder as..."
 #: Editor.java:2270 Editor.java:2308
 msgid "Saving..."
 msgstr "Saving..."
+
+#: ../../../processing/app/FindReplace.java:131
+msgid "Search all Sketch Tabs"
+msgstr ""
 
 #: Base.java:1909
 msgid "Select (or create new) folder for sketches..."
@@ -1527,6 +1550,12 @@ msgid ""
 "necessary. Arduino will then stop talking about\n"
 "himself in the third person."
 msgstr "The sketchbook folder no longer exists.\nArduino will switch to the default sketchbook\nlocation, and create a new sketchbook folder if\nnecessary. Arduino will then stop talking about\nhimself in the third person."
+
+#: ../../../processing/app/debug/Compiler.java:201
+msgid ""
+"Third-party platform.txt does not define compiler.path. Please report this "
+"to the third-party hardware maintainer."
+msgstr ""
 
 #: Sketch.java:1075
 msgid ""
@@ -1844,10 +1873,6 @@ msgstr "environment"
 #: Editor.java:1108
 msgid "http://arduino.cc/"
 msgstr "http://arduino.cc/"
-
-#: ../../../processing/app/debug/Compiler.java:49
-msgid "http://github.com/arduino/Arduino/issues"
-msgstr "http://github.com/arduino/Arduino/issues"
 
 #: UpdateCheck.java:118
 msgid "http://www.arduino.cc/en/Main/Software"
