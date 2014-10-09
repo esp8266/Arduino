@@ -12,7 +12,7 @@ extern "C" {
 #include "EthernetServer.h"
 #include "Dns.h"
 
-uint16_t EthernetClient::_srcport = 1024;
+uint16_t EthernetClient::_srcport = 49152;      //Use IANA recommended ephemeral port range 49152-65535
 
 EthernetClient::EthernetClient() : _sock(MAX_SOCK_NUM) {
 }
@@ -51,7 +51,7 @@ int EthernetClient::connect(IPAddress ip, uint16_t port) {
     return 0;
 
   _srcport++;
-  if (_srcport == 0) _srcport = 1024;
+  if (_srcport == 0) _srcport = 49152;          //Use IANA recommended ephemeral port range 49152-65535
   socket(_sock, SnMR::TCP, _srcport, 0);
 
   if (!::connect(_sock, rawIPAddress(ip), port)) {
