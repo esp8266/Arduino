@@ -3,6 +3,7 @@ ARDUINO 1.0.7
 
 [libraries]
 * Backported GSM from IDE 1.5.x
+* EthernetClien: use IANA recommended ephemeral port range, 49152-65535 (Jack Christensen, cifer-lee)
 
 ARDUINO 1.0.6 - 2014.09.16
 
