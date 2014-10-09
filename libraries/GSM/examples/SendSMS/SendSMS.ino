@@ -1,24 +1,24 @@
 /*
  SMS sender
- 
- This sketch, for the Arduino GSM shield,sends an SMS message 
- you enter in the serial monitor. Connect your Arduino with the 
- GSM shield and SIM card, open the serial monitor, and wait for 
- the "READY" message to appear in the monitor. Next, type a 
- message to send and press "return". Make sure the serial 
+
+ This sketch, for the Arduino GSM shield,sends an SMS message
+ you enter in the serial monitor. Connect your Arduino with the
+ GSM shield and SIM card, open the serial monitor, and wait for
+ the "READY" message to appear in the monitor. Next, type a
+ message to send and press "return". Make sure the serial
  monitor is set to send a newline when you press return.
- 
+
  Circuit:
- * GSM shield 
+ * GSM shield
  * SIM card that can send SMS
- 
+
  created 25 Feb 2012
  by Tom Igoe
- 
+
  This example is in the public domain.
- 
+
  http://arduino.cc/en/Tutorial/GSMExamplesSendSMS
- 
+
  */
 
 // Include the GSM library
@@ -37,7 +37,7 @@ void setup()
   while (!Serial) {
     ; // wait for serial port to connect. Needed for Leonardo only
   }
-  
+
   Serial.println("SMS Messages Sender");
 
   // connection state
@@ -45,9 +45,9 @@ void setup()
 
   // Start GSM shield
   // If your SIM has PIN, pass it as a parameter of begin() in quotes
-  while(notConnected)
+  while (notConnected)
   {
-    if(gsmAccess.begin(PINNUMBER)==GSM_READY)
+    if (gsmAccess.begin(PINNUMBER) == GSM_READY)
       notConnected = false;
     else
     {
@@ -55,7 +55,7 @@ void setup()
       delay(1000);
     }
   }
-  
+
   Serial.println("GSM initialized");
 }
 
@@ -66,7 +66,7 @@ void loop()
   char remoteNum[20];  // telephone number to send sms
   readSerial(remoteNum);
   Serial.println(remoteNum);
-    
+
   // sms text
   Serial.print("Now, enter SMS content: ");
   char txtMsg[200];
@@ -75,11 +75,11 @@ void loop()
   Serial.println();
   Serial.println("Message:");
   Serial.println(txtMsg);
-  
+
   // send the message
   sms.beginSMS(remoteNum);
   sms.print(txtMsg);
-  sms.endSMS(); 
+  sms.endSMS();
   Serial.println("\nCOMPLETE!\n");
 }
 
@@ -89,7 +89,7 @@ void loop()
 int readSerial(char result[])
 {
   int i = 0;
-  while(1)
+  while (1)
   {
     while (Serial.available() > 0)
     {
@@ -100,7 +100,7 @@ int readSerial(char result[])
         Serial.flush();
         return 0;
       }
-      if(inChar!='\r')
+      if (inChar != '\r')
       {
         result[i] = inChar;
         i++;

@@ -167,7 +167,7 @@ class GSM3ShieldV1ModemCore : public GSM3SoftSerialMgr, public Print
 			@param CR			Carriadge return adding automatically
 			@return size
 		 */
-		virtual size_t writePGM(PROGMEM prog_char str[], bool CR=true);
+		virtual size_t writePGM(PGM_P str, bool CR=true);
 		
 		/** Establish debug mode
 			@param db			Boolean that indicates debug on or off
@@ -182,23 +182,17 @@ class GSM3ShieldV1ModemCore : public GSM3SoftSerialMgr, public Print
 		 */		
 		bool genericParse_rsp(bool& rsp, char* string=0, char* string2=0);
 		
-		/** Generates a generic AT command request from PROGMEM prog_char buffer
+		/** Generates a generic AT command request from PROGMEM buffer
 			@param str			Buffer with AT command
 			@param addCR		Carriadge return adding automatically
 		 */
-		void genericCommand_rq(PROGMEM prog_char str[], bool addCR=true);
+		void genericCommand_rq(PGM_P str, bool addCR=true);
 
 		/** Generates a generic AT command request from a simple char buffer
 			@param str			Buffer with AT command
 			@param addCR		Carriadge return adding automatically
 		 */
 		void genericCommand_rqc(const char* str, bool addCR=true);		
-		
-		/** Generates a generic AT command request from characters buffer
-			@param str			Buffer with AT command
-			@param addCR		Carriadge return adding automatically
-		 */
-		void genericCommand_rq(const char* str, bool addCR=true);		
 		
 		/** Returns the circular buffer
 			@return circular buffer

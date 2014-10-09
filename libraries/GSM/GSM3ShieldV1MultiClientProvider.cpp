@@ -1,7 +1,7 @@
 #include <GSM3ShieldV1MultiClientProvider.h>
 #include <GSM3ShieldV1ModemCore.h>
 
-char _command_MultiQISRVC[] PROGMEM = "AT+QISRVC=";
+const char _command_MultiQISRVC[] PROGMEM = "AT+QISRVC=";
 
 #define __TOUTFLUSH__ 10000
 

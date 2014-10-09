@@ -69,7 +69,7 @@ String GSM3ShieldV1ModemVerification::getIMEI()
 	modemResponse.toCharArray(res_to_compare, modemResponse.length());
 	if(strstr(res_to_compare,"OK") == NULL)
 	{	
-		return NULL;
+		return String(NULL);
 	}
 	else
 	{

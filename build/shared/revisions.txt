@@ -1,4 +1,9 @@
 
+ARDUINO 1.0.7
+
+[libraries]
+* Backported GSM from IDE 1.5.x
+
 ARDUINO 1.0.6 - 2014.09.16
 
 [core]

@@ -1,19 +1,19 @@
 /*
   Web client
- 
+
  This sketch connects to a website through a GSM shield. Specifically,
- this example downloads the URL "http://arduino.cc/asciilogo.txt" and 
+ this example downloads the URL "http://arduino.cc/asciilogo.txt" and
  prints it to the Serial monitor.
- 
+
  Circuit:
  * GSM shield attached to an Arduino
  * SIM card with a data plan
- 
+
  created 8 Mar 2012
  by Tom Igoe
- 
+
  http://arduino.cc/en/Tutorial/GSMExamplesWebClient
- 
+
  */
 
 // libraries
@@ -30,7 +30,7 @@
 // initialize the library instance
 GSMClient client;
 GPRS gprs;
-GSM gsmAccess; 
+GSM gsmAccess;
 
 // URL, path & port (for example: arduino.cc)
 char server[] = "arduino.cc";
@@ -51,10 +51,10 @@ void setup()
 
   // After starting the modem with GSM.begin()
   // attach the shield to the GPRS network with the APN, login and password
-  while(notConnected)
+  while (notConnected)
   {
-    if((gsmAccess.begin(PINNUMBER)==GSM_READY) &
-      (gprs.attachGPRS(GPRS_APN, GPRS_LOGIN, GPRS_PASSWORD)==GPRS_READY))
+    if ((gsmAccess.begin(PINNUMBER) == GSM_READY) &
+        (gprs.attachGPRS(GPRS_APN, GPRS_LOGIN, GPRS_PASSWORD) == GPRS_READY))
       notConnected = false;
     else
     {
@@ -77,7 +77,7 @@ void setup()
     client.println(server);
     client.println("Connection: close");
     client.println();
-  } 
+  }
   else
   {
     // if you didn't get a connection to the server:
@@ -87,7 +87,7 @@ void setup()
 
 void loop()
 {
-  // if there are incoming bytes available 
+  // if there are incoming bytes available
   // from the server, read them and print them:
   if (client.available())
   {
@@ -103,7 +103,7 @@ void loop()
     client.stop();
 
     // do nothing forevermore:
-    for(;;)
+    for (;;)
       ;
   }
 }
