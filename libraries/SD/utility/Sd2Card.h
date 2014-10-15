@@ -32,6 +32,11 @@ uint8_t const SPI_HALF_SPEED = 1;
 /** Set SCK rate to F_CPU/8. Sd2Card::setSckRate(). */
 uint8_t const SPI_QUARTER_SPEED = 2;
 /**
+ * USE_SPI_LIB: if set, use the SPI library bundled with Arduino IDE, otherwise
+ * run with a standalone driver for AVR.
+ */
+#define USE_SPI_LIB
+/**
  * Define MEGA_SOFT_SPI non-zero to use software SPI on Mega Arduinos.
  * Pins used are SS 10, MOSI 11, MISO 12, and SCK 13.
  *
@@ -66,7 +71,9 @@ uint8_t const  SPI_MISO_PIN = MISO_PIN;
 /** SPI Clock pin */
 uint8_t const  SPI_SCK_PIN = SCK_PIN;
 /** optimize loops for hardware SPI */
+#ifndef USE_SPI_LIB
 #define OPTIMIZE_HARDWARE_SPI
+#endif
 
 #else  // SOFTWARE_SPI
 // define software SPI pins so Mega can use unmodified GPS Shield
