@@ -1121,7 +1121,11 @@ public class Base {
       
       @Override
       public void onInstall(ContributedPlatform platform) {
-        BaseNoGui.indexer.install(platform);
+        try {
+          BaseNoGui.indexer.install(platform);
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
       }
 
       @Override

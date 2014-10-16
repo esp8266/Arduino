@@ -202,11 +202,39 @@ public class ContributionsIndexer {
     return index;
   }
 
-  public void install(ContributedPlatform platform) {
-    // TODO Auto-generated method stub
+  public void install(ContributedPlatform platform) throws Exception {
+    ContributionInstaller installer = new ContributionInstaller(
+        preferencesFolder, this);
+    installer.install(platform);
   }
 
   public void remove(ContributedPlatform platform) {
-    // TODO Auto-generated method stub
+    ContributionInstaller installer = new ContributionInstaller(
+        preferencesFolder, this);
+    installer.remove(platform);
+  }
+
+  public File getPackagesFolder() {
+    return packagesFolder;
+  }
+
+  /**
+   * Check if a ContributedTool is currently in use by an installed platform
+   * 
+   * @param tool
+   * @return
+   */
+  public boolean isContributedToolUsed(ContributedTool tool) {
+    for (ContributedPackage pack : index.getPackages()) {
+      for (ContributedPlatform platform : pack.getPlatforms()) {
+        if (!platform.isInstalled())
+          continue;
+        for (ContributedTool requiredTool : platform.getResolvedTools()) {
+          if (requiredTool.equals(tool))
+            return true;
+        }
+      }
+    }
+    return false;
   }
 }
