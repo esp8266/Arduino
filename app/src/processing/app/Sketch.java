@@ -34,7 +34,8 @@ import processing.app.forms.PasswordAuthorizationDialog;
 import processing.app.helpers.OSUtils;
 import processing.app.helpers.PreferencesMap;
 import processing.app.helpers.PreferencesMapException;
-import processing.app.packages.Library;
+import processing.app.packages.UserLibrary;
+import static processing.app.I18n._;
 
 import javax.swing.*;
 import java.awt.*;
@@ -938,7 +939,7 @@ public class Sketch {
   }
 
 
-  public void importLibrary(Library lib) throws IOException {
+  public void importLibrary(UserLibrary lib) throws IOException {
     importLibrary(lib.getSrcFolder());
   }
 

@@ -19,6 +19,8 @@ import org.apache.commons.logging.impl.NoOpLog;
 import cc.arduino.packages.DiscoveryManager;
 import cc.arduino.packages.Uploader;
 import processing.app.debug.Compiler;
+
+import cc.arduino.libraries.contributions.LibrariesIndexer;
 import cc.arduino.packages.contributions.ContributionsIndexer;
 import cc.arduino.utils.ArchiveExtractor;
 import processing.app.debug.TargetBoard;
@@ -34,8 +36,8 @@ import processing.app.helpers.UserNotifier;
 import processing.app.helpers.filefilters.OnlyDirs;
 import processing.app.helpers.filefilters.OnlyFilesWithExtension;
 import processing.app.legacy.PApplet;
-import processing.app.packages.Library;
 import processing.app.packages.LibraryList;
+import processing.app.packages.UserLibrary;
 
 public class BaseNoGui {
 
@@ -57,7 +59,7 @@ public class BaseNoGui {
   static private File toolsFolder;
 
   // maps #included files to their library folder
-  public static Map<String, Library> importToLibraryTable;
+  public static Map<String, UserLibrary> importToLibraryTable;
 
   // maps library name to their library folder
   static private LibraryList libraries;
@@ -74,6 +76,7 @@ public class BaseNoGui {
   static final String portableSketchbookFolder = "sketchbook";
 
   static ContributionsIndexer indexer;
+  static LibrariesIndexer librariesIndexer;
 
   // Returns a File object for the given pathname. If the pathname
   // is not absolute, it is interpreted relative to the current
@@ -615,6 +618,9 @@ public class BaseNoGui {
     loadHardware(getHardwareFolder());
     loadHardware(getSketchbookHardwareFolder());
     loadContributedHardware(indexer);
+
+    librariesIndexer = new LibrariesIndexer(BaseNoGui.getSettingsFolder());
+    librariesIndexer.parseIndex();
   }
 
   static protected void initPlatform() {
@@ -708,9 +714,10 @@ public class BaseNoGui {
     examplesFolder = getContentFile("examples");
     toolsFolder = getContentFile("tools");
     librariesFolders = new ArrayList<File>();
+
+    // Add IDE libraries folder
     librariesFolders.add(getContentFile("libraries"));
 
-    // Add library folder for the current selected platform
     TargetPlatform targetPlatform = getTargetPlatform();
     if (targetPlatform != null) {
       String core = getBoardPreferences().get("build.core", "arduino");
@@ -719,13 +726,17 @@ public class BaseNoGui {
         TargetPlatform referencedPlatform = getTargetPlatform(referencedCore, targetPlatform.getId());
         if (referencedPlatform != null) {
           File referencedPlatformFolder = referencedPlatform.getFolder();
+          // Add libraries folder for the referenced platform
           librariesFolders.add(new File(referencedPlatformFolder, "libraries"));
         }
       }
       File platformFolder = targetPlatform.getFolder();
+      // Add libraries folder for the selected platform
       librariesFolders.add(new File(platformFolder, "libraries"));
-      librariesFolders.add(getSketchbookLibrariesFolder());
     }
+
+    // Add libraries folder for the sketchbook
+    librariesFolders.add(getSketchbookLibrariesFolder());
 
     // Scan for libraries in each library folder.
     // Libraries located in the latest folders on the list can override
@@ -747,12 +758,12 @@ public class BaseNoGui {
   
   static public void populateImportToLibraryTable() {
     // Populate importToLibraryTable
-    importToLibraryTable = new HashMap<String, Library>();
-    for (Library lib : getLibraries()) {
+    importToLibraryTable = new HashMap<String, UserLibrary>();
+    for (UserLibrary lib : getLibraries()) {
       try {
         String headers[] = headerListFromIncludePath(lib.getSrcFolder());
         for (String header : headers) {
-          Library old = importToLibraryTable.get(header);
+          UserLibrary old = importToLibraryTable.get(header);
           if (old != null) {
             // This is the case where 2 libraries have a .h header
             // with the same name.  We must decide which library to
@@ -768,8 +779,8 @@ public class BaseNoGui {
             // for "libName", then for "oldName".
             //
             String name = header.substring(0, header.length() - 2); // name without ".h"
-            String oldName = old.getFolder().getName();  // just the library folder name
-            String libName = lib.getFolder().getName();  // just the library folder name
+            String oldName = old.getInstalledFolder().getName();  // just the library folder name
+            String libName = lib.getInstalledFolder().getName();  // just the library folder name
             //System.out.println("name conflict: " + name);
             //System.out.println("  old = " + oldName + "  ->  " + old.getFolder().getPath());
             //System.out.println("  new = " + libName + "  ->  " + lib.getFolder().getPath());
@@ -962,42 +973,7 @@ public class BaseNoGui {
   }
 
   static public LibraryList scanLibraries(List<File> folders) throws IOException {
-    LibraryList res = new LibraryList();
-    for (File folder : folders)
-      res.addOrReplaceAll(scanLibraries(folder));
-    return res;
-  }
-
-  static public LibraryList scanLibraries(File folder) throws IOException {
-    LibraryList res = new LibraryList();
-
-    String list[] = folder.list(new OnlyDirs());
-    // if a bad folder or something like that, this might come back null
-    if (list == null)
-      return res;
-
-    for (String libName : list) {
-      File subfolder = new File(folder, libName);
-      if (!isSanitaryName(libName)) {
-        String mess = I18n.format(_("The library \"{0}\" cannot be used.\n"
-            + "Library names must contain only basic letters and numbers.\n"
-            + "(ASCII only and no spaces, and it cannot start with a number)"),
-                                  libName);
-        showMessage(_("Ignoring bad library name"), mess);
-        continue;
-      }
-
-      try {
-        Library lib = Library.create(subfolder);
-        // (also replace previously found libs with the same name)
-        if (lib != null)
-          res.addOrReplace(lib);
-      } catch (IOException e) {
-        System.out.println(I18n.format(_("Invalid library found in {0}: {1}"),
-                                       subfolder, e.getMessage()));
-      }
-    }
-    return res;
+    return librariesIndexer.scanLibraries(folders);
   }
 
   static public void selectBoard(TargetBoard targetBoard) {

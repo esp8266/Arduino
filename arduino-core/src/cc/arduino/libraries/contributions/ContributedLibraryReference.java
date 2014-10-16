@@ -26,54 +26,18 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  */
-package processing.app.packages;
+package cc.arduino.libraries.contributions;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+public abstract class ContributedLibraryReference {
 
-import processing.app.helpers.FileUtils;
+  public abstract String getName();
 
-@SuppressWarnings("serial")
-public class LibraryList extends ArrayList<UserLibrary> {
+  public abstract String getMaintainer();
 
-  public LibraryList(LibraryList libs) {
-    super(libs);
-  }
+  public abstract String getVersion();
 
-  public LibraryList() {
-    super();
-  }
-
-  public UserLibrary getByName(String name) {
-    for (UserLibrary l : this)
-      if (l.getName().equals(name))
-        return l;
-    return null;
-  }
-
-  public void addOrReplace(UserLibrary lib) {
-    UserLibrary l = getByName(lib.getName());
-    if (l != null)
-      remove(l);
-    add(lib);
-  }
-
-  public void addOrReplaceAll(Collection<? extends UserLibrary> c) {
-    for (UserLibrary l : c)
-      addOrReplace(l);
-  }
-
-  public void sort() {
-    Collections.sort(this, UserLibrary.CASE_INSENSITIVE_ORDER);
-  }
-
-  public LibraryList filterLibrariesInSubfolder(File subFolder) {
-    LibraryList res = new LibraryList();
-    for (UserLibrary lib : this)
-      if (FileUtils.isSubDirectory(subFolder, lib.getInstalledFolder()))
-        res.add(lib);
-    return res;
+  @Override
+  public String toString() {
+    return getName() + " " + getVersion() + " (" + getMaintainer() + ")";
   }
 }

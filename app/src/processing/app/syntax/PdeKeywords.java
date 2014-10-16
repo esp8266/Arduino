@@ -26,10 +26,11 @@ package processing.app.syntax;
 
 import processing.app.*;
 import processing.app.legacy.PApplet;
-import processing.app.packages.Library;
 
 import java.io.*;
 import java.util.*;
+
+import cc.arduino.libraries.contributions.ContributedLibrary;
 
 
 public class PdeKeywords extends CTokenMarker {
@@ -61,8 +62,8 @@ public class PdeKeywords extends CTokenMarker {
         keywordColoring = new KeywordMap(false);
         keywordToReference = new Hashtable();
         getKeywords(Base.getLibStream("keywords.txt"));
-        for (Library lib : Base.getLibraries()) {
-          File keywords = new File(lib.getFolder(), "keywords.txt");
+        for (ContributedLibrary lib : Base.getLibraries()) {
+          File keywords = new File(lib.getInstalledFolder(), "keywords.txt");
           if (keywords.exists()) getKeywords(new FileInputStream(keywords));
         }
       } catch (Exception e) {

@@ -1,16 +1,45 @@
+/*
+ * This file is part of Arduino.
+ *
+ * Copyright 2014 Arduino LLC (http://www.arduino.cc/)
+ *
+ * Arduino is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * As a special exception, you may use this file as part of a free software
+ * library without restriction.  Specifically, if other files instantiate
+ * templates or use macros or inline functions from this file, or you compile
+ * this file and link it with other files to produce an executable, this
+ * file does not by itself cause the resulting executable to be covered by
+ * the GNU General Public License.  This exception does not however
+ * invalidate any other reasons why the executable file might be covered by
+ * the GNU General Public License.
+ */
 package processing.app.packages;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 import processing.app.helpers.FileUtils;
 import processing.app.helpers.PreferencesMap;
+import cc.arduino.libraries.contributions.ContributedLibrary;
+import cc.arduino.libraries.contributions.ContributedLibraryReference;
 
-public class Library {
+public class UserLibrary extends ContributedLibrary {
 
   private String name;
   private String version;
@@ -18,15 +47,10 @@ public class Library {
   private String maintainer;
   private String sentence;
   private String paragraph;
-  private String url;
+  private String website;
   private String category;
   private String license;
   private List<String> architectures;
-  private File folder;
-  private boolean isLegacy;
-
-  private enum LibraryLayout { FLAT, RECURSIVE };
-  private LibraryLayout layout;
 
   private static final List<String> MANDATORY_PROPERTIES = Arrays
       .asList(new String[] { "name", "version", "author", "maintainer",
@@ -37,25 +61,7 @@ public class Library {
       "Device Control", "Timing", "Data Storage", "Data Processing", "Other",
       "Uncategorized" });
 
-  /**
-   * Scans inside a folder and create a Library object out of it. Automatically
-   * detects legacy libraries. Automatically fills metadata from
-   * library.properties file if found.
-   * 
-   * @param libFolder
-   * @return
-   */
-  static public Library create(File libFolder) throws IOException {
-    // A library is considered "new" if it contains a file called
-    // "library.properties"
-    File check = new File(libFolder, "library.properties");
-    if (!check.exists() || !check.isFile())
-      return createLegacyLibrary(libFolder);
-    else
-      return createLibrary(libFolder);
-  }
-
-  private static Library createLibrary(File libFolder) throws IOException {
+  public static UserLibrary create(File libFolder) throws IOException {
     // Parse metadata
     File propertiesFile = new File(libFolder, "library.properties");
     PreferencesMap properties = new PreferencesMap();
@@ -132,101 +138,59 @@ public class Library {
     if (license == null)
       license = "Unspecified";
 
-    Library res = new Library();
-    res.folder = libFolder;
+    UserLibrary res = new UserLibrary();
+    res.setInstalledFolder(libFolder);
+    res.setInstalled(true);
     res.name = properties.get("name").trim();
     res.version = properties.get("version").trim();
     res.author = properties.get("author").trim();
     res.maintainer = properties.get("maintainer").trim();
     res.sentence = properties.get("sentence").trim();
     res.paragraph = properties.get("paragraph").trim();
-    res.url = properties.get("url").trim();
+    res.website = properties.get("url").trim();
     res.category = category.trim();
     res.license = license.trim();
     res.architectures = archs;
-    res.isLegacy = false;
     res.layout = layout;
     return res;
   }
 
-  private static Library createLegacyLibrary(File libFolder) {
-    // construct an old style library
-    Library res = new Library();
-    res.folder = libFolder;
-    res.layout = LibraryLayout.FLAT;
-    res.name = libFolder.getName();
-    res.architectures = Arrays.asList("*");
-    res.isLegacy = true;
-    return res;
-  }
-
-  /**
-   * Returns <b>true</b> if the library declares to support the specified
-   * architecture (through the "architectures" property field).
-   * 
-   * @param reqArch
-   * @return
-   */
-  public boolean supportsArchitecture(String reqArch) {
-    return architectures.contains(reqArch) || architectures.contains("*");
-  }
-
-  /**
-   * Returns <b>true</b> if the library declares to support at least one of the
-   * specified architectures.
-   * 
-   * @param reqArchs
-   *          A List of architectures to check
-   * @return
-   */
-  public boolean supportsArchitecture(List<String> reqArchs) {
-    if (reqArchs.contains("*"))
-      return true;
-    for (String reqArch : reqArchs)
-      if (supportsArchitecture(reqArch))
-        return true;
-    return false;
-  }
-
-  public static final Comparator<Library> CASE_INSENSITIVE_ORDER = new Comparator<Library>() {
-    @Override
-    public int compare(Library o1, Library o2) {
-      return o1.getName().compareToIgnoreCase(o2.getName());
-    }
-  };
-
+  @Override
   public String getName() {
     return name;
   }
 
-  public File getFolder() {
-    return folder;
-  }
-
+  @Override
   public List<String> getArchitectures() {
     return architectures;
   }
 
+  @Override
   public String getAuthor() {
     return author;
   }
 
+  @Override
   public String getParagraph() {
     return paragraph;
   }
 
+  @Override
   public String getSentence() {
     return sentence;
   }
 
-  public String getUrl() {
-    return url;
+  @Override
+  public String getWebsite() {
+    return website;
   }
 
+  @Override
   public String getCategory() {
     return category;
   }
 
+  @Override
   public String getLicense() {
     return license;
   }
@@ -235,31 +199,60 @@ public class Library {
     return CATEGORIES;
   }
 
+  @Override
   public String getVersion() {
     return version;
   }
 
+  @Override
   public String getMaintainer() {
     return maintainer;
   }
 
-  public boolean useRecursion() {
-    return (layout == LibraryLayout.RECURSIVE);
+  @Override
+  public String getChecksum() {
+    return null;
   }
+
+  @Override
+  public long getSize() {
+    return 0;
+  }
+
+  @Override
+  public String getUrl() {
+    return null;
+  }
+
+  @Override
+  public String getArchiveFileName() {
+    return null;
+  }
+
+  @Override
+  public List<ContributedLibraryReference> getRequires() {
+    return null;
+  }
+
+  protected enum LibraryLayout {
+    FLAT, RECURSIVE
+  };
+
+  protected LibraryLayout layout;
 
   public File getSrcFolder() {
     switch (layout) {
-      case FLAT:
-        return folder;
-      case RECURSIVE:
-        return new File(folder, "src");
-      default:
-        return null; // Keep compiler happy :-(
+    case FLAT:
+      return getInstalledFolder();
+    case RECURSIVE:
+      return new File(getInstalledFolder(), "src");
+    default:
+      return null; // Keep compiler happy :-(
     }
   }
 
-  public boolean isLegacy() {
-    return isLegacy;
+  public boolean useRecursion() {
+    return (layout == LibraryLayout.RECURSIVE);
   }
 
   @Override
@@ -271,8 +264,13 @@ public class Library {
     res += " (maintainer=" + maintainer + ")";
     res += " (sentence=" + sentence + ")";
     res += " (paragraph=" + paragraph + ")";
-    res += " (url=" + url + ")";
+    res += " (url=" + website + ")";
     res += " (architectures=" + architectures + ")";
     return res;
+  }
+
+  @Override
+  public String getSupportLevel() {
+    return "Unsupported";
   }
 }

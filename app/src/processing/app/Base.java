@@ -22,6 +22,15 @@
 
 package processing.app;
 
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+import java.util.*;
+import java.util.List;
+
+import javax.swing.*;
+
+import cc.arduino.libraries.contributions.LibrariesIndexer;
 import cc.arduino.packages.DiscoveryManager;
 import cc.arduino.packages.contributions.ui.ContributionManagerUI;
 import cc.arduino.view.SplashScreenHelper;
@@ -34,8 +43,9 @@ import processing.app.helpers.filefilters.OnlyFilesWithExtension;
 import processing.app.javax.swing.filechooser.FileNameExtensionFilter;
 import processing.app.legacy.PApplet;
 import processing.app.macosx.ThinkDifferent;
-import processing.app.packages.Library;
+import processing.app.legacy.PConstants;
 import processing.app.packages.LibraryList;
+import processing.app.packages.UserLibrary;
 import processing.app.tools.MenuScroller;
 import processing.app.tools.ZipDeflater;
 
@@ -1083,27 +1093,19 @@ public class Base {
       // Add examples from libraries
       LibraryList ideLibs = getIDELibs();
       ideLibs.sort();
-      for (Library lib : ideLibs)
+      for (UserLibrary lib : ideLibs)
         addSketchesSubmenu(menu, lib, false);
 
       LibraryList userLibs = getUserLibs();
       if (userLibs.size()>0) {
         menu.addSeparator();
         userLibs.sort();
-        for (Library lib : userLibs)
+        for (UserLibrary lib : userLibs)
           addSketchesSubmenu(menu, lib, false);
       }
     } catch (IOException e) {
       e.printStackTrace();
     }
-  }
-
-  public LibraryList scanLibraries(List<File> folders) throws IOException {
-    return BaseNoGui.scanLibraries(folders);
-  }
-
-  public LibraryList scanLibraries(File folder) throws IOException {
-    return BaseNoGui.scanLibraries(folder);
   }
 
   public void onBoardOrPortChange() {
@@ -1431,10 +1433,10 @@ public class Base {
     return ifound;
   }
 
-  private boolean addSketchesSubmenu(JMenu menu, Library lib,
+  private boolean addSketchesSubmenu(JMenu menu, UserLibrary lib,
                                      boolean replaceExisting)
       throws IOException {
-    return addSketchesSubmenu(menu, lib.getName(), lib.getFolder(),
+    return addSketchesSubmenu(menu, lib.getName(), lib.getInstalledFolder(),
                               replaceExisting);
   }
 
@@ -1516,11 +1518,11 @@ public class Base {
     LibraryList list = new LibraryList(libs);
     list.sort();
 
-    for (Library lib : list) {
+    for (UserLibrary lib : list) {
       @SuppressWarnings("serial")
       AbstractAction action = new AbstractAction(lib.getName()) {
         public void actionPerformed(ActionEvent event) {
-          Library l = (Library) getValue("library");
+          UserLibrary l = (UserLibrary) getValue("library");
           try {
             activeEditor.getSketch().importLibrary(l);
           } catch (IOException e) {

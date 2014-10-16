@@ -52,10 +52,11 @@ import processing.app.SketchCode;
 import processing.app.SketchData;
 import processing.app.helpers.*;
 import processing.app.helpers.filefilters.OnlyDirs;
-import processing.app.packages.Library;
 import processing.app.packages.LibraryList;
 import processing.app.preproc.PdePreprocessor;
 import processing.app.legacy.PApplet;
+import processing.app.packages.LegacyUserLibrary;
+import processing.app.packages.UserLibrary;
 
 public class Compiler implements MessageConsumer {
 
@@ -361,11 +362,15 @@ public class Compiler implements MessageConsumer {
     includeFolders.add(prefs.getFile("build.core.path"));
     if (prefs.getFile("build.variant.path") != null)
       includeFolders.add(prefs.getFile("build.variant.path"));
-    for (Library lib : importedLibraries) {
-      if (verbose)
+    for (UserLibrary lib : importedLibraries) {
+      if (verbose) {
+        String legacy = "";
+        if (lib instanceof LegacyUserLibrary)
+          legacy = "(legacy)";
         System.out.println(I18n
             .format(_("Using library {0} in folder: {1} {2}"), lib.getName(),
-                    lib.getFolder(), lib.isLegacy() ? "(legacy)" : ""));
+                    lib.getInstalledFolder(), legacy));
+      }
       includeFolders.add(lib.getSrcFolder());
     }
     if (verbose)
@@ -377,7 +382,7 @@ public class Compiler implements MessageConsumer {
       String[] overrides = prefs.get("architecture.override_check").split(",");
       archs.addAll(Arrays.asList(overrides));
     }
-    for (Library lib : importedLibraries) {
+    for (UserLibrary lib : importedLibraries) {
       if (!lib.supportsArchitecture(archs)) {
         System.err.println(I18n
             .format(_("WARNING: library {0} claims to run on {1} "
@@ -890,21 +895,21 @@ public class Compiler implements MessageConsumer {
   // 2. compile the libraries, outputting .o files to:
   // <buildPath>/<library>/
   void compileLibraries(List<File> includeFolders) throws RunnerException, PreferencesMapException {
-    for (Library lib : importedLibraries) {
+    for (UserLibrary lib : importedLibraries) {
       compileLibrary(lib, includeFolders);
     }
   }
 
-  private void compileLibrary(Library lib, List<File> includeFolders)
+  private void compileLibrary(UserLibrary lib, List<File> includeFolders)
           throws RunnerException, PreferencesMapException {
     File libFolder = lib.getSrcFolder();
     File libBuildFolder = prefs.getFile(("build.path"), lib.getName());
-
+    
     if (lib.useRecursion()) {
       // libBuildFolder == {build.path}/LibName
       // libFolder      == {lib.path}/src
       recursiveCompileFilesInFolder(libBuildFolder, libFolder, includeFolders);
-
+      
     } else {
       // libFolder          == {lib.path}/
       // utilityFolder      == {lib.path}/utility
@@ -912,11 +917,11 @@ public class Compiler implements MessageConsumer {
       // utilityBuildFolder == {build.path}/LibName/utility
       File utilityFolder = new File(libFolder, "utility");
       File utilityBuildFolder = new File(libBuildFolder, "utility");
-
+      
       includeFolders.add(utilityFolder);
       compileFilesInFolder(libBuildFolder, libFolder, includeFolders);
       compileFilesInFolder(utilityBuildFolder, utilityFolder, includeFolders);
-
+      
       // other libraries should not see this library's utility/ folder
       includeFolders.remove(utilityFolder);
     }
@@ -1162,7 +1167,7 @@ public class Compiler implements MessageConsumer {
 
     importedLibraries = new LibraryList();
     for (String item : preprocessor.getExtraImports()) {
-      Library lib = BaseNoGui.importToLibraryTable.get(item);
+      UserLibrary lib = BaseNoGui.importToLibraryTable.get(item);
       if (lib != null && !importedLibraries.contains(lib)) {
         importedLibraries.add(lib);
       }
