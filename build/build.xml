@@ -50,17 +50,7 @@
   <fileset dir=".." id="runtime.jars">
     <include name="arduino-core/arduino-core.jar" />
     <include name="app/pde.jar" />
-    <include name="app/lib/commons-codec-1.7.jar" />
-    <include name="app/lib/commons-exec-1.1.jar" />
-    <include name="app/lib/commons-httpclient-3.1.jar" />
-    <include name="app/lib/commons-logging-1.0.4.jar" />
-    <include name="app/lib/ecj.jar" />
-    <include name="app/lib/jmdns-3.4.1.jar" />
-    <include name="app/lib/jna.jar" />
-    <include name="app/lib/jsch-0.1.50.jar" />
-    <include name="app/lib/jssc-2.8.0.jar" />
-    <include name="app/lib/ant.jar" />
-    <include name="app/lib/ant-launcher.jar" />
+    <include name="app/lib/*.jar" />
   </fileset>
 
   <target name="build" description="Build Arduino.">
