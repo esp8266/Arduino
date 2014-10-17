@@ -10,8 +10,9 @@
 #ifndef	W5100_H_INCLUDED
 #define	W5100_H_INCLUDED
 
-#include <avr/pgmspace.h>
 #include <SPI.h>
+
+#define SPI_ETHERNET_SETTINGS SPISettings(4000000, MSBFIRST, SPI_MODE0)
 
 #define MAX_SOCK_NUM 4
 
@@ -138,7 +139,7 @@ public:
    * the data from Receive buffer. Here also take care of the condition while it exceed
    * the Rx memory uper-bound of socket.
    */
-  void read_data(SOCKET s, volatile uint8_t * src, volatile uint8_t * dst, uint16_t len);
+  void read_data(SOCKET s, volatile uint16_t src, volatile uint8_t * dst, uint16_t len);
   
   /**
    * @brief	 This function is being called by send() and sendto() function also. 
@@ -340,7 +341,6 @@ private:
   inline static void setSS()     { PORTB &= ~_BV(2); };
   inline static void resetSS()   { PORTB |=  _BV(2); };
 #endif
-
 };
 
 extern W5100Class W5100;
