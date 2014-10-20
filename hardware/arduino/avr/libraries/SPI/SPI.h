@@ -184,6 +184,12 @@ public:
   // Write to the SPI bus (MOSI pin) and also receive (MISO pin)
   inline static uint8_t transfer(uint8_t data) {
     SPDR = data;
+    /*
+     * The following NOP introduces a small delay that can prevent the wait
+     * loop form iterating when running at the maximum speed. This gives
+     * about 10% more speed, even if it seems counter-intuitive. At lower
+     * speeds it is unnoticed.
+     */
     asm volatile("nop");
     while (!(SPSR & _BV(SPIF))) ; // wait
     return SPDR;
@@ -193,16 +199,20 @@ public:
     in.val = data;
     if (!(SPCR & _BV(DORD))) {
       SPDR = in.msb;
+      asm volatile("nop"); // See transfer(uint8_t) function
       while (!(SPSR & _BV(SPIF))) ;
       out.msb = SPDR;
       SPDR = in.lsb;
+      asm volatile("nop");
       while (!(SPSR & _BV(SPIF))) ;
       out.lsb = SPDR;
     } else {
       SPDR = in.lsb;
+      asm volatile("nop");
       while (!(SPSR & _BV(SPIF))) ;
       out.lsb = SPDR;
       SPDR = in.msb;
+      asm volatile("nop");
       while (!(SPSR & _BV(SPIF))) ;
       out.msb = SPDR;
     }
