@@ -20,6 +20,9 @@
 // usingInterrupt(), and SPISetting(clock, bitOrder, dataMode)
 #define SPI_HAS_TRANSACTION 1
 
+// SPI_HAS_NOTUSINGINTERRUPT means that SPI has notUsingInterrupt() method
+#define SPI_HAS_NOTUSINGINTERRUPT 1
+
 // Uncomment this line to add detection of mismatched begin/end transactions.
 // A mismatch occurs if other libraries fail to use SPI.endTransaction() for
 // each SPI.beginTransaction().  Connect an LED to this pin.  The LED will turn
@@ -154,6 +157,13 @@ public:
   // with attachInterrupt.  If SPI is used from a different interrupt
   // (eg, a timer), interruptNumber should be 255.
   static void usingInterrupt(uint8_t interruptNumber);
+  // And this does the opposite.
+  static void notUsingInterrupt(uint8_t interruptNumber);
+  // Note: the usingInterrupt and notUsingInterrupt functions should
+  // not to be called from ISR context or inside a transaction.
+  // For details see:
+  // https://github.com/arduino/Arduino/pull/2381
+  // https://github.com/arduino/Arduino/pull/2449
 
   // Before using SPI.transfer() or asserting chip select pins,
   // this function is used to gain exclusive access to the SPI bus

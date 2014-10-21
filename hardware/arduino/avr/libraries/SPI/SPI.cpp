@@ -151,3 +151,45 @@ void SPIClass::usingInterrupt(uint8_t interruptNumber)
   interrupts();
 }
 
+void SPIClass::notUsingInterrupt(uint8_t interruptNumber)
+{
+  // Once in mode 2 we can't go back to 0 without a proper reference count
+  if (interruptMode == 2)
+    return;
+  uint8_t mask = 0;
+  uint8_t sreg = SREG;
+  noInterrupts(); // Protect from a scheduler and prevent transactionBegin
+  switch (interruptNumber) {
+  #ifdef SPI_INT0_MASK
+  case 0: mask = SPI_INT0_MASK; break;
+  #endif
+  #ifdef SPI_INT1_MASK
+  case 1: mask = SPI_INT1_MASK; break;
+  #endif
+  #ifdef SPI_INT2_MASK
+  case 2: mask = SPI_INT2_MASK; break;
+  #endif
+  #ifdef SPI_INT3_MASK
+  case 3: mask = SPI_INT3_MASK; break;
+  #endif
+  #ifdef SPI_INT4_MASK
+  case 4: mask = SPI_INT4_MASK; break;
+  #endif
+  #ifdef SPI_INT5_MASK
+  case 5: mask = SPI_INT5_MASK; break;
+  #endif
+  #ifdef SPI_INT6_MASK
+  case 6: mask = SPI_INT6_MASK; break;
+  #endif
+  #ifdef SPI_INT7_MASK
+  case 7: mask = SPI_INT7_MASK; break;
+  #endif
+  default:
+    break;
+    // this case can't be reached
+  }
+  interruptMask &= ~mask;
+  if (!interruptMask)
+    interruptMode = 0;
+  SREG = sreg;
+}
