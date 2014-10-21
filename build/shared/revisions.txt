@@ -7,6 +7,7 @@ ARDUINO 1.0.7
 
 [core]
 * Fixed missing NOT_AN_INTERRUPT constant in digitalPinToInterrupt() macro
+* Fixed regression in HardwareSerial::available() introduced with https://github.com/arduino/Arduino/pull/2057
 
 ARDUINO 1.0.6 - 2014.09.16
 
