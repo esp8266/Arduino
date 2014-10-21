@@ -21,7 +21,7 @@
 
 // Uncomment this line to add detection of mismatched begin/end transactions.
 // A mismatch occurs if other libraries fail to use SPI.endTransaction() for
-// each SPI.beginTransaction().  Connect a LED to this pin.  The LED will turn
+// each SPI.beginTransaction().  Connect an LED to this pin.  The LED will turn
 // on if any mismatch is ever detected.
 //#define SPI_TRANSACTION_MISMATCH_LED 5
 
@@ -147,7 +147,7 @@ public:
   // Initialize the SPI library
   static void begin();
 
-  // If SPI is to used from within an interrupt, this function registers
+  // If SPI is used from within an interrupt, this function registers
   // that interrupt with the SPI library, so beginTransaction() can
   // prevent conflicts.  The input interruptNumber is the number used
   // with attachInterrupt.  If SPI is used from a different interrupt
