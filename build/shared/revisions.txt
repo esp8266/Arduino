@@ -9,6 +9,9 @@ The following changes are included also in the Arduino IDE 1.0.7:
 [libraries]
 * EthernetClien: use IANA recommended ephemeral port range, 49152-65535 (Jack Christensen, cifer-lee)
 
+[core]
+* Fixed regression in HardwareSerial::available() introduced with https://github.com/arduino/Arduino/pull/2057
+
 ARDUINO 1.5.8 BETA - 2014.10.01
 
 [ide]
@@ -345,6 +348,10 @@ ARDUINO 1.0.7
 [libraries]
 * Backported GSM from IDE 1.5.x
 * EthernetClien: use IANA recommended ephemeral port range, 49152-65535 (Jack Christensen, cifer-lee)
+
+[core]
+* Fixed missing NOT_AN_INTERRUPT constant in digitalPinToInterrupt() macro
+* Fixed regression in HardwareSerial::available() introduced with https://github.com/arduino/Arduino/pull/2057
 
 ARDUINO 1.0.6 - 2014.09.16
 

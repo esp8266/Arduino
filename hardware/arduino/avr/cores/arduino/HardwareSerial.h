@@ -32,6 +32,8 @@
 // using a ring buffer (I think), in which head is the index of the location
 // to which to write the next incoming character and tail is the index of the
 // location from which to read.
+// NOTE: a "power of 2" buffer size is reccomended to dramatically
+//       optimize all the modulo operations for ring buffers.
 #if !(defined(SERIAL_TX_BUFFER_SIZE) && defined(SERIAL_RX_BUFFER_SIZE))
 #if (RAMEND < 1000)
 #define SERIAL_TX_BUFFER_SIZE 16
