@@ -53,6 +53,8 @@
 // using a ring buffer (I think), in which head is the index of the location
 // to which to write the next incoming character and tail is the index of the
 // location from which to read.
+// NOTE: a "power of 2" buffer size is reccomended to dramatically
+//       optimize all the modulo operations for ring buffers.
 #if (RAMEND < 1000)
   #define SERIAL_BUFFER_SIZE 16
 #else
@@ -426,7 +428,7 @@ void HardwareSerial::end()
 
 int HardwareSerial::available(void)
 {
-  return (int)(SERIAL_BUFFER_SIZE + _rx_buffer->head - _rx_buffer->tail) % SERIAL_BUFFER_SIZE;
+  return ((unsigned int)(SERIAL_BUFFER_SIZE + _rx_buffer->head - _rx_buffer->tail)) % SERIAL_BUFFER_SIZE;
 }
 
 int HardwareSerial::peek(void)
