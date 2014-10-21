@@ -2,6 +2,7 @@
  * Copyright (c) 2010 by Cristian Maglie <c.maglie@bug.st>
  * Copyright (c) 2014 by Paul Stoffregen <paul@pjrc.com> (Transaction API)
  * Copyright (c) 2014 by Matthijs Kooijman <matthijs@stdin.nl> (SPISettings AVR)
+ * Copyright (c) 2014 by Andrew J. Kroll <xxxajk@gmail.com> (atomicity fixes)
  * SPI Master library for arduino.
  *
  * This file is free software; you can redistribute it and/or modify
@@ -281,6 +282,7 @@ public:
   inline static void detachInterrupt() { SPCR &= ~_BV(SPIE); }
 
 private:
+  static uint8_t initialized;
   static uint8_t interruptMode; // 0=none, 1=mask, 2=global
   static uint8_t interruptMask; // which interrupts to mask
   static uint8_t interruptSave; // temp storage, to restore state
