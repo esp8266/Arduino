@@ -4,6 +4,9 @@ ARDUINO 1.5.9
 [ide]
 * Updated AStyle formatter to v2.04: http://astyle.sourceforge.net/notes.html
 
+[core]
+* sam: added -MMD flag to let gcc produce dependency files (full rebuild on Arduino Due is now triggered only if needed)
+
 The following changes are included also in the Arduino IDE 1.0.7:
 
 [libraries]
