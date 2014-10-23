@@ -51,3 +51,13 @@ usbGemma.program.tool=avrdude
 usbGemma.program.extra_params=
 usbGemma.config.path={runtime.platform.path}/bootloaders/gemma/avrdude.conf
 
+## Notes about Dangerous Prototypes Bus Pirate as ISP
+## Bus Pirate V3 need Firmware v5.10 or later
+## Bus Pirate V4 need Firmware v6.3-r2151 or later
+buspirate.name=BusPirate as ISP
+buspirate.communication=serial
+buspirate.protocol=buspirate
+buspirate.program.protocol=buspirate
+buspirate.program.tool=avrdude
+buspirate.program.extra_params=-P{serial.port}
+
