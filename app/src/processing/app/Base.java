@@ -1122,12 +1122,7 @@ public class Base {
       }
     };
     managerUI.setListener(new ContributionManagerUIListener() {
-      @Override
-      public void onCategoryChange(String category) {
-        // TODO Auto-generated method stub
-        System.out.println("Selected " + category);
-      }
-      
+
       @Override
       public void onUpdatePressed() {
         // TODO Auto-generated method stub
@@ -1185,9 +1180,7 @@ public class Base {
         task.start();
       }
     });
-    managerUI.setCategories(Arrays.asList("Arduino", "Arduino Certified",
-                                       "Arduino@Heart"));
-    managerUI.addContributions(BaseNoGui.indexer.getIndex());
+    managerUI.setContributions(BaseNoGui.indexer.getIndex());
     managerUI.setVisible(true);
   }
 

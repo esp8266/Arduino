@@ -73,7 +73,6 @@ public class ContributionManagerUI extends JDialog {
 
   private ContributionManagerUIListener listener = null;
 
-  private String category;
   private JLabel categoryLabel;
   private JComboBox categoryChooser;
   private Component categoryStrut1;
@@ -88,6 +87,10 @@ public class ContributionManagerUI extends JDialog {
   private Box updateBox;
 
   private ContributedPlatformTableCell cellEditor;
+
+  // Currently selected category and filters
+  private String category;
+  private String[] filters;
 
   public ContributionManagerUI(Frame parent) {
     super(parent, "Boards Manager", Dialog.ModalityType.APPLICATION_MODAL);
@@ -108,13 +111,24 @@ public class ContributionManagerUI extends JDialog {
       categoryChooser.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent arg0) {
-          notifyCategoryChange();
+          String selected = (String) categoryChooser.getSelectedItem();
+          if (category == null || !category.equals(selected)) {
+            category = selected;
+            cellEditor.stopCellEditing();
+            contribModel.updateIndexFilter(category, filters);
+          }
         }
       });
 
       setCategories(new ArrayList<String>());
 
-      filterField = new FilterJTextField(_("Filter your search..."));
+      filterField = new FilterJTextField(_("Filter your search...")) {
+        @Override
+        protected void onFilter(String[] _filters) {
+          filters = _filters;
+          contribModel.updateIndexFilter(category, filters);
+        }
+      };
 
       JPanel panel = new JPanel();
       panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
@@ -266,18 +280,9 @@ public class ContributionManagerUI extends JDialog {
     categoryStrut3.setVisible(show);
   }
 
-  private synchronized void notifyCategoryChange() {
-    if (listener == null)
-      return;
-    String selected = (String) categoryChooser.getSelectedItem();
-    if (category == null || !category.equals(selected)) {
-      category = selected;
-      listener.onCategoryChange(category);
-    }
-  }
-
-  public void addContributions(ContributionsIndex index) {
-    contribModel.updateIndex(index);
+  public void setContributions(ContributionsIndex index) {
+    contribModel.setIndex(index);
+    setCategories(index.getCategories());
   }
 
   public void setProgressVisible(boolean visible) {

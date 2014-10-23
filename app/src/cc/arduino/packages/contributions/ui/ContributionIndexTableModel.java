@@ -117,14 +117,46 @@ public class ContributionIndexTableModel extends AbstractTableModel {
 
   private Class<?>[] columnTypes = { ContributedPlatform.class };
 
-  public void updateIndex(ContributionsIndex index) {
+  private ContributionsIndex index;
+
+  public void setIndex(ContributionsIndex _index) {
+    index = _index;
+    updateIndexFilter(null, null);
+  }
+
+  public void updateIndexFilter(String category, String filters[]) {
     contributions.clear();
     for (ContributedPackage pack : index.getPackages()) {
       for (ContributedPlatform platform : pack.getPlatforms()) {
+        if (category != null) {
+          if (!platform.getCategory().equals(category))
+            continue;
+        }
+        if (!stringContainsAll(platform.getName(), filters))
+          continue;
         addContribution(platform);
       }
     }
     fireTableDataChanged();
+  }
+
+  /**
+   * Check if <b>string</b> contains all the substrings in <b>set</b>. The
+   * compare is case insensitive.
+   * 
+   * @param string
+   * @param set
+   * @return <b>true<b> if all the strings in <b>set</b> are contained in
+   *         <b>string</b>.
+   */
+  private boolean stringContainsAll(String string, String set[]) {
+    if (set == null)
+      return true;
+    for (String s : set) {
+      if (!string.toLowerCase().contains(s.toLowerCase()))
+        return false;
+    }
+    return true;
   }
 
   private void addContribution(ContributedPlatform platform) {
@@ -194,4 +226,5 @@ public class ContributionIndexTableModel extends AbstractTableModel {
   public void update() {
     fireTableDataChanged();
   }
+
 }

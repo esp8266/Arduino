@@ -32,8 +32,6 @@ import cc.arduino.packages.contributions.ContributedPlatform;
 
 public interface ContributionManagerUIListener {
   
-  void onCategoryChange(String category);
-
   void onInstall(ContributedPlatform selected);
 
   void onRemove(ContributedPlatform selected);
