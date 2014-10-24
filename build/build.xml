@@ -617,6 +617,7 @@
     <move file="linux/work" tofile="linux/arduino-${version}" />
 
     <exec executable="tar" dir="linux">
+      <arg value="-z"/>
       <arg value="-c"/>
       <arg value="-f"/>
       <arg value="arduino-${version}-${platform}.tgz"/>
