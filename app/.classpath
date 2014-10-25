@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry excluding="processing/app/tools/format/" kind="src" path="src"/>
+	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/antlr.jar"/>
 	<classpathentry kind="lib" path="lib/jna.jar"/>
@@ -13,6 +14,7 @@
 	<classpathentry kind="lib" path="lib/jmdns-3.4.1.jar"/>
 	<classpathentry kind="lib" path="lib/jsch-0.1.50.jar"/>
 	<classpathentry kind="lib" path="lib/jssc-2.8.0.jar"/>
+	<classpathentry kind="lib" path="test-lib/junit-4.11.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/arduino-core"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
