@@ -120,7 +120,7 @@ enum
 	endOption		=	255
 };
 
-typedef struct _RIP_MSG_FIXED
+typedef struct __attribute__((packed)) _RIP_MSG_FIXED
 {
 	uint8_t  op; 
 	uint8_t  htype; 
