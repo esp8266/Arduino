@@ -275,6 +275,23 @@ public class Compiler implements MessageConsumer {
     return objectPaths;
   }
 
+  /**
+   * Strip escape sequences used in makefile dependency files (.d)
+   * https://github.com/arduino/Arduino/issues/2255#issuecomment-57645845
+   *
+   * @param dep
+   * @return
+   */
+  protected static String unescapeDepFile(String line) {
+    // Replaces: "\\" -> "\"
+    // Replaces: "\ " -> " "
+    // Replaces: "\#" -> "#"
+    line = line.replaceAll("\\\\([ #\\\\])", "$1");
+    // Replaces: "$$" -> "$"
+    line = line.replace("$$", "$");
+    return line;
+  }
+
   private boolean isAlreadyCompiled(File src, File obj, File dep, Map<String, String> prefs) {
     boolean ret=true;
     try {
@@ -293,9 +310,7 @@ public class Compiler implements MessageConsumer {
           line = line.substring(0, line.length() - 1);
         }
         line = line.trim();
-        // Strip backslash escape sequences. This replaces \\ with \ and
-        // removes all other backslashes
-        line = line.replaceAll("\\\\(.)", "$1");
+        line = unescapeDepFile(line);
         if (line.length() == 0) continue; // ignore blank lines
         if (need_obj_parse) {
           // line is supposed to be the object file - make sure it really is!
