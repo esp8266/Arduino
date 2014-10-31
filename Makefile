@@ -78,7 +78,7 @@ release:
 	-@rm www/index.20*
 	-@rm -fr $(STAGE)
 	@echo "#define AXTLS_VERSION    \"$(VERSION)\"" > ssl/version.h
-	cd ../; tar cvfz $(RELEASE).tar.gz --wildcards-match-slash --exclude .svn axTLS; cd -;
+	cd ../; tar cvfz $(RELEASE).tar.gz --wildcards-match-slash --exclude .svn axtls-code; cd -;
 
 docs:
 	$(MAKE) -C docsrc doco
