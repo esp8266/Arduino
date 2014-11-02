@@ -718,28 +718,63 @@ public class Compiler implements MessageConsumer {
     if (variantFolder != null)
       includeFolders.add(variantFolder);
 
-    List<File> coreObjectFiles = compileFiles(buildFolder, coreFolder, true,
-                                              includeFolders);
-    for (File file : coreObjectFiles) {
-
-      PreferencesMap dict = new PreferencesMap(prefs);
-      dict.put("ide_version", "" + Base.REVISION);
-      dict.put("archive_file", "core.a");
-      dict.put("object_file", file.getAbsolutePath());
-
-      String[] cmdArray;
-      try {
-        String cmd = prefs.get("recipe.ar.pattern");
-        cmdArray = StringReplacer.formatAndSplit(cmd, dict, true);
-      } catch (Exception e) {
-        throw new RunnerException(e);
-      }
-      execAsynchronously(cmdArray);
-    }
 
     if (variantFolder != null)
       objectFiles.addAll(compileFiles(buildFolder, variantFolder, true,
                                       includeFolders));
+
+    File afile = new File(buildFolder, "core.a");
+
+    List<File> coreObjectFiles = compileFiles(buildFolder, coreFolder, true,
+                                              includeFolders);
+
+    // See if the .a file is already uptodate
+    if (afile.exists()) {
+      boolean changed = false;
+      for (File file : coreObjectFiles) {
+        if (file.lastModified() > afile.lastModified()) {
+          changed = true;
+          break;
+        }
+      }
+
+      // If none of the object files is newer than the .a file, don't
+      // bother rebuilding the .a file. There is a small corner case
+      // here: If a source file was removed, but no other source file
+      // was modified, this will not rebuild core.a even when it
+      // should. It's hard to fix and not a realistic case, so it
+      // shouldn't be a problem.
+      if (!changed) {
+        if (verbose)
+          System.out.println(I18n.format(_("Using previously compiled file: {0}"), afile.getPath()));
+        return;
+      }
+    }
+
+    // Delete the .a file, to prevent any previous code from lingering
+    afile.delete();
+
+    try {
+      for (File file : coreObjectFiles) {
+
+        PreferencesMap dict = new PreferencesMap(prefs);
+        dict.put("ide_version", "" + Base.REVISION);
+        dict.put("archive_file", afile.getName());
+        dict.put("object_file", file.getAbsolutePath());
+
+        String[] cmdArray;
+        try {
+          String cmd = prefs.get("recipe.ar.pattern");
+          cmdArray = StringReplacer.formatAndSplit(cmd, dict, true);
+        } catch (Exception e) {
+          throw new RunnerException(e);
+        }
+        execAsynchronously(cmdArray);
+      }
+    } catch (RunnerException e) {
+      afile.delete();
+      throw e;
+    }
   }
 			
   // 4. link it all together into the .elf file
