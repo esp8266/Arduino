@@ -58,6 +58,24 @@
         <string>Editor</string>
       </dict>
     </array>
+    <key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.c-plus-plus-source</string>
+			</array>
+			<key>UTTypeIdentifier</key>
+			<string>cc.arduino.Arduino.source</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>ino</string>
+				</array>
+			</dict>
+		</dict>
+	</array>
     <key>Java</key>
     <dict>
       <key>VMOptions</key>
