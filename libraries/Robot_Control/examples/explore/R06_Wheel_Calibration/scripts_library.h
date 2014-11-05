@@ -12,7 +12,7 @@ const char script8[] PROGMEM="5. Repeat 4 until going straight\n";
 
 char buffer[42];//must be longer than text
 
-PROGMEM const char *scripts[]={
+const char * const scripts[] PROGMEM = {
   script1,
   script2,
   script3,
