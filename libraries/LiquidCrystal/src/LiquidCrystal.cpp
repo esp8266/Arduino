@@ -87,10 +87,11 @@ void LiquidCrystal::begin(uint8_t cols, uint8_t lines, uint8_t dotsize) {
     _displayfunction |= LCD_2LINE;
   }
   _numlines = lines;
-  _currline = 0;
+
+  setRowOffsets(0x00, 0x40, 0x00 + cols, 0x40 + cols);  
 
   // for some 1 line displays you can select a 10 pixel high font
-  if ((dotsize != 0) && (lines == 1)) {
+  if ((dotsize != LCD_5x8DOTS) && (lines == 1)) {
     _displayfunction |= LCD_5x10DOTS;
   }
 
@@ -157,6 +158,14 @@ void LiquidCrystal::begin(uint8_t cols, uint8_t lines, uint8_t dotsize) {
 
 }
 
+void LiquidCrystal::setRowOffsets(int row0, int row1, int row2, int row3)
+{
+	_row_offsets[0] = row0;
+	_row_offsets[1] = row1;
+	_row_offsets[2] = row2;
+	_row_offsets[3] = row3;
+}
+
 /********** high level commands, for the user! */
 void LiquidCrystal::clear()
 {
@@ -172,12 +181,15 @@ void LiquidCrystal::home()
 
 void LiquidCrystal::setCursor(uint8_t col, uint8_t row)
 {
-  int row_offsets[] = { 0x00, 0x40, 0x14, 0x54 };
+  const size_t max_lines = sizeof(_row_offsets) / sizeof(*_row_offsets);
+  if ( row >= max_lines ) {
+    row = max_lines - 1;    // we count rows starting w/0
+  }
   if ( row >= _numlines ) {
-    row = _numlines-1;    // we count rows starting w/0
+    row = _numlines - 1;    // we count rows starting w/0
   }
   
-  command(LCD_SETDDRAMADDR | (col + row_offsets[row]));
+  command(LCD_SETDDRAMADDR | (col + _row_offsets[row]));
 }
 
 // Turn the display on/off (quickly)

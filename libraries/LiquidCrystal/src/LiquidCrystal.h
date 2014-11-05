@@ -77,6 +77,7 @@ public:
   void autoscroll();
   void noAutoscroll();
 
+  void setRowOffsets(int row1, int row2, int row3, int row4);
   void createChar(uint8_t, uint8_t[]);
   void setCursor(uint8_t, uint8_t); 
   virtual size_t write(uint8_t);
@@ -100,7 +101,8 @@ private:
 
   uint8_t _initialized;
 
-  uint8_t _numlines,_currline;
+  uint8_t _numlines;
+  uint8_t _row_offsets[4];
 };
 
 #endif
