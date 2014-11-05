@@ -23,9 +23,9 @@
 
 package processing.app.debug;
 
-import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.SocketException;
 
 /**
@@ -33,16 +33,25 @@ import java.net.SocketException;
  */
 public class MessageSiphon implements Runnable {
 
-  private final BufferedReader streamReader;
+  private final Reader streamReader;
   private final MessageConsumer consumer;
 
   private Thread thread;
   private boolean canRun;
+  // Data is processed line-by-line if possible, but if this is non-zero
+  // then a partial line is also processed if no line end is received
+  // within this many milliseconds.
+  private int lineTimeout;
 
   public MessageSiphon(InputStream stream, MessageConsumer consumer) {
-    this.streamReader = new BufferedReader(new InputStreamReader(stream));
+    this(stream, consumer, 0);
+  }
+
+  public MessageSiphon(InputStream stream, MessageConsumer consumer, int lineTimeout) {
+    this.streamReader = new InputStreamReader(stream);
     this.consumer = consumer;
     this.canRun = true;
+    this.lineTimeout = lineTimeout;
 
     thread = new Thread(this);
     // don't set priority too low, otherwise exceptions won't
@@ -59,12 +68,46 @@ public class MessageSiphon implements Runnable {
       // (effectively sleeping the thread) until new data comes in.
       // when the program is finally done, null will come through.
       //
-      String currentLine;
-      while (canRun && (currentLine = streamReader.readLine()) != null) {
-        // \n is added again because readLine() strips it out
-        //EditorConsole.systemOut.println("messaging in");
-        consumer.message(currentLine + "\n");
-        //EditorConsole.systemOut.println("messaging out");
+      StringBuilder currentLine = new StringBuilder();
+      long lineStartTime = 0;
+      while (canRun) {
+        // First, try to read as many characters as possible. Take care
+        // not to block when:
+        //  1. lineTimeout is nonzero, and
+        //  2. we have some characters buffered already
+        while (lineTimeout == 0 || currentLine.length() == 0 || streamReader.ready()) {
+          int c = streamReader.read();
+          if (c == -1)
+            return; // EOF
+          if (!canRun)
+            return;
+
+          // Keep track of the line start time
+          if (currentLine.length() == 0)
+            lineStartTime = System.nanoTime();
+
+          // Store the character line
+          currentLine.append((char)c);
+
+          if (c == '\n') {
+            // We read a full line, pass it on
+            consumer.message(currentLine.toString());
+            currentLine.setLength(0);
+          }
+        }
+
+        // No more characters available. Wait until lineTimeout
+        // milliseconds have passed since the start of the line and then
+        // try reading again. If the time has already passed, then just
+        // pass on the characters read so far.
+        long passed = (System.nanoTime() - lineStartTime) / 1000;
+        if (passed < this.lineTimeout) {
+          Thread.sleep(this.lineTimeout - passed);
+          continue;
+        }
+
+        consumer.message(currentLine.toString());
+        currentLine.setLength(0);
       }
       //EditorConsole.systemOut.println("messaging thread done");
     } catch (NullPointerException npe) {

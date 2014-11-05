@@ -102,8 +102,8 @@ public abstract class Uploader implements MessageConsumer {
         System.out.println();
       }
       Process process = ProcessUtils.exec(command);
-      new MessageSiphon(process.getInputStream(), this);
-      new MessageSiphon(process.getErrorStream(), this);
+      new MessageSiphon(process.getInputStream(), this, 100);
+      new MessageSiphon(process.getErrorStream(), this, 100);
 
       // wait for the process to finish.
       result = process.waitFor();
