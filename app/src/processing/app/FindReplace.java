@@ -50,69 +50,47 @@ import processing.app.helpers.OSUtils;
 @SuppressWarnings("serial")
 public class FindReplace extends JFrame implements ActionListener {
 
-  static final int EDGE = OSUtils.isMacOS() ? 20 : 13;
-  static final int SMALL = 6;
-  static final int BUTTONGAP = 12; // 12 is correct for Mac, other numbers may be required for other platofrms
+  private Editor editor;
 
-  Editor editor;
+  private JTextField findField;
+  private JTextField replaceField;
+  private static String findString;
+  private static String replaceString;
 
-  JTextField findField;
-  JTextField replaceField;
-  static String findString;
-  static String replaceString;
+  private JButton replaceButton;
+  private JButton replaceAllButton;
+  private JButton replaceFindButton;
+  private JButton previousButton;
+  private JButton findButton;
 
-  JButton replaceButton;
-  JButton replaceAllButton;
-  JButton replaceFindButton;
-  JButton previousButton;
-  JButton findButton;
+  private JCheckBox ignoreCaseBox;
+  private static boolean ignoreCase = true;
 
-  JCheckBox ignoreCaseBox;
-  static boolean ignoreCase = true;
+  private JCheckBox wrapAroundBox;
+  private static boolean wrapAround = true;
 
-  JCheckBox wrapAroundBox;
-  static boolean wrapAround = true;
-
-  JCheckBox searchAllFilesBox;
-  static boolean searchAllFiles = false;
+  private JCheckBox searchAllFilesBox;
+  private static boolean searchAllFiles = false;
 
   public FindReplace(Editor editor) {
-    super("Find");
-    setResizable(false);
+    super(_("Find"));
     this.editor = editor;
     
-    FlowLayout searchLayout = new FlowLayout(FlowLayout.RIGHT,5,0);
-    Container pane = getContentPane();
-    pane.setLayout(searchLayout);
-
     JLabel findLabel = new JLabel(_("Find:"));
+    findField = new JTextField(20);
     JLabel replaceLabel = new JLabel(_("Replace with:"));
-    Dimension labelDimension = replaceLabel.getPreferredSize();
-    
-    JPanel find = new JPanel();
-    find.add(findLabel);
-    find.add(findField = new JTextField(20));
-    pane.add(find);
-    
-    JPanel replace = new JPanel();
-    replace.add(replaceLabel);
-    replace.add(replaceField = new JTextField(20));
-    pane.add(replace);
-    
-    int fieldHeight = findField.getPreferredSize().height;
+    replaceField=new JTextField(20);
 
-    JPanel checkbox = new JPanel();
-    
     // Fill the findString with selected text if no previous value
     if (editor.getSelectedText() != null &&
         editor.getSelectedText().length() > 0)
       findString = editor.getSelectedText();
     
-    if (findString != null) findField.setText(findString);
-    if (replaceString != null) replaceField.setText(replaceString);
-    //System.out.println("setting find str to " + findString);
-    //findField.requestFocusInWindow();
-
+    if (findString != null) 
+        findField.setText(findString);
+    if (replaceString != null) 
+        replaceField.setText(replaceString);
+    
     ignoreCaseBox = new JCheckBox(_("Ignore Case"));
     ignoreCaseBox.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -120,7 +98,6 @@ public class FindReplace extends JFrame implements ActionListener {
         }
       });
     ignoreCaseBox.setSelected(ignoreCase);
-    checkbox.add(ignoreCaseBox);
 
     wrapAroundBox = new JCheckBox(_("Wrap Around"));
     wrapAroundBox.addActionListener(new ActionListener() {
@@ -129,8 +106,7 @@ public class FindReplace extends JFrame implements ActionListener {
         }
       });
     wrapAroundBox.setSelected(wrapAround);
-    checkbox.add(wrapAroundBox);
-    
+
     searchAllFilesBox = new JCheckBox(_("Search all Sketch Tabs"));
     searchAllFilesBox.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -138,119 +114,103 @@ public class FindReplace extends JFrame implements ActionListener {
         }
       });
     searchAllFilesBox.setSelected(searchAllFiles);
-    checkbox.add(searchAllFilesBox);
 
-    pane.add(checkbox);
-    
-    JPanel buttons = new JPanel();
-    buttons.setLayout(new FlowLayout(FlowLayout.CENTER, BUTTONGAP, 0));
+    JPanel checkboxPanel = new JPanel();
+    checkboxPanel.setLayout(new  BoxLayout(checkboxPanel, BoxLayout.LINE_AXIS));
+    checkboxPanel.add(ignoreCaseBox);
+    checkboxPanel.add(Box.createRigidArea(new Dimension(8,0)));
+    checkboxPanel.add(wrapAroundBox);
+    checkboxPanel.add(Box.createRigidArea(new Dimension(8,0)));
+    checkboxPanel.add(searchAllFilesBox);
 
-    // ordering is different on mac versus pc
+    replaceAllButton = new JButton(_("Replace All"));
+    replaceAllButton.addActionListener(this);
+    replaceButton = new JButton(_("Replace"));
+    replaceButton.addActionListener(this);
+    replaceFindButton = new JButton(_("Replace & Find"));
+    replaceFindButton.addActionListener(this);
+    previousButton = new JButton(_("Previous"));
+    previousButton.addActionListener(this);
+    findButton = new JButton(_("Find"));
+    findButton.addActionListener(this);
+
+    JPanel buttonPanel = new JPanel();
+    buttonPanel.setLayout(new  BoxLayout(buttonPanel, BoxLayout.LINE_AXIS));
+    // ordering of buttons is different on mac versus pc
     if (OSUtils.isMacOS()) {
-      buttons.add(replaceAllButton = new JButton(_("Replace All")));
-      buttons.add(replaceButton = new JButton(_("Replace")));
-      buttons.add(replaceFindButton = new JButton(_("Replace & Find")));
-      buttons.add(previousButton = new JButton(_("Previous")));
-      buttons.add(findButton = new JButton(_("Find")));
+      buttonPanel.add(replaceAllButton);
+      buttonPanel.add(Box.createRigidArea(new Dimension(8,0)));
+      buttonPanel.add(replaceButton);
+      buttonPanel.add(Box.createRigidArea(new Dimension(8,0)));
+      buttonPanel.add(replaceFindButton);
+      buttonPanel.add(Box.createRigidArea(new Dimension(8,0)));
+      buttonPanel.add(previousButton);
+      buttonPanel.add(Box.createRigidArea(new Dimension(8,0)));
+      buttonPanel.add(findButton);
 
     } else {
-      buttons.add(findButton = new JButton(_("Find")));
-      buttons.add(previousButton = new JButton(_("Previous"))); // is this the right position for non-Mac?
-      buttons.add(replaceFindButton = new JButton(_("Replace & Find")));
-      buttons.add(replaceButton = new JButton(_("Replace")));
-      buttons.add(replaceAllButton = new JButton(_("Replace All")));
+      buttonPanel.add(findButton);
+      buttonPanel.add(Box.createRigidArea(new Dimension(8,0)));
+      buttonPanel.add(previousButton); // is this the right position for non-Mac?
+      buttonPanel.add(Box.createRigidArea(new Dimension(8,0)));
+      buttonPanel.add(replaceFindButton);
+      buttonPanel.add(Box.createRigidArea(new Dimension(8,0)));
+      buttonPanel.add(replaceButton);
+      buttonPanel.add(Box.createRigidArea(new Dimension(8,0)));
+      buttonPanel.add(replaceAllButton);
     }
-    pane.add(buttons);
-
+ 
     // to fix ugliness.. normally macosx java 1.3 puts an
     // ugly white border around this object, so turn it off.
     if (OSUtils.isMacOS()) {
-      buttons.setBorder(null);
+      buttonPanel.setBorder(null);
     }
 
-    /*
-    findField.addFocusListener(new FocusListener() {
-        public void focusGained(FocusEvent e) {
-          System.out.println("Focus gained " + e.getOppositeComponent());
-        }
-
-        public void focusLost(FocusEvent e) {
-          System.out.println("Focus lost "); // + e.getOppositeComponent());
-          if (e.getOppositeComponent() == null) {
-            requestFocusInWindow();
-          }
-        }
-      });
-    */
-
-    Dimension buttonsDimension = buttons.getPreferredSize();
-    int visibleButtonWidth = buttonsDimension.width - 2 * BUTTONGAP;
-    int fieldWidth = visibleButtonWidth - (labelDimension.width + SMALL);
-
-   // +1 since it's better to tend downwards
-    int yoff = (1 + fieldHeight - labelDimension.height) / 2;
-
-    int ypos = EDGE;
-    
-    int labelWidth = findLabel.getPreferredSize().width;
-    findLabel.setBounds(EDGE + (labelDimension.width-labelWidth), ypos + yoff, //  + yoff was added to the wrong field
-                        labelWidth, labelDimension.height);
-    findField.setBounds(EDGE + labelDimension.width + SMALL, ypos,
-                        fieldWidth, fieldHeight);
-                        
-    ypos += fieldHeight + SMALL;
-    
-    labelWidth = replaceLabel.getPreferredSize().width;
-    replaceLabel.setBounds(EDGE + (labelDimension.width-labelWidth), ypos + yoff,
-                           labelWidth, labelDimension.height);
-    replaceField.setBounds(EDGE + labelDimension.width + SMALL, ypos,
-                           fieldWidth, fieldHeight);
-
-    ypos += fieldHeight + SMALL;
-
-    ignoreCaseBox.setBounds(EDGE + labelDimension.width + SMALL,
-                            ypos,
-                            (fieldWidth-SMALL)/4, fieldHeight);
-
-    wrapAroundBox.setBounds(EDGE + labelDimension.width + SMALL + (fieldWidth-SMALL)/4 + SMALL,
-                            ypos,
-                            (fieldWidth-SMALL)/4, fieldHeight);
-
-	searchAllFilesBox.setBounds(EDGE + labelDimension.width + SMALL + (int)((fieldWidth-SMALL)/1.9) + SMALL,
-                            ypos,
-                            (fieldWidth-SMALL)/2, fieldHeight);
-
-    ypos += fieldHeight + SMALL;
-
-    buttons.setBounds(EDGE-BUTTONGAP, ypos,
-                      buttonsDimension.width, buttonsDimension.height);
-
-    ypos += buttonsDimension.height;
-
-//    Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-
-    int wide = visibleButtonWidth + EDGE*2;
-    int high = ypos; // butt.y + butt.height + EDGE*2 + SMALL;
+    //Put all components onto the dialog window
+    GridBagLayout searchLayout=new GridBagLayout();
+    GridBagConstraints gbc=new GridBagConstraints();
+    Container pane = getContentPane();
+    pane.setLayout(searchLayout);
+ 
+    gbc.insets=new Insets(4,4,4,4);
+    gbc.gridx=0;
+    gbc.weightx=0.0;
+    gbc.weighty=0.0;
+    gbc.fill=GridBagConstraints.NONE;
+    gbc.anchor=GridBagConstraints.LINE_END;
+    pane.add(findLabel,gbc);
+    gbc.gridx=1;
+    gbc.weightx=1.0;
+    gbc.fill=GridBagConstraints.HORIZONTAL;
+    gbc.anchor=GridBagConstraints.LINE_START;
+    pane.add(findField,gbc);
+    gbc.gridx=0;
+    gbc.gridy=1;
+    gbc.weightx=0.0;
+    gbc.fill=GridBagConstraints.NONE;
+    gbc.anchor=GridBagConstraints.LINE_END;
+    pane.add(replaceLabel,gbc);
+    gbc.gridx=1;
+    gbc.weightx=1.0;
+    gbc.fill=GridBagConstraints.HORIZONTAL;
+    gbc.anchor=GridBagConstraints.LINE_START;
+    pane.add(replaceField,gbc);
+    gbc.gridx=1;
+    gbc.gridy=2;
+    gbc.weighty=0.0;
+    gbc.fill=GridBagConstraints.NONE;
+    pane.add(checkboxPanel,gbc);
+    gbc.anchor=GridBagConstraints.CENTER;
+    gbc.gridwidth=2;
+    gbc.gridx=0;
+    gbc.gridy=3;
+    gbc.insets=new Insets(12,4,4,4);
+    pane.add(buttonPanel,gbc);
 
     pack();
-    Insets insets = getInsets();
-    //System.out.println("Insets = " + insets);
-    setSize(wide + insets.left + insets.right,high + insets.top + insets.bottom); 
-
-    setLocationRelativeTo( null ); // center
- //   setBounds((screen.width - wide) / 2, (screen.height - high) / 2, wide, high);
-
-    replaceButton.addActionListener(this);
-    replaceAllButton.addActionListener(this);
-    replaceFindButton.addActionListener(this);
-    findButton.addActionListener(this);
-    previousButton.addActionListener(this);
-
-    // you mustn't replace what you haven't found, my son
-    // semantics of replace are "replace the current selection with the replace field"
-    // so whether we have found before or not is irrelevent
-    // replaceButton.setEnabled(false);
-    // replaceFindButton.setEnabled(false);
+    setResizable(false);
+    //centers the dialog on thew screen
+    setLocationRelativeTo( null ); 
 
     // make the find button the blinky default
     getRootPane().setDefaultButton(findButton);
