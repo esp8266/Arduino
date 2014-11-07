@@ -203,7 +203,7 @@ void RSA_pub_key_new(RSA_CTX **rsa_ctx,
         const uint8_t *pub_exp, int pub_len);
 void RSA_free(RSA_CTX *ctx);
 int RSA_decrypt(const RSA_CTX *ctx, const uint8_t *in_data, uint8_t *out_data,
-        int is_decryption);
+        int out_len, int is_decryption);
 bigint *RSA_private(const RSA_CTX *c, bigint *bi_msg);
 #if defined(CONFIG_SSL_CERT_VERIFICATION) || defined(CONFIG_SSL_GENERATE_X509_CERT)
 bigint *RSA_sign_verify(BI_CTX *ctx, const uint8_t *sig, int sig_len,
@@ -220,8 +220,8 @@ void RSA_print(const RSA_CTX *ctx);
 EXP_FUNC void STDCALL RNG_initialize(void);
 EXP_FUNC void STDCALL RNG_custom_init(const uint8_t *seed_buf, int size);
 EXP_FUNC void STDCALL RNG_terminate(void);
-EXP_FUNC void STDCALL get_random(int num_rand_bytes, uint8_t *rand_data);
-void get_random_NZ(int num_rand_bytes, uint8_t *rand_data);
+EXP_FUNC int STDCALL get_random(int num_rand_bytes, uint8_t *rand_data);
+int get_random_NZ(int num_rand_bytes, uint8_t *rand_data);
 
 #ifdef __cplusplus
 }

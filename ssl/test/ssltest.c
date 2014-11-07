@@ -57,6 +57,9 @@
 //#define DEFAULT_CLNT_OPTION      SSL_DISPLAY_BYTES|SSL_DISPLAY_STATES
 #define DEFAULT_CLNT_OPTION     0
 
+/* hack to remove gcc warning */
+#define SYSTEM(A)           if (system(A) < 0) printf("system call error\n");
+
 static int g_port = 19001;
 
 /**************************************************************************
@@ -545,7 +548,7 @@ static int RSA_test(void)
     }
 
     RSA_encrypt(rsa_ctx, (const uint8_t *)"abc", 3, enc_data2, 0);
-    RSA_decrypt(rsa_ctx, enc_data2, dec_data2, 1);
+    RSA_decrypt(rsa_ctx, enc_data2, dec_data2, sizeof(dec_data2), 1);
     if (memcmp("abc", dec_data2, 3))
     {
         printf("Error: ENCRYPT/DECRYPT #2 failed\n");
@@ -823,7 +826,7 @@ static void do_client(client_t *clnt)
         g_port, clnt->openssl_option);
     }
 
-    system(openssl_buf);
+    SYSTEM(openssl_buf);
 }
 
 static int SSL_server_test(
@@ -1326,7 +1329,7 @@ static void do_server(server_t *svr)
                 "-accept %d -quiet %s ", g_port, svr->openssl_option);
     }
 
-    system(openssl_buf);
+    SYSTEM(openssl_buf);
 }
 
 static int SSL_client_test(
@@ -1646,8 +1649,8 @@ cleanup:
     {
         ssl_display_error(ret);
         printf("Error: A client test failed\n");
-        system("sh ../ssl/test/killopenssl.sh");
-        system("sh ../ssl/test/killgnutls.sh");
+        SYSTEM("sh ../ssl/test/killopenssl.sh");
+        SYSTEM("sh ../ssl/test/killgnutls.sh");
         exit(1);
     }
     else
@@ -2065,7 +2068,7 @@ static void do_header_issue(void)
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 #endif
     sprintf(axtls_buf, "./axssl s_client -connect localhost:%d", g_port);
-    system(axtls_buf);
+    SYSTEM(axtls_buf);
 }
 
 static int header_issue(void)
@@ -2099,7 +2102,12 @@ static int header_issue(void)
     }
 
     size = fread(buf, 1, sizeof(buf), f);
-    SOCKET_WRITE(client_fd, buf, size);
+    if (SOCKET_WRITE(client_fd, buf, size) < 0)
+    {
+        ret = SSL_ERROR_SOCK_SETUP_FAILURE;
+        goto error;
+    }
+
     usleep(200000);
 
     ret = 0;
@@ -2108,7 +2116,7 @@ error:
     SOCKET_CLOSE(client_fd);
     SOCKET_CLOSE(server_fd);
     TTY_FLUSH();
-    system("killall axssl");
+    SYSTEM("killall axssl");
     return ret;
 }
 
@@ -2208,29 +2216,29 @@ int main(int argc, char *argv[])
     if (SSL_basic_test())
         goto cleanup;
 
-    system("sh ../ssl/test/killopenssl.sh");
+    SYSTEM("sh ../ssl/test/killopenssl.sh");
 
     if (SSL_unblocked_test())
         goto cleanup;
 
-    system("sh ../ssl/test/killopenssl.sh");
+    SYSTEM("sh ../ssl/test/killopenssl.sh");
 
     if (SSL_client_tests())
         goto cleanup;
 
-    system("sh ../ssl/test/killopenssl.sh");
-    system("sh ../ssl/test/killgnutls.sh");
+    SYSTEM("sh ../ssl/test/killopenssl.sh");
+    SYSTEM("sh ../ssl/test/killgnutls.sh");
 
     if (SSL_server_tests())
         goto cleanup;
 
-    system("sh ../ssl/test/killopenssl.sh");
+    SYSTEM("sh ../ssl/test/killopenssl.sh");
 
-    //if (header_issue())
-    //{
-    //    printf("Header tests failed\n"); TTY_FLUSH();
-    //    goto cleanup;
-    //}
+    if (header_issue())
+    {
+        printf("Header tests failed\n"); TTY_FLUSH();
+        goto cleanup;
+    }
 
     ret = 0;        /* all ok */
     printf("**** ALL TESTS PASSED ****\n"); TTY_FLUSH();

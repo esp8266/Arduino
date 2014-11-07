@@ -310,7 +310,9 @@ static int send_server_hello(SSL *ssl)
     buf[5] = ssl->version & 0x0f;
 
     /* server random value */
-    get_random(SSL_RANDOM_SIZE, &buf[6]);
+    if (get_random(SSL_RANDOM_SIZE, &buf[6]) < 0)
+        return SSL_NOT_OK;
+
     memcpy(ssl->dc->server_random, &buf[6], SSL_RANDOM_SIZE);
     offset = 6 + SSL_RANDOM_SIZE;
 
@@ -391,7 +393,8 @@ static int process_client_key_xchg(SSL *ssl)
 
     /* rsa_ctx->bi_ctx is not thread-safe */
     SSL_CTX_LOCK(ssl->ssl_ctx->mutex);
-    premaster_size = RSA_decrypt(rsa_ctx, &buf[offset], premaster_secret, 1);
+    premaster_size = RSA_decrypt(rsa_ctx, &buf[offset], premaster_secret,
+            sizeof(premaster_secret), 1);
     SSL_CTX_UNLOCK(ssl->ssl_ctx->mutex);
 
     if (premaster_size != SSL_SECRET_SIZE || 
@@ -400,7 +403,9 @@ static int process_client_key_xchg(SSL *ssl)
                 premaster_secret[1] != (ssl->client_version & 0x0f))
     {
         /* guard against a Bleichenbacher attack */
-        get_random(SSL_SECRET_SIZE, premaster_secret);
+        if (get_random(SSL_SECRET_SIZE, premaster_secret) < 0)
+            return SSL_NOT_OK;
+
         /* and continue - will die eventually when checking the mac */
     }
 
@@ -453,7 +458,7 @@ static int process_cert_verify(SSL *ssl)
 
     /* rsa_ctx->bi_ctx is not thread-safe */
     SSL_CTX_LOCK(ssl->ssl_ctx->mutex);
-    n = RSA_decrypt(x509_ctx->rsa_ctx, &buf[6], dgst_buf, 0);
+    n = RSA_decrypt(x509_ctx->rsa_ctx, &buf[6], dgst_buf, sizeof(dgst_buf), 0);
     SSL_CTX_UNLOCK(ssl->ssl_ctx->mutex);
 
     if (n != SHA1_SIZE + MD5_SIZE)

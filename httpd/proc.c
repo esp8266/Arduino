@@ -188,7 +188,12 @@ static void procdirlisting(struct connstruct *cn)
     {
         snprintf(buf, sizeof(buf), HTTP_VERSION
                 " 200 OK\nContent-Type: text/html\n\n");
-        write(cn->networkdesc, buf, strlen(buf));
+        if (write(cn->networkdesc, buf, strlen(buf)) < 0)
+        {
+            printf("procdirlisting: could not write");
+            TTY_FLUSH();
+        }
+
         removeconnection(cn);
         return;
     }
@@ -625,7 +630,13 @@ static void proccgi(struct connstruct *cn)
         /* Send POST query data to CGI script */
         if ((cn->reqtype == TYPE_POST) && (cn->content_length > 0)) 
         {
-            write(spipe[1], cn->post_data, cn->content_length);
+            if (write(spipe[1], cn->post_data, cn->content_length) == -1)
+            {
+                printf("[CGI]: could write to pipe");
+                TTY_FLUSH();
+                return;
+            }
+
             close(spipe[0]);	 
             close(spipe[1]);
 

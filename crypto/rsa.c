@@ -134,21 +134,26 @@ void RSA_free(RSA_CTX *rsa_ctx)
 /**
  * @brief Use PKCS1.5 for decryption/verification.
  * @param ctx [in] The context
- * @param in_data [in] The data to encrypt (must be < modulus size-11)
- * @param out_data [out] The encrypted data.
+ * @param in_data [in] The data to decrypt (must be < modulus size-11)
+ * @param out_data [out] The decrypted data.
+ * @param out_len [int] The size of the decrypted buffer in bytes
  * @param is_decryption [in] Decryption or verify operation.
  * @return  The number of bytes that were originally encrypted. -1 on error.
  * @see http://www.rsasecurity.com/rsalabs/node.asp?id=2125
  */
 int RSA_decrypt(const RSA_CTX *ctx, const uint8_t *in_data, 
-                            uint8_t *out_data, int is_decryption)
+                            uint8_t *out_data, int out_len, int is_decryption)
 {
     const int byte_size = ctx->num_octets;
-    int i, size;
+    int i = 0, size;
     bigint *decrypted_bi, *dat_bi;
     uint8_t *block = (uint8_t *)alloca(byte_size);
+    int pad_count = 0;
 
-    memset(out_data, 0, byte_size); /* initialise */
+    if (out_len < byte_size)        /* check output has enough size */
+        return -1;
+
+    memset(out_data, 0, out_len);   /* initialise */
 
     /* decrypt */
     dat_bi = bi_import(ctx->bi_ctx, in_data, byte_size);
@@ -162,28 +167,37 @@ int RSA_decrypt(const RSA_CTX *ctx, const uint8_t *in_data,
     /* convert to a normal block */
     bi_export(ctx->bi_ctx, decrypted_bi, block, byte_size);
 
-    i = 10; /* start at the first possible non-padded byte */
+    if (block[i++] != 0)             /* leading 0? */
+        return -1;
 
 #ifdef CONFIG_SSL_CERT_VERIFICATION
     if (is_decryption == 0) /* PKCS1.5 signing pads with "0xff"s */
     {
-        while (block[i++] == 0xff && i < byte_size);
+        if (block[i++] != 0x01)     /* BT correct? */
+            return -1;
 
-        if (block[i-2] != 0xff)
-            i = byte_size;     /*ensure size is 0 */   
+        while (block[i++] == 0xff && i < byte_size)
+            pad_count++;
     }
     else                    /* PKCS1.5 encryption padding is random */
 #endif
     {
-        while (block[i++] && i < byte_size);
+        if (block[i++] != 0x02)     /* BT correct? */
+            return -1;
+
+        while (block[i++] && i < byte_size)
+            pad_count++;
     }
+
+    /* check separator byte - and padding must be 8 or more bytes */
+    if (i == byte_size || pad_count < 8) 
+        return -1;
+
     size = byte_size - i;
 
     /* get only the bit we want */
-    if (size > 0)
-        memcpy(out_data, &block[i], size);
-    
-    return size ? size : -1;
+    memcpy(out_data, &block[i], size);
+    return size;
 }
 
 /**
@@ -249,7 +263,8 @@ int RSA_encrypt(const RSA_CTX *ctx, const uint8_t *in_data, uint16_t in_len,
     else /* randomize the encryption padding with non-zero bytes */   
     {
         out_data[1] = 2;
-        get_random_NZ(num_pads_needed, &out_data[2]);
+        if (get_random_NZ(num_pads_needed, &out_data[2]) < 0)
+            return -1;
     }
 
     out_data[2+num_pads_needed] = 0;
