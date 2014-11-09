@@ -630,7 +630,7 @@ public class Preferences {
     setBoolean("upload.verbose", verboseUploadBox.isSelected());
     setBoolean("editor.linenumbers", displayLineNumbersBox.isSelected());
     setBoolean("upload.verify", verifyUploadBox.isSelected());
-    setBoolean("save.verifyUpload", saveVerifyUploadBox.isSelected());
+    setBoolean("editor.save_on_verify", saveVerifyUploadBox.isSelected());
 
 //    setBoolean("sketchbook.closing_last_window_quits",
 //               closingLastQuitsBox.isSelected());
@@ -653,7 +653,7 @@ public class Preferences {
 
     setBoolean("editor.external", externalEditorBox.isSelected());
     setBoolean("update.check", checkUpdatesBox.isSelected());
-    setBoolean("save.verifyUpload", saveVerifyUploadBox.isSelected());
+    setBoolean("editor.save_on_verify", saveVerifyUploadBox.isSelected());
 
     /*
       // was gonna use this to check memory settings,
@@ -716,7 +716,7 @@ public class Preferences {
     checkUpdatesBox.
       setSelected(getBoolean("update.check"));
     saveVerifyUploadBox.
-      setSelected(getBoolean("save.verifyUpload"));
+      setSelected(getBoolean("editor.save_on_verify"));
 
     if (autoAssociateBox != null) {
       autoAssociateBox.

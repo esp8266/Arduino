@@ -1887,7 +1887,7 @@ public class Editor extends JFrame implements RunnerListener {
    */
   public void handleRun(final boolean verbose) {
     internalCloseRunner();
-    if (Preferences.getBoolean("save.verifyUpload")) {
+    if (Preferences.getBoolean("editor.save_on_verify")) {
       if (sketch.isModified() && !sketch.isReadOnly()) {
         handleSave(true);
       }
@@ -2374,7 +2374,7 @@ public class Editor extends JFrame implements RunnerListener {
    * hitting export twice, quickly, and horking things up.
    */
   synchronized public void handleExport(final boolean usingProgrammer) {
-    if (Preferences.getBoolean("save.verifyUpload")) {
+    if (Preferences.getBoolean("editor.save_on_verify")) {
       if (sketch.isModified() && !sketch.isReadOnly()) {
         handleSave(true);
       }
