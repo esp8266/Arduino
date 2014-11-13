@@ -149,6 +149,9 @@ editor.divider.size = 0
 # but keeps it from being annoyingly obtrusive
 editor.divider.size.windows = 2
 
+# automatically save sketch when verifying or uploading
+editor.save_on_verify = true
+
 # any additional java options when running externally
 # (for applets that are run external to the environment...
 # those with a code folder, or using any libraries)

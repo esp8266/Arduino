@@ -2,6 +2,7 @@
 ARDUINO 1.5.9
 
 [ide]
+* Autosave on sketch Upload/Verify (Fulvio Ieva)
 * Sketch build process: fixed full rebuild on windows even if not needed
 * Sketch build process: core.a rebuild only if needed (Matthijs Kooijman)
 * Updated AStyle formatter to v2.04: http://astyle.sourceforge.net/notes.html
