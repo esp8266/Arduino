@@ -127,6 +127,8 @@
       </fileset>
     </copy>
 
+    <chmod file="${target.path}/hardware/tools/esp8266/esptool" perm="755" />
+
     <!-- copy shared examples folder -->
     <copy todir="${target.path}/examples">
       <fileset dir="shared/examples" />
@@ -274,6 +276,14 @@
     </antcall>
     <copy file="macosx/libastylej/libastylej.jnilib" todir="macosx/work/Arduino.app/Contents/Resources/Java/lib/" />
     <chmod perm="755" file="macosx/work/Arduino.app/Contents/Resources/Java/lib/libastylej.jnilib" />
+
+    <antcall target="untar">
+      <param name="archive_file" value="./osx-xtensa-lx106-elf.tgz" />
+      <!--param name="archive_url" value="http://downloads.arduino.cc/libastylej-2.04.zip" / -->
+      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/xtensa-lx106-elf" />
+      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/" />
+    </antcall>
+
   </target>
 
   <target name="macosx-run" depends="macosx-build" description="Run Mac OS X version">
