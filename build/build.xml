@@ -127,7 +127,13 @@
       </fileset>
     </copy>
 
-    <chmod file="${target.path}/hardware/tools/esp8266/esptool" perm="755" />
+
+    <antcall target="untar">
+      <param name="archive_file" value="./esptool-0.0.3.tgz" />
+      <!--param name="archive_url" value="http://th.igrr.me/esptool-0.0.3.tgz" / -->
+      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/esptool-0.0.3" />
+      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/" />
+    </antcall>    
 
     <!-- copy shared examples folder -->
     <copy todir="${target.path}/examples">
@@ -267,6 +273,11 @@
       <fileset dir="macosx/work/${staging_hardware_folder}/tools" includes="**/man/**/*"/>
       <fileset dir="macosx/work/${staging_hardware_folder}/tools" includes="**/man"/>
     </delete>
+
+    <move file="macosx/work/${staging_hardware_folder}/tools/esp8266/esptool-0.0.3/esptool_osx" tofile="macosx/work/${staging_hardware_folder}/tools/esp8266/esptool" />
+    
+    <delete dir="macosx/work/${staging_hardware_folder}/tools/esp8266/esptool-0.0.3/" />
+
 
     <antcall target="unzip">
       <param name="archive_file" value="./libastylej-2.04.zip" />
