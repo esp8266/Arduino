@@ -23,6 +23,13 @@
 // SPI_HAS_NOTUSINGINTERRUPT means that SPI has notUsingInterrupt() method
 #define SPI_HAS_NOTUSINGINTERRUPT 1
 
+// SPI_ATOMIC_VERSION means that SPI has atomicity fixes and what version.
+// This way when there is a bug fix you can check this define to alert users
+// of your code if it uses better version of this library.
+// This also implies everything that SPI_HAS_TRANSACTION as documented above is
+// available too.
+#define SPI_ATOMIC_VERSION 1
+
 // Uncomment this line to add detection of mismatched begin/end transactions.
 // A mismatch occurs if other libraries fail to use SPI.endTransaction() for
 // each SPI.beginTransaction().  Connect an LED to this pin.  The LED will turn
@@ -170,17 +177,21 @@ public:
   // and configure the correct settings.
   inline static void beginTransaction(SPISettings settings) {
     if (interruptMode > 0) {
+      uint8_t sreg = SREG;
+      noInterrupts();
+
       #ifdef SPI_AVR_EIMSK
       if (interruptMode == 1) {
         interruptSave = SPI_AVR_EIMSK;
         SPI_AVR_EIMSK &= ~interruptMask;
+        SREG = sreg;
       } else
       #endif
       {
-        interruptSave = SREG;
-        cli();
+        interruptSave = sreg;
       }
     }
+
     #ifdef SPI_TRANSACTION_MISMATCH_LED
     if (inTransactionFlag) {
       pinMode(SPI_TRANSACTION_MISMATCH_LED, OUTPUT);
@@ -188,6 +199,7 @@ public:
     }
     inTransactionFlag = 1;
     #endif
+
     SPCR = settings.spcr;
     SPSR = settings.spsr;
   }
@@ -253,10 +265,16 @@ public:
     }
     inTransactionFlag = 0;
     #endif
+
     if (interruptMode > 0) {
+      #ifdef SPI_AVR_EIMSK
+      uint8_t sreg = SREG;
+      #endif
+      noInterrupts();
       #ifdef SPI_AVR_EIMSK
       if (interruptMode == 1) {
         SPI_AVR_EIMSK = interruptSave;
+        SREG = sreg;
       } else
       #endif
       {
