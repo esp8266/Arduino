@@ -169,11 +169,11 @@
         <tokenfilter>
           <linetokenizer />
           <containsregex pattern="String VERSION_NAME = "/>
-          <replaceregex pattern="[^0-9]*" flags="g" replace=""/>
+          <replaceregex pattern=".*&quot;(.*)&quot;.*" flags="g" replace="\1"/>
         </tokenfilter>
       </filterchain>
     </loadfile>
-    <echo message="Revision in BaseNoGui.java is: ${revision.base}" />
+    <echo message="                     Revision in BaseNoGui.java is: ${revision.base}" />
   </target>
 
   <!-- - - - - - - - -->

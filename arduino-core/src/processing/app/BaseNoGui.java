@@ -41,11 +41,10 @@ import processing.app.packages.LibraryList;
 
 public class BaseNoGui {
 
+  /** Version string to be used for build */
   public static final int REVISION = 158;
-  /** This might be replaced by main() if there's a lib/version.txt file. */
-  static String VERSION_NAME = "0158";
-  /** Set true if this a proper release rather than a numbered revision. */
-  static public boolean RELEASE = false;
+  /** Extended version string displayed on GUI */
+  static String VERSION_NAME = "1.5.8";
 
   static File buildFolder;
 
@@ -608,19 +607,6 @@ public class BaseNoGui {
   }
 
   static public void initVersion() {
-    try {
-      File versionFile = getContentFile("lib/version.txt");
-      if (versionFile.exists()) {
-        String version = PApplet.loadStrings(versionFile)[0];
-        if (!version.equals(VERSION_NAME) && !version.equals("${version}")) {
-          VERSION_NAME = version;
-          RELEASE = true;
-        }
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
     // help 3rd party installers find the correct hardware path
     PreferencesData.set("last.ide." + VERSION_NAME + ".hardwarepath", getHardwarePath());
     PreferencesData.set("last.ide." + VERSION_NAME + ".daterun", "" + (new Date()).getTime() / 1000);

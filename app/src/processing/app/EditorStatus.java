@@ -464,7 +464,7 @@ public class EditorStatus extends JPanel /*implements ActionListener*/ {
       copyErrorButton.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           String message = "";
-          message += _("Arduino: ") + Base.VERSION_NAME + " (" + System.getProperty("os.name") + "), ";
+          message += _("Arduino: ") + BaseNoGui.VERSION_NAME + " (" + System.getProperty("os.name") + "), ";
           message += _("Board: ") + "\"" + Base.getBoardPreferences().get("name") + "\"\n\n";
           message += editor.console.consoleTextPane.getText().trim();
           if ((Preferences.getBoolean("build.verbose")) == false) {

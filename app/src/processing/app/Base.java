@@ -58,11 +58,6 @@ import static processing.app.I18n._;
  * files and images, etc) that comes from that.
  */
 public class Base {
-  public static final int REVISION = BaseNoGui.REVISION;
-  /** This might be replaced by main() if there's a lib/version.txt file. */
-  static String VERSION_NAME = BaseNoGui.VERSION_NAME;
-  /** Set true if this a proper release rather than a numbered revision. */
-  static public boolean RELEASE = BaseNoGui.RELEASE;
 
   static private boolean commandLine;
 
@@ -104,8 +99,6 @@ public class Base {
     BaseNoGui.initParameters(args);
     
     BaseNoGui.initVersion();
-    VERSION_NAME = BaseNoGui.VERSION_NAME;
-    RELEASE = BaseNoGui.RELEASE;
 
 //    if (System.getProperty("mrj.version") != null) {
 //      //String jv = System.getProperty("java.version");
@@ -1509,7 +1502,7 @@ public class Base {
 
           g.setFont(new Font("SansSerif", Font.PLAIN, 11));
           g.setColor(Color.white);
-          g.drawString(VERSION_NAME, 50, 30);
+          g.drawString(BaseNoGui.VERSION_NAME, 50, 30);
         }
       };
     window.addMouseListener(new MouseAdapter() {
