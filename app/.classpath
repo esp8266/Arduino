@@ -15,6 +15,10 @@
 	<classpathentry kind="lib" path="lib/jsch-0.1.50.jar"/>
 	<classpathentry kind="lib" path="lib/jssc-2.8.0.jar"/>
 	<classpathentry kind="lib" path="test-lib/junit-4.11.jar"/>
+	<classpathentry kind="lib" path="test-lib/fest-assert-1.2.jar"/>
+	<classpathentry kind="lib" path="test-lib/fest-reflect-1.2.jar"/>
+	<classpathentry kind="lib" path="test-lib/fest-swing-1.2.jar"/>
+	<classpathentry kind="lib" path="test-lib/fest-util-1.1.2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/arduino-core"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
