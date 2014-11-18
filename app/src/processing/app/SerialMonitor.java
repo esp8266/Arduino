@@ -19,7 +19,7 @@
 package processing.app;
 
 import cc.arduino.packages.BoardPort;
-import processing.core.PApplet;
+import processing.app.legacy.PApplet;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -27,6 +27,7 @@ import java.awt.event.ActionListener;
 
 import static processing.app.I18n._;
 
+@SuppressWarnings("serial")
 public class SerialMonitor extends AbstractMonitor {
 
   private final String port;

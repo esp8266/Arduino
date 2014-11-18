@@ -29,7 +29,7 @@ import javax.swing.text.Segment;
 
 import processing.app.*;
 import processing.app.syntax.*;
-import processing.core.PApplet;
+import processing.app.legacy.PApplet;
 
 /**
  * Format for Discourse Tool

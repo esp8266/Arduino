@@ -16,7 +16,6 @@
   <classPath>
     <mainClass>processing.app.Base</mainClass>
     <cp>lib/pde.jar</cp>
-    <cp>lib/core.jar</cp>
     <cp>lib/jna.jar</cp>
     <cp>lib/ecj.jar</cp>
     <cp>lib/jssc-2.8.0.jar</cp>

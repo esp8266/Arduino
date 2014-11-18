@@ -26,7 +26,10 @@ import static processing.app.I18n._;
 
 import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.*;
+
+import processing.app.helpers.OSUtils;
 
 
 /**
@@ -47,7 +50,7 @@ import javax.swing.*;
 @SuppressWarnings("serial")
 public class FindReplace extends JFrame implements ActionListener {
 
-  static final int EDGE = Base.isMacOS() ? 20 : 13;
+  static final int EDGE = OSUtils.isMacOS() ? 20 : 13;
   static final int SMALL = 6;
   static final int BUTTONGAP = 12; // 12 is correct for Mac, other numbers may be required for other platofrms
 
@@ -143,7 +146,7 @@ public class FindReplace extends JFrame implements ActionListener {
     buttons.setLayout(new FlowLayout(FlowLayout.CENTER, BUTTONGAP, 0));
 
     // ordering is different on mac versus pc
-    if (Base.isMacOS()) {
+    if (OSUtils.isMacOS()) {
       buttons.add(replaceAllButton = new JButton(_("Replace All")));
       buttons.add(replaceButton = new JButton(_("Replace")));
       buttons.add(replaceFindButton = new JButton(_("Replace & Find")));
@@ -161,7 +164,7 @@ public class FindReplace extends JFrame implements ActionListener {
 
     // to fix ugliness.. normally macosx java 1.3 puts an
     // ugly white border around this object, so turn it off.
-    if (Base.isMacOS()) {
+    if (OSUtils.isMacOS()) {
       buttons.setBorder(null);
     }
 

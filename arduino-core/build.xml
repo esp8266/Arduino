@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<project name="Arduino IDE Core" default="build">
+
+  <path id="class.path">
+    <fileset dir="lib">
+      <include name="*.jar"/>
+    </fileset>
+    <pathelement path="${env.JAVA_HOME}/lib/tools.jar"/>
+  </path>
+
+  <target name="clean" description="Clean out the build directories">
+    <delete dir="bin" />
+    <delete file="arduino-core.jar" />
+  </target>
+
+  <target name="compile" description="Compile">
+<!--
+    <taskdef name="methods"
+             classname="PAppletMethods"
+             classpath="methods/methods.jar" />
+    <methods dir="${basedir}/src/processing/core" />
+-->
+    <mkdir dir="bin" />
+
+    <!-- ant seems to nuke ${java.home} for some reason, pointing at the JRE
+	 subfolder instead of the actual JDK found at JAVA_HOME. 
+	 To avoid this, we grab the actual JAVA_HOME environment variable 
+	 and use that to specify the location of tools.jar. -->
+
+    <!-- if someone is better with ant please help clean this up -->
+    <property environment="env" />
+    <property name="java_home" value="${env.JAVA_HOME}" />
+
+    <javac source="1.6"
+           target="1.6"
+           encoding="UTF-8"
+           includeAntRuntime="false"
+           srcdir="src"
+           classpathref="class.path"
+           destdir="bin">
+    </javac>
+
+    <copy todir="bin" overwrite="true" verbose="true">
+      <fileset dir="src" includes="**/*.properties" />
+    </copy>
+  </target>
+
+  <target name="build" depends="compile" description="Build core library">
+    <jar basedir="bin" destfile="arduino-core.jar" />
+  </target>
+
+</project>

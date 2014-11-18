@@ -50,7 +50,7 @@ public class ThinkDifferent implements ApplicationListener {
   private Base base;
 
   
-  static protected void init(Base base) {    
+  static public void init(Base base) {    
     if (application == null) {
       //application = new com.apple.eawt.Application();
       application = com.apple.eawt.Application.getApplication();
