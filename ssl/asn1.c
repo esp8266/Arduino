@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Cameron Rich
+ * Copyright (c) 2007-2014, Cameron Rich
  * 
  * All rights reserved.
  * 
@@ -40,7 +40,7 @@
 #include "crypto.h"
 #include "crypto_misc.h"
 
-/* Must be an RSA algorithm with either SHA1 or MD5 for verifying to work */
+/* Must be an RSA algorithm with either SHA1/SHA256/MD5 for verifying to work */
 static const uint8_t sig_oid_prefix[] = 
 {
     0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01
@@ -64,9 +64,10 @@ static const uint8_t sig_subject_alt_name[] =
 /* CN, O, OU */
 static const uint8_t g_dn_types[] = { 3, 10, 11 };
 
-int get_asn1_length(const uint8_t *buf, int *offset)
+uint32_t get_asn1_length(const uint8_t *buf, int *offset)
 {
-    int len, i;
+    int i;
+    uint32_t len;
 
     if (!(buf[*offset] & 0x80)) /* short form */
     {
@@ -75,6 +76,9 @@ int get_asn1_length(const uint8_t *buf, int *offset)
     else  /* long form */
     {
         int length_bytes = buf[(*offset)++]&0x7f;
+        if (length_bytes > 4)   /* limit number of bytes */
+            return 0;
+
         len = 0;
         for (i = 0; i < length_bytes; i++)
         {
