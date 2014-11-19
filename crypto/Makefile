@@ -38,11 +38,11 @@ OBJ=\
 	bigint.o \
 	crypto_misc.o \
 	hmac.o \
-	md2.o \
 	md5.o \
 	rc4.o \
 	rsa.o \
-	sha1.o
+	sha1.o \
+	sha256.o	
 
 include ../config/makefile.post
 

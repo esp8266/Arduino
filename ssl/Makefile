@@ -69,11 +69,11 @@ CRYPTO_OBJ=\
 	$(CRYPTO_PATH)bigint.o \
 	$(CRYPTO_PATH)crypto_misc.o \
 	$(CRYPTO_PATH)hmac.o \
-	$(CRYPTO_PATH)md2.o \
 	$(CRYPTO_PATH)md5.o \
 	$(CRYPTO_PATH)rc4.o \
 	$(CRYPTO_PATH)rsa.o \
-	$(CRYPTO_PATH)sha1.o
+	$(CRYPTO_PATH)sha1.o \
+	$(CRYPTO_PATH)sha256.o
 
 OBJ=\
 	asn1.o \

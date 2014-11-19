@@ -124,22 +124,21 @@ void SHA1_Update(SHA1_CTX *, const uint8_t * msg, int len);
 void SHA1_Final(uint8_t *digest, SHA1_CTX *);
 
 /**************************************************************************
- * MD2 declarations 
+ * SHA256 declarations 
  **************************************************************************/
 
-#define MD2_SIZE 16
+#define SHA256_SIZE   32
 
 typedef struct
 {
-    unsigned char cksum[16];    /* checksum of the data block */
-    unsigned char state[48];    /* intermediate digest state */
-    unsigned char buffer[16];   /* data block being processed */
-    int left;                   /* amount of data in buffer */
-} MD2_CTX;
+    uint32_t total[2];
+    uint32_t state[8];
+    uint8_t buffer[64];
+} SHA256_CTX;
 
-EXP_FUNC void STDCALL MD2_Init(MD2_CTX *ctx);
-EXP_FUNC void STDCALL MD2_Update(MD2_CTX *ctx, const uint8_t *input, int ilen);
-EXP_FUNC void STDCALL MD2_Final(uint8_t *digest, MD2_CTX *ctx);
+void SHA256_Init(SHA256_CTX *c);
+void SHA256_Update(SHA256_CTX *, const uint8_t *input, int len);
+void SHA256_Final(uint8_t digest[32], SHA256_CTX *);
 
 /**************************************************************************
  * MD5 declarations 
@@ -154,9 +153,9 @@ typedef struct
   uint8_t buffer[64];       /* input buffer */
 } MD5_CTX;
 
-EXP_FUNC void STDCALL MD5_Init(MD5_CTX *);
-EXP_FUNC void STDCALL MD5_Update(MD5_CTX *, const uint8_t *msg, int len);
-EXP_FUNC void STDCALL MD5_Final(uint8_t *digest, MD5_CTX *);
+void MD5_Init(MD5_CTX *);
+void MD5_Update(MD5_CTX *, const uint8_t *msg, int len);
+void MD5_Final(uint8_t *digest, MD5_CTX *);
 
 /**************************************************************************
  * HMAC declarations 

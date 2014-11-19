@@ -121,7 +121,12 @@ int main(int argc, char *argv[])
     }
 
     RNG_initialize();
-    get_random(MD5_SIZE, md5_salt);
+    if (get_random(MD5_SIZE, md5_salt) < 0)
+    {
+        fprintf(stderr, "Can't get random data\n" );
+        exit(1);
+    }
+
     RNG_terminate();
     base64_encode(md5_salt, MD5_SIZE, b64_salt, sizeof(b64_salt));
 

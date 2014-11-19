@@ -126,6 +126,7 @@ const char * x509_display_error(int error);
 #define SIG_TYPE_MD2            0x02
 #define SIG_TYPE_MD5            0x04
 #define SIG_TYPE_SHA1           0x05
+#define SIG_TYPE_SHA256         0x0b
 
 int get_asn1_length(const uint8_t *buf, int *offset);
 int asn1_get_private_key(const uint8_t *buf, int len, RSA_CTX **rsa_ctx);

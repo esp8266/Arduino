@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Cameron Rich
+ * Copyright (c) 2007-2014, Cameron Rich
  * 
  * All rights reserved.
  * 
@@ -303,6 +303,60 @@ end:
 }
 
 /**************************************************************************
+ * SHA256 tests 
+ *
+ * Run through a couple of the SHA-2 tests to verify that SHA256 is correct.
+ **************************************************************************/
+static int SHA256_test(BI_CTX *bi_ctx)
+{
+    SHA256_CTX ctx;
+    uint8_t ct[SHA256_SIZE];
+    uint8_t digest[SHA256_SIZE];
+    int res = 1;
+
+    {
+        const char *in_str = "abc";
+        bigint *ct_bi = bi_str_import(bi_ctx,
+            "BA7816BF8F01CFEA414140DE5DAE2223B00361A396177A9CB410FF61F20015AD");
+        bi_export(bi_ctx, ct_bi, ct, SHA256_SIZE);
+
+        SHA256_Init(&ctx);
+        SHA256_Update(&ctx, (const uint8_t *)in_str, strlen(in_str));
+        SHA256_Final(digest, &ctx);
+
+        if (memcmp(digest, ct, sizeof(ct)))
+        {
+            printf("Error: SHA256 # failed\n");
+            goto end;
+        }
+    }
+
+    {
+        const char *in_str =
+            "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
+        bigint *ct_bi = bi_str_import(bi_ctx,
+            "248D6A61D20638B8E5C026930C3E6039A33CE45964FF2167F6ECEDD419DB06C1");
+        bi_export(bi_ctx, ct_bi, ct, SHA256_SIZE);
+
+        SHA256_Init(&ctx);
+        SHA256_Update(&ctx, (const uint8_t *)in_str, strlen(in_str));
+        SHA256_Final(digest, &ctx);
+
+        if (memcmp(digest, ct, sizeof(ct)))
+        {
+            printf("Error: SHA256 #2 failed\n");
+            goto end;
+        }
+    }
+
+    res = 0;
+    printf("All SHA256 tests passed\n");
+
+end:
+    return res;
+}
+
+/**************************************************************************
  * MD5 tests 
  *
  * Run through a couple of the RFC1321 tests to verify that MD5 is correct.
@@ -521,6 +575,8 @@ static int RSA_test(void)
     int len; 
     uint8_t *buf;
 
+    RNG_initialize();
+
     /* extract the private key elements */
     len = get_file("../ssl/test/axTLS.key_1024", &buf);
     if (asn1_get_private_key(buf, len, &rsa_ctx) < 0)
@@ -547,11 +603,16 @@ static int RSA_test(void)
         goto end;
     }
 
-    RSA_encrypt(rsa_ctx, (const uint8_t *)"abc", 3, enc_data2, 0);
+    if (RSA_encrypt(rsa_ctx, (const uint8_t *)"abc", 3, enc_data2, 0) < 0)
+    {
+        printf("Error: ENCRYPT #2 failed\n");
+        goto end;
+    }
+
     RSA_decrypt(rsa_ctx, enc_data2, dec_data2, sizeof(dec_data2), 1);
     if (memcmp("abc", dec_data2, 3))
     {
-        printf("Error: ENCRYPT/DECRYPT #2 failed\n");
+        printf("Error: DECRYPT #2 failed\n");
         goto end;
     }
 
@@ -560,6 +621,7 @@ static int RSA_test(void)
     printf("All RSA tests passed\n");
 
 end:
+    RNG_terminate();
     return res;
 }
 
@@ -648,8 +710,8 @@ static int cert_tests(void)
     free(buf);
 
     ssl_ctx = ssl_ctx_new(0, 0);
-    len = get_file("../ssl/test/verisign.x509_ca", &buf);
-    if ((res = add_cert_auth(ssl_ctx, buf, len)) <0)
+    if ((res = ssl_obj_load(ssl_ctx, SSL_OBJ_X509_CERT, 
+                "../ssl/test/camster_duckdns_org.crt", NULL)) != SSL_OK)
     {
         printf("Cert #7\n");
         ssl_display_error(res);
@@ -657,23 +719,12 @@ static int cert_tests(void)
     }
 
     ssl_ctx_free(ssl_ctx);
-    free(buf);
-
-    if (get_file("../ssl/test/verisign.x509_my_cert", &buf) < 0 ||
-                                    x509_new(buf, &len, &x509_ctx))
-    {
-        printf("Cert #8\n");
-        ssl_display_error(res);
-        goto bad_cert;
-    }
-
-    x509_free(x509_ctx);
-    free(buf);
 
     ssl_ctx = ssl_ctx_new(0, 0);
     if ((res = ssl_obj_load(ssl_ctx, 
               SSL_OBJ_X509_CERT, "../ssl/test/ms_iis.cer", NULL)) != SSL_OK)
     {
+        printf("Cert #9\n");
         ssl_display_error(res);
         goto bad_cert;
     }
@@ -683,14 +734,14 @@ static int cert_tests(void)
     if (get_file("../ssl/test/qualityssl.com.der", &buf) < 0 ||
                                     x509_new(buf, &len, &x509_ctx))
     {
-        printf("Cert #9\n");
+        printf("Cert #10\n");
         res = -1;
         goto bad_cert;
     }
 
     if (strcmp(x509_ctx->subject_alt_dnsnames[1], "qualityssl.com"))
     {
-        printf("Cert #9 (2)\n");
+        printf("Cert #11\n");
         res = -1;
         goto bad_cert;
     }
@@ -701,7 +752,7 @@ static int cert_tests(void)
     if (ssl_obj_load(ssl_ctx, SSL_OBJ_X509_CACERT, 
             "../ssl/test/ca-bundle.crt", NULL))
     {
-        printf("Cert #10\n");
+        printf("Cert #12\n");
         goto bad_cert;
     }
 
@@ -2061,64 +2112,64 @@ error:
  * Header issue
  *
  **************************************************************************/
-static void do_header_issue(void)
-{
-    char axtls_buf[2048];
-#ifndef WIN32
-    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
-#endif
-    sprintf(axtls_buf, "./axssl s_client -connect localhost:%d", g_port);
-    SYSTEM(axtls_buf);
-}
-
-static int header_issue(void)
-{
-    FILE *f = fopen("../ssl/test/header_issue.dat", "r");
-    int server_fd = -1, client_fd = -1, ret = 1;
-    uint8_t buf[2048];
-    int size = 0;
-    struct sockaddr_in client_addr;
-    socklen_t clnt_len = sizeof(client_addr);
-#ifndef WIN32
-    pthread_t thread;
-#endif
-
-    if (f == NULL || (server_fd = server_socket_init(&g_port)) < 0)
-        goto error;
-
-#ifndef WIN32
-    pthread_create(&thread, NULL, 
-                (void *(*)(void *))do_header_issue, NULL);
-    pthread_detach(thread);
-#else
-    CreateThread(NULL, 1024, (LPTHREAD_START_ROUTINE)do_header_issue, 
-                NULL, 0, NULL);
-#endif
-    if ((client_fd = accept(server_fd, 
-                    (struct sockaddr *) &client_addr, &clnt_len)) < 0)
-    {
-        ret = SSL_ERROR_SOCK_SETUP_FAILURE;
-        goto error;
-    }
-
-    size = fread(buf, 1, sizeof(buf), f);
-    if (SOCKET_WRITE(client_fd, buf, size) < 0)
-    {
-        ret = SSL_ERROR_SOCK_SETUP_FAILURE;
-        goto error;
-    }
-
-    usleep(200000);
-
-    ret = 0;
-error:
-    fclose(f);
-    SOCKET_CLOSE(client_fd);
-    SOCKET_CLOSE(server_fd);
-    TTY_FLUSH();
-    SYSTEM("killall axssl");
-    return ret;
-}
+//static void do_header_issue(void)
+//{
+//    char axtls_buf[2048];
+//#ifndef WIN32
+//    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+//#endif
+//    sprintf(axtls_buf, "./axssl s_client -connect localhost:%d", g_port);
+//    SYSTEM(axtls_buf);
+//}
+//
+//static int header_issue(void)
+//{
+//    FILE *f = fopen("../ssl/test/header_issue.dat", "r");
+//    int server_fd = -1, client_fd = -1, ret = 1;
+//    uint8_t buf[2048];
+//    int size = 0;
+//    struct sockaddr_in client_addr;
+//    socklen_t clnt_len = sizeof(client_addr);
+//#ifndef WIN32
+//    pthread_t thread;
+//#endif
+//
+//    if (f == NULL || (server_fd = server_socket_init(&g_port)) < 0)
+//        goto error;
+//
+//#ifndef WIN32
+//    pthread_create(&thread, NULL, 
+//                (void *(*)(void *))do_header_issue, NULL);
+//    pthread_detach(thread);
+//#else
+//    CreateThread(NULL, 1024, (LPTHREAD_START_ROUTINE)do_header_issue, 
+//                NULL, 0, NULL);
+//#endif
+//    if ((client_fd = accept(server_fd, 
+//                    (struct sockaddr *) &client_addr, &clnt_len)) < 0)
+//    {
+//        ret = SSL_ERROR_SOCK_SETUP_FAILURE;
+//        goto error;
+//    }
+//
+//    size = fread(buf, 1, sizeof(buf), f);
+//    if (SOCKET_WRITE(client_fd, buf, size) < 0)
+//    {
+//        ret = SSL_ERROR_SOCK_SETUP_FAILURE;
+//        goto error;
+//    }
+//
+//    usleep(200000);
+//
+//    ret = 0;
+//error:
+//    fclose(f);
+//    SOCKET_CLOSE(client_fd);
+//    SOCKET_CLOSE(server_fd);
+//    TTY_FLUSH();
+//    SYSTEM("killall axssl");
+//    return ret;
+//}
 
 /**************************************************************************
  * main()
@@ -2174,6 +2225,13 @@ int main(int argc, char *argv[])
     if (SHA1_test(bi_ctx))
     {
         printf("SHA1 tests failed\n");
+        goto cleanup;
+    }
+    TTY_FLUSH();
+
+    if (SHA256_test(bi_ctx))
+    {
+        printf("SHA256 tests failed\n");
         goto cleanup;
     }
     TTY_FLUSH();
@@ -2234,11 +2292,11 @@ int main(int argc, char *argv[])
 
     SYSTEM("sh ../ssl/test/killopenssl.sh");
 
-    if (header_issue())
-    {
-        printf("Header tests failed\n"); TTY_FLUSH();
-        goto cleanup;
-    }
+//    if (header_issue())
+//    {
+//        printf("Header tests failed\n"); TTY_FLUSH();
+//        goto cleanup;
+//    }
 
     ret = 0;        /* all ok */
     printf("**** ALL TESTS PASSED ****\n"); TTY_FLUSH();

@@ -187,7 +187,9 @@ static int send_client_hello(SSL *ssl)
     *tm_ptr++ = (uint8_t)(((long)tm & 0x00ff0000) >> 16);
     *tm_ptr++ = (uint8_t)(((long)tm & 0x0000ff00) >> 8);
     *tm_ptr++ = (uint8_t)(((long)tm & 0x000000ff));
-    get_random(SSL_RANDOM_SIZE-4, &buf[10]);
+    if (get_random(SSL_RANDOM_SIZE-4, &buf[10]) < 0)
+        return SSL_NOT_OK;
+
     memcpy(ssl->dc->client_random, &buf[6], SSL_RANDOM_SIZE);
     offset = 6 + SSL_RANDOM_SIZE;
 
@@ -313,7 +315,9 @@ static int send_client_key_xchg(SSL *ssl)
 
     premaster_secret[0] = 0x03; /* encode the version number */
     premaster_secret[1] = SSL_PROTOCOL_MINOR_VERSION; /* must be TLS 1.1 */
-    get_random(SSL_SECRET_SIZE-2, &premaster_secret[2]);
+    if (get_random(SSL_SECRET_SIZE-2, &premaster_secret[2]) < 0)
+        return SSL_NOT_OK;
+
     DISPLAY_RSA(ssl, ssl->x509_ctx->rsa_ctx);
 
     /* rsa_ctx->bi_ctx is not thread-safe */

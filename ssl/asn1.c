@@ -40,22 +40,23 @@
 #include "crypto.h"
 #include "crypto_misc.h"
 
-#define SIG_OID_PREFIX_SIZE 8
-#define SIG_IIS6_OID_SIZE   5
-#define SIG_SUBJECT_ALT_NAME_SIZE 3
-
 /* Must be an RSA algorithm with either SHA1 or MD5 for verifying to work */
-static const uint8_t sig_oid_prefix[SIG_OID_PREFIX_SIZE] = 
+static const uint8_t sig_oid_prefix[] = 
 {
     0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01
 };
 
-static const uint8_t sig_sha1WithRSAEncrypt[SIG_IIS6_OID_SIZE] =
+static const uint8_t sig_sha1WithRSAEncrypt[] =
 {
     0x2b, 0x0e, 0x03, 0x02, 0x1d
 };
 
-static const uint8_t sig_subject_alt_name[SIG_SUBJECT_ALT_NAME_SIZE] =
+static const uint8_t sig_sha256WithRSAEncrypt[] =
+{
+    0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x01
+};
+
+static const uint8_t sig_subject_alt_name[] =
 {
     0x55, 0x1d, 0x11
 };
@@ -553,7 +554,7 @@ int asn1_find_oid(const uint8_t* cert, int* offset,
 int asn1_find_subjectaltname(const uint8_t* cert, int offset)
 {
     if (asn1_find_oid(cert, &offset, sig_subject_alt_name, 
-                                SIG_SUBJECT_ALT_NAME_SIZE))
+                                sizeof(sig_subject_alt_name)))
     {
         return offset;
     }
@@ -577,17 +578,24 @@ int asn1_signature_type(const uint8_t *cert,
 
     len = get_asn1_length(cert, offset);
 
-    if (len == 5 && memcmp(sig_sha1WithRSAEncrypt, &cert[*offset], 
-                                    SIG_IIS6_OID_SIZE) == 0)
+    if (len == sizeof(sig_sha1WithRSAEncrypt) && 
+            memcmp(sig_sha1WithRSAEncrypt, &cert[*offset], 
+                                    sizeof(sig_sha1WithRSAEncrypt)) == 0)
     {
         x509_ctx->sig_type = SIG_TYPE_SHA1;
     }
+    else if (len == sizeof(sig_sha256WithRSAEncrypt) && 
+            memcmp(sig_sha256WithRSAEncrypt, &cert[*offset], 
+                                    sizeof(sig_sha256WithRSAEncrypt)) == 0)
+    {
+        x509_ctx->sig_type = SIG_TYPE_SHA256;
+    }
     else
     {
-        if (memcmp(sig_oid_prefix, &cert[*offset], SIG_OID_PREFIX_SIZE))
+        if (memcmp(sig_oid_prefix, &cert[*offset], sizeof(sig_oid_prefix)))
             goto end_check_sig;     /* unrecognised cert type */
 
-        x509_ctx->sig_type = cert[*offset + SIG_OID_PREFIX_SIZE];
+        x509_ctx->sig_type = cert[*offset + sizeof(sig_oid_prefix)];
     }
 
     *offset += len;
