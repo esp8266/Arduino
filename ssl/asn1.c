@@ -597,7 +597,18 @@ int asn1_signature_type(const uint8_t *cert,
     else
     {
         if (memcmp(sig_oid_prefix, &cert[*offset], sizeof(sig_oid_prefix)))
+        {
+#ifdef CONFIG_SSL_FULL_MODE
+            int i;
+            printf("invalid digest: ");
+
+            for (i = 0; i < len; i++)
+                printf("%02x ", cert[*offset + i]);
+
+            printf("\n");
+#endif
             goto end_check_sig;     /* unrecognised cert type */
+        }
 
         x509_ctx->sig_type = cert[*offset + sizeof(sig_oid_prefix)];
     }
