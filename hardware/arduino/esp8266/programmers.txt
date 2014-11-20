@@ -2,5 +2,5 @@ esptoolpy.name=esptool
 esptoolpy.communication=serial
 esptoolpy.protocol=esp
 esptoolpy.program.protocol=esp
-esptoolpy.program.tool=esptool.py
-esptoolpy.program.extra_params=--port {serial.port}
+esptoolpy.program.tool=esptoolpy
+esptoolpy.program.extra_params=
