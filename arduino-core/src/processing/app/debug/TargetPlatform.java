@@ -85,15 +85,15 @@ public class TargetPlatform {
       boardsPreferences.remove("menu");
 
       // Create boards
-      Set<String> boardIDs = boardsPreferences.keySet();
-      for (String id : boardIDs) {
-        PreferencesMap preferences = boardsPreferences.get(id);
-        TargetBoard board = new TargetBoard(id, preferences, this);
-        boards.put(id, board);
-      }
-      if (!boardIDs.isEmpty()) {
-        PreferencesMap preferences = boardsPreferences.get(boardIDs.iterator().next());
-        defaultBoard = new TargetBoard(id, preferences, this);
+      Set<String> boardIds = boardsPreferences.keySet();
+      for (String boardId : boardIds) {
+        PreferencesMap preferences = boardsPreferences.get(boardId);
+        TargetBoard board = new TargetBoard(boardId, preferences, this);
+        boards.put(boardId, board);
+
+        // Pick the first board as default
+        if (defaultBoard == null)
+          defaultBoard = board;
       }
     } catch (IOException e) {
       throw new TargetPlatformException(format(_("Error loading {0}"),
