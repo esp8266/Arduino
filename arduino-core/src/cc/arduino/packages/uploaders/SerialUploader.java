@@ -322,19 +322,13 @@ public class SerialUploader extends Uploader {
       prefs.put("bootloader.verbose", prefs.getOrExcept("bootloader.params.quiet"));
     }
 
-    try {
-      String pattern = prefs.getOrExcept("erase.pattern");
-      String[] cmd = StringReplacer.formatAndSplit(pattern, prefs, true);
-      if (!executeUploadCommand(cmd))
-        return false;
+    String pattern = prefs.getOrExcept("erase.pattern");
+    String[] cmd = StringReplacer.formatAndSplit(pattern, prefs, true);
+    if (!executeUploadCommand(cmd))
+      return false;
 
-      pattern = prefs.getOrExcept("bootloader.pattern");
-      cmd = StringReplacer.formatAndSplit(pattern, prefs, true);
-      return executeUploadCommand(cmd);
-    } catch (RunnerException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new RunnerException(e);
-    }
+    pattern = prefs.getOrExcept("bootloader.pattern");
+    cmd = StringReplacer.formatAndSplit(pattern, prefs, true);
+    return executeUploadCommand(cmd);
   }
 }

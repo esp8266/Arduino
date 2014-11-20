@@ -2573,7 +2573,8 @@ public class Editor extends JFrame implements RunnerListener {
           statusError(I18n.format(
                       _("Error while burning bootloader: missing '{0}' configuration parameter"),
                       e.getMessage()));
-          //statusError(e);
+        } catch (RunnerException e) {
+          statusError(e.getMessage());
         } catch (Exception e) {
           statusError(_("Error while burning bootloader."));
           e.printStackTrace();
