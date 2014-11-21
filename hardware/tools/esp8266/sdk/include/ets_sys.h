@@ -48,13 +48,13 @@ typedef struct _ETSTIMER_ {
     ets_intr_unlock()
 
 #define ETS_FRC_TIMER1_INTR_ATTACH(func, arg) \
-    ets_isr_attach(ETS_FRC_TIMER1_INUM, (func), (void *)(arg))
+    ets_isr_attach(ETS_FRC_TIMER1_INUM, (void *)(func), (void *)(arg))
 
 #define ETS_GPIO_INTR_ATTACH(func, arg) \
-    ets_isr_attach(ETS_GPIO_INUM, (func), (void *)(arg))
+    ets_isr_attach(ETS_GPIO_INUM, (void *)(func), (void *)(arg))
 
 #define ETS_UART_INTR_ATTACH(func, arg) \
-    ets_isr_attach(ETS_UART_INUM, (func), (void *)(arg))
+    ets_isr_attach(ETS_UART_INUM, (void *)(func), (void *)(arg))
 
 #define ETS_INTR_ENABLE(inum) \
     ets_isr_unmask((1<<inum))
@@ -79,5 +79,34 @@ typedef struct _ETSTIMER_ {
 
 #define ETS_GPIO_INTR_DISABLE() \
     ETS_INTR_DISABLE(ETS_GPIO_INUM)
+
+
+void ets_isr_attach(int routine, void* something, void *buff);
+void *pvPortMalloc(size_t xWantedSize);
+void pvPortFree(void *ptr);
+void *vPortMalloc(size_t xWantedSize);
+void vPortFree(void *ptr);
+void *ets_memcpy(void *dest, const void *src, size_t n);
+void *ets_memset(void *s, int c, size_t n);
+void ets_timer_arm_new(ETSTimer *a, int b, int c, int isMstimer);
+void ets_timer_setfn(ETSTimer *t, ETSTimerFunc *fn, void *parg);
+void ets_timer_disarm(ETSTimer *a);
+int atoi(const char *nptr);
+int ets_strncmp(const char *s1, const char *s2, int len);
+int ets_strcmp(const char *s1, const char *s2);
+int ets_strlen(const char *s);
+char *ets_strcpy(char *dest, const char *src);
+char *ets_strncpy(char *dest, const char *src, size_t n);
+char *ets_strstr(const char *haystack, const char *needle);
+int ets_sprintf(char *str, const char *format, ...)  __attribute__ ((format (printf, 2, 3)));
+int os_snprintf(char *str, size_t size, const char *format, ...) __attribute__ ((format (printf, 3, 4)));
+int os_printf(const char *format, ...)  __attribute__ ((format (printf, 1, 2)));
+void ets_install_putc1(void* routine);
+void uart_div_modify(int no, int freq);
+void ets_isr_mask(int intr);
+void ets_isr_unmask(int intr);
+void ets_isr_attach(int intr, void *handler, void *arg);
+
+
 
 #endif /* _ETS_SYS_H */
