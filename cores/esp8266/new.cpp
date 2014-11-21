@@ -16,26 +16,21 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-extern "C" {
-#include "osapi.h"
-#include "ets_sys.h"
-#include "mem.h"
-}
-
+#include <stdlib.h>
 
 void *operator new(size_t size) {
-  return os_malloc(size);
+  return malloc(size);
 }
 
 void *operator new[](size_t size) {
-  return os_malloc(size);
+  return malloc(size);
 }
 
 void operator delete(void * ptr) {
-  os_free(ptr);
+  free(ptr);
 }
 
 void operator delete[](void * ptr) {
-  os_free(ptr);
+  free(ptr);
 }
 

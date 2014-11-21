@@ -28,8 +28,8 @@
 #include "user_interface.h"
 #include "cont.h"
 
-extern cont_t g_cont;
-extern void loop_schedule();
+extern void esp_schedule();
+extern void esp_yield();
 
 static os_timer_t delay_timer;
 #define ONCE 0
@@ -43,14 +43,14 @@ unsigned long millis()
 
 void delay_end(void* arg)
 {
-    loop_schedule();
+    esp_schedule();
 }
 
 void delay(unsigned long ms)
 {
     os_timer_setfn(&delay_timer, (os_timer_func_t*) &delay_end, 0);
     os_timer_arm(&delay_timer, ms, ONCE);
-    cont_yield(&g_cont);
+    esp_yield();
     os_timer_disarm(&delay_timer);
 }
 

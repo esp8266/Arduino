@@ -17,19 +17,9 @@
 */
 
 #include <stdlib.h>
-extern "C"
-{
-#include "ets_sys.h"
-}
 
 extern "C" void __cxa_pure_virtual(void) __attribute__ ((__noreturn__));
 extern "C" void __cxa_deleted_virtual(void) __attribute__ ((__noreturn__));
-
-extern "C" void abort()
-{
-  os_printf(" x_x ");
-  while(true){}
-}
 
 void __cxa_pure_virtual(void) {
   // We might want to write some diagnostics to uart in this case
