@@ -21,6 +21,12 @@
 
 #include "WString.h"
 #include "stdlib_noniso.h"
+extern "C" {
+#include "osapi.h"
+#include "ets_sys.h"
+#include "mem.h"
+}
+
 /*********************************************/
 /*  Constructors                             */
 /*********************************************/
@@ -115,7 +121,7 @@ String::String(double value, unsigned char decimalPlaces)
 
 String::~String()
 {
-	free(buffer);
+	os_free(buffer);
 }
 
 /*********************************************/
@@ -131,7 +137,7 @@ inline void String::init(void)
 
 void String::invalidate(void)
 {
-	if (buffer) free(buffer);
+	if (buffer) os_free(buffer);
 	buffer = NULL;
 	capacity = len = 0;
 }
@@ -183,7 +189,7 @@ void String::move(String &rhs)
 			rhs.len = 0;
 			return;
 		} else {
-			free(buffer);
+			os_free(buffer);
 		}
 	}
 	buffer = rhs.buffer;
