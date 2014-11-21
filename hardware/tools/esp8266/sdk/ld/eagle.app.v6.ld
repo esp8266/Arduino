@@ -96,11 +96,14 @@ SECTIONS
     *(.gnu.linkonce.e.*)
     *(.gnu.version_r)
     *(.eh_frame)
+    . = (. + 3) & ~ 3;
     /*  C++ constructor and destructor tables, properly ordered:  */
+    __init_array_start = ABSOLUTE(.);
     KEEP (*crtbegin.o(.ctors))
     KEEP (*(EXCLUDE_FILE (*crtend.o) .ctors))
     KEEP (*(SORT(.ctors.*)))
     KEEP (*(.ctors))
+    __init_array_end = ABSOLUTE(.);
     KEEP (*crtbegin.o(.dtors))
     KEEP (*(EXCLUDE_FILE (*crtend.o) .dtors))
     KEEP (*(SORT(.dtors.*)))
