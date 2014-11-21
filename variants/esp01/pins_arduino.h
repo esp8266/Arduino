@@ -27,39 +27,16 @@
 
 #define PROGMEM
 
-#define NUM_DIGITAL_PINS  30
-#define NUM_ANALOG_INPUTS 12
+#define NUM_DIGITAL_PINS  16
+#define NUM_ANALOG_INPUTS 1
 
-#define TX_RX_LED_INIT	
-#define TXLED0			
-#define TXLED1			
-#define RXLED0			
-#define RXLED1			
+static const uint8_t SDA = 0;
+static const uint8_t SCL = 2;
 
-static const uint8_t SDA = 2;
-static const uint8_t SCL = 3;
-#define LED_BUILTIN 13
-
-// Map SPI port to 'new' pins D14..D17
-static const uint8_t SS   = 17;
-static const uint8_t MOSI = 16;
+static const uint8_t SS   = 12;
+static const uint8_t MOSI = 13;
 static const uint8_t MISO = 14;
 static const uint8_t SCK  = 15;
-
-// Mapping of analog pins as digital I/O
-// A6-A11 share with digital pins
-static const uint8_t A0 = 18;
-static const uint8_t A1 = 19;
-static const uint8_t A2 = 20;
-static const uint8_t A3 = 21;
-static const uint8_t A4 = 22;
-static const uint8_t A5 = 23;
-static const uint8_t A6 = 24;	// D4
-static const uint8_t A7 = 25;	// D6
-static const uint8_t A8 = 26;	// D8
-static const uint8_t A9 = 27;	// D9
-static const uint8_t A10 = 28;	// D10
-static const uint8_t A11 = 29;	// D12
 
 
 

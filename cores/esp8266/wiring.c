@@ -67,5 +67,5 @@ void delayMicroseconds(unsigned int us)
 
 void init()
 {
-    // system_timer_reinit();
+    initPins();
 }
