@@ -15,6 +15,7 @@ ARDUINO 1.6.0rc1
 * Improved avrdude verbose upload (Matthijs Kooijman)
 * (Mac OSX) Add Exported UTI for ino files, allows quick look to view the
   content of the file and external editors to syntax highlight as C++ (Matt Lloyd)
+* Updated libastyle to 2.05
 
 [core]
 * sam: added -MMD flag to let gcc produce dependency files (full rebuild on Arduino Due is now triggered only if needed)
@@ -23,6 +24,7 @@ ARDUINO 1.6.0rc1
 * LiquidCrystal: added setRowOffsets function to support different LCD hardware configurations (Mark Sproul)
 * LiquidCrystal: various improvements and optimizations (Matthijs Kooijman)
 * Fixed PROGMEM error in Robot_Control/examples/explore/R06_Wheel_Calibration
+* SD: Fixed SPI transaction mismatch (Paul Stoffregen)
 
 The following changes are included also in the Arduino IDE 1.0.7:
 
