@@ -26,30 +26,46 @@
 #include "ets_sys.h"
 #include "osapi.h"
 #include "user_interface.h"
+#include "cont.h"
+
+extern cont_t g_cont;
+extern void loop_schedule();
+
+static os_timer_t delay_timer;
+#define ONCE 0
+#define REPEAT 1
 
 unsigned long millis()
 {
-	unsigned long m = system_get_time() / 1000;
-	return m;
+    unsigned long m = system_get_time() / 1000;
+    return m;
+}
+
+void delay_end(void* arg)
+{
+    loop_schedule();
 }
 
 void delay(unsigned long ms)
 {
-	os_delay_us(1000*ms);
+    os_timer_setfn(&delay_timer, (os_timer_func_t*) &delay_end, 0);
+    os_timer_arm(&delay_timer, ms, ONCE);
+    cont_yield(&g_cont);
+    os_timer_disarm(&delay_timer);
 }
 
 unsigned long micros() 
 {
-	unsigned long m = system_get_time();
-	return m;
+    unsigned long m = system_get_time();
+    return m;
 }
 
 void delayMicroseconds(unsigned int us)
 {
-	os_delay_us(us);
+    os_delay_us(us);
 }
 
 void init()
 {
-	system_timer_reinit();
+    // system_timer_reinit();
 }
