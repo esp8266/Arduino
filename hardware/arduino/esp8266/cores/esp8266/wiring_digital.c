@@ -27,19 +27,90 @@
 #define ARDUINO_MAIN
 #include "wiring_private.h"
 #include "pins_arduino.h"
+#include "eagle_soc.h"
+#include "gpio.h"
+
+#define PINCOUNT 16
+
+static const uint32_t g_pin_muxes[PINCOUNT] = {
+    [0] = PERIPHS_IO_MUX_GPIO0_U,
+    [1] = PERIPHS_IO_MUX_U0TXD_U,
+    [2] = PERIPHS_IO_MUX_GPIO2_U,
+    [3] = PERIPHS_IO_MUX_U0RXD_U,
+    [4] = PERIPHS_IO_MUX_GPIO4_U,
+    [5] = PERIPHS_IO_MUX_GPIO5_U,
+
+    // These 6 pins are used for SPI flash interface
+    [6] = 0,
+    [7] = 0,
+    [8] = 0,
+    [9] = 0,
+    [10] = 0,
+    [11] = 0,
+
+    [12] = PERIPHS_IO_MUX_MTDI_U,
+    [13] = PERIPHS_IO_MUX_MTCK_U,
+    [14] = PERIPHS_IO_MUX_MTMS_U,
+    [15] = PERIPHS_IO_MUX_MTDO_U,
+};
+
+static const uint32_t g_pin_funcs[PINCOUNT] = {
+    [0] = FUNC_GPIO0,
+    [1] = FUNC_GPIO1,
+    [2] = FUNC_GPIO2,
+    [3] = FUNC_GPIO3,
+    [4] = FUNC_GPIO4,
+    [5] = FUNC_GPIO5,
+    [12] = FUNC_GPIO12,
+    [13] = FUNC_GPIO13,
+    [14] = FUNC_GPIO14,
+    [15] = FUNC_GPIO15,
+};
+
 
 void pinMode(uint8_t pin, uint8_t mode)
 {
+    uint32_t mux = g_pin_muxes[pin];
+    if (mode == INPUT)
+    {
+        gpio_output_set(0, 0, 0, 1 << pin);
+        PIN_PULLUP_DIS(mux);
+    }
+    else if (mode == INPUT_PULLUP)
+    {
+        gpio_output_set(0, 0, 0, 1 << pin);
+        PIN_PULLUP_EN(mux);
+    }
+    else
+    {
+        gpio_output_set(0, 0, 1 << pin, 0);
+    }
 
 }
 
 void digitalWrite(uint8_t pin, uint8_t val)
 {
-
+    uint32_t set = ((val & 1) << pin);
+    uint32_t clr = (((~val) & 1) << pin);
+    gpio_output_set(set, clr, 0, 0);
 }
 
 int digitalRead(uint8_t pin)
 {
-
-	return LOW;
+    return ((gpio_input_get() >> pin) & 1);
 }
+
+void initPins()
+{
+    gpio_init();
+    for (int i = 0; i < PINCOUNT; ++i)
+    {
+        uint32_t mux = g_pin_muxes[i];
+        if (mux)
+        {
+            uint32_t func = g_pin_funcs[i];
+            PIN_FUNC_SELECT(mux, func);
+        }
+    }
+}
+

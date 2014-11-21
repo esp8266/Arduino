@@ -34,13 +34,6 @@
 extern "C"{
 #endif
 
-#ifndef cbi
-#define cbi(sfr, bit) 
-#endif
-#ifndef sbi
-#define sbi(sfr, bit) 
-#endif
-
 #define EXTERNAL_INT_0 0
 #define EXTERNAL_INT_1 1
 #define EXTERNAL_INT_2 2
@@ -53,6 +46,8 @@ extern "C"{
 #define EXTERNAL_NUM_INTERRUPTS 2
 
 typedef void (*voidFuncPtr)(void);
+
+void initPins();
 
 #ifdef __cplusplus
 } // extern "C"
