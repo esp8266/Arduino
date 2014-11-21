@@ -17,13 +17,15 @@ compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -I{compiler.sdk.path}/incl
 compiler.c.cmd=xtensa-lx106-elf-gcc
 compiler.c.flags=-c -Os -Wpointer-arith -Wno-implicit-function-declaration -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -MMD
 
-compiler.c.elf.ldscript={compiler.sdk.path}/ld/eagle.app.v6.ld
-compiler.c.elf.flags=-nostdlib -Wl,--no-check-sections -u call_user_start -Wl,-static -L{compiler.sdk.path}/lib -T{compiler.c.elf.ldscript}
+compiler.c.elf.ldscript=eagle.app.v6.ld
+compiler.c.elf.flags=-nostdlib -Wl,--no-check-sections -u call_user_start -Wl,-static -L{compiler.sdk.path}/lib -L{compiler.sdk.path}/ld -T{compiler.c.elf.ldscript}
 compiler.c.elf.cmd=xtensa-lx106-elf-gcc
 compiler.c.elf.libs=-lc -lgcc -lhal -lphy -lnet80211 -llwip -lwpa -lmain
 
 compiler.cpp.cmd=xtensa-lx106-elf-g++
-compiler.cpp.flags=-c -Os -mlongcalls -fno-exceptions -MMD
+compiler.cpp.flags=-c -Os -mlongcalls -fno-exceptions -fno-rtti -std=c++11 -MMD 
+
+compiler.as.cmd=xtensa-lx106-elf-as
 
 compiler.ar.cmd=xtensa-lx106-elf-ar
 compiler.ar.flags=cru
@@ -53,7 +55,7 @@ recipe.c.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.cpreprocessor.fla
 recipe.cpp.o.pattern="{compiler.path}{compiler.cpp.cmd}" {compiler.cpreprocessor.flags} {compiler.cpp.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {includes} "{source_file}" -o "{object_file}"
 
 ## Compile S files
-recipe.S.o.pattern=
+recipe.S.o.pattern="{compiler.path}{compiler.as.cmd}"  -o "{object_file}" "{source_file}"
 
 ## Create archives
 recipe.ar.pattern="{compiler.path}{compiler.ar.cmd}" {compiler.ar.flags} {compiler.ar.extra_flags} "{build.path}/{archive_file}" "{object_file}"
