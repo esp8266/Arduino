@@ -341,3 +341,7 @@ PROVIDE ( xthal_window_spill_nw = 0x4000e320 );
 PROVIDE ( Te0 = 0x3fffccf0 );
 PROVIDE ( UartDev = 0x3fffde10 );
 PROVIDE ( flashchip = 0x3fffc714);
+
+malloc = pvPortMalloc;
+free = vPortFree;
+

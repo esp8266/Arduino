@@ -17,6 +17,9 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+//This may be used to change user task stack size:
+//#define CONT_STACKSIZE 4096
+
 #include <Arduino.h>
 extern "C" {
 #include "ets_sys.h"
@@ -26,42 +29,51 @@ extern "C" {
 #include "user_interface.h"
 #include "cont.h"
 }
+#define LOOP_TASK_PRIORITY 0
+#define LOOP_QUEUE_SIZE    1
 
-//Declared weak in Arduino.h to allow user redefinitions.
 int atexit(void (*func)()) { return 0; }
 
-// Weak empty variant initialization function.
-// May be redefined by variant files.
 void initVariant() __attribute__((weak));
 void initVariant() { }
 
 extern void loop();
 extern void setup();
 
-#define LOOP_TASK_PRIORITY 0
-#define LOOP_QUEUE_SIZE    1
+extern void (*__init_array_start)(void);
+extern void (*__init_array_end)(void);
 
-cont_t g_cont;
+static cont_t g_cont;
+static os_event_t g_loop_queue[LOOP_QUEUE_SIZE];
 
-os_event_t loop_queue[LOOP_QUEUE_SIZE];
+extern "C" void esp_yield()
+{
+    cont_yield(&g_cont);
+}
 
-bool g_setup_done = false;
-
-extern "C" void loop_schedule()
+extern "C" void esp_schedule()
 {
     system_os_post(LOOP_TASK_PRIORITY, 0, 0);
 }
 
+extern "C" void __yield() 
+{
+    esp_schedule();
+    esp_yield();
+}
+extern "C" void yield(void) __attribute__ ((weak, alias("__yield")));
+
+
 static void loop_wrapper()
 {
-    if (!g_setup_done)
+    static bool setup_done = false;
+    if (!setup_done)
     {
-        g_setup_done = true;
         setup();
+        setup_done = true;
     }
-
     loop();
-    loop_schedule();
+    esp_schedule();
 }
 
 static void loop_task(os_event_t *events)
@@ -73,9 +85,6 @@ static void loop_task(os_event_t *events)
     }
 }
 
-extern void (*__init_array_start)(void);
-extern void (*__init_array_end)(void);
-
 static void do_global_ctors(void)
 {
     void (**p)(void);
@@ -85,16 +94,13 @@ static void do_global_ctors(void)
 
 void init_done()
 {
-    loop_schedule();
-    
-    int i = ((char*)__init_array_end) - (char*)__init_array_start;
-    os_printf("\r\nInit array size: %d\r\n", i);
+    do_global_ctors();
+    esp_schedule();
 }
 
 extern "C" {
 void user_init(void)
 {
-    do_global_ctors();
     uart_div_modify(0, UART_CLK_FREQ / (115200));
 
     init();
@@ -105,10 +111,10 @@ void user_init(void)
 
     system_os_task( loop_task,
                     LOOP_TASK_PRIORITY,
-                    loop_queue,
+                    g_loop_queue,
                     LOOP_QUEUE_SIZE);
 
-    system_init_done_cb(&init_done);
+    system_init_done_cb(&esp_schedule);
 }
 }
 

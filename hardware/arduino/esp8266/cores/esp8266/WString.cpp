@@ -121,7 +121,7 @@ String::String(double value, unsigned char decimalPlaces)
 
 String::~String()
 {
-	os_free(buffer);
+	free(buffer);
 }
 
 /*********************************************/
@@ -137,7 +137,7 @@ inline void String::init(void)
 
 void String::invalidate(void)
 {
-	if (buffer) os_free(buffer);
+	if (buffer) free(buffer);
 	buffer = NULL;
 	capacity = len = 0;
 }
@@ -189,7 +189,7 @@ void String::move(String &rhs)
 			rhs.len = 0;
 			return;
 		} else {
-			os_free(buffer);
+			free(buffer);
 		}
 	}
 	buffer = rhs.buffer;
