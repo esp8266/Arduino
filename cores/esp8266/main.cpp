@@ -24,6 +24,7 @@ extern "C" {
 #include "osapi.h"
 #include "mem.h"
 #include "user_interface.h"
+#include "cont.h"
 }
 
 //Declared weak in Arduino.h to allow user redefinitions.
@@ -40,29 +41,74 @@ extern void setup();
 #define LOOP_TASK_PRIORITY 0
 #define LOOP_QUEUE_SIZE    1
 
+cont_t g_cont;
+
 os_event_t loop_queue[LOOP_QUEUE_SIZE];
 
-void loop_task(os_event_t *events)
+bool g_setup_done = false;
+
+extern "C" void loop_schedule()
 {
-    loop();
     system_os_post(LOOP_TASK_PRIORITY, 0, 0);
+}
+
+static void loop_wrapper()
+{
+    if (!g_setup_done)
+    {
+        g_setup_done = true;
+        setup();
+    }
+
+    loop();
+    loop_schedule();
+}
+
+static void loop_task(os_event_t *events)
+{
+    cont_run(&g_cont, &loop_wrapper);
+    if (cont_check(&g_cont) != 0)
+    {
+        abort();
+    }
+}
+
+extern void (*__init_array_start)(void);
+extern void (*__init_array_end)(void);
+
+static void do_global_ctors(void)
+{
+    void (**p)(void);
+    for (p = &__init_array_start; p != &__init_array_end; ++p)
+            (*p)();
+}
+
+void init_done()
+{
+    loop_schedule();
+    
+    int i = ((char*)__init_array_end) - (char*)__init_array_start;
+    os_printf("\r\nInit array size: %d\r\n", i);
 }
 
 extern "C" {
 void user_init(void)
 {
+    do_global_ctors();
+    uart_div_modify(0, UART_CLK_FREQ / (115200));
+
     init();
 
     initVariant();
+
+    cont_init(&g_cont);
 
     system_os_task( loop_task,
                     LOOP_TASK_PRIORITY,
                     loop_queue,
                     LOOP_QUEUE_SIZE);
-    setup();
-    loop_task(0);
+
+    system_init_done_cb(&init_done);
 }
 }
-
-
 
