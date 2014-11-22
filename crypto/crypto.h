@@ -153,9 +153,9 @@ typedef struct
   uint8_t buffer[64];       /* input buffer */
 } MD5_CTX;
 
-void MD5_Init(MD5_CTX *);
-void MD5_Update(MD5_CTX *, const uint8_t *msg, int len);
-void MD5_Final(uint8_t *digest, MD5_CTX *);
+EXP_FUNC void STDCALL MD5_Init(MD5_CTX *);
+EXP_FUNC void STDCALL MD5_Update(MD5_CTX *, const uint8_t *msg, int len);
+EXP_FUNC void STDCALL MD5_Final(uint8_t *digest, MD5_CTX *);
 
 /**************************************************************************
  * HMAC declarations 

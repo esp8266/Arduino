@@ -128,7 +128,10 @@ int main(int argc, char *argv[])
     int httpPort = CONFIG_HTTP_PORT;
     char *httpsAddress = NULL;
     int httpsPort = CONFIG_HTTP_HTTPS_PORT;
+    uint32_t options = CONFIG_HTTP_DEFAULT_SSL_OPTIONS;
     char *portStr;
+    char *private_key = NULL;
+    char *cert = NULL;
 
 #ifdef WIN32
     WORD wVersionRequested = MAKEWORD(2, 2);
@@ -190,9 +193,24 @@ int main(int argc, char *argv[])
             continue;
         }
 
+        if (strcmp(argv[i], "-cert") == 0 && argv[i+1] != NULL)
+        {
+            cert = argv[i+1];
+            i += 2;
+            continue;
+        }
+
+        if (strcmp(argv[i], "-key") == 0 && argv[i+1] != NULL)
+        {
+            private_key = argv[i+1];
+            i += 2;
+            continue;
+        }
         printf("%s:\n"
                "    [-p [address:]httpport]\n"
                "    [-s [address:]httpsport]\n"
+               "    [-key private_key]\n"
+               "    [-cert cert]\n"
                "    [-w webroot]\n", argv[0]);
         exit(1);
     }
@@ -223,9 +241,34 @@ int main(int argc, char *argv[])
     }
 
     addtoservers(active);
-    servers->ssl_ctx = ssl_ctx_new(CONFIG_HTTP_DEFAULT_SSL_OPTIONS, 
-                                CONFIG_HTTP_SESSION_CACHE_SIZE);
+
+    if (cert != NULL && private_key != NULL)
+        options |=  SSL_NO_DEFAULT_KEY;
+
+    servers->ssl_ctx = ssl_ctx_new(options, CONFIG_HTTP_SESSION_CACHE_SIZE);
     servers->is_ssl = 1;
+
+    if (cert != NULL && private_key != NULL)
+    {
+        printf("YEAH\n");
+        if (ssl_obj_load(servers->ssl_ctx, SSL_OBJ_RSA_KEY, private_key,
+                    NULL))
+        {
+#ifdef CONFIG_HTTP_VERBOSE
+            fprintf(stderr, "ERR: Couldn't load private key %s\n", private_key);
+#endif
+            exit(1);
+        }
+
+        if (ssl_obj_load(servers->ssl_ctx, SSL_OBJ_X509_CERT, cert,
+                    NULL))
+        {
+#ifdef CONFIG_HTTP_VERBOSE
+            fprintf(stderr, "ERR: Couldn't load cert %s\n", cert);
+#endif
+            exit(1);
+        }
+    }
 
 #if defined(CONFIG_HTTP_HAS_CGI)
     addcgiext(CONFIG_HTTP_CGI_EXTENSIONS);
@@ -262,7 +305,6 @@ int main(int argc, char *argv[])
 
     }
 #endif
-
 
 #ifndef WIN32 
 #ifdef CONFIG_HTTP_IS_DAEMON

@@ -382,7 +382,12 @@ static void do_server(int argc, char *argv[])
 
                     if (res > SSL_OK)    /* display our interesting output */
                     {
-                        printf("%s", read_buf);
+                        int written = 0;
+                        while (written < res)
+                        {
+                            written += write(STDOUT_FILENO, read_buf+written,
+                                                res-written);
+                        }
                         TTY_FLUSH();
                     }
                     else if (res == SSL_CLOSE_NOTIFY)
@@ -711,7 +716,7 @@ static void do_client(int argc, char *argv[])
                     }
                     else
                     {
-                        res = ssl_write(ssl, buf, strlen((char *)buf)+1);
+                        res = ssl_write(ssl, buf, strlen((char *)buf));
                     }
                 }
             }
@@ -724,7 +729,12 @@ static void do_client(int argc, char *argv[])
 
                 if (res > 0)    /* display our interesting output */
                 {
-                    printf("%s", read_buf);
+                    int written = 0;
+                    while (written < res)
+                    {
+                        written += write(STDOUT_FILENO, read_buf+written,
+                                            res-written);
+                    }
                     TTY_FLUSH();
                 }
             }
