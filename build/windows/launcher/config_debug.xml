@@ -15,6 +15,7 @@
   <icon>application.ico</icon>
   <classPath>
     <mainClass>processing.app.Base</mainClass>
+    <cp>lib/arduino-core.jar</cp>
     <cp>lib/pde.jar</cp>
     <cp>lib/jna.jar</cp>
     <cp>lib/ecj.jar</cp>
