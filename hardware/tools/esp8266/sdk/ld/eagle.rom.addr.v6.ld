@@ -344,4 +344,4 @@ PROVIDE ( flashchip = 0x3fffc714);
 
 malloc = pvPortMalloc;
 free = vPortFree;
-
+realloc = pvPortRealloc;

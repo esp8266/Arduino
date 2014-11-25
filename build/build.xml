@@ -277,7 +277,7 @@
     <move file="macosx/work/${staging_hardware_folder}/tools/esp8266/esptool-0.0.3/esptool_osx" tofile="macosx/work/${staging_hardware_folder}/tools/esp8266/esptool" />
     
     <delete dir="macosx/work/${staging_hardware_folder}/tools/esp8266/esptool-0.0.3/" />
-
+    <chmod perm="755" file="macosx/work/${staging_hardware_folder}/tools/esp8266/espflash" />
 
     <antcall target="unzip">
       <param name="archive_file" value="./libastylej-2.04.zip" />

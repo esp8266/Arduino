@@ -114,7 +114,7 @@ void user_init(void)
                     g_loop_queue,
                     LOOP_QUEUE_SIZE);
 
-    system_init_done_cb(&esp_schedule);
+    system_init_done_cb(&init_done);
 }
 }
 
