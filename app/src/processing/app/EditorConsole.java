@@ -206,7 +206,7 @@ class BufferedStyledDocument extends DefaultStyledDocument {
       char c = chars[stop];
       stop++;
       currentLineLength++;
-      if (c == '\n' || currentLineLength > maxLineLength) {
+      if (c == '\n' || c == '\r' || currentLineLength > maxLineLength) {
         elements.add(new ElementSpec(a, ElementSpec.ContentType, chars, start,
             stop - start));
         elements.add(new ElementSpec(a, ElementSpec.EndTagType));
