@@ -80,9 +80,9 @@ recipe.size.regex.eeprom=^(?:\.eeprom)\s+([0-9]+).*
 
 # ------------------------------
 
-tools.esptoolpy.cmd.path={runtime.ide.path}/hardware/tools/esptool.py
+tools.esptoolpy.cmd.path={runtime.ide.path}/hardware/tools/esp8266/espflash
 
 tools.esptoolpy.program.params.verbose=
 tools.esptoolpy.program.params.quiet=
-tools.esptoolpy.program.pattern="python {cmd.path}" --port={serial.port} write_flash 0x00000 "{build.path}/{build.project_name}._00000.bin"
+tools.esptoolpy.program.pattern="{cmd.path}" --port={serial.port} write_flash 0x00000 "{build.path}/{build.project_name}_00000.bin" 0x40000 "{build.path}/{build.project_name}_40000.bin"
 

@@ -80,7 +80,7 @@ class HardwareSerial : public Stream
     unsigned char _tx_buffer[SERIAL_TX_BUFFER_SIZE];
 
   public:
-    HardwareSerial() : _uart(0) { }
+    HardwareSerial();
 
     void begin(unsigned long baud) { begin(baud, 0); }
     void begin(unsigned long, uint8_t);
