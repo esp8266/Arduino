@@ -31,7 +31,7 @@ package cc.arduino.packages.discoverers;
 
 import cc.arduino.packages.BoardPort;
 import cc.arduino.packages.Discovery;
-import cc.arduino.packages.discoverers.network.*;
+import cc.arduino.packages.discoverers.network.NetworkChecker;
 import processing.app.BaseNoGui;
 import processing.app.helpers.NetUtils;
 import processing.app.helpers.PreferencesMap;
@@ -141,7 +141,9 @@ public class NetworkDiscovery implements Discovery, ServiceListener, cc.arduino.
       String label = name + " at " + address;
       if (board != null) {
         String boardName = BaseNoGui.getPlatform().resolveDeviceByBoardID(BaseNoGui.packages, board);
-        label += " (" + boardName + ")";
+        if (boardName != null) {
+          label += " (" + boardName + ")";
+        }
       }
 
       BoardPort port = new BoardPort();
