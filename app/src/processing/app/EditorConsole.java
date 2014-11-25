@@ -33,6 +33,7 @@ import java.util.List;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultStyledDocument;
@@ -126,7 +127,7 @@ public class EditorConsole extends JScrollPane {
 
     // periodically post buffered messages to the console
     // should the interval come from the preferences file?
-    new javax.swing.Timer(250, new ActionListener() {
+    new Timer(250, new ActionListener() {
       public void actionPerformed(ActionEvent evt) {
         SwingUtilities.invokeLater(new Runnable() {
           @Override
