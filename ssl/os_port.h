@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Cameron Rich
+ * Copyright (c) 2007-2014, Cameron Rich
  * 
  * All rights reserved.
  * 
@@ -42,6 +42,7 @@ extern "C" {
 #endif
 
 #include "os_int.h"
+#include "config.h"
 #include <stdio.h>
 
 #if defined(WIN32)
