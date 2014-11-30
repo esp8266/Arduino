@@ -61,7 +61,7 @@ struct uart_
 
 #define UART_TX_FIFO_SIZE 0x7f
 
-void uart0_rx_handler(uart_t* uart)
+void ICACHE_FLASH_ATTR uart0_rx_handler(uart_t* uart)
 {
     if (READ_PERI_REG(UART_INT_ST(0)) & UART_RXFIFO_FULL_INT_ST)
     {
@@ -81,7 +81,7 @@ void uart0_rx_handler(uart_t* uart)
     }
 }
 
-void uart0_wait_for_tx_fifo(size_t size_needed)
+void ICACHE_FLASH_ATTR uart0_wait_for_tx_fifo(size_t size_needed)
 {
     while (true)
     {
@@ -91,17 +91,17 @@ void uart0_wait_for_tx_fifo(size_t size_needed)
     }
 }
 
-void uart0_wait_for_transmit(uart_t* uart)
+void ICACHE_FLASH_ATTR uart0_wait_for_transmit(uart_t* uart)
 {
     uart0_wait_for_tx_fifo(UART_TX_FIFO_SIZE);
 }
 
-void uart0_transmit_char(uart_t* uart, char c)
+void ICACHE_FLASH_ATTR uart0_transmit_char(uart_t* uart, char c)
 {
     WRITE_PERI_REG(UART_FIFO(0), c);
 }
 
-void uart0_transmit(uart_t* uart, const char* buf, size_t size)
+void ICACHE_FLASH_ATTR uart0_transmit(uart_t* uart, const char* buf, size_t size)
 {
     while (size)
     {
@@ -114,13 +114,13 @@ void uart0_transmit(uart_t* uart, const char* buf, size_t size)
     }
 }
 
-void uart0_flush(uart_t* uart)
+void ICACHE_FLASH_ATTR uart0_flush(uart_t* uart)
 {
     SET_PERI_REG_MASK(UART_CONF0(0), UART_RXFIFO_RST | UART_TXFIFO_RST);
     CLEAR_PERI_REG_MASK(UART_CONF0(0), UART_RXFIFO_RST | UART_TXFIFO_RST);
 }
 
-void uart0_interrupt_enable(uart_t* uart)
+void ICACHE_FLASH_ATTR uart0_interrupt_enable(uart_t* uart)
 {
     WRITE_PERI_REG(UART_INT_CLR(0), 0x1ff);
     ETS_UART_INTR_ATTACH(&uart0_rx_handler, uart);
@@ -128,24 +128,24 @@ void uart0_interrupt_enable(uart_t* uart)
     ETS_UART_INTR_ENABLE();
 }
 
-void uart0_interrupt_disable(uart_t* uart)
+void ICACHE_FLASH_ATTR uart0_interrupt_disable(uart_t* uart)
 {
     SET_PERI_REG_MASK(UART_INT_ENA(0), 0);
     ETS_UART_INTR_DISABLE();
 }
 
-void uart0_set_baudrate(uart_t* uart, int baud_rate)
+void ICACHE_FLASH_ATTR uart0_set_baudrate(uart_t* uart, int baud_rate)
 {
     uart->baud_rate = baud_rate;
     uart_div_modify(0, UART_CLK_FREQ / (uart->baud_rate));
 }
 
-int uart0_get_baudrate(uart_t* uart)
+int ICACHE_FLASH_ATTR uart0_get_baudrate(uart_t* uart)
 {
     return uart->baud_rate;
 }
 
-uart_t* uart0_init(int baudrate, uart_rx_handler_t rx_handler)
+uart_t* ICACHE_FLASH_ATTR uart0_init(int baudrate, uart_rx_handler_t rx_handler)
 {
     uart_t* uart = (uart_t*) os_malloc(sizeof(uart_t));
 
@@ -165,7 +165,7 @@ uart_t* uart0_init(int baudrate, uart_rx_handler_t rx_handler)
     return uart;
 }
 
-void uart0_uninit(uart_t* uart)
+void ICACHE_FLASH_ATTR uart0_uninit(uart_t* uart)
 {
     uart0_interrupt_disable(uart);
     // TODO: revert pin functions
@@ -173,12 +173,12 @@ void uart0_uninit(uart_t* uart)
 }
 
 
-void
+void ICACHE_FLASH_ATTR
 uart_ignore_char(char c)
 {    
 }
 
-void
+void ICACHE_FLASH_ATTR
 uart_write_char(char c)
 {
     if (c == '\n')
@@ -188,7 +188,7 @@ uart_write_char(char c)
 }
 
 int s_uart_debug_enabled = 1;
-void uart_set_debug(int enabled)
+void ICACHE_FLASH_ATTR uart_set_debug(int enabled)
 {
     s_uart_debug_enabled = enabled;
     if (enabled)
@@ -197,44 +197,44 @@ void uart_set_debug(int enabled)
         ets_install_putc1((void *)&uart_ignore_char);
 }
 
-int uart_get_debug()
+int ICACHE_FLASH_ATTR uart_get_debug()
 {
     return s_uart_debug_enabled;
 }
 
 HardwareSerial Serial;
 
-void serial_rx_handler(char c)
+void ICACHE_FLASH_ATTR serial_rx_handler(char c)
 {
     Serial._rx_complete_irq(c);
 }
 extern "C" size_t ets_printf(const char*, ...);
 
-HardwareSerial::HardwareSerial() : 
+ICACHE_FLASH_ATTR HardwareSerial::HardwareSerial() : 
     _rx_buffer_head(0), _rx_buffer_tail(0),
     _tx_buffer_head(0), _tx_buffer_tail(0),
     _uart(0)
 {
 }
 
-void HardwareSerial::begin(unsigned long baud, byte config)
+void ICACHE_FLASH_ATTR HardwareSerial::begin(unsigned long baud, byte config)
 {
     _uart = uart0_init(baud, &serial_rx_handler);
     _written = false;
 }
 
-void HardwareSerial::end()
+void ICACHE_FLASH_ATTR HardwareSerial::end()
 {
     uart0_uninit(_uart);
     _uart = 0;
 }
 
-int HardwareSerial::available(void)
+int ICACHE_FLASH_ATTR HardwareSerial::available(void)
 {
     return ((unsigned int)(SERIAL_RX_BUFFER_SIZE + _rx_buffer_head - _rx_buffer_tail)) % SERIAL_RX_BUFFER_SIZE;
 }
 
-int HardwareSerial::peek(void)
+int ICACHE_FLASH_ATTR HardwareSerial::peek(void)
 {
     if (_rx_buffer_head == _rx_buffer_tail) {
         return -1;
@@ -243,7 +243,7 @@ int HardwareSerial::peek(void)
     }
 }
 
-int HardwareSerial::read(void)
+int ICACHE_FLASH_ATTR HardwareSerial::read(void)
 {
     // if the head isn't ahead of the tail, we don't have any characters
     if (_rx_buffer_head == _rx_buffer_tail) {
@@ -255,7 +255,7 @@ int HardwareSerial::read(void)
     }
 }
 
-int HardwareSerial::availableForWrite(void)
+int ICACHE_FLASH_ATTR HardwareSerial::availableForWrite(void)
 {
     tx_buffer_index_t head = _tx_buffer_head;
     tx_buffer_index_t tail = _tx_buffer_tail;
@@ -264,14 +264,14 @@ int HardwareSerial::availableForWrite(void)
 }
 
 
-void HardwareSerial::flush()
+void ICACHE_FLASH_ATTR HardwareSerial::flush()
 {
     if (!_written)
         return;
 }
 
 
-size_t HardwareSerial::write(uint8_t c)
+size_t ICACHE_FLASH_ATTR HardwareSerial::write(uint8_t c)
 {
     uart0_transmit_char(_uart, c);
     // // If the buffer and the data register is empty, just write the byte
@@ -309,7 +309,7 @@ size_t HardwareSerial::write(uint8_t c)
     return 1;
 }
 
-void HardwareSerial::_rx_complete_irq(char c)
+void ICACHE_FLASH_ATTR HardwareSerial::_rx_complete_irq(char c)
 {
     rx_buffer_index_t i = (unsigned int)(_rx_buffer_head + 1) % SERIAL_RX_BUFFER_SIZE;
 
