@@ -5,6 +5,9 @@
 extern "C"{
 #endif
 
+long atol_internal(const char*);
+
+float atof_internal(const char*);
 
 char* itoa (int val, char *s, int radix);
 

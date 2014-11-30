@@ -1,37 +1,47 @@
 #include <stdlib.h>
 #include "stdlib_noniso.h"
 
-char *   itoa (int val, char *s, int radix)
+long atol_internal(const char* s)
+{
+  return 0;
+}
+
+float atof_internal(const char* s)
+{
+  return 0;
+}
+
+char * itoa (int val, char *s, int radix)
 {
   *s = 0;
   return s;
 }
 
-char *   ltoa (long val, char *s, int radix)
+char * ltoa (long val, char *s, int radix)
 {
   *s = 0;
   return s;
 }
  
-char *  utoa (unsigned int val, char *s, int radix)
+char * utoa (unsigned int val, char *s, int radix)
 {
   *s = 0;
   return s;
 }
  
-char *  ultoa (unsigned long val, char *s, int radix)
+char * ultoa (unsigned long val, char *s, int radix)
 {
   *s = 0;
   return s;
 }
 
-char *  dtostre (double __val, char *__s, unsigned char __prec, unsigned char __flags)
+char * dtostre (double __val, char *__s, unsigned char __prec, unsigned char __flags)
 {
   *__s = 0;
   return __s;
 }
  
-char *  dtostrf (double __val, signed char __width, unsigned char __prec, char *__s)
+char * dtostrf (double __val, signed char __width, unsigned char __prec, char *__s)
 {
    *__s = 0;
    return __s;
