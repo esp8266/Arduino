@@ -83,6 +83,7 @@ typedef struct _ETSTIMER_ {
 
 void ets_isr_attach(int routine, void* something, void *buff);
 void *pvPortMalloc(size_t xWantedSize);
+void *pvPortRealloc(void* ptr, size_t xWantedSize);
 void pvPortFree(void *ptr);
 void *vPortMalloc(size_t xWantedSize);
 void vPortFree(void *ptr);

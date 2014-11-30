@@ -46,6 +46,11 @@ extern void (*__init_array_end)(void);
 static cont_t g_cont;
 static os_event_t g_loop_queue[LOOP_QUEUE_SIZE];
 
+extern "C" void abort()
+{
+    while(1){}
+}
+
 extern "C" void esp_yield()
 {
     cont_yield(&g_cont);

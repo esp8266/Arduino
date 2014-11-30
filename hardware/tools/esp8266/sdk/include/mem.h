@@ -8,5 +8,6 @@
 #define os_malloc   pvPortMalloc
 #define os_free     vPortFree
 #define os_zalloc   pvPortZalloc
+#define os_realloc  pvPortRealloc
 
 #endif

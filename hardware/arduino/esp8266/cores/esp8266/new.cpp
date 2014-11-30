@@ -17,20 +17,27 @@
 */
 
 #include <stdlib.h>
+extern "C" {
+#include "ets_sys.h"
+#include "os_type.h"
+#include "osapi.h"
+#include "mem.h"
+#include "user_interface.h"
+}
 
 void *operator new(size_t size) {
-  return malloc(size);
+  return os_malloc(size);
 }
 
 void *operator new[](size_t size) {
-  return malloc(size);
+  return os_malloc(size);
 }
 
 void operator delete(void * ptr) {
-  free(ptr);
+  os_free(ptr);
 }
 
 void operator delete[](void * ptr) {
-  free(ptr);
+  os_free(ptr);
 }
 
