@@ -48,10 +48,20 @@ void delay_end(void* arg)
 
 void delay(unsigned long ms)
 {
-    os_timer_setfn(&delay_timer, (os_timer_func_t*) &delay_end, 0);
-    os_timer_arm(&delay_timer, ms, ONCE);
+    if (ms)
+    {
+        os_timer_setfn(&delay_timer, (os_timer_func_t*) &delay_end, 0);
+        os_timer_arm(&delay_timer, ms, ONCE);
+    }
+    else
+    {
+        esp_schedule();
+    }
     esp_yield();
-    os_timer_disarm(&delay_timer);
+    if (ms)
+    {
+        os_timer_disarm(&delay_timer);
+    }
 }
 
 unsigned long micros() 
