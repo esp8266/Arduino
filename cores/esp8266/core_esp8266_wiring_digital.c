@@ -27,6 +27,7 @@
 #define ARDUINO_MAIN
 #include "wiring_private.h"
 #include "pins_arduino.h"
+#include "c_types.h"
 #include "eagle_soc.h"
 #include "gpio.h"
 
@@ -65,6 +66,12 @@ static const uint32_t g_pin_funcs[PINCOUNT] = {
     [13] = FUNC_GPIO13,
     [14] = FUNC_GPIO14,
     [15] = FUNC_GPIO15,
+};
+
+
+enum PinFunction { GPIO, PWM };
+static uint32_t g_gpio_function[PINCOUNT] = {
+    GPIO
 };
 
 
