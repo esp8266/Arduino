@@ -2,12 +2,16 @@
 ARDUINO 1.0.7
 
 [libraries]
-* Backported GSM from IDE 1.5.x
-* EthernetClien: use IANA recommended ephemeral port range, 49152-65535 (Jack Christensen, cifer-lee)
+* Backported SPI Transaction API from IDE 1.5.x (Paul Stoffregen)
+* Backported GSM from IDE 1.5.x: fix build regression
+* Backported Ethernet from IDE 1.5.x
+* Backported SD from IDE 1.5.x
+* Backported SPI from IDE 1.5.x
+* EthernetClient: use IANA recommended ephemeral port range, 49152-65535 (Jack Christensen, cifer-lee)
 
 [core]
 * Fixed missing NOT_AN_INTERRUPT constant in digitalPinToInterrupt() macro
-* Fixed regression in HardwareSerial::available() introduced with https://github.com/arduino/Arduino/pull/2057
+* Fixed performance regression in HardwareSerial::available() introduced with https://github.com/arduino/Arduino/pull/2057
 
 ARDUINO 1.0.6 - 2014.09.16
 

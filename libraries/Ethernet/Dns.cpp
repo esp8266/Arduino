@@ -2,9 +2,9 @@
 // (c) Copyright 2009-2010 MCQN Ltd.
 // Released under Apache License, version 2.0
 
-#include "w5100.h"
+#include "utility/w5100.h"
 #include "EthernetUdp.h"
-#include "util.h"
+#include "utility/util.h"
 
 #include "Dns.h"
 #include <string.h>

@@ -9,9 +9,8 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <avr/interrupt.h>
 
-#include "w5100.h"
+#include "utility/w5100.h"
 
 // W5100 controller instance
 W5100Class W5100;
@@ -29,10 +28,11 @@ void W5100Class::init(void)
 
   SPI.begin();
   initSS();
-  
+  SPI.beginTransaction(SPI_ETHERNET_SETTINGS);
   writeMR(1<<RST);
   writeTMSR(0x55);
   writeRMSR(0x55);
+  SPI.endTransaction();
 
   for (int i=0; i<MAX_SOCK_NUM; i++) {
     SBASE[i] = TXBUF_BASE + SSIZE * i;
@@ -98,7 +98,7 @@ void W5100Class::recv_data_processing(SOCKET s, uint8_t *data, uint16_t len, uin
 {
   uint16_t ptr;
   ptr = readSnRX_RD(s);
-  read_data(s, (uint8_t *)ptr, data, len);
+  read_data(s, ptr, data, len);
   if (!peek)
   {
     ptr += len;
@@ -106,13 +106,13 @@ void W5100Class::recv_data_processing(SOCKET s, uint8_t *data, uint16_t len, uin
   }
 }
 
-void W5100Class::read_data(SOCKET s, volatile uint8_t *src, volatile uint8_t *dst, uint16_t len)
+void W5100Class::read_data(SOCKET s, volatile uint16_t src, volatile uint8_t *dst, uint16_t len)
 {
   uint16_t size;
   uint16_t src_mask;
   uint16_t src_ptr;
 
-  src_mask = (uint16_t)src & RMASK;
+  src_mask = src & RMASK;
   src_ptr = RBASE[s] + src_mask;
 
   if( (src_mask + len) > RSIZE ) 

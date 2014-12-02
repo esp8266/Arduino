@@ -1,7 +1,8 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-#define htons(x) ( ((x)<<8) | (((x)>>8)&0xFF) )
+#define htons(x) ( ((x)<< 8 & 0xFF00) | \
+                   ((x)>> 8 & 0x00FF) )
 #define ntohs(x) htons(x)
 
 #define htonl(x) ( ((x)<<24 & 0xFF000000UL) | \

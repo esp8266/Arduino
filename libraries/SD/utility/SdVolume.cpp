@@ -17,7 +17,7 @@
  * along with the Arduino SdFat Library.  If not, see
  * <http://www.gnu.org/licenses/>.
  */
-#include <SdFat.h>
+#include "SdFat.h"
 //------------------------------------------------------------------------------
 // raw block cache
 // init cacheBlockNumber_to invalid SD block number
