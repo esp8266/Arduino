@@ -3,7 +3,7 @@
 
  This example demonstrates the use of if() statements.
  It reads the state of a potentiometer (an analog input) and turns on an LED
- only if the LED goes above a certain threshold level. It prints the analog value
+ only if the potentiometer goes above a certain threshold level. It prints the analog value
  regardless of the level.
 
  The circuit:
