@@ -111,7 +111,7 @@ public abstract class AbstractMonitor extends JFrame implements MessageConsumer 
 
     String[] serialRateStrings = {
             "300", "1200", "2400", "4800", "9600",
-            "19200", "57600", "115200"
+            "19200", "38400", "57600", "115200"
     };
 
     serialRates = new JComboBox();
