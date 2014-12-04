@@ -88,11 +88,20 @@ void pinMode(uint8_t pin, uint8_t mode)
         gpio_output_set(0, 0, 0, 1 << pin);
         PIN_PULLUP_EN(mux);
     }
-    else
+    else if (mode == OUPUT)
     {
         gpio_output_set(0, 0, 1 << pin, 0);
     }
+    else if (mode == OUTPUT_OPEN_DRAIN)
+    {
+        GPIO_REG_WRITE(
+            GPIO_PIN_ADDR(GPIO_ID_PIN(pin)), 
+            GPIO_REG_READ(GPIO_PIN_ADDR(GPIO_ID_PIN(pin))) | 
+            GPIO_PIN_PAD_DRIVER_SET(GPIO_PAD_DRIVER_ENABLE)
+        );
 
+        GPIO_REG_WRITE(GPIO_ENABLE_ADDRESS, GPIO_REG_READ(GPIO_ENABLE_ADDRESS) | (1 << pin));
+    }
 }
 
 void digitalWrite(uint8_t pin, uint8_t val)
