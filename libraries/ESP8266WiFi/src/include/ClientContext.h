@@ -21,6 +21,7 @@ public:
     , _discard_cb_arg(discard_cb_arg)
     , _refcnt(0)
     , _next(0)
+    , _send_waiting(false)
     {
         tcp_setprio(pcb, TCP_PRIO_MIN);
         tcp_arg(pcb, this);
@@ -54,19 +55,13 @@ public:
         DEBUGV("WC:ur %d\r\n", _refcnt);
         if (--_refcnt == 0 && _pcb)
         {
-        	// if (_discard_cb)
-	        // 	(*_discard_cb)(_discard_cb_arg, this);
-	        // else
-         //    {
-                tcp_arg(_pcb, NULL);
-                tcp_sent(_pcb, NULL);
-                tcp_recv(_pcb, NULL);
-                tcp_err(_pcb, NULL);
-                tcp_close(_pcb);
-                _pcb = 0;
-                delete this;
-	        	//tcp_abort(_pcb);
-            // }
+            tcp_arg(_pcb, NULL);
+            tcp_sent(_pcb, NULL);
+            tcp_recv(_pcb, NULL);
+            tcp_err(_pcb, NULL);
+            tcp_close(_pcb);
+            _pcb = 0;
+            delete this;
         }
     }
 
@@ -117,7 +112,9 @@ public:
 
     	_size_sent = will_send;
         DEBUGV("WC:wr\r\n");
+        _send_waiting = true;
     	delay(5000); // max send timeout
+        _send_waiting = false;
         DEBUGV("WC:ww\r\n");
     	return will_send - _size_sent;
     }
@@ -153,7 +150,7 @@ private:
 	{
         DEBUGV("WC:er\r\n");
 		_pcb = 0;
-		if (_size_sent)
+		if (_size_sent && _send_waiting)
 			esp_schedule();
 
 	}
@@ -167,7 +164,7 @@ private:
 	{
         DEBUGV("WC:sent %d\r\n", len);
 		_size_sent -= len;
-		if (_size_sent == 0)
+		if (_size_sent == 0 && _send_waiting)
 			esp_schedule();
         return ERR_OK;
 	}
@@ -201,6 +198,7 @@ private:
     discard_cb_t _discard_cb;
     void* _discard_cb_arg;
     size_t _size_sent;
+    bool _send_waiting;
 };
 
 

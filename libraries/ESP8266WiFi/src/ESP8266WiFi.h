@@ -30,43 +30,21 @@ extern "C" {
 #include "WiFiClient.h"
 #include "WiFiServer.h"
 
-class WiFiClass
+enum WiFiMode { WIFI_STA = 1, WIFI_AP = 2, WIFI_AP_STA = 3 };
+
+class ESP8266WiFiClass
 {
-private:
-
-    static void init();
 public:
-    static int16_t 	_state[MAX_SOCK_NUM];
-    static uint16_t _server_port[MAX_SOCK_NUM];
 
-    WiFiClass();
+    ESP8266WiFiClass();
 
-    /*
-     * Get the first socket available
-     */
-    static uint8_t getSocket();
-
-    /*
-     * Get firmware version
-     */
-    static char* firmwareVersion();
-
-
+    void mode(WiFiMode);
+    
     /* Start Wifi connection for OPEN networks
      *
      * param ssid: Pointer to the SSID string.
      */
-    int begin(char* ssid);
-
-    /* Start Wifi connection with WEP encryption.
-     * Configure a key into the device. The key type (WEP-40, WEP-104)
-     * is determined by the size of the key (5 bytes for WEP-40, 13 bytes for WEP-104).
-     *
-     * param ssid: Pointer to the SSID string.
-     * param key_idx: The key index to set. Valid values are 0-3.
-     * param key: Key input buffer.
-     */
-    int begin(char* ssid, uint8_t key_idx, const char* key);
+    int begin(const char* ssid);
 
     /* Start Wifi connection with passphrase
      * the most secure supported mode will be automatically selected
@@ -77,49 +55,29 @@ public:
      */
     int begin(const char* ssid, const char *passphrase);
 
-    /* Change Ip configuration settings disabling the dhcp client
-        *
-        * param local_ip: 	Static ip configuration
-        */
-    void config(IPAddress local_ip);
+
+    /* Set up an open access point
+     *
+     * param ssid: Pointer to the SSID string.
+     */
+    void softAP(const char* ssid);
+
+
+    /* Set up a WPA2-secured access point
+     *
+     * param ssid: Pointer to the SSID string.
+     * param ssid: Pointer to passphrase, 8 characters min.
+     */
+    void softAP(const char* ssid, const char* passphrase);
+
 
     /* Change Ip configuration settings disabling the dhcp client
         *
         * param local_ip: 	Static ip configuration
-	* param dns_server:     IP configuration for DNS server 1
-        */
-    void config(IPAddress local_ip, IPAddress dns_server);
-
-    /* Change Ip configuration settings disabling the dhcp client
-        *
-        * param local_ip: 	Static ip configuration
-	* param dns_server:     IP configuration for DNS server 1
-        * param gateway : 	Static gateway configuration
-        */
-    void config(IPAddress local_ip, IPAddress dns_server, IPAddress gateway);
-
-    /* Change Ip configuration settings disabling the dhcp client
-        *
-        * param local_ip: 	Static ip configuration
-	* param dns_server:     IP configuration for DNS server 1
         * param gateway: 	Static gateway configuration
         * param subnet:		Static Subnet mask
         */
-    void config(IPAddress local_ip, IPAddress dns_server, IPAddress gateway, IPAddress subnet);
-
-    /* Change DNS Ip configuration
-     *
-     * param dns_server1: ip configuration for DNS server 1
-     */
-    void setDNS(IPAddress dns_server1);
-
-    /* Change DNS Ip configuration
-     *
-     * param dns_server1: ip configuration for DNS server 1
-     * param dns_server2: ip configuration for DNS server 2
-     *
-     */
-    void setDNS(IPAddress dns_server1, IPAddress dns_server2);
+    void config(IPAddress local_ip, IPAddress gateway, IPAddress subnet);
 
     /*
      * Disconnect from the network
@@ -129,18 +87,32 @@ public:
     int disconnect(void);
 
     /*
-     * Get the interface MAC address.
+     * Get the station interface MAC address.
      *
      * return: pointer to uint8_t array with length WL_MAC_ADDR_LENGTH
      */
     uint8_t* macAddress(uint8_t* mac);
 
     /*
-     * Get the interface IP address.
+     * Get the softAP interface MAC address.
+     *
+     * return: pointer to uint8_t array with length WL_MAC_ADDR_LENGTH
+     */
+    uint8_t* softAPmacAddress(uint8_t* mac);
+
+    /*
+     * Get the station interface IP address.
      *
      * return: Ip address value
      */
     IPAddress localIP();
+
+    /*
+     * Get the softAP interface IP address.
+     *
+     * return: Ip address value
+     */
+    IPAddress softAPIP();
 
     /*
      * Get the interface subnet mask address.
@@ -162,29 +134,6 @@ public:
      * return: ssid string
      */
     char* SSID();
-
-    /*
-      * Return the current BSSID associated with the network.
-      * It is the MAC address of the Access Point
-      *
-      * return: pointer to uint8_t array with length WL_MAC_ADDR_LENGTH
-      */
-    uint8_t* BSSID(uint8_t* bssid);
-
-    /*
-      * Return the current RSSI /Received Signal Strength in dBm)
-      * associated with the network
-      *
-      * return: signed value
-      */
-    int32_t RSSI();
-
-    /*
-      * Return the Encryption Type associated with the network
-      *
-      * return: one value of wl_enc_type enum
-      */
-    uint8_t	encryptionType();
 
     /*
      * Start scan WiFi networks available
@@ -238,8 +187,15 @@ public:
 
     friend class WiFiClient;
     friend class WiFiServer;
+
+protected:
+    static void _scanDone(void* result, int status);
+    void * _getScanInfoByIndex(int i);
+    static size_t _scanCount;
+    static void* _scanResult;
+
 };
 
-extern WiFiClass WiFi;
+extern ESP8266WiFiClass WiFi;
 
 #endif
