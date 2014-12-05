@@ -48,14 +48,13 @@
 #define WL_MAX_ATTEMPT_CONNECTION	10
 
 typedef enum {
-	WL_NO_SHIELD = 255,
-        WL_IDLE_STATUS = 0,
-        WL_NO_SSID_AVAIL,
-        WL_SCAN_COMPLETED,
-        WL_CONNECTED,
-        WL_CONNECT_FAILED,
-        WL_CONNECTION_LOST,
-        WL_DISCONNECTED
+    WL_IDLE_STATUS = 0,
+    WL_NO_SSID_AVAIL,
+    WL_SCAN_COMPLETED,
+    WL_CONNECTED,
+    WL_CONNECT_FAILED,
+    WL_CONNECTION_LOST,
+    WL_DISCONNECTED
 } wl_status_t;
 
 /* Encryption modes */
