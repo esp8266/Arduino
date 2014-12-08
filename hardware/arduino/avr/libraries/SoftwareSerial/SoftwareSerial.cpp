@@ -175,9 +175,7 @@ void SoftwareSerial::recv()
     } 
     else 
     {
-#if _DEBUG // for scope: pulse pin as overflow indictator
       DebugPulse(_DEBUG_PIN1, 1);
-#endif
       _buffer_overflow = true;
     }
 
