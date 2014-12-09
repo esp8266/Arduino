@@ -36,6 +36,7 @@ test-bin
 *.iml
 .idea
 .DS_Store
+.directory
 build/windows/launch4j-*
 build/windows/launcher/launch4j
 build/windows/WinAVR-*.zip
