@@ -88,7 +88,7 @@ void pinMode(uint8_t pin, uint8_t mode)
         gpio_output_set(0, 0, 0, 1 << pin);
         PIN_PULLUP_EN(mux);
     }
-    else if (mode == OUPUT)
+    else if (mode == OUTPUT)
     {
         gpio_output_set(0, 0, 1 << pin, 0);
     }
@@ -106,9 +106,11 @@ void pinMode(uint8_t pin, uint8_t mode)
 
 void digitalWrite(uint8_t pin, uint8_t val)
 {
-    uint32_t set = ((val & 1) << pin);
-    uint32_t clr = (((~val) & 1) << pin);
-    gpio_output_set(set, clr, 0, 0);
+    uint32_t mask = 1 << pin;
+    if (val)
+      GPIO_REG_WRITE(GPIO_OUT_W1TS_ADDRESS, mask);
+    else
+      GPIO_REG_WRITE(GPIO_OUT_W1TC_ADDRESS, mask);
 }
 
 int digitalRead(uint8_t pin)
