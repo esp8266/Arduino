@@ -1,37 +1,45 @@
 #include <stdlib.h>
 #include "stdlib_noniso.h"
 
+
+extern int ets_sprintf(char*, const char*, ...);
+
+#define sprintf ets_sprintf
+
 long atol_internal(const char* s)
 {
-  return 0;
+  long result = 0;
+  return result;
 }
 
 float atof_internal(const char* s)
 {
-  return 0;
+  float result = 0;
+  return result;
 }
 
 char * itoa (int val, char *s, int radix)
 {
-  *s = 0;
+  // todo: radix
+  sprintf(s, "%d", val);
   return s;
 }
 
 char * ltoa (long val, char *s, int radix)
 {
-  *s = 0;
+  sprintf(s, "%ld", val);
   return s;
 }
  
 char * utoa (unsigned int val, char *s, int radix)
 {
-  *s = 0;
+  sprintf(s, "%u", val);
   return s;
 }
  
 char * ultoa (unsigned long val, char *s, int radix)
 {
-  *s = 0;
+  sprintf(s, "%lu", val);
   return s;
 }
 
