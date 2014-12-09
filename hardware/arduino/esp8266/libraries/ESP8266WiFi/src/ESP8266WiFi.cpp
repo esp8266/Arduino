@@ -72,7 +72,7 @@ int ESP8266WiFiClass::begin(const char* ssid, const char *passphrase)
     wifi_station_set_config(&conf);
     wifi_station_connect();
     ETS_UART_INTR_ENABLE();
-    wifi_station_dhcp_start();
+    wifi_station_dhcpc_start();
     return 0;
 }
 
@@ -229,6 +229,19 @@ int8_t ESP8266WiFiClass::scanNetworks()
     {
         disconnect();
     }
+
+    if (ESP8266WiFiClass::_scanResult)
+    {
+        bss_info* it = reinterpret_cast<bss_info*>(ESP8266WiFiClass::_scanResult);
+        ESP8266WiFiClass::_scanResult = 0;
+        ESP8266WiFiClass::_scanCount = 0;
+        while(it)
+        {
+            bss_info* next = STAILQ_NEXT(it, next);
+            os_free(it);
+            it = next;
+        }
+    }
     
     struct scan_config config; 
     config.ssid = 0;
@@ -245,7 +258,9 @@ void * ESP8266WiFiClass::_getScanInfoByIndex(int i)
         return 0;
 
     struct bss_info* it = reinterpret_cast<struct bss_info*>(ESP8266WiFiClass::_scanResult);
-    for (; i; it = STAILQ_NEXT(it, next), --i);
+    for (; i && it; --i)
+        it = STAILQ_NEXT(it, next);
+
     if (!it)
         return 0;
 
@@ -314,6 +329,7 @@ void wifi_dns_found_callback(const char *name, ip_addr_t *ipaddr, void *callback
 int ESP8266WiFiClass::hostByName(const char* aHostname, IPAddress& aResult)
 {
     ip_addr_t addr;
+    aResult = static_cast<uint32_t>(0);
     err_t err = dns_gethostbyname(aHostname, &addr, &wifi_dns_found_callback, &aResult);
     if (err == ERR_OK)
     {
@@ -324,11 +340,12 @@ int ESP8266WiFiClass::hostByName(const char* aHostname, IPAddress& aResult)
         esp_yield();
         // will return here when dns_found_callback fires
     }
-    else // probably an invalid hostname
-    {
-        aResult = static_cast<uint32_t>(0);
-    }
+    
     return (aResult != 0) ? 1 : 0;
 }
+
+size_t ESP8266WiFiClass::_scanCount = 0;
+void* ESP8266WiFiClass::_scanResult = 0;
+
 
 ESP8266WiFiClass WiFi;
