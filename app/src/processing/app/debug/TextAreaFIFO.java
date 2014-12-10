@@ -68,7 +68,7 @@ public class TextAreaFIFO extends JTextArea implements DocumentListener {
     len = getDocument().getLength();
     if (len > maxChars) {
       int n = len - maxChars;
-      System.out.println("trimDocument: remove " + n + " chars");
+      //System.out.println("trimDocument: remove " + n + " chars");
       try {
         getDocument().remove(0, n);
       } catch (BadLocationException ble) {
