@@ -12,7 +12,7 @@ What works
 - millis, micros, delay, delayMicroseconds
 - yield (call that once in a while in long loops; delay() works as well)
 - Serial
-	Only 8n1 is supported right now. flush() doesn't work, and there is no propper TX buffer.
+	Only 8n1 is supported right now. flush() doesn't work, and there is no proper TX buffer.
 	When sending long strings (>128 chars at a time) something might get lost.
 	There will be some diagnostic output from WiFi libraries unless you call Serial.begin.
 
