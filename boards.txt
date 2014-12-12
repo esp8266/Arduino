@@ -2,7 +2,7 @@
 esp01.name=ESP-01
 
 esp01.upload.tool=esptoolpy
-esp01.upload.speed=57600
+esp01.upload.speed=115200
 esp01.upload.wait_for_upload_port=true
 
 esp01.build.mcu=esp8266
