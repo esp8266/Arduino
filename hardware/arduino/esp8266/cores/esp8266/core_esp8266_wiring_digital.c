@@ -132,3 +132,10 @@ void initPins()
     }
 }
 
+
+void analogWrite(uint8_t pin, int val)
+{
+}
+
+
+
