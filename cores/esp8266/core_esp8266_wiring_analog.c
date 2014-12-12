@@ -27,29 +27,17 @@
 #include "wiring_private.h"
 #include "pins_arduino.h"
 
-uint8_t analog_reference = DEFAULT;
 
 void analogReference(uint8_t mode)
 {
-	analog_reference = mode;
 }
 
 int analogRead(uint8_t pin)
 {
-	uint8_t low, high;
+  if (pin == 0)
+    return system_adc_read();
 
-	low  = 0;
-	high = 0;
-
-	// combine the two bytes
-	return (high << 8) | low;
+  return 0;
 }
 
-// Right now, PWM output only works on the pins with
-// hardware support.  These are defined in the appropriate
-// pins_*.c file.  For the rest of the pins, we default
-// to digital output.
-void analogWrite(uint8_t pin, int val)
-{
-}
 
