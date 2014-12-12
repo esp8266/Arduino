@@ -221,6 +221,7 @@ void ICACHE_FLASH_ATTR HardwareSerial::begin(unsigned long baud, byte config)
 {
     _uart = uart0_init(baud, &serial_rx_handler);
     _written = false;
+    uart_set_debug(0);
 }
 
 void ICACHE_FLASH_ATTR HardwareSerial::end()
