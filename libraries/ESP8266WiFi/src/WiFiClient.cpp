@@ -74,11 +74,11 @@ WiFiClient& ICACHE_FLASH_ATTR  WiFiClient::operator=(const WiFiClient& other)
 
 int ICACHE_FLASH_ATTR  WiFiClient::connect(const char* host, uint16_t port) 
 {
-    // IPAddress remote_addr;
-    // if (WiFi.hostByName(host, remote_addr))
-    // {
-    //     return connect(remote_addr, port);
-    // }
+    IPAddress remote_addr;
+    if (WiFi.hostByName(host, remote_addr))
+    {
+        return connect(remote_addr, port);
+    }
     return 0;
 }
 
