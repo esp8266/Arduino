@@ -1,7 +1,9 @@
-/*
-  EEPROM.h - EEPROM library
-  Copyright (c) 2006 David A. Mellis.  All right reserved.
+/* 
+  EEPROM.cpp - esp8266 EEPROM emulation
 
+  Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
+  This file is part of the esp8266 core for Arduino environment.
+ 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
