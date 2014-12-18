@@ -68,12 +68,12 @@ public:
     void begin(unsigned long baud) { begin(baud, 0); }
     void begin(unsigned long, uint8_t);
     void end();
-    virtual int available(void);
-    virtual int peek(void);
-    virtual int read(void);
+    int available(void) override;
+    int peek(void) override;
+    int read(void) override;
     int availableForWrite(void);
-    virtual void flush(void);
-    virtual size_t write(uint8_t);
+    void flush(void) override;
+    size_t write(uint8_t) override;
     inline size_t write(unsigned long n) { return write((uint8_t)n); }
     inline size_t write(long n) { return write((uint8_t)n); }
     inline size_t write(unsigned int n) { return write((uint8_t)n); }
