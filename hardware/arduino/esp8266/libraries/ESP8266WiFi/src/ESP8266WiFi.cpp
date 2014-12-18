@@ -69,6 +69,8 @@ int ESP8266WiFiClass::begin(const char* ssid, const char *passphrase)
     else
         *conf.password = 0;
 
+    conf.bssid_set = 0;
+
     ETS_UART_INTR_DISABLE();
     wifi_station_set_config(&conf);
     wifi_station_connect();
@@ -201,6 +203,11 @@ char* ESP8266WiFiClass::SSID()
 //     return WiFiDrv::getCurrentEncryptionType();
 // }
 
+extern "C"
+{
+    typedef STAILQ_HEAD(, bss_info) bss_info_head_t;
+}
+
 void ESP8266WiFiClass::_scanDone(void* result, int status)
 {
     if (status != OK)
@@ -210,9 +217,11 @@ void ESP8266WiFiClass::_scanDone(void* result, int status)
     }
     else
     {
-      ESP8266WiFiClass::_scanResult = result;
+      
       int i = 0;
-      for (bss_info* it = reinterpret_cast<bss_info*>(result); it; it = STAILQ_NEXT(it, next), ++i);
+      bss_info_head_t* head = reinterpret_cast<bss_info_head_t*>(result);
+      ESP8266WiFiClass::_scanResult = STAILQ_FIRST(head);
+      for (bss_info* it = STAILQ_FIRST(head); it; it = STAILQ_NEXT(it, next), ++i);
       ESP8266WiFiClass::_scanCount = i;
     }
     esp_schedule();   
@@ -233,7 +242,7 @@ int8_t ESP8266WiFiClass::scanNetworks()
 
     if (ESP8266WiFiClass::_scanResult)
     {
-        bss_info* it = reinterpret_cast<bss_info*>(ESP8266WiFiClass::_scanResult);
+        struct bss_info* it = reinterpret_cast<bss_info*>(ESP8266WiFiClass::_scanResult);
         ESP8266WiFiClass::_scanResult = 0;
         ESP8266WiFiClass::_scanCount = 0;
         while(it)
@@ -244,7 +253,7 @@ int8_t ESP8266WiFiClass::scanNetworks()
         }
     }
     
-    struct scan_config config; 
+    struct scan_config config;
     config.ssid = 0;
     config.bssid = 0;
     config.channel = 0;
@@ -256,25 +265,27 @@ int8_t ESP8266WiFiClass::scanNetworks()
 void * ESP8266WiFiClass::_getScanInfoByIndex(int i)
 {
     if (!ESP8266WiFiClass::_scanResult || i > ESP8266WiFiClass::_scanCount)
+    {
         return 0;
-
-    struct bss_info* it = reinterpret_cast<struct bss_info*>(ESP8266WiFiClass::_scanResult);
-    for (; i && it; --i)
+    }
+    
+    struct bss_info* it = reinterpret_cast<bss_info*>(ESP8266WiFiClass::_scanResult);
+    while(i > 0 && it)
+    {
         it = STAILQ_NEXT(it, next);
-
-    if (!it)
-        return 0;
+        --i;
+    }
 
     return it;
 }
 
-char* ESP8266WiFiClass::SSID(uint8_t i)
+const char* ESP8266WiFiClass::SSID(uint8_t i)
 {
     struct bss_info* it = reinterpret_cast<struct bss_info*>(_getScanInfoByIndex(i));
     if (!it)
         return 0;
 
-    return reinterpret_cast<char*>(it->ssid);
+    return reinterpret_cast<const char*>(it->ssid);
 }
 
 int32_t ESP8266WiFiClass::RSSI(uint8_t i)
@@ -343,6 +354,48 @@ int ESP8266WiFiClass::hostByName(const char* aHostname, IPAddress& aResult)
     }
     
     return (aResult != 0) ? 1 : 0;
+}
+
+void ESP8266WiFiClass::printDiag(Print& p)
+{
+    const char* modes[] = {"NULL", "STA", "AP", "STA+AP"};
+    p.print("Mode: ");
+    p.println(modes[wifi_get_opmode()]);
+
+    const char* phymodes[] = {"", "B", "G", "N"};
+    p.print("PHY mode: ");
+    p.println(phymodes[(int) wifi_get_phy_mode()]);
+
+    p.print("Channel: ");
+    p.println(wifi_get_channel());
+
+    p.print("AP id: ");
+    p.println(wifi_station_get_current_ap_id());
+
+    p.print("Status: ");
+    p.println(wifi_station_get_connect_status());
+
+    p.print("Auto connect: ");
+    p.println(wifi_station_get_auto_connect());
+
+    static struct station_config conf;
+    wifi_station_get_config(&conf);
+    
+    const char* ssid = reinterpret_cast<const char*>(conf.ssid);
+    p.print("SSID (");
+    p.print(strlen(ssid));
+    p.print("): ");
+    p.println(ssid);
+
+    const char* passphrase = reinterpret_cast<const char*>(conf.password);
+    p.print("Passphrase (");
+    p.print(strlen(passphrase));
+    p.print("): ");
+    p.println(passphrase);
+
+    p.print("BSSID set: ");
+    p.println(conf.bssid_set);
+
 }
 
 size_t ESP8266WiFiClass::_scanCount = 0;

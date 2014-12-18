@@ -22,7 +22,7 @@
 #ifndef WiFi_h
 #define WiFi_h
 
-#include <inttypes.h>
+#include <stdint.h>
 
 extern "C" {
   #include "include/wl_definitions.h"
@@ -151,7 +151,7 @@ public:
 	 *
      * return: ssid string of the specified item on the networks scanned list
      */
-    char*	SSID(uint8_t networkItem);
+    const char*	SSID(uint8_t networkItem);
 
     /*
      * Return the encryption type of the networks discovered during the scanNetworks
@@ -186,6 +186,9 @@ public:
      *          else error code
      */
     int hostByName(const char* aHostname, IPAddress& aResult);
+
+
+    void printDiag(Print& dest);
 
     friend class WiFiClient;
     friend class WiFiServer;
