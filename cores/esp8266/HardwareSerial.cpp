@@ -27,6 +27,7 @@
 #include <string.h>
 #include <inttypes.h>
 #include "Arduino.h"
+#include "cbuf.h"
 
 extern "C" {
 #include "osapi.h"
@@ -38,9 +39,9 @@ extern "C" {
 
 #include "HardwareSerial.h"
 
-typedef void (*uart_rx_handler_t)(char);
+HardwareSerial Serial;
 
-uart_t* uart0_init(int baud_rate, uart_rx_handler_t rx_handler);
+uart_t* uart0_init(int baud_rate);
 void uart0_set_baudrate(uart_t* uart, int baud_rate);
 int  uart0_get_baudrate(uart_t* uart);
 void uart0_uninit(uart_t* uart);
@@ -48,22 +49,20 @@ void uart0_transmit(uart_t* uart, const char* buf, size_t size);    // may block
 void uart0_wait_for_transmit(uart_t* uart);
 void uart0_transmit_char(uart_t* uart, char c);  // does not block, but character will be lost if FIFO is full
 
-void uart_set_debug(int enabled);
-int  uart_get_debug();
+void uart_set_debug(bool enabled);
+bool uart_get_debug();
 
 struct uart_
 {
     int  baud_rate;
-    uart_rx_handler_t rx_handler;
 };
 
+#define UART_TX_FIFO_SIZE 0x80
 
-
-#define UART_TX_FIFO_SIZE 0x7f
-
-void ICACHE_FLASH_ATTR uart0_rx_handler(uart_t* uart)
+void ICACHE_FLASH_ATTR uart0_interrupt_handler(uart_t* uart)
 {
-    if (READ_PERI_REG(UART_INT_ST(0)) & UART_RXFIFO_FULL_INT_ST)
+    uint32_t status = READ_PERI_REG(UART_INT_ST(0));
+    if (status & UART_RXFIFO_FULL_INT_ST)
     {
         while(true)
         {
@@ -71,14 +70,23 @@ void ICACHE_FLASH_ATTR uart0_rx_handler(uart_t* uart)
             if (!rx_count)
                 break;
 
-            for(int cnt = 0; cnt < rx_count; ++cnt)
+            while(rx_count--)
             {
                 char c = READ_PERI_REG(UART_FIFO(0)) & 0xFF;
-                (*uart->rx_handler)(c);
+                Serial._rx_complete_irq(c);
             }
         }
         WRITE_PERI_REG(UART_INT_CLR(0), UART_RXFIFO_FULL_INT_CLR);
     }
+    else if (status & UART_TXFIFO_EMPTY_INT_ST)
+    {
+        WRITE_PERI_REG(UART_INT_CLR(0), UART_TXFIFO_EMPTY_INT_CLR);
+        Serial._tx_empty_irq();
+    }
+    else
+    {
+        WRITE_PERI_REG(UART_INT_CLR(0), status);
+    }   
 }
 
 void ICACHE_FLASH_ATTR uart0_wait_for_tx_fifo(size_t size_needed)
@@ -89,6 +97,11 @@ void ICACHE_FLASH_ATTR uart0_wait_for_tx_fifo(size_t size_needed)
         if (tx_count <= (UART_TX_FIFO_SIZE - size_needed))
             break;
     }
+}
+
+size_t ICACHE_FLASH_ATTR uart0_get_tx_fifo_room()
+{
+    return UART_TX_FIFO_SIZE - ((READ_PERI_REG(UART_STATUS(0)) >> UART_TXFIFO_CNT_S) & UART_TXFIFO_CNT);        
 }
 
 void ICACHE_FLASH_ATTR uart0_wait_for_transmit(uart_t* uart)
@@ -123,15 +136,25 @@ void ICACHE_FLASH_ATTR uart0_flush(uart_t* uart)
 void ICACHE_FLASH_ATTR uart0_interrupt_enable(uart_t* uart)
 {
     WRITE_PERI_REG(UART_INT_CLR(0), 0x1ff);
-    ETS_UART_INTR_ATTACH(&uart0_rx_handler, uart);
+    ETS_UART_INTR_ATTACH(&uart0_interrupt_handler, uart);
     SET_PERI_REG_MASK(UART_INT_ENA(0), UART_RXFIFO_FULL_INT_ENA);
     ETS_UART_INTR_ENABLE();
 }
 
 void ICACHE_FLASH_ATTR uart0_interrupt_disable(uart_t* uart)
 {
-    SET_PERI_REG_MASK(UART_INT_ENA(0), 0);
+    CLEAR_PERI_REG_MASK(UART_INT_ENA(0), UART_RXFIFO_FULL_INT_ENA);
     ETS_UART_INTR_DISABLE();
+}
+
+void ICACHE_FLASH_ATTR uart0_arm_tx_interrupt()
+{
+    SET_PERI_REG_MASK(UART_INT_ENA(0), UART_TXFIFO_EMPTY_INT_ENA);
+}
+
+void ICACHE_FLASH_ATTR uart0_disarm_tx_interrupt()
+{
+    CLEAR_PERI_REG_MASK(UART_INT_ENA(0), UART_TXFIFO_EMPTY_INT_ENA);
 }
 
 void ICACHE_FLASH_ATTR uart0_set_baudrate(uart_t* uart, int baud_rate)
@@ -145,11 +168,9 @@ int ICACHE_FLASH_ATTR uart0_get_baudrate(uart_t* uart)
     return uart->baud_rate;
 }
 
-uart_t* ICACHE_FLASH_ATTR uart0_init(int baudrate, uart_rx_handler_t rx_handler)
+uart_t* ICACHE_FLASH_ATTR uart0_init(int baudrate)
 {
     uart_t* uart = (uart_t*) os_malloc(sizeof(uart_t));
-
-    uart->rx_handler = rx_handler;
 
     PIN_PULLUP_DIS(PERIPHS_IO_MUX_U0TXD_U);
     PIN_FUNC_SELECT(PERIPHS_IO_MUX_U0TXD_U, FUNC_U0TXD);
@@ -158,9 +179,11 @@ uart_t* ICACHE_FLASH_ATTR uart0_init(int baudrate, uart_rx_handler_t rx_handler)
     WRITE_PERI_REG(UART_CONF0(0), 0x3 << UART_BIT_NUM_S);   // 8n1
 
     uart0_flush(uart);
-    uart0_interrupt_enable(uart);
     
-    WRITE_PERI_REG(UART_CONF1(0), ((0x01 & UART_RXFIFO_FULL_THRHD) << UART_RXFIFO_FULL_THRHD_S));
+    WRITE_PERI_REG(UART_CONF1(0), ((0x01 & UART_RXFIFO_FULL_THRHD) << UART_RXFIFO_FULL_THRHD_S) |
+                                ((0x20 & UART_TXFIFO_EMPTY_THRHD) << UART_TXFIFO_EMPTY_THRHD_S));
+
+    uart0_interrupt_enable(uart);
 
     return uart;
 }
@@ -187,157 +210,131 @@ uart_write_char(char c)
     WRITE_PERI_REG(UART_FIFO(0), c);
 }
 
-int s_uart_debug_enabled = 1;
-void ICACHE_FLASH_ATTR uart_set_debug(int enabled)
+bool s_uart_debug_enabled = true;
+void ICACHE_FLASH_ATTR uart_set_debug(bool enabled)
 {
     s_uart_debug_enabled = enabled;
     if (enabled)
+    {
+        system_set_os_print(1);
         ets_install_putc1((void *)&uart_write_char);
+    }
     else
         ets_install_putc1((void *)&uart_ignore_char);
 }
 
-int ICACHE_FLASH_ATTR uart_get_debug()
+bool ICACHE_FLASH_ATTR uart_get_debug()
 {
     return s_uart_debug_enabled;
 }
 
-HardwareSerial Serial;
-
-void ICACHE_FLASH_ATTR serial_rx_handler(char c)
-{
-    Serial._rx_complete_irq(c);
-}
-extern "C" size_t ets_printf(const char*, ...);
-
 ICACHE_FLASH_ATTR HardwareSerial::HardwareSerial() : 
-    _rx_buffer_head(0), _rx_buffer_tail(0),
-    _tx_buffer_head(0), _tx_buffer_tail(0),
-    _uart(0)
+    _uart(0), _rx_buffer(0), _tx_buffer(0)
 {
 }
 
 void ICACHE_FLASH_ATTR HardwareSerial::begin(unsigned long baud, byte config)
 {
-    _uart = uart0_init(baud, &serial_rx_handler);
+    _rx_buffer = new cbuf(SERIAL_RX_BUFFER_SIZE);
+    _tx_buffer = new cbuf(SERIAL_TX_BUFFER_SIZE);
+    uart_set_debug(false);
+    _uart = uart0_init(baud);
     _written = false;
-    uart_set_debug(0);
+    delay(1);
 }
 
 void ICACHE_FLASH_ATTR HardwareSerial::end()
 {
     uart0_uninit(_uart);
+    delete _rx_buffer;
+    delete _tx_buffer;
     _uart = 0;
+    _rx_buffer = 0;
+    _tx_buffer = 0;
+}
+
+void ICACHE_FLASH_ATTR HardwareSerial::setDebugOutput(bool en)
+{
+    uart_set_debug(en);
 }
 
 int ICACHE_FLASH_ATTR HardwareSerial::available(void)
 {
-    return ((unsigned int)(SERIAL_RX_BUFFER_SIZE + _rx_buffer_head - _rx_buffer_tail)) % SERIAL_RX_BUFFER_SIZE;
+    return static_cast<int>(_rx_buffer->getSize());
 }
 
 int ICACHE_FLASH_ATTR HardwareSerial::peek(void)
 {
-    if (_rx_buffer_head == _rx_buffer_tail) {
-        return -1;
-    } else {
-        return _rx_buffer[_rx_buffer_tail];
-    }
+    return _rx_buffer->peek();
 }
 
 int ICACHE_FLASH_ATTR HardwareSerial::read(void)
 {
-    // if the head isn't ahead of the tail, we don't have any characters
-    if (_rx_buffer_head == _rx_buffer_tail) {
-        return -1;
-    } else {
-        unsigned char c = _rx_buffer[_rx_buffer_tail];
-        _rx_buffer_tail = (rx_buffer_index_t)(_rx_buffer_tail + 1) % SERIAL_RX_BUFFER_SIZE;
-        return c;
-    }
+    return _rx_buffer->read();
 }
 
 int ICACHE_FLASH_ATTR HardwareSerial::availableForWrite(void)
 {
-    tx_buffer_index_t head = _tx_buffer_head;
-    tx_buffer_index_t tail = _tx_buffer_tail;
-    if (head >= tail) return SERIAL_TX_BUFFER_SIZE - 1 - head + tail;
-    return tail - head - 1;
+    return static_cast<int>(_tx_buffer->room());
 }
-
 
 void ICACHE_FLASH_ATTR HardwareSerial::flush()
 {
     if (!_written)
         return;
+    uart0_flush(_uart);
+    _tx_buffer->flush();
+    _rx_buffer->flush();
+    _written = false;
 }
-
 
 size_t ICACHE_FLASH_ATTR HardwareSerial::write(uint8_t c)
 {
-    uart0_transmit_char(_uart, c);
-    // // If the buffer and the data register is empty, just write the byte
-    // // to the data register and be done. This shortcut helps
-    // // significantly improve the effective datarate at high (>
-    // // 500kbit/s) bitrates, where interrupt overhead becomes a slowdown.
-    // if (_tx_buffer_head == _tx_buffer_tail && bit_is_set(*_ucsra, UDRE0)) {
-    //     *_udr = c;
-    //     sbi(*_ucsra, TXC0);
-    //     return 1;
-    // }
-    // tx_buffer_index_t i = (_tx_buffer_head + 1) % SERIAL_TX_BUFFER_SIZE;
-    
-    // // If the output buffer is full, there's nothing for it other than to 
-    // // wait for the interrupt handler to empty it a bit
-    // while (i == _tx_buffer_tail) {
-    //     if (bit_is_clear(SREG, SREG_I)) {
-    //         // Interrupts are disabled, so we'll have to poll the data
-    //         // register empty flag ourselves. If it is set, pretend an
-    //         // interrupt has happened and call the handler to free up
-    //         // space for us.
-    //         if(bit_is_set(*_ucsra, UDRE0))
-    // _tx_udr_empty_irq();
-    //     } else {
-    //         // nop, the interrupt handler will free up space for us
-    //     }
-    // }
-
-    // _tx_buffer[_tx_buffer_head] = c;
-    // _tx_buffer_head = i;
-    
-    // sbi(*_ucsrb, UDRIE0);
     _written = true;
+    size_t room = uart0_get_tx_fifo_room();
+    if (room > 0 && _tx_buffer->empty())
+    {
+        uart0_transmit_char(_uart, c);
+        if (room < 10)
+        {
+            uart0_arm_tx_interrupt();
+        }
+        return 1;
+    }
     
+    while (_tx_buffer->room() == 0)
+    {
+        yield();
+    }
+    
+    _tx_buffer->write(c);
     return 1;
+}
+
+ICACHE_FLASH_ATTR HardwareSerial::operator bool() const
+{
+    return _uart != 0;
 }
 
 void ICACHE_FLASH_ATTR HardwareSerial::_rx_complete_irq(char c)
 {
-    rx_buffer_index_t i = (unsigned int)(_rx_buffer_head + 1) % SERIAL_RX_BUFFER_SIZE;
-
-    if (i != _rx_buffer_tail) {
-        _rx_buffer[_rx_buffer_head] = c;
-        _rx_buffer_head = i;
-    }
+    _rx_buffer->write(c);
 }
 
+void ICACHE_FLASH_ATTR HardwareSerial::_tx_empty_irq(void)
+{
+    size_t queued = _tx_buffer->getSize();
+    if (!queued)
+    {
+        uart0_disarm_tx_interrupt();
+        return;
+    }
 
-// void HardwareSerial::_tx_udr_empty_irq(void)
-// {
-//   // If interrupts are enabled, there must be more data in the output
-//   // buffer. Send the next byte
-//   unsigned char c = _tx_buffer[_tx_buffer_tail];
-//   _tx_buffer_tail = (_tx_buffer_tail + 1) % SERIAL_TX_BUFFER_SIZE;
-
-//   *_udr = c;
-
-//   // clear the TXC bit -- "can be cleared by writing a one to its bit
-//   // location". This makes sure flush() won't return until the bytes
-//   // actually got written
-//   sbi(*_ucsra, TXC0);
-
-//   if (_tx_buffer_head == _tx_buffer_tail) {
-//     // Buffer empty, so disable interrupts
-//     cbi(*_ucsrb, UDRIE0);
-//   }
-// }
+    size_t room = uart0_get_tx_fifo_room();
+    int n = static_cast<int>((queued < room) ? queued : room);
+    while (n--)
+    {
+        uart0_transmit_char(_uart, _tx_buffer->read());
+    }
+}
 

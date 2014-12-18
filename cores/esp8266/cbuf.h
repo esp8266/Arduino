@@ -40,6 +40,11 @@ public:
         
         return _begin - _end - 1;
     }
+
+    bool empty() const
+    {
+        return _begin == _end;
+    }
     
     char peek()
     {
