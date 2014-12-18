@@ -1,9 +1,9 @@
-/*
-  wiring.c - Partial implementation of the Wiring API for the ATmega8.
-  Part of Arduino - http://www.arduino.cc/
+/* 
+  core_esp8266_wiring.c - implementation of Wiring API for esp8266
 
-  Copyright (c) 2005-2006 David A. Mellis
-
+  Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
+  This file is part of the esp8266 core for Arduino environment.
+ 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -14,13 +14,11 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   Lesser General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General
-  Public License along with this library; if not, write to the
-  Free Software Foundation, Inc., 59 Temple Place, Suite 330,
-  Boston, MA  02111-1307  USA
-
-  $Id$
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+
 
 #include "wiring_private.h"
 #include "ets_sys.h"
