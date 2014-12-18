@@ -28,13 +28,8 @@
 
 #include "Stream.h"
 
-#if !(defined(SERIAL_TX_BUFFER_SIZE) && defined(SERIAL_RX_BUFFER_SIZE))
-#define SERIAL_TX_BUFFER_SIZE 64
-#define SERIAL_RX_BUFFER_SIZE 64
-#endif
-
-typedef uint32_t tx_buffer_index_t;
-typedef uint32_t rx_buffer_index_t;
+#define SERIAL_TX_BUFFER_SIZE 256
+#define SERIAL_RX_BUFFER_SIZE 256
 
 // // Define config for Serial.begin(baud, config);
 // #define SERIAL_5N1 0x00
@@ -62,24 +57,12 @@ typedef uint32_t rx_buffer_index_t;
 // #define SERIAL_7O2 0x3C
 // #define SERIAL_8O2 0x3E
 
-struct uart_;
-typedef uart_ uart_t;
+class cbuf;
+typedef struct uart_ uart_t;
+
 class HardwareSerial : public Stream
 {
-  protected:
-    uart_t* _uart;
-    // Has any byte been written to the UART since begin()
-    bool _written;
-
-    volatile rx_buffer_index_t _rx_buffer_head;
-    volatile rx_buffer_index_t _rx_buffer_tail;
-    volatile tx_buffer_index_t _tx_buffer_head;
-    volatile tx_buffer_index_t _tx_buffer_tail;
-
-    unsigned char _rx_buffer[SERIAL_RX_BUFFER_SIZE];
-    unsigned char _tx_buffer[SERIAL_TX_BUFFER_SIZE];
-
-  public:
+public:
     HardwareSerial();
 
     void begin(unsigned long baud) { begin(baud, 0); }
@@ -96,11 +79,20 @@ class HardwareSerial : public Stream
     inline size_t write(unsigned int n) { return write((uint8_t)n); }
     inline size_t write(int n) { return write((uint8_t)n); }
     using Print::write; // pull in write(str) and write(buf, size) from Print
-    operator bool() { return true; }
+    operator bool() const;
 
-    // Interrupt handlers - Not intended to be called externally
+    void setDebugOutput(bool);
+
+protected:
+    friend void uart0_interrupt_handler(uart_t* uart);
     void _rx_complete_irq(char c);
-    void _tx_udr_empty_irq(void);
+    void _tx_empty_irq(void);
+
+protected:
+    uart_t* _uart;
+    cbuf*   _tx_buffer;
+    cbuf*   _rx_buffer;
+    bool    _written;
 };
 
 extern HardwareSerial Serial;
