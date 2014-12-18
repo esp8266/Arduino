@@ -30,6 +30,7 @@
 #include "c_types.h"
 #include "eagle_soc.h"
 #include "gpio.h"
+#include "ets_sys.h"
 
 #define PINCOUNT 16
 
@@ -118,6 +119,58 @@ int digitalRead(uint8_t pin)
     return ((gpio_input_get() >> pin) & 1);
 }
 
+void analogWrite(uint8_t pin, int val)
+{
+}
+
+typedef void (*inthandler_t)(void);
+static inthandler_t g_handlers[PINCOUNT] = { 0 };
+
+
+void interrupt_handler(void *arg)
+{
+    uint32_t intr_mask = GPIO_REG_READ(GPIO_STATUS_ADDRESS);
+    for (int pin = 0; intr_mask; intr_mask >>= 1, ++pin)
+    {
+        if ((intr_mask & 1) && g_handlers[pin])
+        {
+            GPIO_REG_WRITE(GPIO_STATUS_W1TC_ADDRESS, 1 << pin);
+            (*g_handlers[pin])();
+        }
+    }
+}
+
+void attachInterrupt(uint8_t pin, inthandler_t handler, int mode) 
+{
+    if (pin < 0 || pin > PINCOUNT)
+        return;
+
+    g_handlers[pin] = handler;
+    
+    if (mode == RISING)
+    {
+        gpio_pin_intr_state_set(pin, GPIO_PIN_INTR_POSEDGE);
+    }
+    else if (mode == FALLING)
+    {
+        gpio_pin_intr_state_set(pin, GPIO_PIN_INTR_NEGEDGE);
+    }
+    else if (mode == CHANGE)
+    {
+        gpio_pin_intr_state_set(pin, GPIO_PIN_INTR_ANYEGDE);
+    }
+    else
+    {
+        gpio_pin_intr_state_set(pin, GPIO_PIN_INTR_DISABLE);
+    }
+}
+
+void detachInterrupt(uint8_t pin) 
+{
+    g_handlers[pin] = 0;
+    gpio_pin_intr_state_set(pin, GPIO_PIN_INTR_DISABLE);
+}
+
 void initPins()
 {
     gpio_init();
@@ -130,12 +183,7 @@ void initPins()
             PIN_FUNC_SELECT(mux, func);
         }
     }
+    ETS_GPIO_INTR_ATTACH(&interrupt_handler, NULL);
 }
-
-
-void analogWrite(uint8_t pin, int val)
-{
-}
-
 
 

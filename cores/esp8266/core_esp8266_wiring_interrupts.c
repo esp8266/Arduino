@@ -30,9 +30,4 @@
 #include "wiring_private.h"
 
 
-void attachInterrupt(uint8_t interruptNum, void (*userFunc)(void), int mode) {
-}
-
-void detachInterrupt(uint8_t interruptNum) {
-}
 
