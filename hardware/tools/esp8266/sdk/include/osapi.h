@@ -42,6 +42,7 @@
 #define os_timer_setfn ets_timer_setfn
 
 #define os_sprintf  ets_sprintf
+#define os_printf  ets_printf
 #define os_update_cpu_frequency ets_update_cpu_frequency
 
 #endif

@@ -19,6 +19,11 @@
 
 #define LWIP_INTERNAL
 
+extern "C" {
+    #include "osapi.h"
+    #include "ets_sys.h"
+}
+
 #include "debug.h"
 #include "ESP8266WiFi.h"
 #include "WiFiClient.h"

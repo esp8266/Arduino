@@ -22,6 +22,8 @@
 extern "C" 
 {
     #include "include/wl_definitions.h"
+    #include "osapi.h"
+    #include "ets_sys.h"
 }
 
 #include "debug.h"
