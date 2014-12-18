@@ -34,7 +34,6 @@ extern "C" {
 extern "C" void esp_schedule();
 extern "C" void esp_yield();
 
-
 ESP8266WiFiClass::ESP8266WiFiClass()
 {
 

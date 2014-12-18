@@ -3,7 +3,6 @@
 
 #include <stddef.h>
 
-extern "C" size_t ets_printf(const char*, ...);
 #define DEBUGV ets_printf
 
 

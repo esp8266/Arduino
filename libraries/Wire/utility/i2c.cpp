@@ -5,9 +5,7 @@ extern "C" {
 #include "ets_sys.h"
 #include "osapi.h"
 #include "gpio.h"
-
-size_t ets_printf(const char*, ...);
-#define DEBUGV ets_printf
+#include "debug.h"
 }
 
 static uint8_t s_sda_pin = 0;

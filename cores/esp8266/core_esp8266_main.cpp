@@ -86,6 +86,7 @@ static void loop_task(os_event_t *events)
     cont_run(&g_cont, &loop_wrapper);
     if (cont_check(&g_cont) != 0)
     {
+        ets_printf("\r\nheap collided with sketch stack\r\n");
         abort();
     }
 }
