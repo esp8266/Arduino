@@ -1,6 +1,8 @@
 /*
-  WiFi.h - Library for Arduino Wifi shield.
+  ESP8266WiFi.h - esp8266 Wifi support.
+  Based on WiFi.h from Ardiono WiFi shield library.
   Copyright (c) 2011-2014 Arduino.  All right reserved.
+  Modified by Ivan Grokhotkov, December 2014
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public

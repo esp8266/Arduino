@@ -4,6 +4,9 @@
 
   Copyright (c) 2005-2006 David A. Mellis
 
+   Note: file renamed with a core_esp8266_ prefix to simplify linker
+  script rules for moving code into irom0_text section.
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
