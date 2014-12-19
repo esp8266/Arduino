@@ -8,6 +8,7 @@ What works
 
 - pinMode, digitalRead, digitalWrite
 - analogRead
+- pin interrupts (attachInterrupt, detachInterrupt)
 - shiftIn, shiftOut
 - millis, micros, delay, delayMicroseconds
 - yield (call that once in a while in long loops; delay() works as well)
@@ -15,6 +16,9 @@ What works
 	Only 8n1 is supported right now. flush() doesn't work, and there is no proper TX buffer.
 	When sending long strings (>128 chars at a time) something might get lost.
 	There will be some diagnostic output from WiFi libraries unless you call Serial.begin.
+
+- Ticker
+	Library for calling functions repeatedly with a certain period. Two examples included.
 
 - EEPROM
 	This is a bit different from standard EEPROM class. You need to call EEPROM.begin(size)
@@ -47,14 +51,12 @@ What works
 What is not done yet
 --------------------
 
-- pin interrupts (attachInterrupt, detachInterrupt)
 - analogWrite (PWM)
-- pulseIn, pulseOut
+- pulseIn
 - SPI
 - UDP
 - I2C slave mode
 - Serial modes other than 8n1
-- Serial TX buffer
 - WiFi.scanNetworks
 - WiFi.RSSI
 - Upload sketches via WiFi
