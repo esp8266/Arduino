@@ -1,5 +1,5 @@
 /* 
-  ESP8266WiFi.h - WiFi library for esp8266
+  ESP8266WiFi.cpp - WiFi library for esp8266
 
   Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
   This file is part of the esp8266 core for Arduino environment.
