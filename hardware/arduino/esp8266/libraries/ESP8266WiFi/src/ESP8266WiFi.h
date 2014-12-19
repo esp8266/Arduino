@@ -187,7 +187,10 @@ public:
      */
     int hostByName(const char* aHostname, IPAddress& aResult);
 
-
+    /*
+     * Output WiFi settings to an object derived from Print interface (like Serial).
+     *
+     */
     void printDiag(Print& dest);
 
     friend class WiFiClient;
