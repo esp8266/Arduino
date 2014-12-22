@@ -1,6 +1,6 @@
-esptoolpy.name=esptool
-esptoolpy.communication=serial
-esptoolpy.protocol=esp
-esptoolpy.program.protocol=esp
-esptoolpy.program.tool=esptoolpy
-esptoolpy.program.extra_params=
+esptool.name=esptool
+esptool.communication=serial
+esptool.protocol=esp
+esptool.program.protocol=esp
+esptool.program.tool=esptool
+esptool.program.extra_params=
