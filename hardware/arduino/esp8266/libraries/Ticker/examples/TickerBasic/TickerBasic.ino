@@ -28,7 +28,7 @@ void flip()
   // when the counter reaches a certain value, start blinking like crazy
   if (count == 20)
   {
-    flipper.attach(&flip, 0.1);
+    flipper.attach(0.1, flip);
   }
   // when the counter reaches yet another value, stop blinking
   else if (count == 120)
@@ -42,7 +42,7 @@ void setup() {
   digitalWrite(1, LOW);
   
   // flip the pin every 0.3s
-  flipper.attach(&flip, 0.3);
+  flipper.attach(0.3, flip);
 }
 
 void loop() {

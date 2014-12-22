@@ -37,36 +37,65 @@ public:
 	typedef void (*callback_t)(void);
 	typedef void (*callback_with_arg_t)(void*);
 
-	void attach(callback_t callback, float seconds)
+	void attach(float seconds, callback_t callback)
 	{
-		_attach_ms(reinterpret_cast<callback_with_arg_t>(callback), seconds * 1000, 0);
+		_attach_ms(seconds * 1000, true, reinterpret_cast<callback_with_arg_t>(callback), 0);
 	}
 
-	void attach_ms(callback_t callback, uint32_t milliseconds)
+	void attach_ms(uint32_t milliseconds, callback_t callback)
 	{
-		_attach_ms(reinterpret_cast<callback_with_arg_t>(callback), milliseconds, 0);
+		_attach_ms(milliseconds, true, reinterpret_cast<callback_with_arg_t>(callback), 0);
 	}
 
 	template<typename TArg>
-	void attach(void (*callback)(TArg), float seconds, TArg arg)
+	void attach(float seconds, void (*callback)(TArg), TArg arg)
 	{
 		static_assert(sizeof(TArg) <= sizeof(uint32_t), "attach() callback argument size must be <= 4 bytes");
-		uint32_t arg32 = static_cast<uint32_t>(arg);
-		_attach_ms(reinterpret_cast<callback_with_arg_t>(callback), seconds * 1000, reinterpret_cast<void*>(arg32));
+		// C-cast serves two purposes:
+		// static_cast for smaller integer types,
+		// reinterpret_cast + const_cast for pointer types
+		uint32_t arg32 = (uint32_t)arg;
+		_attach_ms(seconds * 1000, true, reinterpret_cast<callback_with_arg_t>(callback), arg32);
 	}
 
 	template<typename TArg>
-	void attach_ms(void (*callback)(TArg), uint32_t milliseconds, TArg arg)
+	void attach_ms(uint32_t milliseconds, void (*callback)(TArg), TArg arg)
 	{
 		static_assert(sizeof(TArg) <= sizeof(uint32_t), "attach_ms() callback argument size must be <= 4 bytes");
-		uint32_t arg32 = static_cast<uint32_t>(arg);
-		_attach_ms(reinterpret_cast<callback_with_arg_t>(callback), milliseconds, reinterpret_cast<void*>(arg32));
+		uint32_t arg32 = (uint32_t)arg;
+		_attach_ms(milliseconds, true, reinterpret_cast<callback_with_arg_t>(callback), arg32);
+	}
+
+	void once(float seconds, callback_t callback)
+	{
+		_attach_ms(seconds * 1000, false, reinterpret_cast<callback_with_arg_t>(callback), 0);
+	}
+
+	void once_ms(uint32_t milliseconds, callback_t callback)
+	{
+		_attach_ms(milliseconds, false, reinterpret_cast<callback_with_arg_t>(callback), 0);	
+	}
+
+	template<typename TArg>
+	void once(float seconds, void (*callback)(TArg), TArg arg)
+	{
+		static_assert(sizeof(TArg) <= sizeof(uint32_t), "attach() callback argument size must be <= 4 bytes");
+		uint32_t arg32 = (uint32_t)(arg);
+		_attach_ms(seconds * 1000, false, reinterpret_cast<callback_with_arg_t>(callback), arg32);
+	}
+
+	template<typename TArg>
+	void once_ms(uint32_t milliseconds, void (*callback)(TArg), TArg arg)
+	{
+		static_assert(sizeof(TArg) <= sizeof(uint32_t), "attach_ms() callback argument size must be <= 4 bytes");
+		uint32_t arg32 = (uint32_t)(arg);
+		_attach_ms(milliseconds, false, reinterpret_cast<callback_with_arg_t>(callback), arg32);
 	}
 
 	void detach();
 
 protected:	
-	void _attach_ms(callback_with_arg_t callback, uint32_t milliseconds, void* arg);
+	void _attach_ms(uint32_t milliseconds, bool repeat, callback_with_arg_t callback, uint32_t arg);
 
 
 protected:

@@ -25,11 +25,11 @@ void setup() {
   pinMode(1, OUTPUT);
   digitalWrite(1, LOW);
   
-  // call setPin(0) every 25 ms
-  tickerSetLow.attach_ms(&setPin, 25, 0);
+  // every 25 ms, call setPin(0) 
+  tickerSetLow.attach_ms(25, setPin, 0);
   
-  // call setPin(1) every 26 ms
-  tickerSetHigh.attach_ms(&setPin, 26, 1);
+  // every 26 ms, call setPin(1)
+  tickerSetHigh.attach_ms(26, setPin, 1);
 }
 
 void loop() {
