@@ -23,14 +23,16 @@
 
 // Constructors ////////////////////////////////////////////////////////////////
 
-USARTClass::USARTClass( Usart* pUsart, IRQn_Type dwIrq, uint32_t dwId, RingBuffer* pRx_buffer )
+USARTClass::USARTClass( Usart* pUsart, IRQn_Type dwIrq, uint32_t dwId, RingBuffer* pRx_buffer, volatile RingBuffer* pTx_buffer )
 {
-  _rx_buffer = pRx_buffer ;
+  _rx_buffer = pRx_buffer;
+  _tx_buffer = pTx_buffer;
 
   _pUsart=pUsart ;
   _dwIrq=dwIrq ;
   _dwId=dwId ;
 }
+
 
 // Public Methods //////////////////////////////////////////////////////////////
 
@@ -72,6 +74,8 @@ void USARTClass::end( void )
 {
   // clear any received data
   _rx_buffer->_iHead = _rx_buffer->_iTail ;
+
+  while (_tx_buffer->_iHead != _tx_buffer->_iTail); //wait for transmit data to be sent
 
   // Disable UART interrupt in NVIC
   NVIC_DisableIRQ( _dwIrq ) ;
@@ -115,12 +119,21 @@ void USARTClass::flush( void )
 
 size_t USARTClass::write( const uint8_t uc_data )
 {
-  // Check if the transmitter is ready
-  while ((_pUsart->US_CSR & US_CSR_TXRDY) != US_CSR_TXRDY)
-    ;
+  if ((_pUsart->US_CSR & US_CSR_TXRDY) != US_CSR_TXRDY) //is the hardware currently busy?
+  {
+	  //if busy we buffer
+	  unsigned int l = (_tx_buffer->_iHead + 1) % SERIAL_BUFFER_SIZE;
+	  while (_tx_buffer->_iTail == l); //spin locks if we're about to overwrite the buffer. This continues once the data is sent
 
-  // Send character
-  _pUsart->US_THR = uc_data ;
+	  _tx_buffer->_aucBuffer[_tx_buffer->_iHead] = uc_data;
+	  _tx_buffer->_iHead = l;
+	  _pUsart->US_IER = US_IER_TXRDY; //make sure TX interrupt is enabled
+  }
+  else 
+  {
+     // Send character
+     _pUsart->US_THR = uc_data ;
+  }
   return 1;
 }
 
@@ -131,6 +144,17 @@ void USARTClass::IrqHandler( void )
   // Did we receive data ?
   if ((status & US_CSR_RXRDY) == US_CSR_RXRDY)
     _rx_buffer->store_char( _pUsart->US_RHR ) ;
+
+  //Do we need to keep sending data?
+  if ((status & US_CSR_TXRDY) == US_CSR_TXRDY) 
+  {
+	  _pUsart->US_THR = _tx_buffer->_aucBuffer[_tx_buffer->_iTail];
+	  _tx_buffer->_iTail = (unsigned int)(_tx_buffer->_iTail + 1) % SERIAL_BUFFER_SIZE;
+	  if (_tx_buffer->_iTail == _tx_buffer->_iHead) //if this is true we have no more data to transmit
+	  {
+		  _pUsart->US_IDR = US_IDR_TXRDY; //mask off transmit interrupt so we don't get it anymore
+	  }
+  }
 
   // Acknowledge errors
   if ((status & US_CSR_OVRE) == US_CSR_OVRE ||
