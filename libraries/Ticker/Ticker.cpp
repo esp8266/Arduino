@@ -29,6 +29,9 @@ extern "C" {
 #include "osapi.h"
 }
 
+const int ONCE   = 0;
+const int REPEAT = 1;
+
 #include "Ticker.h"
 
 Ticker::Ticker()
@@ -41,10 +44,8 @@ Ticker::~Ticker()
 	detach();
 }
 
-void Ticker::_attach_ms(callback_with_arg_t callback, uint32_t milliseconds, void* arg)
+void Ticker::_attach_ms(uint32_t milliseconds, bool repeat, callback_with_arg_t callback, uint32_t arg)
 {
-	const int REPEAT = 1;
-
 	if (_timer)
 	{
 		os_timer_disarm(_timer);
@@ -54,8 +55,8 @@ void Ticker::_attach_ms(callback_with_arg_t callback, uint32_t milliseconds, voi
 		_timer = new ETSTimer;
 	}
 
-	os_timer_setfn(_timer, reinterpret_cast<ETSTimerFunc*>(callback), arg);
-	os_timer_arm(_timer, milliseconds, REPEAT);
+	os_timer_setfn(_timer, reinterpret_cast<ETSTimerFunc*>(callback), reinterpret_cast<void*>(arg));
+	os_timer_arm(_timer, milliseconds, (repeat)?REPEAT:ONCE);
 }
 
 void Ticker::detach()
