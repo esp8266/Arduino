@@ -311,10 +311,12 @@ uint8_t ESP8266WiFiClass::encryptionType(uint8_t i)
         return ENC_TYPE_NONE;
     if (authmode == AUTH_WEP)
         return ENC_TYPE_WEP;
-    if (authmode == AUTH_WPA_PSK || authmode == AUTH_WPA_WPA2_PSK)  // fixme: is this correct?
+    if (authmode == AUTH_WPA_PSK)
         return ENC_TYPE_TKIP;
     if (authmode == AUTH_WPA2_PSK)
         return ENC_TYPE_CCMP;
+    if (authmode == AUTH_WPA_WPA2_PSK)
+        return ENC_TYPE_AUTO;
     return -1;
 }
 
