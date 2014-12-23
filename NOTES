@@ -58,6 +58,7 @@ What works
 		* WiFi.RSSI() doesn't work
 		* WiFi.printDiag(Serial); will print out some diagnostic info
 	WiFiServer and WiFiClient behave mostly the same way as with WiFi shield library.
+	Three samples are provided for this library.
 
 - Other libraries that don't rely on low-level access to AVR registers.
 
@@ -85,17 +86,18 @@ What is not done yet
 
 - Upload sketches via WiFi
 	Conceptually and technically simple, but need to figure out how to provide the best UX for this feature.
-	
+
 - Samples for all the libraries
 
 
 License and credits
 -------------------
 
-Arduino is licensed under GPL, with Arduino core libraries licensed under LGPL.
+Arduino IDE is licensed under GPL, with Arduino core libraries licensed under LGPL.
 This build includes an xtensa gcc toolchain, which is also under GPL.
 Espressif SDK included in this build is under Espressif Public License.
-Esptool by Christian Klippel is licensed under GPLv2.
+Esptool written by Christian Klippel is licensed under GPLv2. 
+The source with my modfications is available on github: https://github.com/igrr/esptool-ck
 
 ESP8266 port contributed by Ivan Grokhotkov, igrokhotkov at gmail dot com.
 
