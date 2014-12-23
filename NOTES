@@ -7,15 +7,29 @@ What works
 ----------
 
 - pinMode, digitalRead, digitalWrite
-- analogRead
+	Pin numbers correspond directly to the esp8266 GPIO pin numbers. To read GPIO2,
+	call digitalRead(2);
+
+- analogRead(0) reads the value of the ADC channel connected to the TOUT pin.
+
 - pin interrupts (attachInterrupt, detachInterrupt)
+	Interrupts may be attach to any GPIO pin. Standard Arduino interrupt types are 
+	supported: CHANGE, RISING, FALLING.
+
 - shiftIn, shiftOut
-- millis, micros, delay, delayMicroseconds
-- yield (call that once in a while in long loops; delay() works as well)
+- millis, micros
+- delay, delayMicroseconds, yield
+	Remember that there is a lot of code that needs to run on the chip besides the sketch 
+	when WiFi is connected. WiFi and TCP/IP libraries get a chance to handle any pending
+	events each time the loop() function completes, OR when delay(...) is called.
+	There is also a yield() function which is equivalent to delay(0). The delayMicroseconds
+	function, on the other hand, does not yield to other tasks, so using it for delays
+	more than 20 milliseconds is not recommended.
+
 - Serial
-	Only 8n1 is supported right now. flush() doesn't work, and there is no proper TX buffer.
-	When sending long strings (>128 chars at a time) something might get lost.
-	There will be some diagnostic output from WiFi libraries unless you call Serial.begin.
+	Only 8n1 is supported right now. By default the diagnostic output from WiFi 
+	libraries is disabled when you call Serial.begin. To enable debug output again,
+	call Serial.setDebugOutput(true);
 
 - Ticker
 	Library for calling functions repeatedly with a certain period. Two examples included.
@@ -23,9 +37,11 @@ What works
 - EEPROM
 	This is a bit different from standard EEPROM class. You need to call EEPROM.begin(size)
 	before you start reading or writing, size being the number of bytes you want to use.
+	Size can be anywhere between 4 and 4096 bytes.
 	EEPROM.write does not write to flash immediately, instead you must call EEPROM.commit()
 	whenever you wish to save changes to flash. EEPROM.end() will also commit, and will
-	release the RAM copy of EEPROM contents.
+	release the RAM copy of EEPROM contents. 
+	Three examples included.
 
 - I2C (Wire library)
 	Only master mode works, and I haven't tested if Wire.setClock gives correct frequency.
@@ -35,11 +51,12 @@ What works
 - WiFi (ESP8266WiFi library)
 	This is mostly similar to WiFi shield library. Differences include:
 		* WiFi.mode(m): set mode to WIFI_AP, WIFI_STA, or WIFI_AP_STA.
-		* WiFi.softAP(ssid) or WiFi.softAP(ssid, passphrase) to set up an AP.
+		* call WiFi.softAP(ssid) to set up an open network
+		* call WiFi.softAP(ssid, passphrase) to set up a WPA2-PSK network
 		* WiFi.macAddress(mac) is for STA, WiFi.softAPmacAddress(mac) is for AP.
 		* WiFi.localIP() is for STA, WiFi.softAPIP() is for AP.
 		* WiFi.RSSI() doesn't work
-		* WiFi.scanNetworks() doesn't work yet
+		* WiFi.printDiag(Serial); will print out some diagnostic info
 	WiFiServer and WiFiClient behave mostly the same way as with WiFi shield library.
 
 - Other libraries that don't rely on low-level access to AVR registers.
@@ -57,7 +74,6 @@ What is not done yet
 - UDP
 - I2C slave mode
 - Serial modes other than 8n1
-- WiFi.scanNetworks
 - WiFi.RSSI
 - Upload sketches via WiFi
 - Samples for all the libraries
@@ -71,5 +87,6 @@ This build includes an xtensa gcc toolchain, which is also under GPL.
 Espressif SDK included in this build is under Espressif Public License.
 
 ESP8266 port contributed by Ivan Grokhotkov, igrokhotkov at gmail dot com.
-Drop me a line if you find some bugs not mentioned here!
+If you want to use some code in cores/esp8266 directory under a different license
+for your project, drop me a line.
 
