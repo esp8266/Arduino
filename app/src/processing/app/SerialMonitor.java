@@ -18,18 +18,18 @@
 
 package processing.app;
 
-import processing.app.debug.MessageConsumer;
 import processing.app.debug.TextAreaFIFO;
 import processing.core.*;
 import static processing.app.I18n._;
 
 import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.text.*;
 
-public class SerialMonitor extends JFrame implements MessageConsumer,ActionListener {
+public class SerialMonitor extends JFrame implements ActionListener {
   private Serial serial;
   private String port;
   private TextAreaFIFO textArea;
@@ -210,8 +210,12 @@ public class SerialMonitor extends JFrame implements MessageConsumer,ActionListe
   
   public void openSerialPort() throws SerialException {
     if (serial != null) return;
-    serial = new Serial(port, serialRate);
-    serial.addListener(this);
+    serial = new Serial(port, serialRate) {
+      @Override
+      protected void message(char buff[], int n) {
+        addToUpdateBuffer(buff, n);
+      }
+    };
     updateTimer.start();
   }
   
@@ -226,13 +230,8 @@ public class SerialMonitor extends JFrame implements MessageConsumer,ActionListe
     }
   }
   
-  public void message(String s) {
-    // TODO: can we pass a byte array, to avoid overhead of String
-    addToUpdateBuffer(s);
-  }
-
-  private synchronized void addToUpdateBuffer(String s) {
-    updateBuffer.append(s);
+  private synchronized void addToUpdateBuffer(char buff[], int n) {
+    updateBuffer.append(buff, 0, n);
   }
 
   private synchronized String consumeUpdateBuffer() {

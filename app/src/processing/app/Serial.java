@@ -25,9 +25,7 @@
 package processing.app;
 //import processing.core.*;
 
-import processing.app.debug.MessageConsumer;
 import static processing.app.I18n._;
-
 import gnu.io.*;
 
 import java.io.*;
@@ -55,15 +53,13 @@ public class Serial implements SerialPortEventListener {
 
   // read buffer and streams 
 
-  InputStream input;
+  InputStreamReader input;
   OutputStream output;
 
   byte buffer[] = new byte[32768];
   int bufferIndex;
   int bufferLast;
   
-  MessageConsumer consumer;
-
   public Serial(boolean monitor) throws SerialException {
     this(Preferences.get("serial.port"),
       Preferences.getInteger("serial.debug_rate"),
@@ -158,7 +154,7 @@ public class Serial implements SerialPortEventListener {
           if (portId.getName().equals(iname)) {
             //System.out.println("looking for "+iname);
             port = (SerialPort)portId.open("serial madness", 2000);
-            input = port.getInputStream();
+            input = new InputStreamReader(port.getInputStream());
             output = port.getOutputStream();
             port.setSerialPortParams(rate, databits, stopbits, parity);
             port.addEventListener(this);
@@ -237,61 +233,40 @@ public class Serial implements SerialPortEventListener {
     port = null;
   }
   
+  char serialBuffer[] = new char[4096];
   
-  public void addListener(MessageConsumer consumer) {
-    this.consumer = consumer;
-  }
-
-
   synchronized public void serialEvent(SerialPortEvent serialEvent) {
-    //System.out.println("serial port event"); // " + serialEvent);
-    //System.out.flush();
-    //System.out.println("into");
-    //System.out.flush();
-    //System.err.println("type " + serialEvent.getEventType());
-    //System.err.println("ahoooyey");
-    //System.err.println("ahoooyeysdfsdfsdf");
     if (serialEvent.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
-      //System.out.println("data available");
-      //System.err.flush();
       try {
-        while (input.available() > 0) {
-        //if (input.available() > 0) {
-          //serial = input.read();
-          //serialEvent();
-          //buffer[bufferCount++] = (byte) serial;
+        while (input.ready()) {
           synchronized (buffer) {
             if (bufferLast == buffer.length) {
               byte temp[] = new byte[bufferLast << 1];
               System.arraycopy(buffer, 0, temp, 0, bufferLast);
               buffer = temp;
             }
-            //buffer[bufferLast++] = (byte) input.read();
-            if(monitor == true)
-              System.out.print((char) input.read());
-            if (this.consumer != null)
-              this.consumer.message("" + (char) input.read());
-            
-            /*
-            System.err.println(input.available() + " " + 
-                               ((char) buffer[bufferLast-1]));
-            */            //}
+            int n = input.read(serialBuffer);
+            message(serialBuffer, n);
           }
         }
-        //System.out.println("no more");
-
       } catch (IOException e) {
         errorMessage("serialEvent", e);
-        //e.printStackTrace();
-        //System.out.println("angry");
       }
       catch (Exception e) {
       }
     }
-    //System.out.println("out of");
-    //System.err.println("out of event " + serialEvent.getEventType());
   }
 
+
+  /**
+   * This method is intended to be redefined by users of Serial class
+   * 
+   * @param buff
+   * @param n
+   */
+  protected void message(char buff[], int n) {
+    // Empty
+  }
 
   /**
    * Returns the number of bytes that have been read from serial
