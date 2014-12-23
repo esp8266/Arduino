@@ -73,14 +73,17 @@ public:
     void unref()
     {
         DEBUGV("WC:ur %d\r\n", _refcnt);
-        if (--_refcnt == 0 && _pcb)
+        if (--_refcnt == 0)
         {
-            tcp_arg(_pcb, NULL);
-            tcp_sent(_pcb, NULL);
-            tcp_recv(_pcb, NULL);
-            tcp_err(_pcb, NULL);
-            tcp_close(_pcb);
-            _pcb = 0;
+            if (_pcb)
+            {
+                tcp_arg(_pcb, NULL);
+                tcp_sent(_pcb, NULL);
+                tcp_recv(_pcb, NULL);
+                tcp_err(_pcb, NULL);
+                tcp_close(_pcb);
+                _pcb = 0;
+            }
             delete this;
         }
     }
@@ -152,17 +155,23 @@ private:
             tcp_sent(pcb, NULL);
             tcp_recv(pcb, NULL);
             tcp_err(pcb, NULL);
-            tcp_close(pcb);
+            int error = tcp_close(pcb);
+            if (error != ERR_OK)
+            {
+                DEBUGV("WC:rcla\r\n");
+                tcp_abort(pcb);
+                _pcb = 0;
+                return ERR_ABRT;
+            }
             _pcb = 0;
             return ERR_OK;
         }
 
-        DEBUGV("WC:rcr\r\n");
         size_t len = pb->len;
+        DEBUGV("WC:rcr %d\r\n", len);
         _rx_buf.write(reinterpret_cast<const char*>(pb->payload), pb->len);
-        pbuf_free(pb);
-
         tcp_recved(pcb, len);
+        pbuf_free(pb);
         return ERR_OK;
 	}
 
