@@ -69,13 +69,23 @@ What is not done yet
 --------------------
 
 - analogWrite (PWM)
+	ESP8266 has only one hardware PWM source. It is not yet clear how to use it with analogWrite API.
+	Software PWM is also an option, but apparently it causes issues with WiFi connectivity.
+
 - pulseIn
 - SPI
+	HSPI and bit-banging are two interfaces that will be supported.
+
 - UDP
 - I2C slave mode
 - Serial modes other than 8n1
 - WiFi.RSSI
+	SDK doesn't seem to have an API to get RSSI for the current network. So far the only
+	way to obtain RSSI is to disconnect, perform a scan, and get the RSSI value from there.
+
 - Upload sketches via WiFi
+	Conceptually and technically simple, but need to figure out how to provide the best UX for this feature.
+	
 - Samples for all the libraries
 
 
@@ -85,8 +95,7 @@ License and credits
 Arduino is licensed under GPL, with Arduino core libraries licensed under LGPL.
 This build includes an xtensa gcc toolchain, which is also under GPL.
 Espressif SDK included in this build is under Espressif Public License.
+Esptool by Christian Klippel is licensed under GPLv2.
 
 ESP8266 port contributed by Ivan Grokhotkov, igrokhotkov at gmail dot com.
-If you want to use some code in cores/esp8266 directory under a different license
-for your project, drop me a line.
 
