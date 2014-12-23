@@ -218,11 +218,27 @@ void ESP8266WiFiClass::_scanDone(void* result, int status)
     else
     {
       
-      int i = 0;
-      bss_info_head_t* head = reinterpret_cast<bss_info_head_t*>(result);
-      ESP8266WiFiClass::_scanResult = STAILQ_FIRST(head);
-      for (bss_info* it = STAILQ_FIRST(head); it; it = STAILQ_NEXT(it, next), ++i);
-      ESP8266WiFiClass::_scanCount = i;
+        int i = 0;
+        bss_info_head_t* head = reinterpret_cast<bss_info_head_t*>(result);
+
+        for (bss_info* it = STAILQ_FIRST(head); it; it = STAILQ_NEXT(it, next), ++i);
+        ESP8266WiFiClass::_scanCount = i;
+        if (i == 0)
+        {
+            ESP8266WiFiClass::_scanResult = 0;
+        }
+        else
+        {
+            bss_info* copied_info = new bss_info[i];
+            i = 0;
+            for (bss_info* it = STAILQ_FIRST(head); it; it = STAILQ_NEXT(it, next), ++i)
+            {
+                memcpy(copied_info + i, it, sizeof(bss_info));
+            }
+
+            ESP8266WiFiClass::_scanResult = copied_info;
+        }
+
     }
     esp_schedule();   
 }
@@ -242,15 +258,9 @@ int8_t ESP8266WiFiClass::scanNetworks()
 
     if (ESP8266WiFiClass::_scanResult)
     {
-        struct bss_info* it = reinterpret_cast<bss_info*>(ESP8266WiFiClass::_scanResult);
+        delete[] reinterpret_cast<bss_info*>(ESP8266WiFiClass::_scanResult);
         ESP8266WiFiClass::_scanResult = 0;
         ESP8266WiFiClass::_scanCount = 0;
-        while(it)
-        {
-            bss_info* next = STAILQ_NEXT(it, next);
-            os_free(it);
-            it = next;
-        }
     }
     
     struct scan_config config;
@@ -268,15 +278,8 @@ void * ESP8266WiFiClass::_getScanInfoByIndex(int i)
     {
         return 0;
     }
-    
-    struct bss_info* it = reinterpret_cast<bss_info*>(ESP8266WiFiClass::_scanResult);
-    while(i > 0 && it)
-    {
-        it = STAILQ_NEXT(it, next);
-        --i;
-    }
 
-    return it;
+    return reinterpret_cast<bss_info*>(ESP8266WiFiClass::_scanResult) + i;
 }
 
 const char* ESP8266WiFiClass::SSID(uint8_t i)
