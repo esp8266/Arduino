@@ -81,7 +81,6 @@ typedef struct _ETSTIMER_ {
     ETS_INTR_DISABLE(ETS_GPIO_INUM)
 
 
-void ets_isr_attach(int routine, void* something, void *buff);
 void *pvPortMalloc(size_t xWantedSize);
 void *pvPortRealloc(void* ptr, size_t xWantedSize);
 void pvPortFree(void *ptr);
@@ -107,7 +106,8 @@ void uart_div_modify(int no, int freq);
 void ets_isr_mask(int intr);
 void ets_isr_unmask(int intr);
 void ets_isr_attach(int intr, void *handler, void *arg);
-
+void ets_intr_lock();
+void ets_intr_unlock();
 
 
 #endif /* _ETS_SYS_H */
