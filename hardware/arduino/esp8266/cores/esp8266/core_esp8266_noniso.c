@@ -21,16 +21,27 @@
 
 #include <stdlib.h>
 #include "stdlib_noniso.h"
-
-
-extern int ets_sprintf(char*, const char*, ...);
+#include "ets_sys.h"
 
 #define sprintf ets_sprintf
+#define strcpy ets_strcpy
 
 long atol_internal(const char* s)
 {
-  long result = 0;
-  return result;
+  int result = 0;
+  int i;
+  const char* b = s;
+  int sign = 1;
+  for (i = 0; *b; ++i, ++b)
+  {
+    if (i == 0 && *b == '-')
+      sign = -1;
+    int x = *b - '0';
+    if (x < 0 || x > 9)
+      break;
+    result = result * 10 + x;
+  }
+  return sign * result;
 }
 
 float atof_internal(const char* s)
@@ -39,39 +50,176 @@ float atof_internal(const char* s)
   return result;
 }
 
-char * itoa (int val, char *s, int radix)
+
+void reverse(char* begin, char* end)
 {
-  // todo: radix
-  sprintf(s, "%d", val);
-  return s;
+  char *is = begin;
+  char *ie = end - 1;
+  while (is < ie)
+  {
+    char tmp = *ie;
+    *ie = *is;
+    *is = tmp;
+    ++is;
+    --ie;
+  }
 }
 
-char * ltoa (long val, char *s, int radix)
+char* itoa( int value, char* result, int base ) 
 {
-  sprintf(s, "%ld", val);
-  return s;
-}
- 
-char * utoa (unsigned int val, char *s, int radix)
-{
-  sprintf(s, "%u", val);
-  return s;
-}
- 
-char * ultoa (unsigned long val, char *s, int radix)
-{
-  sprintf(s, "%lu", val);
-  return s;
+  if (base < 2 || base > 16) 
+  { 
+    *result = 0;
+    return result; 
+  }
+
+  char* out = result;
+  int quotient = abs(value);
+
+  do 
+  {
+    const int tmp = quotient / base;
+    *out = "0123456789abcdef"[ quotient - (tmp*base) ];
+    ++out;
+    quotient = tmp;
+  } while ( quotient );
+
+  // Apply negative sign
+  if ( value < 0) *out++ = '-';
+
+  reverse(result, out);
+  *out = 0;
+  return result;
 }
 
-char * dtostre (double __val, char *__s, unsigned char __prec, unsigned char __flags)
+char* ltoa( long value, char* result, int base ) 
 {
-  *__s = 0;
-  return __s;
+  if (base < 2 || base > 16) 
+  { 
+    *result = 0;
+    return result; 
+  }
+
+  char* out = result;
+  long quotient = abs(value);
+
+  do 
+  {
+    const long tmp = quotient / base;
+    *out = "0123456789abcdef"[ quotient - (tmp*base) ];
+    ++out;
+    quotient = tmp;
+  } while ( quotient );
+
+  // Apply negative sign
+  if ( value < 0) *out++ = '-';
+
+  reverse(result, out);
+  *out = 0;
+  return result;
 }
  
-char * dtostrf (double __val, signed char __width, unsigned char __prec, char *__s)
+char* utoa( unsigned value, char* result, int base ) 
 {
-   *__s = 0;
-   return __s;
+  if (base < 2 || base > 16) 
+  { 
+    *result = 0;
+    return result; 
+  }
+
+  char* out = result;
+  unsigned quotient = value;
+
+  do 
+  {
+    const unsigned tmp = quotient / base;
+    *out = "0123456789abcdef"[ quotient - (tmp*base) ];
+    ++out;
+    quotient = tmp;
+  } while ( quotient );
+
+  reverse(result, out);
+  *out = 0;
+  return result;
+}
+ 
+char* ultoa( unsigned long value, char* result, int base ) 
+{
+  if (base < 2 || base > 16) 
+  { 
+    *result = 0;
+    return result; 
+  }
+
+  char* out = result;
+  unsigned long quotient = value;
+
+  do 
+  {
+    const unsigned long tmp = quotient / base;
+    *out = "0123456789abcdef"[ quotient - (tmp*base) ];
+    ++out;
+    quotient = tmp;
+  } while ( quotient );
+
+  reverse(result, out);
+  *out = 0;
+  return result;
+}
+
+char * dtostrf (double number, signed char width, unsigned char prec, char *s)
+{
+  size_t n = 0;
+  
+  if (isnan(number)) 
+  {
+    strcpy(s, "nan");
+    return s;
+  }
+  if (isinf(number)) 
+  {
+    strcpy(s, "inf");
+    return s;
+  }
+
+  if (number > 4294967040.0 || 
+      number <-4294967040.0) 
+  {
+    strcpy(s, "ovf");
+    return s;
+  }
+  char* out = s;
+  // Handle negative numbers
+  if (number < 0.0)
+  {
+     *out = '-';
+     ++out;
+     number = -number;
+  }
+
+  // Round correctly so that print(1.999, 2) prints as "2.00"
+  double rounding = 0.5;
+  for (uint8_t i=0; i<prec; ++i)
+    rounding /= 10.0;
+  
+  number += rounding;
+
+  // Extract the integer part of the number and print it
+  unsigned long int_part = (unsigned long)number;
+  double remainder = number - (double)int_part;
+  out += sprintf(out, "%d", int_part);
+
+  // Print the decimal point, but only if there are digits beyond
+  if (prec > 0) {
+    *out = '.';
+    ++out;
+  }
+
+  while (prec-- > 0)
+  {
+    remainder *= 10.0;
+  }
+  sprintf(out, "%d", (int)remainder);
+  
+  return s;
 }
