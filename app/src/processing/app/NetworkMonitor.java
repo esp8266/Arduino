@@ -5,10 +5,14 @@ import cc.arduino.packages.ssh.NoInteractionUserInfo;
 import cc.arduino.packages.ssh.SSHClientSetupChainRing;
 import cc.arduino.packages.ssh.SSHConfigFileSetup;
 import cc.arduino.packages.ssh.SSHPwdSetup;
+
 import com.jcraft.jsch.*;
+
+import processing.app.debug.MessageConsumer;
 import processing.app.debug.MessageSiphon;
 
 import javax.swing.*;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -18,7 +22,7 @@ import java.io.OutputStream;
 import static processing.app.I18n._;
 
 @SuppressWarnings("serial")
-public class NetworkMonitor extends AbstractMonitor {
+public class NetworkMonitor extends AbstractMonitor implements MessageConsumer {
 
   private static final int MAX_CONNECTION_ATTEMPTS = 5;
 

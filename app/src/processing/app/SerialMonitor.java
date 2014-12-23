@@ -91,8 +91,12 @@ public class SerialMonitor extends AbstractMonitor {
   public void open() throws Exception {
     if (serial != null) return;
 
-    serial = new Serial(port, serialRate);
-    serial.addListener(this);
+    serial = new Serial(port, serialRate) {
+      @Override
+      protected void message(char buff[], int n) {
+        addToUpdateBuffer(buff, n);
+      }
+    };
   }
 
   public void close() throws Exception {
@@ -105,4 +109,5 @@ public class SerialMonitor extends AbstractMonitor {
       serial = null;
     }
   }
+  
 }

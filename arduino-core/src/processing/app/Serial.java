@@ -34,7 +34,6 @@ import jssc.SerialPort;
 import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
-import processing.app.debug.MessageConsumer;
 
 
 public class Serial implements SerialPortEventListener {
@@ -59,8 +58,6 @@ public class Serial implements SerialPortEventListener {
   byte buffer[] = new byte[32768];
   int bufferIndex;
   int bufferLast;
-
-  MessageConsumer consumer;
 
   public Serial(boolean monitor) throws SerialException {
     this(PreferencesData.get("serial.port"),
@@ -168,10 +165,6 @@ public class Serial implements SerialPortEventListener {
     }
   }
 
-  public void addListener(MessageConsumer consumer) {
-    this.consumer = consumer;
-  }
-
   public synchronized void serialEvent(SerialPortEvent serialEvent) {
     if (serialEvent.isRXCHAR()) {
       try {
@@ -182,12 +175,12 @@ public class Serial implements SerialPortEventListener {
             System.arraycopy(buffer, 0, temp, 0, bufferLast);
             buffer = temp;
           }
+          String msg = new String(buf);
           if (monitor) {
-            System.out.print(new String(buf));
+            System.out.print(msg);
           }
-          if (this.consumer != null) {
-            this.consumer.message(new String(buf));
-          }
+          char[] chars = msg.toCharArray();
+          message(chars, chars.length);
         }
       } catch (SerialPortException e) {
         errorMessage("serialEvent", e);
@@ -195,6 +188,16 @@ public class Serial implements SerialPortEventListener {
     }
   }
 
+  /**
+   * This method is intented to be extended to receive messages
+   * coming from serial port.
+   *
+   * @param chars
+   * @param length
+   */
+  protected void message(char[] chars, int length) {
+	// Empty
+  }
 
   /**
    * Returns the number of bytes that have been read from serial

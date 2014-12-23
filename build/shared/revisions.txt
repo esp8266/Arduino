@@ -1,4 +1,11 @@
 
+ARDUINO 1.6.0rc2
+
+The following changes are included also in the Arduino IDE 1.0.7:
+
+[ide]
+* Mitigated Serial Monitor resource exhaustion when the connected device sends a lot of data (Paul Stoffregen)
+
 ARDUINO 1.6.0rc1
 
 * IDE internals have been refactored and sorted out. (Claudio Indellicati)
@@ -378,6 +385,9 @@ ARDUINO 1.0.7
 [core]
 * Fixed missing NOT_AN_INTERRUPT constant in digitalPinToInterrupt() macro
 * Fixed performance regression in HardwareSerial::available() introduced with https://github.com/arduino/Arduino/pull/2057
+
+[ide]
+* Mitigated Serial Monitor resource exhaustion when the connected device sends a lot of data (Paul Stoffregen)
 
 ARDUINO 1.0.6 - 2014.09.16
 
