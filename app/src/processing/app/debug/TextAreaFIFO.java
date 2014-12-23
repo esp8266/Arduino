@@ -30,6 +30,7 @@ import javax.swing.text.BadLocationException;
 
 public class TextAreaFIFO extends JTextArea implements DocumentListener {
   private int maxChars;
+  private int trimMaxChars;
 
   private int updateCount; // limit how often we trim the document
 
@@ -37,13 +38,10 @@ public class TextAreaFIFO extends JTextArea implements DocumentListener {
 
   public TextAreaFIFO(int max) {
     maxChars = max;
+    trimMaxChars = max / 2;
     updateCount = 0;
     doTrim = true;
     getDocument().addDocumentListener(this);
-  }
-
-  public void allowTrim(boolean trim) {
-    doTrim = trim;
   }
 
   public void insertUpdate(DocumentEvent e) {
@@ -66,13 +64,29 @@ public class TextAreaFIFO extends JTextArea implements DocumentListener {
   public void trimDocument() {
     int len = 0;
     len = getDocument().getLength();
-    if (len > maxChars) {
-      int n = len - maxChars;
+    if (len > trimMaxChars) {
+      int n = len - trimMaxChars;
       //System.out.println("trimDocument: remove " + n + " chars");
       try {
         getDocument().remove(0, n);
       } catch (BadLocationException ble) {
       }
     }
+  }
+
+  public void appendNoTrim(String s) {
+    int free = maxChars - getDocument().getLength();
+    if (free <= 0)
+      return;
+    if (s.length() > free)
+      append(s.substring(0, free));
+    else
+      append(s);
+    doTrim = false;
+  }
+
+  public void appendTrim(String str) {
+    append(str);
+    doTrim = true;
   }
 }

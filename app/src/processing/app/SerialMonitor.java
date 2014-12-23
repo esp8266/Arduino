@@ -69,7 +69,7 @@ public class SerialMonitor extends JFrame implements ActionListener {
     Font editorFont = Preferences.getFont("editor.font");
     Font font = new Font(consoleFont.getName(), consoleFont.getStyle(), editorFont.getSize());
 
-    textArea = new TextAreaFIFO(4000000);
+    textArea = new TextAreaFIFO(8000000);
     textArea.setRows(16);
     textArea.setColumns(40);
     textArea.setEditable(false);    
@@ -244,11 +244,11 @@ public class SerialMonitor extends JFrame implements ActionListener {
     final String s = consumeUpdateBuffer();
     if (s.length() > 0) {
       //System.out.println("gui append " + s.length());
-      boolean scroll = autoscrollBox.isSelected();
-      textArea.allowTrim(scroll);
-      textArea.append(s);
-      if (scroll) {
+      if (autoscrollBox.isSelected()) {
+        textArea.appendTrim(s);
         textArea.setCaretPosition(textArea.getDocument().getLength());
+      } else {
+        textArea.appendNoTrim(s);
       }
     }
   }
