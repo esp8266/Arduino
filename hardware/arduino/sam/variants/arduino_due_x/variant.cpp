@@ -299,8 +299,9 @@ extern const PinDescription g_APinDescription[]=
  * UART objects
  */
 RingBuffer rx_buffer1;
+RingBuffer tx_buffer1;
 
-UARTClass Serial(UART, UART_IRQn, ID_UART, &rx_buffer1);
+UARTClass Serial(UART, UART_IRQn, ID_UART, &rx_buffer1, &tx_buffer1);
 void serialEvent() __attribute__((weak));
 void serialEvent() { }
 

@@ -23,9 +23,10 @@
 
 // Constructors ////////////////////////////////////////////////////////////////
 
-UARTClass::UARTClass( Uart* pUart, IRQn_Type dwIrq, uint32_t dwId, RingBuffer* pRx_buffer )
+UARTClass::UARTClass( Uart *pUart, IRQn_Type dwIrq, uint32_t dwId, RingBuffer *pRx_buffer, RingBuffer *pTx_buffer )
 {
   _rx_buffer = pRx_buffer ;
+  _tx_buffer = pTx_buffer;
 
   _pUart=pUart ;
   _dwIrq=dwIrq ;
@@ -34,7 +35,14 @@ UARTClass::UARTClass( Uart* pUart, IRQn_Type dwIrq, uint32_t dwId, RingBuffer* p
 
 // Public Methods //////////////////////////////////////////////////////////////
 
+
+
 void UARTClass::begin( const uint32_t dwBaudRate )
+{
+	begin( dwBaudRate, UART_MR_PAR_NO | UART_MR_CHMODE_NORMAL );
+}
+
+void UARTClass::begin( const uint32_t dwBaudRate, const uint32_t config )
 {
   // Configure PMC
   pmc_enable_periph_clk( _dwId ) ;
@@ -46,7 +54,7 @@ void UARTClass::begin( const uint32_t dwBaudRate )
   _pUart->UART_CR = UART_CR_RSTRX | UART_CR_RSTTX | UART_CR_RXDIS | UART_CR_TXDIS ;
 
   // Configure mode
-  _pUart->UART_MR = UART_MR_PAR_NO | UART_MR_CHMODE_NORMAL ;
+  _pUart->UART_MR = config ;
 
   // Configure baudrate (asynchronous, no oversampling)
   _pUart->UART_BRGR = (SystemCoreClock / dwBaudRate) >> 4 ;
@@ -58,6 +66,10 @@ void UARTClass::begin( const uint32_t dwBaudRate )
   // Enable UART interrupt in NVIC
   NVIC_EnableIRQ(_dwIrq);
 
+  //make sure both ring buffers are initialized back to empty.
+  _rx_buffer->_iHead = _rx_buffer->_iTail = 0;
+  _tx_buffer->_iHead = _tx_buffer->_iTail = 0;
+
   // Enable receiver and transmitter
   _pUart->UART_CR = UART_CR_RXEN | UART_CR_TXEN ;
 }
@@ -66,6 +78,8 @@ void UARTClass::end( void )
 {
   // clear any received data
   _rx_buffer->_iHead = _rx_buffer->_iTail ;
+
+  while (_tx_buffer->_iHead != _tx_buffer->_iTail); //wait for transmit data to be sent
 
   // Disable UART interrupt in NVIC
   NVIC_DisableIRQ( _dwIrq ) ;
@@ -79,6 +93,14 @@ void UARTClass::end( void )
 int UARTClass::available( void )
 {
   return (uint32_t)(SERIAL_BUFFER_SIZE + _rx_buffer->_iHead - _rx_buffer->_iTail) % SERIAL_BUFFER_SIZE ;
+}
+
+int UARTClass::availableForWrite(void)
+{
+  int head = _tx_buffer->_iHead;
+  int tail = _tx_buffer->_iTail;
+  if (head >= tail) return SERIAL_BUFFER_SIZE - 1 - head + tail;
+  return tail - head - 1;
 }
 
 int UARTClass::peek( void )
@@ -109,12 +131,21 @@ void UARTClass::flush( void )
 
 size_t UARTClass::write( const uint8_t uc_data )
 {
-  // Check if the transmitter is ready
-  while ((_pUart->UART_SR & UART_SR_TXRDY) != UART_SR_TXRDY)
-    ;
+  if ((_pUart->UART_SR & UART_SR_TXRDY) != UART_SR_TXRDY) //is the hardware currently busy?
+  {
+	  //if busy we buffer
+	  unsigned int l = (_tx_buffer->_iHead + 1) % SERIAL_BUFFER_SIZE;
+	  while (_tx_buffer->_iTail == l); //spin locks if we're about to overwrite the buffer. This continues once the data is sent
 
-  // Send character
-  _pUart->UART_THR = uc_data;
+	  _tx_buffer->_aucBuffer[_tx_buffer->_iHead] = uc_data;
+	  _tx_buffer->_iHead = l;
+	  _pUart->UART_IER = UART_IER_TXRDY; //make sure TX interrupt is enabled
+  }
+  else 
+  {
+     // Send character
+     _pUart->UART_THR = uc_data ;
+  }
   return 1;
 }
 
@@ -125,6 +156,19 @@ void UARTClass::IrqHandler( void )
   // Did we receive data ?
   if ((status & UART_SR_RXRDY) == UART_SR_RXRDY)
     _rx_buffer->store_char(_pUart->UART_RHR);
+
+  //Do we need to keep sending data?
+  if ((status & UART_SR_TXRDY) == UART_SR_TXRDY) 
+  {
+	  if (_tx_buffer->_iTail != _tx_buffer->_iHead) { //just in case
+		_pUart->UART_THR = _tx_buffer->_aucBuffer[_tx_buffer->_iTail];
+		_tx_buffer->_iTail = (unsigned int)(_tx_buffer->_iTail + 1) % SERIAL_BUFFER_SIZE;
+	  }
+	  else
+	  {
+		_pUart->UART_IDR = UART_IDR_TXRDY; //mask off transmit interrupt so we don't get it anymore
+	  }
+  }
 
   // Acknowledge errors
   if ((status & UART_SR_OVRE) == UART_SR_OVRE ||
