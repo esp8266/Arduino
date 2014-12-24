@@ -1,5 +1,3 @@
-/* -*- mode: jde; c-basic-offset: 2; indent-tabs-mode: nil -*- */
-
 /*
   PSerial - class for serial port goodness
   Part of the Processing project - http://processing.org
@@ -53,20 +51,6 @@ public class Serial implements SerialPortEventListener {
   int parity;
   int databits;
   int stopbits;
-  boolean monitor = false;
-
-  byte buffer[] = new byte[32768];
-  int bufferIndex;
-  int bufferLast;
-
-  public Serial(boolean monitor) throws SerialException {
-    this(PreferencesData.get("serial.port"),
-            PreferencesData.getInteger("serial.debug_rate"),
-            PreferencesData.get("serial.parity").charAt(0),
-            PreferencesData.getInteger("serial.databits"),
-            new Float(PreferencesData.get("serial.stopbits")).floatValue());
-    this.monitor = monitor;
-  }
 
   public Serial() throws SerialException {
     this(PreferencesData.get("serial.port"),
@@ -170,15 +154,7 @@ public class Serial implements SerialPortEventListener {
       try {
         byte[] buf = port.readBytes(serialEvent.getEventValue());
         if (buf.length > 0) {
-          if (bufferLast == buffer.length) {
-            byte temp[] = new byte[bufferLast << 1];
-            System.arraycopy(buffer, 0, temp, 0, bufferLast);
-            buffer = temp;
-          }
           String msg = new String(buf);
-          if (monitor) {
-            System.out.print(msg);
-          }
           char[] chars = msg.toCharArray();
           message(chars, chars.length);
         }
@@ -197,200 +173,6 @@ public class Serial implements SerialPortEventListener {
    */
   protected void message(char[] chars, int length) {
 	// Empty
-  }
-
-  /**
-   * Returns the number of bytes that have been read from serial
-   * and are waiting to be dealt with by the user.
-   */
-  public synchronized int available() {
-    return (bufferLast - bufferIndex);
-  }
-
-
-  /**
-   * Ignore all the bytes read so far and empty the buffer.
-   */
-  public synchronized void clear() {
-    bufferLast = 0;
-    bufferIndex = 0;
-  }
-
-
-  /**
-   * Returns a number between 0 and 255 for the next byte that's
-   * waiting in the buffer.
-   * Returns -1 if there was no byte (although the user should
-   * first check available() to see if things are ready to avoid this)
-   */
-  public synchronized int read() {
-    if (bufferIndex == bufferLast) return -1;
-
-    int outgoing = buffer[bufferIndex++] & 0xff;
-    if (bufferIndex == bufferLast) {  // rewind
-      bufferIndex = 0;
-      bufferLast = 0;
-    }
-    return outgoing;
-  }
-
-
-  /**
-   * Returns the next byte in the buffer as a char.
-   * Returns -1, or 0xffff, if nothing is there.
-   */
-  public synchronized char readChar() {
-    if (bufferIndex == bufferLast) return (char) (-1);
-    return (char) read();
-  }
-
-
-  /**
-   * Return a byte array of anything that's in the serial buffer.
-   * Not particularly memory/speed efficient, because it creates
-   * a byte array on each read, but it's easier to use than
-   * readBytes(byte b[]) (see below).
-   */
-  public synchronized byte[] readBytes() {
-    if (bufferIndex == bufferLast) return null;
-
-    int length = bufferLast - bufferIndex;
-    byte outgoing[] = new byte[length];
-    System.arraycopy(buffer, bufferIndex, outgoing, 0, length);
-
-    bufferIndex = 0;  // rewind
-    bufferLast = 0;
-    return outgoing;
-  }
-
-
-  /**
-   * Grab whatever is in the serial buffer, and stuff it into a
-   * byte buffer passed in by the user. This is more memory/time
-   * efficient than readBytes() returning a byte[] array.
-   * <p/>
-   * Returns an int for how many bytes were read. If more bytes
-   * are available than can fit into the byte array, only those
-   * that will fit are read.
-   */
-  public synchronized int readBytes(byte outgoing[]) {
-    if (bufferIndex == bufferLast) return 0;
-
-    int length = bufferLast - bufferIndex;
-    if (length > outgoing.length) length = outgoing.length;
-    System.arraycopy(buffer, bufferIndex, outgoing, 0, length);
-
-    bufferIndex += length;
-    if (bufferIndex == bufferLast) {
-      bufferIndex = 0;  // rewind
-      bufferLast = 0;
-    }
-    return length;
-  }
-
-
-  /**
-   * Reads from the serial port into a buffer of bytes up to and
-   * including a particular character. If the character isn't in
-   * the serial buffer, then 'null' is returned.
-   */
-  public synchronized byte[] readBytesUntil(int interesting) {
-    if (bufferIndex == bufferLast) return null;
-    byte what = (byte) interesting;
-
-    int found = -1;
-    for (int k = bufferIndex; k < bufferLast; k++) {
-      if (buffer[k] == what) {
-        found = k;
-        break;
-      }
-    }
-    if (found == -1) return null;
-
-    int length = found - bufferIndex + 1;
-    byte outgoing[] = new byte[length];
-    System.arraycopy(buffer, bufferIndex, outgoing, 0, length);
-
-    bufferIndex = 0;  // rewind
-    bufferLast = 0;
-    return outgoing;
-  }
-
-
-  /**
-   * Reads from the serial port into a buffer of bytes until a
-   * particular character. If the character isn't in the serial
-   * buffer, then 'null' is returned.
-   * <p/>
-   * If outgoing[] is not big enough, then -1 is returned,
-   * and an error message is printed on the console.
-   * If nothing is in the buffer, zero is returned.
-   * If 'interesting' byte is not in the buffer, then 0 is returned.
-   */
-  public synchronized int readBytesUntil(int interesting, byte outgoing[]) {
-    if (bufferIndex == bufferLast) return 0;
-    byte what = (byte) interesting;
-
-    int found = -1;
-    for (int k = bufferIndex; k < bufferLast; k++) {
-      if (buffer[k] == what) {
-        found = k;
-        break;
-      }
-    }
-    if (found == -1) return 0;
-
-    int length = found - bufferIndex + 1;
-    if (length > outgoing.length) {
-      System.err.println(
-              I18n.format(
-                      _("readBytesUntil() byte buffer is too small for the {0}" +
-                              " bytes up to and including char {1}"),
-                      length,
-                      interesting
-              )
-      );
-      return -1;
-    }
-    //byte outgoing[] = new byte[length];
-    System.arraycopy(buffer, bufferIndex, outgoing, 0, length);
-
-    bufferIndex += length;
-    if (bufferIndex == bufferLast) {
-      bufferIndex = 0;  // rewind
-      bufferLast = 0;
-    }
-    return length;
-  }
-
-
-  /**
-   * Return whatever has been read from the serial port so far
-   * as a String. It assumes that the incoming characters are ASCII.
-   * <p/>
-   * If you want to move Unicode data, you can first convert the
-   * String to a byte stream in the representation of your choice
-   * (i.e. UTF8 or two-byte Unicode data), and send it as a byte array.
-   */
-  public synchronized String readString() {
-    if (bufferIndex == bufferLast) return null;
-    return new String(readBytes());
-  }
-
-
-  /**
-   * Combination of readBytesUntil and readString. See caveats in
-   * each function. Returns null if it still hasn't found what
-   * you're looking for.
-   * <p/>
-   * If you want to move Unicode data, you can first convert the
-   * String to a byte stream in the representation of your choice
-   * (i.e. UTF8 or two-byte Unicode data), and send it as a byte array.
-   */
-  public synchronized String readStringUntil(int interesting) {
-    byte b[] = readBytesUntil(interesting);
-    if (b == null) return null;
-    return new String(b);
   }
 
 
