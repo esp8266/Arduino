@@ -317,9 +317,9 @@ void UART_Handler(void)
 RingBuffer rx_buffer2;
 RingBuffer rx_buffer3;
 RingBuffer rx_buffer4;
-volatile RingBuffer tx_buffer2;
-volatile RingBuffer tx_buffer3;
-volatile RingBuffer tx_buffer4;
+RingBuffer tx_buffer2;
+RingBuffer tx_buffer3;
+RingBuffer tx_buffer4;
 
 USARTClass Serial1(USART0, USART0_IRQn, ID_USART0, &rx_buffer2, &tx_buffer2);
 void serialEvent1() __attribute__((weak));

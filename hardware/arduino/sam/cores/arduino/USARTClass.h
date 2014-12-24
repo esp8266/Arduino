@@ -59,8 +59,8 @@
 class USARTClass : public HardwareSerial
 {
   protected:
-    RingBuffer *_rx_buffer ;
-	volatile RingBuffer *_tx_buffer;
+    RingBuffer *_rx_buffer;
+	RingBuffer *_tx_buffer;
 
   protected:
     Usart* _pUsart ;
@@ -68,12 +68,13 @@ class USARTClass : public HardwareSerial
     uint32_t _dwId ;
 
   public:
-    USARTClass( Usart* pUsart, IRQn_Type dwIrq, uint32_t dwId, RingBuffer* pRx_buffer, volatile RingBuffer* pTx_buffer ) ;
+    USARTClass( Usart* pUsart, IRQn_Type dwIrq, uint32_t dwId, RingBuffer* pRx_buffer, RingBuffer* pTx_buffer ) ;
 
     void begin( const uint32_t dwBaudRate ) ;
     void begin( const uint32_t dwBaudRate , const uint32_t config ) ;
     void end( void ) ;
     int available( void ) ;
+	int availableForWrite(void);
     int peek( void ) ;
     int read( void ) ;
     void flush( void ) ;

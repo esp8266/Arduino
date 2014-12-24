@@ -23,7 +23,7 @@
 
 // Constructors ////////////////////////////////////////////////////////////////
 
-USARTClass::USARTClass( Usart* pUsart, IRQn_Type dwIrq, uint32_t dwId, RingBuffer* pRx_buffer, volatile RingBuffer* pTx_buffer )
+USARTClass::USARTClass( Usart* pUsart, IRQn_Type dwIrq, uint32_t dwId, RingBuffer* pRx_buffer, RingBuffer* pTx_buffer )
 {
   _rx_buffer = pRx_buffer;
   _tx_buffer = pTx_buffer;
@@ -32,7 +32,6 @@ USARTClass::USARTClass( Usart* pUsart, IRQn_Type dwIrq, uint32_t dwId, RingBuffe
   _dwIrq=dwIrq ;
   _dwId=dwId ;
 }
-
 
 // Public Methods //////////////////////////////////////////////////////////////
 
@@ -66,6 +65,10 @@ void USARTClass::begin( const uint32_t dwBaudRate, const uint32_t config )
   // Enable UART interrupt in NVIC
   NVIC_EnableIRQ( _dwIrq ) ;
 
+  //make sure both ring buffers are initialized back to empty.
+  _rx_buffer->_iHead = _rx_buffer->_iTail = 0;
+  _tx_buffer->_iHead = _tx_buffer->_iTail = 0;
+
   // Enable receiver and transmitter
   _pUsart->US_CR = US_CR_RXEN | US_CR_TXEN ;
 }
@@ -89,6 +92,14 @@ void USARTClass::end( void )
 int USARTClass::available( void )
 {
   return (uint32_t)(SERIAL_BUFFER_SIZE + _rx_buffer->_iHead - _rx_buffer->_iTail) % SERIAL_BUFFER_SIZE ;
+}
+
+int USARTClass::availableForWrite(void)
+{
+  int head = _tx_buffer->_iHead;
+  int tail = _tx_buffer->_iTail;
+  if (head >= tail) return SERIAL_BUFFER_SIZE - 1 - head + tail;
+  return tail - head - 1;
 }
 
 int USARTClass::peek( void )
@@ -142,17 +153,20 @@ void USARTClass::IrqHandler( void )
   uint32_t status = _pUsart->US_CSR;
 
   // Did we receive data ?
-  if ((status & US_CSR_RXRDY) == US_CSR_RXRDY)
-    _rx_buffer->store_char( _pUsart->US_RHR ) ;
-
+  if ((status & US_CSR_RXRDY) == US_CSR_RXRDY) 
+  {
+	_rx_buffer->store_char(_pUsart->US_RHR);
+  }
   //Do we need to keep sending data?
   if ((status & US_CSR_TXRDY) == US_CSR_TXRDY) 
   {
-	  _pUsart->US_THR = _tx_buffer->_aucBuffer[_tx_buffer->_iTail];
-	  _tx_buffer->_iTail = (unsigned int)(_tx_buffer->_iTail + 1) % SERIAL_BUFFER_SIZE;
-	  if (_tx_buffer->_iTail == _tx_buffer->_iHead) //if this is true we have no more data to transmit
+	  if (_tx_buffer->_iTail != _tx_buffer->_iHead) { //just in case
+		_pUsart->US_THR = _tx_buffer->_aucBuffer[_tx_buffer->_iTail];
+		_tx_buffer->_iTail = (unsigned int)(_tx_buffer->_iTail + 1) % SERIAL_BUFFER_SIZE;
+	  }
+	  else
 	  {
-		  _pUsart->US_IDR = US_IDR_TXRDY; //mask off transmit interrupt so we don't get it anymore
+		_pUsart->US_IDR = US_IDR_TXRDY; //mask off transmit interrupt so we don't get it anymore
 	  }
   }
 
