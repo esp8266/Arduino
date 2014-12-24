@@ -48,6 +48,8 @@ class UARTClass : public HardwareSerial
     int read( void ) ;
     void flush( void ) ;
     size_t write( const uint8_t c ) ;
+	void setInterruptPriority(uint32_t priority);
+	uint32_t getInterruptPriority();
 
     void IrqHandler( void ) ;
 

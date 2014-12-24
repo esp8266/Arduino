@@ -90,6 +90,16 @@ void UARTClass::end( void )
   pmc_disable_periph_clk( _dwId ) ;
 }
 
+void UARTClass::setInterruptPriority(uint32_t priority)
+{
+	NVIC_SetPriority(_dwIrq, priority & 0x0F);
+}
+
+uint32_t UARTClass::getInterruptPriority()
+{
+	return NVIC_GetPriority(_dwIrq);
+}
+
 int UARTClass::available( void )
 {
   return (uint32_t)(SERIAL_BUFFER_SIZE + _rx_buffer->_iHead - _rx_buffer->_iTail) % SERIAL_BUFFER_SIZE ;
