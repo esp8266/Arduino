@@ -76,7 +76,7 @@ int ESP8266WiFiClass::begin(const char* ssid, const char *passphrase)
     wifi_station_connect();
     ETS_UART_INTR_ENABLE();
     wifi_station_dhcpc_start();
-    return 0;
+    return status();
 }
 
 void ESP8266WiFiClass::config(IPAddress local_ip, IPAddress gateway, IPAddress subnet)
