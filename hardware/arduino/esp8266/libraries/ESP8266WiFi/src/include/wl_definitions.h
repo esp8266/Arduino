@@ -48,6 +48,7 @@
 #define WL_MAX_ATTEMPT_CONNECTION	10
 
 typedef enum {
+    WL_NO_SHIELD = 255,   // for compatibility with WiFi Shield library
     WL_IDLE_STATUS = 0,
     WL_NO_SSID_AVAIL,
     WL_SCAN_COMPLETED,

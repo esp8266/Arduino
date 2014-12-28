@@ -138,6 +138,15 @@ public:
     char* SSID();
 
     /*
+     * Return the current network RSSI. Note: this is just a stub, there is no way to
+     *  get the RSSI in the Espressif SDK yet.
+     *
+     * return: RSSI value (currently 0)
+     */
+
+    int32_t RSSI() { return 0; }
+
+    /*
      * Start scan WiFi networks available
      *
      * return: Number of discovered networks
