@@ -1,5 +1,5 @@
 ##############################################################
-esp01.name=ESP-01
+esp01.name=Generic ESP8266 board (80MHz)
 
 esp01.upload.tool=esptool
 esp01.upload.speed=115200
