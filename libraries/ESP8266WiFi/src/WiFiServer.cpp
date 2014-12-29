@@ -81,7 +81,6 @@ WiFiClient WiFiServer::available(byte* status)
     {
         WiFiClient result(_unclaimed);
         _unclaimed = _unclaimed->next();
-        // printf("WiFiServer::available\r\n");
         DEBUGV("WS:av\r\n");
         return result;
     }
@@ -123,7 +122,7 @@ T* slist_append_tail(T* head, T* item)
 int8_t WiFiServer::_accept(tcp_pcb* apcb, int8_t err)
 {
     DEBUGV("WS:ac\r\n");
-    ClientContext* client = new ClientContext(apcb, _rx_buffer_size, &WiFiServer::_s_discard, this);
+    ClientContext* client = new ClientContext(apcb, &WiFiServer::_s_discard, this);
     _unclaimed = slist_append_tail(_unclaimed, client);
     tcp_accepted(_pcb);
     // printf("WiFiServer::_accept\r\n");
@@ -132,7 +131,7 @@ int8_t WiFiServer::_accept(tcp_pcb* apcb, int8_t err)
 
 void WiFiServer::_discard(ClientContext* client)
 {
-    _discarded = slist_append_tail(_discarded, client);
+    // _discarded = slist_append_tail(_discarded, client);
     DEBUGV("WS:dis\r\n");
     // printf("WiFiServer::_discard\r\n");
 }
