@@ -23,41 +23,42 @@
 
 // Constructors ////////////////////////////////////////////////////////////////
 
-USARTClass::USARTClass( Usart* pUsart, IRQn_Type dwIrq, uint32_t dwId, RingBuffer* pRx_buffer, RingBuffer* pTx_buffer ) : UARTClass((Uart*)pUsart, dwIrq, dwId, pRx_buffer, pTx_buffer)
+USARTClass::USARTClass( Usart* pUsart, IRQn_Type dwIrq, uint32_t dwId, RingBuffer* pRx_buffer, RingBuffer* pTx_buffer )
+  : UARTClass((Uart*)pUsart, dwIrq, dwId, pRx_buffer, pTx_buffer)
 {
-
-  _pUsart=pUsart ; //In case anyone needs USART specific functionality in the future
+  // In case anyone needs USART specific functionality in the future
+  _pUsart=pUsart;
 }
 
 // Public Methods //////////////////////////////////////////////////////////////
 
 void USARTClass::begin( const uint32_t dwBaudRate )
 {
-	begin( dwBaudRate, SERIAL_8N1 );
+  begin( dwBaudRate, SERIAL_8N1 );
 }
 
 void USARTClass::begin( const uint32_t dwBaudRate, const uint32_t config )
 {
-	UARTClass::begin(dwBaudRate, config);
+  UARTClass::begin(dwBaudRate, config);
 }
 
 void USARTClass::end( void )
 {
-	UARTClass::end();
+  UARTClass::end();
 }
 
 void USARTClass::flush( void )
 {
-	UARTClass::flush();
+  UARTClass::flush();
 }
 
 size_t USARTClass::write( const uint8_t uc_data )
 {
-	return UARTClass::write(uc_data);
+  return UARTClass::write(uc_data);
 }
 
 void USARTClass::IrqHandler( void )
 {
-	UARTClass::IrqHandler();
+  UARTClass::IrqHandler();
 }
 
