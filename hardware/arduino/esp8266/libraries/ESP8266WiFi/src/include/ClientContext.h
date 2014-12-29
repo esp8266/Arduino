@@ -33,10 +33,9 @@ extern "C" void esp_schedule();
 class ClientContext
 {
 public:
-    ClientContext(tcp_pcb* pcb, size_t rx_buffer_size, 
+    ClientContext(tcp_pcb* pcb,
     			  discard_cb_t discard_cb, void* discard_cb_arg)
     : _pcb(pcb)
-    // , _rx_buf(rx_buffer_size)
     , _rx_buf(0)
     , _rx_buf_offset(0)
     , _discard_cb(discard_cb)
@@ -50,7 +49,6 @@ public:
         tcp_recv(pcb, &_s_recv);
         tcp_sent(pcb, &_s_sent);
         tcp_err(pcb, &_s_error);
-        // tcp_poll(pcb, &_s_poll, 0);
     }
 
     ~ClientContext()
@@ -297,12 +295,15 @@ private:
 private:
     ClientContext* _next;
     int _refcnt;
+    
     tcp_pcb* _pcb;
+
     pbuf* _rx_buf;
     size_t _rx_buf_offset;
-    // cbuf  _rx_buf;
+
     discard_cb_t _discard_cb;
     void* _discard_cb_arg;
+
     size_t _size_sent;
     bool _send_waiting;
 };

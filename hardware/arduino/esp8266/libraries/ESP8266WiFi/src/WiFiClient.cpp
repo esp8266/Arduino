@@ -126,7 +126,7 @@ int ICACHE_FLASH_ATTR  WiFiClient::connect(IPAddress ip, uint16_t port)
 int8_t ICACHE_FLASH_ATTR WiFiClient::_connected(void* pcb, int8_t err)
 {
     tcp_pcb* tpcb = reinterpret_cast<tcp_pcb*>(pcb);
-    _client = new ClientContext(tpcb, 1024, 0, 0);
+    _client = new ClientContext(tpcb, 0, 0);
     _client->ref();
     esp_schedule();
     return ERR_OK;
@@ -134,7 +134,7 @@ int8_t ICACHE_FLASH_ATTR WiFiClient::_connected(void* pcb, int8_t err)
 
 void ICACHE_FLASH_ATTR WiFiClient::_err(int8_t err)
 {
-    DEBUGV("WC:err\r\n");
+    DEBUGV(":err\r\n");
     esp_schedule();
 }
 
