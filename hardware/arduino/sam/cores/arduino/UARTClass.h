@@ -48,17 +48,12 @@ class UARTClass : public HardwareSerial
     int read(void);
     void flush(void);
     size_t write(const uint8_t c);
+    using Print::write; // pull in write(str) and write(buf, size) from Print
+
     void setInterruptPriority(uint32_t priority);
     uint32_t getInterruptPriority();
 
-    void IrqHandler( void );
-
-#if defined __GNUC__ /* GCC CS3 */
-    using Print::write; // pull in write(str) and write(buf, size) from Print
-#elif defined __ICCARM__ /* IAR Ewarm 5.41+ */
-//    virtual void write( const char *str );
-//    virtual void write( const uint8_t *buffer, size_t size );
-#endif
+    void IrqHandler(void);
 
     operator bool() { return true; }; // UART always active
 };

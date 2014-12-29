@@ -64,22 +64,8 @@ class USARTClass : public UARTClass
   public:
     USARTClass( Usart* pUsart, IRQn_Type dwIrq, uint32_t dwId, RingBuffer* pRx_buffer, RingBuffer* pTx_buffer );
 
-    void begin( const uint32_t dwBaudRate );
     void begin( const uint32_t dwBaudRate , const uint32_t config );
-    void end( void );
-    void flush( void );
-    size_t write( const uint8_t c );
-
-    void IrqHandler( void );
-
-#if defined __GNUC__ /* GCC CS3 */
-    using Print::write; // pull in write(str) and write(buf, size) from Print
-#elif defined __ICCARM__ /* IAR Ewarm 5.41+ */
-//    virtual void write( const char *str );
-//    virtual void write( const uint8_t *buffer, size_t size );
-#endif
-
-    operator bool() { return true; }; // USART always active
+    using UARTClass::begin; // Needed only for polymorphic methods
 };
 
 #endif // _USART_CLASS_
