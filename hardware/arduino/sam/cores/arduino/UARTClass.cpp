@@ -141,7 +141,7 @@ void UARTClass::flush( void )
 
 size_t UARTClass::write( const uint8_t uc_data )
 {
-  if ((_pUart->UART_SR & UART_SR_TXRDY) != UART_SR_TXRDY) //is the hardware currently busy?
+  if (((_pUart->UART_SR & UART_SR_TXRDY) != UART_SR_TXRDY) | (_tx_buffer->_iTail != _tx_buffer->_iHead)) //is the hardware currently busy?
   {
 	  //if busy we buffer
 	  unsigned int l = (_tx_buffer->_iHead + 1) % SERIAL_BUFFER_SIZE;
