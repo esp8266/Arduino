@@ -79,13 +79,11 @@ void UARTClass::end( void )
   // clear any received data
   _rx_buffer->_iHead = _rx_buffer->_iTail ;
 
-  while (_tx_buffer->_iHead != _tx_buffer->_iTail); //wait for transmit data to be sent
+  // Wait for any outstanding data to be sent
+  flush();
 
   // Disable UART interrupt in NVIC
   NVIC_DisableIRQ( _dwIrq ) ;
-
-  // Wait for any outstanding data to be sent
-  flush();
 
   pmc_disable_periph_clk( _dwId ) ;
 }
@@ -134,6 +132,7 @@ int UARTClass::read( void )
 
 void UARTClass::flush( void )
 {
+  while (_tx_buffer->_iHead != _tx_buffer->_iTail); //wait for transmit data to be sent
   // Wait for transmission to complete
   while ((_pUart->UART_SR & UART_SR_TXRDY) != UART_SR_TXRDY)
     ;
