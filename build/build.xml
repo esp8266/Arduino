@@ -588,7 +588,7 @@
   </target>
 
   <target name="linux-dist" depends="build"
-	  description="Build .tar.gz of linux version">
+	  description="Build .tar.xz of linux version">
 
     <!--get src="http://dev.processing.org/build/jre-tools-6u18-linux-i586.tgz" 
 	 dest="linux/jre.tgz" 
@@ -617,10 +617,10 @@
     <move file="linux/work" tofile="linux/arduino-${version}" />
 
     <exec executable="tar" dir="linux">
-      <arg value="-z"/>
+      <arg value="--lzma"/>
       <arg value="-c"/>
       <arg value="-f"/>
-      <arg value="arduino-${version}-${platform}.tgz"/>
+      <arg value="arduino-${version}-${platform}.tar.xz"/>
       <arg value="arduino-${version}"/>
     </exec>
 
@@ -630,16 +630,16 @@
       =======================================================
       Arduino for Linux was built. Grab the archive from
 
-      build/linux/arduino-${version}-${platform}.tgz
+      build/linux/arduino-${version}-${platform}.tar.xz
       =======================================================
     </echo>
   </target>
 
   <target name="linux32-dist" depends="linux-dist"
-	  description="Build .tar.gz of linux version" />
+	  description="Build .tar.xz of linux version" />
 
   <target name="linux64-dist" depends="linux-dist"
-	  description="Build .tar.gz of linux version" />
+	  description="Build .tar.xz of linux version" />
 
   <!-- - - - - - - - -->
   <!-- Windows       -->
