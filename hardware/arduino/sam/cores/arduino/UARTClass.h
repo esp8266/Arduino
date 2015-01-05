@@ -25,22 +25,28 @@
 // Includes Atmel CMSIS
 #include <chip.h>
 
+#define SERIAL_8N1 UARTClass::Mode_8N1
+#define SERIAL_8N2 UARTClass::Mode_8N2
+#define SERIAL_8E1 UARTClass::Mode_8E1
+#define SERIAL_8E2 UARTClass::Mode_8E2
+#define SERIAL_8O1 UARTClass::Mode_8O1
+#define SERIAL_8O2 UARTClass::Mode_8O2
+
 class UARTClass : public HardwareSerial
 {
-  protected:
-    RingBuffer *_rx_buffer;
-    RingBuffer *_tx_buffer;
-
-  protected:
-    Uart* _pUart;
-    IRQn_Type _dwIrq;
-    uint32_t _dwId;
-
   public:
+    enum UARTModes {
+      Mode_8N1 = US_MR_CHRL_8_BIT | US_MR_PAR_NO   | US_MR_NBSTOP_1_BIT,
+      Mode_8N2 = US_MR_CHRL_8_BIT | US_MR_PAR_NO   | US_MR_NBSTOP_2_BIT,
+      Mode_8E1 = US_MR_CHRL_8_BIT | US_MR_PAR_EVEN | US_MR_NBSTOP_1_BIT,
+      Mode_8E2 = US_MR_CHRL_8_BIT | US_MR_PAR_EVEN | US_MR_NBSTOP_2_BIT,
+      Mode_8O1 = US_MR_CHRL_8_BIT | US_MR_PAR_ODD  | US_MR_NBSTOP_1_BIT,
+      Mode_8O2 = US_MR_CHRL_8_BIT | US_MR_PAR_ODD  | US_MR_NBSTOP_2_BIT,
+    };
     UARTClass(Uart* pUart, IRQn_Type dwIrq, uint32_t dwId, RingBuffer* pRx_buffer, RingBuffer* pTx_buffer);
 
     void begin(const uint32_t dwBaudRate);
-    void begin(const uint32_t dwBaudRate, const uint32_t config);
+    void begin(const uint32_t dwBaudRate, const UARTModes config);
     void end(void);
     int available(void);
     int availableForWrite(void);
@@ -56,6 +62,17 @@ class UARTClass : public HardwareSerial
     void IrqHandler(void);
 
     operator bool() { return true; }; // UART always active
+
+  protected:
+    void init(const uint32_t dwBaudRate, const uint32_t config);
+
+    RingBuffer *_rx_buffer;
+    RingBuffer *_tx_buffer;
+
+    Uart* _pUart;
+    IRQn_Type _dwIrq;
+    uint32_t _dwId;
+
 };
 
 #endif // _UART_CLASS_

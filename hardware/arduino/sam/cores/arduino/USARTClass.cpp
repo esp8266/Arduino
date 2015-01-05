@@ -32,8 +32,8 @@ USARTClass::USARTClass( Usart* pUsart, IRQn_Type dwIrq, uint32_t dwId, RingBuffe
 
 // Public Methods //////////////////////////////////////////////////////////////
 
-void USARTClass::begin( const uint32_t dwBaudRate, const uint32_t config )
+void USARTClass::begin( const uint32_t dwBaudRate, const USARTModes config )
 {
-  UARTClass::begin(dwBaudRate, config);
+  UARTClass::init(dwBaudRate, static_cast<uint32_t>(config));
 }
 
