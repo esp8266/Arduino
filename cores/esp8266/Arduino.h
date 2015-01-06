@@ -27,6 +27,7 @@
 #include <math.h>
 
 #include "binary.h"
+#include "pgmspace.h"
 
 #ifdef __cplusplus
 extern "C"{
@@ -140,7 +141,6 @@ void loop(void);
 
 // On the ATmega1280, the addresses of some of the port registers are
 // greater than 255, so we can't store them in uint8_t's.
-#define PROGMEM 
 
 
 #define NOT_A_PIN 0
