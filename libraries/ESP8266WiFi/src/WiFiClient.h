@@ -66,6 +66,8 @@ private:
   void _err(int8_t err);
 
   ClientContext* _client;
+  uint32_t _lastPollTime;
+  
 };
 
 #endif

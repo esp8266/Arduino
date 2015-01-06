@@ -49,6 +49,13 @@ extern void (*__init_array_end)(void);
 static cont_t g_cont;
 static os_event_t g_loop_queue[LOOP_QUEUE_SIZE];
 
+static uint32_t g_micros_at_task_start;
+
+extern "C" uint32_t esp_micros_at_task_start()
+{
+    return g_micros_at_task_start;
+}
+
 extern "C" void abort()
 {
     while(1){}
@@ -86,6 +93,7 @@ static void loop_wrapper()
 
 static void loop_task(os_event_t *events)
 {
+    g_micros_at_task_start = system_get_time();
     cont_run(&g_cont, &loop_wrapper);
     if (cont_check(&g_cont) != 0)
     {
