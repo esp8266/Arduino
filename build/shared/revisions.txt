@@ -6,6 +6,9 @@ The following changes are included also in the Arduino IDE 1.0.7:
 [ide]
 * Mitigated Serial Monitor resource exhaustion when the connected device sends a lot of data (Paul Stoffregen)
 
+[core]
+* sam: HardwareSerial now performs ISR based buffered transmission (Collin Kidder)
+
 ARDUINO 1.6.0rc1
 
 * IDE internals have been refactored and sorted out. (Claudio Indellicati)

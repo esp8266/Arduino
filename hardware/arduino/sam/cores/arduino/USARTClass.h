@@ -19,7 +19,7 @@
 #ifndef _USART_CLASS_
 #define _USART_CLASS_
 
-#include "HardwareSerial.h"
+#include "UARTClass.h"
 #include "RingBuffer.h"
 
 // Includes Atmel CMSIS
@@ -56,38 +56,16 @@
 #define SERIAL_7O2 (US_MR_USART_MODE_NORMAL | US_MR_USCLKS_MCK | US_MR_CHRL_7_BIT | US_MR_PAR_ODD | US_MR_NBSTOP_2_BIT | US_MR_CHMODE_NORMAL)
 #define SERIAL_8O2 (US_MR_USART_MODE_NORMAL | US_MR_USCLKS_MCK | US_MR_CHRL_8_BIT | US_MR_PAR_ODD | US_MR_NBSTOP_2_BIT | US_MR_CHMODE_NORMAL)
 
-class USARTClass : public HardwareSerial
+class USARTClass : public UARTClass
 {
   protected:
-    RingBuffer *_rx_buffer ;
-
-  protected:
-    Usart* _pUsart ;
-    IRQn_Type _dwIrq ;
-    uint32_t _dwId ;
+    Usart* _pUsart;
 
   public:
-    USARTClass( Usart* pUsart, IRQn_Type dwIrq, uint32_t dwId, RingBuffer* pRx_buffer ) ;
+    USARTClass( Usart* pUsart, IRQn_Type dwIrq, uint32_t dwId, RingBuffer* pRx_buffer, RingBuffer* pTx_buffer );
 
-    void begin( const uint32_t dwBaudRate ) ;
-    void begin( const uint32_t dwBaudRate , const uint32_t config ) ;
-    void end( void ) ;
-    int available( void ) ;
-    int peek( void ) ;
-    int read( void ) ;
-    void flush( void ) ;
-    size_t write( const uint8_t c ) ;
-
-    void IrqHandler( void ) ;
-
-#if defined __GNUC__ /* GCC CS3 */
-    using Print::write ; // pull in write(str) and write(buf, size) from Print
-#elif defined __ICCARM__ /* IAR Ewarm 5.41+ */
-//    virtual void write( const char *str ) ;
-//    virtual void write( const uint8_t *buffer, size_t size ) ;
-#endif
-
-    operator bool() { return true; }; // USART always active
+    void begin( const uint32_t dwBaudRate , const uint32_t config );
+    using UARTClass::begin; // Needed only for polymorphic methods
 };
 
 #endif // _USART_CLASS_

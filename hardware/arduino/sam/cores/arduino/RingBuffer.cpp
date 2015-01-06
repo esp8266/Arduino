@@ -21,7 +21,7 @@
 
 RingBuffer::RingBuffer( void )
 {
-    memset( _aucBuffer, 0, SERIAL_BUFFER_SIZE ) ;
+    memset( (void *)_aucBuffer, 0, SERIAL_BUFFER_SIZE ) ;
     _iHead=0 ;
     _iTail=0 ;
 }
