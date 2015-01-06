@@ -74,9 +74,12 @@ void WiFiServer::begin()
     tcp_arg(listen_pcb, (void*) this);
 }
 
+extern "C" uint32_t esp_micros_at_task_start();
 
 WiFiClient WiFiServer::available(byte* status)
 {
+    static uint32_t lastPollTime = 0;
+
     if (_unclaimed)
     {
         WiFiClient result(_unclaimed);
@@ -84,6 +87,10 @@ WiFiClient WiFiServer::available(byte* status)
         DEBUGV("WS:av\r\n");
         return result;
     }
+
+    if (lastPollTime > esp_micros_at_task_start())
+        yield();
+    lastPollTime = micros();
 
     return WiFiClient();
 }
