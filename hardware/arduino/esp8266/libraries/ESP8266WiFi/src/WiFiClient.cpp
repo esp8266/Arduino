@@ -158,13 +158,14 @@ extern "C" uint32_t esp_micros_at_task_start();
 
 int ICACHE_FLASH_ATTR WiFiClient::available()
 {
+    static uint32_t lastPollTime = 0;
     if (!_client)
         return 0;
 
-    if (_lastPollTime > esp_micros_at_task_start())
+    if (lastPollTime > esp_micros_at_task_start())
         yield();
 
-    _lastPollTime = micros();
+    lastPollTime = micros();
 
     int result = _client->getSize();
     return result;
