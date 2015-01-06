@@ -51,7 +51,10 @@ endPacket	KEYWORD2
 parsePacket	KEYWORD2
 remoteIP	KEYWORD2
 remotePort	KEYWORD2
-
+softAP	KEYWORD2
+softAPIP	KEYWORD2
+softAPmacAddress	KEYWORD2
+printDiag	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)

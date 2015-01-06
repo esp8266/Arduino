@@ -157,13 +157,12 @@ IPAddress ESP8266WiFiClass::localIP()
     return IPAddress(ip.ip.addr);
 }
 
-IPAddress softAPIP()
+IPAddress ESP8266WiFiClass::softAPIP()
 {
     struct ip_info ip;
     wifi_get_ip_info(SOFTAP_IF, &ip);
     return IPAddress(ip.ip.addr);    
 }
-
 
 IPAddress ESP8266WiFiClass::subnetMask()
 {
