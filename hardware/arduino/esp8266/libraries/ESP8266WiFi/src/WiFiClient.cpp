@@ -46,7 +46,8 @@ extern "C"
  static int g_localPort = MIN_LOCAL_PORT;
 
 ICACHE_FLASH_ATTR WiFiClient::WiFiClient() 
-: _client(0) 
+: _client(0)
+, _lastPollTime(0)
 {
 }
 
@@ -153,12 +154,20 @@ size_t ICACHE_FLASH_ATTR WiFiClient::write(const uint8_t *buf, size_t size)
     return _client->write(reinterpret_cast<const char*>(buf), size);
 }
 
+extern "C" uint32_t esp_micros_at_task_start();
+
 int ICACHE_FLASH_ATTR WiFiClient::available()
 {
     if (!_client)
         return 0;
 
-    return _client->getSize();
+    if (_lastPollTime > esp_micros_at_task_start())
+        yield();
+
+    _lastPollTime = micros();
+
+    int result = _client->getSize();
+    return result;
 }
 
 int ICACHE_FLASH_ATTR WiFiClient::read() 
