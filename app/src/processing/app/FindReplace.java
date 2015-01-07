@@ -28,6 +28,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 
 import processing.app.helpers.OSUtils;
 
@@ -75,6 +76,11 @@ public class FindReplace extends JFrame implements ActionListener {
   public FindReplace(Editor editor) {
     super(_("Find"));
     this.editor = editor;
+
+    JPanel contentPanel = new JPanel();
+    Border padding = BorderFactory.createEmptyBorder(10, 10, 10, 10);
+    contentPanel.setBorder(padding);
+    setContentPane(contentPanel);
     
     JLabel findLabel = new JLabel(_("Find:"));
     findField = new JTextField(20);
