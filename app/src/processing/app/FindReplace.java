@@ -79,48 +79,48 @@ public class FindReplace extends JFrame implements ActionListener {
     JLabel findLabel = new JLabel(_("Find:"));
     findField = new JTextField(20);
     JLabel replaceLabel = new JLabel(_("Replace with:"));
-    replaceField=new JTextField(20);
+    replaceField = new JTextField(20);
 
     // Fill the findString with selected text if no previous value
-    if (editor.getSelectedText() != null &&
-        editor.getSelectedText().length() > 0)
+    if (editor.getSelectedText() != null
+        && editor.getSelectedText().length() > 0)
       findString = editor.getSelectedText();
     
-    if (findString != null) 
-        findField.setText(findString);
-    if (replaceString != null) 
-        replaceField.setText(replaceString);
-    
+    if (findString != null)
+      findField.setText(findString);
+    if (replaceString != null)
+      replaceField.setText(replaceString);
+
     ignoreCaseBox = new JCheckBox(_("Ignore Case"));
     ignoreCaseBox.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          ignoreCase = ignoreCaseBox.isSelected();
-        }
-      });
+      public void actionPerformed(ActionEvent e) {
+        ignoreCase = ignoreCaseBox.isSelected();
+      }
+    });
     ignoreCaseBox.setSelected(ignoreCase);
 
     wrapAroundBox = new JCheckBox(_("Wrap Around"));
     wrapAroundBox.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          wrapAround = wrapAroundBox.isSelected();
-        }
-      });
+      public void actionPerformed(ActionEvent e) {
+        wrapAround = wrapAroundBox.isSelected();
+      }
+    });
     wrapAroundBox.setSelected(wrapAround);
 
     searchAllFilesBox = new JCheckBox(_("Search all Sketch Tabs"));
     searchAllFilesBox.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          searchAllFiles = searchAllFilesBox.isSelected();
-        }
-      });
+      public void actionPerformed(ActionEvent e) {
+        searchAllFiles = searchAllFilesBox.isSelected();
+      }
+    });
     searchAllFilesBox.setSelected(searchAllFiles);
 
     JPanel checkboxPanel = new JPanel();
-    checkboxPanel.setLayout(new  BoxLayout(checkboxPanel, BoxLayout.LINE_AXIS));
+    checkboxPanel.setLayout(new BoxLayout(checkboxPanel, BoxLayout.LINE_AXIS));
     checkboxPanel.add(ignoreCaseBox);
-    checkboxPanel.add(Box.createRigidArea(new Dimension(8,0)));
+    checkboxPanel.add(Box.createRigidArea(new Dimension(8, 0)));
     checkboxPanel.add(wrapAroundBox);
-    checkboxPanel.add(Box.createRigidArea(new Dimension(8,0)));
+    checkboxPanel.add(Box.createRigidArea(new Dimension(8, 0)));
     checkboxPanel.add(searchAllFilesBox);
 
     replaceAllButton = new JButton(_("Replace All"));
@@ -135,121 +135,121 @@ public class FindReplace extends JFrame implements ActionListener {
     findButton.addActionListener(this);
 
     JPanel buttonPanel = new JPanel();
-    buttonPanel.setLayout(new  BoxLayout(buttonPanel, BoxLayout.LINE_AXIS));
+    buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.LINE_AXIS));
+
     // ordering of buttons is different on mac versus pc
     if (OSUtils.isMacOS()) {
       buttonPanel.add(replaceAllButton);
-      buttonPanel.add(Box.createRigidArea(new Dimension(8,0)));
+      buttonPanel.add(Box.createRigidArea(new Dimension(8, 0)));
       buttonPanel.add(replaceButton);
-      buttonPanel.add(Box.createRigidArea(new Dimension(8,0)));
+      buttonPanel.add(Box.createRigidArea(new Dimension(8, 0)));
       buttonPanel.add(replaceFindButton);
-      buttonPanel.add(Box.createRigidArea(new Dimension(8,0)));
+      buttonPanel.add(Box.createRigidArea(new Dimension(8, 0)));
       buttonPanel.add(previousButton);
-      buttonPanel.add(Box.createRigidArea(new Dimension(8,0)));
+      buttonPanel.add(Box.createRigidArea(new Dimension(8, 0)));
       buttonPanel.add(findButton);
 
     } else {
       buttonPanel.add(findButton);
-      buttonPanel.add(Box.createRigidArea(new Dimension(8,0)));
-      buttonPanel.add(previousButton); // is this the right position for non-Mac?
-      buttonPanel.add(Box.createRigidArea(new Dimension(8,0)));
+      buttonPanel.add(Box.createRigidArea(new Dimension(8, 0)));
+      buttonPanel.add(previousButton); // is this the right position for
+                                       // non-Mac?
+      buttonPanel.add(Box.createRigidArea(new Dimension(8, 0)));
       buttonPanel.add(replaceFindButton);
-      buttonPanel.add(Box.createRigidArea(new Dimension(8,0)));
+      buttonPanel.add(Box.createRigidArea(new Dimension(8, 0)));
       buttonPanel.add(replaceButton);
-      buttonPanel.add(Box.createRigidArea(new Dimension(8,0)));
+      buttonPanel.add(Box.createRigidArea(new Dimension(8, 0)));
       buttonPanel.add(replaceAllButton);
     }
- 
+
     // to fix ugliness.. normally macosx java 1.3 puts an
     // ugly white border around this object, so turn it off.
     if (OSUtils.isMacOS()) {
       buttonPanel.setBorder(null);
     }
 
-    //Put all components onto the dialog window
-    GridBagLayout searchLayout=new GridBagLayout();
-    GridBagConstraints gbc=new GridBagConstraints();
+    // Put all components onto the dialog window
+    GridBagLayout searchLayout = new GridBagLayout();
+    GridBagConstraints gbc = new GridBagConstraints();
     Container pane = getContentPane();
     pane.setLayout(searchLayout);
- 
-    gbc.insets=new Insets(4,4,4,4);
-    gbc.gridx=0;
-    gbc.weightx=0.0;
-    gbc.weighty=0.0;
-    gbc.fill=GridBagConstraints.NONE;
-    gbc.anchor=GridBagConstraints.LINE_END;
-    pane.add(findLabel,gbc);
-    gbc.gridx=1;
-    gbc.weightx=1.0;
-    gbc.fill=GridBagConstraints.HORIZONTAL;
-    gbc.anchor=GridBagConstraints.LINE_START;
-    pane.add(findField,gbc);
-    gbc.gridx=0;
-    gbc.gridy=1;
-    gbc.weightx=0.0;
-    gbc.fill=GridBagConstraints.NONE;
-    gbc.anchor=GridBagConstraints.LINE_END;
-    pane.add(replaceLabel,gbc);
-    gbc.gridx=1;
-    gbc.weightx=1.0;
-    gbc.fill=GridBagConstraints.HORIZONTAL;
-    gbc.anchor=GridBagConstraints.LINE_START;
-    pane.add(replaceField,gbc);
-    gbc.gridx=1;
-    gbc.gridy=2;
-    gbc.weighty=0.0;
-    gbc.fill=GridBagConstraints.NONE;
-    pane.add(checkboxPanel,gbc);
-    gbc.anchor=GridBagConstraints.CENTER;
-    gbc.gridwidth=2;
-    gbc.gridx=0;
-    gbc.gridy=3;
-    gbc.insets=new Insets(12,4,4,4);
-    pane.add(buttonPanel,gbc);
+    
+    gbc.insets = new Insets(4, 4, 4, 4);
+    gbc.gridx = 0;
+    gbc.weightx = 0.0;
+    gbc.weighty = 0.0;
+    gbc.fill = GridBagConstraints.NONE;
+    gbc.anchor = GridBagConstraints.LINE_END;
+    pane.add(findLabel, gbc);
+    gbc.gridx = 1;
+    gbc.weightx = 1.0;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.anchor = GridBagConstraints.LINE_START;
+    pane.add(findField, gbc);
+    gbc.gridx = 0;
+    gbc.gridy = 1;
+    gbc.weightx = 0.0;
+    gbc.fill = GridBagConstraints.NONE;
+    gbc.anchor = GridBagConstraints.LINE_END;
+    pane.add(replaceLabel, gbc);
+    gbc.gridx = 1;
+    gbc.weightx = 1.0;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.anchor = GridBagConstraints.LINE_START;
+    pane.add(replaceField, gbc);
+    gbc.gridx = 1;
+    gbc.gridy = 2;
+    gbc.weighty = 0.0;
+    gbc.fill = GridBagConstraints.NONE;
+    pane.add(checkboxPanel, gbc);
+    gbc.anchor = GridBagConstraints.CENTER;
+    gbc.gridwidth = 2;
+    gbc.gridx = 0;
+    gbc.gridy = 3;
+    gbc.insets = new Insets(12, 4, 4, 4);
+    pane.add(buttonPanel, gbc);
 
     pack();
     setResizable(false);
-    //centers the dialog on thew screen
-    setLocationRelativeTo( null ); 
+    // centers the dialog on thew screen
+    setLocationRelativeTo(null);
 
     // make the find button the blinky default
     getRootPane().setDefaultButton(findButton);
 
     setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     addWindowListener(new WindowAdapter() {
-        public void windowClosing(WindowEvent e) {
-          handleClose();
-        }
-      });
+      public void windowClosing(WindowEvent e) {
+        handleClose();
+      }
+    });
     Base.registerWindowCloseKeys(getRootPane(), new ActionListener() {
-        public void actionPerformed(ActionEvent actionEvent) {
-          //hide();
-          handleClose();
-        }
-      });
+      public void actionPerformed(ActionEvent actionEvent) {
+        // hide();
+        handleClose();
+      }
+    });
     Base.setIcon(this);
 
     // hack to to get first field to focus properly on osx
     addWindowListener(new WindowAdapter() {
-        public void windowActivated(WindowEvent e) {
-          //System.out.println("activating");
-          /*boolean ok =*/ findField.requestFocusInWindow();
-          //System.out.println("got " + ok);
-          findField.selectAll();
-        }
-      });
+      public void windowActivated(WindowEvent e) {
+        // System.out.println("activating");
+        /* boolean ok = */findField.requestFocusInWindow();
+        // System.out.println("got " + ok);
+        findField.selectAll();
+      }
+    });
   }
 
-
   public void handleClose() {
-    //System.out.println("handling close now");
+    // System.out.println("handling close now");
     findString = findField.getText();
     replaceString = replaceField.getText();
 
     // this object should eventually become dereferenced
     setVisible(false);
   }
-
 
   /*
   public void show() {
@@ -281,17 +281,18 @@ public class FindReplace extends JFrame implements ActionListener {
     }
   }
 
-
   // look for the next instance of the find string to be found
   // once found, select it (and go to that line)
 
-  private boolean find(boolean wrap,boolean backwards,boolean searchTabs,int originTab) {
-    //System.out.println("Find: " + originTab);
-	boolean wrapNeeded = false;
+  private boolean find(boolean wrap, boolean backwards, boolean searchTabs,
+                       int originTab) {
+    // System.out.println("Find: " + originTab);
+    boolean wrapNeeded = false;
     String search = findField.getText();
-    //System.out.println("finding for " + search + " " + findString);
+    // System.out.println("finding for " + search + " " + findString);
     // this will catch "find next" being called when no search yet
-    if (search.length() == 0) return false;
+    if (search.length() == 0)
+      return false;
 
     String text = editor.getText();
 
@@ -302,7 +303,7 @@ public class FindReplace extends JFrame implements ActionListener {
 
     int nextIndex;
     if (!backwards) {
-      //int selectionStart = editor.textarea.getSelectionStart();
+      // int selectionStart = editor.textarea.getSelectionStart();
       int selectionEnd = editor.getSelectionStop();
 
       nextIndex = text.indexOf(search, selectionEnd);
@@ -311,10 +312,10 @@ public class FindReplace extends JFrame implements ActionListener {
         wrapNeeded = true;
       }
     } else {
-      //int selectionStart = editor.textarea.getSelectionStart();
-      int selectionStart = editor.getSelectionStart()-1;
+      // int selectionStart = editor.textarea.getSelectionStart();
+      int selectionStart = editor.getSelectionStart() - 1;
 
-      if ( selectionStart >= 0 ) {
+      if (selectionStart >= 0) {
         nextIndex = text.lastIndexOf(search, selectionStart);
       } else {
         nextIndex = -1;
@@ -338,8 +339,8 @@ public class FindReplace extends JFrame implements ActionListener {
               originTab = realCurrentTab;
 
             if (!wrap)
-              if ((!backwards && realCurrentTab + 1 >= sketch.getCodeCount()) ||
-                  (backwards && realCurrentTab - 1 < 0))
+              if ((!backwards && realCurrentTab + 1 >= sketch.getCodeCount())
+                  || (backwards && realCurrentTab - 1 < 0))
                 return false; // Can't continue without wrap
 
             if (backwards) {
@@ -357,23 +358,23 @@ public class FindReplace extends JFrame implements ActionListener {
           }
         }
       }
-      
+
       if (wrapNeeded)
-        nextIndex = backwards ? text.lastIndexOf(search) : text.indexOf(search, 0);
+        nextIndex = backwards ? text.lastIndexOf(search) : text.indexOf(search,
+                                                                        0);
     }
-   	
-   	if (nextIndex != -1) {
+
+    if (nextIndex != -1) {
       editor.setSelection(nextIndex, nextIndex + search.length());
       return true;
-   	}
-   
+    }
+
     return false;
   }
 
-
   /**
-   * Replace the current selection with whatever's in the
-   * replacement text field.
+   * Replace the current selection with whatever's in the replacement text
+   * field.
    */
   public void replace() {
     if (findField.getText().length() == 0)
@@ -399,8 +400,8 @@ public class FindReplace extends JFrame implements ActionListener {
   }
 
   /**
-   * Replace the current selection with whatever's in the
-   * replacement text field, and then find the next match
+   * Replace the current selection with whatever's in the replacement text
+   * field, and then find the next match
    */
   public void replaceAndFindNext() {
     replace();
@@ -408,8 +409,8 @@ public class FindReplace extends JFrame implements ActionListener {
   }
 
   /**
-   * Replace everything that matches by doing find and replace
-   * alternately until nothing more found.
+   * Replace everything that matches by doing find and replace alternately until
+   * nothing more found.
    */
   public void replaceAll() {
     if (findField.getText().length() == 0)
@@ -431,20 +432,20 @@ public class FindReplace extends JFrame implements ActionListener {
       Toolkit.getDefaultToolkit().beep();
     }
   }
-  
-  public void setFindText( String t ) {
-    findField.setText( t );
+
+  public void setFindText(String t) {
+    findField.setText(t);
     findString = t;
   }
 
   public void findNext() {
-    if ( !find( wrapAround, false, searchAllFiles,-1 ) ) {
+    if (!find(wrapAround, false, searchAllFiles, -1)) {
       Toolkit.getDefaultToolkit().beep();
     }
   }
 
   public void findPrevious() {
-    if ( !find( wrapAround, true, searchAllFiles,-1 ) ) {
+    if (!find(wrapAround, true, searchAllFiles, -1)) {
       Toolkit.getDefaultToolkit().beep();
     }
   }
