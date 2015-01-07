@@ -37,13 +37,12 @@ class WiFiServer : public Server {
 private:
   uint16_t _port;
   tcp_pcb* _pcb;
-  size_t   _rx_buffer_size;
 
   ClientContext* _unclaimed;
   ClientContext* _discarded;
 
 public:
-  WiFiServer(uint16_t port, size_t rx_buffer_size = 2048);
+  WiFiServer(uint16_t port);
   WiFiClient available(uint8_t* status = NULL);
   void begin();
   virtual size_t write(uint8_t);

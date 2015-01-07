@@ -13,9 +13,8 @@ const char* ssid = "your-ssid";
 const char* password = "your-password";
 
 // Create an instance of the server
-// specify the port to listen on (first argument)
-// and the receive buffer size (second argument)
-WiFiServer server(80, 2048);  
+// specify the port to listen on as an argument
+WiFiServer server(80);
 
 void setup() {
   Serial.begin(115200);
