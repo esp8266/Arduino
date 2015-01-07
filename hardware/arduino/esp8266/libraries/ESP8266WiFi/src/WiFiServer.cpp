@@ -38,13 +38,12 @@ extern "C" {
 #include "cbuf.h"
 #include "include/ClientContext.h"
 
-WiFiServer::WiFiServer(uint16_t port, size_t rx_buffer_size)
+WiFiServer::WiFiServer(uint16_t port)
 {
     _port = port;
     _pcb = 0;
     _unclaimed = 0;
     _discarded = 0;
-    _rx_buffer_size = rx_buffer_size;
 }
 
 void WiFiServer::begin()
