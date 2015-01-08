@@ -17,21 +17,26 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef wifiudp_h
-#define wifiudp_h
+#ifndef WIFIUDP_H
+#define WIFIUDP_H
 
 #include <Udp.h>
 
-#define UDP_TX_PACKET_MAX_SIZE 24
+#define UDP_TX_PACKET_MAX_SIZE 8192
+
+class UdpContext;
 
 class WiFiUDP : public UDP {
 private:
-  uint8_t _sock;  // socket ID for Wiz5100
-  uint16_t _port; // local port to listen on
+  UdpContext* _ctx;
 
 public:
   WiFiUDP();  // Constructor
-  virtual uint8_t begin(uint16_t);	// initialize, start listening on specified port. Returns 1 if successful, 0 if there are no sockets available to use
+  WiFiUDP(const WiFiUDP& other);
+  WiFiUDP& operator=(const WiFiUDP& rhs);
+  ~WiFiUDP();
+
+  virtual uint8_t begin(uint16_t port);	// initialize, start listening on specified port. Returns 1 if successful, 0 if there are no sockets available to use
   virtual void stop();  // Finish with the UDP socket
 
   // Sending UDP packets
@@ -74,7 +79,7 @@ public:
   // Return the port of the host who sent the current incoming packet
   virtual uint16_t remotePort();
 
-  friend class WiFiDrv;
 };
 
-#endif
+#endif //WIFIUDP_H
+
