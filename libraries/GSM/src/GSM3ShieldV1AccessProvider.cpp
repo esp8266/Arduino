@@ -1,7 +1,7 @@
 #include <GSM3ShieldV1AccessProvider.h>
 #include <Arduino.h>
+#include "GSM3IO.h"
 
-#define __RESETPIN__ 7
 #define __TOUTSHUTDOWN__ 5000
 #define __TOUTMODEMCONFIGURATION__ 5000//equivalent to 30000 because of time in interrupt routine.
 #define __TOUTAT__ 1000
@@ -38,6 +38,11 @@ GSM3_NetworkStatus_t GSM3ShieldV1AccessProvider::begin(char* pin, bool restart, 
 {	
 	pinMode(__RESETPIN__, OUTPUT);
 
+	#ifdef TTOPEN_V1
+	pinMode(__POWERPIN__, OUTPUT);
+	digitalWrite(__POWERPIN__, HIGH);
+	#endif
+
 	// If asked for modem restart, restart
 	if (restart) 
 		HWrestart();
@@ -60,7 +65,11 @@ GSM3_NetworkStatus_t GSM3ShieldV1AccessProvider::begin(char* pin, bool restart, 
 //HWrestart.
 int GSM3ShieldV1AccessProvider::HWrestart()
 {
-
+	#ifdef TTOPEN_V1
+	digitalWrite(__POWERPIN__, HIGH);
+	delay(1000);
+	#endif
+	
 	theGSM3ShieldV1ModemCore.setStatus(IDLE);
 	digitalWrite(__RESETPIN__, HIGH);
 	delay(12000);
@@ -292,5 +301,23 @@ bool GSM3ShieldV1AccessProvider::shutdown()
 			return resp;
 	}
 	return false;
-}     
+}
 
+//Secure shutdown.
+bool GSM3ShieldV1AccessProvider::secureShutdown()
+{
+	// It makes no sense to have an asynchronous shutdown
+	pinMode(__RESETPIN__, OUTPUT);
+	digitalWrite(__RESETPIN__, HIGH);
+	delay(900);
+	digitalWrite(__RESETPIN__, LOW);
+	theGSM3ShieldV1ModemCore.setStatus(OFF);
+	theGSM3ShieldV1ModemCore.gss.close();
+
+#ifdef TTOPEN_V1
+	_delay_ms(12000);
+	digitalWrite(__POWERPIN__, LOW);
+#endif
+	
+	return true;
+}

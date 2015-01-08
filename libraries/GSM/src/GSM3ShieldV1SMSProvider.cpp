@@ -52,6 +52,7 @@ int GSM3ShieldV1SMSProvider::endSMS()
 {
 	theGSM3ShieldV1ModemCore.openCommand(this,ENDSMS);
 	endSMSContinue();
+	while(ready()==0) delay(100);
 	return theGSM3ShieldV1ModemCore.getCommandError();
 }
 

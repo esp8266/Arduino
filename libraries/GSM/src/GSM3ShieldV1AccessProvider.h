@@ -89,6 +89,11 @@ class GSM3ShieldV1AccessProvider : public GSM3MobileAccessProvider, public GSM3S
 		*/
 		bool shutdown();
 		
+		/** Secure shutdown the modem (power off really)
+			@return true if successful
+		 */
+		bool secureShutdown();
+		
 		/** Returns 0 if last command is still executing
 			@return 1 if success, >1 if error 
 		*/
