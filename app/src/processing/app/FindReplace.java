@@ -122,7 +122,7 @@ public class FindReplace extends JFrame implements ActionListener {
     searchAllFilesBox.setSelected(searchAllFiles);
 
     JPanel checkboxPanel = new JPanel();
-    checkboxPanel.setLayout(new BoxLayout(checkboxPanel, BoxLayout.LINE_AXIS));
+    checkboxPanel.setLayout(new BoxLayout(checkboxPanel, BoxLayout.PAGE_AXIS));
     checkboxPanel.add(ignoreCaseBox);
     checkboxPanel.add(Box.createRigidArea(new Dimension(8, 0)));
     checkboxPanel.add(wrapAroundBox);
