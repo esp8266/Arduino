@@ -1924,6 +1924,10 @@ public class Editor extends JFrame implements RunnerListener {
         sketch.prepare();
         sketch.build(false);
         statusNotice(_("Done compiling."));
+      } catch (PreferencesMapException e) {
+        statusError(I18n.format(
+                _("Error while compiling: missing '{0}' configuration parameter"),
+                e.getMessage()));
       } catch (Exception e) {
         status.unprogress();
         statusError(e);
@@ -1941,6 +1945,10 @@ public class Editor extends JFrame implements RunnerListener {
         sketch.prepare();
         sketch.build(true);
         statusNotice(_("Done compiling."));
+      } catch (PreferencesMapException e) {
+        statusError(I18n.format(
+                _("Error while compiling: missing '{0}' configuration parameter"),
+                e.getMessage()));
       } catch (Exception e) {
         status.unprogress();
         statusError(e);
