@@ -179,6 +179,7 @@ println	KEYWORD2	Serial_Println
 available	KEYWORD2	Serial_Available
 availableForWrite	KEYWORD2
 flush	KEYWORD2	Serial_Flush
+swap	KEYWORD2
 setTimeout	KEYWORD2
 find	KEYWORD2
 findUntil	KEYWORD2

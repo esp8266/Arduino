@@ -193,6 +193,18 @@ void ICACHE_FLASH_ATTR uart0_uninit(uart_t* uart)
     os_free(uart);
 }
 
+#define FUNC_U0CTS    4
+#define FUNC_U0RTS    4
+
+void ICACHE_FLASH_ATTR uart0_swap(uart_t* uart)
+{
+    PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTCK_U, FUNC_U0CTS);
+    PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTDO_U, FUNC_U0RTS);
+    //SWAP PIN : U0TXD<==>U0RTS(MTDO, GPIO15) , U0RXD<==>U0CTS(MTCK, GPIO13)
+    SET_PERI_REG_MASK(0x3ff00028 , BIT2);
+    PIN_FUNC_SELECT(PERIPHS_IO_MUX_U0TXD_U, FUNC_GPIO1);
+    PIN_FUNC_SELECT(PERIPHS_IO_MUX_U0RXD_U, FUNC_GPIO3);
+}
 
 void ICACHE_FLASH_ATTR
 uart_ignore_char(char c)
@@ -249,6 +261,13 @@ void ICACHE_FLASH_ATTR HardwareSerial::end()
     _uart = 0;
     _rx_buffer = 0;
     _tx_buffer = 0;
+}
+
+void ICACHE_FLASH_ATTR HardwareSerial::swap()
+{
+    uart0_swap(_uart);
+    pinMode(1, INPUT);
+    pinMode(3, INPUT);
 }
 
 void ICACHE_FLASH_ATTR HardwareSerial::setDebugOutput(bool en)

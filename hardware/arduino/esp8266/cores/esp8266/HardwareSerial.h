@@ -69,6 +69,7 @@ public:
     void begin(unsigned long baud) { begin(baud, 0); }
     void begin(unsigned long, uint8_t);
     void end();
+    void swap();  //use GPIO13 and GPIO15 as RX and TX
     int available(void) override;
     int peek(void) override;
     int read(void) override;
