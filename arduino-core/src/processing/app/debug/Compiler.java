@@ -401,11 +401,11 @@ public class Compiler implements MessageConsumer {
 
     // 5. extract EEPROM data (from EEMEM directive) to .eep file.
     progressListener.progress(70);
-    compileEep();
+    runRecipe("recipe.objcopy.eep.pattern");
 
     // 6. build the .hex file
     progressListener.progress(80);
-    compileHex();
+    runRecipe("recipe.objcopy.hex.pattern");
 
     progressListener.progress(90);
     return true;
@@ -1069,28 +1069,12 @@ public class Compiler implements MessageConsumer {
     execAsynchronously(cmdArray);
   }
 
-  // 5. extract EEPROM data (from EEMEM directive) to .eep file.
-  void compileEep() throws RunnerException, PreferencesMapException {
+  void runRecipe(String recipe) throws RunnerException, PreferencesMapException {
     PreferencesMap dict = new PreferencesMap(prefs);
     dict.put("ide_version", "" + BaseNoGui.REVISION);
 
     String[] cmdArray;
-    String cmd = prefs.getOrExcept("recipe.objcopy.eep.pattern");
-    try {
-      cmdArray = StringReplacer.formatAndSplit(cmd, dict, true);
-    } catch (Exception e) {
-      throw new RunnerException(e);
-    }
-    execAsynchronously(cmdArray);
-  }
-	
-  // 6. build the .hex file
-  void compileHex() throws RunnerException, PreferencesMapException {
-    PreferencesMap dict = new PreferencesMap(prefs);
-    dict.put("ide_version", "" + BaseNoGui.REVISION);
-
-    String[] cmdArray;
-    String cmd = prefs.getOrExcept("recipe.objcopy.hex.pattern");
+    String cmd = prefs.getOrExcept(recipe);
     try {
       cmdArray = StringReplacer.formatAndSplit(cmd, dict, true);
     } catch (Exception e) {
