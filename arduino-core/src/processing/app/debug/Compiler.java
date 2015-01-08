@@ -511,7 +511,7 @@ public class Compiler implements MessageConsumer {
     for (File file : sSources) {
       File objectFile = new File(outputPath, file.getName() + ".o");
       objectPaths.add(objectFile);
-      String[] cmd = getCommandCompilerS(includeFolders, file, objectFile);
+      String[] cmd = getCommandCompilerByRecipe(includeFolders, file, objectFile, "recipe.S.o.pattern");
       execAsynchronously(cmd);
     }
  		
@@ -521,7 +521,7 @@ public class Compiler implements MessageConsumer {
       objectPaths.add(objectFile);
       if (isAlreadyCompiled(file, objectFile, dependFile, prefs))
         continue;
-      String[] cmd = getCommandCompilerC(includeFolders, file, objectFile);
+      String[] cmd = getCommandCompilerByRecipe(includeFolders, file, objectFile, "recipe.c.o.pattern");
       execAsynchronously(cmd);
     }
 
@@ -531,7 +531,7 @@ public class Compiler implements MessageConsumer {
       objectPaths.add(objectFile);
       if (isAlreadyCompiled(file, objectFile, dependFile, prefs))
         continue;
-      String[] cmd = getCommandCompilerCPP(includeFolders, file, objectFile);
+      String[] cmd = getCommandCompilerByRecipe(includeFolders, file, objectFile, "recipe.cpp.o.pattern");
       execAsynchronously(cmd);
     }
     
@@ -811,9 +811,7 @@ public class Compiler implements MessageConsumer {
     System.err.print(s);
   }
 
-  private String[] getCommandCompilerS(List<File> includeFolders,
-                                       File sourceFile, File objectFile)
-          throws RunnerException, PreferencesMapException {
+  private String[] getCommandCompilerByRecipe(List<File> includeFolders, File sourceFile, File objectFile, String recipe) throws PreferencesMapException, RunnerException {
     String includes = prepareIncludes(includeFolders);
     PreferencesMap dict = new PreferencesMap(prefs);
     dict.put("ide_version", "" + BaseNoGui.REVISION);
@@ -821,45 +819,7 @@ public class Compiler implements MessageConsumer {
     dict.put("source_file", sourceFile.getAbsolutePath());
     dict.put("object_file", objectFile.getAbsolutePath());
 
-    String cmd = prefs.getOrExcept("recipe.S.o.pattern");
-    try {
-      return StringReplacer.formatAndSplit(cmd, dict, true);
-    } catch (Exception e) {
-      throw new RunnerException(e);
-    }
-  }
-
-  private String[] getCommandCompilerC(List<File> includeFolders,
-                                       File sourceFile, File objectFile)
-          throws RunnerException, PreferencesMapException {
-    String includes = prepareIncludes(includeFolders);
-
-    PreferencesMap dict = new PreferencesMap(prefs);
-    dict.put("ide_version", "" + BaseNoGui.REVISION);
-    dict.put("includes", includes);
-    dict.put("source_file", sourceFile.getAbsolutePath());
-    dict.put("object_file", objectFile.getAbsolutePath());
-
-    String cmd = prefs.getOrExcept("recipe.c.o.pattern");
-    try {
-      return StringReplacer.formatAndSplit(cmd, dict, true);
-    } catch (Exception e) {
-      throw new RunnerException(e);
-    }
-  }
-
-  private String[] getCommandCompilerCPP(List<File> includeFolders,
-                                         File sourceFile, File objectFile)
-          throws RunnerException, PreferencesMapException {
-    String includes = prepareIncludes(includeFolders);
-
-    PreferencesMap dict = new PreferencesMap(prefs);
-    dict.put("ide_version", "" + BaseNoGui.REVISION);
-    dict.put("includes", includes);
-    dict.put("source_file", sourceFile.getAbsolutePath());
-    dict.put("object_file", objectFile.getAbsolutePath());
-
-    String cmd = prefs.getOrExcept("recipe.cpp.o.pattern");
+    String cmd = prefs.getOrExcept(recipe);
     try {
       return StringReplacer.formatAndSplit(cmd, dict, true);
     } catch (Exception e) {
