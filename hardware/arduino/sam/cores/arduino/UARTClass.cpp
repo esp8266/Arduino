@@ -57,7 +57,7 @@ void UARTClass::init(const uint32_t dwBaudRate, const uint32_t config)
   _pUart->UART_CR = UART_CR_RSTRX | UART_CR_RSTTX | UART_CR_RXDIS | UART_CR_TXDIS;
 
   // Configure mode
-  _pUart->UART_MR = config | US_MR_USART_MODE_NORMAL | US_MR_USCLKS_MCK | US_MR_CHMODE_NORMAL;
+  _pUart->UART_MR = (config & 0x00000E00) | UART_MR_CHMODE_NORMAL;
 
   // Configure baudrate (asynchronous, no oversampling)
   _pUart->UART_BRGR = (SystemCoreClock / dwBaudRate) >> 4;

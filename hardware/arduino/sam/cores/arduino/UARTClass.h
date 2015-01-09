@@ -26,22 +26,21 @@
 #include <chip.h>
 
 #define SERIAL_8N1 UARTClass::Mode_8N1
-#define SERIAL_8N2 UARTClass::Mode_8N2
 #define SERIAL_8E1 UARTClass::Mode_8E1
-#define SERIAL_8E2 UARTClass::Mode_8E2
 #define SERIAL_8O1 UARTClass::Mode_8O1
-#define SERIAL_8O2 UARTClass::Mode_8O2
+#define SERIAL_8M1 UARTClass::Mode_8M1
+#define SERIAL_8S1 UARTClass::Mode_8S1
+
 
 class UARTClass : public HardwareSerial
 {
   public:
     enum UARTModes {
-      Mode_8N1 = US_MR_CHRL_8_BIT | US_MR_PAR_NO   | US_MR_NBSTOP_1_BIT,
-      Mode_8N2 = US_MR_CHRL_8_BIT | US_MR_PAR_NO   | US_MR_NBSTOP_2_BIT,
-      Mode_8E1 = US_MR_CHRL_8_BIT | US_MR_PAR_EVEN | US_MR_NBSTOP_1_BIT,
-      Mode_8E2 = US_MR_CHRL_8_BIT | US_MR_PAR_EVEN | US_MR_NBSTOP_2_BIT,
-      Mode_8O1 = US_MR_CHRL_8_BIT | US_MR_PAR_ODD  | US_MR_NBSTOP_1_BIT,
-      Mode_8O2 = US_MR_CHRL_8_BIT | US_MR_PAR_ODD  | US_MR_NBSTOP_2_BIT,
+      Mode_8N1 = US_MR_CHRL_8_BIT | US_MR_NBSTOP_1_BIT | UART_MR_PAR_NO,
+      Mode_8E1 = US_MR_CHRL_8_BIT | US_MR_NBSTOP_1_BIT | UART_MR_PAR_EVEN,
+      Mode_8O1 = US_MR_CHRL_8_BIT | US_MR_NBSTOP_1_BIT | UART_MR_PAR_ODD,
+	  Mode_8M1 = US_MR_CHRL_8_BIT | US_MR_NBSTOP_1_BIT | UART_MR_PAR_MARK,
+	  Mode_8S1 = US_MR_CHRL_8_BIT | US_MR_NBSTOP_1_BIT | UART_MR_PAR_SPACE,
     };
     UARTClass(Uart* pUart, IRQn_Type dwIrq, uint32_t dwId, RingBuffer* pRx_buffer, RingBuffer* pTx_buffer);
 
