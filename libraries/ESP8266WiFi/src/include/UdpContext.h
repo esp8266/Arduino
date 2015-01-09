@@ -1,5 +1,5 @@
 /* 
-  ClientContext.h - TCP connection handling on top of lwIP
+  UdpContext.h - UDP connection handling on top of lwIP
 
   Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
   This file is part of the esp8266 core for Arduino environment.
