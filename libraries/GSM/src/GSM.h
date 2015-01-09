@@ -47,6 +47,7 @@ https://github.com/BlueVia/Official-Arduino
 #include <GSM3ShieldV1ClientProvider.h>
 #include <GSM3ShieldV1DataNetworkProvider.h>
 #include <GSM3ShieldV1ModemVerification.h>
+#include <GSM3ShieldV1CellManagement.h>
 #include <GSM3ShieldV1PinManagement.h>
 #include <GSM3ShieldV1ScanNetworks.h>
 #include <GSM3SMSService.h>
@@ -61,7 +62,7 @@ https://github.com/BlueVia/Official-Arduino
 
 #define GSMPIN GSM3ShieldV1PinManagement
 #define GSMModem GSM3ShieldV1ModemVerification
-#define GSMCell GSM3CellManagement
+#define GSMCell GSM3ShieldV1CellManagement
 #define GSMBand GSM3ShieldV1BandManagement
 #define GSMScanner GSM3ShieldV1ScanNetworks
 

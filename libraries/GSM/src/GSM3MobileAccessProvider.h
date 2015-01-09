@@ -34,7 +34,7 @@ https://github.com/BlueVia/Official-Arduino
 #ifndef _GSM3MOBILEACCESSPROVIDER_
 #define _GSM3MOBILEACCESSPROVIDER_
 
-enum GSM3_NetworkStatus_t { ERROR, IDLE, CONNECTING, GSM_READY, GPRS_READY, TRANSPARENT_CONNECTED};
+enum GSM3_NetworkStatus_t { ERROR, IDLE, CONNECTING, GSM_READY, GPRS_READY, TRANSPARENT_CONNECTED, OFF};
 
 class GSM3MobileAccessProvider
 {
@@ -58,6 +58,11 @@ class GSM3MobileAccessProvider
 			@return true if successful
 		 */
 		virtual inline bool shutdown()=0;
+		
+		/** Secure shutdown the modem (power off really)
+			@return always true
+		 */
+		virtual inline bool secureShutdown()=0;
 		
 		/** Get last command status
 			@return returns 0 if last command is still executing, 1 success, >1 error

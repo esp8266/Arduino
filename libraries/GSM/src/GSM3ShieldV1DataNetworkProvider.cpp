@@ -219,6 +219,8 @@ void GSM3ShieldV1DataNetworkProvider::detachGPRSContinue()
 				}
 			else theGSM3ShieldV1ModemCore.closeCommand(3);
 		}		
+		theGSM3ShieldV1ModemCore.theBuffer().flush();
+		theGSM3ShieldV1ModemCore.gss.spaceAvailable();
 		break;	
 	}
 }

@@ -32,25 +32,12 @@ The latest version of this library can always be found at
 https://github.com/BlueVia/Official-Arduino
 */
 #include "GSM3SoftSerial.h"
+#include "GSM3IO.h"
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
 #include "pins_arduino.h"
 #include <HardwareSerial.h>
 #include <Arduino.h>
-
-#if defined(__AVR_ATmega328P__) 
-#define __TXPIN__ 3
-#define __RXPIN__ 2
-#define __RXINT__ 3
-#elif defined(__AVR_ATmega2560__) || defined(__AVR_ATmega1280__)
-#define __TXPIN__ 3
-#define __RXPIN__ 10
-#define __RXINT__ 4
-#elif defined(__AVR_ATmega32U4__)
-#define __TXPIN__ 3
-#define __RXPIN__ 8
-#define __RXINT__ 3
-#endif
 
 #define __XON__ 0x11
 #define __XOFF__ 0x13

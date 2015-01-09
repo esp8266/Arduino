@@ -61,19 +61,13 @@ int GSM3ShieldV1ModemVerification::begin()
 // get IMEI
 String GSM3ShieldV1ModemVerification::getIMEI()
 {
-	String number;
+	String number(NULL);
 	// AT command for obtain IMEI
 	String modemResponse = modemAccess.writeModemCommand("AT+GSN", 2000);
 	// Parse and check response
 	char res_to_compare[modemResponse.length()];
 	modemResponse.toCharArray(res_to_compare, modemResponse.length());
-	if(strstr(res_to_compare,"OK") == NULL)
-	{	
-		return String(NULL);
-	}
-	else
-	{
+	if(strstr(res_to_compare,"OK") != NULL)
 		number = modemResponse.substring(1, 17);
-		return number;
-	}
+	return number;
 }
