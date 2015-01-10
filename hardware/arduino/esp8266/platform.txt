@@ -81,9 +81,11 @@ recipe.size.regex=^(?:\.text|\.data|\.bss|\.rodata|\.irom0\.text|)\s+([0-9]+).*
 
 # ------------------------------
 
-tools.esptool.cmd.path={runtime.ide.path}/hardware/tools/esp8266/esptool
+tools.esptool.cmd=esptool
+tools.esptool.cmd.windows=esptool.exe
+tools.esptool.path={runtime.ide.path}/hardware/tools/esp8266
 
-tools.esptool.program.params.verbose=-v -v
-tools.esptool.program.params.quiet=-q
-tools.esptool.program.pattern="{cmd.path}" -cp {serial.port} -ca 0x00000 -cf "{build.path}/{build.project_name}_00000.bin" -ca 0x40000 -cf "{build.path}/{build.project_name}_40000.bin"
+tools.esptool.program.params.verbose=-vv
+tools.esptool.program.params.quiet= 
+tools.esptool.program.pattern="{path}/{cmd}" {program.verbose} -cd {upload.resetmethod} -cb {upload.speed} -cp {serial.port} -ca 0x00000 -cf "{build.path}/{build.project_name}_00000.bin" -ca 0x40000 -cf "{build.path}/{build.project_name}_40000.bin"
 
