@@ -274,9 +274,9 @@
       <fileset dir="macosx/work/${staging_hardware_folder}/tools" includes="**/man"/>
     </delete>
 
-    <move file="macosx/work/${staging_hardware_folder}/tools/esp8266/esptool-0.0.3/esptool_osx" tofile="macosx/work/${staging_hardware_folder}/tools/esp8266/esptool" />
+    <move file="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/esptool-0.0.3/esptool_osx" tofile="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/esptool" />
     
-    <delete dir="macosx/work/${staging_hardware_folder}/tools/esp8266/esptool-0.0.3/" />
+    <delete dir="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/esptool-0.0.3/" />
     
     <antcall target="unzip">
       <param name="archive_file" value="./libastylej-2.04.zip" />
@@ -788,6 +788,18 @@
     <delete includeEmptyDirs="true" quiet="true">
       <fileset dir="windows/work/hardware/tools/avr/doc" />
     </delete>
+	
+	<antcall target="untar">
+      <param name="archive_file" value="${staging_folder}/dist/win32-xtensa-lx106-elf.tgz" />
+      <param name="archive_url" value="http://download.igrr.me/win32-xtensa-lx106-elf.tgz" />
+      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/xtensa-lx106-elf" />
+      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/" />
+    </antcall>
+	
+	<move file="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/esptool-0.0.3/esptool.exe" tofile="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/esptool.exe" />
+    
+    <delete dir="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/esptool-0.0.3/" />
+    
   </target>
 
   <target name="windows-run" depends="windows-build"
