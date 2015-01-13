@@ -191,7 +191,8 @@ private:
         else if (!_rx_buf->next)
         {
             DEBUGV(":c0 %d, %d\r\n", size, _rx_buf->tot_len);
-            tcp_recved(_pcb, _rx_buf->len);
+            if (_pcb)
+                tcp_recved(_pcb, _rx_buf->len);
             pbuf_free(_rx_buf);
             _rx_buf = 0;
             _rx_buf_offset = 0;
@@ -203,7 +204,8 @@ private:
             _rx_buf = _rx_buf->next;
             _rx_buf_offset = 0;
             pbuf_ref(_rx_buf);
-            tcp_recved(_pcb, head->len);
+            if (_pcb)
+                tcp_recved(_pcb, head->len);
             pbuf_free(head);
         }
     }
@@ -218,8 +220,8 @@ private:
             tcp_sent(pcb, NULL);
             tcp_recv(pcb, NULL);
             tcp_err(pcb, NULL);
-            int error = tcp_close(pcb);
-            if (error != ERR_OK)
+            // int error = tcp_close(pcb);
+            // if (error != ERR_OK)
             {
                 DEBUGV(":rcla\r\n");
                 tcp_abort(pcb);
