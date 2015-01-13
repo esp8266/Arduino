@@ -3,6 +3,7 @@ ARDUINO 1.6.0rc2
 
 [ide]
 * Reenabled speed of 38400 on serial monitor
+* Improved Find/Replace dialog layout (Eberhard Fahle)
 
 [core]
 * Arduino "boolean" type is now mapped to "bool" instead of "uint8_t" (Christopher Andrews)
