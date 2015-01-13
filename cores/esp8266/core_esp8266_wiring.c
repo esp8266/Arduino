@@ -30,14 +30,12 @@ extern void esp_schedule();
 extern void esp_yield();
 
 static os_timer_t delay_timer;
+static os_timer_t micros_overflow_timer;
+static uint32_t micros_at_last_overflow_tick = 0;
+static uint32_t micros_overflow_count = 0;
 #define ONCE 0
 #define REPEAT 1
 
-unsigned long millis()
-{
-    unsigned long m = system_get_time() / 1000;
-    return m;
-}
 
 void delay_end(void* arg)
 {
@@ -62,10 +60,24 @@ void delay(unsigned long ms)
     }
 }
 
+void micros_overflow_tick(void* arg)
+{
+    uint32_t m = system_get_time();
+    if (m < micros_at_last_overflow_tick)
+        ++micros_overflow_count;
+    micros_at_last_overflow_tick = m;
+}
+
+unsigned long millis()
+{
+    uint32_t m = system_get_time();
+    uint32_t c = micros_overflow_count + ((m < micros_at_last_overflow_tick) ? 1 : 0);
+    return c * 4294967 + m / 1000;
+}
+
 unsigned long micros() 
 {
-    unsigned long m = system_get_time();
-    return m;
+    return system_get_time();
 }
 
 void delayMicroseconds(unsigned int us)
@@ -76,4 +88,6 @@ void delayMicroseconds(unsigned int us)
 void init()
 {
     initPins();
+    os_timer_setfn(&micros_overflow_timer, (os_timer_func_t*) &micros_overflow_tick, 0);
+    os_timer_arm(&micros_overflow_timer, 60000, REPEAT);
 }
