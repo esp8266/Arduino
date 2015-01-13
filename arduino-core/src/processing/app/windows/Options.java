@@ -18,6 +18,7 @@ import java.util.*;
  * @author TB
  */
 public interface Options {
+  @SuppressWarnings("serial")
   Map<String, Object> UNICODE_OPTIONS = new HashMap<String, Object>() {
     {
       put(OPTION_TYPE_MAPPER, W32APITypeMapper.UNICODE);

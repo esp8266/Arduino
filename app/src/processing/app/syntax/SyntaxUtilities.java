@@ -131,7 +131,6 @@ public class SyntaxUtilities
     Font defaultFont = gfx.getFont();
     Color defaultColor = gfx.getColor();
 
-    int offset = 0;
     for(;;)
       {
         byte id = tokens.id;
@@ -155,7 +154,6 @@ public class SyntaxUtilities
         else
           x = Utilities.drawTabbedText(line, x, y, gfx, expander, 0);        
         line.offset += length;
-        offset += length;
 
         tokens = tokens.next;
       }

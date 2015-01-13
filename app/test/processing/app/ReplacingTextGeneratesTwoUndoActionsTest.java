@@ -3,7 +3,6 @@ package processing.app;
 import org.fest.swing.fixture.JMenuItemFixture;
 import org.junit.Test;
 import processing.app.helpers.JEditTextAreaFixture;
-import processing.app.syntax.JEditTextArea;
 
 import static org.junit.Assert.assertEquals;
 

@@ -639,7 +639,6 @@ public class AutoFormat implements Tool {
         case '\'':
           string[j++] = c;
           cc = getchr();
-          int count = 0;
           while(cc != c && EOF == 0)
           {
             // max. length of line should be 256
