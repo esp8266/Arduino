@@ -49,10 +49,7 @@ import processing.app.I18n;
 import processing.app.PreferencesData;
 import processing.app.SketchCode;
 import processing.app.SketchData;
-import processing.app.helpers.FileUtils;
-import processing.app.helpers.PreferencesMap;
-import processing.app.helpers.ProcessUtils;
-import processing.app.helpers.StringReplacer;
+import processing.app.helpers.*;
 import processing.app.helpers.filefilters.OnlyDirs;
 import processing.app.packages.Library;
 import processing.app.packages.LibraryList;
@@ -86,7 +83,7 @@ public class Compiler implements MessageConsumer {
 
   private ProgressListener progressListener;
 
-  static public String build(SketchData data, String buildPath, File tempBuildFolder, ProgressListener progListener, boolean verbose) throws RunnerException {
+  static public String build(SketchData data, String buildPath, File tempBuildFolder, ProgressListener progListener, boolean verbose) throws RunnerException, PreferencesMapException {
     if (SketchData.checkSketchFile(data.getPrimaryFile()) == null)
       BaseNoGui.showError(_("Bad file selected"),
                           _("Bad sketch primary file or bad sketck directory structure"), null);
@@ -338,12 +335,12 @@ public class Compiler implements MessageConsumer {
 
   /**
    * Compile sketch.
-   * @param buildPath 
+   * @param _verbose
    *
    * @return true if successful.
    * @throws RunnerException Only if there's a problem. Only then.
    */
-  public boolean compile(boolean _verbose) throws RunnerException {
+  public boolean compile(boolean _verbose) throws RunnerException, PreferencesMapException {
     preprocess(prefs.get("build.path"));
     
     verbose = _verbose || PreferencesData.getBoolean("build.verbose");
@@ -404,11 +401,11 @@ public class Compiler implements MessageConsumer {
 
     // 5. extract EEPROM data (from EEMEM directive) to .eep file.
     progressListener.progress(70);
-    compileEep();
+    runRecipe("recipe.objcopy.eep.pattern");
 
     // 6. build the .hex file
     progressListener.progress(80);
-    compileHex();
+    runRecipe("recipe.objcopy.hex.pattern");
 
     progressListener.progress(90);
     return true;
@@ -505,7 +502,7 @@ public class Compiler implements MessageConsumer {
 
   private List<File> compileFiles(File outputPath, File sourcePath,
                                   boolean recurse, List<File> includeFolders)
-      throws RunnerException {
+          throws RunnerException, PreferencesMapException {
     List<File> sSources = findFilesInFolder(sourcePath, "S", recurse);
     List<File> cSources = findFilesInFolder(sourcePath, "c", recurse);
     List<File> cppSources = findFilesInFolder(sourcePath, "cpp", recurse);
@@ -514,7 +511,7 @@ public class Compiler implements MessageConsumer {
     for (File file : sSources) {
       File objectFile = new File(outputPath, file.getName() + ".o");
       objectPaths.add(objectFile);
-      String[] cmd = getCommandCompilerS(includeFolders, file, objectFile);
+      String[] cmd = getCommandCompilerByRecipe(includeFolders, file, objectFile, "recipe.S.o.pattern");
       execAsynchronously(cmd);
     }
  		
@@ -524,7 +521,7 @@ public class Compiler implements MessageConsumer {
       objectPaths.add(objectFile);
       if (isAlreadyCompiled(file, objectFile, dependFile, prefs))
         continue;
-      String[] cmd = getCommandCompilerC(includeFolders, file, objectFile);
+      String[] cmd = getCommandCompilerByRecipe(includeFolders, file, objectFile, "recipe.c.o.pattern");
       execAsynchronously(cmd);
     }
 
@@ -534,7 +531,7 @@ public class Compiler implements MessageConsumer {
       objectPaths.add(objectFile);
       if (isAlreadyCompiled(file, objectFile, dependFile, prefs))
         continue;
-      String[] cmd = getCommandCompilerCPP(includeFolders, file, objectFile);
+      String[] cmd = getCommandCompilerByRecipe(includeFolders, file, objectFile, "recipe.cpp.o.pattern");
       execAsynchronously(cmd);
     }
     
@@ -545,7 +542,7 @@ public class Compiler implements MessageConsumer {
    * Strip escape sequences used in makefile dependency files (.d)
    * https://github.com/arduino/Arduino/issues/2255#issuecomment-57645845
    *
-   * @param dep
+   * @param line
    * @return
    */
   protected static String unescapeDepFile(String line) {
@@ -814,9 +811,7 @@ public class Compiler implements MessageConsumer {
     System.err.print(s);
   }
 
-  private String[] getCommandCompilerS(List<File> includeFolders,
-                                       File sourceFile, File objectFile)
-      throws RunnerException {
+  private String[] getCommandCompilerByRecipe(List<File> includeFolders, File sourceFile, File objectFile, String recipe) throws PreferencesMapException, RunnerException {
     String includes = prepareIncludes(includeFolders);
     PreferencesMap dict = new PreferencesMap(prefs);
     dict.put("ide_version", "" + BaseNoGui.REVISION);
@@ -824,45 +819,7 @@ public class Compiler implements MessageConsumer {
     dict.put("source_file", sourceFile.getAbsolutePath());
     dict.put("object_file", objectFile.getAbsolutePath());
 
-    try {
-      String cmd = prefs.get("recipe.S.o.pattern");
-      return StringReplacer.formatAndSplit(cmd, dict, true);
-    } catch (Exception e) {
-      throw new RunnerException(e);
-    }
-  }
-
-  private String[] getCommandCompilerC(List<File> includeFolders,
-                                       File sourceFile, File objectFile)
-      throws RunnerException {
-    String includes = prepareIncludes(includeFolders);
-
-    PreferencesMap dict = new PreferencesMap(prefs);
-    dict.put("ide_version", "" + BaseNoGui.REVISION);
-    dict.put("includes", includes);
-    dict.put("source_file", sourceFile.getAbsolutePath());
-    dict.put("object_file", objectFile.getAbsolutePath());
-
-    String cmd = prefs.get("recipe.c.o.pattern");
-    try {
-      return StringReplacer.formatAndSplit(cmd, dict, true);
-    } catch (Exception e) {
-      throw new RunnerException(e);
-    }
-  }
-
-  private String[] getCommandCompilerCPP(List<File> includeFolders,
-                                         File sourceFile, File objectFile)
-      throws RunnerException {
-    String includes = prepareIncludes(includeFolders);
-
-    PreferencesMap dict = new PreferencesMap(prefs);
-    dict.put("ide_version", "" + BaseNoGui.REVISION);
-    dict.put("includes", includes);
-    dict.put("source_file", sourceFile.getAbsolutePath());
-    dict.put("object_file", objectFile.getAbsolutePath());
-
-    String cmd = prefs.get("recipe.cpp.o.pattern");
+    String cmd = prefs.getOrExcept(recipe);
     try {
       return StringReplacer.formatAndSplit(cmd, dict, true);
     } catch (Exception e) {
@@ -909,21 +866,21 @@ public class Compiler implements MessageConsumer {
   }
   
   // 1. compile the sketch (already in the buildPath)
-  void compileSketch(List<File> includeFolders) throws RunnerException {
+  void compileSketch(List<File> includeFolders) throws RunnerException, PreferencesMapException {
     File buildPath = prefs.getFile("build.path");
     objectFiles.addAll(compileFiles(buildPath, buildPath, false, includeFolders));
   }
 
   // 2. compile the libraries, outputting .o files to:
   // <buildPath>/<library>/
-  void compileLibraries(List<File> includeFolders) throws RunnerException {
+  void compileLibraries(List<File> includeFolders) throws RunnerException, PreferencesMapException {
     for (Library lib : importedLibraries) {
       compileLibrary(lib, includeFolders);
     }
   }
 
   private void compileLibrary(Library lib, List<File> includeFolders)
-      throws RunnerException {
+          throws RunnerException, PreferencesMapException {
     File libFolder = lib.getSrcFolder();
     File libBuildFolder = prefs.getFile(("build.path"), lib.getName());
 
@@ -949,7 +906,7 @@ public class Compiler implements MessageConsumer {
     }
   }
 
-  private void recursiveCompileFilesInFolder(File srcBuildFolder, File srcFolder, List<File> includeFolders) throws RunnerException {
+  private void recursiveCompileFilesInFolder(File srcBuildFolder, File srcFolder, List<File> includeFolders) throws RunnerException, PreferencesMapException {
     compileFilesInFolder(srcBuildFolder, srcFolder, includeFolders);
     for (File subFolder : srcFolder.listFiles(new OnlyDirs())) {
       File subBuildFolder = new File(srcBuildFolder, subFolder.getName());
@@ -957,7 +914,7 @@ public class Compiler implements MessageConsumer {
     }
   }
 
-  private void compileFilesInFolder(File buildFolder, File srcFolder, List<File> includeFolders) throws RunnerException {
+  private void compileFilesInFolder(File buildFolder, File srcFolder, List<File> includeFolders) throws RunnerException, PreferencesMapException {
     createFolder(buildFolder);
     List<File> objects = compileFiles(buildFolder, srcFolder, false, includeFolders);
     objectFiles.addAll(objects);
@@ -968,7 +925,7 @@ public class Compiler implements MessageConsumer {
   // Also compiles the variant (if it supplies actual source files),
   // which are included in the link directly (not through core.a)
   void compileCore()
-      throws RunnerException {
+          throws RunnerException, PreferencesMapException {
 
     File coreFolder = prefs.getFile("build.core.path");
     File variantFolder = prefs.getFile("build.variant.path");
@@ -1024,8 +981,8 @@ public class Compiler implements MessageConsumer {
         dict.put("object_file", file.getAbsolutePath());
 
         String[] cmdArray;
+        String cmd = prefs.getOrExcept("recipe.ar.pattern");
         try {
-          String cmd = prefs.get("recipe.ar.pattern");
           cmdArray = StringReplacer.formatAndSplit(cmd, dict, true);
         } catch (Exception e) {
           throw new RunnerException(e);
@@ -1040,7 +997,7 @@ public class Compiler implements MessageConsumer {
 			
   // 4. link it all together into the .elf file
   void compileLink()
-      throws RunnerException {
+          throws RunnerException, PreferencesMapException {
 
     // TODO: Make the --relax thing in configuration files.
 
@@ -1063,8 +1020,8 @@ public class Compiler implements MessageConsumer {
     dict.put("ide_version", "" + BaseNoGui.REVISION);
 
     String[] cmdArray;
+    String cmd = prefs.getOrExcept("recipe.c.combine.pattern");
     try {
-      String cmd = prefs.get("recipe.c.combine.pattern");
       cmdArray = StringReplacer.formatAndSplit(cmd, dict, true);
     } catch (Exception e) {
       throw new RunnerException(e);
@@ -1072,29 +1029,13 @@ public class Compiler implements MessageConsumer {
     execAsynchronously(cmdArray);
   }
 
-  // 5. extract EEPROM data (from EEMEM directive) to .eep file.
-  void compileEep() throws RunnerException {
+  void runRecipe(String recipe) throws RunnerException, PreferencesMapException {
     PreferencesMap dict = new PreferencesMap(prefs);
     dict.put("ide_version", "" + BaseNoGui.REVISION);
 
     String[] cmdArray;
+    String cmd = prefs.getOrExcept(recipe);
     try {
-      String cmd = prefs.get("recipe.objcopy.eep.pattern");
-      cmdArray = StringReplacer.formatAndSplit(cmd, dict, true);
-    } catch (Exception e) {
-      throw new RunnerException(e);
-    }
-    execAsynchronously(cmdArray);
-  }
-	
-  // 6. build the .hex file
-  void compileHex() throws RunnerException {
-    PreferencesMap dict = new PreferencesMap(prefs);
-    dict.put("ide_version", "" + BaseNoGui.REVISION);
-
-    String[] cmdArray;
-    try {
-      String cmd = prefs.get("recipe.objcopy.hex.pattern");
       cmdArray = StringReplacer.formatAndSplit(cmd, dict, true);
     } catch (Exception e) {
       throw new RunnerException(e);

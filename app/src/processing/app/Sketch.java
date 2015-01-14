@@ -29,6 +29,7 @@ import processing.app.debug.Compiler.ProgressListener;
 import processing.app.debug.RunnerException;
 import processing.app.forms.PasswordAuthorizationDialog;
 import processing.app.helpers.OSUtils;
+import processing.app.helpers.PreferencesMapException;
 import processing.app.packages.Library;
 import static processing.app.I18n._;
 
@@ -1129,7 +1130,7 @@ public class Sketch {
    * @return null if compilation failed, main class name if not
    * @throws RunnerException
    */
-  public String build(boolean verbose) throws RunnerException {
+  public String build(boolean verbose) throws RunnerException, PreferencesMapException {
     return build(tempBuildFolder.getAbsolutePath(), verbose);
   }
 
@@ -1142,7 +1143,7 @@ public class Sketch {
    *
    * @return null if compilation failed, main class name if not
    */
-  public String build(String buildPath, boolean verbose) throws RunnerException {
+  public String build(String buildPath, boolean verbose) throws RunnerException, PreferencesMapException {
     // run the preprocessor
     editor.status.progressUpdate(20);
 

@@ -1426,8 +1426,8 @@ public class Editor extends JFrame implements RunnerListener {
 
 
   public void resetHandlers() {
-    runHandler = new DefaultRunHandler();
-    presentHandler = new DefaultPresentHandler();
+    runHandler = new BuildHandler();
+    presentHandler = new BuildHandler(true);
     stopHandler = new DefaultStopHandler();
     exportHandler = new DefaultExportHandler();
     exportAppHandler = new DefaultExportAppHandler();
@@ -1917,30 +1917,28 @@ public class Editor extends JFrame implements RunnerListener {
     new Thread(verbose ? presentHandler : runHandler).start();
   }
 
-  // DAM: in Arduino, this is compile
-  class DefaultRunHandler implements Runnable {
-    public void run() {
-      try {
-        sketch.prepare();
-        sketch.build(false);
-        statusNotice(_("Done compiling."));
-      } catch (Exception e) {
-        status.unprogress();
-        statusError(e);
-      }
+  class BuildHandler implements Runnable {
 
-      status.unprogress();
-      toolbar.deactivate(EditorToolbar.RUN);
+    private final boolean verbose;
+
+    public BuildHandler() {
+      this(false);
     }
-  }
 
-  // DAM: in Arduino, this is compile (with verbose output)
-  class DefaultPresentHandler implements Runnable {
+    public BuildHandler(boolean verbose) {
+      this.verbose = verbose;
+    }
+
+    @Override
     public void run() {
       try {
         sketch.prepare();
-        sketch.build(true);
+        sketch.build(verbose);
         statusNotice(_("Done compiling."));
+      } catch (PreferencesMapException e) {
+        statusError(I18n.format(
+                _("Error while compiling: missing '{0}' configuration parameter"),
+                e.getMessage()));
       } catch (Exception e) {
         status.unprogress();
         statusError(e);
@@ -1953,11 +1951,8 @@ public class Editor extends JFrame implements RunnerListener {
 
   class DefaultStopHandler implements Runnable {
     public void run() {
-      try {
-        // DAM: we should try to kill the compilation or upload process here.
-      } catch (Exception e) {
-        statusError(e);
-      }
+      // TODO
+      // DAM: we should try to kill the compilation or upload process here.
     }
   }
 
