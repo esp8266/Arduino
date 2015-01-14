@@ -29,7 +29,7 @@ public class DefaultTargetTest extends AbstractWithPreferencesTest {
     // should not raise an exception
     new Base(new String[0]);
 
-    TargetBoard targetBoard = Base.getTargetBoard();
+    TargetBoard targetBoard = BaseNoGui.getTargetBoard();
     assertNotEquals("unreal_board", targetBoard.getId());
   }
 }
