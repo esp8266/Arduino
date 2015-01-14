@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2014-02-19 14:46+0000\n"
-"Last-Translator: cmaglie <c.maglie@arduino.cc>\n"
+"PO-Revision-Date: 2015-01-14 17:10+0000\n"
+"Last-Translator: Cristian Maglie <c.maglie@arduino.cc>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/arduino-ide-15/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -27,7 +27,7 @@ msgstr "仅有 Arduino Leonardo 支持 'Keyboard' 选项"
 
 #: debug/Compiler.java:450
 msgid "'Mouse' only supported on the Arduino Leonardo"
-msgstr ""
+msgstr "'Mouse' 仅在 Arduino Leonardo 上支持"
 
 #: Preferences.java:478
 msgid "(edit only when Arduino is not running)"
@@ -60,7 +60,7 @@ msgstr "名为{0}的文件已存在于{1}"
 #: Editor.java:2169
 #, java-format
 msgid "A folder named \"{0}\" already exists. Can't open sketch."
-msgstr ""
+msgstr "文件夹 \"{0}\" 已存在。不能打开 sketch。"
 
 #: Base.java:2690
 #, java-format
@@ -114,15 +114,15 @@ msgstr "阿拉贡语"
 
 #: tools/Archiver.java:48
 msgid "Archive Sketch"
-msgstr ""
+msgstr "草稿存档"
 
 #: tools/Archiver.java:109
 msgid "Archive sketch as:"
-msgstr ""
+msgstr "草稿存为:"
 
 #: tools/Archiver.java:139
 msgid "Archive sketch canceled."
-msgstr ""
+msgstr "草稿存档已取消"
 
 #: tools/Archiver.java:75
 msgid ""
@@ -137,6 +137,12 @@ msgstr "Arduino ARM (32 位)板"
 #: ../../../processing/app/I18n.java:82
 msgid "Arduino AVR Boards"
 msgstr "Arduino AVR 板"
+
+#: Editor.java:2137
+msgid ""
+"Arduino can only open its own sketches\n"
+"and other files ending in .ino or .pde"
+msgstr ""
 
 #: Base.java:1682
 msgid ""
@@ -359,7 +365,7 @@ msgstr "复制错误信息"
 
 #: Editor.java:1165 Editor.java:2715
 msgid "Copy for Forum"
-msgstr ""
+msgstr "复制到论坛"
 
 #: Sketch.java:1089
 #, java-format
@@ -626,7 +632,7 @@ msgstr "载入{0}出错"
 #: Serial.java:181
 #, java-format
 msgid "Error opening serial port ''{0}''."
-msgstr ""
+msgstr "打开串行端口{0}出错"
 
 #: Preferences.java:277
 msgid "Error reading preferences"
@@ -770,12 +776,12 @@ msgstr "入门"
 msgid ""
 "Global variables use {0} bytes ({2}%%) of dynamic memory, leaving {3} bytes "
 "for local variables. Maximum is {1} bytes."
-msgstr ""
+msgstr "全局变量使用了{0}字节，({2}%%)的动态内存，余留{3}字节局部变量。最大为{1}字节。"
 
 #: ../../../processing/app/Sketch.java:1651
 #, java-format
 msgid "Global variables use {0} bytes of dynamic memory."
-msgstr ""
+msgstr "全局变量使用了{0}字节的动态内存。"
 
 #: Preferences.java:98
 msgid "Greek"
@@ -889,7 +895,7 @@ msgstr "立陶宛语"
 
 #: ../../../processing/app/Sketch.java:1660
 msgid "Low memory available, stability problems may occur"
-msgstr ""
+msgstr "可用内存偏低，可能会导致稳定性问题"
 
 #: Preferences.java:107
 msgid "Marathi"
@@ -983,7 +989,7 @@ msgstr "未发现有效的配置核心！退出..."
 #: ../../../processing/app/debug/TargetPackage.java:63
 #, java-format
 msgid "No valid hardware definitions found in folder {0}."
-msgstr ""
+msgstr "在文件夹{0}中没有找到有效的硬件定义"
 
 #: Base.java:191
 msgid "Non-fatal error while setting the Look & Feel."
@@ -1114,11 +1120,11 @@ msgstr "设定平台时发生问题。"
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:136
 msgid "Problem accessing board folder /www/sd"
-msgstr ""
+msgstr "访问板上的文件夹 /www/sd 出错"
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:132
 msgid "Problem accessing files in folder "
-msgstr ""
+msgstr "读取文件夹中文件时出现问题"
 
 #: Base.java:1673
 msgid "Problem getting data folder"
@@ -1133,17 +1139,11 @@ msgstr "移动 {0} 到建立的文件夹存在问题"
 msgid ""
 "Problem uploading to board.  See "
 "http://www.arduino.cc/en/Guide/Troubleshooting#upload for suggestions."
-msgstr ""
+msgstr "上传出错。查看页面 http://www.arduino.cc/en/Guide/Troubleshooting#upload 获取建议。"
 
 #: Sketch.java:355 Sketch.java:362 Sketch.java:373
 msgid "Problem with rename"
 msgstr "重命名时出现问题"
-
-#: Editor.java:2137
-msgid ""
-"Arduino can only open its own sketches\n"
-"and other files ending in .ino or .pde"
-msgstr ""
 
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
@@ -1405,15 +1405,15 @@ msgstr "不再支持 ‘BYTE’  关键字。"
 
 #: debug/Compiler.java:426
 msgid "The Client class has been renamed EthernetClient."
-msgstr ""
+msgstr "Client class 已改名为 EthernetClient."
 
 #: debug/Compiler.java:420
 msgid "The Server class has been renamed EthernetServer."
-msgstr ""
+msgstr "Server class 已改名为 EthernetServer."
 
 #: debug/Compiler.java:432
 msgid "The Udp class has been renamed EthernetUdp."
-msgstr ""
+msgstr "Udp class 已改名为 EthernetUdp."
 
 #: Base.java:192
 msgid "The error message follows, however Arduino should run fine."
@@ -1592,7 +1592,7 @@ msgstr "上传..."
 
 #: Editor.java:1269
 msgid "Use Selection For Find"
-msgstr ""
+msgstr "查找选中单元"
 
 #: Preferences.java:409
 msgid "Use external editor"
@@ -1634,11 +1634,11 @@ msgstr "警告"
 
 #: debug/Compiler.java:444
 msgid "Wire.receive() has been renamed Wire.read()."
-msgstr ""
+msgstr "Wire.receive() 已改名为 Wire.read()."
 
 #: debug/Compiler.java:438
 msgid "Wire.send() has been renamed Wire.write()."
-msgstr ""
+msgstr "Wire.send() 已改名为 Wire.write()."
 
 #: FindReplace.java:105
 msgid "Wrap Around"
@@ -1712,10 +1712,10 @@ msgstr "“.{0}”不是合法的扩展名"
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Arduino,you may need to use Tools -> Fix Encoding & "
-"Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
-"todelete the bad characters to get rid of this warning."
-msgstr "”{0}“含有无法识别的字符，若该代码为旧版Arduino所建立，你或许需要利用”工具->修正代码并重新载入“以UTF-8编码來更新草稿码，如不行，请刪除非法字符摆脱此警告信息。"
+"older version of Arduino,you may need to use Tools -> Fix Encoding & Reload "
+"to updatethe sketch to use UTF-8 encoding. If not, you may need todelete the"
+" bad characters to get rid of this warning."
+msgstr ""
 
 #: debug/Compiler.java:409
 msgid ""

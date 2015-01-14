@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2014-02-19 14:46+0000\n"
-"Last-Translator: cmaglie <c.maglie@arduino.cc>\n"
+"PO-Revision-Date: 2015-01-14 17:10+0000\n"
+"Last-Translator: Cristian Maglie <c.maglie@arduino.cc>\n"
 "Language-Team: Nepali (http://www.transifex.com/projects/p/arduino-ide-15/language/ne/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -136,6 +136,12 @@ msgstr ""
 
 #: ../../../processing/app/I18n.java:82
 msgid "Arduino AVR Boards"
+msgstr ""
+
+#: Editor.java:2137
+msgid ""
+"Arduino can only open its own sketches\n"
+"and other files ending in .ino or .pde"
 msgstr ""
 
 #: Base.java:1682
@@ -1139,12 +1145,6 @@ msgstr ""
 msgid "Problem with rename"
 msgstr ""
 
-#: Editor.java:2137
-msgid ""
-"Arduino can only open its own sketches\n"
-"and other files ending in .ino or .pde"
-msgstr ""
-
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
 msgstr ""
@@ -1712,9 +1712,9 @@ msgstr ""
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Arduino,you may need to use Tools -> Fix Encoding & "
-"Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
-"todelete the bad characters to get rid of this warning."
+"older version of Arduino,you may need to use Tools -> Fix Encoding & Reload "
+"to updatethe sketch to use UTF-8 encoding. If not, you may need todelete the"
+" bad characters to get rid of this warning."
 msgstr ""
 
 #: debug/Compiler.java:409

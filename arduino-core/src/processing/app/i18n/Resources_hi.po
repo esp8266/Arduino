@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2014-02-19 14:46+0000\n"
-"Last-Translator: cmaglie <c.maglie@arduino.cc>\n"
+"PO-Revision-Date: 2015-01-14 17:10+0000\n"
+"Last-Translator: Cristian Maglie <c.maglie@arduino.cc>\n"
 "Language-Team: Hindi (http://www.transifex.com/projects/p/arduino-ide-15/language/hi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -20,7 +20,7 @@ msgstr ""
 
 #: Preferences.java:358 Preferences.java:374
 msgid "  (requires restart of Arduino)"
-msgstr "अर्दुइनो को फिर से चालू करें "
+msgstr "(अर्दुइनो को फिर से चालू करने की आवश्यक)"
 
 #: debug/Compiler.java:455
 msgid "'Keyboard' only supported on the Arduino Leonardo"
@@ -66,7 +66,7 @@ msgstr " \"{0}\" इस नाम की पुस्तिका  पहले 
 #: Base.java:2690
 #, java-format
 msgid "A library named {0} already exists"
-msgstr ""
+msgstr "{0} ग्रन्थ पहले से मौजूद"
 
 #: UpdateCheck.java:103
 msgid ""
@@ -90,7 +90,7 @@ msgstr "फाइल जोङिये"
 
 #: Base.java:963
 msgid "Add Library..."
-msgstr ""
+msgstr "ग्रन्थ जोड़े"
 
 #: tools/FixEncoding.java:77
 msgid ""
@@ -107,7 +107,7 @@ msgstr "मशीन के लिए विशिष्ट कोड लोड 
 
 #: Preferences.java:85
 msgid "Arabic"
-msgstr ""
+msgstr "अरबी"
 
 #: Preferences.java:86
 msgid "Aragonese"
@@ -133,10 +133,16 @@ msgstr "स्केच संग्रह कारण रद्द कर द�
 
 #: ../../../processing/app/I18n.java:83
 msgid "Arduino ARM (32-bits) Boards"
-msgstr ""
+msgstr "अर्दुइनो ARM (32 - बिट्स) बोर्ड "
 
 #: ../../../processing/app/I18n.java:82
 msgid "Arduino AVR Boards"
+msgstr "अर्दुइनो AVR बोर्ड "
+
+#: Editor.java:2137
+msgid ""
+"Arduino can only open its own sketches\n"
+"and other files ending in .ino or .pde"
 msgstr ""
 
 #: Base.java:1682
@@ -303,11 +309,11 @@ msgstr "शुरुआत  में अद्यतन के लिए जा
 
 #: ../../../processing/app/Preferences.java:142
 msgid "Chinese (China)"
-msgstr ""
+msgstr "चीनी (चीन)"
 
 #: ../../../processing/app/Preferences.java:142
 msgid "Chinese (Hong Kong)"
-msgstr ""
+msgstr "चीनी (हॉन्ग कॉन्ग) "
 
 #: ../../../processing/app/Preferences.java:144
 msgid "Chinese (Taiwan)"
@@ -319,7 +325,7 @@ msgstr ""
 
 #: Preferences.java:88
 msgid "Chinese Simplified"
-msgstr ""
+msgstr "सरल चीनी "
 
 #: Preferences.java:89
 msgid "Chinese Traditional"
@@ -356,7 +362,7 @@ msgstr "HTML के रूप में कॉपी"
 
 #: ../../../processing/app/EditorStatus.java:455
 msgid "Copy error messages"
-msgstr ""
+msgstr "त्रुटि सन्देश कॉपी "
 
 #: Editor.java:1165 Editor.java:2715
 msgid "Copy for Forum"
@@ -437,7 +443,7 @@ msgstr "आपकी स्केत्च री-सेव नहीं हो 
 msgid ""
 "Could not read color theme settings.\n"
 "You'll need to reinstall Arduino."
-msgstr "आपको processing इन्स्टाल करनी पड़ेगा "
+msgstr ""
 
 #: Preferences.java:219
 msgid ""
@@ -532,7 +538,7 @@ msgstr "सभ बदलाव रद्द करे और फिर से �
 
 #: ../../../processing/app/Preferences.java:438
 msgid "Display line numbers"
-msgstr ""
+msgstr "लाइन नंबर दिखाएँ "
 
 #: Editor.java:2064
 msgid "Don't Save"
@@ -576,11 +582,11 @@ msgstr "एडिटर फॉण्ट साइज़:"
 
 #: Preferences.java:353
 msgid "Editor language: "
-msgstr ""
+msgstr "संपादक भाषा "
 
 #: Preferences.java:92
 msgid "English"
-msgstr ""
+msgstr "अंग्रेजी "
 
 #: ../../../processing/app/Preferences.java:145
 msgid "English (United Kingdom)"
@@ -615,14 +621,14 @@ msgstr "सीरियल  के अन्दर त्रुटी {0}()"
 
 #: ../../../processing/app/Base.java:1232
 msgid "Error loading libraries"
-msgstr ""
+msgstr "पुस्तिका लोड करने में त्रुटि  "
 
 #: ../../../processing/app/debug/TargetPlatform.java:95
 #: ../../../processing/app/debug/TargetPlatform.java:106
 #: ../../../processing/app/debug/TargetPlatform.java:117
 #, java-format
 msgid "Error loading {0}"
-msgstr ""
+msgstr "{0} लोड करने में त्रुटि"
 
 #: Serial.java:181
 #, java-format
@@ -642,7 +648,7 @@ msgstr "प्रेफेरेंसस पढने में त्रुट
 
 #: ../../../cc/arduino/packages/DiscoveryManager.java:25
 msgid "Error starting discovery method: "
-msgstr ""
+msgstr "खोज प्रक्रिया शुरू करने में त्रुटि "
 
 #: Serial.java:125
 #, java-format
@@ -744,7 +750,7 @@ msgstr ""
 
 #: Preferences.java:95
 msgid "French"
-msgstr ""
+msgstr "फ़्रांसिसी "
 
 #: Editor.java:1097
 msgid "Frequently Asked Questions"
@@ -808,7 +814,7 @@ msgstr "मदद"
 
 #: Preferences.java:99
 msgid "Hindi"
-msgstr ""
+msgstr "हिंदी "
 
 #: Sketch.java:295
 msgid ""
@@ -866,11 +872,11 @@ msgstr ""
 
 #: Preferences.java:102
 msgid "Italian"
-msgstr ""
+msgstr "इतालवी "
 
 #: Preferences.java:103
 msgid "Japanese"
-msgstr ""
+msgstr "जापानी "
 
 #: Preferences.java:104
 msgid "Korean"
@@ -894,7 +900,7 @@ msgstr ""
 
 #: Preferences.java:107
 msgid "Marathi"
-msgstr ""
+msgstr "मराठी "
 
 #: Base.java:2112
 msgid "Message"
@@ -918,7 +924,7 @@ msgstr "नयी फाइल का नाम "
 
 #: ../../../processing/app/Preferences.java:149
 msgid "Nepali"
-msgstr ""
+msgstr "नेपाली "
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:51
 msgid "Network upload using programmer not supported"
@@ -958,7 +964,7 @@ msgstr "ऑटो फॉर्मेट के लिए कोई बदला�
 
 #: Editor.java:373
 msgid "No files were added to the sketch."
-msgstr ""
+msgstr "स्केच में कोई फाइल नहीं जोड़ी गयी "
 
 #: Platform.java:167
 msgid "No launcher available"
@@ -1047,7 +1053,7 @@ msgstr "पेस्ट"
 
 #: Preferences.java:109
 msgid "Persian"
-msgstr ""
+msgstr "पारसी "
 
 #: debug/Compiler.java:408
 msgid "Please import the SPI library from the Sketch > Import Library menu."
@@ -1119,7 +1125,7 @@ msgstr ""
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:132
 msgid "Problem accessing files in folder "
-msgstr ""
+msgstr "पुस्तिका में फाइलो तक पहुचने में दिक्कत "
 
 #: Base.java:1673
 msgid "Problem getting data folder"
@@ -1139,12 +1145,6 @@ msgstr "बोर्ड मे अपलोड करने मे समस्�
 #: Sketch.java:355 Sketch.java:362 Sketch.java:373
 msgid "Problem with rename"
 msgstr "नाम बदलने में मुश्किल "
-
-#: Editor.java:2137
-msgid ""
-"Arduino can only open its own sketches\n"
-"and other files ending in .ino or .pde"
-msgstr "प्रोसेसिंग  केवल अपने ही स्केचेस खोल सकता है\nऔर दूसरी फाइल्स जिनका अंत .ino अथवा .pde से होता है"
 
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
@@ -1197,7 +1197,7 @@ msgstr ""
 
 #: Preferences.java:114
 msgid "Russian"
-msgstr ""
+msgstr "रूसी "
 
 #: EditorToolbar.java:41 EditorToolbar.java:46 Editor.java:529
 #: Editor.java:2064 Editor.java:2468
@@ -1398,7 +1398,7 @@ msgstr ""
 
 #: Preferences.java:116
 msgid "Tamil"
-msgstr ""
+msgstr "तमिल "
 
 #: debug/Compiler.java:414
 msgid "The 'BYTE' keyword is no longer supported."
@@ -1581,7 +1581,7 @@ msgstr "उपलोड रद्द कर दिया गया "
 
 #: ../../../processing/app/Sketch.java:1678
 msgid "Upload cancelled"
-msgstr ""
+msgstr "अपलोड कैंसिल किया गया "
 
 #: Editor.java:2378
 msgid "Uploading to I/O Board..."
@@ -1698,7 +1698,7 @@ msgstr "आप आज के दिन के नए स्केच के स�
 
 #: Base.java:2638
 msgid "ZIP files or folders"
-msgstr ""
+msgstr "ZIP फाइलें या पुस्तिकाएँ "
 
 #: Base.java:2661
 msgid "Zip doesn't contain a library"
@@ -1713,10 +1713,10 @@ msgstr "\".{0}\" एक वैध एक्ष्तेन्सिओन नह
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Arduino,you may need to use Tools -> Fix Encoding & "
-"Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
-"todelete the bad characters to get rid of this warning."
-msgstr "\"{0}\"अपरिचित अक्षर ,अगर कोड प्रोसस्सिंग के पुराने संकरण में लिखा गया है आपको टूल्स खोलना पड़ेगा उसमे  ->  फिक्स एन्कोडिंग और रीलोड कीजिये ताकि UTF-8 एन्कोडिंग इस्तेमाल हो सके अगर ये सब नहीं करना तो आपको वो अक्षर मिटाने होंगे ताकि यह चेतावनी ना आये "
+"older version of Arduino,you may need to use Tools -> Fix Encoding & Reload "
+"to updatethe sketch to use UTF-8 encoding. If not, you may need todelete the"
+" bad characters to get rid of this warning."
+msgstr ""
 
 #: debug/Compiler.java:409
 msgid ""

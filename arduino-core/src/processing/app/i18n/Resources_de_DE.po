@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2014-02-19 14:46+0000\n"
-"Last-Translator: cmaglie <c.maglie@arduino.cc>\n"
+"PO-Revision-Date: 2015-01-14 17:10+0000\n"
+"Last-Translator: Cristian Maglie <c.maglie@arduino.cc>\n"
 "Language-Team: German (Germany) (http://www.transifex.com/projects/p/arduino-ide-15/language/de_DE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,7 +24,7 @@ msgstr " (erfordert Neustart von Arduino)"
 
 #: debug/Compiler.java:455
 msgid "'Keyboard' only supported on the Arduino Leonardo"
-msgstr "'Keyboard' wird nur vom Arduino Leonardo unterstützt"
+msgstr "'Tastatur' wird nur vom Arduino Leonardo unterstützt"
 
 #: debug/Compiler.java:450
 msgid "'Mouse' only supported on the Arduino Leonardo"
@@ -66,7 +66,7 @@ msgstr "Ein Ordner mit dem Namen \"{0}\" existiert bereits. Der Sketch kann nich
 #: Base.java:2690
 #, java-format
 msgid "A library named {0} already exists"
-msgstr "Eine Library namens {0} existiert nicht"
+msgstr "Eine Bibliothek namens {0} existiert nicht"
 
 #: UpdateCheck.java:103
 msgid ""
@@ -90,7 +90,7 @@ msgstr "Datei hinzufügen"
 
 #: Base.java:963
 msgid "Add Library..."
-msgstr "Library hinzufügen..."
+msgstr "Bibliothek hinzufügen..."
 
 #: tools/FixEncoding.java:77
 msgid ""
@@ -119,11 +119,11 @@ msgstr "Sketch archivieren"
 
 #: tools/Archiver.java:109
 msgid "Archive sketch as:"
-msgstr "Archiviere den Sketch unter ..."
+msgstr "Archiviere den Sketch unter:"
 
 #: tools/Archiver.java:139
 msgid "Archive sketch canceled."
-msgstr "Die Archivierung des Sketches wurde abgebrochen."
+msgstr "Archivierung des Sketches abgebrochen."
 
 #: tools/Archiver.java:75
 msgid ""
@@ -133,11 +133,17 @@ msgstr "Die Archivierung des Sketches wurde abgebrochen, da der\nSketch nicht or
 
 #: ../../../processing/app/I18n.java:83
 msgid "Arduino ARM (32-bits) Boards"
-msgstr "Arduino ARM (32-bit) Boards"
+msgstr "Arduino ARM (32-bit) Platinen"
 
 #: ../../../processing/app/I18n.java:82
 msgid "Arduino AVR Boards"
-msgstr "Arduino AVR Boards"
+msgstr "Arduino AVR Platinen"
+
+#: Editor.java:2137
+msgid ""
+"Arduino can only open its own sketches\n"
+"and other files ending in .ino or .pde"
+msgstr ""
 
 #: Base.java:1682
 msgid ""
@@ -227,18 +233,18 @@ msgstr "Weißrussisch"
 #: ../../../processing/app/Base.java:1433
 #: ../../../processing/app/Editor.java:707
 msgid "Board"
-msgstr "Board"
+msgstr "Platine"
 
 #: ../../../processing/app/debug/TargetBoard.java:42
 #, java-format
 msgid ""
 "Board {0}:{1}:{2} doesn''t define a ''build.board'' preference. Auto-set to:"
 " {3}"
-msgstr "Das Board {0}:{1}:{2} definiert keine \"build.board\"-Einstellung. Sie wurde automatisch auf {3} gesetzt."
+msgstr "Die Platine {0}:{1}:{2} definiert keine \"Build.Platine\"-Einstellung. Sie wurde automatisch auf {3} gesetzt."
 
 #: ../../../processing/app/EditorStatus.java:472
 msgid "Board: "
-msgstr "Board: "
+msgstr "Platine: "
 
 #: ../../../processing/app/Preferences.java:140
 msgid "Bosnian"
@@ -270,7 +276,7 @@ msgstr "Bootloader brennen"
 
 #: Editor.java:2504
 msgid "Burning bootloader to I/O Board (this may take a minute)..."
-msgstr "Brenne Bootloader auf das I/O Board (kann einige Minuten dauern)..."
+msgstr "Brenne Bootloader auf die E/A-Platine (kann einige Minuten dauern)..."
 
 #: ../../../processing/app/Base.java:368
 msgid "Can't open source sketch!"
@@ -336,11 +342,11 @@ msgstr "Kommentieren/Kommentar aufheben"
 #: debug/Compiler.java:49 debug/Uploader.java:45
 #, java-format
 msgid "Compiler error, please submit this code to {0}"
-msgstr "Fehler beim Übersetzen, bitte den Quelltext an {0} senden"
+msgstr "Kompilerfehler, bitte den Quelltext an {0} senden"
 
 #: Sketch.java:1608 Editor.java:1890
 msgid "Compiling sketch..."
-msgstr "Übersetze den Sketch"
+msgstr "Sketch wird kompiliert..."
 
 #: EditorConsole.java:152
 msgid "Console Error"
@@ -373,7 +379,7 @@ msgstr "Konnte nicht an einen korrekten Speicherort kopieren. "
 
 #: Editor.java:2179
 msgid "Could not create the sketch folder."
-msgstr "Der Sketch-Ordner konnte nicht angelegt werden"
+msgstr "Der Sketch-Ordner konnte nicht angelegt werden."
 
 #: Editor.java:2206
 msgid "Could not create the sketch."
@@ -402,12 +408,12 @@ msgstr "Es konnte keine boards.txt in {0} gefunden werden. Ist sie noch von eine
 #: ../../../cc/arduino/packages/uploaders/SerialUploader.java:282
 #, java-format
 msgid "Could not find tool {0}"
-msgstr "Konnte das Tool {0} nicht finden"
+msgstr "Konnte das Werkzeug {0} nicht finden"
 
 #: ../../../cc/arduino/packages/uploaders/SerialUploader.java:278
 #, java-format
 msgid "Could not find tool {0} from package {1}"
-msgstr "Konnte das Tool {0} aus dem Paket {1} nicht finden"
+msgstr "Konnte das Werkzeug {0} aus dem Paket {1} nicht finden"
 
 #: Base.java:1934
 #, java-format
@@ -437,7 +443,7 @@ msgstr "Der Sketch konnte nicht neu gespeichert werden"
 msgid ""
 "Could not read color theme settings.\n"
 "You'll need to reinstall Arduino."
-msgstr "Die Einstellungen für das Farbschema konnten nicht gelesen werden.\nArduino muss neu installiert werden."
+msgstr ""
 
 #: Preferences.java:219
 msgid ""
@@ -494,7 +500,7 @@ msgid ""
 "Couldn't find a Board on the selected port. Check that you have the correct "
 "port selected.  If it is correct, try pressing the board's reset button "
 "after initiating the upload."
-msgstr "An dem ausgewählten Port konnte kein Board gefunden werden,\nbitte die Auswahl des seriellen Ports überprüfen.\nIst diese korrekt, bitte das Board über die Reset-Taste\nnach dem Start des Hochladens neu starten."
+msgstr "An dem ausgewählten Port konnte keine Platine gefunden werden. Bitte überprüfen Sie die korrekte Auswahl des seriellen Ports. Ist diese korrekt, bitte die Platine über die Reset-Taste nach dem Start des Hochladens neu starten."
 
 #: ../../../processing/app/Preferences.java:82
 msgid "Croatian"
@@ -524,7 +530,7 @@ msgstr "Löschen"
 msgid ""
 "Device is not responding, check the right serial port is selected or RESET "
 "the board right before exporting"
-msgstr "Das Gerät reagiert nicht. Entweder ist der falsche Port ausgewählt,\noder das Board muss vor dem Export mit RESET neu gestartet werden"
+msgstr "Das Gerät reagiert nicht. Entweder ist der falsche Port ausgewählt,\noder die Platine muss vor dem Export mit RESET neu gestartet werden"
 
 #: tools/FixEncoding.java:57
 msgid "Discard all changes and reload sketch?"
@@ -548,11 +554,11 @@ msgstr "Der Bootloader wurde gebrannt."
 
 #: Editor.java:1911 Editor.java:1928
 msgid "Done compiling."
-msgstr "Übersetzen abgeschlossen."
+msgstr "Kompilieren abgeschlossen."
 
 #: Editor.java:2564
 msgid "Done printing."
-msgstr "Drucken abgeschlossen"
+msgstr "Drucken abgeschlossen."
 
 #: Editor.java:2395 Editor.java:2431
 msgid "Done uploading."
@@ -602,7 +608,7 @@ msgstr "Fehler beim Hinzufügen der Datei"
 
 #: debug/Compiler.java:369
 msgid "Error compiling."
-msgstr "Fehler beim Übersetzen"
+msgstr "Fehler beim Kompilieren."
 
 #: Base.java:1674
 msgid "Error getting the Arduino data folder."
@@ -830,7 +836,7 @@ msgstr "Groß/Kleinschreibung ignorieren"
 
 #: Base.java:1058
 msgid "Ignoring bad library name"
-msgstr "Der unzulässige Libraryname wurde ignoriert"
+msgstr "Der unzulässige Bibliotheksname wurde ignoriert"
 
 #: Base.java:1436
 msgid "Ignoring sketch with bad name"
@@ -838,7 +844,7 @@ msgstr "Der unzulässige Sketchname wurde ignoriert"
 
 #: Editor.java:636
 msgid "Import Library..."
-msgstr "Library importieren"
+msgstr "Bibliothek importieren..."
 
 #: ../../../processing/app/Sketch.java:736
 msgid ""
@@ -862,7 +868,7 @@ msgstr "Indonesisch"
 #: ../../../processing/app/Base.java:1204
 #, java-format
 msgid "Invalid library found in {0}: {1}"
-msgstr "Ungültige Library {0} in {1} gefunden"
+msgstr "Ungültige Bibliothek {0} in {1} gefunden"
 
 #: Preferences.java:102
 msgid "Italian"
@@ -882,7 +888,7 @@ msgstr "Lettisch"
 
 #: Base.java:2699
 msgid "Library added to your libraries. Check \"Import library\" menu"
-msgstr "Die Library wurde zu Ihren Libraries hinzugefügt. Bitte im Menü \"Library importieren\" nachprüfen "
+msgstr "Die Bibliothek wurde zu Ihren Bibliotheken hinzugefügt. Bitte im Menü \"Bibliothek importieren\" nachprüfen "
 
 #: Preferences.java:106
 msgid "Lithuaninan"
@@ -902,7 +908,7 @@ msgstr "Mitteilung"
 
 #: ../../../processing/app/preproc/PdePreprocessor.java:412
 msgid "Missing the */ from the end of a /* comment */"
-msgstr ""
+msgstr "Das */ am Ende eines /* Kommentars */ fehlt"
 
 #: Preferences.java:449
 msgid "More preferences can be edited directly in the file"
@@ -950,7 +956,7 @@ msgstr "Nein"
 
 #: debug/Compiler.java:126
 msgid "No board selected; please choose a board from the Tools > Board menu."
-msgstr "Kein Board ausgewählt; bitte ein Board unter Werkzeuge > Board auswählen"
+msgstr "Keine Platine ausgewählt; bitte eine Platine unter Werkzeuge > Platine auswählen"
 
 #: tools/format/src/AutoFormat.java:54 tools/AutoFormat.java:916
 msgid "No changes necessary for Auto Format."
@@ -988,7 +994,7 @@ msgstr "Im Ordner {0} wurden keine gültigen Hardwaredefinitionen gefunden."
 
 #: Base.java:191
 msgid "Non-fatal error while setting the Look & Feel."
-msgstr "Kleiner Fehler beim Einstellen des Look & Feel."
+msgstr "Kleiner Fehler beim Einstellen des Erscheinungsbildes."
 
 #: Sketch.java:396 Sketch.java:410 Sketch.java:419 Sketch.java:859
 msgid "Nope"
@@ -1051,7 +1057,7 @@ msgstr "Persisch"
 
 #: debug/Compiler.java:408
 msgid "Please import the SPI library from the Sketch > Import Library menu."
-msgstr "Bitte die Bibliothek SPI aus dem Sketch > Library importieren-Menü importieren"
+msgstr "Bitte die Bibliothek SPI aus dem Sketch > Bibliothek importieren-Menü importieren"
 
 #: Base.java:239
 msgid "Please install JDK 1.5 or later"
@@ -1115,7 +1121,7 @@ msgstr "Problem beim Aufbau der Plattform"
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:136
 msgid "Problem accessing board folder /www/sd"
-msgstr "Problem beim Zugriff auf den Board-Ordner /www/sd"
+msgstr "Problem beim Zugriff auf den Platinenordner /www/sd"
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:132
 msgid "Problem accessing files in folder "
@@ -1128,23 +1134,17 @@ msgstr "Probleme beim Zugriff auf den Datenordner"
 #: Sketch.java:1467
 #, java-format
 msgid "Problem moving {0} to the build folder"
-msgstr "Probleme beim Verschieben von {0} in den build-Ordner"
+msgstr "Probleme beim Verschieben von {0} in den Build-Ordner"
 
 #: debug/Uploader.java:209
 msgid ""
 "Problem uploading to board.  See "
 "http://www.arduino.cc/en/Guide/Troubleshooting#upload for suggestions."
-msgstr "Probleme beim Hochladen auf das Board. Hilfestellung dazu unter http://www.arduino.cc/en/Guide/Troubleshooting#upload ."
+msgstr "Probleme beim Hochladen auf die Platine. Hilfestellung dazu unter http://www.arduino.cc/en/Guide/Troubleshooting#upload ."
 
 #: Sketch.java:355 Sketch.java:362 Sketch.java:373
 msgid "Problem with rename"
 msgstr "Problem beim Umbenennen"
-
-#: Editor.java:2137
-msgid ""
-"Arduino can only open its own sketches\n"
-"and other files ending in .ino or .pde"
-msgstr "Arduino kann nur seine eigenen Dateien öffnen,\nsowie Dateien mit der Endung .ino oder .pde"
 
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
@@ -1239,7 +1239,7 @@ msgstr "Alles auswählen"
 
 #: Base.java:2636
 msgid "Select a zip file or a folder containing the library you'd like to add"
-msgstr "Bitte die zip-Datei oder einen Ordner mit der Library auswählen"
+msgstr "Bitte die zip-Datei oder einen Ordner mit der Bibliothek auswählen"
 
 #: Sketch.java:975
 msgid "Select an image or other data file to copy to your sketch"
@@ -1251,7 +1251,7 @@ msgstr "Neuen Speicherort für das Sketchbook auswählen"
 
 #: ../../../processing/app/debug/Compiler.java:146
 msgid "Selected board depends on '{0}' core (not installed)."
-msgstr "Das ausgewählte Board benötigt den '{0}'-Kern (nicht installiert)."
+msgstr "Die ausgewählte Platine benötigt den '{0}'-Kern (nicht installiert)."
 
 #: SerialMonitor.java:93
 msgid "Send"
@@ -1360,7 +1360,7 @@ msgstr "Sketche (*.ino, *.pde)"
 
 #: ../../../processing/app/Preferences.java:152
 msgid "Slovenian"
-msgstr "Slovenisch"
+msgstr "Slowenisch"
 
 #: Sketch.java:275 Sketch.java:304 Sketch.java:578 Sketch.java:967
 msgid ""
@@ -1402,19 +1402,19 @@ msgstr "Tamilisch"
 
 #: debug/Compiler.java:414
 msgid "The 'BYTE' keyword is no longer supported."
-msgstr "'BYTE' wird nicht länger unterstützt"
+msgstr "Das 'BYTE' Schlüsselwort wird nicht mehr unterstützt."
 
 #: debug/Compiler.java:426
 msgid "The Client class has been renamed EthernetClient."
-msgstr "Die Klasse Client wurde in EthernetClient umbenannt"
+msgstr "Die Klasse Client wurde in EthernetClient umbenannt."
 
 #: debug/Compiler.java:420
 msgid "The Server class has been renamed EthernetServer."
-msgstr "Die Klasse Server wurde in EthernetServer umbenannt"
+msgstr "Die Klasse Server wurde in EthernetServer umbenannt."
 
 #: debug/Compiler.java:432
 msgid "The Udp class has been renamed EthernetUdp."
-msgstr "Die Klasse Udp wurde in EthernetUdp umbenannt"
+msgstr "Die Klasse Udp wurde in EthernetUdp umbenannt."
 
 #: Base.java:192
 msgid "The error message follows, however Arduino should run fine."
@@ -1434,7 +1434,7 @@ msgid ""
 "The library \"{0}\" cannot be used.\n"
 "Library names must contain only basic letters and numbers.\n"
 "(ASCII only and no spaces, and it cannot start with a number)"
-msgstr "Der Libraryname \"{0}\" kann nicht verwendet werden.\nSie dürfen nur Zeichen oder Zahlen enthalten, keine Sonderzeichen\n(nur ASCII Zeichen, keine Leerzeichen und keine Zahl am Anfang)"
+msgstr "Der Bibliotheksname \"{0}\" kann nicht verwendet werden.\nSie dürfen nur Zeichen oder Zahlen enthalten, keine Sonderzeichen\n(nur ASCII-Zeichen, keine Leerzeichen und keine Zahl am Anfang)"
 
 #: Sketch.java:374
 msgid ""
@@ -1516,11 +1516,11 @@ msgstr "Türkisch"
 
 #: ../../../processing/app/Editor.java:2507
 msgid "Type board password to access its console"
-msgstr "Tippe das Boardpasswort ein, um die Konsole aufzurufen"
+msgstr "Tippen Sie das Platinenpasswort ein, um die Konsole aufzurufen"
 
 #: ../../../processing/app/Sketch.java:1673
 msgid "Type board password to upload a new sketch"
-msgstr "Tippe das Boardpasswort ein, um einen neuen Sketch hochzuladen"
+msgstr "Tippen Sie das Platinenpasswort ein, um einen neuen Sketch hochzuladen"
 
 #: ../../../processing/app/Preferences.java:118
 msgid "Ukrainian"
@@ -1585,7 +1585,7 @@ msgstr "Hochladen abgebrochen"
 
 #: Editor.java:2378
 msgid "Uploading to I/O Board..."
-msgstr "Hochladen zum I/O Board..."
+msgstr "Hochladen zur E/A-Platine..."
 
 #: Sketch.java:1622
 msgid "Uploading..."
@@ -1607,7 +1607,7 @@ msgstr "Verwende die Bibliothek {0} im Ordner: {1} {2}"
 #: ../../../processing/app/debug/Compiler.java:320
 #, java-format
 msgid "Using previously compiled file: {0}"
-msgstr "Verwende die bereits übersetzte Datei: {0}"
+msgstr "Verwende die zuvor kompilierte Datei: {0}"
 
 #: EditorToolbar.java:41 EditorToolbar.java:46
 msgid "Verify"
@@ -1615,7 +1615,7 @@ msgstr "Verifizieren"
 
 #: Editor.java:609
 msgid "Verify / Compile"
-msgstr "Prüfen / Übersetzen"
+msgstr "Überprüfen / Kompilieren"
 
 #: Preferences.java:400
 msgid "Verify code after upload"
@@ -1639,7 +1639,7 @@ msgstr "Wire.receive() wurde in Wire.read() umbenannt"
 
 #: debug/Compiler.java:438
 msgid "Wire.send() has been renamed Wire.write()."
-msgstr "Wire.send() wurde in Wire.write() umbenannt"
+msgstr "Wire.send() wurde in Wire.write() umbenannt."
 
 #: FindReplace.java:105
 msgid "Wrap Around"
@@ -1649,7 +1649,7 @@ msgstr "Umbruch"
 msgid ""
 "Wrong microcontroller found.  Did you select the right board from the Tools "
 "> Board menu?"
-msgstr "Falscher Microcontroller gefunden. Ist das richtige Board im Menü Werkzeuge > Board ausgewählt?"
+msgstr "Falscher Mikrocontroller gefunden. Ist die richtige Platine im Menü Werkzeuge > Platine ausgewählt?"
 
 #: Preferences.java:77 UpdateCheck.java:108
 msgid "Yes"
@@ -1702,7 +1702,7 @@ msgstr "ZIP-Dateien oder Ordner"
 
 #: Base.java:2661
 msgid "Zip doesn't contain a library"
-msgstr "Zip enthält keine Library"
+msgstr "Zip enthält keine Bibliothek"
 
 #: Sketch.java:364
 #, java-format
@@ -1713,10 +1713,10 @@ msgstr "\".{0}\" ist keine zulässige Dateiendung"
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Arduino,you may need to use Tools -> Fix Encoding & "
-"Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
-"todelete the bad characters to get rid of this warning."
-msgstr "\"{0}\" enthält unzulässige Zeichen. Wenn dieser Code mit einer älteren Version\nvon Arduino erstellt wurde, können Sie den Sketch über Werkzeuge -> Kodierung korrigieren\n& neu laden auf UTF-8-Kodierung umstellen.\nWenn das nicht funktioniert, müssen Sie die unzulässigen Zeichen von Hand löschen,\num diese Warnung abzuschalten."
+"older version of Arduino,you may need to use Tools -> Fix Encoding & Reload "
+"to updatethe sketch to use UTF-8 encoding. If not, you may need todelete the"
+" bad characters to get rid of this warning."
+msgstr ""
 
 #: debug/Compiler.java:409
 msgid ""
@@ -1724,7 +1724,7 @@ msgid ""
 "As of Arduino 0019, the Ethernet library depends on the SPI library.\n"
 "You appear to be using it or another library that depends on the SPI library.\n"
 "\n"
-msgstr "\nSeit Arduino 0019 ist die Ethernet-Library von der SPI Bibliothek anhängig.\nEs sieht so aus, als würden Sie diese benutzen oder eine Library einsetzen, welche von der SPI-Library abhängt.\n\n"
+msgstr "\nSeit Arduino 0019 ist die Ethernet-Bibliothek von der SPI-Bibliothek abhängig.\nEs sieht so aus, als würden Sie diese benutzen oder eine Bibliothek einsetzen, welche von der SPI-Bibliothek abhängt.\n\n"
 
 #: debug/Compiler.java:415
 msgid ""
@@ -1732,28 +1732,28 @@ msgid ""
 "As of Arduino 1.0, the 'BYTE' keyword is no longer supported.\n"
 "Please use Serial.write() instead.\n"
 "\n"
-msgstr "\nSeit Arduino 1.0 wird 'BYTE' nicht weiter unterstützt.\nBitte stattdessen Serial.write() verwenden.\n\n"
+msgstr "\nSeit Arduino 1.0 wird der 'BYTE' Schlüsselwort nicht mehr unterstützt.\nBitte verwenden Sie stattdessen Serial.write().\n\n"
 
 #: debug/Compiler.java:427
 msgid ""
 "\n"
 "As of Arduino 1.0, the Client class in the Ethernet library has been renamed to EthernetClient.\n"
 "\n"
-msgstr "\nSeit Arduino 1.0 heißt die Klasse \"Client\" in der Ethernet-Library \"EthernetClient\" umbenannt.\n\n"
+msgstr "\nMit Arduino 1.0 wurde die Klasse \"Client\" in der Ethernet-Bibliothek in \"EthernetClient\" umbenannt.\n\n"
 
 #: debug/Compiler.java:421
 msgid ""
 "\n"
 "As of Arduino 1.0, the Server class in the Ethernet library has been renamed to EthernetServer.\n"
 "\n"
-msgstr "\nSeit Arduino 1.0 heißt die Klasse \"Server\" in der Ethernet-Library \"EthernetServer\" umbenannt.\n\n"
+msgstr "\nMit Arduino 1.0 wurde die Klasse \"Server\" in der Ethernet-Bibliothek in \"EthernetServer\" umbenannt.\n\n"
 
 #: debug/Compiler.java:433
 msgid ""
 "\n"
 "As of Arduino 1.0, the Udp class in the Ethernet library has been renamed to EthernetUdp.\n"
 "\n"
-msgstr "\nSeit Arduino 1.0 heißt die Klasse \"Udp\" in der Ethernet-Library \"EthernetUdp\" umbenannt.\n\n"
+msgstr "\nMit Arduino 1.0 wurde die Klasse \"Udp\" in der Ethernet-Bibliothek in \"EthernetUdp\" umbenannt.\n\n"
 
 #: debug/Compiler.java:445
 msgid ""
@@ -1775,7 +1775,7 @@ msgstr "Baud"
 
 #: Preferences.java:389
 msgid "compilation "
-msgstr "Übersetzung"
+msgstr "Kompilierung"
 
 #: ../../../processing/app/NetworkMonitor.java:111
 msgid "connected!"
@@ -1849,7 +1849,7 @@ msgstr "serialMenu ist null"
 #, java-format
 msgid ""
 "the selected serial port {0} does not exist or your board is not connected"
-msgstr "Der gewählte serielle Port {0} existiert nicht oder das Board ist nicht angeschlossen"
+msgstr "Der gewählte serielle Port {0} existiert nicht oder die Platine ist nicht angeschlossen"
 
 #: Preferences.java:391
 msgid "upload"

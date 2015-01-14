@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2014-02-19 14:46+0000\n"
-"Last-Translator: cmaglie <c.maglie@arduino.cc>\n"
+"PO-Revision-Date: 2015-01-14 17:10+0000\n"
+"Last-Translator: Cristian Maglie <c.maglie@arduino.cc>\n"
 "Language-Team: Danish (Denmark) (http://www.transifex.com/projects/p/arduino-ide-15/language/da_DK/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -89,7 +89,7 @@ msgstr "Tilføj fil..."
 
 #: Base.java:963
 msgid "Add Library..."
-msgstr ""
+msgstr "Tilføj bibliotek..."
 
 #: tools/FixEncoding.java:77
 msgid ""
@@ -114,15 +114,15 @@ msgstr ""
 
 #: tools/Archiver.java:48
 msgid "Archive Sketch"
-msgstr ""
+msgstr "Arkivér skitse"
 
 #: tools/Archiver.java:109
 msgid "Archive sketch as:"
-msgstr ""
+msgstr "Arkivér skitse som:"
 
 #: tools/Archiver.java:139
 msgid "Archive sketch canceled."
-msgstr ""
+msgstr "Arkivering af skitsen annulleret."
 
 #: tools/Archiver.java:75
 msgid ""
@@ -136,6 +136,12 @@ msgstr ""
 
 #: ../../../processing/app/I18n.java:82
 msgid "Arduino AVR Boards"
+msgstr ""
+
+#: Editor.java:2137
+msgid ""
+"Arduino can only open its own sketches\n"
+"and other files ending in .ino or .pde"
 msgstr ""
 
 #: Base.java:1682
@@ -180,27 +186,27 @@ msgstr ""
 
 #: tools/AutoFormat.java:91
 msgid "Auto Format"
-msgstr ""
+msgstr "Automatisk formatering"
 
 #: tools/AutoFormat.java:934
 msgid "Auto Format Canceled: Too many left curly braces."
-msgstr ""
+msgstr "Automatisk formatering afbrudt: For mange venstre Tuborgparenteser."
 
 #: tools/AutoFormat.java:925
 msgid "Auto Format Canceled: Too many left parentheses."
-msgstr ""
+msgstr "Automatisk formatering afbrudt: For mange venstre parenteser."
 
 #: tools/AutoFormat.java:931
 msgid "Auto Format Canceled: Too many right curly braces."
-msgstr ""
+msgstr "Automatisk formatering afbrudt: For mange højre Tuborgparenteser."
 
 #: tools/AutoFormat.java:922
 msgid "Auto Format Canceled: Too many right parentheses."
-msgstr ""
+msgstr "Automatisk formatering afbrudt: For mange højre parenteser."
 
 #: tools/AutoFormat.java:944
 msgid "Auto Format finished."
-msgstr ""
+msgstr "Automatisk formatering udført."
 
 #: Preferences.java:439
 msgid "Automatically associate .ino files with Arduino"
@@ -282,7 +288,7 @@ msgstr ""
 #: Preferences.java:79 Sketch.java:585 Sketch.java:737 Sketch.java:1042
 #: Editor.java:2064 Editor.java:2145 Editor.java:2465
 msgid "Cancel"
-msgstr "Afbryd"
+msgstr "Annuller"
 
 #: Sketch.java:455
 msgid "Cannot Rename"
@@ -318,11 +324,11 @@ msgstr ""
 
 #: Preferences.java:88
 msgid "Chinese Simplified"
-msgstr "Kinesisk Simpel"
+msgstr "Kinesisk, simpel"
 
 #: Preferences.java:89
 msgid "Chinese Traditional"
-msgstr "Kinesisk traditionel"
+msgstr "Kinesisk, traditionel"
 
 #: Editor.java:521 Editor.java:2024
 msgid "Close"
@@ -347,11 +353,11 @@ msgstr ""
 
 #: Editor.java:1157 Editor.java:2707
 msgid "Copy"
-msgstr "Kopiere"
+msgstr "Kopier"
 
 #: Editor.java:1177 Editor.java:2723
 msgid "Copy as HTML"
-msgstr "Kopiere som HTML"
+msgstr "Kopier som HTML"
 
 #: ../../../processing/app/EditorStatus.java:455
 msgid "Copy error messages"
@@ -359,7 +365,7 @@ msgstr ""
 
 #: Editor.java:1165 Editor.java:2715
 msgid "Copy for Forum"
-msgstr "Kopiere fra forum"
+msgstr "Kopier til forum"
 
 #: Sketch.java:1089
 #, java-format
@@ -763,7 +769,7 @@ msgstr "Tysk"
 
 #: Editor.java:1054
 msgid "Getting Started"
-msgstr "Kom igang"
+msgstr "Kom i gang"
 
 #: ../../../processing/app/Sketch.java:1646
 #, java-format
@@ -1014,27 +1020,27 @@ msgstr ""
 
 #: EditorToolbar.java:41
 msgid "Open"
-msgstr "Åben"
+msgstr "Åbn"
 
 #: Editor.java:2688
 msgid "Open URL"
-msgstr "Åben URL"
+msgstr "Åbn URL"
 
 #: Base.java:636
 msgid "Open an Arduino sketch..."
-msgstr ""
+msgstr "Åbn en Arduino skitse..."
 
 #: EditorToolbar.java:46
 msgid "Open in Another Window"
-msgstr "Åben i nyt vindue"
+msgstr "Åbn i nyt vindue"
 
 #: Base.java:903 Editor.java:501
 msgid "Open..."
-msgstr "Åben..."
+msgstr "Åbn..."
 
 #: Editor.java:563
 msgid "Page Setup"
-msgstr "Side opsætning"
+msgstr "Sideopsætning"
 
 #: ../../../processing/app/forms/PasswordAuthorizationDialog.java:44
 msgid "Password:"
@@ -1090,19 +1096,19 @@ msgstr ""
 
 #: Editor.java:571
 msgid "Print"
-msgstr "Print"
+msgstr "Udskriv"
 
 #: Editor.java:2571
 msgid "Printing canceled."
-msgstr "Print annulleret"
+msgstr "Udskrift annulleret"
 
 #: Editor.java:2547
 msgid "Printing..."
-msgstr "Printer..."
+msgstr "Udskriver..."
 
 #: Base.java:1957
 msgid "Problem Opening Folder"
-msgstr "Problem med at åbne biblotek"
+msgstr "Problem med at åbne mappe"
 
 #: Base.java:1933
 msgid "Problem Opening URL"
@@ -1122,7 +1128,7 @@ msgstr ""
 
 #: Base.java:1673
 msgid "Problem getting data folder"
-msgstr "Problem med at åbne data bibloteket"
+msgstr "Problem med at åbne datamappe"
 
 #: Sketch.java:1467
 #, java-format
@@ -1138,12 +1144,6 @@ msgstr ""
 #: Sketch.java:355 Sketch.java:362 Sketch.java:373
 msgid "Problem with rename"
 msgstr "Problem med at omdøde"
-
-#: Editor.java:2137
-msgid ""
-"Arduino can only open its own sketches\n"
-"and other files ending in .ino or .pde"
-msgstr ""
 
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
@@ -1697,7 +1697,7 @@ msgstr ""
 
 #: Base.java:2638
 msgid "ZIP files or folders"
-msgstr "ZIP filer eller biblioteker"
+msgstr "ZIP filer eller mapper"
 
 #: Base.java:2661
 msgid "Zip doesn't contain a library"
@@ -1712,9 +1712,9 @@ msgstr ""
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Arduino,you may need to use Tools -> Fix Encoding & "
-"Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
-"todelete the bad characters to get rid of this warning."
+"older version of Arduino,you may need to use Tools -> Fix Encoding & Reload "
+"to updatethe sketch to use UTF-8 encoding. If not, you may need todelete the"
+" bad characters to get rid of this warning."
 msgstr ""
 
 #: debug/Compiler.java:409

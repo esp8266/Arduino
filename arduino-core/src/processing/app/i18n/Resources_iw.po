@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2014-02-19 14:46+0000\n"
-"Last-Translator: cmaglie <c.maglie@arduino.cc>\n"
+"PO-Revision-Date: 2015-01-14 17:10+0000\n"
+"Last-Translator: Cristian Maglie <c.maglie@arduino.cc>\n"
 "Language-Team: Hebrew (http://www.transifex.com/projects/p/arduino-ide-15/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -138,6 +138,12 @@ msgstr "לוחות ARM ארדווינו (32 - סיביות)"
 msgid "Arduino AVR Boards"
 msgstr "לוחות ארדווינו AVR"
 
+#: Editor.java:2137
+msgid ""
+"Arduino can only open its own sketches\n"
+"and other files ending in .ino or .pde"
+msgstr ""
+
 #: Base.java:1682
 msgid ""
 "Arduino cannot run because it could not\n"
@@ -159,7 +165,7 @@ msgstr "ארדואינו דורש JDK מלא (לא רק JRE) כדי לרוץ.\n�
 
 #: ../../../processing/app/EditorStatus.java:471
 msgid "Arduino: "
-msgstr ""
+msgstr "ארדואינו:"
 
 #: Sketch.java:588
 #, java-format
@@ -172,11 +178,11 @@ msgstr "האם אתה בטוח שאתה רוצה למחוק את הסקיצה ה
 
 #: ../../../processing/app/Preferences.java:137
 msgid "Armenian"
-msgstr ""
+msgstr "ארמנית"
 
 #: ../../../processing/app/Preferences.java:138
 msgid "Asturian"
-msgstr ""
+msgstr "אוסטרית"
 
 #: tools/AutoFormat.java:91
 msgid "Auto Format"
@@ -221,7 +227,7 @@ msgstr "נבחר קובץ לא תקין"
 
 #: ../../../processing/app/Preferences.java:139
 msgid "Belarusian"
-msgstr ""
+msgstr "בלארוסית"
 
 #: ../../../processing/app/Base.java:1433
 #: ../../../processing/app/Editor.java:707
@@ -233,15 +239,15 @@ msgstr "לוח"
 msgid ""
 "Board {0}:{1}:{2} doesn''t define a ''build.board'' preference. Auto-set to:"
 " {3}"
-msgstr ""
+msgstr "לוח {0}:{1}:{2} אינו מסוגל להגדיר את העדפת \"build.board\". שונה-אוטומטית ל: {3}"
 
 #: ../../../processing/app/EditorStatus.java:472
 msgid "Board: "
-msgstr ""
+msgstr "לוח:"
 
 #: ../../../processing/app/Preferences.java:140
 msgid "Bosnian"
-msgstr ""
+msgstr "בוסנית"
 
 #: SerialMonitor.java:112
 msgid "Both NL & CR"
@@ -261,7 +267,7 @@ msgstr "בולגרית"
 
 #: ../../../processing/app/Preferences.java:141
 msgid "Burmese (Myanmar)"
-msgstr ""
+msgstr "ב"
 
 #: Editor.java:708
 msgid "Burn Bootloader"
@@ -302,19 +308,19 @@ msgstr "בדוק עדכונים בהפעלה"
 
 #: ../../../processing/app/Preferences.java:142
 msgid "Chinese (China)"
-msgstr ""
+msgstr "סינית (סין(מנדרינית))"
 
 #: ../../../processing/app/Preferences.java:142
 msgid "Chinese (Hong Kong)"
-msgstr ""
+msgstr "סינית (הונג קונג(יְוֵה))"
 
 #: ../../../processing/app/Preferences.java:144
 msgid "Chinese (Taiwan)"
-msgstr ""
+msgstr "סינית (טאיוואן (מִין))"
 
 #: ../../../processing/app/Preferences.java:143
 msgid "Chinese (Taiwan) (Big5)"
-msgstr ""
+msgstr "סין (טיוואן) (Big5)"
 
 #: Preferences.java:88
 msgid "Chinese Simplified"
@@ -355,7 +361,7 @@ msgstr "העתק כ HTML"
 
 #: ../../../processing/app/EditorStatus.java:455
 msgid "Copy error messages"
-msgstr ""
+msgstr "העתק הודעות שגיאה"
 
 #: Editor.java:1165 Editor.java:2715
 msgid "Copy for Forum"
@@ -396,17 +402,17 @@ msgstr "לא ניתן למחוק את {0}"
 #: ../../../processing/app/debug/TargetPlatform.java:74
 #, java-format
 msgid "Could not find boards.txt in {0}. Is it pre-1.5?"
-msgstr ""
+msgstr "לא ניתן למצוא את  boards.txt ב{0}. Is it pre-1.5?"
 
 #: ../../../cc/arduino/packages/uploaders/SerialUploader.java:282
 #, java-format
 msgid "Could not find tool {0}"
-msgstr ""
+msgstr "לא ניתן למצוא את הכלי {0}"
 
 #: ../../../cc/arduino/packages/uploaders/SerialUploader.java:278
 #, java-format
 msgid "Could not find tool {0} from package {1}"
-msgstr ""
+msgstr "לא ניתן למצוא את הכלי {0} מחבילה {1}"
 
 #: Base.java:1934
 #, java-format
@@ -436,7 +442,7 @@ msgstr "לא ניתן לשמור מחדש את הסקיצה"
 msgid ""
 "Could not read color theme settings.\n"
 "You'll need to reinstall Arduino."
-msgstr "לא נית לקרוא את הגדרות ערכת הצבעים.\nצריך להתקין מחדש עיבוד."
+msgstr ""
 
 #: Preferences.java:219
 msgid ""
@@ -531,7 +537,7 @@ msgstr "להתעלם מכל השינויים ולטעון מחדש את הסקי
 
 #: ../../../processing/app/Preferences.java:438
 msgid "Display line numbers"
-msgstr ""
+msgstr "הצג מספור שורות"
 
 #: Editor.java:2064
 msgid "Don't Save"
@@ -563,7 +569,7 @@ msgstr "הולנדית"
 
 #: ../../../processing/app/Preferences.java:144
 msgid "Dutch (Netherlands)"
-msgstr ""
+msgstr "נורבגית (נורבגיה)"
 
 #: Editor.java:1130
 msgid "Edit"
@@ -583,7 +589,7 @@ msgstr "אנגלית"
 
 #: ../../../processing/app/Preferences.java:145
 msgid "English (United Kingdom)"
-msgstr ""
+msgstr "אנגלית (הממלכה המאוחדת)"
 
 #: Editor.java:1062
 msgid "Environment"
@@ -614,14 +620,14 @@ msgstr "שגיאה בסיריאל. {0}()"
 
 #: ../../../processing/app/Base.java:1232
 msgid "Error loading libraries"
-msgstr ""
+msgstr "שגיאה בטעינה הספריות"
 
 #: ../../../processing/app/debug/TargetPlatform.java:95
 #: ../../../processing/app/debug/TargetPlatform.java:106
 #: ../../../processing/app/debug/TargetPlatform.java:117
 #, java-format
 msgid "Error loading {0}"
-msgstr ""
+msgstr "שגיאה בטעינה {0}"
 
 #: Serial.java:181
 #, java-format
@@ -641,7 +647,7 @@ msgstr "ארעה שגיאה בקריאת קובץ ההעדפות.\nאנא מחק
 
 #: ../../../cc/arduino/packages/DiscoveryManager.java:25
 msgid "Error starting discovery method: "
-msgstr ""
+msgstr "שגיאה בהתחלת הליך גילוי:"
 
 #: Serial.java:125
 #, java-format
@@ -654,7 +660,7 @@ msgstr "שגיאה אירעה בעת צריבת תוכנת הפעלה."
 
 #: ../../../processing/app/Editor.java:2555
 msgid "Error while burning bootloader: missing '{0}' configuration parameter"
-msgstr ""
+msgstr "שגיה במהלך צריבת bootloader: פרמטר הגדרות '{0}' חסר"
 
 #: SketchCode.java:83
 #, java-format
@@ -668,7 +674,7 @@ msgstr "שגיאה בתהליך ההדפסה."
 #: ../../../processing/app/Editor.java:2409
 #: ../../../processing/app/Editor.java:2449
 msgid "Error while uploading: missing '{0}' configuration parameter"
-msgstr ""
+msgstr "שגיאה במהלך העלאת תכנית: פרמטר הגדרות '{0}' חסר"
 
 #: Preferences.java:93
 msgid "Estonian"
@@ -676,7 +682,7 @@ msgstr "אסטונית"
 
 #: ../../../processing/app/Preferences.java:146
 msgid "Estonian (Estonia)"
-msgstr ""
+msgstr "אסטונית (אסטוניה)"
 
 #: Editor.java:516
 msgid "Examples"
@@ -724,7 +730,7 @@ msgstr "חפש:"
 
 #: ../../../processing/app/Preferences.java:147
 msgid "Finnish"
-msgstr ""
+msgstr "פינית"
 
 #: tools/FixEncoding.java:41 tools/FixEncoding.java:58
 #: tools/FixEncoding.java:79
@@ -770,12 +776,12 @@ msgstr "מתחילים"
 msgid ""
 "Global variables use {0} bytes ({2}%%) of dynamic memory, leaving {3} bytes "
 "for local variables. Maximum is {1} bytes."
-msgstr ""
+msgstr "משתנים גלובלים משתמשים ב-{0} בייט ({2}%%) של זיכרון דינמי, משאיר {3} בייט לאחסון משתנים מקומיים. מרב המקום הוא {1} בייטים."
 
 #: ../../../processing/app/Sketch.java:1651
 #, java-format
 msgid "Global variables use {0} bytes of dynamic memory."
-msgstr ""
+msgstr "משתמשים גלובלים משתמשים ב{0} בייט של זכרון דינמי."
 
 #: Preferences.java:98
 msgid "Greek"
@@ -848,7 +854,7 @@ msgid ""
 "disable this in the Preferences dialog.\n"
 "\n"
 "Save sketch and update its extension?"
-msgstr ""
+msgstr "בארדואינו גרסה 1.0, סיומת הקובץ לברירת המחדל השתנתה\nמסיומת .pde לסיומת .ino. סקיצות חדשות (כולל אלו שנוצרו ע\"י\nלחיצה על \"שמירה בשם\") ישתמשו בסיומת החדשה. הסיומת של\nקבצים ישנים תעודכן במהלך שמירה, אולם ניתן לבטל אפשרות זו\nבחלון ההעדפות.\n\nלשמור סקיצה זו ולעדכן את הסיומת שלה?"
 
 #: Editor.java:1216 Editor.java:2757
 msgid "Increase Indent"
@@ -861,7 +867,7 @@ msgstr "אינדונזית"
 #: ../../../processing/app/Base.java:1204
 #, java-format
 msgid "Invalid library found in {0}: {1}"
-msgstr ""
+msgstr "ספרייה לא קבילה נמצאה ב{0}: {1}"
 
 #: Preferences.java:102
 msgid "Italian"
@@ -889,7 +895,7 @@ msgstr "ליטאית"
 
 #: ../../../processing/app/Sketch.java:1660
 msgid "Low memory available, stability problems may occur"
-msgstr ""
+msgstr "זכרון זמין נמוך, בעיות יציבות עלולות להופיע."
 
 #: Preferences.java:107
 msgid "Marathi"
@@ -901,7 +907,7 @@ msgstr "הודעה"
 
 #: ../../../processing/app/preproc/PdePreprocessor.java:412
 msgid "Missing the */ from the end of a /* comment */"
-msgstr ""
+msgstr "חסר סימן /* מסוף /* הערה*/"
 
 #: Preferences.java:449
 msgid "More preferences can be edited directly in the file"
@@ -917,11 +923,11 @@ msgstr "שם קובץ חדש:"
 
 #: ../../../processing/app/Preferences.java:149
 msgid "Nepali"
-msgstr ""
+msgstr "נפאלית"
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:51
 msgid "Network upload using programmer not supported"
-msgstr ""
+msgstr "העלאת רשת בשימוש דרך (?) אינה נתמכת."
 
 #: EditorToolbar.java:41 Editor.java:493
 msgid "New"
@@ -978,7 +984,7 @@ msgstr "אין ייחוס זמין ל \"{0}\""
 
 #: ../../../processing/app/Base.java:309
 msgid "No valid configured cores found! Exiting..."
-msgstr ""
+msgstr "לא נמצאו ליבות תקינות-מוגדרות! יוצא..."
 
 #: ../../../processing/app/debug/TargetPackage.java:63
 #, java-format
@@ -1038,7 +1044,7 @@ msgstr "הגדרות עמוד"
 
 #: ../../../processing/app/forms/PasswordAuthorizationDialog.java:44
 msgid "Password:"
-msgstr ""
+msgstr "סיסמה:"
 
 #: Editor.java:1189 Editor.java:2731
 msgid "Paste"
@@ -1062,19 +1068,19 @@ msgstr "פולנית"
 
 #: ../../../processing/app/Editor.java:718
 msgid "Port"
-msgstr ""
+msgstr "פתחה"
 
 #: ../../../processing/app/Preferences.java:151
 msgid "Portugese"
-msgstr ""
+msgstr "פורטוגזית"
 
 #: ../../../processing/app/Preferences.java:127
 msgid "Portuguese (Brazil)"
-msgstr ""
+msgstr "פורטוגזית (ברזיל)"
 
 #: ../../../processing/app/Preferences.java:128
 msgid "Portuguese (Portugal)"
-msgstr ""
+msgstr "פורטוגזית (פורטוגל)"
 
 #: Preferences.java:295 Editor.java:583
 msgid "Preferences"
@@ -1138,12 +1144,6 @@ msgstr "בעיה בטעינה ללוח בקר ב: http://www.arduino.cc/en/Guide
 #: Sketch.java:355 Sketch.java:362 Sketch.java:373
 msgid "Problem with rename"
 msgstr "בעיה בשינוי שם"
-
-#: Editor.java:2137
-msgid ""
-"Arduino can only open its own sketches\n"
-"and other files ending in .ino or .pde"
-msgstr "העיבוד יכול לפתוח רק את הסקיצות של עצמו\nוקבצים שמסתיימים ב ino. או pde."
 
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
@@ -1389,7 +1389,7 @@ msgstr "אור שמש"
 
 #: ../../../processing/app/Preferences.java:153
 msgid "Swedish"
-msgstr ""
+msgstr "שבדית"
 
 #: Preferences.java:84
 msgid "System Default"
@@ -1580,7 +1580,7 @@ msgstr "העלאה בוטלה."
 
 #: ../../../processing/app/Sketch.java:1678
 msgid "Upload cancelled"
-msgstr ""
+msgstr "העלאה בוטלה"
 
 #: Editor.java:2378
 msgid "Uploading to I/O Board..."
@@ -1622,7 +1622,7 @@ msgstr "אמת את הקוד בסיום ההעלאה"
 
 #: ../../../processing/app/Preferences.java:154
 msgid "Vietnamese"
-msgstr ""
+msgstr "וויאטנאמית"
 
 #: Editor.java:1105
 msgid "Visit Arduino.cc"
@@ -1712,10 +1712,10 @@ msgstr "\".{0}\" היא לא סיומת חוקית"
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Arduino,you may need to use Tools -> Fix Encoding & "
-"Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
-"todelete the bad characters to get rid of this warning."
-msgstr "\"{0}\" מכיל תווים לא מזוהים. אם הקוד נכתב בגירסה ישנה יותר, ייתכן שתצטרך להשתמש ב- כלים -> \"תקן קידוד וטען מחדש\" כדי לעדכן את הסקיצה לשימוש בקידוד UTF-8. אם לא, ייתכן ותצטרך למחוק את התווים הלא מזוהים כדי להיפטר מהערה זו."
+"older version of Arduino,you may need to use Tools -> Fix Encoding & Reload "
+"to updatethe sketch to use UTF-8 encoding. If not, you may need todelete the"
+" bad characters to get rid of this warning."
+msgstr ""
 
 #: debug/Compiler.java:409
 msgid ""
@@ -1778,7 +1778,7 @@ msgstr "קומפילציה"
 
 #: ../../../processing/app/NetworkMonitor.java:111
 msgid "connected!"
-msgstr ""
+msgstr "מחובר!"
 
 #: Sketch.java:540
 msgid "createNewFile() returned false"
@@ -1786,7 +1786,7 @@ msgstr "createNewFile() החזיר ערך שלילי"
 
 #: ../../../processing/app/EditorStatus.java:469
 msgid "enabled in File > Preferences."
-msgstr ""
+msgstr "מאופשר ב קובץ > העדפות"
 
 #: Base.java:2090
 msgid "environment"

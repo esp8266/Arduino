@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2014-02-19 14:46+0000\n"
-"Last-Translator: cmaglie <c.maglie@arduino.cc>\n"
+"PO-Revision-Date: 2015-01-14 17:10+0000\n"
+"Last-Translator: Cristian Maglie <c.maglie@arduino.cc>\n"
 "Language-Team: Galician (http://www.transifex.com/projects/p/arduino-ide-15/language/gl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -138,6 +138,12 @@ msgstr "Placas Arduino ARM (32-bits)"
 msgid "Arduino AVR Boards"
 msgstr "Placas Arduino AVR"
 
+#: Editor.java:2137
+msgid ""
+"Arduino can only open its own sketches\n"
+"and other files ending in .ino or .pde"
+msgstr ""
+
 #: Base.java:1682
 msgid ""
 "Arduino cannot run because it could not\n"
@@ -159,7 +165,7 @@ msgstr "Arduino require o JDK completo (non só o JRE)\npara funcionar. Por favo
 
 #: ../../../processing/app/EditorStatus.java:471
 msgid "Arduino: "
-msgstr ""
+msgstr "Arduino:"
 
 #: Sketch.java:588
 #, java-format
@@ -436,7 +442,7 @@ msgstr "Non foi posíbel gardar de novo o sketch"
 msgid ""
 "Could not read color theme settings.\n"
 "You'll need to reinstall Arduino."
-msgstr "Non se pode ler a configuración do esquema de cor.\nNecesitarás volver a instalar Arduino."
+msgstr ""
 
 #: Preferences.java:219
 msgid ""
@@ -614,14 +620,14 @@ msgstr "Erro dentro de Serial.{0}()"
 
 #: ../../../processing/app/Base.java:1232
 msgid "Error loading libraries"
-msgstr ""
+msgstr "Erro ao cargar as bibliotecas"
 
 #: ../../../processing/app/debug/TargetPlatform.java:95
 #: ../../../processing/app/debug/TargetPlatform.java:106
 #: ../../../processing/app/debug/TargetPlatform.java:117
 #, java-format
 msgid "Error loading {0}"
-msgstr ""
+msgstr "Erro ao cargar {0}"
 
 #: Serial.java:181
 #, java-format
@@ -848,7 +854,7 @@ msgid ""
 "disable this in the Preferences dialog.\n"
 "\n"
 "Save sketch and update its extension?"
-msgstr ""
+msgstr "En Arduino 1.0, a extensión predeterminada dos ficheiros cambiou\nde .pde a .ino. Os novos sketches (incluídos os creados\ncon «Gardar como») usarán a nova extensión. A extensión\ndos sketches existentes actualizarase ao gardar, pero podes\ndesactivar esta opción no diálogo de Preferencias.\n\nDesexa gardar o sketch e actualizar a súa extensión?"
 
 #: Editor.java:1216 Editor.java:2757
 msgid "Increase Indent"
@@ -861,7 +867,7 @@ msgstr "Indonesio"
 #: ../../../processing/app/Base.java:1204
 #, java-format
 msgid "Invalid library found in {0}: {1}"
-msgstr ""
+msgstr "Encontrada unha biblioteca inválida en {0}: {1}"
 
 #: Preferences.java:102
 msgid "Italian"
@@ -889,7 +895,7 @@ msgstr "Lituano"
 
 #: ../../../processing/app/Sketch.java:1660
 msgid "Low memory available, stability problems may occur"
-msgstr ""
+msgstr "Pouca memoria dispoñible, poden ocorrer problemas de estabilidade"
 
 #: Preferences.java:107
 msgid "Marathi"
@@ -1139,12 +1145,6 @@ msgstr "Problema cargando á tarjeta. Vea http://www.arduino.cc/en/Guide/Trouble
 msgid "Problem with rename"
 msgstr "Problema ao cambiar o nome"
 
-#: Editor.java:2137
-msgid ""
-"Arduino can only open its own sketches\n"
-"and other files ending in .ino or .pde"
-msgstr "Arduino só pode abrir os seus propios sketches\ne outros ficheiros rematados en .ino ou .pde"
-
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
 msgstr "Procesador"
@@ -1298,7 +1298,7 @@ msgstr "Mostrar a carpeta do Sketch"
 
 #: ../../../processing/app/EditorStatus.java:468
 msgid "Show verbose output during compilation"
-msgstr ""
+msgstr "Mostrar saída detallada durante a compilación"
 
 #: Preferences.java:387
 msgid "Show verbose output during: "
@@ -1712,10 +1712,10 @@ msgstr "«.{0}» non é unha extensión válida."
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Arduino,you may need to use Tools -> Fix Encoding & "
-"Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
-"todelete the bad characters to get rid of this warning."
-msgstr "«{0}» contén caracteres irrecoñecíbeis. Se este código foi creado cunha versión antiga de Arduino poida que necesites usar Utilidades -> Corrixir a codificación e recargar para actualizar o sketch para usar a codificación UTF-8. Senón, poida que necesites borrar os caracteres erróneos para desfacerte deste aviso."
+"older version of Arduino,you may need to use Tools -> Fix Encoding & Reload "
+"to updatethe sketch to use UTF-8 encoding. If not, you may need todelete the"
+" bad characters to get rid of this warning."
+msgstr ""
 
 #: debug/Compiler.java:409
 msgid ""
@@ -1786,7 +1786,7 @@ msgstr "createNewFile() devolveu valor falso"
 
 #: ../../../processing/app/EditorStatus.java:469
 msgid "enabled in File > Preferences."
-msgstr ""
+msgstr "activado en Ficheiro > Preferencias"
 
 #: Base.java:2090
 msgid "environment"

@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2014-02-19 14:46+0000\n"
-"Last-Translator: cmaglie <c.maglie@arduino.cc>\n"
+"PO-Revision-Date: 2015-01-14 17:10+0000\n"
+"Last-Translator: Cristian Maglie <c.maglie@arduino.cc>\n"
 "Language-Team: Norwegian Bokmål (Norway) (http://www.transifex.com/projects/p/arduino-ide-15/language/nb_NO/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -138,6 +138,12 @@ msgstr "Arduino ARM (32-bits) Kort"
 #: ../../../processing/app/I18n.java:82
 msgid "Arduino AVR Boards"
 msgstr "Arduino AVR kort"
+
+#: Editor.java:2137
+msgid ""
+"Arduino can only open its own sketches\n"
+"and other files ending in .ino or .pde"
+msgstr ""
 
 #: Base.java:1682
 msgid ""
@@ -407,7 +413,7 @@ msgstr "Fant ikke verktøyet {0}"
 #: ../../../cc/arduino/packages/uploaders/SerialUploader.java:278
 #, java-format
 msgid "Could not find tool {0} from package {1}"
-msgstr ""
+msgstr "Fant ikke verktøyet {0} fra pakken {1}"
 
 #: Base.java:1934
 #, java-format
@@ -437,7 +443,7 @@ msgstr "Kunne ikke lagre skissen på nytt"
 msgid ""
 "Could not read color theme settings.\n"
 "You'll need to reinstall Arduino."
-msgstr "Kan ikke lese innstillinger for fargeskjema.\\n Du må installere Arduino på nytt."
+msgstr ""
 
 #: Preferences.java:219
 msgid ""
@@ -849,7 +855,7 @@ msgid ""
 "disable this in the Preferences dialog.\n"
 "\n"
 "Save sketch and update its extension?"
-msgstr ""
+msgstr "Fra Arduino 1.0 har standard filtypen blitt endret\nfra .pde til .ino. Nye skisser (også de oppretten via \n\"Lagre som\") vil benytte den nye filtypen. Eksisterende\nskisser vil bli oppdatert med den nye filtype ved lagring.\nDette kan deaktiveres i dialogen for innstillinger.\n\nLagre skissen og oppdater filtypen?"
 
 #: Editor.java:1216 Editor.java:2757
 msgid "Increase Indent"
@@ -979,7 +985,7 @@ msgstr "Ingen referanse tilgjengelig for \"{0}\""
 
 #: ../../../processing/app/Base.java:309
 msgid "No valid configured cores found! Exiting..."
-msgstr ""
+msgstr "Fant ingen gyldige kjerner konfigurert! Avslutter..."
 
 #: ../../../processing/app/debug/TargetPackage.java:63
 #, java-format
@@ -1140,12 +1146,6 @@ msgstr "Problemer ved opplasting til kortet. Se http://www.arduino.cc/en/Guide/T
 msgid "Problem with rename"
 msgstr "Omdøping feilet"
 
-#: Editor.java:2137
-msgid ""
-"Arduino can only open its own sketches\n"
-"and other files ending in .ino or .pde"
-msgstr "Arduino kan kun åpne egne skisser\nog andre filer som slutter med .ino eller .pde"
-
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
 msgstr "Prosessor"
@@ -1251,7 +1251,7 @@ msgstr "Velg en ny plassering for skisseboken"
 
 #: ../../../processing/app/debug/Compiler.java:146
 msgid "Selected board depends on '{0}' core (not installed)."
-msgstr ""
+msgstr "Valgt kort avhenger av '{0}' kjerne (ikke installert)"
 
 #: SerialMonitor.java:93
 msgid "Send"
@@ -1713,10 +1713,10 @@ msgstr "\".{0}\" er ikke en gyldig filtype"
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Arduino,you may need to use Tools -> Fix Encoding & "
-"Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
-"todelete the bad characters to get rid of this warning."
-msgstr "\"{0}\" inneholder ukjente karakterer. Hvis denne kildekoden var laget med en eldre versjon av Arduino, må du kanskje bruke Verktøy -> Fiks tegnkoding & Last på nytt for å oppdatere skissen til å benytte UTF-8 koding. Hvis ikke må du kanskje slette de ukjente karakterene for å blit kvitt denne feilmeldingen."
+"older version of Arduino,you may need to use Tools -> Fix Encoding & Reload "
+"to updatethe sketch to use UTF-8 encoding. If not, you may need todelete the"
+" bad characters to get rid of this warning."
+msgstr ""
 
 #: debug/Compiler.java:409
 msgid ""
@@ -1787,7 +1787,7 @@ msgstr "createNewFile() returnerte negativ"
 
 #: ../../../processing/app/EditorStatus.java:469
 msgid "enabled in File > Preferences."
-msgstr ""
+msgstr "skrudd på i Fil > Innstillnger"
 
 #: Base.java:2090
 msgid "environment"

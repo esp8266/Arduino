@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2014-02-19 14:46+0000\n"
-"Last-Translator: cmaglie <c.maglie@arduino.cc>\n"
+"PO-Revision-Date: 2015-01-14 17:10+0000\n"
+"Last-Translator: Cristian Maglie <c.maglie@arduino.cc>\n"
 "Language-Team: Hungarian (http://www.transifex.com/projects/p/arduino-ide-15/language/hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -35,7 +35,7 @@ msgstr "(csak akkor szerkeszthető, ha az Arduino nem fut)"
 
 #: Sketch.java:746
 msgid ".pde -> .ino"
-msgstr ""
+msgstr ".pde -> .ino"
 
 #: Base.java:773
 msgid ""
@@ -50,7 +50,7 @@ msgid ""
 " font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Do you "
 "want to save changes to this sketch<BR> before closing?</b><p>If you don't "
 "save, your changes will be lost."
-msgstr ""
+msgstr "<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p { font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Szeretné menteni a változtatásokat ezen a Sketchen<BR> mielött bezárná?</b><p>Ha nem menti el, a változtatások elvesznek."
 
 #: Sketch.java:398
 #, java-format
@@ -60,18 +60,18 @@ msgstr "A \"{0}\" file már létezik a \"{1}\" mappában!"
 #: Editor.java:2169
 #, java-format
 msgid "A folder named \"{0}\" already exists. Can't open sketch."
-msgstr ""
+msgstr "Ez a mappa \"{0}\" már létezik. Sketchet nem lehet megnyitni."
 
 #: Base.java:2690
 #, java-format
 msgid "A library named {0} already exists"
-msgstr ""
+msgstr "Ezen a néven {0} könyvtár már létezik"
 
 #: UpdateCheck.java:103
 msgid ""
 "A new version of Arduino is available,\n"
 "would you like to visit the Arduino download page?"
-msgstr ""
+msgstr "Elérhetö az Arduino új verziója. Szeretnéd meglátogatni az Arduino letöltö oldalát?"
 
 #: EditorConsole.java:153
 msgid ""
@@ -81,11 +81,11 @@ msgstr ""
 
 #: Editor.java:1116
 msgid "About Arduino"
-msgstr ""
+msgstr "Arduinoról"
 
 #: Editor.java:650
 msgid "Add File..."
-msgstr ""
+msgstr "Fájl hozzáadása..."
 
 #: Base.java:963
 msgid "Add Library..."
@@ -106,19 +106,19 @@ msgstr "Rendszerfüggő kód betöltése során\\n hiba lépett fel. A hiba az �
 
 #: Preferences.java:85
 msgid "Arabic"
-msgstr ""
+msgstr "Arab"
 
 #: Preferences.java:86
 msgid "Aragonese"
-msgstr ""
+msgstr "Aragóniai"
 
 #: tools/Archiver.java:48
 msgid "Archive Sketch"
-msgstr ""
+msgstr "Sketch arhiválása"
 
 #: tools/Archiver.java:109
 msgid "Archive sketch as:"
-msgstr ""
+msgstr "Sketch arhiválása másként:"
 
 #: tools/Archiver.java:139
 msgid "Archive sketch canceled."
@@ -136,6 +136,12 @@ msgstr ""
 
 #: ../../../processing/app/I18n.java:82
 msgid "Arduino AVR Boards"
+msgstr ""
+
+#: Editor.java:2137
+msgid ""
+"Arduino can only open its own sketches\n"
+"and other files ending in .ino or .pde"
 msgstr ""
 
 #: Base.java:1682
@@ -159,7 +165,7 @@ msgstr "Az Arduino futtatásához teljes telepítésű JDK (Java Fejlesztői Kö
 
 #: ../../../processing/app/EditorStatus.java:471
 msgid "Arduino: "
-msgstr ""
+msgstr "Arduino: "
 
 #: Sketch.java:588
 #, java-format
@@ -1139,12 +1145,6 @@ msgstr "Hiba a feltöltés során. A hiba elhárítása a http://www.arduino.cc/
 msgid "Problem with rename"
 msgstr "Hiba az átnevezés során"
 
-#: Editor.java:2137
-msgid ""
-"Arduino can only open its own sketches\n"
-"and other files ending in .ino or .pde"
-msgstr ""
-
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
 msgstr ""
@@ -1712,9 +1712,9 @@ msgstr " \".{0}\" nem megfelelő kiterjesztés."
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Arduino,you may need to use Tools -> Fix Encoding & "
-"Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
-"todelete the bad characters to get rid of this warning."
+"older version of Arduino,you may need to use Tools -> Fix Encoding & Reload "
+"to updatethe sketch to use UTF-8 encoding. If not, you may need todelete the"
+" bad characters to get rid of this warning."
 msgstr ""
 
 #: debug/Compiler.java:409

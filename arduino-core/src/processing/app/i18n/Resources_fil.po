@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2014-02-19 14:46+0000\n"
-"Last-Translator: cmaglie <c.maglie@arduino.cc>\n"
+"PO-Revision-Date: 2015-01-14 17:10+0000\n"
+"Last-Translator: Cristian Maglie <c.maglie@arduino.cc>\n"
 "Language-Team: Filipino (http://www.transifex.com/projects/p/arduino-ide-15/language/fil/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -137,6 +137,12 @@ msgstr ""
 
 #: ../../../processing/app/I18n.java:82
 msgid "Arduino AVR Boards"
+msgstr ""
+
+#: Editor.java:2137
+msgid ""
+"Arduino can only open its own sketches\n"
+"and other files ending in .ino or .pde"
 msgstr ""
 
 #: Base.java:1682
@@ -437,7 +443,7 @@ msgstr "Hindi mai-resave ang sketch"
 msgid ""
 "Could not read color theme settings.\n"
 "You'll need to reinstall Arduino."
-msgstr "Hindi mabasa ang color theme settings.\nKinakailangan mong i-reinstall ang Arduino."
+msgstr ""
 
 #: Preferences.java:219
 msgid ""
@@ -1140,12 +1146,6 @@ msgstr "May problema sa pagupload sa board. Tignan ang http://www.arduino.cc/en/
 msgid "Problem with rename"
 msgstr "May mali sa pag palit ng pangalan"
 
-#: Editor.java:2137
-msgid ""
-"Arduino can only open its own sketches\n"
-"and other files ending in .ino or .pde"
-msgstr "Maari lamang buksan ng Arduino ang sariling sketches\nat iba pang file na may extension na .ino o .pde"
-
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
 msgstr ""
@@ -1713,10 +1713,10 @@ msgstr "\".{0}\" ay hindi tamang extension."
 #, java-format
 msgid ""
 "\"{0}\" contains unrecognized characters.If this code was created with an "
-"older version of Arduino,you may need to use Tools -> Fix Encoding & "
-"Reload to updatethe sketch to use UTF-8 encoding. If not, you may need "
-"todelete the bad characters to get rid of this warning."
-msgstr "Ang \"{0}\" ay naglalaman ng hindi maintidihang titik. Kung ang code na ito ay ginawa mula sa lumang bersyon ng Arduino, Kinakailangan mong gamitin ang Mga Kasangkapan -> Itama ang Encoding at I-reload para magamit ang UTF-8 encoding sa sketch. Kung hindi naman ay kinakailangan mong alisin ang mga hindi maintidihang titik para maalis ang babalang ito."
+"older version of Arduino,you may need to use Tools -> Fix Encoding & Reload "
+"to updatethe sketch to use UTF-8 encoding. If not, you may need todelete the"
+" bad characters to get rid of this warning."
+msgstr ""
 
 #: debug/Compiler.java:409
 msgid ""
