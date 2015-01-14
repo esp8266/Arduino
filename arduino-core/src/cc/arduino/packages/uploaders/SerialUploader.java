@@ -114,7 +114,8 @@ public class SerialUploader extends Uploader {
         List<String> before = Serial.list();
         if (before.contains(uploadPort)) {
           if (verbose)
-            System.out.println(_("Forcing reset using 1200bps open/close on port ") + uploadPort);
+            System.out.println(
+              I18n.format(_("Forcing reset using 1200bps open/close on port {0}"), uploadPort));
           Serial.touchPort(uploadPort, 1200);
         }
         Thread.sleep(400);

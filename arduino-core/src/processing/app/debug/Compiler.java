@@ -86,7 +86,7 @@ public class Compiler implements MessageConsumer {
   static public String build(SketchData data, String buildPath, File tempBuildFolder, ProgressListener progListener, boolean verbose) throws RunnerException, PreferencesMapException {
     if (SketchData.checkSketchFile(data.getPrimaryFile()) == null)
       BaseNoGui.showError(_("Bad file selected"),
-                          _("Bad sketch primary file or bad sketck directory structure"), null);
+                          _("Bad sketch primary file or bad sketch directory structure"), null);
 
     String primaryClassName = data.getName() + ".cpp";
     Compiler compiler = new Compiler(data, buildPath, primaryClassName);
