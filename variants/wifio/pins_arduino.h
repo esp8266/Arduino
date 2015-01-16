@@ -3,7 +3,7 @@
   Part of Arduino - http://www.arduino.cc/
 
   Copyright (c) 2007 David A. Mellis
-  Modified for ESP8266 platform by Ivan Grokhotkov, 2014-2015.
+  Modified for ESP8266 WIFIO board by Ivan Grokhotkov, 2015.
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -26,39 +26,32 @@
 #ifndef Pins_Arduino_h
 #define Pins_Arduino_h
 
-#define NUM_DIGITAL_PINS  16
+#define NUM_DIGITAL_PINS  36
 #define NUM_ANALOG_INPUTS 1
+#define ESP_PINS_OFFSET 20
 
-static const uint8_t SDA = 0;
-static const uint8_t SCL = 2;
+static const uint8_t SDA = 4;
+static const uint8_t SCL = 5;
 
 static const uint8_t SS   = 12;
 static const uint8_t MOSI = 13;
 static const uint8_t MISO = 14;
 static const uint8_t SCK  = 15;
 
-static const uint8_t BUILTIN_LED = 1;
+static const uint8_t A0 = 14;
+static const uint8_t A1 = 15;
+static const uint8_t A2 = 16;
+static const uint8_t A3 = 17;
+static const uint8_t A4 = 18;
+static const uint8_t A5 = 19;
+static const uint8_t A6 = 20;
+static const uint8_t A7 = 21;
 
-static const uint8_t A0 = 0;
+static const uint8_t BUILTIN_LED = 2;
 
-// These serial port names are intended to allow libraries and architecture-neutral
-// sketches to automatically default to the correct port name for a particular type
-// of use.  For example, a GPS module would normally connect to SERIAL_PORT_HARDWARE_OPEN,
-// the first hardware serial port whose RX/TX pins are not dedicated to another use.
-//
-// SERIAL_PORT_MONITOR        Port which normally prints to the Arduino Serial Monitor
-//
-// SERIAL_PORT_USBVIRTUAL     Port which is USB virtual serial
-//
-// SERIAL_PORT_LINUXBRIDGE    Port which connects to a Linux system via Bridge library
-//
-// SERIAL_PORT_HARDWARE       Hardware serial port, physical RX & TX pins.
-//
-// SERIAL_PORT_HARDWARE_OPEN  Hardware serial ports which are open for use.  Their RX & TX
-//                            pins are NOT connected to anything by default.
 #define SERIAL_PORT_MONITOR        Serial
 #define SERIAL_PORT_USBVIRTUAL     Serial
-#define SERIAL_PORT_HARDWARE       Serial1
-#define SERIAL_PORT_HARDWARE_OPEN  Serial1
+#define SERIAL_PORT_HARDWARE       Serial
+#define SERIAL_PORT_HARDWARE_OPEN  Serial
 
 #endif /* Pins_Arduino_h */
