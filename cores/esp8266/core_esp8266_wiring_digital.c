@@ -72,8 +72,7 @@ static uint32_t g_gpio_function[PINCOUNT] = {
     GPIO
 };
 
-
-void pinMode(uint8_t pin, uint8_t mode)
+extern void __pinMode(uint8_t pin, uint8_t mode)
 {
     if (pin == 16)
     {
@@ -112,7 +111,7 @@ void pinMode(uint8_t pin, uint8_t mode)
     }
 }
 
-void digitalWrite(uint8_t pin, uint8_t val)
+extern void __digitalWrite(uint8_t pin, uint8_t val)
 {
     if (pin == 16) 
     {
@@ -127,7 +126,7 @@ void digitalWrite(uint8_t pin, uint8_t val)
       GPIO_REG_WRITE(GPIO_OUT_W1TC_ADDRESS, mask);
 }
 
-int digitalRead(uint8_t pin)
+extern int __digitalRead(uint8_t pin)
 {
     if (pin == 16)
         return (READ_PERI_REG(RTC_GPIO_IN_DATA) & 1);
@@ -135,12 +134,12 @@ int digitalRead(uint8_t pin)
         return ((gpio_input_get() >> pin) & 1);
 }
 
-void analogWrite(uint8_t pin, int val)
+extern void __analogWrite(uint8_t pin, int val)
 {
 }
 
-typedef void (*inthandler_t)(void);
-static inthandler_t g_handlers[PINCOUNT] = { 0 };
+typedef void (*voidFuncPtr)(void);
+static voidFuncPtr g_handlers[PINCOUNT] = { 0 };
 
 
 void interrupt_handler(void *arg)
@@ -156,7 +155,7 @@ void interrupt_handler(void *arg)
     }
 }
 
-void attachInterrupt(uint8_t pin, inthandler_t handler, int mode) 
+extern void __attachInterrupt(uint8_t pin, voidFuncPtr handler, int mode) 
 {
     if (pin < 0 || pin > PINCOUNT)
         return;
@@ -181,13 +180,13 @@ void attachInterrupt(uint8_t pin, inthandler_t handler, int mode)
     }
 }
 
-void detachInterrupt(uint8_t pin) 
+extern void __detachInterrupt(uint8_t pin) 
 {
     g_handlers[pin] = 0;
     gpio_pin_intr_state_set(pin, GPIO_PIN_INTR_DISABLE);
 }
 
-void initPins()
+extern void __initPins()
 {
     gpio_init();
     for (int i = 0; i < PINCOUNT; ++i)
@@ -202,4 +201,11 @@ void initPins()
     ETS_GPIO_INTR_ATTACH(&interrupt_handler, NULL);
 }
 
+extern void pinMode(uint8_t pin, uint8_t mode) __attribute__ ((weak, alias("__pinMode")));
+extern void digitalWrite(uint8_t pin, uint8_t val) __attribute__ ((weak, alias("__digitalWrite")));
+extern int  digitalRead(uint8_t pin) __attribute__ ((weak, alias("__digitalRead")));
+extern void analogWrite(uint8_t pin, int val) __attribute__ ((weak, alias("__analogWrite")));
+extern void attachInterrupt(uint8_t pin, voidFuncPtr handler, int mode) __attribute__ ((weak, alias("__attachInterrupt")));
+extern void detachInterrupt(uint8_t pin) __attribute__ ((weak, alias("__detachInterrupt")));
+extern void initPins() __attribute__ ((weak, alias("__initPins")));
 

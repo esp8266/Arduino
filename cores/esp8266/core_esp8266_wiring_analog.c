@@ -27,7 +27,7 @@ void analogReference(uint8_t mode)
 {
 }
 
-int analogRead(uint8_t pin)
+extern int __analogRead(uint8_t pin)
 {
   if (pin == 0)
     return system_adc_read();
@@ -36,3 +36,4 @@ int analogRead(uint8_t pin)
 }
 
 
+extern int analogRead(uint8_t pin) __attribute__ ((weak, alias("__analogRead")));
