@@ -27,6 +27,8 @@
 #include "gpio.h"
 #include "ets_sys.h"
 
+#define MODIFY_PERI_REG(reg, mask, val) WRITE_PERI_REG(reg, (READ_PERI_REG(reg) & (~mask)) | (uint32_t) val)
+
 #define PINCOUNT 16
 
 static const uint32_t g_pin_muxes[PINCOUNT] = {
@@ -73,6 +75,16 @@ static uint32_t g_gpio_function[PINCOUNT] = {
 
 void pinMode(uint8_t pin, uint8_t mode)
 {
+    if (pin == 16)
+    {
+        uint32_t val = (mode == OUTPUT) ? 1 : 0;
+        
+        MODIFY_PERI_REG(PAD_XPD_DCDC_CONF, 0x43, 1);
+        MODIFY_PERI_REG(RTC_GPIO_CONF, 1, 0);
+        MODIFY_PERI_REG(RTC_GPIO_ENABLE, 1, val);
+        return;
+    }
+
     uint32_t mux = g_pin_muxes[pin];
     if (mode == INPUT)
     {
@@ -102,6 +114,12 @@ void pinMode(uint8_t pin, uint8_t mode)
 
 void digitalWrite(uint8_t pin, uint8_t val)
 {
+    if (pin == 16) 
+    {
+        MODIFY_PERI_REG(RTC_GPIO_OUT, 1, (val & 1));
+        return;
+    }
+
     uint32_t mask = 1 << pin;
     if (val)
       GPIO_REG_WRITE(GPIO_OUT_W1TS_ADDRESS, mask);
@@ -111,7 +129,10 @@ void digitalWrite(uint8_t pin, uint8_t val)
 
 int digitalRead(uint8_t pin)
 {
-    return ((gpio_input_get() >> pin) & 1);
+    if (pin == 16)
+        return (READ_PERI_REG(RTC_GPIO_IN_DATA) & 1);
+    else
+        return ((gpio_input_get() >> pin) & 1);
 }
 
 void analogWrite(uint8_t pin, int val)
