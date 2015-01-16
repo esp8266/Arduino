@@ -53,6 +53,9 @@ public:
   virtual uint8_t connected();
   virtual operator bool();
 
+  IPAddress remoteIP();
+  uint16_t  remotePort();
+
   friend class WiFiServer;
 
   using Print::write;
@@ -66,8 +69,7 @@ private:
   void _err(int8_t err);
 
   ClientContext* _client;
-  uint32_t _lastPollTime;
-  
+
 };
 
 #endif

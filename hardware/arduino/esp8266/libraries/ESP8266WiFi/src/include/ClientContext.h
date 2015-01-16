@@ -88,6 +88,22 @@ public:
         }
     }
 
+    uint32_t getRemoteAddress()
+    {
+        if (!_pcb)
+            return 0;
+
+        return _pcb->remote_ip.addr;
+    }
+
+    uint16_t getRemotePort()
+    {
+        if (!_pcb)
+            return 0;
+
+        return _pcb->remote_port;
+    }
+
     size_t getSize() const
     {
         if (!_rx_buf)

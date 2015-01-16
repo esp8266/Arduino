@@ -43,11 +43,10 @@ extern "C"
 #define MIN_LOCAL_PORT 1024
 #define MAX_LOCAL_PORT 1124
 
- static int g_localPort = MIN_LOCAL_PORT;
+static int g_localPort = MIN_LOCAL_PORT;
 
 ICACHE_FLASH_ATTR WiFiClient::WiFiClient() 
 : _client(0)
-, _lastPollTime(0)
 {
 }
 
@@ -227,6 +226,22 @@ uint8_t ICACHE_FLASH_ATTR WiFiClient::status()
 ICACHE_FLASH_ATTR  WiFiClient::operator bool() 
 {
     return _client != 0;
+}
+
+IPAddress WiFiClient::remoteIP()
+{
+    if (!_client)
+        return IPAddress(0U);
+
+    return IPAddress(_client->getRemoteAddress());
+}
+
+uint16_t WiFiClient::remotePort()
+{
+    if (!_client)
+        return 0;
+
+    return _client->getRemotePort();
 }
 
 int8_t ICACHE_FLASH_ATTR WiFiClient::_s_connected(void* arg, void* tpcb, int8_t err)
