@@ -47,6 +47,19 @@ static const uint8_t A5 = 19;
 static const uint8_t A6 = 20;
 static const uint8_t A7 = 21;
 
+static const uint8_t E0 = ESP_PINS_OFFSET + 0;
+static const uint8_t E1 = ESP_PINS_OFFSET + 1;
+static const uint8_t E2 = ESP_PINS_OFFSET + 2;
+static const uint8_t E3 = ESP_PINS_OFFSET + 3;
+static const uint8_t E4 = ESP_PINS_OFFSET + 4;
+static const uint8_t E5 = ESP_PINS_OFFSET + 5;
+static const uint8_t E11 = ESP_PINS_OFFSET + 11;
+static const uint8_t E12 = ESP_PINS_OFFSET + 12;
+static const uint8_t E13 = ESP_PINS_OFFSET + 13;
+static const uint8_t E14 = ESP_PINS_OFFSET + 14;
+static const uint8_t E15 = ESP_PINS_OFFSET + 15;
+static const uint8_t E16 = ESP_PINS_OFFSET + 16;
+
 static const uint8_t BUILTIN_LED = 2;
 
 #define SERIAL_PORT_MONITOR        Serial
