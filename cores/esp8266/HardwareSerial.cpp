@@ -76,15 +76,11 @@ void ICACHE_FLASH_ATTR uart0_interrupt_handler(uart_t* uart)
         }
         WRITE_PERI_REG(UART_INT_CLR(0), UART_RXFIFO_FULL_INT_CLR);
     }
-    else if (status & UART_TXFIFO_EMPTY_INT_ST)
+    if (status & UART_TXFIFO_EMPTY_INT_ST)
     {
         WRITE_PERI_REG(UART_INT_CLR(0), UART_TXFIFO_EMPTY_INT_CLR);
         Serial._tx_empty_irq();
     }
-    else
-    {
-        WRITE_PERI_REG(UART_INT_CLR(0), status);
-    }   
 }
 
 void ICACHE_FLASH_ATTR uart0_wait_for_tx_fifo(size_t size_needed)
@@ -172,16 +168,17 @@ uart_t* ICACHE_FLASH_ATTR uart0_init(int baudrate)
 
     PIN_PULLUP_DIS(PERIPHS_IO_MUX_U0TXD_U);
     PIN_FUNC_SELECT(PERIPHS_IO_MUX_U0TXD_U, FUNC_U0TXD);
+    PIN_PULLUP_EN(PERIPHS_IO_MUX_U0RXD_U);
+    PIN_FUNC_SELECT(PERIPHS_IO_MUX_U0RXD_U, FUNC_U0RXD);
 
     uart0_set_baudrate(uart, baudrate);
     WRITE_PERI_REG(UART_CONF0(0), 0x3 << UART_BIT_NUM_S);   // 8n1
 
     uart0_flush(uart);
-    
+    uart0_interrupt_enable(uart);
+
     WRITE_PERI_REG(UART_CONF1(0), ((0x01 & UART_RXFIFO_FULL_THRHD) << UART_RXFIFO_FULL_THRHD_S) |
                                 ((0x20 & UART_TXFIFO_EMPTY_THRHD) << UART_TXFIFO_EMPTY_THRHD_S));
-
-    uart0_interrupt_enable(uart);
 
     return uart;
 }
