@@ -299,9 +299,10 @@ void ICACHE_FLASH_ATTR HardwareSerial::flush()
 {
     if (!_written)
         return;
-    uart0_flush(_uart);
-    _tx_buffer->flush();
-    _rx_buffer->flush();
+
+    while (_tx_buffer->getSize() || uart0_get_tx_fifo_room() < UART_TX_FIFO_SIZE)
+        yield();
+
     _written = false;
 }
 
