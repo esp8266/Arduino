@@ -25,8 +25,6 @@
 #ifndef Pins_Arduino_h
 #define Pins_Arduino_h
 
-#define PROGMEM
-
 #define NUM_DIGITAL_PINS  16
 #define NUM_ANALOG_INPUTS 1
 
@@ -38,7 +36,9 @@ static const uint8_t MOSI = 13;
 static const uint8_t MISO = 14;
 static const uint8_t SCK  = 15;
 
+static const uint8_t BUILTIN_LED = 1;
 
+static const uint8_t A0 = 0;
 
 // These serial port names are intended to allow libraries and architecture-neutral
 // sketches to automatically default to the correct port name for a particular type
