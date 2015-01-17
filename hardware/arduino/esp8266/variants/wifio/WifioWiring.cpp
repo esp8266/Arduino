@@ -119,10 +119,7 @@ extern "C" void analogWrite(uint8_t pin, int value) {
   }
 }
 
-extern "C" void initPins()
-{
-  __initPins();
-  // sync here  
+void initVariant() 
+{ 
+
 }
-
-

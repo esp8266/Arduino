@@ -186,7 +186,7 @@ extern void __detachInterrupt(uint8_t pin)
     gpio_pin_intr_state_set(pin, GPIO_PIN_INTR_DISABLE);
 }
 
-extern void __initPins()
+void initPins()
 {
     gpio_init();
     for (int i = 0; i < PINCOUNT; ++i)
@@ -207,5 +207,4 @@ extern int  digitalRead(uint8_t pin) __attribute__ ((weak, alias("__digitalRead"
 extern void analogWrite(uint8_t pin, int val) __attribute__ ((weak, alias("__analogWrite")));
 extern void attachInterrupt(uint8_t pin, voidFuncPtr handler, int mode) __attribute__ ((weak, alias("__attachInterrupt")));
 extern void detachInterrupt(uint8_t pin) __attribute__ ((weak, alias("__detachInterrupt")));
-extern void initPins() __attribute__ ((weak, alias("__initPins")));
 
