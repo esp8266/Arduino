@@ -33,6 +33,12 @@ msgstr "'Mouse' 仅在 Arduino Leonardo 上支持"
 msgid "(edit only when Arduino is not running)"
 msgstr "（只能在Arduino未运行时进行编辑）"
 
+#: ../../../processing/app/Base.java:468
+msgid ""
+"--verbose, --verbose-upload and --verbose-build can only be used together "
+"with --verify or --upload"
+msgstr ""
+
 #: Sketch.java:746
 msgid ".pde -> .ino"
 msgstr ".pde-> .ino"
@@ -91,12 +97,30 @@ msgstr "添加文件..."
 msgid "Add Library..."
 msgstr "添加库"
 
+#: ../../../processing/app/Preferences.java:96
+msgid "Albanian"
+msgstr "阿尔巴尼亚语"
+
 #: tools/FixEncoding.java:77
 msgid ""
 "An error occurred while trying to fix the file encoding.\n"
 "Do not attempt to save this sketch as it may overwrite\n"
 "the old version. Use Open to re-open the sketch and try again.\n"
 msgstr "在修复文件编码时发生一个错误。\n请不要保存这个 sketch 否则可能会覆盖源文件。\n使用“打开”命令重新打开 sketch 再试一次。\n"
+
+#: ../../../processing/app/BaseNoGui.java:528
+msgid "An error occurred while uploading the sketch"
+msgstr ""
+
+#: ../../../processing/app/BaseNoGui.java:506
+#: ../../../processing/app/BaseNoGui.java:551
+#: ../../../processing/app/BaseNoGui.java:554
+msgid "An error occurred while verifying the sketch"
+msgstr ""
+
+#: ../../../processing/app/BaseNoGui.java:521
+msgid "An error occurred while verifying/uploading the sketch"
+msgstr ""
 
 #: Base.java:228
 msgid ""
@@ -176,6 +200,30 @@ msgstr "确定要删除\"{0}\"?"
 msgid "Are you sure you want to delete this sketch?"
 msgstr "确定要删除此草稿码？"
 
+#: ../../../processing/app/Base.java:356
+msgid "Argument required for --board"
+msgstr ""
+
+#: ../../../processing/app/Base.java:370
+msgid "Argument required for --curdir"
+msgstr ""
+
+#: ../../../processing/app/Base.java:385
+msgid "Argument required for --get-pref"
+msgstr ""
+
+#: ../../../processing/app/Base.java:363
+msgid "Argument required for --port"
+msgstr ""
+
+#: ../../../processing/app/Base.java:377
+msgid "Argument required for --pref"
+msgstr ""
+
+#: ../../../processing/app/Base.java:384
+msgid "Argument required for --preferences-file"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:137
 msgid "Armenian"
 msgstr "亚美尼亚语"
@@ -183,6 +231,10 @@ msgstr "亚美尼亚语"
 #: ../../../processing/app/Preferences.java:138
 msgid "Asturian"
 msgstr "阿斯图里亚斯语"
+
+#: ../../../processing/app/debug/Compiler.java:145
+msgid "Authorization required"
+msgstr ""
 
 #: tools/AutoFormat.java:91
 msgid "Auto Format"
@@ -225,6 +277,14 @@ msgstr ""
 msgid "Bad file selected"
 msgstr "选择的文件有问题"
 
+#: ../../../processing/app/debug/Compiler.java:89
+msgid "Bad sketch primary file or bad sketch directory structure"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:149
+msgid "Basque"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:139
 msgid "Belarusian"
 msgstr "白俄罗斯语"
@@ -261,6 +321,10 @@ msgstr "浏览"
 msgid "Build folder disappeared or could not be written"
 msgstr "建立的文件夹消失了或者是它不可写"
 
+#: ../../../processing/app/Sketch.java:1530
+msgid "Build options changed, rebuilding all"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:80
 msgid "Bulgarian"
 msgstr "保加利亚语"
@@ -277,9 +341,15 @@ msgstr "烧录引导程序"
 msgid "Burning bootloader to I/O Board (this may take a minute)..."
 msgstr ""
 
-#: ../../../processing/app/Base.java:368
-msgid "Can't open source sketch!"
-msgstr "无法打开源 sketch！"
+#: ../../../processing/app/Base.java:379
+#, java-format
+msgid "Can only pass one of: {0}"
+msgstr ""
+
+#: ../../../processing/app/BaseNoGui.java:504
+#: ../../../processing/app/BaseNoGui.java:549
+msgid "Can't find the sketch in the specified path"
+msgstr ""
 
 #: ../../../processing/app/Preferences.java:92
 msgid "Canadian French"
@@ -293,6 +363,10 @@ msgstr "取消"
 #: Sketch.java:455
 msgid "Cannot Rename"
 msgstr "无法重命名"
+
+#: ../../../processing/app/Base.java:465
+msgid "Cannot specify any sketch files"
+msgstr ""
 
 #: SerialMonitor.java:112
 msgid "Carriage return"
@@ -337,11 +411,6 @@ msgstr "关闭"
 #: Editor.java:1208 Editor.java:2749
 msgid "Comment/Uncomment"
 msgstr "注释/取消注释"
-
-#: debug/Compiler.java:49 debug/Uploader.java:45
-#, java-format
-msgid "Compiler error, please submit this code to {0}"
-msgstr "编译错误，请提交此代码到{0}"
 
 #: Sketch.java:1608 Editor.java:1890
 msgid "Compiling sketch..."
@@ -450,10 +519,9 @@ msgid ""
 "You'll need to reinstall Arduino."
 msgstr "无法读取预设设置。\n你必须重新安装Arduino。"
 
-#: Preferences.java:258
-#, java-format
-msgid "Could not read preferences from {0}"
-msgstr "无法从{0}读取首选项"
+#: ../../../processing/app/Sketch.java:1525
+msgid "Could not read prevous build preferences file, rebuilding all"
+msgstr ""
 
 #: Base.java:2482
 #, java-format
@@ -481,6 +549,10 @@ msgstr "无法重命名草稿码。(2)"
 #, java-format
 msgid "Could not replace {0}"
 msgstr "无法替换{0}"
+
+#: ../../../processing/app/Sketch.java:1579
+msgid "Could not write build preferences file"
+msgstr ""
 
 #: tools/Archiver.java:74
 msgid "Couldn't archive sketch"
@@ -551,6 +623,11 @@ msgstr "保存完成。"
 msgid "Done burning bootloader."
 msgstr "烧录引导程序完成。"
 
+#: ../../../processing/app/BaseNoGui.java:507
+#: ../../../processing/app/BaseNoGui.java:552
+msgid "Done compiling"
+msgstr ""
+
 #: Editor.java:1911 Editor.java:1928
 msgid "Done compiling."
 msgstr "编译完成。"
@@ -558,6 +635,10 @@ msgstr "编译完成。"
 #: Editor.java:2564
 msgid "Done printing."
 msgstr "输出完成。"
+
+#: ../../../processing/app/BaseNoGui.java:514
+msgid "Done uploading"
+msgstr ""
 
 #: Editor.java:2395 Editor.java:2431
 msgid "Done uploading."
@@ -662,6 +743,10 @@ msgstr "烧录引导程序出错。"
 msgid "Error while burning bootloader: missing '{0}' configuration parameter"
 msgstr ""
 
+#: ../../../../../app/src/processing/app/Editor.java:1940
+msgid "Error while compiling: missing '{0}' configuration parameter"
+msgstr ""
+
 #: SketchCode.java:83
 #, java-format
 msgid "Error while loading code {0}"
@@ -671,9 +756,23 @@ msgstr "载入代码{0}时发生错误"
 msgid "Error while printing."
 msgstr "在输出过程中发生错误。"
 
+#: ../../../processing/app/BaseNoGui.java:528
+msgid "Error while uploading"
+msgstr ""
+
 #: ../../../processing/app/Editor.java:2409
 #: ../../../processing/app/Editor.java:2449
 msgid "Error while uploading: missing '{0}' configuration parameter"
+msgstr ""
+
+#: ../../../processing/app/BaseNoGui.java:506
+#: ../../../processing/app/BaseNoGui.java:551
+#: ../../../processing/app/BaseNoGui.java:554
+msgid "Error while verifying"
+msgstr ""
+
+#: ../../../processing/app/BaseNoGui.java:521
+msgid "Error while verifying/uploading"
 msgstr ""
 
 #: Preferences.java:93
@@ -695,6 +794,11 @@ msgstr ""
 #: Base.java:2100
 msgid "FAQ.html"
 msgstr "FAQ.html"
+
+#: ../../../processing/app/Base.java:416
+#, java-format
+msgid "Failed to open sketch: \"{0}\""
+msgstr ""
 
 #: Editor.java:491
 msgid "File"
@@ -743,8 +847,9 @@ msgid ""
 "http://arduino.cc/en/Guide/Libraries\n"
 msgstr "安装库的详细信息，请参阅： http://arduino.cc/en/Guide/Libraries\\n"
 
-#: debug/BasicUploader.java:80
-msgid "Forcing reset using 1200bps open/close on port "
+#: ../../../cc/arduino/packages/uploaders/SerialUploader.java:118
+#, java-format
+msgid "Forcing reset using 1200bps open/close on port {0}"
 msgstr ""
 
 #: Preferences.java:95
@@ -893,9 +998,9 @@ msgstr "库已经加入，请检查“导入库”菜单"
 msgid "Lithuaninan"
 msgstr "立陶宛语"
 
-#: ../../../processing/app/Sketch.java:1660
-msgid "Low memory available, stability problems may occur"
-msgstr "可用内存偏低，可能会导致稳定性问题"
+#: ../../../processing/app/Sketch.java:1684
+msgid "Low memory available, stability problems may occur."
+msgstr ""
 
 #: Preferences.java:107
 msgid "Marathi"
@@ -909,6 +1014,10 @@ msgstr "信息"
 msgid "Missing the */ from the end of a /* comment */"
 msgstr ""
 
+#: ../../../processing/app/BaseNoGui.java:455
+msgid "Mode not supported"
+msgstr ""
+
 #: Preferences.java:449
 msgid "More preferences can be edited directly in the file"
 msgstr "在首选项中还有更多选项可以直接编辑"
@@ -916,6 +1025,18 @@ msgstr "在首选项中还有更多选项可以直接编辑"
 #: Editor.java:2156
 msgid "Moving"
 msgstr "移动中"
+
+#: ../../../processing/app/BaseNoGui.java:484
+msgid "Multiple files not supported"
+msgstr ""
+
+#: ../../../processing/app/Base.java:395
+msgid "Must specify exactly one sketch file"
+msgstr ""
+
+#: ../../../processing/app/Preferences.java:158
+msgid "N'Ko"
+msgstr ""
 
 #: Sketch.java:282
 msgid "Name for new file:"
@@ -953,6 +1074,10 @@ msgstr "下一个标签"
 msgid "No"
 msgstr "否"
 
+#: ../../../processing/app/debug/Compiler.java:146
+msgid "No athorization data found"
+msgstr ""
+
 #: debug/Compiler.java:126
 msgid "No board selected; please choose a board from the Tools > Board menu."
 msgstr "未选择板：请点击“工具>板”菜单选择一个板子。"
@@ -960,6 +1085,10 @@ msgstr "未选择板：请点击“工具>板”菜单选择一个板子。"
 #: tools/format/src/AutoFormat.java:54 tools/AutoFormat.java:916
 msgid "No changes necessary for Auto Format."
 msgstr "无需自动格式化。"
+
+#: ../../../processing/app/BaseNoGui.java:665
+msgid "No command line parameters found"
+msgstr ""
 
 #: Editor.java:373
 msgid "No files were added to the sketch."
@@ -973,6 +1102,10 @@ msgstr "无可用的启动程序"
 msgid "No line ending"
 msgstr "没有结束符"
 
+#: ../../../processing/app/BaseNoGui.java:665
+msgid "No parameters"
+msgstr ""
+
 #: Base.java:541
 msgid "No really, time for some fresh air for you."
 msgstr "说真的，你该出去呼吸新鲜空气了。"
@@ -981,6 +1114,19 @@ msgstr "说真的，你该出去呼吸新鲜空气了。"
 #, java-format
 msgid "No reference available for \"{0}\""
 msgstr "对 \"{0}\" 无可用的参考文件"
+
+#: ../../../processing/app/BaseNoGui.java:504
+#: ../../../processing/app/BaseNoGui.java:549
+msgid "No sketch"
+msgstr ""
+
+#: ../../../processing/app/BaseNoGui.java:428
+msgid "No sketchbook"
+msgstr ""
+
+#: ../../../processing/app/Sketch.java:204
+msgid "No valid code files found"
+msgstr ""
 
 #: ../../../processing/app/Base.java:309
 msgid "No valid configured cores found! Exiting..."
@@ -1018,6 +1164,10 @@ msgstr "好"
 msgid "One file added to the sketch."
 msgstr "一个文件被添加到 sketch。"
 
+#: ../../../processing/app/BaseNoGui.java:455
+msgid "Only --verify, --upload or --get-pref are supported"
+msgstr ""
+
 #: EditorToolbar.java:41
 msgid "Open"
 msgstr "打开"
@@ -1054,13 +1204,26 @@ msgstr "粘贴"
 msgid "Persian"
 msgstr "波斯语"
 
+#: ../../../processing/app/Preferences.java:161
+msgid "Persian (Iran)"
+msgstr ""
+
 #: debug/Compiler.java:408
 msgid "Please import the SPI library from the Sketch > Import Library menu."
 msgstr "请利用 “Sketch>导入库” 菜单导入 SPI 库。"
 
+#: ../../../processing/app/debug/Compiler.java:529
+msgid "Please import the Wire library from the Sketch > Import Library menu."
+msgstr "请点击“草稿> 导入库”导入Wire 库。"
+
 #: Base.java:239
 msgid "Please install JDK 1.5 or later"
 msgstr "请安装 JDK 1.5 或更新的版本"
+
+#: ../../../cc/arduino/packages/uploaders/SerialUploader.java:217
+#: ../../../cc/arduino/packages/uploaders/SerialUploader.java:262
+msgid "Please select a programmer from Tools->Programmer menu"
+msgstr ""
 
 #: Preferences.java:110
 msgid "Polish"
@@ -1224,9 +1387,17 @@ msgstr "保存更改到 \"{0}\"？"
 msgid "Save sketch folder as..."
 msgstr "草稿码文件夹另存为"
 
+#: ../../../../../app/src/processing/app/Preferences.java:425
+msgid "Save when verifying or uploading"
+msgstr ""
+
 #: Editor.java:2270 Editor.java:2308
 msgid "Saving..."
 msgstr "保存中..."
+
+#: ../../../processing/app/FindReplace.java:131
+msgid "Search all Sketch Tabs"
+msgstr ""
 
 #: Base.java:1909
 msgid "Select (or create new) folder for sketches..."
@@ -1259,20 +1430,6 @@ msgstr "发送"
 #: EditorToolbar.java:41 EditorToolbar.java:46 Editor.java:669
 msgid "Serial Monitor"
 msgstr "串口监视器"
-
-#: Serial.java:174
-#, java-format
-msgid ""
-"Serial port ''{0}'' already in use. Try quiting any programs that may be "
-"using it."
-msgstr ""
-
-#: Serial.java:121
-#, java-format
-msgid ""
-"Serial port ''{0}'' already in use. Try quitting any programs that may be "
-"using it."
-msgstr ""
 
 #: Serial.java:194
 #, java-format
@@ -1353,6 +1510,10 @@ msgstr "代码草稿箱消失"
 msgid "Sketchbook location:"
 msgstr "草稿码位置"
 
+#: ../../../processing/app/BaseNoGui.java:428
+msgid "Sketchbook path not defined"
+msgstr ""
+
 #: ../../../processing/app/Base.java:785
 msgid "Sketches (*.ino, *.pde)"
 msgstr "Sketches (*.ino, *.pde)"
@@ -1402,6 +1563,10 @@ msgstr "泰米尔语"
 #: debug/Compiler.java:414
 msgid "The 'BYTE' keyword is no longer supported."
 msgstr "不再支持 ‘BYTE’  关键字。"
+
+#: ../../../processing/app/BaseNoGui.java:484
+msgid "The --upload option supports only one file at a time"
+msgstr ""
 
 #: debug/Compiler.java:426
 msgid "The Client class has been renamed EthernetClient."
@@ -1470,12 +1635,12 @@ msgid ""
 "but anything besides the code will be lost."
 msgstr "sketch 文件夹消失了，\n是否尝试重新保存在相同位置，\n除代码外所有的东西都会丢失。"
 
-#: Sketch.java:2018
+#: ../../../processing/app/Sketch.java:2028
 msgid ""
 "The sketch name had to be modified. Sketch names can only consist\n"
 "of ASCII characters and numbers (but cannot start with a number).\n"
-"They should also be less less than 64 characters long."
-msgstr "sketch 文件名无效，sketch 文件名仅可以包含有\nASCII 支持的字符和数字(不可以以数字开头)，\n且支持的最大文件名长度为64字符。"
+"They should also be less than 64 characters long."
+msgstr ""
 
 #: Base.java:259
 msgid ""
@@ -1485,6 +1650,12 @@ msgid ""
 "necessary. Arduino will then stop talking about\n"
 "himself in the third person."
 msgstr "草稿码文件夹已不存在，\nArduino将使用预设的文件夹位置，\n并视需要新增文件夹。\n然后Arduino将停止以第三人称提及自己。"
+
+#: ../../../processing/app/debug/Compiler.java:201
+msgid ""
+"Third-party platform.txt does not define compiler.path. Please report this "
+"to the third-party hardware maintainer."
+msgstr ""
 
 #: Sketch.java:1075
 msgid ""
@@ -1627,6 +1798,13 @@ msgstr "越南语"
 #: Editor.java:1105
 msgid "Visit Arduino.cc"
 msgstr "访问Arduino.cc"
+
+#: ../../../processing/app/debug/Compiler.java:115
+#, java-format
+msgid ""
+"WARNING: library {0} claims to run on {1} architecture(s) and may be "
+"incompatible with your current board which runs on {2} architecture(s)."
+msgstr ""
 
 #: Base.java:2128
 msgid "Warning"
@@ -1796,10 +1974,6 @@ msgstr "环境"
 msgid "http://arduino.cc/"
 msgstr "http://arduino.cc/"
 
-#: ../../../processing/app/debug/Compiler.java:49
-msgid "http://github.com/arduino/Arduino/issues"
-msgstr "http://github.com/arduino/Arduino/issues"
-
 #: UpdateCheck.java:118
 msgid "http://www.arduino.cc/en/Main/Software"
 msgstr "http://www.arduino.cc/en/Main/Software"
@@ -1829,17 +2003,6 @@ msgstr "名称是空的"
 msgid "platforms.html"
 msgstr "platforms.html"
 
-#: Serial.java:451
-#, java-format
-msgid ""
-"readBytesUntil() byte buffer is too small for the {0} bytes up to and "
-"including char {1}"
-msgstr ""
-
-#: Sketch.java:647
-msgid "removeCode: internal error.. could not find code"
-msgstr "removeCode: 内部错误...找不到代码"
-
 #: Editor.java:932
 msgid "serialMenu is null"
 msgstr ""
@@ -1849,6 +2012,11 @@ msgstr ""
 msgid ""
 "the selected serial port {0} does not exist or your board is not connected"
 msgstr ""
+
+#: ../../../processing/app/Base.java:389
+#, java-format
+msgid "unknown option: {0}"
+msgstr "未知的选项: {0}"
 
 #: Preferences.java:391
 msgid "upload"
@@ -1873,3 +2041,45 @@ msgstr "{0} | Arduino {1}"
 #, java-format
 msgid "{0}.html"
 msgstr "{0}.html"
+
+#: ../../../processing/app/Base.java:519
+#, java-format
+msgid "{0}: Invalid argument to --pref, should be of the form \"pref=value\""
+msgstr ""
+
+#: ../../../processing/app/Base.java:476
+#, java-format
+msgid ""
+"{0}: Invalid board name, it should be of the form \"package:arch:board\" or "
+"\"package:arch:board:options\""
+msgstr ""
+
+#: ../../../processing/app/Base.java:509
+#, java-format
+msgid "{0}: Invalid option for \"{1}\" option for board \"{2}\""
+msgstr ""
+
+#: ../../../processing/app/Base.java:507
+#, java-format
+msgid "{0}: Invalid option for board \"{1}\""
+msgstr ""
+
+#: ../../../processing/app/Base.java:502
+#, java-format
+msgid "{0}: Invalid option, should be of the form \"name=value\""
+msgstr ""
+
+#: ../../../processing/app/Base.java:486
+#, java-format
+msgid "{0}: Unknown architecture"
+msgstr "{0}: 未知的结构"
+
+#: ../../../processing/app/Base.java:491
+#, java-format
+msgid "{0}: Unknown board"
+msgstr "{0}: 未知的版型"
+
+#: ../../../processing/app/Base.java:481
+#, java-format
+msgid "{0}: Unknown package"
+msgstr "{0}: 未知的软件包"
