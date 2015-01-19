@@ -721,6 +721,8 @@
       <param name="dest_folder" value="${staging_folder}" />
     </antcall>
     <copy file="windows/libastylej/AStylej.dll" todir="windows/work/lib" />
+    <copy file="windows/msvcp100.dll" todir="windows/work" />
+    <copy file="windows/msvcr100.dll" todir="windows/work" />
 
     <!-- Copy bossac.exe tool -->
     <copy todir="windows/work/hardware/tools">
