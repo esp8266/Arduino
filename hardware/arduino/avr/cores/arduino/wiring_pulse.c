@@ -61,9 +61,25 @@ unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout)
 		width++;
 	}
 
-	// convert the reading to microseconds. The loop has been determined
-	// to be 20 clock cycles long and have about 16 clocks between the edge
-	// and the start of the loop. There will be some error introduced by
+	// convert the reading to microseconds. There will be some error introduced by
 	// the interrupt handlers.
-	return clockCyclesToMicroseconds(width * 21 + 16); 
+
+	// Conversion constants are compiler-dependent, different compiler versions
+	// have different levels of optimization.
+#if __GNUC__==4 && __GNUC_MINOR__==3 && __GNUC_PATCHLEVEL__==2
+	// avr-gcc 4.3.2
+	return clockCyclesToMicroseconds(width * 21 + 16);
+#elif __GNUC__==4 && __GNUC_MINOR__==8 && __GNUC_PATCHLEVEL__==1
+	// avr-gcc 4.8.1
+	return clockCyclesToMicroseconds(width * 24 + 16);
+#elif __GNUC__<=4 && __GNUC_MINOR__<=3
+	// avr-gcc <=4.3.x
+	#warning "pulseIn() results may not be accurate"
+	return clockCyclesToMicroseconds(width * 21 + 16);
+#else
+	// avr-gcc >4.3.x
+	#warning "pulseIn() results may not be accurate"
+	return clockCyclesToMicroseconds(width * 24 + 16);
+#endif
+
 }
