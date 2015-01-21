@@ -33,26 +33,41 @@ static uint8_t s_sda_pin = 0;
 static uint8_t s_scl_pin = 2;
 static uint32_t s_i2c_delay = 5;
 
+static inline void i2c_digital_write(int pin, int val)
+{
+	uint32_t mask = 1 << pin;
+    if (val)
+      GPIO_REG_WRITE(GPIO_OUT_W1TS_ADDRESS, mask);
+    else
+      GPIO_REG_WRITE(GPIO_OUT_W1TC_ADDRESS, mask);
+}
+
 static inline void i2c_set(int sda, int scl)
 {
-	digitalWrite(s_sda_pin, sda);
-	digitalWrite(s_scl_pin, scl);
+	i2c_digital_write(s_sda_pin, sda);
+	i2c_digital_write(s_scl_pin, scl);
 }
 
 static inline void i2c_set_sda(int sda)
 {
-	digitalWrite(s_sda_pin, sda);
+	i2c_digital_write(s_sda_pin, sda);
 }
 
 static inline void i2c_set_scl(int scl)
 {
-	digitalWrite(s_scl_pin, scl);
+	i2c_digital_write(s_scl_pin, scl);
 }
 
 static inline uint8_t i2c_get_sda()
 {
 	return GPIO_INPUT_GET(GPIO_ID_PIN(s_sda_pin));
 }
+
+static inline uint8_t i2c_get_scl()
+{
+	return GPIO_INPUT_GET(GPIO_ID_PIN(s_scl_pin));
+}
+
 
 static inline void i2c_wait()
 {
@@ -70,8 +85,8 @@ void i2c_init(int sda_pin, int scl_pin)
 {
 	s_sda_pin = sda_pin;
 	s_scl_pin = scl_pin;
-	pinMode(sda_pin, OUTPUT_OPEN_DRAIN);
-	pinMode(scl_pin, OUTPUT_OPEN_DRAIN);
+	pinMode(ESP_PINS_OFFSET + sda_pin, OUTPUT_OPEN_DRAIN);
+	pinMode(ESP_PINS_OFFSET + scl_pin, OUTPUT_OPEN_DRAIN);
 	i2c_set(1, 1);
 	i2c_wait();
 }
@@ -79,8 +94,8 @@ void i2c_init(int sda_pin, int scl_pin)
 
 void i2c_release()
 {
-	pinMode(s_sda_pin, INPUT);
-	pinMode(s_scl_pin, INPUT);
+	pinMode(ESP_PINS_OFFSET + s_sda_pin, INPUT);
+	pinMode(ESP_PINS_OFFSET + s_scl_pin, INPUT);
 }
 
 void i2c_start()
@@ -142,6 +157,7 @@ uint8_t i2c_read(void)
 		i2c_set_scl(0);
 		i2c_wait();
 	}
+	return result;
 }
 
 
@@ -167,11 +183,14 @@ size_t i2c_master_read_from(int address, uint8_t* data, size_t size, bool sendSt
 	uint8_t* end = data + size;
 	for (;data != end; ++data )
 	{
+		i2c_set_sda(1);
+		pinMode(ESP_PINS_OFFSET + s_sda_pin, INPUT);
 		*data = i2c_read();
+		pinMode(ESP_PINS_OFFSET + s_sda_pin, OUTPUT_OPEN_DRAIN);
 		if (data == end - 1)
-			i2c_set_ack(1);
-		else
 			i2c_set_ack(0);
+		else
+			i2c_set_ack(1);
 	}
 	if (sendStop)
 		i2c_stop();
