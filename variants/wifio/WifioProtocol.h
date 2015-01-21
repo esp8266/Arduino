@@ -24,11 +24,12 @@
 
 #include <stdint.h>
 #include "Arduino.h"
+#include "i2c.h"
 
 inline void protocolError()
 {
   delay(5);
-  Serial.flush();
+  i2c_stop();
 }
 
 namespace wifio {
@@ -112,48 +113,39 @@ struct AnalogReadResultCommand {
   uint8_t      parity : 1;
 };
 
+
 template<typename T>
-void sendCommand(Stream& stream, T& t)
+void sendCommand(uint8_t addr, T& t)
 {
   // TODO: calculate parity
   t.parity = 1;
-  stream.write(reinterpret_cast<const uint8_t*>(&t), sizeof(T));
+  if (i2c_master_write_to(addr, reinterpret_cast<const uint8_t*>(&t), sizeof(T), true) != sizeof(T))
+  {
+    protocolError();
+  }
 }
 
-template<typename T>
-bool expectCommand(Stream& stream, enum Command cmd, T& t)
+template<typename TC, typename TR>
+bool sendCommandWaitForReply(uint8_t addr, TC& c, Command rt, TR& r, int32_t d_us)
 {
-  size_t nIt = 0;
-  t = { 0 };
-  while (stream.available() < sizeof(T))
+  c.parity = 1;
+  if (i2c_master_write_to(addr, reinterpret_cast<const uint8_t*>(&c), sizeof(TC), true) != sizeof(TC))
   {
-    if (++nIt == 100) {
-      return false;
-    }
-    delayMicroseconds(10);
+    protocolError();
+    return false;
   }
-  uint8_t* p = reinterpret_cast<uint8_t*>(&t);
-  for (size_t i = 0; i < sizeof(T); ++i)
-    p[i] = stream.read();
-  // TODO : check parity
-  if (static_cast<uint8_t>(cmd) != t.header.cmd) {
+  if (d_us)
+  {
+    delayMicroseconds(d_us);
+  }
+  if (i2c_master_read_from(addr, reinterpret_cast<uint8_t*>(&r), sizeof(TR), true) != sizeof(TR) || r.header.cmd != rt)
+  {
     protocolError();
     return false;
   }
   return true;
 }
 
-inline Command peekCommand(Stream& stream)
-{
-  if (!stream.available())
-    return CMD_NONE;
-
-  uint8_t b = stream.peek();
-  CommandHeader* h = reinterpret_cast<CommandHeader*>(&b);
-  if (h->magic != MAGIC)
-    return CMD_INVALID;
-  return static_cast<Command>(h->cmd);
-}
 
 }// namespace wifio
 
