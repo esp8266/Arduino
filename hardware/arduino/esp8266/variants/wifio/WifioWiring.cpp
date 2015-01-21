@@ -24,41 +24,34 @@
 
 
 namespace wifio {
+    const int WIFIO_AVR_SLAVE_ADDR=0x23;
     
     void pinMode(int avrPin, int mode) {
         PinModeCommand cmd { MAGIC, CMD_PINMODE, static_cast<uint8_t>(avrPin), static_cast<uint8_t>(mode) };
-        sendCommand(Serial, cmd);
+        sendCommand(WIFIO_AVR_SLAVE_ADDR, cmd);
     }
     
     void digitalWrite(int avrPin, int value) {
         DigitalWriteCommand cmd { MAGIC, CMD_DIGITALWRITE, static_cast<uint8_t>(avrPin), static_cast<uint8_t>(value) };
-        sendCommand(Serial, cmd);
+        sendCommand(WIFIO_AVR_SLAVE_ADDR, cmd);
     }
     
     int digitalRead(int avrPin) {
         DigitalReadCommand cmd { MAGIC, CMD_DIGITALREAD, static_cast<uint8_t>(avrPin) };
-        sendCommand(Serial, cmd);
-        DigitalReadResultCommand reply;
-        if (!expectCommand(Serial, CMD_DIGITALREADRESULT, reply) || reply.pin != avrPin) {
-            protocolError();
-            return 0;
-        }
+        DigitalReadResultCommand reply = { 0 };
+        sendCommandWaitForReply(WIFIO_AVR_SLAVE_ADDR, cmd, CMD_DIGITALREADRESULT, reply, 0);
         return reply.value;
     }
     
     void analogWrite(int avrPin, int value) {
         AnalogWriteCommand cmd { MAGIC, CMD_ANALOGWRITE, static_cast<uint8_t>(value), static_cast<uint8_t>(avrPin) };
-        sendCommand(Serial, cmd);
+        sendCommand(WIFIO_AVR_SLAVE_ADDR, cmd);
     }
     
     int analogRead(int avrPin) {
         AnalogReadCommand cmd { MAGIC, CMD_ANALOGREAD, static_cast<uint8_t>(avrPin) };
-        sendCommand(Serial, cmd);
-        AnalogReadResultCommand reply;
-        if (!expectCommand(Serial, CMD_ANALOGREADRESULT, reply) || reply.pin != avrPin) {
-            protocolError();
-            return 0;
-        }
+        AnalogReadResultCommand reply = { 0 };
+        sendCommandWaitForReply(WIFIO_AVR_SLAVE_ADDR, cmd, CMD_ANALOGREADRESULT, reply, 120);
         return ((reply.val_h << 7) | reply.val_l);
     }
     
@@ -119,7 +112,8 @@ extern "C" void analogWrite(uint8_t pin, int value) {
   }
 }
 
+
 void initVariant() 
 { 
-
+  i2c_init(SDA, SCL);
 }
