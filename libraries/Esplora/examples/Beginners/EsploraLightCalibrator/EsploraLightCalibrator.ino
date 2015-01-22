@@ -1,17 +1,17 @@
 /*
   Esplora Led calibration
- 
+
  This  sketch shows you how to read and calibrate the light sensor.
- Because light levels vary from one location to another, you need to calibrate the 
+ Because light levels vary from one location to another, you need to calibrate the
  sensor for each location. To do this, you read the sensor for a few seconds,
- and save the highest and lowest readings as maximum and minimum.  
+ and save the highest and lowest readings as maximum and minimum.
  Then, when you're using the sensor's reading (for example, to set the brightness
  of the LED), you map the sensor's reading to a range between the minimum
  and the maximum.
- 
+
  Created on 22 Dec 2012
  by Tom Igoe
- 
+
  This example is in the public domain.
  */
 
@@ -43,9 +43,9 @@ void loop() {
   int brightness = map(light, lightMin, lightMax, 0, 255);
   // limit the brightness to a range from 0 to 255:
   brightness = constrain(brightness, 0, 255);
-  // write the brightness to the blue LED. 
+  // write the brightness to the blue LED.
   Esplora.writeBlue(brightness);
-  
+
   // if the calibration's been done, show the sensor and brightness
   // levels in the serial monitor:
   if (calibrated == true) {
@@ -56,7 +56,7 @@ void loop() {
     Serial.println(brightness);
   }
   // add a delay to keep the LED from flickering:
-  delay(10); 
+  delay(10);
 }
 
 void calibrate() {
@@ -64,8 +64,8 @@ void calibrate() {
   Serial.println("While holding switch 1, shine a light on the light sensor, then cover it.");
 
   // calibrate while switch 1 is pressed:
-  while(Esplora.readButton(1) == LOW) {
-    // read the sensor value: 
+  while (Esplora.readButton(1) == LOW) {
+    // read the sensor value:
     int light  = Esplora.readLightSensor();
 
     // record the maximum sensor value:

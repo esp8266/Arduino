@@ -1,4 +1,391 @@
 
+ARDUINO 1.6.0rc2 - 2015.01.20
+
+[ide]
+* Reenabled speed of 38400 on serial monitor
+* Improved Find/Replace dialog layout (Eberhard Fahle)
+* Fixed missing .dll error on some Windows box
+
+[core]
+* Arduino "boolean" type is now mapped to "bool" instead of "uint8_t" (Christopher Andrews)
+* sam: HardwareSerial now has buffered transmission (Collin Kidder)
+* sam: HardwareSerial fixed modes (parity, data bits, stop bits) (bluesign2k)
+* avr: Fixed regression in pulseIn() function accuracy
+
+[libraries]
+* GSM: minor changes and bug fix (https://github.com/arduino/Arduino/pull/2546)
+
+The following changes are included also in the Arduino IDE 1.0.7:
+
+[ide]
+* Mitigated Serial Monitor resource exhaustion when the connected device sends a lot of data (Paul Stoffregen)
+
+ARDUINO 1.6.0rc1
+
+* IDE internals have been refactored and sorted out. (Claudio Indellicati)
+  https://github.com/arduino/Arduino/pull/2328
+  The builder and the GUI now have clearly separated source code making it easier
+  for IDE developers to maintain and propose patch.
+  From a user point of view nothing changes and the IDE should behave exactly as before.
+
+[ide]
+* Autosave on sketch Upload/Verify (Fulvio Ieva)
+* Sketch build process: fixed full rebuild on windows even if not needed
+* Sketch build process: core.a rebuild only if needed (Matthijs Kooijman)
+* Updated AStyle formatter to v2.04: http://astyle.sourceforge.net/notes.html
+* Improved avrdude verbose upload (Matthijs Kooijman)
+* (Mac OSX) Add Exported UTI for ino files, allows quick look to view the
+  content of the file and external editors to syntax highlight as C++ (Matt Lloyd)
+* Updated libastyle to 2.05
+
+[core]
+* sam: added -MMD flag to let gcc produce dependency files (full rebuild on Arduino Due is now triggered only if needed)
+
+[libraries]
+* LiquidCrystal: added setRowOffsets function to support different LCD hardware configurations (Mark Sproul)
+* LiquidCrystal: various improvements and optimizations (Matthijs Kooijman)
+* Fixed PROGMEM error in Robot_Control/examples/explore/R06_Wheel_Calibration
+* SD: Fixed SPI transaction mismatch (Paul Stoffregen)
+
+The following changes are included also in the Arduino IDE 1.0.7:
+
+[libraries]
+* EthernetClien: use IANA recommended ephemeral port range, 49152-65535 (Jack Christensen, cifer-lee)
+
+[core]
+* Fixed regression in HardwareSerial::available() introduced with https://github.com/arduino/Arduino/pull/2057
+
+ARDUINO 1.5.8 BETA - 2014.10.01
+
+[ide]
+* Find/Replace over multiple tabs (Erwin Ried, Fulvio Ieva)
+* Fix wrong "Replace" behavior with empty "Find" field (Fulvio Ieva)
+* A lot of command-line improvements (Matthijs Kooijman)
+* Cursor is not moved when invoking autoformat
+
+[libraries]
+* SPI: added transaction API (Paul Stoffregen)
+  https://github.com/arduino/Arduino/pull/2223
+  https://groups.google.com/a/arduino.cc/forum/#!msg/developers/TuZLfjeZjDI/6deNjw3Y9m4J
+* FileIO bridge: fixed wrong return value in File::size() for size >32768
+* Updated Temboo to latest version
+* Updates/Fix to various examples
+
+[core]
+* sam: "new" and "delete" do not bring in 50Kb of stdclib anymore
+* Correct implementation of gcc specific internal functions (__cxa_guard_*) (Alexey Guseynov)
+* Fix for upload problems on Leonardo (and derivative boards based on mega32u4)
+* Small improvements on String class (Matthijs Kooijman)
+* Fixed size of available flash for mega2560 boards (Leonardo Milani, Arnav Gupta)
+* sam: removed useless empty digitalPinToTimer(..) macro stub (Bill Perry)
+
+The following changes are included also in the Arduino IDE 1.0.6:
+
+[core]
+* avr: Added replacement stub for cstdlib atexit() funciton (Christopher Andrews)
+
+ARDUINO 1.5.7 BETA - 2014.07.07
+
+[core]
+* Upgraded AVR toolchain: gcc 4.8.1, avr-libc 1.8.0
+* Upgraded ARM toolchain: gcc 4.8.3-2014q1
+* Upgraded avrdude to version 6.0.1
+* ARM gcc doesn't require ia32-libs anymore on 64 bits linux systems
+* avr: fixed typo in SerialEvent3 handling (Matthijs Kooijman)
+* avr: HardwareSerial support for different size of TX and RX buffer sizes (Jan Baeyens)
+* avr: HardwareSerial support for buffer sizes bigger than 256 bytes (Jan Baeyens)
+* sam: Added configuration (parity, data bits, stop bits) to Serial1/2/3 of Arduino Due (bluesign2k)
+* Removed a lot of compiler warnings from Arduino core
+* avr: Fix EXTERNAL_NUM_INTERRUPTS for atmega128rfa1 and atmega256rfr2 (Matthijs Kooijman)
+* sam: Fix to Wire::endTransmisson() return value (bluesign2k)
+* sam: Fix to Wire usage of TWI status register (bluesign2k)
+* avr: Fixed PROGMEM statements to be compatible with newer avr gcc (Scott Howard)
+
+[ide]
+* Moved to appbundler for building releases for MacOSX. (Haavar Valeur)
+  This should remove dependency from Java 1.6 on recent MacOSX.
+* Added support for '-' and '.' in filenames (Georg von Zengen)
+* (re)Added 'arduino_debug.exe' in Windows build for debugging purposes
+* Magic baudrate is no longer removed (it was a workaround for RXTX)
+  (for more info see github issues: #1203 and #995)
+* Allow overriding platform.txt using platform.local.txt (Matthijs Kooijman)
+* Explicitly define compiler.path in avr/platform.txt (Matthijs Kooijman)
+* Make the low available memory message a warning (Matt Robinson)
+* Proceed with upload even if port can't be found (David Mellis)
+* Added support for ArduinoISP
+* Windows: added board detection on serial port menu
+
+[libraries]
+* Updated SpaceBrew library
+* Fixed HttpClient::running() function
+* Fixed HttpClient::ready() function (Manuel Rabade)
+* Added HttpClient::noCheckSSL() method
+* Improved speed of YunSerialTerminal
+* Fixed CRC of shutdown command on YunSerialTerminal example
+* Updates/Fix to various examples
+* Added Wire.setClock(..) method (Kristian Sloth Lauszus)
+
+The following changes are included also in the Arduino IDE 1.0.6:
+
+[core]
+* avr: Improved USB-CDC write speed (Justin Rajewski)
+* avr: Improved USB-CDC read code (Paul Brook)
+* avr: Fixed race condition in USB-CDC transmit (Paul Brook)
+* Fixed wrong NULL pointer handling in Stream class (Amulya Kumar Sahoo)
+* Added initVariant() hook to allow 3rd party variant-specific initialization
+
+[ide]
+* Fix toolchain command line to compile assembler files (Jimmy Hedman)
+* If two libraries have the same header file use the lib with the same folder name (Paul Stoffregen)
+
+[libraries]
+* Robot_Control: removed duplicated SPI and Wire (Xun Yang)
+* Robot_Control: fixed issue on motors being opposite (Xun Yang)
+* Robot_Control: updated turning algorithm (Xun Yang)
+* Esplora: added reading form Tinkerkit inputs
+* SoftwareSerial: Fix idle level when initializing with inverted logic (Jens-Christian Skibakk)
+
+[firmware]
+* Wifishield: fixed paths on firmware upgrade scripts
+
+ARDUINO 1.5.6-r2 BETA - 2014.02.21
+
+[ide]
+* JSSC: Fixed NPE when RXCHAR event with no bytes (José Pereda)
+
+ARDUINO 1.5.6 BETA - 2014.02.20
+
+[ide]
+* Implemented 1.5 library specification Rev.2
+  (https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5:-Library-specification)
+* Replaced RXTX library with JSSC (Alexey Sokolov)
+  http://code.google.com/p/java-simple-serial-connector/
+* If two libraries provides the same .h file prioritize the library with tha same folder name
+* Improved command-line parsing (Matthijs Kooijman)
+* Windows: added arduino_debug.exe to help debugging errors when launch4j fails to start IDE
+
+[libraries]
+* TFT: warning messages in PImage class and strings inside examples now stored in flash to save RAM. 
+* Ethernet: added operator == for EthernetClient class (Norbert Truchsess)
+* Robot_Control: removed embedded copies of Wire and SPI to allow their use in sketch.
+  Old sketches using Robot_Control now must include Wire.h and SPI.h.
+* Robot_Control: fixed issues about motor turning algorithm
+* Bridge: optimized FileIO.doBuffer() (bobh66)
+
+[core]
+* avr: Pile of HardwareSerial improvements (Matthijs Kooijman)
+  - Remove duplicate code from HardwareSerial::begin() methods
+  - Simplify HardwareSerial::begin() (Rob Tillaart)
+  - Use constants for register bit positions in HardwareSerial
+  - Fix HardwareSerial::flush() when interrupts are kept disabled for a while
+  - Fix lockup when writing to HardwareSerial with interrupts disabled
+  - Disable the UDRE interrupt sooner in HardwareSerial (Nathan Blackwell)
+  - Put each HardwareSerial instance in its own .cpp file in order to save memory
+    for unused UARTS
+  - In HardwareSerial::write, bypass the queue when it's empty in order to
+    improve throughput when using high baudrates (KurtE)
+* sam: Fixed wrap-around bug in delay() (Mark Tillotson)
+* sam: Fixed regression in analogRead() (fails to read multiple channels) (Mark Tillotson)
+* sam: Fixed loops in Reset.cpp (Matthijs Kooijman)
+* sam: Optimized delayMicroseconds() (Rob Tillaart) #1121
+* sam: added itoa() and related functions
+* Optimized Print::print(String&) method, now uses internal string buffer to perform block write
+* Improved portability of String class (maniacbug) #695
+* Make some operators in IPAddress const (Matthijs Kooijman)
+* Fix for compiling assembler files with newer gcc
+
+ARDUINO 1.5.5-r2 BETA - 2014.01.10
+
+* Signed drivers for Windows 8.1
+* Fixed Windows drivers signature (that prevented installation on
+  some Windows 8.x OS). Now the signature is timestamped and should
+  not expire.
+
+ARDUINO 1.5.5 BETA - 2013.11.28
+
+NOTICE:
+The 1.5 library format is under heavy review on the Arduino Developers mailing list.
+We suggest to delay the adoption of the new format until a stable 1.5.x is released.
+
+[ide]
+* Added missing keywords: YunServer, YunClient, pow
+* Improved folder ignore: now hidden, starting with a dot, and SCCS folders are ignored
+* Improved auto format: now handled by Artistic Style http://astyle.sourceforge.net/
+* Improved SSH uploader (Arduino Yún): uses file ~/.ssh/config if available.
+  Allows public key only authentication and ssh servers listening on ports other than 22.
+* Font anti-aliasing now ON by default (users will have to either delete or manually edit their preferences.txt file)
+* Added warning message when opening sketches with additional files with illegal names
+* (windows) Upgraded embedded Java runtime to version 7: much faster startup
+* Improved files open/save dialogs
+* Added line numbers, can be enabled/disabled from preferences (Cayci Gorlitsky)
+* Removed check on forbidden file in 1.5 formatted libraries (#1692)
+* (windows) Updated msys-1.0.dll to the latest version (Windows 8.1 compatibility)
+* Using [code] tag instead of [quote] in "Copy for forum". Removed color coding.
+* When an hardware addon reference another core also the libraries are referenced.
+* It's now possible to specify additional custom board parameters from command line.
+* Sketches path can be relative (#1493)
+* Example and Boards are now scrollable.
+* Fixed localization issues that sometimes prevented the IDE to start.
+* Added "Using library..." debugging message in verbose compile.
+* Improved preprocessor (fixes #1653, #1687, #817, #1293, #1245)
+* Fixed StringStartsWithEndsWith, KeyboardMessage, LCD CustomCharacter, Blink without delay, SD List files, Arduino Robot examples
+* Added PID/VID for older Arduinos
+* (mac) Improved board autodetection on Mac OS X
+
+[libraries]
+* Bridge: Fixed buffer overflow in File::doBuffer() (dreggy)
+* Bridge: Fixed timeout in Bridge::transfer()
+* Bridge: Fixed return value of Bridge::get(..) (returning 0 with valid data len >0)
+* Bridge: Implemented multi-byte File::read(..)
+* sam: Fixed SPI initialization (when using extended API and multiple CS)
+* Partially fixed the behavior of EthernetClient::flush(), now it doesn't discard 
+  incoming data BUT it doesn't wait for outgoing data to be successfully transmitted.
+* Esplora: Added support for display GREENTAB_L
+
+[core]
+* sam: Fixed wrong initialization for ADC timings (analogRead speed Arduino DUE improved by a factor x10)
+       https://github.com/arduino/Arduino/issues/1418
+       (http://www.djerickson.com/arduino/)
+* avr: Fixed wrong extended fuses on Arduino Yún when using external programmer
+* Added LED_BUILTIN metadata in variant files
+* avr: Refactored Mega* variants definitions in boards.txt (Kristian Sloth Lauszus)
+* avr: Removed File object destructor. In order to free memory allocated by a File object the safest way is to call its close() method
+* Added digitalPinToInterrupt variant macro (Paul Stoffregen)
+* avr: added variant file for Arduino Ethernet
+* Added SERIAL_* metadata in variants files (Paul Stoffregen)
+
+ARDUINO 1.5.4 BETA - 2013.09.10
+
+[ide]
+* Revert to English locale if the system default is not available
+* Added support for Arduino Yún
+* Autodetect of boards connected to each serial port
+* Network upload and discovery for Arduino Yún
+
+[libraries]
+* sam: fixed wrong SPI initialization (noblepepper)
+* updated all instances of Adafruit_GFX to the latest version
+* added libraries for Arduino Yún
+
+[core]
+* avr: fixed bug introduced with recent optimizations in HardwareSerial (atmega8 cpu) (darryl)
+
+ARDUINO 1.5.3 BETA - 2013.08.30
+
+[ide]
+* Removed useless baud rates from serial monitor
+* Fixed some minor IDE UI bugs (Shigeru Kanemoto)
+* Added support for new 1.5 Library format (https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5:-Library-specification)
+* Pass board type from boards.txt (https://github.com/arduino/Arduino/issues/308)
+* Display estimated RAM usage after compile (Loren M. Lang)
+* Import library menu is now scrollable
+* Scrollable menus can now be scrolled with the mouse wheel
+
+[arduino core]
+* sam: Fixed delayMicrosecond() when interrupts are disabled (Paul Stoffregen)
+* sam: Upgraded libsam, and added missing modules (CAN, ETH, etc.) (Thibaut Viard)
+* sam: Added compatibility for avr/pgmspace.h (Paul Stoffregen)
+* sam: Added serialEvent*() support
+* sam: Fixed micros() to work with inside interrupts. (stimmer)
+* avr: Added support for Flash strings on String class (Jantje)
+* Added support for floating point numbers in String class (Tevin Zhang, SebiTimeWaster)
+* sam: Fixed String buffer overflows (Paul Stoffregen)
+* avr: Added recipe for assembly files (C. A. Church)
+* avr: Use analogPinToChannel if it's defined (Kristian Sloth Lauszus)
+* avr: Optimized HardwareSerial buffer (Matthijs Kooijman)
+* removed unused flags from String (free 1 byte of SRAM)
+
+[libraries]
+* sam: Removed CAN library, you can find an updated version here:  
+       https://github.com/collin80/due_can
+* sam: Bugfix SPI library: begin() after end() now works (stimmer)
+* sam: Bugfix SPI library: incorrent pin configuration in non-extended mode.
+* Ported all libraries to new 1.5 format
+* Updated Firmata to version 2.3.6 (Jeff Hoefs)
+
+[firmwares]
+* Arduino Due: fixed USB2Serial garbage at startup (https://github.com/arduino/Arduino/pull/1267)
+
+[other]
+* Merged all improvements made in Arduino IDE 1.0.5
+
+ARDUINO 1.5.2 BETA - 2013.02.06
+
+[ide]
+* Scrollable editor tabs (Shigheru KANEMOTO)
+* Scrollable menus
+* Portable Arduino (Shigeru KANEMOTO)
+* Default sketchbook folder for linux is now "Arduino"
+* Fixed IDE startup bug "Menu has no enabled items"
+* Command line build.
+* Fixed some language strings (Shigeru KANEMOTO)
+* Fix to boards.txt: added Micro and fixed Lilypad bootloader path
+* Removed check for ".h" existence in libraries.
+* Deleting tab from IDE does not delete from temporary folder
+* Fixed NPE when unknown boards/platforms are selected in preferences
+* Extended command line build flags
+* Undo/Redo move cursor and focus to where the code has been undone/redone
+
+[arduino core]
+* sam: attachInterrupt() now works also on pins that belongs to PORTD
+* sam: portOutputRegister() is now writeable.
+* sam: fixed issue on weak-symbol for some interrupt handlers
+* sam: fixed BSoD on some Windows machine (louismdavis)
+* sam: added CANRX1/CANTX1 pins 88/89 (same physical pin for 66/53)
+* sam: fixed analogWrite when used in very thight write loops (V.Dorrich)
+* sam: fixed SerialUSB.write() while sending big buffers (Bill Dreschel)
+* sam: SerialUSB receive buffer size is now 512 (PeterVH)
+* sam: Fixed SerialUSB data handshake when host sends a lot of data (PeterVH, stimmer)
+
+[libraries]
+* sam: Added Servo library
+* sam: Added WiFi library
+* Fixed USBHost MouseController example
+
+[other]
+* Merged all improvements made in Arduino IDE 1.0.3
+* Merged all improvements made in Arduino IDE 1.0.4
+
+ARDUINO 1.5.1r2 BETA - 2012.11.06
+
+* Fixed wrong release file for windows.
+
+ARDUINO 1.5.1 BETA - 2012.11.05
+
+* Merged changes coming from stable release of Arduino IDE 1.0.2.
+
+[arduino core]
+* added support for yield() function in Arduino Core. This is a
+  preliminar step for experimenting with cooperative Schedulers.
+
+[ide]
+* Simplified boards menu selection. (new boards.txt file format with
+  custom sub-menus).
+* Fixed "FAT" (multi-platform) library detection. This bug caused
+  many libraries to be detected as 'invalid'.
+
+[sam arduino core]
+* attachInterrupt() and detachInterrupt() are now working.
+* Fixed macros to query low level GPIO registers:
+  digitalPinToBitMask(), digitalPinToTimer(),
+  portOutputRegister, portInputRegister()
+* Fixed analogWrite() on DAC0/1 when writing on both DACs
+  (thanks to smay4finger)
+
+[firmwares]
+* Added firmware for atmega16u2 on Due Board.
+
+ARDUINO 1.5 BETA - 2012.10.22
+
+* First release for the unified IDE for both AVR 8-bit and ARM 32-bit
+  (SAM3 CPUs) architectures.
+* This release include the SAM Arduino Core used in the Arduino Due 
+  Board.
+* Everything is in beta, most features or libraries are still  missing 
+  or incomplete.
+* For more info refer to this press release:
+  http://arduino.cc/blog/2012/10/22/arduino-1-5-support-for-the-due-and-other-processors-easier-library-installation-simplified-board-menu-etc/
+
 ARDUINO 1.0.7
 
 [libraries]

@@ -1,29 +1,29 @@
 /*
   Conditionals - while statement
- 
+
  This example demonstrates the use of  while() statements.
- 
+
  While the pushbutton is pressed, the sketch runs the calibration routine.
- The  sensor readings during the while loop define the minimum and maximum 
+ The  sensor readings during the while loop define the minimum and maximum
  of expected values from the photo resistor.
- 
+
  This is a variation on the calibrate example.
- 
+
  The circuit:
  * photo resistor connected from +5V to analog in pin 0
  * 10K resistor connected from ground to analog in pin 0
  * LED connected from digital pin 9 to ground through 220 ohm resistor
  * pushbutton attached from pin 2 to +5V
  * 10K resistor attached from pin 2 to ground
- 
+
  created 17 Jan 2009
  modified 30 Aug 2011
  by Tom Igoe
- 
+
  This example code is in the public domain.
 
  http://arduino.cc/en/Tutorial/WhileLoop
- 
+
  */
 
 
@@ -50,10 +50,10 @@ void setup() {
 void loop() {
   // while the button is pressed, take calibration readings:
   while (digitalRead(buttonPin) == HIGH) {
-    calibrate(); 
+    calibrate();
   }
   // signal the end of the calibration period
-  digitalWrite(indicatorLedPin, LOW);  
+  digitalWrite(indicatorLedPin, LOW);
 
   // read the sensor:
   sensorValue = analogRead(sensorPin);

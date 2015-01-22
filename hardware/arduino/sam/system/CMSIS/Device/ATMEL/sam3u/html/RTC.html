@@ -1,0 +1,1422 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>SAM3U RTC</title>
+    <link rel="stylesheet" type="text/css" href="css/html.css" media="all" />
+  </head>
+  <body id="abstract">
+    <div id="container">
+      <div id="content">
+        <a id="RTC"></a>
+        <h1>SAM3U RTC</h1>
+        <a id="RTC__User_Interface"></a>
+        <h2>Real-time Clock (RTC) User Interface</h2>
+<!--As per 6056I programmer datasheet.-->
+        <h3>Registers</h3>
+        <table class="registers">
+          <caption>Register Mapping</caption>
+          <thead>
+            <tr>
+              <th class="address">Address</th>
+              <th class="description">Register</th>
+              <th class="name">Name</th>
+              <th class="access">Access</th>
+              <th class="reset">Reset</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="odd">
+              <td class="address" id="address_0x400E1260">0x400E1260</td>
+              <td class="description">Control Register</td>
+              <td class="name">
+                <a href="#RTC_CR" title="Control Register" class="one_click_away">RTC_CR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400E1264">0x400E1264</td>
+              <td class="description">Mode Register</td>
+              <td class="name">
+                <a href="#RTC_MR" title="Mode Register" class="one_click_away">RTC_MR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400E1268">0x400E1268</td>
+              <td class="description">Time Register</td>
+              <td class="name">
+                <a href="#RTC_TIMR" title="Time Register" class="one_click_away">RTC_TIMR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400E126C">0x400E126C</td>
+              <td class="description">Calendar Register</td>
+              <td class="name">
+                <a href="#RTC_CALR" title="Calendar Register" class="one_click_away">RTC_CALR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x01210720</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400E1270">0x400E1270</td>
+              <td class="description">Time Alarm Register</td>
+              <td class="name">
+                <a href="#RTC_TIMALR" title="Time Alarm Register" class="one_click_away">RTC_TIMALR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400E1274">0x400E1274</td>
+              <td class="description">Calendar Alarm Register</td>
+              <td class="name">
+                <a href="#RTC_CALALR" title="Calendar Alarm Register" class="one_click_away">RTC_CALALR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x01010000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400E1278">0x400E1278</td>
+              <td class="description">Status Register</td>
+              <td class="name">
+                <a href="#RTC_SR" title="Status Register" class="one_click_away">RTC_SR</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400E127C">0x400E127C</td>
+              <td class="description">Status Clear Command Register</td>
+              <td class="name">
+                <a href="#RTC_SCCR" title="Status Clear Command Register" class="one_click_away">RTC_SCCR</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400E1280">0x400E1280</td>
+              <td class="description">Interrupt Enable Register</td>
+              <td class="name">
+                <a href="#RTC_IER" title="Interrupt Enable Register" class="one_click_away">RTC_IER</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400E1284">0x400E1284</td>
+              <td class="description">Interrupt Disable Register</td>
+              <td class="name">
+                <a href="#RTC_IDR" title="Interrupt Disable Register" class="one_click_away">RTC_IDR</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400E1288">0x400E1288</td>
+              <td class="description">Interrupt Mask Register</td>
+              <td class="name">
+                <a href="#RTC_IMR" title="Interrupt Mask Register" class="one_click_away">RTC_IMR</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400E128C">0x400E128C</td>
+              <td class="description">Valid Entry Register</td>
+              <td class="name">
+                <a href="#RTC_VER" title="Valid Entry Register" class="one_click_away">RTC_VER</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400E1344">0x400E1344</td>
+              <td class="description">Write Protect Mode Register</td>
+              <td class="name">
+                <a href="#RTC_WPMR" title="Write Protect Mode Register" class="one_click_away">RTC_WPMR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3>Register Fields</h3>
+        <h4 id="RTC_CR">RTC Control Register</h4>
+        <p><strong>Name</strong>: RTC_CR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400E1260</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="2">
+                <a href="#RTC_CR__CALEVSEL" title="Calendar Event Selection">CALEVSEL</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="2">
+                <a href="#RTC_CR__TIMEVSEL" title="Time Event Selection">TIMEVSEL</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#RTC_CR__UPDCAL" title="Update Request Calendar Register">UPDCAL</a>
+              </td>
+              <td colspan="1">
+                <a href="#RTC_CR__UPDTIM" title="Update Request Time Register">UPDTIM</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="RTC_CR__UPDTIM"><strong>UPDTIM</strong>: Update Request Time Register<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Stops the RTC time counting.</td></tr></tbody></table></li>
+          <li id="RTC_CR__UPDCAL"><strong>UPDCAL</strong>: Update Request Calendar Register<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Stops the RTC calendar counting.</td></tr></tbody></table></li>
+          <li id="RTC_CR__TIMEVSEL"><strong>TIMEVSEL</strong>: Time Event Selection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">MINUTE</td><td class="description">Minute change</td></tr><tr class="even"><td class="value">0x1</td><td class="name">HOUR</td><td class="description">Hour change</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">MIDNIGHT</td><td class="description">Every day at midnight</td></tr><tr class="even"><td class="value">0x3</td><td class="name">NOON</td><td class="description">Every day at noon</td></tr></tbody></table></li>
+          <li id="RTC_CR__CALEVSEL"><strong>CALEVSEL</strong>: Calendar Event Selection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">WEEK</td><td class="description">Week change (every Monday at time 00:00:00)</td></tr><tr class="even"><td class="value">0x1</td><td class="name">MONTH</td><td class="description">Month change (every 01 of each month at time 00:00:00)</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">YEAR</td><td class="description">Year change (every January 1 at time 00:00:00)</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="RTC_MR">RTC Mode Register</h4>
+        <p><strong>Name</strong>: RTC_MR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400E1264</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#RTC_MR__HRMOD" title="12-/24-hour Mode">HRMOD</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="RTC_MR__HRMOD"><strong>HRMOD</strong>: 12-/24-hour Mode<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">24-hour mode is selected.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">12-hour mode is selected.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="RTC_TIMR">RTC Time Register</h4>
+        <p><strong>Name</strong>: RTC_TIMR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400E1268</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td colspan="1">
+                <a href="#RTC_TIMR__AMPM" title="Ante Meridiem Post Meridiem Indicator">AMPM</a>
+              </td>
+              <td colspan="6">
+                <a href="#RTC_TIMR__HOUR" title="Current Hour">HOUR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td colspan="7">
+                <a href="#RTC_TIMR__MIN" title="Current Minute">MIN</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td colspan="7">
+                <a href="#RTC_TIMR__SEC" title="Current Second">SEC</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="RTC_TIMR__SEC"><strong>SEC</strong>: Current Second</li>
+          <p>-</p>
+          <li id="RTC_TIMR__MIN"><strong>MIN</strong>: Current Minute</li>
+          <p>-</p>
+          <li id="RTC_TIMR__HOUR"><strong>HOUR</strong>: Current Hour</li>
+          <p>-</p>
+          <li id="RTC_TIMR__AMPM"><strong>AMPM</strong>: Ante Meridiem Post Meridiem Indicator<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">AM.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">PM.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="RTC_CALR">RTC Calendar Register</h4>
+        <p><strong>Name</strong>: RTC_CALR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400E126C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td colspan="6">
+                <a href="#RTC_CALR__DATE" title="Current Day in Current Month">DATE</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="3">
+                <a href="#RTC_CALR__DAY" title="Current Day in Current Week">DAY</a>
+              </td>
+              <td colspan="5">
+                <a href="#RTC_CALR__MONTH" title="Current Month">MONTH</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#RTC_CALR__YEAR" title="Current Year">YEAR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td colspan="7">
+                <a href="#RTC_CALR__CENT" title="Current Century">CENT</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="RTC_CALR__CENT"><strong>CENT</strong>: Current Century</li>
+          <p>-</p>
+          <li id="RTC_CALR__YEAR"><strong>YEAR</strong>: Current Year</li>
+          <p>-</p>
+          <li id="RTC_CALR__MONTH"><strong>MONTH</strong>: Current Month</li>
+          <p>-</p>
+          <li id="RTC_CALR__DAY"><strong>DAY</strong>: Current Day in Current Week</li>
+          <p>-</p>
+          <li id="RTC_CALR__DATE"><strong>DATE</strong>: Current Day in Current Month</li>
+          <p>-</p>
+        </ul>
+        <h4 id="RTC_TIMALR">RTC Time Alarm Register</h4>
+        <p><strong>Name</strong>: RTC_TIMALR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400E1270</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#RTC_TIMALR__HOUREN" title="Hour Alarm Enable">HOUREN</a>
+              </td>
+              <td colspan="1">
+                <a href="#RTC_TIMALR__AMPM" title="AM/PM Indicator">AMPM</a>
+              </td>
+              <td colspan="6">
+                <a href="#RTC_TIMALR__HOUR" title="Hour Alarm">HOUR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#RTC_TIMALR__MINEN" title="Minute Alarm Enable">MINEN</a>
+              </td>
+              <td colspan="7">
+                <a href="#RTC_TIMALR__MIN" title="Minute Alarm">MIN</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#RTC_TIMALR__SECEN" title="Second Alarm Enable">SECEN</a>
+              </td>
+              <td colspan="7">
+                <a href="#RTC_TIMALR__SEC" title="Second Alarm">SEC</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="RTC_TIMALR__SEC"><strong>SEC</strong>: Second Alarm</li>
+          <p>-</p>
+          <li id="RTC_TIMALR__SECEN"><strong>SECEN</strong>: Second Alarm Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The second-matching alarm is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The second-matching alarm is enabled.</td></tr></tbody></table></li>
+          <li id="RTC_TIMALR__MIN"><strong>MIN</strong>: Minute Alarm</li>
+          <p>-</p>
+          <li id="RTC_TIMALR__MINEN"><strong>MINEN</strong>: Minute Alarm Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The minute-matching alarm is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The minute-matching alarm is enabled.</td></tr></tbody></table></li>
+          <li id="RTC_TIMALR__HOUR"><strong>HOUR</strong>: Hour Alarm</li>
+          <p>-</p>
+          <li id="RTC_TIMALR__AMPM"><strong>AMPM</strong>: AM/PM Indicator</li>
+          <p>-</p>
+          <li id="RTC_TIMALR__HOUREN"><strong>HOUREN</strong>: Hour Alarm Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The hour-matching alarm is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The hour-matching alarm is enabled.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="RTC_CALALR">RTC Calendar Alarm Register</h4>
+        <p><strong>Name</strong>: RTC_CALALR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400E1274</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#RTC_CALALR__DATEEN" title="Date Alarm Enable">DATEEN</a>
+              </td>
+              <td>-</td>
+              <td colspan="6">
+                <a href="#RTC_CALALR__DATE" title="Date Alarm">DATE</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#RTC_CALALR__MTHEN" title="Month Alarm Enable">MTHEN</a>
+              </td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="5">
+                <a href="#RTC_CALALR__MONTH" title="Month Alarm">MONTH</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="RTC_CALALR__MONTH"><strong>MONTH</strong>: Month Alarm</li>
+          <p>-</p>
+          <li id="RTC_CALALR__MTHEN"><strong>MTHEN</strong>: Month Alarm Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The month-matching alarm is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The month-matching alarm is enabled.</td></tr></tbody></table></li>
+          <li id="RTC_CALALR__DATE"><strong>DATE</strong>: Date Alarm</li>
+          <p>-</p>
+          <li id="RTC_CALALR__DATEEN"><strong>DATEEN</strong>: Date Alarm Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The date-matching alarm is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The date-matching alarm is enabled.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="RTC_SR">RTC Status Register</h4>
+        <p><strong>Name</strong>: RTC_SR</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x400E1278</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#RTC_SR__CALEV" title="Calendar Event">CALEV</a>
+              </td>
+              <td colspan="1">
+                <a href="#RTC_SR__TIMEV" title="Time Event">TIMEV</a>
+              </td>
+              <td colspan="1">
+                <a href="#RTC_SR__SEC" title="Second Event">SEC</a>
+              </td>
+              <td colspan="1">
+                <a href="#RTC_SR__ALARM" title="Alarm Flag">ALARM</a>
+              </td>
+              <td colspan="1">
+                <a href="#RTC_SR__ACKUPD" title="Acknowledge for Update">ACKUPD</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="RTC_SR__ACKUPD"><strong>ACKUPD</strong>: Acknowledge for Update<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Time and calendar registers cannot be updated.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Time and calendar registers can be updated.</td></tr></tbody></table></li>
+          <li id="RTC_SR__ALARM"><strong>ALARM</strong>: Alarm Flag<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No alarm matching condition occurred.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">An alarm matching condition has occurred.</td></tr></tbody></table></li>
+          <li id="RTC_SR__SEC"><strong>SEC</strong>: Second Event<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No second event has occurred since the last clear.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">At least one second event has occurred since the last clear.</td></tr></tbody></table></li>
+          <li id="RTC_SR__TIMEV"><strong>TIMEV</strong>: Time Event<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No time event has occurred since the last clear.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">At least one time event has occurred since the last clear.</td></tr></tbody></table></li>
+          <li id="RTC_SR__CALEV"><strong>CALEV</strong>: Calendar Event<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No calendar event has occurred since the last clear.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">At least one calendar event has occurred since the last clear.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="RTC_SCCR">RTC Status Clear Command Register</h4>
+        <p><strong>Name</strong>: RTC_SCCR</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x400E127C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#RTC_SCCR__CALCLR" title="Calendar Clear">CALCLR</a>
+              </td>
+              <td colspan="1">
+                <a href="#RTC_SCCR__TIMCLR" title="Time Clear">TIMCLR</a>
+              </td>
+              <td colspan="1">
+                <a href="#RTC_SCCR__SECCLR" title="Second Clear">SECCLR</a>
+              </td>
+              <td colspan="1">
+                <a href="#RTC_SCCR__ALRCLR" title="Alarm Clear">ALRCLR</a>
+              </td>
+              <td colspan="1">
+                <a href="#RTC_SCCR__ACKCLR" title="Acknowledge Clear">ACKCLR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="RTC_SCCR__ACKCLR"><strong>ACKCLR</strong>: Acknowledge Clear<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Clears corresponding status flag in the Status Register (RTC_SR).</td></tr></tbody></table></li>
+          <li id="RTC_SCCR__ALRCLR"><strong>ALRCLR</strong>: Alarm Clear<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Clears corresponding status flag in the Status Register (RTC_SR).</td></tr></tbody></table></li>
+          <li id="RTC_SCCR__SECCLR"><strong>SECCLR</strong>: Second Clear<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Clears corresponding status flag in the Status Register (RTC_SR).</td></tr></tbody></table></li>
+          <li id="RTC_SCCR__TIMCLR"><strong>TIMCLR</strong>: Time Clear<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Clears corresponding status flag in the Status Register (RTC_SR).</td></tr></tbody></table></li>
+          <li id="RTC_SCCR__CALCLR"><strong>CALCLR</strong>: Calendar Clear<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Clears corresponding status flag in the Status Register (RTC_SR).</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="RTC_IER">RTC Interrupt Enable Register</h4>
+        <p><strong>Name</strong>: RTC_IER</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x400E1280</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#RTC_IER__CALEN" title="Calendar Event Interrupt Enable">CALEN</a>
+              </td>
+              <td colspan="1">
+                <a href="#RTC_IER__TIMEN" title="Time Event Interrupt Enable">TIMEN</a>
+              </td>
+              <td colspan="1">
+                <a href="#RTC_IER__SECEN" title="Second Event Interrupt Enable">SECEN</a>
+              </td>
+              <td colspan="1">
+                <a href="#RTC_IER__ALREN" title="Alarm Interrupt Enable">ALREN</a>
+              </td>
+              <td colspan="1">
+                <a href="#RTC_IER__ACKEN" title="Acknowledge Update Interrupt Enable">ACKEN</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="RTC_IER__ACKEN"><strong>ACKEN</strong>: Acknowledge Update Interrupt Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The acknowledge for update interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="RTC_IER__ALREN"><strong>ALREN</strong>: Alarm Interrupt Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The alarm interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="RTC_IER__SECEN"><strong>SECEN</strong>: Second Event Interrupt Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The second periodic interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="RTC_IER__TIMEN"><strong>TIMEN</strong>: Time Event Interrupt Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The selected time event interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="RTC_IER__CALEN"><strong>CALEN</strong>: Calendar Event Interrupt Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="RTC_IDR">RTC Interrupt Disable Register</h4>
+        <p><strong>Name</strong>: RTC_IDR</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x400E1284</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#RTC_IDR__CALDIS" title="Calendar Event Interrupt Disable">CALDIS</a>
+              </td>
+              <td colspan="1">
+                <a href="#RTC_IDR__TIMDIS" title="Time Event Interrupt Disable">TIMDIS</a>
+              </td>
+              <td colspan="1">
+                <a href="#RTC_IDR__SECDIS" title="Second Event Interrupt Disable">SECDIS</a>
+              </td>
+              <td colspan="1">
+                <a href="#RTC_IDR__ALRDIS" title="Alarm Interrupt Disable">ALRDIS</a>
+              </td>
+              <td colspan="1">
+                <a href="#RTC_IDR__ACKDIS" title="Acknowledge Update Interrupt Disable">ACKDIS</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="RTC_IDR__ACKDIS"><strong>ACKDIS</strong>: Acknowledge Update Interrupt Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The acknowledge for update interrupt is disabled.</td></tr></tbody></table></li>
+          <li id="RTC_IDR__ALRDIS"><strong>ALRDIS</strong>: Alarm Interrupt Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The alarm interrupt is disabled.</td></tr></tbody></table></li>
+          <li id="RTC_IDR__SECDIS"><strong>SECDIS</strong>: Second Event Interrupt Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The second periodic interrupt is disabled.</td></tr></tbody></table></li>
+          <li id="RTC_IDR__TIMDIS"><strong>TIMDIS</strong>: Time Event Interrupt Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The selected time event interrupt is disabled.</td></tr></tbody></table></li>
+          <li id="RTC_IDR__CALDIS"><strong>CALDIS</strong>: Calendar Event Interrupt Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The selected calendar event interrupt is disabled.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="RTC_IMR">RTC Interrupt Mask Register</h4>
+        <p><strong>Name</strong>: RTC_IMR</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x400E1288</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#RTC_IMR__CAL" title="Calendar Event Interrupt Mask">CAL</a>
+              </td>
+              <td colspan="1">
+                <a href="#RTC_IMR__TIM" title="Time Event Interrupt Mask">TIM</a>
+              </td>
+              <td colspan="1">
+                <a href="#RTC_IMR__SEC" title="Second Event Interrupt Mask">SEC</a>
+              </td>
+              <td colspan="1">
+                <a href="#RTC_IMR__ALR" title="Alarm Interrupt Mask">ALR</a>
+              </td>
+              <td colspan="1">
+                <a href="#RTC_IMR__ACK" title="Acknowledge Update Interrupt Mask">ACK</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="RTC_IMR__ACK"><strong>ACK</strong>: Acknowledge Update Interrupt Mask<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The acknowledge for update interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The acknowledge for update interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="RTC_IMR__ALR"><strong>ALR</strong>: Alarm Interrupt Mask<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The alarm interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The alarm interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="RTC_IMR__SEC"><strong>SEC</strong>: Second Event Interrupt Mask<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The second periodic interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The second periodic interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="RTC_IMR__TIM"><strong>TIM</strong>: Time Event Interrupt Mask<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The selected time event interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The selected time event interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="RTC_IMR__CAL"><strong>CAL</strong>: Calendar Event Interrupt Mask<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The selected calendar event interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The selected calendar event interrupt is enabled.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="RTC_VER">RTC Valid Entry Register</h4>
+        <p><strong>Name</strong>: RTC_VER</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x400E128C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#RTC_VER__NVCALALR" title="Non-valid Calendar Alarm">NVCALALR</a>
+              </td>
+              <td colspan="1">
+                <a href="#RTC_VER__NVTIMALR" title="Non-valid Time Alarm">NVTIMALR</a>
+              </td>
+              <td colspan="1">
+                <a href="#RTC_VER__NVCAL" title="Non-valid Calendar">NVCAL</a>
+              </td>
+              <td colspan="1">
+                <a href="#RTC_VER__NVTIM" title="Non-valid Time">NVTIM</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="RTC_VER__NVTIM"><strong>NVTIM</strong>: Non-valid Time<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No invalid data has been detected in RTC_TIMR (Time Register).</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">RTC_TIMR has contained invalid data since it was last programmed.</td></tr></tbody></table></li>
+          <li id="RTC_VER__NVCAL"><strong>NVCAL</strong>: Non-valid Calendar<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No invalid data has been detected in RTC_CALR (Calendar Register).</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">RTC_CALR has contained invalid data since it was last programmed.</td></tr></tbody></table></li>
+          <li id="RTC_VER__NVTIMALR"><strong>NVTIMALR</strong>: Non-valid Time Alarm<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No invalid data has been detected in RTC_TIMALR (Time Alarm Register).</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">RTC_TIMALR has contained invalid data since it was last programmed.</td></tr></tbody></table></li>
+          <li id="RTC_VER__NVCALALR"><strong>NVCALALR</strong>: Non-valid Calendar Alarm<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No invalid data has been detected in RTC_CALALR (Calendar Alarm Register).</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">RTC_CALALR has contained invalid data since it was last programmed.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="RTC_WPMR">RTC Write Protect Mode Register</h4>
+        <p><strong>Name</strong>: RTC_WPMR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400E1344</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#RTC_WPMR__WPKEY">WPKEY</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#RTC_WPMR__WPKEY">WPKEY</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#RTC_WPMR__WPKEY">WPKEY</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#RTC_WPMR__WPEN" title="Write Protect Enable">WPEN</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="RTC_WPMR__WPEN"><strong>WPEN</strong>: Write Protect Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Disables the Write Protect if WPKEY corresponds to 0x525443 ("RTC" in ASCII).</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the Write Protect if WPKEY corresponds to 0x525443 ("RTC" in ASCII).</td></tr></tbody></table></li>
+          <li id="RTC_WPMR__WPKEY">
+            <strong>WPKEY</strong>
+          </li>
+          <p>-</p>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>

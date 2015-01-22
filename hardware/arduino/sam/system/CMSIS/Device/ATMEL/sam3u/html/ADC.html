@@ -1,0 +1,2005 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>SAM3U ADC</title>
+    <link rel="stylesheet" type="text/css" href="css/html.css" media="all" />
+  </head>
+  <body id="abstract">
+    <div id="container">
+      <div id="content">
+        <a id="ADC"></a>
+        <h1>SAM3U ADC</h1>
+        <a id="ADC__User_Interface"></a>
+        <h2>Analog-to-digital Converter (ADC) User Interface</h2>
+<!--As per 6051K programmer datasheet.-->
+        <h3>Registers</h3>
+        <table class="registers">
+          <caption>Register Mapping</caption>
+          <thead>
+            <tr>
+              <th class="address">Address</th>
+              <th class="description">Register</th>
+              <th class="name">Name</th>
+              <th class="access">Access</th>
+              <th class="reset">Reset</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="odd">
+              <td class="address" id="address_0x400AC000">0x400AC000</td>
+              <td class="description">Control Register</td>
+              <td class="name">
+                <a href="#ADC_CR" title="Control Register" class="one_click_away">ADC_CR</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400AC004">0x400AC004</td>
+              <td class="description">Mode Register</td>
+              <td class="name">
+                <a href="#ADC_MR" title="Mode Register" class="one_click_away">ADC_MR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400AC010">0x400AC010</td>
+              <td class="description">Channel Enable Register</td>
+              <td class="name">
+                <a href="#ADC_CHER" title="Channel Enable Register" class="one_click_away">ADC_CHER</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400AC014">0x400AC014</td>
+              <td class="description">Channel Disable Register</td>
+              <td class="name">
+                <a href="#ADC_CHDR" title="Channel Disable Register" class="one_click_away">ADC_CHDR</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400AC018">0x400AC018</td>
+              <td class="description">Channel Status Register</td>
+              <td class="name">
+                <a href="#ADC_CHSR" title="Channel Status Register" class="one_click_away">ADC_CHSR</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400AC01C">0x400AC01C</td>
+              <td class="description">Status Register</td>
+              <td class="name">
+                <a href="#ADC_SR" title="Status Register" class="one_click_away">ADC_SR</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x000C0000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400AC020">0x400AC020</td>
+              <td class="description">Last Converted Data Register</td>
+              <td class="name">
+                <a href="#ADC_LCDR" title="Last Converted Data Register" class="one_click_away">ADC_LCDR</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400AC024">0x400AC024</td>
+              <td class="description">Interrupt Enable Register</td>
+              <td class="name">
+                <a href="#ADC_IER" title="Interrupt Enable Register" class="one_click_away">ADC_IER</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400AC028">0x400AC028</td>
+              <td class="description">Interrupt Disable Register</td>
+              <td class="name">
+                <a href="#ADC_IDR" title="Interrupt Disable Register" class="one_click_away">ADC_IDR</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400AC02C">0x400AC02C</td>
+              <td class="description">Interrupt Mask Register</td>
+              <td class="name">
+                <a href="#ADC_IMR" title="Interrupt Mask Register" class="one_click_away">ADC_IMR</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400AC030">0x400AC030</td>
+              <td class="description">Channel Data Register</td>
+              <td class="name">
+                <a href="#ADC_CDR" title="Channel Data Register" class="one_click_away">ADC_CDR[8]</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x0</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400AC100">0x400AC100</td>
+              <td class="description">Receive Pointer Register</td>
+              <td class="name">
+                <a href="#ADC_RPR" title="Receive Pointer Register" class="one_click_away">ADC_RPR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400AC104">0x400AC104</td>
+              <td class="description">Receive Counter Register</td>
+              <td class="name">
+                <a href="#ADC_RCR" title="Receive Counter Register" class="one_click_away">ADC_RCR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400AC110">0x400AC110</td>
+              <td class="description">Receive Next Pointer Register</td>
+              <td class="name">
+                <a href="#ADC_RNPR" title="Receive Next Pointer Register" class="one_click_away">ADC_RNPR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400AC114">0x400AC114</td>
+              <td class="description">Receive Next Counter Register</td>
+              <td class="name">
+                <a href="#ADC_RNCR" title="Receive Next Counter Register" class="one_click_away">ADC_RNCR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400AC120">0x400AC120</td>
+              <td class="description">Transfer Control Register</td>
+              <td class="name">
+                <a href="#ADC_PTCR" title="Transfer Control Register" class="one_click_away">ADC_PTCR</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400AC124">0x400AC124</td>
+              <td class="description">Transfer Status Register</td>
+              <td class="name">
+                <a href="#ADC_PTSR" title="Transfer Status Register" class="one_click_away">ADC_PTSR</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x00000000</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3>Register Fields</h3>
+        <h4 id="ADC_CR">ADC Control Register</h4>
+        <p><strong>Name</strong>: ADC_CR</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x400AC000</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#ADC_CR__START" title="Start Conversion">START</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_CR__SWRST" title="Software Reset">SWRST</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="ADC_CR__SWRST"><strong>SWRST</strong>: Software Reset<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Resets the ADC simulating a hardware reset.</td></tr></tbody></table></li>
+          <li id="ADC_CR__START"><strong>START</strong>: Start Conversion<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Begins analog-to-digital conversion.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="ADC_MR">ADC Mode Register</h4>
+        <p><strong>Name</strong>: ADC_MR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400AC004</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="4">
+                <a href="#ADC_MR__SHTIM" title="Sample &amp; Hold Time">SHTIM</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td colspan="7">
+                <a href="#ADC_MR__STARTUP" title="Start Up Time">STARTUP</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#ADC_MR__PRESCAL" title="Prescaler Rate Selection">PRESCAL</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#ADC_MR__SLEEP" title="Sleep Mode">SLEEP</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_MR__LOWRES" title="Resolution">LOWRES</a>
+              </td>
+              <td colspan="3">
+                <a href="#ADC_MR__TRGSEL" title="Trigger Selection">TRGSEL</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_MR__TRGEN" title="Trigger Enable">TRGEN</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="ADC_MR__TRGEN"><strong>TRGEN</strong>: Trigger Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Hardware triggers are disabled. Starting a conversion is only possible by software.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Hardware trigger selected by TRGSEL field is enabled.</td></tr></tbody></table></li>
+          <li id="ADC_MR__TRGSEL"><strong>TRGSEL</strong>: Trigger Selection<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">-</td><td class="description">TIO Output of the Timer Counter Channel 0</td></tr><tr class="even"><td class="value">0x1</td><td class="name">-</td><td class="description">TIO Output of the Timer Counter Channel 1</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">-</td><td class="description">TIO Output of the Timer Counter Channel 2</td></tr><tr class="even"><td class="value">0x3</td><td class="name">-</td><td class="description">PWM Event Line 0</td></tr><tr class="odd"><td class="value">0x4</td><td class="name">-</td><td class="description">PWM Event Line 1</td></tr><tr class="even"><td class="value">0x6</td><td class="name">-</td><td class="description">External trigger</td></tr></tbody></table></li>
+          <li id="ADC_MR__LOWRES"><strong>LOWRES</strong>: Resolution<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">10-bit resolution</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">8-bit resolution</td></tr></tbody></table></li>
+          <li id="ADC_MR__SLEEP"><strong>SLEEP</strong>: Sleep Mode<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Normal Mode</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Sleep Mode</td></tr></tbody></table></li>
+          <li id="ADC_MR__PRESCAL"><strong>PRESCAL</strong>: Prescaler Rate Selection</li>
+          <p>-</p>
+          <li id="ADC_MR__STARTUP"><strong>STARTUP</strong>: Start Up Time</li>
+          <p>-</p>
+          <li id="ADC_MR__SHTIM"><strong>SHTIM</strong>: Sample &amp; Hold Time</li>
+          <p>-</p>
+        </ul>
+        <h4 id="ADC_CHER">ADC Channel Enable Register</h4>
+        <p><strong>Name</strong>: ADC_CHER</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x400AC010</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#ADC_CHER__CH7" title="Channel 7 Enable">CH7</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_CHER__CH6" title="Channel 6 Enable">CH6</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_CHER__CH5" title="Channel 5 Enable">CH5</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_CHER__CH4" title="Channel 4 Enable">CH4</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_CHER__CH3" title="Channel 3 Enable">CH3</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_CHER__CH2" title="Channel 2 Enable">CH2</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_CHER__CH1" title="Channel 1 Enable">CH1</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_CHER__CH0" title="Channel 0 Enable">CH0</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="ADC_CHER__CH0"><strong>CH0</strong>: Channel 0 Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding channel.</td></tr></tbody></table></li>
+          <li id="ADC_CHER__CH1"><strong>CH1</strong>: Channel 1 Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding channel.</td></tr></tbody></table></li>
+          <li id="ADC_CHER__CH2"><strong>CH2</strong>: Channel 2 Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding channel.</td></tr></tbody></table></li>
+          <li id="ADC_CHER__CH3"><strong>CH3</strong>: Channel 3 Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding channel.</td></tr></tbody></table></li>
+          <li id="ADC_CHER__CH4"><strong>CH4</strong>: Channel 4 Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding channel.</td></tr></tbody></table></li>
+          <li id="ADC_CHER__CH5"><strong>CH5</strong>: Channel 5 Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding channel.</td></tr></tbody></table></li>
+          <li id="ADC_CHER__CH6"><strong>CH6</strong>: Channel 6 Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding channel.</td></tr></tbody></table></li>
+          <li id="ADC_CHER__CH7"><strong>CH7</strong>: Channel 7 Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding channel.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="ADC_CHDR">ADC Channel Disable Register</h4>
+        <p><strong>Name</strong>: ADC_CHDR</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x400AC014</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#ADC_CHDR__CH7" title="Channel 7 Disable">CH7</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_CHDR__CH6" title="Channel 6 Disable">CH6</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_CHDR__CH5" title="Channel 5 Disable">CH5</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_CHDR__CH4" title="Channel 4 Disable">CH4</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_CHDR__CH3" title="Channel 3 Disable">CH3</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_CHDR__CH2" title="Channel 2 Disable">CH2</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_CHDR__CH1" title="Channel 1 Disable">CH1</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_CHDR__CH0" title="Channel 0 Disable">CH0</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="ADC_CHDR__CH0"><strong>CH0</strong>: Channel 0 Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding channel.</td></tr></tbody></table></li>
+          <li id="ADC_CHDR__CH1"><strong>CH1</strong>: Channel 1 Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding channel.</td></tr></tbody></table></li>
+          <li id="ADC_CHDR__CH2"><strong>CH2</strong>: Channel 2 Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding channel.</td></tr></tbody></table></li>
+          <li id="ADC_CHDR__CH3"><strong>CH3</strong>: Channel 3 Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding channel.</td></tr></tbody></table></li>
+          <li id="ADC_CHDR__CH4"><strong>CH4</strong>: Channel 4 Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding channel.</td></tr></tbody></table></li>
+          <li id="ADC_CHDR__CH5"><strong>CH5</strong>: Channel 5 Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding channel.</td></tr></tbody></table></li>
+          <li id="ADC_CHDR__CH6"><strong>CH6</strong>: Channel 6 Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding channel.</td></tr></tbody></table></li>
+          <li id="ADC_CHDR__CH7"><strong>CH7</strong>: Channel 7 Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding channel.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="ADC_CHSR">ADC Channel Status Register</h4>
+        <p><strong>Name</strong>: ADC_CHSR</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x400AC018</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#ADC_CHSR__CH7" title="Channel 7 Status">CH7</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_CHSR__CH6" title="Channel 6 Status">CH6</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_CHSR__CH5" title="Channel 5 Status">CH5</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_CHSR__CH4" title="Channel 4 Status">CH4</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_CHSR__CH3" title="Channel 3 Status">CH3</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_CHSR__CH2" title="Channel 2 Status">CH2</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_CHSR__CH1" title="Channel 1 Status">CH1</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_CHSR__CH0" title="Channel 0 Status">CH0</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="ADC_CHSR__CH0"><strong>CH0</strong>: Channel 0 Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Corresponding channel is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Corresponding channel is enabled.</td></tr></tbody></table></li>
+          <li id="ADC_CHSR__CH1"><strong>CH1</strong>: Channel 1 Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Corresponding channel is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Corresponding channel is enabled.</td></tr></tbody></table></li>
+          <li id="ADC_CHSR__CH2"><strong>CH2</strong>: Channel 2 Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Corresponding channel is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Corresponding channel is enabled.</td></tr></tbody></table></li>
+          <li id="ADC_CHSR__CH3"><strong>CH3</strong>: Channel 3 Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Corresponding channel is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Corresponding channel is enabled.</td></tr></tbody></table></li>
+          <li id="ADC_CHSR__CH4"><strong>CH4</strong>: Channel 4 Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Corresponding channel is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Corresponding channel is enabled.</td></tr></tbody></table></li>
+          <li id="ADC_CHSR__CH5"><strong>CH5</strong>: Channel 5 Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Corresponding channel is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Corresponding channel is enabled.</td></tr></tbody></table></li>
+          <li id="ADC_CHSR__CH6"><strong>CH6</strong>: Channel 6 Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Corresponding channel is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Corresponding channel is enabled.</td></tr></tbody></table></li>
+          <li id="ADC_CHSR__CH7"><strong>CH7</strong>: Channel 7 Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Corresponding channel is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Corresponding channel is enabled.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="ADC_SR">ADC Status Register</h4>
+        <p><strong>Name</strong>: ADC_SR</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x400AC01C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#ADC_SR__RXBUFF" title="RX Buffer Full">RXBUFF</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_SR__ENDRX" title="End of RX Buffer">ENDRX</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_SR__GOVRE" title="General Overrun Error">GOVRE</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_SR__DRDY" title="Data Ready">DRDY</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#ADC_SR__OVRE7" title="Overrun Error 7">OVRE7</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_SR__OVRE6" title="Overrun Error 6">OVRE6</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_SR__OVRE5" title="Overrun Error 5">OVRE5</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_SR__OVRE4" title="Overrun Error 4">OVRE4</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_SR__OVRE3" title="Overrun Error 3">OVRE3</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_SR__OVRE2" title="Overrun Error 2">OVRE2</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_SR__OVRE1" title="Overrun Error 1">OVRE1</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_SR__OVRE0" title="Overrun Error 0">OVRE0</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#ADC_SR__EOC7" title="End of Conversion 7">EOC7</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_SR__EOC6" title="End of Conversion 6">EOC6</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_SR__EOC5" title="End of Conversion 5">EOC5</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_SR__EOC4" title="End of Conversion 4">EOC4</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_SR__EOC3" title="End of Conversion 3">EOC3</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_SR__EOC2" title="End of Conversion 2">EOC2</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_SR__EOC1" title="End of Conversion 1">EOC1</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_SR__EOC0" title="End of Conversion 0">EOC0</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="ADC_SR__EOC0"><strong>EOC0</strong>: End of Conversion 0<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Corresponding analog channel is disabled, or the conversion is not finished.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Corresponding analog channel is enabled and conversion is complete.</td></tr></tbody></table></li>
+          <li id="ADC_SR__EOC1"><strong>EOC1</strong>: End of Conversion 1<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Corresponding analog channel is disabled, or the conversion is not finished.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Corresponding analog channel is enabled and conversion is complete.</td></tr></tbody></table></li>
+          <li id="ADC_SR__EOC2"><strong>EOC2</strong>: End of Conversion 2<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Corresponding analog channel is disabled, or the conversion is not finished.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Corresponding analog channel is enabled and conversion is complete.</td></tr></tbody></table></li>
+          <li id="ADC_SR__EOC3"><strong>EOC3</strong>: End of Conversion 3<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Corresponding analog channel is disabled, or the conversion is not finished.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Corresponding analog channel is enabled and conversion is complete.</td></tr></tbody></table></li>
+          <li id="ADC_SR__EOC4"><strong>EOC4</strong>: End of Conversion 4<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Corresponding analog channel is disabled, or the conversion is not finished.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Corresponding analog channel is enabled and conversion is complete.</td></tr></tbody></table></li>
+          <li id="ADC_SR__EOC5"><strong>EOC5</strong>: End of Conversion 5<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Corresponding analog channel is disabled, or the conversion is not finished.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Corresponding analog channel is enabled and conversion is complete.</td></tr></tbody></table></li>
+          <li id="ADC_SR__EOC6"><strong>EOC6</strong>: End of Conversion 6<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Corresponding analog channel is disabled, or the conversion is not finished.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Corresponding analog channel is enabled and conversion is complete.</td></tr></tbody></table></li>
+          <li id="ADC_SR__EOC7"><strong>EOC7</strong>: End of Conversion 7<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Corresponding analog channel is disabled, or the conversion is not finished.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Corresponding analog channel is enabled and conversion is complete.</td></tr></tbody></table></li>
+          <li id="ADC_SR__OVRE0"><strong>OVRE0</strong>: Overrun Error 0<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No overrun error on the corresponding channel since the last read of ADC_SR.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">There has been an overrun error on the corresponding channel since the last read of ADC_SR.</td></tr></tbody></table></li>
+          <li id="ADC_SR__OVRE1"><strong>OVRE1</strong>: Overrun Error 1<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No overrun error on the corresponding channel since the last read of ADC_SR.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">There has been an overrun error on the corresponding channel since the last read of ADC_SR.</td></tr></tbody></table></li>
+          <li id="ADC_SR__OVRE2"><strong>OVRE2</strong>: Overrun Error 2<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No overrun error on the corresponding channel since the last read of ADC_SR.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">There has been an overrun error on the corresponding channel since the last read of ADC_SR.</td></tr></tbody></table></li>
+          <li id="ADC_SR__OVRE3"><strong>OVRE3</strong>: Overrun Error 3<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No overrun error on the corresponding channel since the last read of ADC_SR.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">There has been an overrun error on the corresponding channel since the last read of ADC_SR.</td></tr></tbody></table></li>
+          <li id="ADC_SR__OVRE4"><strong>OVRE4</strong>: Overrun Error 4<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No overrun error on the corresponding channel since the last read of ADC_SR.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">There has been an overrun error on the corresponding channel since the last read of ADC_SR.</td></tr></tbody></table></li>
+          <li id="ADC_SR__OVRE5"><strong>OVRE5</strong>: Overrun Error 5<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No overrun error on the corresponding channel since the last read of ADC_SR.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">There has been an overrun error on the corresponding channel since the last read of ADC_SR.</td></tr></tbody></table></li>
+          <li id="ADC_SR__OVRE6"><strong>OVRE6</strong>: Overrun Error 6<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No overrun error on the corresponding channel since the last read of ADC_SR.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">There has been an overrun error on the corresponding channel since the last read of ADC_SR.</td></tr></tbody></table></li>
+          <li id="ADC_SR__OVRE7"><strong>OVRE7</strong>: Overrun Error 7<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No overrun error on the corresponding channel since the last read of ADC_SR.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">There has been an overrun error on the corresponding channel since the last read of ADC_SR.</td></tr></tbody></table></li>
+          <li id="ADC_SR__DRDY"><strong>DRDY</strong>: Data Ready<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No data has been converted since the last read of ADC_LCDR.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">At least one data has been converted and is available in ADC_LCDR.</td></tr></tbody></table></li>
+          <li id="ADC_SR__GOVRE"><strong>GOVRE</strong>: General Overrun Error<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No General Overrun Error occurred since the last read of ADC_SR.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">At least one General Overrun Error has occurred since the last read of ADC_SR.</td></tr></tbody></table></li>
+          <li id="ADC_SR__ENDRX"><strong>ENDRX</strong>: End of RX Buffer<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The Receive Counter Register has not reached 0 since the last write in ADC_RCR or ADC_RNCR.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The Receive Counter Register has reached 0 since the last write in ADC_RCR or ADC_RNCR.</td></tr></tbody></table></li>
+          <li id="ADC_SR__RXBUFF"><strong>RXBUFF</strong>: RX Buffer Full<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">ADC_RCR or ADC_RNCR have a value other than 0.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Both ADC_RCR and ADC_RNCR have a value of 0.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="ADC_LCDR">ADC Last Converted Data Register</h4>
+        <p><strong>Name</strong>: ADC_LCDR</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x400AC020</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="2">
+                <a href="#ADC_LCDR__LDATA" title="Last Data Converted">LDATA</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#ADC_LCDR__LDATA" title="Last Data Converted">LDATA</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="ADC_LCDR__LDATA"><strong>LDATA</strong>: Last Data Converted</li>
+          <p>-</p>
+        </ul>
+        <h4 id="ADC_IER">ADC Interrupt Enable Register</h4>
+        <p><strong>Name</strong>: ADC_IER</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x400AC024</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#ADC_IER__RXBUFF" title="Receive Buffer Full Interrupt Enable">RXBUFF</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IER__ENDRX" title="End of Receive Buffer Interrupt Enable">ENDRX</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IER__GOVRE" title="General Overrun Error Interrupt Enable">GOVRE</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IER__DRDY" title="Data Ready Interrupt Enable">DRDY</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#ADC_IER__OVRE7" title="Overrun Error Interrupt Enable 7">OVRE7</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IER__OVRE6" title="Overrun Error Interrupt Enable 6">OVRE6</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IER__OVRE5" title="Overrun Error Interrupt Enable 5">OVRE5</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IER__OVRE4" title="Overrun Error Interrupt Enable 4">OVRE4</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IER__OVRE3" title="Overrun Error Interrupt Enable 3">OVRE3</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IER__OVRE2" title="Overrun Error Interrupt Enable 2">OVRE2</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IER__OVRE1" title="Overrun Error Interrupt Enable 1">OVRE1</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IER__OVRE0" title="Overrun Error Interrupt Enable 0">OVRE0</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#ADC_IER__EOC7" title="End of Conversion Interrupt Enable 7">EOC7</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IER__EOC6" title="End of Conversion Interrupt Enable 6">EOC6</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IER__EOC5" title="End of Conversion Interrupt Enable 5">EOC5</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IER__EOC4" title="End of Conversion Interrupt Enable 4">EOC4</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IER__EOC3" title="End of Conversion Interrupt Enable 3">EOC3</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IER__EOC2" title="End of Conversion Interrupt Enable 2">EOC2</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IER__EOC1" title="End of Conversion Interrupt Enable 1">EOC1</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IER__EOC0" title="End of Conversion Interrupt Enable 0">EOC0</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="ADC_IER__EOC0"><strong>EOC0</strong>: End of Conversion Interrupt Enable 0<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IER__EOC1"><strong>EOC1</strong>: End of Conversion Interrupt Enable 1<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IER__EOC2"><strong>EOC2</strong>: End of Conversion Interrupt Enable 2<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IER__EOC3"><strong>EOC3</strong>: End of Conversion Interrupt Enable 3<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IER__EOC4"><strong>EOC4</strong>: End of Conversion Interrupt Enable 4<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IER__EOC5"><strong>EOC5</strong>: End of Conversion Interrupt Enable 5<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IER__EOC6"><strong>EOC6</strong>: End of Conversion Interrupt Enable 6<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IER__EOC7"><strong>EOC7</strong>: End of Conversion Interrupt Enable 7<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IER__OVRE0"><strong>OVRE0</strong>: Overrun Error Interrupt Enable 0<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IER__OVRE1"><strong>OVRE1</strong>: Overrun Error Interrupt Enable 1<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IER__OVRE2"><strong>OVRE2</strong>: Overrun Error Interrupt Enable 2<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IER__OVRE3"><strong>OVRE3</strong>: Overrun Error Interrupt Enable 3<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IER__OVRE4"><strong>OVRE4</strong>: Overrun Error Interrupt Enable 4<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IER__OVRE5"><strong>OVRE5</strong>: Overrun Error Interrupt Enable 5<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IER__OVRE6"><strong>OVRE6</strong>: Overrun Error Interrupt Enable 6<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IER__OVRE7"><strong>OVRE7</strong>: Overrun Error Interrupt Enable 7<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IER__DRDY"><strong>DRDY</strong>: Data Ready Interrupt Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IER__GOVRE"><strong>GOVRE</strong>: General Overrun Error Interrupt Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IER__ENDRX"><strong>ENDRX</strong>: End of Receive Buffer Interrupt Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IER__RXBUFF"><strong>RXBUFF</strong>: Receive Buffer Full Interrupt Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the corresponding interrupt.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="ADC_IDR">ADC Interrupt Disable Register</h4>
+        <p><strong>Name</strong>: ADC_IDR</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x400AC028</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#ADC_IDR__RXBUFF" title="Receive Buffer Full Interrupt Disable">RXBUFF</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IDR__ENDRX" title="End of Receive Buffer Interrupt Disable">ENDRX</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IDR__GOVRE" title="General Overrun Error Interrupt Disable">GOVRE</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IDR__DRDY" title="Data Ready Interrupt Disable">DRDY</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#ADC_IDR__OVRE7" title="Overrun Error Interrupt Disable 7">OVRE7</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IDR__OVRE6" title="Overrun Error Interrupt Disable 6">OVRE6</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IDR__OVRE5" title="Overrun Error Interrupt Disable 5">OVRE5</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IDR__OVRE4" title="Overrun Error Interrupt Disable 4">OVRE4</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IDR__OVRE3" title="Overrun Error Interrupt Disable 3">OVRE3</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IDR__OVRE2" title="Overrun Error Interrupt Disable 2">OVRE2</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IDR__OVRE1" title="Overrun Error Interrupt Disable 1">OVRE1</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IDR__OVRE0" title="Overrun Error Interrupt Disable 0">OVRE0</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#ADC_IDR__EOC7" title="End of Conversion Interrupt Disable 7">EOC7</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IDR__EOC6" title="End of Conversion Interrupt Disable 6">EOC6</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IDR__EOC5" title="End of Conversion Interrupt Disable 5">EOC5</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IDR__EOC4" title="End of Conversion Interrupt Disable 4">EOC4</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IDR__EOC3" title="End of Conversion Interrupt Disable 3">EOC3</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IDR__EOC2" title="End of Conversion Interrupt Disable 2">EOC2</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IDR__EOC1" title="End of Conversion Interrupt Disable 1">EOC1</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IDR__EOC0" title="End of Conversion Interrupt Disable 0">EOC0</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="ADC_IDR__EOC0"><strong>EOC0</strong>: End of Conversion Interrupt Disable 0<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IDR__EOC1"><strong>EOC1</strong>: End of Conversion Interrupt Disable 1<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IDR__EOC2"><strong>EOC2</strong>: End of Conversion Interrupt Disable 2<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IDR__EOC3"><strong>EOC3</strong>: End of Conversion Interrupt Disable 3<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IDR__EOC4"><strong>EOC4</strong>: End of Conversion Interrupt Disable 4<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IDR__EOC5"><strong>EOC5</strong>: End of Conversion Interrupt Disable 5<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IDR__EOC6"><strong>EOC6</strong>: End of Conversion Interrupt Disable 6<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IDR__EOC7"><strong>EOC7</strong>: End of Conversion Interrupt Disable 7<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IDR__OVRE0"><strong>OVRE0</strong>: Overrun Error Interrupt Disable 0<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IDR__OVRE1"><strong>OVRE1</strong>: Overrun Error Interrupt Disable 1<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IDR__OVRE2"><strong>OVRE2</strong>: Overrun Error Interrupt Disable 2<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IDR__OVRE3"><strong>OVRE3</strong>: Overrun Error Interrupt Disable 3<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IDR__OVRE4"><strong>OVRE4</strong>: Overrun Error Interrupt Disable 4<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IDR__OVRE5"><strong>OVRE5</strong>: Overrun Error Interrupt Disable 5<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IDR__OVRE6"><strong>OVRE6</strong>: Overrun Error Interrupt Disable 6<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IDR__OVRE7"><strong>OVRE7</strong>: Overrun Error Interrupt Disable 7<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IDR__DRDY"><strong>DRDY</strong>: Data Ready Interrupt Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IDR__GOVRE"><strong>GOVRE</strong>: General Overrun Error Interrupt Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IDR__ENDRX"><strong>ENDRX</strong>: End of Receive Buffer Interrupt Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding interrupt.</td></tr></tbody></table></li>
+          <li id="ADC_IDR__RXBUFF"><strong>RXBUFF</strong>: Receive Buffer Full Interrupt Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the corresponding interrupt.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="ADC_IMR">ADC Interrupt Mask Register</h4>
+        <p><strong>Name</strong>: ADC_IMR</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x400AC02C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#ADC_IMR__RXBUFF" title="Receive Buffer Full Interrupt Mask">RXBUFF</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IMR__ENDRX" title="End of Receive Buffer Interrupt Mask">ENDRX</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IMR__GOVRE" title="General Overrun Error Interrupt Mask">GOVRE</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IMR__DRDY" title="Data Ready Interrupt Mask">DRDY</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#ADC_IMR__OVRE7" title="Overrun Error Interrupt Mask 7">OVRE7</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IMR__OVRE6" title="Overrun Error Interrupt Mask 6">OVRE6</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IMR__OVRE5" title="Overrun Error Interrupt Mask 5">OVRE5</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IMR__OVRE4" title="Overrun Error Interrupt Mask 4">OVRE4</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IMR__OVRE3" title="Overrun Error Interrupt Mask 3">OVRE3</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IMR__OVRE2" title="Overrun Error Interrupt Mask 2">OVRE2</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IMR__OVRE1" title="Overrun Error Interrupt Mask 1">OVRE1</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IMR__OVRE0" title="Overrun Error Interrupt Mask 0">OVRE0</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#ADC_IMR__EOC7" title="End of Conversion Interrupt Mask 7">EOC7</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IMR__EOC6" title="End of Conversion Interrupt Mask 6">EOC6</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IMR__EOC5" title="End of Conversion Interrupt Mask 5">EOC5</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IMR__EOC4" title="End of Conversion Interrupt Mask 4">EOC4</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IMR__EOC3" title="End of Conversion Interrupt Mask 3">EOC3</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IMR__EOC2" title="End of Conversion Interrupt Mask 2">EOC2</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IMR__EOC1" title="End of Conversion Interrupt Mask 1">EOC1</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_IMR__EOC0" title="End of Conversion Interrupt Mask 0">EOC0</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="ADC_IMR__EOC0"><strong>EOC0</strong>: End of Conversion Interrupt Mask 0<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The corresponding interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The corresponding interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="ADC_IMR__EOC1"><strong>EOC1</strong>: End of Conversion Interrupt Mask 1<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The corresponding interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The corresponding interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="ADC_IMR__EOC2"><strong>EOC2</strong>: End of Conversion Interrupt Mask 2<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The corresponding interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The corresponding interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="ADC_IMR__EOC3"><strong>EOC3</strong>: End of Conversion Interrupt Mask 3<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The corresponding interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The corresponding interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="ADC_IMR__EOC4"><strong>EOC4</strong>: End of Conversion Interrupt Mask 4<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The corresponding interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The corresponding interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="ADC_IMR__EOC5"><strong>EOC5</strong>: End of Conversion Interrupt Mask 5<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The corresponding interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The corresponding interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="ADC_IMR__EOC6"><strong>EOC6</strong>: End of Conversion Interrupt Mask 6<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The corresponding interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The corresponding interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="ADC_IMR__EOC7"><strong>EOC7</strong>: End of Conversion Interrupt Mask 7<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The corresponding interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The corresponding interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="ADC_IMR__OVRE0"><strong>OVRE0</strong>: Overrun Error Interrupt Mask 0<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The corresponding interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The corresponding interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="ADC_IMR__OVRE1"><strong>OVRE1</strong>: Overrun Error Interrupt Mask 1<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The corresponding interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The corresponding interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="ADC_IMR__OVRE2"><strong>OVRE2</strong>: Overrun Error Interrupt Mask 2<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The corresponding interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The corresponding interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="ADC_IMR__OVRE3"><strong>OVRE3</strong>: Overrun Error Interrupt Mask 3<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The corresponding interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The corresponding interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="ADC_IMR__OVRE4"><strong>OVRE4</strong>: Overrun Error Interrupt Mask 4<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The corresponding interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The corresponding interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="ADC_IMR__OVRE5"><strong>OVRE5</strong>: Overrun Error Interrupt Mask 5<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The corresponding interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The corresponding interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="ADC_IMR__OVRE6"><strong>OVRE6</strong>: Overrun Error Interrupt Mask 6<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The corresponding interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The corresponding interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="ADC_IMR__OVRE7"><strong>OVRE7</strong>: Overrun Error Interrupt Mask 7<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The corresponding interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The corresponding interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="ADC_IMR__DRDY"><strong>DRDY</strong>: Data Ready Interrupt Mask<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The corresponding interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The corresponding interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="ADC_IMR__GOVRE"><strong>GOVRE</strong>: General Overrun Error Interrupt Mask<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The corresponding interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The corresponding interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="ADC_IMR__ENDRX"><strong>ENDRX</strong>: End of Receive Buffer Interrupt Mask<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The corresponding interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The corresponding interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="ADC_IMR__RXBUFF"><strong>RXBUFF</strong>: Receive Buffer Full Interrupt Mask<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The corresponding interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The corresponding interrupt is enabled.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="ADC_CDR">ADC Channel Data Register</h4>
+        <p><strong>Name</strong>: ADC_CDR[0:7]</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x400AC030</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="2">
+                <a href="#ADC_CDR__DATA" title="Converted Data">DATA</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#ADC_CDR__DATA" title="Converted Data">DATA</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="ADC_CDR__DATA"><strong>DATA</strong>: Converted Data</li>
+          <p>-</p>
+        </ul>
+        <h4 id="ADC_RPR">ADC Receive Pointer Register</h4>
+        <p><strong>Name</strong>: ADC_RPR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400AC100</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#ADC_RPR__RXPTR" title="Receive Pointer Register">RXPTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#ADC_RPR__RXPTR" title="Receive Pointer Register">RXPTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#ADC_RPR__RXPTR" title="Receive Pointer Register">RXPTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#ADC_RPR__RXPTR" title="Receive Pointer Register">RXPTR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="ADC_RPR__RXPTR"><strong>RXPTR</strong>: Receive Pointer Register</li>
+          <p>-</p>
+        </ul>
+        <h4 id="ADC_RCR">ADC Receive Counter Register</h4>
+        <p><strong>Name</strong>: ADC_RCR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400AC104</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#ADC_RCR__RXCTR" title="Receive Counter Register">RXCTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#ADC_RCR__RXCTR" title="Receive Counter Register">RXCTR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="ADC_RCR__RXCTR"><strong>RXCTR</strong>: Receive Counter Register</li>
+          <p>-</p>
+        </ul>
+        <h4 id="ADC_RNPR">ADC Receive Next Pointer Register</h4>
+        <p><strong>Name</strong>: ADC_RNPR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400AC110</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#ADC_RNPR__RXNPTR" title="Receive Next Pointer">RXNPTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#ADC_RNPR__RXNPTR" title="Receive Next Pointer">RXNPTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#ADC_RNPR__RXNPTR" title="Receive Next Pointer">RXNPTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#ADC_RNPR__RXNPTR" title="Receive Next Pointer">RXNPTR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="ADC_RNPR__RXNPTR"><strong>RXNPTR</strong>: Receive Next Pointer</li>
+          <p>-</p>
+        </ul>
+        <h4 id="ADC_RNCR">ADC Receive Next Counter Register</h4>
+        <p><strong>Name</strong>: ADC_RNCR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400AC114</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#ADC_RNCR__RXNCTR" title="Receive Next Counter">RXNCTR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#ADC_RNCR__RXNCTR" title="Receive Next Counter">RXNCTR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="ADC_RNCR__RXNCTR"><strong>RXNCTR</strong>: Receive Next Counter</li>
+          <p>-</p>
+        </ul>
+        <h4 id="ADC_PTCR">ADC Transfer Control Register</h4>
+        <p><strong>Name</strong>: ADC_PTCR</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x400AC120</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#ADC_PTCR__TXTDIS" title="Transmitter Transfer Disable">TXTDIS</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_PTCR__TXTEN" title="Transmitter Transfer Enable">TXTEN</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#ADC_PTCR__RXTDIS" title="Receiver Transfer Disable">RXTDIS</a>
+              </td>
+              <td colspan="1">
+                <a href="#ADC_PTCR__RXTEN" title="Receiver Transfer Enable">RXTEN</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="ADC_PTCR__RXTEN"><strong>RXTEN</strong>: Receiver Transfer Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables PDC receiver channel requests if RXTDIS is not set.</td></tr></tbody></table></li>
+          <li id="ADC_PTCR__RXTDIS"><strong>RXTDIS</strong>: Receiver Transfer Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the PDC receiver channel requests.</td></tr></tbody></table></li>
+          <li id="ADC_PTCR__TXTEN"><strong>TXTEN</strong>: Transmitter Transfer Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables the PDC transmitter channel requests.</td></tr></tbody></table></li>
+          <li id="ADC_PTCR__TXTDIS"><strong>TXTDIS</strong>: Transmitter Transfer Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables the PDC transmitter channel requests.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="ADC_PTSR">ADC Transfer Status Register</h4>
+        <p><strong>Name</strong>: ADC_PTSR</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x400AC124</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#ADC_PTSR__TXTEN" title="Transmitter Transfer Enable">TXTEN</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#ADC_PTSR__RXTEN" title="Receiver Transfer Enable">RXTEN</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="ADC_PTSR__RXTEN"><strong>RXTEN</strong>: Receiver Transfer Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">PDC Receiver channel requests are disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">PDC Receiver channel requests are enabled.</td></tr></tbody></table></li>
+          <li id="ADC_PTSR__TXTEN"><strong>TXTEN</strong>: Transmitter Transfer Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">PDC Transmitter channel requests are disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">PDC Transmitter channel requests are enabled.</td></tr></tbody></table></li>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>

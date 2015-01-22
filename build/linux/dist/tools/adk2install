@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# simple wrapper around the adk2tool and bossac to properly erase and reset the 
+# adk2 board
+
+echo $1 /dev/$2 erase
+$1 /dev/$2 erase
+
+echo $3 --port=$2 -w -e -v -b $4
+$3 --port=$2 -w -e -v -b $4
+
+echo $1 /dev/$2 reset
+$1 /dev/$2 reset
+

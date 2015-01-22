@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>SAM4S CHIPID</title>
+    <link rel="stylesheet" type="text/css" href="css/html.css" media="all" />
+  </head>
+  <body id="abstract">
+    <div id="container">
+      <div id="content">
+        <a id="CHIPID"></a>
+        <h1>SAM4S CHIPID</h1>
+        <a id="CHIPID__User_Interface"></a>
+        <h2>Chip Identifier (CHIPID) User Interface</h2>
+<!--As per 6417J programmer datasheet.-->
+        <h3>Registers</h3>
+        <table class="registers">
+          <caption>Register Mapping</caption>
+          <thead>
+            <tr>
+              <th class="address">Address</th>
+              <th class="description">Register</th>
+              <th class="name">Name</th>
+              <th class="access">Access</th>
+              <th class="reset">Reset</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="odd">
+              <td class="address" id="address_0x400E0740">0x400E0740</td>
+              <td class="description">Chip ID Register</td>
+              <td class="name">
+                <a href="#CHIPID_CIDR" title="Chip ID Register" class="one_click_away">CHIPID_CIDR</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400E0744">0x400E0744</td>
+              <td class="description">Chip ID Extension Register</td>
+              <td class="name">
+                <a href="#CHIPID_EXID" title="Chip ID Extension Register" class="one_click_away">CHIPID_EXID</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">-</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3>Register Fields</h3>
+        <h4 id="CHIPID_CIDR">CHIPID Chip ID Register</h4>
+        <p><strong>Name</strong>: CHIPID_CIDR</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x400E0740</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#CHIPID_CIDR__EXT" title="Extension Flag">EXT</a>
+              </td>
+              <td colspan="3">
+                <a href="#CHIPID_CIDR__NVPTYP" title="Nonvolatile Program Memory Type">NVPTYP</a>
+              </td>
+              <td colspan="4">
+                <a href="#CHIPID_CIDR__ARCH" title="Architecture Identifier">ARCH</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="4">
+                <a href="#CHIPID_CIDR__ARCH" title="Architecture Identifier">ARCH</a>
+              </td>
+              <td colspan="4">
+                <a href="#CHIPID_CIDR__SRAMSIZ" title="Internal SRAM Size">SRAMSIZ</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="4">
+                <a href="#CHIPID_CIDR__NVPSIZ2" title="">NVPSIZ2</a>
+              </td>
+              <td colspan="4">
+                <a href="#CHIPID_CIDR__NVPSIZ" title="Nonvolatile Program Memory Size">NVPSIZ</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="3">
+                <a href="#CHIPID_CIDR__EPROC" title="Embedded Processor">EPROC</a>
+              </td>
+              <td colspan="5">
+                <a href="#CHIPID_CIDR__VERSION" title="Version of the Device">VERSION</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="CHIPID_CIDR__VERSION"><strong>VERSION</strong>: Version of the Device</li>
+          <p>-</p>
+          <li id="CHIPID_CIDR__EPROC"><strong>EPROC</strong>: Embedded Processor<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x1</td><td class="name">ARM946ES</td><td class="description">ARM946ES</td></tr><tr class="even"><td class="value">0x2</td><td class="name">ARM7TDMI</td><td class="description">ARM7TDMI</td></tr><tr class="odd"><td class="value">0x3</td><td class="name">CM3</td><td class="description">Cortex-M3</td></tr><tr class="even"><td class="value">0x4</td><td class="name">ARM920T</td><td class="description">ARM920T</td></tr><tr class="odd"><td class="value">0x5</td><td class="name">ARM926EJS</td><td class="description">ARM926EJS</td></tr><tr class="even"><td class="value">0x6</td><td class="name">CA5</td><td class="description">Cortex-A5</td></tr><tr class="odd"><td class="value">0x7</td><td class="name">CM4</td><td class="description">Cortex-M4</td></tr></tbody></table></li>
+          <li id="CHIPID_CIDR__NVPSIZ"><strong>NVPSIZ</strong>: Nonvolatile Program Memory Size<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">NONE</td><td class="description">None</td></tr><tr class="even"><td class="value">0x1</td><td class="name">8K</td><td class="description">8K bytes</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">16K</td><td class="description">16K bytes</td></tr><tr class="even"><td class="value">0x3</td><td class="name">32K</td><td class="description">32K bytes</td></tr><tr class="odd"><td class="value">0x5</td><td class="name">64K</td><td class="description">64K bytes</td></tr><tr class="even"><td class="value">0x7</td><td class="name">128K</td><td class="description">128K bytes</td></tr><tr class="odd"><td class="value">0x9</td><td class="name">256K</td><td class="description">256K bytes</td></tr><tr class="even"><td class="value">0xA</td><td class="name">512K</td><td class="description">512K bytes</td></tr><tr class="odd"><td class="value">0xC</td><td class="name">1024K</td><td class="description">1024K bytes</td></tr><tr class="even"><td class="value">0xE</td><td class="name">2048K</td><td class="description">2048K bytes</td></tr></tbody></table></li>
+          <li id="CHIPID_CIDR__NVPSIZ2">
+            <strong>NVPSIZ2</strong>
+            <table class="values">
+              <thead>
+                <tr>
+                  <th>Value</th>
+                  <th>Name</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="odd">
+                  <td class="value">0x0</td>
+                  <td class="name">NONE</td>
+                  <td class="description">None</td>
+                </tr>
+                <tr class="even">
+                  <td class="value">0x1</td>
+                  <td class="name">8K</td>
+                  <td class="description">8K bytes</td>
+                </tr>
+                <tr class="odd">
+                  <td class="value">0x2</td>
+                  <td class="name">16K</td>
+                  <td class="description">16K bytes</td>
+                </tr>
+                <tr class="even">
+                  <td class="value">0x3</td>
+                  <td class="name">32K</td>
+                  <td class="description">32K bytes</td>
+                </tr>
+                <tr class="odd">
+                  <td class="value">0x5</td>
+                  <td class="name">64K</td>
+                  <td class="description">64K bytes</td>
+                </tr>
+                <tr class="even">
+                  <td class="value">0x7</td>
+                  <td class="name">128K</td>
+                  <td class="description">128K bytes</td>
+                </tr>
+                <tr class="odd">
+                  <td class="value">0x9</td>
+                  <td class="name">256K</td>
+                  <td class="description">256K bytes</td>
+                </tr>
+                <tr class="even">
+                  <td class="value">0xA</td>
+                  <td class="name">512K</td>
+                  <td class="description">512K bytes</td>
+                </tr>
+                <tr class="odd">
+                  <td class="value">0xC</td>
+                  <td class="name">1024K</td>
+                  <td class="description">1024K bytes</td>
+                </tr>
+                <tr class="even">
+                  <td class="value">0xE</td>
+                  <td class="name">2048K</td>
+                  <td class="description">2048K bytes</td>
+                </tr>
+              </tbody>
+            </table>
+          </li>
+          <li id="CHIPID_CIDR__SRAMSIZ"><strong>SRAMSIZ</strong>: Internal SRAM Size<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">48K</td><td class="description">48K bytes</td></tr><tr class="even"><td class="value">0x1</td><td class="name">1K</td><td class="description">1K bytes</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">2K</td><td class="description">2K bytes</td></tr><tr class="even"><td class="value">0x3</td><td class="name">6K</td><td class="description">6K bytes</td></tr><tr class="odd"><td class="value">0x4</td><td class="name">24K</td><td class="description">24K bytes</td></tr><tr class="even"><td class="value">0x5</td><td class="name">4K</td><td class="description">4K bytes</td></tr><tr class="odd"><td class="value">0x6</td><td class="name">80K</td><td class="description">80K bytes</td></tr><tr class="even"><td class="value">0x7</td><td class="name">160K</td><td class="description">160K bytes</td></tr><tr class="odd"><td class="value">0x8</td><td class="name">8K</td><td class="description">8K bytes</td></tr><tr class="even"><td class="value">0x9</td><td class="name">16K</td><td class="description">16K bytes</td></tr><tr class="odd"><td class="value">0xA</td><td class="name">32K</td><td class="description">32K bytes</td></tr><tr class="even"><td class="value">0xB</td><td class="name">64K</td><td class="description">64K bytes</td></tr><tr class="odd"><td class="value">0xC</td><td class="name">128K</td><td class="description">128K bytes</td></tr><tr class="even"><td class="value">0xD</td><td class="name">256K</td><td class="description">256K bytes</td></tr><tr class="odd"><td class="value">0xE</td><td class="name">96K</td><td class="description">96K bytes</td></tr><tr class="even"><td class="value">0xF</td><td class="name">512K</td><td class="description">512K bytes</td></tr></tbody></table></li>
+          <li id="CHIPID_CIDR__ARCH"><strong>ARCH</strong>: Architecture Identifier<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x19</td><td class="name">AT91SAM9xx</td><td class="description">AT91SAM9xx Series</td></tr><tr class="even"><td class="value">0x29</td><td class="name">AT91SAM9XExx</td><td class="description">AT91SAM9XExx Series</td></tr><tr class="odd"><td class="value">0x34</td><td class="name">AT91x34</td><td class="description">AT91x34 Series</td></tr><tr class="even"><td class="value">0x37</td><td class="name">CAP7</td><td class="description">CAP7 Series</td></tr><tr class="odd"><td class="value">0x39</td><td class="name">CAP9</td><td class="description">CAP9 Series</td></tr><tr class="even"><td class="value">0x3B</td><td class="name">CAP11</td><td class="description">CAP11 Series</td></tr><tr class="odd"><td class="value">0x40</td><td class="name">AT91x40</td><td class="description">AT91x40 Series</td></tr><tr class="even"><td class="value">0x42</td><td class="name">AT91x42</td><td class="description">AT91x42 Series</td></tr><tr class="odd"><td class="value">0x55</td><td class="name">AT91x55</td><td class="description">AT91x55 Series</td></tr><tr class="even"><td class="value">0x60</td><td class="name">AT91SAM7Axx</td><td class="description">AT91SAM7Axx Series</td></tr><tr class="odd"><td class="value">0x61</td><td class="name">AT91SAM7AQxx</td><td class="description">AT91SAM7AQxx Series</td></tr><tr class="even"><td class="value">0x63</td><td class="name">AT91x63</td><td class="description">AT91x63 Series</td></tr><tr class="odd"><td class="value">0x70</td><td class="name">AT91SAM7Sxx</td><td class="description">AT91SAM7Sxx Series</td></tr><tr class="even"><td class="value">0x71</td><td class="name">AT91SAM7XCxx</td><td class="description">AT91SAM7XCxx Series</td></tr><tr class="odd"><td class="value">0x72</td><td class="name">AT91SAM7SExx</td><td class="description">AT91SAM7SExx Series</td></tr><tr class="even"><td class="value">0x73</td><td class="name">AT91SAM7Lxx</td><td class="description">AT91SAM7Lxx Series</td></tr><tr class="odd"><td class="value">0x75</td><td class="name">AT91SAM7Xxx</td><td class="description">AT91SAM7Xxx Series</td></tr><tr class="even"><td class="value">0x76</td><td class="name">AT91SAM7SLxx</td><td class="description">AT91SAM7SLxx Series</td></tr><tr class="odd"><td class="value">0x80</td><td class="name">SAM3UxC</td><td class="description">SAM3UxC Series (100-pin version)</td></tr><tr class="even"><td class="value">0x81</td><td class="name">SAM3UxE</td><td class="description">SAM3UxE Series (144-pin version)</td></tr><tr class="odd"><td class="value">0x83</td><td class="name">SAM3ASAM4AxC</td><td class="description">SAM3AxC or SAM4AxC Series (100-pin version)</td></tr><tr class="even"><td class="value">0x84</td><td class="name">SAM3XSAM4XxC</td><td class="description">SAM3XxCor SAM4XxC Series (100-pin version)</td></tr><tr class="odd"><td class="value">0x85</td><td class="name">SAM3XSAM4XxE</td><td class="description">SAM3XxEor SAM4XxE Series (144-pin version)</td></tr><tr class="even"><td class="value">0x86</td><td class="name">SAM3XSAM4XxG</td><td class="description">SAM3XxGor or SAM4XxG Series  (208/217-pin version)</td></tr><tr class="odd"><td class="value">0x88</td><td class="name">SAM3SSAM4SxA</td><td class="description">SAM3SxA or SAM4SxA Series (48-pin version)</td></tr><tr class="even"><td class="value">0x89</td><td class="name">SAM3SSAM4SxB</td><td class="description">SAM3SxBor SAM4SxB Series (64-pin version)</td></tr><tr class="odd"><td class="value">0x8A</td><td class="name">SAM3SSAM4SxC</td><td class="description">SAM3SxCor SAM4SxC Series (100-pin version)</td></tr><tr class="even"><td class="value">0x92</td><td class="name">AT91x92</td><td class="description">AT91x92 Series</td></tr><tr class="odd"><td class="value">0x93</td><td class="name">SAM3NxA</td><td class="description">SAM3NxA Series (48-pin version)</td></tr><tr class="even"><td class="value">0x94</td><td class="name">SAM3NxB</td><td class="description">SAM3NxB Series (64-pin version)</td></tr><tr class="odd"><td class="value">0x95</td><td class="name">SAM3NxC</td><td class="description">SAM3NxC Series (100-pin version)</td></tr><tr class="even"><td class="value">0x99</td><td class="name">SAM3SDxB</td><td class="description">SAM3SDxB Series (64-pin version)</td></tr><tr class="odd"><td class="value">0x9A</td><td class="name">SAM3SDxC</td><td class="description">SAM3SDxC Series (100-pin version)</td></tr><tr class="even"><td class="value">0xA5</td><td class="name">SAM5A</td><td class="description">SAM5A</td></tr><tr class="odd"><td class="value">0xF0</td><td class="name">AT75Cxx</td><td class="description">AT75Cxx Series</td></tr></tbody></table></li>
+          <li id="CHIPID_CIDR__NVPTYP"><strong>NVPTYP</strong>: Nonvolatile Program Memory Type<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">ROM</td><td class="description">ROM</td></tr><tr class="even"><td class="value">0x1</td><td class="name">ROMLESS</td><td class="description">ROMless or on-chip Flash</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">FLASH</td><td class="description">Embedded Flash Memory</td></tr><tr class="even"><td class="value">0x3</td><td class="name">ROM_FLASH</td><td class="description">ROM and Embedded Flash MemoryNVPSIZ is ROM size      NVPSIZ2 is Flash size</td></tr><tr class="odd"><td class="value">0x4</td><td class="name">SRAM</td><td class="description">SRAM emulating ROM</td></tr></tbody></table></li>
+          <li id="CHIPID_CIDR__EXT"><strong>EXT</strong>: Extension Flag<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Chip ID has a single register definition without extension</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">An extended Chip ID exists.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="CHIPID_EXID">CHIPID Chip ID Extension Register</h4>
+        <p><strong>Name</strong>: CHIPID_EXID</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x400E0744</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#CHIPID_EXID__EXID" title="Chip ID Extension">EXID</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#CHIPID_EXID__EXID" title="Chip ID Extension">EXID</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#CHIPID_EXID__EXID" title="Chip ID Extension">EXID</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#CHIPID_EXID__EXID" title="Chip ID Extension">EXID</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="CHIPID_EXID__EXID"><strong>EXID</strong>: Chip ID Extension</li>
+          <p>-</p>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>

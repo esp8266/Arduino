@@ -1,10 +1,10 @@
 /*
   Arduino Starter Kit example
  Project 10  - Zoetrope
- 
+
  This sketch is written to accompany Project 10 in the
  Arduino Starter Kit
- 
+
  Parts required:
  two 10 kilohm resistors
  2 momentary pushbuttons
@@ -12,14 +12,14 @@
  motor
  9V battery
  H-Bridge
- 
+
  Created 13 September 2012
  by Scott Fitzgerald
  Thanks to Federico Vanzati for improvements
 
  http://arduino.cc/starterKit
- 
- This example code is part of the public domain 
+
+ This example code is part of the public domain
  */
 
 const int controlPin1 = 2; // connected to pin 7 on the H-bridge
@@ -39,7 +39,7 @@ int motorEnabled = 0; // Turns the motor on/off
 int motorSpeed = 0; // speed of the motor
 int motorDirection = 1; // current direction of the motor
 
-void setup(){
+void setup() {
   // intialize the inputs and outputs
   pinMode(directionSwitchPin, INPUT);
   pinMode(onOffSwitchStateSwitchPin, INPUT);
@@ -51,44 +51,44 @@ void setup(){
   digitalWrite(enablePin, LOW);
 }
 
-void loop(){
+void loop() {
   // read the value of the on/off switch
   onOffSwitchState = digitalRead(onOffSwitchStateSwitchPin);
   delay(1);
-  
+
   // read the value of the direction switch
   directionSwitchState = digitalRead(directionSwitchPin);
-  
-  // read the value of the pot and divide by 4 to get 
+
+  // read the value of the pot and divide by 4 to get
   // a value that can be used for PWM
-  motorSpeed = analogRead(potPin)/4; 
+  motorSpeed = analogRead(potPin) / 4;
 
   // if the on/off button changed state since the last loop()
-  if(onOffSwitchState != previousOnOffSwitchState){
+  if (onOffSwitchState != previousOnOffSwitchState) {
     // change the value of motorEnabled if pressed
-    if(onOffSwitchState == HIGH){
+    if (onOffSwitchState == HIGH) {
       motorEnabled = !motorEnabled;
     }
   }
 
   // if the direction button changed state since the last loop()
   if (directionSwitchState != previousDirectionSwitchState) {
-    // change the value of motorDirection if pressed 
+    // change the value of motorDirection if pressed
     if (directionSwitchState == HIGH) {
       motorDirection = !motorDirection;
     }
-  }  
+  }
 
   // change the direction the motor spins by talking
   // to the control pins on the H-Bridge
   if (motorDirection == 1) {
     digitalWrite(controlPin1, HIGH);
     digitalWrite(controlPin2, LOW);
-  } 
+  }
   else {
     digitalWrite(controlPin1, LOW);
     digitalWrite(controlPin2, HIGH);
-  }  
+  }
 
   // if the motor is supposed to be on
   if (motorEnabled == 1) {
@@ -99,7 +99,7 @@ void loop(){
     //turn the motor off
     analogWrite(enablePin, 0);
   }
-  // save the current On/Offswitch state as the previous 
+  // save the current On/Offswitch state as the previous
   previousDirectionSwitchState = directionSwitchState;
   // save the current switch state as the previous
   previousOnOffSwitchState = onOffSwitchState;

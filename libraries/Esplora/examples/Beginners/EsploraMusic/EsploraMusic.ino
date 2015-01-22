@@ -16,19 +16,19 @@
 // these are the frequencies for the notes from middle C
 // to one octave above middle C:
 const int note[] = {
-262, // C
-277, // C#
-294, // D
-311, // D#
-330, // E
-349, // F
-370, // F#
-392, // G
-415, // G#
-440, // A
-466, // A#
-494, // B
-523  // C next octave
+  262, // C
+  277, // C#
+  294, // D
+  311, // D#
+  330, // E
+  349, // F
+  370, // F#
+  392, // G
+  415, // G#
+  440, // A
+  466, // A#
+  494, // B
+  523  // C next octave
 };
 
 void setup() {
@@ -39,8 +39,8 @@ void loop() {
   // then play a note:
   if (Esplora.readButton(SWITCH_DOWN) == LOW) {
     int slider = Esplora.readSlider();
-    
-    // use map() to map the slider's range to the 
+
+    // use map() to map the slider's range to the
     // range of notes you have:
     byte thisNote = map(slider, 0, 1023, 0, 13);
     // play the note corresponding to the slider's position:

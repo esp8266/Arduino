@@ -25,6 +25,7 @@
 package processing.app.syntax;
 
 import processing.app.*;
+import processing.app.helpers.OSUtils;
 
 
 public class PdeTextAreaDefaults extends TextAreaDefaults {
@@ -35,7 +36,7 @@ public class PdeTextAreaDefaults extends TextAreaDefaults {
     //inputHandler.addDefaultKeyBindings();  // 0122
 
     // use option on mac for text edit controls that are ctrl on windows/linux
-    String mod = Base.isMacOS() ? "A" : "C";
+    String mod = OSUtils.isMacOS() ? "A" : "C";
 
     // right now, ctrl-up/down is select up/down, but mod should be
     // used instead, because the mac expects it to be option(alt)
@@ -94,7 +95,7 @@ public class PdeTextAreaDefaults extends TextAreaDefaults {
       inputHandler.addKeyBinding("CS+END", InputHandler.SELECT_DOC_END);
     }
 
-    if (Base.isMacOS()) {
+    if (OSUtils.isMacOS()) {
       inputHandler.addKeyBinding("M+LEFT", InputHandler.HOME);
       inputHandler.addKeyBinding("M+RIGHT", InputHandler.END);
       inputHandler.addKeyBinding("MS+LEFT", InputHandler.SELECT_HOME); // 0122

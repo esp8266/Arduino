@@ -18,208 +18,88 @@
 
 package processing.app;
 
-import processing.app.debug.TextAreaFIFO;
-import processing.core.*;
-import static processing.app.I18n._;
+import cc.arduino.packages.BoardPort;
+import processing.app.legacy.PApplet;
 
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.text.*;
+import static processing.app.I18n._;
 
-public class SerialMonitor extends JFrame implements ActionListener {
+@SuppressWarnings("serial")
+public class SerialMonitor extends AbstractMonitor {
+
+  private final String port;
   private Serial serial;
-  private String port;
-  private TextAreaFIFO textArea;
-  private JScrollPane scrollPane;
-  private JTextField textField;
-  private JButton sendButton;
-  private JCheckBox autoscrollBox;
-  private JComboBox lineEndings;
-  private JComboBox serialRates;
   private int serialRate;
-  private javax.swing.Timer updateTimer;
-  private StringBuffer updateBuffer;
 
-  public SerialMonitor(String port) {
-    super(port);
-  
-    this.port = port;
-  
-    addWindowListener(new WindowAdapter() {
-        public void windowClosing(WindowEvent e) {
-          closeSerialPort();
-        }
-      });  
-      
-    // obvious, no?
-    KeyStroke wc = Editor.WINDOW_CLOSE_KEYSTROKE;
-    getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(wc, "close");
-    getRootPane().getActionMap().put("close", new AbstractAction() {
-      public void actionPerformed(ActionEvent e) {
-        closeSerialPort();
-        setVisible(false);
-      }});
-  
-    getContentPane().setLayout(new BorderLayout());
-    
-    Font consoleFont = Theme.getFont("console.font");
-    Font editorFont = Preferences.getFont("editor.font");
-    Font font = new Font(consoleFont.getName(), consoleFont.getStyle(), editorFont.getSize());
+  public SerialMonitor(BoardPort port) {
+    super(port.getLabel());
 
-    textArea = new TextAreaFIFO(8000000);
-    textArea.setRows(16);
-    textArea.setColumns(40);
-    textArea.setEditable(false);    
-    textArea.setFont(font);
-    
-    // don't automatically update the caret.  that way we can manually decide
-    // whether or not to do so based on the autoscroll checkbox.
-    ((DefaultCaret)textArea.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
-    
-    scrollPane = new JScrollPane(textArea);
-    
-    getContentPane().add(scrollPane, BorderLayout.CENTER);
-    
-    JPanel pane = new JPanel();
-    pane.setLayout(new BoxLayout(pane, BoxLayout.X_AXIS));
-    pane.setBorder(new EmptyBorder(4, 4, 4, 4));
-
-    textField = new JTextField(40);
-    textField.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        send(textField.getText());
-        textField.setText("");
-      }});
-
-    sendButton = new JButton(_("Send"));
-    sendButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        send(textField.getText());
-        textField.setText("");
-      }});
-    
-    pane.add(textField);
-    pane.add(Box.createRigidArea(new Dimension(4, 0)));
-    pane.add(sendButton);
-    
-    getContentPane().add(pane, BorderLayout.NORTH);
-    
-    pane = new JPanel();
-    pane.setLayout(new BoxLayout(pane, BoxLayout.X_AXIS));
-    pane.setBorder(new EmptyBorder(4, 4, 4, 4));
-    
-    autoscrollBox = new JCheckBox(_("Autoscroll"), true);
-    
-    lineEndings = new JComboBox(new String[] { _("No line ending"), _("Newline"), _("Carriage return"), _("Both NL & CR") });
-    lineEndings.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent event) {
-      	Preferences.setInteger("serial.line_ending", lineEndings.getSelectedIndex());
-      }
-    });
-    if (Preferences.get("serial.line_ending") != null) {
-      lineEndings.setSelectedIndex(Preferences.getInteger("serial.line_ending"));
-    }
-    lineEndings.setMaximumSize(lineEndings.getMinimumSize());
-      
-    String[] serialRateStrings = {
-      "300","1200","2400","4800","9600","14400",
-      "19200","28800","38400","57600","115200"
-    };
-    
-    serialRates = new JComboBox();
-    for (int i = 0; i < serialRateStrings.length; i++)
-      serialRates.addItem(serialRateStrings[i] + " " + _("baud"));
+    this.port = port.getAddress();
 
     serialRate = Preferences.getInteger("serial.debug_rate");
     serialRates.setSelectedItem(serialRate + " " + _("baud"));
-    serialRates.addActionListener(new ActionListener() {
+    onSerialRateChange(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         String wholeString = (String) serialRates.getSelectedItem();
         String rateString = wholeString.substring(0, wholeString.indexOf(' '));
         serialRate = Integer.parseInt(rateString);
         Preferences.set("serial.debug_rate", rateString);
-        closeSerialPort();
         try {
-          openSerialPort();
-        } catch (SerialException e) {
+          close();
+          Thread.sleep(100); // Wait for serial port to properly close
+          open();
+        } catch (InterruptedException e) {
+          // noop
+        } catch (Exception e) {
           System.err.println(e);
         }
-      }});
-      
-    serialRates.setMaximumSize(serialRates.getMinimumSize());
-
-    pane.add(autoscrollBox);
-    pane.add(Box.createHorizontalGlue());
-    pane.add(lineEndings);
-    pane.add(Box.createRigidArea(new Dimension(8, 0)));
-    pane.add(serialRates);
-    
-    getContentPane().add(pane, BorderLayout.SOUTH);
-
-    pack();
-    
-    Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-    if (Preferences.get("last.screen.height") != null) {
-      // if screen size has changed, the window coordinates no longer
-      // make sense, so don't use them unless they're identical
-      int screenW = Preferences.getInteger("last.screen.width");
-      int screenH = Preferences.getInteger("last.screen.height");
-      if ((screen.width == screenW) && (screen.height == screenH)) {
-        String locationStr = Preferences.get("last.serial.location");
-        if (locationStr != null) {
-          int[] location = PApplet.parseInt(PApplet.split(locationStr, ','));
-          setPlacement(location);
-        }
       }
-    }
+    });
 
-    updateBuffer = new StringBuffer(1048576);
-    updateTimer = new javax.swing.Timer(33, this);  // redraw serial monitor at 30 Hz
-  }
-  
-  protected void setPlacement(int[] location) {
-    setBounds(location[0], location[1], location[2], location[3]);
-  }
-
-  protected int[] getPlacement() {
-    int[] location = new int[4];
-
-    // Get the dimensions of the Frame
-    Rectangle bounds = getBounds();
-    location[0] = bounds.x;
-    location[1] = bounds.y;
-    location[2] = bounds.width;
-    location[3] = bounds.height;
-
-    return location;
+    onSendCommand(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        send(textField.getText());
+        textField.setText("");
+      }
+    });
   }
 
   private void send(String s) {
     if (serial != null) {
       switch (lineEndings.getSelectedIndex()) {
-        case 1: s += "\n"; break;
-        case 2: s += "\r"; break;
-        case 3: s += "\r\n"; break;
+        case 1:
+          s += "\n";
+          break;
+        case 2:
+          s += "\r";
+          break;
+        case 3:
+          s += "\r\n";
+          break;
+      }
+      if ("".equals(s) && lineEndings.getSelectedIndex() == 0 && !Preferences.has("runtime.line.ending.alert.notified")) {
+        noLineEndingAlert.setForeground(Color.RED);
+        Preferences.set("runtime.line.ending.alert.notified", "true");
       }
       serial.write(s);
     }
   }
-  
-  public void openSerialPort() throws SerialException {
+
+  public void open() throws Exception {
     if (serial != null) return;
+
     serial = new Serial(port, serialRate) {
       @Override
       protected void message(char buff[], int n) {
         addToUpdateBuffer(buff, n);
       }
     };
-    updateTimer.start();
   }
-  
-  public void closeSerialPort() {
+
+  public void close() throws Exception {
     if (serial != null) {
       int[] location = getPlacement();
       String locationStr = PApplet.join(PApplet.str(location), ",");
@@ -230,27 +110,4 @@ public class SerialMonitor extends JFrame implements ActionListener {
     }
   }
   
-  private synchronized void addToUpdateBuffer(char buff[], int n) {
-    updateBuffer.append(buff, 0, n);
-  }
-
-  private synchronized String consumeUpdateBuffer() {
-    String s = updateBuffer.toString();
-    updateBuffer.setLength(0);
-    return s;
-  }
-
-  public void actionPerformed(ActionEvent e) {
-    final String s = consumeUpdateBuffer();
-    if (s.length() > 0) {
-      //System.out.println("gui append " + s.length());
-      if (autoscrollBox.isSelected()) {
-        textArea.appendTrim(s);
-        textArea.setCaretPosition(textArea.getDocument().getLength());
-      } else {
-        textArea.appendNoTrim(s);
-      }
-    }
-  }
-
 }

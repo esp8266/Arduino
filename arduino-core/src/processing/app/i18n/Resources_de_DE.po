@@ -1,0 +1,2086 @@
+# English translations for PACKAGE package.
+# Copyright (C) 2012 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# 
+# Translators:
+#   <mathias.wilhelm@freenet.de>, 2012.
+msgid ""
+msgstr ""
+"Project-Id-Version: Arduino IDE 1.5\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-03-29 10:24-0400\n"
+"PO-Revision-Date: 2015-01-14 18:03+0000\n"
+"Last-Translator: Lukas Bestle <lukas@lu-x.me>\n"
+"Language-Team: German (Germany) (http://www.transifex.com/projects/p/arduino-ide-15/language/de_DE/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: de_DE\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: Preferences.java:358 Preferences.java:374
+msgid "  (requires restart of Arduino)"
+msgstr " (erfordert Neustart von Arduino)"
+
+#: debug/Compiler.java:455
+msgid "'Keyboard' only supported on the Arduino Leonardo"
+msgstr "'Tastatur' wird nur vom Arduino Leonardo unterstützt"
+
+#: debug/Compiler.java:450
+msgid "'Mouse' only supported on the Arduino Leonardo"
+msgstr "'Mouse' wird nur vom Arduino Leonardo unterstützt"
+
+#: Preferences.java:478
+msgid "(edit only when Arduino is not running)"
+msgstr "(nur bearbeiten, wenn Arduino nicht läuft)"
+
+#: ../../../processing/app/Base.java:468
+msgid ""
+"--verbose, --verbose-upload and --verbose-build can only be used together "
+"with --verify or --upload"
+msgstr "--verbose, --verbose-upload und --verbose-build können nur zusammen mit --verify oder --upload verwendet werden"
+
+#: Sketch.java:746
+msgid ".pde -> .ino"
+msgstr ".pde -> .ino"
+
+#: Base.java:773
+msgid ""
+"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p {"
+" font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Are you "
+"sure you want to Quit?</b><p>Closing the last open sketch will quit Arduino."
+msgstr "<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p { font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Arduino wirklich beenden?</b><p>Das Schließen des letzten Sketches beendet Arduino."
+
+#: Editor.java:2053
+msgid ""
+"<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p {"
+" font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Do you "
+"want to save changes to this sketch<BR> before closing?</b><p>If you don't "
+"save, your changes will be lost."
+msgstr "<html> <head> <style type=\"text/css\">b { font: 13pt \"Lucida Grande\" }p { font: 11pt \"Lucida Grande\"; margin-top: 8px }</style> </head><b>Wollen Sie die Änderungen an dem Sketch <BR> vor dem Schließen speichern?</b><p>Wenn Sie dies nicht speichern, gehen alle Änderungen verloren."
+
+#: Sketch.java:398
+#, java-format
+msgid "A file named \"{0}\" already exists in \"{1}\""
+msgstr "Eine Datei namens \"{0}\" existiert bereits in \"{1}\""
+
+#: Editor.java:2169
+#, java-format
+msgid "A folder named \"{0}\" already exists. Can't open sketch."
+msgstr "Ein Ordner mit dem Namen \"{0}\" existiert bereits. Der Sketch kann nicht geladen werden."
+
+#: Base.java:2690
+#, java-format
+msgid "A library named {0} already exists"
+msgstr "Eine Bibliothek namens {0} existiert nicht"
+
+#: UpdateCheck.java:103
+msgid ""
+"A new version of Arduino is available,\n"
+"would you like to visit the Arduino download page?"
+msgstr "Eine neue Version von Arduino ist verfügbar.\nZur Arduino Downloadseite wechseln?"
+
+#: EditorConsole.java:153
+msgid ""
+"A problem occurred while trying to open the\n"
+"files used to store the console output."
+msgstr "Beim Öffnen der Dateien, welche verwendet werden,\num die Konsolenausgabe zu speichern, ist ein Problem ist aufgetreten."
+
+#: Editor.java:1116
+msgid "About Arduino"
+msgstr "Über Arduino"
+
+#: Editor.java:650
+msgid "Add File..."
+msgstr "Datei hinzufügen"
+
+#: Base.java:963
+msgid "Add Library..."
+msgstr "Bibliothek hinzufügen..."
+
+#: ../../../processing/app/Preferences.java:96
+msgid "Albanian"
+msgstr "Albanisch"
+
+#: tools/FixEncoding.java:77
+msgid ""
+"An error occurred while trying to fix the file encoding.\n"
+"Do not attempt to save this sketch as it may overwrite\n"
+"the old version. Use Open to re-open the sketch and try again.\n"
+msgstr "Beim Korrigieren der Kodierung ist ein Fehler aufgetreten.\nVersuchen Sie nicht, den Sketch zu speichern, da dies die alte Version\nüberschreiben wird. Verwenden Sie Öffnen um den Sketch neu zu laden und versuchen Sie es erneut.\n"
+
+#: ../../../processing/app/BaseNoGui.java:528
+msgid "An error occurred while uploading the sketch"
+msgstr "Beim Hochladen des Sketches ist ein Fehler aufgetreten"
+
+#: ../../../processing/app/BaseNoGui.java:506
+#: ../../../processing/app/BaseNoGui.java:551
+#: ../../../processing/app/BaseNoGui.java:554
+msgid "An error occurred while verifying the sketch"
+msgstr "Beim Verifizieren des Sketches ist ein Fehler aufgetreten"
+
+#: ../../../processing/app/BaseNoGui.java:521
+msgid "An error occurred while verifying/uploading the sketch"
+msgstr "Beim Verifizieren/Hochladen des Sketches ist ein Fehler aufgetreten"
+
+#: Base.java:228
+msgid ""
+"An unknown error occurred while trying to load\n"
+"platform-specific code for your machine."
+msgstr "Ein unbekannter Fehler ist aufgetreten beim Versuch, \nden platformspezifischen Code für Ihr Gerät zu laden."
+
+#: Preferences.java:85
+msgid "Arabic"
+msgstr "Arabisch"
+
+#: Preferences.java:86
+msgid "Aragonese"
+msgstr "Aragonesisch"
+
+#: tools/Archiver.java:48
+msgid "Archive Sketch"
+msgstr "Sketch archivieren"
+
+#: tools/Archiver.java:109
+msgid "Archive sketch as:"
+msgstr "Archiviere den Sketch unter:"
+
+#: tools/Archiver.java:139
+msgid "Archive sketch canceled."
+msgstr "Archivierung des Sketches abgebrochen."
+
+#: tools/Archiver.java:75
+msgid ""
+"Archiving the sketch has been canceled because\n"
+"the sketch couldn't save properly."
+msgstr "Die Archivierung des Sketches wurde abgebrochen, da der\nSketch nicht ordentlich gespeichert werden konnte."
+
+#: ../../../processing/app/I18n.java:83
+msgid "Arduino ARM (32-bits) Boards"
+msgstr "Arduino ARM (32-bit) Platinen"
+
+#: ../../../processing/app/I18n.java:82
+msgid "Arduino AVR Boards"
+msgstr "Arduino AVR Platinen"
+
+#: Editor.java:2137
+msgid ""
+"Arduino can only open its own sketches\n"
+"and other files ending in .ino or .pde"
+msgstr "Arduino kann nur seine eigenen Sketche und andere\nDateien mit den Dateiendungen .ino und .pde öffnen"
+
+#: Base.java:1682
+msgid ""
+"Arduino cannot run because it could not\n"
+"create a folder to store your settings."
+msgstr "Arduino kann nicht laufen, da es den Ordner\nzum Speichern der Einstellungen nicht erstellen kann."
+
+#: Base.java:1889
+msgid ""
+"Arduino cannot run because it could not\n"
+"create a folder to store your sketchbook."
+msgstr "Arduino kann nicht starten, da der Ordner zum Speichern Ihres Sketchbooks nicht angelegt werden konnte."
+
+#: Base.java:240
+msgid ""
+"Arduino requires a full JDK (not just a JRE)\n"
+"to run. Please install JDK 1.5 or later.\n"
+"More information can be found in the reference."
+msgstr "Arduino braucht das vollständige JDK\n(nicht nur die Laufzeitumgebung JRE). Bitte JDK 1.5\noder höher installieren. Mehr Information\ndazu findet sich in der Referenz."
+
+#: ../../../processing/app/EditorStatus.java:471
+msgid "Arduino: "
+msgstr "Arduino: "
+
+#: Sketch.java:588
+#, java-format
+msgid "Are you sure you want to delete \"{0}\"?"
+msgstr "Sind Sie sicher, dass sie \"{0}\" löschen wollen?"
+
+#: Sketch.java:587
+msgid "Are you sure you want to delete this sketch?"
+msgstr "Sind Sie sicher, dass Sie diesen Sketch löschen wollen?"
+
+#: ../../../processing/app/Base.java:356
+msgid "Argument required for --board"
+msgstr "Argument benötigt für --board"
+
+#: ../../../processing/app/Base.java:370
+msgid "Argument required for --curdir"
+msgstr "Argument benötigt für --curdir"
+
+#: ../../../processing/app/Base.java:385
+msgid "Argument required for --get-pref"
+msgstr "Argument benötigt für --get-pref"
+
+#: ../../../processing/app/Base.java:363
+msgid "Argument required for --port"
+msgstr "Argument benötigt für --port"
+
+#: ../../../processing/app/Base.java:377
+msgid "Argument required for --pref"
+msgstr "Argument benötigt für --pref"
+
+#: ../../../processing/app/Base.java:384
+msgid "Argument required for --preferences-file"
+msgstr "Argument benötigt für --preferences-file"
+
+#: ../../../processing/app/Preferences.java:137
+msgid "Armenian"
+msgstr "Armenisch"
+
+#: ../../../processing/app/Preferences.java:138
+msgid "Asturian"
+msgstr "Asturisch"
+
+#: ../../../processing/app/debug/Compiler.java:145
+msgid "Authorization required"
+msgstr "Autorisierung benötigt"
+
+#: tools/AutoFormat.java:91
+msgid "Auto Format"
+msgstr "Automatische Formatierung"
+
+#: tools/AutoFormat.java:934
+msgid "Auto Format Canceled: Too many left curly braces."
+msgstr "Automatische Formatierung abgebrochen: Zu viele öffnende geschweifte Klammern"
+
+#: tools/AutoFormat.java:925
+msgid "Auto Format Canceled: Too many left parentheses."
+msgstr "Automatische Formatierung abgebrochen: Zu viele öffnende Klammern"
+
+#: tools/AutoFormat.java:931
+msgid "Auto Format Canceled: Too many right curly braces."
+msgstr "Automatische Formatierung abgebrochen: Zu viele schließende geschweifte Klammern"
+
+#: tools/AutoFormat.java:922
+msgid "Auto Format Canceled: Too many right parentheses."
+msgstr "Automatische Formatierung abgebrochen: Zu viele schließende Klammern"
+
+#: tools/AutoFormat.java:944
+msgid "Auto Format finished."
+msgstr "Automatische Formatierung abgeschlossen."
+
+#: Preferences.java:439
+msgid "Automatically associate .ino files with Arduino"
+msgstr ".ino-Dateien mit Arduino öffnen"
+
+#: SerialMonitor.java:110
+msgid "Autoscroll"
+msgstr "Autoscroll"
+
+#: Editor.java:2619
+#, java-format
+msgid "Bad error line: {0}"
+msgstr "Fehler in Zeile: {0}"
+
+#: Editor.java:2136
+msgid "Bad file selected"
+msgstr "Falsche Datei ausgewählt"
+
+#: ../../../processing/app/debug/Compiler.java:89
+msgid "Bad sketch primary file or bad sketch directory structure"
+msgstr "Fehlerhafte primäre Sketch-Datei oder fehlerhafte Sketch-Ordnerstruktur"
+
+#: ../../../processing/app/Preferences.java:149
+msgid "Basque"
+msgstr "Baskisch"
+
+#: ../../../processing/app/Preferences.java:139
+msgid "Belarusian"
+msgstr "Weißrussisch"
+
+#: ../../../processing/app/Base.java:1433
+#: ../../../processing/app/Editor.java:707
+msgid "Board"
+msgstr "Platine"
+
+#: ../../../processing/app/debug/TargetBoard.java:42
+#, java-format
+msgid ""
+"Board {0}:{1}:{2} doesn''t define a ''build.board'' preference. Auto-set to:"
+" {3}"
+msgstr "Die Platine {0}:{1}:{2} definiert keine \"Build.Platine\"-Einstellung. Sie wurde automatisch auf {3} gesetzt."
+
+#: ../../../processing/app/EditorStatus.java:472
+msgid "Board: "
+msgstr "Platine: "
+
+#: ../../../processing/app/Preferences.java:140
+msgid "Bosnian"
+msgstr "Bosnisch"
+
+#: SerialMonitor.java:112
+msgid "Both NL & CR"
+msgstr "CR und NL"
+
+#: Preferences.java:81
+msgid "Browse"
+msgstr "Durchsuchen"
+
+#: Sketch.java:1392 Sketch.java:1423
+msgid "Build folder disappeared or could not be written"
+msgstr "Der Build-Ordner ist verschwunden oder kann nicht beschrieben werden"
+
+#: ../../../processing/app/Sketch.java:1530
+msgid "Build options changed, rebuilding all"
+msgstr "Build-Optionen wurden verändert, alles wird neu gebaut"
+
+#: ../../../processing/app/Preferences.java:80
+msgid "Bulgarian"
+msgstr "Bulgarisch"
+
+#: ../../../processing/app/Preferences.java:141
+msgid "Burmese (Myanmar)"
+msgstr "Birmanisch (Myanmar)"
+
+#: Editor.java:708
+msgid "Burn Bootloader"
+msgstr "Bootloader brennen"
+
+#: Editor.java:2504
+msgid "Burning bootloader to I/O Board (this may take a minute)..."
+msgstr "Brenne Bootloader auf die E/A-Platine (kann einige Minuten dauern)..."
+
+#: ../../../processing/app/Base.java:379
+#, java-format
+msgid "Can only pass one of: {0}"
+msgstr "Kann nur eine übergeben von: {0}"
+
+#: ../../../processing/app/BaseNoGui.java:504
+#: ../../../processing/app/BaseNoGui.java:549
+msgid "Can't find the sketch in the specified path"
+msgstr "Kann den Sketch unter dem angegebenen Pfad nicht finden"
+
+#: ../../../processing/app/Preferences.java:92
+msgid "Canadian French"
+msgstr "Kanadisches Französisch"
+
+#: Preferences.java:79 Sketch.java:585 Sketch.java:737 Sketch.java:1042
+#: Editor.java:2064 Editor.java:2145 Editor.java:2465
+msgid "Cancel"
+msgstr "Abbruch"
+
+#: Sketch.java:455
+msgid "Cannot Rename"
+msgstr "Umbenennen fehlgeschlagen"
+
+#: ../../../processing/app/Base.java:465
+msgid "Cannot specify any sketch files"
+msgstr "Kann keine Sketch-Dateien angeben"
+
+#: SerialMonitor.java:112
+msgid "Carriage return"
+msgstr "Zeilenumbruch (CR)"
+
+#: Preferences.java:87
+msgid "Catalan"
+msgstr "Katalanisch"
+
+#: Preferences.java:419
+msgid "Check for updates on startup"
+msgstr "Beim Start nach Updates suchen"
+
+#: ../../../processing/app/Preferences.java:142
+msgid "Chinese (China)"
+msgstr "Chinesisch (China)"
+
+#: ../../../processing/app/Preferences.java:142
+msgid "Chinese (Hong Kong)"
+msgstr "Chinesisch (Hong Kong)"
+
+#: ../../../processing/app/Preferences.java:144
+msgid "Chinese (Taiwan)"
+msgstr "Chinesisch (Taiwan)"
+
+#: ../../../processing/app/Preferences.java:143
+msgid "Chinese (Taiwan) (Big5)"
+msgstr "Chinesisch (Taiwan) (Big5)"
+
+#: Preferences.java:88
+msgid "Chinese Simplified"
+msgstr "Vereinfachtes Chinesisch"
+
+#: Preferences.java:89
+msgid "Chinese Traditional"
+msgstr "Traditionelles Chinesisch"
+
+#: Editor.java:521 Editor.java:2024
+msgid "Close"
+msgstr "Schließen"
+
+#: Editor.java:1208 Editor.java:2749
+msgid "Comment/Uncomment"
+msgstr "Kommentieren/Kommentar aufheben"
+
+#: Sketch.java:1608 Editor.java:1890
+msgid "Compiling sketch..."
+msgstr "Sketch wird kompiliert..."
+
+#: EditorConsole.java:152
+msgid "Console Error"
+msgstr "Fehler auf der Konsole"
+
+#: Editor.java:1157 Editor.java:2707
+msgid "Copy"
+msgstr "Kopieren"
+
+#: Editor.java:1177 Editor.java:2723
+msgid "Copy as HTML"
+msgstr "Als HTML kopieren"
+
+#: ../../../processing/app/EditorStatus.java:455
+msgid "Copy error messages"
+msgstr "Fehlermeldungen kopieren"
+
+#: Editor.java:1165 Editor.java:2715
+msgid "Copy for Forum"
+msgstr "Für Forum kopieren"
+
+#: Sketch.java:1089
+#, java-format
+msgid "Could not add ''{0}'' to the sketch."
+msgstr "Konnte {0} nicht dem Sketch hinzufügen"
+
+#: Editor.java:2188
+msgid "Could not copy to a proper location."
+msgstr "Konnte nicht an einen korrekten Speicherort kopieren. "
+
+#: Editor.java:2179
+msgid "Could not create the sketch folder."
+msgstr "Der Sketch-Ordner konnte nicht angelegt werden."
+
+#: Editor.java:2206
+msgid "Could not create the sketch."
+msgstr "Der Sketch konnte nicht angelegt werden."
+
+#: Sketch.java:617
+#, java-format
+msgid "Could not delete \"{0}\"."
+msgstr "Konnte \"{0}\" nicht löschen."
+
+#: Sketch.java:1066
+#, java-format
+msgid "Could not delete the existing ''{0}'' file."
+msgstr "Die bestehende Datei \"{0}\" kann nicht gelöscht werden"
+
+#: Base.java:2533 Base.java:2556
+#, java-format
+msgid "Could not delete {0}"
+msgstr "{0} konnte nicht gelöscht werden"
+
+#: ../../../processing/app/debug/TargetPlatform.java:74
+#, java-format
+msgid "Could not find boards.txt in {0}. Is it pre-1.5?"
+msgstr "Es konnte keine boards.txt in {0} gefunden werden. Ist sie noch von einer Version vor Arduino 1.5?"
+
+#: ../../../cc/arduino/packages/uploaders/SerialUploader.java:282
+#, java-format
+msgid "Could not find tool {0}"
+msgstr "Konnte das Werkzeug {0} nicht finden"
+
+#: ../../../cc/arduino/packages/uploaders/SerialUploader.java:278
+#, java-format
+msgid "Could not find tool {0} from package {1}"
+msgstr "Konnte das Werkzeug {0} aus dem Paket {1} nicht finden"
+
+#: Base.java:1934
+#, java-format
+msgid ""
+"Could not open the URL\n"
+"{0}"
+msgstr "URL konnte nicht geöffnet werden\n{0}"
+
+#: Base.java:1958
+#, java-format
+msgid ""
+"Could not open the folder\n"
+"{0}"
+msgstr "Ordner {0} konnte nicht geöffnet werden"
+
+#: Sketch.java:1769
+msgid ""
+"Could not properly re-save the sketch. You may be in trouble at this point,\n"
+"and it might be time to copy and paste your code to another text editor."
+msgstr "Der Sketch konnte nicht neu gespeichert werde. Sie könnten jetzt ernsthafte Probleme haben\nund es wäre eventuell angebracht, den Code in einen anderen Editor zu kopieren"
+
+#: Sketch.java:1768
+msgid "Could not re-save sketch"
+msgstr "Der Sketch konnte nicht neu gespeichert werden"
+
+#: Theme.java:52
+msgid ""
+"Could not read color theme settings.\n"
+"You'll need to reinstall Arduino."
+msgstr "Die Einstellungen für das Farbschema konnten nicht gelesen werden.\nArduino muss neu installiert werden."
+
+#: Preferences.java:219
+msgid ""
+"Could not read default settings.\n"
+"You'll need to reinstall Arduino."
+msgstr "Die Standardeinstellungen konnten nicht geladen werden.\nSie müssen Arduino neu installieren."
+
+#: ../../../processing/app/Sketch.java:1525
+msgid "Could not read prevous build preferences file, rebuilding all"
+msgstr "Die vorherige Build-Voreinstellungsdatei konnte nicht gelesen werden, alles wird neu gebaut"
+
+#: Base.java:2482
+#, java-format
+msgid "Could not remove old version of {0}"
+msgstr "Alte Version von {0} konnte nicht entfernt werden"
+
+#: Sketch.java:483 Sketch.java:528
+#, java-format
+msgid "Could not rename \"{0}\" to \"{1}\""
+msgstr "Konnte \"{0}\" nicht in \"{1}\" umbenennen"
+
+#: Sketch.java:475
+msgid "Could not rename the sketch. (0)"
+msgstr "Konnte den Sketch nicht umbenennen. (0)"
+
+#: Sketch.java:496
+msgid "Could not rename the sketch. (1)"
+msgstr "Konnte den Sketch nicht umbenennen. (1)"
+
+#: Sketch.java:503
+msgid "Could not rename the sketch. (2)"
+msgstr "Konnte den Sketch nicht umbenennen. (2)"
+
+#: Base.java:2492
+#, java-format
+msgid "Could not replace {0}"
+msgstr "{0} konnte nicht ersetzt werden"
+
+#: ../../../processing/app/Sketch.java:1579
+msgid "Could not write build preferences file"
+msgstr "Die Build-Voreinstellungsdatei konnte nicht geschrieben werden"
+
+#: tools/Archiver.java:74
+msgid "Couldn't archive sketch"
+msgstr "Sketch konnte nicht archiviert werden"
+
+#: Sketch.java:1647
+msgid "Couldn't determine program size: {0}"
+msgstr "Die Programmgröße konnte nicht ermittelt werden: {0} "
+
+#: Sketch.java:616
+msgid "Couldn't do it"
+msgstr "Konnte nicht ausgeführt werden"
+
+#: debug/BasicUploader.java:209
+msgid ""
+"Couldn't find a Board on the selected port. Check that you have the correct "
+"port selected.  If it is correct, try pressing the board's reset button "
+"after initiating the upload."
+msgstr "An dem ausgewählten Port konnte keine Platine gefunden werden. Bitte überprüfen Sie die korrekte Auswahl des seriellen Ports. Ist diese korrekt, bitte die Platine über die Reset-Taste nach dem Start des Hochladens neu starten."
+
+#: ../../../processing/app/Preferences.java:82
+msgid "Croatian"
+msgstr "Kroatisch"
+
+#: Editor.java:1149 Editor.java:2699
+msgid "Cut"
+msgstr "Ausschneiden"
+
+#: ../../../processing/app/Preferences.java:83
+msgid "Czech"
+msgstr "Tschechisch"
+
+#: Preferences.java:90
+msgid "Danish"
+msgstr "Dänisch"
+
+#: Editor.java:1224 Editor.java:2765
+msgid "Decrease Indent"
+msgstr "Ausrücken"
+
+#: EditorHeader.java:314 Sketch.java:591
+msgid "Delete"
+msgstr "Löschen"
+
+#: debug/Uploader.java:199
+msgid ""
+"Device is not responding, check the right serial port is selected or RESET "
+"the board right before exporting"
+msgstr "Das Gerät reagiert nicht. Entweder ist der falsche Port ausgewählt,\noder die Platine muss vor dem Export mit RESET neu gestartet werden"
+
+#: tools/FixEncoding.java:57
+msgid "Discard all changes and reload sketch?"
+msgstr "Alle Änderungen verwerfen und den Sketch neu laden?"
+
+#: ../../../processing/app/Preferences.java:438
+msgid "Display line numbers"
+msgstr "Zeilennummern anzeigen"
+
+#: Editor.java:2064
+msgid "Don't Save"
+msgstr "Nicht Speichern"
+
+#: Editor.java:2275 Editor.java:2311
+msgid "Done Saving."
+msgstr "Speichern abgeschlossen."
+
+#: Editor.java:2510
+msgid "Done burning bootloader."
+msgstr "Der Bootloader wurde gebrannt."
+
+#: ../../../processing/app/BaseNoGui.java:507
+#: ../../../processing/app/BaseNoGui.java:552
+msgid "Done compiling"
+msgstr "Übersetzen abgeschlossen"
+
+#: Editor.java:1911 Editor.java:1928
+msgid "Done compiling."
+msgstr "Kompilieren abgeschlossen."
+
+#: Editor.java:2564
+msgid "Done printing."
+msgstr "Drucken abgeschlossen."
+
+#: ../../../processing/app/BaseNoGui.java:514
+msgid "Done uploading"
+msgstr "Hochladen beendet"
+
+#: Editor.java:2395 Editor.java:2431
+msgid "Done uploading."
+msgstr "Hochladen abgeschlossen."
+
+#: Preferences.java:91
+msgid "Dutch"
+msgstr "Holländisch"
+
+#: ../../../processing/app/Preferences.java:144
+msgid "Dutch (Netherlands)"
+msgstr "Niederländisch (Niederlande)"
+
+#: Editor.java:1130
+msgid "Edit"
+msgstr "Bearbeiten"
+
+#: Preferences.java:370
+msgid "Editor font size: "
+msgstr "Zeichengröße für den Editor:"
+
+#: Preferences.java:353
+msgid "Editor language: "
+msgstr "Editorsprache:"
+
+#: Preferences.java:92
+msgid "English"
+msgstr "Englisch"
+
+#: ../../../processing/app/Preferences.java:145
+msgid "English (United Kingdom)"
+msgstr "Englisch (Vereinigtes Königreich)"
+
+#: Editor.java:1062
+msgid "Environment"
+msgstr "Umgebung"
+
+#: Base.java:2147 Preferences.java:256 Sketch.java:475 Sketch.java:481
+#: Sketch.java:496 Sketch.java:503 Sketch.java:526 Sketch.java:543
+#: Editor.java:2167 Editor.java:2178 Editor.java:2188 Editor.java:2206
+msgid "Error"
+msgstr "Fehler"
+
+#: Sketch.java:1065 Sketch.java:1088
+msgid "Error adding file"
+msgstr "Fehler beim Hinzufügen der Datei"
+
+#: debug/Compiler.java:369
+msgid "Error compiling."
+msgstr "Fehler beim Kompilieren."
+
+#: Base.java:1674
+msgid "Error getting the Arduino data folder."
+msgstr "Fehler beim Zugriff auf den Datenordner"
+
+#: Serial.java:593
+#, java-format
+msgid "Error inside Serial.{0}()"
+msgstr "Fehler innerhalb von Serial.{0}()"
+
+#: ../../../processing/app/Base.java:1232
+msgid "Error loading libraries"
+msgstr "Fehler beim Laden der Libraries"
+
+#: ../../../processing/app/debug/TargetPlatform.java:95
+#: ../../../processing/app/debug/TargetPlatform.java:106
+#: ../../../processing/app/debug/TargetPlatform.java:117
+#, java-format
+msgid "Error loading {0}"
+msgstr "Fehler beim Laden vom {0}"
+
+#: Serial.java:181
+#, java-format
+msgid "Error opening serial port ''{0}''."
+msgstr "Fehler beim Öffnen des seriellen Ports \"{0}\"."
+
+#: Preferences.java:277
+msgid "Error reading preferences"
+msgstr "Fehler beim Lesen der Voreinstellungen"
+
+#: Preferences.java:279
+#, java-format
+msgid ""
+"Error reading the preferences file. Please delete (or move)\n"
+"{0} and restart Arduino."
+msgstr "Fehler beim Lesen der Voreinstellungen. Bitte die Datei {0}\nlöschen (oder verschieben) und dann Arduino neu starten"
+
+#: ../../../cc/arduino/packages/DiscoveryManager.java:25
+msgid "Error starting discovery method: "
+msgstr "Fehler beim Starten der Entdeckungsmethode:"
+
+#: Serial.java:125
+#, java-format
+msgid "Error touching serial port ''{0}''."
+msgstr "Fehler beim Ansprechen des seriellen Ports \"{0}\"."
+
+#: Editor.java:2512 Editor.java:2516 Editor.java:2520
+msgid "Error while burning bootloader."
+msgstr "Fehler beim Brennen des Bootloaders."
+
+#: ../../../processing/app/Editor.java:2555
+msgid "Error while burning bootloader: missing '{0}' configuration parameter"
+msgstr "Fehler beim Brennen des Bootloaders: Fehlender Konfigurationsparameter '{0}'"
+
+#: ../../../../../app/src/processing/app/Editor.java:1940
+msgid "Error while compiling: missing '{0}' configuration parameter"
+msgstr "Fehler beim Übersetzen: Fehlender Konfigurationsparameter '{0}'"
+
+#: SketchCode.java:83
+#, java-format
+msgid "Error while loading code {0}"
+msgstr "Fehler beim Laden des Quellcodes {0}"
+
+#: Editor.java:2567
+msgid "Error while printing."
+msgstr "Fehler beim Drucken."
+
+#: ../../../processing/app/BaseNoGui.java:528
+msgid "Error while uploading"
+msgstr "Fehler beim Hochladen"
+
+#: ../../../processing/app/Editor.java:2409
+#: ../../../processing/app/Editor.java:2449
+msgid "Error while uploading: missing '{0}' configuration parameter"
+msgstr "Fehler beim Hochladen: Fehlender Konfigurationsparameter '{0}'"
+
+#: ../../../processing/app/BaseNoGui.java:506
+#: ../../../processing/app/BaseNoGui.java:551
+#: ../../../processing/app/BaseNoGui.java:554
+msgid "Error while verifying"
+msgstr "Fehler beim Verifizieren"
+
+#: ../../../processing/app/BaseNoGui.java:521
+msgid "Error while verifying/uploading"
+msgstr "Fehler beim Verifizieren/Hochladen"
+
+#: Preferences.java:93
+msgid "Estonian"
+msgstr "Estländisch"
+
+#: ../../../processing/app/Preferences.java:146
+msgid "Estonian (Estonia)"
+msgstr "Estländisch (Estland)"
+
+#: Editor.java:516
+msgid "Examples"
+msgstr "Beispiele"
+
+#: Editor.java:2482
+msgid "Export canceled, changes must first be saved."
+msgstr "Export abgebrochen, Änderungen müssen erst gespeichert werden."
+
+#: Base.java:2100
+msgid "FAQ.html"
+msgstr "FAQ.html"
+
+#: ../../../processing/app/Base.java:416
+#, java-format
+msgid "Failed to open sketch: \"{0}\""
+msgstr "Sketch: \"{0}\" konnte nicht geöffnet werden"
+
+#: Editor.java:491
+msgid "File"
+msgstr "Datei"
+
+#: Preferences.java:94
+msgid "Filipino"
+msgstr "Philippinisch"
+
+#: FindReplace.java:124 FindReplace.java:127
+msgid "Find"
+msgstr "Finden"
+
+#: Editor.java:1249
+msgid "Find Next"
+msgstr "Nächstes Vorkommen suchen"
+
+#: Editor.java:1259
+msgid "Find Previous"
+msgstr "Vorheriges Vorkommen suchen"
+
+#: Editor.java:1086 Editor.java:2775
+msgid "Find in Reference"
+msgstr "In der Referenz suchen"
+
+#: Editor.java:1234
+msgid "Find..."
+msgstr "Suchen..."
+
+#: FindReplace.java:80
+msgid "Find:"
+msgstr "Suchen:"
+
+#: ../../../processing/app/Preferences.java:147
+msgid "Finnish"
+msgstr "Finnisch"
+
+#: tools/FixEncoding.java:41 tools/FixEncoding.java:58
+#: tools/FixEncoding.java:79
+msgid "Fix Encoding & Reload"
+msgstr "Kodierung korrigieren & neu laden"
+
+#: Base.java:1851
+msgid ""
+"For information on installing libraries, see: "
+"http://arduino.cc/en/Guide/Libraries\n"
+msgstr "Informationen zur Installation von Libraries finden sich unter: http://arduino.cc/en/Guide/Libraries\n"
+
+#: ../../../cc/arduino/packages/uploaders/SerialUploader.java:118
+#, java-format
+msgid "Forcing reset using 1200bps open/close on port {0}"
+msgstr "Erzwinge Reset durch öffnen/schließen mit 1200bps auf dem Port {0}"
+
+#: Preferences.java:95
+msgid "French"
+msgstr "Französisch"
+
+#: Editor.java:1097
+msgid "Frequently Asked Questions"
+msgstr "Häufig gestellte Fragen"
+
+#: Preferences.java:96
+msgid "Galician"
+msgstr "Galizisch"
+
+#: ../../../processing/app/Preferences.java:94
+msgid "Georgian"
+msgstr "Georgisch"
+
+#: Preferences.java:97
+msgid "German"
+msgstr "Deutsch"
+
+#: Editor.java:1054
+msgid "Getting Started"
+msgstr "Einstieg"
+
+#: ../../../processing/app/Sketch.java:1646
+#, java-format
+msgid ""
+"Global variables use {0} bytes ({2}%%) of dynamic memory, leaving {3} bytes "
+"for local variables. Maximum is {1} bytes."
+msgstr "Globale Variablen verwenden {0} Bytes ({2}%%) des dynamischen Speichers, {3} Bytes für lokale Variablen verbleiben. Das Maximum sind {1} Bytes."
+
+#: ../../../processing/app/Sketch.java:1651
+#, java-format
+msgid "Global variables use {0} bytes of dynamic memory."
+msgstr "Globale Variablen verwenden {0} Bytes des dynamischen Speichers."
+
+#: Preferences.java:98
+msgid "Greek"
+msgstr "Griechisch"
+
+#: Base.java:2085
+msgid "Guide_Environment.html"
+msgstr "Guide_Environment.html"
+
+#: Base.java:2071
+msgid "Guide_MacOSX.html"
+msgstr "Guide_MacOSX.html"
+
+#: Base.java:2095
+msgid "Guide_Troubleshooting.html"
+msgstr "Guide_Troubleshooting.html"
+
+#: Base.java:2073
+msgid "Guide_Windows.html"
+msgstr "Guide_Windows.html"
+
+#: ../../../processing/app/Preferences.java:95
+msgid "Hebrew"
+msgstr "Hebräisch"
+
+#: Editor.java:1015
+msgid "Help"
+msgstr "Hilfe"
+
+#: Preferences.java:99
+msgid "Hindi"
+msgstr "Hinduistisch"
+
+#: Sketch.java:295
+msgid ""
+"How about saving the sketch first \n"
+"before trying to rename it?"
+msgstr "Wie wäre es, den Sketch vor dem\nUmbenennen erst einmal zu speichern?"
+
+#: Sketch.java:882
+msgid "How very Borges of you"
+msgstr "Welch absurde Idee"
+
+#: Preferences.java:100
+msgid "Hungarian"
+msgstr "Ungarisch"
+
+#: FindReplace.java:96
+msgid "Ignore Case"
+msgstr "Groß/Kleinschreibung ignorieren"
+
+#: Base.java:1058
+msgid "Ignoring bad library name"
+msgstr "Der unzulässige Bibliotheksname wurde ignoriert"
+
+#: Base.java:1436
+msgid "Ignoring sketch with bad name"
+msgstr "Der unzulässige Sketchname wurde ignoriert"
+
+#: Editor.java:636
+msgid "Import Library..."
+msgstr "Bibliothek importieren..."
+
+#: ../../../processing/app/Sketch.java:736
+msgid ""
+"In Arduino 1.0, the default file extension has changed\n"
+"from .pde to .ino.  New sketches (including those created\n"
+"by \"Save-As\") will use the new extension.  The extension\n"
+"of existing sketches will be updated on save, but you can\n"
+"disable this in the Preferences dialog.\n"
+"\n"
+"Save sketch and update its extension?"
+msgstr "Mit Arduino 1.0 hat sich die Dateiendung von .pde zu .ino\ngeändert. Neue Sketche (auch die, welche mit \"Speichern unter\"\nerstellt wurden) werden diese neue Endung verwenden. Die\nDateiendung existierender Sketche werden beim Speichern\ngeändert, was aber in den Voreinstellungen geändert werden\nkann.\n\nSketch mit der neuen Dateiendung speichern?"
+
+#: Editor.java:1216 Editor.java:2757
+msgid "Increase Indent"
+msgstr "Einrücken"
+
+#: Preferences.java:101
+msgid "Indonesian"
+msgstr "Indonesisch"
+
+#: ../../../processing/app/Base.java:1204
+#, java-format
+msgid "Invalid library found in {0}: {1}"
+msgstr "Ungültige Bibliothek {0} in {1} gefunden"
+
+#: Preferences.java:102
+msgid "Italian"
+msgstr "Italienisch"
+
+#: Preferences.java:103
+msgid "Japanese"
+msgstr "Japanisch"
+
+#: Preferences.java:104
+msgid "Korean"
+msgstr "Koreanisch"
+
+#: Preferences.java:105
+msgid "Latvian"
+msgstr "Lettisch"
+
+#: Base.java:2699
+msgid "Library added to your libraries. Check \"Import library\" menu"
+msgstr "Die Bibliothek wurde zu Ihren Bibliotheken hinzugefügt. Bitte im Menü \"Bibliothek importieren\" nachprüfen "
+
+#: Preferences.java:106
+msgid "Lithuaninan"
+msgstr "Litauisch"
+
+#: ../../../processing/app/Sketch.java:1684
+msgid "Low memory available, stability problems may occur."
+msgstr "Wenig Speicher verfügbar, es können Stabilitätsprobleme auftreten."
+
+#: Preferences.java:107
+msgid "Marathi"
+msgstr "Marathisch"
+
+#: Base.java:2112
+msgid "Message"
+msgstr "Mitteilung"
+
+#: ../../../processing/app/preproc/PdePreprocessor.java:412
+msgid "Missing the */ from the end of a /* comment */"
+msgstr "Das */ am Ende eines /* Kommentars */ fehlt"
+
+#: ../../../processing/app/BaseNoGui.java:455
+msgid "Mode not supported"
+msgstr "Modus wird nicht unterstützt"
+
+#: Preferences.java:449
+msgid "More preferences can be edited directly in the file"
+msgstr "Mehr Voreinstellungen können direkt in der Datei bearbeitet werden"
+
+#: Editor.java:2156
+msgid "Moving"
+msgstr "Verschiebe"
+
+#: ../../../processing/app/BaseNoGui.java:484
+msgid "Multiple files not supported"
+msgstr "Mehrere Dateien werden nicht unterstützt"
+
+#: ../../../processing/app/Base.java:395
+msgid "Must specify exactly one sketch file"
+msgstr "Es muss genau eine Sketch-Datei angegeben werden"
+
+#: ../../../processing/app/Preferences.java:158
+msgid "N'Ko"
+msgstr "N'Ko"
+
+#: Sketch.java:282
+msgid "Name for new file:"
+msgstr "Name der neuen Datei:"
+
+#: ../../../processing/app/Preferences.java:149
+msgid "Nepali"
+msgstr "Nepali"
+
+#: ../../../cc/arduino/packages/uploaders/SSHUploader.java:51
+msgid "Network upload using programmer not supported"
+msgstr "Netzwerkupload in Verwendung des Programmers wird nicht unterstützt"
+
+#: EditorToolbar.java:41 Editor.java:493
+msgid "New"
+msgstr "Neu"
+
+#: EditorToolbar.java:46
+msgid "New Editor Window"
+msgstr "Neues Editorfenster"
+
+#: EditorHeader.java:292
+msgid "New Tab"
+msgstr "Neuer Tab"
+
+#: SerialMonitor.java:112
+msgid "Newline"
+msgstr "Neue Zeile (NL)"
+
+#: EditorHeader.java:340
+msgid "Next Tab"
+msgstr "Nächster Tab"
+
+#: Preferences.java:78 UpdateCheck.java:108
+msgid "No"
+msgstr "Nein"
+
+#: ../../../processing/app/debug/Compiler.java:146
+msgid "No athorization data found"
+msgstr "Keine Autorisierungsdaten gefunden"
+
+#: debug/Compiler.java:126
+msgid "No board selected; please choose a board from the Tools > Board menu."
+msgstr "Keine Platine ausgewählt; bitte eine Platine unter Werkzeuge > Platine auswählen"
+
+#: tools/format/src/AutoFormat.java:54 tools/AutoFormat.java:916
+msgid "No changes necessary for Auto Format."
+msgstr "Für Automatische Formatierung bedarf es keiner Änderungen."
+
+#: ../../../processing/app/BaseNoGui.java:665
+msgid "No command line parameters found"
+msgstr "Keine Kommandozeilenparameter gefunden"
+
+#: Editor.java:373
+msgid "No files were added to the sketch."
+msgstr "Dem Sketch wurden keine Dateien hinzugefügt"
+
+#: Platform.java:167
+msgid "No launcher available"
+msgstr "Kein Starter/Launcher verfügbar"
+
+#: SerialMonitor.java:112
+msgid "No line ending"
+msgstr "Kein Zeilenende"
+
+#: ../../../processing/app/BaseNoGui.java:665
+msgid "No parameters"
+msgstr "Keine Parameter"
+
+#: Base.java:541
+msgid "No really, time for some fresh air for you."
+msgstr "Ernsthaft, es ist Zeit für etwas Frischluft."
+
+#: Editor.java:1872
+#, java-format
+msgid "No reference available for \"{0}\""
+msgstr "Keine Referenz für \"{0}\" gefunden"
+
+#: ../../../processing/app/BaseNoGui.java:504
+#: ../../../processing/app/BaseNoGui.java:549
+msgid "No sketch"
+msgstr "Kein Sketch"
+
+#: ../../../processing/app/BaseNoGui.java:428
+msgid "No sketchbook"
+msgstr "Kein Sketchbook"
+
+#: ../../../processing/app/Sketch.java:204
+msgid "No valid code files found"
+msgstr "Keine gültige Codedatei gefunden"
+
+#: ../../../processing/app/Base.java:309
+msgid "No valid configured cores found! Exiting..."
+msgstr "Es wurden keine gültig konfigurierten Kerne gefunden! Beende..."
+
+#: ../../../processing/app/debug/TargetPackage.java:63
+#, java-format
+msgid "No valid hardware definitions found in folder {0}."
+msgstr "Im Ordner {0} wurden keine gültigen Hardwaredefinitionen gefunden."
+
+#: Base.java:191
+msgid "Non-fatal error while setting the Look & Feel."
+msgstr "Kleiner Fehler beim Einstellen des Erscheinungsbildes."
+
+#: Sketch.java:396 Sketch.java:410 Sketch.java:419 Sketch.java:859
+msgid "Nope"
+msgstr "Nein"
+
+#: ../../../processing/app/Preferences.java:108
+msgid "Norwegian Bokmål"
+msgstr "Norwegisches Bokmål"
+
+#: ../../../processing/app/Sketch.java:1656
+msgid ""
+"Not enough memory; see http://www.arduino.cc/en/Guide/Troubleshooting#size "
+"for tips on reducing your footprint."
+msgstr "Nicht genug Speicher; unter http://www.arduino.cc/en/Guide/Troubleshooting#size finden sich Hinweise, um die Größe zu verringern."
+
+#: Preferences.java:80 Sketch.java:585 Sketch.java:737 Sketch.java:1042
+#: Editor.java:2145 Editor.java:2465
+msgid "OK"
+msgstr "OK"
+
+#: Sketch.java:992 Editor.java:376
+msgid "One file added to the sketch."
+msgstr "Eine Datei wurde dem Sketch hinzugefügt"
+
+#: ../../../processing/app/BaseNoGui.java:455
+msgid "Only --verify, --upload or --get-pref are supported"
+msgstr "Es werden nur --verify, --upload und --get-pref unterstützt"
+
+#: EditorToolbar.java:41
+msgid "Open"
+msgstr "Öffnen"
+
+#: Editor.java:2688
+msgid "Open URL"
+msgstr "Öffne URL"
+
+#: Base.java:636
+msgid "Open an Arduino sketch..."
+msgstr "Einen Arduino Sketch öffnen..."
+
+#: EditorToolbar.java:46
+msgid "Open in Another Window"
+msgstr "In einem neuen Fenster öffnen"
+
+#: Base.java:903 Editor.java:501
+msgid "Open..."
+msgstr "Öffnen ..."
+
+#: Editor.java:563
+msgid "Page Setup"
+msgstr "Seite einrichten"
+
+#: ../../../processing/app/forms/PasswordAuthorizationDialog.java:44
+msgid "Password:"
+msgstr "Passwort:"
+
+#: Editor.java:1189 Editor.java:2731
+msgid "Paste"
+msgstr "Einfügen"
+
+#: Preferences.java:109
+msgid "Persian"
+msgstr "Persisch"
+
+#: ../../../processing/app/Preferences.java:161
+msgid "Persian (Iran)"
+msgstr "Persisch (Iran)"
+
+#: debug/Compiler.java:408
+msgid "Please import the SPI library from the Sketch > Import Library menu."
+msgstr "Bitte die Bibliothek SPI aus dem Sketch > Bibliothek importieren-Menü importieren"
+
+#: ../../../processing/app/debug/Compiler.java:529
+msgid "Please import the Wire library from the Sketch > Import Library menu."
+msgstr "Bitte importieren Sie die Wire-Bibliothek aus dem Sketch > Bibliothek importieren-Menü."
+
+#: Base.java:239
+msgid "Please install JDK 1.5 or later"
+msgstr "Bitte JDK 1.5 oder höher installieren"
+
+#: ../../../cc/arduino/packages/uploaders/SerialUploader.java:217
+#: ../../../cc/arduino/packages/uploaders/SerialUploader.java:262
+msgid "Please select a programmer from Tools->Programmer menu"
+msgstr "Bitte wählen Sie einen Programmer aus dem Menü Werkzeuge->Programmer aus"
+
+#: Preferences.java:110
+msgid "Polish"
+msgstr "Polnisch"
+
+#: ../../../processing/app/Editor.java:718
+msgid "Port"
+msgstr "Port"
+
+#: ../../../processing/app/Preferences.java:151
+msgid "Portugese"
+msgstr "Portugiesisch"
+
+#: ../../../processing/app/Preferences.java:127
+msgid "Portuguese (Brazil)"
+msgstr "Portugiesisch (Brasilien)"
+
+#: ../../../processing/app/Preferences.java:128
+msgid "Portuguese (Portugal)"
+msgstr "Portugiesisch (Portugal)"
+
+#: Preferences.java:295 Editor.java:583
+msgid "Preferences"
+msgstr "Voreinstellungen"
+
+#: FindReplace.java:123 FindReplace.java:128
+msgid "Previous"
+msgstr "Vorheriges"
+
+#: EditorHeader.java:326
+msgid "Previous Tab"
+msgstr "Vorheriger Tab"
+
+#: Editor.java:571
+msgid "Print"
+msgstr "Drucken"
+
+#: Editor.java:2571
+msgid "Printing canceled."
+msgstr "Druck abgebrochen."
+
+#: Editor.java:2547
+msgid "Printing..."
+msgstr "Drucke..."
+
+#: Base.java:1957
+msgid "Problem Opening Folder"
+msgstr "Problem beim Öffnen des Ordners"
+
+#: Base.java:1933
+msgid "Problem Opening URL"
+msgstr "Problem beim Öffnen der URL"
+
+#: Base.java:227
+msgid "Problem Setting the Platform"
+msgstr "Problem beim Aufbau der Plattform"
+
+#: ../../../cc/arduino/packages/uploaders/SSHUploader.java:136
+msgid "Problem accessing board folder /www/sd"
+msgstr "Problem beim Zugriff auf den Platinenordner /www/sd"
+
+#: ../../../cc/arduino/packages/uploaders/SSHUploader.java:132
+msgid "Problem accessing files in folder "
+msgstr "Problem beim Zugriff auf Dateien im Ordner"
+
+#: Base.java:1673
+msgid "Problem getting data folder"
+msgstr "Probleme beim Zugriff auf den Datenordner"
+
+#: Sketch.java:1467
+#, java-format
+msgid "Problem moving {0} to the build folder"
+msgstr "Probleme beim Verschieben von {0} in den Build-Ordner"
+
+#: debug/Uploader.java:209
+msgid ""
+"Problem uploading to board.  See "
+"http://www.arduino.cc/en/Guide/Troubleshooting#upload for suggestions."
+msgstr "Probleme beim Hochladen auf die Platine. Hilfestellung dazu unter http://www.arduino.cc/en/Guide/Troubleshooting#upload ."
+
+#: Sketch.java:355 Sketch.java:362 Sketch.java:373
+msgid "Problem with rename"
+msgstr "Problem beim Umbenennen"
+
+#: ../../../processing/app/I18n.java:86
+msgid "Processor"
+msgstr "Prozessor"
+
+#: Editor.java:704
+msgid "Programmer"
+msgstr "Programmer"
+
+#: Base.java:783 Editor.java:593
+msgid "Quit"
+msgstr "Verlassen"
+
+#: Editor.java:1138 Editor.java:1140 Editor.java:1390
+msgid "Redo"
+msgstr "Wiederholen"
+
+#: Editor.java:1078
+msgid "Reference"
+msgstr "Referenz"
+
+#: EditorHeader.java:300
+msgid "Rename"
+msgstr "Umbenennen"
+
+#: FindReplace.java:121 FindReplace.java:130 Sketch.java:1046
+msgid "Replace"
+msgstr "Ersetzen"
+
+#: FindReplace.java:122 FindReplace.java:129
+msgid "Replace & Find"
+msgstr "Ersetzen & Suchen"
+
+#: FindReplace.java:120 FindReplace.java:131
+msgid "Replace All"
+msgstr "Alle ersetzen"
+
+#: Sketch.java:1043
+#, java-format
+msgid "Replace the existing version of {0}?"
+msgstr "Die bestehende Version von {0} ersetzen?"
+
+#: FindReplace.java:81
+msgid "Replace with:"
+msgstr "Ersetzen durch:"
+
+#: Preferences.java:113
+msgid "Romanian"
+msgstr "Rumänisch"
+
+#: Preferences.java:114
+msgid "Russian"
+msgstr "Russisch"
+
+#: EditorToolbar.java:41 EditorToolbar.java:46 Editor.java:529
+#: Editor.java:2064 Editor.java:2468
+msgid "Save"
+msgstr "Speichern"
+
+#: Editor.java:537
+msgid "Save As..."
+msgstr "Speichern unter ..."
+
+#: Editor.java:2317
+msgid "Save Canceled."
+msgstr "Speichern abgebrochen."
+
+#: Editor.java:2467
+msgid "Save changes before export?"
+msgstr "Änderungen vor dem Export speichern?"
+
+#: Editor.java:2020
+#, java-format
+msgid "Save changes to \"{0}\"?  "
+msgstr "Änderungen in \"{0}\" speichern?"
+
+#: Sketch.java:825
+msgid "Save sketch folder as..."
+msgstr "Sketch-Ordner speichern als..."
+
+#: ../../../../../app/src/processing/app/Preferences.java:425
+msgid "Save when verifying or uploading"
+msgstr "Speichern beim Überprüfen oder Hochladen"
+
+#: Editor.java:2270 Editor.java:2308
+msgid "Saving..."
+msgstr "Speichern..."
+
+#: ../../../processing/app/FindReplace.java:131
+msgid "Search all Sketch Tabs"
+msgstr "Alle Sketch-Tabs durchsuchen"
+
+#: Base.java:1909
+msgid "Select (or create new) folder for sketches..."
+msgstr "Bitte einen Ordner für Sketches auswählen (oder neu anlegen)..."
+
+#: Editor.java:1198 Editor.java:2739
+msgid "Select All"
+msgstr "Alles auswählen"
+
+#: Base.java:2636
+msgid "Select a zip file or a folder containing the library you'd like to add"
+msgstr "Bitte die zip-Datei oder einen Ordner mit der Bibliothek auswählen"
+
+#: Sketch.java:975
+msgid "Select an image or other data file to copy to your sketch"
+msgstr "Bitte ein Bild oder eine andere Datei auswählen, um sie in den Sketch zu kopieren"
+
+#: Preferences.java:330
+msgid "Select new sketchbook location"
+msgstr "Neuen Speicherort für das Sketchbook auswählen"
+
+#: ../../../processing/app/debug/Compiler.java:146
+msgid "Selected board depends on '{0}' core (not installed)."
+msgstr "Die ausgewählte Platine benötigt den '{0}'-Kern (nicht installiert)."
+
+#: SerialMonitor.java:93
+msgid "Send"
+msgstr "Senden"
+
+#: EditorToolbar.java:41 EditorToolbar.java:46 Editor.java:669
+msgid "Serial Monitor"
+msgstr "Serieller Monitor"
+
+#: Serial.java:194
+#, java-format
+msgid ""
+"Serial port ''{0}'' not found. Did you select the right one from the Tools >"
+" Serial Port menu?"
+msgstr "Serieller Port {0} nicht gefunden. Wurde der richtige Port im Menü Werkzeuge > Serieller Port ausgewählt?"
+
+#: Editor.java:2343
+#, java-format
+msgid ""
+"Serial port {0} not found.\n"
+"Retry the upload with another serial port?"
+msgstr "Serieller Port {0} nicht gefunden.\nMit einem anderen seriellen Port versuchen?"
+
+#: Base.java:1681
+msgid "Settings issues"
+msgstr "Problem mit den Einstellungen"
+
+#: Editor.java:641
+msgid "Show Sketch Folder"
+msgstr "Sketch-Ordner anzeigen"
+
+#: ../../../processing/app/EditorStatus.java:468
+msgid "Show verbose output during compilation"
+msgstr "Ausführliche Ausgabe während der Kompilierung"
+
+#: Preferences.java:387
+msgid "Show verbose output during: "
+msgstr "Ausführliche Ausgabe während:"
+
+#: Editor.java:607
+msgid "Sketch"
+msgstr "Sketch"
+
+#: Sketch.java:1754
+msgid "Sketch Disappeared"
+msgstr "Sketch verschwunden"
+
+#: Base.java:1411
+msgid "Sketch Does Not Exist"
+msgstr "Sketch existiert nicht"
+
+#: Sketch.java:274 Sketch.java:303 Sketch.java:577 Sketch.java:966
+msgid "Sketch is Read-Only"
+msgstr "Sketch ist schreibgeschützt"
+
+#: Sketch.java:294
+msgid "Sketch is Untitled"
+msgstr "Sketch hat keinen Namen"
+
+#: Sketch.java:720
+msgid "Sketch is read-only"
+msgstr "Sketch ist schreibgeschützt"
+
+#: Sketch.java:1653
+msgid ""
+"Sketch too big; see http://www.arduino.cc/en/Guide/Troubleshooting#size for "
+"tips on reducing it."
+msgstr "Der Sketch ist zu groß; unter http://www.arduino.cc/en/Guide/Troubleshooting#size finden sich Hinweise, um die Größe zu verringern."
+
+#: ../../../processing/app/Sketch.java:1639
+#, java-format
+msgid ""
+"Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} "
+"bytes."
+msgstr "Der Sketch verwendet {0} Bytes ({2}%%) des Programmspeicherplatzes. Das Maximum sind {1} Bytes."
+
+#: Editor.java:510
+msgid "Sketchbook"
+msgstr "Sketchbook"
+
+#: Base.java:258
+msgid "Sketchbook folder disappeared"
+msgstr "Der Sketchbook-Ordner ist nicht auffindbar"
+
+#: Preferences.java:315
+msgid "Sketchbook location:"
+msgstr "Sketchbook-Speicherort:"
+
+#: ../../../processing/app/BaseNoGui.java:428
+msgid "Sketchbook path not defined"
+msgstr "Sketchbook-Speicherort nicht definiert"
+
+#: ../../../processing/app/Base.java:785
+msgid "Sketches (*.ino, *.pde)"
+msgstr "Sketche (*.ino, *.pde)"
+
+#: ../../../processing/app/Preferences.java:152
+msgid "Slovenian"
+msgstr "Slowenisch"
+
+#: Sketch.java:275 Sketch.java:304 Sketch.java:578 Sketch.java:967
+msgid ""
+"Some files are marked \"read-only\", so you'll\n"
+"need to re-save the sketch in another location,\n"
+"and try again."
+msgstr "Einige Dateien sind als \"schreibgeschützt\" gekennzeichnet.\nSie müssen den Sketch an einem anderen Ort speichern und es dann erneut versuchen."
+
+#: Sketch.java:721
+msgid ""
+"Some files are marked \"read-only\", so you'll\n"
+"need to re-save this sketch to another location."
+msgstr "Einige Dateien sind als \"schreibgeschützt\" gekennzeichnet.\nSie müssen den Sketch an einem anderen Ort speichern."
+
+#: Sketch.java:457
+#, java-format
+msgid "Sorry, a sketch (or folder) named \"{0}\" already exists."
+msgstr "Entschuldigung, aber ein Sketch (oder Ordner) mit dem Namen \"{0}\" existiert bereits."
+
+#: Preferences.java:115
+msgid "Spanish"
+msgstr "Spanisch"
+
+#: Base.java:540
+msgid "Sunshine"
+msgstr "Sonnenschein"
+
+#: ../../../processing/app/Preferences.java:153
+msgid "Swedish"
+msgstr "Schwedisch"
+
+#: Preferences.java:84
+msgid "System Default"
+msgstr "Systemstandard"
+
+#: Preferences.java:116
+msgid "Tamil"
+msgstr "Tamilisch"
+
+#: debug/Compiler.java:414
+msgid "The 'BYTE' keyword is no longer supported."
+msgstr "Das 'BYTE' Schlüsselwort wird nicht mehr unterstützt."
+
+#: ../../../processing/app/BaseNoGui.java:484
+msgid "The --upload option supports only one file at a time"
+msgstr "Die --upload-Option unterstützt nur eine Datei gleichzeitig"
+
+#: debug/Compiler.java:426
+msgid "The Client class has been renamed EthernetClient."
+msgstr "Die Klasse Client wurde in EthernetClient umbenannt."
+
+#: debug/Compiler.java:420
+msgid "The Server class has been renamed EthernetServer."
+msgstr "Die Klasse Server wurde in EthernetServer umbenannt."
+
+#: debug/Compiler.java:432
+msgid "The Udp class has been renamed EthernetUdp."
+msgstr "Die Klasse Udp wurde in EthernetUdp umbenannt."
+
+#: Base.java:192
+msgid "The error message follows, however Arduino should run fine."
+msgstr "Es folgt eine Fehlermeldung, aber Arduino sollte weiterhin funktionieren."
+
+#: Editor.java:2147
+#, java-format
+msgid ""
+"The file \"{0}\" needs to be inside\n"
+"a sketch folder named \"{1}\".\n"
+"Create this folder, move the file, and continue?"
+msgstr "Die Datei \"{0}\" muss sich im Ordner namens \"{1}\" befinden.\nSoll dieser Ordner angelegt, die Datei verschoben und danach fortgefahren werden?"
+
+#: Base.java:1054 Base.java:2674
+#, java-format
+msgid ""
+"The library \"{0}\" cannot be used.\n"
+"Library names must contain only basic letters and numbers.\n"
+"(ASCII only and no spaces, and it cannot start with a number)"
+msgstr "Der Bibliotheksname \"{0}\" kann nicht verwendet werden.\nSie dürfen nur Zeichen oder Zahlen enthalten, keine Sonderzeichen\n(nur ASCII-Zeichen, keine Leerzeichen und keine Zahl am Anfang)"
+
+#: Sketch.java:374
+msgid ""
+"The main file can't use an extension.\n"
+"(It may be time for your to graduate to a\n"
+"\"real\" programming environment)"
+msgstr "Die Hauptdatei kann keine Dateierweiterungen nutzen.\n(Es ist vielleicht an der Zeit, sich auf eine \"echte\" Programmierumgebung einzustellen)"
+
+#: Sketch.java:356
+msgid "The name cannot start with a period."
+msgstr "Der Name darf nicht mit einem Punkt anfangen"
+
+#: Base.java:1412
+msgid ""
+"The selected sketch no longer exists.\n"
+"You may need to restart Arduino to update\n"
+"the sketchbook menu."
+msgstr "Der gewählte Sketch existiert nicht mehr.\nArduino muss möglicherweise neu gestartet werden,\num das Sketchbook-Menü neu einzulesen."
+
+#: Base.java:1430
+#, java-format
+msgid ""
+"The sketch \"{0}\" cannot be used.\n"
+"Sketch names must contain only basic letters and numbers\n"
+"(ASCII-only with no spaces, and it cannot start with a number).\n"
+"To get rid of this message, remove the sketch from\n"
+"{1}"
+msgstr "Die Sketchname\"{0}\" kann nicht verwendet werden\nSketchnamen dürfen nur Zeichen oder Zahlen enthalten, keine Sonderzeichen\n (nur ASCII Zeichen, keine Leerzeichen und keine Zahl am Anfang)\nUm diese Meldung nicht weiter zu erhaletn, entfernen Sie den Sketch aus\n{1}"
+
+#: Sketch.java:1755
+msgid ""
+"The sketch folder has disappeared.\n"
+" Will attempt to re-save in the same location,\n"
+"but anything besides the code will be lost."
+msgstr "Der Ordner des Sketches ist verschwunden.\nAn dieser Stelle wird der Sketch neu gespeichert,\naber außer dem Quelltext ist alles Andere verloren"
+
+#: ../../../processing/app/Sketch.java:2028
+msgid ""
+"The sketch name had to be modified. Sketch names can only consist\n"
+"of ASCII characters and numbers (but cannot start with a number).\n"
+"They should also be less than 64 characters long."
+msgstr "Der Sketch-Name musste geändert werden. Sketch-Namen können nur aus\nASCII-Zeichen und Zahlen bestehen (aber nicht mit einer Zahl beginnen).\nSie sollten auch weniger als 64 Zeichen lang sein."
+
+#: Base.java:259
+msgid ""
+"The sketchbook folder no longer exists.\n"
+"Arduino will switch to the default sketchbook\n"
+"location, and create a new sketchbook folder if\n"
+"necessary. Arduino will then stop talking about\n"
+"himself in the third person."
+msgstr "Der Sketchbook-Ordner existiert nicht mehr.\nArduino wird auf den Standardordner für das Sketchbook umschalten und bei Bedarf einen neuen Sketchbook-Ordner anlegen.\nDanach wird Arduino aufhören, von sich in der dritten Person zu sprechen."
+
+#: ../../../processing/app/debug/Compiler.java:201
+msgid ""
+"Third-party platform.txt does not define compiler.path. Please report this "
+"to the third-party hardware maintainer."
+msgstr "Die Fremdhersteller-platform.txt definiert keinen compiler.path. Bitte melden Sie dies an den Fremdhersteller."
+
+#: Sketch.java:1075
+msgid ""
+"This file has already been copied to the\n"
+"location from which where you're trying to add it.\n"
+"I ain't not doin nuthin'."
+msgstr "Diese Datei wurde bereits an den Ort kopiert, von dem Sie versuchen, sie hinzuzufügen.\nIch mache erst einmal nichts."
+
+#: ../../../processing/app/EditorStatus.java:467
+msgid "This report would have more information with"
+msgstr "Dieser Report hätte mehr Informationen mit"
+
+#: Base.java:535
+msgid "Time for a Break"
+msgstr "Zeit für eine Pause"
+
+#: Editor.java:663
+msgid "Tools"
+msgstr "Werkzeuge"
+
+#: Editor.java:1070
+msgid "Troubleshooting"
+msgstr "Fehlersuche"
+
+#: ../../../processing/app/Preferences.java:117
+msgid "Turkish"
+msgstr "Türkisch"
+
+#: ../../../processing/app/Editor.java:2507
+msgid "Type board password to access its console"
+msgstr "Tippen Sie das Platinenpasswort ein, um die Konsole aufzurufen"
+
+#: ../../../processing/app/Sketch.java:1673
+msgid "Type board password to upload a new sketch"
+msgstr "Tippen Sie das Platinenpasswort ein, um einen neuen Sketch hochzuladen"
+
+#: ../../../processing/app/Preferences.java:118
+msgid "Ukrainian"
+msgstr "Ukrainisch"
+
+#: ../../../processing/app/Editor.java:2524
+#: ../../../processing/app/NetworkMonitor.java:145
+msgid "Unable to connect: is the sketch using the bridge?"
+msgstr "Fehler beim Verbinden: Verwendet der Sketch die Bridge?"
+
+#: ../../../processing/app/NetworkMonitor.java:130
+msgid "Unable to connect: retrying"
+msgstr "Fehler beim Verbinden: Erneuter Versuch"
+
+#: ../../../processing/app/Editor.java:2526
+msgid "Unable to connect: wrong password?"
+msgstr "Fehler beim Verbinden: Falsches Passwort?"
+
+#: ../../../processing/app/Editor.java:2512
+msgid "Unable to open serial monitor"
+msgstr "Fehler beim Öffnen des seriellen Monitors"
+
+#: Sketch.java:1432
+#, java-format
+msgid "Uncaught exception type: {0}"
+msgstr "Unbehandelte Ausnahme vom Typ: {0}"
+
+#: Editor.java:1133 Editor.java:1355
+msgid "Undo"
+msgstr "Rückgängig"
+
+#: Platform.java:168
+msgid ""
+"Unspecified platform, no launcher available.\n"
+"To enable opening URLs or folders, add a \n"
+"\"launcher=/path/to/app\" line to preferences.txt"
+msgstr "Unbekannte Plattform, kein Starter verfügbar. Um das Öffnen einer URL oder eines Ordners zu ermöglichen, muss der Datei preferences.txt eine Zeile\n\"launcher=/pfad/zur/app\" hinzugefügt werden"
+
+#: UpdateCheck.java:111
+msgid "Update"
+msgstr "Update"
+
+#: Preferences.java:428
+msgid "Update sketch files to new extension on save (.pde -> .ino)"
+msgstr "Sketches mit Dateiendung \".pde\" zur neuen Dateiendung (\".ino\") ändern"
+
+#: EditorToolbar.java:41 Editor.java:545
+msgid "Upload"
+msgstr "Hochladen"
+
+#: EditorToolbar.java:46 Editor.java:553
+msgid "Upload Using Programmer"
+msgstr "Hochladen mit Programmer"
+
+#: Editor.java:2403 Editor.java:2439
+msgid "Upload canceled."
+msgstr "Hochladen abgebrochen."
+
+#: ../../../processing/app/Sketch.java:1678
+msgid "Upload cancelled"
+msgstr "Hochladen abgebrochen"
+
+#: Editor.java:2378
+msgid "Uploading to I/O Board..."
+msgstr "Hochladen zur E/A-Platine..."
+
+#: Sketch.java:1622
+msgid "Uploading..."
+msgstr "Hochladen..."
+
+#: Editor.java:1269
+msgid "Use Selection For Find"
+msgstr "Auswahl für Suche verwenden"
+
+#: Preferences.java:409
+msgid "Use external editor"
+msgstr "Externen Editor verwenden"
+
+#: ../../../processing/app/debug/Compiler.java:94
+#, java-format
+msgid "Using library {0} in folder: {1} {2}"
+msgstr "Verwende die Bibliothek {0} im Ordner: {1} {2}"
+
+#: ../../../processing/app/debug/Compiler.java:320
+#, java-format
+msgid "Using previously compiled file: {0}"
+msgstr "Verwende die zuvor kompilierte Datei: {0}"
+
+#: EditorToolbar.java:41 EditorToolbar.java:46
+msgid "Verify"
+msgstr "Verifizieren"
+
+#: Editor.java:609
+msgid "Verify / Compile"
+msgstr "Überprüfen / Kompilieren"
+
+#: Preferences.java:400
+msgid "Verify code after upload"
+msgstr "Nach dem Hochladen Code überprüfen"
+
+#: ../../../processing/app/Preferences.java:154
+msgid "Vietnamese"
+msgstr "Vietnamesisch"
+
+#: Editor.java:1105
+msgid "Visit Arduino.cc"
+msgstr "Arduino.cc besuchen"
+
+#: ../../../processing/app/debug/Compiler.java:115
+#, java-format
+msgid ""
+"WARNING: library {0} claims to run on {1} architecture(s) and may be "
+"incompatible with your current board which runs on {2} architecture(s)."
+msgstr "WARNUNG: Bibliothek {0} behauptet auf {1} Architektur(en) ausgeführt werden zu können und ist möglicherweise inkompatibel mit Ihrer derzeitigen Platine, welche auf {2} Architektur(en) ausgeführt werden kann."
+
+#: Base.java:2128
+msgid "Warning"
+msgstr "Warnung"
+
+#: debug/Compiler.java:444
+msgid "Wire.receive() has been renamed Wire.read()."
+msgstr "Wire.receive() wurde in Wire.read() umbenannt"
+
+#: debug/Compiler.java:438
+msgid "Wire.send() has been renamed Wire.write()."
+msgstr "Wire.send() wurde in Wire.write() umbenannt."
+
+#: FindReplace.java:105
+msgid "Wrap Around"
+msgstr "Umbruch"
+
+#: debug/Uploader.java:213
+msgid ""
+"Wrong microcontroller found.  Did you select the right board from the Tools "
+"> Board menu?"
+msgstr "Falscher Mikrocontroller gefunden. Ist die richtige Platine im Menü Werkzeuge > Platine ausgewählt?"
+
+#: Preferences.java:77 UpdateCheck.java:108
+msgid "Yes"
+msgstr "Ja"
+
+#: Sketch.java:1074
+msgid "You can't fool me"
+msgstr "So leicht kann man mich nicht täuschen"
+
+#: Sketch.java:411
+msgid "You can't have a .cpp file with the same name as the sketch."
+msgstr "Eine .cpp mit dem gleichen Namen wie der Sketch ist nicht zulässig"
+
+#: Sketch.java:421
+msgid ""
+"You can't rename the sketch to \"{0}\"\n"
+"because the sketch already has a .cpp file with that name."
+msgstr "Sie können den Sketch nicht in \"{0}\" umbenennen,\nda der Sketch bereits eine .cpp Datei mit diesem Namen hat."
+
+#: Sketch.java:861
+msgid ""
+"You can't save the sketch as \"{0}\"\n"
+"because the sketch already has a .cpp file with that name."
+msgstr "Sie können den Sketch nicht unter dem Namen \"{0}\" speichern,\nda der Sketch bereits eine .cpp Datei mit diesem Namen hat."
+
+#: Sketch.java:883
+msgid ""
+"You cannot save the sketch into a folder\n"
+"inside itself. This would go on forever."
+msgstr "Sie können den Sketch nicht in seinem eigenen Ordner speichern.\nDas würde unendlich so weiter gehen."
+
+#: Base.java:1888
+msgid "You forgot your sketchbook"
+msgstr "Sie haben Ihr Sketchbook vergessen"
+
+#: ../../../processing/app/AbstractMonitor.java:92
+msgid ""
+"You've pressed {0} but nothing was sent. Should you select a line ending?"
+msgstr "Du hast {0} gedrückt, es wurde aber nichts geschickt. Solltest du ein Zeilenende auswählen?"
+
+#: Base.java:536
+msgid ""
+"You've reached the limit for auto naming of new sketches\n"
+"for the day. How about going for a walk instead?"
+msgstr "Sie haben die für Heute die Obergrenze für die automatische Vergabe\nder Sketchnamen erreicht. Wie wäre es mit einem Spaziergang?"
+
+#: Base.java:2638
+msgid "ZIP files or folders"
+msgstr "ZIP-Dateien oder Ordner"
+
+#: Base.java:2661
+msgid "Zip doesn't contain a library"
+msgstr "Zip enthält keine Bibliothek"
+
+#: Sketch.java:364
+#, java-format
+msgid "\".{0}\" is not a valid extension."
+msgstr "\".{0}\" ist keine zulässige Dateiendung"
+
+#: SketchCode.java:258
+#, java-format
+msgid ""
+"\"{0}\" contains unrecognized characters.If this code was created with an "
+"older version of Arduino,you may need to use Tools -> Fix Encoding & Reload "
+"to updatethe sketch to use UTF-8 encoding. If not, you may need todelete the"
+" bad characters to get rid of this warning."
+msgstr "\"{0}\" enthält unzulässige Zeichen. Wenn dieser Code mit einer älteren Version von Arduino erstellt wurde, können Sie über Werkzeuge -> Kodierung Korrigieren und Neu Laden den Sketch auf UTF-8 Kodierung umstellen. Wenn das nicht funktioniert, müssen Sie die unzulässigen Zeichen von Hand löschen um diese Warnung abzuschalten."
+
+#: debug/Compiler.java:409
+msgid ""
+"\n"
+"As of Arduino 0019, the Ethernet library depends on the SPI library.\n"
+"You appear to be using it or another library that depends on the SPI library.\n"
+"\n"
+msgstr "\nSeit Arduino 0019 ist die Ethernet-Bibliothek von der SPI-Bibliothek abhängig.\nEs sieht so aus, als würden Sie diese benutzen oder eine Bibliothek einsetzen, welche von der SPI-Bibliothek abhängt.\n\n"
+
+#: debug/Compiler.java:415
+msgid ""
+"\n"
+"As of Arduino 1.0, the 'BYTE' keyword is no longer supported.\n"
+"Please use Serial.write() instead.\n"
+"\n"
+msgstr "\nSeit Arduino 1.0 wird der 'BYTE' Schlüsselwort nicht mehr unterstützt.\nBitte verwenden Sie stattdessen Serial.write().\n\n"
+
+#: debug/Compiler.java:427
+msgid ""
+"\n"
+"As of Arduino 1.0, the Client class in the Ethernet library has been renamed to EthernetClient.\n"
+"\n"
+msgstr "\nMit Arduino 1.0 wurde die Klasse \"Client\" in der Ethernet-Bibliothek in \"EthernetClient\" umbenannt.\n\n"
+
+#: debug/Compiler.java:421
+msgid ""
+"\n"
+"As of Arduino 1.0, the Server class in the Ethernet library has been renamed to EthernetServer.\n"
+"\n"
+msgstr "\nMit Arduino 1.0 wurde die Klasse \"Server\" in der Ethernet-Bibliothek in \"EthernetServer\" umbenannt.\n\n"
+
+#: debug/Compiler.java:433
+msgid ""
+"\n"
+"As of Arduino 1.0, the Udp class in the Ethernet library has been renamed to EthernetUdp.\n"
+"\n"
+msgstr "\nMit Arduino 1.0 wurde die Klasse \"Udp\" in der Ethernet-Bibliothek in \"EthernetUdp\" umbenannt.\n\n"
+
+#: debug/Compiler.java:445
+msgid ""
+"\n"
+"As of Arduino 1.0, the Wire.receive() function was renamed to Wire.read() for consistency with other libraries.\n"
+"\n"
+msgstr "\nSeit Arduino 1.0 heißt die Funktion \"Wire.receive()\" \"Wire.read()\", um mit anderen Bibliotheken konsistent zu sein.\n\n"
+
+#: debug/Compiler.java:439
+msgid ""
+"\n"
+"As of Arduino 1.0, the Wire.send() function was renamed to Wire.write() for consistency with other libraries.\n"
+"\n"
+msgstr "\nSeit Arduino 1.0 heißt die Funktion \"Wire.send()\" \"Wire.write()\", um mit anderen Bibliotheken konsistent zu sein.\n\n"
+
+#: SerialMonitor.java:130 SerialMonitor.java:133
+msgid "baud"
+msgstr "Baud"
+
+#: Preferences.java:389
+msgid "compilation "
+msgstr "Kompilierung"
+
+#: ../../../processing/app/NetworkMonitor.java:111
+msgid "connected!"
+msgstr "Verbunden!"
+
+#: Sketch.java:540
+msgid "createNewFile() returned false"
+msgstr "createNewFile() gab einen Fehler zurück"
+
+#: ../../../processing/app/EditorStatus.java:469
+msgid "enabled in File > Preferences."
+msgstr "aktiviert in Datei > Einstellungen"
+
+#: Base.java:2090
+msgid "environment"
+msgstr "Umgebung"
+
+#: Editor.java:1108
+msgid "http://arduino.cc/"
+msgstr "http://arduino.cc/"
+
+#: UpdateCheck.java:118
+msgid "http://www.arduino.cc/en/Main/Software"
+msgstr "http://www.arduino.cc/en/Main/Software"
+
+#: UpdateCheck.java:53
+msgid "http://www.arduino.cc/latest.txt"
+msgstr "http://www.arduino.cc/latest.txt"
+
+#: Base.java:2075
+msgid "http://www.arduino.cc/playground/Learning/Linux"
+msgstr "http://www.arduino.cc/playground/Learning/Linux"
+
+#: Preferences.java:625
+#, java-format
+msgid "ignoring invalid font size {0}"
+msgstr "Unzulässige Zeichengröße {0} wird ignoriert"
+
+#: Base.java:2080
+msgid "index.html"
+msgstr "index.html"
+
+#: Editor.java:936 Editor.java:943
+msgid "name is null"
+msgstr "Name ist null"
+
+#: Base.java:2090
+msgid "platforms.html"
+msgstr "platforms.html"
+
+#: Editor.java:932
+msgid "serialMenu is null"
+msgstr "serialMenu ist null"
+
+#: debug/Uploader.java:195
+#, java-format
+msgid ""
+"the selected serial port {0} does not exist or your board is not connected"
+msgstr "Der gewählte serielle Port {0} existiert nicht oder die Platine ist nicht angeschlossen"
+
+#: ../../../processing/app/Base.java:389
+#, java-format
+msgid "unknown option: {0}"
+msgstr "unbekannte Option: {0}"
+
+#: Preferences.java:391
+msgid "upload"
+msgstr "Hochladen"
+
+#: Editor.java:380
+#, java-format
+msgid "{0} files added to the sketch."
+msgstr "Dem Sketch wurden {0} Dateien hinzugefügt"
+
+#: debug/Compiler.java:365
+#, java-format
+msgid "{0} returned {1}"
+msgstr "{0} gab {1} zurück"
+
+#: Editor.java:2213
+#, java-format
+msgid "{0} | Arduino {1}"
+msgstr "{0} | Arduino {1}"
+
+#: Editor.java:1874
+#, java-format
+msgid "{0}.html"
+msgstr "{0}.html"
+
+#: ../../../processing/app/Base.java:519
+#, java-format
+msgid "{0}: Invalid argument to --pref, should be of the form \"pref=value\""
+msgstr "{0}: Ungültiges Argument für --pref, sollte in der Form \"pref=Wert\" sein"
+
+#: ../../../processing/app/Base.java:476
+#, java-format
+msgid ""
+"{0}: Invalid board name, it should be of the form \"package:arch:board\" or "
+"\"package:arch:board:options\""
+msgstr "{0}: Ungültiger Platinenname, er sollte in der Form \"Paket:arch:Platine\" oder \"Paket:arch:Platine:Optionen\" sein"
+
+#: ../../../processing/app/Base.java:509
+#, java-format
+msgid "{0}: Invalid option for \"{1}\" option for board \"{2}\""
+msgstr "{0}: Ungültige Option für \"{1}\" Option der Platine \"{2}\""
+
+#: ../../../processing/app/Base.java:507
+#, java-format
+msgid "{0}: Invalid option for board \"{1}\""
+msgstr "{0}: Ungültige Option für Platine \"{1}\""
+
+#: ../../../processing/app/Base.java:502
+#, java-format
+msgid "{0}: Invalid option, should be of the form \"name=value\""
+msgstr "{0}: Ungültige Option, sollte in der Form \"Name=Wert\" sein"
+
+#: ../../../processing/app/Base.java:486
+#, java-format
+msgid "{0}: Unknown architecture"
+msgstr "{0}: Unbekannte Architektur"
+
+#: ../../../processing/app/Base.java:491
+#, java-format
+msgid "{0}: Unknown board"
+msgstr "{0}: Unbekannte Platine"
+
+#: ../../../processing/app/Base.java:481
+#, java-format
+msgid "{0}: Unknown package"
+msgstr "{0}: Unbekanntes Paket"

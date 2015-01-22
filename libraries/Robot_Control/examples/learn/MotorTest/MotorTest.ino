@@ -1,16 +1,16 @@
 /*
  Motor Test
- 
+
  Just see if the robot can move and turn.
- 
+
  Circuit:
  * Arduino Robot
- 
+
  created 1 May 2013
  by X. Yang
  modified 12 May 2013
  by D. Cuartielles
- 
+
  This example is in the public domain
  */
 
@@ -24,19 +24,19 @@ void setup() {
 }
 
 void loop() {
-  Robot.motorsWrite(255,255);   // move forward
+  Robot.motorsWrite(255, 255);  // move forward
   delay(2000);
   Robot.motorsStop();           // fast stop
   delay(1000);
-  Robot.motorsWrite(-255,-255); // backward
+  Robot.motorsWrite(-255, -255); // backward
   delay(1000);
-  Robot.motorsWrite(0,0);       // slow stop
+  Robot.motorsWrite(0, 0);      // slow stop
   delay(1000);
-  Robot.motorsWrite(-255,255);  // turn left
+  Robot.motorsWrite(-255, 255); // turn left
   delay(2000);
   Robot.motorsStop();           // fast stop
   delay(1000);
-  Robot.motorsWrite(255,-255);  // turn right
+  Robot.motorsWrite(255, -255); // turn right
   delay(2000);
   Robot.motorsStop();           // fast stop
   delay(1000);

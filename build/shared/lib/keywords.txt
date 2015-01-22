@@ -134,6 +134,7 @@ sin	KEYWORD2	Sin
 sq	KEYWORD2	Sq
 sqrt	KEYWORD2	Sqrt
 tan	KEYWORD2	Tan
+pow	KEYWORD2	Pow
 
 bitRead	KEYWORD2	BitRead
 bitWrite	KEYWORD2	BitWrite
@@ -162,11 +163,13 @@ pulseIn	KEYWORD2	PulseIn
 shiftIn	KEYWORD2	ShiftIn
 shiftOut	KEYWORD2	ShiftOut
 tone	KEYWORD2	Tone
+yield	KEYWORD2	Yield
 
 Serial	KEYWORD3	Serial
 Serial1	KEYWORD3	Serial
 Serial2	KEYWORD3	Serial
 Serial3	KEYWORD3	Serial
+SerialUSB	KEYWORD3	Serial
 begin	KEYWORD2	Serial_Begin
 end	KEYWORD2	Serial_End
 peek	KEYWORD2	Serial_Peek
@@ -174,6 +177,7 @@ read	KEYWORD2	Serial_Read
 print	KEYWORD2	Serial_Print
 println	KEYWORD2	Serial_Println
 available	KEYWORD2	Serial_Available
+availableForWrite	KEYWORD2
 flush	KEYWORD2	Serial_Flush
 setTimeout	KEYWORD2
 find	KEYWORD2
@@ -184,6 +188,25 @@ readBytes	KEYWORD2
 readBytesUntil	KEYWORD2
 readString	KEYWORD2
 readStringUntil	KEYWORD2
+trim	KEYWORD2
+toUpperCase	KEYWORD2
+toLowerCase	KEYWORD2
+charAt	KEYWORD2
+compareTo	KEYWORD2
+concat	KEYWORD2
+endsWith	KEYWORD2
+startsWith	KEYWORD2
+equals	KEYWORD2
+equalsIgnoreCase	KEYWORD2
+getBytes	KEYWORD2
+indexOf	KEYWORD2
+lastIndexOf	KEYWORD2
+length	KEYWORD2
+replace	KEYWORD2
+setCharAt	KEYWORD2
+substring	KEYWORD2
+toCharArray	KEYWORD2
+toInt	KEYWORD2
 
 # USB-related keywords
 

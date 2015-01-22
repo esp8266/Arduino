@@ -1,0 +1,87 @@
+#######################################
+# Syntax Coloring Map For Bridge
+#######################################
+
+#######################################
+# Class (KEYWORD3)
+#######################################
+
+Bridge	KEYWORD3
+FileIO	KEYWORD3
+FileSystem	KEYWORD3
+Console	KEYWORD3
+Process	KEYWORD3
+Mailbox	KEYWORD3
+HttpClient	KEYWORD3
+YunServer	KEYWORD3
+YunClient	KEYWORD3
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+# methods names in commond
+begin	KEYWORD2
+end	KEYWORD2
+available	KEYWORD2
+read	KEYWORD2
+peek	KEYWORD2
+write	KEYWORD2
+flush	KEYWORD2
+bool	KEYWORD2
+
+# Bridge Class
+transfer	KEYWORD2
+put	KEYWORD2
+get	KEYWORD2
+
+# Console Class
+buffer	KEYWORD2
+noBuffer	KEYWORD2
+connected	KEYWORD2
+
+# FileIO Class
+File	KEYWORD2
+seek	KEYWORD2
+position	KEYWORD2
+size	KEYWORD2
+close	KEYWORD2
+name	KEYWORD2
+isDirectory	KEYWORD2
+openNextFile	KEYWORD2
+rewindDirectory	KEYWORD2
+
+# Process Class
+addParameter	KEYWORD2
+runAsynchronously	KEYWORD2
+run	KEYWORD2
+running	KEYWORD2
+exitValue	KEYWORD2
+runShellCommand	KEYWORD2
+runShellCommandAsynchronously	KEYWORD2
+
+# Mailbox Class
+readMessage	KEYWORD2
+writeMessage	KEYWORD2
+writeJSON	KEYWORD2
+message Available	KEYWORD2
+
+# HttpClient Class
+getAsynchronously	KEYWORD2
+ready	KEYWORD2
+getResult	KEYWORD2
+
+# YunServer Class
+accept	KEYWORD2
+stop	KEYWORD2
+connect	KEYWORD2
+connected	KEYWORD2
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+FILE_READ	LITERAL1
+FILE_WRITE	LITERAL1
+FILE_APPEND	LITERAL1

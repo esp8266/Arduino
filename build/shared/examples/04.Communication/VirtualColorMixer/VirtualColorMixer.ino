@@ -2,17 +2,17 @@
   This example reads three analog sensors (potentiometers are easiest)
  and sends their values serially. The Processing and Max/MSP programs at the bottom
  take those three values and use them to change the background color of the screen.
- 
+
  The circuit:
  * potentiometers attached to analog inputs 0, 1, and 2
- 
+
  http://www.arduino.cc/en/Tutorial/VirtualColorMixer
- 
+
  created 2 Dec 2006
  by David A. Mellis
  modified 30 Aug 2011
  by Tom Igoe and Scott Fitzgerald
- 
+
   This example code is in the public domain.
  */
 
@@ -35,20 +35,20 @@ void loop()
 }
 
 /* Processing code for this example
- 
+
 //  This example code is in the public domain.
- 
+
  import processing.serial.*;
- 
+
  float redValue = 0;        // red value
  float greenValue = 0;      // green value
  float blueValue = 0;       // blue value
- 
+
  Serial myPort;
- 
+
  void setup() {
  size(200, 200);
- 
+
  // List all the available serial ports
  // if using Processing 2.1 or later, use Serial.printArray()
  println(Serial.list());
@@ -60,20 +60,20 @@ void loop()
  // don't generate a serialEvent() unless you get a newline character:
  myPort.bufferUntil('\n');
  }
- 
+
  void draw() {
  // set the background color with the color values:
  background(redValue, greenValue, blueValue);
  }
- 
- void serialEvent(Serial myPort) { 
+
+ void serialEvent(Serial myPort) {
  // get the ASCII string:
  String inString = myPort.readStringUntil('\n');
- 
+
  if (inString != null) {
  // trim off any whitespace:
  inString = trim(inString);
- // split the string on the commas and convert the 
+ // split the string on the commas and convert the
  // resulting substrings into an integer array:
  float[] colors = float(split(inString, ","));
  // if the array has at least three elements, you know
@@ -128,5 +128,5 @@ ASi6Zyw8.RQi65J8ZsNx3ho93OhGWENtWpowepae4YhCFeLErOLENtXJrOSc
 iadi39rf4hwc8xdhHz3gn3dBI7iDRlFe8huAfIZhq
 -----------end_max5_patcher-----------
 
- 
+
  */

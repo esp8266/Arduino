@@ -24,9 +24,11 @@
 package processing.app.tools;
 
 import processing.app.*;
+
+import javax.swing.*;
+
 import static processing.app.I18n._;
 
-import java.awt.FileDialog;
 import java.io.*;
 import java.text.*;
 import java.util.*;
@@ -105,38 +107,36 @@ public class Archiver implements Tool {
     } while (newbie.exists());
 
     // open up a prompt for where to save this fella
-    FileDialog fd =
-      new FileDialog(editor, _("Archive sketch as:"), FileDialog.SAVE);
-    fd.setDirectory(parent.getAbsolutePath());
-    fd.setFile(newbie.getName());
-    fd.setVisible(true);
+    JFileChooser fd = new JFileChooser();
+    fd.setDialogTitle(_("Archive sketch as:"));
+    fd.setDialogType(JFileChooser.SAVE_DIALOG);
+    fd.setSelectedFile(newbie);
 
-    String directory = fd.getDirectory();
-    String filename = fd.getFile();
+    int returnVal = fd.showSaveDialog(editor);
 
-    // only write the file if not canceled
-    if (filename != null) {
-      newbie = new File(directory, filename);
-
-      try {
-        //System.out.println(newbie);
-        FileOutputStream zipOutputFile = new FileOutputStream(newbie);
-        ZipOutputStream zos = new ZipOutputStream(zipOutputFile);
-
-        // recursively fill the zip file
-        buildZip(location, name, zos);
-
-        // close up the jar file
-        zos.flush();
-        zos.close();
-
-        editor.statusNotice("Created archive " + newbie.getName() + ".");
-
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    } else {
+    if (returnVal != JFileChooser.APPROVE_OPTION) {
       editor.statusNotice(_("Archive sketch canceled."));
+      return;
+    }
+
+    newbie = fd.getSelectedFile();
+
+    try {
+      //System.out.println(newbie);
+      FileOutputStream zipOutputFile = new FileOutputStream(newbie);
+      ZipOutputStream zos = new ZipOutputStream(zipOutputFile);
+
+      // recursively fill the zip file
+      buildZip(location, name, zos);
+
+      // close up the jar file
+      zos.flush();
+      zos.close();
+
+      editor.statusNotice("Created archive " + newbie.getName() + ".");
+
+    } catch (IOException e) {
+      e.printStackTrace();
     }
   }
 

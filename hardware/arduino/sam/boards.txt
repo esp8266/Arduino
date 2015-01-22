@@ -1,0 +1,43 @@
+
+arduino_due_x_dbg.name=Arduino Due (Programming Port)
+arduino_due_x_dbg.vid.0=0x2341
+arduino_due_x_dbg.pid.0=0x003d
+arduino_due_x_dbg.upload.tool=bossac
+arduino_due_x_dbg.upload.protocol=sam-ba
+arduino_due_x_dbg.upload.maximum_size=524288
+arduino_due_x_dbg.upload.use_1200bps_touch=true
+arduino_due_x_dbg.upload.wait_for_upload_port=false
+arduino_due_x_dbg.upload.native_usb=false
+arduino_due_x_dbg.build.mcu=cortex-m3
+arduino_due_x_dbg.build.f_cpu=84000000L
+arduino_due_x_dbg.build.usb_product="Arduino Due"
+arduino_due_x_dbg.build.board=SAM_DUE
+arduino_due_x_dbg.build.core=arduino
+arduino_due_x_dbg.build.extra_flags=-D__SAM3X8E__ -mthumb {build.usb_flags}
+arduino_due_x_dbg.build.ldscript=linker_scripts/gcc/flash.ld
+arduino_due_x_dbg.build.variant=arduino_due_x
+arduino_due_x_dbg.build.variant_system_lib=libsam_sam3x8e_gcc_rel.a
+arduino_due_x_dbg.build.vid=0x2341
+arduino_due_x_dbg.build.pid=0x003e
+
+arduino_due_x.name=Arduino Due (Native USB Port)
+arduino_due_x.vid.0=0x2341
+arduino_due_x.pid.0=0x003e
+arduino_due_x.upload.tool=bossac
+arduino_due_x.upload.protocol=sam-ba
+arduino_due_x.upload.maximum_size=524288
+arduino_due_x.upload.use_1200bps_touch=true
+arduino_due_x.upload.wait_for_upload_port=true
+arduino_due_x.upload.native_usb=true
+arduino_due_x.build.mcu=cortex-m3
+arduino_due_x.build.f_cpu=84000000L
+arduino_due_x.build.usb_product="Arduino Due"
+arduino_due_x.build.board=SAM_DUE
+arduino_due_x.build.core=arduino
+arduino_due_x.build.extra_flags=-D__SAM3X8E__ -mthumb {build.usb_flags}
+arduino_due_x.build.ldscript=linker_scripts/gcc/flash.ld
+arduino_due_x.build.variant=arduino_due_x
+arduino_due_x.build.variant_system_lib=libsam_sam3x8e_gcc_rel.a
+arduino_due_x.build.vid=0x2341
+arduino_due_x.build.pid=0x003e
+

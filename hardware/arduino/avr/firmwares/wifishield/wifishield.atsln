@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Atmel Studio Solution File, Format Version 11.00
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "wifi_dnld", "wifi_dnld\wifi_dnld.cproj", "{EB9606BC-DE32-4EDD-9CDA-AE3BF36977A2}"
+EndProject
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "wifiHD", "wifiHD\wifiHD.cproj", "{417E15DB-488A-4B56-8D4E-FBE832B2B649}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug_512|AVR = Debug_512|AVR
+		Debug|AVR = Debug|AVR
+		Release_512|AVR = Release_512|AVR
+		Release|AVR = Release|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EB9606BC-DE32-4EDD-9CDA-AE3BF36977A2}.Debug_512|AVR.ActiveCfg = Debug|AVR
+		{EB9606BC-DE32-4EDD-9CDA-AE3BF36977A2}.Debug_512|AVR.Build.0 = Debug|AVR
+		{EB9606BC-DE32-4EDD-9CDA-AE3BF36977A2}.Debug|AVR.ActiveCfg = Debug|AVR
+		{EB9606BC-DE32-4EDD-9CDA-AE3BF36977A2}.Debug|AVR.Build.0 = Debug|AVR
+		{EB9606BC-DE32-4EDD-9CDA-AE3BF36977A2}.Release_512|AVR.ActiveCfg = Release|AVR
+		{EB9606BC-DE32-4EDD-9CDA-AE3BF36977A2}.Release_512|AVR.Build.0 = Release|AVR
+		{EB9606BC-DE32-4EDD-9CDA-AE3BF36977A2}.Release|AVR.ActiveCfg = Release|AVR
+		{EB9606BC-DE32-4EDD-9CDA-AE3BF36977A2}.Release|AVR.Build.0 = Release|AVR
+		{417E15DB-488A-4B56-8D4E-FBE832B2B649}.Debug_512|AVR.ActiveCfg = Debug_512|AVR
+		{417E15DB-488A-4B56-8D4E-FBE832B2B649}.Debug_512|AVR.Build.0 = Debug_512|AVR
+		{417E15DB-488A-4B56-8D4E-FBE832B2B649}.Debug|AVR.ActiveCfg = Debug|AVR
+		{417E15DB-488A-4B56-8D4E-FBE832B2B649}.Debug|AVR.Build.0 = Debug|AVR
+		{417E15DB-488A-4B56-8D4E-FBE832B2B649}.Release_512|AVR.ActiveCfg = Release_512|AVR
+		{417E15DB-488A-4B56-8D4E-FBE832B2B649}.Release_512|AVR.Build.0 = Release_512|AVR
+		{417E15DB-488A-4B56-8D4E-FBE832B2B649}.Release|AVR.ActiveCfg = Release|AVR
+		{417E15DB-488A-4B56-8D4E-FBE832B2B649}.Release|AVR.Build.0 = Release|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

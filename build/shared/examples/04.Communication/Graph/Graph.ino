@@ -1,26 +1,26 @@
 /*
   Graph
- 
+
  A simple example of communication from the Arduino board to the computer:
  the value of analog input 0 is sent out the serial port.  We call this "serial"
  communication because the connection appears to both the Arduino and the
  computer as a serial port, even though it may actually use
  a USB cable. Bytes are sent one after another (serially) from the Arduino
  to the computer.
- 
+
  You can use the Arduino serial monitor to view the sent data, or it can
- be read by Processing, PD, Max/MSP, or any other program capable of reading 
- data from a serial port.  The Processing code below graphs the data received 
+ be read by Processing, PD, Max/MSP, or any other program capable of reading
+ data from a serial port.  The Processing code below graphs the data received
  so you can see the value of the analog input changing over time.
- 
+
  The circuit:
  Any analog input sensor is attached to analog in pin 0.
-  
+
  created 2006
  by David A. Mellis
  modified 9 Apr 2012
  by Tom Igoe and Scott Fitzgerald
- 
+
  This example code is in the public domain.
 
  http://www.arduino.cc/en/Tutorial/Graph
@@ -34,34 +34,34 @@ void setup() {
 void loop() {
   // send the value of analog input 0:
   Serial.println(analogRead(A0));
-  // wait a bit for the analog-to-digital converter 
+  // wait a bit for the analog-to-digital converter
   // to stabilize after the last reading:
   delay(2);
 }
 
 /* Processing code for this example
- 
+
  // Graphing sketch
- 
- 
+
+
  // This program takes ASCII-encoded strings
  // from the serial port at 9600 baud and graphs them. It expects values in the
  // range 0 to 1023, followed by a newline, or newline and carriage return
- 
+
  // Created 20 Apr 2005
  // Updated 18 Jan 2008
  // by Tom Igoe
  // This example code is in the public domain.
- 
+
  import processing.serial.*;
- 
+
  Serial myPort;        // The serial port
  int xPos = 1;         // horizontal position of the graph
- 
+
  void setup () {
  // set the window size:
- size(400, 300);        
- 
+ size(400, 300);
+
  // List all the available serial ports
  // if using Processing 2.1 or later, use Serial.printArray()
  println(Serial.list());
@@ -80,34 +80,34 @@ void loop() {
  void draw () {
  // everything happens in the serialEvent()
  }
- 
+
  void serialEvent (Serial myPort) {
  // get the ASCII string:
  String inString = myPort.readStringUntil('\n');
- 
+
  if (inString != null) {
  // trim off any whitespace:
  inString = trim(inString);
  // convert to an int and map to the screen height:
- float inByte = float(inString); 
+ float inByte = float(inString);
  inByte = map(inByte, 0, 1023, 0, height);
- 
+
  // draw the line:
  stroke(127,34,255);
  line(xPos, height, xPos, height - inByte);
- 
+
  // at the edge of the screen, go back to the beginning:
  if (xPos >= width) {
  xPos = 0;
- background(0); 
- } 
+ background(0);
+ }
  else {
  // increment the horizontal position:
  xPos++;
  }
  }
  }
- 
+
  */
 
 /* Max/MSP v5 patch for this example
@@ -149,5 +149,5 @@ RnMj5vGl1Fs16drnk7Tf1XOLgv1n0d2iEsCxR.eQsNOZ4FGF7whofgfI3kES
 1kCeOX5L2rifbdu0A9ae2X.V33B1Z+.Bj1FrP5iFrCYCG5EUWSG.hhunHJd.
 HJ5hhnng3h9HPj4lud02.1bxGw.
 -----------end_max5_patcher-----------
-  
+
  */

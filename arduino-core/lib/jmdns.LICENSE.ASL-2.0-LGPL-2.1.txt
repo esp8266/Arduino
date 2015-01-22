@@ -1,0 +1,2 @@
+https://jmdns.svn.sourceforge.net/svnroot/jmdns/tags/jmdns-3.4.1/LICENSE-LGPL.txt
+https://jmdns.svn.sourceforge.net/svnroot/jmdns/tags/jmdns-3.4.1/LICENSE

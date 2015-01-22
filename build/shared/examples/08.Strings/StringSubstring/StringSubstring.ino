@@ -1,14 +1,14 @@
 /*
   String substring()
- 
+
  Examples of how to use substring in a String
- 
- created 27 July 2010, 
+
+ created 27 July 2010,
  modified 2 Apr 2012
  by Zach Eveland
- 
+
  http://arduino.cc/en/Tutorial/StringSubstring
- 
+
  This example code is in the public domain.
  */
 
@@ -31,13 +31,13 @@ void loop() {
 
   // substring(index) looks for the substring from the index position to the end:
   if (stringOne.substring(19) == "html") {
-    Serial.println("It's an html file"); 
-  } 
+    Serial.println("It's an html file");
+  }
   // you can also look for a substring in the middle of a string:
-  if (stringOne.substring(14,18) == "text") {
-    Serial.println("It's a text-based file"); 
-  } 
+  if (stringOne.substring(14, 18) == "text") {
+    Serial.println("It's a text-based file");
+  }
 
   // do nothing while true:
-  while(true);
+  while (true);
 }

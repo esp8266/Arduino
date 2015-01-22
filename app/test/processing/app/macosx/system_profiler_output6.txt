@@ -1,0 +1,158 @@
+USB:
+
+    USB 3.0 SuperSpeed Bus:
+
+      Host Controller Location: Built-in USB
+      Host Controller Driver: AppleUSBXHCI
+      PCI Device ID: 0x1e31 
+      PCI Revision ID: 0x0004 
+      PCI Vendor ID: 0x8086 
+      Bus Number: 0x0a 
+
+    USB Hi-Speed Bus:
+
+      Host Controller Location: Built-in USB
+      Host Controller Driver: AppleUSBEHCI
+      PCI Device ID: 0x1e2d 
+      PCI Revision ID: 0x0004 
+      PCI Vendor ID: 0x8086 
+      Bus Number: 0x1a 
+
+        Hub:
+
+          Product ID: 0x0024
+          Vendor ID: 0x8087  (Intel Corporation)
+          Version: 0.00
+          Speed: Up to 480 Mb/sec
+          Location ID: 0x1a100000 / 2
+          Current Available (mA): 500
+          Current Required (mA): 0
+
+            FaceTime HD Camera (Built-in):
+
+              Product ID: 0x8510
+              Vendor ID: 0x05ac  (Apple Inc.)
+              Version: 80.25
+              Serial Number: DJHC8MZ5E1DNYGE0
+              Speed: Up to 480 Mb/sec
+              Manufacturer: Apple Inc.
+              Location ID: 0x1a110000 / 3
+              Current Available (mA): 500
+              Current Required (mA): 500
+
+    USB Hi-Speed Bus:
+
+      Host Controller Location: Built-in USB
+      Host Controller Driver: AppleUSBEHCI
+      PCI Device ID: 0x1e26 
+      PCI Revision ID: 0x0004 
+      PCI Vendor ID: 0x8086 
+      Bus Number: 0x1d 
+
+        Hub:
+
+          Product ID: 0x0024
+          Vendor ID: 0x8087  (Intel Corporation)
+          Version: 0.00
+          Speed: Up to 480 Mb/sec
+          Location ID: 0x1d100000 / 2
+          Current Available (mA): 500
+          Current Required (mA): 0
+
+            Keyboard Hub:
+
+              Product ID: 0x1006
+              Vendor ID: 0x05ac  (Apple Inc.)
+              Version: 96.15
+              Serial Number: 0
+              Speed: Up to 480 Mb/sec
+              Manufacturer: Apple, Inc.
+              Location ID: 0x1d110000 / 6
+              Current Available (mA): 500
+              Current Required (mA): 300
+
+                Optical USB Mouse:
+
+                  Product ID: 0xc016
+                  Vendor ID: 0x046d  (Logitech Inc.)
+                  Version: 3.40
+                  Speed: Up to 1.5 Mb/sec
+                  Manufacturer: Logitech
+                  Location ID: 0x1d113000 / 9
+                  Current Available (mA): 100
+                  Current Required (mA): 100
+
+                Apple Keyboard:
+
+                  Product ID: 0x0250
+                  Vendor ID: 0x05ac  (Apple Inc.)
+                  Version: 0.74
+                  Speed: Up to 1.5 Mb/sec
+                  Manufacturer: Apple Inc.
+                  Location ID: 0x1d112000 / 7
+                  Current Available (mA): 100
+                  Current Required (mA): 20
+
+            Hub:
+
+              Product ID: 0x2512
+              Vendor ID: 0x0424  (SMSC)
+              Version:  b.b3
+              Speed: Up to 480 Mb/sec
+              Location ID: 0x1d180000 / 3
+              Current Available (mA): 500
+              Current Required (mA): 2
+
+                BRCM20702 Hub:
+
+                  Product ID: 0x4500
+                  Vendor ID: 0x0a5c  (Broadcom Corp.)
+                  Version: 1.00
+                  Speed: Up to 12 Mb/sec
+                  Manufacturer: Apple Inc.
+                  Location ID: 0x1d181000 / 5
+                  Current Available (mA): 500
+                  Current Required (mA): 94
+
+                    Bluetooth USB Host Controller:
+
+                      Product ID: 0x8286
+                      Vendor ID: 0x05ac  (Apple Inc.)
+                      Version: 1.25
+                      Speed: Up to 12 Mb/sec
+                      Manufacturer: Apple Inc.
+                      Location ID: 0x1d181300 / 8
+                      Current Available (mA): 500
+                      Current Required (mA): 0
+
+                Apple Internal Keyboard / Trackpad:
+
+                  Product ID: 0x0262
+                  Vendor ID: 0x05ac  (Apple Inc.)
+                  Version: 2.22
+                  Speed: Up to 12 Mb/sec
+                  Manufacturer: Apple Inc.
+                  Location ID: 0x1d182000 / 4
+                  Current Available (mA): 500
+                  Current Required (mA): 40
+
+    USB 3.0 Hi-Speed Bus:
+
+      Host Controller Location: Built-in USB
+      Host Controller Driver: AppleUSBXHCI
+      PCI Device ID: 0x1e31 
+      PCI Revision ID: 0x0004 
+      PCI Vendor ID: 0x8086 
+      Bus Number: 0x0a 
+
+        Arduino Yun:
+
+          Product ID: 0x8041
+          Vendor ID: 0x2341
+          Version: 1.00
+          Speed: Up to 12 Mb/sec
+          Manufacturer: Arduino LLC
+          Location ID: 0x14200000 / 12
+          Current Available (mA): 500
+          Current Required (mA): 500
+

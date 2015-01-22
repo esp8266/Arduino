@@ -1,0 +1,94 @@
+USB:
+
+    USB Hi-Speed Bus:
+
+      Host Controller Location: Built-in USB
+      Host Controller Driver: AppleUSBEHCI
+      PCI Device ID: 0x0aa9 
+      PCI Revision ID: 0x00b1 
+      PCI Vendor ID: 0x10de 
+      Bus Number: 0x26 
+
+    USB Hi-Speed Bus:
+
+      Host Controller Location: Built-in USB
+      Host Controller Driver: AppleUSBEHCI
+      PCI Device ID: 0x0aa6 
+      PCI Revision ID: 0x00b1 
+      PCI Vendor ID: 0x10de 
+      Bus Number: 0x24 
+
+        Built-in iSight:
+
+          Product ID: 0x8507
+          Vendor ID: 0x05ac  (Apple Inc.)
+          Version: 4,41
+          Serial Number: 8JA34290MAKP3A00
+          Speed: Up to 480 Mb/sec
+          Manufacturer: Apple Inc.
+          Location ID: 0x24400000 / 2
+          Current Available (mA): 500
+          Current Required (mA): 500
+
+    USB Bus:
+
+      Host Controller Location: Built-in USB
+      Host Controller Driver: AppleUSBOHCI
+      PCI Device ID: 0x0aa7 
+      PCI Revision ID: 0x00b1 
+      PCI Vendor ID: 0x10de 
+      Bus Number: 0x06 
+
+        BRCM2070 Hub:
+
+          Product ID: 0x4500
+          Vendor ID: 0x0a5c  (Broadcom Corp.)
+          Version: 1,00
+          Speed: Up to 12 Mb/sec
+          Manufacturer: Apple Inc.
+          Location ID: 0x06100000 / 2
+          Current Available (mA): 500
+          Current Required (mA): 94
+
+            Bluetooth USB Host Controller:
+
+              Product ID: 0x8218
+              Vendor ID: 0x05ac  (Apple Inc.)
+              Version: 0,41
+              Speed: Up to 12 Mb/sec
+              Manufacturer: Apple Inc.
+              Location ID: 0x06130000 / 3
+              Current Available (mA): 500
+              Current Required (mA): 0
+
+    USB Bus:
+
+      Host Controller Location: Built-in USB
+      Host Controller Driver: AppleUSBOHCI
+      PCI Device ID: 0x0aa5 
+      PCI Revision ID: 0x00b1 
+      PCI Vendor ID: 0x10de 
+      Bus Number: 0x04 
+
+        Arduino Yun     :
+
+          Product ID: 0x0041
+          Vendor ID: 0x2341
+          Version: 0,01
+          Speed: Up to 12 Mb/sec
+          Manufacturer: Arduino LLC
+          Location ID: 0x04100000 / 3
+          Current Available (mA): 500
+          Current Required (mA): 100
+
+        Apple Internal Keyboard / Trackpad:
+
+          Product ID: 0x0237
+          Vendor ID: 0x05ac  (Apple Inc.)
+          Version: 0,81
+          Speed: Up to 12 Mb/sec
+          Manufacturer: Apple Inc.
+          Location ID: 0x04600000 / 2
+          Current Available (mA): 500
+          Current Required (mA): 40
+

@@ -1,10 +1,10 @@
 /*
   Arduino Starter Kit example
  Project 12  - Knock Lock
- 
+
  This sketch is written to accompany Project 12 in the
  Arduino Starter Kit
- 
+
  Parts required:
  1 Megohm resistor
  10 kilohm resistor
@@ -16,17 +16,17 @@
  one yellow LED
  one green LED
  100 uF capacitor
- 
+
  Created 18 September 2012
  by Scott Fitzgerald
  Thanks to Federico Vanzati for improvements
- 
+
  http://arduino.cc/starterKit
- 
- This example code is part of the public domain 
+
+ This example code is part of the public domain
  */
 
-// import the library 
+// import the library
 #include <Servo.h>
 // create an instance of the servo library
 Servo myServo;
@@ -51,7 +51,7 @@ boolean locked = false;
 // how many valid knocks you've received
 int numberOfKnocks = 0;
 
-void setup(){
+void setup() {
   // attach the servo to pin 9
   myServo.attach(9);
 
@@ -76,22 +76,22 @@ void setup(){
   Serial.println("the box is unlocked!");
 }
 
-void loop(){
+void loop() {
 
   // if the box is unlocked
-  if(locked == false){
+  if (locked == false) {
 
     // read the value of the switch pin
     switchVal = digitalRead(switchPin);
 
     // if the button is pressed, lock the box
-    if(switchVal == HIGH){
+    if (switchVal == HIGH) {
       // set the locked variable to "true"
       locked = true;
 
       // change the status LEDs
-      digitalWrite(greenLed,LOW);
-      digitalWrite(redLed,HIGH);
+      digitalWrite(greenLed, LOW);
+      digitalWrite(redLed, HIGH);
 
       // move the servo to the locked position
       myServo.write(90);
@@ -105,16 +105,16 @@ void loop(){
   }
 
   // if the box is locked
-  if(locked == true){
+  if (locked == true) {
 
     // check the value of the piezo
     knockVal = analogRead(piezo);
 
     // if there are not enough valid knocks
-    if(numberOfKnocks < 3 && knockVal > 0){
+    if (numberOfKnocks < 3 && knockVal > 0) {
 
       // check to see if the knock is in range
-      if(checkForKnock(knockVal) == true){
+      if (checkForKnock(knockVal) == true) {
 
         // increment the number of valid knocks
         numberOfKnocks++;
@@ -126,7 +126,7 @@ void loop(){
     }
 
     // if there are three knocks
-    if(numberOfKnocks >= 3){
+    if (numberOfKnocks >= 3) {
       // unlock the box
       locked = false;
 
@@ -137,19 +137,19 @@ void loop(){
       delay(20);
 
       // change status LEDs
-      digitalWrite(greenLed,HIGH);
-      digitalWrite(redLed,LOW);
+      digitalWrite(greenLed, HIGH);
+      digitalWrite(redLed, LOW);
       Serial.println("the box is unlocked!");
     }
   }
 }
 
-// this function checks to see if a  
+// this function checks to see if a
 // detected knock is within max and min range
-boolean checkForKnock(int value){
+boolean checkForKnock(int value) {
   // if the value of the knock is greater than
   // the minimum, and larger than the maximum
-  if(value > quietKnock && value < loudKnock){
+  if (value > quietKnock && value < loudKnock) {
     // turn the status LED on
     digitalWrite(yellowLed, HIGH);
     delay(50);
@@ -164,7 +164,7 @@ boolean checkForKnock(int value){
   else {
     // print status
     Serial.print("Bad knock value ");
-    Serial.println(value);  
+    Serial.println(value);
     // return false
     return false;
   }

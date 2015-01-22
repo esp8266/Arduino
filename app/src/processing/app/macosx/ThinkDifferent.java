@@ -26,6 +26,8 @@ import processing.app.Base;
 
 import com.apple.eawt.*;
 
+import java.io.File;
+
 
 /**
  * Deal with issues related to thinking different. This handles the basic
@@ -48,7 +50,7 @@ public class ThinkDifferent implements ApplicationListener {
   private Base base;
 
   
-  static protected void init(Base base) {    
+  static public void init(Base base) {    
     if (application == null) {
       //application = new com.apple.eawt.Application();
       application = com.apple.eawt.Application.getApplication();
@@ -96,7 +98,11 @@ public class ThinkDifferent implements ApplicationListener {
   public void handleOpenFile(ApplicationEvent ae) {
 //    System.out.println("got open file event " + ae.getFilename());
     String filename = ae.getFilename();
-    base.handleOpen(filename);
+    try {
+      base.handleOpen(new File(filename));
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
     ae.setHandled(true);
   }
 

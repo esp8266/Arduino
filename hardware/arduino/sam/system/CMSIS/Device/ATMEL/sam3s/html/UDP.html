@@ -1,0 +1,1513 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>SAM3S UDP</title>
+    <link rel="stylesheet" type="text/css" href="css/html.css" media="all" />
+  </head>
+  <body id="abstract">
+    <div id="container">
+      <div id="content">
+        <a id="UDP"></a>
+        <h1>SAM3S UDP</h1>
+        <a id="UDP__User_Interface"></a>
+        <h2>USB Device Port (UDP) User Interface</h2>
+<!--As per 6083U programmer datasheet.-->
+        <h3>Registers</h3>
+        <table class="registers">
+          <caption>Register Mapping</caption>
+          <thead>
+            <tr>
+              <th class="address">Address</th>
+              <th class="description">Register</th>
+              <th class="name">Name</th>
+              <th class="access">Access</th>
+              <th class="reset">Reset</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="odd">
+              <td class="address" id="address_0x40034000">0x40034000</td>
+              <td class="description">Frame Number Register</td>
+              <td class="name">
+                <a href="#UDP_FRM_NUM" title="Frame Number Register" class="one_click_away">UDP_FRM_NUM</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x40034004">0x40034004</td>
+              <td class="description">Global State Register</td>
+              <td class="name">
+                <a href="#UDP_GLB_STAT" title="Global State Register" class="one_click_away">UDP_GLB_STAT</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000010</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x40034008">0x40034008</td>
+              <td class="description">Function Address Register</td>
+              <td class="name">
+                <a href="#UDP_FADDR" title="Function Address Register" class="one_click_away">UDP_FADDR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000100</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x40034010">0x40034010</td>
+              <td class="description">Interrupt Enable Register</td>
+              <td class="name">
+                <a href="#UDP_IER" title="Interrupt Enable Register" class="one_click_away">UDP_IER</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x40034014">0x40034014</td>
+              <td class="description">Interrupt Disable Register</td>
+              <td class="name">
+                <a href="#UDP_IDR" title="Interrupt Disable Register" class="one_click_away">UDP_IDR</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x40034018">0x40034018</td>
+              <td class="description">Interrupt Mask Register</td>
+              <td class="name">
+                <a href="#UDP_IMR" title="Interrupt Mask Register" class="one_click_away">UDP_IMR</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x00001200</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x4003401C">0x4003401C</td>
+              <td class="description">Interrupt Status Register</td>
+              <td class="name">
+                <a href="#UDP_ISR" title="Interrupt Status Register" class="one_click_away">UDP_ISR</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x40034020">0x40034020</td>
+              <td class="description">Interrupt Clear Register</td>
+              <td class="name">
+                <a href="#UDP_ICR" title="Interrupt Clear Register" class="one_click_away">UDP_ICR</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x40034028">0x40034028</td>
+              <td class="description">Reset Endpoint Register</td>
+              <td class="name">
+                <a href="#UDP_RST_EP" title="Reset Endpoint Register" class="one_click_away">UDP_RST_EP</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x40034030">0x40034030</td>
+              <td class="description">Endpoint Control and Status Register</td>
+              <td class="name">
+                <a href="#UDP_CSR" title="Endpoint Control and Status Register" class="one_click_away">UDP_CSR[8]</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x0</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x40034050">0x40034050</td>
+              <td class="description">Endpoint FIFO Data Register</td>
+              <td class="name">
+                <a href="#UDP_FDR" title="Endpoint FIFO Data Register" class="one_click_away">UDP_FDR[8]</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x0</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x40034074">0x40034074</td>
+              <td class="description">Transceiver Control Register</td>
+              <td class="name">
+                <a href="#UDP_TXVC" title="Transceiver Control Register" class="one_click_away">UDP_TXVC</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000100</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3>Register Fields</h3>
+        <h4 id="UDP_FRM_NUM">UDP Frame Number Register</h4>
+        <p><strong>Name</strong>: UDP_FRM_NUM</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x40034000</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#UDP_FRM_NUM__FRM_OK" title="Frame OK">FRM_OK</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_FRM_NUM__FRM_ERR" title="Frame Error">FRM_ERR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="3">
+                <a href="#UDP_FRM_NUM__FRM_NUM" title="Frame Number as Defined in the Packet Field Formats">FRM_NUM</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#UDP_FRM_NUM__FRM_NUM" title="Frame Number as Defined in the Packet Field Formats">FRM_NUM</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="UDP_FRM_NUM__FRM_NUM"><strong>FRM_NUM</strong>: Frame Number as Defined in the Packet Field Formats</li>
+          <p>-</p>
+          <li id="UDP_FRM_NUM__FRM_ERR"><strong>FRM_ERR</strong>: Frame Error</li>
+          <p>-</p>
+          <li id="UDP_FRM_NUM__FRM_OK"><strong>FRM_OK</strong>: Frame OK</li>
+          <p>-</p>
+        </ul>
+        <h4 id="UDP_GLB_STAT">UDP Global State Register</h4>
+        <p><strong>Name</strong>: UDP_GLB_STAT</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x40034004</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#UDP_GLB_STAT__RMWUPE" title="Remote Wake Up Enable">RMWUPE</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_GLB_STAT__RSMINPR">RSMINPR</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_GLB_STAT__ESR" title="Enable Send Resume">ESR</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_GLB_STAT__CONFG" title="Configured">CONFG</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_GLB_STAT__FADDEN" title="Function Address Enable">FADDEN</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="UDP_GLB_STAT__FADDEN"><strong>FADDEN</strong>: Function Address Enable</li>
+          <p>-</p>
+          <li id="UDP_GLB_STAT__CONFG"><strong>CONFG</strong>: Configured</li>
+          <p>-</p>
+          <li id="UDP_GLB_STAT__ESR"><strong>ESR</strong>: Enable Send Resume<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Mandatory value prior to starting any Remote Wake Up procedure.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Starts the Remote Wake Up procedure if this bit value was 0 and if RMWUPE is enabled.</td></tr></tbody></table></li>
+          <li id="UDP_GLB_STAT__RSMINPR">
+            <strong>RSMINPR</strong>
+          </li>
+          <p>-</p>
+          <li id="UDP_GLB_STAT__RMWUPE"><strong>RMWUPE</strong>: Remote Wake Up Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The Remote Wake Up feature of the device is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The Remote Wake Up feature of the device is enabled.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="UDP_FADDR">UDP Function Address Register</h4>
+        <p><strong>Name</strong>: UDP_FADDR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x40034008</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#UDP_FADDR__FEN" title="Function Enable">FEN</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td colspan="7">
+                <a href="#UDP_FADDR__FADD" title="Function Address Value">FADD</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="UDP_FADDR__FADD"><strong>FADD</strong>: Function Address Value</li>
+          <p>-</p>
+          <li id="UDP_FADDR__FEN"><strong>FEN</strong>: Function Enable</li>
+          <p>-</p>
+        </ul>
+        <h4 id="UDP_IER">UDP Interrupt Enable Register</h4>
+        <p><strong>Name</strong>: UDP_IER</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x40034010</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#UDP_IER__WAKEUP" title="Enable UDP bus Wakeup Interrupt">WAKEUP</a>
+              </td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#UDP_IER__SOFINT" title="Enable Start Of Frame Interrupt">SOFINT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_IER__EXTRSM">EXTRSM</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_IER__RXRSM" title="Enable UDP Resume Interrupt">RXRSM</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_IER__RXSUSP" title="Enable UDP Suspend Interrupt">RXSUSP</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#UDP_IER__EP7INT" title="Enable Endpoint 7 Interrupt">EP7INT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_IER__EP6INT" title="Enable Endpoint 6 Interrupt">EP6INT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_IER__EP5INT" title="Enable Endpoint 5 Interrupt">EP5INT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_IER__EP4INT" title="Enable Endpoint 4 Interrupt">EP4INT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_IER__EP3INT" title="Enable Endpoint 3 Interrupt">EP3INT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_IER__EP2INT" title="Enable Endpoint 2Interrupt">EP2INT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_IER__EP1INT" title="Enable Endpoint 1 Interrupt">EP1INT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_IER__EP0INT" title="Enable Endpoint 0 Interrupt">EP0INT</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="UDP_IER__EP0INT"><strong>EP0INT</strong>: Enable Endpoint 0 Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables corresponding Endpoint Interrupt.</td></tr></tbody></table></li>
+          <li id="UDP_IER__EP1INT"><strong>EP1INT</strong>: Enable Endpoint 1 Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables corresponding Endpoint Interrupt.</td></tr></tbody></table></li>
+          <li id="UDP_IER__EP2INT"><strong>EP2INT</strong>: Enable Endpoint 2Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables corresponding Endpoint Interrupt.</td></tr></tbody></table></li>
+          <li id="UDP_IER__EP3INT"><strong>EP3INT</strong>: Enable Endpoint 3 Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables corresponding Endpoint Interrupt.</td></tr></tbody></table></li>
+          <li id="UDP_IER__EP4INT"><strong>EP4INT</strong>: Enable Endpoint 4 Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables corresponding Endpoint Interrupt.</td></tr></tbody></table></li>
+          <li id="UDP_IER__EP5INT"><strong>EP5INT</strong>: Enable Endpoint 5 Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables corresponding Endpoint Interrupt.</td></tr></tbody></table></li>
+          <li id="UDP_IER__EP6INT"><strong>EP6INT</strong>: Enable Endpoint 6 Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables corresponding Endpoint Interrupt.</td></tr></tbody></table></li>
+          <li id="UDP_IER__EP7INT"><strong>EP7INT</strong>: Enable Endpoint 7 Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables corresponding Endpoint Interrupt.</td></tr></tbody></table></li>
+          <li id="UDP_IER__RXSUSP"><strong>RXSUSP</strong>: Enable UDP Suspend Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables UDP Suspend Interrupt.</td></tr></tbody></table></li>
+          <li id="UDP_IER__RXRSM"><strong>RXRSM</strong>: Enable UDP Resume Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables UDP Resume Interrupt.</td></tr></tbody></table></li>
+          <li id="UDP_IER__EXTRSM">
+            <strong>EXTRSM</strong>
+          </li>
+          <p>-</p>
+          <li id="UDP_IER__SOFINT"><strong>SOFINT</strong>: Enable Start Of Frame Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables Start Of Frame Interrupt.</td></tr></tbody></table></li>
+          <li id="UDP_IER__WAKEUP"><strong>WAKEUP</strong>: Enable UDP bus Wakeup Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables USB bus Interrupt.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="UDP_IDR">UDP Interrupt Disable Register</h4>
+        <p><strong>Name</strong>: UDP_IDR</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x40034014</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#UDP_IDR__WAKEUP" title="Disable USB Bus Interrupt">WAKEUP</a>
+              </td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#UDP_IDR__SOFINT" title="Disable Start Of Frame Interrupt">SOFINT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_IDR__EXTRSM">EXTRSM</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_IDR__RXRSM" title="Disable UDP Resume Interrupt">RXRSM</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_IDR__RXSUSP" title="Disable UDP Suspend Interrupt">RXSUSP</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#UDP_IDR__EP7INT" title="Disable Endpoint 7 Interrupt">EP7INT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_IDR__EP6INT" title="Disable Endpoint 6 Interrupt">EP6INT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_IDR__EP5INT" title="Disable Endpoint 5 Interrupt">EP5INT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_IDR__EP4INT" title="Disable Endpoint 4 Interrupt">EP4INT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_IDR__EP3INT" title="Disable Endpoint 3 Interrupt">EP3INT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_IDR__EP2INT" title="Disable Endpoint 2 Interrupt">EP2INT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_IDR__EP1INT" title="Disable Endpoint 1 Interrupt">EP1INT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_IDR__EP0INT" title="Disable Endpoint 0 Interrupt">EP0INT</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="UDP_IDR__EP0INT"><strong>EP0INT</strong>: Disable Endpoint 0 Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables corresponding Endpoint Interrupt.</td></tr></tbody></table></li>
+          <li id="UDP_IDR__EP1INT"><strong>EP1INT</strong>: Disable Endpoint 1 Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables corresponding Endpoint Interrupt.</td></tr></tbody></table></li>
+          <li id="UDP_IDR__EP2INT"><strong>EP2INT</strong>: Disable Endpoint 2 Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables corresponding Endpoint Interrupt.</td></tr></tbody></table></li>
+          <li id="UDP_IDR__EP3INT"><strong>EP3INT</strong>: Disable Endpoint 3 Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables corresponding Endpoint Interrupt.</td></tr></tbody></table></li>
+          <li id="UDP_IDR__EP4INT"><strong>EP4INT</strong>: Disable Endpoint 4 Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables corresponding Endpoint Interrupt.</td></tr></tbody></table></li>
+          <li id="UDP_IDR__EP5INT"><strong>EP5INT</strong>: Disable Endpoint 5 Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables corresponding Endpoint Interrupt.</td></tr></tbody></table></li>
+          <li id="UDP_IDR__EP6INT"><strong>EP6INT</strong>: Disable Endpoint 6 Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables corresponding Endpoint Interrupt.</td></tr></tbody></table></li>
+          <li id="UDP_IDR__EP7INT"><strong>EP7INT</strong>: Disable Endpoint 7 Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables corresponding Endpoint Interrupt.</td></tr></tbody></table></li>
+          <li id="UDP_IDR__RXSUSP"><strong>RXSUSP</strong>: Disable UDP Suspend Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables UDP Suspend Interrupt.</td></tr></tbody></table></li>
+          <li id="UDP_IDR__RXRSM"><strong>RXRSM</strong>: Disable UDP Resume Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables UDP Resume Interrupt.</td></tr></tbody></table></li>
+          <li id="UDP_IDR__EXTRSM">
+            <strong>EXTRSM</strong>
+          </li>
+          <p>-</p>
+          <li id="UDP_IDR__SOFINT"><strong>SOFINT</strong>: Disable Start Of Frame Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables Start Of Frame Interrupt</td></tr></tbody></table></li>
+          <li id="UDP_IDR__WAKEUP"><strong>WAKEUP</strong>: Disable USB Bus Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disables USB Bus Wakeup Interrupt.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="UDP_IMR">UDP Interrupt Mask Register</h4>
+        <p><strong>Name</strong>: UDP_IMR</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x40034018</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#UDP_IMR__WAKEUP" title="USB Bus WAKEUP Interrupt">WAKEUP</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_IMR__BIT12" title="UDP_IMR Bit 12">BIT12</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_IMR__SOFINT" title="Mask Start Of Frame Interrupt">SOFINT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_IMR__EXTRSM">EXTRSM</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_IMR__RXRSM" title="Mask UDP Resume Interrupt.">RXRSM</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_IMR__RXSUSP" title="Mask UDP Suspend Interrupt">RXSUSP</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#UDP_IMR__EP7INT" title="Mask Endpoint 7 Interrupt">EP7INT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_IMR__EP6INT" title="Mask Endpoint 6 Interrupt">EP6INT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_IMR__EP5INT" title="Mask Endpoint 5 Interrupt">EP5INT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_IMR__EP4INT" title="Mask Endpoint 4 Interrupt">EP4INT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_IMR__EP3INT" title="Mask Endpoint 3 Interrupt">EP3INT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_IMR__EP2INT" title="Mask Endpoint 2 Interrupt">EP2INT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_IMR__EP1INT" title="Mask Endpoint 1 Interrupt">EP1INT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_IMR__EP0INT" title="Mask Endpoint 0 Interrupt">EP0INT</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="UDP_IMR__EP0INT"><strong>EP0INT</strong>: Mask Endpoint 0 Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Corresponding Endpoint Interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Corresponding Endpoint Interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="UDP_IMR__EP1INT"><strong>EP1INT</strong>: Mask Endpoint 1 Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Corresponding Endpoint Interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Corresponding Endpoint Interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="UDP_IMR__EP2INT"><strong>EP2INT</strong>: Mask Endpoint 2 Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Corresponding Endpoint Interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Corresponding Endpoint Interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="UDP_IMR__EP3INT"><strong>EP3INT</strong>: Mask Endpoint 3 Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Corresponding Endpoint Interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Corresponding Endpoint Interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="UDP_IMR__EP4INT"><strong>EP4INT</strong>: Mask Endpoint 4 Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Corresponding Endpoint Interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Corresponding Endpoint Interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="UDP_IMR__EP5INT"><strong>EP5INT</strong>: Mask Endpoint 5 Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Corresponding Endpoint Interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Corresponding Endpoint Interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="UDP_IMR__EP6INT"><strong>EP6INT</strong>: Mask Endpoint 6 Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Corresponding Endpoint Interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Corresponding Endpoint Interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="UDP_IMR__EP7INT"><strong>EP7INT</strong>: Mask Endpoint 7 Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Corresponding Endpoint Interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Corresponding Endpoint Interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="UDP_IMR__RXSUSP"><strong>RXSUSP</strong>: Mask UDP Suspend Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">UDP Suspend Interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">UDP Suspend Interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="UDP_IMR__RXRSM"><strong>RXRSM</strong>: Mask UDP Resume Interrupt.<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">UDP Resume Interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">UDP Resume Interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="UDP_IMR__EXTRSM">
+            <strong>EXTRSM</strong>
+          </li>
+          <p>-</p>
+          <li id="UDP_IMR__SOFINT"><strong>SOFINT</strong>: Mask Start Of Frame Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Start of Frame Interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Start of Frame Interrupt is enabled.</td></tr></tbody></table></li>
+          <li id="UDP_IMR__BIT12"><strong>BIT12</strong>: UDP_IMR Bit 12</li>
+          <p>-</p>
+          <li id="UDP_IMR__WAKEUP"><strong>WAKEUP</strong>: USB Bus WAKEUP Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">USB Bus Wakeup Interrupt is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">USB Bus Wakeup Interrupt is enabled.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="UDP_ISR">UDP Interrupt Status Register</h4>
+        <p><strong>Name</strong>: UDP_ISR</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x4003401C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#UDP_ISR__WAKEUP" title="UDP Resume Interrupt Status">WAKEUP</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_ISR__ENDBUSRES" title="End of BUS Reset Interrupt Status">ENDBUSRES</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_ISR__SOFINT" title="Start of Frame Interrupt Status">SOFINT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_ISR__EXTRSM">EXTRSM</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_ISR__RXRSM" title="UDP Resume Interrupt Status">RXRSM</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_ISR__RXSUSP" title="UDP Suspend Interrupt Status">RXSUSP</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#UDP_ISR__EP7INT" title="Endpoint 7Interrupt Status">EP7INT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_ISR__EP6INT" title="Endpoint 6 Interrupt Status">EP6INT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_ISR__EP5INT" title="Endpoint 5 Interrupt Status">EP5INT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_ISR__EP4INT" title="Endpoint 4 Interrupt Status">EP4INT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_ISR__EP3INT" title="Endpoint 3 Interrupt Status">EP3INT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_ISR__EP2INT" title="Endpoint 2 Interrupt Status">EP2INT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_ISR__EP1INT" title="Endpoint 1 Interrupt Status">EP1INT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_ISR__EP0INT" title="Endpoint 0 Interrupt Status">EP0INT</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="UDP_ISR__EP0INT"><strong>EP0INT</strong>: Endpoint 0 Interrupt Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No Endpoint0 Interrupt pending.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Endpoint0 Interrupt has been raised.</td></tr></tbody></table></li>
+          <li id="UDP_ISR__EP1INT"><strong>EP1INT</strong>: Endpoint 1 Interrupt Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No Endpoint0 Interrupt pending.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Endpoint0 Interrupt has been raised.</td></tr></tbody></table></li>
+          <li id="UDP_ISR__EP2INT"><strong>EP2INT</strong>: Endpoint 2 Interrupt Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No Endpoint0 Interrupt pending.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Endpoint0 Interrupt has been raised.</td></tr></tbody></table></li>
+          <li id="UDP_ISR__EP3INT"><strong>EP3INT</strong>: Endpoint 3 Interrupt Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No Endpoint0 Interrupt pending.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Endpoint0 Interrupt has been raised.</td></tr></tbody></table></li>
+          <li id="UDP_ISR__EP4INT"><strong>EP4INT</strong>: Endpoint 4 Interrupt Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No Endpoint0 Interrupt pending.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Endpoint0 Interrupt has been raised.</td></tr></tbody></table></li>
+          <li id="UDP_ISR__EP5INT"><strong>EP5INT</strong>: Endpoint 5 Interrupt Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No Endpoint0 Interrupt pending.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Endpoint0 Interrupt has been raised.</td></tr></tbody></table></li>
+          <li id="UDP_ISR__EP6INT"><strong>EP6INT</strong>: Endpoint 6 Interrupt Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No Endpoint0 Interrupt pending.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Endpoint0 Interrupt has been raised.</td></tr></tbody></table></li>
+          <li id="UDP_ISR__EP7INT"><strong>EP7INT</strong>: Endpoint 7Interrupt Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No Endpoint0 Interrupt pending.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Endpoint0 Interrupt has been raised.</td></tr></tbody></table></li>
+          <li id="UDP_ISR__RXSUSP"><strong>RXSUSP</strong>: UDP Suspend Interrupt Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No UDP Suspend Interrupt pending.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">UDP Suspend Interrupt has been raised.</td></tr></tbody></table></li>
+          <li id="UDP_ISR__RXRSM"><strong>RXRSM</strong>: UDP Resume Interrupt Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No UDP Resume Interrupt pending.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">UDP Resume Interrupt has been raised.</td></tr></tbody></table></li>
+          <li id="UDP_ISR__EXTRSM">
+            <strong>EXTRSM</strong>
+          </li>
+          <p>-</p>
+          <li id="UDP_ISR__SOFINT"><strong>SOFINT</strong>: Start of Frame Interrupt Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No Start of Frame Interrupt pending.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Start of Frame Interrupt has been raised.</td></tr></tbody></table></li>
+          <li id="UDP_ISR__ENDBUSRES"><strong>ENDBUSRES</strong>: End of BUS Reset Interrupt Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No End of Bus Reset Interrupt pending.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">End of Bus Reset Interrupt has been raised.</td></tr></tbody></table></li>
+          <li id="UDP_ISR__WAKEUP"><strong>WAKEUP</strong>: UDP Resume Interrupt Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No Wakeup Interrupt pending.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">A Wakeup Interrupt (USB Host Sent a RESUME or RESET) occurred since the last clear.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="UDP_ICR">UDP Interrupt Clear Register</h4>
+        <p><strong>Name</strong>: UDP_ICR</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x40034020</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#UDP_ICR__WAKEUP" title="Clear Wakeup Interrupt">WAKEUP</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_ICR__ENDBUSRES" title="Clear End of Bus Reset Interrupt">ENDBUSRES</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_ICR__SOFINT" title="Clear Start Of Frame Interrupt">SOFINT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_ICR__EXTRSM">EXTRSM</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_ICR__RXRSM" title="Clear UDP Resume Interrupt">RXRSM</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_ICR__RXSUSP" title="Clear UDP Suspend Interrupt">RXSUSP</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="UDP_ICR__RXSUSP"><strong>RXSUSP</strong>: Clear UDP Suspend Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Clears UDP Suspend Interrupt.</td></tr></tbody></table></li>
+          <li id="UDP_ICR__RXRSM"><strong>RXRSM</strong>: Clear UDP Resume Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Clears UDP Resume Interrupt.</td></tr></tbody></table></li>
+          <li id="UDP_ICR__EXTRSM">
+            <strong>EXTRSM</strong>
+          </li>
+          <p>-</p>
+          <li id="UDP_ICR__SOFINT"><strong>SOFINT</strong>: Clear Start Of Frame Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Clears Start Of Frame Interrupt.</td></tr></tbody></table></li>
+          <li id="UDP_ICR__ENDBUSRES"><strong>ENDBUSRES</strong>: Clear End of Bus Reset Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Clears End of Bus Reset Interrupt.</td></tr></tbody></table></li>
+          <li id="UDP_ICR__WAKEUP"><strong>WAKEUP</strong>: Clear Wakeup Interrupt<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Clears Wakeup Interrupt.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="UDP_RST_EP">UDP Reset Endpoint Register</h4>
+        <p><strong>Name</strong>: UDP_RST_EP</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x40034028</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#UDP_RST_EP__EP7" title="Reset Endpoint 7">EP7</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_RST_EP__EP6" title="Reset Endpoint 6">EP6</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_RST_EP__EP5" title="Reset Endpoint 5">EP5</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_RST_EP__EP4" title="Reset Endpoint 4">EP4</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_RST_EP__EP3" title="Reset Endpoint 3">EP3</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_RST_EP__EP2" title="Reset Endpoint 2">EP2</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_RST_EP__EP1" title="Reset Endpoint 1">EP1</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_RST_EP__EP0" title="Reset Endpoint 0">EP0</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="UDP_RST_EP__EP0"><strong>EP0</strong>: Reset Endpoint 0<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No reset.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Forces the corresponding endpoint FIF0 pointers to 0, therefore RXBYTECNT field is read at 0 in UDP_CSRx register.</td></tr></tbody></table></li>
+          <li id="UDP_RST_EP__EP1"><strong>EP1</strong>: Reset Endpoint 1<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No reset.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Forces the corresponding endpoint FIF0 pointers to 0, therefore RXBYTECNT field is read at 0 in UDP_CSRx register.</td></tr></tbody></table></li>
+          <li id="UDP_RST_EP__EP2"><strong>EP2</strong>: Reset Endpoint 2<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No reset.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Forces the corresponding endpoint FIF0 pointers to 0, therefore RXBYTECNT field is read at 0 in UDP_CSRx register.</td></tr></tbody></table></li>
+          <li id="UDP_RST_EP__EP3"><strong>EP3</strong>: Reset Endpoint 3<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No reset.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Forces the corresponding endpoint FIF0 pointers to 0, therefore RXBYTECNT field is read at 0 in UDP_CSRx register.</td></tr></tbody></table></li>
+          <li id="UDP_RST_EP__EP4"><strong>EP4</strong>: Reset Endpoint 4<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No reset.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Forces the corresponding endpoint FIF0 pointers to 0, therefore RXBYTECNT field is read at 0 in UDP_CSRx register.</td></tr></tbody></table></li>
+          <li id="UDP_RST_EP__EP5"><strong>EP5</strong>: Reset Endpoint 5<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No reset.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Forces the corresponding endpoint FIF0 pointers to 0, therefore RXBYTECNT field is read at 0 in UDP_CSRx register.</td></tr></tbody></table></li>
+          <li id="UDP_RST_EP__EP6"><strong>EP6</strong>: Reset Endpoint 6<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No reset.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Forces the corresponding endpoint FIF0 pointers to 0, therefore RXBYTECNT field is read at 0 in UDP_CSRx register.</td></tr></tbody></table></li>
+          <li id="UDP_RST_EP__EP7"><strong>EP7</strong>: Reset Endpoint 7<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No reset.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Forces the corresponding endpoint FIF0 pointers to 0, therefore RXBYTECNT field is read at 0 in UDP_CSRx register.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="UDP_CSR">UDP Endpoint Control and Status Register</h4>
+        <p><strong>Name</strong>: UDP_CSR[0:7]</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x40034030</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="3">
+                <a href="#UDP_CSR__RXBYTECNT" title="Number of Bytes Available in the FIFO">RXBYTECNT</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#UDP_CSR__RXBYTECNT" title="Number of Bytes Available in the FIFO">RXBYTECNT</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#UDP_CSR__EPEDS" title="Endpoint Enable Disable">EPEDS</a>
+              </td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#UDP_CSR__DTGLE" title="Data Toggle">DTGLE</a>
+              </td>
+              <td colspan="3">
+                <a href="#UDP_CSR__EPTYPE" title="Endpoint Type">EPTYPE</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#UDP_CSR__DIR" title="Transfer Direction (only available for control endpoints)">DIR</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_CSR__RX_DATA_BK1" title="Receive Data Bank 1 (only used by endpoints with ping-pong attributes)">RX_DATA_BK1</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_CSR__FORCESTALL" title="Force Stall (used by Control, Bulk and Isochronous Endpoints)">FORCESTALL</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_CSR__TXPKTRDY" title="Transmit Packet Ready">TXPKTRDY</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_CSR__STALLSENT" title="Stall Sent (Control, Bulk Interrupt Endpoints)/ISOERROR (Isochronous Endpoints)">STALLSENT</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_CSR__RXSETUP" title="Received Setup">RXSETUP</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_CSR__RX_DATA_BK0" title="Receive Data Bank 0">RX_DATA_BK0</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_CSR__TXCOMP" title="Generates an IN Packet with Data Previously Written in the DPR">TXCOMP</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="UDP_CSR__TXCOMP"><strong>TXCOMP</strong>: Generates an IN Packet with Data Previously Written in the DPR</li>
+          <p>-</p>
+          <li id="UDP_CSR__RX_DATA_BK0"><strong>RX_DATA_BK0</strong>: Receive Data Bank 0</li>
+          <p>-</p>
+          <li id="UDP_CSR__RXSETUP"><strong>RXSETUP</strong>: Received Setup</li>
+          <p>-</p>
+          <li id="UDP_CSR__STALLSENT"><strong>STALLSENT</strong>: Stall Sent (Control, Bulk Interrupt Endpoints)/ISOERROR (Isochronous Endpoints)</li>
+          <p>-</p>
+          <li id="UDP_CSR__ISOERROR"><strong>ISOERROR</strong>: Stall Sent (Control, Bulk Interrupt Endpoints)/ISOERROR (Isochronous Endpoints)</li>
+          <p>-</p>
+          <li id="UDP_CSR__TXPKTRDY"><strong>TXPKTRDY</strong>: Transmit Packet Ready</li>
+          <p>-</p>
+          <li id="UDP_CSR__FORCESTALL"><strong>FORCESTALL</strong>: Force Stall (used by Control, Bulk and Isochronous Endpoints)</li>
+          <p>-</p>
+          <li id="UDP_CSR__RX_DATA_BK1"><strong>RX_DATA_BK1</strong>: Receive Data Bank 1 (only used by endpoints with ping-pong attributes)</li>
+          <p>-</p>
+          <li id="UDP_CSR__DIR"><strong>DIR</strong>: Transfer Direction (only available for control endpoints)<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Allows Data OUT transactions in the control data stage.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enables Data IN transactions in the control data stage.</td></tr></tbody></table></li>
+          <li id="UDP_CSR__EPTYPE"><strong>EPTYPE</strong>: Endpoint Type<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">CTRL</td><td class="description">Control</td></tr><tr class="even"><td class="value">0x1</td><td class="name">ISO_OUT</td><td class="description">Isochronous OUT</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">BULK_OUT</td><td class="description">Bulk OUT</td></tr><tr class="even"><td class="value">0x3</td><td class="name">INT_OUT</td><td class="description">Interrupt OUT</td></tr><tr class="odd"><td class="value">0x5</td><td class="name">ISO_IN</td><td class="description">Isochronous IN</td></tr><tr class="even"><td class="value">0x6</td><td class="name">BULK_IN</td><td class="description">Bulk IN</td></tr><tr class="odd"><td class="value">0x7</td><td class="name">INT_IN</td><td class="description">Interrupt IN</td></tr></tbody></table></li>
+          <li id="UDP_CSR__DTGLE"><strong>DTGLE</strong>: Data Toggle<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Identifies DATA0 packet.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Identifies DATA1 packet.</td></tr></tbody></table></li>
+          <li id="UDP_CSR__EPEDS"><strong>EPEDS</strong>: Endpoint Enable Disable</li>
+          <p>-</p>
+          <li id="UDP_CSR__RXBYTECNT"><strong>RXBYTECNT</strong>: Number of Bytes Available in the FIFO</li>
+          <p>-</p>
+        </ul>
+        <h4 id="UDP_FDR">UDP Endpoint FIFO Data Register</h4>
+        <p><strong>Name</strong>: UDP_FDR[0:7]</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x40034050</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#UDP_FDR__FIFO_DATA" title="FIFO Data Value">FIFO_DATA</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="UDP_FDR__FIFO_DATA"><strong>FIFO_DATA</strong>: FIFO Data Value</li>
+          <p>-</p>
+        </ul>
+        <h4 id="UDP_TXVC">UDP Transceiver Control Register</h4>
+        <p><strong>Name</strong>: UDP_TXVC</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x40034074</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#UDP_TXVC__PUON" title="Pullup On">PUON</a>
+              </td>
+              <td colspan="1">
+                <a href="#UDP_TXVC__TXVDIS" title="Transceiver Disable">TXVDIS</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="UDP_TXVC__TXVDIS"><strong>TXVDIS</strong>: Transceiver Disable</li>
+          <p>-</p>
+          <li id="UDP_TXVC__PUON"><strong>PUON</strong>: Pullup On<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The 1.5KW integrated pullup on DDP is disconnected.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The 1.5 KW integrated pullup on DDP is connected.</td></tr></tbody></table></li>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>

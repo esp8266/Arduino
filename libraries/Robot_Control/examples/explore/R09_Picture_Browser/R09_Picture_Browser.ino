@@ -1,25 +1,25 @@
 /* Picture Browser
 
- You can make your own gallery/picture show with the 
- Robot. Put some pictures on the SD card, start the 
- sketch, they will diplay on the screen. 
- 
- Use the left/right buttons to navigate through the 
- previous and next images. 
- 
- Press up or down to enter a mode where you change 
+ You can make your own gallery/picture show with the
+ Robot. Put some pictures on the SD card, start the
+ sketch, they will diplay on the screen.
+
+ Use the left/right buttons to navigate through the
+ previous and next images.
+
+ Press up or down to enter a mode where you change
  the pictures by rotating the robot.
- 
- You can add your own pictures onto the SD card, and 
+
+ You can add your own pictures onto the SD card, and
  view them in the Robot's gallery!
 
- Pictures must be uncompressed BMP, 24-bit color depth, 
+ Pictures must be uncompressed BMP, 24-bit color depth,
  160 pixels wide, and 128 pixels tall.
- 
- They should be named as "picN.bmp". Replace 'N' with a 
+
+ They should be named as "picN.bmp". Replace 'N' with a
  number between 0 and 9.
 
- The current code only supports 10 pictures. How would you 
+ The current code only supports 10 pictures. How would you
  improve it to handle more?
 
  Circuit:
@@ -29,7 +29,7 @@
  by X. Yang
  modified 12 May 2013
  by D. Cuartielles
- 
+
  This example is in the public domain
  */
 
@@ -51,14 +51,14 @@ int mode = 0;  // Current mode
 char modeNames[][9] = { "keyboard", "tilt    " };
 
 void setup() {
-  // initialize the Robot, SD card, display, and speaker 
+  // initialize the Robot, SD card, display, and speaker
   Robot.beginSD();
   Robot.beginTFT();
   Robot.begin();
-  
-  // draw "lg0.bmp" and "lg1.bmp" on the screen  
+
+  // draw "lg0.bmp" and "lg1.bmp" on the screen
   Robot.displayLogos();
-  
+
   // draw init3.bmp from the SD card on the screen
   Robot.drawBMP("init3.bmp", 0, 0);
 
@@ -73,10 +73,10 @@ void setup() {
 }
 
 void loop() {
-  buffer[3] = '0'+i;// change filename of the img to be displayed
+  buffer[3] = '0' + i; // change filename of the img to be displayed
   Robot.drawBMP(buffer, 0, 0); // draw the file on the screen
   // change control modes
-  switch(mode) { 
+  switch (mode) {
     case CONTROL_MODE_COMPASS:
       compassControl(3);
       break;
@@ -89,15 +89,15 @@ void loop() {
 
 void keyboardControl() {
   //Use buttons to control the gallery
-  while(true) {
+  while (true) {
     int keyPressed = Robot.keyboardRead(); // read the button values
-    switch(keyPressed) {
+    switch (keyPressed) {
       case BUTTON_LEFT:  // display previous picture
-        if(--i < 1) i = NUM_PICS;
+        if (--i < 1) i = NUM_PICS;
         return;
       case BUTTON_MIDDLE:  // do nothing
       case BUTTON_RIGHT:  // display next picture
-        if(++i > NUM_PICS) i = 1;
+        if (++i > NUM_PICS) i = 1;
         return;
       case BUTTON_UP:  // change mode
         changeMode(-1);
@@ -112,23 +112,23 @@ void keyboardControl() {
 // if controlling by the compass
 void compassControl(int change) {
   // Rotate the robot to change the pictures
-  while(true) {
+  while (true) {
     // read the value of the compass
     int oldV = Robot.compassRead();
-    
+
     //get the change of angle
-    int diff = Robot.compassRead()-oldV;
-    if(diff > 180) diff -= 360;
-    else if(diff < -180) diff += 360;
-    
-    if(abs(diff) > change) {
-      if(++i > NUM_PICS) i = 1;
+    int diff = Robot.compassRead() - oldV;
+    if (diff > 180) diff -= 360;
+    else if (diff < -180) diff += 360;
+
+    if (abs(diff) > change) {
+      if (++i > NUM_PICS) i = 1;
       return;
     }
-    
+
     // chage modes, if buttons are pressed
     int keyPressed = Robot.keyboardRead();
-    switch(keyPressed) {
+    switch (keyPressed) {
       case BUTTON_UP:
         changeMode(-1);
         return;
@@ -144,13 +144,13 @@ void compassControl(int change) {
 void changeMode(int changeDir) {
   // alternate modes
   mode += changeDir;
-  if(mode < 0) { 
+  if (mode < 0) {
     mode = 1;
-  } else if(mode > 1)
-    mode=0;
-    
-  // display  the mode on screen  
-  Robot.fill(255, 255, 255);  
+  } else if (mode > 1)
+    mode = 0;
+
+  // display  the mode on screen
+  Robot.fill(255, 255, 255);
   Robot.stroke(255, 255, 255);
   Robot.rect(0, 0, 128, 12);
   Robot.stroke(0, 0, 0);

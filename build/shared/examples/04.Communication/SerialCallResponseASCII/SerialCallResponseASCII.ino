@@ -1,31 +1,31 @@
 /*
   Serial Call and Response in ASCII
  Language: Wiring/Arduino
- 
+
  This program sends an ASCII A (byte of value 65) on startup
  and repeats that until it gets some data in.
- Then it waits for a byte in the serial port, and 
- sends three ASCII-encoded, comma-separated sensor values, 
- truncated by a linefeed and carriage return, 
+ Then it waits for a byte in the serial port, and
+ sends three ASCII-encoded, comma-separated sensor values,
+ truncated by a linefeed and carriage return,
  whenever it gets a byte in.
- 
+
  Thanks to Greg Shakar and Scott Fitzgerald for the improvements
- 
+
   The circuit:
- * potentiometers attached to analog inputs 0 and 1 
+ * potentiometers attached to analog inputs 0 and 1
  * pushbutton attached to digital I/O 2
- 
- 
- 
+
+
+
  Created 26 Sept. 2005
  by Tom Igoe
  modified 24 Apr 2012
  by Tom Igoe and Scott Fitzgerald
- 
+
  This example code is in the public domain.
- 
+
  http://www.arduino.cc/en/Tutorial/SerialCallResponseASCII
- 
+
  */
 
 int firstSensor = 0;    // first analog sensor
@@ -41,9 +41,9 @@ void setup()
     ; // wait for serial port to connect. Needed for Leonardo only
   }
 
-  
+
   pinMode(2, INPUT);   // digital sensor is on digital pin 2
-  establishContact();  // send a byte to establish contact until receiver responds 
+  establishContact();  // send a byte to establish contact until receiver responds
 }
 
 void loop()
@@ -57,13 +57,13 @@ void loop()
     // read second analog input:
     secondSensor = analogRead(A1);
     // read  switch, map it to 0 or 255L
-    thirdSensor = map(digitalRead(2), 0, 1, 0, 255);  
+    thirdSensor = map(digitalRead(2), 0, 1, 0, 255);
     // send sensor values:
     Serial.print(firstSensor);
     Serial.print(",");
     Serial.print(secondSensor);
     Serial.print(",");
-    Serial.println(thirdSensor);               
+    Serial.println(thirdSensor);
   }
 }
 
@@ -102,7 +102,7 @@ void setup() {
 
   // read bytes into a buffer until you get a linefeed (ASCII 10):
   myPort.bufferUntil('\n');
-  
+
   // draw with smooth edges:
   smooth();
 }
@@ -115,22 +115,22 @@ void draw() {
 }
 
 // serialEvent  method is run automatically by the Processing applet
-// whenever the buffer reaches the  byte value set in the bufferUntil() 
+// whenever the buffer reaches the  byte value set in the bufferUntil()
 // method in the setup():
 
-void serialEvent(Serial myPort) { 
+void serialEvent(Serial myPort) {
   // read the serial buffer:
   String myString = myPort.readStringUntil('\n');
   // if you got any bytes other than the linefeed:
     myString = trim(myString);
- 
+
     // split the string at the commas
     // and convert the sections into integers:
     int sensors[] = int(split(myString, ','));
 
     // print out the values you got:
     for (int sensorNum = 0; sensorNum < sensors.length; sensorNum++) {
-      print("Sensor " + sensorNum + ": " + sensors[sensorNum] + "\t"); 
+      print("Sensor " + sensorNum + ": " + sensors[sensorNum] + "\t");
     }
     // add a linefeed after all the sensor values are printed:
     println();

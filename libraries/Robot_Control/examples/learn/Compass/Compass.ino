@@ -1,17 +1,17 @@
 /*
  Compass
- 
+
  Try the compass both on the robot's TFT
  and through the serial port.
- 
+
  Circuit:
  * Arduino Robot
- 
+
  created 1 May 2013
  by X. Yang
  modified 12 May 2013
  by D. Cuartielles
- 
+
  This example is in the public domain
  */
 
@@ -35,8 +35,8 @@ void loop() {
   int compass = Robot.compassRead();
 
   // print out the sensor's value
-  Serial.println(compass);  
-  
+  Serial.println(compass);
+
   // show the value on the robot's screen
   Robot.drawCompass(compass);
 }

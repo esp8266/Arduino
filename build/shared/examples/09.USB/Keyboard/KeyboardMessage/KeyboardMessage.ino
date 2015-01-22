@@ -4,7 +4,7 @@
  For the Arduino Leonardo and Micro.
  
  Sends a text string when a button is pressed.
- 
+
  The circuit:
  * pushbutton attached from pin 4 to +5V
  * 10-kilohm resistor attached from pin 4 to ground
@@ -34,18 +34,18 @@ void setup() {
 void loop() {
   // read the pushbutton:
   int buttonState = digitalRead(buttonPin);
-  // if the button state has changed, 
-  if ((buttonState != previousButtonState) 
-    // and it's currently pressed:
-  && (buttonState == HIGH)) {
+  // if the button state has changed,
+  if ((buttonState != previousButtonState)
+      // and it's currently pressed:
+      && (buttonState == HIGH)) {
     // increment the button counter
     counter++;
     // type out a message
     Keyboard.print("You pressed the button ");
-    Keyboard.print(counter); 
+    Keyboard.print(counter);
     Keyboard.println(" times.");
   }
   // save the current button state for comparison next time:
-  previousButtonState = buttonState; 
+  previousButtonState = buttonState;
 }
 

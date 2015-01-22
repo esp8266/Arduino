@@ -1,0 +1,4591 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>SAM3XA EMAC</title>
+    <link rel="stylesheet" type="text/css" href="css/html.css" media="all" />
+  </head>
+  <body id="abstract">
+    <div id="container">
+      <div id="content">
+        <a id="EMAC"></a>
+        <h1>SAM3XA EMAC</h1>
+        <a id="EMAC__User_Interface"></a>
+        <h2>Ethernet MAC 10/100 (EMAC) User Interface</h2>
+<!--As per 6119I programmer datasheet.-->
+        <h3>Registers</h3>
+        <table class="registers">
+          <caption>Register Mapping</caption>
+          <thead>
+            <tr>
+              <th class="address">Address</th>
+              <th class="description">Register</th>
+              <th class="name">Name</th>
+              <th class="access">Access</th>
+              <th class="reset">Reset</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="odd">
+              <td class="address" id="address_0x400B0000">0x400B0000</td>
+              <td class="description">Network Control Register</td>
+              <td class="name">
+                <a href="#EMAC_NCR" title="Network Control Register" class="one_click_away">EMAC_NCR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400B0004">0x400B0004</td>
+              <td class="description">Network Configuration Register</td>
+              <td class="name">
+                <a href="#EMAC_NCFGR" title="Network Configuration Register" class="one_click_away">EMAC_NCFGR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000800</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400B0008">0x400B0008</td>
+              <td class="description">Network Status Register</td>
+              <td class="name">
+                <a href="#EMAC_NSR" title="Network Status Register" class="one_click_away">EMAC_NSR</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400B0014">0x400B0014</td>
+              <td class="description">Transmit Status Register</td>
+              <td class="name">
+                <a href="#EMAC_TSR" title="Transmit Status Register" class="one_click_away">EMAC_TSR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400B0018">0x400B0018</td>
+              <td class="description">Receive Buffer Queue Pointer Register</td>
+              <td class="name">
+                <a href="#EMAC_RBQP" title="Receive Buffer Queue Pointer Register" class="one_click_away">EMAC_RBQP</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400B001C">0x400B001C</td>
+              <td class="description">Transmit Buffer Queue Pointer Register</td>
+              <td class="name">
+                <a href="#EMAC_TBQP" title="Transmit Buffer Queue Pointer Register" class="one_click_away">EMAC_TBQP</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400B0020">0x400B0020</td>
+              <td class="description">Receive Status Register</td>
+              <td class="name">
+                <a href="#EMAC_RSR" title="Receive Status Register" class="one_click_away">EMAC_RSR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400B0024">0x400B0024</td>
+              <td class="description">Interrupt Status Register</td>
+              <td class="name">
+                <a href="#EMAC_ISR" title="Interrupt Status Register" class="one_click_away">EMAC_ISR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400B0028">0x400B0028</td>
+              <td class="description">Interrupt Enable Register</td>
+              <td class="name">
+                <a href="#EMAC_IER" title="Interrupt Enable Register" class="one_click_away">EMAC_IER</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400B002C">0x400B002C</td>
+              <td class="description">Interrupt Disable Register</td>
+              <td class="name">
+                <a href="#EMAC_IDR" title="Interrupt Disable Register" class="one_click_away">EMAC_IDR</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400B0030">0x400B0030</td>
+              <td class="description">Interrupt Mask Register</td>
+              <td class="name">
+                <a href="#EMAC_IMR" title="Interrupt Mask Register" class="one_click_away">EMAC_IMR</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x00003FFF</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400B0034">0x400B0034</td>
+              <td class="description">Phy Maintenance Register</td>
+              <td class="name">
+                <a href="#EMAC_MAN" title="Phy Maintenance Register" class="one_click_away">EMAC_MAN</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400B0038">0x400B0038</td>
+              <td class="description">Pause Time Register</td>
+              <td class="name">
+                <a href="#EMAC_PTR" title="Pause Time Register" class="one_click_away">EMAC_PTR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400B003C">0x400B003C</td>
+              <td class="description">Pause Frames Received Register</td>
+              <td class="name">
+                <a href="#EMAC_PFR" title="Pause Frames Received Register" class="one_click_away">EMAC_PFR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400B0040">0x400B0040</td>
+              <td class="description">Frames Transmitted Ok Register</td>
+              <td class="name">
+                <a href="#EMAC_FTO" title="Frames Transmitted Ok Register" class="one_click_away">EMAC_FTO</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400B0044">0x400B0044</td>
+              <td class="description">Single Collision Frames Register</td>
+              <td class="name">
+                <a href="#EMAC_SCF" title="Single Collision Frames Register" class="one_click_away">EMAC_SCF</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400B0048">0x400B0048</td>
+              <td class="description">Multiple Collision Frames Register</td>
+              <td class="name">
+                <a href="#EMAC_MCF" title="Multiple Collision Frames Register" class="one_click_away">EMAC_MCF</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400B004C">0x400B004C</td>
+              <td class="description">Frames Received Ok Register</td>
+              <td class="name">
+                <a href="#EMAC_FRO" title="Frames Received Ok Register" class="one_click_away">EMAC_FRO</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400B0050">0x400B0050</td>
+              <td class="description">Frame Check Sequence Errors Register</td>
+              <td class="name">
+                <a href="#EMAC_FCSE" title="Frame Check Sequence Errors Register" class="one_click_away">EMAC_FCSE</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400B0054">0x400B0054</td>
+              <td class="description">Alignment Errors Register</td>
+              <td class="name">
+                <a href="#EMAC_ALE" title="Alignment Errors Register" class="one_click_away">EMAC_ALE</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400B0058">0x400B0058</td>
+              <td class="description">Deferred Transmission Frames Register</td>
+              <td class="name">
+                <a href="#EMAC_DTF" title="Deferred Transmission Frames Register" class="one_click_away">EMAC_DTF</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400B005C">0x400B005C</td>
+              <td class="description">Late Collisions Register</td>
+              <td class="name">
+                <a href="#EMAC_LCOL" title="Late Collisions Register" class="one_click_away">EMAC_LCOL</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400B0060">0x400B0060</td>
+              <td class="description">Excessive Collisions Register</td>
+              <td class="name">
+                <a href="#EMAC_ECOL" title="Excessive Collisions Register" class="one_click_away">EMAC_ECOL</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400B0064">0x400B0064</td>
+              <td class="description">Transmit Underrun Errors Register</td>
+              <td class="name">
+                <a href="#EMAC_TUND" title="Transmit Underrun Errors Register" class="one_click_away">EMAC_TUND</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400B0068">0x400B0068</td>
+              <td class="description">Carrier Sense Errors Register</td>
+              <td class="name">
+                <a href="#EMAC_CSE" title="Carrier Sense Errors Register" class="one_click_away">EMAC_CSE</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400B006C">0x400B006C</td>
+              <td class="description">Receive Resource Errors Register</td>
+              <td class="name">
+                <a href="#EMAC_RRE" title="Receive Resource Errors Register" class="one_click_away">EMAC_RRE</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400B0070">0x400B0070</td>
+              <td class="description">Receive Overrun Errors Register</td>
+              <td class="name">
+                <a href="#EMAC_ROV" title="Receive Overrun Errors Register" class="one_click_away">EMAC_ROV</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400B0074">0x400B0074</td>
+              <td class="description">Receive Symbol Errors Register</td>
+              <td class="name">
+                <a href="#EMAC_RSE" title="Receive Symbol Errors Register" class="one_click_away">EMAC_RSE</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400B0078">0x400B0078</td>
+              <td class="description">Excessive Length Errors Register</td>
+              <td class="name">
+                <a href="#EMAC_ELE" title="Excessive Length Errors Register" class="one_click_away">EMAC_ELE</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400B007C">0x400B007C</td>
+              <td class="description">Receive Jabbers Register</td>
+              <td class="name">
+                <a href="#EMAC_RJA" title="Receive Jabbers Register" class="one_click_away">EMAC_RJA</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400B0080">0x400B0080</td>
+              <td class="description">Undersize Frames Register</td>
+              <td class="name">
+                <a href="#EMAC_USF" title="Undersize Frames Register" class="one_click_away">EMAC_USF</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400B0084">0x400B0084</td>
+              <td class="description">SQE Test Errors Register</td>
+              <td class="name">
+                <a href="#EMAC_STE" title="SQE Test Errors Register" class="one_click_away">EMAC_STE</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400B0088">0x400B0088</td>
+              <td class="description">Received Length Field Mismatch Register</td>
+              <td class="name">
+                <a href="#EMAC_RLE" title="Received Length Field Mismatch Register" class="one_click_away">EMAC_RLE</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400B0090">0x400B0090</td>
+              <td class="description">Hash Register Bottom [31:0] Register</td>
+              <td class="name">
+                <a href="#EMAC_HRB" title="Hash Register Bottom [31:0] Register" class="one_click_away">EMAC_HRB</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400B0094">0x400B0094</td>
+              <td class="description">Hash Register Top [63:32] Register</td>
+              <td class="name">
+                <a href="#EMAC_HRT" title="Hash Register Top [63:32] Register" class="one_click_away">EMAC_HRT</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400B0098">0x400B0098</td>
+              <td class="description">Specific Address 1 Bottom Register</td>
+              <td class="name">
+                <a href="#EMAC_SA1B" title="Specific Address 1 Bottom Register" class="one_click_away">EMAC_SA1B</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400B009C">0x400B009C</td>
+              <td class="description">Specific Address 1 Top Register</td>
+              <td class="name">
+                <a href="#EMAC_SA1T" title="Specific Address 1 Top Register" class="one_click_away">EMAC_SA1T</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400B00A0">0x400B00A0</td>
+              <td class="description">Specific Address 2 Bottom Register</td>
+              <td class="name">
+                <a href="#EMAC_SA2B" title="Specific Address 2 Bottom Register" class="one_click_away">EMAC_SA2B</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400B00A4">0x400B00A4</td>
+              <td class="description">Specific Address 2 Top Register</td>
+              <td class="name">
+                <a href="#EMAC_SA2T" title="Specific Address 2 Top Register" class="one_click_away">EMAC_SA2T</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400B00A8">0x400B00A8</td>
+              <td class="description">Specific Address 3 Bottom Register</td>
+              <td class="name">
+                <a href="#EMAC_SA3B" title="Specific Address 3 Bottom Register" class="one_click_away">EMAC_SA3B</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400B00AC">0x400B00AC</td>
+              <td class="description">Specific Address 3 Top Register</td>
+              <td class="name">
+                <a href="#EMAC_SA3T" title="Specific Address 3 Top Register" class="one_click_away">EMAC_SA3T</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400B00B0">0x400B00B0</td>
+              <td class="description">Specific Address 4 Bottom Register</td>
+              <td class="name">
+                <a href="#EMAC_SA4B" title="Specific Address 4 Bottom Register" class="one_click_away">EMAC_SA4B</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400B00B4">0x400B00B4</td>
+              <td class="description">Specific Address 4 Top Register</td>
+              <td class="name">
+                <a href="#EMAC_SA4T" title="Specific Address 4 Top Register" class="one_click_away">EMAC_SA4T</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400B00B8">0x400B00B8</td>
+              <td class="description">Type ID Checking Register</td>
+              <td class="name">
+                <a href="#EMAC_TID" title="Type ID Checking Register" class="one_click_away">EMAC_TID</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400B00C0">0x400B00C0</td>
+              <td class="description">User Input/Output Register</td>
+              <td class="name">
+                <a href="#EMAC_USRIO" title="User Input/Output Register" class="one_click_away">EMAC_USRIO</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3>Register Fields</h3>
+        <h4 id="EMAC_NCR">EMAC Network Control Register</h4>
+        <p><strong>Name</strong>: EMAC_NCR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B0000</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#EMAC_NCR__THALT" title="Transmit halt">THALT</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_NCR__TSTART" title="Start transmission">TSTART</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_NCR__BP" title="Back pressure">BP</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#EMAC_NCR__WESTAT" title="Write enable for statistics registers">WESTAT</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_NCR__INCSTAT" title="Increment statistics registers">INCSTAT</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_NCR__CLRSTAT" title="Clear statistics registers">CLRSTAT</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_NCR__MPE" title="Management port enable">MPE</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_NCR__TE" title="Transmit enable">TE</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_NCR__RE" title="Receive enable">RE</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_NCR__LLB" title="Loopback local">LLB</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_NCR__LB" title="LoopBack">LB</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_NCR__LB"><strong>LB</strong>: LoopBack</li>
+          <p>-</p>
+          <li id="EMAC_NCR__LLB"><strong>LLB</strong>: Loopback local</li>
+          <p>-</p>
+          <li id="EMAC_NCR__RE"><strong>RE</strong>: Receive enable</li>
+          <p>-</p>
+          <li id="EMAC_NCR__TE"><strong>TE</strong>: Transmit enable</li>
+          <p>-</p>
+          <li id="EMAC_NCR__MPE"><strong>MPE</strong>: Management port enable</li>
+          <p>-</p>
+          <li id="EMAC_NCR__CLRSTAT"><strong>CLRSTAT</strong>: Clear statistics registers</li>
+          <p>-</p>
+          <li id="EMAC_NCR__INCSTAT"><strong>INCSTAT</strong>: Increment statistics registers</li>
+          <p>-</p>
+          <li id="EMAC_NCR__WESTAT"><strong>WESTAT</strong>: Write enable for statistics registers</li>
+          <p>-</p>
+          <li id="EMAC_NCR__BP"><strong>BP</strong>: Back pressure</li>
+          <p>-</p>
+          <li id="EMAC_NCR__TSTART"><strong>TSTART</strong>: Start transmission</li>
+          <p>-</p>
+          <li id="EMAC_NCR__THALT"><strong>THALT</strong>: Transmit halt</li>
+          <p>-</p>
+        </ul>
+        <h4 id="EMAC_NCFGR">EMAC Network Configuration Register</h4>
+        <p><strong>Name</strong>: EMAC_NCFGR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B0004</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#EMAC_NCFGR__IRXFCS" title="Ignore RX FCS">IRXFCS</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_NCFGR__EFRHD" title="">EFRHD</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_NCFGR__DRFCS" title="Discard Receive FCS">DRFCS</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_NCFGR__RLCE" title="Receive Length field Checking Enable">RLCE</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="2">
+                <a href="#EMAC_NCFGR__RBOF" title="Receive Buffer Offset">RBOF</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_NCFGR__PAE" title="Pause Enable">PAE</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_NCFGR__RTY" title="Retry test">RTY</a>
+              </td>
+              <td colspan="2">
+                <a href="#EMAC_NCFGR__CLK" title="MDC clock divider">CLK</a>
+              </td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#EMAC_NCFGR__BIG" title="Receive 1536 bytes frames">BIG</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#EMAC_NCFGR__UNI" title="Unicast Hash Enable">UNI</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_NCFGR__MTI" title="Multicast Hash Enable">MTI</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_NCFGR__NBC" title="No Broadcast">NBC</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_NCFGR__CAF" title="Copy All Frames">CAF</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_NCFGR__JFRAME" title="Jumbo Frames">JFRAME</a>
+              </td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#EMAC_NCFGR__FD" title="Full Duplex">FD</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_NCFGR__SPD" title="Speed">SPD</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_NCFGR__SPD"><strong>SPD</strong>: Speed</li>
+          <p>-</p>
+          <li id="EMAC_NCFGR__FD"><strong>FD</strong>: Full Duplex</li>
+          <p>-</p>
+          <li id="EMAC_NCFGR__JFRAME"><strong>JFRAME</strong>: Jumbo Frames</li>
+          <p>-</p>
+          <li id="EMAC_NCFGR__CAF"><strong>CAF</strong>: Copy All Frames</li>
+          <p>-</p>
+          <li id="EMAC_NCFGR__NBC"><strong>NBC</strong>: No Broadcast</li>
+          <p>-</p>
+          <li id="EMAC_NCFGR__MTI"><strong>MTI</strong>: Multicast Hash Enable</li>
+          <p>-</p>
+          <li id="EMAC_NCFGR__UNI"><strong>UNI</strong>: Unicast Hash Enable</li>
+          <p>-</p>
+          <li id="EMAC_NCFGR__BIG"><strong>BIG</strong>: Receive 1536 bytes frames</li>
+          <p>-</p>
+          <li id="EMAC_NCFGR__CLK"><strong>CLK</strong>: MDC clock divider<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">MCK_8</td><td class="description">MCK divided by 8 (MCK up to 20 MHz).</td></tr><tr class="even"><td class="value">0x1</td><td class="name">MCK_16</td><td class="description">MCK divided by 16 (MCK up to 40 MHz).</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">MCK_32</td><td class="description">MCK divided by 32 (MCK up to 80 MHz).</td></tr><tr class="even"><td class="value">0x3</td><td class="name">MCK_64</td><td class="description">MCK divided by 64 (MCK up to 160 MHz).</td></tr></tbody></table></li>
+          <li id="EMAC_NCFGR__RTY"><strong>RTY</strong>: Retry test</li>
+          <p>-</p>
+          <li id="EMAC_NCFGR__PAE"><strong>PAE</strong>: Pause Enable</li>
+          <p>-</p>
+          <li id="EMAC_NCFGR__RBOF"><strong>RBOF</strong>: Receive Buffer Offset<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">OFFSET_0</td><td class="description">No offset from start of receive buffer.</td></tr><tr class="even"><td class="value">0x1</td><td class="name">OFFSET_1</td><td class="description">One-byte offset from start of receive buffer.</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">OFFSET_2</td><td class="description">Two-byte offset from start of receive buffer.</td></tr><tr class="even"><td class="value">0x3</td><td class="name">OFFSET_3</td><td class="description">Three-byte offset from start of receive buffer.</td></tr></tbody></table></li>
+          <li id="EMAC_NCFGR__RLCE"><strong>RLCE</strong>: Receive Length field Checking Enable</li>
+          <p>-</p>
+          <li id="EMAC_NCFGR__DRFCS"><strong>DRFCS</strong>: Discard Receive FCS</li>
+          <p>-</p>
+          <li id="EMAC_NCFGR__EFRHD">
+            <strong>EFRHD</strong>
+          </li>
+          <p>-</p>
+          <li id="EMAC_NCFGR__IRXFCS"><strong>IRXFCS</strong>: Ignore RX FCS</li>
+          <p>-</p>
+        </ul>
+        <h4 id="EMAC_NSR">EMAC Network Status Register</h4>
+        <p><strong>Name</strong>: EMAC_NSR</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x400B0008</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#EMAC_NSR__IDLE" title="">IDLE</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_NSR__MDIO" title="">MDIO</a>
+              </td>
+              <td>-</td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_NSR__MDIO">
+            <strong>MDIO</strong>
+          </li>
+          <p>-</p>
+          <li id="EMAC_NSR__IDLE">
+            <strong>IDLE</strong>
+            <table class="values">
+              <thead>
+                <tr>
+                  <th>Value</th>
+                  <th>Name</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="odd">
+                  <td class="value">0</td>
+                  <td class="name">-</td>
+                  <td class="description">The PHY logic is running.</td>
+                </tr>
+                <tr class="even">
+                  <td class="value">1</td>
+                  <td class="name">-</td>
+                  <td class="description">The PHY management logic is idle (i.e., has completed).</td>
+                </tr>
+              </tbody>
+            </table>
+          </li>
+        </ul>
+        <h4 id="EMAC_TSR">EMAC Transmit Status Register</h4>
+        <p><strong>Name</strong>: EMAC_TSR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B0014</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td colspan="1">
+                <a href="#EMAC_TSR__UND" title="Transmit Underrun">UND</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_TSR__COMP" title="Transmit Complete">COMP</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_TSR__BEX" title="Buffers exhausted mid frame">BEX</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_TSR__TGO" title="Transmit Go">TGO</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_TSR__RLES" title="Retry Limit exceeded">RLES</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_TSR__COL" title="Collision Occurred">COL</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_TSR__UBR" title="Used Bit Read">UBR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_TSR__UBR"><strong>UBR</strong>: Used Bit Read</li>
+          <p>-</p>
+          <li id="EMAC_TSR__COL"><strong>COL</strong>: Collision Occurred</li>
+          <p>-</p>
+          <li id="EMAC_TSR__RLES"><strong>RLES</strong>: Retry Limit exceeded</li>
+          <p>-</p>
+          <li id="EMAC_TSR__TGO"><strong>TGO</strong>: Transmit Go</li>
+          <p>-</p>
+          <li id="EMAC_TSR__BEX"><strong>BEX</strong>: Buffers exhausted mid frame</li>
+          <p>-</p>
+          <li id="EMAC_TSR__COMP"><strong>COMP</strong>: Transmit Complete</li>
+          <p>-</p>
+          <li id="EMAC_TSR__UND"><strong>UND</strong>: Transmit Underrun</li>
+          <p>-</p>
+        </ul>
+        <h4 id="EMAC_RBQP">EMAC Receive Buffer Queue Pointer Register</h4>
+        <p><strong>Name</strong>: EMAC_RBQP</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B0018</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_RBQP__ADDR" title="Receive buffer queue pointer address">ADDR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_RBQP__ADDR" title="Receive buffer queue pointer address">ADDR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_RBQP__ADDR" title="Receive buffer queue pointer address">ADDR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="6">
+                <a href="#EMAC_RBQP__ADDR" title="Receive buffer queue pointer address">ADDR</a>
+              </td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_RBQP__ADDR"><strong>ADDR</strong>: Receive buffer queue pointer address</li>
+          <p>-</p>
+        </ul>
+        <h4 id="EMAC_TBQP">EMAC Transmit Buffer Queue Pointer Register</h4>
+        <p><strong>Name</strong>: EMAC_TBQP</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B001C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_TBQP__ADDR" title="Transmit buffer queue pointer address">ADDR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_TBQP__ADDR" title="Transmit buffer queue pointer address">ADDR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_TBQP__ADDR" title="Transmit buffer queue pointer address">ADDR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="6">
+                <a href="#EMAC_TBQP__ADDR" title="Transmit buffer queue pointer address">ADDR</a>
+              </td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_TBQP__ADDR"><strong>ADDR</strong>: Transmit buffer queue pointer address</li>
+          <p>-</p>
+        </ul>
+        <h4 id="EMAC_RSR">EMAC Receive Status Register</h4>
+        <p><strong>Name</strong>: EMAC_RSR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B0020</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#EMAC_RSR__OVR" title="Receive Overrun">OVR</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_RSR__REC" title="Frame Received">REC</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_RSR__BNA" title="Buffer Not Available">BNA</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_RSR__BNA"><strong>BNA</strong>: Buffer Not Available</li>
+          <p>-</p>
+          <li id="EMAC_RSR__REC"><strong>REC</strong>: Frame Received</li>
+          <p>-</p>
+          <li id="EMAC_RSR__OVR"><strong>OVR</strong>: Receive Overrun</li>
+          <p>-</p>
+        </ul>
+        <h4 id="EMAC_ISR">EMAC Interrupt Status Register</h4>
+        <p><strong>Name</strong>: EMAC_ISR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B0024</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#EMAC_ISR__PTZ" title="Pause Time Zero">PTZ</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_ISR__PFRE" title="Pause Frame Received">PFRE</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_ISR__HRESP" title="Hresp not OK">HRESP</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_ISR__ROVR" title="Receive Overrun">ROVR</a>
+              </td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#EMAC_ISR__TCOMP" title="Transmit Complete">TCOMP</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_ISR__TXERR" title="Transmit Error">TXERR</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_ISR__RLEX" title="Retry Limit Exceeded">RLEX</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_ISR__TUND" title="Ethernet Transmit Buffer Underrun">TUND</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_ISR__TXUBR" title="Transmit Used Bit Read">TXUBR</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_ISR__RXUBR" title="Receive Used Bit Read">RXUBR</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_ISR__RCOMP" title="Receive Complete">RCOMP</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_ISR__MFD" title="Management Frame Done">MFD</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_ISR__MFD"><strong>MFD</strong>: Management Frame Done</li>
+          <p>-</p>
+          <li id="EMAC_ISR__RCOMP"><strong>RCOMP</strong>: Receive Complete</li>
+          <p>-</p>
+          <li id="EMAC_ISR__RXUBR"><strong>RXUBR</strong>: Receive Used Bit Read</li>
+          <p>-</p>
+          <li id="EMAC_ISR__TXUBR"><strong>TXUBR</strong>: Transmit Used Bit Read</li>
+          <p>-</p>
+          <li id="EMAC_ISR__TUND"><strong>TUND</strong>: Ethernet Transmit Buffer Underrun</li>
+          <p>-</p>
+          <li id="EMAC_ISR__RLEX"><strong>RLEX</strong>: Retry Limit Exceeded</li>
+          <p>-</p>
+          <li id="EMAC_ISR__TXERR"><strong>TXERR</strong>: Transmit Error</li>
+          <p>-</p>
+          <li id="EMAC_ISR__TCOMP"><strong>TCOMP</strong>: Transmit Complete</li>
+          <p>-</p>
+          <li id="EMAC_ISR__ROVR"><strong>ROVR</strong>: Receive Overrun</li>
+          <p>-</p>
+          <li id="EMAC_ISR__HRESP"><strong>HRESP</strong>: Hresp not OK</li>
+          <p>-</p>
+          <li id="EMAC_ISR__PFRE"><strong>PFRE</strong>: Pause Frame Received</li>
+          <p>-</p>
+          <li id="EMAC_ISR__PTZ"><strong>PTZ</strong>: Pause Time Zero</li>
+          <p>-</p>
+        </ul>
+        <h4 id="EMAC_IER">EMAC Interrupt Enable Register</h4>
+        <p><strong>Name</strong>: EMAC_IER</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x400B0028</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#EMAC_IER__PTZ" title="Pause Time Zero">PTZ</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_IER__PFR" title="Pause Frame Received">PFR</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_IER__HRESP" title="Hresp not OK">HRESP</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_IER__ROVR" title="Receive Overrun">ROVR</a>
+              </td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#EMAC_IER__TCOMP" title="Transmit Complete">TCOMP</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_IER__TXERR" title="">TXERR</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_IER__RLE" title="Retry Limit Exceeded">RLE</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_IER__TUND" title="Ethernet Transmit Buffer Underrun">TUND</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_IER__TXUBR" title="Transmit Used Bit Read">TXUBR</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_IER__RXUBR" title="Receive Used Bit Read">RXUBR</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_IER__RCOMP" title="Receive Complete">RCOMP</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_IER__MFD" title="Management Frame sent">MFD</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_IER__MFD"><strong>MFD</strong>: Management Frame sent</li>
+          <p>-</p>
+          <li id="EMAC_IER__RCOMP"><strong>RCOMP</strong>: Receive Complete</li>
+          <p>-</p>
+          <li id="EMAC_IER__RXUBR"><strong>RXUBR</strong>: Receive Used Bit Read</li>
+          <p>-</p>
+          <li id="EMAC_IER__TXUBR"><strong>TXUBR</strong>: Transmit Used Bit Read</li>
+          <p>-</p>
+          <li id="EMAC_IER__TUND"><strong>TUND</strong>: Ethernet Transmit Buffer Underrun</li>
+          <p>-</p>
+          <li id="EMAC_IER__RLE"><strong>RLE</strong>: Retry Limit Exceeded</li>
+          <p>-</p>
+          <li id="EMAC_IER__TXERR">
+            <strong>TXERR</strong>
+          </li>
+          <p>-</p>
+          <li id="EMAC_IER__TCOMP"><strong>TCOMP</strong>: Transmit Complete</li>
+          <p>-</p>
+          <li id="EMAC_IER__ROVR"><strong>ROVR</strong>: Receive Overrun</li>
+          <p>-</p>
+          <li id="EMAC_IER__HRESP"><strong>HRESP</strong>: Hresp not OK</li>
+          <p>-</p>
+          <li id="EMAC_IER__PFR"><strong>PFR</strong>: Pause Frame Received</li>
+          <p>-</p>
+          <li id="EMAC_IER__PTZ"><strong>PTZ</strong>: Pause Time Zero</li>
+          <p>-</p>
+        </ul>
+        <h4 id="EMAC_IDR">EMAC Interrupt Disable Register</h4>
+        <p><strong>Name</strong>: EMAC_IDR</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x400B002C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#EMAC_IDR__PTZ" title="Pause Time Zero">PTZ</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_IDR__PFR" title="Pause Frame Received">PFR</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_IDR__HRESP" title="Hresp not OK">HRESP</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_IDR__ROVR" title="Receive Overrun">ROVR</a>
+              </td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#EMAC_IDR__TCOMP" title="Transmit Complete">TCOMP</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_IDR__TXERR" title="">TXERR</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_IDR__RLE" title="Retry Limit Exceeded">RLE</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_IDR__TUND" title="Ethernet Transmit Buffer Underrun">TUND</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_IDR__TXUBR" title="Transmit Used Bit Read">TXUBR</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_IDR__RXUBR" title="Receive Used Bit Read">RXUBR</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_IDR__RCOMP" title="Receive Complete">RCOMP</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_IDR__MFD" title="Management Frame sent">MFD</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_IDR__MFD"><strong>MFD</strong>: Management Frame sent</li>
+          <p>-</p>
+          <li id="EMAC_IDR__RCOMP"><strong>RCOMP</strong>: Receive Complete</li>
+          <p>-</p>
+          <li id="EMAC_IDR__RXUBR"><strong>RXUBR</strong>: Receive Used Bit Read</li>
+          <p>-</p>
+          <li id="EMAC_IDR__TXUBR"><strong>TXUBR</strong>: Transmit Used Bit Read</li>
+          <p>-</p>
+          <li id="EMAC_IDR__TUND"><strong>TUND</strong>: Ethernet Transmit Buffer Underrun</li>
+          <p>-</p>
+          <li id="EMAC_IDR__RLE"><strong>RLE</strong>: Retry Limit Exceeded</li>
+          <p>-</p>
+          <li id="EMAC_IDR__TXERR">
+            <strong>TXERR</strong>
+          </li>
+          <p>-</p>
+          <li id="EMAC_IDR__TCOMP"><strong>TCOMP</strong>: Transmit Complete</li>
+          <p>-</p>
+          <li id="EMAC_IDR__ROVR"><strong>ROVR</strong>: Receive Overrun</li>
+          <p>-</p>
+          <li id="EMAC_IDR__HRESP"><strong>HRESP</strong>: Hresp not OK</li>
+          <p>-</p>
+          <li id="EMAC_IDR__PFR"><strong>PFR</strong>: Pause Frame Received</li>
+          <p>-</p>
+          <li id="EMAC_IDR__PTZ"><strong>PTZ</strong>: Pause Time Zero</li>
+          <p>-</p>
+        </ul>
+        <h4 id="EMAC_IMR">EMAC Interrupt Mask Register</h4>
+        <p><strong>Name</strong>: EMAC_IMR</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x400B0030</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#EMAC_IMR__PTZ" title="Pause Time Zero">PTZ</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_IMR__PFR" title="Pause Frame Received">PFR</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_IMR__HRESP" title="Hresp not OK">HRESP</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_IMR__ROVR" title="Receive Overrun">ROVR</a>
+              </td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#EMAC_IMR__TCOMP" title="Transmit Complete">TCOMP</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_IMR__TXERR" title="">TXERR</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_IMR__RLE" title="Retry Limit Exceeded">RLE</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_IMR__TUND" title="Ethernet Transmit Buffer Underrun">TUND</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_IMR__TXUBR" title="Transmit Used Bit Read">TXUBR</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_IMR__RXUBR" title="Receive Used Bit Read">RXUBR</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_IMR__RCOMP" title="Receive Complete">RCOMP</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_IMR__MFD" title="Management Frame sent">MFD</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_IMR__MFD"><strong>MFD</strong>: Management Frame sent</li>
+          <p>-</p>
+          <li id="EMAC_IMR__RCOMP"><strong>RCOMP</strong>: Receive Complete</li>
+          <p>-</p>
+          <li id="EMAC_IMR__RXUBR"><strong>RXUBR</strong>: Receive Used Bit Read</li>
+          <p>-</p>
+          <li id="EMAC_IMR__TXUBR"><strong>TXUBR</strong>: Transmit Used Bit Read</li>
+          <p>-</p>
+          <li id="EMAC_IMR__TUND"><strong>TUND</strong>: Ethernet Transmit Buffer Underrun</li>
+          <p>-</p>
+          <li id="EMAC_IMR__RLE"><strong>RLE</strong>: Retry Limit Exceeded</li>
+          <p>-</p>
+          <li id="EMAC_IMR__TXERR">
+            <strong>TXERR</strong>
+          </li>
+          <p>-</p>
+          <li id="EMAC_IMR__TCOMP"><strong>TCOMP</strong>: Transmit Complete</li>
+          <p>-</p>
+          <li id="EMAC_IMR__ROVR"><strong>ROVR</strong>: Receive Overrun</li>
+          <p>-</p>
+          <li id="EMAC_IMR__HRESP"><strong>HRESP</strong>: Hresp not OK</li>
+          <p>-</p>
+          <li id="EMAC_IMR__PFR"><strong>PFR</strong>: Pause Frame Received</li>
+          <p>-</p>
+          <li id="EMAC_IMR__PTZ"><strong>PTZ</strong>: Pause Time Zero</li>
+          <p>-</p>
+        </ul>
+        <h4 id="EMAC_MAN">EMAC Phy Maintenance Register</h4>
+        <p><strong>Name</strong>: EMAC_MAN</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B0034</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="2">
+                <a href="#EMAC_MAN__SOF" title="Start of frame">SOF</a>
+              </td>
+              <td colspan="2">
+                <a href="#EMAC_MAN__RW" title="Read-write">RW</a>
+              </td>
+              <td colspan="4">
+                <a href="#EMAC_MAN__PHYA" title="PHY Address">PHYA</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="1">
+                <a href="#EMAC_MAN__PHYA" title="PHY Address">PHYA</a>
+              </td>
+              <td colspan="5">
+                <a href="#EMAC_MAN__REGA" title="Register Address">REGA</a>
+              </td>
+              <td colspan="2">
+                <a href="#EMAC_MAN__CODE" title="">CODE</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_MAN__DATA" title="">DATA</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_MAN__DATA" title="">DATA</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_MAN__DATA">
+            <strong>DATA</strong>
+          </li>
+          <p>-</p>
+          <li id="EMAC_MAN__CODE">
+            <strong>CODE</strong>
+          </li>
+          <p>-</p>
+          <li id="EMAC_MAN__REGA"><strong>REGA</strong>: Register Address</li>
+          <p>-</p>
+          <li id="EMAC_MAN__PHYA"><strong>PHYA</strong>: PHY Address</li>
+          <p>-</p>
+          <li id="EMAC_MAN__RW"><strong>RW</strong>: Read-write</li>
+          <p>-</p>
+          <li id="EMAC_MAN__SOF"><strong>SOF</strong>: Start of frame</li>
+          <p>-</p>
+        </ul>
+        <h4 id="EMAC_PTR">EMAC Pause Time Register</h4>
+        <p><strong>Name</strong>: EMAC_PTR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B0038</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_PTR__PTIME" title="Pause Time">PTIME</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_PTR__PTIME" title="Pause Time">PTIME</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_PTR__PTIME"><strong>PTIME</strong>: Pause Time</li>
+          <p>-</p>
+        </ul>
+        <h4 id="EMAC_PFR">EMAC Pause Frames Received Register</h4>
+        <p><strong>Name</strong>: EMAC_PFR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B003C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_PFR__FROK" title="Pause Frames received OK">FROK</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_PFR__FROK" title="Pause Frames received OK">FROK</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_PFR__FROK"><strong>FROK</strong>: Pause Frames received OK<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x74CBB1</td><td class="name">-</td><td class="description">0</td></tr><tr class="even"><td class="value">0x1608940C365</td><td class="name">-</td><td class="description">8</td></tr><tr class="odd"><td class="value">0x151ED2399749</td><td class="name">-</td><td class="description">16</td></tr><tr class="even"><td class="value">0x1C7847EB8CF1</td><td class="name">-</td><td class="description">24</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="EMAC_FTO">EMAC Frames Transmitted Ok Register</h4>
+        <p><strong>Name</strong>: EMAC_FTO</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B0040</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_FTO__FTOK" title="Frames Transmitted OK">FTOK</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_FTO__FTOK" title="Frames Transmitted OK">FTOK</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_FTO__FTOK" title="Frames Transmitted OK">FTOK</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_FTO__FTOK"><strong>FTOK</strong>: Frames Transmitted OK<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x74CBB1</td><td class="name">-</td><td class="description">0</td></tr><tr class="even"><td class="value">0x1608940C365</td><td class="name">-</td><td class="description">8</td></tr><tr class="odd"><td class="value">0x151ED2399749</td><td class="name">-</td><td class="description">16</td></tr><tr class="even"><td class="value">0x1C7847EB8CF1</td><td class="name">-</td><td class="description">24</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="EMAC_SCF">EMAC Single Collision Frames Register</h4>
+        <p><strong>Name</strong>: EMAC_SCF</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B0044</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_SCF__SCF" title="Single Collision Frames">SCF</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_SCF__SCF" title="Single Collision Frames">SCF</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_SCF__SCF"><strong>SCF</strong>: Single Collision Frames<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x74CBB1</td><td class="name">-</td><td class="description">0</td></tr><tr class="even"><td class="value">0x1608940C365</td><td class="name">-</td><td class="description">8</td></tr><tr class="odd"><td class="value">0x151ED2399749</td><td class="name">-</td><td class="description">16</td></tr><tr class="even"><td class="value">0x1C7847EB8CF1</td><td class="name">-</td><td class="description">24</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="EMAC_MCF">EMAC Multiple Collision Frames Register</h4>
+        <p><strong>Name</strong>: EMAC_MCF</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B0048</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_MCF__MCF" title="Multicollision Frames">MCF</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_MCF__MCF" title="Multicollision Frames">MCF</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_MCF__MCF"><strong>MCF</strong>: Multicollision Frames<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x74CBB1</td><td class="name">-</td><td class="description">0</td></tr><tr class="even"><td class="value">0x1608940C365</td><td class="name">-</td><td class="description">8</td></tr><tr class="odd"><td class="value">0x151ED2399749</td><td class="name">-</td><td class="description">16</td></tr><tr class="even"><td class="value">0x1C7847EB8CF1</td><td class="name">-</td><td class="description">24</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="EMAC_FRO">EMAC Frames Received Ok Register</h4>
+        <p><strong>Name</strong>: EMAC_FRO</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B004C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_FRO__FROK" title="Frames Received OK">FROK</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_FRO__FROK" title="Frames Received OK">FROK</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_FRO__FROK" title="Frames Received OK">FROK</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_FRO__FROK"><strong>FROK</strong>: Frames Received OK<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x74CBB1</td><td class="name">-</td><td class="description">0</td></tr><tr class="even"><td class="value">0x1608940C365</td><td class="name">-</td><td class="description">8</td></tr><tr class="odd"><td class="value">0x151ED2399749</td><td class="name">-</td><td class="description">16</td></tr><tr class="even"><td class="value">0x1C7847EB8CF1</td><td class="name">-</td><td class="description">24</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="EMAC_FCSE">EMAC Frame Check Sequence Errors Register</h4>
+        <p><strong>Name</strong>: EMAC_FCSE</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B0050</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_FCSE__FCSE" title="Frame Check Sequence Errors">FCSE</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_FCSE__FCSE"><strong>FCSE</strong>: Frame Check Sequence Errors<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x74CBB1</td><td class="name">-</td><td class="description">0</td></tr><tr class="even"><td class="value">0x1608940C365</td><td class="name">-</td><td class="description">8</td></tr><tr class="odd"><td class="value">0x151ED2399749</td><td class="name">-</td><td class="description">16</td></tr><tr class="even"><td class="value">0x1C7847EB8CF1</td><td class="name">-</td><td class="description">24</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="EMAC_ALE">EMAC Alignment Errors Register</h4>
+        <p><strong>Name</strong>: EMAC_ALE</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B0054</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_ALE__ALE" title="Alignment Errors">ALE</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_ALE__ALE"><strong>ALE</strong>: Alignment Errors<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x74CBB1</td><td class="name">-</td><td class="description">0</td></tr><tr class="even"><td class="value">0x1608940C365</td><td class="name">-</td><td class="description">8</td></tr><tr class="odd"><td class="value">0x151ED2399749</td><td class="name">-</td><td class="description">16</td></tr><tr class="even"><td class="value">0x1C7847EB8CF1</td><td class="name">-</td><td class="description">24</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="EMAC_DTF">EMAC Deferred Transmission Frames Register</h4>
+        <p><strong>Name</strong>: EMAC_DTF</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B0058</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_DTF__DTF" title="Deferred Transmission Frames">DTF</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_DTF__DTF" title="Deferred Transmission Frames">DTF</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_DTF__DTF"><strong>DTF</strong>: Deferred Transmission Frames<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x74CBB1</td><td class="name">-</td><td class="description">0</td></tr><tr class="even"><td class="value">0x1608940C365</td><td class="name">-</td><td class="description">8</td></tr><tr class="odd"><td class="value">0x151ED2399749</td><td class="name">-</td><td class="description">16</td></tr><tr class="even"><td class="value">0x1C7847EB8CF1</td><td class="name">-</td><td class="description">24</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="EMAC_LCOL">EMAC Late Collisions Register</h4>
+        <p><strong>Name</strong>: EMAC_LCOL</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B005C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_LCOL__LCOL" title="Late Collisions">LCOL</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_LCOL__LCOL"><strong>LCOL</strong>: Late Collisions<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x74CBB1</td><td class="name">-</td><td class="description">0</td></tr><tr class="even"><td class="value">0x1608940C365</td><td class="name">-</td><td class="description">8</td></tr><tr class="odd"><td class="value">0x151ED2399749</td><td class="name">-</td><td class="description">16</td></tr><tr class="even"><td class="value">0x1C7847EB8CF1</td><td class="name">-</td><td class="description">24</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="EMAC_ECOL">EMAC Excessive Collisions Register</h4>
+        <p><strong>Name</strong>: EMAC_ECOL</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B0060</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_ECOL__EXCOL" title="Excessive Collisions">EXCOL</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_ECOL__EXCOL"><strong>EXCOL</strong>: Excessive Collisions<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x74CBB1</td><td class="name">-</td><td class="description">0</td></tr><tr class="even"><td class="value">0x1608940C365</td><td class="name">-</td><td class="description">8</td></tr><tr class="odd"><td class="value">0x151ED2399749</td><td class="name">-</td><td class="description">16</td></tr><tr class="even"><td class="value">0x1C7847EB8CF1</td><td class="name">-</td><td class="description">24</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="EMAC_TUND">EMAC Transmit Underrun Errors Register</h4>
+        <p><strong>Name</strong>: EMAC_TUND</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B0064</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_TUND__TUND" title="Transmit Underruns">TUND</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_TUND__TUND"><strong>TUND</strong>: Transmit Underruns<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x74CBB1</td><td class="name">-</td><td class="description">0</td></tr><tr class="even"><td class="value">0x1608940C365</td><td class="name">-</td><td class="description">8</td></tr><tr class="odd"><td class="value">0x151ED2399749</td><td class="name">-</td><td class="description">16</td></tr><tr class="even"><td class="value">0x1C7847EB8CF1</td><td class="name">-</td><td class="description">24</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="EMAC_CSE">EMAC Carrier Sense Errors Register</h4>
+        <p><strong>Name</strong>: EMAC_CSE</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B0068</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_CSE__CSE" title="Carrier Sense Errors">CSE</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_CSE__CSE"><strong>CSE</strong>: Carrier Sense Errors<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x74CBB1</td><td class="name">-</td><td class="description">0</td></tr><tr class="even"><td class="value">0x1608940C365</td><td class="name">-</td><td class="description">8</td></tr><tr class="odd"><td class="value">0x151ED2399749</td><td class="name">-</td><td class="description">16</td></tr><tr class="even"><td class="value">0x1C7847EB8CF1</td><td class="name">-</td><td class="description">24</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="EMAC_RRE">EMAC Receive Resource Errors Register</h4>
+        <p><strong>Name</strong>: EMAC_RRE</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B006C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_RRE__RRE" title="Receive Resource Errors">RRE</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_RRE__RRE" title="Receive Resource Errors">RRE</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_RRE__RRE"><strong>RRE</strong>: Receive Resource Errors<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x74CBB1</td><td class="name">-</td><td class="description">0</td></tr><tr class="even"><td class="value">0x1608940C365</td><td class="name">-</td><td class="description">8</td></tr><tr class="odd"><td class="value">0x151ED2399749</td><td class="name">-</td><td class="description">16</td></tr><tr class="even"><td class="value">0x1C7847EB8CF1</td><td class="name">-</td><td class="description">24</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="EMAC_ROV">EMAC Receive Overrun Errors Register</h4>
+        <p><strong>Name</strong>: EMAC_ROV</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B0070</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_ROV__ROVR" title="Receive Overrun">ROVR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_ROV__ROVR"><strong>ROVR</strong>: Receive Overrun<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x74CBB1</td><td class="name">-</td><td class="description">0</td></tr><tr class="even"><td class="value">0x1608940C365</td><td class="name">-</td><td class="description">8</td></tr><tr class="odd"><td class="value">0x151ED2399749</td><td class="name">-</td><td class="description">16</td></tr><tr class="even"><td class="value">0x1C7847EB8CF1</td><td class="name">-</td><td class="description">24</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="EMAC_RSE">EMAC Receive Symbol Errors Register</h4>
+        <p><strong>Name</strong>: EMAC_RSE</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B0074</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_RSE__RSE" title="Receive Symbol Errors">RSE</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_RSE__RSE"><strong>RSE</strong>: Receive Symbol Errors<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x74CBB1</td><td class="name">-</td><td class="description">0</td></tr><tr class="even"><td class="value">0x1608940C365</td><td class="name">-</td><td class="description">8</td></tr><tr class="odd"><td class="value">0x151ED2399749</td><td class="name">-</td><td class="description">16</td></tr><tr class="even"><td class="value">0x1C7847EB8CF1</td><td class="name">-</td><td class="description">24</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="EMAC_ELE">EMAC Excessive Length Errors Register</h4>
+        <p><strong>Name</strong>: EMAC_ELE</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B0078</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_ELE__EXL" title="Excessive Length Errors">EXL</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_ELE__EXL"><strong>EXL</strong>: Excessive Length Errors<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x74CBB1</td><td class="name">-</td><td class="description">0</td></tr><tr class="even"><td class="value">0x1608940C365</td><td class="name">-</td><td class="description">8</td></tr><tr class="odd"><td class="value">0x151ED2399749</td><td class="name">-</td><td class="description">16</td></tr><tr class="even"><td class="value">0x1C7847EB8CF1</td><td class="name">-</td><td class="description">24</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="EMAC_RJA">EMAC Receive Jabbers Register</h4>
+        <p><strong>Name</strong>: EMAC_RJA</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B007C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_RJA__RJB" title="Receive Jabbers">RJB</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_RJA__RJB"><strong>RJB</strong>: Receive Jabbers<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x74CBB1</td><td class="name">-</td><td class="description">0</td></tr><tr class="even"><td class="value">0x1608940C365</td><td class="name">-</td><td class="description">8</td></tr><tr class="odd"><td class="value">0x151ED2399749</td><td class="name">-</td><td class="description">16</td></tr><tr class="even"><td class="value">0x1C7847EB8CF1</td><td class="name">-</td><td class="description">24</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="EMAC_USF">EMAC Undersize Frames Register</h4>
+        <p><strong>Name</strong>: EMAC_USF</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B0080</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_USF__USF" title="Undersize frames">USF</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_USF__USF"><strong>USF</strong>: Undersize frames<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x74CBB1</td><td class="name">-</td><td class="description">0</td></tr><tr class="even"><td class="value">0x1608940C365</td><td class="name">-</td><td class="description">8</td></tr><tr class="odd"><td class="value">0x151ED2399749</td><td class="name">-</td><td class="description">16</td></tr><tr class="even"><td class="value">0x1C7847EB8CF1</td><td class="name">-</td><td class="description">24</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="EMAC_STE">EMAC SQE Test Errors Register</h4>
+        <p><strong>Name</strong>: EMAC_STE</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B0084</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_STE__SQER" title="SQE test errors">SQER</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_STE__SQER"><strong>SQER</strong>: SQE test errors<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x74CBB1</td><td class="name">-</td><td class="description">0</td></tr><tr class="even"><td class="value">0x1608940C365</td><td class="name">-</td><td class="description">8</td></tr><tr class="odd"><td class="value">0x151ED2399749</td><td class="name">-</td><td class="description">16</td></tr><tr class="even"><td class="value">0x1C7847EB8CF1</td><td class="name">-</td><td class="description">24</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="EMAC_RLE">EMAC Received Length Field Mismatch Register</h4>
+        <p><strong>Name</strong>: EMAC_RLE</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B0088</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_RLE__RLFM" title="Receive Length Field Mismatch">RLFM</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_RLE__RLFM"><strong>RLFM</strong>: Receive Length Field Mismatch</li>
+          <p>-</p>
+        </ul>
+        <h4 id="EMAC_HRB">EMAC Hash Register Bottom [31:0] Register</h4>
+        <p><strong>Name</strong>: EMAC_HRB</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B0090</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_HRB__ADDR" title="">ADDR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_HRB__ADDR" title="">ADDR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_HRB__ADDR" title="">ADDR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_HRB__ADDR" title="">ADDR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_HRB__ADDR">
+            <strong>ADDR</strong>
+          </li>
+          <p>-</p>
+        </ul>
+        <h4 id="EMAC_HRT">EMAC Hash Register Top [63:32] Register</h4>
+        <p><strong>Name</strong>: EMAC_HRT</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B0094</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_HRT__ADDR" title="">ADDR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_HRT__ADDR" title="">ADDR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_HRT__ADDR" title="">ADDR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_HRT__ADDR" title="">ADDR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_HRT__ADDR">
+            <strong>ADDR</strong>
+          </li>
+          <p>-</p>
+        </ul>
+        <h4 id="EMAC_SA1B">EMAC Specific Address 1 Bottom Register</h4>
+        <p><strong>Name</strong>: EMAC_SA1B</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B0098</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_SA1B__ADDR" title="">ADDR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_SA1B__ADDR" title="">ADDR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_SA1B__ADDR" title="">ADDR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_SA1B__ADDR" title="">ADDR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_SA1B__ADDR">
+            <strong>ADDR</strong>
+          </li>
+          <p>-</p>
+        </ul>
+        <h4 id="EMAC_SA1T">EMAC Specific Address 1 Top Register</h4>
+        <p><strong>Name</strong>: EMAC_SA1T</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B009C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_SA1T__ADDR" title="">ADDR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_SA1T__ADDR" title="">ADDR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_SA1T__ADDR">
+            <strong>ADDR</strong>
+          </li>
+          <p>-</p>
+        </ul>
+        <h4 id="EMAC_SA2B">EMAC Specific Address 2 Bottom Register</h4>
+        <p><strong>Name</strong>: EMAC_SA2B</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B00A0</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_SA2B__ADDR" title="">ADDR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_SA2B__ADDR" title="">ADDR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_SA2B__ADDR" title="">ADDR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_SA2B__ADDR" title="">ADDR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_SA2B__ADDR">
+            <strong>ADDR</strong>
+          </li>
+          <p>-</p>
+        </ul>
+        <h4 id="EMAC_SA2T">EMAC Specific Address 2 Top Register</h4>
+        <p><strong>Name</strong>: EMAC_SA2T</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B00A4</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_SA2T__ADDR" title="">ADDR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_SA2T__ADDR" title="">ADDR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_SA2T__ADDR">
+            <strong>ADDR</strong>
+          </li>
+          <p>-</p>
+        </ul>
+        <h4 id="EMAC_SA3B">EMAC Specific Address 3 Bottom Register</h4>
+        <p><strong>Name</strong>: EMAC_SA3B</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B00A8</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_SA3B__ADDR" title="">ADDR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_SA3B__ADDR" title="">ADDR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_SA3B__ADDR" title="">ADDR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_SA3B__ADDR" title="">ADDR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_SA3B__ADDR">
+            <strong>ADDR</strong>
+          </li>
+          <p>-</p>
+        </ul>
+        <h4 id="EMAC_SA3T">EMAC Specific Address 3 Top Register</h4>
+        <p><strong>Name</strong>: EMAC_SA3T</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B00AC</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_SA3T__ADDR" title="">ADDR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_SA3T__ADDR" title="">ADDR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_SA3T__ADDR">
+            <strong>ADDR</strong>
+          </li>
+          <p>-</p>
+        </ul>
+        <h4 id="EMAC_SA4B">EMAC Specific Address 4 Bottom Register</h4>
+        <p><strong>Name</strong>: EMAC_SA4B</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B00B0</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_SA4B__ADDR" title="">ADDR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_SA4B__ADDR" title="">ADDR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_SA4B__ADDR" title="">ADDR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_SA4B__ADDR" title="">ADDR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_SA4B__ADDR">
+            <strong>ADDR</strong>
+          </li>
+          <p>-</p>
+        </ul>
+        <h4 id="EMAC_SA4T">EMAC Specific Address 4 Top Register</h4>
+        <p><strong>Name</strong>: EMAC_SA4T</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B00B4</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_SA4T__ADDR" title="">ADDR</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_SA4T__ADDR" title="">ADDR</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_SA4T__ADDR">
+            <strong>ADDR</strong>
+          </li>
+          <p>-</p>
+        </ul>
+        <h4 id="EMAC_TID">EMAC Type ID Checking Register</h4>
+        <p><strong>Name</strong>: EMAC_TID</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B00B8</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_TID__TID" title="Type ID checking">TID</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EMAC_TID__TID" title="Type ID checking">TID</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_TID__TID"><strong>TID</strong>: Type ID checking</li>
+          <p>-</p>
+        </ul>
+        <h4 id="EMAC_USRIO">EMAC User Input/Output Register</h4>
+        <p><strong>Name</strong>: EMAC_USRIO</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400B00C0</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#EMAC_USRIO__CLKEN" title="Clock Enable">CLKEN</a>
+              </td>
+              <td colspan="1">
+                <a href="#EMAC_USRIO__RMII" title="Reduce MII">RMII</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EMAC_USRIO__RMII"><strong>RMII</strong>: Reduce MII</li>
+          <p>-</p>
+          <li id="EMAC_USRIO__CLKEN"><strong>CLKEN</strong>: Clock Enable</li>
+          <p>-</p>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>

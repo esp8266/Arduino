@@ -1,0 +1,2776 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>SAM3N PWM</title>
+    <link rel="stylesheet" type="text/css" href="css/html.css" media="all" />
+  </head>
+  <body id="abstract">
+    <div id="container">
+      <div id="content">
+        <a id="PWM"></a>
+        <h1>SAM3N PWM</h1>
+        <a id="PWM__User_Interface"></a>
+        <h2>Pulse Width Modulation Controller (PWM) User Interface</h2>
+<!--As per 6044I programmer datasheet.-->
+        <h3>Registers</h3>
+        <table class="registers">
+          <caption>Register Mapping</caption>
+          <thead>
+            <tr>
+              <th class="address">Address</th>
+              <th class="description">Register</th>
+              <th class="name">Name</th>
+              <th class="access">Access</th>
+              <th class="reset">Reset</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="odd">
+              <td class="address" id="address_0x40020000">0x40020000</td>
+              <td class="description">PWM Mode Register</td>
+              <td class="name">
+                <a href="#PWM_MR" title="PWM Mode Register" class="one_click_away">PWM_MR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x40020004">0x40020004</td>
+              <td class="description">PWM Enable Register</td>
+              <td class="name">
+                <a href="#PWM_ENA" title="PWM Enable Register" class="one_click_away">PWM_ENA</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x40020008">0x40020008</td>
+              <td class="description">PWM Disable Register</td>
+              <td class="name">
+                <a href="#PWM_DIS" title="PWM Disable Register" class="one_click_away">PWM_DIS</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x4002000C">0x4002000C</td>
+              <td class="description">PWM Status Register</td>
+              <td class="name">
+                <a href="#PWM_SR" title="PWM Status Register" class="one_click_away">PWM_SR</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x40020010">0x40020010</td>
+              <td class="description">PWM Interrupt Enable Register</td>
+              <td class="name">
+                <a href="#PWM_IER" title="PWM Interrupt Enable Register" class="one_click_away">PWM_IER</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x40020014">0x40020014</td>
+              <td class="description">PWM Interrupt Disable Register</td>
+              <td class="name">
+                <a href="#PWM_IDR" title="PWM Interrupt Disable Register" class="one_click_away">PWM_IDR</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x40020018">0x40020018</td>
+              <td class="description">PWM Interrupt Mask Register</td>
+              <td class="name">
+                <a href="#PWM_IMR" title="PWM Interrupt Mask Register" class="one_click_away">PWM_IMR</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x4002001C">0x4002001C</td>
+              <td class="description">PWM Interrupt Status Register</td>
+              <td class="name">
+                <a href="#PWM_ISR" title="PWM Interrupt Status Register" class="one_click_away">PWM_ISR</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x40020200">0x40020200</td>
+              <td class="description">PWM Channel Mode Register (ch_num = 0)</td>
+              <td class="name">
+                <a href="#PWM_CMR0" title="PWM Channel Mode Register (ch_num = 0)" class="one_click_away">PWM_CMR0</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x40020204">0x40020204</td>
+              <td class="description">PWM Channel Duty Cycle Register (ch_num = 0)</td>
+              <td class="name">
+                <a href="#PWM_CDTY0" title="PWM Channel Duty Cycle Register (ch_num = 0)" class="one_click_away">PWM_CDTY0</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x40020208">0x40020208</td>
+              <td class="description">PWM Channel Period Register (ch_num = 0)</td>
+              <td class="name">
+                <a href="#PWM_CPRD0" title="PWM Channel Period Register (ch_num = 0)" class="one_click_away">PWM_CPRD0</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x4002020C">0x4002020C</td>
+              <td class="description">PWM Channel Counter Register (ch_num = 0)</td>
+              <td class="name">
+                <a href="#PWM_CCNT0" title="PWM Channel Counter Register (ch_num = 0)" class="one_click_away">PWM_CCNT0</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x40020210">0x40020210</td>
+              <td class="description">PWM Channel Update Register (ch_num = 0)</td>
+              <td class="name">
+                <a href="#PWM_CUPD0" title="PWM Channel Update Register (ch_num = 0)" class="one_click_away">PWM_CUPD0</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x40020220">0x40020220</td>
+              <td class="description">PWM Channel Mode Register (ch_num = 1)</td>
+              <td class="name">
+                <a href="#PWM_CMR1" title="PWM Channel Mode Register (ch_num = 1)" class="one_click_away">PWM_CMR1</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x40020224">0x40020224</td>
+              <td class="description">PWM Channel Duty Cycle Register (ch_num = 1)</td>
+              <td class="name">
+                <a href="#PWM_CDTY1" title="PWM Channel Duty Cycle Register (ch_num = 1)" class="one_click_away">PWM_CDTY1</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x40020228">0x40020228</td>
+              <td class="description">PWM Channel Period Register (ch_num = 1)</td>
+              <td class="name">
+                <a href="#PWM_CPRD1" title="PWM Channel Period Register (ch_num = 1)" class="one_click_away">PWM_CPRD1</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x4002022C">0x4002022C</td>
+              <td class="description">PWM Channel Counter Register (ch_num = 1)</td>
+              <td class="name">
+                <a href="#PWM_CCNT1" title="PWM Channel Counter Register (ch_num = 1)" class="one_click_away">PWM_CCNT1</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x40020230">0x40020230</td>
+              <td class="description">PWM Channel Update Register (ch_num = 1)</td>
+              <td class="name">
+                <a href="#PWM_CUPD1" title="PWM Channel Update Register (ch_num = 1)" class="one_click_away">PWM_CUPD1</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x40020240">0x40020240</td>
+              <td class="description">PWM Channel Mode Register (ch_num = 2)</td>
+              <td class="name">
+                <a href="#PWM_CMR2" title="PWM Channel Mode Register (ch_num = 2)" class="one_click_away">PWM_CMR2</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x40020244">0x40020244</td>
+              <td class="description">PWM Channel Duty Cycle Register (ch_num = 2)</td>
+              <td class="name">
+                <a href="#PWM_CDTY2" title="PWM Channel Duty Cycle Register (ch_num = 2)" class="one_click_away">PWM_CDTY2</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x40020248">0x40020248</td>
+              <td class="description">PWM Channel Period Register (ch_num = 2)</td>
+              <td class="name">
+                <a href="#PWM_CPRD2" title="PWM Channel Period Register (ch_num = 2)" class="one_click_away">PWM_CPRD2</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x4002024C">0x4002024C</td>
+              <td class="description">PWM Channel Counter Register (ch_num = 2)</td>
+              <td class="name">
+                <a href="#PWM_CCNT2" title="PWM Channel Counter Register (ch_num = 2)" class="one_click_away">PWM_CCNT2</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x40020250">0x40020250</td>
+              <td class="description">PWM Channel Update Register (ch_num = 2)</td>
+              <td class="name">
+                <a href="#PWM_CUPD2" title="PWM Channel Update Register (ch_num = 2)" class="one_click_away">PWM_CUPD2</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x40020260">0x40020260</td>
+              <td class="description">PWM Channel Mode Register (ch_num = 3)</td>
+              <td class="name">
+                <a href="#PWM_CMR3" title="PWM Channel Mode Register (ch_num = 3)" class="one_click_away">PWM_CMR3</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x40020264">0x40020264</td>
+              <td class="description">PWM Channel Duty Cycle Register (ch_num = 3)</td>
+              <td class="name">
+                <a href="#PWM_CDTY3" title="PWM Channel Duty Cycle Register (ch_num = 3)" class="one_click_away">PWM_CDTY3</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x40020268">0x40020268</td>
+              <td class="description">PWM Channel Period Register (ch_num = 3)</td>
+              <td class="name">
+                <a href="#PWM_CPRD3" title="PWM Channel Period Register (ch_num = 3)" class="one_click_away">PWM_CPRD3</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x4002026C">0x4002026C</td>
+              <td class="description">PWM Channel Counter Register (ch_num = 3)</td>
+              <td class="name">
+                <a href="#PWM_CCNT3" title="PWM Channel Counter Register (ch_num = 3)" class="one_click_away">PWM_CCNT3</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x40020270">0x40020270</td>
+              <td class="description">PWM Channel Update Register (ch_num = 3)</td>
+              <td class="name">
+                <a href="#PWM_CUPD3" title="PWM Channel Update Register (ch_num = 3)" class="one_click_away">PWM_CUPD3</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3>Register Fields</h3>
+        <h4 id="PWM_MR">PWM PWM Mode Register</h4>
+        <p><strong>Name</strong>: PWM_MR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x40020000</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="4">
+                <a href="#PWM_MR__PREB" title="">PREB</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_MR__DIVB" title="CLKA, CLKB Divide Factor">DIVB</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="4">
+                <a href="#PWM_MR__PREA" title="">PREA</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_MR__DIVA" title="CLKA, CLKB Divide Factor">DIVA</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="PWM_MR__DIVA"><strong>DIVA</strong>: CLKA, CLKB Divide Factor<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">CLK_OFF</td><td class="description">CLKA, CLKB clock is turned off</td></tr><tr class="even"><td class="value">1</td><td class="name">CLK_DIV1</td><td class="description">CLKA, CLKB clock is clock selected by PREA, PREB</td></tr></tbody></table></li>
+          <li id="PWM_MR__PREA">
+            <strong>PREA</strong>
+            <table class="values">
+              <thead>
+                <tr>
+                  <th>Value</th>
+                  <th>Name</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="odd">
+                  <td class="value">0x0</td>
+                  <td class="name">MCK</td>
+                  <td class="description">Master Clock</td>
+                </tr>
+                <tr class="even">
+                  <td class="value">0x1</td>
+                  <td class="name">MCKDIV2</td>
+                  <td class="description">Master Clock divided by 2</td>
+                </tr>
+                <tr class="odd">
+                  <td class="value">0x2</td>
+                  <td class="name">MCKDIV4</td>
+                  <td class="description">Master Clock divided by 4</td>
+                </tr>
+                <tr class="even">
+                  <td class="value">0x3</td>
+                  <td class="name">MCKDIV8</td>
+                  <td class="description">Master Clock divided by 8</td>
+                </tr>
+                <tr class="odd">
+                  <td class="value">0x4</td>
+                  <td class="name">MCKDIV16</td>
+                  <td class="description">Master Clock divided by 16</td>
+                </tr>
+                <tr class="even">
+                  <td class="value">0x5</td>
+                  <td class="name">MCKDIV32</td>
+                  <td class="description">Master Clock divided by 32</td>
+                </tr>
+                <tr class="odd">
+                  <td class="value">0x6</td>
+                  <td class="name">MCKDIV64</td>
+                  <td class="description">Master Clock divided by 64</td>
+                </tr>
+                <tr class="even">
+                  <td class="value">0x7</td>
+                  <td class="name">MCKDIV128</td>
+                  <td class="description">Master Clock divided by 128</td>
+                </tr>
+                <tr class="odd">
+                  <td class="value">0x8</td>
+                  <td class="name">MCKDIV256</td>
+                  <td class="description">Master Clock divided by 256</td>
+                </tr>
+                <tr class="even">
+                  <td class="value">0x9</td>
+                  <td class="name">MCKDIV512</td>
+                  <td class="description">Master Clock divided by 512</td>
+                </tr>
+                <tr class="odd">
+                  <td class="value">0xA</td>
+                  <td class="name">MCKDIV1024</td>
+                  <td class="description">Master Clock divided by 1024</td>
+                </tr>
+              </tbody>
+            </table>
+          </li>
+          <li id="PWM_MR__DIVB"><strong>DIVB</strong>: CLKA, CLKB Divide Factor<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">CLK_OFF</td><td class="description">CLKA, CLKB clock is turned off</td></tr><tr class="even"><td class="value">1</td><td class="name">CLK_DIV1</td><td class="description">CLKA, CLKB clock is clock selected by PREA, PREB</td></tr></tbody></table></li>
+          <li id="PWM_MR__PREB">
+            <strong>PREB</strong>
+            <table class="values">
+              <thead>
+                <tr>
+                  <th>Value</th>
+                  <th>Name</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="odd">
+                  <td class="value">0x0</td>
+                  <td class="name">MCK</td>
+                  <td class="description">Master Clock</td>
+                </tr>
+                <tr class="even">
+                  <td class="value">0x1</td>
+                  <td class="name">MCKDIV2</td>
+                  <td class="description">Master Clock divided by 2</td>
+                </tr>
+                <tr class="odd">
+                  <td class="value">0x2</td>
+                  <td class="name">MCKDIV4</td>
+                  <td class="description">Master Clock divided by 4</td>
+                </tr>
+                <tr class="even">
+                  <td class="value">0x3</td>
+                  <td class="name">MCKDIV8</td>
+                  <td class="description">Master Clock divided by 8</td>
+                </tr>
+                <tr class="odd">
+                  <td class="value">0x4</td>
+                  <td class="name">MCKDIV16</td>
+                  <td class="description">Master Clock divided by 16</td>
+                </tr>
+                <tr class="even">
+                  <td class="value">0x5</td>
+                  <td class="name">MCKDIV32</td>
+                  <td class="description">Master Clock divided by 32</td>
+                </tr>
+                <tr class="odd">
+                  <td class="value">0x6</td>
+                  <td class="name">MCKDIV64</td>
+                  <td class="description">Master Clock divided by 64</td>
+                </tr>
+                <tr class="even">
+                  <td class="value">0x7</td>
+                  <td class="name">MCKDIV128</td>
+                  <td class="description">Master Clock divided by 128</td>
+                </tr>
+                <tr class="odd">
+                  <td class="value">0x8</td>
+                  <td class="name">MCKDIV256</td>
+                  <td class="description">Master Clock divided by 256</td>
+                </tr>
+                <tr class="even">
+                  <td class="value">0x9</td>
+                  <td class="name">MCKDIV512</td>
+                  <td class="description">Master Clock divided by 512</td>
+                </tr>
+                <tr class="odd">
+                  <td class="value">0xA</td>
+                  <td class="name">MCKDIV1024</td>
+                  <td class="description">Master Clock divided by 1024</td>
+                </tr>
+              </tbody>
+            </table>
+          </li>
+        </ul>
+        <h4 id="PWM_ENA">PWM PWM Enable Register</h4>
+        <p><strong>Name</strong>: PWM_ENA</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x40020004</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#PWM_ENA__CHID3" title="Channel ID">CHID3</a>
+              </td>
+              <td colspan="1">
+                <a href="#PWM_ENA__CHID2" title="Channel ID">CHID2</a>
+              </td>
+              <td colspan="1">
+                <a href="#PWM_ENA__CHID1" title="Channel ID">CHID1</a>
+              </td>
+              <td colspan="1">
+                <a href="#PWM_ENA__CHID0" title="Channel ID">CHID0</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="PWM_ENA__CHID0"><strong>CHID0</strong>: Channel ID<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enable PWM output for channel x.</td></tr></tbody></table></li>
+          <li id="PWM_ENA__CHID1"><strong>CHID1</strong>: Channel ID<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enable PWM output for channel x.</td></tr></tbody></table></li>
+          <li id="PWM_ENA__CHID2"><strong>CHID2</strong>: Channel ID<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enable PWM output for channel x.</td></tr></tbody></table></li>
+          <li id="PWM_ENA__CHID3"><strong>CHID3</strong>: Channel ID<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enable PWM output for channel x.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="PWM_DIS">PWM PWM Disable Register</h4>
+        <p><strong>Name</strong>: PWM_DIS</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x40020008</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#PWM_DIS__CHID3" title="Channel ID">CHID3</a>
+              </td>
+              <td colspan="1">
+                <a href="#PWM_DIS__CHID2" title="Channel ID">CHID2</a>
+              </td>
+              <td colspan="1">
+                <a href="#PWM_DIS__CHID1" title="Channel ID">CHID1</a>
+              </td>
+              <td colspan="1">
+                <a href="#PWM_DIS__CHID0" title="Channel ID">CHID0</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="PWM_DIS__CHID0"><strong>CHID0</strong>: Channel ID<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disable PWM output for channel x.</td></tr></tbody></table></li>
+          <li id="PWM_DIS__CHID1"><strong>CHID1</strong>: Channel ID<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disable PWM output for channel x.</td></tr></tbody></table></li>
+          <li id="PWM_DIS__CHID2"><strong>CHID2</strong>: Channel ID<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disable PWM output for channel x.</td></tr></tbody></table></li>
+          <li id="PWM_DIS__CHID3"><strong>CHID3</strong>: Channel ID<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disable PWM output for channel x.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="PWM_SR">PWM PWM Status Register</h4>
+        <p><strong>Name</strong>: PWM_SR</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x4002000C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#PWM_SR__CHID3" title="Channel ID">CHID3</a>
+              </td>
+              <td colspan="1">
+                <a href="#PWM_SR__CHID2" title="Channel ID">CHID2</a>
+              </td>
+              <td colspan="1">
+                <a href="#PWM_SR__CHID1" title="Channel ID">CHID1</a>
+              </td>
+              <td colspan="1">
+                <a href="#PWM_SR__CHID0" title="Channel ID">CHID0</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="PWM_SR__CHID0"><strong>CHID0</strong>: Channel ID<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">PWM output for channel x is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">PWM output for channel x is enabled.</td></tr></tbody></table></li>
+          <li id="PWM_SR__CHID1"><strong>CHID1</strong>: Channel ID<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">PWM output for channel x is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">PWM output for channel x is enabled.</td></tr></tbody></table></li>
+          <li id="PWM_SR__CHID2"><strong>CHID2</strong>: Channel ID<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">PWM output for channel x is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">PWM output for channel x is enabled.</td></tr></tbody></table></li>
+          <li id="PWM_SR__CHID3"><strong>CHID3</strong>: Channel ID<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">PWM output for channel x is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">PWM output for channel x is enabled.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="PWM_IER">PWM PWM Interrupt Enable Register</h4>
+        <p><strong>Name</strong>: PWM_IER</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x40020010</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#PWM_IER__CHID3" title="Channel ID.">CHID3</a>
+              </td>
+              <td colspan="1">
+                <a href="#PWM_IER__CHID2" title="Channel ID.">CHID2</a>
+              </td>
+              <td colspan="1">
+                <a href="#PWM_IER__CHID1" title="Channel ID.">CHID1</a>
+              </td>
+              <td colspan="1">
+                <a href="#PWM_IER__CHID0" title="Channel ID.">CHID0</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="PWM_IER__CHID0"><strong>CHID0</strong>: Channel ID.<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enable interrupt for PWM channel x.</td></tr></tbody></table></li>
+          <li id="PWM_IER__CHID1"><strong>CHID1</strong>: Channel ID.<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enable interrupt for PWM channel x.</td></tr></tbody></table></li>
+          <li id="PWM_IER__CHID2"><strong>CHID2</strong>: Channel ID.<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enable interrupt for PWM channel x.</td></tr></tbody></table></li>
+          <li id="PWM_IER__CHID3"><strong>CHID3</strong>: Channel ID.<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Enable interrupt for PWM channel x.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="PWM_IDR">PWM PWM Interrupt Disable Register</h4>
+        <p><strong>Name</strong>: PWM_IDR</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x40020014</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#PWM_IDR__CHID3" title="Channel ID.">CHID3</a>
+              </td>
+              <td colspan="1">
+                <a href="#PWM_IDR__CHID2" title="Channel ID.">CHID2</a>
+              </td>
+              <td colspan="1">
+                <a href="#PWM_IDR__CHID1" title="Channel ID.">CHID1</a>
+              </td>
+              <td colspan="1">
+                <a href="#PWM_IDR__CHID0" title="Channel ID.">CHID0</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="PWM_IDR__CHID0"><strong>CHID0</strong>: Channel ID.<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disable interrupt for PWM channel x.</td></tr></tbody></table></li>
+          <li id="PWM_IDR__CHID1"><strong>CHID1</strong>: Channel ID.<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disable interrupt for PWM channel x.</td></tr></tbody></table></li>
+          <li id="PWM_IDR__CHID2"><strong>CHID2</strong>: Channel ID.<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disable interrupt for PWM channel x.</td></tr></tbody></table></li>
+          <li id="PWM_IDR__CHID3"><strong>CHID3</strong>: Channel ID.<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No effect.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Disable interrupt for PWM channel x.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="PWM_IMR">PWM PWM Interrupt Mask Register</h4>
+        <p><strong>Name</strong>: PWM_IMR</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x40020018</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#PWM_IMR__CHID3" title="Channel ID.">CHID3</a>
+              </td>
+              <td colspan="1">
+                <a href="#PWM_IMR__CHID2" title="Channel ID.">CHID2</a>
+              </td>
+              <td colspan="1">
+                <a href="#PWM_IMR__CHID1" title="Channel ID.">CHID1</a>
+              </td>
+              <td colspan="1">
+                <a href="#PWM_IMR__CHID0" title="Channel ID.">CHID0</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="PWM_IMR__CHID0"><strong>CHID0</strong>: Channel ID.<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Interrupt for PWM channel x is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Interrupt for PWM channel x is enabled.</td></tr></tbody></table></li>
+          <li id="PWM_IMR__CHID1"><strong>CHID1</strong>: Channel ID.<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Interrupt for PWM channel x is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Interrupt for PWM channel x is enabled.</td></tr></tbody></table></li>
+          <li id="PWM_IMR__CHID2"><strong>CHID2</strong>: Channel ID.<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Interrupt for PWM channel x is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Interrupt for PWM channel x is enabled.</td></tr></tbody></table></li>
+          <li id="PWM_IMR__CHID3"><strong>CHID3</strong>: Channel ID.<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Interrupt for PWM channel x is disabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Interrupt for PWM channel x is enabled.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="PWM_ISR">PWM PWM Interrupt Status Register</h4>
+        <p><strong>Name</strong>: PWM_ISR</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x4002001C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#PWM_ISR__CHID3" title="Channel ID">CHID3</a>
+              </td>
+              <td colspan="1">
+                <a href="#PWM_ISR__CHID2" title="Channel ID">CHID2</a>
+              </td>
+              <td colspan="1">
+                <a href="#PWM_ISR__CHID1" title="Channel ID">CHID1</a>
+              </td>
+              <td colspan="1">
+                <a href="#PWM_ISR__CHID0" title="Channel ID">CHID0</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="PWM_ISR__CHID0"><strong>CHID0</strong>: Channel ID<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No new channel period has been achieved since the last read of the PWM_ISR register.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">At least one new channel period has been achieved since the last read of the PWM_ISR register.</td></tr></tbody></table></li>
+          <li id="PWM_ISR__CHID1"><strong>CHID1</strong>: Channel ID<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No new channel period has been achieved since the last read of the PWM_ISR register.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">At least one new channel period has been achieved since the last read of the PWM_ISR register.</td></tr></tbody></table></li>
+          <li id="PWM_ISR__CHID2"><strong>CHID2</strong>: Channel ID<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No new channel period has been achieved since the last read of the PWM_ISR register.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">At least one new channel period has been achieved since the last read of the PWM_ISR register.</td></tr></tbody></table></li>
+          <li id="PWM_ISR__CHID3"><strong>CHID3</strong>: Channel ID<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No new channel period has been achieved since the last read of the PWM_ISR register.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">At least one new channel period has been achieved since the last read of the PWM_ISR register.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="PWM_CMR0">PWM PWM Channel Mode Register (ch_num = 0)</h4>
+        <p><strong>Name</strong>: PWM_CMR0</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x40020200</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#PWM_CMR0__CPD" title="Channel Update Period">CPD</a>
+              </td>
+              <td colspan="1">
+                <a href="#PWM_CMR0__CPOL" title="Channel Polarity">CPOL</a>
+              </td>
+              <td colspan="1">
+                <a href="#PWM_CMR0__CALG" title="Channel Alignment">CALG</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="4">
+                <a href="#PWM_CMR0__CPRE" title="Channel Pre-scaler">CPRE</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="PWM_CMR0__CPRE"><strong>CPRE</strong>: Channel Pre-scaler<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">MCK</td><td class="description">Master Clock</td></tr><tr class="even"><td class="value">0x1</td><td class="name">MCKDIV2</td><td class="description">Master Clock divided by 2</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">MCKDIV4</td><td class="description">Master Clock divided by 4</td></tr><tr class="even"><td class="value">0x3</td><td class="name">MCKDIV8</td><td class="description">Master Clock divided by 8</td></tr><tr class="odd"><td class="value">0x4</td><td class="name">MCKDIV16</td><td class="description">Master Clock divided by 16</td></tr><tr class="even"><td class="value">0x5</td><td class="name">MCKDIV32</td><td class="description">Master Clock divided by 32</td></tr><tr class="odd"><td class="value">0x6</td><td class="name">MCKDIV64</td><td class="description">Master Clock divided by 64</td></tr><tr class="even"><td class="value">0x7</td><td class="name">MCKDIV128</td><td class="description">Master Clock divided by 128</td></tr><tr class="odd"><td class="value">0x8</td><td class="name">MCKDIV256</td><td class="description">Master Clock divided by 256</td></tr><tr class="even"><td class="value">0x9</td><td class="name">MCKDIV512</td><td class="description">Master Clock divided by 512</td></tr><tr class="odd"><td class="value">0xA</td><td class="name">MCKDIV1024</td><td class="description">Master Clock divided by 1024</td></tr><tr class="even"><td class="value">0xB</td><td class="name">CLKA</td><td class="description">Clock A</td></tr><tr class="odd"><td class="value">0xC</td><td class="name">CLKB</td><td class="description">Clock B</td></tr></tbody></table></li>
+          <li id="PWM_CMR0__CALG"><strong>CALG</strong>: Channel Alignment<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The period is left aligned.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The period is center aligned.</td></tr></tbody></table></li>
+          <li id="PWM_CMR0__CPOL"><strong>CPOL</strong>: Channel Polarity<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The output waveform starts at a low level.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The output waveform starts at a high level.</td></tr></tbody></table></li>
+          <li id="PWM_CMR0__CPD"><strong>CPD</strong>: Channel Update Period<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Writing to the PWM_CUPDx will modify the duty cycle at the next period start event.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Writing to the PWM_CUPDx will modify the period at the next period start event.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="PWM_CDTY0">PWM PWM Channel Duty Cycle Register (ch_num = 0)</h4>
+        <p><strong>Name</strong>: PWM_CDTY0</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x40020204</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CDTY0__CDTY" title="Channel Duty Cycle">CDTY</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CDTY0__CDTY" title="Channel Duty Cycle">CDTY</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CDTY0__CDTY" title="Channel Duty Cycle">CDTY</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CDTY0__CDTY" title="Channel Duty Cycle">CDTY</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="PWM_CDTY0__CDTY"><strong>CDTY</strong>: Channel Duty Cycle</li>
+          <p>-</p>
+        </ul>
+        <h4 id="PWM_CPRD0">PWM PWM Channel Period Register (ch_num = 0)</h4>
+        <p><strong>Name</strong>: PWM_CPRD0</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x40020208</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CPRD0__CPRD" title="Channel Period">CPRD</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CPRD0__CPRD" title="Channel Period">CPRD</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CPRD0__CPRD" title="Channel Period">CPRD</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CPRD0__CPRD" title="Channel Period">CPRD</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="PWM_CPRD0__CPRD"><strong>CPRD</strong>: Channel Period</li>
+          <p>-</p>
+        </ul>
+        <h4 id="PWM_CCNT0">PWM PWM Channel Counter Register (ch_num = 0)</h4>
+        <p><strong>Name</strong>: PWM_CCNT0</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x4002020C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CCNT0__CNT" title="Channel Counter Register">CNT</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CCNT0__CNT" title="Channel Counter Register">CNT</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CCNT0__CNT" title="Channel Counter Register">CNT</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CCNT0__CNT" title="Channel Counter Register">CNT</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="PWM_CCNT0__CNT"><strong>CNT</strong>: Channel Counter Register</li>
+          <p>-</p>
+        </ul>
+        <h4 id="PWM_CUPD0">PWM PWM Channel Update Register (ch_num = 0)</h4>
+        <p><strong>Name</strong>: PWM_CUPD0</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x40020210</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CUPD0__CUPD">CUPD</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CUPD0__CUPD">CUPD</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CUPD0__CUPD">CUPD</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CUPD0__CUPD">CUPD</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="PWM_CUPD0__CUPD">
+            <strong>CUPD</strong>
+          </li>
+          <p>-</p>
+        </ul>
+        <h4 id="PWM_CMR1">PWM PWM Channel Mode Register (ch_num = 1)</h4>
+        <p><strong>Name</strong>: PWM_CMR1</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x40020220</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#PWM_CMR1__CPD" title="Channel Update Period">CPD</a>
+              </td>
+              <td colspan="1">
+                <a href="#PWM_CMR1__CPOL" title="Channel Polarity">CPOL</a>
+              </td>
+              <td colspan="1">
+                <a href="#PWM_CMR1__CALG" title="Channel Alignment">CALG</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="4">
+                <a href="#PWM_CMR1__CPRE" title="Channel Pre-scaler">CPRE</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="PWM_CMR1__CPRE"><strong>CPRE</strong>: Channel Pre-scaler<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">MCK</td><td class="description">Master Clock</td></tr><tr class="even"><td class="value">0x1</td><td class="name">MCKDIV2</td><td class="description">Master Clock divided by 2</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">MCKDIV4</td><td class="description">Master Clock divided by 4</td></tr><tr class="even"><td class="value">0x3</td><td class="name">MCKDIV8</td><td class="description">Master Clock divided by 8</td></tr><tr class="odd"><td class="value">0x4</td><td class="name">MCKDIV16</td><td class="description">Master Clock divided by 16</td></tr><tr class="even"><td class="value">0x5</td><td class="name">MCKDIV32</td><td class="description">Master Clock divided by 32</td></tr><tr class="odd"><td class="value">0x6</td><td class="name">MCKDIV64</td><td class="description">Master Clock divided by 64</td></tr><tr class="even"><td class="value">0x7</td><td class="name">MCKDIV128</td><td class="description">Master Clock divided by 128</td></tr><tr class="odd"><td class="value">0x8</td><td class="name">MCKDIV256</td><td class="description">Master Clock divided by 256</td></tr><tr class="even"><td class="value">0x9</td><td class="name">MCKDIV512</td><td class="description">Master Clock divided by 512</td></tr><tr class="odd"><td class="value">0xA</td><td class="name">MCKDIV1024</td><td class="description">Master Clock divided by 1024</td></tr><tr class="even"><td class="value">0xB</td><td class="name">CLKA</td><td class="description">Clock A</td></tr><tr class="odd"><td class="value">0xC</td><td class="name">CLKB</td><td class="description">Clock B</td></tr></tbody></table></li>
+          <li id="PWM_CMR1__CALG"><strong>CALG</strong>: Channel Alignment<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The period is left aligned.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The period is center aligned.</td></tr></tbody></table></li>
+          <li id="PWM_CMR1__CPOL"><strong>CPOL</strong>: Channel Polarity<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The output waveform starts at a low level.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The output waveform starts at a high level.</td></tr></tbody></table></li>
+          <li id="PWM_CMR1__CPD"><strong>CPD</strong>: Channel Update Period<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Writing to the PWM_CUPDx will modify the duty cycle at the next period start event.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Writing to the PWM_CUPDx will modify the period at the next period start event.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="PWM_CDTY1">PWM PWM Channel Duty Cycle Register (ch_num = 1)</h4>
+        <p><strong>Name</strong>: PWM_CDTY1</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x40020224</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CDTY1__CDTY" title="Channel Duty Cycle">CDTY</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CDTY1__CDTY" title="Channel Duty Cycle">CDTY</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CDTY1__CDTY" title="Channel Duty Cycle">CDTY</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CDTY1__CDTY" title="Channel Duty Cycle">CDTY</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="PWM_CDTY1__CDTY"><strong>CDTY</strong>: Channel Duty Cycle</li>
+          <p>-</p>
+        </ul>
+        <h4 id="PWM_CPRD1">PWM PWM Channel Period Register (ch_num = 1)</h4>
+        <p><strong>Name</strong>: PWM_CPRD1</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x40020228</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CPRD1__CPRD" title="Channel Period">CPRD</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CPRD1__CPRD" title="Channel Period">CPRD</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CPRD1__CPRD" title="Channel Period">CPRD</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CPRD1__CPRD" title="Channel Period">CPRD</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="PWM_CPRD1__CPRD"><strong>CPRD</strong>: Channel Period</li>
+          <p>-</p>
+        </ul>
+        <h4 id="PWM_CCNT1">PWM PWM Channel Counter Register (ch_num = 1)</h4>
+        <p><strong>Name</strong>: PWM_CCNT1</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x4002022C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CCNT1__CNT" title="Channel Counter Register">CNT</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CCNT1__CNT" title="Channel Counter Register">CNT</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CCNT1__CNT" title="Channel Counter Register">CNT</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CCNT1__CNT" title="Channel Counter Register">CNT</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="PWM_CCNT1__CNT"><strong>CNT</strong>: Channel Counter Register</li>
+          <p>-</p>
+        </ul>
+        <h4 id="PWM_CUPD1">PWM PWM Channel Update Register (ch_num = 1)</h4>
+        <p><strong>Name</strong>: PWM_CUPD1</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x40020230</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CUPD1__CUPD">CUPD</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CUPD1__CUPD">CUPD</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CUPD1__CUPD">CUPD</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CUPD1__CUPD">CUPD</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="PWM_CUPD1__CUPD">
+            <strong>CUPD</strong>
+          </li>
+          <p>-</p>
+        </ul>
+        <h4 id="PWM_CMR2">PWM PWM Channel Mode Register (ch_num = 2)</h4>
+        <p><strong>Name</strong>: PWM_CMR2</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x40020240</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#PWM_CMR2__CPD" title="Channel Update Period">CPD</a>
+              </td>
+              <td colspan="1">
+                <a href="#PWM_CMR2__CPOL" title="Channel Polarity">CPOL</a>
+              </td>
+              <td colspan="1">
+                <a href="#PWM_CMR2__CALG" title="Channel Alignment">CALG</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="4">
+                <a href="#PWM_CMR2__CPRE" title="Channel Pre-scaler">CPRE</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="PWM_CMR2__CPRE"><strong>CPRE</strong>: Channel Pre-scaler<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">MCK</td><td class="description">Master Clock</td></tr><tr class="even"><td class="value">0x1</td><td class="name">MCKDIV2</td><td class="description">Master Clock divided by 2</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">MCKDIV4</td><td class="description">Master Clock divided by 4</td></tr><tr class="even"><td class="value">0x3</td><td class="name">MCKDIV8</td><td class="description">Master Clock divided by 8</td></tr><tr class="odd"><td class="value">0x4</td><td class="name">MCKDIV16</td><td class="description">Master Clock divided by 16</td></tr><tr class="even"><td class="value">0x5</td><td class="name">MCKDIV32</td><td class="description">Master Clock divided by 32</td></tr><tr class="odd"><td class="value">0x6</td><td class="name">MCKDIV64</td><td class="description">Master Clock divided by 64</td></tr><tr class="even"><td class="value">0x7</td><td class="name">MCKDIV128</td><td class="description">Master Clock divided by 128</td></tr><tr class="odd"><td class="value">0x8</td><td class="name">MCKDIV256</td><td class="description">Master Clock divided by 256</td></tr><tr class="even"><td class="value">0x9</td><td class="name">MCKDIV512</td><td class="description">Master Clock divided by 512</td></tr><tr class="odd"><td class="value">0xA</td><td class="name">MCKDIV1024</td><td class="description">Master Clock divided by 1024</td></tr><tr class="even"><td class="value">0xB</td><td class="name">CLKA</td><td class="description">Clock A</td></tr><tr class="odd"><td class="value">0xC</td><td class="name">CLKB</td><td class="description">Clock B</td></tr></tbody></table></li>
+          <li id="PWM_CMR2__CALG"><strong>CALG</strong>: Channel Alignment<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The period is left aligned.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The period is center aligned.</td></tr></tbody></table></li>
+          <li id="PWM_CMR2__CPOL"><strong>CPOL</strong>: Channel Polarity<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The output waveform starts at a low level.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The output waveform starts at a high level.</td></tr></tbody></table></li>
+          <li id="PWM_CMR2__CPD"><strong>CPD</strong>: Channel Update Period<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Writing to the PWM_CUPDx will modify the duty cycle at the next period start event.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Writing to the PWM_CUPDx will modify the period at the next period start event.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="PWM_CDTY2">PWM PWM Channel Duty Cycle Register (ch_num = 2)</h4>
+        <p><strong>Name</strong>: PWM_CDTY2</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x40020244</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CDTY2__CDTY" title="Channel Duty Cycle">CDTY</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CDTY2__CDTY" title="Channel Duty Cycle">CDTY</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CDTY2__CDTY" title="Channel Duty Cycle">CDTY</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CDTY2__CDTY" title="Channel Duty Cycle">CDTY</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="PWM_CDTY2__CDTY"><strong>CDTY</strong>: Channel Duty Cycle</li>
+          <p>-</p>
+        </ul>
+        <h4 id="PWM_CPRD2">PWM PWM Channel Period Register (ch_num = 2)</h4>
+        <p><strong>Name</strong>: PWM_CPRD2</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x40020248</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CPRD2__CPRD" title="Channel Period">CPRD</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CPRD2__CPRD" title="Channel Period">CPRD</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CPRD2__CPRD" title="Channel Period">CPRD</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CPRD2__CPRD" title="Channel Period">CPRD</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="PWM_CPRD2__CPRD"><strong>CPRD</strong>: Channel Period</li>
+          <p>-</p>
+        </ul>
+        <h4 id="PWM_CCNT2">PWM PWM Channel Counter Register (ch_num = 2)</h4>
+        <p><strong>Name</strong>: PWM_CCNT2</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x4002024C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CCNT2__CNT" title="Channel Counter Register">CNT</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CCNT2__CNT" title="Channel Counter Register">CNT</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CCNT2__CNT" title="Channel Counter Register">CNT</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CCNT2__CNT" title="Channel Counter Register">CNT</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="PWM_CCNT2__CNT"><strong>CNT</strong>: Channel Counter Register</li>
+          <p>-</p>
+        </ul>
+        <h4 id="PWM_CUPD2">PWM PWM Channel Update Register (ch_num = 2)</h4>
+        <p><strong>Name</strong>: PWM_CUPD2</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x40020250</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CUPD2__CUPD">CUPD</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CUPD2__CUPD">CUPD</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CUPD2__CUPD">CUPD</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CUPD2__CUPD">CUPD</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="PWM_CUPD2__CUPD">
+            <strong>CUPD</strong>
+          </li>
+          <p>-</p>
+        </ul>
+        <h4 id="PWM_CMR3">PWM PWM Channel Mode Register (ch_num = 3)</h4>
+        <p><strong>Name</strong>: PWM_CMR3</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x40020260</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#PWM_CMR3__CPD" title="Channel Update Period">CPD</a>
+              </td>
+              <td colspan="1">
+                <a href="#PWM_CMR3__CPOL" title="Channel Polarity">CPOL</a>
+              </td>
+              <td colspan="1">
+                <a href="#PWM_CMR3__CALG" title="Channel Alignment">CALG</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="4">
+                <a href="#PWM_CMR3__CPRE" title="Channel Pre-scaler">CPRE</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="PWM_CMR3__CPRE"><strong>CPRE</strong>: Channel Pre-scaler<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0x0</td><td class="name">MCK</td><td class="description">Master Clock</td></tr><tr class="even"><td class="value">0x1</td><td class="name">MCKDIV2</td><td class="description">Master Clock divided by 2</td></tr><tr class="odd"><td class="value">0x2</td><td class="name">MCKDIV4</td><td class="description">Master Clock divided by 4</td></tr><tr class="even"><td class="value">0x3</td><td class="name">MCKDIV8</td><td class="description">Master Clock divided by 8</td></tr><tr class="odd"><td class="value">0x4</td><td class="name">MCKDIV16</td><td class="description">Master Clock divided by 16</td></tr><tr class="even"><td class="value">0x5</td><td class="name">MCKDIV32</td><td class="description">Master Clock divided by 32</td></tr><tr class="odd"><td class="value">0x6</td><td class="name">MCKDIV64</td><td class="description">Master Clock divided by 64</td></tr><tr class="even"><td class="value">0x7</td><td class="name">MCKDIV128</td><td class="description">Master Clock divided by 128</td></tr><tr class="odd"><td class="value">0x8</td><td class="name">MCKDIV256</td><td class="description">Master Clock divided by 256</td></tr><tr class="even"><td class="value">0x9</td><td class="name">MCKDIV512</td><td class="description">Master Clock divided by 512</td></tr><tr class="odd"><td class="value">0xA</td><td class="name">MCKDIV1024</td><td class="description">Master Clock divided by 1024</td></tr><tr class="even"><td class="value">0xB</td><td class="name">CLKA</td><td class="description">Clock A</td></tr><tr class="odd"><td class="value">0xC</td><td class="name">CLKB</td><td class="description">Clock B</td></tr></tbody></table></li>
+          <li id="PWM_CMR3__CALG"><strong>CALG</strong>: Channel Alignment<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The period is left aligned.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The period is center aligned.</td></tr></tbody></table></li>
+          <li id="PWM_CMR3__CPOL"><strong>CPOL</strong>: Channel Polarity<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The output waveform starts at a low level.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The output waveform starts at a high level.</td></tr></tbody></table></li>
+          <li id="PWM_CMR3__CPD"><strong>CPD</strong>: Channel Update Period<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Writing to the PWM_CUPDx will modify the duty cycle at the next period start event.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Writing to the PWM_CUPDx will modify the period at the next period start event.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="PWM_CDTY3">PWM PWM Channel Duty Cycle Register (ch_num = 3)</h4>
+        <p><strong>Name</strong>: PWM_CDTY3</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x40020264</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CDTY3__CDTY" title="Channel Duty Cycle">CDTY</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CDTY3__CDTY" title="Channel Duty Cycle">CDTY</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CDTY3__CDTY" title="Channel Duty Cycle">CDTY</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CDTY3__CDTY" title="Channel Duty Cycle">CDTY</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="PWM_CDTY3__CDTY"><strong>CDTY</strong>: Channel Duty Cycle</li>
+          <p>-</p>
+        </ul>
+        <h4 id="PWM_CPRD3">PWM PWM Channel Period Register (ch_num = 3)</h4>
+        <p><strong>Name</strong>: PWM_CPRD3</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x40020268</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CPRD3__CPRD" title="Channel Period">CPRD</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CPRD3__CPRD" title="Channel Period">CPRD</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CPRD3__CPRD" title="Channel Period">CPRD</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CPRD3__CPRD" title="Channel Period">CPRD</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="PWM_CPRD3__CPRD"><strong>CPRD</strong>: Channel Period</li>
+          <p>-</p>
+        </ul>
+        <h4 id="PWM_CCNT3">PWM PWM Channel Counter Register (ch_num = 3)</h4>
+        <p><strong>Name</strong>: PWM_CCNT3</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x4002026C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CCNT3__CNT" title="Channel Counter Register">CNT</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CCNT3__CNT" title="Channel Counter Register">CNT</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CCNT3__CNT" title="Channel Counter Register">CNT</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CCNT3__CNT" title="Channel Counter Register">CNT</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="PWM_CCNT3__CNT"><strong>CNT</strong>: Channel Counter Register</li>
+          <p>-</p>
+        </ul>
+        <h4 id="PWM_CUPD3">PWM PWM Channel Update Register (ch_num = 3)</h4>
+        <p><strong>Name</strong>: PWM_CUPD3</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x40020270</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CUPD3__CUPD">CUPD</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CUPD3__CUPD">CUPD</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CUPD3__CUPD">CUPD</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#PWM_CUPD3__CUPD">CUPD</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="PWM_CUPD3__CUPD">
+            <strong>CUPD</strong>
+          </li>
+          <p>-</p>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>

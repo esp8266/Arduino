@@ -1,24 +1,24 @@
 /*
   Arduino Starter Kit example
  Project 11  - Crystal Ball
- 
+
  This sketch is written to accompany Project 11 in the
  Arduino Starter Kit
- 
+
  Parts required:
  220 ohm resistor
  10 kilohm resistor
  10 kilohm potentiometer
  16x2 LCD screen
  tilt switch
- 
- 
+
+
  Created 13 September 2012
  by Scott Fitzgerald
- 
+
  http://arduino.cc/starterKit
- 
- This example code is part of the public domain 
+
+ This example code is part of the public domain
  */
 
 // include the library code:
@@ -40,12 +40,12 @@ int prevSwitchState = 0;
 int reply;
 
 void setup() {
-  // set up the number of columns and rows on the LCD 
+  // set up the number of columns and rows on the LCD
   lcd.begin(16, 2);
-  
+
   // set up the switch pin as an input
-  pinMode(switchPin,INPUT);
-  
+  pinMode(switchPin, INPUT);
+
   // Print a message to the LCD.
   lcd.print("Ask the");
   // set the cursor to column 0, line 1
@@ -62,57 +62,57 @@ void loop() {
   // compare the switchState to its previous state
   if (switchState != prevSwitchState) {
     // if the state has changed from HIGH to LOW
-    // you know that the ball has been tilted from 
-    // one direction to the other 
+    // you know that the ball has been tilted from
+    // one direction to the other
     if (switchState == LOW) {
       // randomly chose a reply
       reply = random(8);
       // clean up the screen before printing a new reply
       lcd.clear();
-      // set the cursor to column 0, line 0     
+      // set the cursor to column 0, line 0
       lcd.setCursor(0, 0);
       // print some text
       lcd.print("the ball says:");
       // move the cursor to the second line
       lcd.setCursor(0, 1);
 
-      // choose a saying to print baed on the value in reply 
-      switch(reply){
-      case 0:
-        lcd.print("Yes");
-        break;
+      // choose a saying to print baed on the value in reply
+      switch (reply) {
+        case 0:
+          lcd.print("Yes");
+          break;
 
-      case 1:
-        lcd.print("Most likely");
-        break;
+        case 1:
+          lcd.print("Most likely");
+          break;
 
-      case 2:
-        lcd.print("Certainly");
-        break;
+        case 2:
+          lcd.print("Certainly");
+          break;
 
-      case 3:
-        lcd.print("Outlook good");
-        break;
+        case 3:
+          lcd.print("Outlook good");
+          break;
 
-      case 4:
-        lcd.print("Unsure");
-        break;
+        case 4:
+          lcd.print("Unsure");
+          break;
 
-      case 5:
-        lcd.print("Ask again");
-        break;
+        case 5:
+          lcd.print("Ask again");
+          break;
 
-      case 6:
-        lcd.print("Doubtful");
-        break;
+        case 6:
+          lcd.print("Doubtful");
+          break;
 
-      case 7:
-        lcd.print("No");
-        break;
+        case 7:
+          lcd.print("No");
+          break;
       }
     }
   }
-  // save the current switch state as the last state 
+  // save the current switch state as the last state
   prevSwitchState = switchState;
 }
 

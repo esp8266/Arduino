@@ -1,14 +1,14 @@
 /*
   String Case changes
- 
+
  Examples of how to change the case of a string
- 
+
  created 27 July 2010
  modified 2 Apr 2012
  by Tom Igoe
- 
+
  http://arduino.cc/en/Tutorial/StringCaseChanges
- 
+
  This example code is in the public domain.
  */
 
@@ -31,7 +31,7 @@ void loop() {
   stringOne.toUpperCase();
   Serial.println(stringOne);
 
-  // toLowerCase() changes all letters to lower case:  
+  // toLowerCase() changes all letters to lower case:
   String stringTwo = "</BODY></HTML>";
   Serial.println(stringTwo);
   stringTwo.toLowerCase();
@@ -39,5 +39,5 @@ void loop() {
 
 
   // do nothing while true:
-  while(true);
+  while (true);
 }

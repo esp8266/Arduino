@@ -1,14 +1,14 @@
 /*
   LiquidCrystal Library - Custom Characters
- 
- Demonstrates how to add custom characters on an LCD  display.  
- The LiquidCrystal library works with all LCD displays that are 
- compatible with the  Hitachi HD44780 driver. There are many of 
+
+ Demonstrates how to add custom characters on an LCD  display.
+ The LiquidCrystal library works with all LCD displays that are
+ compatible with the  Hitachi HD44780 driver. There are many of
  them out there, and you can usually tell them by the 16-pin interface.
- 
+
  This sketch prints "I <heart> Arduino!" and a little dancing man
  to the LCD.
- 
+
   The circuit:
  * LCD RS pin to digital pin 12
  * LCD Enable pin to digital pin 11
@@ -29,13 +29,13 @@
  
  Based on Adafruit's example at
  https://github.com/adafruit/SPI_VFD/blob/master/examples/createChar/createChar.pde
- 
+
  This example code is in the public domain.
  http://www.arduino.cc/en/Tutorial/LiquidCrystal
- 
+
  Also useful:
  http://icontexto.com/charactercreator/
- 
+
  */
 
 // include the library code:
@@ -111,15 +111,15 @@ void setup() {
   // create a new character
   lcd.createChar(2, frownie);
   // create a new character
-  lcd.createChar(3, armsDown);  
+  lcd.createChar(3, armsDown);
   // create a new character
-  lcd.createChar(4, armsUp);  
+  lcd.createChar(4, armsUp);
 
   // Print a message to the lcd.
   lcd.print("I "); 
   lcd.write(byte(0)); // when calling lcd.write() '0' must be cast as a byte
   lcd.print(" Arduino! ");
-  lcd.write(1);
+  lcd.write((byte) 1);
 
 }
 
@@ -136,5 +136,5 @@ void loop() {
   lcd.setCursor(4, 1);
   // draw him arms up:
   lcd.write(4);
-  delay(delayTime); 
+  delay(delayTime);
 }

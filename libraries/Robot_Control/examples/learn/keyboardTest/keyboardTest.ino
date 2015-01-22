@@ -1,6 +1,6 @@
 /*
  Keyboard Test
- 
+
  Check how the robot's keyboard works. This example
  sends the data about the key pressed through the
  serial port.
@@ -12,15 +12,15 @@
  It is possible to recalibrate the thresholds of the buttons using
  the Robot.keyboardCalibrate() function, that takes a 5 ints long
  array as parameter
- 
+
  Circuit:
  * Arduino Robot
- 
+
  created 1 May 2013
  by X. Yang
  modified 12 May 2013
  by D. Cuartielles
- 
+
  This example is in the public domain
  */
 

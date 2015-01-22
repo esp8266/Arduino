@@ -1,0 +1,84 @@
+USB:
+
+    USB High-Speed Bus:
+
+      Host Controller Location: Built-in USB
+      Host Controller Driver: AppleUSBEHCI
+      PCI Device ID: 0x1c2d 
+      PCI Revision ID: 0x0005 
+      PCI Vendor ID: 0x8086 
+      Bus Number: 0xfa 
+
+        Hub:
+
+          Product ID: 0x2513
+          Vendor ID: 0x0424  (SMSC)
+          Version:  b.b3
+          Speed: Up to 480 Mb/sec
+          Location ID: 0xfa100000 / 2
+          Current Available (mA): 500
+          Current Required (mA): 2
+
+            BRCM20702 Hub:
+
+              Product ID: 0x4500
+              Vendor ID: 0x0a5c  (Broadcom Corp.)
+              Version: 1.00
+              Speed: Up to 12 Mb/sec
+              Manufacturer: Apple Inc.
+              Location ID: 0xfa110000 / 3
+              Current Available (mA): 500
+              Current Required (mA): 94
+
+                Bluetooth USB Host Controller:
+
+                  Product ID: 0x8281
+                  Vendor ID: 0x05ac  (Apple Inc.)
+                  Version: 0.97
+                  Speed: Up to 12 Mb/sec
+                  Manufacturer: Apple Inc.
+                  Location ID: 0xfa113000 / 4
+                  Current Available (mA): 500
+                  Current Required (mA): 0
+
+    USB High-Speed Bus:
+
+      Host Controller Location: Built-in USB
+      Host Controller Driver: AppleUSBEHCI
+      PCI Device ID: 0x7fa700001c26 
+      PCI Revision ID: 0x7fa700000005 
+      PCI Vendor ID: 0x7fa700008086 
+      Bus Number: 0xfd 
+
+        Hub:
+
+          Product ID: 0x2513
+          Vendor ID: 0x0424  (SMSC)
+          Version:  b.b3
+          Speed: Up to 480 Mb/sec
+          Location ID: 0xfd100000 / 2
+          Current Available (mA): 500
+          Current Required (mA): 2
+
+            Arduino Leonardo:
+
+              Product ID: 0x8036
+              Vendor ID: 0x2341
+              Version: 1.00
+              Speed: Up to 12 Mb/sec
+              Manufacturer: Arduino LLC
+              Location ID: 0xfd130000 / 4
+              Current Available (mA): 500
+              Current Required (mA): 500
+
+            IR Receiver:
+
+              Product ID: 0x8242
+              Vendor ID: 0x05ac  (Apple Inc.)
+              Version: 0.16
+              Speed: Up to 1.5 Mb/sec
+              Manufacturer: Apple Computer, Inc.
+              Location ID: 0xfd110000 / 3
+              Current Available (mA): 500
+              Current Required (mA): 100
+

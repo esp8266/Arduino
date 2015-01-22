@@ -7,7 +7,7 @@
   By moving the joystick in a direction or by pressing a switch,
   the PC will "see" that a key is pressed. If the PC is running
   a game that has keyboard input, the Esplora can control it.
-  
+
   The default configuration is suitable for SuperTuxKart, an
   open-source racing game. It can be downloaded from
   http://supertuxkart.sourceforge.net/ .
@@ -20,11 +20,11 @@
 #include <Esplora.h>
 
 /*
-  You're going to handle eight different buttons. You'll use arrays, 
-  which are ordered lists of variables with a fixed size. Each array 
+  You're going to handle eight different buttons. You'll use arrays,
+  which are ordered lists of variables with a fixed size. Each array
   has an index (counting from 0) to keep track of the position
   you're reading in the array, and each position can contain a number.
- 
+
   This code uses three different arrays: one for the buttons you'll read;
   a second to hold the current states of those buttons; and a third to hold
   the keystrokes associated with each button.
@@ -89,14 +89,14 @@ void setup() {
   Here we continuously check if something happened with the
   buttons.
 */
-void loop() { 
-  
+void loop() {
+
   // Iterate through all the buttons:
-  for (byte thisButton=0; thisButton<8; thisButton++) {
+  for (byte thisButton = 0; thisButton < 8; thisButton++) {
     boolean lastState = buttonStates[thisButton];
     boolean newState = Esplora.readButton(buttons[thisButton]);
     if (lastState != newState) { // Something changed!
-      /* 
+      /*
         The Keyboard library allows you to "press" and "release" the
         keys as two distinct actions. These actions can be
         linked to the buttons we're handling.
@@ -112,7 +112,7 @@ void loop() {
     // Store the new button state, so you can sense a difference later:
     buttonStates[thisButton] = newState;
   }
-  
+
   /*
     Wait a little bit (50ms) between a check and another.
     When a mechanical switch is pressed or released, the

@@ -1,12 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry excluding="processing/app/tools/format/|processing/app/tools/format/src/|processing/app/Trace.java|processing/app/RunnerClassLoader.java" kind="src" path="app/src"/>
+	<classpathentry kind="src" path="app/test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/processing-core"/>
 	<classpathentry kind="lib" path="app/lib/antlr.jar"/>
 	<classpathentry kind="lib" path="app/lib/apple.jar"/>
 	<classpathentry kind="lib" path="app/lib/ecj.jar"/>
 	<classpathentry kind="lib" path="app/lib/jna.jar"/>
-	<classpathentry kind="lib" path="app/lib/RXTXcomm.jar"/>
+	<classpathentry kind="lib" path="app/test-lib/junit-4.11.jar"/>
+	<classpathentry kind="lib" path="app/test-lib/fest-assert-1.2.jar"/>
+	<classpathentry kind="lib" path="app/test-lib/fest-reflect-1.2.jar"/>
+	<classpathentry kind="lib" path="app/test-lib/fest-swing-1.2.jar" sourcepath="/home/megabug/git/fest-swing-1.2-sources.jar"/>
+	<classpathentry kind="lib" path="app/test-lib/fest-util-1.1.2.jar"/>
+	<classpathentry kind="lib" path="app/test-lib/jcip-annotations-1.0.jar"/>
+	<classpathentry kind="lib" path="app/lib/commons-codec-1.7.jar"/>
+	<classpathentry kind="lib" path="app/lib/commons-exec-1.1.jar"/>
+	<classpathentry kind="lib" path="app/lib/commons-httpclient-3.1.jar"/>
+	<classpathentry kind="lib" path="app/lib/commons-logging-1.0.4.jar"/>
+	<classpathentry kind="lib" path="app/lib/jmdns-3.4.1.jar"/>
+	<classpathentry kind="lib" path="app/lib/jsch-0.1.50.jar"/>
+	<classpathentry kind="lib" path="app/lib/jssc-2.8.0.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/arduino-core"/>
 	<classpathentry kind="output" path="app/bin"/>
 </classpath>

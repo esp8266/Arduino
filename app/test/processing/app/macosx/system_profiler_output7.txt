@@ -1,0 +1,151 @@
+USB:
+
+    USB Hi-Speed Bus:
+
+      Host Controller Location: Built-in USB
+      Host Controller Driver: AppleUSBEHCI
+      PCI Device ID: 0x0d9d
+      PCI Revision ID: 0x00a2
+      PCI Vendor ID: 0x10de
+      Bus Number: 0x26
+
+        Internal Memory Card Reader:
+
+          Product ID: 0x8403
+          Vendor ID: 0x05ac  (Apple Inc.)
+          Version: 98,33
+          Serial Number: 9833
+          Speed: Up to 480 Mb/sec
+          Manufacturer: Apple
+          Location ID: 0x26100000 / 2
+          Current Available (mA): 500
+          Current Required (mA): 500
+
+    USB Hi-Speed Bus:
+
+      Host Controller Location: Built-in USB
+      Host Controller Driver: AppleUSBEHCI
+      PCI Device ID: 0x0d9d
+      PCI Revision ID: 0x00a2
+      PCI Vendor ID: 0x10de
+      Bus Number: 0x24
+
+        USB 2.0 Hub:
+
+          Product ID: 0x0101
+          Vendor ID: 0x1a40  (TERMINUS TECHNOLOGY INC.)
+          Version: 1,11
+          Speed: Up to 480 Mb/sec
+          Location ID: 0x24100000 / 3
+          Current Available (mA): 500
+          Current Required (mA): 100
+
+            FT230X Basic UART:
+
+              Product ID: 0x6015
+              Vendor ID: 0x0403  (Future Technology Devices International Limited)
+              Version: 10,00
+              Serial Number: DN0031EV
+              Speed: Up to 12 Mb/sec
+              Manufacturer: FTDI
+              Location ID: 0x24120000 / 7
+              Current Available (mA): 500
+              Current Required (mA): 90
+
+            Arduino Leonardo:
+
+              Product ID: 0x8036
+              Vendor ID: 0x2341
+              Version: 1,00
+              Speed: Up to 12 Mb/sec
+              Manufacturer: Arduino LLC
+              Location ID: 0x24130000 / 6
+              Current Available (mA): 500
+              Current Required (mA): 500
+
+            USB Receiver:
+
+              Product ID: 0xc521
+              Vendor ID: 0x046d  (Logitech Inc.)
+              Version: 57,01
+              Speed: Up to 1.5 Mb/sec
+              Manufacturer: Logitech
+              Location ID: 0x24140000 / 5
+              Current Available (mA): 500
+              Current Required (mA): 98
+
+        Built-in iSight:
+
+          Product ID: 0x8507
+          Vendor ID: 0x05ac  (Apple Inc.)
+          Version: 4,35
+          Serial Number: 8JA9E1A6TDCLNL00
+          Speed: Up to 480 Mb/sec
+          Manufacturer: Apple Inc.
+          Location ID: 0x24600000 / 2
+          Current Available (mA): 500
+          Current Required (mA): 500
+
+    USB Bus:
+
+      Host Controller Location: Built-in USB
+      Host Controller Driver: AppleUSBOHCI
+      PCI Device ID: 0x0d9c
+      PCI Revision ID: 0x00a1
+      PCI Vendor ID: 0x10de
+      Bus Number: 0x06
+
+        BRCM2046 Hub:
+
+          Product ID: 0x4500
+          Vendor ID: 0x0a5c  (Broadcom Corp.)
+          Version: 1,00
+          Speed: Up to 12 Mb/sec
+          Manufacturer: Apple Inc.
+          Location ID: 0x06600000 / 4
+          Current Available (mA): 500
+          Current Required (mA): 0
+
+            Bluetooth USB Host Controller:
+
+              Product ID: 0x8213
+              Vendor ID: 0x05ac  (Apple Inc.)
+              Version: 2,06
+              Serial Number: C8BCC8B0B471
+              Speed: Up to 12 Mb/sec
+              Manufacturer: Apple Inc.
+              Location ID: 0x06610000 / 5
+              Current Available (mA): 500
+              Current Required (mA): 0
+
+        IR Receiver:
+
+          Product ID: 0x8242
+          Vendor ID: 0x05ac  (Apple Inc.)
+          Version: 0,16
+          Speed: Up to 1.5 Mb/sec
+          Manufacturer: Apple Computer, Inc.
+          Location ID: 0x06500000 / 3
+          Current Available (mA): 500
+          Current Required (mA): 100
+
+        Apple Internal Keyboard / Trackpad:
+
+          Product ID: 0x0237
+          Vendor ID: 0x05ac  (Apple Inc.)
+          Version: 0,90
+          Speed: Up to 12 Mb/sec
+          Manufacturer: Apple Inc.
+          Location ID: 0x06300000 / 2
+          Current Available (mA): 500
+          Current Required (mA): 40
+
+    USB Bus:
+
+      Host Controller Location: Built-in USB
+      Host Controller Driver: AppleUSBOHCI
+      PCI Device ID: 0x0d9c
+      PCI Revision ID: 0x00a1
+      PCI Vendor ID: 0x10de
+      Bus Number: 0x04
+

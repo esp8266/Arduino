@@ -15,15 +15,21 @@
   <icon>application.ico</icon>
   <classPath>
     <mainClass>processing.app.Base</mainClass>
+    <cp>lib/arduino-core.jar</cp>
     <cp>lib/pde.jar</cp>
-    <cp>lib/core.jar</cp>
     <cp>lib/jna.jar</cp>
     <cp>lib/ecj.jar</cp>
-    <cp>lib/RXTXcomm.jar</cp>
+    <cp>lib/jssc-2.8.0.jar</cp>
+    <cp>lib/commons-codec-1.7.jar</cp>
+    <cp>lib/commons-exec-1.1.jar</cp>
+    <cp>lib/commons-httpclient-3.1.jar</cp>
+    <cp>lib/commons-logging-1.0.4.jar</cp>
+    <cp>lib/jmdns-3.4.1.jar</cp>
+    <cp>lib/jsch-0.1.50.jar</cp>
   </classPath>
   <jre>
     <path>java</path>
-    <minVersion>1.5.0</minVersion>
+    <minVersion>1.6.0</minVersion>
     <maxVersion></maxVersion>
     <jdkPreference>preferJre</jdkPreference>
     <opt>-Xms128m -Xmx128m</opt>

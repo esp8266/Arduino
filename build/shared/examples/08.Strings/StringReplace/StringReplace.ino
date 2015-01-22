@@ -1,15 +1,15 @@
 /*
   String replace()
- 
+
  Examples of how to replace characters or substrings of a string
- 
+
  created 27 July 2010
  modified 2 Apr 2012
  by Tom Igoe
- 
+
  http://arduino.cc/en/Tutorial/StringReplace
- 
- This example code is in the public domain. 
+
+ This example code is in the public domain.
  */
 
 void setup() {
@@ -46,5 +46,5 @@ void loop() {
   Serial.println("l33tspeak: " + leetString);
 
   // do nothing while true:
-  while(true);
+  while (true);
 }

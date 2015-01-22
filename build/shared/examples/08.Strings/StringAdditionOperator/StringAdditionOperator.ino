@@ -1,16 +1,16 @@
 /*
   Adding Strings together
- 
+
  Examples of how to add strings together
  You can also add several different data types to string, as shown here:
- 
+
  created 27 July 2010
  modified 2 Apr 2012
  by Tom Igoe
- 
+
  http://arduino.cc/en/Tutorial/StringAdditionOperator
- 
- This example code is in the public domain. 
+
+ This example code is in the public domain.
  */
 
 // declare three strings:
@@ -59,10 +59,10 @@ void loop() {
 
   // adding a variable long integer to a string:
   long currentTime = millis();
-  stringOne="millis() value: ";
+  stringOne = "millis() value: ";
   stringThree = stringOne + millis();
   Serial.println(stringThree);    // prints "The millis: 345345" or whatever value currentTime has
 
   // do nothing while true:
-  while(true);
+  while (true);
 }

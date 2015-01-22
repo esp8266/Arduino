@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>SAM3XA EFC1</title>
+    <link rel="stylesheet" type="text/css" href="css/html.css" media="all" />
+  </head>
+  <body id="abstract">
+    <div id="container">
+      <div id="content">
+        <a id="EFC1"></a>
+        <h1>SAM3XA EFC1</h1>
+        <a id="EFC1__User_Interface"></a>
+        <h2>Embedded Flash Controller (EFC1) User Interface</h2>
+<!--As per 6450E programmer datasheet.-->
+        <h3>Registers</h3>
+        <table class="registers">
+          <caption>Register Mapping</caption>
+          <thead>
+            <tr>
+              <th class="address">Address</th>
+              <th class="description">Register</th>
+              <th class="name">Name</th>
+              <th class="access">Access</th>
+              <th class="reset">Reset</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="odd">
+              <td class="address" id="address_0x400E0C00">0x400E0C00</td>
+              <td class="description">EEFC Flash Mode Register</td>
+              <td class="name">
+                <a href="#EFC1_FMR" title="EEFC Flash Mode Register" class="one_click_away">EFC1_FMR</a>
+              </td>
+              <td class="access">read-write</td>
+              <td class="address">0x00000000</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400E0C04">0x400E0C04</td>
+              <td class="description">EEFC Flash Command Register</td>
+              <td class="name">
+                <a href="#EFC1_FCR" title="EEFC Flash Command Register" class="one_click_away">EFC1_FCR</a>
+              </td>
+              <td class="access">write-only</td>
+              <td class="address">-</td>
+            </tr>
+            <tr class="odd">
+              <td class="address" id="address_0x400E0C08">0x400E0C08</td>
+              <td class="description">EEFC Flash Status Register</td>
+              <td class="name">
+                <a href="#EFC1_FSR" title="EEFC Flash Status Register" class="one_click_away">EFC1_FSR</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x00000001</td>
+            </tr>
+            <tr class="even">
+              <td class="address" id="address_0x400E0C0C">0x400E0C0C</td>
+              <td class="description">EEFC Flash Result Register</td>
+              <td class="name">
+                <a href="#EFC1_FRR" title="EEFC Flash Result Register" class="one_click_away">EFC1_FRR</a>
+              </td>
+              <td class="access">read-only</td>
+              <td class="address">0x00000000</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3>Register Fields</h3>
+        <h4 id="EFC1_FMR">EFC1 EEFC Flash Mode Register</h4>
+        <p><strong>Name</strong>: EFC1_FMR</p>
+        <p><strong>Access</strong>: read-write</p>
+        <p><strong>Address</strong>: 0x400E0C00</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#EFC1_FMR__FAM" title="Flash Access Mode">FAM</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#EFC1_FMR__SCOD" title="Sequential Code Optimization Disable">SCOD</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="4">
+                <a href="#EFC1_FMR__FWS" title="Flash Wait State">FWS</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#EFC1_FMR__FRDY" title="Ready Interrupt Enable">FRDY</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EFC1_FMR__FRDY"><strong>FRDY</strong>: Ready Interrupt Enable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">Flash Ready does not generate an interrupt.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Flash Ready (to accept a new command) generates an interrupt.</td></tr></tbody></table></li>
+          <li id="EFC1_FMR__FWS"><strong>FWS</strong>: Flash Wait State</li>
+          <p>-</p>
+          <li id="EFC1_FMR__SCOD"><strong>SCOD</strong>: Sequential Code Optimization Disable<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The sequential code optimization is enabled.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The sequential code optimization is disabled.</td></tr></tbody></table></li>
+          <li id="EFC1_FMR__FAM"><strong>FAM</strong>: Flash Access Mode<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">128-bit access in read Mode only, to enhance access speed.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">64-bit access in read Mode only, to enhance power consumption.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="EFC1_FCR">EFC1 EEFC Flash Command Register</h4>
+        <p><strong>Name</strong>: EFC1_FCR</p>
+        <p><strong>Access</strong>: write-only</p>
+        <p><strong>Address</strong>: 0x400E0C04</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EFC1_FCR__FKEY" title="Flash Writing Protection Key">FKEY</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EFC1_FCR__FARG" title="Flash Command Argument">FARG</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EFC1_FCR__FARG" title="Flash Command Argument">FARG</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EFC1_FCR__FCMD" title="Flash Command">FCMD</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EFC1_FCR__FCMD"><strong>FCMD</strong>: Flash Command</li>
+          <p>-</p>
+          <li id="EFC1_FCR__FARG"><strong>FARG</strong>: Flash Command Argument</li>
+          <p>-</p>
+          <li id="EFC1_FCR__FKEY"><strong>FKEY</strong>: Flash Writing Protection Key</li>
+          <p>-</p>
+        </ul>
+        <h4 id="EFC1_FSR">EFC1 EEFC Flash Status Register</h4>
+        <p><strong>Name</strong>: EFC1_FSR</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x400E0C08</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td colspan="1">
+                <a href="#EFC1_FSR__FLOCKE" title="Flash Lock Error Status">FLOCKE</a>
+              </td>
+              <td colspan="1">
+                <a href="#EFC1_FSR__FCMDE" title="Flash Command Error Status">FCMDE</a>
+              </td>
+              <td colspan="1">
+                <a href="#EFC1_FSR__FRDY" title="Flash Ready Status">FRDY</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EFC1_FSR__FRDY"><strong>FRDY</strong>: Flash Ready Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">The Enhanced Embedded Flash Controller (EEFC) is busy.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">The Enhanced Embedded Flash Controller (EEFC) is ready to start a new command.</td></tr></tbody></table></li>
+          <li id="EFC1_FSR__FCMDE"><strong>FCMDE</strong>: Flash Command Error Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No invalid commands and no bad keywords were written in the Flash Mode Register EEFC_FMR.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">An invalid command and/or a bad keyword was/were written in the Flash Mode Register EEFC_FMR.</td></tr></tbody></table></li>
+          <li id="EFC1_FSR__FLOCKE"><strong>FLOCKE</strong>: Flash Lock Error Status<table class="values"><thead><tr><th>Value</th><th>Name</th><th>Description</th></tr></thead><tbody><tr class="odd"><td class="value">0</td><td class="name">-</td><td class="description">No programming/erase of at least one locked region has happened since the last read of EEFC_FSR.</td></tr><tr class="even"><td class="value">1</td><td class="name">-</td><td class="description">Programming/erase of at least one locked region has happened since the last read of EEFC_FSR.</td></tr></tbody></table></li>
+        </ul>
+        <h4 id="EFC1_FRR">EFC1 EEFC Flash Result Register</h4>
+        <p><strong>Name</strong>: EFC1_FRR</p>
+        <p><strong>Access</strong>: read-only</p>
+        <p><strong>Address</strong>: 0x400E0C0C</p>
+        <table class="fields">
+          <tbody>
+            <tr class="offsets">
+              <td>31</td>
+              <td>30</td>
+              <td>29</td>
+              <td>28</td>
+              <td>27</td>
+              <td>26</td>
+              <td>25</td>
+              <td>24</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EFC1_FRR__FVALUE" title="Flash Result Value">FVALUE</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>23</td>
+              <td>22</td>
+              <td>21</td>
+              <td>20</td>
+              <td>19</td>
+              <td>18</td>
+              <td>17</td>
+              <td>16</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EFC1_FRR__FVALUE" title="Flash Result Value">FVALUE</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>15</td>
+              <td>14</td>
+              <td>13</td>
+              <td>12</td>
+              <td>11</td>
+              <td>10</td>
+              <td>9</td>
+              <td>8</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EFC1_FRR__FVALUE" title="Flash Result Value">FVALUE</a>
+              </td>
+            </tr>
+            <tr class="offsets">
+              <td>7</td>
+              <td>6</td>
+              <td>5</td>
+              <td>4</td>
+              <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+            </tr>
+            <tr class="fields">
+              <td colspan="8">
+                <a href="#EFC1_FRR__FVALUE" title="Flash Result Value">FVALUE</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="values">
+          <li id="EFC1_FRR__FVALUE"><strong>FVALUE</strong>: Flash Result Value</li>
+          <p>-</p>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>

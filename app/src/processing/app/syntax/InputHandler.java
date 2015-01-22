@@ -24,7 +24,6 @@ import java.util.*;
  * to the implementations of this class to do so.
  *
  * @author Slava Pestov
- * @version $Id: InputHandler.java 6126 2010-02-16 23:43:53Z fry $
  */
 public abstract class InputHandler extends KeyAdapter
 {

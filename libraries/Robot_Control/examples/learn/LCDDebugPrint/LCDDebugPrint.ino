@@ -1,17 +1,17 @@
 /*
  LCD Debug Print
- 
+
  Use the Robot's library function debugPrint() to
  quickly send a sensor reading to the robot's creen.
- 
+
  Circuit:
  * Arduino Robot
- 
+
  created 1 May 2013
  by X. Yang
  modified 12 May 2013
  by D. Cuartielles
- 
+
  This example is in the public domain
  */
 
@@ -28,7 +28,7 @@ void setup() {
   // initialize the screen
   Robot.beginTFT();
 }
-void loop(){
+void loop() {
   // read a value
   value = analogRead(A4);
 

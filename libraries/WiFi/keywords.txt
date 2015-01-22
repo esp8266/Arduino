@@ -3,10 +3,16 @@
 #######################################
 
 #######################################
+# Library (KEYWORD3)
+#######################################
+
+WiFi	KEYWORD3
+WiFiUdp	KEYWORD3
+
+#######################################
 # Datatypes (KEYWORD1)
 #######################################
 
-WiFi	KEYWORD1
 Client	KEYWORD1
 Server	KEYWORD1
 
@@ -14,6 +20,7 @@ Server	KEYWORD1
 # Methods and Functions (KEYWORD2)
 #######################################
 
+firmwareVersion	KEYWORD2
 status	KEYWORD2
 connect	KEYWORD2
 write	KEYWORD2
@@ -44,6 +51,7 @@ endPacket	KEYWORD2
 parsePacket	KEYWORD2
 remoteIP	KEYWORD2
 remotePort	KEYWORD2
+
 
 #######################################
 # Constants (LITERAL1)
