@@ -20,7 +20,7 @@ The following changes are included also in the Arduino IDE 1.0.7:
 [ide]
 * Mitigated Serial Monitor resource exhaustion when the connected device sends a lot of data (Paul Stoffregen)
 
-ARDUINO 1.6.0rc1
+ARDUINO 1.6.0rc1 - 2014.12.11
 
 * IDE internals have been refactored and sorted out. (Claudio Indellicati)
   https://github.com/arduino/Arduino/pull/2328
@@ -32,11 +32,10 @@ ARDUINO 1.6.0rc1
 * Autosave on sketch Upload/Verify (Fulvio Ieva)
 * Sketch build process: fixed full rebuild on windows even if not needed
 * Sketch build process: core.a rebuild only if needed (Matthijs Kooijman)
-* Updated AStyle formatter to v2.04: http://astyle.sourceforge.net/notes.html
+* Updated AStyle formatter to v2.05: http://astyle.sourceforge.net/notes.html
 * Improved avrdude verbose upload (Matthijs Kooijman)
 * (Mac OSX) Add Exported UTI for ino files, allows quick look to view the
   content of the file and external editors to syntax highlight as C++ (Matt Lloyd)
-* Updated libastyle to 2.05
 
 [core]
 * sam: added -MMD flag to let gcc produce dependency files (full rebuild on Arduino Due is now triggered only if needed)
