@@ -1133,8 +1133,8 @@ public class Sketch {
    * @return null if compilation failed, main class name if not
    * @throws RunnerException
    */
-  public String build(boolean verbose) throws RunnerException, PreferencesMapException {
-    return build(tempBuildFolder.getAbsolutePath(), verbose);
+  public String build(boolean verbose, boolean save) throws RunnerException, PreferencesMapException {
+    return build(tempBuildFolder.getAbsolutePath(), verbose, save);
   }
 
   /**
@@ -1146,7 +1146,7 @@ public class Sketch {
    *
    * @return null if compilation failed, main class name if not
    */
-  public String build(String buildPath, boolean verbose) throws RunnerException, PreferencesMapException {
+  public String build(String buildPath, boolean verbose, boolean save) throws RunnerException, PreferencesMapException {
     // run the preprocessor
     editor.status.progressUpdate(20);
 
@@ -1159,7 +1159,7 @@ public class Sketch {
       }
     };
     
-    return Compiler.build(data, buildPath, tempBuildFolder, pl, verbose);
+    return Compiler.build(data, buildPath, tempBuildFolder, pl, verbose, save);
   }
 
   protected boolean exportApplet(boolean usingProgrammer) throws Exception {
@@ -1177,7 +1177,7 @@ public class Sketch {
 
     // build the sketch
     editor.status.progressNotice(_("Compiling sketch..."));
-    String foundName = build(appletPath, false);
+    String foundName = build(appletPath, false, false);
     // (already reported) error during export, exit this function
     if (foundName == null) return false;
 

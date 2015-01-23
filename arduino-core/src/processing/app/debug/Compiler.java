@@ -67,6 +67,7 @@ public class Compiler implements MessageConsumer {
   private SketchData sketch;
   private PreferencesMap prefs;
   private boolean verbose;
+  private boolean saveHex;
 
   private List<File> objectFiles;
 
@@ -83,7 +84,7 @@ public class Compiler implements MessageConsumer {
 
   private ProgressListener progressListener;
 
-  static public String build(SketchData data, String buildPath, File tempBuildFolder, ProgressListener progListener, boolean verbose) throws RunnerException, PreferencesMapException {
+  static public String build(SketchData data, String buildPath, File tempBuildFolder, ProgressListener progListener, boolean verbose, boolean save) throws RunnerException, PreferencesMapException {
     if (SketchData.checkSketchFile(data.getPrimaryFile()) == null)
       BaseNoGui.showError(_("Bad file selected"),
                           _("Bad sketch primary file or bad sketch directory structure"), null);
@@ -113,7 +114,7 @@ public class Compiler implements MessageConsumer {
     // compile the program. errors will happen as a RunnerException
     // that will bubble up to whomever called build().
     try {
-      if (compiler.compile(verbose)) {
+      if (compiler.compile(verbose, save)) {
         compiler.size(compiler.getBuildPreferences());
         return primaryClassName;
       }
@@ -350,10 +351,11 @@ public class Compiler implements MessageConsumer {
    * @return true if successful.
    * @throws RunnerException Only if there's a problem. Only then.
    */
-  public boolean compile(boolean _verbose) throws RunnerException, PreferencesMapException {
+  public boolean compile(boolean _verbose, boolean _save) throws RunnerException, PreferencesMapException {
     preprocess(prefs.get("build.path"));
     
     verbose = _verbose || PreferencesData.getBoolean("build.verbose");
+    saveHex = _save;
     sketchIsCompiled = false;
 
     // Hook runs at Start of Compilation
@@ -399,26 +401,26 @@ public class Compiler implements MessageConsumer {
     }
     
     // 1. compile the sketch (already in the buildPath)
-    progressListener.progress(30);
+    progressListener.progress(20);
     compileSketch(includeFolders);
     sketchIsCompiled = true;
 
     // 2. compile the libraries, outputting .o files to: <buildPath>/<library>/
     // Doesn't really use configPreferences
-    progressListener.progress(40);
+    progressListener.progress(30);
     compileLibraries(includeFolders);
 
     // 3. compile the core, outputting .o files to <buildPath> and then
     // collecting them into the core.a library file.
-    progressListener.progress(50);
+    progressListener.progress(40);
     compileCore();
 
     // 4. link it all together into the .elf file
-    progressListener.progress(60);
+    progressListener.progress(50);
     compileLink();
 
     // 5. run objcopy to generate output files
-    progressListener.progress(75);
+    progressListener.progress(60);
     List<String> objcopyPatterns = new ArrayList<String>();
     for (String key : prefs.keySet()) {
       if (key.startsWith("recipe.objcopy.") && key.endsWith(".pattern"))
@@ -427,6 +429,12 @@ public class Compiler implements MessageConsumer {
     Collections.sort(objcopyPatterns);
     for (String recipe : objcopyPatterns) {
       runRecipe(recipe);
+    }
+
+    // 7. save the hex file
+    if (saveHex) {
+      progressListener.progress(80);
+      saveHex();
     }
 
     progressListener.progress(90);
@@ -1144,6 +1152,37 @@ public class Compiler implements MessageConsumer {
     }
     execAsynchronously(cmdArray);
   }
+  
+  //7. Save the .hex file
+  void saveHex() throws RunnerException {
+    PreferencesMap dict = new PreferencesMap(prefs);
+    dict.put("ide_version", "" + BaseNoGui.REVISION);
+
+    String[] cmdArray;
+    try {
+      String tmp_file = prefs.getOrExcept("recipe.hex.tmp_file");
+      tmp_file = StringReplacer.replaceFromMapping(tmp_file, dict);
+      String save_file = prefs.getOrExcept("recipe.hex.save_file");
+      save_file = StringReplacer.replaceFromMapping(save_file, dict);
+
+      File hexFile = new File(prefs.get("build.path") + "/" + tmp_file);
+      File saveFile = new File(sketch.getFolder().getAbsolutePath() + "/" + save_file);
+
+      FileReader in = new FileReader(hexFile);
+      FileWriter out = new FileWriter(saveFile);
+
+      int c;
+      while ((c = in.read()) != -1)
+        out.write(c);
+
+      in.close();
+      out.close();
+      
+    } catch (Exception e) {
+      throw new RunnerException(e);
+    }
+  }
+  
 
   private static String prepareIncludes(List<File> includeFolders) {
     String res = "";
