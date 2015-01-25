@@ -1,13 +1,41 @@
 
-ARDUINO 1.5.9
+ARDUINO 1.6.0rc2 - 2015.01.20
+
+[ide]
+* Reenabled speed of 38400 on serial monitor
+* Improved Find/Replace dialog layout (Eberhard Fahle)
+* Fixed missing .dll error on some Windows box
+
+[core]
+* Arduino "boolean" type is now mapped to "bool" instead of "uint8_t" (Christopher Andrews)
+* sam: HardwareSerial now has buffered transmission (Collin Kidder)
+* sam: HardwareSerial fixed modes (parity, data bits, stop bits) (bluesign2k)
+* avr: Fixed regression in pulseIn() function accuracy
+
+[libraries]
+* GSM: minor changes and bug fix (https://github.com/arduino/Arduino/pull/2546)
+
+The following changes are included also in the Arduino IDE 1.0.7:
+
+[ide]
+* Mitigated Serial Monitor resource exhaustion when the connected device sends a lot of data (Paul Stoffregen)
+
+ARDUINO 1.6.0rc1 - 2014.12.11
+
+* IDE internals have been refactored and sorted out. (Claudio Indellicati)
+  https://github.com/arduino/Arduino/pull/2328
+  The builder and the GUI now have clearly separated source code making it easier
+  for IDE developers to maintain and propose patch.
+  From a user point of view nothing changes and the IDE should behave exactly as before.
 
 [ide]
 * Autosave on sketch Upload/Verify (Fulvio Ieva)
 * Sketch build process: fixed full rebuild on windows even if not needed
 * Sketch build process: core.a rebuild only if needed (Matthijs Kooijman)
-* Updated AStyle formatter to v2.04: http://astyle.sourceforge.net/notes.html
+* Updated AStyle formatter to v2.05: http://astyle.sourceforge.net/notes.html
 * Improved avrdude verbose upload (Matthijs Kooijman)
-* (Mac OSX) Add Exported UTI for ino files, allows quick look to view the content of the file and external editors to syntax highlight as C++ (Matt Lloyd)
+* (Mac OSX) Add Exported UTI for ino files, allows quick look to view the
+  content of the file and external editors to syntax highlight as C++ (Matt Lloyd)
 
 [core]
 * sam: added -MMD flag to let gcc produce dependency files (full rebuild on Arduino Due is now triggered only if needed)
@@ -16,6 +44,7 @@ ARDUINO 1.5.9
 * LiquidCrystal: added setRowOffsets function to support different LCD hardware configurations (Mark Sproul)
 * LiquidCrystal: various improvements and optimizations (Matthijs Kooijman)
 * Fixed PROGMEM error in Robot_Control/examples/explore/R06_Wheel_Calibration
+* SD: Fixed SPI transaction mismatch (Paul Stoffregen)
 
 The following changes are included also in the Arduino IDE 1.0.7:
 
@@ -359,12 +388,19 @@ ARDUINO 1.5 BETA - 2012.10.22
 ARDUINO 1.0.7
 
 [libraries]
-* Backported GSM from IDE 1.5.x
-* EthernetClien: use IANA recommended ephemeral port range, 49152-65535 (Jack Christensen, cifer-lee)
+* Backported SPI Transaction API from IDE 1.5.x (Paul Stoffregen)
+* Backported GSM from IDE 1.5.x: fix build regression
+* Backported Ethernet from IDE 1.5.x
+* Backported SD from IDE 1.5.x
+* Backported SPI from IDE 1.5.x
+* EthernetClient: use IANA recommended ephemeral port range, 49152-65535 (Jack Christensen, cifer-lee)
 
 [core]
 * Fixed missing NOT_AN_INTERRUPT constant in digitalPinToInterrupt() macro
-* Fixed regression in HardwareSerial::available() introduced with https://github.com/arduino/Arduino/pull/2057
+* Fixed performance regression in HardwareSerial::available() introduced with https://github.com/arduino/Arduino/pull/2057
+
+[ide]
+* Mitigated Serial Monitor resource exhaustion when the connected device sends a lot of data (Paul Stoffregen)
 
 ARDUINO 1.0.6 - 2014.09.16
 

@@ -1,29 +1,52 @@
 package processing.app;
 
-import processing.app.debug.MessageConsumer;
-import processing.core.PApplet;
+import static processing.app.I18n._;
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.text.DefaultCaret;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import static processing.app.I18n._;
+import javax.swing.AbstractAction;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import javax.swing.border.EmptyBorder;
+import javax.swing.text.DefaultCaret;
 
-public abstract class AbstractMonitor extends JFrame implements MessageConsumer {
+import processing.app.debug.TextAreaFIFO;
+import processing.app.legacy.PApplet;
+
+@SuppressWarnings("serial")
+public abstract class AbstractMonitor extends JFrame implements ActionListener {
 
   protected final JLabel noLineEndingAlert;
-  protected JTextArea textArea;
+  protected TextAreaFIFO textArea;
   protected JScrollPane scrollPane;
   protected JTextField textField;
   protected JButton sendButton;
   protected JCheckBox autoscrollBox;
   protected JComboBox lineEndings;
   protected JComboBox serialRates;
+
+  private Timer updateTimer;
+  private StringBuffer updateBuffer;
 
   public AbstractMonitor(String title) {
     super(title);
@@ -58,7 +81,9 @@ public abstract class AbstractMonitor extends JFrame implements MessageConsumer 
     Font editorFont = Preferences.getFont("editor.font");
     Font font = new Font(consoleFont.getName(), consoleFont.getStyle(), editorFont.getSize());
 
-    textArea = new JTextArea(16, 40);
+    textArea = new TextAreaFIFO(8000000);
+    textArea.setRows(16);
+    textArea.setColumns(40);
     textArea.setEditable(false);
     textArea.setFont(font);
 
@@ -110,7 +135,7 @@ public abstract class AbstractMonitor extends JFrame implements MessageConsumer 
 
     String[] serialRateStrings = {
             "300", "1200", "2400", "4800", "9600",
-            "19200", "57600", "115200"
+            "19200", "38400", "57600", "115200"
     };
 
     serialRates = new JComboBox();
@@ -148,6 +173,10 @@ public abstract class AbstractMonitor extends JFrame implements MessageConsumer 
         }
       }
     }
+    
+    updateBuffer = new StringBuffer(1048576);
+    updateTimer = new Timer(33, this);  // redraw serial monitor at 30 Hz
+    updateTimer.start();
   }
 
   public void onSerialRateChange(ActionListener listener) {
@@ -198,4 +227,28 @@ public abstract class AbstractMonitor extends JFrame implements MessageConsumer 
   public abstract void open() throws Exception;
 
   public abstract void close() throws Exception;
+  
+  public synchronized void addToUpdateBuffer(char buff[], int n) {
+    updateBuffer.append(buff, 0, n);
+  }
+
+  private synchronized String consumeUpdateBuffer() {
+    String s = updateBuffer.toString();
+    updateBuffer.setLength(0);
+    return s;
+  }
+
+  public void actionPerformed(ActionEvent e) {
+    final String s = consumeUpdateBuffer();
+    if (s.length() > 0) {
+      //System.out.println("gui append " + s.length());
+      if (autoscrollBox.isSelected()) {
+        textArea.appendTrim(s);
+        textArea.setCaretPosition(textArea.getDocument().getLength());
+      } else {
+        textArea.appendNoTrim(s);
+      }
+    }
+  }
+
 }

@@ -5,6 +5,7 @@ import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 
+@SuppressWarnings("serial")
 public class LastUndoableEditAwareUndoManager extends UndoManager {
 
   private UndoableEdit lastUndoableEdit;

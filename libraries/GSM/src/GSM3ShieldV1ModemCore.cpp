@@ -78,7 +78,7 @@ void GSM3ShieldV1ModemCore::closeCommand(int code)
 void GSM3ShieldV1ModemCore::genericCommand_rq(PGM_P str, bool addCR)
 {
 	theBuffer().flush();
-	writePGM(str, addCR);	
+	writePGM(str, addCR);
 }
 
 //Generic command (const string).

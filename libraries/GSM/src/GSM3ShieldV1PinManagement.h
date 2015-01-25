@@ -100,4 +100,4 @@ class GSM3ShieldV1PinManagement
 		void setPINUsed(bool used);
 };
 
-#endif;
+#endif

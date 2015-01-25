@@ -31,8 +31,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 The latest version of this library can always be found at
 https://github.com/BlueVia/Official-Arduino
 */
-#include "GSM3CircularBuffer.h"
-#include <HardwareSerial.h>
+#include <GSM3CircularBuffer.h>
+#include <Arduino.h>
 
 GSM3CircularBuffer::GSM3CircularBuffer(GSM3CircularBufferManager* mgr)
 {

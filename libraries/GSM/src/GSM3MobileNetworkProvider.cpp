@@ -32,7 +32,6 @@ The latest version of this library can always be found at
 https://github.com/BlueVia/Official-Arduino
 */
 #include <GSM3MobileNetworkProvider.h>
-#include <HardwareSerial.h>
 
 GSM3MobileNetworkProvider* theProvider;
 

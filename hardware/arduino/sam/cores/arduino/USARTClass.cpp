@@ -23,121 +23,31 @@
 
 // Constructors ////////////////////////////////////////////////////////////////
 
-USARTClass::USARTClass( Usart* pUsart, IRQn_Type dwIrq, uint32_t dwId, RingBuffer* pRx_buffer )
+USARTClass::USARTClass( Usart* pUsart, IRQn_Type dwIrq, uint32_t dwId, RingBuffer* pRx_buffer, RingBuffer* pTx_buffer )
+  : UARTClass((Uart*)pUsart, dwIrq, dwId, pRx_buffer, pTx_buffer)
 {
-  _rx_buffer = pRx_buffer ;
-
-  _pUsart=pUsart ;
-  _dwIrq=dwIrq ;
-  _dwId=dwId ;
+  // In case anyone needs USART specific functionality in the future
+  _pUsart=pUsart;
 }
 
 // Public Methods //////////////////////////////////////////////////////////////
 
-void USARTClass::begin( const uint32_t dwBaudRate )
+void USARTClass::begin(const uint32_t dwBaudRate)
 {
-	begin( dwBaudRate, SERIAL_8N1 );
+  begin(dwBaudRate, Mode_8N1);
 }
 
-void USARTClass::begin( const uint32_t dwBaudRate, const uint32_t config )
+void USARTClass::begin(const uint32_t dwBaudRate, const UARTModes config)
 {
-  // Configure PMC
-  pmc_enable_periph_clk( _dwId ) ;
-
-  // Disable PDC channel
-  _pUsart->US_PTCR = US_PTCR_RXTDIS | US_PTCR_TXTDIS ;
-
-  // Reset and disable receiver and transmitter
-  _pUsart->US_CR = US_CR_RSTRX | US_CR_RSTTX | US_CR_RXDIS | US_CR_TXDIS ;
-
-  // Configure mode
-  _pUsart->US_MR = config;
-
-
-  // Configure baudrate, asynchronous no oversampling
-  _pUsart->US_BRGR = (SystemCoreClock / dwBaudRate) / 16 ;
-
-  // Configure interrupts
-  _pUsart->US_IDR = 0xFFFFFFFF;
-  _pUsart->US_IER = US_IER_RXRDY | US_IER_OVRE | US_IER_FRAME;
-
-  // Enable UART interrupt in NVIC
-  NVIC_EnableIRQ( _dwIrq ) ;
-
-  // Enable receiver and transmitter
-  _pUsart->US_CR = US_CR_RXEN | US_CR_TXEN ;
+  uint32_t modeReg = static_cast<uint32_t>(config);
+  modeReg |= US_MR_USART_MODE_NORMAL | US_MR_USCLKS_MCK | US_MR_CHMODE_NORMAL;
+  init(dwBaudRate, modeReg);
 }
 
-void USARTClass::end( void )
+void USARTClass::begin(const uint32_t dwBaudRate, const USARTModes config)
 {
-  // clear any received data
-  _rx_buffer->_iHead = _rx_buffer->_iTail ;
-
-  // Disable UART interrupt in NVIC
-  NVIC_DisableIRQ( _dwIrq ) ;
-
-  // Wait for any outstanding data to be sent
-  flush();
-
-  pmc_disable_periph_clk( _dwId ) ;
-}
-
-int USARTClass::available( void )
-{
-  return (uint32_t)(SERIAL_BUFFER_SIZE + _rx_buffer->_iHead - _rx_buffer->_iTail) % SERIAL_BUFFER_SIZE ;
-}
-
-int USARTClass::peek( void )
-{
-  if ( _rx_buffer->_iHead == _rx_buffer->_iTail )
-    return -1 ;
-
-  return _rx_buffer->_aucBuffer[_rx_buffer->_iTail] ;
-}
-
-int USARTClass::read( void )
-{
-  // if the head isn't ahead of the tail, we don't have any characters
-  if ( _rx_buffer->_iHead == _rx_buffer->_iTail )
-    return -1 ;
-
-  uint8_t uc = _rx_buffer->_aucBuffer[_rx_buffer->_iTail] ;
-  _rx_buffer->_iTail = (unsigned int)(_rx_buffer->_iTail + 1) % SERIAL_BUFFER_SIZE ;
-  return uc ;
-}
-
-void USARTClass::flush( void )
-{
-  // Wait for transmission to complete
-  while ((_pUsart->US_CSR & US_CSR_TXRDY) != US_CSR_TXRDY)
-	;
-}
-
-size_t USARTClass::write( const uint8_t uc_data )
-{
-  // Check if the transmitter is ready
-  while ((_pUsart->US_CSR & US_CSR_TXRDY) != US_CSR_TXRDY)
-    ;
-
-  // Send character
-  _pUsart->US_THR = uc_data ;
-  return 1;
-}
-
-void USARTClass::IrqHandler( void )
-{
-  uint32_t status = _pUsart->US_CSR;
-
-  // Did we receive data ?
-  if ((status & US_CSR_RXRDY) == US_CSR_RXRDY)
-    _rx_buffer->store_char( _pUsart->US_RHR ) ;
-
-  // Acknowledge errors
-  if ((status & US_CSR_OVRE) == US_CSR_OVRE ||
-		  (status & US_CSR_FRAME) == US_CSR_FRAME)
-  {
-	// TODO: error reporting outside ISR
-    _pUsart->US_CR |= US_CR_RSTSTA;
-  }
+  uint32_t modeReg = static_cast<uint32_t>(config);
+  modeReg |= US_MR_USART_MODE_NORMAL | US_MR_USCLKS_MCK | US_MR_CHMODE_NORMAL;
+  init(dwBaudRate, modeReg);
 }
 

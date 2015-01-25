@@ -92,7 +92,7 @@ String GSM3ShieldV1ScanNetworks::readNetworks()
 	String result;
 	bool inQuotes=false;
 	int quoteCounter=0;
-	for(int i=0; i<modemResponse.length();i++)
+	for(unsigned int i=0; i<modemResponse.length();i++)
 	{
 		if(modemResponse[i]=='"')
 		{
