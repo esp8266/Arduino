@@ -9,12 +9,14 @@ What works
 - pinMode, digitalRead, digitalWrite
 	Pin numbers correspond directly to the esp8266 GPIO pin numbers. To read GPIO2,
 	call digitalRead(2);
+	GPIO0-GPIO15 can be INPUT, OUTPUT, INPUT_PULLUP, and OUTPUT_OPEN_DRAIN.
+	GPIO16 can be INPUT or OUTPUT.
 
 - analogRead(0) reads the value of the ADC channel connected to the TOUT pin.
 
 - pin interrupts (attachInterrupt, detachInterrupt)
-	Interrupts may be attached to any GPIO pin. Standard Arduino interrupt types are 
-	supported: CHANGE, RISING, FALLING.
+	Interrupts may be attached to any GPIO pin, except GPIO16. Standard Arduino interrupt 
+	types are supported: CHANGE, RISING, FALLING.
 
 - shiftIn, shiftOut
 - millis, micros
@@ -22,6 +24,9 @@ What works
 	Remember that there is a lot of code that needs to run on the chip besides the sketch 
 	when WiFi is connected. WiFi and TCP/IP libraries get a chance to handle any pending
 	events each time the loop() function completes, OR when delay(...) is called.
+	If you have a loop somewhere in your sketch that takes a lot of time (>50ms) without
+	calling delay(), you might consider adding a call to delay function to keep the WiFi
+	stack running smoothly.
 	There is also a yield() function which is equivalent to delay(0). The delayMicroseconds
 	function, on the other hand, does not yield to other tasks, so using it for delays
 	more than 20 milliseconds is not recommended.
@@ -48,6 +53,11 @@ What works
 	Before using I2C, you need to set pins you will use for SDA and SCL by calling
 	Wire.pins(int sda, int scl), i.e. Wire.pins(0, 2); on ESP-01.
 
+- OneWire (from https://www.pjrc.com/teensy/td_libs_OneWire.html)
+	Library was adapted to work with ESP8266 by including register definitions into OneWire.h
+	Note that if you have OneWire library in your Arduino/libraries folder, it will be used
+	instead of the one that comes with the Arduino IDE (this one).
+
 - WiFi (ESP8266WiFi library)
 	This is mostly similar to WiFi shield library. Differences include:
 		* WiFi.mode(m): set mode to WIFI_AP, WIFI_STA, or WIFI_AP_STA.
@@ -64,7 +74,8 @@ What works
 
 - Upload via serial port
 	Select "esptool" as a programmer, and pick the correct serial port.
-	You need to put ESP8266 into bootloader mode before uploading code (pull GPIO0 low and toggle power).
+	You need to put ESP8266 into bootloader mode before uploading code (pull GPIO0 low and 
+	toggle power).
 
 What is not done yet
 --------------------
