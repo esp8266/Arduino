@@ -67,6 +67,32 @@ static const uint32_t g_pin_funcs[PINCOUNT] = {
 };
 
 
+uint32_t digitalPinToPort(uint32_t pin)
+{
+    return 0;
+}
+
+uint32_t digitalPinToBitMask(uint32_t pin)
+{
+    return 1 << pin;
+}
+
+volatile uint32_t* portOutputRegister(uint32_t port)
+{
+    return (volatile uint32_t*) (PERIPHS_GPIO_BASEADDR + GPIO_OUT_ADDRESS);
+}
+
+volatile uint32_t* portInputRegister(uint32_t port)
+{
+    return (volatile uint32_t*) (PERIPHS_GPIO_BASEADDR + GPIO_IN_ADDRESS);
+}
+
+volatile uint32_t* portModeRegister(uint32_t port)
+{
+    return (volatile uint32_t*) (PERIPHS_GPIO_BASEADDR + GPIO_ENABLE_ADDRESS);
+}
+
+
 enum PinFunction { GPIO, PWM };
 static uint32_t g_gpio_function[PINCOUNT] = {
     GPIO
