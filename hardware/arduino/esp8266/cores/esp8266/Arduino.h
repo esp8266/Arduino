@@ -137,10 +137,12 @@ void loop(void);
 // Get the bit location within the hardware port of the given virtual pin.
 // This comes from the pins_*.c file for the active board configuration.
 
+uint32_t digitalPinToPort(uint32_t pin);
+uint32_t digitalPinToBitMask(uint32_t pin);
 #define analogInPinToBit(P) (P)
-
-// On the ATmega1280, the addresses of some of the port registers are
-// greater than 255, so we can't store them in uint8_t's.
+volatile uint32_t* portOutputRegister(uint32_t port);
+volatile uint32_t* portInputRegister(uint32_t port);
+volatile uint32_t* portModeRegister(uint32_t port);
 
 
 #define NOT_A_PIN 0
