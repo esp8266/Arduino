@@ -13,7 +13,7 @@ What works
 - analogRead(0) reads the value of the ADC channel connected to the TOUT pin.
 
 - pin interrupts (attachInterrupt, detachInterrupt)
-	Interrupts may be attach to any GPIO pin. Standard Arduino interrupt types are 
+	Interrupts may be attached to any GPIO pin. Standard Arduino interrupt types are 
 	supported: CHANGE, RISING, FALLING.
 
 - shiftIn, shiftOut

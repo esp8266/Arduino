@@ -22,6 +22,7 @@ Server	KEYWORD1
 
 firmwareVersion	KEYWORD2
 status	KEYWORD2
+mode	KEYWORD2
 connect	KEYWORD2
 write	KEYWORD2
 available	KEYWORD2
