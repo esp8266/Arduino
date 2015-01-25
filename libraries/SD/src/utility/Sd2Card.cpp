@@ -157,16 +157,24 @@ uint32_t Sd2Card::cardSize(void) {
   }
 }
 //------------------------------------------------------------------------------
+static uint8_t chip_select_asserted = 0;
+
 void Sd2Card::chipSelectHigh(void) {
   digitalWrite(chipSelectPin_, HIGH);
 #ifdef USE_SPI_LIB
-  SPI.endTransaction();
+  if (chip_select_asserted) {
+    chip_select_asserted = 0;
+    SPI.endTransaction();
+  }
 #endif
 }
 //------------------------------------------------------------------------------
 void Sd2Card::chipSelectLow(void) {
 #ifdef USE_SPI_LIB
-  SPI.beginTransaction(settings);
+  if (!chip_select_asserted) {
+    chip_select_asserted = 1;
+    SPI.beginTransaction(settings);
+  }
 #endif
   digitalWrite(chipSelectPin_, LOW);
 }
