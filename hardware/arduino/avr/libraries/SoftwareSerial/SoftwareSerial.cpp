@@ -266,8 +266,12 @@ SoftwareSerial::~SoftwareSerial()
 
 void SoftwareSerial::setTX(uint8_t tx)
 {
-  pinMode(tx, OUTPUT);
+  // First write, then set output. If we do this the other way around,
+  // the pin would be output low for a short while before switching to
+  // output hihg. Now, it is input with pullup for a short while, which
+  // is fine. With inverse logic, either order is fine.
   digitalWrite(tx, _inverse_logic ? LOW : HIGH);
+  pinMode(tx, OUTPUT);
   _transmitBitMask = digitalPinToBitMask(tx);
   uint8_t port = digitalPinToPort(tx);
   _transmitPortRegister = portOutputRegister(port);
