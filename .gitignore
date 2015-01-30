@@ -29,6 +29,8 @@ build/macosx/dist/*.tar.gz
 build/macosx/dist/*.tar.bz2
 build/macosx/libastylej*
 build/macosx/appbundler*.jar
+build/macosx/appbundler*.zip
+build/macosx/appbundler
 build/linux/work/
 build/linux/dist/*.tar.gz
 build/linux/dist/*.tar.bz2

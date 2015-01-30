@@ -6,11 +6,19 @@
 
   <!-- Sets properties for macosx/windows/linux depending on current system -->
   <condition property="platform" value="macosx"><os family="mac" /></condition>
+  <condition property="platform" value="oldmacosx">
+    <and>
+      <os family="mac" />
+      <matches string="${os.version}" pattern="^10.[56]." />
+    </and>
+  </condition>
   <condition property="platform" value="windows"><os family="windows" /></condition>
   <condition property="platform" value="linux32"><os family="unix" arch="i386" /></condition>
   <condition property="platform" value="linux64"><os family="unix" arch="amd64" /></condition>
 
   <condition property="macosx"><equals arg1="${platform}" arg2="macosx" /></condition>
+  <condition property="macosx"><equals arg1="${platform}" arg2="oldmacosx" /></condition>
+  <condition property="oldmacosx"><equals arg1="${platform}" arg2="oldmacosx" /></condition>
   <condition property="windows"><equals arg1="${platform}" arg2="windows" /></condition>
   <condition property="linux32"><equals arg1="${platform}" arg2="linux32" /></condition>
   <condition property="linux64"><equals arg1="${platform}" arg2="linux64" /></condition>
@@ -18,11 +26,13 @@
   <condition property="linux"><equals arg1="${platform}" arg2="linux64" /></condition>
 
   <condition property="staging_folder" value="macosx"><equals arg1="${platform}" arg2="macosx" /></condition>
+  <condition property="staging_folder" value="macosx"><equals arg1="${platform}" arg2="oldmacosx" /></condition>
   <condition property="staging_folder" value="windows"><equals arg1="${platform}" arg2="windows" /></condition>
   <condition property="staging_folder" value="linux"><equals arg1="${platform}" arg2="linux32" /></condition>
   <condition property="staging_folder" value="linux"><equals arg1="${platform}" arg2="linux64" /></condition>
 
-  <condition property="staging_hardware_folder" value="Arduino.app/Contents/Resources/Java/hardware"><equals arg1="${platform}" arg2="macosx" /></condition>
+  <condition property="staging_hardware_folder" value="Arduino.app/Contents/Java/hardware"><equals arg1="${platform}" arg2="macosx" /></condition>
+  <condition property="staging_hardware_folder" value="Arduino.app/Contents/Resources/Java/hardware"><equals arg1="${platform}" arg2="oldmacosx" /></condition>
   <condition property="staging_hardware_folder" value="hardware"><equals arg1="${platform}" arg2="windows" /></condition>
   <condition property="staging_hardware_folder" value="hardware"><equals arg1="${platform}" arg2="linux32" /></condition>
   <condition property="staging_hardware_folder" value="hardware"><equals arg1="${platform}" arg2="linux64" /></condition>
@@ -180,6 +190,8 @@
   <!-- Mac OS X      -->
   <!-- - - - - - - - -->
 
+  <target name="oldmacosx-clean" depends="macosx-clean" description="Clean Mac OS X build"/>
+
   <target name="macosx-clean" depends="subprojects-clean" description="Clean Mac OS X build">
     <delete dir="macosx/work" />
     <delete dir="macosx/working_dir" />
@@ -201,7 +213,7 @@
     <fail message="wrong platform (${os.name})" />
   </target>
 
-  <target name="macosx-build" if="macosx" depends="revision-check, macosx-checkos, subprojects-build" description="Build Mac OS X version">
+  <target name="oldmacosx-build" if="macosx" depends="revision-check, macosx-checkos, subprojects-build" description="Build Mac OS X version">
     <mkdir dir="macosx/work" />
 
     <!-- assemble the pde -->
@@ -220,6 +232,92 @@
       <fileset file="shared/revisions.txt" />
     </copy>
 
+    <antcall target="macosx-build-common"/>
+
+    <replace file="macosx/work/Arduino.app/Contents/Info.plist"
+             token="VERSION" value="${version}" />
+    <replace file="macosx/work/Arduino.app/Contents/Info.plist"
+             token="REVISION" value="${revision}" />
+
+  </target>
+
+  <target name="macosx-build" if="macosx" depends="revision-check, macosx-checkos, subprojects-build" description="Build Mac OS X version">
+    <antcall target="unzip">
+      <param name="archive_file" value="${staging_folder}/appbundler-1.0ea.jar.zip" />
+      <param name="archive_url" value="http://arduino.cc/download.php?f=/appbundler-1.0ea.jar.zip" />
+      <param name="final_folder" value="${staging_folder}/appbundler" />
+      <param name="dest_folder" value="${staging_folder}/appbundler" />
+    </antcall>
+
+    <mkdir dir="${staging_folder}/work" />
+
+    <taskdef name="bundleapp" classname="com.oracle.appbundler.AppBundlerTask" classpath="${staging_folder}/appbundler/appbundler-1.0ea.jar"/>
+
+    <bundleapp outputDirectory="${staging_folder}/work"
+               name="Arduino"
+               displayName="Arduino"
+               executableName="Arduino"
+               identifier="cc.arduino.Arduino"
+               signature="Pde1"
+               icon="macosx/template.app/Contents/Resources/processing.icns"
+               copyright="Arduino LLC"
+               getInfo="${version}"
+               shortVersion="${version}"
+               version="${revision}"
+               mainClassName="processing.app.Base"
+               minimumsystem="10.7"
+               highresolutioncapable="true">
+
+      <arch name="x86_64"/>
+      <arch name="i386"/>
+
+      <classpath refid="runtime.jars"/>
+      <classpath file="./macosx/template.app/Contents/Resources/Java/quaqua.jar"/>
+
+      <option value="-Dapple.awt.application.name=Arduino" />
+      <option value="-Dapple.laf.useScreenMenuBar=true"/>
+      <option value="-Dcom.apple.macos.use-file-dialog-packages=true"/>
+      <option value="-Dcom.apple.smallTabs=true"/>
+
+      <!--
+      <option value="-Dapple.awt.showGrowBox=false"/>
+      <option value="-Dapple.awt.Antialiasing=false"/>
+      <option value="-Dapple.awt.TextAntialiasing=true"/>
+      <option value="-Dcom.apple.hwaccel=true"/>
+      <option value="-Dapple.awt.graphics.UseQuartz=true"/>
+      -->
+
+      <!--<option value="-Dcom.apple.macos.useScreenMenuBar=true"/>-->
+
+      <!-- Workaround since the icon parameter for bundleapp doesn't work -->
+      <option value="-Xdock:icon=Contents/Resources/processing.icns"/>
+      <option value="-Dcom.apple.mrj.application.apple.menu.about.name=Arduino"/>
+      <option value="-Dfile.encoding=UTF-8"/>
+
+      <option value="-Xms128M"/>
+      <option value="-Xmx256M"/>
+
+      <bundledocument extensions="ino,c,cpp,h"
+                      icon="macosx/template.app/Contents/Resources/pde.icns"
+                      name="Arduino Source File"
+                      role="Editor">
+      </bundledocument>
+
+    </bundleapp>
+
+    <copy todir="${staging_folder}/work/${staging_hardware_folder}/../">
+      <fileset dir="shared" includes="lib/**" />
+      <fileset file="shared/revisions.txt" />
+      <file file="macosx/template.app/Contents/Resources/Java/quaqua.jar"/>
+      <fileset file="macosx/template.app/Contents/Resources/Java/libquaqua*" />
+    </copy>
+
+    <antcall target="macosx-build-common"/>
+
+  </target>
+
+  <target name="macosx-build-common">
+
     <!-- Unzip AVR tools -->
     <antcall target="unzip">
       <param name="archive_file" value="${staging_folder}/avr-toolchain-mac32-gcc-4.8.1.zip" />
@@ -228,20 +326,6 @@
       <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/avr" />
     </antcall>
 
-<!--
-    <exec executable="unzip">
-      <arg value="-q" />
-      <arg value="-n" />
-      <arg value="-d" />
-      <arg value="macosx/work/${staging_hardware_folder}" />
-      <arg value="macosx/dist/tools-universal.zip" />
-    </exec>
-
-    <copy todir="macosx/work/Arduino.app/Contents/Resources/Java/hardware/tools/avr/avr/include/avr">
-      <fileset file="macosx/dist/eeprom.h" />
-    </copy>
--->
-
     <copy todir="macosx/work/${staging_hardware_folder}/tools/">
       <fileset file="macosx/dist/bossac" />
     </copy>
@@ -249,7 +333,7 @@
     <chmod file="macosx/work/${staging_hardware_folder}/tools/bossac" perm="+x" />
 
     <antcall target="assemble">
-      <param name="target.path" value="macosx/work/Arduino.app/Contents/Resources/Java" />
+      <param name="target.path" value="macosx/work/${staging_hardware_folder}/../" />
     </antcall>
 
     <antcall target="untar">
@@ -272,17 +356,42 @@
       <param name="final_folder" value="${staging_folder}/libastylej" />
       <param name="dest_folder" value="${staging_folder}" />
     </antcall>
-    <copy file="macosx/libastylej/libastylej.jnilib" todir="macosx/work/Arduino.app/Contents/Resources/Java/lib/" />
-    <chmod perm="755" file="macosx/work/Arduino.app/Contents/Resources/Java/lib/libastylej.jnilib" />
+    <copy file="macosx/libastylej/libastylej.jnilib" todir="macosx/work/${staging_hardware_folder}/../lib/" />
+    <chmod perm="755" file="macosx/work/${staging_hardware_folder}/../lib/libastylej.jnilib" />
+    <copy file="macosx/libastylej/libastylej.jnilib" tofile="macosx/work/${staging_hardware_folder}/../lib/libastylej.dylib" />
+    <chmod perm="755" file="macosx/work/${staging_hardware_folder}/../lib/libastylej.dylib" />
+
+    <chmod perm="+x">
+      <fileset dir="macosx/work/${staging_hardware_folder}/tools/avr/bin" includes="**/*" />
+      <fileset dir="macosx/work/${staging_hardware_folder}/tools/avr/avr/bin" includes="**/*" />
+      <fileset dir="macosx/work/${staging_hardware_folder}/tools/avr/libexec/gcc/avr/4.8.1/" includes="*" />
+    </chmod>
+
+  </target>
+
+  <target name="oldmacosx-run" depends="oldmacosx-build" description="Run Mac OS X version">
+    <antcall target="macosx-run-common"/>
   </target>
 
   <target name="macosx-run" depends="macosx-build" description="Run Mac OS X version">
+    <antcall target="macosx-run-common"/>
+  </target>
+
+  <target name="oldmacosx-debug" depends="oldmacosx-build" description="Run Mac OS X version">
+    <antcall target="macosx-debug-common"/>
+  </target>
+
+  <target name="macosx-debug" depends="macosx-build" description="Run Mac OS X version">
+    <antcall target="macosx-debug-common"/>
+  </target>
+
+  <target name="macosx-run-common">
     <exec executable="open" dir="macosx/work">
       <arg value="Arduino.app"/>
     </exec>
   </target>
 
-  <target name="macosx-debug" depends="macosx-build" description="Run Mac OS X version">
+  <target name="macosx-debug-common">
     <exec executable="open" dir="macosx/work" spawn="false">
       <arg value="Arduino.app"/>
     </exec>
@@ -343,32 +452,28 @@
   <!-- - - - - - - - - - - - - - - - - - - -->
   <!-- Build distribution file for MacOSX. -->
   <!-- - - - - - - - - - - - - - - - - - - -->
+  <target name="oldmacosx-dist" if="macosx" depends="oldmacosx-build" description="Create a downloadable .zip for the Mac OS X version">
+    <antcall target="macosx-dist-common">
+      <param name="custom_platform" value="macosx"/>
+    </antcall>
+  </target>
+
   <target name="macosx-dist" if="macosx" depends="macosx-build" description="Create a downloadable .zip for the Mac OS X version">
-    <!-- The ant copy command does not preserve permissions. -->
-    <chmod file="macosx/work/Arduino.app/Contents/MacOS/JavaApplicationStub" perm="+x" />
-    <chmod perm="+x">
-      <fileset dir="macosx/work/${staging_hardware_folder}/tools/avr/bin" includes="**/*" />
-      <fileset dir="macosx/work/${staging_hardware_folder}/tools/avr/avr/bin" includes="**/*" />
-      <fileset dir="macosx/work/${staging_hardware_folder}/tools/avr/libexec/gcc/avr/4.8.1/" includes="*" />
-    </chmod>
+    <antcall target="macosx-dist-common">
+      <param name="custom_platform" value="macosx-new"/>
+    </antcall>
+  </target>
 
-    <replace file="macosx/work/Arduino.app/Contents/Info.plist"
-             token="VERSION" value="${version}" />
-    <replace file="macosx/work/Arduino.app/Contents/Info.plist"
-             token="REVISION" value="${revision}" />
-
+  <target name="macosx-dist-common">
     <exec executable="zip" dir="macosx/work">
-      <arg line="-q -r ../arduino-${version}-${platform}.zip ." />
+      <arg line="-q -r ../arduino-${version}-${custom_platform}.zip ." />
     </exec>
-    <!-- <exec executable="ditto" dir="macosx/work">
-      <arg line="-c -k -rsrc . ../arduino-${version}-macosx.zip" />
-    </exec> -->
 
     <echo>
       =======================================================
       Arduino for Mac OS X was built. Grab the image from
 
-      macosx/arduino-${version}-${platform}.zip
+      macosx/arduino-${version}-${custom_platform}.zip
       =======================================================
     </echo>
   </target>

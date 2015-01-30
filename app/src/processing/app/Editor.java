@@ -2025,6 +2025,8 @@ public class Editor extends JFrame implements RunnerListener {
     // As of Processing 1.0.10, this always happens immediately.
     // http://dev.processing.org/bugs/show_bug.cgi?id=1456
 
+    toFront();
+
     String prompt = I18n.format(_("Save changes to \"{0}\"?  "), sketch.getName());
 
     if (!OSUtils.isMacOS()) {
