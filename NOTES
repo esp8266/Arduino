@@ -67,8 +67,12 @@ What works
 		* WiFi.localIP() is for STA, WiFi.softAPIP() is for AP.
 		* WiFi.RSSI() doesn't work
 		* WiFi.printDiag(Serial); will print out some diagnostic info
-	WiFiServer and WiFiClient behave mostly the same way as with WiFi shield library.
+	WiFiServer, WiFiClient, and WiFiUDP behave mostly the same way as with WiFi shield library.
 	Three samples are provided for this library.
+
+- mDNS responder (ESP8266mDNS library)
+	Allows the sketch to respond to multicast DNS queries for domain names like "foo.local".
+	See attached example and library README file for details.
 
 - Other libraries that don't rely on low-level access to AVR registers.
 
@@ -88,7 +92,6 @@ What is not done yet
 - SPI
 	HSPI and bit-banging are two interfaces that will be supported.
 
-- UDP
 - I2C slave mode
 - Serial modes other than 8n1
 - WiFi.RSSI
