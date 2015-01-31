@@ -194,7 +194,7 @@ public:
         return size;
     }
 
-    void send()
+    void send(ip_addr_t* addr = 0, uint16_t port = 0)
     {
         size_t orig_size = _tx_buf_head->tot_len;
 
@@ -209,7 +209,10 @@ public:
             }
         }
 
-        udp_send(_pcb, _tx_buf_head);
+        if (addr)
+            udp_sendto(_pcb, _tx_buf_head, addr, port);
+        else
+            udp_send(_pcb, _tx_buf_head);
 
         for (pbuf* p = _tx_buf_head; p; p = p->next)
         {

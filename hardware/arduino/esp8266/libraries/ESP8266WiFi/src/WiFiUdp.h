@@ -38,8 +38,11 @@ public:
   WiFiUDP& operator=(const WiFiUDP& rhs);
   ~WiFiUDP();
 
+  operator bool() const { return _ctx != 0; }
+
   virtual uint8_t begin(uint16_t port);	// initialize, start listening on specified port. Returns 1 if successful, 0 if there are no sockets available to use
   virtual void stop();  // Finish with the UDP socket
+  uint8_t beginMulticast(IPAddress multicast, uint16_t port); // connect to a multicast group and listen on the given port
 
   // Sending UDP packets
   
@@ -52,6 +55,9 @@ public:
   // Finish off this packet and send it
   // Returns 1 if the packet was sent successfully, 0 if there was an error
   virtual int endPacket();
+  // Send the packet to a multicast address
+  // Returns 1 if the packet was sent successfully, 0 if there was an error
+  int endPacketMulticast(IPAddress ip, uint16_t port);
   // Write a single byte into the packet
   virtual size_t write(uint8_t);
   // Write size bytes from buffer into the packet
