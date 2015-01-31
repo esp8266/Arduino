@@ -434,7 +434,7 @@
   <target name="linux-clean" depends="subprojects-clean" description="Clean linux version">
     <delete dir="linux/work" />
     <delete>
-      <fileset dir="linux" includes="arduino-*linux*.tgz"/>
+      <fileset dir="linux" includes="arduino-*linux*.tar.xz"/>
     </delete>
   </target>
 
