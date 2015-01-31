@@ -35,6 +35,7 @@ extern "C"
 #include "lwip/opt.h"
 #include "lwip/udp.h"
 #include "lwip/inet.h"
+#include "lwip/igmp.h"
 #include "include/UdpContext.h"
 
 /* Constructor */
@@ -71,6 +72,32 @@ uint8_t WiFiUDP::begin(uint16_t port)
     ip_addr_t addr;
     addr.addr = INADDR_ANY;
     return (_ctx->listen(addr, port)) ? 1 : 0;
+}
+
+uint8_t WiFiUDP::beginMulticast(IPAddress multicast, uint16_t port)
+{
+    if (_ctx)
+    {
+        _ctx->unref();
+        _ctx = 0;
+    }
+    
+
+    ip_addr_t ifaddr;
+    ifaddr.addr = (uint32_t) WiFi.localIP();
+    ip_addr_t multicast_addr;
+    multicast_addr.addr = (uint32_t) multicast;
+
+    if (igmp_joingroup(&ifaddr, &multicast_addr)!= ERR_OK) {
+        return 0;
+    }
+
+    _ctx = new UdpContext;
+    if (!_ctx->listen(*IP_ADDR_ANY, port)) {
+        return 0;
+    }
+
+    return 1;
 }
 
 /* return number of bytes available in the current packet,
@@ -117,6 +144,17 @@ int WiFiUDP::endPacket()
         return 0;
 
     _ctx->send();
+    return 1;
+}
+
+int WiFiUDP::endPacketMulticast(IPAddress ip, uint16_t port)
+{
+    if (!_ctx)
+        return 0;
+    ip_addr_t addr;
+    addr.addr = (uint32_t) ip;
+    _ctx->send(&addr, port);
+    return 1;
 }
 
 size_t WiFiUDP::write(uint8_t byte)
