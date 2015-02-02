@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -167,7 +168,11 @@ public class BaseNoGui {
     File path = new File(System.getProperty("user.dir"));
 
     if (OSUtils.isMacOS()) {
-      path = new File(BaseNoGui.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile();
+      try {
+        path = new File(BaseNoGui.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile();
+      } catch (URISyntaxException e) {
+        throw new RuntimeException(e);
+      }
     }
 
     return new File(path, name);
