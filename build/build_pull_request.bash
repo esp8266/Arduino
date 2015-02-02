@@ -27,3 +27,6 @@ mv windows/arduino-*$VERSION*.zip ../
 ant -Djava.net.preferIPv4Stack=true -Dplatform=macosx -Dversion="${VERSION}" clean dist
 mv macosx/arduino-*$VERSION*.zip ../
 
+ant -Djava.net.preferIPv4Stack=true -Dplatform=oldmacosx -Dversion="${VERSION}" clean dist
+mv macosx/arduino-*$VERSION*.zip ../
+
