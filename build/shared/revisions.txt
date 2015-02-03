@@ -1,4 +1,9 @@
 
+ARDUINO 1.6.0rc3 - 2015.02.03
+
+[ide]
+* Bunch of bugfix on MacOSX build (https://github.com/arduino/Arduino/pull/2590)
+
 ARDUINO 1.6.0rc2 - 2015.01.20
 
 [ide]
