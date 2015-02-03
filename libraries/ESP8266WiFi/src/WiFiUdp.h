@@ -42,7 +42,7 @@ public:
 
   virtual uint8_t begin(uint16_t port);	// initialize, start listening on specified port. Returns 1 if successful, 0 if there are no sockets available to use
   virtual void stop();  // Finish with the UDP socket
-  uint8_t beginMulticast(IPAddress multicast, uint16_t port); // connect to a multicast group and listen on the given port
+  uint8_t beginMulticast(IPAddress interfaceAddr, IPAddress multicast, uint16_t port); // connect to a multicast group and listen on the given port
 
   // Sending UDP packets
   

@@ -149,7 +149,7 @@ bool MDNSResponder::begin(const char* domain, IPAddress addr, uint32_t ttlSecond
   
   // Open the MDNS socket if it isn't already open.
   if (!_mdnsConn) {
-    if (!_mdnsConn.beginMulticast(IPAddress(224, 0, 0, 251), 5353)) {
+    if (!_mdnsConn.beginMulticast(addr, IPAddress(224, 0, 0, 251), 5353)) {
       return false;
     }
   }
