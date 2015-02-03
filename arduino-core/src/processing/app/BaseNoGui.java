@@ -168,10 +168,14 @@ public class BaseNoGui {
     File path = new File(System.getProperty("user.dir"));
 
     if (OSUtils.isMacOS()) {
-      try {
-        path = new File(BaseNoGui.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile();
-      } catch (URISyntaxException e) {
-        throw new RuntimeException(e);
+      if (System.getProperty("WORK_DIR") != null) {
+        path = new File(System.getProperty("WORK_DIR"));
+      } else {
+        try {
+          path = new File(BaseNoGui.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile();
+        } catch (URISyntaxException e) {
+          throw new RuntimeException(e);
+        }
       }
     }
 

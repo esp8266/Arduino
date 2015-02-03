@@ -103,6 +103,7 @@
 
     <junit printsummary="yes" dir="${work.dir}" fork="true">
       <jvmarg value="-Djava.library.path=${java.additional.library.path}"/>
+      <jvmarg value="-DWORK_DIR=."/>
       <classpath>
         <pathelement location="bin"/>
         <pathelement location="test-bin"/>
