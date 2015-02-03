@@ -1,26 +1,26 @@
 #######################################
-# Syntax Coloring Map For WiFi
+# Syntax Coloring Map For ESP8266WiFi
 #######################################
 
 #######################################
 # Library (KEYWORD3)
 #######################################
 
-WiFi	KEYWORD3
-WiFiUdp	KEYWORD3
+ESP8266WiFi	KEYWORD3
 
 #######################################
 # Datatypes (KEYWORD1)
 #######################################
 
-Client	KEYWORD1
-Server	KEYWORD1
+WiFi	KEYWORD1
+WiFiClient	KEYWORD1
+WiFiServer	KEYWORD1
+WiFiUDP	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
 
-firmwareVersion	KEYWORD2
 status	KEYWORD2
 mode	KEYWORD2
 connect	KEYWORD2
@@ -42,11 +42,6 @@ SSID	KEYWORD2
 BSSID		KEYWORD2
 RSSI	KEYWORD2
 encryptionType	KEYWORD2
-getResult	KEYWORD2
-getSocket	KEYWORD2
-WiFiClient	KEYWORD2
-WiFiServer	KEYWORD2
-WiFiUDP		KEYWORD2
 beginPacket	KEYWORD2
 endPacket	KEYWORD2
 parsePacket	KEYWORD2
@@ -56,8 +51,13 @@ softAP	KEYWORD2
 softAPIP	KEYWORD2
 softAPmacAddress	KEYWORD2
 printDiag	KEYWORD2
+hostByName	KEYWORD2
+scanNetworks	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
 #######################################
+WIFI_AP	LITERAL1
+WIFI_STA	LITERAL1
+WIFI_AP_STA	LITERAL1
 
