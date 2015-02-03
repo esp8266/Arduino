@@ -5,7 +5,7 @@
   <!--echo message="os.version = ${os.version}" /-->
 
   <!-- Sets properties for macosx/windows/linux depending on current system -->
-  <condition property="platform" value="macosxnew"><os family="mac" /></condition>
+  <condition property="platform" value="macosx-java-latest"><os family="mac" /></condition>
   <condition property="platform" value="macosx">
     <and>
       <os family="mac" />
@@ -17,21 +17,21 @@
   <condition property="platform" value="linux64"><os family="unix" arch="amd64" /></condition>
 
   <condition property="macosx"><equals arg1="${platform}" arg2="macosx" /></condition>
-  <condition property="macosx"><equals arg1="${platform}" arg2="macosxnew" /></condition>
-  <condition property="macosxnew"><equals arg1="${platform}" arg2="macosxnew" /></condition>
+  <condition property="macosx"><equals arg1="${platform}" arg2="macosx-java-latest" /></condition>
+  <condition property="macosx-java-latest"><equals arg1="${platform}" arg2="macosx-java-latest" /></condition>
   <condition property="windows"><equals arg1="${platform}" arg2="windows" /></condition>
   <condition property="linux32"><equals arg1="${platform}" arg2="linux32" /></condition>
   <condition property="linux64"><equals arg1="${platform}" arg2="linux64" /></condition>
   <condition property="linux"><equals arg1="${platform}" arg2="linux32" /></condition>
   <condition property="linux"><equals arg1="${platform}" arg2="linux64" /></condition>
 
-  <condition property="staging_folder" value="macosx"><equals arg1="${platform}" arg2="macosxnew" /></condition>
+  <condition property="staging_folder" value="macosx"><equals arg1="${platform}" arg2="macosx-java-latest" /></condition>
   <condition property="staging_folder" value="macosx"><equals arg1="${platform}" arg2="macosx" /></condition>
   <condition property="staging_folder" value="windows"><equals arg1="${platform}" arg2="windows" /></condition>
   <condition property="staging_folder" value="linux"><equals arg1="${platform}" arg2="linux32" /></condition>
   <condition property="staging_folder" value="linux"><equals arg1="${platform}" arg2="linux64" /></condition>
 
-  <condition property="staging_hardware_folder" value="Arduino.app/Contents/Java/hardware"><equals arg1="${platform}" arg2="macosxnew" /></condition>
+  <condition property="staging_hardware_folder" value="Arduino.app/Contents/Java/hardware"><equals arg1="${platform}" arg2="macosx-java-latest" /></condition>
   <condition property="staging_hardware_folder" value="Arduino.app/Contents/Resources/Java/hardware"><equals arg1="${platform}" arg2="macosx" /></condition>
   <condition property="staging_hardware_folder" value="hardware"><equals arg1="${platform}" arg2="windows" /></condition>
   <condition property="staging_hardware_folder" value="hardware"><equals arg1="${platform}" arg2="linux32" /></condition>
@@ -190,7 +190,7 @@
   <!-- Mac OS X      -->
   <!-- - - - - - - - -->
 
-  <target name="macosxnew-clean" depends="macosx-clean" description="Clean Mac OS X build"/>
+  <target name="macosx-java-latest-clean" depends="macosx-clean" description="Clean Mac OS X build"/>
 
   <target name="macosx-clean" depends="subprojects-clean" description="Clean Mac OS X build">
     <delete dir="macosx/work" />
@@ -241,7 +241,7 @@
 
   </target>
 
-  <target name="macosxnew-build" if="macosx" depends="revision-check, macosx-checkos, subprojects-build" description="Build Mac OS X version">
+  <target name="macosx-java-latest-build" if="macosx" depends="revision-check, macosx-checkos, subprojects-build" description="Build Mac OS X version">
     <antcall target="unzip">
       <param name="archive_file" value="${staging_folder}/appbundler-1.0ea.jar.zip" />
       <param name="archive_url" value="http://arduino.cc/download.php?f=/appbundler-1.0ea.jar.zip" />
@@ -278,6 +278,7 @@
       <option value="-Dapple.laf.useScreenMenuBar=true"/>
       <option value="-Dcom.apple.macos.use-file-dialog-packages=true"/>
       <option value="-Dcom.apple.smallTabs=true"/>
+      <option value="-Dcom.apple.macos.useScreenMenuBar=true" />
 
       <!--
       <option value="-Dapple.awt.showGrowBox=false"/>
@@ -373,7 +374,7 @@
     <antcall target="macosx-run-common"/>
   </target>
 
-  <target name="macosxnew-run" depends="macosxnew-build" description="Run Mac OS X version">
+  <target name="macosx-java-latest-run" depends="macosx-java-latest-build" description="Run Mac OS X version">
     <antcall target="macosx-run-common"/>
   </target>
 
@@ -381,7 +382,7 @@
     <antcall target="macosx-debug-common"/>
   </target>
 
-  <target name="macosxnew-debug" depends="macosxnew-build" description="Run Mac OS X version">
+  <target name="macosx-java-latest-debug" depends="macosx-java-latest-build" description="Run Mac OS X version">
     <antcall target="macosx-debug-common"/>
   </target>
 
@@ -456,7 +457,7 @@
     <antcall target="macosx-dist-common"/>
   </target>
 
-  <target name="macosxnew-dist" if="macosx" depends="macosxnew-build" description="Create a downloadable .zip for the Mac OS X version">
+  <target name="macosx-java-latest-dist" if="macosx" depends="macosx-java-latest-build" description="Create a downloadable .zip for the Mac OS X version">
     <antcall target="macosx-dist-common"/>
   </target>
 
