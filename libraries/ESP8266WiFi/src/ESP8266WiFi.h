@@ -68,9 +68,10 @@ public:
     /* Set up a WPA2-secured access point
      *
      * param ssid: Pointer to the SSID string.
-     * param ssid: Pointer to passphrase, 8 characters min.
+     * param passphrase: Pointer to passphrase, 8 characters min.
+     * param channel: WiFi channel number, 1 - 13.
      */
-    void softAP(const char* ssid, const char* passphrase);
+    void softAP(const char* ssid, const char* passphrase, int channel = 1);
 
 
     /* Change Ip configuration settings disabling the dhcp client
