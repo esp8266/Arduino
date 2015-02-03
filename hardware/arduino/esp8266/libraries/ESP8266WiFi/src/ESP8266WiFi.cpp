@@ -108,7 +108,7 @@ void ESP8266WiFiClass::softAP(const char* ssid)
 }
   
 
-void ESP8266WiFiClass::softAP(const char* ssid, const char* passphrase)
+void ESP8266WiFiClass::softAP(const char* ssid, const char* passphrase, int channel)
 {
     if (wifi_get_opmode() == WIFI_STA)
     {
@@ -119,7 +119,11 @@ void ESP8266WiFiClass::softAP(const char* ssid, const char* passphrase)
     struct softap_config conf;
     wifi_softap_get_config(&conf);
     strcpy(reinterpret_cast<char*>(conf.ssid), ssid);
-    conf.channel = 1;
+    conf.channel = channel;
+    conf.ssid_len = strlen(ssid);
+    conf.ssid_hidden = 0;
+    conf.max_connection = 4;
+    conf.beacon_interval = 100;
 
     if (!passphrase || strlen(passphrase) == 0)
     {
@@ -266,6 +270,7 @@ int8_t ESP8266WiFiClass::scanNetworks()
     config.ssid = 0;
     config.bssid = 0;
     config.channel = 0;
+    config.show_hidden = 0;
     wifi_station_scan(&config, reinterpret_cast<scan_done_cb_t>(&ESP8266WiFiClass::_scanDone));
     esp_yield();
     return ESP8266WiFiClass::_scanCount;
