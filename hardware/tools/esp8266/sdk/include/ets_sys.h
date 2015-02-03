@@ -36,6 +36,10 @@ typedef struct _ETSTIMER_ {
 } ETSTimer;
 
 /* interrupt related */
+
+typedef void (*int_handler_t)(void*);
+
+#define ETS_SPI_INUM	   2
 #define ETS_GPIO_INUM       4
 #define ETS_UART_INUM       5
 #define ETS_UART1_INUM      5
@@ -48,19 +52,25 @@ typedef struct _ETSTIMER_ {
     ets_intr_unlock()
 
 #define ETS_FRC_TIMER1_INTR_ATTACH(func, arg) \
-    ets_isr_attach(ETS_FRC_TIMER1_INUM, (void *)(func), (void *)(arg))
+    ets_isr_attach(ETS_FRC_TIMER1_INUM, (int_handler_t)(func), (void *)(arg))
 
 #define ETS_GPIO_INTR_ATTACH(func, arg) \
-    ets_isr_attach(ETS_GPIO_INUM, (void *)(func), (void *)(arg))
+    ets_isr_attach(ETS_GPIO_INUM, (int_handler_t)(func), (void *)(arg))
 
 #define ETS_UART_INTR_ATTACH(func, arg) \
-    ets_isr_attach(ETS_UART_INUM, (void *)(func), (void *)(arg))
+    ets_isr_attach(ETS_UART_INUM, (int_handler_t)(func), (void *)(arg))
+
+#define ETS_SPI_INTR_ATTACH(func, arg) \
+    ets_isr_attach(ETS_SPI_INUM, (int_handler_t)(func), (void *)(arg))
 
 #define ETS_INTR_ENABLE(inum) \
     ets_isr_unmask((1<<inum))
 
 #define ETS_INTR_DISABLE(inum) \
     ets_isr_mask((1<<inum))
+
+#define ETS_SPI_INTR_ENABLE() \
+    ETS_INTR_ENABLE(ETS_SPI_INUM)
 
 #define ETS_UART_INTR_ENABLE() \
     ETS_INTR_ENABLE(ETS_UART_INUM)
@@ -105,7 +115,7 @@ void ets_install_putc1(void* routine);
 void uart_div_modify(int no, int freq);
 void ets_isr_mask(int intr);
 void ets_isr_unmask(int intr);
-void ets_isr_attach(int intr, void *handler, void *arg);
+void ets_isr_attach(int intr, int_handler_t handler, void *arg);
 void ets_intr_lock();
 void ets_intr_unlock();
 
