@@ -4,7 +4,7 @@
   Part of the Processing project - http://processing.org
 
   Copyright (c) 2004-09 Ben Fry and Casey Reas
-  Copyright (c) 2001-04 Massachusetts Institute of Technology
+  Copyright (c) 2001-04 Massachusetts Institute of Technol("Expoogy
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License version 2
@@ -641,7 +641,7 @@ public class Editor extends JFrame implements RunnerListener {
     sketchMenu.add(item);
 
 
-    item = newJMenuItemAlt("Export compiled Binary", 'S');
+    item = newJMenuItemAlt(_("Export compiled Binary"), 'S');
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           handleRunAndSave(true);
