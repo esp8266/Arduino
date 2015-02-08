@@ -143,7 +143,12 @@
     </copy>
 
     <!-- Unzip documentation -->
-    <unzip dest="${target.path}" src="shared/reference.zip" overwrite="false"/>
+    <antcall target="unzip">
+      <param name="archive_file" value="shared/reference-1.6.0.zip" />
+      <param name="archive_url" value="http://arduino.cc/download.php?f=/reference-1.6.0.zip" />
+      <param name="final_folder" value="${target.path}/reference" />
+      <param name="dest_folder" value="${target.path}" />
+    </antcall>
 
     <!-- Write the revision file! -->
     <echo file="${target.path}/lib/version.txt" message="${version}" />

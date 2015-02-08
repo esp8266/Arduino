@@ -1881,7 +1881,7 @@ public class Editor extends JFrame implements RunnerListener {
 		if (referenceFile == null) {
 			statusNotice(I18n.format(_("No reference available for \"{0}\""), text));
 		} else {
-			Base.showReference(I18n.format(_("{0}.html"), referenceFile));
+			Base.showReference("Reference/" + referenceFile);
 		}
 	}
 

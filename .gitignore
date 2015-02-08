@@ -37,6 +37,7 @@ build/linux/dist/*.tar.bz2
 build/linux/*.tgz
 build/linux/*.zip
 build/linux/libastylej*
+build/shared/reference*.zip
 test-bin
 *.iml
 .idea
