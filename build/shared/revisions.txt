@@ -1,4 +1,10 @@
 
+ARDUINO 1.6.0 - 2015.02.09
+
+[ide]
+* Updated help with the latest docs
+* Updated translations
+
 ARDUINO 1.6.0rc3 - 2015.02.03
 
 [ide]
