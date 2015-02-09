@@ -1160,9 +1160,9 @@ public class Compiler implements MessageConsumer {
 
     String[] cmdArray;
     try {
-      String tmp_file = prefs.getOrExcept("recipe.hex.tmp_file");
+      String tmp_file = prefs.getOrExcept("recipe.output.tmp_file");
       tmp_file = StringReplacer.replaceFromMapping(tmp_file, dict);
-      String save_file = prefs.getOrExcept("recipe.hex.save_file");
+      String save_file = prefs.getOrExcept("recipe.output.save_file");
       save_file = StringReplacer.replaceFromMapping(save_file, dict);
 
       File hexFile = new File(prefs.get("build.path") + "/" + tmp_file);
