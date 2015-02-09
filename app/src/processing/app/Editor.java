@@ -1881,7 +1881,7 @@ public class Editor extends JFrame implements RunnerListener {
 		if (referenceFile == null) {
 			statusNotice(I18n.format(_("No reference available for \"{0}\""), text));
 		} else {
-			Base.showReference(I18n.format(_("{0}.html"), referenceFile));
+			Base.showReference("Reference/" + referenceFile);
 		}
 	}
 
@@ -2024,6 +2024,8 @@ public class Editor extends JFrame implements RunnerListener {
 
     // As of Processing 1.0.10, this always happens immediately.
     // http://dev.processing.org/bugs/show_bug.cgi?id=1456
+
+    toFront();
 
     String prompt = I18n.format(_("Save changes to \"{0}\"?  "), sketch.getName());
 

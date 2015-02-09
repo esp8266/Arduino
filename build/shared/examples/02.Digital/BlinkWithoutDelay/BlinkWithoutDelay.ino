@@ -1,6 +1,6 @@
 /* Blink without Delay
 
- Turns on and off a light emitting diode(LED) connected to a digital
+ Turns on and off a light emitting diode (LED) connected to a digital
  pin, without using the delay() function.  This means that other code
  can run at the same time without being interrupted by the LED code.
 
@@ -28,7 +28,7 @@ const int ledPin =  13;      // the number of the LED pin
 // Variables will change :
 int ledState = LOW;             // ledState used to set the LED
 
-// Generally, you shuould use "unsigned long" for variables that hold time
+// Generally, you should use "unsigned long" for variables that hold time
 // The value will quickly become too large for an int to store
 unsigned long previousMillis = 0;        // will store last time LED was updated
 

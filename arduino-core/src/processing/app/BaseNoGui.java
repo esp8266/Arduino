@@ -7,13 +7,8 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.net.URISyntaxException;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -170,19 +165,21 @@ public class BaseNoGui {
   }
 
   static public File getContentFile(String name) {
-    String path = System.getProperty("user.dir");
+    File path = new File(System.getProperty("user.dir"));
 
-    // Get a path to somewhere inside the .app folder
     if (OSUtils.isMacOS()) {
-//      <key>javaroot</key>
-//      <string>$JAVAROOT</string>
-      String javaroot = System.getProperty("javaroot");
-      if (javaroot != null) {
-        path = javaroot;
+      if (System.getProperty("WORK_DIR") != null) {
+        path = new File(System.getProperty("WORK_DIR"));
+      } else {
+        try {
+          path = new File(BaseNoGui.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile();
+        } catch (URISyntaxException e) {
+          throw new RuntimeException(e);
+        }
       }
     }
-    File working = new File(path);
-    return new File(working, name);
+
+    return new File(path, name);
   }
 
   static public TargetPlatform getCurrentTargetPlatformFromPackage(String pack) {
