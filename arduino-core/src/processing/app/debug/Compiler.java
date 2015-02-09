@@ -405,7 +405,7 @@ public class Compiler implements MessageConsumer {
 
     // 6. build the .hex file
     progressListener.progress(80);
-    runRecipe("recipe.objcopy.hex.pattern");
+    runRecipe("recipe.objcopy.output.pattern");
 
     progressListener.progress(90);
     return true;
