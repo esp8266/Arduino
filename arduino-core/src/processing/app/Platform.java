@@ -30,6 +30,7 @@ import java.util.Map;
 
 import javax.swing.UIManager;
 
+import cc.arduino.packages.BoardPort;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 import processing.app.debug.TargetBoard;
@@ -216,5 +217,9 @@ public class Platform {
     BaseNoGui.showWarning(_("No launcher available"), 
                           _("Unspecified platform, no launcher available.\nTo enable opening URLs or folders, add a \n\"launcher=/path/to/app\" line to preferences.txt"),
                           null);
+  }
+
+  public List<BoardPort> filterPorts(List<BoardPort> ports, boolean aBoolean) {
+    return new LinkedList<BoardPort>(ports);
   }
 }
