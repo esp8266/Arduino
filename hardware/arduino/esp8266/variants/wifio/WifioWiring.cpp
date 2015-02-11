@@ -115,5 +115,6 @@ extern "C" void analogWrite(uint8_t pin, int value) {
 
 void initVariant() 
 { 
+  i2c_freq(100000);
   i2c_init(SDA, SCL);
 }

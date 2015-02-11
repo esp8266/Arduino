@@ -71,7 +71,7 @@ static inline uint8_t i2c_get_scl()
 
 static inline void i2c_wait()
 {
-	delayMicroseconds(5);
+	delayMicroseconds(s_i2c_delay);
 }
 
 void i2c_freq(int freq_hz)
