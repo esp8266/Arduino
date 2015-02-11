@@ -149,18 +149,27 @@ public class BaseNoGui {
     TargetBoard board = getTargetBoard();
     if (board == null)
       return null;
+    String boardId = board.getId();
     
     PreferencesMap prefs = new PreferencesMap(board.getPreferences());
+
+    String extendedName = prefs.get("name");
     for (String menuId : board.getMenuIds()) {
+      if (!board.hasMenu(menuId))
+        continue;
+
+      // Get "custom_[MENU_ID]" preference (for example "custom_cpu")
       String entry = PreferencesData.get("custom_" + menuId);
-      if (board.hasMenu(menuId) && entry != null &&
-          entry.startsWith(board.getId())) {
-        String selectionId = entry.substring(entry.indexOf("_") + 1);
+      if (entry != null && entry.startsWith(boardId)) {
+
+        String selectionId = entry.substring(boardId.length() + 1);
         prefs.putAll(board.getMenuPreferences(menuId, selectionId));
-        prefs.put("name", prefs.get("name") + ", " +
-            board.getMenuLabel(menuId, selectionId));
+
+        // Update the name with the extended configuration
+        extendedName += ", " + board.getMenuLabel(menuId, selectionId);
       }
     }
+    prefs.put("name", extendedName);
     return prefs;
   }
 
