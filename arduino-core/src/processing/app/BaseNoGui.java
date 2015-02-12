@@ -688,7 +688,7 @@ public class BaseNoGui {
     // Add library folder for the current selected platform
     TargetPlatform targetPlatform = getTargetPlatform();
     if (targetPlatform != null) {
-      String core = getBoardPreferences().get("build.core");
+      String core = getBoardPreferences().get("build.core", "arduino");
       if (core.contains(":")) {
         String referencedCore = core.split(":")[0];
         TargetPlatform referencedPlatform = getTargetPlatform(referencedCore, targetPlatform.getId());

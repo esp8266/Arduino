@@ -426,7 +426,7 @@ public class Compiler implements MessageConsumer {
     TargetPlatform targetPlatform = BaseNoGui.getTargetPlatform();
     TargetPlatform corePlatform = null;
     PreferencesMap boardPreferences = BaseNoGui.getBoardPreferences();
-    String core = boardPreferences.get("build.core");
+    String core = boardPreferences.get("build.core", "arduino");
     if (core.contains(":")) {
       String[] split = core.split(":");
       core = split[1];
