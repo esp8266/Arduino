@@ -148,7 +148,7 @@ uint8_t* ESP8266WiFiClass::macAddress(uint8_t* mac)
     return mac;
 }
 
-uint8_t* softAPmacAddress(uint8_t* mac)
+uint8_t* ESP8266WiFiClass::softAPmacAddress(uint8_t* mac)
 {
     wifi_get_macaddr(SOFTAP_IF, mac);
     return mac;
