@@ -1004,6 +1004,8 @@ public class Editor extends JFrame implements RunnerListener {
 
     List<BoardPort> ports = Base.getDiscoveryManager().discovery();
 
+    ports = Base.getPlatform().filterPorts(ports, Preferences.getBoolean("serial.ports.showall"));
+
     Collections.sort(ports, new Comparator<BoardPort>() {
       @Override
       public int compare(BoardPort o1, BoardPort o2) {
