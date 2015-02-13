@@ -5,13 +5,13 @@
   <!--echo message="os.version = ${os.version}" /-->
 
   <!-- Sets properties for macosx/windows/linux depending on current system -->
-  <condition property="platform" value="macosx-java-latest"><os family="mac" /></condition>
   <condition property="platform" value="macosx">
     <and>
       <os family="mac" />
       <matches string="${os.version}" pattern="^10.[56]." />
     </and>
   </condition>
+  <condition property="platform" value="macosx-java-latest"><os family="mac" /></condition>
   <condition property="platform" value="windows"><os family="windows" /></condition>
   <condition property="platform" value="linux32"><os family="unix" arch="i386" /></condition>
   <condition property="platform" value="linux64"><os family="unix" arch="amd64" /></condition>
