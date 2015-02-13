@@ -60,6 +60,9 @@ import cc.arduino.packages.uploaders.SerialUploader;
 @SuppressWarnings("serial")
 public class Editor extends JFrame implements RunnerListener {
 
+  private final static List<String> BOARD_PROTOCOLS_ORDER = Arrays.asList(new String[]{"serial", "network"});
+  private final static List<String> BOARD_PROTOCOLS_ORDER_TRANSLATIONS = Arrays.asList(new String[]{_("Serial ports"), _("Network ports")});
+
   Base base;
 
   // otherwise, if the window is resized with the message label
@@ -441,7 +444,7 @@ public class Editor extends JFrame implements RunnerListener {
     textarea.setEditable(!external);
     saveMenuItem.setEnabled(!external);
     saveAsMenuItem.setEnabled(!external);
-    
+
     textarea.setDisplayLineNumbers(Preferences.getBoolean("editor.linenumbers"));
 
     TextAreaPainter painter = textarea.getPainter();
@@ -996,7 +999,30 @@ public class Editor extends JFrame implements RunnerListener {
     String selectedPort = Preferences.get("serial.port");
 
     List<BoardPort> ports = Base.getDiscoveryManager().discovery();
+
+    Collections.sort(ports, new Comparator<BoardPort>() {
+      @Override
+      public int compare(BoardPort o1, BoardPort o2) {
+        return BOARD_PROTOCOLS_ORDER.indexOf(o1.getProtocol()) - BOARD_PROTOCOLS_ORDER.indexOf(o2.getProtocol());
+      }
+    });
+
+    String lastProtocol = null;
+    String lastProtocolTranslated;
     for (BoardPort port : ports) {
+      if (lastProtocol == null || !port.getProtocol().equals(lastProtocol)) {
+        if (lastProtocol != null) {
+          serialMenu.addSeparator();
+        }
+        lastProtocol = port.getProtocol();
+
+        if (BOARD_PROTOCOLS_ORDER.indexOf(port.getProtocol()) != -1) {
+          lastProtocolTranslated = BOARD_PROTOCOLS_ORDER_TRANSLATIONS.get(BOARD_PROTOCOLS_ORDER.indexOf(port.getProtocol()));
+        } else {
+          lastProtocolTranslated = port.getProtocol();
+        }
+        serialMenu.add(new JMenuItem(_(lastProtocolTranslated)));
+      }
       String address = port.getAddress();
       String label = port.getLabel();
 
@@ -1646,7 +1672,7 @@ public class Editor extends JFrame implements RunnerListener {
     if (document == null) {  // this document not yet inited
       document = new SyntaxDocument();
       codeDoc.setDocument(document);
-      
+
       // turn on syntax highlighting
       document.setTokenMarker(new PdeKeywords());
 
@@ -1870,7 +1896,7 @@ public class Editor extends JFrame implements RunnerListener {
 
 		} catch (BadLocationException bl) {
 			bl.printStackTrace();
-		} 
+		}
 		return text;
 	}
 
