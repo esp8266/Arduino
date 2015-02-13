@@ -967,13 +967,17 @@ public class Editor extends JFrame implements RunnerListener {
     }
     JCheckBoxMenuItem selection = null;
     for (int i = 0; i < serialMenu.getItemCount(); i++) {
-      JCheckBoxMenuItem item = ((JCheckBoxMenuItem)serialMenu.getItem(i));
-      if (item == null) {
+      JMenuItem menuItem = serialMenu.getItem(i);
+      if (!(menuItem instanceof JCheckBoxMenuItem)) {
+        continue;
+      }
+      JCheckBoxMenuItem checkBoxMenuItem = ((JCheckBoxMenuItem) menuItem);
+      if (checkBoxMenuItem == null) {
         System.out.println(_("name is null"));
         continue;
       }
-      item.setState(false);
-      if (name.equals(item.getText())) selection = item;
+      checkBoxMenuItem.setState(false);
+      if (name.equals(checkBoxMenuItem.getText())) selection = checkBoxMenuItem;
     }
     if (selection != null) selection.setState(true);
     //System.out.println(item.getLabel());
