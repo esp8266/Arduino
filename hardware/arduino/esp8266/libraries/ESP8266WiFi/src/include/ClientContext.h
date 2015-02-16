@@ -68,6 +68,7 @@ public:
     void ref()
     {
         ++_refcnt;
+        DEBUGV(":ref %d\r\n", _refcnt);
     }
 
     void unref()
