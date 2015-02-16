@@ -422,7 +422,9 @@ public class FindReplace extends JFrame implements ActionListener {
     if (findField.getText().length() == 0)
       return;
     
-    editor.getSketch().setCurrentCode(0); // select the first tab
+    if (searchAllFiles)
+        editor.getSketch().setCurrentCode(0); // select the first tab
+    
     editor.setSelection(0, 0); // move to the beginning
 
     boolean foundAtLeastOne = false;
