@@ -19,8 +19,8 @@ import org.apache.commons.logging.impl.NoOpLog;
 import cc.arduino.packages.DiscoveryManager;
 import cc.arduino.packages.Uploader;
 import processing.app.debug.Compiler;
-
 import cc.arduino.libraries.contributions.LibrariesIndexer;
+import cc.arduino.packages.contributions.ContributedTool;
 import cc.arduino.packages.contributions.ContributionsIndexer;
 import cc.arduino.utils.ArchiveExtractor;
 import processing.app.debug.TargetBoard;
@@ -618,6 +618,7 @@ public class BaseNoGui {
     loadHardware(getHardwareFolder());
     loadHardware(getSketchbookHardwareFolder());
     loadContributedHardware(indexer);
+    createToolPreferences(indexer);
 
     librariesIndexer = new LibrariesIndexer(BaseNoGui.getSettingsFolder());
     File librariesIndexFile = librariesIndexer.getIndexFile();
@@ -771,6 +772,21 @@ public class BaseNoGui {
     }
   }
   
+  static private void createToolPreferences(ContributionsIndexer indexer) {
+    // Remove previous runtime preferences
+    final String prefix = "runtime.tools.";
+    PreferencesData.removeAllKeysWithPrefix(prefix);
+
+    for (ContributedTool tool : indexer.getInstalledTools()) {
+      String path = tool.getDownloadableContribution().getInstalledFolder()
+          .getAbsolutePath();
+      String toolId = tool.getName();
+      PreferencesData.set(prefix + toolId + ".path", path);
+      toolId += "-" + tool.getVersion();
+      PreferencesData.set(prefix + toolId + ".path", path);
+    }
+  }
+
   static public void populateImportToLibraryTable() {
     // Populate importToLibraryTable
     importToLibraryTable = new HashMap<String, UserLibrary>();

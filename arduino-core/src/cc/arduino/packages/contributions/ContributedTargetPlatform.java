@@ -28,16 +28,11 @@
  */
 package cc.arduino.packages.contributions;
 
-import static processing.app.I18n._;
-import static processing.app.I18n.format;
-
 import java.io.File;
-import java.util.Set;
 
 import processing.app.debug.LegacyTargetPlatform;
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatformException;
-import processing.app.helpers.PreferencesMap;
 
 public class ContributedTargetPlatform extends LegacyTargetPlatform {
 
@@ -46,35 +41,5 @@ public class ContributedTargetPlatform extends LegacyTargetPlatform {
                                    ContributionsIndex index)
       throws TargetPlatformException {
     super(_name, _folder, parent);
-
-    // Populate tools
-    PreferencesMap toolsPrefs = preferences.subTree("tools");
-    Set<String> names = toolsPrefs.firstLevelMap().keySet();
-    for (String name : names) {
-      String version = toolsPrefs.get(name + ".version");
-      if (version == null) {
-        throw new TargetPlatformException(
-            format(_("Tool {0} must define a version property ({1})"), //
-                   name, "tools." + name + ".version"));
-      }
-
-      String packageName = getContainerPackage().getId();
-      ContributedTool tool = index.findTool(packageName, name, version);
-      if (tool == null) {
-        throw new TargetPlatformException(
-            format(_("Tool {0} not found in package {1}"),
-                   name + ":" + version, packageName));
-      }
-
-      DownloadableContribution download = tool.getDownloadableContribution();
-      if (!download.isInstalled()) {
-        throw new TargetPlatformException(
-            format(_("Tool {0} is required but it's not installed."), //
-                   name + ":" + version));
-      }
-      preferences.put("tools." + name + ".path", //
-                      download.getInstalledFolder().getAbsolutePath());
-    }
-
   }
 }

@@ -35,7 +35,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
@@ -219,6 +221,20 @@ public class ContributionsIndexer {
       }
     }
     return false;
+  }
+
+  public Set<ContributedTool> getInstalledTools() {
+    Set<ContributedTool> tools = new HashSet<ContributedTool>();
+    for (ContributedPackage pack : index.getPackages()) {
+      for (ContributedPlatform platform : pack.getPlatforms()) {
+        if (!platform.isInstalled())
+          continue;
+        for (ContributedTool tool : platform.getResolvedTools()) {
+          tools.add(tool);
+        }
+      }
+    }
+    return tools;
   }
 
   public ContributionsIndex getIndex() {

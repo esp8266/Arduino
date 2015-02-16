@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.MissingResourceException;
 
 import processing.app.helpers.PreferencesMap;
@@ -203,6 +204,13 @@ public class PreferencesData {
   static public PreferencesMap getMap() 
   {
     return new PreferencesMap(prefs);
+  }
+
+  static public void removeAllKeysWithPrefix(String prefix) {
+    Iterator<String> keys = prefs.keySet().iterator();
+    while (keys.hasNext())
+      if (keys.next().startsWith(prefix))
+        keys.remove();
   }
 
   // Decide wether changed preferences will be saved. When value is
