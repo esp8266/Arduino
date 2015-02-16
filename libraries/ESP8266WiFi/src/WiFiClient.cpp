@@ -70,6 +70,8 @@ ICACHE_FLASH_ATTR WiFiClient::WiFiClient(const WiFiClient& other)
 
 WiFiClient& ICACHE_FLASH_ATTR  WiFiClient::operator=(const WiFiClient& other)
 {
+   if (_client)
+        _client->unref(); 
     _client = other._client;
     if (_client)
         _client->ref();
