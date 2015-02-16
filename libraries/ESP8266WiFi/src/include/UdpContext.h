@@ -102,6 +102,24 @@ public:
         return _rx_buf->len - _rx_buf_offset;
     }
 
+    uint32_t getRemoteAddress()
+    {
+        if (!_rx_buf)
+            return 0;
+
+        struct ip_hdr* iphdr = (struct ip_hdr*) (((uint8_t*)_rx_buf->payload) - UDP_HLEN - IP_HLEN);
+        return iphdr->src.addr;
+    }
+
+    uint16_t getRemotePort()
+    {
+        if (!_rx_buf)
+            return 0;
+
+        struct udp_hdr* udphdr = (struct udp_hdr*) (((uint8_t*)_rx_buf->payload) - UDP_HLEN);
+        return ntohs(udphdr->src);
+    }
+
     bool next()
     {
         if (!_rx_buf)

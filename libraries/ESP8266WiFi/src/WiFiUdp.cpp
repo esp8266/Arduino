@@ -36,6 +36,7 @@ extern "C"
 #include "lwip/udp.h"
 #include "lwip/inet.h"
 #include "lwip/igmp.h"
+#include "lwip/mem.h"
 #include "include/UdpContext.h"
 
 /* Constructor */
@@ -209,23 +210,19 @@ void WiFiUDP::flush()
         _ctx->flush();
 }
 
-IPAddress  WiFiUDP::remoteIP()
+IPAddress WiFiUDP::remoteIP()
 {
-    uint8_t _remoteIp[4] = {0};
-    uint8_t _remotePort[2] = {0};
+    if (!_ctx)
+        return IPAddress(0U);
 
-    // WiFiDrv::getRemoteData(_sock, _remoteIp, _remotePort);
-    IPAddress ip(_remoteIp);
-    return ip;
+    return IPAddress(_ctx->getRemoteAddress());
 }
 
-uint16_t  WiFiUDP::remotePort()
+uint16_t WiFiUDP::remotePort()
 {
-    uint8_t _remoteIp[4] = {0};
-    uint8_t _remotePort[2] = {0};
+    if (!_ctx)
+        return 0;
 
-    // WiFiDrv::getRemoteData(_sock, _remoteIp, _remotePort);
-    uint16_t port = (_remotePort[0]<<8)+_remotePort[1];
-    return port;
+    return _ctx->getRemotePort();
 }
 
