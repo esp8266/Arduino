@@ -421,8 +421,9 @@ public class FindReplace extends JFrame implements ActionListener {
   public void replaceAll() {
     if (findField.getText().length() == 0)
       return;
-    // move to the beginning
-    editor.setSelection(0, 0);
+    
+    editor.getSketch().setCurrentCode(0); // select the first tab
+    editor.setSelection(0, 0); // move to the beginning
 
     boolean foundAtLeastOne = false;
     while (true) {
