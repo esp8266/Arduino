@@ -11,7 +11,7 @@ public abstract class NetUtils {
     Socket socket = null;
     try {
       socket = new Socket();
-      socket.connect(new InetSocketAddress(address, port), 100);
+      socket.connect(new InetSocketAddress(address, port), 300);
       return true;
     } catch (IOException e) {
       return false;
