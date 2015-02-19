@@ -1697,6 +1697,7 @@ public class Editor extends JFrame implements RunnerListener {
 
           } else if (undo != null) {
             undo.addEdit(new CaretAwareUndoableEdit(e.getEdit(), textarea));
+            sketch.setModified(true);
             undoAction.updateUndoState();
             redoAction.updateRedoState();
           }
