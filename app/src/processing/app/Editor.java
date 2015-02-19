@@ -1693,10 +1693,11 @@ public class Editor extends JFrame implements RunnerListener {
       document.addUndoableEditListener(new UndoableEditListener() {
         public void undoableEditHappened(UndoableEditEvent e) {
           if (compoundEdit != null) {
-            compoundEdit.addEdit(e.getEdit());
-
+            compoundEdit.addEdit(new CaretAwareUndoableEdit(e.getEdit(), textarea));
           } else if (undo != null) {
             undo.addEdit(new CaretAwareUndoableEdit(e.getEdit(), textarea));
+          }
+          if (compoundEdit != null || undo != null) {
             sketch.setModified(true);
             undoAction.updateUndoState();
             redoAction.updateRedoState();
