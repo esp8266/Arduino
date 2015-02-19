@@ -26,8 +26,8 @@
 #include <YunServer.h>
 #include <YunClient.h>
 
-// Listen on default port 5555, the webserver on the Yún
-// will forward there all the HTTP requests for us.
+// Listen to the default port 5555, the Yún webserver
+// will forward there all the HTTP requests you send
 YunServer server;
 
 void setup() {
