@@ -75,10 +75,7 @@ public class NetworkDiscovery implements Discovery, ServiceListener, cc.arduino.
           ports.add(0, 22);
         }
 
-        boolean reachable = false;
-        for (Integer port : ports) {
-          reachable = reachable || NetUtils.isReachable(inetAddress, port);
-        }
+        boolean reachable = NetUtils.isReachable(inetAddress, ports);
         if (!reachable) {
           boardPortIterator.remove();
         }
