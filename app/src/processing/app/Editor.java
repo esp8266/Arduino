@@ -1365,6 +1365,7 @@ public class Editor extends JFrame implements RunnerListener {
     public void actionPerformed(ActionEvent e) {
       try {
         undo.undo();
+        sketch.setModified(true);
       } catch (CannotUndoException ex) {
         //System.out.println("Unable to undo: " + ex);
         //ex.printStackTrace();
@@ -1386,17 +1387,11 @@ public class Editor extends JFrame implements RunnerListener {
         undoItem.setEnabled(true);
         undoItem.setText(undo.getUndoPresentationName());
         putValue(Action.NAME, undo.getUndoPresentationName());
-        if (sketch != null) {
-          sketch.setModified(true);  // 0107
-        }
       } else {
         this.setEnabled(false);
         undoItem.setEnabled(false);
         undoItem.setText(_("Undo"));
         putValue(Action.NAME, "Undo");
-        if (sketch != null) {
-          sketch.setModified(false);  // 0107
-        }
       }
     }
   }
@@ -1411,6 +1406,7 @@ public class Editor extends JFrame implements RunnerListener {
     public void actionPerformed(ActionEvent e) {
       try {
         undo.redo();
+        sketch.setModified(true);
       } catch (CannotRedoException ex) {
         //System.out.println("Unable to redo: " + ex);
         //ex.printStackTrace();
