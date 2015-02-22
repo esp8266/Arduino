@@ -1187,6 +1187,7 @@ public class Base {
           Action subAction = new AbstractAction(_(boardCustomMenu.get(customMenuOption))) {
             public void actionPerformed(ActionEvent e) {
               Preferences.set("custom_" + menuId, ((TargetBoard)getValue("board")).getId() + "_" + getValue("custom_menu_option"));
+              onBoardOrPortChange();
             }
           };
           subAction.putValue("board", board);
