@@ -172,7 +172,7 @@ public class ContributionInstaller {
     final MultiStepProgress progress = new MultiStepProgress(1);
     final String statusText = _("Downloading platforms index...");
 
-    URL url = new URL("http://arduino.cc/package_index.json");
+    URL url = new URL("http://arduino.cc/download.php?f=/packages/package_index.json");
     File outputFile = indexer.getIndexFile();
     File tmpFile = new File(outputFile.getAbsolutePath() + ".tmp");
     downloader.download(url, tmpFile, progress, statusText);

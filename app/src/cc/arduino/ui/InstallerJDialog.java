@@ -28,29 +28,10 @@
  */
 package cc.arduino.ui;
 
-import static cc.arduino.packages.contributions.ui.ContributionIndexTableModel.DESCRIPTION_COL;
-import static processing.app.I18n._;
+import processing.app.Base;
+import processing.app.Theme;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
@@ -58,8 +39,14 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
 
-import processing.app.Theme;
+import static cc.arduino.packages.contributions.ui.ContributionIndexTableModel.DESCRIPTION_COL;
+import static processing.app.I18n._;
 
 public abstract class InstallerJDialog extends JDialog {
 
@@ -156,8 +143,7 @@ public abstract class InstallerJDialog extends JDialog {
     contribTable.setDragEnabled(false);
     contribTable.setIntercellSpacing(new Dimension(0, 1));
     contribTable.setShowVerticalLines(false);
-    contribTable
-        .setSelectionBackground(Theme.getColor("status.notice.bgcolor"));
+    contribTable.setSelectionBackground(Theme.getColor("status.notice.bgcolor"));
 
     {
       TableColumnModel tcm = contribTable.getColumnModel();
@@ -222,6 +208,15 @@ public abstract class InstallerJDialog extends JDialog {
     setProgressVisible(false);
 
     setMinimumSize(new Dimension(600, 450));
+
+    setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
+    Base.registerWindowCloseKeys(getRootPane(), new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        InstallerJDialog.this.dispatchEvent(new WindowEvent(InstallerJDialog.this, WindowEvent.WINDOW_CLOSING));
+      }
+    });
   }
 
   public void setProgressVisible(boolean visible) {

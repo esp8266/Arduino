@@ -63,7 +63,7 @@ public class LibraryInstaller {
     final MultiStepProgress progress = new MultiStepProgress(2);
 
     // Step 1: Download index
-    URL url = new URL("http://arduino.cc/library_index.json");
+    URL url = new URL("http://arduino.cc/download.php?f=/libraries/library_index.json");
     File outputFile = indexer.getIndexFile();
     File tmpFile = new File(outputFile.getAbsolutePath() + ".tmp");
     try {
