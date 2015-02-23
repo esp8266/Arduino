@@ -63,8 +63,8 @@ public class ContributionManagerUI extends InstallerJDialog {
   protected InstallerTableCell createCellEditor() {
     return new ContributedPlatformTableCell() {
       @Override
-      protected void onInstall(ContributedPlatform selectedPlatform) {
-        onInstallPressed(selectedPlatform);
+      protected void onInstall(ContributedPlatform selectedPlatform, ContributedPlatform installed) {
+        onInstallPressed(selectedPlatform, installed);
       }
 
       @Override
@@ -146,13 +146,16 @@ public class ContributionManagerUI extends InstallerJDialog {
     installerThread.start();
   }
 
-  public void onInstallPressed(final ContributedPlatform platform) {
+  public void onInstallPressed(final ContributedPlatform platformToInstall, final ContributedPlatform platformToRemove) {
     installerThread = new Thread(new Runnable() {
       @Override
       public void run() {
         try {
           setProgressVisible(true);
-          installer.install(platform);
+          installer.install(platformToInstall);
+          if (platformToRemove != null) {
+            installer.remove(platformToRemove);
+          }
         } catch (Exception e) {
           // TODO Show ERROR
           e.printStackTrace();

@@ -28,13 +28,16 @@
  */
 package cc.arduino.packages.contributions.ui;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import cc.arduino.packages.contributions.ContributedPackage;
 import cc.arduino.packages.contributions.ContributedPlatform;
 import cc.arduino.packages.contributions.ContributionsIndex;
 import cc.arduino.ui.FilteredAbstractTableModel;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+import static processing.app.I18n._;
 
 @SuppressWarnings("serial")
 public class ContributionIndexTableModel extends FilteredAbstractTableModel {
@@ -69,9 +72,21 @@ public class ContributionIndexTableModel extends FilteredAbstractTableModel {
     }
 
     public ContributedPlatform getInstalled() {
-      for (ContributedPlatform plat : releases)
-        if (plat.isInstalled())
-          return plat;
+      List<ContributedPlatform> installedPlatforms = new LinkedList<ContributedPlatform>();
+      for (ContributedPlatform platform : releases) {
+        if (platform.isInstalled()) {
+          installedPlatforms.add(platform);
+        }
+      }
+
+      if (installedPlatforms.size() > 1) {
+        throw new IllegalStateException(_("More than one platform is currently installed! Only one can be installed at any given time"));
+      }
+
+      if (!installedPlatforms.isEmpty()) {
+        return installedPlatforms.get(0);
+      }
+
       return null;
     }
 
@@ -112,9 +127,9 @@ public class ContributionIndexTableModel extends FilteredAbstractTableModel {
 
   private List<ContributedPlatformReleases> contributions = new ArrayList<ContributedPlatformReleases>();
 
-  private String[] columnNames = { "Description" };
+  private String[] columnNames = {"Description"};
 
-  private Class<?>[] columnTypes = { ContributedPlatform.class };
+  private Class<?>[] columnTypes = {ContributedPlatform.class};
 
   private ContributionsIndex index;
 
@@ -141,11 +156,11 @@ public class ContributionIndexTableModel extends FilteredAbstractTableModel {
   /**
    * Check if <b>string</b> contains all the substrings in <b>set</b>. The
    * compare is case insensitive.
-   * 
+   *
    * @param string
    * @param set
    * @return <b>true<b> if all the strings in <b>set</b> are contained in
-   *         <b>string</b>.
+   * <b>string</b>.
    */
   private boolean stringContainsAll(String string, String set[]) {
     if (set == null)

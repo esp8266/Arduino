@@ -66,7 +66,6 @@ public class LibrariesIndexer {
 
   public void parseIndex() throws JsonParseException, IOException {
     parseIndex(indexFile);
-    System.out.println(index);
 
     index.fillCategories();
     // TODO: resolve libraries inner references

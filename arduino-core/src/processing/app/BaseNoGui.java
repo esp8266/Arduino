@@ -612,7 +612,6 @@ public class BaseNoGui {
     }
     indexer.parseIndex();
     indexer.syncWithFilesystem();
-    System.out.println(indexer);
 
     packages = new HashMap<String, TargetPackage>();
     loadHardware(getHardwareFolder());

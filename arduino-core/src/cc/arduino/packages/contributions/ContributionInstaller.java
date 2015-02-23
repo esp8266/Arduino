@@ -60,8 +60,9 @@ public class ContributionInstaller {
   }
 
   public void install(ContributedPlatform platform) throws Exception {
-    if (platform.isInstalled())
+    if (platform.isInstalled()) {
       throw new Exception("Platform is already installed!");
+    }
 
     // Do not download already installed tools
     List<ContributedTool> tools = new LinkedList<ContributedTool>(platform.getResolvedTools());
@@ -111,13 +112,11 @@ public class ContributionInstaller {
     File toolsFolder = new File(packageFolder, "tools");
     int i = 1;
     for (ContributedTool tool : platform.getResolvedTools()) {
-      progress.setStatus(format(_("Installing tools ({0}/{1})..."), i,
-                                tools.size()));
+      progress.setStatus(format(_("Installing tools ({0}/{1})..."), i, tools.size()));
       onProgress(progress);
       i++;
       DownloadableContribution toolContrib = tool.getDownloadableContribution();
-      File destFolder = new File(toolsFolder, tool.getName() + File.separator +
-          tool.getVersion());
+      File destFolder = new File(toolsFolder, tool.getName() + File.separator + tool.getVersion());
 
       destFolder.mkdirs();
       ArchiveExtractor.extract(toolContrib.getDownloadedFile(), destFolder, 1);
@@ -129,8 +128,7 @@ public class ContributionInstaller {
     // Unpack platform on the correct location
     progress.setStatus(_("Installing boards..."));
     onProgress(progress);
-    File platformFolder = new File(packageFolder, "hardware" + File.separator +
-        platform.getArchitecture());
+    File platformFolder = new File(packageFolder, "hardware" + File.separator + platform.getArchitecture());
     File destFolder = new File(platformFolder, platform.getVersion());
     destFolder.mkdirs();
     ArchiveExtractor.extract(platform.getDownloadedFile(), destFolder, 1);

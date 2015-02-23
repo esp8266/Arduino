@@ -1123,7 +1123,7 @@ public class Base {
     rebuildExamplesMenu(Editor.examplesMenu);
   }
 
-  private void openInstallBoardDialog() {
+  private void openInstallBoardDialog() throws Exception {
     // Create dialog for contribution manager
     @SuppressWarnings("serial")
     ContributionManagerUI managerUI = new ContributionManagerUI(activeEditor) {
@@ -1139,14 +1139,9 @@ public class Base {
     // Installer dialog is modal, waits here until closed
 
     // Reload all boards (that may have been installed/updated/removed)
-    try {
-      BaseNoGui.initPackages();
-      rebuildBoardsMenu();
-      onBoardOrPortChange();
-    } catch (Exception e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
+    BaseNoGui.initPackages();
+    rebuildBoardsMenu();
+    onBoardOrPortChange();
   }
 
   public void rebuildBoardsMenu() throws Exception {
@@ -1158,7 +1153,12 @@ public class Base {
     @SuppressWarnings("serial")
     Action runInstaller = new AbstractAction("Install boards...") {
       public void actionPerformed(ActionEvent actionevent) {
-        openInstallBoardDialog();
+        try {
+          openInstallBoardDialog();
+        } catch (Exception e) {
+          //TODO show error
+          e.printStackTrace();
+        }
       }
     };
     boardMenu.add(new JMenuItem(runInstaller));

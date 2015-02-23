@@ -98,7 +98,7 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
     installButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        onInstall(editorValue.getSelected());
+        onInstall(editorValue.getSelected(), editorValue.getInstalled());
       }
     });
 
@@ -129,7 +129,7 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
     // Empty
   }
 
-  protected void onInstall(ContributedPlatform contributedPlatform) {
+  protected void onInstall(ContributedPlatform contributedPlatform, ContributedPlatform installed) {
     // Empty
   }
 
