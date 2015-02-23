@@ -723,11 +723,67 @@ public class BaseNoGui {
         for (String header : headers) {
           Library old = importToLibraryTable.get(header);
           if (old != null) {
-            // If a library was already found with this header, keep
-            // it if the library's name matches the header name.
-            String name = header.substring(0, header.length() - 2);
-            if (old.getFolder().getPath().endsWith(name))
-              continue;
+            // This is the case where 2 libraries have a .h header
+            // with the same name.  We must decide which library to
+            // use when a sketch has #include "name.h"
+            //
+            // When all other factors are equal, "libName" is
+            // used in preference to "oldName", because getLibraries()
+            // gives the library list in order from less specific to
+            // more specific locations.
+            //
+            // But often one library is more clearly the user's
+            // intention to use.  Many cases are tested, always first
+            // for "libName", then for "oldName".
+            //
+            String name = header.substring(0, header.length() - 2); // name without ".h"
+            String oldName = old.getFolder().getName();  // just the library folder name
+            String libName = lib.getFolder().getName();  // just the library folder name
+            //System.out.println("name conflict: " + name);
+            //System.out.println("  old = " + oldName + "  ->  " + old.getFolder().getPath());
+            //System.out.println("  new = " + libName + "  ->  " + lib.getFolder().getPath());
+            String name_lc = name.toLowerCase();
+            String oldName_lc = oldName.toLowerCase();
+            String libName_lc = libName.toLowerCase();
+            // always favor a perfect name match
+            if (libName.equals(name)) {
+            } else if (oldName.equals(name)) {
+                continue;
+            // check for "-master" appended (zip file from github)
+            } else if (libName.equals(name+"-master")) {
+            } else if (oldName.equals(name+"-master")) {
+                continue;
+            // next, favor a match with other stuff appended
+            } else if (libName.startsWith(name)) {
+            } else if (oldName.startsWith(name)) {
+                continue;
+            // otherwise, favor a match with stuff prepended
+            } else if (libName.endsWith(name)) {
+            } else if (oldName.endsWith(name)) {
+                continue;
+            // as a last resort, match if stuff prepended and appended
+            } else if (libName.contains(name)) {
+            } else if (oldName.contains(name)) {
+                continue;
+            // repeat all the above tests, with case insensitive matching
+            } else if (libName_lc.equals(name_lc)) {
+            } else if (oldName_lc.equals(name_lc)) {
+                continue;
+            } else if (libName_lc.equals(name_lc+"-master")) {
+            } else if (oldName_lc.equals(name_lc+"-master")) {
+                continue;
+            } else if (libName_lc.startsWith(name_lc)) {
+            } else if (oldName_lc.startsWith(name_lc)) {
+                continue;
+            } else if (libName_lc.endsWith(name_lc)) {
+            } else if (oldName_lc.endsWith(name_lc)) {
+                continue;
+            } else if (libName_lc.contains(name_lc)) {
+            } else if (oldName_lc.contains(name_lc)) {
+                continue;
+            } else {
+              // none of these tests matched, so just default to "libName".
+            }
           }
           importToLibraryTable.put(header, lib);
         }
