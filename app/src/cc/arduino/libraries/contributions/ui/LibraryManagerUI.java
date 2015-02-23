@@ -137,8 +137,7 @@ public class LibraryManagerUI extends InstallerJDialog {
           installer.updateIndex();
           onIndexesUpdated();
         } catch (Exception e) {
-          // TODO Show ERROR
-          e.printStackTrace();
+          throw new RuntimeException(e);
         } finally {
           setProgressVisible(false);
         }
@@ -156,8 +155,7 @@ public class LibraryManagerUI extends InstallerJDialog {
           installer.install(lib);
           getContribModel().updateLibrary(lib);
         } catch (Exception e) {
-          // TODO Show ERROR
-          e.printStackTrace();
+          throw new RuntimeException(e);
         } finally {
           setProgressVisible(false);
         }
@@ -175,8 +173,7 @@ public class LibraryManagerUI extends InstallerJDialog {
           installer.remove(lib);
           getContribModel().updateLibrary(lib);
         } catch (Exception e) {
-          // TODO Show ERROR
-          e.printStackTrace();
+          throw new RuntimeException(e);
         } finally {
           setProgressVisible(false);
         }

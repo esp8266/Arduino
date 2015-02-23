@@ -719,6 +719,8 @@ public class BaseNoGui {
     initParameters(args);
     
     init(args);
+
+    Thread.setDefaultUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
   }
 
   static public void onBoardOrPortChange() {
@@ -765,7 +767,7 @@ public class BaseNoGui {
     populateImportToLibraryTable();
   }
 
-  static protected void loadContributedHardware(ContributionsIndexer indexer) {
+  static protected void loadContributedHardware(ContributionsIndexer indexer) throws TargetPlatformException {
     for (TargetPackage pack : indexer.createTargetPackages()) {
       packages.put(pack.getId(), pack);
     }

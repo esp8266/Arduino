@@ -64,7 +64,7 @@ public class AStyle implements Tool {
     try {
       formatterConfiguration = FileUtils.readFileToString(formatterConf);
     } catch (IOException e) {
-      // noop
+      // ignored
     }
     this.formatterConfiguration = formatterConfiguration;
   }

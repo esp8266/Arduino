@@ -28,7 +28,13 @@
  */
 package cc.arduino.packages.contributions;
 
-import static processing.app.helpers.filefilters.OnlyDirs.ONLY_DIRS;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.module.mrbean.MrBeanModule;
+import processing.app.debug.TargetPackage;
+import processing.app.debug.TargetPlatform;
+import processing.app.debug.TargetPlatformException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,14 +45,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import processing.app.debug.TargetPackage;
-import processing.app.debug.TargetPlatform;
-import processing.app.debug.TargetPlatformException;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.module.mrbean.MrBeanModule;
+import static processing.app.helpers.filefilters.OnlyDirs.ONLY_DIRS;
 
 public class ContributionsIndexer {
 
@@ -58,7 +57,7 @@ public class ContributionsIndexer {
   public ContributionsIndexer(File preferencesFolder) {
     packagesFolder = new File(preferencesFolder, "packages");
     stagingFolder = new File(preferencesFolder, "staging" + File.separator +
-        "packages");
+            "packages");
     indexFile = new File(preferencesFolder, "package_index.json");
   }
 
@@ -95,7 +94,7 @@ public class ContributionsIndexer {
   }
 
   private void parseIndex(File indexFile) throws JsonParseException,
-      IOException {
+          IOException {
     InputStream indexIn = new FileInputStream(indexFile);
     ObjectMapper mapper = new ObjectMapper();
     mapper.registerModule(new MrBeanModule());
@@ -141,14 +140,14 @@ public class ContributionsIndexer {
   private void syncToolWithFilesystem(ContributedPackage pack, File toolFolder,
                                       File versionFolder) {
     ContributedTool tool = pack.findTool(toolFolder.getName(),
-                                         versionFolder.getName());
+            versionFolder.getName());
     if (tool == null)
       return;
     DownloadableContribution contrib = tool.getDownloadableContribution();
     if (contrib == null) {
       System.err.println(tool +
-          " seems to have no downloadable contributions for your " +
-          "operating system, but it is installed in\n" + versionFolder);
+              " seems to have no downloadable contributions for your " +
+              "operating system, but it is installed in\n" + versionFolder);
       return;
     }
     contrib.setInstalled(true);
@@ -173,7 +172,7 @@ public class ContributionsIndexer {
     return index.toString();
   }
 
-  public List<TargetPackage> createTargetPackages() {
+  public List<TargetPackage> createTargetPackages() throws TargetPlatformException {
     List<TargetPackage> res = new ArrayList<TargetPackage>();
 
     for (ContributedPackage pack : index.getPackages()) {
@@ -187,14 +186,9 @@ public class ContributionsIndexer {
         String arch = platform.getArchitecture();
         File folder = platform.getInstalledFolder();
 
-        try {
-          TargetPlatform targetPlatform;
-          targetPlatform = new ContributedTargetPlatform(arch, folder,
-              targetPackage, index);
-          targetPackage.addPlatform(targetPlatform);
-        } catch (TargetPlatformException e) {
-          e.printStackTrace();
-        }
+        TargetPlatform targetPlatform;
+        targetPlatform = new ContributedTargetPlatform(arch, folder, targetPackage, index);
+        targetPackage.addPlatform(targetPlatform);
       }
 
       if (targetPackage.hasPlatforms())
@@ -205,7 +199,7 @@ public class ContributionsIndexer {
 
   /**
    * Check if a ContributedTool is currently in use by an installed platform
-   * 
+   *
    * @param tool
    * @return
    */

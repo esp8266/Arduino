@@ -29,27 +29,15 @@
 
 package cc.arduino.packages.security;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.security.Security;
-
+import cc.arduino.packages.security.keys.PackagersPublicKeys;
 import org.bouncycastle.bcpg.ArmoredInputStream;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.openpgp.PGPObjectFactory;
-import org.bouncycastle.openpgp.PGPPublicKey;
-import org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
-import org.bouncycastle.openpgp.PGPSignature;
-import org.bouncycastle.openpgp.PGPSignatureList;
+import org.bouncycastle.openpgp.*;
 import org.bouncycastle.openpgp.operator.jcajce.JcaPGPContentVerifierBuilderProvider;
-
 import processing.app.helpers.StringUtils;
-import cc.arduino.packages.security.keys.PackagersPublicKeys;
+
+import java.io.*;
+import java.security.Security;
 
 public class ClearSignedVerifier {
 
@@ -61,19 +49,17 @@ public class ClearSignedVerifier {
 
   /**
    * Verify a PGP clearText-signature.
-   * 
-   * @param signedTextFile
-   *          A File containing the clearText signature
-   * @param pubKeyRing
-   *          A public key-ring containing the public key needed for the
-   *          signature verification
+   *
+   * @param signedTextFile A File containing the clearText signature
+   * @param pubKeyRing     A public key-ring containing the public key needed for the
+   *                       signature verification
    * @return A VerifyResult class with the clearText and the signature
-   *         verification status
+   * verification status
    * @throws FileNotFoundException
    */
   public static VerifyResult verify(File signedTextFile,
                                     PGPPublicKeyRingCollection pubKeyRing)
-      throws FileNotFoundException {
+          throws FileNotFoundException {
     // Create the result object
     VerifyResult result = new VerifyResult();
     result.clearText = null;
@@ -108,14 +94,14 @@ public class ClearSignedVerifier {
       // Verify signature
       Security.addProvider(new BouncyCastleProvider());
       sig.init(new JcaPGPContentVerifierBuilderProvider().setProvider("BC"),
-               publicKey);
+              publicKey);
       // RFC 4880, section 7: http://tools.ietf.org/html/rfc4880#section-7
       // The signature must be validated using clear text:
       // - without trailing white spaces on every line
       // - using CR LF line endings, no matter what the original line ending is
       // - without the latest line ending
       BufferedReader textIn = new BufferedReader(new InputStreamReader(
-          new ByteArrayInputStream(clearText)));
+              new ByteArrayInputStream(clearText)));
       while (true) {
         // remove trailing whitespace and line endings
         String line = StringUtils.rtrim(textIn.readLine());
@@ -136,7 +122,7 @@ public class ClearSignedVerifier {
         try {
           in.close();
         } catch (IOException e) {
-          e.printStackTrace();
+          // ignored
         }
     }
     return result;
@@ -144,7 +130,7 @@ public class ClearSignedVerifier {
 
   public static void main(String[] args) throws Exception {
     VerifyResult verify = verify(new File(
-        "/home/megabug/git/arduino/test.txt.asc"), new PackagersPublicKeys());
+            "/home/megabug/git/arduino/test.txt.asc"), new PackagersPublicKeys());
     System.out.println(verify.verified);
   }
 }

@@ -136,8 +136,7 @@ public class ContributionManagerUI extends InstallerJDialog {
           installer.updateIndex();
           onIndexesUpdated();
         } catch (Exception e) {
-          // TODO Show ERROR
-          e.printStackTrace();
+          throw new RuntimeException(e);
         } finally {
           setProgressVisible(false);
         }
@@ -157,8 +156,7 @@ public class ContributionManagerUI extends InstallerJDialog {
             installer.remove(platformToRemove);
           }
         } catch (Exception e) {
-          // TODO Show ERROR
-          e.printStackTrace();
+          throw new RuntimeException(e);
         } finally {
           setProgressVisible(false);
         }
@@ -175,8 +173,7 @@ public class ContributionManagerUI extends InstallerJDialog {
           setProgressVisible(true);
           installer.remove(platform);
         } catch (Exception e) {
-          // TODO Show ERROR
-          e.printStackTrace();
+          throw new RuntimeException(e);
         } finally {
           setProgressVisible(false);
         }

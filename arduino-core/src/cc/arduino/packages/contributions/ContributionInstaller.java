@@ -162,7 +162,7 @@ public class ContributionInstaller {
       try {
         destFolder.getParentFile().delete();
       } catch (SecurityException e) {
-        // Do nothing
+        // ignore
       }
     }
   }

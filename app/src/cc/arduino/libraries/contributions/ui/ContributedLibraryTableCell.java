@@ -166,8 +166,7 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
     return getUpdatedCellComponent(value, true, row);
   }
 
-  private Component getUpdatedCellComponent(Object value, boolean isSelected,
-                                            int row) {
+  private Component getUpdatedCellComponent(Object value, boolean isSelected, int row) {
     ContributedLibraryReleases releases = (ContributedLibraryReleases) value;
     ContributedLibrary selectedLib = releases.getSelected();
     ContributedLibrary installedLib = releases.getInstalled();
@@ -245,26 +244,25 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
     description.setText(desc);
     description.setBackground(Color.WHITE);
 
+    // for modelToView to work, the text area has to be sized. It doesn't
+    // matter if it's visible or not.
+
+    // See:
+    // http://stackoverflow.com/questions/3081210/how-to-set-jtextarea-to-have-height-that-matches-the-size-of-a-text-it-contains
+    int width = parentTable.getBounds().width;
+    width -= installButtonPlaceholder.getPreferredSize().width;
+    width -= removeButtonPlaceholder.getPreferredSize().width;
+    Dimension minimalSize = new Dimension(width, 10);
+    description.setPreferredSize(minimalSize);
+    description.setSize(minimalSize);
+
     try {
-      // for modelToView to work, the text area has to be sized. It doesn't
-      // matter if it's visible or not.
-
-      // See:
-      // http://stackoverflow.com/questions/3081210/how-to-set-jtextarea-to-have-height-that-matches-the-size-of-a-text-it-contains
-      int width = parentTable.getBounds().width;
-      width -= installButtonPlaceholder.getPreferredSize().width;
-      width -= removeButtonPlaceholder.getPreferredSize().width;
-      Dimension minimalSize = new Dimension(width, 10);
-      description.setPreferredSize(minimalSize);
-      description.setSize(minimalSize);
-
-      Rectangle r = description.modelToView(description.getDocument()
-          .getLength());
+      Rectangle r = description.modelToView(description.getDocument().getLength());
       r.height += description.modelToView(0).y; // add margins
       Dimension d = new Dimension(minimalSize.width, r.y + r.height);
       description.setPreferredSize(d);
     } catch (BadLocationException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
 
     if (isSelected) {
