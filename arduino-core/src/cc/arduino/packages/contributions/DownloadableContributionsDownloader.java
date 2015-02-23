@@ -28,17 +28,17 @@
  */
 package cc.arduino.packages.contributions;
 
-import static processing.app.I18n._;
-import static processing.app.I18n.format;
+import cc.arduino.utils.FileHash;
+import cc.arduino.utils.Progress;
+import cc.arduino.utils.network.FileDownloader;
 
 import java.io.File;
 import java.net.URL;
 import java.util.Observable;
 import java.util.Observer;
 
-import cc.arduino.utils.FileHash;
-import cc.arduino.utils.Progress;
-import cc.arduino.utils.network.FileDownloader;
+import static processing.app.I18n._;
+import static processing.app.I18n.format;
 
 public class DownloadableContributionsDownloader {
 
@@ -50,7 +50,7 @@ public class DownloadableContributionsDownloader {
 
   public File download(DownloadableContribution contribution,
                        final Progress progress, final String statusText)
-      throws Exception {
+          throws Exception {
     URL url = new URL(contribution.getUrl());
     final File outputFile = new File(stagingFolder, contribution.getArchiveFileName());
 
@@ -67,8 +67,9 @@ public class DownloadableContributionsDownloader {
     onProgress(progress);
     String checksum = contribution.getChecksum();
     String algo = checksum.split(":")[0];
-    if (!FileHash.hash(outputFile, algo).equals(checksum))
+    if (!FileHash.hash(outputFile, algo).equals(checksum)) {
       throw new Exception(_("CRC doesn't match. File is corrupted."));
+    }
 
     contribution.setDownloaded(true);
     contribution.setDownloadedFile(outputFile);
@@ -94,9 +95,9 @@ public class DownloadableContributionsDownloader {
       }
     });
     downloader.download();
-    if (!downloader.isCompleted())
-      throw new Exception(format(_("Error dowloading {0}"), url),
-          downloader.getError());
+    if (!downloader.isCompleted()) {
+      throw new Exception(format(_("Error dowloading {0}"), url), downloader.getError());
+    }
   }
 
   protected void onProgress(Progress progress) {

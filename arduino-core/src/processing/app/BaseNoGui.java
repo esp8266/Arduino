@@ -13,6 +13,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import cc.arduino.DefaultUncaughtExceptionHandler;
 import org.apache.commons.logging.impl.LogFactoryImpl;
 import org.apache.commons.logging.impl.NoOpLog;
 
@@ -712,6 +713,8 @@ public class BaseNoGui {
     if (args.length == 0)
       showError(_("No parameters"), _("No command line parameters found"), null);
 
+    Thread.setDefaultUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
+
     initPlatform();
     
     initPortableFolder();
@@ -719,8 +722,6 @@ public class BaseNoGui {
     initParameters(args);
     
     init(args);
-
-    Thread.setDefaultUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
   }
 
   static public void onBoardOrPortChange() {

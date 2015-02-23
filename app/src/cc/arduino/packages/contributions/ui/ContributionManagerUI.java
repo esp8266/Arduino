@@ -28,10 +28,6 @@
  */
 package cc.arduino.packages.contributions.ui;
 
-import java.awt.Dialog;
-import java.awt.Frame;
-import java.util.Collection;
-
 import cc.arduino.packages.contributions.ContributedPlatform;
 import cc.arduino.packages.contributions.ContributionInstaller;
 import cc.arduino.packages.contributions.ContributionsIndexer;
@@ -39,6 +35,9 @@ import cc.arduino.ui.FilteredAbstractTableModel;
 import cc.arduino.ui.InstallerJDialog;
 import cc.arduino.ui.InstallerTableCell;
 import cc.arduino.utils.Progress;
+
+import java.awt.*;
+import java.util.Collection;
 
 @SuppressWarnings("serial")
 public class ContributionManagerUI extends InstallerJDialog {
@@ -122,8 +121,9 @@ public class ContributionManagerUI extends InstallerJDialog {
 
   @Override
   public void onCancelPressed() {
-    if (installerThread != null)
+    if (installerThread != null) {
       installerThread.interrupt();
+    }
   }
 
   @Override
@@ -142,6 +142,7 @@ public class ContributionManagerUI extends InstallerJDialog {
         }
       }
     });
+    installerThread.setUncaughtExceptionHandler(new ContributionUncaughtExceptionHandler(this));
     installerThread.start();
   }
 
@@ -162,6 +163,7 @@ public class ContributionManagerUI extends InstallerJDialog {
         }
       }
     });
+    installerThread.setUncaughtExceptionHandler(new ContributionUncaughtExceptionHandler(this));
     installerThread.start();
   }
 
@@ -179,12 +181,13 @@ public class ContributionManagerUI extends InstallerJDialog {
         }
       }
     });
+    installerThread.setUncaughtExceptionHandler(new ContributionUncaughtExceptionHandler(this));
     installerThread.start();
   }
 
   /**
    * Callback invoked when indexes are updated
-   * 
+   *
    * @throws Exception
    */
   protected void onIndexesUpdated() throws Exception {

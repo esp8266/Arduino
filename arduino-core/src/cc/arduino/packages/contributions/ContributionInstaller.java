@@ -28,8 +28,10 @@
  */
 package cc.arduino.packages.contributions;
 
-import static processing.app.I18n._;
-import static processing.app.I18n.format;
+import cc.arduino.utils.ArchiveExtractor;
+import cc.arduino.utils.MultiStepProgress;
+import cc.arduino.utils.Progress;
+import processing.app.helpers.FileUtils;
 
 import java.io.File;
 import java.net.URL;
@@ -37,10 +39,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import processing.app.helpers.FileUtils;
-import cc.arduino.utils.ArchiveExtractor;
-import cc.arduino.utils.MultiStepProgress;
-import cc.arduino.utils.Progress;
+import static processing.app.I18n._;
+import static processing.app.I18n.format;
 
 public class ContributionInstaller {
 
@@ -55,7 +55,7 @@ public class ContributionInstaller {
       @Override
       protected void onProgress(Progress progress) {
         ContributionInstaller.this.onProgress(progress);
-      };
+      }
     };
   }
 
@@ -84,8 +84,7 @@ public class ContributionInstaller {
     // Download all
     try {
       // Download platform
-      downloader.download(platform, progress,
-                          _("Downloading boards definitions."));
+      downloader.download(platform, progress, _("Downloading boards definitions."));
       progress.stepDone();
 
       // Download tools
@@ -111,7 +110,7 @@ public class ContributionInstaller {
     // Unzip tools on the correct location
     File toolsFolder = new File(packageFolder, "tools");
     int i = 1;
-    for (ContributedTool tool : platform.getResolvedTools()) {
+    for (ContributedTool tool : tools) {
       progress.setStatus(format(_("Installing tools ({0}/{1})..."), i, tools.size()));
       onProgress(progress);
       i++;
@@ -119,6 +118,7 @@ public class ContributionInstaller {
       File destFolder = new File(toolsFolder, tool.getName() + File.separator + tool.getVersion());
 
       destFolder.mkdirs();
+      assert toolContrib.getDownloadedFile() != null;
       ArchiveExtractor.extract(toolContrib.getDownloadedFile(), destFolder, 1);
       toolContrib.setInstalled(true);
       toolContrib.setInstalledFolder(destFolder);
@@ -147,8 +147,9 @@ public class ContributionInstaller {
 
     // Check if the tools are no longer needed
     for (ContributedTool tool : platform.getResolvedTools()) {
-      if (indexer.isContributedToolUsed(tool))
+      if (indexer.isContributedToolUsed(tool)) {
         continue;
+      }
 
       DownloadableContribution toolContrib = tool.getDownloadableContribution();
       File destFolder = toolContrib.getInstalledFolder();
