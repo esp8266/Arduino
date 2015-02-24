@@ -10,8 +10,8 @@ msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2015-01-14 17:10+0000\n"
-"Last-Translator: Cristian Maglie <c.maglie@arduino.cc>\n"
+"PO-Revision-Date: 2015-02-24 01:29+0000\n"
+"Last-Translator: Robin van der Vliet <info@robinvandervliet.nl>\n"
 "Language-Team: Dutch (http://www.transifex.com/projects/p/arduino-ide-15/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -98,6 +98,10 @@ msgstr "Bestand toevoegen..."
 #: Base.java:963
 msgid "Add Library..."
 msgstr "Bibliotheek toevoegen…"
+
+#: ../../../../../app/src/processing/app/Preferences.java:161
+msgid "Afrikaans"
+msgstr ""
 
 #: ../../../processing/app/Preferences.java:96
 msgid "Albanian"
@@ -290,6 +294,10 @@ msgstr "Baskisch"
 #: ../../../processing/app/Preferences.java:139
 msgid "Belarusian"
 msgstr "Witrussisch"
+
+#: ../../../../../app/src/processing/app/Preferences.java:165
+msgid "Bengali (India)"
+msgstr ""
 
 #: ../../../processing/app/Base.java:1433
 #: ../../../processing/app/Editor.java:707
@@ -587,9 +595,17 @@ msgstr "Knippen"
 msgid "Czech"
 msgstr "Tsjechisch"
 
+#: ../../../../../app/src/processing/app/Preferences.java:119
+msgid "Czech (Czech Republic)"
+msgstr ""
+
 #: Preferences.java:90
 msgid "Danish"
 msgstr "Deens"
+
+#: ../../../../../app/src/processing/app/Preferences.java:120
+msgid "Danish (Denmark)"
+msgstr ""
 
 #: Editor.java:1224 Editor.java:2765
 msgid "Decrease Indent"
@@ -793,10 +809,6 @@ msgstr "Voorbeelden"
 msgid "Export canceled, changes must first be saved."
 msgstr "Exporteren is geannuleerd, wijzigingen moeten eerst worden opgeslagen."
 
-#: Base.java:2100
-msgid "FAQ.html"
-msgstr "FAQ.html"
-
 #: ../../../processing/app/Base.java:416
 #, java-format
 msgid "Failed to open sketch: \"{0}\""
@@ -866,6 +878,10 @@ msgstr "Veelgestelde vragen"
 msgid "Galician"
 msgstr "Gallicisch"
 
+#: ../../../../../app/src/processing/app/Preferences.java:176
+msgid "Galician (Spain)"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:94
 msgid "Georgian"
 msgstr "Georgisch"
@@ -893,22 +909,6 @@ msgstr "Globale variabelen gebruiken {0} bytes van het dynamisch geheugen."
 #: Preferences.java:98
 msgid "Greek"
 msgstr "Grieks"
-
-#: Base.java:2085
-msgid "Guide_Environment.html"
-msgstr "Guide_Environment.html"
-
-#: Base.java:2071
-msgid "Guide_MacOSX.html"
-msgstr "Guide_MacOSX.html"
-
-#: Base.java:2095
-msgid "Guide_Troubleshooting.html"
-msgstr "Guide_Troubleshooting.html"
-
-#: Base.java:2073
-msgid "Guide_Windows.html"
-msgstr "Guide_Windows.html"
 
 #: ../../../processing/app/Preferences.java:95
 msgid "Hebrew"
@@ -1004,6 +1004,10 @@ msgstr "Litouws"
 msgid "Low memory available, stability problems may occur."
 msgstr ""
 
+#: ../../../../../app/src/processing/app/Preferences.java:180
+msgid "Malay (Malaysia)"
+msgstr ""
+
 #: Preferences.java:107
 msgid "Marathi"
 msgstr "Marathi"
@@ -1047,6 +1051,10 @@ msgstr "Naam voor het nieuwe bestand:"
 #: ../../../processing/app/Preferences.java:149
 msgid "Nepali"
 msgstr "Nepalees"
+
+#: ../../../../../app/src/processing/app/Editor.java:65
+msgid "Network ports"
+msgstr ""
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:51
 msgid "Network upload using programmer not supported"
@@ -1106,7 +1114,7 @@ msgstr "Geen regeleinde"
 
 #: ../../../processing/app/BaseNoGui.java:665
 msgid "No parameters"
-msgstr ""
+msgstr "Geen parameters"
 
 #: Base.java:541
 msgid "No really, time for some fresh air for you."
@@ -1120,11 +1128,11 @@ msgstr "Geen naslagwerk beschikbaar voor \"{0}\""
 #: ../../../processing/app/BaseNoGui.java:504
 #: ../../../processing/app/BaseNoGui.java:549
 msgid "No sketch"
-msgstr ""
+msgstr "Geen schets"
 
 #: ../../../processing/app/BaseNoGui.java:428
 msgid "No sketchbook"
-msgstr ""
+msgstr "Geen schetsboek"
 
 #: ../../../processing/app/Sketch.java:204
 msgid "No valid code files found"
@@ -1147,9 +1155,17 @@ msgstr "Niet-fatale fout bij het instellen van de 'Look & Feel'."
 msgid "Nope"
 msgstr "Neen"
 
+#: ../../../../../app/src/processing/app/Preferences.java:181
+msgid "Norwegian"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:108
 msgid "Norwegian Bokmål"
 msgstr "Noors Bokmål"
+
+#: ../../../../../app/src/processing/app/Preferences.java:182
+msgid "Norwegian Nynorsk"
+msgstr ""
 
 #: ../../../processing/app/Sketch.java:1656
 msgid ""
@@ -1447,6 +1463,10 @@ msgid ""
 "Retry the upload with another serial port?"
 msgstr "Seriële poort {0} is niet gevonden.\nProbeer de upload met een andere seriële poort."
 
+#: ../../../../../app/src/processing/app/Editor.java:65
+msgid "Serial ports"
+msgstr ""
+
 #: Base.java:1681
 msgid "Settings issues"
 msgstr "Problemen met de instellingen"
@@ -1520,6 +1540,10 @@ msgstr ""
 msgid "Sketches (*.ino, *.pde)"
 msgstr "Schetsen (*.ino, *.pde)"
 
+#: ../../../../../app/src/processing/app/Preferences.java:185
+msgid "Slovak"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:152
 msgid "Slovenian"
 msgstr "Sloveens"
@@ -1550,6 +1574,10 @@ msgstr "Spaans"
 msgid "Sunshine"
 msgstr "Zonneschijn"
 
+#: ../../../../../app/src/processing/app/Preferences.java:187
+msgid "Swahili"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:153
 msgid "Swedish"
 msgstr "Zweeds"
@@ -1557,6 +1585,10 @@ msgstr "Zweeds"
 #: Preferences.java:84
 msgid "System Default"
 msgstr "Systeemstandaard"
+
+#: ../../../../../app/src/processing/app/Preferences.java:188
+msgid "Talossan"
+msgstr ""
 
 #: Preferences.java:116
 msgid "Tamil"
@@ -1763,6 +1795,10 @@ msgstr "Bezig met uploaden naar I/O-board..."
 msgid "Uploading..."
 msgstr "Bezig met uploaden..."
 
+#: ../../../../../app/src/processing/app/Preferences.java:189
+msgid "Urdu (Pakistan)"
+msgstr ""
+
 #: Editor.java:1269
 msgid "Use Selection For Find"
 msgstr "Selectie gebruiken voor zoekactie"
@@ -1811,6 +1847,10 @@ msgstr "WAARSCHUWING: bibliotheek {0} beweert te werken onder architectuur {1} e
 #: Base.java:2128
 msgid "Warning"
 msgstr "Waarschuwing"
+
+#: ../../../../../app/src/processing/app/Preferences.java:190
+msgid "Western Frisian"
+msgstr ""
 
 #: debug/Compiler.java:444
 msgid "Wire.receive() has been renamed Wire.read()."
@@ -1968,10 +2008,6 @@ msgstr "createNewFile() heeft false geantwoord"
 msgid "enabled in File > Preferences."
 msgstr "ingeschakeld in Bestand > Voorkeuren."
 
-#: Base.java:2090
-msgid "environment"
-msgstr "omgeving"
-
 #: Editor.java:1108
 msgid "http://arduino.cc/"
 msgstr "http://arduino.cc/"
@@ -1984,26 +2020,14 @@ msgstr "http://www.arduino.cc/en/Main/Software"
 msgid "http://www.arduino.cc/latest.txt"
 msgstr "http://www.arduino.cc/latest.txt"
 
-#: Base.java:2075
-msgid "http://www.arduino.cc/playground/Learning/Linux"
-msgstr "http://www.arduino.cc/playground/Learning/Linux"
-
 #: Preferences.java:625
 #, java-format
 msgid "ignoring invalid font size {0}"
 msgstr "Ongeldige lettertypegrootte {0} wordt genegeerd"
 
-#: Base.java:2080
-msgid "index.html"
-msgstr "index.html"
-
 #: Editor.java:936 Editor.java:943
 msgid "name is null"
 msgstr "naam is leeg"
-
-#: Base.java:2090
-msgid "platforms.html"
-msgstr "platforms.html"
 
 #: Editor.java:932
 msgid "serialMenu is null"
@@ -2038,11 +2062,6 @@ msgstr "{0} antwoordde {1}"
 #, java-format
 msgid "{0} | Arduino {1}"
 msgstr "{0} | Arduino {1}"
-
-#: Editor.java:1874
-#, java-format
-msgid "{0}.html"
-msgstr "{0}.html"
 
 #: ../../../processing/app/Base.java:519
 #, java-format

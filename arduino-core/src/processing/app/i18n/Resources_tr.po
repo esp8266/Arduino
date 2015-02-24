@@ -101,6 +101,10 @@ msgstr "Dosya Ekle..."
 msgid "Add Library..."
 msgstr "Kütüphane ekle..."
 
+#: ../../../../../app/src/processing/app/Preferences.java:161
+msgid "Afrikaans"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:96
 msgid "Albanian"
 msgstr "Arnavutça"
@@ -292,6 +296,10 @@ msgstr "Baskça"
 #: ../../../processing/app/Preferences.java:139
 msgid "Belarusian"
 msgstr "Belarusça"
+
+#: ../../../../../app/src/processing/app/Preferences.java:165
+msgid "Bengali (India)"
+msgstr ""
 
 #: ../../../processing/app/Base.java:1433
 #: ../../../processing/app/Editor.java:707
@@ -589,9 +597,17 @@ msgstr "Kes"
 msgid "Czech"
 msgstr "Çekçe"
 
+#: ../../../../../app/src/processing/app/Preferences.java:119
+msgid "Czech (Czech Republic)"
+msgstr ""
+
 #: Preferences.java:90
 msgid "Danish"
 msgstr "Danca"
+
+#: ../../../../../app/src/processing/app/Preferences.java:120
+msgid "Danish (Denmark)"
+msgstr ""
 
 #: Editor.java:1224 Editor.java:2765
 msgid "Decrease Indent"
@@ -795,10 +811,6 @@ msgstr "Örnekler"
 msgid "Export canceled, changes must first be saved."
 msgstr "Dışa aktarma iptal edildi. Önce değişikliklerin kaydedilmesi gerekiyor."
 
-#: Base.java:2100
-msgid "FAQ.html"
-msgstr "FAQ.html"
-
 #: ../../../processing/app/Base.java:416
 #, java-format
 msgid "Failed to open sketch: \"{0}\""
@@ -868,6 +880,10 @@ msgstr "Sıkça Sorulan Sorular"
 msgid "Galician"
 msgstr "Galik dili"
 
+#: ../../../../../app/src/processing/app/Preferences.java:176
+msgid "Galician (Spain)"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:94
 msgid "Georgian"
 msgstr "Gürcüce"
@@ -895,22 +911,6 @@ msgstr "Global değişkenler dinamik bellekte {0} bayt kullanır."
 #: Preferences.java:98
 msgid "Greek"
 msgstr "Yunanca"
-
-#: Base.java:2085
-msgid "Guide_Environment.html"
-msgstr "Guide_Environment.html"
-
-#: Base.java:2071
-msgid "Guide_MacOSX.html"
-msgstr "Guide_MacOSX.html"
-
-#: Base.java:2095
-msgid "Guide_Troubleshooting.html"
-msgstr "Guide_Troubleshooting.html"
-
-#: Base.java:2073
-msgid "Guide_Windows.html"
-msgstr "Guide_Windows.html"
 
 #: ../../../processing/app/Preferences.java:95
 msgid "Hebrew"
@@ -1006,6 +1006,10 @@ msgstr "Litvanca"
 msgid "Low memory available, stability problems may occur."
 msgstr ""
 
+#: ../../../../../app/src/processing/app/Preferences.java:180
+msgid "Malay (Malaysia)"
+msgstr ""
+
 #: Preferences.java:107
 msgid "Marathi"
 msgstr "Marati"
@@ -1049,6 +1053,10 @@ msgstr "Yeni dosya için isim:"
 #: ../../../processing/app/Preferences.java:149
 msgid "Nepali"
 msgstr "Nepalce"
+
+#: ../../../../../app/src/processing/app/Editor.java:65
+msgid "Network ports"
+msgstr ""
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:51
 msgid "Network upload using programmer not supported"
@@ -1149,9 +1157,17 @@ msgstr "Görünüm ayarlanırken kritik olmayan bir hata oluştu."
 msgid "Nope"
 msgstr "Yok"
 
+#: ../../../../../app/src/processing/app/Preferences.java:181
+msgid "Norwegian"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:108
 msgid "Norwegian Bokmål"
 msgstr "Norveççe"
+
+#: ../../../../../app/src/processing/app/Preferences.java:182
+msgid "Norwegian Nynorsk"
+msgstr ""
 
 #: ../../../processing/app/Sketch.java:1656
 msgid ""
@@ -1449,6 +1465,10 @@ msgid ""
 "Retry the upload with another serial port?"
 msgstr "Seri port \"{0}\" bulunamadı.\nBaşka bir seri port ile denemek ister misiniz?"
 
+#: ../../../../../app/src/processing/app/Editor.java:65
+msgid "Serial ports"
+msgstr ""
+
 #: Base.java:1681
 msgid "Settings issues"
 msgstr "Ayar problemleri"
@@ -1522,6 +1542,10 @@ msgstr ""
 msgid "Sketches (*.ino, *.pde)"
 msgstr "Çalışmalar (*.ino,*.pde)"
 
+#: ../../../../../app/src/processing/app/Preferences.java:185
+msgid "Slovak"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:152
 msgid "Slovenian"
 msgstr "Slovence"
@@ -1552,6 +1576,10 @@ msgstr "İspanyolca"
 msgid "Sunshine"
 msgstr "Gün Işığı"
 
+#: ../../../../../app/src/processing/app/Preferences.java:187
+msgid "Swahili"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:153
 msgid "Swedish"
 msgstr "İsveççe"
@@ -1559,6 +1587,10 @@ msgstr "İsveççe"
 #: Preferences.java:84
 msgid "System Default"
 msgstr "Sistem Varsayılanı"
+
+#: ../../../../../app/src/processing/app/Preferences.java:188
+msgid "Talossan"
+msgstr ""
 
 #: Preferences.java:116
 msgid "Tamil"
@@ -1765,6 +1797,10 @@ msgstr "I/O kartına yükleniyor..."
 msgid "Uploading..."
 msgstr "Yükleniyor..."
 
+#: ../../../../../app/src/processing/app/Preferences.java:189
+msgid "Urdu (Pakistan)"
+msgstr ""
+
 #: Editor.java:1269
 msgid "Use Selection For Find"
 msgstr "Seçimi Kullanarak Bul"
@@ -1813,6 +1849,10 @@ msgstr "UYARI : {0} kütüphanesi çalışmak için {1} mimarisine ihtiyaç duyu
 #: Base.java:2128
 msgid "Warning"
 msgstr "Uyarı"
+
+#: ../../../../../app/src/processing/app/Preferences.java:190
+msgid "Western Frisian"
+msgstr ""
 
 #: debug/Compiler.java:444
 msgid "Wire.receive() has been renamed Wire.read()."
@@ -1970,10 +2010,6 @@ msgstr "createNewFile(), false değeri döndürdü"
 msgid "enabled in File > Preferences."
 msgstr "Dosya > Tercihler'de etkinleştirilmiş."
 
-#: Base.java:2090
-msgid "environment"
-msgstr "ortam"
-
 #: Editor.java:1108
 msgid "http://arduino.cc/"
 msgstr "http://arduino.cc/"
@@ -1986,26 +2022,14 @@ msgstr "http://www.arduino.cc/en/Main/Software"
 msgid "http://www.arduino.cc/latest.txt"
 msgstr "http://www.arduino.cc/latest.txt"
 
-#: Base.java:2075
-msgid "http://www.arduino.cc/playground/Learning/Linux"
-msgstr "http://www.arduino.cc/playground/Learning/Linux"
-
 #: Preferences.java:625
 #, java-format
 msgid "ignoring invalid font size {0}"
 msgstr "geçersiz font boyutu {0} yok sayıldı "
 
-#: Base.java:2080
-msgid "index.html"
-msgstr "index.html"
-
 #: Editor.java:936 Editor.java:943
 msgid "name is null"
 msgstr "name değeri boş"
-
-#: Base.java:2090
-msgid "platforms.html"
-msgstr "platforms.html"
 
 #: Editor.java:932
 msgid "serialMenu is null"
@@ -2040,11 +2064,6 @@ msgstr "{0}, {1}'i döndürdü"
 #, java-format
 msgid "{0} | Arduino {1}"
 msgstr "{0} | Arduino {1}"
-
-#: Editor.java:1874
-#, java-format
-msgid "{0}.html"
-msgstr "{0}.html"
 
 #: ../../../processing/app/Base.java:519
 #, java-format

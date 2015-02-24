@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2015-02-07 20:31+0000\n"
+"PO-Revision-Date: 2015-02-09 21:22+0000\n"
 "Last-Translator: netavek <netavek.translate@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/projects/p/arduino-ide-15/language/uk/)\n"
 "MIME-Version: 1.0\n"
@@ -96,6 +96,10 @@ msgstr "Додати файл…"
 #: Base.java:963
 msgid "Add Library..."
 msgstr "Додати бібліотеку…"
+
+#: ../../../../../app/src/processing/app/Preferences.java:161
+msgid "Afrikaans"
+msgstr ""
 
 #: ../../../processing/app/Preferences.java:96
 msgid "Albanian"
@@ -288,6 +292,10 @@ msgstr "баскійська"
 #: ../../../processing/app/Preferences.java:139
 msgid "Belarusian"
 msgstr "білоруська"
+
+#: ../../../../../app/src/processing/app/Preferences.java:165
+msgid "Bengali (India)"
+msgstr ""
 
 #: ../../../processing/app/Base.java:1433
 #: ../../../processing/app/Editor.java:707
@@ -585,9 +593,17 @@ msgstr "Вирізати"
 msgid "Czech"
 msgstr "чеська"
 
+#: ../../../../../app/src/processing/app/Preferences.java:119
+msgid "Czech (Czech Republic)"
+msgstr ""
+
 #: Preferences.java:90
 msgid "Danish"
 msgstr "данська"
+
+#: ../../../../../app/src/processing/app/Preferences.java:120
+msgid "Danish (Denmark)"
+msgstr ""
 
 #: Editor.java:1224 Editor.java:2765
 msgid "Decrease Indent"
@@ -791,10 +807,6 @@ msgstr "Приклади"
 msgid "Export canceled, changes must first be saved."
 msgstr "Експорт скасовано, спочатку збережіть зміни."
 
-#: Base.java:2100
-msgid "FAQ.html"
-msgstr "FAQ.html"
-
 #: ../../../processing/app/Base.java:416
 #, java-format
 msgid "Failed to open sketch: \"{0}\""
@@ -864,6 +876,10 @@ msgstr "Часті питання"
 msgid "Galician"
 msgstr "галісійська"
 
+#: ../../../../../app/src/processing/app/Preferences.java:176
+msgid "Galician (Spain)"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:94
 msgid "Georgian"
 msgstr "грузинська"
@@ -891,22 +907,6 @@ msgstr "Глобальні змінні використовують {0} бай�
 #: Preferences.java:98
 msgid "Greek"
 msgstr "грецька"
-
-#: Base.java:2085
-msgid "Guide_Environment.html"
-msgstr "Guide_Environment.html"
-
-#: Base.java:2071
-msgid "Guide_MacOSX.html"
-msgstr "Guide_MacOSX.html"
-
-#: Base.java:2095
-msgid "Guide_Troubleshooting.html"
-msgstr "Guide_Troubleshooting.html"
-
-#: Base.java:2073
-msgid "Guide_Windows.html"
-msgstr "Guide_Windows.html"
 
 #: ../../../processing/app/Preferences.java:95
 msgid "Hebrew"
@@ -992,7 +992,7 @@ msgstr "латвійська"
 
 #: Base.java:2699
 msgid "Library added to your libraries. Check \"Import library\" menu"
-msgstr "Бібліотеку додано до ваших бібліотек. Перевірте меню \"Імпорт бібліотек\" "
+msgstr "Бібліотеку додано до ваших бібліотек. Перевірте меню «Імпортувати бібліотеку…»"
 
 #: Preferences.java:106
 msgid "Lithuaninan"
@@ -1001,6 +1001,10 @@ msgstr "литовська"
 #: ../../../processing/app/Sketch.java:1684
 msgid "Low memory available, stability problems may occur."
 msgstr "Низький обсяг доступної пам’яті, можливі проблеми зі стабільністю."
+
+#: ../../../../../app/src/processing/app/Preferences.java:180
+msgid "Malay (Malaysia)"
+msgstr ""
 
 #: Preferences.java:107
 msgid "Marathi"
@@ -1045,6 +1049,10 @@ msgstr "Ім’я для нового файлу:"
 #: ../../../processing/app/Preferences.java:149
 msgid "Nepali"
 msgstr "непальська"
+
+#: ../../../../../app/src/processing/app/Editor.java:65
+msgid "Network ports"
+msgstr ""
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:51
 msgid "Network upload using programmer not supported"
@@ -1145,9 +1153,17 @@ msgstr "Нефатальна помилка при налаштуванні зо
 msgid "Nope"
 msgstr "Ні"
 
+#: ../../../../../app/src/processing/app/Preferences.java:181
+msgid "Norwegian"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:108
 msgid "Norwegian Bokmål"
 msgstr "норвезька (букмол)"
+
+#: ../../../../../app/src/processing/app/Preferences.java:182
+msgid "Norwegian Nynorsk"
+msgstr ""
 
 #: ../../../processing/app/Sketch.java:1656
 msgid ""
@@ -1445,6 +1461,10 @@ msgid ""
 "Retry the upload with another serial port?"
 msgstr "Послідовний порт {0} не знайдено.\nПовторити вивантаження з іншого послідовного порту?"
 
+#: ../../../../../app/src/processing/app/Editor.java:65
+msgid "Serial ports"
+msgstr ""
+
 #: Base.java:1681
 msgid "Settings issues"
 msgstr "Питання, пов’язані з налаштуваннями"
@@ -1518,6 +1538,10 @@ msgstr "Не знайдено шлях до теки зі скетчами"
 msgid "Sketches (*.ino, *.pde)"
 msgstr "Скетчі (*.ino, *.pde)"
 
+#: ../../../../../app/src/processing/app/Preferences.java:185
+msgid "Slovak"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:152
 msgid "Slovenian"
 msgstr "словенська"
@@ -1548,6 +1572,10 @@ msgstr "іспанська"
 msgid "Sunshine"
 msgstr "Сонячне світло"
 
+#: ../../../../../app/src/processing/app/Preferences.java:187
+msgid "Swahili"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:153
 msgid "Swedish"
 msgstr "шведська"
@@ -1555,6 +1583,10 @@ msgstr "шведська"
 #: Preferences.java:84
 msgid "System Default"
 msgstr "системна мова за умовчанням"
+
+#: ../../../../../app/src/processing/app/Preferences.java:188
+msgid "Talossan"
+msgstr ""
 
 #: Preferences.java:116
 msgid "Tamil"
@@ -1761,6 +1793,10 @@ msgstr "Вивантаження на плату введення/виведен
 msgid "Uploading..."
 msgstr "Вивантаження..."
 
+#: ../../../../../app/src/processing/app/Preferences.java:189
+msgid "Urdu (Pakistan)"
+msgstr ""
+
 #: Editor.java:1269
 msgid "Use Selection For Find"
 msgstr "Знайти вибране"
@@ -1809,6 +1845,10 @@ msgstr "УВАГА: бібліотека {0} потребує для робот�
 #: Base.java:2128
 msgid "Warning"
 msgstr "Попередження"
+
+#: ../../../../../app/src/processing/app/Preferences.java:190
+msgid "Western Frisian"
+msgstr ""
 
 #: debug/Compiler.java:444
 msgid "Wire.receive() has been renamed Wire.read()."
@@ -1966,10 +2006,6 @@ msgstr "createNewFile () повернув false"
 msgid "enabled in File > Preferences."
 msgstr "увімкнено в Файл > Налаштування"
 
-#: Base.java:2090
-msgid "environment"
-msgstr "середовище розробки"
-
 #: Editor.java:1108
 msgid "http://arduino.cc/"
 msgstr "http://arduino.cc/"
@@ -1982,26 +2018,14 @@ msgstr "http://www.arduino.cc/en/Main/Software"
 msgid "http://www.arduino.cc/latest.txt"
 msgstr "http://www.arduino.cc/latest.txt"
 
-#: Base.java:2075
-msgid "http://www.arduino.cc/playground/Learning/Linux"
-msgstr "http://www.arduino.cc/playground/Learning/Linux"
-
 #: Preferences.java:625
 #, java-format
 msgid "ignoring invalid font size {0}"
 msgstr "ігнорування некоректного розміру шрифту {0}"
 
-#: Base.java:2080
-msgid "index.html"
-msgstr "index.html"
-
 #: Editor.java:936 Editor.java:943
 msgid "name is null"
 msgstr "немає імені"
-
-#: Base.java:2090
-msgid "platforms.html"
-msgstr "platforms.html"
 
 #: Editor.java:932
 msgid "serialMenu is null"
@@ -2036,11 +2060,6 @@ msgstr "{0} повернув {1}"
 #, java-format
 msgid "{0} | Arduino {1}"
 msgstr "{0} | Arduino {1}"
-
-#: Editor.java:1874
-#, java-format
-msgid "{0}.html"
-msgstr "{0}.html"
 
 #: ../../../processing/app/Base.java:519
 #, java-format

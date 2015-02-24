@@ -98,6 +98,10 @@ msgstr "ファイルを追加..."
 msgid "Add Library..."
 msgstr "ライブラリをインストール..."
 
+#: ../../../../../app/src/processing/app/Preferences.java:161
+msgid "Afrikaans"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:96
 msgid "Albanian"
 msgstr "アルバニア語"
@@ -288,6 +292,10 @@ msgstr ""
 
 #: ../../../processing/app/Preferences.java:139
 msgid "Belarusian"
+msgstr ""
+
+#: ../../../../../app/src/processing/app/Preferences.java:165
+msgid "Bengali (India)"
 msgstr ""
 
 #: ../../../processing/app/Base.java:1433
@@ -586,9 +594,17 @@ msgstr "切り取り"
 msgid "Czech"
 msgstr ""
 
+#: ../../../../../app/src/processing/app/Preferences.java:119
+msgid "Czech (Czech Republic)"
+msgstr ""
+
 #: Preferences.java:90
 msgid "Danish"
 msgstr "デンマーク語"
+
+#: ../../../../../app/src/processing/app/Preferences.java:120
+msgid "Danish (Denmark)"
+msgstr ""
 
 #: Editor.java:1224 Editor.java:2765
 msgid "Decrease Indent"
@@ -792,10 +808,6 @@ msgstr "スケッチの例"
 msgid "Export canceled, changes must first be saved."
 msgstr "エクスポートを中止しました。エクスポートを行う前に保存する必要があります。"
 
-#: Base.java:2100
-msgid "FAQ.html"
-msgstr "FAQ.html"
-
 #: ../../../processing/app/Base.java:416
 #, java-format
 msgid "Failed to open sketch: \"{0}\""
@@ -865,6 +877,10 @@ msgstr "よくある質問"
 msgid "Galician"
 msgstr "ガリシア語"
 
+#: ../../../../../app/src/processing/app/Preferences.java:176
+msgid "Galician (Spain)"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:94
 msgid "Georgian"
 msgstr ""
@@ -892,22 +908,6 @@ msgstr "グローバル変数は {0}バイトの動的メモリを使用して�
 #: Preferences.java:98
 msgid "Greek"
 msgstr "ギリシア語"
-
-#: Base.java:2085
-msgid "Guide_Environment.html"
-msgstr "Guide_Environment.html"
-
-#: Base.java:2071
-msgid "Guide_MacOSX.html"
-msgstr "Guide_MacOSX.html"
-
-#: Base.java:2095
-msgid "Guide_Troubleshooting.html"
-msgstr "Guide_Troubleshooting.html"
-
-#: Base.java:2073
-msgid "Guide_Windows.html"
-msgstr "Guide_Windows.html"
 
 #: ../../../processing/app/Preferences.java:95
 msgid "Hebrew"
@@ -1003,6 +1003,10 @@ msgstr "リトアニア語"
 msgid "Low memory available, stability problems may occur."
 msgstr ""
 
+#: ../../../../../app/src/processing/app/Preferences.java:180
+msgid "Malay (Malaysia)"
+msgstr ""
+
 #: Preferences.java:107
 msgid "Marathi"
 msgstr "マラーティ語"
@@ -1045,6 +1049,10 @@ msgstr "新規ファイルの名前："
 
 #: ../../../processing/app/Preferences.java:149
 msgid "Nepali"
+msgstr ""
+
+#: ../../../../../app/src/processing/app/Editor.java:65
+msgid "Network ports"
 msgstr ""
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:51
@@ -1146,8 +1154,16 @@ msgstr "GUIの挙動の設定中にエラーが発生しましたが、重大で
 msgid "Nope"
 msgstr "エラー"
 
+#: ../../../../../app/src/processing/app/Preferences.java:181
+msgid "Norwegian"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:108
 msgid "Norwegian Bokmål"
+msgstr ""
+
+#: ../../../../../app/src/processing/app/Preferences.java:182
+msgid "Norwegian Nynorsk"
 msgstr ""
 
 #: ../../../processing/app/Sketch.java:1656
@@ -1446,6 +1462,10 @@ msgid ""
 "Retry the upload with another serial port?"
 msgstr "シリアルポート「{0}」が存在しません。\nシリアルポートを変更して、もう一度書き込みますか？"
 
+#: ../../../../../app/src/processing/app/Editor.java:65
+msgid "Serial ports"
+msgstr ""
+
 #: Base.java:1681
 msgid "Settings issues"
 msgstr "設定に関する問題"
@@ -1519,6 +1539,10 @@ msgstr ""
 msgid "Sketches (*.ino, *.pde)"
 msgstr "スケッチ (*.ino, *pde)"
 
+#: ../../../../../app/src/processing/app/Preferences.java:185
+msgid "Slovak"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:152
 msgid "Slovenian"
 msgstr ""
@@ -1549,6 +1573,10 @@ msgstr "スペイン語"
 msgid "Sunshine"
 msgstr "終わりにしましょう"
 
+#: ../../../../../app/src/processing/app/Preferences.java:187
+msgid "Swahili"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:153
 msgid "Swedish"
 msgstr ""
@@ -1556,6 +1584,10 @@ msgstr ""
 #: Preferences.java:84
 msgid "System Default"
 msgstr "パソコンの設定に従う"
+
+#: ../../../../../app/src/processing/app/Preferences.java:188
+msgid "Talossan"
+msgstr ""
 
 #: Preferences.java:116
 msgid "Tamil"
@@ -1762,6 +1794,10 @@ msgstr "マイコンボードに書き込んでいます..."
 msgid "Uploading..."
 msgstr "マイコンボードに書き込んでいます..."
 
+#: ../../../../../app/src/processing/app/Preferences.java:189
+msgid "Urdu (Pakistan)"
+msgstr ""
+
 #: Editor.java:1269
 msgid "Use Selection For Find"
 msgstr "選択されている文字列を検索"
@@ -1810,6 +1846,10 @@ msgstr ""
 #: Base.java:2128
 msgid "Warning"
 msgstr "警告"
+
+#: ../../../../../app/src/processing/app/Preferences.java:190
+msgid "Western Frisian"
+msgstr ""
 
 #: debug/Compiler.java:444
 msgid "Wire.receive() has been renamed Wire.read()."
@@ -1967,10 +2007,6 @@ msgstr "createNewFile()がfalseを返しました。"
 msgid "enabled in File > Preferences."
 msgstr "ファイル > 設定 で有効にする"
 
-#: Base.java:2090
-msgid "environment"
-msgstr "environment"
-
 #: Editor.java:1108
 msgid "http://arduino.cc/"
 msgstr "http://arduino.cc/"
@@ -1983,26 +2019,14 @@ msgstr "http://www.arduino.cc/en/Main/Software"
 msgid "http://www.arduino.cc/latest.txt"
 msgstr "http://www.arduino.cc/latest.txt"
 
-#: Base.java:2075
-msgid "http://www.arduino.cc/playground/Learning/Linux"
-msgstr "http://www.arduino.cc/playground/Learning/Linux"
-
 #: Preferences.java:625
 #, java-format
 msgid "ignoring invalid font size {0}"
 msgstr "フォントサイズの指定「{0}」が異常なので無視します。"
 
-#: Base.java:2080
-msgid "index.html"
-msgstr "index.html"
-
 #: Editor.java:936 Editor.java:943
 msgid "name is null"
 msgstr "nameがnullです"
-
-#: Base.java:2090
-msgid "platforms.html"
-msgstr "platforms.html"
 
 #: Editor.java:932
 msgid "serialMenu is null"
@@ -2037,11 +2061,6 @@ msgstr "{0}が{1}を返しました。"
 #, java-format
 msgid "{0} | Arduino {1}"
 msgstr "{0} | Arduino {1}"
-
-#: Editor.java:1874
-#, java-format
-msgid "{0}.html"
-msgstr "{0}.html"
 
 #: ../../../processing/app/Base.java:519
 #, java-format

@@ -98,6 +98,10 @@ msgstr "Datei hinzufügen"
 msgid "Add Library..."
 msgstr "Bibliothek hinzufügen..."
 
+#: ../../../../../app/src/processing/app/Preferences.java:161
+msgid "Afrikaans"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:96
 msgid "Albanian"
 msgstr "Albanisch"
@@ -289,6 +293,10 @@ msgstr "Baskisch"
 #: ../../../processing/app/Preferences.java:139
 msgid "Belarusian"
 msgstr "Weißrussisch"
+
+#: ../../../../../app/src/processing/app/Preferences.java:165
+msgid "Bengali (India)"
+msgstr ""
 
 #: ../../../processing/app/Base.java:1433
 #: ../../../processing/app/Editor.java:707
@@ -586,9 +594,17 @@ msgstr "Ausschneiden"
 msgid "Czech"
 msgstr "Tschechisch"
 
+#: ../../../../../app/src/processing/app/Preferences.java:119
+msgid "Czech (Czech Republic)"
+msgstr ""
+
 #: Preferences.java:90
 msgid "Danish"
 msgstr "Dänisch"
+
+#: ../../../../../app/src/processing/app/Preferences.java:120
+msgid "Danish (Denmark)"
+msgstr ""
 
 #: Editor.java:1224 Editor.java:2765
 msgid "Decrease Indent"
@@ -792,10 +808,6 @@ msgstr "Beispiele"
 msgid "Export canceled, changes must first be saved."
 msgstr "Export abgebrochen, Änderungen müssen erst gespeichert werden."
 
-#: Base.java:2100
-msgid "FAQ.html"
-msgstr "FAQ.html"
-
 #: ../../../processing/app/Base.java:416
 #, java-format
 msgid "Failed to open sketch: \"{0}\""
@@ -865,6 +877,10 @@ msgstr "Häufig gestellte Fragen"
 msgid "Galician"
 msgstr "Galizisch"
 
+#: ../../../../../app/src/processing/app/Preferences.java:176
+msgid "Galician (Spain)"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:94
 msgid "Georgian"
 msgstr "Georgisch"
@@ -892,22 +908,6 @@ msgstr "Globale Variablen verwenden {0} Bytes des dynamischen Speichers."
 #: Preferences.java:98
 msgid "Greek"
 msgstr "Griechisch"
-
-#: Base.java:2085
-msgid "Guide_Environment.html"
-msgstr "Guide_Environment.html"
-
-#: Base.java:2071
-msgid "Guide_MacOSX.html"
-msgstr "Guide_MacOSX.html"
-
-#: Base.java:2095
-msgid "Guide_Troubleshooting.html"
-msgstr "Guide_Troubleshooting.html"
-
-#: Base.java:2073
-msgid "Guide_Windows.html"
-msgstr "Guide_Windows.html"
 
 #: ../../../processing/app/Preferences.java:95
 msgid "Hebrew"
@@ -1003,6 +1003,10 @@ msgstr "Litauisch"
 msgid "Low memory available, stability problems may occur."
 msgstr "Wenig Speicher verfügbar, es können Stabilitätsprobleme auftreten."
 
+#: ../../../../../app/src/processing/app/Preferences.java:180
+msgid "Malay (Malaysia)"
+msgstr ""
+
 #: Preferences.java:107
 msgid "Marathi"
 msgstr "Marathisch"
@@ -1046,6 +1050,10 @@ msgstr "Name der neuen Datei:"
 #: ../../../processing/app/Preferences.java:149
 msgid "Nepali"
 msgstr "Nepali"
+
+#: ../../../../../app/src/processing/app/Editor.java:65
+msgid "Network ports"
+msgstr ""
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:51
 msgid "Network upload using programmer not supported"
@@ -1146,9 +1154,17 @@ msgstr "Kleiner Fehler beim Einstellen des Erscheinungsbildes."
 msgid "Nope"
 msgstr "Nein"
 
+#: ../../../../../app/src/processing/app/Preferences.java:181
+msgid "Norwegian"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:108
 msgid "Norwegian Bokmål"
 msgstr "Norwegisches Bokmål"
+
+#: ../../../../../app/src/processing/app/Preferences.java:182
+msgid "Norwegian Nynorsk"
+msgstr ""
 
 #: ../../../processing/app/Sketch.java:1656
 msgid ""
@@ -1446,6 +1462,10 @@ msgid ""
 "Retry the upload with another serial port?"
 msgstr "Serieller Port {0} nicht gefunden.\nMit einem anderen seriellen Port versuchen?"
 
+#: ../../../../../app/src/processing/app/Editor.java:65
+msgid "Serial ports"
+msgstr ""
+
 #: Base.java:1681
 msgid "Settings issues"
 msgstr "Problem mit den Einstellungen"
@@ -1519,6 +1539,10 @@ msgstr "Sketchbook-Speicherort nicht definiert"
 msgid "Sketches (*.ino, *.pde)"
 msgstr "Sketche (*.ino, *.pde)"
 
+#: ../../../../../app/src/processing/app/Preferences.java:185
+msgid "Slovak"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:152
 msgid "Slovenian"
 msgstr "Slowenisch"
@@ -1549,6 +1573,10 @@ msgstr "Spanisch"
 msgid "Sunshine"
 msgstr "Sonnenschein"
 
+#: ../../../../../app/src/processing/app/Preferences.java:187
+msgid "Swahili"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:153
 msgid "Swedish"
 msgstr "Schwedisch"
@@ -1556,6 +1584,10 @@ msgstr "Schwedisch"
 #: Preferences.java:84
 msgid "System Default"
 msgstr "Systemstandard"
+
+#: ../../../../../app/src/processing/app/Preferences.java:188
+msgid "Talossan"
+msgstr ""
 
 #: Preferences.java:116
 msgid "Tamil"
@@ -1762,6 +1794,10 @@ msgstr "Hochladen zur E/A-Platine..."
 msgid "Uploading..."
 msgstr "Hochladen..."
 
+#: ../../../../../app/src/processing/app/Preferences.java:189
+msgid "Urdu (Pakistan)"
+msgstr ""
+
 #: Editor.java:1269
 msgid "Use Selection For Find"
 msgstr "Auswahl für Suche verwenden"
@@ -1810,6 +1846,10 @@ msgstr "WARNUNG: Bibliothek {0} behauptet auf {1} Architektur(en) ausgeführt we
 #: Base.java:2128
 msgid "Warning"
 msgstr "Warnung"
+
+#: ../../../../../app/src/processing/app/Preferences.java:190
+msgid "Western Frisian"
+msgstr ""
 
 #: debug/Compiler.java:444
 msgid "Wire.receive() has been renamed Wire.read()."
@@ -1967,10 +2007,6 @@ msgstr "createNewFile() gab einen Fehler zurück"
 msgid "enabled in File > Preferences."
 msgstr "aktiviert in Datei > Einstellungen"
 
-#: Base.java:2090
-msgid "environment"
-msgstr "Umgebung"
-
 #: Editor.java:1108
 msgid "http://arduino.cc/"
 msgstr "http://arduino.cc/"
@@ -1983,26 +2019,14 @@ msgstr "http://www.arduino.cc/en/Main/Software"
 msgid "http://www.arduino.cc/latest.txt"
 msgstr "http://www.arduino.cc/latest.txt"
 
-#: Base.java:2075
-msgid "http://www.arduino.cc/playground/Learning/Linux"
-msgstr "http://www.arduino.cc/playground/Learning/Linux"
-
 #: Preferences.java:625
 #, java-format
 msgid "ignoring invalid font size {0}"
 msgstr "Unzulässige Zeichengröße {0} wird ignoriert"
 
-#: Base.java:2080
-msgid "index.html"
-msgstr "index.html"
-
 #: Editor.java:936 Editor.java:943
 msgid "name is null"
 msgstr "Name ist null"
-
-#: Base.java:2090
-msgid "platforms.html"
-msgstr "platforms.html"
 
 #: Editor.java:932
 msgid "serialMenu is null"
@@ -2037,11 +2061,6 @@ msgstr "{0} gab {1} zurück"
 #, java-format
 msgid "{0} | Arduino {1}"
 msgstr "{0} | Arduino {1}"
-
-#: Editor.java:1874
-#, java-format
-msgid "{0}.html"
-msgstr "{0}.html"
 
 #: ../../../processing/app/Base.java:519
 #, java-format

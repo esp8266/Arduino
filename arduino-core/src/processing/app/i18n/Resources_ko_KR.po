@@ -97,6 +97,10 @@ msgstr "파일 추가…"
 msgid "Add Library..."
 msgstr "라이브러리 추가…"
 
+#: ../../../../../app/src/processing/app/Preferences.java:161
+msgid "Afrikaans"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:96
 msgid "Albanian"
 msgstr ""
@@ -288,6 +292,10 @@ msgstr ""
 #: ../../../processing/app/Preferences.java:139
 msgid "Belarusian"
 msgstr "벨로루시어"
+
+#: ../../../../../app/src/processing/app/Preferences.java:165
+msgid "Bengali (India)"
+msgstr ""
 
 #: ../../../processing/app/Base.java:1433
 #: ../../../processing/app/Editor.java:707
@@ -585,9 +593,17 @@ msgstr "잘라내기"
 msgid "Czech"
 msgstr "체코어"
 
+#: ../../../../../app/src/processing/app/Preferences.java:119
+msgid "Czech (Czech Republic)"
+msgstr ""
+
 #: Preferences.java:90
 msgid "Danish"
 msgstr "덴마크어"
+
+#: ../../../../../app/src/processing/app/Preferences.java:120
+msgid "Danish (Denmark)"
+msgstr ""
 
 #: Editor.java:1224 Editor.java:2765
 msgid "Decrease Indent"
@@ -791,10 +807,6 @@ msgstr "예제"
 msgid "Export canceled, changes must first be saved."
 msgstr "내보내기 취소, 변경 사항은 먼저 저장되야 합니다."
 
-#: Base.java:2100
-msgid "FAQ.html"
-msgstr "FAQ.html"
-
 #: ../../../processing/app/Base.java:416
 #, java-format
 msgid "Failed to open sketch: \"{0}\""
@@ -864,6 +876,10 @@ msgstr "자주 묻는 질문"
 msgid "Galician"
 msgstr "갈리시아어"
 
+#: ../../../../../app/src/processing/app/Preferences.java:176
+msgid "Galician (Spain)"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:94
 msgid "Georgian"
 msgstr "조지안어"
@@ -891,22 +907,6 @@ msgstr "전역 변수는 {0} 바이트의 동적 메모리를 사용."
 #: Preferences.java:98
 msgid "Greek"
 msgstr "그리스어"
-
-#: Base.java:2085
-msgid "Guide_Environment.html"
-msgstr "Guide_Environment.html"
-
-#: Base.java:2071
-msgid "Guide_MacOSX.html"
-msgstr "Guide_MacOSX.html"
-
-#: Base.java:2095
-msgid "Guide_Troubleshooting.html"
-msgstr "Guide_Troubleshooting.html"
-
-#: Base.java:2073
-msgid "Guide_Windows.html"
-msgstr "Guide_Windows.html"
 
 #: ../../../processing/app/Preferences.java:95
 msgid "Hebrew"
@@ -1002,6 +1002,10 @@ msgstr "리투아니아어"
 msgid "Low memory available, stability problems may occur."
 msgstr ""
 
+#: ../../../../../app/src/processing/app/Preferences.java:180
+msgid "Malay (Malaysia)"
+msgstr ""
+
 #: Preferences.java:107
 msgid "Marathi"
 msgstr "마라티어"
@@ -1045,6 +1049,10 @@ msgstr "새로운 파일을 위한 이름:"
 #: ../../../processing/app/Preferences.java:149
 msgid "Nepali"
 msgstr "네팔어"
+
+#: ../../../../../app/src/processing/app/Editor.java:65
+msgid "Network ports"
+msgstr ""
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:51
 msgid "Network upload using programmer not supported"
@@ -1145,9 +1153,17 @@ msgstr "GUI 동작을 설정할 때 에러가 발생을 했지만 치명적이�
 msgid "Nope"
 msgstr "아니요"
 
+#: ../../../../../app/src/processing/app/Preferences.java:181
+msgid "Norwegian"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:108
 msgid "Norwegian Bokmål"
 msgstr "노르웨이 브크몰어"
+
+#: ../../../../../app/src/processing/app/Preferences.java:182
+msgid "Norwegian Nynorsk"
+msgstr ""
 
 #: ../../../processing/app/Sketch.java:1656
 msgid ""
@@ -1445,6 +1461,10 @@ msgid ""
 "Retry the upload with another serial port?"
 msgstr "시리얼 포트 {0} 를 찾을 수 없습니다.\n다른 시리얼 포트로 업로드를 다시 시도하시겠습니까?"
 
+#: ../../../../../app/src/processing/app/Editor.java:65
+msgid "Serial ports"
+msgstr ""
+
 #: Base.java:1681
 msgid "Settings issues"
 msgstr "설정 문제"
@@ -1518,6 +1538,10 @@ msgstr ""
 msgid "Sketches (*.ino, *.pde)"
 msgstr "스케치 (*.ino, *.pde)"
 
+#: ../../../../../app/src/processing/app/Preferences.java:185
+msgid "Slovak"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:152
 msgid "Slovenian"
 msgstr "슬로베니아어"
@@ -1548,6 +1572,10 @@ msgstr "스페인어"
 msgid "Sunshine"
 msgstr "햇살"
 
+#: ../../../../../app/src/processing/app/Preferences.java:187
+msgid "Swahili"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:153
 msgid "Swedish"
 msgstr "스웨덴어"
@@ -1555,6 +1583,10 @@ msgstr "스웨덴어"
 #: Preferences.java:84
 msgid "System Default"
 msgstr "시스템 기본설정"
+
+#: ../../../../../app/src/processing/app/Preferences.java:188
+msgid "Talossan"
+msgstr ""
 
 #: Preferences.java:116
 msgid "Tamil"
@@ -1761,6 +1793,10 @@ msgstr "I/O 보드에 업로드…"
 msgid "Uploading..."
 msgstr "업로딩…"
 
+#: ../../../../../app/src/processing/app/Preferences.java:189
+msgid "Urdu (Pakistan)"
+msgstr ""
+
 #: Editor.java:1269
 msgid "Use Selection For Find"
 msgstr "찾기위해 선택된 부분을 사용"
@@ -1809,6 +1845,10 @@ msgstr ""
 #: Base.java:2128
 msgid "Warning"
 msgstr "경고"
+
+#: ../../../../../app/src/processing/app/Preferences.java:190
+msgid "Western Frisian"
+msgstr ""
 
 #: debug/Compiler.java:444
 msgid "Wire.receive() has been renamed Wire.read()."
@@ -1966,10 +2006,6 @@ msgstr "createNewFile()가 false를 반환했습니다"
 msgid "enabled in File > Preferences."
 msgstr "파일 > 설정에 사용가능하게 됨"
 
-#: Base.java:2090
-msgid "environment"
-msgstr "환경설정"
-
 #: Editor.java:1108
 msgid "http://arduino.cc/"
 msgstr "http://arduino.cc/"
@@ -1982,26 +2018,14 @@ msgstr "http://www.arduino.cc/en/Main/Software"
 msgid "http://www.arduino.cc/latest.txt"
 msgstr "http://www.arduino.cc/latest.txt"
 
-#: Base.java:2075
-msgid "http://www.arduino.cc/playground/Learning/Linux"
-msgstr "http://www.arduino.cc/playground/Learning/Linux"
-
 #: Preferences.java:625
 #, java-format
 msgid "ignoring invalid font size {0}"
 msgstr "잘못된 글꼴 크기 {0}를 무시"
 
-#: Base.java:2080
-msgid "index.html"
-msgstr "index.html"
-
 #: Editor.java:936 Editor.java:943
 msgid "name is null"
 msgstr "name 이 null입니다."
-
-#: Base.java:2090
-msgid "platforms.html"
-msgstr "platforms.html"
 
 #: Editor.java:932
 msgid "serialMenu is null"
@@ -2036,11 +2060,6 @@ msgstr "{0} 가 {1}를 리턴했습니다"
 #, java-format
 msgid "{0} | Arduino {1}"
 msgstr "{0} | 아두이노 {1}"
-
-#: Editor.java:1874
-#, java-format
-msgid "{0}.html"
-msgstr "{0}.html"
 
 #: ../../../processing/app/Base.java:519
 #, java-format

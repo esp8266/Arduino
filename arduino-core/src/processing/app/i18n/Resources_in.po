@@ -97,6 +97,10 @@ msgstr "Tambah Berkas..."
 msgid "Add Library..."
 msgstr "Tambah pustaka..."
 
+#: ../../../../../app/src/processing/app/Preferences.java:161
+msgid "Afrikaans"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:96
 msgid "Albanian"
 msgstr "Bahasa Albania"
@@ -288,6 +292,10 @@ msgstr "Bahasa Basque"
 #: ../../../processing/app/Preferences.java:139
 msgid "Belarusian"
 msgstr "Bahasa Belarusia"
+
+#: ../../../../../app/src/processing/app/Preferences.java:165
+msgid "Bengali (India)"
+msgstr ""
 
 #: ../../../processing/app/Base.java:1433
 #: ../../../processing/app/Editor.java:707
@@ -585,9 +593,17 @@ msgstr "Potong"
 msgid "Czech"
 msgstr "Bahasa Ceko"
 
+#: ../../../../../app/src/processing/app/Preferences.java:119
+msgid "Czech (Czech Republic)"
+msgstr ""
+
 #: Preferences.java:90
 msgid "Danish"
 msgstr "Bahasa Denmark"
+
+#: ../../../../../app/src/processing/app/Preferences.java:120
+msgid "Danish (Denmark)"
+msgstr ""
 
 #: Editor.java:1224 Editor.java:2765
 msgid "Decrease Indent"
@@ -791,10 +807,6 @@ msgstr "Contoh"
 msgid "Export canceled, changes must first be saved."
 msgstr "Ekspor dibatalkan, perubahan harus disimpan terlebih dahulu."
 
-#: Base.java:2100
-msgid "FAQ.html"
-msgstr "FAQ.html"
-
 #: ../../../processing/app/Base.java:416
 #, java-format
 msgid "Failed to open sketch: \"{0}\""
@@ -864,6 +876,10 @@ msgstr "Pertanyaan yang Sering Ditanyakan"
 msgid "Galician"
 msgstr "Bahasa Galisia"
 
+#: ../../../../../app/src/processing/app/Preferences.java:176
+msgid "Galician (Spain)"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:94
 msgid "Georgian"
 msgstr "Bahasa Georgia"
@@ -891,22 +907,6 @@ msgstr "Variabel global menggunakan {0} byte dari memori dinamik."
 #: Preferences.java:98
 msgid "Greek"
 msgstr "Bahasa Yunani"
-
-#: Base.java:2085
-msgid "Guide_Environment.html"
-msgstr "Guide_Environment.html"
-
-#: Base.java:2071
-msgid "Guide_MacOSX.html"
-msgstr "Guide_MacOSX.html"
-
-#: Base.java:2095
-msgid "Guide_Troubleshooting.html"
-msgstr "Guide_Troubleshooting.html"
-
-#: Base.java:2073
-msgid "Guide_Windows.html"
-msgstr "Guide_Windows.html"
 
 #: ../../../processing/app/Preferences.java:95
 msgid "Hebrew"
@@ -1002,6 +1002,10 @@ msgstr ""
 msgid "Low memory available, stability problems may occur."
 msgstr "Memori rendah tersedia, masalah stabilitas dapat terjadi."
 
+#: ../../../../../app/src/processing/app/Preferences.java:180
+msgid "Malay (Malaysia)"
+msgstr ""
+
 #: Preferences.java:107
 msgid "Marathi"
 msgstr ""
@@ -1045,6 +1049,10 @@ msgstr "Nama untuk berkas baru:"
 #: ../../../processing/app/Preferences.java:149
 msgid "Nepali"
 msgstr "Bahasa Nepal"
+
+#: ../../../../../app/src/processing/app/Editor.java:65
+msgid "Network ports"
+msgstr ""
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:51
 msgid "Network upload using programmer not supported"
@@ -1145,8 +1153,16 @@ msgstr ""
 msgid "Nope"
 msgstr ""
 
+#: ../../../../../app/src/processing/app/Preferences.java:181
+msgid "Norwegian"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:108
 msgid "Norwegian Bokmål"
+msgstr ""
+
+#: ../../../../../app/src/processing/app/Preferences.java:182
+msgid "Norwegian Nynorsk"
 msgstr ""
 
 #: ../../../processing/app/Sketch.java:1656
@@ -1445,6 +1461,10 @@ msgid ""
 "Retry the upload with another serial port?"
 msgstr ""
 
+#: ../../../../../app/src/processing/app/Editor.java:65
+msgid "Serial ports"
+msgstr ""
+
 #: Base.java:1681
 msgid "Settings issues"
 msgstr "Mengatur masalah"
@@ -1518,6 +1538,10 @@ msgstr ""
 msgid "Sketches (*.ino, *.pde)"
 msgstr ""
 
+#: ../../../../../app/src/processing/app/Preferences.java:185
+msgid "Slovak"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:152
 msgid "Slovenian"
 msgstr ""
@@ -1548,12 +1572,20 @@ msgstr ""
 msgid "Sunshine"
 msgstr ""
 
+#: ../../../../../app/src/processing/app/Preferences.java:187
+msgid "Swahili"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:153
 msgid "Swedish"
 msgstr ""
 
 #: Preferences.java:84
 msgid "System Default"
+msgstr ""
+
+#: ../../../../../app/src/processing/app/Preferences.java:188
+msgid "Talossan"
 msgstr ""
 
 #: Preferences.java:116
@@ -1761,6 +1793,10 @@ msgstr "Mengunggah ke papan I/O..."
 msgid "Uploading..."
 msgstr "Mengunggah..."
 
+#: ../../../../../app/src/processing/app/Preferences.java:189
+msgid "Urdu (Pakistan)"
+msgstr ""
+
 #: Editor.java:1269
 msgid "Use Selection For Find"
 msgstr "Gunakan Seleksi Untuk Cari"
@@ -1809,6 +1845,10 @@ msgstr "PERINGATAN: pustaka {0} mengklaim berjalan di {1} arsitektur (s) dan mun
 #: Base.java:2128
 msgid "Warning"
 msgstr "Peringatan"
+
+#: ../../../../../app/src/processing/app/Preferences.java:190
+msgid "Western Frisian"
+msgstr ""
 
 #: debug/Compiler.java:444
 msgid "Wire.receive() has been renamed Wire.read()."
@@ -1966,10 +2006,6 @@ msgstr "buatBerkasBaru() mengembalikan salah"
 msgid "enabled in File > Preferences."
 msgstr "diaktifkan pada Berkas > Preferensi."
 
-#: Base.java:2090
-msgid "environment"
-msgstr "lingkungan"
-
 #: Editor.java:1108
 msgid "http://arduino.cc/"
 msgstr "http://arduino.cc/"
@@ -1982,26 +2018,14 @@ msgstr "http://www.arduino.cc/en/Main/Software"
 msgid "http://www.arduino.cc/latest.txt"
 msgstr "http://www.arduino.cc/latest.txt"
 
-#: Base.java:2075
-msgid "http://www.arduino.cc/playground/Learning/Linux"
-msgstr "http://www.arduino.cc/playground/Learning/Linux"
-
 #: Preferences.java:625
 #, java-format
 msgid "ignoring invalid font size {0}"
 msgstr "mengabaikan ukuran fonta tidak sah {0}"
 
-#: Base.java:2080
-msgid "index.html"
-msgstr "index.html"
-
 #: Editor.java:936 Editor.java:943
 msgid "name is null"
 msgstr "nama adalah tidak ada"
-
-#: Base.java:2090
-msgid "platforms.html"
-msgstr "platforms.html"
 
 #: Editor.java:932
 msgid "serialMenu is null"
@@ -2036,11 +2060,6 @@ msgstr "{0} mengembalikan {1}"
 #, java-format
 msgid "{0} | Arduino {1}"
 msgstr "{0} | Arduino {1}"
-
-#: Editor.java:1874
-#, java-format
-msgid "{0}.html"
-msgstr "{0}.html"
 
 #: ../../../processing/app/Base.java:519
 #, java-format
