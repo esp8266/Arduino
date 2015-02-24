@@ -64,15 +64,12 @@ public class LibrariesIndexer {
         "libraries");
   }
 
-  public void parseIndex() throws JsonParseException, IOException {
+  public void parseIndex() throws IOException {
     parseIndex(indexFile);
-
-    index.fillCategories();
     // TODO: resolve libraries inner references
   }
 
-  private void parseIndex(File indexFile) throws JsonParseException,
-      IOException {
+  private void parseIndex(File indexFile) throws IOException {
     InputStream indexIn = new FileInputStream(indexFile);
     ObjectMapper mapper = new ObjectMapper();
     mapper.registerModule(new MrBeanModule());
@@ -80,6 +77,12 @@ public class LibrariesIndexer {
     mapper.configure(DeserializationFeature.EAGER_DESERIALIZER_FETCH, true);
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
     index = mapper.readValue(indexIn, LibrariesIndex.class);
+
+    for (ContributedLibrary library : index.getLibraries()) {
+      if (library.getCategory() == null || "".equals(library.getCategory())) {
+        library.setCategory("Uncategorized");
+      }
+    }
   }
 
   public void setLibrariesFolders(List<File> _librariesFolders)
@@ -172,7 +175,7 @@ public class LibrariesIndexer {
    * Set the sketchbook library folder. <br />
    * New libraries will be installed here. <br />
    * Libraries not found on this folder will be marked as read-only.
-   * 
+   *
    * @param folder
    */
   public void setSketchbookLibrariesFolder(File folder) {

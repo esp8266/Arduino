@@ -47,6 +47,8 @@ public abstract class ContributedLibrary extends DownloadableContribution {
 
   public abstract String getCategory();
 
+  public abstract void setCategory(String category);
+
   public abstract String getLicense();
 
   public abstract String getParagraph();
@@ -79,7 +81,7 @@ public abstract class ContributedLibrary extends DownloadableContribution {
   /**
    * Returns <b>true</b> if the library declares to support the specified
    * architecture (through the "architectures" property field).
-   * 
+   *
    * @param reqArch
    * @return
    */
@@ -91,7 +93,7 @@ public abstract class ContributedLibrary extends DownloadableContribution {
   /**
    * Returns <b>true</b> if the library declares to support at least one of the
    * specified architectures.
-   * 
+   *
    * @param reqArchs
    *          A List of architectures to check
    * @return

@@ -200,6 +200,11 @@ public class UserLibrary extends ContributedLibrary {
   }
 
   @Override
+  public void setCategory(String category) {
+    this.category = category;
+  }
+
+  @Override
   public String getVersion() {
     return version;
   }

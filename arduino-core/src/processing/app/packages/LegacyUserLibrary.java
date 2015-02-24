@@ -80,7 +80,7 @@ public class LegacyUserLibrary extends UserLibrary {
 
   @Override
   public String getCategory() {
-    return null;
+    return "Uncategorized";
   }
 
   @Override
