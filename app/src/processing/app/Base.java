@@ -1025,7 +1025,7 @@ public class Base {
       return;
     importMenu.removeAll();
 
-    JMenuItem menu = new JMenuItem(_("Manage libraries..."));
+    JMenuItem menu = new JMenuItem(_("Manage Libraries..."));
     menu.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         openManageLibrariesDialog();
@@ -1033,7 +1033,19 @@ public class Base {
     });
     importMenu.add(menu);
     importMenu.addSeparator();
-    
+
+    JMenuItem addLibraryMenuItem = new JMenuItem(_("Add .ZIP Library..."));
+    addLibraryMenuItem.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        Base.this.handleAddLibrary();
+        Base.this.onBoardOrPortChange();
+        Base.this.rebuildImportMenu(Editor.importMenu);
+        Base.this.rebuildExamplesMenu(Editor.examplesMenu);
+      }
+    });
+    importMenu.add(addLibraryMenuItem);
+    importMenu.addSeparator();
+
     // Split between user supplied libraries and IDE libraries
     TargetPlatform targetPlatform = getTargetPlatform();
     
@@ -1043,19 +1055,23 @@ public class Base {
       try {
         // Find the current target. Get the platform, and then select the
         // correct name and core path.
+        String platformNameLabel;
         PreferencesMap prefs = targetPlatform.getPreferences();
-        if (prefs != null) {
-          String platformName = prefs.get("name");
-          if (platformName != null) {
-            JMenuItem platformItem = new JMenuItem(_(platformName));
-            platformItem.setEnabled(false);
-            importMenu.add(platformItem);
-          }
+        if (prefs != null && prefs.get("name") != null) {
+          platformNameLabel = prefs.get("name");
+        } else {
+          platformNameLabel = targetPlatform.getContainerPackage().getId() + "/" + targetPlatform.getId();
+          platformNameLabel = I18n.format(_("{0} boards"), platformNameLabel);
         }
+        JMenuItem platformItem = new JMenuItem(_(platformNameLabel));
+        platformItem.setEnabled(false);
+        importMenu.add(platformItem);
+
         if (ideLibs.size() > 0) {
           importMenu.addSeparator();
           addLibraries(importMenu, ideLibs);
         }
+
         if (userLibs.size() > 0) {
           importMenu.addSeparator();
           addLibraries(importMenu, userLibs);
