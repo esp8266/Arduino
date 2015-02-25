@@ -33,17 +33,21 @@ import static processing.app.I18n.format;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextPane;
+import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -62,9 +66,16 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
 
   private JPanel panel;
   private JTextPane description;
+
+  private JPanel buttonsPanel;
   private JButton installButton;
+  private JComboBox downgradeChooser;
+  private JButton downgradeButton;
   private JButton removeButton;
-  private Component removeButtonPlaceholder;
+  private Component removeButtonStrut;
+
+  private JPanel inactiveButtonsPanel;
+  private JLabel statusLabel;
 
   public ContributedPlatformTableCell() {
     description = new JTextPane();
@@ -110,19 +121,74 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
       }
     });
 
-    int width = removeButton.getPreferredSize().width;
-    removeButtonPlaceholder = Box.createRigidArea(new Dimension(width, 1));
+    downgradeButton = new JButton(_("Install"));
+    downgradeButton.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        ContributedPlatform selected;
+        selected = (ContributedPlatform) downgradeChooser.getSelectedItem();
+        onInstall(selected, editorValue.getInstalled());
+      }
+    });
 
+    downgradeChooser = new JComboBox();
+    downgradeChooser.addItem("-");
+    downgradeChooser.setMaximumSize(downgradeChooser.getPreferredSize());
+    downgradeChooser.addItemListener(new ItemListener() {
+      @Override
+      public void itemStateChanged(ItemEvent e) {
+        Object selectVersionItem = downgradeChooser.getItemAt(0);
+        boolean disableDowngrade = (e.getItem() == selectVersionItem);
+        downgradeButton.setEnabled(!disableDowngrade);
+      }
+    });
+    
     panel = new JPanel();
-    panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
     panel.add(description);
-    panel.add(Box.createHorizontalStrut(5));
-    panel.add(installButton);
-    panel.add(Box.createHorizontalStrut(5));
-    panel.add(removeButton);
-    panel.add(removeButtonPlaceholder);
-    panel.add(Box.createHorizontalStrut(5));
+    
+    {
+      buttonsPanel = new JPanel();
+      buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
+      buttonsPanel.setOpaque(false);
+
+      buttonsPanel.add(Box.createHorizontalStrut(20));
+      buttonsPanel.add(downgradeChooser);
+      buttonsPanel.add(Box.createHorizontalStrut(5));
+      buttonsPanel.add(downgradeButton);
+      buttonsPanel.add(Box.createHorizontalGlue());
+
+      buttonsPanel.add(installButton);
+      buttonsPanel.add(Box.createHorizontalStrut(5));
+      buttonsPanel.add(removeButton);
+      removeButtonStrut = Box.createHorizontalStrut(5);
+      buttonsPanel.add(removeButtonStrut);
+      buttonsPanel.add(Box.createHorizontalStrut(15));
+
+      panel.add(buttonsPanel);
+    }
+    
+    {
+      inactiveButtonsPanel = new JPanel();
+      inactiveButtonsPanel.setLayout(new BoxLayout(inactiveButtonsPanel,
+          BoxLayout.X_AXIS));
+      inactiveButtonsPanel.setOpaque(false);
+
+      int h = installButton.getMinimumSize().height;
+      inactiveButtonsPanel.add(Box.createVerticalStrut(h));
+      inactiveButtonsPanel.add(Box.createGlue());
+      
+      statusLabel = new JLabel(" ");
+      inactiveButtonsPanel.add(statusLabel);
+      
+      inactiveButtonsPanel.add(Box.createGlue());
+      inactiveButtonsPanel.add(Box.createVerticalStrut(h));
+
+      panel.add(inactiveButtonsPanel);
+    }
+
+    panel.add(Box.createVerticalStrut(10));
   }
 
   protected void onRemove(ContributedPlatform contributedPlatform) {
@@ -138,6 +204,8 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
                                                  boolean hasFocus, int row,
                                                  int column) {
     parentTable = table;
+    setEnabled(false);
+
     Component panel = getUpdatedCellComponent(value, isSelected, row);
     return panel;
   }
@@ -156,6 +224,20 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
                                                int column) {
     parentTable = table;
     editorValue = (ContributedPlatformReleases) value;
+    setEnabled(true);
+
+    downgradeChooser.removeAllItems();
+    downgradeChooser.addItem(_("Select version"));
+    boolean visible = false;
+    for (ContributedPlatform release : editorValue.releases) {
+      if (release.isInstalled())
+        continue;
+      downgradeChooser.addItem(release);
+      visible = true;
+    }
+    downgradeChooser.setVisible(visible);
+    downgradeButton.setVisible(visible);
+
     return getUpdatedCellComponent(value, true, row);
   }
 
@@ -183,30 +265,24 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
     installButton.setVisible(installable || upgradable);
 
     removeButton.setVisible(removable);
-    removeButtonPlaceholder.setVisible(!removable);
+    removeButtonStrut.setVisible(removable);
 
     String desc = "<html><body>";
     desc += "<b>" + selectedPlatform.getName() + "</b>";
     String author = selectedPlatform.getParentPackage().getMaintainer();
     String url = selectedPlatform.getParentPackage().getWebsiteURL();
     if (author != null && !author.isEmpty()) {
-      desc += format(" by <a href=\"{0}\">{1}</a>", url, author);
+      desc += " " + format("by <a href=\"{0}\">{1}</a>", url, author);
     }
-    desc += "<br />";
+    if (removable) {
+      desc += " " + format(_("version <b>{0}</b>"), installedPlatform.getVersion());
+    }
     desc += "<br />";
 
-    desc += _("Boards contributed in this package:") + "<br />";
+    desc += _("Boards included in this package:") + "<br />";
     for (ContributedBoard board : selectedPlatform.getBoards())
-      desc += format("- {0}<br />", board.getName());
-    desc += "<br />";
-    desc += format(_("Available version: <b>{0}</b>"),
-                   selectedPlatform.getVersion());
-    desc += "<br />";
-    if (removable) {
-      desc += format(_("Installed version: <b>{0}</b>"),
-                     installedPlatform.getVersion());
-    }
-    desc += "<br />";
+      desc += format("{0}, ", board.getName());
+    desc = desc.substring(0, desc.lastIndexOf(',')) + ".<br />";
     desc += "</body></html>";
     description.setText(desc);
     description.setBackground(Color.WHITE);
@@ -222,10 +298,31 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
     return panel;
   }
 
+  private Timer enabler = new Timer(100, new ActionListener() {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      enable(true);
+      enabler.stop();
+    }
+  });
+  
   @Override
   public void setEnabled(boolean enabled) {
+    enable(false);
+    if (enabled) {
+      enabler.start();
+    }
+    buttonsPanel.setVisible(enabled);
+    inactiveButtonsPanel.setVisible(!enabled);
+  }
+
+  private void enable(boolean enabled) {
     installButton.setEnabled(enabled);
     removeButton.setEnabled(enabled);
+  }
+
+  public void setStatus(String status) {
+    statusLabel.setText(status);
   }
 
   public void invalidate() {

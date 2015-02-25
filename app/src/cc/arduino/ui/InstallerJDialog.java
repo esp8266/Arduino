@@ -205,7 +205,7 @@ public abstract class InstallerJDialog extends JDialog {
       progressPanel.add(updateBox);
       pane.add(progressPanel, BorderLayout.SOUTH);
     }
-    setProgressVisible(false);
+    setProgressVisible(false, "");
 
     setMinimumSize(new Dimension(600, 450));
 
@@ -219,7 +219,7 @@ public abstract class InstallerJDialog extends JDialog {
     });
   }
 
-  public void setProgressVisible(boolean visible) {
+  public void setProgressVisible(boolean visible, String status) {
     progressBox.setVisible(visible);
 
     filterField.setEnabled(!visible);
@@ -228,7 +228,8 @@ public abstract class InstallerJDialog extends JDialog {
     updateBox.setVisible(!visible);
     updateBox.setEnabled(!visible);
     cellEditor.setEnabled(!visible);
-
+    cellEditor.setStatus(status);
+    
     if (visible && contribTable.isEditing()) {
       TableCellEditor editor = contribTable.getCellEditor();
       if (editor != null)

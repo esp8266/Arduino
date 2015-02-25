@@ -28,6 +28,7 @@
  */
 package cc.arduino.packages.contributions.ui;
 
+import static processing.app.I18n._;
 import cc.arduino.packages.contributions.ContributedPlatform;
 import cc.arduino.packages.contributions.ContributionInstaller;
 import cc.arduino.packages.contributions.ContributionsIndexer;
@@ -132,13 +133,13 @@ public class ContributionManagerUI extends InstallerJDialog {
       @Override
       public void run() {
         try {
-          setProgressVisible(true);
+          setProgressVisible(true, "");
           installer.updateIndex();
           onIndexesUpdated();
         } catch (Exception e) {
           throw new RuntimeException(e);
         } finally {
-          setProgressVisible(false);
+          setProgressVisible(false, "");
         }
       }
     });
@@ -151,7 +152,7 @@ public class ContributionManagerUI extends InstallerJDialog {
       @Override
       public void run() {
         try {
-          setProgressVisible(true);
+          setProgressVisible(true, _("Installing..."));
           installer.install(platformToInstall);
           if (platformToRemove != null) {
             installer.remove(platformToRemove);
@@ -159,7 +160,7 @@ public class ContributionManagerUI extends InstallerJDialog {
         } catch (Exception e) {
           throw new RuntimeException(e);
         } finally {
-          setProgressVisible(false);
+          setProgressVisible(false, "");
         }
       }
     });
@@ -172,12 +173,12 @@ public class ContributionManagerUI extends InstallerJDialog {
       @Override
       public void run() {
         try {
-          setProgressVisible(true);
+          setProgressVisible(true, _("Removing..."));
           installer.remove(platform);
         } catch (Exception e) {
           throw new RuntimeException(e);
         } finally {
-          setProgressVisible(false);
+          setProgressVisible(false, "");
         }
       }
     });

@@ -87,4 +87,8 @@ public abstract class ContributedPlatform extends DownloadableContribution {
     this.parentPackage = parentPackage;
   }
 
+  @Override
+  public String toString() {
+    return getVersion();
+  }
 }

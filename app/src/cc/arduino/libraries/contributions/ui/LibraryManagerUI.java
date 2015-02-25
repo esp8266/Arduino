@@ -28,6 +28,8 @@
  */
 package cc.arduino.libraries.contributions.ui;
 
+import static processing.app.I18n._;
+
 import java.awt.Dialog;
 import java.awt.Frame;
 import java.util.Collection;
@@ -133,13 +135,13 @@ public class LibraryManagerUI extends InstallerJDialog {
       @Override
       public void run() {
         try {
-          setProgressVisible(true);
+          setProgressVisible(true, "");
           installer.updateIndex();
           onIndexesUpdated();
         } catch (Exception e) {
           throw new RuntimeException(e);
         } finally {
-          setProgressVisible(false);
+          setProgressVisible(false, "");
         }
       }
     });
@@ -151,13 +153,13 @@ public class LibraryManagerUI extends InstallerJDialog {
       @Override
       public void run() {
         try {
-          setProgressVisible(true);
+          setProgressVisible(true, _("Installing..."));
           installer.install(lib);
           getContribModel().updateLibrary(lib);
         } catch (Exception e) {
           throw new RuntimeException(e);
         } finally {
-          setProgressVisible(false);
+          setProgressVisible(false, "");
         }
       }
     });
@@ -169,13 +171,13 @@ public class LibraryManagerUI extends InstallerJDialog {
       @Override
       public void run() {
         try {
-          setProgressVisible(true);
+          setProgressVisible(true, _("Removing..."));
           installer.remove(lib);
           getContribModel().updateLibrary(lib);
         } catch (Exception e) {
           throw new RuntimeException(e);
         } finally {
-          setProgressVisible(false);
+          setProgressVisible(false, "");
         }
       }
     });

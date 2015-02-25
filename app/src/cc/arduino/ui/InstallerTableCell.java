@@ -39,4 +39,8 @@ public abstract class InstallerTableCell extends AbstractCellEditor implements
     // Empty
   }
 
+  public void setStatus(String s) {
+    // Empty
+  }
+
 }
