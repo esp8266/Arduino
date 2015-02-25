@@ -142,12 +142,12 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
         downgradeButton.setEnabled(!disableDowngrade);
       }
     });
-    
+
     panel = new JPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
     panel.add(description);
-    
+
     {
       buttonsPanel = new JPanel();
       buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
@@ -168,22 +168,21 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
 
       panel.add(buttonsPanel);
     }
-    
+
     {
       inactiveButtonsPanel = new JPanel();
-      inactiveButtonsPanel.setLayout(new BoxLayout(inactiveButtonsPanel,
-          BoxLayout.X_AXIS));
+      inactiveButtonsPanel.setLayout(new BoxLayout(inactiveButtonsPanel, BoxLayout.X_AXIS));
       inactiveButtonsPanel.setOpaque(false);
 
-      int h = installButton.getMinimumSize().height;
-      inactiveButtonsPanel.add(Box.createVerticalStrut(h));
+      int height = installButton.getMinimumSize().height;
+      inactiveButtonsPanel.add(Box.createVerticalStrut(height));
       inactiveButtonsPanel.add(Box.createGlue());
-      
+
       statusLabel = new JLabel(" ");
       inactiveButtonsPanel.add(statusLabel);
-      
+
       inactiveButtonsPanel.add(Box.createGlue());
-      inactiveButtonsPanel.add(Box.createVerticalStrut(h));
+      inactiveButtonsPanel.add(Box.createVerticalStrut(height));
 
       panel.add(inactiveButtonsPanel);
     }
@@ -295,6 +294,9 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
       panel.setForeground(parentTable.getForeground());
     }
 
+    int width = parentTable.getBounds().width;
+    setJTextPaneDimensionToFitContainedText(description, width);
+
     return panel;
   }
 
@@ -305,7 +307,7 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
       enabler.stop();
     }
   });
-  
+
   @Override
   public void setEnabled(boolean enabled) {
     enable(false);

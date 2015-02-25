@@ -28,19 +28,34 @@
  */
 package cc.arduino.ui;
 
-import javax.swing.AbstractCellEditor;
+import javax.swing.*;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.text.BadLocationException;
+import java.awt.*;
 
-public abstract class InstallerTableCell extends AbstractCellEditor implements
-    TableCellEditor, TableCellRenderer {
+public abstract class InstallerTableCell extends AbstractCellEditor implements TableCellEditor, TableCellRenderer {
 
   public void setEnabled(boolean b) {
-    // Empty
   }
 
   public void setStatus(String s) {
-    // Empty
+  }
+  
+  protected void setJTextPaneDimensionToFitContainedText(JTextPane jTextPane, int width) {
+    Dimension minimumDimension = new Dimension(width, 10);
+    jTextPane.setPreferredSize(minimumDimension);
+    jTextPane.setSize(minimumDimension);
+
+    try {
+      Rectangle r = jTextPane.modelToView(jTextPane.getDocument().getLength());
+      r.height += jTextPane.modelToView(0).y; // add margins
+      Dimension d = new Dimension(minimumDimension.width, r.y + r.height);
+      jTextPane.setPreferredSize(d);
+    } catch (BadLocationException e) {
+      throw new RuntimeException(e);
+    }
+
   }
 
 }

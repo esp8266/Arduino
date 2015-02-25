@@ -28,35 +28,24 @@
  */
 package cc.arduino.libraries.contributions.ui;
 
-import static processing.app.I18n._;
-import static processing.app.I18n.format;
-
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Insets;
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JTable;
-import javax.swing.JTextPane;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import javax.swing.text.html.HTMLDocument;
-import javax.swing.text.html.StyleSheet;
-
-import processing.app.Base;
 import cc.arduino.libraries.contributions.ContributedLibrary;
 import cc.arduino.libraries.contributions.ui.LibrariesIndexTableModel.ContributedLibraryReleases;
 import cc.arduino.ui.InstallerTableCell;
+import processing.app.Base;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.text.Document;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.StyleSheet;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import static processing.app.I18n._;
+import static processing.app.I18n.format;
 
 @SuppressWarnings("serial")
 public class ContributedLibraryTableCell extends InstallerTableCell {
@@ -252,18 +241,7 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
     int width = parentTable.getBounds().width;
     width -= installButtonPlaceholder.getPreferredSize().width;
     width -= removeButtonPlaceholder.getPreferredSize().width;
-    Dimension minimalSize = new Dimension(width, 10);
-    description.setPreferredSize(minimalSize);
-    description.setSize(minimalSize);
-
-    try {
-      Rectangle r = description.modelToView(description.getDocument().getLength());
-      r.height += description.modelToView(0).y; // add margins
-      Dimension d = new Dimension(minimalSize.width, r.y + r.height);
-      description.setPreferredSize(d);
-    } catch (BadLocationException e) {
-      throw new RuntimeException(e);
-    }
+    setJTextPaneDimensionToFitContainedText(description, width);
 
     if (isSelected) {
       panel.setBackground(parentTable.getSelectionBackground());
