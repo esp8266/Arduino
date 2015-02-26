@@ -80,11 +80,12 @@ public class Serial implements SerialPortEventListener {
             new Float(PreferencesData.get("serial.stopbits")).floatValue());
   }
 
-  public static boolean touchPort(String iname, int irate) throws SerialException {
+  public static boolean touchForCDCReset(String iname) throws SerialException {
     SerialPort serialPort = new SerialPort(iname);
     try {
       serialPort.openPort();
-      serialPort.setParams(irate, 8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+      serialPort.setParams(1200, 8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+      serialPort.setDTR(false);
       serialPort.closePort();
       return true;
     } catch (SerialPortException e) {
