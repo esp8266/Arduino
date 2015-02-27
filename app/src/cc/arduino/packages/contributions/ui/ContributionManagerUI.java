@@ -28,7 +28,6 @@
  */
 package cc.arduino.packages.contributions.ui;
 
-import static processing.app.I18n._;
 import cc.arduino.packages.contributions.ContributedPlatform;
 import cc.arduino.packages.contributions.ContributionInstaller;
 import cc.arduino.packages.contributions.ContributionsIndexer;
@@ -39,6 +38,8 @@ import cc.arduino.utils.Progress;
 
 import java.awt.*;
 import java.util.Collection;
+
+import static processing.app.I18n._;
 
 @SuppressWarnings("serial")
 public class ContributionManagerUI extends InstallerJDialog {
@@ -122,6 +123,7 @@ public class ContributionManagerUI extends InstallerJDialog {
 
   @Override
   public void onCancelPressed() {
+    super.onCancelPressed();
     if (installerThread != null) {
       installerThread.interrupt();
     }
@@ -129,6 +131,7 @@ public class ContributionManagerUI extends InstallerJDialog {
 
   @Override
   public void onUpdatePressed() {
+    super.onUpdatePressed();
     installerThread = new Thread(new Runnable() {
       @Override
       public void run() {
@@ -143,11 +146,12 @@ public class ContributionManagerUI extends InstallerJDialog {
         }
       }
     });
-    installerThread.setUncaughtExceptionHandler(new ContributionUncaughtExceptionHandler(this));
+    installerThread.setUncaughtExceptionHandler(new InstallerJDialogUncaughtExceptionHandler(this));
     installerThread.start();
   }
 
   public void onInstallPressed(final ContributedPlatform platformToInstall, final ContributedPlatform platformToRemove) {
+    clearErrorMessage();
     installerThread = new Thread(new Runnable() {
       @Override
       public void run() {
@@ -165,11 +169,12 @@ public class ContributionManagerUI extends InstallerJDialog {
         }
       }
     });
-    installerThread.setUncaughtExceptionHandler(new ContributionUncaughtExceptionHandler(this));
+    installerThread.setUncaughtExceptionHandler(new InstallerJDialogUncaughtExceptionHandler(this));
     installerThread.start();
   }
 
   public void onRemovePressed(final ContributedPlatform platform) {
+    clearErrorMessage();
     installerThread = new Thread(new Runnable() {
       @Override
       public void run() {
@@ -184,7 +189,7 @@ public class ContributionManagerUI extends InstallerJDialog {
         }
       }
     });
-    installerThread.setUncaughtExceptionHandler(new ContributionUncaughtExceptionHandler(this));
+    installerThread.setUncaughtExceptionHandler(new InstallerJDialogUncaughtExceptionHandler(this));
     installerThread.start();
   }
 

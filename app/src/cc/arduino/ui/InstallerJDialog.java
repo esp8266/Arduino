@@ -35,14 +35,12 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 
 import static cc.arduino.packages.contributions.ui.ContributionIndexTableModel.DESCRIPTION_COL;
@@ -91,6 +89,7 @@ public abstract class InstallerJDialog extends JDialog {
   protected ProgressJProgressBar progressBar;
   protected Box progressBox;
   protected Box updateBox;
+  private final JLabel errorMessage;
 
   protected InstallerTableCell cellEditor;
 
@@ -170,6 +169,10 @@ public abstract class InstallerJDialog extends JDialog {
     progressBar.setString(" ");
     progressBar.setVisible(true);
 
+    errorMessage = new JLabel("");
+    errorMessage.setForeground(Color.RED);
+    errorMessage.setVisible(false);
+
     {
       JButton cancelButton = new JButton(_("Cancel"));
       cancelButton.addActionListener(new ActionListener() {
@@ -194,6 +197,8 @@ public abstract class InstallerJDialog extends JDialog {
 
       updateBox = Box.createHorizontalBox();
       updateBox.add(Box.createHorizontalGlue());
+      updateBox.add(errorMessage);
+      updateBox.add(Box.createHorizontalGlue());
       updateBox.add(updateButton);
     }
 
@@ -217,6 +222,16 @@ public abstract class InstallerJDialog extends JDialog {
         InstallerJDialog.this.dispatchEvent(new WindowEvent(InstallerJDialog.this, WindowEvent.WINDOW_CLOSING));
       }
     });
+  }
+
+  public void setErrorMessage(String message) {
+    errorMessage.setText(message);
+    errorMessage.setVisible(true);
+  }
+
+  public void clearErrorMessage() {
+    errorMessage.setText("");
+    errorMessage.setVisible(false);
   }
 
   public void setProgressVisible(boolean visible, String status) {
@@ -258,14 +273,14 @@ public abstract class InstallerJDialog extends JDialog {
    * Action performed when the Cancel button is pressed.
    */
   protected void onCancelPressed() {
-    // Empty
+    clearErrorMessage();
   }
 
   /**
    * Action performed when the "Update List" button is pressed.
    */
   protected void onUpdatePressed() {
-    // Empty
+    clearErrorMessage();
   }
 
 }

@@ -28,18 +28,18 @@
  */
 package cc.arduino.libraries.contributions.ui;
 
-import static processing.app.I18n._;
-
-import java.awt.Dialog;
-import java.awt.Frame;
-import java.util.Collection;
-
 import cc.arduino.libraries.contributions.ContributedLibrary;
 import cc.arduino.libraries.contributions.LibrariesIndexer;
+import cc.arduino.packages.contributions.ui.InstallerJDialogUncaughtExceptionHandler;
 import cc.arduino.ui.FilteredAbstractTableModel;
 import cc.arduino.ui.InstallerJDialog;
 import cc.arduino.ui.InstallerTableCell;
 import cc.arduino.utils.Progress;
+
+import java.awt.*;
+import java.util.Collection;
+
+import static processing.app.I18n._;
 
 @SuppressWarnings("serial")
 public class LibraryManagerUI extends InstallerJDialog {
@@ -48,7 +48,7 @@ public class LibraryManagerUI extends InstallerJDialog {
   protected FilteredAbstractTableModel createContribModel() {
     return new LibrariesIndexTableModel();
   }
-  
+
   private LibrariesIndexTableModel getContribModel() {
     return (LibrariesIndexTableModel) contribModel;
   }
@@ -125,12 +125,15 @@ public class LibraryManagerUI extends InstallerJDialog {
 
   @Override
   protected void onCancelPressed() {
-    if (installerThread != null)
+    super.onUpdatePressed();
+    if (installerThread != null) {
       installerThread.interrupt();
+    }
   }
 
   @Override
   protected void onUpdatePressed() {
+    super.onUpdatePressed();
     installerThread = new Thread(new Runnable() {
       @Override
       public void run() {
@@ -145,10 +148,12 @@ public class LibraryManagerUI extends InstallerJDialog {
         }
       }
     });
+    installerThread.setUncaughtExceptionHandler(new InstallerJDialogUncaughtExceptionHandler(this));
     installerThread.start();
   }
 
   public void onInstallPressed(final ContributedLibrary lib, final ContributedLibrary replaced) {
+    clearErrorMessage();
     installerThread = new Thread(new Runnable() {
       @Override
       public void run() {
@@ -164,10 +169,12 @@ public class LibraryManagerUI extends InstallerJDialog {
         }
       }
     });
+    installerThread.setUncaughtExceptionHandler(new InstallerJDialogUncaughtExceptionHandler(this));
     installerThread.start();
   }
 
   public void onRemovePressed(final ContributedLibrary lib) {
+    clearErrorMessage();
     installerThread = new Thread(new Runnable() {
       @Override
       public void run() {
@@ -183,6 +190,7 @@ public class LibraryManagerUI extends InstallerJDialog {
         }
       }
     });
+    installerThread.setUncaughtExceptionHandler(new InstallerJDialogUncaughtExceptionHandler(this));
     installerThread.start();
   }
 
