@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -399,13 +400,17 @@ public class Compiler implements MessageConsumer {
     progressListener.progress(60);
     compileLink();
 
-    // 5. extract EEPROM data (from EEMEM directive) to .eep file.
-    progressListener.progress(70);
-    runRecipe("recipe.objcopy.eep.pattern");
-
-    // 6. build the .hex file
-    progressListener.progress(80);
-    runRecipe("recipe.objcopy.output.pattern");
+    // 5. run objcopy to generate output files
+    progressListener.progress(75);
+    List<String> objcopyPatterns = new ArrayList<String>();
+    for (String key : prefs.keySet()) {
+      if (key.startsWith("recipe.objcopy.") && key.endsWith(".pattern"))
+        objcopyPatterns.add(key);
+    }
+    Collections.sort(objcopyPatterns);
+    for (String recipe : objcopyPatterns) {
+      runRecipe(recipe);
+    }
 
     progressListener.progress(90);
     return true;

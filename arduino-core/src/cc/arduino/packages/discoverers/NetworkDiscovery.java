@@ -58,19 +58,32 @@ public class NetworkDiscovery implements Discovery, ServiceListener, cc.arduino.
 
   @Override
   public List<BoardPort> discovery() {
-    List<BoardPort> ports = clonePortsList();
-    Iterator<BoardPort> iterator = ports.iterator();
-    while (iterator.hasNext()) {
+    List<BoardPort> boardPorts = clonePortsList();
+    Iterator<BoardPort> boardPortIterator = boardPorts.iterator();
+    while (boardPortIterator.hasNext()) {
       try {
-        BoardPort board = iterator.next();
-        if (!NetUtils.isReachable(InetAddress.getByName(board.getAddress()), Integer.parseInt(board.getPrefs().get("port")))) {
-          iterator.remove();
+        BoardPort board = boardPortIterator.next();
+
+        InetAddress inetAddress = InetAddress.getByName(board.getAddress());
+        int broadcastedPort = Integer.valueOf(board.getPrefs().get("port"));
+
+        List<Integer> ports = new LinkedList<Integer>();
+        ports.add(broadcastedPort);
+
+        //dirty code: allows non up to date yuns to be discovered. Newer yuns will broadcast port 22
+        if (broadcastedPort == 80) {
+          ports.add(0, 22);
+        }
+
+        boolean reachable = NetUtils.isReachable(inetAddress, ports);
+        if (!reachable) {
+          boardPortIterator.remove();
         }
       } catch (UnknownHostException e) {
-        iterator.remove();
+        boardPortIterator.remove();
       }
     }
-    return ports;
+    return boardPorts;
   }
 
   private List<BoardPort> clonePortsList() {

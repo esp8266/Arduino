@@ -160,7 +160,7 @@ int YunClient::connect(const char *host, uint16_t port) {
   if (connected())
     return 1;
 
-  opened = false;
+  stop();
   handle = 0;
   return 0;
 }

@@ -15,7 +15,7 @@
  '~' followed by '1' -> Set the UART speed to 115200 baud
  '~' followed by '2' -> Set the UART speed to 250000 baud
  '~' followed by '3' -> Set the UART speed to 500000 baud
- '~' followeb by '~' -> Sends the bridge's shutdown command to
+ '~' followed by '~' -> Sends the bridge's shutdown command to
                         obtain the console.
 
  The circuit:
