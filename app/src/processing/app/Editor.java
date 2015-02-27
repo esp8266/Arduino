@@ -2212,7 +2212,7 @@ public class Editor extends JFrame implements RunnerListener {
           // copy the sketch inside
           File properPdeFile = new File(properFolder, sketchFile.getName());
           try {
-            Base.copyFile(file, properPdeFile);
+            Base.copyFile(sketchFile, properPdeFile);
           } catch (IOException e) {
             Base.showWarning(_("Error"), _("Could not copy to a proper location."), e);
             return false;
