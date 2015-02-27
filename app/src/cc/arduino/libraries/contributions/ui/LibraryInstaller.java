@@ -88,7 +88,7 @@ public class LibraryInstaller {
     rescanLibraryIndex(progress);
   }
 
-  public void install(ContributedLibrary lib) throws Exception {
+  public void install(ContributedLibrary lib, ContributedLibrary replacedLib) throws Exception {
     if (lib.isInstalled())
       throw new Exception(_("Library is already installed!"));
 
@@ -109,12 +109,26 @@ public class LibraryInstaller {
     // Step 2: Unpack library on the correct location
     progress.setStatus(_("Installing library..."));
     onProgress(progress);
-    File destFolder = new File(indexer.getSketchbookLibrariesFolder(), lib.getName());
-    destFolder.mkdirs();
-    ArchiveExtractor.extract(lib.getDownloadedFile(), destFolder, 1);
+    File libsFolder = indexer.getSketchbookLibrariesFolder();
+    File tmpFolder = FileUtils.createTempFolderIn(libsFolder);
+    try {
+      ArchiveExtractor.extract(lib.getDownloadedFile(), tmpFolder, 1);
+    } catch (Exception e) {
+      if (tmpFolder.exists())
+        FileUtils.recursiveDelete(tmpFolder);
+    }
     progress.stepDone();
 
-    // Step 3: Rescan index
+    // Step 3: Remove replaced library and move installed one to the correct location
+    // TODO: Fix progress bar...
+    if (replacedLib != null) {
+      remove(replacedLib);
+    }
+    File destFolder = new File(libsFolder, lib.getName());
+    tmpFolder.renameTo(destFolder);
+    progress.stepDone();
+    
+    // Step 4: Rescan index
     rescanLibraryIndex(progress);
   }
 

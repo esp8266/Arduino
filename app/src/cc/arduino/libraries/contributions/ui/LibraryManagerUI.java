@@ -62,8 +62,8 @@ public class LibraryManagerUI extends InstallerJDialog {
   protected InstallerTableCell createCellEditor() {
     return new ContributedLibraryTableCell() {
       @Override
-      protected void onInstall(ContributedLibrary selectedPlatform) {
-        onInstallPressed(selectedPlatform);
+      protected void onInstall(ContributedLibrary selectedLibrary, ContributedLibrary installedLibrary) {
+        onInstallPressed(selectedLibrary, installedLibrary);
       }
 
       @Override
@@ -148,13 +148,13 @@ public class LibraryManagerUI extends InstallerJDialog {
     installerThread.start();
   }
 
-  public void onInstallPressed(final ContributedLibrary lib) {
+  public void onInstallPressed(final ContributedLibrary lib, final ContributedLibrary replaced) {
     installerThread = new Thread(new Runnable() {
       @Override
       public void run() {
         try {
           setProgressVisible(true, _("Installing..."));
-          installer.install(lib);
+          installer.install(lib, replaced);
           onIndexesUpdated(); // TODO: Do a better job in refreshing only the needed element
           //getContribModel().updateLibrary(lib);
         } catch (Exception e) {

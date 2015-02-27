@@ -110,7 +110,7 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
       installButton.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-          onInstall(editorValue.getSelected());
+          onInstall(editorValue.getSelected(), editorValue.getInstalled());
         }
       });
       int width = installButton.getPreferredSize().width;
@@ -135,7 +135,7 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
       public void actionPerformed(ActionEvent e) {
         ContributedLibrary selected;
         selected = (ContributedLibrary) downgradeChooser.getSelectedItem();
-        onInstall(selected);//, editorValue.getInstalled());
+        onInstall(selected, editorValue.getInstalled());
       }
     });
 
@@ -199,11 +199,11 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
     panel.add(Box.createVerticalStrut(10));
   }
 
-  protected void onRemove(ContributedLibrary contributedPlatform) {
+  protected void onRemove(ContributedLibrary selectedLib) {
     // Empty
   }
 
-  protected void onInstall(ContributedLibrary contributedPlatform) {
+  protected void onInstall(ContributedLibrary selectedLib, ContributedLibrary installedLib) {
     // Empty
   }
 
