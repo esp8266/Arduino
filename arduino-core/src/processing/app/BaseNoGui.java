@@ -713,8 +713,6 @@ public class BaseNoGui {
     if (args.length == 0)
       showError(_("No parameters"), _("No command line parameters found"), null);
 
-    Thread.setDefaultUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
-
     initPlatform();
     
     initPortableFolder();

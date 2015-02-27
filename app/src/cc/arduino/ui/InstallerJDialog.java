@@ -229,12 +229,6 @@ public abstract class InstallerJDialog extends JDialog {
     updateBox.setEnabled(!visible);
     cellEditor.setEnabled(!visible);
     cellEditor.setStatus(status);
-    
-    if (visible && contribTable.isEditing()) {
-      TableCellEditor editor = contribTable.getCellEditor();
-      if (editor != null)
-        editor.stopCellEditing();
-    }
   }
 
   private void updateCellsHeight(TableModelEvent e) {

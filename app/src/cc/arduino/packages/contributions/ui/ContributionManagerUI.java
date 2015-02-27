@@ -157,6 +157,7 @@ public class ContributionManagerUI extends InstallerJDialog {
           if (platformToRemove != null) {
             installer.remove(platformToRemove);
           }
+          onIndexesUpdated();
         } catch (Exception e) {
           throw new RuntimeException(e);
         } finally {
@@ -175,6 +176,7 @@ public class ContributionManagerUI extends InstallerJDialog {
         try {
           setProgressVisible(true, _("Removing..."));
           installer.remove(platform);
+          onIndexesUpdated();
         } catch (Exception e) {
           throw new RuntimeException(e);
         } finally {
