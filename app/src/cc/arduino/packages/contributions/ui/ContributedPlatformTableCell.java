@@ -284,8 +284,11 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
     desc = desc.substring(0, desc.lastIndexOf(',')) + ".<br />";
     desc += "</body></html>";
     description.setText(desc);
-    description.setBackground(Color.WHITE);
+    //description.setBackground(Color.WHITE);
 
+    int width = parentTable.getBounds().width;
+    setJTextPaneDimensionToFitContainedText(description, width);
+    
     if (isSelected) {
       panel.setBackground(parentTable.getSelectionBackground());
       panel.setForeground(parentTable.getSelectionForeground());
@@ -293,9 +296,6 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
       panel.setBackground(parentTable.getBackground());
       panel.setForeground(parentTable.getForeground());
     }
-
-    int width = parentTable.getBounds().width;
-    setJTextPaneDimensionToFitContainedText(description, width);
 
     return panel;
   }

@@ -49,7 +49,7 @@ public abstract class InstallerTableCell extends AbstractCellEditor implements T
 
     try {
       Rectangle r = jTextPane.modelToView(jTextPane.getDocument().getLength());
-      r.height += jTextPane.modelToView(0).y; // add margins
+      //r.height += jTextPane.modelToView(0).y; // add margins
       Dimension d = new Dimension(minimumDimension.width, r.y + r.height);
       jTextPane.setPreferredSize(d);
     } catch (BadLocationException e) {

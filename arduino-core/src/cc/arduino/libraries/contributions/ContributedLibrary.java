@@ -109,6 +109,10 @@ public abstract class ContributedLibrary extends DownloadableContribution {
 
   @Override
   public String toString() {
+    return getVersion();
+  }
+  
+  public String info() {
     String res = "";
     res += "  ContributedLibrary : " + getName() + "\n";
     res += "              author : " + getAuthor() + "\n";

@@ -155,7 +155,8 @@ public class LibraryManagerUI extends InstallerJDialog {
         try {
           setProgressVisible(true, _("Installing..."));
           installer.install(lib);
-          getContribModel().updateLibrary(lib);
+          onIndexesUpdated(); // TODO: Do a better job in refreshing only the needed element
+          //getContribModel().updateLibrary(lib);
         } catch (Exception e) {
           throw new RuntimeException(e);
         } finally {
@@ -173,7 +174,8 @@ public class LibraryManagerUI extends InstallerJDialog {
         try {
           setProgressVisible(true, _("Removing..."));
           installer.remove(lib);
-          getContribModel().updateLibrary(lib);
+          onIndexesUpdated(); // TODO: Do a better job in refreshing only the needed element
+          //getContribModel().updateLibrary(lib);
         } catch (Exception e) {
           throw new RuntimeException(e);
         } finally {
