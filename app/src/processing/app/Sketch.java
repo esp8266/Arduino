@@ -641,7 +641,14 @@ public class Sketch {
       fd.setSelectedFile(new File(Base.getSketchbookFolder().getAbsolutePath(), data.getFolder().getName()));
     } else {
       // default to the parent folder of where this was
-      fd.setSelectedFile(data.getFolder());
+      // on macs a .getParentFile() method is required
+        
+      if (OSUtils.isMacOS()) {
+            fd.setSelectedFile(data.getFolder().getParentFile());
+      } else {
+          fd.setSelectedFile(data.getFolder());
+      }
+        
     }
 
     int returnVal = fd.showSaveDialog(editor);
