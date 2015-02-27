@@ -83,7 +83,12 @@ public class FileUtils {
   }
 
   public static File createTempFolder() throws IOException {
-    File tmpFolder = new File(System.getProperty("java.io.tmpdir"), "arduino_" + new Random().nextInt(1000000));
+    return createTempFolderIn(new File(System.getProperty("java.io.tmpdir")));
+  }
+
+  public static File createTempFolderIn(File parent) throws IOException {
+    File tmpFolder = new File(parent, "arduino_"
+                                      + new Random().nextInt(1000000));
     if (!tmpFolder.mkdir()) {
       throw new IOException("Unable to create temp folder " + tmpFolder);
     }
