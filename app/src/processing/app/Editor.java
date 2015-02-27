@@ -26,6 +26,7 @@ import cc.arduino.packages.MonitorFactory;
 
 import com.jcraft.jsch.JSchException;
 
+import jssc.SerialPortException;
 import processing.app.debug.*;
 import processing.app.forms.PasswordAuthorizationDialog;
 import processing.app.helpers.OSUtils;
@@ -2572,6 +2573,12 @@ public class Editor extends JFrame implements RunnerListener {
         statusError(_("Unable to connect: is the sketch using the bridge?"));
       } catch (JSchException e) {
         statusError(_("Unable to connect: wrong password?"));
+      } catch (SerialException e) {
+        String errorMessage = e.getMessage();
+        if (e.getCause() != null && e.getCause() instanceof SerialPortException) {
+          errorMessage += " (" + ((SerialPortException) e.getCause()).getExceptionType() + ")";
+        }
+        statusError(errorMessage);
       } catch (Exception e) {
         statusError(e);
       } finally {
