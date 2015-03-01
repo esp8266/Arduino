@@ -81,7 +81,7 @@
       <key>VMOptions</key>
       <array>
         <string>-Xms128M</string>
-        <string>-Xmx256M</string>
+        <string>-Xmx1024M</string>
       </array>
 
       <key>MainClass</key>

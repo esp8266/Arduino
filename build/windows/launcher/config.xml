@@ -32,7 +32,6 @@
     <minVersion>1.6.0</minVersion>
     <maxVersion></maxVersion>
     <jdkPreference>preferJre</jdkPreference>
-    <opt>-Xms128m -Xmx128m</opt>
   </jre>
   <splash>
     <file>about.bmp</file>
