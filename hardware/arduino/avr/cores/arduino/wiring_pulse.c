@@ -48,7 +48,12 @@ unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout)
 	unsigned long maxloops = microsecondsToClockCycles(timeout)/16;
 
 	width = countPulseASM(portInputRegister(port), bit, stateMask, maxloops);
-	return clockCyclesToMicroseconds(width * 16 + 16);
+
+	//prevent clockCyclesToMicroseconds to return bogus values if countPulseASM timed out
+	if (width)
+		return clockCyclesToMicroseconds(width * 16 + 16);
+	else
+		return 0;
 }
 
 /* Measures the length (in microseconds) of a pulse on the pin; state is HIGH
