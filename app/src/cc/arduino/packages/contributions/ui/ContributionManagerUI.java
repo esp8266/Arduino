@@ -36,6 +36,7 @@ import cc.arduino.ui.InstallerJDialog;
 import cc.arduino.ui.InstallerTableCell;
 import cc.arduino.utils.Progress;
 
+import javax.swing.*;
 import java.awt.*;
 import java.util.Collection;
 
@@ -108,6 +109,15 @@ public class ContributionManagerUI extends InstallerJDialog {
         setProgress(progress);
       }
     };
+
+    if (indexer.getIndex().getPackages().isEmpty()) {
+      SwingUtilities.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          onUpdatePressed();
+        }
+      });
+    }
   }
 
   public void setProgress(Progress progress) {
