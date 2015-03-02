@@ -888,19 +888,12 @@
   <target name="windows-dist" depends="windows-build"
 	  description="Create .zip files of windows version">
 
-    <get src="http://arduino.cc/download.php?f=/jre_7u40_windows_i586.zip" dest="windows/jre.zip" usetimestamp="true" skipexisting="true" />
-
-    <unzip dest="windows/work" src="windows/jre.zip" overwrite="false"/>
-
-    <!--
-    <zip basedir="windows/work" 
-	 prefix="arduino-${version}"
-	 destfile="windows/arduino-${version}.zip" />
-    <zip basedir="windows/work" 
-	 prefix="arduino-${version}"
-	 destfile="windows/arduino-${version}-expert.zip" 
-	 excludes="java/**" />
-    -->
+    <antcall target="unzip">
+      <param name="archive_file" value="windows/jre-8u31.zip" />
+      <param name="archive_url" value="http://arduino.cc/download.php?f=/jre-8u31.zip" />
+      <param name="final_folder" value="${staging_folder}/work/java" />
+      <param name="dest_folder" value="${staging_folder}/work/" />
+    </antcall>
 
     <zip destfile="windows/arduino-${version}-${platform}.zip" level="9">
       <zipfileset dir="windows/work"
