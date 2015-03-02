@@ -7,7 +7,16 @@ ARDUINO 1.6.1
 * /dev/cu.* serial ports are now filtered from the port list on MacOSX
 * Ports in ports list are now grouped by type
 * Upgraded avr-gcc toolchains to 3.4.5
-* Fixed wrong parsing of boards.txt when using submenu and boards id with underscores
+* Fixed: wrong parsing of boards.txt when using submenu and boards id with underscores
+* Windows: updated bundled JVM to latest 8u31
+* Windows: JVM memory settings can be customized editing arduino.l4j.ini and arduino_debug.l4j.ini files
+* "new" button now behaves as "File -> New..." menu: a new window with an empty sketch is created
+* Windows: opening a lonely sketch caused the IDE to crash. Fixed with a bounty on bountysource @gerito1
+* Bridge: fixed bug with multiple and failing YunClient.connect calls @sngl
+* Translations updated
+* Fixed: status board was not changing when using custom menu @PaulStoffregen
+* Fixed: better error message when using a busy serial device
+* Fixed: missing bool operator on EthernetClient
 
 ARDUINO 1.6.0 - 2015.02.09
 
