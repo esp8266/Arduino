@@ -12,7 +12,7 @@ version=1.6.2
 # --------------------- 
 
 # Default "compiler.path" is correct, change only if you want to overidde the initial value
-compiler.path={runtime.ide.path}/hardware/tools/avr/bin/
+compiler.path={runtime.tools.avr-gcc-4.8.1-arduino.path}/bin/
 compiler.c.cmd=avr-gcc
 compiler.c.flags=-c -g -Os -w -ffunction-sections -fdata-sections -MMD
 # -w flag added to avoid printing a wrong warning http://gcc.gnu.org/bugzilla/show_bug.cgi?id=59396
@@ -75,8 +75,9 @@ recipe.size.regex.eeprom=^(?:\.eeprom)\s+([0-9]+).*
 # AVR Uploader/Programmers tools
 # ------------------------------
 
-tools.avrdude.cmd.path={runtime.ide.path}/hardware/tools/avr/bin/avrdude
-tools.avrdude.config.path={runtime.ide.path}/hardware/tools/avr/etc/avrdude.conf
+tools.avrdude.path={runtime.tools.avrdude.path}
+tools.avrdude.cmd.path={path}/avrdude
+tools.avrdude.config.path={path}/avrdude.conf
 
 tools.avrdude.upload.params.verbose=-v
 tools.avrdude.upload.params.quiet=-q -q
