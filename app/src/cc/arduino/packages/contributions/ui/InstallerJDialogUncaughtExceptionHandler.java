@@ -19,6 +19,7 @@ public class InstallerJDialogUncaughtExceptionHandler implements Thread.Uncaught
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
+        System.err.println(_(e.getMessage().substring(e.getMessage().indexOf(":") + 2)));
         e.printStackTrace();
       }
     });
