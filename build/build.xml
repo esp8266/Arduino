@@ -248,8 +248,8 @@
 
   <target name="macosx-java-latest-build" if="macosx" depends="revision-check, macosx-checkos, subprojects-build" description="Build Mac OS X version">
     <antcall target="unzip">
-      <param name="archive_file" value="${staging_folder}/appbundler-1.0ea.jar.zip" />
-      <param name="archive_url" value="http://arduino.cc/download.php?f=/appbundler-1.0ea.jar.zip" />
+      <param name="archive_file" value="${staging_folder}/appbundler-1.0ea-arduino.jar.zip" />
+      <param name="archive_url" value="http://arduino.cc/download.php?f=/appbundler-1.0ea-arduino.jar.zip" />
       <param name="final_folder" value="${staging_folder}/appbundler" />
       <param name="dest_folder" value="${staging_folder}/appbundler" />
     </antcall>
@@ -277,7 +277,6 @@
       <arch name="i386"/>
 
       <classpath refid="runtime.jars"/>
-      <classpath file="./macosx/template.app/Contents/Resources/Java/quaqua.jar"/>
 
       <option value="-Dapple.awt.application.name=Arduino" />
       <option value="-Dapple.laf.useScreenMenuBar=true"/>
@@ -314,8 +313,6 @@
     <copy todir="${staging_folder}/work/${staging_hardware_folder}/../">
       <fileset dir="shared" includes="lib/**" />
       <fileset file="shared/revisions.txt" />
-      <file file="macosx/template.app/Contents/Resources/Java/quaqua.jar"/>
-      <fileset file="macosx/template.app/Contents/Resources/Java/libquaqua*" />
     </copy>
 
     <antcall target="macosx-build-common"/>

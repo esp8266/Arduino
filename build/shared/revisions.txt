@@ -17,6 +17,7 @@ ARDUINO 1.6.1
 * Fixed: status board was not changing when using custom menu @PaulStoffregen
 * Fixed: better error message when using a busy serial device
 * Fixed: missing bool operator on EthernetClient
+* MacOSX: back to native file dialogs and buttons, when using experimental version
 
 ARDUINO 1.6.0 - 2015.02.09
 
