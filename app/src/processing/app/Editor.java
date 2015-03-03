@@ -651,7 +651,7 @@ public class Editor extends JFrame implements RunnerListener {
     sketchMenu.addSeparator();
 
     if (importMenu == null) {
-      importMenu = new JMenu(_("Import Library..."));
+      importMenu = new JMenu(_("Include Library"));
       MenuScroller.setScrollerFor(importMenu);
       base.rebuildImportMenu(importMenu);
     }

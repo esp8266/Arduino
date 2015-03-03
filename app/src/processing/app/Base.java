@@ -1167,7 +1167,7 @@ public class Base {
     JMenu boardMenu = new JMenu(_("Board"));
     MenuScroller.setScrollerFor(boardMenu);
     @SuppressWarnings("serial")
-    Action runInstaller = new AbstractAction("Install boards...") {
+    Action runInstaller = new AbstractAction(_("Boards Manager...")) {
       public void actionPerformed(ActionEvent actionevent) {
         try {
           openInstallBoardDialog();
@@ -2544,7 +2544,7 @@ public class Base {
         activeEditor.statusError(e);
         return;
       }
-      activeEditor.statusNotice(_("Library added to your libraries. Check \"Import library\" menu"));
+      activeEditor.statusNotice(_("Library added to your libraries. Check \"Include library\" menu"));
     } finally {
       // delete zip created temp folder, if exists
       FileUtils.recursiveDelete(tmpFolder);
