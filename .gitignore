@@ -31,6 +31,7 @@ build/macosx/libastylej*
 build/macosx/appbundler*.jar
 build/macosx/appbundler*.zip
 build/macosx/appbundler
+build/macosx/appbundler-1.0ea-arduino2
 build/linux/work/
 build/linux/dist/*.tar.gz
 build/linux/dist/*.tar.bz2

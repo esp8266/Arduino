@@ -248,30 +248,31 @@
 
   <target name="macosx-java-latest-build" if="macosx" depends="revision-check, macosx-checkos, subprojects-build" description="Build Mac OS X version">
     <antcall target="unzip">
-      <param name="archive_file" value="${staging_folder}/appbundler-1.0ea-arduino.jar.zip" />
-      <param name="archive_url" value="http://arduino.cc/download.php?f=/appbundler-1.0ea-arduino.jar.zip" />
-      <param name="final_folder" value="${staging_folder}/appbundler" />
-      <param name="dest_folder" value="${staging_folder}/appbundler" />
+      <param name="archive_file" value="${staging_folder}/appbundler-1.0ea-arduino2.jar.zip" />
+      <param name="archive_url" value="http://arduino.cc/download.php?f=/appbundler-1.0ea-arduino2.jar.zip" />
+      <param name="final_folder" value="${staging_folder}/appbundler-1.0ea-arduino2" />
+      <param name="dest_folder" value="${staging_folder}/appbundler-1.0ea-arduino2" />
     </antcall>
 
     <mkdir dir="${staging_folder}/work" />
 
-    <taskdef name="bundleapp" classname="com.oracle.appbundler.AppBundlerTask" classpath="${staging_folder}/appbundler/appbundler-1.0ea.jar"/>
+    <taskdef name="bundleapp" classname="com.oracle.appbundler.AppBundlerTask" classpath="${staging_folder}/appbundler-1.0ea-arduino2/appbundler-1.0ea-arduino2.jar"/>
 
-    <bundleapp outputDirectory="${staging_folder}/work"
-               name="Arduino"
-               displayName="Arduino"
-               executableName="Arduino"
-               identifier="cc.arduino.Arduino"
-               signature="Pde1"
-               icon="macosx/template.app/Contents/Resources/processing.icns"
-               copyright="Arduino LLC"
-               getInfo="${version}"
-               shortVersion="${version}"
-               version="${revision}"
-               mainClassName="processing.app.Base"
-               minimumsystem="10.7"
-               highresolutioncapable="true">
+    <bundleapp
+            jvmRequired="1.7"
+            outputdirectory="${staging_folder}/work"
+            name="Arduino"
+            displayname="Arduino"
+            executablename="Arduino"
+            identifier="cc.arduino.Arduino"
+            shortversion="${version}"
+            version="${revision}"
+            signature="Pde1"
+            icon="macosx/template.app/Contents/Resources/processing.icns"
+            mainclassname="processing.app.Base"
+            copyright="Arduino LLC"
+            minimumsystemversion="10.7"
+            highresolutioncapable="true">
 
       <arch name="x86_64"/>
       <arch name="i386"/>
@@ -295,7 +296,7 @@
       <!--<option value="-Dcom.apple.macos.useScreenMenuBar=true"/>-->
 
       <!-- Workaround since the icon parameter for bundleapp doesn't work -->
-      <option value="-Xdock:icon=Contents/Resources/processing.icns"/>
+      <option value="-Xdock:name=Arduino"/>
       <option value="-Dcom.apple.mrj.application.apple.menu.about.name=Arduino"/>
       <option value="-Dfile.encoding=UTF-8"/>
 
