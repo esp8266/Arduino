@@ -647,7 +647,14 @@ public class Sketch {
       fd.setDirectory(Base.getSketchbookFolder().getAbsolutePath());
     } else {
       // default to the parent folder of where this was
-      fd.setDirectory(data.getFolder().getParentFile().getAbsolutePath());
+      // on macs a .getParentFile() method is required
+        
+      if (OSUtils.isMacOS()) {
+            fd.setSelectedFile(data.getFolder().getParentFile());
+      } else {
+          fd.setSelectedFile(data.getFolder());
+      }
+        
     }
     String oldName = data.getName();
     fd.setFile(oldName);
