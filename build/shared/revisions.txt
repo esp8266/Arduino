@@ -18,6 +18,7 @@ ARDUINO 1.6.1
 * Fixed: better error message when using a busy serial device
 * Fixed: missing bool operator on EthernetClient
 * MacOSX: back to native file dialogs and buttons, when using experimental version
+* MacOSX: command line interface now works also with java-latest version
 
 ARDUINO 1.6.0 - 2015.02.09
 
