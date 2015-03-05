@@ -142,7 +142,7 @@ public class ContributionIndexTableModel extends FilteredAbstractTableModel {
     for (ContributedPackage pack : index.getPackages()) {
       for (ContributedPlatform platform : pack.getPlatforms()) {
         if (category != null) {
-          if (!platform.getCategory().equals(category))
+          if (!category.equals(platform.getCategory()))
             continue;
         }
         if (!stringContainsAll(platform.getName(), filters))

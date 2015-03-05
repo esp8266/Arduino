@@ -1,44 +1,29 @@
 package processing.app;
 
-import static processing.app.I18n._;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import cc.arduino.DefaultUncaughtExceptionHandler;
-import org.apache.commons.logging.impl.LogFactoryImpl;
-import org.apache.commons.logging.impl.NoOpLog;
-
+import cc.arduino.libraries.contributions.LibrariesIndexer;
 import cc.arduino.packages.DiscoveryManager;
 import cc.arduino.packages.Uploader;
-import processing.app.debug.Compiler;
-import cc.arduino.libraries.contributions.LibrariesIndexer;
 import cc.arduino.packages.contributions.ContributedTool;
 import cc.arduino.packages.contributions.ContributionsIndexer;
 import cc.arduino.utils.ArchiveExtractor;
-import processing.app.debug.TargetBoard;
-import processing.app.debug.LegacyTargetPackage;
-import processing.app.debug.TargetPackage;
-import processing.app.debug.TargetPlatform;
-import processing.app.debug.TargetPlatformException;
-import processing.app.helpers.BasicUserNotifier;
-import processing.app.helpers.CommandlineParser;
-import processing.app.helpers.OSUtils;
-import processing.app.helpers.PreferencesMap;
-import processing.app.helpers.UserNotifier;
+import org.apache.commons.logging.impl.LogFactoryImpl;
+import org.apache.commons.logging.impl.NoOpLog;
+import processing.app.debug.Compiler;
+import processing.app.debug.*;
+import processing.app.helpers.*;
 import processing.app.helpers.filefilters.OnlyDirs;
 import processing.app.helpers.filefilters.OnlyFilesWithExtension;
 import processing.app.legacy.PApplet;
 import processing.app.packages.LibraryList;
 import processing.app.packages.UserLibrary;
+
+import java.io.*;
+import java.net.URISyntaxException;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static processing.app.I18n._;
 
 public class BaseNoGui {
 
@@ -594,21 +579,24 @@ public class BaseNoGui {
     indexer = new ContributionsIndexer(BaseNoGui.getSettingsFolder());
     File indexFile = indexer.getIndexFile();
     if (!indexFile.isFile()) {
-      try {
-        File distFile = getContentFile("dist/default_package.tar.bz2");
-        if (distFile.isFile()) {
-          // If present, unpack distribution file into preferences folder
-          ArchiveExtractor.extract(distFile, BaseNoGui.getSettingsFolder(), 1);
+      File distFile = findDefaultPackageFile();
+      if (distFile != null) {
+        // If present, unpack distribution file into preferences folder
+        ArchiveExtractor.extract(distFile, BaseNoGui.getSettingsFolder(), 0);
 
-          // TODO: The first distribution file may be removed after extraction?
-        } else {
-          // Otherwise create an empty packages index
-          FileOutputStream out = new FileOutputStream(indexFile);
+        // TODO: The first distribution file may be removed after extraction?
+      } else {
+        // Otherwise create an empty packages index
+        FileOutputStream out = null;
+        try {
+          out = new FileOutputStream(indexFile);
           out.write("{ \"packages\" : [ ] }".getBytes());
           out.close();
+        } finally {
+          if (out != null) {
+            out.close();
+          }
         }
-      } catch (IOException e) {
-        e.printStackTrace();
       }
     }
     indexer.parseIndex();
@@ -633,6 +621,23 @@ public class BaseNoGui {
       }
     }
     librariesIndexer.parseIndex();
+  }
+
+  private static File findDefaultPackageFile() {
+    File distFolder = getContentFile("dist");
+    if (!distFolder.exists()) {
+      return null;
+    }
+    File[] files = distFolder.listFiles();
+    if (files.length > 1) {
+      throw new IllegalStateException("More than one file in " + distFolder);
+    }
+    File file = files[0];
+    if (!file.isFile() || !(file.getName().contains(".tar.") || file.getName().endsWith(".zip"))) {
+      throw new IllegalStateException(file + " must be a valid .tar.* or .zip file");
+    }
+
+    return file;
   }
 
   static protected void initPlatform() {
@@ -771,7 +776,7 @@ public class BaseNoGui {
       packages.put(pack.getId(), pack);
     }
   }
-  
+
   static private void createToolPreferences(ContributionsIndexer indexer) {
     // Remove previous runtime preferences
     final String prefix = "runtime.tools.";

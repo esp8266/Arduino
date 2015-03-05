@@ -30,6 +30,6 @@ package cc.arduino.packages.contributions;
 
 public interface ContributedBoard {
 
-  public String getName();
+  String getName();
 
 }

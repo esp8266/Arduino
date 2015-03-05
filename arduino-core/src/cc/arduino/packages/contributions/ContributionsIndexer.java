@@ -49,9 +49,9 @@ import static processing.app.helpers.filefilters.OnlyDirs.ONLY_DIRS;
 
 public class ContributionsIndexer {
 
-  private File packagesFolder;
-  private File stagingFolder;
-  private File indexFile;
+  private final File packagesFolder;
+  private final File stagingFolder;
+  private final File indexFile;
   private ContributionsIndex index;
 
   public ContributionsIndexer(File preferencesFolder) {
@@ -75,7 +75,7 @@ public class ContributionsIndexer {
   // indexer.syncWithFilesystem();
   // }
 
-  public void parseIndex() throws JsonParseException, IOException {
+  public void parseIndex() throws IOException {
     // Parse index file
     parseIndex(indexFile);
 
@@ -93,8 +93,7 @@ public class ContributionsIndexer {
     index.fillCategories();
   }
 
-  private void parseIndex(File indexFile) throws JsonParseException,
-          IOException {
+  private void parseIndex(File indexFile) throws IOException {
     InputStream indexIn = new FileInputStream(indexFile);
     ObjectMapper mapper = new ObjectMapper();
     mapper.registerModule(new MrBeanModule());
