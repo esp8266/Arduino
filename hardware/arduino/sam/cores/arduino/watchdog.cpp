@@ -30,7 +30,7 @@ void watchdogEnable (uint32_t timeout)
 		timeout = 1;
 	else if (timeout > 0xFFF)
 		timeout = 0xFFF;
-	timeout = WDT_MR_WDRSTEN | WDT_MR_WDRPROC | WDT_MR_WDV(timeout) | WDT_MR_WDD(timeout);
+	timeout = WDT_MR_WDRSTEN | WDT_MR_WDV(timeout) | WDT_MR_WDD(timeout);
 	WDT_Enable (WDT, timeout);
 }
 
