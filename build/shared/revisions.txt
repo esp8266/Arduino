@@ -1,4 +1,36 @@
 
+ARDUINO 1.6.1
+
+[ide]
+* Improved Yun detection for upload via network (Ron Guest)
+* In platforms.txt "objcopy" recipe is no more tied to the "hex" format (Arnav Gupta)
+* /dev/cu.* serial ports are now filtered from the port list on MacOSX
+* Ports in ports list are now grouped by type
+* Upgraded avr-gcc toolchains to 3.4.5
+* Fixed: wrong parsing of boards.txt when using submenu and boards id with underscores
+* Windows: updated bundled JVM to latest 8u31
+* Windows: JVM memory settings can be customized editing arduino.l4j.ini and arduino_debug.l4j.ini files
+* "new" button now behaves as "File -> New..." menu: a new window with an empty sketch is created
+* Windows: opening a lonely sketch caused the IDE to crash. Fixed with a bounty on bountysource @gerito1
+* Bridge: fixed bug with multiple and failing YunClient.connect calls @sngl
+* Translations updated
+* Fixed: status board was not changing when using custom menu @PaulStoffregen
+* Fixed: better error message when using a busy serial device
+* Fixed: missing bool operator on EthernetClient
+* MacOSX: back to native file dialogs and buttons, when using experimental version
+* MacOSX: command line interface now works also with java-latest version
+
+ARDUINO 1.6.0 - 2015.02.09
+
+[ide]
+* Updated help with the latest docs
+* Updated translations
+
+ARDUINO 1.6.0rc3 - 2015.02.03
+
+[ide]
+* Bunch of bugfix on MacOSX build (https://github.com/arduino/Arduino/pull/2590)
+
 ARDUINO 1.6.0rc2 - 2015.01.20
 
 [ide]
@@ -20,7 +52,7 @@ The following changes are included also in the Arduino IDE 1.0.7:
 [ide]
 * Mitigated Serial Monitor resource exhaustion when the connected device sends a lot of data (Paul Stoffregen)
 
-ARDUINO 1.6.0rc1
+ARDUINO 1.6.0rc1 - 2014.12.11
 
 * IDE internals have been refactored and sorted out. (Claudio Indellicati)
   https://github.com/arduino/Arduino/pull/2328
@@ -32,11 +64,10 @@ ARDUINO 1.6.0rc1
 * Autosave on sketch Upload/Verify (Fulvio Ieva)
 * Sketch build process: fixed full rebuild on windows even if not needed
 * Sketch build process: core.a rebuild only if needed (Matthijs Kooijman)
-* Updated AStyle formatter to v2.04: http://astyle.sourceforge.net/notes.html
+* Updated AStyle formatter to v2.05: http://astyle.sourceforge.net/notes.html
 * Improved avrdude verbose upload (Matthijs Kooijman)
 * (Mac OSX) Add Exported UTI for ino files, allows quick look to view the
   content of the file and external editors to syntax highlight as C++ (Matt Lloyd)
-* Updated libastyle to 2.05
 
 [core]
 * sam: added -MMD flag to let gcc produce dependency files (full rebuild on Arduino Due is now triggered only if needed)

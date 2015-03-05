@@ -22,23 +22,11 @@
 
 package processing.app;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.util.*;
-import java.util.List;
-
-import javax.swing.*;
-
 import cc.arduino.packages.DiscoveryManager;
 import processing.app.debug.TargetBoard;
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
-import processing.app.helpers.CommandlineParser;
-import processing.app.helpers.FileUtils;
-import processing.app.helpers.GUIUserNotifier;
-import processing.app.helpers.OSUtils;
-import processing.app.helpers.PreferencesMap;
+import processing.app.helpers.*;
 import processing.app.helpers.filefilters.OnlyDirs;
 import processing.app.helpers.filefilters.OnlyFilesWithExtension;
 import processing.app.javax.swing.filechooser.FileNameExtensionFilter;
@@ -48,6 +36,14 @@ import processing.app.packages.Library;
 import processing.app.packages.LibraryList;
 import processing.app.tools.MenuScroller;
 import processing.app.tools.ZipDeflater;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+import java.util.*;
+import java.util.List;
+
 import static processing.app.I18n._;
 
 
@@ -186,7 +182,6 @@ public class Base {
     try {
       Class.forName("com.sun.jdi.VirtualMachine");
     } catch (ClassNotFoundException cnfe) {
-      showPlatforms();
       showError(_("Please install JDK 1.5 or later"),
                 _("Arduino requires a full JDK (not just a JRE)\n" +
                   "to run. Please install JDK 1.5 or later.\n" +
@@ -661,21 +656,30 @@ public class Base {
    */
   public void handleOpenPrompt() throws Exception {
     // get the frontmost window frame for placing file dialog
-    JFileChooser fd = new JFileChooser(Preferences.get("last.folder", getSketchbookFolder().getAbsolutePath()));
-    fd.setDialogTitle(_("Open an Arduino sketch..."));
-    fd.setFileSelectionMode(JFileChooser.FILES_ONLY);
-    fd.setFileFilter(new FileNameExtensionFilter(_("Sketches (*.ino, *.pde)"), "ino", "pde"));
-
-    Dimension preferredSize = fd.getPreferredSize();
-    fd.setPreferredSize(new Dimension(preferredSize.width + 200, preferredSize.height + 200));
-
-    int returnVal = fd.showOpenDialog(activeEditor);
-
-    if (returnVal != JFileChooser.APPROVE_OPTION) {
-      return;
+    FileDialog fd = new FileDialog(activeEditor, _("Open an Arduino sketch..."), FileDialog.LOAD);
+    File lastFolder = new File(Preferences.get("last.folder", getSketchbookFolder().getAbsolutePath()));
+    if (lastFolder.exists() && lastFolder.isFile()) {
+      lastFolder = lastFolder.getParentFile();
     }
+    fd.setDirectory(lastFolder.getAbsolutePath());
 
-    File inputFile = fd.getSelectedFile();
+    // Only show .pde files as eligible bachelors
+    fd.setFilenameFilter(new FilenameFilter() {
+      public boolean accept(File dir, String name) {
+        return name.toLowerCase().endsWith(".ino")
+                || name.toLowerCase().endsWith(".pde");
+      }
+    });
+
+    fd.setVisible(true);
+
+    String directory = fd.getDirectory();
+    String filename = fd.getFile();
+
+    // User canceled selection
+    if (filename == null) return;
+
+    File inputFile = new File(directory, filename);
 
     Preferences.set("last.folder", inputFile.getAbsolutePath());
     handleOpen(inputFile);
@@ -1188,6 +1192,7 @@ public class Base {
           Action subAction = new AbstractAction(_(boardCustomMenu.get(customMenuOption))) {
             public void actionPerformed(ActionEvent e) {
               Preferences.set("custom_" + menuId, ((TargetBoard)getValue("board")).getId() + "_" + getValue("custom_menu_option"));
+              onBoardOrPortChange();
             }
           };
           subAction.putValue("board", board);
@@ -1901,43 +1906,40 @@ public class Base {
 
 
   static public void showReference(String filename) {
-    File referenceFolder = getContentFile("reference");
+    File referenceFolder = getContentFile("reference/arduino.cc/en");
     File referenceFile = new File(referenceFolder, filename);
+    if (!referenceFile.exists())
+      referenceFile = new File(referenceFolder, filename + ".html");
     openURL(referenceFile.getAbsolutePath());
   }
 
   static public void showGettingStarted() {
     if (OSUtils.isMacOS()) {
-      showReference(_("Guide_MacOSX.html"));
+      showReference("Guide/MacOSX");
     } else if (OSUtils.isWindows()) {
-      showReference(_("Guide_Windows.html"));
+      showReference("Guide/Windows");
     } else {
-      openURL(_("http://www.arduino.cc/playground/Learning/Linux"));
+      openURL("http://www.arduino.cc/playground/Learning/Linux");
     }
   }
 
   static public void showReference() {
-    showReference(_("index.html"));
+    showReference("Reference/HomePage");
   }
 
 
   static public void showEnvironment() {
-    showReference(_("Guide_Environment.html"));
-  }
-
-
-  static public void showPlatforms() {
-    showReference(_("environment") + File.separator + _("platforms.html"));
+    showReference("Guide/Environment");
   }
 
 
   static public void showTroubleshooting() {
-    showReference(_("Guide_Troubleshooting.html"));
+    showReference("Guide/Troubleshooting");
   }
 
 
   static public void showFAQ() {
-    showReference(_("FAQ.html"));
+    showReference("Main/FAQ");
   }
 
 

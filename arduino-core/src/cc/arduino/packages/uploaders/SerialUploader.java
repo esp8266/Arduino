@@ -7,7 +7,7 @@
   Copyright (c) 2004-05
   Hernando Barragan
   Copyright (c) 2012
-  Cristian Maglie <c.maglie@bug.st>
+  Cristian Maglie <c.maglie@arduino.cc>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by

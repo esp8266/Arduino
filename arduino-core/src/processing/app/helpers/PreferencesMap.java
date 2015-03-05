@@ -319,4 +319,12 @@ public class PreferencesMap extends LinkedHashMap<String, String> {
     return new Boolean(prev);
   }
 
+  public String get(String key, String defaultValue) {
+    String value = get(key);
+    if (value != null) {
+      return value;
+    }
+    return defaultValue;
+  }
+
 }

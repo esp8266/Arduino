@@ -31,12 +31,17 @@ import processing.app.forms.PasswordAuthorizationDialog;
 import processing.app.helpers.OSUtils;
 import processing.app.helpers.PreferencesMapException;
 import processing.app.packages.Library;
-import static processing.app.I18n._;
-
-import java.io.*;
-import java.util.*;
 
 import javax.swing.*;
+import java.awt.*;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
+import static processing.app.I18n._;
 
 
 /**
@@ -632,42 +637,44 @@ public class Sketch {
    * because they can cause trouble.
    */
   protected boolean saveAs() throws IOException {
-    JFileChooser fd = new JFileChooser();
-    fd.setDialogTitle(_("Save sketch folder as..."));
-    fd.setDialogType(JFileChooser.SAVE_DIALOG);
+    String newParentDir = null;
+    String newName = null;
 
+    // get new name for folder
+    FileDialog fd = new FileDialog(editor, _("Save sketch folder as..."), FileDialog.SAVE);
     if (isReadOnly() || isUntitled()) {
       // default to the sketchbook folder
-      fd.setSelectedFile(new File(Base.getSketchbookFolder().getAbsolutePath(), data.getFolder().getName()));
+      fd.setDirectory(Base.getSketchbookFolder().getAbsolutePath());
     } else {
       // default to the parent folder of where this was
-      fd.setSelectedFile(data.getFolder());
+      // on macs a .getParentFile() method is required
+
+      fd.setDirectory(data.getFolder().getParentFile().getAbsolutePath());
     }
+    String oldName = data.getName();
+    fd.setFile(oldName);
 
-    int returnVal = fd.showSaveDialog(editor);
+    fd.setVisible(true);
+    newParentDir = fd.getDirectory();
+    newName = fd.getFile();
 
-    if (returnVal != JFileChooser.APPROVE_OPTION) {
-      return false;
-    }
+    // user canceled selection
+    if (newName == null) return false;
+    newName = Sketch.checkName(newName);
 
-    File selectedFile = fd.getSelectedFile();
-
-    String newName = Sketch.checkName(selectedFile.getName());
-
-    File newFolder = new File(selectedFile.getParentFile(), newName);
+    File newFolder = new File(newParentDir, newName);
 
     // make sure there doesn't exist a .cpp file with that name already
     // but ignore this situation for the first tab, since it's probably being
     // resaved (with the same name) to another location/folder.
     for (SketchCode code : data.getCodes()) {
-      if (newName.equalsIgnoreCase(code.getPrettyName()) &&
-        code.isExtension("cpp")) {
+      if (newName.equalsIgnoreCase(code.getPrettyName()) && code.isExtension("cpp")) {
         Base.showMessage(_("Nope"),
-			 I18n.format(
-                           _("You can't save the sketch as \"{0}\"\n" +
-                             "because the sketch already has a .cpp file with that name."),
-			   newName
-			 ));
+                I18n.format(
+                        _("You can't save the sketch as \"{0}\"\n" +
+                                "because the sketch already has a .cpp file with that name."),
+                        newName
+                ));
         return false;
       }
     }
@@ -686,11 +693,12 @@ public class Sketch {
 
       if (newPath.indexOf(oldPath) == 0) {
         Base.showWarning(_("How very Borges of you"),
-                         _("You cannot save the sketch into a folder\n" +
-                           "inside itself. This would go on forever."), null);
+                _("You cannot save the sketch into a folder\n" +
+                        "inside itself. This would go on forever."), null);
         return false;
       }
-    } catch (IOException e) { }
+    } catch (IOException e) {
+    }
 
     // if the new folder already exists, then need to remove
     // its contents before copying everything over
@@ -742,10 +750,10 @@ public class Sketch {
     data.getCode(0).saveAs(newFile);
 
     editor.handleOpenUnchecked(newFile,
-                               currentIndex,
-                               editor.getSelectionStart(),
-                               editor.getSelectionStop(),
-                               editor.getScrollPosition());
+            currentIndex,
+            editor.getSelectionStart(),
+            editor.getSelectionStop(),
+            editor.getScrollPosition());
 
     // Name changed, rebuild the sketch menus
     //editor.sketchbook.rebuildMenusAsync();
@@ -778,20 +786,16 @@ public class Sketch {
     }
 
     // get a dialog, select a file to add to the sketch
-    String prompt =
-      _("Select an image or other data file to copy to your sketch");
-    JFileChooser fd = new JFileChooser(Preferences.get("last.folder"));
-    fd.setDialogTitle(prompt);
+    FileDialog fd = new FileDialog(editor, _("Select an image or other data file to copy to your sketch"), FileDialog.LOAD);
+    fd.setVisible(true);
 
-    int returnVal = fd.showOpenDialog(editor);
-
-    if (returnVal != JFileChooser.APPROVE_OPTION) {
-      return;
-    }
+    String directory = fd.getDirectory();
+    String filename = fd.getFile();
+    if (filename == null) return;
 
     // copy the file into the folder. if people would rather
     // it move instead of copy, they can do it by hand
-    File sourceFile = fd.getSelectedFile();
+    File sourceFile = new File(directory, filename);
 
     // now do the work of adding the file
     boolean result = addFile(sourceFile);

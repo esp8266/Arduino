@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: Arduino IDE 1.5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-03-29 10:24-0400\n"
-"PO-Revision-Date: 2015-01-14 17:10+0000\n"
-"Last-Translator: Cristian Maglie <c.maglie@arduino.cc>\n"
+"PO-Revision-Date: 2015-02-09 21:22+0000\n"
+"Last-Translator: netavek <netavek.translate@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/projects/p/arduino-ide-15/language/uk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,11 +23,11 @@ msgstr "  (вимагає перезавантаження Arduino)"
 
 #: debug/Compiler.java:455
 msgid "'Keyboard' only supported on the Arduino Leonardo"
-msgstr "'Keyboard' підтримується тільки в Arduino Leonardo"
+msgstr "«Keyboard» підтримується лише в Arduino Leonardo"
 
 #: debug/Compiler.java:450
 msgid "'Mouse' only supported on the Arduino Leonardo"
-msgstr "'Mouse'  підтримується тільки в Arduino Leonardo"
+msgstr "«Mouse» підтримується лише в Arduino Leonardo"
 
 #: Preferences.java:478
 msgid "(edit only when Arduino is not running)"
@@ -37,7 +37,7 @@ msgstr "(редагуйте тільки якщо Arduino не запущено)
 msgid ""
 "--verbose, --verbose-upload and --verbose-build can only be used together "
 "with --verify or --upload"
-msgstr ""
+msgstr "--verbose, --verbose-upload та --verbose-build можуть використовуватись лише з with --verify або --upload"
 
 #: Sketch.java:746
 msgid ".pde -> .ino"
@@ -71,7 +71,7 @@ msgstr "Тека з іменем \"{0}\" вже існує. Неможливо �
 #: Base.java:2690
 #, java-format
 msgid "A library named {0} already exists"
-msgstr "Вже існує бібліотека з назвою  {0} "
+msgstr "Бібліотека з назвою {0} вже існує"
 
 #: UpdateCheck.java:103
 msgid ""
@@ -83,44 +83,48 @@ msgstr "Доступна нова версія Arduino,\nХочете перей
 msgid ""
 "A problem occurred while trying to open the\n"
 "files used to store the console output."
-msgstr "Виникла проблема при спробі відкрити файли,\nщо використовуються для зберігання виведу на консоль."
+msgstr "Виникла проблема при спробі відкрити файли,\nщо використовуються для зберігання виведення на консоль."
 
 #: Editor.java:1116
 msgid "About Arduino"
-msgstr "Про програму"
+msgstr "Про Arduino"
 
 #: Editor.java:650
 msgid "Add File..."
-msgstr "Додати файл..."
+msgstr "Додати файл…"
 
 #: Base.java:963
 msgid "Add Library..."
-msgstr "Додати бібліотеку"
+msgstr "Додати бібліотеку…"
+
+#: ../../../../../app/src/processing/app/Preferences.java:161
+msgid "Afrikaans"
+msgstr ""
 
 #: ../../../processing/app/Preferences.java:96
 msgid "Albanian"
-msgstr ""
+msgstr "албанська"
 
 #: tools/FixEncoding.java:77
 msgid ""
 "An error occurred while trying to fix the file encoding.\n"
 "Do not attempt to save this sketch as it may overwrite\n"
 "the old version. Use Open to re-open the sketch and try again.\n"
-msgstr "Виникла помилка при спробі виправити кодування.\nНе намагайтеся зберегти цей скетч, оскільки він може\nперезаписати стару версію. Використовуйте 'Відкрити', щоб\nвідкрити скетч заново.\n"
+msgstr "Виникла помилка при спробі виправити кодування.\nНе намагайтеся зберегти цей скетч, оскільки він може\nперезаписати стару версію. Використовуйте «Відкрити», щоб\nвідкрити скетч знову.\n"
 
 #: ../../../processing/app/BaseNoGui.java:528
 msgid "An error occurred while uploading the sketch"
-msgstr ""
+msgstr "Сталась помилка при вивантаженні скетча"
 
 #: ../../../processing/app/BaseNoGui.java:506
 #: ../../../processing/app/BaseNoGui.java:551
 #: ../../../processing/app/BaseNoGui.java:554
 msgid "An error occurred while verifying the sketch"
-msgstr ""
+msgstr "Сталась помилка при перевірці скетча"
 
 #: ../../../processing/app/BaseNoGui.java:521
 msgid "An error occurred while verifying/uploading the sketch"
-msgstr ""
+msgstr "Сталась помилка при перевірці/вивантаженні скетча"
 
 #: Base.java:228
 msgid ""
@@ -142,7 +146,7 @@ msgstr "Архівувати скетч"
 
 #: tools/Archiver.java:109
 msgid "Archive sketch as:"
-msgstr "заархівувати скетч як:"
+msgstr "Архівувати скетч як:"
 
 #: tools/Archiver.java:139
 msgid "Archive sketch canceled."
@@ -152,21 +156,21 @@ msgstr "Архівування скетчу скасовано"
 msgid ""
 "Archiving the sketch has been canceled because\n"
 "the sketch couldn't save properly."
-msgstr "Архівування скетчу було перервано, бо\nскетч некоректно зберігся."
+msgstr "Архівування скетчу було перервано,\nоскільки скетч некоректно зберігся."
 
 #: ../../../processing/app/I18n.java:83
 msgid "Arduino ARM (32-bits) Boards"
-msgstr ""
+msgstr "Arduino ARM (32-bits) Boards"
 
 #: ../../../processing/app/I18n.java:82
 msgid "Arduino AVR Boards"
-msgstr ""
+msgstr "Arduino AVR Boards"
 
 #: Editor.java:2137
 msgid ""
 "Arduino can only open its own sketches\n"
 "and other files ending in .ino or .pde"
-msgstr ""
+msgstr "Arduino може відкривати лише власні скетчі\nта інші файли з розширенням .ino або .pde"
 
 #: Base.java:1682
 msgid ""
@@ -189,7 +193,7 @@ msgstr "Arduino потрібна повна версія JDK (а не тільк
 
 #: ../../../processing/app/EditorStatus.java:471
 msgid "Arduino: "
-msgstr ""
+msgstr "Arduino:"
 
 #: Sketch.java:588
 #, java-format
@@ -202,39 +206,39 @@ msgstr "Ви дійсно хочете видалити цей скетч?"
 
 #: ../../../processing/app/Base.java:356
 msgid "Argument required for --board"
-msgstr ""
+msgstr "Необхідний аргумент для --board"
 
 #: ../../../processing/app/Base.java:370
 msgid "Argument required for --curdir"
-msgstr ""
+msgstr "Необхідний аргумент для --curdir"
 
 #: ../../../processing/app/Base.java:385
 msgid "Argument required for --get-pref"
-msgstr ""
+msgstr "Необхідний аргумент для --get-pref"
 
 #: ../../../processing/app/Base.java:363
 msgid "Argument required for --port"
-msgstr ""
+msgstr "Необхідний аргумент для --port"
 
 #: ../../../processing/app/Base.java:377
 msgid "Argument required for --pref"
-msgstr ""
+msgstr "Необхідний аргумент для --pref"
 
 #: ../../../processing/app/Base.java:384
 msgid "Argument required for --preferences-file"
-msgstr ""
+msgstr "Необхідний аргумент для --preferences-file"
 
 #: ../../../processing/app/Preferences.java:137
 msgid "Armenian"
-msgstr ""
+msgstr "вірменська"
 
 #: ../../../processing/app/Preferences.java:138
 msgid "Asturian"
-msgstr ""
+msgstr "австрійська"
 
 #: ../../../processing/app/debug/Compiler.java:145
 msgid "Authorization required"
-msgstr ""
+msgstr "Потрібна авторизація"
 
 #: tools/AutoFormat.java:91
 msgid "Auto Format"
@@ -242,19 +246,19 @@ msgstr "Автоформатування"
 
 #: tools/AutoFormat.java:934
 msgid "Auto Format Canceled: Too many left curly braces."
-msgstr "Автоформатування перервано: надто багато лівих фігурних дужок."
+msgstr "Автоформатування перервано: забагато лівих фігурних дужок."
 
 #: tools/AutoFormat.java:925
 msgid "Auto Format Canceled: Too many left parentheses."
-msgstr "Автоформатування перервано: надто багато лівих круглих дужок."
+msgstr "Автоформатування перервано: забагато лівих круглих дужок."
 
 #: tools/AutoFormat.java:931
 msgid "Auto Format Canceled: Too many right curly braces."
-msgstr "Автоформатування перервано: занадто багато правих фігурних дужок."
+msgstr "Автоформатування перервано: забагато правих фігурних дужок."
 
 #: tools/AutoFormat.java:922
 msgid "Auto Format Canceled: Too many right parentheses."
-msgstr "Автоформатування перервано: занадто багато правих круглих дужок."
+msgstr "Автоформатування перервано: забагато правих круглих дужок."
 
 #: tools/AutoFormat.java:944
 msgid "Auto Format finished."
@@ -266,7 +270,7 @@ msgstr "Автоматично асоціювати .ino файли з Arduino"
 
 #: SerialMonitor.java:110
 msgid "Autoscroll"
-msgstr "Автопрокрутка"
+msgstr "Автопрокручування"
 
 #: Editor.java:2619
 #, java-format
@@ -279,35 +283,39 @@ msgstr "Вибрано неправильний файл"
 
 #: ../../../processing/app/debug/Compiler.java:89
 msgid "Bad sketch primary file or bad sketch directory structure"
-msgstr ""
+msgstr "Неправильний файл скетчу або структура каталогів"
 
 #: ../../../processing/app/Preferences.java:149
 msgid "Basque"
-msgstr ""
+msgstr "баскійська"
 
 #: ../../../processing/app/Preferences.java:139
 msgid "Belarusian"
+msgstr "білоруська"
+
+#: ../../../../../app/src/processing/app/Preferences.java:165
+msgid "Bengali (India)"
 msgstr ""
 
 #: ../../../processing/app/Base.java:1433
 #: ../../../processing/app/Editor.java:707
 msgid "Board"
-msgstr ""
+msgstr "Плата"
 
 #: ../../../processing/app/debug/TargetBoard.java:42
 #, java-format
 msgid ""
 "Board {0}:{1}:{2} doesn''t define a ''build.board'' preference. Auto-set to:"
 " {3}"
-msgstr ""
+msgstr "Плата {0}:{1}:{2} не знаходить налаштувань «build.board». Авто-значення: {3}"
 
 #: ../../../processing/app/EditorStatus.java:472
 msgid "Board: "
-msgstr ""
+msgstr "Плата:"
 
 #: ../../../processing/app/Preferences.java:140
 msgid "Bosnian"
-msgstr ""
+msgstr "боснійська"
 
 #: SerialMonitor.java:112
 msgid "Both NL & CR"
@@ -323,15 +331,15 @@ msgstr "Відсутня або не перезаписується тека з�
 
 #: ../../../processing/app/Sketch.java:1530
 msgid "Build options changed, rebuilding all"
-msgstr ""
+msgstr "Змінились налаштування збірки, все має бути перезібрано"
 
 #: ../../../processing/app/Preferences.java:80
 msgid "Bulgarian"
-msgstr ""
+msgstr "болгарська"
 
 #: ../../../processing/app/Preferences.java:141
 msgid "Burmese (Myanmar)"
-msgstr ""
+msgstr "бірманська (м’янманська)"
 
 #: Editor.java:708
 msgid "Burn Bootloader"
@@ -339,21 +347,21 @@ msgstr "Записати завантажувач"
 
 #: Editor.java:2504
 msgid "Burning bootloader to I/O Board (this may take a minute)..."
-msgstr "Запис завантажувача на плату введення/виводу (хвилиночку)..."
+msgstr "Запис завантажувача на плату введення/виведення (хвилиночку)…"
 
 #: ../../../processing/app/Base.java:379
 #, java-format
 msgid "Can only pass one of: {0}"
-msgstr ""
+msgstr "Можна передати лише один з: {0}"
 
 #: ../../../processing/app/BaseNoGui.java:504
 #: ../../../processing/app/BaseNoGui.java:549
 msgid "Can't find the sketch in the specified path"
-msgstr ""
+msgstr "Не можу знайти скетч за цим шляхом"
 
 #: ../../../processing/app/Preferences.java:92
 msgid "Canadian French"
-msgstr ""
+msgstr "канадська французька"
 
 #: Preferences.java:79 Sketch.java:585 Sketch.java:737 Sketch.java:1042
 #: Editor.java:2064 Editor.java:2145 Editor.java:2465
@@ -366,7 +374,7 @@ msgstr "Перейменування неможливе"
 
 #: ../../../processing/app/Base.java:465
 msgid "Cannot specify any sketch files"
-msgstr ""
+msgstr "Не можу визначити будь-які скетч-файли"
 
 #: SerialMonitor.java:112
 msgid "Carriage return"
@@ -382,19 +390,19 @@ msgstr "Перевіряти оновлення при запуску"
 
 #: ../../../processing/app/Preferences.java:142
 msgid "Chinese (China)"
-msgstr ""
+msgstr "китайська (Китай)"
 
 #: ../../../processing/app/Preferences.java:142
 msgid "Chinese (Hong Kong)"
-msgstr ""
+msgstr "китайська (Гонконг)"
 
 #: ../../../processing/app/Preferences.java:144
 msgid "Chinese (Taiwan)"
-msgstr ""
+msgstr "китайська (Тайвань)"
 
 #: ../../../processing/app/Preferences.java:143
 msgid "Chinese (Taiwan) (Big5)"
-msgstr ""
+msgstr "китайська (Тайвань) (Big5)"
 
 #: Preferences.java:88
 msgid "Chinese Simplified"
@@ -430,7 +438,7 @@ msgstr "Копіювати як HTML"
 
 #: ../../../processing/app/EditorStatus.java:455
 msgid "Copy error messages"
-msgstr ""
+msgstr "Скопіюйте повідомлення про помилку"
 
 #: Editor.java:1165 Editor.java:2715
 msgid "Copy for Forum"
@@ -439,7 +447,7 @@ msgstr "Копіювати для форуму"
 #: Sketch.java:1089
 #, java-format
 msgid "Could not add ''{0}'' to the sketch."
-msgstr "Неможливо додати ''{0}'' до скетчу."
+msgstr "Неможливо додати «{0}» до скетчу."
 
 #: Editor.java:2188
 msgid "Could not copy to a proper location."
@@ -451,7 +459,7 @@ msgstr "Неможливо створити теку скетчу."
 
 #: Editor.java:2206
 msgid "Could not create the sketch."
-msgstr "Неможливо створити скетч"
+msgstr "Неможливо створити скетч."
 
 #: Sketch.java:617
 #, java-format
@@ -461,7 +469,7 @@ msgstr "Неможливо видалити \"{0}\"."
 #: Sketch.java:1066
 #, java-format
 msgid "Could not delete the existing ''{0}'' file."
-msgstr "Не вдається видалити існуючий файл ''{0}''."
+msgstr "Не вдається видалити наявний файл «{0}»."
 
 #: Base.java:2533 Base.java:2556
 #, java-format
@@ -471,17 +479,17 @@ msgstr "Не вдалося видалити {0}"
 #: ../../../processing/app/debug/TargetPlatform.java:74
 #, java-format
 msgid "Could not find boards.txt in {0}. Is it pre-1.5?"
-msgstr ""
+msgstr "Не можу знайти boards.txt в {0}. Це пре-1.5?"
 
 #: ../../../cc/arduino/packages/uploaders/SerialUploader.java:282
 #, java-format
 msgid "Could not find tool {0}"
-msgstr ""
+msgstr "Не можу знайти інструмент {0}"
 
 #: ../../../cc/arduino/packages/uploaders/SerialUploader.java:278
 #, java-format
 msgid "Could not find tool {0} from package {1}"
-msgstr ""
+msgstr "Не можу знайти інструмент {0} з пакету {1}"
 
 #: Base.java:1934
 #, java-format
@@ -511,17 +519,17 @@ msgstr "Не вдалося перезберегти скетч"
 msgid ""
 "Could not read color theme settings.\n"
 "You'll need to reinstall Arduino."
-msgstr ""
+msgstr "Не вдалось прочитати налаштування кольорової теми.\nНеобхідно перевстановити Arduino."
 
 #: Preferences.java:219
 msgid ""
 "Could not read default settings.\n"
 "You'll need to reinstall Arduino."
-msgstr "Налаштування за замовчуванням не читаються.\nВам потрібно перевстановити Arduino."
+msgstr "Не вдалось прочитати налаштування за умовчанням.\nНеобхідно перевстановити Arduino."
 
 #: ../../../processing/app/Sketch.java:1525
 msgid "Could not read prevous build preferences file, rebuilding all"
-msgstr ""
+msgstr "Не вдалось прочитати попередній файл налаштування збірки, все має бути перезібрано"
 
 #: Base.java:2482
 #, java-format
@@ -531,19 +539,19 @@ msgstr "Не вдалося видалити стару версію {0}"
 #: Sketch.java:483 Sketch.java:528
 #, java-format
 msgid "Could not rename \"{0}\" to \"{1}\""
-msgstr "Неможливо перейменувати \"{0}\" в \"{1}\""
+msgstr "Не вдалося перейменувати \"{0}\" в \"{1}\""
 
 #: Sketch.java:475
 msgid "Could not rename the sketch. (0)"
-msgstr "Неможливо перейменувати скетч. (0)"
+msgstr "Не вдалося перейменувати скетч. (0)"
 
 #: Sketch.java:496
 msgid "Could not rename the sketch. (1)"
-msgstr "Неможливо перейменувати скетч. (1)"
+msgstr "Не вдалося перейменувати скетч. (1)"
 
 #: Sketch.java:503
 msgid "Could not rename the sketch. (2)"
-msgstr "Неможливо перейменувати скетч. (2)"
+msgstr "Не вдалося перейменувати скетч. (2)"
 
 #: Base.java:2492
 #, java-format
@@ -552,30 +560,30 @@ msgstr "Не вдалося замінити {0}"
 
 #: ../../../processing/app/Sketch.java:1579
 msgid "Could not write build preferences file"
-msgstr ""
+msgstr "Не вдалося записати файл налаштування збірки"
 
 #: tools/Archiver.java:74
 msgid "Couldn't archive sketch"
-msgstr "Скетч не може бути заархівовано"
+msgstr "Не вдалося заархівувати скетч"
 
 #: Sketch.java:1647
 msgid "Couldn't determine program size: {0}"
-msgstr "Не можу визначити розмір програми: {0}"
+msgstr "Не вдалося визначити розмір програми: {0}"
 
 #: Sketch.java:616
 msgid "Couldn't do it"
-msgstr "Неможливо зробити це"
+msgstr "Не вдалося зробити це"
 
 #: debug/BasicUploader.java:209
 msgid ""
 "Couldn't find a Board on the selected port. Check that you have the correct "
 "port selected.  If it is correct, try pressing the board's reset button "
 "after initiating the upload."
-msgstr "Не знайдено плату на обраному порту. Перевірте, чи обрано вірний порт.  Якщо це так перезавантажте плату натиском кнопки на ній."
+msgstr "Не вдалося знайти плату на обраному порті. Перевірте чи обрано правильний порт. Якщо так — спробуйте перезавантажити плату кнопкою після початку вивантаження."
 
 #: ../../../processing/app/Preferences.java:82
 msgid "Croatian"
-msgstr ""
+msgstr "хорватська"
 
 #: Editor.java:1149 Editor.java:2699
 msgid "Cut"
@@ -583,11 +591,19 @@ msgstr "Вирізати"
 
 #: ../../../processing/app/Preferences.java:83
 msgid "Czech"
+msgstr "чеська"
+
+#: ../../../../../app/src/processing/app/Preferences.java:119
+msgid "Czech (Czech Republic)"
 msgstr ""
 
 #: Preferences.java:90
 msgid "Danish"
 msgstr "данська"
+
+#: ../../../../../app/src/processing/app/Preferences.java:120
+msgid "Danish (Denmark)"
+msgstr ""
 
 #: Editor.java:1224 Editor.java:2765
 msgid "Decrease Indent"
@@ -601,15 +617,15 @@ msgstr "Видалити"
 msgid ""
 "Device is not responding, check the right serial port is selected or RESET "
 "the board right before exporting"
-msgstr "Пристрій не відповідає. Перевірте, чи правильно обрано послідовний порт,або перезавантажте плату прямо перед завантаженням"
+msgstr "Пристрій не відповідає. Перевірте, чи правильно обрано послідовний порт, або перезавантажте плату просто перед експортом"
 
 #: tools/FixEncoding.java:57
 msgid "Discard all changes and reload sketch?"
-msgstr "Не зберігати зміни і перезавантажити скетч?"
+msgstr "Скасувати зміни і перезавантажити скетч?"
 
 #: ../../../processing/app/Preferences.java:438
 msgid "Display line numbers"
-msgstr ""
+msgstr "Показувати нумерацію рядків"
 
 #: Editor.java:2064
 msgid "Don't Save"
@@ -626,7 +642,7 @@ msgstr "Запис завантажувача виконано."
 #: ../../../processing/app/BaseNoGui.java:507
 #: ../../../processing/app/BaseNoGui.java:552
 msgid "Done compiling"
-msgstr ""
+msgstr "Компіляцію виконано"
 
 #: Editor.java:1911 Editor.java:1928
 msgid "Done compiling."
@@ -638,7 +654,7 @@ msgstr "Друк виконано."
 
 #: ../../../processing/app/BaseNoGui.java:514
 msgid "Done uploading"
-msgstr ""
+msgstr "Вивантаження виконано"
 
 #: Editor.java:2395 Editor.java:2431
 msgid "Done uploading."
@@ -650,7 +666,7 @@ msgstr "голландська"
 
 #: ../../../processing/app/Preferences.java:144
 msgid "Dutch (Netherlands)"
-msgstr ""
+msgstr "нідерландська (Нідерланди)"
 
 #: Editor.java:1130
 msgid "Edit"
@@ -662,7 +678,7 @@ msgstr "Розмір шрифту редактора: "
 
 #: Preferences.java:353
 msgid "Editor language: "
-msgstr "Мова інтерфейсу"
+msgstr "Мова інтерфейсу:"
 
 #: Preferences.java:92
 msgid "English"
@@ -670,7 +686,7 @@ msgstr "англійська"
 
 #: ../../../processing/app/Preferences.java:145
 msgid "English (United Kingdom)"
-msgstr ""
+msgstr "англійська (Велика Британія)"
 
 #: Editor.java:1062
 msgid "Environment"
@@ -692,28 +708,28 @@ msgstr "Помилка при компіляції."
 
 #: Base.java:1674
 msgid "Error getting the Arduino data folder."
-msgstr "Проблема при зверненні до теки з даними Arduino"
+msgstr "Проблема при зверненні до теки з даними Arduino."
 
 #: Serial.java:593
 #, java-format
 msgid "Error inside Serial.{0}()"
-msgstr "Помилка в Serial. {0}()"
+msgstr "Помилка в послідовному порті. {0}()"
 
 #: ../../../processing/app/Base.java:1232
 msgid "Error loading libraries"
-msgstr ""
+msgstr "Помилка завантаження бібліотеки"
 
 #: ../../../processing/app/debug/TargetPlatform.java:95
 #: ../../../processing/app/debug/TargetPlatform.java:106
 #: ../../../processing/app/debug/TargetPlatform.java:117
 #, java-format
 msgid "Error loading {0}"
-msgstr ""
+msgstr "Помилка завантаження {0}"
 
 #: Serial.java:181
 #, java-format
 msgid "Error opening serial port ''{0}''."
-msgstr "Помилка при відкритті послідовного порту ''{0}''."
+msgstr "Помилка при відкритті послідовного порту «{0}»."
 
 #: Preferences.java:277
 msgid "Error reading preferences"
@@ -724,33 +740,33 @@ msgstr "Помилка читання налаштувань"
 msgid ""
 "Error reading the preferences file. Please delete (or move)\n"
 "{0} and restart Arduino."
-msgstr "Помилка читання файлу налаштувань. Будь ласка вилучіть (або перемістіть) \n{0} і перезавантажте Arduino."
+msgstr "Помилка читання файлу налаштувань. Будь ласка, вилучіть\n(або перемістіть) {0} і перезавантажте Arduino."
 
 #: ../../../cc/arduino/packages/DiscoveryManager.java:25
 msgid "Error starting discovery method: "
-msgstr ""
+msgstr "Помилка запуску методу виявлення:"
 
 #: Serial.java:125
 #, java-format
 msgid "Error touching serial port ''{0}''."
-msgstr "Помилка при відкритті послідовного порту ''{0}''."
+msgstr "Помилка відкриття послідовного порту «{0}»."
 
 #: Editor.java:2512 Editor.java:2516 Editor.java:2520
 msgid "Error while burning bootloader."
-msgstr "Помилка при записі завантажувача."
+msgstr "Помилка запису завантажувача."
 
 #: ../../../processing/app/Editor.java:2555
 msgid "Error while burning bootloader: missing '{0}' configuration parameter"
-msgstr ""
+msgstr "Помилка запису завантажувача: відсутній конфігураційний параметр «{0}»"
 
 #: ../../../../../app/src/processing/app/Editor.java:1940
 msgid "Error while compiling: missing '{0}' configuration parameter"
-msgstr ""
+msgstr "Помилка компіляції: відсутній конфігураційний параметр «{0}»"
 
 #: SketchCode.java:83
 #, java-format
 msgid "Error while loading code {0}"
-msgstr "Помилка при завантаженні коду {0}"
+msgstr "Помилка завантаження коду {0}"
 
 #: Editor.java:2567
 msgid "Error while printing."
@@ -758,22 +774,22 @@ msgstr "Помилка під час друку"
 
 #: ../../../processing/app/BaseNoGui.java:528
 msgid "Error while uploading"
-msgstr ""
+msgstr "Помилка вивантаження"
 
 #: ../../../processing/app/Editor.java:2409
 #: ../../../processing/app/Editor.java:2449
 msgid "Error while uploading: missing '{0}' configuration parameter"
-msgstr ""
+msgstr "Помилка вивантаження: відсутній конфігураційний параметр «{0}»"
 
 #: ../../../processing/app/BaseNoGui.java:506
 #: ../../../processing/app/BaseNoGui.java:551
 #: ../../../processing/app/BaseNoGui.java:554
 msgid "Error while verifying"
-msgstr ""
+msgstr "Помилка перевірки"
 
 #: ../../../processing/app/BaseNoGui.java:521
 msgid "Error while verifying/uploading"
-msgstr ""
+msgstr "Помилка перевірки/вивантаження"
 
 #: Preferences.java:93
 msgid "Estonian"
@@ -781,7 +797,7 @@ msgstr "естонська"
 
 #: ../../../processing/app/Preferences.java:146
 msgid "Estonian (Estonia)"
-msgstr ""
+msgstr "естонська (Естонія)"
 
 #: Editor.java:516
 msgid "Examples"
@@ -789,16 +805,12 @@ msgstr "Приклади"
 
 #: Editor.java:2482
 msgid "Export canceled, changes must first be saved."
-msgstr "Експорт скасований, спочатку збережіть зміни."
-
-#: Base.java:2100
-msgid "FAQ.html"
-msgstr "FAQ.html"
+msgstr "Експорт скасовано, спочатку збережіть зміни."
 
 #: ../../../processing/app/Base.java:416
 #, java-format
 msgid "Failed to open sketch: \"{0}\""
-msgstr ""
+msgstr "Не вдалось відкрити скетч: \"{0}\""
 
 #: Editor.java:491
 msgid "File"
@@ -834,7 +846,7 @@ msgstr "Знайти:"
 
 #: ../../../processing/app/Preferences.java:147
 msgid "Finnish"
-msgstr ""
+msgstr "фінська"
 
 #: tools/FixEncoding.java:41 tools/FixEncoding.java:58
 #: tools/FixEncoding.java:79
@@ -850,7 +862,7 @@ msgstr "Щодо встановлення бібліотек, переглянь
 #: ../../../cc/arduino/packages/uploaders/SerialUploader.java:118
 #, java-format
 msgid "Forcing reset using 1200bps open/close on port {0}"
-msgstr ""
+msgstr "Примусово скинути за допомогою 1200 біт/с відкривання/закривання порту {0}"
 
 #: Preferences.java:95
 msgid "French"
@@ -864,9 +876,13 @@ msgstr "Часті питання"
 msgid "Galician"
 msgstr "галісійська"
 
+#: ../../../../../app/src/processing/app/Preferences.java:176
+msgid "Galician (Spain)"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:94
 msgid "Georgian"
-msgstr ""
+msgstr "грузинська"
 
 #: Preferences.java:97
 msgid "German"
@@ -881,36 +897,20 @@ msgstr "Початок роботи"
 msgid ""
 "Global variables use {0} bytes ({2}%%) of dynamic memory, leaving {3} bytes "
 "for local variables. Maximum is {1} bytes."
-msgstr ""
+msgstr "Глобальні змінні використовують {0} байтів ({2}%%) динамічної пам’яті, і залишають {3} байтів для локальних змінних. Щонайбільше {1} байтів."
 
 #: ../../../processing/app/Sketch.java:1651
 #, java-format
 msgid "Global variables use {0} bytes of dynamic memory."
-msgstr ""
+msgstr "Глобальні змінні використовують {0} байтів динамічної пам’яті."
 
 #: Preferences.java:98
 msgid "Greek"
 msgstr "грецька"
 
-#: Base.java:2085
-msgid "Guide_Environment.html"
-msgstr "Guide_Environment.html"
-
-#: Base.java:2071
-msgid "Guide_MacOSX.html"
-msgstr "Guide_MacOSX.html"
-
-#: Base.java:2095
-msgid "Guide_Troubleshooting.html"
-msgstr "Guide_Troubleshooting.html"
-
-#: Base.java:2073
-msgid "Guide_Windows.html"
-msgstr "Guide_Windows.html"
-
 #: ../../../processing/app/Preferences.java:95
 msgid "Hebrew"
-msgstr ""
+msgstr "іврит"
 
 #: Editor.java:1015
 msgid "Help"
@@ -924,7 +924,7 @@ msgstr "хінді"
 msgid ""
 "How about saving the sketch first \n"
 "before trying to rename it?"
-msgstr "Як щодо того, щоб спочатку зберегти скетч, \nперед тим як перейменовувати його?"
+msgstr "Як щодо збереження скетчу перед\nспробою його перейменувати?"
 
 #: Sketch.java:882
 msgid "How very Borges of you"
@@ -940,11 +940,11 @@ msgstr "Ігнорувати регістр"
 
 #: Base.java:1058
 msgid "Ignoring bad library name"
-msgstr "ігнорую бібліотеку з поганим ім'ям"
+msgstr "Ігнорую бібліотеку з поганим ім’ям"
 
 #: Base.java:1436
 msgid "Ignoring sketch with bad name"
-msgstr "Ігнорую скетч з поганим ім'ям"
+msgstr "Ігнорую скетч з поганим ім’ям"
 
 #: Editor.java:636
 msgid "Import Library..."
@@ -959,7 +959,7 @@ msgid ""
 "disable this in the Preferences dialog.\n"
 "\n"
 "Save sketch and update its extension?"
-msgstr ""
+msgstr "В Arduino 1.0 розширення за умовчанням було змінено\nз .pde на .ino. Нові скетчі (в тому числі створені\nза допомогою «Зберегти як») мають нове розширення.\nРозширення старих скетчів оновиться при збереженні,\nале ви можете скасувати це у Налаштуваннях.\n\nЗберегти скетч та оновити розширення?"
 
 #: Editor.java:1216 Editor.java:2757
 msgid "Increase Indent"
@@ -972,7 +972,7 @@ msgstr "індонезійська"
 #: ../../../processing/app/Base.java:1204
 #, java-format
 msgid "Invalid library found in {0}: {1}"
-msgstr ""
+msgstr "Недійсна бібліотека знаходиться в {0}: {1}"
 
 #: Preferences.java:102
 msgid "Italian"
@@ -992,7 +992,7 @@ msgstr "латвійська"
 
 #: Base.java:2699
 msgid "Library added to your libraries. Check \"Import library\" menu"
-msgstr "Бібліотеку додано до ваших бібліотек. Перевірте меню \"Імпорт бібліотек\" "
+msgstr "Бібліотеку додано до ваших бібліотек. Перевірте меню «Імпортувати бібліотеку…»"
 
 #: Preferences.java:106
 msgid "Lithuaninan"
@@ -1000,6 +1000,10 @@ msgstr "литовська"
 
 #: ../../../processing/app/Sketch.java:1684
 msgid "Low memory available, stability problems may occur."
+msgstr "Низький обсяг доступної пам’яті, можливі проблеми зі стабільністю."
+
+#: ../../../../../app/src/processing/app/Preferences.java:180
+msgid "Malay (Malaysia)"
 msgstr ""
 
 #: Preferences.java:107
@@ -1012,15 +1016,15 @@ msgstr "Повідомлення"
 
 #: ../../../processing/app/preproc/PdePreprocessor.java:412
 msgid "Missing the */ from the end of a /* comment */"
-msgstr ""
+msgstr "Відсутній */ для кінця /* примітки */"
 
 #: ../../../processing/app/BaseNoGui.java:455
 msgid "Mode not supported"
-msgstr ""
+msgstr "Режим не підтримується"
 
 #: Preferences.java:449
 msgid "More preferences can be edited directly in the file"
-msgstr "Більше властивостей може бути відредаговано прямо у файлі"
+msgstr "Більше властивостей може бути відредаговано просто у файлі"
 
 #: Editor.java:2156
 msgid "Moving"
@@ -1028,27 +1032,31 @@ msgstr "Переміщення"
 
 #: ../../../processing/app/BaseNoGui.java:484
 msgid "Multiple files not supported"
-msgstr ""
+msgstr "Декілька файлів не підтримуються"
 
 #: ../../../processing/app/Base.java:395
 msgid "Must specify exactly one sketch file"
-msgstr ""
+msgstr "Необхідно вказати лише один файл скетчу"
 
 #: ../../../processing/app/Preferences.java:158
 msgid "N'Ko"
-msgstr ""
+msgstr "нко"
 
 #: Sketch.java:282
 msgid "Name for new file:"
-msgstr "Ім'я для нового файлу:"
+msgstr "Ім’я для нового файлу:"
 
 #: ../../../processing/app/Preferences.java:149
 msgid "Nepali"
+msgstr "непальська"
+
+#: ../../../../../app/src/processing/app/Editor.java:65
+msgid "Network ports"
 msgstr ""
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:51
 msgid "Network upload using programmer not supported"
-msgstr ""
+msgstr "Мережеві вивантаження з використанням програматора не підтримуються"
 
 #: EditorToolbar.java:41 Editor.java:493
 msgid "New"
@@ -1076,11 +1084,11 @@ msgstr "Ні"
 
 #: ../../../processing/app/debug/Compiler.java:146
 msgid "No athorization data found"
-msgstr ""
+msgstr "Не знайдено даних авторизації"
 
 #: debug/Compiler.java:126
 msgid "No board selected; please choose a board from the Tools > Board menu."
-msgstr "Не обрана модель плати, будь ласка, виберіть її в меню Сервіс > Плати."
+msgstr "Не обрано модель плати. Будь ласка, виберіть її в меню Сервіс > Плати."
 
 #: tools/format/src/AutoFormat.java:54 tools/AutoFormat.java:916
 msgid "No changes necessary for Auto Format."
@@ -1088,7 +1096,7 @@ msgstr "Нічого форматувати."
 
 #: ../../../processing/app/BaseNoGui.java:665
 msgid "No command line parameters found"
-msgstr ""
+msgstr "Не знайдено параметрів командного рядка"
 
 #: Editor.java:373
 msgid "No files were added to the sketch."
@@ -1104,7 +1112,7 @@ msgstr "Без закінчення рядка"
 
 #: ../../../processing/app/BaseNoGui.java:665
 msgid "No parameters"
-msgstr ""
+msgstr "Немає параметрів"
 
 #: Base.java:541
 msgid "No really, time for some fresh air for you."
@@ -1118,24 +1126,24 @@ msgstr "Немає посилань для \"{0}\""
 #: ../../../processing/app/BaseNoGui.java:504
 #: ../../../processing/app/BaseNoGui.java:549
 msgid "No sketch"
-msgstr ""
+msgstr "Немає скетчу"
 
 #: ../../../processing/app/BaseNoGui.java:428
 msgid "No sketchbook"
-msgstr ""
+msgstr "Немає теки зі скетчами"
 
 #: ../../../processing/app/Sketch.java:204
 msgid "No valid code files found"
-msgstr ""
+msgstr "Не знайдено файлів із дійсним кодом"
 
 #: ../../../processing/app/Base.java:309
 msgid "No valid configured cores found! Exiting..."
-msgstr ""
+msgstr "Не знайдено дійсних налаштованих ядер! Вихід…"
 
 #: ../../../processing/app/debug/TargetPackage.java:63
 #, java-format
 msgid "No valid hardware definitions found in folder {0}."
-msgstr ""
+msgstr "Не знайдено дійсних апаратних налаштувань у теці {0}."
 
 #: Base.java:191
 msgid "Non-fatal error while setting the Look & Feel."
@@ -1145,15 +1153,23 @@ msgstr "Нефатальна помилка при налаштуванні зо
 msgid "Nope"
 msgstr "Ні"
 
+#: ../../../../../app/src/processing/app/Preferences.java:181
+msgid "Norwegian"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:108
 msgid "Norwegian Bokmål"
+msgstr "норвезька (букмол)"
+
+#: ../../../../../app/src/processing/app/Preferences.java:182
+msgid "Norwegian Nynorsk"
 msgstr ""
 
 #: ../../../processing/app/Sketch.java:1656
 msgid ""
 "Not enough memory; see http://www.arduino.cc/en/Guide/Troubleshooting#size "
 "for tips on reducing your footprint."
-msgstr ""
+msgstr "Не вистачає пам’яті; зверніться до http://www.arduino.cc/en/Guide/Troubleshooting#size за порадами щодо зменшення необхідного розміру пам’яті."
 
 #: Preferences.java:80 Sketch.java:585 Sketch.java:737 Sketch.java:1042
 #: Editor.java:2145 Editor.java:2465
@@ -1166,11 +1182,11 @@ msgstr "Один файл доданий до скетчу."
 
 #: ../../../processing/app/BaseNoGui.java:455
 msgid "Only --verify, --upload or --get-pref are supported"
-msgstr ""
+msgstr "Підтримуються лише --verify, --upload або --get-pref"
 
 #: EditorToolbar.java:41
 msgid "Open"
-msgstr "Відкрити..."
+msgstr "Відкрити"
 
 #: Editor.java:2688
 msgid "Open URL"
@@ -1194,7 +1210,7 @@ msgstr "Параметри сторінки"
 
 #: ../../../processing/app/forms/PasswordAuthorizationDialog.java:44
 msgid "Password:"
-msgstr ""
+msgstr "Пароль:"
 
 #: Editor.java:1189 Editor.java:2731
 msgid "Paste"
@@ -1206,7 +1222,7 @@ msgstr "перська"
 
 #: ../../../processing/app/Preferences.java:161
 msgid "Persian (Iran)"
-msgstr ""
+msgstr "перська (Іран)"
 
 #: debug/Compiler.java:408
 msgid "Please import the SPI library from the Sketch > Import Library menu."
@@ -1214,7 +1230,7 @@ msgstr "Будь ласка, приєднайте бібліотеку SPI в м
 
 #: ../../../processing/app/debug/Compiler.java:529
 msgid "Please import the Wire library from the Sketch > Import Library menu."
-msgstr ""
+msgstr "Будь ласка, приєднайте бібліотеку Wire в меню Скетч > Підключити бібліотеку."
 
 #: Base.java:239
 msgid "Please install JDK 1.5 or later"
@@ -1223,7 +1239,7 @@ msgstr "Встановіть версію JDK 1.5 або старше."
 #: ../../../cc/arduino/packages/uploaders/SerialUploader.java:217
 #: ../../../cc/arduino/packages/uploaders/SerialUploader.java:262
 msgid "Please select a programmer from Tools->Programmer menu"
-msgstr ""
+msgstr "Будь ласка, виберіть програматор з меню Інструменти > Програматор"
 
 #: Preferences.java:110
 msgid "Polish"
@@ -1231,19 +1247,19 @@ msgstr "польська"
 
 #: ../../../processing/app/Editor.java:718
 msgid "Port"
-msgstr ""
+msgstr "Порт"
 
 #: ../../../processing/app/Preferences.java:151
 msgid "Portugese"
-msgstr ""
+msgstr "португальська"
 
 #: ../../../processing/app/Preferences.java:127
 msgid "Portuguese (Brazil)"
-msgstr ""
+msgstr "португальська (Бразилія)"
 
 #: ../../../processing/app/Preferences.java:128
 msgid "Portuguese (Portugal)"
-msgstr ""
+msgstr "португальська (Португалія)"
 
 #: Preferences.java:295 Editor.java:583
 msgid "Preferences"
@@ -1267,7 +1283,7 @@ msgstr "Друк скасовано."
 
 #: Editor.java:2547
 msgid "Printing..."
-msgstr "Друк..."
+msgstr "Друкування…"
 
 #: Base.java:1957
 msgid "Problem Opening Folder"
@@ -1283,11 +1299,11 @@ msgstr "Проблема з установкою платформи"
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:136
 msgid "Problem accessing board folder /www/sd"
-msgstr ""
+msgstr "Проблема доступу до теки плати /www/sd"
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:132
 msgid "Problem accessing files in folder "
-msgstr ""
+msgstr "Проблема доступу до файлів у теці"
 
 #: Base.java:1673
 msgid "Problem getting data folder"
@@ -1310,7 +1326,7 @@ msgstr "Проблема з перейменуванням"
 
 #: ../../../processing/app/I18n.java:86
 msgid "Processor"
-msgstr ""
+msgstr "Процесор"
 
 #: Editor.java:704
 msgid "Programmer"
@@ -1389,7 +1405,7 @@ msgstr "Зберегти теку скетчу як..."
 
 #: ../../../../../app/src/processing/app/Preferences.java:425
 msgid "Save when verifying or uploading"
-msgstr ""
+msgstr "Зберігати при перевірці або вивантаженні"
 
 #: Editor.java:2270 Editor.java:2308
 msgid "Saving..."
@@ -1397,7 +1413,7 @@ msgstr "Збереження..."
 
 #: ../../../processing/app/FindReplace.java:131
 msgid "Search all Sketch Tabs"
-msgstr ""
+msgstr "Шукати у всіх відкритих скетчах"
 
 #: Base.java:1909
 msgid "Select (or create new) folder for sketches..."
@@ -1409,7 +1425,7 @@ msgstr "Виділити все"
 
 #: Base.java:2636
 msgid "Select a zip file or a folder containing the library you'd like to add"
-msgstr "Оберіть zip-файл або теку, що містить бібліотеку, яку слід додати"
+msgstr "Виберіть zip-файл або теку, що містить бібліотеку яку слід додати"
 
 #: Sketch.java:975
 msgid "Select an image or other data file to copy to your sketch"
@@ -1421,7 +1437,7 @@ msgstr "Виберіть нове розташування теки зі ске�
 
 #: ../../../processing/app/debug/Compiler.java:146
 msgid "Selected board depends on '{0}' core (not installed)."
-msgstr ""
+msgstr "Вибрана плата залежить від ядра «{0}» (не встановлено)."
 
 #: SerialMonitor.java:93
 msgid "Send"
@@ -1429,25 +1445,29 @@ msgstr "Надіслати"
 
 #: EditorToolbar.java:41 EditorToolbar.java:46 Editor.java:669
 msgid "Serial Monitor"
-msgstr "Монітор порту"
+msgstr "Монітор послідовного порту"
 
 #: Serial.java:194
 #, java-format
 msgid ""
 "Serial port ''{0}'' not found. Did you select the right one from the Tools >"
 " Serial Port menu?"
-msgstr "Послідовний порт ''{0}'' не знайдено. Ви вибрали потрібний із меню Сервіс > Послідовний порт?"
+msgstr "Послідовний порт «{0}» не знайдено. Ви вибрали потрібний із меню Сервіс > Послідовний порт?"
 
 #: Editor.java:2343
 #, java-format
 msgid ""
 "Serial port {0} not found.\n"
 "Retry the upload with another serial port?"
-msgstr "Послідовний порт {0} не знайдений.\nПовторити вивантаження з інших послідовних портом?"
+msgstr "Послідовний порт {0} не знайдено.\nПовторити вивантаження з іншого послідовного порту?"
+
+#: ../../../../../app/src/processing/app/Editor.java:65
+msgid "Serial ports"
+msgstr ""
 
 #: Base.java:1681
 msgid "Settings issues"
-msgstr "Питання, пов'язані з налаштуваннями"
+msgstr "Питання, пов’язані з налаштуваннями"
 
 #: Editor.java:641
 msgid "Show Sketch Folder"
@@ -1455,11 +1475,11 @@ msgstr "Показати теку скетчів"
 
 #: ../../../processing/app/EditorStatus.java:468
 msgid "Show verbose output during compilation"
-msgstr ""
+msgstr "Показувати докладний звіт при компіляції"
 
 #: Preferences.java:387
 msgid "Show verbose output during: "
-msgstr "Показувати докладний висновок при: "
+msgstr "Показати докладний звіт при:"
 
 #: Editor.java:607
 msgid "Sketch"
@@ -1467,7 +1487,7 @@ msgstr "Скетч"
 
 #: Sketch.java:1754
 msgid "Sketch Disappeared"
-msgstr "Не вдається знайти скетч"
+msgstr "Скетч зник"
 
 #: Base.java:1411
 msgid "Sketch Does Not Exist"
@@ -1475,7 +1495,7 @@ msgstr "Скетч не існує"
 
 #: Sketch.java:274 Sketch.java:303 Sketch.java:577 Sketch.java:966
 msgid "Sketch is Read-Only"
-msgstr "Скетч тільки для читання"
+msgstr "Скетч лише для читання"
 
 #: Sketch.java:294
 msgid "Sketch is Untitled"
@@ -1496,7 +1516,7 @@ msgstr "Скетч занадто великий; зверніться до http
 msgid ""
 "Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} "
 "bytes."
-msgstr ""
+msgstr "Скетч використовує {0} байтів ({2}%%) місця зберігання для програм. Щонайбільше має бути {1} байтів."
 
 #: Editor.java:510
 msgid "Sketchbook"
@@ -1512,15 +1532,19 @@ msgstr "Розташування теки зі скетчами:"
 
 #: ../../../processing/app/BaseNoGui.java:428
 msgid "Sketchbook path not defined"
-msgstr ""
+msgstr "Не знайдено шлях до теки зі скетчами"
 
 #: ../../../processing/app/Base.java:785
 msgid "Sketches (*.ino, *.pde)"
+msgstr "Скетчі (*.ino, *.pde)"
+
+#: ../../../../../app/src/processing/app/Preferences.java:185
+msgid "Slovak"
 msgstr ""
 
 #: ../../../processing/app/Preferences.java:152
 msgid "Slovenian"
-msgstr ""
+msgstr "словенська"
 
 #: Sketch.java:275 Sketch.java:304 Sketch.java:578 Sketch.java:967
 msgid ""
@@ -1538,23 +1562,31 @@ msgstr "Деякі файли відзначені \"тільки для чит�
 #: Sketch.java:457
 #, java-format
 msgid "Sorry, a sketch (or folder) named \"{0}\" already exists."
-msgstr "Вибачте, скетч (або тека) з назвою \"{0}\" вже існує"
+msgstr "Вибачте, скетч (або тека) з назвою \"{0}\" вже існує."
 
 #: Preferences.java:115
 msgid "Spanish"
-msgstr "Іспанська"
+msgstr "іспанська"
 
 #: Base.java:540
 msgid "Sunshine"
 msgstr "Сонячне світло"
 
+#: ../../../../../app/src/processing/app/Preferences.java:187
+msgid "Swahili"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:153
 msgid "Swedish"
-msgstr ""
+msgstr "шведська"
 
 #: Preferences.java:84
 msgid "System Default"
-msgstr "типова системна"
+msgstr "системна мова за умовчанням"
+
+#: ../../../../../app/src/processing/app/Preferences.java:188
+msgid "Talossan"
+msgstr ""
 
 #: Preferences.java:116
 msgid "Tamil"
@@ -1562,11 +1594,11 @@ msgstr "тамільська"
 
 #: debug/Compiler.java:414
 msgid "The 'BYTE' keyword is no longer supported."
-msgstr "Дескриптор 'BYTE' більше не підтримується."
+msgstr "Дескриптор «BYTE» більше не підтримується."
 
 #: ../../../processing/app/BaseNoGui.java:484
 msgid "The --upload option supports only one file at a time"
-msgstr ""
+msgstr "Опція --upload підтримує лише один файл за раз"
 
 #: debug/Compiler.java:426
 msgid "The Client class has been renamed EthernetClient."
@@ -1598,7 +1630,7 @@ msgid ""
 "The library \"{0}\" cannot be used.\n"
 "Library names must contain only basic letters and numbers.\n"
 "(ASCII only and no spaces, and it cannot start with a number)"
-msgstr "Бібліотека \"{0}\" не може бути використана.\nІмена бібліотек повинні містити лише основні букви і цифри.\n(Тільки ASCII, без пропусків, не може починатися з пропуску)."
+msgstr "Бібліотека «{0}» не може бути використана.\nНазви бібліотек повинні містити лише основні букви і цифри.\n(Лише ASCII, без пропусків, не можуть починатися з цифри)"
 
 #: Sketch.java:374
 msgid ""
@@ -1609,7 +1641,7 @@ msgstr "Основний файл не може використовувати �
 
 #: Sketch.java:356
 msgid "The name cannot start with a period."
-msgstr "Ім'я не може починатися з крапки."
+msgstr "Ім’я не може починатися з крапки."
 
 #: Base.java:1412
 msgid ""
@@ -1626,7 +1658,7 @@ msgid ""
 "(ASCII-only with no spaces, and it cannot start with a number).\n"
 "To get rid of this message, remove the sketch from\n"
 "{1}"
-msgstr "Скетч \"{0}\" не може бути використаний.\nІмена скетчів повинні містити лише основні букви і цифри.\n(Тільки ASCII, без пропусків,  не може починатися з пропуску).\nЩоб позбутися цього повідомлення, приберіть скетч з\n{1}"
+msgstr "Скетч \"{0}\" не може бути використаний.\nІмена скетчів повинні містити лише основні букви і цифри.\n(Лише ASCII, без пропусків,  не може починатися з цифри).\nЩоб позбутися цього повідомлення, приберіть скетч з\n{1}"
 
 #: Sketch.java:1755
 msgid ""
@@ -1640,7 +1672,7 @@ msgid ""
 "The sketch name had to be modified. Sketch names can only consist\n"
 "of ASCII characters and numbers (but cannot start with a number).\n"
 "They should also be less than 64 characters long."
-msgstr ""
+msgstr "Назву скетчу було змінено. Назви можуть містити лише\nсимволи ASCII та числа (але не можуть починатись із чисел).\nДовжина має бути меншою за 64 символи."
 
 #: Base.java:259
 msgid ""
@@ -1649,13 +1681,13 @@ msgid ""
 "location, and create a new sketchbook folder if\n"
 "necessary. Arduino will then stop talking about\n"
 "himself in the third person."
-msgstr "Тека зі скетчами більше не існує.\nArduino переключиться на теку за замовчуванням,\nстворивши її при необхідності. А потім Arduino\nперестане говорити про себе в третій особі."
+msgstr "Тека зі скетчами більше не існує.\nArduino переключиться на теку за умовчанням,\nстворивши її за необхідності. А потім Arduino\nперестане говорити про себе в третій особі."
 
 #: ../../../processing/app/debug/Compiler.java:201
 msgid ""
 "Third-party platform.txt does not define compiler.path. Please report this "
 "to the third-party hardware maintainer."
-msgstr ""
+msgstr "Сторонній platform.txt не містить compiler.path. Будь ласка, сповістіть про це у підтримку виробника стороннього пристрою."
 
 #: Sketch.java:1075
 msgid ""
@@ -1666,11 +1698,11 @@ msgstr "Цей файл вже був скопійований в місце,\n�
 
 #: ../../../processing/app/EditorStatus.java:467
 msgid "This report would have more information with"
-msgstr ""
+msgstr "Цей звіт буде містити більше інформації з"
 
 #: Base.java:535
 msgid "Time for a Break"
-msgstr "Пора зробити перерву."
+msgstr "Час зробити перерву"
 
 #: Editor.java:663
 msgid "Tools"
@@ -1682,36 +1714,36 @@ msgstr "Пошук неполадок"
 
 #: ../../../processing/app/Preferences.java:117
 msgid "Turkish"
-msgstr ""
+msgstr "турецька"
 
 #: ../../../processing/app/Editor.java:2507
 msgid "Type board password to access its console"
-msgstr ""
+msgstr "Введіть пароль плати для доступу до її консолі"
 
 #: ../../../processing/app/Sketch.java:1673
 msgid "Type board password to upload a new sketch"
-msgstr ""
+msgstr "Введіть пароль плати для вивантаження нового скетчу"
 
 #: ../../../processing/app/Preferences.java:118
 msgid "Ukrainian"
-msgstr ""
+msgstr "українська"
 
 #: ../../../processing/app/Editor.java:2524
 #: ../../../processing/app/NetworkMonitor.java:145
 msgid "Unable to connect: is the sketch using the bridge?"
-msgstr ""
+msgstr "Не вдалося з’єднатись: скетч використовує міст?"
 
 #: ../../../processing/app/NetworkMonitor.java:130
 msgid "Unable to connect: retrying"
-msgstr ""
+msgstr "Не вдалося з’єднатись: повторна спроба"
 
 #: ../../../processing/app/Editor.java:2526
 msgid "Unable to connect: wrong password?"
-msgstr ""
+msgstr "Не вдалося з’єднатись: неправильний пароль?"
 
 #: ../../../processing/app/Editor.java:2512
 msgid "Unable to open serial monitor"
-msgstr ""
+msgstr "Не вдалося відкрити монітор послідовного порту"
 
 #: Sketch.java:1432
 #, java-format
@@ -1720,7 +1752,7 @@ msgstr "Неперехоплений тип виключення: {0}"
 
 #: Editor.java:1133 Editor.java:1355
 msgid "Undo"
-msgstr "Вернути"
+msgstr "Повернути"
 
 #: Platform.java:168
 msgid ""
@@ -1739,7 +1771,7 @@ msgstr "Оновлювати розширення скетчів на нове �
 
 #: EditorToolbar.java:41 Editor.java:545
 msgid "Upload"
-msgstr "Вивантаження"
+msgstr "Вивантажити"
 
 #: EditorToolbar.java:46 Editor.java:553
 msgid "Upload Using Programmer"
@@ -1747,19 +1779,23 @@ msgstr "Вивантажити за допомогою програматора"
 
 #: Editor.java:2403 Editor.java:2439
 msgid "Upload canceled."
-msgstr "Вивантаження скасовано"
+msgstr "Вивантаження скасовано."
 
 #: ../../../processing/app/Sketch.java:1678
 msgid "Upload cancelled"
-msgstr ""
+msgstr "Вивантаження скасовано"
 
 #: Editor.java:2378
 msgid "Uploading to I/O Board..."
-msgstr "Вивантаження на плату введення/виведення..."
+msgstr "Вивантаження на плату введення/виведення…"
 
 #: Sketch.java:1622
 msgid "Uploading..."
 msgstr "Вивантаження..."
+
+#: ../../../../../app/src/processing/app/Preferences.java:189
+msgid "Urdu (Pakistan)"
+msgstr ""
 
 #: Editor.java:1269
 msgid "Use Selection For Find"
@@ -1772,12 +1808,12 @@ msgstr "Використовувати зовнішній редактор"
 #: ../../../processing/app/debug/Compiler.java:94
 #, java-format
 msgid "Using library {0} in folder: {1} {2}"
-msgstr ""
+msgstr "Використання бібліотеки {0} з теки: {1} {2}"
 
 #: ../../../processing/app/debug/Compiler.java:320
 #, java-format
 msgid "Using previously compiled file: {0}"
-msgstr ""
+msgstr "Використати раніше скомпільований файл: {0}"
 
 #: EditorToolbar.java:41 EditorToolbar.java:46
 msgid "Verify"
@@ -1793,7 +1829,7 @@ msgstr "Перевірка коду після вивантаження"
 
 #: ../../../processing/app/Preferences.java:154
 msgid "Vietnamese"
-msgstr ""
+msgstr "в’єтнамська"
 
 #: Editor.java:1105
 msgid "Visit Arduino.cc"
@@ -1804,11 +1840,15 @@ msgstr "Перейти на Arduino.cc"
 msgid ""
 "WARNING: library {0} claims to run on {1} architecture(s) and may be "
 "incompatible with your current board which runs on {2} architecture(s)."
-msgstr ""
+msgstr "УВАГА: бібліотека {0} потребує для роботи архітектуру {1}, та може бути несумісною з вашою платою, що працює на архітектурі {2}."
 
 #: Base.java:2128
 msgid "Warning"
 msgstr "Попередження"
+
+#: ../../../../../app/src/processing/app/Preferences.java:190
+msgid "Western Frisian"
+msgstr ""
 
 #: debug/Compiler.java:444
 msgid "Wire.receive() has been renamed Wire.read()."
@@ -1826,7 +1866,7 @@ msgstr "Виділяти"
 msgid ""
 "Wrong microcontroller found.  Did you select the right board from the Tools "
 "> Board menu?"
-msgstr "Тип мікроконтролера невірний. Ви правильно вибрали плату з меню Сервіс > Плати?"
+msgstr "Хибний тип мікроконтролера. Ви правильно вибрали плату з меню Сервіс > Плати?"
 
 #: Preferences.java:77 UpdateCheck.java:108
 msgid "Yes"
@@ -1838,7 +1878,7 @@ msgstr "Мене не обдуриш"
 
 #: Sketch.java:411
 msgid "You can't have a .cpp file with the same name as the sketch."
-msgstr "Ви не можете використовувати .cpp файл з таким же ім'ям як і у скетчу."
+msgstr "Ви не можете використовувати .cpp файл з таким самим іменем як у скетчу."
 
 #: Sketch.java:421
 msgid ""
@@ -1865,7 +1905,7 @@ msgstr "Ви забули вашу теку зі скетчами"
 #: ../../../processing/app/AbstractMonitor.java:92
 msgid ""
 "You've pressed {0} but nothing was sent. Should you select a line ending?"
-msgstr ""
+msgstr "Ви натиснули {0}, але нічого не було надіслано. Слід вибрати кінець рядка?"
 
 #: Base.java:536
 msgid ""
@@ -1893,7 +1933,7 @@ msgid ""
 "older version of Arduino,you may need to use Tools -> Fix Encoding & Reload "
 "to updatethe sketch to use UTF-8 encoding. If not, you may need todelete the"
 " bad characters to get rid of this warning."
-msgstr ""
+msgstr "«{0}» містить нерозпізнані символи. Якщо цей код було створено у старій версії Arduino, скористайтесь меню Інструменти > Виправити кодування і перезавантажити, щоб змінити кодування скетчу на UTF-8. Якщо ні, то вам необхідно видалити неправильні символи, для того щоб позбутись цього попередження."
 
 #: debug/Compiler.java:409
 msgid ""
@@ -1901,7 +1941,7 @@ msgid ""
 "As of Arduino 0019, the Ethernet library depends on the SPI library.\n"
 "You appear to be using it or another library that depends on the SPI library.\n"
 "\n"
-msgstr "\nПочинаючи з Arduino 0019 бібліотека Ethernet залежить від бібліотеки SPI.\nСхоже, що ви використовуєте саме її, або іншу бібліотеку, що залежитьвід бібліотеки SPI.\n\n"
+msgstr "\nПочавши з Arduino 0019, бібліотека Ethernet залежить від бібліотеки SPI.\nСхоже що ви використовуєте саме її, або іншу бібліотеку, що залежить від бібліотеки SPI.\n\n"
 
 #: debug/Compiler.java:415
 msgid ""
@@ -1909,42 +1949,42 @@ msgid ""
 "As of Arduino 1.0, the 'BYTE' keyword is no longer supported.\n"
 "Please use Serial.write() instead.\n"
 "\n"
-msgstr "\nПочинаючи з версії Arduino 1.0, дескриптор 'BYTE' більше не підтримується.\nБудь ласка, використовуйте Serial.write() замість нього.\n\n"
+msgstr "\nЗ версії Arduino 1.0, дескриптор «BYTE» більше не підтримується.\nБудь ласка, використовуйте Serial.write() замість нього.\n\n"
 
 #: debug/Compiler.java:427
 msgid ""
 "\n"
 "As of Arduino 1.0, the Client class in the Ethernet library has been renamed to EthernetClient.\n"
 "\n"
-msgstr "\nПочинаючи з версії Arduino 1.0, клас Client бібліотеки Ethernet був перейменований в EthernetClient.\n\n"
+msgstr "\nЗ версії Arduino 1.0, клас Client бібліотеки Ethernet має  назву EthernetClient.\n\n"
 
 #: debug/Compiler.java:421
 msgid ""
 "\n"
 "As of Arduino 1.0, the Server class in the Ethernet library has been renamed to EthernetServer.\n"
 "\n"
-msgstr "\nПочинаючи з версії Arduino 1.0, клас Server бібліотеки Ethernet був перейменований в EthernetServer.\n\n"
+msgstr "\nЗ версії Arduino 1.0, клас Server бібліотеки Ethernet має назву EthernetServer.\n\n"
 
 #: debug/Compiler.java:433
 msgid ""
 "\n"
 "As of Arduino 1.0, the Udp class in the Ethernet library has been renamed to EthernetUdp.\n"
 "\n"
-msgstr "\nПочинаючи з версії Arduino 1.0, клас Udp бібліотеки Ethernet був перейменований в EthernetUdp.\n\n"
+msgstr "\nЗ версії Arduino 1.0, клас Udp бібліотеки Ethernet має назву EthernetUdp.\n\n"
 
 #: debug/Compiler.java:445
 msgid ""
 "\n"
 "As of Arduino 1.0, the Wire.receive() function was renamed to Wire.read() for consistency with other libraries.\n"
 "\n"
-msgstr "\nПочинаючи з версії Arduino 1.0, функція Wire.receive() була перейменована в Wire.read() для узгодженості з іншими бібліотеками.\n\n"
+msgstr "\nЗ версії Arduino 1.0, функція Wire.receive() має назву Wire.read(), для узгодженості з іншими бібліотеками.\n\n"
 
 #: debug/Compiler.java:439
 msgid ""
 "\n"
 "As of Arduino 1.0, the Wire.send() function was renamed to Wire.write() for consistency with other libraries.\n"
 "\n"
-msgstr "\nПочинаючи з версії Arduino 1.0, функція Wire.send() була перейменована в Wire.write() для узгодженості з іншими бібліотеками.\n\n"
+msgstr "\nЗ версії Arduino 1.0, функція Wire.send() має назву Wire.write(), для узгодженості з іншими бібліотеками.\n\n"
 
 #: SerialMonitor.java:130 SerialMonitor.java:133
 msgid "baud"
@@ -1956,7 +1996,7 @@ msgstr "компіляції"
 
 #: ../../../processing/app/NetworkMonitor.java:111
 msgid "connected!"
-msgstr ""
+msgstr "підключено!"
 
 #: Sketch.java:540
 msgid "createNewFile() returned false"
@@ -1964,11 +2004,7 @@ msgstr "createNewFile () повернув false"
 
 #: ../../../processing/app/EditorStatus.java:469
 msgid "enabled in File > Preferences."
-msgstr ""
-
-#: Base.java:2090
-msgid "environment"
-msgstr "середовище розробки"
+msgstr "увімкнено в Файл > Налаштування"
 
 #: Editor.java:1108
 msgid "http://arduino.cc/"
@@ -1982,41 +2018,29 @@ msgstr "http://www.arduino.cc/en/Main/Software"
 msgid "http://www.arduino.cc/latest.txt"
 msgstr "http://www.arduino.cc/latest.txt"
 
-#: Base.java:2075
-msgid "http://www.arduino.cc/playground/Learning/Linux"
-msgstr "http://www.arduino.cc/playground/Learning/Linux"
-
 #: Preferences.java:625
 #, java-format
 msgid "ignoring invalid font size {0}"
 msgstr "ігнорування некоректного розміру шрифту {0}"
 
-#: Base.java:2080
-msgid "index.html"
-msgstr "index.html"
-
 #: Editor.java:936 Editor.java:943
 msgid "name is null"
 msgstr "немає імені"
 
-#: Base.java:2090
-msgid "platforms.html"
-msgstr "platforms.html"
-
 #: Editor.java:932
 msgid "serialMenu is null"
-msgstr "Меню послідовного порту пусто"
+msgstr "Меню послідовного порту пусте"
 
 #: debug/Uploader.java:195
 #, java-format
 msgid ""
 "the selected serial port {0} does not exist or your board is not connected"
-msgstr "Обраний послідовний порт {0} не існує або ваша плата не підключена"
+msgstr "Обраний послідовний порт {0} не існує, або ваша плата не підключена"
 
 #: ../../../processing/app/Base.java:389
 #, java-format
 msgid "unknown option: {0}"
-msgstr ""
+msgstr "невідомий параметр: {0}"
 
 #: Preferences.java:391
 msgid "upload"
@@ -2037,49 +2061,44 @@ msgstr "{0} повернув {1}"
 msgid "{0} | Arduino {1}"
 msgstr "{0} | Arduino {1}"
 
-#: Editor.java:1874
-#, java-format
-msgid "{0}.html"
-msgstr "{0}.html"
-
 #: ../../../processing/app/Base.java:519
 #, java-format
 msgid "{0}: Invalid argument to --pref, should be of the form \"pref=value\""
-msgstr ""
+msgstr "{0}: Хибний аргумент --pref, має бути у формі «pref=value»"
 
 #: ../../../processing/app/Base.java:476
 #, java-format
 msgid ""
 "{0}: Invalid board name, it should be of the form \"package:arch:board\" or "
 "\"package:arch:board:options\""
-msgstr ""
+msgstr "{0}: Хибна назва плати, має бути у формі «package:arch:board» або  «package:arch:board:options»"
 
 #: ../../../processing/app/Base.java:509
 #, java-format
 msgid "{0}: Invalid option for \"{1}\" option for board \"{2}\""
-msgstr ""
+msgstr "{0}: Хибне налаштування для опції «{1}» плати «{2}»"
 
 #: ../../../processing/app/Base.java:507
 #, java-format
 msgid "{0}: Invalid option for board \"{1}\""
-msgstr ""
+msgstr "{0}: Хибне налаштування для плати «{1}»"
 
 #: ../../../processing/app/Base.java:502
 #, java-format
 msgid "{0}: Invalid option, should be of the form \"name=value\""
-msgstr ""
+msgstr "{0}: Хибне налаштування, має бути у формі «name=value»"
 
 #: ../../../processing/app/Base.java:486
 #, java-format
 msgid "{0}: Unknown architecture"
-msgstr ""
+msgstr "{0}: Невідома архітектура"
 
 #: ../../../processing/app/Base.java:491
 #, java-format
 msgid "{0}: Unknown board"
-msgstr ""
+msgstr "{0}: Невідома плата"
 
 #: ../../../processing/app/Base.java:481
 #, java-format
 msgid "{0}: Unknown package"
-msgstr ""
+msgstr "{0}: Невідомий пакет"

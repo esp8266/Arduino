@@ -5,7 +5,7 @@
   Part of the Arduino project - http://www.arduino.cc/
 
   Copyright (c) 2006 David A. Mellis
-  Copyright (c) 2011 Cristian Maglie <c.maglie@bug.st>
+  Copyright (c) 2011 Cristian Maglie <c.maglie@arduino.cc>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by

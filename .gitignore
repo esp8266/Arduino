@@ -29,12 +29,16 @@ build/macosx/dist/*.tar.gz
 build/macosx/dist/*.tar.bz2
 build/macosx/libastylej*
 build/macosx/appbundler*.jar
+build/macosx/appbundler*.zip
+build/macosx/appbundler
+build/macosx/appbundler-1.0ea-arduino2
 build/linux/work/
 build/linux/dist/*.tar.gz
 build/linux/dist/*.tar.bz2
 build/linux/*.tgz
 build/linux/*.zip
 build/linux/libastylej*
+build/shared/reference*.zip
 test-bin
 *.iml
 .idea

@@ -97,6 +97,10 @@ msgstr "Thêm tập tin.."
 msgid "Add Library..."
 msgstr "Thêm Thư Viện..."
 
+#: ../../../../../app/src/processing/app/Preferences.java:161
+msgid "Afrikaans"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:96
 msgid "Albanian"
 msgstr ""
@@ -288,6 +292,10 @@ msgstr ""
 #: ../../../processing/app/Preferences.java:139
 msgid "Belarusian"
 msgstr "Belarusian"
+
+#: ../../../../../app/src/processing/app/Preferences.java:165
+msgid "Bengali (India)"
+msgstr ""
 
 #: ../../../processing/app/Base.java:1433
 #: ../../../processing/app/Editor.java:707
@@ -585,9 +593,17 @@ msgstr "Cắt"
 msgid "Czech"
 msgstr "Czech"
 
+#: ../../../../../app/src/processing/app/Preferences.java:119
+msgid "Czech (Czech Republic)"
+msgstr ""
+
 #: Preferences.java:90
 msgid "Danish"
 msgstr "Danish"
+
+#: ../../../../../app/src/processing/app/Preferences.java:120
+msgid "Danish (Denmark)"
+msgstr ""
 
 #: Editor.java:1224 Editor.java:2765
 msgid "Decrease Indent"
@@ -791,10 +807,6 @@ msgstr "Ví dụ"
 msgid "Export canceled, changes must first be saved."
 msgstr "Quy trình xuất dữ liệu đã bị hủy bỏ, việc trước tiên cần làm là phải lưu các thay đổi."
 
-#: Base.java:2100
-msgid "FAQ.html"
-msgstr "FAQ.html"
-
 #: ../../../processing/app/Base.java:416
 #, java-format
 msgid "Failed to open sketch: \"{0}\""
@@ -864,6 +876,10 @@ msgstr "Các câu hỏi thường gặp"
 msgid "Galician"
 msgstr "Galician"
 
+#: ../../../../../app/src/processing/app/Preferences.java:176
+msgid "Galician (Spain)"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:94
 msgid "Georgian"
 msgstr "Georgian"
@@ -891,22 +907,6 @@ msgstr "Biến toàn cục sử dụng {0} byte của bộ nhớ động."
 #: Preferences.java:98
 msgid "Greek"
 msgstr "Greek"
-
-#: Base.java:2085
-msgid "Guide_Environment.html"
-msgstr "Guide_Environment.html"
-
-#: Base.java:2071
-msgid "Guide_MacOSX.html"
-msgstr "Guide_MacOSX.html"
-
-#: Base.java:2095
-msgid "Guide_Troubleshooting.html"
-msgstr "Guide_Troubleshooting.html"
-
-#: Base.java:2073
-msgid "Guide_Windows.html"
-msgstr "Guide_Windows.html"
 
 #: ../../../processing/app/Preferences.java:95
 msgid "Hebrew"
@@ -1002,6 +1002,10 @@ msgstr "Lithuaninan"
 msgid "Low memory available, stability problems may occur."
 msgstr ""
 
+#: ../../../../../app/src/processing/app/Preferences.java:180
+msgid "Malay (Malaysia)"
+msgstr ""
+
 #: Preferences.java:107
 msgid "Marathi"
 msgstr "Marathi"
@@ -1045,6 +1049,10 @@ msgstr "Tên cho tập tin mới:"
 #: ../../../processing/app/Preferences.java:149
 msgid "Nepali"
 msgstr "Nepali"
+
+#: ../../../../../app/src/processing/app/Editor.java:65
+msgid "Network ports"
+msgstr ""
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:51
 msgid "Network upload using programmer not supported"
@@ -1145,9 +1153,17 @@ msgstr "Lỗi không phải đến từ hệ thống trong khi thiết lập Gia
 msgid "Nope"
 msgstr "Không"
 
+#: ../../../../../app/src/processing/app/Preferences.java:181
+msgid "Norwegian"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:108
 msgid "Norwegian Bokmål"
 msgstr "Norwegian Bokmål"
+
+#: ../../../../../app/src/processing/app/Preferences.java:182
+msgid "Norwegian Nynorsk"
+msgstr ""
 
 #: ../../../processing/app/Sketch.java:1656
 msgid ""
@@ -1445,6 +1461,10 @@ msgid ""
 "Retry the upload with another serial port?"
 msgstr "Cổng có số hiệu {0} không được tìm thấy.\nThử lại việc tải dữ liệu vào bo mạch với một cổng có số hiệu khác?"
 
+#: ../../../../../app/src/processing/app/Editor.java:65
+msgid "Serial ports"
+msgstr ""
+
 #: Base.java:1681
 msgid "Settings issues"
 msgstr "Các vấn đề về thiết lập"
@@ -1518,6 +1538,10 @@ msgstr ""
 msgid "Sketches (*.ino, *.pde)"
 msgstr "Bản mạch (*.ino, *.pde)"
 
+#: ../../../../../app/src/processing/app/Preferences.java:185
+msgid "Slovak"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:152
 msgid "Slovenian"
 msgstr "Slovenian"
@@ -1548,6 +1572,10 @@ msgstr "Spanish"
 msgid "Sunshine"
 msgstr "Bình minh"
 
+#: ../../../../../app/src/processing/app/Preferences.java:187
+msgid "Swahili"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:153
 msgid "Swedish"
 msgstr "Swedish"
@@ -1555,6 +1583,10 @@ msgstr "Swedish"
 #: Preferences.java:84
 msgid "System Default"
 msgstr "Mặc định theo hệ thống"
+
+#: ../../../../../app/src/processing/app/Preferences.java:188
+msgid "Talossan"
+msgstr ""
 
 #: Preferences.java:116
 msgid "Tamil"
@@ -1761,6 +1793,10 @@ msgstr "Đang tải vào Bo Mạch I/O..."
 msgid "Uploading..."
 msgstr "Đang tải..."
 
+#: ../../../../../app/src/processing/app/Preferences.java:189
+msgid "Urdu (Pakistan)"
+msgstr ""
+
 #: Editor.java:1269
 msgid "Use Selection For Find"
 msgstr "Sử dụng vùng lựa chọn cho tìm kiếm"
@@ -1809,6 +1845,10 @@ msgstr ""
 #: Base.java:2128
 msgid "Warning"
 msgstr "Cảnh báo"
+
+#: ../../../../../app/src/processing/app/Preferences.java:190
+msgid "Western Frisian"
+msgstr ""
 
 #: debug/Compiler.java:444
 msgid "Wire.receive() has been renamed Wire.read()."
@@ -1966,10 +2006,6 @@ msgstr "createNewFile() trả về giá trị sai"
 msgid "enabled in File > Preferences."
 msgstr "được bật trong Tập tin > Tùy Biến."
 
-#: Base.java:2090
-msgid "environment"
-msgstr "môi trường"
-
 #: Editor.java:1108
 msgid "http://arduino.cc/"
 msgstr "http://arduino.cc/"
@@ -1982,26 +2018,14 @@ msgstr "http://www.arduino.cc/en/Main/Software"
 msgid "http://www.arduino.cc/latest.txt"
 msgstr "http://www.arduino.cc/latest.txt"
 
-#: Base.java:2075
-msgid "http://www.arduino.cc/playground/Learning/Linux"
-msgstr "http://www.arduino.cc/playground/Learning/Linux"
-
 #: Preferences.java:625
 #, java-format
 msgid "ignoring invalid font size {0}"
 msgstr "bỏ qua kiểu chữ không hợp lệ {0}"
 
-#: Base.java:2080
-msgid "index.html"
-msgstr "index.html"
-
 #: Editor.java:936 Editor.java:943
 msgid "name is null"
 msgstr "tên bị rỗng"
-
-#: Base.java:2090
-msgid "platforms.html"
-msgstr "platforms.html"
 
 #: Editor.java:932
 msgid "serialMenu is null"
@@ -2036,11 +2060,6 @@ msgstr "{0} trả về {1}"
 #, java-format
 msgid "{0} | Arduino {1}"
 msgstr "{0} | Arduino {1}"
-
-#: Editor.java:1874
-#, java-format
-msgid "{0}.html"
-msgstr "{0}.html"
 
 #: ../../../processing/app/Base.java:519
 #, java-format

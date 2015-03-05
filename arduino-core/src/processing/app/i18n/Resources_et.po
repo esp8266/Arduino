@@ -96,6 +96,10 @@ msgstr "Lisa fail…"
 msgid "Add Library..."
 msgstr "Lisa teek…"
 
+#: ../../../../../app/src/processing/app/Preferences.java:161
+msgid "Afrikaans"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:96
 msgid "Albanian"
 msgstr ""
@@ -286,6 +290,10 @@ msgstr ""
 
 #: ../../../processing/app/Preferences.java:139
 msgid "Belarusian"
+msgstr ""
+
+#: ../../../../../app/src/processing/app/Preferences.java:165
+msgid "Bengali (India)"
 msgstr ""
 
 #: ../../../processing/app/Base.java:1433
@@ -584,9 +592,17 @@ msgstr "Lõika"
 msgid "Czech"
 msgstr ""
 
+#: ../../../../../app/src/processing/app/Preferences.java:119
+msgid "Czech (Czech Republic)"
+msgstr ""
+
 #: Preferences.java:90
 msgid "Danish"
 msgstr "Taani"
+
+#: ../../../../../app/src/processing/app/Preferences.java:120
+msgid "Danish (Denmark)"
+msgstr ""
 
 #: Editor.java:1224 Editor.java:2765
 msgid "Decrease Indent"
@@ -790,10 +806,6 @@ msgstr "Näited"
 msgid "Export canceled, changes must first be saved."
 msgstr "Eksport katkestatud. Muudatused peavad olema enne salvestatud."
 
-#: Base.java:2100
-msgid "FAQ.html"
-msgstr "FAQ.html"
-
 #: ../../../processing/app/Base.java:416
 #, java-format
 msgid "Failed to open sketch: \"{0}\""
@@ -863,6 +875,10 @@ msgstr "Korduma Kippuvad Küsimused"
 msgid "Galician"
 msgstr "Galeegi"
 
+#: ../../../../../app/src/processing/app/Preferences.java:176
+msgid "Galician (Spain)"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:94
 msgid "Georgian"
 msgstr ""
@@ -890,22 +906,6 @@ msgstr ""
 #: Preferences.java:98
 msgid "Greek"
 msgstr "Kreeka"
-
-#: Base.java:2085
-msgid "Guide_Environment.html"
-msgstr "Guide_Environment.html"
-
-#: Base.java:2071
-msgid "Guide_MacOSX.html"
-msgstr "Guide_MacOSX.html"
-
-#: Base.java:2095
-msgid "Guide_Troubleshooting.html"
-msgstr "Guide_Troubleshooting.html"
-
-#: Base.java:2073
-msgid "Guide_Windows.html"
-msgstr "Guide_Windows.html"
 
 #: ../../../processing/app/Preferences.java:95
 msgid "Hebrew"
@@ -1001,6 +1001,10 @@ msgstr "Leedu"
 msgid "Low memory available, stability problems may occur."
 msgstr ""
 
+#: ../../../../../app/src/processing/app/Preferences.java:180
+msgid "Malay (Malaysia)"
+msgstr ""
+
 #: Preferences.java:107
 msgid "Marathi"
 msgstr "Marathi"
@@ -1043,6 +1047,10 @@ msgstr "Uue faili nimi:"
 
 #: ../../../processing/app/Preferences.java:149
 msgid "Nepali"
+msgstr ""
+
+#: ../../../../../app/src/processing/app/Editor.java:65
+msgid "Network ports"
 msgstr ""
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:51
@@ -1144,8 +1152,16 @@ msgstr "Mitte-saatsulik viga välimuse seadmises."
 msgid "Nope"
 msgstr "Vabandust"
 
+#: ../../../../../app/src/processing/app/Preferences.java:181
+msgid "Norwegian"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:108
 msgid "Norwegian Bokmål"
+msgstr ""
+
+#: ../../../../../app/src/processing/app/Preferences.java:182
+msgid "Norwegian Nynorsk"
 msgstr ""
 
 #: ../../../processing/app/Sketch.java:1656
@@ -1444,6 +1460,10 @@ msgid ""
 "Retry the upload with another serial port?"
 msgstr "Jadaport {0} puudub.\nProovin mõnda teist porti?"
 
+#: ../../../../../app/src/processing/app/Editor.java:65
+msgid "Serial ports"
+msgstr ""
+
 #: Base.java:1681
 msgid "Settings issues"
 msgstr "Probleem seadetega"
@@ -1517,6 +1537,10 @@ msgstr ""
 msgid "Sketches (*.ino, *.pde)"
 msgstr ""
 
+#: ../../../../../app/src/processing/app/Preferences.java:185
+msgid "Slovak"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:152
 msgid "Slovenian"
 msgstr ""
@@ -1547,6 +1571,10 @@ msgstr "Hispaania"
 msgid "Sunshine"
 msgstr "Särasilm"
 
+#: ../../../../../app/src/processing/app/Preferences.java:187
+msgid "Swahili"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:153
 msgid "Swedish"
 msgstr ""
@@ -1554,6 +1582,10 @@ msgstr ""
 #: Preferences.java:84
 msgid "System Default"
 msgstr "Süsteemi vaikimisi keel"
+
+#: ../../../../../app/src/processing/app/Preferences.java:188
+msgid "Talossan"
+msgstr ""
 
 #: Preferences.java:116
 msgid "Tamil"
@@ -1760,6 +1792,10 @@ msgstr "I/O plaadile laadimine…"
 msgid "Uploading..."
 msgstr "Üleslaadimine…"
 
+#: ../../../../../app/src/processing/app/Preferences.java:189
+msgid "Urdu (Pakistan)"
+msgstr ""
+
 #: Editor.java:1269
 msgid "Use Selection For Find"
 msgstr "Kasuta otsimiseks valikut"
@@ -1808,6 +1844,10 @@ msgstr ""
 #: Base.java:2128
 msgid "Warning"
 msgstr "Hoiatus"
+
+#: ../../../../../app/src/processing/app/Preferences.java:190
+msgid "Western Frisian"
+msgstr ""
 
 #: debug/Compiler.java:444
 msgid "Wire.receive() has been renamed Wire.read()."
@@ -1965,10 +2005,6 @@ msgstr "createNewFile() ebaõnnestus"
 msgid "enabled in File > Preferences."
 msgstr ""
 
-#: Base.java:2090
-msgid "environment"
-msgstr "Töökeskkond"
-
 #: Editor.java:1108
 msgid "http://arduino.cc/"
 msgstr "http://arduino.cc/"
@@ -1981,26 +2017,14 @@ msgstr "http://www.arduino.cc/en/Main/Software"
 msgid "http://www.arduino.cc/latest.txt"
 msgstr "http://www.arduino.cc/latest.txt"
 
-#: Base.java:2075
-msgid "http://www.arduino.cc/playground/Learning/Linux"
-msgstr "http://www.arduino.cc/playground/Learning/Linux"
-
 #: Preferences.java:625
 #, java-format
 msgid "ignoring invalid font size {0}"
 msgstr "vigase fondi suuruse {0} eiramine"
 
-#: Base.java:2080
-msgid "index.html"
-msgstr "index.html"
-
 #: Editor.java:936 Editor.java:943
 msgid "name is null"
 msgstr "name on null"
-
-#: Base.java:2090
-msgid "platforms.html"
-msgstr "platforms.html"
 
 #: Editor.java:932
 msgid "serialMenu is null"
@@ -2035,11 +2059,6 @@ msgstr "{0} tagastas {1}"
 #, java-format
 msgid "{0} | Arduino {1}"
 msgstr "{0} | Arduino {1}"
-
-#: Editor.java:1874
-#, java-format
-msgid "{0}.html"
-msgstr "{0}.html"
 
 #: ../../../processing/app/Base.java:519
 #, java-format

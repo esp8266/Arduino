@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 by Cristian Maglie <c.maglie@bug.st>
+ * Copyright (c) 2010 by Cristian Maglie <c.maglie@arduino.cc>
  * Copyright (c) 2014 by Paul Stoffregen <paul@pjrc.com> (Transaction API)
  * SPI Master library for arduino.
  *

@@ -26,6 +26,7 @@ import cc.arduino.packages.MonitorFactory;
 
 import com.jcraft.jsch.JSchException;
 
+import jssc.SerialPortException;
 import processing.app.debug.*;
 import processing.app.forms.PasswordAuthorizationDialog;
 import processing.app.helpers.OSUtils;
@@ -59,6 +60,9 @@ import cc.arduino.packages.uploaders.SerialUploader;
  */
 @SuppressWarnings("serial")
 public class Editor extends JFrame implements RunnerListener {
+
+  private final static List<String> BOARD_PROTOCOLS_ORDER = Arrays.asList(new String[]{"serial", "network"});
+  private final static List<String> BOARD_PROTOCOLS_ORDER_TRANSLATIONS = Arrays.asList(new String[]{_("Serial ports"), _("Network ports")});
 
   Base base;
 
@@ -441,7 +445,7 @@ public class Editor extends JFrame implements RunnerListener {
     textarea.setEditable(!external);
     saveMenuItem.setEnabled(!external);
     saveAsMenuItem.setEnabled(!external);
-    
+
     textarea.setDisplayLineNumbers(Preferences.getBoolean("editor.linenumbers"));
 
     TextAreaPainter painter = textarea.getPainter();
@@ -964,13 +968,17 @@ public class Editor extends JFrame implements RunnerListener {
     }
     JCheckBoxMenuItem selection = null;
     for (int i = 0; i < serialMenu.getItemCount(); i++) {
-      JCheckBoxMenuItem item = ((JCheckBoxMenuItem)serialMenu.getItem(i));
-      if (item == null) {
+      JMenuItem menuItem = serialMenu.getItem(i);
+      if (!(menuItem instanceof JCheckBoxMenuItem)) {
+        continue;
+      }
+      JCheckBoxMenuItem checkBoxMenuItem = ((JCheckBoxMenuItem) menuItem);
+      if (checkBoxMenuItem == null) {
         System.out.println(_("name is null"));
         continue;
       }
-      item.setState(false);
-      if (name.equals(item.getText())) selection = item;
+      checkBoxMenuItem.setState(false);
+      if (name.equals(checkBoxMenuItem.getText())) selection = checkBoxMenuItem;
     }
     if (selection != null) selection.setState(true);
     //System.out.println(item.getLabel());
@@ -996,7 +1004,32 @@ public class Editor extends JFrame implements RunnerListener {
     String selectedPort = Preferences.get("serial.port");
 
     List<BoardPort> ports = Base.getDiscoveryManager().discovery();
+
+    ports = Base.getPlatform().filterPorts(ports, Preferences.getBoolean("serial.ports.showall"));
+
+    Collections.sort(ports, new Comparator<BoardPort>() {
+      @Override
+      public int compare(BoardPort o1, BoardPort o2) {
+        return BOARD_PROTOCOLS_ORDER.indexOf(o1.getProtocol()) - BOARD_PROTOCOLS_ORDER.indexOf(o2.getProtocol());
+      }
+    });
+
+    String lastProtocol = null;
+    String lastProtocolTranslated;
     for (BoardPort port : ports) {
+      if (lastProtocol == null || !port.getProtocol().equals(lastProtocol)) {
+        if (lastProtocol != null) {
+          serialMenu.addSeparator();
+        }
+        lastProtocol = port.getProtocol();
+
+        if (BOARD_PROTOCOLS_ORDER.indexOf(port.getProtocol()) != -1) {
+          lastProtocolTranslated = BOARD_PROTOCOLS_ORDER_TRANSLATIONS.get(BOARD_PROTOCOLS_ORDER.indexOf(port.getProtocol()));
+        } else {
+          lastProtocolTranslated = port.getProtocol();
+        }
+        serialMenu.add(new JMenuItem(_(lastProtocolTranslated)));
+      }
       String address = port.getAddress();
       String label = port.getLabel();
 
@@ -1332,6 +1365,7 @@ public class Editor extends JFrame implements RunnerListener {
     public void actionPerformed(ActionEvent e) {
       try {
         undo.undo();
+        sketch.setModified(true);
       } catch (CannotUndoException ex) {
         //System.out.println("Unable to undo: " + ex);
         //ex.printStackTrace();
@@ -1353,17 +1387,11 @@ public class Editor extends JFrame implements RunnerListener {
         undoItem.setEnabled(true);
         undoItem.setText(undo.getUndoPresentationName());
         putValue(Action.NAME, undo.getUndoPresentationName());
-        if (sketch != null) {
-          sketch.setModified(true);  // 0107
-        }
       } else {
         this.setEnabled(false);
         undoItem.setEnabled(false);
         undoItem.setText(_("Undo"));
         putValue(Action.NAME, "Undo");
-        if (sketch != null) {
-          sketch.setModified(false);  // 0107
-        }
       }
     }
   }
@@ -1378,6 +1406,7 @@ public class Editor extends JFrame implements RunnerListener {
     public void actionPerformed(ActionEvent e) {
       try {
         undo.redo();
+        sketch.setModified(true);
       } catch (CannotRedoException ex) {
         //System.out.println("Unable to redo: " + ex);
         //ex.printStackTrace();
@@ -1646,7 +1675,7 @@ public class Editor extends JFrame implements RunnerListener {
     if (document == null) {  // this document not yet inited
       document = new SyntaxDocument();
       codeDoc.setDocument(document);
-      
+
       // turn on syntax highlighting
       document.setTokenMarker(new PdeKeywords());
 
@@ -1664,10 +1693,12 @@ public class Editor extends JFrame implements RunnerListener {
       document.addUndoableEditListener(new UndoableEditListener() {
         public void undoableEditHappened(UndoableEditEvent e) {
           if (compoundEdit != null) {
-            compoundEdit.addEdit(e.getEdit());
-
+            compoundEdit.addEdit(new CaretAwareUndoableEdit(e.getEdit(), textarea));
           } else if (undo != null) {
             undo.addEdit(new CaretAwareUndoableEdit(e.getEdit(), textarea));
+          }
+          if (compoundEdit != null || undo != null) {
+            sketch.setModified(true);
             undoAction.updateUndoState();
             redoAction.updateRedoState();
           }
@@ -1870,7 +1901,7 @@ public class Editor extends JFrame implements RunnerListener {
 
 		} catch (BadLocationException bl) {
 			bl.printStackTrace();
-		} 
+		}
 		return text;
 	}
 
@@ -1881,7 +1912,7 @@ public class Editor extends JFrame implements RunnerListener {
 		if (referenceFile == null) {
 			statusNotice(I18n.format(_("No reference available for \"{0}\""), text));
 		} else {
-			Base.showReference(I18n.format(_("{0}.html"), referenceFile));
+			Base.showReference("Reference/" + referenceFile);
 		}
 	}
 
@@ -2024,6 +2055,8 @@ public class Editor extends JFrame implements RunnerListener {
 
     // As of Processing 1.0.10, this always happens immediately.
     // http://dev.processing.org/bugs/show_bug.cgi?id=1456
+
+    toFront();
 
     String prompt = I18n.format(_("Save changes to \"{0}\"?  "), sketch.getName());
 
@@ -2177,7 +2210,7 @@ public class Editor extends JFrame implements RunnerListener {
           // copy the sketch inside
           File properPdeFile = new File(properFolder, sketchFile.getName());
           try {
-            Base.copyFile(file, properPdeFile);
+            Base.copyFile(sketchFile, properPdeFile);
           } catch (IOException e) {
             Base.showWarning(_("Error"), _("Could not copy to a proper location."), e);
             return false;
@@ -2538,6 +2571,12 @@ public class Editor extends JFrame implements RunnerListener {
         statusError(_("Unable to connect: is the sketch using the bridge?"));
       } catch (JSchException e) {
         statusError(_("Unable to connect: wrong password?"));
+      } catch (SerialException e) {
+        String errorMessage = e.getMessage();
+        if (e.getCause() != null && e.getCause() instanceof SerialPortException) {
+          errorMessage += " (" + ((SerialPortException) e.getCause()).getExceptionType() + ")";
+        }
+        statusError(errorMessage);
       } catch (Exception e) {
         statusError(e);
       } finally {

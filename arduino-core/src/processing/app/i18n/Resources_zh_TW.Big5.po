@@ -97,6 +97,10 @@ msgstr "加入檔案..."
 msgid "Add Library..."
 msgstr "匯入程式庫..."
 
+#: ../../../../../app/src/processing/app/Preferences.java:161
+msgid "Afrikaans"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:96
 msgid "Albanian"
 msgstr "阿爾巴尼亞語"
@@ -288,6 +292,10 @@ msgstr "巴斯克語"
 #: ../../../processing/app/Preferences.java:139
 msgid "Belarusian"
 msgstr "白俄羅斯語"
+
+#: ../../../../../app/src/processing/app/Preferences.java:165
+msgid "Bengali (India)"
+msgstr ""
 
 #: ../../../processing/app/Base.java:1433
 #: ../../../processing/app/Editor.java:707
@@ -585,9 +593,17 @@ msgstr "剪下"
 msgid "Czech"
 msgstr "捷克語"
 
+#: ../../../../../app/src/processing/app/Preferences.java:119
+msgid "Czech (Czech Republic)"
+msgstr ""
+
 #: Preferences.java:90
 msgid "Danish"
 msgstr "丹麥語"
+
+#: ../../../../../app/src/processing/app/Preferences.java:120
+msgid "Danish (Denmark)"
+msgstr ""
 
 #: Editor.java:1224 Editor.java:2765
 msgid "Decrease Indent"
@@ -791,10 +807,6 @@ msgstr "範例"
 msgid "Export canceled, changes must first be saved."
 msgstr "匯出動作已取消，必須先儲存變更。"
 
-#: Base.java:2100
-msgid "FAQ.html"
-msgstr "FAQ.html"
-
 #: ../../../processing/app/Base.java:416
 #, java-format
 msgid "Failed to open sketch: \"{0}\""
@@ -864,6 +876,10 @@ msgstr "常見問答集"
 msgid "Galician"
 msgstr "加利西亞語"
 
+#: ../../../../../app/src/processing/app/Preferences.java:176
+msgid "Galician (Spain)"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:94
 msgid "Georgian"
 msgstr "喬治亞語"
@@ -891,22 +907,6 @@ msgstr ""
 #: Preferences.java:98
 msgid "Greek"
 msgstr "希臘語"
-
-#: Base.java:2085
-msgid "Guide_Environment.html"
-msgstr "Guide_Environment.html"
-
-#: Base.java:2071
-msgid "Guide_MacOSX.html"
-msgstr "Guide_MacOSX.html"
-
-#: Base.java:2095
-msgid "Guide_Troubleshooting.html"
-msgstr "Guide_Troubleshooting.html"
-
-#: Base.java:2073
-msgid "Guide_Windows.html"
-msgstr "Guide_Windows.html"
 
 #: ../../../processing/app/Preferences.java:95
 msgid "Hebrew"
@@ -1002,6 +1002,10 @@ msgstr "立陶宛語"
 msgid "Low memory available, stability problems may occur."
 msgstr ""
 
+#: ../../../../../app/src/processing/app/Preferences.java:180
+msgid "Malay (Malaysia)"
+msgstr ""
+
 #: Preferences.java:107
 msgid "Marathi"
 msgstr "馬拉地語"
@@ -1044,6 +1048,10 @@ msgstr "新檔案的名字："
 
 #: ../../../processing/app/Preferences.java:149
 msgid "Nepali"
+msgstr ""
+
+#: ../../../../../app/src/processing/app/Editor.java:65
+msgid "Network ports"
 msgstr ""
 
 #: ../../../cc/arduino/packages/uploaders/SSHUploader.java:51
@@ -1145,9 +1153,17 @@ msgstr "設定外觀與感覺時發生非重大的錯誤。"
 msgid "Nope"
 msgstr "不要"
 
+#: ../../../../../app/src/processing/app/Preferences.java:181
+msgid "Norwegian"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:108
 msgid "Norwegian Bokmål"
 msgstr "巴克摩挪威語"
+
+#: ../../../../../app/src/processing/app/Preferences.java:182
+msgid "Norwegian Nynorsk"
+msgstr ""
 
 #: ../../../processing/app/Sketch.java:1656
 msgid ""
@@ -1445,6 +1461,10 @@ msgid ""
 "Retry the upload with another serial port?"
 msgstr "沒找到序列埠{0}。\n以另一個序列埠再試著上傳嗎？"
 
+#: ../../../../../app/src/processing/app/Editor.java:65
+msgid "Serial ports"
+msgstr ""
+
 #: Base.java:1681
 msgid "Settings issues"
 msgstr "設定值相關問題"
@@ -1518,6 +1538,10 @@ msgstr ""
 msgid "Sketches (*.ino, *.pde)"
 msgstr ""
 
+#: ../../../../../app/src/processing/app/Preferences.java:185
+msgid "Slovak"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:152
 msgid "Slovenian"
 msgstr ""
@@ -1548,6 +1572,10 @@ msgstr "西班牙語"
 msgid "Sunshine"
 msgstr "陽光"
 
+#: ../../../../../app/src/processing/app/Preferences.java:187
+msgid "Swahili"
+msgstr ""
+
 #: ../../../processing/app/Preferences.java:153
 msgid "Swedish"
 msgstr ""
@@ -1555,6 +1583,10 @@ msgstr ""
 #: Preferences.java:84
 msgid "System Default"
 msgstr "系統預設"
+
+#: ../../../../../app/src/processing/app/Preferences.java:188
+msgid "Talossan"
+msgstr ""
 
 #: Preferences.java:116
 msgid "Tamil"
@@ -1761,6 +1793,10 @@ msgstr "上傳到板子中..."
 msgid "Uploading..."
 msgstr "上傳中..."
 
+#: ../../../../../app/src/processing/app/Preferences.java:189
+msgid "Urdu (Pakistan)"
+msgstr ""
+
 #: Editor.java:1269
 msgid "Use Selection For Find"
 msgstr "以選取字串進行尋找"
@@ -1809,6 +1845,10 @@ msgstr ""
 #: Base.java:2128
 msgid "Warning"
 msgstr "警告"
+
+#: ../../../../../app/src/processing/app/Preferences.java:190
+msgid "Western Frisian"
+msgstr ""
 
 #: debug/Compiler.java:444
 msgid "Wire.receive() has been renamed Wire.read()."
@@ -1966,10 +2006,6 @@ msgstr "createNewFile()回傳false"
 msgid "enabled in File > Preferences."
 msgstr "在檔案 > 偏好設定裡啟用。"
 
-#: Base.java:2090
-msgid "environment"
-msgstr "開發環境"
-
 #: Editor.java:1108
 msgid "http://arduino.cc/"
 msgstr "http://arduino.cc/"
@@ -1982,26 +2018,14 @@ msgstr "http://www.arduino.cc/en/Main/Software"
 msgid "http://www.arduino.cc/latest.txt"
 msgstr "http://www.arduino.cc/latest.txt"
 
-#: Base.java:2075
-msgid "http://www.arduino.cc/playground/Learning/Linux"
-msgstr "http://www.arduino.cc/playground/Learning/Linux"
-
 #: Preferences.java:625
 #, java-format
 msgid "ignoring invalid font size {0}"
 msgstr "忽略無效的字型大小{0}"
 
-#: Base.java:2080
-msgid "index.html"
-msgstr "index.html"
-
 #: Editor.java:936 Editor.java:943
 msgid "name is null"
 msgstr "名稱是空的"
-
-#: Base.java:2090
-msgid "platforms.html"
-msgstr "platforms.html"
 
 #: Editor.java:932
 msgid "serialMenu is null"
@@ -2036,11 +2060,6 @@ msgstr "{0}回傳{1}"
 #, java-format
 msgid "{0} | Arduino {1}"
 msgstr "{0} | Arduino {1}"
-
-#: Editor.java:1874
-#, java-format
-msgid "{0}.html"
-msgstr "{0}.html"
 
 #: ../../../processing/app/Base.java:519
 #, java-format

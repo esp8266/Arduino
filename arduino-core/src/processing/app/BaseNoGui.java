@@ -7,13 +7,8 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.net.URISyntaxException;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,9 +37,9 @@ import processing.app.packages.LibraryList;
 public class BaseNoGui {
 
   /** Version string to be used for build */
-  public static final int REVISION = 10600;
+  public static final int REVISION = 10601;
   /** Extended version string displayed on GUI */
-  static String VERSION_NAME = "1.6.0";
+  static String VERSION_NAME = "1.6.1";
 
   static File buildFolder;
 
@@ -154,35 +149,46 @@ public class BaseNoGui {
     TargetBoard board = getTargetBoard();
     if (board == null)
       return null;
+    String boardId = board.getId();
     
     PreferencesMap prefs = new PreferencesMap(board.getPreferences());
+
+    String extendedName = prefs.get("name");
     for (String menuId : board.getMenuIds()) {
+      if (!board.hasMenu(menuId))
+        continue;
+
+      // Get "custom_[MENU_ID]" preference (for example "custom_cpu")
       String entry = PreferencesData.get("custom_" + menuId);
-      if (board.hasMenu(menuId) && entry != null &&
-          entry.startsWith(board.getId())) {
-        String selectionId = entry.substring(entry.indexOf("_") + 1);
+      if (entry != null && entry.startsWith(boardId)) {
+
+        String selectionId = entry.substring(boardId.length() + 1);
         prefs.putAll(board.getMenuPreferences(menuId, selectionId));
-        prefs.put("name", prefs.get("name") + ", " +
-            board.getMenuLabel(menuId, selectionId));
+
+        // Update the name with the extended configuration
+        extendedName += ", " + board.getMenuLabel(menuId, selectionId);
       }
     }
+    prefs.put("name", extendedName);
     return prefs;
   }
 
   static public File getContentFile(String name) {
-    String path = System.getProperty("user.dir");
+    File path = new File(System.getProperty("user.dir"));
 
-    // Get a path to somewhere inside the .app folder
     if (OSUtils.isMacOS()) {
-//      <key>javaroot</key>
-//      <string>$JAVAROOT</string>
-      String javaroot = System.getProperty("javaroot");
-      if (javaroot != null) {
-        path = javaroot;
+      if (System.getProperty("WORK_DIR") != null) {
+        path = new File(System.getProperty("WORK_DIR"));
+      } else {
+        try {
+          path = new File(BaseNoGui.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile();
+        } catch (URISyntaxException e) {
+          throw new RuntimeException(e);
+        }
       }
     }
-    File working = new File(path);
-    return new File(working, name);
+
+    return new File(path, name);
   }
 
   static public TargetPlatform getCurrentTargetPlatformFromPackage(String pack) {
@@ -682,7 +688,7 @@ public class BaseNoGui {
     // Add library folder for the current selected platform
     TargetPlatform targetPlatform = getTargetPlatform();
     if (targetPlatform != null) {
-      String core = getBoardPreferences().get("build.core");
+      String core = getBoardPreferences().get("build.core", "arduino");
       if (core.contains(":")) {
         String referencedCore = core.split(":")[0];
         TargetPlatform referencedPlatform = getTargetPlatform(referencedCore, targetPlatform.getId());
