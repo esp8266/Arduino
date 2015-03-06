@@ -23,12 +23,16 @@
 
 package processing.app;
 
+import cc.arduino.packages.BoardPort;
 import cc.arduino.packages.Uploader;
+import cc.arduino.view.*;
 import processing.app.debug.Compiler;
 import processing.app.debug.Compiler.ProgressListener;
 import processing.app.debug.RunnerException;
+import processing.app.debug.TargetBoard;
 import processing.app.forms.PasswordAuthorizationDialog;
 import processing.app.helpers.OSUtils;
+import processing.app.helpers.PreferencesMap;
 import processing.app.helpers.PreferencesMapException;
 import processing.app.packages.Library;
 
@@ -1148,6 +1152,8 @@ public class Sketch {
    * @return null if compilation failed, main class name if not
    */
   public String build(String buildPath, boolean verbose) throws RunnerException, PreferencesMapException {
+    useOriginalVidPidIfUncertified();
+
     // run the preprocessor
     editor.status.progressUpdate(20);
 
@@ -1197,6 +1203,37 @@ public class Sketch {
     return success;
   }
 
+  private void useOriginalVidPidIfUncertified() {
+    BoardPort boardPort = BaseNoGui.getDiscoveryManager().find(PreferencesData.get("serial.port"));
+    if (boardPort == null) {
+      return;
+    }
+    TargetBoard targetBoard = BaseNoGui.getTargetBoard();
+    if (targetBoard == null) {
+      return;
+    }
+    PreferencesMap boardPreferences = targetBoard.getPreferences();
+    if (boardPreferences.containsKey("build.vid") && boardPreferences.containsKey("build.pid")) {
+      if (!boardPreferences.containsKey("backup.build.vid")) {
+        boardPreferences.put("backup.build.vid", boardPreferences.get("build.vid"));
+        boardPreferences.put("backup.build.pid", boardPreferences.get("build.pid"));
+      }
+
+      if (boardPort.getPrefs().get("warning") != null) {
+        boardPreferences.put("build.vid", boardPort.getPrefs().get("vid"));
+        boardPreferences.put("build.pid", boardPort.getPrefs().get("pid"));
+      } else {
+        boardPreferences.put("build.vid", boardPreferences.get("backup.build.vid"));
+        boardPreferences.put("build.pid", boardPreferences.get("backup.build.pid"));
+      }
+    }
+
+    if (boardPort.getPrefs().get("warning") != null && !Preferences.getBoolean("uncertifiedBoardWarning_dontShowMeAgain")) {
+      SwingUtilities.invokeLater(new ShowUncertifiedBoardWarning(editor));
+    }
+
+
+  }
 
   protected boolean upload(String buildPath, String suggestedClassName, boolean usingProgrammer) throws Exception {
 

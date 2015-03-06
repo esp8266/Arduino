@@ -210,7 +210,7 @@ public class Platform extends processing.app.Platform {
   }
 
   @Override
-  public String resolveDeviceAttachedTo(String serial, Map<String, TargetPackage> packages, String devicesListOutput) {
+  public Map<String, Object> resolveDeviceAttachedTo(String serial, Map<String, TargetPackage> packages, String devicesListOutput) {
     if (devicesListOutput == null) {
       return super.resolveDeviceAttachedTo(serial, packages, devicesListOutput);
     }

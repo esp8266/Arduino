@@ -29,17 +29,26 @@
 
 package cc.arduino.packages.discoverers;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import cc.arduino.packages.BoardPort;
+import cc.arduino.packages.Discovery;
 import processing.app.BaseNoGui;
 import processing.app.Platform;
 import processing.app.Serial;
+import processing.app.debug.TargetBoard;
 import processing.app.helpers.PreferencesMap;
-import cc.arduino.packages.BoardPort;
-import cc.arduino.packages.Discovery;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static processing.app.I18n._;
 
 public class SerialDiscovery implements Discovery {
+
+  static {
+    //makes transifex happy
+    _("Uncertified");
+  }
 
   @Override
   public List<BoardPort> discovery() {
@@ -51,16 +60,35 @@ public class SerialDiscovery implements Discovery {
     List<String> ports = Serial.list();
 
     for (String port : ports) {
-      String boardName = os.resolveDeviceAttachedTo(port, BaseNoGui.packages, devicesListOutput);
-      String label = port;
-      if (boardName != null)
-        label += " (" + boardName + ")";
+      Map<String, Object> boardData = os.resolveDeviceAttachedTo(port, BaseNoGui.packages, devicesListOutput);
+      TargetBoard board = (TargetBoard) boardData.get("board");
 
       BoardPort boardPort = new BoardPort();
       boardPort.setAddress(port);
       boardPort.setProtocol("serial");
+
+      PreferencesMap prefs = new PreferencesMap();
+      prefs.put("vid", boardData.get("vid").toString());
+      prefs.put("pid", boardData.get("pid").toString());
+      String warningKey = "vid." + boardData.get("vid").toString() + ".warning";
+      String warning = board.getPreferences().get(warningKey);
+      prefs.put("warning", warning);
+
+      String boardName = board.getName();
+      String label = port;
+      if (boardName != null) {
+        if (warning != null) {
+          label += " (" + boardName + " - " + _(warning) + ")";
+        } else {
+          label += " (" + boardName + ")";
+        }
+      }
       boardPort.setBoardName(boardName);
       boardPort.setLabel(label);
+
+
+      boardPort.setPrefs(prefs);
+
       res.add(boardPort);
     }
     return res;

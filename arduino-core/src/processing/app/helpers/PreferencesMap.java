@@ -222,12 +222,21 @@ public class PreferencesMap extends LinkedHashMap<String, String> {
    * @return
    */
   public PreferencesMap subTree(String parent) {
+    return subTree(parent, -1);
+  }
+
+  public PreferencesMap subTree(String parent, int sublevels) {
     PreferencesMap res = new PreferencesMap();
     parent += ".";
     int parentLen = parent.length();
     for (String key : keySet()) {
-      if (key.startsWith(parent))
-        res.put(key.substring(parentLen), get(key));
+      if (key.startsWith(parent)) {
+        String newKey = key.substring(parentLen);
+        int keySubLevels = newKey.split("\\.").length;
+        if (sublevels == -1 || keySubLevels == sublevels) {
+          res.put(newKey, get(key));
+        }
+      }
     }
     return res;
   }

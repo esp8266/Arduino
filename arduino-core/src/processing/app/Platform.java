@@ -24,6 +24,7 @@ package processing.app;
 import static processing.app.I18n._;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -135,7 +136,7 @@ public class Platform {
     }
   }
 
-  public String resolveDeviceAttachedTo(String serial, Map<String, TargetPackage> packages, String devicesListOutput) {
+  public Map<String, Object> resolveDeviceAttachedTo(String serial, Map<String, TargetPackage> packages, String devicesListOutput) {
     return null;
   }
 
@@ -143,17 +144,21 @@ public class Platform {
     return null;
   }
 
-  protected String resolveDeviceByVendorIdProductId(Map<String, TargetPackage> packages, String readVIDPID) {
+  protected Map<String, Object> resolveDeviceByVendorIdProductId(Map<String, TargetPackage> packages, String readVIDPID) {
     for (TargetPackage targetPackage : packages.values()) {
       for (TargetPlatform targetPlatform : targetPackage.getPlatforms().values()) {
         for (TargetBoard board : targetPlatform.getBoards().values()) {
-          List<String> vids = new LinkedList<String>(board.getPreferences().subTree("vid").values());
+          List<String> vids = new LinkedList<String>(board.getPreferences().subTree("vid", 1).values());
           if (!vids.isEmpty()) {
-            List<String> pids = new LinkedList<String>(board.getPreferences().subTree("pid").values());
-            for (int i = 0; i< vids.size(); i++) {
+            List<String> pids = new LinkedList<String>(board.getPreferences().subTree("pid", 1).values());
+            for (int i = 0; i < vids.size(); i++) {
               String vidPid = vids.get(i) + "_" + pids.get(i);
               if (vidPid.toUpperCase().equals(readVIDPID)) {
-                return board.getName();
+                Map<String, Object> boardData = new HashMap<String, Object>();
+                boardData.put("board", board);
+                boardData.put("vid", vids.get(i));
+                boardData.put("pid", pids.get(i));
+                return boardData;
               }
             }
           }
