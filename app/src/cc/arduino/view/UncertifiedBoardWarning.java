@@ -66,10 +66,10 @@ public class UncertifiedBoardWarning extends javax.swing.JDialog {
     jLabel1.setText("<html><body>" + _("This board comes from an uncertified manufacturer.") + "<br>" + _("We won't be able to provide any support if it doesn't work as expected.") + "</body></html>");
     jLabel1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
-    dontShowMeAgain.setText("Don't show me again");
+    dontShowMeAgain.setText(_("Don't show me again"));
     dontShowMeAgain.setName("dontShowMeAgain"); // NOI18N
 
-    ok.setText("OK");
+    ok.setText(_("OK"));
     ok.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         okActionPerformed(evt);
