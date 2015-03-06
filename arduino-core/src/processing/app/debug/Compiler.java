@@ -183,6 +183,9 @@ public class Compiler implements MessageConsumer {
     sketch = _sketch;
     prefs = createBuildPreferences(_buildPath, _primaryClassName);
 
+    // provide access to the source tree
+    prefs.put("build.source.path", _sketch.getFolder().getAbsolutePath());
+
     // Start with an empty progress listener
     progressListener = new ProgressListener() {
       @Override
