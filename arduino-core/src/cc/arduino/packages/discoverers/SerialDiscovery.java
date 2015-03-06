@@ -38,6 +38,7 @@ import processing.app.debug.TargetBoard;
 import processing.app.helpers.PreferencesMap;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,32 +62,38 @@ public class SerialDiscovery implements Discovery {
 
     for (String port : ports) {
       Map<String, Object> boardData = os.resolveDeviceAttachedTo(port, BaseNoGui.packages, devicesListOutput);
-      TargetBoard board = (TargetBoard) boardData.get("board");
 
       BoardPort boardPort = new BoardPort();
       boardPort.setAddress(port);
       boardPort.setProtocol("serial");
 
-      PreferencesMap prefs = new PreferencesMap();
-      prefs.put("vid", boardData.get("vid").toString());
-      prefs.put("pid", boardData.get("pid").toString());
-      String warningKey = "vid." + boardData.get("vid").toString() + ".warning";
-      String warning = board.getPreferences().get(warningKey);
-      prefs.put("warning", warning);
-
-      String boardName = board.getName();
       String label = port;
-      if (boardName != null) {
-        if (warning != null) {
-          label += " (" + boardName + " - " + _(warning) + ")";
-        } else {
-          label += " (" + boardName + ")";
+
+      PreferencesMap prefs = new PreferencesMap();
+
+      if (boardData != null) {
+        prefs.put("vid", boardData.get("vid").toString());
+        prefs.put("pid", boardData.get("pid").toString());
+
+        TargetBoard board = (TargetBoard) boardData.get("board");
+        if (board != null) {
+          String warningKey = "vid." + boardData.get("vid").toString() + ".warning";
+          String warning = board.getPreferences().get(warningKey);
+          prefs.put("warning", warning);
+
+          String boardName = board.getName();
+          if (boardName != null) {
+            if (warning != null) {
+              label += " (" + boardName + " - " + _(warning) + ")";
+            } else {
+              label += " (" + boardName + ")";
+            }
+          }
+          boardPort.setBoardName(boardName);
         }
       }
-      boardPort.setBoardName(boardName);
+
       boardPort.setLabel(label);
-
-
       boardPort.setPrefs(prefs);
 
       res.add(boardPort);
