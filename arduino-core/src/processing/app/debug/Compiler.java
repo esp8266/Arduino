@@ -349,6 +349,11 @@ public class Compiler implements MessageConsumer {
     
     verbose = _verbose || PreferencesData.getBoolean("build.verbose");
     sketchIsCompiled = false;
+
+    // Hook runs at Start of Compilation
+    if (prefs.containsKey("recipe.hooks.prebuild"))
+        runRecipe("recipe.hooks.prebuild");
+
     objectFiles = new ArrayList<File>();
 
     // 0. include paths for core + all libraries
@@ -416,6 +421,11 @@ public class Compiler implements MessageConsumer {
     }
 
     progressListener.progress(90);
+
+    //    Hook runs at End of Compilation
+    if (prefs.containsKey("recipe.hooks.postbuild"))
+        runRecipe("recipe.hooks.postbuild");
+
     return true;
   }
 
