@@ -351,8 +351,7 @@ public class Compiler implements MessageConsumer {
     sketchIsCompiled = false;
 
     // Hook runs at Start of Compilation
-    if (prefs.containsKey("recipe.hooks.prebuild"))
-        runRecipe("recipe.hooks.prebuild");
+    runActions("hooks.prebuild", prefs);
 
     objectFiles = new ArrayList<File>();
 
@@ -422,9 +421,8 @@ public class Compiler implements MessageConsumer {
 
     progressListener.progress(90);
 
-    //    Hook runs at End of Compilation
-    if (prefs.containsKey("recipe.hooks.postbuild"))
-        runRecipe("recipe.hooks.postbuild");
+    // Hook runs at End of Compilation
+    runActions("hooks.postbuild", prefs);
 
     return true;
   }
@@ -1045,6 +1043,18 @@ public class Compiler implements MessageConsumer {
       throw new RunnerException(e);
     }
     execAsynchronously(cmdArray);
+  }
+
+  void runActions(String recipeClass, PreferencesMap prefs) throws RunnerException, PreferencesMapException {
+    List<String> patterns = new ArrayList<String>();
+    for (String key : prefs.keySet()) {
+    if (key.startsWith("recipe."+recipeClass) && key.endsWith(".pattern"))
+      patterns.add(key);
+    }
+    Collections.sort(patterns);
+    for (String recipe : patterns) {
+      runRecipe(recipe);
+    }
   }
 
   void runRecipe(String recipe) throws RunnerException, PreferencesMapException {
