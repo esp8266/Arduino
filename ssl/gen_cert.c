@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Cameron Rich
+ * Copyright (c) 2007-2014, Cameron Rich
  * 
  * All rights reserved.
  * 
@@ -142,7 +142,7 @@ static int gen_dn(const char *name, uint8_t dn_type,
     buf[(*offset)++] = dn_type;
     buf[(*offset)++] = ASN1_PRINTABLE_STR;
     buf[(*offset)++] = name_size;
-    strcpy(&buf[*offset], name);
+    strcpy((char *)&buf[*offset], name);
     *offset += name_size;
 
 error:
@@ -165,7 +165,13 @@ static int gen_issuer(const char * dn[], uint8_t *buf, int *offset)
         gethostname(fqdn, sizeof(fqdn));
         fqdn_len = strlen(fqdn);
         fqdn[fqdn_len++] = '.';
-        getdomainname(&fqdn[fqdn_len], sizeof(fqdn)-fqdn_len);
+
+        if (getdomainname(&fqdn[fqdn_len], sizeof(fqdn)-fqdn_len) < 0)
+        {
+            ret = X509_NOT_OK;
+            goto error;
+        }
+
         fqdn_len = strlen(fqdn);
 
         if (fqdn[fqdn_len-1] == '.')    /* ensure '.' is not last char */

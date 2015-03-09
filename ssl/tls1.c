@@ -1348,13 +1348,14 @@ int basic_read(SSL *ssl, uint8_t **in_data)
             break;
 
         case PT_APP_PROTOCOL_DATA:
-            if (in_data)
+            if (in_data && ssl->hs_status == SSL_OK)
             {
                 *in_data = buf;   /* point to the work buffer */
                 (*in_data)[read_len] = 0;  /* null terminate just in case */
+                ret = read_len;
             }
-
-            ret = read_len;
+            else
+                ret = SSL_ERROR_INVALID_PROT_MSG;
             break;
 
         case PT_ALERT_PROTOCOL:
