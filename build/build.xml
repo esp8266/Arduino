@@ -602,7 +602,7 @@
     <chmod perm="755" file="linux/work/lib/libastylej.so" />
   </target>
 
-  <target name="linux32-build" depends="linux-build" description="Build linux (32-bit) version">
+  <target name="linux32-build" depends="linux-build" unless="light_bundle" description="Build linux (32-bit) version">
     <antcall target="avr-toolchain-bundle">
       <param name="unpack_target" value="untar"/>
       <param name="gcc_archive_file" value="avr-gcc-4.8.1-arduino-i686-pc-linux-gnu.tar.bz2"/>
@@ -622,7 +622,7 @@
     <delete dir="${staging_folder}/work/dist/bundled_package/"/>
   </target>
 
-  <target name="linux64-build" depends="linux-build" description="Build linux (64-bit) version">
+  <target name="linux64-build" depends="linux-build"  unless="light_bundle" description="Build linux (64-bit) version">
     <antcall target="avr-toolchain-bundle">
       <param name="unpack_target" value="untar"/>
       <param name="gcc_archive_file" value="avr-gcc-4.8.1-arduino-x86_64-pc-linux-gnu.tar.bz2"/>
