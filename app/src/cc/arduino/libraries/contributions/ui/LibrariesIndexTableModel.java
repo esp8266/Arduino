@@ -28,17 +28,17 @@
  */
 package cc.arduino.libraries.contributions.ui;
 
-import static cc.arduino.packages.contributions.VersionComparator.VERSION_COMPARATOR;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import cc.arduino.libraries.contributions.ContributedLibrary;
 import cc.arduino.libraries.contributions.LibrariesIndexer;
 import cc.arduino.packages.contributions.ContributedPackage;
 import cc.arduino.packages.contributions.ContributedPlatform;
 import cc.arduino.ui.FilteredAbstractTableModel;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static cc.arduino.packages.contributions.VersionComparator.VERSION_COMPARATOR;
 
 @SuppressWarnings("serial")
 public class LibrariesIndexTableModel extends FilteredAbstractTableModel {
@@ -144,17 +144,25 @@ public class LibrariesIndexTableModel extends FilteredAbstractTableModel {
    * compare is case insensitive.
    * 
    * @param string
-   * @param set
+   * @param filters
    * @return <b>true<b> if all the strings in <b>set</b> are contained in
    *         <b>string</b>.
    */
-  private boolean stringContainsAll(String string, String set[]) {
-    if (set == null)
-      return true;
-    for (String s : set) {
-      if (!string.toLowerCase().contains(s.toLowerCase()))
-        return false;
+  private boolean stringContainsAll(String string, String filters[]) {
+    if (string == null) {
+      return false;
     }
+
+    if (filters == null) {
+      return true;
+    }
+
+    for (String filter : filters) {
+      if (!string.toLowerCase().contains(filter.toLowerCase())) {
+        return false;
+      }
+    }
+
     return true;
   }
 
@@ -229,12 +237,13 @@ public class LibrariesIndexTableModel extends FilteredAbstractTableModel {
 
   private void applyFilterToLibrary(ContributedLibrary lib) {
     if (selectedCategory != null && !selectedCategory.isEmpty()) {
-      if (lib.getCategory() == null ||
-          !lib.getCategory().equals(selectedCategory))
+      if (lib.getCategory() == null || !lib.getCategory().equals(selectedCategory)) {
         return;
+      }
     }
-    if (!stringContainsAll(lib.getName(), selectedFilters))
+    if (!stringContainsAll(lib.getName(), selectedFilters) && !stringContainsAll(lib.getParagraph(), selectedFilters) && !stringContainsAll(lib.getSentence(), selectedFilters)) {
       return;
+    }
     addContribution(lib);
   }
 

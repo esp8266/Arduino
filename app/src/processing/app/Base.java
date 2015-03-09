@@ -1056,24 +1056,23 @@ public class Base {
         // Find the current target. Get the platform, and then select the
         // correct name and core path.
         String platformNameLabel;
-        PreferencesMap prefs = targetPlatform.getPreferences();
-        if (prefs != null && prefs.get("name") != null) {
-          platformNameLabel = prefs.get("name");
-        } else {
-          platformNameLabel = targetPlatform.getContainerPackage().getId() + "/" + targetPlatform.getId();
-          platformNameLabel = I18n.format(_("{0} boards"), platformNameLabel);
-        }
+        platformNameLabel = targetPlatform.getContainerPackage().getId() + "/" + targetPlatform.getId();
+        platformNameLabel = I18n.format(_("{0} libraries"), platformNameLabel);
         JMenuItem platformItem = new JMenuItem(_(platformNameLabel));
         platformItem.setEnabled(false);
         importMenu.add(platformItem);
 
         if (ideLibs.size() > 0) {
-          importMenu.addSeparator();
           addLibraries(importMenu, ideLibs);
         }
 
         if (userLibs.size() > 0) {
-          importMenu.addSeparator();
+          if (ideLibs.size() > 0) {
+            importMenu.addSeparator();
+          }
+          JMenuItem contributedLibraryItem = new JMenuItem(_("Contributed libraries"));
+          contributedLibraryItem.setEnabled(false);
+          importMenu.add(contributedLibraryItem);
           addLibraries(importMenu, userLibs);
         }
       } catch (IOException e) {

@@ -258,9 +258,19 @@ public abstract class InstallerJDialog extends JDialog {
   }
 
   protected ActionListener categoryChooserActionListener = new ActionListener() {
+
+    public String getSelectedItem() {
+      Object obj = categoryChooser.getSelectedItem();
+      if (obj instanceof String) {
+        return (String) obj;
+      }
+      DropdownItem item = (DropdownItem) obj;
+      return item.getItemValue();
+    }
+
     @Override
-    public void actionPerformed(ActionEvent arg0) {
-      String selected = (String) categoryChooser.getSelectedItem();
+    public void actionPerformed(ActionEvent event) {
+      String selected = getSelectedItem();
       if (category == null || !category.equals(selected)) {
         category = selected;
         cellEditor.stopCellEditing();

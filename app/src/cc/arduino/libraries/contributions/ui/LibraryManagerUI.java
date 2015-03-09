@@ -31,6 +31,7 @@ package cc.arduino.libraries.contributions.ui;
 import cc.arduino.libraries.contributions.ContributedLibrary;
 import cc.arduino.libraries.contributions.LibrariesIndexer;
 import cc.arduino.packages.contributions.ui.InstallerJDialogUncaughtExceptionHandler;
+import cc.arduino.ui.DropdownALLItem;
 import cc.arduino.ui.FilteredAbstractTableModel;
 import cc.arduino.ui.InstallerJDialog;
 import cc.arduino.ui.InstallerTableCell;
@@ -94,7 +95,7 @@ public class LibraryManagerUI extends InstallerJDialog {
 
     // Load categories
     Collection<String> categories = indexer.getIndex().getCategories();
-    categoryChooser.addItem("");
+    categoryChooser.addItem(new DropdownALLItem());
     for (String s : categories)
       categoryChooser.addItem(s);
 

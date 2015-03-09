@@ -28,38 +28,26 @@
  */
 package cc.arduino.libraries.contributions.ui;
 
-import static processing.app.I18n._;
-import static processing.app.I18n.format;
+import cc.arduino.libraries.contributions.ContributedLibrary;
+import cc.arduino.libraries.contributions.ui.LibrariesIndexTableModel.ContributedLibraryReleases;
+import cc.arduino.ui.InstallerTableCell;
+import processing.app.Base;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTable;
-import javax.swing.JTextPane;
-import javax.swing.Timer;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.Document;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.StyleSheet;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
-import processing.app.Base;
-import cc.arduino.libraries.contributions.ContributedLibrary;
-import cc.arduino.libraries.contributions.ui.LibrariesIndexTableModel.ContributedLibraryReleases;
-import cc.arduino.ui.InstallerTableCell;
+import static processing.app.I18n._;
+import static processing.app.I18n.format;
 
 @SuppressWarnings("serial")
 public class ContributedLibraryTableCell extends InstallerTableCell {
@@ -213,7 +201,14 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
                                                  int column) {
     parentTable = table;
     setEnabled(false);
-    return getUpdatedCellComponent(value, isSelected, row);
+    Component component = getUpdatedCellComponent(value, isSelected, row);
+    if (row % 2 == 0) {
+      component.setBackground(new Color(236, 241, 241)); //#ecf1f1
+    } else {
+      component.setBackground(new Color(255, 255, 255));
+    }
+
+    return component;
   }
 
   private ContributedLibraryReleases editorValue;
@@ -241,10 +236,12 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
       downgradeChooser.addItem(release);
       visible = true;
     }
-    downgradeChooser.setVisible(visible);
-    downgradeButton.setVisible(visible);
+    downgradeChooser.setVisible(visible && editorValue.releases.size() > 1);
+    downgradeButton.setVisible(visible && editorValue.releases.size() > 1);
 
-    return getUpdatedCellComponent(value, true, row);
+    Component component = getUpdatedCellComponent(value, true, row);
+    component.setBackground(new Color(218, 227, 227)); //#dae3e3
+    return component;
   }
 
   private Component getUpdatedCellComponent(Object value, boolean isSelected, int row) {
@@ -293,7 +290,7 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
     // ...author...
     desc += format("<font color=\"{0}\">", midcolor);
     if (author != null && !author.isEmpty()) {
-      desc += format(" by <a href=\"{0}\">{1}</a>", website, author);
+      desc += format(" by <b>{0}</b>", author);
     }
     
     // ...version.
@@ -314,6 +311,9 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
       if (paragraph != null && !paragraph.isEmpty())
         desc += format("{0}", paragraph);
       desc += "<br />";
+    }
+    if (author != null && !author.isEmpty()) {
+      desc += format("<a href=\"{0}\">More info</a>", website);
     }
 
     desc += "</body></html>";
