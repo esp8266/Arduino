@@ -14,9 +14,11 @@ ARDUINO 1.6.1
 * Windows: opening a lonely sketch caused the IDE to crash. Fixed with a bounty on bountysource @gerito1
 * Bridge: fixed bug with multiple and failing YunClient.connect calls @sngl
 * Translations updated
+* Improved SoftSerial library and optimized its memory usage @matthijskooijman
 * Fixed: status board was not changing when using custom menu @PaulStoffregen
 * Fixed: better error message when using a busy serial device
 * Fixed: missing bool operator on EthernetClient
+* Fixed: missing bool operator on SoftSerial
 * MacOSX: back to native file dialogs and buttons, when using experimental version
 * MacOSX: command line interface now works also with java-latest version
 
