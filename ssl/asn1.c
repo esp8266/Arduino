@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2014, Cameron Rich
+ * Copyright (c) 2007-2015, Cameron Rich
  * 
  * All rights reserved.
  * 
@@ -40,20 +40,39 @@
 #include "crypto.h"
 #include "crypto_misc.h"
 
-/* Must be an RSA algorithm with either SHA1/SHA256/MD5 for verifying to work */
+/* 1.2.840.113549.1.1 OID prefix - handle the following */
+/* md5WithRSAEncryption(4) */
+/* sha1WithRSAEncryption(5) */
+/* sha256WithRSAEncryption (11) */
+/* sha384WithRSAEncryption (12) */
+/* sha512WithRSAEncryption (13) */
 static const uint8_t sig_oid_prefix[] = 
 {
     0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01
 };
 
+/* 1.3.14.3.2.29 SHA1 with RSA signature */
 static const uint8_t sig_sha1WithRSAEncrypt[] =
 {
     0x2b, 0x0e, 0x03, 0x02, 0x1d
 };
 
-static const uint8_t sig_sha256WithRSAEncrypt[] =
+/* 2.16.840.1.101.3.4.2.1 SHA-256 */
+static const uint8_t sig_sha256[] =
 {
     0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x01
+};
+
+/* 2.16.840.1.101.3.4.2.2 SHA-384 */
+static const uint8_t sig_sha384[] =
+{
+    0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x02
+};
+
+/* 2.16.840.1.101.3.4.2.3 SHA-512 */
+static const uint8_t sig_sha512[] =
+{
+    0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x03
 };
 
 static const uint8_t sig_subject_alt_name[] =
@@ -588,11 +607,23 @@ int asn1_signature_type(const uint8_t *cert,
     {
         x509_ctx->sig_type = SIG_TYPE_SHA1;
     }
-    else if (len == sizeof(sig_sha256WithRSAEncrypt) && 
-            memcmp(sig_sha256WithRSAEncrypt, &cert[*offset], 
-                                    sizeof(sig_sha256WithRSAEncrypt)) == 0)
+    else if (len == sizeof(sig_sha256) && 
+            memcmp(sig_sha256, &cert[*offset], 
+                                    sizeof(sig_sha256)) == 0)
     {
         x509_ctx->sig_type = SIG_TYPE_SHA256;
+    }
+    else if (len == sizeof(sig_sha384) && 
+            memcmp(sig_sha384, &cert[*offset], 
+                                    sizeof(sig_sha384)) == 0)
+    {
+        x509_ctx->sig_type = SIG_TYPE_SHA384;
+    }
+    else if (len == sizeof(sig_sha512) && 
+            memcmp(sig_sha512, &cert[*offset], 
+                                    sizeof(sig_sha512)) == 0)
+    {
+        x509_ctx->sig_type = SIG_TYPE_SHA512;
     }
     else
     {

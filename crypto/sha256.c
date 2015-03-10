@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001-2003  Christophe Devine
+ * Copyright (c) 2015, Cameron Rich
  * 
  * All rights reserved.
  * 
@@ -74,7 +74,7 @@ void SHA256_Init(SHA256_CTX *ctx)
     ctx->state[7] = 0x5BE0CD19;
 }
 
-void SHA256_Process(const uint8_t digest[64], SHA256_CTX *ctx)
+static void SHA256_Process(const uint8_t digest[64], SHA256_CTX *ctx)
 {
     uint32_t temp1, temp2, W[64];
     uint32_t A, B, C, D, E, F, G, H;

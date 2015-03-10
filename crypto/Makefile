@@ -42,7 +42,9 @@ OBJ=\
 	rc4.o \
 	rsa.o \
 	sha1.o \
-	sha256.o	
+	sha256.o \
+	sha384.o \
+	sha512.o	
 
 include ../config/makefile.post
 

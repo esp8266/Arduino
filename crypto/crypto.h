@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2014, Cameron Rich
+ * Copyright (c) 2007-2015, Cameron Rich
  * 
  * All rights reserved.
  * 
@@ -137,7 +137,44 @@ typedef struct
 
 void SHA256_Init(SHA256_CTX *c);
 void SHA256_Update(SHA256_CTX *, const uint8_t *input, int len);
-void SHA256_Final(uint8_t digest[32], SHA256_CTX *);
+void SHA256_Final(uint8_t *digest, SHA256_CTX *);
+
+/**************************************************************************
+ * SHA512 declarations 
+ **************************************************************************/
+
+#define SHA512_SIZE   64
+
+typedef struct
+{
+    union
+    {
+        uint64_t h[8];
+        uint8_t digest[64];
+    };
+    union
+    {
+        uint64_t w[80];
+        uint8_t buffer[128];
+    };
+    size_t size;
+    uint64_t totalSize;
+} SHA512_CTX;
+
+void SHA512_Init(SHA512_CTX *c);
+void SHA512_Update(SHA512_CTX *, const uint8_t *input, int len);
+void SHA512_Final(uint8_t *digest, SHA512_CTX *);
+
+/**************************************************************************
+ * SHA384 declarations 
+ **************************************************************************/
+
+#define SHA384_SIZE   48
+
+typedef SHA512_CTX SHA384_CTX;
+void SHA384_Init(SHA384_CTX *c);
+void SHA384_Update(SHA384_CTX *, const uint8_t *input, int len);
+void SHA384_Final(uint8_t *digest, SHA384_CTX *);
 
 /**************************************************************************
  * MD5 declarations 

@@ -326,7 +326,7 @@ static int SHA256_test(BI_CTX *bi_ctx)
 
         if (memcmp(digest, ct, sizeof(ct)))
         {
-            printf("Error: SHA256 # failed\n");
+            printf("Error: SHA256 #1 failed\n");
             goto end;
         }
     }
@@ -356,6 +356,112 @@ end:
     return res;
 }
 
+/**************************************************************************
+ * SHA384 tests 
+ *
+ * Run through a couple of the SHA-2 tests to verify that SHA384 is correct.
+ **************************************************************************/
+static int SHA384_test(BI_CTX *bi_ctx)
+{
+    SHA384_CTX ctx;
+    uint8_t ct[SHA384_SIZE];
+    uint8_t digest[SHA384_SIZE];
+    int res = 1;
+
+    {
+        const char *in_str = "abc";
+        bigint *ct_bi = bi_str_import(bi_ctx,
+            "CB00753F45A35E8BB5A03D699AC65007272C32AB0EDED1631A8B605A43FF5BED8086072BA1E7CC2358BAECA134C825A7");
+        bi_export(bi_ctx, ct_bi, ct, SHA384_SIZE);
+
+        SHA384_Init(&ctx);
+        SHA384_Update(&ctx, (const uint8_t *)in_str, strlen(in_str));
+        SHA384_Final(digest, &ctx);
+
+        if (memcmp(digest, ct, sizeof(ct)))
+        {
+            printf("Error: SHA384 #1 failed\n");
+            goto end;
+        }
+    }
+
+    {
+        const char *in_str =
+            "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
+        bigint *ct_bi = bi_str_import(bi_ctx,
+            "3391FDDDFC8DC7393707A65B1B4709397CF8B1D162AF05ABFE8F450DE5F36BC6B0455A8520BC4E6F5FE95B1FE3C8452B");
+        bi_export(bi_ctx, ct_bi, ct, SHA384_SIZE);
+
+        SHA384_Init(&ctx);
+        SHA384_Update(&ctx, (const uint8_t *)in_str, strlen(in_str));
+        SHA384_Final(digest, &ctx);
+
+        if (memcmp(digest, ct, sizeof(ct)))
+        {
+            printf("Error: SHA384 #2 failed\n");
+            goto end;
+        }
+    }
+
+    res = 0;
+    printf("All SHA384 tests passed\n");
+
+end:
+    return res;
+}
+/**************************************************************************
+ * SHA512 tests 
+ *
+ * Run through a couple of the SHA-2 tests to verify that SHA512 is correct.
+ **************************************************************************/
+static int SHA512_test(BI_CTX *bi_ctx)
+{
+    SHA512_CTX ctx;
+    uint8_t ct[SHA512_SIZE];
+    uint8_t digest[SHA512_SIZE];
+    int res = 1;
+
+    {
+        const char *in_str = "abc";
+        bigint *ct_bi = bi_str_import(bi_ctx,
+            "DDAF35A193617ABACC417349AE20413112E6FA4E89A97EA20A9EEEE64B55D39A2192992A274FC1A836BA3C23A3FEEBBD454D4423643CE80E2A9AC94FA54CA49F");
+        bi_export(bi_ctx, ct_bi, ct, SHA512_SIZE);
+
+        SHA512_Init(&ctx);
+        SHA512_Update(&ctx, (const uint8_t *)in_str, strlen(in_str));
+        SHA512_Final(digest, &ctx);
+
+        if (memcmp(digest, ct, sizeof(ct)))
+        {
+            printf("Error: SHA512 #1 failed\n");
+            goto end;
+        }
+    }
+
+    {
+        const char *in_str =
+            "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
+        bigint *ct_bi = bi_str_import(bi_ctx,
+            "204A8FC6DDA82F0A0CED7BEB8E08A41657C16EF468B228A8279BE331A703C33596FD15C13B1B07F9AA1D3BEA57789CA031AD85C7A71DD70354EC631238CA3445");
+        bi_export(bi_ctx, ct_bi, ct, SHA512_SIZE);
+
+        SHA512_Init(&ctx);
+        SHA512_Update(&ctx, (const uint8_t *)in_str, strlen(in_str));
+        SHA512_Final(digest, &ctx);
+
+        if (memcmp(digest, ct, sizeof(ct)))
+        {
+            printf("Error: SHA512 #2 failed\n");
+            goto end;
+        }
+    }
+
+    res = 0;
+    printf("All SHA512 tests passed\n");
+
+end:
+    return res;
+}
 /**************************************************************************
  * MD5 tests 
  *
@@ -721,6 +827,17 @@ static int cert_tests(void)
     ssl_ctx_free(ssl_ctx);
 
     ssl_ctx = ssl_ctx_new(0, 0);
+    if ((res = ssl_obj_load(ssl_ctx, SSL_OBJ_X509_CERT, 
+                "../ssl/test/comodo.sha384.cer", NULL)) != SSL_OK)
+    {
+        printf("Cert #8\n");
+        ssl_display_error(res);
+        goto bad_cert;
+    }
+
+    ssl_ctx_free(ssl_ctx);
+
+    ssl_ctx = ssl_ctx_new(0, 0);
     if ((res = ssl_obj_load(ssl_ctx, 
               SSL_OBJ_X509_CERT, "../ssl/test/ms_iis.cer", NULL)) != SSL_OK)
     {
@@ -748,11 +865,11 @@ static int cert_tests(void)
     x509_free(x509_ctx);
     free(buf);
 
+    // this bundle has two DSA (1.2.840.10040.4.3 invalid) certificates
     ssl_ctx = ssl_ctx_new(0, 0);
     if (ssl_obj_load(ssl_ctx, SSL_OBJ_X509_CACERT, 
             "../ssl/test/ca-bundle.crt", NULL))
     {
-        printf("Cert #12\n");
         goto bad_cert;
     }
 
@@ -2232,6 +2349,20 @@ int main(int argc, char *argv[])
     if (SHA256_test(bi_ctx))
     {
         printf("SHA256 tests failed\n");
+        goto cleanup;
+    }
+    TTY_FLUSH();
+
+    if (SHA384_test(bi_ctx))
+    {
+        printf("SHA384 tests failed\n");
+        goto cleanup;
+    }
+    TTY_FLUSH();
+
+    if (SHA512_test(bi_ctx))
+    {
+        printf("SHA512 tests failed\n");
         goto cleanup;
     }
     TTY_FLUSH();

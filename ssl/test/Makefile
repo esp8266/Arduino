@@ -71,7 +71,10 @@ CRYPTO_OBJ=\
 	$(CRYPTO_PATH)md5.obj \
 	$(CRYPTO_PATH)rc4.obj \
 	$(CRYPTO_PATH)rsa.obj \
-	$(CRYPTO_PATH)sha1.obj
+	$(CRYPTO_PATH)sha1.obj \
+	$(CRYPTO_PATH)sha256.obj \
+	$(CRYPTO_PATH)sha384.obj \
+	$(CRYPTO_PATH)sha512.obj
 
 OBJ=\
 	$(AXTLS_SSL_PATH)asn1.obj \

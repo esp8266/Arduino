@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, Cameron Rich
+ * Copyright (c) 2015, Cameron Rich
  * 
  * All rights reserved.
  * 
@@ -28,41 +28,49 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "os_port.h"
+#include "crypto.h"
+ 
 /**
- * @file os_int.h
- *
- * Ensure a consistent bit size 
- */
-
-#ifndef HEADER_OS_INT_H
-#define HEADER_OS_INT_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#if defined(WIN32)
-typedef UINT8 uint8_t;
-typedef INT8 int8_t;
-typedef UINT16 uint16_t;
-typedef INT16 int16_t;
-typedef UINT32 uint32_t;
-typedef INT32 int32_t;
-typedef UINT64 uint64_t;
-typedef INT64 int64_t;
-#else   /* Not Win32 */
-
-#ifdef CONFIG_PLATFORM_SOLARIS
-#include <inttypes.h>
-#else
-#include <stdint.h>
-#include <endian.h>
-#endif /* Not Solaris */
-
-#endif /* Not Win32 */
-
-#ifdef __cplusplus
+* Initialize the SHA384 context 
+*/
+ void SHA384_Init(SHA384_CTX *ctx)
+ {
+    //Set initial hash value
+    ctx->h[0] = 0xCBBB9D5DC1059ED8;
+    ctx->h[1] = 0x629A292A367CD507;
+    ctx->h[2] = 0x9159015A3070DD17;
+    ctx->h[3] = 0x152FECD8F70E5939;
+    ctx->h[4] = 0x67332667FFC00B31;
+    ctx->h[5] = 0x8EB44A8768581511;
+    ctx->h[6] = 0xDB0C2E0D64F98FA7;
+    ctx->h[7] = 0x47B5481DBEFA4FA4;
+ 
+    // Number of bytes in the buffer
+    ctx->size = 0;
+    // Total length of the message
+    ctx->totalSize = 0;
+ }
+ 
+/**
+* Accepts an array of octets as the next portion of the message.
+*/
+void SHA384_Update(SHA384_CTX *ctx, const uint8_t * msg, int len)
+{
+    // The function is defined in the exact same manner as SHA-512
+    SHA512_Update(ctx, msg, len);
 }
-#endif
-
-#endif 
+ 
+/**
+* Return the 384-bit message digest into the user's array
+*/
+void SHA384_Final(uint8_t *digest, SHA384_CTX *ctx)
+{
+    // The function is defined in the exact same manner as SHA-512
+    SHA512_Final(NULL, ctx);
+ 
+    // Copy the resulting digest
+    if (digest != NULL)
+        memcpy(digest, ctx->digest, SHA384_SIZE);
+}
+ 

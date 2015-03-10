@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Cameron Rich
+ * Copyright (c) 2007-2015, Cameron Rich
  * 
  * All rights reserved.
  * 
@@ -55,6 +55,7 @@ extern "C" {
 #define X509_VFY_ERROR_INVALID_CHAIN        -7
 #define X509_VFY_ERROR_UNSUPPORTED_DIGEST   -8
 #define X509_INVALID_PRIV_KEY               -9
+#define X509_MAX_CERTS                      -10
 
 /*
  * The Distinguished Name
@@ -127,6 +128,8 @@ const char * x509_display_error(int error);
 #define SIG_TYPE_MD5            0x04
 #define SIG_TYPE_SHA1           0x05
 #define SIG_TYPE_SHA256         0x0b
+#define SIG_TYPE_SHA384         0x0c
+#define SIG_TYPE_SHA512         0x0d
 
 uint32_t get_asn1_length(const uint8_t *buf, int *offset);
 int asn1_get_private_key(const uint8_t *buf, int len, RSA_CTX **rsa_ctx);

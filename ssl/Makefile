@@ -73,7 +73,9 @@ CRYPTO_OBJ=\
 	$(CRYPTO_PATH)rc4.o \
 	$(CRYPTO_PATH)rsa.o \
 	$(CRYPTO_PATH)sha1.o \
-	$(CRYPTO_PATH)sha256.o
+	$(CRYPTO_PATH)sha256.o \
+	$(CRYPTO_PATH)sha384.o \
+	$(CRYPTO_PATH)sha512.o
 
 OBJ=\
 	asn1.o \
