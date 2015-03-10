@@ -21,6 +21,7 @@ ARDUINO 1.6.1
 * Fixed: missing bool operator on SoftSerial
 * MacOSX: back to native file dialogs and buttons, when using experimental version
 * MacOSX: command line interface now works also with java-latest version
+* Improved library name matching @PaulStoffregen. Avoids conflicts with libraries that bundle files equally named
 
 ARDUINO 1.6.0 - 2015.02.09
 
