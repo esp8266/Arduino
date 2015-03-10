@@ -30,8 +30,7 @@ package cc.arduino.packages.contributions;
 
 import java.util.Properties;
 
-public abstract class HostDependentDownloadableContribution extends
-    DownloadableContribution {
+public abstract class HostDependentDownloadableContribution extends DownloadableContribution {
 
   public abstract String getHost();
 
@@ -53,25 +52,21 @@ public abstract class HostDependentDownloadableContribution extends
 
     if (osName.contains("Linux")) {
       if (osArch.contains("amd64")) {
-        // os.arch = amd64
         return host.matches("x86_64-.*linux-gnu");
       } else {
-        // 32 bit systems
         return host.matches("i[3456]86-.*linux-gnu");
       }
     }
 
     if (osName.contains("Windows")) {
-      if (host.matches("i[3456]86-.*mingw32"))
-        return true;
-      if (host.matches("i[3456]86-.*cygwin"))
-        return true;
+      return host.matches("i[3456]86-.*mingw32") || host.matches("i[3456]86-.*cygwin");
     }
 
     if (osName.contains("Mac")) {
-      if (osArch.contains("86")) {
-        if (host.matches("i[3456]86-apple-darwin.*"))
-          return true;
+      if (osArch.contains("x86_64")) {
+        return host.matches("x86_64-apple-darwin.*") || host.matches("i[3456]86-apple-darwin.*");
+      } else {
+        return host.matches("i[3456]86-apple-darwin.*");
       }
     }
 

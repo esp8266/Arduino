@@ -5,26 +5,21 @@ import cc.arduino.packages.Uploader;
 import cc.arduino.packages.UploaderFactory;
 import cc.arduino.packages.uploaders.SSHUploader;
 import cc.arduino.packages.uploaders.SerialUploader;
-import org.junit.Before;
 import org.junit.Test;
 import processing.app.AbstractWithPreferencesTest;
+import processing.app.helpers.PreferencesMap;
 
-import java.io.File;
+import java.util.HashMap;
 
 import static org.junit.Assert.assertTrue;
 
 public class UploaderFactoryTest extends AbstractWithPreferencesTest {
 
-  private TargetPackage targetPackage;
-
-  @Before
-  public void setUp() throws Exception {
-    targetPackage = new LegacyTargetPackage("arduino", new File(".", "hardware/arduino/"));
-  }
-
   @Test
   public void shouldCreateAnInstanceOfSSHUploader() throws Exception {
-    TargetBoard board = targetPackage.getPlatforms().get("avr").getBoards().get("yun");
+    TargetBoard board = new LegacyTargetBoard("yun", new PreferencesMap(new HashMap<String, String>()), new TargetPlatformStub("id", new TargetPackageStub("id")));
+    board.getPreferences().put("upload.via_ssh", "true");
+
     BoardPort boardPort = new BoardPort();
     boardPort.setBoardName("yun");
     boardPort.setAddress("192.168.0.1");
@@ -36,7 +31,9 @@ public class UploaderFactoryTest extends AbstractWithPreferencesTest {
 
   @Test
   public void shouldCreateAnInstanceOfBasicUploaderWhenSSHIsUnsupported() throws Exception {
-    TargetBoard board = targetPackage.getPlatforms().get("avr").getBoards().get("uno");
+    TargetBoard board = new LegacyTargetBoard("uno", new PreferencesMap(new HashMap<String, String>()), new TargetPlatformStub("id", new TargetPackageStub("id")));
+    board.getPreferences().put("upload.via_ssh", "false");
+
     BoardPort boardPort = new BoardPort();
     boardPort.setBoardName("myyun");
     boardPort.setAddress("192.168.0.1");
@@ -48,7 +45,9 @@ public class UploaderFactoryTest extends AbstractWithPreferencesTest {
 
   @Test
   public void shouldCreateAnInstanceOfBasicUploaderWhenPortIsSerial() throws Exception {
-    TargetBoard board = targetPackage.getPlatforms().get("avr").getBoards().get("uno");
+    TargetBoard board = new LegacyTargetBoard("uno", new PreferencesMap(new HashMap<String, String>()), new TargetPlatformStub("id", new TargetPackageStub("id")));
+    board.getPreferences().put("upload.via_ssh", "false");
+
     BoardPort boardPort = new BoardPort();
     boardPort.setBoardName("Arduino Leonardo");
     boardPort.setAddress("/dev/ttyACM0");
