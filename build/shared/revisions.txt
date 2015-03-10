@@ -1,5 +1,5 @@
 
-ARDUINO 1.6.1
+ARDUINO 1.6.1 - 2015.03.10
 
 [ide]
 * Improved Yun detection for upload via network (Ron Guest)
