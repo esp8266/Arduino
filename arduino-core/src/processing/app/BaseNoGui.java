@@ -581,10 +581,7 @@ public class BaseNoGui {
     if (!indexFile.isFile()) {
       File distFile = findDefaultPackageFile();
       if (distFile != null) {
-        // If present, unpack distribution file into preferences folder
         ArchiveExtractor.extract(distFile, BaseNoGui.getSettingsFolder(), 0);
-
-        // TODO: The first distribution file may be removed after extraction?
       } else {
         // Otherwise create an empty packages index
         FileOutputStream out = null;
