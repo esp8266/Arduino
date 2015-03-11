@@ -1,4 +1,6 @@
 
+ARDUINO 1.6.2
+
 ARDUINO 1.6.1 - 2015.03.10
 
 [ide]
