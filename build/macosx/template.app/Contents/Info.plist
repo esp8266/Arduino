@@ -87,6 +87,9 @@
       <key>MainClass</key>
       <string>processing.app.Base</string>
 
+      <key>SplashFile</key>
+      <string>$APP_PACKAGE/Contents/Resources/Java/lib/splash.png</string>
+
       <key>JVMVersion</key>
       <string>1.6*</string>
 

@@ -23,6 +23,7 @@
 package processing.app;
 
 import cc.arduino.packages.DiscoveryManager;
+import cc.arduino.view.SplashScreenHelper;
 import processing.app.debug.TargetBoard;
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
@@ -56,6 +57,7 @@ import static processing.app.I18n._;
 public class Base {
 
   static private boolean commandLine;
+  public static SplashScreenHelper splashScreenHelper;
 
   // A single instance of the preferences window
   Preferences preferencesFrame;
@@ -86,6 +88,8 @@ public class Base {
   static public void main(String args[]) throws Exception {
     System.setProperty("awt.useSystemAAFontSettings", "on");
     System.setProperty("swing.aatext", "true");
+
+    splashScreenHelper = new SplashScreenHelper(SplashScreen.getSplashScreen());
 
     BaseNoGui.initLogger();
     
@@ -221,8 +225,10 @@ public class Base {
       }
     }
 
+    splashScreenHelper.splashText(_("Initializing packages..."));
     BaseNoGui.initPackages();
-    
+    splashScreenHelper.splashText(_("Preparing boards..."));
+
     // Setup board-dependent variables.
     onBoardOrPortChange();
 
@@ -263,6 +269,7 @@ public class Base {
     Preferences.save();
 
       if (parser.isVerifyOrUploadMode()) {
+        splashScreenHelper.close();
         // Set verbosity for command line build
         Preferences.set("build.verbose", "" + parser.isDoVerboseBuild());
         Preferences.set("upload.verbose", "" + parser.isDoVerboseUpload());
@@ -290,6 +297,8 @@ public class Base {
         System.exit(0);
       }
       else if (parser.isGuiMode()) {
+        splashScreenHelper.splashText(_("Starting..."));
+
         // Check if there were previously opened sketches to be restored
         restoreSketches();
 

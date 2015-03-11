@@ -302,6 +302,7 @@
 
       <option value="-Xms128M"/>
       <option value="-Xmx512M"/>
+      <option value="-splash:$APP_ROOT/Contents/Java/lib/splash.png"/>
 
       <bundledocument extensions="ino,c,cpp,h"
                       icon="macosx/template.app/Contents/Resources/pde.icns"

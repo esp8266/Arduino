@@ -21,7 +21,8 @@ build/windows/libastylej*
 build/windows/arduino-*.zip
 build/windows/dist/*.tar.gz
 build/windows/dist/*.tar.bz2
-build/windows/launch4j-*
+build/windows/launch4j-*.tgz
+build/windows/launch4j-*.zip
 build/windows/launcher/launch4j
 build/windows/WinAVR-*.zip
 build/macosx/arduino-*.zip
@@ -44,8 +45,5 @@ test-bin
 .idea
 .DS_Store
 .directory
-build/windows/launch4j-*
-build/windows/launcher/launch4j
-build/windows/WinAVR-*.zip
 hardware/arduino/avr/libraries/Bridge/examples/XivelyClient/passwords.h
 avr-toolchain-*.zip
