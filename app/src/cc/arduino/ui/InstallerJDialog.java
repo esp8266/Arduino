@@ -88,7 +88,7 @@ public abstract class InstallerJDialog extends JDialog {
   // - Progress bar
   protected ProgressJProgressBar progressBar;
   protected Box progressBox;
-  protected Box updateBox;
+  protected Box errorMessageBox;
   private final JLabel errorMessage;
 
   protected InstallerTableCell cellEditor;
@@ -187,10 +187,20 @@ public abstract class InstallerJDialog extends JDialog {
       progressBox.add(Box.createHorizontalStrut(5));
       progressBox.add(cancelButton);
 
-      updateBox = Box.createHorizontalBox();
-      updateBox.add(Box.createHorizontalGlue());
-      updateBox.add(errorMessage);
-      updateBox.add(Box.createHorizontalGlue());
+      JButton dismissErrorMessageButton = new JButton(_("OK"));
+      dismissErrorMessageButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+          clearErrorMessage();
+        }
+      });
+
+      errorMessageBox = Box.createHorizontalBox();
+      errorMessageBox.add(Box.createHorizontalGlue());
+      errorMessageBox.add(errorMessage);
+      errorMessageBox.add(Box.createHorizontalGlue());
+      errorMessageBox.add(dismissErrorMessageButton);
+      errorMessageBox.setVisible(false);
     }
 
     {
@@ -198,7 +208,7 @@ public abstract class InstallerJDialog extends JDialog {
       progressPanel.setBorder(new EmptyBorder(7, 7, 7, 7));
       progressPanel.setLayout(new BoxLayout(progressPanel, BoxLayout.Y_AXIS));
       progressPanel.add(progressBox);
-      progressPanel.add(updateBox);
+      progressPanel.add(errorMessageBox);
       pane.add(progressPanel, BorderLayout.SOUTH);
     }
     setProgressVisible(false, "");
@@ -224,22 +234,26 @@ public abstract class InstallerJDialog extends JDialog {
 
   public void setErrorMessage(String message) {
     errorMessage.setText(message);
-    errorMessage.setVisible(true);
+    errorMessageBox.setVisible(true);
   }
 
   public void clearErrorMessage() {
     errorMessage.setText("");
-    errorMessage.setVisible(false);
+    errorMessageBox.setVisible(false);
   }
 
   public void setProgressVisible(boolean visible, String status) {
+    if (visible) {
+      setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+    } else {
+      setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+    }
     progressBox.setVisible(visible);
 
     filterField.setEnabled(!visible);
     categoryChooser.setEnabled(!visible);
     contribTable.setEnabled(!visible);
-    updateBox.setVisible(!visible);
-    updateBox.setEnabled(!visible);
+    errorMessageBox.setVisible(false);
     cellEditor.setEnabled(!visible);
     cellEditor.setStatus(status);
   }
