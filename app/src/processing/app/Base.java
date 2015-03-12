@@ -84,6 +84,9 @@ public class Base {
   Editor activeEditor;
 
   static public void main(String args[]) throws Exception {
+    System.setProperty("awt.useSystemAAFontSettings", "on");
+    System.setProperty("swing.aatext", "true");
+
     BaseNoGui.initLogger();
     
     BaseNoGui.notifier = new GUIUserNotifier();
