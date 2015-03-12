@@ -301,7 +301,7 @@
       <option value="-Dfile.encoding=UTF-8"/>
 
       <option value="-Xms128M"/>
-      <option value="-Xmx1024M"/>
+      <option value="-Xmx512M"/>
 
       <bundledocument extensions="ino,c,cpp,h"
                       icon="macosx/template.app/Contents/Resources/pde.icns"
