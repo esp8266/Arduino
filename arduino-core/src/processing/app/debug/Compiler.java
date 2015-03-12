@@ -183,6 +183,9 @@ public class Compiler implements MessageConsumer {
     sketch = _sketch;
     prefs = createBuildPreferences(_buildPath, _primaryClassName);
 
+    // provide access to the source tree
+    prefs.put("build.source.path", _sketch.getFolder().getAbsolutePath());
+
     // Start with an empty progress listener
     progressListener = new ProgressListener() {
       @Override
@@ -346,6 +349,10 @@ public class Compiler implements MessageConsumer {
     
     verbose = _verbose || PreferencesData.getBoolean("build.verbose");
     sketchIsCompiled = false;
+
+    // Hook runs at Start of Compilation
+    runActions("hooks.prebuild", prefs);
+
     objectFiles = new ArrayList<File>();
 
     // 0. include paths for core + all libraries
@@ -413,6 +420,10 @@ public class Compiler implements MessageConsumer {
     }
 
     progressListener.progress(90);
+
+    // Hook runs at End of Compilation
+    runActions("hooks.postbuild", prefs);
+
     return true;
   }
 
@@ -1032,6 +1043,18 @@ public class Compiler implements MessageConsumer {
       throw new RunnerException(e);
     }
     execAsynchronously(cmdArray);
+  }
+
+  void runActions(String recipeClass, PreferencesMap prefs) throws RunnerException, PreferencesMapException {
+    List<String> patterns = new ArrayList<String>();
+    for (String key : prefs.keySet()) {
+    if (key.startsWith("recipe."+recipeClass) && key.endsWith(".pattern"))
+      patterns.add(key);
+    }
+    Collections.sort(patterns);
+    for (String recipe : patterns) {
+      runRecipe(recipe);
+    }
   }
 
   void runRecipe(String recipe) throws RunnerException, PreferencesMapException {
