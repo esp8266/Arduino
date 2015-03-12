@@ -32,11 +32,12 @@ import cc.arduino.libraries.contributions.ContributedLibrary;
 import cc.arduino.libraries.contributions.LibrariesIndexer;
 import cc.arduino.packages.contributions.ContributedPackage;
 import cc.arduino.packages.contributions.ContributedPlatform;
+import cc.arduino.packages.contributions.VersionComparator;
 import cc.arduino.ui.FilteredAbstractTableModel;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static cc.arduino.packages.contributions.VersionComparator.VERSION_COMPARATOR;
 
@@ -45,9 +46,7 @@ public class LibrariesIndexTableModel extends FilteredAbstractTableModel {
 
   public final static int DESCRIPTION_COL = 0;
 
-  public static class ContributedLibraryReleases implements
-      Comparable<ContributedLibraryReleases> {
-    public ContributedPackage packager;
+  public static class ContributedLibraryReleases implements            Comparable<ContributedLibraryReleases> {
     public String name;
     public List<ContributedLibrary> releases = new ArrayList<ContributedLibrary>();
     public List<String> versions = new ArrayList<String>();
@@ -71,23 +70,33 @@ public class LibrariesIndexTableModel extends FilteredAbstractTableModel {
     }
 
     public ContributedLibrary getInstalled() {
-      for (ContributedLibrary lib : releases)
-        if (lib.isInstalled())
-          return lib;
-      return null;
+      List<ContributedLibrary> installedReleases = new LinkedList<ContributedLibrary>(Collections2.filter(releases, new Predicate<ContributedLibrary>() {
+        @Override
+        public boolean apply(ContributedLibrary contributedLibrary) {
+          return contributedLibrary.isInstalled();
+        }
+      }));
+
+      return getLatestOf(installedReleases);
     }
 
     public ContributedLibrary getLatest() {
-      ContributedLibrary latest = null;
-      for (ContributedLibrary lib : releases) {
-        if (latest == null)
-          latest = lib;
-        // TODO a better version compare
+      return getLatestOf(releases);
+    }
 
-        if (VERSION_COMPARATOR.compare(lib.getVersion(), latest.getVersion()) > 0)
-          latest = lib;
+    private ContributedLibrary getLatestOf(List<ContributedLibrary> libs) {
+      Collections.sort(new LinkedList<ContributedLibrary>(libs), new Comparator<ContributedLibrary>() {
+        @Override
+        public int compare(ContributedLibrary lib1, ContributedLibrary lib2) {
+          return VersionComparator.VERSION_COMPARATOR.compare(lib1.getVersion(), lib2.getVersion());
+        }
+      });
+
+      if (libs.isEmpty()) {
+        return null;
       }
-      return latest;
+
+      return libs.get(libs.size() - 1);
     }
 
     public ContributedLibrary getSelected() {
@@ -120,9 +129,9 @@ public class LibrariesIndexTableModel extends FilteredAbstractTableModel {
 
   private List<ContributedLibraryReleases> contributions = new ArrayList<ContributedLibraryReleases>();
 
-  private String[] columnNames = { "Description" };
+  private String[] columnNames = {"Description"};
 
-  private Class<?>[] columnTypes = { ContributedPlatform.class };
+  private Class<?>[] columnTypes = {ContributedPlatform.class};
 
   private LibrariesIndexer indexer;
 
@@ -142,11 +151,11 @@ public class LibrariesIndexTableModel extends FilteredAbstractTableModel {
   /**
    * Check if <b>string</b> contains all the substrings in <b>set</b>. The
    * compare is case insensitive.
-   * 
+   *
    * @param string
    * @param filters
    * @return <b>true<b> if all the strings in <b>set</b> are contained in
-   *         <b>string</b>.
+   * <b>string</b>.
    */
   private boolean stringContainsAll(String string, String filters[]) {
     if (string == null) {
