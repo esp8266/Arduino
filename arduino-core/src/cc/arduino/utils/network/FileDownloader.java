@@ -28,6 +28,8 @@
  */
 package cc.arduino.utils.network;
 
+import org.apache.commons.codec.binary.Base64;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,8 +38,6 @@ import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.Observable;
-
-import org.apache.commons.codec.binary.Base64;
 
 public class FileDownloader extends Observable {
 
@@ -48,7 +48,7 @@ public class FileDownloader extends Observable {
     COMPLETE, //
     CANCELLED, //
     ERROR, //
-  };
+  }
 
   private Status status;
   private long initialSize;
@@ -120,13 +120,10 @@ public class FileDownloader extends Observable {
 
       setStatus(Status.CONNECTING);
 
-      HttpURLConnection connection = (HttpURLConnection) downloadUrl
-          .openConnection();
+      HttpURLConnection connection = (HttpURLConnection) downloadUrl.openConnection();
 
       if (downloadUrl.getUserInfo() != null) {
-        String auth = "Basic "
-                      + new String(new Base64().encode(downloadUrl
-                          .getUserInfo().getBytes()));
+        String auth = "Basic " + new String(new Base64().encode(downloadUrl.getUserInfo().getBytes()));
         connection.setRequestProperty("Authorization", auth);
       }
 
@@ -137,9 +134,27 @@ public class FileDownloader extends Observable {
       // Connect
       connection.connect();
       int resp = connection.getResponseCode();
-      if (resp < 200 || resp >= 300)
-        throw new IOException(
-            "Recevied invalid http status code from server: " + resp);
+
+      if (resp == HttpURLConnection.HTTP_MOVED_PERM || resp == HttpURLConnection.HTTP_MOVED_TEMP) {
+        String newUrl = connection.getHeaderField("Location");
+
+        // open the new connnection again
+        connection = (HttpURLConnection) new URL(newUrl).openConnection();
+        if (downloadUrl.getUserInfo() != null) {
+          String auth = "Basic " + new String(new Base64().encode(downloadUrl.getUserInfo().getBytes()));
+          connection.setRequestProperty("Authorization", auth);
+        }
+
+        connection.setRequestProperty("Range", "bytes=" + initialSize + "-");
+        connection.setConnectTimeout(5000);
+
+        connection.connect();
+        resp = connection.getResponseCode();
+      }
+
+      if (resp < 200 || resp >= 300) {
+        throw new IOException("Recevied invalid http status code from server: " + resp);
+      }
 
       // Check for valid content length.
       long len = connection.getContentLength();
