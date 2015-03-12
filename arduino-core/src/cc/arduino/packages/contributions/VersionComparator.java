@@ -28,6 +28,8 @@
  */
 package cc.arduino.packages.contributions;
 
+import com.github.zafarkhaja.semver.Version;
+
 import java.util.Comparator;
 
 public class VersionComparator implements Comparator<String> {
@@ -45,8 +47,23 @@ public class VersionComparator implements Comparator<String> {
     if (b == null)
       return 1;
 
-    // TODO: do a proper version compare. Look also http://semver.org/
-    return a.compareTo(b);
+    Version versionA = valueOf(a);
+    Version versionB = valueOf(b);
+
+    return versionA.compareTo(versionB);
+  }
+
+  private Version valueOf(String ver) {
+    String[] verParts = ver.split("\\.");
+    if (verParts.length < 3) {
+      if (verParts.length == 2) {
+        return Version.forIntegers(Integer.valueOf(verParts[0]), Integer.valueOf(verParts[1]));
+      } else {
+        return Version.forIntegers(Integer.valueOf(verParts[0]));
+      }
+    } else {
+      return Version.valueOf(ver);
+    }
   }
 
 }
