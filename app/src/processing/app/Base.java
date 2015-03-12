@@ -26,6 +26,8 @@ import cc.arduino.libraries.contributions.ui.LibraryManagerUI;
 import cc.arduino.packages.DiscoveryManager;
 import cc.arduino.packages.contributions.ui.ContributionManagerUI;
 import cc.arduino.view.SplashScreenHelper;
+import org.apache.commons.lang3.*;
+import org.apache.commons.lang3.StringUtils;
 import processing.app.debug.TargetBoard;
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
@@ -1056,7 +1058,7 @@ public class Base {
         // Find the current target. Get the platform, and then select the
         // correct name and core path.
         String platformNameLabel;
-        platformNameLabel = targetPlatform.getContainerPackage().getId() + "/" + targetPlatform.getId();
+        platformNameLabel = StringUtils.capitalize(targetPlatform.getContainerPackage().getId()) + "/" + StringUtils.capitalize(targetPlatform.getId());
         platformNameLabel = I18n.format(_("{0} libraries"), platformNameLabel);
         JMenuItem platformItem = new JMenuItem(_(platformNameLabel));
         platformItem.setEnabled(false);
