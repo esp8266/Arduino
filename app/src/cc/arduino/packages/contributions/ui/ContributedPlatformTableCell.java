@@ -28,27 +28,36 @@
  */
 package cc.arduino.packages.contributions.ui;
 
-import cc.arduino.packages.contributions.ContributedBoard;
-import cc.arduino.packages.contributions.ContributedPlatform;
-import cc.arduino.packages.contributions.ui.ContributionIndexTableModel.ContributedPlatformReleases;
-import cc.arduino.ui.InstallerTableCell;
-import processing.app.Base;
+import static processing.app.I18n._;
+import static processing.app.I18n.format;
 
-import javax.swing.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.JTextPane;
+import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.Document;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.StyleSheet;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 
-import static processing.app.I18n._;
-import static processing.app.I18n.format;
+import processing.app.Base;
+import cc.arduino.packages.contributions.ContributedBoard;
+import cc.arduino.packages.contributions.ContributedPlatform;
+import cc.arduino.packages.contributions.ui.ContributionIndexTableModel.ContributedPlatformReleases;
+import cc.arduino.ui.InstallerTableCell;
 
 @SuppressWarnings("serial")
 public class ContributedPlatformTableCell extends InstallerTableCell {
@@ -94,7 +103,7 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
       }
     });
 
-    installButton = new JButton(_("Install"));
+    installButton = new JButton(_("Update"));
     installButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -123,14 +132,6 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
     downgradeChooser = new JComboBox();
     downgradeChooser.addItem("-");
     downgradeChooser.setMaximumSize(downgradeChooser.getPreferredSize());
-    downgradeChooser.addItemListener(new ItemListener() {
-      @Override
-      public void itemStateChanged(ItemEvent e) {
-        Object selectVersionItem = downgradeChooser.getItemAt(0);
-        boolean disableDowngrade = (e.getItem() == selectVersionItem);
-        downgradeButton.setEnabled(!disableDowngrade);
-      }
-    });
 
     panel = new JPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -218,7 +219,6 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
     setEnabled(true);
 
     downgradeChooser.removeAllItems();
-    downgradeChooser.addItem(_("Select version"));
     boolean visible = false;
     for (ContributedPlatform release : editorValue.releases) {
       if (release.isInstalled())
@@ -240,23 +240,16 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
     ContributedPlatform selectedPlatform = releases.getSelected();
     ContributedPlatform installedPlatform = releases.getInstalled();
 
-    boolean removable, installable, upgradable;
+    boolean removable, upgradable;
     if (installedPlatform == null) {
-      installable = true;
       removable = false;
       upgradable = false;
     } else {
-      installable = false;
       removable = true;
       upgradable = (selectedPlatform != installedPlatform);
     }
 
-    if (installable)
-      installButton.setText(_("Install"));
-    if (upgradable)
-      installButton.setText(_("Upgrade"));
-    installButton.setVisible(installable || upgradable);
-
+    installButton.setVisible(upgradable);
     removeButton.setVisible(removable);
     removeButtonStrut.setVisible(removable);
 
