@@ -9,12 +9,12 @@
         {
           "name": "Arduino AVR Boards",
           "architecture": "avr",
-          "version": "1.6.1-beta1",
+          "version": "1.6.2-beta1",
           "category": "Arduino",
-          "url": "http://arduino.cc/download.php?f=/cores/avr-1.6.1-beta1.tar.bz2",
-          "archiveFileName": "avr-1.6.1-beta1.tar.bz2",
-          "checksum": "SHA-256:c360a8762a6c44e229b9323a4f3c0157100f842391746f15932cbec42c3f4ee1",
-          "size": "4860386",
+          "url": "http://arduino.cc/download.php?f=/cores/avr-1.6.2-beta1.tar.bz2",
+          "archiveFileName": "avr-1.6.2-beta1.tar.bz2",
+          "checksum": "SHA-256:7ac66a33822d638d0cee7bacb68ec00dbf58f08f0f8b38e6eb11dd13c858a331",
+          "size": "4860781",
           "boards": [
             {"name": "Arduino Yún"},
             {"name": "Arduino Uno"},
@@ -40,12 +40,12 @@
             {
               "packager": "arduino",
               "name": "avr-gcc",
-              "version": "4.8.1-arduino"
+              "version": "4.8.1-arduino1"
             },
             {
               "packager": "arduino",
               "name": "avrdude",
-              "version": "6.0.1-arduino"
+              "version": "6.0.1-arduino1"
             }
           ]
         }
@@ -53,73 +53,72 @@
       "tools": [
         {
           "name": "avr-gcc",
-          "version": "4.8.1-arduino",
+          "version": "4.8.1-arduino1",
           "systems": [
             {
-              "size": "24443508",
-              "checksum": "SHA-256:1285188c63efdd6de6ededbc327365b7d55466798014e170cc8351d0bbb26561",
+              "size": "24441029",
+              "checksum": "SHA-256:bc836e43eb25054cfeb43bcc6e1717e1c26b3cf1f48b95f2593a4dededa29926",
               "host": "i386-apple-darwin11",
-              "archiveFileName": "avr-gcc-4.8.1-arduino-i386-apple-darwin11.tar.bz2",
-              "url": "http://arduino.cc/download.php?f=/tools/avr-gcc-4.8.1-arduino-i386-apple-darwin11.tar.bz2"
+              "archiveFileName": "avr-gcc-4.8.1-arduino1-i386-apple-darwin11.tar.bz2",
+              "url": "http://arduino.cc/download.php?f=/tools/avr-gcc-4.8.1-arduino1-i386-apple-darwin11.tar.bz2"
             },
             {
-              "size": "27152089",
-              "checksum": "SHA-256:a4b1a2fd58c5129539d1ef466c1be6f4fb6dd141eca2f63e0c04aee0afd4d294",
+              "size": "27150843",
+              "checksum": "SHA-256:d17ff97b3c8833bc4152f9c3542f19b2bfc31a5c5344f14d0f972716bac7cd1f",
               "host": "x86_64-linux-gnu",
-              "archiveFileName": "avr-gcc-4.8.1-arduino-x86_64-pc-linux-gnu.tar.bz2",
-              "url": "http://arduino.cc/download.php?f=/tools/avr-gcc-4.8.1-arduino-x86_64-pc-linux-gnu.tar.bz2"
+              "archiveFileName": "avr-gcc-4.8.1-arduino1-x86_64-pc-linux-gnu.tar.bz2",
+              "url": "http://arduino.cc/download.php?f=/tools/avr-gcc-4.8.1-arduino1-x86_64-pc-linux-gnu.tar.bz2"
             },
             {
-              "size": "25875299",
-              "checksum": "SHA-256:14bc3dc08990ea1aec49335306aad9dbe9bd6751cf84ce51fad3500ec6cfbda8",
+              "size": "25875775",
+              "checksum": "SHA-256:dc388232aa843d452e180811f88897a9eace1982fba829356a6db15a7c1adb5c",
               "host": "i686-linux-gnu",
-              "archiveFileName": "avr-gcc-4.8.1-arduino-i686-pc-linux-gnu.tar.bz2",
-              "url": "http://arduino.cc/download.php?f=/tools/avr-gcc-4.8.1-arduino-i686-pc-linux-gnu.tar.bz2"
+              "archiveFileName": "avr-gcc-4.8.1-arduino1-i686-pc-linux-gnu.tar.bz2",
+              "url": "http://arduino.cc/download.php?f=/tools/avr-gcc-4.8.1-arduino1-i686-pc-linux-gnu.tar.bz2"
             },
             {
-              "size": "46816142",
-              "checksum": "SHA-256:25d114605a247fd4d3ad95f73caf1a2d453b5656524c6cafc5b23cae787d104b",
+              "size": "37788607",
+              "checksum": "SHA-256:81f2f9aaea55a95de8c6e9794a382286a96071188edfd6c29f61c3492f39ee3f",
               "host": "i686-mingw32",
-              "archiveFileName": "avr-gcc-4.8.1-arduino-i686-mingw32.zip",
-              "url": "http://arduino.cc/download.php?f=/tools/avr-gcc-4.8.1-arduino-i686-mingw32.zip"
+              "archiveFileName": "avr-gcc-4.8.1-arduino1-i686-mingw32.zip",
+              "url": "http://arduino.cc/download.php?f=/tools/avr-gcc-4.8.1-arduino1-i686-mingw32.zip"
             }
           ]
         },
         {
           "name": "avrdude",
-          "version": "6.0.1-arduino",
+          "version": "6.0.1-arduino1",
           "systems": [
             {
-              "size": "264817",
-              "checksum": "SHA-256:310ac863267de23673a9e8164d6058b0d6a33a1e8009bbc2f34c8a09ddefe546",
+              "size": "264976",
+              "checksum": "SHA-256:4fe666c5e2eb935a880823916c8644b005509339ca4610d70d8a797136de0dc4",
               "host": "i386-apple-darwin11",
-              "archiveFileName": "avrdude-6.0.1-arduino-i386-apple-darwin11.tar.bz2",
-              "url": "http://arduino.cc/download.php?f=/tools/avrdude-6.0.1-arduino-i386-apple-darwin11.tar.bz2"
+              "archiveFileName": "avrdude-6.0.1-arduino1-i386-apple-darwin11.tar.bz2",
+              "url": "http://arduino.cc/download.php?f=/tools/avrdude-6.0.1-arduino1-i386-apple-darwin11.tar.bz2"
             },
             {
-              "size": "292575",
-              "checksum": "SHA-256:914adfb769cf7e99e52601a48dccc9f8806b8768e1ceeba81f9286df13af2342",
+              "size": "292741",
+              "checksum": "SHA-256:0cb5d104cdcbd5ea7022ae3747957bbbeddb49f3bfae0ebb65e0ba671fe9290b",
               "host": "x86_64-linux-gnu",
-              "archiveFileName": "avrdude-6.0.1-arduino-x86_64-pc-linux-gnu.tar.bz2",
-              "url": "http://arduino.cc/download.php?f=/tools/avrdude-6.0.1-arduino-x86_64-pc-linux-gnu.tar.bz2"
+              "archiveFileName": "avrdude-6.0.1-arduino1-x86_64-pc-linux-gnu.tar.bz2",
+              "url": "http://arduino.cc/download.php?f=/tools/avrdude-6.0.1-arduino1-x86_64-pc-linux-gnu.tar.bz2"
             },
             {
-              "size": "283166",
-              "checksum": "SHA-256:20f278697c1d96b9ae7cf0eecd55d128912244f88fc4e8352bf33b20ac301d4c",
+              "size": "283009",
+              "checksum": "SHA-256:856fba0839c574251d454a5971ce7cc1b3b2a8f86026c7eb366fb1d7c0d6d79a",
               "host": "i686-linux-gnu",
-              "archiveFileName": "avrdude-6.0.1-arduino-i686-pc-linux-gnu.tar.bz2",
-              "url": "http://arduino.cc/download.php?f=/tools/avrdude-6.0.1-arduino-i686-pc-linux-gnu.tar.bz2"
+              "archiveFileName": "avrdude-6.0.1-arduino1-i686-pc-linux-gnu.tar.bz2",
+              "url": "http://arduino.cc/download.php?f=/tools/avrdude-6.0.1-arduino1-i686-pc-linux-gnu.tar.bz2"
             },
             {
               "size": "241621",
-              "checksum": "SHA-256:724c7fcfd456ec94b0041fa4e18c76fad48a57cff60681b946ae76e282583bcc",
+              "checksum": "SHA-256:8306ac5e1f2083999bebbfdbabe2678a32a68e3330caf0dfdb6b4e998d1b7f64",
               "host": "i686-mingw32",
-              "archiveFileName": "avrdude-6.0.1-arduino-i686-mingw32.zip",
-              "url": "http://arduino.cc/download.php?f=/tools/avrdude-6.0.1-arduino-i686-mingw32.zip"
+              "archiveFileName": "avrdude-6.0.1-arduino1-i686-mingw32.zip",
+              "url": "http://arduino.cc/download.php?f=/tools/avrdude-6.0.1-arduino1-i686-mingw32.zip"
             }
           ]
         }
       ]
-    }
-  ]
+    }  ]
 }

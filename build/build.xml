@@ -138,8 +138,8 @@
 
   <!-- copy hardware folder -->
   <target name="assemble-hardware" unless="light_bundle">
-    <mkdir dir="${staging_folder}/work/dist/bundled_package/packages/arduino/hardware/avr/1.6.1-beta1/"/>
-    <copy todir="${staging_folder}/work/dist/bundled_package/packages/arduino/hardware/avr/1.6.1-beta1/">
+    <mkdir dir="${staging_folder}/work/dist/bundled_package/packages/arduino/hardware/avr/1.6.2-beta1/"/>
+    <copy todir="${staging_folder}/work/dist/bundled_package/packages/arduino/hardware/avr/1.6.2-beta1/">
       <fileset dir="../hardware/arduino/avr/"/>
     </copy>
   </target>
@@ -346,9 +346,9 @@
     <antcall target="avr-toolchain-bundle">
       <param name="unpack_target" value="untar"/>
       <param name="gcc_archive_file" value="avr-gcc-4.8.1-arduino1-i386-apple-darwin11.tar.bz2"/>
-      <param name="gcc_version" value="4.8.1-arduino/"/>
+      <param name="gcc_version" value="4.8.1-arduino1/"/>
       <param name="avrdude_archive_file" value="avrdude-6.0.1-arduino1-i386-apple-darwin11.tar.bz2"/>
-      <param name="avrdude_version" value="6.0.1-arduino"/>
+      <param name="avrdude_version" value="6.0.1-arduino1"/>
     </antcall>
 
     <chmod perm="+x">
@@ -606,9 +606,9 @@
     <antcall target="avr-toolchain-bundle">
       <param name="unpack_target" value="untar"/>
       <param name="gcc_archive_file" value="avr-gcc-4.8.1-arduino1-i686-pc-linux-gnu.tar.bz2"/>
-      <param name="gcc_version" value="4.8.1-arduino/"/>
+      <param name="gcc_version" value="4.8.1-arduino1/"/>
       <param name="avrdude_archive_file" value="avrdude-6.0.1-arduino1-i686-pc-linux-gnu.tar.bz2"/>
-      <param name="avrdude_version" value="6.0.1-arduino"/>
+      <param name="avrdude_version" value="6.0.1-arduino1"/>
     </antcall>
 
     <exec executable="tar" dir="${staging_folder}/work/dist/bundled_package/">
@@ -626,9 +626,9 @@
     <antcall target="avr-toolchain-bundle">
       <param name="unpack_target" value="untar"/>
       <param name="gcc_archive_file" value="avr-gcc-4.8.1-arduino1-x86_64-pc-linux-gnu.tar.bz2"/>
-      <param name="gcc_version" value="4.8.1-arduino/"/>
+      <param name="gcc_version" value="4.8.1-arduino1/"/>
       <param name="avrdude_archive_file" value="avrdude-6.0.1-arduino1-x86_64-pc-linux-gnu.tar.bz2"/>
-      <param name="avrdude_version" value="6.0.1-arduino"/>
+      <param name="avrdude_version" value="6.0.1-arduino1"/>
     </antcall>
 
     <exec executable="tar" dir="${staging_folder}/work/dist/bundled_package/">
@@ -881,9 +881,9 @@
     <antcall target="avr-toolchain-bundle">
       <param name="unpack_target" value="unzip"/>
       <param name="gcc_archive_file" value="avr-gcc-4.8.1-arduino1-i686-mingw32.zip"/>
-      <param name="gcc_version" value="4.8.1-arduino/"/>
+      <param name="gcc_version" value="4.8.1-arduino1/"/>
       <param name="avrdude_archive_file" value="avrdude-6.0.1-arduino1-i686-mingw32.zip"/>
-      <param name="avrdude_version" value="6.0.1-arduino"/>
+      <param name="avrdude_version" value="6.0.1-arduino1"/>
     </antcall>
   </target>
 
