@@ -112,15 +112,6 @@ public class LibraryManagerUI extends InstallerJDialog {
         setProgress(progress);
       }
     };
-
-    if (indexer.getIndex().getLibraries().isEmpty()) {
-      SwingUtilities.invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          onUpdatePressed();
-        }
-      });
-    }
   }
 
   public void setProgress(Progress progress) {
