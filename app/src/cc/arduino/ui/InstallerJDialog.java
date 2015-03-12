@@ -182,14 +182,6 @@ public abstract class InstallerJDialog extends JDialog {
         }
       });
 
-      JButton updateButton = new JButton(_("Update list"));
-      updateButton.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent arg0) {
-          onUpdatePressed();
-        }
-      });
-
       progressBox = Box.createHorizontalBox();
       progressBox.add(progressBar);
       progressBox.add(Box.createHorizontalStrut(5));
@@ -199,7 +191,6 @@ public abstract class InstallerJDialog extends JDialog {
       updateBox.add(Box.createHorizontalGlue());
       updateBox.add(errorMessage);
       updateBox.add(Box.createHorizontalGlue());
-      updateBox.add(updateButton);
     }
 
     {
@@ -220,6 +211,13 @@ public abstract class InstallerJDialog extends JDialog {
       @Override
       public void actionPerformed(ActionEvent e) {
         InstallerJDialog.this.dispatchEvent(new WindowEvent(InstallerJDialog.this, WindowEvent.WINDOW_CLOSING));
+      }
+    });
+
+    SwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        onUpdatePressed();
       }
     });
   }
