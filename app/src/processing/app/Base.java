@@ -1128,6 +1128,7 @@ public class Base {
         setIndexer(BaseNoGui.librariesIndexer);
       }
     };
+    managerUI.setLocationRelativeTo(activeEditor);
     managerUI.setIndexer(BaseNoGui.librariesIndexer);
     managerUI.setVisible(true);
     // Manager dialog is modal, waits here until closed
@@ -1149,6 +1150,7 @@ public class Base {
         setIndexer(BaseNoGui.indexer);
       }
     };
+    managerUI.setLocationRelativeTo(activeEditor);
     managerUI.setIndexer(BaseNoGui.indexer);
     managerUI.setVisible(true);
     // Installer dialog is modal, waits here until closed
