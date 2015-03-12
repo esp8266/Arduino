@@ -169,9 +169,7 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
 
       statusLabel = new JLabel(" ");
       inactiveButtonsPanel.add(statusLabel);
-
-      inactiveButtonsPanel.add(Box.createGlue());
-      inactiveButtonsPanel.add(Box.createVerticalStrut(height));
+      inactiveButtonsPanel.add(Box.createHorizontalStrut(15));
 
       panel.add(inactiveButtonsPanel);
     }
