@@ -675,6 +675,7 @@ public class Preferences {
     updateExtensionBox.setSelected(PreferencesData.get("editor.update_extension") == null ||
                                    PreferencesData.getBoolean("editor.update_extension"));
 
+    dialog.setLocationRelativeTo(editor);
     dialog.setVisible(true);
   }
 
