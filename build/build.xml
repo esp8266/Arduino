@@ -51,6 +51,7 @@
     <include name="arduino-core/arduino-core.jar" />
     <include name="app/pde.jar" />
     <include name="app/lib/*.jar" />
+    <include name="arduino-core/lib/*.jar" />
   </fileset>
 
   <target name="build" description="Build Arduino.">
