@@ -39,6 +39,7 @@ build/linux/work/
 build/linux/dist/*.tar.gz
 build/linux/dist/*.tar.bz2
 build/linux/*.tgz
+build/linux/*.tar.xz
 build/linux/*.tar.bz2
 build/linux/*.zip
 build/linux/libastylej*
