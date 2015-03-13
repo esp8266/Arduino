@@ -1286,6 +1286,7 @@ public class Editor extends JFrame implements RunnerListener {
           }
           if (getSelectedText()!= null) find.setFindText( getSelectedText() );
           //new FindReplace(Editor.this).show();
+          find.setLocationRelativeTo(Editor.this);
           find.setVisible(true);
           //find.setVisible(true);
         }
@@ -1320,6 +1321,7 @@ public class Editor extends JFrame implements RunnerListener {
           if (find == null) {
             find = new FindReplace(Editor.this);
           }
+          find.setLocationRelativeTo(Editor.this);
           find.setFindText( getSelectedText() );
         }
       });
