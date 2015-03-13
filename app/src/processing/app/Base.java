@@ -96,7 +96,9 @@ public class Base {
     BaseNoGui.initPortableFolder();
 
     BaseNoGui.initParameters(args);
-    
+
+    System.setProperty("swing.aatext", Preferences.get("editor.antialias", "true"));
+
     BaseNoGui.initVersion();
 
 //    if (System.getProperty("mrj.version") != null) {
