@@ -65,8 +65,8 @@ public class LibraryManagerUI extends InstallerJDialog {
       }
 
       @Override
-      protected void onRemove(ContributedLibrary installedPlatform) {
-        onRemovePressed(installedPlatform);
+      protected void onRemove(ContributedLibrary library) {
+        onRemovePressed(library);
       }
     };
   }

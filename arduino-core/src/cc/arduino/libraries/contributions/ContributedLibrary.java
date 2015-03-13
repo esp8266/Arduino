@@ -32,6 +32,9 @@ import java.util.Comparator;
 import java.util.List;
 
 import cc.arduino.packages.contributions.DownloadableContribution;
+import processing.app.I18n;
+
+import static processing.app.I18n._;
 
 public abstract class ContributedLibrary extends DownloadableContribution {
 
@@ -109,9 +112,9 @@ public abstract class ContributedLibrary extends DownloadableContribution {
 
   @Override
   public String toString() {
-    return getVersion();
+    return I18n.format(_("Version {0}"), getVersion());
   }
-  
+
   public String info() {
     String res = "";
     res += "  ContributedLibrary : " + getName() + "\n";

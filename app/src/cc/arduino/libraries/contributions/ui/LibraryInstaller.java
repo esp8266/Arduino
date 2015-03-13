@@ -68,7 +68,7 @@ public class LibraryInstaller {
     File tmpFile = new File(outputFile.getAbsolutePath() + ".tmp");
     try {
       downloader.download(url, tmpFile, progress,
-                          _("Downloading libraries index..."));
+              _("Downloading libraries index..."));
     } catch (InterruptedException e) {
       // Download interrupted... just exit
       return;
@@ -121,7 +121,7 @@ public class LibraryInstaller {
 
     // Step 3: Remove replaced library and move installed one to the correct location
     // TODO: Fix progress bar...
-    if (replacedLib != null) {
+    if (replacedLib != null && !replacedLib.isReadOnly()) {
       remove(replacedLib);
     }
     File destFolder = new File(libsFolder, lib.getName());
@@ -133,6 +133,10 @@ public class LibraryInstaller {
   }
 
   public void remove(ContributedLibrary lib) throws IOException {
+    if (lib.isReadOnly()) {
+      throw new IllegalArgumentException("Can't delete a built-in library");
+    }
+
     final MultiStepProgress progress = new MultiStepProgress(2);
 
     // Step 1: Remove library

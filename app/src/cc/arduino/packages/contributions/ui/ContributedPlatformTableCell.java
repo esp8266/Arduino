@@ -254,7 +254,7 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
     if (installable)
       installButton.setText(_("Install"));
     if (upgradable)
-      installButton.setText(_("Upgrade"));
+      installButton.setText(_("Update"));
     installButton.setVisible(installable || upgradable);
 
     removeButton.setVisible(removable);
