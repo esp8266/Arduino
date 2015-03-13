@@ -77,8 +77,8 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
       HTMLDocument html = (HTMLDocument) doc;
       StyleSheet stylesheet = html.getStyleSheet();
       stylesheet.addRule("body { margin: 0; padding: 0;"
-          + "font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;"
-          + "font-size: 100%;" + "font-size: 0.95em; }");
+              + "font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;"
+              + "font-size: 100%;" + "font-size: 0.95em; }");
     }
     description.setOpaque(false);
     description.setBorder(new EmptyBorder(4, 7, 7, 7));
@@ -138,12 +138,12 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
         downgradeButton.setEnabled(!disableDowngrade);
       }
     });
-    
+
     panel = new JPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
     panel.add(description);
-    
+
     {
       buttonsPanel = new JPanel();
       buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
@@ -165,7 +165,7 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
 
       panel.add(buttonsPanel);
     }
-    
+
     {
       inactiveButtonsPanel = new JPanel();
       inactiveButtonsPanel.setLayout(new BoxLayout(inactiveButtonsPanel, BoxLayout.X_AXIS));
@@ -286,24 +286,31 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
     if (installedLib != null && installedLib.isReadOnly()) {
       desc += "Built-In ";
     }
-    
+
     // ...author...
     desc += format("<font color=\"{0}\">", midcolor);
     if (author != null && !author.isEmpty()) {
       desc += format(" by <b>{0}</b>", author);
     }
-    
+
     // ...version.
     if (installedLib != null) {
       String installedVer = installedLib.getVersion();
-      if (installedVer == null)
+      if (installedVer == null) {
         desc += " " + _("Version unknown");
-      else
+      } else {
         desc += " " + format(_("Version <b>{0}</b>"), installedVer);
+      }
     } else {
       // not installed...
     }
-    desc += "</font><br />";
+    desc += "</font>";
+
+    if (installedLib != null) {
+      desc += " <strong><font color=\"#00979D\">INSTALLED</font></strong>";
+    }
+
+    desc += "<br/>";
 
     // Description
     if (sentence != null) {
@@ -319,7 +326,7 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
     desc += "</body></html>";
     description.setText(desc);
     description.setBackground(Color.WHITE);
-    
+
     // If the selected lib is available from repository...
     if (url != null) {
       removeButton.setText(_("Remove"));
@@ -365,7 +372,7 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
     buttonsPanel.setVisible(enabled);
     inactiveButtonsPanel.setVisible(!enabled);
   }
-  
+
   public void enable(boolean enabled) {
     installButton.setEnabled(enabled);
     removeButton.setEnabled(enabled);

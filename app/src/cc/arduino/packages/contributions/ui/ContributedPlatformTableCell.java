@@ -78,8 +78,8 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
       HTMLDocument html = (HTMLDocument) doc;
       StyleSheet stylesheet = html.getStyleSheet();
       stylesheet.addRule("body { margin: 0; padding: 0;"
-          + "font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;"
-          + "font-size: 100%;" + "font-size: 0.95em; }");
+              + "font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;"
+              + "font-size: 100%;" + "font-size: 0.95em; }");
     }
     description.setOpaque(false);
     description.setBorder(new EmptyBorder(4, 7, 7, 7));
@@ -268,7 +268,7 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
       desc += " " + format("by <b>{0}</b>", author);
     }
     if (removable) {
-      desc += " " + format(_("version <b>{0}</b>"), installedPlatform.getVersion());
+      desc += " " + format(_("version <b>{0}</b>"), installedPlatform.getVersion()) + " <strong><font color=\"#00979D\">INSTALLED</font></strong>";
     }
     desc += "<br />";
 
@@ -287,7 +287,7 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
 
     int width = parentTable.getBounds().width;
     setJTextPaneDimensionToFitContainedText(description, width);
-    
+
     if (isSelected) {
       panel.setBackground(parentTable.getSelectionBackground());
       panel.setForeground(parentTable.getSelectionForeground());
