@@ -12,7 +12,7 @@ version=1.6.2
 # --------------------- 
 
 # Default "compiler.path" is correct, change only if you want to overidde the initial value
-compiler.path={runtime.tools.avr-gcc-4.8.1-arduino.path}/bin/
+compiler.path={runtime.tools.avr-gcc.path}/bin/
 compiler.c.cmd=avr-gcc
 compiler.c.flags=-c -g -Os -w -ffunction-sections -fdata-sections -MMD
 # -w flag added to avoid printing a wrong warning http://gcc.gnu.org/bugzilla/show_bug.cgi?id=59396

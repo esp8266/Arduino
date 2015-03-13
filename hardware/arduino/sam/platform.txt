@@ -10,7 +10,7 @@ version=1.6.2
 # SAM3 compile variables
 # ----------------------
 
-compiler.path={runtime.tools.arm-none-eabi-gcc-4.4.1-sourcery2010q1-188.path}/bin/
+compiler.path={runtime.tools.arm-none-eabi-gcc.path}/bin/
 compiler.c.cmd=arm-none-eabi-gcc
 compiler.c.flags=-c -g -Os -w -ffunction-sections -fdata-sections -nostdlib --param max-inline-insns-single=500 -Dprintf=iprintf -MMD
 compiler.c.elf.cmd=arm-none-eabi-gcc
