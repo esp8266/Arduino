@@ -2,7 +2,8 @@
 ARDUINO 1.6.2
 
 [ide]
-* In custom platform.txt files, pre and post build hooks can now be specified. Example: recipe.hooks.prebuild.0.pattern=echo "Hello {build.source.path}". Thanks @Wackerbarth
+* In platform.txt, pre and post build hooks can now be specified. Example: recipe.hooks.prebuild.0.pattern=echo "Hello {build.source.path}". Thanks @Wackerbarth
+* Windows and MacOSX JVM Xmx halved to 512M
 
 ARDUINO 1.6.1 - 2015.03.10
 
