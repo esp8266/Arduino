@@ -57,7 +57,7 @@ import static processing.app.I18n._;
 public class Base {
 
   static private boolean commandLine;
-  public static SplashScreenHelper splashScreenHelper;
+  public static SplashScreenHelper splashScreenHelper = new SplashScreenHelper(SplashScreen.getSplashScreen());
 
   // A single instance of the preferences window
   Preferences preferencesFrame;
@@ -88,8 +88,6 @@ public class Base {
   static public void main(String args[]) throws Exception {
     System.setProperty("awt.useSystemAAFontSettings", "on");
     System.setProperty("swing.aatext", "true");
-
-    splashScreenHelper = new SplashScreenHelper(SplashScreen.getSplashScreen());
 
     BaseNoGui.initLogger();
     
