@@ -30,7 +30,6 @@ package cc.arduino.libraries.contributions.ui;
 
 import cc.arduino.libraries.contributions.ContributedLibrary;
 import cc.arduino.libraries.contributions.LibrariesIndexer;
-import cc.arduino.packages.contributions.ContributedPackage;
 import cc.arduino.packages.contributions.ContributedPlatform;
 import cc.arduino.packages.contributions.VersionComparator;
 import cc.arduino.ui.FilteredAbstractTableModel;
@@ -39,14 +38,12 @@ import com.google.common.collect.Collections2;
 
 import java.util.*;
 
-import static cc.arduino.packages.contributions.VersionComparator.VERSION_COMPARATOR;
-
 @SuppressWarnings("serial")
-public class LibrariesIndexTableModel extends FilteredAbstractTableModel {
+public class LibrariesIndexTableModel extends FilteredAbstractTableModel<ContributedLibrary> {
 
   public final static int DESCRIPTION_COL = 0;
 
-  public static class ContributedLibraryReleases implements            Comparable<ContributedLibraryReleases> {
+  public static class ContributedLibraryReleases implements Comparable<ContributedLibraryReleases> {
     public String name;
     public List<ContributedLibrary> releases = new ArrayList<ContributedLibrary>();
     public List<String> versions = new ArrayList<String>();
@@ -139,11 +136,11 @@ public class LibrariesIndexTableModel extends FilteredAbstractTableModel {
     indexer = _index;
   }
 
-  String selectedCategory = null;
+  Predicate<ContributedLibrary> selectedCategoryFilter = null;
   String selectedFilters[] = null;
 
-  public void updateIndexFilter(String category, String filters[]) {
-    selectedCategory = category;
+  public void updateIndexFilter(Predicate<ContributedLibrary> categoryFilter, String filters[]) {
+    selectedCategoryFilter = categoryFilter;
     selectedFilters = filters;
     update();
   }
@@ -245,10 +242,8 @@ public class LibrariesIndexTableModel extends FilteredAbstractTableModel {
   }
 
   private void applyFilterToLibrary(ContributedLibrary lib) {
-    if (selectedCategory != null && !selectedCategory.isEmpty()) {
-      if (lib.getCategory() == null || !lib.getCategory().equals(selectedCategory)) {
-        return;
-      }
+    if (selectedCategoryFilter != null && !selectedCategoryFilter.apply(lib)) {
+      return;
     }
     if (!stringContainsAll(lib.getName(), selectedFilters) && !stringContainsAll(lib.getParagraph(), selectedFilters) && !stringContainsAll(lib.getSentence(), selectedFilters)) {
       return;

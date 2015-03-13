@@ -28,10 +28,13 @@
  */
 package cc.arduino.ui;
 
+import cc.arduino.libraries.contributions.ContributedLibrary;
+import com.google.common.base.Predicate;
+
 import javax.swing.table.AbstractTableModel;
 
-public abstract class FilteredAbstractTableModel extends AbstractTableModel {
+public abstract class FilteredAbstractTableModel<T> extends AbstractTableModel {
 
-  abstract public void updateIndexFilter(String category, String[] filters);
+  abstract public void updateIndexFilter(Predicate<T> categoryFilter, String[] filters);
 
 }

@@ -28,6 +28,8 @@
  */
 package cc.arduino.ui;
 
+import cc.arduino.libraries.contributions.ContributedLibrary;
+import com.google.common.base.Predicate;
 import processing.app.Base;
 import processing.app.Theme;
 
@@ -46,7 +48,7 @@ import java.awt.event.WindowEvent;
 import static cc.arduino.packages.contributions.ui.ContributionIndexTableModel.DESCRIPTION_COL;
 import static processing.app.I18n._;
 
-public abstract class InstallerJDialog extends JDialog {
+public abstract class InstallerJDialog<T> extends JDialog {
 
   // Toolbar on top of the window:
   // - Categories drop-down menu
@@ -58,7 +60,7 @@ public abstract class InstallerJDialog extends JDialog {
   // - Search text-field
   protected FilterJTextField filterField;
   // Currently selected category and filters
-  protected String category;
+  protected Predicate<T> categoryFilter;
   protected String[] filters;
 
   // Real contribution table
@@ -118,7 +120,7 @@ public abstract class InstallerJDialog extends JDialog {
         protected void onFilter(String[] _filters) {
           filters = _filters;
           cellEditor.stopCellEditing();
-          contribModel.updateIndexFilter(category, filters);
+          contribModel.updateIndexFilter(categoryFilter, filters);
         }
       };
 
@@ -271,22 +273,13 @@ public abstract class InstallerJDialog extends JDialog {
 
   protected ActionListener categoryChooserActionListener = new ActionListener() {
 
-    public String getSelectedItem() {
-      Object obj = categoryChooser.getSelectedItem();
-      if (obj instanceof String) {
-        return (String) obj;
-      }
-      DropdownItem item = (DropdownItem) obj;
-      return item.getItemValue();
-    }
-
     @Override
     public void actionPerformed(ActionEvent event) {
-      String selected = getSelectedItem();
-      if (category == null || !category.equals(selected)) {
-        category = selected;
+      DropdownItem<T> selected = (DropdownItem<T>) categoryChooser.getSelectedItem();
+      if (categoryFilter == null || !categoryFilter.equals(selected)) {
+        categoryFilter = selected.getFilterPredicate();
         cellEditor.stopCellEditing();
-        contribModel.updateIndexFilter(category, filters);
+        contribModel.updateIndexFilter(categoryFilter, filters);
       }
     }
   };

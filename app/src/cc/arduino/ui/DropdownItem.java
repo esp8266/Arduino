@@ -1,6 +1,9 @@
 package cc.arduino.ui;
 
-public interface DropdownItem {
+import com.google.common.base.Predicate;
 
-  String getItemValue();
+public interface DropdownItem<T> {
+
+  Predicate<T> getFilterPredicate();
+
 }

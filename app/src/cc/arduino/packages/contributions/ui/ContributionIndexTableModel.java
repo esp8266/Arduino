@@ -32,6 +32,7 @@ import cc.arduino.packages.contributions.ContributedPackage;
 import cc.arduino.packages.contributions.ContributedPlatform;
 import cc.arduino.packages.contributions.ContributionsIndex;
 import cc.arduino.ui.FilteredAbstractTableModel;
+import com.google.common.base.Predicate;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -40,7 +41,7 @@ import java.util.List;
 import static processing.app.I18n._;
 
 @SuppressWarnings("serial")
-public class ContributionIndexTableModel extends FilteredAbstractTableModel {
+public class ContributionIndexTableModel extends FilteredAbstractTableModel<ContributedPlatform> {
 
   public final static int DESCRIPTION_COL = 0;
 
@@ -137,13 +138,12 @@ public class ContributionIndexTableModel extends FilteredAbstractTableModel {
     index = _index;
   }
 
-  public void updateIndexFilter(String category, String filters[]) {
+  public void updateIndexFilter(Predicate<ContributedPlatform> categoryFilter, String filters[]) {
     contributions.clear();
     for (ContributedPackage pack : index.getPackages()) {
       for (ContributedPlatform platform : pack.getPlatforms()) {
-        if (category != null) {
-          if (!category.equals(platform.getCategory()))
-            continue;
+        if (!categoryFilter.apply(platform)) {
+          continue;
         }
         if (!stringContainsAll(platform.getName(), filters))
           continue;

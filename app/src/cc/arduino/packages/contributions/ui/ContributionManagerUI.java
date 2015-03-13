@@ -28,15 +28,16 @@
  */
 package cc.arduino.packages.contributions.ui;
 
+import cc.arduino.libraries.contributions.ui.DropdownLibraryOfCategoryItem;
 import cc.arduino.packages.contributions.ContributedPlatform;
 import cc.arduino.packages.contributions.ContributionInstaller;
 import cc.arduino.packages.contributions.ContributionsIndexer;
+import cc.arduino.libraries.contributions.ui.DropdownAllLibrariesItem;
 import cc.arduino.ui.FilteredAbstractTableModel;
 import cc.arduino.ui.InstallerJDialog;
 import cc.arduino.ui.InstallerTableCell;
 import cc.arduino.utils.Progress;
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.Collection;
 
@@ -86,7 +87,7 @@ public class ContributionManagerUI extends InstallerJDialog {
 
     getContribModel().setIndex(indexer.getIndex());
 
-    category = null;
+    categoryFilter = null;
     categoryChooser.removeAllItems();
 
     filterField.setEnabled(getContribModel().getRowCount() > 0);
@@ -95,12 +96,11 @@ public class ContributionManagerUI extends InstallerJDialog {
     categoryChooser.addActionListener(categoryChooserActionListener);
 
     // Enable categories combo only if there are two or more choices
+    categoryChooser.addItem(new DropdownAllCoresItem());
     Collection<String> categories = indexer.getIndex().getCategories();
-    int count = categories.size();
-    categoryChooser.setEnabled(count > 1);
-
-    for (String s : categories)
-      categoryChooser.addItem(s);
+    for (String s : categories) {
+      categoryChooser.addItem(new DropdownCoreOfCategoryItem(s));
+    }
 
     // Create ConstributionInstaller tied with the provided index
     installer = new ContributionInstaller(indexer) {

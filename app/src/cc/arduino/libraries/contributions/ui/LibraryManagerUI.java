@@ -31,13 +31,9 @@ package cc.arduino.libraries.contributions.ui;
 import cc.arduino.libraries.contributions.ContributedLibrary;
 import cc.arduino.libraries.contributions.LibrariesIndexer;
 import cc.arduino.packages.contributions.ui.InstallerJDialogUncaughtExceptionHandler;
-import cc.arduino.ui.DropdownALLItem;
-import cc.arduino.ui.FilteredAbstractTableModel;
-import cc.arduino.ui.InstallerJDialog;
-import cc.arduino.ui.InstallerTableCell;
+import cc.arduino.ui.*;
 import cc.arduino.utils.Progress;
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.Collection;
 
@@ -87,17 +83,20 @@ public class LibraryManagerUI extends InstallerJDialog {
     // return a FilteredAbstractTableModel
     getContribModel().setIndexer(indexer);
 
-    category = null;
+    categoryFilter = null;
     categoryChooser.removeAllItems();
 
     getContribModel().addTableModelListener(tableModelListener);
     categoryChooser.addActionListener(categoryChooserActionListener);
 
     // Load categories
+    categoryChooser.addItem(new DropdownAllLibrariesItem());
+    categoryChooser.addItem(new DropdownInstalledLibrariesItem());
+    categoryChooser.addItem(new DropdownBuiltInLibrariesItem());
     Collection<String> categories = indexer.getIndex().getCategories();
-    categoryChooser.addItem(new DropdownALLItem());
-    for (String s : categories)
-      categoryChooser.addItem(s);
+    for (String category : categories) {
+      categoryChooser.addItem(new DropdownLibraryOfCategoryItem(category));
+    }
 
     // Enable categories combo only if there are two or more choices
     int count = categoryChooser.getItemCount();
