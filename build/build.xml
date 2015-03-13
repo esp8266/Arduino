@@ -913,8 +913,7 @@
     </antcall>
 
     <zip destfile="windows/arduino-${version}-${platform}.zip" level="9">
-      <zipfileset dir="windows/work"
-		  prefix="arduino-${version}" />
+      <zipfileset dir="windows/work" prefix="arduino-${version}"/>
     </zip>
 
     <echo>
