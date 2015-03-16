@@ -36,6 +36,7 @@ import cc.arduino.ui.InstallerJDialog;
 import cc.arduino.ui.InstallerTableCell;
 import cc.arduino.utils.Progress;
 
+import javax.swing.*;
 import java.awt.*;
 import java.util.Collection;
 
@@ -43,6 +44,8 @@ import static processing.app.I18n._;
 
 @SuppressWarnings("serial")
 public class LibraryManagerUI extends InstallerJDialog {
+
+  private LibrariesIndexer indexer;
 
   @Override
   protected FilteredAbstractTableModel createContribModel() {
@@ -82,6 +85,7 @@ public class LibraryManagerUI extends InstallerJDialog {
   }
 
   public void setIndexer(LibrariesIndexer indexer) {
+    this.indexer = indexer;
     getContribModel().removeTableModelListener(tableModelListener);
     categoryChooser.removeActionListener(categoryChooserActionListener);
 
@@ -181,6 +185,15 @@ public class LibraryManagerUI extends InstallerJDialog {
   }
 
   public void onRemovePressed(final ContributedLibrary lib) {
+    boolean managedByIndex = indexer.getIndex().getLibraries().contains(lib);
+
+    if (!managedByIndex) {
+      int chosenOption = JOptionPane.showConfirmDialog(getParent(), _("This library is not listed on Library Manager. You won't be able to resinstall it from here.\nAre you sure you want to delete it?"), _("Please confirm library deletion"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+      if (chosenOption != JOptionPane.YES_OPTION) {
+        return;
+      }
+    }
+
     clearErrorMessage();
     installerThread = new Thread(new Runnable() {
       @Override
