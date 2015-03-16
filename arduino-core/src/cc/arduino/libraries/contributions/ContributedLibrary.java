@@ -28,11 +28,11 @@
  */
 package cc.arduino.libraries.contributions;
 
-import java.util.Comparator;
-import java.util.List;
-
 import cc.arduino.packages.contributions.DownloadableContribution;
 import processing.app.I18n;
+
+import java.util.Comparator;
+import java.util.List;
 
 import static processing.app.I18n._;
 
@@ -90,15 +90,14 @@ public abstract class ContributedLibrary extends DownloadableContribution {
    */
   public boolean supportsArchitecture(String reqArch) {
     return getArchitectures().contains(reqArch) ||
-        getArchitectures().contains("*");
+            getArchitectures().contains("*");
   }
 
   /**
    * Returns <b>true</b> if the library declares to support at least one of the
    * specified architectures.
    *
-   * @param reqArchs
-   *          A List of architectures to check
+   * @param reqArchs A List of architectures to check
    * @return
    */
   public boolean supportsArchitecture(List<String> reqArchs) {
@@ -146,4 +145,22 @@ public abstract class ContributedLibrary extends DownloadableContribution {
     return res;
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof ContributedLibrary)) {
+      return false;
+    }
+
+    String thisVersion = getVersion();
+    String otherVersion = ((ContributedLibrary) obj).getVersion();
+
+    boolean versionEquals = thisVersion == null || otherVersion == null || thisVersion == otherVersion || thisVersion.equals(otherVersion);
+
+    String thisName = getName();
+    String otherName = ((ContributedLibrary) obj).getName();
+
+    boolean nameEquals = thisName == null || otherName == null || thisName == otherName || thisName.equals(otherName);
+
+    return versionEquals && nameEquals;
+  }
 }

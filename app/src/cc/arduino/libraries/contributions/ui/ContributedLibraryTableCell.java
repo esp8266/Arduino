@@ -31,14 +31,18 @@ package cc.arduino.libraries.contributions.ui;
 import cc.arduino.libraries.contributions.ContributedLibrary;
 import cc.arduino.libraries.contributions.ContributedLibraryComparator;
 import cc.arduino.libraries.contributions.ui.LibrariesIndexTableModel.ContributedLibraryReleases;
+import cc.arduino.libraries.contributions.ui.filters.BuiltInPredicate;
 import cc.arduino.libraries.contributions.ui.filters.InstalledPredicate;
+import cc.arduino.libraries.contributions.ui.filters.OnlyUpstreamReleasePredicate;
+import cc.arduino.packages.contributions.VersionComparator;
 import cc.arduino.ui.InstallerTableCell;
 import cc.arduino.utils.ReverseComparator;
+import com.google.common.base.Function;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 import processing.app.Base;
 
-import javax.sound.midi.Soundbank;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
@@ -168,7 +172,7 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
       buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
       buttonsPanel.setOpaque(false);
 
-      buttonsPanel.add(Box.createHorizontalStrut(20));
+      buttonsPanel.add(Box.createHorizontalStrut(7));
       buttonsPanel.add(downgradeChooser);
       buttonsPanel.add(Box.createHorizontalStrut(5));
       buttonsPanel.add(downgradeButton);
@@ -205,7 +209,7 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
       panel.add(inactiveButtonsPanel);
     }
 
-    panel.add(Box.createVerticalStrut(10));
+    panel.add(Box.createVerticalStrut(15));
   }
 
   protected void onRemove(ContributedLibrary selectedLib) {
@@ -222,7 +226,7 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
                                                  int column) {
     parentTable = table;
     setEnabled(false);
-    Component component = getUpdatedCellComponent(value, isSelected, row);
+    Component component = getUpdatedCellComponent(value, isSelected, row, false);
     if (row % 2 == 0) {
       component.setBackground(new Color(236, 241, 241)); //#ecf1f1
     } else {
@@ -248,29 +252,59 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
     editorValue = (ContributedLibraryReleases) value;
     setEnabled(true);
 
-    List<ContributedLibrary> uninstalledLibraries = new LinkedList<ContributedLibrary>(Collections2.filter(editorValue.releases, Predicates.not(new InstalledPredicate())));
+    final ContributedLibrary installedLibrary = editorValue.getInstalled();
+
+    List<ContributedLibrary> libraries = new LinkedList<ContributedLibrary>(Collections2.filter(editorValue.releases, new OnlyUpstreamReleasePredicate()));
+    List<ContributedLibrary> uninstalledLibraries = new LinkedList<ContributedLibrary>(Collections2.filter(libraries, Predicates.not(new InstalledPredicate())));
+
+    List<ContributedLibrary> installedBuiltIn = new LinkedList<ContributedLibrary>(Collections2.filter(libraries, Predicates.and(new InstalledPredicate(), new BuiltInPredicate())));
+
+    if (installedLibrary != null && !installedBuiltIn.contains(installedLibrary)) {
+      uninstalledLibraries.addAll(installedBuiltIn);
+    }
+
     Collections.sort(uninstalledLibraries, new ReverseComparator<ContributedLibrary>(new ContributedLibraryComparator()));
 
     downgradeChooser.removeAllItems();
     downgradeChooser.addItem(_("Select version"));
-    for (ContributedLibrary release : uninstalledLibraries) {
+
+    final List<ContributedLibrary> uninstalledPreviousLibraries = Lists.newLinkedList();
+    final List<ContributedLibrary> uninstalledNewerLibraries = Lists.newLinkedList();
+
+    Lists.newLinkedList(Lists.transform(uninstalledLibraries, new Function<ContributedLibrary, ContributedLibrary>() {
+      @Override
+      public ContributedLibrary apply(ContributedLibrary input) {
+        if (installedLibrary == null || VersionComparator.VERSION_COMPARATOR.greaterThan(installedLibrary.getVersion(), input.getVersion())) {
+          uninstalledPreviousLibraries.add(input);
+        } else {
+          uninstalledNewerLibraries.add(input);
+        }
+
+        return input;
+      }
+    }));
+    for (ContributedLibrary release : uninstalledNewerLibraries) {
       downgradeChooser.addItem(release);
     }
-    downgradeChooser.setVisible(editorValue.getInstalled() != null && uninstalledLibraries.size() > 1);
-    downgradeButton.setVisible(editorValue.getInstalled() != null && uninstalledLibraries.size() > 1);
+    for (ContributedLibrary release : uninstalledPreviousLibraries) {
+      downgradeChooser.addItem(release);
+    }
+
+    downgradeChooser.setVisible(installedLibrary != null && (!uninstalledPreviousLibraries.isEmpty() || uninstalledNewerLibraries.size() > 1));
+    downgradeButton.setVisible(installedLibrary != null && (!uninstalledPreviousLibraries.isEmpty() || uninstalledNewerLibraries.size() > 1));
 
     versionToInstallChooser.removeAllItems();
     for (ContributedLibrary release : uninstalledLibraries) {
       versionToInstallChooser.addItem(release);
     }
-    versionToInstallChooser.setVisible(editorValue.getInstalled() == null && uninstalledLibraries.size() > 1);
+    versionToInstallChooser.setVisible(installedLibrary == null && uninstalledLibraries.size() > 1);
 
-    Component component = getUpdatedCellComponent(value, true, row);
+    Component component = getUpdatedCellComponent(value, true, row, !installedBuiltIn.isEmpty());
     component.setBackground(new Color(218, 227, 227)); //#dae3e3
     return component;
   }
 
-  private Component getUpdatedCellComponent(Object value, boolean isSelected, int row) {
+  private Component getUpdatedCellComponent(Object value, boolean isSelected, int row, boolean hasBuiltInRelease) {
     ContributedLibraryReleases releases = (ContributedLibraryReleases) value;
     ContributedLibrary selectedLib = releases.getSelected();
     ContributedLibrary installedLib = releases.getInstalled();
@@ -282,7 +316,7 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
       upgradable = false;
     } else {
       installable = false;
-      removable = !installedLib.isReadOnly();
+      removable = !installedLib.isReadOnly() && !hasBuiltInRelease;
       upgradable = new ContributedLibraryComparator().compare(selectedLib, installedLib) > 0;
     }
     if (installable) {

@@ -53,6 +53,24 @@ public class VersionComparator implements Comparator<String> {
     return versionA.compareTo(versionB);
   }
 
+  public boolean greaterThan(String a, String b) {
+    // null is always less than any other value
+    if (a == null && b == null) {
+      return false;
+    }
+    if (a == null) {
+      return false;
+    }
+    if (b == null) {
+      return true;
+    }
+
+    Version versionA = valueOf(a);
+    Version versionB = valueOf(b);
+
+    return versionA.greaterThan(versionB);
+  }
+
   private Version valueOf(String ver) {
     String[] verParts = ver.split("\\.");
     if (verParts.length < 3) {

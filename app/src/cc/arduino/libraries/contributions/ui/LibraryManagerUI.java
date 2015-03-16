@@ -31,7 +31,9 @@ package cc.arduino.libraries.contributions.ui;
 import cc.arduino.libraries.contributions.ContributedLibrary;
 import cc.arduino.libraries.contributions.LibrariesIndexer;
 import cc.arduino.packages.contributions.ui.InstallerJDialogUncaughtExceptionHandler;
-import cc.arduino.ui.*;
+import cc.arduino.ui.FilteredAbstractTableModel;
+import cc.arduino.ui.InstallerJDialog;
+import cc.arduino.ui.InstallerTableCell;
 import cc.arduino.utils.Progress;
 
 import java.awt.*;
@@ -61,7 +63,11 @@ public class LibraryManagerUI extends InstallerJDialog {
     return new ContributedLibraryTableCell() {
       @Override
       protected void onInstall(ContributedLibrary selectedLibrary, ContributedLibrary installedLibrary) {
-        onInstallPressed(selectedLibrary, installedLibrary);
+        if (selectedLibrary.isReadOnly()) {
+          onRemovePressed(installedLibrary);
+        } else {
+          onInstallPressed(selectedLibrary, installedLibrary);
+        }
       }
 
       @Override

@@ -55,9 +55,7 @@ public class LibrariesIndexTableModel extends FilteredAbstractTableModel<Contrib
     }
 
     public boolean shouldContain(ContributedLibrary lib) {
-      if (!lib.getName().equals(name))
-        return false;
-      return true;
+      return lib.getName().equals(name);
     }
 
     public void add(ContributedLibrary library) {
