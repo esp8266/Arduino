@@ -116,7 +116,7 @@ public class SerialUploader extends Uploader {
           if (verbose)
             System.out.println(
               I18n.format(_("Forcing reset using 1200bps open/close on port {0}"), uploadPort));
-          Serial.touchPort(uploadPort, 1200);
+          Serial.touchForCDCReset(uploadPort);
         }
         Thread.sleep(400);
         if (waitForUploadPort) {
