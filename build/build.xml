@@ -853,11 +853,11 @@
 
     <copy todir="windows/work">
       <fileset dir="windows/launcher"
-	       includes="about.bmp, application.ico, config.xml, config_debug.xml, arduino.l4j.ini"/>
+	       includes="application.ico, config.xml, config_debug.xml, arduino.l4j.ini"/>
     </copy>
     <launch4j configFile="windows/work/config.xml" />
     <launch4j configFile="windows/work/config_debug.xml" />
-    <delete dir="windows/work" includes="about.bmp, application.ico, config.xml, config_debug.xml" />
+    <delete dir="windows/work" includes="application.ico, config.xml, config_debug.xml" />
     <copy file="windows/work/arduino.l4j.ini" tofile="windows/work/arduino_debug.l4j.ini" />
 
     <!-- cygwin requires html, dll, and exe to have the +x flag -->

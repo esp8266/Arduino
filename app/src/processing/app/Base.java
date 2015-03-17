@@ -1516,29 +1516,30 @@ public class Base {
    */
   @SuppressWarnings("serial")
   public void handleAbout() {
-    final Image image = getLibImage("about.jpg", activeEditor);
+    final Image image = getLibImage("about.png", activeEditor);
     final Window window = new Window(activeEditor) {
-        public void paint(Graphics g) {
-          g.drawImage(image, 0, 0, null);
+      public void paint(Graphics g) {
+        g.drawImage(image, 0, 0, null);
 
-          Graphics2D g2 = (Graphics2D) g;
-          g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                              RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
 
-          g.setFont(new Font("SansSerif", Font.PLAIN, 11));
-          g.setColor(Color.white);
-          g.drawString(BaseNoGui.VERSION_NAME, 50, 30);
-        }
-      };
+        g.setFont(new Font("SansSerif", Font.PLAIN, 11));
+        g.setColor(Color.white);
+        g.drawString(BaseNoGui.VERSION_NAME, 33, 20);
+      }
+    };
     window.addMouseListener(new MouseAdapter() {
-        public void mousePressed(MouseEvent e) {
-          window.dispose();
-        }
-      });
+      public void mousePressed(MouseEvent e) {
+        window.dispose();
+      }
+    });
     int w = image.getWidth(activeEditor);
     int h = image.getHeight(activeEditor);
     Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-    window.setBounds((screen.width-w)/2, (screen.height-h)/2, w, h);
+    window.setBounds((screen.width - w) / 2, (screen.height - h) / 2, w, h);
+    window.setLocationRelativeTo(activeEditor);
     window.setVisible(true);
   }
 
@@ -2173,11 +2174,10 @@ public class Base {
    * Return an Image object from inside the Processing lib folder.
    */
   static public Image getLibImage(String name, Component who) {
-    Image image = null;
     Toolkit tk = Toolkit.getDefaultToolkit();
 
     File imageLocation = new File(getContentFile("lib"), name);
-    image = tk.getImage(imageLocation.getAbsolutePath());
+    Image image = tk.getImage(imageLocation.getAbsolutePath());
     MediaTracker tracker = new MediaTracker(who);
     tracker.addImage(image, 0);
     try {
