@@ -32,12 +32,13 @@
     <minVersion>1.8.0</minVersion>
     <maxVersion></maxVersion>
     <jdkPreference>preferJre</jdkPreference>
+    <opt>-Dsun.java2d.d3d=false</opt>
   </jre>
   <messages>
     <startupErr>An error occurred while starting the application.</startupErr>
     <bundledJreErr>This application was configured to use a bundled Java Runtime Environment but the runtime is missing or corrupted.</bundledJreErr>
     <jreVersionErr>This application requires at least Java Development Kit</jreVersionErr>
-    <launcherErr>The registry refers to a nonexistent Java Development Kit  installation or the runtime is corrupted.</launcherErr>
+    <launcherErr>The registry refers to a nonexistent Java Development Kit installation or the runtime is corrupted.</launcherErr>
     <instanceAlreadyExistsMsg>An application instance is already running.</instanceAlreadyExistsMsg>
   </messages>
 </launch4jConfig>
