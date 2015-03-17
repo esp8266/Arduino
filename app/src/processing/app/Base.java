@@ -22,11 +22,10 @@
 
 package processing.app;
 
-import cc.arduino.libraries.contributions.ui.LibraryManagerUI;
+import cc.arduino.contributions.libraries.ui.LibraryManagerUI;
 import cc.arduino.packages.DiscoveryManager;
-import cc.arduino.packages.contributions.ui.ContributionManagerUI;
+import cc.arduino.contributions.packages.ui.ContributionManagerUI;
 import cc.arduino.view.SplashScreenHelper;
-import org.apache.commons.lang3.*;
 import org.apache.commons.lang3.StringUtils;
 import processing.app.debug.TargetBoard;
 import processing.app.debug.TargetPackage;

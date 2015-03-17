@@ -36,8 +36,8 @@ import java.util.List;
 
 import processing.app.helpers.FileUtils;
 import processing.app.helpers.PreferencesMap;
-import cc.arduino.libraries.contributions.ContributedLibrary;
-import cc.arduino.libraries.contributions.ContributedLibraryReference;
+import cc.arduino.contributions.libraries.ContributedLibrary;
+import cc.arduino.contributions.libraries.ContributedLibraryReference;
 
 public class UserLibrary extends ContributedLibrary {
 

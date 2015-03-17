@@ -30,7 +30,7 @@ import processing.app.legacy.PApplet;
 import java.io.*;
 import java.util.*;
 
-import cc.arduino.libraries.contributions.ContributedLibrary;
+import cc.arduino.contributions.libraries.ContributedLibrary;
 
 
 public class PdeKeywords extends CTokenMarker {

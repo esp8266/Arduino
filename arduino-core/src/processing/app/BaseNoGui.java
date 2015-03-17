@@ -1,10 +1,10 @@
 package processing.app;
 
-import cc.arduino.libraries.contributions.LibrariesIndexer;
+import cc.arduino.contributions.libraries.LibrariesIndexer;
 import cc.arduino.packages.DiscoveryManager;
 import cc.arduino.packages.Uploader;
-import cc.arduino.packages.contributions.ContributedTool;
-import cc.arduino.packages.contributions.ContributionsIndexer;
+import cc.arduino.contributions.packages.ContributedTool;
+import cc.arduino.contributions.packages.ContributionsIndexer;
 import cc.arduino.utils.ArchiveExtractor;
 import org.apache.commons.logging.impl.LogFactoryImpl;
 import org.apache.commons.logging.impl.NoOpLog;

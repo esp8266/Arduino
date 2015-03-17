@@ -32,7 +32,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import cc.arduino.libraries.contributions.ContributedLibraryReference;
+import cc.arduino.contributions.libraries.ContributedLibraryReference;
 
 public class LegacyUserLibrary extends UserLibrary {
 
