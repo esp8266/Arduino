@@ -29,6 +29,8 @@
 package cc.arduino.utils.network;
 
 import org.apache.commons.codec.binary.Base64;
+import processing.app.PreferencesData;
+import processing.app.helpers.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -120,6 +122,19 @@ public class FileDownloader extends Observable {
 
       setStatus(Status.CONNECTING);
 
+      if (PreferencesData.has("proxy.server") && PreferencesData.get("proxy.server") != null && !PreferencesData.get("proxy.server").equals("")) {
+        System.getProperties().put("http.proxyHost", PreferencesData.get("proxy.server"));
+        System.getProperties().put("http.proxyPort", PreferencesData.get("proxy.port"));
+        if (PreferencesData.has("proxy.user")) {
+          System.getProperties().put("http.proxyUser", PreferencesData.get("proxy.user"));
+          System.getProperties().put("http.proxyPassword", PreferencesData.get("proxy.password"));
+        }
+      } else {
+        System.getProperties().remove("http.proxyHost");
+        System.getProperties().remove("http.proxyPort");
+        System.getProperties().remove("http.proxyUser");
+        System.getProperties().remove("http.proxyPassword");
+      }
       HttpURLConnection connection = (HttpURLConnection) downloadUrl.openConnection();
 
       if (downloadUrl.getUserInfo() != null) {

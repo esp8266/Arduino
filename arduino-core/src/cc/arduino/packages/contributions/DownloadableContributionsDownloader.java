@@ -96,7 +96,7 @@ public class DownloadableContributionsDownloader {
     });
     downloader.download();
     if (!downloader.isCompleted()) {
-      throw new Exception(format(_("Error dowloading {0}"), url), downloader.getError());
+      throw new Exception(format(_("Error downloading {0}"), url), downloader.getError());
     }
   }
 

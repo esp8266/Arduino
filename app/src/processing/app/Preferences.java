@@ -21,39 +21,18 @@
 
 package processing.app;
 
-import static processing.app.I18n._;
-
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Insets;
-import java.awt.SystemColor;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.File;
-
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-
 import processing.app.helpers.FileUtils;
 import processing.app.helpers.OSUtils;
 import processing.app.helpers.PreferencesHelper;
 import processing.app.helpers.PreferencesMap;
 import processing.app.legacy.PApplet;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.File;
+
+import static processing.app.I18n._;
 
 
 /**
@@ -152,8 +131,8 @@ public class Preferences {
       new Language(_("Swedish"), "Svenska", "sv"),
       new Language(_("Tamil"), "தமிழ்", "ta"),
       new Language(_("Turkish"), "Türk", "tr"),
-      new Language(_("Ukrainian"), "Український", "uk"), 
-      new Language(_("Vietnamese"), "Tiếng Việt", "vi"), 
+      new Language(_("Ukrainian"), "Український", "uk"),
+      new Language(_("Vietnamese"), "Tiếng Việt", "vi"),
       };
 
   // Incomplete languages 
@@ -236,6 +215,10 @@ public class Preferences {
   JCheckBox autoAssociateBox;
   JComboBox comboLanguage;
   JCheckBox saveVerifyUploadBox;
+  JTextField proxyServer;
+  JTextField proxyPort;
+  JTextField proxyUser;
+  JPasswordField proxyPassword;
 
 
   // the calling editor, so updates can be applied
@@ -260,8 +243,8 @@ public class Preferences {
     dialog = new JFrame(_("Preferences"));
     dialog.setResizable(false);
 
-    Container pain = dialog.getContentPane();
-    pain.setLayout(null);
+    Container pane = dialog.getContentPane();
+    pane.setLayout(null);
 
     int top = GUI_BIG;
     int left = GUI_BIG;
@@ -278,13 +261,13 @@ public class Preferences {
     // [...............................]  [ Browse ]
 
     label = new JLabel(_("Sketchbook location:"));
-    pain.add(label);
+    pane.add(label);
     d = label.getPreferredSize();
     label.setBounds(left, top, d.width, d.height);
     top += d.height; // + GUI_SMALL;
 
     sketchbookLocationField = new JTextField(40);
-    pain.add(sketchbookLocationField);
+    pane.add(sketchbookLocationField);
     d = sketchbookLocationField.getPreferredSize();
 
     button = new JButton(I18n.PROMPT_BROWSE);
@@ -305,7 +288,7 @@ public class Preferences {
           }
         }
       });
-    pain.add(button);
+    pane.add(button);
     d2 = button.getPreferredSize();
 
     // take max height of all components to vertically align em
@@ -333,13 +316,13 @@ public class Preferences {
     box.add(comboLanguage);
     label = new JLabel(_("  (requires restart of Arduino)"));
     box.add(label);
-    pain.add(box);
+    pane.add(box);
     d = box.getPreferredSize();
     box.setForeground(Color.gray);
     box.setBounds(left, top, d.width, d.height);
     right = Math.max(right, left + d.width);
     top += d.height + GUI_BETWEEN;
-    
+
     // Editor font size [    ]
 
     box = Box.createHorizontalBox();
@@ -349,7 +332,7 @@ public class Preferences {
     box.add(fontSizeField);
     label = new JLabel(_("  (requires restart of Arduino)"));
     box.add(label);
-    pain.add(box);
+    pane.add(box);
     d = box.getPreferredSize();
     box.setBounds(left, top, d.width, d.height);
     Font editorFont = Preferences.getFont("editor.font");
@@ -358,7 +341,7 @@ public class Preferences {
 
 
     // Show verbose output during: [ ] compilation [ ] upload
-    
+
     box = Box.createHorizontalBox();
     label = new JLabel(_("Show verbose output during: "));
     box.add(label);
@@ -366,33 +349,33 @@ public class Preferences {
     box.add(verboseCompilationBox);
     verboseUploadBox = new JCheckBox(_("upload"));
     box.add(verboseUploadBox);
-    pain.add(box);
+    pane.add(box);
     d = box.getPreferredSize();
     box.setBounds(left, top, d.width, d.height);
     top += d.height + GUI_BETWEEN;
 
 	// [ ] Display line numbers
-    
+
     displayLineNumbersBox = new JCheckBox(_("Display line numbers"));
-    pain.add(displayLineNumbersBox);
+    pane.add(displayLineNumbersBox);
     d = displayLineNumbersBox.getPreferredSize();
     displayLineNumbersBox.setBounds(left, top, d.width + 10, d.height);
     right = Math.max(right, left + d.width);
     top += d.height + GUI_BETWEEN;
-	
+
     // [ ] Verify code after upload
-    
+
     verifyUploadBox = new JCheckBox(_("Verify code after upload"));
-    pain.add(verifyUploadBox);
+    pane.add(verifyUploadBox);
     d = verifyUploadBox.getPreferredSize();
     verifyUploadBox.setBounds(left, top, d.width + 10, d.height);
     right = Math.max(right, left + d.width);
     top += d.height + GUI_BETWEEN;
-    
+
     // [ ] Use external editor
 
     externalEditorBox = new JCheckBox(_("Use external editor"));
-    pain.add(externalEditorBox);
+    pane.add(externalEditorBox);
     d = externalEditorBox.getPreferredSize();
     externalEditorBox.setBounds(left, top, d.width + 10, d.height);
     right = Math.max(right, left + d.width);
@@ -402,27 +385,27 @@ public class Preferences {
     // [ ] Check for updates on startup
 
     checkUpdatesBox = new JCheckBox(_("Check for updates on startup"));
-    pain.add(checkUpdatesBox);
+    pane.add(checkUpdatesBox);
     d = checkUpdatesBox.getPreferredSize();
     checkUpdatesBox.setBounds(left, top, d.width + 10, d.height);
     right = Math.max(right, left + d.width);
     top += d.height + GUI_BETWEEN;
-    
+
     // [ ] Update sketch files to new extension on save (.pde -> .ino)
-    
+
     updateExtensionBox = new JCheckBox(_("Update sketch files to new extension on save (.pde -> .ino)"));
-    pain.add(updateExtensionBox);
+    pane.add(updateExtensionBox);
     d = updateExtensionBox.getPreferredSize();
     updateExtensionBox.setBounds(left, top, d.width + 10, d.height);
     right = Math.max(right, left + d.width);
-    top += d.height + GUI_BETWEEN;    
+    top += d.height + GUI_BETWEEN;
 
     // [ ] Automatically associate .pde files with Processing
 
     if (OSUtils.isWindows()) {
       autoAssociateBox =
         new JCheckBox(_("Automatically associate .ino files with Arduino"));
-      pain.add(autoAssociateBox);
+      pane.add(autoAssociateBox);
       d = autoAssociateBox.getPreferredSize();
       autoAssociateBox.setBounds(left, top, d.width + 10, d.height);
       right = Math.max(right, left + d.width);
@@ -436,16 +419,24 @@ public class Preferences {
     // [ ] save when verifying or uploading
 
     saveVerifyUploadBox = new JCheckBox(_("Save when verifying or uploading"));
-    pain.add(saveVerifyUploadBox);
+    pane.add(saveVerifyUploadBox);
     d = saveVerifyUploadBox.getPreferredSize();
     saveVerifyUploadBox.setBounds(left, top, d.width + 10, d.height);
+    right = Math.max(right, left + d.width);
+    top += d.height + GUI_BETWEEN;
+
+    JPanel proxySettingsContainer = new JPanel();
+    pane.add(proxySettingsContainer);
+    setupProxySettingsFieldSet(proxySettingsContainer);
+    d = proxySettingsContainer.getMinimumSize();
+    proxySettingsContainer.setBounds(left, top, d.width + 10, d.height);
     right = Math.max(right, left + d.width);
     top += d.height + GUI_BETWEEN;
 
     // More preferences are in the ...
 
     label = new JLabel(_("More preferences can be edited directly in the file"));
-    pain.add(label);
+    pane.add(label);
     d = label.getPreferredSize();
     label.setForeground(Color.gray);
     label.setBounds(left, top, d.width, d.height);
@@ -467,14 +458,14 @@ public class Preferences {
           clickable.setForeground(Color.BLACK);
         }
       });
-    pain.add(label);
+    pane.add(label);
     d = label.getPreferredSize();
     label.setBounds(left, top, d.width, d.height);
     right = Math.max(right, left + d.width);
     top += d.height;
 
     label = new JLabel(_("(edit only when Arduino is not running)"));
-    pain.add(label);
+    pane.add(label);
     d = label.getPreferredSize();
     label.setForeground(Color.gray);
     label.setBounds(left, top, d.width, d.height);
@@ -491,7 +482,7 @@ public class Preferences {
           disposeFrame();
         }
       });
-    pain.add(button);
+    pane.add(button);
     d2 = button.getPreferredSize();
     BUTTON_HEIGHT = d2.height;
 
@@ -505,7 +496,7 @@ public class Preferences {
           disposeFrame();
         }
       });
-    pain.add(button);
+    pane.add(button);
     button.setBounds(h, top, BUTTON_WIDTH, BUTTON_HEIGHT);
 
     top += BUTTON_HEIGHT + GUI_BETWEEN;
@@ -545,18 +536,99 @@ public class Preferences {
 
     // handle window closing commands for ctrl/cmd-W or hitting ESC.
 
-    pain.addKeyListener(new KeyAdapter() {
-        public void keyPressed(KeyEvent e) {
-          //System.out.println(e);
-          KeyStroke wc = Editor.WINDOW_CLOSE_KEYSTROKE;
-          if ((e.getKeyCode() == KeyEvent.VK_ESCAPE) ||
-              (KeyStroke.getKeyStrokeForEvent(e).equals(wc))) {
-            disposeFrame();
-          }
+    pane.addKeyListener(new KeyAdapter() {
+      public void keyPressed(KeyEvent e) {
+        //System.out.println(e);
+        KeyStroke wc = Editor.WINDOW_CLOSE_KEYSTROKE;
+        if ((e.getKeyCode() == KeyEvent.VK_ESCAPE) ||
+                (KeyStroke.getKeyStrokeForEvent(e).equals(wc))) {
+          disposeFrame();
         }
-      });
+      }
+    });
   }
 
+  @SuppressWarnings("unchecked")
+  // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+  private void setupProxySettingsFieldSet(Container pane) {
+
+    JPanel proxySettingsPanel = new JPanel();
+    JLabel jLabel2 = new JLabel();
+    proxyServer = new JTextField();
+    JLabel jLabel3 = new JLabel();
+    proxyPort = new JTextField();
+    JLabel jLabel4 = new JLabel();
+    proxyUser = new JTextField();
+    JLabel jLabel5 = new JLabel();
+    proxyPassword = new JPasswordField();
+
+    proxySettingsPanel.setBorder(BorderFactory.createTitledBorder(_("Proxy Settings")));
+
+    jLabel2.setText(_("Server:"));
+
+    proxyServer.setColumns(10);
+
+    jLabel3.setText(_("Port:"));
+
+    proxyPort.setColumns(10);
+
+    jLabel4.setText(_("Username:"));
+
+    jLabel5.setText(_("Password:"));
+
+    GroupLayout proxySettingsPanelLayout = new GroupLayout(proxySettingsPanel);
+    proxySettingsPanel.setLayout(proxySettingsPanelLayout);
+    proxySettingsPanelLayout.setHorizontalGroup(
+            proxySettingsPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addGroup(proxySettingsPanelLayout.createSequentialGroup()
+                            .addContainerGap()
+                            .addGroup(proxySettingsPanelLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jLabel4)
+                                    .addComponent(jLabel2))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(proxySettingsPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(proxyServer)
+                                    .addComponent(proxyUser))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(proxySettingsPanelLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jLabel5)
+                                    .addComponent(jLabel3))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(proxySettingsPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(proxyPassword)
+                                    .addComponent(proxyPort))
+                            .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+    );
+    proxySettingsPanelLayout.setVerticalGroup(
+            proxySettingsPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addGroup(proxySettingsPanelLayout.createSequentialGroup()
+                            .addGroup(proxySettingsPanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel2)
+                                    .addComponent(proxyServer, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel3)
+                                    .addComponent(proxyPort, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(proxySettingsPanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel4)
+                                    .addComponent(proxyUser, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel5)
+                                    .addComponent(proxyPassword, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+    );
+
+    GroupLayout layout = new GroupLayout(pane);
+    pane.setLayout(layout);
+    layout.setHorizontalGroup(
+            layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                            .addComponent(proxySettingsPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+    );
+    layout.setVerticalGroup(
+            layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                            .addComponent(proxySettingsPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+    );
+
+  }// </editor-fold>//GEN-END:initComponents
 
   // .................................................................
 
@@ -580,7 +652,7 @@ public class Preferences {
     PreferencesData.setBoolean("editor.linenumbers", displayLineNumbersBox.isSelected());
     PreferencesData.setBoolean("upload.verify", verifyUploadBox.isSelected());
     PreferencesData.setBoolean("editor.save_on_verify", saveVerifyUploadBox.isSelected());
-    
+
 //    setBoolean("sketchbook.closing_last_window_quits",
 //               closingLastQuitsBox.isSelected());
     //setBoolean("sketchbook.prompt", sketchPromptBox.isSelected());
@@ -628,15 +700,23 @@ public class Preferences {
     }
 
     if (autoAssociateBox != null) {
-      PreferencesData.setBoolean("platform.auto_file_type_associations",
-                 autoAssociateBox.isSelected());
+      PreferencesData.setBoolean("platform.auto_file_type_associations", autoAssociateBox.isSelected());
     }
-    
+
     PreferencesData.setBoolean("editor.update_extension", updateExtensionBox.isSelected());
 
     // adds the selected language to the preferences file
     Language newLanguage = (Language) comboLanguage.getSelectedItem();
     PreferencesData.set("editor.languages.current", newLanguage.isoCode);
+
+    Preferences.set("proxy.server", proxyServer.getText());
+    try {
+      Preferences.set("proxy.port", Integer.valueOf(proxyPort.getText()).toString());
+    } catch (NumberFormatException e) {
+      Preferences.remove("proxy.port");
+    }
+    Preferences.set("proxy.user", proxyUser.getText());
+    Preferences.set("proxy.password", new String(proxyPassword.getPassword()));
 
     editor.applyPreferences();
   }
@@ -658,22 +738,25 @@ public class Preferences {
     //sketchCleanBox.
     //  setSelected(getBoolean("sketchbook.auto_clean"));
 
-    sketchbookLocationField.
-      setText(PreferencesData.get("sketchbook.path"));
-    externalEditorBox.
-      setSelected(PreferencesData.getBoolean("editor.external"));
-    checkUpdatesBox.
-      setSelected(PreferencesData.getBoolean("update.check"));
-    saveVerifyUploadBox.
-      setSelected(PreferencesData.getBoolean("editor.save_on_verify"));
+    sketchbookLocationField.setText(PreferencesData.get("sketchbook.path"));
+    externalEditorBox.setSelected(PreferencesData.getBoolean("editor.external"));
+    checkUpdatesBox.setSelected(PreferencesData.getBoolean("update.check"));
+    saveVerifyUploadBox.setSelected(PreferencesData.getBoolean("editor.save_on_verify"));
 
     if (autoAssociateBox != null) {
-      autoAssociateBox.
-        setSelected(PreferencesData.getBoolean("platform.auto_file_type_associations"));
+      autoAssociateBox.setSelected(PreferencesData.getBoolean("platform.auto_file_type_associations"));
     }
-    
-    updateExtensionBox.setSelected(PreferencesData.get("editor.update_extension") == null ||
-                                   PreferencesData.getBoolean("editor.update_extension"));
+
+    updateExtensionBox.setSelected(PreferencesData.get("editor.update_extension") == null || PreferencesData.getBoolean("editor.update_extension"));
+
+    proxyServer.setText(Preferences.get("proxy.server"));
+    try {
+      proxyPort.setText(Integer.toString(Preferences.getInteger("proxy.port")));
+    } catch (NumberFormatException e) {
+      proxyPort.setText("");
+    }
+    proxyUser.setText(Preferences.get("proxy.user"));
+    proxyPassword.setText(Preferences.get("proxy.password"));
 
     dialog.setLocationRelativeTo(editor);
     dialog.setVisible(true);
@@ -723,6 +806,14 @@ public class Preferences {
     return PreferencesData.getInteger(attribute);
   }
 
+  static public int getInteger(String attribute, int defaultValue) {
+    if (PreferencesData.has(attribute)) {
+      return PreferencesData.getInteger(attribute);
+    }
+
+    return defaultValue;
+  }
+
 
   static public void setInteger(String key, int value) {
     PreferencesData.setInteger(key, value);
@@ -740,7 +831,7 @@ public class Preferences {
   }
 
   // get a copy of the Preferences
-  static public PreferencesMap getMap() 
+  static public PreferencesMap getMap()
   {
     return PreferencesData.getMap();
   }
