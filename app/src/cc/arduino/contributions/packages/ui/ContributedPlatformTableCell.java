@@ -28,12 +28,21 @@
  */
 package cc.arduino.contributions.packages.ui;
 
+import cc.arduino.contributions.VersionComparator;
+import cc.arduino.contributions.filters.InstalledPredicate;
 import cc.arduino.contributions.packages.ContributedBoard;
 import cc.arduino.contributions.packages.ContributedPlatform;
+import cc.arduino.contributions.packages.ContributedPlatformComparator;
 import cc.arduino.contributions.ui.InstallerTableCell;
+import cc.arduino.utils.ReverseComparator;
+import com.google.common.base.Function;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 import processing.app.Base;
 
 import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -41,10 +50,12 @@ import javax.swing.text.Document;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.StyleSheet;
 import java.awt.*;
+import java.awt.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.*;
 
 import static processing.app.I18n._;
 import static processing.app.I18n.format;
@@ -54,14 +65,15 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
 
   private JPanel panel;
   private JTextPane description;
-
-  private JPanel buttonsPanel;
   private JButton installButton;
-  private JComboBox downgradeChooser;
-  private JButton downgradeButton;
   private JButton removeButton;
+  private Component removeButtonPlaceholder;
+  private Component installButtonPlaceholder;
+  private JComboBox downgradeChooser;
+  private JComboBox versionToInstallChooser;
+  private JButton downgradeButton;
+  private JPanel buttonsPanel;
   private Component removeButtonStrut;
-
   private JPanel inactiveButtonsPanel;
   private JLabel statusLabel;
 
@@ -93,28 +105,35 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
       }
     });
 
-    installButton = new JButton(_("Install"));
-    installButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        onInstall(editorValue.getSelected(), editorValue.getInstalled());
-      }
-    });
+    {
+      installButton = new JButton(_("Install"));
+      installButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+          onInstall(editorValue.getSelected(), editorValue.getInstalled());
+        }
+      });
+      int width = installButton.getPreferredSize().width;
+      installButtonPlaceholder = Box.createRigidArea(new Dimension(width, 1));
+    }
 
-    removeButton = new JButton(_("Remove"));
-    removeButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        onRemove(editorValue.getInstalled());
-      }
-    });
+    {
+      removeButton = new JButton(_("Remove"));
+      removeButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+          onRemove(editorValue.getInstalled());
+        }
+      });
+      int width = removeButton.getPreferredSize().width;
+      removeButtonPlaceholder = Box.createRigidArea(new Dimension(width, 1));
+    }
 
     downgradeButton = new JButton(_("Install"));
     downgradeButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        ContributedPlatform selected;
-        selected = (ContributedPlatform) downgradeChooser.getSelectedItem();
+        ContributedPlatform selected = (ContributedPlatform) downgradeChooser.getSelectedItem();
         onInstall(selected, editorValue.getInstalled());
       }
     });
@@ -131,6 +150,16 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
       }
     });
 
+    versionToInstallChooser = new JComboBox();
+    versionToInstallChooser.addItem("-");
+    versionToInstallChooser.setMaximumSize(versionToInstallChooser.getPreferredSize());
+    versionToInstallChooser.addItemListener(new ItemListener() {
+      @Override
+      public void itemStateChanged(ItemEvent e) {
+        editorValue.select((ContributedPlatform) versionToInstallChooser.getSelectedItem());
+      }
+    });
+
     panel = new JPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
@@ -141,12 +170,15 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
       buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
       buttonsPanel.setOpaque(false);
 
-      buttonsPanel.add(Box.createHorizontalStrut(20));
+      buttonsPanel.add(Box.createHorizontalStrut(7));
       buttonsPanel.add(downgradeChooser);
       buttonsPanel.add(Box.createHorizontalStrut(5));
       buttonsPanel.add(downgradeButton);
+
       buttonsPanel.add(Box.createHorizontalGlue());
 
+      buttonsPanel.add(versionToInstallChooser);
+      buttonsPanel.add(Box.createHorizontalStrut(5));
       buttonsPanel.add(installButton);
       buttonsPanel.add(Box.createHorizontalStrut(5));
       buttonsPanel.add(removeButton);
@@ -173,7 +205,7 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
       panel.add(inactiveButtonsPanel);
     }
 
-    panel.add(Box.createVerticalStrut(10));
+    panel.add(Box.createVerticalStrut(15));
   }
 
   protected void onRemove(ContributedPlatform contributedPlatform) {
@@ -190,13 +222,13 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
                                                  int column) {
     parentTable = table;
     setEnabled(false);
-
-    Component component = getUpdatedCellComponent(value, isSelected, row);
+    Component component = getUpdatedCellComponent(value, isSelected, row, false);
     if (row % 2 == 0) {
       component.setBackground(new Color(236, 241, 241)); //#ecf1f1
     } else {
       component.setBackground(new Color(255, 255, 255));
     }
+
     return component;
   }
 
@@ -216,63 +248,105 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
     editorValue = (ContributionIndexTableModel.ContributedPlatformReleases) value;
     setEnabled(true);
 
+    final ContributedPlatform installed = editorValue.getInstalled();
+
+    java.util.List<ContributedPlatform> releases = new LinkedList<ContributedPlatform>(editorValue.releases);
+    java.util.List<ContributedPlatform> uninstalledReleases = new LinkedList<ContributedPlatform>(Collections2.filter(releases, Predicates.not(new InstalledPredicate())));
+
+    java.util.List<ContributedPlatform> installedBuiltIn = new LinkedList<ContributedPlatform>();
+
+    if (installed != null && !installedBuiltIn.contains(installed)) {
+      uninstalledReleases.addAll(installedBuiltIn);
+    }
+
+    Collections.sort(uninstalledReleases, new ReverseComparator<ContributedPlatform>(new ContributedPlatformComparator()));
+
     downgradeChooser.removeAllItems();
     downgradeChooser.addItem(_("Select version"));
-    boolean visible = false;
-    for (ContributedPlatform release : editorValue.releases) {
-      if (release.isInstalled())
-        continue;
-      downgradeChooser.addItem(release);
-      visible = true;
-    }
-    downgradeChooser.setVisible(visible && editorValue.releases.size() > 1);
-    downgradeButton.setVisible(visible && editorValue.releases.size() > 1);
 
-    Component component = getUpdatedCellComponent(value, true, row);
+    final java.util.List<ContributedPlatform> uninstalledPreviousReleases = Lists.newLinkedList();
+    final java.util.List<ContributedPlatform> uninstalledNewerReleases = Lists.newLinkedList();
+
+    Lists.newLinkedList(Lists.transform(uninstalledReleases, new Function<ContributedPlatform, ContributedPlatform>() {
+      @Override
+      public ContributedPlatform apply(ContributedPlatform input) {
+        if (installed == null || VersionComparator.VERSION_COMPARATOR.greaterThan(installed.getVersion(), input.getVersion())) {
+          uninstalledPreviousReleases.add(input);
+        } else {
+          uninstalledNewerReleases.add(input);
+        }
+
+        return input;
+      }
+    }));
+    for (ContributedPlatform release : uninstalledNewerReleases) {
+      downgradeChooser.addItem(release);
+    }
+    for (ContributedPlatform release : uninstalledPreviousReleases) {
+      downgradeChooser.addItem(release);
+    }
+
+    downgradeChooser.setVisible(installed != null && (!uninstalledPreviousReleases.isEmpty() || uninstalledNewerReleases.size() > 1));
+    downgradeButton.setVisible(installed != null && (!uninstalledPreviousReleases.isEmpty() || uninstalledNewerReleases.size() > 1));
+
+    versionToInstallChooser.removeAllItems();
+    for (ContributedPlatform release : uninstalledReleases) {
+      versionToInstallChooser.addItem(release);
+    }
+    versionToInstallChooser.setVisible(installed == null && uninstalledReleases.size() > 1);
+
+    Component component = getUpdatedCellComponent(value, true, row, !installedBuiltIn.isEmpty());
     component.setBackground(new Color(218, 227, 227)); //#dae3e3
     return component;
   }
 
-  private Component getUpdatedCellComponent(Object value, boolean isSelected,
-                                            int row) {
+  private Component getUpdatedCellComponent(Object value, boolean isSelected, int row, boolean hasBuiltInRelease) {
     ContributionIndexTableModel.ContributedPlatformReleases releases = (ContributionIndexTableModel.ContributedPlatformReleases) value;
-    ContributedPlatform selectedPlatform = releases.getSelected();
-    ContributedPlatform installedPlatform = releases.getInstalled();
+
+    //FIXME: happens on macosx, don't know why
+    if (releases == null) {
+      return panel;
+    }
+
+    ContributedPlatform selected = releases.getSelected();
+    ContributedPlatform installed = releases.getInstalled();
 
     boolean removable, installable, upgradable;
-    if (installedPlatform == null) {
+    if (installed == null) {
       installable = true;
       removable = false;
       upgradable = false;
     } else {
       installable = false;
-      removable = true;
-      upgradable = (selectedPlatform != installedPlatform);
+      //removable = !installed.isReadOnly() && !hasBuiltInRelease;
+      removable = !hasBuiltInRelease;
+      upgradable = new ContributedPlatformComparator().compare(selected, installed) > 0;
     }
-
-    if (installable)
+    if (installable) {
       installButton.setText(_("Install"));
-    if (upgradable)
+    }
+    if (upgradable) {
       installButton.setText(_("Update"));
+    }
     installButton.setVisible(installable || upgradable);
-
+    installButtonPlaceholder.setVisible(!(installable || upgradable));
     removeButton.setVisible(removable);
-    removeButtonStrut.setVisible(removable);
+    removeButtonPlaceholder.setVisible(!removable);
 
     String desc = "<html><body>";
-    desc += "<b>" + selectedPlatform.getName() + "</b>";
-    String author = selectedPlatform.getParentPackage().getMaintainer();
-    String url = selectedPlatform.getParentPackage().getWebsiteURL();
+    desc += "<b>" + selected.getName() + "</b>";
+    String author = selected.getParentPackage().getMaintainer();
+    String url = selected.getParentPackage().getWebsiteURL();
     if (author != null && !author.isEmpty()) {
       desc += " " + format("by <b>{0}</b>", author);
     }
     if (removable) {
-      desc += " " + format(_("version <b>{0}</b>"), installedPlatform.getVersion()) + " <strong><font color=\"#00979D\">INSTALLED</font></strong>";
+      desc += " " + format(_("version <b>{0}</b>"), installed.getVersion()) + " <strong><font color=\"#00979D\">INSTALLED</font></strong>";
     }
     desc += "<br />";
 
     desc += _("Boards included in this package:") + "<br />";
-    for (ContributedBoard board : selectedPlatform.getBoards())
+    for (ContributedBoard board : selected.getBoards())
       desc += format("{0}, ", board.getName());
     desc = desc.substring(0, desc.lastIndexOf(',')) + ".<br />";
 
@@ -282,8 +356,13 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
 
     desc += "</body></html>";
     description.setText(desc);
-    //description.setBackground(Color.WHITE);
+    description.setBackground(Color.WHITE);
 
+    // for modelToView to work, the text area has to be sized. It doesn't
+    // matter if it's visible or not.
+
+    // See:
+    // http://stackoverflow.com/questions/3081210/how-to-set-jtextarea-to-have-height-that-matches-the-size-of-a-text-it-contains
     int width = parentTable.getBounds().width;
     setJTextPaneDimensionToFitContainedText(description, width);
 
@@ -311,12 +390,14 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
     enable(false);
     if (enabled) {
       enabler.start();
+    } else {
+      enabler.stop();
     }
     buttonsPanel.setVisible(enabled);
     inactiveButtonsPanel.setVisible(!enabled);
   }
 
-  private void enable(boolean enabled) {
+  public void enable(boolean enabled) {
     installButton.setEnabled(enabled);
     removeButton.setEnabled(enabled);
   }

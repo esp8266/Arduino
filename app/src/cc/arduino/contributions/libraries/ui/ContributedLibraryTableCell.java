@@ -31,7 +31,7 @@ package cc.arduino.contributions.libraries.ui;
 import cc.arduino.contributions.libraries.ContributedLibrary;
 import cc.arduino.contributions.libraries.ContributedLibraryComparator;
 import cc.arduino.contributions.libraries.filters.BuiltInPredicate;
-import cc.arduino.contributions.libraries.filters.InstalledPredicate;
+import cc.arduino.contributions.filters.InstalledPredicate;
 import cc.arduino.contributions.libraries.filters.OnlyUpstreamReleasePredicate;
 import cc.arduino.contributions.VersionComparator;
 import cc.arduino.contributions.ui.InstallerTableCell;
@@ -201,9 +201,7 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
 
       statusLabel = new JLabel(" ");
       inactiveButtonsPanel.add(statusLabel);
-
-      inactiveButtonsPanel.add(Box.createGlue());
-      inactiveButtonsPanel.add(Box.createVerticalStrut(height));
+      inactiveButtonsPanel.add(Box.createHorizontalStrut(15));
 
       panel.add(inactiveButtonsPanel);
     }
@@ -211,11 +209,11 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
     panel.add(Box.createVerticalStrut(15));
   }
 
-  protected void onRemove(ContributedLibrary selectedLib) {
+  protected void onRemove(ContributedLibrary selected) {
     // Empty
   }
 
-  protected void onInstall(ContributedLibrary selectedLib, ContributedLibrary installedLib) {
+  protected void onInstall(ContributedLibrary selected, ContributedLibrary installed) {
     // Empty
   }
 
@@ -251,52 +249,52 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
     editorValue = (LibrariesIndexTableModel.ContributedLibraryReleases) value;
     setEnabled(true);
 
-    final ContributedLibrary installedLibrary = editorValue.getInstalled();
+    final ContributedLibrary installed = editorValue.getInstalled();
 
-    List<ContributedLibrary> libraries = new LinkedList<ContributedLibrary>(Collections2.filter(editorValue.releases, new OnlyUpstreamReleasePredicate()));
-    List<ContributedLibrary> uninstalledLibraries = new LinkedList<ContributedLibrary>(Collections2.filter(libraries, Predicates.not(new InstalledPredicate())));
+    List<ContributedLibrary> releases = new LinkedList<ContributedLibrary>(Collections2.filter(editorValue.releases, new OnlyUpstreamReleasePredicate()));
+    List<ContributedLibrary> uninstalledReleases = new LinkedList<ContributedLibrary>(Collections2.filter(releases, Predicates.not(new InstalledPredicate())));
 
-    List<ContributedLibrary> installedBuiltIn = new LinkedList<ContributedLibrary>(Collections2.filter(libraries, Predicates.and(new InstalledPredicate(), new BuiltInPredicate())));
+    List<ContributedLibrary> installedBuiltIn = new LinkedList<ContributedLibrary>(Collections2.filter(releases, Predicates.and(new InstalledPredicate(), new BuiltInPredicate())));
 
-    if (installedLibrary != null && !installedBuiltIn.contains(installedLibrary)) {
-      uninstalledLibraries.addAll(installedBuiltIn);
+    if (installed != null && !installedBuiltIn.contains(installed)) {
+      uninstalledReleases.addAll(installedBuiltIn);
     }
 
-    Collections.sort(uninstalledLibraries, new ReverseComparator<ContributedLibrary>(new ContributedLibraryComparator()));
+    Collections.sort(uninstalledReleases, new ReverseComparator<ContributedLibrary>(new ContributedLibraryComparator()));
 
     downgradeChooser.removeAllItems();
     downgradeChooser.addItem(_("Select version"));
 
-    final List<ContributedLibrary> uninstalledPreviousLibraries = Lists.newLinkedList();
-    final List<ContributedLibrary> uninstalledNewerLibraries = Lists.newLinkedList();
+    final List<ContributedLibrary> uninstalledPreviousReleases = Lists.newLinkedList();
+    final List<ContributedLibrary> uninstalledNewerReleases = Lists.newLinkedList();
 
-    Lists.newLinkedList(Lists.transform(uninstalledLibraries, new Function<ContributedLibrary, ContributedLibrary>() {
+    Lists.newLinkedList(Lists.transform(uninstalledReleases, new Function<ContributedLibrary, ContributedLibrary>() {
       @Override
       public ContributedLibrary apply(ContributedLibrary input) {
-        if (installedLibrary == null || VersionComparator.VERSION_COMPARATOR.greaterThan(installedLibrary.getVersion(), input.getVersion())) {
-          uninstalledPreviousLibraries.add(input);
+        if (installed == null || VersionComparator.VERSION_COMPARATOR.greaterThan(installed.getVersion(), input.getVersion())) {
+          uninstalledPreviousReleases.add(input);
         } else {
-          uninstalledNewerLibraries.add(input);
+          uninstalledNewerReleases.add(input);
         }
 
         return input;
       }
     }));
-    for (ContributedLibrary release : uninstalledNewerLibraries) {
+    for (ContributedLibrary release : uninstalledNewerReleases) {
       downgradeChooser.addItem(release);
     }
-    for (ContributedLibrary release : uninstalledPreviousLibraries) {
+    for (ContributedLibrary release : uninstalledPreviousReleases) {
       downgradeChooser.addItem(release);
     }
 
-    downgradeChooser.setVisible(installedLibrary != null && (!uninstalledPreviousLibraries.isEmpty() || uninstalledNewerLibraries.size() > 1));
-    downgradeButton.setVisible(installedLibrary != null && (!uninstalledPreviousLibraries.isEmpty() || uninstalledNewerLibraries.size() > 1));
+    downgradeChooser.setVisible(installed != null && (!uninstalledPreviousReleases.isEmpty() || uninstalledNewerReleases.size() > 1));
+    downgradeButton.setVisible(installed != null && (!uninstalledPreviousReleases.isEmpty() || uninstalledNewerReleases.size() > 1));
 
     versionToInstallChooser.removeAllItems();
-    for (ContributedLibrary release : uninstalledLibraries) {
+    for (ContributedLibrary release : uninstalledReleases) {
       versionToInstallChooser.addItem(release);
     }
-    versionToInstallChooser.setVisible(installedLibrary == null && uninstalledLibraries.size() > 1);
+    versionToInstallChooser.setVisible(installed == null && uninstalledReleases.size() > 1);
 
     Component component = getUpdatedCellComponent(value, true, row, !installedBuiltIn.isEmpty());
     component.setBackground(new Color(218, 227, 227)); //#dae3e3
@@ -311,18 +309,18 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
       return panel;
     }
 
-    ContributedLibrary selectedLib = releases.getSelected();
-    ContributedLibrary installedLib = releases.getInstalled();
+    ContributedLibrary selected = releases.getSelected();
+    ContributedLibrary installed = releases.getInstalled();
 
     boolean removable, installable, upgradable;
-    if (installedLib == null) {
+    if (installed == null) {
       installable = true;
       removable = false;
       upgradable = false;
     } else {
       installable = false;
-      removable = !installedLib.isReadOnly() && !hasBuiltInRelease;
-      upgradable = new ContributedLibraryComparator().compare(selectedLib, installedLib) > 0;
+      removable = !installed.isReadOnly() && !hasBuiltInRelease;
+      upgradable = new ContributedLibraryComparator().compare(selected, installed) > 0;
     }
     if (installable) {
       installButton.setText(_("Install"));
@@ -335,14 +333,14 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
     removeButton.setVisible(removable);
     removeButtonPlaceholder.setVisible(!removable);
 
-    String name = selectedLib.getName();
-    String author = selectedLib.getAuthor();
+    String name = selected.getName();
+    String author = selected.getAuthor();
     // String maintainer = selectedLib.getMaintainer();
-    String website = selectedLib.getWebsite();
-    String sentence = selectedLib.getSentence();
-    String paragraph = selectedLib.getParagraph();
+    String website = selected.getWebsite();
+    String sentence = selected.getSentence();
+    String paragraph = selected.getParagraph();
     // String availableVer = selectedLib.getVersion();
-    String url = selectedLib.getUrl();
+    String url = selected.getUrl();
 
     String midcolor = isSelected ? "#000000" : "#888888";
 
@@ -350,7 +348,7 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
 
     // Library name...
     desc += format("<b>{0}</b> ", name);
-    if (installedLib != null && installedLib.isReadOnly()) {
+    if (installed != null && installed.isReadOnly()) {
       desc += "Built-In ";
     }
 
@@ -361,8 +359,8 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
     }
 
     // ...version.
-    if (installedLib != null) {
-      String installedVer = installedLib.getVersion();
+    if (installed != null) {
+      String installedVer = installed.getVersion();
       if (installedVer == null) {
         desc += " " + _("Version unknown");
       } else {
@@ -373,7 +371,7 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
     }
     desc += "</font>";
 
-    if (installedLib != null) {
+    if (installed != null) {
       desc += " <strong><font color=\"#00979D\">INSTALLED</font></strong>";
     }
 
@@ -436,6 +434,10 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
   public void enable(boolean enabled) {
     installButton.setEnabled(enabled);
     removeButton.setEnabled(enabled);
+  }
+
+  public void setStatus(String status) {
+    statusLabel.setText(status);
   }
 
   public void invalidate() {
