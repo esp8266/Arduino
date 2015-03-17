@@ -24,10 +24,8 @@ package processing.app.windows;
 
 import com.sun.jna.Library;
 import com.sun.jna.Native;
-
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
-
 import processing.app.PreferencesData;
 import processing.app.debug.TargetPackage;
 import processing.app.legacy.PApplet;
@@ -350,5 +348,10 @@ public class Platform extends processing.app.Platform {
     } catch (Throwable e) {
       return super.preListAllCandidateDevices();
     }
+  }
+
+  @Override
+  public void fixPrefsFilePermissions(File prefsFile) throws IOException {
+    //noop
   }
 }

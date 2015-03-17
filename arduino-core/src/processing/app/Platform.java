@@ -21,15 +21,6 @@
 */
 
 package processing.app;
-import static processing.app.I18n._;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import javax.swing.UIManager;
 
 import cc.arduino.packages.BoardPort;
 import com.sun.jna.Library;
@@ -38,6 +29,12 @@ import processing.app.debug.TargetBoard;
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
 import processing.app.legacy.PConstants;
+
+import javax.swing.*;
+import java.io.*;
+import java.util.*;
+
+import static processing.app.I18n._;
 
 
 /**
@@ -226,5 +223,10 @@ public class Platform {
 
   public List<BoardPort> filterPorts(List<BoardPort> ports, boolean aBoolean) {
     return new LinkedList<BoardPort>(ports);
+  }
+
+  public void fixPrefsFilePermissions(File prefsFile) throws IOException, InterruptedException {
+    Process process = Runtime.getRuntime().exec(new String[]{"chmod", "600", prefsFile.getAbsolutePath()}, null, null);
+    process.waitFor();
   }
 }

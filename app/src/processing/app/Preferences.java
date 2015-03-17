@@ -64,8 +64,6 @@ import static processing.app.I18n._;
  */
 public class Preferences {
 
-  static final String PREFS_FILE = PreferencesData.PREFS_FILE;
-
   class Language {
     Language(String _name, String _originalName, String _isoCode) {
       name = _name;
