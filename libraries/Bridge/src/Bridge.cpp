@@ -191,12 +191,13 @@ uint16_t BridgeClass::transfer(const uint8_t *buff1, uint16_t len1,
 
     // Recv data
     for (uint16_t i = 0; i < l; i++) {
+      // Cut received data if rxbuffer is too small
+      if (i >= rxlen)
+          break;
       int c = timedRead(5);
       if (c < 0)
         continue;
-      // Cut received data if rxbuffer is too small
-      if (i < rxlen)
-        rxbuff[i] = c;
+      rxbuff[i] = c;
       crcUpdate(c);
     }
 
