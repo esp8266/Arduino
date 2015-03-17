@@ -306,6 +306,12 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
 
   private Component getUpdatedCellComponent(Object value, boolean isSelected, int row, boolean hasBuiltInRelease) {
     ContributedLibraryReleases releases = (ContributedLibraryReleases) value;
+
+    //FIXME: happens on macosx, don't know why
+    if (releases == null) {
+      return panel;
+    }
+
     ContributedLibrary selectedLib = releases.getSelected();
     ContributedLibrary installedLib = releases.getInstalled();
 
