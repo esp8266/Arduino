@@ -80,7 +80,6 @@ public class ContributionManagerUI extends InstallerJDialog {
   }
 
   public void setIndexer(ContributionsIndexer indexer) {
-    getContribModel().removeTableModelListener(tableModelListener);
     categoryChooser.removeActionListener(categoryChooserActionListener);
 
     getContribModel().setIndex(indexer.getIndex());
@@ -90,7 +89,6 @@ public class ContributionManagerUI extends InstallerJDialog {
 
     filterField.setEnabled(getContribModel().getRowCount() > 0);
 
-    getContribModel().addTableModelListener(tableModelListener);
     categoryChooser.addActionListener(categoryChooserActionListener);
 
     // Enable categories combo only if there are two or more choices

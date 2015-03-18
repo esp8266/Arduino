@@ -28,12 +28,12 @@
  */
 package cc.arduino.contributions.libraries.ui;
 
+import cc.arduino.contributions.VersionComparator;
+import cc.arduino.contributions.filters.InstalledPredicate;
 import cc.arduino.contributions.libraries.ContributedLibrary;
 import cc.arduino.contributions.libraries.ContributedLibraryComparator;
 import cc.arduino.contributions.libraries.filters.BuiltInPredicate;
-import cc.arduino.contributions.filters.InstalledPredicate;
 import cc.arduino.contributions.libraries.filters.OnlyUpstreamReleasePredicate;
-import cc.arduino.contributions.VersionComparator;
 import cc.arduino.contributions.ui.InstallerTableCell;
 import cc.arduino.utils.ReverseComparator;
 import com.google.common.base.Function;
@@ -65,7 +65,6 @@ import static processing.app.I18n.format;
 public class ContributedLibraryTableCell extends InstallerTableCell {
 
   private JPanel panel;
-  private JTextPane description;
   private JButton installButton;
   private JButton removeButton;
   private Component removeButtonPlaceholder;
@@ -79,33 +78,6 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
   private JLabel statusLabel;
 
   public ContributedLibraryTableCell() {
-    description = new JTextPane();
-    description.setInheritsPopupMenu(true);
-    Insets margin = description.getMargin();
-    margin.bottom = 0;
-    description.setMargin(margin);
-    description.setContentType("text/html");
-    Document doc = description.getDocument();
-    if (doc instanceof HTMLDocument) {
-      HTMLDocument html = (HTMLDocument) doc;
-      StyleSheet stylesheet = html.getStyleSheet();
-      stylesheet.addRule("body { margin: 0; padding: 0;"
-              + "font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;"
-              + "font-size: 100%;" + "font-size: 0.95em; }");
-    }
-    description.setOpaque(false);
-    description.setBorder(new EmptyBorder(4, 7, 7, 7));
-    description.setHighlighter(null);
-    description.setEditable(false);
-    description.addHyperlinkListener(new HyperlinkListener() {
-      @Override
-      public void hyperlinkUpdate(HyperlinkEvent e) {
-        if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-          Base.openURL(e.getDescription());
-        }
-      }
-    });
-
     {
       installButton = new JButton(_("Install"));
       installButton.addActionListener(new ActionListener() {
@@ -164,7 +136,7 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
     panel = new JPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-    panel.add(description);
+    makeNewDescription(panel);
 
     {
       buttonsPanel = new JPanel();
@@ -209,6 +181,40 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
     panel.add(Box.createVerticalStrut(15));
   }
 
+  private JTextPane makeNewDescription(JPanel panel) {
+    if (panel.getComponentCount() > 0) {
+      panel.remove(0);
+    }
+    JTextPane description = new JTextPane();
+    description.setInheritsPopupMenu(true);
+    Insets margin = description.getMargin();
+    margin.bottom = 0;
+    description.setMargin(margin);
+    description.setContentType("text/html");
+    Document doc = description.getDocument();
+    if (doc instanceof HTMLDocument) {
+      HTMLDocument html = (HTMLDocument) doc;
+      StyleSheet stylesheet = html.getStyleSheet();
+      stylesheet.addRule("body { margin: 0; padding: 0;"
+              + "font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;"
+              + "font-size: 100%;" + "font-size: 0.95em; }");
+    }
+    description.setOpaque(false);
+    description.setBorder(new EmptyBorder(4, 7, 7, 7));
+    description.setHighlighter(null);
+    description.setEditable(false);
+    description.addHyperlinkListener(new HyperlinkListener() {
+      @Override
+      public void hyperlinkUpdate(HyperlinkEvent e) {
+        if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+          Base.openURL(e.getDescription());
+        }
+      }
+    });
+    panel.add(description, 0);
+    return description;
+  }
+
   protected void onRemove(ContributedLibrary selected) {
     // Empty
   }
@@ -228,6 +234,11 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
       component.setBackground(new Color(236, 241, 241)); //#ecf1f1
     } else {
       component.setBackground(new Color(255, 255, 255));
+    }
+
+    int height = new Double(component.getPreferredSize().getHeight()).intValue();
+    if (table.getRowHeight(row) < height) {
+      table.setRowHeight(row, height);
     }
 
     return component;
@@ -303,6 +314,8 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
 
   private Component getUpdatedCellComponent(Object value, boolean isSelected, int row, boolean hasBuiltInRelease) {
     LibrariesIndexTableModel.ContributedLibraryReleases releases = (LibrariesIndexTableModel.ContributedLibraryReleases) value;
+
+    JTextPane description = makeNewDescription(panel);
 
     //FIXME: happens on macosx, don't know why
     if (releases == null) {

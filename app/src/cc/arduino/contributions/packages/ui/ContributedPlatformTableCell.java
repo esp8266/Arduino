@@ -42,7 +42,6 @@ import com.google.common.collect.Lists;
 import processing.app.Base;
 
 import javax.swing.*;
-import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -50,12 +49,12 @@ import javax.swing.text.Document;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.StyleSheet;
 import java.awt.*;
-import java.awt.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
 
 import static processing.app.I18n._;
 import static processing.app.I18n.format;
@@ -64,7 +63,6 @@ import static processing.app.I18n.format;
 public class ContributedPlatformTableCell extends InstallerTableCell {
 
   private JPanel panel;
-  private JTextPane description;
   private JButton installButton;
   private JButton removeButton;
   private Component removeButtonPlaceholder;
@@ -78,33 +76,6 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
   private JLabel statusLabel;
 
   public ContributedPlatformTableCell() {
-    description = new JTextPane();
-    description.setInheritsPopupMenu(true);
-    Insets margin = description.getMargin();
-    margin.bottom = 0;
-    description.setMargin(margin);
-    description.setContentType("text/html");
-    Document doc = description.getDocument();
-    if (doc instanceof HTMLDocument) {
-      HTMLDocument html = (HTMLDocument) doc;
-      StyleSheet stylesheet = html.getStyleSheet();
-      stylesheet.addRule("body { margin: 0; padding: 0;"
-              + "font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;"
-              + "font-size: 100%;" + "font-size: 0.95em; }");
-    }
-    description.setOpaque(false);
-    description.setBorder(new EmptyBorder(4, 7, 7, 7));
-    description.setHighlighter(null);
-    description.setEditable(false);
-    description.addHyperlinkListener(new HyperlinkListener() {
-      @Override
-      public void hyperlinkUpdate(HyperlinkEvent e) {
-        if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-          Base.openURL(e.getDescription());
-        }
-      }
-    });
-
     {
       installButton = new JButton(_("Install"));
       installButton.addActionListener(new ActionListener() {
@@ -163,7 +134,7 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
     panel = new JPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-    panel.add(description);
+    makeNewDescription(panel);
 
     {
       buttonsPanel = new JPanel();
@@ -208,6 +179,40 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
     panel.add(Box.createVerticalStrut(15));
   }
 
+  private JTextPane makeNewDescription(JPanel panel) {
+    if (panel.getComponentCount() > 0) {
+      panel.remove(0);
+    }
+    JTextPane description = new JTextPane();
+    description.setInheritsPopupMenu(true);
+    Insets margin = description.getMargin();
+    margin.bottom = 0;
+    description.setMargin(margin);
+    description.setContentType("text/html");
+    Document doc = description.getDocument();
+    if (doc instanceof HTMLDocument) {
+      HTMLDocument html = (HTMLDocument) doc;
+      StyleSheet stylesheet = html.getStyleSheet();
+      stylesheet.addRule("body { margin: 0; padding: 0;"
+              + "font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;"
+              + "font-size: 100%;" + "font-size: 0.95em; }");
+    }
+    description.setOpaque(false);
+    description.setBorder(new EmptyBorder(4, 7, 7, 7));
+    description.setHighlighter(null);
+    description.setEditable(false);
+    description.addHyperlinkListener(new HyperlinkListener() {
+      @Override
+      public void hyperlinkUpdate(HyperlinkEvent e) {
+        if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+          Base.openURL(e.getDescription());
+        }
+      }
+    });
+    panel.add(description, 0);
+    return description;
+  }
+
   protected void onRemove(ContributedPlatform contributedPlatform) {
     // Empty
   }
@@ -227,6 +232,11 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
       component.setBackground(new Color(236, 241, 241)); //#ecf1f1
     } else {
       component.setBackground(new Color(255, 255, 255));
+    }
+
+    int height = new Double(component.getPreferredSize().getHeight()).intValue();
+    if (table.getRowHeight(row) < height) {
+      table.setRowHeight(row, height);
     }
 
     return component;
@@ -302,6 +312,8 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
 
   private Component getUpdatedCellComponent(Object value, boolean isSelected, int row, boolean hasBuiltInRelease) {
     ContributionIndexTableModel.ContributedPlatformReleases releases = (ContributionIndexTableModel.ContributedPlatformReleases) value;
+
+    JTextPane description = makeNewDescription(panel);
 
     //FIXME: happens on macosx, don't know why
     if (releases == null) {

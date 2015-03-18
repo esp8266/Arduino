@@ -66,18 +66,6 @@ public abstract class InstallerJDialog<T> extends JDialog {
   protected JTable contribTable;
   // Model behind the table
   protected FilteredAbstractTableModel contribModel;
-  // Default table model listener
-  protected TableModelListener tableModelListener = new TableModelListener() {
-    @Override
-    public void tableChanged(final TableModelEvent event) {
-      SwingUtilities.invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          updateCellsHeight(event);
-        }
-      });
-    }
-  };
 
   abstract protected FilteredAbstractTableModel createContribModel();
 
@@ -257,17 +245,6 @@ public abstract class InstallerJDialog<T> extends JDialog {
     errorMessageBox.setVisible(false);
     cellEditor.setEnabled(!visible);
     cellEditor.setStatus(status);
-  }
-
-  private void updateCellsHeight(TableModelEvent e) {
-    int first = e.getFirstRow();
-    int last = Math.min(e.getLastRow(), contribTable.getRowCount() - 1);
-    for (int row = first; row <= last; row++) {
-      TableCellRenderer editor = createCellRenderer();
-      Component comp = contribTable.prepareRenderer(editor, row, 0);
-      int height = comp.getPreferredSize().height;
-      contribTable.setRowHeight(row, height);
-    }
   }
 
   protected ActionListener categoryChooserActionListener = new ActionListener() {

@@ -84,7 +84,6 @@ public class LibraryManagerUI extends InstallerJDialog {
 
   public void setIndexer(LibrariesIndexer indexer) {
     this.indexer = indexer;
-    getContribModel().removeTableModelListener(tableModelListener);
     categoryChooser.removeActionListener(categoryChooserActionListener);
 
     // TODO: Remove setIndexer and make getContribModel 
@@ -94,7 +93,6 @@ public class LibraryManagerUI extends InstallerJDialog {
     categoryFilter = null;
     categoryChooser.removeAllItems();
 
-    getContribModel().addTableModelListener(tableModelListener);
     categoryChooser.addActionListener(categoryChooserActionListener);
 
     // Load categories
