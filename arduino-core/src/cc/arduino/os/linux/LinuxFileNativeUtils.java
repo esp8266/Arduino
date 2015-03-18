@@ -44,7 +44,7 @@ public class LinuxFileNativeUtils {
   public static void link(File file, File link) throws IOException {
     int res = libc.link(file.getAbsolutePath(), link.getAbsolutePath());
     if (res == -1)
-      throw new IOException("Could not create hard link: " + strerror());
+      throw new IOException("Could not create hard link to " + file + " from " + link + ": " + strerror());
   }
 
   public static void symlink(File file, File link) throws IOException {

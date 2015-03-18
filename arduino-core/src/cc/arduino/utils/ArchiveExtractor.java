@@ -28,15 +28,7 @@
  */
 package cc.arduino.utils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-
+import cc.arduino.os.FileNativeUtils;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -45,38 +37,35 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 
-import cc.arduino.os.FileNativeUtils;
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ArchiveExtractor {
 
   /**
    * Extract <b>source</b> into <b>destFolder</b>. <b>source</b> file archive
    * format is autodetected from file extension.
-   * 
+   *
    * @param archiveFile
    * @param destFolder
    * @throws IOException
    */
-  public static void extract(File archiveFile, File destFolder)
-      throws IOException {
+  public static void extract(File archiveFile, File destFolder) throws IOException {
     extract(archiveFile, destFolder, 0);
   }
 
   /**
    * Extract <b>source</b> into <b>destFolder</b>. <b>source</b> file archive
    * format is autodetected from file extension.
-   * 
-   * @param archiveFile
-   *          Archive file to extract
-   * @param destFolder
-   *          Destination folder
-   * @param stripPath
-   *          Number of path elements to strip from the paths contained in the
-   *          archived files
+   *
+   * @param archiveFile Archive file to extract
+   * @param destFolder  Destination folder
+   * @param stripPath   Number of path elements to strip from the paths contained in the
+   *                    archived files
    * @throws IOException
    */
-  public static void extract(File archiveFile, File destFolder, int stripPath)
-      throws IOException {
+  public static void extract(File archiveFile, File destFolder, int stripPath) throws IOException {
 
     // Folders timestamps must be set at the end of archive extraction
     // (because creating a file in a folder alters the folder's timestamp)
@@ -106,11 +95,17 @@ public class ArchiveExtractor {
 
       String pathPrefix = "";
 
+      Map<File, File> hardLinks = new HashMap<File, File>();
+      Map<File, Integer> hardLinksMode = new HashMap<File, Integer>();
+      Map<File, File> symLinks = new HashMap<File, File>();
+      Map<File, Long> symLinksModifiedTimes = new HashMap<File, Long>();
+
       // Cycle through all the archive entries
       while (true) {
         ArchiveEntry entry = in.getNextEntry();
-        if (entry == null)
+        if (entry == null) {
           break;
+        }
 
         // Extract entry info
         long size = entry.getSize();
@@ -127,18 +122,21 @@ public class ArchiveExtractor {
           // http://superuser.com/questions/61185/why-do-i-get-files-like-foo-in-my-tarball-on-os-x
           int slash = name.lastIndexOf('/');
           if (slash == -1) {
-            if (name.startsWith("._"))
+            if (name.startsWith("._")) {
               continue;
+            }
           } else {
-            if (name.substring(slash + 1).startsWith("._"))
+            if (name.substring(slash + 1).startsWith("._")) {
               continue;
+            }
           }
         }
 
         // Skip git metadata
         // http://www.unix.com/unix-for-dummies-questions-and-answers/124958-file-pax_global_header-means-what.html
-        if (name.contains("pax_global_header"))
+        if (name.contains("pax_global_header")) {
           continue;
+        }
 
         if (entry instanceof TarArchiveEntry) {
           TarArchiveEntry tarEntry = (TarArchiveEntry) entry;
@@ -154,9 +152,9 @@ public class ArchiveExtractor {
           int slash = 0;
           while (stripPath > 0) {
             slash = name.indexOf("/", slash);
-            if (slash == -1)
-              throw new IOException(
-                  "Invalid archive: it must contains a single root folder");
+            if (slash == -1) {
+              throw new IOException("Invalid archive: it must contains a single root folder");
+            }
             slash++;
             stripPath--;
           }
@@ -164,21 +162,19 @@ public class ArchiveExtractor {
         }
 
         // Strip the common path prefix when requested
-        if (!name.startsWith(pathPrefix))
-          throw new IOException(
-              "Invalid archive: it must contains a single root folder while file "
-                  + name + " is outside " + pathPrefix);
+        if (!name.startsWith(pathPrefix)) {
+          throw new IOException("Invalid archive: it must contains a single root folder while file " + name + " is outside " + pathPrefix);
+        }
         name = name.substring(pathPrefix.length());
-        if (name.isEmpty())
+        if (name.isEmpty()) {
           continue;
+        }
         File outputFile = new File(destFolder, name);
 
         File outputLinkFile = null;
         if (isLink) {
           if (!linkName.startsWith(pathPrefix)) {
-            throw new IOException(
-                "Invalid archive: it must contains a single root folder while file "
-                    + linkName + " is outside " + pathPrefix);
+            throw new IOException("Invalid archive: it must contains a single root folder while file " + linkName + " is outside " + pathPrefix);
           }
           linkName = linkName.substring(pathPrefix.length());
           outputLinkFile = new File(destFolder, linkName);
@@ -186,52 +182,69 @@ public class ArchiveExtractor {
         if (isSymLink) {
           // Symbolic links are referenced with relative paths
           outputLinkFile = new File(linkName);
-          if (outputLinkFile.isAbsolute())
-            throw new IOException(
-                "Invalid archive: it contains a symbolic link with absolute path '"
-                    + outputLinkFile + "'");
+          if (outputLinkFile.isAbsolute()) {
+            throw new IOException("Invalid archive: it contains a symbolic link with absolute path '" + outputLinkFile + "'");
+          }
         }
 
         // Safety check
         if (isDirectory) {
-          if (outputFile.isFile())
-            throw new IOException("Can't create folder " + outputFile
-                                  + ", a file with the same name exists!");
+          if (outputFile.isFile()) {
+            throw new IOException("Can't create folder " + outputFile + ", a file with the same name exists!");
+          }
         } else {
           // - isLink
           // - isSymLink
           // - anything else
-          if (outputFile.exists())
-            throw new IOException("Can't extract file " + outputFile
-                                  + ", file already exists!");
+          if (outputFile.exists()) {
+            throw new IOException("Can't extract file " + outputFile + ", file already exists!");
+          }
         }
 
         // Extract the entry
         if (isDirectory) {
-          if (!outputFile.exists())
-            if (!outputFile.mkdirs())
-              throw new IOException("Could not create folder: " + outputFile);
+          if (!outputFile.exists() && !outputFile.mkdirs()) {
+            throw new IOException("Could not create folder: " + outputFile);
+          }
           foldersTimestamps.put(outputFile, modifiedTime);
         } else if (isLink) {
-          FileNativeUtils.link(outputLinkFile, outputFile);
+          hardLinks.put(outputLinkFile, outputFile);
+          hardLinksMode.put(outputFile, mode);
         } else if (isSymLink) {
-          FileNativeUtils.symlink(outputLinkFile, outputFile);
-          outputFile.setLastModified(modifiedTime);
+          symLinks.put(outputLinkFile, outputFile);
+          symLinksModifiedTimes.put(outputFile, modifiedTime);
         } else {
           // Create the containing folder if not exists
-          if (!outputFile.getParentFile().isDirectory())
+          if (!outputFile.getParentFile().isDirectory()) {
             outputFile.getParentFile().mkdirs();
+          }
           copyStreamToFile(in, size, outputFile);
           outputFile.setLastModified(modifiedTime);
         }
 
         // Set file/folder permission
-        if (mode != null && !isSymLink)
+        if (mode != null && !isSymLink && outputFile.exists()) {
           FileNativeUtils.chmod(outputFile, mode);
+        }
       }
+
+      for (Map.Entry<File, File> entry : hardLinks.entrySet()) {
+        FileNativeUtils.link(entry.getKey(), entry.getValue());
+        Integer mode = hardLinksMode.get(entry.getValue());
+        if (mode != null) {
+          FileNativeUtils.chmod(entry.getValue(), mode);
+        }
+      }
+
+      for (Map.Entry<File, File> entry : symLinks.entrySet()) {
+        FileNativeUtils.symlink(entry.getKey(), entry.getValue());
+        entry.getValue().setLastModified(symLinksModifiedTimes.get(entry.getValue()));
+      }
+
     } finally {
-      if (in != null)
+      if (in != null) {
         in.close();
+      }
     }
 
     // Set folders timestamps
@@ -240,17 +253,15 @@ public class ArchiveExtractor {
     }
   }
 
-  private static void copyStreamToFile(InputStream in, long size,
-                                       File outputFile)
-      throws FileNotFoundException, IOException {
+  private static void copyStreamToFile(InputStream in, long size, File outputFile) throws IOException {
     FileOutputStream fos = new FileOutputStream(outputFile);
     try {
       // if size is not available, copy until EOF...
       if (size == -1) {
         byte buffer[] = new byte[4096];
-        int l;
-        while ((l = in.read(buffer)) != -1) {
-          fos.write(buffer, 0, l);
+        int length;
+        while ((length = in.read(buffer)) != -1) {
+          fos.write(buffer, 0, length);
         }
         return;
       }
@@ -258,12 +269,12 @@ public class ArchiveExtractor {
       // ...else copy just the needed amount of bytes
       byte buffer[] = new byte[4096];
       while (size > 0) {
-        int l = in.read(buffer);
-        if (l <= 0)
-          throw new IOException("Error while extracting file "
-                                + outputFile.getAbsolutePath());
-        fos.write(buffer, 0, l);
-        size -= l;
+        int length = in.read(buffer);
+        if (length <= 0) {
+          throw new IOException("Error while extracting file " + outputFile.getAbsolutePath());
+        }
+        fos.write(buffer, 0, length);
+        size -= length;
       }
     } finally {
       fos.close();

@@ -44,6 +44,17 @@ import static processing.app.I18n.format;
 
 public class ContributionInstaller {
 
+  private static final String PACKAGE_INDEX_URL;
+
+  static {
+    String extenalPackageIndexUrl = System.getProperty("PACKAGE_INDEX_URL");
+    if (extenalPackageIndexUrl != null && !"".equals(extenalPackageIndexUrl)) {
+      PACKAGE_INDEX_URL = extenalPackageIndexUrl;
+    } else {
+      PACKAGE_INDEX_URL = "http://arduino.cc/download.php?f=/packages/package_index.json";
+    }
+  }
+
   private File stagingFolder;
   private ContributionsIndexer indexer;
   private DownloadableContributionsDownloader downloader;
@@ -172,7 +183,7 @@ public class ContributionInstaller {
     final MultiStepProgress progress = new MultiStepProgress(1);
     final String statusText = _("Downloading platforms index...");
 
-    URL url = new URL("http://arduino.cc/download.php?f=/packages/package_index.json");
+    URL url = new URL(PACKAGE_INDEX_URL);
     File outputFile = indexer.getIndexFile();
     File tmpFile = new File(outputFile.getAbsolutePath() + ".tmp");
     downloader.download(url, tmpFile, progress, statusText);
