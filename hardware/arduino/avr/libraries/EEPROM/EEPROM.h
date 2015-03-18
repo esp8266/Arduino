@@ -154,5 +154,5 @@ struct EEPROMClass{
     }
 };
 
-extern EEPROMClass EEPROM;
+static EEPROMClass EEPROM;
 #endif
