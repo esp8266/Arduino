@@ -125,6 +125,8 @@ public class FileDownloader extends Observable {
       if (PreferencesData.has("proxy.server") && PreferencesData.get("proxy.server") != null && !PreferencesData.get("proxy.server").equals("")) {
         System.getProperties().put("http.proxyHost", PreferencesData.get("proxy.server"));
         System.getProperties().put("http.proxyPort", PreferencesData.get("proxy.port"));
+        System.getProperties().put("https.proxyHost", PreferencesData.get("proxy.server"));
+        System.getProperties().put("https.proxyPort", PreferencesData.get("proxy.port"));
         if (PreferencesData.has("proxy.user")) {
           System.getProperties().put("http.proxyUser", PreferencesData.get("proxy.user"));
           System.getProperties().put("http.proxyPassword", PreferencesData.get("proxy.password"));
@@ -132,6 +134,8 @@ public class FileDownloader extends Observable {
       } else {
         System.getProperties().remove("http.proxyHost");
         System.getProperties().remove("http.proxyPort");
+        System.getProperties().remove("https.proxyHost");
+        System.getProperties().remove("https.proxyPort");
         System.getProperties().remove("http.proxyUser");
         System.getProperties().remove("http.proxyPassword");
       }
