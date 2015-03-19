@@ -814,8 +814,8 @@
 
     <!-- Unzip AVR tools -->
     <antcall target="unzip">
-      <param name="archive_file" value="${staging_folder}/avr-toolchain-win32-3.4.5.zip" />
-      <param name="archive_url" value="http://arduino.cc/download.php?f=/avr-toolchain-win32-3.4.5.zip" />
+      <param name="archive_file" value="${staging_folder}/avr-toolchain-win32-3.4.5-arduino1.zip" />
+      <param name="archive_url" value="http://arduino.cc/download.php?f=/avr-toolchain-win32-3.4.5-arduino1.zip" />
       <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/avr" />
       <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/avr" />
     </antcall>
