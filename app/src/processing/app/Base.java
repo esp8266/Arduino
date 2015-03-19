@@ -89,6 +89,8 @@ public class Base {
     System.setProperty("awt.useSystemAAFontSettings", "on");
     System.setProperty("swing.aatext", "true");
 
+    splashScreenHelper.splashText(_("Loading configuration..."));
+
     BaseNoGui.initLogger();
     
     BaseNoGui.notifier = new GUIUserNotifier();
