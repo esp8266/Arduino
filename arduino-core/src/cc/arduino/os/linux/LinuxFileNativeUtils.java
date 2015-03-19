@@ -37,20 +37,23 @@ public class LinuxFileNativeUtils {
 
   public static void chmod(File file, int mode) throws IOException {
     int res = libc.chmod(file.getAbsolutePath(), mode);
-    if (res == -1)
+    if (res == -1) {
       throw new IOException("Could not change file permission: " + strerror());
+    }
   }
 
-  public static void link(File file, File link) throws IOException {
-    int res = libc.link(file.getAbsolutePath(), link.getAbsolutePath());
-    if (res == -1)
-      throw new IOException("Could not create hard link to " + file + " from " + link + ": " + strerror());
+  public static void link(File something, File somewhere) throws IOException {
+    int res = libc.link(something.getAbsolutePath(), somewhere.getAbsolutePath());
+    if (res == -1) {
+      throw new IOException("Could not create hard link to " + somewhere + " from " + something + ": " + strerror());
+    }
   }
 
-  public static void symlink(File file, File link) throws IOException {
-    int res = libc.symlink(file.getPath(), link.getAbsolutePath());
-    if (res == -1)
-      throw new IOException("Could not create symlink: " + strerror());
+  public static void symlink(File something, File somewhere) throws IOException {
+    int res = libc.symlink(something.getPath(), somewhere.getAbsolutePath());
+    if (res == -1) {
+      throw new IOException("Could not create symlink to " + somewhere + " from " + something + ": " + strerror());
+    }
   }
 
   private static String strerror() {

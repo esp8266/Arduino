@@ -45,8 +45,6 @@ public abstract class HostDependentDownloadableContribution extends Downloadable
     Properties prop = System.getProperties();
     String osName = prop.getProperty("os.name");
     String osArch = prop.getProperty("os.arch");
-    // for (Object k : properties.keySet())
-    // System.out.println(k + " = " + properties.get(k));
 
     String host = getHost();
 

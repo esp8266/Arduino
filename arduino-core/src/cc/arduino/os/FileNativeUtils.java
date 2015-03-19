@@ -59,33 +59,33 @@ public class FileNativeUtils {
    * Create a hard link from <b>oldFile</b> to <b>newFile</b>. If the underlying
    * filesystem doesn't support hard links then the command is ignored.
    * 
-   * @param oldFile
-   * @param newFile
+   * @param something
+   * @param somewhere
    * @throws IOException
    */
-  public static void link(File oldFile, File newFile) throws IOException {
+  public static void link(File something, File somewhere) throws IOException {
     if (OSUtils.isLinux())
-      LinuxFileNativeUtils.link(oldFile, newFile);
+      LinuxFileNativeUtils.link(something, somewhere);
     if (OSUtils.isMacOS())
-      MacOSFileNativeUtils.link(oldFile, newFile);
+      MacOSFileNativeUtils.link(something, somewhere);
     if (OSUtils.isWindows())
-      WindowsFileNativeUtils.link(oldFile, newFile);
+      WindowsFileNativeUtils.link(something, somewhere);
   }
 
   /**
    * Create a symlink link from <b>oldFile</b> to <b>newFile</b>. If the
    * underlying filesystem doesn't support symlinks then the command is ignored.
    * 
-   * @param oldFile
-   * @param newFile
+   * @param something
+   * @param somewhere
    * @throws IOException
    */
-  public static void symlink(File oldFile, File newFile) throws IOException {
+  public static void symlink(File something, File somewhere) throws IOException {
     if (OSUtils.isLinux())
-      LinuxFileNativeUtils.symlink(oldFile, newFile);
+      LinuxFileNativeUtils.symlink(something, somewhere);
     if (OSUtils.isMacOS())
-      MacOSFileNativeUtils.symlink(oldFile, newFile);
+      MacOSFileNativeUtils.symlink(something, somewhere);
     if (OSUtils.isWindows())
-      WindowsFileNativeUtils.symlink(oldFile, newFile);
+      WindowsFileNativeUtils.symlink(something, somewhere);
   }
 }

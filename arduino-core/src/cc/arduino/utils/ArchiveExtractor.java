@@ -174,21 +174,23 @@ public class ArchiveExtractor {
         }
         File outputFile = new File(destFolder, name);
 
-        File outputLinkFile = null;
+        File outputLinkedFile = null;
         if (isLink) {
           if (!linkName.startsWith(pathPrefix)) {
             throw new IOException("Invalid archive: it must contains a single root folder while file " + linkName + " is outside " + pathPrefix);
           }
           linkName = linkName.substring(pathPrefix.length());
-          outputLinkFile = new File(destFolder, linkName);
+          outputLinkedFile = new File(destFolder, linkName);
         }
         if (isSymLink) {
           // Symbolic links are referenced with relative paths
-          outputLinkFile = new File(linkName);
-          if (outputLinkFile.isAbsolute()) {
-            System.err.println(I18n.format(_("Warning: file {0} links to an absolute path {1}, changing it to {2}"), outputFile, outputLinkFile, new File(outputLinkFile.getName())));
+          outputLinkedFile = new File(linkName);
+          if (outputLinkedFile.isAbsolute()) {
+            System.err.println(I18n.format(_("Warning: file {0} links to an absolute path {1}, changing it to {2}"), outputFile, outputLinkedFile, new File(outputLinkedFile.getName())));
             System.err.println();
-            outputLinkFile = new File(outputLinkFile.getName());
+            outputLinkedFile = new File(outputLinkedFile.getName());
+          } else {
+            outputLinkedFile = new File(outputFile.getParent(), linkName);
           }
         }
 
@@ -213,10 +215,10 @@ public class ArchiveExtractor {
           }
           foldersTimestamps.put(outputFile, modifiedTime);
         } else if (isLink) {
-          hardLinks.put(outputLinkFile, outputFile);
+          hardLinks.put(outputFile, outputLinkedFile);
           hardLinksMode.put(outputFile, mode);
         } else if (isSymLink) {
-          symLinks.put(outputLinkFile, outputFile);
+          symLinks.put(outputFile, outputLinkedFile);
           symLinksModifiedTimes.put(outputFile, modifiedTime);
         } else {
           // Create the containing folder if not exists
@@ -234,16 +236,16 @@ public class ArchiveExtractor {
       }
 
       for (Map.Entry<File, File> entry : hardLinks.entrySet()) {
-        FileNativeUtils.link(entry.getKey(), entry.getValue());
-        Integer mode = hardLinksMode.get(entry.getValue());
+        FileNativeUtils.link(entry.getValue(), entry.getKey());
+        Integer mode = hardLinksMode.get(entry.getKey());
         if (mode != null) {
-          FileNativeUtils.chmod(entry.getValue(), mode);
+          FileNativeUtils.chmod(entry.getKey(), mode);
         }
       }
 
       for (Map.Entry<File, File> entry : symLinks.entrySet()) {
-        FileNativeUtils.symlink(entry.getKey(), entry.getValue());
-        entry.getValue().setLastModified(symLinksModifiedTimes.get(entry.getValue()));
+        FileNativeUtils.symlink(entry.getValue(), entry.getKey());
+        entry.getKey().setLastModified(symLinksModifiedTimes.get(entry.getKey()));
       }
 
     } finally {

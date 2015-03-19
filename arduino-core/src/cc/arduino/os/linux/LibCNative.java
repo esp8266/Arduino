@@ -35,18 +35,16 @@ import com.sun.jna.Pointer;
 
 public interface LibCNative extends Library {
 
-  static LibCNative libc = (LibCNative) Native.loadLibrary("c",
-                                                           LibCNative.class);
+  LibCNative libc = (LibCNative) Native.loadLibrary("c", LibCNative.class);
 
-  Pointer errno = NativeLibrary.getInstance("c")
-      .getGlobalVariableAddress("errno");
+  Pointer errno = NativeLibrary.getInstance("c").getGlobalVariableAddress("errno");
 
-  public int chmod(String path, int mode);
+  int chmod(String path, int mode);
 
-  public int link(String oldpath, String newpath);
+  int link(String something, String somewhere);
 
-  public int symlink(String oldpath, String newpath);
+  int symlink(String something, String somewhere);
 
-  public String strerror(int errno);
+  String strerror(int errno);
 
 }
