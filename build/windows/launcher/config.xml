@@ -33,6 +33,7 @@
     <maxVersion></maxVersion>
     <jdkPreference>preferJre</jdkPreference>
     <opt>-splash:./lib/splash.png</opt>
+    <opt>-Dsun.java2d.d3d=false</opt>
   </jre>
   <messages>
     <startupErr>An error occurred while starting the application.</startupErr>
