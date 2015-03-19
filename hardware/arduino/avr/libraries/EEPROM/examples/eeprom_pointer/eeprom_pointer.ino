@@ -54,7 +54,7 @@ void setup() {
     of the C++11 ranged for loop.
   ***/
   
-  for( EEPtr ptr = EEPROM.begin() ; item != EEPROM.end() ; ++item ){
+  for( EEPtr ptr = EEPROM.begin() ; ptr != EEPROM.end() ; ++ptr ){
     Serial.print( *ptr, HEX );
     Serial.print( ", " );
   }

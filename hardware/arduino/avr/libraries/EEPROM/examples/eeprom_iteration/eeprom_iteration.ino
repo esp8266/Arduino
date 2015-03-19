@@ -42,14 +42,14 @@ void setup() {
     Iterate the EEPROM using a do-while loop.
   ***/
   
-  int idx = 0;
+  int idx = 0;  //Used 'idx' to avoid name conflict with 'index' above.
   
   do{
   
     //Add one to each cell in the EEPROM
-    EEPROM[ index ] += 1;  
-    index++;
-  }while( index < EEPROM.length() );
+    EEPROM[ idx ] += 1;  
+    idx++;
+  }while( idx < EEPROM.length() );
   
   /***
     Iterate the EEPROM using a C++11 ranged for loop.

@@ -92,28 +92,16 @@ struct EEPtr{
     operator const int() const          { return index; }
     EEPtr &operator=( int in )          { return index = in, *this; }
     
-    
     //Iterator functionality.
     bool operator!=( const EEPtr &ptr ) { return index != ptr.index; }
-    EERef operator*()                   { return( this->index ); }
+    EERef operator*()                   { return index; }
     
-    
-    /** Prefix increment/decrement **/
+    /** Prefix & Postfix increment/decrement **/
     EEPtr& operator++()                 { return ++index, *this; }
     EEPtr& operator--()                 { return --index, *this; }
-    
-    
-    /** Postfix increment/decrement **/
-    EEPtr operator++ (int){ 
-        int ret = index;
-        return ++index, ret;
-    }
+    EEPtr operator++ (int)              { return index++; }
+    EEPtr operator-- (int)              { return index--; }
 
-    EEPtr operator-- (int){ 
-        int ret = index;
-        return --index, ret;
-    }
-    
     int index; //Index of current EEPROM cell.
 };
 
@@ -128,15 +116,15 @@ struct EEPtr{
 struct EEPROMClass{
 
     //Basic user access methods.
-    EERef operator[]( const int index )  { return( index ); }
-    uint8_t read( int idx )              { return (EERef( idx )); }
+    EERef operator[]( const int idx )    { return idx; }
+    uint8_t read( int idx )              { return EERef( idx ); }
     void write( int idx, uint8_t val )   { (EERef( idx )) = val; }
     void update( int idx, uint8_t val )  { EERef( idx ).update( val ); }
     
     //STL and C++11 iteration capability.
-    EEPtr begin()                        { return( 0x00 ); }
-    EEPtr end()                          { return length(); } //Standards requires this to be the item after the last valid entry. The returned pointer is invalid. 
-    uint16_t length()                    { return E2END + 1; }    
+    EEPtr begin()                        { return 0x00; }
+    EEPtr end()                          { return length(); } //Standards requires this to be the item after the last valid entry. The returned pointer is invalid.
+    uint16_t length()                    { return E2END + 1; }
     
     //Functionality to 'get' and 'put' objects to and from EEPROM.
     template< typename T > T &get( int idx, T &t ){
