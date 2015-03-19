@@ -76,7 +76,7 @@ public class ContributionManagerUI extends InstallerJDialog {
   }
 
   public ContributionManagerUI(Frame parent) {
-    super(parent, "Boards Manager", Dialog.ModalityType.APPLICATION_MODAL);
+    super(parent, _("Boards Manager"), Dialog.ModalityType.APPLICATION_MODAL);
   }
 
   public void setIndexer(ContributionsIndexer indexer) {

@@ -34,9 +34,6 @@ import processing.app.Theme;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
@@ -160,7 +157,6 @@ public abstract class InstallerJDialog<T> extends JDialog {
 
     errorMessage = new JLabel("");
     errorMessage.setForeground(Color.RED);
-    errorMessage.setVisible(false);
 
     {
       JButton cancelButton = new JButton(_("Cancel"));
