@@ -8,11 +8,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * Handy process executor, collecting stdout into a given OutputStream
+ * Handy process executor, collecting stdout and stderr into given OutputStreams
  */
-public class ExternalProcessExecutor extends DefaultExecutor {
+public class CollectStdOutStdErrExecutor extends DefaultExecutor {
 
-  public ExternalProcessExecutor(final OutputStream os) {
+  public CollectStdOutStdErrExecutor(final OutputStream stdout, final OutputStream stderr) {
     this.setStreamHandler(new ExecuteStreamHandler() {
       @Override
       public void setProcessInputStream(OutputStream outputStream) throws IOException {
@@ -20,6 +20,11 @@ public class ExternalProcessExecutor extends DefaultExecutor {
 
       @Override
       public void setProcessErrorStream(InputStream inputStream) throws IOException {
+        byte[] buf = new byte[4096];
+        int bytes = -1;
+        while ((bytes = inputStream.read(buf)) != -1) {
+          stderr.write(buf, 0, bytes);
+        }
       }
 
       @Override
@@ -27,7 +32,7 @@ public class ExternalProcessExecutor extends DefaultExecutor {
         byte[] buf = new byte[4096];
         int bytes = -1;
         while ((bytes = inputStream.read(buf)) != -1) {
-          os.write(buf, 0, bytes);
+          stdout.write(buf, 0, bytes);
         }
       }
 

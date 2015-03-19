@@ -27,9 +27,9 @@ import com.apple.eio.FileManager;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
 import processing.app.debug.TargetPackage;
-import processing.app.tools.ExternalProcessExecutor;
 import processing.app.legacy.PApplet;
 import processing.app.legacy.PConstants;
+import processing.app.tools.CollectStdOutExecutor;
 
 import javax.swing.*;
 import java.awt.*;
@@ -231,7 +231,7 @@ public class Platform extends processing.app.Platform {
   @Override
   public String preListAllCandidateDevices() {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    Executor executor = new ExternalProcessExecutor(baos);
+    Executor executor = new CollectStdOutExecutor(baos);
 
     try {
       CommandLine toDevicePath = CommandLine.parse("/usr/sbin/system_profiler SPUSBDataType");

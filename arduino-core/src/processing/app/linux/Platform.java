@@ -26,8 +26,8 @@ import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
 import processing.app.PreferencesData;
 import processing.app.debug.TargetPackage;
-import processing.app.tools.ExternalProcessExecutor;
 import processing.app.legacy.PConstants;
+import processing.app.tools.CollectStdOutExecutor;
 
 import java.io.*;
 import java.util.Map;
@@ -131,7 +131,7 @@ public class Platform extends processing.app.Platform {
   @Override
   public Map<String, Object> resolveDeviceAttachedTo(String serial, Map<String, TargetPackage> packages, String devicesListOutput) {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    Executor executor = new ExternalProcessExecutor(baos);
+    Executor executor = new CollectStdOutExecutor(baos);
 
     try {
       CommandLine toDevicePath = CommandLine.parse("udevadm info -q path -n " + serial);

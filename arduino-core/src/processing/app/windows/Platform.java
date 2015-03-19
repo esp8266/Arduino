@@ -32,7 +32,8 @@ import processing.app.PreferencesData;
 import processing.app.debug.TargetPackage;
 import processing.app.legacy.PApplet;
 import processing.app.legacy.PConstants;
-import processing.app.tools.ExternalProcessExecutor;
+import processing.app.tools.CollectStdOutExecutor;
+import processing.app.tools.CollectStdOutStdErrExecutor;
 import processing.app.windows.Registry.REGISTRY_ROOT_KEY;
 
 import java.io.ByteArrayOutputStream;
@@ -338,7 +339,7 @@ public class Platform extends processing.app.Platform {
   @Override
   public String preListAllCandidateDevices() {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    Executor executor = new ExternalProcessExecutor(baos);
+    Executor executor = new CollectStdOutExecutor(baos);
 
     try {
       String listComPorts = new File(System.getProperty("user.dir"), "hardware/tools/listComPorts.exe").getCanonicalPath();
