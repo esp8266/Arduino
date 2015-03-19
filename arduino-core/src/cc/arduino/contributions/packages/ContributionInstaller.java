@@ -31,10 +31,20 @@ package cc.arduino.contributions.packages;
 import cc.arduino.utils.ArchiveExtractor;
 import cc.arduino.utils.MultiStepProgress;
 import cc.arduino.utils.Progress;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.Executor;
+import processing.app.BaseNoGui;
 import processing.app.helpers.FileUtils;
+import processing.app.helpers.filefilters.OnlyDirs;
+import processing.app.tools.CollectStdOutStdErrExecutor;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -131,6 +141,7 @@ public class ContributionInstaller {
       destFolder.mkdirs();
       assert toolContrib.getDownloadedFile() != null;
       ArchiveExtractor.extract(toolContrib.getDownloadedFile(), destFolder, 1);
+      executePostInstallScriptIfAny(destFolder);
       toolContrib.setInstalled(true);
       toolContrib.setInstalledFolder(destFolder);
       progress.stepDone();
@@ -149,6 +160,36 @@ public class ContributionInstaller {
 
     progress.setStatus(_("Installation completed!"));
     onProgress(progress);
+  }
+
+  private void executePostInstallScriptIfAny(File folder) throws IOException {
+    Collection<File> postInstallScripts = Collections2.filter(BaseNoGui.getPlatform().postInstallScripts(folder), new Predicate<File>() {
+      @Override
+      public boolean apply(File file) {
+        return file.isFile() && file.exists() && file.canRead() && file.canExecute();
+      }
+    });
+
+    if (postInstallScripts.isEmpty()) {
+      String[] subfolders = folder.list(new OnlyDirs());
+      if (subfolders.length > 1) {
+        return;
+      }
+
+      executePostInstallScriptIfAny(new File(folder, subfolders[0]));
+      return;
+    }
+
+    File postInstallScript = postInstallScripts.iterator().next();
+
+    ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    Executor executor = new CollectStdOutStdErrExecutor(stdout, stderr);
+
+    executor.execute(new CommandLine(postInstallScript));
+
+    System.out.write(stdout.toByteArray());
+    System.err.write(stderr.toByteArray());
   }
 
   public void remove(ContributedPlatform platform) {

@@ -229,4 +229,11 @@ public class Platform {
     Process process = Runtime.getRuntime().exec(new String[]{"chmod", "600", prefsFile.getAbsolutePath()}, null, null);
     process.waitFor();
   }
+
+  public List<File> postInstallScripts(File folder) {
+    List<File> scripts = new LinkedList<File>();
+    scripts.add(new File(folder, "install_script.sh"));
+    scripts.add(new File(folder, "post_install.sh"));
+    return scripts;
+  }
 }

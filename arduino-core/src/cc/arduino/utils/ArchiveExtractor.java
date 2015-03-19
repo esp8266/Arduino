@@ -36,10 +36,13 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import processing.app.I18n;
 
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
+
+import static processing.app.I18n._;
 
 public class ArchiveExtractor {
 
@@ -183,7 +186,9 @@ public class ArchiveExtractor {
           // Symbolic links are referenced with relative paths
           outputLinkFile = new File(linkName);
           if (outputLinkFile.isAbsolute()) {
-            throw new IOException("Invalid archive: it contains a symbolic link with absolute path '" + outputLinkFile + "'");
+            System.err.println(I18n.format(_("Warning: file {0} links to an absolute path {1}, changing it to {2}"), outputFile, outputLinkFile, new File(outputLinkFile.getName())));
+            System.err.println();
+            outputLinkFile = new File(outputLinkFile.getName());
           }
         }
 

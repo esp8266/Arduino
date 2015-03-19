@@ -38,6 +38,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 
@@ -353,5 +355,11 @@ public class Platform extends processing.app.Platform {
   @Override
   public void fixPrefsFilePermissions(File prefsFile) throws IOException {
     //noop
+  }
+
+  public List<File> postInstallScripts(File folder) {
+    List<File> scripts = new LinkedList<File>();
+    scripts.add(new File(folder, "post_install.bat"));
+    return scripts;
   }
 }
