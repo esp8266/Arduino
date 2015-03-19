@@ -132,7 +132,6 @@ void i2c_set_ack(int ack)
 
 int i2c_get_ack()
 {
-	i2c_wait();
 	i2c_set_scl(1);
 	i2c_wait();
 	int result = i2c_get_sda();
@@ -153,9 +152,7 @@ uint8_t i2c_read(void)
 		i2c_wait();
 		result <<= 1;
 		result |= i2c_get_sda();
-		i2c_wait();				// <- remove
 		i2c_set_scl(0);
-		i2c_wait();
 	}
 	return result;
 }
@@ -170,8 +167,8 @@ void i2c_write(uint8_t val)
 		i2c_set_scl(1);
 		i2c_wait();
 		i2c_set_scl(0);
-		i2c_wait();
 	}
+	i2c_wait();
 	i2c_set_sda(1);
 }
 
