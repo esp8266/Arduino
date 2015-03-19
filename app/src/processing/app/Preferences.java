@@ -213,8 +213,10 @@ public class Preferences {
   JCheckBox autoAssociateBox;
   JComboBox comboLanguage;
   JCheckBox saveVerifyUploadBox;
-  JTextField proxyServer;
-  JTextField proxyPort;
+  JTextField proxyHTTPServer;
+  JTextField proxyHTTPPort;
+  JTextField proxyHTTPSServer;
+  JTextField proxyHTTPSPort;
   JTextField proxyUser;
   JPasswordField proxyPassword;
 
@@ -551,28 +553,41 @@ public class Preferences {
   private void setupProxySettingsFieldSet(Container pane) {
 
     JPanel proxySettingsPanel = new JPanel();
-    JLabel jLabel2 = new JLabel();
-    proxyServer = new JTextField();
-    JLabel jLabel3 = new JLabel();
-    proxyPort = new JTextField();
-    JLabel jLabel4 = new JLabel();
+
+    JLabel proxyHTTPServerLabel = new JLabel();
+    proxyHTTPServer = new JTextField();
+    JLabel proxyHTTPPortLabel = new JLabel();
+    proxyHTTPPort = new JTextField();
+    JLabel proxyHTTPSServerLabel = new JLabel();
+    proxyHTTPSServer = new JTextField();
+    JLabel proxyHTTPSPortLabel = new JLabel();
+    proxyHTTPSPort = new JTextField();
+    JLabel proxyUserLabel = new JLabel();
     proxyUser = new JTextField();
-    JLabel jLabel5 = new JLabel();
+    JLabel proxyPasswordLabel = new JLabel();
     proxyPassword = new JPasswordField();
 
     proxySettingsPanel.setBorder(BorderFactory.createTitledBorder(_("Proxy Settings")));
 
-    jLabel2.setText(_("Server:"));
+    proxyHTTPServerLabel.setText(_("Server (HTTP):"));
 
-    proxyServer.setColumns(10);
+    proxyHTTPServer.setColumns(10);
 
-    jLabel3.setText(_("Port:"));
+    proxyHTTPPortLabel.setText(_("Port (HTTP):"));
 
-    proxyPort.setColumns(10);
+    proxyHTTPPort.setColumns(10);
 
-    jLabel4.setText(_("Username:"));
+    proxyHTTPSServerLabel.setText(_("Server: (HTTPS)"));
 
-    jLabel5.setText(_("Password:"));
+    proxyHTTPSServer.setColumns(10);
+
+    proxyHTTPSPortLabel.setText(_("Port (HTTPS):"));
+
+    proxyHTTPSPort.setColumns(10);
+
+    proxyUserLabel.setText(_("Username:"));
+
+    proxyPasswordLabel.setText(_("Password:"));
 
     GroupLayout proxySettingsPanelLayout = new GroupLayout(proxySettingsPanel);
     proxySettingsPanel.setLayout(proxySettingsPanelLayout);
@@ -581,35 +596,45 @@ public class Preferences {
                     .addGroup(proxySettingsPanelLayout.createSequentialGroup()
                             .addContainerGap()
                             .addGroup(proxySettingsPanelLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel4)
-                                    .addComponent(jLabel2))
+                                    .addComponent(proxyUserLabel)
+                                    .addComponent(proxyHTTPSServerLabel)
+                                    .addComponent(proxyHTTPServerLabel))
                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                             .addGroup(proxySettingsPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(proxyServer)
+                                    .addComponent(proxyHTTPServer)
+                                    .addComponent(proxyHTTPSServer)
                                     .addComponent(proxyUser))
                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                             .addGroup(proxySettingsPanelLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel5)
-                                    .addComponent(jLabel3))
+                                    .addComponent(proxyPasswordLabel)
+                                    .addComponent(proxyHTTPSPortLabel)
+                                    .addComponent(proxyHTTPPortLabel))
                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                             .addGroup(proxySettingsPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
                                     .addComponent(proxyPassword)
-                                    .addComponent(proxyPort))
+                                    .addComponent(proxyHTTPSPort)
+                                    .addComponent(proxyHTTPPort))
                             .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
     );
     proxySettingsPanelLayout.setVerticalGroup(
             proxySettingsPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                     .addGroup(proxySettingsPanelLayout.createSequentialGroup()
                             .addGroup(proxySettingsPanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel2)
-                                    .addComponent(proxyServer, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel3)
-                                    .addComponent(proxyPort, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(proxyHTTPServerLabel)
+                                    .addComponent(proxyHTTPServer, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(proxyHTTPPortLabel)
+                                    .addComponent(proxyHTTPPort, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                             .addGroup(proxySettingsPanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel4)
+                                    .addComponent(proxyHTTPSServerLabel)
+                                    .addComponent(proxyHTTPSServer, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(proxyHTTPSPortLabel)
+                                    .addComponent(proxyHTTPSPort, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(proxySettingsPanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                    .addComponent(proxyUserLabel)
                                     .addComponent(proxyUser, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel5)
+                                    .addComponent(proxyPasswordLabel)
                                     .addComponent(proxyPassword, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
     );
 
@@ -627,7 +652,6 @@ public class Preferences {
     );
 
   }// </editor-fold>//GEN-END:initComponents
-
   // .................................................................
 
 
@@ -707,11 +731,17 @@ public class Preferences {
     Language newLanguage = (Language) comboLanguage.getSelectedItem();
     PreferencesData.set("editor.languages.current", newLanguage.isoCode);
 
-    Preferences.set("proxy.server", proxyServer.getText());
+    Preferences.set("proxy.http.server", proxyHTTPServer.getText());
     try {
-      Preferences.set("proxy.port", Integer.valueOf(proxyPort.getText()).toString());
+      Preferences.set("proxy.http.port", Integer.valueOf(proxyHTTPPort.getText()).toString());
     } catch (NumberFormatException e) {
-      Preferences.remove("proxy.port");
+      Preferences.remove("proxy.http.port");
+    }
+    Preferences.set("proxy.https.server", proxyHTTPServer.getText());
+    try {
+      Preferences.set("proxy.https.port", Integer.valueOf(proxyHTTPPort.getText()).toString());
+    } catch (NumberFormatException e) {
+      Preferences.remove("proxy.https.port");
     }
     Preferences.set("proxy.user", proxyUser.getText());
     Preferences.set("proxy.password", new String(proxyPassword.getPassword()));
@@ -747,11 +777,17 @@ public class Preferences {
 
     updateExtensionBox.setSelected(PreferencesData.get("editor.update_extension") == null || PreferencesData.getBoolean("editor.update_extension"));
 
-    proxyServer.setText(Preferences.get("proxy.server"));
+    proxyHTTPServer.setText(Preferences.get("proxy.http.server"));
     try {
-      proxyPort.setText(Integer.toString(Preferences.getInteger("proxy.port")));
+      proxyHTTPPort.setText(Integer.toString(Preferences.getInteger("proxy.http.port", 8080)));
     } catch (NumberFormatException e) {
-      proxyPort.setText("");
+      proxyHTTPPort.setText("");
+    }
+    proxyHTTPServer.setText(Preferences.get("proxy.https.server"));
+    try {
+      proxyHTTPPort.setText(Integer.toString(Preferences.getInteger("proxy.https.port", 8443)));
+    } catch (NumberFormatException e) {
+      proxyHTTPPort.setText("");
     }
     proxyUser.setText(Preferences.get("proxy.user"));
     proxyPassword.setText(Preferences.get("proxy.password"));

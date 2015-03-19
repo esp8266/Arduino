@@ -30,7 +30,6 @@ package cc.arduino.utils.network;
 
 import org.apache.commons.codec.binary.Base64;
 import processing.app.PreferencesData;
-import processing.app.helpers.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -122,23 +121,28 @@ public class FileDownloader extends Observable {
 
       setStatus(Status.CONNECTING);
 
-      if (PreferencesData.has("proxy.server") && PreferencesData.get("proxy.server") != null && !PreferencesData.get("proxy.server").equals("")) {
-        System.getProperties().put("http.proxyHost", PreferencesData.get("proxy.server"));
-        System.getProperties().put("http.proxyPort", PreferencesData.get("proxy.port"));
-        System.getProperties().put("https.proxyHost", PreferencesData.get("proxy.server"));
-        System.getProperties().put("https.proxyPort", PreferencesData.get("proxy.port"));
-        if (PreferencesData.has("proxy.user")) {
-          System.getProperties().put("http.proxyUser", PreferencesData.get("proxy.user"));
-          System.getProperties().put("http.proxyPassword", PreferencesData.get("proxy.password"));
-        }
-      } else {
-        System.getProperties().remove("http.proxyHost");
-        System.getProperties().remove("http.proxyPort");
-        System.getProperties().remove("https.proxyHost");
-        System.getProperties().remove("https.proxyPort");
-        System.getProperties().remove("http.proxyUser");
-        System.getProperties().remove("http.proxyPassword");
+      System.getProperties().remove("http.proxyHost");
+      System.getProperties().remove("http.proxyPort");
+      System.getProperties().remove("https.proxyHost");
+      System.getProperties().remove("https.proxyPort");
+      System.getProperties().remove("http.proxyUser");
+      System.getProperties().remove("http.proxyPassword");
+
+      if (PreferencesData.has("proxy.http.server") && PreferencesData.get("proxy.http.server") != null && !PreferencesData.get("proxy.http.server").equals("")) {
+        System.getProperties().put("http.proxyHost", PreferencesData.get("proxy.http.server"));
+        System.getProperties().put("http.proxyPort", PreferencesData.get("proxy.http.port"));
       }
+      if (PreferencesData.has("proxy.https.server") && PreferencesData.get("proxy.https.server") != null && !PreferencesData.get("proxy.https.server").equals("")) {
+        System.getProperties().put("https.proxyHost", PreferencesData.get("proxy.https.server"));
+        System.getProperties().put("https.proxyPort", PreferencesData.get("proxy.https.port"));
+      }
+      if (PreferencesData.has("proxy.user") && PreferencesData.get("proxy.user") != null && !PreferencesData.get("proxy.user").equals("")) {
+        System.getProperties().put("http.proxyUser", PreferencesData.get("proxy.user"));
+        System.getProperties().put("http.proxyPassword", PreferencesData.get("proxy.password"));
+        System.getProperties().put("https.proxyUser", PreferencesData.get("proxy.user"));
+        System.getProperties().put("https.proxyPassword", PreferencesData.get("proxy.password"));
+      }
+
       HttpURLConnection connection = (HttpURLConnection) downloadUrl.openConnection();
 
       if (downloadUrl.getUserInfo() != null) {
