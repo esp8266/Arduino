@@ -79,7 +79,7 @@ public class LibraryManagerUI extends InstallerJDialog {
   }
 
   public LibraryManagerUI(Frame parent) {
-    super(parent, "Library Manager", Dialog.ModalityType.APPLICATION_MODAL);
+    super(parent, "Library Manager", Dialog.ModalityType.APPLICATION_MODAL, _("No internet connection available, the list of available libraries is not complete. You will be able to manage only the libraries you've already installed."));
   }
 
   public void setIndexer(LibrariesIndexer indexer) {
@@ -155,7 +155,7 @@ public class LibraryManagerUI extends InstallerJDialog {
         }
       }
     });
-    installerThread.setUncaughtExceptionHandler(new InstallerJDialogUncaughtExceptionHandler(this));
+    installerThread.setUncaughtExceptionHandler(new InstallerJDialogUncaughtExceptionHandler(this, noConnectionErrorMessage));
     installerThread.start();
   }
 
@@ -176,7 +176,7 @@ public class LibraryManagerUI extends InstallerJDialog {
         }
       }
     });
-    installerThread.setUncaughtExceptionHandler(new InstallerJDialogUncaughtExceptionHandler(this));
+    installerThread.setUncaughtExceptionHandler(new InstallerJDialogUncaughtExceptionHandler(this, noConnectionErrorMessage));
     installerThread.start();
   }
 
@@ -184,7 +184,7 @@ public class LibraryManagerUI extends InstallerJDialog {
     boolean managedByIndex = indexer.getIndex().getLibraries().contains(lib);
 
     if (!managedByIndex) {
-      int chosenOption = JOptionPane.showConfirmDialog(getParent(), _("This library is not listed on Library Manager. You won't be able to resinstall it from here.\nAre you sure you want to delete it?"), _("Please confirm library deletion"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+      int chosenOption = JOptionPane.showConfirmDialog(getParent(), _("This library is not listed on Library Manager. You won't be able to resinstall it from here.<br/>Are you sure you want to delete it?"), _("Please confirm library deletion"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
       if (chosenOption != JOptionPane.YES_OPTION) {
         return;
       }
@@ -206,7 +206,7 @@ public class LibraryManagerUI extends InstallerJDialog {
         }
       }
     });
-    installerThread.setUncaughtExceptionHandler(new InstallerJDialogUncaughtExceptionHandler(this));
+    installerThread.setUncaughtExceptionHandler(new InstallerJDialogUncaughtExceptionHandler(this, noConnectionErrorMessage));
     installerThread.start();
   }
 

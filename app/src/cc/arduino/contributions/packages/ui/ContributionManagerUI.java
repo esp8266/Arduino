@@ -78,7 +78,7 @@ public class ContributionManagerUI extends InstallerJDialog {
   }
 
   public ContributionManagerUI(Frame parent) {
-    super(parent, _("Boards Manager"), Dialog.ModalityType.APPLICATION_MODAL);
+    super(parent, _("Boards Manager"), Dialog.ModalityType.APPLICATION_MODAL, _("No internet connection available, the list of available boards is not complete. You will be able to manage only the boards you've already installed."));
   }
 
   public void setIndexer(ContributionsIndexer indexer) {
@@ -145,7 +145,7 @@ public class ContributionManagerUI extends InstallerJDialog {
         }
       }
     });
-    installerThread.setUncaughtExceptionHandler(new InstallerJDialogUncaughtExceptionHandler(this));
+    installerThread.setUncaughtExceptionHandler(new InstallerJDialogUncaughtExceptionHandler(this, noConnectionErrorMessage));
     installerThread.start();
   }
 
@@ -168,7 +168,7 @@ public class ContributionManagerUI extends InstallerJDialog {
         }
       }
     });
-    installerThread.setUncaughtExceptionHandler(new InstallerJDialogUncaughtExceptionHandler(this));
+    installerThread.setUncaughtExceptionHandler(new InstallerJDialogUncaughtExceptionHandler(this, noConnectionErrorMessage));
     installerThread.start();
   }
 
@@ -194,7 +194,7 @@ public class ContributionManagerUI extends InstallerJDialog {
         }
       }
     });
-    installerThread.setUncaughtExceptionHandler(new InstallerJDialogUncaughtExceptionHandler(this));
+    installerThread.setUncaughtExceptionHandler(new InstallerJDialogUncaughtExceptionHandler(this, noConnectionErrorMessage));
     installerThread.start();
   }
 

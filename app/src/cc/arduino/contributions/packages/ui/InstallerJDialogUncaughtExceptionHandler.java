@@ -9,21 +9,28 @@ import static processing.app.I18n._;
 public class InstallerJDialogUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
 
   private final InstallerJDialog parent;
+  private final String connectionErrorMessage;
 
-  public InstallerJDialogUncaughtExceptionHandler(InstallerJDialog parent) {
+  public InstallerJDialogUncaughtExceptionHandler(InstallerJDialog parent, String connectionErrorMessage) {
     this.parent = parent;
+    this.connectionErrorMessage = connectionErrorMessage;
   }
 
   @Override
   public void uncaughtException(Thread t, final Throwable e) {
+    String errorMessage = _(e.getMessage().substring(e.getMessage().indexOf(":") + 2));
+    if (errorMessage.startsWith("Error downloading")) {
+      errorMessage = connectionErrorMessage;
+    }
+    final String finalErrorMessage = errorMessage;
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        System.err.println(_(e.getMessage().substring(e.getMessage().indexOf(":") + 2)));
+        System.err.println(finalErrorMessage);
         e.printStackTrace();
       }
     });
-    parent.setErrorMessage(_(e.getMessage().substring(e.getMessage().indexOf(":") + 2)));
+    parent.setErrorMessage(finalErrorMessage);
   }
 
 }

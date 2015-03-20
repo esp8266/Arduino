@@ -58,6 +58,7 @@ public abstract class InstallerJDialog<T> extends JDialog {
   // Currently selected category and filters
   protected Predicate<T> categoryFilter;
   protected String[] filters;
+  protected final String noConnectionErrorMessage;
 
   // Real contribution table
   protected JTable contribTable;
@@ -79,9 +80,9 @@ public abstract class InstallerJDialog<T> extends JDialog {
 
   protected InstallerTableCell cellEditor;
 
-  public InstallerJDialog(Frame parent, String title,
-                          ModalityType applicationModal) {
+  public InstallerJDialog(Frame parent, String title, ModalityType applicationModal, String noConnectionErrorMessage) {
     super(parent, title, applicationModal);
+    this.noConnectionErrorMessage = noConnectionErrorMessage;
 
     setResizable(true);
 
@@ -218,7 +219,7 @@ public abstract class InstallerJDialog<T> extends JDialog {
   }
 
   public void setErrorMessage(String message) {
-    errorMessage.setText(message);
+    errorMessage.setText("<html><body>" + message + "</body></html>");
     errorMessageBox.setVisible(true);
   }
 
