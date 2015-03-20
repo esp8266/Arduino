@@ -35,7 +35,9 @@ import cc.arduino.contributions.ui.FilteredAbstractTableModel;
 import cc.arduino.contributions.ui.InstallerJDialog;
 import cc.arduino.contributions.ui.InstallerTableCell;
 import cc.arduino.utils.Progress;
+import processing.app.I18n;
 
+import javax.swing.*;
 import java.awt.*;
 import java.util.Collection;
 
@@ -172,6 +174,12 @@ public class ContributionManagerUI extends InstallerJDialog {
 
   public void onRemovePressed(final ContributedPlatform platform) {
     clearErrorMessage();
+
+    int chosenOption = JOptionPane.showConfirmDialog(getParent(), I18n.format(_("Do you want to remove {0}?\nIf you do so you won't be able to use {0} any more."), platform.getName()), _("Please confirm boards deletion"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+    if (chosenOption != JOptionPane.YES_OPTION) {
+      return;
+    }
+
     installerThread = new Thread(new Runnable() {
       @Override
       public void run() {
