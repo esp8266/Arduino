@@ -1,0 +1,372 @@
+{
+  "packages": [
+    {
+      "name": "arduino",
+      "maintainer": "Arduino",
+      "websiteURL": "http://www.arduino.cc/",
+      "email": "packages@arduino.cc",
+      "platforms": [
+        {
+          "name": "Arduino AVR Boards",
+          "architecture": "avr",
+          "version": "1.6.2-beta1",
+          "category": "Arduino",
+          "url": "http://arduino.cc/download.php?f=/cores/avr-1.6.2-beta1.tar.bz2",
+          "archiveFileName": "avr-1.6.2-beta1.tar.bz2",
+          "checksum": "SHA-256:7ac66a33822d638d0cee7bacb68ec00dbf58f08f0f8b38e6eb11dd13c858a331",
+          "size": "4860781",
+          "boards": [
+            {"name": "Arduino Yún"},
+            {"name": "Arduino Uno"},
+            {"name": "Arduino Diecimila"},
+            {"name": "Arduino Nano"},
+            {"name": "Arduino Mega"},
+            {"name": "Arduino MegaADK"},
+            {"name": "Arduino Leonardo"},
+            {"name": "Arduino Micro"},
+            {"name": "Arduino Esplora"},
+            {"name": "Arduino Mini"},
+            {"name": "Arduino Ethernet"},
+            {"name": "Arduino Fio"},
+            {"name": "Arduino BT"},
+            {"name": "Arduino LilyPadUSB"},
+            {"name": "Arduino Lilypad"},
+            {"name": "Arduino Pro"},
+            {"name": "Arduino ATMegaNG"},
+            {"name": "Arduino Robot Control"},
+            {"name": "Arduino Robot Motor"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino1"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino1"
+            }
+          ]
+        },
+        {
+          "name": "Arduino AVR Boards",
+          "architecture": "avr",
+          "version": "1.6.2-beta2",
+          "category": "Arduino",
+          "url": "http://arduino.cc/download.php?f=/cores/avr-1.6.2-beta2.tar.bz2",
+          "archiveFileName": "avr-1.6.2-beta2.tar.bz2",
+          "checksum": "SHA-256:8c3b7fa754c48d10734686a538e1ae017f2d3d7bbc5dcb4dc395e8c0ccd68ec6",
+          "size": "4860815",
+          "boards": [
+            {"name": "Arduino Yún"},
+            {"name": "Arduino Uno"},
+            {"name": "Arduino Diecimila"},
+            {"name": "Arduino Nano"},
+            {"name": "Arduino Mega"},
+            {"name": "Arduino MegaADK"},
+            {"name": "Arduino Leonardo"},
+            {"name": "Arduino Micro"},
+            {"name": "Arduino Esplora"},
+            {"name": "Arduino Mini"},
+            {"name": "Arduino Ethernet"},
+            {"name": "Arduino Fio"},
+            {"name": "Arduino BT"},
+            {"name": "Arduino LilyPadUSB"},
+            {"name": "Arduino Lilypad"},
+            {"name": "Arduino Pro"},
+            {"name": "Arduino ATMegaNG"},
+            {"name": "Arduino Robot Control"},
+            {"name": "Arduino Robot Motor"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "avr-gcc",
+              "version": "4.8.1-arduino1"
+            },
+            {
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino1"
+            }
+          ]
+        },
+        {
+          "name": "Arduino SAM Boards (32-bits ARM Cortex-M3)",
+          "architecture": "sam",
+          "version": "1.6.2-beta1",
+          "category": "Arduino",
+          "url": "http://arduino.cc/download.php?f=/cores/sam-1.6.2-beta1.tar.bz2",
+          "archiveFileName": "sam-1.6.2-beta1.tar.bz2",
+          "checksum": "SHA-256:286f82585a0a9030689f5b534cae9f811900f2ab752eb59c5f9ecc9d2ed0e3f9",
+          "size": "17140968",
+          "boards": [
+            {"name": "Arduino Due"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "arm-none-eabi-gcc",
+              "version": "4.8.3-2014q1"
+            },
+            {
+              "packager": "arduino",
+              "name": "bossac",
+              "version": "1.3a-arduino"
+            }
+          ]
+        },
+        {
+          "name": "Arduino SAM Boards (32-bits ARM Cortex-M3)",
+          "architecture": "sam",
+          "version": "1.6.2-beta2",
+          "category": "Arduino",
+          "url": "http://arduino.cc/download.php?f=/cores/sam-1.6.2-beta2.tar.bz2",
+          "archiveFileName": "sam-1.6.2-beta2.tar.bz2",
+          "checksum": "SHA-256:56d1fdfef92d2cd431d468fa68a8711832b69cd538681d5cf0022a29e1513250",
+          "size": "17141011",
+          "boards": [
+            {"name": "Arduino Due"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "arm-none-eabi-gcc",
+              "version": "4.8.3-2014q1"
+            },
+            {
+              "packager": "arduino",
+              "name": "bossac",
+              "version": "1.3a-arduino"
+            }
+          ]
+        }
+      ],
+      "tools": [
+        {
+          "name": "arm-none-eabi-gcc",
+          "version": "4.8.3-2014q1",
+          "systems": [
+            {
+              "host": "i686-mingw32",
+              "archiveFileName": "gcc-arm-none-eabi-4.8.3-2014q1-windows.tar.gz",
+              "url": "http://arduino.cc/download.php?f=/gcc-arm-none-eabi-4.8.3-2014q1-windows.tar.gz",
+              "checksum": "SHA-256:fd8c111c861144f932728e00abd3f7d1107e186eb9cd6083a54c7236ea78b7c2",
+              "size": "84537449"
+            },
+            {
+              "host": "x86_64-apple-darwin",
+              "url": "http://arduino.cc/download.php?f=/gcc-arm-none-eabi-4.8.3-2014q1-mac.tar.gz",
+              "archiveFileName": "gcc-arm-none-eabi-4.8.3-2014q1-mac.tar.gz",
+              "checksum": "SHA-256:3598acf21600f17a8e4a4e8e193dc422b894dc09384759b270b2ece5facb59c2",
+              "size": "52518522"
+            },
+            {
+              "host": "x86_64-pc-linux-gnu",
+              "url": "http://arduino.cc/download.php?f=/gcc-arm-none-eabi-4.8.3-2014q1-linux64.tar.gz",
+              "archiveFileName": "gcc-arm-none-eabi-4.8.3-2014q1-linux64.tar.gz",
+              "checksum": "SHA-256:d23f6626148396d6ec42a5b4d928955a703e0757829195fa71a939e5b86eecf6",
+              "size": "51395093"
+            },
+            {
+              "host": "i686-pc-linux-gnu",
+              "url": "http://arduino.cc/download.php?f=/gcc-arm-none-eabi-4.8.3-2014q1-linux32.tar.gz",
+              "archiveFileName": "gcc-arm-none-eabi-4.8.3-2014q1-linux32.tar.gz",
+              "checksum": "SHA-256:ba1994235f69c526c564f65343f22ddbc9822b2ea8c5ee07dd79d89f6ace2498",
+              "size": "51029223"
+            }
+          ]
+        },
+        {
+          "name": "arm-none-eabi-gcc",
+          "version": "4.4.1-sourcery2010q1-188",
+          "systems": [
+            {
+              "host": "x86_64-pc-linux-gnu",
+              "url": "http://arduino.cc/download.php?f=/tools/arm-none-eabi-gcc-4.4.1-sourcery2010q1-188-i686-pc-linux-gnu.tar.bz2",
+              "archiveFileName": "arm-none-eabi-gcc-4.4.1-sourcery2010q1-188-i686-pc-linux-gnu.tar.bz2",
+              "checksum": "SHA-256:6492d9987f82f18408495c2973d92673c4025499b835727424bd8130909b7383",
+              "size": "19490928"
+            },
+            {
+              "host": "i686-pc-linux-gnu",
+              "url": "http://arduino.cc/download.php?f=/tools/arm-none-eabi-gcc-4.4.1-sourcery2010q1-188-i686-pc-linux-gnu.tar.bz2",
+              "archiveFileName": "arm-none-eabi-gcc-4.4.1-sourcery2010q1-188-i686-pc-linux-gnu.tar.bz2",
+              "checksum": "SHA-256:6492d9987f82f18408495c2973d92673c4025499b835727424bd8130909b7383",
+              "size": "19490928"
+            }
+          ]
+        },
+        {
+          "name": "bossac",
+          "version": "1.3a-arduino",
+          "systems": [
+            {
+              "host": "i686-linux-gnu",
+              "url": "http://arduino.cc/download.php?f=/tools/bossac-1.3a-arduino-i686-linux-gnu.tar.bz2",
+              "archiveFileName": "bossac-1.3a-arduino-i686-linux-gnu.tar.bz2",
+              "checksum": "SHA-256:d6d10362f40729a7877e43474fcf02ad82cf83321cc64ca931f5c82b2d25d24f",
+              "size": "147359"
+            },
+            {
+              "host": "x86_64-pc-linux-gnu",
+              "url": "http://arduino.cc/download.php?f=/tools/bossac-1.3a-arduino-x86_64-pc-linux-gnu.tar.bz2",
+              "archiveFileName": "bossac-1.3a-arduino-x86_64-pc-linux-gnu.tar.bz2",
+              "checksum": "SHA-256:c1daed033251296768fa8b63ad283e053da93427c0f3cd476a71a9188e18442c",
+              "size": "26179"
+            },
+            {
+              "host": "i686-mingw32",
+              "url": "http://arduino.cc/download.php?f=/tools/bossac-1.3a-arduino-i686-mingw32.tar.bz2",
+              "archiveFileName": "bossac-1.3a-arduino-i686-mingw32.tar.bz2",
+              "checksum": "SHA-256:a37727622e0f86cb4f2856ad0209568a5d804234dba3dc0778829730d61a5ec7",
+              "size": "265647"
+            },
+            {
+              "host": "i386-apple-darwin11",
+              "url": "http://arduino.cc/download.php?f=/tools/bossac-1.3a-arduino-i386-apple-darwin11.tar.bz2",
+              "archiveFileName": "bossac-1.3a-arduino-i386-apple-darwin11.tar.bz2",
+              "checksum": "SHA-256:40770b225753e7a52bb165e8f37e6b760364f5c5e96048168d0178945bd96ad6",
+              "size": "109052"
+            }
+          ]
+        },
+        {
+          "name": "avr-gcc",
+          "version": "4.8.1-arduino1",
+          "systems": [
+            {
+              "size": "24441029",
+              "checksum": "SHA-256:bc836e43eb25054cfeb43bcc6e1717e1c26b3cf1f48b95f2593a4dededa29926",
+              "host": "i386-apple-darwin11",
+              "archiveFileName": "avr-gcc-4.8.1-arduino1-i386-apple-darwin11.tar.bz2",
+              "url": "http://arduino.cc/download.php?f=/tools/avr-gcc-4.8.1-arduino1-i386-apple-darwin11.tar.bz2"
+            },
+            {
+              "size": "27150843",
+              "checksum": "SHA-256:d17ff97b3c8833bc4152f9c3542f19b2bfc31a5c5344f14d0f972716bac7cd1f",
+              "host": "x86_64-linux-gnu",
+              "archiveFileName": "avr-gcc-4.8.1-arduino1-x86_64-pc-linux-gnu.tar.bz2",
+              "url": "http://arduino.cc/download.php?f=/tools/avr-gcc-4.8.1-arduino1-x86_64-pc-linux-gnu.tar.bz2"
+            },
+            {
+              "size": "25875775",
+              "checksum": "SHA-256:dc388232aa843d452e180811f88897a9eace1982fba829356a6db15a7c1adb5c",
+              "host": "i686-linux-gnu",
+              "archiveFileName": "avr-gcc-4.8.1-arduino1-i686-pc-linux-gnu.tar.bz2",
+              "url": "http://arduino.cc/download.php?f=/tools/avr-gcc-4.8.1-arduino1-i686-pc-linux-gnu.tar.bz2"
+            },
+            {
+              "size": "37788607",
+              "checksum": "SHA-256:81f2f9aaea55a95de8c6e9794a382286a96071188edfd6c29f61c3492f39ee3f",
+              "host": "i686-mingw32",
+              "archiveFileName": "avr-gcc-4.8.1-arduino1-i686-mingw32.zip",
+              "url": "http://arduino.cc/download.php?f=/tools/avr-gcc-4.8.1-arduino1-i686-mingw32.zip"
+            }
+          ]
+        },
+        {
+          "name": "avrdude",
+          "version": "6.0.1-arduino1",
+          "systems": [
+            {
+              "size": "264976",
+              "checksum": "SHA-256:4fe666c5e2eb935a880823916c8644b005509339ca4610d70d8a797136de0dc4",
+              "host": "i386-apple-darwin11",
+              "archiveFileName": "avrdude-6.0.1-arduino1-i386-apple-darwin11.tar.bz2",
+              "url": "http://arduino.cc/download.php?f=/tools/avrdude-6.0.1-arduino1-i386-apple-darwin11.tar.bz2"
+            },
+            {
+              "size": "292741",
+              "checksum": "SHA-256:0cb5d104cdcbd5ea7022ae3747957bbbeddb49f3bfae0ebb65e0ba671fe9290b",
+              "host": "x86_64-linux-gnu",
+              "archiveFileName": "avrdude-6.0.1-arduino1-x86_64-pc-linux-gnu.tar.bz2",
+              "url": "http://arduino.cc/download.php?f=/tools/avrdude-6.0.1-arduino1-x86_64-pc-linux-gnu.tar.bz2"
+            },
+            {
+              "size": "283009",
+              "checksum": "SHA-256:856fba0839c574251d454a5971ce7cc1b3b2a8f86026c7eb366fb1d7c0d6d79a",
+              "host": "i686-linux-gnu",
+              "archiveFileName": "avrdude-6.0.1-arduino1-i686-pc-linux-gnu.tar.bz2",
+              "url": "http://arduino.cc/download.php?f=/tools/avrdude-6.0.1-arduino1-i686-pc-linux-gnu.tar.bz2"
+            },
+            {
+              "size": "241621",
+              "checksum": "SHA-256:8306ac5e1f2083999bebbfdbabe2678a32a68e3330caf0dfdb6b4e998d1b7f64",
+              "host": "i686-mingw32",
+              "archiveFileName": "avrdude-6.0.1-arduino1-i686-mingw32.zip",
+              "url": "http://arduino.cc/download.php?f=/tools/avrdude-6.0.1-arduino1-i686-mingw32.zip"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "email": "support@intel.com",
+      "maintainer": "Intel",
+      "websiteURL": "http://www.intel.com/",
+      "name": "Intel",
+      "platforms": [
+        {
+          "name": "Intel i686 Boards",
+          "version": "1.6.1",
+          "category": "Arduino Certified",
+          "architecture": "i686",
+          "url": "https://github.com/01org/corelibs-edison/archive/1.6.1.tar.gz",
+          "archiveFileName": "1.6.1.tar.gz",
+          "checksum": "SHA-256:45dacc6fd419ca6227c8e478e302e0ecabeb71aab0257c8ba910545c70093174",
+          "size": "271398",
+          "boards": [
+            {
+              "name": "Edison"
+            }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "Intel",
+              "name": "core2-32-poky-linux",
+              "version": "1.6.1"
+            }
+          ]
+        }
+      ],
+      "tools": [
+        {
+          "name": "core2-32-poky-linux",
+          "version": "1.6.1",
+          "systems": [
+            {
+              "size": "42690480",
+              "checksum": "SHA-256:c2df8480cac45cd77cc13259dbb7f2409c11df0cdd9cb9c44818dd9689d9e5ce",
+              "host": "i386-apple-darwin11",
+              "archiveFileName": "edison-toolchain-20150120-osx.tar.bz2",
+              "url": "http://downloadmirror.intel.com/24472/eng/edison-toolchain-20150120-osx.tar.bz2"
+            },
+            {
+              "size": "56683098",
+              "checksum": "SHA-256:eb87bb1c0223a9583eb692cfc6ec4c54d7e031a25305255d30c4174486b2f7ee",
+              "host": "i686-mingw32",
+              "archiveFileName": "edison-toolchain-20150120-windows.zip",
+              "url": "http://downloadmirror.intel.com/24472/eng/edison-toolchain-20150120-windows.zip"
+            },
+            {
+              "size": "79000830",
+              "checksum": "SHA-256:d7abcb58eb35eac85ec9c557feef16b790d63eab87a7cec03b372f1682e238e2",
+              "host": "x86_64-linux-gnu",
+              "archiveFileName": "edison-toolchain-20150120-linux64.tar.bz2",
+              "url": "http://downloadmirror.intel.com/24472/eng/edison-toolchain-20150120-linux64.tar.bz2"
+            },
+            {
+              "size": "76493322",
+              "checksum": "SHA-256:1c252b637a58d6dfce711e47bcd92c6a2b0cef56d77691f2088488ab86e18891",
+              "host": "i686-linux-gnu",
+              "archiveFileName": "edison-toolchain-20150120-linux32.tar.bz2",
+              "url": "http://downloadmirror.intel.com/24472/eng/edison-toolchain-20150120-linux32.tar.bz2"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
