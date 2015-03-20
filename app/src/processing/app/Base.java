@@ -91,7 +91,7 @@ public class Base {
   // these menus are shared so that the board and serial port selections
   // are the same for all windows (since the board and serial port that are
   // actually used are determined by the preferences, which are shared)
-  static List<JMenu> boardsCustomMenus;
+  private List<JMenu> boardsCustomMenus;
 
   static public void main(String args[]) throws Exception {
     System.setProperty("awt.useSystemAAFontSettings", "on");
@@ -1315,7 +1315,7 @@ public class Base {
     return item;
   }
 
-  private static void filterVisibilityOfSubsequentBoardMenus(TargetBoard board,
+  private void filterVisibilityOfSubsequentBoardMenus(TargetBoard board,
                                                              int fromIndex) {
     for (int i = fromIndex; i < boardsCustomMenus.size(); i++) {
       JMenu menu = boardsCustomMenus.get(i);
@@ -1801,7 +1801,7 @@ public class Base {
     return BaseNoGui.getBoardPreferences();
   }
 
-  public static List<JMenu> getBoardsCustomMenus() {
+  public List<JMenu> getBoardsCustomMenus() {
     return boardsCustomMenus;
   }
 

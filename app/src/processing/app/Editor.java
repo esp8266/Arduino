@@ -191,7 +191,7 @@ public class Editor extends JFrame implements RunnerListener {
           fileMenu.insert(examplesMenu, 3);
           sketchMenu.insert(importMenu, 4);
           int offset = 0;
-          for (JMenu menu : Base.getBoardsCustomMenus()) {
+          for (JMenu menu : base.getBoardsCustomMenus()) {
             toolsMenu.insert(menu, numTools + offset);
             offset++;
           }
@@ -205,7 +205,7 @@ public class Editor extends JFrame implements RunnerListener {
           fileMenu.remove(sketchbookMenu);
           fileMenu.remove(examplesMenu);
           sketchMenu.remove(importMenu);
-          for (JMenu menu : Base.getBoardsCustomMenus()) {
+          for (JMenu menu : base.getBoardsCustomMenus()) {
             toolsMenu.remove(menu);
           }
           toolsMenu.remove(serialMenu);
@@ -702,7 +702,7 @@ public class Editor extends JFrame implements RunnerListener {
     // XXX: DAM: these should probably be implemented using the Tools plugin
     // API, if possible (i.e. if it supports custom actions, etc.)
 
-    for (JMenu menu : Base.getBoardsCustomMenus()) {
+    for (JMenu menu : base.getBoardsCustomMenus()) {
       toolsMenu.add(menu);
     }
 
