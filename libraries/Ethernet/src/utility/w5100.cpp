@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "utility/w5100.h"
+#include "w5100.h"
 
 // W5100 controller instance
 W5100Class W5100;
