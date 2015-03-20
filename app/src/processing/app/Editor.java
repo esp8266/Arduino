@@ -28,7 +28,6 @@ import cc.arduino.view.*;
 import cc.arduino.view.Event;
 import cc.arduino.view.EventListener;
 import com.jcraft.jsch.JSchException;
-
 import jssc.SerialPortException;
 import processing.app.debug.*;
 import processing.app.forms.PasswordAuthorizationDialog;
@@ -184,7 +183,6 @@ public class Editor extends JFrame implements RunnerListener {
     // When bringing a window to front, let the Base know
     addWindowListener(new WindowAdapter() {
         public void windowActivated(WindowEvent e) {
-//          System.err.println("activate");  // not coming through
           base.handleActivated(Editor.this);
           // re-add the sub-menus that are shared by all windows
           fileMenu.insert(sketchbookMenu, 2);
@@ -201,12 +199,20 @@ public class Editor extends JFrame implements RunnerListener {
         // added for 1.0.5
         // http://dev.processing.org/bugs/show_bug.cgi?id=1260
         public void windowDeactivated(WindowEvent e) {
-//          System.err.println("deactivate");  // not coming through
           fileMenu.remove(sketchbookMenu);
           fileMenu.remove(examplesMenu);
           sketchMenu.remove(importMenu);
-          for (JMenu menu : base.getBoardsCustomMenus()) {
-            toolsMenu.remove(menu);
+          List<Component> toolsMenuItemsToRemove = new LinkedList<Component>();
+          for (Component menuItem : toolsMenu.getMenuComponents()) {
+            if (menuItem instanceof JComponent) {
+              Object removeOnWindowDeactivation = ((JComponent) menuItem).getClientProperty("removeOnWindowDeactivation");
+              if (removeOnWindowDeactivation != null && Boolean.valueOf(removeOnWindowDeactivation.toString())) {
+                toolsMenuItemsToRemove.add(menuItem);
+              }
+            }
+          }
+          for (Component menuItem : toolsMenuItemsToRemove) {
+            toolsMenu.remove(menuItem);
           }
           toolsMenu.remove(serialMenu);
         }

@@ -1167,6 +1167,7 @@ public class Base {
 
     // The first custom menu is the "Board" selection submenu
     JMenu boardMenu = new JMenu(_("Board"));
+    boardMenu.putClientProperty("removeOnWindowDeactivation", true);
     MenuScroller.setScrollerFor(boardMenu);
     @SuppressWarnings("serial")
     Action runInstaller = new AbstractAction(_("Boards Manager...")) {
@@ -1190,13 +1191,16 @@ public class Base {
     boardMenu.add(new JSeparator());
 
     // Generate custom menus for all platforms
-    Set<String> titles = new HashSet<String>();
+    Set<String> customMenusTitles = new HashSet<String>();
     for (TargetPackage targetPackage : BaseNoGui.packages.values()) {
-      for (TargetPlatform targetPlatform : targetPackage.platforms())
-        titles.addAll(targetPlatform.getCustomMenus().values());
+      for (TargetPlatform targetPlatform : targetPackage.platforms()) {
+        customMenusTitles.addAll(targetPlatform.getCustomMenus().values());
+      }
     }
-    for (String title : titles) {
-      boardsCustomMenus.add(new JMenu(_(title)));
+    for (String customMenuTitle : customMenusTitles) {
+      JMenu customMenu = new JMenu(_(customMenuTitle));
+      customMenu.putClientProperty("removeOnWindowDeactivation", true);
+      boardsCustomMenus.add(customMenu);
     }
 
     List<JMenuItem> menuItemsToClickAfterStartup = new LinkedList<JMenuItem>();
@@ -1225,7 +1229,7 @@ public class Base {
 
         // Cycle through all boards of this platform
         for (TargetBoard board : targetPlatform.getBoards().values()) {
-          JMenuItem item = createBoardMenusAndCustomMenus(menuItemsToClickAfterStartup,
+          JMenuItem item = createBoardMenusAndCustomMenus(boardsCustomMenus, menuItemsToClickAfterStartup,
                                                           buttonGroupsMap,
                                                           board, targetPlatform, targetPackage);
           boardMenu.add(item);
@@ -1245,7 +1249,7 @@ public class Base {
   }
 
   private JRadioButtonMenuItem createBoardMenusAndCustomMenus(
-          List<JMenuItem> menuItemsToClickAfterStartup,
+          final List<JMenu> boardsCustomMenus, List<JMenuItem> menuItemsToClickAfterStartup,
           Map<String, ButtonGroup> buttonGroupsMap,
           TargetBoard board, TargetPlatform targetPlatform, TargetPackage targetPackage)
       throws Exception {
@@ -1262,7 +1266,7 @@ public class Base {
     Action action = new AbstractAction(board.getName()) {
       public void actionPerformed(ActionEvent actionevent) {
         selectBoard((TargetBoard)getValue("b"));
-        filterVisibilityOfSubsequentBoardMenus((TargetBoard)getValue("b"), 1);
+        filterVisibilityOfSubsequentBoardMenus(boardsCustomMenus, (TargetBoard)getValue("b"), 1);
 
         onBoardOrPortChange();
         rebuildImportMenu(Editor.importMenu);
@@ -1315,8 +1319,8 @@ public class Base {
     return item;
   }
 
-  private void filterVisibilityOfSubsequentBoardMenus(TargetBoard board,
-                                                             int fromIndex) {
+  private void filterVisibilityOfSubsequentBoardMenus(List<JMenu> boardsCustomMenus, TargetBoard board,
+                                                      int fromIndex) {
     for (int i = fromIndex; i < boardsCustomMenus.size(); i++) {
       JMenu menu = boardsCustomMenus.get(i);
       for (int m = 0; m < menu.getItemCount(); m++) {
@@ -1345,9 +1349,11 @@ public class Base {
   }
 
   private JMenu getBoardCustomMenu(String label) throws Exception {
-    for (JMenu menu : boardsCustomMenus)
-      if (label.equals(menu.getText()))
+    for (JMenu menu : boardsCustomMenus) {
+      if (label.equals(menu.getText())) {
         return menu;
+      }
+    }
     throw new Exception("Custom menu not found!");
   }
 
