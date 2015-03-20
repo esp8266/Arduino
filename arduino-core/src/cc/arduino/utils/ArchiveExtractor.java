@@ -189,8 +189,6 @@ public class ArchiveExtractor {
             System.err.println(I18n.format(_("Warning: file {0} links to an absolute path {1}, changing it to {2}"), outputFile, outputLinkedFile, new File(outputLinkedFile.getName())));
             System.err.println();
             outputLinkedFile = new File(outputLinkedFile.getName());
-          } else {
-            outputLinkedFile = new File(outputFile.getParent(), linkName);
           }
         }
 
