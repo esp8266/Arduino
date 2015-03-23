@@ -141,11 +141,12 @@ public abstract class InstallerJDialog<T> extends JDialog {
     }
 
     {
-      JScrollPane s = new JScrollPane();
-      s.setViewportView(contribTable);
-      s.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-      s.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-      pane.add(s, BorderLayout.CENTER);
+      JScrollPane scrollPane = new JScrollPane();
+      scrollPane.setViewportView(contribTable);
+      scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+      scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+      scrollPane.getVerticalScrollBar().setUnitIncrement(7);
+      pane.add(scrollPane, BorderLayout.CENTER);
     }
 
     pane.add(Box.createHorizontalStrut(10), BorderLayout.WEST);
