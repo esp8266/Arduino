@@ -186,9 +186,8 @@ public class ArchiveExtractor {
           // Symbolic links are referenced with relative paths
           outputLinkedFile = new File(linkName);
           if (outputLinkedFile.isAbsolute()) {
-            System.err.println(I18n.format(_("Warning: file {0} links to an absolute path {1}, changing it to {2}"), outputFile, outputLinkedFile, new File(outputLinkedFile.getName())));
+            System.err.println(I18n.format(_("Warning: file {0} links to an absolute path {1}"), outputFile, outputLinkedFile));
             System.err.println();
-            outputLinkedFile = new File(outputLinkedFile.getName());
           }
         }
 
