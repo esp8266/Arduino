@@ -34,6 +34,7 @@ import cc.arduino.contributions.packages.ContributedBoard;
 import cc.arduino.contributions.packages.ContributedPlatform;
 import cc.arduino.contributions.packages.ContributedPlatformComparator;
 import cc.arduino.contributions.ui.InstallerTableCell;
+import cc.arduino.contributions.ui.listeners.DelegatingKeyListener;
 import cc.arduino.utils.ReverseComparator;
 import com.google.common.base.Function;
 import com.google.common.base.Predicates;
@@ -71,7 +72,6 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
   private JComboBox versionToInstallChooser;
   private JButton downgradeButton;
   private JPanel buttonsPanel;
-  private Component removeButtonStrut;
   private JPanel inactiveButtonsPanel;
   private JLabel statusLabel;
 
@@ -153,8 +153,7 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
       buttonsPanel.add(installButton);
       buttonsPanel.add(Box.createHorizontalStrut(5));
       buttonsPanel.add(removeButton);
-      removeButtonStrut = Box.createHorizontalStrut(5);
-      buttonsPanel.add(removeButtonStrut);
+      buttonsPanel.add(Box.createHorizontalStrut(5));
       buttonsPanel.add(Box.createHorizontalStrut(15));
 
       panel.add(buttonsPanel);
@@ -209,6 +208,7 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
         }
       }
     });
+    description.addKeyListener(new DelegatingKeyListener(parentTable));
     panel.add(description, 0);
     return description;
   }

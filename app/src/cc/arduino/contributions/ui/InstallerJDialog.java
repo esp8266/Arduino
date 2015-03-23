@@ -28,6 +28,7 @@
  */
 package cc.arduino.contributions.ui;
 
+import cc.arduino.contributions.ui.listeners.AbstractKeyListener;
 import com.google.common.base.Predicate;
 import processing.app.Base;
 import processing.app.Theme;
@@ -39,6 +40,7 @@ import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 
 import static cc.arduino.contributions.packages.ui.ContributionIndexTableModel.DESCRIPTION_COL;
@@ -78,8 +80,6 @@ public abstract class InstallerJDialog<T> extends JDialog {
   protected Box errorMessageBox;
   private final JLabel errorMessage;
 
-  protected InstallerTableCell cellEditor;
-
   public InstallerJDialog(Frame parent, String title, ModalityType applicationModal, String noConnectionErrorMessage) {
     super(parent, title, applicationModal);
     this.noConnectionErrorMessage = noConnectionErrorMessage;
@@ -104,7 +104,9 @@ public abstract class InstallerJDialog<T> extends JDialog {
         @Override
         protected void onFilter(String[] _filters) {
           filters = _filters;
-          cellEditor.stopCellEditing();
+          if (contribTable.getCellEditor() != null) {
+            contribTable.getCellEditor().stopCellEditing();
+          }
           contribModel.updateIndexFilter(categoryFilter, filters);
         }
       };
@@ -130,13 +132,23 @@ public abstract class InstallerJDialog<T> extends JDialog {
     contribTable.setIntercellSpacing(new Dimension(0, 1));
     contribTable.setShowVerticalLines(false);
     contribTable.setSelectionBackground(Theme.getColor("status.notice.bgcolor"));
+    contribTable.addKeyListener(new AbstractKeyListener() {
+
+      @Override
+      public void keyReleased(KeyEvent keyEvent) {
+        if (keyEvent.getKeyCode() != keyEvent.VK_DOWN && keyEvent.getKeyCode() != KeyEvent.VK_UP) {
+          return;
+        }
+
+        contribTable.editCellAt(contribTable.getSelectedRow(), contribTable.getSelectedColumn());
+      }
+    });
 
     {
       TableColumnModel tcm = contribTable.getColumnModel();
       TableColumn col = tcm.getColumn(DESCRIPTION_COL);
       col.setCellRenderer(createCellRenderer());
-      cellEditor = createCellEditor();
-      col.setCellEditor(cellEditor);
+      col.setCellEditor(createCellEditor());
       col.setResizable(true);
     }
 
@@ -241,8 +253,10 @@ public abstract class InstallerJDialog<T> extends JDialog {
     categoryChooser.setEnabled(!visible);
     contribTable.setEnabled(!visible);
     errorMessageBox.setVisible(false);
-    cellEditor.setEnabled(!visible);
-    cellEditor.setStatus(status);
+    if (contribTable.getCellEditor() != null) {
+      ((InstallerTableCell) contribTable.getCellEditor()).setEnabled(!visible);
+      ((InstallerTableCell) contribTable.getCellEditor()).setStatus(status);
+    }
   }
 
   protected ActionListener categoryChooserActionListener = new ActionListener() {
@@ -252,7 +266,9 @@ public abstract class InstallerJDialog<T> extends JDialog {
       DropdownItem<T> selected = (DropdownItem<T>) categoryChooser.getSelectedItem();
       if (categoryFilter == null || !categoryFilter.equals(selected)) {
         categoryFilter = selected.getFilterPredicate();
-        cellEditor.stopCellEditing();
+        if (contribTable.getCellEditor() != null) {
+          contribTable.getCellEditor().stopCellEditing();
+        }
         contribModel.updateIndexFilter(categoryFilter, filters);
       }
     }
