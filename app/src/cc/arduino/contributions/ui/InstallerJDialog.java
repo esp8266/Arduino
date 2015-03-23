@@ -140,6 +140,10 @@ public abstract class InstallerJDialog<T> extends JDialog {
           return;
         }
 
+        if (!contribTable.isEnabled()) {
+          return;
+        }
+
         contribTable.editCellAt(contribTable.getSelectedRow(), contribTable.getSelectedColumn());
       }
     });
