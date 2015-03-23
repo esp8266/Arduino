@@ -693,6 +693,12 @@
     </exec>
   </target>
 
+  <target name="unzip-with-ant-task" depends="untar-unzip-checksum" unless="${archive_file}_installed">
+    <echo>Unzipping ${archive_file} into folder ${dest_folder}</echo>
+    <mkdir dir="${dest_folder}" />
+    <unzip src="${archive_file}" dest="${dest_folder}"/>
+  </target>
+
   <target name="linux-dist" depends="build"
 	  description="Build .tar.xz of linux version">
 
@@ -772,7 +778,7 @@
   </target>
 
   <target name="download-launch4j-windows">
-    <antcall target="unzip">
+    <antcall target="unzip-with-ant-task">
       <param name="archive_file" value="windows/launch4j-3.7-win32.zip"/>
       <param name="archive_url" value="http://switch.dl.sourceforge.net/project/launch4j/launch4j-3/3.7/launch4j-3.7-win32.zip"/>
       <param name="final_folder" value="windows/launcher/launch4j"/>
