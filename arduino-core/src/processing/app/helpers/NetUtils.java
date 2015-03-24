@@ -11,7 +11,7 @@ public abstract class NetUtils {
 
   private static boolean isReachableByEcho(InetAddress address) {
     try {
-      return address.isReachable(100);
+      return address.isReachable(300);
     } catch (IOException e) {
       return false;
     }
@@ -38,7 +38,7 @@ public abstract class NetUtils {
     Socket socket = null;
     try {
       socket = new Socket();
-      socket.connect(new InetSocketAddress(address, port), 300);
+      socket.connect(new InetSocketAddress(address, port), 1000);
       return true;
     } catch (IOException e) {
       return false;

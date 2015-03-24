@@ -63,7 +63,7 @@ public class DiscoveryManager {
           try {
             d.stop();
           } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace(); //just printing as the JVM is terminating
           }
         }
       }
@@ -74,7 +74,7 @@ public class DiscoveryManager {
   public List<BoardPort> discovery() {
     List<BoardPort> res = new ArrayList<BoardPort>();
     for (Discovery d : discoverers) {
-      res.addAll(d.discovery());
+      res.addAll(d.listDiscoveredBoards());
     }
     return res;
   }

@@ -29,36 +29,27 @@
 
 package cc.arduino.packages;
 
-import processing.app.helpers.PreferencesMap;
-
 import java.util.List;
 
 public interface Discovery {
-
-  /**
-   * Set discovery preferences
-   *
-   * @param options
-   */
-  public void setPreferences(PreferencesMap options);
 
   /**
    * Start discovery service
    *
    * @throws Exception
    */
-  public void start() throws Exception;
+  void start() throws Exception;
 
   /**
    * Stop discovery service
    */
-  public void stop() throws Exception;
+  void stop() throws Exception;
 
   /**
    * Return the list of discovered ports.
    *
    * @return
    */
-  public List<BoardPort> discovery();
+  List<BoardPort> listDiscoveredBoards();
 
 }
