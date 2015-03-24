@@ -181,8 +181,9 @@ public class FileDownloader extends Observable {
 
       // Check for valid content length.
       long len = connection.getContentLength();
-      if (len >= 0)
+      if (len >= 0) {
         setDownloadSize(len);
+      }
       setStatus(Status.DOWNLOADING);
 
       synchronized (this) {
