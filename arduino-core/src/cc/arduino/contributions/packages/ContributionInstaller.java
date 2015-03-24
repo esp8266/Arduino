@@ -65,12 +65,11 @@ public class ContributionInstaller {
     }
   }
 
-  private File stagingFolder;
-  private ContributionsIndexer indexer;
-  private DownloadableContributionsDownloader downloader;
+  private final ContributionsIndexer indexer;
+  private final DownloadableContributionsDownloader downloader;
 
   public ContributionInstaller(ContributionsIndexer contributionsIndexer) {
-    stagingFolder = contributionsIndexer.getStagingFolder();
+    File stagingFolder = contributionsIndexer.getStagingFolder();
     indexer = contributionsIndexer;
     downloader = new DownloadableContributionsDownloader(stagingFolder) {
       @Override

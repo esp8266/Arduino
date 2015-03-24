@@ -44,9 +44,9 @@ public class LibrariesIndexTableModel extends FilteredAbstractTableModel<Contrib
   public final static int DESCRIPTION_COL = 0;
 
   public static class ContributedLibraryReleases implements Comparable<ContributedLibraryReleases> {
-    public String name;
-    public List<ContributedLibrary> releases = new ArrayList<ContributedLibrary>();
-    public List<String> versions = new ArrayList<String>();
+    public final String name;
+    public final List<ContributedLibrary> releases = new ArrayList<ContributedLibrary>();
+    public final List<String> versions = new ArrayList<String>();
     public ContributedLibrary selected = null;
 
     public ContributedLibraryReleases(ContributedLibrary library) {
@@ -122,11 +122,11 @@ public class LibrariesIndexTableModel extends FilteredAbstractTableModel<Contrib
     }
   }
 
-  private List<ContributedLibraryReleases> contributions = new ArrayList<ContributedLibraryReleases>();
+  private final List<ContributedLibraryReleases> contributions = new ArrayList<ContributedLibraryReleases>();
 
-  private String[] columnNames = {"Description"};
+  private final String[] columnNames = {"Description"};
 
-  private Class<?>[] columnTypes = {ContributedPlatform.class};
+  private final Class<?>[] columnTypes = {ContributedPlatform.class};
 
   private LibrariesIndexer indexer;
 

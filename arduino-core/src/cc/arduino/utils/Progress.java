@@ -30,11 +30,11 @@ package cc.arduino.utils;
 
 public interface Progress {
 
-  public void setProgress(double progress);
+  void setProgress(double progress);
 
   double getProgress();
 
-  public void setStatus(String _status);
+  void setStatus(String _status);
 
   String getStatus();
 

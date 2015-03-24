@@ -1,6 +1,5 @@
 package cc.arduino.contributions.ui;
 
-import cc.arduino.contributions.libraries.ContributedLibrary;
 import cc.arduino.contributions.filters.NoopPredicate;
 import cc.arduino.contributions.packages.DownloadableContribution;
 import cc.arduino.contributions.ui.DropdownItem;

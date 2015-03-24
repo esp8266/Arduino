@@ -80,14 +80,9 @@ public abstract class DownloadableContribution {
 
   @Override
   public String toString() {
-    String chk = getChecksum();
-    if (chk.length() > 14)
-      chk = getChecksum().substring(0, 14);
     String res = "";
-    // res += getUrl() + " (" + chk + ") ";
     if (installed) {
-      res += "installed on " + installedFolder.getAbsolutePath() + " (" +
-          getSize() + " bytes)";
+      res += "installed on " + installedFolder.getAbsolutePath() + " (" + getSize() + " bytes)";
     }
     return res;
   }

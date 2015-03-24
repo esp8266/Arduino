@@ -51,10 +51,10 @@ import com.fasterxml.jackson.module.mrbean.MrBeanModule;
 public class LibrariesIndexer {
 
   private LibrariesIndex index;
-  private LibraryList installedLibraries = new LibraryList();
+  private final LibraryList installedLibraries = new LibraryList();
   private List<File> librariesFolders;
-  private File indexFile;
-  private File stagingFolder;
+  private final File indexFile;
+  private final File stagingFolder;
   private File sketchbookLibrariesFolder;
 
   public LibrariesIndexer(File preferencesFolder) {
@@ -84,13 +84,12 @@ public class LibrariesIndexer {
     }
   }
 
-  public void setLibrariesFolders(List<File> _librariesFolders)
-      throws IOException {
+  public void setLibrariesFolders(List<File> _librariesFolders) {
     librariesFolders = _librariesFolders;
     rescanLibraries();
   }
 
-  public void rescanLibraries() throws IOException {
+  public void rescanLibraries() {
     // Clear all installed flags
     installedLibraries.clear();
     for (ContributedLibrary lib : index.getLibraries())

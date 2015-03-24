@@ -42,7 +42,7 @@ import static processing.app.I18n._;
 
 public class AStyle implements Tool {
 
-  private static String FORMATTER_CONF = "formatter.conf";
+  private static final String FORMATTER_CONF = "formatter.conf";
 
   private final AStyleInterface aStyleInterface;
   private final String formatterConfiguration;

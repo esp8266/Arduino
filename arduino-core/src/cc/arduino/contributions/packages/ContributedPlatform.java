@@ -60,12 +60,13 @@ public abstract class ContributedPlatform extends DownloadableContribution {
     return new LinkedList<ContributedTool>(resolvedTools);
   }
 
-  public List<ContributedTool> resolveToolsDependencies(Collection<ContributedPackage> packages) {
+  public void resolveToolsDependencies(Collection<ContributedPackage> packages) {
     resolvedTools = new ArrayList<ContributedTool>();
 
     // If there are no dependencies return empty list
-    if (getToolsDependencies() == null)
-      return resolvedTools;
+    if (getToolsDependencies() == null) {
+      return;
+    }
 
     // For each tool dependency
     for (ContributedToolReference dep : getToolsDependencies()) {
@@ -76,7 +77,6 @@ public abstract class ContributedPlatform extends DownloadableContribution {
       }
       resolvedTools.add(tool);
     }
-    return resolvedTools;
   }
 
   public ContributedPackage getParentPackage() {

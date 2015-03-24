@@ -757,13 +757,9 @@ public class BaseNoGui {
     // Scan for libraries in each library folder.
     // Libraries located in the latest folders on the list can override
     // other libraries with the same name.
-    try {
-      BaseNoGui.librariesIndexer.setSketchbookLibrariesFolder(getSketchbookLibrariesFolder());
-      BaseNoGui.librariesIndexer.setLibrariesFolders(librariesFolders);
-      BaseNoGui.librariesIndexer.rescanLibraries();
-    } catch (IOException e) {
-      showWarning(_("Error"), _("Error loading libraries"), e);
-    }
+    BaseNoGui.librariesIndexer.setSketchbookLibrariesFolder(getSketchbookLibrariesFolder());
+    BaseNoGui.librariesIndexer.setLibrariesFolders(librariesFolders);
+    BaseNoGui.librariesIndexer.rescanLibraries();
 
     populateImportToLibraryTable();
   }

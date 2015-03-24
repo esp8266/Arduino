@@ -38,7 +38,7 @@ import java.util.Map;
 public class SplashScreenHelper {
 
   private final Map desktopHints;
-  private SplashScreen splash;
+  private final SplashScreen splash;
   private Rectangle2D.Double splashTextArea;
   private Graphics2D splashGraphics;
 

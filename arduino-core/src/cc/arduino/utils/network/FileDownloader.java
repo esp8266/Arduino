@@ -55,9 +55,9 @@ public class FileDownloader extends Observable {
   private long initialSize;
   private Long downloadSize = null;
   private long downloaded;
-  private URL downloadUrl;
+  private final URL downloadUrl;
 
-  private File outputFile;
+  private final File outputFile;
   private InputStream stream = null;
   private Exception error;
 
@@ -225,6 +225,7 @@ public class FileDownloader extends Observable {
         try {
           file.close();
         } catch (Exception e) {
+          //ignore
         }
       }
 
@@ -233,6 +234,7 @@ public class FileDownloader extends Observable {
           try {
             stream.close();
           } catch (Exception e) {
+            //ignore
           }
         }
       }

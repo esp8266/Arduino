@@ -61,9 +61,7 @@ public class ContributionIndexTableModel extends FilteredAbstractTableModel<Cont
     public boolean shouldContain(ContributedPlatform platform) {
       if (platform.getParentPackage() != packager)
         return false;
-      if (!platform.getArchitecture().equals(arch))
-        return false;
-      return true;
+      return platform.getArchitecture().equals(arch);
     }
 
     public void add(ContributedPlatform platform) {

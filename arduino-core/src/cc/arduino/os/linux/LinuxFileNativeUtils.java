@@ -33,7 +33,7 @@ import java.io.IOException;
 
 public class LinuxFileNativeUtils {
 
-  public static LibCNative libc = LibCNative.libc;
+  public static final LibCNative libc = LibCNative.libc;
 
   public static void chmod(File file, int mode) throws IOException {
     int res = libc.chmod(file.getAbsolutePath(), mode);

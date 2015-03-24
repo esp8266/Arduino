@@ -55,18 +55,17 @@ public class LibraryInstaller {
     }
   }
 
-  private LibrariesIndexer indexer;
-  private File stagingFolder;
-  private DownloadableContributionsDownloader downloader;
+  private final LibrariesIndexer indexer;
+  private final DownloadableContributionsDownloader downloader;
 
   public LibraryInstaller(LibrariesIndexer _indexer) {
     indexer = _indexer;
-    stagingFolder = _indexer.getStagingFolder();
+    File stagingFolder = _indexer.getStagingFolder();
     downloader = new DownloadableContributionsDownloader(stagingFolder) {
       @Override
       protected void onProgress(Progress progress) {
         LibraryInstaller.this.onProgress(progress);
-      };
+      }
     };
   }
 
@@ -160,8 +159,7 @@ public class LibraryInstaller {
     rescanLibraryIndex(progress);
   }
 
-  private void rescanLibraryIndex(MultiStepProgress progress)
-      throws IOException {
+  private void rescanLibraryIndex(MultiStepProgress progress) {
     progress.setStatus(_("Updating list of installed libraries"));
     onProgress(progress);
     indexer.rescanLibraries();

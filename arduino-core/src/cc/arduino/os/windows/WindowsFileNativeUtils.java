@@ -29,11 +29,10 @@
 package cc.arduino.os.windows;
 
 import java.io.File;
-import java.io.IOException;
 
 public class WindowsFileNativeUtils {
 
-  public static void chmod(File file, int mode) throws IOException {
+  public static void chmod(File file, int mode) {
     // Empty
   }
 

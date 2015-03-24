@@ -30,10 +30,10 @@ package cc.arduino.utils;
 
 public class MultiStepProgress implements Progress {
 
-  double steps;
+  private final double steps;
 
-  double step;
-  double stepProgress;
+  private double step;
+  private double stepProgress;
 
   String status;
 

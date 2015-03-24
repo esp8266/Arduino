@@ -51,7 +51,7 @@ public abstract class ContributionsIndex {
     return pack.findTool(name, version);
   }
 
-  private List<String> categories = new ArrayList<String>();
+  private final List<String> categories = new ArrayList<String>();
 
   public List<String> getCategories() {
     return categories;

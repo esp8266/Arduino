@@ -50,13 +50,13 @@ public abstract class InstallerJDialog<T> extends JDialog {
 
   // Toolbar on top of the window:
   // - Categories drop-down menu
-  protected JLabel categoryLabel;
-  protected JComboBox categoryChooser;
-  protected Component categoryStrut1;
-  protected Component categoryStrut2;
-  protected Component categoryStrut3;
+  protected final JLabel categoryLabel;
+  protected final JComboBox categoryChooser;
+  protected final Component categoryStrut1;
+  protected final Component categoryStrut2;
+  protected final Component categoryStrut3;
   // - Search text-field
-  protected FilterJTextField filterField;
+  protected final FilterJTextField filterField;
   // Currently selected category and filters
   protected Predicate<T> categoryFilter;
   protected String[] filters;
@@ -75,9 +75,9 @@ public abstract class InstallerJDialog<T> extends JDialog {
 
   // Bottom:
   // - Progress bar
-  protected ProgressJProgressBar progressBar;
-  protected Box progressBox;
-  protected Box errorMessageBox;
+  protected final ProgressJProgressBar progressBar;
+  protected final Box progressBox;
+  protected final Box errorMessageBox;
   private final JLabel errorMessage;
 
   public InstallerJDialog(Frame parent, String title, ModalityType applicationModal, String noConnectionErrorMessage) {
@@ -136,7 +136,7 @@ public abstract class InstallerJDialog<T> extends JDialog {
 
       @Override
       public void keyReleased(KeyEvent keyEvent) {
-        if (keyEvent.getKeyCode() != keyEvent.VK_DOWN && keyEvent.getKeyCode() != KeyEvent.VK_UP) {
+        if (keyEvent.getKeyCode() != KeyEvent.VK_DOWN && keyEvent.getKeyCode() != KeyEvent.VK_UP) {
           return;
         }
 
@@ -263,7 +263,7 @@ public abstract class InstallerJDialog<T> extends JDialog {
     }
   }
 
-  protected ActionListener categoryChooserActionListener = new ActionListener() {
+  protected final ActionListener categoryChooserActionListener = new ActionListener() {
 
     @Override
     public void actionPerformed(ActionEvent event) {

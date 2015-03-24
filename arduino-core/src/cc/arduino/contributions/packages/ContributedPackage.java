@@ -94,7 +94,7 @@ public abstract class ContributedPackage {
       for (ContributedPlatform plat : getPlatforms()) {
         res += "\n        Plaform   : name         : " + plat.getName();
         if (plat.isInstalled()) {
-          res += "\n                    " + ((DownloadableContribution) plat);
+          res += "\n                    " + plat;
         }
         res += "\n                    category     : " + plat.getCategory();
         res += "\n                    architecture : " +

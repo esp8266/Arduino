@@ -28,7 +28,6 @@
  */
 package cc.arduino.contributions.packages;
 
-import processing.app.BaseNoGui;
 import processing.app.Platform;
 
 public abstract class HostDependentDownloadableContribution extends DownloadableContribution {

@@ -154,12 +154,12 @@ public abstract class ContributedLibrary extends DownloadableContribution {
     String thisVersion = getVersion();
     String otherVersion = ((ContributedLibrary) obj).getVersion();
 
-    boolean versionEquals = thisVersion == null || otherVersion == null || thisVersion == otherVersion || thisVersion.equals(otherVersion);
+    boolean versionEquals = thisVersion == null || otherVersion == null || thisVersion.equals(otherVersion);
 
     String thisName = getName();
     String otherName = ((ContributedLibrary) obj).getName();
 
-    boolean nameEquals = thisName == null || otherName == null || thisName == otherName || thisName.equals(otherName);
+    boolean nameEquals = thisName == null || otherName == null || thisName.equals(otherName);
 
     return versionEquals && nameEquals;
   }

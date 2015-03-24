@@ -150,7 +150,6 @@ public class ContributionsIndexer {
     }
     contrib.setInstalled(true);
     contrib.setInstalledFolder(versionFolder);
-    return;
   }
 
   private void syncHardwareWithFilesystem(ContributedPackage pack,

@@ -37,8 +37,8 @@ import processing.app.debug.TargetPlatform;
 
 public class ContributedTargetPackage implements TargetPackage {
 
-  private String id;
-  private Map<String, TargetPlatform> platforms;
+  private final String id;
+  private final Map<String, TargetPlatform> platforms;
 
   public ContributedTargetPackage(String _id) {
     id = _id;

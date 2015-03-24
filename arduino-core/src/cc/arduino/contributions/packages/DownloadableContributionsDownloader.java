@@ -42,7 +42,7 @@ import static processing.app.I18n.format;
 
 public class DownloadableContributionsDownloader {
 
-  private File stagingFolder;
+  private final File stagingFolder;
 
   public DownloadableContributionsDownloader(File _stagingFolder) {
     stagingFolder = _stagingFolder;

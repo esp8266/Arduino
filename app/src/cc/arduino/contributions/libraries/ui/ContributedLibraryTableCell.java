@@ -353,7 +353,7 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
     String sentence = selected.getSentence();
     String paragraph = selected.getParagraph();
     // String availableVer = selectedLib.getVersion();
-    String url = selected.getUrl();
+    // String url = selected.getUrl();
 
     String midcolor = isSelected ? "#000000" : "#888888";
 
@@ -379,8 +379,6 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
       } else {
         desc += " " + format(_("Version <b>{0}</b>"), installedVer);
       }
-    } else {
-      // not installed...
     }
     desc += "</font>";
 

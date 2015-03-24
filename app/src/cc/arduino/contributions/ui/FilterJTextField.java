@@ -40,7 +40,7 @@ import javax.swing.event.DocumentListener;
 
 @SuppressWarnings("serial")
 public class FilterJTextField extends JTextField {
-  private String filterHint;
+  private final String filterHint;
 
   private boolean showingHint;
 

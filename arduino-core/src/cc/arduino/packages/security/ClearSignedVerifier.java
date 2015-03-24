@@ -58,8 +58,7 @@ public class ClearSignedVerifier {
    * @throws FileNotFoundException
    */
   public static VerifyResult verify(File signedTextFile,
-                                    PGPPublicKeyRingCollection pubKeyRing)
-          throws FileNotFoundException {
+                                    PGPPublicKeyRingCollection pubKeyRing) {
     // Create the result object
     VerifyResult result = new VerifyResult();
     result.clearText = null;
