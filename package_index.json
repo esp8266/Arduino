@@ -179,26 +179,6 @@
           ]
         },
         {
-          "name": "arm-none-eabi-gcc",
-          "version": "4.4.1-sourcery2010q1-188",
-          "systems": [
-            {
-              "host": "x86_64-pc-linux-gnu",
-              "url": "http://arduino.cc/download.php?f=/tools/arm-none-eabi-gcc-4.4.1-sourcery2010q1-188-i686-pc-linux-gnu.tar.bz2",
-              "archiveFileName": "arm-none-eabi-gcc-4.4.1-sourcery2010q1-188-i686-pc-linux-gnu.tar.bz2",
-              "checksum": "SHA-256:6492d9987f82f18408495c2973d92673c4025499b835727424bd8130909b7383",
-              "size": "19490928"
-            },
-            {
-              "host": "i686-pc-linux-gnu",
-              "url": "http://arduino.cc/download.php?f=/tools/arm-none-eabi-gcc-4.4.1-sourcery2010q1-188-i686-pc-linux-gnu.tar.bz2",
-              "archiveFileName": "arm-none-eabi-gcc-4.4.1-sourcery2010q1-188-i686-pc-linux-gnu.tar.bz2",
-              "checksum": "SHA-256:6492d9987f82f18408495c2973d92673c4025499b835727424bd8130909b7383",
-              "size": "19490928"
-            }
-          ]
-        },
-        {
           "name": "bossac",
           "version": "1.3a-arduino",
           "systems": [
@@ -228,7 +208,7 @@
               "url": "http://arduino.cc/download.php?f=/tools/bossac-1.3a-arduino-i386-apple-darwin11.tar.bz2",
               "archiveFileName": "bossac-1.3a-arduino-i386-apple-darwin11.tar.bz2",
               "checksum": "SHA-256:40770b225753e7a52bb165e8f37e6b760364f5c5e96048168d0178945bd96ad6",
-              "size": "109052"
+              "size": "39475"
             }
           ]
         },
