@@ -31,13 +31,27 @@ void loop()
   Serial.print(value, DEC);
   Serial.println();
 
-  // advance to the next address of the EEPROM
+  /***
+    Advance to the next address, when at the end restart at the beginning.    
+    
+    Larger AVR processors have larger EEPROM sizes, E.g:
+    - Arduno Duemilanove: 512b EEPROM storage.
+    - Arduino Uno:        1kb EEPROM storage.
+    - Arduino Mega:       4kb EEPROM storage.
+    
+    Rather than hard-coding the length, you should use the pre-provided length function.
+    This will make your code portable to all AVR processors.    
+  ***/
   address = address + 1;
-
-  // there are only 512 bytes of EEPROM, from 0 to 511, so if we're
-  // on address 512, wrap around to address 0
-  if (address == 512)
+  if(address == EEPROM.length())
     address = 0;
+    
+  /***
+    As the EEPROM sizes are powers of two, wrapping (preventing overflow) of an 
+    EEPROM address is also doable by a bitwise and of the length - 1.
+    
+    ++address &= EEPROM.length() - 1;
+  ***/
 
   delay(500);
 }
