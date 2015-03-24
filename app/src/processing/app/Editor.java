@@ -1090,34 +1090,78 @@ public class Editor extends JFrame implements RunnerListener {
     item = new JMenuItem(_("Getting Started"));
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          Base.showGettingStarted();
+          Base.showArduinoGettingStarted();
         }
       });
     menu.add(item);
 
     item = new JMenuItem(_("Environment"));
     item.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          Base.showEnvironment();
-        }
-      });
+      public void actionPerformed(ActionEvent e) {
+        Base.showEnvironment();
+      }
+    });
     menu.add(item);
 
     item = new JMenuItem(_("Troubleshooting"));
     item.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          Base.showTroubleshooting();
-        }
-      });
+      public void actionPerformed(ActionEvent e) {
+        Base.showTroubleshooting();
+      }
+    });
     menu.add(item);
 
     item = new JMenuItem(_("Reference"));
     item.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          Base.showReference();
-        }
-      });
+      public void actionPerformed(ActionEvent e) {
+        Base.showReference();
+      }
+    });
     menu.add(item);
+
+    menu.addSeparator();
+
+    item = new JMenuItem(_("Galileo Help"));
+    item.setEnabled(false);
+    menu.add(item);
+
+    item = new JMenuItem(_("Getting Started"));
+    item.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        Base.showReference("reference/Galileo_help_files", "ArduinoIDE_guide_galileo");
+      }
+    });
+    menu.add(item);
+    item = new JMenuItem(_("Troubleshooting"));
+    item.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        Base.showReference("reference/Galileo_help_files", "Guide_Troubleshooting_Galileo");;
+      }
+    });
+    menu.add(item);
+
+    menu.addSeparator();
+
+    item = new JMenuItem(_("Edison Help"));
+    item.setEnabled(false);
+    menu.add(item);
+
+    item = new JMenuItem(_("Getting Started"));
+    item.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        Base.showReference("reference/Edison_help_files", "ArduinoIDE_guide_edison");
+      }
+    });
+    menu.add(item);
+    item = new JMenuItem(_("Troubleshooting"));
+    item.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        Base.showReference("reference/Edison_help_files", "Guide_Troubleshooting_Edison");;
+      }
+    });
+    menu.add(item);
+
+    menu.addSeparator();
 
     item = newJMenuItemShift(_("Find in Reference"), 'F');
     item.addActionListener(new ActionListener() {

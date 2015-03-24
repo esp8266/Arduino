@@ -2006,14 +2006,22 @@ public class Base {
 
 
   static public void showReference(String filename) {
-    File referenceFolder = getContentFile("reference/arduino.cc/en");
+    showReference("reference/arduino.cc/en", filename);
+  }
+
+  static public void showReference(String prefix, String filename) {
+    File referenceFolder = getContentFile(prefix);
     File referenceFile = new File(referenceFolder, filename);
     if (!referenceFile.exists())
       referenceFile = new File(referenceFolder, filename + ".html");
     openURL(referenceFile.getAbsolutePath());
   }
 
-  static public void showGettingStarted() {
+  public static void showEdisonGettingStarted() {
+    showReference("reference/Edison_help_files", "ArduinoIDE_guide_edison");
+  }
+
+  static public void showArduinoGettingStarted() {
     if (OSUtils.isMacOS()) {
       showReference("Guide/MacOSX");
     } else if (OSUtils.isWindows()) {
