@@ -187,7 +187,7 @@ public class Editor extends JFrame implements RunnerListener {
           // re-add the sub-menus that are shared by all windows
           fileMenu.insert(sketchbookMenu, 2);
           fileMenu.insert(examplesMenu, 3);
-          sketchMenu.insert(importMenu, 4);
+          buildSketchMenu();
           int offset = 0;
           for (JMenu menu : base.getBoardsCustomMenus()) {
             toolsMenu.insert(menu, numTools + offset);
@@ -201,7 +201,7 @@ public class Editor extends JFrame implements RunnerListener {
         public void windowDeactivated(WindowEvent e) {
           fileMenu.remove(sketchbookMenu);
           fileMenu.remove(examplesMenu);
-          sketchMenu.remove(importMenu);
+          buildSketchMenu();
           List<Component> toolsMenuItemsToRemove = new LinkedList<Component>();
           for (Component menuItem : toolsMenu.getMenuComponents()) {
             if (menuItem instanceof JComponent) {
@@ -627,10 +627,13 @@ public class Editor extends JFrame implements RunnerListener {
 
 
   protected JMenu buildSketchMenu() {
-    JMenuItem item;
-    sketchMenu = new JMenu(_("Sketch"));
+    if (sketchMenu == null) {
+      sketchMenu = new JMenu(_("Sketch"));
+    } else {
+      sketchMenu.removeAll();
+    }
 
-    item = newJMenuItem(_("Verify / Compile"), 'R');
+    JMenuItem item = newJMenuItem(_("Verify / Compile"), 'R');
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           handleRun(false);
@@ -656,21 +659,21 @@ public class Editor extends JFrame implements RunnerListener {
 
     sketchMenu.addSeparator();
 
+    item = newJMenuItem(_("Show Sketch Folder"), 'K');
+    item.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        Base.openFolder(sketch.getFolder());
+      }
+    });
+    sketchMenu.add(item);
+    item.setEnabled(Base.openFolderAvailable());
+
     if (importMenu == null) {
       importMenu = new JMenu(_("Include Library"));
       MenuScroller.setScrollerFor(importMenu);
       base.rebuildImportMenu(importMenu);
     }
     sketchMenu.add(importMenu);
-
-    item = newJMenuItem(_("Show Sketch Folder"), 'K');
-    item.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          Base.openFolder(sketch.getFolder());
-        }
-      });
-    sketchMenu.add(item);
-    item.setEnabled(Base.openFolderAvailable());
 
     item = new JMenuItem(_("Add File..."));
     item.addActionListener(new ActionListener() {
