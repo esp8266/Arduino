@@ -44,6 +44,8 @@ build/linux/*.tar.bz2
 build/linux/*.zip
 build/linux/libastylej*
 build/shared/reference*.zip
+build/shared/Edison*.zip
+build/shared/Galileo*.zip
 test-bin
 *.iml
 .idea

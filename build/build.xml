@@ -123,6 +123,18 @@
       <param name="final_folder" value="${target.path}/reference" />
       <param name="dest_folder" value="${target.path}" />
     </antcall>
+    <antcall target="unzip">
+      <param name="archive_file" value="shared/Galileo_help_files-1.6.2.zip" />
+      <param name="archive_url" value="http://arduino.cc/download.php?f=/Galileo_help_files-1.6.2.zip" />
+      <param name="final_folder" value="${target.path}/reference/Galileo_help_files" />
+      <param name="dest_folder" value="${target.path}/reference/" />
+    </antcall>
+    <antcall target="unzip">
+      <param name="archive_file" value="shared/Edison_help_files-1.6.2.zip" />
+      <param name="archive_url" value="http://arduino.cc/download.php?f=/Edison_help_files-1.6.2.zip" />
+      <param name="final_folder" value="${target.path}/reference/Edison_help_files" />
+      <param name="dest_folder" value="${target.path}/reference/" />
+    </antcall>
 
     <!-- Write the revision file! -->
     <echo file="${target.path}/lib/version.txt" message="${version}" />
