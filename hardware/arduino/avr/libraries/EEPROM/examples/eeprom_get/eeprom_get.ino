@@ -23,8 +23,11 @@ void setup(){
   int eeAddress = 0; //EEPROM address to start reading from
   
   Serial.begin( 9600 );
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
   Serial.print( "Read float from EEPROM: " );
-  
+
   //Get the float data from the EEPROM at position 'eeAddress'
   EEPROM.get( eeAddress, f );
   Serial.println( f, 3 );  //This may print 'ovf, nan' if the data inside the EEPROM is not a valid float.

@@ -14,7 +14,10 @@ void setup(){
   
   //Start serial
   Serial.begin(9600);
-  
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
+
   //Print length of data to run CRC on.
   Serial.print( "EEPROM length: " );
   Serial.println( EEPROM.length() );
