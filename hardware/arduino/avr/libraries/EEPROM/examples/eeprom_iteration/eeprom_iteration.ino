@@ -51,22 +51,6 @@ void setup() {
     idx++;
   }while( idx < EEPROM.length() );
   
-  /***
-    Iterate the EEPROM using a C++11 ranged for loop.
-    
-    This version of the loop is best explained in the example 'eeprom_pointer'
-    as this kind of iteration uses pointers rather than an index/integer.
-    
-    !! Note: C++11 is not yet enabled by default in any IDE version.
-       Unless you manually enable it, this sketch will not compile.
-       You can comment the loop below to verify the non C++11 content.
-  ***/
-  
-  for( auto cell : EEPROM ){
-
-    //Add one to each cell in the EEPROM
-    cell += 1;
-  }
   
 } //End of setup function.
 

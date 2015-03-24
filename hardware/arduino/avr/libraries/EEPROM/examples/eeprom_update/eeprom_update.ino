@@ -14,7 +14,7 @@
 #include <EEPROM.h>
 
 /** the current address in the EEPROM (i.e. which byte we're going to write to next) **/
-int addr = 0;
+int address = 0;
 
 void setup(){ /** EMpty setup **/ }
 
@@ -32,13 +32,13 @@ void loop()
     these values will remain there when the board is
     turned off.
   ***/
-  EEPROM.update(addr, val);
+  EEPROM.update(address, val);
   
   /***
-    The function EEPROM.update(addr, val) is equivalent to the following:
+    The function EEPROM.update(address, val) is equivalent to the following:
   
-    if( EEPROM.read(addr) != val ){
-      EEPROM.write(addr, val);
+    if( EEPROM.read(address) != val ){
+      EEPROM.write(address, val);
     }
   ***/
   
@@ -54,15 +54,15 @@ void loop()
     Rather than hard-coding the length, you should use the pre-provided length function.
     This will make your code portable to all AVR processors.    
   ***/
-  addr = addr + 1;
-  if(addr == EEPROM.length())
-    addr = 0;
+  address = address + 1;
+  if(address == EEPROM.length())
+    address = 0;
     
   /***
     As the EEPROM sizes are powers of two, wrapping (preventing overflow) of an 
     EEPROM address is also doable by a bitwise and of the length - 1.
     
-    ++addr &= EEPROM.length() - 1;
+    ++address &= EEPROM.length() - 1;
   ***/
 
   delay(100);

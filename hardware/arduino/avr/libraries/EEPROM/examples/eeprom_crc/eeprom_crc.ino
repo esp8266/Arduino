@@ -38,7 +38,7 @@ unsigned long eeprom_crc( void ){
   
   unsigned long crc = ~0L;
   
-  for( int index = 0 ; index < 32  ; ++index ){
+  for( int index = 0 ; index < EEPROM.length()  ; ++index ){
     crc = crc_table[( crc ^ EEPROM[index] ) & 0x0f] ^ (crc >> 4);
     crc = crc_table[( crc ^ ( EEPROM[index] >> 4 )) & 0x0f] ^ (crc >> 4);    
     crc = ~crc;

@@ -16,6 +16,12 @@
 
 #include <EEPROM.h>
 
+struct MyObject{
+  float field1;
+  byte field2;
+  char name[10];
+};
+
 void setup(){
 
   Serial.begin(9600);
@@ -30,12 +36,6 @@ void setup(){
   Serial.println("Written float data type!");
   
   /** Put is designed for use with custom structures also. **/
-  
-  struct MyObject{
-    float field1;
-    byte field2;
-    char name[10];
-  };
   
   //Data to store.
   MyObject customVar = {
