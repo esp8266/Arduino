@@ -6,6 +6,13 @@ ARDUINO 1.6.2
 * Windows and MacOSX JVM Xmx halved to 512M
 * Introduced starting splashscreen with progress status: will be used for notifying user of long running startup tasks
 
+[libraries]
+* EEPROM: Replaced existing library with more complete implementation @Chris--A
+* SD: fixed endless timeout on 32bit core (Due) @Timmmm
+* Ethernet: fixed headers include path
+* SPI: do not influence state of SS pin if it's already been set as output by user sketch @vicatcu
+* Bridge: discard message if received length is bigger than rx buffer @arve0
+
 ARDUINO 1.6.1 - 2015.03.10
 
 [ide]
