@@ -248,15 +248,15 @@
 
   <target name="macosx-java-latest-build" if="macosx" depends="revision-check, macosx-checkos, subprojects-build" description="Build Mac OS X version">
     <antcall target="unzip">
-      <param name="archive_file" value="${staging_folder}/appbundler-1.0ea-arduino2.jar.zip" />
-      <param name="archive_url" value="http://arduino.cc/download.php?f=/appbundler-1.0ea-arduino2.jar.zip" />
-      <param name="final_folder" value="${staging_folder}/appbundler-1.0ea-arduino2" />
-      <param name="dest_folder" value="${staging_folder}/appbundler-1.0ea-arduino2" />
+      <param name="archive_file" value="${staging_folder}/appbundler-1.0ea-upstream1.jar.zip" />
+      <param name="archive_url" value="http://arduino.cc/download.php?f=/appbundler-1.0ea-upstream1.jar.zip" />
+      <param name="final_folder" value="${staging_folder}/appbundler-1.0ea-upstream1" />
+      <param name="dest_folder" value="${staging_folder}/appbundler-1.0ea-upstream1" />
     </antcall>
 
     <mkdir dir="${staging_folder}/work" />
 
-    <taskdef name="bundleapp" classname="com.oracle.appbundler.AppBundlerTask" classpath="${staging_folder}/appbundler-1.0ea-arduino2/appbundler-1.0ea-arduino2.jar"/>
+    <taskdef name="bundleapp" classname="com.oracle.appbundler.AppBundlerTask" classpath="${staging_folder}/appbundler-1.0ea-upstream1/appbundler-1.0ea-upstream1.jar"/>
 
     <bundleapp
             jvmRequired="1.7"

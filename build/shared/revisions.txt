@@ -6,6 +6,7 @@ ARDUINO 1.6.2
 * Windows and MacOSX JVM Xmx halved to 512M
 * Introduced starting splashscreen with progress status: will be used for notifying user of long running startup tasks
 * Available ports list is now generated in background: hence "tools" menu is much faster
+* MacOSX: appbundler merged our contribution, switching to upstream version https://bitbucket.org/infinitekind/appbundler/
 
 [libraries]
 * EEPROM: Replaced existing library with more complete implementation @Chris--A
