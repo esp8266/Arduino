@@ -26,6 +26,7 @@ import cc.arduino.packages.BoardPort;
 import com.apple.eio.FileManager;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
+import org.apache.commons.lang3.StringUtils;
 import processing.app.debug.TargetPackage;
 import processing.app.legacy.PApplet;
 import processing.app.legacy.PConstants;
@@ -45,6 +46,8 @@ import java.util.List;
  */
 public class Platform extends processing.app.Platform {
 
+  private String osArch;
+
   public void setLookAndFeel() throws Exception {
   }
 
@@ -54,35 +57,18 @@ public class Platform extends processing.app.Platform {
     Toolkit.getDefaultToolkit();
   }
 
-  public void init() {
+  public void init() throws IOException {
     System.setProperty("apple.laf.useScreenMenuBar", "true");
-    /*
-    try {
-      String name = "processing.app.macosx.ThinkDifferent";
-      Class osxAdapter = ClassLoader.getSystemClassLoader().loadClass(name);
 
-      Class[] defArgs = { Base.class };
-      Method registerMethod = osxAdapter.getDeclaredMethod("register", defArgs);
-      if (registerMethod != null) {
-        Object[] args = { this };
-        registerMethod.invoke(osxAdapter, args);
-      }
-    } catch (NoClassDefFoundError e) {
-      // This will be thrown first if the OSXAdapter is loaded on a system without the EAWT
-      // because OSXAdapter extends ApplicationAdapter in its def
-      System.err.println("This version of Mac OS X does not support the Apple EAWT." +
-                         "Application Menu handling has been disabled (" + e + ")");
+    discoverRealOsArch();
+  }
 
-    } catch (ClassNotFoundException e) {
-      // This shouldn't be reached; if there's a problem with the OSXAdapter
-      // we should get the above NoClassDefFoundError first.
-      System.err.println("This version of Mac OS X does not support the Apple EAWT. " +
-                         "Application Menu handling has been disabled (" + e + ")");
-    } catch (Exception e) {
-      System.err.println("Exception while loading BaseOSX:");
-      e.printStackTrace();
-    }
-    */
+  private void discoverRealOsArch() throws IOException {
+    CommandLine uname = CommandLine.parse("uname -m");
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    CollectStdOutExecutor executor = new CollectStdOutExecutor(baos);
+    executor.execute(uname);
+    osArch = StringUtils.trim(new String(baos.toByteArray()));
   }
 
 
@@ -251,5 +237,10 @@ public class Platform extends processing.app.Platform {
     }
 
     return filteredPorts;
+  }
+
+  @Override
+  public String getOsArch() {
+    return osArch;
   }
 }

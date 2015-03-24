@@ -28,6 +28,8 @@
  */
 package cc.arduino.contributions.packages;
 
+import processing.app.BaseNoGui;
+
 import java.util.List;
 
 public abstract class ContributedTool {
@@ -40,7 +42,7 @@ public abstract class ContributedTool {
 
   public DownloadableContribution getDownloadableContribution() {
     for (HostDependentDownloadableContribution c : getSystems()) {
-      if (c.isCompatible())
+      if (c.isCompatible(BaseNoGui.getPlatform()))
         return c;
     }
     return null;
@@ -52,7 +54,7 @@ public abstract class ContributedTool {
     res = "Tool name : " + getName() + " " + getVersion() + "\n";
     for (HostDependentDownloadableContribution sys : getSystems()) {
       res += "     sys";
-      res += sys.isCompatible() ? "*" : " ";
+      res += sys.isCompatible(BaseNoGui.getPlatform()) ? "*" : " ";
       res += " : " + sys + "\n";
     }
     return res;

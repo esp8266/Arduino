@@ -72,7 +72,7 @@ public class Platform {
   }
   
   
-  public void init() {
+  public void init() throws IOException {
   }
   
   
@@ -235,5 +235,13 @@ public class Platform {
     scripts.add(new File(folder, "install_script.sh"));
     scripts.add(new File(folder, "post_install.sh"));
     return scripts;
+  }
+
+  public String getOsName() {
+    return System.getProperty("os.name");
+  }
+
+  public String getOsArch() {
+    return System.getProperty("os.arch");
   }
 }

@@ -28,7 +28,8 @@
  */
 package cc.arduino.contributions.packages;
 
-import java.util.Properties;
+import processing.app.BaseNoGui;
+import processing.app.Platform;
 
 public abstract class HostDependentDownloadableContribution extends DownloadableContribution {
 
@@ -39,12 +40,9 @@ public abstract class HostDependentDownloadableContribution extends Downloadable
     return getHost() + " " + super.toString();
   }
 
-  public boolean isCompatible() {
-    // TODO: add missing host detections
-
-    Properties prop = System.getProperties();
-    String osName = prop.getProperty("os.name");
-    String osArch = prop.getProperty("os.arch");
+  public boolean isCompatible(Platform platform) {
+    String osName = platform.getOsName();
+    String osArch = platform.getOsArch();
 
     String host = getHost();
 

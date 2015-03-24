@@ -56,7 +56,7 @@ public class Platform extends processing.app.Platform {
     "\\arduino.exe \"%1\"";
   static final String DOC = "Arduino.Document";
 
-  public void init() {
+  public void init() throws IOException {
     super.init();
 
     checkAssociations();

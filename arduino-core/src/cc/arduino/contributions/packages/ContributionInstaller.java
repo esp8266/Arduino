@@ -172,7 +172,7 @@ public class ContributionInstaller {
 
     if (postInstallScripts.isEmpty()) {
       String[] subfolders = folder.list(new OnlyDirs());
-      if (subfolders.length > 1) {
+      if (subfolders.length != 1) {
         return;
       }
 
