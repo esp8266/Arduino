@@ -98,7 +98,7 @@ public class ContributionsIndexer {
     mapper.registerModule(new MrBeanModule());
     mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
     mapper.configure(DeserializationFeature.EAGER_DESERIALIZER_FETCH, true);
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     index = mapper.readValue(indexIn, ContributionsIndex.class);
   }
 
