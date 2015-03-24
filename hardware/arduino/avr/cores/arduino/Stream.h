@@ -97,6 +97,20 @@ class Stream : public Print
   // this allows format characters (typically commas) in values to be ignored
 
   float parseFloat(char skipChar);  // as above but the given skipChar is ignored
+
+  public:
+  struct MultiTarget {
+    const char *str;  // string you're searching for
+    size_t len;       // length of string you're searching for
+    size_t index;     // index used by the search routine.
+  };
+
+  // This allows you to search for an arbitrary number of strings.
+  // Returns index of the target that is found first or -1 if timeout occurs.
+  int findMulti(struct MultiTarget *targets, int tCount);
+
+
 };
+
 
 #endif
