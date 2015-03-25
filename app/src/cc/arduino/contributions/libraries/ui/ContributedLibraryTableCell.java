@@ -67,8 +67,6 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
 
   private JPanel panel;
   private JButton installButton;
-  private JButton removeButton;
-  private Component removeButtonPlaceholder;
   private Component installButtonPlaceholder;
   private JComboBox downgradeChooser;
   private JComboBox versionToInstallChooser;
@@ -88,18 +86,6 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
       });
       int width = installButton.getPreferredSize().width;
       installButtonPlaceholder = Box.createRigidArea(new Dimension(width, 1));
-    }
-
-    {
-      removeButton = new JButton(_("Remove"));
-      removeButton.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-          onRemove(editorValue.getInstalled());
-        }
-      });
-      int width = removeButton.getPreferredSize().width;
-      removeButtonPlaceholder = Box.createRigidArea(new Dimension(width, 1));
     }
 
     downgradeButton = new JButton(_("Install"));
@@ -153,8 +139,6 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
       buttonsPanel.add(versionToInstallChooser);
       buttonsPanel.add(Box.createHorizontalStrut(5));
       buttonsPanel.add(installButton);
-      buttonsPanel.add(Box.createHorizontalStrut(5));
-      buttonsPanel.add(removeButton);
       buttonsPanel.add(Box.createHorizontalStrut(5));
       buttonsPanel.add(Box.createHorizontalStrut(15));
 
@@ -343,8 +327,6 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
     }
     installButton.setVisible(installable || upgradable);
     installButtonPlaceholder.setVisible(!(installable || upgradable));
-    removeButton.setVisible(removable);
-    removeButtonPlaceholder.setVisible(!removable);
 
     String name = selected.getName();
     String author = selected.getAuthor();
@@ -444,7 +426,6 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
 
   public void enable(boolean enabled) {
     installButton.setEnabled(enabled);
-    removeButton.setEnabled(enabled);
   }
 
   public void setStatus(String status) {
