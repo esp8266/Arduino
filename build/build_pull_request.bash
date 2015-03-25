@@ -18,4 +18,5 @@ fi
 
 VERSION="PR-${ghprbPullId}-BUILD-${BUILD_NUMBER}"
 
-./build_all_dist.bash -Dversion="${VERSION}"
+./build_all_dist.bash -Dversion="${VERSION}" -DMACOSX_BUNDLED_JVM=$MACOSX_BUNDLED_JVM
+
