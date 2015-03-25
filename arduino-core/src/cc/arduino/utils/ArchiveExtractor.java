@@ -69,6 +69,11 @@ public class ArchiveExtractor {
    * @throws IOException
    */
   public static void extract(File archiveFile, File destFolder, int stripPath) throws IOException {
+    extract(archiveFile, destFolder, stripPath, false);
+  }
+
+
+  public static void extract(File archiveFile, File destFolder, int stripPath, boolean overwrite) throws IOException {
 
     // Folders timestamps must be set at the end of archive extraction
     // (because creating a file in a folder alters the folder's timestamp)
@@ -193,14 +198,14 @@ public class ArchiveExtractor {
 
         // Safety check
         if (isDirectory) {
-          if (outputFile.isFile()) {
+          if (outputFile.isFile() && !overwrite) {
             throw new IOException("Can't create folder " + outputFile + ", a file with the same name exists!");
           }
         } else {
           // - isLink
           // - isSymLink
           // - anything else
-          if (outputFile.exists()) {
+          if (outputFile.exists() && !overwrite) {
             throw new IOException("Can't extract file " + outputFile + ", file already exists!");
           }
         }
@@ -233,6 +238,9 @@ public class ArchiveExtractor {
       }
 
       for (Map.Entry<File, File> entry : hardLinks.entrySet()) {
+        if (entry.getKey().exists() && overwrite) {
+          entry.getKey().delete();
+        }
         FileNativeUtils.link(entry.getValue(), entry.getKey());
         Integer mode = hardLinksMode.get(entry.getKey());
         if (mode != null) {
@@ -241,6 +249,9 @@ public class ArchiveExtractor {
       }
 
       for (Map.Entry<File, File> entry : symLinks.entrySet()) {
+        if (entry.getKey().exists() && overwrite) {
+          entry.getKey().delete();
+        }
         FileNativeUtils.symlink(entry.getValue(), entry.getKey());
         entry.getKey().setLastModified(symLinksModifiedTimes.get(entry.getKey()));
       }

@@ -578,11 +578,12 @@ public class BaseNoGui {
   static public void initPackages() throws Exception {
     indexer = new ContributionsIndexer(BaseNoGui.getSettingsFolder());
     File indexFile = indexer.getIndexFile();
-    if (!indexFile.isFile()) {
+    File avrCoreFolder = FileUtils.newFile(indexFile.getParentFile(), "packages", "arduino", "hardware", "avr");
+    if (!indexFile.isFile() || !(avrCoreFolder.exists() && avrCoreFolder.isDirectory())) {
       File distFile = findDefaultPackageFile();
       if (distFile != null) {
-        ArchiveExtractor.extract(distFile, BaseNoGui.getSettingsFolder(), 0);
-      } else {
+        ArchiveExtractor.extract(distFile, BaseNoGui.getSettingsFolder(), 0, true);
+      } else if (!indexFile.isFile()) {
         // Otherwise create an empty packages index
         FileOutputStream out = null;
         try {

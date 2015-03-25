@@ -73,11 +73,13 @@ public class FileUtils {
   }
 
   public static void recursiveDelete(File file) {
-    if (file == null)
+    if (file == null) {
       return;
+    }
     if (file.isDirectory()) {
-      for (File current : file.listFiles())
+      for (File current : file.listFiles()) {
         recursiveDelete(current);
+      }
     }
     file.delete();
   }
@@ -251,6 +253,15 @@ public class FileUtils {
       if (extensions.isEmpty() || hasExtension(file, extensions))
         result.add(file);
     }
+    return result;
+  }
+
+  public static File newFile(File parent, String... parts) {
+    File result = parent;
+    for (String part : parts) {
+      result = new File(result, part);
+    }
+
     return result;
   }
 
