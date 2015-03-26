@@ -3,11 +3,11 @@
 #######################################
 
 #######################################
-# Library (KEYWORD3)
+# Library (KEYWORD1)
 #######################################
 
-WiFi	KEYWORD3
-WiFiUdp	KEYWORD3
+WiFi	KEYWORD1
+WiFiUdp	KEYWORD1
 
 #######################################
 # Datatypes (KEYWORD1)

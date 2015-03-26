@@ -3,18 +3,18 @@
 #######################################
 
 #######################################
-# Class (KEYWORD3)
+# Class (KEYWORD1)
 #######################################
 
-Bridge	KEYWORD3
-FileIO	KEYWORD3
-FileSystem	KEYWORD3
-Console	KEYWORD3
-Process	KEYWORD3
-Mailbox	KEYWORD3
-HttpClient	KEYWORD3
-YunServer	KEYWORD3
-YunClient	KEYWORD3
+Bridge	KEYWORD1
+FileIO	KEYWORD4
+FileSystem	KEYWORD1
+Console	KEYWORD1
+Process	KEYWORD1
+Mailbox	KEYWORD1
+HttpClient	KEYWORD1
+YunServer	KEYWORD1
+YunClient	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)

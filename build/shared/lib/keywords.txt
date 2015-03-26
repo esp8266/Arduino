@@ -1,113 +1,60 @@
-# LITERAL1 specifies constants
+#FUNCTIONS COLOR 			#D35400 - ORANGE			KEYWORD1
+#FUNCTIONS COLOR			#D35400 - ORANGE			KEYWORD2
+#STRUCTURE COLORS 			#728E00 - GREEN			KEYWORD3
+#VARIABLES COLOR 				#00979C - BLUE				LITERAL2
 
-HIGH	LITERAL1	Constants
-LOW	LITERAL1	Constants
-INPUT	LITERAL1	Constants
-INPUT_PULLUP	LITERAL1	Constants
-OUTPUT	LITERAL1	Constants
-DEC	LITERAL1	Serial_Print
-BIN	LITERAL1	Serial_Print
-HEX	LITERAL1	Serial_Print
-OCT	LITERAL1	Serial_Print
-PI	LITERAL1
-HALF_PI	LITERAL1
-TWO_PI	LITERAL1
-LSBFIRST	LITERAL1	ShiftOut
-MSBFIRST	LITERAL1	ShiftOut
-CHANGE	LITERAL1	AttachInterrupt
-FALLING	LITERAL1	AttachInterrupt
-RISING	LITERAL1	AttachInterrupt
-DEFAULT	LITERAL1	AnalogReference
-EXTERNAL	LITERAL1	AnalogReference
-INTERNAL	LITERAL1	AnalogReference
-INTERNAL1V1	LITERAL1	AnalogReference
-INTERNAL2V56	LITERAL1	AnalogReference
+# LITERAL2 specifies constants
 
-# KEYWORD1 specifies datatypes and C/C++ keywords
+HIGH	LITERAL2	Constants
+LOW	LITERAL2	Constants
+INPUT	LITERAL2	Constants
+INPUT_PULLUP	LITERAL2	Constants
+OUTPUT	LITERAL2	Constants
+DEC	LITERAL2	Serial_Print
+BIN	LITERAL2	Serial_Print
+HEX	LITERAL2	Serial_Print
+OCT	LITERAL2	Serial_Print
+PI	LITERAL2
+HALF_PI	LITERAL2
+TWO_PI	LITERAL2
+LSBFIRST	LITERAL2	ShiftOut
+MSBFIRST	LITERAL2	ShiftOut
+CHANGE	LITERAL2	AttachInterrupt
+FALLING	LITERAL2	AttachInterrupt
+RISING	LITERAL2	AttachInterrupt
+DEFAULT	LITERAL2	AnalogReference
+EXTERNAL	LITERAL2	AnalogReference
+INTERNAL	LITERAL2	AnalogReference
+INTERNAL1V1	LITERAL2	AnalogReference
+INTERNAL2V56	LITERAL2	AnalogReference
 
-boolean	KEYWORD1	BooleanVariables
-break	KEYWORD1	Break
-byte	KEYWORD1	Byte
-case	KEYWORD1	SwitchCase
-char	KEYWORD1	Char
-class	KEYWORD1
-const	KEYWORD1	Const
-continue	KEYWORD1	Continue
-default	KEYWORD1	SwitchCase	
-do	KEYWORD1	DoWhile
-double	KEYWORD1	Double
-else	KEYWORD1	Else
-false	KEYWORD1	Constants
-float	KEYWORD1	Float
-for	KEYWORD1	For
-if	KEYWORD1	If
-int	KEYWORD1	Int
-long	KEYWORD1	Long
-new	KEYWORD1	
-null	KEYWORD1	
-private	KEYWORD1
-protected	KEYWORD1	
-public	KEYWORD1	
-register	KEYWORD1	
-return	KEYWORD1	Return	
-short	KEYWORD1
-signed	KEYWORD1
-static	KEYWORD1	Static
-String	KEYWORD1	String	
-switch	KEYWORD1	SwitchCase
-this	KEYWORD1	
-throw	KEYWORD1	
-try	KEYWORD1	
-true	KEYWORD1	
-unsigned	KEYWORD1
-void	KEYWORD1	Void
-while	KEYWORD1	While
-word	KEYWORD1	Word
+boolean	LITERAL2	BooleanVariables
+byte	LITERAL2	Byte
+const	LITERAL2	Const
+false	LITERAL2	Constants
+float	LITERAL2	Float
+null	LITERAL2	
+int	LITERAL2	Int
+long	LITERAL2	Long
+new	LITERAL2	
+private	LITERAL2
+protected	LITERAL2	
+public	LITERAL2	
+short	LITERAL2
+signed	LITERAL2
+static	LITERAL2	Static
+String	LITERAL2	String
+void	LITERAL2	Void
+true	LITERAL2	
+unsigned	LITERAL2
 
-# operators aren't highlighted, but may have documentation
-
-+=		IncrementCompound
-+		Arithmetic
-[]		arrayaccess
-=		assign
-&		BitwiseAnd
-|		BitwiseAnd
-,		
-//		Comments
-?:		
-{}		Braces
---		Increment
-/		Arithmetic
-/*		Comments
-.		dot
-==		
-<		greaterthan
-<=		greaterthanorequalto
-++		Increment
-!=		inequality
-<<		Bitshift
-<		lessthan
-<=		lessthanorequalto
-&&		Boolean
-!		Boolean
-||		Boolean
--		Arithmetic
-%		Modulo
-*		Arithmetic
-()		parentheses
->>		Bitshift
-;		SemiColon
--=		IncrementCompound
-
-# these are datatypes, but we've also defined functions to cast to them
-
-boolean	KEYWORD2	boolean_
-byte	KEYWORD2	byte_
-char	KEYWORD2	char_
-float	KEYWORD2	float_
-int	KEYWORD2	int_
-long	KEYWORD2	long_
-word	KEYWORD2	word_
+boolean	LITERAL2	boolean_
+byte	LITERAL2	byte_
+char	LITERAL2	char_
+float	LITERAL2	float_
+int	LITERAL2	int_
+long	LITERAL2	long_
+word	LITERAL2	word_
 
 # KEYWORD2 specifies methods and functions
 
@@ -165,11 +112,11 @@ shiftOut	KEYWORD2	ShiftOut
 tone	KEYWORD2	Tone
 yield	KEYWORD2	Yield
 
-Serial	KEYWORD3	Serial
-Serial1	KEYWORD3	Serial
-Serial2	KEYWORD3	Serial
-Serial3	KEYWORD3	Serial
-SerialUSB	KEYWORD3	Serial
+Serial	KEYWORD1	Serial
+Serial1	KEYWORD1	Serial
+Serial2	KEYWORD1	Serial
+Serial3	KEYWORD1	Serial
+SerialUSB	KEYWORD1	Serial
 begin	KEYWORD2	Serial_Begin
 end	KEYWORD2	Serial_End
 peek	KEYWORD2	Serial_Peek
@@ -208,10 +155,8 @@ substring	KEYWORD2
 toCharArray	KEYWORD2
 toInt	KEYWORD2
 
-# USB-related keywords
-
-Keyboard	KEYWORD3
-Mouse	KEYWORD3
+Keyboard	KEYWORD1
+Mouse	KEYWORD1
 press	KEYWORD2
 release	KEYWORD2
 releaseAll	KEYWORD2
@@ -220,5 +165,63 @@ click	KEYWORD2
 move	KEYWORD2
 isPressed	KEYWORD2
 
+# KEYWORD3 specifies structures
+
+break	KEYWORD3	Break
+case	KEYWORD3	SwitchCase
+char	KEYWORD3	Char
+class	KEYWORD3
+continue	KEYWORD3	Continue
+default	KEYWORD3	SwitchCase	
+do	KEYWORD3	DoWhile
+double	KEYWORD3	Double
+else	KEYWORD3	Else
+for	KEYWORD3	For
+if	KEYWORD3	If
+register	KEYWORD3	
+return	KEYWORD3	Return	
+	
+switch	KEYWORD3	SwitchCase
+this	KEYWORD3	
+throw	KEYWORD3	
+try	KEYWORD3
+while	KEYWORD3	While
+word	KEYWORD3	Word
+
 setup	KEYWORD3	Setup
 loop	KEYWORD3	Loop
+
+# operators aren't highlighted, but may have documentation
+
++=		IncrementCompound
++		Arithmetic
+[]		arrayaccess
+=		assign
+&		BitwiseAnd
+|		BitwiseAnd
+,		
+//		Comments
+?:		
+{}		Braces
+--		Increment
+/		Arithmetic
+/*		Comments
+.		dot
+==		
+<		greaterthan
+<=		greaterthanorequalto
+++		Increment
+!=		inequality
+<<		Bitshift
+<		lessthan
+<=		lessthanorequalto
+&&		Boolean
+!		Boolean
+||		Boolean
+-		Arithmetic
+%		Modulo
+*		Arithmetic
+()		parentheses
+>>		Bitshift
+;		SemiColon
+-=		IncrementCompound

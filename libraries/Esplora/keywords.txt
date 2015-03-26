@@ -4,7 +4,7 @@
 # Class
 #######################################
 
-Esplora	KEYWORD3
+Esplora	KEYWORD1
 
 #######################################
 # Methods and Functions 
