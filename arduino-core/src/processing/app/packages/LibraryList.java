@@ -29,13 +29,14 @@
 package processing.app.packages;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 import processing.app.helpers.FileUtils;
 
 @SuppressWarnings("serial")
-public class LibraryList extends ArrayList<UserLibrary> {
+public class LibraryList extends LinkedList<UserLibrary> {
 
   public LibraryList(LibraryList libs) {
     super(libs);
@@ -43,6 +44,10 @@ public class LibraryList extends ArrayList<UserLibrary> {
 
   public LibraryList() {
     super();
+  }
+
+  public LibraryList(List<UserLibrary> ideLibs) {
+    super(ideLibs);
   }
 
   public UserLibrary getByName(String name) {
@@ -69,9 +74,11 @@ public class LibraryList extends ArrayList<UserLibrary> {
 
   public LibraryList filterLibrariesInSubfolder(File subFolder) {
     LibraryList res = new LibraryList();
-    for (UserLibrary lib : this)
-      if (FileUtils.isSubDirectory(subFolder, lib.getInstalledFolder()))
+    for (UserLibrary lib : this) {
+      if (FileUtils.isSubDirectory(subFolder, lib.getInstalledFolder())) {
         res.add(lib);
+      }
+    }
     return res;
   }
 }

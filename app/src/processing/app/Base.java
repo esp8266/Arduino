@@ -26,6 +26,9 @@ import cc.arduino.contributions.libraries.ui.LibraryManagerUI;
 import cc.arduino.packages.DiscoveryManager;
 import cc.arduino.contributions.packages.ui.ContributionManagerUI;
 import cc.arduino.view.SplashScreenHelper;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Collections2;
 import org.apache.commons.lang3.StringUtils;
 import processing.app.debug.TargetBoard;
 import processing.app.debug.TargetPackage;
@@ -58,6 +61,13 @@ import static processing.app.I18n._;
  * files and images, etc) that comes from that.
  */
 public class Base {
+
+  public static final Predicate<UserLibrary> CONTRIBUTED = new Predicate<UserLibrary>() {
+    @Override
+    public boolean apply(UserLibrary library) {
+      return library.getTypes() == null || library.getTypes().isEmpty() || library.getTypes().contains("Contributed");
+    }
+  };
 
   static private boolean commandLine;
   public static SplashScreenHelper splashScreenHelper = new SplashScreenHelper(SplashScreen.getSplashScreen());
@@ -1012,13 +1022,15 @@ public class Base {
   }
 
   public LibraryList getIDELibs() {
-    LibraryList res = new LibraryList(BaseNoGui.librariesIndexer.getInstalledLibraries());
-    res.removeAll(getUserLibs());
-    return res;
+    LibraryList installedLibraries = new LibraryList(BaseNoGui.librariesIndexer.getInstalledLibraries());
+    List<UserLibrary> libs = new LinkedList<UserLibrary>(Collections2.filter(new LinkedList<UserLibrary>(installedLibraries), Predicates.not(CONTRIBUTED)));
+    return new LibraryList(libs);
   }
 
   public LibraryList getUserLibs() {
-    return BaseNoGui.getUserLibs();
+    LibraryList installedLibraries = new LibraryList(BaseNoGui.librariesIndexer.getInstalledLibraries());
+    List<UserLibrary> libs = new LinkedList<UserLibrary>(Collections2.filter(new LinkedList<UserLibrary>(installedLibraries), CONTRIBUTED));
+    return new LibraryList(libs);
   }
 
   public void rebuildImportMenu(JMenu importMenu) {
