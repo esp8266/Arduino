@@ -8,6 +8,9 @@ ARDUINO 1.6.2
 * Available ports list is now generated in background: hence "tools" menu is much faster
 * MacOSX: appbundler merged our contribution, switching to upstream version https://bitbucket.org/infinitekind/appbundler/
 
+[core]
+* Stream: fixed bug in findUntil routine #2591 @Xuth
+
 [libraries]
 * EEPROM: Replaced existing library with more complete implementation @Chris--A
 * SD: fixed endless timeout on 32bit core (Due) @Timmmm
