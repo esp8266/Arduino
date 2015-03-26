@@ -28,10 +28,10 @@
  */
 package cc.arduino.contributions.libraries.ui;
 
+import cc.arduino.contributions.VersionComparator;
 import cc.arduino.contributions.libraries.ContributedLibrary;
 import cc.arduino.contributions.libraries.LibrariesIndexer;
 import cc.arduino.contributions.packages.ContributedPlatform;
-import cc.arduino.contributions.VersionComparator;
 import cc.arduino.contributions.ui.FilteredAbstractTableModel;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
@@ -279,10 +279,12 @@ public class LibrariesIndexTableModel extends FilteredAbstractTableModel<Contrib
 
   private void updateContributions() {
     contributions.clear();
-    for (ContributedLibrary l : indexer.getIndex().getLibraries())
+    for (ContributedLibrary l : indexer.getIndex().getLibraries()) {
       applyFilterToLibrary(l);
-    for (ContributedLibrary l : indexer.getInstalledLibraries())
+    }
+    for (ContributedLibrary l : indexer.getInstalledLibraries()) {
       applyFilterToLibrary(l);
+    }
     Collections.sort(contributions);
   }
 

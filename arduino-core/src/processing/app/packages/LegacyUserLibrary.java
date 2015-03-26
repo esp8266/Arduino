@@ -123,8 +123,4 @@ public class LegacyUserLibrary extends UserLibrary {
     return "LegacyLibrary:" + name + "\n";
   }
 
-  @Override
-  public String getSupportLevel() {
-    return "Unsupported";
-  }
 }

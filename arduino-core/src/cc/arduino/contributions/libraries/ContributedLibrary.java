@@ -58,8 +58,6 @@ public abstract class ContributedLibrary extends DownloadableContribution {
 
   public abstract String getSentence();
 
-  public abstract String getSupportLevel();
-
   public abstract List<String> getArchitectures();
 
   public abstract List<String> getTypes();
@@ -91,8 +89,7 @@ public abstract class ContributedLibrary extends DownloadableContribution {
    * @return
    */
   public boolean supportsArchitecture(String reqArch) {
-    return getArchitectures().contains(reqArch) ||
-            getArchitectures().contains("*");
+    return getArchitectures().contains(reqArch) || getArchitectures().contains("*");
   }
 
   /**

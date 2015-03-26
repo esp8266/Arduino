@@ -278,8 +278,4 @@ public class UserLibrary extends ContributedLibrary {
     return res;
   }
 
-  @Override
-  public String getSupportLevel() {
-    return "Unsupported";
-  }
 }

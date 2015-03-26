@@ -87,7 +87,7 @@ public class LibraryManagerUI extends InstallerJDialog<ContributedLibrary> {
   public LibraryManagerUI(Frame parent) {
     super(parent, "Library Manager", Dialog.ModalityType.APPLICATION_MODAL, _("No internet connection available, the list of available libraries is not complete. You will be able to manage only the libraries you've already installed."));
 
-    filtersContainer.add(new JLabel(_("Category:")), 1);
+    filtersContainer.add(new JLabel(_("Topic")), 1);
     filtersContainer.remove(2);
 
     typeChooser = new JComboBox();
@@ -95,8 +95,9 @@ public class LibraryManagerUI extends InstallerJDialog<ContributedLibrary> {
     typeChooser.setEnabled(false);
 
     filtersContainer.add(Box.createHorizontalStrut(5), 0);
-    filtersContainer.add(new JLabel(_("Type:")), 1);
-    filtersContainer.add(typeChooser, 2);
+    filtersContainer.add(new JLabel(_("Type")), 1);
+    filtersContainer.add(Box.createHorizontalStrut(5), 2);
+    filtersContainer.add(typeChooser, 3);
   }
 
   protected final ActionListener typeChooserActionListener = new ActionListener() {
@@ -136,8 +137,6 @@ public class LibraryManagerUI extends InstallerJDialog<ContributedLibrary> {
 
     // Load categories
     categoryChooser.addItem(new DropdownAllItem());
-    categoryChooser.addItem(new DropdownInstalledContributionItem());
-    categoryChooser.addItem(new DropdownBuiltInLibrariesItem());
     Collection<String> categories = indexer.getIndex().getCategories();
     for (String category : categories) {
       categoryChooser.addItem(new DropdownLibraryOfCategoryItem(category));
@@ -151,13 +150,13 @@ public class LibraryManagerUI extends InstallerJDialog<ContributedLibrary> {
     typeFilter = null;
     typeChooser.removeAllItems();
     typeChooser.addItem(new DropdownAllItem());
+    typeChooser.addItem(new DropdownInstalledContributionItem());
     Collection<String> types = indexer.getIndex().getTypes();
     for (String type : types) {
       typeChooser.addItem(new DropdownLibraryOfTypeItem(type));
     }
     typeChooser.setEnabled(typeChooser.getItemCount() > 1);
     typeChooser.addActionListener(typeChooserActionListener);
-    typeChooser.setSelectedIndex(1);
 
     filterField.setEnabled(contribModel.getRowCount() > 0);
 
