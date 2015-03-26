@@ -33,17 +33,23 @@ import cc.arduino.contributions.libraries.LibrariesIndexer;
 import cc.arduino.contributions.packages.ui.InstallerJDialogUncaughtExceptionHandler;
 import cc.arduino.contributions.ui.*;
 import cc.arduino.utils.Progress;
+import com.google.common.base.Predicate;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Arrays;
 import java.util.Collection;
 
 import static processing.app.I18n._;
 
 @SuppressWarnings("serial")
-public class LibraryManagerUI extends InstallerJDialog {
+public class LibraryManagerUI extends InstallerJDialog<ContributedLibrary> {
 
   private LibrariesIndexer indexer;
+  private final JComboBox typeChooser;
+  private Predicate<ContributedLibrary> typeFilter;
 
   @Override
   protected FilteredAbstractTableModel createContribModel() {
@@ -80,11 +86,46 @@ public class LibraryManagerUI extends InstallerJDialog {
 
   public LibraryManagerUI(Frame parent) {
     super(parent, "Library Manager", Dialog.ModalityType.APPLICATION_MODAL, _("No internet connection available, the list of available libraries is not complete. You will be able to manage only the libraries you've already installed."));
+
+    filtersContainer.add(new JLabel(_("Category:")), 1);
+    filtersContainer.remove(2);
+
+    typeChooser = new JComboBox();
+    typeChooser.setMaximumRowCount(20);
+    typeChooser.setEnabled(false);
+
+    filtersContainer.add(Box.createHorizontalStrut(5), 0);
+    filtersContainer.add(new JLabel(_("Type:")), 1);
+    filtersContainer.add(typeChooser, 2);
+  }
+
+  protected final ActionListener typeChooserActionListener = new ActionListener() {
+
+    @Override
+    public void actionPerformed(ActionEvent event) {
+      DropdownItem<ContributedLibrary> selected = (DropdownItem<ContributedLibrary>) typeChooser.getSelectedItem();
+      if (typeFilter == null || !typeFilter.equals(selected)) {
+        typeFilter = selected.getFilterPredicate();
+        if (contribTable.getCellEditor() != null) {
+          contribTable.getCellEditor().stopCellEditing();
+        }
+        updateIndexFilter(filters, categoryFilter, typeFilter);
+      }
+    }
+  };
+
+  @Override
+  public void updateIndexFilter(String[] filters, Predicate<ContributedLibrary>... additionalFilters) {
+    if (additionalFilters.length == 1) {
+      additionalFilters = new Predicate[] { additionalFilters[0], typeFilter };
+    }
+    super.updateIndexFilter(filters, additionalFilters);
   }
 
   public void setIndexer(LibrariesIndexer indexer) {
     this.indexer = indexer;
     categoryChooser.removeActionListener(categoryChooserActionListener);
+    typeChooser.removeActionListener(typeChooserActionListener);
 
     // TODO: Remove setIndexer and make getContribModel 
     // return a FilteredAbstractTableModel
@@ -92,8 +133,6 @@ public class LibraryManagerUI extends InstallerJDialog {
 
     categoryFilter = null;
     categoryChooser.removeAllItems();
-
-    categoryChooser.addActionListener(categoryChooserActionListener);
 
     // Load categories
     categoryChooser.addItem(new DropdownAllItem());
@@ -104,9 +143,21 @@ public class LibraryManagerUI extends InstallerJDialog {
       categoryChooser.addItem(new DropdownLibraryOfCategoryItem(category));
     }
 
-    // Enable categories combo only if there are two or more choices
-    int count = categoryChooser.getItemCount();
-    categoryChooser.setEnabled(count > 1);
+    categoryChooser.setEnabled(categoryChooser.getItemCount() > 1);
+
+    categoryChooser.addActionListener(categoryChooserActionListener);
+    categoryChooser.setSelectedIndex(0);
+
+    typeFilter = null;
+    typeChooser.removeAllItems();
+    typeChooser.addItem(new DropdownAllItem());
+    Collection<String> types = indexer.getIndex().getTypes();
+    for (String type : types) {
+      typeChooser.addItem(new DropdownLibraryOfTypeItem(type));
+    }
+    typeChooser.setEnabled(typeChooser.getItemCount() > 1);
+    typeChooser.addActionListener(typeChooserActionListener);
+    typeChooser.setSelectedIndex(1);
 
     filterField.setEnabled(contribModel.getRowCount() > 0);
 

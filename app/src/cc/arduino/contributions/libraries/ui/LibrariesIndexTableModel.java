@@ -34,6 +34,7 @@ import cc.arduino.contributions.packages.ContributedPlatform;
 import cc.arduino.contributions.VersionComparator;
 import cc.arduino.contributions.ui.FilteredAbstractTableModel;
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 
 import java.util.*;
@@ -137,8 +138,8 @@ public class LibrariesIndexTableModel extends FilteredAbstractTableModel<Contrib
   Predicate<ContributedLibrary> selectedCategoryFilter = null;
   String selectedFilters[] = null;
 
-  public void updateIndexFilter(Predicate<ContributedLibrary> categoryFilter, String filters[]) {
-    selectedCategoryFilter = categoryFilter;
+  public void updateIndexFilter(String filters[], Predicate<ContributedLibrary>... additionalFilters) {
+    selectedCategoryFilter = Predicates.and(additionalFilters);
     selectedFilters = filters;
     update();
   }

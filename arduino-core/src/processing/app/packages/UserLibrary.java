@@ -191,6 +191,11 @@ public class UserLibrary extends ContributedLibrary {
   }
 
   @Override
+  public List<String> getTypes() {
+    return Arrays.asList("Contributed");
+  }
+
+  @Override
   public String getLicense() {
     return license;
   }

@@ -62,6 +62,8 @@ public abstract class ContributedLibrary extends DownloadableContribution {
 
   public abstract List<String> getArchitectures();
 
+  public abstract List<String> getTypes();
+
   public abstract List<ContributedLibraryReference> getRequires();
 
   private boolean readOnly;

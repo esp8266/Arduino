@@ -62,4 +62,18 @@ public abstract class LibrariesIndex {
 
     return categories;
   }
+
+  public List<String> getTypes() {
+    Collection<String> typesAccumulator = new HashSet<String>();
+    for (ContributedLibrary lib : getLibraries()) {
+      if (lib.getTypes() != null) {
+        typesAccumulator.addAll(lib.getTypes());
+      }
+    }
+
+    List<String> types = new LinkedList<String>(typesAccumulator);
+    Collections.sort(types);
+
+    return types;
+  }
 }

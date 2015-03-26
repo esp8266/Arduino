@@ -33,6 +33,7 @@ import cc.arduino.contributions.packages.ContributedPlatform;
 import cc.arduino.contributions.packages.ContributionsIndex;
 import cc.arduino.contributions.ui.FilteredAbstractTableModel;
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -136,11 +137,12 @@ public class ContributionIndexTableModel extends FilteredAbstractTableModel<Cont
     index = _index;
   }
 
-  public void updateIndexFilter(Predicate<ContributedPlatform> categoryFilter, String filters[]) {
+  public void updateIndexFilter(String filters[], Predicate<ContributedPlatform>... additionalFilters) {
     contributions.clear();
+    Predicate<ContributedPlatform> filter = Predicates.and(additionalFilters);
     for (ContributedPackage pack : index.getPackages()) {
       for (ContributedPlatform platform : pack.getPlatforms()) {
-        if (!categoryFilter.apply(platform)) {
+        if (!filter.apply(platform)) {
           continue;
         }
         if (!stringContainsAll(platform.getName(), filters))

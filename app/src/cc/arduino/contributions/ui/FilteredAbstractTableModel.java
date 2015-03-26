@@ -34,6 +34,6 @@ import javax.swing.table.AbstractTableModel;
 
 public abstract class FilteredAbstractTableModel<T> extends AbstractTableModel {
 
-  abstract public void updateIndexFilter(Predicate<T> categoryFilter, String[] filters);
+  abstract public void updateIndexFilter(String[] filters, Predicate<T>... additionalFilters);
 
 }

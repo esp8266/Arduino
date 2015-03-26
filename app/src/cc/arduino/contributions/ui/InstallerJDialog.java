@@ -28,8 +28,11 @@
  */
 package cc.arduino.contributions.ui;
 
+import cc.arduino.contributions.packages.ui.ContributionIndexTableModel;
 import cc.arduino.contributions.ui.listeners.AbstractKeyListener;
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Collections2;
 import processing.app.Base;
 import processing.app.Theme;
 
@@ -42,6 +45,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
 
 import static cc.arduino.contributions.packages.ui.ContributionIndexTableModel.DESCRIPTION_COL;
 import static processing.app.I18n._;
@@ -50,13 +56,10 @@ public abstract class InstallerJDialog<T> extends JDialog {
 
   // Toolbar on top of the window:
   // - Categories drop-down menu
-  protected final JLabel categoryLabel;
   protected final JComboBox categoryChooser;
-  protected final Component categoryStrut1;
-  protected final Component categoryStrut2;
-  protected final Component categoryStrut3;
   // - Search text-field
   protected final FilterJTextField filterField;
+  protected final JPanel filtersContainer;
   // Currently selected category and filters
   protected Predicate<T> categoryFilter;
   protected String[] filters;
@@ -65,7 +68,7 @@ public abstract class InstallerJDialog<T> extends JDialog {
   // Real contribution table
   protected JTable contribTable;
   // Model behind the table
-  protected FilteredAbstractTableModel contribModel;
+  protected FilteredAbstractTableModel<T> contribModel;
 
   abstract protected FilteredAbstractTableModel createContribModel();
 
@@ -90,12 +93,6 @@ public abstract class InstallerJDialog<T> extends JDialog {
     pane.setLayout(new BorderLayout());
 
     {
-      categoryStrut1 = Box.createHorizontalStrut(5);
-      categoryStrut2 = Box.createHorizontalStrut(5);
-      categoryStrut3 = Box.createHorizontalStrut(5);
-
-      categoryLabel = new JLabel(_("Category:"));
-
       categoryChooser = new JComboBox();
       categoryChooser.setMaximumRowCount(20);
       categoryChooser.setEnabled(false);
@@ -107,20 +104,20 @@ public abstract class InstallerJDialog<T> extends JDialog {
           if (contribTable.getCellEditor() != null) {
             contribTable.getCellEditor().stopCellEditing();
           }
-          contribModel.updateIndexFilter(categoryFilter, filters);
+          updateIndexFilter(filters, categoryFilter);
         }
       };
 
-      JPanel panel = new JPanel();
-      panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-      panel.add(categoryStrut1);
-      panel.add(categoryLabel);
-      panel.add(categoryStrut2);
-      panel.add(categoryChooser);
-      panel.add(categoryStrut3);
-      panel.add(filterField);
-      panel.setBorder(new EmptyBorder(7, 7, 7, 7));
-      pane.add(panel, BorderLayout.NORTH);
+      filtersContainer = new JPanel();
+      filtersContainer.setLayout(new BoxLayout(filtersContainer, BoxLayout.X_AXIS));
+      filtersContainer.add(Box.createHorizontalStrut(5));
+      filtersContainer.add(new JLabel(_("Type:")));
+      filtersContainer.add(Box.createHorizontalStrut(5));
+      filtersContainer.add(categoryChooser);
+      filtersContainer.add(Box.createHorizontalStrut(5));
+      filtersContainer.add(filterField);
+      filtersContainer.setBorder(new EmptyBorder(7, 7, 7, 7));
+      pane.add(filtersContainer, BorderLayout.NORTH);
     }
 
     contribModel = createContribModel();
@@ -216,7 +213,7 @@ public abstract class InstallerJDialog<T> extends JDialog {
     }
     setProgressVisible(false, "");
 
-    setMinimumSize(new Dimension(600, 450));
+    setMinimumSize(new Dimension(800, 450));
 
     setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -233,6 +230,11 @@ public abstract class InstallerJDialog<T> extends JDialog {
         onUpdatePressed();
       }
     });
+  }
+
+  public void updateIndexFilter(String[] filters, Predicate<T>... additionalFilters) {
+    Collection<Predicate<T>> notNullAdditionalFilters = Collections2.filter(Arrays.asList(additionalFilters), Predicates.notNull());
+    contribModel.updateIndexFilter(filters, notNullAdditionalFilters.toArray(new Predicate[notNullAdditionalFilters.size()]));
   }
 
   public void setErrorMessage(String message) {
@@ -273,7 +275,7 @@ public abstract class InstallerJDialog<T> extends JDialog {
         if (contribTable.getCellEditor() != null) {
           contribTable.getCellEditor().stopCellEditing();
         }
-        contribModel.updateIndexFilter(categoryFilter, filters);
+        updateIndexFilter(filters, categoryFilter);
       }
     }
   };
