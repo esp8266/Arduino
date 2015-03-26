@@ -46,11 +46,6 @@ import java.util.List;
 public class Platform extends processing.app.Platform {
 
   public void setLookAndFeel() throws Exception {
-    // Use the Quaqua L & F on OS X to make JFileChooser less awful
-    UIManager.setLookAndFeel("ch.randelshofer.quaqua.QuaquaLookAndFeel");
-    // undo quaqua trying to fix the margins, since we've already
-    // hacked that in, bit by bit, over the years
-    UIManager.put("Component.visualMargin", new Insets(1, 1, 1, 1));
   }
 
   public Platform() {
