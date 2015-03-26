@@ -72,6 +72,9 @@ public class VersionComparator implements Comparator<String> {
   }
 
   private Version valueOf(String ver) {
+    if (ver.endsWith("b")) {
+      ver = ver.substring(0, ver.lastIndexOf("b")) + ".1";
+    }
     String[] verParts = ver.split("\\.");
     if (verParts.length < 3) {
       if (verParts.length == 2) {
