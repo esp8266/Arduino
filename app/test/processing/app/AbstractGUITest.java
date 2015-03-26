@@ -15,6 +15,8 @@ public abstract class AbstractGUITest {
 
   @Before
   public void startUpTheIDE() throws Exception {
+    System.setProperty("mrj.version", "whynot"); //makes sense only on osx. See https://github.com/alexruiz/fest-swing-1.x/issues/2#issuecomment-86532042
+
     FailOnThreadViolationRepaintManager.install();
 
     Base.initPlatform();
