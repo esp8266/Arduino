@@ -33,6 +33,7 @@ import cc.arduino.contributions.filters.InstalledPredicate;
 import cc.arduino.contributions.libraries.ContributedLibrary;
 import cc.arduino.contributions.libraries.ContributedLibraryComparator;
 import cc.arduino.contributions.libraries.filters.BuiltInPredicate;
+import cc.arduino.contributions.libraries.filters.InstalledLibraryPredicate;
 import cc.arduino.contributions.libraries.filters.OnlyUpstreamReleasePredicate;
 import cc.arduino.contributions.ui.InstallerTableCell;
 import cc.arduino.contributions.ui.listeners.DelegatingKeyListener;
@@ -65,6 +66,7 @@ import static processing.app.I18n.format;
 @SuppressWarnings("serial")
 public class ContributedLibraryTableCell extends InstallerTableCell {
 
+  private final LibraryManagerUI indexer;
   private JPanel panel;
   private JButton installButton;
   private Component installButtonPlaceholder;
@@ -75,7 +77,9 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
   private JPanel inactiveButtonsPanel;
   private JLabel statusLabel;
 
-  public ContributedLibraryTableCell() {
+  public ContributedLibraryTableCell(LibraryManagerUI indexer) {
+    this.indexer = indexer;
+
     {
       installButton = new JButton(_("Install"));
       installButton.addActionListener(new ActionListener() {

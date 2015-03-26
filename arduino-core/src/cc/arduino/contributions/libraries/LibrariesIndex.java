@@ -26,7 +26,11 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  */
+
 package cc.arduino.contributions.libraries;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 
 import java.util.*;
 
@@ -34,10 +38,20 @@ public abstract class LibrariesIndex {
 
   public abstract List<ContributedLibrary> getLibraries();
 
+  public List<ContributedLibrary> find(final String name) {
+    return new LinkedList<ContributedLibrary>(Collections2.filter(getLibraries(), new Predicate<ContributedLibrary>() {
+      @Override
+      public boolean apply(ContributedLibrary contributedLibrary) {
+        return name.equals(contributedLibrary.getName());
+      }
+    }));
+  }
+
   public ContributedLibrary find(String name, String version) {
-    for (ContributedLibrary lib : getLibraries()) {
-      if (lib.getName().equals(name) && lib.getVersion().equals(version))
+    for (ContributedLibrary lib : find(name)) {
+      if (lib.getVersion().equals(version)) {
         return lib;
+      }
     }
     return null;
   }

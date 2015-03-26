@@ -39,7 +39,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Arrays;
 import java.util.Collection;
 
 import static processing.app.I18n._;
@@ -62,12 +61,12 @@ public class LibraryManagerUI extends InstallerJDialog<ContributedLibrary> {
 
   @Override
   protected InstallerTableCell createCellRenderer() {
-    return new ContributedLibraryTableCell();
+    return new ContributedLibraryTableCell(this);
   }
 
   @Override
   protected InstallerTableCell createCellEditor() {
-    return new ContributedLibraryTableCell() {
+    return new ContributedLibraryTableCell(this) {
       @Override
       protected void onInstall(ContributedLibrary selectedLibrary, ContributedLibrary installedLibrary) {
         if (selectedLibrary.isReadOnly()) {
@@ -150,7 +149,7 @@ public class LibraryManagerUI extends InstallerJDialog<ContributedLibrary> {
     typeFilter = null;
     typeChooser.removeAllItems();
     typeChooser.addItem(new DropdownAllItem());
-    typeChooser.addItem(new DropdownInstalledContributionItem());
+    typeChooser.addItem(new DropdownInstalledLibraryItem(indexer.getIndex()));
     Collection<String> types = indexer.getIndex().getTypes();
     for (String type : types) {
       typeChooser.addItem(new DropdownLibraryOfTypeItem(type));
@@ -167,6 +166,10 @@ public class LibraryManagerUI extends InstallerJDialog<ContributedLibrary> {
         setProgress(progress);
       }
     };
+  }
+
+  public LibrariesIndexer getIndexer() {
+    return indexer;
   }
 
   public void setProgress(Progress progress) {

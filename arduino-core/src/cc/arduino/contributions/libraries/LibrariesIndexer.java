@@ -28,14 +28,9 @@
  */
 package cc.arduino.contributions.libraries;
 
-import static processing.app.I18n._;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.module.mrbean.MrBeanModule;
 import processing.app.BaseNoGui;
 import processing.app.I18n;
 import processing.app.helpers.FileUtils;
@@ -44,9 +39,14 @@ import processing.app.packages.LegacyUserLibrary;
 import processing.app.packages.LibraryList;
 import processing.app.packages.UserLibrary;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.module.mrbean.MrBeanModule;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
+
+import static processing.app.I18n._;
 
 public class LibrariesIndexer {
 
@@ -60,7 +60,7 @@ public class LibrariesIndexer {
   public LibrariesIndexer(File preferencesFolder) {
     indexFile = new File(preferencesFolder, "library_index.json");
     stagingFolder = new File(preferencesFolder, "staging" + File.separator +
-        "libraries");
+            "libraries");
   }
 
   public void parseIndex() throws IOException {
@@ -109,9 +109,9 @@ public class LibrariesIndexer {
     for (File subfolder : list) {
       if (!BaseNoGui.isSanitaryName(subfolder.getName())) {
         String mess = I18n.format(_("The library \"{0}\" cannot be used.\n"
-            + "Library names must contain only basic letters and numbers.\n"
-            + "(ASCII only and no spaces, and it cannot start with a number)"),
-                                  subfolder.getName());
+                        + "Library names must contain only basic letters and numbers.\n"
+                        + "(ASCII only and no spaces, and it cannot start with a number)"),
+                subfolder.getName());
         BaseNoGui.showMessage(_("Ignoring bad library name"), mess);
         continue;
       }
@@ -119,21 +119,18 @@ public class LibrariesIndexer {
       try {
         scanLibrary(subfolder);
       } catch (IOException e) {
-        System.out.println(I18n.format(_("Invalid library found in {0}: {1}"),
-                                       subfolder, e.getMessage()));
+        System.out.println(I18n.format(_("Invalid library found in {0}: {1}"), subfolder, e.getMessage()));
       }
     }
   }
 
   private void scanLibrary(File folder) throws IOException {
-    boolean readOnly = !FileUtils
-        .isSubDirectory(sketchbookLibrariesFolder, folder);
+    boolean readOnly = !FileUtils.isSubDirectory(sketchbookLibrariesFolder, folder);
 
     // A library is considered "legacy" if it doesn't contains
     // a file called "library.properties"
     File check = new File(folder, "library.properties");
     if (!check.exists() || !check.isFile()) {
-
       // Create a legacy library and exit
       LegacyUserLibrary lib = LegacyUserLibrary.create(folder);
       lib.setReadOnly(readOnly);
@@ -148,12 +145,20 @@ public class LibrariesIndexer {
 
     // Check if we can find the same library in the index
     // and mark it as installed
-    String libName = folder.getName(); // XXX: lib.getName()?
-    ContributedLibrary foundLib = index.find(libName, lib.getVersion());
+    ContributedLibrary foundLib = index.find(lib.getName(), lib.getVersion());
     if (foundLib != null) {
       foundLib.setInstalled(true);
       foundLib.setInstalledFolder(folder);
       foundLib.setReadOnly(readOnly);
+      lib.setTypes(foundLib.getTypes());
+    }
+
+    if (lib.isReadOnly() && lib.getTypes() == null && !lib.getDeclaredTypes().isEmpty()) {
+      lib.setTypes(lib.getDeclaredTypes());
+    }
+
+    if (lib.getTypes() == null) {
+      lib.setTypes(Arrays.asList("Contributed"));
     }
   }
 

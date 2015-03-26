@@ -28,16 +28,17 @@
  */
 package processing.app.packages;
 
+import cc.arduino.contributions.libraries.ContributedLibrary;
+import cc.arduino.contributions.libraries.ContributedLibraryReference;
+import processing.app.helpers.FileUtils;
+import processing.app.helpers.PreferencesMap;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
-
-import processing.app.helpers.FileUtils;
-import processing.app.helpers.PreferencesMap;
-import cc.arduino.contributions.libraries.ContributedLibrary;
-import cc.arduino.contributions.libraries.ContributedLibraryReference;
 
 public class UserLibrary extends ContributedLibrary {
 
@@ -51,15 +52,17 @@ public class UserLibrary extends ContributedLibrary {
   private String category;
   private String license;
   private List<String> architectures;
+  private List<String> types;
+  private List<String> declaredTypes;
 
   private static final List<String> MANDATORY_PROPERTIES = Arrays
-      .asList(new String[] { "name", "version", "author", "maintainer",
-          "sentence", "paragraph", "url" });
+          .asList(new String[]{"name", "version", "author", "maintainer",
+                  "sentence", "paragraph", "url"});
 
-  private static final List<String> CATEGORIES = Arrays.asList(new String[] {
-      "Display", "Communication", "Signal Input/Output", "Sensors",
-      "Device Control", "Timing", "Data Storage", "Data Processing", "Other",
-      "Uncategorized" });
+  private static final List<String> CATEGORIES = Arrays.asList(new String[]{
+          "Display", "Communication", "Signal Input/Output", "Sensors",
+          "Device Control", "Timing", "Data Storage", "Data Processing", "Other",
+          "Uncategorized"});
 
   public static UserLibrary create(File libFolder) throws IOException {
     // Parse metadata
@@ -72,16 +75,16 @@ public class UserLibrary extends ContributedLibrary {
 
     // Compatibility with 1.5 rev.1 libraries:
     // "email" field changed to "maintainer"
-    if (!properties.containsKey("maintainer") &&
-        properties.containsKey("email"))
+    if (!properties.containsKey("maintainer") && properties.containsKey("email")) {
       properties.put("maintainer", properties.get("email"));
+    }
 
     // Compatibility with 1.5 rev.1 libraries:
     // "arch" folder no longer supported
     File archFolder = new File(libFolder, "arch");
     if (archFolder.isDirectory())
       throw new IOException("'arch' folder is no longer supported! See "
-          + "http://goo.gl/gfFJzU for more information");
+              + "http://goo.gl/gfFJzU for more information");
 
     // Check mandatory properties
     for (String p : MANDATORY_PROPERTIES)
@@ -99,7 +102,7 @@ public class UserLibrary extends ContributedLibrary {
       File utilFolder = new File(libFolder, "utility");
       if (utilFolder.exists() && utilFolder.isDirectory()) {
         throw new IOException(
-            "Library can't use both 'src' and 'utility' folders.");
+                "Library can't use both 'src' and 'utility' folders.");
       }
     } else {
       // Layout with source code on library's root and "utility" folders
@@ -110,8 +113,7 @@ public class UserLibrary extends ContributedLibrary {
     for (File file : libFolder.listFiles()) {
       if (file.isDirectory()) {
         if (FileUtils.isSCCSOrHiddenFile(file)) {
-          System.out.println("WARNING: Spurious " + file.getName() +
-              " folder in '" + properties.get("name") + "' library");
+          System.out.println("WARNING: Spurious " + file.getName() + " folder in '" + properties.get("name") + "' library");
           continue;
         }
       }
@@ -131,12 +133,22 @@ public class UserLibrary extends ContributedLibrary {
     if (!CATEGORIES.contains(category)) {
       category = "Uncategorized";
       System.out.println("WARNING: Category '" + category + "' in library " +
-          properties.get("name") + " is not valid. Setting to 'Uncategorized'");
+              properties.get("name") + " is not valid. Setting to 'Uncategorized'");
     }
 
     String license = properties.get("license");
-    if (license == null)
+    if (license == null) {
       license = "Unspecified";
+    }
+
+    String types = properties.get("types");
+    if (types == null) {
+      types = "Contributed";
+    }
+    List<String> typesList = new LinkedList<String>();
+    for (String type : types.split(",")) {
+      typesList.add(type.trim());
+    }
 
     UserLibrary res = new UserLibrary();
     res.setInstalledFolder(libFolder);
@@ -152,6 +164,7 @@ public class UserLibrary extends ContributedLibrary {
     res.license = license.trim();
     res.architectures = archs;
     res.layout = layout;
+    res.declaredTypes = typesList;
     return res;
   }
 
@@ -192,7 +205,11 @@ public class UserLibrary extends ContributedLibrary {
 
   @Override
   public List<String> getTypes() {
-    return Arrays.asList("Contributed");
+    return types;
+  }
+
+  public void setTypes(List<String> types) {
+    this.types = types;
   }
 
   @Override
@@ -244,20 +261,24 @@ public class UserLibrary extends ContributedLibrary {
     return null;
   }
 
+  public List<String> getDeclaredTypes() {
+    return declaredTypes;
+  }
+
   protected enum LibraryLayout {
     FLAT, RECURSIVE
-  };
+  }
 
   protected LibraryLayout layout;
 
   public File getSrcFolder() {
     switch (layout) {
-    case FLAT:
-      return getInstalledFolder();
-    case RECURSIVE:
-      return new File(getInstalledFolder(), "src");
-    default:
-      return null; // Keep compiler happy :-(
+      case FLAT:
+        return getInstalledFolder();
+      case RECURSIVE:
+        return new File(getInstalledFolder(), "src");
+      default:
+        return null; // Keep compiler happy :-(
     }
   }
 
