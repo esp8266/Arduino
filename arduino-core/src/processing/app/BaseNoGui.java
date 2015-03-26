@@ -609,13 +609,18 @@ public class BaseNoGui {
     librariesIndexer = new LibrariesIndexer(BaseNoGui.getSettingsFolder());
     File librariesIndexFile = librariesIndexer.getIndexFile();
     if (!librariesIndexFile.isFile()) {
-      try {
-        // Otherwise create an empty packages index
-        FileOutputStream out = new FileOutputStream(librariesIndexFile);
-        out.write("{ \"libraries\" : [ ] }".getBytes());
-        out.close();
-      } catch (IOException e) {
-        e.printStackTrace();
+      File defaultLibraryJsonFile = new File(getContentFile("dist"), "library_index.json");
+      if (defaultLibraryJsonFile.isFile()) {
+        FileUtils.copyFile(defaultLibraryJsonFile, librariesIndexFile);
+      } else {
+        try {
+          // Otherwise create an empty packages index
+          FileOutputStream out = new FileOutputStream(librariesIndexFile);
+          out.write("{ \"libraries\" : [ ] }".getBytes());
+          out.close();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
       }
     }
     librariesIndexer.parseIndex();
@@ -626,16 +631,11 @@ public class BaseNoGui {
     if (!distFolder.exists()) {
       return null;
     }
-    File[] files = distFolder.listFiles();
+    File[] files = distFolder.listFiles(new OnlyFilesWithExtension("tar.bz2", "zip", "tar.gz", "tar"));
     if (files.length > 1) {
       throw new IllegalStateException("More than one file in " + distFolder);
     }
-    File file = files[0];
-    if (!file.isFile() || !(file.getName().contains(".tar.") || file.getName().endsWith(".zip"))) {
-      throw new IllegalStateException(file + " must be a valid .tar.* or .zip file");
-    }
-
-    return file;
+    return files[0];
   }
 
   static protected void initPlatform() {

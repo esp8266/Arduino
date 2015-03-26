@@ -1001,6 +1001,7 @@
     <move file="${staging_folder}/work/dist/bundled_package/packages/arduino/tools/avrdude/avrdude-6.0.1" tofile="${staging_folder}/work/dist/bundled_package/packages/arduino/tools/avrdude/${avrdude_version}"/>
 
     <copy file="shared/bundled_package_index.json" tofile="${staging_folder}/work/dist/bundled_package/package_index.json"/>
+    <copy file="shared/bundled_library_index.json" tofile="${staging_folder}/work/dist/library_index.json"/>
   </target>
 
 </project>

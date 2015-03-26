@@ -29,13 +29,15 @@ public class OnlyFilesWithExtension implements FilenameFilter {
   String extensions[];
 
   public OnlyFilesWithExtension(String... ext) {
-    extensions = ext;
+    this.extensions = ext;
   }
 
   public boolean accept(File dir, String name) {
-    for (String ext : extensions)
-      if (name.endsWith(ext))
+    for (String ext : extensions) {
+      if (name.endsWith(ext)) {
         return true;
+      }
+    }
     return false;
   }
 

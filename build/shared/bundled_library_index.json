@@ -1,0 +1,264 @@
+{
+  "libraries": [
+    {
+      "name": "WiFi",
+      "version": "1.2",
+      "author": "Arduino",
+      "maintainer": "Arduino \u003cinfo@arduino.cc\u003e",
+      "sentence": "Enables network connection (local and Internet) using the Arduino WiFi shield. For all Arduino boards.",
+      "paragraph": "With this library you can instantiate Servers, Clients and send/receive UDP packets through WiFi. The shield can connect either to open or encrypted networks (WEP, WPA). The IP address can be assigned statically or through a DHCP. The library can also manage DNS.",
+      "website": "http://arduino.cc/en/Reference/WiFi",
+      "category": "Communication",
+      "architectures": [
+        "*"
+      ],
+      "types": [
+        "Arduino"
+      ],
+      "url": "http://arduino.cc/download.php?f=/libraries/WiFi-1.2.zip",
+      "archiveFileName": "WiFi-1.2.zip",
+      "size": 5318498,
+      "checksum": "SHA-256:f9ca7dce918fed50b5adc04433c3a51789b99b50d8ca68607b1fdffbd67eb539"
+    },
+    {
+      "name": "Bridge",
+      "version": "1.2",
+      "author": "Arduino",
+      "maintainer": "Arduino \u003cinfo@arduino.cc\u003e",
+      "sentence": "Enables the communication between the Linux processor and the AVR. For Arduino Yún and TRE only.",
+      "paragraph": "The Bridge library feature: access to the shared storage, run and manage linux processes, open a remote console, access to the linux file system, including the SD card, enstablish http clients or servers.",
+      "website": "http://arduino.cc/en/Reference/YunBridgeLibrary",
+      "category": "Communication",
+      "architectures": [
+        "*"
+      ],
+      "types": [
+        "Arduino"
+      ],
+      "url": "http://arduino.cc/download.php?f=/libraries/Bridge-1.2.zip",
+      "archiveFileName": "Bridge-1.2.zip",
+      "size": 79698,
+      "checksum": "SHA-256:a90ea655ba0a53f766364a235228255a208634bcf5e0797f66c82720669821b3"
+    },
+    {
+      "name": "GSM",
+      "version": "1.0",
+      "author": "Arduino",
+      "maintainer": "Arduino \u003cinfo@arduino.cc\u003e",
+      "sentence": "Enables GSM/GRPS network connection using the Arduino GSM Shield. For all Arduino boards BUT Arduino DUE.",
+      "paragraph": "Use this library to make/receive voice calls, to send and receive SMS with the Quectel M10 GSM module.\u003c/br\u003eThis library also allows you to connect to internet through the GPRS networks. You can either use web Clients and Servers.\u003c/br\u003e",
+      "website": "http://arduino.cc/en/Reference/GSM",
+      "category": "Communication",
+      "architectures": [
+        "avr"
+      ],
+      "types": [
+        "Arduino"
+      ],
+      "url": "http://arduino.cc/download.php?f=/libraries/GSM-1.0.zip",
+      "archiveFileName": "GSM-1.0.zip",
+      "size": 126171,
+      "checksum": "SHA-256:4c4666f74254f26cf6bd4548b8b06c66205b556a18a58e3c6be7c6343958edfa"
+    },
+    {
+      "name": "Robot IR Remote",
+      "version": "1.0",
+      "author": "Arduino",
+      "maintainer": "Arduino \u003cinfo@arduino.cc\u003e",
+      "sentence": "Allows controlling the Arduino Robot via an IR remote control. For Arduino Robot only.",
+      "website": "https://github.com/shirriff/Arduino-IRremote",
+      "category": "Device Control",
+      "architectures": [
+        "avr"
+      ],
+      "types": [
+        "Arduino"
+      ],
+      "url": "http://arduino.cc/download.php?f=/libraries/Robot_IR_Remote-1.0.zip",
+      "archiveFileName": "Robot_IR_Remote-1.0.zip",
+      "size": 22142,
+      "checksum": "SHA-256:cfa3f87b3d6c280f57d96282069c27d10654782b4fc31c1ab47ccff29cae5413"
+    },
+    {
+      "name": "Servo",
+      "version": "1.0",
+      "author": "Michael Margolis, Arduino",
+      "maintainer": "Arduino \u003cinfo@arduino.cc\u003e",
+      "sentence": "Allows Arduino boards to control a variety of servo motors. For all Arduino boards.",
+      "paragraph": "This library can control a great number of servos.\u003cbr /\u003eIt makes careful use of timers: the library can control 12 servos using only 1 timer.\u003cbr /\u003eOn the Arduino Due you can control up to 60 servos.\u003cbr /\u003e",
+      "website": "http://arduino.cc/en/Reference/Servo",
+      "category": "Device Control",
+      "architectures": [
+        "avr",
+        "sam"
+      ],
+      "types": [
+        "Arduino"
+      ],
+      "url": "http://arduino.cc/download.php?f=/libraries/Servo-1.0.zip",
+      "archiveFileName": "Servo-1.0.zip",
+      "size": 13868,
+      "checksum": "SHA-256:fc254ddded0abc097186a7c3823d8c52b90f9a683a7dab64be89abfb743ed092"
+    },
+    {
+      "name": "Stepper",
+      "version": "1.0",
+      "author": "Arduino",
+      "maintainer": "Arduino \u003cinfo@arduino.cc\u003e",
+      "sentence": "Allows Arduino boards to control a variety of stepper motors. For all Arduino boards.",
+      "paragraph": "This library allows you to control unipolar or bipolar stepper motors. To use it you will need a stepper motor, and the appropriate hardware to control it.",
+      "website": "http://arduino.cc/en/Reference/Stepper",
+      "category": "Device Control",
+      "architectures": [
+        "*"
+      ],
+      "types": [
+        "Arduino"
+      ],
+      "url": "http://arduino.cc/download.php?f=/libraries/Stepper-1.0.zip",
+      "archiveFileName": "Stepper-1.0.zip",
+      "size": 7671,
+      "checksum": "SHA-256:f703900afcb236631d3ab5ba904c9b1c3ef74b82528db93ffca855c27800bda0"
+    },
+    {
+      "name": "LiquidCrystal",
+      "version": "1.0",
+      "author": "Arduino, Adafruit",
+      "maintainer": "Arduino \u003cinfo@arduino.cc\u003e",
+      "sentence": "Allows communication with alphanumerical liquid crystal displays (LCDs). For all Arduino boards.",
+      "paragraph": "This library allows an Arduino board to control LiquidCrystal displays (LCDs) based on the Hitachi HD44780 (or a compatible) chipset, which is found on most text-based LCDs. The library works with in either 4 or 8 bit mode (i.e. using 4 or 8 data lines in addition to the rs, enable, and, optionally, the rw control lines).",
+      "website": "http://arduino.cc/en/Reference/LiquidCrystal",
+      "category": "Display",
+      "architectures": [
+        "*"
+      ],
+      "types": [
+        "Arduino"
+      ],
+      "url": "http://arduino.cc/download.php?f=/libraries/LiquidCrystal-1.0.zip",
+      "archiveFileName": "LiquidCrystal-1.0.zip",
+      "size": 15887,
+      "checksum": "SHA-256:a1210e20887cee267bce0039bdeab393647334d6b4972abc029dfbd662497c00"
+    },
+    {
+      "name": "Robot Control",
+      "version": "1.0",
+      "author": "Arduino",
+      "maintainer": "Arduino \u003cinfo@arduino.cc\u003e",
+      "sentence": "Enables easy access to the controls of the Arduino Robot Control board. For Arduino Robot only.",
+      "paragraph": "The Arduino robot is made by two independent boards. The Control Board is the top board of the Arduino Robot, with this library you can easily write sketches to control the robot.",
+      "website": "http://arduino.cc/en/Reference/RobotLibrary",
+      "category": "Device Control",
+      "architectures": [
+        "avr"
+      ],
+      "types": [
+        "Arduino"
+      ],
+      "url": "http://arduino.cc/download.php?f=/libraries/Robot_Control-1.0.zip",
+      "archiveFileName": "Robot_Control-1.0.zip",
+      "size": 107911,
+      "checksum": "SHA-256:0e44a693a72834de71add8a9d7a9de220bea5ab20582d6fc5aa4c2582809835a"
+    },
+    {
+      "name": "TFT",
+      "version": "1.0",
+      "author": "Arduino, Adafruit",
+      "maintainer": "Arduino \u003cinfo@arduino.cc\u003e",
+      "sentence": "Allows drawing text, images, and shapes on the Arduino TFT graphical display. For all Arduino boards.",
+      "paragraph": "This library is compatible with most of the TFT display based on the ST7735 chipset",
+      "website": "http://arduino.cc/en/Reference/TFTLibrary",
+      "category": "Display",
+      "architectures": [
+        "*"
+      ],
+      "types": [
+        "Arduino"
+      ],
+      "url": "http://arduino.cc/download.php?f=/libraries/TFT-1.0.zip",
+      "archiveFileName": "TFT-1.0.zip",
+      "size": 43501,
+      "checksum": "SHA-256:e64bb1bb23455f6a03e01694993c7f5b41e2c41e39f5cfbd77b32d9273aef56e"
+    },
+    {
+      "name": "Ethernet",
+      "version": "1.0",
+      "author": "Arduino",
+      "maintainer": "Arduino \u003cinfo@arduino.cc\u003e",
+      "sentence": "Enables network connection (local and Internet) using the Arduino Ethernet board or shield. For all Arduino boards.",
+      "paragraph": "With this library you can use the Arduino Ethernet (shield or board) to connect to Internet. The library provides both Client and server functionalities. The library permits you to connect to a local network also with DHCP and to resolve DNS.",
+      "website": "http://arduino.cc/en/Reference/Ethernet",
+      "category": "Communication",
+      "architectures": [
+        "*"
+      ],
+      "types": [
+        "Arduino"
+      ],
+      "url": "http://arduino.cc/download.php?f=/libraries/Ethernet-1.0.zip",
+      "archiveFileName": "Ethernet-1.0.zip",
+      "size": 47389,
+      "checksum": "SHA-256:ed1bda4683ffe2b2e90d083c430f8b253d8160545387bd89e0482201b619c19d"
+    },
+    {
+      "name": "SD",
+      "version": "1.0",
+      "author": "Arduino, SparkFun",
+      "maintainer": "Arduino \u003cinfo@arduino.cc\u003e",
+      "sentence": "Enables reading and writing on SD cards. For all Arduino boards.",
+      "paragraph": "Once an SD memory card is connected to the SPI interfare of the Arduino board you are enabled to create files and read/write on them. You can also move through directories on the SD card.",
+      "website": "http://arduino.cc/en/Reference/SD",
+      "category": "Data Storage",
+      "architectures": [
+        "*"
+      ],
+      "types": [
+        "Arduino"
+      ],
+      "url": "http://arduino.cc/download.php?f=/libraries/SD-1.0.zip",
+      "archiveFileName": "SD-1.0.zip",
+      "size": 59165,
+      "checksum": "SHA-256:5804e4eb7a6ca47f3e074bda86fc504eaea1fcebc8c182344a4a768015241197"
+    },
+    {
+      "name": "Esplora",
+      "version": "1.0",
+      "author": "Arduino",
+      "maintainer": "Arduino \u003cinfo@arduino.cc\u003e",
+      "sentence": "Grants easy access to the various sensors and actuators of the Esplora. For Arduino Esplora only.",
+      "paragraph": "The sensors available on the board are:2-Axis analog joystick with center push-button,4 push-buttons,microphone, light sensor, temperature sensor, 3-axis accelerometer, 2 TinkerKit input connectors.\u003c/br\u003eThe actuators available on the board are: bright RGB LED, piezo buzzer, 2 TinkerKit output connectors.",
+      "website": "http://arduino.cc/en/Reference/EsploraLibrary",
+      "category": "Device Control",
+      "architectures": [
+        "avr"
+      ],
+      "types": [
+        "Arduino"
+      ],
+      "url": "http://arduino.cc/download.php?f=/libraries/Esplora-1.0.zip",
+      "archiveFileName": "Esplora-1.0.zip",
+      "size": 19718,
+      "checksum": "SHA-256:93658339703db8166abfb41c4429cd85e06e86dcf3646eb079bc8413ffe9f392"
+    },
+    {
+      "name": "Firmata",
+      "version": "2.3.6",
+      "author": "Firmata Developers",
+      "maintainer": "Firmata Developers \u003cfirmata-devel@lists.sourceforge.net\u003e",
+      "sentence": "Enables the communication with computer apps using a standard serial protocol. For all Arduino boards.",
+      "paragraph": "The Firmata library implements the Firmata protocol for communicating with software on the host computer. This allows you to write custom firmware without having to create your own protocol and objects for the programming environment that you are using.",
+      "website": "http://firmata.org",
+      "category": "Device Control",
+      "architectures": [
+        "*"
+      ],
+      "types": [
+        "Arduino"
+      ],
+      "url": "http://arduino.cc/download.php?f=/libraries/Firmata-2.3.6.zip",
+      "archiveFileName": "Firmata-2.3.6.zip",
+      "size": 56651,
+      "checksum": "SHA-256:bcfbaebbcc614114ac8a9ea569175c2ee5d0af3999a03b1b9418553e2e7ef0f3"
+    }
+  ]
+}
