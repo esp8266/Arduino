@@ -134,7 +134,7 @@ public class LibraryInstaller {
     if (replacedLib != null && !replacedLib.isReadOnly()) {
       remove(replacedLib);
     }
-    File destFolder = new File(libsFolder, lib.getName());
+    File destFolder = new File(libsFolder, lib.getName().replaceAll(" ", "_"));
     tmpFolder.renameTo(destFolder);
     progress.stepDone();
     
