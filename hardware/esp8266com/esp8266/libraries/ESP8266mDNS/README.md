@@ -31,7 +31,7 @@ See the included MDNS + HTTP server sketch for a full example.
 License
 -------
 Copyright (c) 2013 Tony DiCola (tony@tonydicola.com)
-ESP8266 port (c) 2015 Ivan Grokhotkov (igrokhotkov@gmail.com)
+ESP8266 port (c) 2015 Ivan Grokhotkov (ivan@esp8266.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

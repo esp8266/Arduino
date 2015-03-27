@@ -2,7 +2,7 @@
 ESP8266 Multicast DNS (port of CC3000 Multicast DNS library)
 Version 1.1
 Copyright (c) 2013 Tony DiCola (tony@tonydicola.com)
-ESP8266 port (c) 2015 Ivan Grokhotkov (igrokhotkov@gmail.com)
+ESP8266 port (c) 2015 Ivan Grokhotkov (ivan@esp8266.com)
 
 This is a simple implementation of multicast DNS query support for an Arduino
 running on ESP8266 chip. Only support for resolving address queries is currently
