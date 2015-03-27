@@ -8,10 +8,9 @@ Downloads
 
 | OS | Build status | Latest release |
 | --- | ------------ | -------------- |
-| Linux | [![Linux build status](http://img.shields.io/travis/igrr/Arduino.svg)](https://travis-ci.org/igrr/esptool-ck) |  |
-| Windows | [![Windows build status](http://img.shields.io/appveyor/ci/igrr/Arduino.svg)](https://ci.appveyor.com/project/igrr/esptool-ck) |  |
-| OS X |  |  |
-
+| Linux | [![Linux build status](http://img.shields.io/travis/igrr/Arduino.svg)](https://travis-ci.org/igrr/Arduino) | [arduino-1.6.1-linux64.tar.xz](releases/download/arduino-1.6.1-esp8266-1/arduino-1.6.1-linux64.tar.xz) |
+| Windows | [![Windows build status](http://img.shields.io/appveyor/ci/igrr/Arduino.svg)](https://ci.appveyor.com/project/igrr/Arduino) | [arduino-1.6.1-win32.zip](releases/download/arduino-1.6.1-esp8266-1/arduino-1.6.1-win32.zip) |
+| OS X |  | [arduino-1.6.1-macosx.zip](releases/download/arduino-1.6.1-esp8266-1/arduino-1.6.1-macosx.zip) |
 
 
 What works
