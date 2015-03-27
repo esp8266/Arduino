@@ -3,6 +3,17 @@ Arduino IDE with ESP8266 support
 
 This is an early beta. Things might not work as expected, please do report any bugs you find.
 
+Downloads
+---------
+
+| OS | Build status | Latest release |
+| --- | ------------ | -------------- |
+| Linux | [![Linux build status](http://img.shields.io/travis/igrr/Arduino.svg)](https://travis-ci.org/igrr/esptool-ck) |  |
+| Windows | [![Windows build status](http://img.shields.io/appveyor/ci/igrr/Arduino.svg)](https://ci.appveyor.com/project/igrr/esptool-ck) |  |
+| OS X |  |  |
+
+
+
 What works
 ----------
 
