@@ -245,7 +245,7 @@ public class Platform extends processing.app.Platform {
 
     List<BoardPort> filteredPorts = new LinkedList<BoardPort>();
     for (BoardPort port : ports) {
-      if (!port.getAddress().startsWith("/dev/cu.")) {
+      if (!port.getAddress().startsWith("/dev/tty.")) {
         filteredPorts.add(port);
       }
     }
