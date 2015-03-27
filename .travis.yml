@@ -1,0 +1,31 @@
+sudo: true
+language: java
+
+jdk:
+  - openjdk6
+
+script:
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq ant
+  - pushd build
+  - echo "" | ant dist
+  - popd
+#- bash -x ./generate-appimage
+
+deploy:
+  provider: releases
+  api_key:
+    secure: eKHcAMuC58JZKRsn1QwbiYE4aL/9dZsybDqqHTo1dUo8x9+3fGed/Dci76ItFFS7SmFfIdl6ej8/Uj0nPK/sIE21blKBe3+L0KAJm0TTq3m0ig1suCmMipCsSW+srWYM0hl58+OKagM4FoHKDjsEnzRDv9Z4xtxyvG+7/XLD1dE=
+  skip_cleanup: true
+  file_glob: true
+  file:
+    - '$TRAVIS_BUILD_DIR/build/linux/arduino-*.tar.xz'
+#    - '$TRAVIS_BUILD_DIR/Arduino.AppImage'
+  on:
+    tags: true
+    all_branches: true
+
+notifications:
+  email:
+    on_success: change
+    on_failure: change
