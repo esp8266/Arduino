@@ -156,8 +156,8 @@
 
   <!-- copy hardware folder -->
   <target name="assemble-hardware" unless="light_bundle">
-    <mkdir dir="${staging_folder}/work/dist/bundled_package/packages/arduino/hardware/avr/1.6.2-beta1/"/>
-    <copy todir="${staging_folder}/work/dist/bundled_package/packages/arduino/hardware/avr/1.6.2-beta1/">
+    <mkdir dir="${staging_folder}/work/dist/bundled_package/packages/arduino/hardware/avr/1.6.2/"/>
+    <copy todir="${staging_folder}/work/dist/bundled_package/packages/arduino/hardware/avr/1.6.2/">
       <fileset dir="../hardware/arduino/avr/"/>
     </copy>
   </target>
