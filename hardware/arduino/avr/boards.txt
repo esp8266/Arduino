@@ -11,6 +11,13 @@ yun.vid.0=0x2341
 yun.pid.0=0x0041
 yun.vid.1=0x2341
 yun.pid.1=0x8041
+yun.vid.2=0x2A03
+yun.pid.2=0x0041
+yun.vid.3=0x2A03
+yun.pid.3=0x8041
+
+yun.vid.0x2A03.warning=Uncertified
+
 yun.upload.tool=avrdude
 yun.upload.protocol=avr109
 yun.upload.maximum_size=28672
@@ -46,6 +53,10 @@ uno.vid.0=0x2341
 uno.pid.0=0x0043
 uno.vid.1=0x2341
 uno.pid.1=0x0001
+uno.vid.2=0x2A03
+uno.pid.2=0x0043
+
+uno.vid.0x2A03.warning=Uncertified
 
 uno.upload.tool=avrdude
 uno.upload.protocol=arduino
@@ -166,6 +177,12 @@ mega.vid.0=0x2341
 mega.pid.0=0x0010
 mega.vid.1=0x2341
 mega.pid.1=0x0042
+mega.vid.2=0x2A03
+mega.pid.2=0x0010
+mega.vid.3=0x2A03
+mega.pid.3=0x0042
+
+mega.vid.0x2A03.warning=Uncertified
 
 mega.upload.tool=avrdude
 mega.upload.maximum_data_size=8192
@@ -219,6 +236,12 @@ megaADK.vid.0=0x2341
 megaADK.pid.0=0x003f
 megaADK.vid.1=0x2341
 megaADK.pid.1=0x0044
+megaADK.vid.2=0x2A03
+megaADK.pid.2=0x003f
+megaADK.vid.3=0x2A03
+megaADK.pid.3=0x0044
+
+megaADK.vid.0x2A03.warning=Uncertified
 
 megaADK.upload.tool=avrdude
 megaADK.upload.protocol=wiring
@@ -247,6 +270,13 @@ leonardo.vid.0=0x2341
 leonardo.pid.0=0x0036
 leonardo.vid.1=0x2341
 leonardo.pid.1=0x8036
+leonardo.vid.2=0x2A03
+leonardo.pid.2=0x0036
+leonardo.vid.3=0x2A03
+leonardo.pid.3=0x8036
+
+leonardo.vid.0x2A03.warning=Uncertified
+
 leonardo.upload.tool=avrdude
 leonardo.upload.protocol=avr109
 leonardo.upload.maximum_size=28672
@@ -277,6 +307,17 @@ leonardo.build.extra_flags={build.usb_flags}
 ##############################################################
 
 micro.name=Arduino Micro
+micro.vid.0=0x2341
+micro.pid.0=0x0037
+micro.vid.1=0x2341
+micro.pid.1=0x8037
+micro.vid.2=0x2A03
+micro.pid.2=0x0037
+micro.vid.3=0x2A03
+micro.pid.3=0x8037
+
+micro.vid.0x2A03.warning=Uncertified
+
 micro.upload.tool=avrdude
 micro.upload.protocol=avr109
 micro.upload.maximum_size=28672
@@ -308,9 +349,16 @@ micro.build.extra_flags={build.usb_flags}
 
 esplora.name=Arduino Esplora
 esplora.vid.0=0x2341
-esplora.pid.0=0x003c
+esplora.pid.0=0x003C
 esplora.vid.1=0x2341
-esplora.pid.1=0x803c
+esplora.pid.1=0x803C
+esplora.vid.2=0x2A03
+esplora.pid.2=0x003C
+esplora.vid.3=0x2A03
+esplora.pid.3=0x803C
+
+esplora.vid.0x2A03.warning=Uncertified
+
 esplora.upload.tool=avrdude
 esplora.upload.protocol=avr109
 esplora.upload.maximum_size=28672
@@ -477,6 +525,10 @@ bt.menu.cpu.atmega168.build.mcu=atmega168
 ##############################################################
 
 LilyPadUSB.name=LilyPad Arduino USB
+LilyPadUSB.vid.0=0x1B4F
+LilyPadUSB.pid.0=0x9207
+LilyPadUSB.vid.1=0x1B4F
+LilyPadUSB.pid.1=0x9208
 
 LilyPadUSB.upload.tool=avrdude
 LilyPadUSB.upload.protocol=avr109
@@ -678,6 +730,17 @@ atmegang.menu.cpu.atmega8.build.mcu=atmega8
 ##############################################################
 
 robotControl.name=Arduino Robot Control
+robotControl.vid.0=0x2341
+robotControl.pid.0=0x0038
+robotControl.vid.1=0x2341
+robotControl.pid.1=0x8038
+robotControl.vid.2=0x2A03
+robotControl.pid.2=0x0038
+robotControl.vid.3=0x2A03
+robotControl.pid.3=0x8038
+
+robotControl.vid.0x2A03.warning=Uncertified
+
 robotControl.upload.tool=avrdude
 robotControl.upload.protocol=avr109
 robotControl.upload.maximum_size=28672
@@ -708,6 +771,17 @@ robotControl.build.extra_flags={build.usb_flags}
 ##############################################################
 
 robotMotor.name=Arduino Robot Motor
+robotMotor.vid.0=0x2341
+robotMotor.pid.0=0x0039
+robotMotor.vid.1=0x2341
+robotMotor.pid.1=0x8039
+robotMotor.vid.2=0x2A03
+robotMotor.pid.2=0x0039
+robotMotor.vid.3=0x2A03
+robotMotor.pid.3=0x8039
+
+robotMotor.vid.0x2A03.warning=Uncertified
+
 robotMotor.upload.tool=avrdude
 robotMotor.upload.protocol=avr109
 robotMotor.upload.maximum_size=28672

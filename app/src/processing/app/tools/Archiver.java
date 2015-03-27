@@ -23,16 +23,21 @@
 
 package processing.app.tools;
 
-import processing.app.*;
+import processing.app.Base;
+import processing.app.Editor;
+import processing.app.Sketch;
 
-import javax.swing.*;
+import java.awt.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import static processing.app.I18n._;
-
-import java.io.*;
-import java.text.*;
-import java.util.*;
-import java.util.zip.*;
 
 
 public class Archiver implements Tool {
@@ -107,36 +112,37 @@ public class Archiver implements Tool {
     } while (newbie.exists());
 
     // open up a prompt for where to save this fella
-    JFileChooser fd = new JFileChooser();
-    fd.setDialogTitle(_("Archive sketch as:"));
-    fd.setDialogType(JFileChooser.SAVE_DIALOG);
-    fd.setSelectedFile(newbie);
+    FileDialog fd = new FileDialog(editor, _("Archive sketch as:"), FileDialog.SAVE);
+    fd.setDirectory(parent.getAbsolutePath());
+    fd.setFile(newbie.getName());
+    fd.setVisible(true);
 
-    int returnVal = fd.showSaveDialog(editor);
+    String directory = fd.getDirectory();
+    String filename = fd.getFile();
 
-    if (returnVal != JFileChooser.APPROVE_OPTION) {
+    // only write the file if not canceled
+    if (filename != null) {
+      newbie = new File(directory, filename);
+
+      try {
+        //System.out.println(newbie);
+        FileOutputStream zipOutputFile = new FileOutputStream(newbie);
+        ZipOutputStream zos = new ZipOutputStream(zipOutputFile);
+
+        // recursively fill the zip file
+        buildZip(location, name, zos);
+
+        // close up the jar file
+        zos.flush();
+        zos.close();
+
+        editor.statusNotice("Created archive " + newbie.getName() + ".");
+
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    } else {
       editor.statusNotice(_("Archive sketch canceled."));
-      return;
-    }
-
-    newbie = fd.getSelectedFile();
-
-    try {
-      //System.out.println(newbie);
-      FileOutputStream zipOutputFile = new FileOutputStream(newbie);
-      ZipOutputStream zos = new ZipOutputStream(zipOutputFile);
-
-      // recursively fill the zip file
-      buildZip(location, name, zos);
-
-      // close up the jar file
-      zos.flush();
-      zos.close();
-
-      editor.statusNotice("Created archive " + newbie.getName() + ".");
-
-    } catch (IOException e) {
-      e.printStackTrace();
     }
   }
 

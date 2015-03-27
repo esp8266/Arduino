@@ -63,6 +63,10 @@ public class CommandlineParser {
         action = a;
         continue;
       }
+      if (args[i].startsWith("-psn")) {
+        //discard
+        continue;
+      }
       if (args[i].equals("--verbose") || args[i].equals("-v")) {
         doVerboseBuild = true;
         doVerboseUpload = true;

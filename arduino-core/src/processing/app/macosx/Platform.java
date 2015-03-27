@@ -22,6 +22,7 @@
 
 package processing.app.macosx;
 
+import cc.arduino.packages.BoardPort;
 import com.apple.eio.FileManager;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
@@ -35,7 +36,8 @@ import java.awt.*;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.net.URI;
-import java.util.Map;
+import java.util.*;
+import java.util.List;
 
 
 /**
@@ -208,7 +210,7 @@ public class Platform extends processing.app.Platform {
   }
 
   @Override
-  public String resolveDeviceAttachedTo(String serial, Map<String, TargetPackage> packages, String devicesListOutput) {
+  public Map<String, Object> resolveDeviceAttachedTo(String serial, Map<String, TargetPackage> packages, String devicesListOutput) {
     if (devicesListOutput == null) {
       return super.resolveDeviceAttachedTo(serial, packages, devicesListOutput);
     }
@@ -238,5 +240,21 @@ public class Platform extends processing.app.Platform {
     } catch (Throwable e) {
       return super.preListAllCandidateDevices();
     }
+  }
+
+  @Override
+  public java.util.List<BoardPort> filterPorts(java.util.List<BoardPort> ports, boolean showAll) {
+    if (showAll) {
+      return super.filterPorts(ports, true);
+    }
+
+    List<BoardPort> filteredPorts = new LinkedList<BoardPort>();
+    for (BoardPort port : ports) {
+      if (!port.getAddress().startsWith("/dev/cu.")) {
+        filteredPorts.add(port);
+      }
+    }
+
+    return filteredPorts;
   }
 }

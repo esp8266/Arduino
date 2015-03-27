@@ -37,6 +37,7 @@
            includeAntRuntime="false"
            srcdir="src"
            classpathref="class.path"
+           debug="true"
            destdir="bin">
     </javac>
 

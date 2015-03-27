@@ -1,4 +1,34 @@
 
+ARDUINO 1.6.1 - 2015.03.10
+
+[ide]
+* Improved Yun detection for upload via network (Ron Guest)
+* In platforms.txt "objcopy" recipe is no more tied to the "hex" format (Arnav Gupta)
+* /dev/cu.* serial ports are now filtered from the port list on MacOSX
+* Ports in ports list are now grouped by type
+* Upgraded avr-gcc toolchains to 3.4.5
+* Fixed: wrong parsing of boards.txt when using submenu and boards id with underscores
+* Windows: updated bundled JVM to latest 8u31
+* Windows: JVM memory settings can be customized editing arduino.l4j.ini and arduino_debug.l4j.ini files
+* "new" button now behaves as "File -> New..." menu: a new window with an empty sketch is created
+* Windows: opening a lonely sketch caused the IDE to crash. Fixed with a bounty on bountysource @gerito1
+* Bridge: fixed bug with multiple and failing YunClient.connect calls @sngl
+* Translations updated
+* Improved SoftSerial library and optimized its memory usage @matthijskooijman
+* Fixed: status board was not changing when using custom menu @PaulStoffregen
+* Fixed: better error message when using a busy serial device
+* Fixed: missing bool operator on EthernetClient
+* Fixed: missing bool operator on SoftSerial
+* MacOSX: back to native file dialogs and buttons, when using experimental version
+* MacOSX: command line interface now works also with java-latest version
+* Improved library name matching @PaulStoffregen. Avoids conflicts with libraries that bundle files equally named
+
+ARDUINO 1.6.0 - 2015.02.09
+
+[ide]
+* Updated help with the latest docs
+* Updated translations
+
 ARDUINO 1.6.0rc3 - 2015.02.03
 
 [ide]

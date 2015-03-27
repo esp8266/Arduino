@@ -129,7 +129,7 @@ public class Platform extends processing.app.Platform {
   }
 
   @Override
-  public String resolveDeviceAttachedTo(String serial, Map<String, TargetPackage> packages, String devicesListOutput) {
+  public Map<String, Object> resolveDeviceAttachedTo(String serial, Map<String, TargetPackage> packages, String devicesListOutput) {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     Executor executor = new ExternalProcessExecutor(baos);
 
