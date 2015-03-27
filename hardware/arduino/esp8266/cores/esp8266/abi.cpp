@@ -52,4 +52,10 @@ void __cxa_deleted_virtual(void) {
   abort();
 }
 
+namespace std {
+  void __throw_bad_function_call() {
+    abort();
+  }
+}
+
 
