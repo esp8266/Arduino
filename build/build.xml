@@ -386,6 +386,7 @@
 
     <mkdir dir="macosx/work/${staging_hardware_folder}/../dist"/>
     <move file="${staging_folder}/work/dist/default_package.tar.gz" todir="macosx/work/${staging_hardware_folder}/../dist"/>
+    <move file="${staging_folder}/work/dist/library_index.json" todir="macosx/work/${staging_hardware_folder}/../dist"/>
 
     <delete dir="${staging_folder}/work/dist/"/>
   </target>
