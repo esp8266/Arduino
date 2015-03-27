@@ -19,7 +19,7 @@ wifio.name=WIFIO
 
 wifio.upload.tool=esptool
 wifio.upload.speed=115200
-wifio.upload.resetmethod=wifio2
+wifio.upload.resetmethod=wifio
 wifio.upload.maximum_size=524288
 wifio.upload.wait_for_upload_port=true
 
@@ -27,6 +27,5 @@ wifio.build.mcu=esp8266
 wifio.build.f_cpu=80000000L
 wifio.build.board=ESP8266_WIFIO
 wifio.build.core=esp8266
-# TODO: add board variant for WIFIO
 wifio.build.variant=wifio
 
