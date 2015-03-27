@@ -440,7 +440,7 @@
 
     <!-- Sign app -->
     <exec executable="codesign" dir="macosx/work">
-      <arg line="--keychain &quot;${macosx-sign-keychain}&quot; --force -s &quot;${macosx-sign-id}&quot; -v Arduino.app/" />
+      <arg line="--keychain &quot;${macosx-sign-keychain}&quot; --force -s &quot;${macosx-sign-id}&quot; --deep -v Arduino.app/" />
     </exec>
 
     <!-- Check for successful signing -->
