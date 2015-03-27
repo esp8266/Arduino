@@ -1,0 +1,67 @@
+version: 0.0.{build}
+
+platform:
+    - x86
+
+skip_commits:
+  message: /\[skip appveyor\]/
+
+shallow_clone: true
+
+matrix:
+    fast_finish: true
+
+init:
+    - git config --global url."https://".insteadOf git://
+
+build_script:
+    - java -version
+    - javac -version
+    - where javac
+    - choco -y install ant
+    - echo ON
+    - echo PATH %PATH%
+    - echo JAVA_HOME %JAVA_HOME%
+    - echo ANT_HOME %ANT_HOME%
+    - SET ANT_HOME=C:\tools\apache-ant-1.9.4
+    - SET PATH=%PATH%;C:\tools\apache-ant-1.9.4\bin
+    - SET JAVA_HOME=C:\Program Files\Java\jdk1.7.0
+    - echo PATH %PATH%
+    - echo JAVA_HOME %JAVA_HOME%
+    - echo ANT_HOME %ANT_HOME%
+    - java -version
+    - javac -version
+    - ant -version
+    - cd build
+    - ant dist < NUL
+#    - SET PATH=C:\MinGW\bin;C:\MinGW\msys\1.0\bin;%PATH%
+#    - make all
+    - for /f %%i in ('git describe --always') do set PRODUCT_VERSION=%%i
+#    - SET PRODUCT_NAME=esptool-%PRODUCT_VERSION%
+#    - SET PLATFORM_NAME=win32
+#    - SET PRODUCT_DIST_NAME=%PRODUCT_NAME%-%PLATFORM_NAME%
+    - echo %PRODUCT_VERSION%
+#    - echo %PRODUCT_DIST_NAME%
+#    - mkdir %PRODUCT_DIST_NAME%
+#    - cp esptool.exe %PRODUCT_DIST_NAME%\esptool.exe
+#    - SET PRODUCT_ZIP=%PRODUCT_DIST_NAME%.zip
+#    - 7z a %PRODUCT_ZIP% %PRODUCT_DIST_NAME%
+#    - appveyor PushArtifact %PRODUCT_ZIP%
+#    - SET PRODUCT_ZIP_SHA=%PRODUCT_ZIP%.sha
+#    - ps: Get-FileHash $env:PRODUCT_ZIP -Algorithm SHA1 | Out-File $env:PRODUCT_ZIP_SHA
+#    - type %PRODUCT_ZIP_SHA%
+#    - appveyor PushArtifact %PRODUCT_ZIP_SHA%
+
+artifacts:
+  - path: build\windows\arduino-*.zip
+
+
+deploy:
+    - provider: GitHub
+      auth_token:
+        secure: 'PGg5fnoBpP1Omzr6f3KIYDiD8J30rretQjSl/MITRpzvSCmN88kM6VDMz1TBGZTA'
+      artifact: /.*\.zip/
+      draft: true
+      prerelease: false
+      on:
+        appveyor_repo_tag: true
