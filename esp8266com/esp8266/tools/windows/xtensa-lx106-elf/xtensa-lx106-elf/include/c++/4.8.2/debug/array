@@ -1,0 +1,305 @@
+// Debugging array implementation -*- C++ -*-
+
+// Copyright (C) 2012-2013 Free Software Foundation, Inc.
+//
+// This file is part of the GNU ISO C++ Library.  This library is free
+// software; you can redistribute it and/or modify it under the
+// terms of the GNU General Public License as published by the
+// Free Software Foundation; either version 3, or (at your option)
+// any later version.
+
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// Under Section 7 of GPL version 3, you are granted additional
+// permissions described in the GCC Runtime Library Exception, version
+// 3.1, as published by the Free Software Foundation.
+
+// You should have received a copy of the GNU General Public License and
+// a copy of the GCC Runtime Library Exception along with this program;
+// see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+// <http://www.gnu.org/licenses/>.
+
+/** @file debug/array
+ *  This is a Standard C++ Library header.
+ */
+
+#ifndef _GLIBCXX_DEBUG_ARRAY
+#define _GLIBCXX_DEBUG_ARRAY 1
+
+#pragma GCC system_header
+
+#include <debug/safe_sequence.h>
+
+namespace std _GLIBCXX_VISIBILITY(default)
+{
+namespace __debug
+{
+  template<typename _Tp, std::size_t _Nm>
+    struct array
+    {
+      typedef _Tp 	    			      value_type;
+      typedef value_type*			      pointer;
+      typedef const value_type*                       const_pointer;
+      typedef value_type&                   	      reference;
+      typedef const value_type&             	      const_reference;
+      typedef value_type*                             iterator;
+      typedef const value_type*                       const_iterator;
+      typedef std::size_t                    	      size_type;
+      typedef std::ptrdiff_t                   	      difference_type;
+      typedef std::reverse_iterator<iterator>	      reverse_iterator;
+      typedef std::reverse_iterator<const_iterator>   const_reverse_iterator;
+
+      // Support for zero-sized arrays mandatory.
+      typedef _GLIBCXX_STD_C::__array_traits<_Tp, _Nm> _AT_Type;
+      typename _AT_Type::_Type                         _M_elems;
+
+      template<std::size_t _Size>
+	struct _Array_check_subscript
+ 	{
+	  std::size_t size() { return _Size; }
+
+	  _Array_check_subscript(std::size_t __index)
+	  { __glibcxx_check_subscript(__index); }
+        };
+
+      template<std::size_t _Size>
+	struct _Array_check_nonempty
+ 	{
+	  bool empty() { return _Size == 0; }
+
+	  _Array_check_nonempty()
+	  { __glibcxx_check_nonempty(); }
+        };
+
+      // No explicit construct/copy/destroy for aggregate type.
+
+      // DR 776.
+      void
+      fill(const value_type& __u)
+      { std::fill_n(begin(), size(), __u); }
+
+      void
+      swap(array& __other)
+      noexcept(noexcept(swap(std::declval<_Tp&>(), std::declval<_Tp&>())))
+      { std::swap_ranges(begin(), end(), __other.begin()); }
+
+      // Iterators.
+      iterator
+      begin() noexcept
+      { return iterator(data()); }
+
+      const_iterator
+      begin() const noexcept
+      { return const_iterator(data()); }
+
+      iterator
+      end() noexcept
+      { return iterator(data() + _Nm); }
+
+      const_iterator
+      end() const noexcept
+      { return const_iterator(data() + _Nm); }
+
+      reverse_iterator 
+      rbegin() noexcept
+      { return reverse_iterator(end()); }
+
+      const_reverse_iterator 
+      rbegin() const noexcept
+      { return const_reverse_iterator(end()); }
+
+      reverse_iterator 
+      rend() noexcept
+      { return reverse_iterator(begin()); }
+
+      const_reverse_iterator 
+      rend() const noexcept
+      { return const_reverse_iterator(begin()); }
+
+      const_iterator
+      cbegin() const noexcept
+      { return const_iterator(data()); }
+
+      const_iterator
+      cend() const noexcept
+      { return const_iterator(data() + _Nm); }
+
+      const_reverse_iterator 
+      crbegin() const noexcept
+      { return const_reverse_iterator(end()); }
+
+      const_reverse_iterator 
+      crend() const noexcept
+      { return const_reverse_iterator(begin()); }
+
+      // Capacity.
+      constexpr size_type 
+      size() const noexcept { return _Nm; }
+
+      constexpr size_type 
+      max_size() const noexcept { return _Nm; }
+
+      constexpr bool 
+      empty() const noexcept { return size() == 0; }
+
+      // Element access.
+      reference
+      operator[](size_type __n)
+      {
+	__glibcxx_check_subscript(__n);
+	return _AT_Type::_S_ref(_M_elems, __n);
+      }
+
+      constexpr const_reference
+      operator[](size_type __n) const noexcept
+      {
+	return __n < _Nm ? _AT_Type::_S_ref(_M_elems, __n)
+	 : (_GLIBCXX_THROW_OR_ABORT(_Array_check_subscript<_Nm>(__n)),
+	    _AT_Type::_S_ref(_M_elems, 0));
+      }
+
+      reference
+      at(size_type __n)
+      {
+	if (__n >= _Nm)
+	  std::__throw_out_of_range(__N("array::at"));
+	return _AT_Type::_S_ref(_M_elems, __n);
+      }
+
+      constexpr const_reference
+      at(size_type __n) const
+      {
+	// Result of conditional expression must be an lvalue so use
+	// boolean ? lvalue : (throw-expr, lvalue)
+	return __n < _Nm ? _AT_Type::_S_ref(_M_elems, __n)
+	  : (std::__throw_out_of_range(__N("array::at")),
+	     _AT_Type::_S_ref(_M_elems, 0));
+      }
+
+      reference 
+      front()
+      {
+	__glibcxx_check_nonempty();
+	return *begin();
+      }
+
+      constexpr const_reference 
+      front() const
+      {
+	return _Nm ? _AT_Type::_S_ref(_M_elems, 0)
+	  : (_GLIBCXX_THROW_OR_ABORT(_Array_check_nonempty<_Nm>()),
+	     _AT_Type::_S_ref(_M_elems, 0));
+      }
+
+      reference 
+      back()
+      {
+	__glibcxx_check_nonempty();
+	return _Nm ? *(end() - 1) : *end();
+      }
+
+      constexpr const_reference 
+      back() const
+      {
+	return _Nm ? _AT_Type::_S_ref(_M_elems, _Nm - 1)
+	  : (_GLIBCXX_THROW_OR_ABORT(_Array_check_nonempty<_Nm>()),
+	     _AT_Type::_S_ref(_M_elems, 0));
+      }
+
+      pointer
+      data() noexcept
+      { return std::__addressof(_AT_Type::_S_ref(_M_elems, 0)); }
+
+      const_pointer
+      data() const noexcept
+      { return std::__addressof(_AT_Type::_S_ref(_M_elems, 0)); }
+    };
+
+  // Array comparisons.
+  template<typename _Tp, std::size_t _Nm>
+    inline bool 
+    operator==(const array<_Tp, _Nm>& __one, const array<_Tp, _Nm>& __two)
+    { return std::equal(__one.begin(), __one.end(), __two.begin()); }
+
+  template<typename _Tp, std::size_t _Nm>
+    inline bool
+    operator!=(const array<_Tp, _Nm>& __one, const array<_Tp, _Nm>& __two)
+    { return !(__one == __two); }
+
+  template<typename _Tp, std::size_t _Nm>
+    inline bool
+    operator<(const array<_Tp, _Nm>& __a, const array<_Tp, _Nm>& __b)
+    { 
+      return std::lexicographical_compare(__a.begin(), __a.end(),
+					  __b.begin(), __b.end()); 
+    }
+
+  template<typename _Tp, std::size_t _Nm>
+    inline bool
+    operator>(const array<_Tp, _Nm>& __one, const array<_Tp, _Nm>& __two)
+    { return __two < __one; }
+
+  template<typename _Tp, std::size_t _Nm>
+    inline bool
+    operator<=(const array<_Tp, _Nm>& __one, const array<_Tp, _Nm>& __two)
+    { return !(__one > __two); }
+
+  template<typename _Tp, std::size_t _Nm>
+    inline bool
+    operator>=(const array<_Tp, _Nm>& __one, const array<_Tp, _Nm>& __two)
+    { return !(__one < __two); }
+
+  // Specialized algorithms.
+  template<typename _Tp, std::size_t _Nm>
+    inline void
+    swap(array<_Tp, _Nm>& __one, array<_Tp, _Nm>& __two)
+    noexcept(noexcept(__one.swap(__two)))
+    { __one.swap(__two); }
+
+  template<std::size_t _Int, typename _Tp, std::size_t _Nm>
+    constexpr _Tp&
+    get(array<_Tp, _Nm>& __arr) noexcept
+    {
+      static_assert(_Int < _Nm, "index is out of bounds");
+      return _GLIBCXX_STD_C::__array_traits<_Tp, _Nm>::
+	_S_ref(__arr._M_elems, _Int);
+    }
+
+  template<std::size_t _Int, typename _Tp, std::size_t _Nm>
+    constexpr _Tp&&
+    get(array<_Tp, _Nm>&& __arr) noexcept
+    {
+      static_assert(_Int < _Nm, "index is out of bounds");
+      return std::move(get<_Int>(__arr));
+    }
+
+  template<std::size_t _Int, typename _Tp, std::size_t _Nm>
+    constexpr const _Tp&
+    get(const array<_Tp, _Nm>& __arr) noexcept
+    {
+      static_assert(_Int < _Nm, "index is out of bounds");
+      return _GLIBCXX_STD_C::__array_traits<_Tp, _Nm>::
+	_S_ref(__arr._M_elems, _Int);
+    }
+} // namespace __debug
+
+  // Tuple interface to class template array.
+
+  /// tuple_size
+  template<typename _Tp, std::size_t _Nm>
+    struct tuple_size<__debug::array<_Tp, _Nm>>
+    : public integral_constant<std::size_t, _Nm> { };
+
+  /// tuple_element
+  template<std::size_t _Int, typename _Tp, std::size_t _Nm>
+    struct tuple_element<_Int, __debug::array<_Tp, _Nm>>
+    {
+      static_assert(_Int < _Nm, "index is out of bounds");
+      typedef _Tp type;
+    };
+} // namespace std
+
+#endif // _GLIBCXX_DEBUG_ARRAY

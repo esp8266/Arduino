@@ -1,0 +1,62 @@
+This is the file .../info/dir, which contains the
+topmost node of the Info hierarchy, called (dir)Top.
+The first time you invoke Info you start off looking at this node.
+
+File: dir,	Node: Top	This is the top of the INFO tree
+
+  This (the Directory node) gives a menu of major topics.
+  Typing "q" exits, "?" lists all Info commands, "d" returns here,
+  "h" gives a primer for first-timers,
+  "mEmacs<Return>" visits the Emacs manual, etc.
+
+  In Emacs, you can click mouse button 2 on a menu item or cross reference
+  to select it.
+
+* Menu:
+
+Individual utilities
+* addr2line: (binutils)addr2line.               Convert addresses to file and 
+                                                  line.
+* ar: (binutils)ar.                             Create, modify, and extract 
+                                                  from archives.
+* c++filt: (binutils)c++filt.                   Filter to demangle encoded C++ 
+                                                  symbols.
+* cxxfilt: (binutils)c++filt.                   MS-DOS name for c++filt.
+* dlltool: (binutils)dlltool.                   Create files needed to build 
+                                                  and use DLLs.
+* elfedit: (binutils)elfedit.                   Update the ELF header of ELF 
+                                                  files.
+* nlmconv: (binutils)nlmconv.                   Converts object code into an 
+                                                  NLM.
+* nm: (binutils)nm.                             List symbols from object files.
+* objcopy: (binutils)objcopy.                   Copy and translate object 
+                                                  files.
+* objdump: (binutils)objdump.                   Display information from 
+                                                  object files.
+* ranlib: (binutils)ranlib.                     Generate index to archive 
+                                                  contents.
+* readelf: (binutils)readelf.                   Display the contents of ELF 
+                                                  format files.
+* size: (binutils)size.                         List section sizes and total 
+                                                  size.
+* strings: (binutils)strings.                   List printable strings from 
+                                                  files.
+* strip: (binutils)strip.                       Discard symbols.
+* windmc: (binutils)windmc.                     Generator for Windows message 
+                                                  resources.
+* windres: (binutils)windres.                   Manipulate Windows resources.
+
+Software development
+* As: (as).                     The GNU assembler.
+* Bfd: (bfd).                   The Binary File Descriptor library.
+* Binutils: (binutils).         The GNU binary utilities.
+* Cpp: (cpp).                   The GNU C preprocessor.
+* Cpplib: (cppinternals).       Cpplib internals.
+* Gas: (as).                    The GNU assembler.
+* Ld: (ld).                     The GNU linker.
+* g++: (gcc).                   The GNU C++ compiler.
+* gcc: (gcc).                   The GNU Compiler Collection.
+* gccinstall: (gccinstall).     Installing the GNU Compiler Collection.
+* gccint: (gccint).             Internals of the GNU Compiler Collection.
+* gcov: (gcc) Gcov.             `gcov'--a test coverage program.
+* gprof: (gprof).               Profiling your program's execution
