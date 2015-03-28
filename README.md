@@ -15,7 +15,7 @@ Based off of [esp8266/Arduino](https://github.com/esp8266/Arduino)'s fully custo
 __Note__:
 
  * Windows:
-  * ```~``` correponds to ```C: > Users > <YourName> > Documents > Arduino```
+  * ```~``` correponds to ```C: > Users > <YourName>```
 
 ### Supported boards ###
 
