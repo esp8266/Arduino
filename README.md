@@ -1,25 +1,12 @@
-Arduino-compatible IDE with ESP8266 support
+ESP8266 Arduino add-on
 ===========================================
 
 This project brings support for ESP8266 chip to the Arduino environment. ESP8266WiFi library bundled with this project has the same interface as the WiFi Shield library, making it easy to re-use existing code and libraries.
 
-### Downloads ###
-
-| OS | Build status | Latest release |
-| --- | ------------ | -------------- |
-| Linux | [![Linux build status](http://img.shields.io/travis/igrr/Arduino.svg)](https://travis-ci.org/igrr/Arduino) | [arduino-1.6.1-linux64.tar.xz](../../releases/download/1.6.1-esp8266-1/arduino-1.6.1-linux64.tar.xz) |
-| Windows | [![Windows build status](http://img.shields.io/appveyor/ci/igrr/Arduino.svg)](https://ci.appveyor.com/project/igrr/Arduino) | [arduino-1.6.1-p1-windows.zip](https://github.com/igrr/Arduino/releases/download/1.6.1-esp8266-1/arduino-1.6.1-p1-windows.zip) |
-| OS X |  | [arduino-1.6.1-macosx-java-latest-signed.zip](../../releases/download/1.6.1-esp8266-1/arduino-1.6.1-macosx-java-latest-signed.zip) |
-
-
-### Building from source ###
-```
-$ git clone https://github.com/esp8266/Arduino.git
-$ cd Arduino/build
-$ ant dist
-```
+Based off of [esp8266/Arduino](https://github.com/esp8266/Arduino)'s fully customized ESP8266 Arduino IDE.
 
 ### Supported boards ###
+
 - [Wifio](http://wifio.cc)
 - Generic esp8266 modules (without auto-reset support)
 
@@ -144,7 +131,7 @@ toggle power).
 
 Forum: http://www.esp8266.com/arduino
 
-Submit issues on Github: https://github.com/esp8266/Arduino/issues
+Submit issues on Github: https://github.com/sandeepmistry/esp8266-Arduino
 
 ### License and credits ###
 
