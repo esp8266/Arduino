@@ -8,9 +8,9 @@
 name=Arduino ESP8266
 version=1.5.8
 
-compiler.tools.path={runtime.ide.path}/hardware/tools/esp8266/
+compiler.tools.path={runtime.hardware.path}/esp8266/tools/{runtime.os}/
 compiler.path={compiler.tools.path}xtensa-lx106-elf/bin/
-compiler.sdk.path={compiler.tools.path}sdk/
+compiler.sdk.path={runtime.hardware.path}/esp8266/sdk/
 
 compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH "-I{compiler.sdk.path}/include"
 
@@ -23,7 +23,7 @@ compiler.c.elf.cmd=xtensa-lx106-elf-gcc
 compiler.c.elf.libs=-lc -lgcc -lhal -lphy -lnet80211 -llwip -lwpa -lmain -lpp
 
 compiler.cpp.cmd=xtensa-lx106-elf-g++
-compiler.cpp.flags=-c -Os -mlongcalls -mtext-section-literals -fno-exceptions -fno-rtti -std=c++11 -MMD 
+compiler.cpp.flags=-c -Os -mlongcalls -mtext-section-literals -fno-exceptions -fno-rtti -std=c++11 -MMD
 
 compiler.as.cmd=xtensa-lx106-elf-as
 
@@ -63,7 +63,7 @@ recipe.S.o.pattern="{compiler.path}{compiler.as.cmd}"  -o "{object_file}" "{sour
 recipe.ar.pattern="{compiler.path}{compiler.ar.cmd}" {compiler.ar.flags} {compiler.ar.extra_flags} "{build.path}/{archive_file}" "{object_file}"
 
 ## Combine gc-sections, archives, and objects
-recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {compiler.c.elf.flags} {compiler.c.elf.extra_flags} -o "{build.path}/{build.project_name}.elf" -Wl,--start-group {object_files} "{build.path}/{archive_file}" {compiler.c.elf.libs} -Wl,--end-group "-L{build.path}" 
+recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {compiler.c.elf.flags} {compiler.c.elf.extra_flags} -o "{build.path}/{build.project_name}.elf" -Wl,--start-group {object_files} "{build.path}/{archive_file}" {compiler.c.elf.libs} -Wl,--end-group "-L{build.path}"
 
 ## Create eeprom
 recipe.objcopy.eep.pattern=
@@ -86,6 +86,6 @@ tools.esptool.cmd.windows=esptool.exe
 tools.esptool.path={runtime.ide.path}/hardware/tools/esp8266
 
 tools.esptool.program.params.verbose=-vv
-tools.esptool.program.params.quiet= 
+tools.esptool.program.params.quiet=
 tools.esptool.program.pattern="{path}/{cmd}" {program.verbose} -cd {upload.resetmethod} -cb {upload.speed} -cp {serial.port} -ca 0x00000 -cf "{build.path}/{build.project_name}_00000.bin" -ca 0x40000 -cf "{build.path}/{build.project_name}_40000.bin"
 
