@@ -2,6 +2,7 @@
 ARDUINO 1.6.2 - 2015.03.28
 
 [ide]
+* Boards and libraries managers, for one click install of additional boards and libraries
 * In platform.txt, pre and post build hooks can now be specified. Example: recipe.hooks.prebuild.0.pattern=echo "Hello {build.source.path}". Thanks @Wackerbarth
 * Windows and MacOSX JVM Xmx halved to 512M
 * Introduced starting splashscreen with progress status: will be used for notifying user of long running startup tasks
