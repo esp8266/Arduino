@@ -1,0 +1,42 @@
+/* Internal functions.
+   Copyright (C) 2011-2013 Free Software Foundation, Inc.
+
+This file is part of GCC.
+
+GCC is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 3, or (at your option) any later
+version.
+
+GCC is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with GCC; see the file COPYING3.  If not see
+<http://www.gnu.org/licenses/>.  */
+
+/* This file specifies a list of internal "functions".  These functions
+   differ from built-in functions in that they have no linkage and cannot
+   be called directly by the user.  They represent operations that are only
+   synthesised by GCC itself.
+
+   Internal functions are used instead of tree codes if the operation
+   and its operands are more naturally represented as a GIMPLE_CALL
+   than a GIMPLE_ASSIGN.
+
+   Each entry in this file has the form:
+
+     DEF_INTERNAL_FN (NAME, FLAGS)
+
+   where NAME is the name of the function and FLAGS is a set of
+   ECF_* flags.  Each entry must have a corresponding expander
+   of the form:
+
+     void expand_NAME (gimple stmt)
+
+   where STMT is the statement that performs the call.  */
+
+DEF_INTERNAL_FN (LOAD_LANES, ECF_CONST | ECF_LEAF)
+DEF_INTERNAL_FN (STORE_LANES, ECF_CONST | ECF_LEAF)

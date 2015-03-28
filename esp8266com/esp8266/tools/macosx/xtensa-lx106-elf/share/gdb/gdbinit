@@ -1,0 +1,6 @@
+python
+import sys
+sys.path.insert(0, '/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/builds/xtensa-lx106-elf/share/gcc-4.8.2/python')
+from libstdcxx.v6.printers import register_libstdcxx_printers
+register_libstdcxx_printers (None)
+end
