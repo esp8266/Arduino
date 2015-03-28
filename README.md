@@ -5,6 +5,18 @@ This project brings support for ESP8266 chip to the Arduino environment. ESP8266
 
 Based off of [esp8266/Arduino](https://github.com/esp8266/Arduino)'s fully customized ESP8266 Arduino IDE.
 
+### Installing ###
+
+1. Create a folder named ```hardware``` in ```~/Documents/Arduino```
+2. [Download a release](https://github.com/sandeepmistry/esp8266-Arduino/releases)
+3. Extract release
+4. Place ```esp8266com``` folder in ```~/Documents/Arduino/hardware```
+
+__Note__:
+
+ * Windows:
+  * ```~``` correponds to ```C: > Users > <YourName> > Documents > Arduino```
+
 ### Supported boards ###
 
 - [Wifio](http://wifio.cc)
