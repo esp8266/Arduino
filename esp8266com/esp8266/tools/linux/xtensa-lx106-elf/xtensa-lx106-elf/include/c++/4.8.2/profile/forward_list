@@ -1,0 +1,182 @@
+// <forward_list> -*- C++ -*-
+
+// Copyright (C) 2010-2013 Free Software Foundation, Inc.
+//
+// This file is part of the GNU ISO C++ Library.  This library is free
+// software; you can redistribute it and/or modify it under the
+// terms of the GNU General Public License as published by the
+// Free Software Foundation; either version 3, or (at your option)
+// any later version.
+
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// Under Section 7 of GPL version 3, you are granted additional
+// permissions described in the GCC Runtime Library Exception, version
+// 3.1, as published by the Free Software Foundation.
+
+// You should have received a copy of the GNU General Public License and
+// a copy of the GCC Runtime Library Exception along with this program;
+// see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+// <http://www.gnu.org/licenses/>.
+
+/** @file profile/forward_list
+ *  This file is a GNU debug extension to the Standard C++ Library.
+ */
+
+#ifndef _GLIBCXX_PROFILE_FORWARD_LIST
+#define _GLIBCXX_PROFILE_FORWARD_LIST 1
+
+#if __cplusplus < 201103L
+# include <bits/c++0x_warning.h>
+#else
+
+#include <forward_list>
+
+namespace std _GLIBCXX_VISIBILITY(default)
+{
+namespace __profile
+{
+  /// Class std::forward_list wrapper with performance instrumentation.
+  template<typename _Tp, typename _Alloc = std::allocator<_Tp> >
+    class forward_list
+    : public _GLIBCXX_STD_C::forward_list<_Tp, _Alloc>
+    {
+      typedef _GLIBCXX_STD_C::forward_list<_Tp, _Alloc> _Base;
+
+      typedef typename __gnu_cxx::__alloc_traits<_Alloc>::template
+        rebind<_GLIBCXX_STD_C::_Fwd_list_node<_Tp>>::other _Node_alloc_type;
+
+      typedef __gnu_cxx::__alloc_traits<_Node_alloc_type> _Node_alloc_traits;
+
+    public:
+      typedef typename _Base::size_type             size_type;
+
+      // 23.2.3.1 construct/copy/destroy:
+      explicit
+      forward_list(const _Alloc& __al = _Alloc())
+      : _Base(__al) { }
+
+      forward_list(const forward_list& __list, const _Alloc& __al)
+      : _Base(__list, __al)
+      { }
+
+      forward_list(forward_list&& __list, const _Alloc& __al)
+      : _Base(std::move(__list), __al)
+      { }
+
+      explicit
+      forward_list(size_type __n, const _Alloc& __al = _Alloc())
+      : _Base(__n, __al)
+      { }
+
+      forward_list(size_type __n, const _Tp& __value,
+                   const _Alloc& __al = _Alloc())
+      : _Base(__n, __value, __al)
+      { }
+
+      template<typename _InputIterator,
+	       typename = std::_RequireInputIter<_InputIterator>>
+        forward_list(_InputIterator __first, _InputIterator __last,
+                     const _Alloc& __al = _Alloc())
+        : _Base(__first, __last, __al)
+        { }
+
+      forward_list(const forward_list& __list)
+      : _Base(__list)
+      { }
+
+      forward_list(forward_list&& __list) noexcept
+      : _Base(std::move(__list)) { }
+
+      forward_list(std::initializer_list<_Tp> __il,
+                   const _Alloc& __al = _Alloc())
+      : _Base(__il, __al)
+      { }
+
+      ~forward_list() noexcept
+      { }
+
+      forward_list&
+      operator=(const forward_list& __list)
+      {
+	static_cast<_Base&>(*this) = __list;
+	return *this;
+      }
+
+      forward_list&
+      operator=(forward_list&& __list)
+      noexcept(_Node_alloc_traits::_S_nothrow_move())
+      {
+	static_cast<_Base&>(*this) = std::move(__list);
+	return *this;
+      }
+
+      forward_list&
+      operator=(std::initializer_list<_Tp> __il)
+      {
+	static_cast<_Base&>(*this) = __il;
+        return *this;
+      }
+
+      _Base&
+      _M_base() noexcept       { return *this; }
+
+      const _Base&
+      _M_base() const noexcept { return *this; }
+    };
+
+  template<typename _Tp, typename _Alloc>
+    inline bool
+    operator==(const forward_list<_Tp, _Alloc>& __lx,
+               const forward_list<_Tp, _Alloc>& __ly)
+    { return __lx._M_base() == __ly._M_base(); }
+
+  template<typename _Tp, typename _Alloc>
+    inline bool
+    operator<(const forward_list<_Tp, _Alloc>& __lx,
+              const forward_list<_Tp, _Alloc>& __ly)
+    { return __lx._M_base() < __ly._M_base(); }
+
+  template<typename _Tp, typename _Alloc>
+    inline bool
+    operator!=(const forward_list<_Tp, _Alloc>& __lx,
+               const forward_list<_Tp, _Alloc>& __ly)
+    { return !(__lx == __ly); }
+
+  /// Based on operator<
+  template<typename _Tp, typename _Alloc>
+    inline bool
+    operator>(const forward_list<_Tp, _Alloc>& __lx,
+              const forward_list<_Tp, _Alloc>& __ly)
+    { return (__ly < __lx); }
+
+  /// Based on operator<
+  template<typename _Tp, typename _Alloc>
+    inline bool
+    operator>=(const forward_list<_Tp, _Alloc>& __lx,
+               const forward_list<_Tp, _Alloc>& __ly)
+    { return !(__lx < __ly); }
+
+  /// Based on operator<
+  template<typename _Tp, typename _Alloc>
+    inline bool
+    operator<=(const forward_list<_Tp, _Alloc>& __lx,
+               const forward_list<_Tp, _Alloc>& __ly)
+    { return !(__ly < __lx); }
+
+  /// See std::forward_list::swap().
+  template<typename _Tp, typename _Alloc>
+    inline void
+    swap(forward_list<_Tp, _Alloc>& __lx,
+	 forward_list<_Tp, _Alloc>& __ly)
+    { __lx.swap(__ly); }
+
+} // namespace __profile
+} // namespace std
+
+#endif // C++11
+
+#endif

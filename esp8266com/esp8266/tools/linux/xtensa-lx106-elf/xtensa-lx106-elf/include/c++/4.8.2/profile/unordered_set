@@ -1,0 +1,463 @@
+// Profiling unordered_set/unordered_multiset implementation -*- C++ -*-
+
+// Copyright (C) 2009-2013 Free Software Foundation, Inc.
+//
+// This file is part of the GNU ISO C++ Library.  This library is free
+// software; you can redistribute it and/or modify it under the
+// terms of the GNU General Public License as published by the
+// Free Software Foundation; either version 3, or (at your option)
+// any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// Under Section 7 of GPL version 3, you are granted additional
+// permissions described in the GCC Runtime Library Exception, version
+// 3.1, as published by the Free Software Foundation.
+
+// You should have received a copy of the GNU General Public License along
+// with this library; see the file COPYING3.  If not see
+// <http://www.gnu.org/licenses/>.
+
+/** @file profile/unordered_set
+ *  This file is a GNU profile extension to the Standard C++ Library.
+ */
+
+#ifndef _GLIBCXX_PROFILE_UNORDERED_SET
+#define _GLIBCXX_PROFILE_UNORDERED_SET 1
+
+#if __cplusplus < 201103L
+# include <bits/c++0x_warning.h>
+#else
+# include <unordered_set>
+
+#include <profile/base.h>
+#include <profile/unordered_base.h>
+
+#define _GLIBCXX_BASE unordered_set<_Key, _Hash, _Pred, _Alloc>
+#define _GLIBCXX_STD_BASE _GLIBCXX_STD_C::_GLIBCXX_BASE
+
+namespace std _GLIBCXX_VISIBILITY(default)
+{
+namespace __profile
+{
+  /** @brief Unordered_set wrapper with performance instrumentation.  */
+  template<typename _Key, 
+	   typename _Hash = std::hash<_Key>,
+	   typename _Pred = std::equal_to<_Key>,
+	   typename _Alloc =  std::allocator<_Key> >
+    class unordered_set
+    : public _GLIBCXX_STD_BASE,
+      public _Unordered_profile<unordered_set<_Key, _Hash, _Pred, _Alloc>,
+				true>
+    {
+      typedef _GLIBCXX_STD_BASE _Base;
+
+      _Base&
+      _M_base() noexcept       { return *this; }
+
+      const _Base&
+      _M_base() const noexcept { return *this; }
+
+    public:
+      typedef typename _Base::size_type       size_type;
+      typedef typename _Base::hasher          hasher;
+      typedef typename _Base::key_equal       key_equal;
+      typedef typename _Base::allocator_type  allocator_type;
+      typedef typename _Base::key_type        key_type;
+      typedef typename _Base::value_type      value_type;
+      typedef typename _Base::difference_type difference_type;
+      typedef typename _Base::reference       reference;
+      typedef typename _Base::const_reference const_reference;
+
+      typedef typename _Base::iterator iterator;
+      typedef typename _Base::const_iterator const_iterator;
+
+      explicit
+      unordered_set(size_type __n = 10,
+		    const hasher& __hf = hasher(),
+		    const key_equal& __eql = key_equal(),
+		    const allocator_type& __a = allocator_type())
+	: _Base(__n, __hf, __eql, __a)
+      { }
+
+      template<typename _InputIterator>
+        unordered_set(_InputIterator __f, _InputIterator __l,
+		      size_type __n = 0,
+		      const hasher& __hf = hasher(),
+		      const key_equal& __eql = key_equal(),
+		      const allocator_type& __a = allocator_type())
+	  : _Base(__f, __l, __n, __hf, __eql, __a)
+      { }
+
+      unordered_set(const unordered_set&) = default;
+
+      unordered_set(const _Base& __x)
+	: _Base(__x)
+      { }
+
+      unordered_set(unordered_set&&) = default;
+
+      unordered_set(initializer_list<value_type> __l,
+		    size_type __n = 0,
+		    const hasher& __hf = hasher(),
+		    const key_equal& __eql = key_equal(),
+		    const allocator_type& __a = allocator_type())
+      : _Base(__l, __n, __hf, __eql, __a)
+      { }
+
+      unordered_set&
+      operator=(const unordered_set&) = default;
+
+      unordered_set&
+      operator=(unordered_set&&) = default;
+
+      unordered_set&
+      operator=(initializer_list<value_type> __l)
+      {
+	_M_base() = __l;
+	return *this;
+      }
+
+      void
+      swap(unordered_set& __x)
+      { _Base::swap(__x); }
+
+      void
+      clear() noexcept
+      {
+        __profcxx_hashtable_destruct(this, _Base::bucket_count(), 
+                                     _Base::size());
+        this->_M_profile_destruct();
+        _Base::clear();
+      }
+
+      template<typename... _Args>
+	std::pair<iterator, bool>
+	emplace(_Args&&... __args)
+	{
+	  size_type __old_size = _Base::bucket_count();
+	  std::pair<iterator, bool> __res
+	    = _Base::emplace(std::forward<_Args>(__args)...);
+	  _M_profile_resize(__old_size);
+	  return __res;
+	}
+
+      template<typename... _Args>
+	iterator
+	emplace_hint(const_iterator __it, _Args&&... __args)
+	{
+	  size_type __old_size = _Base::bucket_count();
+	  iterator __res
+	    = _Base::emplace_hint(__it, std::forward<_Args>(__args)...);
+	  _M_profile_resize(__old_size);
+	  return __res;
+	}
+
+      void
+      insert(std::initializer_list<value_type> __l)
+      { 
+        size_type __old_size = _Base::bucket_count();
+        _Base::insert(__l); 
+        _M_profile_resize(__old_size); 
+      }
+
+      std::pair<iterator, bool>
+      insert(const value_type& __obj)
+      {
+        size_type __old_size = _Base::bucket_count();
+        std::pair<iterator, bool> __res = _Base::insert(__obj);
+        _M_profile_resize(__old_size); 
+        return __res;
+      }
+
+      iterator
+      insert(const_iterator __iter, const value_type& __v)
+      { 
+        size_type __old_size = _Base::bucket_count(); 
+        iterator __res = _Base::insert(__iter, __v);
+        _M_profile_resize(__old_size); 
+        return __res;
+      }
+
+      std::pair<iterator, bool>
+      insert(value_type&& __obj)
+      {
+        size_type __old_size = _Base::bucket_count();
+        std::pair<iterator, bool> __res = _Base::insert(std::move(__obj));
+        _M_profile_resize(__old_size); 
+        return __res;
+      }
+
+      iterator
+      insert(const_iterator __iter, value_type&& __v)
+      { 
+        size_type __old_size = _Base::bucket_count();
+        iterator __res = _Base::insert(__iter, std::move(__v));
+        _M_profile_resize(__old_size); 
+        return __res;
+      }
+
+      template<typename _InputIter>
+        void
+        insert(_InputIter __first, _InputIter __last)
+        {
+	  size_type __old_size = _Base::bucket_count(); 
+	  _Base::insert(__first, __last);
+	  _M_profile_resize(__old_size); 
+	}
+
+      void
+      rehash(size_type __n)
+      {
+        size_type __old_size = _Base::bucket_count();
+        _Base::rehash(__n);
+        _M_profile_resize(__old_size); 
+      }
+
+    private:
+      void
+      _M_profile_resize(size_type __old_size)
+      {
+	size_type __new_size = _Base::bucket_count();
+	if (__old_size != __new_size)
+	  __profcxx_hashtable_resize(this, __old_size, __new_size);
+      }
+  };
+
+  template<typename _Key, typename _Hash, typename _Pred, typename _Alloc>
+    inline void
+    swap(unordered_set<_Key, _Hash, _Pred, _Alloc>& __x,
+	 unordered_set<_Key, _Hash, _Pred, _Alloc>& __y)
+    { __x.swap(__y); }
+
+  template<typename _Key, typename _Hash, typename _Pred, typename _Alloc>
+    inline bool
+    operator==(const unordered_set<_Key, _Hash, _Pred, _Alloc>& __x,
+	       const unordered_set<_Key, _Hash, _Pred, _Alloc>& __y)
+    { return static_cast<const _GLIBCXX_STD_BASE&>(__x) == __y; }
+
+  template<typename _Key, typename _Hash, typename _Pred, typename _Alloc>
+    inline bool
+    operator!=(const unordered_set<_Key, _Hash, _Pred, _Alloc>& __x,
+	       const unordered_set<_Key, _Hash, _Pred, _Alloc>& __y)
+    { return !(__x == __y); }
+
+#undef _GLIBCXX_BASE
+#undef _GLIBCXX_STD_BASE
+#define _GLIBCXX_STD_BASE _GLIBCXX_STD_C::_GLIBCXX_BASE
+#define _GLIBCXX_BASE unordered_multiset<_Value, _Hash, _Pred, _Alloc>
+
+  /** @brief Unordered_multiset wrapper with performance instrumentation.  */
+  template<typename _Value,
+	   typename _Hash = std::hash<_Value>,
+	   typename _Pred = std::equal_to<_Value>,
+	   typename _Alloc =  std::allocator<_Value> >
+    class unordered_multiset
+    : public _GLIBCXX_STD_BASE,
+      public _Unordered_profile<unordered_multiset<_Value,
+						   _Hash, _Pred, _Alloc>,
+				false>
+    {
+      typedef _GLIBCXX_STD_BASE _Base;
+
+      _Base&
+      _M_base() noexcept       { return *this; }
+
+      const _Base&
+      _M_base() const noexcept { return *this; }
+
+    public:
+      typedef typename _Base::size_type       size_type;
+      typedef typename _Base::hasher          hasher;
+      typedef typename _Base::key_equal       key_equal;
+      typedef typename _Base::allocator_type  allocator_type;
+      typedef typename _Base::key_type        key_type;
+      typedef typename _Base::value_type      value_type;
+      typedef typename _Base::difference_type difference_type;
+      typedef typename _Base::reference       reference;
+      typedef typename _Base::const_reference const_reference;
+
+      typedef typename _Base::iterator iterator;
+      typedef typename _Base::const_iterator const_iterator;
+
+      explicit
+      unordered_multiset(size_type __n = 10,
+			 const hasher& __hf = hasher(),
+			 const key_equal& __eql = key_equal(),
+			 const allocator_type& __a = allocator_type())
+	: _Base(__n, __hf, __eql, __a)
+      { }
+
+      template<typename _InputIterator>
+        unordered_multiset(_InputIterator __f, _InputIterator __l,
+			   size_type __n = 0,
+			   const hasher& __hf = hasher(),
+			   const key_equal& __eql = key_equal(),
+			   const allocator_type& __a = allocator_type())
+	  : _Base(__f, __l, __n, __hf, __eql, __a)
+      { }
+
+      unordered_multiset(const unordered_multiset&) = default;
+
+      unordered_multiset(const _Base& __x)
+	: _Base(__x)
+      { }
+
+      unordered_multiset(unordered_multiset&&) = default;
+
+      unordered_multiset(initializer_list<value_type> __l,
+			 size_type __n = 0,
+			 const hasher& __hf = hasher(),
+			 const key_equal& __eql = key_equal(),
+			 const allocator_type& __a = allocator_type())
+	: _Base(__l, __n, __hf, __eql, __a)
+      { }
+
+      unordered_multiset&
+      operator=(const unordered_multiset&) = default;
+
+      unordered_multiset&
+      operator=(unordered_multiset&&) = default;
+
+      unordered_multiset&
+      operator=(initializer_list<value_type> __l)
+      {
+	_M_base() = __l;
+	return *this;
+      }
+
+      void
+      swap(unordered_multiset& __x)
+      { _Base::swap(__x); }
+
+      void
+      clear() noexcept
+      {
+        __profcxx_hashtable_destruct(this, _Base::bucket_count(), 
+                                     _Base::size());
+        this->_M_profile_destruct();
+        _Base::clear();
+      }
+
+      template<typename... _Args>
+	iterator
+	emplace(_Args&&... __args)
+	{
+	  size_type __old_size = _Base::bucket_count();
+	  iterator __res = _Base::emplace(std::forward<_Args>(__args)...);
+	  _M_profile_resize(__old_size);
+	  return __res;
+	}
+
+      template<typename... _Args>
+	iterator
+	emplace_hint(const_iterator __it, _Args&&... __args)
+	{
+	  size_type __old_size = _Base::bucket_count();
+	  iterator __res
+	    = _Base::emplace_hint(__it, std::forward<_Args>(__args)...);
+	  _M_profile_resize(__old_size);
+	  return __res;
+	}
+
+      void
+      insert(std::initializer_list<value_type> __l)
+      { 
+        size_type __old_size = _Base::bucket_count();
+        _Base::insert(__l); 
+        _M_profile_resize(__old_size); 
+      }
+
+      iterator
+      insert(const value_type& __obj)
+      {
+        size_type __old_size = _Base::bucket_count();
+        iterator __res = _Base::insert(__obj);
+        _M_profile_resize(__old_size); 
+        return __res;
+      }
+
+      iterator
+      insert(const_iterator __iter, const value_type& __v)
+      {
+        size_type __old_size = _Base::bucket_count(); 
+        iterator __res = _Base::insert(__iter, __v);
+        _M_profile_resize(__old_size); 
+        return __res;
+      }
+
+      iterator
+      insert(value_type&& __obj)
+      {
+	size_type __old_size = _Base::bucket_count();
+        iterator __res = _Base::insert(std::move(__obj));
+        _M_profile_resize(__old_size); 
+        return __res;
+      }
+
+      iterator
+      insert(const_iterator __iter, value_type&& __v)
+      {
+        size_type __old_size = _Base::bucket_count(); 
+        iterator __res = _Base::insert(__iter, std::move(__v));
+        _M_profile_resize(__old_size); 
+        return __res;
+      }
+
+      template<typename _InputIter>
+        void
+        insert(_InputIter __first, _InputIter __last)
+        {
+	  size_type __old_size = _Base::bucket_count(); 
+	  _Base::insert(__first, __last);
+	  _M_profile_resize(__old_size); 
+	}
+
+      void
+      rehash(size_type __n)
+      {
+        size_type __old_size = _Base::bucket_count();
+        _Base::rehash(__n);
+        _M_profile_resize(__old_size); 
+      }
+
+    private:
+      void
+      _M_profile_resize(size_type __old_size)
+      {
+	size_type __new_size = _Base::bucket_count();
+        if (__old_size != __new_size)
+          __profcxx_hashtable_resize(this, __old_size, __new_size);
+      }
+   };
+
+  template<typename _Value, typename _Hash, typename _Pred, typename _Alloc>
+    inline void
+    swap(unordered_multiset<_Value, _Hash, _Pred, _Alloc>& __x,
+	 unordered_multiset<_Value, _Hash, _Pred, _Alloc>& __y)
+    { __x.swap(__y); }
+
+  template<typename _Value, typename _Hash, typename _Pred, typename _Alloc>
+    inline bool
+    operator==(const unordered_multiset<_Value, _Hash, _Pred, _Alloc>& __x,
+	       const unordered_multiset<_Value, _Hash, _Pred, _Alloc>& __y)
+    { return static_cast<const _GLIBCXX_STD_BASE&>(__x) == __y; }
+
+  template<typename _Value, typename _Hash, typename _Pred, typename _Alloc>
+    inline bool
+    operator!=(const unordered_multiset<_Value, _Hash, _Pred, _Alloc>& __x,
+	       const unordered_multiset<_Value, _Hash, _Pred, _Alloc>& __y)
+    { return !(__x == __y); }
+
+} // namespace __profile
+} // namespace std
+
+#undef _GLIBCXX_BASE
+#undef _GLIBCXX_STD_BASE
+
+#endif // C++11
+
+#endif

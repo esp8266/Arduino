@@ -1,0 +1,2980 @@
+/* Target hook definitions.
+   Copyright (C) 2001-2013 Free Software Foundation, Inc.
+
+   This program is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 3, or (at your option) any
+   later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; see the file COPYING3.  If not see
+   <http://www.gnu.org/licenses/>.
+
+   In other words, you are welcome to use, share and improve this program.
+   You are forbidden to forbid anyone else to use, share and improve
+   what you give them.   Help stamp out software-hoarding!  */
+
+/* See target-hooks-macros.h for details of macros that should be
+   provided by the including file, and how to use them here.  */
+#include "target-hooks-macros.h"
+
+#undef HOOK_TYPE
+#define HOOK_TYPE "Target Hook"
+
+HOOK_VECTOR (TARGET_INITIALIZER, gcc_target)
+
+/* Functions that output assembler for the target.  */
+#define HOOK_PREFIX "TARGET_ASM_"
+HOOK_VECTOR (TARGET_ASM_OUT, asm_out)
+
+/* Opening and closing parentheses for asm expression grouping.  */
+DEFHOOKPOD
+(open_paren,
+ "",
+ const char *, "(")
+DEFHOOKPODX (close_paren, const char *, ")")
+
+/* Assembler instructions for creating various kinds of integer object.  */
+DEFHOOKPOD
+(byte_op,
+ "",
+ const char *, "\t.byte\t")
+DEFHOOKPOD (aligned_op, "*", struct asm_int_op, TARGET_ASM_ALIGNED_INT_OP)
+DEFHOOKPOD (unaligned_op, "*", struct asm_int_op, TARGET_ASM_UNALIGNED_INT_OP)
+
+/* The maximum number of bytes to skip when applying
+   LABEL_ALIGN_AFTER_BARRIER.  */
+DEFHOOK
+(label_align_after_barrier_max_skip,
+ "",
+ int, (rtx label),
+ default_label_align_after_barrier_max_skip)
+
+/* The maximum number of bytes to skip when applying
+   LOOP_ALIGN.  */
+DEFHOOK
+(loop_align_max_skip,
+ "",
+ int, (rtx label),
+ default_loop_align_max_skip)
+
+/* The maximum number of bytes to skip when applying
+   LABEL_ALIGN.  */
+DEFHOOK
+(label_align_max_skip,
+ "",
+ int, (rtx label),
+ default_label_align_max_skip)
+
+/* The maximum number of bytes to skip when applying
+   JUMP_ALIGN.  */
+DEFHOOK
+(jump_align_max_skip,
+ "",
+ int, (rtx label),
+ default_jump_align_max_skip)
+
+/* Try to output the assembler code for an integer object whose
+   value is given by X.  SIZE is the size of the object in bytes and
+   ALIGNED_P indicates whether it is aligned.  Return true if
+   successful.  Only handles cases for which BYTE_OP, ALIGNED_OP
+   and UNALIGNED_OP are NULL.  */
+DEFHOOK
+(integer,
+ "",
+ /* Only handles cases for which BYTE_OP, ALIGNED_OP and UNALIGNED_OP are
+    NULL.  */
+ bool, (rtx x, unsigned int size, int aligned_p),
+ default_assemble_integer)
+
+/* Output code that will globalize a label.  */
+DEFHOOK
+(globalize_label,
+ "",
+ void, (FILE *stream, const char *name),
+ default_globalize_label)
+
+/* Output code that will globalize a declaration.  */
+DEFHOOK
+(globalize_decl_name,
+ "",
+ void, (FILE *stream, tree decl), default_globalize_decl_name)
+
+/* Output code that will emit a label for unwind info, if this
+   target requires such labels.  Second argument is the decl the
+   unwind info is associated with, third is a boolean: true if
+   this is for exception handling, fourth is a boolean: true if
+   this is only a placeholder for an omitted FDE.  */
+DEFHOOK
+(emit_unwind_label,
+ "",
+ void, (FILE *stream, tree decl, int for_eh, int empty),
+ default_emit_unwind_label)
+
+/* Output code that will emit a label to divide up the exception table.  */
+DEFHOOK
+(emit_except_table_label,
+ "",
+ void, (FILE *stream),
+ default_emit_except_table_label)
+
+/* Emit a directive for setting the personality for the function.  */
+DEFHOOK
+(emit_except_personality,
+ "If the target implements @code{TARGET_ASM_UNWIND_EMIT}, this hook may be\
+ used to emit a directive to install a personality hook into the unwind\
+ info.  This hook should not be used if dwarf2 unwind info is used.",
+ void, (rtx personality),
+ NULL)
+
+/* Emit any directives required to unwind this instruction.  */
+DEFHOOK
+(unwind_emit,
+ "",
+ void, (FILE *stream, rtx insn),
+ NULL)
+
+DEFHOOKPOD
+(unwind_emit_before_insn,
+ "True if the @code{TARGET_ASM_UNWIND_EMIT} hook should be called before\
+ the assembly for @var{insn} has been emitted, false if the hook should\
+ be called afterward.",
+ bool, true)
+
+/* Generate an internal label.
+   For now this is just a wrapper for ASM_GENERATE_INTERNAL_LABEL.  */
+DEFHOOK_UNDOC
+(generate_internal_label,
+ "",
+ void, (char *buf, const char *prefix, unsigned long labelno),
+ default_generate_internal_label)
+
+/* Output an internal label.  */
+DEFHOOK
+(internal_label,
+ "",
+ void, (FILE *stream, const char *prefix, unsigned long labelno),
+ default_internal_label)
+
+/* Output label for the constant.  */
+DEFHOOK
+(declare_constant_name,
+ "",
+ void, (FILE *file, const char *name, const_tree expr, HOST_WIDE_INT size),
+ default_asm_declare_constant_name)
+
+/* Emit a ttype table reference to a typeinfo object.  */
+DEFHOOK
+(ttype,
+ "",
+ bool, (rtx sym),
+ hook_bool_rtx_false)
+
+/* Emit an assembler directive to set visibility for the symbol
+   associated with the tree decl.  */
+DEFHOOK
+(assemble_visibility,
+ "",
+ void, (tree decl, int visibility),
+ default_assemble_visibility)
+
+/* Output the assembler code for entry to a function.  */
+DEFHOOK
+(function_prologue,
+ "",
+ void, (FILE *file, HOST_WIDE_INT size),
+ default_function_pro_epilogue)
+
+/* Output the assembler code for end of prologue.  */
+DEFHOOK
+(function_end_prologue,
+ "",
+ void, (FILE *file),
+ no_asm_to_stream)
+
+/* Output the assembler code for start of epilogue.  */
+DEFHOOK
+(function_begin_epilogue,
+ "",
+ void, (FILE *file),
+ no_asm_to_stream)
+
+/* Output the assembler code for function exit.  */
+DEFHOOK
+(function_epilogue,
+ "",
+ void, (FILE *file, HOST_WIDE_INT size),
+ default_function_pro_epilogue)
+
+/* Initialize target-specific sections.  */
+DEFHOOK
+(init_sections,
+ "",
+ void, (void),
+ hook_void_void)
+
+/* Tell assembler to change to section NAME with attributes FLAGS.
+   If DECL is non-NULL, it is the VAR_DECL or FUNCTION_DECL with
+   which this section is associated.  */
+DEFHOOK
+(named_section,
+ "",
+ void, (const char *name, unsigned int flags, tree decl),
+ default_no_named_section)
+
+/* Return preferred text (sub)section for function DECL.
+   Main purpose of this function is to separate cold, normal and hot
+   functions. STARTUP is true when function is known to be used only 
+   at startup (from static constructors or it is main()).
+   EXIT is true when function is known to be used only at exit
+   (from static destructors).
+   Return NULL if function should go to default text section.  */
+DEFHOOK
+(function_section,
+ "",
+ section *, (tree decl, enum node_frequency freq, bool startup, bool exit),
+ default_function_section)
+
+/* Output the assembler code for function exit.  */
+DEFHOOK
+(function_switched_text_sections,
+ "Used by the target to emit any assembler directives or additional\
+  labels needed when a function is partitioned between different\
+  sections.  Output should be written to @var{file}.  The function\
+  decl is available as @var{decl} and the new section is `cold' if\
+  @var{new_is_cold} is @code{true}.",
+ void, (FILE *file, tree decl, bool new_is_cold),
+ default_function_switched_text_sections)
+
+/* Return a mask describing how relocations should be treated when
+   selecting sections.  Bit 1 should be set if global relocations
+   should be placed in a read-write section; bit 0 should be set if
+   local relocations should be placed in a read-write section.  */
+DEFHOOK
+(reloc_rw_mask,
+ "",
+ int, (void),
+ default_reloc_rw_mask)
+
+ /* Return a section for EXP.  It may be a DECL or a constant.  RELOC
+    is nonzero if runtime relocations must be applied; bit 1 will be
+    set if the runtime relocations require non-local name resolution.
+    ALIGN is the required alignment of the data.  */
+DEFHOOK
+(select_section,
+ "",
+ section *, (tree exp, int reloc, unsigned HOST_WIDE_INT align),
+ default_select_section)
+
+/* Return a section for X.  MODE is X's mode and ALIGN is its
+   alignment in bits.  */
+DEFHOOK
+(select_rtx_section,
+ "",
+ section *, (enum machine_mode mode, rtx x, unsigned HOST_WIDE_INT align),
+ default_select_rtx_section)
+
+/* Select a unique section name for DECL.  RELOC is the same as
+   for SELECT_SECTION.  */
+DEFHOOK
+(unique_section,
+ "",
+ void, (tree decl, int reloc),
+ default_unique_section)
+
+/* Return the readonly data section associated with function DECL.  */
+DEFHOOK
+(function_rodata_section,
+ "",
+ section *, (tree decl),
+ default_function_rodata_section)
+
+/* Nonnull if the target wants to override the default ".rodata" prefix
+   for mergeable data sections.  */
+DEFHOOKPOD
+(mergeable_rodata_prefix,
+ "Usually, the compiler uses the prefix @code{\".rodata\"} to construct\n\
+section names for mergeable constant data.  Define this macro to override\n\
+the string if a different section name should be used.",
+ const char *, ".rodata")
+
+/* Return the section to be used for transactional memory clone tables.  */
+DEFHOOK
+(tm_clone_table_section,
+ "Return the section that should be used for transactional memory clone\
+  tables.",
+ section *, (void), default_clone_table_section)
+
+/* Output a constructor for a symbol with a given priority.  */
+DEFHOOK
+(constructor,
+ "",
+ void, (rtx symbol, int priority), NULL)
+
+/* Output a destructor for a symbol with a given priority.  */
+DEFHOOK
+(destructor,
+ "",
+ void, (rtx symbol, int priority), NULL)
+
+/* Output the assembler code for a thunk function.  THUNK_DECL is the
+   declaration for the thunk function itself, FUNCTION is the decl for
+   the target function.  DELTA is an immediate constant offset to be
+   added to THIS.  If VCALL_OFFSET is nonzero, the word at
+   *(*this + vcall_offset) should be added to THIS.  */
+DEFHOOK
+(output_mi_thunk,
+ "",
+ void, (FILE *file, tree thunk_fndecl, HOST_WIDE_INT delta,
+	HOST_WIDE_INT vcall_offset, tree function),
+ NULL)
+
+/* Determine whether output_mi_thunk would succeed.  */
+/* ??? Ideally, this hook would not exist, and success or failure
+   would be returned from output_mi_thunk directly.  But there's
+   too much undo-able setup involved in invoking output_mi_thunk.
+   Could be fixed by making output_mi_thunk emit rtl instead of
+   text to the output file.  */
+DEFHOOK
+(can_output_mi_thunk,
+ "",
+ bool, (const_tree thunk_fndecl, HOST_WIDE_INT delta,
+	HOST_WIDE_INT vcall_offset, const_tree function),
+ hook_bool_const_tree_hwi_hwi_const_tree_false)
+
+/* Output any boilerplate text needed at the beginning of a
+   translation unit.  */
+DEFHOOK
+(file_start,
+ "",
+ void, (void),
+ default_file_start)
+
+/* Output any boilerplate text needed at the end of a translation unit.  */
+DEFHOOK
+(file_end,
+ "",
+ void, (void),
+ hook_void_void)
+
+/* Output any boilerplate text needed at the beginning of an
+   LTO output stream.  */
+DEFHOOK
+(lto_start,
+ "",
+ void, (void),
+ hook_void_void)
+
+/* Output any boilerplate text needed at the end of an
+   LTO output stream.  */
+DEFHOOK
+(lto_end,
+ "",
+ void, (void),
+ hook_void_void)
+
+/* Output any boilerplace text needed at the end of a
+   translation unit before debug and unwind info is emitted.  */
+DEFHOOK
+(code_end,
+ "",
+ void, (void),
+ hook_void_void)
+
+/* Output an assembler pseudo-op to declare a library function name
+   external.  */
+DEFHOOK
+(external_libcall,
+ "",
+ void, (rtx symref),
+ default_external_libcall)
+
+/* Output an assembler directive to mark decl live. This instructs
+   linker to not dead code strip this symbol.  */
+DEFHOOK
+(mark_decl_preserved,
+ "",
+ void, (const char *symbol),
+ hook_void_constcharptr)
+
+/* Output a record of the command line switches that have been passed.  */
+DEFHOOK
+(record_gcc_switches,
+ "",
+ int, (print_switch_type type, const char *text),
+ NULL)
+
+/* The name of the section that the example ELF implementation of
+   record_gcc_switches will use to store the information.  Target
+   specific versions of record_gcc_switches may or may not use
+   this information.  */
+DEFHOOKPOD
+(record_gcc_switches_section,
+ "",
+ const char *, ".GCC.command.line")
+
+/* Output the definition of a section anchor.  */
+DEFHOOK
+(output_anchor,
+ "",
+ void, (rtx x),
+ default_asm_output_anchor)
+
+DEFHOOK
+(output_ident,
+ "Output a string based on @var{name}, suitable for the @samp{#ident} \
+ directive, or the equivalent directive or pragma in non-C-family languages. \
+ If this hook is not defined, nothing is output for the @samp{#ident} \
+ directive.",
+ void, (const char *name),
+ hook_void_constcharptr)
+
+/* Output a DTP-relative reference to a TLS symbol.  */
+DEFHOOK
+(output_dwarf_dtprel,
+ "",
+ void, (FILE *file, int size, rtx x),
+ NULL)
+
+/* Some target machines need to postscan each insn after it is output.  */
+DEFHOOK
+(final_postscan_insn,
+ "",
+ void, (FILE *file, rtx insn, rtx *opvec, int noperands),
+ NULL)
+
+/* Emit the trampoline template.  This hook may be NULL.  */
+DEFHOOK
+(trampoline_template,
+ "",
+ void, (FILE *f),
+ NULL)
+
+DEFHOOK
+(output_source_filename,
+ "Output COFF information or DWARF debugging information which indicates\
+ that filename @var{name} is the current source file to the stdio\
+ stream @var{file}.\n\
+ \n\
+ This target hook need not be defined if the standard form of output\
+ for the file format in use is appropriate.",
+ void ,(FILE *file, const char *name),
+ default_asm_output_source_filename)
+
+DEFHOOK
+(output_addr_const_extra,
+ "",
+ bool, (FILE *file, rtx x),
+ hook_bool_FILEptr_rtx_false)
+
+/* ??? The TARGET_PRINT_OPERAND* hooks are part of the asm_out struct,
+   even though that is not reflected in the macro name to override their
+   initializers.  */
+#undef HOOK_PREFIX
+#define HOOK_PREFIX "TARGET_"
+
+/* Emit a machine-specific insn operand.  */
+/* ??? tm.texi only documents the old macro PRINT_OPERAND,
+   not this  hook, and uses a different name for the argument FILE.  */
+DEFHOOK_UNDOC
+(print_operand,
+ "",
+ void, (FILE *file, rtx x, int code),
+ default_print_operand)
+
+/* Emit a machine-specific memory address.  */
+/* ??? tm.texi only documents the old macro PRINT_OPERAND_ADDRESS,
+   not this  hook, and uses different argument names.  */
+DEFHOOK_UNDOC
+(print_operand_address,
+ "",
+ void, (FILE *file, rtx addr),
+ default_print_operand_address)
+
+/* Determine whether CODE is a valid punctuation character for the
+   `print_operand' hook.  */
+/* ??? tm.texi only documents the old macro PRINT_OPERAND_PUNCT_VALID_P,
+   not this  hook.  */
+DEFHOOK_UNDOC
+(print_operand_punct_valid_p,
+ "",
+ bool ,(unsigned char code),
+ default_print_operand_punct_valid_p)
+
+/* Given a symbol name, perform same mangling as assemble_name and
+   ASM_OUTPUT_LABELREF, returning result as an IDENTIFIER_NODE.  */
+DEFHOOK
+(mangle_assembler_name,
+ "Given a symbol @var{name}, perform same mangling as @code{varasm.c}'s\
+ @code{assemble_name}, but in memory rather than to a file stream, returning\
+ result as an @code{IDENTIFIER_NODE}.  Required for correct LTO symtabs.  The\
+ default implementation calls the @code{TARGET_STRIP_NAME_ENCODING} hook and\
+ then prepends the @code{USER_LABEL_PREFIX}, if any.",
+ tree, (const char *name),
+ default_mangle_assembler_name)
+
+HOOK_VECTOR_END (asm_out)
+
+/* Functions relating to instruction scheduling.  All of these
+   default to null pointers, which haifa-sched.c looks for and handles.  */
+#undef HOOK_PREFIX
+#define HOOK_PREFIX "TARGET_SCHED_"
+HOOK_VECTOR (TARGET_SCHED, sched)
+
+/* Given the current cost, COST, of an insn, INSN, calculate and
+   return a new cost based on its relationship to DEP_INSN through
+   the dependence LINK.  The default is to make no adjustment.  */
+DEFHOOK
+(adjust_cost,
+ "",
+ int, (rtx insn, rtx link, rtx dep_insn, int cost), NULL)
+
+/* Adjust the priority of an insn as you see fit.  Returns the new priority.  */
+DEFHOOK
+(adjust_priority,
+ "",
+ int, (rtx insn, int priority), NULL)
+
+/* Function which returns the maximum number of insns that can be
+   scheduled in the same machine cycle.  This must be constant
+   over an entire compilation.  The default is 1.  */
+DEFHOOK
+(issue_rate,
+ "",
+ int, (void), NULL)
+
+/* Calculate how much this insn affects how many more insns we
+   can emit this cycle.  Default is they all cost the same.  */
+DEFHOOK
+(variable_issue,
+ "",
+ int, (FILE *file, int verbose, rtx insn, int more), NULL)
+
+/* Initialize machine-dependent scheduling code.  */
+DEFHOOK
+(init,
+ "",
+ void, (FILE *file, int verbose, int max_ready), NULL)
+
+/* Finalize machine-dependent scheduling code.  */
+DEFHOOK
+(finish,
+ "",
+ void, (FILE *file, int verbose), NULL)
+
+ /* Initialize machine-dependent function wide scheduling code.  */
+DEFHOOK
+(init_global,
+ "",
+ void, (FILE *file, int verbose, int old_max_uid), NULL)
+
+/* Finalize machine-dependent function wide scheduling code.  */
+DEFHOOK
+(finish_global,
+ "",
+ void, (FILE *file, int verbose), NULL)
+
+/* Reorder insns in a machine-dependent fashion, in two different
+       places.  Default does nothing.  */
+DEFHOOK
+(reorder,
+ "",
+ int, (FILE *file, int verbose, rtx *ready, int *n_readyp, int clock), NULL)
+
+DEFHOOK
+(reorder2,
+ "",
+ int, (FILE *file, int verbose, rtx *ready, int *n_readyp, int clock), NULL)
+
+/* The following member value is a pointer to a function called
+   after evaluation forward dependencies of insns in chain given
+   by two parameter values (head and tail correspondingly).  */
+DEFHOOK
+(dependencies_evaluation_hook,
+ "",
+ void, (rtx head, rtx tail), NULL)
+
+/* The values of the following four members are pointers to functions
+   used to simplify the automaton descriptions.  dfa_pre_cycle_insn and
+   dfa_post_cycle_insn give functions returning insns which are used to
+   change the pipeline hazard recognizer state when the new simulated
+   processor cycle correspondingly starts and finishes.  The function
+   defined by init_dfa_pre_cycle_insn and init_dfa_post_cycle_insn are
+   used to initialize the corresponding insns.  The default values of
+   the members result in not changing the automaton state when the
+   new simulated processor cycle correspondingly starts and finishes.  */
+
+DEFHOOK
+(init_dfa_pre_cycle_insn,
+ "",
+ void, (void), NULL)
+
+DEFHOOK
+(dfa_pre_cycle_insn,
+ "",
+ rtx, (void), NULL)
+
+DEFHOOK
+(init_dfa_post_cycle_insn,
+ "",
+ void, (void), NULL)
+
+DEFHOOK
+(dfa_post_cycle_insn,
+ "",
+ rtx, (void), NULL)
+
+/* The values of the following two members are pointers to
+   functions used to simplify the automaton descriptions.
+   dfa_pre_advance_cycle and dfa_post_advance_cycle are getting called
+   immediately before and after cycle is advanced.  */
+
+DEFHOOK
+(dfa_pre_advance_cycle,
+ "",
+ void, (void), NULL)
+
+DEFHOOK
+(dfa_post_advance_cycle,
+ "",
+ void, (void), NULL)
+
+/* The following member value is a pointer to a function returning value
+   which defines how many insns in queue `ready' will we try for
+   multi-pass scheduling.  If the member value is nonzero and the
+   function returns positive value, the DFA based scheduler will make
+   multi-pass scheduling for the first cycle.  In other words, we will
+   try to choose ready insn which permits to start maximum number of
+   insns on the same cycle.  */
+DEFHOOK
+(first_cycle_multipass_dfa_lookahead,
+ "",
+ int, (void), NULL)
+
+/* The following member value is pointer to a function controlling
+   what insns from the ready insn queue will be considered for the
+   multipass insn scheduling.  If the hook returns zero for insn
+   passed as the parameter, the insn will be not chosen to be issued.  */
+DEFHOOK
+(first_cycle_multipass_dfa_lookahead_guard,
+ "",
+ int, (rtx insn), NULL)
+
+/* This hook prepares the target for a new round of multipass
+   scheduling.
+   DATA is a pointer to target-specific data used for multipass scheduling.
+   READY_TRY and N_READY represent the current state of search in the
+   optimization space.  The target can filter out instructions that
+   should not be tried during current round by setting corresponding
+   elements in READY_TRY to non-zero.
+   FIRST_CYCLE_INSN_P is true if this is the first round of multipass
+   scheduling on current cycle.  */
+DEFHOOK
+(first_cycle_multipass_begin,
+ "",
+ void, (void *data, char *ready_try, int n_ready, bool first_cycle_insn_p),
+ NULL)
+
+/* This hook is called when multipass scheduling evaluates instruction INSN.
+   DATA is a pointer to target-specific data that can be used to record effects
+   of INSN on CPU that are not described in DFA.
+   READY_TRY and N_READY represent the current state of search in the
+   optimization space.  The target can filter out instructions that
+   should not be tried after issuing INSN by setting corresponding
+   elements in READY_TRY to non-zero.
+   INSN is the instruction being evaluated.
+   PREV_DATA is a pointer to target-specific data corresponding
+   to a state before issuing INSN.  */
+DEFHOOK
+(first_cycle_multipass_issue,
+ "",
+ void, (void *data, char *ready_try, int n_ready, rtx insn,
+	const void *prev_data), NULL)
+
+/* This hook is called when multipass scheduling backtracks from evaluation of
+   instruction corresponding to DATA.
+   DATA is a pointer to target-specific data that stores the effects
+   of instruction from which the algorithm backtracks on CPU that are not
+   described in DFA.
+   READY_TRY and N_READY represent the current state of search in the
+   optimization space.  The target can filter out instructions that
+   should not be tried after issuing INSN by setting corresponding
+   elements in READY_TRY to non-zero.  */
+DEFHOOK
+(first_cycle_multipass_backtrack,
+ "",
+ void, (const void *data, char *ready_try, int n_ready), NULL)
+
+/* This hook notifies the target about the result of the concluded current
+   round of multipass scheduling.
+   DATA is a pointer.
+   If DATA is non-NULL it points to target-specific data used for multipass
+   scheduling which corresponds to instruction at the start of the chain of
+   the winning solution.  DATA is NULL when multipass scheduling cannot find
+   a good enough solution on current cycle and decides to retry later,
+   usually after advancing the cycle count.  */
+DEFHOOK
+(first_cycle_multipass_end,
+ "",
+ void, (const void *data), NULL)
+
+/* This hook is called to initialize target-specific data for multipass
+   scheduling after it has been allocated.
+   DATA is a pointer to target-specific data that stores the effects
+   of instruction from which the algorithm backtracks on CPU that are not
+   described in DFA.  */
+DEFHOOK
+(first_cycle_multipass_init,
+ "",
+ void, (void *data), NULL)
+
+/* This hook is called to finalize target-specific data for multipass
+   scheduling before it is deallocated.
+   DATA is a pointer to target-specific data that stores the effects
+   of instruction from which the algorithm backtracks on CPU that are not
+   described in DFA.  */
+DEFHOOK
+(first_cycle_multipass_fini,
+ "",
+ void, (void *data), NULL)
+
+/* The following member value is pointer to a function called by
+   the insn scheduler before issuing insn passed as the third
+   parameter on given cycle.  If the hook returns nonzero, the
+   insn is not issued on given processors cycle.  Instead of that,
+   the processor cycle is advanced.  If the value passed through
+   the last parameter is zero, the insn ready queue is not sorted
+   on the new cycle start as usually.  The first parameter passes
+   file for debugging output.  The second one passes the scheduler
+   verbose level of the debugging output.  The forth and the fifth
+   parameter values are correspondingly processor cycle on which
+   the previous insn has been issued and the current processor cycle.  */
+DEFHOOK
+(dfa_new_cycle,
+ "",
+ int, (FILE *dump, int verbose, rtx insn, int last_clock,
+       int clock, int *sort_p),
+ NULL)
+
+/* The following member value is a pointer to a function called by the
+   insn scheduler.  It should return true if there exists a dependence
+   which is considered costly by the target, between the insn
+   DEP_PRO (&_DEP), and the insn DEP_CON (&_DEP).  The first parameter is
+   the dep that represents the dependence between the two insns.  The
+   second argument is the cost of the dependence as estimated by
+   the scheduler.  The last argument is the distance in cycles
+   between the already scheduled insn (first parameter) and the
+   second insn (second parameter).  */
+DEFHOOK
+(is_costly_dependence,
+ "",
+ bool, (struct _dep *_dep, int cost, int distance), NULL)
+
+DEFHOOK_UNDOC
+(adjust_cost_2,
+ "Given the current cost, @var{cost}, of an insn, @var{insn}, calculate and\
+ return a new cost based on its relationship to @var{dep_insn} through the\
+ dependence of weakness @var{dw}.  The default is to make no adjustment.",
+ int, (rtx insn, int dep_type1, rtx dep_insn, int cost, int dw), NULL)
+
+/* The following member value is a pointer to a function called
+   by the insn scheduler. This hook is called to notify the backend
+   that new instructions were emitted.  */
+DEFHOOK
+(h_i_d_extended,
+ "",
+ void, (void), NULL)
+
+/* Next 5 functions are for multi-point scheduling.  */
+
+/* Allocate memory for scheduler context.  */
+DEFHOOK
+(alloc_sched_context,
+ "",
+ void *, (void), NULL)
+
+/* Fills the context from the local machine scheduler context.  */
+DEFHOOK
+(init_sched_context,
+ "",
+ void, (void *tc, bool clean_p), NULL)
+
+/* Sets local machine scheduler context to a saved value.  */
+DEFHOOK
+(set_sched_context,
+ "",
+ void, (void *tc), NULL)
+
+/* Clears a scheduler context so it becomes like after init.  */
+DEFHOOK
+(clear_sched_context,
+ "",
+ void, (void *tc), NULL)
+
+/* Frees the scheduler context.  */
+DEFHOOK
+(free_sched_context,
+ "",
+ void, (void *tc), NULL)
+
+/* The following member value is a pointer to a function called
+   by the insn scheduler.
+   The first parameter is an instruction, the second parameter is the type
+   of the requested speculation, and the third parameter is a pointer to the
+   speculative pattern of the corresponding type (set if return value == 1).
+   It should return
+   -1, if there is no pattern, that will satisfy the requested speculation type,
+   0, if current pattern satisfies the requested speculation type,
+   1, if pattern of the instruction should be changed to the newly
+   generated one.  */
+DEFHOOK
+(speculate_insn,
+ "",
+ int, (rtx insn, int request, rtx *new_pat), NULL)
+
+/* The following member value is a pointer to a function called
+   by the insn scheduler.  It should return true if the check instruction
+   passed as the parameter needs a recovery block.  */
+DEFHOOK
+(needs_block_p,
+ "",
+ bool, (int dep_status), NULL)
+
+/* The following member value is a pointer to a function called
+   by the insn scheduler.  It should return a pattern for the check
+   instruction.
+   The first parameter is a speculative instruction, the second parameter
+   is the label of the corresponding recovery block (or null, if it is a
+   simple check).  If the mutation of the check is requested (e.g. from
+   ld.c to chk.a), the third parameter is true - in this case the first
+   parameter is the previous check.  */
+DEFHOOK
+(gen_spec_check,
+ "",
+ rtx, (rtx insn, rtx label, int mutate_p), NULL)
+
+/* The following member value is a pointer to a function controlling
+   what insns from the ready insn queue will be considered for the
+   multipass insn scheduling.  If the hook returns zero for the insn
+   passed as the parameter, the insn will not be chosen to be
+   issued.  This hook is used to discard speculative instructions,
+   that stand at the first position of the ready list.  */
+DEFHOOK
+(first_cycle_multipass_dfa_lookahead_guard_spec,
+ "",
+ bool, (const_rtx insn), NULL)
+
+/* The following member value is a pointer to a function that provides
+   information about the speculation capabilities of the target.
+   The parameter is a pointer to spec_info variable.  */
+DEFHOOK
+(set_sched_flags,
+ "",
+ void, (struct spec_info_def *spec_info), NULL)
+
+DEFHOOK_UNDOC
+(get_insn_spec_ds,
+ "Return speculation types of instruction @var{insn}.",
+ int, (rtx insn), NULL)
+
+DEFHOOK_UNDOC
+(get_insn_checked_ds,
+ "Return speculation types that are checked for instruction @var{insn}",
+ int, (rtx insn), NULL)
+
+DEFHOOK_UNDOC
+(skip_rtx_p,
+ "Return bool if rtx scanning should just skip current layer and\
+ advance to the inner rtxes.",
+ bool, (const_rtx x), NULL)
+
+/* The following member value is a pointer to a function that provides
+   information about the target resource-based lower bound which is
+   used by the swing modulo scheduler.  The parameter is a pointer
+   to ddg variable.  */
+DEFHOOK
+(sms_res_mii,
+ "",
+ int, (struct ddg *g), NULL)
+
+/* The following member value is a function that initializes dispatch
+   schedling and adds instructions to dispatch window according to its
+   parameters.  */
+DEFHOOK
+(dispatch_do,
+"",
+void, (rtx insn, int x),
+hook_void_rtx_int)
+
+/* The following member value is a a function that returns true is
+   dispatch schedling is supported in hardware and condition passed
+   as the second parameter is true.  */
+DEFHOOK
+(dispatch,
+"",
+bool, (rtx insn, int x),
+hook_bool_rtx_int_false)
+
+DEFHOOKPOD
+(exposed_pipeline,
+"True if the processor has an exposed pipeline, which means that not just\n\
+the order of instructions is important for correctness when scheduling, but\n\
+also the latencies of operations.",
+bool, false)
+
+/* The following member value is a function that returns number
+   of operations reassociator should try to put in parallel for
+   statements of the given type.  By default 1 is used.  */
+DEFHOOK
+(reassociation_width,
+"This hook is called by tree reassociator to determine a level of\n\
+parallelism required in output calculations chain.",
+int, (unsigned int opc, enum machine_mode mode),
+hook_int_uint_mode_1)
+
+HOOK_VECTOR_END (sched)
+
+/* Functions relating to vectorization.  */
+#undef HOOK_PREFIX
+#define HOOK_PREFIX "TARGET_VECTORIZE_"
+HOOK_VECTOR (TARGET_VECTORIZE, vectorize)
+
+/* The following member value is a pointer to a function called
+   by the vectorizer, and return the decl of the target builtin
+   function.  */
+DEFHOOK
+(builtin_mask_for_load,
+ "",
+ tree, (void), NULL)
+
+/* Returns a code for builtin that realizes vectorized version of
+   function, or NULL_TREE if not available.  */
+DEFHOOK
+(builtin_vectorized_function,
+ "",
+ tree, (tree fndecl, tree vec_type_out, tree vec_type_in),
+ default_builtin_vectorized_function)
+
+/* Returns a function declaration for a builtin that realizes the
+   vector conversion, or NULL_TREE if not available.  */
+DEFHOOK
+(builtin_conversion,
+ "",
+ tree, (unsigned code, tree dest_type, tree src_type),
+ default_builtin_vectorized_conversion)
+
+/* Cost of different vector/scalar statements in vectorization cost
+   model. In case of misaligned vector loads and stores the cost depends
+   on the data type and misalignment value.  */
+DEFHOOK
+(builtin_vectorization_cost,
+ "",
+ int, (enum vect_cost_for_stmt type_of_cost, tree vectype, int misalign),
+ default_builtin_vectorization_cost)
+
+/* Return true if vector alignment is reachable (by peeling N
+   iterations) for the given type.  */
+DEFHOOK
+(vector_alignment_reachable,
+ "",
+ bool, (const_tree type, bool is_packed),
+ default_builtin_vector_alignment_reachable)
+
+/* Return true if a vector created for vec_perm_const is valid.
+   A NULL indicates that all constants are valid permutations.  */
+DEFHOOK
+(vec_perm_const_ok,
+ "",
+ bool, (enum machine_mode, const unsigned char *sel),
+ NULL)
+
+/* Return true if the target supports misaligned store/load of a
+   specific factor denoted in the third parameter.  The last parameter
+   is true if the access is defined in a packed struct.  */
+DEFHOOK
+(support_vector_misalignment,
+ "",
+ bool,
+ (enum machine_mode mode, const_tree type, int misalignment, bool is_packed),
+ default_builtin_support_vector_misalignment)
+
+/* Return the builtin decl needed to load a vector of TYPE.  */
+DEFHOOK
+(builtin_tm_load,
+ "This hook should return the built-in decl needed to load a vector of the "
+ "given type within a transaction.",
+ tree,
+ (tree),
+ default_builtin_tm_load_store)
+
+/* Return the builtin decl needed to store a vector of TYPE.  */
+DEFHOOK
+(builtin_tm_store,
+ "This hook should return the built-in decl needed to store a vector of the "
+ "given type within a transaction.",
+ tree,
+ (tree),
+ default_builtin_tm_load_store)
+
+/* Returns the preferred mode for SIMD operations for the specified
+   scalar mode.  */
+DEFHOOK
+(preferred_simd_mode,
+ "",
+ enum machine_mode,
+ (enum machine_mode mode),
+ default_preferred_simd_mode)
+
+/* Returns a mask of vector sizes to iterate over when auto-vectorizing
+   after processing the preferred one derived from preferred_simd_mode.  */
+DEFHOOK
+(autovectorize_vector_sizes,
+ "",
+ unsigned int,
+ (void),
+ default_autovectorize_vector_sizes)
+
+/* Target builtin that implements vector gather operation.  */
+DEFHOOK
+(builtin_gather,
+ "",
+ tree,
+ (const_tree mem_vectype, const_tree index_type, int scale),
+ NULL)
+
+/* Target function to initialize the cost model for a loop or block.  */
+DEFHOOK
+(init_cost,
+ "This hook should initialize target-specific data structures in preparation "
+ "for modeling the costs of vectorizing a loop or basic block.  The default "
+ "allocates three unsigned integers for accumulating costs for the prologue, "
+ "body, and epilogue of the loop or basic block.  If @var{loop_info} is "
+ "non-NULL, it identifies the loop being vectorized; otherwise a single block "
+ "is being vectorized.",
+ void *,
+ (struct loop *loop_info),
+ default_init_cost)
+
+/* Target function to record N statements of the given kind using the
+   given vector type within the cost model data for the current loop or
+    block.  */
+DEFHOOK
+(add_stmt_cost,
+ "This hook should update the target-specific @var{data} in response to "
+ "adding @var{count} copies of the given @var{kind} of statement to a "
+ "loop or basic block.  The default adds the builtin vectorizer cost for "
+ "the copies of the statement to the accumulator specified by @var{where}, "
+ "(the prologue, body, or epilogue) and returns the amount added.  The "
+ "return value should be viewed as a tentative cost that may later be "
+ "revised.",
+ unsigned,
+ (void *data, int count, enum vect_cost_for_stmt kind,
+  struct _stmt_vec_info *stmt_info, int misalign,
+  enum vect_cost_model_location where),
+ default_add_stmt_cost)
+
+/* Target function to calculate the total cost of the current vectorized
+   loop or block.  */
+DEFHOOK
+(finish_cost,
+ "This hook should complete calculations of the cost of vectorizing a loop "
+ "or basic block based on @var{data}, and return the prologue, body, and "
+ "epilogue costs as unsigned integers.  The default returns the value of "
+ "the three accumulators.",
+ void,
+ (void *data, unsigned *prologue_cost, unsigned *body_cost,
+  unsigned *epilogue_cost),
+ default_finish_cost)
+
+/* Function to delete target-specific cost modeling data.  */
+DEFHOOK
+(destroy_cost_data,
+ "This hook should release @var{data} and any related data structures "
+ "allocated by TARGET_VECTORIZE_INIT_COST.  The default releases the "
+ "accumulator.",
+ void,
+ (void *data),
+ default_destroy_cost_data)
+
+HOOK_VECTOR_END (vectorize)
+
+#undef HOOK_PREFIX
+#define HOOK_PREFIX "TARGET_"
+
+/* Allow target specific overriding of option settings after options have
+  been changed by an attribute or pragma or when it is reset at the
+  end of the code affected by an attribute or pragma.  */
+DEFHOOK
+(override_options_after_change,
+ "",
+ void, (void),
+ hook_void_void)
+
+DEFHOOK_UNDOC
+(eh_return_filter_mode,
+ "Return machine mode for filter value.",
+ enum machine_mode, (void),
+ default_eh_return_filter_mode)
+
+/* Return machine mode for libgcc expanded cmp instructions.  */
+DEFHOOK
+(libgcc_cmp_return_mode,
+ "",
+ enum machine_mode, (void),
+ default_libgcc_cmp_return_mode)
+
+/* Return machine mode for libgcc expanded shift instructions.  */
+DEFHOOK
+(libgcc_shift_count_mode,
+ "",
+ enum machine_mode, (void),
+ default_libgcc_shift_count_mode)
+
+/* Return machine mode to be used for _Unwind_Word type.  */
+DEFHOOK
+(unwind_word_mode,
+ "",
+ enum machine_mode, (void),
+ default_unwind_word_mode)
+
+/* Given two decls, merge their attributes and return the result.  */
+DEFHOOK
+(merge_decl_attributes,
+ "",
+ tree, (tree olddecl, tree newdecl),
+ merge_decl_attributes)
+
+/* Given two types, merge their attributes and return the result.  */
+DEFHOOK
+(merge_type_attributes,
+ "",
+ tree, (tree type1, tree type2),
+ merge_type_attributes)
+
+/* Table of machine attributes and functions to handle them.
+   Ignored if NULL.  */
+DEFHOOKPOD
+(attribute_table,
+ "",
+ const struct attribute_spec *, NULL)
+
+/* Return true iff attribute NAME expects a plain identifier as its first
+   argument.  */
+DEFHOOK
+(attribute_takes_identifier_p,
+ "",
+ bool, (const_tree name),
+ hook_bool_const_tree_false)
+
+/* Return zero if the attributes on TYPE1 and TYPE2 are incompatible,
+   one if they are compatible and two if they are nearly compatible
+   (which causes a warning to be generated).  */
+DEFHOOK
+(comp_type_attributes,
+ "",
+ int, (const_tree type1, const_tree type2),
+ hook_int_const_tree_const_tree_1)
+
+/* Assign default attributes to the newly defined TYPE.  */
+DEFHOOK
+(set_default_type_attributes,
+ "",
+ void, (tree type),
+ hook_void_tree)
+
+/* Insert attributes on the newly created DECL.  */
+DEFHOOK
+(insert_attributes,
+ "",
+ void, (tree node, tree *attr_ptr),
+ hook_void_tree_treeptr)
+
+/* Return true if FNDECL (which has at least one machine attribute)
+   can be inlined despite its machine attributes, false otherwise.  */
+DEFHOOK
+(function_attribute_inlinable_p,
+ "",
+ bool, (const_tree fndecl),
+ hook_bool_const_tree_false)
+
+/* Return true if bitfields in RECORD_TYPE should follow the
+   Microsoft Visual C++ bitfield layout rules.  */
+DEFHOOK
+(ms_bitfield_layout_p,
+ "",
+ bool, (const_tree record_type),
+ hook_bool_const_tree_false)
+
+/* For now this is only an interface to WORDS_BIG_ENDIAN for
+   target-independent code like the front ends, need performance testing
+   before switching completely to the target hook.  */
+DEFHOOK_UNDOC
+(words_big_endian,
+ "",
+ bool, (void),
+ targhook_words_big_endian)
+
+/* Likewise for FLOAT_WORDS_BIG_ENDIAN.  */
+DEFHOOK_UNDOC
+(float_words_big_endian,
+ "",
+ bool, (void),
+ targhook_float_words_big_endian)
+
+/* True if the target supports decimal floating point.  */
+DEFHOOK
+(decimal_float_supported_p,
+ "",
+ bool, (void),
+ default_decimal_float_supported_p)
+
+/* True if the target supports fixed-point.  */
+DEFHOOK
+(fixed_point_supported_p,
+ "",
+ bool, (void),
+ default_fixed_point_supported_p)
+
+/* Return true if anonymous bitfields affect structure alignment.  */
+DEFHOOK
+(align_anon_bitfield,
+ "",
+ bool, (void),
+ hook_bool_void_false)
+
+/* Return true if volatile bitfields should use the narrowest type possible.
+   Return false if they should use the container type.  */
+DEFHOOK
+(narrow_volatile_bitfield,
+ "",
+ bool, (void),
+ hook_bool_void_false)
+
+/* Set up target-specific built-in functions.  */
+DEFHOOK
+(init_builtins,
+ "",
+ void, (void),
+ hook_void_void)
+
+/* Initialize (if INITIALIZE_P is true) and return the target-specific
+   built-in function decl for CODE.
+   Return NULL if that is not possible.  Return error_mark_node if CODE
+   is outside of the range of valid target builtin function codes.  */
+DEFHOOK
+(builtin_decl,
+ "",
+ tree, (unsigned code, bool initialize_p), NULL)
+
+/* Expand a target-specific builtin.  */
+DEFHOOK
+(expand_builtin,
+ "",
+ rtx,
+ (tree exp, rtx target, rtx subtarget, enum machine_mode mode, int ignore),
+ default_expand_builtin)
+
+/* Select a replacement for a target-specific builtin.  This is done
+   *before* regular type checking, and so allows the target to
+   implement a crude form of function overloading.  The result is a
+   complete expression that implements the operation.  PARAMS really
+   has type VEC(tree,gc)*, but we don't want to include tree.h here.  */
+DEFHOOK
+(resolve_overloaded_builtin,
+ "",
+ tree, (unsigned int /*location_t*/ loc, tree fndecl, void *arglist), NULL)
+
+/* Fold a target-specific builtin.  */
+DEFHOOK
+(fold_builtin,
+ "",
+ tree, (tree fndecl, int n_args, tree *argp, bool ignore),
+ hook_tree_tree_int_treep_bool_null)
+
+/* Target hook is used to compare the target attributes in two functions to
+   determine which function's features get higher priority.  This is used
+   during function multi-versioning to figure out the order in which two
+   versions must be dispatched.  A function version with a higher priority
+   is checked for dispatching earlier.  DECL1 and DECL2 are
+   the two function decls that will be compared. It returns positive value
+   if DECL1 is higher priority,  negative value if DECL2 is higher priority
+   and 0 if they are the same. */
+DEFHOOK
+(compare_version_priority,
+ "",
+ int, (tree decl1, tree decl2), NULL)
+
+/*  Target hook is used to generate the dispatcher logic to invoke the right
+    function version at run-time for a given set of function versions.
+    ARG points to the callgraph node of the dispatcher function whose body
+    must be generated.  */
+DEFHOOK
+(generate_version_dispatcher_body,
+ "",
+ tree, (void *arg), NULL) 
+
+/* Target hook is used to get the dispatcher function for a set of function
+   versions.  The dispatcher function is called to invoke the right function
+   version at run-time.  DECL is one version from a set of semantically
+   identical versions.  */
+DEFHOOK
+(get_function_versions_dispatcher,
+ "",
+ tree, (void *decl), NULL)
+
+/* Returns a code for a target-specific builtin that implements
+   reciprocal of the function, or NULL_TREE if not available.  */
+DEFHOOK
+(builtin_reciprocal,
+ "",
+ tree, (unsigned fn, bool md_fn, bool sqrt),
+ default_builtin_reciprocal)
+
+/* For a vendor-specific TYPE, return a pointer to a statically-allocated
+   string containing the C++ mangling for TYPE.  In all other cases, return
+   NULL.  */
+DEFHOOK
+(mangle_type,
+ "",
+ const char *, (const_tree type),
+ hook_constcharptr_const_tree_null)
+
+/* Make any adjustments to libfunc names needed for this target.  */
+DEFHOOK
+(init_libfuncs,
+ "",
+ void, (void),
+ hook_void_void)
+
+ /* Add a __gnu_ prefix to library functions rather than just __.  */
+DEFHOOKPOD
+(libfunc_gnu_prefix,
+ "If false (the default), internal library routines start with two\n\
+underscores.  If set to true, these routines start with @code{__gnu_}\n\
+instead.  E.g., @code{__muldi3} changes to @code{__gnu_muldi3}.  This\n\
+currently only affects functions defined in @file{libgcc2.c}.  If this\n\
+is set to true, the @file{tm.h} file must also\n\
+@code{#define LIBGCC2_GNU_PREFIX}.",
+  bool, false)
+
+/* Given a decl, a section name, and whether the decl initializer
+   has relocs, choose attributes for the section.  */
+/* ??? Should be merged with SELECT_SECTION and UNIQUE_SECTION.  */
+DEFHOOK
+(section_type_flags,
+ "",
+ unsigned int, (tree decl, const char *name, int reloc),
+ default_section_type_flags)
+
+/* True if new jumps cannot be created, to replace existing ones or
+   not, at the current point in the compilation.  */
+DEFHOOK
+(cannot_modify_jumps_p,
+ "",
+ bool, (void),
+ hook_bool_void_false)
+
+/* True if FOLLOWER may be modified to follow FOLLOWEE.  */
+DEFHOOK
+(can_follow_jump,
+ "FOLLOWER and FOLLOWEE are JUMP_INSN instructions;\
+  return true if FOLLOWER may be modified to follow FOLLOWEE;\
+  false, if it can't.\
+  For example, on some targets, certain kinds of branches can't be made to\
+  follow through a hot/cold partitioning.",
+ bool, (const_rtx follower, const_rtx followee),
+ hook_bool_const_rtx_const_rtx_true)
+
+/* Return a register class for which branch target register
+   optimizations should be applied.  */
+DEFHOOK
+(branch_target_register_class,
+ "",
+ reg_class_t, (void),
+ default_branch_target_register_class)
+
+/* Return true if branch target register optimizations should include
+   callee-saved registers that are not already live during the current
+   function.  AFTER_PE_GEN is true if prologues and epilogues have
+   already been generated.  */
+DEFHOOK
+(branch_target_register_callee_saved,
+ "",
+ bool, (bool after_prologue_epilogue_gen),
+ hook_bool_bool_false)
+
+/* Return true if the target supports conditional execution.  */
+DEFHOOK
+(have_conditional_execution,
+ "",
+ bool, (void),
+ default_have_conditional_execution)
+
+/* Return a new value for loop unroll size.  */
+DEFHOOK
+(loop_unroll_adjust,
+ "",
+ unsigned, (unsigned nunroll, struct loop *loop),
+ NULL)
+
+/* True if X is a legitimate MODE-mode immediate operand.  */
+DEFHOOK
+(legitimate_constant_p,
+ "",
+ bool, (enum machine_mode mode, rtx x),
+ hook_bool_mode_rtx_true)
+
+/* True if the constant X cannot be placed in the constant pool.  */
+DEFHOOK
+(cannot_force_const_mem,
+ "",
+ bool, (enum machine_mode mode, rtx x),
+ hook_bool_mode_rtx_false)
+
+DEFHOOK_UNDOC
+(cannot_copy_insn_p,
+ "True if the insn @var{x} cannot be duplicated.",
+ bool, (rtx), NULL)
+
+/* True if X is considered to be commutative.  */
+DEFHOOK
+(commutative_p,
+ "",
+ bool, (const_rtx x, int outer_code),
+ hook_bool_const_rtx_commutative_p)
+
+/* True if ADDR is an address-expression whose effect depends
+   on the mode of the memory reference it is used in.  */
+DEFHOOK
+(mode_dependent_address_p,
+ "",
+ bool, (const_rtx addr, addr_space_t addrspace),
+ default_mode_dependent_address_p)
+
+/* Given an invalid address X for a given machine mode, try machine-specific
+   ways to make it legitimate.  Return X or an invalid address on failure.  */
+DEFHOOK
+(legitimize_address,
+ "",
+ rtx, (rtx x, rtx oldx, enum machine_mode mode),
+ default_legitimize_address)
+
+/* Given an address RTX, undo the effects of LEGITIMIZE_ADDRESS.  */
+DEFHOOK
+(delegitimize_address,
+ "",
+ rtx, (rtx x),
+ delegitimize_mem_from_attrs)
+
+/* Given an RTX, return true if it is not ok to emit it into debug info
+   section.  */
+DEFHOOK
+(const_not_ok_for_debug_p,
+ "",
+ bool, (rtx x),
+ hook_bool_rtx_false)
+
+/* Given an address RTX, say whether it is valid.  */
+DEFHOOK
+(legitimate_address_p,
+ "",
+ bool, (enum machine_mode mode, rtx x, bool strict),
+ default_legitimate_address_p)
+
+/* True if the given constant can be put into an object_block.  */
+DEFHOOK
+(use_blocks_for_constant_p,
+ "",
+ bool, (enum machine_mode mode, const_rtx x),
+ hook_bool_mode_const_rtx_false)
+
+/* True if the given decl can be put into an object_block.  */
+DEFHOOK
+(use_blocks_for_decl_p,
+ "",
+ bool, (const_tree decl),
+ hook_bool_const_tree_true)
+
+/* The minimum and maximum byte offsets for anchored addresses.  */
+DEFHOOKPOD
+(min_anchor_offset,
+ "",
+ HOST_WIDE_INT, 0)
+
+DEFHOOKPOD
+(max_anchor_offset,
+ "",
+ HOST_WIDE_INT, 0)
+
+/* True if section anchors can be used to access the given symbol.  */
+DEFHOOK
+(use_anchors_for_symbol_p,
+ "",
+ bool, (const_rtx x),
+ default_use_anchors_for_symbol_p)
+
+/* True if it is OK to do sibling call optimization for the specified
+   call expression EXP.  DECL will be the called function, or NULL if
+   this is an indirect call.  */
+DEFHOOK
+(function_ok_for_sibcall,
+ "",
+ bool, (tree decl, tree exp),
+ hook_bool_tree_tree_false)
+
+/* Establish appropriate back-end context for processing the function
+   FNDECL.  The argument might be NULL to indicate processing at top
+   level, outside of any function scope.  */
+DEFHOOK
+(set_current_function,
+ "",
+ void, (tree decl), hook_void_tree)
+
+/* True if EXP should be placed in a "small data" section.  */
+DEFHOOK
+(in_small_data_p,
+ "",
+ bool, (const_tree exp),
+ hook_bool_const_tree_false)
+
+/* True if EXP names an object for which name resolution must resolve
+   to the current executable or shared library.  */
+DEFHOOK
+(binds_local_p,
+ "",
+ bool, (const_tree exp),
+ default_binds_local_p)
+
+/* Check if profiling code is before or after prologue.  */
+DEFHOOK
+(profile_before_prologue,
+ "It returns true if target wants profile code emitted before prologue.\n\n\
+The default version of this hook use the target macro\n\
+@code{PROFILE_BEFORE_PROLOGUE}.",
+ bool, (void),
+ default_profile_before_prologue)
+
+/* Modify and return the identifier of a DECL's external name,
+   originally identified by ID, as required by the target,
+   (eg, append @nn to windows32 stdcall function names).
+   The default is to return ID without modification. */
+DEFHOOK
+(mangle_decl_assembler_name,
+ "",
+ tree, (tree decl, tree  id),
+ default_mangle_decl_assembler_name)
+
+/* Do something target-specific to record properties of the DECL into
+   the associated SYMBOL_REF.  */
+DEFHOOK
+(encode_section_info,
+ "",
+ void, (tree decl, rtx rtl, int new_decl_p),
+ default_encode_section_info)
+
+/* Undo the effects of encode_section_info on the symbol string.  */
+DEFHOOK
+(strip_name_encoding,
+ "",
+ const char *, (const char *name),
+ default_strip_name_encoding)
+
+/* If shift optabs for MODE are known to always truncate the shift count,
+   return the mask that they apply.  Return 0 otherwise.  */
+DEFHOOK
+(shift_truncation_mask,
+ "",
+ unsigned HOST_WIDE_INT, (enum machine_mode mode),
+ default_shift_truncation_mask)
+
+/* Return the number of divisions in the given MODE that should be present,
+   so that it is profitable to turn the division into a multiplication by
+   the reciprocal.  */
+DEFHOOK
+(min_divisions_for_recip_mul,
+ "",
+ unsigned int, (enum machine_mode mode),
+ default_min_divisions_for_recip_mul)
+
+/* If the representation of integral MODE is such that values are
+   always sign-extended to a wider mode MODE_REP then return
+   SIGN_EXTEND.  Return UNKNOWN otherwise.  */
+/* Note that the return type ought to be RTX_CODE, but that's not
+   necessarily defined at this point.  */
+DEFHOOK
+(mode_rep_extended,
+ "",
+ int, (enum machine_mode mode, enum machine_mode rep_mode),
+ default_mode_rep_extended)
+
+/* True if MODE is valid for a pointer in __attribute__((mode("MODE"))).  */
+DEFHOOK
+(valid_pointer_mode,
+ "",
+ bool, (enum machine_mode mode),
+ default_valid_pointer_mode)
+
+/* Disambiguate with errno.  */
+DEFHOOK
+(ref_may_alias_errno,
+ "Define this to return nonzero if the memory reference @var{ref}\
+  may alias with the system C library errno location.  The default\
+  version of this hook assumes the system C library errno location\
+  is either a declaration of type int or accessed by dereferencing\
+  a pointer to int.",
+ bool, (struct ao_ref_s *ref),
+ default_ref_may_alias_errno)
+
+/* Support for named address spaces.  */
+#undef HOOK_PREFIX
+#define HOOK_PREFIX "TARGET_ADDR_SPACE_"
+HOOK_VECTOR (TARGET_ADDR_SPACE_HOOKS, addr_space)
+
+/* MODE to use for a pointer into another address space.  */
+DEFHOOK
+(pointer_mode,
+ "",
+ enum machine_mode, (addr_space_t address_space),
+ default_addr_space_pointer_mode)
+
+/* MODE to use for an address in another address space.  */
+DEFHOOK
+(address_mode,
+ "",
+ enum machine_mode, (addr_space_t address_space),
+ default_addr_space_address_mode)
+
+/* True if MODE is valid for a pointer in __attribute__((mode("MODE")))
+   in another address space.  */
+DEFHOOK
+(valid_pointer_mode,
+ "",
+ bool, (enum machine_mode mode, addr_space_t as),
+ default_addr_space_valid_pointer_mode)
+
+/* True if an address is a valid memory address to a given named address
+   space for a given mode.  */
+DEFHOOK
+(legitimate_address_p,
+ "",
+ bool, (enum machine_mode mode, rtx exp, bool strict, addr_space_t as),
+ default_addr_space_legitimate_address_p)
+
+/* Return an updated address to convert an invalid pointer to a named
+   address space to a valid one.  If NULL_RTX is returned use machine
+   independent methods to make the address valid.  */
+DEFHOOK
+(legitimize_address,
+ "",
+ rtx, (rtx x, rtx oldx, enum machine_mode mode, addr_space_t as),
+ default_addr_space_legitimize_address)
+
+/* True if one named address space is a subset of another named address. */
+DEFHOOK
+(subset_p,
+ "",
+ bool, (addr_space_t subset, addr_space_t superset),
+ default_addr_space_subset_p)
+
+/* Function to convert an rtl expression from one address space to another.  */
+DEFHOOK
+(convert,
+ "",
+ rtx, (rtx op, tree from_type, tree to_type),
+ default_addr_space_convert)
+
+HOOK_VECTOR_END (addr_space)
+
+#undef HOOK_PREFIX
+#define HOOK_PREFIX "TARGET_"
+
+/* True if MODE is valid for the target.  By "valid", we mean able to
+   be manipulated in non-trivial ways.  In particular, this means all
+   the arithmetic is supported.  */
+DEFHOOK
+(scalar_mode_supported_p,
+ "",
+ bool, (enum machine_mode mode),
+ default_scalar_mode_supported_p)
+
+/* Similarly for vector modes.  "Supported" here is less strict.  At
+   least some operations are supported; need to check optabs or builtins
+   for further details.  */
+DEFHOOK
+(vector_mode_supported_p,
+ "",
+ bool, (enum machine_mode mode),
+ hook_bool_mode_false)
+
+DEFHOOK
+(vector_alignment,
+ "This hook can be used to define the alignment for a vector of type\n\
+@var{type}, in order to comply with a platform ABI.  The default is to\n\
+require natural alignment for vector types.  The alignment returned by\n\
+this hook must be a power-of-two multiple of the default alignment of\n\
+the vector element type.",
+ HOST_WIDE_INT, (const_tree type),
+ default_vector_alignment)
+
+/* True if we should try to use a scalar mode to represent an array,
+   overriding the usual MAX_FIXED_MODE limit.  */
+DEFHOOK
+(array_mode_supported_p,
+ "Return true if GCC should try to use a scalar mode to store an array\n\
+of @var{nelems} elements, given that each element has mode @var{mode}.\n\
+Returning true here overrides the usual @code{MAX_FIXED_MODE} limit\n\
+and allows GCC to use any defined integer mode.\n\
+\n\
+One use of this hook is to support vector load and store operations\n\
+that operate on several homogeneous vectors.  For example, ARM NEON\n\
+has operations like:\n\
+\n\
+@smallexample\n\
+int8x8x3_t vld3_s8 (const int8_t *)\n\
+@end smallexample\n\
+\n\
+where the return type is defined as:\n\
+\n\
+@smallexample\n\
+typedef struct int8x8x3_t\n\
+@{\n\
+  int8x8_t val[3];\n\
+@} int8x8x3_t;\n\
+@end smallexample\n\
+\n\
+If this hook allows @code{val} to have a scalar mode, then\n\
+@code{int8x8x3_t} can have the same mode.  GCC can then store\n\
+@code{int8x8x3_t}s in registers rather than forcing them onto the stack.",
+ bool, (enum machine_mode mode, unsigned HOST_WIDE_INT nelems),
+ hook_bool_mode_uhwi_false)
+
+/* Compute cost of moving data from a register of class FROM to one of
+   TO, using MODE.  */
+DEFHOOK
+(register_move_cost,
+ "",
+ int, (enum machine_mode mode, reg_class_t from, reg_class_t to),
+ default_register_move_cost)
+
+/* Compute cost of moving registers to/from memory.  */
+/* ??? Documenting the argument types for this hook requires a GFDL
+   license grant.  Also, the documentation uses a different name for RCLASS.  */
+DEFHOOK
+(memory_move_cost,
+ "",
+ int, (enum machine_mode mode, reg_class_t rclass, bool in),
+ default_memory_move_cost)
+
+/* True for MODE if the target expects that registers in this mode will
+   be allocated to registers in a small register class.  The compiler is
+   allowed to use registers explicitly used in the rtl as spill registers
+   but it should prevent extending the lifetime of these registers.  */
+DEFHOOK
+(small_register_classes_for_mode_p,
+ "",
+ bool, (enum machine_mode mode),
+ hook_bool_mode_false)
+
+/* Register number for a flags register.  Only needs to be defined if the
+   target is constrainted to use post-reload comparison elimination.  */
+DEFHOOKPOD
+(flags_regnum,
+ "If the target has a dedicated flags register, and it needs to use the\
+ post-reload comparison elimination pass, then this value should be set\
+ appropriately.",
+ unsigned int, INVALID_REGNUM)
+
+/* Compute a (partial) cost for rtx X.  Return true if the complete
+   cost has been computed, and false if subexpressions should be
+   scanned.  In either case, *TOTAL contains the cost result.  */
+/* Note that CODE and OUTER_CODE ought to be RTX_CODE, but that's
+   not necessarily defined at this point.  */
+DEFHOOK
+(rtx_costs,
+ "",
+ bool, (rtx x, int code, int outer_code, int opno, int *total, bool speed),
+ hook_bool_rtx_int_int_int_intp_bool_false)
+
+/* Compute the cost of X, used as an address.  Never called with
+   invalid addresses.  */
+DEFHOOK
+(address_cost,
+ "",
+ int, (rtx address, enum machine_mode mode, addr_space_t as, bool speed),
+ default_address_cost)
+
+/* Return where to allocate pseudo for a given hard register initial value.  */
+DEFHOOK
+(allocate_initial_value,
+ "",
+ rtx, (rtx hard_reg), NULL)
+
+/* Return nonzero if evaluating UNSPEC X might cause a trap.
+   FLAGS has the same meaning as in rtlanal.c: may_trap_p_1.  */
+DEFHOOK
+(unspec_may_trap_p,
+ "",
+ int, (const_rtx x, unsigned flags),
+ default_unspec_may_trap_p)
+
+/* Given a register, this hook should return a parallel of registers
+   to represent where to find the register pieces.  Define this hook
+   if the register and its mode are represented in Dwarf in
+   non-contiguous locations, or if the register should be
+   represented in more than one register in Dwarf.  Otherwise, this
+   hook should return NULL_RTX.  */
+DEFHOOK
+(dwarf_register_span,
+ "",
+ rtx, (rtx reg),
+ hook_rtx_rtx_null)
+
+/* If expand_builtin_init_dwarf_reg_sizes needs to fill in table
+   entries not corresponding directly to registers below
+   FIRST_PSEUDO_REGISTER, this hook should generate the necessary
+   code, given the address of the table.  */
+DEFHOOK
+(init_dwarf_reg_sizes_extra,
+ "",
+ void, (tree address),
+ hook_void_tree)
+
+/* Fetch the fixed register(s) which hold condition codes, for
+   targets where it makes sense to look for duplicate assignments to
+   the condition codes.  This should return true if there is such a
+   register, false otherwise.  The arguments should be set to the
+   fixed register numbers.  Up to two condition code registers are
+   supported.  If there is only one for this target, the int pointed
+   at by the second argument should be set to -1.  */
+DEFHOOK
+(fixed_condition_code_regs,
+ "",
+ bool, (unsigned int *p1, unsigned int *p2),
+ hook_bool_uintp_uintp_false)
+
+/* If two condition code modes are compatible, return a condition
+     code mode which is compatible with both, such that a comparison
+     done in the returned mode will work for both of the original
+     modes.  If the condition code modes are not compatible, return
+     VOIDmode.  */
+DEFHOOK
+(cc_modes_compatible,
+ "",
+ enum machine_mode, (enum machine_mode m1, enum machine_mode m2),
+ default_cc_modes_compatible)
+
+/* Do machine-dependent code transformations.  Called just before
+     delayed-branch scheduling.  */
+DEFHOOK
+(machine_dependent_reorg,
+ "",
+ void, (void), NULL)
+
+/* Create the __builtin_va_list type.  */
+DEFHOOK
+(build_builtin_va_list,
+ "",
+ tree, (void),
+ std_build_builtin_va_list)
+
+/* Enumerate the va list variants.  */
+DEFHOOK
+(enum_va_list_p,
+ "",
+ int, (int idx, const char **pname, tree *ptree),
+ NULL)
+
+/* Get the cfun/fndecl calling abi __builtin_va_list type.  */
+DEFHOOK
+(fn_abi_va_list,
+ "",
+ tree, (tree fndecl),
+ std_fn_abi_va_list)
+
+/* Get the __builtin_va_list type dependent on input type.  */
+DEFHOOK
+(canonical_va_list_type,
+ "",
+ tree, (tree type),
+ std_canonical_va_list_type)
+
+/* ??? Documenting this hook requires a GFDL license grant.  */
+DEFHOOK_UNDOC
+(expand_builtin_va_start,
+"Expand the @code{__builtin_va_start} builtin.",
+ void, (tree valist, rtx nextarg), NULL)
+
+/* Gimplifies a VA_ARG_EXPR.  */
+DEFHOOK
+(gimplify_va_arg_expr,
+ "",
+ tree, (tree valist, tree type, gimple_seq *pre_p, gimple_seq *post_p),
+ std_gimplify_va_arg_expr)
+
+/* Validity-checking routines for PCH files, target-specific.
+   get_pch_validity returns a pointer to the data to be stored,
+   and stores the size in its argument.  pch_valid_p gets the same
+   information back and returns NULL if the PCH is valid,
+   or an error message if not.  */
+DEFHOOK
+(get_pch_validity,
+ "",
+ void *, (size_t *sz),
+ default_get_pch_validity)
+
+DEFHOOK
+(pch_valid_p,
+ "",
+ const char *, (const void *data, size_t sz),
+ default_pch_valid_p)
+
+DEFHOOK
+(prepare_pch_save,
+ "Called before writing out a PCH file.  If the target has some\n\
+garbage-collected data that needs to be in a particular state on PCH loads,\n\
+it can use this hook to enforce that state.  Very few targets need\n\
+to do anything here.",
+ void, (void),
+ hook_void_void)
+
+/* If nonnull, this function checks whether a PCH file with the
+   given set of target flags can be used.  It returns NULL if so,
+   otherwise it returns an error message.  */
+DEFHOOK
+(check_pch_target_flags,
+ "",
+ const char *, (int pch_flags), NULL)
+
+/* True if the compiler should give an enum type only as many
+   bytes as it takes to represent the range of possible values of
+   that type.  */
+DEFHOOK
+(default_short_enums,
+ "",
+ bool, (void),
+ hook_bool_void_false)
+
+/* This target hook returns an rtx that is used to store the address
+   of the current frame into the built-in setjmp buffer.  */
+DEFHOOK
+(builtin_setjmp_frame_value,
+ "",
+ rtx, (void),
+ default_builtin_setjmp_frame_value)
+
+/* This target hook should add STRING_CST trees for any hard regs
+   the port wishes to automatically clobber for an asm.  */
+DEFHOOK
+(md_asm_clobbers,
+ "",
+ tree, (tree outputs, tree inputs, tree clobbers),
+ hook_tree_tree_tree_tree_3rd_identity)
+
+/* This target hook allows the backend to specify a calling convention
+   in the debug information.  This function actually returns an
+   enum dwarf_calling_convention, but because of forward declarations
+   and not wanting to include dwarf2.h everywhere target.h is included
+   the function is being declared as an int.  */
+DEFHOOK
+(dwarf_calling_convention,
+ "",
+ int, (const_tree function),
+ hook_int_const_tree_0)
+
+/* This target hook allows the backend to emit frame-related insns that
+   contain UNSPECs or UNSPEC_VOLATILEs.  The call frame debugging info
+   engine will invoke it on insns of the form
+     (set (reg) (unspec [...] UNSPEC_INDEX))
+   and
+     (set (reg) (unspec_volatile [...] UNSPECV_INDEX))
+   to let the backend emit the call frame instructions.  */
+DEFHOOK
+(dwarf_handle_frame_unspec,
+ "",
+ void, (const char *label, rtx pattern, int index), NULL)
+
+/* ??? Documenting this hook requires a GFDL license grant.  */
+DEFHOOK_UNDOC
+(stdarg_optimize_hook,
+"Perform architecture specific checking of statements gimplified\
+ from @code{VA_ARG_EXPR}.  @var{stmt} is the statement.  Returns true if\
+ the statement doesn't need to be checked for @code{va_list} references.",
+ bool, (struct stdarg_info *ai, const_gimple stmt), NULL)
+
+/* This target hook allows the operating system to override the DECL
+   that represents the external variable that contains the stack
+   protection guard variable.  The type of this DECL is ptr_type_node.  */
+DEFHOOK
+(stack_protect_guard,
+ "",
+ tree, (void),
+ default_stack_protect_guard)
+
+/* This target hook allows the operating system to override the CALL_EXPR
+   that is invoked when a check vs the guard variable fails.  */
+DEFHOOK
+(stack_protect_fail,
+ "",
+ tree, (void),
+ default_external_stack_protect_fail)
+
+/* Returns NULL if target supports the insn within a doloop block,
+   otherwise it returns an error message.  */
+DEFHOOK
+(invalid_within_doloop,
+ "",
+ const char *, (const_rtx insn),
+ default_invalid_within_doloop)
+
+/* Returns true for a legitimate combined insn.  */
+DEFHOOK
+(legitimate_combined_insn,
+"Take an instruction in @var{insn} and return @code{false} if the instruction\
+ is not appropriate as a combination of two or more instructions.  The\
+ default is to accept all instructions.",
+ bool, (rtx insn),
+ hook_bool_rtx_true)
+
+DEFHOOK
+(valid_dllimport_attribute_p,
+"@var{decl} is a variable or function with @code{__attribute__((dllimport))}\
+ specified.  Use this hook if the target needs to add extra validation\
+ checks to @code{handle_dll_attribute}.",
+ bool, (const_tree decl),
+ hook_bool_const_tree_true)
+
+/* If non-zero, align constant anchors in CSE to a multiple of this
+   value.  */
+DEFHOOKPOD
+(const_anchor,
+ "",
+ unsigned HOST_WIDE_INT, 0)
+
+/* Defines, which target-dependent bits (upper 16) are used by port  */
+DEFHOOK
+(memmodel_check,
+ "",
+ unsigned HOST_WIDE_INT, (unsigned HOST_WIDE_INT val), NULL)
+
+/* Defines an offset bitwise ored into shifted address to get corresponding
+   Address Sanitizer shadow address, or -1 if Address Sanitizer is not
+   supported by the target.  */
+DEFHOOK
+(asan_shadow_offset,
+ "Return the offset bitwise ored into shifted address to get corresponding\n\
+Address Sanitizer shadow memory address.  NULL if Address Sanitizer is not\n\
+supported by the target.",
+ unsigned HOST_WIDE_INT, (void),
+ NULL)
+
+/* Functions relating to calls - argument passing, returns, etc.  */
+/* Members of struct call have no special macro prefix.  */
+HOOK_VECTOR (TARGET_CALLS, calls)
+
+DEFHOOK
+(promote_function_mode,
+ "",
+ enum machine_mode, (const_tree type, enum machine_mode mode, int *punsignedp,
+		     const_tree funtype, int for_return),
+ default_promote_function_mode)
+
+DEFHOOK
+(promote_prototypes,
+ "",
+ bool, (const_tree fntype),
+ hook_bool_const_tree_false)
+
+DEFHOOK
+(struct_value_rtx,
+ "",
+ rtx, (tree fndecl, int incoming),
+ hook_rtx_tree_int_null)
+DEFHOOK
+(return_in_memory,
+ "",
+ bool, (const_tree type, const_tree fntype),
+ default_return_in_memory)
+
+DEFHOOK
+(return_in_msb,
+ "",
+ bool, (const_tree type),
+ hook_bool_const_tree_false)
+
+/* Return true if a parameter must be passed by reference.  TYPE may
+   be null if this is a libcall.  CA may be null if this query is
+   from __builtin_va_arg.  */
+DEFHOOK
+(pass_by_reference,
+ "",
+ bool,
+ (cumulative_args_t cum, enum machine_mode mode, const_tree type, bool named),
+ hook_bool_CUMULATIVE_ARGS_mode_tree_bool_false)
+
+DEFHOOK
+(expand_builtin_saveregs,
+ "",
+ rtx, (void),
+ default_expand_builtin_saveregs)
+
+/* Returns pretend_argument_size.  */
+DEFHOOK
+(setup_incoming_varargs,
+ "",
+ void, (cumulative_args_t args_so_far, enum machine_mode mode, tree type,
+	int *pretend_args_size, int second_time),
+ default_setup_incoming_varargs)
+
+DEFHOOK
+(strict_argument_naming,
+ "",
+ bool, (cumulative_args_t ca),
+ hook_bool_CUMULATIVE_ARGS_false)
+
+/* Returns true if we should use
+   targetm.calls.setup_incoming_varargs() and/or
+   targetm.calls.strict_argument_naming().  */
+DEFHOOK
+(pretend_outgoing_varargs_named,
+ "",
+ bool, (cumulative_args_t ca),
+ default_pretend_outgoing_varargs_named)
+
+/* Given a complex type T, return true if a parameter of type T
+   should be passed as two scalars.  */
+DEFHOOK
+(split_complex_arg,
+ "",
+ bool, (const_tree type), NULL)
+
+/* Return true if type T, mode MODE, may not be passed in registers,
+   but must be passed on the stack.  */
+/* ??? This predicate should be applied strictly after pass-by-reference.
+   Need audit to verify that this is the case.  */
+DEFHOOK
+(must_pass_in_stack,
+ "",
+ bool, (enum machine_mode mode, const_tree type),
+ must_pass_in_stack_var_size_or_pad)
+
+/* Return true if type TYPE, mode MODE, which is passed by reference,
+   should have the object copy generated by the callee rather than
+   the caller.  It is never called for TYPE requiring constructors.  */
+DEFHOOK
+(callee_copies,
+ "",
+ bool,
+ (cumulative_args_t cum, enum machine_mode mode, const_tree type, bool named),
+ hook_bool_CUMULATIVE_ARGS_mode_tree_bool_false)
+
+/* Return zero for arguments passed entirely on the stack or entirely
+   in registers.  If passed in both, return the number of bytes passed
+   in registers; the balance is therefore passed on the stack.  */
+DEFHOOK
+(arg_partial_bytes,
+ "",
+ int, (cumulative_args_t cum, enum machine_mode mode, tree type, bool named),
+ hook_int_CUMULATIVE_ARGS_mode_tree_bool_0)
+
+/* Update the state in CA to advance past an argument in the
+   argument list.  The values MODE, TYPE, and NAMED describe that
+   argument.  */
+DEFHOOK
+(function_arg_advance,
+ "",
+ void,
+ (cumulative_args_t ca, enum machine_mode mode, const_tree type, bool named),
+ default_function_arg_advance)
+
+/* Return zero if the argument described by the state of CA should
+   be placed on a stack, or a hard register in which to store the
+   argument.  The values MODE, TYPE, and NAMED describe that
+   argument.  */
+DEFHOOK
+(function_arg,
+ "",
+ rtx, (cumulative_args_t ca, enum machine_mode mode, const_tree type,
+       bool named),
+ default_function_arg)
+
+/* Likewise, but for machines with register windows.  Return the
+   location where the argument will appear to the callee.  */
+DEFHOOK
+(function_incoming_arg,
+ "",
+ rtx, (cumulative_args_t ca, enum machine_mode mode, const_tree type,
+       bool named),
+ default_function_incoming_arg)
+
+DEFHOOK
+(function_arg_boundary,
+ "",
+ unsigned int, (enum machine_mode mode, const_tree type),
+ default_function_arg_boundary)
+
+DEFHOOK
+(function_arg_round_boundary,
+ "Normally, the size of an argument is rounded up to @code{PARM_BOUNDARY},\n\
+which is the default value for this hook.  You can define this hook to\n\
+return a different value if an argument size must be rounded to a larger\n\
+value.",
+ unsigned int, (enum machine_mode mode, const_tree type),
+ default_function_arg_round_boundary)
+
+/* Return the diagnostic message string if function without a prototype
+   is not allowed for this 'val' argument; NULL otherwise. */
+DEFHOOK
+(invalid_arg_for_unprototyped_fn,
+ "",
+ const char *, (const_tree typelist, const_tree funcdecl, const_tree val),
+ hook_invalid_arg_for_unprototyped_fn)
+
+/* Return an rtx for the return value location of the function
+   specified by FN_DECL_OR_TYPE with a return type of RET_TYPE.  */
+DEFHOOK
+(function_value,
+ "",
+ rtx, (const_tree ret_type, const_tree fn_decl_or_type, bool outgoing),
+ default_function_value)
+
+/* Return the rtx for the result of a libcall of mode MODE,
+   calling the function FN_NAME.  */
+DEFHOOK
+(libcall_value,
+ "",
+ rtx, (enum machine_mode mode, const_rtx fun),
+ default_libcall_value)
+
+/* Return true if REGNO is a possible register number for
+   a function value as seen by the caller.  */
+DEFHOOK
+(function_value_regno_p,
+ "",
+ bool, (const unsigned int regno),
+ default_function_value_regno_p)
+
+/* ??? Documenting this hook requires a GFDL license grant.  */
+DEFHOOK_UNDOC
+(internal_arg_pointer,
+"Return an rtx for the argument pointer incoming to the\
+ current function.",
+ rtx, (void),
+ default_internal_arg_pointer)
+
+/* Update the current function stack boundary if needed.  */
+DEFHOOK
+(update_stack_boundary,
+ "",
+ void, (void), NULL)
+
+/* Handle stack alignment and return an rtx for Dynamic Realign
+   Argument Pointer if necessary.  */
+DEFHOOK
+(get_drap_rtx,
+ "",
+ rtx, (void), NULL)
+
+/* Return true if all function parameters should be spilled to the
+   stack.  */
+DEFHOOK
+(allocate_stack_slots_for_args,
+ "",
+ bool, (void),
+ hook_bool_void_true)
+
+/* Return an rtx for the static chain for FNDECL.  If INCOMING_P is true,
+       then it should be for the callee; otherwise for the caller.  */
+DEFHOOK
+(static_chain,
+ "",
+ rtx, (const_tree fndecl, bool incoming_p),
+ default_static_chain)
+
+/* Fill in the trampoline at MEM with a call to FNDECL and a
+   static chain value of CHAIN.  */
+DEFHOOK
+(trampoline_init,
+ "",
+ void, (rtx m_tramp, tree fndecl, rtx static_chain),
+ default_trampoline_init)
+
+/* Adjust the address of the trampoline in a target-specific way.  */
+DEFHOOK
+(trampoline_adjust_address,
+ "",
+ rtx, (rtx addr), NULL)
+
+/* Return the number of bytes of its own arguments that a function
+   pops on returning, or 0 if the function pops no arguments and the
+   caller must therefore pop them all after the function returns.  */
+/* ??? tm.texi has no types for the parameters.  */
+DEFHOOK
+(return_pops_args,
+ "",
+ int, (tree fundecl, tree funtype, int size),
+ default_return_pops_args)
+
+/* Return a mode wide enough to copy any function value that might be
+   returned.  */
+DEFHOOK
+(get_raw_result_mode,
+ "This target hook returns the mode to be used when accessing raw return\
+ registers in @code{__builtin_return}.  Define this macro if the value\
+ in @var{reg_raw_mode} is not correct.",
+ enum machine_mode, (int regno),
+ default_get_reg_raw_mode)
+
+/* Return a mode wide enough to copy any argument value that might be
+   passed.  */
+DEFHOOK
+(get_raw_arg_mode,
+ "This target hook returns the mode to be used when accessing raw argument\
+ registers in @code{__builtin_apply_args}.  Define this macro if the value\
+ in @var{reg_raw_mode} is not correct.",
+ enum machine_mode, (int regno),
+ default_get_reg_raw_mode)
+
+HOOK_VECTOR_END (calls)
+
+/* Return the diagnostic message string if conversion from FROMTYPE
+   to TOTYPE is not allowed, NULL otherwise.  */
+DEFHOOK
+(invalid_conversion,
+ "",
+ const char *, (const_tree fromtype, const_tree totype),
+ hook_constcharptr_const_tree_const_tree_null)
+
+/* Return the diagnostic message string if the unary operation OP is
+   not permitted on TYPE, NULL otherwise.  */
+DEFHOOK
+(invalid_unary_op,
+ "",
+ const char *, (int op, const_tree type),
+ hook_constcharptr_int_const_tree_null)
+
+/* Return the diagnostic message string if the binary operation OP
+   is not permitted on TYPE1 and TYPE2, NULL otherwise.  */
+DEFHOOK
+(invalid_binary_op,
+ "",
+ const char *, (int op, const_tree type1, const_tree type2),
+ hook_constcharptr_int_const_tree_const_tree_null)
+
+/* Return the diagnostic message string if TYPE is not valid as a
+   function parameter type, NULL otherwise.  */
+DEFHOOK
+(invalid_parameter_type,
+ "",
+ const char *, (const_tree type),
+ hook_constcharptr_const_tree_null)
+
+/* Return the diagnostic message string if TYPE is not valid as a
+   function return type, NULL otherwise.  */
+DEFHOOK
+(invalid_return_type,
+ "",
+ const char *, (const_tree type),
+ hook_constcharptr_const_tree_null)
+
+/* If values of TYPE are promoted to some other type when used in
+   expressions (analogous to the integer promotions), return that type,
+   or NULL_TREE otherwise.  */
+DEFHOOK
+(promoted_type,
+ "",
+ tree, (const_tree type),
+ hook_tree_const_tree_null)
+
+/* Convert EXPR to TYPE, if target-specific types with special conversion
+   rules are involved.  Return the converted expression, or NULL to apply
+   the standard conversion rules.  */
+DEFHOOK
+(convert_to_type,
+ "",
+ tree, (tree type, tree expr),
+ hook_tree_tree_tree_null)
+
+/* Return true if we use LRA instead of reload.  */
+DEFHOOK
+(lra_p,
+ "A target hook which returns true if we use LRA instead of reload pass.\
+  It means that LRA was ported to the target.\
+  \
+  The default version of this target hook returns always false.",
+ bool, (void),
+ default_lra_p)
+
+/* Return register priority of given hard regno for the current target.  */
+DEFHOOK
+(register_priority,
+ "A target hook which returns the register priority number to which the\
+  register @var{hard_regno} belongs to.  The bigger the number, the\
+  more preferable the hard register usage (when all other conditions are\
+  the same).  This hook can be used to prefer some hard register over\
+  others in LRA.  For example, some x86-64 register usage needs\
+  additional prefix which makes instructions longer.  The hook can\
+  return lower priority number for such registers make them less favorable\
+  and as result making the generated code smaller.\
+  \
+  The default version of this target hook returns always zero.",
+ int, (int),
+ default_register_priority)
+
+/* Return true if maximal address displacement can be different.  */
+DEFHOOK
+(different_addr_displacement_p,
+ "A target hook which returns true if an address with the same structure\
+  can have different maximal legitimate displacement.  For example, the\
+  displacement can depend on memory mode or on operand combinations in\
+  the insn.\
+  \
+  The default version of this target hook returns always false.",
+ bool, (void),
+ default_different_addr_displacement_p)
+
+/* Determine class for spilling pseudos of given mode into registers
+   instead of memory.  */
+DEFHOOK
+(spill_class,
+ "This hook defines a class of registers which could be used for spilling\
+  pseudos of the given mode and class, or @code{NO_REGS} if only memory\
+  should be used.  Not defining this hook is equivalent to returning\
+  @code{NO_REGS} for all inputs.",
+ reg_class_t, (reg_class_t, enum machine_mode),
+ NULL)
+
+/* True if a structure, union or array with MODE containing FIELD should
+   be accessed using BLKmode.  */
+DEFHOOK
+(member_type_forces_blk,
+ "",
+ bool, (const_tree field, enum machine_mode mode),
+ default_member_type_forces_blk)
+
+/* Return the class for a secondary reload, and fill in extra information.  */
+DEFHOOK
+(secondary_reload,
+ "",
+ reg_class_t,
+ (bool in_p, rtx x, reg_class_t reload_class, enum machine_mode reload_mode,
+  secondary_reload_info *sri),
+ default_secondary_reload)
+
+/* Given an rtx X being reloaded into a reg required to be in class CLASS,
+   return the class of reg to actually use.  */
+DEFHOOK
+(preferred_reload_class,
+ "",
+ reg_class_t,
+ (rtx x, reg_class_t rclass),
+ default_preferred_reload_class)
+
+/* Like TARGET_PREFERRED_RELOAD_CLASS, but for output reloads instead of
+   input reloads.  */
+DEFHOOK
+(preferred_output_reload_class,
+ "",
+ reg_class_t,
+ (rtx x, reg_class_t rclass),
+ default_preferred_output_reload_class)
+
+DEFHOOK
+(class_likely_spilled_p,
+ "",
+ bool, (reg_class_t rclass),
+ default_class_likely_spilled_p)
+
+/* Return the maximum number of consecutive registers
+   needed to represent mode MODE in a register of class RCLASS.  */
+DEFHOOK
+(class_max_nregs,
+ "",
+ unsigned char, (reg_class_t rclass, enum machine_mode mode),
+ default_class_max_nregs)
+
+DEFHOOK
+(preferred_rename_class,
+ "A target hook that places additional preference on the register\
+ class to use when it is necessary to rename a register in class\
+ @var{rclass} to another class, or perhaps @var{NO_REGS}, if no\
+ preferred register class is found or hook @code{preferred_rename_class}\
+ is not implemented.\
+ Sometimes returning a more restrictive class makes better code.  For\
+ example, on ARM, thumb-2 instructions using @code{LO_REGS} may be\
+ smaller than instructions using @code{GENERIC_REGS}.  By returning\
+ @code{LO_REGS} from @code{preferred_rename_class}, code size can\
+ be reduced.",
+ reg_class_t, (reg_class_t rclass),
+ default_preferred_rename_class)
+
+/* This target hook allows the backend to perform additional
+   processing while initializing for variable expansion.  */
+DEFHOOK
+(expand_to_rtl_hook,
+ "",
+ void, (void),
+ hook_void_void)
+
+/* This target hook allows the backend to perform additional
+   instantiations on rtx that are not actually in insns yet,
+   but will be later.  */
+DEFHOOK
+(instantiate_decls,
+ "",
+ void, (void),
+ hook_void_void)
+
+/* Return true if is OK to use a hard register REGNO as scratch register
+   in peephole2.  */
+DEFHOOK
+(hard_regno_scratch_ok,
+ "",
+ bool, (unsigned int regno),
+ default_hard_regno_scratch_ok)
+
+/* Return the smallest number of different values for which it is best to
+   use a jump-table instead of a tree of conditional branches.  */
+DEFHOOK
+(case_values_threshold,
+ "",
+ unsigned int, (void),
+ default_case_values_threshold)
+
+/* Retutn true if a function must have and use a frame pointer.  */
+DEFHOOK
+(frame_pointer_required,
+ "",
+ bool, (void),
+ hook_bool_void_false)
+
+/* Returns true if the compiler is allowed to try to replace register number
+   from-reg with register number to-reg.  */
+DEFHOOK
+(can_eliminate,
+ "",
+ bool, (const int from_reg, const int to_reg),
+ hook_bool_const_int_const_int_true)
+
+/* Modify any or all of fixed_regs, call_used_regs, global_regs,
+   reg_names, and reg_class_contents to account of the vagaries of the
+   target.  */
+DEFHOOK
+(conditional_register_usage,
+ "",
+ void, (void),
+ hook_void_void)
+
+/* Functions specific to the C family of frontends.  */
+#undef HOOK_PREFIX
+#define HOOK_PREFIX "TARGET_C_"
+HOOK_VECTOR (TARGET_C, c)
+
+/* ??? Documenting this hook requires a GFDL license grant.  */
+DEFHOOK_UNDOC
+(mode_for_suffix,
+"Return machine mode for non-standard constant literal suffix @var{c},\
+ or VOIDmode if non-standard suffixes are unsupported.",
+ enum machine_mode, (char c),
+ default_mode_for_suffix)
+
+HOOK_VECTOR_END (c)
+
+/* Functions specific to the C++ frontend.  */
+#undef HOOK_PREFIX
+#define HOOK_PREFIX "TARGET_CXX_"
+HOOK_VECTOR (TARGET_CXX, cxx)
+
+/* Return the integer type used for guard variables.  */
+DEFHOOK
+(guard_type,
+ "",
+ tree, (void),
+ default_cxx_guard_type)
+
+/* Return true if only the low bit of the guard should be tested.  */
+DEFHOOK
+(guard_mask_bit,
+ "",
+ bool, (void),
+ hook_bool_void_false)
+
+/* Returns the size of the array cookie for an array of type.  */
+DEFHOOK
+(get_cookie_size,
+ "",
+ tree, (tree type),
+ default_cxx_get_cookie_size)
+
+/* Returns true if the element size should be stored in the array cookie.  */
+DEFHOOK
+(cookie_has_size,
+ "",
+ bool, (void),
+ hook_bool_void_false)
+
+/* Allows backends to perform additional processing when
+   deciding if a class should be exported or imported.  */
+DEFHOOK
+(import_export_class,
+ "",
+ int, (tree type, int import_export), NULL)
+
+/* Returns true if constructors and destructors return "this".  */
+DEFHOOK
+(cdtor_returns_this,
+ "",
+ bool, (void),
+ hook_bool_void_false)
+
+/* Returns true if the key method for a class can be an inline
+   function, so long as it is not declared inline in the class
+   itself.  Returning true is the behavior required by the Itanium C++ ABI.  */
+DEFHOOK
+(key_method_may_be_inline,
+ "",
+ bool, (void),
+ hook_bool_void_true)
+
+DEFHOOK
+(determine_class_data_visibility,
+"@var{decl} is a virtual table, virtual table table, typeinfo object,\
+ or other similar implicit class data object that will be emitted with\
+ external linkage in this translation unit.  No ELF visibility has been\
+ explicitly specified.  If the target needs to specify a visibility\
+ other than that of the containing class, use this hook to set\
+ @code{DECL_VISIBILITY} and @code{DECL_VISIBILITY_SPECIFIED}.",
+ void, (tree decl),
+ hook_void_tree)
+
+/* Returns true (the default) if virtual tables and other
+   similar implicit class data objects are always COMDAT if they
+   have external linkage.  If this hook returns false, then
+   class data for classes whose virtual table will be emitted in
+   only one translation unit will not be COMDAT.  */
+DEFHOOK
+(class_data_always_comdat,
+ "",
+ bool, (void),
+ hook_bool_void_true)
+
+/* Returns true (the default) if the RTTI for the basic types,
+   which is always defined in the C++ runtime, should be COMDAT;
+   false if it should not be COMDAT.  */
+DEFHOOK
+(library_rtti_comdat,
+ "",
+ bool, (void),
+ hook_bool_void_true)
+
+/* Returns true if __aeabi_atexit should be used to register static
+   destructors.  */
+DEFHOOK
+(use_aeabi_atexit,
+ "",
+ bool, (void),
+ hook_bool_void_false)
+
+/* Returns true if target may use atexit in the same manner as
+   __cxa_atexit  to register static destructors.  */
+DEFHOOK
+(use_atexit_for_cxa_atexit,
+ "",
+ bool, (void),
+ hook_bool_void_false)
+
+DEFHOOK
+(adjust_class_at_definition,
+"@var{type} is a C++ class (i.e., RECORD_TYPE or UNION_TYPE) that has just\
+ been defined.  Use this hook to make adjustments to the class (eg, tweak\
+ visibility or perform any other required target modifications).",
+ void, (tree type),
+ hook_void_tree)
+
+DEFHOOK
+(decl_mangling_context,
+ "Return target-specific mangling context of @var{decl} or @code{NULL_TREE}.",
+ tree, (const_tree decl),
+ hook_tree_const_tree_null)
+
+HOOK_VECTOR_END (cxx)
+
+/* Functions and data for emulated TLS support.  */
+#undef HOOK_PREFIX
+#define HOOK_PREFIX "TARGET_EMUTLS_"
+HOOK_VECTOR (TARGET_EMUTLS, emutls)
+
+/* Name of the address and common functions.  */
+DEFHOOKPOD
+(get_address,
+ "",
+ const char *, "__builtin___emutls_get_address")
+
+DEFHOOKPOD
+(register_common,
+ "",
+ const char *, "__builtin___emutls_register_common")
+
+/* Prefixes for proxy variable and template.  */
+DEFHOOKPOD
+(var_section,
+ "",
+ const char *, NULL)
+
+DEFHOOKPOD
+(tmpl_section,
+ "",
+ const char *, NULL)
+
+/* Prefixes for proxy variable and template.  */
+DEFHOOKPOD
+(var_prefix,
+ "",
+ const char *, NULL)
+
+DEFHOOKPOD
+(tmpl_prefix,
+ "",
+ const char *, NULL)
+
+/* Function to generate field definitions of the proxy variable.  */
+DEFHOOK
+(var_fields,
+ "",
+ tree, (tree type, tree *name),
+ default_emutls_var_fields)
+
+/* Function to initialize a proxy variable.  */
+DEFHOOK
+(var_init,
+ "",
+ tree, (tree var, tree decl, tree tmpl_addr),
+ default_emutls_var_init)
+
+/* Whether we are allowed to alter the usual alignment of the
+   proxy variable.  */
+DEFHOOKPOD
+(var_align_fixed,
+ "",
+ bool, false)
+
+/* Whether we can emit debug information for TLS vars.  */
+DEFHOOKPOD
+(debug_form_tls_address,
+ "",
+ bool, false)
+
+HOOK_VECTOR_END (emutls)
+
+#undef HOOK_PREFIX
+#define HOOK_PREFIX "TARGET_OPTION_"
+HOOK_VECTOR (TARGET_OPTION_HOOKS, target_option_hooks)
+
+/* Function to validate the attribute((target(...))) strings.  If
+   the option is validated, the hook should also fill in
+   DECL_FUNCTION_SPECIFIC_TARGET in the function decl node.  */
+DEFHOOK
+(valid_attribute_p,
+ "",
+ bool, (tree fndecl, tree name, tree args, int flags),
+ default_target_option_valid_attribute_p)
+
+/* Function to save any extra target state in the target options structure.  */
+DEFHOOK
+(save,
+ "",
+ void, (struct cl_target_option *ptr), NULL)
+
+/* Function to restore any extra target state from the target options
+   structure.  */
+DEFHOOK
+(restore,
+ "",
+ void, (struct cl_target_option *ptr), NULL)
+
+/* Function to print any extra target state from the target options
+   structure.  */
+DEFHOOK
+(print,
+ "",
+ void, (FILE *file, int indent, struct cl_target_option *ptr), NULL)
+
+/* Function to parse arguments to be validated for #pragma target, and to
+   change the state if the options are valid.  If the first argument is
+   NULL, the second argument specifies the default options to use.  Return
+   true if the options are valid, and set the current state.  */
+DEFHOOK
+(pragma_parse,
+ "",
+ bool, (tree args, tree pop_target),
+ default_target_option_pragma_parse)
+
+/* Do option overrides for the target.  */
+DEFHOOK
+(override,
+ "",
+ void, (void),
+ hook_void_void)
+
+/* This function returns true if DECL1 and DECL2 are versions of the same
+   function.  DECL1 and DECL2 are function versions if and only if they
+   have the same function signature and different target specific attributes,
+   that is, they are compiled for different target machines.  */
+DEFHOOK
+(function_versions,
+ "",
+ bool, (tree decl1, tree decl2),
+ hook_bool_tree_tree_false)
+
+/* Function to determine if one function can inline another function.  */
+#undef HOOK_PREFIX
+#define HOOK_PREFIX "TARGET_"
+DEFHOOK
+(can_inline_p,
+ "",
+ bool, (tree caller, tree callee),
+ default_target_can_inline_p)
+
+HOOK_VECTOR_END (target_option)
+
+/* For targets that need to mark extra registers as live on entry to
+   the function, they should define this target hook and set their
+   bits in the bitmap passed in. */
+DEFHOOK
+(extra_live_on_entry,
+ "",
+ void, (bitmap regs),
+ hook_void_bitmap)
+
+/* Fill in additional registers set up by prologue into a regset.  */
+DEFHOOK
+(set_up_by_prologue,
+ "This hook should add additional registers that are computed by the prologue\
+ to the hard regset for shrink-wrapping optimization purposes.",
+ void, (struct hard_reg_set_container *),
+ NULL)
+
+/* For targets that have attributes that can affect whether a
+   function's return statements need checking.  For instance a 'naked'
+   function attribute.  */
+DEFHOOK
+(warn_func_return,
+ "True if a function's return statements should be checked for matching the function's return type.  This includes checking for falling off the end of a non-void function.  Return false if no such check should be made.",
+ bool, (tree),
+ hook_bool_tree_true)
+
+/* Determine the type of unwind info to emit for debugging.  */
+DEFHOOK
+(debug_unwind_info,
+ "",
+ enum unwind_info_type, (void),
+ default_debug_unwind_info)
+
+/* The code parameter should be of type enum rtx_code but this is not
+   defined at this time.  */
+DEFHOOK
+(canonicalize_comparison,
+ "",
+ void, (int *code, rtx *op0, rtx *op1, bool op0_preserve_value),
+ default_canonicalize_comparison)
+
+DEFHOOKPOD
+(atomic_test_and_set_trueval,
+ "This value should be set if the result written by\
+ @code{atomic_test_and_set} is not exactly 1, i.e. the\
+ @code{bool} @code{true}.",
+ unsigned char, 1)
+ 
+/* Leave the boolean fields at the end.  */
+
+/* True if we can create zeroed data by switching to a BSS section
+   and then using ASM_OUTPUT_SKIP to allocate the space.  */
+DEFHOOKPOD
+(have_switchable_bss_sections,
+ "",
+ bool, false)
+
+/* True if "native" constructors and destructors are supported,
+   false if we're using collect2 for the job.  */
+DEFHOOKPOD
+(have_ctors_dtors,
+ "",
+ bool, false)
+
+/* True if thread-local storage is supported.  */
+DEFHOOKPOD
+(have_tls,
+ "",
+ bool, false)
+
+/* True if a small readonly data section is supported.  */
+DEFHOOKPOD
+(have_srodata_section,
+ "",
+ bool, false)
+
+/* True if EH frame info sections should be zero-terminated.  */
+DEFHOOKPOD
+(terminate_dw2_eh_frame_info,
+ "",
+ bool, true)
+
+/* True if #NO_APP should be emitted at the beginning of assembly output.  */
+DEFHOOKPOD
+(asm_file_start_app_off,
+ "",
+ bool, false)
+
+/* True if output_file_directive should be called for main_input_filename
+   at the beginning of assembly output.  */
+DEFHOOKPOD
+(asm_file_start_file_directive,
+ "",
+ bool, false)
+
+/* True if the target is allowed to reorder memory accesses unless
+   synchronization is explicitly requested.  */
+DEFHOOKPOD
+(relaxed_ordering,
+ "",
+ bool, false)
+
+/* Returns true if we should generate exception tables for use with the
+   ARM EABI.  The effects the encoding of function exception specifications.  */
+DEFHOOKPOD
+(arm_eabi_unwinder,
+ "",
+ bool, false)
+
+DEFHOOKPOD
+(want_debug_pub_sections,
+ "True if the @code{.debug_pubtypes} and @code{.debug_pubnames} sections\
+ should be emitted.  These sections are not used on most platforms, and\
+ in particular GDB does not use them.",
+ bool, false)
+
+DEFHOOKPOD
+(force_at_comp_dir,
+ "True if the @code{DW_AT_comp_dir} attribute should be emitted for each \
+ compilation unit.  This attribute is required for the darwin linker \
+ to emit debug information.",
+ bool, false)
+
+DEFHOOKPOD
+(delay_sched2, "True if sched2 is not to be run at its normal place.  \
+This usually means it will be run as part of machine-specific reorg.",
+bool, false)
+
+DEFHOOKPOD
+(delay_vartrack, "True if vartrack is not to be run at its normal place.  \
+This usually means it will be run as part of machine-specific reorg.",
+bool, false)
+
+/* Leave the boolean fields at the end.  */
+
+/* Close the 'struct gcc_target' definition.  */
+HOOK_VECTOR_END (C90_EMPTY_HACK)
