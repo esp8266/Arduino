@@ -89,8 +89,26 @@ bool system_rtc_mem_write(uint8 des_addr, const void *src_addr, uint16 save_size
 void system_uart_swap(void);
 
 uint16 system_adc_read(void);
+uint16 system_get_vdd33(void);
 
 const char *system_get_sdk_version(void);
+
+#define SYS_BOOT_ENHANCE_MODE	0
+#define SYS_BOOT_NORMAL_MODE	1
+
+#define SYS_BOOT_NORMAL_BIN		0
+#define SYS_BOOT_TEST_BIN		1
+
+uint8 system_get_boot_version(void);
+uint32 system_get_userbin_addr(void);
+uint8 system_get_boot_mode(void);
+bool system_restart_enhance(uint8 bin_type, uint32 bin_addr);
+
+#define SYS_CPU_80MHZ	80
+#define SYS_CPU_160MHZ	160
+
+bool system_update_cpu_freq(uint8 freq);
+uint8 system_get_cpu_freq(void);
 
 #define NULL_MODE       0x00
 #define STATION_MODE    0x01
@@ -107,7 +125,11 @@ typedef enum _auth_mode {
 } AUTH_MODE;
 
 uint8 wifi_get_opmode(void);
+uint8 wifi_get_opmode_default(void);
 bool wifi_set_opmode(uint8 opmode);
+bool wifi_set_opmode_current(uint8 opmode);
+uint8 wifi_get_broadcast_if(void);
+bool wifi_set_broadcast_if(uint8 interface);
 
 struct bss_info {
     STAILQ_ENTRY(bss_info)     next;
@@ -140,7 +162,9 @@ struct station_config {
 };
 
 bool wifi_station_get_config(struct station_config *config);
+bool wifi_station_get_config_default(struct station_config *config);
 bool wifi_station_set_config(struct station_config *config);
+bool wifi_station_set_config_current(struct station_config *config);
 
 bool wifi_station_connect(void);
 bool wifi_station_disconnect(void);
@@ -193,7 +217,9 @@ struct softap_config {
 };
 
 bool wifi_softap_get_config(struct softap_config *config);
+bool wifi_softap_get_config_default(struct softap_config *config);
 bool wifi_softap_set_config(struct softap_config *config);
+bool wifi_softap_set_config_current(struct softap_config *config);
 
 struct station_info {
 	STAILQ_ENTRY(station_info)	next;
@@ -239,6 +265,8 @@ void wifi_promiscuous_enable(uint8 promiscuous);
 typedef void (* wifi_promiscuous_cb_t)(uint8 *buf, uint16 len);
 
 void wifi_set_promiscuous_rx_cb(wifi_promiscuous_cb_t cb);
+
+void wifi_promiscuous_set_mac(const uint8_t *address);
 
 enum phy_mode {
 	PHY_MODE_11B	= 1,
