@@ -198,7 +198,7 @@ extern void __attachInterrupt(uint8_t pin, voidFuncPtr handler, int mode)
     }
     else if (mode == CHANGE)
     {
-        gpio_pin_intr_state_set(pin, GPIO_PIN_INTR_ANYEGDE);
+        gpio_pin_intr_state_set(pin, GPIO_PIN_INTR_ANYEDGE);
     }
     else
     {
