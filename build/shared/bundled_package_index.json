@@ -56,8 +56,8 @@
           "category": "Arduino",
           "url": "http://arduino.cc/download.php?f=/cores/avr-1.6.3.tar.bz2",
           "archiveFileName": "avr-1.6.3.tar.bz2",
-          "checksum": "SHA-256:2909a4c6dd6d7497e7e1b5fcaa2f66a100271417510f3a68593b65af8ff78c1c",
-          "size": "4877442",
+          "checksum": "SHA-256:c30033ba70cbb2d46ee0901a331b0f83be082f9110eda0464b624fdbb51b3c7b",
+          "size": "4876816",
           "boards": [
             {"name": "Arduino Yún"},
             {"name": "Arduino Uno"},
@@ -124,8 +124,8 @@
           "category": "Arduino",
           "url": "http://arduino.cc/download.php?f=/cores/sam-1.6.3.tar.bz2",
           "archiveFileName": "sam-1.6.3.tar.bz2",
-          "checksum": "SHA-256:2d3c8a90bc214947cff1b816d0c2706441398efc78af7984d5250f2e50eddd5f",
-          "size": "16174730",
+          "checksum": "SHA-256:0a6e1d5542790e38ba454c796aabbd0e48b07635a5b4d8adc044a4eba959ca27",
+          "size": "16174017",
           "boards": [
             {"name": "Arduino Due"}
           ],
