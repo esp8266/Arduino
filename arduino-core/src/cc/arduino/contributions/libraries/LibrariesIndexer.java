@@ -52,6 +52,7 @@ public class LibrariesIndexer {
 
   private LibrariesIndex index;
   private final LibraryList installedLibraries = new LibraryList();
+  private final LibraryList installedLibrariesWithDuplicates = new LibraryList();
   private List<File> librariesFolders;
   private final File indexFile;
   private final File stagingFolder;
@@ -92,15 +93,16 @@ public class LibrariesIndexer {
   public void rescanLibraries() {
     // Clear all installed flags
     installedLibraries.clear();
+    installedLibrariesWithDuplicates.clear();
     for (ContributedLibrary lib : index.getLibraries())
       lib.setInstalled(false);
 
     // Rescan libraries
     for (File folder : librariesFolders)
-      scanInstalledLibraries(folder);
+      scanInstalledLibraries(folder, folder.equals(sketchbookLibrariesFolder));
   }
 
-  private void scanInstalledLibraries(File folder) {
+  private void scanInstalledLibraries(File folder, boolean isSketchbook) {
     File list[] = folder.listFiles(OnlyDirs.ONLY_DIRS);
     // if a bad folder or something like that, this might come back null
     if (list == null)
@@ -117,14 +119,14 @@ public class LibrariesIndexer {
       }
 
       try {
-        scanLibrary(subfolder);
+        scanLibrary(subfolder, isSketchbook);
       } catch (IOException e) {
         System.out.println(I18n.format(_("Invalid library found in {0}: {1}"), subfolder, e.getMessage()));
       }
     }
   }
 
-  private void scanLibrary(File folder) throws IOException {
+  private void scanLibrary(File folder, boolean isSketchbook) throws IOException {
     boolean readOnly = !FileUtils.isSubDirectory(sketchbookLibrariesFolder, folder);
 
     // A library is considered "legacy" if it doesn't contains
@@ -135,6 +137,11 @@ public class LibrariesIndexer {
       LegacyUserLibrary lib = LegacyUserLibrary.create(folder);
       lib.setReadOnly(readOnly);
       installedLibraries.addOrReplace(lib);
+      if (isSketchbook) {
+        installedLibrariesWithDuplicates.add(lib);
+      } else {
+        installedLibrariesWithDuplicates.addOrReplace(lib);
+      }
       return;
     }
 
@@ -142,6 +149,11 @@ public class LibrariesIndexer {
     UserLibrary lib = UserLibrary.create(folder);
     lib.setReadOnly(readOnly);
     installedLibraries.addOrReplace(lib);
+    if (isSketchbook) {
+      installedLibrariesWithDuplicates.add(lib);
+    } else {
+      installedLibrariesWithDuplicates.addOrReplace(lib);
+    }
 
     // Check if we can find the same library in the index
     // and mark it as installed
@@ -168,6 +180,15 @@ public class LibrariesIndexer {
 
   public LibraryList getInstalledLibraries() {
     return installedLibraries;
+  }
+
+  // Same as getInstalledLibraries(), but allow duplicates between
+  // builtin+package libraries and sketchbook installed libraries.
+  // However, do not report duplicates among builtin and packages, to
+  // allow any package to override builtin libraries without being
+  // reported as duplicates.
+  public LibraryList getInstalledLibrariesWithDuplicates() {
+    return installedLibrariesWithDuplicates;
   }
 
   public File getStagingFolder() {

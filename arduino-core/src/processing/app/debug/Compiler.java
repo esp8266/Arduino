@@ -114,9 +114,16 @@ public class Compiler implements MessageConsumer {
     
     // compile the program. errors will happen as a RunnerException
     // that will bubble up to whomever called build().
-    if (compiler.compile(verbose)) {
-      compiler.size(compiler.getBuildPreferences());
-      return primaryClassName;
+    try {
+      if (compiler.compile(verbose)) {
+        compiler.size(compiler.getBuildPreferences());
+        return primaryClassName;
+      }
+    } catch (RunnerException e) {
+      // when the compile fails, take this opportunity to show
+      // any helpful info possible before throwing the exception
+      compiler.adviseDuplicateLibraries();
+      throw e;
     }
     return null;
   }
@@ -428,8 +435,27 @@ public class Compiler implements MessageConsumer {
 
     // Hook runs at End of Compilation
     runActions("hooks.postbuild", prefs);
+    adviseDuplicateLibraries();
 
     return true;
+  }
+
+  private void adviseDuplicateLibraries() {
+    for (int i=0; i < importedDuplicateHeaders.size(); i++) {
+      System.out.println(I18n.format(_("Multiple libraries were found for \"{0}\""),
+        importedDuplicateHeaders.get(i)));
+      boolean first = true;
+      for (UserLibrary lib : importedDuplicateLibraries.get(i)) {
+        if (first) {
+          System.out.println(I18n.format(_(" Used: {0}"),
+            lib.getInstalledFolder().getPath()));
+          first = false;
+        } else {
+          System.out.println(I18n.format(_(" Not used: {0}"),
+            lib.getInstalledFolder().getPath()));
+        }
+      }
+    }
   }
 
   private PreferencesMap createBuildPreferences(String _buildPath,
@@ -1166,10 +1192,19 @@ public class Compiler implements MessageConsumer {
     // grab the imports from the code just preproc'd
 
     importedLibraries = new LibraryList();
+    importedDuplicateHeaders = new ArrayList<String>();
+    importedDuplicateLibraries = new ArrayList<LibraryList>();
     for (String item : preprocessor.getExtraImports()) {
-      UserLibrary lib = BaseNoGui.importToLibraryTable.get(item);
-      if (lib != null && !importedLibraries.contains(lib)) {
-        importedLibraries.add(lib);
+      LibraryList list = BaseNoGui.importToLibraryTable.get(item);
+      if (list != null) {
+        UserLibrary lib = list.peekFirst();
+        if (lib != null && !importedLibraries.contains(lib)) {
+          importedLibraries.add(lib);
+          if (list.size() > 1) {
+            importedDuplicateHeaders.add(item);
+            importedDuplicateLibraries.add(list);
+          }
+        }
       }
     }
 
@@ -1201,6 +1236,8 @@ public class Compiler implements MessageConsumer {
    * List of library folders.
    */
   private LibraryList importedLibraries;
+  private List<String>      importedDuplicateHeaders;
+  private List<LibraryList> importedDuplicateLibraries;
 
   /**
    * Map an error from a set of processed .java files back to its location

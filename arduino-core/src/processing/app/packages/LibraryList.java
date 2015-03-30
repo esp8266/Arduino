@@ -81,4 +81,11 @@ public class LibraryList extends LinkedList<UserLibrary> {
     }
     return res;
   }
+
+  public boolean hasLibrary(UserLibrary lib) {
+    for (UserLibrary l : this)
+      if (l == lib) return true;
+    return false;
+  }
 }
+
