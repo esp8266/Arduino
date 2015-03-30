@@ -48,9 +48,9 @@ public class LibraryInstaller {
   private static final String LIBRARY_INDEX_URL;
 
   static {
-    String extenalLibraryIndexUrl = System.getProperty("LIBRARY_INDEX_URL");
-    if (extenalLibraryIndexUrl != null && !"".equals(extenalLibraryIndexUrl)) {
-      LIBRARY_INDEX_URL = extenalLibraryIndexUrl;
+    String externalLibraryIndexUrl = System.getProperty("LIBRARY_INDEX_URL");
+    if (externalLibraryIndexUrl != null && !"".equals(externalLibraryIndexUrl)) {
+      LIBRARY_INDEX_URL = externalLibraryIndexUrl;
     } else {
       LIBRARY_INDEX_URL = "http://arduino.cc/download.php?f=/libraries/library_index.json";
     }
