@@ -1,4 +1,10 @@
 
+ARDUINO 1.6.3
+
+[ide]
+* Fixed an ArchiveExtractor issue when dealing with native stuff, affecting some linuxes
+* Upgrading toolchains: statically compiled, ship with Link Time Optimization plugin (disabled by defalt)
+
 ARDUINO 1.6.2 - 2015.03.28
 
 [ide]
