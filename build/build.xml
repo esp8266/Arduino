@@ -46,6 +46,8 @@
   <condition property="launch4j-download-unpack-target-name" value="launch4j-windows"><os family="windows" /></condition>
   <property name="launch4j-download-unpack-target-name" value="launch4j-linux"/>
 
+  <property name="MACOSX_BUNDLED_JVM" value="${java.home}/../"/>
+
   <!-- Libraries required for running arduino -->
   <fileset dir=".." id="runtime.jars">
     <include name="arduino-core/arduino-core.jar" />
