@@ -112,7 +112,7 @@ public class ArchiveExtractor {
 
       Map<File, File> hardLinks = new HashMap<File, File>();
       Map<File, Integer> hardLinksMode = new HashMap<File, Integer>();
-      Map<File, File> symLinks = new HashMap<File, File>();
+      Map<File, String> symLinks = new HashMap<File, String>();
       Map<File, Long> symLinksModifiedTimes = new HashMap<File, Long>();
 
       // Cycle through all the archive entries
@@ -227,7 +227,7 @@ public class ArchiveExtractor {
           hardLinks.put(outputFile, outputLinkedFile);
           hardLinksMode.put(outputFile, mode);
         } else if (isSymLink) {
-          symLinks.put(outputFile, outputLinkedFile);
+          symLinks.put(outputFile, linkName);
           symLinksModifiedTimes.put(outputFile, modifiedTime);
         } else {
           // Create the containing folder if not exists
@@ -255,7 +255,7 @@ public class ArchiveExtractor {
         }
       }
 
-      for (Map.Entry<File, File> entry : symLinks.entrySet()) {
+      for (Map.Entry<File, String> entry : symLinks.entrySet()) {
         if (entry.getKey().exists() && overwrite) {
           entry.getKey().delete();
         }

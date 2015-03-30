@@ -216,8 +216,8 @@ public class Platform {
     return System.getProperty("os.arch");
   }
 
-  public void symlink(File something, File somewhere) throws IOException, InterruptedException {
-    Process process = Runtime.getRuntime().exec(new String[]{"ln", "-s", something.getAbsolutePath(), somewhere.getAbsolutePath()}, null, null);
+  public void symlink(String something, File somewhere) throws IOException, InterruptedException {
+    Process process = Runtime.getRuntime().exec(new String[]{"ln", "-s", something, somewhere.getAbsolutePath()}, null, somewhere.getParentFile());
     process.waitFor();
   }
 
