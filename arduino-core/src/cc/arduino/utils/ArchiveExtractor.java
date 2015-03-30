@@ -28,7 +28,6 @@
  */
 package cc.arduino.utils;
 
-import cc.arduino.os.FileNativeUtils;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -37,6 +36,7 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import processing.app.I18n;
+import processing.app.Platform;
 
 import java.io.*;
 import java.util.HashMap;
@@ -46,6 +46,13 @@ import static processing.app.I18n._;
 
 public class ArchiveExtractor {
 
+  private final Platform platform;
+
+  public ArchiveExtractor(Platform platform) {
+    assert platform != null;
+    this.platform = platform;
+  }
+
   /**
    * Extract <b>source</b> into <b>destFolder</b>. <b>source</b> file archive
    * format is autodetected from file extension.
@@ -54,7 +61,7 @@ public class ArchiveExtractor {
    * @param destFolder
    * @throws IOException
    */
-  public static void extract(File archiveFile, File destFolder) throws IOException {
+  public void extract(File archiveFile, File destFolder) throws IOException, InterruptedException {
     extract(archiveFile, destFolder, 0);
   }
 
@@ -68,12 +75,12 @@ public class ArchiveExtractor {
    *                    archived files
    * @throws IOException
    */
-  public static void extract(File archiveFile, File destFolder, int stripPath) throws IOException {
+  public void extract(File archiveFile, File destFolder, int stripPath) throws IOException, InterruptedException {
     extract(archiveFile, destFolder, stripPath, false);
   }
 
 
-  public static void extract(File archiveFile, File destFolder, int stripPath, boolean overwrite) throws IOException {
+  public void extract(File archiveFile, File destFolder, int stripPath, boolean overwrite) throws IOException, InterruptedException {
 
     // Folders timestamps must be set at the end of archive extraction
     // (because creating a file in a folder alters the folder's timestamp)
@@ -233,7 +240,7 @@ public class ArchiveExtractor {
 
         // Set file/folder permission
         if (mode != null && !isSymLink && outputFile.exists()) {
-          FileNativeUtils.chmod(outputFile, mode);
+          platform.chmod(outputFile, mode);
         }
       }
 
@@ -241,10 +248,10 @@ public class ArchiveExtractor {
         if (entry.getKey().exists() && overwrite) {
           entry.getKey().delete();
         }
-        FileNativeUtils.link(entry.getValue(), entry.getKey());
+        platform.link(entry.getValue(), entry.getKey());
         Integer mode = hardLinksMode.get(entry.getKey());
         if (mode != null) {
-          FileNativeUtils.chmod(entry.getKey(), mode);
+          platform.chmod(entry.getKey(), mode);
         }
       }
 
@@ -252,7 +259,7 @@ public class ArchiveExtractor {
         if (entry.getKey().exists() && overwrite) {
           entry.getKey().delete();
         }
-        FileNativeUtils.symlink(entry.getValue(), entry.getKey());
+        platform.symlink(entry.getValue(), entry.getKey());
         entry.getKey().setLastModified(symLinksModifiedTimes.get(entry.getKey()));
       }
 

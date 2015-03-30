@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
+import processing.app.BaseNoGui;
 import processing.app.helpers.FileUtils;
 import cc.arduino.contributions.libraries.ContributedLibrary;
 import cc.arduino.contributions.libraries.LibrariesIndexer;
@@ -122,7 +123,7 @@ public class LibraryInstaller {
     File libsFolder = indexer.getSketchbookLibrariesFolder();
     File tmpFolder = FileUtils.createTempFolderIn(libsFolder);
     try {
-      ArchiveExtractor.extract(lib.getDownloadedFile(), tmpFolder, 1);
+      new ArchiveExtractor(BaseNoGui.getPlatform()).extract(lib.getDownloadedFile(), tmpFolder, 1);
     } catch (Exception e) {
       if (tmpFolder.exists())
         FileUtils.recursiveDelete(tmpFolder);

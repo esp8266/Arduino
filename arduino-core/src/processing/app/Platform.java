@@ -244,4 +244,19 @@ public class Platform {
   public String getOsArch() {
     return System.getProperty("os.arch");
   }
+
+  public void symlink(File something, File somewhere) throws IOException, InterruptedException {
+    Process process = Runtime.getRuntime().exec(new String[]{"ln", "-s", something.getAbsolutePath(), somewhere.getAbsolutePath()}, null, null);
+    process.waitFor();
+  }
+
+  public void link(File something, File somewhere) throws IOException, InterruptedException {
+    Process process = Runtime.getRuntime().exec(new String[]{"ln", something.getAbsolutePath(), somewhere.getAbsolutePath()}, null, null);
+    process.waitFor();
+  }
+
+  public void chmod(File file, int mode) throws IOException, InterruptedException {
+    Process process = Runtime.getRuntime().exec(new String[]{"chmod", Integer.toOctalString(mode), file.getAbsolutePath()}, null, null);
+    process.waitFor();
+  }
 }

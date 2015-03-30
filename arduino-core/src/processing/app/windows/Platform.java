@@ -362,4 +362,13 @@ public class Platform extends processing.app.Platform {
     scripts.add(new File(folder, "post_install.bat"));
     return scripts;
   }
+
+  public void symlink(File something, File somewhere) throws IOException, InterruptedException {
+  }
+
+  public void link(File something, File somewhere) throws IOException, InterruptedException {
+  }
+
+  public void chmod(File file, int mode) throws IOException, InterruptedException {
+  }
 }

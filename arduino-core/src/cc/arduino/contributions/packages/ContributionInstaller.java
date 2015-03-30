@@ -139,7 +139,7 @@ public class ContributionInstaller {
 
       destFolder.mkdirs();
       assert toolContrib.getDownloadedFile() != null;
-      ArchiveExtractor.extract(toolContrib.getDownloadedFile(), destFolder, 1);
+      new ArchiveExtractor(BaseNoGui.getPlatform()).extract(toolContrib.getDownloadedFile(), destFolder, 1);
       executePostInstallScriptIfAny(destFolder);
       toolContrib.setInstalled(true);
       toolContrib.setInstalledFolder(destFolder);
@@ -152,7 +152,7 @@ public class ContributionInstaller {
     File platformFolder = new File(packageFolder, "hardware" + File.separator + platform.getArchitecture());
     File destFolder = new File(platformFolder, platform.getVersion());
     destFolder.mkdirs();
-    ArchiveExtractor.extract(platform.getDownloadedFile(), destFolder, 1);
+    new ArchiveExtractor(BaseNoGui.getPlatform()).extract(platform.getDownloadedFile(), destFolder, 1);
     platform.setInstalled(true);
     platform.setInstalledFolder(destFolder);
     progress.stepDone();

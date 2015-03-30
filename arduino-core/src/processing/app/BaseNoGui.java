@@ -582,7 +582,7 @@ public class BaseNoGui {
     if (!indexFile.isFile() || !(avrCoreFolder.exists() && avrCoreFolder.isDirectory())) {
       File distFile = findDefaultPackageFile();
       if (distFile != null) {
-        ArchiveExtractor.extract(distFile, BaseNoGui.getSettingsFolder(), 0, true);
+        new ArchiveExtractor(getPlatform()).extract(distFile, BaseNoGui.getSettingsFolder(), 0, true);
       } else if (!indexFile.isFile()) {
         // Otherwise create an empty packages index
         FileOutputStream out = null;
