@@ -20,8 +20,9 @@
  */
 package processing.app.debug;
 
-import static processing.app.I18n._;
-import static processing.app.I18n.format;
+import processing.app.BaseNoGui;
+import processing.app.I18n;
+import processing.app.helpers.PreferencesMap;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,7 +30,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import processing.app.helpers.PreferencesMap;
+import static processing.app.I18n._;
+import static processing.app.I18n.format;
 
 public class LegacyTargetPlatform implements TargetPlatform {
 
@@ -117,6 +119,12 @@ public class LegacyTargetPlatform implements TargetPlatform {
           format(_("Error loading {0}"), localPlatformsFile.getAbsolutePath()), e);
     }
 
+    try {
+      rewriteKeysOfOldPlatformsTxtAndWarnAboutIt();
+    } catch (IOException e) {
+      throw new TargetPlatformException(e);
+    }
+
     File progFile = new File(folder, "programmers.txt");
     try {
       if (progFile.exists() && progFile.canRead()) {
@@ -127,6 +135,35 @@ public class LegacyTargetPlatform implements TargetPlatform {
     } catch (IOException e) {
       throw new TargetPlatformException(format(_("Error loading {0}"),
                                                progFile.getAbsolutePath()), e);
+    }
+  }
+
+  private void rewriteKeysOfOldPlatformsTxtAndWarnAboutIt() throws IOException {
+    File platformRewrite = new File(BaseNoGui.getHardwareFolder(), "platform.keys.rewrite.txt");
+    PreferencesMap platformRewriteProps = new PreferencesMap(platformRewrite);
+
+    PreferencesMap oldProps = platformRewriteProps.subTree("old");
+    PreferencesMap newProps = platformRewriteProps.subTree("new");
+
+    String platformName = preferences.get("name");
+    if (platformName == null) {
+      platformName = folder.getAbsolutePath();
+    }
+
+    for (Map.Entry<String, String> entry : oldProps.entrySet()) {
+      String preferencesKey = entry.getKey().substring(entry.getKey().indexOf(".") + 1);
+      if (preferences.containsKey(preferencesKey) && entry.getValue().equals(preferences.get(preferencesKey))) {
+        System.err.println(I18n.format(_("Warning: platform.txt from core '{0}' contains deprecated {1}, automatically converted to {2}. Consider upgrading this core."), platformName, preferencesKey + "=" + entry.getValue(), preferencesKey + "=" + newProps.get(entry.getKey())));
+        preferences.put(preferencesKey, newProps.get(entry.getKey()));
+      }
+    }
+
+    PreferencesMap addedProps = platformRewriteProps.subTree("added");
+    for (Map.Entry<String, String> entry : addedProps.entrySet()) {
+      if (!preferences.containsKey(entry.getKey())) {
+        System.err.println(I18n.format(_("Warning: platform.txt from core '{0}' misses property {1}, automatically set to {2}. Consider upgrading this core."), platformName, entry.getKey(), entry.getValue()));
+        preferences.put(entry.getKey(), entry.getValue());
+      }
     }
   }
 
