@@ -32,7 +32,6 @@ import processing.app.legacy.PApplet;
 import processing.app.legacy.PConstants;
 import processing.app.tools.CollectStdOutExecutor;
 
-import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.lang.reflect.Method;
