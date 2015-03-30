@@ -51,6 +51,7 @@ typedef struct _esp_tcp {
     espconn_connect_callback connect_callback;
     espconn_reconnect_callback reconnect_callback;
     espconn_connect_callback disconnect_callback;
+	espconn_connect_callback write_finish_fn;
 } esp_tcp;
 
 typedef struct _esp_udp {
@@ -88,8 +89,10 @@ struct espconn {
 };
 
 enum espconn_option{
-	ESPCONN_REUSEADDR = 1,
-	ESPCONN_NODELAY,
+	ESPCONN_START = 0x00,
+	ESPCONN_REUSEADDR = 0x01,
+	ESPCONN_NODELAY = 0x02,
+	ESPCONN_COPY = 0x04,
 	ESPCONN_END
 };
 
@@ -206,6 +209,18 @@ sint8 espconn_get_connection_info(struct espconn *pespconn, remot_info **pcon_in
 *******************************************************************************/
 
 sint8 espconn_regist_sentcb(struct espconn *espconn, espconn_sent_callback sent_cb);
+
+/******************************************************************************
+ * FunctionName : espconn_regist_sentcb
+ * Description  : Used to specify the function that should be called when data
+ *                has been successfully delivered to the remote host.
+ * Parameters   : espconn -- espconn to set the sent callback
+ *                sent_cb -- sent callback function to call for this espconn
+ *                when data is successfully sent
+ * Returns      : none
+*******************************************************************************/
+
+sint8 espconn_regist_write_finish(struct espconn *espconn, espconn_connect_callback write_finish_fn);
 
 /******************************************************************************
  * FunctionName : espconn_sent

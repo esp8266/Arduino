@@ -60,15 +60,15 @@ public:
         return _begin == _end;
     }
     
-    char peek()
+    int peek()
     {
         if (_end == _begin)
             return -1;
         
-        return *_begin;
+        return static_cast<int>(*_begin);
     }
     
-    char read()
+    int read()
     {
         if (getSize() == 0)
             return -1;
@@ -76,7 +76,7 @@ public:
         char result = *_begin;
         if (++_begin == _bufend)
             _begin = _buf;
-        return result;
+        return static_cast<int>(result);
     }
     
     size_t read(char* dst, size_t size)
