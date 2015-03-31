@@ -13,6 +13,7 @@ esp01.build.board=ESP8266_ESP01
 esp01.build.core=esp8266
 esp01.build.variant=esp01
 
+esp01.upload.tool=esptool
 
 ##############################################################
 wifio.name=WIFIO
@@ -29,3 +30,4 @@ wifio.build.board=ESP8266_WIFIO
 wifio.build.core=esp8266
 wifio.build.variant=wifio
 
+wifio.upload.tool=esptool
