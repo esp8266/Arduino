@@ -578,12 +578,11 @@ public class BaseNoGui {
   static public void initPackages() throws Exception {
     indexer = new ContributionsIndexer(BaseNoGui.getSettingsFolder());
     File indexFile = indexer.getIndexFile();
-    File avrCoreFolder = FileUtils.newFile(indexFile.getParentFile(), "packages", "arduino", "hardware", "avr");
-    if (!indexFile.isFile() || !(avrCoreFolder.exists() && avrCoreFolder.isDirectory())) {
-      File distFile = findDefaultPackageFile();
-      if (distFile != null) {
-        new ArchiveExtractor(getPlatform()).extract(distFile, BaseNoGui.getSettingsFolder(), 0, true);
-      } else if (!indexFile.isFile()) {
+    if (!indexFile.isFile()) {
+      File defaultPackageJsonFile = new File(getContentFile("dist"), "package_index.json");
+      if (defaultPackageJsonFile.isFile()) {
+        FileUtils.copyFile(defaultPackageJsonFile, indexFile);
+      } else {
         // Otherwise create an empty packages index
         FileOutputStream out = null;
         try {
@@ -598,7 +597,7 @@ public class BaseNoGui {
       }
     }
     indexer.parseIndex();
-    indexer.syncWithFilesystem();
+    indexer.syncWithFilesystem(getHardwareFolder());
 
     packages = new HashMap<String, TargetPackage>();
     loadHardware(getHardwareFolder());
@@ -624,18 +623,6 @@ public class BaseNoGui {
       }
     }
     librariesIndexer.parseIndex();
-  }
-
-  private static File findDefaultPackageFile() {
-    File distFolder = getContentFile("dist");
-    if (!distFolder.exists()) {
-      return null;
-    }
-    File[] files = distFolder.listFiles(new OnlyFilesWithExtension("tar.bz2", "zip", "tar.gz", "tar"));
-    if (files.length > 1) {
-      throw new IllegalStateException("More than one file in " + distFolder);
-    }
-    return files[0];
   }
 
   static protected void initPlatform() {
@@ -697,7 +684,7 @@ public class BaseNoGui {
       try {
         packages.put(target, new LegacyTargetPackage(target, subfolder));
       } catch (TargetPlatformException e) {
-        System.out.println("WARNING: Error loading hardware folder " + target);
+        System.out.println("WARNING: Error loading hardware folder " + new File(folder, target));
         System.out.println("  " + e.getMessage());
       }
     }
@@ -777,12 +764,9 @@ public class BaseNoGui {
     PreferencesData.removeAllKeysWithPrefix(prefix);
 
     for (ContributedTool tool : indexer.getInstalledTools()) {
-      String path = tool.getDownloadableContribution().getInstalledFolder()
-          .getAbsolutePath();
-      String toolId = tool.getName();
-      PreferencesData.set(prefix + toolId + ".path", path);
-      toolId += "-" + tool.getVersion();
-      PreferencesData.set(prefix + toolId + ".path", path);
+      String path = tool.getDownloadableContribution().getInstalledFolder().getAbsolutePath();
+      PreferencesData.set(prefix + tool.getName() + ".path", path);
+      PreferencesData.set(prefix + tool.getName() + "-" + tool.getVersion() + ".path", path);
     }
   }
 

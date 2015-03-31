@@ -30,4 +30,9 @@ public class TargetPackageStub implements TargetPackage {
   public TargetPlatform get(String platform) {
     return null;
   }
+
+  @Override
+  public boolean hasPlatform(TargetPlatform platform) {
+    return false;
+  }
 }

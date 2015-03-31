@@ -25,12 +25,13 @@ import java.util.Map;
 
 public interface TargetPackage {
 
-  public String getId();
-  
-  public Map<String, TargetPlatform> getPlatforms();
+  String getId();
 
-  public Collection<TargetPlatform> platforms();
+  Map<String, TargetPlatform> getPlatforms();
 
-  public TargetPlatform get(String platform);
-  
+  Collection<TargetPlatform> platforms();
+
+  TargetPlatform get(String platform);
+
+  boolean hasPlatform(TargetPlatform platform);
 }

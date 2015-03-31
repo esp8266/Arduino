@@ -29,7 +29,9 @@
 package cc.arduino.contributions.packages.ui;
 
 import cc.arduino.contributions.VersionComparator;
+import cc.arduino.contributions.VersionHelper;
 import cc.arduino.contributions.filters.InstalledPredicate;
+import cc.arduino.contributions.filters.BuiltInPredicate;
 import cc.arduino.contributions.packages.ContributedBoard;
 import cc.arduino.contributions.packages.ContributedPlatform;
 import cc.arduino.contributions.packages.ContributedPlatformComparator;
@@ -263,7 +265,7 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
     java.util.List<ContributedPlatform> releases = new LinkedList<ContributedPlatform>(editorValue.releases);
     java.util.List<ContributedPlatform> uninstalledReleases = new LinkedList<ContributedPlatform>(Collections2.filter(releases, Predicates.not(new InstalledPredicate())));
 
-    java.util.List<ContributedPlatform> installedBuiltIn = new LinkedList<ContributedPlatform>();
+    java.util.List<ContributedPlatform> installedBuiltIn = new LinkedList<ContributedPlatform>(Collections2.filter(releases, Predicates.and(new InstalledPredicate(), new BuiltInPredicate())));
 
     if (installed != null && !installedBuiltIn.contains(installed)) {
       uninstalledReleases.addAll(installedBuiltIn);
@@ -330,8 +332,7 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
       upgradable = false;
     } else {
       installable = false;
-      //removable = !installed.isReadOnly() && !hasBuiltInRelease;
-      removable = !hasBuiltInRelease;
+      removable = !installed.isReadOnly() && !hasBuiltInRelease;
       upgradable = new ContributedPlatformComparator().compare(selected, installed) > 0;
     }
     if (installable) {
@@ -352,17 +353,18 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
     if (author != null && !author.isEmpty()) {
       desc += " " + format("by <b>{0}</b>", author);
     }
-    if (removable) {
-      desc += " " + format(_("version <b>{0}</b>"), installed.getVersion()) + " <strong><font color=\"#00979D\">INSTALLED</font></strong>";
+    if (installed != null) {
+      desc += " " + format(_("version <b>{0}</b>"), VersionHelper.valueOf(installed.getVersion())) + " <strong><font color=\"#00979D\">INSTALLED</font></strong>";
     }
     desc += "<br />";
 
     desc += _("Boards included in this package:") + "<br />";
-    for (ContributedBoard board : selected.getBoards())
-      desc += format("{0}, ", board.getName());
+    for (ContributedBoard board : selected.getBoards()) {
+      desc += board.getName() + ", ";
+    }
     desc = desc.substring(0, desc.lastIndexOf(',')) + ".<br />";
 
-    if (author != null && !author.isEmpty()) {
+    if (url != null && !url.isEmpty()) {
       desc += " " + format("<a href=\"{0}\">More info</a>", url);
     }
 

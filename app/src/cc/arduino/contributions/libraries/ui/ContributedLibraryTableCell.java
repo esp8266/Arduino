@@ -29,15 +29,16 @@
 package cc.arduino.contributions.libraries.ui;
 
 import cc.arduino.contributions.VersionComparator;
+import cc.arduino.contributions.VersionHelper;
 import cc.arduino.contributions.filters.InstalledPredicate;
 import cc.arduino.contributions.libraries.ContributedLibrary;
 import cc.arduino.contributions.libraries.ContributedLibraryComparator;
-import cc.arduino.contributions.libraries.filters.BuiltInPredicate;
-import cc.arduino.contributions.libraries.filters.InstalledLibraryPredicate;
+import cc.arduino.contributions.filters.BuiltInPredicate;
 import cc.arduino.contributions.libraries.filters.OnlyUpstreamReleasePredicate;
 import cc.arduino.contributions.ui.InstallerTableCell;
 import cc.arduino.contributions.ui.listeners.DelegatingKeyListener;
 import cc.arduino.utils.ReverseComparator;
+import com.github.zafarkhaja.semver.Version;
 import com.google.common.base.Function;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
@@ -66,7 +67,6 @@ import static processing.app.I18n.format;
 @SuppressWarnings("serial")
 public class ContributedLibraryTableCell extends InstallerTableCell {
 
-  private final LibraryManagerUI indexer;
   private JPanel panel;
   private JButton installButton;
   private Component installButtonPlaceholder;
@@ -77,9 +77,7 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
   private JPanel inactiveButtonsPanel;
   private JLabel statusLabel;
 
-  public ContributedLibraryTableCell(LibraryManagerUI indexer) {
-    this.indexer = indexer;
-
+  public ContributedLibraryTableCell() {
     {
       installButton = new JButton(_("Install"));
       installButton.addActionListener(new ActionListener() {
@@ -359,7 +357,7 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
 
     // ...version.
     if (installed != null) {
-      String installedVer = installed.getVersion();
+      Version installedVer = VersionHelper.valueOf(installed.getVersion());
       if (installedVer == null) {
         desc += " " + _("Version unknown");
       } else {

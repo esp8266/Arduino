@@ -40,6 +40,8 @@ public abstract class DownloadableContribution {
 
   public abstract String getUrl();
 
+  public abstract String getVersion();
+
   public abstract String getChecksum();
 
   public abstract long getSize();
@@ -76,6 +78,16 @@ public abstract class DownloadableContribution {
 
   public void setInstalledFolder(File installedFolder) {
     this.installedFolder = installedFolder;
+  }
+
+  private boolean readOnly;
+
+  public boolean isReadOnly() {
+    return readOnly;
+  }
+
+  public void setReadOnly(boolean readOnly) {
+    this.readOnly = readOnly;
   }
 
   @Override

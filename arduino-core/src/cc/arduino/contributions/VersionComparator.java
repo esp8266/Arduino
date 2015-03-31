@@ -47,8 +47,8 @@ public class VersionComparator implements Comparator<String> {
     if (b == null)
       return 1;
 
-    Version versionA = valueOf(a);
-    Version versionB = valueOf(b);
+    Version versionA = VersionHelper.valueOf(a);
+    Version versionB = VersionHelper.valueOf(b);
 
     return versionA.compareTo(versionB);
   }
@@ -65,26 +65,10 @@ public class VersionComparator implements Comparator<String> {
       return true;
     }
 
-    Version versionA = valueOf(a);
-    Version versionB = valueOf(b);
+    Version versionA = VersionHelper.valueOf(a);
+    Version versionB = VersionHelper.valueOf(b);
 
     return versionA.greaterThan(versionB);
-  }
-
-  private Version valueOf(String ver) {
-    if (ver.endsWith("b")) {
-      ver = ver.substring(0, ver.lastIndexOf("b")) + ".1";
-    }
-    String[] verParts = ver.split("\\.");
-    if (verParts.length < 3) {
-      if (verParts.length == 2) {
-        return Version.forIntegers(Integer.valueOf(verParts[0]), Integer.valueOf(verParts[1]));
-      } else {
-        return Version.forIntegers(Integer.valueOf(verParts[0]));
-      }
-    } else {
-      return Version.valueOf(ver);
-    }
   }
 
 }

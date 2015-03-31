@@ -66,13 +66,17 @@ public class ContributionManagerUI extends InstallerJDialog {
   protected InstallerTableCell createCellEditor() {
     return new ContributedPlatformTableCell() {
       @Override
-      protected void onInstall(ContributedPlatform selectedPlatform, ContributedPlatform installed) {
-        onInstallPressed(selectedPlatform, installed);
+      protected void onInstall(ContributedPlatform selected, ContributedPlatform installed) {
+        if (selected.isReadOnly()) {
+          onRemovePressed(installed, false);
+        } else {
+          onInstallPressed(selected, installed);
+        }
       }
 
       @Override
       protected void onRemove(ContributedPlatform installedPlatform) {
-        onRemovePressed(installedPlatform);
+        onRemovePressed(installedPlatform, true);
       }
     };
   }
@@ -157,7 +161,7 @@ public class ContributionManagerUI extends InstallerJDialog {
         try {
           setProgressVisible(true, _("Installing..."));
           installer.install(platformToInstall);
-          if (platformToRemove != null) {
+          if (platformToRemove != null && !platformToRemove.isReadOnly()) {
             installer.remove(platformToRemove);
           }
           onIndexesUpdated();
@@ -172,12 +176,14 @@ public class ContributionManagerUI extends InstallerJDialog {
     installerThread.start();
   }
 
-  public void onRemovePressed(final ContributedPlatform platform) {
+  public void onRemovePressed(final ContributedPlatform platform, boolean showWarning) {
     clearErrorMessage();
 
-    int chosenOption = JOptionPane.showConfirmDialog(getParent(), I18n.format(_("Do you want to remove {0}?\nIf you do so you won't be able to use {0} any more."), platform.getName()), _("Please confirm boards deletion"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-    if (chosenOption != JOptionPane.YES_OPTION) {
-      return;
+    if (showWarning) {
+      int chosenOption = JOptionPane.showConfirmDialog(getParent(), I18n.format(_("Do you want to remove {0}?\nIf you do so you won't be able to use {0} any more."), platform.getName()), _("Please confirm boards deletion"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+      if (chosenOption != JOptionPane.YES_OPTION) {
+        return;
+      }
     }
 
     installerThread = new Thread(new Runnable() {

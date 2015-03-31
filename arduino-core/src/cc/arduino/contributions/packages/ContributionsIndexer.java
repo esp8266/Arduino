@@ -28,21 +28,27 @@
  */
 package cc.arduino.contributions.packages;
 
+import cc.arduino.contributions.DownloadableContributionBuiltInAtTheBottomComparator;
+import cc.arduino.contributions.filters.BuiltInPredicate;
+import cc.arduino.contributions.filters.InstalledPredicate;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.mrbean.MrBeanModule;
+import com.google.common.base.Function;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.Multimaps;
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
 import processing.app.debug.TargetPlatformException;
+import processing.app.helpers.PreferencesMap;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static processing.app.helpers.filefilters.OnlyDirs.ONLY_DIRS;
 
@@ -102,7 +108,47 @@ public class ContributionsIndexer {
     index = mapper.readValue(indexIn, ContributionsIndex.class);
   }
 
-  public void syncWithFilesystem() {
+  public void syncWithFilesystem(File hardwareFolder) throws IOException {
+    syncBuiltInHardwareFolder(hardwareFolder);
+
+    syncLocalPackagesFolder();
+  }
+
+  public void syncBuiltInHardwareFolder(File hardwareFolder) throws IOException {
+    for (File folder : hardwareFolder.listFiles(ONLY_DIRS)) {
+      ContributedPackage pack = index.findPackage(folder.getName());
+      if (pack != null) {
+        syncBuiltInPackageWithFilesystem(pack, folder);
+
+        File toolsFolder = new File(hardwareFolder, "tools");
+        if (toolsFolder.isDirectory()) {
+          for (File toolFolder : toolsFolder.listFiles(ONLY_DIRS)) {
+            File builtInToolsMetadata = new File(toolFolder, "builtin_tools_versions.txt");
+            if (builtInToolsMetadata.isFile()) {
+              PreferencesMap toolsMetadata = new PreferencesMap(builtInToolsMetadata).subTree(pack.getName());
+              for (Map.Entry<String, String> toolMetadata : toolsMetadata.entrySet()) {
+                syncToolWithFilesystem(pack, toolFolder, toolMetadata.getKey(), toolMetadata.getValue());
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private void syncBuiltInPackageWithFilesystem(ContributedPackage pack, File hardwareFolder) throws IOException {
+    // Scan all hardware folders and mark as installed all the tools found.
+    for (File platformFolder : hardwareFolder.listFiles(ONLY_DIRS)) {
+      File platformTxt = new File(platformFolder, "platform.txt");
+      String version = new PreferencesMap(platformTxt).get("version");
+      ContributedPlatform platform = syncHardwareWithFilesystem(pack, platformFolder, platformFolder.getName(), version);
+      if (platform != null) {
+        platform.setReadOnly(true);
+      }
+    }
+  }
+
+  public void syncLocalPackagesFolder() {
     if (!packagesFolder.isDirectory())
       return;
 
@@ -110,8 +156,9 @@ public class ContributionsIndexer {
     // platforms found.
     for (File folder : packagesFolder.listFiles(ONLY_DIRS)) {
       ContributedPackage pack = index.findPackage(folder.getName());
-      if (pack != null)
+      if (pack != null) {
         syncPackageWithFilesystem(pack, folder);
+      }
     }
   }
 
@@ -120,8 +167,9 @@ public class ContributionsIndexer {
     File hardwareFolder = new File(root, "hardware");
     if (hardwareFolder.isDirectory()) {
       for (File platformFolder : hardwareFolder.listFiles(ONLY_DIRS)) {
-        for (File versionFolder : platformFolder.listFiles(ONLY_DIRS))
-          syncHardwareWithFilesystem(pack, platformFolder, versionFolder);
+        for (File versionFolder : platformFolder.listFiles(ONLY_DIRS)) {
+          syncHardwareWithFilesystem(pack, versionFolder, platformFolder.getName(), versionFolder.getName());
+        }
       }
     }
 
@@ -129,39 +177,35 @@ public class ContributionsIndexer {
     File toolsFolder = new File(root, "tools");
     if (toolsFolder.isDirectory()) {
       for (File toolFolder : toolsFolder.listFiles(ONLY_DIRS)) {
-        for (File versionFolder : toolFolder.listFiles(ONLY_DIRS))
-          syncToolWithFilesystem(pack, toolFolder, versionFolder);
+        for (File versionFolder : toolFolder.listFiles(ONLY_DIRS)) {
+          syncToolWithFilesystem(pack, versionFolder, toolFolder.getName(), versionFolder.getName());
+        }
       }
     }
   }
 
-  private void syncToolWithFilesystem(ContributedPackage pack, File toolFolder,
-                                      File versionFolder) {
-    ContributedTool tool = pack.findTool(toolFolder.getName(),
-            versionFolder.getName());
-    if (tool == null)
+  private void syncToolWithFilesystem(ContributedPackage pack, File installationFolder, String toolName, String version) {
+    ContributedTool tool = pack.findTool(toolName, version);
+    if (tool == null) {
       return;
+    }
     DownloadableContribution contrib = tool.getDownloadableContribution();
     if (contrib == null) {
-      System.err.println(tool +
-              " seems to have no downloadable contributions for your " +
-              "operating system, but it is installed in\n" + versionFolder);
+      System.err.println(tool + " seems to have no downloadable contributions for your operating system, but it is installed in\n" + installationFolder);
       return;
     }
     contrib.setInstalled(true);
-    contrib.setInstalledFolder(versionFolder);
+    contrib.setInstalledFolder(installationFolder);
   }
 
-  private void syncHardwareWithFilesystem(ContributedPackage pack,
-                                          File platformFolder,
-                                          File versionFolder) {
-    String architecture = platformFolder.getName();
-    String version = versionFolder.getName();
+  private ContributedPlatform syncHardwareWithFilesystem(ContributedPackage pack, File installationFolder, String architecture, String version) {
     ContributedPlatform platform = pack.findPlatform(architecture, version);
     if (platform != null) {
       platform.setInstalled(true);
-      platform.setInstalledFolder(versionFolder);
+      platform.setReadOnly(false);
+      platform.setInstalledFolder(installationFolder);
     }
+    return platform;
   }
 
   @Override
@@ -170,28 +214,29 @@ public class ContributionsIndexer {
   }
 
   public List<TargetPackage> createTargetPackages() throws TargetPlatformException {
-    List<TargetPackage> res = new ArrayList<TargetPackage>();
+    List<TargetPackage> packages = new ArrayList<TargetPackage>();
 
-    for (ContributedPackage pack : index.getPackages()) {
-      ContributedTargetPackage targetPackage;
-      targetPackage = new ContributedTargetPackage(pack.getName());
+    for (ContributedPackage aPackage : index.getPackages()) {
+      ContributedTargetPackage targetPackage = new ContributedTargetPackage(aPackage.getName());
 
-      for (ContributedPlatform platform : pack.getPlatforms()) {
-        if (!platform.isInstalled())
-          continue;
+      List<ContributedPlatform> platforms = new LinkedList<ContributedPlatform>(Collections2.filter(aPackage.getPlatforms(), new InstalledPredicate()));
+      Collections.sort(platforms, new DownloadableContributionBuiltInAtTheBottomComparator());
 
+      for (ContributedPlatform platform : platforms) {
         String arch = platform.getArchitecture();
         File folder = platform.getInstalledFolder();
 
-        TargetPlatform targetPlatform;
-        targetPlatform = new ContributedTargetPlatform(arch, folder, targetPackage, index);
-        targetPackage.addPlatform(targetPlatform);
+        TargetPlatform targetPlatform = new ContributedTargetPlatform(arch, folder, targetPackage, index);
+        if (!targetPackage.hasPlatform(targetPlatform)) {
+          targetPackage.addPlatform(targetPlatform);
+        }
       }
 
-      if (targetPackage.hasPlatforms())
-        res.add(targetPackage);
+      if (targetPackage.hasPlatforms()) {
+        packages.add(targetPackage);
+      }
     }
-    return res;
+    return packages;
   }
 
   /**
@@ -217,11 +262,21 @@ public class ContributionsIndexer {
   public Set<ContributedTool> getInstalledTools() {
     Set<ContributedTool> tools = new HashSet<ContributedTool>();
     for (ContributedPackage pack : index.getPackages()) {
-      for (ContributedPlatform platform : pack.getPlatforms()) {
-        if (!platform.isInstalled())
-          continue;
-        for (ContributedTool tool : platform.getResolvedTools()) {
-          tools.add(tool);
+      Collection<ContributedPlatform> platforms = Collections2.filter(pack.getPlatforms(), new InstalledPredicate());
+      ImmutableListMultimap<String, ContributedPlatform> platformsByName = Multimaps.index(platforms, new Function<ContributedPlatform, String>() {
+        @Override
+        public String apply(ContributedPlatform contributedPlatform) {
+          return contributedPlatform.getName();
+        }
+      });
+
+      for (Map.Entry<String, Collection<ContributedPlatform>> entry : platformsByName.asMap().entrySet()) {
+        Collection<ContributedPlatform> platformsWithName = entry.getValue();
+        if (platformsWithName.size() > 1) {
+          platformsWithName = Collections2.filter(platformsWithName, Predicates.not(new BuiltInPredicate()));
+        }
+        for (ContributedPlatform platform : platformsWithName) {
+          tools.addAll(platform.getResolvedTools());
         }
       }
     }

@@ -28,16 +28,22 @@
  */
 package cc.arduino.contributions.libraries.ui;
 
-import cc.arduino.contributions.VersionComparator;
+import cc.arduino.contributions.DownloadableContributionBuiltInAtTheBottomComparator;
+import cc.arduino.contributions.VersionHelper;
+import cc.arduino.contributions.filters.InstalledPredicate;
 import cc.arduino.contributions.libraries.ContributedLibrary;
 import cc.arduino.contributions.libraries.LibrariesIndexer;
 import cc.arduino.contributions.packages.ContributedPlatform;
 import cc.arduino.contributions.ui.FilteredAbstractTableModel;
+import com.github.zafarkhaja.semver.Version;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 @SuppressWarnings("serial")
 public class LibrariesIndexTableModel extends FilteredAbstractTableModel<ContributedLibrary> {
@@ -45,13 +51,18 @@ public class LibrariesIndexTableModel extends FilteredAbstractTableModel<Contrib
   public final static int DESCRIPTION_COL = 0;
 
   public static class ContributedLibraryReleases implements Comparable<ContributedLibraryReleases> {
+
     public final String name;
-    public final List<ContributedLibrary> releases = new ArrayList<ContributedLibrary>();
-    public final List<String> versions = new ArrayList<String>();
-    public ContributedLibrary selected = null;
+    public final List<ContributedLibrary> releases;
+    public final List<Version> versions;
+
+    public ContributedLibrary selected;
 
     public ContributedLibraryReleases(ContributedLibrary library) {
-      name = library.getName();
+      this.name = library.getName();
+      this.versions = new LinkedList<Version>();
+      this.releases = new LinkedList<ContributedLibrary>();
+      this.selected = null;
       add(library);
     }
 
@@ -61,38 +72,26 @@ public class LibrariesIndexTableModel extends FilteredAbstractTableModel<Contrib
 
     public void add(ContributedLibrary library) {
       releases.add(library);
-      versions.add(library.getVersion());
+      Version version = VersionHelper.valueOf(library.getVersion());
+      if (version != null) {
+        versions.add(version);
+      }
       selected = getLatest();
     }
 
     public ContributedLibrary getInstalled() {
-      List<ContributedLibrary> installedReleases = new LinkedList<ContributedLibrary>(Collections2.filter(releases, new Predicate<ContributedLibrary>() {
-        @Override
-        public boolean apply(ContributedLibrary contributedLibrary) {
-          return contributedLibrary.isInstalled();
-        }
-      }));
+      List<ContributedLibrary> installedReleases = new LinkedList<ContributedLibrary>(Collections2.filter(releases, new InstalledPredicate()));
+      Collections.sort(installedReleases, new DownloadableContributionBuiltInAtTheBottomComparator());
 
-      return getLatestOf(installedReleases);
+      if (installedReleases.isEmpty()) {
+        return null;
+      }
+
+      return installedReleases.get(0);
     }
 
     public ContributedLibrary getLatest() {
       return getLatestOf(releases);
-    }
-
-    private ContributedLibrary getLatestOf(List<ContributedLibrary> libs) {
-      Collections.sort(new LinkedList<ContributedLibrary>(libs), new Comparator<ContributedLibrary>() {
-        @Override
-        public int compare(ContributedLibrary lib1, ContributedLibrary lib2) {
-          return VersionComparator.VERSION_COMPARATOR.compare(lib1.getVersion(), lib2.getVersion());
-        }
-      });
-
-      if (libs.isEmpty()) {
-        return null;
-      }
-
-      return libs.get(libs.size() - 1);
     }
 
     public ContributedLibrary getSelected() {
@@ -223,7 +222,7 @@ public class LibrariesIndexTableModel extends FilteredAbstractTableModel<Contrib
     return col == DESCRIPTION_COL;
   }
 
-  public List<String> getReleasesVersions(int row) {
+  public List<Version> getReleasesVersions(int row) {
     return contributions.get(row).versions;
   }
 

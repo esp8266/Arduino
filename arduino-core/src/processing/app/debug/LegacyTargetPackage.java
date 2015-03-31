@@ -78,6 +78,11 @@ public class LegacyTargetPackage implements TargetPackage {
   }
 
   @Override
+  public boolean hasPlatform(TargetPlatform platform) {
+    return platforms.containsKey(platform.getId());
+  }
+
+  @Override
   public String getId() {
     return id;
   }

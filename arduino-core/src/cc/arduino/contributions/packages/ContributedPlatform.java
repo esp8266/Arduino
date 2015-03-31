@@ -37,8 +37,6 @@ public abstract class ContributedPlatform extends DownloadableContribution {
 
   public abstract String getName();
 
-  public abstract String getVersion();
-
   public abstract String getCategory();
 
   public abstract String getArchitecture();

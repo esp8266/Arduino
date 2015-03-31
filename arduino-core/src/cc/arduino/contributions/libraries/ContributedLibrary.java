@@ -40,8 +40,6 @@ public abstract class ContributedLibrary extends DownloadableContribution {
 
   public abstract String getName();
 
-  public abstract String getVersion();
-
   public abstract String getMaintainer();
 
   public abstract String getAuthor();
@@ -63,16 +61,6 @@ public abstract class ContributedLibrary extends DownloadableContribution {
   public abstract List<String> getTypes();
 
   public abstract List<ContributedLibraryReference> getRequires();
-
-  private boolean readOnly;
-
-  public boolean isReadOnly() {
-    return readOnly;
-  }
-
-  public void setReadOnly(boolean readOnly) {
-    this.readOnly = readOnly;
-  }
 
   public static final Comparator<ContributedLibrary> CASE_INSENSITIVE_ORDER = new Comparator<ContributedLibrary>() {
     @Override

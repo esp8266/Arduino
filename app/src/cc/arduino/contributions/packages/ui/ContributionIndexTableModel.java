@@ -28,18 +28,22 @@
  */
 package cc.arduino.contributions.packages.ui;
 
+import cc.arduino.contributions.DownloadableContributionBuiltInAtTheBottomComparator;
+import cc.arduino.contributions.VersionHelper;
+import cc.arduino.contributions.filters.InstalledPredicate;
 import cc.arduino.contributions.packages.ContributedPackage;
 import cc.arduino.contributions.packages.ContributedPlatform;
 import cc.arduino.contributions.packages.ContributionsIndex;
 import cc.arduino.contributions.ui.FilteredAbstractTableModel;
+import com.github.zafarkhaja.semver.Version;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import com.google.common.collect.Collections2;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-
-import static processing.app.I18n._;
 
 @SuppressWarnings("serial")
 public class ContributionIndexTableModel extends FilteredAbstractTableModel<ContributedPlatform> {
@@ -47,15 +51,17 @@ public class ContributionIndexTableModel extends FilteredAbstractTableModel<Cont
   public final static int DESCRIPTION_COL = 0;
 
   public static class ContributedPlatformReleases {
-    public ContributedPackage packager;
-    public String arch;
-    public List<ContributedPlatform> releases = new ArrayList<ContributedPlatform>();
-    public List<String> versions = new ArrayList<String>();
+    public final ContributedPackage packager;
+    public final String arch;
+    public final List<ContributedPlatform> releases;
+    public final List<Version> versions;
     public ContributedPlatform selected = null;
 
     public ContributedPlatformReleases(ContributedPlatform platform) {
-      packager = platform.getParentPackage();
-      arch = platform.getArchitecture();
+      this.packager = platform.getParentPackage();
+      this.arch = platform.getArchitecture();
+      this.releases = new LinkedList<ContributedPlatform>();
+      this.versions = new LinkedList<Version>();
       add(platform);
     }
 
@@ -67,39 +73,26 @@ public class ContributionIndexTableModel extends FilteredAbstractTableModel<Cont
 
     public void add(ContributedPlatform platform) {
       releases.add(platform);
-      versions.add(platform.getVersion());
+      Version version = VersionHelper.valueOf(platform.getVersion());
+      if (version != null) {
+        versions.add(version);
+      }
       selected = getLatest();
     }
 
     public ContributedPlatform getInstalled() {
-      List<ContributedPlatform> installedPlatforms = new LinkedList<ContributedPlatform>();
-      for (ContributedPlatform platform : releases) {
-        if (platform.isInstalled()) {
-          installedPlatforms.add(platform);
-        }
+      List<ContributedPlatform> installedReleases = new LinkedList<ContributedPlatform>(Collections2.filter(releases, new InstalledPredicate()));
+      Collections.sort(installedReleases, new DownloadableContributionBuiltInAtTheBottomComparator());
+
+      if (installedReleases.isEmpty()) {
+        return null;
       }
 
-      if (installedPlatforms.size() > 1) {
-        throw new IllegalStateException(_("More than one platform is currently installed! Only one can be installed at any given time"));
-      }
-
-      if (!installedPlatforms.isEmpty()) {
-        return installedPlatforms.get(0);
-      }
-
-      return null;
+      return installedReleases.get(0);
     }
 
     public ContributedPlatform getLatest() {
-      ContributedPlatform latest = null;
-      for (ContributedPlatform plat : releases) {
-        if (latest == null)
-          latest = plat;
-        // TODO a better version compare
-        if (plat.getVersion().compareTo(latest.getVersion()) > 0)
-          latest = plat;
-      }
-      return latest;
+      return getLatestOf(releases);
     }
 
     public ContributedPlatform getSelected() {
@@ -224,7 +217,7 @@ public class ContributionIndexTableModel extends FilteredAbstractTableModel<Cont
     return col == DESCRIPTION_COL;
   }
 
-  public List<String> getReleasesVersions(int row) {
+  public List<Version> getReleasesVersions(int row) {
     return contributions.get(row).versions;
   }
 

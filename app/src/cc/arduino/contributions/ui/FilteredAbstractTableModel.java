@@ -28,12 +28,34 @@
  */
 package cc.arduino.contributions.ui;
 
+import cc.arduino.contributions.VersionComparator;
+import cc.arduino.contributions.packages.DownloadableContribution;
 import com.google.common.base.Predicate;
 
 import javax.swing.table.AbstractTableModel;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 
 public abstract class FilteredAbstractTableModel<T> extends AbstractTableModel {
 
   abstract public void updateIndexFilter(String[] filters, Predicate<T>... additionalFilters);
+
+  protected static <T extends DownloadableContribution> T getLatestOf(List<T> contribs) {
+    contribs = new LinkedList<T>(contribs);
+    Collections.sort(contribs, new Comparator<T>() {
+      @Override
+      public int compare(T contrib1, T contrib2) {
+        return VersionComparator.VERSION_COMPARATOR.compare(contrib1.getVersion(), contrib2.getVersion());
+      }
+    });
+
+    if (contribs.isEmpty()) {
+      return null;
+    }
+
+    return contribs.get(contribs.size() - 1);
+  }
 
 }

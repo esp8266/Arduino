@@ -3,6 +3,12 @@ package cc.arduino.packages.contributions;
 import cc.arduino.contributions.packages.HostDependentDownloadableContribution;
 
 public class HostDependentDownloadableContributionStub extends HostDependentDownloadableContribution {
+
+  @Override
+  public String getVersion() {
+    return null;
+  }
+
   @Override
   public String getHost() {
     return null;
