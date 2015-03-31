@@ -37,17 +37,17 @@ GPIO16 can be ```INPUT``` or ```OUTPUT```.
 
 ```analogRead(0)``` reads the value of the ADC channel connected to the TOUT pin.
 
-Pin interrupts are supported through ```attachInterrupt```, ```detachInterrupt``` functions. 
-Interrupts may be attached to any GPIO pin, except GPIO16. Standard Arduino interrupt 
+Pin interrupts are supported through ```attachInterrupt```, ```detachInterrupt``` functions.
+Interrupts may be attached to any GPIO pin, except GPIO16. Standard Arduino interrupt
 types are supported: ```CHANGE```, ```RISING```, ```FALLING```.
 
 #### Timing and delays ####
-```millis``` and ```micros``` return the number of milliseconds and microseconds elapsed after reset, respectively. 
+```millis``` and ```micros``` return the number of milliseconds and microseconds elapsed after reset, respectively.
 
 ```delay``` pauses the sketch for a given number of milliseconds and allows WiFi and TCP/IP tasks to run.
 ```delayMicroseconds``` pauses for a given number of microseconds.
 
-Remember that there is a lot of code that needs to run on the chip besides the sketch 
+Remember that there is a lot of code that needs to run on the chip besides the sketch
 when WiFi is connected. WiFi and TCP/IP libraries get a chance to handle any pending
 events each time the ```loop()``` function completes, OR when ```delay(...)``` is called.
 If you have a loop somewhere in your sketch that takes a lot of time (>50ms) without
@@ -62,7 +62,7 @@ more than 20 milliseconds is not recommended.
 
 ```Serial``` object works much the same way as on a regular Arduino. Apart from hardware FIFO (128 bytes for TX and RX) HardwareSerial has additional 256-byte TX and RX buffers. Both transmit and receive is interrupt-driven. Write and read functions only block the sketch execution when the respective FIFO/buffers are full/empty.
 
-Only 8n1 mode is supported right now. 
+Only 8n1 mode is supported right now.
 
 By default the diagnostic output from WiFi libraries is disabled when you call ```Serial.begin```. To enable debug output again, call ```Serial.setDebugOutput(true);```
 
@@ -93,7 +93,7 @@ Size can be anywhere between 4 and 4096 bytes.
 
 ```EEPROM.write``` does not write to flash immediately, instead you must call ```EEPROM.commit()```
 whenever you wish to save changes to flash. ```EEPROM.end()``` will also commit, and will
-release the RAM copy of EEPROM contents. 
+release the RAM copy of EEPROM contents.
 
 Three examples included.
 
@@ -125,7 +125,7 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 
 #### Upload via serial port ####
 Select "esptool" as a programmer, and pick the correct serial port.
-You need to put ESP8266 into bootloader mode before uploading code (pull GPIO0 low and 
+You need to put ESP8266 into bootloader mode before uploading code (pull GPIO0 low and
 toggle power).
 
 ### Things not done yet ###
