@@ -124,7 +124,7 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 
 
 #### Upload via serial port ####
-Select "esptool" as a programmer, and pick the correct serial port.
+Pick the correct serial port.
 You need to put ESP8266 into bootloader mode before uploading code (pull GPIO0 low and
 toggle power).
 

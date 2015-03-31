@@ -88,7 +88,8 @@ tools.esptool.cmd=esptool
 tools.esptool.cmd.windows=esptool.exe
 tools.esptool.path={runtime.ide.path}/hardware/tools/esp8266
 
-tools.esptool.program.params.verbose=-vv
-tools.esptool.program.params.quiet=
-tools.esptool.program.pattern="{path}/{cmd}" {program.verbose} -cd {upload.resetmethod} -cb {upload.speed} -cp {serial.port} -ca 0x00000 -cf "{build.path}/{build.project_name}_00000.bin" -ca 0x40000 -cf "{build.path}/{build.project_name}_40000.bin"
+tools.esptool.upload.protocol=esp
+tools.esptool.upload.params.verbose=-vv
+tools.esptool.upload.params.quiet=
+tools.esptool.upload.pattern="{path}/{cmd}" {upload.verbose} -cd {upload.resetmethod} -cb {upload.speed} -cp {serial.port} -ca 0x00000 -cf "{build.path}/{build.project_name}_00000.bin" -ca 0x40000 -cf "{build.path}/{build.project_name}_40000.bin"
 

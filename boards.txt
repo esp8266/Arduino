@@ -26,6 +26,7 @@ esp01.menu.UploadSpeed.256000.upload.speed=256000
 esp01.menu.UploadSpeed.921600=921600
 esp01.menu.UploadSpeed.921600.upload.speed=921600
 
+esp01.upload.tool=esptool
 
 ##############################################################
 wifio.name=WIFIO
@@ -42,3 +43,4 @@ wifio.build.board=ESP8266_WIFIO
 wifio.build.core=esp8266
 wifio.build.variant=wifio
 
+wifio.upload.tool=esptool
