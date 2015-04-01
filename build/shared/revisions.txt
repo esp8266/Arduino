@@ -1,9 +1,16 @@
-
 ARDUINO 1.6.3
 
 [ide]
 * Fixed an ArchiveExtractor issue when dealing with native stuff, affecting some linuxes
-* Upgrading toolchains: statically compiled, ship with Link Time Optimization plugin (disabled by defalt)
+* MacOSX: MACOSX_BUNDLED_JVM property is automatically set to JAVA_HOME if not provided
+* New splashscreen image
+
+[core]
+* Upgraded toolchains: statically compiled, ship with Link Time Optimization plugin (disabled by default)
+* Restored backward compatibility by providing a platform.txt in-memory rewrite: old values (eg: compiler.path) are converted to new values
+* platform.txt rewriting can be disabled if target platform has a "rewriting=disabled" key/value pair set
+* AVR bundle files (core files and toolchain) is again inside IDE "hardware" folder, instead of unpacked into user's home folder at first IDE startup
+* Advise of duplicate libraries after compiling. Thanks @PaulStoffregen
 
 ARDUINO 1.6.2 - 2015.03.28
 
