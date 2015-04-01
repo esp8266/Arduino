@@ -54,14 +54,14 @@ public class ContributionIndexTableModel extends FilteredAbstractTableModel<Cont
     public final ContributedPackage packager;
     public final String arch;
     public final List<ContributedPlatform> releases;
-    public final List<Version> versions;
+    public final List<String> versions;
     public ContributedPlatform selected = null;
 
     public ContributedPlatformReleases(ContributedPlatform platform) {
       this.packager = platform.getParentPackage();
       this.arch = platform.getArchitecture();
       this.releases = new LinkedList<ContributedPlatform>();
-      this.versions = new LinkedList<Version>();
+      this.versions = new LinkedList<String>();
       add(platform);
     }
 
@@ -73,7 +73,7 @@ public class ContributionIndexTableModel extends FilteredAbstractTableModel<Cont
 
     public void add(ContributedPlatform platform) {
       releases.add(platform);
-      Version version = VersionHelper.valueOf(platform.getVersion());
+      String version = platform.getParsedVersion();
       if (version != null) {
         versions.add(version);
       }
@@ -97,15 +97,6 @@ public class ContributionIndexTableModel extends FilteredAbstractTableModel<Cont
 
     public ContributedPlatform getSelected() {
       return selected;
-    }
-
-    public void selectVersion(String version) {
-      for (ContributedPlatform plat : releases) {
-        if (plat.getVersion().equals(version)) {
-          selected = plat;
-          return;
-        }
-      }
     }
 
     public void select(ContributedPlatform value) {
@@ -215,10 +206,6 @@ public class ContributionIndexTableModel extends FilteredAbstractTableModel<Cont
   @Override
   public boolean isCellEditable(int row, int col) {
     return col == DESCRIPTION_COL;
-  }
-
-  public List<Version> getReleasesVersions(int row) {
-    return contributions.get(row).versions;
   }
 
   public ContributedPlatformReleases getReleases(int row) {

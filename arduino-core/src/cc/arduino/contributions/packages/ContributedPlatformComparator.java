@@ -8,7 +8,7 @@ public class ContributedPlatformComparator implements Comparator<ContributedPlat
 
   @Override
   public int compare(ContributedPlatform lib1, ContributedPlatform lib2) {
-    return VersionComparator.VERSION_COMPARATOR.compare(lib1.getVersion(), lib2.getVersion());
+    return VersionComparator.VERSION_COMPARATOR.compare(lib1.getParsedVersion(), lib2.getParsedVersion());
   }
 
 

@@ -28,6 +28,9 @@
  */
 package cc.arduino.contributions.packages;
 
+import cc.arduino.contributions.VersionHelper;
+import com.github.zafarkhaja.semver.Version;
+
 import java.io.File;
 
 public abstract class DownloadableContribution {
@@ -88,6 +91,14 @@ public abstract class DownloadableContribution {
 
   public void setReadOnly(boolean readOnly) {
     this.readOnly = readOnly;
+  }
+
+  public String getParsedVersion() {
+    Version version = VersionHelper.valueOf(getVersion());
+    if (version == null) {
+      return null;
+    }
+    return version.toString();
   }
 
   @Override

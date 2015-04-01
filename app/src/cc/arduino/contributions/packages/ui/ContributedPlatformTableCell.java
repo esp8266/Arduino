@@ -282,7 +282,7 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
     Lists.newLinkedList(Lists.transform(uninstalledReleases, new Function<ContributedPlatform, ContributedPlatform>() {
       @Override
       public ContributedPlatform apply(ContributedPlatform input) {
-        if (installed == null || VersionComparator.VERSION_COMPARATOR.greaterThan(installed.getVersion(), input.getVersion())) {
+        if (installed == null || VersionComparator.VERSION_COMPARATOR.greaterThan(installed.getParsedVersion(), input.getParsedVersion())) {
           uninstalledPreviousReleases.add(input);
         } else {
           uninstalledNewerReleases.add(input);
@@ -357,7 +357,7 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
       desc += " " + format("by <b>{0}</b>", author);
     }
     if (installed != null) {
-      desc += " " + format(_("version <b>{0}</b>"), VersionHelper.valueOf(installed.getVersion())) + " <strong><font color=\"#00979D\">INSTALLED</font></strong>";
+      desc += " " + format(_("version <b>{0}</b>"), installed.getParsedVersion()) + " <strong><font color=\"#00979D\">INSTALLED</font></strong>";
     }
     desc += "<br />";
 

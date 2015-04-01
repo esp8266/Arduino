@@ -100,8 +100,9 @@ public class LibraryInstaller {
   }
 
   public void install(ContributedLibrary lib, ContributedLibrary replacedLib) throws Exception {
-    if (lib.isInstalled())
+    if (lib.isInstalled()) {
       throw new Exception(_("Library is already installed!"));
+    }
 
     final MultiStepProgress progress = new MultiStepProgress(3);
 

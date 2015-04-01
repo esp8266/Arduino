@@ -49,7 +49,7 @@ public abstract class LibrariesIndex {
 
   public ContributedLibrary find(String name, String version) {
     for (ContributedLibrary lib : find(name)) {
-      if (lib.getVersion().equals(version)) {
+      if (version.equals(lib.getParsedVersion())) {
         return lib;
       }
     }

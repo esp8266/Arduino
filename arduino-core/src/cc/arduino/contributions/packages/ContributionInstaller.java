@@ -155,7 +155,7 @@ public class ContributionInstaller {
     progress.setStatus(_("Installing boards..."));
     onProgress(progress);
     File platformFolder = new File(packageFolder, "hardware" + File.separator + platform.getArchitecture());
-    File destFolder = new File(platformFolder, platform.getVersion());
+    File destFolder = new File(platformFolder, platform.getParsedVersion());
     destFolder.mkdirs();
     new ArchiveExtractor(BaseNoGui.getPlatform()).extract(platform.getDownloadedFile(), destFolder, 1);
     platform.setInstalled(true);

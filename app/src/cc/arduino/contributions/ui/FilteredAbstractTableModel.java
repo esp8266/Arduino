@@ -47,7 +47,7 @@ public abstract class FilteredAbstractTableModel<T> extends AbstractTableModel {
     Collections.sort(contribs, new Comparator<T>() {
       @Override
       public int compare(T contrib1, T contrib2) {
-        return VersionComparator.VERSION_COMPARATOR.compare(contrib1.getVersion(), contrib2.getVersion());
+        return VersionComparator.VERSION_COMPARATOR.compare(contrib1.getParsedVersion(), contrib2.getParsedVersion());
       }
     });
 

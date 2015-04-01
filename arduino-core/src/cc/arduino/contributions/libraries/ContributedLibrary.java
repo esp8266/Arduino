@@ -98,7 +98,7 @@ public abstract class ContributedLibrary extends DownloadableContribution {
 
   @Override
   public String toString() {
-    return I18n.format(_("Version {0}"), getVersion());
+    return I18n.format(_("Version {0}"), getParsedVersion());
   }
 
   public String info() {
@@ -106,7 +106,7 @@ public abstract class ContributedLibrary extends DownloadableContribution {
     res += "  ContributedLibrary : " + getName() + "\n";
     res += "              author : " + getAuthor() + "\n";
     res += "          maintainer : " + getMaintainer() + "\n";
-    res += "             version : " + getVersion() + "\n";
+    res += "             version : " + getParsedVersion() + "\n";
     res += "             website : " + getUrl() + "\n";
     res += "            category : " + getCategory() + "\n";
     res += "             license : " + getLicense() + "\n";
@@ -138,8 +138,8 @@ public abstract class ContributedLibrary extends DownloadableContribution {
       return false;
     }
 
-    String thisVersion = getVersion();
-    String otherVersion = ((ContributedLibrary) obj).getVersion();
+    String thisVersion = getParsedVersion();
+    String otherVersion = ((ContributedLibrary) obj).getParsedVersion();
 
     boolean versionEquals = thisVersion == null || otherVersion == null || thisVersion.equals(otherVersion);
 

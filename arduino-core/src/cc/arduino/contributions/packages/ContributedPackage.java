@@ -48,8 +48,7 @@ public abstract class ContributedPackage {
 
   public ContributedPlatform findPlatform(String architecture, String version) {
     for (ContributedPlatform platform : getPlatforms()) {
-      if (platform.getArchitecture().equals(architecture) &&
-          platform.getVersion().equals(version))
+      if (platform.getArchitecture().equals(architecture) && version.equals(platform.getParsedVersion()))
         return platform;
     }
     return null;
@@ -71,7 +70,7 @@ public abstract class ContributedPackage {
         found = p;
         continue;
       }
-      if (version.compare(p.getVersion(), found.getVersion()) > 0)
+      if (version.compare(p.getParsedVersion(), found.getParsedVersion()) > 0)
         found = p;
     }
     return found;
@@ -98,7 +97,7 @@ public abstract class ContributedPackage {
         }
         res += "\n                    category     : " + plat.getCategory();
         res += "\n                    architecture : " +
-            plat.getArchitecture() + " " + plat.getVersion() + "\n";
+            plat.getArchitecture() + " " + plat.getParsedVersion() + "\n";
         if (plat.getToolsDependencies() != null)
           for (ContributedToolReference t : plat.getToolsDependencies()) {
             res += "                    tool dep     : " + t.getName() + " " +

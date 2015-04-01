@@ -268,7 +268,7 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
     Lists.newLinkedList(Lists.transform(uninstalledReleases, new Function<ContributedLibrary, ContributedLibrary>() {
       @Override
       public ContributedLibrary apply(ContributedLibrary input) {
-        if (installed == null || VersionComparator.VERSION_COMPARATOR.greaterThan(installed.getVersion(), input.getVersion())) {
+        if (installed == null || VersionComparator.VERSION_COMPARATOR.greaterThan(installed.getParsedVersion(), input.getParsedVersion())) {
           uninstalledPreviousReleases.add(input);
         } else {
           uninstalledNewerReleases.add(input);
@@ -357,7 +357,7 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
 
     // ...version.
     if (installed != null) {
-      Version installedVer = VersionHelper.valueOf(installed.getVersion());
+      String installedVer = installed.getParsedVersion();
       if (installedVer == null) {
         desc += " " + _("Version unknown");
       } else {

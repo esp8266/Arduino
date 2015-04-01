@@ -157,7 +157,7 @@ public class LibrariesIndexer {
 
     // Check if we can find the same library in the index
     // and mark it as installed
-    ContributedLibrary foundLib = index.find(lib.getName(), lib.getVersion());
+    ContributedLibrary foundLib = index.find(lib.getName(), lib.getParsedVersion());
     if (foundLib != null) {
       foundLib.setInstalled(true);
       foundLib.setInstalledFolder(folder);

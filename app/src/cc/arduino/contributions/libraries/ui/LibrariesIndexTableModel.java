@@ -54,13 +54,13 @@ public class LibrariesIndexTableModel extends FilteredAbstractTableModel<Contrib
 
     public final String name;
     public final List<ContributedLibrary> releases;
-    public final List<Version> versions;
+    public final List<String> versions;
 
     public ContributedLibrary selected;
 
     public ContributedLibraryReleases(ContributedLibrary library) {
       this.name = library.getName();
-      this.versions = new LinkedList<Version>();
+      this.versions = new LinkedList<String>();
       this.releases = new LinkedList<ContributedLibrary>();
       this.selected = null;
       add(library);
@@ -72,7 +72,7 @@ public class LibrariesIndexTableModel extends FilteredAbstractTableModel<Contrib
 
     public void add(ContributedLibrary library) {
       releases.add(library);
-      Version version = VersionHelper.valueOf(library.getVersion());
+      String version = library.getParsedVersion();
       if (version != null) {
         versions.add(version);
       }
@@ -96,15 +96,6 @@ public class LibrariesIndexTableModel extends FilteredAbstractTableModel<Contrib
 
     public ContributedLibrary getSelected() {
       return selected;
-    }
-
-    public void selectVersion(String version) {
-      for (ContributedLibrary lib : releases) {
-        if (lib.getVersion().equals(version)) {
-          selected = lib;
-          return;
-        }
-      }
     }
 
     public void select(ContributedLibrary value) {
@@ -220,10 +211,6 @@ public class LibrariesIndexTableModel extends FilteredAbstractTableModel<Contrib
   @Override
   public boolean isCellEditable(int row, int col) {
     return col == DESCRIPTION_COL;
-  }
-
-  public List<Version> getReleasesVersions(int row) {
-    return contributions.get(row).versions;
   }
 
   public ContributedLibraryReleases getReleases(int row) {
