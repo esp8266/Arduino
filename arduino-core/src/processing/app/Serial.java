@@ -57,27 +57,35 @@ public class Serial implements SerialPortEventListener {
             PreferencesData.getInteger("serial.debug_rate"),
             PreferencesData.get("serial.parity").charAt(0),
             PreferencesData.getInteger("serial.databits"),
-            new Float(PreferencesData.get("serial.stopbits")).floatValue());
+            new Float(PreferencesData.get("serial.stopbits")).floatValue(),
+			BaseNoGui.getBoardPreferences().get("serial.disableRTS") == null,
+			BaseNoGui.getBoardPreferences().get("serial.disableDTR") == null);
   }
 
   public Serial(int irate) throws SerialException {
     this(PreferencesData.get("serial.port"), irate,
             PreferencesData.get("serial.parity").charAt(0),
             PreferencesData.getInteger("serial.databits"),
-            new Float(PreferencesData.get("serial.stopbits")).floatValue());
+            new Float(PreferencesData.get("serial.stopbits")).floatValue(),
+			BaseNoGui.getBoardPreferences().get("serial.disableRTS") == null,
+			BaseNoGui.getBoardPreferences().get("serial.disableDTR") == null);
   }
 
   public Serial(String iname, int irate) throws SerialException {
     this(iname, irate, PreferencesData.get("serial.parity").charAt(0),
             PreferencesData.getInteger("serial.databits"),
-            new Float(PreferencesData.get("serial.stopbits")).floatValue());
+            new Float(PreferencesData.get("serial.stopbits")).floatValue(),
+			BaseNoGui.getBoardPreferences().get("serial.disableRTS") == null,
+			BaseNoGui.getBoardPreferences().get("serial.disableDTR") == null);
   }
 
   public Serial(String iname) throws SerialException {
     this(iname, PreferencesData.getInteger("serial.debug_rate"),
             PreferencesData.get("serial.parity").charAt(0),
             PreferencesData.getInteger("serial.databits"),
-            new Float(PreferencesData.get("serial.stopbits")).floatValue());
+            new Float(PreferencesData.get("serial.stopbits")).floatValue(),
+			BaseNoGui.getBoardPreferences().get("serial.disableRTS") == null,
+			BaseNoGui.getBoardPreferences().get("serial.disableDTR") == null);
   }
 
   public static boolean touchPort(String iname, int irate) throws SerialException {
@@ -100,7 +108,7 @@ public class Serial implements SerialPortEventListener {
     }
   }
 
-  public Serial(String iname, int irate, char iparity, int idatabits, float istopbits) throws SerialException {
+  public Serial(String iname, int irate, char iparity, int idatabits, float istopbits, boolean setRTS, boolean setDTR) throws SerialException {
     //if (port != null) port.close();
     //this.parent = parent;
     //parent.attach(this);
@@ -120,7 +128,7 @@ public class Serial implements SerialPortEventListener {
     try {
       port = new SerialPort(iname);
       port.openPort();
-      port.setParams(rate, databits, stopbits, parity, true, true);
+      port.setParams(rate, databits, stopbits, parity, setRTS, setDTR);
       port.addEventListener(this);
     } catch (Exception e) {
       throw new SerialException(I18n.format(_("Error opening serial port ''{0}''."), iname), e);
