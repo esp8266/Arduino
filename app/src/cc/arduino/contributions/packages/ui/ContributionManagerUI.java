@@ -40,6 +40,8 @@ import processing.app.I18n;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 import static processing.app.I18n._;
 
@@ -158,17 +160,21 @@ public class ContributionManagerUI extends InstallerJDialog {
     installerThread = new Thread(new Runnable() {
       @Override
       public void run() {
+        List<String> errors = new LinkedList<String>();
         try {
           setProgressVisible(true, _("Installing..."));
-          installer.install(platformToInstall);
+          errors.addAll(installer.install(platformToInstall));
           if (platformToRemove != null && !platformToRemove.isReadOnly()) {
-            installer.remove(platformToRemove);
+            errors.addAll(installer.remove(platformToRemove));
           }
           onIndexesUpdated();
         } catch (Exception e) {
           throw new RuntimeException(e);
         } finally {
           setProgressVisible(false, "");
+          if (!errors.isEmpty()) {
+            setErrorMessage(errors.get(0));
+          }
         }
       }
     });

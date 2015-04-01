@@ -344,9 +344,9 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
     String desc = "<html><body>";
 
     // Library name...
-    desc += format("<b>{0}</b> ", name);
+    desc += format("<b>{0}</b>", name);
     if (installed != null && installed.isReadOnly()) {
-      desc += "Built-In ";
+      desc += " Built-In ";
     }
 
     // ...author...

@@ -348,8 +348,11 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
 
     String desc = "<html><body>";
     desc += "<b>" + selected.getName() + "</b>";
+    if (installed != null && installed.isReadOnly()) {
+      desc += " Built-In ";
+    }
+
     String author = selected.getParentPackage().getMaintainer();
-    String url = selected.getParentPackage().getWebsiteURL();
     if (author != null && !author.isEmpty()) {
       desc += " " + format("by <b>{0}</b>", author);
     }
@@ -364,6 +367,7 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
     }
     desc = desc.substring(0, desc.lastIndexOf(',')) + ".<br />";
 
+    String url = selected.getParentPackage().getWebsiteURL();
     if (url != null && !url.isEmpty()) {
       desc += " " + format("<a href=\"{0}\">More info</a>", url);
     }

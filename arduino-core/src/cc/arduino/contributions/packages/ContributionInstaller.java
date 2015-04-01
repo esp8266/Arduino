@@ -79,7 +79,8 @@ public class ContributionInstaller {
     };
   }
 
-  public void install(ContributedPlatform platform) throws Exception {
+  public List<String> install(ContributedPlatform platform) throws Exception {
+    List<String> errors = new LinkedList<String>();
     if (platform.isInstalled()) {
       throw new Exception("Platform is already installed!");
     }
@@ -117,7 +118,7 @@ public class ContributionInstaller {
       }
     } catch (InterruptedException e) {
       // Download interrupted... just exit
-      return;
+      return errors;
     }
 
     ContributedPackage pack = platform.getParentPackage();
@@ -140,7 +141,11 @@ public class ContributionInstaller {
       destFolder.mkdirs();
       assert toolContrib.getDownloadedFile() != null;
       new ArchiveExtractor(BaseNoGui.getPlatform()).extract(toolContrib.getDownloadedFile(), destFolder, 1);
-      executePostInstallScriptIfAny(destFolder);
+      try {
+        executePostInstallScriptIfAny(destFolder);
+      } catch (IOException e) {
+        errors.add(_("Error running post install script"));
+      }
       toolContrib.setInstalled(true);
       toolContrib.setInstalledFolder(destFolder);
       progress.stepDone();
@@ -159,6 +164,8 @@ public class ContributionInstaller {
 
     progress.setStatus(_("Installation completed!"));
     onProgress(progress);
+
+    return errors;
   }
 
   private void executePostInstallScriptIfAny(File folder) throws IOException {
@@ -184,14 +191,15 @@ public class ContributionInstaller {
     ByteArrayOutputStream stdout = new ByteArrayOutputStream();
     ByteArrayOutputStream stderr = new ByteArrayOutputStream();
     Executor executor = new CollectStdOutStdErrExecutor(stdout, stderr);
-
+    executor.setWorkingDirectory(folder);
     executor.execute(new CommandLine(postInstallScript));
 
     System.out.write(stdout.toByteArray());
     System.err.write(stderr.toByteArray());
   }
 
-  public void remove(ContributedPlatform platform) {
+  public List<String> remove(ContributedPlatform platform) {
+    List<String> errors = new LinkedList<String>();
     FileUtils.recursiveDelete(platform.getInstalledFolder());
     platform.setInstalled(false);
     platform.setInstalledFolder(null);
@@ -217,11 +225,14 @@ public class ContributionInstaller {
         // ignore
       }
     }
+
+    return errors;
   }
 
-  public void updateIndex() throws Exception {
-    final MultiStepProgress progress = new MultiStepProgress(1);
-    final String statusText = _("Downloading platforms index...");
+  public List<String> updateIndex() throws Exception {
+    List<String> errors = new LinkedList<String>();
+    MultiStepProgress progress = new MultiStepProgress(1);
+    String statusText = _("Downloading platforms index...");
 
     URL url = new URL(PACKAGE_INDEX_URL);
     File outputFile = indexer.getIndexFile();
@@ -232,10 +243,13 @@ public class ContributionInstaller {
     // TODO: Check downloaded index
 
     // Replace old index with the updated one
-    if (outputFile.exists())
+    if (outputFile.exists()) {
       outputFile.delete();
-    if (!tmpFile.renameTo(outputFile))
+    }
+    if (!tmpFile.renameTo(outputFile)) {
       throw new Exception("An error occurred while updating platforms index!");
+    }
+    return errors;
   }
 
   protected void onProgress(Progress progress) {
