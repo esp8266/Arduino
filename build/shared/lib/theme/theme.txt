@@ -1,6 +1,6 @@
 #FUNCTIONS COLOR 			#D35400 - ORANGE			KEYWORD1
 #FUNCTIONS COLOR			#D35400 - ORANGE			KEYWORD2
-#STRUCTURE COLORS 			#728E00 - GREEN			KEYWORD3
+#STRUCTURE COLORS 			#5E6D03 - GREEN			KEYWORD3
 #VARIABLES COLOR 				#00979C - BLUE				LITERAL1
 
 #ERROR COLOR					#A61717 - RED
@@ -82,7 +82,7 @@ editor.keyword1.style = #d35400,bold
 editor.keyword2.style = #D35400,plain
 
 # STRUCTURES
-editor.keyword3.style = #728e00,plain
+editor.keyword3.style = #5E6D03,plain
 
 
 # TEXT - LITERALS
