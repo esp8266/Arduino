@@ -11,7 +11,7 @@
  */
 
 #include "SPI.h"
-#include "HSPI.h"
+#include "include\HSPI.h"
 
 SPIClass SPI;
 
@@ -38,11 +38,27 @@ void SPIClass::end()
   _impl = 0;
 }
 
+void SPIClass::beginTransaction(SPISettings settings)
+{
+	if (!_impl)
+	  return;
+	_impl->setBitOrder(settings._bitOrder);
+	_impl->setDataMode(settings._dataMode);
+	_impl->setClockDivider(settings._clock);
+}
+
 uint8_t SPIClass::transfer(uint8_t data) 
 {
   if (!_impl)
-    return;
+    return 0;
   return _impl->transfer(data);
+}
+
+uint16_t SPIClass::transfer16(uint16_t data) 
+{
+  if (!_impl)
+    return 0;
+  return _impl->transfer16(data);
 }
 
 void SPIClass::transfer(void *buf, size_t count) 

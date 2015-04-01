@@ -1,0 +1,61 @@
+#######################################
+# Syntax Coloring Map For SeeedTft2.0
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+Tft	KEYWORD1
+TFTv2	KEYWORD1
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+TFTinit	KEYWORD2
+setCol	KEYWORD2
+setPage	KEYWORD2
+setXY	KEYWORD2
+setPixel	KEYWORD2
+sendCMD	KEYWORD2
+WRITE_Package	KEYWORD2
+WRITE_DATA	KEYWORD2
+sendData	KEYWORD2
+Read_Register	KEYWORD2
+fillScreen	KEYWORD2
+drawChar	KEYWORD2
+drawString	KEYWORD2
+fillRectangle	KEYWORD2
+drawLine	KEYWORD2
+drawVerticalLine	KEYWORD2
+drawHorizontalLine	KEYWORD2
+drawRectangle	KEYWORD2
+drawCircle	KEYWORD2
+fillCircle	KEYWORD2
+drawTraingle	KEYWORD2
+drawNumber	KEYWORD2
+drawFloat	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+RED	LITERAL1
+GREEN	LITERAL1
+BLUE	LITERAL1
+BLACK	LITERAL1
+YELLOW	LITERAL1
+WHITE	LITERAL1
+CYAN	LITERAL1
+BRIGHT_RED	LITERAL1
+GRAY1	LITERAL1
+GRAY2	LITERAL1
+MIN_X	LITERAL1
+MIN_Y	LITERAL1
+MAX_X	LITERAL1
+MAX_Y	LITERAL1
+TFT_BL_ON	LITERAL1
+TFT_BL_OFF	LITERAL1
+TFT_CS_LOW	LITERAL1
+TFT_CS_HIGH	LITERAL1
+TFT_DC_LOW	LITERAL1
+TFT_DC_HIGH	LITERAL1
+RED	LITERAL1
+RED	LITERAL1
