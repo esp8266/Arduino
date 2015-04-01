@@ -162,9 +162,13 @@ public class LegacyTargetPlatform implements TargetPlatform {
 
     PreferencesMap addedProps = platformRewriteProps.subTree("added");
     for (Map.Entry<String, String> entry : addedProps.entrySet()) {
-      if (!preferences.containsKey(entry.getKey())) {
-        System.err.println(I18n.format(_("Warning: platform.txt from core '{0}' misses property {1}, automatically set to {2}. Consider upgrading this core."), platformName, entry.getKey(), entry.getValue()));
-        preferences.put(entry.getKey(), entry.getValue());
+      String keyToAdd = entry.getKey();
+      String[] keyToAddParts = keyToAdd.split("\\.");
+      String keyToAddFirstLevel = keyToAddParts[0];
+      String keyToAddSecondLevel = keyToAddParts[0] + "." + keyToAddParts[1];
+      if (!preferences.subTree(keyToAddFirstLevel).isEmpty() && !preferences.subTree(keyToAddSecondLevel).isEmpty() && !preferences.containsKey(keyToAdd)) {
+        System.err.println(I18n.format(_("Warning: platform.txt from core '{0}' misses property {1}, automatically set to {2}. Consider upgrading this core."), platformName, keyToAdd, entry.getValue()));
+        preferences.put(keyToAdd, entry.getValue());
       }
     }
   }
