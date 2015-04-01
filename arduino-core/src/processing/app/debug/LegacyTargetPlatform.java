@@ -119,10 +119,12 @@ public class LegacyTargetPlatform implements TargetPlatform {
           format(_("Error loading {0}"), localPlatformsFile.getAbsolutePath()), e);
     }
 
-    try {
-      rewriteKeysOfOldPlatformsTxtAndWarnAboutIt();
-    } catch (IOException e) {
-      throw new TargetPlatformException(e);
+    if (!preferences.containsKey("rewriting") || !"disabled".equals(preferences.get("rewriting"))) {
+      try {
+        rewriteKeysOfOldPlatformsTxtAndWarnAboutIt();
+      } catch (IOException e) {
+        throw new TargetPlatformException(e);
+      }
     }
 
     File progFile = new File(folder, "programmers.txt");
