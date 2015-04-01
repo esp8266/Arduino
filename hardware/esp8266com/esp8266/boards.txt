@@ -15,6 +15,7 @@ esp01.build.board=ESP8266_ESP01
 esp01.build.core=esp8266
 esp01.build.variant=esp01
 
+esp01.upload.tool=esptool
 esp01.menu.UploadSpeed.115200=115200
 esp01.menu.UploadSpeed.115200.upload.speed=115200
 esp01.menu.UploadSpeed.9600=9600
