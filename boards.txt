@@ -5,9 +5,11 @@ esp01.name=Generic ESP8266 board
 
 esp01.upload.tool=esptool
 esp01.upload.speed=115200
-esp01.upload.resetmethod=none
+esp01.upload.resetmethod=ck
 esp01.upload.maximum_size=524288
 esp01.upload.wait_for_upload_port=true
+esp01.serial.disableDTR=true
+esp01.serial.disableRTS=true
 
 esp01.build.mcu=esp8266
 esp01.build.f_cpu=80000000L
