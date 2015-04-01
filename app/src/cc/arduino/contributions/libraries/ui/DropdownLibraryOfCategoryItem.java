@@ -21,4 +21,10 @@ public class DropdownLibraryOfCategoryItem implements DropdownItem<ContributedLi
   public Predicate<ContributedLibrary> getFilterPredicate() {
     return new CategoryPredicate(category);
   }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof DropdownLibraryOfCategoryItem && ((DropdownLibraryOfCategoryItem) obj).category.equals(category);
+  }
+
 }

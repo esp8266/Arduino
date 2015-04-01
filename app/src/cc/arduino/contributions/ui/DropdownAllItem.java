@@ -17,4 +17,10 @@ public class DropdownAllItem implements DropdownItem<DownloadableContribution> {
   public Predicate<DownloadableContribution> getFilterPredicate() {
     return new NoopPredicate<DownloadableContribution>();
   }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof DropdownAllItem;
+  }
+
 }

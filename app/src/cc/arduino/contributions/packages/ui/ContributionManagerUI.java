@@ -31,6 +31,8 @@ package cc.arduino.contributions.packages.ui;
 import cc.arduino.contributions.packages.ContributedPlatform;
 import cc.arduino.contributions.packages.ContributionInstaller;
 import cc.arduino.contributions.packages.ContributionsIndexer;
+import cc.arduino.contributions.packages.DownloadableContribution;
+import cc.arduino.contributions.ui.DropdownItem;
 import cc.arduino.contributions.ui.FilteredAbstractTableModel;
 import cc.arduino.contributions.ui.InstallerJDialog;
 import cc.arduino.contributions.ui.InstallerTableCell;
@@ -88,6 +90,8 @@ public class ContributionManagerUI extends InstallerJDialog {
   }
 
   public void setIndexer(ContributionsIndexer indexer) {
+    DropdownItem<DownloadableContribution> previouslySelectedCategory = (DropdownItem<DownloadableContribution>) categoryChooser.getSelectedItem();
+
     categoryChooser.removeActionListener(categoryChooserActionListener);
 
     getContribModel().setIndex(indexer.getIndex());
@@ -104,6 +108,11 @@ public class ContributionManagerUI extends InstallerJDialog {
     Collection<String> categories = indexer.getIndex().getCategories();
     for (String s : categories) {
       categoryChooser.addItem(new DropdownCoreOfCategoryItem(s));
+    }
+    if (previouslySelectedCategory != null) {
+      categoryChooser.setSelectedItem(previouslySelectedCategory);
+    } else {
+      categoryChooser.setSelectedIndex(0);
     }
 
     // Create ConstributionInstaller tied with the provided index

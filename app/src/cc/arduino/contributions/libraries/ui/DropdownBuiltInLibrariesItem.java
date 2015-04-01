@@ -17,4 +17,10 @@ public class DropdownBuiltInLibrariesItem implements DropdownItem<DownloadableCo
   public Predicate<DownloadableContribution> getFilterPredicate() {
     return new BuiltInPredicate();
   }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof DropdownBuiltInLibrariesItem;
+  }
+
 }

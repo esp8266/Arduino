@@ -17,4 +17,9 @@ public class DropdownAllCoresItem implements DropdownItem<ContributedPlatform> {
   public Predicate<ContributedPlatform> getFilterPredicate() {
     return new NoopPredicate<ContributedPlatform>();
   }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof DropdownAllCoresItem;
+  }
 }

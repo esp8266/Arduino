@@ -21,4 +21,10 @@ public class DropdownCoreOfCategoryItem implements DropdownItem<ContributedPlatf
   public Predicate<ContributedPlatform> getFilterPredicate() {
     return new CategoryPredicate(category);
   }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof DropdownCoreOfCategoryItem && ((DropdownCoreOfCategoryItem) obj).category.equals(category);
+  }
+
 }

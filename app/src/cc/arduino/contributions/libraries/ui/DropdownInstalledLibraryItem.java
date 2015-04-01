@@ -24,4 +24,10 @@ public class DropdownInstalledLibraryItem implements DropdownItem<ContributedLib
   public Predicate<ContributedLibrary> getFilterPredicate() {
     return new InstalledLibraryPredicate(index);
   }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof DropdownInstalledLibraryItem;
+  }
+
 }

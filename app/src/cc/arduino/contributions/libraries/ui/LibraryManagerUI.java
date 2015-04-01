@@ -30,6 +30,7 @@ package cc.arduino.contributions.libraries.ui;
 
 import cc.arduino.contributions.libraries.ContributedLibrary;
 import cc.arduino.contributions.libraries.LibrariesIndexer;
+import cc.arduino.contributions.packages.DownloadableContribution;
 import cc.arduino.contributions.packages.ui.InstallerJDialogUncaughtExceptionHandler;
 import cc.arduino.contributions.ui.*;
 import cc.arduino.utils.Progress;
@@ -124,6 +125,10 @@ public class LibraryManagerUI extends InstallerJDialog<ContributedLibrary> {
 
   public void setIndexer(LibrariesIndexer indexer) {
     this.indexer = indexer;
+
+    DropdownItem<DownloadableContribution> previouslySelectedCategory = (DropdownItem<DownloadableContribution>) categoryChooser.getSelectedItem();
+    DropdownItem<DownloadableContribution> previouslySelectedType = (DropdownItem<DownloadableContribution>) typeChooser.getSelectedItem();
+
     categoryChooser.removeActionListener(categoryChooserActionListener);
     typeChooser.removeActionListener(typeChooserActionListener);
 
@@ -144,7 +149,11 @@ public class LibraryManagerUI extends InstallerJDialog<ContributedLibrary> {
     categoryChooser.setEnabled(categoryChooser.getItemCount() > 1);
 
     categoryChooser.addActionListener(categoryChooserActionListener);
-    categoryChooser.setSelectedIndex(0);
+    if (previouslySelectedCategory != null) {
+      categoryChooser.setSelectedItem(previouslySelectedCategory);
+    } else {
+      categoryChooser.setSelectedIndex(0);
+    }
 
     typeFilter = null;
     typeChooser.removeAllItems();
@@ -156,6 +165,11 @@ public class LibraryManagerUI extends InstallerJDialog<ContributedLibrary> {
     }
     typeChooser.setEnabled(typeChooser.getItemCount() > 1);
     typeChooser.addActionListener(typeChooserActionListener);
+    if (previouslySelectedType != null) {
+      typeChooser.setSelectedItem(previouslySelectedType);
+    } else {
+      typeChooser.setSelectedIndex(0);
+    }
 
     filterField.setEnabled(contribModel.getRowCount() > 0);
 
