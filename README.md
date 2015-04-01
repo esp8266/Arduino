@@ -103,6 +103,11 @@ Only master mode works, and ```Wire.setClock``` has not been verified to give ex
 Before using I2C, pins for SDA and SCL need to be set by calling
 ```Wire.pins(int sda, int scl)```, i.e. ```Wire.pins(0, 2);``` on ESP-01.
 
+#### SPI ####
+
+An initial SPI support for the HSPI interface (GPIO12-15) was implemented by [Sermus](https://github.com/Sermus).
+The implementation supports the entire Arduino SPI API including transactions, except setting phase and polarity as it's unclear how to set them in ESP8266 yet.
+
 #### OneWire (from https://www.pjrc.com/teensy/td_libs_OneWire.html) ####
 
 Library was adapted to work with ESP8266 by including register definitions into OneWire.h
@@ -132,7 +137,6 @@ toggle power).
 
 - analogWrite (PWM). ESP8266 has only one hardware PWM source. It is not yet clear how to use it with analogWrite API. Software PWM is also an option, but apparently it causes issues with WiFi connectivity.
 - pulseIn
-- SPI. HSPI and bit-banging are two interfaces that will be supported.
 - I2C slave mode
 - Serial modes other than 8n1
 - WiFi.RSSI. SDK doesn't seem to have an API to get RSSI for the current network. So far the only
