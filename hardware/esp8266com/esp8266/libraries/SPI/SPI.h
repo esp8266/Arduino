@@ -14,6 +14,7 @@
 #define _SPI_H_INCLUDED
 
 #include <Arduino.h>
+#include <stdlib.h>
 #include "include/SPIdef.h"
 
 
@@ -42,11 +43,11 @@ public:
   void begin();
 
   // void usingInterrupt(uint8_t interruptNumber);
-  // void beginTransaction(SPISettings settings);
+  void beginTransaction(SPISettings settings);
   uint8_t transfer(uint8_t data);
-  // uint16_t transfer16(uint16_t data);
+  uint16_t transfer16(uint16_t data);
   void transfer(void *buf, size_t count);
-  // void endTransaction(void);
+  void endTransaction(void);
 
   void end();
 
