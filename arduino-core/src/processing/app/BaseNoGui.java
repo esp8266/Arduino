@@ -45,7 +45,7 @@ public class BaseNoGui {
   static private File toolsFolder;
 
   // maps #included files to their library folder
-  public static Map<String, UserLibrary> importToLibraryTable;
+  public static Map<String, LibraryList> importToLibraryTable;
 
   // maps library name to their library folder
   static private LibraryList libraries;
@@ -771,14 +771,24 @@ public class BaseNoGui {
   }
 
   static public void populateImportToLibraryTable() {
-    // Populate importToLibraryTable
-    importToLibraryTable = new HashMap<String, UserLibrary>();
+    // Populate importToLibraryTable. Each header filename maps to
+    // a list of libraries. Compiler.java will use only the first
+    // library on each list. The others are used only to advise
+    // user of ambiguously matched and duplicate libraries.
+    importToLibraryTable = new HashMap<String, LibraryList>();
     for (UserLibrary lib : librariesIndexer.getInstalledLibraries()) {
       try {
         String headers[] = headerListFromIncludePath(lib.getSrcFolder());
         for (String header : headers) {
-          UserLibrary old = importToLibraryTable.get(header);
-          if (old != null) {
+          LibraryList list = importToLibraryTable.get(header);
+          if (list == null) {
+            // This is the first library found with this header
+            list = new LibraryList();
+            list.addFirst(lib);
+            importToLibraryTable.put(header, list);
+          } else {
+            UserLibrary old = list.peekFirst();
+            boolean useThisLib = true;
             // This is the case where 2 libraries have a .h header
             // with the same name.  We must decide which library to
             // use when a sketch has #include "name.h"
@@ -796,56 +806,79 @@ public class BaseNoGui {
             String oldName = old.getInstalledFolder().getName();  // just the library folder name
             String libName = lib.getInstalledFolder().getName();  // just the library folder name
             //System.out.println("name conflict: " + name);
-            //System.out.println("  old = " + oldName + "  ->  " + old.getFolder().getPath());
-            //System.out.println("  new = " + libName + "  ->  " + lib.getFolder().getPath());
+            //System.out.println(" old = " + oldName + " -> " + old.getInstalledFolder().getPath());
+            //System.out.println(" new = " + libName + " -> " + lib.getInstalledFolder().getPath());
             String name_lc = name.toLowerCase();
             String oldName_lc = oldName.toLowerCase();
             String libName_lc = libName.toLowerCase();
             // always favor a perfect name match
             if (libName.equals(name)) {
             } else if (oldName.equals(name)) {
-                continue;
+                useThisLib = false;
             // check for "-master" appended (zip file from github)
             } else if (libName.equals(name+"-master")) {
             } else if (oldName.equals(name+"-master")) {
-                continue;
+                useThisLib = false;
             // next, favor a match with other stuff appended
             } else if (libName.startsWith(name)) {
             } else if (oldName.startsWith(name)) {
-                continue;
+                useThisLib = false;
             // otherwise, favor a match with stuff prepended
             } else if (libName.endsWith(name)) {
             } else if (oldName.endsWith(name)) {
-                continue;
+                useThisLib = false;
             // as a last resort, match if stuff prepended and appended
             } else if (libName.contains(name)) {
             } else if (oldName.contains(name)) {
-                continue;
+                useThisLib = false;
             // repeat all the above tests, with case insensitive matching
             } else if (libName_lc.equals(name_lc)) {
             } else if (oldName_lc.equals(name_lc)) {
-                continue;
+                useThisLib = false;
             } else if (libName_lc.equals(name_lc+"-master")) {
             } else if (oldName_lc.equals(name_lc+"-master")) {
-                continue;
+                useThisLib = false;
             } else if (libName_lc.startsWith(name_lc)) {
             } else if (oldName_lc.startsWith(name_lc)) {
-                continue;
+                useThisLib = false;
             } else if (libName_lc.endsWith(name_lc)) {
             } else if (oldName_lc.endsWith(name_lc)) {
-                continue;
+                useThisLib = false;
             } else if (libName_lc.contains(name_lc)) {
             } else if (oldName_lc.contains(name_lc)) {
-                continue;
+                useThisLib = false;
             } else {
               // none of these tests matched, so just default to "libName".
             }
+            if (useThisLib) {
+              list.addFirst(lib);
+            } else {
+              list.addLast(lib);
+            }
           }
-          importToLibraryTable.put(header, lib);
         }
       } catch (IOException e) {
         showWarning(_("Error"), I18n
             .format("Unable to list header files in {0}", lib.getSrcFolder()), e);
+      }
+    }
+    // repeat for ALL libraries, to pick up duplicates not visible normally.
+    // any new libraries found here are NEVER used, but they are added to the
+    // end of already-found headers, to allow Compiler to report them if
+    // the sketch tries to use them.
+    for (UserLibrary lib : librariesIndexer.getInstalledLibrariesWithDuplicates()) {
+      try {
+        String headers[] = headerListFromIncludePath(lib.getSrcFolder());
+        for (String header : headers) {
+          LibraryList list = importToLibraryTable.get(header);
+          if (list != null) {
+            if (!(list.hasLibrary(lib))) {
+              list.addLast(lib);
+              //System.out.println(" duplicate lib: " + lib.getInstalledFolder().getPath());
+            }
+          }
+        }
+        } catch (IOException e) {
       }
     }
   }
