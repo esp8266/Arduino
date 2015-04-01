@@ -42,7 +42,7 @@ compiler.size.cmd=xtensa-lx106-elf-size
 compiler.esptool.cmd=esptool
 
 # This can be overriden in boards.txt
-build.extra_flags=
+build.extra_flags=-DESP8266
 
 # These can be overridden in platform.local.txt
 compiler.c.extra_flags=
