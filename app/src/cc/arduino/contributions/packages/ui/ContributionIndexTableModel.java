@@ -196,6 +196,9 @@ public class ContributionIndexTableModel extends FilteredAbstractTableModel<Cont
 
   @Override
   public Object getValueAt(int row, int col) {
+    if (row >= contributions.size()) {
+      return null;
+    }
     ContributedPlatformReleases contribution = contributions.get(row);
     if (col == DESCRIPTION_COL) {
       return contribution;// .getSelected();
