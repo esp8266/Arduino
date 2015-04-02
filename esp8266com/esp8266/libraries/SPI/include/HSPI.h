@@ -27,7 +27,7 @@ private:
 	uint32_t _clkDiv;
 	uint32_t *spi_fifo;
 	const uint32_t hspi_port = 1;
-	const uint32_t hspi_fifo_size = 32;
+	const uint32_t hspi_fifo_size = 16;
 
 private:
 	inline void hspi_wait_ready(void){while (READ_PERI_REG(SPI_FLASH_CMD(hspi_port))&SPI_FLASH_USR);}
