@@ -37,11 +37,23 @@ extern "C" {
 
 int atexit(void (*func)()) { return 0; }
 
+extern "C" void ets_update_cpu_frequency(int freqmhz); 
 void initVariant() __attribute__((weak));
 void initVariant() { }
 
 extern void loop();
 extern void setup();
+
+void preloop_update_frequency() __attribute__((weak));
+void preloop_update_frequency()
+{
+#if defined(F_CPU) && (F_CPU == 16000000L)
+    REG_SET_BIT(0x3ff00014, BIT(0));
+    ets_update_cpu_frequency(160);
+#endif
+}
+
+
 
 extern void (*__init_array_start)(void);
 extern void (*__init_array_end)(void);
@@ -87,6 +99,7 @@ static void loop_wrapper()
         setup();
         setup_done = true;
     }
+    preloop_update_frequency();
     loop();
     esp_schedule();
 }
