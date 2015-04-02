@@ -192,10 +192,16 @@ public class ContributionInstaller {
     ByteArrayOutputStream stderr = new ByteArrayOutputStream();
     Executor executor = new CollectStdOutStdErrExecutor(stdout, stderr);
     executor.setWorkingDirectory(folder);
-    executor.execute(new CommandLine(postInstallScript));
+    executor.setExitValues(null);
+    int exitValue = executor.execute(new CommandLine(postInstallScript));
+    executor.setExitValues(new int[0]);
 
     System.out.write(stdout.toByteArray());
     System.err.write(stderr.toByteArray());
+
+    if (executor.isFailure(exitValue)) {
+      throw new IOException();
+    }
   }
 
   public List<String> remove(ContributedPlatform platform) {
