@@ -73,6 +73,7 @@ public:
 
     void unref()
     {
+    	err_t err;
         DEBUGV(":ur %d\r\n", _refcnt);
         if (--_refcnt == 0)
         {
@@ -82,7 +83,11 @@ public:
                 tcp_sent(_pcb, NULL);
                 tcp_recv(_pcb, NULL);
                 tcp_err(_pcb, NULL);
-                tcp_close(_pcb);
+                err = tcp_close(_pcb);
+				if(err != ERR_OK) {
+					DEBUGV(":tc err %d\r\n", err);
+					tcp_abort(_pcb);
+				}
                 _pcb = 0;
             }
             delete this;
@@ -269,7 +274,7 @@ private:
 
 	void _error(err_t err)
 	{
-        DEBUGV(":er\r\n");
+        DEBUGV(":er %d\r\n", err);
 		_pcb = 0;
 		if (_size_sent && _send_waiting)
 			esp_schedule();
