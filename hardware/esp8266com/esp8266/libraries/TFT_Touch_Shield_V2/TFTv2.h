@@ -81,12 +81,12 @@ Modified by Sermus for ESP8266
 #define XP 21   // can be a digital pin, this is A3
 
 #else
-#define TFT_CS_LOW  //ESP8266 hspi has hardware controlled CS
-#define TFT_CS_HIGH 
-#define TFT_DC_LOW  pinMode(2, 0);
-#define TFT_DC_HIGH pinMode(2, 1);
-#define TFT_BL_OFF  pinMode(0, 0);
-#define TFT_BL_ON   pinMode(0, 1);
+#define TFT_CS_LOW  digitalWrite(15, 0);
+#define TFT_CS_HIGH digitalWrite(15, 1);
+#define TFT_DC_LOW  digitalWrite(2, 0);
+#define TFT_DC_HIGH digitalWrite(2, 1);
+#define TFT_BL_OFF  digitalWrite(4, 0);
+#define TFT_BL_ON   digitalWrite(4, 1);
 
 #define YP A2   // must be an analog pin, use "An" notation!
 #define XM A1   // must be an analog pin, use "An" notation!
