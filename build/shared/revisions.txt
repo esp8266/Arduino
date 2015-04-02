@@ -4,6 +4,8 @@ ARDUINO 1.6.3
 * Fixed an ArchiveExtractor issue when dealing with native stuff, affecting some linuxes
 * MacOSX: MACOSX_BUNDLED_JVM property is automatically set to JAVA_HOME if not provided
 * New splashscreen image
+* New editor theme
+* MacOSX and Windows: https links were not working, fixed
 
 [core]
 * Upgraded toolchains: statically compiled, ship with Link Time Optimization plugin (disabled by default)
