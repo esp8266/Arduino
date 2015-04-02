@@ -7,13 +7,13 @@ void HSPI::begin()
 {
 	spi_fifo = (uint32_t*)SPI_FLASH_C0(hspi_port);
 	//bit9 of PERIPHS_IO_MUX should be cleared when HSPI clock doesn't equal CPU clock
-	WRITE_PERI_REG(PERIPHS_IO_MUX, 0x105); 
+	WRITE_PERI_REG(PERIPHS_IO_MUX, 0x105);
 	PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTDI_U, FUNC_HSPIQ_MISO);	// gpio12
 	PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTCK_U, FUNC_HSPID_MOSI);	// gpio13
 	PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTMS_U, FUNC_HSPI_CLK);		// gpio14
 
 	// SPI clock=CPU clock/8
-	WRITE_PERI_REG(SPI_FLASH_CLOCK(hspi_port), 
+	WRITE_PERI_REG(SPI_FLASH_CLOCK(hspi_port),
 		((1&SPI_CLKDIV_PRE)<<SPI_CLKDIV_PRE_S)|
 		((3&SPI_CLKCNT_N)<<SPI_CLKCNT_N_S)|
 		((1&SPI_CLKCNT_H)<<SPI_CLKCNT_H_S)|
@@ -53,7 +53,7 @@ void HSPI::setClockDivider(uint8_t clockDiv)
 {
 	uint32_t clock_reg_val = (((clockDiv - 1) & SPI_CLKDIV_PRE) << SPI_CLKDIV_PRE_S) |
 				   ((1 & SPI_CLKCNT_N) << SPI_CLKCNT_N_S) |
-				   ((0 & SPI_CLKCNT_H) << SPI_CLKCNT_H_S) | 
+				   ((0 & SPI_CLKCNT_H) << SPI_CLKCNT_H_S) |
 				   ((1 & SPI_CLKCNT_L) << SPI_CLKCNT_L_S);
 	WRITE_PERI_REG(SPI_FLASH_CLOCK(hspi_port), clock_reg_val);
 }

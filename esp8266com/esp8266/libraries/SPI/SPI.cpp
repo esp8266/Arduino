@@ -29,7 +29,7 @@ void SPIClass::begin()
   _impl->begin();
 }
 
-void SPIClass::end() 
+void SPIClass::end()
 {
   if (!_impl)
     return;
@@ -47,42 +47,42 @@ void SPIClass::beginTransaction(SPISettings settings)
 	_impl->setClockDivider(settings._clock);
 }
 
-uint8_t SPIClass::transfer(uint8_t data) 
+uint8_t SPIClass::transfer(uint8_t data)
 {
   if (!_impl)
     return 0;
   return _impl->transfer(data);
 }
 
-uint16_t SPIClass::transfer16(uint16_t data) 
+uint16_t SPIClass::transfer16(uint16_t data)
 {
   if (!_impl)
     return 0;
   return _impl->transfer16(data);
 }
 
-void SPIClass::transfer(void *buf, size_t count) 
+void SPIClass::transfer(void *buf, size_t count)
 {
   if (!_impl)
     return;
   _impl->transfer(buf, count);
 }
 
-void SPIClass::setBitOrder(uint8_t bitOrder) 
+void SPIClass::setBitOrder(uint8_t bitOrder)
 {
   if (!_impl)
     return;
   _impl->setBitOrder(bitOrder);
 }
 
-void SPIClass::setDataMode(uint8_t dataMode) 
+void SPIClass::setDataMode(uint8_t dataMode)
 {
   if (!_impl)
     return;
   _impl->setDataMode(dataMode);
 }
 
-void SPIClass::setClockDivider(uint8_t clockDiv) 
+void SPIClass::setClockDivider(uint8_t clockDiv)
 {
   if (!_impl)
     return;
