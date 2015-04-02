@@ -26,7 +26,11 @@
 
 void TFT::TFTinit (void)
 {
+    pinMode(2, OUTPUT);
+    pinMode(4, OUTPUT);
+    pinMode(15, OUTPUT);
     SPI.begin();
+    SPI.setClockDivider(2);
     
     TFT_CS_HIGH;
     TFT_DC_HIGH;
