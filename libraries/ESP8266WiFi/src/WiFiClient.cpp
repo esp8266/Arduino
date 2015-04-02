@@ -136,7 +136,7 @@ int8_t ICACHE_FLASH_ATTR WiFiClient::_connected(void* pcb, int8_t err)
 
 void ICACHE_FLASH_ATTR WiFiClient::_err(int8_t err)
 {
-    DEBUGV(":err\r\n");
+    DEBUGV(":err %d\r\n", err);
     esp_schedule();
 }
 
