@@ -87,10 +87,11 @@ void BridgeClass::begin() {
 void BridgeClass::put(const char *key, const char *value) {
   // TODO: do it in a more efficient way
   String cmd = "D";
+  uint8_t res[1];
   cmd += key;
   cmd += "\xFE";
   cmd += value;
-  transfer((uint8_t*)cmd.c_str(), cmd.length());
+  transfer((uint8_t*)cmd.c_str(), cmd.length(), res, 1);
 }
 
 unsigned int BridgeClass::get(const char *key, uint8_t *value, unsigned int maxlen) {
