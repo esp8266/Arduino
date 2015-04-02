@@ -32,6 +32,9 @@
 // result objects are assumed to be writable by subsequent concatenations.
 class StringSumHelper;
 
+typedef char* __FlashStringHelper;
+#define F(str) str
+
 // The string class
 class String
 {
