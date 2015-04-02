@@ -95,7 +95,7 @@ public class Platform extends processing.app.Platform {
 
   public void openURL(String url) throws Exception {
     if (PApplet.javaVersion < 1.6f) {
-      if (url.startsWith("http://")) {
+      if (url.startsWith("http")) {
         // formerly com.apple.eio.FileManager.openURL(url);
         // but due to deprecation, instead loading dynamically
         try {
