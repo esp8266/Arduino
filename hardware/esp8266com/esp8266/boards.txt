@@ -1,5 +1,5 @@
 menu.UploadSpeed=Upload Speed
-
+menu.CpuFrequency=CPU Frequency
 ##############################################################
 esp01.name=Generic ESP8266 board
 
@@ -16,6 +16,12 @@ esp01.build.f_cpu=80000000L
 esp01.build.board=ESP8266_ESP01
 esp01.build.core=esp8266
 esp01.build.variant=esp01
+
+esp01.menu.CpuFrequency.80=80MHz
+esp01.menu.CpuFrequency.80.build.f_cpu=80000000L
+
+esp01.menu.CpuFrequency.160=160MHz
+esp01.menu.CpuFrequency.160.build.f_cpu=160000000L
 
 esp01.upload.tool=esptool
 esp01.menu.UploadSpeed.115200=115200
