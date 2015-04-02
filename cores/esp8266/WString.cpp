@@ -702,12 +702,12 @@ void ICACHE_FLASH_ATTR String::trim(void)
 
 long ICACHE_FLASH_ATTR String::toInt(void) const
 {
-	if (buffer) return atol_internal(buffer);
+	if (buffer) return atol(buffer);
 	return 0;
 }
 
 float ICACHE_FLASH_ATTR String::toFloat(void) const
 {
-	if (buffer) return float(atof_internal(buffer));
+	if (buffer) return atof(buffer);
 	return 0;
 }
