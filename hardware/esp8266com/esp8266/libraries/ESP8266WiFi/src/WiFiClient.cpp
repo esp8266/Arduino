@@ -40,10 +40,15 @@ extern "C"
 #include "include/ClientContext.h"
 #include "c_types.h"
 
+
+#define NO_PORT_BIND
+
+#ifndef NO_PORT_BIND
 #define MIN_LOCAL_PORT 1024
 #define MAX_LOCAL_PORT 1124
 
 static int g_localPort = MIN_LOCAL_PORT;
+#endif
 
 ICACHE_FLASH_ATTR WiFiClient::WiFiClient() 
 : _client(0)
@@ -97,7 +102,7 @@ int ICACHE_FLASH_ATTR  WiFiClient::connect(IPAddress ip, uint16_t port)
     tcp_pcb* pcb = tcp_new();
     if (!pcb)
         return 0;
-
+#ifndef NO_PORT_BIND
     while(true)
     {
         err_t err = tcp_bind(pcb, INADDR_ANY, g_localPort);
@@ -105,11 +110,14 @@ int ICACHE_FLASH_ATTR  WiFiClient::connect(IPAddress ip, uint16_t port)
             g_localPort = MIN_LOCAL_PORT;
         if (err == ERR_OK)
             break;
-        if (err == ERR_USE)
+        if (err == ERR_USE) {
+        	esp_yield();
             continue;
+        }
         tcp_abort(pcb);
         return 0;
     }
+#endif
     ip_addr_t addr;
     addr.addr = ip;
     tcp_arg(pcb, this);
