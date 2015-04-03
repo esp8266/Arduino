@@ -1,5 +1,5 @@
-#include "include\HSPI.h"
-#include "include\spi_register.h"
+#include "include/HSPI.h"
+#include "include/spi_register.h"
 
 #define __min(a,b) ((a > b) ? (b):(a))
 
