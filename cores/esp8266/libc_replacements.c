@@ -25,6 +25,7 @@
 
 #include <stddef.h>
 #include <stdarg.h>
+#include <math.h>
 
 #include "ets_sys.h"
 #include "os_type.h"
@@ -310,4 +311,80 @@ int isblank(int c) {
 }
 
 // ##########################################################################
+
+static int errno = 0;
+
+int * __errno(void) {
+	printf("__errno is called last error: %d (not current)\n", errno);
+	return &errno;
+}
+
+
+// ##########################################################################
+//                     __ieee754  functions
+// ##########################################################################
+
+double __ieee754_sinh(double x) {
+	return sinh(x);
+}
+
+double __ieee754_hypot(double x, double y) {
+	return hypot(x, y);
+}
+
+float __ieee754_hypotf(float x, float y) {
+	return hypotf(x, y);
+}
+
+float __ieee754_logf(float x) {
+	return logf(x);
+}
+
+double __ieee754_log10(double x) {
+	return log10(x);
+}
+
+double __ieee754_exp(double x) {
+	return exp(x);
+}
+
+double __ieee754_cosh(double x) {
+	return cosh(x);
+}
+
+float __ieee754_expf(float x) {
+	return expf(x);
+}
+
+float __ieee754_log10f(float x) {
+	return log10f(x);
+}
+
+double __ieee754_atan2(double x, double y) {
+	return atan2(x, y);
+}
+
+float __ieee754_sqrtf(float x) {
+	return sqrtf(x);
+}
+
+float __ieee754_sinhf(float x) {
+	return sinhf(x);
+}
+
+double __ieee754_log(double x) {
+	return log(x);
+}
+
+double __ieee754_sqrt(double x) {
+	return sqrt(x);
+}
+
+float __ieee754_coshf(float x) {
+	return coshf(x);
+}
+
+float __ieee754_atan2f(float x, float y) {
+	return atan2f(x, y);
+}
 
