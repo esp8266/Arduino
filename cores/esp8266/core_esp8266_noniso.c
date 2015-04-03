@@ -49,7 +49,7 @@ long atol(const char* s)
 double atof(const char* s)
 {
   double result = 0;
-  double sign = 1;
+  double factor = 1.0;
 
   while (*s == ' ' || *s == '\t' || *s == '\r' || *s == '\n')
     ++s;
@@ -59,7 +59,7 @@ double atof(const char* s)
 
   if (*s == '-') 
   {
-    sign = -1;
+    factor = -1.0;
     ++s;
   }
   if (*s == '+')
@@ -68,7 +68,6 @@ double atof(const char* s)
   }
 
   bool decimals = false;
-  double factor = 1.0;
   char c;
   while((c = *s)) 
   {
