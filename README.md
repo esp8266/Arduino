@@ -123,7 +123,7 @@ See attached example and library README file for details.
 
 Libraries that don't rely on low-level access to AVR registers should work well. Here are a few libraries that were verified to work:
 
-- [PubSubClient](https://github.com/knolleary/pubsubclient) MQTT library - [sample](https://gist.github.com/igrr/7f7e7973366fc01d6393)
+- PubSubClient MQTT library. This library is not bundled with the IDE, you need to [download it separately](https://github.com/knolleary/pubsubclient). Use this [sample](https://gist.github.com/igrr/7f7e7973366fc01d6393) to get started.
 - [DHT11](https://github.com/adafruit/DHT-sensor-library) - initialize DHT as follows: ```DHT dht(DHTPIN, DHTTYPE, 15);```
 - [DallasTemperature](https://github.com/milesburton/Arduino-Temperature-Control-Library.git)
 
