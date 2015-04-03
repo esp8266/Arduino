@@ -1,38 +1,40 @@
 menu.UploadSpeed=Upload Speed
+menu.CpuFrequency=CPU Frequency
+##############################################################
+generic.name=Generic ESP8266 Module
+
+generic.upload.tool=esptool
+generic.upload.speed=115200
+generic.upload.resetmethod=ck
+generic.upload.maximum_size=524288
+generic.upload.wait_for_upload_port=true
+generic.serial.disableDTR=true
+generic.serial.disableRTS=true
+
+generic.build.mcu=esp8266
+generic.build.f_cpu=80000000L
+generic.build.board=ESP8266_ESP01
+generic.build.core=esp8266
+generic.build.variant=generic
+
+generic.menu.CpuFrequency.80=80 MHz
+generic.menu.CpuFrequency.80.build.f_cpu=80000000L
+generic.menu.CpuFrequency.160=160 MHz
+generic.menu.CpuFrequency.160.build.f_cpu=160000000L
+
+generic.menu.UploadSpeed.115200=115200
+generic.menu.UploadSpeed.115200.upload.speed=115200
+generic.menu.UploadSpeed.9600=9600
+generic.menu.UploadSpeed.9600.upload.speed=9600
+generic.menu.UploadSpeed.57600=57600
+generic.menu.UploadSpeed.57600.upload.speed=57600
+generic.menu.UploadSpeed.256000=256000
+generic.menu.UploadSpeed.256000.upload.speed=256000
+generic.menu.UploadSpeed.921600=921600
+generic.menu.UploadSpeed.921600.upload.speed=921600
 
 ##############################################################
-esp01.name=Generic ESP8266 board
-
-esp01.upload.tool=esptool
-esp01.upload.speed=115200
-esp01.upload.resetmethod=ck
-esp01.upload.maximum_size=524288
-esp01.upload.wait_for_upload_port=true
-esp01.serial.disableDTR=true
-esp01.serial.disableRTS=true
-
-esp01.build.mcu=esp8266
-esp01.build.f_cpu=80000000L
-esp01.build.board=ESP8266_ESP01
-esp01.build.core=esp8266
-esp01.build.variant=esp01
-
-esp01.upload.tool=esptool
-esp01.menu.UploadSpeed.115200=115200
-esp01.menu.UploadSpeed.115200.upload.speed=115200
-esp01.menu.UploadSpeed.9600=9600
-esp01.menu.UploadSpeed.9600.upload.speed=9600
-esp01.menu.UploadSpeed.57600=57600
-esp01.menu.UploadSpeed.57600.upload.speed=57600
-esp01.menu.UploadSpeed.256000=256000
-esp01.menu.UploadSpeed.256000.upload.speed=256000
-esp01.menu.UploadSpeed.921600=921600
-esp01.menu.UploadSpeed.921600.upload.speed=921600
-
-esp01.upload.tool=esptool
-
-##############################################################
-wifio.name=WIFIO
+wifio.name=Wifio
 
 wifio.upload.tool=esptool
 wifio.upload.speed=115200
@@ -45,5 +47,10 @@ wifio.build.f_cpu=80000000L
 wifio.build.board=ESP8266_WIFIO
 wifio.build.core=esp8266
 wifio.build.variant=wifio
+
+wifio.menu.CpuFrequency.80=80MHz
+wifio.menu.CpuFrequency.80.build.f_cpu=80000000L
+wifio.menu.CpuFrequency.160=160MHz
+wifio.menu.CpuFrequency.160.build.f_cpu=160000000L
 
 wifio.upload.tool=esptool

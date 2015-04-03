@@ -1,12 +1,12 @@
 
-# Arduino ESP8266 platform
+# ESP8266 platform
 # ------------------------------
 
 # For more info:
 # https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5---3rd-party-Hardware-specification
 
-name=Arduino ESP8266
-version=1.5.8
+name=ESP8266 Modules
+version=1.6.1
 
 compiler.tools.path={runtime.ide.path}/hardware/tools/esp8266/
 compiler.path={compiler.tools.path}xtensa-lx106-elf/bin/

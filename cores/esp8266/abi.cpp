@@ -58,4 +58,6 @@ namespace std {
   }
 }
 
+// TODO: rebuild windows toolchain to make this unnecessary:
+void* __dso_handle;
 
