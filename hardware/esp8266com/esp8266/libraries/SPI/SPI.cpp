@@ -11,7 +11,7 @@
  */
 
 #include "SPI.h"
-#include "include\HSPI.h"
+#include "include/HSPI.h"
 
 SPIClass SPI;
 
