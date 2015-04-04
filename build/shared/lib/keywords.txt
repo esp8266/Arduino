@@ -30,6 +30,7 @@ INTERNAL2V56	LITERAL2	AnalogReference
 
 boolean	LITERAL2	BooleanVariables
 byte	LITERAL2	Byte
+char	LITERAL2	Char
 const	LITERAL2	Const
 false	LITERAL2	Constants
 float	LITERAL2	Float
@@ -169,7 +170,6 @@ isPressed	KEYWORD2
 
 break	KEYWORD3	Break
 case	KEYWORD3	SwitchCase
-char	KEYWORD3	Char
 class	KEYWORD3
 continue	KEYWORD3	Continue
 default	KEYWORD3	SwitchCase	
@@ -224,4 +224,4 @@ loop	KEYWORD3	Loop
 ()		parentheses
 >>		Bitshift
 ;		SemiColon
--=		IncrementCompound
+-=		DecrementCompound
