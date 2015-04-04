@@ -26,9 +26,11 @@
 extern "C"{
 #endif
 
-long atol_internal(const char*);
+int atoi(const char *s);
 
-float atof_internal(const char*);
+long atol(const char* s);
+
+double atof(const char* s);
 
 char* itoa (int val, char *s, int radix);
 
