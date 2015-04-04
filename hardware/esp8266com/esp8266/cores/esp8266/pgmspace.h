@@ -6,6 +6,7 @@
 #define PROGMEM
 #define PGM_P  		const char *
 #define PSTR(str) 	(str)
+#define F(str)		(str)
 
 #define _SFR_BYTE(n) (n)
 
