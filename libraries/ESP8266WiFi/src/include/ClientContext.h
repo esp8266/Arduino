@@ -284,11 +284,24 @@ private:
 	void _error(err_t err)
 	{
         DEBUGV(":er %d\r\n", err);
-		_pcb = 0;
-		if (_size_sent && _send_waiting)
-			esp_schedule();
 
-	}
+        if(_pcb) {
+            tcp_arg(_pcb, NULL);
+            tcp_sent(_pcb, NULL);
+            tcp_recv(_pcb, NULL);
+            tcp_err(_pcb, NULL);
+            err = tcp_close(_pcb);
+            if(err != ERR_OK) {
+                DEBUGV(":tc err %d\r\n", err);
+                tcp_abort(_pcb);
+            }
+        }
+ 		_pcb = 0;
+
+        if(_size_sent && _send_waiting) {
+            esp_schedule();
+        }
+    }
 
 	err_t _poll(tcp_pcb* pcb)
 	{
