@@ -49,6 +49,7 @@ class ClientContext {
 
         ClientContext* next(ClientContext* new_next) {
             _next = new_next;
+            return _next;
         }
 
         void ref() {

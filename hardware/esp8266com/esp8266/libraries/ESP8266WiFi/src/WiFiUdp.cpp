@@ -54,6 +54,7 @@ WiFiUDP& WiFiUDP::operator=(const WiFiUDP& rhs)
     _ctx = rhs._ctx;
     if (_ctx)
         _ctx->ref();
+    return *this;
 }
 
 WiFiUDP::~WiFiUDP()

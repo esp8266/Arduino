@@ -157,7 +157,6 @@ int ICACHE_FLASH_ATTR WiFiClient::available()
 
 int ICACHE_FLASH_ATTR WiFiClient::read() 
 {
-    uint8_t b;
     if (!available())
         return -1;
 
