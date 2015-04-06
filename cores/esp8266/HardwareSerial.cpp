@@ -394,17 +394,31 @@ void ICACHE_FLASH_ATTR uart_ignore_char(char c) {
 }
 
 void ICACHE_FLASH_ATTR uart0_write_char(char c) {
-	if(c == '\n') {
-		WRITE_PERI_REG(UART_FIFO(0), '\r');
-	}
-	WRITE_PERI_REG(UART_FIFO(0), c);
+    if(&Serial != NULL && Serial.isTxEnabled()) {
+        if(c == '\n') {
+            Serial.write('\r');
+        }
+        Serial.write(c);
+    } else {
+        if(c == '\n') {
+            WRITE_PERI_REG(UART_FIFO(0), '\r');
+        }
+        WRITE_PERI_REG(UART_FIFO(0), c);
+    }
 }
 
 void ICACHE_FLASH_ATTR uart1_write_char(char c) {
-	if(c == '\n') {
-		WRITE_PERI_REG(UART_FIFO(1), '\r');
-	}
-	WRITE_PERI_REG(UART_FIFO(1), c);
+    if(&Serial1 != NULL && Serial1.isTxEnabled()) {
+        if(c == '\n') {
+            Serial1.write('\r');
+        }
+        Serial1.write(c);
+    } else {
+        if(c == '\n') {
+            WRITE_PERI_REG(UART_FIFO(1), '\r');
+        }
+        WRITE_PERI_REG(UART_FIFO(1), c);
+    }
 }
 
 static UARTnr_t s_uart_debug_nr = UART_NO;
