@@ -77,6 +77,7 @@ public:
         DEBUGV(":ur %d\r\n", _refcnt);
         if (--_refcnt == 0)
         {
+            flush();
             if (_pcb)
             {
                 tcp_arg(_pcb, NULL);

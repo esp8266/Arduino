@@ -33,6 +33,7 @@
 class StringSumHelper;
 
 typedef char* __FlashStringHelper;
+//#define F(str)  []() -> const char * { static const char tmp[] ICACHE_RODATA_ATTR = str; return &tmp[0]; }()
 #define F(str) str
 
 // The string class
