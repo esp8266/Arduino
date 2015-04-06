@@ -202,7 +202,8 @@ uint8_t twi_writeTo(uint8_t addr, uint8_t* data, uint8_t size, uint8_t wait, uin
 }
 
 uint8_t twi_transmit(const uint8_t* data, uint8_t length) {
-
+    //TODO implement twi_transmit
+    return 0;
 }
 
 void twi_attachSlaveRxEvent(void (*)(uint8_t*, int)) {

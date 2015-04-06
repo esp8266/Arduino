@@ -34,12 +34,12 @@ int atoi(const char* s) {
 }
 
 long atol(const char* s) {
-    const char * tmp;
+    char * tmp;
     return strtol(s, &tmp, 10);
 }
 
 double atof(const char* s) {
-    const char * tmp;
+    char * tmp;
     return strtod(s, &tmp);
 }
 
@@ -148,7 +148,6 @@ char* ultoa(unsigned long value, char* result, int base) {
 }
 
 char * dtostrf(double number, signed char width, unsigned char prec, char *s) {
-    size_t n = 0;
 
     if(isnan(number)) {
         strcpy(s, "nan");
