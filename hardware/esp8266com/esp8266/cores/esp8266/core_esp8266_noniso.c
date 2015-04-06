@@ -34,57 +34,13 @@ int atoi(const char* s) {
 }
 
 long atol(const char* s) {
-	long int result = 0;
-	int i;
-	const char* b = s;
-	int sign = 1;
-	for(i = 0; *b; ++i, ++b) {
-		if(i == 0 && *b == '-') sign = -1;
-		int x = *b - '0';
-		if(x < 0 || x > 9) break;
-		result = result * 10 + x;
-	}
-	return sign * result;
+	const char * tmp;
+	return strtol(s, &tmp, 10);
 }
 
-// Source:
-// https://github.com/anakod/Sming/blob/master/Sming/system/stringconversion.cpp#L93
 double atof(const char* s) {
-	double result = 0;
-	double sign = 1;
-
-	while(*s == ' ' || *s == '\t' || *s == '\r' || *s == '\n')
-		++s;
-
-	if(*s == 0) return 0;
-
-	if(*s == '-') {
-		sign = -1;
-		++s;
-	}
-	if(*s == '+') {
-		++s;
-	}
-
-	bool decimals = false;
-	double factor = 1.0;
-	char c;
-	while((c = *s)) {
-		if(c == '.') {
-			decimals = true;
-			++s;
-			continue;
-		}
-
-		int d = c - '0';
-		if(d < 0 || d > 9) break;
-
-		result = 10.0 * result + d;
-		if(decimals) factor *= 0.1;
-		++s;
-	}
-
-	return result * factor;
+	const char * tmp;
+	return strtod(s, &tmp);
 }
 
 void reverse(char* begin, char* end) {

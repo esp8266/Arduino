@@ -25,7 +25,10 @@
 
 #include <stddef.h>
 #include <stdarg.h>
+#include <stdio.h>
 #include <math.h>
+#include <limits.h>
+#include <errno.h>
 
 #include "ets_sys.h"
 #include "os_type.h"
@@ -44,6 +47,10 @@ void free(void* ptr) {
 
 void* realloc(void* ptr, size_t size) {
 	return os_realloc(ptr, size);
+}
+
+int	puts(const char * str){
+	return os_printf("%s", str);
 }
 
 int printf(const char* format, ...) {
@@ -113,7 +120,7 @@ char *ets_strstr(const char *haystack, const char *needle) {
 	return strstr(haystack, needle);
 }
 
-char *strchr(const char * str, int character) {
+char * strchr(const char * str, int character) {
 	while(1) {
 		if(*str == 0x00) {
 			return NULL;
@@ -125,7 +132,7 @@ char *strchr(const char * str, int character) {
 	}
 }
 
-char *strrchr(const char * str, int character) {
+char * strrchr(const char * str, int character) {
 	char * ret = NULL;
 	while(1) {
 		if(*str == 0x00) {
@@ -138,11 +145,11 @@ char *strrchr(const char * str, int character) {
 	}
 }
 
-char *strcat(char * dest, const char * src) {
+char * strcat(char * dest, const char * src) {
 	return strncat(dest, src, strlen(src));
 }
 
-char *strncat(char * dest, const char * src, size_t n) {
+char * strncat(char * dest, const char * src, size_t n) {
 	uint32_t offset = strlen(dest);
 	for(uint32_t i = 0; i < n; i++) {
 		*(dest + i + offset) = *(src + i);
@@ -153,7 +160,7 @@ char *strncat(char * dest, const char * src, size_t n) {
 	return dest;
 }
 
-char *strtok_r(char * str, const char * delimiters, char ** temp) {
+char * strtok_r(char * str, const char * delimiters, char ** temp) {
 	static char * ret = NULL;
 	char * start = NULL;
 	char * end = NULL;
@@ -195,6 +202,128 @@ char *strtok_r(char * str, const char * delimiters, char ** temp) {
 	return ret;
 }
 
+int strcasecmp(const char * str1, const char * str2) {
+	int d = 0;
+	while(1) {
+		int c1 = tolower(*str1++);
+		int c2 = tolower(*str2++);
+		if(((d = c1 - c2) != 0) || (c2 == '\0')) {
+			break;
+		}
+	}
+	return d;
+}
+
+char * strdup(const char *str) {
+	size_t len = strlen(str) + 1;
+	char *cstr = malloc(len);
+	if(cstr) {
+		memcpy(cstr, str, len);
+	}
+	return cstr;
+}
+
+
+long int ICACHE_FLASH_ATTR strtol(const char* str, char** endptr, int base) {
+	long int result = 0;
+	int sign = 1;
+
+	while(isspace(*str)) {
+		str++;
+	}
+
+	if(*str == 0x00) {
+		// only space in str?
+		*endptr = (char*) str;
+		return result;
+	}
+
+	switch(base) {
+		case 10:
+
+			if(*str == '-') {
+				sign = -1;
+				str++;
+			} else if(*str == '+') {
+				str++;
+			}
+
+			for(uint8_t i = 0; *str; i++, str++) {
+				int x = *str - '0';
+				if(x < 0 || x > 9) {
+					break;
+				}
+				result = result * 10 + x;
+			}
+			break;
+		case 2:
+			for(uint8_t i = 0; *str; i++, str++) {
+				int x = *str - '0';
+				if(x < 0 || x > 1) {
+					break;
+				}
+				result = result * 2 + x;
+			}
+			break;
+		case 16:
+		default:
+			os_printf("fnk: strtol() only supports base 10 and 2 ATM!\n");
+			break;
+
+	}
+	*endptr = (char*) str;
+	return sign * result;
+}
+
+
+// based on Source:
+// https://github.com/anakod/Sming/blob/master/Sming/system/stringconversion.cpp#L93
+double ICACHE_FLASH_ATTR strtod(const char* str, char** endptr) {
+	double result = 0.0;
+	double factor = 1.0;
+	bool decimals = false;
+	char c;
+
+	while(isspace(*str)) {
+		str++;
+	}
+
+	if(*str == 0x00) {
+		// only space in str?
+		*endptr = (char*) str;
+		return result;
+	}
+
+	if(*str == '-') {
+		factor = -1;
+		str++;
+	} else if(*str == '+') {
+		str++;
+	}
+
+	while((c = *str)) {
+		if(c == '.') {
+			decimals = true;
+			str++;
+			continue;
+		}
+
+		int d = c - '0';
+		if(d < 0 || d > 9) {
+			break;
+		}
+
+		result = 10.0 * result + d;
+		if(decimals) {
+			factor *= 0.1;
+		}
+
+		str++;
+	}
+	*endptr = (char*) str;
+	return result * factor;
+}
+
 // ##########################################################################
 //                             ctype functions
 // ##########################################################################
@@ -226,6 +355,7 @@ int isdigit(int c) {
 	}
 	return 0;
 }
+
 int isgraph(int c) {
 	if(isprint(c) && c != ' ') {
 		return 1;
@@ -312,13 +442,12 @@ int isblank(int c) {
 
 // ##########################################################################
 
-static int errno = 0;
+static int errno_var = 0;
 
 int * __errno(void) {
-	printf("__errno is called last error: %d (not current)\n", errno);
-	return &errno;
+	os_printf("__errno is called last error: %d (not current)\n", errno_var);
+	return &errno_var;
 }
-
 
 // ##########################################################################
 //                     __ieee754  functions
