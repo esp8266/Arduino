@@ -62,66 +62,64 @@
 class cbuf;
 
 typedef enum {
-	UART0 = 0,
-	UART1 = 1,
-	UART_NO = 0xFF
+    UART0 = 0, UART1 = 1, UART_NO = 0xFF
 } UARTnr_t;
 
 typedef struct {
-	UARTnr_t uart_nr;
-	int baud_rate;
-	bool rxEnabled;
-	bool txEnabled;
-	uint8_t rxPin;
-	uint8_t txPin;
+        UARTnr_t uart_nr;
+        int baud_rate;
+        bool rxEnabled;
+        bool txEnabled;
+        uint8_t rxPin;
+        uint8_t txPin;
 } uart_t;
 
 class HardwareSerial: public Stream {
-	public:
-		HardwareSerial(UARTnr_t uart_nr);
+    public:
+        HardwareSerial(UARTnr_t uart_nr);
 
-		void begin(unsigned long baud) {
-			begin(baud, 0);
-		}
-		void begin(unsigned long, uint8_t);
-		void end();
-		void swap();  //use GPIO13 and GPIO15 as RX and TX
-		int available(void) override;
-		int peek(void) override;
-		int read(void) override;
-		int availableForWrite(void);
-		void flush(void) override;
-		size_t write(uint8_t) override;
-		inline size_t write(unsigned long n) {
-			return write((uint8_t) n);
-		}
-		inline size_t write(long n) {
-			return write((uint8_t) n);
-		}
-		inline size_t write(unsigned int n) {
-			return write((uint8_t) n);
-		}
-		inline size_t write(int n) {
-			return write((uint8_t) n);
-		}
-		using Print::write; // pull in write(str) and write(buf, size) from Print
-		operator bool() const;
+        void begin(unsigned long baud) {
+            begin(baud, 0);
+        }
+        void begin(unsigned long, uint8_t);
+        void end();
+        void swap();  //use GPIO13 and GPIO15 as RX and TX
+        int available(void) override;
+        int peek(void) override;
+        int read(void) override;
+        int availableForWrite(void);
+        void flush(void) override;
+        size_t write(uint8_t) override;
+        inline size_t write(unsigned long n) {
+            return write((uint8_t) n);
+        }
+        inline size_t write(long n) {
+            return write((uint8_t) n);
+        }
+        inline size_t write(unsigned int n) {
+            return write((uint8_t) n);
+        }
+        inline size_t write(int n) {
+            return write((uint8_t) n);
+        }
+        using Print::write; // pull in write(str) and write(buf, size) from Print
+        operator bool() const;
 
-		void setDebugOutput(bool);
-		bool isTxEnabled(void);
-		bool isRxEnabled(void);
+        void setDebugOutput(bool);
+        bool isTxEnabled(void);
+        bool isRxEnabled(void);
 
-	protected:
-		friend void uart_interrupt_handler(uart_t* uart);
-		void _rx_complete_irq(char c);
-		void _tx_empty_irq(void);
+    protected:
+        friend void uart_interrupt_handler(uart_t* uart);
+        void _rx_complete_irq(char c);
+        void _tx_empty_irq(void);
 
-	protected:
-		UARTnr_t _uart_nr;
-		uart_t* _uart;
-		cbuf* _tx_buffer;
-		cbuf* _rx_buffer;
-		bool _written;
+    protected:
+        UARTnr_t _uart_nr;
+        uart_t* _uart;
+        cbuf* _tx_buffer;
+        cbuf* _rx_buffer;
+        bool _written;
 };
 
 extern HardwareSerial Serial;
