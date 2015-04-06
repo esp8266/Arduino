@@ -162,11 +162,12 @@ public:
 
     void flush()
     {
-        if (!_rx_buf)
+        if(!_rx_buf) {
             return;
-
-        size_t len = _rx_buf->tot_len;
-        tcp_recved(_pcb, len);
+        }
+        if(_pcb) {
+            tcp_recved(_pcb, (size_t) _rx_buf->tot_len);
+        }
         pbuf_free(_rx_buf);
         _rx_buf = 0;
         _rx_buf_offset = 0;
