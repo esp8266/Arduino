@@ -182,14 +182,22 @@ public:
 
     size_t write(const char* data, size_t size)
     {
-    	if (!_pcb)
+    	if (!_pcb) {
+    	    DEBUGV(":wr !_pcb\r\n");
     		return 0;
+    	}
+
+		if(size == 0) {
+			return 0;
+		}
 
     	size_t room = tcp_sndbuf(_pcb);
     	size_t will_send = (room < size) ? room : size;
     	err_t err = tcp_write(_pcb, data, will_send, 0);
-    	if (err != ERR_OK)
+    	if (err != ERR_OK) {
+    		DEBUGV(":wr !ERR_OK\r\n");
     		return 0;
+    	}
 
     	_size_sent = will_send;
         DEBUGV(":wr\r\n");
