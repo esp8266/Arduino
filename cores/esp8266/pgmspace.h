@@ -6,6 +6,7 @@
 #define PROGMEM
 #define PGM_P  		const char *
 #define PSTR(str) 	(str)
+#define F(str)		(str)
 
 #define vsnprintf_P(...) 	vsnprintf( __VA_ARGS__ )
 #define snprintf_P(...) 	snprintf( __VA_ARGS__ )
