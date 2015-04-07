@@ -141,7 +141,7 @@ public abstract class ContributedLibrary extends DownloadableContribution {
     String thisVersion = getParsedVersion();
     String otherVersion = ((ContributedLibrary) obj).getParsedVersion();
 
-    boolean versionEquals = thisVersion == null || otherVersion == null || thisVersion.equals(otherVersion);
+    boolean versionEquals = thisVersion == otherVersion || (thisVersion != null && otherVersion != null && thisVersion.equals(otherVersion));
 
     String thisName = getName();
     String otherName = ((ContributedLibrary) obj).getName();

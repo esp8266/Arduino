@@ -8,15 +8,20 @@ public class VersionHelper {
     if (ver == null) {
       return null;
     }
-    String[] verParts = ver.split("\\.");
-    if (verParts.length < 3) {
-      if (verParts.length == 2) {
-        return Version.forIntegers(Integer.valueOf(verParts[0]), Integer.valueOf(verParts[1]));
+    try {
+      String[] verParts = ver.split("\\.");
+      if (verParts.length < 3) {
+        if (verParts.length == 2) {
+          return Version.forIntegers(Integer.valueOf(verParts[0]), Integer.valueOf(verParts[1]));
+        } else {
+          return Version.forIntegers(Integer.valueOf(verParts[0]));
+        }
       } else {
-        return Version.forIntegers(Integer.valueOf(verParts[0]));
+        return Version.valueOf(ver);
       }
-    } else {
-      return Version.valueOf(ver);
+    } catch (Exception e) {
+      System.err.println("Invalid version found: " + ver);
+      return null;
     }
   }
 
