@@ -1,3 +1,14 @@
+ARDUINO 1.6.4
+
+[ide]
+* Restored previous "error" colour in black lower part of the IDE
+* Relaxed IDE checks against libraries versions
+* Fixed colour of 'char' keyword. Thanks @mixania
+* Tools submenu show selected subentry. Thanks @PaulStoffregen
+
+[libraries]
+* Bridge fixes
+
 ARDUINO 1.6.3 - 2015.04.02
 
 [ide]
