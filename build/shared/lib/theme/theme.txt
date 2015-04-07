@@ -30,7 +30,7 @@ console.font = Monospaced,plain,11
 console.font.macosx = Monaco,plain,10
 console.color = #000000
 console.output.color = #eeeeee
-console.error.color = #A61717
+console.error.color = #E34C00
 
 # GUI - BUTTONS
 buttons.bgcolor = #006468
