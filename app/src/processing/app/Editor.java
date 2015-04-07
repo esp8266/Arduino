@@ -739,6 +739,32 @@ public class Editor extends JFrame implements RunnerListener {
       public void menuSelected(MenuEvent e) {
         //System.out.println("Tools menu selected.");
         populatePortMenu();
+        for (Component c : toolsMenu.getMenuComponents()) {
+          if ((c instanceof JMenu) && c.isVisible()) {
+            JMenu menu = (JMenu)c;
+            String name = menu.getText();
+            if (name == null) continue;
+            String basename = name;
+            int index = name.indexOf(':');
+            if (index > 0) basename = name.substring(0, index);
+            String sel = null;
+            int count = menu.getItemCount();
+            for (int i=0; i < count; i++) {
+              JMenuItem item = menu.getItem(i);
+              if (item != null && item.isSelected()) {
+                sel = item.getText();
+                if (sel != null) break;
+              }
+            }
+            if (sel == null) {
+              if (!name.equals(basename)) menu.setText(basename);
+            } else {
+              if (sel.length() > 17) sel = sel.substring(0, 16) + "...";
+              String newname = basename + ": \"" + sel + "\"";
+              if (!name.equals(newname)) menu.setText(newname);
+            }
+          }
+        }
       }
     });
 
