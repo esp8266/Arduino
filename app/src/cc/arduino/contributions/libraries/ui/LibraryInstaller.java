@@ -28,20 +28,20 @@
  */
 package cc.arduino.contributions.libraries.ui;
 
-import static processing.app.I18n._;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-
-import processing.app.BaseNoGui;
-import processing.app.helpers.FileUtils;
 import cc.arduino.contributions.libraries.ContributedLibrary;
 import cc.arduino.contributions.libraries.LibrariesIndexer;
 import cc.arduino.contributions.packages.DownloadableContributionsDownloader;
 import cc.arduino.utils.ArchiveExtractor;
 import cc.arduino.utils.MultiStepProgress;
 import cc.arduino.utils.Progress;
+import processing.app.BaseNoGui;
+import processing.app.helpers.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+
+import static processing.app.I18n._;
 
 public class LibraryInstaller {
 
@@ -93,7 +93,7 @@ public class LibraryInstaller {
       outputFile.delete();
     if (!tmpFile.renameTo(outputFile))
       throw new Exception(
-          _("An error occurred while updating libraries index!"));
+              _("An error occurred while updating libraries index!"));
 
     // Step 2: Rescan index
     rescanLibraryIndex(progress);
@@ -133,20 +133,18 @@ public class LibraryInstaller {
 
     // Step 3: Remove replaced library and move installed one to the correct location
     // TODO: Fix progress bar...
-    if (replacedLib != null && !replacedLib.isReadOnly()) {
-      remove(replacedLib);
-    }
+    remove(replacedLib);
     File destFolder = new File(libsFolder, lib.getName().replaceAll(" ", "_"));
     tmpFolder.renameTo(destFolder);
     progress.stepDone();
-    
+
     // Step 4: Rescan index
     rescanLibraryIndex(progress);
   }
 
   public void remove(ContributedLibrary lib) throws IOException {
-    if (lib.isReadOnly()) {
-      throw new IllegalArgumentException("Can't delete a built-in library");
+    if (lib == null || lib.isReadOnly()) {
+      return;
     }
 
     final MultiStepProgress progress = new MultiStepProgress(2);

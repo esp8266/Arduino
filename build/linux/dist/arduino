@@ -20,7 +20,7 @@ export LD_LIBRARY_PATH
 
 export PATH="${APPDIR}/java/bin:${PATH}"
 
-if [[ "$@" == *"--upload"* || "$@" == *"--verify"* || "$@" == *"--get-pref"* ]] ; then
+if [[ "$@" == *"--upload"* || "$@" == *"--verify"* || "$@" == *"--get-pref"* || "$@" == *"--install-board"* || "$@" == *"--install-library"* ]] ; then
 	SPLASH=""
 else
 	SPLASH="-splash:./lib/splash.png"

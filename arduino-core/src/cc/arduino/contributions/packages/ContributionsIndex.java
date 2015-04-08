@@ -28,8 +28,15 @@
  */
 package cc.arduino.contributions.packages;
 
-import java.util.ArrayList;
-import java.util.List;
+import cc.arduino.contributions.DownloadableContributionBuiltInAtTheBottomComparator;
+import cc.arduino.contributions.filters.InstalledPredicate;
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+
+import java.util.*;
 
 public abstract class ContributionsIndex {
 
@@ -42,6 +49,69 @@ public abstract class ContributionsIndex {
     }
     return null;
   }
+
+  public List<ContributedPlatform> findPlatforms(String packageName, final String platformName) {
+    if (packageName == null || platformName == null) {
+      return null;
+
+    }
+    ContributedPackage aPackage = findPackage(packageName);
+    if (aPackage == null) {
+      return null;
+    }
+    Collection<ContributedPlatform> platforms = Collections2.filter(aPackage.getPlatforms(), new Predicate<ContributedPlatform>() {
+      @Override
+      public boolean apply(ContributedPlatform contributedPlatform) {
+        return platformName.equals(contributedPlatform.getName());
+      }
+    });
+    return Lists.newLinkedList(platforms);
+  }
+
+  public ContributedPlatform findPlatform(String packageName, final String platformName, final String platformVersion) {
+    if (platformVersion == null) {
+      return null;
+
+    }
+
+    Collection<ContributedPlatform> platformsByName = findPlatforms(packageName, platformName);
+    if (platformsByName == null) {
+      return null;
+    }
+
+    Collection<ContributedPlatform> platforms = Collections2.filter(platformsByName, new Predicate<ContributedPlatform>() {
+      @Override
+      public boolean apply(ContributedPlatform contributedPlatform) {
+        return platformVersion.equals(contributedPlatform.getParsedVersion());
+      }
+    });
+    if (platforms.isEmpty()) {
+      return null;
+    }
+
+    return platforms.iterator().next();
+  }
+
+  public ContributedPlatform getInstalled(String packageName, String platformName) {
+    List<ContributedPlatform> installedPlatforms = new LinkedList<ContributedPlatform>(Collections2.filter(findPlatforms(packageName, platformName), new InstalledPredicate()));
+    Collections.sort(installedPlatforms, new DownloadableContributionBuiltInAtTheBottomComparator());
+
+    if (installedPlatforms.isEmpty()) {
+      return null;
+    }
+
+    return installedPlatforms.get(0);
+  }
+
+  public List<ContributedPlatform> getPlatforms() {
+    return Lists.newLinkedList(Iterables.concat(Collections2.transform(getPackages(), new Function<ContributedPackage, List<ContributedPlatform>>() {
+      @Override
+      public List<ContributedPlatform> apply(ContributedPackage contributedPackage) {
+        return contributedPackage.getPlatforms();
+      }
+    })));
+  }
+
 
   public ContributedTool findTool(String packageName, String name,
                                   String version) {

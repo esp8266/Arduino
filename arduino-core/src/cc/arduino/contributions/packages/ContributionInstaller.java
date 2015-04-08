@@ -205,6 +205,9 @@ public class ContributionInstaller {
   }
 
   public List<String> remove(ContributedPlatform platform) {
+    if (platform == null || platform.isReadOnly()) {
+      return new LinkedList<String>();
+    }
     List<String> errors = new LinkedList<String>();
     FileUtils.recursiveDelete(platform.getInstalledFolder());
     platform.setInstalled(false);

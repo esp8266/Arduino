@@ -22,9 +22,17 @@
 
 package processing.app;
 
+import cc.arduino.contributions.VersionHelper;
+import cc.arduino.contributions.libraries.ContributedLibrary;
+import cc.arduino.contributions.libraries.LibrariesIndexer;
+import cc.arduino.contributions.libraries.ui.LibraryInstaller;
 import cc.arduino.contributions.libraries.ui.LibraryManagerUI;
-import cc.arduino.packages.DiscoveryManager;
+import cc.arduino.contributions.packages.ContributedPlatform;
+import cc.arduino.contributions.packages.ContributionInstaller;
+import cc.arduino.contributions.packages.ContributionsIndexer;
 import cc.arduino.contributions.packages.ui.ContributionManagerUI;
+import cc.arduino.packages.DiscoveryManager;
+import cc.arduino.utils.Progress;
 import cc.arduino.view.SplashScreenHelper;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
@@ -296,7 +304,78 @@ public class Base {
     // them.
     Preferences.save();
 
-      if (parser.isVerifyOrUploadMode()) {
+    if (parser.isInstallBoard()) {
+      ContributionsIndexer indexer = new ContributionsIndexer(BaseNoGui.getSettingsFolder());
+      ContributionInstaller installer = new ContributionInstaller(indexer) {
+        private String lastStatus = "";
+        @Override
+        protected void onProgress(Progress progress) {
+          if (!lastStatus.equals(progress.getStatus())) {
+            System.out.println(progress.getStatus());
+          }
+          lastStatus = progress.getStatus();
+        }
+      };
+      installer.updateIndex();
+      indexer.parseIndex();
+      indexer.syncWithFilesystem(getHardwareFolder());
+
+      String[] boardToInstallParts = parser.getBoardToInstall().split(":");
+
+      ContributedPlatform selected = indexer.getIndex().findPlatform(boardToInstallParts[0], boardToInstallParts[1], VersionHelper.valueOf(boardToInstallParts[2]).toString());
+      if (selected == null) {
+        System.out.println(_("Selected board is not available"));
+        System.exit(1);
+      }
+
+      ContributedPlatform installed = indexer.getIndex().getInstalled(boardToInstallParts[0], boardToInstallParts[1]);
+
+      if (!selected.isReadOnly()) {
+        installer.install(selected);
+      }
+
+      if (installed != null && !installed.isReadOnly()) {
+        installer.remove(installed);
+      }
+
+      System.exit(0);
+
+    } else if (parser.isInstallLibrary()) {
+      LibrariesIndexer indexer = new LibrariesIndexer(BaseNoGui.getSettingsFolder());
+      LibraryInstaller installer = new LibraryInstaller(indexer) {
+        private String lastStatus = "";
+        @Override
+        protected void onProgress(Progress progress) {
+          if (!lastStatus.equals(progress.getStatus())) {
+            System.out.println(progress.getStatus());
+          }
+          lastStatus = progress.getStatus();
+        }
+      };
+      indexer.parseIndex();
+      BaseNoGui.onBoardOrPortChange();
+      indexer.setSketchbookLibrariesFolder(BaseNoGui.getSketchbookLibrariesFolder());
+      indexer.setLibrariesFolders(BaseNoGui.getLibrariesPath());
+      installer.updateIndex();
+
+      String[] libraryToInstallParts = parser.getLibraryToInstall().split(":");
+
+      ContributedLibrary selected = indexer.getIndex().find(libraryToInstallParts[0], VersionHelper.valueOf(libraryToInstallParts[1]).toString());
+      if (selected == null) {
+        System.out.println(_("Selected library is not available"));
+        System.exit(1);
+      }
+
+      ContributedLibrary installed = indexer.getIndex().getInstalled(libraryToInstallParts[0]);
+      if (selected.isReadOnly()) {
+        installer.remove(installed);
+      } else {
+        installer.install(selected, installed);
+      }
+
+      System.exit(0);
+
+    } else if (parser.isVerifyOrUploadMode()) {
         splashScreenHelper.close();
         // Set verbosity for command line build
         Preferences.set("build.verbose", "" + parser.isDoVerboseBuild());
@@ -1525,11 +1604,11 @@ public class Base {
           String complaining = I18n
               .format(
                       _("The sketch \"{0}\" cannot be used.\n"
-                          + "Sketch names must contain only basic letters and numbers\n"
-                          + "(ASCII-only with no spaces, "
-                          + "and it cannot start with a number).\n"
-                          + "To get rid of this message, remove the sketch from\n"
-                          + "{1}"), name, entry.getAbsolutePath());
+                              + "Sketch names must contain only basic letters and numbers\n"
+                              + "(ASCII-only with no spaces, "
+                              + "and it cannot start with a number).\n"
+                              + "To get rid of this message, remove the sketch from\n"
+                              + "{1}"), name, entry.getAbsolutePath());
           showMessage(_("Ignoring sketch with bad name"), complaining);
         }
         return false;
