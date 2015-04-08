@@ -46,6 +46,8 @@ public abstract class ContributedPackage {
 
   public abstract List<ContributedTool> getTools();
 
+  public abstract ContributedHelp getHelp();
+
   public ContributedPlatform findPlatform(String architecture, String version) {
     if (architecture == null || version == null) {
       return null;

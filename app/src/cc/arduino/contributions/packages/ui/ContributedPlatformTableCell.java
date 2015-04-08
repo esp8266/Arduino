@@ -28,13 +28,14 @@
  */
 package cc.arduino.contributions.packages.ui;
 
+import cc.arduino.contributions.DownloadableContributionVersionComparator;
 import cc.arduino.contributions.VersionComparator;
-import cc.arduino.contributions.filters.InstalledPredicate;
 import cc.arduino.contributions.filters.BuiltInPredicate;
+import cc.arduino.contributions.filters.InstalledPredicate;
 import cc.arduino.contributions.packages.ContributedBoard;
+import cc.arduino.contributions.packages.ContributedHelp;
 import cc.arduino.contributions.packages.ContributedPlatform;
 import cc.arduino.contributions.packages.DownloadableContribution;
-import cc.arduino.contributions.DownloadableContributionVersionComparator;
 import cc.arduino.contributions.ui.InstallerTableCell;
 import cc.arduino.contributions.ui.listeners.DelegatingKeyListener;
 import cc.arduino.utils.ReverseComparator;
@@ -367,6 +368,19 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
       desc += board.getName() + ", ";
     }
     desc = desc.substring(0, desc.lastIndexOf(',')) + ".<br />";
+
+    ContributedHelp help = null;
+    if (selected.getHelp() != null) {
+      help = selected.getHelp();
+    } else if (selected.getParentPackage().getHelp() != null) {
+      help = selected.getParentPackage().getHelp();
+    }
+    if (help != null) {
+      String url = help.getOnline();
+      if (url != null && !url.isEmpty()) {
+        desc += " " + format("<a href=\"{0}\">Online help</a><br/>", url);
+      }
+    }
 
     String url = selected.getParentPackage().getWebsiteURL();
     if (url != null && !url.isEmpty()) {

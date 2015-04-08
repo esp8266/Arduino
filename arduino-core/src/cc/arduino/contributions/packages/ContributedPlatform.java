@@ -47,6 +47,8 @@ public abstract class ContributedPlatform extends DownloadableContribution {
 
   public abstract List<ContributedBoard> getBoards();
 
+  public abstract ContributedHelp getHelp();
+
   private List<ContributedTool> resolvedTools = null;
 
   private ContributedPackage parentPackage;
