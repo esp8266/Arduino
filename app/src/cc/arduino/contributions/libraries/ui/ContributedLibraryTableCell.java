@@ -29,16 +29,15 @@
 package cc.arduino.contributions.libraries.ui;
 
 import cc.arduino.contributions.VersionComparator;
-import cc.arduino.contributions.VersionHelper;
+import cc.arduino.contributions.filters.BuiltInPredicate;
 import cc.arduino.contributions.filters.InstalledPredicate;
 import cc.arduino.contributions.libraries.ContributedLibrary;
-import cc.arduino.contributions.libraries.ContributedLibraryComparator;
-import cc.arduino.contributions.filters.BuiltInPredicate;
 import cc.arduino.contributions.libraries.filters.OnlyUpstreamReleasePredicate;
+import cc.arduino.contributions.packages.DownloadableContribution;
+import cc.arduino.contributions.DownloadableContributionVersionComparator;
 import cc.arduino.contributions.ui.InstallerTableCell;
 import cc.arduino.contributions.ui.listeners.DelegatingKeyListener;
 import cc.arduino.utils.ReverseComparator;
-import com.github.zafarkhaja.semver.Version;
 import com.google.common.base.Function;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
@@ -257,7 +256,7 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
       uninstalledReleases.addAll(installedBuiltIn);
     }
 
-    Collections.sort(uninstalledReleases, new ReverseComparator<ContributedLibrary>(new ContributedLibraryComparator()));
+    Collections.sort(uninstalledReleases, new ReverseComparator<DownloadableContribution>(new DownloadableContributionVersionComparator()));
 
     downgradeChooser.removeAllItems();
     downgradeChooser.addItem(_("Select version"));
@@ -265,10 +264,11 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
     final List<ContributedLibrary> uninstalledPreviousReleases = Lists.newLinkedList();
     final List<ContributedLibrary> uninstalledNewerReleases = Lists.newLinkedList();
 
+    final VersionComparator versionComparator = new VersionComparator();
     Lists.newLinkedList(Lists.transform(uninstalledReleases, new Function<ContributedLibrary, ContributedLibrary>() {
       @Override
       public ContributedLibrary apply(ContributedLibrary input) {
-        if (installed == null || VersionComparator.VERSION_COMPARATOR.greaterThan(installed.getParsedVersion(), input.getParsedVersion())) {
+        if (installed == null || versionComparator.greaterThan(installed.getParsedVersion(), input.getParsedVersion())) {
           uninstalledPreviousReleases.add(input);
         } else {
           uninstalledNewerReleases.add(input);
@@ -319,7 +319,7 @@ public class ContributedLibraryTableCell extends InstallerTableCell {
     } else {
       installable = false;
       removable = !installed.isReadOnly() && !hasBuiltInRelease;
-      upgradable = new ContributedLibraryComparator().compare(selected, installed) > 0;
+      upgradable = new DownloadableContributionVersionComparator().compare(selected, installed) > 0;
     }
     if (installable) {
       installButton.setText(_("Install"));

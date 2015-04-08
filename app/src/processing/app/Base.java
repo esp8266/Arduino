@@ -30,6 +30,7 @@ import cc.arduino.contributions.libraries.ui.LibraryManagerUI;
 import cc.arduino.contributions.packages.ContributedPlatform;
 import cc.arduino.contributions.packages.ContributionInstaller;
 import cc.arduino.contributions.packages.ContributionsIndexer;
+import cc.arduino.contributions.DownloadableContributionVersionComparator;
 import cc.arduino.contributions.packages.ui.ContributionManagerUI;
 import cc.arduino.packages.DiscoveryManager;
 import cc.arduino.utils.Progress;
@@ -322,7 +323,16 @@ public class Base {
 
       String[] boardToInstallParts = parser.getBoardToInstall().split(":");
 
-      ContributedPlatform selected = indexer.getIndex().findPlatform(boardToInstallParts[0], boardToInstallParts[1], VersionHelper.valueOf(boardToInstallParts[2]).toString());
+      ContributedPlatform selected = null;
+      if (boardToInstallParts.length == 3) {
+        selected = indexer.getIndex().findPlatform(boardToInstallParts[0], boardToInstallParts[1], VersionHelper.valueOf(boardToInstallParts[2]).toString());
+      } else if (boardToInstallParts.length == 2) {
+        List<ContributedPlatform> platformsByName = indexer.getIndex().findPlatforms(boardToInstallParts[0], boardToInstallParts[1]);
+        Collections.sort(platformsByName, new DownloadableContributionVersionComparator());
+        if (!platformsByName.isEmpty()) {
+          selected = platformsByName.get(platformsByName.size() - 1);
+        }
+      }
       if (selected == null) {
         System.out.println(_("Selected board is not available"));
         System.exit(1);

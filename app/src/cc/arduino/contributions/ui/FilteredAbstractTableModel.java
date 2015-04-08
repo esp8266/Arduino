@@ -44,10 +44,11 @@ public abstract class FilteredAbstractTableModel<T> extends AbstractTableModel {
 
   protected static <T extends DownloadableContribution> T getLatestOf(List<T> contribs) {
     contribs = new LinkedList<T>(contribs);
+    final VersionComparator versionComparator = new VersionComparator();
     Collections.sort(contribs, new Comparator<T>() {
       @Override
       public int compare(T contrib1, T contrib2) {
-        return VersionComparator.VERSION_COMPARATOR.compare(contrib1.getParsedVersion(), contrib2.getParsedVersion());
+        return versionComparator.compare(contrib1.getParsedVersion(), contrib2.getParsedVersion());
       }
     });
 

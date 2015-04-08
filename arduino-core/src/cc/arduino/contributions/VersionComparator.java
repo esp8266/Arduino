@@ -34,9 +34,6 @@ import java.util.Comparator;
 
 public class VersionComparator implements Comparator<String> {
 
-  // An handy pre-instatiated object
-  public static final VersionComparator VERSION_COMPARATOR = new VersionComparator();
-
   @Override
   public int compare(String a, String b) {
     // null is always less than any other value

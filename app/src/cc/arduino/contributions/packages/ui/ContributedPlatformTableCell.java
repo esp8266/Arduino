@@ -29,12 +29,12 @@
 package cc.arduino.contributions.packages.ui;
 
 import cc.arduino.contributions.VersionComparator;
-import cc.arduino.contributions.VersionHelper;
 import cc.arduino.contributions.filters.InstalledPredicate;
 import cc.arduino.contributions.filters.BuiltInPredicate;
 import cc.arduino.contributions.packages.ContributedBoard;
 import cc.arduino.contributions.packages.ContributedPlatform;
-import cc.arduino.contributions.packages.ContributedPlatformComparator;
+import cc.arduino.contributions.packages.DownloadableContribution;
+import cc.arduino.contributions.DownloadableContributionVersionComparator;
 import cc.arduino.contributions.ui.InstallerTableCell;
 import cc.arduino.contributions.ui.listeners.DelegatingKeyListener;
 import cc.arduino.utils.ReverseComparator;
@@ -271,7 +271,7 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
       uninstalledReleases.addAll(installedBuiltIn);
     }
 
-    Collections.sort(uninstalledReleases, new ReverseComparator<ContributedPlatform>(new ContributedPlatformComparator()));
+    Collections.sort(uninstalledReleases, new ReverseComparator<DownloadableContribution>(new DownloadableContributionVersionComparator()));
 
     downgradeChooser.removeAllItems();
     downgradeChooser.addItem(_("Select version"));
@@ -279,10 +279,11 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
     final java.util.List<ContributedPlatform> uninstalledPreviousReleases = Lists.newLinkedList();
     final java.util.List<ContributedPlatform> uninstalledNewerReleases = Lists.newLinkedList();
 
+    final VersionComparator versionComparator = new VersionComparator();
     Lists.newLinkedList(Lists.transform(uninstalledReleases, new Function<ContributedPlatform, ContributedPlatform>() {
       @Override
       public ContributedPlatform apply(ContributedPlatform input) {
-        if (installed == null || VersionComparator.VERSION_COMPARATOR.greaterThan(installed.getParsedVersion(), input.getParsedVersion())) {
+        if (installed == null || versionComparator.greaterThan(installed.getParsedVersion(), input.getParsedVersion())) {
           uninstalledPreviousReleases.add(input);
         } else {
           uninstalledNewerReleases.add(input);
@@ -333,7 +334,7 @@ public class ContributedPlatformTableCell extends InstallerTableCell {
     } else {
       installable = false;
       removable = !installed.isReadOnly() && !hasBuiltInRelease;
-      upgradable = new ContributedPlatformComparator().compare(selected, installed) > 0;
+      upgradable = new DownloadableContributionVersionComparator().compare(selected, installed) > 0;
     }
     if (installable) {
       installButton.setText(_("Install"));
