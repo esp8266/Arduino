@@ -29,13 +29,11 @@
 package cc.arduino.contributions.packages.ui;
 
 import cc.arduino.contributions.DownloadableContributionBuiltInAtTheBottomComparator;
-import cc.arduino.contributions.VersionHelper;
 import cc.arduino.contributions.filters.InstalledPredicate;
 import cc.arduino.contributions.packages.ContributedPackage;
 import cc.arduino.contributions.packages.ContributedPlatform;
 import cc.arduino.contributions.packages.ContributionsIndex;
 import cc.arduino.contributions.ui.FilteredAbstractTableModel;
-import com.github.zafarkhaja.semver.Version;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
