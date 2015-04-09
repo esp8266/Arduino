@@ -29,7 +29,7 @@ SYNOPSIS
 
 *arduino* [*--get-pref* __preference__]
 
-*arduino* [*--install-board* __package name__:__platform name__[:__version__]]
+*arduino* [*--install-boards* __package name__:__platform architecture__[:__version__]]
 
 *arduino* [*--install-library* __library name__[:__version__]]
 
@@ -68,7 +68,7 @@ ACTIONS
 	stream. When the value does not exist, nothing is printed and
 	the exit status is set (see EXIT STATUS below).
 
-*--install-board* __package name__:__platform name__[:__version__]::
+*--install-boards* __package name__:__platform architecture__[:__version__]::
 	Fetches available board support (platform) list and install the specified one, along with its related tools. If __version__ is omitted, the latest is installed. If a platform with the same version is already installed, nothing is installed and program exits with exit code 1. If a platform with a different version is already installed, it's replaced.
 
 *--install-library* __library name__[:__version__]::
@@ -249,7 +249,11 @@ Change the selected board and build path and do nothing else.
 
 Install latest SAM board support
 
-     arduino --install-board "arduino:Arduino SAM Boards (32-bits ARM Cortex-M3)"
+     arduino --install-boards "arduino:sam"
+
+Install AVR board support, 1.6.2
+
+     arduino --install-boards "arduino:avr:1.6.2"
 
 Install Bridge library version 1.0.0
 
@@ -285,7 +289,7 @@ HISTORY
 	Introduced *--save-prefs*.
 
 1.6.4::
-	Introduced *--install-board* and *--install-library*.
+	Introduced *--install-boards* and *--install-library*.
 
 {empty}::
 	*--pref* options are now not saved to the preferences file, just

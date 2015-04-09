@@ -19,7 +19,7 @@ import static processing.app.I18n._;
 public class CommandlineParser {
 
   private enum ACTION {
-    GUI, NOOP, VERIFY("--verify"), UPLOAD("--upload"), GET_PREF("--get-pref"), INSTALL_BOARD("--install-board"), INSTALL_LIBRARY("--install-library");
+    GUI, NOOP, VERIFY("--verify"), UPLOAD("--upload"), GET_PREF("--get-pref"), INSTALL_BOARD("--install-boards"), INSTALL_LIBRARY("--install-library");
 
     private final String value;
 
@@ -58,7 +58,7 @@ public class CommandlineParser {
     actions.put("--verify", ACTION.VERIFY);
     actions.put("--upload", ACTION.UPLOAD);
     actions.put("--get-pref", ACTION.GET_PREF);
-    actions.put("--install-board", ACTION.INSTALL_BOARD);
+    actions.put("--install-boards", ACTION.INSTALL_BOARD);
     actions.put("--install-library", ACTION.INSTALL_LIBRARY);
 
     // Check if any files were passed in on the command line

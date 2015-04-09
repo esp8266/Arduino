@@ -59,28 +59,6 @@ public abstract class ContributedPackage {
     return null;
   }
 
-  /**
-   * Return the latest version available of a platform
-   * 
-   * @param platform
-   * @return
-   */
-  public ContributedPlatform findPlatform(String platform) {
-    VersionComparator version = new VersionComparator();
-    ContributedPlatform found = null;
-    for (ContributedPlatform p : getPlatforms()) {
-      if (!p.getName().equals(platform))
-        continue;
-      if (found == null) {
-        found = p;
-        continue;
-      }
-      if (version.compare(p.getParsedVersion(), found.getParsedVersion()) > 0)
-        found = p;
-    }
-    return found;
-  }
-
   public ContributedTool findTool(String name, String version) {
     for (ContributedTool tool : getTools()) {
       if (tool.getName().equals(name) && tool.getVersion().equals(version))

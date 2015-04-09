@@ -50,8 +50,8 @@ public abstract class ContributionsIndex {
     return null;
   }
 
-  public List<ContributedPlatform> findPlatforms(String packageName, final String platformName) {
-    if (packageName == null || platformName == null) {
+  public List<ContributedPlatform> findPlatforms(String packageName, final String platformArch) {
+    if (packageName == null || platformArch == null) {
       return null;
 
     }
@@ -62,19 +62,19 @@ public abstract class ContributionsIndex {
     Collection<ContributedPlatform> platforms = Collections2.filter(aPackage.getPlatforms(), new Predicate<ContributedPlatform>() {
       @Override
       public boolean apply(ContributedPlatform contributedPlatform) {
-        return platformName.equals(contributedPlatform.getName());
+        return platformArch.equals(contributedPlatform.getArchitecture());
       }
     });
     return Lists.newLinkedList(platforms);
   }
 
-  public ContributedPlatform findPlatform(String packageName, final String platformName, final String platformVersion) {
+  public ContributedPlatform findPlatform(String packageName, final String platformArch, final String platformVersion) {
     if (platformVersion == null) {
       return null;
 
     }
 
-    Collection<ContributedPlatform> platformsByName = findPlatforms(packageName, platformName);
+    Collection<ContributedPlatform> platformsByName = findPlatforms(packageName, platformArch);
     if (platformsByName == null) {
       return null;
     }
@@ -92,8 +92,8 @@ public abstract class ContributionsIndex {
     return platforms.iterator().next();
   }
 
-  public ContributedPlatform getInstalled(String packageName, String platformName) {
-    List<ContributedPlatform> installedPlatforms = new LinkedList<ContributedPlatform>(Collections2.filter(findPlatforms(packageName, platformName), new InstalledPredicate()));
+  public ContributedPlatform getInstalled(String packageName, String platformArch) {
+    List<ContributedPlatform> installedPlatforms = new LinkedList<ContributedPlatform>(Collections2.filter(findPlatforms(packageName, platformArch), new InstalledPredicate()));
     Collections.sort(installedPlatforms, new DownloadableContributionBuiltInAtTheBottomComparator());
 
     if (installedPlatforms.isEmpty()) {
