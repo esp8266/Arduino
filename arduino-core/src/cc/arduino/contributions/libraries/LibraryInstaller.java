@@ -100,7 +100,7 @@ public class LibraryInstaller {
 
   public void install(ContributedLibrary lib, ContributedLibrary replacedLib) throws Exception {
     if (lib.isInstalled()) {
-      System.out.println(I18n.format(_("Library is already installed: \"{0}\""), lib.getName() + " " + lib.getParsedVersion()));
+      System.out.println(I18n.format(_("Library is already installed: {0}"), lib.getName() + _(" version ") + lib.getParsedVersion()));
       return;
     }
 
@@ -108,7 +108,7 @@ public class LibraryInstaller {
 
     // Step 1: Download library
     try {
-      downloader.download(lib, progress, I18n.format(_("Downloading library: \"{0}\""), lib.getName()));
+      downloader.download(lib, progress, I18n.format(_("Downloading library: {0}"), lib.getName()));
     } catch (InterruptedException e) {
       // Download interrupted... just exit
       return;
@@ -119,7 +119,7 @@ public class LibraryInstaller {
     // all the temporary folders and abort installation.
 
     // Step 2: Unpack library on the correct location
-    progress.setStatus(I18n.format(_("Installing library: \"{0}\""), lib.getName()));
+    progress.setStatus(I18n.format(_("Installing library: {0}"), lib.getName()));
     onProgress(progress);
     File libsFolder = indexer.getSketchbookLibrariesFolder();
     File tmpFolder = FileUtils.createTempFolderIn(libsFolder);
@@ -150,7 +150,7 @@ public class LibraryInstaller {
     final MultiStepProgress progress = new MultiStepProgress(2);
 
     // Step 1: Remove library
-    progress.setStatus(I18n.format(_("Removing library: \"{0}\""), lib.getName()));
+    progress.setStatus(I18n.format(_("Removing library: {0}"), lib.getName()));
     onProgress(progress);
     FileUtils.recursiveDelete(lib.getInstalledFolder());
     progress.stepDone();
