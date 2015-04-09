@@ -31,7 +31,7 @@ SYNOPSIS
 
 *arduino* [*--install-boards* __package name__:__platform architecture__[:__version__]]
 
-*arduino* [*--install-library* __library name__[:__version__]]
+*arduino* [*--install-library* __library name__[:__version__][,__library name__[:__version__],__library name__[:__version__]]
 
 DESCRIPTION
 -----------
@@ -73,6 +73,7 @@ ACTIONS
 
 *--install-library* __library name__[:__version__]::
 	Fetches available libraries list and install the specified one. If __version__ is omitted, the latest is installed. If a library with the same version is already installed, nothing is installed and program exits with exit code 1. If a library with a different version is already installed, it's replaced.
+	Multiple libraries can be specified, separated by a comma.
 
 OPTIONS
 -------
@@ -258,6 +259,10 @@ Install AVR board support, 1.6.2
 Install Bridge library version 1.0.0
 
      arduino --install-library "Bridge:1.0.0"
+
+Install Bridge and Servo libraries
+
+     arduino --install-library "Bridge:1.0.0,Servo:1.2.0"
 
 HISTORY
 -------
