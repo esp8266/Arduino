@@ -27,7 +27,7 @@
  * the GNU General Public License.
  */
 
-package cc.arduino.contributions.packages.ui;
+package cc.arduino.contributions.ui;
 
 import cc.arduino.contributions.ui.InstallerJDialog;
 

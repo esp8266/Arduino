@@ -26,10 +26,8 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  */
-package cc.arduino.contributions.libraries.ui;
+package cc.arduino.contributions.libraries;
 
-import cc.arduino.contributions.libraries.ContributedLibrary;
-import cc.arduino.contributions.libraries.LibrariesIndexer;
 import cc.arduino.contributions.packages.DownloadableContributionsDownloader;
 import cc.arduino.utils.ArchiveExtractor;
 import cc.arduino.utils.MultiStepProgress;

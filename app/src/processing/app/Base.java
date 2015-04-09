@@ -25,7 +25,7 @@ package processing.app;
 import cc.arduino.contributions.VersionHelper;
 import cc.arduino.contributions.libraries.ContributedLibrary;
 import cc.arduino.contributions.libraries.LibrariesIndexer;
-import cc.arduino.contributions.libraries.ui.LibraryInstaller;
+import cc.arduino.contributions.libraries.LibraryInstaller;
 import cc.arduino.contributions.libraries.ui.LibraryManagerUI;
 import cc.arduino.contributions.packages.ContributedPlatform;
 import cc.arduino.contributions.packages.ContributionInstaller;
