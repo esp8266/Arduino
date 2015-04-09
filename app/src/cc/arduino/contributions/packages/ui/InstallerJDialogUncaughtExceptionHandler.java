@@ -47,7 +47,7 @@ public class InstallerJDialogUncaughtExceptionHandler implements Thread.Uncaught
 
   @Override
   public void uncaughtException(Thread t, final Throwable e) {
-    String errorMessage = _(e.getMessage().substring(e.getMessage().indexOf(":") + 2));
+    String errorMessage = _(e.getMessage().substring(e.getMessage().indexOf(":") + 1));
     if (errorMessage.startsWith("Error downloading")) {
       errorMessage = connectionErrorMessage;
     }
