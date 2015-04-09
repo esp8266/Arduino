@@ -106,7 +106,7 @@ public class LibraryInstaller {
 
     // Step 1: Download library
     try {
-      downloader.download(lib, progress, _("Downloading library."));
+      downloader.download(lib, progress, _("Downloading library: \"" + lib.getName() + "\""));
     } catch (InterruptedException e) {
       // Download interrupted... just exit
       return;
@@ -117,7 +117,7 @@ public class LibraryInstaller {
     // all the temporary folders and abort installation.
 
     // Step 2: Unpack library on the correct location
-    progress.setStatus(_("Installing library..."));
+    progress.setStatus(_("Installing library: \"" + lib.getName() + "\""));
     onProgress(progress);
     File libsFolder = indexer.getSketchbookLibrariesFolder();
     File tmpFolder = FileUtils.createTempFolderIn(libsFolder);
@@ -148,7 +148,7 @@ public class LibraryInstaller {
     final MultiStepProgress progress = new MultiStepProgress(2);
 
     // Step 1: Remove library
-    progress.setStatus(_("Removing library..."));
+    progress.setStatus(_("Removing library: \"" + lib.getName() + "\""));
     onProgress(progress);
     FileUtils.recursiveDelete(lib.getInstalledFolder());
     progress.stepDone();
