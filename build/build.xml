@@ -123,19 +123,19 @@
     <!-- Unzip documentation -->
     <antcall target="unzip">
       <param name="archive_file" value="shared/reference-1.6.0.zip" />
-      <param name="archive_url" value="http://arduino.cc/download.php?f=/reference-1.6.0.zip" />
+      <param name="archive_url" value="http://downloads.arduino.cc/reference-1.6.0.zip" />
       <param name="final_folder" value="${target.path}/reference" />
       <param name="dest_folder" value="${target.path}" />
     </antcall>
     <antcall target="unzip">
       <param name="archive_file" value="shared/Galileo_help_files-1.6.2.zip" />
-      <param name="archive_url" value="http://arduino.cc/download.php?f=/Galileo_help_files-1.6.2.zip" />
+      <param name="archive_url" value="http://downloads.arduino.cc/Galileo_help_files-1.6.2.zip" />
       <param name="final_folder" value="${target.path}/reference/Galileo_help_files" />
       <param name="dest_folder" value="${target.path}/reference/" />
     </antcall>
     <antcall target="unzip">
       <param name="archive_file" value="shared/Edison_help_files-1.6.2.zip" />
-      <param name="archive_url" value="http://arduino.cc/download.php?f=/Edison_help_files-1.6.2.zip" />
+      <param name="archive_url" value="http://downloads.arduino.cc/Edison_help_files-1.6.2.zip" />
       <param name="final_folder" value="${target.path}/reference/Edison_help_files" />
       <param name="dest_folder" value="${target.path}/reference/" />
     </antcall>
@@ -265,7 +265,7 @@
 
     <antcall target="unzip">
       <param name="archive_file" value="${staging_folder}/appbundler-1.0ea-upstream1.jar.zip" />
-      <param name="archive_url" value="http://arduino.cc/download.php?f=/appbundler-1.0ea-upstream1.jar.zip" />
+      <param name="archive_url" value="http://downloads.arduino.cc/appbundler-1.0ea-upstream1.jar.zip" />
       <param name="final_folder" value="${staging_folder}/appbundler-1.0ea-upstream1" />
       <param name="dest_folder" value="${staging_folder}/appbundler-1.0ea-upstream1" />
     </antcall>
@@ -351,7 +351,7 @@
 
     <antcall target="unzip">
       <param name="archive_file" value="./libastylej-2.05.zip" />
-      <param name="archive_url" value="http://arduino.cc/download.php?f=/libastylej-2.05.zip" />
+      <param name="archive_url" value="http://downloads.arduino.cc/libastylej-2.05.zip" />
       <param name="final_folder" value="${staging_folder}/libastylej" />
       <param name="dest_folder" value="${staging_folder}" />
     </antcall>
@@ -600,7 +600,7 @@
 
     <antcall target="unzip">
       <param name="archive_file" value="./libastylej-2.05.zip" />
-      <param name="archive_url" value="http://arduino.cc/download.php?f=/libastylej-2.05.zip" />
+      <param name="archive_url" value="http://downloads.arduino.cc/libastylej-2.05.zip" />
       <param name="final_folder" value="${staging_folder}/libastylej" />
       <param name="dest_folder" value="${staging_folder}" />
     </antcall>
@@ -818,7 +818,7 @@
 
     <antcall target="unzip">
       <param name="archive_file" value="./libastylej-2.05.zip" />
-      <param name="archive_url" value="http://arduino.cc/download.php?f=/libastylej-2.05.zip" />
+      <param name="archive_url" value="http://downloads.arduino.cc/libastylej-2.05.zip" />
       <param name="final_folder" value="${staging_folder}/libastylej" />
       <param name="dest_folder" value="${staging_folder}" />
     </antcall>
@@ -882,7 +882,7 @@
 
     <antcall target="unzip">
       <param name="archive_file" value="windows/jre-8u31.zip" />
-      <param name="archive_url" value="http://arduino.cc/download.php?f=/jre-8u31.zip" />
+      <param name="archive_url" value="http://downloads.arduino.cc/jre-8u31.zip" />
       <param name="final_folder" value="${staging_folder}/work/java" />
       <param name="dest_folder" value="${staging_folder}/work/" />
     </antcall>
@@ -948,7 +948,7 @@
 
     <antcall target="${unpack_target}">
       <param name="archive_file" value="${staging_folder}/${gcc_archive_file}"/>
-      <param name="archive_url" value="http://arduino.cc/download.php?f=/tools/${gcc_archive_file}"/>
+      <param name="archive_url" value="http://downloads.arduino.cc/tools/${gcc_archive_file}"/>
       <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tmp/gcc/${gcc_version}/"/>
       <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tmp/gcc/"/>
     </antcall>
@@ -957,7 +957,7 @@
 
     <antcall target="${unpack_target}">
       <param name="archive_file" value="${staging_folder}/${avrdude_archive_file}"/>
-      <param name="archive_url" value="http://arduino.cc/download.php?f=/tools/${avrdude_archive_file}"/>
+      <param name="archive_url" value="http://downloads.arduino.cc/tools/${avrdude_archive_file}"/>
       <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tmp/avrdude/${avrdude_version}"/>
       <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tmp/avrdude/"/>
     </antcall>

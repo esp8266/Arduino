@@ -52,7 +52,7 @@ public class LibraryInstaller {
     if (externalLibraryIndexUrl != null && !"".equals(externalLibraryIndexUrl)) {
       LIBRARY_INDEX_URL = externalLibraryIndexUrl;
     } else {
-      LIBRARY_INDEX_URL = "http://arduino.cc/download.php?f=/libraries/library_index.json";
+      LIBRARY_INDEX_URL = "http://downloads.arduino.cc/libraries/library_index.json";
     }
   }
 

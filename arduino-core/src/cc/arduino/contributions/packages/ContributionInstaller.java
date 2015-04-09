@@ -61,7 +61,7 @@ public class ContributionInstaller {
     if (extenalPackageIndexUrl != null && !"".equals(extenalPackageIndexUrl)) {
       PACKAGE_INDEX_URL = extenalPackageIndexUrl;
     } else {
-      PACKAGE_INDEX_URL = "http://arduino.cc/download.php?f=/packages/package_index.json";
+      PACKAGE_INDEX_URL = "http://downloads.arduino.cc/packages/package_index.json";
     }
   }
 
