@@ -368,28 +368,30 @@ public class Base {
       indexer.setLibrariesFolders(BaseNoGui.getLibrariesPath());
       installer.updateIndex();
 
-      String[] libraryToInstallParts = parser.getLibraryToInstall().split(":");
+      for (String library : parser.getLibraryToInstall().split(",")) {
+        String[] libraryToInstallParts = library.split(":");
 
-      ContributedLibrary selected=null;
-      if (libraryToInstallParts.length == 2) {
-        selected = indexer.getIndex().find(libraryToInstallParts[0], VersionHelper.valueOf(libraryToInstallParts[1]).toString());
-      } else if (libraryToInstallParts.length == 1) {
-        List<ContributedLibrary> librariesByName = indexer.getIndex().find(libraryToInstallParts[0]);
-        Collections.sort(librariesByName, new DownloadableContributionVersionComparator());
-        if (!librariesByName.isEmpty()) {
-          selected = librariesByName.get(librariesByName.size() - 1);
+        ContributedLibrary selected=null;
+        if (libraryToInstallParts.length == 2) {
+          selected = indexer.getIndex().find(libraryToInstallParts[0], VersionHelper.valueOf(libraryToInstallParts[1]).toString());
+        } else if (libraryToInstallParts.length == 1) {
+          List<ContributedLibrary> librariesByName = indexer.getIndex().find(libraryToInstallParts[0]);
+          Collections.sort(librariesByName, new DownloadableContributionVersionComparator());
+          if (!librariesByName.isEmpty()) {
+            selected = librariesByName.get(librariesByName.size() - 1);
+          }
         }
-      }
-      if (selected == null) {
-        System.out.println(_("Selected library is not available"));
-        System.exit(1);
-      }
+        if (selected == null) {
+          System.out.println(_("Selected library is not available"));
+          System.exit(1);
+        }
 
-      ContributedLibrary installed = indexer.getIndex().getInstalled(libraryToInstallParts[0]);
-      if (selected.isReadOnly()) {
-        installer.remove(installed);
-      } else {
-        installer.install(selected, installed);
+        ContributedLibrary installed = indexer.getIndex().getInstalled(libraryToInstallParts[0]);
+        if (selected.isReadOnly()) {
+          installer.remove(installed);
+        } else {
+          installer.install(selected, installed);
+        }
       }
 
       System.exit(0);
