@@ -100,7 +100,7 @@ public class LibraryInstaller {
 
   public void install(ContributedLibrary lib, ContributedLibrary replacedLib) throws Exception {
     if (lib.isInstalled()) {
-      System.out.println(I18n.format(_("Library is already installed: {0}"), lib.getName() + _(" version ") + lib.getParsedVersion()));
+      System.out.println(I18n.format(_("Library is already installed: {0} version {1}"), lib.getName(), lib.getParsedVersion()));
       return;
     }
 
