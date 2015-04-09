@@ -97,9 +97,10 @@ public class LibraryInstaller {
     rescanLibraryIndex(progress);
   }
 
-  public void install(ContributedLibrary lib, ContributedLibrary replacedLib) throws Exception {
+  public void install(ContributedLibrary lib, ContributedLibrary replacedLib) {
     if (lib.isInstalled()) {
-      throw new Exception(_("Library is already installed!"));
+      System.out.println(_("Library is already installed: \"" + lib.getName() + "\""));
+      return;
     }
 
     final MultiStepProgress progress = new MultiStepProgress(3);
