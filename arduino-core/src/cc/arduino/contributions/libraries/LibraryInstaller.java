@@ -33,6 +33,7 @@ import cc.arduino.utils.ArchiveExtractor;
 import cc.arduino.utils.MultiStepProgress;
 import cc.arduino.utils.Progress;
 import processing.app.BaseNoGui;
+import processing.app.I18n;
 import processing.app.helpers.FileUtils;
 
 import java.io.File;
@@ -97,9 +98,9 @@ public class LibraryInstaller {
     rescanLibraryIndex(progress);
   }
 
-  public void install(ContributedLibrary lib, ContributedLibrary replacedLib) {
+  public void install(ContributedLibrary lib, ContributedLibrary replacedLib) throws Exception {
     if (lib.isInstalled()) {
-      System.out.println(_("Library is already installed: \"" + lib.getName() + "\""));
+      System.out.println(I18n.format(_("Library is already installed: \"{0}\""), lib.getName() + " " + lib.getParsedVersion()));
       return;
     }
 
@@ -107,7 +108,7 @@ public class LibraryInstaller {
 
     // Step 1: Download library
     try {
-      downloader.download(lib, progress, _("Downloading library: \"" + lib.getName() + "\""));
+      downloader.download(lib, progress, I18n.format(_("Downloading library: \"{0}\""), lib.getName()));
     } catch (InterruptedException e) {
       // Download interrupted... just exit
       return;
@@ -118,7 +119,7 @@ public class LibraryInstaller {
     // all the temporary folders and abort installation.
 
     // Step 2: Unpack library on the correct location
-    progress.setStatus(_("Installing library: \"" + lib.getName() + "\""));
+    progress.setStatus(I18n.format(_("Installing library: \"{0}\""), lib.getName()));
     onProgress(progress);
     File libsFolder = indexer.getSketchbookLibrariesFolder();
     File tmpFolder = FileUtils.createTempFolderIn(libsFolder);
@@ -149,7 +150,7 @@ public class LibraryInstaller {
     final MultiStepProgress progress = new MultiStepProgress(2);
 
     // Step 1: Remove library
-    progress.setStatus(_("Removing library: \"" + lib.getName() + "\""));
+    progress.setStatus(I18n.format(_("Removing library: \"{0}\""), lib.getName()));
     onProgress(progress);
     FileUtils.recursiveDelete(lib.getInstalledFolder());
     progress.stepDone();
