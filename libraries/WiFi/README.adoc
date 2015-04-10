@@ -7,7 +7,10 @@ http://arduino.cc/en/Reference/WiFi
 
 == License ==
 
-Copyright (c) Arduino LLC. All right reserved.
+Copyright (c) 2011-2014 Arduino LLC. All right reserved.
+Copyright (C) 2006-2008, Atmel Corporation All rights reserved.
+Copyright (c) 2001-2004 Swedish Institute of Computer Science.
+Copyright (c) 2009-2010, H&D Wireless AB All rights reserved.
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public

@@ -7,6 +7,7 @@ http://arduino.cc/en/Reference/SD
 
 == License ==
 
+ Copyright (C) 2009 by William Greiman
 Copyright (c) 2010 SparkFun Electronics
 
 This program is free software: you can redistribute it and/or modify

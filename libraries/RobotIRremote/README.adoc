@@ -8,6 +8,13 @@ http://arduino.cc/en/Reference/RobotLibrary
 == License ==
 
 Copyright (c) Arduino LLC. All right reserved.
+Copyright (c) Paul Stoffregen. All right reserved.
+Copyright (c) Mitra Ardron. All right reserved.
+Copyright (c) Joe Knapp. All right reserved.
+Copyright (c) Mark Ivey. All right reserved.
+Copyright (c) Kristian Lauszus. All right reserved.
+
+Copyright (c) 2009 Ken Shirriff. All right reserved.
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public

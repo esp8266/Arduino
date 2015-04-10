@@ -1,7 +1,7 @@
 /*
   Esplora.cpp - Arduino Esplora board library
   Written by Enrico Gueli
-  Copyright (c) 2012 Arduino(TM)  All right reserved.
+  Copyright (c) 2012 Arduino LLC. All right reserved.
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
