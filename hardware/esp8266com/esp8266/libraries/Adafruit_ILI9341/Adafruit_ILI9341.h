@@ -8,7 +8,7 @@ extern "C"
 #include <c_types.h>
 #include <osapi.h>
 #include <gpio.h>
-#include "driver\hspi.h"
+#include "driver/hspi.h"
 }
 
 #define ILI9341_TFTWIDTH  240
