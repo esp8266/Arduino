@@ -311,7 +311,7 @@ public class PreferencesMap extends LinkedHashMap<String, String> {
    *         insensitive compared), <b>false</b> in any other case
    */
   public boolean getBoolean(String key) {
-    return new Boolean(get(key));
+    return Boolean.valueOf(get(key));
   }
 
   /**

@@ -203,10 +203,9 @@ public class Preferences {
   JCheckBox verboseCompilationBox;
   JCheckBox verboseUploadBox;
   JCheckBox displayLineNumbersBox;
+  JCheckBox enableCompilerWarningsBox;
   JCheckBox verifyUploadBox;
   JCheckBox externalEditorBox;
-  JCheckBox memoryOverrideBox;
-  JTextField memoryField;
   JCheckBox checkUpdatesBox;
   JTextField fontSizeField;
   JCheckBox updateExtensionBox;
@@ -352,6 +351,15 @@ public class Preferences {
     pane.add(box);
     d = box.getPreferredSize();
     box.setBounds(left, top, d.width, d.height);
+    top += d.height + GUI_BETWEEN;
+
+	// [ ] Enable all compiler warnings
+
+    enableCompilerWarningsBox = new JCheckBox(_("Enable all compiler warnings"));
+    pane.add(enableCompilerWarningsBox);
+    d = enableCompilerWarningsBox.getPreferredSize();
+    enableCompilerWarningsBox.setBounds(left, top, d.width + 10, d.height);
+    right = Math.max(right, left + d.width);
     top += d.height + GUI_BETWEEN;
 
 	// [ ] Display line numbers
@@ -674,6 +682,7 @@ public class Preferences {
     PreferencesData.setBoolean("editor.linenumbers", displayLineNumbersBox.isSelected());
     PreferencesData.setBoolean("upload.verify", verifyUploadBox.isSelected());
     PreferencesData.setBoolean("editor.save_on_verify", saveVerifyUploadBox.isSelected());
+    PreferencesData.setBoolean("build.allwarnings", enableCompilerWarningsBox.isSelected());
 
 //    setBoolean("sketchbook.closing_last_window_quits",
 //               closingLastQuitsBox.isSelected());
@@ -758,6 +767,7 @@ public class Preferences {
     verboseUploadBox.setSelected(PreferencesData.getBoolean("upload.verbose"));
     displayLineNumbersBox.setSelected(PreferencesData.getBoolean("editor.linenumbers"));
     verifyUploadBox.setSelected(PreferencesData.getBoolean("upload.verify"));
+    enableCompilerWarningsBox.setSelected(PreferencesData.getBoolean("build.allwarnings"));
 
     //closingLastQuitsBox.
     //  setSelected(getBoolean("sketchbook.closing_last_window_quits"));

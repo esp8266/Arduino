@@ -559,6 +559,7 @@ public class Compiler implements MessageConsumer {
       File objectFile = new File(outputPath, file.getName() + ".o");
       objectPaths.add(objectFile);
       String[] cmd = getCommandCompilerByRecipe(includeFolders, file, objectFile, "recipe.S.o.pattern");
+      cmd = enableWarnings(cmd, prefs.getBoolean("build.allwarnings"));
       execAsynchronously(cmd);
     }
  		
@@ -569,6 +570,7 @@ public class Compiler implements MessageConsumer {
       if (isAlreadyCompiled(file, objectFile, dependFile, prefs))
         continue;
       String[] cmd = getCommandCompilerByRecipe(includeFolders, file, objectFile, "recipe.c.o.pattern");
+      cmd = enableWarnings(cmd, prefs.getBoolean("build.allwarnings"));
       execAsynchronously(cmd);
     }
 
@@ -579,10 +581,22 @@ public class Compiler implements MessageConsumer {
       if (isAlreadyCompiled(file, objectFile, dependFile, prefs))
         continue;
       String[] cmd = getCommandCompilerByRecipe(includeFolders, file, objectFile, "recipe.cpp.o.pattern");
+      cmd = enableWarnings(cmd, prefs.getBoolean("build.allwarnings"));
       execAsynchronously(cmd);
     }
     
     return objectPaths;
+  }
+
+  private String[] enableWarnings(String[] cmd, boolean enable) {
+    if (!enable) {
+      return cmd;
+    }
+
+    List<String> cmdList = new ArrayList<String>(Arrays.asList(cmd));
+    cmdList.remove("-w");
+
+    return cmdList.toArray(new String[cmdList.size()]);
   }
 
   /**
