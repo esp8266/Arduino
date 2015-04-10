@@ -395,13 +395,13 @@
   </target>
 
   <target name="macosx-run-common">
-    <exec executable="open" dir="macosx/work">
+    <exec executable="open" dir="macosx/work" failonerror="true">
       <arg value="Arduino.app"/>
     </exec>
   </target>
 
   <target name="macosx-debug-common">
-    <exec executable="open" dir="macosx/work" spawn="false">
+    <exec executable="open" dir="macosx/work" spawn="false" failonerror="true">
       <arg value="Arduino.app"/>
     </exec>
   </target>
@@ -417,17 +417,17 @@
     <delete dir="macosx/work/Arduino.app" />
 
     <!-- Unzip unsigned app into working dir -->
-    <exec executable="unzip" dir="macosx/work">
+    <exec executable="unzip" dir="macosx/work" failonerror="true">
       <arg line="../arduino-${version}-${platform}.zip" />
     </exec>
 
     <!-- Unlock keychain file -->
-    <exec executable="security" dir="macosx/work">
+    <exec executable="security" dir="macosx/work" failonerror="true">
       <arg line="unlock-keychain -p &quot;${macosx-sign-keychain-pass}&quot; &quot;${macosx-sign-keychain}&quot;" />
     </exec>
 
     <!-- Sign app -->
-    <exec executable="codesign" dir="macosx/work">
+    <exec executable="codesign" dir="macosx/work" failonerror="true">
       <arg line="--keychain &quot;${macosx-sign-keychain}&quot; --force -s &quot;${macosx-sign-id}&quot; --deep -v Arduino.app/" />
     </exec>
 
@@ -439,7 +439,7 @@
     <delete file="macosx/arduino-${version}-${platform}.zip" />
 
     <!-- Create signed zip file -->
-    <exec executable="zip" dir="macosx/work">
+    <exec executable="zip" dir="macosx/work" failonerror="true">
       <arg line="-q -r ../arduino-${version}-${platform}-signed.zip ." />
     </exec>
 
@@ -470,7 +470,7 @@
   </target>
 
   <target name="macosx-dist-common">
-    <exec executable="zip" dir="macosx/work">
+    <exec executable="zip" dir="macosx/work" failonerror="true">
       <arg line="-q -r ../arduino-${version}-${platform}.zip ." />
     </exec>
 
@@ -629,11 +629,11 @@
   </target>
 
   <target name="linux32-run" depends="linux32-build" description="Run Linux (32-bit) version">
-    <exec executable="./linux/work/arduino" spawn="false"/>
+    <exec executable="./linux/work/arduino" spawn="false" failonerror="true"/>
   </target>
 
   <target name="linux64-run" depends="linux64-build" description="Run Linux (64-bit) version">
-    <exec executable="./linux/work/arduino" spawn="false"/>
+    <exec executable="./linux/work/arduino" spawn="false" failonerror="true"/>
   </target>
 
   <!-- Set '${dist_file}_available' property if toolchain dist_file is downloaded              -->
@@ -665,7 +665,7 @@
   <!-- Ensure that the tool is downloaded and test checksums, if everything's ok unzip it on the tools folder  -->
   <target name="untar" depends="untar-unzip-checksum" unless="${archive_file}_installed">
     <echo>Untarring ${archive_file} into folder ${dest_folder}</echo>
-    <exec executable="tar">
+    <exec executable="tar" failonerror="true">
       <arg value="xf"/>
       <arg value="${archive_file}"/>
       <arg value="--directory=${dest_folder}"/>
@@ -675,7 +675,7 @@
   <target name="unzip" depends="untar-unzip-checksum" unless="${archive_file}_installed">
     <echo>Unzipping ${archive_file} into folder ${dest_folder}</echo>
     <mkdir dir="${dest_folder}" />
-    <exec executable="unzip">
+    <exec executable="unzip" failonerror="true">
       <arg value="-q" />
       <arg value="-n" />
       <arg value="-d" />
@@ -719,7 +719,7 @@
 -->
     <move file="linux/work" tofile="linux/arduino-${version}" />
 
-    <exec executable="tar" dir="linux">
+    <exec executable="tar" dir="linux" failonerror="true">
       <arg value="--lzma"/>
       <arg value="-c"/>
       <arg value="-f"/>
@@ -873,8 +873,7 @@
 
   <target name="windows-run" depends="windows-build"
 	  description="Run windows version">
-    <exec executable="windows/work/arduino.exe"
-	  dir="windows/work" spawn="true"/>
+    <exec executable="windows/work/arduino.exe" dir="windows/work" spawn="true" failonerror="true"/>
   </target>
 
   <target name="windows-dist" depends="windows-build"
@@ -976,11 +975,11 @@
   </target>
 
   <target name="macosx-fix-bundled-toolchain-missing-symlinks" if="macosx">
-    <exec executable="mv">
+    <exec executable="mv" failonerror="true">
       <arg value="${staging_folder}/work/${staging_hardware_folder}/tmp/avrdude/avrdude-6.0.1/lib/libusb.dylib"/>
       <arg value="${staging_folder}/work/${staging_hardware_folder}/tools/avr/lib/"/>
     </exec>
-    <exec executable="mv">
+    <exec executable="mv" failonerror="true">
       <arg value="${staging_folder}/work/${staging_hardware_folder}/tmp/avrdude/avrdude-6.0.1/lib/libusb-1.0.dylib"/>
       <arg value="${staging_folder}/work/${staging_hardware_folder}/tools/avr/lib/"/>
     </exec>
