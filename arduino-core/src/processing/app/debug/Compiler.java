@@ -25,13 +25,7 @@ package processing.app.debug;
 
 import static processing.app.I18n._;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -45,6 +39,9 @@ import cc.arduino.packages.BoardPort;
 import cc.arduino.packages.Uploader;
 import cc.arduino.packages.UploaderFactory;
 
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.ExecuteStreamHandler;
 import processing.app.BaseNoGui;
 import processing.app.I18n;
 import processing.app.PreferencesData;
@@ -696,7 +693,6 @@ public class Compiler implements MessageConsumer {
     command = stringList.toArray(new String[stringList.size()]);
     if (command.length == 0)
       return;
-    int result = 0;
 
     if (verbose) {
       for (String c : command)
@@ -704,30 +700,57 @@ public class Compiler implements MessageConsumer {
       System.out.println();
     }
 
-    Process process;
+    DefaultExecutor executor = new DefaultExecutor();
+    executor.setStreamHandler(new ExecuteStreamHandler() {
+      @Override
+      public void setProcessInputStream(OutputStream os) throws IOException {
+
+      }
+
+      @Override
+      public void setProcessErrorStream(InputStream is) throws IOException {
+        forwardToMessage(is);
+      }
+
+      @Override
+      public void setProcessOutputStream(InputStream is) throws IOException {
+        forwardToMessage(is);
+      }
+
+      private void forwardToMessage(InputStream is) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        String line;
+        while ((line = reader.readLine()) != null) {
+          message(line + "\n");
+        }
+      }
+
+      @Override
+      public void start() throws IOException {
+
+      }
+
+      @Override
+      public void stop() {
+
+      }
+    });
+
+    CommandLine commandLine = new CommandLine(command[0]);
+    for (int i = 1; i < command.length; i++) {
+      commandLine.addArgument(command[i]);
+    }
+
+    int result;
+    executor.setExitValues(null);
     try {
-      process = ProcessUtils.exec(command);
+      result = executor.execute(commandLine);
     } catch (IOException e) {
       RunnerException re = new RunnerException(e.getMessage());
       re.hideStackTrace();
       throw re;
     }
-
-    MessageSiphon in = new MessageSiphon(process.getInputStream(), this);
-    MessageSiphon err = new MessageSiphon(process.getErrorStream(), this);
-
-    // wait for the process to finish.  if interrupted
-    // before waitFor returns, continue waiting
-    boolean compiling = true;
-    while (compiling) {
-      try {
-        in.join();
-        err.join();
-        result = process.waitFor();
-        //System.out.println("result is " + result);
-        compiling = false;
-      } catch (InterruptedException ignored) { }
-    }
+    executor.setExitValues(new int[0]);
 
     // an error was queued up by message(), barf this back to compile(),
     // which will barf it back to Editor. if you're having trouble
@@ -769,10 +792,10 @@ public class Compiler implements MessageConsumer {
         s = s.substring(0, i) + s.substring(i + (buildPath + File.separator).length());
       }
     }
-  
+
     // look for error line, which contains file name, line number,
     // and at least the first line of the error message
-    String errorFormat = "([\\w\\d_]+.\\w+):(\\d+):\\s*error:\\s*(.*)\\s*";
+    String errorFormat = "(.+\\.\\w+):(\\d+)(:\\d+)*:\\s*error:\\s*(.*)\\s*";
     String[] pieces = PApplet.match(s, errorFormat);
 
 //    if (pieces != null && exception == null) {
@@ -781,56 +804,56 @@ public class Compiler implements MessageConsumer {
 //    }
     
     if (pieces != null) {
-      String error = pieces[3], msg = "";
+      String error = pieces[pieces.length - 1], msg = "";
       
-      if (pieces[3].trim().equals("SPI.h: No such file or directory")) {
+      if (error.trim().equals("SPI.h: No such file or directory")) {
         error = _("Please import the SPI library from the Sketch > Import Library menu.");
         msg = _("\nAs of Arduino 0019, the Ethernet library depends on the SPI library." +
               "\nYou appear to be using it or another library that depends on the SPI library.\n\n");
       }
       
-      if (pieces[3].trim().equals("'BYTE' was not declared in this scope")) {
+      if (error.trim().equals("'BYTE' was not declared in this scope")) {
         error = _("The 'BYTE' keyword is no longer supported.");
         msg = _("\nAs of Arduino 1.0, the 'BYTE' keyword is no longer supported." +
               "\nPlease use Serial.write() instead.\n\n");
       }
       
-      if (pieces[3].trim().equals("no matching function for call to 'Server::Server(int)'")) {
+      if (error.trim().equals("no matching function for call to 'Server::Server(int)'")) {
         error = _("The Server class has been renamed EthernetServer.");
         msg = _("\nAs of Arduino 1.0, the Server class in the Ethernet library " +
               "has been renamed to EthernetServer.\n\n");
       }
       
-      if (pieces[3].trim().equals("no matching function for call to 'Client::Client(byte [4], int)'")) {
+      if (error.trim().equals("no matching function for call to 'Client::Client(byte [4], int)'")) {
         error = _("The Client class has been renamed EthernetClient.");
         msg = _("\nAs of Arduino 1.0, the Client class in the Ethernet library " +
               "has been renamed to EthernetClient.\n\n");
       }
       
-      if (pieces[3].trim().equals("'Udp' was not declared in this scope")) {
+      if (error.trim().equals("'Udp' was not declared in this scope")) {
         error = _("The Udp class has been renamed EthernetUdp.");
         msg = _("\nAs of Arduino 1.0, the Udp class in the Ethernet library " +
               "has been renamed to EthernetUdp.\n\n");
       }
       
-      if (pieces[3].trim().equals("'class TwoWire' has no member named 'send'")) {
+      if (error.trim().equals("'class TwoWire' has no member named 'send'")) {
         error = _("Wire.send() has been renamed Wire.write().");
         msg = _("\nAs of Arduino 1.0, the Wire.send() function was renamed " +
               "to Wire.write() for consistency with other libraries.\n\n");
       }
       
-      if (pieces[3].trim().equals("'class TwoWire' has no member named 'receive'")) {
+      if (error.trim().equals("'class TwoWire' has no member named 'receive'")) {
         error = _("Wire.receive() has been renamed Wire.read().");
         msg = _("\nAs of Arduino 1.0, the Wire.receive() function was renamed " +
               "to Wire.read() for consistency with other libraries.\n\n");
       }
 
-      if (pieces[3].trim().equals("'Mouse' was not declared in this scope")) {
+      if (error.trim().equals("'Mouse' was not declared in this scope")) {
         error = _("'Mouse' only supported on the Arduino Leonardo");
         //msg = _("\nThe 'Mouse' class is only supported on the Arduino Leonardo.\n\n");
       }
       
-      if (pieces[3].trim().equals("'Keyboard' was not declared in this scope")) {
+      if (error.trim().equals("'Keyboard' was not declared in this scope")) {
         error = _("'Keyboard' only supported on the Arduino Leonardo");
         //msg = _("\nThe 'Keyboard' class is only supported on the Arduino Leonardo.\n\n");
       }
@@ -848,13 +871,15 @@ public class Compiler implements MessageConsumer {
         SketchCode code = sketch.getCode(e.getCodeIndex());
         String fileName = (code.isExtension("ino") || code.isExtension("pde")) ? code.getPrettyName() : code.getFileName();
         int lineNum = e.getCodeLine() + 1;
-        s = fileName + ":" + lineNum + ": error: " + pieces[3] + msg;        
+        s = fileName + ":" + lineNum + ": error: " + error + msg;
       }
-            
-      if (exception == null && e != null) {
-        exception = e;
-        exception.hideStackTrace();
-      }      
+
+      if (e != null) {
+        if (exception == null || exception.getMessage().equals(e.getMessage())) {
+          exception = e;
+          exception.hideStackTrace();
+        }
+      }
     }
     
     if (s.contains("undefined reference to `SPIClass::begin()'") &&
