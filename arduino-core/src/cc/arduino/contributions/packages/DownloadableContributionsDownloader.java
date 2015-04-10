@@ -67,7 +67,7 @@ public class DownloadableContributionsDownloader {
     onProgress(progress);
     String checksum = contribution.getChecksum();
     String algo = checksum.split(":")[0];
-    if (!FileHash.hash(outputFile, algo).equals(checksum)) {
+    if (!FileHash.hash(outputFile, algo).equalsIgnoreCase(checksum)) {
       throw new Exception(_("CRC doesn't match. File is corrupted."));
     }
 
