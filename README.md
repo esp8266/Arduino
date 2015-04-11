@@ -79,7 +79,7 @@ This is mostly similar to WiFi shield library. Differences include:
 - ```WiFi.printDiag(Serial);``` will print out some diagnostic info
 
 WiFiServer, WiFiClient, and WiFiUDP behave mostly the same way as with WiFi shield library.
-Three samples are provided for this library.
+Four samples are provided for this library.
 
 #### Ticker ####
 

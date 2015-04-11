@@ -86,6 +86,8 @@ public:
   virtual IPAddress remoteIP();
   // Return the port of the host who sent the current incoming packet
   virtual uint16_t remotePort();
+  // Return the local port for outgoing packets
+  uint16_t localPort();
 
 };
 
