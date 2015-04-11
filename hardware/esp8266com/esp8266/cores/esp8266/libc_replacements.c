@@ -111,15 +111,15 @@ int strncmp(const char *s1, const char *s2, size_t len) {
     return ets_strncmp(s1, s2, len);
 }
 
-char *strncpy(char * dest, const char * src, size_t n) {
+char* strncpy(char * dest, const char * src, size_t n) {
     return ets_strncpy(dest, src, n);
 }
 
-char *ets_strstr(const char *haystack, const char *needle) {
-    return strstr(haystack, needle);
+char* strstr(const char *haystack, const char *needle) {
+    return ets_strstr(haystack, needle);
 }
 
-char * strchr(const char * str, int character) {
+char* strchr(const char * str, int character) {
     while(1) {
         if(*str == 0x00) {
             return NULL;
@@ -144,11 +144,11 @@ char * strrchr(const char * str, int character) {
     }
 }
 
-char * strcat(char * dest, const char * src) {
+char* ICACHE_FLASH_ATTR strcat(char * dest, const char * src) {
     return strncat(dest, src, strlen(src));
 }
 
-char * strncat(char * dest, const char * src, size_t n) {
+char* ICACHE_FLASH_ATTR strncat(char * dest, const char * src, size_t n) {
     uint32_t offset = strlen(dest);
     for(uint32_t i = 0; i < n; i++) {
         *(dest + i + offset) = *(src + i);
@@ -159,7 +159,7 @@ char * strncat(char * dest, const char * src, size_t n) {
     return dest;
 }
 
-char * strtok_r(char * str, const char * delimiters, char ** temp) {
+char* ICACHE_FLASH_ATTR strtok_r(char * str, const char * delimiters, char ** temp) {
     static char * ret = NULL;
     char * start = NULL;
     char * end = NULL;
@@ -213,7 +213,7 @@ int strcasecmp(const char * str1, const char * str2) {
     return d;
 }
 
-char * strdup(const char *str) {
+char* ICACHE_FLASH_ATTR strdup(const char *str) {
     size_t len = strlen(str) + 1;
     char *cstr = malloc(len);
     if(cstr) {
@@ -441,7 +441,7 @@ int isblank(int c) {
 
 static int errno_var = 0;
 
-int * __errno(void) {
+int* ICACHE_FLASH_ATTR __errno(void) {
     os_printf("__errno is called last error: %d (not current)\n", errno_var);
     return &errno_var;
 }
@@ -450,67 +450,67 @@ int * __errno(void) {
 //                     __ieee754  functions
 // ##########################################################################
 
-double __ieee754_sinh(double x) {
+double ICACHE_FLASH_ATTR __ieee754_sinh(double x) {
     return sinh(x);
 }
 
-double __ieee754_hypot(double x, double y) {
+double ICACHE_FLASH_ATTR __ieee754_hypot(double x, double y) {
     return hypot(x, y);
 }
 
-float __ieee754_hypotf(float x, float y) {
+float ICACHE_FLASH_ATTR __ieee754_hypotf(float x, float y) {
     return hypotf(x, y);
 }
 
-float __ieee754_logf(float x) {
+float ICACHE_FLASH_ATTR __ieee754_logf(float x) {
     return logf(x);
 }
 
-double __ieee754_log10(double x) {
+double ICACHE_FLASH_ATTR __ieee754_log10(double x) {
     return log10(x);
 }
 
-double __ieee754_exp(double x) {
+double ICACHE_FLASH_ATTR __ieee754_exp(double x) {
     return exp(x);
 }
 
-double __ieee754_cosh(double x) {
+double ICACHE_FLASH_ATTR __ieee754_cosh(double x) {
     return cosh(x);
 }
 
-float __ieee754_expf(float x) {
+float ICACHE_FLASH_ATTR __ieee754_expf(float x) {
     return expf(x);
 }
 
-float __ieee754_log10f(float x) {
+float ICACHE_FLASH_ATTR __ieee754_log10f(float x) {
     return log10f(x);
 }
 
-double __ieee754_atan2(double x, double y) {
+double ICACHE_FLASH_ATTR __ieee754_atan2(double x, double y) {
     return atan2(x, y);
 }
 
-float __ieee754_sqrtf(float x) {
+float ICACHE_FLASH_ATTR __ieee754_sqrtf(float x) {
     return sqrtf(x);
 }
 
-float __ieee754_sinhf(float x) {
+float ICACHE_FLASH_ATTR __ieee754_sinhf(float x) {
     return sinhf(x);
 }
 
-double __ieee754_log(double x) {
+double ICACHE_FLASH_ATTR __ieee754_log(double x) {
     return log(x);
 }
 
-double __ieee754_sqrt(double x) {
+double ICACHE_FLASH_ATTR __ieee754_sqrt(double x) {
     return sqrt(x);
 }
 
-float __ieee754_coshf(float x) {
+float ICACHE_FLASH_ATTR __ieee754_coshf(float x) {
     return coshf(x);
 }
 
-float __ieee754_atan2f(float x, float y) {
+float ICACHE_FLASH_ATTR __ieee754_atan2f(float x, float y) {
     return atan2f(x, y);
 }
 

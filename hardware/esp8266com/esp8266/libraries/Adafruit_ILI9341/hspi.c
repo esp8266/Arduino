@@ -1,4 +1,4 @@
-#include "driver\hspi.h"
+#include "driver/hspi.h"
 
 /*
 Pinout:

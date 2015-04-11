@@ -108,6 +108,14 @@ Before using I2C, pins for SDA and SCL need to be set by calling
 An initial SPI support for the HSPI interface (GPIO12-15) was implemented by [Sermus](https://github.com/Sermus).
 The implementation supports the entire Arduino SPI API including transactions, except setting phase and polarity as it's unclear how to set them in ESP8266 yet.
 
+#### ESP-specific APIs ####
+
+APIs related to deep sleep and watchdog timer are available in the ```ESP``` object.
+
+```ESP.deepSleep(microseconds, mode)``` will put the chip into deep sleep. ```mode``` is one of ```WAKE_DEFAULT```, ```WAKE_RFCAL```, ```WAKE_NO_RFCAL```, ```WAKE_RF_DISABLED```.
+
+```ESP.wdtEnable()```, ```ESP.wdtDisable()```, and ```ESP.wdtFeed()``` provide some control over the watchdog timer.
+
 #### OneWire (from https://www.pjrc.com/teensy/td_libs_OneWire.html) ####
 
 Library was adapted to work with ESP8266 by including register definitions into OneWire.h
