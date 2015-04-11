@@ -5,7 +5,7 @@ extern "C"{
 #include <ets_sys.h>
 #include <os_type.h>
 #include <osapi.h>
-#include "driver\hspi.h"
+#include "driver/hspi.h"
 }
 
 #define SWAPBYTES(i) ((i>>8) | (i<<8))
