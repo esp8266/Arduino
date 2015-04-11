@@ -66,13 +66,13 @@ static inline void i2c_wait() {
     delayMicroseconds(s_i2c_delay);
 }
 
-void i2c_freq(int freq_hz) {
+void ICACHE_FLASH_ATTR i2c_freq(int freq_hz) {
     s_i2c_delay = 1000000 / freq_hz / 4 - 1;
     if(s_i2c_delay < 0)
         s_i2c_delay = 0;
 }
 
-void i2c_init(int sda_pin, int scl_pin) {
+void ICACHE_FLASH_ATTR i2c_init(int sda_pin, int scl_pin) {
     s_sda_pin = sda_pin;
     s_scl_pin = scl_pin;
     pinMode(ESP_PINS_OFFSET + sda_pin, OUTPUT_OPEN_DRAIN);
@@ -81,7 +81,7 @@ void i2c_init(int sda_pin, int scl_pin) {
     i2c_wait();
 }
 
-void i2c_release() {
+void ICACHE_FLASH_ATTR i2c_release() {
     pinMode(ESP_PINS_OFFSET + s_sda_pin, INPUT);
     pinMode(ESP_PINS_OFFSET + s_scl_pin, INPUT);
 }
@@ -151,7 +151,7 @@ void i2c_write(uint8_t val) {
     i2c_set_sda(1);
 }
 
-size_t i2c_master_read_from(int address, uint8_t* data, size_t size, bool sendStop) {
+size_t ICACHE_FLASH_ATTR i2c_master_read_from(int address, uint8_t* data, size_t size, bool sendStop) {
     i2c_start();
     i2c_write(address << 1 | 1);
     int ack = i2c_get_ack();
@@ -171,7 +171,7 @@ size_t i2c_master_read_from(int address, uint8_t* data, size_t size, bool sendSt
     return size;
 }
 
-size_t i2c_master_write_to(int address, const uint8_t* data, size_t size, bool sendStop) {
+size_t ICACHE_FLASH_ATTR i2c_master_write_to(int address, const uint8_t* data, size_t size, bool sendStop) {
     i2c_start();
     i2c_write(address << 1);
     int ack = i2c_get_ack();
@@ -193,11 +193,11 @@ void twi_init(void) {
 void twi_setAddress(uint8_t) {
 }
 
-uint8_t twi_readFrom(uint8_t addr, uint8_t* data, uint8_t size, uint8_t sendStop) {
+uint8_t ICACHE_FLASH_ATTR twi_readFrom(uint8_t addr, uint8_t* data, uint8_t size, uint8_t sendStop) {
     return i2c_master_read_from(addr, data, size, sendStop);
 }
 
-uint8_t twi_writeTo(uint8_t addr, uint8_t* data, uint8_t size, uint8_t wait, uint8_t sendStop) {
+uint8_t ICACHE_FLASH_ATTR twi_writeTo(uint8_t addr, uint8_t* data, uint8_t size, uint8_t wait, uint8_t sendStop) {
     return i2c_master_write_to(addr, data, size, sendStop);
 }
 
