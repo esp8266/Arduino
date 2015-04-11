@@ -158,6 +158,7 @@ volatile uint32_t* portModeRegister(uint32_t port);
 #include "WString.h"
 
 #include "HardwareSerial.h"
+#include "Esp.h"
 
 uint16_t makeWord(uint16_t w);
 uint16_t makeWord(byte h, byte l);
