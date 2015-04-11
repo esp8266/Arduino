@@ -39,6 +39,8 @@ class EspClass {
         void wdtFeed();
 
         void deepSleep(uint32_t time_us, WakeMode mode = WAKE_RF_DEFAULT);
+
+        void reset();
 };
 
 extern EspClass ESP;
