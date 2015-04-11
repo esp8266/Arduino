@@ -116,6 +116,8 @@ APIs related to deep sleep and watchdog timer are available in the ```ESP``` obj
 
 ```ESP.wdtEnable()```, ```ESP.wdtDisable()```, and ```ESP.wdtFeed()``` provide some control over the watchdog timer.
 
+```ESP.reset()``` resets the CPU.
+
 #### OneWire (from https://www.pjrc.com/teensy/td_libs_OneWire.html) ####
 
 Library was adapted to work with ESP8266 by including register definitions into OneWire.h
