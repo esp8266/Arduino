@@ -79,7 +79,7 @@ This is mostly similar to WiFi shield library. Differences include:
 - ```WiFi.printDiag(Serial);``` will print out some diagnostic info
 
 WiFiServer, WiFiClient, and WiFiUDP behave mostly the same way as with WiFi shield library.
-Three samples are provided for this library.
+Four samples are provided for this library.
 
 #### Ticker ####
 
@@ -115,6 +115,8 @@ APIs related to deep sleep and watchdog timer are available in the ```ESP``` obj
 ```ESP.deepSleep(microseconds, mode)``` will put the chip into deep sleep. ```mode``` is one of ```WAKE_DEFAULT```, ```WAKE_RFCAL```, ```WAKE_NO_RFCAL```, ```WAKE_RF_DISABLED```.
 
 ```ESP.wdtEnable()```, ```ESP.wdtDisable()```, and ```ESP.wdtFeed()``` provide some control over the watchdog timer.
+
+```ESP.reset()``` resets the CPU.
 
 #### OneWire (from https://www.pjrc.com/teensy/td_libs_OneWire.html) ####
 

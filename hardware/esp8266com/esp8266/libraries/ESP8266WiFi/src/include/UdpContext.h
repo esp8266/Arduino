@@ -120,6 +120,14 @@ public:
         return ntohs(udphdr->src);
     }
 
+    uint16_t getLocalPort()
+    {
+        if (!_pcb)
+            return 0;
+
+        return _pcb->local_port;
+    }
+
     bool next()
     {
         if (!_rx_buf)
