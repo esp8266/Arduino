@@ -54,6 +54,7 @@ WiFiUDP& WiFiUDP::operator=(const WiFiUDP& rhs)
     _ctx = rhs._ctx;
     if (_ctx)
         _ctx->ref();
+    return *this;
 }
 
 WiFiUDP::~WiFiUDP()
@@ -65,10 +66,10 @@ WiFiUDP::~WiFiUDP()
 /* Start WiFiUDP socket, listening at local port */
 uint8_t WiFiUDP::begin(uint16_t port) 
 {
-    if (_ctx)
-    {
+    if (_ctx) {
         _ctx->unref();
     }
+
     _ctx = new UdpContext;
     ip_addr_t addr;
     addr.addr = INADDR_ANY;
@@ -77,13 +78,11 @@ uint8_t WiFiUDP::begin(uint16_t port)
 
 uint8_t WiFiUDP::beginMulticast(IPAddress interfaceAddr, IPAddress multicast, uint16_t port)
 {
-    if (_ctx)
-    {
+    if (_ctx) {
         _ctx->unref();
         _ctx = 0;
     }
     
-
     ip_addr_t ifaddr;
     ifaddr.addr = (uint32_t) interfaceAddr;
     ip_addr_t multicast_addr;
@@ -94,6 +93,7 @@ uint8_t WiFiUDP::beginMulticast(IPAddress interfaceAddr, IPAddress multicast, ui
     }
 
     _ctx = new UdpContext;
+    
     if (!_ctx->listen(*IP_ADDR_ANY, port)) {
         return 0;
     }
@@ -133,9 +133,8 @@ int WiFiUDP::beginPacket(IPAddress ip, uint16_t port)
     ip_addr_t addr;
     addr.addr = ip;
 
-    if (_ctx)
-        _ctx->unref();
-    _ctx = new UdpContext;
+    if (!_ctx)
+        _ctx = new UdpContext;
     return (_ctx->connect(addr, port)) ? 1 : 0;
 }
 
@@ -226,3 +225,10 @@ uint16_t WiFiUDP::remotePort()
     return _ctx->getRemotePort();
 }
 
+uint16_t WiFiUDP::localPort()
+{
+    if (!_ctx)
+        return 0;
+
+    return _ctx->getLocalPort();
+}

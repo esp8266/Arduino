@@ -1,7 +1,6 @@
 /* 
- sigma_delta.h - esp8266 sigma-delta source
-
- Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
+ Esp.cpp - ESP8266-specific APIs
+ Copyright (c) 2015 Ivan Grokhotkov. All rights reserved.
  This file is part of the esp8266 core for Arduino environment.
  
  This library is free software; you can redistribute it and/or
@@ -19,14 +18,45 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef SIGMA_DELTA_H
-#define SIGMA_DELTA_H
+#include "Arduino.h"
 
-#include <stdint.h>
+extern "C" {
+#include "user_interface.h"
+}
 
-void sigma_delta_close(uint32_t gpio);
-void set_sigma_target(uint8_t target);
-void set_sigma_prescale(uint8_t prescale);
-void set_sigma_duty_312KHz(uint8_t duty);
+extern "C" void ets_wdt_enable (void);
+extern "C" void ets_wdt_disable (void);
+extern "C" void wdt_feed (void);
 
-#endif//SIGMA_DELTA_H
+EspClass ESP;
+
+EspClass::EspClass()
+{
+
+}
+
+void EspClass::wdtEnable(int)
+{
+	ets_wdt_enable();
+}
+
+void EspClass::wdtDisable()
+{
+	ets_wdt_disable();
+}
+
+void EspClass::wdtFeed()
+{
+	wdt_feed();
+}
+
+void EspClass::deepSleep(uint32_t time_us, WakeMode mode)
+{
+	system_deep_sleep_set_option(static_cast<int>(mode));
+ 	system_deep_sleep(time_us);
+}
+
+void EspClass::reset()
+{
+	((void (*)(void))0x40000080)();
+}
