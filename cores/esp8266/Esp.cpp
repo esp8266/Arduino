@@ -55,3 +55,8 @@ void EspClass::deepSleep(uint32_t time_us, WakeMode mode)
 	system_deep_sleep_set_option(static_cast<int>(mode));
  	system_deep_sleep(time_us);
 }
+
+void EspClass::reset()
+{
+	((void (*)(void))0x40000080)();
+}
