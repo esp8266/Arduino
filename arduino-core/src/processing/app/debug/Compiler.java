@@ -557,7 +557,6 @@ public class Compiler implements MessageConsumer {
       File objectFile = new File(outputPath, file.getName() + ".o");
       objectPaths.add(objectFile);
       String[] cmd = getCommandCompilerByRecipe(includeFolders, file, objectFile, "recipe.S.o.pattern");
-      cmd = enableWarnings(cmd, prefs.getBoolean("build.allwarnings"));
       execAsynchronously(cmd);
     }
  		
@@ -568,7 +567,6 @@ public class Compiler implements MessageConsumer {
       if (isAlreadyCompiled(file, objectFile, dependFile, prefs))
         continue;
       String[] cmd = getCommandCompilerByRecipe(includeFolders, file, objectFile, "recipe.c.o.pattern");
-      cmd = enableWarnings(cmd, prefs.getBoolean("build.allwarnings"));
       execAsynchronously(cmd);
     }
 
@@ -579,22 +577,10 @@ public class Compiler implements MessageConsumer {
       if (isAlreadyCompiled(file, objectFile, dependFile, prefs))
         continue;
       String[] cmd = getCommandCompilerByRecipe(includeFolders, file, objectFile, "recipe.cpp.o.pattern");
-      cmd = enableWarnings(cmd, prefs.getBoolean("build.allwarnings"));
       execAsynchronously(cmd);
     }
     
     return objectPaths;
-  }
-
-  private String[] enableWarnings(String[] cmd, boolean enable) {
-    if (!enable) {
-      return cmd;
-    }
-
-    List<String> cmdList = new ArrayList<String>(Arrays.asList(cmd));
-    cmdList.remove("-w");
-
-    return cmdList.toArray(new String[cmdList.size()]);
   }
 
   /**
@@ -906,11 +892,26 @@ public class Compiler implements MessageConsumer {
     dict.put("source_file", sourceFile.getAbsolutePath());
     dict.put("object_file", objectFile.getAbsolutePath());
 
+    setupWarningFlags(dict);
+
     String cmd = prefs.getOrExcept(recipe);
     try {
       return StringReplacer.formatAndSplit(cmd, dict, true);
     } catch (Exception e) {
       throw new RunnerException(e);
+    }
+  }
+
+  private void setupWarningFlags(PreferencesMap dict) {
+    if (dict.containsKey("compiler.warning_flags")) {
+      String key = "compiler.warning_flags." + dict.get("compiler.warning_flags");
+      dict.put("compiler.warning_flags", dict.get(key));
+    } else {
+      dict.put("compiler.warning_flags", dict.get("compiler.warning_flags.none"));
+    }
+
+    if (dict.get("compiler.warning_flags") == null) {
+      dict.remove("compiler.warning_flags");
     }
   }
 
@@ -1105,6 +1106,8 @@ public class Compiler implements MessageConsumer {
     dict.put("archive_file", "core.a");
     dict.put("object_files", objectFileList);
     dict.put("ide_version", "" + BaseNoGui.REVISION);
+
+    setupWarningFlags(dict);
 
     String[] cmdArray;
     String cmd = prefs.getOrExcept("recipe.c.combine.pattern");

@@ -165,6 +165,25 @@ public class Preferences {
       new Language(_("Western Frisian"), "Western Frisian", "fy"),
       };
 
+  private static class WarningItem {
+    private final String value;
+    private final String translation;
+
+    public WarningItem(String value, String translation) {
+      this.value = value;
+      this.translation = translation;
+    }
+
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return translation;
+    }
+  }
+
   /**
    * Standardized width for buttons. Mac OS X 10.3 wants 70 as its default,
    * Windows XP needs 66, and my Ubuntu machine needs 80+, so 80 seems proper.
@@ -203,7 +222,6 @@ public class Preferences {
   JCheckBox verboseCompilationBox;
   JCheckBox verboseUploadBox;
   JCheckBox displayLineNumbersBox;
-  JCheckBox enableCompilerWarningsBox;
   JCheckBox verifyUploadBox;
   JCheckBox externalEditorBox;
   JCheckBox checkUpdatesBox;
@@ -211,6 +229,7 @@ public class Preferences {
   JCheckBox updateExtensionBox;
   JCheckBox autoAssociateBox;
   JComboBox comboLanguage;
+  JComboBox comboWarnings;
   JCheckBox saveVerifyUploadBox;
   JTextField proxyHTTPServer;
   JTextField proxyHTTPPort;
@@ -355,10 +374,22 @@ public class Preferences {
 
 	// [ ] Enable all compiler warnings
 
-    enableCompilerWarningsBox = new JCheckBox(_("Enable all compiler warnings"));
-    pane.add(enableCompilerWarningsBox);
-    d = enableCompilerWarningsBox.getPreferredSize();
-    enableCompilerWarningsBox.setBounds(left, top, d.width + 10, d.height);
+    box = Box.createHorizontalBox();
+    label = new JLabel(_("Compiler warnings: "));
+    box.add(label);
+    WarningItem[] warningItems = new WarningItem[]{new WarningItem("none", _("none")), new WarningItem("normal", _("normal")), new WarningItem("all", _("all")), new WarningItem("extra", _("extra")), };
+    comboWarnings = new JComboBox(warningItems);
+    String currentWarningLevel = PreferencesData.get("compiler.warning_flags", "none");
+    for (WarningItem item : warningItems) {
+      if (currentWarningLevel.equals(item.getValue())) {
+        comboWarnings.setSelectedItem(item);
+      }
+    }
+    box.add(comboWarnings);
+    pane.add(box);
+    d = box.getPreferredSize();
+    box.setForeground(Color.gray);
+    box.setBounds(left, top, d.width, d.height);
     right = Math.max(right, left + d.width);
     top += d.height + GUI_BETWEEN;
 
@@ -682,7 +713,6 @@ public class Preferences {
     PreferencesData.setBoolean("editor.linenumbers", displayLineNumbersBox.isSelected());
     PreferencesData.setBoolean("upload.verify", verifyUploadBox.isSelected());
     PreferencesData.setBoolean("editor.save_on_verify", saveVerifyUploadBox.isSelected());
-    PreferencesData.setBoolean("build.allwarnings", enableCompilerWarningsBox.isSelected());
 
 //    setBoolean("sketchbook.closing_last_window_quits",
 //               closingLastQuitsBox.isSelected());
@@ -740,6 +770,9 @@ public class Preferences {
     Language newLanguage = (Language) comboLanguage.getSelectedItem();
     PreferencesData.set("editor.languages.current", newLanguage.isoCode);
 
+    WarningItem warningItem = (WarningItem) comboWarnings.getSelectedItem();
+    PreferencesData.set("compiler.warning_flags", warningItem.getValue());
+
     Preferences.set("proxy.http.server", proxyHTTPServer.getText());
     try {
       Preferences.set("proxy.http.port", Integer.valueOf(proxyHTTPPort.getText()).toString());
@@ -767,7 +800,6 @@ public class Preferences {
     verboseUploadBox.setSelected(PreferencesData.getBoolean("upload.verbose"));
     displayLineNumbersBox.setSelected(PreferencesData.getBoolean("editor.linenumbers"));
     verifyUploadBox.setSelected(PreferencesData.getBoolean("upload.verify"));
-    enableCompilerWarningsBox.setSelected(PreferencesData.getBoolean("build.allwarnings"));
 
     //closingLastQuitsBox.
     //  setSelected(getBoolean("sketchbook.closing_last_window_quits"));
