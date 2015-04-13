@@ -122,6 +122,7 @@ public class Platform extends processing.app.Platform {
 
   @Override
   public Map<String, Object> resolveDeviceAttachedTo(String serial, Map<String, TargetPackage> packages, String devicesListOutput) {
+    assert packages != null;
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     Executor executor = new CollectStdOutExecutor(baos);
 

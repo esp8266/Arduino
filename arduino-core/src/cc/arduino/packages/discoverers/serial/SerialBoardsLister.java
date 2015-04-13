@@ -55,6 +55,10 @@ public class SerialBoardsLister extends TimerTask {
 
   @Override
   public void run() {
+    if (BaseNoGui.packages == null) {
+      return;
+    }
+
     Platform platform = BaseNoGui.getPlatform();
     if (platform == null) {
       return;

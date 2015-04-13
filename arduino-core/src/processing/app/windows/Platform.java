@@ -286,6 +286,7 @@ public class Platform extends processing.app.Platform {
 
   @Override
   public Map<String, Object> resolveDeviceAttachedTo(String serial, Map<String, TargetPackage> packages, String devicesListOutput) {
+    assert packages != null;
     if (devicesListOutput == null) {
       return super.resolveDeviceAttachedTo(serial, packages, devicesListOutput);
     }
