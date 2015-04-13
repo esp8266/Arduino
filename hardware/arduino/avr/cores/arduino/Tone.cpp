@@ -390,7 +390,7 @@ void tone(uint8_t _pin, unsigned int frequency, unsigned long duration)
         break;
 #endif
 
-#if defined(TIMSK3)
+#if defined(OCR3A) && defined(TIMSK3) && defined(OCIE3A)
       case 3:
         OCR3A = ocr;
         timer3_toggle_count = toggle_count;
@@ -398,7 +398,7 @@ void tone(uint8_t _pin, unsigned int frequency, unsigned long duration)
         break;
 #endif
 
-#if defined(TIMSK4)
+#if defined(OCR4A) && defined(TIMSK4) && defined(OCIE4A)
       case 4:
         OCR4A = ocr;
         timer4_toggle_count = toggle_count;
@@ -455,21 +455,21 @@ void disableTimer(uint8_t _timer)
       #endif
       break;
 
-#if defined(TIMSK3)
+#if defined(TIMSK3) && defined(OCIE3A)
     case 3:
-      TIMSK3 &= ~(1 << OCIE3A);
+      bitWrite(TIMSK3, OCIE3A, 0);
       break;
 #endif
 
-#if defined(TIMSK4)
+#if defined(TIMSK4) && defined(OCIE4A)
     case 4:
-      TIMSK4 &= ~(1 << OCIE4A);
+      bitWrite(TIMSK4, OCIE4A, 0);
       break;
 #endif
 
-#if defined(TIMSK5)
+#if defined(TIMSK5) && defined(OCIE5A)
     case 5:
-      TIMSK5 &= ~(1 << OCIE5A);
+      bitWrite(TIMSK5, OCIE5A, 0);
       break;
 #endif
   }
