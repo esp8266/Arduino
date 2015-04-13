@@ -5,7 +5,9 @@ ARDUINO 1.6.4
 * Relaxed IDE checks against libraries versions
 * Fixed colour of 'char' keyword. Thanks @mixania
 * Tools submenu show selected subentry. Thanks @PaulStoffregen
-* Boards and Libraries Managers command line: --install-board "arduino:Arduino SAM Boards (32-bits ARM Cortex-M3):1.6.3" and --install-library "Bridge:1.0.1". Version can be omitted: if omitted, latest version available is automatically picked
+* Boards and Libraries Managers command line (with contribs from @Lauszus): --install-board "arduino:Arduino SAM Boards (32-bits ARM Cortex-M3):1.6.3" and --install-library "Bridge:1.0.1". Version can be omitted: if omitted, latest version available is automatically picked
+* Warning levels can be set in File > Preferences
+* When compilation fails, editor highlights the reported row
 
 [libraries]
 * Bridge fixes
