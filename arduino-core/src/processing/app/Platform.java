@@ -164,6 +164,8 @@ public class Platform {
   }
 
   public String resolveDeviceByBoardID(Map<String, TargetPackage> packages, String boardId) {
+    assert packages != null;
+    assert boardId != null;
     for (TargetPackage targetPackage : packages.values()) {
       for (TargetPlatform targetPlatform : targetPackage.getPlatforms().values()) {
         for (TargetBoard board : targetPlatform.getBoards().values()) {
