@@ -54,6 +54,7 @@ import processing.app.preproc.PdePreprocessor;
 import processing.app.legacy.PApplet;
 import processing.app.packages.LegacyUserLibrary;
 import processing.app.packages.UserLibrary;
+import processing.app.tools.ArgumentsWithSpaceAwareCommandLine;
 
 public class Compiler implements MessageConsumer {
 
@@ -319,10 +320,10 @@ public class Compiler implements MessageConsumer {
       if (maxDataSize > 0) {
         System.out
             .println(I18n
-                .format(
-                        _("Global variables use {0} bytes ({2}%%) of dynamic memory, leaving {3} bytes for local variables. Maximum is {1} bytes."),
-                        dataSize, maxDataSize, dataSize * 100 / maxDataSize,
-                        maxDataSize - dataSize));
+                    .format(
+                            _("Global variables use {0} bytes ({2}%%) of dynamic memory, leaving {3} bytes for local variables. Maximum is {1} bytes."),
+                            dataSize, maxDataSize, dataSize * 100 / maxDataSize,
+                            maxDataSize - dataSize));
       } else {
         System.out.println(I18n
             .format(_("Global variables use {0} bytes of dynamic memory."), dataSize));
@@ -736,9 +737,9 @@ public class Compiler implements MessageConsumer {
       }
     });
 
-    CommandLine commandLine = new CommandLine(command[0]);
+    CommandLine commandLine = new ArgumentsWithSpaceAwareCommandLine(command[0]);
     for (int i = 1; i < command.length; i++) {
-      commandLine.addArgument(command[i]);
+      commandLine.addArgument(command[i], false);
     }
 
     int result;
