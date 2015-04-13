@@ -43,6 +43,8 @@ import static processing.app.I18n._;
 
 public class SerialBoardsLister extends TimerTask {
 
+  private static final int MAX_TIME_AWAITING_FOR_PACKAGES = 5000;
+
   private final SerialDiscovery serialDiscovery;
 
   public SerialBoardsLister(SerialDiscovery serialDiscovery) {
@@ -55,8 +57,14 @@ public class SerialBoardsLister extends TimerTask {
 
   @Override
   public void run() {
-    if (BaseNoGui.packages == null) {
-      return;
+    int sleptFor = 0;
+    while (BaseNoGui.packages == null && sleptFor <= MAX_TIME_AWAITING_FOR_PACKAGES) {
+      try {
+        Thread.sleep(1000);
+        sleptFor += 1000;
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
     }
 
     Platform platform = BaseNoGui.getPlatform();

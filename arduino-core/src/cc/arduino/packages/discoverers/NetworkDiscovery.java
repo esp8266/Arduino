@@ -45,6 +45,8 @@ import java.util.*;
 
 public class NetworkDiscovery implements Discovery, ServiceListener, cc.arduino.packages.discoverers.network.NetworkTopologyListener {
 
+  private static final int MAX_TIME_AWAITING_FOR_PACKAGES = 5000;
+
   private final List<BoardPort> boardPortsDiscoveredWithJmDNS;
   private final Map<InetAddress, JmDNS> mappedJmDNSs;
   private Timer networkCheckerTimer;
@@ -121,6 +123,16 @@ public class NetworkDiscovery implements Discovery, ServiceListener, cc.arduino.
 
   @Override
   public void serviceResolved(ServiceEvent serviceEvent) {
+    int sleptFor = 0;
+    while (BaseNoGui.packages == null && sleptFor <= MAX_TIME_AWAITING_FOR_PACKAGES) {
+      try {
+        Thread.sleep(1000);
+        sleptFor += 1000;
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+    }
+
     ServiceInfo info = serviceEvent.getInfo();
     for (InetAddress inetAddress : info.getInet4Addresses()) {
       String address = inetAddress.getHostAddress();
