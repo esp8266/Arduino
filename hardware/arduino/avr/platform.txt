@@ -12,9 +12,9 @@ version=1.6.3
 # --------------------- 
 
 compiler.warning_flags.none=-w
-compiler.warning_flags.normal=
-compiler.warning_flags.all=-Wall
-compiler.warning_flags.extra=-Wall -Wextra
+compiler.warning_flags.default=
+compiler.warning_flags.more=-Wall
+compiler.warning_flags.all=-Wall -Wextra
 
 # Default "compiler.path" is correct, change only if you want to overidde the initial value
 compiler.path={runtime.tools.avr-gcc.path}/bin/

@@ -377,7 +377,7 @@ public class Preferences {
     box = Box.createHorizontalBox();
     label = new JLabel(_("Compiler warnings: "));
     box.add(label);
-    WarningItem[] warningItems = new WarningItem[]{new WarningItem("none", _("none")), new WarningItem("normal", _("normal")), new WarningItem("all", _("all")), new WarningItem("extra", _("extra")), };
+    WarningItem[] warningItems = new WarningItem[]{new WarningItem("none", _("None")), new WarningItem("default", _("Default")), new WarningItem("more", _("More")), new WarningItem("all", _("All")), };
     comboWarnings = new JComboBox(warningItems);
     String currentWarningLevel = PreferencesData.get("compiler.warning_flags", "none");
     for (WarningItem item : warningItems) {
