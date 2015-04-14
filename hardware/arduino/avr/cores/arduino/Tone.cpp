@@ -31,6 +31,7 @@ Version Modified By Date     Comments
 0007    M Sproul    10/08/29 Changed #ifdefs from cpu to register
 0008    S Kanemoto  12/06/22 Fixed for Leonardo by @maris_HY
 0009    J Reucker   15/04/10 Issue #292 Fixed problems with ATmega8 (thanks to Pete62)
+0010    jipp        15/04/13 added additional define check #2923
 *************************************************/
 
 #include <avr/interrupt.h>
@@ -152,7 +153,7 @@ static int8_t toneBegin(uint8_t _pin)
     // whereas 16 bit timers are set to either ck/1 or ck/64 prescalar
     switch (_timer)
     {
-      #if defined(TCCR0A) && defined(TCCR0B)
+      #if defined(TCCR0A) && defined(TCCR0B) && defined(WGM01)
       case 0:
         // 8 bit timer
         TCCR0A = 0;
