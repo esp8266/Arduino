@@ -1,5 +1,6 @@
 package processing.app;
 
+import cc.arduino.files.DeleteFilesOnShutdown;
 import org.fest.swing.edt.FailOnThreadViolationRepaintManager;
 import org.fest.swing.edt.GuiActionRunner;
 import org.fest.swing.edt.GuiQuery;
@@ -16,6 +17,7 @@ public abstract class AbstractGUITest {
   @Before
   public void startUpTheIDE() throws Exception {
     System.setProperty("mrj.version", "whynot"); //makes sense only on osx. See https://github.com/alexruiz/fest-swing-1.x/issues/2#issuecomment-86532042
+    Runtime.getRuntime().addShutdownHook(new Thread(DeleteFilesOnShutdown.INSTANCE));
 
     FailOnThreadViolationRepaintManager.install();
 
@@ -25,7 +27,7 @@ public abstract class AbstractGUITest {
     Theme.init();
     Base.getPlatform().setLookAndFeel();
     Base.untitledFolder = Base.createTempFolder("untitled");
-    Base.untitledFolder.deleteOnExit();
+    DeleteFilesOnShutdown.add(Base.untitledFolder);
 
     window = GuiActionRunner.execute(new GuiQuery<ArduinoFrameFixture>() {
       @Override

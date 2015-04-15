@@ -1,11 +1,11 @@
 package processing.app;
 
 import cc.arduino.contributions.libraries.LibrariesIndexer;
+import cc.arduino.files.DeleteFilesOnShutdown;
 import cc.arduino.packages.DiscoveryManager;
 import cc.arduino.packages.Uploader;
 import cc.arduino.contributions.packages.ContributedTool;
 import cc.arduino.contributions.packages.ContributionsIndexer;
-import cc.arduino.utils.ArchiveExtractor;
 import org.apache.commons.logging.impl.LogFactoryImpl;
 import org.apache.commons.logging.impl.NoOpLog;
 import processing.app.debug.Compiler;
@@ -133,7 +133,7 @@ public class BaseNoGui {
         //File folder = new File(getTempFolder(), "build");
         //if (!folder.exists()) folder.mkdirs();
         buildFolder = createTempFolder("build");
-        buildFolder.deleteOnExit();
+        DeleteFilesOnShutdown.add(buildFolder);
       }
     }
     return buildFolder;
@@ -702,6 +702,8 @@ public class BaseNoGui {
   static public void main(String args[]) throws Exception {
     if (args.length == 0)
       showError(_("No parameters"), _("No command line parameters found"), null);
+
+    Runtime.getRuntime().addShutdownHook(new Thread(DeleteFilesOnShutdown.INSTANCE));
 
     initPlatform();
     

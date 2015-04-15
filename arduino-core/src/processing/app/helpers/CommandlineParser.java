@@ -36,6 +36,7 @@ public class CommandlineParser {
   private boolean doVerboseBuild = false;
   private boolean doVerboseUpload = false;
   private boolean doUseProgrammer = false;
+  private boolean preserveTempFiles;
   private boolean noUploadPort = false;
   private boolean forceSavePrefs = false;
   private String getPref;
@@ -101,6 +102,12 @@ public class CommandlineParser {
       if (args[i].equals("--verbose") || args[i].equals("-v")) {
         doVerboseBuild = true;
         doVerboseUpload = true;
+        if (action == ACTION.GUI)
+          action = ACTION.NOOP;
+        continue;
+      }
+      if (args[i].equals("--preserve-temp-files")) {
+        preserveTempFiles = true;
         if (action == ACTION.GUI)
           action = ACTION.NOOP;
         continue;
@@ -329,5 +336,9 @@ public class CommandlineParser {
 
   public String getLibraryToInstall() {
     return libraryToInstall;
+  }
+
+  public boolean isPreserveTempFiles() {
+    return preserveTempFiles;
   }
 }

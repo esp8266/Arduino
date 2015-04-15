@@ -32,6 +32,7 @@ import cc.arduino.contributions.packages.ContributionInstaller;
 import cc.arduino.contributions.packages.ContributionsIndexer;
 import cc.arduino.contributions.DownloadableContributionVersionComparator;
 import cc.arduino.contributions.packages.ui.ContributionManagerUI;
+import cc.arduino.files.DeleteFilesOnShutdown;
 import cc.arduino.packages.DiscoveryManager;
 import cc.arduino.utils.Progress;
 import cc.arduino.view.SplashScreenHelper;
@@ -127,6 +128,8 @@ public class Base {
   }
   
   static public void guardedMain(String args[]) throws Exception {
+    Runtime.getRuntime().addShutdownHook(new Thread(DeleteFilesOnShutdown.INSTANCE));
+
     BaseNoGui.initLogger();
     
     BaseNoGui.notifier = new GUIUserNotifier();
@@ -202,7 +205,7 @@ public class Base {
 
     // Create a location for untitled sketches
     untitledFolder = createTempFolder("untitled");
-    untitledFolder.deleteOnExit();
+    DeleteFilesOnShutdown.add(untitledFolder);
 
     new Base(args);
   }
@@ -401,6 +404,7 @@ public class Base {
         // Set verbosity for command line build
         Preferences.set("build.verbose", "" + parser.isDoVerboseBuild());
         Preferences.set("upload.verbose", "" + parser.isDoVerboseUpload());
+        Preferences.set("runtime.preserve.temp.files", Boolean.toString(parser.isPreserveTempFiles()));
 
         // Make sure these verbosity preferences are only for the
         // current session
