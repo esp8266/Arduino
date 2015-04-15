@@ -1,6 +1,8 @@
 package processing.app;
 
+import org.junit.After;
 import org.junit.Before;
+import processing.app.helpers.FileUtils;
 
 public abstract class AbstractWithPreferencesTest {
 
@@ -11,7 +13,11 @@ public abstract class AbstractWithPreferencesTest {
     Theme.init();
 
     Base.untitledFolder = Base.createTempFolder("untitled");
-    Base.untitledFolder.deleteOnExit();
 
+  }
+
+  @After
+  public void cleanup() {
+    FileUtils.recursiveDelete(Base.untitledFolder);
   }
 }

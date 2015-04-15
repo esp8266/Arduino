@@ -6,6 +6,7 @@ import org.fest.swing.edt.GuiQuery;
 import org.junit.After;
 import org.junit.Before;
 import processing.app.helpers.ArduinoFrameFixture;
+import processing.app.helpers.FileUtils;
 
 import javax.swing.*;
 
@@ -25,7 +26,6 @@ public abstract class AbstractGUITest {
     Theme.init();
     Base.getPlatform().setLookAndFeel();
     Base.untitledFolder = Base.createTempFolder("untitled");
-    Base.untitledFolder.deleteOnExit();
 
     window = GuiActionRunner.execute(new GuiQuery<ArduinoFrameFixture>() {
       @Override
@@ -38,6 +38,7 @@ public abstract class AbstractGUITest {
   @After
   public void stopTheIDE() {
     window.cleanUp();
+    FileUtils.recursiveDelete(Base.untitledFolder);
   }
 
 }
