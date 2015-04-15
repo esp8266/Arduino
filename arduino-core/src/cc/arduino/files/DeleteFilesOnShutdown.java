@@ -1,5 +1,6 @@
 package cc.arduino.files;
 
+import processing.app.PreferencesData;
 import processing.app.helpers.FileUtils;
 
 import java.io.File;
@@ -27,6 +28,10 @@ public class DeleteFilesOnShutdown implements Runnable {
 
   @Override
   public void run() {
+    boolean preserveTempFiles = PreferencesData.getBoolean("runtime.preserve.temp.files");
+    if (preserveTempFiles) {
+      return;
+    }
     List<File> copyOfFiles;
     synchronized (this) {
       copyOfFiles = new LinkedList<File>(files);

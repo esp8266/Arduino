@@ -404,6 +404,7 @@ public class Base {
         // Set verbosity for command line build
         Preferences.set("build.verbose", "" + parser.isDoVerboseBuild());
         Preferences.set("upload.verbose", "" + parser.isDoVerboseUpload());
+        Preferences.set("runtime.preserve.temp.files", Boolean.toString(parser.isPreserveTempFiles()));
 
         // Make sure these verbosity preferences are only for the
         // current session

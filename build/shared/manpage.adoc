@@ -25,7 +25,7 @@ SYNOPSIS
 --------
 *arduino* ['FILE.ino'...]
 
-*arduino* [*--verify*|*--upload*] [*--board* __package__:__arch__:__board__[:__parameters__]] [*--port* __portname__] [*--pref* __name__=__value__] [*-v*|*--verbose*] [__FILE.ino__]
+*arduino* [*--verify*|*--upload*] [*--board* __package__:__arch__:__board__[:__parameters__]] [*--port* __portname__] [*--pref* __name__=__value__] [*-v*|*--verbose*] [--preserve-temp-files] [__FILE.ino__]
 
 *arduino* [*--get-pref* __preference__]
 
@@ -116,6 +116,10 @@ OPTIONS
 	Enable verbose mode during build. If this option is not given,
 	verbose mode during build is *disabled* regardless of the current
 	preferences.
+
+*--preserve-temp-files*::
+	Keep temporary files (preprocessed sketch, object files...) after termination.
+	If omitted, temporary files are deleted.
 
 {empty}::
 	This option is only valid together with *--verify* or
