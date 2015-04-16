@@ -197,7 +197,7 @@ uint8_t ICACHE_FLASH_ATTR WiFiClient::connected()
     if (!_client)
         return 0;
 
-    return _client->state() == ESTABLISHED;
+    return _client->state() == ESTABLISHED || available();
 }
 
 uint8_t ICACHE_FLASH_ATTR WiFiClient::status() 
