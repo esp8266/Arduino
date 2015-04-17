@@ -44,3 +44,10 @@ arduinoasisp.program.protocol=stk500v1
 arduinoasisp.program.speed=19200
 arduinoasisp.program.tool=avrdude
 arduinoasisp.program.extra_params=-P{serial.port} -b{program.speed}
+
+usbGemma.name=Arduino Gemma
+usbGemma.protocol=arduinogemma
+usbGemma.program.tool=avrdude
+usbGemma.program.extra_params=
+usbGemma.config.path={runtime.platform.path}/bootloaders/gemma/avrdude.conf
+
