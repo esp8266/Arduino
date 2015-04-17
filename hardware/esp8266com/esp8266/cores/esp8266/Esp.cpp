@@ -40,12 +40,12 @@ void EspClass::wdtEnable(int)
 	ets_wdt_enable();
 }
 
-void EspClass::wdtDisable()
+void EspClass::wdtDisable(void)
 {
 	ets_wdt_disable();
 }
 
-void EspClass::wdtFeed()
+void EspClass::wdtFeed(void)
 {
 	wdt_feed();
 }
@@ -56,7 +56,17 @@ void EspClass::deepSleep(uint32_t time_us, WakeMode mode)
  	system_deep_sleep(time_us);
 }
 
-void EspClass::reset()
+void EspClass::reset(void)
 {
 	((void (*)(void))0x40000080)();
+}
+
+void EspClass::restart(void)
+{
+    system_restart();
+}
+
+uint16_t EspClass::getVCC(void)
+{
+    return system_get_vdd33();
 }
