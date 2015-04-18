@@ -35,6 +35,27 @@ class EEPROMClass
     void commit();
     void end();
 
+    template<typename T> T &get(int address, T &t)
+    {
+        if (address < 0 || address >= _size)
+            return t;
+
+        uint8_t *ptr = (uint8_t*) &t;
+        for(int count = 0; count < sizeof(T); ++count) *ptr++ = _data[address + count];
+        return t;
+    }
+
+    template<typename T> const T &put(int address, const T &t)
+    {
+        if (address < 0 || address >= _size)
+            return t;
+
+        const uint8_t *ptr = (const uint8_t*) &t;
+        for(int count = 0; count < sizeof(T); ++count) _data[address + count] = *ptr++;
+        _dirty = true;
+        return t;
+    }
+
   protected:
     uint8_t* _data;
     size_t _size;
