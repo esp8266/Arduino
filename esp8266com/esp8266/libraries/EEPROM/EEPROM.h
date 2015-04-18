@@ -24,6 +24,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 
 class EEPROMClass
 {
@@ -41,7 +42,7 @@ class EEPROMClass
             return t;
 
         uint8_t *ptr = (uint8_t*) &t;
-        for(int count = 0; count < sizeof(T); ++count) *ptr++ = _data[address + count];
+        memcpy(ptr, _data + address, sizeof(T));
         return t;
     }
 
@@ -51,7 +52,7 @@ class EEPROMClass
             return t;
 
         const uint8_t *ptr = (const uint8_t*) &t;
-        for(int count = 0; count < sizeof(T); ++count) _data[address + count] = *ptr++;
+        memcpy(_data + address, ptr, sizeof(T));
         _dirty = true;
         return t;
     }
