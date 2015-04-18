@@ -91,5 +91,5 @@ tools.esptool.path={runtime.hardware.path}/esp8266/tools/{runtime.os}
 tools.esptool.upload.protocol=esp
 tools.esptool.upload.params.verbose=-vv
 tools.esptool.upload.params.quiet=
-tools.esptool.upload.pattern="{path}/{cmd}" {upload.verbose} -cd {upload.resetmethod} -cb {upload.speed} -cp {serial.port} -ca 0x00000 -cf "{build.path}/{build.project_name}_00000.bin" -ca 0x40000 -cf "{build.path}/{build.project_name}_40000.bin"
+tools.esptool.upload.pattern="{path}/{cmd}" {upload.verbose} -cd {upload.resetmethod} -cb {upload.speed} -cp "{serial.port}" -ca 0x00000 -cf "{build.path}/{build.project_name}_00000.bin" -ca 0x40000 -cf "{build.path}/{build.project_name}_40000.bin"
 
