@@ -48,6 +48,18 @@ void ESP8266WiFiClass::mode(WiFiMode m)
     ETS_UART_INTR_ENABLE();
 }
 
+int ESP8266WiFiClass::begin()
+{
+    static struct station_config conf;
+    wifi_station_get_config(&conf);
+    
+    const char* ssid = reinterpret_cast<const char*>(conf.ssid);
+    const char* passphrase = reinterpret_cast<const char*>(conf.password);
+    
+    begin(ssid,passphrase);
+
+}
+
 int ESP8266WiFiClass::begin(const char* ssid)
 {
     return begin(ssid, 0);
@@ -364,6 +376,26 @@ int ESP8266WiFiClass::hostByName(const char* aHostname, IPAddress& aResult)
     
     return (aResult != 0) ? 1 : 0;
 }
+
+void ESP8266WiFiClass::setSmartLink()
+{
+    smartconfig_start(SC_TYPE_ESPTOUCH,smartconfig_call_back);//SC_TYPE_ESPTOUCH use ESPTOUCH for smartconfig, or use SC_TYPE_AIRKISS for AIRKISS 
+}
+
+sc_status ESP8266WiFiClass::getSmartlinkStatus(){
+    return smartconfig_get_status();//when smartconfig complete, return SC_STATUS_LINK_OVER
+}
+
+void smartconfig_call_back(void *data)
+{
+    struct station_config *sta_conf = (struct station_config *)data;
+  
+    wifi_station_set_config(sta_conf);
+    wifi_station_disconnect();
+    wifi_station_connect();
+  
+}
+
 
 void ESP8266WiFiClass::printDiag(Print& p)
 {
