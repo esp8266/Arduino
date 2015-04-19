@@ -24,6 +24,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 
 class EEPROMClass
 {
@@ -34,6 +35,27 @@ class EEPROMClass
     void write(int address, uint8_t val);
     void commit();
     void end();
+
+    template<typename T> T &get(int address, T &t)
+    {
+        if (address < 0 || address + sizeof(T) > _size)
+            return t;
+
+        uint8_t *ptr = (uint8_t*) &t;
+        memcpy(ptr, _data + address, sizeof(T));
+        return t;
+    }
+
+    template<typename T> const T &put(int address, const T &t)
+    {
+        if (address < 0 || address + sizeof(T) > _size)
+            return t;
+
+        const uint8_t *ptr = (const uint8_t*) &t;
+        memcpy(_data + address, ptr, sizeof(T));
+        _dirty = true;
+        return t;
+    }
 
   protected:
     uint8_t* _data;
