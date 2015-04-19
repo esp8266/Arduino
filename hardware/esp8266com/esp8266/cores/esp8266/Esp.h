@@ -35,12 +35,15 @@ class EspClass {
 
         void wdtEnable(int timeout_ms = 0);  
         // TODO: figure out how to set WDT timeout
-        void wdtDisable();
-        void wdtFeed();
+        void wdtDisable(void);
+        void wdtFeed(void);
 
         void deepSleep(uint32_t time_us, WakeMode mode = WAKE_RF_DEFAULT);
 
-        void reset();
+
+        void reset(void);
+        void restart(void);
+        uint16_t getVCC(void);
 };
 
 extern EspClass ESP;

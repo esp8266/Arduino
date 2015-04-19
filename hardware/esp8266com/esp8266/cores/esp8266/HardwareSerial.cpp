@@ -157,6 +157,8 @@ void ICACHE_FLASH_ATTR uart_interrupt_handler(uart_t* uart) {
 // ####################################################################################################
 
 void ICACHE_FLASH_ATTR uart_wait_for_tx_fifo(uart_t* uart, size_t size_needed) {
+    if(uart == 0)
+        return;
     if(uart->txEnabled) {
         while(true) {
             size_t tx_count = (READ_PERI_REG(UART_STATUS(uart->uart_nr)) >> UART_TXFIFO_CNT_S) & UART_TXFIFO_CNT;
@@ -167,6 +169,8 @@ void ICACHE_FLASH_ATTR uart_wait_for_tx_fifo(uart_t* uart, size_t size_needed) {
 }
 
 size_t ICACHE_FLASH_ATTR uart_get_tx_fifo_room(uart_t* uart) {
+    if(uart == 0)
+        return 0;
     if(uart->txEnabled) {
         return UART_TX_FIFO_SIZE - ((READ_PERI_REG(UART_STATUS(uart->uart_nr)) >> UART_TXFIFO_CNT_S) & UART_TXFIFO_CNT);
     }
@@ -174,18 +178,24 @@ size_t ICACHE_FLASH_ATTR uart_get_tx_fifo_room(uart_t* uart) {
 }
 
 void ICACHE_FLASH_ATTR uart_wait_for_transmit(uart_t* uart) {
+    if(uart == 0)
+        return;
     if(uart->txEnabled) {
         uart_wait_for_tx_fifo(uart, UART_TX_FIFO_SIZE);
     }
 }
 
 void ICACHE_FLASH_ATTR uart_transmit_char(uart_t* uart, char c) {
+    if(uart == 0)
+        return;
     if(uart->txEnabled) {
         WRITE_PERI_REG(UART_FIFO(uart->uart_nr), c);
     }
 }
 
 void ICACHE_FLASH_ATTR uart_transmit(uart_t* uart, const char* buf, size_t size) {
+    if(uart == 0)
+        return;
     if(uart->txEnabled) {
         while(size) {
             size_t part_size = (size > UART_TX_FIFO_SIZE) ? UART_TX_FIFO_SIZE : size;
@@ -201,6 +211,9 @@ void ICACHE_FLASH_ATTR uart_transmit(uart_t* uart, const char* buf, size_t size)
 void ICACHE_FLASH_ATTR uart_flush(uart_t* uart) {
     uint32_t tmp = 0x00000000;
 
+    if(uart == 0)
+        return;
+
     if(uart->rxEnabled) {
         tmp |= UART_RXFIFO_RST;
     }
@@ -214,6 +227,8 @@ void ICACHE_FLASH_ATTR uart_flush(uart_t* uart) {
 }
 
 void ICACHE_FLASH_ATTR uart_interrupt_enable(uart_t* uart) {
+    if(uart == 0)
+        return;
     WRITE_PERI_REG(UART_INT_CLR(uart->uart_nr), 0x1ff);
     ETS_UART_INTR_ATTACH(&uart_interrupt_handler, uart); // uart parameter is not osed in irq function!
     if(uart->rxEnabled) {
@@ -223,6 +238,8 @@ void ICACHE_FLASH_ATTR uart_interrupt_enable(uart_t* uart) {
 }
 
 void ICACHE_FLASH_ATTR uart_interrupt_disable(uart_t* uart) {
+    if(uart == 0)
+        return;
     if(uart->rxEnabled) {
         CLEAR_PERI_REG_MASK(UART_INT_ENA(uart->uart_nr), UART_RXFIFO_FULL_INT_ENA);
     }
@@ -233,23 +250,31 @@ void ICACHE_FLASH_ATTR uart_interrupt_disable(uart_t* uart) {
 }
 
 void ICACHE_FLASH_ATTR uart_arm_tx_interrupt(uart_t* uart) {
+    if(uart == 0)
+        return;
     if(uart->txEnabled) {
         SET_PERI_REG_MASK(UART_INT_ENA(uart->uart_nr), UART_TXFIFO_EMPTY_INT_ENA);
     }
 }
 
 void ICACHE_FLASH_ATTR uart_disarm_tx_interrupt(uart_t* uart) {
+    if(uart == 0)
+        return;
     if(uart->txEnabled) {
         CLEAR_PERI_REG_MASK(UART_INT_ENA(uart->uart_nr), UART_TXFIFO_EMPTY_INT_ENA);
     }
 }
 
 void ICACHE_FLASH_ATTR uart_set_baudrate(uart_t* uart, int baud_rate) {
+    if(uart == 0)
+        return;
     uart->baud_rate = baud_rate;
     uart_div_modify(uart->uart_nr, UART_CLK_FREQ / (uart->baud_rate));
 }
 
 int ICACHE_FLASH_ATTR uart_get_baudrate(uart_t* uart) {
+    if(uart == 0)
+        return 0;
     return uart->baud_rate;
 }
 
@@ -257,6 +282,11 @@ uart_t* ICACHE_FLASH_ATTR uart_init(UARTnr_t uart_nr, int baudrate) {
 
     uint32_t conf1 = 0x00000000;
     uart_t* uart = (uart_t*) os_malloc(sizeof(uart_t));
+
+    if(uart == 0) {
+        return 0;
+    }
+
     uart->uart_nr = uart_nr;
 
     switch(uart->uart_nr) {
@@ -303,6 +333,8 @@ uart_t* ICACHE_FLASH_ATTR uart_init(UARTnr_t uart_nr, int baudrate) {
 }
 
 void ICACHE_FLASH_ATTR uart_uninit(uart_t* uart) {
+    if(uart == 0)
+        return;
     uart_interrupt_disable(uart);
 
     switch(uart->rxPin) {
@@ -316,7 +348,7 @@ void ICACHE_FLASH_ATTR uart_uninit(uart_t* uart) {
             break;
     }
 
-    switch(uart->rxPin) {
+    switch(uart->txPin) {
         case 1:
             PIN_FUNC_SELECT(PERIPHS_IO_MUX_U0TXD_U, FUNC_GPIO1);
             break;
@@ -335,6 +367,8 @@ void ICACHE_FLASH_ATTR uart_uninit(uart_t* uart) {
 }
 
 void ICACHE_FLASH_ATTR uart_swap(uart_t* uart) {
+    if(uart == 0)
+        return;
     switch(uart->uart_nr) {
         case UART0:
             if(uart->txPin == 1 && uart->rxPin == 3) {
@@ -461,6 +495,10 @@ void ICACHE_FLASH_ATTR HardwareSerial::begin(unsigned long baud, byte config) {
 
     _uart = uart_init(_uart_nr, baud);
 
+    if(_uart == 0) {
+        return;
+    }
+
     if(_uart->rxEnabled) {
         _rx_buffer = new cbuf(SERIAL_RX_BUFFER_SIZE);
     }
@@ -481,10 +519,14 @@ void ICACHE_FLASH_ATTR HardwareSerial::end() {
 }
 
 void ICACHE_FLASH_ATTR HardwareSerial::swap() {
+    if(_uart == 0)
+        return;
     uart_swap(_uart);
 }
 
 void ICACHE_FLASH_ATTR HardwareSerial::setDebugOutput(bool en) {
+    if(_uart == 0)
+        return;
     if(en) {
         uart_set_debug(_uart->uart_nr);
     } else {
@@ -508,6 +550,8 @@ bool ICACHE_FLASH_ATTR HardwareSerial::isRxEnabled(void) {
 }
 
 int ICACHE_FLASH_ATTR HardwareSerial::available(void) {
+    if(_uart == 0)
+        return 0;
     if(_uart->rxEnabled) {
         return static_cast<int>(_rx_buffer->getSize());
     } else {
@@ -516,6 +560,8 @@ int ICACHE_FLASH_ATTR HardwareSerial::available(void) {
 }
 
 int ICACHE_FLASH_ATTR HardwareSerial::peek(void) {
+    if(_uart == 0)
+        return -1;
     if(_uart->rxEnabled) {
         return _rx_buffer->peek();
     } else {
@@ -524,6 +570,8 @@ int ICACHE_FLASH_ATTR HardwareSerial::peek(void) {
 }
 
 int ICACHE_FLASH_ATTR HardwareSerial::read(void) {
+    if(_uart == 0)
+        return -1;
     if(_uart->rxEnabled) {
         return _rx_buffer->read();
     } else {
@@ -532,6 +580,8 @@ int ICACHE_FLASH_ATTR HardwareSerial::read(void) {
 }
 
 int ICACHE_FLASH_ATTR HardwareSerial::availableForWrite(void) {
+    if(_uart == 0)
+        return 0;
     if(_uart->txEnabled) {
         return static_cast<int>(_tx_buffer->room());
     } else {
@@ -540,6 +590,8 @@ int ICACHE_FLASH_ATTR HardwareSerial::availableForWrite(void) {
 }
 
 void ICACHE_FLASH_ATTR HardwareSerial::flush() {
+    if(_uart == 0)
+        return;
     if(!_uart->txEnabled)
         return;
     if(!_written)
@@ -552,7 +604,7 @@ void ICACHE_FLASH_ATTR HardwareSerial::flush() {
 }
 
 size_t ICACHE_FLASH_ATTR HardwareSerial::write(uint8_t c) {
-    if(!_uart->txEnabled)
+    if(_uart == 0 || !_uart->txEnabled)
         return 0;
     _written = true;
     size_t room = uart_get_tx_fifo_room(_uart);
@@ -577,10 +629,16 @@ ICACHE_FLASH_ATTR HardwareSerial::operator bool() const {
 }
 
 void ICACHE_FLASH_ATTR HardwareSerial::_rx_complete_irq(char c) {
-    _rx_buffer->write(c);
+    if(_rx_buffer) {
+        _rx_buffer->write(c);
+    }
 }
 
 void ICACHE_FLASH_ATTR HardwareSerial::_tx_empty_irq(void) {
+    if(_uart == 0)
+        return;
+    if(_tx_buffer == 0)
+        return;
     size_t queued = _tx_buffer->getSize();
     if(!queued) {
         uart_disarm_tx_interrupt(_uart);

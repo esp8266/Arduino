@@ -20,18 +20,23 @@
 #ifndef Arduino_h
 #define Arduino_h
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
+#include <stdarg.h>
+#include <stdio.h>
 #include <string.h>
 #include <math.h>
 
 #include "binary.h"
 #include "pgmspace.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 void yield(void);
 
