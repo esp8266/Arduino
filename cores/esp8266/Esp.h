@@ -20,7 +20,27 @@
 
 #ifndef ESP_H
 #define ESP_H
+/**
+ * AVR macros for WDT managment
+ */
+typedef enum {
+    WDTO_0MS    = 0,   //!< WDTO_0MS
+    WDTO_15MS   = 15,  //!< WDTO_15MS
+    WDTO_30MS   = 30,  //!< WDTO_30MS
+    WDTO_60MS   = 60,  //!< WDTO_60MS
+    WDTO_120MS  = 120, //!< WDTO_120MS
+    WDTO_250MS  = 250, //!< WDTO_250MS
+    WDTO_500MS  = 500, //!< WDTO_500MS
+    WDTO_1S     = 1000,//!< WDTO_1S
+    WDTO_2S     = 2000,//!< WDTO_2S
+    WDTO_4S     = 4000,//!< WDTO_4S
+    WDTO_8S     = 8000 //!< WDTO_8S
+} WDTO_t;
 
+
+#define wdt_enable(time)    ESP.wdtEnable(time)
+#define wdt_disable()       ESP.wdtDisable()
+#define wdt_reset()         ESP.wdtFeed()
 
 enum WakeMode {
     WAKE_RF_DEFAULT = 0, // RF_CAL or not after deep-sleep wake up, depends on init data byte 108.
@@ -33,8 +53,10 @@ class EspClass {
     public:
         EspClass();
 
-        void wdtEnable(int timeout_ms = 0);  
         // TODO: figure out how to set WDT timeout
+        void wdtEnable(uint32_t timeout_ms = 0);
+        void wdtEnable(WDTO_t timeout_ms = WDTO_0MS);
+
         void wdtDisable(void);
         void wdtFeed(void);
 
@@ -45,6 +67,16 @@ class EspClass {
         void restart(void);
         uint16_t getVCC(void);
         uint32_t getFreeHeap(void);
+
+        uint32_t getChipId(void);
+
+        const char * getSDKversion(void);
+
+        uint8_t getBootVersion(void);
+        uint8_t getBootMode(void);
+
+        uint8_t getCPUfreqMHz(void);
+
 };
 
 extern EspClass ESP;
