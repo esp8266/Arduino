@@ -24,9 +24,11 @@ extern "C" {
 #include "user_interface.h"
 }
 
-extern "C" void ets_wdt_enable (void);
-extern "C" void ets_wdt_disable (void);
-extern "C" void wdt_feed (void);
+
+//extern "C" void ets_wdt_init(uint32_t val);
+extern "C" void ets_wdt_enable(void);
+extern "C" void ets_wdt_disable(void);
+extern "C" void wdt_feed(void);
 
 EspClass ESP;
 
@@ -35,9 +37,15 @@ EspClass::EspClass()
 
 }
 
-void EspClass::wdtEnable(int)
+void EspClass::wdtEnable(uint32_t timeout_ms)
 {
+    //todo find doku for ets_wdt_init may set the timeout
 	ets_wdt_enable();
+}
+
+void EspClass::wdtEnable(WDTO_t timeout_ms)
+{
+    wdtEnable((uint32_t) timeout_ms);
 }
 
 void EspClass::wdtDisable(void)
@@ -76,4 +84,27 @@ uint32_t EspClass::getFreeHeap(void)
     return system_get_free_heap_size();
 }
 
+uint32_t EspClass::getChipId(void)
+{
+    return system_get_chip_id();
+}
 
+const char * EspClass::getSDKversion(void)
+{
+    return system_get_sdk_version();
+}
+
+uint8_t EspClass::getBootVersion(void)
+{
+    return system_get_boot_version();
+}
+
+uint8_t EspClass::getBootMode(void)
+{
+    return system_get_boot_mode();
+}
+
+uint8_t EspClass::getCPUfreqMHz(void)
+{
+    return system_get_cpu_freq();
+}
