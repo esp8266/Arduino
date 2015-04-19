@@ -1,10 +1,10 @@
-/* 
+/*
  libc_replacements.c - replaces libc functions with functions
  from Espressif SDK
 
  Copyright (c) 2015 Ivan Grokhotkov. All rights reserved.
  This file is part of the esp8266 core for Arduino environment.
- 
+
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
@@ -159,10 +159,6 @@ char* ICACHE_FLASH_ATTR strncat(char * dest, const char * src, size_t n) {
     return dest;
 }
 
-char* ICACHE_FLASH_ATTR strtok(char * str, const char * delimiters) {
-    return strtok_r(str, delimiters, NULL);
-}
-
 char* ICACHE_FLASH_ATTR strtok_r(char * str, const char * delimiters, char ** temp) {
     static char * ret = NULL;
     char * start = NULL;
@@ -203,6 +199,10 @@ char* ICACHE_FLASH_ATTR strtok_r(char * str, const char * delimiters, char ** te
     ret = (char *) malloc(size);
     strncpy(ret, start, size);
     return ret;
+}
+
+char* ICACHE_FLASH_ATTR strtok(char * str, const char * delimiters) {
+    return strtok_r(str, delimiters, NULL);
 }
 
 int strcasecmp(const char * str1, const char * str2) {
