@@ -44,6 +44,7 @@ class EspClass {
         void reset(void);
         void restart(void);
         uint16_t getVCC(void);
+        uint32_t getFreeHeap(void);
 };
 
 extern EspClass ESP;

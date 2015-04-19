@@ -70,3 +70,10 @@ uint16_t EspClass::getVCC(void)
 {
     return system_get_vdd33();
 }
+
+uint32_t EspClass::getFreeHeap(void)
+{
+    return system_get_free_heap_size();
+}
+
+
