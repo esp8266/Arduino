@@ -159,9 +159,6 @@ char* ICACHE_FLASH_ATTR strncat(char * dest, const char * src, size_t n) {
     return dest;
 }
 
-char* ICACHE_FLASH_ATTR strtok(char * str, const char * delimiters) {
-    return strtok_r(str, delimiters, NULL);
-}
 
 char* ICACHE_FLASH_ATTR strtok_r(char * str, const char * delimiters, char ** temp) {
     static char * ret = NULL;
@@ -203,6 +200,10 @@ char* ICACHE_FLASH_ATTR strtok_r(char * str, const char * delimiters, char ** te
     ret = (char *) malloc(size);
     strncpy(ret, start, size);
     return ret;
+}
+
+char* ICACHE_FLASH_ATTR strtok(char * str, const char * delimiters) {
+    return strtok_r(str, delimiters, NULL);
 }
 
 int strcasecmp(const char * str1, const char * str2) {
