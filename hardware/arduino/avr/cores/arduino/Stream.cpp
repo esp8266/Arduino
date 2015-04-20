@@ -293,7 +293,7 @@ int Stream::findMulti( struct Stream::MultiTarget *targets, int tCount) {
 
 	// otherwise we need to check the rest of the found string
 	int diff = origIndex - t->index;
-	int i;
+	size_t i;
 	for (i = 0; i < t->index; ++i)
 	  if (t->str[i] != t->str[i + diff])
 	    break;
