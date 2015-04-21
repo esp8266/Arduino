@@ -4,21 +4,20 @@
 WiFiUDP Udp;
 
 void setup() {
-  uint8_t cnt = 0;
+  int cnt = 0;
   
   Serial.begin(115200);
   
   WiFi.mode(WIFI_STA);
-  WiFi.begin();
   
   while(WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
     if(cnt++ >= 10){
-       WiFi.setSmartLink();
+       WiFi.beginSmartConfig();
        while(1){
            delay(1000);
-           if(WiFi.getSmartlinkStatus() == SC_STATUS_LINK_OVER){
+           if(WiFi.smartConfigDone()){
              Serial.println("SmartConfig Success");
              break;
            }

@@ -26,14 +26,11 @@
 
 extern "C" {
   #include "include/wl_definitions.h"
-  #include "smartconfig.h"
 }
 
 #include "IPAddress.h"
 #include "WiFiClient.h"
 #include "WiFiServer.h"
-
-void smartconfig_call_back(void *data);
 
 enum WiFiMode { WIFI_STA = 1, WIFI_AP = 2, WIFI_AP_STA = 3 };
 
@@ -44,13 +41,7 @@ public:
     ESP8266WiFiClass();
 
     void mode(WiFiMode);
-    
-    /* Start Wifi reconnection
-     * used for Smartconfig
-     * no param.
-     */
-    int begin();    
-    
+        
     
     /* Start Wifi connection for OPEN networks
      *
@@ -216,15 +207,16 @@ public:
     /*
      * Start SmartConfig
      *
-     */    
-    void setSmartLink();
+     */ 
+    void beginSmartConfig();
     
     /*
      * Query SmartConfig status, to decide when stop config
      *
      */    
-    sc_status getSmartlinkStatus();
-    
+    bool smartConfigDone();
+
+    void stopSmartConfig();
 
     friend class WiFiClient;
     friend class WiFiServer;
@@ -232,6 +224,9 @@ public:
 protected:
     static void _scanDone(void* result, int status);
     void * _getScanInfoByIndex(int i);
+    static void _smartConfigDone(void* result);
+    bool _smartConfigStarted = false;
+
     static size_t _scanCount;
     static void* _scanResult;
 
