@@ -93,7 +93,14 @@ enum espconn_option{
 	ESPCONN_REUSEADDR = 0x01,
 	ESPCONN_NODELAY = 0x02,
 	ESPCONN_COPY = 0x04,
+	ESPCONN_KEEPALIVE = 0x08,
 	ESPCONN_END
+};
+
+enum espconn_level{
+	ESPCONN_KEEPIDLE,
+	ESPCONN_KEEPINTVL,
+	ESPCONN_KEEPCNT
 };
 
 /******************************************************************************
@@ -295,6 +302,40 @@ uint32 espconn_port(void);
 *******************************************************************************/
 
 sint8 espconn_set_opt(struct espconn *espconn, uint8 opt);
+
+/******************************************************************************
+ * FunctionName : espconn_clear_opt
+ * Description  : clear the option for connections so that we don't end up bouncing
+ *                all connections at the same time .
+ * Parameters   : espconn -- the espconn used to set the connection
+ * 				  opt -- the option for clear
+ * Returns      : the result
+*******************************************************************************/
+
+sint8 espconn_clear_opt(struct espconn *espconn, uint8 opt);
+
+/******************************************************************************
+ * FunctionName : espconn_set_keepalive
+ * Description  : access level value for connection so that we set the value for
+ * 				  keep alive
+ * Parameters   : espconn -- the espconn used to set the connection
+ * 				  level -- the connection's level
+ * 				  value -- the value of time(s)
+ * Returns      : access port value
+*******************************************************************************/
+
+sint8 espconn_set_keepalive(struct espconn *espconn, uint8 level, void* optarg);
+
+/******************************************************************************
+ * FunctionName : espconn_get_keepalive
+ * Description  : access level value for connection so that we get the value for
+ * 				  keep alive
+ * Parameters   : espconn -- the espconn used to get the connection
+ * 				  level -- the connection's level
+ * Returns      : access keep alive value
+*******************************************************************************/
+
+sint8 espconn_get_keepalive(struct espconn *espconn, uint8 level, void *optarg);
 
 /******************************************************************************
  * TypedefName : dns_found_callback
