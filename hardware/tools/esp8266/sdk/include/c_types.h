@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+typedef __SIZE_TYPE__       size_t;
 typedef signed char         sint8_t;
 typedef signed short        sint16_t;
 typedef signed long         sint32_t;

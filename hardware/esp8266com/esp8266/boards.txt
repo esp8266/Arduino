@@ -1,5 +1,7 @@
 menu.UploadSpeed=Upload Speed
 menu.CpuFrequency=CPU Frequency
+
+
 ##############################################################
 generic.name=Generic ESP8266 Module
 
@@ -32,6 +34,41 @@ generic.menu.UploadSpeed.256000=256000
 generic.menu.UploadSpeed.256000.upload.speed=256000
 generic.menu.UploadSpeed.921600=921600
 generic.menu.UploadSpeed.921600.upload.speed=921600
+
+
+##############################################################
+espd12.name=ESPD-12
+
+espd12.upload.tool=esptool
+espd12.upload.speed=115200
+espd12.upload.resetmethod=ck
+espd12.upload.maximum_size=4194304
+espd12.upload.wait_for_upload_port=true
+espd12.serial.disableDTR=true
+espd12.serial.disableRTS=true
+
+espd12.build.mcu=esp8266
+espd12.build.f_cpu=80000000L
+espd12.build.board=ESP8266_ESP01
+espd12.build.core=esp8266
+espd12.build.variant=espd12
+
+espd12.menu.CpuFrequency.80=80 MHz
+espd12.menu.CpuFrequency.80.build.f_cpu=80000000L
+espd12.menu.CpuFrequency.160=160 MHz
+espd12.menu.CpuFrequency.160.build.f_cpu=160000000L
+
+espd12.menu.UploadSpeed.115200=115200
+espd12.menu.UploadSpeed.115200.upload.speed=115200
+espd12.menu.UploadSpeed.9600=9600
+espd12.menu.UploadSpeed.9600.upload.speed=9600
+espd12.menu.UploadSpeed.57600=57600
+espd12.menu.UploadSpeed.57600.upload.speed=57600
+espd12.menu.UploadSpeed.256000=256000
+espd12.menu.UploadSpeed.256000.upload.speed=256000
+espd12.menu.UploadSpeed.921600=921600
+espd12.menu.UploadSpeed.921600.upload.speed=921600
+
 
 ##############################################################
 wifio.name=Wifio
