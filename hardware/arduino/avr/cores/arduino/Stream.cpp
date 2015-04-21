@@ -265,11 +265,11 @@ int Stream::findMulti( struct Stream::MultiTarget *targets, int tCount) {
 
     for (struct MultiTarget *t = targets; t < targets+tCount; ++t) {
       // the simple case is if we match, deal with that first.
-      if (c == t->str[t->index])
-	if (++t->index == t->len)
-	  return t - targets;
-	else
-	  continue;
+      if (c == t->str[t->index]) {
+        if (++t->index == t->len)
+          return t - targets;
+      } else
+        continue;
 
       // if not we need to walk back and see if we could have matched further
       // down the stream (ie '1112' doesn't match the first position in '11112'
@@ -293,7 +293,7 @@ int Stream::findMulti( struct Stream::MultiTarget *targets, int tCount) {
 
 	// otherwise we need to check the rest of the found string
 	int diff = origIndex - t->index;
-	int i;
+	size_t i;
 	for (i = 0; i < t->index; ++i)
 	  if (t->str[i] != t->str[i + diff])
 	    break;
