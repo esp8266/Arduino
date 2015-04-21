@@ -7,6 +7,7 @@
 #define _C_TYPES_H_
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdarg.h>
 
 typedef signed char         sint8_t;
 typedef signed short        sint16_t;
@@ -75,8 +76,8 @@ typedef enum {
 #ifndef __cplusplus
 //typedef unsigned char   bool;
 #define BOOL            bool
-#define true            (1)
-#define false           (0)
+//#define true            (1)
+//#define false           (0)
 #define TRUE            true
 #define FALSE           false
 
