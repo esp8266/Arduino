@@ -82,6 +82,14 @@ public:
         */
     void config(IPAddress local_ip, IPAddress gateway, IPAddress subnet);
 
+    /* Configure access point
+     *
+     * param local_ip: access point IP
+     * param gateway: gateway IP
+     * param subnet: subnet mask
+     */
+    void softAPConfig(IPAddress local_ip, IPAddress gateway, IPAddress subnet);
+
     /*
      * Disconnect from the network
      *
