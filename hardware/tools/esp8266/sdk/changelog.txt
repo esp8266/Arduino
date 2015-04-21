@@ -1,3 +1,27 @@
+esp_iot_sdk_v1.0.1_b2_15_04_10 release note
+-------------------------------------------
+
+Fix bugs:
+1.Call espconn_sent to send UDP packet in user_init cause reset.[BBP#2 reporter (????)] 
+2.UART & FlowControl issue: send data to FIFO without CTS flag will cause WDT [BBP#11 reporter (pvxx)]
+3.SSL issue,add an API (espconn_secure_set_size) to set SSL buffer size [BBP#29 reporter (PeteW)]
+4.UDP broadcast issue in WEP
+
+Optimize:
+1.Add more details about measure ADC & VDD3P3 in appendix of document“2C-SDK-Espressif IoT SDK Programming Guide”[BBP#15 reporter (DarkByte)]
+2.Can not do any WiFi related operation if WiFi mode is in NULL_MODE [BBP#23 reporter (hao.wang)]
+3.start_ip and end_ip won't change through API wifi_softap_set_dhcps_lease [BBP#37 reporter (glb)]
+4.AT get into busy state [BBP#35 reporter (tommy_hk)]
+5.ssid + password length limitation when using AirKiss [BBP#45 reporter (zhchbin)]
+
+Add APIs:
+1.espconn_secure_set_size:set buffer size for SSL packet
+2.espconn_secure_get_size:get SSL buffer size
+3.at_register_uart_rx_intr:set UART0 to be used by user or AT commands
+
+Add AT command:
+1.AT+SLEEP: set ESP8266 sleep mode
+
 esp_iot_sdk_v1.0.1_b1_15_04_02 Release note
 -------------------------------------------
 

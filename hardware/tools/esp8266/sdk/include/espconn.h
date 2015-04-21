@@ -103,6 +103,14 @@ enum espconn_level{
 	ESPCONN_KEEPCNT
 };
 
+enum {
+	ESPCONN_IDLE = 0,
+	ESPCONN_CLIENT,
+	ESPCONN_SERVER,
+	ESPCONN_BOTH,
+	ESPCONN_MAX
+};
+
 /******************************************************************************
  * FunctionName : espconn_connect
  * Description  : The function given as the connect
@@ -398,6 +406,27 @@ sint8 espconn_secure_disconnect(struct espconn *espconn);
 *******************************************************************************/
 
 sint8 espconn_secure_sent(struct espconn *espconn, uint8 *psent, uint16 length);
+
+/******************************************************************************
+ * FunctionName : espconn_secure_set_size
+ * Description  : set the buffer size for client or server
+ * Parameters   : level -- set for client or server
+ * 				  1: client,2:server,3:client and server
+ * 				  size -- buffer size
+ * Returns      : true or false
+*******************************************************************************/
+
+bool espconn_secure_set_size(uint8 level, uint16 size);
+
+/******************************************************************************
+ * FunctionName : espconn_secure_get_size
+ * Description  : get buffer size for client or server
+ * Parameters   : level -- set for client or server
+ *				  1: client,2:server,3:client and server
+ * Returns      : buffer size for client or server
+*******************************************************************************/
+
+sint16 espconn_secure_get_size(uint8 level);
 
 /******************************************************************************
  * FunctionName : espconn_secure_accept

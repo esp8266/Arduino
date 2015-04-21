@@ -244,6 +244,7 @@
 #define PERIPHS_IO_MUX_SD_DATA0_U       (PERIPHS_IO_MUX + 0x20)
 #define FUNC_SDDATA0                        0
 #define FUNC_SPIQ_MISO                      1
+#define FUNC_SPIQ                           1
 #define FUNC_GPIO7                          3
 #define FUNC_U1TXD                          4
 #define FUNC_UART1_TXD                      4
