@@ -253,11 +253,11 @@ public class Editor extends JFrame implements RunnerListener {
     lineStatus = new EditorLineStatus(textarea);
     consolePanel.add(lineStatus, BorderLayout.SOUTH);
 
-    //scrollPane = new RTextScrollPane(textarea);
-    
+    // RTextScrollPane
     scrollPane = new RTextScrollPane(textarea, true);
     scrollPane.setViewportBorder(BorderFactory.createEmptyBorder());
-    scrollPane.setIconRowHeaderEnabled(true);
+    scrollPane.setLineNumbersEnabled(Preferences.getBoolean("editor.linenumbers"));
+    scrollPane.setIconRowHeaderEnabled(false);
     
     Gutter gutter = scrollPane.getGutter();
     gutter.setBookmarkingEnabled(false);
@@ -450,7 +450,7 @@ public class Editor extends JFrame implements RunnerListener {
     saveMenuItem.setEnabled(!external);
     saveAsMenuItem.setEnabled(!external);
 
-    textarea.setMarginLineEnabled(PreferencesData.getBoolean("editor.linenumbers"));
+    scrollPane.setLineNumbersEnabled(PreferencesData.getBoolean("editor.linenumbers"));
 
     if (external) {
       // disable line highlight and turn off the caret when disabling
@@ -479,6 +479,8 @@ public class Editor extends JFrame implements RunnerListener {
     //sketchbook.rebuildMenus();
     // For 0126, moved into Base, which will notify all editors.
     //base.rebuildMenusAsync();
+    
+    textarea.setTheme(Preferences.get("editor.syntax_theme"));
   }
 
 
@@ -956,6 +958,7 @@ public class Editor extends JFrame implements RunnerListener {
       SketchTextArea textArea = new SketchTextArea();
       textArea.requestFocusInWindow();
       textArea.setMarkOccurrences(true);
+      textArea.setMarginLineEnabled(false);
       textArea.setCodeFoldingEnabled(PreferencesData.getBoolean("editor.codefolding"));
       textArea.setAntiAliasingEnabled(PreferencesData.getBoolean("editor.antialias"));
 //      textArea.setClearWhitespaceLinesEnabled(false);

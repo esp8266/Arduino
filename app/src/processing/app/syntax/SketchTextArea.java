@@ -21,14 +21,12 @@ import javax.swing.text.Segment;
 import javax.swing.undo.UndoManager;
 
 import org.fife.ui.rsyntaxtextarea.*;
+import org.fife.ui.rsyntaxtextarea.Theme;
 import org.fife.ui.rsyntaxtextarea.Token;
 import org.fife.ui.rsyntaxtextarea.focusabletip.FocusableTip;
 import org.fife.ui.rtextarea.RUndoManager;
 
-import processing.app.Base;
-import processing.app.BaseNoGui;
-import processing.app.EditorLineStatus;
-import processing.app.EditorListener;
+import processing.app.*;
 
 /**
  * Arduino Sketch code editor based on RSyntaxTextArea (http://fifesoft.com/rsyntaxtextarea)
@@ -57,9 +55,18 @@ public class SketchTextArea extends RSyntaxTextArea {
   
   
   protected void installFeatures(){
+    setTheme(PreferencesData.get("editor.syntax_theme", "default"));
+
+    setLinkGenerator(new DocLinkGenerator());
+    
+    fixControlTab();
+    installTokenMaker();  
+  }
+  
+  public void setTheme(String name){
     FileInputStream defaultXmlInputStream = null;
     try {
-      defaultXmlInputStream = new FileInputStream(new File(BaseNoGui.getContentFile("lib"), "theme/syntax/default.xml"));
+      defaultXmlInputStream = new FileInputStream(new File(BaseNoGui.getContentFile("lib"), "theme/syntax/"+name+".xml"));
       Theme theme = Theme.load(defaultXmlInputStream);
       theme.apply(this);
     } catch (IOException e) {
@@ -73,11 +80,6 @@ public class SketchTextArea extends RSyntaxTextArea {
         }
       }
     }
-    
-    setLinkGenerator(new DocLinkGenerator());
-    
-    fixControlTab();
-    installTokenMaker();  
   }
   
   // Removing the default focus traversal keys
