@@ -596,6 +596,8 @@
     </antcall>
 
     <copy todir="linux/work" file="linux/dist/arduino" />
+    <copy todir="linux/work" file="linux/dist/arduino.desktop" />
+    <copy todir="linux/work" file="linux/dist/install.sh" />
     <chmod perm="755" file="linux/work/arduino" />
 
     <copy todir="linux/work" file="linux/dist/arduino" />

@@ -38,6 +38,7 @@
     <cp>lib/jsch-0.1.50.jar</cp>
     <cp>lib/jssc-2.8.0.jar</cp>
     <cp>lib/pde.jar</cp>
+    <cp>lib/rsyntaxtextarea-2.6.0-SNAPSHOT.jar</cp>
   </classPath>
   <jre>
     <path>java</path>

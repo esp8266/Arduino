@@ -26,5 +26,5 @@ else
 	SPLASH="-splash:./lib/splash.png"
 fi
 
-java -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel $SPLASH processing.app.Base --curdir $CURDIR "$@"
+java -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel $SPLASH ArduinoIDE --curdir $CURDIR "$@"
 
