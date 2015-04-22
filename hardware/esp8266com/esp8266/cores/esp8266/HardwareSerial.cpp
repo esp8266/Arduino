@@ -453,7 +453,7 @@ void ICACHE_FLASH_ATTR uart1_write_char(char c) {
     }
 }
 
-static UARTnr_t s_uart_debug_nr = UART_NO;
+static UARTnr_t s_uart_debug_nr = UART0;
 void ICACHE_FLASH_ATTR uart_set_debug(UARTnr_t uart_nr) {
     s_uart_debug_nr = uart_nr;
     switch(s_uart_debug_nr) {
