@@ -1,17 +1,17 @@
 package processing.app;
 
-import processing.app.syntax.JEditTextArea;
-
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoableEdit;
+
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 
 public class CaretAwareUndoableEdit implements UndoableEdit {
 
   private final UndoableEdit undoableEdit;
   private final int caretPosition;
 
-  public CaretAwareUndoableEdit(UndoableEdit undoableEdit, JEditTextArea textArea) {
+  public CaretAwareUndoableEdit(UndoableEdit undoableEdit, RSyntaxTextArea textArea) {
     this.undoableEdit = undoableEdit;
     this.caretPosition = textArea.getCaretPosition();
   }

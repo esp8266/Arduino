@@ -1,3 +1,5 @@
+/* -*- mode: java; c-basic-offset: 2; indent-tabs-mode: nil -*- */
+
 /*
  * This file is part of Arduino.
  *
@@ -29,16 +31,18 @@
 
 package cc.arduino.packages.formatter;
 
-import processing.app.Base;
-import processing.app.Editor;
-import processing.app.helpers.FileUtils;
-import processing.app.syntax.JEditTextArea;
-import processing.app.tools.Tool;
+import static processing.app.I18n._;
 
 import java.io.File;
 import java.io.IOException;
 
-import static processing.app.I18n._;
+import javax.swing.text.BadLocationException;
+
+import processing.app.Base;
+import processing.app.Editor;
+import processing.app.helpers.FileUtils;
+import processing.app.syntax.SketchTextArea;
+import processing.app.tools.Tool;
 
 public class AStyle implements Tool {
 
@@ -84,13 +88,17 @@ public class AStyle implements Tool {
       return;
     }
 
-    JEditTextArea textArea = editor.getTextArea();
-    int line = textArea.getLineOfOffset(textArea.getCaretPosition());
-    int lineOffset = textArea.getCaretPosition() - textArea.getLineStartOffset(line);
-
+    SketchTextArea textArea = editor.getTextArea();
     editor.setText(formattedText);
     editor.getSketch().setModified(true);
-    textArea.setCaretPosition(Math.min(textArea.getLineStartOffset(line) + lineOffset, textArea.getSafeLineStopOffset(line) - 1));
+    
+    try {
+      int line = textArea.getLineOfOffset(textArea.getCaretPosition());
+      int lineOffset = textArea.getCaretPosition() - textArea.getLineStartOffset(line);
+      textArea.setCaretPosition(Math.min(textArea.getLineStartOffset(line) + lineOffset, textArea.getLineEndOffset(line) - 1));
+    } catch (BadLocationException e) {
+      e.printStackTrace();
+    }
     // mark as finished
     editor.statusNotice(_("Auto Format finished."));
   }

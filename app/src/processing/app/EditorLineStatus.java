@@ -1,3 +1,5 @@
+/* -*- mode: java; c-basic-offset: 2; indent-tabs-mode: nil -*- */
+
 /*
   Part of the Processing project - http://processing.org
 
@@ -20,26 +22,23 @@
 
 package processing.app;
 
-import processing.app.helpers.OSUtils;
-
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Image;
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.util.Map;
 
 import javax.swing.JComponent;
 
+import processing.app.helpers.OSUtils;
 import processing.app.helpers.PreferencesMap;
-import processing.app.syntax.JEditTextArea;
+import processing.app.syntax.SketchTextArea;
+
 
 /**
  * Li'l status bar fella that shows the line number.
  */
-@SuppressWarnings("serial")
 public class EditorLineStatus extends JComponent {
-  JEditTextArea textarea;
+  SketchTextArea textarea;
+  
   int start = -1, stop;
 
   Image resize;
@@ -55,9 +54,11 @@ public class EditorLineStatus extends JComponent {
   String name = "";
   String serialport = "";
 
-  public EditorLineStatus(JEditTextArea textarea) {
+
+  public EditorLineStatus(SketchTextArea textarea) {
+    
     this.textarea = textarea;
-    textarea.editorLineStatus = this;
+    textarea.setEditorLineStatus(this);
 
     background = Theme.getColor("linestatus.bgcolor");
     font = Theme.getFont("linestatus.font");

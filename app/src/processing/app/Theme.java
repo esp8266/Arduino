@@ -28,9 +28,11 @@ import java.awt.Font;
 import java.awt.SystemColor;
 import java.io.File;
 
+import javax.swing.text.StyleContext;
+
+import processing.app.helpers.OSUtils;
 import processing.app.helpers.PreferencesHelper;
 import processing.app.helpers.PreferencesMap;
-import processing.app.syntax.SyntaxStyle;
 
 /**
  * Storage class for theme settings. This was separated from the Preferences
@@ -104,17 +106,40 @@ public class Theme {
     }
     return font;
   }
+  
+    /**
+   * Returns the default font for text areas.
+   *
+   * @return The default font.
+   */
+  public static final Font getDefaultFont() {
 
-  static public SyntaxStyle getStyle(String what) {
-    String split[] = get("editor." + what + ".style").split(",");
+    // Use StyleContext to get a composite font for better Asian language
+    // support; see Sun bug S282887.
+    StyleContext sc = StyleContext.getDefaultStyleContext();
+    Font font = null;
 
-    Color color = PreferencesHelper.parseColor(split[0]);
+    if (OSUtils.isMacOS()) {
+      // Snow Leopard (1.6) uses Menlo as default monospaced font,
+      // pre-Snow Leopard used Monaco.
+      font = sc.getFont("Menlo", Font.PLAIN, 12);
+      if (!"Menlo".equals(font.getFamily())) {
+        font = sc.getFont("Monaco", Font.PLAIN, 12);
+        if (!"Monaco".equals(font.getFamily())) { // Shouldn't happen
+          font = sc.getFont("Monospaced", Font.PLAIN, 13);
+        }
+      }
+    }
+    else {
+      // Consolas added in Vista, used by VS2010+.
+      font = sc.getFont("Consolas", Font.PLAIN, 13);
+      if (!"Consolas".equals(font.getFamily())) {
+        font = sc.getFont("Monospaced", Font.PLAIN, 13);
+      }
+    }
 
-    String style = split[1];
-    boolean bold = style.contains("bold");
-    boolean italic = style.contains("italic");
-    boolean underlined = style.contains("underlined");
+    //System.out.println(font.getFamily() + ", " + font.getName());
+    return font;
 
-    return new SyntaxStyle(color, italic, bold, underlined);
   }
 }

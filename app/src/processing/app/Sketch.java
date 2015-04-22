@@ -112,7 +112,7 @@ public class Sketch {
 
     for (SketchCode code : data.getCodes()) {
       if (code.getMetadata() == null)
-        code.setMetadata(new SketchCodeDocument(code));
+        code.setMetadata(new SketchCodeDocument(this, code));
     }
 
     // set the main file to be the current tab
@@ -409,7 +409,7 @@ public class Sketch {
         return;
       }
       ensureExistence();
-      data.addCode((new SketchCodeDocument(newFile)).getCode());
+      data.addCode((new SketchCodeDocument(this, newFile)).getCode());
     }
 
     // sort the entries
@@ -905,7 +905,7 @@ public class Sketch {
     }
 
     if (codeExtension != null) {
-      SketchCode newCode = (new SketchCodeDocument(destFile)).getCode();
+      SketchCode newCode = (new SketchCodeDocument(this, destFile)).getCode();
 
       if (replacement) {
         data.replaceCode(newCode);
