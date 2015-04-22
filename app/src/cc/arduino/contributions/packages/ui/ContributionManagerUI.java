@@ -87,7 +87,7 @@ public class ContributionManagerUI extends InstallerJDialog {
   }
 
   public ContributionManagerUI(Frame parent) {
-    super(parent, _("Boards Manager"), Dialog.ModalityType.APPLICATION_MODAL, _("No internet connection available, the list of available boards is not complete. You will be able to manage only the boards you've already installed."));
+    super(parent, _("Boards Manager"), Dialog.ModalityType.APPLICATION_MODAL, _("Unable to reach Arduino.cc due to possible network issues."));
   }
 
   public void setIndexer(ContributionsIndexer indexer) {

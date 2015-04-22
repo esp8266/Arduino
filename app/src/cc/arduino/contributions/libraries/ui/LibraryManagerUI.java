@@ -86,7 +86,7 @@ public class LibraryManagerUI extends InstallerJDialog<ContributedLibrary> {
   }
 
   public LibraryManagerUI(Frame parent) {
-    super(parent, "Library Manager", Dialog.ModalityType.APPLICATION_MODAL, _("No internet connection available, the list of available libraries is not complete. You will be able to manage only the libraries you've already installed."));
+    super(parent, "Library Manager", Dialog.ModalityType.APPLICATION_MODAL, _("Unable to reach Arduino.cc due to possible network issues."));
 
     filtersContainer.add(new JLabel(_("Topic")), 1);
     filtersContainer.remove(2);
