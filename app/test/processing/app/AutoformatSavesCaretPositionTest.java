@@ -31,7 +31,7 @@ package processing.app;
 
 import org.fest.swing.fixture.JMenuItemFixture;
 import org.junit.Test;
-import processing.app.helpers.JEditTextAreaFixture;
+import processing.app.helpers.RSyntaxTextAreaFixture;
 
 import static org.junit.Assert.assertEquals;
 
@@ -42,7 +42,7 @@ public class AutoformatSavesCaretPositionTest extends AbstractGUITest {
     JMenuItemFixture menuToolsAutoFormat = window.menuItem("menuToolsAutoFormat");
     menuToolsAutoFormat.requireEnabled();
 
-    JEditTextAreaFixture editor = window.jEditTextArea("editor");
+    RSyntaxTextAreaFixture editor = window.RSyntaxTextArea("editor");
     editor.setText("void setup() {\n" +
             "              // put your setup code here, to run once:\n" +
             "\n" +

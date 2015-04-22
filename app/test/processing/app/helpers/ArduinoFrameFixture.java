@@ -30,8 +30,9 @@
 package processing.app.helpers;
 
 import org.fest.swing.fixture.FrameFixture;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+
 import processing.app.Editor;
-import processing.app.syntax.JEditTextArea;
 
 public class ArduinoFrameFixture extends FrameFixture {
 
@@ -42,8 +43,8 @@ public class ArduinoFrameFixture extends FrameFixture {
     this.editor = editor;
   }
 
-  public JEditTextAreaFixture jEditTextArea(String name) {
-    return new JEditTextAreaFixture(robot, (JEditTextArea) this.robot.finder().find(new JEditTextAreaComponentMatcher(name)));
+  public RSyntaxTextAreaFixture RSyntaxTextArea(String name) {
+    return new RSyntaxTextAreaFixture(robot, (RSyntaxTextArea) this.robot.finder().find(new RSyntaxTextAreaComponentMatcher(name)));
   }
 
   public Editor getEditor() {

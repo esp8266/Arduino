@@ -34,7 +34,7 @@ import static org.junit.Assert.assertEquals;
 import org.fest.swing.fixture.JMenuItemFixture;
 import org.junit.Test;
 
-import processing.app.helpers.JEditTextAreaFixture;
+import processing.app.helpers.RSyntaxTextAreaFixture;
 
 public class ReduceIndentWith1CharOnLastLineTest extends AbstractGUITest {
 
@@ -42,7 +42,7 @@ public class ReduceIndentWith1CharOnLastLineTest extends AbstractGUITest {
   public void shouldJustCloseTheDialog() throws Exception {
     JMenuItemFixture menuDecreaseIndent = window.menuItem("menuDecreaseIndent");
 
-    JEditTextAreaFixture editor = window.jEditTextArea("editor");
+    RSyntaxTextAreaFixture editor = window.RSyntaxTextArea("editor");
     editor.setText("void loop()\n{\n  Serial.begin(9600)\n}");
 
     editor.selectAll();

@@ -31,7 +31,7 @@ package processing.app;
 
 import org.fest.swing.fixture.JMenuItemFixture;
 import org.junit.Test;
-import processing.app.helpers.JEditTextAreaFixture;
+import processing.app.helpers.RSyntaxTextAreaFixture;
 
 import static org.junit.Assert.assertEquals;
 
@@ -44,19 +44,19 @@ public class ReplacingTextGeneratesTwoUndoActionsTest extends AbstractGUITest {
     JMenuItemFixture menuEditRedo = window.menuItem("menuEditRedo");
     menuEditRedo.requireDisabled();
 
-    JEditTextAreaFixture jEditTextArea = window.jEditTextArea("editor");
+    RSyntaxTextAreaFixture RSyntaxTextArea = window.RSyntaxTextArea("editor");
 
-    jEditTextArea.setText("fake text");
+    RSyntaxTextArea.setText("fake text");
 
     menuEditUndo.requireEnabled();
     menuEditUndo.click();
 
-    assertEquals("", jEditTextArea.getText());
+    assertEquals("", RSyntaxTextArea.getText());
 
     menuEditRedo.requireEnabled();
     menuEditRedo.click();
 
-    //assertEquals("fake text", jEditTextArea.getText());
+    //assertEquals("fake text", RSyntaxTextArea.getText());
 
     menuEditUndo.requireEnabled();
     menuEditUndo.click();

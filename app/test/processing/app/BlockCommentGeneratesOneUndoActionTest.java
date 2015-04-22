@@ -29,15 +29,16 @@
 
 package processing.app;
 
+import static org.junit.Assert.assertEquals;
+
+import java.awt.Frame;
+
 import org.fest.swing.edt.GuiActionRunner;
 import org.fest.swing.edt.GuiQuery;
 import org.fest.swing.fixture.JMenuItemFixture;
 import org.junit.Test;
-import processing.app.helpers.JEditTextAreaFixture;
 
-import java.awt.*;
-
-import static org.junit.Assert.assertEquals;
+import processing.app.helpers.RSyntaxTextAreaFixture;
 
 public class BlockCommentGeneratesOneUndoActionTest extends AbstractGUITest {
 
@@ -46,7 +47,7 @@ public class BlockCommentGeneratesOneUndoActionTest extends AbstractGUITest {
     JMenuItemFixture menuEditUndo = window.menuItem("menuEditUndo");
     menuEditUndo.requireDisabled();
 
-    JEditTextAreaFixture jEditTextArea = window.jEditTextArea("editor");
+    RSyntaxTextAreaFixture jEditTextArea = window.RSyntaxTextArea("editor");
     String previousText = jEditTextArea.getText();
 
     jEditTextArea.selectAll();
