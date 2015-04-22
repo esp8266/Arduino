@@ -42,6 +42,9 @@ import java.util.regex.*;
  * Class that orchestrates preprocessing p5 syntax into straight Java.
  */
 public class PdePreprocessor {
+  
+  private static final String IMPORT_REGEX = "^\\s*#include\\s*[<\"](\\S+)[\">]";
+  
   // stores number of built user-defined function prototypes
   public int prototypeCount = 0;
 
@@ -94,10 +97,9 @@ public class PdePreprocessor {
     }
 
     //String importRegexp = "(?:^|\\s|;)(import\\s+)(\\S+)(\\s*;)";
-    String importRegexp = "^\\s*#include\\s*[<\"](\\S+)[\">]";
     programImports = new ArrayList<String>();
 
-    String[][] pieces = PApplet.matchAll(program, importRegexp);
+    String[][] pieces = PApplet.matchAll(program, IMPORT_REGEX);
 
     if (pieces != null)
       for (int i = 0; i < pieces.length; i++)
@@ -121,6 +123,19 @@ public class PdePreprocessor {
     return headerCount + prototypeCount;
   }
 
+  public static List<String> findIncludes(String code){
+   
+    String[][] pieces = PApplet.matchAll(code, IMPORT_REGEX);
+
+    ArrayList programImports = new ArrayList<String>();
+    
+    if (pieces != null)
+      for (int i = 0; i < pieces.length; i++)
+        programImports.add(pieces[i][1]);  // the package name
+
+    return programImports;
+  }
+    
 
   static String substituteUnicode(String program) {
     // check for non-ascii chars (these will be/must be in unicode format)
