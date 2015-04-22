@@ -2,16 +2,12 @@ package processing.app;
 
 import java.io.File;
 
-import javax.swing.Action;
-import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 import javax.swing.undo.UndoManager;
 
-import org.fife.ui.rtextarea.RTextArea;
-
-public class SketchCodeDocument implements SketchDocumentProvider, DocumentListener{
+public class SketchCodeDocument implements DocumentListener{
 
   private SketchCode code;
   private Sketch sketch;
