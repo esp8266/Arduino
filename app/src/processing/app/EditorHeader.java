@@ -153,16 +153,16 @@ public class EditorHeader extends JComponent {
 
     Graphics g = offscreen.getGraphics();
     if (font == null) {
-      font = Theme.getFont("header.text.font");
+      font = Theme.getDefaultFont(); // Get optimal font.
+      if(font == null) font = Theme.getFont("header.text.font");
     }
+    
     g.setFont(font);  // need to set this each time through
     metrics = g.getFontMetrics();
     fontAscent = metrics.getAscent();
     //}
 
-    //Graphics2D g2 = (Graphics2D) g;
-    //g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-    //                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+    Graphics2D g2 = (Graphics2D) g;
 
     // set the background for the offscreen
     g.setColor(backgroundColor);
@@ -182,9 +182,8 @@ public class EditorHeader extends JComponent {
         code.getPrettyName() : code.getFileName();
 
       // if modified, add the li'l glyph next to the name
-      String text = "  " + codeName + (code.isModified() ? " \u00A7" : "  ");
+      String text = " " + codeName + " ";
 
-      Graphics2D g2 = (Graphics2D) g;
       int textWidth = (int)
         font.getStringBounds(text, g2.getFontRenderContext()).getWidth();
 
@@ -207,7 +206,16 @@ public class EditorHeader extends JComponent {
       g.setColor(textColor[state]);
       int baseline = (sizeH + fontAscent) / 2;
       //g.drawString(sketch.code[i].name, textLeft, baseline);
+      
+      g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                          RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+      
       g.drawString(text, textLeft, baseline);
+      
+      if(code.isModified()){
+        g.setColor(Color.RED);
+        g.drawString("*", textLeft - 3, baseline);
+      }
 
       g.drawImage(pieces[state][RIGHT], x, 0, null);
       x += PIECE_WIDTH - 1;  // overlap by 1 pixel
