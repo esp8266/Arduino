@@ -1,0 +1,13 @@
+esptool.name=esptool
+esptool.communication=serial
+esptool.protocol=esp
+esptool.program.protocol=esp
+esptool.program.tool=esptool
+esptool.program.extra_params=
+
+pyesptool.name=pyesptool
+pyesptool.communication=serial
+pyesptool.protocol=esp
+pyesptool.program.protocol=esp
+pyesptool.program.tool=pyesptool
+pyesptool.program.extra_params=

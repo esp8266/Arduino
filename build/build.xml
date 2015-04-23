@@ -388,6 +388,9 @@
     <move file="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/esptool-0.4.2-osx/esptool" tofile="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/esptool" />
     <delete dir="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/esptool-0.4.2-osx/" />
 
+	<!-- Retrieve pyesptool -->
+    <get src="https://raw.githubusercontent.com/themadinventor/esptool/master/esptool.py" dest="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/esptool.py" verbose="true" ignoreerrors="true" />
+
   </target>
 
   <target name="macosx-run" depends="macosx-build" description="Run Mac OS X version">
@@ -667,6 +670,9 @@
     </antcall>
     <move file="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/esptool-0.4.2-linux64/esptool" tofile="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/esptool" />
     <delete dir="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/esptool-0.4.2-linux64/" />
+    
+    <!-- Retrieve pyesptool -->
+    <get src="https://raw.githubusercontent.com/themadinventor/esptool/master/esptool.py" dest="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/esptool.py" verbose="true" ignoreerrors="true" />
 
   </target>
 
