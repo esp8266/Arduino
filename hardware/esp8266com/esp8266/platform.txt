@@ -93,7 +93,7 @@ tools.esptool.program.params.quiet=
 tools.esptool.program.pattern="{path}/{cmd}" -vvv {program.verbose} -cd {upload.resetmethod} -cb {upload.speed} -cp {serial.port} -ca 0x00000 -cf "{build.path}/{build.project_name}_00000.bin" -ca 0x40000 -cf "{build.path}/{build.project_name}_40000.bin"
 
 tools.pyesptool.cmd=esptool.py
-tools.pyesptool.cmd.windows=esptool.exe
+tools.pyesptool.cmd.windows=esptool.py
 tools.pyesptool.path={runtime.ide.path}/hardware/tools/esp8266
 tools.pyesptool.program.params.verbose=""
 tools.pyesptool.program.params.quiet="" 
