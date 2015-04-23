@@ -6,15 +6,15 @@
 # Library (KEYWORD1)
 #######################################
 
-WiFi	KEYWORD1
-WiFiUdp	KEYWORD1
+WiFi	KEYWORD1	WiFi
+WiFiUdp	KEYWORD1	WiFiUDPConstructor
 
 #######################################
 # Datatypes (KEYWORD1)
 #######################################
 
-Client	KEYWORD1
-Server	KEYWORD1
+Client	KEYWORD1	WiFiClientConstructor
+Server	KEYWORD1	WiFiServerConstructor
 
 #######################################
 # Methods and Functions (KEYWORD2)
@@ -43,9 +43,9 @@ RSSI	KEYWORD2
 encryptionType	KEYWORD2
 getResult	KEYWORD2
 getSocket	KEYWORD2
-WiFiClient	KEYWORD2
-WiFiServer	KEYWORD2
-WiFiUDP		KEYWORD2
+WiFiClient	KEYWORD2	WiFiClient
+WiFiServer	KEYWORD2	WiFiServer
+WiFiUDP		KEYWORD2	WiFiUDPConstructor
 beginPacket	KEYWORD2
 endPacket	KEYWORD2
 parsePacket	KEYWORD2

@@ -6,7 +6,7 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-Scheduler	KEYWORD1
+Scheduler	KEYWORD1	Scheduler
 
 #######################################
 # Methods and Functions (KEYWORD2)

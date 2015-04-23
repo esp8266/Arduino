@@ -4,7 +4,7 @@
 # Class
 #######################################
 
-Esplora	KEYWORD1
+Esplora	KEYWORD1	EsploraLibrary
 
 #######################################
 # Methods and Functions 

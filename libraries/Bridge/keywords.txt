@@ -6,15 +6,15 @@
 # Class (KEYWORD1)
 #######################################
 
-Bridge	KEYWORD1
-FileIO	KEYWORD4
-FileSystem	KEYWORD1
-Console	KEYWORD1
-Process	KEYWORD1
-Mailbox	KEYWORD1
-HttpClient	KEYWORD1
-YunServer	KEYWORD1
-YunClient	KEYWORD1
+Bridge	KEYWORD1	YunBridgeLibrary
+FileIO	KEYWORD4	YunFileIOConstructor
+FileSystem	KEYWORD1	YunFileIOConstructor
+Console	KEYWORD1	YunConsoleConstructor
+Process	KEYWORD1	YunProcessConstructor
+Mailbox	KEYWORD1	YunMailboxConstructor
+HttpClient	KEYWORD1	YunHttpClientConstructor
+YunServer	KEYWORD1	YunServerConstructor
+YunClient	KEYWORD1	YunClientConstructor
 
 #######################################
 # Methods and Functions (KEYWORD2)
