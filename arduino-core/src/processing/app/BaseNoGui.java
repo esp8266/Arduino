@@ -1,11 +1,11 @@
 package processing.app;
 
 import cc.arduino.contributions.libraries.LibrariesIndexer;
+import cc.arduino.contributions.packages.ContributedTool;
+import cc.arduino.contributions.packages.ContributionsIndexer;
 import cc.arduino.files.DeleteFilesOnShutdown;
 import cc.arduino.packages.DiscoveryManager;
 import cc.arduino.packages.Uploader;
-import cc.arduino.contributions.packages.ContributedTool;
-import cc.arduino.contributions.packages.ContributionsIndexer;
 import org.apache.commons.logging.impl.LogFactoryImpl;
 import org.apache.commons.logging.impl.NoOpLog;
 import processing.app.debug.Compiler;
@@ -578,21 +578,19 @@ public class BaseNoGui {
   static public void initPackages() throws Exception {
     indexer = new ContributionsIndexer(BaseNoGui.getSettingsFolder());
     File indexFile = indexer.getIndexFile();
-    if (!indexFile.isFile()) {
-      File defaultPackageJsonFile = new File(getContentFile("dist"), "package_index.json");
-      if (defaultPackageJsonFile.isFile()) {
-        FileUtils.copyFile(defaultPackageJsonFile, indexFile);
-      } else {
-        // Otherwise create an empty packages index
-        FileOutputStream out = null;
-        try {
-          out = new FileOutputStream(indexFile);
-          out.write("{ \"packages\" : [ ] }".getBytes());
+    File defaultPackageJsonFile = new File(getContentFile("dist"), "package_index.json");
+    if (!indexFile.isFile() || (defaultPackageJsonFile.isFile() && defaultPackageJsonFile.lastModified() > indexFile.lastModified())) {
+      FileUtils.copyFile(defaultPackageJsonFile, indexFile);
+    } else if (!indexFile.isFile()) {
+      // Otherwise create an empty packages index
+      FileOutputStream out = null;
+      try {
+        out = new FileOutputStream(indexFile);
+        out.write("{ \"packages\" : [ ] }".getBytes());
+        out.close();
+      } finally {
+        if (out != null) {
           out.close();
-        } finally {
-          if (out != null) {
-            out.close();
-          }
         }
       }
     }
