@@ -50,6 +50,7 @@
 	os_printf_plus(flash_str, ##__VA_ARGS__);	\
 	} while(0)
 #else
+extern int os_printf_plus(const char * format, ...);
 #define os_printf	os_printf_plus
 #endif
 

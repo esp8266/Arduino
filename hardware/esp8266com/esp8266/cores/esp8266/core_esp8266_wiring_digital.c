@@ -81,7 +81,12 @@ extern void __pinMode(uint8_t pin, uint8_t mode) {
         PIN_PULLUP_DIS(mux);
     } else if(mode == INPUT_PULLUP) {
         gpio_output_set(0, 0, 0, 1 << pin);
+        PIN_PULLDWN_DIS(mux);
         PIN_PULLUP_EN(mux);
+    } else if(mode == INPUT_PULLDOWN) {
+        gpio_output_set(0, 0, 0, 1 << pin);
+        PIN_PULLUP_DIS(mux);
+        PIN_PULLDWN_EN(mux);
     } else if(mode == OUTPUT) {
         gpio_output_set(0, 0, 1 << pin, 0);
     } else if(mode == OUTPUT_OPEN_DRAIN) {
