@@ -451,6 +451,10 @@ public class Editor extends JFrame implements RunnerListener {
     saveAsMenuItem.setEnabled(!external);
 
     scrollPane.setLineNumbersEnabled(PreferencesData.getBoolean("editor.linenumbers"));
+        
+    textarea.setTheme(PreferencesData.get("editor.syntax_theme"));
+    
+    textarea.setCodeFoldingEnabled(PreferencesData.getBoolean("editor.code_folding"));
 
     if (external) {
       // disable line highlight and turn off the caret when disabling
@@ -479,8 +483,7 @@ public class Editor extends JFrame implements RunnerListener {
     //sketchbook.rebuildMenus();
     // For 0126, moved into Base, which will notify all editors.
     //base.rebuildMenusAsync();
-    
-    textarea.setTheme(Preferences.get("editor.syntax_theme"));
+
   }
 
 

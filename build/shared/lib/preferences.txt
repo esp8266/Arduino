@@ -87,7 +87,10 @@ editor.window.height.min = 290
 #editor.window.height.min.windows = 530
 
 # Syntax coloring  ( on lib/theme/syntax )
-editor.syntax_theme = default
+editor.syntax_theme=default
+
+# Enable code folding 
+editor.code_folding=true
 
 # font size for editor
 editor.font=Monospaced,plain,12

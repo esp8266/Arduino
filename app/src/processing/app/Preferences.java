@@ -222,6 +222,7 @@ public class Preferences {
   JCheckBox verboseCompilationBox;
   JCheckBox verboseUploadBox;
   JCheckBox displayLineNumbersBox;
+  JCheckBox enableCodeFoldingBox;
   JCheckBox verifyUploadBox;
   JCheckBox externalEditorBox;
   JCheckBox checkUpdatesBox;
@@ -423,6 +424,15 @@ public class Preferences {
     right = Math.max(right, left + d.width);
     top += d.height + GUI_BETWEEN;
 
+   // [ ] Enable Code Folding
+
+    enableCodeFoldingBox = new JCheckBox(_("Enable Code Folding"));
+    pane.add(enableCodeFoldingBox);
+    d = enableCodeFoldingBox.getPreferredSize();
+    enableCodeFoldingBox.setBounds(left, top, d.width + 10, d.height);
+    right = Math.max(right, left + d.width);
+    top += d.height + GUI_BETWEEN;
+    
     // [ ] Verify code after upload
 
     verifyUploadBox = new JCheckBox(_("Verify code after upload"));
@@ -745,6 +755,7 @@ public class Preferences {
     PreferencesData.setBoolean("build.verbose", verboseCompilationBox.isSelected());
     PreferencesData.setBoolean("upload.verbose", verboseUploadBox.isSelected());
     PreferencesData.setBoolean("editor.linenumbers", displayLineNumbersBox.isSelected());
+     PreferencesData.setBoolean("editor.code_folding", enableCodeFoldingBox.isSelected());
     PreferencesData.setBoolean("upload.verify", verifyUploadBox.isSelected());
     PreferencesData.setBoolean("editor.save_on_verify", saveVerifyUploadBox.isSelected());
 
@@ -836,6 +847,7 @@ public class Preferences {
     verboseCompilationBox.setSelected(PreferencesData.getBoolean("build.verbose"));
     verboseUploadBox.setSelected(PreferencesData.getBoolean("upload.verbose"));
     displayLineNumbersBox.setSelected(PreferencesData.getBoolean("editor.linenumbers"));
+    enableCodeFoldingBox.setSelected(PreferencesData.getBoolean("editor.code_folding"));
     verifyUploadBox.setSelected(PreferencesData.getBoolean("upload.verify"));
 
     //closingLastQuitsBox.
