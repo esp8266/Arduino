@@ -379,7 +379,7 @@ public class Preferences {
     box.add(label);
     WarningItem[] warningItems = new WarningItem[]{new WarningItem("none", _("None")), new WarningItem("default", _("Default")), new WarningItem("more", _("More")), new WarningItem("all", _("All")), };
     comboWarnings = new JComboBox(warningItems);
-    String currentWarningLevel = PreferencesData.get("compiler.warning_flags", "none");
+    String currentWarningLevel = PreferencesData.get("compiler.warning_level", "none");
     for (WarningItem item : warningItems) {
       if (currentWarningLevel.equals(item.getValue())) {
         comboWarnings.setSelectedItem(item);
@@ -771,7 +771,7 @@ public class Preferences {
     PreferencesData.set("editor.languages.current", newLanguage.isoCode);
 
     WarningItem warningItem = (WarningItem) comboWarnings.getSelectedItem();
-    PreferencesData.set("compiler.warning_flags", warningItem.getValue());
+    PreferencesData.set("compiler.warning_level", warningItem.getValue());
 
     Preferences.set("proxy.http.server", proxyHTTPServer.getText());
     try {

@@ -903,8 +903,8 @@ public class Compiler implements MessageConsumer {
   }
 
   private void setupWarningFlags(PreferencesMap dict) {
-    if (dict.containsKey("compiler.warning_flags")) {
-      String key = "compiler.warning_flags." + dict.get("compiler.warning_flags");
+    if (dict.containsKey("compiler.warning_level")) {
+      String key = "compiler.warning_flags." + dict.get("compiler.warning_level");
       dict.put("compiler.warning_flags", dict.get(key));
     } else {
       dict.put("compiler.warning_flags", dict.get("compiler.warning_flags.none"));

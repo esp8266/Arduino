@@ -6,11 +6,12 @@
 # https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5---3rd-party-Hardware-specification
 
 name=Arduino AVR Boards
-version=1.6.4
+version=1.6.5
 
 # AVR compile variables
 # --------------------- 
 
+compiler.warning_flags=-w
 compiler.warning_flags.none=-w
 compiler.warning_flags.default=
 compiler.warning_flags.more=-Wall

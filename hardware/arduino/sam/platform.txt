@@ -11,6 +11,7 @@ version=1.6.3
 # SAM3 compile variables
 # ----------------------
 
+compiler.warning_flags=-w
 compiler.warning_flags.none=-w
 compiler.warning_flags.default=
 compiler.warning_flags.more=-Wall
