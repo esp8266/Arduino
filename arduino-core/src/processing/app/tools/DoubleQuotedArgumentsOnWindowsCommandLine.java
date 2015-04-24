@@ -7,24 +7,24 @@ import processing.app.helpers.OSUtils;
 
 import java.io.File;
 
-public class ArgumentsWithSpaceAwareCommandLine extends CommandLine {
+public class DoubleQuotedArgumentsOnWindowsCommandLine extends CommandLine {
 
-  public ArgumentsWithSpaceAwareCommandLine(String executable) {
+  public DoubleQuotedArgumentsOnWindowsCommandLine(String executable) {
     super(executable);
   }
 
-  public ArgumentsWithSpaceAwareCommandLine(File executable) {
+  public DoubleQuotedArgumentsOnWindowsCommandLine(File executable) {
     super(executable);
   }
 
-  public ArgumentsWithSpaceAwareCommandLine(CommandLine other) {
+  public DoubleQuotedArgumentsOnWindowsCommandLine(CommandLine other) {
     super(other);
   }
 
   @Override
   public CommandLine addArgument(String argument, boolean handleQuoting) {
-    if (argument.contains(" ") && OSUtils.isWindows()) {
-      argument = argument.replaceAll("\"", "").replaceAll("'", "");
+    if (argument.contains("\"") && OSUtils.isWindows()) {
+      argument = argument.replace("\"", "\\\"");
     }
 
     return super.addArgument(argument, handleQuoting);
