@@ -75,13 +75,14 @@ public class SketchTextArea extends RSyntaxTextArea {
 
   private EditorListener editorListener;
   
-  public SketchTextArea() {
+  public SketchTextArea() throws IOException {
     super();
     installFeatures();
   }
   
   
-  protected void installFeatures(){
+  protected void installFeatures() throws IOException {
+
     setTheme(PreferencesData.get("editor.syntax_theme", "default"));
 
     setLinkGenerator(new DocLinkGenerator());
@@ -89,26 +90,20 @@ public class SketchTextArea extends RSyntaxTextArea {
     fixControlTab();
     installTokenMaker();  
   }
-  
-  public void setTheme(String name){
+
+  public void setTheme(String name) throws IOException {
     FileInputStream defaultXmlInputStream = null;
     try {
-      defaultXmlInputStream = new FileInputStream(new File(BaseNoGui.getContentFile("lib"), "theme/syntax/"+name+".xml"));
+      defaultXmlInputStream = new FileInputStream(new File(BaseNoGui.getContentFile("lib"), "theme/syntax/" + name + ".xml"));
       Theme theme = Theme.load(defaultXmlInputStream);
       theme.apply(this);
-    } catch (IOException e) {
-      e.printStackTrace();
     } finally {
       if (defaultXmlInputStream != null) {
-        try {
-          defaultXmlInputStream.close();
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
+        defaultXmlInputStream.close();
       }
     }
   }
-  
+
   // Removing the default focus traversal keys
   // This is because the DefaultKeyboardFocusManager handles the keypress and consumes the event
   protected void fixControlTab(){

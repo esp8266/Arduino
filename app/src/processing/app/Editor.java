@@ -451,9 +451,7 @@ public class Editor extends JFrame implements RunnerListener {
     saveAsMenuItem.setEnabled(!external);
 
     scrollPane.setLineNumbersEnabled(PreferencesData.getBoolean("editor.linenumbers"));
-        
-    textarea.setTheme(PreferencesData.get("editor.syntax_theme"));
-    
+
     textarea.setCodeFoldingEnabled(PreferencesData.getBoolean("editor.code_folding"));
 
     if (external) {
@@ -957,7 +955,7 @@ public class Editor extends JFrame implements RunnerListener {
   }
 
   
-  protected SketchTextArea createTextArea(){
+  protected SketchTextArea createTextArea() throws IOException {
       SketchTextArea textArea = new SketchTextArea();
       textArea.requestFocusInWindow();
       textArea.setMarkOccurrences(true);

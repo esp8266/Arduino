@@ -231,7 +231,6 @@ public class Preferences {
   JCheckBox autoAssociateBox;
   JComboBox comboLanguage;
   JComboBox comboWarnings;
-  JComboBox comboSyntaxThemes;
   JCheckBox saveVerifyUploadBox;
   JTextField proxyHTTPServer;
   JTextField proxyHTTPPort;
@@ -359,27 +358,6 @@ public class Preferences {
     fontSizeField.setText(String.valueOf(editorFont.getSize()));
     top += d.height + GUI_BETWEEN;
 
-    // Syntax Coloring [    ]
-
-    box = Box.createHorizontalBox();
-    label = new JLabel(_("Syntax Coloring: "));
-    box.add(label);
-    String[] syntaxThemes = new String[]{"default","dark"};
-    comboSyntaxThemes = new JComboBox(syntaxThemes);
-    String currentTheme = PreferencesData.get("editor.syntax_theme", "default");
-    for (String item : syntaxThemes) {
-      if (currentTheme.equals(item)) {
-        comboSyntaxThemes.setSelectedItem(item);
-      }
-    }
-    box.add(comboSyntaxThemes);
-    pane.add(box);
-    d = box.getPreferredSize();
-    box.setForeground(Color.gray);
-    box.setBounds(left, top, d.width, d.height);
-    right = Math.max(right, left + d.width);
-    top += d.height + GUI_BETWEEN;
-    
     // Show verbose output during: [ ] compilation [ ] upload
 
     box = Box.createHorizontalBox();
@@ -778,7 +756,6 @@ public class Preferences {
       PreferencesData.set("sketchbook.path", newPath);
     }
 
-    PreferencesData.set("editor.syntax_theme", comboSyntaxThemes.getSelectedItem().toString());
     PreferencesData.setBoolean("editor.external", externalEditorBox.isSelected());
     PreferencesData.setBoolean("update.check", checkUpdatesBox.isSelected());
     PreferencesData.setBoolean("editor.save_on_verify", saveVerifyUploadBox.isSelected());

@@ -86,9 +86,6 @@ editor.window.height.min = 290
 # tested to be 515 on Windows XP, this leaves some room
 #editor.window.height.min.windows = 530
 
-# Syntax coloring  ( on lib/theme/syntax )
-editor.syntax_theme=default
-
 # Enable code folding 
 editor.code_folding=true
 
