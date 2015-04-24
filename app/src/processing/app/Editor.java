@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.zip.*;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.*;
 import javax.swing.text.*;
 import javax.swing.undo.*;
@@ -255,6 +256,7 @@ public class Editor extends JFrame implements RunnerListener {
 
     // RTextScrollPane
     scrollPane = new RTextScrollPane(textarea, true);
+    scrollPane.setBorder(new EmptyBorder(0, 0, 0, 0));
     scrollPane.setViewportBorder(BorderFactory.createEmptyBorder());
     scrollPane.setLineNumbersEnabled(Preferences.getBoolean("editor.linenumbers"));
     scrollPane.setIconRowHeaderEnabled(false);
