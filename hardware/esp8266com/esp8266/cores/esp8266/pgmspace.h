@@ -38,6 +38,12 @@ typedef uint32_t prog_uint32_t;
 #define strcmp_P(a, b) 				strcmp((a), (b))
 #define strstr_P(a, b) 				strstr((a), (b))
 #define strlen_P(s) 				strlen((const char *)(s))
+#define strcasecmp_P(a, b)          strcasecmp((a), (b))
+#define strncpy_P(dest, src, size) 		strncpy((dest), (src), (size))
+#define strncat_P(dest, src, size) 		strncat((dest), (src), (size))
+#define strncmp_P(a, b, size) 			strncmp((a), (b), (size))
+#define strnlen_P(s, size) 				strnlen((const char *)(s), (size))
+#define strncasecmp_P(a, b, size)       strncasecmp((a), (b), (size))
 
 #define pgm_read_byte(addr) 		(*(const unsigned char *)(addr))
 #define pgm_read_word(addr) 		(*(const unsigned short *)(addr))
