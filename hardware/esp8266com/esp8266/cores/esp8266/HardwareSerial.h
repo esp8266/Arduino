@@ -21,6 +21,7 @@
  Modified 3 December 2013 by Matthijs Kooijman
  Modified 18 December 2014 by Ivan Grokhotkov (esp8266 platform support)
  Modified 31 March 2015 by Markus Sattler (rewrite the code for UART0 + UART1 support in ESP8266)
+ Modified 25 April 2015 by Thomas Flayols (add configuration different from 8N1 in ESP8266)
  */
 
 #ifndef HardwareSerial_h
@@ -33,31 +34,31 @@
 #define SERIAL_TX_BUFFER_SIZE 256
 #define SERIAL_RX_BUFFER_SIZE 256
 
-// // Define config for Serial.begin(baud, config);
-// #define SERIAL_5N1 0x00
-// #define SERIAL_6N1 0x02
-// #define SERIAL_7N1 0x04
-// #define SERIAL_8N1 0x06
-// #define SERIAL_5N2 0x08
-// #define SERIAL_6N2 0x0A
-// #define SERIAL_7N2 0x0C
-// #define SERIAL_8N2 0x0E
-// #define SERIAL_5E1 0x20
-// #define SERIAL_6E1 0x22
-// #define SERIAL_7E1 0x24
-// #define SERIAL_8E1 0x26
-// #define SERIAL_5E2 0x28
-// #define SERIAL_6E2 0x2A
-// #define SERIAL_7E2 0x2C
-// #define SERIAL_8E2 0x2E
-// #define SERIAL_5O1 0x30
-// #define SERIAL_6O1 0x32
-// #define SERIAL_7O1 0x34
-// #define SERIAL_8O1 0x36
-// #define SERIAL_5O2 0x38
-// #define SERIAL_6O2 0x3A
-// #define SERIAL_7O2 0x3C
-// #define SERIAL_8O2 0x3E
+// Define config for Serial.begin(baud, config);
+#define SERIAL_5N1 0x10
+#define SERIAL_6N1 0x14
+#define SERIAL_7N1 0x18
+#define SERIAL_8N1 0x1c
+#define SERIAL_5N2 0x30
+#define SERIAL_6N2 0x34
+#define SERIAL_7N2 0x38
+#define SERIAL_8N2 0x3c
+#define SERIAL_5E1 0x12
+#define SERIAL_6E1 0x16
+#define SERIAL_7E1 0x1a
+#define SERIAL_8E1 0x1e
+#define SERIAL_5E2 0x32
+#define SERIAL_6E2 0x36
+#define SERIAL_7E2 0x3a
+#define SERIAL_8E2 0x3e
+#define SERIAL_5O1 0x13
+#define SERIAL_6O1 0x17
+#define SERIAL_7O1 0x1b
+#define SERIAL_8O1 0x1f
+#define SERIAL_5O2 0x33
+#define SERIAL_6O2 0x37
+#define SERIAL_7O2 0x3b
+#define SERIAL_8O2 0x3f
 
 class cbuf;
 
@@ -79,7 +80,7 @@ class HardwareSerial: public Stream {
         HardwareSerial(UARTnr_t uart_nr);
 
         void begin(unsigned long baud) {
-            begin(baud, 0);
+            begin(baud, SERIAL_8N1);
         }
         void begin(unsigned long, uint8_t);
         void end();
