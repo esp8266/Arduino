@@ -111,6 +111,23 @@ enum {
 	ESPCONN_MAX
 };
 
+struct espconn_packet{
+	uint16 sent_length;		/* sent length successful*/
+	uint16 snd_buf_size;	/* Available buffer size for sending  */
+	uint16 snd_queuelen;	/* Available buffer space for sending */
+	uint16 total_queuelen;	/* total Available buffer space for sending */
+	uint32 packseqno;		/* seqno to be sent */
+	uint32 packseq_nxt;		/* seqno expected */
+	uint32 packnum;
+};
+
+struct mdns_info {
+	char *host_name;
+	char *server_name;
+	uint16 server_port;
+	unsigned long ipAddr;
+	char *txt_data;
+};
 /******************************************************************************
  * FunctionName : espconn_connect
  * Description  : The function given as the connect
@@ -212,6 +229,16 @@ sint8 espconn_regist_time(struct espconn *espconn, uint32 interval, uint8 type_f
 *******************************************************************************/
 
 sint8 espconn_get_connection_info(struct espconn *pespconn, remot_info **pcon_info, uint8 typeflags);
+
+/******************************************************************************
+ * FunctionName : espconn_get_packet_info
+ * Description  : get the packet info with host
+ * Parameters   : espconn -- the espconn used to disconnect the connection
+ * 				  infoarg -- the packet info
+ * Returns      : the errur code
+*******************************************************************************/
+
+sint8 espconn_get_packet_info(struct espconn *espconn, struct espconn_packet* infoarg);
 
 /******************************************************************************
  * FunctionName : espconn_regist_sentcb
@@ -471,5 +498,85 @@ sint8 espconn_recv_hold(struct espconn *pespconn);
 *******************************************************************************/
 sint8 espconn_recv_unhold(struct espconn *pespconn);
 
+/******************************************************************************
+ * FunctionName : espconn_mdns_init
+ * Description  : register a device with mdns
+ * Parameters   : ipAddr -- the ip address of device
+ * 				  hostname -- the hostname of device
+ * Returns      : none
+*******************************************************************************/
+
+void espconn_mdns_init(struct mdns_info *info);
+/******************************************************************************
+ * FunctionName : espconn_mdns_close
+ * Description  : close a device with mdns
+ * Parameters   : a
+ * Returns      : none
+*******************************************************************************/
+
+void espconn_mdns_close(void);
+/******************************************************************************
+ * FunctionName : espconn_mdns_server_register
+ * Description  : register a device with mdns
+ * Parameters   : a
+ * Returns      : none
+*******************************************************************************/
+void espconn_mdns_server_register(void);
+
+/******************************************************************************
+ * FunctionName : espconn_mdns_server_unregister
+ * Description  : unregister a device with mdns
+ * Parameters   : a
+ * Returns      : none
+*******************************************************************************/
+void espconn_mdns_server_unregister(void);
+
+/******************************************************************************
+ * FunctionName : espconn_mdns_get_servername
+ * Description  : get server name of device with mdns
+ * Parameters   : a
+ * Returns      : none
+*******************************************************************************/
+
+char* espconn_mdns_get_servername(void);
+/******************************************************************************
+ * FunctionName : espconn_mdns_set_servername
+ * Description  : set server name of device with mdns
+ * Parameters   : a
+ * Returns      : none
+*******************************************************************************/
+void espconn_mdns_set_servername(const char *name);
+
+/******************************************************************************
+ * FunctionName : espconn_mdns_set_hostname
+ * Description  : set host name of device with mdns
+ * Parameters   : a
+ * Returns      : none
+*******************************************************************************/
+void espconn_mdns_set_hostname(char *name);
+
+/******************************************************************************
+ * FunctionName : espconn_mdns_get_hostname
+ * Description  : get host name of device with mdns
+ * Parameters   : a
+ * Returns      : none
+*******************************************************************************/
+char* espconn_mdns_get_hostname(void);
+
+/******************************************************************************
+ * FunctionName : espconn_mdns_disable
+ * Description  : disable a device with mdns
+ * Parameters   : a
+ * Returns      : none
+*******************************************************************************/
+void espconn_mdns_disable(void);
+
+/******************************************************************************
+ * FunctionName : espconn_mdns_enable
+ * Description  : disable a device with mdns
+ * Parameters   : a
+ * Returns      : none
+*******************************************************************************/
+void espconn_mdns_enable(void);
 #endif
 
