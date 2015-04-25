@@ -1,3 +1,63 @@
+esp_iot_sdk_v1.0.1_15_04_24 Release Note 
+-------------------------------------------
+
+Resolved Issues(Bugs below are eligible for Bug Bounty Program):
+1. SSL connection may fail if SSL packet size larger than 2kBytes [PeteW ] 
+2. UDP remote IP to be 0.0.0.0 may cause reset [Jerry S] 
+3. Optimize wifi_get_ip_info to fix loss of wireless connectivity problem 
+4. Air-Kiss restart [Orgmar] 
+
+Optimization:
+1. Optimized IOT_Espressif_EspTouch.APK (apply for access from Espressif) for improved compatibility. [???] 
+2. TCP server can not open again immediately with the same port [624908539] 
+3. Update UART driver for parity bit value may be incorrect [1062583993] 
+4. Add define of “ICACHE_RODATA_ATTR” for Symbol 'ICACHE_RODATA_ATTR' could not be resolved. [???] 
+5. Add API wifi_softap_dhcps_set_offer_option to enable/disable ESP8266 softAP DHCP server default gateway. [xyz769] 
+6. AT register_uart_rx_intr may enter callback twice. [???] 
+7.optimize document that WPA password length range : 8 ~ 64 bytes [785057041] 
+8. ESP8266 softAP DHCP server record 8 DHCP client's IP at most [ygjeon] 
+9. To set static IP (wifi_set_ip_info) has to disable DHCP first(wifi_softap_dhcps_stop or wifi_station_dhcpc_stop) 
+10.Add example of wifi_softap_set_dhcps_lease
+11. smartconfig_start can only be called in ESP8266 station mode 
+
+Added APIs: 
+1. Wi-Fi related APIs: 
+wifi_station_set_reconnect_policy: enable/disable reconnect when ESP8266 disconnect from router,default to be enable reconnect. 
+wifi_set_event_handler_cb: set event handler of ESP8266 softAP or station status change. 
+wifi_softap_dhcps_set_offer_option: enable/disable get router information from ESP8266 softAP, default to be enable. 
+2. SNTP APIs: 
+sntp_get_current_timestamp: get current timestamp from Jan 01, 1970, 00:00 (GMT) 
+sntp_get_real_time: char,get real time (GTM + 8 time zone) 
+sntp_init: initialize SNTP 
+sntp_stop: stop SNTP 
+sntp_setserver: set SNTP server by IP 
+sntp_getserver: get SNTP server IP 
+sntp_setservername: set SNTP server by domain name 
+sntp_getservername: get domain name of SNTP server set by sntp_setservername 
+3. MDNS APIs: 
+espconn_mdns_init: initialize mDNS 
+espconn_mdns_close: close mDNS 
+espconn_mdns_server_register: register mDNS server 
+espconn_mdns_server_unregister: unregister mDNS server 
+espconn_mdns_get_servername: get mDNS server name 
+espconn_mdns_set_servername: set mDNS server name 
+espconn_mdns_set_hostname: get mDNS host name 
+espconn_mdns_get_hostname: set mDNS host name 
+espconn_mdns_disable: disable mDNS 
+espconn_mdns_enable: endisable mDNS 
+
+AT_v0.23 Release Note: 
+Optimized: 
+1.AT+CWJAP add parameter "bssid", for several APs may have the same SSID 
+
+New AT commands: 
+1. AT+CIPSENDBUF: write data into TCP-send-buffer; non-blocking. Background task automatically handles transmission. Has much higher throughput. 
+2. AT+CIPBUFRESET: resets segment count in TCP-send-buffer 
+3. AT+CIPBUFSTATUS: checks status of TCP-send-buffer 
+4. AT+CIPCHECKSEGID: checks if a specific segment in TCP-send-buffer has sent successfully 
+
+
+
 esp_iot_sdk_v1.0.1_b2_15_04_10 release note
 -------------------------------------------
 
