@@ -1,0 +1,1 @@
+{"mixinTypes":["contribution"],"builders":{"configs":{}},"runners":{"configs":{}},"description":"Arduino IDE for ESP8266","type":"blank","attributes":{"contribute_branch":["esp8266"],"contribute_mode":["contribute"]}}

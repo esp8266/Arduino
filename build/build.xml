@@ -952,7 +952,7 @@
    <target name="source-dist" depends="revision-check"
 	  description="Build .tar.gz of source code">
     <input message="Enter version number:"
-	   addproperty="vreersion"
+	   addproperty="version"
 	   defaultvalue="${revision}" />
 
     <tar compression="gzip" destfile="arduino-${version}-src.tar.gz">
