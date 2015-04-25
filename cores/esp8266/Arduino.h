@@ -33,10 +33,9 @@ extern "C" {
 #include <string.h>
 #include <math.h>
 
+#include "stdlib_noniso.h"
 #include "binary.h"
 #include "pgmspace.h"
-
-
 
 void yield(void);
 
