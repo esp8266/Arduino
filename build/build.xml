@@ -47,9 +47,6 @@
   <condition property="launch4j-download-unpack-target-name" value="launch4j-windows"><os family="windows" /></condition>
   <property name="launch4j-download-unpack-target-name" value="launch4j-linux"/>
 
-  <property name="MACOSX_BUNDLED_JVM" value="${java.home}/../"/>
-  <property name="WINDOWS_BUNDLED_JVM" value="${java.home}"/>
-
   <!-- Libraries required for running arduino -->
   <fileset dir=".." id="runtime.jars">
     <include name="arduino-core/arduino-core.jar" />
@@ -732,6 +729,30 @@
   <target name="linux-dist" depends="build"
 	  description="Build .tar.xz of linux version">
 
+    <!--get src="http://dev.processing.org/build/jre-tools-6u18-linux-i586.tgz" 
+	 dest="linux/jre.tgz" 
+	 usetimestamp="true" />    
+    <untar compression="gzip" 
+	   dest="linux/work" 
+	   src="linux/jre.tgz" 
+	   overwrite="false"/-->
+
+<!--
+    <tar compression="gzip" basedir="linux/work"
+	 destfile="linux/arduino-${version}.tgz" />
+
+    <tar compression="gzip" destfile="linux/arduino-${version}-linux.tgz">
+      <tarfileset dir="linux/work"
+		  prefix="arduino-${version}"
+		  excludes="arduino,
+			    hardware/tools/avrdude,
+			    java/**"
+		  />
+      <tarfileset file="linux/work/arduino" filemode="755" prefix="arduino-${version}" />
+      <tarfileset file="linux/work/hardware/tools/avrdude" filemode="755"
+		  prefix="arduino-${version}/hardware/tools" />
+    </tar>
+-->
     <move file="linux/work" tofile="linux/arduino-${version}" />
 
     <exec executable="tar" dir="linux">
@@ -914,21 +935,15 @@
 	  dir="windows/work" spawn="true"/>
   </target>
 
-  <target name="windows-dist" depends="windows-build" description="Create .zip files of windows version">
+  <target name="windows-dist" depends="windows-build"
+	  description="Create .zip files of windows version">
 
-    <loadproperties srcfile="${WINDOWS_BUNDLED_JVM}/release" prefix="windows"/>
-
-    <fail message="It looks like ${WINDOWS_BUNDLED_JVM} does not contain a Windows JVM">
-      <condition>
-        <not>
-          <equals arg1="${windows.OS_NAME}" arg2="&quot;Windows&quot;"/>
-        </not>
-      </condition>
-    </fail>
-
-    <copy todir="${staging_folder}/work/java" includeemptydirs="true" preservelastmodified="true" overwrite="true" failonerror="true">
-      <fileset dir="${WINDOWS_BUNDLED_JVM}" includes="*/**"/>
-    </copy>
+    <antcall target="unzip">
+      <param name="archive_file" value="windows/jre-8u31.zip" />
+      <param name="archive_url" value="http://arduino.cc/download.php?f=/jre-8u31.zip" />
+      <param name="final_folder" value="${staging_folder}/work/java" />
+      <param name="dest_folder" value="${staging_folder}/work/" />
+    </antcall>
 
     <zip destfile="windows/arduino-${version}-${platform}.zip" level="9">
       <zipfileset dir="windows/work"
