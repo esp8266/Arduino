@@ -118,6 +118,7 @@ void ets_isr_unmask(int intr);
 void ets_isr_attach(int intr, int_handler_t handler, void *arg);
 void ets_intr_lock();
 void ets_intr_unlock();
-
+int ets_vsnprintf(char * s, size_t n, const char * format, va_list arg);
+int ets_vprintf(const char * format, va_list arg);
 
 #endif /* _ETS_SYS_H */

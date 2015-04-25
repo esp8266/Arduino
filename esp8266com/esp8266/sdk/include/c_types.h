@@ -7,6 +7,7 @@
 #define _C_TYPES_H_
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdarg.h>
 
 typedef signed char         sint8_t;
 typedef signed short        sint16_t;

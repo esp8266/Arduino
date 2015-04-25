@@ -1,14 +1,24 @@
 #ifndef __PGMSPACE_H_
 #define __PGMSPACE_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <stdint.h>
+#include <stdio.h>
+#include "ets_sys.h"
+#include "osapi.h"
+#ifdef __cplusplus
+}
+#endif
 
 #define PROGMEM
 #define PGM_P  		const char *
 #define PSTR(str) 	(str)
 
-#define vsnprintf_P(...) 	vsnprintf( __VA_ARGS__ )
+#define vsnprintf_P(...) 	ets_vsnprintf( __VA_ARGS__ )
 #define snprintf_P(...) 	snprintf( __VA_ARGS__ )
+#define printf_P(...)       os_printf(__VA_ARGS__)
 
 #define _SFR_BYTE(n) (n)
 
