@@ -170,7 +170,7 @@ class ClientContext {
             _size_sent = will_send;
             DEBUGV(":wr\r\n");
             _send_waiting = true;
-            delay(5000); // max send timeout
+            tcp_output( _pcb );
             _send_waiting = false;
             DEBUGV(":ww\r\n");
             return will_send - _size_sent;
