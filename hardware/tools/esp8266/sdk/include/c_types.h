@@ -66,10 +66,12 @@ typedef enum {
 #define SHMEM_ATTR
 
 #ifdef ICACHE_FLASH
-#define ICACHE_FLASH_ATTR __attribute__((section(".irom0.text")))
-#define ICACHE_RODATA_ATTR __attribute__((section(".irom.text")))
+#define ICACHE_FLASH_ATTR   __attribute__((section(".irom0.text")))
+#define ICACHE_RAM_ATTR     __attribute__((section(".text")))
+#define ICACHE_RODATA_ATTR  __attribute__((section(".irom.text")))
 #else
 #define ICACHE_FLASH_ATTR
+#define ICACHE_RAM_ATTR
 #define ICACHE_RODATA_ATTR
 #endif /* ICACHE_FLASH */
 
