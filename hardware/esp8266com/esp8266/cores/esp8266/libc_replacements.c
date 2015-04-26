@@ -116,6 +116,13 @@ char* strncpy(char * dest, const char * src, size_t n) {
     return ets_strncpy(dest, src, n);
 }
 
+size_t strnlen(const char *s, size_t len) {
+    // there is no ets_strnlen
+    const char *cp;
+    for (cp = s; len != 0 && *cp != '\0'; cp++, len--);
+    return (size_t)(cp - s);
+}
+
 char* strstr(const char *haystack, const char *needle) {
     return ets_strstr(haystack, needle);
 }
