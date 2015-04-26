@@ -143,6 +143,16 @@ void ESP8266WiFiClass::softAP(const char* ssid, const char* passphrase, int chan
     ETS_UART_INTR_ENABLE();
 }
 
+void ESP8266WiFiClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPAddress subnet)
+{
+    struct ip_info info;
+    info.ip.addr = static_cast<uint32_t>(local_ip);
+    info.gw.addr = static_cast<uint32_t>(gateway);
+    info.netmask.addr = static_cast<uint32_t>(subnet);
+    wifi_softap_dhcps_stop();
+    wifi_set_ip_info(SOFTAP_IF, &info);
+    wifi_softap_dhcps_start();
+}
 
 uint8_t* ESP8266WiFiClass::macAddress(uint8_t* mac)
 {

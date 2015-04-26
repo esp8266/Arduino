@@ -49,3 +49,10 @@ build/windows/launcher/launch4j
 build/windows/WinAVR-*.zip
 hardware/arduino/avr/libraries/Bridge/examples/XivelyClient/passwords.h
 avr-toolchain-*.zip
+/hardware/tools/esp8266/utils/
+/hardware/tools/esp8266/xtensa-lx106-elf
+/hardware/tools/esp8266/esptool.exe
+/hardware/tools/avr/
+/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/
+/hardware/tools/bossac.exe
+/hardware/tools/listComPorts.exe

@@ -33,10 +33,9 @@ extern "C" {
 #include <string.h>
 #include <math.h>
 
+#include "stdlib_noniso.h"
 #include "binary.h"
 #include "pgmspace.h"
-
-
 
 void yield(void);
 
@@ -46,6 +45,7 @@ void yield(void);
 #define INPUT 0x0
 #define OUTPUT 0x1
 #define INPUT_PULLUP 0x2
+#define INPUT_PULLDOWN 0x3
 #define OUTPUT_OPEN_DRAIN 0x4
 
 #define PI 3.1415926535897932384626433832795

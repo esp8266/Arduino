@@ -29,6 +29,7 @@
 #include <math.h>
 #include <limits.h>
 #include <errno.h>
+#include <string.h>
 
 #include "ets_sys.h"
 #include "os_type.h"
@@ -113,6 +114,13 @@ int strncmp(const char *s1, const char *s2, size_t len) {
 
 char* strncpy(char * dest, const char * src, size_t n) {
     return ets_strncpy(dest, src, n);
+}
+
+size_t strnlen(const char *s, size_t len) {
+    // there is no ets_strnlen
+    const char *cp;
+    for (cp = s; len != 0 && *cp != '\0'; cp++, len--);
+    return (size_t)(cp - s);
 }
 
 char* strstr(const char *haystack, const char *needle) {
