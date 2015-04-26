@@ -101,7 +101,7 @@ UARTnr_t uart_get_debug();
 // ####################################################################################################
 // ####################################################################################################
 
-void uart_interrupt_handler(uart_t* uart) {
+void ICACHE_RAM_ATTR uart_interrupt_handler(uart_t* uart) {
 
     // -------------- UART 0 --------------
     uint32_t status = READ_PERI_REG(UART_INT_ST(0));
