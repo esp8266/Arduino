@@ -108,6 +108,7 @@ void ets_intr_unlock();
 typedef unsigned int word;
 
 #define bit(b) (1UL << (b))
+#define _BV(b) (1UL << (b))
 
 typedef uint8_t boolean;
 typedef uint8_t byte;
