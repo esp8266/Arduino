@@ -63,7 +63,6 @@ volatile uint32_t* portModeRegister(uint32_t port) {
 enum PinFunction {
     GPIO, PWM
 };
-static uint32_t g_gpio_function[PINCOUNT] = { GPIO };
 
 extern void __pinMode(uint8_t pin, uint8_t mode) {
     if(pin == 16) {

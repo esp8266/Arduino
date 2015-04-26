@@ -180,7 +180,7 @@ char * dtostrf(double number, signed char width, unsigned char prec, char *s) {
     // Extract the integer part of the number and print it
     unsigned long int_part = (unsigned long) number;
     double remainder = number - (double) int_part;
-    out += sprintf(out, "%d", int_part);
+    out += sprintf(out, "%ld", int_part);
 
     // Print the decimal point, but only if there are digits beyond
     if(prec > 0) {
