@@ -259,7 +259,7 @@ void ESP8266WebServer::_parseArguments(String data)
 		Serial.print(" &@ ");
 		Serial.println(next_arg_index);
 #endif
-		if (equal_sign_index == -1 || equal_sign_index > next_arg_index && next_arg_index != -1) {
+		if ((equal_sign_index == -1) || ((equal_sign_index > next_arg_index) && (next_arg_index != -1))) {
 #ifdef DEBUG
 			Serial.print("arg missing value: ");
 			Serial.println(iarg);
