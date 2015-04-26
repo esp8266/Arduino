@@ -41,6 +41,7 @@ public:
     ESP8266WiFiClass();
 
     void mode(WiFiMode);
+        
     
     /* Start Wifi connection for OPEN networks
      *
@@ -211,12 +212,29 @@ public:
      */
     void printDiag(Print& dest);
 
+    /*
+     * Start SmartConfig
+     *
+     */ 
+    void beginSmartConfig();
+    
+    /*
+     * Query SmartConfig status, to decide when stop config
+     *
+     */    
+    bool smartConfigDone();
+
+    void stopSmartConfig();
+
     friend class WiFiClient;
     friend class WiFiServer;
 
 protected:
     static void _scanDone(void* result, int status);
     void * _getScanInfoByIndex(int i);
+    static void _smartConfigDone(void* result);
+    bool _smartConfigStarted = false;
+
     static size_t _scanCount;
     static void* _scanResult;
 

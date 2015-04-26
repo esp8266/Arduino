@@ -19,7 +19,7 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
  Modified 31 March 2015 by Markus Sattler (rewrite the code for UART0 + UART1 support in ESP8266)
-
+ Modified 25 April 2015 by Thomas Flayols (add configuration different from 8N1 in ESP8266)
  */
 
 #include <stdlib.h>
@@ -86,7 +86,7 @@ void uart_disarm_tx_interrupt(uart_t* uart);
 void uart_set_baudrate(uart_t* uart, int baud_rate);
 int uart_get_baudrate(uart_t* uart);
 
-uart_t* uart_init(UARTnr_t uart_nr, int baudrate);
+uart_t* uart_init(UARTnr_t uart_nr, int baudrate, byte config);
 void uart_uninit(uart_t* uart);
 void uart_swap(uart_t* uart);
 
@@ -278,7 +278,7 @@ int ICACHE_FLASH_ATTR uart_get_baudrate(uart_t* uart) {
     return uart->baud_rate;
 }
 
-uart_t* ICACHE_FLASH_ATTR uart_init(UARTnr_t uart_nr, int baudrate) {
+uart_t* ICACHE_FLASH_ATTR uart_init(UARTnr_t uart_nr, int baudrate, byte config) {
 
     uint32_t conf1 = 0x00000000;
     uart_t* uart = (uart_t*) os_malloc(sizeof(uart_t));
@@ -314,7 +314,7 @@ uart_t* ICACHE_FLASH_ATTR uart_init(UARTnr_t uart_nr, int baudrate) {
             break;
     }
     uart_set_baudrate(uart, baudrate);
-    WRITE_PERI_REG(UART_CONF0(uart->uart_nr), 0x3 << UART_BIT_NUM_S);   // 8n1
+    WRITE_PERI_REG(UART_CONF0(uart->uart_nr), config);
 
     uart_flush(uart);
     uart_interrupt_enable(uart);
@@ -493,7 +493,7 @@ void ICACHE_FLASH_ATTR HardwareSerial::begin(unsigned long baud, byte config) {
         uart_set_debug(UART_NO);
     }
 
-    _uart = uart_init(_uart_nr, baud);
+    _uart = uart_init(_uart_nr, baud, config);
 
     if(_uart == 0) {
         return;
