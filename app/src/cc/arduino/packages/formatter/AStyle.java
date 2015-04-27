@@ -31,18 +31,17 @@
 
 package cc.arduino.packages.formatter;
 
-import static processing.app.I18n._;
-
-import java.io.File;
-import java.io.IOException;
-
-import javax.swing.text.BadLocationException;
-
 import processing.app.Base;
 import processing.app.Editor;
 import processing.app.helpers.FileUtils;
 import processing.app.syntax.SketchTextArea;
 import processing.app.tools.Tool;
+
+import javax.swing.text.BadLocationException;
+import java.io.File;
+import java.io.IOException;
+
+import static processing.app.I18n._;
 
 public class AStyle implements Tool {
 
@@ -89,18 +88,45 @@ public class AStyle implements Tool {
     }
 
     SketchTextArea textArea = editor.getTextArea();
+
+    int line = getLineOfOffset(textArea);
+    int lineOffset = getLineOffset(textArea, line);
+
     editor.setText(formattedText);
     editor.getSketch().setModified(true);
-    
+
+    if (line != -1 && lineOffset != -1) {
+      setCaretPosition(textArea, line, lineOffset);
+    }
+
+    // mark as finished
+    editor.statusNotice(_("Auto Format finished."));
+  }
+
+  private void setCaretPosition(SketchTextArea textArea, int line, int lineOffset) {
     try {
-      int line = textArea.getLineOfOffset(textArea.getCaretPosition());
-      int lineOffset = textArea.getCaretPosition() - textArea.getLineStartOffset(line);
       textArea.setCaretPosition(Math.min(textArea.getLineStartOffset(line) + lineOffset, textArea.getLineEndOffset(line) - 1));
     } catch (BadLocationException e) {
       e.printStackTrace();
     }
-    // mark as finished
-    editor.statusNotice(_("Auto Format finished."));
+  }
+
+  private int getLineOffset(SketchTextArea textArea, int line) {
+    try {
+      return textArea.getCaretPosition() - textArea.getLineStartOffset(line);
+    } catch (BadLocationException e) {
+      e.printStackTrace();
+    }
+    return -1;
+  }
+
+  private int getLineOfOffset(SketchTextArea textArea) {
+    try {
+      return textArea.getLineOfOffset(textArea.getCaretPosition());
+    } catch (BadLocationException e) {
+      e.printStackTrace();
+    }
+    return -1;
   }
 
   @Override

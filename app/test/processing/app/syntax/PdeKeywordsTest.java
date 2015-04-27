@@ -16,15 +16,15 @@ public class PdeKeywordsTest extends AbstractWithPreferencesTest {
     pdeKeywords.reload();
 
     assertEquals("Constants", pdeKeywords.getReference("HIGH"));
-    assertEquals("IDENTIFIER", pdeKeywords.getTokenTypeAsString("HIGH"));
-    assertEquals(TokenTypes.IDENTIFIER, pdeKeywords.getTokenType("HIGH".toCharArray(), 0, 3));
+    assertEquals("RESERVED_WORD_2", pdeKeywords.getTokenTypeAsString("HIGH"));
+    assertEquals(TokenTypes.RESERVED_WORD_2, pdeKeywords.getTokenType("HIGH".toCharArray(), 0, 3));
 
     assertEquals("IncrementCompound", pdeKeywords.getReference("+="));
     assertNull(pdeKeywords.getTokenTypeAsString("+="));
 
     assertNull(pdeKeywords.getReference("Mouse"));
-    assertEquals("VARIABLE", pdeKeywords.getTokenTypeAsString("Mouse"));
-    assertEquals(TokenTypes.VARIABLE, pdeKeywords.getTokenType("Mouse".toCharArray(), 0, 4));
+    assertEquals("DATA_TYPE", pdeKeywords.getTokenTypeAsString("Mouse"));
+    assertEquals(TokenTypes.DATA_TYPE, pdeKeywords.getTokenType("Mouse".toCharArray(), 0, 4));
   }
 
 }
