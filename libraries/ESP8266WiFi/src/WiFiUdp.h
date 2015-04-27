@@ -40,9 +40,13 @@ public:
 
   operator bool() const { return _ctx != 0; }
 
-  virtual uint8_t begin(uint16_t port);	// initialize, start listening on specified port. Returns 1 if successful, 0 if there are no sockets available to use
-  virtual void stop();  // Finish with the UDP socket
-  uint8_t beginMulticast(IPAddress interfaceAddr, IPAddress multicast, uint16_t port); // connect to a multicast group and listen on the given port
+  // initialize, start listening on specified port. 
+  // Returns 1 if successful, 0 if there are no sockets available to use
+  virtual uint8_t begin(uint16_t port);	
+  // Finish with the UDP connetion
+  virtual void stop();
+  // join a multicast group and listen on the given port
+  uint8_t beginMulticast(IPAddress interfaceAddr, IPAddress multicast, uint16_t port); 
 
   // Sending UDP packets
   
@@ -52,12 +56,19 @@ public:
   // Start building up a packet to send to the remote host specific in host and port
   // Returns 1 if successful, 0 if there was a problem resolving the hostname or port
   virtual int beginPacket(const char *host, uint16_t port);
+  // Start building up a packet to send to the multicast address
+  // multicastAddress - muticast address to send to
+  // interfaceAddress - the local IP address of the interface that should be used
+  //                    use WiFi.localIP() or WiFi.softAPIP() depending on the interface you need
+  // ttl              - multicast packet TTL (default is 1)
+  // Returns 1 if successful, 0 if there was a problem with the supplied IP address or port
+  virtual int beginPacketMulticast(IPAddress multicastAddress, 
+                                   uint16_t port, 
+                                   IPAddress interfaceAddress, 
+                                   int ttl = 1);
   // Finish off this packet and send it
   // Returns 1 if the packet was sent successfully, 0 if there was an error
   virtual int endPacket();
-  // Send the packet to a multicast address
-  // Returns 1 if the packet was sent successfully, 0 if there was an error
-  int endPacketMulticast(IPAddress ip, uint16_t port);
   // Write a single byte into the packet
   virtual size_t write(uint8_t);
   // Write size bytes from buffer into the packet
