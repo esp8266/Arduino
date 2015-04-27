@@ -62,6 +62,7 @@ MDNSResponder::~MDNSResponder() {
 
 bool MDNSResponder::begin(const char* domain, IPAddress addr, uint32_t ttlSeconds)
 { 
+  _localAddr = addr;
   // Construct DNS request/response fully qualified domain name of form:
   // <domain length>, <domain characters>, 5, "local"
   size_t n = strlen(domain);
@@ -190,8 +191,9 @@ void MDNSResponder::update() {
         Serial.print("responding, i=");
         Serial.println(i);
 #endif
+        _mdnsConn.beginPacketMulticast(IPAddress(224, 0, 0, 251), 5353, _localAddr);
         _mdnsConn.write(_response, _responseLen);
-        _mdnsConn.endPacketMulticast(IPAddress(224, 0, 0, 251), 5353);
+        _mdnsConn.endPacket();
         _index = 0;
       }
     }
