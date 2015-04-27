@@ -47,6 +47,7 @@ beginPacket	KEYWORD2
 beginPacketMulticast	KEYWORD2
 endPacket	KEYWORD2
 parsePacket	KEYWORD2
+destinationIP	KEYWORD2
 remoteIP	KEYWORD2
 remotePort	KEYWORD2
 softAP	KEYWORD2
