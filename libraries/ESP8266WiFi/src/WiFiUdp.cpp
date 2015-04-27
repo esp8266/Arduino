@@ -240,6 +240,17 @@ uint16_t WiFiUDP::remotePort()
     return _ctx->getRemotePort();
 }
 
+IPAddress WiFiUDP::destinationIP()
+{
+    IPAddress addr;
+
+    if (!_ctx)
+        return addr;
+
+    addr = _ctx->getDestAddress();
+    return addr;
+}
+
 uint16_t WiFiUDP::localPort()
 {
     if (!_ctx)

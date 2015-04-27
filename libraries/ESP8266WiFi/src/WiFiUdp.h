@@ -97,6 +97,9 @@ public:
   virtual IPAddress remoteIP();
   // Return the port of the host who sent the current incoming packet
   virtual uint16_t remotePort();
+  // Return the destination address for incoming packets,
+  // useful to distinguish multicast and ordinary packets
+  IPAddress destinationIP();
   // Return the local port for outgoing packets
   uint16_t localPort();
 
