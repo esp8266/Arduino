@@ -26,7 +26,8 @@ class UdpContext;
 extern "C" void esp_yield();
 extern "C" void esp_schedule();
 
-
+#define GET_IP_HDR(pb) reinterpret_cast<ip_hdr*>(((uint8_t*)((pb)->payload)) - UDP_HLEN - IP_HLEN);
+#define GET_UDP_HDR(pb) reinterpret_cast<udp_hdr*>(((uint8_t*)((pb)->payload)) - UDP_HLEN);
 class UdpContext
 {
 public:
@@ -122,7 +123,7 @@ public:
         if (!_rx_buf)
             return 0;
 
-        struct ip_hdr* iphdr = (struct ip_hdr*) (((uint8_t*)_rx_buf->payload) - UDP_HLEN - IP_HLEN);
+        ip_hdr* iphdr = GET_IP_HDR(_rx_buf);
         return iphdr->src.addr;
     }
 
@@ -131,8 +132,14 @@ public:
         if (!_rx_buf)
             return 0;
 
-        struct udp_hdr* udphdr = (struct udp_hdr*) (((uint8_t*)_rx_buf->payload) - UDP_HLEN);
+        udp_hdr* udphdr = GET_UDP_HDR(_rx_buf);
         return ntohs(udphdr->src);
+    }
+
+    uint32_t getDestAddress()
+    {
+        ip_hdr* iphdr = GET_IP_HDR(_rx_buf);
+        return iphdr->dest.addr;
     }
 
     uint16_t getLocalPort()
