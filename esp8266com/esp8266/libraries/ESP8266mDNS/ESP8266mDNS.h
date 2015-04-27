@@ -64,6 +64,8 @@ private:
   int _responseLen;
   // Socket for MDNS communication
   WiFiUDP _mdnsConn;
+  // local IP Address
+  IPAddress _localAddr;
 };
 
 #endif //ESP8266MDNS_H

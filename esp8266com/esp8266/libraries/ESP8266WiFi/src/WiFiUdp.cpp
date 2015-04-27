@@ -142,22 +142,33 @@ int WiFiUDP::beginPacket(IPAddress ip, uint16_t port)
     return (_ctx->connect(addr, port)) ? 1 : 0;
 }
 
+int WiFiUDP::beginPacketMulticast(IPAddress multicastAddress, uint16_t port, 
+    IPAddress interfaceAddress, int ttl)
+{
+    ip_addr_t mcastAddr;
+    mcastAddr.addr = multicastAddress;
+    ip_addr_t ifaceAddr;
+    ifaceAddr.addr = interfaceAddress;
+
+    if (!_ctx) {
+        _ctx = new UdpContext;
+        _ctx->ref();
+    }
+    if (!_ctx->connect(mcastAddr, port)) {
+        return 0;
+    }
+    _ctx->setMulticastInterface(ifaceAddr);
+    _ctx->setMulticastTTL(ttl);
+    return 1;
+}
+
 int WiFiUDP::endPacket()
 {
     if (!_ctx)
         return 0;
 
     _ctx->send();
-    return 1;
-}
-
-int WiFiUDP::endPacketMulticast(IPAddress ip, uint16_t port)
-{
-    if (!_ctx)
-        return 0;
-    ip_addr_t addr;
-    addr.addr = (uint32_t) ip;
-    _ctx->send(&addr, port);
+    _ctx->disconnect();
     return 1;
 }
 
@@ -227,6 +238,17 @@ uint16_t WiFiUDP::remotePort()
         return 0;
 
     return _ctx->getRemotePort();
+}
+
+IPAddress WiFiUDP::destinationIP()
+{
+    IPAddress addr;
+
+    if (!_ctx)
+        return addr;
+
+    addr = _ctx->getDestAddress();
+    return addr;
 }
 
 uint16_t WiFiUDP::localPort()
