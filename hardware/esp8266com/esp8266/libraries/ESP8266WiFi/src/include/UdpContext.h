@@ -94,6 +94,21 @@ public:
         udp_disconnect(_pcb);
     }
 
+    void setMulticastInterface(ip_addr_t addr)
+    {
+        // newer versions of lwip have a macro to set the multicast ip
+        // udp_set_multicast_netif_addr(_pcb, addr);
+        _pcb->multicast_ip = addr;
+    }
+
+    void setMulticastTTL(int ttl)
+    {
+        // newer versions of lwip have an additional field (mcast_ttl) for this purpose
+        // and a macro to set it instead of direct field access
+        // udp_set_multicast_ttl(_pcb, ttl);
+        _pcb->ttl = ttl;
+    }
+
     size_t getSize() const
     {
         if (!_rx_buf)
