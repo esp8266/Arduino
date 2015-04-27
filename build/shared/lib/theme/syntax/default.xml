@@ -18,7 +18,7 @@
    <marginLine fg="b0b4b9"/>
    <markAllHighlight color="ffc800"/>
    <markOccurrencesHighlight color="d4d4d4" border="false"/>
-   <matchedBracket fg="000080" bg="eaeaff" highlightBoth="false" animate="true"/>
+   <matchedBracket fg="000080" bg="ffffff" highlightBoth="false" animate="true"/>
    <hyperlinks fg="0000ff"/>
    <secondaryLanguages>
       <language index="1" bg="fff0cc"/>
@@ -40,7 +40,7 @@
       <style token="VARIABLE" fg="cc6600" bold="true"/>
       <style token="RESERVED_WORD" fg="024f8b" bold="true"/>
       <style token="RESERVED_WORD_2" fg="008080" bold="false"/>
-      <style token="PREPROCESSOR" fg="024f8b" bold="false"/>
+      <style token="PREPROCESSOR" fg="000000" bold="false"/>
 
       <style token="ANNOTATION" fg="808080"/>
       <style token="COMMENT_DOCUMENTATION" fg="7e7e7e"/>
@@ -48,13 +48,13 @@
       <style token="COMMENT_MULTILINE" fg="7e7e7e"/>
       <style token="COMMENT_KEYWORD" fg="7F9FBF" bold="true"/>
       <style token="COMMENT_MARKUP" fg="7f7f9f"/>
-      <style token="LITERAL_BOOLEAN" fg="ff0000" bold="false"/>
-      <style token="LITERAL_NUMBER_DECIMAL_INT" fg="ff0000"/>
-      <style token="LITERAL_NUMBER_FLOAT" fg="ff0000"/>
-      <style token="LITERAL_NUMBER_HEXADECIMAL" fg="ff0000"/>
+      <style token="LITERAL_BOOLEAN" fg="000000" bold="false"/>
+      <style token="LITERAL_NUMBER_DECIMAL_INT" fg="000000"/>
+      <style token="LITERAL_NUMBER_FLOAT" fg="000000"/>
+      <style token="LITERAL_NUMBER_HEXADECIMAL" fg="000000"/>
       <style token="LITERAL_STRING_DOUBLE_QUOTE" fg="006699"/>
-      <style token="LITERAL_CHAR" fg="DC009C"/>
-      <style token="LITERAL_BACKQUOTE" fg="DC009C"/>
+      <style token="LITERAL_CHAR" fg="006699"/>
+      <style token="LITERAL_BACKQUOTE" fg="000000"/>
 
       <style token="OPERATOR" fg="804040"/>
       <style token="REGEX" fg="008040"/>

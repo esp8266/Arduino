@@ -53,6 +53,7 @@ import processing.app.legacy.PApplet;
 import processing.app.macosx.ThinkDifferent;
 import processing.app.packages.LibraryList;
 import processing.app.packages.UserLibrary;
+import processing.app.syntax.PdeKeywords;
 import processing.app.tools.MenuScroller;
 import processing.app.tools.ZipDeflater;
 
@@ -117,6 +118,8 @@ public class Base {
   // actually used are determined by the preferences, which are shared)
   private List<JMenu> boardsCustomMenus;
   private volatile Action openBoardsManager;
+
+  private final PdeKeywords pdeKeywords;
 
   static public void main(String args[]) throws Exception {
     System.setProperty("awt.useSystemAAFontSettings", "on");
@@ -344,6 +347,9 @@ public class Base {
     // handler, but for other modes we should also make sure to save
     // them.
     PreferencesData.save();
+
+    this.pdeKeywords = new PdeKeywords();
+    this.pdeKeywords.reload();
 
     if (parser.isInstallBoard()) {
       ContributionsIndexer indexer = new ContributionsIndexer(BaseNoGui.getSettingsFolder());
@@ -2770,5 +2776,9 @@ public class Base {
 
   public Action getOpenBoardsManager() {
     return openBoardsManager;
+  }
+
+  public PdeKeywords getPdeKeywords() {
+    return pdeKeywords;
   }
 }

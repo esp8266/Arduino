@@ -29,66 +29,67 @@
 
 package processing.app.syntax;
 
-import java.awt.AWTKeyStroke;
-import java.awt.KeyboardFocusManager;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.logging.Logger;
-
-import javax.swing.JPopupMenu;
-import javax.swing.KeyStroke;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import javax.swing.text.Segment;
-import javax.swing.undo.UndoManager;
-
 import org.fife.ui.rsyntaxtextarea.*;
 import org.fife.ui.rsyntaxtextarea.Theme;
 import org.fife.ui.rsyntaxtextarea.Token;
 import org.fife.ui.rsyntaxtextarea.focusabletip.FocusableTip;
 import org.fife.ui.rtextarea.RUndoManager;
-
 import processing.app.*;
+
+import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.Segment;
+import javax.swing.undo.UndoManager;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * Arduino Sketch code editor based on RSyntaxTextArea (http://fifesoft.com/rsyntaxtextarea)
- * @author Ricardo JL Rufino (ricardo@criativasoft.com.br) 
+ *
+ * @author Ricardo JL Rufino (ricardo@criativasoft.com.br)
  * @date 20/04/2015
  * @since 1.6.4
  */
 public class SketchTextArea extends RSyntaxTextArea {
-  
+
   private final static Logger LOG = Logger.getLogger(SketchTextArea.class.getName());
-  
-  /** The last docTooltip displayed. */
+
+  /**
+   * The last docTooltip displayed.
+   */
   private FocusableTip docTooltip;
-  
+
   /**
    * The component that tracks the current line number.
    */
   protected EditorLineStatus editorLineStatus;
 
   private EditorListener editorListener;
-  
-  public SketchTextArea() throws IOException {
-    super();
+
+  private final PdeKeywords pdeKeywords;
+
+  public SketchTextArea(PdeKeywords pdeKeywords) throws IOException {
+    this.pdeKeywords = pdeKeywords;
     installFeatures();
   }
-  
-  
-  protected void installFeatures() throws IOException {
 
+  protected void installFeatures() throws IOException {
     setTheme(PreferencesData.get("editor.syntax_theme", "default"));
 
-    setLinkGenerator(new DocLinkGenerator());
-    
+    setLinkGenerator(new DocLinkGenerator(pdeKeywords));
+
     fixControlTab();
-    installTokenMaker();  
+
+    setSyntaxEditingStyle(SYNTAX_STYLE_CPLUSPLUS);
   }
 
   public void setTheme(String name) throws IOException {
@@ -102,93 +103,118 @@ public class SketchTextArea extends RSyntaxTextArea {
         defaultXmlInputStream.close();
       }
     }
+
+    setForeground(processing.app.Theme.getColor("editor.fgcolor"));
+    setBackground(processing.app.Theme.getColor("editor.bgcolor"));
+    setCurrentLineHighlightColor(processing.app.Theme.getColor("editor.linehighlight.color"));
+    setCaretColor(processing.app.Theme.getColor("editor.caret.color"));
+    setSelectedTextColor(null);
+    setUseSelectedTextColor(false);
+    setSelectionColor(processing.app.Theme.getColor("editor.selection.color"));
+    setMatchedBracketBorderColor(processing.app.Theme.getColor("editor.brackethighlight.color"));
+
+    setSyntaxTheme(TokenTypes.DATA_TYPE, "data_type");
+    setSyntaxTheme(TokenTypes.FUNCTION, "function");
+    setSyntaxTheme(TokenTypes.RESERVED_WORD, "reserved_word");
+    setSyntaxTheme(TokenTypes.RESERVED_WORD_2, "reserved_word_2");
+    setSyntaxTheme(TokenTypes.VARIABLE, "variable");
+    setSyntaxTheme(TokenTypes.OPERATOR, "operator");
+    setSyntaxTheme(TokenTypes.COMMENT_DOCUMENTATION, "comment1");
+    setSyntaxTheme(TokenTypes.COMMENT_EOL, "comment1");
+    setSyntaxTheme(TokenTypes.COMMENT_KEYWORD, "comment1");
+    setSyntaxTheme(TokenTypes.COMMENT_MARKUP, "comment1");
+    setSyntaxTheme(TokenTypes.LITERAL_CHAR, "literal_char");
+    setSyntaxTheme(TokenTypes.LITERAL_STRING_DOUBLE_QUOTE, "literal_string_double_quote");
+  }
+
+  private void setSyntaxTheme(int tokenType, String id) {
+    Style style = getSyntaxScheme().getStyle(tokenType);
+
+    Map<String, Object> styledFont = processing.app.Theme.getStyledFont(id, style.font);
+    style.foreground = (Color) styledFont.get("color");
+    style.font = (Font) styledFont.get("font");
+
+    getSyntaxScheme().setStyle(tokenType, style);
   }
 
   // Removing the default focus traversal keys
   // This is because the DefaultKeyboardFocusManager handles the keypress and consumes the event
-  protected void fixControlTab(){
+  protected void fixControlTab() {
     KeyStroke ctrlTab = KeyStroke.getKeyStroke("ctrl TAB");
     KeyStroke ctrlShiftTab = KeyStroke.getKeyStroke("ctrl shift TAB");
- 
+
     // Remove ctrl-tab from normal focus traversal
     Set<AWTKeyStroke> forwardKeys = new HashSet<AWTKeyStroke>(this.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
     forwardKeys.remove(ctrlTab);
     this.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, forwardKeys);
- 
+
     // Remove ctrl-shift-tab from normal focus traversal
     Set<AWTKeyStroke> backwardKeys = new HashSet<AWTKeyStroke>(this.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
     backwardKeys.remove(ctrlShiftTab);
   }
 
 
-  
   public void setEditorLineStatus(EditorLineStatus editorLineStatus) {
     this.editorLineStatus = editorLineStatus;
   }
-  
+
   @Override
   public void select(int selectionStart, int selectionEnd) {
     super.select(selectionStart, selectionEnd);
-    if(editorLineStatus != null) editorLineStatus.set(selectionStart, selectionEnd);
+    if (editorLineStatus != null) editorLineStatus.set(selectionStart, selectionEnd);
   }
 
   public boolean isSelectionActive() {
     return this.getSelectedText() != null;
   }
-  
-  public void setSelectedText(String text){
-    
+
+  public void setSelectedText(String text) {
+
     int old = getTextMode();
     setTextMode(OVERWRITE_MODE);
     replaceSelection(text);
     setTextMode(old);
-    
+
   }
 
-  protected void installTokenMaker(){
-    AbstractTokenMakerFactory atmf = (AbstractTokenMakerFactory)TokenMakerFactory.getDefaultInstance();
-    atmf.putMapping(SYNTAX_STYLE_CPLUSPLUS, "processing.app.syntax.SketchTokenMaker");
-    setSyntaxEditingStyle(SYNTAX_STYLE_CPLUSPLUS);
-  }
-  
   public void processKeyEvent(KeyEvent evt) {
-  
+
     // this had to be added because the menu key events weren't making it up to the frame.
-    
-    switch(evt.getID()) {
-    case KeyEvent.KEY_TYPED:
-      if (editorListener != null) editorListener.keyTyped(evt);
-      break;
-    case KeyEvent.KEY_PRESSED:
-      if (editorListener != null) editorListener.keyPressed(evt);
-      break;
-    case KeyEvent.KEY_RELEASED:
-      // inputHandler.keyReleased(evt);
-      break;
+
+    switch (evt.getID()) {
+      case KeyEvent.KEY_TYPED:
+        if (editorListener != null) editorListener.keyTyped(evt);
+        break;
+      case KeyEvent.KEY_PRESSED:
+        if (editorListener != null) editorListener.keyPressed(evt);
+        break;
+      case KeyEvent.KEY_RELEASED:
+        // inputHandler.keyReleased(evt);
+        break;
     }
-    
-    if(!evt.isConsumed()){
-       super.processKeyEvent(evt);
+
+    if (!evt.isConsumed()) {
+      super.processKeyEvent(evt);
     }
   }
-  
+
   public void switchDocument(Document document, UndoManager newUndo) {
-    
+
     // HACK: Dont discard changes on curret UndoManager.
     // BUG: https://github.com/bobbylight/RSyntaxTextArea/issues/84
     setUndoManager(null); // bypass reset current undo manager...
-    
+
     super.setDocument(document);
-    
+
     setUndoManager((RUndoManager) newUndo);
-    
+
     // HACK: Complement previous hack (hide code folding on switch) | Drawback: Lose folding state
 //  if(sketch.getCodeCount() > 1 && textarea.isCodeFoldingEnabled()){
 //    textarea.setCodeFoldingEnabled(false);
 //    textarea.setCodeFoldingEnabled(true);
 //  }
-    
-    
+
+
   }
 
   @Override
@@ -196,12 +222,12 @@ public class SketchTextArea extends RSyntaxTextArea {
     JPopupMenu menu = super.createPopupMenu();
     return menu;
   }
-  
+
   @Override
   protected void configurePopupMenu(JPopupMenu popupMenu) {
     super.configurePopupMenu(popupMenu);
   }
-  
+
   public void getTextLine(int line, Segment segment) {
     try {
       int offset = getLineStartOffset(line);
@@ -210,7 +236,7 @@ public class SketchTextArea extends RSyntaxTextArea {
     } catch (BadLocationException e) {
     }
   }
-  
+
   public String getTextLine(int line) {
     try {
       int offset = getLineStartOffset(line);
@@ -220,48 +246,54 @@ public class SketchTextArea extends RSyntaxTextArea {
       return null;
     }
   }
-  
+
 
   public void setEditorListener(EditorListener editorListener) {
     this.editorListener = editorListener;
   }
-  
-  private static class DocLinkGenerator implements LinkGenerator{
-    
-     @Override
-      public LinkGeneratorResult isLinkAtOffset(RSyntaxTextArea textArea, final int offs) {
-        
-        final Token token = textArea.modelToToken(offs);
-        
-        final String reference = PdeKeywords.getReference(token.getLexeme());
 
-        // LOG.fine("reference: " + reference + ", match: " + (token.getType() == TokenTypes.DATA_TYPE || token.getType() == TokenTypes.VARIABLE || token.getType() == TokenTypes.FUNCTION));
-        
-        if(token != null && (reference != null || (token.getType() == TokenTypes.DATA_TYPE || token.getType() == TokenTypes.VARIABLE || token.getType() == TokenTypes.FUNCTION) )){
-          
-          LinkGeneratorResult generatorResult = new LinkGeneratorResult() {
-            
-            @Override
-            public int getSourceOffset() {
-              return offs;
-            }
-            
-            @Override
-            public HyperlinkEvent execute() {
-              
-              LOG.fine("Open Reference: " + reference);
-              
-              Base.showReference("Reference/" + reference);
-              
-              return null;
-            }
-          };
-          
-          return generatorResult;
-        }
-        
-        return null;
+  private static class DocLinkGenerator implements LinkGenerator {
+
+    private final PdeKeywords pdeKeywords;
+
+    public DocLinkGenerator(PdeKeywords pdeKeywords) {
+      this.pdeKeywords = pdeKeywords;
+    }
+
+    @Override
+    public LinkGeneratorResult isLinkAtOffset(RSyntaxTextArea textArea, final int offs) {
+
+      final Token token = textArea.modelToToken(offs);
+
+      final String reference = pdeKeywords.getReference(token.getLexeme());
+
+      // LOG.fine("reference: " + reference + ", match: " + (token.getType() == TokenTypes.DATA_TYPE || token.getType() == TokenTypes.VARIABLE || token.getType() == TokenTypes.FUNCTION));
+
+      if (token != null && (reference != null || (token.getType() == TokenTypes.DATA_TYPE || token.getType() == TokenTypes.VARIABLE || token.getType() == TokenTypes.FUNCTION))) {
+
+        LinkGeneratorResult generatorResult = new LinkGeneratorResult() {
+
+          @Override
+          public int getSourceOffset() {
+            return offs;
+          }
+
+          @Override
+          public HyperlinkEvent execute() {
+
+            LOG.fine("Open Reference: " + reference);
+
+            Base.showReference("Reference/" + reference);
+
+            return null;
+          }
+        };
+
+        return generatorResult;
       }
-    };
+
+      return null;
+    }
+  }
 
 }

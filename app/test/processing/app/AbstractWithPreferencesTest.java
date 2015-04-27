@@ -41,6 +41,8 @@ public abstract class AbstractWithPreferencesTest {
     Preferences.init(null);
     Theme.init();
 
+    BaseNoGui.initPackages();
+
     Base.untitledFolder = Base.createTempFolder("untitled");
     DeleteFilesOnShutdown.add(Base.untitledFolder);
   }

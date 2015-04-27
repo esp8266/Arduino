@@ -25,6 +25,7 @@
 package processing.app.syntax;
 
 import cc.arduino.contributions.libraries.ContributedLibrary;
+import org.fife.ui.rsyntaxtextarea.TokenMap;
 import org.fife.ui.rsyntaxtextarea.TokenTypes;
 import processing.app.Base;
 import processing.app.BaseNoGui;
@@ -35,130 +36,146 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 
 public class PdeKeywords {
 
-  // Value is org.fife.ui.rsyntaxtextarea.TokenTypes
-  private static HashMap<String, Integer> keywords = new HashMap<String, Integer>();
+  private static final Map<String, Integer> KNOWN_TOKEN_TYPES = new HashMap<String, Integer>();
+  private static final Pattern ALPHA = Pattern.compile("\\w");
 
-  private static HashMap<String, String> keywordToReference = new HashMap<String, String>();
-
-  public static HashMap<String, Integer> reload() {
-    keywords.clear();
-    keywordToReference.clear();
-    return get();
+  static {
+    KNOWN_TOKEN_TYPES.put("RESERVED_WORD", TokenTypes.RESERVED_WORD);
+    KNOWN_TOKEN_TYPES.put("RESERVED_WORD_2", TokenTypes.RESERVED_WORD_2);
+    KNOWN_TOKEN_TYPES.put("VARIABLE", TokenTypes.VARIABLE);
+    KNOWN_TOKEN_TYPES.put("OPERATOR", TokenTypes.OPERATOR);
+    KNOWN_TOKEN_TYPES.put("DATA_TYPE", TokenTypes.DATA_TYPE);
+    KNOWN_TOKEN_TYPES.put("LITERAL_BOOLEAN", TokenTypes.LITERAL_BOOLEAN);
+    KNOWN_TOKEN_TYPES.put("LITERAL_CHAR", TokenTypes.LITERAL_CHAR);
   }
 
-  public static HashMap<String, Integer> get() {
+  // lookup table for the TokenMarker subclass, handles coloring
+  private final TokenMap keywordTokenType;
+  private final Map<String, String> keywordOldToken;
+  private final Map<String, String> keywordTokenTypeAsString;
 
-    if (keywords.isEmpty()) {
-      try {
-        load(new File(BaseNoGui.getContentFile("lib"), "keywords.txt"));
-        if (Base.getLibraries() != null) {
-          for (ContributedLibrary lib : Base.getLibraries()) {
-            File keywords = new File(lib.getInstalledFolder(), "keywords.txt");
-            if (keywords.exists()) load(keywords);
-          }
+  // lookup table that maps keywords to their html reference pages
+  private final Map<String, String> keywordToReference;
+
+  public PdeKeywords() {
+    this.keywordTokenType = new TokenMap();
+    this.keywordOldToken = new HashMap<String, String>();
+    this.keywordTokenTypeAsString = new HashMap<String, String>();
+    this.keywordToReference = new HashMap<String, String>();
+  }
+
+  /**
+   * Handles loading of keywords file.
+   * <p/>
+   * Uses getKeywords()  method because that's part of the
+   * TokenMarker classes.
+   * <p/>
+   * It is recommended that a # sign be used for comments
+   * inside keywords.txt.
+   */
+  public void reload() {
+    try {
+      parseKeywordsTxt(new File(BaseNoGui.getContentFile("lib"), "keywords.txt"));
+      for (ContributedLibrary lib : Base.getLibraries()) {
+        File keywords = new File(lib.getInstalledFolder(), "keywords.txt");
+        if (keywords.exists()) {
+          parseKeywordsTxt(keywords);
         }
-      } catch (Exception e) {
-        Base.showError("Problem loading keywords",
-                "Could not load keywords.txt,\n" +
-                        "please re-install Arduino.", e);
-        System.exit(1);
       }
+    } catch (Exception e) {
+      Base.showError("Problem loading keywords", "Could not load keywords.txt,\nplease re-install Arduino.", e);
+      System.exit(1);
     }
-
-    return keywords;
   }
 
-  static private void load(File input) throws Exception {
+  private void parseKeywordsTxt(File input) throws Exception {
     BufferedReader reader = null;
     try {
       reader = new BufferedReader(new InputStreamReader(new FileInputStream(input)));
 
-      String line = null;
+      String line;
       while ((line = reader.readLine()) != null) {
         //System.out.println("line is " + line);
         // in case there's any garbage on the line
-        //if (line.trim().length() == 0) continue;
+        line = line.trim();
+        if (line.length() == 0 || line.startsWith("#")) {
+          continue;
+        }
 
         String pieces[] = PApplet.split(line, '\t');
+
+        String keyword = pieces[0].trim();
+
         if (pieces.length >= 2) {
-          //int tab = line.indexOf('\t');
-          // any line with no tab is ignored
-          // meaning that a comment is any line without a tab
-          //if (tab == -1) continue;
+          keywordOldToken.put(keyword, pieces[1]);
+        }
 
-          String keyword = pieces[0].trim();
-          //String keyword = line.substring(0, tab).trim();
-          //String second = line.substring(tab + 1);
-          //tab = second.indexOf('\t');
-          //String coloring = second.substring(0, tab).trim();
-          //String htmlFilename = second.substring(tab + 1).trim();
-          String coloring = pieces[1].trim();
-
-          if (coloring.length() > 0 && Character.isDigit(coloring.charAt(coloring.length() - 1))) {
-            // text will be KEYWORD or LITERAL
-            boolean isKey = (coloring.charAt(0) == 'K');
-            // KEYWORD1 -> 0, KEYWORD2 -> 1, etc
-            int num = coloring.charAt(coloring.length() - 1) - '1';
-            byte id = (byte)
-                    ((isKey ? Token.KEYWORD1 : Token.LITERAL1) + num);
-            //System.out.println("got " + (isKey ? "keyword" : "literal") +
-            //                 (num+1) + " for " + keyword);
-
-            int tokenType = TokenTypes.IDENTIFIER;
-
-            // KEYWORD1 Classes, datatypes, and C++ keywords
-            // KEYWORD2 Methods and functions
-            // KEYWORD3 setup and loop functions, as well as the Serial keywords
-            // LITERAL1 Constants
-            // LITERAL2 Built-in variables (INPUT,OUTPUT,CHANGE,FALLING)
-
-            switch (id) {
-              case Token.KEYWORD1:
-                tokenType = TokenTypes.VARIABLE;
-                break;
-              case Token.KEYWORD2:
-                tokenType = TokenTypes.FUNCTION;
-                break;
-              case Token.KEYWORD3:
-                tokenType = TokenTypes.RESERVED_WORD;
-                break;
-              case Token.LITERAL1:
-                tokenType = TokenTypes.PREPROCESSOR;
-                break;
-              case Token.LITERAL2:
-                tokenType = TokenTypes.RESERVED_WORD_2;
-                break;
-              default:
-                break;
-            }
-
-            if ("true".equals(keyword) || "false".equals(keyword)) {
-              tokenType = TokenTypes.LITERAL_BOOLEAN;
-            }
-
-            keywords.put(keyword, tokenType);
-          }
-          if (pieces.length >= 3) {
-            String htmlFilename = pieces[2].trim();
-            if (htmlFilename.length() > 0) {
-              keywordToReference.put(keyword, htmlFilename);
-            }
-          }
+        if (pieces.length >= 3) {
+          parseHTMLReferenceFileName(pieces[2], keyword);
+        }
+        if (pieces.length >= 4) {
+          parseRSyntaxTextAreaTokenType(pieces[3], keyword);
         }
       }
+
+      fillMissingTokenType();
     } finally {
       if (reader != null) {
         reader.close();
       }
     }
+
   }
 
-  public static String getReference(String keyword) {
-    if (keywordToReference == null) return null;
+  private void fillMissingTokenType() {
+    for (Map.Entry<String, String> oldTokenEntry : keywordOldToken.entrySet()) {
+      String keyword = oldTokenEntry.getKey();
+      if (!keywordTokenTypeAsString.containsKey(keyword)) {
+        if ("KEYWORD1".equals(oldTokenEntry.getValue())) {
+          parseRSyntaxTextAreaTokenType("DATA_TYPE", keyword);
+        } else {
+          parseRSyntaxTextAreaTokenType("FUNCTION", keyword);
+        }
+      }
+    }
+  }
+
+  private void parseRSyntaxTextAreaTokenType(String tokenTypeAsString, String keyword) {
+    if (!ALPHA.matcher(keyword).find()) {
+      return;
+    }
+
+    if (KNOWN_TOKEN_TYPES.containsKey(tokenTypeAsString)) {
+      keywordTokenType.put(keyword, KNOWN_TOKEN_TYPES.get(tokenTypeAsString));
+      keywordTokenTypeAsString.put(keyword, tokenTypeAsString);
+    } else {
+      keywordTokenType.put(keyword, TokenTypes.FUNCTION);
+      keywordTokenTypeAsString.put(keyword, "FUNCTION");
+    }
+  }
+
+  private void parseHTMLReferenceFileName(String piece, String keyword) {
+    String htmlFilename = piece.trim();
+    if (htmlFilename.length() > 0) {
+      keywordToReference.put(keyword, htmlFilename);
+    }
+  }
+
+  public String getReference(String keyword) {
     return keywordToReference.get(keyword);
+  }
+
+  public String getTokenTypeAsString(String keyword) {
+    return keywordTokenTypeAsString.get(keyword);
+  }
+
+  public int getTokenType(char[] array, int start, int end) {
+    return keywordTokenType.get(array, start, end);
   }
 }

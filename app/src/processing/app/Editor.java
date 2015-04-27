@@ -958,7 +958,7 @@ public class Editor extends JFrame implements RunnerListener {
 
   
   protected SketchTextArea createTextArea() throws IOException {
-      SketchTextArea textArea = new SketchTextArea();
+      SketchTextArea textArea = new SketchTextArea(base.getPdeKeywords());
       textArea.requestFocusInWindow();
       textArea.setMarkOccurrences(true);
       textArea.setMarginLineEnabled(false);
@@ -1757,7 +1757,7 @@ public class Editor extends JFrame implements RunnerListener {
     RSyntaxDocument document = (RSyntaxDocument) codeDoc.getDocument();
 
     if (document == null) {  // this document not yet inited
-      document = new RSyntaxDocument(RSyntaxDocument.SYNTAX_STYLE_CPLUSPLUS);
+      document = new RSyntaxDocument(new ArduinoTokenMakerFactory(base.getPdeKeywords()), RSyntaxDocument.SYNTAX_STYLE_CPLUSPLUS);
       document.putProperty(PlainDocument.tabSizeAttribute, Preferences.getInteger("editor.tabs.size"));
 
       // insert the program text into the document object
@@ -1953,7 +1953,7 @@ public class Editor extends JFrame implements RunnerListener {
 	protected void handleFindReference() {
 		String text = getCurrentKeyword();
 
-		String referenceFile = PdeKeywords.getReference(text);
+		String referenceFile = base.getPdeKeywords().getReference(text);
 		if (referenceFile == null) {
 			statusNotice(I18n.format(_("No reference available for \"{0}\""), text));
 		} else {
@@ -2897,7 +2897,7 @@ public class Editor extends JFrame implements RunnerListener {
 
       @Override
       public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-            String referenceFile = PdeKeywords.getReference(getCurrentKeyword());
+            String referenceFile = base.getPdeKeywords().getReference(getCurrentKeyword());
             referenceItem.setEnabled(referenceFile != null);
     
             int offset = textarea.getCaretPosition();
