@@ -53,6 +53,7 @@ remotePort	KEYWORD2
 softAP	KEYWORD2
 softAPIP	KEYWORD2
 softAPmacAddress	KEYWORD2
+softAPConfig	KEYWORD2
 printDiag	KEYWORD2
 hostByName	KEYWORD2
 scanNetworks	KEYWORD2

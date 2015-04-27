@@ -75,6 +75,14 @@ This is mostly similar to WiFi shield library. Differences include:
 - ```WiFi.localIP()``` is for STA, ```WiFi.softAPIP()``` is for AP.
 - ```WiFi.RSSI()``` doesn't work
 - ```WiFi.printDiag(Serial);``` will print out some diagnostic info
+- ```WiFiUDP``` class supports sending and receiving multicast packets on STA interface.
+When sending a multicast packet, replace ```udp.beginPacket(addr, port)``` with 
+```udp.beginPacketMulticast(addr, port, WiFi.localIP())```.
+When listening to multicast packets, replace ```udp.begin(port)``` with 
+```udp.beginMulticast(WiFi.localIP(), multicast_ip_addr, port)```.
+You can use ```udp.destinationIP()``` to tell whether the packet received was
+sent to the multicast or unicast address.
+Also note that multicast doesn't work on softAP interface.
 
 WiFiServer, WiFiClient, and WiFiUDP behave mostly the same way as with WiFi shield library.
 Four samples are provided for this library.
