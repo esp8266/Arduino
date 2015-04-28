@@ -933,6 +933,8 @@
     <move file="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/esptool-0.4.2-win32/esptool.exe" tofile="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/esptool.exe" />
     <delete dir="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/esptool-0.4.2-win32/" />
  
+    <!-- Retrieve pyesptool -->
+    <get src="https://raw.githubusercontent.com/themadinventor/esptool/master/esptool.py" dest="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/esptool.py" verbose="true" ignoreerrors="true" />
   </target>
 
   <target name="windows-run" depends="windows-build"
