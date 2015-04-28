@@ -312,6 +312,9 @@ public class Base {
     // Setup board-dependent variables.
     onBoardOrPortChange();
 
+    this.pdeKeywords = new PdeKeywords();
+    this.pdeKeywords.reload();
+
     CommandlineParser parser = CommandlineParser.newCommandlineParser(args);
 
     for (String path : parser.getFilenames()) {
@@ -347,9 +350,6 @@ public class Base {
     // handler, but for other modes we should also make sure to save
     // them.
     PreferencesData.save();
-
-    this.pdeKeywords = new PdeKeywords();
-    this.pdeKeywords.reload();
 
     if (parser.isInstallBoard()) {
       ContributionsIndexer indexer = new ContributionsIndexer(BaseNoGui.getSettingsFolder());
