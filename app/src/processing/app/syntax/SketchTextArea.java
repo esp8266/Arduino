@@ -112,6 +112,7 @@ public class SketchTextArea extends RSyntaxTextArea {
     setUseSelectedTextColor(false);
     setSelectionColor(processing.app.Theme.getColor("editor.selection.color"));
     setMatchedBracketBorderColor(processing.app.Theme.getColor("editor.brackethighlight.color"));
+    setHyperlinkForeground((Color) processing.app.Theme.getStyledFont("url", getFont()).get("color"));
 
     setSyntaxTheme(TokenTypes.DATA_TYPE, "data_type");
     setSyntaxTheme(TokenTypes.FUNCTION, "function");

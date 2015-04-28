@@ -956,23 +956,32 @@ public class Editor extends JFrame implements RunnerListener {
     return null;
   }
 
-  
+
   protected SketchTextArea createTextArea() throws IOException {
-      SketchTextArea textArea = new SketchTextArea(base.getPdeKeywords());
-      textArea.requestFocusInWindow();
-      textArea.setMarkOccurrences(true);
-      textArea.setMarginLineEnabled(false);
-      textArea.setCodeFoldingEnabled(PreferencesData.getBoolean("editor.codefolding"));
-      textArea.setAntiAliasingEnabled(PreferencesData.getBoolean("editor.antialias"));
-//      textArea.setClearWhitespaceLinesEnabled(false);
-      textArea.setTabsEmulated(PreferencesData.getBoolean("editor.tabs.expand"));
-      textArea.setTabSize(PreferencesData.getInteger("editor.tabs.size"));
-      textArea.setEditorListener(new EditorListener(this));
-      
-      ToolTipManager.sharedInstance().registerComponent(textArea);
-      
-      configurePopupMenu(textArea);
-      return textArea;
+    SketchTextArea textArea = new SketchTextArea(base.getPdeKeywords());
+    textArea.requestFocusInWindow();
+    textArea.setMarkOccurrences(true);
+    textArea.setMarginLineEnabled(false);
+    textArea.setCodeFoldingEnabled(PreferencesData.getBoolean("editor.codefolding"));
+    textArea.setAntiAliasingEnabled(PreferencesData.getBoolean("editor.antialias"));
+    textArea.setTabsEmulated(PreferencesData.getBoolean("editor.tabs.expand"));
+    textArea.setTabSize(PreferencesData.getInteger("editor.tabs.size"));
+    textArea.setEditorListener(new EditorListener(this));
+    textArea.addHyperlinkListener(new HyperlinkListener() {
+      @Override
+      public void hyperlinkUpdate(HyperlinkEvent hyperlinkEvent) {
+        try {
+          base.getPlatform().openURL(hyperlinkEvent.getURL().toExternalForm());
+        } catch (Exception e) {
+          Base.showWarning(e.getMessage(), e.getMessage(), e);
+        }
+      }
+    });
+
+    ToolTipManager.sharedInstance().registerComponent(textArea);
+
+    configurePopupMenu(textArea);
+    return textArea;
   }
 
   protected JMenuItem createToolMenuItem(String className) {
