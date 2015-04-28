@@ -33,20 +33,28 @@ import org.fife.ui.rsyntaxtextarea.*;
 import org.fife.ui.rsyntaxtextarea.Theme;
 import org.fife.ui.rsyntaxtextarea.Token;
 import org.fife.ui.rsyntaxtextarea.focusabletip.FocusableTip;
+import org.fife.ui.rtextarea.RTextArea;
 import org.fife.ui.rtextarea.RUndoManager;
+
 import processing.app.*;
 
 import javax.swing.*;
+import javax.swing.event.EventListenerList;
 import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Segment;
 import javax.swing.undo.UndoManager;
+
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -228,6 +236,11 @@ public class SketchTextArea extends RSyntaxTextArea {
   protected void configurePopupMenu(JPopupMenu popupMenu) {
     super.configurePopupMenu(popupMenu);
   }
+  
+  @Override
+  protected RTAMouseListener createMouseListener() {
+    return new SketchTextAreaMouseListener(this);
+  }
 
   public void getTextLine(int line, Segment segment) {
     try {
@@ -295,6 +308,168 @@ public class SketchTextArea extends RSyntaxTextArea {
 
       return null;
     }
+  }
+  
+  
+  /**
+   * Handles http hyperlinks.
+   * NOTE (@Ricardo JL Rufino): Workaround to enable hyperlinks by default: https://github.com/bobbylight/RSyntaxTextArea/issues/119
+   */
+  private class SketchTextAreaMouseListener extends RTextAreaMutableCaretEvent {
+
+    private Insets insets;
+    private boolean isScanningForLinks;
+    private int hoveredOverLinkOffset = -1;
+    
+    protected SketchTextAreaMouseListener(RTextArea textArea) {
+      super(textArea);
+      insets = new Insets(0, 0, 0, 0);
+    }
+    
+    /**
+     * Notifies all listeners that have registered interest for notification
+     * on this event type.  The listener list is processed last to first.
+     *
+     * @param e The event to fire.
+     * @see EventListenerList
+     */
+    private void fireHyperlinkUpdate(HyperlinkEvent e) {
+      // Guaranteed to return a non-null array
+      Object[] listeners = listenerList.getListenerList();
+      // Process the listeners last to first, notifying
+      // those that are interested in this event
+      for (int i = listeners.length-2; i>=0; i-=2) {
+        if (listeners[i]==HyperlinkListener.class) {
+          ((HyperlinkListener)listeners[i+1]).hyperlinkUpdate(e);
+        }          
+      }
+    }
+    
+    private HyperlinkEvent createHyperlinkEvent(MouseEvent e) {
+      HyperlinkEvent he = null;
+      
+      Token t = viewToToken(e.getPoint());
+      if (t!=null) {
+        // Copy token, viewToModel() unfortunately modifies Token
+        t = new TokenImpl(t);
+      }
+      
+      if (t != null && t.isHyperlink()) {
+        URL url = null;
+        String desc = null;
+        try {
+          String temp = t.getLexeme();
+          // URI's need "http://" prefix for web URL's to work.
+          if (temp.startsWith("www.")) {
+            temp = "http://" + temp;
+          }
+          url = new URL(temp);
+        } catch (MalformedURLException mue) {
+          desc = mue.getMessage();
+        }
+        he = new HyperlinkEvent(SketchTextArea.this, HyperlinkEvent.EventType.ACTIVATED, url, desc);
+      }
+      
+      return he;
+    }
+    
+    @Override
+    public void mouseClicked(MouseEvent e) {
+      if (getHyperlinksEnabled()) {
+        HyperlinkEvent he = createHyperlinkEvent(e);
+        if (he!=null) {
+          fireHyperlinkUpdate(he);
+        }
+      }
+    }
+    
+        @Override
+    public void mouseMoved(MouseEvent e) {
+
+      super.mouseMoved(e);
+
+      if (!getHyperlinksEnabled()) {
+        return;
+      }
+      
+//      LinkGenerator linkGenerator = getLinkGenerator();
+      
+      // GitHub issue RSyntaxTextArea/#25 - links identified at "edges" of editor
+      // should not be activated if mouse is in margin insets.
+      insets = getInsets(insets);
+      if (insets!=null) {
+        int x = e.getX();
+        int y = e.getY();
+        if (x<=insets.left || y<insets.top) {
+          if (isScanningForLinks) {
+            stopScanningForLinks();
+          }
+          return;
+        }
+      }
+
+      isScanningForLinks = true;
+      Token t = viewToToken(e.getPoint());
+      if (t!=null) {
+        // Copy token, viewToModel() unfortunately modifies Token
+        t = new TokenImpl(t);
+      }
+      Cursor c2 = null;
+      if (t!=null && t.isHyperlink()) {
+        if (hoveredOverLinkOffset==-1 ||
+            hoveredOverLinkOffset!=t.getOffset()) {
+          hoveredOverLinkOffset = t.getOffset();
+          repaint();
+        }
+        c2 = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
+      }
+//      else if (t!=null && linkGenerator!=null) {
+//        int offs = viewToModel(e.getPoint());
+//        LinkGeneratorResult newResult = linkGenerator.
+//            isLinkAtOffset(SketchTextArea.this, offs);
+//        if (newResult!=null) {
+//          // Repaint if we're at a new link now.
+//          if (linkGeneratorResult==null ||
+//              !equal(newResult, linkGeneratorResult)) {
+//            repaint();
+//          }
+//          linkGeneratorResult = newResult;
+//          hoveredOverLinkOffset = t.getOffset();
+//          c2 = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
+//        }
+//        else {
+//          // Repaint if we've moved off of a link.
+//          if (linkGeneratorResult!=null) {
+//            repaint();
+//          }
+//          c2 = Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR);
+//          hoveredOverLinkOffset = -1;
+//          linkGeneratorResult = null;
+//        }
+//      }
+      else {
+        c2 = Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR);
+        hoveredOverLinkOffset = -1;
+       //  linkGeneratorResult = null;
+      }
+      if (getCursor()!=c2) {
+        setCursor(c2);
+        // TODO: Repaint just the affected line(s).
+        repaint(); // Link either left or went into.
+      }   
+    }
+        
+    private void stopScanningForLinks() {
+      if (isScanningForLinks) {
+        Cursor c = getCursor();
+        isScanningForLinks = false;
+        if (c != null && c.getType() == Cursor.HAND_CURSOR) {
+          setCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR));
+          repaint(); // TODO: Repaint just the affected line.
+        }
+      }
+    }
+
   }
 
 }
