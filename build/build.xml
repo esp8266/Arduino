@@ -951,8 +951,9 @@
     <echo append="true" file="${staging_folder}/work/${staging_hardware_folder}/tools/avr/builtin_tools_versions.txt" message="arduino.avrdude=${avrdude_version}${line.separator}"/>
     <echo append="true" file="${staging_folder}/work/${staging_hardware_folder}/tools/avr/builtin_tools_versions.txt" message="arduino.avr-gcc=${gcc_version}${line.separator}"/>
 
-    <copy file="shared/bundled_package_index.json" tofile="${staging_folder}/work/${staging_hardware_folder}/../dist/package_index.json"/>
-    <copy file="shared/bundled_library_index.json" tofile="${staging_folder}/work/${staging_hardware_folder}/../dist/library_index.json"/>
+    <mkdir dir="${staging_folder}/work/${staging_hardware_folder}/../dist/"/>
+    <get src="http://downloads.arduino.cc/packages/package_index.json" dest="${staging_folder}/work/${staging_hardware_folder}/../dist/package_index.json" verbose="true" skipexisting="false" />
+    <get src="http://downloads.arduino.cc/libraries/library_index.json" dest="${staging_folder}/work/${staging_hardware_folder}/../dist/library_index.json" verbose="true" skipexisting="false" />
 
     <delete dir="${staging_folder}/work/${staging_hardware_folder}/tmp"/>
   </target>
