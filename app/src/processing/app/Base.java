@@ -413,10 +413,10 @@ public class Base {
         Editor editor = editors.get(0);
 
         if (parser.isUploadMode()) {
-          // Build and upload
+          splashScreenHelper.splashText(_("Verifying and uploading..."));
           editor.exportHandler.run();
         } else {
-          // Build only
+          splashScreenHelper.splashText(_("Verifying..."));
           editor.runHandler.run();
         }
 
