@@ -324,7 +324,7 @@
       <bundledocument extensions="ino,c,cpp,h"
                       icon="macosx/template.app/Contents/Resources/pde.icns"
                       name="Arduino Source File"
-                      role="Editor">
+                      role="Editor" ispackage="false">
       </bundledocument>
 
     </bundleapp>
