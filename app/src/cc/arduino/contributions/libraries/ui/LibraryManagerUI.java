@@ -252,7 +252,7 @@ public class LibraryManagerUI extends InstallerJDialog<ContributedLibrary> {
     boolean managedByIndex = indexer.getIndex().getLibraries().contains(lib);
 
     if (!managedByIndex) {
-      int chosenOption = JOptionPane.showConfirmDialog(getParent(), _("This library is not listed on Library Manager. You won't be able to resinstall it from here.\nAre you sure you want to delete it?"), _("Please confirm library deletion"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+      int chosenOption = JOptionPane.showConfirmDialog(this, _("This library is not listed on Library Manager. You won't be able to resinstall it from here.\nAre you sure you want to delete it?"), _("Please confirm library deletion"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
       if (chosenOption != JOptionPane.YES_OPTION) {
         return;
       }
