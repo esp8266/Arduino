@@ -452,9 +452,8 @@ public class Editor extends JFrame implements RunnerListener {
     saveMenuItem.setEnabled(!external);
     saveAsMenuItem.setEnabled(!external);
 
-    scrollPane.setLineNumbersEnabled(PreferencesData.getBoolean("editor.linenumbers"));
-
     textarea.setCodeFoldingEnabled(PreferencesData.getBoolean("editor.code_folding"));
+    scrollPane.setLineNumbersEnabled(PreferencesData.getBoolean("editor.linenumbers"));
 
     if (external) {
       // disable line highlight and turn off the caret when disabling
