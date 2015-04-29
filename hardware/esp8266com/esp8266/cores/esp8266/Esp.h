@@ -69,6 +69,7 @@ class EspClass {
         uint32_t getFreeHeap(void);
 
         uint32_t getChipId(void);
+        uint32_t getFlashChipId(void);
 
         const char * getSDKversion(void);
 

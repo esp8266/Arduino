@@ -89,6 +89,11 @@ uint32_t EspClass::getChipId(void)
     return system_get_chip_id();
 }
 
+uint32_t EspClass::getFlashChipId(void)
+{
+    return spi_flash_get_id();
+}
+
 const char * EspClass::getSDKversion(void)
 {
     return system_get_sdk_version();
