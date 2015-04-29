@@ -99,10 +99,6 @@ public class Base {
   // Location for untitled items
   static File untitledFolder;
 
-  // Current directory to use for relative paths specified on the
-  // commandline
-  static String currentDirectory = BaseNoGui.currentDirectory;
-
   // p5 icon for the window
 //  static Image icon;
 
