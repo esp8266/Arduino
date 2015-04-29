@@ -788,7 +788,6 @@ public class Base {
    * @param path Location of the primary pde file for the sketch.
    */
   public void handleOpenReplace(File file) {
-    System.out.println("handleOpenReplace");
     if (!activeEditor.checkModified()) {
       return;  // sketch was modified, and user canceled
     }
@@ -1018,7 +1017,6 @@ public class Base {
    * @return false if canceled, true otherwise.
    */
   public boolean handleQuit() {
-    System.out.println("handleQuit");
     // If quit is canceled, this will be replaced anyway
     // by a later handleQuit() that is not canceled.
     storeSketches();
