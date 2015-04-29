@@ -77,7 +77,11 @@ public class FileUtils {
       return;
     }
     if (file.isDirectory()) {
-      for (File current : file.listFiles()) {
+      File[] files = file.listFiles();
+      if (files == null) {
+        return;
+      }
+      for (File current : files) {
         recursiveDelete(current);
       }
     }
