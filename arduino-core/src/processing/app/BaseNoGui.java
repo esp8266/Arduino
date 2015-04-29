@@ -577,7 +577,7 @@ public class BaseNoGui {
 
   static public void initPackages() throws Exception {
     indexer = new ContributionsIndexer(BaseNoGui.getSettingsFolder());
-    File indexFile = indexer.getIndexFile();
+    File indexFile = indexer.getIndexFile("package_index.json");
     File defaultPackageJsonFile = new File(getContentFile("dist"), "package_index.json");
     if (!indexFile.isFile() || (defaultPackageJsonFile.isFile() && defaultPackageJsonFile.lastModified() > indexFile.lastModified())) {
       FileUtils.copyFile(defaultPackageJsonFile, indexFile);

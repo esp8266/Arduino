@@ -44,26 +44,25 @@ import processing.app.debug.TargetPlatform;
 import processing.app.debug.TargetPlatformException;
 import processing.app.helpers.PreferencesMap;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
 
 import static processing.app.helpers.filefilters.OnlyDirs.ONLY_DIRS;
 
 public class ContributionsIndexer {
 
+  private static final String DEFAULT_INDEX_FILE_NAME = "package_index.json";
+  private static final List<String> PROTECTED_PACKAGE_NAMES = Arrays.asList("arduino", "Intel");
+
   private final File packagesFolder;
   private final File stagingFolder;
-  private final File indexFile;
+  private final File preferencesFolder;
   private ContributionsIndex index;
 
   public ContributionsIndexer(File preferencesFolder) {
+    this.preferencesFolder = preferencesFolder;
     packagesFolder = new File(preferencesFolder, "packages");
-    stagingFolder = new File(preferencesFolder, "staging" + File.separator +
-            "packages");
-    indexFile = new File(preferencesFolder, "package_index.json");
+    stagingFolder = new File(preferencesFolder, "staging" + File.separator + "packages");
   }
 
   // public static void main(String args[]) throws Exception {
@@ -81,8 +80,19 @@ public class ContributionsIndexer {
   // }
 
   public void parseIndex() throws IOException {
-    // Parse index file
-    parseIndex(indexFile);
+    index = parseIndex(getIndexFile(DEFAULT_INDEX_FILE_NAME));
+
+    File[] indexFiles = preferencesFolder.listFiles(new FilenameFilter() {
+      @Override
+      public boolean accept(File file, String name) {
+        return !DEFAULT_INDEX_FILE_NAME.equals(name) && name.startsWith("package_") && name.endsWith("_index.json");
+      }
+    });
+
+    for (File indexFile : indexFiles) {
+      ContributionsIndex contributionsIndex = parseIndex(indexFile);
+      mergeContributions(contributionsIndex, indexFile);
+    }
 
     List<ContributedPackage> packages = index.getPackages();
     for (ContributedPackage pack : packages) {
@@ -98,14 +108,58 @@ public class ContributionsIndexer {
     index.fillCategories();
   }
 
-  private void parseIndex(File indexFile) throws IOException {
+  private void mergeContributions(ContributionsIndex contributionsIndex, File indexFile) {
+    for (ContributedPackage contributedPackage : contributionsIndex.getPackages()) {
+      ContributedPackage targetPackage = index.getPackage(contributedPackage.getName());
+
+      if (targetPackage == null) {
+        index.getPackages().add(contributedPackage);
+      } else {
+        if (mergeAllowed(contributedPackage, indexFile)) {
+          List<ContributedPlatform> platforms = contributedPackage.getPlatforms();
+          if (platforms == null) {
+            platforms = new LinkedList<ContributedPlatform>();
+          }
+          for (ContributedPlatform contributedPlatform : platforms) {
+            ContributedPlatform platform = targetPackage.findPlatform(contributedPlatform.getArchitecture(), contributedPlatform.getVersion());
+            if (platform != null) {
+              targetPackage.getPlatforms().remove(platform);
+            }
+            targetPackage.getPlatforms().add(contributedPlatform);
+          }
+          List<ContributedTool> tools = contributedPackage.getTools();
+          if (tools == null) {
+            tools = new LinkedList<ContributedTool>();
+          }
+          for (ContributedTool contributedTool : tools) {
+            ContributedTool tool = targetPackage.findTool(contributedTool.getName(), contributedTool.getVersion());
+            if (tool != null) {
+              targetPackage.getTools().remove(tool);
+            }
+            targetPackage.getTools().add(contributedTool);
+          }
+        }
+      }
+    }
+  }
+
+  private boolean mergeAllowed(ContributedPackage contributedPackage, File indexFile) {
+    return !PROTECTED_PACKAGE_NAMES.contains(contributedPackage.getName()) || isSigned(indexFile);
+  }
+
+  //TODO stub implementation
+  private boolean isSigned(File indexFile) {
+    return true;
+  }
+
+  private ContributionsIndex parseIndex(File indexFile) throws IOException {
     InputStream indexIn = new FileInputStream(indexFile);
     ObjectMapper mapper = new ObjectMapper();
     mapper.registerModule(new MrBeanModule());
     mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
     mapper.configure(DeserializationFeature.EAGER_DESERIALIZER_FETCH, true);
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    index = mapper.readValue(indexIn, ContributionsIndex.class);
+    return mapper.readValue(indexIn, ContributionsIndex.class);
   }
 
   public void syncWithFilesystem(File hardwareFolder) throws IOException {
@@ -295,8 +349,8 @@ public class ContributionsIndexer {
     return stagingFolder;
   }
 
-  public File getIndexFile() {
-    return indexFile;
+  public File getIndexFile(String name) {
+    return new File(preferencesFolder, name);
   }
 
 }

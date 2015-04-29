@@ -244,7 +244,8 @@ public class ContributionInstaller {
     String statusText = _("Downloading platforms index...");
 
     URL url = new URL(PACKAGE_INDEX_URL);
-    File outputFile = indexer.getIndexFile();
+    String[] urlPathParts = url.getFile().split("/");
+    File outputFile = indexer.getIndexFile(urlPathParts[urlPathParts.length - 1]);
     File tmpFile = new File(outputFile.getAbsolutePath() + ".tmp");
     downloader.download(url, tmpFile, progress, statusText);
     progress.stepDone();
