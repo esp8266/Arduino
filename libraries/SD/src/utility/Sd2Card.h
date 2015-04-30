@@ -25,12 +25,20 @@
  */
 #include "Sd2PinMap.h"
 #include "SdInfo.h"
+
+#ifdef ESP8266
+#include "SPI.h"
+uint32_t const SPI_FULL_SPEED = SPI_CLOCK_DIV2;
+uint32_t const SPI_HALF_SPEED = SPI_CLOCK_DIV4;
+uint32_t const SPI_QUARTER_SPEED = SPI_CLOCK_DIV8;
+#else
 /** Set SCK to max rate of F_CPU/2. See Sd2Card::setSckRate(). */
 uint8_t const SPI_FULL_SPEED = 0;
 /** Set SCK rate to F_CPU/4. See Sd2Card::setSckRate(). */
 uint8_t const SPI_HALF_SPEED = 1;
 /** Set SCK rate to F_CPU/8. Sd2Card::setSckRate(). */
 uint8_t const SPI_QUARTER_SPEED = 2;
+#endif
 /**
  * USE_SPI_LIB: if set, use the SPI library bundled with Arduino IDE, otherwise
  * run with a standalone driver for AVR.
@@ -181,10 +189,17 @@ class Sd2Card {
    * and the default SD chip select pin.
    * See sd2Card::init(uint8_t sckRateID, uint8_t chipSelectPin).
    */
+  #ifdef ESP8266
+  uint8_t init(uint32_t sckRateID) {
+    return init(sckRateID, SD_CHIP_SELECT_PIN);
+  }
+  uint8_t init(uint32_t sckRateID, uint8_t chipSelectPin);
+  #else
   uint8_t init(uint8_t sckRateID) {
     return init(sckRateID, SD_CHIP_SELECT_PIN);
   }
   uint8_t init(uint8_t sckRateID, uint8_t chipSelectPin);
+  #endif
   void partialBlockRead(uint8_t value);
   /** Returns the current value, true or false, for partial block read. */
   uint8_t partialBlockRead(void) const {return partialBlockRead_;}
@@ -205,7 +220,11 @@ class Sd2Card {
     return readRegister(CMD9, csd);
   }
   void readEnd(void);
+  #ifdef ESP8266
+  uint8_t setSckRate(uint32_t sckRateID);
+  #else
   uint8_t setSckRate(uint8_t sckRateID);
+  #endif
   /** Return the card type: SD V1, SD V2 or SDHC */
   uint8_t type(void) const {return type_;}
   uint8_t writeBlock(uint32_t blockNumber, const uint8_t* src);

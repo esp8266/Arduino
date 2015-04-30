@@ -120,13 +120,13 @@ uint8_t Sd2Card::cardCommand(uint8_t cmd, uint32_t arg) {
   for (int8_t s = 24; s >= 0; s -= 8) spiSend(arg >> s);
 
   // send CRC
-  uint8_t crc = 0XFF;
-  if (cmd == CMD0) crc = 0X95;  // correct crc for CMD0 with arg 0
-  if (cmd == CMD8) crc = 0X87;  // correct crc for CMD8 with arg 0X1AA
+  uint8_t crc = 0xFF;
+  if (cmd == CMD0) crc = 0x95;  // correct crc for CMD0 with arg 0
+  if (cmd == CMD8) crc = 0x87;  // correct crc for CMD8 with arg 0X1AA
   spiSend(crc);
 
   // wait for response
-  for (uint8_t i = 0; ((status_ = spiRec()) & 0X80) && i != 0XFF; i++)
+  for (uint8_t i = 0; ((status_ = spiRec()) & 0x80) && i != 0xFF; i++)
     ;
   return status_;
 }
@@ -239,7 +239,11 @@ uint8_t Sd2Card::eraseSingleBlockEnable(void) {
  * the value zero, false, is returned for failure.  The reason for failure
  * can be determined by calling errorCode() and errorData().
  */
+#ifdef ESP8266
+uint8_t Sd2Card::init(uint32_t sckRateID, uint8_t chipSelectPin) {
+#else
 uint8_t Sd2Card::init(uint8_t sckRateID, uint8_t chipSelectPin) {
+#endif
   errorCode_ = inBlock_ = partialBlockRead_ = type_ = 0;
   chipSelectPin_ = chipSelectPin;
   // 16-bit init start time allows over a minute
@@ -266,7 +270,11 @@ uint8_t Sd2Card::init(uint8_t sckRateID, uint8_t chipSelectPin) {
   SPSR &= ~(1 << SPI2X);
 #else // USE_SPI_LIB
   SPI.begin();
+  #ifdef ESP8266
+  settings = SPISettings(SPI_CLOCK_DIV64, MSBFIRST, SPI_MODE0);
+  #else
   settings = SPISettings(250000, MSBFIRST, SPI_MODE0);
+  #endif
 #endif // USE_SPI_LIB
 #endif // SOFTWARE_SPI
 
@@ -498,11 +506,15 @@ uint8_t Sd2Card::readRegister(uint8_t cmd, void* buf) {
  * \return The value one, true, is returned for success and the value zero,
  * false, is returned for an invalid value of \a sckRateID.
  */
+#ifdef ESP8266
+uint8_t Sd2Card::setSckRate(uint32_t sckRateID) {
+#else
 uint8_t Sd2Card::setSckRate(uint8_t sckRateID) {
   if (sckRateID > 6) {
     error(SD_CARD_ERROR_SCK_RATE);
     return false;
   }
+#endif
 #ifndef USE_SPI_LIB
   // see avr processor datasheet for SPI register bit definitions
   if ((sckRateID & 1) || sckRateID == 6) {
@@ -514,6 +526,9 @@ uint8_t Sd2Card::setSckRate(uint8_t sckRateID) {
   SPCR |= (sckRateID & 4 ? (1 << SPR1) : 0)
     | (sckRateID & 2 ? (1 << SPR0) : 0);
 #else // USE_SPI_LIB
+  #ifdef ESP8266
+  settings = SPISettings(sckRateID, MSBFIRST, SPI_MODE0);
+  #else
   switch (sckRateID) {
     case 0:  settings = SPISettings(25000000, MSBFIRST, SPI_MODE0); break;
     case 1:  settings = SPISettings(4000000, MSBFIRST, SPI_MODE0); break;
@@ -523,6 +538,7 @@ uint8_t Sd2Card::setSckRate(uint8_t sckRateID) {
     case 5:  settings = SPISettings(250000, MSBFIRST, SPI_MODE0); break;
     default: settings = SPISettings(125000, MSBFIRST, SPI_MODE0);
   }
+  #endif
 #endif // USE_SPI_LIB
   return true;
 }

@@ -22,6 +22,7 @@
 #include <avr/pgmspace.h>
 #endif
 #include <Arduino.h>
+#define PRINT_PORT Serial
 //------------------------------------------------------------------------------
 // callback function for date/time
 void (*SdFile::dateTime_)(uint16_t* date, uint16_t* time) = NULL;
@@ -215,7 +216,7 @@ void SdFile::ls(uint8_t flags, uint8_t indent) {
     if (!DIR_IS_FILE_OR_SUBDIR(p)) continue;
 
     // print any indent spaces
-    for (int8_t i = 0; i < indent; i++) Serial.print(' ');
+    for (int8_t i = 0; i < indent; i++) PRINT_PORT.print(' ');
 
     // print file name with possible blank fill
     printDirName(*p, flags & (LS_DATE | LS_SIZE) ? 14 : 0);
@@ -223,15 +224,15 @@ void SdFile::ls(uint8_t flags, uint8_t indent) {
     // print modify date/time if requested
     if (flags & LS_DATE) {
        printFatDate(p->lastWriteDate);
-       Serial.print(' ');
+       PRINT_PORT.print(' ');
        printFatTime(p->lastWriteTime);
     }
     // print size if requested
     if (!DIR_IS_SUBDIR(p) && (flags & LS_SIZE)) {
-      Serial.print(' ');
-      Serial.print(p->fileSize);
+      PRINT_PORT.print(' ');
+      PRINT_PORT.print(p->fileSize);
     }
-    Serial.println();
+    PRINT_PORT.println();
 
     // list subdirectory content if requested
     if ((flags & LS_R) && DIR_IS_SUBDIR(p)) {
@@ -595,18 +596,18 @@ void SdFile::printDirName(const dir_t& dir, uint8_t width) {
   for (uint8_t i = 0; i < 11; i++) {
     if (dir.name[i] == ' ')continue;
     if (i == 8) {
-      Serial.print('.');
+      PRINT_PORT.print('.');
       w++;
     }
-    Serial.write(dir.name[i]);
+    PRINT_PORT.write(dir.name[i]);
     w++;
   }
   if (DIR_IS_SUBDIR(&dir)) {
-    Serial.print('/');
+    PRINT_PORT.print('/');
     w++;
   }
   while (w < width) {
-    Serial.print(' ');
+    PRINT_PORT.print(' ');
     w++;
   }
 }
@@ -618,10 +619,10 @@ void SdFile::printDirName(const dir_t& dir, uint8_t width) {
  * \param[in] fatDate The date field from a directory entry.
  */
 void SdFile::printFatDate(uint16_t fatDate) {
-  Serial.print(FAT_YEAR(fatDate));
-  Serial.print('-');
+  PRINT_PORT.print(FAT_YEAR(fatDate));
+  PRINT_PORT.print('-');
   printTwoDigits(FAT_MONTH(fatDate));
-  Serial.print('-');
+  PRINT_PORT.print('-');
   printTwoDigits(FAT_DAY(fatDate));
 }
 //------------------------------------------------------------------------------
@@ -633,9 +634,9 @@ void SdFile::printFatDate(uint16_t fatDate) {
  */
 void SdFile::printFatTime(uint16_t fatTime) {
   printTwoDigits(FAT_HOUR(fatTime));
-  Serial.print(':');
+  PRINT_PORT.print(':');
   printTwoDigits(FAT_MINUTE(fatTime));
-  Serial.print(':');
+  PRINT_PORT.print(':');
   printTwoDigits(FAT_SECOND(fatTime));
 }
 //------------------------------------------------------------------------------
@@ -648,7 +649,7 @@ void SdFile::printTwoDigits(uint8_t v) {
   str[0] = '0' + v/10;
   str[1] = '0' + v % 10;
   str[2] = 0;
-  Serial.print(str);
+  PRINT_PORT.print(str);
 }
 //------------------------------------------------------------------------------
 /**

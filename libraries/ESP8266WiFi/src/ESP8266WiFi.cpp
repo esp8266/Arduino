@@ -49,6 +49,7 @@ void ESP8266WiFiClass::mode(WiFiMode m)
     ETS_UART_INTR_ENABLE();
 }
 
+
 int ESP8266WiFiClass::begin(const char* ssid)
 {
     return begin(ssid, 0);
@@ -57,7 +58,7 @@ int ESP8266WiFiClass::begin(const char* ssid)
 
 int ESP8266WiFiClass::begin(const char* ssid, const char *passphrase)
 {
-    if (wifi_get_opmode() == WIFI_AP)
+    if ((wifi_get_opmode() & 1) == 0)//1 and 3 have STA enabled
     {
         // turn on AP+STA mode
         mode(WIFI_AP_STA);
@@ -111,7 +112,7 @@ void ESP8266WiFiClass::softAP(const char* ssid)
 
 void ESP8266WiFiClass::softAP(const char* ssid, const char* passphrase, int channel)
 {
-    if (wifi_get_opmode() == WIFI_STA)
+    if (wifi_get_opmode() < WIFI_AP)//will be OFF or STA
     {
         // turn on AP+STA mode
         mode(WIFI_AP_STA);
@@ -260,7 +261,7 @@ void ESP8266WiFiClass::_scanDone(void* result, int status)
 
 int8_t ESP8266WiFiClass::scanNetworks()
 {
-    if (wifi_get_opmode() == WIFI_AP)
+    if ((wifi_get_opmode() & 1) == 0)//1 and 3 have STA enabled
     {
         mode(WIFI_AP_STA);
     }
@@ -381,7 +382,10 @@ void ESP8266WiFiClass::beginSmartConfig()
     if (_smartConfigStarted)
         return;
 
-    WiFi.mode(WIFI_STA);
+    if ((wifi_get_opmode() & 1) == 0)//1 and 3 have STA enabled
+    {
+        mode(WIFI_AP_STA);
+    }
 
     _smartConfigStarted = true;
 

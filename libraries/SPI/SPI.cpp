@@ -1,91 +1,78 @@
-/*
- * Copyright (c) 2010 by Cristian Maglie <c.maglie@bug.st>
- * Copyright (c) 2014 by Paul Stoffregen <paul@pjrc.com> (Transaction API)
- * Copyright (c) 2014 by Matthijs Kooijman <matthijs@stdin.nl> (SPISettings AVR)
- * SPI Master library for arduino.
- *
- * This file is free software; you can redistribute it and/or modify
- * it under the terms of either the GNU General Public License version 2
- * or the GNU Lesser General Public License version 2.1, both as
- * published by the Free Software Foundation.
- */
+/* 
+  SPI.cpp - SPI library for esp8266
+
+  Copyright (c) 2015 Hristo Gochkov. All rights reserved.
+  This file is part of the esp8266 core for Arduino environment.
+ 
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 
 #include "SPI.h"
-#include "include/HSPI.h"
 
 SPIClass SPI;
 
+SPIClass::SPIClass(){}
 
-SPIClass::SPIClass()
-: _impl(0)
-{
+void SPIClass::begin(){
+  pinMode(SCK, SPECIAL);
+  pinMode(MISO, SPECIAL);
+  pinMode(MOSI, SPECIAL);
+  
+  GPMUX = 0x105;
+  SPI1C = 0;
+  SPI1CLK = SPI_CLOCK_DIV16;//1MHz
+  SPI1U = SPIUMOSI | SPIUDUPLEX | SPIUSSE;
+  SPI1U1 = (7 << SPILMOSI) | (7 << SPILMISO);
+  SPI1C1 = 0;
 }
 
-void SPIClass::begin()
-{
-  if (_impl)
-    end();
-  _impl = new HSPI;
-  _impl->begin();
+void SPIClass::end() {
+  pinMode(SCK, INPUT);
+  pinMode(MISO, INPUT);
+  pinMode(MOSI, INPUT);
 }
 
-void SPIClass::end() 
-{
-  if (!_impl)
-    return;
-  _impl->end();
-  delete _impl;
-  _impl = 0;
+void SPIClass::beginTransaction(SPISettings settings) {
+  setClockDivider(settings._clock);
+  setBitOrder(settings._bitOrder);
+  setDataMode(settings._dataMode);
 }
 
-void SPIClass::beginTransaction(SPISettings settings)
-{
-	if (!_impl)
-	  return;
-	_impl->setBitOrder(settings._bitOrder);
-	_impl->setDataMode(settings._dataMode);
-	_impl->setClockDivider(settings._clock);
+void SPIClass::endTransaction() {}
+
+void SPIClass::setDataMode(uint8_t dataMode) {
+  
 }
 
-uint8_t SPIClass::transfer(uint8_t data) 
-{
-  if (!_impl)
-    return 0;
-  return _impl->transfer(data);
+void SPIClass::setBitOrder(uint8_t bitOrder) {
+  if (bitOrder == MSBFIRST){
+    SPI1C &= ~(SPICWBO | SPICRBO);
+  } else {
+    SPI1C |= (SPICWBO | SPICRBO);
+  }
 }
 
-uint16_t SPIClass::transfer16(uint16_t data) 
-{
-  if (!_impl)
-    return 0;
-  return _impl->transfer16(data);
+void SPIClass::setClockDivider(uint32_t clockDiv) {
+  SPI1CLK = clockDiv;
 }
 
-void SPIClass::transfer(void *buf, size_t count) 
-{
-  if (!_impl)
-    return;
-  _impl->transfer(buf, count);
-}
-
-void SPIClass::setBitOrder(uint8_t bitOrder) 
-{
-  if (!_impl)
-    return;
-  _impl->setBitOrder(bitOrder);
-}
-
-void SPIClass::setDataMode(uint8_t dataMode) 
-{
-  if (!_impl)
-    return;
-  _impl->setDataMode(dataMode);
-}
-
-void SPIClass::setClockDivider(uint8_t clockDiv) 
-{
-  if (!_impl)
-    return;
-  _impl->setClockDivider(clockDiv);
+uint8_t SPIClass::transfer(uint8_t data) {
+  while(SPI1CMD & SPIBUSY);
+  SPI1W0 = data;
+  SPI1CMD |= SPIBUSY;
+  while(SPI1CMD & SPIBUSY);
+  return (uint8_t)(SPI1W0 & 0xff);
 }
 

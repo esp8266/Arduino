@@ -24,12 +24,11 @@
 
 #include <stdint.h>
 #include "Arduino.h"
-#include "i2c.h"
 
 inline void protocolError()
 {
   delay(5);
-  i2c_stop();
+  twi_stop();
 }
 
 namespace wifio {
@@ -119,7 +118,7 @@ void sendCommand(uint8_t addr, T& t)
 {
   // TODO: calculate parity
   t.parity = 1;
-  if (i2c_master_write_to(addr, reinterpret_cast<const uint8_t*>(&t), sizeof(T), true) != sizeof(T))
+  if (twi_writeTo(addr, reinterpret_cast<uint8_t*>(&t), sizeof(T), true) != sizeof(T))
   {
     protocolError();
   }
@@ -129,7 +128,7 @@ template<typename TC, typename TR>
 bool sendCommandWaitForReply(uint8_t addr, TC& c, Command rt, TR& r, int32_t d_us)
 {
   c.parity = 1;
-  if (i2c_master_write_to(addr, reinterpret_cast<const uint8_t*>(&c), sizeof(TC), true) != sizeof(TC))
+  if (twi_writeTo(addr, reinterpret_cast<uint8_t*>(&c), sizeof(TC), true) != sizeof(TC))
   {
     protocolError();
     return false;
@@ -138,7 +137,7 @@ bool sendCommandWaitForReply(uint8_t addr, TC& c, Command rt, TR& r, int32_t d_u
   {
     delayMicroseconds(d_us);
   }
-  if (i2c_master_read_from(addr, reinterpret_cast<uint8_t*>(&r), sizeof(TR), true) != sizeof(TR) || r.header.cmd != rt)
+  if (twi_readFrom(addr, reinterpret_cast<uint8_t*>(&r), sizeof(TR), true) != sizeof(TR) || r.header.cmd != rt)
   {
     protocolError();
     return false;
