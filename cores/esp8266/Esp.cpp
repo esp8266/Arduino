@@ -24,6 +24,17 @@ extern "C" {
 #include "user_interface.h"
 }
 
+#define kHz (1000L)
+#define MHz (1000L*kHz)
+#define GHz (1000L*MHz)
+
+#define kBit (1024L)
+#define MBit (1024L*kBit)
+#define GBit (1024L*MBit)
+
+#define kB (1024L)
+#define MB (1024L*kB)
+#define GB (1024L*MB)
 
 //extern "C" void ets_wdt_init(uint32_t val);
 extern "C" void ets_wdt_enable(void);
