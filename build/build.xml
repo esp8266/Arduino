@@ -952,9 +952,16 @@
     <echo append="true" file="${staging_folder}/work/${staging_hardware_folder}/tools/avr/builtin_tools_versions.txt" message="arduino.avr-gcc=${gcc_version}${line.separator}"/>
 
     <mkdir dir="${staging_folder}/work/${staging_hardware_folder}/../dist/"/>
-    <get src="http://downloads.arduino.cc/packages/package_index.json" dest="${staging_folder}/work/${staging_hardware_folder}/../dist/package_index.json" verbose="true" skipexisting="false" />
-    <get src="http://downloads.arduino.cc/packages/package_index.json.sig" dest="${staging_folder}/work/${staging_hardware_folder}/../dist/package_index.json.sig" verbose="true" skipexisting="false" />
-    <get src="http://downloads.arduino.cc/libraries/library_index.json" dest="${staging_folder}/work/${staging_hardware_folder}/../dist/library_index.json" verbose="true" skipexisting="false" />
+
+    <get src="http://downloads.arduino.cc/packages/package_index.json.gz" dest="${staging_folder}/work/${staging_hardware_folder}/../dist/" verbose="true" skipexisting="false" />
+    <gunzip src="${staging_folder}/work/${staging_hardware_folder}/../dist/package_index.json.gz" dest="${staging_folder}/work/${staging_hardware_folder}/../dist/"/>
+    <delete file="${staging_folder}/work/${staging_hardware_folder}/../dist/package_index.json.gz"/>
+
+    <get src="http://downloads.arduino.cc/packages/package_index.json.sig" dest="${staging_folder}/work/${staging_hardware_folder}/../dist/" verbose="true" skipexisting="false" />
+
+    <get src="http://downloads.arduino.cc/libraries/library_index.json.gz" dest="${staging_folder}/work/${staging_hardware_folder}/../dist/" verbose="true" skipexisting="false" />
+    <gunzip src="${staging_folder}/work/${staging_hardware_folder}/../dist/library_index.json.gz" dest="${staging_folder}/work/${staging_hardware_folder}/../dist/"/>
+    <delete file="${staging_folder}/work/${staging_hardware_folder}/../dist/library_index.json.gz"/>
 
     <delete dir="${staging_folder}/work/${staging_hardware_folder}/tmp"/>
   </target>
