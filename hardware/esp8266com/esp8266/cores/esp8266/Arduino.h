@@ -186,48 +186,4 @@ long map(long, long, long, long, long);
 
 #include "pins_arduino.h"
 
-/**
- * User-defined Literals
- *  usage:
- *
- *   uint32_t = test = 10_MHz; // --> 10000000
- */
-#ifdef __cplusplus
-unsigned long long operator"" _kHz(unsigned long long x) {
-    return x * 1000;
-}
-
-unsigned long long operator"" _MHz(unsigned long long x) {
-    return x * 1000 * 1000;
-}
-
-unsigned long long operator"" _GHz(unsigned long long x) {
-    return x * 1000 * 1000 * 1000;
-}
-
-unsigned long long operator"" _kBit(unsigned long long x) {
-    return x * 1024;
-}
-
-unsigned long long operator"" _MBit(unsigned long long x) {
-    return x * 1024 * 1024;
-}
-
-unsigned long long operator"" _GBit(unsigned long long x) {
-    return x * 1024 * 1024 * 1024;
-}
-
-unsigned long long operator"" _kB(unsigned long long x) {
-    return x * 1024;
-}
-
-unsigned long long operator"" _MB(unsigned long long x) {
-    return x * 1024 * 1024;
-}
-
-unsigned long long operator"" _GB(unsigned long long x) {
-    return x * 1024 * 1024 * 1024;
-}
-#endif
-
 #endif
