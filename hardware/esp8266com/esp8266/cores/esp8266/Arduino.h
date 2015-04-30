@@ -88,7 +88,7 @@ void yield(void);
 
 #define kBit (1024L)
 #define MBit (1024L*kBit)
-#define GBit (1024L*kBit)
+#define GBit (1024L*MBit)
 
 #define kB (1024L)
 #define MB (1024L*kB)
