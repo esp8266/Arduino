@@ -7,8 +7,8 @@
 	<classpathentry kind="lib" path="lib/jna.jar"/>
 	<classpathentry kind="lib" path="lib/ecj.jar"/>
 	<classpathentry kind="lib" path="lib/apple.jar"/>
-	<classpathentry kind="lib" path="lib/bcpg-jdk15on-149.jar"/>
-	<classpathentry kind="lib" path="lib/bcprov-jdk15on-149.jar"/>
+	<classpathentry kind="lib" path="lib/bcpg-jdk15on-152.jar"/>
+	<classpathentry kind="lib" path="lib/bcprov-jdk15on-152.jar"/>
 	<classpathentry kind="lib" path="lib/commons-codec-1.7.jar"/>
 	<classpathentry kind="lib" path="lib/commons-compress-1.8.jar"/>
 	<classpathentry kind="lib" path="lib/commons-exec-1.1.jar"/>

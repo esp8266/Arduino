@@ -241,16 +241,26 @@ public class ContributionInstaller {
   public List<String> updateIndex() throws Exception {
     List<String> errors = new LinkedList<String>();
     MultiStepProgress progress = new MultiStepProgress(1);
-    String statusText = _("Downloading platforms index...");
 
-    URL url = new URL(PACKAGE_INDEX_URL);
+    downloadIndex(progress, PACKAGE_INDEX_URL);
+    try {
+      downloadIndex(progress, PACKAGE_INDEX_URL + ".sig");
+    } catch (Exception e) {
+      //ignore errors
+    }
+
+    progress.stepDone();
+
+    return errors;
+  }
+
+  private void downloadIndex(MultiStepProgress progress, String packageIndexUrl) throws Exception {
+    String statusText = _("Downloading platforms index...");
+    URL url = new URL(packageIndexUrl);
     String[] urlPathParts = url.getFile().split("/");
     File outputFile = indexer.getIndexFile(urlPathParts[urlPathParts.length - 1]);
     File tmpFile = new File(outputFile.getAbsolutePath() + ".tmp");
     downloader.download(url, tmpFile, progress, statusText);
-    progress.stepDone();
-
-    // TODO: Check downloaded index
 
     // Replace old index with the updated one
     if (outputFile.exists()) {
@@ -259,7 +269,6 @@ public class ContributionInstaller {
     if (!tmpFile.renameTo(outputFile)) {
       throw new Exception("An error occurred while updating platforms index!");
     }
-    return errors;
   }
 
   protected void onProgress(Progress progress) {

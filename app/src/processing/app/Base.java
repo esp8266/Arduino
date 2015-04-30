@@ -22,6 +22,7 @@
 
 package processing.app;
 
+import cc.arduino.DefaultUncaughtExceptionHandler;
 import cc.arduino.contributions.DownloadableContributionVersionComparator;
 import cc.arduino.contributions.VersionHelper;
 import cc.arduino.contributions.libraries.ContributedLibrary;
@@ -342,7 +343,7 @@ public class Base {
         System.exit(1);
       }
 
-      ContributedPlatform installed = indexer.getIndex().getInstalled(boardToInstallParts[0], boardToInstallParts[1]);
+      ContributedPlatform installed = indexer.getInstalled(boardToInstallParts[0], boardToInstallParts[1]);
 
       if (!selected.isReadOnly()) {
         installer.install(selected);

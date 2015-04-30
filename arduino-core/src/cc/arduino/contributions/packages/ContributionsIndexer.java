@@ -29,6 +29,8 @@
 package cc.arduino.contributions.packages;
 
 import cc.arduino.contributions.DownloadableContributionBuiltInAtTheBottomComparator;
+import cc.arduino.contributions.GPGDetachedSignatureVerifier;
+import cc.arduino.contributions.SignatureVerificationFailedException;
 import cc.arduino.contributions.filters.BuiltInPredicate;
 import cc.arduino.contributions.filters.InstalledPredicate;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -39,6 +41,7 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Multimaps;
+import processing.app.BaseNoGui;
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
 import processing.app.debug.TargetPlatformException;
@@ -65,22 +68,12 @@ public class ContributionsIndexer {
     stagingFolder = new File(preferencesFolder, "staging" + File.separator + "packages");
   }
 
-  // public static void main(String args[]) throws Exception {
-  // File indexFile = new File(args[0]);
-  //
-  // // VerifyResult verify = ClearSignedVerifier.verify(indexFile,
-  // // new PackagersPublicKeys());
-  // // if (!verify.verified)
-  // // throw new Exception("Invalid index file!");
-  //
-  // ContributionsIndexer indexer = new ContributionsIndexer(null);
-  // // indexer.parse(new ByteArrayInputStream(verify.clearText));
-  // indexer.parseIndex(indexFile);
-  // indexer.syncWithFilesystem();
-  // }
-
-  public void parseIndex() throws IOException {
-    index = parseIndex(getIndexFile(DEFAULT_INDEX_FILE_NAME));
+  public void parseIndex() throws Exception {
+    File defaultIndexFile = getIndexFile(DEFAULT_INDEX_FILE_NAME);
+    if (!isSigned(defaultIndexFile)) {
+      throw new SignatureVerificationFailedException(DEFAULT_INDEX_FILE_NAME);
+    }
+    index = parseIndex(defaultIndexFile);
 
     File[] indexFiles = preferencesFolder.listFiles(new FilenameFilter() {
       @Override
@@ -147,9 +140,18 @@ public class ContributionsIndexer {
     return !PROTECTED_PACKAGE_NAMES.contains(contributedPackage.getName()) || isSigned(indexFile);
   }
 
-  //TODO stub implementation
   private boolean isSigned(File indexFile) {
-    return true;
+    File signature = new File(indexFile.getParent(), indexFile.getName() + ".sig");
+    if (!signature.exists()) {
+      return false;
+    }
+
+    try {
+      return new GPGDetachedSignatureVerifier().verify(indexFile, signature, new File(BaseNoGui.getContentFile("lib"), "public.gpg.key"));
+    } catch (Exception e) {
+      BaseNoGui.showWarning(e.getMessage(), e.getMessage(), e);
+      return false;
+    }
   }
 
   private ContributionsIndex parseIndex(File indexFile) throws IOException {
@@ -169,6 +171,9 @@ public class ContributionsIndexer {
   }
 
   public void syncBuiltInHardwareFolder(File hardwareFolder) throws IOException {
+    if (index == null) {
+      return;
+    }
     for (File folder : hardwareFolder.listFiles(ONLY_DIRS)) {
       ContributedPackage pack = index.findPackage(folder.getName());
       if (pack != null) {
@@ -203,8 +208,13 @@ public class ContributionsIndexer {
   }
 
   public void syncLocalPackagesFolder() {
-    if (!packagesFolder.isDirectory())
+    if (!packagesFolder.isDirectory()) {
       return;
+    }
+
+    if (index == null) {
+      return;
+    }
 
     // Scan all hardware folders and mark as installed all the
     // platforms found.
@@ -270,6 +280,10 @@ public class ContributionsIndexer {
   public List<TargetPackage> createTargetPackages() throws TargetPlatformException {
     List<TargetPackage> packages = new ArrayList<TargetPackage>();
 
+    if (index == null) {
+      return packages;
+    }
+
     for (ContributedPackage aPackage : index.getPackages()) {
       ContributedTargetPackage targetPackage = new ContributedTargetPackage(aPackage.getName());
 
@@ -315,6 +329,9 @@ public class ContributionsIndexer {
 
   public Set<ContributedTool> getInstalledTools() {
     Set<ContributedTool> tools = new HashSet<ContributedTool>();
+    if (index == null) {
+      return tools;
+    }
     for (ContributedPackage pack : index.getPackages()) {
       Collection<ContributedPlatform> platforms = Collections2.filter(pack.getPlatforms(), new InstalledPredicate());
       ImmutableListMultimap<String, ContributedPlatform> platformsByName = Multimaps.index(platforms, new Function<ContributedPlatform, String>() {
@@ -353,4 +370,24 @@ public class ContributionsIndexer {
     return new File(preferencesFolder, name);
   }
 
+  public List<ContributedPackage> getPackages() {
+    if (index == null) {
+      return new LinkedList<ContributedPackage>();
+    }
+    return index.getPackages();
+  }
+
+  public List<String> getCategories() {
+    if (index == null) {
+      return new LinkedList<String>();
+    }
+    return index.getCategories();
+  }
+
+  public ContributedPlatform getInstalled(String packageName, String platformArch) {
+    if (index == null) {
+      return null;
+    }
+    return index.getInstalled(packageName, platformArch);
+  }
 }

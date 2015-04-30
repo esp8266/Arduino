@@ -20,8 +20,8 @@
 	<classpathentry kind="lib" path="app/lib/jmdns-3.4.1.jar"/>
 	<classpathentry kind="lib" path="app/lib/jsch-0.1.50.jar"/>
 	<classpathentry kind="lib" path="app/lib/jssc-2.8.0.jar"/>
-	<classpathentry kind="lib" path="app/lib/bcpg-jdk15on-149.jar"/>
-	<classpathentry kind="lib" path="app/lib/bcprov-jdk15on-149.jar"/>
+	<classpathentry kind="lib" path="app/lib/bcpg-jdk15on-152.jar"/>
+	<classpathentry kind="lib" path="app/lib/bcprov-jdk15on-152.jar"/>
 	<classpathentry kind="lib" path="app/lib/jackson-core-2.2.3.jar"/>
 	<classpathentry kind="lib" path="app/lib/jackson-databind-2.2.3.jar"/>
 	<classpathentry kind="lib" path="app/lib/jackson-module-mrbean-2.2.3.jar"/>

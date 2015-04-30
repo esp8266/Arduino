@@ -28,15 +28,11 @@
  */
 package cc.arduino.contributions.packages.ui;
 
-import cc.arduino.contributions.ui.InstallerJDialogUncaughtExceptionHandler;
 import cc.arduino.contributions.packages.ContributedPlatform;
 import cc.arduino.contributions.packages.ContributionInstaller;
 import cc.arduino.contributions.packages.ContributionsIndexer;
 import cc.arduino.contributions.packages.DownloadableContribution;
-import cc.arduino.contributions.ui.DropdownItem;
-import cc.arduino.contributions.ui.FilteredAbstractTableModel;
-import cc.arduino.contributions.ui.InstallerJDialog;
-import cc.arduino.contributions.ui.InstallerTableCell;
+import cc.arduino.contributions.ui.*;
 import cc.arduino.utils.Progress;
 import processing.app.I18n;
 
@@ -95,7 +91,7 @@ public class ContributionManagerUI extends InstallerJDialog {
 
     categoryChooser.removeActionListener(categoryChooserActionListener);
 
-    getContribModel().setIndex(indexer.getIndex());
+    getContribModel().setIndexer(indexer);
 
     categoryFilter = null;
     categoryChooser.removeAllItems();
@@ -106,7 +102,7 @@ public class ContributionManagerUI extends InstallerJDialog {
 
     // Enable categories combo only if there are two or more choices
     categoryChooser.addItem(new DropdownAllCoresItem());
-    Collection<String> categories = indexer.getIndex().getCategories();
+    Collection<String> categories = indexer.getCategories();
     for (String s : categories) {
       categoryChooser.addItem(new DropdownCoreOfCategoryItem(s));
     }

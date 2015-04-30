@@ -1,5 +1,6 @@
 package processing.app;
 
+import cc.arduino.contributions.SignatureVerificationFailedException;
 import cc.arduino.contributions.libraries.LibrariesIndexer;
 import cc.arduino.contributions.packages.ContributedTool;
 import cc.arduino.contributions.packages.ContributionsIndexer;
@@ -581,6 +582,7 @@ public class BaseNoGui {
     File defaultPackageJsonFile = new File(getContentFile("dist"), "package_index.json");
     if (!indexFile.isFile() || (defaultPackageJsonFile.isFile() && defaultPackageJsonFile.lastModified() > indexFile.lastModified())) {
       FileUtils.copyFile(defaultPackageJsonFile, indexFile);
+      FileUtils.copyFile(new File(getContentFile("dist"), "package_index.json.sig"), new File(indexFile.getParent(), "package_index.json.sig"));
     } else if (!indexFile.isFile()) {
       // Otherwise create an empty packages index
       FileOutputStream out = null;
@@ -594,7 +596,13 @@ public class BaseNoGui {
         }
       }
     }
-    indexer.parseIndex();
+
+    try {
+      indexer.parseIndex();
+    } catch (SignatureVerificationFailedException e) {
+      indexFile.delete();
+      throw e;
+    }
     indexer.syncWithFilesystem(getHardwareFolder());
 
     packages = new HashMap<String, TargetPackage>();
