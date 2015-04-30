@@ -149,6 +149,8 @@ public class ContributionManagerUI extends InstallerJDialog {
         try {
           setProgressVisible(true, "");
           installer.updateIndex();
+          List<String> downloadedPackageIndexFiles = installer.updateIndex();
+          installer.deleteUnknownFiles(downloadedPackageIndexFiles);
           onIndexesUpdated();
         } catch (Exception e) {
           throw new RuntimeException(e);

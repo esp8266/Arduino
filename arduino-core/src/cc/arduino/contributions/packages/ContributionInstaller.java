@@ -28,6 +28,7 @@
  */
 package cc.arduino.contributions.packages;
 
+import cc.arduino.contributions.GPGDetachedSignatureVerifier;
 import cc.arduino.utils.ArchiveExtractor;
 import cc.arduino.utils.MultiStepProgress;
 import cc.arduino.utils.Progress;
@@ -36,6 +37,8 @@ import com.google.common.collect.Collections2;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
 import processing.app.BaseNoGui;
+import processing.app.I18n;
+import processing.app.PreferencesData;
 import processing.app.helpers.FileUtils;
 import processing.app.helpers.filefilters.OnlyDirs;
 import processing.app.tools.CollectStdOutStdErrExecutor;
@@ -44,26 +47,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import static processing.app.I18n._;
 import static processing.app.I18n.format;
 
 public class ContributionInstaller {
-
-  private static final String PACKAGE_INDEX_URL;
-
-  static {
-    String extenalPackageIndexUrl = System.getProperty("PACKAGE_INDEX_URL");
-    if (extenalPackageIndexUrl != null && !"".equals(extenalPackageIndexUrl)) {
-      PACKAGE_INDEX_URL = extenalPackageIndexUrl;
-    } else {
-      PACKAGE_INDEX_URL = "http://downloads.arduino.cc/packages/package_index.json";
-    }
-  }
 
   private final ContributionsIndexer indexer;
   private final DownloadableContributionsDownloader downloader;
@@ -239,22 +228,46 @@ public class ContributionInstaller {
   }
 
   public List<String> updateIndex() throws Exception {
-    List<String> errors = new LinkedList<String>();
     MultiStepProgress progress = new MultiStepProgress(1);
 
-    downloadIndex(progress, PACKAGE_INDEX_URL);
-    try {
-      downloadIndex(progress, PACKAGE_INDEX_URL + ".sig");
-    } catch (Exception e) {
-      //ignore errors
+    List<String> downloadedPackageIndexFilesAccumulator = new LinkedList<String>();
+    downloadIndexAndSignature(progress, downloadedPackageIndexFilesAccumulator, Constants.PACKAGE_INDEX_URL);
+
+    Set<String> packageIndexURLs = new HashSet<String>();
+    String additionalURLs = PreferencesData.get(Constants.PREFERENCES_BOARDS_MANAGER_ADDITIONAL_URLS, "");
+    if (!"".equals(additionalURLs)) {
+      packageIndexURLs.addAll(Arrays.asList(additionalURLs.split(",")));
+    }
+
+    for (String packageIndexURL : packageIndexURLs) {
+      downloadIndexAndSignature(progress, downloadedPackageIndexFilesAccumulator, packageIndexURL);
     }
 
     progress.stepDone();
 
-    return errors;
+    return downloadedPackageIndexFilesAccumulator;
   }
 
-  private void downloadIndex(MultiStepProgress progress, String packageIndexUrl) throws Exception {
+  private void downloadIndexAndSignature(MultiStepProgress progress, List<String> downloadedPackagedIndexFilesAccumulator, String packageIndexUrl) throws Exception {
+    File packageIndex = downloadIndex(progress, packageIndexUrl);
+    downloadedPackagedIndexFilesAccumulator.add(packageIndex.getName());
+    try {
+      File packageIndexSignature = downloadIndex(progress, packageIndexUrl + ".sig");
+      boolean signatureVerified = new GPGDetachedSignatureVerifier().verify(packageIndex, packageIndexSignature, new File(BaseNoGui.getContentFile("lib"), "public.gpg.key"));
+      if (signatureVerified) {
+        downloadedPackagedIndexFilesAccumulator.add(packageIndexSignature.getName());
+      } else {
+        downloadedPackagedIndexFilesAccumulator.remove(packageIndex.getName());
+        packageIndex.delete();
+        packageIndexSignature.delete();
+        System.err.println(I18n.format(_("{0} file signature verification failed. File ignored."), packageIndexUrl));
+      }
+    } catch (Exception e) {
+      //ignore errors
+    }
+  }
+
+  private File downloadIndex(MultiStepProgress progress, String packageIndexUrl) throws Exception {
     String statusText = _("Downloading platforms index...");
     URL url = new URL(packageIndexUrl);
     String[] urlPathParts = url.getFile().split("/");
@@ -269,9 +282,24 @@ public class ContributionInstaller {
     if (!tmpFile.renameTo(outputFile)) {
       throw new Exception("An error occurred while updating platforms index!");
     }
+
+    return outputFile;
   }
 
   protected void onProgress(Progress progress) {
     // Empty
+  }
+
+  public void deleteUnknownFiles(List<String> downloadedPackageIndexFiles) {
+    File preferencesFolder = indexer.getIndexFile(".").getParentFile();
+    File[] additionalPackageIndexFiles = preferencesFolder.listFiles(new PackageIndexFilenameFilter(Constants.DEFAULT_INDEX_FILE_NAME));
+    if (additionalPackageIndexFiles == null) {
+      return;
+    }
+    for (File additionalPackageIndexFile : additionalPackageIndexFiles) {
+      if (!downloadedPackageIndexFiles.contains(additionalPackageIndexFile.getName())) {
+        additionalPackageIndexFile.delete();
+      }
+    }
   }
 }

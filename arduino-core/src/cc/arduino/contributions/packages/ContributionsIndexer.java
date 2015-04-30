@@ -47,15 +47,15 @@ import processing.app.debug.TargetPlatform;
 import processing.app.debug.TargetPlatformException;
 import processing.app.helpers.PreferencesMap;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 import static processing.app.helpers.filefilters.OnlyDirs.ONLY_DIRS;
 
 public class ContributionsIndexer {
-
-  private static final String DEFAULT_INDEX_FILE_NAME = "package_index.json";
-  private static final List<String> PROTECTED_PACKAGE_NAMES = Arrays.asList("arduino", "Intel");
 
   private final File packagesFolder;
   private final File stagingFolder;
@@ -69,18 +69,13 @@ public class ContributionsIndexer {
   }
 
   public void parseIndex() throws Exception {
-    File defaultIndexFile = getIndexFile(DEFAULT_INDEX_FILE_NAME);
+    File defaultIndexFile = getIndexFile(Constants.DEFAULT_INDEX_FILE_NAME);
     if (!isSigned(defaultIndexFile)) {
-      throw new SignatureVerificationFailedException(DEFAULT_INDEX_FILE_NAME);
+      throw new SignatureVerificationFailedException(Constants.DEFAULT_INDEX_FILE_NAME);
     }
     index = parseIndex(defaultIndexFile);
 
-    File[] indexFiles = preferencesFolder.listFiles(new FilenameFilter() {
-      @Override
-      public boolean accept(File file, String name) {
-        return !DEFAULT_INDEX_FILE_NAME.equals(name) && name.startsWith("package_") && name.endsWith("_index.json");
-      }
-    });
+    File[] indexFiles = preferencesFolder.listFiles(new PackageIndexFilenameFilter(Constants.DEFAULT_INDEX_FILE_NAME));
 
     for (File indexFile : indexFiles) {
       ContributionsIndex contributionsIndex = parseIndex(indexFile);
@@ -137,7 +132,7 @@ public class ContributionsIndexer {
   }
 
   private boolean mergeAllowed(ContributedPackage contributedPackage, File indexFile) {
-    return !PROTECTED_PACKAGE_NAMES.contains(contributedPackage.getName()) || isSigned(indexFile);
+    return !Constants.PROTECTED_PACKAGE_NAMES.contains(contributedPackage.getName()) || isSigned(indexFile);
   }
 
   private boolean isSigned(File indexFile) {

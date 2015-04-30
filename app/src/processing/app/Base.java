@@ -322,7 +322,8 @@ public class Base {
           lastStatus = progress.getStatus();
         }
       };
-      installer.updateIndex();
+      List<String> downloadedPackageIndexFiles = installer.updateIndex();
+      installer.deleteUnknownFiles(downloadedPackageIndexFiles);
       indexer.parseIndex();
       indexer.syncWithFilesystem(getHardwareFolder());
 
