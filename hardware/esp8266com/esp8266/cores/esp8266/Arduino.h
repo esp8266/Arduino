@@ -82,6 +82,18 @@ void yield(void);
 #define degrees(rad) ((rad)*RAD_TO_DEG)
 #define sq(x) ((x)*(x))
 
+#define kHz (1000L)
+#define MHz (1000L*kHz)
+#define GHz (1000L*MHz)
+
+#define kBit (1024L)
+#define MBit (1024L*kBit)
+#define GBit (1024L*kBit)
+
+#define kB (1024L)
+#define MB (1024L*kB)
+#define GB (1024L*MB)
+
 void ets_intr_lock();
 void ets_intr_unlock();
 
