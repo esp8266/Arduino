@@ -27,6 +27,7 @@ extern "C" {
 #include "osapi.h"
 #include "mem.h"
 #include "user_interface.h"
+#include "smartconfig.h"
 #include "lwip/opt.h"
 #include "lwip/err.h"
 #include "lwip/dns.h"
@@ -374,6 +375,45 @@ int ESP8266WiFiClass::hostByName(const char* aHostname, IPAddress& aResult)
     
     return (aResult != 0) ? 1 : 0;
 }
+
+void ESP8266WiFiClass::beginSmartConfig()
+{
+    if (_smartConfigStarted)
+        return;
+
+    WiFi.mode(WIFI_STA);
+
+    _smartConfigStarted = true;
+
+    //SC_TYPE_ESPTOUCH use ESPTOUCH for smartconfig, or use SC_TYPE_AIRKISS for AIRKISS 
+    smartconfig_start(SC_TYPE_ESPTOUCH, &ESP8266WiFiClass::_smartConfigDone);
+}
+
+void ESP8266WiFiClass::stopSmartConfig()
+{
+    if (!_smartConfigStarted)
+        return;
+
+    smartconfig_stop();
+    _smartConfigStarted = false;
+}
+
+bool ESP8266WiFiClass::smartConfigDone(){
+    if (!_smartConfigStarted)
+        return false;
+
+    return smartconfig_get_status() == SC_STATUS_LINK_OVER;
+}
+
+void ESP8266WiFiClass::_smartConfigDone(void* result)
+{
+    station_config* sta_conf = reinterpret_cast<station_config*>(result);
+  
+    wifi_station_set_config(sta_conf);
+    wifi_station_disconnect();
+    wifi_station_connect();
+}
+
 
 void ESP8266WiFiClass::printDiag(Print& p)
 {
