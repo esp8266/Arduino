@@ -221,6 +221,32 @@ String ESP8266WebServer::arg(const char* name)
 	return String();
 }
 
+String ESP8266WebServer::arg(int i)
+{
+	if (i < _currentArgCount)
+		return _currentArgs[i].value;
+	return String();
+}
+
+String ESP8266WebServer::argName(int i)
+{
+	if (i < _currentArgCount)
+		return _currentArgs[i].key;
+	return String();
+}
+
+int ESP8266WebServer::args(){
+  return _currentArgCount;
+}
+
+bool ESP8266WebServer::hasArg(const char* name)
+{
+	for (int i = 0; i < _currentArgCount; ++i) {
+		if (_currentArgs[i].key == name)
+			return true;
+	}
+	return false;
+}
 
 void ESP8266WebServer::_parseArguments(String data)
 {
@@ -293,6 +319,9 @@ void ESP8266WebServer::_parseArguments(String data)
 
 }
 
+void ESP8266WebServer::onNotFound(TNotFoundHandlerFunction fn){
+  _notFoundHandler = fn;
+}
 
 void ESP8266WebServer::_handleRequest(WiFiClient& client, String uri, HTTPMethod method) {
 	_currentClient   = client;
@@ -312,12 +341,12 @@ void ESP8266WebServer::_handleRequest(WiFiClient& client, String uri, HTTPMethod
 		break;
 	}
 
-	if (!handler)
-	{
+	if (!handler){
 #ifdef DEBUG
 		Serial.println("request handler not found");
 #endif
-		send(404, "text/plain", String("Not found: ") + uri);
+    if(!_notFoundHandler || !_notFoundHandler())
+      send(404, "text/plain", String("Not found: ") + uri);
 	}
 
 	_currentClient   = WiFiClient();
