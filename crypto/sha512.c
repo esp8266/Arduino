@@ -83,14 +83,14 @@ static const uint64_t k[80] =
 */
 void SHA512_Init(SHA512_CTX *ctx)
 {
-    ctx->h[0] = 0x6A09E667F3BCC908;
-    ctx->h[1] = 0xBB67AE8584CAA73B;
-    ctx->h[2] = 0x3C6EF372FE94F82B;
-    ctx->h[3] = 0xA54FF53A5F1D36F1;
-    ctx->h[4] = 0x510E527FADE682D1;
-    ctx->h[5] = 0x9B05688C2B3E6C1F;
-    ctx->h[6] = 0x1F83D9ABFB41BD6B;
-    ctx->h[7] = 0x5BE0CD19137E2179;
+    ctx->h_dig.h[0] = 0x6A09E667F3BCC908;
+    ctx->h_dig.h[1] = 0xBB67AE8584CAA73B;
+    ctx->h_dig.h[2] = 0x3C6EF372FE94F82B;
+    ctx->h_dig.h[3] = 0xA54FF53A5F1D36F1;
+    ctx->h_dig.h[4] = 0x510E527FADE682D1;
+    ctx->h_dig.h[5] = 0x9B05688C2B3E6C1F;
+    ctx->h_dig.h[6] = 0x1F83D9ABFB41BD6B;
+    ctx->h_dig.h[7] = 0x5BE0CD19137E2179;
     ctx->size = 0;
     ctx->totalSize = 0;
 }
@@ -102,22 +102,22 @@ static void SHA512_Process(SHA512_CTX *ctx)
     uint64_t temp2;
  
     // Initialize the 8 working registers
-    uint64_t a = ctx->h[0];
-    uint64_t b = ctx->h[1];
-    uint64_t c = ctx->h[2];
-    uint64_t d = ctx->h[3];
-    uint64_t e = ctx->h[4];
-    uint64_t f = ctx->h[5];
-    uint64_t g = ctx->h[6];
-    uint64_t h = ctx->h[7];
+    uint64_t a = ctx->h_dig.h[0];
+    uint64_t b = ctx->h_dig.h[1];
+    uint64_t c = ctx->h_dig.h[2];
+    uint64_t d = ctx->h_dig.h[3];
+    uint64_t e = ctx->h_dig.h[4];
+    uint64_t f = ctx->h_dig.h[5];
+    uint64_t g = ctx->h_dig.h[6];
+    uint64_t h = ctx->h_dig.h[7];
  
     // Process message in 16-word blocks
-    uint64_t *w = ctx->w;
+    uint64_t *w = ctx->w_buf.w;
  
     // Convert from big-endian byte order to host byte order
     for (t = 0; t < 16; t++)
        w[t] = be64toh(w[t]);
- 
+
     // Prepare the message schedule
     for (t = 16; t < 80; t++)
        w[t] = SIGMA4(w[t - 2]) + w[t - 7] + SIGMA3(w[t - 15]) + w[t - 16];
@@ -141,14 +141,14 @@ static void SHA512_Process(SHA512_CTX *ctx)
     }
  
     // Update the hash value
-    ctx->h[0] += a;
-    ctx->h[1] += b;
-    ctx->h[2] += c;
-    ctx->h[3] += d;
-    ctx->h[4] += e;
-    ctx->h[5] += f;
-    ctx->h[6] += g;
-    ctx->h[7] += h;
+    ctx->h_dig.h[0] += a;
+    ctx->h_dig.h[1] += b;
+    ctx->h_dig.h[2] += c;
+    ctx->h_dig.h[3] += d;
+    ctx->h_dig.h[4] += e;
+    ctx->h_dig.h[5] += f;
+    ctx->h_dig.h[6] += g;
+    ctx->h_dig.h[7] += h;
  }
 
 /**
@@ -163,7 +163,7 @@ void SHA512_Update(SHA512_CTX *ctx, const uint8_t * msg, int len)
         size_t n = MIN(len, 128 - ctx->size);
  
         // Copy the data to the buffer
-        memcpy(ctx->buffer + ctx->size, msg, n);
+        memcpy(ctx->w_buf.buffer + ctx->size, msg, n);
  
         // Update the SHA-512 ctx
         ctx->size += n;
@@ -203,18 +203,18 @@ void SHA512_Final(uint8_t *digest, SHA512_CTX *ctx)
     SHA512_Update(ctx, padding, paddingSize);
  
     // Append the length of the original message
-    ctx->w[14] = 0;
-    ctx->w[15] = be64toh(totalSize);
+    ctx->w_buf.w[14] = 0;
+    ctx->w_buf.w[15] = be64toh(totalSize);
  
     // Calculate the message digest
     SHA512_Process(ctx);
  
     // Convert from host byte order to big-endian byte order
     for (i = 0; i < 8; i++)
-       ctx->h[i] = be64toh(ctx->h[i]);
+       ctx->h_dig.h[i] = be64toh(ctx->h_dig.h[i]);
  
     // Copy the resulting digest
     if (digest != NULL)
-       memcpy(digest, ctx->digest, SHA512_SIZE);
+       memcpy(digest, ctx->h_dig.digest, SHA512_SIZE);
  }
  

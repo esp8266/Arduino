@@ -151,12 +151,12 @@ typedef struct
     {
         uint64_t h[8];
         uint8_t digest[64];
-    };
+    } h_dig;
     union
     {
         uint64_t w[80];
         uint8_t buffer[128];
-    };
+    } w_buf;
     size_t size;
     uint64_t totalSize;
 } SHA512_CTX;

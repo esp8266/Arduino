@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2014, Cameron Rich
+ * Copyright (c) 2007-2015, Cameron Rich
  * 
  * All rights reserved.
  * 
@@ -136,11 +136,16 @@ EXP_FUNC int STDCALL getdomainname(char *buf, int buf_size);
 #include <sys/wait.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <asm/byteorder.h>
 
 #define SOCKET_READ(A,B,C)      read(A,B,C)
 #define SOCKET_WRITE(A,B,C)     write(A,B,C)
 #define SOCKET_CLOSE(A)         if (A >= 0) close(A)
 #define TTY_FLUSH()
+
+#ifndef be64toh
+#define be64toh(x) __be64_to_cpu(x)
+#endif
 
 #endif  /* Not Win32 */
 

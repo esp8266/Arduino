@@ -41,6 +41,7 @@ extern "C" {
 #endif
 
 #include "version.h"
+#include "config.h"
 #include "os_int.h"
 #include "crypto.h"
 #include "crypto_misc.h"
