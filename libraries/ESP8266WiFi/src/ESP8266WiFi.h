@@ -223,6 +223,10 @@ public:
      */    
     bool smartConfigDone();
 
+    /*
+     * Stop SmartConfig
+     *
+     */ 
     void stopSmartConfig();
 
     friend class WiFiClient;

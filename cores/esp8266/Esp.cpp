@@ -74,7 +74,7 @@ void EspClass::restart(void)
     system_restart();
 }
 
-uint16_t EspClass::getVCC(void)
+uint16_t EspClass::getVcc(void)
 {
     return system_get_vdd33();
 }
@@ -89,7 +89,7 @@ uint32_t EspClass::getChipId(void)
     return system_get_chip_id();
 }
 
-const char * EspClass::getSDKversion(void)
+const char * EspClass::getSdkVersion(void)
 {
     return system_get_sdk_version();
 }
@@ -104,7 +104,7 @@ uint8_t EspClass::getBootMode(void)
     return system_get_boot_mode();
 }
 
-uint8_t EspClass::getCPUfreqMHz(void)
+uint8_t EspClass::getCpuFreqMHz(void)
 {
     return system_get_cpu_freq();
 }
@@ -121,7 +121,7 @@ uint32_t EspClass::getFlashChipSize(void)
     uint8_t * bytes = (uint8_t *) &data;
     // read first 4 byte (magic byte + flash config)
     if(spi_flash_read(0x0000, &data, 4) == SPI_FLASH_RESULT_OK) {
-        switch((bytes[3] & 0xF0) >> 4) {
+        switch((bytes[3] & 0xf0) >> 4) {
             case 0x0: // 4 Mbit (512KB)
                 return (512 * kB);
             case 0x1: // 2 MBit (256KB)
@@ -152,7 +152,7 @@ uint32_t EspClass::getFlashChipSpeed(void)
                 return (26 * MHz);
             case 0x2: // 20 MHz
                 return (20 * MHz);
-            case 0xF: // 80 MHz
+            case 0xf: // 80 MHz
                 return (80 * MHz);
             default: // fail?
                 return 0;
@@ -163,14 +163,14 @@ uint32_t EspClass::getFlashChipSpeed(void)
 
 FlashMode_t EspClass::getFlashChipMode(void)
 {
-    FlashMode_t mode = FM_FAILD;
+    FlashMode_t mode = FM_UNKNOWN;
     uint32_t data;
     uint8_t * bytes = (uint8_t *) &data;
     // read first 4 byte (magic byte + flash config)
     if(spi_flash_read(0x0000, &data, 4) == SPI_FLASH_RESULT_OK) {
         mode = (FlashMode_t) bytes[2];
         if(mode > FM_DOUT) {
-            mode = FM_FAILD;
+            mode = FM_UNKNOWN;
         }
     }
     return mode;
