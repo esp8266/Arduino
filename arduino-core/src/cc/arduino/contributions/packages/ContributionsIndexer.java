@@ -75,7 +75,7 @@ public class ContributionsIndexer {
     }
     index = parseIndex(defaultIndexFile);
 
-    File[] indexFiles = preferencesFolder.listFiles(new PackageIndexFilenameFilter(Constants.DEFAULT_INDEX_FILE_NAME));
+    File[] indexFiles = preferencesFolder.listFiles(new TestPackageIndexFilenameFilter(new PackageIndexFilenameFilter(Constants.DEFAULT_INDEX_FILE_NAME)));
 
     for (File indexFile : indexFiles) {
       ContributionsIndex contributionsIndex = parseIndex(indexFile);

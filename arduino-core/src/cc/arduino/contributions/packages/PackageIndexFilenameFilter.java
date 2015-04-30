@@ -13,6 +13,6 @@ public class PackageIndexFilenameFilter implements FilenameFilter {
 
   @Override
   public boolean accept(File file, String name) {
-    return !defaultPackageIndexFileName.equals(name) && name.startsWith("package_") && name.endsWith("_index.json");
+    return new File(file, name).isFile() && !defaultPackageIndexFileName.equals(name) && name.startsWith("package_") && name.endsWith("_index.json");
   }
 }
