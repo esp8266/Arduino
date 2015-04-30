@@ -582,7 +582,6 @@ public class BaseNoGui {
     File defaultPackageJsonFile = new File(getContentFile("dist"), "package_index.json");
     if (!indexFile.isFile() || (defaultPackageJsonFile.isFile() && defaultPackageJsonFile.lastModified() > indexFile.lastModified())) {
       FileUtils.copyFile(defaultPackageJsonFile, indexFile);
-      FileUtils.copyFile(new File(getContentFile("dist"), "package_index.json.sig"), new File(indexFile.getParent(), "package_index.json.sig"));
     } else if (!indexFile.isFile()) {
       // Otherwise create an empty packages index
       FileOutputStream out = null;
@@ -597,10 +596,17 @@ public class BaseNoGui {
       }
     }
 
+    File indexSignatureFile = indexer.getIndexFile("package_index.json.sig");
+    File defaultPackageJsonSignatureFile = new File(getContentFile("dist"), "package_index.json.sig");
+    if (!indexSignatureFile.isFile() || (defaultPackageJsonSignatureFile.isFile() && defaultPackageJsonSignatureFile.lastModified() > indexSignatureFile.lastModified())) {
+      FileUtils.copyFile(defaultPackageJsonSignatureFile, indexSignatureFile);
+    }
+
     try {
       indexer.parseIndex();
     } catch (SignatureVerificationFailedException e) {
       indexFile.delete();
+      indexSignatureFile.delete();
       throw e;
     }
     indexer.syncWithFilesystem(getHardwareFolder());
