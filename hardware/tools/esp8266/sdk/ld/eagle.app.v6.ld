@@ -153,7 +153,7 @@ SECTIONS
     _irom0_text_start = ABSOLUTE(.);
     *core_esp8266_*.o(.literal*, .text*)
     *.cpp.o(.literal*, .text*)
-	*libm.a:(.literal .text .literal.* .text.*)
+    *libm.a:(.literal .text .literal.* .text.*)
     *libsmartconfig.a:(.literal .text .literal.* .text.*)
     *(.irom0.literal .irom.literal .irom.text.literal .irom0.text .irom.text)
     _irom0_text_end = ABSOLUTE(.);
