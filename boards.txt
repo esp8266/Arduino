@@ -1,5 +1,6 @@
 menu.UploadSpeed=Upload Speed
 menu.CpuFrequency=CPU Frequency
+menu.FlashSize=Flash size
 ##############################################################
 generic.name=Generic ESP8266 Module
 
@@ -16,6 +17,9 @@ generic.build.f_cpu=80000000L
 generic.build.board=ESP8266_ESP01
 generic.build.core=esp8266
 generic.build.variant=generic
+generic.build.flash_mode=qio
+generic.build.flash_size=512K
+generic.build.flash_freq=40
 
 generic.menu.CpuFrequency.80=80 MHz
 generic.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -28,29 +32,52 @@ generic.menu.UploadSpeed.9600=9600
 generic.menu.UploadSpeed.9600.upload.speed=9600
 generic.menu.UploadSpeed.57600=57600
 generic.menu.UploadSpeed.57600.upload.speed=57600
-generic.menu.UploadSpeed.256000=256000
+generic.menu.UploadSpeed.256000.windows=256000
 generic.menu.UploadSpeed.256000.upload.speed=256000
+generic.menu.UploadSpeed.230400.linux=230400
+generic.menu.UploadSpeed.230400.macosx=230400
+generic.menu.UploadSpeed.230400.upload.speed=230400
+generic.menu.UploadSpeed.460800.linux=460800
+generic.menu.UploadSpeed.460800.macosx=460800
+generic.menu.UploadSpeed.460800.upload.speed=460800
+generic.menu.UploadSpeed.512000.windows=512000
+generic.menu.UploadSpeed.512000.upload.speed=512000
 generic.menu.UploadSpeed.921600=921600
 generic.menu.UploadSpeed.921600.upload.speed=921600
 
+generic.menu.FlashSize.512K=512K
+generic.menu.FlashSize.512K.build.flash_size=512K
+generic.menu.FlashSize.256K=256K
+generic.menu.FlashSize.256K.build.flash_size=256K
+generic.menu.FlashSize.1M=1M
+generic.menu.FlashSize.1M.build.flash_size=1M
+generic.menu.FlashSize.2M=2M
+generic.menu.FlashSize.2M.build.flash_size=2M
+generic.menu.FlashSize.4M=4M
+generic.menu.FlashSize.4M.build.flash_size=4M
+
 ##############################################################
-wifio.name=Wifio
-
-wifio.upload.tool=esptool
-wifio.upload.speed=115200
-wifio.upload.resetmethod=wifio
-wifio.upload.maximum_size=524288
-wifio.upload.wait_for_upload_port=true
-
-wifio.build.mcu=esp8266
-wifio.build.f_cpu=80000000L
-wifio.build.board=ESP8266_WIFIO
-wifio.build.core=esp8266
-wifio.build.variant=wifio
-
-wifio.menu.CpuFrequency.80=80MHz
-wifio.menu.CpuFrequency.80.build.f_cpu=80000000L
-wifio.menu.CpuFrequency.160=160MHz
-wifio.menu.CpuFrequency.160.build.f_cpu=160000000L
-
-wifio.upload.tool=esptool
+# wifio.name=Wifio
+#
+# wifio.upload.tool=esptool
+# wifio.upload.speed=115200
+# wifio.upload.resetmethod=wifio
+# wifio.upload.maximum_size=524288
+# wifio.upload.wait_for_upload_port=true
+#
+# wifio.build.mcu=esp8266
+# wifio.build.f_cpu=80000000L
+# wifio.build.board=ESP8266_WIFIO
+# wifio.build.core=esp8266
+# wifio.build.variant=wifio
+# wifio.build.flash_mode=qio
+# wifio.build.flash_size=512K
+# wifio.build.flash_freq=40
+#
+# wifio.menu.CpuFrequency.80=80MHz
+# wifio.menu.CpuFrequency.80.build.f_cpu=80000000L
+# wifio.menu.CpuFrequency.160=160MHz
+# wifio.menu.CpuFrequency.160.build.f_cpu=160000000L
+#
+# wifio.upload.tool=esptool
+#
