@@ -39,21 +39,26 @@ public:
 	void handleClient();
 
 	typedef std::function<void(void)> THandlerFunction;
+	typedef std::function<bool(void)> TNotFoundHandlerFunction;
 	void on(const char* uri, THandlerFunction handler);
 	void on(const char* uri, HTTPMethod method, THandlerFunction fn);
+	void onNotFound(TNotFoundHandlerFunction fn);//called when handler is not assigned
 
 	String uri() { return _currentUri; }
 	HTTPMethod method() { return _currentMethod; }
 	WiFiClient client() { return _currentClient; }
-
+	
+	String arg(const char* name);// get request argument value
+	String arg(int i);// get request argument value buy number
+	String argName(int i);// get request argument name buy number
+  int args();//get arguments count
+  bool hasArg(const char* name);//check if argument exists
+  
 	// send response to the client
 	// code - HTTP response code, can be 200 or 404
 	// content_type - HTTP content type, like "text/plain" or "image/png"
 	// content - actual content body
 	void send(int code, const char* content_type = NULL, String content = String(""));
-
-	// get request argument value
-	String arg(const char* name);
 
 protected:
 	void _handleRequest(WiFiClient& client, String uri, HTTPMethod method);
@@ -76,6 +81,7 @@ protected:
 
 	RequestHandler* _firstHandler;
 	RequestHandler* _lastHandler;
+  TNotFoundHandlerFunction _notFoundHandler;
 
 };
 
