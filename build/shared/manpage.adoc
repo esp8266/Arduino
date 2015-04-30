@@ -268,6 +268,26 @@ Install Bridge and Servo libraries
 
      arduino --install-library "Bridge:1.0.0,Servo:1.2.0"
 
+BUGS
+----
+
+Even in command line mode the Arduino IDE requires a graphical user interface to be
+present. This should usually be the case in Windows or Mac OS X. On Linux however you
+might want to compile and upload sketches when logged in via SSH or in batch mode. To
+accomplish this, install the Xvfb dummy X server and write a small wrapper script to 
+create an instance of this Xserver, run the Arduino IDE in it and kill the Xserver 
+afterwards:
+
+     #!/bin/bash
+     Xvfb :1 -nolisten tcp -screen :1 1280x800x24 &
+     xvfb="$!"
+     DISPLAY=:1 arduino $@
+     kill -9 $xvfb
+
+Save the script as *arduino-headless* and run it with the options described above.
+If the script does not return to a shell prompt, the options you specified were wrong
+and the Arduino IDE actually opened a window, stop its execution with Ctrl+C.
+
 HISTORY
 -------
 1.5.2::
