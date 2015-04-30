@@ -218,3 +218,32 @@ FlashMode_t EspClass::getFlashChipMode(void)
     }
     return mode;
 }
+
+/**
+ * Infos from
+ *  http://www.wlxmall.com/images/stock_item/att/A1010004.pdf
+ *  http://www.gigadevice.com/product-series/5.html?locale=en_US
+ */
+uint32_t EspClass::getFlashChipSizeByChipId(void) {
+    uint32_t chipId = getFlashChipId();
+    switch(chipId) {
+        case 0x1740C8: // GD25Q64B
+            return (8_MB);
+        case 0x1640C8: // GD25Q32B
+            return (4_MB);
+        case 0x1540C8: // GD25Q16B
+            return (2_MB);
+        case 0x1440C8: // GD25Q80
+            return (1_MB);
+        case 0x1340C8: // GD25Q40
+            return (512_kB);
+        case 0x1240C8: // GD25Q20
+            return (256_kB);
+        case 0x1140C8: // GD25Q10
+            return (128_kB);
+        case 0x1040C8: // GD25Q12
+            return (64_kB);
+        default:
+            return 0;
+    }
+}
