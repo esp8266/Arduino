@@ -24,18 +24,6 @@ extern "C" {
 #include "user_interface.h"
 }
 
-#define kHz (1000L)
-#define MHz (1000L*kHz)
-#define GHz (1000L*MHz)
-
-#define kBit (1024L)
-#define MBit (1024L*kBit)
-#define GBit (1024L*MBit)
-
-#define kB (1024L)
-#define MB (1024L*kB)
-#define GB (1024L*MB)
-
 //extern "C" void ets_wdt_init(uint32_t val);
 extern "C" void ets_wdt_enable(void);
 extern "C" void ets_wdt_disable(void);
@@ -134,15 +122,15 @@ uint32_t EspClass::getFlashChipSize(void)
     if(spi_flash_read(0x0000, &data, 4) == SPI_FLASH_RESULT_OK) {
         switch((bytes[3] & 0xf0) >> 4) {
             case 0x0: // 4 Mbit (512KB)
-                return (512 * kB);
+                return (512_kB);
             case 0x1: // 2 MBit (256KB)
-                return (256 * kB);
+                return (256_kB);
             case 0x2: // 8 MBit (1MB)
-                return (1 * MB);
+                return (1_MB);
             case 0x3: // 16 MBit (2MB)
-                return (2 * MB);
+                return (2_MB);
             case 0x4: // 32 MBit (4MB)
-                return (4 * MB);
+                return (4_MB);
             default: // fail?
                 return 0;
         }
@@ -158,13 +146,13 @@ uint32_t EspClass::getFlashChipSpeed(void)
     if(spi_flash_read(0x0000, &data, 4) == SPI_FLASH_RESULT_OK) {
         switch(bytes[3] & 0x0F) {
             case 0x0: // 40 MHz
-                return (40 * MHz);
+                return (40_MHz);
             case 0x1: // 26 MHz
-                return (26 * MHz);
+                return (26_MHz);
             case 0x2: // 20 MHz
-                return (20 * MHz);
+                return (20_MHz);
             case 0xf: // 80 MHz
-                return (80 * MHz);
+                return (80_MHz);
             default: // fail?
                 return 0;
         }
