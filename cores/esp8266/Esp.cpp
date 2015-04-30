@@ -89,11 +89,6 @@ uint32_t EspClass::getChipId(void)
     return system_get_chip_id();
 }
 
-uint32_t EspClass::getFlashChipId(void)
-{
-    return spi_flash_get_id();
-}
-
 const char * EspClass::getSDKversion(void)
 {
     return system_get_sdk_version();
@@ -112,4 +107,71 @@ uint8_t EspClass::getBootMode(void)
 uint8_t EspClass::getCPUfreqMHz(void)
 {
     return system_get_cpu_freq();
+}
+
+
+uint32_t EspClass::getFlashChipId(void)
+{
+    return spi_flash_get_id();
+}
+
+uint32_t EspClass::getFlashChipSize(void)
+{
+    uint32_t data;
+    uint8_t * bytes = (uint8_t *) &data;
+    // read first 4 byte (magic byte + flash config)
+    if(spi_flash_read(0x0000, &data, 4) == SPI_FLASH_RESULT_OK) {
+        switch((bytes[3] & 0xF0) >> 4) {
+            case 0x0: // 4 Mbit (512KB)
+                return (512 * kB);
+            case 0x1: // 2 MBit (256KB)
+                return (256 * kB);
+            case 0x2: // 8 MBit (1MB)
+                return (1 * MB);
+            case 0x3: // 16 MBit (2MB)
+                return (2 * MB);
+            case 0x4: // 32 MBit (4MB)
+                return (4 * MB);
+            default: // fail?
+                return 0;
+        }
+    }
+    return 0;
+}
+
+uint32_t EspClass::getFlashChipSpeed(void)
+{
+    uint32_t data;
+    uint8_t * bytes = (uint8_t *) &data;
+    // read first 4 byte (magic byte + flash config)
+    if(spi_flash_read(0x0000, &data, 4) == SPI_FLASH_RESULT_OK) {
+        switch(bytes[3] & 0x0F) {
+            case 0x0: // 40 MHz
+                return (40 * MHz);
+            case 0x1: // 26 MHz
+                return (26 * MHz);
+            case 0x2: // 20 MHz
+                return (20 * MHz);
+            case 0xF: // 80 MHz
+                return (80 * MHz);
+            default: // fail?
+                return 0;
+        }
+    }
+    return 0;
+}
+
+FlashMode_t EspClass::getFlashChipMode(void)
+{
+    FlashMode_t mode = FM_FAILD;
+    uint32_t data;
+    uint8_t * bytes = (uint8_t *) &data;
+    // read first 4 byte (magic byte + flash config)
+    if(spi_flash_read(0x0000, &data, 4) == SPI_FLASH_RESULT_OK) {
+        mode = (FlashMode_t) bytes[2];
+        if(mode > FM_DOUT) {
+            mode = FM_FAILD;
+        }
+    }
+    return mode;
 }

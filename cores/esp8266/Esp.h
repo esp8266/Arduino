@@ -49,6 +49,14 @@ enum WakeMode {
     WAKE_RF_DISABLED = 4 // disable RF after deep-sleep wake up, just like modem sleep, there will be the smallest current.
 };
 
+typedef enum {
+     FM_QIO = 0x00,
+     FM_QOUT = 0x01,
+     FM_DIO = 0x02,
+     FM_DOUT = 0x03,
+     FM_FAILD = 0xFF
+} FlashMode_t;
+
 class EspClass {
     public:
         EspClass();
@@ -69,7 +77,7 @@ class EspClass {
         uint32_t getFreeHeap(void);
 
         uint32_t getChipId(void);
-        uint32_t getFlashChipId(void);
+
 
         const char * getSDKversion(void);
 
@@ -77,6 +85,11 @@ class EspClass {
         uint8_t getBootMode(void);
 
         uint8_t getCPUfreqMHz(void);
+
+        uint32_t getFlashChipId(void);
+        uint32_t getFlashChipSize(void);
+        uint32_t getFlashChipSpeed(void);
+        FlashMode_t getFlashChipMode(void);
 
 };
 
