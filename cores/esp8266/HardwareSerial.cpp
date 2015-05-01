@@ -510,9 +510,6 @@ void ICACHE_FLASH_ATTR HardwareSerial::begin(unsigned long baud, byte config) {
 }
 
 void ICACHE_FLASH_ATTR HardwareSerial::end() {
-    if(uart_get_debug() == _uart_nr) {
-        uart_set_debug(UART_NO);
-    }
     uart_uninit(_uart);
     delete _rx_buffer;
     delete _tx_buffer;
