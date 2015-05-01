@@ -154,6 +154,11 @@ extern void __detachInterrupt(uint8_t pin) {
 }
 
 void initPins() {
+  //Disable UART interrupts
+  system_set_os_print(0);
+  U0IE = 0;
+  U1IE = 0;
+
   for (int i = 0; i <= 5; ++i) {
     pinMode(i, INPUT);
   }
