@@ -90,6 +90,7 @@ class EspClass {
         uint32_t getFlashChipSize(void);
         uint32_t getFlashChipSpeed(void);
         FlashMode_t getFlashChipMode(void);
+        uint32_t getFlashChipSizeByChipId(void);
 
 };
 
