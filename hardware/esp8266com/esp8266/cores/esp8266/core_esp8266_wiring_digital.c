@@ -59,13 +59,17 @@ extern void __pinMode(uint8_t pin, uint8_t mode) {
       GPF(pin) = GPFFS(GPFFS_GPIO(pin));//Set mode to GPIO
       GPC(pin) = (GPC(pin) & (0xF << GPCI)); //SOURCE(GPIO) | DRIVER(NORMAL) | INT_TYPE(UNCHANGED) | WAKEUP_ENABLE(DISABLED)
       GPES = (1 << pin); //Enable
-    } else if(mode == INPUT || mode == INPUT_PULLUP){
+    } else if(mode == INPUT || mode == INPUT_PULLUP || mode == INPUT_PULLDOWN){
       GPF(pin) = GPFFS(GPFFS_GPIO(pin));//Set mode to GPIO
       GPC(pin) = (GPC(pin) & (0xF << GPCI)) | (1 << GPCD); //SOURCE(GPIO) | DRIVER(OPEN_DRAIN) | INT_TYPE(UNCHANGED) | WAKEUP_ENABLE(DISABLED)
       GPEC = (1 << pin); //Disable
-      if(mode == INPUT_PULLUP){
-        GPF(pin) |= (1 << GPFPU);//Enable Pullup
-      }
+        if(mode == INPUT_PULLUP) {
+            GPF(pin) &= ~(1 << GPFPD); // Disable Pulldown
+            GPF(pin) |= (1 << GPFPU);  // Enable  Pullup
+        } else if(mode == INPUT_PULLDOWN) {
+            GPF(pin) &= ~(1 << GPFPU); // Disable Pullup
+            GPF(pin) |= (1 << GPFPD);  // Enable  Pulldown
+        }
     }
   } else if(pin == 16){
     GPF16 = GP16FFS(GPFFS_GPIO(pin));//Set mode to GPIO
@@ -81,7 +85,7 @@ extern void __pinMode(uint8_t pin, uint8_t mode) {
   }
 }
 
-extern void __digitalWrite(uint8_t pin, uint8_t val) {
+extern void ICACHE_RAM_ATTR __digitalWrite(uint8_t pin, uint8_t val) {
   val &= 0x01;
   if(pin < 16){
     if(val) GPOS = (1 << pin);
@@ -92,12 +96,13 @@ extern void __digitalWrite(uint8_t pin, uint8_t val) {
   }
 }
 
-extern int __digitalRead(uint8_t pin) {
+extern int ICACHE_RAM_ATTR __digitalRead(uint8_t pin) {
   if(pin < 16){
     return GPIP(pin);
   } else if(pin == 16){
     return GP16I & 0x01;
   }
+  return 0;
 }
 
 /*
@@ -154,6 +159,11 @@ extern void __detachInterrupt(uint8_t pin) {
 }
 
 void initPins() {
+  //Disable UART interrupts
+  system_set_os_print(0);
+  U0IE = 0;
+  U1IE = 0;
+
   for (int i = 0; i <= 5; ++i) {
     pinMode(i, INPUT);
   }

@@ -93,9 +93,11 @@ static uint8_t esp8266_gpioToFn[16] = {0x34, 0x18, 0x38, 0x14, 0x3C, 0x40, 0x1C,
 //GPIO (0-15) PIN Function Bits
 #define GPFSOE 0 //Sleep OE
 #define GPFSS  1 //Sleep Sel
+#define GPFSPD 2 //Sleep Pulldown
 #define GPFSPU 3 //Sleep Pullup
 #define GPFFS0 4 //Function Select bit 0
 #define GPFFS1 5 //Function Select bit 1
+#define GPFPD  6 //Pulldown
 #define GPFPU  7 //Pullup
 #define GPFFS2 8 //Function Select bit 2
 #define GPFFS(f) (((((f) & 4) != 0) << GPFFS2) | ((((f) & 2) != 0) << GPFFS1) | ((((f) & 1) != 0) << GPFFS0))

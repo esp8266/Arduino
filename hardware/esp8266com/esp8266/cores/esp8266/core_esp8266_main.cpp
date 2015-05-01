@@ -48,7 +48,7 @@ extern void setup();
 
 void preloop_update_frequency() __attribute__((weak));
 void preloop_update_frequency() {
-#if defined(F_CPU) && (F_CPU == 16000000L)
+#if defined(F_CPU) && (F_CPU == 160000000L)
     REG_SET_BIT(0x3ff00014, BIT(0));
     ets_update_cpu_frequency(160);
 #endif
