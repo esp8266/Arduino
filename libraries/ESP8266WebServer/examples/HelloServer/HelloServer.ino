@@ -14,15 +14,16 @@ const int led = 13;
 void handleRoot() {
   digitalWrite(led, 1);
   server.send(200, "text/plain", "hello from esp8266!");
+  digitalWrite(led, 0);
 }
 
 void handleNotFound(){
   digitalWrite(led, 1);
-  String message = "URI: ";
+  String message += "File Not Found\n\n";
+  message += "URI: ";
   message += server.uri();
   message += "\nMethod: ";
   message += (server.method() == HTTP_GET)?"GET":"POST";
-  message += "\nNot Found!\n\n";
   message += "\nArguments: ";
   message += server.args();
   message += "\n";
