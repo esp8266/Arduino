@@ -81,7 +81,7 @@ extern void __pinMode(uint8_t pin, uint8_t mode) {
   }
 }
 
-extern void __digitalWrite(uint8_t pin, uint8_t val) {
+extern void ICACHE_RAM_ATTR __digitalWrite(uint8_t pin, uint8_t val) {
   val &= 0x01;
   if(pin < 16){
     if(val) GPOS = (1 << pin);
@@ -92,12 +92,13 @@ extern void __digitalWrite(uint8_t pin, uint8_t val) {
   }
 }
 
-extern int __digitalRead(uint8_t pin) {
+extern int ICACHE_RAM_ATTR __digitalRead(uint8_t pin) {
   if(pin < 16){
     return GPIP(pin);
   } else if(pin == 16){
     return GP16I & 0x01;
   }
+  return 0;
 }
 
 /*
