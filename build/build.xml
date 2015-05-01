@@ -784,12 +784,12 @@
   </target>
 
   <target name="download-launch4j-windows">
-    <get src="http://switch.dl.sourceforge.net/project/launch4j/launch4j-3/3.0.2/launch4j-3.0.2-win32.zip" dest="windows" usetimestamp="true" skipexisting="true" verbose="true" />
+    <get src="http://heanet.dl.sourceforge.net/project/launch4j/launch4j-3/3.0.2/launch4j-3.0.2-win32.zip" dest="windows" usetimestamp="true" skipexisting="true" verbose="true" />
     <unzip dest="windows/launcher/" src="windows/launch4j-3.0.2-win32.zip" overwrite="true"/>
   </target>
 
   <target name="download-launch4j-linux">
-    <get src="http://switch.dl.sourceforge.net/project/launch4j/launch4j-3/3.0.2/launch4j-3.0.2-linux.tgz" dest="windows" usetimestamp="true" skipexisting="true" verbose="true" />
+    <get src="http://heanet.dl.sourceforge.net/project/launch4j/launch4j-3/3.0.2/launch4j-3.0.2-linux.tgz" dest="windows" usetimestamp="true" skipexisting="true" verbose="true" />
 
     <exec executable="tar" dir="windows/launcher">
       <arg value="-xf"/>
