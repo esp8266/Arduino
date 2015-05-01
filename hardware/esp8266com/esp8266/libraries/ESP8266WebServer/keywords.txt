@@ -21,6 +21,10 @@ method	KEYWORD2
 client	KEYWORD2
 send	KEYWORD2
 arg	KEYWORD2
+argName	KEYWORD2
+args	KEYWORD2
+hasArg	KEYWORD2
+onNotFound	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
