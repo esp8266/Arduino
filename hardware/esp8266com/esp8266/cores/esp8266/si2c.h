@@ -1,5 +1,5 @@
 /* 
-  pulse.c - wiring pulseIn implementation for esp8266
+  si2c.h - Software I2C library for esp8266
 
   Copyright (c) 2015 Hristo Gochkov. All rights reserved.
   This file is part of the esp8266 core for Arduino environment.
@@ -18,15 +18,14 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#include "wiring_private.h"
-#include "pins_arduino.h"
+#ifndef SI2C_h
+#define SI2C_h
+#include "Arduino.h"
 
-unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout) {
-  pinMode(pin, INPUT);
-  uint32_t start = micros();
-  while(digitalRead(pin) == state && (micros() - start) < timeout);
-  while(digitalRead(pin) != state && (micros() - start) < timeout);
-  start = micros();
-  while(digitalRead(pin) == state && (micros() - start) < timeout);
-  return micros() - start;
-}
+void twi_init(uint8_t sda, uint8_t scl);
+void twi_stop(void);
+void twi_setClock(uint32_t freq);
+uint8_t twi_writeTo(uint8_t address, uint8_t * buf, uint32_t len, uint8_t sendStop);
+uint8_t twi_readFrom(uint8_t address, uint8_t * buf, uint32_t len, uint8_t sendStop);
+
+#endif

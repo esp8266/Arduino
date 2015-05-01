@@ -36,17 +36,27 @@ extern "C" {
 #include "stdlib_noniso.h"
 #include "binary.h"
 #include "pgmspace.h"
+#include "esp8266_peri.h"
+#include "si2c.h"
 
 void yield(void);
 
 #define HIGH 0x1
 #define LOW  0x0
 
-#define INPUT 0x0
-#define OUTPUT 0x1
-#define INPUT_PULLUP 0x2
-#define INPUT_PULLDOWN 0x3
-#define OUTPUT_OPEN_DRAIN 0x4
+#define PWMRANGE 1023
+
+//GPIO FUNCTIONS
+#define INPUT           0x00
+#define OUTPUT          0x01
+#define INPUT_PULLUP    0x02
+#define INPUT_PULLDOWN  0x04
+#define SPECIAL         0xF8 //defaults to the usable BUSes uart0rx/tx uart1tx and hspi
+#define FUNCTION_0      0x08
+#define FUNCTION_1      0x18
+#define FUNCTION_2      0x28
+#define FUNCTION_3      0x38
+#define FUNCTION_4      0x48
 
 #define PI 3.1415926535897932384626433832795
 #define HALF_PI 1.5707963267948966192313216916398
@@ -61,12 +71,40 @@ void yield(void);
 #define LSBFIRST 0
 #define MSBFIRST 1
 
-#define CHANGE 1
-#define FALLING 2
-#define RISING 3
+//Interrupt Modes
+#define DISABLED  0x00
+#define RISING    0x01
+#define FALLING   0x02
+#define CHANGE    0x03
+#define ONLOW     0x04
+#define ONHIGH    0x05
+#define ONLOW_WE  0x0C
+#define ONHIGH_WE 0x0D
 
 #define DEFAULT 1
 #define EXTERNAL 0
+
+//timer dividers
+#define TIM_DIV1 	0 //80MHz (80 ticks/us - 104857.588 us max)
+#define TIM_DIV16	1 //5MHz (5 ticks/us - 1677721.4 us max)
+#define TIM_DIV265	3 //312.5Khz (1 tick = 3.2us - 26843542.4 us max)
+//timer int_types
+#define TIM_EDGE	0
+#define TIM_LEVEL	1
+//timer reload values
+#define TIM_SINGLE	0 //on interrupt routine you need to write a new value to start the timer again
+#define TIM_LOOP	1 //on interrupt the counter will start with the same value again
+
+#define timer1_read()           (T1V)
+#define timer1_enabled()        ((T1C & (1 << TCTE)) != 0)
+#define timer1_interrupted()    ((T1C & (1 << TCIS)) != 0)
+
+void timer1_isr_init(void);
+void timer1_enable(uint8_t divider, uint8_t int_type, uint8_t reload);
+void timer1_disable(void);
+void timer1_attachInterrupt(void (*userFunc)(void));
+void timer1_detachInterrupt(void);
+void timer1_write(uint32_t ticks); //maximum ticks 8388607
 
 // undefine stdlib's abs if encountered
 #ifdef abs
@@ -145,13 +183,12 @@ void loop(void);
 
 uint32_t digitalPinToPort(uint32_t pin);
 uint32_t digitalPinToBitMask(uint32_t pin);
-#define analogInPinToBit(P) (P)
 volatile uint32_t* portOutputRegister(uint32_t port);
 volatile uint32_t* portInputRegister(uint32_t port);
 volatile uint32_t* portModeRegister(uint32_t port);
 
-#define NOT_A_PIN 0
-#define NOT_A_PORT 0
+#define NOT_A_PIN -1
+#define NOT_A_PORT -1
 #define NOT_AN_INTERRUPT -1
 
 #ifdef __cplusplus

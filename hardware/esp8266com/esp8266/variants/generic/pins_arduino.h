@@ -26,34 +26,25 @@
 #ifndef Pins_Arduino_h
 #define Pins_Arduino_h
 
-#define NUM_DIGITAL_PINS  16
-#define NUM_ANALOG_INPUTS 1
-#define ESP_PINS_OFFSET   0 
+#define EXTERNAL_NUM_INTERRUPTS 16
+#define NUM_DIGITAL_PINS        17
+#define NUM_ANALOG_INPUTS       1
 
-static const uint8_t SDA = 0;
-static const uint8_t SCL = 2;
+#define analogInputToDigitalPin(p)  ((p > 0)?NOT_A_PIN:0)
+#define digitalPinToInterrupt(p)  	(((p) < EXTERNAL_NUM_INTERRUPTS)?p:NOT_A_PIN)
+#define digitalPinHasPWM(p)         (((p) < NUM_DIGITAL_PINS)?p:NOT_A_PIN)
 
-static const uint8_t SS   = 12;
-static const uint8_t MOSI = 13;
-static const uint8_t MISO = 14;
-static const uint8_t SCK  = 15;
+static const uint8_t SDA = 4;
+static const uint8_t SCL = 5;
+
+static const uint8_t SS    = 15;
+static const uint8_t MOSI  = 13;
+static const uint8_t MISO  = 12;
+static const uint8_t SCK   = 14;
 
 static const uint8_t BUILTIN_LED = 1;
 
-static const uint8_t A0 = 0;
-
-static const uint8_t E0 = ESP_PINS_OFFSET + 0;
-static const uint8_t E1 = ESP_PINS_OFFSET + 1;
-static const uint8_t E2 = ESP_PINS_OFFSET + 2;
-static const uint8_t E3 = ESP_PINS_OFFSET + 3;
-static const uint8_t E4 = ESP_PINS_OFFSET + 4;
-static const uint8_t E5 = ESP_PINS_OFFSET + 5;
-static const uint8_t E11 = ESP_PINS_OFFSET + 11;
-static const uint8_t E12 = ESP_PINS_OFFSET + 12;
-static const uint8_t E13 = ESP_PINS_OFFSET + 13;
-static const uint8_t E14 = ESP_PINS_OFFSET + 14;
-static const uint8_t E15 = ESP_PINS_OFFSET + 15;
-static const uint8_t E16 = ESP_PINS_OFFSET + 16;
+static const uint8_t A0 = 17;
 
 // These serial port names are intended to allow libraries and architecture-neutral
 // sketches to automatically default to the correct port name for a particular type

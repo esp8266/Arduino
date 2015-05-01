@@ -56,3 +56,5 @@ avr-toolchain-*.zip
 /hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/
 /hardware/tools/bossac.exe
 /hardware/tools/listComPorts.exe
+
+build/macosx/esptool-*-osx.zip

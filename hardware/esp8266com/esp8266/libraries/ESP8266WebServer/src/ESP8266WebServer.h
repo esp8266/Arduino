@@ -32,50 +32,57 @@ class ESP8266WebServer
 {
 public:
 
-	ESP8266WebServer(int port = 80);
-	~ESP8266WebServer();
+  ESP8266WebServer(int port = 80);
+  ~ESP8266WebServer();
 
-	void begin();
-	void handleClient();
+  void begin();
+  void handleClient();
 
-	typedef std::function<void(void)> THandlerFunction;
-	void on(const char* uri, THandlerFunction handler);
-	void on(const char* uri, HTTPMethod method, THandlerFunction fn);
+  typedef std::function<void(void)> THandlerFunction;
+  void on(const char* uri, THandlerFunction handler);
+  void on(const char* uri, HTTPMethod method, THandlerFunction fn);
+  void onNotFound(THandlerFunction fn);  //called when handler is not assigned
 
-	String uri() { return _currentUri; }
-	HTTPMethod method() { return _currentMethod; }
-	WiFiClient client() { return _currentClient; }
-
-	// send response to the client
-	// code - HTTP response code, can be 200 or 404
-	// content_type - HTTP content type, like "text/plain" or "image/png"
-	// content - actual content body
-	void send(int code, const char* content_type = NULL, String content = String(""));
-
-	// get request argument value
-	String arg(const char* name);
+  String uri() { return _currentUri; }
+  HTTPMethod method() { return _currentMethod; }
+  WiFiClient client() { return _currentClient; }
+  
+  String arg(const char* name);   // get request argument value by name
+  String arg(int i);              // get request argument value by number
+  String argName(int i);          // get request argument name by number
+  int args();                     // get arguments count
+  bool hasArg(const char* name);  // check if argument exists
+  
+  // send response to the client
+  // code - HTTP response code, can be 200 or 404
+  // content_type - HTTP content type, like "text/plain" or "image/png"
+  // content - actual content body
+  void send(int code, const char* content_type = NULL, String content = String(""));
 
 protected:
-	void _handleRequest(WiFiClient& client, String uri, HTTPMethod method);
-	void _parseArguments(String data);
+  void _handleRequest(WiFiClient& client, String uri, HTTPMethod method);
+  void _parseArguments(String data);
+  static const char* _responseCodeToString(int code);
+  static void _appendHeader(String& response, const char* name, const char* value);
+  
+  struct RequestHandler;
+  struct RequestArgument {
+    String key;
+    String value;
+  };
 
-	struct RequestHandler;
-	struct RequestArgument {
-		String key;
-		String value;
-	};
+  WiFiServer  _server;
 
-	WiFiServer 	_server;
+  WiFiClient  _currentClient;
+  HTTPMethod  _currentMethod;
+  String      _currentUri;
 
-	WiFiClient 	_currentClient;
-	HTTPMethod 	_currentMethod;
-	String 		_currentUri;
+  size_t           _currentArgCount;
+  RequestArgument* _currentArgs;
 
-	size_t      _currentArgCount;
-	RequestArgument* _currentArgs;
-
-	RequestHandler* _firstHandler;
-	RequestHandler* _lastHandler;
+  RequestHandler*  _firstHandler;
+  RequestHandler*  _lastHandler;
+  THandlerFunction _notFoundHandler;
 
 };
 

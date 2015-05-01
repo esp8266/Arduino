@@ -1,5 +1,5 @@
 /*
-  TwoWire.cpp - TWI/I2C library for Wiring & Arduino
+  TwoWire.cpp - TWI/I2C library for Arduino & Wiring
   Copyright (c) 2006 Nicholas Zambetti.  All right reserved.
 
   This library is free software; you can redistribute it and/or
@@ -15,9 +15,10 @@
   You should have received a copy of the GNU Lesser General Public
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- 
+
   Modified 2012 by Todd Krein (todd@krein.org) to implement repeated starts
   Modified December 2014 by Ivan Grokhotkov (ivan@esp8266.com) - esp8266 support
+  Modified April 2015 by Hrsto Gochkov (ficeto@ficeto.com) - alternative esp8266 support
 */
 
 extern "C" {
@@ -26,7 +27,7 @@ extern "C" {
   #include <inttypes.h>
 }
 
-#include "i2c.h"
+#include "si2c.h"
 #include "Wire.h"
 
 // Initialize Class Variables //////////////////////////////////////////////////
@@ -46,215 +47,137 @@ void (*TwoWire::user_onReceive)(int);
 
 // Constructors ////////////////////////////////////////////////////////////////
 
-TwoWire::TwoWire()
-{
-}
+TwoWire::TwoWire(){}
 
 // Public Methods //////////////////////////////////////////////////////////////
 
-void TwoWire::pins(int sda, int scl)
-{
-    i2c_init(sda, scl);
+void TwoWire::begin(int sda, int scl){
+    twi_init(sda, scl);
+    flush();
 }
 
-void TwoWire::begin(void)
-{
-  rxBufferIndex = 0;
-  rxBufferLength = 0;
-
-  txBufferIndex = 0;
-  txBufferLength = 0;
-
+void TwoWire::begin(void){
+  begin(SDA, SCL);
 }
 
-void TwoWire::begin(uint8_t address)
-{
+void TwoWire::begin(uint8_t address){
   // twi_setAddress(address);
   // twi_attachSlaveTxEvent(onRequestService);
   // twi_attachSlaveRxEvent(onReceiveService);
-  // begin();
+  begin();
 }
 
-void TwoWire::begin(int address)
-{
-  // begin((uint8_t)address);
+void TwoWire::begin(int address){
+  begin((uint8_t)address);
 }
 
-void TwoWire::setClock(uint32_t frequency)
-{
-    i2c_freq(frequency);
+void TwoWire::setClock(uint32_t frequency){
+  twi_setClock(frequency);
 }
-size_t TwoWire::requestFrom(uint8_t address, size_t size, bool sendStop)
-{
-  // clamp to buffer length
+
+size_t TwoWire::requestFrom(uint8_t address, size_t size, bool sendStop){
   if(size > BUFFER_LENGTH){
     size = BUFFER_LENGTH;
   }
-  // perform blocking read into buffer
-  size_t read = i2c_master_read_from(address, rxBuffer, size, sendStop);
-  // set rx buffer iterator vars
+  size_t read = (twi_readFrom(address, rxBuffer, size, sendStop) == 0)?size:0;
   rxBufferIndex = 0;
   rxBufferLength = read;
-
   return read;
 }
 
-uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity, uint8_t sendStop)
-{
+uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity, uint8_t sendStop){
   return requestFrom(address, static_cast<size_t>(quantity), static_cast<bool>(sendStop));
 }
 
-uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity)
-{
+uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity){
   return requestFrom(address, static_cast<size_t>(quantity), true);
 }
 
-uint8_t TwoWire::requestFrom(int address, int quantity)
-{
+uint8_t TwoWire::requestFrom(int address, int quantity){
   return requestFrom(static_cast<uint8_t>(address), static_cast<size_t>(quantity), true);
 }
 
-uint8_t TwoWire::requestFrom(int address, int quantity, int sendStop)
-{
+uint8_t TwoWire::requestFrom(int address, int quantity, int sendStop){
   return requestFrom(static_cast<uint8_t>(address), static_cast<size_t>(quantity), static_cast<bool>(sendStop));
 }
 
-void TwoWire::beginTransmission(uint8_t address)
-{
-  // indicate that we are transmitting
+void TwoWire::beginTransmission(uint8_t address){
   transmitting = 1;
-  // set address of targeted slave
   txAddress = address;
-  // reset tx buffer iterator vars
   txBufferIndex = 0;
   txBufferLength = 0;
 }
 
-void TwoWire::beginTransmission(int address)
-{
+void TwoWire::beginTransmission(int address){
   beginTransmission((uint8_t)address);
 }
 
-//
-//	Originally, 'endTransmission' was an f(void) function.
-//	It has been modified to take one parameter indicating
-//	whether or not a STOP should be performed on the bus.
-//	Calling endTransmission(false) allows a sketch to 
-//	perform a repeated start. 
-//
-//	WARNING: Nothing in the library keeps track of whether
-//	the bus tenure has been properly ended with a STOP. It
-//	is very possible to leave the bus in a hung state if
-//	no call to endTransmission(true) is made. Some I2C
-//	devices will behave oddly if they do not see a STOP.
-//
-uint8_t TwoWire::endTransmission(uint8_t sendStop)
-{
-  // transmit buffer (blocking)
-  int8_t ret = i2c_master_write_to(txAddress, txBuffer, txBufferLength, sendStop);
-  // reset tx buffer iterator vars
+uint8_t TwoWire::endTransmission(uint8_t sendStop){
+  int8_t ret = twi_writeTo(txAddress, txBuffer, txBufferLength, sendStop);
   txBufferIndex = 0;
   txBufferLength = 0;
-  // indicate that we are done transmitting
   transmitting = 0;
   return ret;
 }
 
-//	This provides backwards compatibility with the original
-//	definition, and expected behaviour, of endTransmission
-//
-uint8_t TwoWire::endTransmission(void)
-{
+uint8_t TwoWire::endTransmission(void){
   return endTransmission(true);
 }
 
-// must be called in:
-// slave tx event callback
-// or after beginTransmission(address)
-size_t TwoWire::write(uint8_t data)
-{
+size_t TwoWire::write(uint8_t data){
   if(transmitting){
-  // in master transmitter mode
-    // don't bother if buffer is full
     if(txBufferLength >= BUFFER_LENGTH){
       setWriteError();
       return 0;
     }
-    // put byte in tx buffer
     txBuffer[txBufferIndex] = data;
     ++txBufferIndex;
-    // update amount in buffer   
     txBufferLength = txBufferIndex;
-  }else{
-  // in slave send mode
-    // reply to master
+  } else {
     // i2c_slave_transmit(&data, 1);
   }
   return 1;
 }
 
-// must be called in:
-// slave tx event callback
-// or after beginTransmission(address)
-size_t TwoWire::write(const uint8_t *data, size_t quantity)
-{
+size_t TwoWire::write(const uint8_t *data, size_t quantity){
   if(transmitting){
-  // in master transmitter mode
     for(size_t i = 0; i < quantity; ++i){
-      write(data[i]);
+      if(!write(data[i])) return i;
     }
   }else{
-  // in slave send mode
-    // reply to master
     // i2c_slave_transmit(data, quantity);
   }
   return quantity;
 }
 
-// must be called in:
-// slave rx event callback
-// or after requestFrom(address, numBytes)
-int TwoWire::available(void)
-{
+int TwoWire::available(void){
   return rxBufferLength - rxBufferIndex;
 }
 
-// must be called in:
-// slave rx event callback
-// or after requestFrom(address, numBytes)
-int TwoWire::read(void)
-{
+int TwoWire::read(void){
   int value = -1;
-  
-  // get each successive byte on each call
   if(rxBufferIndex < rxBufferLength){
     value = rxBuffer[rxBufferIndex];
     ++rxBufferIndex;
   }
-
   return value;
 }
 
-// must be called in:
-// slave rx event callback
-// or after requestFrom(address, numBytes)
-int TwoWire::peek(void)
-{
+int TwoWire::peek(void){
   int value = -1;
-  
   if(rxBufferIndex < rxBufferLength){
     value = rxBuffer[rxBufferIndex];
   }
-
   return value;
 }
 
-void TwoWire::flush(void)
-{
-  // XXX: to be implemented.
+void TwoWire::flush(void){
+  rxBufferIndex = 0;
+  rxBufferLength = 0;
+  txBufferIndex = 0;
+  txBufferLength = 0;
 }
 
-// behind the scenes function that is called when data is received
 void TwoWire::onReceiveService(uint8_t* inBytes, int numBytes)
 {
   // don't bother if user hasn't registered a callback
@@ -279,9 +202,7 @@ void TwoWire::onReceiveService(uint8_t* inBytes, int numBytes)
   // user_onReceive(numBytes);
 }
 
-// behind the scenes function that is called when data is requested
-void TwoWire::onRequestService(void)
-{
+void TwoWire::onRequestService(void){
   // // don't bother if user hasn't registered a callback
   // if(!user_onRequest){
   //   return;
@@ -294,16 +215,12 @@ void TwoWire::onRequestService(void)
   // user_onRequest();
 }
 
-// sets function called on slave write
-void TwoWire::onReceive( void (*function)(int) )
-{
-  // user_onReceive = function;
+void TwoWire::onReceive( void (*function)(int) ){
+  //user_onReceive = function;
 }
 
-// sets function called on slave read
-void TwoWire::onRequest( void (*function)(void) )
-{
-  // user_onRequest = function;
+void TwoWire::onRequest( void (*function)(void) ){
+  //user_onRequest = function;
 }
 
 // Preinstantiate Objects //////////////////////////////////////////////////////
