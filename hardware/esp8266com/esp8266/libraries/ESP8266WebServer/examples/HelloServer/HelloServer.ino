@@ -9,11 +9,15 @@ MDNSResponder mdns;
 
 ESP8266WebServer server(80);
 
+const int led = 13;
+
 void handleRoot() {
+  digitalWrite(led, 1);
   server.send(200, "text/plain", "hello from esp8266!");
 }
 
 void handleNotFound(){
+  digitalWrite(led, 1);
   String message = "URI: ";
   message += server.uri();
   message += "\nMethod: ";
@@ -26,9 +30,12 @@ void handleNotFound(){
     message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
   }
   server.send(404, "text/plain", message);
+  digitalWrite(led, 0);
 }
  
 void setup(void){
+  pinMode(led, OUTPUT);
+  digitalWrite(led, 0);
   Serial.begin(115200);
   WiFi.begin(ssid, password);
   Serial.println("");
