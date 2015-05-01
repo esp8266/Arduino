@@ -59,13 +59,17 @@ extern void __pinMode(uint8_t pin, uint8_t mode) {
       GPF(pin) = GPFFS(GPFFS_GPIO(pin));//Set mode to GPIO
       GPC(pin) = (GPC(pin) & (0xF << GPCI)); //SOURCE(GPIO) | DRIVER(NORMAL) | INT_TYPE(UNCHANGED) | WAKEUP_ENABLE(DISABLED)
       GPES = (1 << pin); //Enable
-    } else if(mode == INPUT || mode == INPUT_PULLUP){
+    } else if(mode == INPUT || mode == INPUT_PULLUP || mode == INPUT_PULLDOWN){
       GPF(pin) = GPFFS(GPFFS_GPIO(pin));//Set mode to GPIO
       GPC(pin) = (GPC(pin) & (0xF << GPCI)) | (1 << GPCD); //SOURCE(GPIO) | DRIVER(OPEN_DRAIN) | INT_TYPE(UNCHANGED) | WAKEUP_ENABLE(DISABLED)
       GPEC = (1 << pin); //Disable
-      if(mode == INPUT_PULLUP){
-        GPF(pin) |= (1 << GPFPU);//Enable Pullup
-      }
+        if(mode == INPUT_PULLUP) {
+            GPF(pin) &= ~(1 << GPFPD); // Disable Pulldown
+            GPF(pin) |= (1 << GPFPU);  // Enable  Pullup
+        } else if(mode == INPUT_PULLDOWN) {
+            GPF(pin) &= ~(1 << GPFPU); // Disable Pullup
+            GPF(pin) |= (1 << GPFPD);  // Enable  Pulldown
+        }
     }
   } else if(pin == 16){
     GPF16 = GP16FFS(GPFFS_GPIO(pin));//Set mode to GPIO
