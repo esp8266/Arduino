@@ -42,16 +42,15 @@ public:
 	typedef std::function<bool(void)> TNotFoundHandlerFunction;
 	void on(const char* uri, THandlerFunction handler);
 	void on(const char* uri, HTTPMethod method, THandlerFunction fn);
-  //called when handler is not assigned, return true if you handle it else return false to let the class return 404
-	void onNotFound(TNotFoundHandlerFunction fn);
+	void onNotFound(TNotFoundHandlerFunction fn);//called when handler is not assigned
 
 	String uri() { return _currentUri; }
 	HTTPMethod method() { return _currentMethod; }
 	WiFiClient client() { return _currentClient; }
 	
 	String arg(const char* name);// get request argument value
-	String arg(int i);// get request argument value by number
-	String argName(int i);// get request argument name by number
+	String arg(int i);// get request argument value buy number
+	String argName(int i);// get request argument name buy number
   int args();//get arguments count
   bool hasArg(const char* name);//check if argument exists
   
