@@ -6,18 +6,14 @@
 const char* ssid = "........";
 const char* password = "........";
 MDNSResponder mdns;
+
 ESP8266WebServer server(80);
 
-const int led = 13;
-
 void handle_root() {
-  digitalWrite(led, 1);
   server.send(200, "text/plain", "hello from esp8266!");
-  digitalWrite(led, 0);
 }
 
 bool handle_not_found(){
-  digitalWrite(led, 1);
   String message = "URI: ";
   message += server.uri();
   message += "\nMethod: ";
@@ -30,14 +26,11 @@ bool handle_not_found(){
   }
   message += "\nNotFound!";
   server.send(404, "text/plain", message);
-  digitalWrite(led, 0);
   return true;
 }
  
 void setup(void){
   Serial.begin(115200);
-  pinMode(led, OUTPUT);
-  digitalWrite(led, 0);
   WiFi.begin(ssid, password);
   Serial.println("");
 
