@@ -154,7 +154,15 @@ extern void __detachInterrupt(uint8_t pin) {
 }
 
 void initPins() {
-  ETS_GPIO_INTR_ATTACH(interrupt_handlers, &interrupt_reg);
+  for (int i = 0; i <= 5; ++i) {
+    pinMode(i, INPUT);
+  }
+  // pins 6-11 are used for the SPI flash interface
+  for (int i = 12; i <= 16; ++i) {
+    pinMode(i, INPUT);
+  }
+  
+  ETS_GPIO_INTR_ATTACH(interrupt_handler, &interrupt_reg);
   ETS_GPIO_INTR_ENABLE();
 }
 
