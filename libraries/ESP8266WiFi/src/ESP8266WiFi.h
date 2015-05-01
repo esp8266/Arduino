@@ -32,7 +32,7 @@ extern "C" {
 #include "WiFiClient.h"
 #include "WiFiServer.h"
 
-enum WiFiMode { WIFI_STA = 1, WIFI_AP = 2, WIFI_AP_STA = 3 };
+enum WiFiMode { WIFI_OFF = 0, WIFI_STA = 1, WIFI_AP = 2, WIFI_AP_STA = 3 };
 
 class ESP8266WiFiClass
 {
@@ -41,6 +41,7 @@ public:
     ESP8266WiFiClass();
 
     void mode(WiFiMode);
+        
     
     /* Start Wifi connection for OPEN networks
      *

@@ -23,7 +23,7 @@ compiler.S.flags=-c -g -x assembler-with-cpp -MMD
 compiler.c.elf.ldscript=eagle.app.v6.ld
 compiler.c.elf.flags=-nostdlib -Wl,--no-check-sections -u call_user_start -Wl,-static "-L{compiler.sdk.path}/lib" "-L{compiler.sdk.path}/ld" "-T{compiler.c.elf.ldscript}"
 compiler.c.elf.cmd=xtensa-lx106-elf-gcc
-compiler.c.elf.libs=-lgcc -lm -lhal -lphy -lnet80211 -llwip -lwpa -lmain -lpp -lsmartconfig
+compiler.c.elf.libs=-lc -lm -lg -lgcc -lhal -lphy -lnet80211 -llwip -lwpa -lmain -lpp -lsmartconfig
 
 compiler.cpp.cmd=xtensa-lx106-elf-g++
 compiler.cpp.flags=-c -Os -mlongcalls -mtext-section-literals -fno-exceptions -fno-rtti -std=c++11 -MMD
@@ -92,4 +92,3 @@ tools.esptool.upload.protocol=esp
 tools.esptool.upload.params.verbose=-vv
 tools.esptool.upload.params.quiet=
 tools.esptool.upload.pattern="{path}/{cmd}" {upload.verbose} -cd {upload.resetmethod} -cb {upload.speed} -cp "{serial.port}" -ca 0x00000 -cf "{build.path}/{build.project_name}_00000.bin" -ca 0x40000 -cf "{build.path}/{build.project_name}_40000.bin"
-
