@@ -154,7 +154,7 @@ extern void __detachInterrupt(uint8_t pin) {
 }
 
 void initPins() {
-  ETS_GPIO_INTR_ATTACH(interrupt_handlers, &interrupt_reg);
+  ETS_GPIO_INTR_ATTACH(interrupt_handler, &interrupt_reg);
   ETS_GPIO_INTR_ENABLE();
 }
 
