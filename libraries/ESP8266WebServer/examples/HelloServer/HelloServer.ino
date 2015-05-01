@@ -9,24 +9,23 @@ MDNSResponder mdns;
 
 ESP8266WebServer server(80);
 
-void handle_root() {
+void handleRoot() {
   server.send(200, "text/plain", "hello from esp8266!");
 }
 
-bool handle_not_found(){
+void handleNotFound(){
   String message = "URI: ";
   message += server.uri();
   message += "\nMethod: ";
   message += (server.method() == HTTP_GET)?"GET":"POST";
+  message += "\nNot Found!\n\n";
   message += "\nArguments: ";
   message += server.args();
   message += "\n";
   for (uint8_t i=0; i<server.args(); i++){
     message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
   }
-  message += "\nNotFound!";
   server.send(404, "text/plain", message);
-  return true;
 }
  
 void setup(void){
@@ -45,15 +44,17 @@ void setup(void){
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
   
-  if (mdns.begin("esp8266", WiFi.localIP())) Serial.println("MDNS responder started");
+  if (mdns.begin("esp8266", WiFi.localIP())) {
+    Serial.println("MDNS responder started");
+  }
   
-  server.on("/", handle_root);
+  server.on("/", handleRoot);
   
   server.on("/inline", [](){
     server.send(200, "text/plain", "this works as well");
   });
 
-  server.onNotFound(handle_not_found);
+  server.onNotFound(handleNotFound);
   
   server.begin();
   Serial.println("HTTP server started");

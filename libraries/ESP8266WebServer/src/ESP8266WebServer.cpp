@@ -28,18 +28,18 @@
 // #define DEBUG
 
 struct ESP8266WebServer::RequestHandler {
-	RequestHandler(ESP8266WebServer::THandlerFunction fn, const char* uri, HTTPMethod method)
-	: fn(fn)
-	, uri(uri)
-	, method(method)
-	, next(NULL)
-	{
-	}
+  RequestHandler(ESP8266WebServer::THandlerFunction fn, const char* uri, HTTPMethod method)
+  : fn(fn)
+  , uri(uri)
+  , method(method)
+  , next(NULL)
+  {
+  }
 
-	ESP8266WebServer::THandlerFunction fn;
-	String uri;
-	HTTPMethod method;
-	RequestHandler* next;
+  ESP8266WebServer::THandlerFunction fn;
+  String uri;
+  HTTPMethod method;
+  RequestHandler* next;
 
 };
 
@@ -54,302 +54,309 @@ ESP8266WebServer::ESP8266WebServer(int port)
 
 ESP8266WebServer::~ESP8266WebServer()
 {
-	if (!_firstHandler)
-		return;
-	RequestHandler* handler = _firstHandler;
-	while (handler) {
-		RequestHandler* next = handler->next;
-		delete handler;
-		handler = next;
-	}
+  if (!_firstHandler)
+    return;
+  RequestHandler* handler = _firstHandler;
+  while (handler) {
+    RequestHandler* next = handler->next;
+    delete handler;
+    handler = next;
+  }
 }
 
 void ESP8266WebServer::begin() {
-	_server.begin();
+  _server.begin();
 }
 
 
 void ESP8266WebServer::on(const char* uri, ESP8266WebServer::THandlerFunction handler)
 {
-	on(uri, HTTP_ANY, handler);
+  on(uri, HTTP_ANY, handler);
 }
 
 void ESP8266WebServer::on(const char* uri, HTTPMethod method, ESP8266WebServer::THandlerFunction fn)
 {
-	RequestHandler* handler = new RequestHandler(fn, uri, method);
-	if (!_lastHandler) {
-		_firstHandler = handler;
-		_lastHandler = handler;
-	}
-	else {
-		_lastHandler->next = handler;
-		_lastHandler = handler;
-	}
+  RequestHandler* handler = new RequestHandler(fn, uri, method);
+  if (!_lastHandler) {
+    _firstHandler = handler;
+    _lastHandler = handler;
+  }
+  else {
+    _lastHandler->next = handler;
+    _lastHandler = handler;
+  }
 }
 
 void ESP8266WebServer::handleClient()
 {
-	WiFiClient client = _server.available();
-	if (!client) {
-		return;
-	}
+  WiFiClient client = _server.available();
+  if (!client) {
+    return;
+  }
 
 #ifdef DEBUG
-	Serial.println("New client");
+  Serial.println("New client");
 #endif
-	// Wait for data from client to become available
-	while(client.connected() && !client.available()){
-		delay(1);
-	}
+  // Wait for data from client to become available
+  while(client.connected() && !client.available()){
+    delay(1);
+  }
 
-	// Read the first line of HTTP request
-	String req = client.readStringUntil('\r');
-	client.readStringUntil('\n');
+  // Read the first line of HTTP request
+  String req = client.readStringUntil('\r');
+  client.readStringUntil('\n');
 
-	HTTPMethod method = HTTP_GET;
-	if (req.startsWith("POST")) {
-		method = HTTP_POST;
-	}
+  HTTPMethod method = HTTP_GET;
+  if (req.startsWith("POST")) {
+    method = HTTP_POST;
+  }
 
-
-	// First line of HTTP request looks like "GET /path HTTP/1.1"
-	// Retrieve the "/path" part by finding the spaces
-	int addr_start = req.indexOf(' ');
-	int addr_end = req.indexOf(' ', addr_start + 1);
-	if (addr_start == -1 || addr_end == -1) {
+  // First line of HTTP request looks like "GET /path HTTP/1.1"
+  // Retrieve the "/path" part by finding the spaces
+  int addr_start = req.indexOf(' ');
+  int addr_end = req.indexOf(' ', addr_start + 1);
+  if (addr_start == -1 || addr_end == -1) {
 #ifdef DEBUG
-		Serial.print("Invalid request: ");
-		Serial.println(req);
+    Serial.print("Invalid request: ");
+    Serial.println(req);
 #endif
-		return;
-	}
+    return;
+  }
 
-	req = req.substring(addr_start + 1, addr_end);
+  req = req.substring(addr_start + 1, addr_end);
 
-	String formData;
-	if (method == HTTP_POST)
-	{
-		int contentLength = -1;
-		int headerCount = 0;
-		while(headerCount < 1024) {	// there shouldn't be that much really
-			String line = client.readStringUntil('\r');
-			client.readStringUntil('\n');
+  String formData;
+  if (method == HTTP_POST) {
+    int contentLength = -1;
+    int headerCount = 0;
+    while(headerCount < 1024) { // there shouldn't be that much really
+      String line = client.readStringUntil('\r');
+      client.readStringUntil('\n');
 
-			if (line.length() > 0) {	// this is a header
-				++headerCount;
-				if (contentLength < 0 && line.startsWith("Content-Length")) {
-					// get content length from the header
-					int valuePos = line.indexOf(' ', 14);
-					if (valuePos > 0) {
-						String valueStr = line.substring(valuePos+1);
-						contentLength = valueStr.toInt();
+      if (line.length() > 0) {  // this is a header
+        ++headerCount;
+        if (contentLength < 0 && line.startsWith("Content-Length")) {
+          // get content length from the header
+          int valuePos = line.indexOf(' ', 14);
+          if (valuePos > 0) {
+            String valueStr = line.substring(valuePos+1);
+            contentLength = valueStr.toInt();
 #ifdef DEBUG
-						Serial.print("Content-Length: ");
-						Serial.println(contentLength);
+            Serial.print("Content-Length: ");
+            Serial.println(contentLength);
 #endif
-					}
-				}
-			}
-			else {
-				break;
-			}
-		}
+          }
+        }
+      }
+      else {
+        break;
+      }
+    }
 #ifdef DEBUG
-		Serial.print("headerCount=");
-		Serial.println(headerCount);
+    Serial.print("headerCount=");
+    Serial.println(headerCount);
 #endif
-		if (contentLength >= 0) {
-			formData = "";
-			int n = 0;	 // timeout counter
-			while (formData.length() < contentLength && ++n < 3)
-				formData += client.readString();
-		}
-		else {
-			formData = client.readStringUntil('\r'); // will return after timing out once
-		}
-		// read form data
-		// formData = 
-	}
-	else if (method == HTTP_GET)
-	{
-		int args_start = req.indexOf('?');
-		if (args_start != -1)
-		{
-			formData = req.substring(args_start + 1);
-			req = req.substring(0, args_start);
-		}
-	}
+    if (contentLength >= 0) {
+      formData = "";
+      int n = 0;   // timeout counter
+      while (formData.length() < contentLength && ++n < 3)
+        formData += client.readString();
+    }
+    else {
+      formData = client.readStringUntil('\r'); // will return after timing out once
+    }
+  }
+  else if (method == HTTP_GET) {
+    int args_start = req.indexOf('?');
+    if (args_start != -1) {
+      formData = req.substring(args_start + 1);
+      req = req.substring(0, args_start);
+    }
+  }
 
-	client.flush();
+  client.flush();
 
 #ifdef DEBUG
-	Serial.print("Request: ");
-	Serial.println(req);
-	Serial.print("Args: ");
-	Serial.println(formData);
+  Serial.print("Request: ");
+  Serial.println(req);
+  Serial.print("Args: ");
+  Serial.println(formData);
 #endif
 
-	_parseArguments(formData);
-	_handleRequest(client, req, method);
+  _parseArguments(formData);
+  _handleRequest(client, req, method);
 
 }
 
 void ESP8266WebServer::send(int code, const char* content_type, String content) {
-	String response = "HTTP/1.1 ";
-	response += String(code);
-	response += " ";
-	if (code == 200)
-		response += "OK";
-	else if (code == 404)
-		response += "Not found";
-	response += "\r\n";
-	if (!content_type)
-		content_type = "text/html";
-	response += "Content-Type: ";
-	response += content_type;
-	response += "\r\n\r\n";
-	response += content;
-	_currentClient.print(response);
+  String response = "HTTP/1.1 ";
+  response += String(code);
+  response += " ";
+  response += _responseCodeToString(code);
+  response += "\r\n";
+
+  if (!content_type)
+    content_type = "text/html";
+  _appendHeader(response, "Content-Type", content_type);
+  
+  response += "\r\n";
+  response += content;
+  _currentClient.print(response);
 }
 
-String ESP8266WebServer::arg(const char* name)
-{
-	for (int i = 0; i < _currentArgCount; ++i) {
-		if (_currentArgs[i].key == name)
-			return _currentArgs[i].value;
-	}
-	return String();
+String ESP8266WebServer::arg(const char* name) {
+  for (int i = 0; i < _currentArgCount; ++i) {
+    if (_currentArgs[i].key == name)
+      return _currentArgs[i].value;
+  }
+  return String();
 }
 
-String ESP8266WebServer::arg(int i)
-{
-	if (i < _currentArgCount)
-		return _currentArgs[i].value;
-	return String();
+String ESP8266WebServer::arg(int i) {
+  if (i < _currentArgCount)
+    return _currentArgs[i].value;
+  return String();
 }
 
-String ESP8266WebServer::argName(int i)
-{
-	if (i < _currentArgCount)
-		return _currentArgs[i].key;
-	return String();
+String ESP8266WebServer::argName(int i) {
+  if (i < _currentArgCount)
+    return _currentArgs[i].key;
+  return String();
 }
 
-int ESP8266WebServer::args(){
+int ESP8266WebServer::args() {
   return _currentArgCount;
 }
 
-bool ESP8266WebServer::hasArg(const char* name)
-{
-	for (int i = 0; i < _currentArgCount; ++i) {
-		if (_currentArgs[i].key == name)
-			return true;
-	}
-	return false;
+bool ESP8266WebServer::hasArg(const char* name) {
+  for (int i = 0; i < _currentArgCount; ++i) {
+    if (_currentArgs[i].key == name)
+      return true;
+  }
+  return false;
 }
 
-void ESP8266WebServer::_parseArguments(String data)
-{
-	if (_currentArgs)
-		delete[] _currentArgs;
-	_currentArgs = 0;
-	if (data.length() == 0) {
-		_currentArgCount = 0;
-		return;
-	}
-	_currentArgCount = 1;
+void ESP8266WebServer::_parseArguments(String data) {
+  if (_currentArgs)
+    delete[] _currentArgs;
+  _currentArgs = 0;
+  if (data.length() == 0) {
+    _currentArgCount = 0;
+    return;
+  }
+  _currentArgCount = 1;
 
-	for (int i = 0; i < data.length(); ) {
-		i = data.indexOf('&', i);
-		if (i == -1)
-			break;
-		++i;
-		++_currentArgCount;
-	}
+  for (int i = 0; i < data.length(); ) {
+    i = data.indexOf('&', i);
+    if (i == -1)
+      break;
+    ++i;
+    ++_currentArgCount;
+  }
 #ifdef DEBUG
-	Serial.print("args count: ");
-	Serial.println(_currentArgCount);
+  Serial.print("args count: ");
+  Serial.println(_currentArgCount);
 #endif
 
-	_currentArgs = new RequestArgument[_currentArgCount];
-	int pos = 0;
-	int iarg;
-	for (iarg = 0; iarg < _currentArgCount;) {
-		int equal_sign_index = data.indexOf('=', pos);
-		int next_arg_index = data.indexOf('&', pos);
+  _currentArgs = new RequestArgument[_currentArgCount];
+  int pos = 0;
+  int iarg;
+  for (iarg = 0; iarg < _currentArgCount;) {
+    int equal_sign_index = data.indexOf('=', pos);
+    int next_arg_index = data.indexOf('&', pos);
 #ifdef DEBUG
-		Serial.print("pos ");
-		Serial.print(pos);
-		Serial.print("=@ ");
-		Serial.print(equal_sign_index);
-		Serial.print(" &@ ");
-		Serial.println(next_arg_index);
+    Serial.print("pos ");
+    Serial.print(pos);
+    Serial.print("=@ ");
+    Serial.print(equal_sign_index);
+    Serial.print(" &@ ");
+    Serial.println(next_arg_index);
 #endif
-		if ((equal_sign_index == -1) || ((equal_sign_index > next_arg_index) && (next_arg_index != -1))) {
+    if ((equal_sign_index == -1) || ((equal_sign_index > next_arg_index) && (next_arg_index != -1))) {
 #ifdef DEBUG
-			Serial.print("arg missing value: ");
-			Serial.println(iarg);
+      Serial.print("arg missing value: ");
+      Serial.println(iarg);
 #endif
-			if (next_arg_index == -1)
-				break;
-			pos = next_arg_index + 1;
-			continue;
-		}
-		RequestArgument& arg = _currentArgs[iarg];
-		arg.key = data.substring(pos, equal_sign_index);
-		arg.value = data.substring(equal_sign_index + 1, next_arg_index);
+      if (next_arg_index == -1)
+        break;
+      pos = next_arg_index + 1;
+      continue;
+    }
+    RequestArgument& arg = _currentArgs[iarg];
+    arg.key = data.substring(pos, equal_sign_index);
+    arg.value = data.substring(equal_sign_index + 1, next_arg_index);
 #ifdef DEBUG
-		Serial.print("arg ");
-		Serial.print(iarg);
-		Serial.print(" key: ");
-		Serial.print(arg.key);
-		Serial.print(" value: ");
-		Serial.println(arg.value);
+    Serial.print("arg ");
+    Serial.print(iarg);
+    Serial.print(" key: ");
+    Serial.print(arg.key);
+    Serial.print(" value: ");
+    Serial.println(arg.value);
 #endif
-		++iarg;
-		if (next_arg_index == -1)
-			break;
-		pos = next_arg_index + 1;
-	}
-	_currentArgCount = iarg;
+    ++iarg;
+    if (next_arg_index == -1)
+      break;
+    pos = next_arg_index + 1;
+  }
+  _currentArgCount = iarg;
 #ifdef DEBUG
-	Serial.print("args count: ");
-	Serial.println(_currentArgCount);
+  Serial.print("args count: ");
+  Serial.println(_currentArgCount);
 #endif
 
 }
 
-void ESP8266WebServer::onNotFound(TNotFoundHandlerFunction fn){
+void ESP8266WebServer::onNotFound(THandlerFunction fn) {
   _notFoundHandler = fn;
 }
 
 void ESP8266WebServer::_handleRequest(WiFiClient& client, String uri, HTTPMethod method) {
-	_currentClient   = client;
-	_currentUri      = uri;
-	_currentMethod   = method;
+  _currentClient   = client;
+  _currentUri      = uri;
+  _currentMethod   = method;
 
-	RequestHandler* handler;
-	for (handler = _firstHandler; handler; handler = handler->next)
-	{
-		if (handler->method != HTTP_ANY && handler->method != method)
-			continue;
+  RequestHandler* handler;
+  for (handler = _firstHandler; handler; handler = handler->next)
+  {
+    if (handler->method != HTTP_ANY && handler->method != method)
+      continue;
 
-		if (handler->uri != uri)
-			continue;
+    if (handler->uri != uri)
+      continue;
 
-		handler->fn();
-		break;
-	}
+    handler->fn();
+    break;
+  }
 
-	if (!handler){
+  if (!handler){
 #ifdef DEBUG
-		Serial.println("request handler not found");
+    Serial.println("request handler not found");
 #endif
-    if(!_notFoundHandler || !_notFoundHandler())
-      send(404, "text/plain", String("Not found: ") + uri);
-	}
 
-	_currentClient   = WiFiClient();
-	_currentUri      = String();
-	
+    if(_notFoundHandler) {
+      _notFoundHandler();
+    }
+    else {
+      send(404, "text/plain", String("Not found: ") + uri);
+    }
+  }
+
+  _currentClient   = WiFiClient();
+  _currentUri      = String();
+  
+}
+
+const char* ESP8266WebServer::_responseCodeToString(int code) {
+  switch (code) {
+    case 200: return "OK";
+    case 404: return "Not found";
+    default:  return "";
+  }
+}
+
+void ESP8266WebServer::_appendHeader(String& response, const char* name, const char* value) {
+  response += name;
+  response += ": ";
+  response += value;
+  response += "\r\n";
 }
