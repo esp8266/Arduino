@@ -9,10 +9,14 @@ Based off of [esp8266/Arduino](https://github.com/esp8266/Arduino)'s fully custo
 
 ### Installing ###
 
-1. Create a folder named ```hardware``` in ```~/Documents/Arduino```
+1. Create a folder named ```hardware``` in your ```Sketchbook``` folder, usually:
+    * Linux: ```~/Sketchbook```
+    * OS X: ```~/Documents/Arduino```
+    * Windows: ```~/My Document/Arduino```
 2. [Download a release](https://github.com/sandeepmistry/esp8266-Arduino/releases)
 3. Extract release
-4. Place ```esp8266com``` folder in ```~/Documents/Arduino/hardware```
+4. Place ```esp8266com``` folder in ```hardware``` folder created in step 1.
+5. Start or restart the Arduino IDE
 
 __Note__:
 
