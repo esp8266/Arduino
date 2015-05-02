@@ -7,6 +7,14 @@ This project brings support for ESP8266 chip to the Arduino environment. ESP8266
 
 Based off of [esp8266/Arduino](https://github.com/esp8266/Arduino)'s fully customized ESP8266 Arduino IDE.
 
+### Prerequisites ###
+
+ * [Arduino IDE](http://www.arduino.cc/en/Main/Software) 1.6.0 or later
+ * OS Specific
+   * OS X: 64-bit system
+   * Linux: 64-bit sytem
+   * Windows: 32-bit or 64-bit system
+
 ### Installing ###
 
 1. Create a folder named ```hardware``` in your ```Sketchbook``` folder, usually:
