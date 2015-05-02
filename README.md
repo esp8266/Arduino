@@ -71,7 +71,7 @@ This is mostly similar to WiFi shield library. Differences include:
 
 - ```WiFi.mode(m)```: set mode to ```WIFI_AP```, ```WIFI_STA```, or ```WIFI_AP_STA```.
 - call ```WiFi.softAP(ssid)``` to set up an open network
-- call ```WiFi.softAP(ssid, passphrase)``` to set up a WPA2-PSK network
+- call ```WiFi.softAP(ssid, password)``` to set up a WPA2-PSK network (password should be at least 8 characters)
 - ```WiFi.macAddress(mac)``` is for STA, ```WiFi.softAPmacAddress(mac)``` is for AP.
 - ```WiFi.localIP()``` is for STA, ```WiFi.softAPIP()``` is for AP.
 - ```WiFi.RSSI()``` doesn't work
@@ -156,7 +156,6 @@ toggle power).
 - analogWrite (PWM). ESP8266 has only one hardware PWM source. It is not yet clear how to use it with analogWrite API. Software PWM is also an option, but apparently it causes issues with WiFi connectivity.
 - pulseIn
 - I2C slave mode
-- Serial modes other than 8n1
 - WiFi.RSSI. SDK doesn't seem to have an API to get RSSI for the current network. So far the only
 	way to obtain RSSI is to disconnect, perform a scan, and get the RSSI value from there.
 - Upload sketches via WiFi. Conceptually and technically simple, but need to figure out how to provide the best UX for this feature.

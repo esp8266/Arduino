@@ -1,9 +1,9 @@
-/* 
+/*
   ESP8266WiFi.cpp - WiFi library for esp8266
 
   Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
   This file is part of the esp8266 core for Arduino environment.
- 
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -58,7 +58,7 @@ int ESP8266WiFiClass::begin(const char* ssid)
 
 int ESP8266WiFiClass::begin(const char* ssid, const char *passphrase)
 {
-    if (wifi_get_opmode() == WIFI_AP)
+    if ((wifi_get_opmode() & 1) == 0)//1 and 3 have STA enabled
     {
         // turn on AP+STA mode
         mode(WIFI_AP_STA);
@@ -108,11 +108,11 @@ void ESP8266WiFiClass::softAP(const char* ssid)
 {
     softAP(ssid, 0);
 }
-  
+
 
 void ESP8266WiFiClass::softAP(const char* ssid, const char* passphrase, int channel)
 {
-    if (wifi_get_opmode() == WIFI_STA)
+    if (wifi_get_opmode() < WIFI_AP)//will be OFF or STA
     {
         // turn on AP+STA mode
         mode(WIFI_AP_STA);
@@ -165,7 +165,7 @@ uint8_t* ESP8266WiFiClass::softAPmacAddress(uint8_t* mac)
     wifi_get_macaddr(SOFTAP_IF, mac);
     return mac;
 }
-   
+
 IPAddress ESP8266WiFiClass::localIP()
 {
     struct ip_info ip;
@@ -177,7 +177,7 @@ IPAddress ESP8266WiFiClass::softAPIP()
 {
     struct ip_info ip;
     wifi_get_ip_info(SOFTAP_IF, &ip);
-    return IPAddress(ip.ip.addr);    
+    return IPAddress(ip.ip.addr);
 }
 
 IPAddress ESP8266WiFiClass::subnetMask()
@@ -232,7 +232,7 @@ void ESP8266WiFiClass::_scanDone(void* result, int status)
     }
     else
     {
-      
+
         int i = 0;
         bss_info_head_t* head = reinterpret_cast<bss_info_head_t*>(result);
 
@@ -255,13 +255,13 @@ void ESP8266WiFiClass::_scanDone(void* result, int status)
         }
 
     }
-    esp_schedule();   
+    esp_schedule();
 }
 
 
 int8_t ESP8266WiFiClass::scanNetworks()
 {
-    if (wifi_get_opmode() == WIFI_AP)
+    if ((wifi_get_opmode() & 1) == 0)//1 and 3 have STA enabled
     {
         mode(WIFI_AP_STA);
     }
@@ -277,7 +277,7 @@ int8_t ESP8266WiFiClass::scanNetworks()
         ESP8266WiFiClass::_scanResult = 0;
         ESP8266WiFiClass::_scanCount = 0;
     }
-    
+
     struct scan_config config;
     config.ssid = 0;
     config.bssid = 0;
@@ -373,7 +373,7 @@ int ESP8266WiFiClass::hostByName(const char* aHostname, IPAddress& aResult)
         esp_yield();
         // will return here when dns_found_callback fires
     }
-    
+
     return (aResult != 0) ? 1 : 0;
 }
 
@@ -382,11 +382,14 @@ void ESP8266WiFiClass::beginSmartConfig()
     if (_smartConfigStarted)
         return;
 
-    WiFi.mode(WIFI_STA);
+    if ((wifi_get_opmode() & 1) == 0)//1 and 3 have STA enabled
+    {
+        mode(WIFI_AP_STA);
+    }
 
     _smartConfigStarted = true;
 
-    //SC_TYPE_ESPTOUCH use ESPTOUCH for smartconfig, or use SC_TYPE_AIRKISS for AIRKISS 
+    //SC_TYPE_ESPTOUCH use ESPTOUCH for smartconfig, or use SC_TYPE_AIRKISS for AIRKISS
     smartconfig_start(SC_TYPE_ESPTOUCH, &ESP8266WiFiClass::_smartConfigDone);
 }
 
@@ -409,7 +412,7 @@ bool ESP8266WiFiClass::smartConfigDone(){
 void ESP8266WiFiClass::_smartConfigDone(void* result)
 {
     station_config* sta_conf = reinterpret_cast<station_config*>(result);
-  
+
     wifi_station_set_config(sta_conf);
     wifi_station_disconnect();
     wifi_station_connect();
@@ -440,7 +443,7 @@ void ESP8266WiFiClass::printDiag(Print& p)
 
     static struct station_config conf;
     wifi_station_get_config(&conf);
-    
+
     const char* ssid = reinterpret_cast<const char*>(conf.ssid);
     p.print("SSID (");
     p.print(strlen(ssid));

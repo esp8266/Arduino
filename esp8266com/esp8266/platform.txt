@@ -12,7 +12,7 @@ compiler.tools.path={runtime.hardware.path}/esp8266/tools/{runtime.os}/
 compiler.path={compiler.tools.path}xtensa-lx106-elf/bin/
 compiler.sdk.path={runtime.hardware.path}/esp8266/sdk/
 
-compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH "-I{compiler.sdk.path}/include"
+compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ "-I{compiler.sdk.path}/include"
 
 compiler.c.cmd=xtensa-lx106-elf-gcc
 compiler.c.flags=-c -Os -Wpointer-arith -Wno-implicit-function-declaration -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -mtext-section-literals -MMD -std=c99
@@ -23,7 +23,7 @@ compiler.S.flags=-c -g -x assembler-with-cpp -MMD
 compiler.c.elf.ldscript=eagle.app.v6.ld
 compiler.c.elf.flags=-nostdlib -Wl,--no-check-sections -u call_user_start -Wl,-static "-L{compiler.sdk.path}/lib" "-L{compiler.sdk.path}/ld" "-T{compiler.c.elf.ldscript}"
 compiler.c.elf.cmd=xtensa-lx106-elf-gcc
-compiler.c.elf.libs=-lgcc -lm -lhal -lphy -lnet80211 -llwip -lwpa -lmain -lpp -lsmartconfig
+compiler.c.elf.libs=-lm -lc -lgcc -lhal -lphy -lnet80211 -llwip -lwpa -lmain -lpp -lsmartconfig
 
 compiler.cpp.cmd=xtensa-lx106-elf-g++
 compiler.cpp.flags=-c -Os -mlongcalls -mtext-section-literals -fno-exceptions -fno-rtti -std=c++11 -MMD
@@ -74,7 +74,7 @@ recipe.objcopy.eep.pattern=
 ## Create hex
 #recipe.objcopy.hex.pattern="{compiler.path}{compiler.elf2hex.cmd}" {compiler.elf2hex.flags} {compiler.elf2hex.extra_flags} "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.hex"
 
-recipe.objcopy.hex.pattern="{compiler.tools.path}{compiler.esptool.cmd}" -eo "{build.path}/{build.project_name}.elf" -bo "{build.path}/{build.project_name}_00000.bin" -bs .text -bs .data -bs .rodata -bc -ec -eo "{build.path}/{build.project_name}.elf" -es .irom0.text "{build.path}/{build.project_name}_40000.bin" -ec
+recipe.objcopy.hex.pattern="{compiler.tools.path}{compiler.esptool.cmd}" -eo "{build.path}/{build.project_name}.elf" -bo "{build.path}/{build.project_name}_00000.bin" -bm {build.flash_mode} -bf {build.flash_freq} -bz {build.flash_size} -bs .text -bs .data -bs .rodata -bc -ec -eo "{build.path}/{build.project_name}.elf" -es .irom0.text "{build.path}/{build.project_name}_40000.bin" -ec
 
 ## Compute size
 recipe.size.pattern="{compiler.path}{compiler.size.cmd}" -A "{build.path}/{build.project_name}.elf"
@@ -92,4 +92,3 @@ tools.esptool.upload.protocol=esp
 tools.esptool.upload.params.verbose=-vv
 tools.esptool.upload.params.quiet=
 tools.esptool.upload.pattern="{path}/{cmd}" {upload.verbose} -cd {upload.resetmethod} -cb {upload.speed} -cp "{serial.port}" -ca 0x00000 -cf "{build.path}/{build.project_name}_00000.bin" -ca 0x40000 -cf "{build.path}/{build.project_name}_40000.bin"
-

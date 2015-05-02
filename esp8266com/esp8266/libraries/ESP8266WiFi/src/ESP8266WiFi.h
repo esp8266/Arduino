@@ -32,7 +32,7 @@ extern "C" {
 #include "WiFiClient.h"
 #include "WiFiServer.h"
 
-enum WiFiMode { WIFI_STA = 1, WIFI_AP = 2, WIFI_AP_STA = 3 };
+enum WiFiMode { WIFI_OFF = 0, WIFI_STA = 1, WIFI_AP = 2, WIFI_AP_STA = 3 };
 
 class ESP8266WiFiClass
 {
@@ -41,8 +41,8 @@ public:
     ESP8266WiFiClass();
 
     void mode(WiFiMode);
-        
-    
+
+
     /* Start Wifi connection for OPEN networks
      *
      * param ssid: Pointer to the SSID string.
@@ -77,9 +77,9 @@ public:
 
     /* Change Ip configuration settings disabling the dhcp client
         *
-        * param local_ip: 	Static ip configuration
-        * param gateway: 	Static gateway configuration
-        * param subnet:		Static Subnet mask
+        * param local_ip:   Static ip configuration
+        * param gateway:    Static gateway configuration
+        * param subnet:     Static Subnet mask
         */
     void config(IPAddress local_ip, IPAddress gateway, IPAddress subnet);
 
@@ -167,25 +167,25 @@ public:
      * Return the SSID discovered during the network scan.
      *
      * param networkItem: specify from which network item want to get the information
-	 *
+     *
      * return: ssid string of the specified item on the networks scanned list
      */
-    const char*	SSID(uint8_t networkItem);
+    const char* SSID(uint8_t networkItem);
 
     /*
      * Return the encryption type of the networks discovered during the scanNetworks
      *
      * param networkItem: specify from which network item want to get the information
-	 *
+     *
      * return: encryption type (enum wl_enc_type) of the specified item on the networks scanned list
      */
-    uint8_t	encryptionType(uint8_t networkItem);
+    uint8_t encryptionType(uint8_t networkItem);
 
     /*
      * Return the RSSI of the networks discovered during the scanNetworks
      *
      * param networkItem: specify from which network item want to get the information
-	 *
+     *
      * return: signed value of RSSI of the specified item on the networks scanned list
      */
     int32_t RSSI(uint8_t networkItem);
@@ -215,15 +215,19 @@ public:
     /*
      * Start SmartConfig
      *
-     */ 
+     */
     void beginSmartConfig();
-    
+
     /*
      * Query SmartConfig status, to decide when stop config
      *
-     */    
+     */
     bool smartConfigDone();
 
+    /*
+     * Stop SmartConfig
+     *
+     */
     void stopSmartConfig();
 
     friend class WiFiClient;

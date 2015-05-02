@@ -18,6 +18,7 @@
 
   Modified 2012 by Todd Krein (todd@krein.org) to implement repeated starts
   Modified December 2014 by Ivan Grokhotkov (ivan@esp8266.com) - esp8266 support
+  Modified April 2015 by Hrsto Gochkov (ficeto@ficeto.com) - alternative esp8266 support
 */
 
 #ifndef TwoWire_h
@@ -49,7 +50,7 @@ class TwoWire : public Stream
     static void onReceiveService(uint8_t*, int);
   public:
     TwoWire();
-    void pins(int sda, int scl);
+    void begin(int sda, int scl);
     void begin();
     void begin(uint8_t);
     void begin(int);
