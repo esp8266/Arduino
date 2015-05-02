@@ -25,26 +25,6 @@
 #include "eagle_soc.h"
 #include "ets_sys.h"
 
-uint32_t digitalPinToPort(uint32_t pin) {
-    return 0;
-}
-
-uint32_t digitalPinToBitMask(uint32_t pin) {
-    return 1 << pin;
-}
-
-volatile uint32_t* portOutputRegister(uint32_t port) {
-    return (volatile uint32_t*)GPO;
-}
-
-volatile uint32_t* portInputRegister(uint32_t port) {
-    return (volatile uint32_t*)GPI;
-}
-
-volatile uint32_t* portModeRegister(uint32_t port) {
-    return (volatile uint32_t*)GPE;
-}
-
 extern void __pinMode(uint8_t pin, uint8_t mode) {
   if(pin < 16){
     if(mode == SPECIAL){
