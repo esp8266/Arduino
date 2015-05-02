@@ -180,12 +180,11 @@ void loop(void);
 
 // Get the bit location within the hardware port of the given virtual pin.
 // This comes from the pins_*.c file for the active board configuration.
-
-uint32_t digitalPinToPort(uint32_t pin);
-uint32_t digitalPinToBitMask(uint32_t pin);
-volatile uint32_t* portOutputRegister(uint32_t port);
-volatile uint32_t* portInputRegister(uint32_t port);
-volatile uint32_t* portModeRegister(uint32_t port);
+#define digitalPinToPort(pin)       (0)
+#define digitalPinToBitMask(pin)    (1UL << (pin))
+#define portOutputRegister(port)    ((volatile uint32_t*) GPO)
+#define portInputRegister(port)     ((volatile uint32_t*) GPI)
+#define portModeRegister(port)      ((volatile uint32_t*) GPE)
 
 #define NOT_A_PIN -1
 #define NOT_A_PORT -1
