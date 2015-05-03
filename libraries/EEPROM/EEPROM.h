@@ -36,6 +36,8 @@ class EEPROMClass
     bool commit();
     void end();
 
+    uint8_t * getDataPtr();
+
     template<typename T> T &get(int address, T &t)
     {
         if (address < 0 || address + sizeof(T) > _size)
