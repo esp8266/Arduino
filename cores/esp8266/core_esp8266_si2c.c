@@ -72,7 +72,7 @@ void twi_stop(void){
 }
 
 static void twi_delay(unsigned char v){
-  unsigned char i;
+  unsigned int i;
   unsigned int reg;
   for(i=0;i<v;i++) reg = GPI;
 }
@@ -88,7 +88,7 @@ static bool twi_write_start(void) {
 }
 
 static bool twi_write_stop(void){
-  unsigned char i = 0;
+  unsigned int i = 0;
   SCL_LOW();
   SDA_LOW();
   twi_delay(twi_dcount);
@@ -102,7 +102,7 @@ static bool twi_write_stop(void){
 }
 
 static bool twi_write_bit(bool bit) {
-  unsigned char i = 0;
+  unsigned int i = 0;
   SCL_LOW();
   if (bit) SDA_HIGH();
   else SDA_LOW();
@@ -114,7 +114,7 @@ static bool twi_write_bit(bool bit) {
 }
 
 static bool twi_read_bit(void) {
-  unsigned char i = 0;
+  unsigned int i = 0;
   SCL_LOW();
   SDA_HIGH();
   twi_delay(twi_dcount+1);
