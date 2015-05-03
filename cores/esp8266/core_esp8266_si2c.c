@@ -131,7 +131,7 @@ static bool twi_write_byte(unsigned char byte) {
     twi_write_bit(byte & 0x80);
     byte <<= 1;
   }
-  return twi_read_bit();//NACK/ACK
+  return !twi_read_bit();//NACK/ACK
 }
 
 static unsigned char twi_read_byte(bool nack) {
