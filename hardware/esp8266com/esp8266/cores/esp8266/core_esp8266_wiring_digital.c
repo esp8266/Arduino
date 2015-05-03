@@ -31,10 +31,12 @@ extern void __pinMode(uint8_t pin, uint8_t mode) {
       GPC(pin) = (GPC(pin) & (0xF << GPCI)); //SOURCE(GPIO) | DRIVER(NORMAL) | INT_TYPE(UNCHANGED) | WAKEUP_ENABLE(DISABLED)
       GPEC = (1 << pin); //Disable
       GPF(pin) = GPFFS(GPFFS_BUS(pin));//Set mode to BUS (RX0, TX0, TX1, SPI, HSPI or CLK depending in the pin)
+      if(pin == 3) GPF(pin) |= (1 << GPFPU);//enable pullup on RX
     } else if(mode & FUNCTION_0){
       GPC(pin) = (GPC(pin) & (0xF << GPCI)); //SOURCE(GPIO) | DRIVER(NORMAL) | INT_TYPE(UNCHANGED) | WAKEUP_ENABLE(DISABLED)
       GPEC = (1 << pin); //Disable
       GPF(pin) = GPFFS((mode >> 4) & 0x07);
+      if(pin == 13 && mode == FUNCTION_4) GPF(pin) |= (1 << GPFPU);//enable pullup on RX
     }  else if(mode == OUTPUT){
       GPF(pin) = GPFFS(GPFFS_GPIO(pin));//Set mode to GPIO
       GPC(pin) = (GPC(pin) & (0xF << GPCI)); //SOURCE(GPIO) | DRIVER(NORMAL) | INT_TYPE(UNCHANGED) | WAKEUP_ENABLE(DISABLED)

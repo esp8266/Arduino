@@ -37,7 +37,7 @@ extern "C" {
 #include "binary.h"
 #include "pgmspace.h"
 #include "esp8266_peri.h"
-#include "si2c.h"
+#include "twi.h"
 
 void yield(void);
 
