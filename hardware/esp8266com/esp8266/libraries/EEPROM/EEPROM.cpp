@@ -35,7 +35,7 @@
 #define CONFIG_ADDR (SPI_FLASH_SEC_SIZE * CONFIG_SECTOR)
 
 EEPROMClass::EEPROMClass()
-: _data(0), _size(0)
+: _data(0), _size(0), _dirty(false)
 {
 }
 
@@ -67,7 +67,7 @@ void EEPROMClass::end()
 
 uint8_t EEPROMClass::read(int address)
 {
-    if (address < 0 || address >= _size)
+    if (address < 0 || (size_t)address >= _size)
         return 0;
 
     return _data[address];
@@ -75,7 +75,7 @@ uint8_t EEPROMClass::read(int address)
 
 void EEPROMClass::write(int address, uint8_t value)
 {
-    if (address < 0 || address >= _size)
+    if (address < 0 || (size_t)address >= _size)
         return;
 
     _data[address] = value;
@@ -99,6 +99,11 @@ bool EEPROMClass::commit()
     }
     ETS_UART_INTR_ENABLE();
     return ret;
+}
+
+uint8_t * EEPROMClass::getDataPtr()
+{
+    return &_data[0];
 }
 
 
