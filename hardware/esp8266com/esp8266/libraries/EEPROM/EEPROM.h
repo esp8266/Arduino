@@ -33,7 +33,7 @@ class EEPROMClass
     void begin(size_t size);
     uint8_t read(int address);
     void write(int address, uint8_t val);
-    void commit();
+    bool commit();
     void end();
 
     template<typename T> T &get(int address, T &t)

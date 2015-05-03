@@ -30,7 +30,7 @@
 #include "spi_flash.h"
 }
 
-#define CONFIG_START_SECTOR 0x3C
+#define CONFIG_START_SECTOR 0x7b
 #define CONFIG_SECTOR (CONFIG_START_SECTOR + 0)
 #define CONFIG_ADDR (SPI_FLASH_SEC_SIZE * CONFIG_SECTOR)
 
@@ -82,16 +82,23 @@ void EEPROMClass::write(int address, uint8_t value)
     _dirty = true;
 }
 
-void EEPROMClass::commit()
+bool EEPROMClass::commit()
 {
-    if (!_size || !_dirty)
-        return;
+    bool ret = false;
+    if (!_size)
+        return false;
+    if(!_dirty)
+        return true;
 
     ETS_UART_INTR_DISABLE();
-    spi_flash_erase_sector(CONFIG_SECTOR);
-    spi_flash_write(CONFIG_ADDR, reinterpret_cast<uint32_t*>(_data), _size);
+    if(spi_flash_erase_sector(CONFIG_SECTOR) == SPI_FLASH_RESULT_OK) {
+        if(spi_flash_write(CONFIG_ADDR, reinterpret_cast<uint32_t*>(_data), _size) == SPI_FLASH_RESULT_OK) {
+            _dirty = false;
+            ret = true;
+        }
+    }
     ETS_UART_INTR_ENABLE();
-    _dirty = false;
+    return ret;
 }
 
 
