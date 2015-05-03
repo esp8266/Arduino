@@ -269,7 +269,7 @@ void ICACHE_FLASH_ATTR uart_set_baudrate(uart_t* uart, int baud_rate) {
     if(uart == 0)
         return;
     uart->baud_rate = baud_rate;
-    USD(uart->uart_nr) = (F_CPU / uart->baud_rate);
+    USD(uart->uart_nr) = (80000000UL / uart->baud_rate);
 }
 
 int ICACHE_FLASH_ATTR uart_get_baudrate(uart_t* uart) {
