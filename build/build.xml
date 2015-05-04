@@ -346,6 +346,8 @@
 
     <antcall target="macosx-build-common-avr-toolchain" />
 
+    <antcall target="package-library-index-json-bundle"/>
+
     <antcall target="assemble">
       <param name="target.path" value="${staging_folder}/work/${staging_hardware_folder}/.." />
     </antcall>
@@ -609,7 +611,7 @@
     <chmod perm="755" file="linux/work/lib/libastylej.so" />
   </target>
 
-  <target name="linux32-build" depends="linux-build" unless="light_bundle" description="Build linux (32-bit) version">
+  <target name="linux32-build" depends="linux-build" description="Build linux (32-bit) version">
     <antcall target="avr-toolchain-bundle">
       <param name="unpack_target" value="untar"/>
       <param name="gcc_archive_file" value="avr-gcc-4.8.1-arduino5-i686-pc-linux-gnu.tar.bz2"/>
@@ -617,9 +619,11 @@
       <param name="avrdude_archive_file" value="avrdude-6.0.1-arduino5-i686-pc-linux-gnu.tar.bz2"/>
       <param name="avrdude_version" value="6.0.1-arduino5"/>
     </antcall>
+
+    <antcall target="package-library-index-json-bundle"/>
   </target>
 
-  <target name="linux64-build" depends="linux-build"  unless="light_bundle" description="Build linux (64-bit) version">
+  <target name="linux64-build" depends="linux-build" description="Build linux (64-bit) version">
     <antcall target="avr-toolchain-bundle">
       <param name="unpack_target" value="untar"/>
       <param name="gcc_archive_file" value="avr-gcc-4.8.1-arduino5-x86_64-pc-linux-gnu.tar.bz2"/>
@@ -627,6 +631,8 @@
       <param name="avrdude_archive_file" value="avrdude-6.0.1-arduino5-x86_64-pc-linux-gnu.tar.bz2"/>
       <param name="avrdude_version" value="6.0.1-arduino5"/>
     </antcall>
+
+    <antcall target="package-library-index-json-bundle"/>
   </target>
 
   <target name="linux32-run" depends="linux32-build" description="Run Linux (32-bit) version">
@@ -846,6 +852,8 @@
       <param name="avrdude_archive_file" value="avrdude-6.0.1-arduino5-i686-mingw32.zip"/>
       <param name="avrdude_version" value="6.0.1-arduino5"/>
     </antcall>
+
+    <antcall target="package-library-index-json-bundle"/>
   </target>
 
   <target name="windows-run" depends="windows-build"
@@ -950,7 +958,9 @@
 
     <echo append="true" file="${staging_folder}/work/${staging_hardware_folder}/tools/avr/builtin_tools_versions.txt" message="arduino.avrdude=${avrdude_version}${line.separator}"/>
     <echo append="true" file="${staging_folder}/work/${staging_hardware_folder}/tools/avr/builtin_tools_versions.txt" message="arduino.avr-gcc=${gcc_version}${line.separator}"/>
+  </target>
 
+  <target name="package-library-index-json-bundle">
     <mkdir dir="${staging_folder}/work/${staging_hardware_folder}/../dist/"/>
 
     <get src="http://downloads.arduino.cc/packages/package_index.json.gz" dest="${staging_folder}/work/${staging_hardware_folder}/../dist/" verbose="true" skipexisting="false" />
