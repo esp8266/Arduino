@@ -775,9 +775,11 @@ public class BaseNoGui {
     PreferencesData.removeAllKeysWithPrefix(prefix);
 
     for (ContributedTool tool : indexer.getInstalledTools()) {
-      String path = tool.getDownloadableContribution().getInstalledFolder().getAbsolutePath();
-      PreferencesData.set(prefix + tool.getName() + ".path", path);
-      PreferencesData.set(prefix + tool.getName() + "-" + tool.getVersion() + ".path", path);
+      File installedFolder = tool.getDownloadableContribution().getInstalledFolder();
+      if (installedFolder != null) {
+        PreferencesData.set(prefix + tool.getName() + ".path", installedFolder.getAbsolutePath());
+        PreferencesData.set(prefix + tool.getName() + "-" + tool.getVersion() + ".path", installedFolder.getAbsolutePath());
+      }
     }
   }
 
