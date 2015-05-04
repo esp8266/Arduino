@@ -5,11 +5,11 @@ This project brings support for ESP8266 chip to the Arduino environment. ESP8266
 
 ### Downloads ###
 
-| OS | Build status | Latest release |
+| OS | Build status | Latest release | Alpha Version |
 | --- | ------------ | -------------- |
-| Linux | [![Linux build status](http://img.shields.io/travis/igrr/Arduino.svg)](https://travis-ci.org/igrr/Arduino) | [arduino-1.6.1-linux64.tar.xz](../../releases/download/1.6.1-esp8266-1/arduino-1.6.1-linux64.tar.xz) |
-| Windows | [![Windows build status](http://img.shields.io/appveyor/ci/igrr/Arduino.svg)](https://ci.appveyor.com/project/igrr/Arduino) | [arduino-1.6.1-p1-windows.zip](https://github.com/igrr/Arduino/releases/download/1.6.1-esp8266-1/arduino-1.6.1-p1-windows.zip) |
-| OS X |  | [arduino-1.6.1-macosx-java-latest-signed.zip](../../releases/download/1.6.1-esp8266-1/arduino-1.6.1-macosx-java-latest-signed.zip) |
+| Linux | [![Linux build status](http://img.shields.io/travis/igrr/Arduino.svg)](https://travis-ci.org/igrr/Arduino) | [arduino-1.6.1-linux64.tar.xz](../../releases/download/1.6.1-esp8266-1/arduino-1.6.1-linux64.tar.xz) | |
+| Windows | [![Windows build status](http://img.shields.io/appveyor/ci/igrr/Arduino.svg)](https://ci.appveyor.com/project/igrr/Arduino) | [arduino-1.6.1-p1-windows.zip](https://github.com/igrr/Arduino/releases/download/1.6.1-esp8266-1/arduino-1.6.1-p1-windows.zip) |  [appveyor Build](https://ci.appveyor.com/project/igrr/Arduino/build/artifacts) |
+| OS X |  | [arduino-1.6.1-macosx-java-latest-signed.zip](../../releases/download/1.6.1-esp8266-1/arduino-1.6.1-macosx-java-latest-signed.zip) | |
 
 
 ### Building from source ###
