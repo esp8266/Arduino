@@ -249,10 +249,10 @@ public class ContributionInstaller {
   }
 
   private void downloadIndexAndSignature(MultiStepProgress progress, List<String> downloadedPackagedIndexFilesAccumulator, String packageIndexUrl) throws Exception {
-    File packageIndex = downloadIndex(progress, packageIndexUrl);
+    File packageIndex = download(progress, packageIndexUrl);
     downloadedPackagedIndexFilesAccumulator.add(packageIndex.getName());
     try {
-      File packageIndexSignature = downloadIndex(progress, packageIndexUrl + ".sig");
+      File packageIndexSignature = download(progress, packageIndexUrl + ".sig");
       boolean signatureVerified = new GPGDetachedSignatureVerifier().verify(packageIndex, packageIndexSignature, new File(BaseNoGui.getContentFile("lib"), "public.gpg.key"));
       if (signatureVerified) {
         downloadedPackagedIndexFilesAccumulator.add(packageIndexSignature.getName());
@@ -267,7 +267,7 @@ public class ContributionInstaller {
     }
   }
 
-  private File downloadIndex(MultiStepProgress progress, String packageIndexUrl) throws Exception {
+  private File download(MultiStepProgress progress, String packageIndexUrl) throws Exception {
     String statusText = _("Downloading platforms index...");
     URL url = new URL(packageIndexUrl);
     String[] urlPathParts = url.getFile().split("/");
