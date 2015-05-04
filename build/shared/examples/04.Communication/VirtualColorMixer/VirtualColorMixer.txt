@@ -1,0 +1,1 @@
+Send multiple variables from Arduino to your computer and read them in Processing or Max/MSP.

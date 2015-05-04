@@ -1,0 +1,1 @@
+Fade 12 LEDs on and off, one by one, using an Arduino Mega board. 

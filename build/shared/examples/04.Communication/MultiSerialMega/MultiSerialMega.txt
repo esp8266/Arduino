@@ -1,0 +1,1 @@
+Use two of the serial ports available on the Arduino Mega.
