@@ -27,7 +27,7 @@ $ ant dist
 
 #### Basic Wiring functions ####
 
-```pinMode```, ```digitalRead```, ```digitalWrite``` work as usual.
+```pinMode```, ```digitalRead```, ```digitalWrite```, ```analogWrite``` work as usual.
 
 Pin numbers correspond directly to the esp8266 GPIO pin numbers. To read GPIO2,
 call ```digitalRead(2);```
@@ -35,7 +35,10 @@ call ```digitalRead(2);```
 GPIO0-GPIO15 can be ```INPUT```, ```OUTPUT```, ```INPUT_PULLUP```, and ```OUTPUT_OPEN_DRAIN```.
 GPIO16 can be ```INPUT``` or ```OUTPUT```.
 
-```analogRead(0)``` reads the value of the ADC channel connected to the TOUT pin.
+```analogRead(A0)``` reads the value of the ADC channel connected to the TOUT pin.
+
+```analogWrite(pin, value)``` enables software PWM on the given pin. PWM may be used on pins 0 to 15.
+Call ```analogWrite(pin, 0)``` to disable PWM on the pin.
 
 Pin interrupts are supported through ```attachInterrupt```, ```detachInterrupt``` functions.
 Interrupts may be attached to any GPIO pin, except GPIO16. Standard Arduino interrupt
@@ -62,7 +65,13 @@ more than 20 milliseconds is not recommended.
 
 ```Serial``` object works much the same way as on a regular Arduino. Apart from hardware FIFO (128 bytes for TX and RX) HardwareSerial has additional 256-byte TX and RX buffers. Both transmit and receive is interrupt-driven. Write and read functions only block the sketch execution when the respective FIFO/buffers are full/empty.
 
-By default the diagnostic output from WiFi libraries is disabled when you call ```Serial.begin```. To enable debug output again, call ```Serial.setDebugOutput(true);```
+```Serial``` uses UART0, which is mapped to pins GPIO1 (TX) and GPIO3 (RX). Serial may be remapped to GPIO15 (TX) and GPIO13 (RX) by calling ```Serial.swap();``` after ```Serial.begin();```. Calling ```swap``` again maps UART0 back to GPIO1 and GPIO3.
+
+```Serial1``` uses UART1 which is a transmit-only UART. UART1 TX pin is GPIO2. To use ```Serial1```, call ```Serial1.begin```.
+
+By default the diagnostic output from WiFi libraries is disabled when you call ```Serial.begin```. To enable debug output again, call ```Serial.setDebugOutput(true);```. To redirect debug output to ```Serial1``` instead, call ```Serial1.setDebugOutput(true);```.
+
+Both ```Serial``` and ```Serial1``` objects support 5, 6, 7, 8 data bits, odd (O), even (E), and no (N) parity, and 1 or 2 stop bits. To set the desired mode, call ```Serial.begin(baudrate, SERIAL_8N1);```, ```Serial.begin(baudrate, SERIAL_6E2);```, etc.
 
 #### WiFi(ESP8266WiFi library) ####
 
@@ -91,6 +100,9 @@ Four samples are provided for this library.
 
 Library for calling functions repeatedly with a certain period. Two examples included.
 
+It is currently not recommended to do blocking IO operations (network, serial, file) from Ticker 
+callback functions. Instead, set a flag inside the ticker callback and check for that flag inside the loop function.
+
 #### EEPROM ####
 
 This is a bit different from standard EEPROM class. You need to call ```EEPROM.begin(size)```
@@ -101,28 +113,42 @@ Size can be anywhere between 4 and 4096 bytes.
 whenever you wish to save changes to flash. ```EEPROM.end()``` will also commit, and will
 release the RAM copy of EEPROM contents.
 
+EEPROM library uses one sector of flash located at 0x7b000 for storage.
+
 Three examples included.
 
 #### I2C (Wire library) ####
 
-Only master mode works, and ```Wire.setClock``` has not been verified to give exactly correct frequency.
+Wire library currently supports master mode up to approximately 450KHz (at 80 MHz CPU clock).
 Before using I2C, pins for SDA and SCL need to be set by calling
-```Wire.pins(int sda, int scl)```, i.e. ```Wire.pins(0, 2);``` on ESP-01.
+```Wire.begin(int sda, int scl)```, i.e. ```Wire.begin(0, 2);``` on ESP-01.
 
 #### SPI ####
 
-An initial SPI support for the HSPI interface (GPIO12-15) was implemented by [Sermus](https://github.com/Sermus).
-The implementation supports the entire Arduino SPI API including transactions, except setting phase and polarity as it's unclear how to set them in ESP8266 yet.
+SPI library supports the entire Arduino SPI API including transactions, including setting phase and polarity.
 
 #### ESP-specific APIs ####
 
 APIs related to deep sleep and watchdog timer are available in the ```ESP``` object.
 
-```ESP.deepSleep(microseconds, mode)``` will put the chip into deep sleep. ```mode``` is one of ```WAKE_DEFAULT```, ```WAKE_RFCAL```, ```WAKE_NO_RFCAL```, ```WAKE_RF_DISABLED```. (GPIO16 needs to be tied to RST to wake from deepSleep.)
+```ESP.deepSleep(microseconds, mode)``` will put the chip into deep sleep. ```mode``` is one of ```WAKE_RF_DEFAULT```, ```WAKE_RFCAL```, ```WAKE_NO_RFCAL```, ```WAKE_RF_DISABLED```. (GPIO16 needs to be tied to RST to wake from deepSleep.)
 
 ```ESP.wdtEnable()```, ```ESP.wdtDisable()```, and ```ESP.wdtFeed()``` provide some control over the watchdog timer.
 
 ```ESP.reset()``` resets the CPU.
+
+```ESP.getFreeHeap()``` returns the free heap size.
+
+```ESP.getChipId()``` returns the ESP8266 chip ID as a 32-bit integer.
+
+Several APIs may be used to get flash chip info:
+
+```ESP.getFlashChipId()``` returns the flash chip ID as a 32-bit integer.
+
+```ESP.getFlashChipSize()``` returns the flash chip size, in bytes, as seen by the SDK (may be less than actual size).
+
+```ESP.getFlashChipSpeed(void)``` returns the flash chip frequency, in Hz.
+
 
 #### OneWire (from https://www.pjrc.com/teensy/td_libs_OneWire.html) ####
 
@@ -133,6 +159,7 @@ instead of the one that comes with the Arduino IDE (this one).
 #### mDNS responder (ESP8266mDNS library) ####
 
 Allows the sketch to respond to multicast DNS queries for domain names like "foo.local".
+Currently the library only works on STA interface, AP interface is not supported.
 See attached example and library README file for details.
 
 #### Other libraries (not included with the IDE)
@@ -149,16 +176,6 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 Pick the correct serial port.
 You need to put ESP8266 into bootloader mode before uploading code (pull GPIO0 low and
 toggle power).
-
-### Things not done yet ###
-
-- analogWrite (PWM). ESP8266 has only one hardware PWM source. It is not yet clear how to use it with analogWrite API. Software PWM is also an option, but apparently it causes issues with WiFi connectivity.
-- pulseIn
-- I2C slave mode
-- WiFi.RSSI. SDK doesn't seem to have an API to get RSSI for the current network. So far the only
-	way to obtain RSSI is to disconnect, perform a scan, and get the RSSI value from there.
-- Upload sketches via WiFi. Conceptually and technically simple, but need to figure out how to provide the best UX for this feature.
-- Samples for all the libraries
 
 ### Issues and support ###
 
