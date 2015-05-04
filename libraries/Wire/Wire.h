@@ -51,6 +51,7 @@ class TwoWire : public Stream
   public:
     TwoWire();
     void begin(int sda, int scl);
+    void pins(int sda, int scl) __attribute__((deprecated)); // use begin(sda, scl) in new code
     void begin();
     void begin(uint8_t);
     void begin(int);
