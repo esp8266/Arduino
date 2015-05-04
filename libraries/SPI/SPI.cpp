@@ -57,7 +57,7 @@ void SPIClass::setDataMode(uint8_t dataMode) {
 }
 
 void SPIClass::setBitOrder(uint8_t bitOrder) {
-  if (bitOrder == MSBFIRST){
+  if (bitOrder == MSBFIRST) {
     SPI1C &= ~(SPICWBO | SPICRBO);
   } else {
     SPI1C |= (SPICWBO | SPICRBO);
@@ -74,5 +74,27 @@ uint8_t SPIClass::transfer(uint8_t data) {
   SPI1CMD |= SPIBUSY;
   while(SPI1CMD & SPIBUSY);
   return (uint8_t)(SPI1W0 & 0xff);
+}
+
+uint16_t SPIClass::transfer16(uint16_t data) {
+    union {
+            uint16_t val;
+            struct {
+                    uint8_t lsb;
+                    uint8_t msb;
+            };
+    } in, out;
+    in.val = data;
+
+    if((SPI1C & (SPICWBO | SPICRBO))) {
+        //MSBFIRST
+        out.msb = transfer(in.msb);
+        out.lsb = transfer(in.lsb);
+    } else {
+        //LSBFIRST
+        out.lsb = transfer(in.lsb);
+        out.msb = transfer(in.msb);
+    }
+    return out.val;
 }
 
