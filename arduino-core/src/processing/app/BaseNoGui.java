@@ -7,6 +7,7 @@ import cc.arduino.contributions.packages.ContributionsIndexer;
 import cc.arduino.files.DeleteFilesOnShutdown;
 import cc.arduino.packages.DiscoveryManager;
 import cc.arduino.packages.Uploader;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.logging.impl.LogFactoryImpl;
 import org.apache.commons.logging.impl.NoOpLog;
 import processing.app.debug.Compiler;
@@ -597,9 +598,13 @@ public class BaseNoGui {
 
     try {
       indexer.parseIndex();
+    } catch (JsonProcessingException e) {
+      FileUtils.deleteIfExists(indexFile);
+      FileUtils.deleteIfExists(indexSignatureFile);
+      throw e;
     } catch (SignatureVerificationFailedException e) {
-      indexFile.delete();
-      indexSignatureFile.delete();
+      FileUtils.deleteIfExists(indexFile);
+      FileUtils.deleteIfExists(indexSignatureFile);
       throw e;
     }
     indexer.syncWithFilesystem(getHardwareFolder());
@@ -631,7 +636,12 @@ public class BaseNoGui {
         }
       }
     }
-    librariesIndexer.parseIndex();
+    try {
+      librariesIndexer.parseIndex();
+    } catch (JsonProcessingException e) {
+      FileUtils.deleteIfExists(librariesIndexFile);
+      throw e;
+    }
   }
 
   static protected void initPlatform() {
