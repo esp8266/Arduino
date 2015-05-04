@@ -209,7 +209,7 @@ public class Preferences {
   // and linux is all over the map
 
   static final int GUI_BIG     = 13;
-  static final int GUI_BETWEEN = 10;
+  static final int GUI_BETWEEN = 5;
   static final int GUI_SMALL   = 6;
 
   // gui elements
@@ -237,7 +237,7 @@ public class Preferences {
   JTextField proxyHTTPSPort;
   JTextField proxyUser;
   JPasswordField proxyPassword;
-
+  private final JTextField additionalBoardsManagerField;
 
   // the calling editor, so updates can be applied
 
@@ -464,12 +464,25 @@ public class Preferences {
     right = Math.max(right, left + d.width);
     top += d.height + GUI_BETWEEN;
 
+    // proxy settings
+
     JPanel proxySettingsContainer = new JPanel();
     pane.add(proxySettingsContainer);
     setupProxySettingsFieldSet(proxySettingsContainer);
     d = proxySettingsContainer.getMinimumSize();
     proxySettingsContainer.setBounds(left, top, d.width + 10, d.height);
     right = Math.max(right, left + d.width);
+    top += d.height + GUI_BETWEEN;
+
+    // boards manager additional urls
+    box = Box.createHorizontalBox();
+    label = new JLabel(_("Additional Boards Manager URLs: "));
+    box.add(label);
+    additionalBoardsManagerField = new JTextField(30);
+    box.add(additionalBoardsManagerField);
+    pane.add(box);
+    d = box.getPreferredSize();
+    box.setBounds(left, top, d.width, d.height);
     top += d.height + GUI_BETWEEN;
 
     // More preferences are in the ...
@@ -788,6 +801,8 @@ public class Preferences {
     Preferences.set("proxy.user", proxyUser.getText());
     Preferences.set("proxy.password", new String(proxyPassword.getPassword()));
 
+    Preferences.set("boardsmanager.additional.urls", additionalBoardsManagerField.getText().replace("\r\n", "\n").replace("\r", "\n").replace("\n", ","));
+
     editor.applyPreferences();
   }
 
@@ -833,6 +848,8 @@ public class Preferences {
     }
     proxyUser.setText(Preferences.get("proxy.user"));
     proxyPassword.setText(Preferences.get("proxy.password"));
+
+    additionalBoardsManagerField.setText(Preferences.get("boardsmanager.additional.urls"));
 
     dialog.setLocationRelativeTo(editor);
     dialog.setVisible(true);
