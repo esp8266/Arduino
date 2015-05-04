@@ -30,12 +30,12 @@
 #include "spi_flash.h"
 }
 
-#define CONFIG_START_SECTOR 0x3C
+#define CONFIG_START_SECTOR 0x7b
 #define CONFIG_SECTOR (CONFIG_START_SECTOR + 0)
 #define CONFIG_ADDR (SPI_FLASH_SEC_SIZE * CONFIG_SECTOR)
 
 EEPROMClass::EEPROMClass()
-: _data(0), _size(0)
+: _data(0), _size(0), _dirty(false)
 {
 }
 
@@ -67,7 +67,7 @@ void EEPROMClass::end()
 
 uint8_t EEPROMClass::read(int address)
 {
-    if (address < 0 || address >= _size)
+    if (address < 0 || (size_t)address >= _size)
         return 0;
 
     return _data[address];
@@ -75,23 +75,35 @@ uint8_t EEPROMClass::read(int address)
 
 void EEPROMClass::write(int address, uint8_t value)
 {
-    if (address < 0 || address >= _size)
+    if (address < 0 || (size_t)address >= _size)
         return;
 
     _data[address] = value;
     _dirty = true;
 }
 
-void EEPROMClass::commit()
+bool EEPROMClass::commit()
 {
-    if (!_size || !_dirty)
-        return;
+    bool ret = false;
+    if (!_size)
+        return false;
+    if(!_dirty)
+        return true;
 
     ETS_UART_INTR_DISABLE();
-    spi_flash_erase_sector(CONFIG_SECTOR);
-    spi_flash_write(CONFIG_ADDR, reinterpret_cast<uint32_t*>(_data), _size);
+    if(spi_flash_erase_sector(CONFIG_SECTOR) == SPI_FLASH_RESULT_OK) {
+        if(spi_flash_write(CONFIG_ADDR, reinterpret_cast<uint32_t*>(_data), _size) == SPI_FLASH_RESULT_OK) {
+            _dirty = false;
+            ret = true;
+        }
+    }
     ETS_UART_INTR_ENABLE();
-    _dirty = false;
+    return ret;
+}
+
+uint8_t * EEPROMClass::getDataPtr()
+{
+    return &_data[0];
 }
 
 
