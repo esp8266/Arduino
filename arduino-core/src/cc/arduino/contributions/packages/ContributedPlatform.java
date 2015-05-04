@@ -39,6 +39,8 @@ public abstract class ContributedPlatform extends DownloadableContribution {
 
   public abstract String getCategory();
 
+  public abstract void setCategory(String category);
+
   public abstract String getArchitecture();
 
   public abstract String getChecksum();

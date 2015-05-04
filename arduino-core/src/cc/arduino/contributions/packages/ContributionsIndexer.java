@@ -97,13 +97,21 @@ public class ContributionsIndexer {
   }
 
   private void mergeContributions(ContributionsIndex contributionsIndex, File indexFile) {
+    boolean signed = isSigned(indexFile);
+
     for (ContributedPackage contributedPackage : contributionsIndex.getPackages()) {
+      if (!signed) {
+        for (ContributedPlatform contributedPlatform : contributedPackage.getPlatforms()) {
+          contributedPlatform.setCategory("Contributed");
+        }
+      }
+
       ContributedPackage targetPackage = index.getPackage(contributedPackage.getName());
 
       if (targetPackage == null) {
         index.getPackages().add(contributedPackage);
       } else {
-        if (mergeAllowed(contributedPackage, indexFile)) {
+        if (signed || !isPackageNameProtected(contributedPackage)) {
           List<ContributedPlatform> platforms = contributedPackage.getPlatforms();
           if (platforms == null) {
             platforms = new LinkedList<ContributedPlatform>();
@@ -131,8 +139,8 @@ public class ContributionsIndexer {
     }
   }
 
-  private boolean mergeAllowed(ContributedPackage contributedPackage, File indexFile) {
-    return !Constants.PROTECTED_PACKAGE_NAMES.contains(contributedPackage.getName()) || isSigned(indexFile);
+  private boolean isPackageNameProtected(ContributedPackage contributedPackage) {
+    return Constants.PROTECTED_PACKAGE_NAMES.contains(contributedPackage.getName());
   }
 
   private boolean isSigned(File indexFile) {
