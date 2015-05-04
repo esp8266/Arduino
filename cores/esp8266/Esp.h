@@ -42,6 +42,9 @@ typedef enum {
 #define wdt_disable()       ESP.wdtDisable()
 #define wdt_reset()         ESP.wdtFeed()
 
+#define cli()        ets_intr_lock()       // IRQ Disable
+#define sei()        ets_intr_unlock()     // IRQ Enable
+
 enum WakeMode {
     WAKE_RF_DEFAULT = 0, // RF_CAL or not after deep-sleep wake up, depends on init data byte 108.
     WAKE_RFCAL = 1,      // RF_CAL after deep-sleep wake up, there will be large current.
