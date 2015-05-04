@@ -1210,12 +1210,12 @@ public class Compiler implements MessageConsumer {
     // 2. run preproc on that code using the sugg class name
     //    to create a single .java file and write to buildpath
 
+    FileOutputStream outputStream = null;
     try {
       // Output file
       File streamFile = new File(buildPath, sketch.getName() + ".cpp");
-      FileOutputStream outputStream = new FileOutputStream(streamFile);
+      outputStream = new FileOutputStream(streamFile);
       preprocessor.write(outputStream);
-      outputStream.close();
     } catch (FileNotFoundException fnfe) {
       fnfe.printStackTrace();
       String msg = _("Build folder disappeared or could not be written");
@@ -1230,6 +1230,14 @@ public class Compiler implements MessageConsumer {
       System.err.println(I18n.format(_("Uncaught exception type: {0}"), ex.getClass()));
       ex.printStackTrace();
       throw new RunnerException(ex.toString());
+    } finally {
+      if (outputStream != null) {
+        try {
+          outputStream.close();
+        } catch (IOException e) {
+          //noop
+        }
+      }
     }
 
     // grab the imports from the code just preproc'd

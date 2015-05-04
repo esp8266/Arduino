@@ -233,13 +233,6 @@ public class BaseNoGui {
     return librariesFolders;
   }
 
-  /**
-   * Return an InputStream for a file inside the Processing lib folder.
-   */
-  static public InputStream getLibStream(String filename) throws IOException {
-    return new FileInputStream(new File(getContentFile("lib"), filename));
-  }
-
   static public Platform getPlatform() {
     return platform;
   }
@@ -624,13 +617,17 @@ public class BaseNoGui {
       if (defaultLibraryJsonFile.isFile()) {
         FileUtils.copyFile(defaultLibraryJsonFile, librariesIndexFile);
       } else {
+        FileOutputStream out = null;
         try {
           // Otherwise create an empty packages index
-          FileOutputStream out = new FileOutputStream(librariesIndexFile);
+          out = new FileOutputStream(librariesIndexFile);
           out.write("{ \"libraries\" : [ ] }".getBytes());
-          out.close();
         } catch (IOException e) {
           e.printStackTrace();
+        } finally {
+          if (out != null) {
+            out.close();
+          }
         }
       }
     }

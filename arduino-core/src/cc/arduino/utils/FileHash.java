@@ -40,19 +40,18 @@ public class FileHash {
    * Calculate a message digest of a file using the algorithm specified. The
    * result is a string containing the algorithm name followed by ":" and by the
    * resulting hash in hex.
-   * 
+   *
    * @param file
-   * @param algorithm
-   *          For example "SHA-256"
+   * @param algorithm For example "SHA-256"
    * @return The algorithm followed by ":" and the hash, for example:<br />
-   *         "SHA-256:ee6796513086080cca078cbb383f543c5e508b647a71c9d6f39b7bca41071883"
+   * "SHA-256:ee6796513086080cca078cbb383f543c5e508b647a71c9d6f39b7bca41071883"
    * @throws IOException
    * @throws NoSuchAlgorithmException
    */
-  public static String hash(File file, String algorithm) throws IOException,
-      NoSuchAlgorithmException {
-    FileInputStream in = new FileInputStream(file);
+  public static String hash(File file, String algorithm) throws IOException, NoSuchAlgorithmException {
+    FileInputStream in = null;
     try {
+      in = new FileInputStream(file);
       byte buff[] = new byte[10240];
       MessageDigest digest = MessageDigest.getInstance(algorithm);
       while (in.available() > 0) {
@@ -69,7 +68,9 @@ public class FileHash {
       }
       return algorithm + ":" + res;
     } finally {
-      in.close();
+      if (in != null) {
+        in.close();
+      }
     }
   }
 }

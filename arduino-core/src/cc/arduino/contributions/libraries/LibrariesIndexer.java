@@ -70,17 +70,24 @@ public class LibrariesIndexer {
   }
 
   private void parseIndex(File indexFile) throws IOException {
-    InputStream indexIn = new FileInputStream(indexFile);
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new MrBeanModule());
-    mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
-    mapper.configure(DeserializationFeature.EAGER_DESERIALIZER_FETCH, true);
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    index = mapper.readValue(indexIn, LibrariesIndex.class);
+    InputStream indexIn = null;
+    try {
+      indexIn = new FileInputStream(indexFile);
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.registerModule(new MrBeanModule());
+      mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
+      mapper.configure(DeserializationFeature.EAGER_DESERIALIZER_FETCH, true);
+      mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+      index = mapper.readValue(indexIn, LibrariesIndex.class);
 
-    for (ContributedLibrary library : index.getLibraries()) {
-      if (library.getCategory() == null || "".equals(library.getCategory())) {
-        library.setCategory("Uncategorized");
+      for (ContributedLibrary library : index.getLibraries()) {
+        if (library.getCategory() == null || "".equals(library.getCategory())) {
+          library.setCategory("Uncategorized");
+        }
+      }
+    } finally {
+      if (indexIn != null) {
+        indexIn.close();
       }
     }
   }

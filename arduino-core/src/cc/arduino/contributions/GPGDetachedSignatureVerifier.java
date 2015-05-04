@@ -52,23 +52,41 @@ public class GPGDetachedSignatureVerifier {
   public boolean verify(File signedFile, File signature, File publicKey) throws IOException, PGPException {
     PGPPublicKey pgpPublicKey = readPublicKey(publicKey, keyId);
 
-    PGPObjectFactory pgpObjectFactory = new PGPObjectFactory(new FileInputStream(signature), new BcKeyFingerprintCalculator());
+    FileInputStream signatureInputStream = null;
+    FileInputStream signedFileInputStream = null;
+    try {
+      signatureInputStream = new FileInputStream(signature);
+      PGPObjectFactory pgpObjectFactory = new PGPObjectFactory(signatureInputStream, new BcKeyFingerprintCalculator());
 
-    PGPSignatureList pgpSignatureList = (PGPSignatureList) pgpObjectFactory.nextObject();
-    assert pgpSignatureList.size() == 1;
-    PGPSignature pgpSignature = pgpSignatureList.get(0);
+      PGPSignatureList pgpSignatureList = (PGPSignatureList) pgpObjectFactory.nextObject();
+      assert pgpSignatureList.size() == 1;
+      PGPSignature pgpSignature = pgpSignatureList.get(0);
 
-    pgpSignature.init(new BcPGPContentVerifierBuilderProvider(), pgpPublicKey);
-    pgpSignature.update(IOUtils.toByteArray(new FileInputStream(signedFile)));
+      pgpSignature.init(new BcPGPContentVerifierBuilderProvider(), pgpPublicKey);
+      signedFileInputStream = new FileInputStream(signedFile);
+      pgpSignature.update(IOUtils.toByteArray(signedFileInputStream));
 
-    return pgpSignature.verify();
+      return pgpSignature.verify();
+    } finally {
+      if (signatureInputStream != null) {
+        signatureInputStream.close();
+      }
+      if (signedFileInputStream != null) {
+        signedFileInputStream.close();
+      }
+    }
   }
 
   private PGPPublicKey readPublicKey(File file, String keyId) throws IOException, PGPException {
-    InputStream keyIn = new BufferedInputStream(new FileInputStream(file));
-    PGPPublicKey pubKey = readPublicKey(keyIn, keyId);
-    keyIn.close();
-    return pubKey;
+    InputStream keyIn = null;
+    try {
+      keyIn = new BufferedInputStream(new FileInputStream(file));
+      return readPublicKey(keyIn, keyId);
+    } finally {
+      if (keyIn != null) {
+        keyIn.close();
+      }
+    }
   }
 
   private PGPPublicKey readPublicKey(InputStream input, String keyId) throws IOException, PGPException {

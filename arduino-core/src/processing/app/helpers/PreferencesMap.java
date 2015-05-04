@@ -21,17 +21,13 @@
  */
 package processing.app.helpers;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import processing.app.legacy.PApplet;
+
+import java.io.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
-import processing.app.legacy.PApplet;
 
 @SuppressWarnings("serial")
 public class PreferencesMap extends LinkedHashMap<String, String> {
@@ -71,7 +67,15 @@ public class PreferencesMap extends LinkedHashMap<String, String> {
    * @throws IOException
    */
   public void load(File file) throws IOException {
-    load(new FileInputStream(file));
+    FileInputStream fileInputStream = null;
+    try {
+      fileInputStream = new FileInputStream(file);
+      load(fileInputStream);
+    } finally {
+      if (fileInputStream != null) {
+        fileInputStream.close();
+      }
+    }
   }
 
   protected String processPlatformSuffix(String key, String suffix, boolean isCurrentPlatform) {

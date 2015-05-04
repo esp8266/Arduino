@@ -277,10 +277,12 @@ public class ContributionInstaller {
 
     // Replace old index with the updated one
     if (outputFile.exists()) {
-      outputFile.delete();
+      if (!outputFile.delete()) {
+        throw new Exception("An error occurred while updating platforms index! I can't delete file " + outputFile);
+      }
     }
     if (!tmpFile.renameTo(outputFile)) {
-      throw new Exception("An error occurred while updating platforms index!");
+      throw new Exception("An error occurred while updating platforms index! I can't rename file " + tmpFile);
     }
 
     return outputFile;

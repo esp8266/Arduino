@@ -158,13 +158,20 @@ public class ContributionsIndexer {
   }
 
   private ContributionsIndex parseIndex(File indexFile) throws IOException {
-    InputStream indexIn = new FileInputStream(indexFile);
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new MrBeanModule());
-    mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
-    mapper.configure(DeserializationFeature.EAGER_DESERIALIZER_FETCH, true);
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    return mapper.readValue(indexIn, ContributionsIndex.class);
+    InputStream inputStream = null;
+    try {
+      inputStream = new FileInputStream(indexFile);
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.registerModule(new MrBeanModule());
+      mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
+      mapper.configure(DeserializationFeature.EAGER_DESERIALIZER_FETCH, true);
+      mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+      return mapper.readValue(inputStream, ContributionsIndex.class);
+    } finally {
+      if (inputStream != null) {
+        inputStream.close();
+      }
+    }
   }
 
   public void syncWithFilesystem(File hardwareFolder) throws IOException {
