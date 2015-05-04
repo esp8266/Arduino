@@ -52,8 +52,12 @@ TwoWire::TwoWire(){}
 // Public Methods //////////////////////////////////////////////////////////////
 
 void TwoWire::begin(int sda, int scl){
-    twi_init(sda, scl);
-    flush();
+  twi_init(sda, scl);
+  flush();
+}
+
+void TwoWire::pins(int sda, int scl){
+  twi_init(sda, scl);
 }
 
 void TwoWire::begin(void){
