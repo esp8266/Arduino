@@ -119,7 +119,7 @@ sample code bearing this copyright.
 
 OneWire::OneWire(uint8_t pin)
 {
-	pinMode(pin, INPUT);
+	pinMode(pin, INPUT_PULLUP);
 	bitmask = PIN_TO_BITMASK(pin);
 	baseReg = PIN_TO_BASEREG(pin);
 #if ONEWIRE_SEARCH
