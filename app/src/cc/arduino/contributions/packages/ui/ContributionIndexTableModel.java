@@ -32,7 +32,7 @@ import cc.arduino.contributions.DownloadableContributionBuiltInAtTheBottomCompar
 import cc.arduino.contributions.filters.InstalledPredicate;
 import cc.arduino.contributions.packages.ContributedPackage;
 import cc.arduino.contributions.packages.ContributedPlatform;
-import cc.arduino.contributions.packages.ContributionsIndex;
+import cc.arduino.contributions.packages.ContributionsIndexer;
 import cc.arduino.contributions.ui.FilteredAbstractTableModel;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
@@ -113,16 +113,16 @@ public class ContributionIndexTableModel extends FilteredAbstractTableModel<Cont
 
   private Class<?>[] columnTypes = {ContributedPlatform.class};
 
-  private ContributionsIndex index;
+  private ContributionsIndexer indexer;
 
-  public void setIndex(ContributionsIndex _index) {
-    index = _index;
+  public void setIndexer(ContributionsIndexer indexer) {
+    this.indexer = indexer;
   }
 
   public void updateIndexFilter(String filters[], Predicate<ContributedPlatform>... additionalFilters) {
     contributions.clear();
     Predicate<ContributedPlatform> filter = Predicates.and(additionalFilters);
-    for (ContributedPackage pack : index.getPackages()) {
+    for (ContributedPackage pack : indexer.getPackages()) {
       for (ContributedPlatform platform : pack.getPlatforms()) {
         if (!filter.apply(platform)) {
           continue;

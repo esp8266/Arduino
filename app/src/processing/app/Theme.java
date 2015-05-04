@@ -26,6 +26,7 @@ import static processing.app.I18n._;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.SystemColor;
+import java.io.File;
 
 import processing.app.helpers.PreferencesHelper;
 import processing.app.helpers.PreferencesMap;
@@ -45,7 +46,7 @@ public class Theme {
 
   static protected void init() {
     try {
-      table.load(Base.getLibStream("theme/theme.txt"));
+      table.load(new File(BaseNoGui.getContentFile("lib"), "theme/theme.txt"));
     } catch (Exception te) {
       Base.showError(null, _("Could not read color theme settings.\n" +
                              "You'll need to reinstall Arduino."), te);

@@ -18,8 +18,8 @@
     <cp>lib/antlr.jar</cp>
     <cp>lib/apple.jar</cp>
     <cp>lib/arduino-core.jar</cp>
-    <cp>lib/bcpg-jdk15on-149.jar</cp>
-    <cp>lib/bcprov-jdk15on-149.jar</cp>
+    <cp>lib/bcpg-jdk15on-152.jar</cp>
+    <cp>lib/bcprov-jdk15on-152.jar</cp>
     <cp>lib/commons-codec-1.7.jar</cp>
     <cp>lib/commons-compress-1.8.jar</cp>
     <cp>lib/commons-exec-1.1.jar</cp>

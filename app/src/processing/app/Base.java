@@ -22,6 +22,7 @@
 
 package processing.app;
 
+import cc.arduino.DefaultUncaughtExceptionHandler;
 import cc.arduino.contributions.DownloadableContributionVersionComparator;
 import cc.arduino.contributions.VersionHelper;
 import cc.arduino.contributions.libraries.ContributedLibrary;
@@ -321,7 +322,8 @@ public class Base {
           lastStatus = progress.getStatus();
         }
       };
-      installer.updateIndex();
+      List<String> downloadedPackageIndexFiles = installer.updateIndex();
+      installer.deleteUnknownFiles(downloadedPackageIndexFiles);
       indexer.parseIndex();
       indexer.syncWithFilesystem(getHardwareFolder());
 
@@ -342,7 +344,7 @@ public class Base {
         System.exit(1);
       }
 
-      ContributedPlatform installed = indexer.getIndex().getInstalled(boardToInstallParts[0], boardToInstallParts[1]);
+      ContributedPlatform installed = indexer.getInstalled(boardToInstallParts[0], boardToInstallParts[1]);
 
       if (!selected.isReadOnly()) {
         installer.install(selected);
@@ -2404,14 +2406,6 @@ public class Base {
   }
 
 
-  /**
-   * Return an InputStream for a file inside the Processing lib folder.
-   */
-  static public InputStream getLibStream(String filename) throws IOException {
-    return BaseNoGui.getLibStream(filename);
-  }
-
-
   // ...................................................................
 
 
@@ -2429,17 +2423,22 @@ public class Base {
    */
   static public byte[] loadBytesRaw(File file) throws IOException {
     int size = (int) file.length();
-    FileInputStream input = new FileInputStream(file);
-    byte buffer[] = new byte[size];
-    int offset = 0;
-    int bytesRead;
-    while ((bytesRead = input.read(buffer, offset, size - offset)) != -1) {
-      offset += bytesRead;
-      if (bytesRead == 0) break;
+    FileInputStream input = null;
+    try {
+      input = new FileInputStream(file);
+      byte buffer[] = new byte[size];
+      int offset = 0;
+      int bytesRead;
+      while ((bytesRead = input.read(buffer, offset, size - offset)) != -1) {
+        offset += bytesRead;
+        if (bytesRead == 0) break;
+      }
+      return buffer;
+    } finally {
+      if (input != null) {
+        input.close();
+      }
     }
-    input.close();  // weren't properly being closed
-    input = null;
-    return buffer;
   }
 
 
@@ -2474,20 +2473,25 @@ public class Base {
 
   static public void copyFile(File sourceFile,
                               File targetFile) throws IOException {
-    InputStream from =
-            new BufferedInputStream(new FileInputStream(sourceFile));
-    OutputStream to =
-            new BufferedOutputStream(new FileOutputStream(targetFile));
-    byte[] buffer = new byte[16 * 1024];
-    int bytesRead;
-    while ((bytesRead = from.read(buffer)) != -1) {
-      to.write(buffer, 0, bytesRead);
+    InputStream from = null;
+    OutputStream to = null;
+    try {
+      from = new BufferedInputStream(new FileInputStream(sourceFile));
+      to = new BufferedOutputStream(new FileOutputStream(targetFile));
+      byte[] buffer = new byte[16 * 1024];
+      int bytesRead;
+      while ((bytesRead = from.read(buffer)) != -1) {
+        to.write(buffer, 0, bytesRead);
+      }
+      to.flush();
+    } finally {
+      if (from != null) {
+        from.close(); // ??
+      }
+      if (to != null) {
+        to.close(); // ??
+      }
     }
-    to.flush();
-    from.close(); // ??
-    from = null;
-    to.close(); // ??
-    to = null;
 
     targetFile.setLastModified(sourceFile.lastModified());
   }

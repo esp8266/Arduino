@@ -266,9 +266,20 @@ public class PApplet {
   }
 
   static public String[] loadStrings(File file) {
-    InputStream is = createInput(file);
-    if (is != null) return loadStrings(is);
-    return null;
+    InputStream is = null;
+    try {
+      is = createInput(file);
+      if (is != null) return loadStrings(is);
+      return null;
+    } finally {
+      if (is != null) {
+        try {
+          is.close();
+        } catch (IOException e) {
+          // noop
+        }
+      }
+    }
   }
 
   static public String[] loadStrings(InputStream input) {
@@ -319,14 +330,29 @@ public class PApplet {
 
 
   static public void saveStrings(File file, String strings[]) {
-    saveStrings(createOutput(file), strings);
+    OutputStream outputStream = null;
+    try {
+      outputStream = createOutput(file);
+      saveStrings(outputStream, strings);
+    } finally {
+      if (outputStream != null) {
+        try {
+          outputStream.close();
+        } catch (IOException e) {
+          //noop
+        }
+      }
+    }
   }
 
 
   static public void saveStrings(OutputStream output, String strings[]) {
     PrintWriter writer = createWriter(output);
-    for (int i = 0; i < strings.length; i++) {
-      writer.println(strings[i]);
+    if (writer == null) {
+      return;
+    }
+    for (String string : strings) {
+      writer.println(string);
     }
     writer.flush();
     writer.close();

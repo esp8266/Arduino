@@ -137,10 +137,12 @@ public abstract class ContributionsIndex {
     }
   }
 
-  public ContributedPackage getPackage(String packager) {
-    for (ContributedPackage pack : getPackages())
-      if (pack.getName().equals(packager))
+  public ContributedPackage getPackage(String packageName) {
+    for (ContributedPackage pack : getPackages()) {
+      if (pack.getName().equals(packageName)) {
         return pack;
+      }
+    }
     return null;
   }
 

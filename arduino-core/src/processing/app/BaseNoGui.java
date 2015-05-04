@@ -1,5 +1,6 @@
 package processing.app;
 
+import cc.arduino.contributions.SignatureVerificationFailedException;
 import cc.arduino.contributions.libraries.LibrariesIndexer;
 import cc.arduino.contributions.packages.ContributedTool;
 import cc.arduino.contributions.packages.ContributionsIndexer;
@@ -230,13 +231,6 @@ public class BaseNoGui {
 
   static public List<File> getLibrariesPath() {
     return librariesFolders;
-  }
-
-  /**
-   * Return an InputStream for a file inside the Processing lib folder.
-   */
-  static public InputStream getLibStream(String filename) throws IOException {
-    return new FileInputStream(new File(getContentFile("lib"), filename));
   }
 
   static public Platform getPlatform() {
@@ -577,7 +571,7 @@ public class BaseNoGui {
 
   static public void initPackages() throws Exception {
     indexer = new ContributionsIndexer(BaseNoGui.getSettingsFolder());
-    File indexFile = indexer.getIndexFile();
+    File indexFile = indexer.getIndexFile("package_index.json");
     File defaultPackageJsonFile = new File(getContentFile("dist"), "package_index.json");
     if (!indexFile.isFile() || (defaultPackageJsonFile.isFile() && defaultPackageJsonFile.lastModified() > indexFile.lastModified())) {
       FileUtils.copyFile(defaultPackageJsonFile, indexFile);
@@ -594,7 +588,20 @@ public class BaseNoGui {
         }
       }
     }
-    indexer.parseIndex();
+
+    File indexSignatureFile = indexer.getIndexFile("package_index.json.sig");
+    File defaultPackageJsonSignatureFile = new File(getContentFile("dist"), "package_index.json.sig");
+    if (!indexSignatureFile.isFile() || (defaultPackageJsonSignatureFile.isFile() && defaultPackageJsonSignatureFile.lastModified() > indexSignatureFile.lastModified())) {
+      FileUtils.copyFile(defaultPackageJsonSignatureFile, indexSignatureFile);
+    }
+
+    try {
+      indexer.parseIndex();
+    } catch (SignatureVerificationFailedException e) {
+      indexFile.delete();
+      indexSignatureFile.delete();
+      throw e;
+    }
     indexer.syncWithFilesystem(getHardwareFolder());
 
     packages = new HashMap<String, TargetPackage>();
@@ -610,13 +617,17 @@ public class BaseNoGui {
       if (defaultLibraryJsonFile.isFile()) {
         FileUtils.copyFile(defaultLibraryJsonFile, librariesIndexFile);
       } else {
+        FileOutputStream out = null;
         try {
           // Otherwise create an empty packages index
-          FileOutputStream out = new FileOutputStream(librariesIndexFile);
+          out = new FileOutputStream(librariesIndexFile);
           out.write("{ \"libraries\" : [ ] }".getBytes());
-          out.close();
         } catch (IOException e) {
           e.printStackTrace();
+        } finally {
+          if (out != null) {
+            out.close();
+          }
         }
       }
     }

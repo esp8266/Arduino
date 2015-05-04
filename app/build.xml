@@ -99,6 +99,8 @@
       <fileset dir="test" includes="**/*.txt" />
       <fileset dir="test" includes="**/*.properties" />
       <fileset dir="test" includes="**/*.ino" />
+      <fileset dir="test" includes="**/*.json*" />
+      <fileset dir="test" includes="**/*.key" />
     </copy>
 
     <junit printsummary="yes" dir="${work.dir}" fork="true">

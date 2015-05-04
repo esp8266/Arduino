@@ -45,7 +45,7 @@ public class PreferencesData {
     // start by loading the defaults, in case something
     // important was deleted from the user prefs
     try {
-      prefs.load(BaseNoGui.getLibStream(PREFS_FILE));
+      prefs.load(new File(BaseNoGui.getContentFile("lib"), PREFS_FILE));
     } catch (IOException e) {
       BaseNoGui.showError(null, _("Could not read default settings.\n" +
               "You'll need to reinstall Arduino."), e);
@@ -94,41 +94,6 @@ public class PreferencesData {
   }
 
 
-  static public String[] loadStrings(InputStream input) {
-    try {
-      BufferedReader reader =
-              new BufferedReader(new InputStreamReader(input, "UTF-8"));
-
-      String lines[] = new String[100];
-      int lineCount = 0;
-      String line = null;
-      while ((line = reader.readLine()) != null) {
-        if (lineCount == lines.length) {
-          String temp[] = new String[lineCount << 1];
-          System.arraycopy(lines, 0, temp, 0, lineCount);
-          lines = temp;
-        }
-        lines[lineCount++] = line;
-      }
-      reader.close();
-
-      if (lineCount == lines.length) {
-        return lines;
-      }
-
-      // resize array to appropriate amount for these lines
-      String output[] = new String[lineCount];
-      System.arraycopy(lines, 0, output, 0, lineCount);
-      return output;
-
-    } catch (IOException e) {
-      e.printStackTrace();
-      //throw new RuntimeException("Error inside loadStrings()");
-    }
-    return null;
-  }
-
-
   static protected void save() {
     if (!doSave)
       return;
@@ -139,18 +104,24 @@ public class PreferencesData {
     if (preferencesFile == null) return;
 
     // Fix for 0163 to properly use Unicode when writing preferences.txt
-    PrintWriter writer = PApplet.createWriter(preferencesFile);
+    PrintWriter writer = null;
+    try {
+      writer = PApplet.createWriter(preferencesFile);
 
-    String[] keys = prefs.keySet().toArray(new String[0]);
-    Arrays.sort(keys);
-    for (String key: keys) {
-      if (key.startsWith("runtime."))
-        continue;
-      writer.println(key + "=" + prefs.get(key));
+      String[] keys = prefs.keySet().toArray(new String[0]);
+      Arrays.sort(keys);
+      for (String key : keys) {
+        if (key.startsWith("runtime."))
+          continue;
+        writer.println(key + "=" + prefs.get(key));
+      }
+
+      writer.flush();
+    } finally {
+      if (writer != null) {
+        writer.close();
+      }
     }
-
-    writer.flush();
-    writer.close();
 
     try {
       BaseNoGui.getPlatform().fixPrefsFilePermissions(preferencesFile);

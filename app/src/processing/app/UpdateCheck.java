@@ -22,16 +22,16 @@
 
 package processing.app;
 
+import processing.app.legacy.PApplet;
+
+import javax.swing.*;
 import java.io.BufferedReader;
-import java.io.InputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Random;
 
-import javax.swing.JOptionPane;
-
-import processing.app.legacy.PApplet;
 import static processing.app.I18n._;
 
 
@@ -126,11 +126,16 @@ public class UpdateCheck implements Runnable {
   }
 
 
-  protected int readInt(String filename) throws Exception {
+  protected int readInt(String filename) throws IOException {
     URL url = new URL(filename);
-    InputStream stream = url.openStream();
-    InputStreamReader isr = new InputStreamReader(stream);
-    BufferedReader reader = new BufferedReader(isr);
-    return Integer.parseInt(reader.readLine());
+    BufferedReader reader = null;
+    try {
+      reader = new BufferedReader(new InputStreamReader(url.openStream()));
+      return Integer.parseInt(reader.readLine());
+    } finally {
+      if (reader != null) {
+        reader.close();
+      }
+    }
   }
 }
