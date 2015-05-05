@@ -32,8 +32,8 @@ $ ant dist
 Pin numbers correspond directly to the esp8266 GPIO pin numbers. To read GPIO2,
 call ```digitalRead(2);```
 
-GPIO0-GPIO15 can be ```INPUT```, ```OUTPUT```, ```INPUT_PULLUP```, and ```OUTPUT_OPEN_DRAIN```.
-GPIO16 can be ```INPUT``` or ```OUTPUT```.
+GPIO0-GPIO15 can be ```INPUT```, ```OUTPUT```, ```INPUT_PULLUP```, and ```INPUT_PULLDOWN```.
+GPIO16 can be ```INPUT```, ```OUTPUT``` or ```INPUT_PULLDOWN```.
 
 ```analogRead(A0)``` reads the value of the ADC channel connected to the TOUT pin.
 
@@ -47,6 +47,8 @@ types are supported: ```CHANGE```, ```RISING```, ```FALLING```.
 #### Pin Functions ####
 
 ![Pin Functions](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/pin_functions.png)
+The most usable pin functions are mapped to the macro ```SPECIAL```, so calling ```pinMode(pin, SPECIAL)```
+will switch that pin in the most usable FUNCTION_X. Those are UART RX/TX on pins 1 - 3, HSPI for pins 12-15 and CLK functions for pins 0, 4 and 5.
 
 #### Timing and delays ####
 ```millis``` and ```micros``` return the number of milliseconds and microseconds elapsed after reset, respectively.
@@ -123,9 +125,10 @@ Three examples included.
 
 #### I2C (Wire library) ####
 
-Wire library currently supports master mode up to approximately 450KHz (at 80 MHz CPU clock).
+Wire library currently supports master mode up to approximately 450KHz.
 Before using I2C, pins for SDA and SCL need to be set by calling
-```Wire.begin(int sda, int scl)```, i.e. ```Wire.begin(0, 2);``` on ESP-01.
+```Wire.begin(int sda, int scl)```, i.e. ```Wire.begin(0, 2);``` on ESP-01,
+else they default to pins 4(SDA) and 5(SCL).
 
 #### SPI ####
 
