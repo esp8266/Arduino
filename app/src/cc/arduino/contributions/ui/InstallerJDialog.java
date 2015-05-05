@@ -41,10 +41,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -279,6 +276,13 @@ public abstract class InstallerJDialog<T> extends JDialog {
       }
     }
   };
+
+  public void setFilterText(String filterText) {
+    for (FocusListener listener : filterField.getFocusListeners()) {
+      listener.focusGained(new FocusEvent(filterField, FocusEvent.FOCUS_GAINED));
+    }
+    filterField.setText(filterText);
+  }
 
   /**
    * Action performed when the Cancel button is pressed.

@@ -22,7 +22,7 @@
 
 package processing.app;
 
-import cc.arduino.DefaultUncaughtExceptionHandler;
+import cc.arduino.contributions.BuiltInCoreIsNewerCheck;
 import cc.arduino.contributions.DownloadableContributionVersionComparator;
 import cc.arduino.contributions.VersionHelper;
 import cc.arduino.contributions.libraries.ContributedLibrary;
@@ -36,7 +36,8 @@ import cc.arduino.contributions.packages.ui.ContributionManagerUI;
 import cc.arduino.files.DeleteFilesOnShutdown;
 import cc.arduino.packages.DiscoveryManager;
 import cc.arduino.utils.Progress;
-import cc.arduino.view.SplashScreenHelper;
+import cc.arduino.view.*;
+import cc.arduino.view.Event;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
@@ -111,6 +112,7 @@ public class Base {
   // are the same for all windows (since the board and serial port that are
   // actually used are determined by the preferences, which are shared)
   private List<JMenu> boardsCustomMenus;
+  private volatile Action openBoardsManager;
 
   static public void main(String args[]) throws Exception {
     System.setProperty("awt.useSystemAAFontSettings", "on");
@@ -446,6 +448,9 @@ public class Base {
       if (PreferencesData.getBoolean("update.check")) {
         new UpdateCheck(this);
       }
+
+      new Thread(new BuiltInCoreIsNewerCheck(this)).start();
+
     } else if (parser.isNoOpMode()) {
       // Do nothing (intended for only changing preferences)
       System.exit(0);
@@ -1265,7 +1270,7 @@ public class Base {
     rebuildExamplesMenu(Editor.examplesMenu);
   }
 
-  private void openInstallBoardDialog() throws Exception {
+  private void openInstallBoardDialog(final String filterText) throws Exception {
     // Create dialog for contribution manager
     @SuppressWarnings("serial")
     ContributionManagerUI managerUI = new ContributionManagerUI(activeEditor) {
@@ -1274,6 +1279,10 @@ public class Base {
         BaseNoGui.initPackages();
         rebuildBoardsMenu();
         setIndexer(BaseNoGui.indexer);
+        if (StringUtils.isNotEmpty(filterText)) {
+          setFilterText(filterText);
+        }
+
       }
     };
     managerUI.setLocationRelativeTo(activeEditor);
@@ -1294,18 +1303,22 @@ public class Base {
     JMenu boardMenu = new JMenu(_("Board"));
     boardMenu.putClientProperty("removeOnWindowDeactivation", true);
     MenuScroller.setScrollerFor(boardMenu);
-    @SuppressWarnings("serial")
-    Action runInstaller = new AbstractAction(_("Boards Manager...")) {
+
+    openBoardsManager = new AbstractAction(_("Boards Manager...")) {
       public void actionPerformed(ActionEvent actionevent) {
+        String filterText = "";
+        if (actionevent instanceof cc.arduino.view.Event) {
+          filterText = ((Event) actionevent).getPayload().get("filterText").toString();
+        }
         try {
-          openInstallBoardDialog();
+          openInstallBoardDialog(filterText);
         } catch (Exception e) {
           //TODO show error
           e.printStackTrace();
         }
       }
     };
-    boardMenu.add(new JMenuItem(runInstaller));
+    boardMenu.add(new JMenuItem(openBoardsManager));
     boardsCustomMenus.add(boardMenu);
 
     // If there are no platforms installed we are done
@@ -2700,7 +2713,15 @@ public class Base {
     return activeEditor;
   }
 
+  public boolean hasActiveEditor() {
+    return activeEditor != null;
+  }
+
   public List<Editor> getEditors() {
     return new LinkedList<Editor>(editors);
+  }
+
+  public Action getOpenBoardsManager() {
+    return openBoardsManager;
   }
 }

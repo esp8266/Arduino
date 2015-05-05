@@ -29,6 +29,7 @@
 
 package cc.arduino.contributions.libraries.filters;
 
+import cc.arduino.contributions.filters.InstalledPredicate;
 import cc.arduino.contributions.libraries.ContributedLibrary;
 import cc.arduino.contributions.libraries.LibrariesIndex;
 import com.google.common.base.Predicate;
@@ -50,12 +51,7 @@ public class InstalledLibraryPredicate implements Predicate<ContributedLibrary> 
       return true;
     }
 
-    Collection<ContributedLibrary> installed = Collections2.filter(index.find(input.getName()), new Predicate<ContributedLibrary>() {
-      @Override
-      public boolean apply(ContributedLibrary input) {
-        return input.isInstalled();
-      }
-    });
+    Collection<ContributedLibrary> installed = Collections2.filter(index.find(input.getName()), new InstalledPredicate());
 
     return !installed.isEmpty();
   }
