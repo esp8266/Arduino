@@ -41,11 +41,6 @@ import static processing.app.I18n._;
 
 public class SerialDiscovery implements Discovery {
 
-  static {
-    //makes transifex happy
-    _("Uncertified");
-  }
-
   private Timer serialBoardsListerTimer;
   private final List<BoardPort> serialBoardPorts;
 

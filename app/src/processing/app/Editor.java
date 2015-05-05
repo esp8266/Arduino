@@ -966,22 +966,15 @@ public class Editor extends JFrame implements RunnerListener {
 
   class SerialMenuListener implements ActionListener {
 
-    private final Frame parent;
     private final String serialPort;
-    private final String warning;
 
-    public SerialMenuListener(Frame parent, String serialPort, String warning) {
-      this.parent = parent;
+    public SerialMenuListener(String serialPort) {
       this.serialPort = serialPort;
-      this.warning = warning;
     }
 
     public void actionPerformed(ActionEvent e) {
       selectSerialPort(serialPort);
       base.onBoardOrPortChange();
-      if (warning != null && !Preferences.getBoolean("uncertifiedBoardWarning_dontShowMeAgain")) {
-        SwingUtilities.invokeLater(new ShowUncertifiedBoardWarning(parent));
-      }
     }
 
   }
@@ -1063,7 +1056,7 @@ public class Editor extends JFrame implements RunnerListener {
       String label = port.getLabel();
 
       JCheckBoxMenuItem item = new JCheckBoxMenuItem(label, address.equals(selectedPort));
-      item.addActionListener(new SerialMenuListener(this, address, port.getPrefs().get("warning")));
+      item.addActionListener(new SerialMenuListener(address));
       serialMenu.add(item);
     }
 

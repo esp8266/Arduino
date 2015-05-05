@@ -39,8 +39,6 @@ import processing.app.helpers.PreferencesMap;
 
 import java.util.*;
 
-import static processing.app.I18n._;
-
 public class SerialBoardsLister extends TimerTask {
 
   private static final int MAX_TIME_AWAITING_FOR_PACKAGES = 5000;
@@ -98,17 +96,9 @@ public class SerialBoardsLister extends TimerTask {
 
         TargetBoard board = (TargetBoard) boardData.get("board");
         if (board != null) {
-          String warningKey = "vid." + boardData.get("vid").toString() + ".warning";
-          String warning = board.getPreferences().get(warningKey);
-          prefs.put("warning", warning);
-
           String boardName = board.getName();
           if (boardName != null) {
-            if (warning != null) {
-              label += " (" + boardName + " - " + _(warning) + ")";
-            } else {
-              label += " (" + boardName + ")";
-            }
+            label += " (" + boardName + ")";
           }
           boardPort.setBoardName(boardName);
         }
