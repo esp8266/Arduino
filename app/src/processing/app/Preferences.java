@@ -24,6 +24,7 @@ package processing.app;
 import processing.app.helpers.FileUtils;
 import processing.app.helpers.OSUtils;
 import processing.app.helpers.PreferencesHelper;
+import processing.app.helpers.PreferencesMap;
 import processing.app.legacy.PApplet;
 
 import javax.swing.*;
@@ -854,12 +855,69 @@ public class Preferences {
     dialog.setVisible(true);
   }
 
-
-  static protected void save() {
+  @Deprecated
+  protected static void save() {
     PreferencesData.save();
   }
 
+  @Deprecated
+  public static String get(String attribute) {
+    return PreferencesData.get(attribute);
+  }
 
-  // .................................................................
+  @Deprecated
+  public static String get(String attribute, String defaultValue) {
+    return PreferencesData.get(attribute, defaultValue);
+  }
+
+  @Deprecated
+  public static boolean has(String key) {
+    return PreferencesData.has(key);
+  }
+
+  @Deprecated
+  public static void remove(String key) {
+    PreferencesData.remove(key);
+  }
+
+  @Deprecated
+  public static void set(String attribute, String value) {
+    PreferencesData.set(attribute, value);
+  }
+
+  @Deprecated
+  public static boolean getBoolean(String attribute) {
+    return PreferencesData.getBoolean(attribute);
+  }
+
+  @Deprecated
+  public static void setBoolean(String attribute, boolean value) {
+    PreferencesData.setBoolean(attribute, value);
+  }
+
+  @Deprecated
+  public static int getInteger(String attribute) {
+    return PreferencesData.getInteger(attribute);
+  }
+
+  @Deprecated
+  public static int getInteger(String attribute, int defaultValue) {
+    return PreferencesData.getInteger(attribute, defaultValue);
+  }
+
+  @Deprecated
+  public static void setInteger(String key, int value) {
+    PreferencesData.setInteger(key, value);
+  }
+
+  @Deprecated
+  public static PreferencesMap getMap() {
+    return PreferencesData.getMap();
+  }
+
+  @Deprecated
+  public static void setDoSave(boolean value) {
+    PreferencesData.setDoSave(value);
+  }
 
 }

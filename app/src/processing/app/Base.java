@@ -309,7 +309,7 @@ public class Base {
     // Save the preferences. For GUI mode, this happens in the quit
     // handler, but for other modes we should also make sure to save
     // them.
-    Preferences.save();
+    PreferencesData.save();
 
     if (parser.isInstallBoard()) {
       ContributionsIndexer indexer = new ContributionsIndexer(BaseNoGui.getSettingsFolder());
@@ -988,7 +988,7 @@ public class Base {
       storeSketches();
 
       // Save out the current prefs state
-      Preferences.save();
+      PreferencesData.save();
 
       // Since this wasn't an actual Quit event, call System.exit()
       System.exit(0);
@@ -1035,7 +1035,7 @@ public class Base {
         editor.internalCloseRunner();
       }
       // Save out the current prefs state
-      Preferences.save();
+      PreferencesData.save();
 
       if (!OSUtils.isMacOS()) {
         // If this was fired from the menu or an AppleEvent (the Finder),

@@ -2309,7 +2309,7 @@ public class Editor extends JFrame implements RunnerListener {
     // Store information on who's open and running
     // (in case there's a crash or something that can't be recovered)
     base.storeSketches();
-    Preferences.save();
+    PreferencesData.save();
 
     // opening was successful
     return true;
