@@ -57,12 +57,12 @@ generic.menu.FlashSize.4M=4M
 generic.menu.FlashSize.4M.build.flash_size=4M
 
 ##############################################################
-nodemcu.name=NODEMCU ESP8266 Module (v0.9)
+nodemcu.name=NodeMCU (ESP8266 ESP-12 Module)
 
 nodemcu.upload.tool=esptool
 nodemcu.upload.speed=115200
 nodemcu.upload.resetmethod=ck
-nodemcu.upload.maximum_size=524288
+nodemcu.upload.maximum_size=4194304
 nodemcu.upload.wait_for_upload_port=true
 nodemcu.serial.disableDTR=true
 nodemcu.serial.disableRTS=true
