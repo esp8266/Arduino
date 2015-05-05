@@ -58,7 +58,16 @@ public class GPGDetachedSignatureVerifier {
       signatureInputStream = new FileInputStream(signature);
       PGPObjectFactory pgpObjectFactory = new PGPObjectFactory(signatureInputStream, new BcKeyFingerprintCalculator());
 
-      PGPSignatureList pgpSignatureList = (PGPSignatureList) pgpObjectFactory.nextObject();
+      Object nextObject;
+      try {
+        nextObject = pgpObjectFactory.nextObject();
+        if (!(nextObject instanceof PGPSignatureList)) {
+          return false;
+        }
+      } catch (IOException e) {
+        return false;
+      }
+      PGPSignatureList pgpSignatureList = (PGPSignatureList) nextObject;
       assert pgpSignatureList.size() == 1;
       PGPSignature pgpSignature = pgpSignatureList.get(0);
 
