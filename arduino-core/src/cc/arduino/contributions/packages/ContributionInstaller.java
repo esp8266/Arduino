@@ -29,10 +29,10 @@
 package cc.arduino.contributions.packages;
 
 import cc.arduino.contributions.GPGDetachedSignatureVerifier;
+import cc.arduino.filters.FileExecutablePredicate;
 import cc.arduino.utils.ArchiveExtractor;
 import cc.arduino.utils.MultiStepProgress;
 import cc.arduino.utils.Progress;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
@@ -158,12 +158,7 @@ public class ContributionInstaller {
   }
 
   private void executePostInstallScriptIfAny(File folder) throws IOException {
-    Collection<File> postInstallScripts = Collections2.filter(BaseNoGui.getPlatform().postInstallScripts(folder), new Predicate<File>() {
-      @Override
-      public boolean apply(File file) {
-        return file.isFile() && file.exists() && file.canRead() && file.canExecute();
-      }
-    });
+    Collection<File> postInstallScripts = Collections2.filter(BaseNoGui.getPlatform().postInstallScripts(folder), new FileExecutablePredicate());
 
     if (postInstallScripts.isEmpty()) {
       String[] subfolders = folder.list(new OnlyDirs());

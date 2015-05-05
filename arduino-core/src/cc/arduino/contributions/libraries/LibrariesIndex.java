@@ -31,7 +31,7 @@ package cc.arduino.contributions.libraries;
 
 import cc.arduino.contributions.DownloadableContributionBuiltInAtTheBottomComparator;
 import cc.arduino.contributions.filters.InstalledPredicate;
-import com.google.common.base.Predicate;
+import cc.arduino.contributions.libraries.filters.LibraryWithNamePredicate;
 import com.google.common.collect.Collections2;
 
 import java.util.*;
@@ -41,12 +41,7 @@ public abstract class LibrariesIndex {
   public abstract List<ContributedLibrary> getLibraries();
 
   public List<ContributedLibrary> find(final String name) {
-    return new LinkedList<ContributedLibrary>(Collections2.filter(getLibraries(), new Predicate<ContributedLibrary>() {
-      @Override
-      public boolean apply(ContributedLibrary contributedLibrary) {
-        return name.equals(contributedLibrary.getName());
-      }
-    }));
+    return new LinkedList<ContributedLibrary>(Collections2.filter(getLibraries(), new LibraryWithNamePredicate(name)));
   }
 
   public ContributedLibrary find(String name, String version) {
