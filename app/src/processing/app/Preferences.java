@@ -24,7 +24,6 @@ package processing.app;
 import processing.app.helpers.FileUtils;
 import processing.app.helpers.OSUtils;
 import processing.app.helpers.PreferencesHelper;
-import processing.app.helpers.PreferencesMap;
 import processing.app.legacy.PApplet;
 
 import javax.swing.*;
@@ -353,7 +352,7 @@ public class Preferences {
     pane.add(box);
     d = box.getPreferredSize();
     box.setBounds(left, top, d.width, d.height);
-    Font editorFont = Preferences.getFont("editor.font");
+    Font editorFont = PreferencesData.getFont("editor.font");
     fontSizeField.setText(String.valueOf(editorFont.getSize()));
     top += d.height + GUI_BETWEEN;
 
@@ -786,22 +785,22 @@ public class Preferences {
     WarningItem warningItem = (WarningItem) comboWarnings.getSelectedItem();
     PreferencesData.set("compiler.warning_level", warningItem.getValue());
 
-    Preferences.set("proxy.http.server", proxyHTTPServer.getText());
+    PreferencesData.set("proxy.http.server", proxyHTTPServer.getText());
     try {
-      Preferences.set("proxy.http.port", Integer.valueOf(proxyHTTPPort.getText()).toString());
+      PreferencesData.set("proxy.http.port", Integer.valueOf(proxyHTTPPort.getText()).toString());
     } catch (NumberFormatException e) {
-      Preferences.remove("proxy.http.port");
+      PreferencesData.remove("proxy.http.port");
     }
-    Preferences.set("proxy.https.server", proxyHTTPSServer.getText());
+    PreferencesData.set("proxy.https.server", proxyHTTPSServer.getText());
     try {
-      Preferences.set("proxy.https.port", Integer.valueOf(proxyHTTPSPort.getText()).toString());
+      PreferencesData.set("proxy.https.port", Integer.valueOf(proxyHTTPSPort.getText()).toString());
     } catch (NumberFormatException e) {
-      Preferences.remove("proxy.https.port");
+      PreferencesData.remove("proxy.https.port");
     }
-    Preferences.set("proxy.user", proxyUser.getText());
-    Preferences.set("proxy.password", new String(proxyPassword.getPassword()));
+    PreferencesData.set("proxy.user", proxyUser.getText());
+    PreferencesData.set("proxy.password", new String(proxyPassword.getPassword()));
 
-    Preferences.set("boardsmanager.additional.urls", additionalBoardsManagerField.getText().replace("\r\n", "\n").replace("\r", "\n").replace("\n", ","));
+    PreferencesData.set("boardsmanager.additional.urls", additionalBoardsManagerField.getText().replace("\r\n", "\n").replace("\r", "\n").replace("\n", ","));
 
     editor.applyPreferences();
   }
@@ -834,22 +833,22 @@ public class Preferences {
 
     updateExtensionBox.setSelected(PreferencesData.get("editor.update_extension") == null || PreferencesData.getBoolean("editor.update_extension"));
 
-    proxyHTTPServer.setText(Preferences.get("proxy.http.server"));
+    proxyHTTPServer.setText(PreferencesData.get("proxy.http.server"));
     try {
-      proxyHTTPPort.setText(Integer.toString(Preferences.getInteger("proxy.http.port", 8080)));
+      proxyHTTPPort.setText(Integer.toString(PreferencesData.getInteger("proxy.http.port", 8080)));
     } catch (NumberFormatException e) {
       proxyHTTPPort.setText("");
     }
-    proxyHTTPSServer.setText(Preferences.get("proxy.https.server"));
+    proxyHTTPSServer.setText(PreferencesData.get("proxy.https.server"));
     try {
-      proxyHTTPSPort.setText(Integer.toString(Preferences.getInteger("proxy.https.port", 8443)));
+      proxyHTTPSPort.setText(Integer.toString(PreferencesData.getInteger("proxy.https.port", 8443)));
     } catch (NumberFormatException e) {
       proxyHTTPSPort.setText("");
     }
-    proxyUser.setText(Preferences.get("proxy.user"));
-    proxyPassword.setText(Preferences.get("proxy.password"));
+    proxyUser.setText(PreferencesData.get("proxy.user"));
+    proxyPassword.setText(PreferencesData.get("proxy.password"));
 
-    additionalBoardsManagerField.setText(Preferences.get("boardsmanager.additional.urls"));
+    additionalBoardsManagerField.setText(PreferencesData.get("boardsmanager.additional.urls"));
 
     dialog.setLocationRelativeTo(editor);
     dialog.setVisible(true);
@@ -863,76 +862,4 @@ public class Preferences {
 
   // .................................................................
 
-  static public String get(String attribute) {
-    return PreferencesData.get(attribute);
-  }
-
-  static public String get(String attribute, String defaultValue) {
-    return PreferencesData.get(attribute, defaultValue);
-  }
-
-  public static boolean has(String key) {
-    return PreferencesData.has(key);
-  }
-
-  public static void remove(String key) {
-    PreferencesData.remove(key);
-  }
-
-
-  static public void set(String attribute, String value) {
-    PreferencesData.set(attribute, value);
-  }
-
-
-  static public boolean getBoolean(String attribute) {
-    return PreferencesData.getBoolean(attribute);
-  }
-
-
-  static public void setBoolean(String attribute, boolean value) {
-    PreferencesData.setBoolean(attribute, value);
-  }
-
-
-  static public int getInteger(String attribute) {
-    return PreferencesData.getInteger(attribute);
-  }
-
-  static public int getInteger(String attribute, int defaultValue) {
-    if (PreferencesData.has(attribute)) {
-      return PreferencesData.getInteger(attribute);
-    }
-
-    return defaultValue;
-  }
-
-
-  static public void setInteger(String key, int value) {
-    PreferencesData.setInteger(key, value);
-  }
-
-
-  static public Font getFont(String attr) {
-    Font font = PreferencesHelper.getFont(PreferencesData.prefs, attr);
-    if (font == null) {
-      String value = PreferencesData.defaults.get(attr);
-      PreferencesData.prefs.put(attr, value);
-      font = PreferencesHelper.getFont(PreferencesData.prefs, attr);
-    }
-    return font;
-  }
-
-  // get a copy of the Preferences
-  static public PreferencesMap getMap()
-  {
-    return PreferencesData.getMap();
-  }
-
-  // Decide wether changed preferences will be saved. When value is
-  // false, Preferences.save becomes a no-op.
-  static public void setDoSave(boolean value)
-  {
-    PreferencesData.setDoSave(value);
-  }
 }

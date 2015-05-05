@@ -43,18 +43,18 @@ public class DefaultTargetTest extends AbstractWithPreferencesTest {
 
   @Before
   public void saveBoardFromPreferences() throws Exception {
-    oldBoardID = Preferences.get("board");
+    oldBoardID = PreferencesData.get("board");
   }
 
   @After
   public void restoreBoardIntoPreferences() throws Exception {
-    Preferences.set("board", oldBoardID);
-    Preferences.save();
+    PreferencesData.set("board", oldBoardID);
+    PreferencesData.save();
   }
 
   @Test
   public void testDefaultTarget() throws Exception {
-    Preferences.set("board", "unreal_board");
+    PreferencesData.set("board", "unreal_board");
 
     // should not raise an exception
     new Base(new String[0]);

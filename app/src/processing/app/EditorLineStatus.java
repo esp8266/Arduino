@@ -101,7 +101,7 @@ public class EditorLineStatus extends JComponent {
         setBoardName(boardPreferences.get("name"));
       else
         setBoardName("-");
-      setSerialPort(Preferences.get("serial.port"));
+      setSerialPort(PreferencesData.get("serial.port"));
     }
     g.setColor(background);
     Dimension size = getSize();

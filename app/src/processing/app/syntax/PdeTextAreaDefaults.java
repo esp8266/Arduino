@@ -44,7 +44,7 @@ public class PdeTextAreaDefaults extends TextAreaDefaults {
     inputHandler.addKeyBinding("BACK_SPACE", InputHandler.BACKSPACE);
     // for 0122, shift-backspace is delete, for 0176, it's now a preference, 
     // to prevent holy warriors from attacking me for it.
-    if (Preferences.getBoolean("editor.keys.shift_backspace_is_delete")) {
+    if (PreferencesData.getBoolean("editor.keys.shift_backspace_is_delete")) {
       inputHandler.addKeyBinding("S+BACK_SPACE", InputHandler.DELETE);
     } else {
       inputHandler.addKeyBinding("S+BACK_SPACE", InputHandler.BACKSPACE);
@@ -65,7 +65,7 @@ public class PdeTextAreaDefaults extends TextAreaDefaults {
     
     // http://dev.processing.org/bugs/show_bug.cgi?id=162
     // added for 0176, though the bindings do not appear relevant for osx 
-    if (Preferences.getBoolean("editor.keys.alternative_cut_copy_paste")) {
+    if (PreferencesData.getBoolean("editor.keys.alternative_cut_copy_paste")) {
       inputHandler.addKeyBinding("C+INSERT", InputHandler.CLIPBOARD_COPY);
       inputHandler.addKeyBinding("S+INSERT", InputHandler.CLIPBOARD_PASTE);
       inputHandler.addKeyBinding("S+DELETE", InputHandler.CLIPBOARD_CUT);
@@ -78,7 +78,7 @@ public class PdeTextAreaDefaults extends TextAreaDefaults {
     // HOME and END now mean the beginning/end of the document
     // for 0176 changed this to a preference so that the Mac OS X people
     // can get the "normal" behavior as well if they prefer.
-    if (Preferences.getBoolean("editor.keys.home_and_end_travel_far")) {
+    if (PreferencesData.getBoolean("editor.keys.home_and_end_travel_far")) {
       inputHandler.addKeyBinding("HOME", InputHandler.DOCUMENT_HOME);
       inputHandler.addKeyBinding("END", InputHandler.DOCUMENT_END);
       inputHandler.addKeyBinding("S+HOME", InputHandler.SELECT_DOC_HOME);
@@ -182,13 +182,13 @@ public class PdeTextAreaDefaults extends TextAreaDefaults {
 
     // moved from TextAreaPainter
 
-    font = Preferences.getFont("editor.font");
+    font = PreferencesData.getFont("editor.font");
 
     fgcolor = Theme.getColor("editor.fgcolor");
     bgcolor = Theme.getColor("editor.bgcolor");
 
     caretVisible = true;
-    caretBlinks = Preferences.getBoolean("editor.caret.blink");
+    caretBlinks = PreferencesData.getBoolean("editor.caret.blink");
     caretColor = Theme.getColor("editor.caret.color");
 
     selectionColor = Theme.getColor("editor.selection.color");

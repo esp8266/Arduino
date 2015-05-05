@@ -60,7 +60,7 @@ implements TabExpander, Printable
     setForeground(defaults.fgcolor);
     setBackground(defaults.bgcolor);
 
-    antialias = Preferences.getBoolean("editor.antialias");
+    antialias = PreferencesData.getBoolean("editor.antialias");
 
     blockCaret = defaults.blockCaret;
     styles = defaults.styles;

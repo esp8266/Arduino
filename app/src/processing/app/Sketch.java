@@ -575,7 +575,7 @@ public class Sketch {
       });
 
       if (pdeFiles != null && pdeFiles.length > 0) {
-        if (Preferences.get("editor.update_extension") == null) {
+        if (PreferencesData.get("editor.update_extension") == null) {
           Object[] options = { _("OK"), _("Cancel") };
           int result = JOptionPane.showOptionDialog(editor,
                                                     _("In Arduino 1.0, the default file extension has changed\n" +
@@ -594,10 +594,10 @@ public class Sketch {
 
           if (result != JOptionPane.OK_OPTION) return false; // save cancelled
 
-          Preferences.setBoolean("editor.update_extension", true);
+          PreferencesData.setBoolean("editor.update_extension", true);
         }
 
-        if (Preferences.getBoolean("editor.update_extension")) {
+        if (PreferencesData.getBoolean("editor.update_extension")) {
           // Do rename of all .pde files to new .ino extension
           for (File pdeFile : pdeFiles)
             renameCodeToInoExtension(pdeFile);
@@ -801,7 +801,7 @@ public class Sketch {
 
     if (result) {
       editor.statusNotice(_("One file added to the sketch."));
-      Preferences.set("last.folder", sourceFile.getAbsolutePath());
+      PreferencesData.set("last.folder", sourceFile.getAbsolutePath());
     }
   }
 
@@ -1059,7 +1059,7 @@ public class Sketch {
 
     // if an external editor is being used, need to grab the
     // latest version of the code from the file.
-    if (Preferences.getBoolean("editor.external")) {
+    if (PreferencesData.getBoolean("editor.external")) {
       // history gets screwed by the open..
       //String historySaved = history.lastRecorded;
       //handleOpen(sketch);
@@ -1202,7 +1202,7 @@ public class Sketch {
 
     boolean success = false;
     do {
-      if (uploader.requiresAuthorization() && !Preferences.has(uploader.getAuthorizationKey())) {
+      if (uploader.requiresAuthorization() && !PreferencesData.has(uploader.getAuthorizationKey())) {
         PasswordAuthorizationDialog dialog = new PasswordAuthorizationDialog(editor, _("Type board password to upload a new sketch"));
         dialog.setLocationRelativeTo(editor);
         dialog.setVisible(true);
@@ -1212,7 +1212,7 @@ public class Sketch {
           return false;
         }
 
-        Preferences.set(uploader.getAuthorizationKey(), dialog.getPassword());
+        PreferencesData.set(uploader.getAuthorizationKey(), dialog.getPassword());
       }
 
       List<String> warningsAccumulator = new LinkedList<String>();
@@ -1220,7 +1220,7 @@ public class Sketch {
         success = Compiler.upload(data, uploader, buildPath, suggestedClassName, usingProgrammer, false, warningsAccumulator);
       } finally {
         if (uploader.requiresAuthorization() && !success) {
-          Preferences.remove(uploader.getAuthorizationKey());
+          PreferencesData.remove(uploader.getAuthorizationKey());
         }
       }
 

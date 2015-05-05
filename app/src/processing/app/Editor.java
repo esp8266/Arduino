@@ -24,9 +24,6 @@ package processing.app;
 
 import cc.arduino.packages.MonitorFactory;
 
-import cc.arduino.view.*;
-import cc.arduino.view.Event;
-import cc.arduino.view.EventListener;
 import com.jcraft.jsch.JSchException;
 import jssc.SerialPortException;
 import processing.app.debug.*;
@@ -280,7 +277,7 @@ public class Editor extends JFrame implements RunnerListener {
     splitPane.setBorder(null);
 
     // the default size on windows is too small and kinda ugly
-    int dividerSize = Preferences.getInteger("editor.divider.size");
+    int dividerSize = PreferencesData.getInteger("editor.divider.size");
     if (dividerSize != 0) {
       splitPane.setDividerSize(dividerSize);
     }
@@ -312,8 +309,8 @@ public class Editor extends JFrame implements RunnerListener {
 
 
     // Set the minimum size for the editor window
-    setMinimumSize(new Dimension(Preferences.getInteger("editor.window.width.min"),
-                                 Preferences.getInteger("editor.window.height.min")));
+    setMinimumSize(new Dimension(PreferencesData.getInteger("editor.window.width.min"),
+                                 PreferencesData.getInteger("editor.window.height.min")));
 //    System.out.println("t3");
 
     // Bring back the general options for the editor
@@ -445,13 +442,13 @@ public class Editor extends JFrame implements RunnerListener {
   protected void applyPreferences() {
 
     // apply the setting for 'use external editor'
-    boolean external = Preferences.getBoolean("editor.external");
+    boolean external = PreferencesData.getBoolean("editor.external");
 
     textarea.setEditable(!external);
     saveMenuItem.setEnabled(!external);
     saveAsMenuItem.setEnabled(!external);
 
-    textarea.setDisplayLineNumbers(Preferences.getBoolean("editor.linenumbers"));
+    textarea.setDisplayLineNumbers(PreferencesData.getBoolean("editor.linenumbers"));
 
     TextAreaPainter painter = textarea.getPainter();
     if (external) {
@@ -464,14 +461,14 @@ public class Editor extends JFrame implements RunnerListener {
     } else {
       Color color = Theme.getColor("editor.bgcolor");
       painter.setBackground(color);
-      boolean highlight = Preferences.getBoolean("editor.linehighlight");
+      boolean highlight = PreferencesData.getBoolean("editor.linehighlight");
       painter.setLineHighlightEnabled(highlight);
       textarea.setCaretVisible(true);
     }
 
     // apply changes to the font size for the editor
     //TextAreaPainter painter = textarea.getPainter();
-    painter.setFont(Preferences.getFont("editor.font"));
+    painter.setFont(PreferencesData.getFont("editor.font"));
     //Font font = painter.getFont();
     //textarea.getPainter().setFont(new Font("Courier", Font.PLAIN, 36));
 
@@ -586,10 +583,10 @@ public class Editor extends JFrame implements RunnerListener {
 
     item = newJMenuItemShift(_("Page Setup"), 'P');
     item.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          handlePageSetup();
-        }
-      });
+      public void actionPerformed(ActionEvent e) {
+        handlePageSetup();
+      }
+    });
     fileMenu.add(item);
 
     item = newJMenuItem(_("Print"), 'P');
@@ -677,10 +674,10 @@ public class Editor extends JFrame implements RunnerListener {
 
     item = new JMenuItem(_("Add File..."));
     item.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          sketch.handleAddFile();
-        }
-      });
+      public void actionPerformed(ActionEvent e) {
+        sketch.handleAddFile();
+      }
+    });
     sketchMenu.add(item);
 
     return sketchMenu;
@@ -1023,11 +1020,11 @@ public class Editor extends JFrame implements RunnerListener {
   protected void populatePortMenu() {
     serialMenu.removeAll();
 
-    String selectedPort = Preferences.get("serial.port");
+    String selectedPort = PreferencesData.get("serial.port");
 
     List<BoardPort> ports = Base.getDiscoveryManager().discovery();
 
-    ports = Base.getPlatform().filterPorts(ports, Preferences.getBoolean("serial.ports.showall"));
+    ports = Base.getPlatform().filterPorts(ports, PreferencesData.getBoolean("serial.ports.showall"));
 
     Collections.sort(ports, new Comparator<BoardPort>() {
       @Override
@@ -1891,7 +1888,7 @@ public class Editor extends JFrame implements RunnerListener {
 
 
   protected void handleIndentOutdent(boolean indent) {
-    int tabSize = Preferences.getInteger("editor.tabs.size");
+    int tabSize = PreferencesData.getInteger("editor.tabs.size");
     String tabString = Editor.EMPTY.substring(0, tabSize);
 
     startCompoundEdit();
@@ -1994,7 +1991,7 @@ public class Editor extends JFrame implements RunnerListener {
    */
   public void handleRun(final boolean verbose) {
     internalCloseRunner();
-    if (Preferences.getBoolean("editor.save_on_verify")) {
+    if (PreferencesData.getBoolean("editor.save_on_verify")) {
       if (sketch.isModified() && !sketch.isReadOnly()) {
         handleSave(true);
       }
@@ -2007,7 +2004,7 @@ public class Editor extends JFrame implements RunnerListener {
     for (int i = 0; i < 10; i++) System.out.println();
 
     // clear the console on each run, unless the user doesn't want to
-    if (Preferences.getBoolean("console.auto_clear")) {
+    if (PreferencesData.getBoolean("console.auto_clear")) {
       console.clear();
     }
 
@@ -2433,7 +2430,7 @@ public class Editor extends JFrame implements RunnerListener {
 	I18n.format(
 	  _("Serial port {0} not found.\n" +
 	    "Retry the upload with another serial port?"),
-	  Preferences.get("serial.port")
+	  PreferencesData.get("serial.port")
 	),
 				  "Serial port not found",
                                   JOptionPane.PLAIN_MESSAGE,
@@ -2463,7 +2460,7 @@ public class Editor extends JFrame implements RunnerListener {
    * hitting export twice, quickly, and horking things up.
    */
   synchronized public void handleExport(final boolean usingProgrammer) {
-    if (Preferences.getBoolean("editor.save_on_verify")) {
+    if (PreferencesData.getBoolean("editor.save_on_verify")) {
       if (sketch.isModified() && !sketch.isReadOnly()) {
         handleSave(true);
       }
@@ -2606,10 +2603,10 @@ public class Editor extends JFrame implements RunnerListener {
       }
     }
 
-    BoardPort port = Base.getDiscoveryManager().find(Preferences.get("serial.port"));
+    BoardPort port = Base.getDiscoveryManager().find(PreferencesData.get("serial.port"));
 
     if (port == null) {
-      statusError(I18n.format("Board at {0} is not available", Preferences.get("serial.port")));
+      statusError(I18n.format("Board at {0} is not available", PreferencesData.get("serial.port")));
       return;
     }
 
@@ -2618,7 +2615,7 @@ public class Editor extends JFrame implements RunnerListener {
 
     boolean success = false;
     do {
-      if (serialMonitor.requiresAuthorization() && !Preferences.has(serialMonitor.getAuthorizationKey())) {
+      if (serialMonitor.requiresAuthorization() && !PreferencesData.has(serialMonitor.getAuthorizationKey())) {
         PasswordAuthorizationDialog dialog = new PasswordAuthorizationDialog(this, _("Type board password to access its console"));
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
@@ -2628,7 +2625,7 @@ public class Editor extends JFrame implements RunnerListener {
           return;
         }
 
-        Preferences.set(serialMonitor.getAuthorizationKey(), dialog.getPassword());
+        PreferencesData.set(serialMonitor.getAuthorizationKey(), dialog.getPassword());
       }
 
       try {
@@ -2649,7 +2646,7 @@ public class Editor extends JFrame implements RunnerListener {
         statusError(e);
       } finally {
         if (serialMonitor.requiresAuthorization() && !success) {
-          Preferences.remove(serialMonitor.getAuthorizationKey());
+          PreferencesData.remove(serialMonitor.getAuthorizationKey());
         }
       }
 
@@ -2829,7 +2826,7 @@ public class Editor extends JFrame implements RunnerListener {
       lineStatus.setBoardName(boardPreferences.get("name"));
     else
       lineStatus.setBoardName("-");
-    lineStatus.setSerialPort(Preferences.get("serial.port"));
+    lineStatus.setSerialPort(PreferencesData.get("serial.port"));
     lineStatus.repaint();
   }
 

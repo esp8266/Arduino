@@ -73,12 +73,12 @@ public class EditorListener {
 
 
   public void applyPreferences() {
-    tabsExpand = Preferences.getBoolean("editor.tabs.expand");
+    tabsExpand = PreferencesData.getBoolean("editor.tabs.expand");
     //tabsIndent = Preferences.getBoolean("editor.tabs.indent");
-    tabSize = Preferences.getInteger("editor.tabs.size");
+    tabSize = PreferencesData.getInteger("editor.tabs.size");
     tabString = Editor.EMPTY.substring(0, tabSize);
-    autoIndent = Preferences.getBoolean("editor.indent");
-    externalEditor = Preferences.getBoolean("editor.external");
+    autoIndent = PreferencesData.getBoolean("editor.indent");
+    externalEditor = PreferencesData.getBoolean("editor.external");
   }
 
 

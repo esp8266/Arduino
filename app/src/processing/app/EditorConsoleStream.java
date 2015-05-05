@@ -37,14 +37,14 @@ class EditorConsoleStream extends OutputStream {
       tempFolder = Base.createTempFolder("console");
       DeleteFilesOnShutdown.add(tempFolder);
       try {
-        String outFileName = Preferences.get("console.output.file");
+        String outFileName = PreferencesData.get("console.output.file");
         if (outFileName != null) {
           outFile = new File(tempFolder, outFileName);
           DeleteFilesOnShutdown.add(outFile);
           stdoutFile = new FileOutputStream(outFile);
         }
 
-        String errFileName = Preferences.get("console.error.file");
+        String errFileName = PreferencesData.get("console.error.file");
         if (errFileName != null) {
           errFile = new File(tempFolder, errFileName);
           DeleteFilesOnShutdown.add(errFile);
@@ -58,7 +58,7 @@ class EditorConsoleStream extends OutputStream {
       consoleOut = new PrintStream(new EditorConsoleStream(false));
       consoleErr = new PrintStream(new EditorConsoleStream(true));
 
-      if (Preferences.getBoolean("console")) {
+      if (PreferencesData.getBoolean("console")) {
         try {
           System.setOut(consoleOut);
           System.setErr(consoleErr);

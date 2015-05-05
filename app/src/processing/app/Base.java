@@ -143,7 +143,7 @@ public class Base {
 
     BaseNoGui.initParameters(args);
 
-    System.setProperty("swing.aatext", Preferences.get("editor.antialias", "true"));
+    System.setProperty("swing.aatext", PreferencesData.get("editor.antialias", "true"));
 
     BaseNoGui.initVersion();
 
@@ -257,9 +257,9 @@ public class Base {
     if (sketchbookPath == null) {
       File defaultFolder = getDefaultSketchbookFolderOrPromptForIt();
       if (BaseNoGui.getPortableFolder() != null)
-        Preferences.set("sketchbook.path", BaseNoGui.getPortableSketchbookFolder());
+        PreferencesData.set("sketchbook.path", BaseNoGui.getPortableSketchbookFolder());
       else
-        Preferences.set("sketchbook.path", defaultFolder.getAbsolutePath());
+        PreferencesData.set("sketchbook.path", defaultFolder.getAbsolutePath());
       if (!defaultFolder.exists()) {
         defaultFolder.mkdirs();
       }
@@ -293,7 +293,7 @@ public class Base {
 
       boolean showEditor = parser.isGuiMode();
       if (!parser.isForceSavePrefs())
-        Preferences.setDoSave(showEditor);
+        PreferencesData.setDoSave(showEditor);
       if (handleOpen(file, nextEditorLocation(), showEditor) == null) {
         String mess = I18n.format(_("Failed to open sketch: \"{0}\""), path);
         // Open failure is fatal in upload/verify mode
@@ -406,13 +406,13 @@ public class Base {
     } else if (parser.isVerifyOrUploadMode()) {
       splashScreenHelper.close();
       // Set verbosity for command line build
-      Preferences.set("build.verbose", "" + parser.isDoVerboseBuild());
-      Preferences.set("upload.verbose", "" + parser.isDoVerboseUpload());
-      Preferences.set("runtime.preserve.temp.files", Boolean.toString(parser.isPreserveTempFiles()));
+      PreferencesData.set("build.verbose", "" + parser.isDoVerboseBuild());
+      PreferencesData.set("upload.verbose", "" + parser.isDoVerboseUpload());
+      PreferencesData.set("runtime.preserve.temp.files", Boolean.toString(parser.isPreserveTempFiles()));
 
       // Make sure these verbosity preferences are only for the
       // current session
-      Preferences.setDoSave(false);
+      PreferencesData.setDoSave(false);
 
       Editor editor = editors.get(0);
 
@@ -443,14 +443,14 @@ public class Base {
       }
 
       // Check for updates
-      if (Preferences.getBoolean("update.check")) {
+      if (PreferencesData.getBoolean("update.check")) {
         new UpdateCheck(this);
       }
     } else if (parser.isNoOpMode()) {
       // Do nothing (intended for only changing preferences)
       System.exit(0);
     } else if (parser.isGetPrefMode()) {
-      String value = Preferences.get(parser.getGetPref(), null);
+      String value = PreferencesData.get(parser.getGetPref(), null);
       if (value != null) {
         System.out.println(value);
         System.exit(0);
@@ -474,11 +474,11 @@ public class Base {
     Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
     boolean windowPositionValid = true;
 
-    if (Preferences.get("last.screen.height") != null) {
+    if (PreferencesData.get("last.screen.height") != null) {
       // if screen size has changed, the window coordinates no longer
       // make sense, so don't use them unless they're identical
-      int screenW = Preferences.getInteger("last.screen.width");
-      int screenH = Preferences.getInteger("last.screen.height");
+      int screenW = PreferencesData.getInteger("last.screen.width");
+      int screenH = PreferencesData.getInteger("last.screen.height");
 
       if ((screen.width != screenW) || (screen.height != screenH)) {
         windowPositionValid = false;
@@ -499,10 +499,10 @@ public class Base {
     // If !windowPositionValid, then ignore the coordinates found for each.
 
     // Save the sketch path and window placement for each open sketch
-    int count = Preferences.getInteger("last.sketch.count");
+    int count = PreferencesData.getInteger("last.sketch.count");
     int opened = 0;
     for (int i = 0; i < count; i++) {
-      String path = Preferences.get("last.sketch" + i + ".path");
+      String path = PreferencesData.get("last.sketch" + i + ".path");
       if (BaseNoGui.getPortableFolder() != null) {
         File absolute = new File(BaseNoGui.getPortableFolder(), path);
         try {
@@ -513,7 +513,7 @@ public class Base {
       }
       int[] location;
       if (windowPositionValid) {
-        String locationStr = Preferences.get("last.sketch" + i + ".location");
+        String locationStr = PreferencesData.get("last.sketch" + i + ".location");
         location = PApplet.parseInt(PApplet.split(locationStr, ','));
       } else {
         location = nextEditorLocation();
@@ -534,8 +534,8 @@ public class Base {
   protected void storeSketches() {
     // Save the width and height of the screen
     Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-    Preferences.setInteger("last.screen.width", screen.width);
-    Preferences.setInteger("last.screen.height", screen.height);
+    PreferencesData.setInteger("last.screen.width", screen.width);
+    PreferencesData.setInteger("last.screen.height", screen.height);
 
     String untitledPath = untitledFolder.getAbsolutePath();
 
@@ -554,14 +554,14 @@ public class Base {
         if (path == null)
           continue;
       }
-      Preferences.set("last.sketch" + index + ".path", path);
+      PreferencesData.set("last.sketch" + index + ".path", path);
 
       int[] location = editor.getPlacement();
       String locationStr = PApplet.join(PApplet.str(location), ",");
-      Preferences.set("last.sketch" + index + ".location", locationStr);
+      PreferencesData.set("last.sketch" + index + ".location", locationStr);
       index++;
     }
-    Preferences.setInteger("last.sketch.count", index);
+    PreferencesData.setInteger("last.sketch.count", index);
   }
 
 
@@ -577,7 +577,7 @@ public class Base {
       if (path == null)
         path = "";
     }
-    Preferences.set("last.sketch" + index + ".path", path);
+    PreferencesData.set("last.sketch" + index + ".path", path);
   }
 
 
@@ -616,8 +616,8 @@ public class Base {
 
 
   protected int[] nextEditorLocation() {
-    int defaultWidth = Preferences.getInteger("editor.window.width.default");
-    int defaultHeight = Preferences.getInteger("editor.window.height.default");
+    int defaultWidth = PreferencesData.getInteger("editor.window.width.default");
+    int defaultHeight = PreferencesData.getInteger("editor.window.height.default");
 
     if (activeEditor == null) {
       Rectangle screen = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().getBounds();
@@ -808,7 +808,7 @@ public class Base {
   public void handleOpenPrompt() throws Exception {
     // get the frontmost window frame for placing file dialog
     FileDialog fd = new FileDialog(activeEditor, _("Open an Arduino sketch..."), FileDialog.LOAD);
-    File lastFolder = new File(Preferences.get("last.folder", getSketchbookFolder().getAbsolutePath()));
+    File lastFolder = new File(PreferencesData.get("last.folder", getSketchbookFolder().getAbsolutePath()));
     if (lastFolder.exists() && lastFolder.isFile()) {
       lastFolder = lastFolder.getParentFile();
     }
@@ -832,7 +832,7 @@ public class Base {
 
     File inputFile = new File(directory, filename);
 
-    Preferences.set("last.folder", inputFile.getAbsolutePath());
+    PreferencesData.set("last.folder", inputFile.getAbsolutePath());
     handleOpen(inputFile);
   }
 
@@ -1378,9 +1378,9 @@ public class Base {
           Map<String, ButtonGroup> buttonGroupsMap,
           TargetBoard board, TargetPlatform targetPlatform, TargetPackage targetPackage)
           throws Exception {
-    String selPackage = Preferences.get("target_package");
-    String selPlatform = Preferences.get("target_platform");
-    String selBoard = Preferences.get("board");
+    String selPackage = PreferencesData.get("target_package");
+    String selPlatform = PreferencesData.get("target_platform");
+    String selBoard = PreferencesData.get("board");
 
     String boardId = board.getId();
     String packageName = targetPackage.getId();
@@ -1418,7 +1418,7 @@ public class Base {
           @SuppressWarnings("serial")
           Action subAction = new AbstractAction(_(boardCustomMenu.get(customMenuOption))) {
             public void actionPerformed(ActionEvent e) {
-              Preferences.set("custom_" + menuId, ((TargetBoard) getValue("board")).getId() + "_" + getValue("custom_menu_option"));
+              PreferencesData.set("custom_" + menuId, ((TargetBoard) getValue("board")).getId() + "_" + getValue("custom_menu_option"));
               onBoardOrPortChange();
             }
           };
@@ -1433,7 +1433,7 @@ public class Base {
           menu.add(subItem);
           buttonGroupsMap.get(menuId).add(subItem);
 
-          String selectedCustomMenuEntry = Preferences.get("custom_" + menuId);
+          String selectedCustomMenuEntry = PreferencesData.get("custom_" + menuId);
           if (selBoard.equals(boardId) && (boardId + "_" + customMenuOption).equals(selectedCustomMenuEntry)) {
             menuItemsToClickAfterStartup.add(subItem);
           }
@@ -1534,12 +1534,12 @@ public class Base {
           AbstractAction action = new AbstractAction(targetPlatform
                   .getProgrammer(programmer).get("name")) {
             public void actionPerformed(ActionEvent actionevent) {
-              Preferences.set("programmer", "" + getValue("id"));
+              PreferencesData.set("programmer", "" + getValue("id"));
             }
           };
           action.putValue("id", id);
           JMenuItem item = new JRadioButtonMenuItem(action);
-          if (Preferences.get("programmer").equals(id))
+          if (PreferencesData.get("programmer").equals(id))
             item.setSelected(true);
           group.add(item);
           menu.add(item);

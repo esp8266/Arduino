@@ -2,6 +2,7 @@ package processing.app;
 
 import static processing.app.I18n._;
 
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -12,6 +13,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.MissingResourceException;
 
+import processing.app.helpers.PreferencesHelper;
 import processing.app.helpers.PreferencesMap;
 import processing.app.legacy.PApplet;
 import processing.app.legacy.PConstants;
@@ -179,6 +181,13 @@ public class PreferencesData {
     return Integer.parseInt(get(attribute));
   }
 
+  static public int getInteger(String attribute, int defaultValue) {
+    if (has(attribute)) {
+      return getInteger(attribute);
+    }
+
+    return defaultValue;
+  }
 
   static public void setInteger(String key, int value) {
     set(key, String.valueOf(value));
@@ -202,5 +211,15 @@ public class PreferencesData {
   static public void setDoSave(boolean value)
   {
     doSave = value;
+  }
+
+  static public Font getFont(String attr) {
+    Font font = PreferencesHelper.getFont(prefs, attr);
+    if (font == null) {
+      String value = defaults.get(attr);
+      prefs.put(attr, value);
+      font = PreferencesHelper.getFont(prefs, attr);
+    }
+    return font;
   }
 }

@@ -68,7 +68,7 @@ public class EditorConsole extends JScrollPane {
   public EditorConsole(Editor _editor) {
     editor = _editor;
 
-    int maxLineCount = Preferences.getInteger("console.length");
+    int maxLineCount = PreferencesData.getInteger("console.length");
 
     consoleDoc = new BufferedStyledDocument(4000, maxLineCount);
     consoleTextPane = new JTextPane(consoleDoc);
@@ -84,7 +84,7 @@ public class EditorConsole extends JScrollPane {
     Color fgColorOut = Theme.getColor("console.output.color");
     Color fgColorErr = Theme.getColor("console.error.color");
     Font consoleFont = Theme.getFont("console.font");
-    Font editorFont = Preferences.getFont("editor.font");
+    Font editorFont = PreferencesData.getFont("editor.font");
     Font font = new Font(consoleFont.getName(), consoleFont.getStyle(), editorFont.getSize());
 
     stdStyle = new SimpleAttributeSet();
@@ -112,7 +112,7 @@ public class EditorConsole extends JScrollPane {
     // and size window accordingly
     FontMetrics metrics = getFontMetrics(font);
     int height = metrics.getAscent() + metrics.getDescent();
-    int lines = Preferences.getInteger("console.lines");
+    int lines = PreferencesData.getInteger("console.lines");
     int sizeFudge = 6; //10; // unclear why this is necessary, but it is
     setPreferredSize(new Dimension(1024, (height * lines) + sizeFudge));
     setMinimumSize(new Dimension(1024, (height * 4) + sizeFudge));
