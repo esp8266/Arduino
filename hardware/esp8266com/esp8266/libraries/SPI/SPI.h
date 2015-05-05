@@ -80,6 +80,7 @@ public:
   void setClockDivider(uint32_t clockDiv);
   void beginTransaction(SPISettings settings);
   uint8_t transfer(uint8_t data);
+  uint16_t transfer16(uint16_t data);
   void endTransaction(void);
 };
 
