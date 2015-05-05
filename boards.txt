@@ -57,6 +57,62 @@ generic.menu.FlashSize.4M=4M
 generic.menu.FlashSize.4M.build.flash_size=4M
 
 ##############################################################
+nodemcu.name=NODEMCU ESP8266 Module (v0.9)
+
+nodemcu.upload.tool=esptool
+nodemcu.upload.speed=115200
+nodemcu.upload.resetmethod=ck
+nodemcu.upload.maximum_size=524288
+nodemcu.upload.wait_for_upload_port=true
+nodemcu.serial.disableDTR=true
+nodemcu.serial.disableRTS=true
+
+nodemcu.build.mcu=esp8266
+nodemcu.build.f_cpu=80000000L
+nodemcu.build.board=ESP8266_ESP12
+nodemcu.build.core=esp8266
+nodemcu.build.variant=nodemcu
+nodemcu.build.flash_mode=qio
+nodemcu.build.flash_size=512K
+nodemcu.build.flash_freq=40
+
+nodemcu.menu.CpuFrequency.80=80 MHz
+nodemcu.menu.CpuFrequency.80.build.f_cpu=80000000L
+nodemcu.menu.CpuFrequency.160=160 MHz
+nodemcu.menu.CpuFrequency.160.build.f_cpu=160000000L
+
+nodemcu.menu.UploadSpeed.115200=115200
+nodemcu.menu.UploadSpeed.115200.upload.speed=115200
+nodemcu.menu.UploadSpeed.9600=9600
+nodemcu.menu.UploadSpeed.9600.upload.speed=9600
+nodemcu.menu.UploadSpeed.57600=57600
+nodemcu.menu.UploadSpeed.57600.upload.speed=57600
+nodemcu.menu.UploadSpeed.256000.windows=256000
+nodemcu.menu.UploadSpeed.256000.upload.speed=256000
+nodemcu.menu.UploadSpeed.230400.linux=230400
+nodemcu.menu.UploadSpeed.230400.macosx=230400
+nodemcu.menu.UploadSpeed.230400.macosx=230400
+nodemcu.menu.UploadSpeed.230400.upload.speed=230400
+nodemcu.menu.UploadSpeed.460800.linux=460800
+nodemcu.menu.UploadSpeed.460800.macosx=460800
+nodemcu.menu.UploadSpeed.460800.upload.speed=460800
+nodemcu.menu.UploadSpeed.512000.windows=512000
+nodemcu.menu.UploadSpeed.512000.upload.speed=512000
+nodemcu.menu.UploadSpeed.921600=921600
+nodemcu.menu.UploadSpeed.921600.upload.speed=921600
+
+nodemcu.menu.FlashSize.512K=512K
+nodemcu.menu.FlashSize.512K.build.flash_size=512K
+nodemcu.menu.FlashSize.256K=256K
+nodemcu.menu.FlashSize.256K.build.flash_size=256K
+nodemcu.menu.FlashSize.1M=1M
+nodemcu.menu.FlashSize.1M.build.flash_size=1M
+nodemcu.menu.FlashSize.2M=2M
+nodemcu.menu.FlashSize.2M.build.flash_size=2M
+nodemcu.menu.FlashSize.4M=4M
+nodemcu.menu.FlashSize.4M.build.flash_size=4M
+
+##############################################################
 # wifio.name=Wifio
 #
 # wifio.upload.tool=esptool
