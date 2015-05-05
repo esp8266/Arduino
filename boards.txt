@@ -73,7 +73,7 @@ nodemcu.build.board=ESP8266_ESP12
 nodemcu.build.core=esp8266
 nodemcu.build.variant=nodemcu
 nodemcu.build.flash_mode=qio
-nodemcu.build.flash_size=512K
+nodemcu.build.flash_size=4M
 nodemcu.build.flash_freq=40
 
 nodemcu.menu.CpuFrequency.80=80 MHz
