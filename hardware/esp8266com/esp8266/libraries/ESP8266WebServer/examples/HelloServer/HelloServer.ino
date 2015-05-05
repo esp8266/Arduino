@@ -19,7 +19,7 @@ void handleRoot() {
 
 void handleNotFound(){
   digitalWrite(led, 1);
-  String message += "File Not Found\n\n";
+  String message = "File Not Found\n\n";
   message += "URI: ";
   message += server.uri();
   message += "\nMethod: ";
