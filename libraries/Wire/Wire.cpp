@@ -45,6 +45,9 @@ uint8_t TwoWire::transmitting = 0;
 void (*TwoWire::user_onRequest)(void);
 void (*TwoWire::user_onReceive)(int);
 
+static int default_sda_pin = SDA;
+static int default_scl_pin = SCL;
+
 // Constructors ////////////////////////////////////////////////////////////////
 
 TwoWire::TwoWire(){}
@@ -57,11 +60,12 @@ void TwoWire::begin(int sda, int scl){
 }
 
 void TwoWire::pins(int sda, int scl){
-  twi_init(sda, scl);
+  default_sda_pin = sda;
+  default_scl_pin = scl;
 }
 
 void TwoWire::begin(void){
-  begin(SDA, SCL);
+  begin(default_sda_pin, default_scl_pin);
 }
 
 void TwoWire::begin(uint8_t address){
