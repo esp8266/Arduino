@@ -101,14 +101,6 @@ nodemcu.menu.UploadSpeed.512000.upload.speed=512000
 nodemcu.menu.UploadSpeed.921600=921600
 nodemcu.menu.UploadSpeed.921600.upload.speed=921600
 
-nodemcu.menu.FlashSize.512K=512K
-nodemcu.menu.FlashSize.512K.build.flash_size=512K
-nodemcu.menu.FlashSize.256K=256K
-nodemcu.menu.FlashSize.256K.build.flash_size=256K
-nodemcu.menu.FlashSize.1M=1M
-nodemcu.menu.FlashSize.1M.build.flash_size=1M
-nodemcu.menu.FlashSize.2M=2M
-nodemcu.menu.FlashSize.2M.build.flash_size=2M
 nodemcu.menu.FlashSize.4M=4M
 nodemcu.menu.FlashSize.4M.build.flash_size=4M
 
