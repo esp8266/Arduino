@@ -181,8 +181,30 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 
 #### Upload via serial port ####
 Pick the correct serial port.
-You need to put ESP8266 into bootloader mode before uploading code (pull GPIO0 low and
-toggle power).
+You need to put ESP8266 into bootloader mode before uploading code.
+
+#### Minimal hardware Setup for Bootloading and usage ####
+
+ESPxx Hardware
+
+| PIN           | Resistor | Serial Adapter |
+| ------------- | -------- | -------------- | 
+| VCC           |          | VCC (3.3V)     |
+| GND           |          | GND            |
+| TX or GPIO2*  |          | RX             |
+| RX            |          | TX             |
+| GPIO0         | PullUp   | DTR            |
+| Reset*        |          | RTS            |
+| GPIO15*       | PullDown |                |
+| CH_PD         | PullUp   |                |
+
+* Note 
+ - GPIO15 is also named MTDO
+ - Reset is also named RSBT or REST (adding PullUp improves the stability of the Module)
+ - GPIO2 is alternative TX for the boot loader mode
+ 
+ESP01 example:
+![ESP01 connect](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/ESP01_connect.jpg)
 
 ### Issues and support ###
 
