@@ -204,7 +204,25 @@ ESPxx Hardware
  - GPIO2 is alternative TX for the boot loader mode
  
 ESP01 example:
+
 ![ESP01 connect](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/ESP01_connect.jpg)
+
+#### Minimal hardware Setup for Bootloading only ####
+ESPxx Hardware
+
+| PIN           | Resistor | Serial Adapter |
+| ------------- | -------- | -------------- | 
+| VCC           |          | VCC (3.3V)     |
+| GND           |          | GND            |
+| TX or GPIO2   |          | RX             |
+| RX            |          | TX             |
+| GPIO0         |          | GND            |
+| Reset         |          | RTS*            |
+| GPIO15        | PullDown |                |
+| CH_PD         | PullUp   |                |
+
+* Note 
+	- if no RTS is used a manual power toggle is needed
 
 ### Issues and support ###
 
