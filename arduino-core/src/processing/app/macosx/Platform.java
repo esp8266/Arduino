@@ -119,7 +119,7 @@ public class Platform extends processing.app.Platform {
 
         // for Java 1.6, replacing with java.awt.Desktop.browse() 
         // and java.awt.Desktop.open()
-        if (url.startsWith("http://")) {  // browse to a location
+        if (url.startsWith("http")) {  // browse to a location
           Method browseMethod =
             desktopClass.getMethod("browse", new Class[] { URI.class });
           browseMethod.invoke(desktop, new Object[] { new URI(url) });
