@@ -72,7 +72,7 @@ modwifi.build.mcu=esp8266
 modwifi.build.f_cpu=80000000L
 modwifi.build.board=MOD_WIFI_ESP8266
 modwifi.build.core=esp8266
-modwifi.build.variant=modwifi
+modwifi.build.variant=generic
 # Winbond W25Q16 flash
 modwifi.build.flash_mode=qio
 modwifi.build.flash_size=2M
@@ -102,9 +102,6 @@ modwifi.menu.UploadSpeed.512000.windows=512000
 modwifi.menu.UploadSpeed.512000.upload.speed=512000
 modwifi.menu.UploadSpeed.921600=921600
 modwifi.menu.UploadSpeed.921600.upload.speed=921600
-
-modwifi.menu.FlashSize.2M=2M
-modwifi.menu.FlashSize.2M.build.flash_size=2M
 
 ##############################################################
 nodemcu.name=NodeMCU (ESP8266 ESP-12 Module)
