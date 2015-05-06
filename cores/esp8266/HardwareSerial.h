@@ -62,29 +62,19 @@
 
 class cbuf;
 
-typedef enum {
-    UART0 = 0, UART1 = 1, UART_NO = 0xFF
-} UARTnr_t;
-
-typedef struct {
-        UARTnr_t uart_nr;
-        int baud_rate;
-        bool rxEnabled;
-        bool txEnabled;
-        uint8_t rxPin;
-        uint8_t txPin;
-} uart_t;
+struct uart_;
+typedef struct uart_ uart_t;
 
 class HardwareSerial: public Stream {
     public:
-        HardwareSerial(UARTnr_t uart_nr);
+        HardwareSerial(int uart_nr);
 
         void begin(unsigned long baud) {
             begin(baud, SERIAL_8N1);
         }
         void begin(unsigned long, uint8_t);
         void end();
-        void swap();  //use GPIO13 and GPIO15 as RX and TX
+        void swap();  //toggle between use of GPIO13/GPIO15 or GPIO3/GPIO1 as RX and TX
         int available(void) override;
         int peek(void) override;
         int read(void) override;
@@ -116,7 +106,7 @@ class HardwareSerial: public Stream {
         void _tx_empty_irq(void);
 
     protected:
-        UARTnr_t _uart_nr;
+        int _uart_nr;
         uart_t* _uart;
         cbuf* _tx_buffer;
         cbuf* _rx_buffer;
