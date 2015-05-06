@@ -253,8 +253,8 @@ public class SerialUploader extends Uploader {
     if (programmerPrefs == null)
       throw new RunnerException(
           _("Please select a programmer from Tools->Programmer menu"));
+    prefs.putAll(targetPlatform.getTool(programmerPrefs.getOrExcept("program.tool")));
     prefs.putAll(programmerPrefs);
-    prefs.putAll(targetPlatform.getTool(prefs.getOrExcept("program.tool")));
 
     prefs.put("build.path", buildPath);
     prefs.put("build.project_name", className);
