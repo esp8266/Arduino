@@ -95,7 +95,15 @@ class EspClass {
         FlashMode_t getFlashChipMode(void);
         uint32_t getFlashChipSizeByChipId(void);
 
+        inline uint32_t getCycleCount(void);
 };
+
+uint32_t EspClass::getCycleCount(void)
+{
+    uint32_t ccount;
+    __asm__ __volatile__("rsr %0,ccount":"=a" (ccount));
+    return ccount;
+}
 
 extern EspClass ESP;
 
