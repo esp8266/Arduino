@@ -124,8 +124,11 @@ void timer1_write(uint32_t ticks); //maximum ticks 8388607
 void ets_intr_lock();
 void ets_intr_unlock();
 
-#define interrupts() ets_intr_unlock();
-#define noInterrupts() ets_intr_lock();
+void xt_enable_interrupts();
+void xt_disable_interrupts();
+
+#define interrupts() xt_enable_interrupts();
+#define noInterrupts() xt_disable_interrupts();
 
 #define clockCyclesPerMicrosecond() ( F_CPU / 1000000L )
 #define clockCyclesToMicroseconds(a) ( (a) / clockCyclesPerMicrosecond() )
