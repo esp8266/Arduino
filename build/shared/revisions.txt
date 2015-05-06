@@ -1,4 +1,4 @@
-ARDUINO 1.6.4
+ARDUINO 1.6.4 - 2015.05.06
 
 [ide]
 * Restored previous "error" colour in black lower part of the IDE
@@ -12,6 +12,10 @@ ARDUINO 1.6.4
 * Disabled "uncertified" warning (requires avr core >= 1.6.6, sam core >= 1.6.4)
 * Additional boards/cores can be listed specifying comma separated list of package_SOMETHING_index.json url in File > Preferences
 * MacOSX: fixed wrong sketch opened when double clicking on a .ino file
+* Boards and Libraries main files are downloaded directly (no proxy php script), fixing some glitches when using a proxy server
+* Added notification if the bundled AVR core is newer than the one installed through Boards Manager (useful when upgrading the IDE)
+* Fixed error when in Serial and Network discovery that was leaving the Ports menu greyed out
+* IDE now deletes temporary files on exit. When using the CLI, --preserve-temp-files arguments skips deletion
 
 [libraries]
 * Bridge fixes
