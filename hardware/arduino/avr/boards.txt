@@ -791,3 +791,27 @@ robotMotor.build.core=arduino
 robotMotor.build.variant=robot_motor
 robotMotor.build.extra_flags={build.usb_flags}
 
+##############################################################
+
+gemma.vid.0=0x2341
+gemma.pid.0=0x0c9f
+
+gemma.name=Arduino Gemma
+
+gemma.bootloader.low_fuses=0xF1
+gemma.bootloader.high_fuses=0xD5
+gemma.bootloader.extended_fuses=0xFE
+gemma.bootloader.tool=avrdude
+gemma.bootloader.lock_bits=
+gemma.bootloader.unlock_bits=
+gemma.bootloader.file=gemma/gemma_v1.hex
+
+gemma.build.mcu=attiny85
+gemma.build.f_cpu=8000000L
+gemma.build.core=arduino
+gemma.build.variant=gemma
+gemma.build.board=AVR_GEMMA
+
+gemma.upload.tool=avrdude
+gemma.upload.maximum_size=5310
+
