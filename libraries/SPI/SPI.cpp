@@ -21,26 +21,38 @@
 
 #include "SPI.h"
 #include "HardwareSerial.h"
+
 typedef struct {
         uint32_t divider;
-        uint32_t regValue;
+        union {
+                uint32_t regValue;
+                struct {
+                        unsigned regL :6;
+                        unsigned regH :6;
+                        unsigned regN :6;
+                        unsigned regPre :13;
+                        unsigned regEQU :1;
+                };
+        };
 } spiClockDiv_t;
 
+// todo find way of calculation for the divider
 static const spiClockDiv_t spiClockDiv[] = {
-    { 0, (0x80000000) },    ///< @80Mhz = 80 MHz       @160Mhz = 160 MHz
-    { 2, (0x00001001) },    ///< @80Mhz = 40 MHz       @160Mhz = 80 MHz
-    { 4, (0x00041001) },    ///< @80Mhz = 20 MHz       @160Mhz = 40 MHz
-    { 6, (0x000fffc0) },    ///< @80Mhz = 16 MHz       @160Mhz = 32 MHz
-    { 8, (0x000c1001) },    ///< @80Mhz = 10 MHz       @160Mhz = 20 MHz
-    { 10, (0x00101001) },   ///< @80Mhz = 8 MHz        @160Mhz = 16 MHz
-    { 16, (0x001c1001) },   ///< @80Mhz = 5 MHz        @160Mhz = 10 MHz
-    { 20, (0x00241001) },   ///< @80Mhz = 4 MHz        @160Mhz = 8 MHz
-    { 40, (0x004c1001) },   ///< @80Mhz = 2 MHz        @160Mhz = 4 MHz
-    { 80, (0x009c1001) },   ///< @80Mhz = 1 MHz        @160Mhz = 2 MHz
-    { 160, (0x013c1001) },  ///< @80Mhz = 500 KHz      @160Mhz = 1 MHz
-    { 320, (0x027c1001) },  ///< @80Mhz = 250 KHz      @160Mhz = 500 KHz
-    { 640, (0x04fc1001) }   ///< @80Mhz = 125 KHz      @160Mhz = 250 KHz
+    { 0, (0x80000000) },    ///< [0]  EQU: 1     Pre: 0      N: 0    H: 0    L: 0    Div: 0     @80Mhz = 80 MHz       @160Mhz = 160 MHz
+    { 2, (0x00001001) },    ///< [1]  EQU: 0     Pre: 0      N: 1    H: 0    L: 1    Div: 2     @80Mhz = 40 MHz       @160Mhz = 80 MHz
+    { 4, (0x00041001) },    ///< [2]  EQU: 0     Pre: 1      N: 1    H: 0    L: 1    Div: 4     @80Mhz = 20 MHz       @160Mhz = 40 MHz
+    { 6, (0x000fffc0) },    ///< [3]  EQU: 0     Pre: 3      N: 63   H: 63   L: 0    Div: 6     @80Mhz = 16 MHz       @160Mhz = 32 MHz
+    { 8, (0x000c1001) },    ///< [4]  EQU: 0     Pre: 3      N: 1    H: 0    L: 1    Div: 8     @80Mhz = 10 MHz       @160Mhz = 20 MHz
+    { 10, (0x00101001) },   ///< [5]  EQU: 0     Pre: 4      N: 1    H: 0    L: 1    Div: 10    @80Mhz = 8 MHz        @160Mhz = 16 MHz
+    { 16, (0x001c1001) },   ///< [6]  EQU: 0     Pre: 7      N: 1    H: 0    L: 1    Div: 16    @80Mhz = 5 MHz        @160Mhz = 10 MHz
+    { 20, (0x00241001) },   ///< [7]  EQU: 0     Pre: 9      N: 1    H: 0    L: 1    Div: 20    @80Mhz = 4 MHz        @160Mhz = 8 MHz
+    { 40, (0x004c1001) },   ///< [8]  EQU: 0     Pre: 19     N: 1    H: 0    L: 1    Div: 40    @80Mhz = 2 MHz        @160Mhz = 4 MHz
+    { 80, (0x009c1001) },   ///< [9]  EQU: 0     Pre: 39     N: 1    H: 0    L: 1    Div: 80    @80Mhz = 1 MHz        @160Mhz = 2 MHz
+    { 160, (0x013c1001) },  ///< [10] EQU: 0     Pre: 79     N: 1    H: 0    L: 1    Div: 160   @80Mhz = 500 KHz      @160Mhz = 1 MHz
+    { 320, (0x027c1001) },  ///< [11] EQU: 0     Pre: 159    N: 1    H: 0    L: 1    Div: 320   @80Mhz = 250 KHz      @160Mhz = 500 KHz
+    { 640, (0x04fc1001) }   ///< [12] EQU: 0     Pre: 319    N: 1    H: 0    L: 1    Div: 640   @80Mhz = 125 KHz      @160Mhz = 250 KHz
 };
+
 
 static const uint8_t spiClockDiv_count = (sizeof(spiClockDiv) / sizeof(spiClockDiv_t));
 
@@ -53,6 +65,11 @@ void SPIClass::begin() {
     pinMode(SCK, SPECIAL);  ///< GPIO14
     pinMode(MISO, SPECIAL); ///< GPIO12
     pinMode(MOSI, SPECIAL); ///< GPIO13
+/*
+    for(uint8_t i = 0; i < (spiClockDiv_count); i++) {
+        os_printf("[%d]\t EQU: %d\t Pre: %d\t N: %d\t H: %d\t L: %d\t Div: %d - %d\n", i, spiClockDiv[i].regEQU, spiClockDiv[i].regPre, spiClockDiv[i].regN, spiClockDiv[i].regH, spiClockDiv[i].regL, spiClockDiv[i].divider  );
+    }
+*/
 
     GPMUX = 0x105; // note crash if SPI flash Frequency < 40MHz
     SPI1C = 0;
