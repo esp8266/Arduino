@@ -22,39 +22,16 @@
 #include "SPI.h"
 #include "HardwareSerial.h"
 
-typedef struct {
-        uint32_t divider;
-        union {
-                uint32_t regValue;
-                struct {
-                        unsigned regL :6;
-                        unsigned regH :6;
-                        unsigned regN :6;
-                        unsigned regPre :13;
-                        unsigned regEQU :1;
-                };
+typedef union {
+        uint32_t regValue;
+        struct {
+                unsigned regL :6;
+                unsigned regH :6;
+                unsigned regN :6;
+                unsigned regPre :13;
+                unsigned regEQU :1;
         };
-} spiClockDiv_t;
-
-// todo find way of calculation for the divider
-static const spiClockDiv_t spiClockDiv[] = {
-    { 0, (0x80000000) },    ///< [0]  EQU: 1     Pre: 0      N: 0    H: 0    L: 0    Div: 0     @80Mhz = 80 MHz       @160Mhz = 160 MHz
-    { 2, (0x00001001) },    ///< [1]  EQU: 0     Pre: 0      N: 1    H: 0    L: 1    Div: 2     @80Mhz = 40 MHz       @160Mhz = 80 MHz
-    { 4, (0x00041001) },    ///< [2]  EQU: 0     Pre: 1      N: 1    H: 0    L: 1    Div: 4     @80Mhz = 20 MHz       @160Mhz = 40 MHz
-    { 6, (0x000fffc0) },    ///< [3]  EQU: 0     Pre: 3      N: 63   H: 63   L: 0    Div: 6     @80Mhz = 16 MHz       @160Mhz = 32 MHz
-    { 8, (0x000c1001) },    ///< [4]  EQU: 0     Pre: 3      N: 1    H: 0    L: 1    Div: 8     @80Mhz = 10 MHz       @160Mhz = 20 MHz
-    { 10, (0x00101001) },   ///< [5]  EQU: 0     Pre: 4      N: 1    H: 0    L: 1    Div: 10    @80Mhz = 8 MHz        @160Mhz = 16 MHz
-    { 16, (0x001c1001) },   ///< [6]  EQU: 0     Pre: 7      N: 1    H: 0    L: 1    Div: 16    @80Mhz = 5 MHz        @160Mhz = 10 MHz
-    { 20, (0x00241001) },   ///< [7]  EQU: 0     Pre: 9      N: 1    H: 0    L: 1    Div: 20    @80Mhz = 4 MHz        @160Mhz = 8 MHz
-    { 40, (0x004c1001) },   ///< [8]  EQU: 0     Pre: 19     N: 1    H: 0    L: 1    Div: 40    @80Mhz = 2 MHz        @160Mhz = 4 MHz
-    { 80, (0x009c1001) },   ///< [9]  EQU: 0     Pre: 39     N: 1    H: 0    L: 1    Div: 80    @80Mhz = 1 MHz        @160Mhz = 2 MHz
-    { 160, (0x013c1001) },  ///< [10] EQU: 0     Pre: 79     N: 1    H: 0    L: 1    Div: 160   @80Mhz = 500 KHz      @160Mhz = 1 MHz
-    { 320, (0x027c1001) },  ///< [11] EQU: 0     Pre: 159    N: 1    H: 0    L: 1    Div: 320   @80Mhz = 250 KHz      @160Mhz = 500 KHz
-    { 640, (0x04fc1001) }   ///< [12] EQU: 0     Pre: 319    N: 1    H: 0    L: 1    Div: 640   @80Mhz = 125 KHz      @160Mhz = 250 KHz
-};
-
-
-static const uint8_t spiClockDiv_count = (sizeof(spiClockDiv) / sizeof(spiClockDiv_t));
+} spiClk_t;
 
 SPIClass SPI;
 
@@ -65,15 +42,10 @@ void SPIClass::begin() {
     pinMode(SCK, SPECIAL);  ///< GPIO14
     pinMode(MISO, SPECIAL); ///< GPIO12
     pinMode(MOSI, SPECIAL); ///< GPIO13
-/*
-    for(uint8_t i = 0; i < (spiClockDiv_count); i++) {
-        os_printf("[%d]\t EQU: %d\t Pre: %d\t N: %d\t H: %d\t L: %d\t Div: %d - %d\n", i, spiClockDiv[i].regEQU, spiClockDiv[i].regPre, spiClockDiv[i].regN, spiClockDiv[i].regH, spiClockDiv[i].regL, spiClockDiv[i].divider  );
-    }
-*/
 
     GPMUX = 0x105; // note crash if SPI flash Frequency < 40MHz
     SPI1C = 0;
-    setFrequency(1000000); ///< 1Mhz
+    setFrequency(1000000); ///< 1MHz
     SPI1U = SPIUMOSI | SPIUDUPLEX | SPIUSSE;
     SPI1U1 = (7 << SPILMOSI) | (7 << SPILMISO);
     SPI1C1 = 0;
@@ -96,15 +68,15 @@ void SPIClass::endTransaction() {
 
 void SPIClass::setDataMode(uint8_t dataMode) {
 
-/**
-    SPI_MODE0 0x00 - CPOL: 0  CPHA: 0
-    SPI_MODE1 0x01 - CPOL: 0  CPHA: 1
-    SPI_MODE2 0x10 - CPOL: 1  CPHA: 0
-    SPI_MODE3 0x11 - CPOL: 1  CPHA: 1
-*/
+    /**
+     SPI_MODE0 0x00 - CPOL: 0  CPHA: 0
+     SPI_MODE1 0x01 - CPOL: 0  CPHA: 1
+     SPI_MODE2 0x10 - CPOL: 1  CPHA: 0
+     SPI_MODE3 0x11 - CPOL: 1  CPHA: 1
+     */
 
-    bool CPOL = (dataMode&0x10); ///< CPOL (Clock Polarity)
-    bool CPHA = (dataMode&0x01); ///< CPHA (Clock Phase)
+    bool CPOL = (dataMode & 0x10); ///< CPOL (Clock Polarity)
+    bool CPHA = (dataMode & 0x01); ///< CPHA (Clock Phase)
 
     if(CPHA) {
         SPI1U |= (SPIUSME);
@@ -126,17 +98,92 @@ void SPIClass::setBitOrder(uint8_t bitOrder) {
     }
 }
 
+/**
+ * calculate the Frequency based on the register value
+ * @param reg
+ * @return
+ */
+static uint32_t ClkRegToFreq(spiClk_t * reg) {
+    return (F_CPU / ((reg->regPre + 1) * (reg->regN + 1)));
+}
+
 void SPIClass::setFrequency(uint32_t freq) {
-    uint8_t i = 0;
+    static uint32_t lastSetFrequency = 0;
+    static uint32_t lastSetRegister = 0;
+
+    if(freq >= F_CPU) {
+        setClockDivider(0x80000000);
+        return;
+    }
+
+    if(lastSetFrequency == freq && lastSetRegister == SPI1CLK) {
+        // do nothing (speed optimization)
+        return;
+    }
+
+    const spiClk_t minFreqReg = { 0x7FFFF000 };
+    uint32_t minFreq = ClkRegToFreq((spiClk_t*) &minFreqReg);
+    if(freq < minFreq) {
+        freq = minFreq;
+    }
+
+    uint8_t calN = 1;
+
+    spiClk_t bestReg = { 0 };
+    int32_t bestFreq = 0;
+
     // find the best match
-    if(freq < F_CPU) {
-        for(i = 1; i < (spiClockDiv_count-1); i++) {
-            if(freq >= (F_CPU/spiClockDiv[i].divider)) {
+    while(calN <= 0x3F) { // 0x3F max for N
+
+        spiClk_t reg = { 0 };
+        int32_t calFreq;
+        int32_t calPre;
+        int8_t calPreVari = -2;
+
+        reg.regN = calN;
+
+        while(calPreVari++ <= 1) { // test different variants for Pre (we calculate in int so we miss the decimals, testing is the easyest and fastest way)
+            calPre = (((F_CPU / (reg.regN + 1)) / freq) - 1) + calPreVari;
+            if(calPre > 0x1FFF) {
+                reg.regPre = 0x1FFF; // 8191
+            } else if(calPre <= 0) {
+                reg.regPre = 0;
+            } else {
+                reg.regPre = calPre;
+            }
+
+            reg.regL = ((reg.regN + 1) / 2);
+            // reg.regH = (reg.regN - reg.regL);
+
+            // test calculation
+            calFreq = ClkRegToFreq(&reg);
+            //os_printf("-----[0x%08X][%d]\t EQU: %d\t Pre: %d\t N: %d\t H: %d\t L: %d = %d\n", reg.regValue, freq, reg.regEQU, reg.regPre, reg.regN, reg.regH, reg.regL, calFreq);
+
+            if(calFreq == (int32_t) freq) {
+                // accurate match use it!
+                memcpy(&bestReg, &reg, sizeof(bestReg));
                 break;
+            } else if(calFreq < (int32_t) freq) {
+                // never go over the requested frequency
+                if(abs(freq - calFreq) < abs(freq - bestFreq)) {
+                    bestFreq = calFreq;
+                    memcpy(&bestReg, &reg, sizeof(bestReg));
+                }
             }
         }
+        if(calFreq == (int32_t) freq) {
+            // accurate match use it!
+            break;
+        }
+        calN++;
     }
-    setClockDivider(spiClockDiv[i].regValue);
+
+    // os_printf("[0x%08X][%d]\t EQU: %d\t Pre: %d\t N: %d\t H: %d\t L: %d\t - Real Frequency: %d\n", bestReg.regValue, freq, bestReg.regEQU, bestReg.regPre, bestReg.regN, bestReg.regH, bestReg.regL, ClkRegToFreq(&bestReg));
+
+    setClockDivider(bestReg.regValue);
+    lastSetRegister = SPI1CLK;
+    lastSetFrequency = freq;
+
 }
 
 void SPIClass::setClockDivider(uint32_t clockDiv) {
@@ -144,10 +191,12 @@ void SPIClass::setClockDivider(uint32_t clockDiv) {
 }
 
 uint8_t SPIClass::transfer(uint8_t data) {
-    while(SPI1CMD & SPIBUSY);
+    while(SPI1CMD & SPIBUSY)
+        ;
     SPI1W0 = data;
     SPI1CMD |= SPIBUSY;
-    while(SPI1CMD & SPIBUSY);
+    while(SPI1CMD & SPIBUSY)
+        ;
     return (uint8_t) (SPI1W0 & 0xff);
 }
 
