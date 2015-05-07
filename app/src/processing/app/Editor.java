@@ -961,7 +961,7 @@ public class Editor extends JFrame implements RunnerListener {
     textArea.requestFocusInWindow();
     textArea.setMarkOccurrences(true);
     textArea.setMarginLineEnabled(false);
-    textArea.setCodeFoldingEnabled(PreferencesData.getBoolean("editor.codefolding"));
+    textArea.setCodeFoldingEnabled(PreferencesData.getBoolean("editor.code_folding"));
     textArea.setAntiAliasingEnabled(PreferencesData.getBoolean("editor.antialias"));
     textArea.setTabsEmulated(PreferencesData.getBoolean("editor.tabs.expand"));
     textArea.setTabSize(PreferencesData.getInteger("editor.tabs.size"));

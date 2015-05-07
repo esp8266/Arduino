@@ -87,7 +87,7 @@ editor.window.height.min = 290
 #editor.window.height.min.windows = 530
 
 # Enable code folding 
-editor.code_folding=true
+editor.code_folding=false
 
 # font size for editor
 editor.font=Monospaced,plain,12
