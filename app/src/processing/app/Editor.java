@@ -619,7 +619,7 @@ public class Editor extends JFrame implements RunnerListener {
     JMenuItem item = newJMenuItem(_("Verify / Compile"), 'R');
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          handleRun(false);
+          handleRun(false, Editor.this.presentHandler, Editor.this.runHandler);
         }
       });
     sketchMenu.add(item);
@@ -644,7 +644,7 @@ public class Editor extends JFrame implements RunnerListener {
     item = newJMenuItemAlt(_("Export compiled Binary"), 'S');
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          handleRunAndSave(true);
+          handleRun(false, Editor.this.presentAndSaveHandler, Editor.this.runAndSaveHandler);
         }
       });
     sketchMenu.add(item);
@@ -1531,8 +1531,8 @@ public class Editor extends JFrame implements RunnerListener {
   public void resetHandlers() {
     runHandler = new BuildHandler();
     presentHandler = new BuildHandler(true);
-    runAndSaveHandler = new BuildAndSaveHandler();
-    presentAndSaveHandler = new BuildAndSaveHandler(true);
+    runAndSaveHandler = new BuildHandler(false, true);
+    presentAndSaveHandler = new BuildHandler(true, true);
     stopHandler = new DefaultStopHandler();
     exportHandler = new DefaultExportHandler();
     exportAppHandler = new DefaultExportAppHandler();
@@ -1999,8 +1999,10 @@ public class Editor extends JFrame implements RunnerListener {
   /**
    * Implements Sketch &rarr; Run.
    * @param verbose Set true to run with verbose output.
+   * @param verboseHandler
+   * @param nonVerboseHandler
    */
-  public void handleRun(final boolean verbose) {
+  public void handleRun(final boolean verbose, Runnable verboseHandler, Runnable nonVerboseHandler) {
     internalCloseRunner();
     if (PreferencesData.getBoolean("editor.save_on_verify")) {
       if (sketch.isModified() && !sketch.isReadOnly()) {
@@ -2021,49 +2023,32 @@ public class Editor extends JFrame implements RunnerListener {
 
     // Cannot use invokeLater() here, otherwise it gets
     // placed on the event thread and causes a hang--bad idea all around.
-    new Thread(verbose ? presentHandler : runHandler).start();
+    new Thread(verbose ? verboseHandler : nonVerboseHandler).start();
   }
   
-  /**
-   * Implements Sketch &rarr; Run and Save.
-   * @param verbose Set true to run with verbose output.
-   */
-  public void handleRunAndSave(final boolean verbose) {
-    internalCloseRunner();
-    running = true;
-    toolbar.activate(EditorToolbar.RUN);
-    status.progress(_("Compiling sketch..."));
-
-    // do this to advance/clear the terminal window / dos prompt / etc
-    for (int i = 0; i < 10; i++) System.out.println();
-
-    // clear the console on each run, unless the user doesn't want to
-    if (Preferences.getBoolean("console.auto_clear")) {
-      console.clear();
-    }
-
-    // Cannot use invokeLater() here, otherwise it gets
-    // placed on the event thread and causes a hang--bad idea all around.
-    new Thread(verbose ? presentAndSaveHandler : runAndSaveHandler).start();
-  }
-
   class BuildHandler implements Runnable {
 
     private final boolean verbose;
+    private final boolean saveHex;
 
     public BuildHandler() {
       this(false);
     }
 
     public BuildHandler(boolean verbose) {
+      this(verbose, false);
+    }
+
+    public BuildHandler(boolean verbose, boolean saveHex) {
       this.verbose = verbose;
+      this.saveHex = saveHex;
     }
 
     @Override
     public void run() {
       try {
         sketch.prepare();
-        sketch.build(verbose, false);
+        sketch.build(verbose, saveHex);
         statusNotice(_("Done compiling."));
       } catch (PreferencesMapException e) {
         statusError(I18n.format(
@@ -2078,38 +2063,6 @@ public class Editor extends JFrame implements RunnerListener {
       toolbar.deactivate(EditorToolbar.RUN);
     }
   }
-  
-  class BuildAndSaveHandler implements Runnable {
-
-	    private final boolean verbose;
-
-	    public BuildAndSaveHandler() {
-	      this(false);
-	    }
-
-	    public BuildAndSaveHandler(boolean verbose) {
-	      this.verbose = verbose;
-	    }
-
-	    @Override
-	    public void run() {
-	      try {
-	        sketch.prepare();
-	        sketch.build(verbose, true);
-	        statusNotice(_("Done compiling."));
-	      } catch (PreferencesMapException e) {
-	        statusError(I18n.format(
-	                _("Error while compiling: missing '{0}' configuration parameter"),
-	                e.getMessage()));
-	      } catch (Exception e) {
-	        status.unprogress();
-	        statusError(e);
-	      }
-
-	      status.unprogress();
-	      toolbar.deactivate(EditorToolbar.RUN);
-	    }
-	  }
 
   class DefaultStopHandler implements Runnable {
     public void run() {
