@@ -8,7 +8,7 @@ This project brings support for ESP8266 chip to the Arduino environment. ESP8266
 | OS | Build status | Latest release | Alpha Version |
 | --- | ------------ | -------------- | --------------- |
 | Linux | [![Linux build status](http://img.shields.io/travis/igrr/Arduino.svg)](https://travis-ci.org/igrr/Arduino) | [arduino-1.6.1-linux64.tar.xz](../../releases/download/1.6.1-esp8266-1/arduino-1.6.1-linux64.tar.xz) | |
-| Windows | [![Windows build status](http://img.shields.io/appveyor/ci/igrr/Arduino.svg)](https://ci.appveyor.com/project/igrr/Arduino) | [arduino-1.6.1-p1-windows.zip](https://github.com/igrr/Arduino/releases/download/1.6.1-esp8266-1/arduino-1.6.1-p1-windows.zip) |  [appveyor Build](https://ci.appveyor.com/project/igrr/Arduino/build/artifacts) |
+| Windows | [![Windows build status](http://img.shields.io/appveyor/ci/igrr/Arduino.svg)](https://ci.appveyor.com/project/igrr/Arduino) | [arduino-1.6.1-p1-windows.zip](https://github.com/igrr/Arduino/releases/download/1.6.1-esp8266-1/arduino-1.6.1-p1-windows.zip) |  [appveyor 64Bit Build](https://ci.appveyor.com/project/igrr/Arduino/build/artifacts) |
 | OS X |  | [arduino-1.6.1-macosx-java-latest-signed.zip](../../releases/download/1.6.1-esp8266-1/arduino-1.6.1-macosx-java-latest-signed.zip) | |
 
 
@@ -181,8 +181,48 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 
 #### Upload via serial port ####
 Pick the correct serial port.
-You need to put ESP8266 into bootloader mode before uploading code (pull GPIO0 low and
-toggle power).
+You need to put ESP8266 into bootloader mode before uploading code.
+
+#### Minimal hardware Setup for Bootloading and usage ####
+
+ESPxx Hardware
+
+| PIN           | Resistor | Serial Adapter |
+| ------------- | -------- | -------------- | 
+| VCC           |          | VCC (3.3V)     |
+| GND           |          | GND            |
+| TX or GPIO2*  |          | RX             |
+| RX            |          | TX             |
+| GPIO0         | PullUp   | DTR            |
+| Reset*        |          | RTS            |
+| GPIO15*       | PullDown |                |
+| CH_PD         | PullUp   |                |
+
+* Note 
+ - GPIO15 is also named MTDO
+ - Reset is also named RSBT or REST (adding PullUp improves the stability of the Module)
+ - GPIO2 is alternative TX for the boot loader mode
+ 
+ESP01 example:
+
+![ESP01 connect](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/ESP01_connect.jpg)
+
+#### Minimal hardware Setup for Bootloading only ####
+ESPxx Hardware
+
+| PIN           | Resistor | Serial Adapter |
+| ------------- | -------- | -------------- | 
+| VCC           |          | VCC (3.3V)     |
+| GND           |          | GND            |
+| TX or GPIO2   |          | RX             |
+| RX            |          | TX             |
+| GPIO0         |          | GND            |
+| Reset         |          | RTS*            |
+| GPIO15        | PullDown |                |
+| CH_PD         | PullUp   |                |
+
+* Note 
+	- if no RTS is used a manual power toggle is needed
 
 ### Issues and support ###
 
