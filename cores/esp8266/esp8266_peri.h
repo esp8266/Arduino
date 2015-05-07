@@ -132,7 +132,7 @@ static uint8_t esp8266_gpioToFn[16] = {0x34, 0x18, 0x38, 0x14, 0x3C, 0x40, 0x1C,
 #define T1I  ESP8266_REG(0x60C) //Interrupt Status Register (1bit) write to clear
 //edge interrupt enable register
 #define TEIE 	ESP8266_DREG(0x04)
-#define TEIE1	0x02 //it for timer 1
+#define TEIE1	0x02 //bit for timer 1
 
 //Timer 2 Registers (32bit CountUp Timer)
 #define T2L  ESP8266_REG(0x620) //Load Value (Starting Value of Counter)
