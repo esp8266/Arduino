@@ -87,12 +87,20 @@ bool loadFromSdCard(String path){
     uint8_t obuf[WWW_BUF_SIZE];
     while (dataFile.available() > WWW_BUF_SIZE){
       dataFile.read(obuf, WWW_BUF_SIZE);
-      client.write(obuf, WWW_BUF_SIZE);
+      if(client.write(obuf, WWW_BUF_SIZE) != WWW_BUF_SIZE){
+        Serial.println("Sent less data than expected!");
+        dataFile.close();
+        return true;
+      }
     }
     //stream the last data left (size is at most WWW_BUF_SIZE bytes)
     uint16_t leftLen = dataFile.available();
     dataFile.read(obuf, leftLen);
-    client.write(obuf, leftLen);
+    if(client.write(obuf, leftLen) != leftLen){
+      Serial.println("Sent less data than expected!");
+      dataFile.close();
+      return true;
+    }
     
     dataFile.close();
     return true;
@@ -124,7 +132,7 @@ void setup(void){
   while (WiFi.status() != WL_CONNECTED && i++ < 20) delay(500);
   
   //check if we have connected?
-  if(i == 20){
+  if(i == 21){
     Serial.print("Could not connect to");
     Serial.println(ssid);
     //stop execution and wait forever
