@@ -100,7 +100,7 @@ bool loadFromSdCard(String path){
   return false;
 }
 
-void loadFromSdCard(){
+void tryLoadFromSdCard(){
   String message = "FileNotFound\n\n";
   if(hasSD){
     //try to load the URL from SD Card
@@ -142,7 +142,7 @@ void setup(void){
   }
   
   //Attach handler
-  server.onNotFound(loadFromSdCard);
+  server.onNotFound(tryLoadFromSdCard);
   
   //start server
   server.begin();
