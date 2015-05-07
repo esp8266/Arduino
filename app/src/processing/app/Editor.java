@@ -183,15 +183,6 @@ public class Editor extends JFrame implements RunnerListener {
     addWindowListener(new WindowAdapter() {
         public void windowActivated(WindowEvent e) {
           base.handleActivated(Editor.this);
-          // re-add the sub-menus that are shared by all windows
-          fileMenu.insert(sketchbookMenu, 2);
-          fileMenu.insert(examplesMenu, 3);
-          int offset = 0;
-          for (JMenu menu : base.getBoardsCustomMenus()) {
-            toolsMenu.insert(menu, numTools + offset);
-            offset++;
-          }
-          toolsMenu.insert(serialMenu, numTools + offset);
         }
 
         // added for 1.0.5
@@ -488,7 +479,23 @@ public class Editor extends JFrame implements RunnerListener {
 
   protected void buildMenuBar() throws Exception {
     JMenuBar menubar = new JMenuBar();
-    menubar.add(buildFileMenu());
+    final JMenu fileMenu = buildFileMenu();
+    fileMenu.addMenuListener(new StubMenuListener() {
+      @Override
+      public void menuSelected(MenuEvent e) {
+        List<Component> components = Arrays.asList(fileMenu.getComponents());
+        if (!components.contains(sketchbookMenu)) {
+          fileMenu.insert(sketchbookMenu, 2);
+        }
+        if (!components.contains(sketchbookMenu)) {
+          fileMenu.insert(examplesMenu, 3);
+        }
+        fileMenu.revalidate();
+        validate();
+      }
+    });
+    menubar.add(fileMenu);
+
     menubar.add(buildEditMenu());
 
     final JMenu sketchMenu = new JMenu(_("Sketch"));
@@ -504,7 +511,27 @@ public class Editor extends JFrame implements RunnerListener {
     buildSketchMenu(sketchMenu);
     menubar.add(sketchMenu);
 
-    menubar.add(buildToolsMenu());
+    final JMenu toolsMenu = buildToolsMenu();
+    toolsMenu.addMenuListener(new StubMenuListener() {
+      @Override
+      public void menuSelected(MenuEvent e) {
+        List<Component> components = Arrays.asList(fileMenu.getComponents());
+        int offset = 0;
+        for (JMenu menu : base.getBoardsCustomMenus()) {
+          if (!components.contains(menu)) {
+            toolsMenu.insert(menu, numTools + offset);
+            offset++;
+          }
+        }
+        if (!components.contains(serialMenu)) {
+          toolsMenu.insert(serialMenu, numTools + offset);
+        }
+        toolsMenu.revalidate();
+        validate();
+      }
+    });
+    menubar.add(toolsMenu);
+
     menubar.add(buildHelpMenu());
     setJMenuBar(menubar);
   }
