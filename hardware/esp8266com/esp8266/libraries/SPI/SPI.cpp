@@ -54,7 +54,7 @@ void SPIClass::begin() {
     pinMode(MISO, SPECIAL); ///< GPIO12
     pinMode(MOSI, SPECIAL); ///< GPIO13
 
-    GPMUX = 0x105; // note crash if spi flash Frequency < 40MHz
+    GPMUX = 0x105; // note crash if SPI flash Frequency < 40MHz
     SPI1C = 0;
     setFrequency(1000000); ///< 1Mhz
     SPI1U = SPIUMOSI | SPIUDUPLEX | SPIUSSE;
@@ -78,7 +78,27 @@ void SPIClass::endTransaction() {
 }
 
 void SPIClass::setDataMode(uint8_t dataMode) {
-    // todo find way to set
+
+/**
+    SPI_MODE0 0x00 - CPOL: 0  CPHA: 0
+    SPI_MODE1 0x01 - CPOL: 0  CPHA: 1
+    SPI_MODE2 0x10 - CPOL: 1  CPHA: 0
+    SPI_MODE3 0x11 - CPOL: 1  CPHA: 1
+*/
+
+    bool CPOL = (dataMode&0x10); ///< CPOL (Clock Polarity)
+    bool CPHA = (dataMode&0x01); ///< CPHA (Clock Phase)
+
+    if(CPHA) {
+        SPI1U |= (SPIUSME);
+    } else {
+        SPI1U &= ~(SPIUSME);
+    }
+
+    if(CPOL) {
+        //todo How set CPOL???
+    }
+
 }
 
 void SPIClass::setBitOrder(uint8_t bitOrder) {
