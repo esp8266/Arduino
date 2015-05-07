@@ -1,3 +1,10 @@
+esp_iot_sdk_v1.0.1_15_05_04_p1
+-------------------------------------------
+Here is a patch for station+softAP issue that users may have, based on SDK_v1.0.1, 
+solved problem that connect to ESP8266 softAP may fail in station+softAP mode.
+
+Sorry for the inconvenience.
+
 esp_iot_sdk_v1.0.1_15_04_24 Release Note 
 -------------------------------------------
 
