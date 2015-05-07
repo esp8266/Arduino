@@ -24,6 +24,7 @@ package processing.app;
 
 import cc.arduino.packages.MonitorFactory;
 
+import cc.arduino.view.StubMenuListener;
 import com.jcraft.jsch.JSchException;
 import jssc.SerialPortException;
 import processing.app.debug.*;
@@ -92,7 +93,6 @@ public class Editor extends JFrame implements RunnerListener {
 
   // file, sketch, and tools menus for re-inserting items
   JMenu fileMenu;
-  JMenu sketchMenu;
   JMenu toolsMenu;
 
   int numTools = 0;
@@ -186,7 +186,6 @@ public class Editor extends JFrame implements RunnerListener {
           // re-add the sub-menus that are shared by all windows
           fileMenu.insert(sketchbookMenu, 2);
           fileMenu.insert(examplesMenu, 3);
-          buildSketchMenu();
           int offset = 0;
           for (JMenu menu : base.getBoardsCustomMenus()) {
             toolsMenu.insert(menu, numTools + offset);
@@ -200,7 +199,6 @@ public class Editor extends JFrame implements RunnerListener {
         public void windowDeactivated(WindowEvent e) {
           fileMenu.remove(sketchbookMenu);
           fileMenu.remove(examplesMenu);
-          buildSketchMenu();
           List<Component> toolsMenuItemsToRemove = new LinkedList<Component>();
           for (Component menuItem : toolsMenu.getMenuComponents()) {
             if (menuItem instanceof JComponent) {
@@ -492,7 +490,20 @@ public class Editor extends JFrame implements RunnerListener {
     JMenuBar menubar = new JMenuBar();
     menubar.add(buildFileMenu());
     menubar.add(buildEditMenu());
-    menubar.add(buildSketchMenu());
+
+    final JMenu sketchMenu = new JMenu(_("Sketch"));
+    sketchMenu.addMenuListener(new StubMenuListener() {
+
+      @Override
+      public void menuSelected(MenuEvent e) {
+        buildSketchMenu(sketchMenu);
+        sketchMenu.revalidate();
+        validate();
+      }
+    });
+    buildSketchMenu(sketchMenu);
+    menubar.add(sketchMenu);
+
     menubar.add(buildToolsMenu());
     menubar.add(buildHelpMenu());
     setJMenuBar(menubar);
@@ -609,12 +620,8 @@ public class Editor extends JFrame implements RunnerListener {
   }
 
 
-  protected JMenu buildSketchMenu() {
-    if (sketchMenu == null) {
-      sketchMenu = new JMenu(_("Sketch"));
-    } else {
-      sketchMenu.removeAll();
-    }
+  protected void buildSketchMenu(JMenu sketchMenu) {
+    sketchMenu.removeAll();
 
     JMenuItem item = newJMenuItem(_("Verify / Compile"), 'R');
     item.addActionListener(new ActionListener() {
@@ -623,7 +630,7 @@ public class Editor extends JFrame implements RunnerListener {
         }
       });
     sketchMenu.add(item);
-    
+
     item = newJMenuItem(_("Upload"), 'U');
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -682,8 +689,6 @@ public class Editor extends JFrame implements RunnerListener {
       }
     });
     sketchMenu.add(item);
-
-    return sketchMenu;
   }
 
 
@@ -733,9 +738,7 @@ public class Editor extends JFrame implements RunnerListener {
     });
     toolsMenu.add(item);
 
-    toolsMenu.addMenuListener(new MenuListener() {
-      public void menuCanceled(MenuEvent e) {}
-      public void menuDeselected(MenuEvent e) {}
+    toolsMenu.addMenuListener(new StubMenuListener() {
       public void menuSelected(MenuEvent e) {
         //System.out.println("Tools menu selected.");
         populatePortMenu();
@@ -2025,7 +2028,7 @@ public class Editor extends JFrame implements RunnerListener {
     // placed on the event thread and causes a hang--bad idea all around.
     new Thread(verbose ? verboseHandler : nonVerboseHandler).start();
   }
-  
+
   class BuildHandler implements Runnable {
 
     private final boolean verbose;
