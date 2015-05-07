@@ -1,5 +1,9 @@
 ARDUINO 1.6.5
 
+[ide]
+* File, Sketch and Tools menu items are properly handled when switching between different windows
+* Sketch > Export compiled Binary: saves the compiled binary (hex, bin) into the sketch folder. Thanks @championswimmer
+
 ARDUINO 1.6.4 - 2015.05.06
 
 [ide]
