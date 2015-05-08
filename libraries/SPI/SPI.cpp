@@ -43,7 +43,6 @@ void SPIClass::begin() {
     pinMode(MISO, SPECIAL); ///< GPIO12
     pinMode(MOSI, SPECIAL); ///< GPIO13
 
-    GPMUX = 0x105; // note crash if SPI flash Frequency < 40MHz
     SPI1C = 0;
     setFrequency(1000000); ///< 1MHz
     SPI1U = SPIUMOSI | SPIUDUPLEX | SPIUSSE;
@@ -124,7 +123,11 @@ void SPIClass::setFrequency(uint32_t freq) {
     const spiClk_t minFreqReg = { 0x7FFFF000 };
     uint32_t minFreq = ClkRegToFreq((spiClk_t*) &minFreqReg);
     if(freq < minFreq) {
-        freq = minFreq;
+        // use minimum possible clock
+        setClockDivider(minFreqReg.regValue);
+        lastSetRegister = SPI1CLK;
+        lastSetFrequency = freq;
+        return;
     }
 
     uint8_t calN = 1;
@@ -187,6 +190,11 @@ void SPIClass::setFrequency(uint32_t freq) {
 }
 
 void SPIClass::setClockDivider(uint32_t clockDiv) {
+    if(clockDiv == 0x80000000) {
+        GPMUX |= (1 << 9); // Set bit 9 if sysclock required
+    } else {
+        GPMUX &= ~(1 << 9);
+    }
     SPI1CLK = clockDiv;
 }
 
