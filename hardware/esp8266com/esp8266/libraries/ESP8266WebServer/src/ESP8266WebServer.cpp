@@ -520,7 +520,7 @@ readfile:
       arg.value = postArgs[iarg].value;
     }
     _currentArgCount = iarg;
-    
+    if (postArgs) delete[] postArgs;
   }
 }
 
