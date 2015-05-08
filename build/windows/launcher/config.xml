@@ -42,8 +42,6 @@
   </classPath>
   <jre>
     <path>java</path>
-    <minVersion>1.8.0</minVersion>
-    <jdkPreference>preferJre</jdkPreference>
     <runtimeBits>32</runtimeBits>
     <opt>-splash:./lib/splash.png</opt>
     <opt>-Dsun.java2d.d3d=false</opt>
