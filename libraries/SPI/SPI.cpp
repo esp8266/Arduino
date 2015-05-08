@@ -123,7 +123,11 @@ void SPIClass::setFrequency(uint32_t freq) {
     const spiClk_t minFreqReg = { 0x7FFFF000 };
     uint32_t minFreq = ClkRegToFreq((spiClk_t*) &minFreqReg);
     if(freq < minFreq) {
-        freq = minFreq;
+        // use minimum possible clock
+        setClockDivider(minFreqReg.regValue);
+        lastSetRegister = SPI1CLK;
+        lastSetFrequency = freq;
+        return;
     }
 
     uint8_t calN = 1;
