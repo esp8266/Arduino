@@ -227,6 +227,13 @@ FlashMode_t EspClass::getFlashChipMode(void)
  */
 uint32_t EspClass::getFlashChipSizeByChipId(void) {
     uint32_t chipId = getFlashChipId();
+    /**
+     * Chip ID
+     * 00 - always 00 (Chip ID use only 3 byte)
+     * 17 - ? looks like 2^xx is size in Byte ?     //todo: find docu to this
+     * 40 - ? may be Speed ?                        //todo: find docu to this
+     * C8 - manufacturer ID
+     */
     switch(chipId) {
 
         // GigaDevice
