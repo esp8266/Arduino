@@ -43,6 +43,26 @@ MDNSResponder mdns;
 ESP8266WebServer server(80);
 
 static bool hasSD = false;
+File uploadFile;
+
+void handleFileUpload(){
+  if(server.uri() != "/upload") return;
+  HTTPUpload upload = server.upload();
+  if(upload.status == UPLOAD_FILE_START){
+    Serial.print("Upload: START, filename:");
+    Serial.println(upload.filename);
+    if(SD.exists((char *)upload.filename.c_str())) SD.remove((char *)upload.filename.c_str());
+    uploadFile = SD.open(upload.filename.c_str(), FILE_WRITE);
+  } else if(upload.status == UPLOAD_FILE_WRITE){
+    Serial.print("Upload: WRITE, Bytes:");
+    Serial.println(upload.buflen);
+    if(uploadFile) uploadFile.write(upload.buf, upload.buflen);
+  } else if(upload.status == UPLOAD_FILE_END){
+    Serial.print("Upload: END, Size:");
+    Serial.println(upload.size);
+    if(uploadFile) uploadFile.close();
+  }
+}
 
 bool loadFromSdCard(String path){
   String dataType = "text/plain";
@@ -151,6 +171,19 @@ void setup(void){
   
   //Attach handler
   server.onNotFound(tryLoadFromSdCard);
+  
+  //Attach Upload handler
+  server.onFileUpload(handleFileUpload);
+  
+  //Attach handler for the Upload location
+  server.on("/upload", HTTP_POST, [](){
+    WiFiClient client = server.client();
+    String message = "HTTP/1.1 200 OK\r\n";
+    message += "Content-Type: text/plain\r\n";
+    message += "Access-Control-Allow-Origin: *\r\n";
+    message += "\r\n";
+    client.print(message);
+  });
   
   //start server
   server.begin();
