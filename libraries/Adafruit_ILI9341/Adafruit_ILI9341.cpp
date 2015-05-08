@@ -153,7 +153,7 @@ void Adafruit_ILI9341::writedata(uint8_t c) {
 static inline void spi_begin(void) __attribute__((always_inline));
 static inline void spi_begin(void) {
 #ifdef ESP8266
-  SPI.beginTransaction(SPISettings(40000000, MSBFIRST, SPI_MODE0));
+  SPI.beginTransaction(SPISettings(80000000, MSBFIRST, SPI_MODE0));
 #else
   SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
 #endif
