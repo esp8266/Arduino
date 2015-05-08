@@ -139,6 +139,9 @@ extern void __detachInterrupt(uint8_t pin) {
   }
 }
 
+// stored state for the noInterrupts/interrupts methods
+uint32_t interruptsState = 0;
+
 void initPins() {
   //Disable UART interrupts
   system_set_os_print(0);

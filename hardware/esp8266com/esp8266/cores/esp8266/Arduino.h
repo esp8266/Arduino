@@ -124,8 +124,17 @@ void timer1_write(uint32_t ticks); //maximum ticks 8388607
 void ets_intr_lock();
 void ets_intr_unlock();
 
-#define interrupts() ets_intr_unlock();
-#define noInterrupts() ets_intr_lock();
+// level (0-15), 
+// level 15 will disable ALL interrupts, 
+// level 0 will disable most software interrupts
+//
+#define xt_disable_interrupts(state, level) __asm__ __volatile__("rsil %0," __STRINGIFY(level) "; esync; isync; dsync" : "=a" (state))
+#define xt_enable_interrupts(state)  __asm__ __volatile__("wsr %0,ps; esync" :: "a" (state) : "memory")
+
+extern uint32_t interruptsState;
+
+#define interrupts() xt_enable_interrupts(interruptsState)
+#define noInterrupts() xt_disable_interrupts(interruptsState, 15)
 
 #define clockCyclesPerMicrosecond() ( F_CPU / 1000000L )
 #define clockCyclesToMicroseconds(a) ( (a) / clockCyclesPerMicrosecond() )
