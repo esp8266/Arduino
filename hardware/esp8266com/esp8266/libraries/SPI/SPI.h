@@ -24,6 +24,8 @@
 #include <Arduino.h>
 #include <stdlib.h>
 
+#define SPI_HAS_TRANSACTION
+
 // This defines are not representing the real Divider of the ESP8266
 // the Defines match to an AVR Arduino on 16MHz for better compatibility
 #if F_CPU == 80000000L
