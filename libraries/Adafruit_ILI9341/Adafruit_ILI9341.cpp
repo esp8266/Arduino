@@ -479,16 +479,31 @@ void Adafruit_ILI9341::begin(void) {
 
 }
 
-
 void Adafruit_ILI9341::setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
+    spiCsLow();
+    setAddrWindow_(x0, y0, x1, y1);
+    spiCsHigh();
+}
 
-  uint8_t buffC[] = {(uint8_t)(x0 >> 8), (uint8_t)x0, (uint8_t)(x1 >> 8), (uint8_t)x1};
-  uint8_t buffP[] = {(uint8_t)(y0 >> 8), (uint8_t)y0, (uint8_t)(y1 >> 8), (uint8_t)y1};
+void Adafruit_ILI9341::setAddrWindow_(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
 
-  writeCmdData(ILI9341_CASET, &buffC[0], sizeof(buffC));  // Column addr set
-  writeCmdData(ILI9341_PASET, &buffP[0], sizeof(buffP));  // Column addr set
+    uint8_t buffC[] = { (uint8_t) (x0 >> 8), (uint8_t) x0, (uint8_t) (x1 >> 8), (uint8_t) x1 };
+    uint8_t buffP[] = { (uint8_t) (y0 >> 8), (uint8_t) y0, (uint8_t) (y1 >> 8), (uint8_t) y1 };
 
-  writecommand(ILI9341_RAMWR); // write to RAM
+    spiDcLow();
+    spiwrite(ILI9341_CASET);
+    spiDcHigh();
+    spiwriteBytes(&buffC[0], sizeof(buffC));
+
+    spiDcLow();
+    spiwrite(ILI9341_PASET);
+    spiDcHigh();
+    spiwriteBytes(&buffP[0], sizeof(buffP));
+
+    spiDcLow();
+    spiwrite(ILI9341_RAMWR);
+    spiDcHigh();
+
 }
 
 
@@ -512,71 +527,80 @@ void Adafruit_ILI9341::pushColor(uint16_t color) {
 
 void Adafruit_ILI9341::drawPixel(int16_t x, int16_t y, uint16_t color) {
 
-  if((x < 0) ||(x >= _width) || (y < 0) || (y >= _height)) return;
+    if((x < 0) || (x >= _width) || (y < 0) || (y >= _height)) {
+        return;
+    }
 
-  if (hwSPI) spi_begin();
-  setAddrWindow(x,y,x+1,y+1);
-  spiDcHigh();
-  spiCsLow();
+    if(hwSPI) {
+        spi_begin();
+    }
+
+    spiCsLow();
+
+    setAddrWindow_(x, y, x + 1, y + 1);
 
 #ifdef ESP8266
-  spiwrite16(color);
+    spiwrite16(color);
 #else
-  spiwrite(color >> 8);
-  spiwrite(color);
+    spiwrite(color >> 8);
+    spiwrite(color);
 #endif
 
-  spiCsHigh();
+    spiCsHigh();
 
-  if (hwSPI) spi_end();
+    if(hwSPI) {
+        spi_end();
+    }
 }
 
 
-void Adafruit_ILI9341::drawFastVLine(int16_t x, int16_t y, int16_t h,
- uint16_t color) {
+void Adafruit_ILI9341::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color) {
 
-  // Rudimentary clipping
-  if((x >= _width) || (y >= _height)) return;
+    // Rudimentary clipping
+    if((x >= _width) || (y >= _height)) return;
+    if((y + h - 1) >= _height)   h = _height - y;
 
-  if((y+h-1) >= _height) 
-    h = _height-y;
+    if(hwSPI) {
+        spi_begin();
+    }
 
-  if (hwSPI) spi_begin();
-  setAddrWindow(x, y, x, y+h-1);
-#ifndef ESP8266
-  uint8_t hi = color >> 8, lo = color;
-#endif
+    spiCsLow();
 
-  spiDcHigh();
-  spiCsLow();
+    setAddrWindow_(x, y, x, (y + h - 1));
 
-  uint8_t colorBin[] = { (uint8_t) (color >> 8), (uint8_t) color };
-  spiwritePattern(&colorBin[0], 2, h);
+    uint8_t colorBin[] = { (uint8_t) (color >> 8), (uint8_t) color };
+    spiwritePattern(&colorBin[0], 2, h);
 
-  spiCsHigh();
+    spiCsHigh();
 
-  if (hwSPI) spi_end();
+    if(hwSPI) {
+        spi_end();
+    }
 }
 
+void Adafruit_ILI9341::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color) {
 
-void Adafruit_ILI9341::drawFastHLine(int16_t x, int16_t y, int16_t w,
-  uint16_t color) {
+    // Rudimentary clipping
+    if((x >= _width) || (y >= _height)) return;
+    if((x+w-1) >= _width)  w = _width-x;
 
-  // Rudimentary clipping
-  if((x >= _width) || (y >= _height)) return;
-  if((x+w-1) >= _width)  w = _width-x;
-  if (hwSPI) spi_begin();
-  setAddrWindow(x, y, x+w-1, y);
+    if(hwSPI) {
+        spi_begin();
+    }
 
-  spiDcHigh();
-  spiCsLow();
+    spiDcHigh();
+    spiCsLow();
 
-  uint8_t colorBin[] = { (uint8_t) (color >> 8), (uint8_t) color };
-  spiwritePattern(&colorBin[0], 2, w);
+    setAddrWindow_(x, y, (x + w - 1), y);
 
-  spiCsHigh();
+    uint8_t colorBin[] = { (uint8_t) (color >> 8), (uint8_t) color };
+    spiwritePattern(&colorBin[0], 2, w);
 
-  if (hwSPI) spi_end();
+    spiCsHigh();
+
+    if(hwSPI) {
+        spi_end();
+    }
 }
 
 void Adafruit_ILI9341::fillScreen(uint16_t color) {
@@ -598,10 +622,9 @@ void Adafruit_ILI9341::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint
         spi_begin();
     }
 
-    setAddrWindow(x, y, x + w - 1, y + h - 1);
-
-    spiDcHigh();
     spiCsLow();
+
+    setAddrWindow_(x, y, x + w - 1, y + h - 1);
 
     uint8_t colorBin[] = { (uint8_t) (color >> 8), (uint8_t) color };
     spiwritePattern(&colorBin[0], 2, (w * h));
