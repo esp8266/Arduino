@@ -36,6 +36,7 @@ typedef union {
 SPIClass SPI;
 
 SPIClass::SPIClass() {
+    useHwCs = false;
 }
 
 void SPIClass::begin() {
@@ -54,9 +55,26 @@ void SPIClass::end() {
     pinMode(SCK, INPUT);
     pinMode(MISO, INPUT);
     pinMode(MOSI, INPUT);
+    if(useHwCs) {
+        pinMode(SS, INPUT);
+    }
+}
+
+void SPIClass::setHwCs(bool use) {
+    if(use) {
+        pinMode(SS, SPECIAL); ///< GPIO15
+        SPI1U |= (SPIUCSSETUP | SPIUCSHOLD);
+    } else {
+        if(useHwCs) {
+            pinMode(SS, INPUT);
+            SPI1U &= ~(SPIUCSSETUP | SPIUCSHOLD);
+        }
+    }
+    useHwCs = use;
 }
 
 void SPIClass::beginTransaction(SPISettings settings) {
+    while(SPI1CMD & SPIBUSY) {}
     setFrequency(settings._clock);
     setBitOrder(settings._bitOrder);
     setDataMode(settings._dataMode);
@@ -199,12 +217,10 @@ void SPIClass::setClockDivider(uint32_t clockDiv) {
 }
 
 uint8_t SPIClass::transfer(uint8_t data) {
-    while(SPI1CMD & SPIBUSY)
-        ;
+    while(SPI1CMD & SPIBUSY) {}
     SPI1W0 = data;
     SPI1CMD |= SPIBUSY;
-    while(SPI1CMD & SPIBUSY)
-        ;
+    while(SPI1CMD & SPIBUSY) {}
     return (uint8_t) (SPI1W0 & 0xff);
 }
 
@@ -230,3 +246,101 @@ uint16_t SPIClass::transfer16(uint16_t data) {
     return out.val;
 }
 
+void SPIClass::write(uint8_t data) {
+    while(SPI1CMD & SPIBUSY) {}
+    SPI1W0 = data;
+    SPI1CMD |= SPIBUSY;
+    while(SPI1CMD & SPIBUSY) {}
+}
+
+void SPIClass::write16(uint16_t data) {
+    write16(data, (SPI1C & (SPICWBO | SPICRBO)));
+}
+
+void SPIClass::write16(uint16_t data, bool msb) {
+    while(SPI1CMD & SPIBUSY) {}
+    // Set to 16Bits transfer
+    SPI1U1 = (SPI1U1 & ~((SPIMMOSI << SPILMOSI))) | ((16 - 1) << SPILMOSI);
+    if(msb) {
+        // MSBFIRST Byte first
+        SPI1W0 = (data >> 8) | (data << 8);
+        SPI1CMD |= SPIBUSY;
+    } else {
+        // LSBFIRST Byte first
+        SPI1W0 = data;
+        SPI1CMD |= SPIBUSY;
+    }
+    while(SPI1CMD & SPIBUSY) {}
+    // reset to 8Bit mode
+    SPI1U1 = (SPI1U1 & ~((SPIMMOSI << SPILMOSI))) | ((8 - 1) << SPILMOSI);
+}
+
+void SPIClass::writeBytes(uint8_t * data, uint32_t size) {
+    while(size) {
+        if(size > 64) {
+            writeBytes_(data, 64);
+            size -= 64;
+            data += 64;
+        } else {
+            writeBytes_(data, size);
+            size = 0;
+        }
+    }
+}
+
+void SPIClass::writeBytes_(uint8_t * data, uint8_t size) {
+    while(SPI1CMD & SPIBUSY) {}
+    // Set Bits to transfer
+    SPI1U1 = (SPI1U1 & ~((SPIMMOSI << SPILMOSI))) | ((size * 8 - 1) << SPILMOSI);
+
+    volatile uint32_t * fifoPtr = &SPI1W0;
+    uint32_t * dataPtr = (uint32_t*) data;
+    uint8_t dataSize = ((size + 3) / 4);
+
+    while(dataSize--) {
+        *fifoPtr = *dataPtr;
+        dataPtr++;
+        fifoPtr++;
+    }
+
+    SPI1CMD |= SPIBUSY;
+    while(SPI1CMD & SPIBUSY) {}
+    // reset to 8Bit mode
+    SPI1U1 = (SPI1U1 & ~((SPIMMOSI << SPILMOSI))) | ((8 - 1) << SPILMOSI);
+}
+
+void SPIClass::writePattern(uint8_t * data, uint8_t size, uint32_t repeat) {
+    if(size > 64) return; //max Hardware FIFO
+
+    uint32_t byte = (size * repeat);
+    uint8_t r = (64 / size);
+
+    while(byte) {
+        if(byte > 64) {
+            writePattern_(data, size, r);
+            byte -= 64;
+        } else {
+            writePattern_(data, size, (byte / size));
+            byte = 0;
+        }
+    }
+}
+
+void SPIClass::writePattern_(uint8_t * data, uint8_t size, uint8_t repeat) {
+    uint8_t bytes = (size * repeat);
+    uint8_t buffer[64];
+    uint8_t * bufferPtr = &buffer[0];
+    uint8_t * dataPtr;
+    uint8_t dataSize = bytes;
+    for(uint8_t i = 0; i < repeat; i++) {
+        dataSize = size;
+        dataPtr = data;
+        while(dataSize--) {
+            *bufferPtr = *dataPtr;
+            dataPtr++;
+            bufferPtr++;
+        }
+    }
+
+    writeBytes(&buffer[0], bytes);
+}

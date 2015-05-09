@@ -111,6 +111,10 @@
 #define ILI9341_PINK        0xF81F
 
 //#define USE_DIGITAL_WRITE
+#ifdef ESP8266
+//not working
+//#define USE_HW_CS
+#endif
 
 class Adafruit_ILI9341 : public Adafruit_GFX {
 
@@ -119,8 +123,11 @@ class Adafruit_ILI9341 : public Adafruit_GFX {
   Adafruit_ILI9341(int8_t _CS, int8_t _DC, int8_t _MOSI, int8_t _SCLK,
 		   int8_t _RST, int8_t _MISO);
 #endif
+#ifdef USE_HW_CS
+  Adafruit_ILI9341(int8_t _DC, int8_t _RST = -1);
+#else
   Adafruit_ILI9341(int8_t _CS, int8_t _DC, int8_t _RST = -1);
-
+#endif
   void     begin(void),
            setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1),
            pushColor(uint16_t color),
@@ -134,22 +141,43 @@ class Adafruit_ILI9341 : public Adafruit_GFX {
            invertDisplay(boolean i);
   uint16_t color565(uint8_t r, uint8_t g, uint8_t b);
 
-  /* These are not for current use, 8-bit protocol only! */
-  uint8_t  readdata(void),
-    readcommand8(uint8_t reg, uint8_t index = 0);
-  /*
-  uint16_t readcommand16(uint8_t);
-  uint32_t readcommand32(uint8_t);
-  void     dummyclock(void);
-  */  
+  void  commandList(uint8_t *addr);
 
-  void     spiwrite(uint8_t),
-    writecommand(uint8_t c),
-    writedata(uint8_t d),
-    commandList(uint8_t *addr);
-  uint8_t  spiread(void);
+  /* These are not for current use, 8-bit protocol only! */
+   uint8_t  readdata(void),
+     readcommand8(uint8_t reg, uint8_t index = 0);
+   /*
+   uint16_t readcommand16(uint8_t);
+   uint32_t readcommand32(uint8_t);
+   void     dummyclock(void);
+   */
+
+   void  writecommand(uint8_t c);
+   void  writedata(uint8_t d);
+   void  writedata(uint8_t * data, uint8_t size);
+   void  writeCmdData(uint8_t cmd, uint8_t * data, uint8_t size);
 
  private:
+
+  uint8_t  spiread(void);
+
+#ifdef ESP8266
+  inline void spiwrite(uint8_t data);
+  inline void spiwrite16(uint16_t data);
+  inline void spiwriteBytes(uint8_t * data, uint8_t size);
+  inline void spiwritePattern(uint8_t * data, uint8_t size, uint32_t repeat);
+#else
+  void spiwrite(uint8_t);
+  void spiwrite16(uint16_t data);
+  void spiwriteBytes(uint8_t * data, uint8_t size);
+  void spiwritePattern(uint8_t * data, uint8_t size, uint8_t repeat);
+#endif
+
+  inline void spiCsHigh(void);
+  inline void spiCsLow(void);
+  inline void spiDcHigh(void);
+  inline void spiDcLow(void);
+
   uint8_t  tabcolor;
 
   boolean  hwSPI;
@@ -163,7 +191,10 @@ class Adafruit_ILI9341 : public Adafruit_GFX {
     uint32_t  _cs, _dc, _rst, _mosi, _miso, _sclk;
     uint32_t  mosipinmask, clkpinmask, cspinmask, dcpinmask;
 #elif defined (ESP8266)
-    uint32_t  _cs, _dc, _rst;
+#ifndef USE_HW_CS
+    int8_t  _cs;
+#endif
+    int8_t  _dc, _rst;
 #endif
 };
 

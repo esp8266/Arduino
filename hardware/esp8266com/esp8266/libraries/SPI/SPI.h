@@ -64,6 +64,7 @@ public:
   SPIClass();
   void begin();
   void end();
+  void setHwCs(bool use);
   void setBitOrder(uint8_t bitOrder);  
   void setDataMode(uint8_t dataMode);
   void setFrequency(uint32_t freq);
@@ -71,7 +72,16 @@ public:
   void beginTransaction(SPISettings settings);
   uint8_t transfer(uint8_t data);
   uint16_t transfer16(uint16_t data);
+  void write(uint8_t data);
+  void write16(uint16_t data);
+  void write16(uint16_t data, bool msb);
+  void writeBytes(uint8_t * data, uint32_t size);
+  void writePattern(uint8_t * data, uint8_t size, uint32_t repeat);
   void endTransaction(void);
+private:
+  bool useHwCs;
+  void writeBytes_(uint8_t * data, uint8_t size);
+  void writePattern_(uint8_t * data, uint8_t size, uint8_t repeat);
 };
 
 extern SPIClass SPI;
