@@ -37,7 +37,7 @@ extern "C" {
 #include "binary.h"
 #include "pgmspace.h"
 #include "esp8266_peri.h"
-#include "si2c.h"
+#include "twi.h"
 
 void yield(void);
 
@@ -47,16 +47,17 @@ void yield(void);
 #define PWMRANGE 1023
 
 //GPIO FUNCTIONS
-#define INPUT           0x00
-#define OUTPUT          0x01
-#define INPUT_PULLUP    0x02
-#define INPUT_PULLDOWN  0x04
-#define SPECIAL         0xF8 //defaults to the usable BUSes uart0rx/tx uart1tx and hspi
-#define FUNCTION_0      0x08
-#define FUNCTION_1      0x18
-#define FUNCTION_2      0x28
-#define FUNCTION_3      0x38
-#define FUNCTION_4      0x48
+#define INPUT             0x00
+#define INPUT_PULLUP      0x02
+#define INPUT_PULLDOWN    0x04
+#define OUTPUT            0x01
+#define OUTPUT_OPEN_DRAIN 0x03
+#define SPECIAL           0xF8 //defaults to the usable BUSes uart0rx/tx uart1tx and hspi
+#define FUNCTION_0        0x08
+#define FUNCTION_1        0x18
+#define FUNCTION_2        0x28
+#define FUNCTION_3        0x38
+#define FUNCTION_4        0x48
 
 #define PI 3.1415926535897932384626433832795
 #define HALF_PI 1.5707963267948966192313216916398
@@ -123,8 +124,17 @@ void timer1_write(uint32_t ticks); //maximum ticks 8388607
 void ets_intr_lock();
 void ets_intr_unlock();
 
-#define interrupts() ets_intr_unlock();
-#define noInterrupts() ets_intr_lock();
+// level (0-15), 
+// level 15 will disable ALL interrupts, 
+// level 0 will disable most software interrupts
+//
+#define xt_disable_interrupts(state, level) __asm__ __volatile__("rsil %0," __STRINGIFY(level) "; esync; isync; dsync" : "=a" (state))
+#define xt_enable_interrupts(state)  __asm__ __volatile__("wsr %0,ps; esync" :: "a" (state) : "memory")
+
+extern uint32_t interruptsState;
+
+#define interrupts() xt_enable_interrupts(interruptsState)
+#define noInterrupts() xt_disable_interrupts(interruptsState, 15)
 
 #define clockCyclesPerMicrosecond() ( F_CPU / 1000000L )
 #define clockCyclesToMicroseconds(a) ( (a) / clockCyclesPerMicrosecond() )

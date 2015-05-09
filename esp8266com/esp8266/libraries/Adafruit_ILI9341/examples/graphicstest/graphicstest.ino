@@ -11,8 +11,6 @@
 
   Written by Limor Fried/Ladyada for Adafruit Industries.
   MIT license, all text above must be included in any redistribution
-  
-  Modified by Sermus for ESP8266
  ****************************************************/
 
 
@@ -20,14 +18,33 @@
 #include "Adafruit_GFX.h"
 #include "Adafruit_ILI9341.h"
 
-Adafruit_ILI9341 tft = Adafruit_ILI9341();
+// For the Adafruit shield, these are the default.
+#define TFT_DC 9
+#define TFT_CS 10
+
+// Use hardware SPI (on Uno, #13, #12, #11) and the above for CS/DC
+Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
+// If using the breakout, change pins as desired
+//Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_RST, TFT_MISO);
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
   Serial.println("ILI9341 Test!"); 
  
   tft.begin();
 
+  // read diagnostics (optional but can help debug problems)
+  uint8_t x = tft.readcommand8(ILI9341_RDMODE);
+  Serial.print("Display Power Mode: 0x"); Serial.println(x, HEX);
+  x = tft.readcommand8(ILI9341_RDMADCTL);
+  Serial.print("MADCTL Mode: 0x"); Serial.println(x, HEX);
+  x = tft.readcommand8(ILI9341_RDPIXFMT);
+  Serial.print("Pixel Format: 0x"); Serial.println(x, HEX);
+  x = tft.readcommand8(ILI9341_RDIMGFMT);
+  Serial.print("Image Format: 0x"); Serial.println(x, HEX);
+  x = tft.readcommand8(ILI9341_RDSELFDIAG);
+  Serial.print("Self Diagnostic: 0x"); Serial.println(x, HEX); 
+  
   Serial.println(F("Benchmark                Time (microseconds)"));
 
   Serial.print(F("Screen fill              "));

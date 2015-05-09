@@ -132,7 +132,7 @@ static uint8_t esp8266_gpioToFn[16] = {0x34, 0x18, 0x38, 0x14, 0x3C, 0x40, 0x1C,
 #define T1I  ESP8266_REG(0x60C) //Interrupt Status Register (1bit) write to clear
 //edge interrupt enable register
 #define TEIE 	ESP8266_DREG(0x04)
-#define TEIE1	0x02 //it for timer 1
+#define TEIE1	0x02 //bit for timer 1
 
 //Timer 2 Registers (32bit CountUp Timer)
 #define T2L  ESP8266_REG(0x620) //Load Value (Starting Value of Counter)
@@ -148,6 +148,10 @@ static uint8_t esp8266_gpioToFn[16] = {0x34, 0x18, 0x38, 0x14, 0x3C, 0x40, 0x1C,
 #define TCPD  2 //Prescale Devider (2bit) 0:1(12.5ns/tick), 1:16(0.2us/tick), 2/3:256(3.2us/tick)
 #define TCIT  0 //Interrupt Type 0:edge, 1:level
 
+
+//UART SWAP Register
+#define USWAP ESP8266_DREG(0x28)
+#define USWAP0 2 //BIT 2 swaps UART 0
 
 //UART 0 Registers
 #define U0F   ESP8266_REG(0x000) //UART FIFO
@@ -182,6 +186,23 @@ static uint8_t esp8266_gpioToFn[16] = {0x34, 0x18, 0x38, 0x14, 0x3C, 0x40, 0x1C,
 #define U1PN  ESP8266_REG(0xF30) //PULSE_NUM
 #define U1DT  ESP8266_REG(0xF78) //DATE
 #define U1ID  ESP8266_REG(0xF7C) //ID
+
+//UART(uart) Registers
+#define USF(u)   ESP8266_REG(0x000+(0xF00*(u&1))) //UART FIFO
+#define USIR(u)  ESP8266_REG(0x004+(0xF00*(u&1))) //INT_RAW
+#define USIS(u)  ESP8266_REG(0x008+(0xF00*(u&1))) //INT_STATUS
+#define USIE(u)  ESP8266_REG(0x00c+(0xF00*(u&1))) //INT_ENABLE
+#define USIC(u)  ESP8266_REG(0x010+(0xF00*(u&1))) //INT_CLEAR
+#define USD(u)   ESP8266_REG(0x014+(0xF00*(u&1))) //CLKDIV
+#define USA(u)   ESP8266_REG(0x018+(0xF00*(u&1))) //AUTOBAUD
+#define USS(u)   ESP8266_REG(0x01C+(0xF00*(u&1))) //STATUS
+#define USC0(u)  ESP8266_REG(0x020+(0xF00*(u&1))) //CONF0
+#define USC1(u)  ESP8266_REG(0x024+(0xF00*(u&1))) //CONF1
+#define USLP(u)  ESP8266_REG(0x028+(0xF00*(u&1))) //LOW_PULSE
+#define USHP(u)  ESP8266_REG(0x02C+(0xF00*(u&1))) //HIGH_PULSE
+#define USPN(u)  ESP8266_REG(0x030+(0xF00*(u&1))) //PULSE_NUM
+#define USDT(u)  ESP8266_REG(0x078+(0xF00*(u&1))) //DATE
+#define USID(u)  ESP8266_REG(0x07C+(0xF00*(u&1))) //ID
 
 //UART INT Registers Bits
 #define UITO	8 //RX FIFO TimeOut

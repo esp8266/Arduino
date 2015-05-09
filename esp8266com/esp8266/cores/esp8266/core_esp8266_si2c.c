@@ -18,12 +18,12 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#include "si2c.h"
+#include "twi.h"
 #include "pins_arduino.h"
 #include "wiring_private.h"
 
-uint8_t twi_dcount = 18;
-static uint8_t twi_sda, twi_scl;
+unsigned char twi_dcount = 18;
+static unsigned char twi_sda, twi_scl;
 
 #define SDA_LOW()   (GPES = (1 << twi_sda)) //Enable SDA (becomes output and since GPO is 0 for the pin, it will pull the line low)
 #define SDA_HIGH()  (GPEC = (1 << twi_sda)) //Disable SDA (becomes input and since it has pullup it will go high) 
@@ -42,7 +42,7 @@ static uint8_t twi_sda, twi_scl;
 #define TWI_CLOCK_STRETCH 400
 #endif
 
-void twi_setClock(uint32_t freq){
+void twi_setClock(unsigned int freq){
 #if F_CPU == FCPU80
   if(freq <= 100000) twi_dcount = 18;//about 100KHz
   else if(freq <= 200000) twi_dcount = 8;//about 200KHz
@@ -58,7 +58,7 @@ void twi_setClock(uint32_t freq){
 #endif
 }
 
-void twi_init(uint8_t sda, uint8_t scl){
+void twi_init(unsigned char sda, unsigned char scl){
   twi_sda = sda;
   twi_scl = scl;
   pinMode(twi_sda, INPUT_PULLUP);
@@ -71,9 +71,9 @@ void twi_stop(void){
   pinMode(twi_scl, INPUT);
 }
 
-static void twi_delay(uint8_t v){
-  uint8_t i;
-  uint32_t reg;
+static void twi_delay(unsigned char v){
+  unsigned int i;
+  unsigned int reg;
   for(i=0;i<v;i++) reg = GPI;
 }
 
@@ -88,7 +88,7 @@ static bool twi_write_start(void) {
 }
 
 static bool twi_write_stop(void){
-  uint8_t i = 0;
+  unsigned int i = 0;
   SCL_LOW();
   SDA_LOW();
   twi_delay(twi_dcount);
@@ -102,7 +102,7 @@ static bool twi_write_stop(void){
 }
 
 static bool twi_write_bit(bool bit) {
-  uint8_t i = 0;
+  unsigned int i = 0;
   SCL_LOW();
   if (bit) SDA_HIGH();
   else SDA_LOW();
@@ -114,7 +114,7 @@ static bool twi_write_bit(bool bit) {
 }
 
 static bool twi_read_bit(void) {
-  uint8_t i = 0;
+  unsigned int i = 0;
   SCL_LOW();
   SDA_HIGH();
   twi_delay(twi_dcount+1);
@@ -125,25 +125,25 @@ static bool twi_read_bit(void) {
   return bit;
 }
 
-static bool twi_write_byte(uint8_t byte) {
-  uint8_t bit;
+static bool twi_write_byte(unsigned char byte) {
+  unsigned char bit;
   for (bit = 0; bit < 8; bit++) {
     twi_write_bit(byte & 0x80);
     byte <<= 1;
   }
-  return twi_read_bit();//NACK/ACK
+  return !twi_read_bit();//NACK/ACK
 }
 
-static uint8_t twi_read_byte(bool nack) {
-  uint8_t byte = 0;
-  uint8_t bit;
+static unsigned char twi_read_byte(bool nack) {
+  unsigned char byte = 0;
+  unsigned char bit;
   for (bit = 0; bit < 8; bit++) byte = (byte << 1) | twi_read_bit();
   twi_write_bit(nack);
   return byte;
 }
 
-uint8_t twi_writeTo(uint8_t address, uint8_t * buf, uint32_t len, uint8_t sendStop){
-  uint32_t i;
+unsigned char twi_writeTo(unsigned char address, unsigned char * buf, unsigned int len, unsigned char sendStop){
+  unsigned int i;
   if(!twi_write_start()) return 4;//line busy
   if(!twi_write_byte(((address << 1) | 0) & 0xFF)) return 2;//received NACK on transmit of address
   for(i=0; i<len; i++){
@@ -153,8 +153,8 @@ uint8_t twi_writeTo(uint8_t address, uint8_t * buf, uint32_t len, uint8_t sendSt
   return 0;
 }
 
-uint8_t twi_readFrom(uint8_t address, uint8_t* buf, uint32_t len, uint8_t sendStop){
-  uint32_t i;
+unsigned char twi_readFrom(unsigned char address, unsigned char* buf, unsigned int len, unsigned char sendStop){
+  unsigned int i;
   if(!twi_write_start()) return 4;//line busy
   if(!twi_write_byte(((address << 1) | 1) & 0xFF)) return 2;//received NACK on transmit of address
   for(i=0; i<len; i++) buf[i] = twi_read_byte(false);

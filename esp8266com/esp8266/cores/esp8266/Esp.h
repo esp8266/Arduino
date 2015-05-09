@@ -42,6 +42,9 @@ typedef enum {
 #define wdt_disable()       ESP.wdtDisable()
 #define wdt_reset()         ESP.wdtFeed()
 
+#define cli()        ets_intr_lock()       // IRQ Disable
+#define sei()        ets_intr_unlock()     // IRQ Enable
+
 enum WakeMode {
     WAKE_RF_DEFAULT = 0, // RF_CAL or not after deep-sleep wake up, depends on init data byte 108.
     WAKE_RFCAL = 1,      // RF_CAL after deep-sleep wake up, there will be large current.
@@ -92,7 +95,15 @@ class EspClass {
         FlashMode_t getFlashChipMode(void);
         uint32_t getFlashChipSizeByChipId(void);
 
+        inline uint32_t getCycleCount(void);
 };
+
+uint32_t EspClass::getCycleCount(void)
+{
+    uint32_t ccount;
+    __asm__ __volatile__("rsr %0,ccount":"=a" (ccount));
+    return ccount;
+}
 
 extern EspClass ESP;
 

@@ -1,15 +1,33 @@
+/***************************************************
+  This is our library for the Adafruit  ILI9341 Breakout and Shield
+  ----> http://www.adafruit.com/products/1651
+
+  Check out the links above for our tutorials and wiring diagrams
+  These displays use SPI to communicate, 4 or 5 pins are required to
+  interface (RST is optional)
+  Adafruit invests time and resources providing this open source code,
+  please support Adafruit and open-source hardware by purchasing
+  products from Adafruit!
+
+  Written by Limor Fried/Ladyada for Adafruit Industries.
+  MIT license, all text above must be included in any redistribution
+ ****************************************************/
+
 #ifndef _ADAFRUIT_ILI9341H_
 #define _ADAFRUIT_ILI9341H_
 
-#include "Adafruit_GFX.h"
-
-extern "C"
-{
-#include <c_types.h>
-#include <osapi.h>
-#include <gpio.h>
-#include "driver/hspi.h"
-}
+#if ARDUINO >= 100
+ #include "Arduino.h"
+ #include "Print.h"
+#else
+ #include "WProgram.h"
+#endif
+#include <Adafruit_GFX.h>
+#ifdef ESP8266
+#include <pgmspace.h>
+#else
+#include <avr/pgmspace.h>
+#endif
 
 #define ILI9341_TFTWIDTH  240
 #define ILI9341_TFTHEIGHT 320
@@ -72,41 +90,40 @@ extern "C"
 */
 
 // Color definitions
-#define	ILI9341_BLACK   0x0000
-#define	ILI9341_BLUE    0x001F
-#define	ILI9341_RED     0xF800
-#define	ILI9341_GREEN   0x07E0
-#define ILI9341_CYAN    0x07FF
-#define ILI9341_MAGENTA 0xF81F
-#define ILI9341_YELLOW  0xFFE0  
-#define ILI9341_WHITE   0xFFFF
+#define ILI9341_BLACK       0x0000      /*   0,   0,   0 */
+#define ILI9341_NAVY        0x000F      /*   0,   0, 128 */
+#define ILI9341_DARKGREEN   0x03E0      /*   0, 128,   0 */
+#define ILI9341_DARKCYAN    0x03EF      /*   0, 128, 128 */
+#define ILI9341_MAROON      0x7800      /* 128,   0,   0 */
+#define ILI9341_PURPLE      0x780F      /* 128,   0, 128 */
+#define ILI9341_OLIVE       0x7BE0      /* 128, 128,   0 */
+#define ILI9341_LIGHTGREY   0xC618      /* 192, 192, 192 */
+#define ILI9341_DARKGREY    0x7BEF      /* 128, 128, 128 */
+#define ILI9341_BLUE        0x001F      /*   0,   0, 255 */
+#define ILI9341_GREEN       0x07E0      /*   0, 255,   0 */
+#define ILI9341_CYAN        0x07FF      /*   0, 255, 255 */
+#define ILI9341_RED         0xF800      /* 255,   0,   0 */
+#define ILI9341_MAGENTA     0xF81F      /* 255,   0, 255 */
+#define ILI9341_YELLOW      0xFFE0      /* 255, 255,   0 */
+#define ILI9341_WHITE       0xFFFF      /* 255, 255, 255 */
+#define ILI9341_ORANGE      0xFD20      /* 255, 165,   0 */
+#define ILI9341_GREENYELLOW 0xAFE5      /* 173, 255,  47 */
+#define ILI9341_PINK        0xF81F
 
-#define TFT_DC_DATA		GPIO_OUTPUT_SET(2, 1)
-#define TFT_DC_COMMAND	GPIO_OUTPUT_SET(2, 0)
-#define TFT_DC_INIT 	PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO2_U, FUNC_GPIO2); TFT_DC_DATA
-
-#define MAKEWORD(b1, b2, b3, b4) (uint32_t(b1) | ((b2) << 8) | ((b3) << 16) | ((b4) << 24))
-#define SWAPBYTES(i) ((i>>8) | (i<<8))
+//#define USE_DIGITAL_WRITE
 
 class Adafruit_ILI9341 : public Adafruit_GFX {
 
-private:
- uint8_t  tabcolor;
- spi_config config;
- void transmitCmdData(uint8_t cmd, const uint8_t *data, uint8_t numDataByte);
- inline void transmitData(uint16_t data) {spi_wait_ready(); spi_send_uint16(data);}
- inline void transmitCmdData(uint8_t cmd, uint32_t data) {spi_wait_ready(); TFT_DC_COMMAND; spi_send_uint8(cmd); spi_wait_ready(); TFT_DC_DATA; spi_send_uint32(data);}
- inline void transmitData(uint16_t data, int32_t repeats){spi_wait_ready(); spi_send_uint16_r(data, repeats);}
- inline void transmitCmd(uint8_t cmd){spi_wait_ready(); TFT_DC_COMMAND; spi_send_uint8(cmd);spi_wait_ready(); TFT_DC_DATA;}
- inline void drawPixelInternal(int16_t x, int16_t y, uint16_t color) {	if((x < 0) ||(x >= _width) || (y < 0) || (y >= _height)) return;
-	setAddrWindow(x,y,x+1,y+1);
-	transmitData(SWAPBYTES(color));
- }
+ public:
+#ifndef ESP8266
+  Adafruit_ILI9341(int8_t _CS, int8_t _DC, int8_t _MOSI, int8_t _SCLK,
+		   int8_t _RST, int8_t _MISO);
+#endif
+  Adafruit_ILI9341(int8_t _CS, int8_t _DC, int8_t _RST = -1);
 
-public:
-  Adafruit_ILI9341() : Adafruit_GFX(ILI9341_TFTWIDTH, ILI9341_TFTHEIGHT), tabcolor(0){}
-
-  void     begin(),
+  void     begin(void),
+           setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1),
+           pushColor(uint16_t color),
            fillScreen(uint16_t color),
            drawPixel(int16_t x, int16_t y, uint16_t color),
            drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color),
@@ -115,12 +132,39 @@ public:
              uint16_t color),
            setRotation(uint8_t r),
            invertDisplay(boolean i);
-  inline void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
-  {	  transmitCmdData(ILI9341_CASET, MAKEWORD(x0 >> 8, x0 & 0xFF, x1 >> 8, x1 & 0xFF));
-  	  transmitCmdData(ILI9341_PASET, MAKEWORD(y0 >> 8, y0 & 0xFF, y1 >> 8, y1 & 0xFF));
-	  transmitCmd(ILI9341_RAMWR); // write to RAM
-  }
   uint16_t color565(uint8_t r, uint8_t g, uint8_t b);
+
+  /* These are not for current use, 8-bit protocol only! */
+  uint8_t  readdata(void),
+    readcommand8(uint8_t reg, uint8_t index = 0);
+  /*
+  uint16_t readcommand16(uint8_t);
+  uint32_t readcommand32(uint8_t);
+  void     dummyclock(void);
+  */  
+
+  void     spiwrite(uint8_t),
+    writecommand(uint8_t c),
+    writedata(uint8_t d),
+    commandList(uint8_t *addr);
+  uint8_t  spiread(void);
+
+ private:
+  uint8_t  tabcolor;
+
+  boolean  hwSPI;
+#if defined (__AVR__) || defined(TEENSYDUINO)
+  uint8_t mySPCR;
+  volatile uint8_t *mosiport, *clkport, *dcport, *rsport, *csport;
+  int8_t  _cs, _dc, _rst, _mosi, _miso, _sclk;
+  uint8_t  mosipinmask, clkpinmask, cspinmask, dcpinmask;
+#elif defined (__arm__)
+    volatile RwReg *mosiport, *clkport, *dcport, *rsport, *csport;
+    uint32_t  _cs, _dc, _rst, _mosi, _miso, _sclk;
+    uint32_t  mosipinmask, clkpinmask, cspinmask, dcpinmask;
+#elif defined (ESP8266)
+    uint32_t  _cs, _dc, _rst;
+#endif
 };
 
 #endif

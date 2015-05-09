@@ -223,10 +223,20 @@ FlashMode_t EspClass::getFlashChipMode(void)
  * Infos from
  *  http://www.wlxmall.com/images/stock_item/att/A1010004.pdf
  *  http://www.gigadevice.com/product-series/5.html?locale=en_US
+ *  http://www.elinux.org/images/f/f5/Winbond-w25q32.pdf
  */
 uint32_t EspClass::getFlashChipSizeByChipId(void) {
     uint32_t chipId = getFlashChipId();
+    /**
+     * Chip ID
+     * 00 - always 00 (Chip ID use only 3 byte)
+     * 17 - ? looks like 2^xx is size in Byte ?     //todo: find docu to this
+     * 40 - ? may be Speed ?                        //todo: find docu to this
+     * C8 - manufacturer ID
+     */
     switch(chipId) {
+
+        // GigaDevice
         case 0x1740C8: // GD25Q64B
             return (8_MB);
         case 0x1640C8: // GD25Q32B
@@ -243,6 +253,15 @@ uint32_t EspClass::getFlashChipSizeByChipId(void) {
             return (128_kB);
         case 0x1040C8: // GD25Q12
             return (64_kB);
+
+        // Winbond
+        case 0x1640EF: // W25Q32
+            return (4_MB);
+        case 0x1540EF: // W25Q16
+            return (2_MB);
+        case 0x1440EF: // W25Q80
+            return (1_MB);
+
         default:
             return 0;
     }
