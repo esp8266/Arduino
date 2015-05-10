@@ -8,9 +8,9 @@
 name=ESP8266 Modules
 version=1.6.1
 
-compiler.tools.path={runtime.hardware.path}/esp8266/tools/{runtime.os}/
+compiler.tools.path={runtime.platform.path}/tools/{runtime.os}/
 compiler.path={compiler.tools.path}xtensa-lx106-elf/bin/
-compiler.sdk.path={runtime.hardware.path}/esp8266/sdk/
+compiler.sdk.path={runtime.platform.path}/sdk/
 
 compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ "-I{compiler.sdk.path}/include"
 
@@ -86,7 +86,7 @@ recipe.size.regex=^(?:\.text|\.data|\.rodata|\.irom0\.text|)\s+([0-9]+).*
 
 tools.esptool.cmd=esptool
 tools.esptool.cmd.windows=esptool.exe
-tools.esptool.path={runtime.hardware.path}/esp8266/tools/{runtime.os}
+tools.esptool.path={runtime.platform.path}/tools/{runtime.os}
 
 tools.esptool.upload.protocol=esp
 tools.esptool.upload.params.verbose=-vv
