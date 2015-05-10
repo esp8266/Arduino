@@ -31,6 +31,8 @@ class UdpContext;
 class WiFiUDP : public UDP {
 private:
   UdpContext* _ctx;
+  IPAddress begunIp_;
+  uint16_t begunPort_;
 
 public:
   WiFiUDP();  // Constructor
