@@ -75,13 +75,18 @@ public:
   void write(uint8_t data);
   void write16(uint16_t data);
   void write16(uint16_t data, bool msb);
+  void write32(uint32_t data);
+  void write32(uint32_t data, bool msb);
   void writeBytes(uint8_t * data, uint32_t size);
   void writePattern(uint8_t * data, uint8_t size, uint32_t repeat);
+  void transferBytes(uint8_t * out, uint8_t * in, uint32_t size);
   void endTransaction(void);
 private:
   bool useHwCs;
   void writeBytes_(uint8_t * data, uint8_t size);
   void writePattern_(uint8_t * data, uint8_t size, uint8_t repeat);
+  void transferBytes_(uint8_t * out, uint8_t * in, uint8_t size);
+  inline void setDataBits(uint16_t bits);
 };
 
 extern SPIClass SPI;

@@ -110,10 +110,11 @@
 #define ILI9341_GREENYELLOW 0xAFE5      /* 173, 255,  47 */
 #define ILI9341_PINK        0xF81F
 
-//#define USE_DIGITAL_WRITE
+//#define ILI9341_USE_DIGITAL_WRITE
+//#define ILI9341_USE_NO_CS
 #ifdef ESP8266
 //not working
-//#define USE_HW_CS
+//#define ILI9341_USE_HW_CS
 #endif
 
 class Adafruit_ILI9341 : public Adafruit_GFX {
@@ -123,7 +124,7 @@ class Adafruit_ILI9341 : public Adafruit_GFX {
   Adafruit_ILI9341(int8_t _CS, int8_t _DC, int8_t _MOSI, int8_t _SCLK,
 		   int8_t _RST, int8_t _MISO);
 #endif
-#ifdef USE_HW_CS
+#if defined(USE_HW_CS) || defined(USE_NO_CS)
   Adafruit_ILI9341(int8_t _DC, int8_t _RST = -1);
 #else
   Adafruit_ILI9341(int8_t _CS, int8_t _DC, int8_t _RST = -1);
@@ -183,8 +184,9 @@ class Adafruit_ILI9341 : public Adafruit_GFX {
   inline void spiDcLow(void);
 
   uint8_t  tabcolor;
-
+#ifndef ESP8266
   boolean  hwSPI;
+#endif
 #if defined (__AVR__) || defined(TEENSYDUINO)
   uint8_t mySPCR;
   volatile uint8_t *mosiport, *clkport, *dcport, *rsport, *csport;
@@ -197,8 +199,10 @@ class Adafruit_ILI9341 : public Adafruit_GFX {
 #elif defined (ESP8266)
 #ifndef USE_HW_CS
     int8_t  _cs;
+    uint32_t _csMask;
 #endif
     int8_t  _dc, _rst;
+    uint32_t _dcMask, _rstMask;
 #endif
 };
 
