@@ -152,7 +152,7 @@ void ESP8266WebServer::handleClient()
 
   String formData;
   //bellow is needed only when POST type request
-  if(method == HTTP_POST || method == HTTP_PUT || method == HTTP_PATCH){
+  if(method == HTTP_POST || method == HTTP_PUT || method == HTTP_PATCH || method == HTTP_DELETE){
     String boundaryStr;
     String headerName;
     String headerValue;
@@ -391,7 +391,8 @@ void ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t 
               line = client.readStringUntil('\r');
               client.readStringUntil('\n');
               if(line.startsWith("--"+boundary)) break;
-              argValue += line+"\n";
+              if(argValue.length() > 0) argValue += "\n";
+              argValue += line;
             }
   #ifdef DEBUG
             DEBUG_OUTPUT.print("PostArg Value: ");
