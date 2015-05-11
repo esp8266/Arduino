@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.zip.*;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
+import javax.swing.border.MatteBorder;
 import javax.swing.event.*;
 import javax.swing.text.*;
 import javax.swing.undo.*;
@@ -256,7 +256,7 @@ public class Editor extends JFrame implements RunnerListener {
 
     // RTextScrollPane
     scrollPane = new RTextScrollPane(textarea, true);
-    scrollPane.setBorder(new EmptyBorder(0, 0, 0, 0));
+    scrollPane.setBorder(new MatteBorder(0, 6, 0, 0, Theme.getColor("editor.bgcolor")));
     scrollPane.setViewportBorder(BorderFactory.createEmptyBorder());
     scrollPane.setLineNumbersEnabled(Preferences.getBoolean("editor.linenumbers"));
     scrollPane.setIconRowHeaderEnabled(false);
@@ -265,7 +265,7 @@ public class Editor extends JFrame implements RunnerListener {
     gutter.setBookmarkingEnabled(false);
     //gutter.setBookmarkIcon(CompletionsRenderer.getIcon(CompletionType.TEMPLATE));
     gutter.setIconRowHeaderInheritsGutterBackground(true);
-    
+
     upper.add(scrollPane);
     splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, upper, consolePanel);
 
