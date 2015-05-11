@@ -139,4 +139,10 @@ extern void __analogWrite(uint8_t pin, int value) {
 	}
 }
 
+extern void __analogWriteFreq(uint32_t freq){
+  pwm_freq = freq;
+  prep_pwm_steps();
+}
+
 extern void analogWrite(uint8_t pin, int val) __attribute__ ((weak, alias("__analogWrite")));
+extern void analogWriteFreq(uint32_t freq) __attribute__ ((weak, alias("__analogWriteFreq")));
