@@ -1787,7 +1787,7 @@ public class Base {
 
         g.setFont(new Font("SansSerif", Font.PLAIN, 11));
         g.setColor(Color.white);
-        g.drawString(BaseNoGui.VERSION_NAME, 33, 20);
+        g.drawString(BaseNoGui.VERSION_NAME_LONG, 33, 20);
       }
     };
     window.addMouseListener(new MouseAdapter() {

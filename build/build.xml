@@ -4,6 +4,10 @@
   <!--echo message="os.arch = ${os.arch}" /-->
   <!--echo message="os.version = ${os.version}" /-->
 
+  <tstamp>
+    <format property="BUILD_DATE" pattern="yyyy/MM/dd hh:mm"/>
+  </tstamp>
+
   <!-- Sets properties for macosx/windows/linux depending on current system -->
   <condition property="platform" value="macosx-old">
     <and>
@@ -59,6 +63,8 @@
 
   <target name="build" description="Build Arduino.">
     <antcall target="${platform}-build" />
+
+    <antcall target="generate-hourly-build-txt"/>
   </target>
 
   <target name="run" description="Run Arduino.">
@@ -385,7 +391,7 @@
     <antcall target="macosx-run-common"/>
   </target>
 
-  <target name="macosx-run" depends="macosx-build" description="Run Mac OS X version">
+  <target name="macosx-run" depends="build" description="Run Mac OS X version">
     <antcall target="macosx-run-common"/>
   </target>
 
@@ -393,7 +399,7 @@
     <antcall target="macosx-debug-common"/>
   </target>
 
-  <target name="macosx-debug" depends="macosx-build" description="Run Mac OS X version">
+  <target name="macosx-debug" depends="build" description="Run Mac OS X version">
     <antcall target="macosx-debug-common"/>
   </target>
 
@@ -468,7 +474,7 @@
     <antcall target="macosx-dist-common"/>
   </target>
 
-  <target name="macosx-dist" if="macosx" depends="macosx-build" description="Create a downloadable .zip for the Mac OS X version">
+  <target name="macosx-dist" if="macosx" depends="build" description="Create a downloadable .zip for the Mac OS X version">
     <antcall target="macosx-dist-common"/>
   </target>
 
@@ -637,11 +643,11 @@
     <antcall target="package-library-index-json-bundle"/>
   </target>
 
-  <target name="linux32-run" depends="linux32-build" description="Run Linux (32-bit) version">
+  <target name="linux32-run" depends="build" description="Run Linux (32-bit) version">
     <exec executable="./linux/work/arduino" spawn="false" failonerror="true"/>
   </target>
 
-  <target name="linux64-run" depends="linux64-build" description="Run Linux (64-bit) version">
+  <target name="linux64-run" depends="build" description="Run Linux (64-bit) version">
     <exec executable="./linux/work/arduino" spawn="false" failonerror="true"/>
   </target>
 
@@ -858,12 +864,12 @@
     <antcall target="package-library-index-json-bundle"/>
   </target>
 
-  <target name="windows-run" depends="windows-build"
+  <target name="windows-run" depends="build"
 	  description="Run windows version">
     <exec executable="windows/work/arduino.exe" dir="windows/work" spawn="true" failonerror="true"/>
   </target>
 
-  <target name="windows-dist" depends="windows-build" description="Create .zip files of windows version">
+  <target name="windows-dist" depends="build" description="Create .zip files of windows version">
 
     <loadproperties srcfile="${WINDOWS_BUNDLED_JVM}/release" prefix="windows"/>
 
@@ -987,6 +993,10 @@
       <arg value="${staging_folder}/work/${staging_hardware_folder}/tmp/avrdude/avrdude-6.0.1/lib/libusb-1.0.dylib"/>
       <arg value="${staging_folder}/work/${staging_hardware_folder}/tools/avr/lib/"/>
     </exec>
+  </target>
+
+  <target name="generate-hourly-build-txt" if="hourly">
+    <echo file="${staging_folder}/work/${staging_hardware_folder}/../lib/hourlyBuild.txt">${BUILD_DATE}</echo>
   </target>
 
 </project>

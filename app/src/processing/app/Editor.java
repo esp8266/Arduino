@@ -2297,9 +2297,7 @@ public class Editor extends JFrame implements RunnerListener {
       return false;
     }
     header.rebuild();
-    // Set the title of the window to "sketch_070752a - Processing 0126"
-    setTitle(I18n.format(_("{0} | Arduino {1}"), sketch.getName(),
-                         BaseNoGui.VERSION_NAME));
+    setTitle(I18n.format(_("{0} | Arduino {1}"), sketch.getName(), BaseNoGui.VERSION_NAME_LONG));
     // Disable untitled setting from previous document, if any
     untitled = false;
 

@@ -32,7 +32,22 @@ public class BaseNoGui {
   /** Version string to be used for build */
   public static final int REVISION = 10605;
   /** Extended version string displayed on GUI */
-  static String VERSION_NAME = "1.6.5";
+  public static final String VERSION_NAME = "1.6.5";
+  public static final String VERSION_NAME_LONG;
+
+  static {
+    String versionNameLong = VERSION_NAME;
+    File hourlyBuildTxt = new File(getContentFile("lib"), "hourlyBuild.txt");
+    if (hourlyBuildTxt.exists() && hourlyBuildTxt.canRead()) {
+      versionNameLong += " Hourly Build";
+      try {
+        versionNameLong += " " + FileUtils.readFileToString(hourlyBuildTxt).trim();
+      } catch (IOException e) {
+        //noop
+      }
+    }
+    VERSION_NAME_LONG = versionNameLong;
+  }
 
   static File buildFolder;
 
