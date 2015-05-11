@@ -1119,7 +1119,9 @@ public class Editor extends JFrame implements RunnerListener {
         } else {
           lastProtocolTranslated = port.getProtocol();
         }
-        serialMenu.add(new JMenuItem(_(lastProtocolTranslated)));
+        JMenuItem lastProtocolMenuItem = new JMenuItem(_(lastProtocolTranslated));
+        lastProtocolMenuItem.setEnabled(false);
+        serialMenu.add(lastProtocolMenuItem);
       }
       String address = port.getAddress();
       String label = port.getLabel();
