@@ -33,18 +33,19 @@ uint16_t pwm_steps[17];
 uint8_t pwm_steps_len = 0;
 uint32_t pwm_steps_mask[17];
 
-int pwm_sort_asc(const void* a, const void* b){
-     return (*((uint16_t*)a) > *((uint16_t*)b)) - (*((uint16_t*)a) < *((uint16_t*)b));
-}
-
 int pwm_sort_array(uint16_t a[], uint16_t al){
-	qsort(a, al, sizeof(uint16_t), pwm_sort_asc);
-	int i;
-	int bl = 1;
-	for(i = 1; i < al; i++){
-		if(a[i] != a[i-1]) a[bl++] = a[i];
-	}
-	return bl;
+  uint16_t i, j;
+  for (i = 1; i < al; i++) {
+    uint16_t tmp = a[i];
+    for (j = i; j >= 1 && tmp < a[j-1]; j--)
+      a[j] = a[j-1];
+    a[j] = tmp;
+  }
+  int bl = 1;
+  for(i = 1; i < al; i++){
+    if(a[i] != a[i-1]) a[bl++] = a[i];
+  }
+  return bl;
 }
 
 uint32_t pwm_get_mask(uint16_t value){
