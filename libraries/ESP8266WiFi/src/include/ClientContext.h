@@ -98,7 +98,18 @@ class ClientContext {
                 delete this;
             }
         }
-
+        
+        void setNoDelay(bool nodelay){
+          if(!_pcb) return;
+          if(nodelay) tcp_nagle_disable(_pcb);
+          else tcp_nagle_enable(_pcb);
+        }
+        
+        bool getNoDelay(){
+          if(!_pcb) return false;
+          return tcp_nagle_disabled(_pcb);
+        }
+        
         uint32_t getRemoteAddress() {
             if(!_pcb) return 0;
 
