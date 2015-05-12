@@ -133,14 +133,13 @@ int WiFiUDP::beginPacket(const char *host, uint16_t port)
 
 int WiFiUDP::beginPacket(IPAddress ip, uint16_t port)
 {
-    ip_addr_t addr;
-    addr.addr = ip;
-
     if (!_ctx) {
         _ctx = new UdpContext;
         _ctx->ref();
     }
-    return (_ctx->connect(addr, port)) ? 1 : 0;
+    begunIp_ = ip;
+    begunPort_= port;
+    return 1;
 }
 
 int WiFiUDP::beginPacketMulticast(IPAddress multicastAddress, uint16_t port, 
@@ -168,8 +167,9 @@ int WiFiUDP::endPacket()
     if (!_ctx)
         return 0;
 
-    _ctx->send();
-    _ctx->disconnect();
+    ip_addr_t addr;
+    addr.addr = begunIp_;
+    _ctx->send(&addr, begunPort_);
     return 1;
 }
 
