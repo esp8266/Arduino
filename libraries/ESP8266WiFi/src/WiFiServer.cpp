@@ -73,7 +73,23 @@ void WiFiServer::begin()
     tcp_arg(listen_pcb, (void*) this);
 }
 
+void WiFiServer::setNoDelay(bool nodelay){
+  if(!_pcb) return;
+  if(nodelay) tcp_nagle_disable(_pcb);
+  else tcp_nagle_enable(_pcb);
+}
+
+bool WiFiServer::getNoDelay(){
+  if(!_pcb) return false;
+  return tcp_nagle_disabled(_pcb);
+}
+
 extern "C" uint32_t esp_micros_at_task_start();
+
+bool WiFiServer::hasClient(){
+  if (_unclaimed) return true;
+  return false;
+}
 
 WiFiClient WiFiServer::available(byte* status)
 {

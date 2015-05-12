@@ -21,7 +21,8 @@
 */
 
 #define LWIP_INTERNAL
-
+#include <functional>
+  
 extern "C" 
 {
     #include "include/wl_definitions.h"
@@ -168,7 +169,6 @@ int WiFiUDP::endPacket()
         return 0;
 
     _ctx->send();
-    _ctx->disconnect();
     return 1;
 }
 
