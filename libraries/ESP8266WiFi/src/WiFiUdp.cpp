@@ -169,7 +169,6 @@ int WiFiUDP::endPacket()
         return 0;
 
     _ctx->send();
-    _ctx->disconnect();
     return 1;
 }
 
