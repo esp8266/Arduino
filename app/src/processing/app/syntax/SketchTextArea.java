@@ -150,17 +150,22 @@ public class SketchTextArea extends RSyntaxTextArea {
   // Removing the default focus traversal keys
   // This is because the DefaultKeyboardFocusManager handles the keypress and consumes the event
   protected void fixControlTab() {
-    KeyStroke ctrlTab = KeyStroke.getKeyStroke("ctrl TAB");
-    KeyStroke ctrlShiftTab = KeyStroke.getKeyStroke("ctrl shift TAB");
+    removeCTRLTabFromFocusTraversal();
 
-    // Remove ctrl-tab from normal focus traversal
+    removeCTRLSHIFTTabFromFocusTraversal();
+  }
+
+  private void removeCTRLSHIFTTabFromFocusTraversal() {
+    KeyStroke ctrlShiftTab = KeyStroke.getKeyStroke("ctrl shift TAB");
+    Set<AWTKeyStroke> backwardKeys = new HashSet<AWTKeyStroke>(this.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
+    backwardKeys.remove(ctrlShiftTab);
+  }
+
+  private void removeCTRLTabFromFocusTraversal() {
+    KeyStroke ctrlTab = KeyStroke.getKeyStroke("ctrl TAB");
     Set<AWTKeyStroke> forwardKeys = new HashSet<AWTKeyStroke>(this.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
     forwardKeys.remove(ctrlTab);
     this.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, forwardKeys);
-
-    // Remove ctrl-shift-tab from normal focus traversal
-    Set<AWTKeyStroke> backwardKeys = new HashSet<AWTKeyStroke>(this.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
-    backwardKeys.remove(ctrlShiftTab);
   }
 
 

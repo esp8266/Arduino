@@ -54,6 +54,7 @@ import processing.app.macosx.ThinkDifferent;
 import processing.app.packages.LibraryList;
 import processing.app.packages.UserLibrary;
 import processing.app.syntax.PdeKeywords;
+import processing.app.syntax.SketchTextAreaDefaultInputMap;
 import processing.app.tools.MenuScroller;
 import processing.app.tools.ZipDeflater;
 
@@ -476,6 +477,8 @@ public class Base {
     } else if (parser.isGuiMode()) {
       splashScreenHelper.splashText(_("Starting..."));
 
+      installKeyboardInputMap();
+
       // Check if there were previously opened sketches to be restored
       restoreSketches();
 
@@ -503,6 +506,10 @@ public class Base {
         System.exit(4);
       }
     }
+  }
+
+  private void installKeyboardInputMap() {
+    UIManager.put("RSyntaxTextAreaUI.inputMap", new SketchTextAreaDefaultInputMap());
   }
 
   /**
