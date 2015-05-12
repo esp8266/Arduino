@@ -30,39 +30,32 @@ void timer1_isr_handler(void *para){
     if(timer1_user_cb) timer1_user_cb();
 }
 
-extern void __timer1_isr_init(){
+void timer1_isr_init(){
     ETS_FRC_TIMER1_INTR_ATTACH(timer1_isr_handler, NULL);
 }
 
-extern void __timer1_attachInterrupt(void (*userFunc)(void)) {
+void timer1_attachInterrupt(void (*userFunc)(void)) {
     timer1_user_cb = userFunc;
     ETS_FRC1_INTR_ENABLE();
 }
 
-extern void __timer1_detachInterrupt() {
+void timer1_detachInterrupt() {
     timer1_user_cb = 0;
     TEIE &= ~TEIE1;//edge int disable
     ETS_FRC1_INTR_DISABLE();
 }
 
-extern void __timer1_enable(uint8_t divider, uint8_t int_type, uint8_t reload){
+void timer1_enable(uint8_t divider, uint8_t int_type, uint8_t reload){
     T1C = (1 << TCTE) | ((divider & 3) << TCPD) | ((int_type & 1) << TCIT) | ((reload & 1) << TCAR);
     T1I = 0;
 }
 
-extern void __timer1_write(uint32_t ticks){
+void timer1_write(uint32_t ticks){
     T1L = ((ticks) & 0x7FFFFF);
     if((T1C & (1 << TCIT)) == 0) TEIE |= TEIE1;//edge int enable
 }
 
-extern void __timer1_disable(){
+void timer1_disable(){
     T1C = 0;
     T1I = 0;
 }
-
-extern void timer1_isr_init(void) __attribute__ ((weak, alias("__timer1_isr_init")));
-extern void timer1_detachInterrupt(void) __attribute__ ((weak, alias("__timer1_detachInterrupt")));
-extern void timer1_disable(void) __attribute__ ((weak, alias("__timer1_disable")));
-extern void timer1_attachInterrupt(void (*userFunc)(void)) __attribute__ ((weak, alias("__timer1_attachInterrupt")));
-extern void timer1_write(uint32_t ticks) __attribute__ ((weak, alias("__timer1_write")));
-extern void timer1_enable(uint8_t divider, uint8_t int_type, uint8_t reload) __attribute__ ((weak, alias("__timer1_enable")));
