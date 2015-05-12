@@ -41,7 +41,9 @@ public abstract class HostDependentDownloadableContribution extends Downloadable
 
   public boolean isCompatible(Platform platform) {
     String osName = platform.getOsName();
+    assert osName != null;
     String osArch = platform.getOsArch();
+    assert osArch != null;
 
     String host = getHost();
 

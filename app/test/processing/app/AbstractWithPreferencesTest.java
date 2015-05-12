@@ -38,6 +38,7 @@ public abstract class AbstractWithPreferencesTest {
   public void init() throws Exception {
     Runtime.getRuntime().addShutdownHook(new Thread(DeleteFilesOnShutdown.INSTANCE));
     Base.initPlatform();
+    Base.getPlatform().init();
     Preferences.init(null);
     Theme.init();
 
