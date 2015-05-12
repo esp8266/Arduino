@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.ArrayList;
 
 import static processing.app.I18n._;
 
@@ -64,6 +65,8 @@ public class LibrariesIndexer {
   private final File indexFile;
   private final File stagingFolder;
   private File sketchbookLibrariesFolder;
+  
+  private static final List<String> badLibNotified = new ArrayList<String>();
 
   public LibrariesIndexer(File preferencesFolder, ContributionsIndexer contributionsIndexer) {
     this.contributionsIndexer = contributionsIndexer;
@@ -135,11 +138,18 @@ public class LibrariesIndexer {
 
     for (File subfolder : list) {
       if (!BaseNoGui.isSanitaryName(subfolder.getName())) {
-        String mess = I18n.format(_("The library \"{0}\" cannot be used.\n"
+
+        // Detect whether the current folder name has already had a notification.
+        if(!badLibNotified.contains(subfolder.getName())) { 
+
+          badLibNotified.add(subfolder.getName());
+
+          String mess = I18n.format(_("The library \"{0}\" cannot be used.\n"
                         + "Library names must contain only basic letters and numbers.\n"
                         + "(ASCII only and no spaces, and it cannot start with a number)"),
                 subfolder.getName());
-        BaseNoGui.showMessage(_("Ignoring bad library name"), mess);
+          BaseNoGui.showMessage(_("Ignoring bad library name"), mess);
+        }
         continue;
       }
 
