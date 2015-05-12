@@ -94,6 +94,7 @@ class ClientContext {
             if(--_refcnt == 0) {
                 flush();
                 close();
+                if(_discard_cb) _discard_cb(_discard_cb_arg, this);
                 delete this;
             }
         }
@@ -231,7 +232,6 @@ class ClientContext {
 
             if(pb == 0) // connection closed
             {
-                if(_discard_cb) _discard_cb(_discard_cb_arg, this);
                 DEBUGV(":rcla\r\n");
                 return abort();
             }
