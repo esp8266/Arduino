@@ -34,7 +34,11 @@ static void spiSend(uint8_t b) {
   while (!(SPSR & (1 << SPIF)))
     ;
 #else
+#ifdef ESP8266
+  SPI.write(b);
+#else
   SPI.transfer(b);
+#endif
 #endif
 }
 /** Receive a byte from the card */
@@ -116,8 +120,14 @@ uint8_t Sd2Card::cardCommand(uint8_t cmd, uint32_t arg) {
   // send command
   spiSend(cmd | 0x40);
 
+#ifdef ESP8266
+  // send argument
+  SPI.write32(arg, true);
+#else
   // send argument
   for (int8_t s = 24; s >= 0; s -= 8) spiSend(arg >> s);
+#endif
+
 
   // send CRC
   uint8_t crc = 0xFF;
@@ -424,7 +434,14 @@ uint8_t Sd2Card::readData(uint32_t block,
   dst[n] = SPDR;
 
 #else  // OPTIMIZE_HARDWARE_SPI
+#ifdef ESP8266
+  // skip data before offset
+  SPI.transferBytes(NULL, NULL, offset_);
 
+  // transfer data
+  SPI.transferBytes(NULL, dst, count);
+
+#else
   // skip data before offset
   for (;offset_ < offset; offset_++) {
     spiRec();
@@ -433,6 +450,7 @@ uint8_t Sd2Card::readData(uint32_t block,
   for (uint16_t i = 0; i < count; i++) {
     dst[i] = spiRec();
   }
+#endif
 #endif  // OPTIMIZE_HARDWARE_SPI
 
   offset_ += count;
@@ -463,7 +481,11 @@ void Sd2Card::readEnd(void) {
     while (!(SPSR & (1 << SPIF)))
       ;
 #else  // OPTIMIZE_HARDWARE_SPI
+#ifdef ESP8266
+    SPI.transferBytes(NULL, NULL, (514-offset_));
+#else
     while (offset_++ < 514) spiRec();
+#endif
 #endif  // OPTIMIZE_HARDWARE_SPI
     chipSelectHigh();
     inBlock_ = 0;
@@ -479,7 +501,11 @@ uint8_t Sd2Card::readRegister(uint8_t cmd, void* buf) {
   }
   if (!waitStartBlock()) goto fail;
   // transfer data
+#ifdef ESP8266
+  SPI.transferBytes(NULL, dst, 16);
+#else
   for (uint16_t i = 0; i < 16; i++) dst[i] = spiRec();
+#endif
   spiRec();  // get first crc byte
   spiRec();  // get second crc byte
   chipSelectHigh();
@@ -646,13 +672,21 @@ uint8_t Sd2Card::writeData(uint8_t token, const uint8_t* src) {
 
 #else  // OPTIMIZE_HARDWARE_SPI
   spiSend(token);
+#ifdef ESP8266
+  // send argument
+  SPI.writeBytes((uint8_t *)src, 512);
+#else
   for (uint16_t i = 0; i < 512; i++) {
     spiSend(src[i]);
   }
+#endif
 #endif  // OPTIMIZE_HARDWARE_SPI
+#ifdef ESP8266
+  SPI.write16(0xFFFF, true);
+#else
   spiSend(0xff);  // dummy crc
   spiSend(0xff);  // dummy crc
-
+#endif
   status_ = spiRec();
   if ((status_ & DATA_RES_MASK) != DATA_RES_ACCEPTED) {
     error(SD_CARD_ERROR_WRITE);

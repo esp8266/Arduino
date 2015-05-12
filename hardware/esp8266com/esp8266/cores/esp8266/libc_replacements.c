@@ -175,12 +175,19 @@ char* ICACHE_FLASH_ATTR strtok_r(char * str, const char * delimiters, char ** te
     uint32_t size = 0;
 
     if(str == NULL) {
+        if(temp == NULL) {
+            return NULL;
+        }
         start = *temp;
     } else {
         start = str;
     }
 
     if(start == NULL) {
+        return NULL;
+    }
+
+    if(delimiters == NULL) {
         return NULL;
     }
 
@@ -211,7 +218,9 @@ char* ICACHE_FLASH_ATTR strtok_r(char * str, const char * delimiters, char ** te
 }
 
 char* ICACHE_FLASH_ATTR strtok(char * str, const char * delimiters) {
-    return strtok_r(str, delimiters, NULL);
+    static char * ret = NULL;
+    ret = strtok_r(str, delimiters, &ret);
+    return ret;
 }
 
 int strcasecmp(const char * str1, const char * str2) {

@@ -152,7 +152,7 @@ void ESP8266WebServer::handleClient()
 
   String formData;
   //bellow is needed only when POST type request
-  if(method == HTTP_POST || method == HTTP_PUT || method == HTTP_PATCH){
+  if(method == HTTP_POST || method == HTTP_PUT || method == HTTP_PATCH || method == HTTP_DELETE){
     String boundaryStr;
     String headerName;
     String headerValue;
@@ -391,7 +391,8 @@ void ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t 
               line = client.readStringUntil('\r');
               client.readStringUntil('\n');
               if(line.startsWith("--"+boundary)) break;
-              argValue += line+"\n";
+              if(argValue.length() > 0) argValue += "\n";
+              argValue += line;
             }
   #ifdef DEBUG
             DEBUG_OUTPUT.print("PostArg Value: ");
@@ -441,8 +442,6 @@ readfile:
             
             argByte = client.read();
             if(argByte == 0x0A){
-              line = client.readStringUntil(0x0D);
-              client.readStringUntil(0x0A);
 #ifdef DEBUG
               DEBUG_OUTPUT.print("Write File: ");
               DEBUG_OUTPUT.println(_currentUpload.buflen);
@@ -450,7 +449,28 @@ readfile:
               if(_fileUploadHandler) _fileUploadHandler();
               _currentUpload.size += _currentUpload.buflen;
               _currentUpload.buflen = 0;
-              if(line.startsWith("--"+boundary)){
+              
+              argByte = client.read();
+              if((char)argByte != '-'){
+                //continue reading the file
+                _currentUpload.buf[_currentUpload.buflen++] = 0x0D;
+                _currentUpload.buf[_currentUpload.buflen++] = 0x0A;
+                goto readfile;
+              } else {
+                argByte = client.read();
+                if((char)argByte != '-'){
+                  //continue reading the file
+                  _currentUpload.buf[_currentUpload.buflen++] = 0x0D;
+                  _currentUpload.buf[_currentUpload.buflen++] = 0x0A;
+                  _currentUpload.buf[_currentUpload.buflen++] = (uint8_t)('-');
+                  goto readfile;
+                }
+              }
+              
+              uint8_t endBuf[boundary.length()];
+              client.readBytes(endBuf, boundary.length());
+              
+              if(strstr((const char*)endBuf, (const char*)(boundary.c_str())) != NULL){
                 _currentUpload.status = UPLOAD_FILE_END;
 #ifdef DEBUG
                 DEBUG_OUTPUT.print("End File: ");
@@ -461,7 +481,9 @@ readfile:
                 DEBUG_OUTPUT.println(_currentUpload.size);
 #endif
                 if(_fileUploadHandler) _fileUploadHandler();
-                if(line == ("--"+boundary+"--")){
+                line = client.readStringUntil(0x0D);
+                client.readStringUntil(0x0A);
+                if(line == "--"){
 #ifdef DEBUG
                   DEBUG_OUTPUT.println("Done Parsing POST");
 #endif
@@ -471,10 +493,9 @@ readfile:
               } else {
                 _currentUpload.buf[_currentUpload.buflen++] = 0x0D;
                 _currentUpload.buf[_currentUpload.buflen++] = 0x0A;
-                const char * lineChars = line.c_str();
                 uint32_t i = 0;
-                while(i < os_strlen(lineChars)){
-                  _currentUpload.buf[_currentUpload.buflen++] = lineChars[i++];
+                while(i < boundary.length()){
+                  _currentUpload.buf[_currentUpload.buflen++] = endBuf[i++];
                   if(_currentUpload.buflen == 1460){
 #ifdef DEBUG
                     DEBUG_OUTPUT.println("Write File: 1460");
