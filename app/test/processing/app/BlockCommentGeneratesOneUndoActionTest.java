@@ -38,7 +38,7 @@ import org.fest.swing.edt.GuiQuery;
 import org.fest.swing.fixture.JMenuItemFixture;
 import org.junit.Test;
 
-import processing.app.helpers.RSyntaxTextAreaFixture;
+import processing.app.helpers.SketchTextAreaFixture;
 
 public class BlockCommentGeneratesOneUndoActionTest extends AbstractGUITest {
 
@@ -47,7 +47,7 @@ public class BlockCommentGeneratesOneUndoActionTest extends AbstractGUITest {
     JMenuItemFixture menuEditUndo = window.menuItem("menuEditUndo");
     menuEditUndo.requireDisabled();
 
-    RSyntaxTextAreaFixture jEditTextArea = window.RSyntaxTextArea("editor");
+    SketchTextAreaFixture jEditTextArea = window.textArea("editor");
     String previousText = jEditTextArea.getText();
 
     jEditTextArea.selectAll();

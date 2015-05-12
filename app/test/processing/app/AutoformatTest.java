@@ -31,7 +31,7 @@ package processing.app;
 
 import org.fest.swing.fixture.JMenuItemFixture;
 import org.junit.Test;
-import processing.app.helpers.RSyntaxTextAreaFixture;
+import processing.app.helpers.SketchTextAreaFixture;
 
 import static org.junit.Assert.assertEquals;
 
@@ -42,7 +42,7 @@ public class AutoformatTest extends AbstractGUITest {
     JMenuItemFixture menuToolsAutoFormat = window.menuItem("menuToolsAutoFormat");
     menuToolsAutoFormat.requireEnabled();
 
-    RSyntaxTextAreaFixture editor = window.RSyntaxTextArea("editor");
+    SketchTextAreaFixture editor = window.textArea("editor");
     editor.setText("void setup() {\n" +
             "// put your setup code here, to run once:\n" +
             "int foo[] = { 1, 2, 3, 4, 5};\n" +

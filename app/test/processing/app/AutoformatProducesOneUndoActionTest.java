@@ -31,7 +31,7 @@ package processing.app;
 
 import org.fest.swing.fixture.JMenuItemFixture;
 import org.junit.Test;
-import processing.app.helpers.RSyntaxTextAreaFixture;
+import processing.app.helpers.SketchTextAreaFixture;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -65,7 +65,7 @@ public class AutoformatProducesOneUndoActionTest extends AbstractGUITest {
     JMenuItemFixture menuToolsAutoFormat = window.menuItem("menuToolsAutoFormat");
     menuToolsAutoFormat.requireEnabled();
 
-    RSyntaxTextAreaFixture editor = window.RSyntaxTextArea("editor");
+    SketchTextAreaFixture editor = window.textArea("editor");
     editor.setText(SOURCE_BEFORE);
 
     editor.setCaretPosition(29); // right before the first // (double slash)

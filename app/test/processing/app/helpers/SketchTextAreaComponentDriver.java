@@ -34,24 +34,24 @@ import org.fest.swing.core.Robot;
 import org.fest.swing.driver.JComponentDriver;
 import org.fest.swing.edt.GuiActionRunner;
 import org.fest.swing.edt.GuiQuery;
-import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import processing.app.syntax.SketchTextArea;
 
-public class RSyntaxTextAreaComponentDriver extends JComponentDriver {
+public class SketchTextAreaComponentDriver extends JComponentDriver {
 
-  public RSyntaxTextAreaComponentDriver(Robot robot) {
+  public SketchTextAreaComponentDriver(Robot robot) {
     super(robot);
   }
 
-  public void enterText(RSyntaxTextArea target, String text) {
+  public void enterText(SketchTextArea target, String text) {
     focusAndWaitForFocusGain(target);
     robot.enterText(text);
   }
 
-  public void setText(final RSyntaxTextArea target, final String text) {
+  public void setText(final SketchTextArea target, final String text) {
     focusAndWaitForFocusGain(target);
-    GuiActionRunner.execute(new GuiQuery<RSyntaxTextArea>() {
+    GuiActionRunner.execute(new GuiQuery<SketchTextArea>() {
 
-      protected RSyntaxTextArea executeInEDT() {
+      protected SketchTextArea executeInEDT() {
         target.setText(text);
         return target;
       }
@@ -60,7 +60,7 @@ public class RSyntaxTextAreaComponentDriver extends JComponentDriver {
     robot.waitForIdle();
   }
 
-  public String getText(final RSyntaxTextArea target) {
+  public String getText(final SketchTextArea target) {
     focusAndWaitForFocusGain(target);
     return GuiActionRunner.execute(new GuiQuery<String>() {
 
@@ -71,10 +71,10 @@ public class RSyntaxTextAreaComponentDriver extends JComponentDriver {
     });
   }
 
-  public RSyntaxTextArea selectAll(final RSyntaxTextArea target) {
-    return GuiActionRunner.execute(new GuiQuery<RSyntaxTextArea>() {
+  public SketchTextArea selectAll(final SketchTextArea target) {
+    return GuiActionRunner.execute(new GuiQuery<SketchTextArea>() {
 
-      protected RSyntaxTextArea executeInEDT() {
+      protected SketchTextArea executeInEDT() {
         target.selectAll();
         return target;
       }
@@ -82,7 +82,7 @@ public class RSyntaxTextAreaComponentDriver extends JComponentDriver {
     });
   }
 
-  public Integer getCaretPosition(final RSyntaxTextArea target) {
+  public Integer getCaretPosition(final SketchTextArea target) {
     focusAndWaitForFocusGain(target);
     return GuiActionRunner.execute(new GuiQuery<Integer>() {
 
@@ -93,11 +93,11 @@ public class RSyntaxTextAreaComponentDriver extends JComponentDriver {
     });
   }
 
-  public void setCaretPosition(final RSyntaxTextArea target, final int caretPosition) {
+  public void setCaretPosition(final SketchTextArea target, final int caretPosition) {
     focusAndWaitForFocusGain(target);
-    GuiActionRunner.execute(new GuiQuery<RSyntaxTextArea>() {
+    GuiActionRunner.execute(new GuiQuery<SketchTextArea>() {
 
-      protected RSyntaxTextArea executeInEDT() {
+      protected SketchTextArea executeInEDT() {
         target.setCaretPosition(caretPosition);
         return target;
       }

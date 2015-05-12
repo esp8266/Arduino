@@ -32,51 +32,51 @@ package processing.app.helpers;
 
 import org.fest.swing.core.Robot;
 import org.fest.swing.fixture.ComponentFixture;
-import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import processing.app.syntax.SketchTextArea;
 
-public class RSyntaxTextAreaFixture extends ComponentFixture {
+public class SketchTextAreaFixture extends ComponentFixture {
 
-  private final RSyntaxTextAreaComponentDriver driver;
+  private final SketchTextAreaComponentDriver driver;
 
-  public RSyntaxTextAreaFixture(Robot robot, Class type) {
+  public SketchTextAreaFixture(Robot robot, Class type) {
     super(robot, type);
-    this.driver = new RSyntaxTextAreaComponentDriver(robot);
+    this.driver = new SketchTextAreaComponentDriver(robot);
   }
 
-  public RSyntaxTextAreaFixture(Robot robot, String name, Class type) {
+  public SketchTextAreaFixture(Robot robot, String name, Class type) {
     super(robot, name, type);
-    this.driver = new RSyntaxTextAreaComponentDriver(robot);
+    this.driver = new SketchTextAreaComponentDriver(robot);
   }
 
-  public RSyntaxTextAreaFixture(Robot robot, RSyntaxTextArea target) {
+  public SketchTextAreaFixture(Robot robot, SketchTextArea target) {
     super(robot, target);
-    this.driver = new RSyntaxTextAreaComponentDriver(robot);
+    this.driver = new SketchTextAreaComponentDriver(robot);
   }
 
-  public RSyntaxTextAreaFixture enterText(String text) {
-    driver.enterText((RSyntaxTextArea) target, text);
+  public SketchTextAreaFixture enterText(String text) {
+    driver.enterText((SketchTextArea) target, text);
     return this;
   }
 
-  public RSyntaxTextAreaFixture setText(String text) {
-    driver.setText((RSyntaxTextArea) target, text);
+  public SketchTextAreaFixture setText(String text) {
+    driver.setText((SketchTextArea) target, text);
     return this;
   }
 
   public String getText() {
-    return driver.getText((RSyntaxTextArea) target);
+    return driver.getText((SketchTextArea) target);
   }
 
-  public RSyntaxTextAreaFixture selectAll() {
-    driver.selectAll((RSyntaxTextArea) target);
+  public SketchTextAreaFixture selectAll() {
+    driver.selectAll((SketchTextArea) target);
     return this;
   }
 
   public int getCaretPosition() {
-    return driver.getCaretPosition((RSyntaxTextArea) target);
+    return driver.getCaretPosition((SketchTextArea) target);
   }
 
   public void setCaretPosition(int caretPosition) {
-    driver.setCaretPosition((RSyntaxTextArea) target, caretPosition);
+    driver.setCaretPosition((SketchTextArea) target, caretPosition);
   }
 }

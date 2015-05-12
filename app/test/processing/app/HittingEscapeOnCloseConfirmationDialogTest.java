@@ -33,7 +33,7 @@ import org.fest.swing.core.KeyPressInfo;
 import org.fest.swing.finder.WindowFinder;
 import org.fest.swing.fixture.DialogFixture;
 import org.junit.Test;
-import processing.app.helpers.RSyntaxTextAreaFixture;
+import processing.app.helpers.SketchTextAreaFixture;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
@@ -44,7 +44,7 @@ public class HittingEscapeOnCloseConfirmationDialogTest extends AbstractGUITest 
 
   @Test
   public void shouldJustCloseTheDialog() throws Exception {
-    RSyntaxTextAreaFixture editor = window.RSyntaxTextArea("editor");
+    SketchTextAreaFixture editor = window.textArea("editor");
     editor.setText("test");
 
     window.close();

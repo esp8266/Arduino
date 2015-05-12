@@ -30,21 +30,21 @@
 
 package processing.app.helpers;
 
-import java.awt.Component;
-
 import org.fest.swing.core.ComponentMatcher;
-import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import processing.app.syntax.SketchTextArea;
 
-public class RSyntaxTextAreaComponentMatcher implements ComponentMatcher {
+import java.awt.*;
+
+public class SketchTextAreaComponentMatcher implements ComponentMatcher {
 
   private final String name;
 
-  public RSyntaxTextAreaComponentMatcher(String name) {
+  public SketchTextAreaComponentMatcher(String name) {
     this.name = name;
   }
 
   @Override
   public boolean matches(Component component) {
-    return component instanceof RSyntaxTextArea && name.equals(component.getName());
+    return component instanceof SketchTextArea && name.equals(component.getName());
   }
 }
