@@ -326,7 +326,13 @@ boolean callback_rmdir(SdFile& parentDir, char *filePathComponent,
   return true;
 }
 
-boolean SDClass::begin(uint8_t csPin, uint32_t sckRateID) {
+
+
+/* Implementation of class used to create `SDCard` object. */
+
+
+
+boolean SDClass::begin(uint8_t csPin, uint32_t speed) {
   /*
 
     Performs the initialisation required by the sdfatlib library.
@@ -334,7 +340,7 @@ boolean SDClass::begin(uint8_t csPin, uint32_t sckRateID) {
     Return true if initialization succeeds, false otherwise.
 
    */
-  return card.init(sckRateID, csPin) &&
+  return card.init(speed, csPin) &&
          volume.init(card) &&
          root.openRoot(volume);
 }
