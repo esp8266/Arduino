@@ -42,6 +42,10 @@ License (MIT license):
 #define TTL_OFFSET 4
 #define IP_OFFSET 10
 
+static const IPAddress MDNS_MULTICAST_ADDR(224, 0, 0, 251);
+static const int MDNS_MULTICAST_TTL = 1;
+static const int MDNS_PORT = 5353;
+
 
 MDNSResponder::MDNSResponder()
   : _expected(NULL)
@@ -49,6 +53,7 @@ MDNSResponder::MDNSResponder()
   , _response(NULL)
   , _responseLen(0)
   , _index(0)
+  , _conn(0)
 { }
 
 MDNSResponder::~MDNSResponder() {
@@ -149,21 +154,37 @@ bool MDNSResponder::begin(const char* domain, IPAddress addr, uint32_t ttlSecond
   records[IP_OFFSET + 0] = (uint8_t) ipAddress;
   
   // Open the MDNS socket if it isn't already open.
-  if (!_mdnsConn) {
-    if (!_mdnsConn.beginMulticast(addr, IPAddress(224, 0, 0, 251), 5353)) {
+  if (!_conn) {
+    ip_addr_t ifaddr;
+    ifaddr.addr = (uint32_t) addr;
+    ip_addr_t multicast_addr;
+    multicast_addr.addr = (uint32_t) MDNS_MULTICAST_ADDR;
+
+    if (igmp_joingroup(&ifaddr, &multicast_addr)!= ERR_OK) {
       return false;
     }
-  }
 
+    _conn = new UdpContext;
+    _conn->ref();
+
+    if (!_conn->listen(*IP_ADDR_ANY, MDNS_PORT)) {
+      return false;
+    }
+    _conn->setMulticastInterface(ifaddr);
+    _conn->setMulticastTTL(MDNS_MULTICAST_TTL);
+    _conn->onRx(std::bind(&MDNSResponder::update, this));
+    _conn->connect(multicast_addr, MDNS_PORT);
+  }
   return true;
 }
 
 void MDNSResponder::update() {
-  if (!_mdnsConn.parsePacket())
-    return;
+  if (!_conn->next()) {
+    return; 
+  }
 
   // Read available data.
-  int n = _mdnsConn.available();
+  int n = _conn->getSize();
 
   _index = 0;
 
@@ -172,7 +193,7 @@ void MDNSResponder::update() {
 #endif
   // Look for domain name in request and respond with canned response if found.
   for (int i = 0; i < n; ++i) {
-    uint8_t ch = tolower(_mdnsConn.read());
+    uint8_t ch = tolower(_conn->read());
 
 #ifdef MDNS_DEBUG
     String str(ch, 16);
@@ -191,9 +212,12 @@ void MDNSResponder::update() {
         Serial.print("responding, i=");
         Serial.println(i);
 #endif
-        _mdnsConn.beginPacketMulticast(IPAddress(224, 0, 0, 251), 5353, _localAddr);
-        _mdnsConn.write(_response, _responseLen);
-        _mdnsConn.endPacket();
+        ip_addr_t multicast_addr;
+        multicast_addr.addr = (uint32_t) MDNS_MULTICAST_ADDR;
+
+        _conn->append(reinterpret_cast<const char*>(_response), _responseLen);
+        _conn->send();
+
         _index = 0;
       }
     }
