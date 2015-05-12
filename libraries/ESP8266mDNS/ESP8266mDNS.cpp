@@ -30,7 +30,27 @@ License (MIT license):
 // - DNS request and response: http://www.ietf.org/rfc/rfc1035.txt
 // - Multicast DNS: http://www.ietf.org/rfc/rfc6762.txt
 
+#define LWIP_INTERNAL
 #include "ESP8266mDNS.h"
+#include <functional>
+  
+extern "C" 
+{
+    #include "osapi.h"
+    #include "ets_sys.h"
+}
+
+#include "debug.h"
+
+#include "WiFiUdp.h"
+#include "lwip/opt.h"
+#include "lwip/udp.h"
+#include "lwip/inet.h"
+#include "lwip/igmp.h"
+#include "lwip/mem.h"
+#include "include/UdpContext.h"
+
+
 
 
 // #define MDNS_DEBUG
