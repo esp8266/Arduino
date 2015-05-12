@@ -327,6 +327,15 @@ void ESP8266WebServer::_parseArguments(String data) {
 
 }
 
+void ESP8266WebServer::_uploadWriteByte(uint8_t b){
+  if(_currentUpload.buflen == HTTP_UPLOAD_BUFLEN){
+    if(_fileUploadHandler) _fileUploadHandler();
+    _currentUpload.size += _currentUpload.buflen;
+    _currentUpload.buflen = 0;
+  }
+  _currentUpload.buf[_currentUpload.buflen++] = b;
+}
+
 void ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t len){
   
 #ifdef DEBUG
@@ -428,41 +437,25 @@ void ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t 
             uint8_t argByte = client.read();
 readfile:
             while(argByte != 0x0D){
-              _currentUpload.buf[_currentUpload.buflen++] = argByte;
-              if(_currentUpload.buflen == 1460){
-  #ifdef DEBUG
-                DEBUG_OUTPUT.println("Write File: 1460");
-  #endif
-                if(_fileUploadHandler) _fileUploadHandler();
-                _currentUpload.size += _currentUpload.buflen;
-                _currentUpload.buflen = 0;
-              }
+              _uploadWriteByte(argByte);
               argByte = client.read();
             }
             
             argByte = client.read();
             if(argByte == 0x0A){
-#ifdef DEBUG
-              DEBUG_OUTPUT.print("Write File: ");
-              DEBUG_OUTPUT.println(_currentUpload.buflen);
-#endif
-              if(_fileUploadHandler) _fileUploadHandler();
-              _currentUpload.size += _currentUpload.buflen;
-              _currentUpload.buflen = 0;
-              
               argByte = client.read();
               if((char)argByte != '-'){
                 //continue reading the file
-                _currentUpload.buf[_currentUpload.buflen++] = 0x0D;
-                _currentUpload.buf[_currentUpload.buflen++] = 0x0A;
+                _uploadWriteByte(0x0D);
+                _uploadWriteByte(0x0A);
                 goto readfile;
               } else {
                 argByte = client.read();
                 if((char)argByte != '-'){
                   //continue reading the file
-                  _currentUpload.buf[_currentUpload.buflen++] = 0x0D;
-                  _currentUpload.buf[_currentUpload.buflen++] = 0x0A;
-                  _currentUpload.buf[_currentUpload.buflen++] = (uint8_t)('-');
+                  _uploadWriteByte(0x0D);
+                  _uploadWriteByte(0x0A);
+                  _uploadWriteByte((uint8_t)('-'));
                   goto readfile;
                 }
               }
@@ -471,7 +464,10 @@ readfile:
               client.readBytes(endBuf, boundary.length());
               
               if(strstr((const char*)endBuf, (const char*)(boundary.c_str())) != NULL){
+                if(_fileUploadHandler) _fileUploadHandler();
+                _currentUpload.size += _currentUpload.buflen;
                 _currentUpload.status = UPLOAD_FILE_END;
+                if(_fileUploadHandler) _fileUploadHandler();
 #ifdef DEBUG
                 DEBUG_OUTPUT.print("End File: ");
                 DEBUG_OUTPUT.print(_currentUpload.filename);
@@ -480,7 +476,6 @@ readfile:
                 DEBUG_OUTPUT.print(" Size: ");
                 DEBUG_OUTPUT.println(_currentUpload.size);
 #endif
-                if(_fileUploadHandler) _fileUploadHandler();
                 line = client.readStringUntil(0x0D);
                 client.readStringUntil(0x0A);
                 if(line == "--"){
@@ -491,33 +486,17 @@ readfile:
                 }
                 continue;
               } else {
-                _currentUpload.buf[_currentUpload.buflen++] = 0x0D;
-                _currentUpload.buf[_currentUpload.buflen++] = 0x0A;
+                _uploadWriteByte(0x0D);
+                _uploadWriteByte(0x0A);
                 uint32_t i = 0;
                 while(i < boundary.length()){
-                  _currentUpload.buf[_currentUpload.buflen++] = endBuf[i++];
-                  if(_currentUpload.buflen == 1460){
-#ifdef DEBUG
-                    DEBUG_OUTPUT.println("Write File: 1460");
-#endif
-                    if(_fileUploadHandler) _fileUploadHandler();
-                    _currentUpload.size += _currentUpload.buflen;
-                    _currentUpload.buflen = 0;
-                  }
+                  _uploadWriteByte(endBuf[i++]);
                 }
                 argByte = client.read();
                 goto readfile;
               }
             } else {
-              _currentUpload.buf[_currentUpload.buflen++] = 0x0D;
-              if(_currentUpload.buflen == 1460){
-  #ifdef DEBUG
-                DEBUG_OUTPUT.println("Write File: 1460");
-  #endif
-                if(_fileUploadHandler) _fileUploadHandler();
-                _currentUpload.size += _currentUpload.buflen;
-                _currentUpload.buflen = 0;
-              }
+              _uploadWriteByte(0x0D);
               goto readfile;
             }
             break;
