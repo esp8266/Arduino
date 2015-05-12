@@ -4,6 +4,13 @@ ARDUINO 1.6.5
 * File, Sketch and Tools menu items are properly handled when switching between different windows
 * Sketch > Export compiled Binary: saves the compiled binary (hex, bin) into the sketch folder. Thanks @championswimmer
 * New editor, based on RSyntaxTextArea. Thanks @ricardojlrufino
+* New keywords. Thanks @Chris--A
+
+[libraries]
+* LiquidCrystal fixes. Thanks @newbie15
+
+[core]
+* SAM: added watchdog routing for Due. Thanks @bobc
 
 ARDUINO 1.6.4 - 2015.05.06
 
