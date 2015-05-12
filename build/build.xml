@@ -850,6 +850,20 @@
     <chmod perm="755">
       <fileset dir="windows/work" includes="**/*.html, **/*.dll, **/*.exe" />
     </chmod>
+
+    <loadproperties srcfile="${WINDOWS_BUNDLED_JVM}/release" prefix="windows"/>
+
+    <fail message="It looks like ${WINDOWS_BUNDLED_JVM} does not contain a Windows JVM">
+      <condition>
+        <not>
+          <equals arg1="${windows.OS_NAME}" arg2="&quot;Windows&quot;"/>
+        </not>
+      </condition>
+    </fail>
+
+    <copy todir="${staging_folder}/work/java" includeemptydirs="true" preservelastmodified="true" overwrite="true" failonerror="true">
+      <fileset dir="${WINDOWS_BUNDLED_JVM}" includes="*/**"/>
+    </copy>
   </target>
 
   <target name="windows-build-avr-toolchain">
@@ -870,21 +884,6 @@
   </target>
 
   <target name="windows-dist" depends="build" description="Create .zip files of windows version">
-
-    <loadproperties srcfile="${WINDOWS_BUNDLED_JVM}/release" prefix="windows"/>
-
-    <fail message="It looks like ${WINDOWS_BUNDLED_JVM} does not contain a Windows JVM">
-      <condition>
-        <not>
-          <equals arg1="${windows.OS_NAME}" arg2="&quot;Windows&quot;"/>
-        </not>
-      </condition>
-    </fail>
-
-    <copy todir="${staging_folder}/work/java" includeemptydirs="true" preservelastmodified="true" overwrite="true" failonerror="true">
-      <fileset dir="${WINDOWS_BUNDLED_JVM}" includes="*/**"/>
-    </copy>
-
     <zip destfile="windows/arduino-${version}-${platform}.zip" level="9">
       <zipfileset dir="windows/work" prefix="arduino-${version}"/>
     </zip>
