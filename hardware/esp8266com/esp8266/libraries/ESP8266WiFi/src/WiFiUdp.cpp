@@ -21,7 +21,8 @@
 */
 
 #define LWIP_INTERNAL
-
+#include <functional>
+  
 extern "C" 
 {
     #include "include/wl_definitions.h"
