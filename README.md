@@ -132,7 +132,8 @@ else they default to pins 4(SDA) and 5(SCL).
 
 #### SPI ####
 
-SPI library supports the entire Arduino SPI API including transactions, including setting phase and polarity.
+SPI library supports the entire Arduino SPI API including transactions, including setting phase (CPHA).
+Setting the Clock polarity (CPOL) is not supported, yet (SPI_MODE2 and SPI_MODE3 not working).
 
 #### ESP-specific APIs ####
 
