@@ -24,16 +24,12 @@
 #include <Arduino.h>
 #include <stdlib.h>
 
-#define FCPU80 80000000L
+#define SPI_HAS_TRANSACTION
 
-#if F_CPU == FCPU80
-#define SPI_CLOCK_DIV80M	0x80000000 //80 MHz
-#define SPI_CLOCK_DIV40M	0x00001001 //40 MHz
-#define SPI_CLOCK_DIV20M	0x00041001 //20 MHz
-#define SPI_CLOCK_DIV16M	0x000fffc0 //16 MHz
-#define SPI_CLOCK_DIV10M	0x000c1001 //10 MHz
+// This defines are not representing the real Divider of the ESP8266
+// the Defines match to an AVR Arduino on 16MHz for better compatibility
+#if F_CPU == 80000000L
 #define SPI_CLOCK_DIV2 		0x00101001 //8 MHz
-#define SPI_CLOCK_DIV5M		0x001c1001 //5 MHz
 #define SPI_CLOCK_DIV4 		0x00241001 //4 MHz
 #define SPI_CLOCK_DIV8 		0x004c1001 //2 MHz
 #define SPI_CLOCK_DIV16 	0x009c1001 //1 MHz
@@ -41,13 +37,6 @@
 #define SPI_CLOCK_DIV64 	0x027c1001 //250 KHz
 #define SPI_CLOCK_DIV128 	0x04fc1001 //125 KHz
 #else
-#define SPI_CLOCK_DIV160M	0x80000000 //160 MHz
-#define SPI_CLOCK_DIV80M	0x00001001 //80 MHz
-#define SPI_CLOCK_DIV40M	0x00041001 //40 MHz
-#define SPI_CLOCK_DIV32M	0x000fffc0 //32 MHz
-#define SPI_CLOCK_DIV20M	0x000c1001 //20 MHz
-#define SPI_CLOCK_DIV16M	0x00101001 //16 MHz
-#define SPI_CLOCK_DIV10M	0x001c1001 //10 MHz
 #define SPI_CLOCK_DIV2 		0x00241001 //8 MHz
 #define SPI_CLOCK_DIV4 		0x004c1001 //4 MHz
 #define SPI_CLOCK_DIV8  	0x009c1001 //2 MHz
@@ -56,14 +45,14 @@
 #define SPI_CLOCK_DIV64 	0x04fc1001 //250 KHz
 #endif
 
-const uint8_t SPI_MODE0 = 0x00;
-const uint8_t SPI_MODE1 = 0x04;
-const uint8_t SPI_MODE2 = 0x08;
-const uint8_t SPI_MODE3 = 0x0C;
+const uint8_t SPI_MODE0 = 0x00; ///<  CPOL: 0  CPHA: 0
+const uint8_t SPI_MODE1 = 0x01; ///<  CPOL: 0  CPHA: 1
+const uint8_t SPI_MODE2 = 0x10; ///<  CPOL: 1  CPHA: 0
+const uint8_t SPI_MODE3 = 0x11; ///<  CPOL: 1  CPHA: 1
 
 class SPISettings {
 public:
-  SPISettings() :_clock(SPI_CLOCK_DIV16), _bitOrder(LSBFIRST), _dataMode(SPI_MODE0){}
+  SPISettings() :_clock(1000000), _bitOrder(LSBFIRST), _dataMode(SPI_MODE0){}
   SPISettings(uint32_t clock, uint8_t bitOrder, uint8_t dataMode) :_clock(clock), _bitOrder(bitOrder), _dataMode(dataMode){}
   uint32_t _clock;
   uint8_t  _bitOrder;
@@ -77,6 +66,7 @@ public:
   void end();
   void setBitOrder(uint8_t bitOrder);  
   void setDataMode(uint8_t dataMode);
+  void setFrequency(uint32_t freq);
   void setClockDivider(uint32_t clockDiv);
   void beginTransaction(SPISettings settings);
   uint8_t transfer(uint8_t data);

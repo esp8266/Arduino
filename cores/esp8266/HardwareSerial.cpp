@@ -118,24 +118,14 @@ int uart_get_debug();
 void ICACHE_RAM_ATTR uart_interrupt_handler(uart_t* uart) {
 
     // -------------- UART 0 --------------
-    uint32_t status = U0IS;
     if(Serial.isRxEnabled()) {
-        if(status & (1 << UIFF)) {
-            while(true) {
-                int rx_count = (U0S >> USTXC) & 0xff;
-                if(!rx_count)
-                    break;
-
-                while(rx_count--) {
-                    char c = U0F & 0xff;
-                    Serial._rx_complete_irq(c);
-                }
-            }
+        while(U0IS & (1 << UIFF)) {
+            Serial._rx_complete_irq((char)(U0F & 0xff));
             U0IC = (1 << UIFF);
         }
     }
     if(Serial.isTxEnabled()) {
-        if(status & (1 << UIFE)) {
+        if(U0IS & (1 << UIFE)) {
             U0IC = (1 << UIFE);
             Serial._tx_empty_irq();
         }
@@ -143,25 +133,14 @@ void ICACHE_RAM_ATTR uart_interrupt_handler(uart_t* uart) {
 
     // -------------- UART 1 --------------
 
-    status = U1IS;
     if(Serial1.isRxEnabled()) {
-        if(status & (1 << UIFF)) {
-            while(true) {
-                int rx_count = (U1S >> USTXC) & 0xff;
-                if(!rx_count)
-                    break;
-
-                while(rx_count--) {
-                    char c = U1F & 0xff;
-                    Serial1._rx_complete_irq(c);
-                }
-            }
+        while(U1IS & (1 << UIFF)) {
+            Serial1._rx_complete_irq((char)(U1F & 0xff));
             U1IC = (1 << UIFF);
         }
     }
     if(Serial1.isTxEnabled()) {
-        status = U1IS;
-        if(status & (1 << UIFE)) {
+        if(U1IS & (1 << UIFE)) {
             U1IC = (1 << UIFE);
             Serial1._tx_empty_irq();
         }

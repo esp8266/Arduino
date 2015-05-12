@@ -75,6 +75,11 @@ void WiFiServer::begin()
 
 extern "C" uint32_t esp_micros_at_task_start();
 
+bool WiFiServer::hasClient(){
+  if (_unclaimed) return true;
+  return false;
+}
+
 WiFiClient WiFiServer::available(byte* status)
 {
     static uint32_t lastPollTime = 0;

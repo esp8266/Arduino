@@ -28,9 +28,9 @@
 
 #ifdef ESP8266
 #include "SPI.h"
-uint32_t const SPI_FULL_SPEED = SPI_CLOCK_DIV2;
-uint32_t const SPI_HALF_SPEED = SPI_CLOCK_DIV4;
-uint32_t const SPI_QUARTER_SPEED = SPI_CLOCK_DIV8;
+uint32_t const SPI_FULL_SPEED = 8000000;
+uint32_t const SPI_HALF_SPEED = 4000000;
+uint32_t const SPI_QUARTER_SPEED = 2000000;
 #else
 /** Set SCK to max rate of F_CPU/2. See Sd2Card::setSckRate(). */
 uint8_t const SPI_FULL_SPEED = 0;
