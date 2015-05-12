@@ -345,8 +345,6 @@ boolean SDClass::begin(uint8_t csPin, uint32_t speed) {
          root.openRoot(volume);
 }
 
-
-
 // this little helper is used to traverse paths
 SdFile SDClass::getParentDir(const char *filepath, int *index) {
   // get parent directory
