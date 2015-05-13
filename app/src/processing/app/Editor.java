@@ -959,7 +959,7 @@ public class Editor extends JFrame implements RunnerListener {
   protected SketchTextArea createTextArea() throws IOException {
     SketchTextArea textArea = new SketchTextArea(base.getPdeKeywords());
     textArea.requestFocusInWindow();
-    textArea.setMarkOccurrences(true);
+    textArea.setMarkOccurrences(PreferencesData.getBoolean("editor.advanced"));
     textArea.setMarginLineEnabled(false);
     textArea.setCodeFoldingEnabled(PreferencesData.getBoolean("editor.code_folding"));
     textArea.setAntiAliasingEnabled(PreferencesData.getBoolean("editor.antialias"));
