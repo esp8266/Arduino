@@ -1159,15 +1159,15 @@ public class Compiler implements MessageConsumer {
     dict.put("ide_version", "" + BaseNoGui.REVISION);
 
     try {
-      String tmp_file = prefs.getOrExcept("recipe.output.tmp_file");
-      tmp_file = StringReplacer.replaceFromMapping(tmp_file, dict);
-      String save_file = prefs.getOrExcept("recipe.output.save_file");
-      save_file = StringReplacer.replaceFromMapping(save_file, dict);
+      String compiledSketch = prefs.getOrExcept("recipe.output.tmp_file");
+      compiledSketch = StringReplacer.replaceFromMapping(compiledSketch, dict);
+      String copyOfCompiledSketch = prefs.getOrExcept("recipe.output.save_file");
+      copyOfCompiledSketch = StringReplacer.replaceFromMapping(copyOfCompiledSketch, dict);
 
-      File hexFile = new File(prefs.get("build.path") + "/" + tmp_file);
-      File saveFile = new File(sketch.getFolder().getAbsolutePath() + "/" + save_file);
+      File compiledSketchFile = new File(prefs.get("build.path"), compiledSketch);
+      File copyOfCompiledSketchFile = new File(sketch.getFolder(), copyOfCompiledSketch);
 
-      FileUtils.copyFile(hexFile, saveFile);
+      FileUtils.copyFile(compiledSketchFile, copyOfCompiledSketchFile);
     } catch (Exception e) {
       throw new RunnerException(e);
     }
