@@ -3,19 +3,10 @@
 // Based on NodeMCU platform_flash
 // https://github.com/nodemcu/nodemcu-firmware
 
-extern char _flash_code_end[];
 extern uint32_t _SPIFFS_start;
-extern uint32_t _SPIFFS_end;
-
-#define SPIFFS_PARTITION_SIZE() (uint32_t)(_SPIFFS_end - _SPIFFS_start)
-#define CAN_FIT_ON_SPIFFS(a,l) (((a+l)-_SPIFFS_start) <= SPIFFS_PARTITION_SIZE())
 
 uint32_t flashmem_write( const void *from, uint32_t toaddr, uint32_t size )
 {
-  if(!CAN_FIT_ON_SPIFFS(toaddr,size)){
-    os_printf("File Out Of Bounds\n");
-    return 0;
-  }
   uint32_t temp, rest, ssize = size;
   unsigned i;
   char tmpdata[ INTERNAL_FLASH_WRITE_UNIT_SIZE ];
@@ -62,10 +53,6 @@ uint32_t flashmem_write( const void *from, uint32_t toaddr, uint32_t size )
 
 uint32_t flashmem_read( void *to, uint32_t fromaddr, uint32_t size )
 {
-  if(!CAN_FIT_ON_SPIFFS(fromaddr,size)){
-    os_printf("File Out Of Bounds\n");
-    return 0;
-  }
   uint32_t temp, rest, ssize = size;
   unsigned i;
   char tmpdata[ INTERNAL_FLASH_READ_UNIT_SIZE ];
@@ -224,13 +211,13 @@ uint32_t flashmem_read_internal( void *to, uint32_t fromaddr, uint32_t size )
 }
 
 uint32_t flashmem_get_first_free_block_address(){
-  if (_SPIFFS_start == 0){
-	  debugf("_SPIFFS_start:%08x\n", _SPIFFS_start);
+  if ((uint32_t)&_SPIFFS_start == 0){
 	  return 0;
   }
+	debugf("_SPIFFS_start:%08x\n", (uint32_t)&_SPIFFS_start);
 
   // Round the total used flash size to the closest flash block address
   uint32_t end;
-  flashmem_find_sector( _SPIFFS_start - 1, NULL, &end);
+  flashmem_find_sector( (uint32_t)&_SPIFFS_start - 1, NULL, &end);
   return end + 1;
 }
