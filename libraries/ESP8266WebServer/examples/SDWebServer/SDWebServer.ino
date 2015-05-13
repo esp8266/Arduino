@@ -111,10 +111,23 @@ bool loadFromSdCard(String path){
     dataType = 0;
     path = 0;
     
-    if(client.write(dataFile) != dataFile.size()){
-      DBG_OUTPUT_PORT.println("Sent less data than expected!");
-    }
+    uint8_t obuf[WWW_BUF_SIZE];
     
+    while (dataFile.available() > WWW_BUF_SIZE){
+      dataFile.read(obuf, WWW_BUF_SIZE);
+      if(client.write(obuf, WWW_BUF_SIZE) != WWW_BUF_SIZE){
+        DBG_OUTPUT_PORT.println("Sent less data than expected!");
+        dataFile.close();
+        return true;
+      }
+    }
+    uint16_t leftLen = dataFile.available();
+    dataFile.read(obuf, leftLen);
+    if(client.write(obuf, leftLen) != leftLen){
+      DBG_OUTPUT_PORT.println("Sent less data than expected!");
+      dataFile.close();
+      return true;
+    }
     dataFile.close();
     client.stop();
     return true;
