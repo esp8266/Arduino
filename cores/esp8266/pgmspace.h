@@ -12,13 +12,11 @@ extern "C" {
 }
 #endif
 
-#define PROGMEM
+#define PROGMEM     ICACHE_RODATA_ATTR
 #define PGM_P  		const char *
-#define PSTR(str) 	(str)
+#define PGM_VOID_P  const void *
+#define PSTR(s) (__extension__({static const char __c[] PROGMEM = (s); &__c[0];}))
 
-#define vsnprintf_P(...) 	ets_vsnprintf( __VA_ARGS__ )
-#define snprintf_P(...) 	snprintf( __VA_ARGS__ )
-#define printf_P(...)       os_printf(__VA_ARGS__)
 
 #define _SFR_BYTE(n) (n)
 
@@ -32,23 +30,56 @@ typedef uint16_t prog_uint16_t;
 typedef int32_t prog_int32_t;
 typedef uint32_t prog_uint32_t;
 
-#define memcpy_P(dest, src, num) 	memcpy((dest), (src), (num))
-#define strcpy_P(dest, src) 		strcpy((dest), (src))
-#define strcat_P(dest, src) 		strcat((dest), (src))
-#define strcmp_P(a, b) 				strcmp((a), (b))
-#define strstr_P(a, b) 				strstr((a), (b))
-#define strlen_P(s) 				strlen((const char *)(s))
-#define strcasecmp_P(a, b)          strcasecmp((a), (b))
-#define strncpy_P(dest, src, size) 		strncpy((dest), (src), (size))
-#define strncat_P(dest, src, size) 		strncat((dest), (src), (size))
-#define strncmp_P(a, b, size) 			strncmp((a), (b), (size))
-#define strnlen_P(s, size) 				strnlen((const char *)(s), (size))
-#define strncasecmp_P(a, b, size)       strncasecmp((a), (b), (size))
+#define SIZE_IRRELEVANT 0x7fffffff
 
-#define pgm_read_byte(addr) 		(*(const unsigned char *)(addr))
-#define pgm_read_word(addr) 		(*(const unsigned short *)(addr))
-#define pgm_read_dword(addr) 		(*(const unsigned long *)(addr))
-#define pgm_read_float(addr) 		(*(const float *)(addr))
+extern void* memcpy_P(void* dest, const void* src, size_t count);
+
+extern char* strncpy_P(char* dest, const char* src, size_t size);
+#define strcpy_P(dest, src)          strncpy_P((dest), (src), SIZE_IRRELEVANT)
+
+extern char* strncat_P(char* dest, const char* src, size_t size);
+#define strcat_P(dest, src)          strncat_P((dest), (src), SIZE_IRRELEVANT)
+
+extern int strncmp_P(const char* str1, const char* str2P, size_t size);
+#define strcmp_P(str1, str2P)          strncmp_P((str1), (str2P), SIZE_IRRELEVANT)
+
+extern int strncasecmp_P(const char* str1, const char* str2P, size_t size);
+#define strcasecmp_P(str1, str2P)          strncasecmp_P((str1), (str2P), SIZE_IRRELEVANT)
+
+extern size_t strnlen_P(const char *s, size_t size);
+#define strlen_P(strP)          strnlen_P((strP), SIZE_IRRELEVANT)
+
+extern int	printf_P(const char *formatP, ...);
+extern int	snprintf_P(char *str, size_t strSize, const char *formatP, ...);
+extern int	vsnprintf_P(char *str, size_t strSize, const char *formatP, va_list ap);
+
+// flash memory must be read using 32 bit aligned addresses else a processor
+// exception will be triggered
+// order within the 32 bit values are
+// --------------
+// b3, b2, b1, b0
+//     w1,     w0
+
+#define pgm_read_byte(addr) 		                                           \
+(__extension__({                                                               \
+    PGM_P __local = (PGM_P)(addr);  /* isolate varible for macro expansion */         \
+    ptrdiff_t __offset = ((uint32_t)__local & 0x00000003); /* byte aligned mask */            \
+    const uint32_t* __addr32 = reinterpret_cast<const uint32_t*>(reinterpret_cast<const uint8_t*>(__local)-__offset);   \
+    uint8_t __result = ((*__addr32) >> (__offset * 8));                        \
+    __result;                                                                  \
+}))
+
+#define pgm_read_word(addr) 		                                           \
+(__extension__({                                                               \
+    PGM_P __local = (PGM_P)(addr); /* isolate varible for macro expansion */          \
+    ptrdiff_t __offset = ((uint32_t)__local & 0x00000002);   /* word aligned mask */          \
+    const uint32_t* __addr32 = reinterpret_cast<const uint32_t*>(reinterpret_cast<const uint8_t*>(__local) - __offset); \
+    uint16_t __result = ((*__addr32) >> (__offset * 8));                       \
+    __result;                                                                  \
+}))	
+
+#define pgm_read_dword(addr) 		(*reinterpret_cast<const uint32_t*>(addr))
+#define pgm_read_float(addr) 		(*reinterpret_cast<const float*>(addr))
 
 #define pgm_read_byte_near(addr) 	pgm_read_byte(addr)
 #define pgm_read_word_near(addr) 	pgm_read_word(addr)

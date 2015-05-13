@@ -116,7 +116,7 @@ char* strncpy(char * dest, const char * src, size_t n) {
     return ets_strncpy(dest, src, n);
 }
 
-size_t strnlen(const char *s, size_t len) {
+size_t ICACHE_FLASH_ATTR strnlen(const char *s, size_t len) {
     // there is no ets_strnlen
     const char *cp;
     for (cp = s; len != 0 && *cp != '\0'; cp++, len--);
@@ -127,7 +127,7 @@ char* strstr(const char *haystack, const char *needle) {
     return ets_strstr(haystack, needle);
 }
 
-char* strchr(const char * str, int character) {
+char* ICACHE_FLASH_ATTR strchr(const char * str, int character) {
     while(1) {
         if(*str == 0x00) {
             return NULL;
@@ -139,7 +139,7 @@ char* strchr(const char * str, int character) {
     }
 }
 
-char * strrchr(const char * str, int character) {
+char * ICACHE_FLASH_ATTR strrchr(const char * str, int character) {
     char * ret = NULL;
     while(1) {
         if(*str == 0x00) {
@@ -223,7 +223,7 @@ char* ICACHE_FLASH_ATTR strtok(char * str, const char * delimiters) {
     return ret;
 }
 
-int strcasecmp(const char * str1, const char * str2) {
+int ICACHE_FLASH_ATTR strcasecmp(const char * str1, const char * str2) {
     int d = 0;
     while(1) {
         int c1 = tolower(*str1++);
