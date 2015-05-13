@@ -55,7 +55,6 @@ void returnOK(){
   message += "Access-Control-Allow-Origin: *\r\n";
   message += "\r\n";
   client.print(message);
-  message = 0;
   client.stop();
 }
 
@@ -69,7 +68,6 @@ void returnFail(String msg){
   message += msg;
   message += "\r\n";
   client.print(message);
-  message = 0;
   client.stop();
 }
 
@@ -108,8 +106,8 @@ bool loadFromSdCard(String path){
     head += "\r\nAccess-Control-Allow-Origin: *";
     head += "\r\n\r\n";
     client.print(head);
-    dataType = 0;
-    path = 0;
+    dataType = String();
+    path = String();
     
     uint8_t obuf[WWW_BUF_SIZE];
     
@@ -172,11 +170,11 @@ void deleteRecursive(String path){
       entry.close();
       SD.remove((char *)entryPath.c_str());
     }
-    entryPath = 0;
+    entryPath = String();
     yield();
   }
   SD.rmdir((char *)path.c_str());
-  path = 0;
+  path = String();
   file.close();
 }
 
@@ -186,7 +184,7 @@ void handleDelete(){
   if(path == "/" || !SD.exists((char *)path.c_str())) return returnFail("BAD PATH");
   deleteRecursive(path);
   returnOK();
-  path = 0;
+  path = String();
 }
 
 void handleCreate(){
@@ -203,7 +201,7 @@ void handleCreate(){
     SD.mkdir((char *)path.c_str());
   }
   returnOK();
-  path = 0;
+  path = String();
 }
 
 void printDirectory() {
@@ -211,7 +209,7 @@ void printDirectory() {
   String path = server.arg("dir");
   if(path != "/" && !SD.exists((char *)path.c_str())) return returnFail("BAD PATH");
   File dir = SD.open((char *)path.c_str());
-  path = 0;
+  path = String();
   if(!dir.isDirectory()){
     dir.close();
     return returnFail("NOT DIR");
@@ -242,7 +240,7 @@ void printDirectory() {
  output += "]";
  client.write(output.c_str(), output.length());
  client.stop();
- output = 0;
+ output = String();
 }
 
 void handleNotFound(){
