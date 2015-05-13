@@ -212,6 +212,7 @@ void loop(void);
 
 #include "HardwareSerial.h"
 #include "Esp.h"
+#include "debug.h"
 
 uint16_t makeWord(uint16_t w);
 uint16_t makeWord(byte h, byte l);
@@ -229,8 +230,6 @@ long random(long, long);
 void randomSeed(unsigned int);
 long map(long, long, long, long, long);
 
-// Debugging functions
-void hexdump(uint8_t *mem, uint32_t len, uint8_t cols = 16);
 
 #endif
 
