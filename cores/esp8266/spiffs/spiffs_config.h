@@ -25,8 +25,6 @@
 #define IRAM_ATTR __attribute__((section(".iram.text")))
 #define STORE_TYPEDEF_ATTR __attribute__((aligned(4),packed))
 #define STORE_ATTR __attribute__((aligned(4)))
-#define debugf(fmt, ...) os_printf(fmt"\r\n", ##__VA_ARGS__)
-#define SYSTEM_ERROR(fmt, ...) os_printf("ERROR: " fmt "\r\n", ##__VA_ARGS__)
 
 #define SPIFFS_CHACHE 0
 
@@ -59,6 +57,8 @@ typedef uint8_t u8_t;
 #endif
 
 // compile time switches
+#define debugf(fmt, ...) //os_printf(fmt"\r\n", ##__VA_ARGS__)
+#define SYSTEM_ERROR(fmt, ...) //os_printf("ERROR: " fmt "\r\n", ##__VA_ARGS__)
 
 // Set generic spiffs debug output call.
 #ifndef SPIFFS_DGB
