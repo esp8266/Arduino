@@ -56,6 +56,28 @@ public:
   IPAddress remoteIP();
   uint16_t  remotePort();
 
+  template<typename T> size_t write(T &src){
+    uint8_t obuf[1460];
+    size_t doneLen = 0;
+    size_t sentLen;
+    int i;
+    
+    while (src.available() > 1460){
+      src.read(obuf, 1460);
+      sentLen = write(obuf, 1460);
+      doneLen = doneLen + sentLen;
+      if(sentLen != 1460){
+        return doneLen;
+      }
+    }
+      
+    uint16_t leftLen = src.available();
+    src.read(obuf, leftLen);
+    sentLen = write(obuf, leftLen);
+    doneLen = doneLen + sentLen;
+    return doneLen;
+  }
+
   friend class WiFiServer;
 
   using Print::write;
