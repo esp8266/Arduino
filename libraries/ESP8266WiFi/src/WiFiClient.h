@@ -55,6 +55,8 @@ public:
 
   IPAddress remoteIP();
   uint16_t  remotePort();
+  bool getNoDelay();
+  void setNoDelay(bool nodelay);
 
   template<typename T> size_t write(T &src){
     uint8_t obuf[1460];

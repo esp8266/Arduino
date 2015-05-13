@@ -123,6 +123,19 @@ void ICACHE_FLASH_ATTR WiFiClient::_err(int8_t err)
     esp_schedule();
 }
 
+
+void ICACHE_FLASH_ATTR WiFiClient::setNoDelay(bool nodelay) {
+    if (!_client)
+        return;
+    _client->setNoDelay(nodelay);
+}
+
+bool ICACHE_FLASH_ATTR WiFiClient::getNoDelay() {
+    if (!_client)
+        return false;
+    return _client->getNoDelay();
+}
+
 size_t ICACHE_FLASH_ATTR WiFiClient::write(uint8_t b) 
 {
     return write(&b, 1);
