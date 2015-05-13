@@ -39,15 +39,18 @@ the entire chip (chip erase). The W25Q32BV has 1,024 erasable sectors and 64 era
 The small 4KB sectors allow for greater flexibility in applications that require data and parameter storage.
 ********************/
 
+extern uint32_t _SPIFFS_start;
+extern uint32_t _SPIFFS_end;
+
 spiffs_config spiffs_get_storage_config()
 {
 	spiffs_config cfg = {0};
-	cfg.phys_addr = ( u32_t )flashmem_get_first_free_block_address();
+	cfg.phys_addr = (u32_t)&_SPIFFS_start;
 	if (cfg.phys_addr == 0)
 		return cfg;
 	cfg.phys_addr += 0x3000;
 	cfg.phys_addr &= 0xFFFFC000;  // align to 4 sector.
-	cfg.phys_size = INTERNAL_FLASH_SIZE - ( ( u32_t )cfg.phys_addr - INTERNAL_FLASH_START_ADDRESS );
+	cfg.phys_size = (u32_t)((u32_t)&_SPIFFS_end - (u32_t)&_SPIFFS_start);
 	/*cfg.phys_addr = INTERNAL_FLASH_SIZE - SPIFFS_WORK_SIZE + INTERNAL_FLASH_START_ADDRESS;
 	cfg.phys_addr += 0x3000;
 	cfg.phys_addr &= 0xFFFFC000;  // align to 4 sector.
@@ -69,9 +72,8 @@ bool spiffs_format_internal()
 
   u32_t sect_first, sect_last;
   sect_first = cfg.phys_addr;
-  sect_first = flashmem_get_sector_of_address(sect_first);
-  sect_last = cfg.phys_addr + cfg.phys_size;
-  sect_last = flashmem_get_sector_of_address(sect_last);
+  sect_first = flashmem_get_sector_of_address((u32_t)&_SPIFFS_start);
+  sect_last = flashmem_get_sector_of_address((u32_t)&_SPIFFS_end);
   debugf("sect_first: %x, sect_last: %x\n", sect_first, sect_last);
   while( sect_first <= sect_last )
 	if(!flashmem_erase_sector( sect_first ++ ))
