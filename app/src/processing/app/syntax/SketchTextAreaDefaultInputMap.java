@@ -1,6 +1,7 @@
 package processing.app.syntax;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextAreaDefaultInputMap;
+import org.fife.ui.rtextarea.RTextArea;
 import org.fife.ui.rtextarea.RTextAreaEditorKit;
 import processing.app.PreferencesData;
 
@@ -22,6 +23,11 @@ public class SketchTextAreaDefaultInputMap extends RSyntaxTextAreaDefaultInputMa
     } else {
       remove(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, alt));
       remove(KeyStroke.getKeyStroke(KeyEvent.VK_UP, alt));
+    }
+
+    boolean isOSX = RTextArea.isOSX();
+    if (isOSX) {
+      put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, alt), SketchTextAreaEditorKit.rtaDeleteNextWordAction);
     }
   }
 }

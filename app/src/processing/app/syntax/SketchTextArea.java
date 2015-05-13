@@ -35,8 +35,8 @@ import org.fife.ui.rsyntaxtextarea.Theme;
 import org.fife.ui.rsyntaxtextarea.Token;
 import org.fife.ui.rsyntaxtextarea.focusabletip.FocusableTip;
 import org.fife.ui.rtextarea.RTextArea;
+import org.fife.ui.rtextarea.RTextAreaUI;
 import org.fife.ui.rtextarea.RUndoManager;
-
 import processing.app.*;
 
 import javax.swing.*;
@@ -47,7 +47,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Segment;
 import javax.swing.undo.UndoManager;
-
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -242,7 +241,7 @@ public class SketchTextArea extends RSyntaxTextArea {
   protected void configurePopupMenu(JPopupMenu popupMenu) {
     super.configurePopupMenu(popupMenu);
   }
-  
+
   @Override
   protected RTAMouseListener createMouseListener() {
     return new SketchTextAreaMouseListener(this);
@@ -315,8 +314,8 @@ public class SketchTextArea extends RSyntaxTextArea {
       return null;
     }
   }
-  
-  
+
+
   /**
    * Handles http hyperlinks.
    * NOTE (@Ricardo JL Rufino): Workaround to enable hyperlinks by default: https://github.com/bobbylight/RSyntaxTextArea/issues/119
@@ -326,12 +325,12 @@ public class SketchTextArea extends RSyntaxTextArea {
     private Insets insets;
     private boolean isScanningForLinks;
     private int hoveredOverLinkOffset = -1;
-    
+
     protected SketchTextAreaMouseListener(RTextArea textArea) {
       super(textArea);
       insets = new Insets(0, 0, 0, 0);
     }
-    
+
     /**
      * Notifies all listeners that have registered interest for notification
      * on this event type.  The listener list is processed last to first.
@@ -344,22 +343,22 @@ public class SketchTextArea extends RSyntaxTextArea {
       Object[] listeners = listenerList.getListenerList();
       // Process the listeners last to first, notifying
       // those that are interested in this event
-      for (int i = listeners.length-2; i>=0; i-=2) {
-        if (listeners[i]==HyperlinkListener.class) {
-          ((HyperlinkListener)listeners[i+1]).hyperlinkUpdate(e);
-        }          
+      for (int i = listeners.length - 2; i >= 0; i -= 2) {
+        if (listeners[i] == HyperlinkListener.class) {
+          ((HyperlinkListener) listeners[i + 1]).hyperlinkUpdate(e);
+        }
       }
     }
-    
+
     private HyperlinkEvent createHyperlinkEvent(MouseEvent e) {
       HyperlinkEvent he = null;
-      
+
       Token t = viewToToken(e.getPoint());
-      if (t!=null) {
+      if (t != null) {
         // Copy token, viewToModel() unfortunately modifies Token
         t = new TokenImpl(t);
       }
-      
+
       if (t != null && t.isHyperlink()) {
         URL url = null;
         String desc = null;
@@ -375,21 +374,21 @@ public class SketchTextArea extends RSyntaxTextArea {
         }
         he = new HyperlinkEvent(SketchTextArea.this, HyperlinkEvent.EventType.ACTIVATED, url, desc);
       }
-      
+
       return he;
     }
-    
+
     @Override
     public void mouseClicked(MouseEvent e) {
       if (getHyperlinksEnabled()) {
         HyperlinkEvent he = createHyperlinkEvent(e);
-        if (he!=null) {
+        if (he != null) {
           fireHyperlinkUpdate(he);
         }
       }
     }
-    
-        @Override
+
+    @Override
     public void mouseMoved(MouseEvent e) {
 
       super.mouseMoved(e);
@@ -397,16 +396,16 @@ public class SketchTextArea extends RSyntaxTextArea {
       if (!getHyperlinksEnabled()) {
         return;
       }
-      
+
 //      LinkGenerator linkGenerator = getLinkGenerator();
-      
+
       // GitHub issue RSyntaxTextArea/#25 - links identified at "edges" of editor
       // should not be activated if mouse is in margin insets.
       insets = getInsets(insets);
-      if (insets!=null) {
+      if (insets != null) {
         int x = e.getX();
         int y = e.getY();
-        if (x<=insets.left || y<insets.top) {
+        if (x <= insets.left || y < insets.top) {
           if (isScanningForLinks) {
             stopScanningForLinks();
           }
@@ -416,14 +415,14 @@ public class SketchTextArea extends RSyntaxTextArea {
 
       isScanningForLinks = true;
       Token t = viewToToken(e.getPoint());
-      if (t!=null) {
+      if (t != null) {
         // Copy token, viewToModel() unfortunately modifies Token
         t = new TokenImpl(t);
       }
       Cursor c2 = null;
-      if (t!=null && t.isHyperlink()) {
-        if (hoveredOverLinkOffset==-1 ||
-            hoveredOverLinkOffset!=t.getOffset()) {
+      if (t != null && t.isHyperlink()) {
+        if (hoveredOverLinkOffset == -1 ||
+          hoveredOverLinkOffset != t.getOffset()) {
           hoveredOverLinkOffset = t.getOffset();
           repaint();
         }
@@ -456,15 +455,15 @@ public class SketchTextArea extends RSyntaxTextArea {
       else {
         c2 = Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR);
         hoveredOverLinkOffset = -1;
-       //  linkGeneratorResult = null;
+        //  linkGeneratorResult = null;
       }
-      if (getCursor()!=c2) {
+      if (getCursor() != c2) {
         setCursor(c2);
         // TODO: Repaint just the affected line(s).
         repaint(); // Link either left or went into.
-      }   
+      }
     }
-        
+
     private void stopScanningForLinks() {
       if (isScanningForLinks) {
         Cursor c = getCursor();
@@ -478,4 +477,8 @@ public class SketchTextArea extends RSyntaxTextArea {
 
   }
 
+  @Override
+  protected RTextAreaUI createRTextAreaUI() {
+    return new SketchTextAreaUI(this);
+  }
 }
