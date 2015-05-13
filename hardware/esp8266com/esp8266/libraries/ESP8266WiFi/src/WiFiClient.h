@@ -55,6 +55,7 @@ public:
 
   IPAddress remoteIP();
   uint16_t  remotePort();
+  size_t write(Stream&);
 
   friend class WiFiServer;
 
