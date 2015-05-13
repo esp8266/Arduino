@@ -5,6 +5,7 @@ ARDUINO 1.6.5
 * Sketch > Export compiled Binary: saves the compiled binary (hex, bin) into the sketch folder. Thanks @championswimmer
 * New editor, based on RSyntaxTextArea. Thanks @ricardojlrufino
 * New keywords. Thanks @Chris--A
+* Easier "additional boards manager url" field: a wide text area opens by clicking the added button (right side of the text field)
 
 [libraries]
 * LiquidCrystal fixes. Thanks @newbie15
