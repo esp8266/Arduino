@@ -1158,7 +1158,6 @@ public class Compiler implements MessageConsumer {
     PreferencesMap dict = new PreferencesMap(prefs);
     dict.put("ide_version", "" + BaseNoGui.REVISION);
 
-    String[] cmdArray;
     try {
       String tmp_file = prefs.getOrExcept("recipe.output.tmp_file");
       tmp_file = StringReplacer.replaceFromMapping(tmp_file, dict);
@@ -1168,16 +1167,7 @@ public class Compiler implements MessageConsumer {
       File hexFile = new File(prefs.get("build.path") + "/" + tmp_file);
       File saveFile = new File(sketch.getFolder().getAbsolutePath() + "/" + save_file);
 
-      FileReader in = new FileReader(hexFile);
-      FileWriter out = new FileWriter(saveFile);
-
-      int c;
-      while ((c = in.read()) != -1)
-        out.write(c);
-
-      in.close();
-      out.close();
-      
+      FileUtils.copyFile(hexFile, saveFile);
     } catch (Exception e) {
       throw new RunnerException(e);
     }
