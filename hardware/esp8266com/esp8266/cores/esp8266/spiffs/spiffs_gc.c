@@ -11,7 +11,7 @@ static s32_t spiffs_gc_erase_block(
   u32_t addr = SPIFFS_BLOCK_TO_PADDR(fs, bix);
   s32_t size = SPIFFS_CFG_LOG_BLOCK_SZ(fs);
 
-  SPIFFS_GC_DBG("gc: erase block %i\n", bix);
+  SPIFFS_GC_DBG("gc: erase block %d\n", bix);
 
   // here we ignore res, just try erasing the block
   while (size > 0) {
@@ -129,10 +129,10 @@ s32_t spiffs_gc_check(
     return SPIFFS_OK;
   }
 
-  //printf("gcing started  %i dirty, blocks %i free, want %i bytes\n", fs->stats_p_allocated + fs->stats_p_deleted, fs->free_blocks, len);
+  //printf("gcing started  %d dirty, blocks %d free, want %d bytes\n", fs->stats_p_allocated + fs->stats_p_deleted, fs->free_blocks, len);
 
   do {
-    SPIFFS_GC_DBG("\ngc_check #%i: run gc free_blocks:%i pfree:%i pallo:%i pdele:%i [%i] len:%i of %i\n",
+    SPIFFS_GC_DBG("\ngc_check #%d: run gc free_blocks:%d pfree:%d pallo:%d pdele:%d [%d] len:%d of %d\n",
         tries,
         fs->free_blocks, free_pages, fs->stats_p_allocated, fs->stats_p_deleted, (free_pages+fs->stats_p_allocated+fs->stats_p_deleted),
         len, free_pages*SPIFFS_DATA_PAGE_SIZE(fs));
@@ -151,13 +151,13 @@ s32_t spiffs_gc_check(
 #endif
     cand = cands[0];
     fs->cleaning = 1;
-    //printf("gcing: cleaning block %i\n", cand);
+    //printf("gcing: cleaning block %d\n", cand);
     res = spiffs_gc_clean(fs, cand);
     fs->cleaning = 0;
     if (res < 0) {
-      SPIFFS_GC_DBG("gc_check: cleaning block %i, result %i\n", cand, res);
+      SPIFFS_GC_DBG("gc_check: cleaning block %d, result %d\n", cand, res);
     } else {
-      SPIFFS_GC_DBG("gc_check: cleaning block %i, result %i\n", cand, res);
+      SPIFFS_GC_DBG("gc_check: cleaning block %d, result %d\n", cand, res);
     }
     SPIFFS_CHECK_RES(res);
 
@@ -175,7 +175,7 @@ s32_t spiffs_gc_check(
       len > free_pages*SPIFFS_DATA_PAGE_SIZE(fs)));
   SPIFFS_GC_DBG("gc_check: finished\n");
 
-  //printf("gcing finished %i dirty, blocks %i free, %i pages free, %i tries, res %i\n",
+  //printf("gcing finished %d dirty, blocks %d free, %d pages free, %d tries, res %d\n",
   //    fs->stats_p_allocated + fs->stats_p_deleted,
   //    fs->free_blocks, free_pages, tries, res);
 
@@ -213,7 +213,7 @@ s32_t spiffs_gc_erase_page_stats(
     } // per entry
     obj_lookup_page++;
   } // per object lookup page
-  SPIFFS_GC_DBG("gc_check: wipe pallo:%i pdele:%i\n", allo, dele);
+  SPIFFS_GC_DBG("gc_check: wipe pallo:%d pdele:%d\n", allo, dele);
   fs->stats_p_allocated -= allo;
   fs->stats_p_deleted -= dele;
   return res;
@@ -249,7 +249,6 @@ s32_t spiffs_gc_find_candidate(
   while (res == SPIFFS_OK && blocks--) {
     u16_t deleted_pages_in_block = 0;
     u16_t used_pages_in_block = 0;
-
     int obj_lookup_page = 0;
     // check each object lookup page
     while (res == SPIFFS_OK && obj_lookup_page < (int)SPIFFS_OBJ_LOOKUP_PAGES(fs)) {
@@ -298,7 +297,7 @@ s32_t spiffs_gc_find_candidate(
           used_pages_in_block * SPIFFS_GC_HEUR_W_USED +
           erase_age * SPIFFS_GC_HEUR_W_ERASE_AGE;
       int cand_ix = 0;
-      SPIFFS_GC_DBG("gc_check: bix:%i del:%i use:%i score:%i\n", cur_block, deleted_pages_in_block, used_pages_in_block, score);
+      SPIFFS_GC_DBG("\ngc_check: bix:%d del:%d use:%d score:%d\n", cur_block, deleted_pages_in_block, used_pages_in_block, score);
       while (cand_ix < max_candidates) {
         if (cand_blocks[cand_ix] == (spiffs_block_ix)-1) {
           cand_blocks[cand_ix] = cur_block;
@@ -367,7 +366,7 @@ s32_t spiffs_gc_clean(spiffs *fs, spiffs_block_ix bix) {
   spiffs_page_object_ix_header *objix_hdr = (spiffs_page_object_ix_header *)fs->work;
   spiffs_page_object_ix *objix = (spiffs_page_object_ix *)fs->work;
 
-  SPIFFS_GC_DBG("gc_clean: cleaning block %i\n", bix);
+  SPIFFS_GC_DBG("gc_clean: cleaning block %d\n", bix);
 
   c_memset(&gc, 0, sizeof(spiffs_gc));
   gc.state = FIND_OBJ_DATA;
@@ -376,11 +375,11 @@ s32_t spiffs_gc_clean(spiffs *fs, spiffs_block_ix bix) {
     // move free cursor to next block, cannot use free pages from the block we want to clean
     fs->free_cursor_block_ix = (bix+1)%fs->block_count;
     fs->free_cursor_obj_lu_entry = 0;
-    SPIFFS_GC_DBG("gc_clean: move free cursor to block %i\n", fs->free_cursor_block_ix);
+    SPIFFS_GC_DBG("gc_clean: move free cursor to block %d\n", fs->free_cursor_block_ix);
   }
 
   while (res == SPIFFS_OK && gc.state != FINISHED) {
-    SPIFFS_GC_DBG("gc_clean: state = %i entry:%i\n", gc.state, cur_entry);
+    SPIFFS_GC_DBG("gc_clean: state = %d entry:%d\n", gc.state, cur_entry);
     gc.obj_id_found = 0;
 
     // scan through lookup pages
@@ -403,7 +402,7 @@ s32_t spiffs_gc_clean(spiffs *fs, spiffs_block_ix bix) {
         case FIND_OBJ_DATA:
           if (obj_id != SPIFFS_OBJ_ID_DELETED && obj_id != SPIFFS_OBJ_ID_FREE &&
               ((obj_id & SPIFFS_OBJ_ID_IX_FLAG) == 0)) {
-            SPIFFS_GC_DBG("gc_clean: FIND_DATA state:%i - found obj id %04x\n", gc.state, obj_id);
+            SPIFFS_GC_DBG("gc_clean: FIND_DATA state:%d - found obj id %04x\n", gc.state, obj_id);
             gc.obj_id_found = 1;
             gc.cur_obj_id = obj_id;
             scan = 0;
@@ -547,7 +546,7 @@ s32_t spiffs_gc_clean(spiffs *fs, spiffs_block_ix bix) {
       cur_entry = 0;
       break;
     }
-    SPIFFS_GC_DBG("gc_clean: state-> %i\n", gc.state);
+    SPIFFS_GC_DBG("gc_clean: state-> %d\n", gc.state);
   } // while state != FINISHED
 
 
