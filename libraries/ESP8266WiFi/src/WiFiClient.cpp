@@ -138,34 +138,6 @@ size_t ICACHE_FLASH_ATTR WiFiClient::write(const uint8_t *buf, size_t size)
     return _client->write(reinterpret_cast<const char*>(buf), size);
 }
 
-size_t ICACHE_FLASH_ATTR WiFiClient::write(Stream &src)
-{
-    uint8_t obuf[1460];
-    size_t doneLen = 0;
-    size_t sentLen;
-    int i;
-    
-    while (src.available() > 1460)
-    {
-        for(i=0;i<1460;i++) obuf[i] = src.read();
-        sentLen = write(obuf, 1460);
-        doneLen = doneLen + sentLen;
-        if(sentLen != 1460){
-            DEBUGV("Sent: %u < 1460\r\n", sentLen);
-            return doneLen;
-        }
-    }
-      
-    uint16_t leftLen = src.available();
-    for(i=0;i<leftLen;i++) obuf[i] = src.read();
-    sentLen = write(obuf, leftLen);
-    doneLen = doneLen + sentLen;
-    if(sentLen != leftLen){
-        DEBUGV("Sent: %u < %u\r\n", sentLen, leftLen);
-    }
-    return doneLen;
-}
-
 extern "C" uint32_t esp_micros_at_task_start();
 
 int ICACHE_FLASH_ATTR WiFiClient::available()
