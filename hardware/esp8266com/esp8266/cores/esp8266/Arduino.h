@@ -229,6 +229,9 @@ long random(long, long);
 void randomSeed(unsigned int);
 long map(long, long, long, long, long);
 
+// Debugging functions
+void hexdump(uint8_t *mem, uint32_t len, uint8_t cols = 16);
+
 #endif
 
 #include "pins_arduino.h"
