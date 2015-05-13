@@ -21,6 +21,11 @@
 
 package processing.app;
 
+import cc.arduino.view.preferences.AdditionalBoardsManagerURLTextArea;
+import com.google.common.base.Function;
+import com.google.common.base.Functions;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Collections2;
 import processing.app.helpers.FileUtils;
 import processing.app.helpers.OSUtils;
 import processing.app.helpers.PreferencesHelper;
@@ -31,6 +36,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.util.*;
+import java.util.List;
 
 import static processing.app.I18n._;
 
@@ -489,6 +496,22 @@ public class Preferences {
     box.add(label);
     additionalBoardsManagerField = new JTextField(30);
     box.add(additionalBoardsManagerField);
+    JButton extendedAdditionalUrlFieldWindow = new JButton(new ImageIcon(Base.getThemeImage("newwindow.gif", dialog)));
+    extendedAdditionalUrlFieldWindow.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        final AdditionalBoardsManagerURLTextArea additionalBoardsManagerURLTextArea = new AdditionalBoardsManagerURLTextArea(dialog);
+        additionalBoardsManagerURLTextArea.setText(additionalBoardsManagerField.getText());
+        additionalBoardsManagerURLTextArea.onOk(new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            additionalBoardsManagerField.setText(additionalBoardsManagerURLTextArea.getText());
+          }
+        });
+        additionalBoardsManagerURLTextArea.setVisible(true);
+      }
+    });
+    box.add(extendedAdditionalUrlFieldWindow);
     pane.add(box);
     d = box.getPreferredSize();
     box.setBounds(left, top, d.width, d.height);
