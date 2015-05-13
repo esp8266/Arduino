@@ -4,6 +4,7 @@
  Copyright (c) 2009-10 Hernando Barragan.  All rights reserved.
  Copyright 2011, Paul Stoffregen, paul@pjrc.com
  Modified by Ivan Grokhotkov, 2014 - esp8266 support
+ Modified by Michael C. Miller, 2015 - esp8266 progmem support
 
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -42,6 +43,11 @@ ICACHE_FLASH_ATTR String::String(const char *cstr) {
 ICACHE_FLASH_ATTR String::String(const String &value) {
     init();
     *this = value;
+}
+
+ICACHE_FLASH_ATTR String::String(const __FlashStringHelper *pstr) {
+    init();
+    *this = pstr; // see operator =
 }
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
@@ -167,6 +173,16 @@ String & ICACHE_FLASH_ATTR String::copy(const char *cstr, unsigned int length) {
     return *this;
 }
 
+String & ICACHE_FLASH_ATTR String::copy(const __FlashStringHelper *pstr, unsigned int length) {
+    if (!reserve(length)) {
+        invalidate();
+        return *this;
+    }
+    len = length;
+    strcpy_P(buffer, (PGM_P)pstr);
+    return *this;
+}
+
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
 void ICACHE_FLASH_ATTR String::move(String &rhs) {
     if(buffer) {
@@ -219,6 +235,14 @@ String & ICACHE_FLASH_ATTR String::operator =(const char *cstr) {
         copy(cstr, strlen(cstr));
     else
         invalidate();
+
+    return *this;
+}
+
+String & ICACHE_FLASH_ATTR String::operator = (const __FlashStringHelper *pstr)
+{
+    if (pstr) copy(pstr, strlen_P((PGM_P)pstr));
+    else invalidate();
 
     return *this;
 }
@@ -299,6 +323,17 @@ unsigned char ICACHE_FLASH_ATTR String::concat(double num) {
     return concat(string, strlen(string));
 }
 
+unsigned char ICACHE_FLASH_ATTR String::concat(const __FlashStringHelper * str) {
+    if (!str) return 0;
+    int length = strlen_P((PGM_P)str);
+    if (length == 0) return 1;
+    unsigned int newlen = len + length;
+    if (!reserve(newlen)) return 0;
+    strcpy_P(buffer + len, (PGM_P)str);
+    len = newlen;
+    return 1;
+}
+
 /*********************************************/
 /*  Concatenate                              */
 /*********************************************/
@@ -370,6 +405,13 @@ StringSumHelper & ICACHE_FLASH_ATTR operator +(const StringSumHelper &lhs, doubl
     StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
     if(!a.concat(num))
         a.invalidate();
+    return a;
+}
+
+StringSumHelper & ICACHE_FLASH_ATTR operator + (const StringSumHelper &lhs, const __FlashStringHelper *rhs)
+{
+    StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
+    if (!a.concat(rhs))	a.invalidate();
     return a;
 }
 
