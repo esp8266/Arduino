@@ -131,9 +131,9 @@ public class UserLibrary extends ContributedLibrary {
     if (category == null)
       category = "Uncategorized";
     if (!CATEGORIES.contains(category)) {
-      category = "Uncategorized";
       System.out.println("WARNING: Category '" + category + "' in library " +
               properties.get("name") + " is not valid. Setting to 'Uncategorized'");
+      category = "Uncategorized";
     }
 
     String license = properties.get("license");
