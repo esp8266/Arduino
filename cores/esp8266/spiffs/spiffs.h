@@ -12,8 +12,6 @@
 extern "C" {
 #endif
 
-//#include "c_stdio.h"
-#include <user_config.h>
 #include "spiffs_config.h"
 #include "flashmem.h"
 
