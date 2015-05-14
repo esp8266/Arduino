@@ -188,10 +188,10 @@ char * dtostrf(double number, signed char width, unsigned char prec, char *s) {
         ++out;
     }
 
-    while(prec-- > 0) {
+    for (unsigned char decShift = prec; decShift > 0; decShift--) {
         remainder *= 10.0;
     }
-    sprintf(out, "%d", (int) remainder);
+    sprintf(out, "%0*d", prec, (int)remainder);
 
     return s;
 }
