@@ -14,7 +14,7 @@
 
 void setup()
 {
-  Wire.begin(2);                // join i2c bus with address #2
+  Wire.begin(8);                // join i2c bus with address #8
   Wire.onRequest(requestEvent); // register event
 }
 
