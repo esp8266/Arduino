@@ -25,6 +25,7 @@
 #include "Print.h"
 #include "Client.h"
 #include "IPAddress.h"
+#include <memory>
 
 class ClientContext;
 class WiFiServer;
@@ -44,6 +45,9 @@ public:
   virtual int connect(const char *host, uint16_t port);
   virtual size_t write(uint8_t);
   virtual size_t write(const uint8_t *buf, size_t size);
+  template <typename T>
+  size_t write(T& source, size_t unitSize);
+
   virtual int available();
   virtual int read();
   virtual int read(uint8_t *buf, size_t size);
@@ -71,5 +75,25 @@ private:
   ClientContext* _client;
 
 };
+
+
+template <typename T>
+inline size_t WiFiClient::write(T& source, size_t unitSize) {
+  std::unique_ptr<uint8_t[]> buffer(new uint8_t[unitSize]);
+  size_t size_sent = 0;
+  while(true) {
+    size_t left = source.available();
+    if (!left)
+      break;
+    size_t will_send = (left < unitSize) ? left : unitSize;
+    source.read(buffer.get(), will_send);
+    size_t cb = write(buffer.get(), will_send);
+    size_sent += cb;
+    if (cb != will_send) {
+      break;
+    }
+  }
+  return size_sent;
+}
 
 #endif

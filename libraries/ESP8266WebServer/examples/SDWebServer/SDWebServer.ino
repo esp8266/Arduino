@@ -34,7 +34,6 @@
 #include <SPI.h>
 #include <SD.h>
 
-#define WWW_BUF_SIZE 1460
 #define DBG_OUTPUT_PORT Serial
 
 const char* ssid = "**********";
@@ -47,28 +46,17 @@ ESP8266WebServer server(80);
 static bool hasSD = false;
 File uploadFile;
 
-void returnOK(){
-  WiFiClient client = server.client();
-  String message = "HTTP/1.1 200 OK\r\n";
-  message += "Content-Type: text/plain\r\n";
-  message += "Connection: close\r\n";
-  message += "Access-Control-Allow-Origin: *\r\n";
-  message += "\r\n";
-  client.print(message);
-  client.stop();
+
+void returnOK() {
+  server.sendHeader("Connection", "close");
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  server.send(200, "text/plain", "");
 }
 
-void returnFail(String msg){
-  WiFiClient client = server.client();
-  String message = "HTTP/1.1 500 Fail\r\n";
-  message += "Content-Type: text/plain\r\n";
-  message += "Connection: close\r\n";
-  message += "Access-Control-Allow-Origin: *\r\n";
-  message += "\r\n";
-  message += msg;
-  message += "\r\n";
-  client.print(message);
-  client.stop();
+void returnFail(String msg) {
+  server.sendHeader("Connection", "close");
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  server.send(500, "text/plain", msg + "\r\n");
 }
 
 bool loadFromSdCard(String path){
@@ -93,59 +81,40 @@ bool loadFromSdCard(String path){
     dataType = "text/html";
     dataFile = SD.open(path.c_str());
   }
+
+  if (!dataFile)
+    return false;
   
   if(server.hasArg("download")) dataType = "application/octet-stream";
   
-  if (dataFile) {
-    WiFiClient client = server.client();
-    String head = "HTTP/1.1 200 OK\r\nContent-Type: ";
-    head += dataType;
-    head += "\r\nContent-Length: ";
-    head += dataFile.size();
-    head += "\r\nConnection: close";
-    head += "\r\nAccess-Control-Allow-Origin: *";
-    head += "\r\n\r\n";
-    client.print(head);
-    dataType = String();
-    path = String();
-    
-    uint8_t obuf[WWW_BUF_SIZE];
-    
-    while (dataFile.available() > WWW_BUF_SIZE){
-      dataFile.read(obuf, WWW_BUF_SIZE);
-      if(client.write(obuf, WWW_BUF_SIZE) != WWW_BUF_SIZE){
-        DBG_OUTPUT_PORT.println("Sent less data than expected!");
-        dataFile.close();
-        return true;
-      }
-    }
-    uint16_t leftLen = dataFile.available();
-    dataFile.read(obuf, leftLen);
-    if(client.write(obuf, leftLen) != leftLen){
-      DBG_OUTPUT_PORT.println("Sent less data than expected!");
-      dataFile.close();
-      return true;
-    }
-    dataFile.close();
-    client.stop();
-    return true;
+  server.sendHeader("Content-Length", String(dataFile.size()));
+  server.sendHeader("Connection", "close");
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  server.send(200, dataType.c_str(), "");
+
+  WiFiClient client = server.client();
+  size_t totalSize = dataFile.size();
+  if (client.write(dataFile, PAYLOAD_UNIT_SIZE) != totalSize) {
+    DBG_OUTPUT_PORT.println("Sent less data than expected!");
   }
-  return false;
+
+  dataFile.close();
+  return true;
 }
 
 void handleFileUpload(){
   if(server.uri() != "/edit") return;
-  HTTPUpload upload = server.upload();
+  HTTPUpload& upload = server.upload();
   if(upload.status == UPLOAD_FILE_START){
     if(SD.exists((char *)upload.filename.c_str())) SD.remove((char *)upload.filename.c_str());
     uploadFile = SD.open(upload.filename.c_str(), FILE_WRITE);
     DBG_OUTPUT_PORT.print("Upload: START, filename: "); DBG_OUTPUT_PORT.println(upload.filename);
   } else if(upload.status == UPLOAD_FILE_WRITE){
-    if(uploadFile) uploadFile.write(upload.buf, upload.buflen);
-    DBG_OUTPUT_PORT.print("Upload: WRITE, Bytes: "); DBG_OUTPUT_PORT.println(upload.buflen);
+    if(uploadFile) uploadFile.write(upload.buf, upload.currentSize);
+    DBG_OUTPUT_PORT.print("Upload: WRITE, Bytes: "); DBG_OUTPUT_PORT.println(upload.currentSize);
   } else if(upload.status == UPLOAD_FILE_END){
     if(uploadFile) uploadFile.close();
-    DBG_OUTPUT_PORT.print("Upload: END, Size: "); DBG_OUTPUT_PORT.println(upload.size);
+    DBG_OUTPUT_PORT.print("Upload: END, Size: "); DBG_OUTPUT_PORT.println(upload.totalSize);
   }
 }
 
@@ -156,13 +125,12 @@ void deleteRecursive(String path){
     SD.remove((char *)path.c_str());
     return;
   }
+
   file.rewindDirectory();
-  File entry;
-  String entryPath;
   while(true) {
-    entry = file.openNextFile();
+    File entry = file.openNextFile();
     if (!entry) break;
-    entryPath = path + "/" +entry.name();
+    String entryPath = path + "/" +entry.name();
     if(entry.isDirectory()){
       entry.close();
       deleteRecursive(entryPath);
@@ -170,27 +138,32 @@ void deleteRecursive(String path){
       entry.close();
       SD.remove((char *)entryPath.c_str());
     }
-    entryPath = String();
     yield();
   }
+
   SD.rmdir((char *)path.c_str());
-  path = String();
   file.close();
 }
 
 void handleDelete(){
   if(server.args() == 0) return returnFail("BAD ARGS");
   String path = server.arg(0);
-  if(path == "/" || !SD.exists((char *)path.c_str())) return returnFail("BAD PATH");
+  if(path == "/" || !SD.exists((char *)path.c_str())) {
+    returnFail("BAD PATH");
+    return;
+  }
   deleteRecursive(path);
   returnOK();
-  path = String();
 }
 
 void handleCreate(){
   if(server.args() == 0) return returnFail("BAD ARGS");
   String path = server.arg(0);
-  if(path == "/" || SD.exists((char *)path.c_str())) return returnFail("BAD PATH");
+  if(path == "/" || SD.exists((char *)path.c_str())) { 
+    returnFail("BAD PATH");
+    return;
+  }
+
   if(path.indexOf('.') > 0){
     File file = SD.open((char *)path.c_str(), FILE_WRITE);
     if(file){
@@ -201,7 +174,6 @@ void handleCreate(){
     SD.mkdir((char *)path.c_str());
   }
   returnOK();
-  path = String();
 }
 
 void printDirectory() {
@@ -216,31 +188,31 @@ void printDirectory() {
   }
   dir.rewindDirectory();
   
-  File entry;
+  server.send(200, "text/json", "");
   WiFiClient client = server.client();
-  client.print("HTTP/1.1 200 OK\r\nContent-Type: text/json\r\n\r\n");
-  String output = "[";
-  while(true) {
-   entry = dir.openNextFile();
-   if (!entry) break;
-   if(output != "[") output += ',';
-   output += "{\"type\":\"";
-   output += (entry.isDirectory())?"dir":"file";
-   output += "\",\"name\":\"";
-   output += entry.name();
-   output += "\"";
-   output += "}";
-   entry.close();
-   if(output.length() > 1460){
-     client.write(output.substring(0, 1460).c_str(), 1460);
-     output = output.substring(1460);
-   }
+
+  for (int cnt = 0; true; ++cnt) {
+    File entry = dir.openNextFile();
+    if (!entry)
+    break;
+
+    String output;
+    if (cnt == 0) 
+      output = '[';
+    else 
+      output = ',';
+
+    output += "{\"type\":\"";
+    output += (entry.isDirectory()) ? "dir" : "file";
+    output += "\",\"name\":\"";
+    output += entry.name();
+    output += "\"";
+    output += "}";
+    server.sendContent(output);
+    entry.close();
  }
+ server.sendContent("]");
  dir.close();
- output += "]";
- client.write(output.c_str(), output.length());
- client.stop();
- output = String();
 }
 
 void handleNotFound(){
@@ -280,14 +252,14 @@ void setup(void){
   }
   DBG_OUTPUT_PORT.print("Connected! IP address: ");
   DBG_OUTPUT_PORT.println(WiFi.localIP());
-  /*
+  
   if (mdns.begin(hostname, WiFi.localIP())) {
     DBG_OUTPUT_PORT.println("MDNS responder started");
     DBG_OUTPUT_PORT.print("You can now connect to http://");
     DBG_OUTPUT_PORT.print(hostname);
     DBG_OUTPUT_PORT.println(".local");
   }
-  */
+  
   
   server.on("/list", HTTP_GET, printDirectory);
   server.on("/edit", HTTP_DELETE, handleDelete);
@@ -304,7 +276,7 @@ void setup(void){
      hasSD = true;
   }
 }
- 
+
 void loop(void){
   server.handleClient();
 }
