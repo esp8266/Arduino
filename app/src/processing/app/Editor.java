@@ -1407,40 +1407,55 @@ public class Editor extends JFrame implements RunnerListener {
 
     item = newJMenuItem(_("Find..."), 'F');
     item.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          if (find == null) {
-            find = new FindReplace(Editor.this);
-          }
-          if (getSelectedText()!= null) find.setFindText( getSelectedText() );
-          //new FindReplace(Editor.this).show();
-          find.setLocationRelativeTo(Editor.this);
-          find.setVisible(true);
-          //find.setVisible(true);
+      public void actionPerformed(ActionEvent e) {
+        if (find == null) {
+          find = new FindReplace(Editor.this);
         }
-      });
+        if (!OSUtils.isMacOS() && getSelectedText() != null) {
+          find.setFindText(getSelectedText());
+        }
+        find.setLocationRelativeTo(Editor.this);
+        find.setVisible(true);
+      }
+    });
     menu.add(item);
 
-    // TODO find next should only be enabled after a
-    // search has actually taken place
     item = newJMenuItem(_("Find Next"), 'G');
     item.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          if (find != null) {
-            find.findNext();
-          }
+      public void actionPerformed(ActionEvent e) {
+        if (find != null) {
+          find.findNext();
         }
-      });
+      }
+    });
     menu.add(item);
 
     item = newJMenuItemShift(_("Find Previous"), 'G');
     item.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        if (find != null) {
+          find.findPrevious();
+        }
+      }
+    });
+    menu.add(item);
+
+    if (OSUtils.isMacOS()) {
+      item = newJMenuItem(_("Use Selection For Find"), 'E');
+      item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          if (find != null) {
-            find.findPrevious();
+          if (find == null) {
+            find = new FindReplace(Editor.this);
           }
+          if (getSelectedText() != null) {
+            find.setFindText(getSelectedText());
+          }
+          find.setLocationRelativeTo(Editor.this);
+          find.setVisible(true);
         }
       });
-    menu.add(item);
+      menu.add(item);
+    }
 
     return menu;
   }
