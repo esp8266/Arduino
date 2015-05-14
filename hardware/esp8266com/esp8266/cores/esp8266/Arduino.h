@@ -38,6 +38,7 @@ extern "C" {
 #include "pgmspace.h"
 #include "esp8266_peri.h"
 #include "twi.h"
+#include "spiffs/spiffs.h"
 
 void yield(void);
 
@@ -211,6 +212,7 @@ void loop(void);
 #include "WString.h"
 
 #include "HardwareSerial.h"
+#include "FileSystem.h"
 #include "Esp.h"
 #include "debug.h"
 

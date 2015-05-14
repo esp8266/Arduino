@@ -29,23 +29,22 @@
 enum HTTPMethod { HTTP_ANY, HTTP_GET, HTTP_POST, HTTP_PUT, HTTP_PATCH, HTTP_DELETE };
 enum HTTPUploadStatus { UPLOAD_FILE_START, UPLOAD_FILE_WRITE, UPLOAD_FILE_END };
 
-#define PAYLOAD_UNIT_SIZE 1460
+#define HTTP_DOWNLOAD_UNIT_SIZE 1460
+#define HTTP_UPLOAD_BUFLEN 2048
 
 typedef struct {
   HTTPUploadStatus status;
-  String filename;
-  String name;
-  String type;
-  size_t totalSize; // file size
-  size_t  currentSize; // size of data currently in buf
-  uint8_t buf[PAYLOAD_UNIT_SIZE];
-
+  String  filename;
+  String  name;
+  String  type;
+  size_t  totalSize;    // file size
+  size_t  currentSize;  // size of data currently in buf
+  uint8_t buf[HTTP_UPLOAD_BUFLEN];
 } HTTPUpload;
 
 class ESP8266WebServer
 {
 public:
-
   ESP8266WebServer(int port = 80);
   ~ESP8266WebServer();
 
@@ -83,6 +82,7 @@ protected:
   void _parseArguments(String data);
   static const char* _responseCodeToString(int code);
   void _parseForm(WiFiClient& client, String boundary, uint32_t len);
+  void _uploadWriteByte(uint8_t b);
   
   struct RequestHandler;
   struct RequestArgument {

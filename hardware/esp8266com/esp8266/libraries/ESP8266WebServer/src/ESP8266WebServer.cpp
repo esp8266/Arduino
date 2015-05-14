@@ -149,7 +149,7 @@ void ESP8266WebServer::sendContent(String content) {
   size_t size_to_send = content.length();
   size_t size_sent = 0;
   while(size_to_send) {
-    const size_t unit_size = PAYLOAD_UNIT_SIZE;
+    const size_t unit_size = HTTP_DOWNLOAD_UNIT_SIZE;
     size_t will_send = (size_to_send < unit_size) ? size_to_send : unit_size;
     size_t sent = _currentClient.write(content.c_str() + size_sent, will_send);
     size_to_send -= sent;

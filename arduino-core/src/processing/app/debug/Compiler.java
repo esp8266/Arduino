@@ -460,6 +460,13 @@ public class Compiler implements MessageConsumer {
     p.put("build.path", _buildPath);
     p.put("build.project_name", _primaryClassName);
     p.put("build.arch", targetPlatform.getId().toUpperCase());
+    File sketch_data = sketch.getDataFolder();
+    if(sketch_data.exists()){
+      p.put("build.sketch_data", sketch_data.getAbsolutePath());
+    } else {
+      p.put("build.sketch_data", "");
+    }
+    
     
     // Platform.txt should define its own compiler.path. For
     // compatibility with earlier 1.5 versions, we define a (ugly,
