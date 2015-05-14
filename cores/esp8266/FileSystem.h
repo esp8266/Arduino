@@ -29,7 +29,7 @@ class String;
 #define FSFILE_WRITE (SPIFFS_RDONLY | SPIFFS_WRONLY | SPIFFS_CREAT | SPIFFS_APPEND | SPIFFS_TRUNC)
 
 class FSFile : public Stream {
- private:
+private:
   spiffs_stat _stats; 
   file_t _file;
 
@@ -47,34 +47,29 @@ public:
   uint32_t remove();
   uint32_t position();
   uint32_t size();
-  boolean eof();
+  bool eof();
   void close();
   int lastError();
   void clearError();
-  operator bool(){ return _file > 0; }
+  operator bool() { return _file > 0; }
   char * name();
-  boolean isDirectory(void);
+  bool isDirectory(void);
 
   template<typename T> size_t write(T &src){
-    uint8_t obuf[64];
-    size_t doneLen = 0;
-    size_t sentLen;
-    int i;
-
-    while (src.available() > 64){
-      src.read(obuf, 64);
-      sentLen = write(obuf, 64);
-      doneLen = doneLen + sentLen;
-      if(sentLen != 64){
-        return doneLen;
+    const size_t bufferSize = 64;
+    uint8_t obuf[bufferSize];
+    size_t bytesWritten = 0;
+    while (true){
+      size_t available = src.available();
+      size_t willWrite = (available < bufferSize) ? available : bufferSize;
+      src.read(obuf, willWrite);
+      size_t cb = write(obuf, willWrite);
+      bytesWritten += cb;
+      if (cb != willWrite) {
+        return bytesWritten;
       }
     }
-  
-    size_t leftLen = src.available();
-    src.read(obuf, leftLen);
-    sentLen = write(obuf, leftLen);
-    doneLen = doneLen + sentLen;
-    return doneLen;
+    return bytesWritten;
   }
   
   using Print::write;
@@ -83,16 +78,16 @@ public:
 class FSClass {
 
 private:
-  boolean _mounted;
+  bool _mounted;
   
 public:
-  boolean mount();
+  bool mount();
   void unmount();
-  boolean format();
-  boolean exists(const char *filename);
-  boolean create(const char *filepath);
-  boolean remove(const char *filepath);
-  boolean rename(const char *filename, const char *newname);
+  bool format();
+  bool exists(const char *filename);
+  bool create(const char *filepath);
+  bool remove(const char *filepath);
+  bool rename(const char *filename, const char *newname);
   
   FSFile open(const char *filename, uint8_t mode = FSFILE_READ);
 
