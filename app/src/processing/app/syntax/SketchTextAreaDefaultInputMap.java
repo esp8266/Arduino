@@ -6,6 +6,7 @@ import org.fife.ui.rtextarea.RTextAreaEditorKit;
 import processing.app.PreferencesData;
 
 import javax.swing.*;
+import javax.swing.text.DefaultEditorKit;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
@@ -32,6 +33,8 @@ public class SketchTextAreaDefaultInputMap extends RSyntaxTextAreaDefaultInputMa
 
     if (isOSX) {
       put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, defaultModifier), SketchTextAreaEditorKit.rtaDeleteLineToCursorAction);
+      put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, defaultModifier), DefaultEditorKit.beginAction);
+      put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, defaultModifier), DefaultEditorKit.endAction);
     }
   }
 }
