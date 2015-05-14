@@ -59,17 +59,6 @@ generic.menu.FlashSize.2M.build.flash_size=2M
 generic.menu.FlashSize.4M=4M
 generic.menu.FlashSize.4M.build.flash_size=4M
 
-generic.menu.FlashSize.512K=512K
-generic.menu.FlashSize.512K.build.flash_size=512K
-generic.menu.FlashSize.256K=256K
-generic.menu.FlashSize.256K.build.flash_size=256K
-generic.menu.FlashSize.1M=1M
-generic.menu.FlashSize.1M.build.flash_size=1M
-generic.menu.FlashSize.2M=2M
-generic.menu.FlashSize.2M.build.flash_size=2M
-generic.menu.FlashSize.4M=4M
-generic.menu.FlashSize.4M.build.flash_size=4M
-
 generic.menu.FlashFreq.40=40MHz
 generic.menu.FlashFreq.40.build.flash_freq=40
 generic.menu.FlashFreq.20=20MHz
