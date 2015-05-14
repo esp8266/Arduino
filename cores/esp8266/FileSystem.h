@@ -1,59 +1,83 @@
-/****
- * Sming Framework Project - Open Source framework for high efficiency native ESP8266 development.
- * Created 2015 by Skurydin Alexey
- * http://github.com/anakod/Sming
- * All files of the Sming Core are provided under the LGPL v3 license.
- ****/
+/* 
+  FileSystem.h - SPIFS implementation for esp8266
 
-#ifndef _SMING_CORE_FILESYSTEM_H_
-#define _SMING_CORE_FILESYSTEM_H_
+  Copyright (c) 2015 Hristo Gochkov. All rights reserved.
+  This file is part of the esp8266 core for Arduino environment.
+ 
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
+#ifndef _SPIFFS_CORE_FILESYSTEM_H_
+#define _SPIFFS_CORE_FILESYSTEM_H_
 
 #include "spiffs/spiffs.h"
+#include "Arduino.h"
 class String;
 
-enum FileOpenFlags
-{
-  eFO_ReadOnly = SPIFFS_RDONLY,
-  eFO_WriteOnly = SPIFFS_WRONLY,
-  eFO_ReadWrite = eFO_ReadOnly | eFO_WriteOnly,
-  eFO_CreateIfNotExist = SPIFFS_CREAT,
-  eFO_Append = SPIFFS_APPEND,
-  eFO_Truncate = SPIFFS_TRUNC,
-  eFO_CreateNewAlways = eFO_CreateIfNotExist | eFO_Truncate
+#define FSFILE_READ SPIFFS_RDONLY
+#define FSFILE_WRITE (SPIFFS_RDONLY | SPIFFS_WRONLY | SPIFFS_CREAT | SPIFFS_APPEND | SPIFFS_TRUNC)
+
+class FSFile : public Stream {
+ private:
+  spiffs_stat _stats; 
+  file_t _file;
+
+public:
+  FSFile(file_t f);
+  FSFile(void);
+  virtual size_t write(uint8_t);
+  virtual size_t write(const uint8_t *buf, size_t size);
+  virtual int read();
+  virtual int peek();
+  virtual int available();
+  virtual void flush();
+  int read(void *buf, uint16_t nbyte);
+  uint32_t seek(uint32_t pos);
+  uint32_t remove();
+  uint32_t position();
+  uint32_t size();
+  boolean eof();
+  void close();
+  int lastError();
+  void clearError();
+  operator bool(){ return _file > 0; }
+  char * name();
+  boolean isDirectory(void);
+  
+  using Print::write;
 };
 
-static FileOpenFlags operator|(FileOpenFlags lhs, FileOpenFlags rhs)
-{
-    return (FileOpenFlags) ((int)lhs| (int)rhs);
-}
+class FSClass {
 
-typedef enum
-{
-	eSO_FileStart = SPIFFS_SEEK_SET,
-	eSO_CurrentPos = SPIFFS_SEEK_CUR,
-	eSO_FileEnd = SPIFFS_SEEK_END
-} SeekOriginFlags;
+private:
+  boolean _mounted;
+  
+public:
+  boolean mount();
+  void unmount();
+  boolean format();
+  boolean exists(const char *filename);
+  boolean create(const char *filepath);
+  boolean remove(const char *filepath);
+  boolean rename(const char *filename, const char *newname);
+  
+  FSFile open(const char *filename, uint8_t mode = FSFILE_READ);
 
-file_t fileOpen(const String name, FileOpenFlags flags);
-void fileClose(file_t file);
-size_t fileWrite(file_t file, const void* data, size_t size);
-size_t fileRead(file_t file, void* data, size_t size);
-int fileSeek(file_t file, int offset, SeekOriginFlags origin);
-bool fileIsEOF(file_t file);
-int32_t fileTell(file_t file);
-int fileFlush(file_t file);
-int fileLastError(file_t fd);
-void fileClearLastError(file_t fd);
-void fileSetContent(const String fileName, const char *content);
-uint32_t fileGetSize(const String fileName);
-String fileGetContent(const String fileName);
-int fileGetContent(const String fileName, char* buffer, int bufSize);
+private:
+  friend class FSFile;
+};
 
+extern FSClass FS;
 
-int fileStats(const String name, spiffs_stat *stat);
-int fileStats(file_t file, spiffs_stat *stat);
-void fileDelete(const String name);
-void fileDelete(file_t file);
-bool fileExist(const String name);
-
-#endif /* _SMING_CORE_FILESYSTEM_H_ */
+#endif
