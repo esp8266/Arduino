@@ -61,13 +61,15 @@ public:
     size_t bytesWritten = 0;
     while (true){
       size_t available = src.available();
+      if(!available)
+        return bytesWritten;
       size_t willWrite = (available < bufferSize) ? available : bufferSize;
       src.read(obuf, willWrite);
       size_t cb = write(obuf, willWrite);
-      bytesWritten += cb;
       if (cb != willWrite) {
         return bytesWritten;
       }
+      bytesWritten += cb;
     }
     return bytesWritten;
   }
