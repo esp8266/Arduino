@@ -21,41 +21,46 @@
 #include "FileSystem.h"
 #include "Arduino.h"
 
-boolean FSClass::mount(){
-  if(_mounted) return true;
+bool FSClass::mount() {
+  if (_mounted) 
+    return true;
+
   _mounted = spiffs_mount();
   return _mounted;
 }
 
-void FSClass::unmount(){
-  if(!_mounted) return;
+void FSClass::unmount() {
+  if (!_mounted)
+    return;
+
   spiffs_unmount();
   _mounted = false;
 }
 
-boolean FSClass::format(){
+bool FSClass::format() {
   return spiffs_format();
 }
 
-boolean FSClass::exists(const char *filename){
+bool FSClass::exists(const char *filename) {
   spiffs_stat stat = {0};
-  if (SPIFFS_stat(&_filesystemStorageHandle, filename, &stat) < 0) return false;
+  if (SPIFFS_stat(&_filesystemStorageHandle, filename, &stat) < 0) 
+    return false;
   return stat.name[0] != '\0';
 }
 
-boolean FSClass::create(const char *filepath){
+bool FSClass::create(const char *filepath){
   return SPIFFS_creat(&_filesystemStorageHandle, filepath, 0) == 0;
 }
 
-boolean FSClass::remove(const char *filepath){
+bool FSClass::remove(const char *filepath){
   return SPIFFS_remove(&_filesystemStorageHandle, filepath) == 0;
 }
 
-boolean FSClass::rename(const char *filename, const char *newname){
+bool FSClass::rename(const char *filename, const char *newname) {
   return SPIFFS_rename(&_filesystemStorageHandle, filename, newname) == 0;
 }
 
-FSFile FSClass::open(const char *filename, uint8_t mode){
+FSFile FSClass::open(const char *filename, uint8_t mode) {
   int repeats = 0;
   bool notExist;
   bool canRecreate = (mode & SPIFFS_CREAT) == SPIFFS_CREAT;
@@ -81,25 +86,25 @@ FSFile FSClass::open(const char *filename, uint8_t mode){
 
 FSClass FS;
 
-FSFile::FSFile(){
+FSFile::FSFile() {
   _file = 0;
   _stats = {0};
 }
 
-FSFile::FSFile(file_t f){
+FSFile::FSFile(file_t f) {
   _file = f;
   if(SPIFFS_fstat(&_filesystemStorageHandle, _file, &_stats) != 0){
     debugf("mount errno %d\n", SPIFFS_errno(&_filesystemStorageHandle));
   }
 }
 
-void FSFile::close(){
+void FSFile::close() {
   if (! _file) return;
   SPIFFS_close(&_filesystemStorageHandle, _file);
   _file = 0;
 }
 
-uint32_t FSFile::size(){
+uint32_t FSFile::size() {
   if(! _file) return 0;
   uint32_t pos = SPIFFS_tell(&_filesystemStorageHandle, _file);
   SPIFFS_lseek(&_filesystemStorageHandle, _file, 0, SPIFFS_SEEK_END);
@@ -108,31 +113,31 @@ uint32_t FSFile::size(){
   return size;
 }
 
-uint32_t FSFile::seek(uint32_t pos){
+uint32_t FSFile::seek(uint32_t pos) {
   if (! _file) return 0;
   return SPIFFS_lseek(&_filesystemStorageHandle, _file, pos, SPIFFS_SEEK_SET);
 }
 
-uint32_t FSFile::position(){
+uint32_t FSFile::position() {
   if (! _file) return 0;
   return SPIFFS_tell(&_filesystemStorageHandle, _file);
 }
 
-boolean FSFile::eof(){
+bool FSFile::eof() {
   if (! _file) return 0;
   return SPIFFS_eof(&_filesystemStorageHandle, _file);
 }
 
-boolean FSFile::isDirectory(void){
+bool FSFile::isDirectory(void) {
   return false;
 }
 
-int FSFile::read(void *buf, uint16_t nbyte){
+int FSFile::read(void *buf, uint16_t nbyte) {
   if (! _file) return -1;
   return SPIFFS_read(&_filesystemStorageHandle, _file, buf, nbyte);
 }
 
-int FSFile::read(){
+int FSFile::read() {
   if (! _file) return -1;
   int val;
   if(SPIFFS_read(&_filesystemStorageHandle, _file, &val, 1) != 1) return -1;
