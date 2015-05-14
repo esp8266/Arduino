@@ -308,6 +308,13 @@ void SPIClass::write32(uint32_t data, bool msb) {
     while(SPI1CMD & SPIBUSY) {}
 }
 
+/**
+ * Note:
+ *  data need to be aligned to 32Bit
+ *  or you get an Fatal exception (9)
+ * @param data uint8_t *
+ * @param size uint32_t
+ */
 void SPIClass::writeBytes(uint8_t * data, uint32_t size) {
     while(size) {
         if(size > 64) {
@@ -340,6 +347,15 @@ void SPIClass::writeBytes_(uint8_t * data, uint8_t size) {
     while(SPI1CMD & SPIBUSY) {}
 }
 
+
+/**
+ * Note:
+ *  data need to be aligned to 32Bit
+ *  or you get an Fatal exception (9)
+ * @param data uint8_t *
+ * @param size uint8_t  max for size is 64Byte
+ * @param repeat uint32_t
+ */
 void SPIClass::writePattern(uint8_t * data, uint8_t size, uint32_t repeat) {
     if(size > 64) return; //max Hardware FIFO
 
@@ -376,6 +392,14 @@ void SPIClass::writePattern_(uint8_t * data, uint8_t size, uint8_t repeat) {
     writeBytes(&buffer[0], bytes);
 }
 
+/**
+ * Note:
+ *  in and out need to be aligned to 32Bit
+ *  or you get an Fatal exception (9)
+ * @param out uint8_t *
+ * @param in  uint8_t *
+ * @param size uint32_t
+ */
 void SPIClass::transferBytes(uint8_t * out, uint8_t * in, uint32_t size) {
     while(size) {
         if(size > 64) {
