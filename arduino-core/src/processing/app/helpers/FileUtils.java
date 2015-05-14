@@ -274,10 +274,6 @@ public class FileUtils {
       return true;
     }
 
-    if (!file.exists()) {
-      return false;
-    }
-
     return file.delete();
   }
 
