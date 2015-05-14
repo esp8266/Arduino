@@ -214,12 +214,22 @@ void ESP8266WebServer::_uploadWriteByte(uint8_t b){
   _currentUpload.buf[_currentUpload.currentSize++] = b;
 }
 
+uint8_t ESP8266WebServer::_uploadReadByte(WiFiClient& client){
+  int res = client.read();
+  if(res == -1){
+    while(!client.available())
+      yield();
+    res = client.read();
+  }
+  return (uint8_t)res;
+}
+
 void ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t len){
   
 #ifdef DEBUG
   DEBUG_OUTPUT.print("Parse Form: Boundary: ");
   DEBUG_OUTPUT.print(boundary);
-  DEBUG_OUTPUT.print("Length: ");
+  DEBUG_OUTPUT.print(" Length: ");
   DEBUG_OUTPUT.println(len);
 #endif
   String line;
@@ -249,17 +259,17 @@ void ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t 
             argFilename = argName.substring(nameStart+2, argName.length() - 1);
             argName = argName.substring(0, argName.indexOf('"'));
             argIsFile = true;
-  #ifdef DEBUG
+#ifdef DEBUG
             DEBUG_OUTPUT.print("PostArg FileName: ");
             DEBUG_OUTPUT.println(argFilename);
-  #endif
+#endif
             //use GET to set the filename if uploading using blob
             if (argFilename == "blob" && hasArg("filename")) argFilename = arg("filename");
           }
-  #ifdef DEBUG
+#ifdef DEBUG
           DEBUG_OUTPUT.print("PostArg Name: ");
           DEBUG_OUTPUT.println(argName);
-  #endif
+#endif
           argType = "text/plain";
           line = client.readStringUntil('\r');
           client.readStringUntil('\n');
@@ -269,10 +279,10 @@ void ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t 
             client.readStringUntil('\r');
             client.readStringUntil('\n');
           }
-  #ifdef DEBUG
+#ifdef DEBUG
           DEBUG_OUTPUT.print("PostArg Type: ");
           DEBUG_OUTPUT.println(argType);
-  #endif
+#endif
           if (!argIsFile){
             while(1){
               line = client.readStringUntil('\r');
@@ -281,20 +291,20 @@ void ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t 
               if (argValue.length() > 0) argValue += "\n";
               argValue += line;
             }
-  #ifdef DEBUG
+#ifdef DEBUG
             DEBUG_OUTPUT.print("PostArg Value: ");
             DEBUG_OUTPUT.println(argValue);
             DEBUG_OUTPUT.println();
-  #endif
+#endif
             
             RequestArgument& arg = postArgs[postArgsLen++];
             arg.key = argName;
             arg.value = argValue;
             
             if (line == ("--"+boundary+"--")){
-  #ifdef DEBUG
+#ifdef DEBUG
               DEBUG_OUTPUT.println("Done Parsing POST");
-  #endif
+#endif
               break;
             }
           } else {
@@ -312,23 +322,23 @@ void ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t 
 #endif
             if (_fileUploadHandler) _fileUploadHandler();
             _currentUpload.status = UPLOAD_FILE_WRITE;
-            uint8_t argByte = client.read();
+            uint8_t argByte = _uploadReadByte(client);
 readfile:
             while(argByte != 0x0D){
               _uploadWriteByte(argByte);
-              argByte = client.read();
+              argByte = _uploadReadByte(client);
             }
             
-            argByte = client.read();
+            argByte = _uploadReadByte(client);
             if (argByte == 0x0A){
-              argByte = client.read();
+              argByte = _uploadReadByte(client);
               if ((char)argByte != '-'){
                 //continue reading the file
                 _uploadWriteByte(0x0D);
                 _uploadWriteByte(0x0A);
                 goto readfile;
               } else {
-                argByte = client.read();
+                argByte = _uploadReadByte(client);
                 if ((char)argByte != '-'){
                   //continue reading the file
                   _uploadWriteByte(0x0D);
@@ -366,11 +376,13 @@ readfile:
               } else {
                 _uploadWriteByte(0x0D);
                 _uploadWriteByte(0x0A);
+                _uploadWriteByte((uint8_t)('-'));
+                _uploadWriteByte((uint8_t)('-'));
                 uint32_t i = 0;
                 while(i < boundary.length()){
                   _uploadWriteByte(endBuf[i++]);
                 }
-                argByte = client.read();
+                argByte = _uploadReadByte(client);
                 goto readfile;
               }
             } else {
