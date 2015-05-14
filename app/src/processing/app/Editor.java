@@ -251,7 +251,7 @@ public class Editor extends JFrame implements RunnerListener {
     console.setBorder(null);
     consolePanel.add(console, BorderLayout.CENTER);
 
-    lineStatus = new EditorLineStatus(textarea);
+    lineStatus = new EditorLineStatus();
     consolePanel.add(lineStatus, BorderLayout.SOUTH);
 
     // RTextScrollPane
@@ -957,7 +957,7 @@ public class Editor extends JFrame implements RunnerListener {
 
 
   protected SketchTextArea createTextArea() throws IOException {
-    SketchTextArea textArea = new SketchTextArea(base.getPdeKeywords());
+    final SketchTextArea textArea = new SketchTextArea(base.getPdeKeywords());
     textArea.requestFocusInWindow();
     textArea.setMarkOccurrences(PreferencesData.getBoolean("editor.advanced"));
     textArea.setMarginLineEnabled(false);
@@ -975,6 +975,17 @@ public class Editor extends JFrame implements RunnerListener {
           Base.showWarning(e.getMessage(), e.getMessage(), e);
         }
       }
+    });
+    textArea.addCaretListener(new CaretListener() {
+
+      @Override
+      public void caretUpdate(CaretEvent e) {
+        int lineStart = textArea.getDocument().getDefaultRootElement().getElementIndex(e.getMark());
+        int lineEnd = textArea.getDocument().getDefaultRootElement().getElementIndex(e.getDot());
+
+        lineStatus.set(lineStart, lineEnd);
+      }
+
     });
 
     ToolTipManager.sharedInstance().registerComponent(textArea);

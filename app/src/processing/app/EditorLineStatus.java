@@ -37,8 +37,6 @@ import processing.app.syntax.SketchTextArea;
  * Li'l status bar fella that shows the line number.
  */
 public class EditorLineStatus extends JComponent {
-  SketchTextArea textarea;
-  
   int start = -1, stop;
 
   Image resize;
@@ -55,11 +53,7 @@ public class EditorLineStatus extends JComponent {
   String serialport = "";
 
 
-  public EditorLineStatus(SketchTextArea textarea) {
-    
-    this.textarea = textarea;
-    textarea.setEditorLineStatus(this);
-
+  public EditorLineStatus() {
     background = Theme.getColor("linestatus.bgcolor");
     font = Theme.getFont("linestatus.font");
     foreground = Theme.getColor("linestatus.color");

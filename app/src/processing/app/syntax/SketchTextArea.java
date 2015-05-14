@@ -76,11 +76,6 @@ public class SketchTextArea extends RSyntaxTextArea {
    */
   private FocusableTip docTooltip;
 
-  /**
-   * The component that tracks the current line number.
-   */
-  protected EditorLineStatus editorLineStatus;
-
   private EditorListener editorListener;
 
   private final PdeKeywords pdeKeywords;
@@ -168,14 +163,9 @@ public class SketchTextArea extends RSyntaxTextArea {
   }
 
 
-  public void setEditorLineStatus(EditorLineStatus editorLineStatus) {
-    this.editorLineStatus = editorLineStatus;
-  }
-
   @Override
   public void select(int selectionStart, int selectionEnd) {
     super.select(selectionStart, selectionEnd);
-    if (editorLineStatus != null) editorLineStatus.set(selectionStart, selectionEnd);
   }
 
   public boolean isSelectionActive() {
