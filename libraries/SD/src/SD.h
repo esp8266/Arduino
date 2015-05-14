@@ -48,6 +48,28 @@ public:
   boolean isDirectory(void);
   File openNextFile(uint8_t mode = O_RDONLY);
   void rewindDirectory(void);
+
+  template<typename T> size_t write(T &src){
+    uint8_t obuf[512];
+    size_t doneLen = 0;
+    size_t sentLen;
+    int i;
+
+    while (src.available() > 512){
+      src.read(obuf, 512);
+      sentLen = write(obuf, 512);
+      doneLen = doneLen + sentLen;
+      if(sentLen != 512){
+        return doneLen;
+      }
+    }
+  
+    size_t leftLen = src.available();
+    src.read(obuf, leftLen);
+    sentLen = write(obuf, leftLen);
+    doneLen = doneLen + sentLen;
+    return doneLen;
+  }
   
   using Print::write;
 };

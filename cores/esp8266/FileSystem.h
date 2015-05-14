@@ -54,6 +54,28 @@ public:
   operator bool(){ return _file > 0; }
   char * name();
   boolean isDirectory(void);
+
+  template<typename T> size_t write(T &src){
+    uint8_t obuf[64];
+    size_t doneLen = 0;
+    size_t sentLen;
+    int i;
+
+    while (src.available() > 64){
+      src.read(obuf, 64);
+      sentLen = write(obuf, 64);
+      doneLen = doneLen + sentLen;
+      if(sentLen != 64){
+        return doneLen;
+      }
+    }
+  
+    size_t leftLen = src.available();
+    src.read(obuf, leftLen);
+    sentLen = write(obuf, leftLen);
+    doneLen = doneLen + sentLen;
+    return doneLen;
+  }
   
   using Print::write;
 };
