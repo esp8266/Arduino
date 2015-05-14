@@ -20,7 +20,7 @@ static spiffs_cache_page *spiffs_cache_page_get(spiffs *fs, spiffs_page_ix pix) 
     if ((cache->cpage_use_map & (1<<i)) &&
         (cp->flags & SPIFFS_CACHE_FLAG_TYPE_WR) == 0 &&
         cp->pix == pix ) {
-      SPIFFS_CACHE_DBG("CACHE_GET: have cache page %u for %04x\n", i, pix);
+      SPIFFS_CACHE_DBG("CACHE_GET: have cache page %d for %04x\n", i, pix);
       cp->last_access = cache->last_access;
       return cp;
     }
@@ -46,9 +46,9 @@ static s32_t spiffs_cache_page_free(spiffs *fs, int ix, u8_t write_back) {
     cache->cpage_use_map &= ~(1 << ix);
 
     if (cp->flags & SPIFFS_CACHE_FLAG_TYPE_WR) {
-      SPIFFS_CACHE_DBG("CACHE_FREE: free cache page %u objid %04x\n", ix, cp->obj_id);
+      SPIFFS_CACHE_DBG("CACHE_FREE: free cache page %d objid %04x\n", ix, cp->obj_id);
     } else {
-      SPIFFS_CACHE_DBG("CACHE_FREE: free cache page %u pix %04x\n", ix, cp->pix);
+      SPIFFS_CACHE_DBG("CACHE_FREE: free cache page %d pix %04x\n", ix, cp->pix);
     }
   }
 
@@ -98,7 +98,7 @@ static spiffs_cache_page *spiffs_cache_page_allocate(spiffs *fs) {
       spiffs_cache_page *cp = spiffs_get_cache_page_hdr(fs, cache, i);
       cache->cpage_use_map |= (1<<i);
       cp->last_access = cache->last_access;
-      SPIFFS_CACHE_DBG("CACHE_ALLO: allocated cache page %u\n", i);
+      SPIFFS_CACHE_DBG("CACHE_ALLO: allocated cache page %d\n", i);
       return cp;
     }
   }
