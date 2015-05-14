@@ -80,7 +80,7 @@ public:
 class FSClass {
 
 private:
-  bool _mounted;
+  bool _mounted = false;
   
 public:
   bool mount();
