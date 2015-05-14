@@ -43,8 +43,6 @@ spiffs_config spiffs_get_storage_config()
 	spiffs_config cfg = {0};
 	if ((u32_t)&_SPIFFS_start == 0) return cfg;
 	cfg.phys_addr = (u32_t)&_SPIFFS_start;
-	cfg.phys_addr += 0x3000;
-	cfg.phys_addr &= 0xFFFFC000;  // align to 4 sector.
 	cfg.phys_size = (u32_t)((u32_t)&_SPIFFS_end - (u32_t)&_SPIFFS_start);
 	cfg.phys_erase_block = INTERNAL_FLASH_SECTOR_SIZE; // according to datasheet
 	cfg.log_block_size = INTERNAL_FLASH_SECTOR_SIZE * 2; // Important to make large
