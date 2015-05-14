@@ -48,7 +48,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
   String url = req.substring(addr_start + 1, addr_end);
   String searchStr = "";
   int hasSearch = url.indexOf('?');
-  if(hasSearch != -1){
+  if (hasSearch != -1){
     searchStr = url.substring(hasSearch + 1);
     url = url.substring(0, hasSearch);
   }
@@ -77,7 +77,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
 
   String formData;
   // below is needed only when POST type request
-  if(method == HTTP_POST || method == HTTP_PUT || method == HTTP_PATCH || method == HTTP_DELETE){
+  if (method == HTTP_POST || method == HTTP_PUT || method == HTTP_PATCH || method == HTTP_DELETE){
     String boundaryStr;
     String headerName;
     String headerValue;
@@ -87,32 +87,32 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
     while(1){
       req = client.readStringUntil('\r');
       client.readStringUntil('\n');
-      if(req == "") break;//no moar headers
+      if (req == "") break;//no moar headers
       int headerDiv = req.indexOf(':');
-      if(headerDiv == -1){
+      if (headerDiv == -1){
         break;
       }
       headerName = req.substring(0, headerDiv);
       headerValue = req.substring(headerDiv + 2);
-      if(headerName == "Content-Type"){
-        if(headerValue.startsWith("text/plain")){
+      if (headerName == "Content-Type"){
+        if (headerValue.startsWith("text/plain")){
           isForm = false;
-        } else if(headerValue.startsWith("multipart/form-data")){
+        } else if (headerValue.startsWith("multipart/form-data")){
           boundaryStr = headerValue.substring(headerValue.indexOf('=')+1);
           isForm = true;
         }
-      } else if(headerName == "Content-Length"){
+      } else if (headerName == "Content-Length"){
         contentLength = headerValue.toInt();
       }
     }
   
-    if(!isForm){
-      if(searchStr != "") searchStr += '&';
+    if (!isForm){
+      if (searchStr != "") searchStr += '&';
       searchStr += client.readStringUntil('\r');
       client.readStringUntil('\n');
     }
     _parseArguments(searchStr);
-    if(isForm){
+    if (isForm){
       _parseForm(client, boundaryStr, contentLength);
     }
   } else {
@@ -205,6 +205,15 @@ void ESP8266WebServer::_parseArguments(String data) {
 
 }
 
+void ESP8266WebServer::_uploadWriteByte(uint8_t b){
+  if (_currentUpload.currentSize == HTTP_UPLOAD_BUFLEN){
+    if (_fileUploadHandler) _fileUploadHandler();
+    _currentUpload.totalSize += _currentUpload.currentSize;
+    _currentUpload.currentSize = 0;
+  }
+  _currentUpload.buf[_currentUpload.currentSize++] = b;
+}
+
 void ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t len){
   
 #ifdef DEBUG
@@ -217,7 +226,7 @@ void ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t 
   line = client.readStringUntil('\r');
   client.readStringUntil('\n');
   //start reading the form
-  if(line == ("--"+boundary)){
+  if (line == ("--"+boundary)){
     RequestArgument* postArgs = new RequestArgument[32];
     int postArgsLen = 0;
     while(1){
@@ -229,12 +238,12 @@ void ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t 
       
       line = client.readStringUntil('\r');
       client.readStringUntil('\n');
-      if(line.startsWith("Content-Disposition")){
+      if (line.startsWith("Content-Disposition")){
         int nameStart = line.indexOf('=');
-        if(nameStart != -1){
+        if (nameStart != -1){
           argName = line.substring(nameStart+2);
           nameStart = argName.indexOf('=');
-          if(nameStart == -1){
+          if (nameStart == -1){
             argName = argName.substring(0, argName.length() - 1);
           } else {
             argFilename = argName.substring(nameStart+2, argName.length() - 1);
@@ -245,7 +254,7 @@ void ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t 
             DEBUG_OUTPUT.println(argFilename);
   #endif
             //use GET to set the filename if uploading using blob
-            if(argFilename == "blob" && hasArg("filename")) argFilename = arg("filename");
+            if (argFilename == "blob" && hasArg("filename")) argFilename = arg("filename");
           }
   #ifdef DEBUG
           DEBUG_OUTPUT.print("PostArg Name: ");
@@ -254,7 +263,7 @@ void ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t 
           argType = "text/plain";
           line = client.readStringUntil('\r');
           client.readStringUntil('\n');
-          if(line.startsWith("Content-Type")){
+          if (line.startsWith("Content-Type")){
             argType = line.substring(line.indexOf(':')+2);
             //skip next line
             client.readStringUntil('\r');
@@ -264,12 +273,12 @@ void ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t 
           DEBUG_OUTPUT.print("PostArg Type: ");
           DEBUG_OUTPUT.println(argType);
   #endif
-          if(!argIsFile){
+          if (!argIsFile){
             while(1){
               line = client.readStringUntil('\r');
               client.readStringUntil('\n');
-              if(line.startsWith("--"+boundary)) break;
-              if(argValue.length() > 0) argValue += "\n";
+              if (line.startsWith("--"+boundary)) break;
+              if (argValue.length() > 0) argValue += "\n";
               argValue += line;
             }
   #ifdef DEBUG
@@ -282,7 +291,7 @@ void ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t 
             arg.key = argName;
             arg.value = argValue;
             
-            if(line == ("--"+boundary+"--")){
+            if (line == ("--"+boundary+"--")){
   #ifdef DEBUG
               DEBUG_OUTPUT.println("Done Parsing POST");
   #endif
@@ -301,47 +310,30 @@ void ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t 
             DEBUG_OUTPUT.print(" Type: ");
             DEBUG_OUTPUT.println(_currentUpload.type);
 #endif
-            if(_fileUploadHandler) _fileUploadHandler();
+            if (_fileUploadHandler) _fileUploadHandler();
             _currentUpload.status = UPLOAD_FILE_WRITE;
             uint8_t argByte = client.read();
 readfile:
             while(argByte != 0x0D){
-              _currentUpload.buf[_currentUpload.currentSize++] = argByte;
-              if(_currentUpload.currentSize == PAYLOAD_UNIT_SIZE){
-  #ifdef DEBUG
-                DEBUG_OUTPUT.print("Write File: ");
-                DEBUG_OUTPUT.println(PAYLOAD_UNIT_SIZE);
-  #endif
-                if(_fileUploadHandler) _fileUploadHandler();
-                _currentUpload.totalSize += _currentUpload.currentSize;
-                _currentUpload.currentSize = 0;
-              }
+              _uploadWriteByte(argByte);
               argByte = client.read();
             }
             
             argByte = client.read();
-            if(argByte == 0x0A){
-#ifdef DEBUG
-              DEBUG_OUTPUT.print("Write File: ");
-              DEBUG_OUTPUT.println(_currentUpload.currentSize);
-#endif
-              if(_fileUploadHandler) _fileUploadHandler();
-              _currentUpload.totalSize += _currentUpload.currentSize;
-              _currentUpload.currentSize = 0;
-              
+            if (argByte == 0x0A){
               argByte = client.read();
-              if((char)argByte != '-'){
+              if ((char)argByte != '-'){
                 //continue reading the file
-                _currentUpload.buf[_currentUpload.currentSize++] = 0x0D;
-                _currentUpload.buf[_currentUpload.currentSize++] = 0x0A;
+                _uploadWriteByte(0x0D);
+                _uploadWriteByte(0x0A);
                 goto readfile;
               } else {
                 argByte = client.read();
-                if((char)argByte != '-'){
+                if ((char)argByte != '-'){
                   //continue reading the file
-                  _currentUpload.buf[_currentUpload.currentSize++] = 0x0D;
-                  _currentUpload.buf[_currentUpload.currentSize++] = 0x0A;
-                  _currentUpload.buf[_currentUpload.currentSize++] = (uint8_t)('-');
+                  _uploadWriteByte(0x0D);
+                  _uploadWriteByte(0x0A);
+                  _uploadWriteByte((uint8_t)('-'));
                   goto readfile;
                 }
               }
@@ -349,8 +341,11 @@ readfile:
               uint8_t endBuf[boundary.length()];
               client.readBytes(endBuf, boundary.length());
               
-              if(strstr((const char*)endBuf, (const char*)(boundary.c_str())) != NULL){
+              if (strstr((const char*)endBuf, boundary.c_str()) != NULL){
+                if (_fileUploadHandler) _fileUploadHandler();
+                _currentUpload.totalSize += _currentUpload.currentSize;
                 _currentUpload.status = UPLOAD_FILE_END;
+                if (_fileUploadHandler) _fileUploadHandler();
 #ifdef DEBUG
                 DEBUG_OUTPUT.print("End File: ");
                 DEBUG_OUTPUT.print(_currentUpload.filename);
@@ -359,10 +354,9 @@ readfile:
                 DEBUG_OUTPUT.print(" Size: ");
                 DEBUG_OUTPUT.println(_currentUpload.totalSize);
 #endif
-                if(_fileUploadHandler) _fileUploadHandler();
                 line = client.readStringUntil(0x0D);
                 client.readStringUntil(0x0A);
-                if(line == "--"){
+                if (line == "--"){
 #ifdef DEBUG
                   DEBUG_OUTPUT.println("Done Parsing POST");
 #endif
@@ -370,35 +364,17 @@ readfile:
                 }
                 continue;
               } else {
-                _currentUpload.buf[_currentUpload.currentSize++] = 0x0D;
-                _currentUpload.buf[_currentUpload.currentSize++] = 0x0A;
+                _uploadWriteByte(0x0D);
+                _uploadWriteByte(0x0A);
                 uint32_t i = 0;
                 while(i < boundary.length()){
-                  _currentUpload.buf[_currentUpload.currentSize++] = endBuf[i++];
-                  if(_currentUpload.currentSize == PAYLOAD_UNIT_SIZE){
-#ifdef DEBUG
-                    DEBUG_OUTPUT.print("Write File: ");
-                    DEBUG_OUTPUT.println(PAYLOAD_UNIT_SIZE);
-#endif
-                    if(_fileUploadHandler) _fileUploadHandler();
-                    _currentUpload.totalSize += _currentUpload.currentSize;
-                    _currentUpload.currentSize = 0;
-                  }
+                  _uploadWriteByte(endBuf[i++]);
                 }
                 argByte = client.read();
                 goto readfile;
               }
             } else {
-              _currentUpload.buf[_currentUpload.currentSize++] = 0x0D;
-              if(_currentUpload.currentSize == PAYLOAD_UNIT_SIZE){
-  #ifdef DEBUG
-                DEBUG_OUTPUT.print("Write File: ");
-                DEBUG_OUTPUT.println(PAYLOAD_UNIT_SIZE);
-  #endif
-                if(_fileUploadHandler) _fileUploadHandler();
-                _currentUpload.totalSize += _currentUpload.currentSize;
-                _currentUpload.currentSize = 0;
-              }
+              _uploadWriteByte(0x0D);
               goto readfile;
             }
             break;
@@ -425,4 +401,5 @@ readfile:
     if (postArgs) delete[] postArgs;
   }
 }
+
 

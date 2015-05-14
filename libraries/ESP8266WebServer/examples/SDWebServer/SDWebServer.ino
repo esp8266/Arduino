@@ -94,7 +94,7 @@ bool loadFromSdCard(String path){
 
   WiFiClient client = server.client();
   size_t totalSize = dataFile.size();
-  if (client.write(dataFile, PAYLOAD_UNIT_SIZE) != totalSize) {
+  if (client.write(dataFile, HTTP_DOWNLOAD_UNIT_SIZE) != totalSize) {
     DBG_OUTPUT_PORT.println("Sent less data than expected!");
   }
 
