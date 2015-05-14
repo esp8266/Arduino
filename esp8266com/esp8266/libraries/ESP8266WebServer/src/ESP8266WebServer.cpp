@@ -1,9 +1,9 @@
-/* 
+/*
   ESP8266WebServer.cpp - Dead simple web-server.
   Supports only one simultaneous client, knows how to handle GET and POST.
 
   Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
- 
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -137,7 +137,7 @@ void ESP8266WebServer::send(int code, const char* content_type, String content) 
   if (!content_type)
     content_type = "text/html";
   sendHeader("Content-Type", content_type, true);
-  
+
   response += _responseHeaders;
   response += "\r\n";
   response += content;

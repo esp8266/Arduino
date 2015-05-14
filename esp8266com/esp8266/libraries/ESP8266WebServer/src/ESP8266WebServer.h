@@ -1,9 +1,9 @@
-/* 
+/*
   ESP8266WebServer.h - Dead simple web-server.
   Supports only one simultaneous client, knows how to handle GET and POST.
 
   Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
- 
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -61,13 +61,13 @@ public:
   HTTPMethod method() { return _currentMethod; }
   WiFiClient client() { return _currentClient; }
   HTTPUpload& upload() { return _currentUpload; }
-  
+
   String arg(const char* name);   // get request argument value by name
   String arg(int i);              // get request argument value by number
   String argName(int i);          // get request argument name by number
   int args();                     // get arguments count
   bool hasArg(const char* name);  // check if argument exists
-  
+
   // send response to the client
   // code - HTTP response code, can be 200 or 404
   // content_type - HTTP content type, like "text/plain" or "image/png"
@@ -83,7 +83,7 @@ protected:
   static const char* _responseCodeToString(int code);
   void _parseForm(WiFiClient& client, String boundary, uint32_t len);
   void _uploadWriteByte(uint8_t b);
-  
+
   struct RequestHandler;
   struct RequestArgument {
     String key;

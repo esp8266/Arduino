@@ -1,8 +1,8 @@
-/* 
+/*
   Parsing.cpp - HTTP request parsing.
 
   Copyright (c) 2015 Ivan Grokhotkov. All rights reserved.
- 
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -43,7 +43,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
 #endif
     return false;
   }
-  
+
   String methodStr = req.substring(0, addr_start);
   String url = req.substring(addr_start + 1, addr_end);
   String searchStr = "";
@@ -53,7 +53,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
     url = url.substring(0, hasSearch);
   }
   _currentUri = url;
-  
+
   HTTPMethod method = HTTP_GET;
   if (methodStr == "POST") {
     method = HTTP_POST;
@@ -65,7 +65,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
     method = HTTP_PATCH;
   }
   _currentMethod = method;
-  
+
 #ifdef DEBUG
   DEBUG_OUTPUT.print("method: ");
   DEBUG_OUTPUT.print(methodStr);
@@ -105,7 +105,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
         contentLength = headerValue.toInt();
       }
     }
-  
+
     if (!isForm){
       if (searchStr != "") searchStr += '&';
       searchStr += client.readStringUntil('\r');
@@ -215,7 +215,7 @@ void ESP8266WebServer::_uploadWriteByte(uint8_t b){
 }
 
 void ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t len){
-  
+
 #ifdef DEBUG
   DEBUG_OUTPUT.print("Parse Form: Boundary: ");
   DEBUG_OUTPUT.print(boundary);
@@ -235,7 +235,7 @@ void ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t 
       String argType;
       String argFilename;
       bool argIsFile = false;
-      
+
       line = client.readStringUntil('\r');
       client.readStringUntil('\n');
       if (line.startsWith("Content-Disposition")){
@@ -286,11 +286,11 @@ void ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t 
             DEBUG_OUTPUT.println(argValue);
             DEBUG_OUTPUT.println();
   #endif
-            
+
             RequestArgument& arg = postArgs[postArgsLen++];
             arg.key = argName;
             arg.value = argValue;
-            
+
             if (line == ("--"+boundary+"--")){
   #ifdef DEBUG
               DEBUG_OUTPUT.println("Done Parsing POST");
@@ -318,7 +318,7 @@ readfile:
               _uploadWriteByte(argByte);
               argByte = client.read();
             }
-            
+
             argByte = client.read();
             if (argByte == 0x0A){
               argByte = client.read();
@@ -337,10 +337,10 @@ readfile:
                   goto readfile;
                 }
               }
-              
+
               uint8_t endBuf[boundary.length()];
               client.readBytes(endBuf, boundary.length());
-              
+
               if (strstr((const char*)endBuf, boundary.c_str()) != NULL){
                 if (_fileUploadHandler) _fileUploadHandler();
                 _currentUpload.totalSize += _currentUpload.currentSize;
@@ -382,7 +382,7 @@ readfile:
         }
       }
     }
-    
+
     int iarg;
     int totalArgs = ((32 - postArgsLen) < _currentArgCount)?(32 - postArgsLen):_currentArgCount;
     for (iarg = 0; iarg < totalArgs; iarg++){
@@ -401,5 +401,4 @@ readfile:
     if (postArgs) delete[] postArgs;
   }
 }
-
 
