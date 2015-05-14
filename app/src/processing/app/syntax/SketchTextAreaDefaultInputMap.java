@@ -12,10 +12,12 @@ import java.awt.event.KeyEvent;
 public class SketchTextAreaDefaultInputMap extends RSyntaxTextAreaDefaultInputMap {
 
   public SketchTextAreaDefaultInputMap() {
-    int defaultMod = getDefaultModifier();
+    int defaultModifier = getDefaultModifier();
     int alt = InputEvent.ALT_MASK;
+    boolean isOSX = RTextArea.isOSX();
+    int moveByWordMod = isOSX ? alt : defaultModifier;
 
-    remove(KeyStroke.getKeyStroke(KeyEvent.VK_K, defaultMod));
+    remove(KeyStroke.getKeyStroke(KeyEvent.VK_K, defaultModifier));
 
     if (PreferencesData.getBoolean("editor.advanced")) {
       put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, alt), RTextAreaEditorKit.rtaLineDownAction);
@@ -25,9 +27,11 @@ public class SketchTextAreaDefaultInputMap extends RSyntaxTextAreaDefaultInputMa
       remove(KeyStroke.getKeyStroke(KeyEvent.VK_UP, alt));
     }
 
-    boolean isOSX = RTextArea.isOSX();
+    remove(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, defaultModifier));
+    put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, moveByWordMod), RTextAreaEditorKit.rtaDeletePrevWordAction);
+
     if (isOSX) {
-      put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, alt), SketchTextAreaEditorKit.rtaDeleteNextWordAction);
+      put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, defaultModifier), SketchTextAreaEditorKit.rtaDeleteLineToCursorAction);
     }
   }
 }
