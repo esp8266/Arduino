@@ -83,12 +83,10 @@ typedef enum {
 } spiffs_check_report;
 
 /* file system check callback function */
-typedef void (*spiffs_check_callback)(spiffs_check_type type, spiffs_check_report report,
-    u32_t arg1, u32_t arg2);
+typedef void (*spiffs_check_callback)(spiffs_check_type type, spiffs_check_report report, u32_t arg1, u32_t arg2);
 
 #ifndef SPIFFS_DBG
-#define SPIFFS_DBG(...) \
-    print(__VA_ARGS__)
+#define SPIFFS_DBG(...) printf(__VA_ARGS__)
 #endif
 #ifndef SPIFFS_GC_DBG
 #define SPIFFS_GC_DBG(...) printf(__VA_ARGS__)
@@ -456,7 +454,7 @@ u32_t SPIFFS_buffer_bytes_for_cache(spiffs *fs, u32_t num_pages);
 #endif
 
 
-void spiffs_mount();
+bool spiffs_mount();
 void spiffs_unmount();
 bool spiffs_format();
 spiffs_config spiffs_get_storage_config();
