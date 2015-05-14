@@ -163,7 +163,7 @@ int FSFile::available() {
 size_t FSFile::write(const uint8_t *buf, size_t size){
   if (! _file) return 0;
   int res = SPIFFS_write(&_filesystemStorageHandle, _file, (uint8_t *)buf, size);
-  return (res > 0)?res:0;
+  return (res > 0)?(size_t)res:0;
 }
 
 size_t FSFile::write(uint8_t val) {
