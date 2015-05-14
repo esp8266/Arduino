@@ -214,6 +214,7 @@ void loop(void);
 #include "HardwareSerial.h"
 #include "FileSystem.h"
 #include "Esp.h"
+#include "debug.h"
 
 uint16_t makeWord(uint16_t w);
 uint16_t makeWord(byte h, byte l);
@@ -230,6 +231,7 @@ long random(long);
 long random(long, long);
 void randomSeed(unsigned int);
 long map(long, long, long, long, long);
+
 
 #endif
 
