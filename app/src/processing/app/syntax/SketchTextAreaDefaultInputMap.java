@@ -33,8 +33,11 @@ public class SketchTextAreaDefaultInputMap extends RSyntaxTextAreaDefaultInputMa
 
     if (isOSX) {
       put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, defaultModifier), SketchTextAreaEditorKit.rtaDeleteLineToCursorAction);
+
       put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, defaultModifier), DefaultEditorKit.beginAction);
       put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, defaultModifier), DefaultEditorKit.endAction);
+
+      remove(KeyStroke.getKeyStroke(KeyEvent.VK_J, defaultModifier));
     }
   }
 }
