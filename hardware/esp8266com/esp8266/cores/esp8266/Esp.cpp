@@ -28,6 +28,7 @@ extern "C" {
 extern "C" void ets_wdt_enable(void);
 extern "C" void ets_wdt_disable(void);
 extern "C" void wdt_feed(void);
+extern "C" uint16_t readvdd33(void);
 
 /**
  * User-defined Literals
@@ -120,6 +121,11 @@ void EspClass::restart(void)
 uint16_t EspClass::getVcc(void)
 {
     return system_get_vdd33();
+}
+
+uint16_t EspClass::getVdd33(void)
+{
+return readvdd33();
 }
 
 uint32_t EspClass::getFreeHeap(void)
