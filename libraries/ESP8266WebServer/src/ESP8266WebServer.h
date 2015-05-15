@@ -76,6 +76,20 @@ public:
 
   void sendHeader(String name, String value, bool first = false);
   void sendContent(String content);
+
+template<typename T> size_t streamFile(T &file, String contentType){
+  String head = "HTTP/1.1 200 OK\r\nContent-Type: ";
+  head += contentType;
+  head += "\r\nContent-Length: ";
+  head += file.size();
+  head += "\r\nConnection: close";
+  head += "\r\nAccess-Control-Allow-Origin: *";
+  head += "\r\n\r\n";
+  _currentClient.print(head);
+  head = String();
+  return _currentClient.write(file, HTTP_DOWNLOAD_UNIT_SIZE);
+}
+  
 protected:
   void _handleRequest();
   bool _parseRequest(WiFiClient& client);
