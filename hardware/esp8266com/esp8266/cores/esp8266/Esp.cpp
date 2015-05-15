@@ -125,7 +125,7 @@ uint16_t EspClass::getVcc(void)
 
 uint16_t EspClass::getVdd33(void)
 {
-return readvdd33();
+   return readvdd33();
 }
 
 uint32_t EspClass::getFreeHeap(void)
