@@ -20,8 +20,7 @@ compiler.c.flags=-c -Os -Wpointer-arith -Wno-implicit-function-declaration -Wl,-
 compiler.S.cmd=xtensa-lx106-elf-gcc
 compiler.S.flags=-c -g -x assembler-with-cpp -MMD
 
-compiler.c.elf.ldscript=eagle.app.v6.ld
-compiler.c.elf.flags=-nostdlib -Wl,--no-check-sections -u call_user_start -Wl,-static "-L{compiler.sdk.path}/lib" "-L{compiler.sdk.path}/ld" "-T{compiler.c.elf.ldscript}"
+compiler.c.elf.flags=-nostdlib -Wl,--no-check-sections -u call_user_start -Wl,-static "-L{compiler.sdk.path}/lib" "-L{compiler.sdk.path}/ld" "-T{build.flash_ld}"
 compiler.c.elf.cmd=xtensa-lx106-elf-gcc
 compiler.c.elf.libs=-lm -lgcc -lhal -lphy -lnet80211 -llwip -lwpa -lmain -lpp -lsmartconfig
 

@@ -20,7 +20,6 @@
 #include "stddef.h"
 #include "osapi.h"
 #include "ets_sys.h"
-#include <user_config.h>
 // ----------- >8 ------------
 #define IRAM_ATTR __attribute__((section(".iram.text")))
 #define STORE_TYPEDEF_ATTR __attribute__((aligned(4),packed))

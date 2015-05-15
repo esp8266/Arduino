@@ -1,12 +1,5 @@
 /* This linker script generated from xt-genldscripts.tpp for LSP . */
 /* Linker Script for ld -N */
-MEMORY
-{
-  dport0_0_seg :                        org = 0x3FF00000, len = 0x10
-  dram0_0_seg :                         org = 0x3FFE8000, len = 0x14000
-  iram1_0_seg :                         org = 0x40100000, len = 0x8000
-  irom0_0_seg :                         org = 0x40210000, len = 0x5B000
-}
 
 PHDRS
 {
@@ -20,8 +13,6 @@ PHDRS
 
 /*  Default entry point:  */
 ENTRY(call_user_start)
-PROVIDE ( _SPIFFS_start = 0x4026B000 );
-PROVIDE ( _SPIFFS_end = 0x4027B000 );
 PROVIDE(_memmap_vecbase_reset = 0x40000000);
 /* Various memory-map dependent cache attribute settings: */
 _memmap_cacheattr_wb_base = 0x00000110;

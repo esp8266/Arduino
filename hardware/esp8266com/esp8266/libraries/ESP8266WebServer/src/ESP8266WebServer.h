@@ -83,6 +83,7 @@ protected:
   static const char* _responseCodeToString(int code);
   void _parseForm(WiFiClient& client, String boundary, uint32_t len);
   void _uploadWriteByte(uint8_t b);
+  uint8_t _uploadReadByte(WiFiClient& client);
   
   struct RequestHandler;
   struct RequestArgument {
