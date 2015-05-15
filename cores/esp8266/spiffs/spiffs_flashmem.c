@@ -1,4 +1,5 @@
 #include "flashmem.h"
+#include "esp8266_peri.h"
 
 // Based on NodeMCU platform_flash
 // https://github.com/nodemcu/nodemcu-firmware

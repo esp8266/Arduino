@@ -23,6 +23,7 @@ generic.build.variant=generic
 generic.build.flash_mode=qio
 generic.build.flash_size=512K
 generic.build.flash_freq=40
+generic.build.flash_ld=eagle.flash.512k.ld
 
 generic.menu.CpuFrequency.80=80 MHz
 generic.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -50,14 +51,19 @@ generic.menu.UploadSpeed.921600.upload.speed=921600
 
 generic.menu.FlashSize.512K=512K
 generic.menu.FlashSize.512K.build.flash_size=512K
+generic.menu.FlashSize.512K.build.flash_ld=eagle.flash.512k.ld
 generic.menu.FlashSize.256K=256K
 generic.menu.FlashSize.256K.build.flash_size=256K
+generic.menu.FlashSize.256K.build.flash_ld=eagle.flash.256k.ld
 generic.menu.FlashSize.1M=1M
 generic.menu.FlashSize.1M.build.flash_size=1M
+generic.menu.FlashSize.1M.build.flash_ld=eagle.flash.1m.ld
 generic.menu.FlashSize.2M=2M
 generic.menu.FlashSize.2M.build.flash_size=2M
+generic.menu.FlashSize.2M.build.flash_ld=eagle.flash.2m.ld
 generic.menu.FlashSize.4M=4M
 generic.menu.FlashSize.4M.build.flash_size=4M
+generic.menu.FlashSize.4M.build.flash_ld=eagle.flash.4m.ld
 
 generic.menu.FlashFreq.40=40MHz
 generic.menu.FlashFreq.40.build.flash_freq=40
@@ -97,6 +103,7 @@ modwifi.build.variant=generic
 modwifi.build.flash_mode=qio
 modwifi.build.flash_size=2M
 modwifi.build.flash_freq=40
+modwifi.build.flash_ld=eagle.flash.2m.ld
 
 modwifi.menu.CpuFrequency.80=80 MHz
 modwifi.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -142,6 +149,7 @@ nodemcu.build.variant=nodemcu
 nodemcu.build.flash_mode=qio
 nodemcu.build.flash_size=4M
 nodemcu.build.flash_freq=40
+nodemcu.build.flash_ld=eagle.flash.4m.ld
 
 nodemcu.menu.CpuFrequency.80=80 MHz
 nodemcu.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -188,6 +196,7 @@ nodemcu.menu.FlashSize.4M.build.flash_size=4M
 # wifio.build.flash_mode=qio
 # wifio.build.flash_size=512K
 # wifio.build.flash_freq=40
+# wifio.build.flash_ld=eagle.flash.512k.ld
 #
 # wifio.menu.CpuFrequency.80=80MHz
 # wifio.menu.CpuFrequency.80.build.f_cpu=80000000L
