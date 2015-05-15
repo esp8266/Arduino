@@ -28,9 +28,10 @@
 #include "os_type.h"
 #include "osapi.h"
 #include "spi_flash.h"
+extern uint32_t _SPIFFS_end;
 }
 
-#define CONFIG_START_SECTOR 0x7b
+#define CONFIG_START_SECTOR (((uint32_t)_SPIFFS_end - 0x40200000) / 4096)
 #define CONFIG_SECTOR (CONFIG_START_SECTOR + 0)
 #define CONFIG_ADDR (SPI_FLASH_SEC_SIZE * CONFIG_SECTOR)
 
