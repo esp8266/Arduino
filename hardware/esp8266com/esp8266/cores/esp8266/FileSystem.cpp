@@ -41,6 +41,10 @@ bool FSClass::format() {
   return spiffs_format();
 }
 
+bool FSClass::check() {
+  return SPIFFS_check(&_filesystemStorageHandle) == 0;
+}
+
 bool FSClass::exists(const char *filename) {
   spiffs_stat stat = {0};
   if (SPIFFS_stat(&_filesystemStorageHandle, filename, &stat) < 0) 
@@ -61,6 +65,7 @@ bool FSClass::rename(const char *filename, const char *newname) {
 }
 
 FSFile FSClass::open(const char *filename, uint8_t mode) {
+  if(String(filename) == "" || String(filename) == "/") return FSFile("/");
   int repeats = 0;
   bool notExist;
   bool canRecreate = (mode & SPIFFS_CREAT) == SPIFFS_CREAT;
@@ -84,6 +89,14 @@ FSFile FSClass::open(const char *filename, uint8_t mode) {
   return FSFile();
 }
 
+FSFile FSClass::open(spiffs_dirent* entry, uint8_t mode){
+  int res = SPIFFS_open_by_dirent(&_filesystemStorageHandle, entry, (spiffs_flags)mode, 0);
+  if(res){
+    return FSFile(res);
+  }
+  return FSFile();
+}
+
 FSClass FS;
 
 FSFile::FSFile() {
@@ -91,88 +104,125 @@ FSFile::FSFile() {
   _stats = {0};
 }
 
+FSFile::FSFile(String path) {
+  if(path == "/"){
+    _file = 0x1;
+    os_sprintf((char*)_stats.name, "%s", (char*)path.c_str());
+    _stats.size = 0;
+    _stats.type = SPIFFS_TYPE_DIR;
+    SPIFFS_opendir(&_filesystemStorageHandle, (char*)_stats.name, &_dir);
+  } else {
+    _file = SPIFFS_open(&_filesystemStorageHandle, path.c_str(), (spiffs_flags)FSFILE_READ, 0);
+    if(SPIFFS_fstat(&_filesystemStorageHandle, _file, &_stats) != 0){
+      debugf("stats errno %d\n", SPIFFS_errno(&_filesystemStorageHandle));
+    }
+    debugf("FSFile name: %s, size: %d, type: %d\n", _stats.name, _stats.size, _stats.type);
+    if(_stats.type == SPIFFS_TYPE_DIR){
+      SPIFFS_opendir(&_filesystemStorageHandle, (char*)_stats.name, &_dir);
+    }
+  }
+}
+
 FSFile::FSFile(file_t f) {
   _file = f;
   if(SPIFFS_fstat(&_filesystemStorageHandle, _file, &_stats) != 0){
-    debugf("mount errno %d\n", SPIFFS_errno(&_filesystemStorageHandle));
+    debugf("stats errno %d\n", SPIFFS_errno(&_filesystemStorageHandle));
+  }
+  debugf("FSFile name: %s, size: %d, type: %d\n", _stats.name, _stats.size, _stats.type);
+  if(_stats.type == SPIFFS_TYPE_DIR){
+    SPIFFS_opendir(&_filesystemStorageHandle, (char*)_stats.name, &_dir);
   }
 }
 
 void FSFile::close() {
   if (! _file) return;
-  SPIFFS_close(&_filesystemStorageHandle, _file);
+  if(_stats.type == SPIFFS_TYPE_DIR){
+    SPIFFS_closedir(&_dir);
+  }
+  if(os_strlen((char*)_stats.name) > 1)
+    SPIFFS_close(&_filesystemStorageHandle, _file);
   _file = 0;
+}
+
+void FSFile::rewindDirectory() {
+  if (! _file || !isDirectory()) return;
+  SPIFFS_closedir(&_dir);
+  SPIFFS_opendir(&_filesystemStorageHandle, (char*)_stats.name, &_dir);
+}
+
+FSFile FSFile::openNextFile(){
+  if (! _file || !isDirectory()) return FSFile();
+  struct spiffs_dirent e;
+  struct spiffs_dirent *pe = &e;
+  if ((pe = SPIFFS_readdir(&_dir, pe))){
+    return FS.open((char *)pe->name);
+  }
+  return FSFile();
 }
 
 uint32_t FSFile::size() {
   if(! _file) return 0;
-  uint32_t pos = SPIFFS_tell(&_filesystemStorageHandle, _file);
-  SPIFFS_lseek(&_filesystemStorageHandle, _file, 0, SPIFFS_SEEK_END);
-  uint32_t size = SPIFFS_tell(&_filesystemStorageHandle, _file);
-  SPIFFS_lseek(&_filesystemStorageHandle, _file, pos, SPIFFS_SEEK_SET);
-  return size;
+  if(SPIFFS_fstat(&_filesystemStorageHandle, _file, &_stats) != 0) return 0;
+  return _stats.size;
 }
 
 uint32_t FSFile::seek(uint32_t pos) {
-  if (! _file) return 0;
+  if (! _file || isDirectory()) return 0;
   return SPIFFS_lseek(&_filesystemStorageHandle, _file, pos, SPIFFS_SEEK_SET);
 }
 
 uint32_t FSFile::position() {
-  if (! _file) return 0;
+  if (! _file || isDirectory()) return 0;
   return SPIFFS_tell(&_filesystemStorageHandle, _file);
 }
 
 bool FSFile::eof() {
-  if (! _file) return 0;
+  if (! _file || isDirectory()) return 0;
   return SPIFFS_eof(&_filesystemStorageHandle, _file);
 }
 
 bool FSFile::isDirectory(void) {
-  return false;
+  return _stats.type == SPIFFS_TYPE_DIR;
 }
 
 int FSFile::read(void *buf, uint16_t nbyte) {
-  if (! _file) return -1;
+  if (! _file || isDirectory()) return -1;
   return SPIFFS_read(&_filesystemStorageHandle, _file, buf, nbyte);
 }
 
 int FSFile::read() {
-  if (! _file) return -1;
+  if (! _file || isDirectory()) return -1;
   int val;
   if(SPIFFS_read(&_filesystemStorageHandle, _file, &val, 1) != 1) return -1;
   return val;
 }
 
 int FSFile::peek() {
-  if (! _file) return 0;
+  if (! _file || isDirectory()) return 0;
   int c = read();
   SPIFFS_lseek(&_filesystemStorageHandle, _file, -1, SPIFFS_SEEK_CUR);
   return c;
 }
 
 int FSFile::available() {
-  if (! _file) return 0;
+  if (! _file || isDirectory()) return 0;
   uint32_t pos = SPIFFS_tell(&_filesystemStorageHandle, _file);
-  SPIFFS_lseek(&_filesystemStorageHandle, _file, 0, SPIFFS_SEEK_END);
-  uint32_t size = SPIFFS_tell(&_filesystemStorageHandle, _file);
-  SPIFFS_lseek(&_filesystemStorageHandle, _file, pos, SPIFFS_SEEK_SET);
-  return size - pos;
+  return _stats.size - pos;
 }
 
 size_t FSFile::write(const uint8_t *buf, size_t size){
-  if (! _file) return 0;
+  if (! _file || isDirectory()) return 0;
   int res = SPIFFS_write(&_filesystemStorageHandle, _file, (uint8_t *)buf, size);
   return (res > 0)?(size_t)res:0;
 }
 
 size_t FSFile::write(uint8_t val) {
-  if (! _file) return 0;
+  if (! _file || isDirectory()) return 0;
   return write(&val, 1);
 }
 
 void FSFile::flush(){
-  if (! _file) return;
+  if (! _file || isDirectory()) return;
   SPIFFS_fflush(&_filesystemStorageHandle, _file);
 }
 
@@ -191,24 +241,5 @@ void FSFile::clearError(){
 }
 
 char * FSFile::name(){
-  return 0;
+  return (char*)_stats.name;
 }
-
-
-
-
-
-
-/*
-spiffs_DIR *dirOpen(spiffs_DIR *d){
-  return SPIFFS_opendir(&_filesystemStorageHandle, 0, d);
-}
-
-int dirClose(spiffs_DIR *d){
-  return SPIFFS_closedir(d);
-}
-
-file_t dirOpenFile(spiffs_dirent* entry, uint8_t flags){
-  return SPIFFS_open_by_dirent(&_filesystemStorageHandle, entry, (spiffs_flags)flags, 0);
-}
-*/

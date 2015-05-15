@@ -26,14 +26,17 @@
 class String;
 
 #define FSFILE_READ SPIFFS_RDONLY
-#define FSFILE_WRITE (SPIFFS_RDONLY | SPIFFS_WRONLY | SPIFFS_CREAT | SPIFFS_APPEND | SPIFFS_TRUNC)
+#define FSFILE_WRITE (SPIFFS_RDWR | SPIFFS_CREAT | SPIFFS_APPEND | SPIFFS_DIRECT)
+#define FSFILE_OVERWRITE (SPIFFS_RDWR | SPIFFS_CREAT | SPIFFS_APPEND | SPIFFS_TRUNC | SPIFFS_DIRECT)
 
 class FSFile : public Stream {
 private:
   spiffs_stat _stats; 
   file_t _file;
+  spiffs_DIR _dir;
 
 public:
+  FSFile(String path);
   FSFile(file_t f);
   FSFile(void);
   virtual size_t write(uint8_t);
@@ -54,6 +57,8 @@ public:
   operator bool() { return _file > 0; }
   char * name();
   bool isDirectory(void);
+  void rewindDirectory(void);
+  FSFile openNextFile(void);
 
   template<typename T> size_t write(T &src){
     const size_t bufferSize = 64;
@@ -86,12 +91,14 @@ public:
   bool mount();
   void unmount();
   bool format();
+  bool check();
   bool exists(const char *filename);
   bool create(const char *filepath);
   bool remove(const char *filepath);
   bool rename(const char *filename, const char *newname);
   
   FSFile open(const char *filename, uint8_t mode = FSFILE_READ);
+  FSFile open(spiffs_dirent* entry, uint8_t mode = FSFILE_READ);
 
 private:
   friend class FSFile;
