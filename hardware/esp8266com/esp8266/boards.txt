@@ -188,9 +188,6 @@ nodemcu.menu.UploadSpeed.512000.upload.speed=512000
 nodemcu.menu.UploadSpeed.921600=921600
 nodemcu.menu.UploadSpeed.921600.upload.speed=921600
 
-nodemcu.menu.FlashSize.4M=4M
-nodemcu.menu.FlashSize.4M.build.flash_size=4M
-
 ##############################################################
 # wifio.name=Wifio
 #
