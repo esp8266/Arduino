@@ -443,7 +443,7 @@ public class Editor extends JFrame implements RunnerListener {
    * the app is just starting up, or the user just finished messing
    * with things in the Preferences window.
    */
-  protected void applyPreferences() {
+  public void applyPreferences() {
 
     // apply the setting for 'use external editor'
     boolean external = PreferencesData.getBoolean("editor.external");

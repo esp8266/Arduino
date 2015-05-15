@@ -35,6 +35,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import processing.app.Base;
 
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -47,7 +48,7 @@ public class AdditionalBoardsManagerURLTextArea extends javax.swing.JDialog {
 
   private ActionListener onOkListener;
 
-  public AdditionalBoardsManagerURLTextArea(java.awt.Frame parent) {
+  public AdditionalBoardsManagerURLTextArea(Window parent) {
     super(parent);
     initComponents();
     setLocationRelativeTo(parent);

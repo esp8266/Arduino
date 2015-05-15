@@ -92,9 +92,6 @@ public class Base {
 
   public static SplashScreenHelper splashScreenHelper = new SplashScreenHelper(SplashScreen.getSplashScreen());
 
-  // A single instance of the preferences window
-  Preferences preferencesFrame;
-
   // set to true after the first time the menu is built.
   // so that the errors while building don't show up again.
   boolean builtOnce;
@@ -1123,7 +1120,7 @@ public class Base {
    * Asynchronous version of menu rebuild to be used on save and rename
    * to prevent the interface from locking up until the menus are done.
    */
-  protected void rebuildSketchbookMenus() {
+  public void rebuildSketchbookMenus() {
     //System.out.println("async enter");
     //new Exception().printStackTrace();
     SwingUtilities.invokeLater(new Runnable() {
@@ -1815,8 +1812,13 @@ public class Base {
    * Show the Preferences window.
    */
   public void handlePrefs() {
-    if (preferencesFrame == null) preferencesFrame = new Preferences();
-    preferencesFrame.showFrame(activeEditor);
+    cc.arduino.view.preferences.Preferences dialog = new cc.arduino.view.preferences.Preferences(activeEditor, this);
+    if (activeEditor != null) {
+      dialog.setLocationRelativeTo(activeEditor);
+    }
+    dialog.pack();
+    dialog.setMinimumSize(dialog.getSize());
+    dialog.setVisible(true);
   }
 
 
@@ -2025,7 +2027,7 @@ public class Base {
   }
 
 
-  protected File getDefaultSketchbookFolderOrPromptForIt() {
+  public File getDefaultSketchbookFolderOrPromptForIt() {
 
     File sketchbookFolder = BaseNoGui.getDefaultSketchbookFolder();
 
@@ -2119,7 +2121,7 @@ public class Base {
   // .................................................................
 
 
-  static public File selectFolder(String prompt, File folder, Frame frame) {
+  static public File selectFolder(String prompt, File folder, Component parent) {
     JFileChooser fc = new JFileChooser();
     fc.setDialogTitle(prompt);
     if (folder != null) {
@@ -2127,7 +2129,7 @@ public class Base {
     }
     fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
-    int returned = fc.showOpenDialog(new JDialog());
+    int returned = fc.showOpenDialog(parent);
     if (returned == JFileChooser.APPROVE_OPTION) {
       return fc.getSelectedFile();
     }

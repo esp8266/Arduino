@@ -88,6 +88,10 @@ public class PreferencesData {
     fixPreferences();
   }
 
+  public static File getPreferencesFile() {
+    return preferencesFile;
+  }
+
   private static void fixPreferences() {
     String baud = get("serial.debug_rate");
     if ("14400".equals(baud) || "28800".equals(baud)) {

@@ -89,7 +89,7 @@ public class SplashScreenHelper {
     splash.close();
   }
 
-  public void printText(String str) {
+  private void printText(String str) {
     System.out.println(str);
   }
 
