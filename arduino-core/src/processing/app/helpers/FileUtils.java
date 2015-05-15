@@ -85,7 +85,7 @@ public class FileUtils {
         recursiveDelete(current);
       }
     }
-    deleteIfExists(file);
+    file.delete();
   }
 
   public static File createTempFolder() throws IOException {
@@ -272,10 +272,6 @@ public class FileUtils {
   public static boolean deleteIfExists(File file) {
     if (file == null) {
       return true;
-    }
-
-    if (!file.exists()) {
-      return false;
     }
 
     return file.delete();
