@@ -184,7 +184,7 @@ uint32_t flashmem_write_internal( const void *from, uint32_t toaddr, uint32_t si
       return 0;
     os_memcpy(apbuf, from, size);
   }
-  WRITE_PERI_REG(0x60000914, 0x73);
+  WDT_RESET();
   r = spi_flash_write(toaddr, apbuf?(uint32 *)apbuf:(uint32 *)from, size);
   if(apbuf)
     os_free(apbuf);
@@ -200,7 +200,7 @@ uint32_t flashmem_read_internal( void *to, uint32_t fromaddr, uint32_t size )
 {
   fromaddr -= INTERNAL_FLASH_START_ADDRESS;
   SpiFlashOpResult r;
-  WRITE_PERI_REG(0x60000914, 0x73);
+  WDT_RESET();
   r = spi_flash_read(fromaddr, (uint32 *)to, size);
   if(SPI_FLASH_RESULT_OK == r)
     return size;
