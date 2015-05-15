@@ -258,7 +258,7 @@ public class Editor extends JFrame implements RunnerListener {
     scrollPane = new RTextScrollPane(textarea, true);
     scrollPane.setBorder(new MatteBorder(0, 6, 0, 0, Theme.getColor("editor.bgcolor")));
     scrollPane.setViewportBorder(BorderFactory.createEmptyBorder());
-    scrollPane.setLineNumbersEnabled(Preferences.getBoolean("editor.linenumbers"));
+    scrollPane.setLineNumbersEnabled(PreferencesData.getBoolean("editor.linenumbers"));
     scrollPane.setIconRowHeaderEnabled(false);
     
     Gutter gutter = scrollPane.getGutter();
@@ -1794,7 +1794,7 @@ public class Editor extends JFrame implements RunnerListener {
 
     if (document == null) {  // this document not yet inited
       document = new RSyntaxDocument(new ArduinoTokenMakerFactory(base.getPdeKeywords()), RSyntaxDocument.SYNTAX_STYLE_CPLUSPLUS);
-      document.putProperty(PlainDocument.tabSizeAttribute, Preferences.getInteger("editor.tabs.size"));
+      document.putProperty(PlainDocument.tabSizeAttribute, PreferencesData.getInteger("editor.tabs.size"));
 
       // insert the program text into the document object
       try {
