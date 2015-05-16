@@ -106,6 +106,14 @@ public:
   
   boolean rmdir(char *filepath);
 
+  size_t type(){ return card.type(); }
+  size_t fatType(){ return volume.fatType(); }
+  size_t blocksPerCluster(){ return volume.blocksPerCluster(); }
+  size_t totalClusters(){ return volume.clusterCount(); }
+  size_t blockSize(){ return (size_t)0x200; }
+  size_t totalBlocks(){ return (totalClusters() / blocksPerCluster()); }
+  size_t clusterSize(){ return blocksPerCluster() * blockSize(); }
+  size_t size(){ return (clusterSize() * totalClusters()); }
 private:
 
   // This is used to determine the mode used to open a file
