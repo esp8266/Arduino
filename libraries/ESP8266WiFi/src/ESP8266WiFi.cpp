@@ -336,7 +336,7 @@ uint8_t ESP8266WiFiClass::encryptionType(uint8_t i)
     return -1;
 }
 
-uint8_t ESP8266WiFiClass::status()
+wl_status_t ESP8266WiFiClass::status()
 {
     int status = wifi_station_get_connect_status();
 
