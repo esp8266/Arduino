@@ -21,7 +21,7 @@ static s32_t api_spiffs_write(u32_t addr, u32_t size, u8_t *src){
 static s32_t api_spiffs_erase(u32_t addr, u32_t size){
   debugf("api_spiffs_erase");
   u32_t sect_first = flashmem_get_sector_of_address(addr);
-  u32_t sect_last = sect_first;
+  u32_t sect_last = flashmem_get_sector_of_address(addr+size);
   while( sect_first <= sect_last )
     if( !flashmem_erase_sector( sect_first ++ ) )
       return SPIFFS_ERR_INTERNAL;
@@ -68,7 +68,7 @@ bool spiffs_format_internal(){
   return true;
 }
 
-bool spiffs_mount(){
+bool spiffs_mount_internal(bool wipe){
   spiffs_config cfg = spiffs_get_storage_config();
   if (cfg.phys_addr == 0){
     SYSTEM_ERROR("Can't start file system, wrong address");
@@ -85,7 +85,7 @@ bool spiffs_mount(){
   bool writeFirst = false;
   flashmem_read(&dat, cfg.phys_addr, 4);
 
-  if (dat == UINT32_MAX){
+  if (dat == UINT32_MAX || wipe){
     debugf("First init file system");
     if(!spiffs_format_internal()){
       SYSTEM_ERROR("Can't format file system");
@@ -115,15 +115,17 @@ bool spiffs_mount(){
   return true;
 }
 
+bool spiffs_mount(){
+  return spiffs_mount_internal(false);
+}
+
 void spiffs_unmount(){
 	SPIFFS_unmount(&_filesystemStorageHandle);
 }
 
 bool spiffs_format(){
   spiffs_unmount();
-  if(!spiffs_format_internal()) return false;
-  spiffs_mount();
-  return true;
+  return spiffs_mount_internal(true);
 }
 
 void test_spiffs(){
