@@ -106,8 +106,8 @@ public:
   
   boolean rmdir(char *filepath);
 
-  size_t type(){ return card.type(); }
-  size_t fatType(){ return volume.fatType(); }
+  uint8_t type(){ return card.type(); }
+  uint8_t fatType(){ return volume.fatType(); }
   size_t blocksPerCluster(){ return volume.blocksPerCluster(); }
   size_t totalClusters(){ return volume.clusterCount(); }
   size_t blockSize(){ return (size_t)0x200; }
