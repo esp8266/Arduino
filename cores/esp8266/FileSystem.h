@@ -96,6 +96,13 @@ public:
   bool create(const char *filepath);
   bool remove(const char *filepath);
   bool rename(const char *filename, const char *newname);
+  size_t size(){ return _filesystemStorageHandle.cfg.phys_size; }
+  size_t blockSize(){ return _filesystemStorageHandle.cfg.log_block_size; }
+  size_t totalBlocks(){ return _filesystemStorageHandle.block_count; }
+  size_t freeBlocks(){ return _filesystemStorageHandle.free_blocks; }
+  size_t pageSize(){ return _filesystemStorageHandle.cfg.log_page_size; }
+  size_t allocatedPages(){ return _filesystemStorageHandle.stats_p_allocated; }
+  size_t deletedPages(){ return _filesystemStorageHandle.stats_p_deleted; }
   
   FSFile open(const char *filename, uint8_t mode = FSFILE_READ);
   FSFile open(spiffs_dirent* entry, uint8_t mode = FSFILE_READ);
