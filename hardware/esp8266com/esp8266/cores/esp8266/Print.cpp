@@ -49,7 +49,7 @@ size_t Print::printf(const char *format, ...) {
   va_start(arg, format);
   char temp[256];
   size_t len = ets_vsnprintf(temp, 256, format, arg);
-  len = write((const char *)temp);
+  len = print(temp);
   va_end(arg);
   return len;
 }
