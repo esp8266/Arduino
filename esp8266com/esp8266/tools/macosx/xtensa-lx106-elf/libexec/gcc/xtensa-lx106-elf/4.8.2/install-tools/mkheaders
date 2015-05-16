@@ -53,7 +53,7 @@ if [ x$1 != x ] ; then
   prefix=$1
   shift
 else
-  prefix=/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/builds/xtensa-lx106-elf
+  prefix=/Users/igrokhotkov/e/ESPTools/crosstool-NG/builds/xtensa-lx106-elf
 fi
 
 # Allow for alternate isysroot in which to find headers

@@ -1,5 +1,5 @@
 /* Generated automatically by the program 'build/genpreds'
-   from the machine description file '/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/config/xtensa/xtensa.md'.  */
+   from the machine description file '/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/config/xtensa/xtensa.md'.  */
 
 #ifndef GCC_TM_PREDS_H
 #define GCC_TM_PREDS_H

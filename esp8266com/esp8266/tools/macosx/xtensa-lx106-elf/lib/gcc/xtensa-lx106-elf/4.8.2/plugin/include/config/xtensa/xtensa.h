@@ -171,7 +171,8 @@ extern unsigned xtensa_current_frame_size;
    constants to be word aligned so that 'strcpy' calls that copy
    constants can be done inline.  */
 #define CONSTANT_ALIGNMENT(EXP, ALIGN)					\
-  ((TREE_CODE (EXP) == STRING_CST || TREE_CODE (EXP) == CONSTRUCTOR)	\
+  (!optimize_size &&							\
+   (TREE_CODE (EXP) == STRING_CST || TREE_CODE (EXP) == CONSTRUCTOR)	\
    && (ALIGN) < BITS_PER_WORD						\
 	? BITS_PER_WORD							\
 	: (ALIGN))
@@ -183,7 +184,7 @@ extern unsigned xtensa_current_frame_size;
    that copy constants to character arrays can be done inline.  */
 #undef DATA_ALIGNMENT
 #define DATA_ALIGNMENT(TYPE, ALIGN)					\
-  ((((ALIGN) < BITS_PER_WORD)						\
+  (!optimize_size && (((ALIGN) < BITS_PER_WORD)				\
     && (TREE_CODE (TYPE) == ARRAY_TYPE					\
 	|| TREE_CODE (TYPE) == UNION_TYPE				\
 	|| TREE_CODE (TYPE) == RECORD_TYPE)) ? BITS_PER_WORD : (ALIGN))
@@ -234,24 +235,22 @@ extern unsigned xtensa_current_frame_size;
    registers that can be used without being saved.
    The latter must include the registers where values are returned
    and the register where structure-value addresses are passed.
-   Aside from that, you can include as many other registers as you like.  */
-#if TARGET_WINDOWED_ABI
+   Aside from that, you can include as many other registers as you like.
+
+   The value encoding is the following:
+   1: register is used by all ABIs;
+   bit 1 is set: register is used by windowed ABI;
+   bit 2 is set: register is used by call0 ABI.
+
+   Proper values are computed in TARGET_CONDITIONAL_REGISTER_USAGE.  */
+
 #define CALL_USED_REGISTERS						\
 {									\
-  1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,			\
+  1, 1, 4, 4, 4, 4, 4, 4, 1, 1, 1, 1, 2, 2, 2, 2,			\
   1, 1, 1,								\
   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,			\
   1,									\
 }
-#else
-#define CALL_USED_REGISTERS						\
-{									\
-  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,			\
-  1, 1, 1,								\
-  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,			\
-  1,									\
-}
-#endif
 
 /* For non-leaf procedures on Xtensa processors, the allocation order
    is as specified below by REG_ALLOC_ORDER.  For leaf procedures, we
@@ -267,7 +266,6 @@ extern unsigned xtensa_current_frame_size;
    argument registers are not used until after other register choices
    have been exhausted.  */
 
-#if TARGET_WINDOWED_ABI
 #define REG_ALLOC_ORDER \
 {  8,  9, 10, 11, 12, 13, 14, 15,  7,  6,  5,  4,  3,  2, \
   18, \
@@ -275,15 +273,6 @@ extern unsigned xtensa_current_frame_size;
    0,  1, 16, 17, \
   35, \
 }
-#else
-#define REG_ALLOC_ORDER \
-{  8,  9, 10, 11,  7,  6,  5,  4,  3,  2, 12, 13, 14, 15, \
-  18, \
-  19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, \
-   0,  1, 16, 17, \
-  35, \
-}
-#endif
 
 
 #define ADJUST_REG_ALLOC_ORDER order_regs_for_local_alloc ()
@@ -383,20 +372,17 @@ extern char xtensa_hard_regno_mode_ok[][FIRST_PSEUDO_REGISTER];
    take advantage of the possibility for variable-sized windows; instead,
    we use a fixed window size of 8.  */
 
-#if TARGET_WINDOWED_ABI
 #define INCOMING_REGNO(OUT)						\
-  ((GP_REG_P (OUT) &&							\
-    ((unsigned) ((OUT) - GP_REG_FIRST) >= WINDOW_SIZE)) ?		\
-   (OUT) - WINDOW_SIZE : (OUT))
+  (TARGET_WINDOWED_ABI ?						\
+   ((GP_REG_P (OUT) &&							\
+     ((unsigned) ((OUT) - GP_REG_FIRST) >= WINDOW_SIZE)) ?		\
+    (OUT) - WINDOW_SIZE : (OUT)) : (OUT))
 
 #define OUTGOING_REGNO(IN)						\
-  ((GP_REG_P (IN) &&							\
-    ((unsigned) ((IN) - GP_REG_FIRST) < WINDOW_SIZE)) ?			\
-   (IN) + WINDOW_SIZE : (IN))
-#else
-#define INCOMING_REGNO(OUT) (OUT)
-#define OUTGOING_REGNO(IN) (IN)
-#endif
+  (TARGET_WINDOWED_ABI ?						\
+   ((GP_REG_P (IN) &&							\
+     ((unsigned) ((IN) - GP_REG_FIRST) < WINDOW_SIZE)) ?		\
+    (IN) + WINDOW_SIZE : (IN)) : (IN))
 
 
 /* Define the classes of registers for register constraints in the
@@ -438,7 +424,6 @@ enum reg_class
 /* Contents of the register classes.  The Nth integer specifies the
    contents of class N.  The way the integer MASK is interpreted is
    that register R is in the class if 'MASK & (1 << R)' is 1.  */
-#if TARGET_WINDOWED_ABI
 #define REG_CLASS_CONTENTS \
 { \
   { 0x00000000, 0x00000000 }, /* no registers */ \
@@ -446,33 +431,17 @@ enum reg_class
   { 0xfff80000, 0x00000007 }, /* floating-point registers */ \
   { 0x00000000, 0x00000008 }, /* MAC16 accumulator */ \
   { 0x00000002, 0x00000000 }, /* stack pointer register */ \
-  { 0x0000ff7d, 0x00000000 }, /* preferred reload registers */ \
+  { 0x0000fffd, 0x00000000 }, /* preferred reload registers */ \
   { 0x0000fffd, 0x00000000 }, /* general-purpose registers */ \
   { 0x0003ffff, 0x00000000 }, /* integer registers */ \
   { 0xffffffff, 0x0000000f }  /* all registers */ \
 }
-#else
-#define REG_CLASS_CONTENTS \
-{ \
-  { 0x00000000, 0x00000000 }, /* no registers */ \
-  { 0x00040000, 0x00000000 }, /* coprocessor boolean registers */ \
-  { 0xfff80000, 0x00000007 }, /* floating-point registers */ \
-  { 0x00000000, 0x00000008 }, /* MAC16 accumulator */ \
-  { 0x00000002, 0x00000000 }, /* stack pointer register */ \
-  { 0x00007ffd, 0x00000000 }, /* preferred reload registers */ \
-  { 0x0000fffd, 0x00000000 }, /* general-purpose registers */ \
-  { 0x0003ffff, 0x00000000 }, /* integer registers */ \
-  { 0xffffffff, 0x0000000f }  /* all registers */ \
-}
-#endif
 
 /* A C expression whose value is a register class containing hard
    register REGNO.  In general there is more that one such class;
    choose a class which is "minimal", meaning that no smaller class
    also contains the register.  */
-extern const enum reg_class xtensa_regno_to_class[FIRST_PSEUDO_REGISTER];
-
-#define REGNO_REG_CLASS(REGNO) xtensa_regno_to_class[ (REGNO) ]
+#define REGNO_REG_CLASS(REGNO) xtensa_regno_to_class (REGNO)
 
 /* Use the Xtensa AR register file for base registers.
    No index registers.  */
@@ -657,9 +626,7 @@ typedef struct xtensa_args
 
 /* Define this if the return address of a particular stack frame is
    accessed from the frame pointer of the previous stack frame.  */
-#if TARGET_WINDOWED_ABI
-#define RETURN_ADDR_IN_PREVIOUS_FRAME
-#endif
+#define RETURN_ADDR_IN_PREVIOUS_FRAME TARGET_WINDOWED_ABI
 
 /* A C expression whose value is RTL representing the value of the
    return address for the frame COUNT steps up from the current
@@ -848,6 +815,8 @@ typedef struct xtensa_args
    ? (((GLOBAL) ? DW_EH_PE_indirect : 0)				\
       | DW_EH_PE_pcrel | DW_EH_PE_sdata4)				\
    : DW_EH_PE_absptr)
+
+#define EH_RETURN_STACKADJ_RTX gen_rtx_REG (Pmode, GP_REG_FIRST + 10)
 
 /* Emit a PC-relative relocation.  */
 #define ASM_OUTPUT_DWARF_PCREL(FILE, SIZE, LABEL)			\

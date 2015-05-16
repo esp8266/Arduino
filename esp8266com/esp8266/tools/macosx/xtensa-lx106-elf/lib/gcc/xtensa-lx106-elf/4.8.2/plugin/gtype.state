@@ -6,7 +6,7 @@
 
 (!version  "4.8.2")
 
-(!srcdir  "/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc")
+(!srcdir  "/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc")
 
 (!languages 9 ada c cp fortran go java lto objc objcp)
 
@@ -326,12 +326,12 @@ nil )
 (!srcfileloc  "tree.h" 437)
 nil )
 (!pair  "u"
-(!type union 12 nil  gc_unused "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/tree.h:439"
+(!type union 12 nil  gc_unused "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/tree.h:439"
 (!srcfileloc  "tree.h" 472)
 
 (!fields 3 
 (!pair  "bits"
-(!type struct 13 nil  gc_unused "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/tree.h:442"
+(!type struct 13 nil  gc_unused "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/tree.h:442"
 (!srcfileloc  "tree.h" 464)
 
 (!fields 15 
@@ -8061,7 +8061,7 @@ nil )
 (!srcfileloc  "gimple.h" 282)
 nil )
 (!pair  "u"
-(!type union 323 nil  gc_used "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/gimple.h:285"
+(!type union 323 nil  gc_used "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/gimple.h:285"
 (!srcfileloc  "gimple.h" 288)
 
 (!fields 2 
@@ -8332,7 +8332,7 @@ nil )
 )
 )
 (!pair  "loc"
-(!type union 336 nil  gc_unused "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/tree.h:1960"
+(!type union 336 nil  gc_unused "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/tree.h:1960"
 (!srcfileloc  "tree.h" 1960)
 
 (!fields 2 
@@ -8979,7 +8979,7 @@ nil 511 nil )
 )
 )
 (!pair  "x"
-(!type struct 361 nil  gc_used "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/basic-block.h:199"
+(!type struct 361 nil  gc_used "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/basic-block.h:199"
 (!srcfileloc  "basic-block.h" 202)
 
 (!fields 2 
@@ -15674,7 +15674,7 @@ nil )
 
 (!fields 11 
 (!pair  "u"
-(!type union 584 nil  gc_used "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/c/c-decl.c:188"
+(!type union 584 nil  gc_used "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/c/c-decl.c:188"
 (!srcfileloc  "c/c-decl.c" 191)
 
 (!fields 2 
@@ -16914,7 +16914,7 @@ nil 0 nil )
 (!fields 0 )
 nil 0 nil )
 
-(!type struct 647 nil  gc_unused "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/java/expr.c:2058"nil 
+(!type struct 647 nil  gc_unused "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/java/expr.c:2058"nil 
 (!fields 0 )
 nil 0 nil )
 
@@ -17051,11 +17051,11 @@ nil )
 nil ))
 nil 8 nil )
 
-(!type struct 657 nil  gc_unused "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/fortran/trans.h:334"nil 
+(!type struct 657 nil  gc_unused "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/fortran/trans.h:334"nil 
 (!fields 0 )
 nil 0 nil )
 
-(!type struct 658 nil  gc_unused "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/fortran/trans.h:322"nil 
+(!type struct 658 nil  gc_unused "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/fortran/trans.h:322"nil 
 (!fields 0 )
 nil 0 nil )
 
@@ -17079,7 +17079,7 @@ nil 0 nil )
 (!fields 0 )
 nil 0 nil )
 
-(!type struct 664 nil  gc_unused "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/fortran/trans.h:31"nil 
+(!type struct 664 nil  gc_unused "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/fortran/trans.h:31"nil 
 (!fields 0 )
 nil 0 nil )
 
@@ -18416,7 +18416,7 @@ nil ))
 
 (!type already_seen 112)
 
-(!type struct 753 nil  gc_unused "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/c/c-parser.c:5589"nil 
+(!type struct 753 nil  gc_unused "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/c/c-parser.c:5589"nil 
 (!fields 0 )
 nil 0 nil )
 
@@ -18527,7 +18527,7 @@ nil 130 nil )
 (!fields 0 )
 nil 0 nil )
 
-(!type struct 759 nil  gc_unused "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/c-family/c-pragma.c:1153"nil 
+(!type struct 759 nil  gc_unused "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/c-family/c-pragma.c:1153"nil 
 (!fields 0 )
 nil 0 nil )
 
@@ -19100,7 +19100,7 @@ nil ))
 (!fields 0 )
 nil 0 nil )
 
-(!type struct 815 nil  gc_unused "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/ada/gcc-interface/decl.c:172"nil 
+(!type struct 815 nil  gc_unused "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/ada/gcc-interface/decl.c:172"nil 
 (!fields 0 )
 nil 0 nil )
 
@@ -19803,7 +19803,7 @@ nil 0 nil )
 nil ))
 nil 511 nil )
 
-(!type struct 893 nil  gc_unused "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/lto-streamer.h:451"nil 
+(!type struct 893 nil  gc_unused "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/lto-streamer.h:451"nil 
 (!fields 0 )
 nil 0 nil )
 
@@ -19815,7 +19815,7 @@ nil 0 nil )
 (!fields 0 )
 nil 0 nil )
 
-(!type struct 896 nil  gc_unused "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/lto-streamer.h:426"nil 
+(!type struct 896 nil  gc_unused "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/lto-streamer.h:426"nil 
 (!fields 0 )
 nil 0 nil )
 
@@ -21404,7 +21404,7 @@ nil 0 nil )
 (!fields 0 )
 nil 0 nil )
 
-(!type union 1027 nil  gc_unused "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/tree-eh.c:41"nil 
+(!type union 1027 nil  gc_unused "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/tree-eh.c:41"nil 
 (!fields 0 )
 nil 0 nil )
 
@@ -21416,7 +21416,7 @@ nil 0 nil )
 (!fields 0 )
 nil 0 nil )
 
-(!type struct 1030 nil  gc_unused "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/tree-flow.h:570"nil 
+(!type struct 1030 nil  gc_unused "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/tree-flow.h:570"nil 
 (!fields 0 )
 nil 0 nil )
 
@@ -21465,7 +21465,7 @@ nil 0 nil )
 (!fields 0 )
 nil 0 nil )
 
-(!type struct 1038 nil  gc_unused "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/tree-flow.h:103"nil 
+(!type struct 1038 nil  gc_unused "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/tree-flow.h:103"nil 
 (!fields 0 )
 nil 0 nil )
 
@@ -21557,7 +21557,7 @@ nil 0 nil )
 
 (!type already_seen 312)
 
-(!type struct 1044 nil  gc_unused "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/gimple.h:134"nil 
+(!type struct 1044 nil  gc_unused "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/gimple.h:134"nil 
 (!fields 0 )
 nil 0 nil )
 
@@ -21576,11 +21576,11 @@ nil ))
 (!fields 0 )
 nil 0 nil )
 
-(!type struct 1047 nil  gc_unused "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/varasm.c:4712"nil 
+(!type struct 1047 nil  gc_unused "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/varasm.c:4712"nil 
 (!fields 0 )
 nil 0 nil )
 
-(!type struct 1048 nil  gc_unused "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/varasm.c:4464"nil 
+(!type struct 1048 nil  gc_unused "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/varasm.c:4464"nil 
 (!fields 0 )
 nil 0 nil )
 
@@ -21673,7 +21673,7 @@ nil 0 nil )
 (!fields 0 )
 nil 0 nil )
 
-(!type union 1062 nil  gc_unused "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/mcf.c:344"nil 
+(!type union 1062 nil  gc_unused "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/mcf.c:344"nil 
 (!fields 0 )
 nil 0 nil )
 
@@ -22496,7 +22496,7 @@ nil ))
 (!fields 0 )
 nil 0 nil )
 
-(!type struct 1154 nil  gc_unused "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/dwarf2cfi.c:192"nil 
+(!type struct 1154 nil  gc_unused "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/dwarf2cfi.c:192"nil 
 (!fields 0 )
 nil 0 nil )
 
@@ -22504,7 +22504,7 @@ nil 0 nil )
 (!type pointer 1156 nil  gc_unused
 (!type already_seen 1155)
 )
- gc_unused "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/dwarf2cfi.c:98"nil 
+ gc_unused "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/dwarf2cfi.c:98"nil 
 (!fields 0 )
 nil 0 nil )
 
@@ -23003,11 +23003,11 @@ nil 511 nil )
 
 (!type already_seen 930)
 
-(!type struct 1213 nil  gc_unused "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/cgraph.h:363"nil 
+(!type struct 1213 nil  gc_unused "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/cgraph.h:363"nil 
 (!fields 0 )
 nil 0 nil )
 
-(!type struct 1214 nil  gc_unused "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/cgraph.h:356"nil 
+(!type struct 1214 nil  gc_unused "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/cgraph.h:356"nil 
 (!fields 0 )
 nil 0 nil )
 
@@ -23093,7 +23093,7 @@ nil 511 nil )
 
 (!type already_seen 910)
 
-(!type struct 1221 nil  gc_unused "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/basic-block.h:574"nil 
+(!type struct 1221 nil  gc_unused "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/basic-block.h:574"nil 
 (!fields 0 )
 nil 0 nil )
 
@@ -23141,7 +23141,7 @@ nil 0 nil )
 
 (!type already_seen 868)
 
-(!type struct 1229 nil  gc_unused "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/cfgloop.h:544"nil 
+(!type struct 1229 nil  gc_unused "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/cfgloop.h:544"nil 
 (!fields 0 )
 nil 0 nil )
 
@@ -24062,7 +24062,7 @@ nil 511 nil )
 (!fields 0 )
 nil 0 nil )
 
-(!type struct 1279 nil  gc_unused "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/tree.h:5523"nil 
+(!type struct 1279 nil  gc_unused "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/tree.h:5523"nil 
 (!fields 0 )
 nil 0 nil )
 
@@ -24619,7 +24619,7 @@ nil 511 nil )
 
 (!type already_seen 259)
 
-(!type struct 1298 nil  gc_unused "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/rtl.h:116"nil 
+(!type struct 1298 nil  gc_unused "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/rtl.h:116"nil 
 (!fields 0 )
 nil 0 nil )
 
@@ -24677,7 +24677,7 @@ nil ))
 )
 511 nil )
 
-(!type struct 1304 nil  gc_unused "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/bitmap.h:316"nil 
+(!type struct 1304 nil  gc_unused "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/bitmap.h:316"nil 
 (!fields 0 )
 nil 0 nil )
 
@@ -24763,11 +24763,11 @@ nil 0 nil )
 (!fields 0 )
 nil 0 nil )
 
-(!type struct 1318 nil  gc_unused "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/../libcpp/include/cpplib.h:984"nil 
+(!type struct 1318 nil  gc_unused "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/../libcpp/include/cpplib.h:984"nil 
 (!fields 0 )
 nil 0 nil )
 
-(!type struct 1319 nil  gc_unused "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/../libcpp/include/cpplib.h:973"nil 
+(!type struct 1319 nil  gc_unused "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/../libcpp/include/cpplib.h:973"nil 
 (!fields 0 )
 nil 0 nil )
 
@@ -24821,7 +24821,7 @@ nil 0 nil )
 (!fields 0 )
 nil 0 nil )
 
-(!type struct 1328 nil  gc_unused "anonymous:/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/.build/src/gcc-4.8.2/gcc/../libcpp/include/line-map.h:627"nil 
+(!type struct 1328 nil  gc_unused "anonymous:/Users/igrokhotkov/e/ESPTools/crosstool-NG/.build/src/gcc-4.8.2/gcc/../libcpp/include/line-map.h:627"nil 
 (!fields 0 )
 nil 0 nil )
 
@@ -30200,7 +30200,7 @@ nil )
 (!pair  "xtensa_tls_module_base_symbol"
 (!type already_seen 136)
 
-(!srcfileloc  "config/xtensa/xtensa.c" 1830)
+(!srcfileloc  "config/xtensa/xtensa.c" 1818)
 nil )
 (!pair  "stack_chk_fail_decl"
 (!type already_seen 5)

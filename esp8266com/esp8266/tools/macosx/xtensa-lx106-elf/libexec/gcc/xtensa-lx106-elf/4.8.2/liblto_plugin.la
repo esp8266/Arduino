@@ -38,4 +38,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/builds/xtensa-lx106-elf/libexec/gcc/xtensa-lx106-elf/4.8.2'
+libdir='/Users/igrokhotkov/e/ESPTools/crosstool-NG/builds/xtensa-lx106-elf/libexec/gcc/xtensa-lx106-elf/4.8.2'

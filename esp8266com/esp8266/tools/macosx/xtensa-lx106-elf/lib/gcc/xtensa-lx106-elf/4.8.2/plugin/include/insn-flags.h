@@ -47,7 +47,9 @@
 #define HAVE_entry 1
 #define HAVE_return ((TARGET_WINDOWED_ABI || !xtensa_current_frame_size) && reload_completed)
 #define HAVE_nop 1
-#define HAVE_eh_return 1
+#define HAVE_eh_set_a0_windowed 1
+#define HAVE_eh_set_a0_call0 1
+#define HAVE_blockage 1
 #define HAVE_set_frame_ptr 1
 #define HAVE_ctzsi2 1
 #define HAVE_ffssi2 1
@@ -76,6 +78,7 @@
 #define HAVE_call_value 1
 #define HAVE_prologue 1
 #define HAVE_epilogue 1
+#define HAVE_eh_return 1
 #define HAVE_sym_TPOFF 1
 #define HAVE_sym_DTPOFF 1
 #define HAVE_memory_barrier 1
@@ -333,7 +336,9 @@ extern rtx        gen_call_value_internal      (rtx, rtx, rtx);
 extern rtx        gen_entry                    (rtx);
 extern rtx        gen_return                   (void);
 extern rtx        gen_nop                      (void);
-extern rtx        gen_eh_return                (rtx);
+extern rtx        gen_eh_set_a0_windowed       (rtx);
+extern rtx        gen_eh_set_a0_call0          (rtx);
+extern rtx        gen_blockage                 (void);
 extern rtx        gen_set_frame_ptr            (void);
 static inline rtx gen_get_thread_pointersi     (rtx);
 static inline rtx
@@ -442,6 +447,7 @@ gen_nonlocal_goto(rtx ARG_UNUSED (a), rtx ARG_UNUSED (b), rtx ARG_UNUSED (c), rt
 {
   return 0;
 }
+extern rtx        gen_eh_return                (rtx);
 extern rtx        gen_sym_TPOFF                (rtx);
 extern rtx        gen_sym_DTPOFF               (rtx);
 extern rtx        gen_memory_barrier           (void);

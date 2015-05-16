@@ -61,6 +61,7 @@ extern void init_cumulative_args (CUMULATIVE_ARGS *, int);
 extern void print_operand (FILE *, rtx, int);
 extern void print_operand_address (FILE *, rtx);
 extern void xtensa_output_literal (FILE *, rtx, enum machine_mode, int);
+extern void xtensa_set_return_address (rtx, rtx);
 extern rtx xtensa_return_addr (int, rtx);
 #endif /* RTX_CODE */
 
@@ -70,5 +71,6 @@ extern long compute_frame_size (int);
 extern void xtensa_expand_prologue (void);
 extern void xtensa_expand_epilogue (void);
 extern void order_regs_for_local_alloc (void);
+extern enum reg_class xtensa_regno_to_class (int regno);
 
 #endif /* !__XTENSA_PROTOS_H__ */

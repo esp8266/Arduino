@@ -19,8 +19,8 @@ import gdb
 import os
 import os.path
 
-pythondir = '/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/builds/xtensa-lx106-elf/share/gcc-4.8.2/python'
-libdir = '/Users/igrokhotkov/projects/esp8266/esptools/crosstool-NG/builds/xtensa-lx106-elf/xtensa-lx106-elf/lib'
+pythondir = '/Users/igrokhotkov/e/ESPTools/crosstool-NG/builds/xtensa-lx106-elf/share/gcc-4.8.2/python'
+libdir = '/Users/igrokhotkov/e/ESPTools/crosstool-NG/builds/xtensa-lx106-elf/xtensa-lx106-elf/lib'
 
 # This file might be loaded when there is no current objfile.  This
 # can happen if the user loads it manually.  In this case we don't

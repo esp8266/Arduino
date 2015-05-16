@@ -12,6 +12,7 @@
 #define UNSPEC_TLS_CALL 9
 #define A9_REG 9
 #define UNSPECV_SET_FP 1
+#define UNSPECV_BLOCKAGE 8
 #define UNSPEC_TP 10
 #define UNSPECV_ENTRY 2
 #define UNSPEC_NOP 2
