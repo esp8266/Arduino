@@ -27,6 +27,7 @@
 #ifndef WIFICLIENTMULTI_H_
 #define WIFICLIENTMULTI_H_
 
+#include "ESP8266WiFi.h"
 #include <vector>
 
 //#define DEBUG_WIFI_MULTI(...) os_printf( __VA_ARGS__ )
