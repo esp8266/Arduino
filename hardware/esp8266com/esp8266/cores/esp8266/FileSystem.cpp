@@ -144,14 +144,22 @@ void FSFile::close() {
   _file = 0;
 }
 
+char * FSFile::name(){
+  return (char*)_stats.name;
+}
+
+bool FSFile::isDirectory(void) {
+  return _stats.type == SPIFFS_TYPE_DIR;
+}
+
 void FSFile::rewindDirectory() {
-  if (! _file || !isDirectory()) return;
+  if (!_file || !isDirectory()) return;
   SPIFFS_closedir(&_dir);
   SPIFFS_opendir(&_filesystemStorageHandle, (char*)_stats.name, &_dir);
 }
 
 FSFile FSFile::openNextFile(){
-  if (! _file || !isDirectory()) return FSFile();
+  if (!_file || !isDirectory()) return FSFile();
   struct spiffs_dirent e;
   struct spiffs_dirent *pe = &e;
   if ((pe = SPIFFS_readdir(&_dir, pe))){
@@ -161,28 +169,34 @@ FSFile FSFile::openNextFile(){
 }
 
 uint32_t FSFile::size() {
-  if(! _file) return 0;
-  if(SPIFFS_fstat(&_filesystemStorageHandle, _file, &_stats) != 0) return 0;
+  if(!_file) return 0;
+  if(_stats.size) return _stats.size;
+  uint32_t pos = SPIFFS_tell(&_filesystemStorageHandle, _file);
+  SPIFFS_lseek(&_filesystemStorageHandle, _file, 0, SPIFFS_SEEK_END);
+  _stats.size = SPIFFS_tell(&_filesystemStorageHandle, _file);
+  SPIFFS_lseek(&_filesystemStorageHandle, _file, pos, SPIFFS_SEEK_SET);
   return _stats.size;
 }
 
+int FSFile::available() {
+  if (!_file) return 0;
+  uint32_t pos = SPIFFS_tell(&_filesystemStorageHandle, _file);
+  return size() - pos;
+}
+
 uint32_t FSFile::seek(uint32_t pos) {
-  if (! _file || isDirectory()) return 0;
+  if (!_file) return 0;
   return SPIFFS_lseek(&_filesystemStorageHandle, _file, pos, SPIFFS_SEEK_SET);
 }
 
 uint32_t FSFile::position() {
-  if (! _file || isDirectory()) return 0;
+  if (!_file) return 0;
   return SPIFFS_tell(&_filesystemStorageHandle, _file);
 }
 
 bool FSFile::eof() {
-  if (! _file || isDirectory()) return 0;
+  if (!_file) return 0;
   return SPIFFS_eof(&_filesystemStorageHandle, _file);
-}
-
-bool FSFile::isDirectory(void) {
-  return _stats.type == SPIFFS_TYPE_DIR;
 }
 
 int FSFile::read(void *buf, uint16_t nbyte) {
@@ -204,12 +218,6 @@ int FSFile::peek() {
   return c;
 }
 
-int FSFile::available() {
-  if (! _file || isDirectory()) return 0;
-  uint32_t pos = SPIFFS_tell(&_filesystemStorageHandle, _file);
-  return _stats.size - pos;
-}
-
 size_t FSFile::write(const uint8_t *buf, size_t size){
   if (! _file || isDirectory()) return 0;
   int res = SPIFFS_write(&_filesystemStorageHandle, _file, (uint8_t *)buf, size);
@@ -226,10 +234,10 @@ void FSFile::flush(){
   SPIFFS_fflush(&_filesystemStorageHandle, _file);
 }
 
-uint32_t FSFile::remove(){
+bool FSFile::remove(){
   if (! _file) return 0;
-	return SPIFFS_fremove(&_filesystemStorageHandle, _file);
-  _file = 0;
+  close();
+	return SPIFFS_remove(&_filesystemStorageHandle, (const char *)_stats.name) == 0;
 }
 
 int FSFile::lastError(){
@@ -238,8 +246,4 @@ int FSFile::lastError(){
 
 void FSFile::clearError(){
   _filesystemStorageHandle.errno = SPIFFS_OK;
-}
-
-char * FSFile::name(){
-  return (char*)_stats.name;
 }
