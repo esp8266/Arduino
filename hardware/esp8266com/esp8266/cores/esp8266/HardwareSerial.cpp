@@ -392,30 +392,34 @@ void uart_ignore_char(char c) {
 
 void uart0_write_char(char c) {
     if(&Serial != NULL && Serial.isTxEnabled()) {
-        if(c == '\n') {
-            Serial.write('\r');
+        if(Serial.availableForWrite() > 0) {
+            if(c == '\n') {
+                Serial.write('\r');
+            }
+            Serial.write(c);
+            return;
         }
-        Serial.write(c);
-    } else {
-        if(c == '\n') {
-            USF(0) = '\r';
-        }
-        USF(0) = c;
     }
+    if(c == '\n') {
+        USF(0) = '\r';
+    }
+    USF(0) = c;
 }
 
 void uart1_write_char(char c) {
     if(&Serial1 != NULL && Serial1.isTxEnabled()) {
-        if(c == '\n') {
-            Serial1.write('\r');
+        if(Serial1.availableForWrite() > 0) {
+            if(c == '\n') {
+                Serial1.write('\r');
+            }
+            Serial1.write(c);
+            return;
         }
-        Serial1.write(c);
-    } else {
-        if(c == '\n') {
-            USF(1) = '\r';
-        }
-        USF(1) = c;
     }
+    if(c == '\n') {
+        USF(1) = '\r';
+    }
+    USF(1) = c;
 }
 
 static int s_uart_debug_nr = UART0;
