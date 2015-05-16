@@ -23,7 +23,6 @@
  *
  */
 
-#include "ESP8266WiFi.h"
 #include "ESP8266WiFiMulti.h"
 #include <limits.h>
 
@@ -76,6 +75,7 @@ wl_status_t ESP8266WiFiMulti::run(void) {
                         break;
                     }
                 }
+
                 if(known) {
                     DEBUG_WIFI_MULTI(" ---> ");
                 } else {
@@ -102,9 +102,13 @@ wl_status_t ESP8266WiFiMulti::run(void) {
                 status = WiFi.status();
             }
 
+            IPAddress ip;
             switch(status) {
                 case WL_CONNECTED:
-                    DEBUG_WIFI_MULTI("[WIFI] Connecting Done.\n");
+                    ip = WiFi.localIP();
+                    DEBUG_WIFI_MULTI("[WIFI] Connecting done.\n");
+                    DEBUG_WIFI_MULTI("[WIFI] SSID: %s\n", WiFi.SSID());
+                    DEBUG_WIFI_MULTI("[WIFI] IP: %d.%d.%d.%d\n", ip[0], ip[1], ip[2], ip[3]);
                     break;
                 case WL_NO_SSID_AVAIL:
                     DEBUG_WIFI_MULTI("[WIFI] Connecting Faild AP not found.\n");
