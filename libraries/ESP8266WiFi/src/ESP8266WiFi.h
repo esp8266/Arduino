@@ -58,6 +58,10 @@ public:
      */
     int begin(const char* ssid, const char *passphrase);
 
+   /* Wait for Wifi connection to reach a result
+    * returns the status reached or disconnect if STA is off
+    */
+    uint8_t waitForConnectResult();
 
     /* Set up an open access point
      *
