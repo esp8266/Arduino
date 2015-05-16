@@ -1,5 +1,6 @@
 #include "flashmem.h"
 #include "esp8266_peri.h"
+#include "Arduino.h"
 
 // Based on NodeMCU platform_flash
 // https://github.com/nodemcu/nodemcu-firmware
@@ -98,7 +99,10 @@ uint32_t flashmem_read( void *to, uint32_t fromaddr, uint32_t size )
 bool flashmem_erase_sector( uint32_t sector_id )
 {
   WDT_RESET();
-  return spi_flash_erase_sector( sector_id ) == SPI_FLASH_RESULT_OK;
+  noInterrupts();
+  bool erased = spi_flash_erase_sector( sector_id ) == SPI_FLASH_RESULT_OK;
+  interrupts();
+  return erased;
 }
 
 SPIFlashInfo flashmem_get_info()
@@ -186,9 +190,9 @@ uint32_t flashmem_write_internal( const void *from, uint32_t toaddr, uint32_t si
     os_memcpy(apbuf, from, size);
   }
   WDT_RESET();
-  ETS_UART_INTR_DISABLE();
+  noInterrupts();
   r = spi_flash_write(toaddr, apbuf?(uint32 *)apbuf:(uint32 *)from, size);
-  ETS_UART_INTR_ENABLE();
+  interrupts();
   if(apbuf)
     os_free(apbuf);
   if(SPI_FLASH_RESULT_OK == r)
@@ -204,9 +208,9 @@ uint32_t flashmem_read_internal( void *to, uint32_t fromaddr, uint32_t size )
   fromaddr -= INTERNAL_FLASH_START_ADDRESS;
   SpiFlashOpResult r;
   WDT_RESET();
-  ETS_UART_INTR_DISABLE();
+  noInterrupts();
   r = spi_flash_read(fromaddr, (uint32 *)to, size);
-  ETS_UART_INTR_ENABLE();
+  interrupts();
   if(SPI_FLASH_RESULT_OK == r)
     return size;
   else{
