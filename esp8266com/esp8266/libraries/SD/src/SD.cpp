@@ -332,7 +332,7 @@ boolean callback_rmdir(SdFile& parentDir, char *filePathComponent,
 
 
 
-boolean SDClass::begin(uint8_t csPin) {
+boolean SDClass::begin(uint8_t csPin, uint32_t speed) {
   /*
 
     Performs the initialisation required by the sdfatlib library.
@@ -340,12 +340,10 @@ boolean SDClass::begin(uint8_t csPin) {
     Return true if initialization succeeds, false otherwise.
 
    */
-  return card.init(SPI_HALF_SPEED, csPin) &&
+  return card.init(speed, csPin) &&
          volume.init(card) &&
          root.openRoot(volume);
 }
-
-
 
 // this little helper is used to traverse paths
 SdFile SDClass::getParentDir(const char *filepath, int *index) {

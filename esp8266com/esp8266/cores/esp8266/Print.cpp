@@ -18,6 +18,7 @@
  
  Modified 23 November 2006 by David A. Mellis
  Modified December 2014 by Ivan Grokhotkov
+ Modified May 2015 by Michael C. Miller - esp8266 progmem support
  */
 
 #include <stdlib.h>
@@ -38,6 +39,18 @@ size_t ICACHE_FLASH_ATTR Print::write(const uint8_t *buffer, size_t size) {
     size_t n = 0;
     while(size--) {
         n += write(*buffer++);
+    }
+    return n;
+}
+
+size_t ICACHE_FLASH_ATTR Print::print(const __FlashStringHelper *ifsh) {
+    PGM_P p = reinterpret_cast<PGM_P>(ifsh);
+
+    size_t n = 0;
+    while (1) {
+        uint8_t c = pgm_read_byte(p++);
+        if (c == 0) break;
+        n += write(c);
     }
     return n;
 }
@@ -90,6 +103,12 @@ size_t ICACHE_FLASH_ATTR Print::print(unsigned long n, int base) {
 
 size_t ICACHE_FLASH_ATTR Print::print(double n, int digits) {
     return printFloat(n, digits);
+}
+
+size_t ICACHE_FLASH_ATTR Print::println(const __FlashStringHelper *ifsh) {
+    size_t n = print(ifsh);
+    n += println();
+    return n;
 }
 
 size_t ICACHE_FLASH_ATTR Print::print(const Printable& x) {

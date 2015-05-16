@@ -38,6 +38,7 @@ extern "C" {
 #include "pgmspace.h"
 #include "esp8266_peri.h"
 #include "twi.h"
+#include "spiffs/spiffs.h"
 
 void yield(void);
 
@@ -172,6 +173,7 @@ int digitalRead(uint8_t);
 int analogRead(uint8_t);
 void analogReference(uint8_t mode);
 void analogWrite(uint8_t, int);
+void analogWriteFreq(uint32_t freq);
 
 unsigned long millis(void);
 unsigned long micros(void);
@@ -210,7 +212,9 @@ void loop(void);
 #include "WString.h"
 
 #include "HardwareSerial.h"
+#include "FileSystem.h"
 #include "Esp.h"
+#include "debug.h"
 
 uint16_t makeWord(uint16_t w);
 uint16_t makeWord(byte h, byte l);
@@ -227,6 +231,7 @@ long random(long);
 long random(long, long);
 void randomSeed(unsigned int);
 long map(long, long, long, long, long);
+
 
 #endif
 

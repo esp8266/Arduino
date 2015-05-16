@@ -28,9 +28,13 @@ extern "C" void esp_schedule();
 
 #define GET_IP_HDR(pb) reinterpret_cast<ip_hdr*>(((uint8_t*)((pb)->payload)) - UDP_HLEN - IP_HLEN);
 #define GET_UDP_HDR(pb) reinterpret_cast<udp_hdr*>(((uint8_t*)((pb)->payload)) - UDP_HLEN);
+
 class UdpContext
 {
 public:
+
+    typedef std::function<void(void)> rxhandler_t;
+
     UdpContext()
     : _pcb(0)
     , _rx_buf(0)
@@ -40,8 +44,11 @@ public:
     , _tx_buf_head(0)
     , _tx_buf_cur(0)
     , _tx_buf_offset(0)
+    , _multicast_ttl(1)
+    , _dest_port(0)
     {
         _pcb = udp_new();
+        _dest_addr.addr = 0;
     }
 
     ~UdpContext()
@@ -79,8 +86,9 @@ public:
 
     bool connect(ip_addr_t addr, uint16_t port)
     {
-        err_t err = udp_connect(_pcb, &addr, port);
-        return err == ERR_OK;
+        _dest_addr = addr;
+        _dest_port = port;
+        return true;
     }
 
     bool listen(ip_addr_t addr, uint16_t port)
@@ -107,7 +115,13 @@ public:
         // newer versions of lwip have an additional field (mcast_ttl) for this purpose
         // and a macro to set it instead of direct field access
         // udp_set_multicast_ttl(_pcb, ttl);
-        _pcb->ttl = ttl;
+        _multicast_ttl = ttl;
+    }
+
+    // warning: handler is called from tcp stack context
+    // esp_yield and non-reentrant functions which depend on it will fail
+    void onRx(rxhandler_t handler) {
+        _on_rx = handler;
     }
 
     size_t getSize() const
@@ -173,10 +187,10 @@ public:
         return _rx_buf != 0;
     }
 
-    char read()
+    int read()
     {
         if (!_rx_buf || _rx_buf->len == _rx_buf_offset)
-            return 0;
+            return -1;
 
         char c = reinterpret_cast<char*>(_rx_buf->payload)[_rx_buf_offset];
         _consume(1);
@@ -190,7 +204,7 @@ public:
 
         size_t max_size = _rx_buf->len - _rx_buf_offset;
         size = (size < max_size) ? size : max_size;
-        DEBUGV(":rd %d, %d, %d\r\n", size, _rx_buf->len, _rx_buf_offset);
+        DEBUGV(":urd %d, %d, %d\r\n", size, _rx_buf->len, _rx_buf_offset);
         
         os_memcpy(dst, reinterpret_cast<char*>(_rx_buf->payload) + _rx_buf_offset, size);        
         _consume(size);
@@ -257,10 +271,19 @@ public:
             }
         }
 
-        if (addr)
-            udp_sendto(_pcb, _tx_buf_head, addr, port);
-        else
-            udp_send(_pcb, _tx_buf_head);
+        if (!addr) {
+            addr = &_dest_addr;
+            port = _dest_port;
+        }
+
+        uint16_t old_ttl = _pcb->ttl;
+        if (ip_addr_ismulticast(addr)) {
+            _pcb->ttl = _multicast_ttl;
+        }
+
+        udp_sendto(_pcb, _tx_buf_head, addr, port);
+
+        _pcb->ttl = old_ttl;
 
         for (pbuf* p = _tx_buf_head; p; p = p->next)
         {
@@ -281,7 +304,7 @@ private:
 
     void _reserve(size_t size)
     {
-        const size_t pbuf_unit_size = 1024;
+        const size_t pbuf_unit_size = 512;
         if (!_tx_buf_head)
         {
             _tx_buf_head = pbuf_alloc(PBUF_TRANSPORT, pbuf_unit_size, PBUF_RAM);
@@ -317,15 +340,18 @@ private:
         {
             // there is some unread data
             // chain the new pbuf to the existing one
-            DEBUGV(":rch %d, %d\r\n", _rx_buf->tot_len, pb->tot_len);
+            DEBUGV(":urch %d, %d\r\n", _rx_buf->tot_len, pb->tot_len);
             pbuf_cat(_rx_buf, pb);
         }
         else
         {
-            DEBUGV(":rn %d\r\n", pb->tot_len);
+            DEBUGV(":urn %d\r\n", pb->tot_len);
             _first_buf_taken = false;
             _rx_buf = pb;
             _rx_buf_offset = 0;
+        }
+        if (_on_rx) {
+            _on_rx();
         }
     }
 
@@ -341,6 +367,11 @@ private:
     int _refcnt;
     udp_pcb* _pcb;
 
+    ip_addr_t _dest_addr;
+    uint16_t _dest_port;
+
+    uint16_t _multicast_ttl;
+
     bool _first_buf_taken;
     pbuf* _rx_buf;
     size_t _rx_buf_offset;
@@ -348,6 +379,8 @@ private:
     pbuf* _tx_buf_head;
     pbuf* _tx_buf_cur;
     size_t _tx_buf_offset;
+
+    rxhandler_t _on_rx;
 };
 
 

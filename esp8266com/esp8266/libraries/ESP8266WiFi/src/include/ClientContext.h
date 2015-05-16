@@ -39,7 +39,39 @@ class ClientContext {
             tcp_sent(pcb, &_s_sent);
             tcp_err(pcb, &_s_error);
         }
-
+        
+        err_t abort(){
+          if(_pcb) {
+              DEBUGV(":abort\r\n");
+              tcp_arg(_pcb, NULL);
+              tcp_sent(_pcb, NULL);
+              tcp_recv(_pcb, NULL);
+              tcp_err(_pcb, NULL);
+              tcp_abort(_pcb);
+              _pcb = 0;
+          }
+          return ERR_ABRT;
+        }
+        
+        err_t close(){
+          err_t err = ERR_OK;
+          if(_pcb) {
+              DEBUGV(":close\r\n");
+              tcp_arg(_pcb, NULL);
+              tcp_sent(_pcb, NULL);
+              tcp_recv(_pcb, NULL);
+              tcp_err(_pcb, NULL);
+              err = tcp_close(_pcb);
+              if(err != ERR_OK) {
+                  DEBUGV(":tc err %d\r\n", err);
+                  tcp_abort(_pcb);
+                  err = ERR_ABRT;
+              }
+              _pcb = 0;
+          }
+          return err;
+        }
+        
         ~ClientContext() {
         }
 
@@ -58,26 +90,26 @@ class ClientContext {
         }
 
         void unref() {
-            err_t err;
             DEBUGV(":ur %d\r\n", _refcnt);
             if(--_refcnt == 0) {
                 flush();
-                if(_pcb) {
-                    tcp_arg(_pcb, NULL);
-                    tcp_sent(_pcb, NULL);
-                    tcp_recv(_pcb, NULL);
-                    tcp_err(_pcb, NULL);
-                    err = tcp_close(_pcb);
-                    if(err != ERR_OK) {
-                        DEBUGV(":tc err %d\r\n", err);
-                        tcp_abort(_pcb);
-                    }
-                    _pcb = 0;
-                }
+                close();
+                if(_discard_cb) _discard_cb(_discard_cb_arg, this);
                 delete this;
             }
         }
-
+        
+        void setNoDelay(bool nodelay){
+          if(!_pcb) return;
+          if(nodelay) tcp_nagle_disable(_pcb);
+          else tcp_nagle_enable(_pcb);
+        }
+        
+        bool getNoDelay(){
+          if(!_pcb) return false;
+          return tcp_nagle_disabled(_pcb);
+        }
+        
         uint32_t getRemoteAddress() {
             if(!_pcb) return 0;
 
@@ -179,6 +211,13 @@ class ClientContext {
 
     private:
 
+        err_t _sent(tcp_pcb* pcb, uint16_t len) {
+            DEBUGV(":sent %d\r\n", len);
+            _size_sent -= len;
+            if(_size_sent == 0 && _send_waiting) esp_schedule();
+            return ERR_OK;
+        }
+
         void _consume(size_t size) {
             ptrdiff_t left = _rx_buf->len - _rx_buf_offset - size;
             if(left > 0) {
@@ -204,21 +243,8 @@ class ClientContext {
 
             if(pb == 0) // connection closed
             {
-                DEBUGV(":rcl\r\n");
-                tcp_arg(pcb, NULL);
-                tcp_sent(pcb, NULL);
-                tcp_recv(pcb, NULL);
-                tcp_err(pcb, NULL);
-                // int error = tcp_close(pcb);
-                // if (error != ERR_OK)
-                {
-                    DEBUGV(":rcla\r\n");
-                    tcp_abort(pcb);
-                    _pcb = 0;
-                    return ERR_ABRT;
-                }
-                _pcb = 0;
-                return ERR_OK;
+                DEBUGV(":rcla\r\n");
+                return abort();
             }
 
             if(_rx_buf) {
@@ -231,40 +257,18 @@ class ClientContext {
                 _rx_buf = pb;
                 _rx_buf_offset = 0;
             }
-            // tcp_recved(pcb, received);
-            // pbuf_free(pb);
             return ERR_OK;
         }
 
         void _error(err_t err) {
             DEBUGV(":er %d\r\n", err);
-
-            if(_pcb) {
-                tcp_arg(_pcb, NULL);
-                tcp_sent(_pcb, NULL);
-                tcp_recv(_pcb, NULL);
-                tcp_err(_pcb, NULL);
-                err = tcp_close(_pcb);
-                if(err != ERR_OK) {
-                    DEBUGV(":tc err %d\r\n", err);
-                    tcp_abort(_pcb);
-                }
-            }
-            _pcb = 0;
-
+            close();
             if(_size_sent && _send_waiting) {
                 esp_schedule();
             }
         }
 
         err_t _poll(tcp_pcb* pcb) {
-            return ERR_OK;
-        }
-
-        err_t _sent(tcp_pcb* pcb, uint16_t len) {
-            DEBUGV(":sent %d\r\n", len);
-            _size_sent -= len;
-            if(_size_sent == 0 && _send_waiting) esp_schedule();
             return ERR_OK;
         }
 

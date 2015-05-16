@@ -30,6 +30,10 @@ void timer1_isr_handler(void *para){
     if(timer1_user_cb) timer1_user_cb();
 }
 
+void timer1_isr_init(){
+    ETS_FRC_TIMER1_INTR_ATTACH(timer1_isr_handler, NULL);
+}
+
 void timer1_attachInterrupt(void (*userFunc)(void)) {
     timer1_user_cb = userFunc;
     ETS_FRC1_INTR_ENABLE();
@@ -54,8 +58,4 @@ void timer1_write(uint32_t ticks){
 void timer1_disable(){
     T1C = 0;
     T1I = 0;
-}
-
-void timer1_isr_init(){
-    ETS_FRC_TIMER1_INTR_ATTACH(timer1_isr_handler, NULL);
 }
