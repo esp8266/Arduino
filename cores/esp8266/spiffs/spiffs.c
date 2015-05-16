@@ -58,7 +58,7 @@ bool spiffs_format_internal(){
   }
 
   u32_t sect_first, sect_last;
-  sect_first = flashmem_get_first_free_block_address();
+  sect_first = flashmem_get_sector_of_address((u32_t)&_SPIFFS_start);
   sect_last = flashmem_get_sector_of_address((u32_t)&_SPIFFS_end);
   debugf("sect_first: %x, sect_last: %x\n", sect_first, sect_last);
   while( sect_first <= sect_last ){
