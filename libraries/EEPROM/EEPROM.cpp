@@ -49,7 +49,9 @@ void EEPROMClass::begin(size_t size)
     _data = new uint8_t[size];
     _size = size;
 
+    noInterrupts();
     spi_flash_read(CONFIG_ADDR, reinterpret_cast<uint32_t*>(_data), _size);
+    interrupts();
 }
 
 void EEPROMClass::end()
@@ -90,19 +92,21 @@ bool EEPROMClass::commit()
     if(!_dirty)
         return true;
 
-    ETS_UART_INTR_DISABLE();
+    noInterrupts();
     if(spi_flash_erase_sector(CONFIG_SECTOR) == SPI_FLASH_RESULT_OK) {
         if(spi_flash_write(CONFIG_ADDR, reinterpret_cast<uint32_t*>(_data), _size) == SPI_FLASH_RESULT_OK) {
             _dirty = false;
             ret = true;
         }
     }
-    ETS_UART_INTR_ENABLE();
+    interrupts();
+
     return ret;
 }
 
 uint8_t * EEPROMClass::getDataPtr()
 {
+    _dirty = true;
     return &_data[0];
 }
 
