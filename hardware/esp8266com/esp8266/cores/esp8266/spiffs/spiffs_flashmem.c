@@ -97,7 +97,7 @@ uint32_t flashmem_read( void *to, uint32_t fromaddr, uint32_t size )
 
 bool flashmem_erase_sector( uint32_t sector_id )
 {
-  WRITE_PERI_REG(0x60000914, 0x73);
+  WDT_RESET();
   return spi_flash_erase_sector( sector_id ) == SPI_FLASH_RESULT_OK;
 }
 
@@ -186,7 +186,9 @@ uint32_t flashmem_write_internal( const void *from, uint32_t toaddr, uint32_t si
     os_memcpy(apbuf, from, size);
   }
   WDT_RESET();
+  ETS_UART_INTR_DISABLE();
   r = spi_flash_write(toaddr, apbuf?(uint32 *)apbuf:(uint32 *)from, size);
+  ETS_UART_INTR_ENABLE();
   if(apbuf)
     os_free(apbuf);
   if(SPI_FLASH_RESULT_OK == r)
@@ -202,7 +204,9 @@ uint32_t flashmem_read_internal( void *to, uint32_t fromaddr, uint32_t size )
   fromaddr -= INTERNAL_FLASH_START_ADDRESS;
   SpiFlashOpResult r;
   WDT_RESET();
+  ETS_UART_INTR_DISABLE();
   r = spi_flash_read(fromaddr, (uint32 *)to, size);
+  ETS_UART_INTR_ENABLE();
   if(SPI_FLASH_RESULT_OK == r)
     return size;
   else{
