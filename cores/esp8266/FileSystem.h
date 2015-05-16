@@ -26,8 +26,8 @@
 class String;
 
 #define FSFILE_READ SPIFFS_RDONLY
-#define FSFILE_WRITE (SPIFFS_RDWR | SPIFFS_CREAT | SPIFFS_APPEND | SPIFFS_DIRECT)
-#define FSFILE_OVERWRITE (SPIFFS_RDWR | SPIFFS_CREAT | SPIFFS_APPEND | SPIFFS_TRUNC | SPIFFS_DIRECT)
+#define FSFILE_WRITE (SPIFFS_RDONLY | SPIFFS_WRONLY | SPIFFS_CREAT | SPIFFS_APPEND | SPIFFS_DIRECT)
+#define FSFILE_OVERWRITE (SPIFFS_RDONLY | SPIFFS_WRONLY | SPIFFS_CREAT | SPIFFS_APPEND | SPIFFS_TRUNC | SPIFFS_DIRECT)
 
 class FSFile : public Stream {
 private:
@@ -47,11 +47,11 @@ public:
   virtual void flush();
   int read(void *buf, uint16_t nbyte);
   uint32_t seek(uint32_t pos);
-  uint32_t remove();
   uint32_t position();
   uint32_t size();
   bool eof();
   void close();
+  bool remove();
   int lastError();
   void clearError();
   operator bool() { return _file > 0; }
