@@ -91,10 +91,10 @@ typedef void (*int_handler_t)(void*);
     ETS_INTR_DISABLE(ETS_GPIO_INUM)
 
 
-void *pvPortMalloc(size_t xWantedSize);
-void *pvPortRealloc(void* ptr, size_t xWantedSize);
+void *pvPortMalloc(size_t xWantedSize) __attribute__((malloc, alloc_size(1)));
+void *pvPortRealloc(void* ptr, size_t xWantedSize) __attribute__((alloc_size(2)));
 void pvPortFree(void *ptr);
-void *vPortMalloc(size_t xWantedSize);
+void *vPortMalloc(size_t xWantedSize) __attribute__((malloc, alloc_size(1)));
 void vPortFree(void *ptr);
 void *ets_memcpy(void *dest, const void *src, size_t n);
 void *ets_memset(void *s, int c, size_t n);
