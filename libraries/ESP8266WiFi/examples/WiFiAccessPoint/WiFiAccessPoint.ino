@@ -31,6 +31,7 @@
 /* Create a WiFi access point and provide a web server on it. */
 
 #include <ESP8266WiFi.h>
+#include <WiFiClient.h> 
 #include <ESP8266WebServer.h>
 
 /* Set these to your desired credentials. */
