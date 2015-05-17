@@ -48,14 +48,14 @@
 #define WL_MAX_ATTEMPT_CONNECTION	10
 
 typedef enum {
-    WL_NO_SHIELD = 255,   // for compatibility with WiFi Shield library
-    WL_IDLE_STATUS = 0,
-    WL_NO_SSID_AVAIL,
-    WL_SCAN_COMPLETED,
-    WL_CONNECTED,
-    WL_CONNECT_FAILED,
-    WL_CONNECTION_LOST,
-    WL_DISCONNECTED
+    WL_NO_SHIELD        = 255,   // for compatibility with WiFi Shield library
+    WL_IDLE_STATUS      = 0,
+    WL_NO_SSID_AVAIL    = 1,
+    WL_SCAN_COMPLETED   = 2,
+    WL_CONNECTED        = 3,
+    WL_CONNECT_FAILED   = 4,
+    WL_CONNECTION_LOST  = 5,
+    WL_DISCONNECTED     = 6
 } wl_status_t;
 
 /* Encryption modes */

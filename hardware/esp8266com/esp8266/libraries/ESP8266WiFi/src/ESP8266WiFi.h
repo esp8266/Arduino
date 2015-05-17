@@ -199,7 +199,7 @@ public:
      *
      * return: one of the value defined in wl_status_t
      */
-    uint8_t status();
+    wl_status_t status();
 
     /*
      * Resolve the given hostname to an IP address.
