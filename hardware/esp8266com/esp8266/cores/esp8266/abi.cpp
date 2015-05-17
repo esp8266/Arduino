@@ -26,10 +26,12 @@ extern "C" {
 }
 
 void *operator new(size_t size) {
+    size = ((size + 3) & ~((size_t)0x3));
     return os_malloc(size);
 }
 
 void *operator new[](size_t size) {
+    size = ((size + 3) & ~((size_t)0x3));
     return os_malloc(size);
 }
 
