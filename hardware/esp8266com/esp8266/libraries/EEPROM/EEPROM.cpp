@@ -41,7 +41,7 @@ EEPROMClass::EEPROMClass()
 
 void EEPROMClass::begin(size_t size)
 {
-    if (size < 0)
+    if (size <= 0)
         return;
     if (size > SPI_FLASH_SEC_SIZE)
         size = SPI_FLASH_SEC_SIZE;
@@ -60,8 +60,9 @@ void EEPROMClass::end()
         return;
 
     commit();
-
-    delete[] _data;
+    if(_data) {
+        delete[] _data;
+    }
     _data = 0;
     _size = 0;
 }
@@ -71,6 +72,8 @@ uint8_t EEPROMClass::read(int address)
 {
     if (address < 0 || (size_t)address >= _size)
         return 0;
+    if(!_data)
+        return 0;
 
     return _data[address];
 }
@@ -78,6 +81,8 @@ uint8_t EEPROMClass::read(int address)
 void EEPROMClass::write(int address, uint8_t value)
 {
     if (address < 0 || (size_t)address >= _size)
+        return;
+    if(!_data)
         return;
 
     _data[address] = value;
@@ -91,6 +96,8 @@ bool EEPROMClass::commit()
         return false;
     if(!_dirty)
         return true;
+    if(!_data)
+        return false;
 
     noInterrupts();
     if(spi_flash_erase_sector(CONFIG_SECTOR) == SPI_FLASH_RESULT_OK) {
