@@ -85,6 +85,16 @@ generic.menu.FlashSize.4M.build.flash_size=4M
 generic.menu.FlashSize.4M.build.flash_ld=eagle.flash.4m.ld
 generic.menu.FlashSize.4M.build.spiffs_start=0x100000
 generic.menu.FlashSize.4M.build.spiffs_end=0x3FB000
+generic.menu.FlashSize.8M=8M (7M SPIFFS)
+generic.menu.FlashSize.8M.build.flash_size=1M
+generic.menu.FlashSize.8M.build.flash_ld=eagle.flash.8m.ld
+generic.menu.FlashSize.8M.build.spiffs_start=0x100000
+generic.menu.FlashSize.8M.build.spiffs_end=0x800000
+generic.menu.FlashSize.16M=16M (15M SPIFFS)
+generic.menu.FlashSize.16M.build.flash_size=1M
+generic.menu.FlashSize.16M.build.flash_ld=eagle.flash.16m.ld
+generic.menu.FlashSize.16M.build.spiffs_start=0x100000
+generic.menu.FlashSize.16M.build.spiffs_end=0x1000000
 
 # generic.menu.FlashFreq.40=40MHz
 # generic.menu.FlashFreq.40.build.flash_freq=40

@@ -11,7 +11,10 @@
 bool flashmem_erase_sector( uint32_t sector_id ){
   WDT_RESET();
   noInterrupts();
+  uint32_t chip_size = flashchip->chip_size;
+  flashchip->chip_size = 0x01000000;
   bool erased = spi_flash_erase_sector( sector_id ) == SPI_FLASH_RESULT_OK;
+  flashchip->chip_size = chip_size;
   interrupts();
   return erased;
 }
@@ -30,7 +33,10 @@ uint32_t flashmem_write_internal( const void *from, uint32_t toaddr, uint32_t si
   }
   WDT_RESET();
   noInterrupts();
+  uint32_t chip_size = flashchip->chip_size;
+  flashchip->chip_size = 0x01000000;
   r = spi_flash_write(toaddr, apbuf?(uint32 *)apbuf:(uint32 *)from, size);
+  flashchip->chip_size = chip_size;
   interrupts();
   if(apbuf)
     os_free(apbuf);
@@ -48,7 +54,10 @@ uint32_t flashmem_read_internal( void *to, uint32_t fromaddr, uint32_t size ){
   SpiFlashOpResult r;
   WDT_RESET();
   noInterrupts();
+  uint32_t chip_size = flashchip->chip_size;
+  flashchip->chip_size = 0x01000000;
   r = spi_flash_read(fromaddr, (uint32 *)to, size);
+  flashchip->chip_size = chip_size;
   interrupts();
   if(SPI_FLASH_RESULT_OK == r)
     return size;
