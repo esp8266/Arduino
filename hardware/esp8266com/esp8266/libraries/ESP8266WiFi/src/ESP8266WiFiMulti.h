@@ -28,6 +28,8 @@
 #define WIFICLIENTMULTI_H_
 
 #include "ESP8266WiFi.h"
+#undef min
+#undef max
 #include <vector>
 
 //#define DEBUG_WIFI_MULTI(...) os_printf( __VA_ARGS__ )
