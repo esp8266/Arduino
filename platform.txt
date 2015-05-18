@@ -8,10 +8,8 @@
 name=ESP8266 Modules
 version=1.6.4
 
-#board-manager-package-compat-begin
-runtime.tools.xtensa-lx106-elf-gcc.path={runtime.platform.path}/tools/xtensa-lx106-elf-gcc
+runtime.tools.xtensa-lx106-elf-gcc.path={runtime.platform.path}/tools/xtensa-lx106-elf
 runtime.tools.esptool.path={runtime.platform.path}/tools
-#board-manager-package-compat-end
 
 compiler.path={runtime.tools.xtensa-lx106-elf-gcc.path}/bin/
 compiler.sdk.path={runtime.platform.path}/tools/sdk/
@@ -88,8 +86,9 @@ recipe.size.regex=^(?:\.text|\.data|\.rodata|\.irom0\.text|)\s+([0-9]+).*
 
 tools.esptool.cmd=esptool
 tools.esptool.cmd.windows=esptool.exe
+tools.esptool.path={runtime.platform.path}/tools
 
 tools.esptool.upload.protocol=esp
 tools.esptool.upload.params.verbose=-vv
 tools.esptool.upload.params.quiet=
-tools.esptool.upload.pattern="{runtime.tools.esptool.path}/{cmd}" {upload.verbose} -cd {upload.resetmethod} -cb {upload.speed} -cp "{serial.port}" -ca 0x00000 -cf "{build.path}/{build.project_name}_00000.bin" -ca 0x10000 -cf "{build.path}/{build.project_name}_10000.bin"
+tools.esptool.upload.pattern="{path}/{cmd}" {upload.verbose} -cd {upload.resetmethod} -cb {upload.speed} -cp "{serial.port}" -ca 0x00000 -cf "{build.path}/{build.project_name}_00000.bin" -ca 0x10000 -cf "{build.path}/{build.project_name}_10000.bin"
