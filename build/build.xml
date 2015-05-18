@@ -397,14 +397,14 @@
     </antcall>
 
     
-    <antcall target="unzip">
-      <param name="archive_file" value="${staging_folder}/esptool-0.4.3-osx.zip" />
-      <param name="archive_url" value="https://github.com/igrr/esptool-ck/releases/download/0.4.3/esptool-0.4.3-osx.zip" />
-      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.3-osx" />
+    <antcall target="untar">
+      <param name="archive_file" value="${staging_folder}/esptool-0.4.4-osx.tar.gz" />
+      <param name="archive_url" value="https://github.com/igrr/esptool-ck/releases/download/0.4.4/esptool-0.4.4-osx.tar.gz" />
+      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.4-osx" />
       <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/" />
     </antcall>
-    <move file="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.3-osx/esptool" tofile="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool" />
-    <delete dir="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.3-osx/" />
+    <move file="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.4-osx/esptool" tofile="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool" />
+    <delete dir="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.4-osx/" />
 
   </target>
 
@@ -670,14 +670,14 @@
       <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/" />
     </antcall>
 
-    <antcall target="unzip">
-      <param name="archive_file" value="${staging_folder}/esptool-0.4.3-linux64.zip" />
-      <param name="archive_url" value="https://github.com/igrr/esptool-ck/releases/download/0.4.3/esptool-0.4.3-linux64.zip" />
-      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.3-linux64" />
+    <antcall target="untar">
+      <param name="archive_file" value="${staging_folder}/esptool-0.4.4-linux64.tar.gz" />
+      <param name="archive_url" value="https://github.com/igrr/esptool-ck/releases/download/0.4.4/esptool-0.4.4-linux64.tar.gz" />
+      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.4-linux64" />
       <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/" />
     </antcall>
-    <move file="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.3-linux64/esptool" tofile="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool" />
-    <delete dir="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.3-linux64/" />
+    <move file="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.4-linux64/esptool" tofile="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool" />
+    <delete dir="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.4-linux64/" />
 
   </target>
 
@@ -924,13 +924,13 @@
 	
 
     <antcall target="unzip">
-      <param name="archive_file" value="${staging_folder}/esptool-0.4.3-win32.zip" />
-      <param name="archive_url" value="https://github.com/igrr/esptool-ck/releases/download/0.4.3/esptool-0.4.3-win32.zip" />
-      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.3-win32" />
+      <param name="archive_file" value="${staging_folder}/esptool-0.4.4-win32.zip" />
+      <param name="archive_url" value="https://github.com/igrr/esptool-ck/releases/download/0.4.4/esptool-0.4.4-win32.zip" />
+      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.4-win32" />
       <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/" />
     </antcall>
-    <move file="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.3-win32/esptool.exe" tofile="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool.exe" />
-    <delete dir="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.3-win32/" />
+    <move file="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.4-win32/esptool.exe" tofile="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool.exe" />
+    <delete dir="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.4-win32/" />
  
   </target>
 
