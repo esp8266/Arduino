@@ -1155,6 +1155,11 @@ public class Compiler implements MessageConsumer {
   
   //7. Save the .hex file
   void saveHex() throws RunnerException {
+    if (!prefs.containsKey("recipe.output.tmp_file") || !prefs.containsKey("recipe.output.save_file")) {
+      System.err.println(_("Warning: This core does not support exporting sketches. Please consider upgrading it or contacting its author"));
+      return;
+    }
+
     PreferencesMap dict = new PreferencesMap(prefs);
     dict.put("ide_version", "" + BaseNoGui.REVISION);
 
