@@ -26,10 +26,12 @@ import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
 import processing.app.PreferencesData;
 import processing.app.debug.TargetPackage;
-import processing.app.tools.ExternalProcessExecutor;
 import processing.app.legacy.PConstants;
+import processing.app.tools.CollectStdOutExecutor;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
 
@@ -42,17 +44,7 @@ public class Platform extends processing.app.Platform {
   // TODO Need to be smarter here since KDE people ain't gonna like that GTK.
   //      It may even throw a weird exception at 'em for their trouble.
   public void setLookAndFeel() throws Exception {
-    // Linux is by default even uglier than metal (Motif?).
-    // Actually, i'm using native menus, so they're even uglier
-    // and Motif-looking (Lesstif?). Ick. Need to fix this.
-    //String lfname = UIManager.getCrossPlatformLookAndFeelClassName();
-    //UIManager.setLookAndFeel(lfname);
-
-    // For 0120, trying out the gtk+ look and feel as the default.
-    // This is available in Java 1.4.2 and later, and it can't possibly
-    // be any worse than Metal. (Ocean might also work, but that's for
-    // Java 1.5, and we aren't going there yet)
-    //UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+    GTKLookAndFeelFixer.installGtkPopupBugWorkaround();
   }
 
 
@@ -130,8 +122,9 @@ public class Platform extends processing.app.Platform {
 
   @Override
   public Map<String, Object> resolveDeviceAttachedTo(String serial, Map<String, TargetPackage> packages, String devicesListOutput) {
+    assert packages != null;
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    Executor executor = new ExternalProcessExecutor(baos);
+    Executor executor = new CollectStdOutExecutor(baos);
 
     try {
       CommandLine toDevicePath = CommandLine.parse("udevadm info -q path -n " + serial);

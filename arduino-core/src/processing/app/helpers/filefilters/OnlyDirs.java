@@ -32,11 +32,17 @@ import java.io.FilenameFilter;
  */
 public class OnlyDirs implements FilenameFilter {
 
-	public boolean accept(File dir, String name) {
-		if (name.charAt(0) == '.')
-			return false;
-		if (name.equals("CVS"))
-			return false;
-		return new File(dir, name).isDirectory();
-	}
+  public boolean accept(File dir, String name) {
+    if (name.charAt(0) == '.')
+      return false;
+    if (name.equals("CVS"))
+      return false;
+    return new File(dir, name).isDirectory();
+  }
+  
+  /**
+   * An handy pre-instantiated object 
+   */
+  public static final OnlyDirs ONLY_DIRS = new OnlyDirs();
+  
 }

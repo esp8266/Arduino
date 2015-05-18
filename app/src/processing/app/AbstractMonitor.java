@@ -78,7 +78,7 @@ public abstract class AbstractMonitor extends JFrame implements ActionListener {
     getContentPane().setLayout(new BorderLayout());
 
     Font consoleFont = Theme.getFont("console.font");
-    Font editorFont = Preferences.getFont("editor.font");
+    Font editorFont = PreferencesData.getFont("editor.font");
     Font font = new Font(consoleFont.getName(), consoleFont.getStyle(), editorFont.getSize());
 
     textArea = new TextAreaFIFO(8000000);
@@ -124,12 +124,12 @@ public abstract class AbstractMonitor extends JFrame implements ActionListener {
     lineEndings = new JComboBox(new String[]{_("No line ending"), _("Newline"), _("Carriage return"), _("Both NL & CR")});
     lineEndings.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
-        Preferences.setInteger("serial.line_ending", lineEndings.getSelectedIndex());
+        PreferencesData.setInteger("serial.line_ending", lineEndings.getSelectedIndex());
         noLineEndingAlert.setForeground(pane.getBackground());
       }
     });
-    if (Preferences.get("serial.line_ending") != null) {
-      lineEndings.setSelectedIndex(Preferences.getInteger("serial.line_ending"));
+    if (PreferencesData.get("serial.line_ending") != null) {
+      lineEndings.setSelectedIndex(PreferencesData.getInteger("serial.line_ending"));
     }
     lineEndings.setMaximumSize(lineEndings.getMinimumSize());
 
@@ -160,13 +160,13 @@ public abstract class AbstractMonitor extends JFrame implements ActionListener {
     pack();
 
     Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-    if (Preferences.get("last.screen.height") != null) {
+    if (PreferencesData.get("last.screen.height") != null) {
       // if screen size has changed, the window coordinates no longer
       // make sense, so don't use them unless they're identical
-      int screenW = Preferences.getInteger("last.screen.width");
-      int screenH = Preferences.getInteger("last.screen.height");
+      int screenW = PreferencesData.getInteger("last.screen.width");
+      int screenH = PreferencesData.getInteger("last.screen.height");
       if ((screen.width == screenW) && (screen.height == screenH)) {
-        String locationStr = Preferences.get("last.serial.location");
+        String locationStr = PreferencesData.get("last.serial.location");
         if (locationStr != null) {
           int[] location = PApplet.parseInt(PApplet.split(locationStr, ','));
           setPlacement(location);

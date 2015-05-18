@@ -9,5 +9,26 @@
 	<classpathentry kind="lib" path="lib/jssc-2.8.0.jar"/>
 	<classpathentry kind="lib" path="lib/jsch-0.1.50.jar"/>
 	<classpathentry kind="lib" path="lib/commons-exec-1.1.jar"/>
+	<classpathentry kind="lib" path="../app/lib/commons-codec-1.7.jar"/>
+	<classpathentry kind="lib" path="../app/lib/commons-compress-1.8.jar"/>
+	<classpathentry kind="lib" path="../app/lib/commons-exec-1.1.jar"/>
+	<classpathentry kind="lib" path="../app/lib/commons-httpclient-3.1.jar"/>
+	<classpathentry kind="lib" path="../app/lib/jackson-annotations-2.2.3.jar"/>
+	<classpathentry kind="lib" path="../app/lib/jackson-core-2.2.3.jar"/>
+	<classpathentry kind="lib" path="../app/lib/jackson-databind-2.2.3.jar"/>
+	<classpathentry kind="lib" path="../app/lib/jackson-module-mrbean-2.2.3.jar"/>
+	<classpathentry kind="lib" path="../app/lib/bcpg-jdk15on-152.jar"/>
+	<classpathentry kind="lib" path="../app/lib/bcprov-jdk15on-152.jar"/>
+	<classpathentry kind="lib" path="lib/bcpg-jdk15on-152.jar"/>
+	<classpathentry kind="lib" path="lib/bcprov-jdk15on-152.jar"/>
+	<classpathentry kind="lib" path="lib/commons-codec-1.7.jar"/>
+	<classpathentry kind="lib" path="lib/commons-compress-1.8.jar"/>
+	<classpathentry kind="lib" path="lib/commons-lang3-3.3.2.jar"/>
+	<classpathentry kind="lib" path="lib/guava-18.0.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-annotations-2.2.3.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-core-2.2.3.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-databind-2.2.3.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-module-mrbean-2.2.3.jar"/>
+	<classpathentry kind="lib" path="lib/java-semver-0.8.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

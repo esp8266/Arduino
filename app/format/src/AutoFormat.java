@@ -45,7 +45,7 @@ import java.io.*;
 
   public void show() {
     String originalText = editor.textarea.getText();
-    int indentSize = Preferences.getInteger("editor.tabs.size");
+    int indentSize = PreferencesData.getInteger("editor.tabs.size");
 
     //
 
