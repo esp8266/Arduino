@@ -5,15 +5,15 @@
  *      Author: petera
  */
 
+
+
 #ifndef SPIFFS_H_
 #define SPIFFS_H_
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "spiffs_config.h"
-#include "flashmem.h"
 
 #define SPIFFS_OK                       0
 #define SPIFFS_ERR_NOT_MOUNTED          -10000
@@ -40,6 +40,13 @@ extern "C" {
 #define SPIFFS_ERR_NOT_WRITABLE         -10021
 #define SPIFFS_ERR_NOT_READABLE         -10022
 #define SPIFFS_ERR_CONFLICTING_NAME     -10023
+#define SPIFFS_ERR_NOT_CONFIGURED       -10024
+
+#define SPIFFS_ERR_NOT_A_FS             -10025
+#define SPIFFS_ERR_MOUNTED              -10026
+#define SPIFFS_ERR_ERASE_FAIL           -10027
+#define SPIFFS_ERR_MAGIC_NOT_POSSIBLE   -10028
+
 
 #define SPIFFS_ERR_INTERNAL             -10050
 
@@ -81,19 +88,21 @@ typedef enum {
 } spiffs_check_report;
 
 /* file system check callback function */
-typedef void (*spiffs_check_callback)(spiffs_check_type type, spiffs_check_report report, u32_t arg1, u32_t arg2);
+typedef void (*spiffs_check_callback)(spiffs_check_type type, spiffs_check_report report,
+    u32_t arg1, u32_t arg2);
 
 #ifndef SPIFFS_DBG
-#define SPIFFS_DBG(...) printf(__VA_ARGS__)
+#define SPIFFS_DBG(...) \
+    print(__VA_ARGS__)
 #endif
 #ifndef SPIFFS_GC_DBG
-#define SPIFFS_GC_DBG(...) printf(__VA_ARGS__)
+#define SPIFFS_GC_DBG(...) c_printf(__VA_ARGS__)
 #endif
 #ifndef SPIFFS_CACHE_DBG
-#define SPIFFS_CACHE_DBG(...) printf(__VA_ARGS__)
+#define SPIFFS_CACHE_DBG(...) c_printf(__VA_ARGS__)
 #endif
 #ifndef SPIFFS_CHECK_DBG
-#define SPIFFS_CHECK_DBG(...) printf(__VA_ARGS__)
+#define SPIFFS_CHECK_DBG(...) c_printf(__VA_ARGS__)
 #endif
 
 /* Any write to the filehandle is appended to end of the file */
@@ -182,7 +191,7 @@ typedef struct {
   u32_t fd_count;
 
   // last error
-  s32_t errno;
+  s32_t err_code;
 
   // current number of free blocks
   u32_t free_blocks;
@@ -212,6 +221,11 @@ typedef struct {
 
   // check callback function
   spiffs_check_callback check_cb_f;
+
+  // mounted flag
+  u8_t mounted;
+  // config magic
+  u32_t config_magic;
 } spiffs;
 
 /* spiffs file status struct */
@@ -239,7 +253,10 @@ typedef struct {
 // functions
 
 /**
- * Initializes the file system dynamic parameters and mounts the filesystem
+ * Initializes the file system dynamic parameters and mounts the filesystem.
+ * If SPIFFS_USE_MAGIC is enabled the mounting may fail with SPIFFS_ERR_NOT_A_FS
+ * if the flash does not contain a recognizable file system.
+ * In this case, SPIFFS_format must be called prior to remounting.
  * @param fs            the file system struct
  * @param config        the physical and logical configuration of the file system
  * @param work          a memory work buffer comprising 2*config->log_page_size
@@ -268,7 +285,7 @@ void SPIFFS_unmount(spiffs *fs);
  * @param path          the path of the new file
  * @param mode          ignored, for posix compliance
  */
-s32_t SPIFFS_creat(spiffs *fs, const char *path, spiffs_mode mode);
+s32_t SPIFFS_creat(spiffs *fs, char *path, spiffs_mode mode);
 
 /**
  * Opens/creates a file.
@@ -279,7 +296,8 @@ s32_t SPIFFS_creat(spiffs *fs, const char *path, spiffs_mode mode);
  *                      SPIFFS_WR_ONLY, SPIFFS_RDWR, SPIFFS_DIRECT
  * @param mode          ignored, for posix compliance
  */
-spiffs_file SPIFFS_open(spiffs *fs, const char *path, spiffs_flags flags, spiffs_mode mode);
+spiffs_file SPIFFS_open(spiffs *fs, char *path, spiffs_flags flags, spiffs_mode mode);
+
 
 /**
  * Opens a file by given dir entry.
@@ -304,7 +322,7 @@ spiffs_file SPIFFS_open_by_dirent(spiffs *fs, struct spiffs_dirent *e, spiffs_fl
  * @param len           how much to read
  * @returns number of bytes read, or -1 if error
  */
-s32_t SPIFFS_read(spiffs *fs, spiffs_file fh, void *buf, u32_t len);
+s32_t SPIFFS_read(spiffs *fs, spiffs_file fh, void *buf, s32_t len);
 
 /**
  * Writes to given filehandle.
@@ -314,7 +332,7 @@ s32_t SPIFFS_read(spiffs *fs, spiffs_file fh, void *buf, u32_t len);
  * @param len           how much to write
  * @returns number of bytes written, or -1 if error
  */
-s32_t SPIFFS_write(spiffs *fs, spiffs_file fh, void *buf, u32_t len);
+s32_t SPIFFS_write(spiffs *fs, spiffs_file fh, void *buf, s32_t len);
 
 /**
  * Moves the read/write file offset
@@ -332,7 +350,7 @@ s32_t SPIFFS_lseek(spiffs *fs, spiffs_file fh, s32_t offs, int whence);
  * @param fs            the file system struct
  * @param path          the path of the file to remove
  */
-s32_t SPIFFS_remove(spiffs *fs, const char *path);
+s32_t SPIFFS_remove(spiffs *fs, char *path);
 
 /**
  * Removes a file by filehandle
@@ -347,7 +365,7 @@ s32_t SPIFFS_fremove(spiffs *fs, spiffs_file fh);
  * @param path          the path of the file to stat
  * @param s             the stat struct to populate
  */
-s32_t SPIFFS_stat(spiffs *fs, const char *path, spiffs_stat *s);
+s32_t SPIFFS_stat(spiffs *fs, char *path, spiffs_stat *s);
 
 /**
  * Gets file status by filehandle
@@ -375,15 +393,21 @@ void SPIFFS_close(spiffs *fs, spiffs_file fh);
  * Renames a file
  * @param fs            the file system struct
  * @param old           path of file to rename
- * @param new           new path of file
+ * @param newPath       new path of file
  */
-s32_t SPIFFS_rename(spiffs *fs, const char *old, const char *newname);
+s32_t SPIFFS_rename(spiffs *fs, char *old, char *newPath);
 
 /**
  * Returns last error of last file operation.
  * @param fs            the file system struct
  */
 s32_t SPIFFS_errno(spiffs *fs);
+
+/**
+ * Clears last error.
+ * @param fs            the file system struct
+ */
+void SPIFFS_clearerr(spiffs *fs);
 
 /**
  * Opens a directory stream corresponding to the given name.
@@ -394,7 +418,7 @@ s32_t SPIFFS_errno(spiffs *fs);
  * @param name          the name of the directory
  * @param d             pointer the directory stream to be populated
  */
-spiffs_DIR *SPIFFS_opendir(spiffs *fs, const char *name, spiffs_DIR *d);
+spiffs_DIR *SPIFFS_opendir(spiffs *fs, char *name, spiffs_DIR *d);
 
 /**
  * Closes a directory stream
@@ -416,12 +440,51 @@ struct spiffs_dirent *SPIFFS_readdir(spiffs_DIR *d, struct spiffs_dirent *e);
  */
 s32_t SPIFFS_check(spiffs *fs);
 
+
+/**
+ * Returns number of total bytes available and number of used bytes.
+ * This is an estimation, and depends on if there a many files with little
+ * data or few files with much data.
+ * NB: If used number of bytes exceeds total bytes, a SPIFFS_check should
+ * run. This indicates a power loss in midst of things. In worst case
+ * (repeated powerlosses in mending or gc) you might have to delete some files.
+ *
+ * @param fs            the file system struct
+ * @param total         total number of bytes in filesystem
+ * @param used          used number of bytes in filesystem
+ */
+s32_t SPIFFS_info(spiffs *fs, u32_t *total, u32_t *used);
+
+/**
+ * Formats the entire file system. All data will be lost.
+ * The filesystem must not be mounted when calling this.
+ *
+ * NB: formatting is awkward. Due to backwards compatibility, SPIFFS_mount
+ * MUST be called prior to formatting in order to configure the filesystem.
+ * If SPIFFS_mount succeeds, SPIFFS_unmount must be called before calling
+ * SPIFFS_format.
+ * If SPIFFS_mount fails, SPIFFS_format can be called directly without calling
+ * SPIFFS_unmount first.
+ */
+s32_t SPIFFS_format(spiffs *fs);
+
+/**
+ * Returns nonzero if spiffs is mounted, or zero if unmounted.
+ */
+u8_t SPIFFS_mounted(spiffs *fs);
+
 /**
  * Check if EOF reached.
  * @param fs            the file system struct
  * @param fh            the filehandle of the file to check
  */
 s32_t SPIFFS_eof(spiffs *fs, spiffs_file fh);
+
+/**
+ * Get the current position of the data pointer.
+ * @param fs            the file system struct
+ * @param fh            the filehandle of the open file
+ */
 s32_t SPIFFS_tell(spiffs *fs, spiffs_file fh);
 
 #if SPIFFS_TEST_VISUALISATION
@@ -448,19 +511,10 @@ u32_t SPIFFS_buffer_bytes_for_cache(spiffs *fs, u32_t num_pages);
 #endif
 #endif
 
-#if SPIFFS_CACHE
-#endif
-
-
-bool spiffs_mount();
-void spiffs_unmount();
-bool spiffs_format();
-spiffs_config spiffs_get_storage_config();
-extern void test_spiffs();
-
-extern spiffs _filesystemStorageHandle;
+#include "spiffs_esp8266.h"
 
 #ifdef __cplusplus
 }
 #endif
+
 #endif /* SPIFFS_H_ */

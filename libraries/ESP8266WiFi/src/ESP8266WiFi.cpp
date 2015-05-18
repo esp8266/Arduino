@@ -81,6 +81,14 @@ int ESP8266WiFiClass::begin(const char* ssid, const char *passphrase)
     return status();
 }
 
+uint8_t ESP8266WiFiClass::waitForConnectResult(){
+  if ((wifi_get_opmode() & 1) == 0)//1 and 3 have STA enabled
+      return WL_DISCONNECTED;
+  while (status() == WL_DISCONNECTED)
+    delay(100);
+  return status();
+}
+
 void ESP8266WiFiClass::config(IPAddress local_ip, IPAddress gateway, IPAddress subnet)
 {
     struct ip_info info;
@@ -336,7 +344,7 @@ uint8_t ESP8266WiFiClass::encryptionType(uint8_t i)
     return -1;
 }
 
-uint8_t ESP8266WiFiClass::status()
+wl_status_t ESP8266WiFiClass::status()
 {
     int status = wifi_station_get_connect_status();
 
