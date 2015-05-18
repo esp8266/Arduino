@@ -94,8 +94,8 @@ cat << EOF > package_esp8266com_index.json
            "host":"i686-mingw32",
            "url":"http://arduino.esp8266.com/win32-xtensa-lx106-elf.tar.gz",
            "archiveFileName":"win32-xtensa-lx106-elf.tar.gz",
-           "checksum":"SHA-256:5e3de7c20007bf13587907ccf026b0e9bc736a99a022ed020c70b834d01ba512",
-           "size":"128052524"
+           "checksum":"SHA-256:1561ec85cc58cab35cc48bfdb0d0087809f89c043112a2c36b54251a13bf781f",
+           "size":"153807368"
         },
         {
            "host":"x86_64-apple-darwin",
