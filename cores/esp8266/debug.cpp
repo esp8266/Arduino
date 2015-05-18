@@ -26,6 +26,7 @@ void ICACHE_RAM_ATTR hexdump(uint8_t *mem, uint32_t len, uint8_t cols) {
     for(uint32_t i = 0; i < len; i++) {
         if(i % cols == 0) {
             os_printf("\n[0x%08X] 0x%08X: ", mem, i);
+        	yield();
         }
         os_printf("%02X ", *mem);
         mem++;
