@@ -135,7 +135,7 @@ void ets_intr_unlock();
 extern uint32_t interruptsState;
 
 #define interrupts() xt_enable_interrupts(interruptsState)
-#define noInterrupts() xt_disable_interrupts(interruptsState, 15)
+#define noInterrupts() __asm__ __volatile__("rsil %0,15; esync; isync; dsync" : "=a" (interruptsState))
 
 #define clockCyclesPerMicrosecond() ( F_CPU / 1000000L )
 #define clockCyclesToMicroseconds(a) ( (a) / clockCyclesPerMicrosecond() )

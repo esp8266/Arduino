@@ -26,14 +26,17 @@
 class String;
 
 #define FSFILE_READ SPIFFS_RDONLY
-#define FSFILE_WRITE (SPIFFS_RDONLY | SPIFFS_WRONLY | SPIFFS_CREAT | SPIFFS_APPEND | SPIFFS_TRUNC)
+#define FSFILE_WRITE (SPIFFS_RDONLY | SPIFFS_WRONLY | SPIFFS_CREAT | SPIFFS_APPEND )
+#define FSFILE_OVERWRITE (SPIFFS_RDONLY | SPIFFS_WRONLY | SPIFFS_CREAT | SPIFFS_APPEND | SPIFFS_TRUNC )
 
 class FSFile : public Stream {
 private:
   spiffs_stat _stats; 
   file_t _file;
+  spiffs_DIR _dir;
 
 public:
+  FSFile(String path);
   FSFile(file_t f);
   FSFile(void);
   virtual size_t write(uint8_t);
@@ -44,16 +47,18 @@ public:
   virtual void flush();
   int read(void *buf, uint16_t nbyte);
   uint32_t seek(uint32_t pos);
-  uint32_t remove();
   uint32_t position();
   uint32_t size();
   bool eof();
   void close();
+  bool remove();
   int lastError();
   void clearError();
   operator bool() { return _file > 0; }
   char * name();
   bool isDirectory(void);
+  void rewindDirectory(void);
+  FSFile openNextFile(void);
 
   template<typename T> size_t write(T &src){
     const size_t bufferSize = 64;
@@ -80,18 +85,28 @@ public:
 class FSClass {
 
 private:
-  bool _mounted = false;
   
 public:
   bool mount();
   void unmount();
   bool format();
-  bool exists(const char *filename);
-  bool create(const char *filepath);
-  bool remove(const char *filepath);
-  bool rename(const char *filename, const char *newname);
+  bool check();
+  bool exists(char *filename);
+  bool create(char *filepath);
+  bool remove(char *filepath);
+  bool rename(char *filename, char *newname);
+  size_t totalBytes();
+  size_t usedBytes();
+  size_t size(){ return _filesystemStorageHandle.cfg.phys_size; }
+  size_t blockSize(){ return _filesystemStorageHandle.cfg.log_block_size; }
+  size_t totalBlocks(){ return _filesystemStorageHandle.block_count; }
+  size_t freeBlocks(){ return _filesystemStorageHandle.free_blocks; }
+  size_t pageSize(){ return _filesystemStorageHandle.cfg.log_page_size; }
+  size_t allocatedPages(){ return _filesystemStorageHandle.stats_p_allocated; }
+  size_t deletedPages(){ return _filesystemStorageHandle.stats_p_deleted; }
   
-  FSFile open(const char *filename, uint8_t mode = FSFILE_READ);
+  FSFile open(char *filename, uint8_t mode = FSFILE_READ);
+  FSFile open(spiffs_dirent* entry, uint8_t mode = FSFILE_READ);
 
 private:
   friend class FSFile;

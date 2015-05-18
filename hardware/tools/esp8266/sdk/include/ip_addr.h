@@ -59,11 +59,10 @@ struct ip_info {
 #define IPADDR_ANY          ((uint32)0x00000000UL)
 uint32 ipaddr_addr(const char *cp);
 
-#define IP2STR(ipaddr) ip4_addr1_16(ipaddr), \
-    ip4_addr2_16(ipaddr), \
-    ip4_addr3_16(ipaddr), \
-    ip4_addr4_16(ipaddr)
-
+#define IP2STR(addr) (uint8_t)(addr & 0xFF), (uint8_t)((addr >> 8) & 0xFF), (uint8_t)((addr >> 16) & 0xFF), (uint8_t)((addr >> 24) & 0xFF)
 #define IPSTR "%d.%d.%d.%d"
+
+#define MAC2STR(mac) (uint8_t)mac[0], (uint8_t)mac[1], (uint8_t)mac[2], (uint8_t)mac[3], (uint8_t)mac[4], (uint8_t)mac[5]
+#define MACSTR "%02x:%02x:%02x:%02x:%02x:%02x"
 
 #endif /* __IP_ADDR_H__ */
