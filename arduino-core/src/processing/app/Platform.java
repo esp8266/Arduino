@@ -21,23 +21,18 @@
 */
 
 package processing.app;
-import static processing.app.I18n._;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import javax.swing.UIManager;
 
 import cc.arduino.packages.BoardPort;
-import com.sun.jna.Library;
-import com.sun.jna.Native;
 import processing.app.debug.TargetBoard;
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
 import processing.app.legacy.PConstants;
+
+import javax.swing.*;
+import java.io.*;
+import java.util.*;
+
+import static processing.app.I18n._;
 
 
 /**
@@ -75,7 +70,7 @@ public class Platform {
   }
   
   
-  public void init() {
+  public void init() throws IOException {
   }
   
   
@@ -169,6 +164,8 @@ public class Platform {
   }
 
   public String resolveDeviceByBoardID(Map<String, TargetPackage> packages, String boardId) {
+    assert packages != null;
+    assert boardId != null;
     for (TargetPackage targetPackage : packages.values()) {
       for (TargetPlatform targetPlatform : targetPackage.getPlatforms().values()) {
         for (TargetBoard board : targetPlatform.getBoards().values()) {
@@ -182,33 +179,6 @@ public class Platform {
   }
 
   // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-
-  public interface CLibrary extends Library {
-    CLibrary INSTANCE = (CLibrary)Native.loadLibrary("c", CLibrary.class);
-    int setenv(String name, String value, int overwrite);
-    String getenv(String name);
-    int unsetenv(String name);
-    int putenv(String string);
-  }
-
-  
-  public void setenv(String variable, String value) {
-    CLibrary clib = CLibrary.INSTANCE;
-    clib.setenv(variable, value, 1);
-  }
-
-  
-  public String getenv(String variable) {
-    CLibrary clib = CLibrary.INSTANCE;
-    return clib.getenv(variable);
-  }
-
-
-  public int unsetenv(String variable) {
-    CLibrary clib = CLibrary.INSTANCE;
-    return clib.unsetenv(variable);
-  }
 
   public String getName() {
     return PConstants.platformNames[PConstants.OTHER];
@@ -226,5 +196,40 @@ public class Platform {
 
   public List<BoardPort> filterPorts(List<BoardPort> ports, boolean aBoolean) {
     return new LinkedList<BoardPort>(ports);
+  }
+
+  public void fixPrefsFilePermissions(File prefsFile) throws IOException, InterruptedException {
+    Process process = Runtime.getRuntime().exec(new String[]{"chmod", "600", prefsFile.getAbsolutePath()}, null, null);
+    process.waitFor();
+  }
+
+  public List<File> postInstallScripts(File folder) {
+    List<File> scripts = new LinkedList<File>();
+    scripts.add(new File(folder, "install_script.sh"));
+    scripts.add(new File(folder, "post_install.sh"));
+    return scripts;
+  }
+
+  public String getOsName() {
+    return System.getProperty("os.name");
+  }
+
+  public String getOsArch() {
+    return System.getProperty("os.arch");
+  }
+
+  public void symlink(String something, File somewhere) throws IOException, InterruptedException {
+    Process process = Runtime.getRuntime().exec(new String[]{"ln", "-s", something, somewhere.getAbsolutePath()}, null, somewhere.getParentFile());
+    process.waitFor();
+  }
+
+  public void link(File something, File somewhere) throws IOException, InterruptedException {
+    Process process = Runtime.getRuntime().exec(new String[]{"ln", something.getAbsolutePath(), somewhere.getAbsolutePath()}, null, null);
+    process.waitFor();
+  }
+
+  public void chmod(File file, int mode) throws IOException, InterruptedException {
+    Process process = Runtime.getRuntime().exec(new String[]{"chmod", Integer.toOctalString(mode), file.getAbsolutePath()}, null, null);
+    process.waitFor();
   }
 }

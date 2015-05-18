@@ -1,27 +1,33 @@
 
 # Arduino AVR Core and platform.
 # ------------------------------
-
+#
 # For more info:
 # https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5---3rd-party-Hardware-specification
 
 name=Arduino AVR Boards
-version=1.6.1
+version=1.6.7
 
 # AVR compile variables
 # --------------------- 
 
+compiler.warning_flags=-w
+compiler.warning_flags.none=-w
+compiler.warning_flags.default=
+compiler.warning_flags.more=-Wall
+compiler.warning_flags.all=-Wall -Wextra
+
 # Default "compiler.path" is correct, change only if you want to overidde the initial value
-compiler.path={runtime.ide.path}/hardware/tools/avr/bin/
+compiler.path={runtime.tools.avr-gcc.path}/bin/
 compiler.c.cmd=avr-gcc
-compiler.c.flags=-c -g -Os -w -ffunction-sections -fdata-sections -MMD
+compiler.c.flags=-c -g -Os {compiler.warning_flags} -ffunction-sections -fdata-sections -MMD
 # -w flag added to avoid printing a wrong warning http://gcc.gnu.org/bugzilla/show_bug.cgi?id=59396
 # This is fixed in gcc 4.8.3 and will be removed as soon as we update the toolchain
-compiler.c.elf.flags=-w -Os -Wl,--gc-sections
+compiler.c.elf.flags={compiler.warning_flags} -Os -Wl,--gc-sections
 compiler.c.elf.cmd=avr-gcc
 compiler.S.flags=-c -g -x assembler-with-cpp
 compiler.cpp.cmd=avr-g++
-compiler.cpp.flags=-c -g -Os -w -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -MMD
+compiler.cpp.flags=-c -g -Os {compiler.warning_flags} -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -MMD
 compiler.ar.cmd=avr-ar
 compiler.ar.flags=rcs
 compiler.objcopy.cmd=avr-objcopy
@@ -65,6 +71,10 @@ recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {compiler.c.elf.f
 recipe.objcopy.eep.pattern="{compiler.path}{compiler.objcopy.cmd}" {compiler.objcopy.eep.flags} {compiler.objcopy.eep.extra_flags} "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.eep"
 recipe.objcopy.hex.pattern="{compiler.path}{compiler.elf2hex.cmd}" {compiler.elf2hex.flags} {compiler.elf2hex.extra_flags} "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.hex"
 
+## Save hex
+recipe.output.tmp_file={build.project_name}.hex
+recipe.output.save_file={build.project_name}.{build.variant}.hex
+
 ## Compute size
 recipe.size.pattern="{compiler.path}{compiler.size.cmd}" -A "{build.path}/{build.project_name}.elf"
 recipe.size.regex=^(?:\.text|\.data|\.bootloader)\s+([0-9]+).*
@@ -75,8 +85,9 @@ recipe.size.regex.eeprom=^(?:\.eeprom)\s+([0-9]+).*
 # AVR Uploader/Programmers tools
 # ------------------------------
 
-tools.avrdude.cmd.path={runtime.ide.path}/hardware/tools/avr/bin/avrdude
-tools.avrdude.config.path={runtime.ide.path}/hardware/tools/avr/etc/avrdude.conf
+tools.avrdude.path={runtime.tools.avrdude.path}
+tools.avrdude.cmd.path={path}/bin/avrdude
+tools.avrdude.config.path={path}/etc/avrdude.conf
 
 tools.avrdude.upload.params.verbose=-v
 tools.avrdude.upload.params.quiet=-q -q

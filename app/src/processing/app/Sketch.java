@@ -23,18 +23,15 @@
 
 package processing.app;
 
-import cc.arduino.packages.BoardPort;
 import cc.arduino.packages.Uploader;
-import cc.arduino.view.*;
 import processing.app.debug.Compiler;
 import processing.app.debug.Compiler.ProgressListener;
 import processing.app.debug.RunnerException;
-import processing.app.debug.TargetBoard;
 import processing.app.forms.PasswordAuthorizationDialog;
 import processing.app.helpers.OSUtils;
-import processing.app.helpers.PreferencesMap;
 import processing.app.helpers.PreferencesMapException;
-import processing.app.packages.Library;
+import processing.app.packages.UserLibrary;
+import static processing.app.I18n._;
 
 import javax.swing.*;
 import java.awt.*;
@@ -44,8 +41,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-
-import static processing.app.I18n._;
 
 
 /**
@@ -117,7 +112,7 @@ public class Sketch {
 
     for (SketchCode code : data.getCodes()) {
       if (code.getMetadata() == null)
-        code.setMetadata(new SketchCodeDocument(code));
+        code.setMetadata(new SketchCodeDocument(this, code));
     }
 
     // set the main file to be the current tab
@@ -414,7 +409,7 @@ public class Sketch {
         return;
       }
       ensureExistence();
-      data.addCode((new SketchCodeDocument(newFile)).getCode());
+      data.addCode((new SketchCodeDocument(this, newFile)).getCode());
     }
 
     // sort the entries
@@ -580,7 +575,7 @@ public class Sketch {
       });
 
       if (pdeFiles != null && pdeFiles.length > 0) {
-        if (Preferences.get("editor.update_extension") == null) {
+        if (PreferencesData.get("editor.update_extension") == null) {
           Object[] options = { _("OK"), _("Cancel") };
           int result = JOptionPane.showOptionDialog(editor,
                                                     _("In Arduino 1.0, the default file extension has changed\n" +
@@ -599,10 +594,10 @@ public class Sketch {
 
           if (result != JOptionPane.OK_OPTION) return false; // save cancelled
 
-          Preferences.setBoolean("editor.update_extension", true);
+          PreferencesData.setBoolean("editor.update_extension", true);
         }
 
-        if (Preferences.getBoolean("editor.update_extension")) {
+        if (PreferencesData.getBoolean("editor.update_extension")) {
           // Do rename of all .pde files to new .ino extension
           for (File pdeFile : pdeFiles)
             renameCodeToInoExtension(pdeFile);
@@ -806,7 +801,7 @@ public class Sketch {
 
     if (result) {
       editor.statusNotice(_("One file added to the sketch."));
-      Preferences.set("last.folder", sourceFile.getAbsolutePath());
+      PreferencesData.set("last.folder", sourceFile.getAbsolutePath());
     }
   }
 
@@ -910,7 +905,7 @@ public class Sketch {
     }
 
     if (codeExtension != null) {
-      SketchCode newCode = (new SketchCodeDocument(destFile)).getCode();
+      SketchCode newCode = (new SketchCodeDocument(this, destFile)).getCode();
 
       if (replacement) {
         data.replaceCode(newCode);
@@ -938,7 +933,7 @@ public class Sketch {
   }
 
 
-  public void importLibrary(Library lib) throws IOException {
+  public void importLibrary(UserLibrary lib) throws IOException {
     importLibrary(lib.getSrcFolder());
   }
 
@@ -1064,7 +1059,7 @@ public class Sketch {
 
     // if an external editor is being used, need to grab the
     // latest version of the code from the file.
-    if (Preferences.getBoolean("editor.external")) {
+    if (PreferencesData.getBoolean("editor.external")) {
       // history gets screwed by the open..
       //String historySaved = history.lastRecorded;
       //handleOpen(sketch);
@@ -1138,8 +1133,8 @@ public class Sketch {
    * @return null if compilation failed, main class name if not
    * @throws RunnerException
    */
-  public String build(boolean verbose) throws RunnerException, PreferencesMapException {
-    return build(tempBuildFolder.getAbsolutePath(), verbose);
+  public String build(boolean verbose, boolean save) throws RunnerException, PreferencesMapException {
+    return build(tempBuildFolder.getAbsolutePath(), verbose, save);
   }
 
   /**
@@ -1151,9 +1146,7 @@ public class Sketch {
    *
    * @return null if compilation failed, main class name if not
    */
-  public String build(String buildPath, boolean verbose) throws RunnerException, PreferencesMapException {
-    useOriginalVidPidIfUncertified();
-
+  public String build(String buildPath, boolean verbose, boolean save) throws RunnerException, PreferencesMapException {
     // run the preprocessor
     editor.status.progressUpdate(20);
 
@@ -1166,7 +1159,7 @@ public class Sketch {
       }
     };
     
-    return Compiler.build(data, buildPath, tempBuildFolder, pl, verbose);
+    return Compiler.build(data, buildPath, tempBuildFolder, pl, verbose, save);
   }
 
   protected boolean exportApplet(boolean usingProgrammer) throws Exception {
@@ -1184,7 +1177,7 @@ public class Sketch {
 
     // build the sketch
     editor.status.progressNotice(_("Compiling sketch..."));
-    String foundName = build(appletPath, false);
+    String foundName = build(appletPath, false, false);
     // (already reported) error during export, exit this function
     if (foundName == null) return false;
 
@@ -1203,45 +1196,13 @@ public class Sketch {
     return success;
   }
 
-  private void useOriginalVidPidIfUncertified() {
-    BoardPort boardPort = BaseNoGui.getDiscoveryManager().find(PreferencesData.get("serial.port"));
-    if (boardPort == null) {
-      return;
-    }
-    TargetBoard targetBoard = BaseNoGui.getTargetBoard();
-    if (targetBoard == null) {
-      return;
-    }
-    PreferencesMap boardPreferences = targetBoard.getPreferences();
-    if (boardPreferences.containsKey("build.vid") && boardPreferences.containsKey("build.pid")) {
-      if (!boardPreferences.containsKey("backup.build.vid")) {
-        boardPreferences.put("backup.build.vid", boardPreferences.get("build.vid"));
-        boardPreferences.put("backup.build.pid", boardPreferences.get("build.pid"));
-      }
-
-      if (boardPort.getPrefs().get("warning") != null) {
-        boardPreferences.put("build.vid", boardPort.getPrefs().get("vid"));
-        boardPreferences.put("build.pid", boardPort.getPrefs().get("pid"));
-      } else {
-        boardPreferences.put("build.vid", boardPreferences.get("backup.build.vid"));
-        boardPreferences.put("build.pid", boardPreferences.get("backup.build.pid"));
-      }
-    }
-
-    if (boardPort.getPrefs().get("warning") != null && !Preferences.getBoolean("uncertifiedBoardWarning_dontShowMeAgain")) {
-      SwingUtilities.invokeLater(new ShowUncertifiedBoardWarning(editor));
-    }
-
-
-  }
-
   protected boolean upload(String buildPath, String suggestedClassName, boolean usingProgrammer) throws Exception {
 
     Uploader uploader = Compiler.getUploaderByPreferences(false);
 
     boolean success = false;
     do {
-      if (uploader.requiresAuthorization() && !Preferences.has(uploader.getAuthorizationKey())) {
+      if (uploader.requiresAuthorization() && !PreferencesData.has(uploader.getAuthorizationKey())) {
         PasswordAuthorizationDialog dialog = new PasswordAuthorizationDialog(editor, _("Type board password to upload a new sketch"));
         dialog.setLocationRelativeTo(editor);
         dialog.setVisible(true);
@@ -1251,7 +1212,7 @@ public class Sketch {
           return false;
         }
 
-        Preferences.set(uploader.getAuthorizationKey(), dialog.getPassword());
+        PreferencesData.set(uploader.getAuthorizationKey(), dialog.getPassword());
       }
 
       List<String> warningsAccumulator = new LinkedList<String>();
@@ -1259,7 +1220,7 @@ public class Sketch {
         success = Compiler.upload(data, uploader, buildPath, suggestedClassName, usingProgrammer, false, warningsAccumulator);
       } finally {
         if (uploader.requiresAuthorization() && !success) {
-          Preferences.remove(uploader.getAuthorizationKey());
+          PreferencesData.remove(uploader.getAuthorizationKey());
         }
       }
 

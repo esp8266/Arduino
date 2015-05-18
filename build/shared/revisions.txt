@@ -1,3 +1,78 @@
+ARDUINO 1.6.5
+
+[ide]
+* File, Sketch and Tools menu items are properly handled when switching between different windows
+* Sketch > Export compiled Binary: saves the compiled binary (hex, bin) into the sketch folder. Thanks @championswimmer
+* New editor, based on RSyntaxTextArea. Thanks @ricardojlrufino
+* New keywords. Thanks @Chris--A
+* Easier "additional boards manager url" field: a wide text area opens by clicking the added button (right side of the text field)
+
+[libraries]
+* LiquidCrystal fixes. Thanks @newbie15
+
+[core]
+* SAM: added watchdog routing for Due. Thanks @bobc
+
+ARDUINO 1.6.4 - 2015.05.06
+
+[ide]
+* Added support for Arduino Gemma
+* Restored previous "error" colour in black lower part of the IDE
+* Relaxed IDE checks against libraries versions
+* Fixed colour of 'char' keyword. Thanks @mixania
+* Tools submenu show selected subentry. Thanks @PaulStoffregen
+* Boards and Libraries Managers command line (with contribs from @Lauszus): --install-board "arduino:Arduino SAM Boards (32-bits ARM Cortex-M3):1.6.3" and --install-library "Bridge:1.0.1". Version can be omitted: if omitted, latest version available is automatically picked
+* Warning levels can be set in File > Preferences
+* When compilation fails, editor highlights the reported row
+* Windows and MacOSX: updated bunbled JVM to 1.8.0_45 (latest available atm)
+* Disabled "uncertified" warning (requires avr core >= 1.6.6, sam core >= 1.6.4)
+* Additional boards/cores can be listed specifying comma separated list of package_SOMETHING_index.json url in File > Preferences
+* MacOSX: fixed wrong sketch opened when double clicking on a .ino file
+* Boards and Libraries main files are downloaded directly (no proxy php script), fixing some glitches when using a proxy server
+* Added notification if the bundled AVR core is newer than the one installed through Boards Manager (useful when upgrading the IDE)
+* Fixed error when in Serial and Network discovery that was leaving the Ports menu greyed out
+* IDE now deletes temporary files on exit. When using the CLI, --preserve-temp-files arguments skips deletion
+
+[libraries]
+* Bridge fixes
+* SD: allow multiple SD instances (@squelched)
+* SD: fix examples with Ethernet shield
+
+ARDUINO 1.6.3 - 2015.04.02
+
+[ide]
+* Fixed an ArchiveExtractor issue when dealing with native stuff, affecting some linuxes
+* MacOSX: MACOSX_BUNDLED_JVM property is automatically set to JAVA_HOME if not provided
+* New splashscreen image
+* New editor theme
+* MacOSX and Windows: https links were not working, fixed
+
+[core]
+* Upgraded toolchains: statically compiled, ship with Link Time Optimization plugin (disabled by default)
+* Restored backward compatibility by providing a platform.txt in-memory rewrite: old values (eg: compiler.path) are converted to new values
+* platform.txt rewriting can be disabled if target platform has a "rewriting=disabled" key/value pair set
+* AVR bundle files (core files and toolchain) is again inside IDE "hardware" folder, instead of unpacked into user's home folder at first IDE startup
+* Advise of duplicate libraries after compiling. Thanks @PaulStoffregen
+
+ARDUINO 1.6.2 - 2015.03.28
+
+[ide]
+* Boards and libraries managers, for one click install of additional boards and libraries
+* In platform.txt, pre and post build hooks can now be specified. Example: recipe.hooks.prebuild.0.pattern=echo "Hello {build.source.path}". Thanks @Wackerbarth
+* Windows and MacOSX JVM Xmx halved to 512M
+* Introduced starting splashscreen with progress status: will be used for notifying user of long running startup tasks
+* Available ports list is now generated in background: hence "tools" menu is much faster
+* MacOSX: appbundler merged our contribution, switching to upstream version https://bitbucket.org/infinitekind/appbundler/
+
+[core]
+* Stream: fixed bug in findUntil routine #2591 @Xuth
+
+[libraries]
+* EEPROM: Replaced existing library with more complete implementation @Chris--A
+* SD: fixed endless timeout on 32bit core (Due) @Timmmm
+* Ethernet: fixed headers include path
+* SPI: do not influence state of SS pin if it's already been set as output by user sketch @vicatcu
+* Bridge: discard message if received length is bigger than rx buffer @arve0
 
 ARDUINO 1.6.1 - 2015.03.10
 

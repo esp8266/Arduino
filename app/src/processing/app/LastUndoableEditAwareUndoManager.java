@@ -2,31 +2,36 @@ package processing.app;
 
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
-import javax.swing.undo.UndoManager;
-import javax.swing.undo.UndoableEdit;
 
-@SuppressWarnings("serial")
-public class LastUndoableEditAwareUndoManager extends UndoManager {
+import org.fife.ui.rtextarea.RUndoManager;
 
-  private UndoableEdit lastUndoableEdit;
+import processing.app.syntax.SketchTextArea;
 
-  public LastUndoableEditAwareUndoManager() {
-    this.lastUndoableEdit = null;
+public class LastUndoableEditAwareUndoManager extends RUndoManager {
+  
+  private Editor editor;
+
+  public LastUndoableEditAwareUndoManager(SketchTextArea textarea, Editor editor) {
+    super(textarea);
+    this.editor = editor;
   }
 
   @Override
   public synchronized void undo() throws CannotUndoException {
-    lastUndoableEdit = super.editToBeUndone();
     super.undo();
   }
 
   @Override
   public synchronized void redo() throws CannotRedoException {
-    lastUndoableEdit = super.editToBeRedone();
     super.redo();
   }
-
-  public UndoableEdit getLastUndoableEdit() {
-    return lastUndoableEdit;
+  
+  @Override
+  public void updateActions() {
+    super.updateActions();
+    editor.undoAction.updateUndoState();
+    editor.redoAction.updateRedoState();
   }
+
+
 }

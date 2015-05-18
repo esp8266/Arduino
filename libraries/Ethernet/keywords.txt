@@ -6,10 +6,10 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-Ethernet	KEYWORD1
-EthernetClient	KEYWORD1
-EthernetServer	KEYWORD1
-IPAddress	KEYWORD1
+Ethernet	KEYWORD1	Ethernet
+EthernetClient	KEYWORD1	EthernetClient
+EthernetServer	KEYWORD1	EthernetServer
+IPAddress	KEYWORD1	EthernetIPAddress
 
 #######################################
 # Methods and Functions (KEYWORD2)

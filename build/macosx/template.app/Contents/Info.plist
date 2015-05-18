@@ -81,11 +81,14 @@
       <key>VMOptions</key>
       <array>
         <string>-Xms128M</string>
-        <string>-Xmx1024M</string>
+        <string>-Xmx512M</string>
       </array>
 
       <key>MainClass</key>
       <string>processing.app.Base</string>
+
+      <key>SplashFile</key>
+      <string>$APP_PACKAGE/Contents/Resources/Java/lib/splash.png</string>
 
       <key>JVMVersion</key>
       <string>1.6*</string>
@@ -94,7 +97,7 @@
       <!-- In 0149, removed /System/Library/Java from the CLASSPATH because
            it can cause problems if users have installed weird files there.
            http://dev.processing.org/bugs/show_bug.cgi?id=1045 -->
-      <string>$JAVAROOT/pde.jar:$JAVAROOT/arduino-core.jar:$JAVAROOT/antlr.jar:$JAVAROOT/apple.jar:$JAVAROOT/ecj.jar:$JAVAROOT/registry.jar:$JAVAROOT/quaqua.jar:$JAVAROOT/jssc-2.8.0.jar:$JAVAROOT/commons-codec-1.7.jar:$JAVAROOT/commons-exec-1.1.jar:$JAVAROOT/commons-httpclient-3.1.jar:$JAVAROOT/commons-logging-1.0.4.jar:$JAVAROOT/jmdns-3.4.1.jar:$JAVAROOT/jsch-0.1.50.jar:$JAVAROOT/jna.jar</string>
+      <string>$JAVAROOT/antlr.jar:$JAVAROOT/apple.jar:$JAVAROOT/arduino-core.jar:$JAVAROOT/bcpg-jdk15on-152.jar:$JAVAROOT/bcprov-jdk15on-152.jar:$JAVAROOT/commons-codec-1.7.jar:$JAVAROOT/commons-compress-1.8.jar:$JAVAROOT/commons-exec-1.1.jar:$JAVAROOT/commons-httpclient-3.1.jar:$JAVAROOT/commons-lang3-3.3.2.jar:$JAVAROOT/commons-logging-1.0.4.jar:$JAVAROOT/ecj.jar:$JAVAROOT/guava-18.0.jar:$JAVAROOT/jackson-annotations-2.2.3.jar:$JAVAROOT/jackson-core-2.2.3.jar:$JAVAROOT/jackson-databind-2.2.3.jar:$JAVAROOT/jackson-module-mrbean-2.2.3.jar:$JAVAROOT/java-semver-0.8.0.jar:$JAVAROOT/jmdns-3.4.1.jar:$JAVAROOT/jna.jar:$JAVAROOT/jsch-0.1.50.jar:$JAVAROOT/jssc-2.8.0.jar:$JAVAROOT/pde.jar:$JAVAROOT/quaqua.jar:$JAVAROOT/rsyntaxtextarea-2.5.6.1+arduino.jar</string>
 
       <key>JVMArchs</key>  
       <array>  

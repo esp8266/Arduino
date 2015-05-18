@@ -119,7 +119,10 @@ public class SSHUploader extends Uploader {
   private boolean runAVRDude(SSH ssh) throws IOException, JSchException {
     TargetPlatform targetPlatform = BaseNoGui.getTargetPlatform();
     PreferencesMap prefs = PreferencesData.getMap();
-    prefs.putAll(BaseNoGui.getBoardPreferences());
+    PreferencesMap boardPreferences = BaseNoGui.getBoardPreferences();
+    if (boardPreferences != null) {
+      prefs.putAll(boardPreferences);
+    }
     prefs.putAll(targetPlatform.getTool(prefs.get("upload.tool")));
 
     String additionalParams = verbose ? prefs.get("upload.params.verbose") : prefs.get("upload.params.quiet");

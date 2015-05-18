@@ -1,5 +1,5 @@
 #######################################
-# Syntax Coloring Map For Ultrasound
+# Syntax Coloring Map For EEPROM
 #######################################
 
 #######################################
@@ -7,10 +7,14 @@
 #######################################
 
 EEPROM	KEYWORD1
+EERef	KEYWORD1
+EEPtr	KEYWORD2
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
+
+update	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)

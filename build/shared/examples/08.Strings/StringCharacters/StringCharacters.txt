@@ -1,0 +1,1 @@
+Get/set the value of a specific character in a string. 

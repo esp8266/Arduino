@@ -1,0 +1,1 @@
+Logs out the current user with key commands.

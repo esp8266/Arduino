@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 by Cristian Maglie <c.maglie@arduino.cc>
+ * Copyright (c) 2010 by Arduino LLC. All rights reserved.
  *
  * This file is free software; you can redistribute it and/or modify
  * it under the terms of either the GNU General Public License version 2

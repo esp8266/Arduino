@@ -1,0 +1,48 @@
+#!/bin/bash -ex
+
+git checkout master
+
+LIB=$1
+
+git branch lib_$LIB
+git checkout lib_$LIB
+
+git filter-branch -f --prune-empty --subdirectory-filter libraries/$LIB lib_$LIB
+
+cd ../libraries
+mkdir $LIB
+cd $LIB
+
+git init
+
+git pull ../../Arduino lib_$LIB
+
+git config user.email f.fissore@arduino.cc
+
+git filter-branch -f --commit-filter 'if [ "$GIT_AUTHOR_EMAIL" = "f.vanzati@gmail.com" ];
+  then export GIT_AUTHOR_EMAIL=f.vanzati@arduino.cc;
+  fi; git commit-tree "$@"'
+git filter-branch -f --commit-filter 'if [ "$GIT_AUTHOR_EMAIL" = "federico@fissore.org" ];
+  then export GIT_AUTHOR_EMAIL=f.fissore@arduino.cc;
+  fi; git commit-tree "$@"'
+git filter-branch -f --commit-filter 'if [ "$GIT_AUTHOR_EMAIL" = "c.maglie@bug.st" ];
+  then export GIT_AUTHOR_EMAIL=c.maglie@arduino.cc;
+  fi; git commit-tree "$@"'
+git filter-branch -f --commit-filter 'if [ "$GIT_AUTHOR_EMAIL" = "tigoe@tigoemac.itp.tsoa.nyu.edu" ];
+  then export GIT_AUTHOR_EMAIL=t.igoe@arduino.cc;
+  fi; git commit-tree "$@"'
+git filter-branch -f --commit-filter 'if [ "$GIT_AUTHOR_EMAIL" = "tom.igoe@gmail.com" ];
+  then export GIT_AUTHOR_EMAIL=t.igoe@arduino.cc;
+  fi; git commit-tree "$@"'
+git filter-branch -f --commit-filter 'if [ "$GIT_AUTHOR_EMAIL" = "facchinm@users.noreply.github.com" ];
+  then export GIT_AUTHOR_EMAIL=m.facchin@arduino.cc;
+  fi; git commit-tree "$@"'
+
+git remote add origin git@github.com:arduino-libraries/$LIB.git
+git fetch --all
+
+cd ../../Arduino
+
+git checkout master
+git branch -D lib_$LIB
+

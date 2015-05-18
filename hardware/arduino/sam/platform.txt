@@ -1,23 +1,30 @@
 
 # Arduino SAM Core and platform.
+# ------------------------------
 #
 # For more info:
 # https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5---3rd-party-Hardware-specification
 
 name=Arduino ARM (32-bits) Boards
-version=1.6.1
+version=1.6.4
 
 # SAM3 compile variables
 # ----------------------
 
-compiler.path={runtime.ide.path}/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/
+compiler.warning_flags=-w
+compiler.warning_flags.none=-w
+compiler.warning_flags.default=
+compiler.warning_flags.more=-Wall
+compiler.warning_flags.all=-Wall -Wextra
+
+compiler.path={runtime.tools.arm-none-eabi-gcc.path}/bin/
 compiler.c.cmd=arm-none-eabi-gcc
-compiler.c.flags=-c -g -Os -w -ffunction-sections -fdata-sections -nostdlib --param max-inline-insns-single=500 -Dprintf=iprintf -MMD
+compiler.c.flags=-c -g -Os {compiler.warning_flags} -ffunction-sections -fdata-sections -nostdlib --param max-inline-insns-single=500 -Dprintf=iprintf -MMD
 compiler.c.elf.cmd=arm-none-eabi-gcc
 compiler.c.elf.flags=-Os -Wl,--gc-sections
 compiler.S.flags=-c -g -x assembler-with-cpp
 compiler.cpp.cmd=arm-none-eabi-g++
-compiler.cpp.flags=-c -g -Os -w -ffunction-sections -fdata-sections -nostdlib -fno-threadsafe-statics --param max-inline-insns-single=500 -fno-rtti -fno-exceptions -Dprintf=iprintf -MMD
+compiler.cpp.flags=-c -g -Os {compiler.warning_flags} -ffunction-sections -fdata-sections -nostdlib -fno-threadsafe-statics --param max-inline-insns-single=500 -fno-rtti -fno-exceptions -Dprintf=iprintf -MMD
 compiler.ar.cmd=arm-none-eabi-ar
 compiler.ar.flags=rcs
 compiler.objcopy.cmd=arm-none-eabi-objcopy
@@ -68,6 +75,10 @@ recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {compiler.c.elf.f
 ## Create output (.bin file)
 recipe.objcopy.bin.pattern="{compiler.path}{compiler.elf2hex.cmd}" {compiler.elf2hex.flags} {compiler.elf2hex.extra_flags} "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.bin"
 
+## Save hex
+recipe.output.tmp_file={build.project_name}.bin
+recipe.output.save_file={build.project_name}.{build.variant}.bin
+
 ## Compute size
 recipe.size.pattern="{compiler.path}{compiler.size.cmd}" -A "{build.path}/{build.project_name}.elf"
 recipe.size.regex=\.text\s+([0-9]+).*
@@ -76,9 +87,9 @@ recipe.size.regex=\.text\s+([0-9]+).*
 # SAM3 Uploader tools
 # -------------------
 
+tools.bossac.path={runtime.tools.bossac.path}
 tools.bossac.cmd=bossac
 tools.bossac.cmd.windows=bossac.exe
-tools.bossac.path={runtime.ide.path}/hardware/tools
 
 tools.bossac.upload.params.verbose=-i -d
 tools.bossac.upload.params.quiet=

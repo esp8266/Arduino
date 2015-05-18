@@ -6,7 +6,7 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-TFT	KEYWORD1
+TFT	KEYWORD1	TFTLibrary
 
 #######################################
 # Methods and Functions (KEYWORD2)

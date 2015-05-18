@@ -59,10 +59,15 @@ extern USBDevice_ USBDevice;
 
 struct ring_buffer;
 
+#ifndef SERIAL_BUFFER_SIZE
 #if (RAMEND < 1000)
 #define SERIAL_BUFFER_SIZE 16
 #else
 #define SERIAL_BUFFER_SIZE 64
+#endif
+#endif
+#if (SERIAL_BUFFER_SIZE>256)
+#error Please lower the CDC Buffer size
 #endif
 
 class Serial_ : public Stream
