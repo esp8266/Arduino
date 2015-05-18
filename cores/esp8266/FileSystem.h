@@ -85,17 +85,18 @@ public:
 class FSClass {
 
 private:
-  bool _mounted = false;
   
 public:
   bool mount();
   void unmount();
   bool format();
   bool check();
-  bool exists(const char *filename);
-  bool create(const char *filepath);
-  bool remove(const char *filepath);
-  bool rename(const char *filename, const char *newname);
+  bool exists(char *filename);
+  bool create(char *filepath);
+  bool remove(char *filepath);
+  bool rename(char *filename, char *newname);
+  size_t totalBytes();
+  size_t usedBytes();
   size_t size(){ return _filesystemStorageHandle.cfg.phys_size; }
   size_t blockSize(){ return _filesystemStorageHandle.cfg.log_block_size; }
   size_t totalBlocks(){ return _filesystemStorageHandle.block_count; }
@@ -104,7 +105,7 @@ public:
   size_t allocatedPages(){ return _filesystemStorageHandle.stats_p_allocated; }
   size_t deletedPages(){ return _filesystemStorageHandle.stats_p_deleted; }
   
-  FSFile open(const char *filename, uint8_t mode = FSFILE_READ);
+  FSFile open(char *filename, uint8_t mode = FSFILE_READ);
   FSFile open(spiffs_dirent* entry, uint8_t mode = FSFILE_READ);
 
 private:
