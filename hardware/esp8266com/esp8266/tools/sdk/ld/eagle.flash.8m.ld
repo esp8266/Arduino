@@ -1,7 +1,7 @@
-/* Flash Split for 16M chips */
+/* Flash Split for 8M chips */
 /* irom0  940KB */
 /* eeprom 20KB */
-/* spiffs 15MB */
+/* spiffs 7MB */
 
 MEMORY
 {
@@ -12,6 +12,6 @@ MEMORY
 }
 
 PROVIDE ( _SPIFFS_start = 0x40300000 );
-PROVIDE ( _SPIFFS_end = 0x41200000 );
+PROVIDE ( _SPIFFS_end = 0x40A00000 );
 
 INCLUDE "../ld/eagle.app.v6.common.ld"
