@@ -23,7 +23,7 @@
 #include "spiffs/spiffs_esp8266.h"
 
 #define LOGICAL_PAGE_SIZE       256
-#define LOGICAL_BLOCK_SIZE      512
+#define LOGICAL_BLOCK_SIZE      (INTERNAL_FLASH_SECTOR_SIZE * 1)
 
 
 // These addresses are defined in the linker script.
@@ -64,7 +64,7 @@ int FSClass::_mountInternal(){
   
   SPIFFS_API_DBG_V("FSClass::_mountInternal: start:%x, size:%d Kb\n", cfg.phys_addr, cfg.phys_size / 1024);
 
-  _work.reset(new uint8_t[LOGICAL_BLOCK_SIZE]);
+  _work.reset(new uint8_t[2*LOGICAL_PAGE_SIZE]);
   _fdsSize = 32 * _maxOpenFiles;
   _fds.reset(new uint8_t[_fdsSize]);
   _cacheSize = (32 + LOGICAL_PAGE_SIZE) * _maxOpenFiles;
