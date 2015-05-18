@@ -1,11 +1,14 @@
 #!/bin/bash -ex
 
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+cd $DIR
+
 if [ "x${ghprbPullId}" == "x" ]
 then
 	exit 1
 fi
 
-ant -Djava.net.preferIPv4Stack=true -Dplatform=linux64 -Dlinux64=1 clean build test
+ant -Djava.net.preferIPv4Stack=true -Dplatform=linux64 -Dlinux64=1 clean build
 
 ERRORS=`grep '<error' ../app/test-bin/TEST-*.xml | wc -l`
 if [ $ERRORS -ne 0 ] ;
@@ -15,18 +18,5 @@ fi
 
 VERSION="PR-${ghprbPullId}-BUILD-${BUILD_NUMBER}"
 
-ant -Djava.net.preferIPv4Stack=true -Dplatform=linux32 -Dversion="${VERSION}" clean dist
-mv linux/arduino-*$VERSION*.tar.xz ../
-
-ant -Djava.net.preferIPv4Stack=true -Dplatform=linux64 -Dversion="${VERSION}" clean dist
-mv linux/arduino-*$VERSION*.tar.xz ../
-
-ant -Djava.net.preferIPv4Stack=true -Dplatform=windows -Dversion="${VERSION}" clean dist
-mv windows/arduino-*$VERSION*.zip ../
-
-ant -Djava.net.preferIPv4Stack=true -Dplatform=macosx -Dversion="${VERSION}" clean dist
-mv macosx/arduino-*$VERSION*.zip ../
-
-ant -Djava.net.preferIPv4Stack=true -Dplatform=macosx-java-latest -Dversion="${VERSION}" clean dist
-mv macosx/arduino-*$VERSION*.zip ../
+./build_all_dist.bash -Dversion="${VERSION}" -DMACOSX_BUNDLED_JVM=$MACOSX_BUNDLED_JVM -DWINDOWS_BUNDLED_JVM=$WINDOWS_BUNDLED_JVM
 

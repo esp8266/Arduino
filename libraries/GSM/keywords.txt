@@ -4,16 +4,16 @@
 # Class
 #######################################
 
-GSM	KEYWORD3
-GSMVoiceCall	KEYWORD3
-GSM_SMS	KEYWORD3
-GPRS	KEYWORD3
-GSMClient	KEYWORD3
-GSMServer	KEYWORD3
-GSMModem	KEYWORD3
-GSMScanner	KEYWORD3
-GSMPIN	KEYWORD3
-GSMBand KEYWORD3
+GSM	KEYWORD1	GSM
+GSMVoiceCall	KEYWORD1	GSMVCSConstructor
+GSM_SMS	KEYWORD1	GSMSMSConstructor
+GPRS	KEYWORD1	GPRSConstructor
+GSMClient	KEYWORD1	GSMClientConstructor
+GSMServer	KEYWORD1	GSMServerConstructor
+GSMModem	KEYWORD1	GSMModemConstructor
+GSMScanner	KEYWORD1	GSMScannerConstructor
+GSMPIN	KEYWORD1	GSMPINConstructor
+GSMBand KEYWORD1	GSMBandConstructor
 
 #######################################
 # Methods and Functions 

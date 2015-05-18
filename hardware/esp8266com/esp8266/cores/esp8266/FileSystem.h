@@ -21,9 +21,9 @@
 #ifndef _SPIFFS_CORE_FILESYSTEM_H_
 #define _SPIFFS_CORE_FILESYSTEM_H_
 
+#include <memory>
 #include "spiffs/spiffs.h"
 #include "Arduino.h"
-class String;
 
 #define FSFILE_READ SPIFFS_RDONLY
 #define FSFILE_WRITE (SPIFFS_RDONLY | SPIFFS_WRONLY | SPIFFS_CREAT | SPIFFS_APPEND )
@@ -34,10 +34,11 @@ private:
   spiffs_stat _stats; 
   file_t _file;
   spiffs_DIR _dir;
+  spiffs * _fs;
 
 public:
-  FSFile(String path);
-  FSFile(file_t f);
+  FSFile(spiffs* fs, String path);
+  FSFile(spiffs* fs, file_t f);
   FSFile(void);
   virtual size_t write(uint8_t);
   virtual size_t write(const uint8_t *buf, size_t size);
@@ -83,10 +84,9 @@ public:
 };
 
 class FSClass {
-
-private:
-  
 public:
+  FSClass(uint32_t beginAddress, uint32_t endAddress, uint32_t maxOpenFiles);
+
   bool mount();
   void unmount();
   bool format();
@@ -97,16 +97,29 @@ public:
   bool rename(char *filename, char *newname);
   size_t totalBytes();
   size_t usedBytes();
-  size_t size(){ return _filesystemStorageHandle.cfg.phys_size; }
-  size_t blockSize(){ return _filesystemStorageHandle.cfg.log_block_size; }
-  size_t totalBlocks(){ return _filesystemStorageHandle.block_count; }
-  size_t freeBlocks(){ return _filesystemStorageHandle.free_blocks; }
-  size_t pageSize(){ return _filesystemStorageHandle.cfg.log_page_size; }
-  size_t allocatedPages(){ return _filesystemStorageHandle.stats_p_allocated; }
-  size_t deletedPages(){ return _filesystemStorageHandle.stats_p_deleted; }
+  size_t size(){ return _fs.cfg.phys_size; }
+  size_t blockSize(){ return _fs.cfg.log_block_size; }
+  size_t totalBlocks(){ return _fs.block_count; }
+  size_t freeBlocks(){ return _fs.free_blocks; }
+  size_t pageSize(){ return _fs.cfg.log_page_size; }
+  size_t allocatedPages(){ return _fs.stats_p_allocated; }
+  size_t deletedPages(){ return _fs.stats_p_deleted; }
   
   FSFile open(char *filename, uint8_t mode = FSFILE_READ);
   FSFile open(spiffs_dirent* entry, uint8_t mode = FSFILE_READ);
+
+protected:
+  int _mountInternal();
+  std::unique_ptr<uint8_t[]> _work;
+  std::unique_ptr<uint8_t[]> _fds;
+  size_t _fdsSize;
+  std::unique_ptr<uint8_t[]> _cache;
+  size_t _cacheSize;
+  uint32_t _beginAddress;
+  uint32_t _endAddress;
+  uint32_t _maxOpenFiles;
+  spiffs _fs;
+
 
 private:
   friend class FSFile;

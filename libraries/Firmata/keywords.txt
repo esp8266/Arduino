@@ -6,7 +6,7 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-Firmata	KEYWORD1
+Firmata	KEYWORD1	Firmata
 callbackFunction	KEYWORD1
 systemResetCallbackFunction	KEYWORD1
 stringCallbackFunction	KEYWORD1

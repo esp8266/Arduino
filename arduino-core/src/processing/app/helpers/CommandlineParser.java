@@ -1,13 +1,5 @@
 package processing.app.helpers;
 
-import static processing.app.I18n._;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import processing.app.BaseNoGui;
 import processing.app.I18n;
 import processing.app.PreferencesData;
@@ -16,34 +8,59 @@ import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
 import processing.app.legacy.PApplet;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import static processing.app.I18n._;
+
 public class CommandlineParser {
 
-  protected static enum ACTION { GUI, NOOP, VERIFY, UPLOAD, GET_PREF };
+  private enum ACTION {
+    GUI, NOOP, VERIFY("--verify"), UPLOAD("--upload"), GET_PREF("--get-pref"), INSTALL_BOARD("--install-boards"), INSTALL_LIBRARY("--install-library");
+
+    private final String value;
+
+    ACTION() {
+      this.value = null;
+    }
+
+    ACTION(String value) {
+      this.value = value;
+    }
+  }
 
   private ACTION action = ACTION.GUI;
   private boolean doVerboseBuild = false;
   private boolean doVerboseUpload = false;
   private boolean doUseProgrammer = false;
+  private boolean preserveTempFiles;
   private boolean noUploadPort = false;
   private boolean forceSavePrefs = false;
-  private String getPref = null;
+  private String getPref;
+  private String boardToInstall;
+  private String libraryToInstall;
   private List<String> filenames = new LinkedList<String>();
 
   public static CommandlineParser newCommandlineParser(String[] args) {
     return new CommandlineParser(args);
   }
-  
+
   private CommandlineParser(String[] args) {
     parseArguments(args);
     checkAction();
   }
-  
+
   private void parseArguments(String[] args) {
     // Map of possible actions and corresponding options
     final Map<String, ACTION> actions = new HashMap<String, ACTION>();
     actions.put("--verify", ACTION.VERIFY);
     actions.put("--upload", ACTION.UPLOAD);
     actions.put("--get-pref", ACTION.GET_PREF);
+    actions.put("--install-boards", ACTION.INSTALL_BOARD);
+    actions.put("--install-library", ACTION.INSTALL_LIBRARY);
 
     // Check if any files were passed in on the command line
     for (int i = 0; i < args.length; i++) {
@@ -56,9 +73,24 @@ public class CommandlineParser {
         }
         if (a == ACTION.GET_PREF) {
           i++;
-          if (i >= args.length)
-            BaseNoGui.showError(null, _("Argument required for --get-pref"), 3);
+          if (i >= args.length) {
+            BaseNoGui.showError(null, I18n.format(_("Argument required for {0}"), a.value), 3);
+          }
           getPref = args[i];
+        }
+        if (a == ACTION.INSTALL_BOARD) {
+          i++;
+          if (i >= args.length) {
+            BaseNoGui.showError(null, I18n.format(_("Argument required for {0}"), a.value), 3);
+          }
+          boardToInstall = args[i];
+        }
+        if (a == ACTION.INSTALL_LIBRARY) {
+          i++;
+          if (i >= args.length) {
+            BaseNoGui.showError(null, I18n.format(_("Argument required for {0}"), a.value), 3);
+          }
+          libraryToInstall = args[i];
         }
         action = a;
         continue;
@@ -70,6 +102,12 @@ public class CommandlineParser {
       if (args[i].equals("--verbose") || args[i].equals("-v")) {
         doVerboseBuild = true;
         doVerboseUpload = true;
+        if (action == ACTION.GUI)
+          action = ACTION.NOOP;
+        continue;
+      }
+      if (args[i].equals("--preserve-temp-files")) {
+        preserveTempFiles = true;
         if (action == ACTION.GUI)
           action = ACTION.NOOP;
         continue;
@@ -164,7 +202,7 @@ public class CommandlineParser {
       filenames.add(args[i]);
     }
   }
-  
+
   private void checkAction() {
     if ((action == ACTION.UPLOAD || action == ACTION.VERIFY) && filenames.size() != 1)
       BaseNoGui.showError(null, _("Must specify exactly one sketch file"), 3);
@@ -179,7 +217,7 @@ public class CommandlineParser {
   private void processBoardArgument(String selectBoard) {
     // No board selected? Nothing to do
     if (selectBoard == null)
-        return;
+      return;
 
     String[] split = selectBoard.split(":", 4);
 
@@ -251,27 +289,27 @@ public class CommandlineParser {
   public List<String> getFilenames() {
     return filenames;
   }
-  
+
   public boolean isGetPrefMode() {
     return action == ACTION.GET_PREF;
   }
-  
+
   public boolean isGuiMode() {
     return action == ACTION.GUI;
   }
-  
+
   public boolean isNoOpMode() {
     return action == ACTION.NOOP;
   }
-  
+
   public boolean isUploadMode() {
     return action == ACTION.UPLOAD;
   }
-  
+
   public boolean isVerifyMode() {
     return action == ACTION.VERIFY;
   }
-  
+
   public boolean isVerifyOrUploadMode() {
     return isVerifyMode() || isUploadMode();
   }
@@ -284,4 +322,23 @@ public class CommandlineParser {
     return noUploadPort;
   }
 
+  public boolean isInstallBoard() {
+    return action == ACTION.INSTALL_BOARD;
+  }
+
+  public boolean isInstallLibrary() {
+    return action == ACTION.INSTALL_LIBRARY;
+  }
+
+  public String getBoardToInstall() {
+    return this.boardToInstall;
+  }
+
+  public String getLibraryToInstall() {
+    return libraryToInstall;
+  }
+
+  public boolean isPreserveTempFiles() {
+    return preserveTempFiles;
+  }
 }

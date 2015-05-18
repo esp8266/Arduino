@@ -8,6 +8,9 @@ http://arduino.cc/en/Reference/RobotLibrary
 == License ==
 
 Copyright (c) Arduino LLC. All right reserved.
+Copyright (c) Bill Porter. All right reserved.
+Copyright (C) 2008 by William Greiman. All right reserved.
+Copyright (c) 2013 Adafruit Industries.  All rights reserved.
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public

@@ -74,14 +74,14 @@ public class PresentMode {
         public void actionPerformed(ActionEvent e) {
           int index = selector.getSelectedIndex();
           //device = devices[index];
-          Preferences.setInteger("run.present.display", index + 1);
+          PreferencesData.setInteger("run.present.display", index + 1);
         }
       });
   }
 
 
   static public JComboBox getSelector() {
-    int deviceIndex = Preferences.getInteger("run.present.display") - 1;
+    int deviceIndex = PreferencesData.getInteger("run.present.display") - 1;
     selector.setSelectedIndex(deviceIndex);
     return selector;
   }

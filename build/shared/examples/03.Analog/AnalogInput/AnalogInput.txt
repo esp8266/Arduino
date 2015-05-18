@@ -1,0 +1,1 @@
+Use a potentiometer to control the blinking of an LED. 

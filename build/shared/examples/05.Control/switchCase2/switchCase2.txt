@@ -1,0 +1,1 @@
+A second switch-case example, showing how to take different actions based in characters received in the serial port. 

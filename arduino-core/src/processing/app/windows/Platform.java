@@ -22,23 +22,21 @@
 
 package processing.app.windows;
 
-import com.sun.jna.Library;
-import com.sun.jna.Native;
-
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
-
 import processing.app.PreferencesData;
 import processing.app.debug.TargetPackage;
 import processing.app.legacy.PApplet;
 import processing.app.legacy.PConstants;
-import processing.app.tools.ExternalProcessExecutor;
+import processing.app.tools.CollectStdOutExecutor;
 import processing.app.windows.Registry.REGISTRY_ROOT_KEY;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 
@@ -55,7 +53,7 @@ public class Platform extends processing.app.Platform {
     "\\arduino.exe \"%1\"";
   static final String DOC = "Arduino.Document";
 
-  public void init() {
+  public void init() throws IOException {
     super.init();
 
     checkAssociations();
@@ -244,7 +242,7 @@ public class Platform extends processing.app.Platform {
     // "Access is denied" in both cygwin and the "dos" prompt.
     //Runtime.getRuntime().exec("cmd /c " + currentDir + "\\reference\\" +
     //                    referenceFile + ".html");
-    if (url.startsWith("http://")) {
+    if (url.startsWith("http")) {
       // open dos prompt, give it 'start' command, which will
       // open the url properly. start by itself won't work since
       // it appears to need cmd
@@ -281,36 +279,6 @@ public class Platform extends processing.app.Platform {
   // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
-  // Code partially thanks to Richard Quirk from:
-  // http://quirkygba.blogspot.com/2009/11/setting-environment-variables-in-java.html
-
-  static WinLibC clib = (WinLibC) Native.loadLibrary("msvcrt", WinLibC.class);
-
-  public interface WinLibC extends Library {
-    //WinLibC INSTANCE = (WinLibC) Native.loadLibrary("msvcrt", WinLibC.class);
-    //libc = Native.loadLibrary("msvcrt", WinLibC.class);
-    public int _putenv(String name);
-}
-
-
-  public void setenv(String variable, String value) {
-    //WinLibC clib = WinLibC.INSTANCE;
-    clib._putenv(variable + "=" + value);
-  }
-
-
-  public String getenv(String variable) {
-    return System.getenv(variable);
-  }
-
-
-  public int unsetenv(String variable) {
-    //WinLibC clib = WinLibC.INSTANCE;
-    //clib._putenv(variable + "=");
-    //return 0;
-    return clib._putenv(variable + "=");
-  }
-
   @Override
   public String getName() {
     return PConstants.platformNames[PConstants.WINDOWS];
@@ -318,6 +286,7 @@ public class Platform extends processing.app.Platform {
 
   @Override
   public Map<String, Object> resolveDeviceAttachedTo(String serial, Map<String, TargetPackage> packages, String devicesListOutput) {
+    assert packages != null;
     if (devicesListOutput == null) {
       return super.resolveDeviceAttachedTo(serial, packages, devicesListOutput);
     }
@@ -338,7 +307,7 @@ public class Platform extends processing.app.Platform {
   @Override
   public String preListAllCandidateDevices() {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    Executor executor = new ExternalProcessExecutor(baos);
+    Executor executor = new CollectStdOutExecutor(baos);
 
     try {
       String listComPorts = new File(System.getProperty("user.dir"), "hardware/tools/listComPorts.exe").getCanonicalPath();
@@ -349,5 +318,25 @@ public class Platform extends processing.app.Platform {
     } catch (Throwable e) {
       return super.preListAllCandidateDevices();
     }
+  }
+
+  @Override
+  public void fixPrefsFilePermissions(File prefsFile) throws IOException {
+    //noop
+  }
+
+  public List<File> postInstallScripts(File folder) {
+    List<File> scripts = new LinkedList<File>();
+    scripts.add(new File(folder, "post_install.bat"));
+    return scripts;
+  }
+
+  public void symlink(File something, File somewhere) throws IOException, InterruptedException {
+  }
+
+  public void link(File something, File somewhere) throws IOException, InterruptedException {
+  }
+
+  public void chmod(File file, int mode) throws IOException, InterruptedException {
   }
 }

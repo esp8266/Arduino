@@ -158,12 +158,18 @@ void LiquidCrystal::begin(uint8_t cols, uint8_t lines, uint8_t dotsize) {
 
 }
 
+/*
+   in some 16x4 LCD when line 3 and 4 are not placed correctly you may try:
+     setRowOffsets(0x00, 0x40, 0x14, 0x54)
+   or
+     setRowOffsets(0x00, 0x40, 0x10, 0x50)
+ */
 void LiquidCrystal::setRowOffsets(int row0, int row1, int row2, int row3)
 {
-	_row_offsets[0] = row0;
-	_row_offsets[1] = row1;
-	_row_offsets[2] = row2;
-	_row_offsets[3] = row3;
+  _row_offsets[0] = row0;
+  _row_offsets[1] = row1;
+  _row_offsets[2] = row2;
+  _row_offsets[3] = row3;
 }
 
 /********** high level commands, for the user! */

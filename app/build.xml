@@ -48,7 +48,7 @@
     <fail if="windows" unless="java_home"
 	  message="The JAVA_HOME variable must be set to the location of a full JDK. For instance, on Windows, this might be c:\jdk1.6.0_18." />
 
-    <condition property="work.dir" value="../build/macosx/work/Arduino.app/Contents/Resources/Java/">
+    <condition property="work.dir" value="../build/macosx/work/Arduino.app/Contents/Java/">
       <os family="mac"/>
     </condition>
     <condition property="java.additional.library.path" value=".">
@@ -99,11 +99,14 @@
       <fileset dir="test" includes="**/*.txt" />
       <fileset dir="test" includes="**/*.properties" />
       <fileset dir="test" includes="**/*.ino" />
+      <fileset dir="test" includes="**/*.json*" />
+      <fileset dir="test" includes="**/*.key" />
     </copy>
 
     <junit printsummary="yes" dir="${work.dir}" fork="true">
       <jvmarg value="-Djava.library.path=${java.additional.library.path}"/>
       <jvmarg value="-DWORK_DIR=."/>
+      <jvmarg value="-ea"/>
       <classpath>
         <pathelement location="bin"/>
         <pathelement location="test-bin"/>

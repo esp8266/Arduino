@@ -1,0 +1,17 @@
+old.0.compiler.path={runtime.ide.path}/hardware/tools/avr/bin/
+new.0.compiler.path={runtime.tools.avr-gcc.path}/bin/
+
+added.tools.avrdude.path={runtime.tools.avrdude.path}
+
+old.1.tools.avrdude.cmd.path={runtime.ide.path}/hardware/tools/avr/bin/avrdude
+new.1.tools.avrdude.cmd.path={path}/bin/avrdude
+
+old.2.tools.avrdude.config.path={runtime.ide.path}/hardware/tools/avr/etc/avrdude.conf
+new.2.tools.avrdude.config.path={path}/etc/avrdude.conf
+
+old.3.compiler.path={runtime.ide.path}/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/
+new.3.compiler.path={runtime.tools.arm-none-eabi-gcc.path}/bin/
+
+old.4.tools.bossac.path={runtime.ide.path}/hardware/tools
+new.4.tools.bossac.path={runtime.tools.bossac.path}
+

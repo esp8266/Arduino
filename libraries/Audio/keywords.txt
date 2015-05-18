@@ -6,7 +6,7 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-Audio	KEYWORD1
+Audio	KEYWORD1	Audio
 
 #######################################
 # Methods and Functions (KEYWORD2)

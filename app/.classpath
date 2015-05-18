@@ -7,10 +7,17 @@
 	<classpathentry kind="lib" path="lib/jna.jar"/>
 	<classpathentry kind="lib" path="lib/ecj.jar"/>
 	<classpathentry kind="lib" path="lib/apple.jar"/>
+	<classpathentry kind="lib" path="lib/bcpg-jdk15on-152.jar"/>
+	<classpathentry kind="lib" path="lib/bcprov-jdk15on-152.jar"/>
 	<classpathentry kind="lib" path="lib/commons-codec-1.7.jar"/>
+	<classpathentry kind="lib" path="lib/commons-compress-1.8.jar"/>
 	<classpathentry kind="lib" path="lib/commons-exec-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/commons-httpclient-3.1.jar"/>
 	<classpathentry kind="lib" path="lib/commons-logging-1.0.4.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-annotations-2.2.3.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-core-2.2.3.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-databind-2.2.3.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-module-mrbean-2.2.3.jar"/>
 	<classpathentry kind="lib" path="lib/jmdns-3.4.1.jar"/>
 	<classpathentry kind="lib" path="lib/jsch-0.1.50.jar"/>
 	<classpathentry kind="lib" path="lib/jssc-2.8.0.jar"/>
@@ -21,5 +28,9 @@
 	<classpathentry kind="lib" path="test-lib/fest-util-1.1.2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/arduino-core"/>
 	<classpathentry kind="lib" path="test-lib/jcip-annotations-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/commons-lang3-3.3.2.jar"/>
+	<classpathentry kind="lib" path="lib/guava-18.0.jar"/>
+	<classpathentry kind="lib" path="lib/java-semver-0.8.0.jar"/>
+	<classpathentry kind="lib" path="lib/rsyntaxtextarea-2.5.6.1+arduino.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

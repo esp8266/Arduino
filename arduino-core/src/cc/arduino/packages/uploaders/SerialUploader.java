@@ -60,7 +60,10 @@ public class SerialUploader extends Uploader {
     // FIXME: Preferences should be reorganized
     TargetPlatform targetPlatform = BaseNoGui.getTargetPlatform();
     PreferencesMap prefs = PreferencesData.getMap();
-    prefs.putAll(BaseNoGui.getBoardPreferences());
+    PreferencesMap boardPreferences = BaseNoGui.getBoardPreferences();
+    if (boardPreferences != null) {
+      prefs.putAll(boardPreferences);
+    }
     String tool = prefs.getOrExcept("upload.tool");
     if (tool.contains(":")) {
       String[] split = tool.split(":", 2);
@@ -116,7 +119,7 @@ public class SerialUploader extends Uploader {
           if (verbose)
             System.out.println(
               I18n.format(_("Forcing reset using 1200bps open/close on port {0}"), uploadPort));
-          Serial.touchPort(uploadPort, 1200);
+          Serial.touchForCDCReset(uploadPort);
         }
         Thread.sleep(400);
         if (waitForUploadPort) {
@@ -242,13 +245,16 @@ public class SerialUploader extends Uploader {
     }
 
     PreferencesMap prefs = PreferencesData.getMap();
-    prefs.putAll(BaseNoGui.getBoardPreferences());
+    PreferencesMap boardPreferences = BaseNoGui.getBoardPreferences();
+    if (boardPreferences != null) {
+      prefs.putAll(boardPreferences);
+    }
     PreferencesMap programmerPrefs = targetPlatform.getProgrammer(programmer);
     if (programmerPrefs == null)
       throw new RunnerException(
           _("Please select a programmer from Tools->Programmer menu"));
+    prefs.putAll(targetPlatform.getTool(programmerPrefs.getOrExcept("program.tool")));
     prefs.putAll(programmerPrefs);
-    prefs.putAll(targetPlatform.getTool(prefs.getOrExcept("program.tool")));
 
     prefs.put("build.path", buildPath);
     prefs.put("build.project_name", className);
@@ -295,7 +301,10 @@ public class SerialUploader extends Uploader {
 
     // Build configuration for the current programmer
     PreferencesMap prefs = PreferencesData.getMap();
-    prefs.putAll(BaseNoGui.getBoardPreferences());
+    PreferencesMap boardPreferences = BaseNoGui.getBoardPreferences();
+    if (boardPreferences != null) {
+      prefs.putAll(boardPreferences);
+    }
     prefs.putAll(programmerPrefs);
 
     // Create configuration for bootloader tool

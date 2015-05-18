@@ -34,12 +34,17 @@
 // location from which to read.
 // NOTE: a "power of 2" buffer size is reccomended to dramatically
 //       optimize all the modulo operations for ring buffers.
-#if !(defined(SERIAL_TX_BUFFER_SIZE) && defined(SERIAL_RX_BUFFER_SIZE))
+#if !defined(SERIAL_TX_BUFFER_SIZE)
 #if (RAMEND < 1000)
 #define SERIAL_TX_BUFFER_SIZE 16
-#define SERIAL_RX_BUFFER_SIZE 16
 #else
 #define SERIAL_TX_BUFFER_SIZE 64
+#endif
+#endif
+#if !defined(SERIAL_RX_BUFFER_SIZE)
+#if (RAMEND < 1000)
+#define SERIAL_RX_BUFFER_SIZE 16
+#else
 #define SERIAL_RX_BUFFER_SIZE 64
 #endif
 #endif

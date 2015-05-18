@@ -102,11 +102,11 @@ void loop() {
       // convert the millivolts to temperature celsius:
       float temperature = (voltage - 500) / 10;
       // print the temperature:
-      client.print("Current time on the Yún: ");
+      client.print("Current time on the Y&uacute;n: ");
       client.println(timeString);
       client.print("<br>Current temperature: ");
       client.print(temperature);
-      client.print(" degrees C");
+      client.print(" &deg;C");
       client.print("<br>This sketch has been running since ");
       client.print(startString);
       client.print("<br>Hits so far: ");

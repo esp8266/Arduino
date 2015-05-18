@@ -1,6 +1,6 @@
 package processing.app;
 
-import processing.app.syntax.JEditTextArea;
+import processing.app.syntax.SketchTextArea;
 
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -11,7 +11,7 @@ public class CaretAwareUndoableEdit implements UndoableEdit {
   private final UndoableEdit undoableEdit;
   private final int caretPosition;
 
-  public CaretAwareUndoableEdit(UndoableEdit undoableEdit, JEditTextArea textArea) {
+  public CaretAwareUndoableEdit(UndoableEdit undoableEdit, SketchTextArea textArea) {
     this.undoableEdit = undoableEdit;
     this.caretPosition = textArea.getCaretPosition();
   }

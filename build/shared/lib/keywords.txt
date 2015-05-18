@@ -1,113 +1,77 @@
-# LITERAL1 specifies constants
+#FUNCTIONS COLOR 			#D35400 - ORANGE			KEYWORD1
+#FUNCTIONS COLOR			#D35400 - ORANGE			KEYWORD2
+#STRUCTURE COLORS 			#5E6D03 - GREEN			KEYWORD3
+#VARIABLES COLOR 				#00979C - BLUE				LITERAL2
 
-HIGH	LITERAL1	Constants
-LOW	LITERAL1	Constants
-INPUT	LITERAL1	Constants
-INPUT_PULLUP	LITERAL1	Constants
-OUTPUT	LITERAL1	Constants
-DEC	LITERAL1	Serial_Print
-BIN	LITERAL1	Serial_Print
-HEX	LITERAL1	Serial_Print
-OCT	LITERAL1	Serial_Print
-PI	LITERAL1
-HALF_PI	LITERAL1
-TWO_PI	LITERAL1
-LSBFIRST	LITERAL1	ShiftOut
-MSBFIRST	LITERAL1	ShiftOut
-CHANGE	LITERAL1	AttachInterrupt
-FALLING	LITERAL1	AttachInterrupt
-RISING	LITERAL1	AttachInterrupt
-DEFAULT	LITERAL1	AnalogReference
-EXTERNAL	LITERAL1	AnalogReference
-INTERNAL	LITERAL1	AnalogReference
-INTERNAL1V1	LITERAL1	AnalogReference
-INTERNAL2V56	LITERAL1	AnalogReference
+# LITERAL2 specifies constants
 
-# KEYWORD1 specifies datatypes and C/C++ keywords
+HIGH	LITERAL2	Constants	RESERVED_WORD_2
+LOW	LITERAL2	Constants	RESERVED_WORD_2
+INPUT	LITERAL2	Constants	RESERVED_WORD_2
+INPUT_PULLUP	LITERAL2	Constants	RESERVED_WORD_2
+OUTPUT	LITERAL2	Constants	RESERVED_WORD_2
+DEC	LITERAL2	Serial_Print	RESERVED_WORD_2
+BIN	LITERAL2	Serial_Print	RESERVED_WORD_2
+HEX	LITERAL2	Serial_Print	RESERVED_WORD_2
+OCT	LITERAL2	Serial_Print	RESERVED_WORD_2
+PI	LITERAL2		RESERVED_WORD_2
+HALF_PI	LITERAL2		RESERVED_WORD_2
+TWO_PI	LITERAL2		RESERVED_WORD_2
+LSBFIRST	LITERAL2	ShiftOut	RESERVED_WORD_2
+MSBFIRST	LITERAL2	ShiftOut	RESERVED_WORD_2
+CHANGE	LITERAL2	AttachInterrupt	RESERVED_WORD_2
+FALLING	LITERAL2	AttachInterrupt	RESERVED_WORD_2
+RISING	LITERAL2	AttachInterrupt	RESERVED_WORD_2
+DEFAULT	LITERAL2	AnalogReference	RESERVED_WORD_2
+EXTERNAL	LITERAL2	AnalogReference	RESERVED_WORD_2
+INTERNAL	LITERAL2	AnalogReference	RESERVED_WORD_2
+INTERNAL1V1	LITERAL2	AnalogReference	RESERVED_WORD_2
+INTERNAL2V56	LITERAL2	AnalogReference	RESERVED_WORD_2
 
-boolean	KEYWORD1	BooleanVariables
-break	KEYWORD1	Break
-byte	KEYWORD1	Byte
-case	KEYWORD1	SwitchCase
-char	KEYWORD1	Char
-class	KEYWORD1
-const	KEYWORD1	Const
-continue	KEYWORD1	Continue
-default	KEYWORD1	SwitchCase	
-do	KEYWORD1	DoWhile
-double	KEYWORD1	Double
-else	KEYWORD1	Else
-false	KEYWORD1	Constants
-float	KEYWORD1	Float
-for	KEYWORD1	For
-if	KEYWORD1	If
-int	KEYWORD1	Int
-long	KEYWORD1	Long
-new	KEYWORD1	
-null	KEYWORD1	
-private	KEYWORD1
-protected	KEYWORD1	
-public	KEYWORD1	
-register	KEYWORD1	
-return	KEYWORD1	Return	
-short	KEYWORD1
-signed	KEYWORD1
-static	KEYWORD1	Static
-String	KEYWORD1	String	
-switch	KEYWORD1	SwitchCase
-this	KEYWORD1	
-throw	KEYWORD1	
-try	KEYWORD1	
-true	KEYWORD1	
-unsigned	KEYWORD1
-void	KEYWORD1	Void
-while	KEYWORD1	While
-word	KEYWORD1	Word
+auto	LITERAL2		RESERVED_WORD_2
+constexpr	LITERAL2		RESERVED_WORD_2
+decltype	LITERAL2		RESERVED_WORD_2
+nullptr	LITERAL2		RESERVED_WORD_2
+wchar_t	LITERAL2		RESERVED_WORD_2
 
-# operators aren't highlighted, but may have documentation
+int8_t	LITERAL2		RESERVED_WORD_2
+int16_t	LITERAL2		RESERVED_WORD_2
+int32_t	LITERAL2		RESERVED_WORD_2
+int64_t	LITERAL2		RESERVED_WORD_2
+uint8_t	LITERAL2		RESERVED_WORD_2
+uint16_t	LITERAL2		RESERVED_WORD_2
+uint32_t	LITERAL2		RESERVED_WORD_2
+uint64_t	LITERAL2		RESERVED_WORD_2
 
-+=		IncrementCompound
-+		Arithmetic
-[]		arrayaccess
-=		assign
-&		BitwiseAnd
-|		BitwiseAnd
-,		
-//		Comments
-?:		
-{}		Braces
---		Increment
-/		Arithmetic
-/*		Comments
-.		dot
-==		
-<		greaterthan
-<=		greaterthanorequalto
-++		Increment
-!=		inequality
-<<		Bitshift
-<		lessthan
-<=		lessthanorequalto
-&&		Boolean
-!		Boolean
-||		Boolean
--		Arithmetic
-%		Modulo
-*		Arithmetic
-()		parentheses
->>		Bitshift
-;		SemiColon
--=		IncrementCompound
-
-# these are datatypes, but we've also defined functions to cast to them
-
-boolean	KEYWORD2	boolean_
-byte	KEYWORD2	byte_
-char	KEYWORD2	char_
-float	KEYWORD2	float_
-int	KEYWORD2	int_
-long	KEYWORD2	long_
-word	KEYWORD2	word_
+char16_t	LITERAL2		RESERVED_WORD_2
+char32_t	LITERAL2		RESERVED_WORD_2
+static_assert	LITERAL2		RESERVED_WORD_2
+operator	LITERAL2		RESERVED_WORD_2
+enum	LITERAL2		RESERVED_WORD_2
+delete	LITERAL2		RESERVED_WORD_2
+bool	LITERAL2		RESERVED_WORD_2
+boolean	LITERAL2	BooleanVariables	RESERVED_WORD_2
+byte	LITERAL2	Byte	RESERVED_WORD_2
+char	LITERAL2	Char	RESERVED_WORD_2
+const	LITERAL2	Const	RESERVED_WORD_2
+false	LITERAL2	Constants	LITERAL_BOOLEAN
+float	LITERAL2	Float	RESERVED_WORD_2
+double	LITERAL2		RESERVED_WORD_2
+null	LITERAL2		RESERVED_WORD_2
+int	LITERAL2	Int	RESERVED_WORD_2
+long	LITERAL2	Long	RESERVED_WORD_2
+new	LITERAL2		RESERVED_WORD_2
+private	LITERAL2		RESERVED_WORD_2
+protected	LITERAL2		RESERVED_WORD_2
+public	LITERAL2		RESERVED_WORD_2
+short	LITERAL2		RESERVED_WORD_2
+signed	LITERAL2		RESERVED_WORD_2
+static	LITERAL2	Static	RESERVED_WORD_2
+String	LITERAL2	String	RESERVED_WORD_2
+void	LITERAL2	Void	RESERVED_WORD_2
+true	LITERAL2		LITERAL_BOOLEAN
+unsigned	LITERAL2		RESERVED_WORD_2
+word	LITERAL2		RESERVED_WORD_2
 
 # KEYWORD2 specifies methods and functions
 
@@ -165,11 +129,11 @@ shiftOut	KEYWORD2	ShiftOut
 tone	KEYWORD2	Tone
 yield	KEYWORD2	Yield
 
-Serial	KEYWORD3	Serial
-Serial1	KEYWORD3	Serial
-Serial2	KEYWORD3	Serial
-Serial3	KEYWORD3	Serial
-SerialUSB	KEYWORD3	Serial
+Serial	KEYWORD1	Serial	DATA_TYPE
+Serial1	KEYWORD1	Serial	DATA_TYPE
+Serial2	KEYWORD1	Serial	DATA_TYPE
+Serial3	KEYWORD1	Serial	DATA_TYPE
+SerialUSB	KEYWORD1	Serial	DATA_TYPE
 begin	KEYWORD2	Serial_Begin
 end	KEYWORD2	Serial_End
 peek	KEYWORD2	Serial_Peek
@@ -209,10 +173,8 @@ substring	KEYWORD2
 toCharArray	KEYWORD2
 toInt	KEYWORD2
 
-# USB-related keywords
-
-Keyboard	KEYWORD3
-Mouse	KEYWORD3
+Keyboard	KEYWORD1		DATA_TYPE
+Mouse	KEYWORD1		DATA_TYPE
 press	KEYWORD2
 release	KEYWORD2
 releaseAll	KEYWORD2
@@ -221,5 +183,68 @@ click	KEYWORD2
 move	KEYWORD2
 isPressed	KEYWORD2
 
-setup	KEYWORD3	Setup
-loop	KEYWORD3	Loop
+# KEYWORD3 specifies structures
+
+break	KEYWORD3	Break	RESERVED_WORD
+case	KEYWORD3	SwitchCase	RESERVED_WORD
+class	KEYWORD3		RESERVED_WORD
+continue	KEYWORD3	Continue	RESERVED_WORD
+default	KEYWORD3	SwitchCase	RESERVED_WORD
+do	KEYWORD3	DoWhile	RESERVED_WORD
+else	KEYWORD3	Else	RESERVED_WORD
+for	KEYWORD3	For	RESERVED_WORD
+if	KEYWORD3	If	RESERVED_WORD
+register	KEYWORD3		RESERVED_WORD
+return	KEYWORD3	Return	RESERVED_WORD
+	
+switch	KEYWORD3	SwitchCase	RESERVED_WORD
+this	KEYWORD3		RESERVED_WORD
+throw	KEYWORD3		RESERVED_WORD
+try	KEYWORD3		RESERVED_WORD
+while	KEYWORD3	While	RESERVED_WORD
+
+setup	KEYWORD3	Setup	RESERVED_WORD
+loop	KEYWORD3	Loop	RESERVED_WORD
+
+alignas	KEYWORD3		RESERVED_WORD
+alignof	KEYWORD3		RESERVED_WORD
+asm	KEYWORD3		RESERVED_WORD
+export	KEYWORD3		RESERVED_WORD
+thread_local	KEYWORD3		RESERVED_WORD
+noexcept	KEYWORD3		RESERVED_WORD
+export	KEYWORD3		RESERVED_WORD
+
+# operators aren't highlighted, but may have documentation
+
++=		IncrementCompound
++		Arithmetic
+[]		arrayaccess
+=		assign
+&		BitwiseAnd
+|		BitwiseAnd
+,
+//		Comments
+?:
+{}		Braces
+--		Increment
+/		Arithmetic
+/*		Comments
+.		dot
+==
+<		greaterthan
+<=		greaterthanorequalto
+++		Increment
+!=		inequality
+<<		Bitshift
+<		lessthan
+<=		lessthanorequalto
+&&		Boolean
+!		Boolean
+||		Boolean
+-		Arithmetic
+%		Modulo
+*		Arithmetic
+()		parentheses
+>>		Bitshift
+;		SemiColon
+-=		DecrementCompound

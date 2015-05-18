@@ -1,3 +1,13 @@
+#FUNCTIONS COLOR 			#D35400 - ORANGE			KEYWORD1
+#FUNCTIONS COLOR			#D35400 - ORANGE			KEYWORD2
+#STRUCTURE COLORS 			#5E6D03 - GREEN			KEYWORD3
+#VARIABLES COLOR 				#00979C - BLUE				LITERAL1
+
+#ERROR COLOR					#A61717 - RED
+#COMMENTS // COLOR			#95A5A6 - LIGHT GREY
+#COMMENTS /**/ COLOR		#434F54	- DARK GREY
+
+
 # GUI - STATUS
 status.notice.fgcolor = #002325
 status.notice.bgcolor = #17A1A5
@@ -65,29 +75,37 @@ editor.brackethighlight.color = #006699
 
 # TEXT - KEYWORDS
 
-# e.g abstract, final, private
-editor.keyword1.style = #cc6600,plain
+# FUNCTIONS
+editor.keyword1.style = #d35400,bold
+editor.data_type.style = #d35400,bold
 
-# e.g. beginShape, point, line
-editor.keyword2.style = #cc6600,plain
+# METHODS
+editor.keyword2.style = #D35400,plain
+editor.function.style = #d35400,plain
 
-# e.g. byte, char, short, color
-editor.keyword3.style = #cc6600,bold
+# STRUCTURES
+editor.keyword3.style = #5E6D03,plain
+editor.reserved_word.style = #5E6D03,plain
 
 
 # TEXT - LITERALS
 
-# constants: e.g. null, true, this, RGB, TWO_PI
+# constants & datatypes
 editor.literal1.style = #006699,plain
 
 # p5 built in variables: e.g. mouseX, width, pixels
-editor.literal2.style = #006699,plain
+editor.literal2.style = #00979C,plain
+editor.variable.style = #00979C,plain
+editor.reserved_word_2.style = #00979C,plain
+editor.literal_char.style = #00979C,plain
+editor.literal_string_double_quote.style = #00979C,plain
 
 # http://arduino.cc/
 editor.url.style = #0000ff,underlined
 
 # e.g. + - = /
-editor.operator.style = #000000,plain
+editor.operator.style = #434f54,plain
+
 
 # ?? maybe this is for words followed by a colon
 # like in case statements or goto
@@ -95,8 +113,8 @@ editor.label.style = #7e7e7e,bold
 
 
 # TEXT - COMMENTS
-editor.comment1.style = #7e7e7e,plain
-editor.comment2.style = #7e7e7e,plain
+editor.comment1.style = #434F54,plain
+editor.comment2.style = #95a5a6,plain
 
 
 # LINE STATUS - editor line number status bar at the bottom of the screen
