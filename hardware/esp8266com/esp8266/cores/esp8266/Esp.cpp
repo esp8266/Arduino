@@ -175,6 +175,12 @@ uint32_t EspClass::getFlashChipSize(void)
                 return (2_MB);
             case 0x4: // 32 MBit (4MB)
                 return (4_MB);
+            case 0x5: // 64 MBit (8MB)
+                return (8_MB);
+            case 0x6: // 128 MBit (16MB)
+                return (16_MB);
+            case 0x7: // 256 MBit (32MB)
+                return (32_MB);
             default: // fail?
                 return 0;
         }
