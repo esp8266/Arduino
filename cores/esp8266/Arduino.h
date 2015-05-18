@@ -38,7 +38,6 @@ extern "C" {
 #include "pgmspace.h"
 #include "esp8266_peri.h"
 #include "twi.h"
-  //#include "spiffs/spiffs.h"
 
 void yield(void);
 
