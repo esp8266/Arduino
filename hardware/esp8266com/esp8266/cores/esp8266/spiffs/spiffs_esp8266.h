@@ -24,14 +24,11 @@ The small 4KB sectors allow for greater flexibility in applications that require
 #define INTERNAL_FLASH_WRITE_UNIT_SIZE  4
 #define INTERNAL_FLASH_READ_UNIT_SIZE   4
 
-extern spiffs _filesystemStorageHandle;
-
 extern uint32_t flashmem_write( const void *from, uint32_t toaddr, uint32_t size );
 extern uint32_t flashmem_read( void *to, uint32_t fromaddr, uint32_t size );
 extern bool flashmem_erase_sector( uint32_t sector_id );
 uint32_t flashmem_find_sector( uint32_t address, uint32_t *pstart, uint32_t *pend );
 uint32_t flashmem_get_sector_of_address( uint32_t addr );
-s32_t spiffs_mount();
 
 #ifdef __cplusplus
 }
