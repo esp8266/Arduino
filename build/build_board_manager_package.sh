@@ -50,7 +50,7 @@ cat << EOF > package_esp8266com_index.json
       "toolsDependencies":[ {
         "packager":"esp8266",
         "name":"esptool",
-        "version":"0.4.3"
+        "version":"0.4.4"
       },
       {
         "packager":"esp8266",
@@ -61,7 +61,7 @@ cat << EOF > package_esp8266com_index.json
 
     "tools": [ {
       "name":"esptool",
-      "version":"0.4.3",
+      "version":"0.4.4",
       "systems": [
         {
            "host":"i686-mingw32",
