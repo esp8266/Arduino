@@ -880,7 +880,7 @@
 
   <target name="windows-run" depends="build"
 	  description="Run windows version">
-    <exec executable="windows/work/arduino.exe" dir="windows/work" spawn="true" failonerror="true"/>
+    <exec executable="windows/work/arduino.exe" dir="windows/work" failonerror="true"/>
   </target>
 
   <target name="windows-dist" depends="build" description="Create .zip files of windows version">
