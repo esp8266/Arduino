@@ -22,49 +22,71 @@
 #include "Arduino.h"
 
 bool FSClass::mount() {
-  if (_mounted) 
-    return true;
-
-  _mounted = spiffs_mount();
-  return _mounted;
+  if(SPIFFS_mounted(&_filesystemStorageHandle)) return true;
+  int res = spiffs_mount();
+  if(res != 0){
+    int formated = SPIFFS_format(&_filesystemStorageHandle);
+    if(formated != 0) return false;
+    res = spiffs_mount();
+  }
+  return (res == 0);
 }
 
 void FSClass::unmount() {
-  if (!_mounted)
-    return;
-
-  spiffs_unmount();
-  _mounted = false;
+  if(SPIFFS_mounted(&_filesystemStorageHandle))
+    SPIFFS_unmount(&_filesystemStorageHandle);
 }
 
 bool FSClass::format() {
-  return spiffs_format();
+  if(!SPIFFS_mounted(&_filesystemStorageHandle)){
+    spiffs_mount();
+  }
+  SPIFFS_unmount(&_filesystemStorageHandle);
+  int formated = SPIFFS_format(&_filesystemStorageHandle);
+  if(formated != 0) return false;
+  return (spiffs_mount() == 0);
 }
 
 bool FSClass::check() {
   return SPIFFS_check(&_filesystemStorageHandle) == 0;
 }
 
-bool FSClass::exists(const char *filename) {
+bool FSClass::exists(char *filename) {
   spiffs_stat stat = {0};
   if (SPIFFS_stat(&_filesystemStorageHandle, filename, &stat) < 0) 
     return false;
   return stat.name[0] != '\0';
 }
 
-bool FSClass::create(const char *filepath){
+bool FSClass::create(char *filepath){
   return SPIFFS_creat(&_filesystemStorageHandle, filepath, 0) == 0;
 }
 
-bool FSClass::remove(const char *filepath){
+bool FSClass::remove(char *filepath){
   return SPIFFS_remove(&_filesystemStorageHandle, filepath) == 0;
 }
 
-bool FSClass::rename(const char *filename, const char *newname) {
+bool FSClass::rename(char *filename, char *newname) {
   return SPIFFS_rename(&_filesystemStorageHandle, filename, newname) == 0;
 }
 
-FSFile FSClass::open(const char *filename, uint8_t mode) {
+size_t FSClass::totalBytes(){
+  u32_t totalBytes;
+  u32_t usedBytes;
+  if(SPIFFS_info(&_filesystemStorageHandle, &totalBytes, &usedBytes) == 0)
+    return totalBytes;
+  return 0;
+}
+
+size_t FSClass::usedBytes(){
+  u32_t totalBytes;
+  u32_t usedBytes;
+  if(SPIFFS_info(&_filesystemStorageHandle, &totalBytes, &usedBytes) == 0)
+    return usedBytes;
+  return 0;
+}
+
+FSFile FSClass::open(char *filename, uint8_t mode) {
   if(String(filename) == "" || String(filename) == "/") return FSFile("/");
   int repeats = 0;
   bool notExist;
@@ -76,7 +98,7 @@ FSFile FSClass::open(const char *filename, uint8_t mode) {
     res = SPIFFS_open(&_filesystemStorageHandle, filename, (spiffs_flags)mode, 0);
     int code = SPIFFS_errno(&_filesystemStorageHandle);
     if (res < 0){
-      debugf("open errno %d\n", code);
+      SPIFFS_API_DBG_E("open errno %d\n", code);
       notExist = (code == SPIFFS_ERR_NOT_FOUND || code == SPIFFS_ERR_DELETED || code == SPIFFS_ERR_FILE_DELETED || code == SPIFFS_ERR_IS_FREE);
       if (notExist && canRecreate)
         remove(filename); // fix for deleted files
@@ -112,11 +134,11 @@ FSFile::FSFile(String path) {
     _stats.type = SPIFFS_TYPE_DIR;
     SPIFFS_opendir(&_filesystemStorageHandle, (char*)_stats.name, &_dir);
   } else {
-    _file = SPIFFS_open(&_filesystemStorageHandle, path.c_str(), (spiffs_flags)FSFILE_READ, 0);
+    _file = SPIFFS_open(&_filesystemStorageHandle, (char *)path.c_str(), (spiffs_flags)FSFILE_READ, 0);
     if(SPIFFS_fstat(&_filesystemStorageHandle, _file, &_stats) != 0){
-      debugf("stats errno %d\n", SPIFFS_errno(&_filesystemStorageHandle));
+      SPIFFS_API_DBG_E("fstat errno %d\n", SPIFFS_errno(&_filesystemStorageHandle));
     }
-    debugf("FSFile name: %s, size: %d, type: %d\n", _stats.name, _stats.size, _stats.type);
+    //debugf("FSFile name: %s, size: %d, type: %d\n", _stats.name, _stats.size, _stats.type);
     if(_stats.type == SPIFFS_TYPE_DIR){
       SPIFFS_opendir(&_filesystemStorageHandle, (char*)_stats.name, &_dir);
     }
@@ -126,9 +148,9 @@ FSFile::FSFile(String path) {
 FSFile::FSFile(file_t f) {
   _file = f;
   if(SPIFFS_fstat(&_filesystemStorageHandle, _file, &_stats) != 0){
-    debugf("stats errno %d\n", SPIFFS_errno(&_filesystemStorageHandle));
+    SPIFFS_API_DBG_E("fstat errno %d\n", SPIFFS_errno(&_filesystemStorageHandle));
   }
-  debugf("FSFile name: %s, size: %d, type: %d\n", _stats.name, _stats.size, _stats.type);
+  //debugf("FSFile name: %s, size: %d, type: %d\n", _stats.name, _stats.size, _stats.type);
   if(_stats.type == SPIFFS_TYPE_DIR){
     SPIFFS_opendir(&_filesystemStorageHandle, (char*)_stats.name, &_dir);
   }
@@ -237,7 +259,7 @@ void FSFile::flush(){
 bool FSFile::remove(){
   if (! _file) return 0;
   close();
-	return SPIFFS_remove(&_filesystemStorageHandle, (const char *)_stats.name) == 0;
+	return SPIFFS_remove(&_filesystemStorageHandle, (char *)_stats.name) == 0;
 }
 
 int FSFile::lastError(){
@@ -245,5 +267,5 @@ int FSFile::lastError(){
 }
 
 void FSFile::clearError(){
-  _filesystemStorageHandle.errno = SPIFFS_OK;
+  _filesystemStorageHandle.err_code = SPIFFS_OK;
 }

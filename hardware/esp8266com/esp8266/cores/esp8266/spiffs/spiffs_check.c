@@ -597,7 +597,7 @@ static s32_t spiffs_page_consistency_check_i(spiffs *fs) {
                   data_spix_offset + i, data_pix, cur_pix);
               if (res <= _SPIFFS_ERR_CHECK_FIRST && res > _SPIFFS_ERR_CHECK_LAST) {
                 // index bad also, cannot mend this file
-                SPIFFS_CHECK_DBG("PA: FIXUP: index bad %u, cannot mend - delete object\n", res);
+                SPIFFS_CHECK_DBG("PA: FIXUP: index bad %d, cannot mend - delete object\n", res);
                 if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_PAGE, SPIFFS_CHECK_DELETE_BAD_FILE, objix_p_hdr->obj_id, 0);
                 // delete file
                 res = spiffs_page_delete(fs, cur_pix);
@@ -763,7 +763,7 @@ static s32_t spiffs_page_consistency_check_i(spiffs *fs) {
               res = spiffs_rewrite_index(fs, p_hdr.obj_id, p_hdr.span_ix, cur_pix, objix_pix);
               if (res <= _SPIFFS_ERR_CHECK_FIRST && res > _SPIFFS_ERR_CHECK_LAST) {
                 // index bad also, cannot mend this file
-                SPIFFS_CHECK_DBG("PA: FIXUP: index bad %u, cannot mend!\n", res);
+                SPIFFS_CHECK_DBG("PA: FIXUP: index bad %d, cannot mend!\n", res);
                 if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_PAGE, SPIFFS_CHECK_DELETE_BAD_FILE, p_hdr.obj_id, 0);
                 res = spiffs_page_delete(fs, cur_pix);
                 SPIFFS_CHECK_RES(res);
