@@ -23,10 +23,6 @@
 #include <SPI.h>
 #include <SD.h>
 
-// On the Ethernet Shield, CS is pin 4. Note that even if it's not
-// used as the CS pin, the hardware CS pin (10 on most Arduino boards,
-// 53 on the Mega) must be left as an output or the SD library
-// functions will not work.
 const int chipSelect = 4;
 
 void setup()
@@ -39,9 +35,6 @@ void setup()
 
 
   Serial.print("Initializing SD card...");
-  // make sure that the default chip select pin is set to
-  // output, even if you don't use it:
-  pinMode(10, OUTPUT);
 
   // see if the card is present and can be initialized:
   if (!SD.begin(chipSelect)) {
