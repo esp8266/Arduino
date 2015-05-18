@@ -50,7 +50,7 @@ cat << EOF > package_esp8266com_index.json
       "toolsDependencies":[ {
         "packager":"esp8266",
         "name":"esptool",
-        "version":"0.4.3"
+        "version":"0.4.4"
       },
       {
         "packager":"esp8266",
@@ -61,7 +61,7 @@ cat << EOF > package_esp8266com_index.json
 
     "tools": [ {
       "name":"esptool",
-      "version":"0.4.3",
+      "version":"0.4.4",
       "systems": [
         {
            "host":"i686-mingw32",
@@ -92,22 +92,22 @@ cat << EOF > package_esp8266com_index.json
       "systems": [
         {
            "host":"i686-mingw32",
-           "url":"http://arduino.esp8266.com/win32-xtensa-lx106-elf.tar.gz",
-           "archiveFileName":"win32-xtensa-lx106-elf.tar.gz",
+           "url":"http://arduino.esp8266.com/win32-xtensa-lx106-elf-gb404fb9.tar.gz",
+           "archiveFileName":"win32-xtensa-lx106-elf-gb404fb9.tar.gz",
            "checksum":"SHA-256:1561ec85cc58cab35cc48bfdb0d0087809f89c043112a2c36b54251a13bf781f",
            "size":"153807368"
         },
         {
            "host":"x86_64-apple-darwin",
-           "url":"http://arduino.esp8266.com/osx-xtensa-lx106-elf.tar.gz",
-           "archiveFileName":"osx-xtensa-lx106-elf.tar.gz",
+           "url":"http://arduino.esp8266.com/osx-xtensa-lx106-elf-gb404fb9.tar.gz",
+           "archiveFileName":"osx-xtensa-lx106-elf-gb404fb9.tar.gz",
            "checksum":"SHA-256:540be2ca32637584463a4a4d04717f6c79c7355e336b8c3578b0947218cf92b9",
            "size":"35189446"
         },
         {
            "host":"x86_64-pc-linux-gnu",
-           "url":"http://arduino.esp8266.com/linux64-xtensa-lx106-elf.tar.gz",
-           "archiveFileName":"linux64-xtensa-lx106-elf.tar.gz",
+           "url":"http://arduino.esp8266.com/linux64-xtensa-lx106-elf-gb404fb9.tar.gz",
+           "archiveFileName":"linux64-xtensa-lx106-elf-gb404fb9.tar.gz",
            "checksum":"SHA-256:46f057fbd8b320889a26167daf325038912096d09940b2a95489db92431473b7",
            "size":"30262903"
         }

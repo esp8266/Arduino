@@ -390,8 +390,8 @@
     <mkdir dir="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools" />
 
     <antcall target="untar">
-      <param name="archive_file" value="${staging_folder}/dist/osx-xtensa-lx106-elf.tgz" />
-      <param name="archive_url" value="http://download.igrr.me/osx-xtensa-lx106-elf.tgz" />
+      <param name="archive_file" value="${staging_folder}/dist/osx-xtensa-lx106-elf-gb404fb9.tgz" />
+      <param name="archive_url" value="http://download.igrr.me/osx-xtensa-lx106-elf-gb404fb9.tgz" />
       <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/xtensa-lx106-elf" />
       <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/" />
     </antcall>
@@ -663,9 +663,11 @@
 
     <antcall target="package-library-index-json-bundle"/>
 
+    <mkdir dir="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools" />
+
     <antcall target="untar">
-      <param name="archive_file" value="${staging_folder}/dist/linux64-xtensa-lx106-elf.tgz" />
-      <param name="archive_url" value="http://download.igrr.me/linux64-xtensa-lx106-elf.tgz" />
+      <param name="archive_file" value="${staging_folder}/dist/linux64-xtensa-lx106-elf-gb404fb9.tgz" />
+      <param name="archive_url" value="http://download.igrr.me/linux64-xtensa-lx106-elf-gb404fb9.tgz" />
       <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/xtensa-lx106-elf" />
       <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/" />
     </antcall>
@@ -914,10 +916,12 @@
     </antcall>
 
     <antcall target="package-library-index-json-bundle"/>
+
+    <mkdir dir="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools" />
 	
   	<antcall target="untar">
-      <param name="archive_file" value="${staging_folder}/dist/win32-xtensa-lx106-elf.tgz" />
-      <param name="archive_url" value="http://download.igrr.me/win32-xtensa-lx106-elf.tgz" />
+      <param name="archive_file" value="${staging_folder}/dist/win32-xtensa-lx106-elf-gb404fb9.tgz" />
+      <param name="archive_url" value="http://download.igrr.me/win32-xtensa-lx106-elf-gb404fb9.tgz" />
       <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/xtensa-lx106-elf" />
       <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/" />
     </antcall>
