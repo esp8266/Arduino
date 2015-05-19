@@ -1,24 +1,22 @@
 package cc.arduino.contributions.libraries;
 
-import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
 
 public class LibraryByTypeComparator implements Comparator<ContributedLibrary> {
 
-  private final List<String> types;
+  private final LibraryTypeComparator libraryTypeComparator;
 
   public LibraryByTypeComparator() {
-    this("Arduino", "Recommended", "Contributed");
+    this(new LibraryTypeComparator());
   }
 
-  public LibraryByTypeComparator(String... types) {
-    this.types = Arrays.asList(types);
+  public LibraryByTypeComparator(LibraryTypeComparator libraryTypeComparator) {
+    this.libraryTypeComparator = libraryTypeComparator;
   }
 
   @Override
   public int compare(ContributedLibrary o1, ContributedLibrary o2) {
-    return types.indexOf(o1.getTypes().get(0)) - types.indexOf(o2.getTypes().get(0));
+    return libraryTypeComparator.compare(o1.getTypes().get(0), o2.getTypes().get(0));
   }
 
 }

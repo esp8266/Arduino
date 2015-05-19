@@ -31,6 +31,7 @@ package cc.arduino.contributions.libraries.ui;
 import cc.arduino.contributions.libraries.ContributedLibrary;
 import cc.arduino.contributions.libraries.LibrariesIndexer;
 import cc.arduino.contributions.libraries.LibraryInstaller;
+import cc.arduino.contributions.libraries.LibraryTypeComparator;
 import cc.arduino.contributions.packages.DownloadableContribution;
 import cc.arduino.contributions.ui.InstallerJDialogUncaughtExceptionHandler;
 import cc.arduino.contributions.ui.*;
@@ -41,7 +42,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Collection;
+import java.util.*;
 
 import static processing.app.I18n._;
 
@@ -160,7 +161,8 @@ public class LibraryManagerUI extends InstallerJDialog<ContributedLibrary> {
     typeChooser.removeAllItems();
     typeChooser.addItem(new DropdownAllItem());
     typeChooser.addItem(new DropdownInstalledLibraryItem(indexer.getIndex()));
-    Collection<String> types = indexer.getIndex().getTypes();
+    java.util.List<String> types = new LinkedList<String>(indexer.getIndex().getTypes());
+    Collections.sort(types, new LibraryTypeComparator());
     for (String type : types) {
       typeChooser.addItem(new DropdownLibraryOfTypeItem(type));
     }
