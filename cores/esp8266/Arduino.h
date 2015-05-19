@@ -112,8 +112,6 @@ void timer1_write(uint32_t ticks); //maximum ticks 8388607
 #undef abs
 #endif
 
-#define min(a,b) ((a)<(b)?(a):(b))
-#define max(a,b) ((a)>(b)?(a):(b))
 #define abs(x) ((x)>0?(x):-(x))
 #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
 #define round(x)     ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
@@ -214,6 +212,9 @@ void loop(void);
 #include "FileSystem.h"
 #include "Esp.h"
 #include "debug.h"
+
+#define min(a,b) ((a)<(b)?(a):(b))
+#define max(a,b) ((a)>(b)?(a):(b))
 
 uint16_t makeWord(uint16_t w);
 uint16_t makeWord(byte h, byte l);

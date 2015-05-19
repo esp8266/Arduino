@@ -6,12 +6,13 @@
 # https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5---3rd-party-Hardware-specification
 
 name=ESP8266 Modules
-version=1.6.1
+version=1.6.4
 
-compiler.tools.path={runtime.platform.path}/tools/
-compiler.path={compiler.tools.path}xtensa-lx106-elf/bin/
-compiler.sdk.path={compiler.tools.path}sdk/
+runtime.tools.xtensa-lx106-elf-gcc.path={runtime.platform.path}/tools/xtensa-lx106-elf
+runtime.tools.esptool.path={runtime.platform.path}/tools
 
+compiler.path={runtime.tools.xtensa-lx106-elf-gcc.path}/bin/
+compiler.sdk.path={runtime.platform.path}/tools/sdk/
 compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ "-I{compiler.sdk.path}/include"
 
 compiler.c.cmd=xtensa-lx106-elf-gcc
@@ -33,7 +34,6 @@ compiler.ar.cmd=xtensa-lx106-elf-ar
 compiler.ar.flags=cru
 
 compiler.elf2hex.cmd=esptool
-
 compiler.elf2hex.flags=
 
 compiler.size.cmd=xtensa-lx106-elf-size
@@ -74,7 +74,7 @@ recipe.objcopy.eep.pattern=
 ## Create hex
 #recipe.objcopy.hex.pattern="{compiler.path}{compiler.elf2hex.cmd}" {compiler.elf2hex.flags} {compiler.elf2hex.extra_flags} "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.hex"
 
-recipe.objcopy.hex.pattern="{compiler.tools.path}{compiler.esptool.cmd}" -eo "{build.path}/{build.project_name}.elf" -bo "{build.path}/{build.project_name}_00000.bin" -bm {build.flash_mode} -bf {build.flash_freq} -bz {build.flash_size} -bs .text -bs .data -bs .rodata -bc -ec -eo "{build.path}/{build.project_name}.elf" -es .irom0.text "{build.path}/{build.project_name}_10000.bin" -ec
+recipe.objcopy.hex.pattern="{runtime.tools.esptool.path}/{compiler.esptool.cmd}" -eo "{build.path}/{build.project_name}.elf" -bo "{build.path}/{build.project_name}_00000.bin" -bm {build.flash_mode} -bf {build.flash_freq} -bz {build.flash_size} -bs .text -bs .data -bs .rodata -bc -ec -eo "{build.path}/{build.project_name}.elf" -es .irom0.text "{build.path}/{build.project_name}_10000.bin" -ec
 
 ## Compute size
 recipe.size.pattern="{compiler.path}{compiler.size.cmd}" -A "{build.path}/{build.project_name}.elf"

@@ -90,6 +90,9 @@ class EspClass {
         uint8_t getCpuFreqMHz(void);
 
         uint32_t getFlashChipId(void);
+        //gets the actual chip size based on the flash id
+        uint32_t getFlashChipRealSize(void);
+        //gets the size of the flash as set by the compiler
         uint32_t getFlashChipSize(void);
         uint32_t getFlashChipSpeed(void);
         FlashMode_t getFlashChipMode(void);
