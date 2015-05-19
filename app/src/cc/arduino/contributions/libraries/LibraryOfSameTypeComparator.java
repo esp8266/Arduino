@@ -6,6 +6,12 @@ public class LibraryOfSameTypeComparator implements Comparator<ContributedLibrar
 
   @Override
   public int compare(ContributedLibrary o1, ContributedLibrary o2) {
+    if (o1.getTypes() == null) {
+      return 1;
+    }
+    if (o2.getTypes() == null) {
+      return -1;
+    }
     if (!o1.getTypes().get(0).equals(o2.getTypes().get(0))) {
       return 0;
     }
