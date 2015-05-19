@@ -37,14 +37,17 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.mrbean.MrBeanModule;
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimaps;
 import processing.app.BaseNoGui;
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
 import processing.app.debug.TargetPlatformException;
+import processing.app.helpers.FileUtils;
 import processing.app.helpers.PreferencesMap;
 
 import java.io.File;
@@ -398,6 +401,29 @@ public class ContributionsIndexer {
     if (index == null) {
       return null;
     }
-    return index.getInstalled(packageName, platformArch);
+    return index.getInstalledPlatform(packageName, platformArch);
+  }
+
+  public List<ContributedPlatform> getInstalledPlatforms() {
+    if (index == null) {
+      return new LinkedList<ContributedPlatform>();
+    }
+    return index.getInstalledPlatforms();
+  }
+
+  public boolean isFolderInsidePlatform(final File folder) {
+    return getPlatformByFolder(folder) != null;
+  }
+
+  public ContributedPlatform getPlatformByFolder(final File folder) {
+    com.google.common.base.Optional<ContributedPlatform> platformOptional = Iterables.tryFind(getInstalledPlatforms(), new Predicate<ContributedPlatform>() {
+      @Override
+      public boolean apply(ContributedPlatform contributedPlatform) {
+        assert contributedPlatform.getInstalledFolder() != null;
+        return FileUtils.isSubDirectory(contributedPlatform.getInstalledFolder(), folder);
+      }
+    });
+
+    return platformOptional.orNull();
   }
 }

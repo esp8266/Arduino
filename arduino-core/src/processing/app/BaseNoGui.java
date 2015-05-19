@@ -630,7 +630,7 @@ public class BaseNoGui {
     loadContributedHardware(indexer);
     createToolPreferences(indexer);
 
-    librariesIndexer = new LibrariesIndexer(BaseNoGui.getSettingsFolder());
+    librariesIndexer = new LibrariesIndexer(BaseNoGui.getSettingsFolder(), indexer);
     File librariesIndexFile = librariesIndexer.getIndexFile();
     if (!librariesIndexFile.isFile()) {
       File defaultLibraryJsonFile = new File(getContentFile("dist"), "library_index.json");

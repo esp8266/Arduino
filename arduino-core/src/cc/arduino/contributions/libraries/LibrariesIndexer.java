@@ -28,9 +28,15 @@
  */
 package cc.arduino.contributions.libraries;
 
+import cc.arduino.contributions.libraries.filters.LibraryInstalledInsideCore;
+import cc.arduino.contributions.libraries.filters.TypePredicate;
+import cc.arduino.contributions.packages.ContributedPlatform;
+import cc.arduino.contributions.packages.ContributionsIndexer;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.mrbean.MrBeanModule;
+import com.google.common.base.Function;
+import com.google.common.collect.FluentIterable;
 import processing.app.BaseNoGui;
 import processing.app.I18n;
 import processing.app.helpers.FileUtils;
@@ -50,6 +56,7 @@ import static processing.app.I18n._;
 
 public class LibrariesIndexer {
 
+  private final ContributionsIndexer contributionsIndexer;
   private LibrariesIndex index;
   private final LibraryList installedLibraries = new LibraryList();
   private final LibraryList installedLibrariesWithDuplicates = new LibraryList();
@@ -58,10 +65,10 @@ public class LibrariesIndexer {
   private final File stagingFolder;
   private File sketchbookLibrariesFolder;
 
-  public LibrariesIndexer(File preferencesFolder) {
-    indexFile = new File(preferencesFolder, "library_index.json");
-    stagingFolder = new File(preferencesFolder, "staging" + File.separator +
-            "libraries");
+  public LibrariesIndexer(File preferencesFolder, ContributionsIndexer contributionsIndexer) {
+    this.contributionsIndexer = contributionsIndexer;
+    this.indexFile = new File(preferencesFolder, "library_index.json");
+    this.stagingFolder = new File(new File(preferencesFolder, "staging"), "libraries");
   }
 
   public void parseIndex() throws IOException {
@@ -101,12 +108,23 @@ public class LibrariesIndexer {
     // Clear all installed flags
     installedLibraries.clear();
     installedLibrariesWithDuplicates.clear();
-    for (ContributedLibrary lib : index.getLibraries())
+    for (ContributedLibrary lib : index.getLibraries()) {
       lib.setInstalled(false);
+    }
 
     // Rescan libraries
-    for (File folder : librariesFolders)
+    for (File folder : librariesFolders) {
       scanInstalledLibraries(folder, folder.equals(sketchbookLibrariesFolder));
+    }
+
+    FluentIterable.from(installedLibraries).filter(new TypePredicate("Contributed")).filter(new LibraryInstalledInsideCore(contributionsIndexer)).transform(new Function<UserLibrary, Object>() {
+      @Override
+      public Object apply(UserLibrary userLibrary) {
+        ContributedPlatform platform = contributionsIndexer.getPlatformByFolder(userLibrary.getInstalledFolder());
+        userLibrary.setTypes(Arrays.asList(platform.getCategory()));
+        return userLibrary;
+      }
+    }).toList();
   }
 
   private void scanInstalledLibraries(File folder, boolean isSketchbook) {

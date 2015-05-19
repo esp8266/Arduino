@@ -56,13 +56,13 @@ public class UserLibrary extends ContributedLibrary {
   private List<String> declaredTypes;
 
   private static final List<String> MANDATORY_PROPERTIES = Arrays
-          .asList(new String[]{"name", "version", "author", "maintainer",
-                  "sentence", "paragraph", "url"});
+    .asList("name", "version", "author", "maintainer",
+      "sentence", "paragraph", "url");
 
-  private static final List<String> CATEGORIES = Arrays.asList(new String[]{
-          "Display", "Communication", "Signal Input/Output", "Sensors",
-          "Device Control", "Timing", "Data Storage", "Data Processing", "Other",
-          "Uncategorized"});
+  private static final List<String> CATEGORIES = Arrays.asList(
+    "Display", "Communication", "Signal Input/Output", "Sensors",
+    "Device Control", "Timing", "Data Storage", "Data Processing", "Other",
+    "Uncategorized");
 
   public static UserLibrary create(File libFolder) throws IOException {
     // Parse metadata

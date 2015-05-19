@@ -397,7 +397,7 @@ public class Base {
       System.exit(0);
 
     } else if (parser.isInstallLibrary()) {
-      LibrariesIndexer indexer = new LibrariesIndexer(BaseNoGui.getSettingsFolder());
+      LibrariesIndexer indexer = new LibrariesIndexer(BaseNoGui.getSettingsFolder(), new ContributionsIndexer(BaseNoGui.getSettingsFolder()));
       LibraryInstaller installer = new LibraryInstaller(indexer) {
         private String lastStatus = "";
 
