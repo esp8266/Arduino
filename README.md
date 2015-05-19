@@ -7,7 +7,7 @@ This project brings support for ESP8266 chip to the Arduino environment. ESP8266
 
 ### Installing with Boards Manager ###
 
-Starting with 1.6.4, Arduino allows installation of third-party platform packages using Boards Manager. We have packages available for Windows, Mac OS, and Linux x64.
+Starting with 1.6.4, Arduino allows installation of third-party platform packages using Boards Manager. We have packages available for Windows, Mac OS, and Linux (32 and 64 bit).
 
 - Install Arduino 1.6.4 from the [Arduino website](http://www.arduino.cc/en/main/software).
 - Start Arduino and open Perferences window.
