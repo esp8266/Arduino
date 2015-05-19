@@ -439,9 +439,12 @@ public class FindReplace extends JFrame implements ActionListener {
     }
   }
 
-  public void setFindText(String t) {
-    findField.setText(t);
-    findString = t;
+  public void setFindText(String text) {
+    if (text == null) {
+      return;
+    }
+    findField.setText(text);
+    findString = text;
   }
 
   public void findNext() {

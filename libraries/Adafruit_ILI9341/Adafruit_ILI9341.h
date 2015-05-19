@@ -158,6 +158,13 @@ class Adafruit_ILI9341 : public Adafruit_GFX {
    void  writedata(uint8_t * data, uint8_t size);
    void  writeCmdData(uint8_t cmd, uint8_t * data, uint8_t size);
 
+
+   uint16_t getHeight(void);
+   uint16_t getWidth(void);
+
+   void area_update_start(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
+   void area_update_data(uint8_t *data, uint32_t pixel);
+   void area_update_end(void);
  private:
 
   uint8_t  spiread(void);
@@ -166,7 +173,7 @@ class Adafruit_ILI9341 : public Adafruit_GFX {
 #ifdef ESP8266
   inline void spiwrite(uint8_t data);
   inline void spiwrite16(uint16_t data);
-  inline void spiwriteBytes(uint8_t * data, uint8_t size);
+  inline void spiwriteBytes(uint8_t * data, uint32_t size);
   inline void spiwritePattern(uint8_t * data, uint8_t size, uint32_t repeat);
 
   inline void setAddrWindow_(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
