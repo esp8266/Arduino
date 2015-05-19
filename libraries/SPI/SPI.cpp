@@ -121,14 +121,14 @@ void SPIClass::setBitOrder(uint8_t bitOrder) {
  * @return
  */
 static uint32_t ClkRegToFreq(spiClk_t * reg) {
-    return (F_CPU / ((reg->regPre + 1) * (reg->regN + 1)));
+    return (SPI_MAX_SPEED / ((reg->regPre + 1) * (reg->regN + 1)));
 }
 
 void SPIClass::setFrequency(uint32_t freq) {
     static uint32_t lastSetFrequency = 0;
     static uint32_t lastSetRegister = 0;
 
-    if(freq >= F_CPU) {
+    if(freq >= SPI_MAX_SPEED) {
         setClockDivider(0x80000000);
         return;
     }
@@ -164,7 +164,7 @@ void SPIClass::setFrequency(uint32_t freq) {
         reg.regN = calN;
 
         while(calPreVari++ <= 1) { // test different variants for Pre (we calculate in int so we miss the decimals, testing is the easyest and fastest way)
-            calPre = (((F_CPU / (reg.regN + 1)) / freq) - 1) + calPreVari;
+            calPre = (((SPI_MAX_SPEED / (reg.regN + 1)) / freq) - 1) + calPreVari;
             if(calPre > 0x1FFF) {
                 reg.regPre = 0x1FFF; // 8191
             } else if(calPre <= 0) {
@@ -308,6 +308,13 @@ void SPIClass::write32(uint32_t data, bool msb) {
     while(SPI1CMD & SPIBUSY) {}
 }
 
+/**
+ * Note:
+ *  data need to be aligned to 32Bit
+ *  or you get an Fatal exception (9)
+ * @param data uint8_t *
+ * @param size uint32_t
+ */
 void SPIClass::writeBytes(uint8_t * data, uint32_t size) {
     while(size) {
         if(size > 64) {
@@ -340,6 +347,15 @@ void SPIClass::writeBytes_(uint8_t * data, uint8_t size) {
     while(SPI1CMD & SPIBUSY) {}
 }
 
+
+/**
+ * Note:
+ *  data need to be aligned to 32Bit
+ *  or you get an Fatal exception (9)
+ * @param data uint8_t *
+ * @param size uint8_t  max for size is 64Byte
+ * @param repeat uint32_t
+ */
 void SPIClass::writePattern(uint8_t * data, uint8_t size, uint32_t repeat) {
     if(size > 64) return; //max Hardware FIFO
 
@@ -376,6 +392,14 @@ void SPIClass::writePattern_(uint8_t * data, uint8_t size, uint8_t repeat) {
     writeBytes(&buffer[0], bytes);
 }
 
+/**
+ * Note:
+ *  in and out need to be aligned to 32Bit
+ *  or you get an Fatal exception (9)
+ * @param out uint8_t *
+ * @param in  uint8_t *
+ * @param size uint32_t
+ */
 void SPIClass::transferBytes(uint8_t * out, uint8_t * in, uint32_t size) {
     while(size) {
         if(size > 64) {

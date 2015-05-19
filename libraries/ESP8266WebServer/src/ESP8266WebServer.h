@@ -29,20 +29,22 @@
 enum HTTPMethod { HTTP_ANY, HTTP_GET, HTTP_POST, HTTP_PUT, HTTP_PATCH, HTTP_DELETE };
 enum HTTPUploadStatus { UPLOAD_FILE_START, UPLOAD_FILE_WRITE, UPLOAD_FILE_END };
 
+#define HTTP_DOWNLOAD_UNIT_SIZE 1460
+#define HTTP_UPLOAD_BUFLEN 2048
+
 typedef struct {
   HTTPUploadStatus status;
-  String filename;
-  String name;
-  String type;
-  size_t size;
-  size_t buflen;
-  uint8_t buf[1460];
+  String  filename;
+  String  name;
+  String  type;
+  size_t  totalSize;    // file size
+  size_t  currentSize;  // size of data currently in buf
+  uint8_t buf[HTTP_UPLOAD_BUFLEN];
 } HTTPUpload;
 
 class ESP8266WebServer
 {
 public:
-
   ESP8266WebServer(int port = 80);
   ~ESP8266WebServer();
 
@@ -58,7 +60,7 @@ public:
   String uri() { return _currentUri; }
   HTTPMethod method() { return _currentMethod; }
   WiFiClient client() { return _currentClient; }
-  HTTPUpload upload() { return _currentUpload; }
+  HTTPUpload& upload() { return _currentUpload; }
   
   String arg(const char* name);   // get request argument value by name
   String arg(int i);              // get request argument value by number
@@ -72,12 +74,30 @@ public:
   // content - actual content body
   void send(int code, const char* content_type = NULL, String content = String(""));
 
+  void sendHeader(String name, String value, bool first = false);
+  void sendContent(String content);
+
+template<typename T> size_t streamFile(T &file, String contentType){
+  String head = "HTTP/1.1 200 OK\r\nContent-Type: ";
+  head += contentType;
+  head += "\r\nContent-Length: ";
+  head += file.size();
+  head += "\r\nConnection: close";
+  head += "\r\nAccess-Control-Allow-Origin: *";
+  head += "\r\n\r\n";
+  _currentClient.print(head);
+  head = String();
+  return _currentClient.write(file, HTTP_DOWNLOAD_UNIT_SIZE);
+}
+  
 protected:
-  void _handleRequest(WiFiClient& client, String uri, HTTPMethod method);
+  void _handleRequest();
+  bool _parseRequest(WiFiClient& client);
   void _parseArguments(String data);
   static const char* _responseCodeToString(int code);
-  static void _appendHeader(String& response, const char* name, const char* value);
   void _parseForm(WiFiClient& client, String boundary, uint32_t len);
+  void _uploadWriteByte(uint8_t b);
+  uint8_t _uploadReadByte(WiFiClient& client);
   
   struct RequestHandler;
   struct RequestArgument {
@@ -94,6 +114,8 @@ protected:
   size_t           _currentArgCount;
   RequestArgument* _currentArgs;
   HTTPUpload       _currentUpload;
+
+  String           _responseHeaders;
 
   RequestHandler*  _firstHandler;
   RequestHandler*  _lastHandler;

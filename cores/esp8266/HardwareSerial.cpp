@@ -42,12 +42,12 @@ extern "C" {
 #define UART_TX_FIFO_SIZE 0x80
 
 struct uart_ {
-    int uart_nr;
+        int uart_nr;
     int baud_rate;
     bool rxEnabled;
     bool txEnabled;
-    uint8_t rxPin;
-    uint8_t txPin;
+        uint8_t rxPin;
+        uint8_t txPin;
 };
 
 static const int UART0 = 0;
@@ -120,7 +120,7 @@ void ICACHE_RAM_ATTR uart_interrupt_handler(uart_t* uart) {
     // -------------- UART 0 --------------
     if(Serial.isRxEnabled()) {
         while(U0IS & (1 << UIFF)) {
-            Serial._rx_complete_irq((char)(U0F & 0xff));
+            Serial._rx_complete_irq((char) (U0F & 0xff));
             U0IC = (1 << UIFF);
         }
     }
@@ -135,7 +135,7 @@ void ICACHE_RAM_ATTR uart_interrupt_handler(uart_t* uart) {
 
     if(Serial1.isRxEnabled()) {
         while(U1IS & (1 << UIFF)) {
-            Serial1._rx_complete_irq((char)(U1F & 0xff));
+            Serial1._rx_complete_irq((char) (U1F & 0xff));
             U1IC = (1 << UIFF);
         }
     }
@@ -357,19 +357,19 @@ void uart_swap(uart_t* uart) {
     switch(uart->uart_nr) {
         case UART0:
             if(uart->txPin == 1 && uart->rxPin == 3) {
-                pinMode(15, FUNCTION_4);//TX
-                pinMode(13, FUNCTION_4);//RX
+                pinMode(15, FUNCTION_4); //TX
+                pinMode(13, FUNCTION_4); //RX
                 USWAP |= (1 << USWAP0);
-                pinMode(1, INPUT);//TX
-                pinMode(3, INPUT);//RX
+                pinMode(1, INPUT); //TX
+                pinMode(3, INPUT); //RX
                 uart->rxPin = 13;
                 uart->txPin = 15;
             } else {
-                pinMode(1, SPECIAL);//TX
-                pinMode(3, SPECIAL);//RX
+                pinMode(1, SPECIAL); //TX
+                pinMode(3, SPECIAL); //RX
                 USWAP &= ~(1 << USWAP0);
-                pinMode(15, INPUT);//TX
-                pinMode(13, INPUT);//RX
+                pinMode(15, INPUT); //TX
+                pinMode(13, INPUT); //RX
                 uart->rxPin = 3;
                 uart->txPin = 1;
             }
@@ -392,30 +392,50 @@ void uart_ignore_char(char c) {
 
 void uart0_write_char(char c) {
     if(&Serial != NULL && Serial.isTxEnabled()) {
-        if(c == '\n') {
-            Serial.write('\r');
+        if(Serial.availableForWrite() > 0) {
+            if(c == '\n') {
+                Serial.write('\r');
+            }
+            Serial.write(c);
+            return;
         }
-        Serial.write(c);
-    } else {
-        if(c == '\n') {
-            USF(0) = '\r';
-        }
-        USF(0) = c;
     }
+
+    // wait for the Hardware FIFO
+    while(true) {
+        if(((USS(0) >> USTXC) & 0xff) <= (UART_TX_FIFO_SIZE - 2)) {
+            break;
+        }
+    }
+
+    if(c == '\n') {
+        USF(0) = '\r';
+    }
+    USF(0) = c;
 }
 
 void uart1_write_char(char c) {
     if(&Serial1 != NULL && Serial1.isTxEnabled()) {
-        if(c == '\n') {
-            Serial1.write('\r');
+        if(Serial1.availableForWrite() > 0) {
+            if(c == '\n') {
+                Serial1.write('\r');
+            }
+            Serial1.write(c);
+            return;
         }
-        Serial1.write(c);
-    } else {
-        if(c == '\n') {
-            USF(1) = '\r';
-        }
-        USF(1) = c;
     }
+
+    // wait for the Hardware FIFO
+    while(true) {
+        if(((USS(1) >> USTXC) & 0xff) <= (UART_TX_FIFO_SIZE - 2)) {
+            break;
+        }
+    }
+
+    if(c == '\n') {
+        USF(1) = '\r';
+    }
+    USF(1) = c;
 }
 
 static int s_uart_debug_nr = UART0;
@@ -465,11 +485,11 @@ void HardwareSerial::begin(unsigned long baud, byte config) {
     }
 
     if(_uart->rxEnabled) {
-        if (!_rx_buffer)
+        if(!_rx_buffer)
             _rx_buffer = new cbuf(SERIAL_RX_BUFFER_SIZE);
     }
     if(_uart->txEnabled) {
-        if (!_tx_buffer)
+        if(!_tx_buffer)
             _tx_buffer = new cbuf(SERIAL_TX_BUFFER_SIZE);
     }
     _written = false;

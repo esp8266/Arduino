@@ -38,6 +38,7 @@
 #include "user_interface.h"
 
 void* malloc(size_t size) {
+    size = ((size + 3) & ~((size_t)0x3));
     return os_malloc(size);
 }
 
@@ -46,6 +47,7 @@ void free(void* ptr) {
 }
 
 void* realloc(void* ptr, size_t size) {
+    size = ((size + 3) & ~((size_t)0x3));
     return os_realloc(ptr, size);
 }
 

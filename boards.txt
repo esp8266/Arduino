@@ -1,6 +1,7 @@
 menu.UploadSpeed=Upload Speed
 menu.CpuFrequency=CPU Frequency
-menu.FlashSize=Flash size
+menu.FlashSize=Flash Size
+menu.FlashFreq=Flash Frequency
 
 ##############################################################
 generic.name=Generic ESP8266 Module
@@ -21,6 +22,9 @@ generic.build.variant=generic
 generic.build.flash_mode=qio
 generic.build.flash_size=512K
 generic.build.flash_freq=40
+generic.build.flash_ld=eagle.flash.512k.ld
+generic.build.spiffs_start=0x6B000
+generic.build.spiffs_end=0x7B000
 
 generic.menu.CpuFrequency.80=80 MHz
 generic.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -46,16 +50,56 @@ generic.menu.UploadSpeed.512000.upload.speed=512000
 generic.menu.UploadSpeed.921600=921600
 generic.menu.UploadSpeed.921600.upload.speed=921600
 
-generic.menu.FlashSize.512K=512K
+generic.menu.FlashSize.512K=512K (64K SPIFFS)
 generic.menu.FlashSize.512K.build.flash_size=512K
-generic.menu.FlashSize.256K=256K
-generic.menu.FlashSize.256K.build.flash_size=256K
-generic.menu.FlashSize.1M=1M
-generic.menu.FlashSize.1M.build.flash_size=1M
-generic.menu.FlashSize.2M=2M
+generic.menu.FlashSize.512K.build.flash_ld=eagle.flash.512k.ld
+generic.menu.FlashSize.512K.build.spiffs_start=0x6B000
+generic.menu.FlashSize.512K.build.spiffs_end=0x7B000
+generic.menu.FlashSize.1M512=1M (512K SPIFFS)
+generic.menu.FlashSize.1M512.build.flash_size=1M
+generic.menu.FlashSize.1M512.build.flash_ld=eagle.flash.1m512.ld
+generic.menu.FlashSize.1M512.build.spiffs_start=0x6B000
+generic.menu.FlashSize.1M512.build.spiffs_end=0xFB000
+generic.menu.FlashSize.1M256=1M (256K SPIFFS)
+generic.menu.FlashSize.1M256.build.flash_size=1M
+generic.menu.FlashSize.1M256.build.flash_ld=eagle.flash.1m256.ld
+generic.menu.FlashSize.1M256.build.spiffs_start=0xAB000
+generic.menu.FlashSize.1M256.build.spiffs_end=0xFB000
+generic.menu.FlashSize.1M128=1M (128K SPIFFS)
+generic.menu.FlashSize.1M128.build.flash_size=1M
+generic.menu.FlashSize.1M128.build.flash_ld=eagle.flash.1m128.ld
+generic.menu.FlashSize.1M128.build.spiffs_start=0xCB000
+generic.menu.FlashSize.1M128.build.spiffs_end=0xFB000
+generic.menu.FlashSize.1M64=1M (64K SPIFFS)
+generic.menu.FlashSize.1M64.build.flash_size=1M
+generic.menu.FlashSize.1M64.build.flash_ld=eagle.flash.1m64.ld
+generic.menu.FlashSize.1M64.build.spiffs_start=0xEB000
+generic.menu.FlashSize.1M64.build.spiffs_end=0xFB000
+generic.menu.FlashSize.2M=2M (1M SPIFFS)
 generic.menu.FlashSize.2M.build.flash_size=2M
-generic.menu.FlashSize.4M=4M
+generic.menu.FlashSize.2M.build.flash_ld=eagle.flash.2m.ld
+generic.menu.FlashSize.2M.build.spiffs_start=0x100000
+generic.menu.FlashSize.2M.build.spiffs_end=0x1FB000
+generic.menu.FlashSize.4M=4M (3M SPIFFS)
 generic.menu.FlashSize.4M.build.flash_size=4M
+generic.menu.FlashSize.4M.build.flash_ld=eagle.flash.4m.ld
+generic.menu.FlashSize.4M.build.spiffs_start=0x100000
+generic.menu.FlashSize.4M.build.spiffs_end=0x3FB000
+generic.menu.FlashSize.8M=8M (7M SPIFFS)
+generic.menu.FlashSize.8M.build.flash_size=1M
+generic.menu.FlashSize.8M.build.flash_ld=eagle.flash.8m.ld
+generic.menu.FlashSize.8M.build.spiffs_start=0x100000
+generic.menu.FlashSize.8M.build.spiffs_end=0x800000
+generic.menu.FlashSize.16M=16M (15M SPIFFS)
+generic.menu.FlashSize.16M.build.flash_size=1M
+generic.menu.FlashSize.16M.build.flash_ld=eagle.flash.16m.ld
+generic.menu.FlashSize.16M.build.spiffs_start=0x100000
+generic.menu.FlashSize.16M.build.spiffs_end=0x1000000
+
+# generic.menu.FlashFreq.40=40MHz
+# generic.menu.FlashFreq.40.build.flash_freq=40
+# generic.menu.FlashFreq.80=80MHz
+# generic.menu.FlashFreq.80.build.flash_freq=80
 
 ##############################################################
 modwifi.name=Olimex MOD-WIFI-ESP8266(-DEV)
@@ -77,6 +121,9 @@ modwifi.build.variant=generic
 modwifi.build.flash_mode=qio
 modwifi.build.flash_size=2M
 modwifi.build.flash_freq=40
+modwifi.build.flash_ld=eagle.flash.2m.ld
+modwifi.build.spiffs_start=0x100000
+modwifi.build.spiffs_end=0x1FB000
 
 modwifi.menu.CpuFrequency.80=80 MHz
 modwifi.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -122,6 +169,9 @@ nodemcu.build.variant=nodemcu
 nodemcu.build.flash_mode=qio
 nodemcu.build.flash_size=4M
 nodemcu.build.flash_freq=40
+nodemcu.build.flash_ld=eagle.flash.4m.ld
+nodemcu.build.spiffs_start=0x100000
+nodemcu.build.spiffs_end=0x3FB000
 
 nodemcu.menu.CpuFrequency.80=80 MHz
 nodemcu.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -148,9 +198,6 @@ nodemcu.menu.UploadSpeed.512000.upload.speed=512000
 nodemcu.menu.UploadSpeed.921600=921600
 nodemcu.menu.UploadSpeed.921600.upload.speed=921600
 
-nodemcu.menu.FlashSize.4M=4M
-nodemcu.menu.FlashSize.4M.build.flash_size=4M
-
 ##############################################################
 # wifio.name=Wifio
 #
@@ -168,6 +215,9 @@ nodemcu.menu.FlashSize.4M.build.flash_size=4M
 # wifio.build.flash_mode=qio
 # wifio.build.flash_size=512K
 # wifio.build.flash_freq=40
+# wifio.build.flash_ld=eagle.flash.512k.ld
+# wifio.build.spiffs_start=0x6B000
+# wifio.build.spiffs_end=0x7B000
 #
 # wifio.menu.CpuFrequency.80=80MHz
 # wifio.menu.CpuFrequency.80.build.f_cpu=80000000L
