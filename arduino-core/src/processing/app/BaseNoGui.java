@@ -417,7 +417,7 @@ public class BaseNoGui {
    * within the header files at the top-level).
    */
   static public String[] headerListFromIncludePath(File path) throws IOException {
-    String[] list = path.list(new OnlyFilesWithExtension(".h"));
+    String[] list = path.list(new OnlyFilesWithExtension(".h", ".hh", ".hpp"));
     if (list == null) {
       throw new IOException();
     }
