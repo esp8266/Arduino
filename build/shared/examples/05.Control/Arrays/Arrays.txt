@@ -1,0 +1,1 @@
+A variation on the For Loop example that demonstrates how to use an array. 

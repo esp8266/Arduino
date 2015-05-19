@@ -1,18 +1,20 @@
 Arduino-compatible IDE with ESP8266 support
 ===========================================
 
+![Linux build status](http://img.shields.io/travis/igrr/Arduino.svg)
+
 This project brings support for ESP8266 chip to the Arduino environment. ESP8266WiFi library bundled with this project has the same interface as the WiFi Shield library, making it easy to re-use existing code and libraries.
 
-### Downloads ###
+### Installing with Boards Manager ###
 
-| OS | Build status | Latest release | Alpha Version |
-| --- | ------------ | -------------- | --------------- |
-| Linux | [![Linux build status](http://img.shields.io/travis/igrr/Arduino.svg)](https://travis-ci.org/igrr/Arduino) | [arduino-1.6.1-linux64.tar.xz](../../releases/download/1.6.1-esp8266-1/arduino-1.6.1-linux64.tar.xz) | |
-| Windows | [![Windows build status](http://img.shields.io/appveyor/ci/igrr/Arduino.svg)](https://ci.appveyor.com/project/igrr/Arduino) | [arduino-1.6.1-p1-windows.zip](https://github.com/igrr/Arduino/releases/download/1.6.1-esp8266-1/arduino-1.6.1-p1-windows.zip) |  [appveyor 64Bit Build](https://ci.appveyor.com/project/igrr/Arduino/build/artifacts) |
-| OS X |  | [arduino-1.6.1-macosx-java-latest-signed.zip](../../releases/download/1.6.1-esp8266-1/arduino-1.6.1-macosx-java-latest-signed.zip) | |
+Starting with 1.6.4, Arduino allows installation of third-party platform packages using Boards Manager. We have packages available for Windows, Mac OS, and Linux (32 and 64 bit).
 
+- Install Arduino 1.6.4 from the [Arduino website](http://www.arduino.cc/en/main/software).
+- Start Arduino and open Perferences window.
+- Enter ```http://arduino.esp8266.com/package_esp8266com_index.json``` into *Additional Board Manager URLs* field. You can add multiple URLs, separating them with commas.
+- Open Boards Manager from Tools > Board menu and install *esp8266* platform (and don't forget to select your ESP8266 board from Tools > Board menu after installation).
 
-### Building from source ###
+### Building latest version from source ###
 ```
 $ git clone https://github.com/esp8266/Arduino.git
 $ cd Arduino/build
@@ -20,8 +22,9 @@ $ ant dist
 ```
 
 ### Supported boards ###
-- [Wifio](http://wifio.cc)
 - Generic esp8266 modules (without auto-reset support)
+- NodeMCU
+- Olimex MOD-WIFI-ESP8266
 
 ### Things that work ###
 

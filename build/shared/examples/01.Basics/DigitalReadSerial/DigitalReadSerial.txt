@@ -1,0 +1,1 @@
+Read a switch, print the state out to the Arduino Serial Monitor.

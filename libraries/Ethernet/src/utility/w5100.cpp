@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 by Cristian Maglie <c.maglie@arduino.cc>
+ * Copyright (c) 2010 by Arduino LLC. All rights reserved.
  *
  * This file is free software; you can redistribute it and/or modify
  * it under the terms of either the GNU General Public License version 2
@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "utility/w5100.h"
+#include "w5100.h"
 
 // W5100 controller instance
 W5100Class W5100;

@@ -7,7 +7,7 @@
  can usually tell them by the 16-pin interface.
 
  This sketch prints to all the positions of the LCD using the
- setCursor(0 method:
+ setCursor() method:
 
   The circuit:
  * LCD RS pin to digital pin 12
@@ -56,9 +56,9 @@ void loop() {
   // loop from ASCII 'a' to ASCII 'z':
   for (int thisLetter = 'a'; thisLetter <= 'z'; thisLetter++) {
     // loop over the columns:
-    for (int thisCol = 0; thisCol < numRows; thisCol++) {
+    for (int  thisRow = 0; thisRow < numRows; thisRow++) {
       // loop over the rows:
-      for (int thisRow = 0; thisRow < numCols; thisRow++) {
+      for (int thisCol = 0; thisCol < numCols; thisCol++) {
         // set the cursor position:
         lcd.setCursor(thisCol, thisRow);
         // print the letter:

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 CURDIR=`pwd`
 APPDIR="$(dirname -- "$(readlink -f -- "${0}")" )"
@@ -20,5 +20,13 @@ export LD_LIBRARY_PATH
 
 export PATH="${APPDIR}/java/bin:${PATH}"
 
-java -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel processing.app.Base --curdir $CURDIR "$@"
+if [[ "$@" == *"--upload"* || "$@" == *"--verify"* || "$@" == *"--get-pref"* || "$@" == *"--install-board"* || "$@" == *"--install-library"* ]] ; then
+	SPLASH=""
+else
+	SPLASH="-splash:./lib/splash.png"
+fi
+
+export JAVA_TOOL_OPTIONS=`echo $JAVA_TOOL_OPTIONS | sed 's|-javaagent:/usr/share/java/jayatanaag.jar||g'`
+
+java -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel $SPLASH processing.app.Base --curdir $CURDIR "$@"
 

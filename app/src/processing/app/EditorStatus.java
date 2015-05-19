@@ -219,7 +219,7 @@ public class EditorStatus extends JPanel /*implements ActionListener*/ {
   
   public void unprogress()
   {
-    if (Preferences.getBoolean("editor.beep.compile")) {
+    if (PreferencesData.getBoolean("editor.beep.compile")) {
       Toolkit.getDefaultToolkit().beep();
     }
     if (progressBar == null) return;
@@ -464,10 +464,10 @@ public class EditorStatus extends JPanel /*implements ActionListener*/ {
       copyErrorButton.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           String message = "";
-          message += _("Arduino: ") + BaseNoGui.VERSION_NAME + " (" + System.getProperty("os.name") + "), ";
+          message += _("Arduino: ") + BaseNoGui.VERSION_NAME_LONG + " (" + System.getProperty("os.name") + "), ";
           message += _("Board: ") + "\"" + Base.getBoardPreferences().get("name") + "\"\n\n";
           message += editor.console.consoleTextPane.getText().trim();
-          if ((Preferences.getBoolean("build.verbose")) == false) {
+          if ((PreferencesData.getBoolean("build.verbose")) == false) {
             message += "\n\n";
             message += "  " + _("This report would have more information with") + "\n";
             message += "  \"" + _("Show verbose output during compilation") + "\"\n";

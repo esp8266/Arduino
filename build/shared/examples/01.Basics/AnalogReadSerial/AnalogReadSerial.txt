@@ -1,0 +1,1 @@
+Read a potentiometer, print its state out to the Arduino Serial Monitor. 

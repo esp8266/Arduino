@@ -30,6 +30,7 @@
 #include "Print.h"
 extern "C" {
 #include "c_types.h"
+#include "ets_sys.h"
 }
 
 // Public Methods //////////////////////////////////////////////////////////////
@@ -41,6 +42,16 @@ size_t ICACHE_FLASH_ATTR Print::write(const uint8_t *buffer, size_t size) {
         n += write(*buffer++);
     }
     return n;
+}
+
+size_t Print::printf(const char *format, ...) {
+  va_list arg;
+  va_start(arg, format);
+  char temp[256];
+  size_t len = ets_vsnprintf(temp, 256, format, arg);
+  len = print(temp);
+  va_end(arg);
+  return len;
 }
 
 size_t ICACHE_FLASH_ATTR Print::print(const __FlashStringHelper *ifsh) {

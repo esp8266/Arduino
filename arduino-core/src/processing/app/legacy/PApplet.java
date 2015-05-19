@@ -1,16 +1,6 @@
 package processing.app.legacy;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
@@ -276,15 +266,26 @@ public class PApplet {
   }
 
   static public String[] loadStrings(File file) {
-    InputStream is = createInput(file);
-    if (is != null) return loadStrings(is);
-    return null;
+    InputStream is = null;
+    try {
+      is = createInput(file);
+      if (is != null) return loadStrings(is);
+      return null;
+    } finally {
+      if (is != null) {
+        try {
+          is.close();
+        } catch (IOException e) {
+          // noop
+        }
+      }
+    }
   }
 
   static public String[] loadStrings(InputStream input) {
+    BufferedReader reader = null;
     try {
-      BufferedReader reader =
-        new BufferedReader(new InputStreamReader(input, "UTF-8"));
+      reader = new BufferedReader(new InputStreamReader(input, "UTF-8"));
 
       String lines[] = new String[100];
       int lineCount = 0;
@@ -297,7 +298,6 @@ public class PApplet {
         }
         lines[lineCount++] = line;
       }
-      reader.close();
 
       if (lineCount == lines.length) {
         return lines;
@@ -311,6 +311,15 @@ public class PApplet {
     } catch (IOException e) {
       e.printStackTrace();
       //throw new RuntimeException("Error inside loadStrings()");
+    } finally {
+      if (reader != null) {
+        try {
+          reader.close();
+        } catch (IOException e) {
+          //ignore
+        }
+      }
+
     }
     return null;
   }
@@ -321,14 +330,29 @@ public class PApplet {
 
 
   static public void saveStrings(File file, String strings[]) {
-    saveStrings(createOutput(file), strings);
+    OutputStream outputStream = null;
+    try {
+      outputStream = createOutput(file);
+      saveStrings(outputStream, strings);
+    } finally {
+      if (outputStream != null) {
+        try {
+          outputStream.close();
+        } catch (IOException e) {
+          //noop
+        }
+      }
+    }
   }
 
 
   static public void saveStrings(OutputStream output, String strings[]) {
     PrintWriter writer = createWriter(output);
-    for (int i = 0; i < strings.length; i++) {
-      writer.println(strings[i]);
+    if (writer == null) {
+      return;
+    }
+    for (String string : strings) {
+      writer.println(string);
     }
     writer.flush();
     writer.close();

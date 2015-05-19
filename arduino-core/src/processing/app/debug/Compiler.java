@@ -25,13 +25,7 @@ package processing.app.debug;
 
 import static processing.app.I18n._;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -45,6 +39,9 @@ import cc.arduino.packages.BoardPort;
 import cc.arduino.packages.Uploader;
 import cc.arduino.packages.UploaderFactory;
 
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.ExecuteStreamHandler;
 import processing.app.BaseNoGui;
 import processing.app.I18n;
 import processing.app.PreferencesData;
@@ -52,10 +49,12 @@ import processing.app.SketchCode;
 import processing.app.SketchData;
 import processing.app.helpers.*;
 import processing.app.helpers.filefilters.OnlyDirs;
-import processing.app.packages.Library;
 import processing.app.packages.LibraryList;
 import processing.app.preproc.PdePreprocessor;
 import processing.app.legacy.PApplet;
+import processing.app.packages.LegacyUserLibrary;
+import processing.app.packages.UserLibrary;
+import processing.app.tools.DoubleQuotedArgumentsOnWindowsCommandLine;
 
 public class Compiler implements MessageConsumer {
 
@@ -68,6 +67,7 @@ public class Compiler implements MessageConsumer {
   private SketchData sketch;
   private PreferencesMap prefs;
   private boolean verbose;
+  private boolean saveHex;
 
   private List<File> objectFiles;
 
@@ -84,7 +84,7 @@ public class Compiler implements MessageConsumer {
 
   private ProgressListener progressListener;
 
-  static public String build(SketchData data, String buildPath, File tempBuildFolder, ProgressListener progListener, boolean verbose) throws RunnerException, PreferencesMapException {
+  static public String build(SketchData data, String buildPath, File tempBuildFolder, ProgressListener progListener, boolean verbose, boolean save) throws RunnerException, PreferencesMapException {
     if (SketchData.checkSketchFile(data.getPrimaryFile()) == null)
       BaseNoGui.showError(_("Bad file selected"),
                           _("Bad sketch primary file or bad sketch directory structure"), null);
@@ -113,9 +113,16 @@ public class Compiler implements MessageConsumer {
     
     // compile the program. errors will happen as a RunnerException
     // that will bubble up to whomever called build().
-    if (compiler.compile(verbose)) {
-      compiler.size(compiler.getBuildPreferences());
-      return primaryClassName;
+    try {
+      if (compiler.compile(verbose, save)) {
+        compiler.size(compiler.getBuildPreferences());
+        return primaryClassName;
+      }
+    } catch (RunnerException e) {
+      // when the compile fails, take this opportunity to show
+      // any helpful info possible before throwing the exception
+      compiler.adviseDuplicateLibraries();
+      throw e;
     }
     return null;
   }
@@ -182,6 +189,9 @@ public class Compiler implements MessageConsumer {
       throws RunnerException {
     sketch = _sketch;
     prefs = createBuildPreferences(_buildPath, _primaryClassName);
+
+    // provide access to the source tree
+    prefs.put("build.source.path", _sketch.getFolder().getAbsolutePath());
 
     // Start with an empty progress listener
     progressListener = new ProgressListener() {
@@ -311,10 +321,10 @@ public class Compiler implements MessageConsumer {
       if (maxDataSize > 0) {
         System.out
             .println(I18n
-                .format(
-                        _("Global variables use {0} bytes ({2}%%) of dynamic memory, leaving {3} bytes for local variables. Maximum is {1} bytes."),
-                        dataSize, maxDataSize, dataSize * 100 / maxDataSize,
-                        maxDataSize - dataSize));
+                    .format(
+                            _("Global variables use {0} bytes ({2}%%) of dynamic memory, leaving {3} bytes for local variables. Maximum is {1} bytes."),
+                            dataSize, maxDataSize, dataSize * 100 / maxDataSize,
+                            maxDataSize - dataSize));
       } else {
         System.out.println(I18n
             .format(_("Global variables use {0} bytes of dynamic memory."), dataSize));
@@ -341,11 +351,16 @@ public class Compiler implements MessageConsumer {
    * @return true if successful.
    * @throws RunnerException Only if there's a problem. Only then.
    */
-  public boolean compile(boolean _verbose) throws RunnerException, PreferencesMapException {
+  public boolean compile(boolean _verbose, boolean _save) throws RunnerException, PreferencesMapException {
     preprocess(prefs.get("build.path"));
     
     verbose = _verbose || PreferencesData.getBoolean("build.verbose");
+    saveHex = _save;
     sketchIsCompiled = false;
+
+    // Hook runs at Start of Compilation
+    runActions("hooks.prebuild", prefs);
+
     objectFiles = new ArrayList<File>();
 
     // 0. include paths for core + all libraries
@@ -354,11 +369,15 @@ public class Compiler implements MessageConsumer {
     includeFolders.add(prefs.getFile("build.core.path"));
     if (prefs.getFile("build.variant.path") != null)
       includeFolders.add(prefs.getFile("build.variant.path"));
-    for (Library lib : importedLibraries) {
-      if (verbose)
+    for (UserLibrary lib : importedLibraries) {
+      if (verbose) {
+        String legacy = "";
+        if (lib instanceof LegacyUserLibrary)
+          legacy = "(legacy)";
         System.out.println(I18n
             .format(_("Using library {0} in folder: {1} {2}"), lib.getName(),
-                    lib.getFolder(), lib.isLegacy() ? "(legacy)" : ""));
+                    lib.getInstalledFolder(), legacy));
+      }
       includeFolders.add(lib.getSrcFolder());
     }
     if (verbose)
@@ -370,7 +389,7 @@ public class Compiler implements MessageConsumer {
       String[] overrides = prefs.get("architecture.override_check").split(",");
       archs.addAll(Arrays.asList(overrides));
     }
-    for (Library lib : importedLibraries) {
+    for (UserLibrary lib : importedLibraries) {
       if (!lib.supportsArchitecture(archs)) {
         System.err.println(I18n
             .format(_("WARNING: library {0} claims to run on {1} "
@@ -382,26 +401,26 @@ public class Compiler implements MessageConsumer {
     }
     
     // 1. compile the sketch (already in the buildPath)
-    progressListener.progress(30);
+    progressListener.progress(20);
     compileSketch(includeFolders);
     sketchIsCompiled = true;
 
     // 2. compile the libraries, outputting .o files to: <buildPath>/<library>/
     // Doesn't really use configPreferences
-    progressListener.progress(40);
+    progressListener.progress(30);
     compileLibraries(includeFolders);
 
     // 3. compile the core, outputting .o files to <buildPath> and then
     // collecting them into the core.a library file.
-    progressListener.progress(50);
+    progressListener.progress(40);
     compileCore();
 
     // 4. link it all together into the .elf file
-    progressListener.progress(60);
+    progressListener.progress(50);
     compileLink();
 
     // 5. run objcopy to generate output files
-    progressListener.progress(75);
+    progressListener.progress(60);
     List<String> objcopyPatterns = new ArrayList<String>();
     for (String key : prefs.keySet()) {
       if (key.startsWith("recipe.objcopy.") && key.endsWith(".pattern"))
@@ -412,8 +431,37 @@ public class Compiler implements MessageConsumer {
       runRecipe(recipe);
     }
 
+    // 7. save the hex file
+    if (saveHex) {
+      progressListener.progress(80);
+      saveHex();
+    }
+
     progressListener.progress(90);
+
+    // Hook runs at End of Compilation
+    runActions("hooks.postbuild", prefs);
+    adviseDuplicateLibraries();
+
     return true;
+  }
+
+  private void adviseDuplicateLibraries() {
+    for (int i=0; i < importedDuplicateHeaders.size(); i++) {
+      System.out.println(I18n.format(_("Multiple libraries were found for \"{0}\""),
+        importedDuplicateHeaders.get(i)));
+      boolean first = true;
+      for (UserLibrary lib : importedDuplicateLibraries.get(i)) {
+        if (first) {
+          System.out.println(I18n.format(_(" Used: {0}"),
+            lib.getInstalledFolder().getPath()));
+          first = false;
+        } else {
+          System.out.println(I18n.format(_(" Not used: {0}"),
+            lib.getInstalledFolder().getPath()));
+        }
+      }
+    }
   }
 
   private PreferencesMap createBuildPreferences(String _buildPath,
@@ -460,6 +508,13 @@ public class Compiler implements MessageConsumer {
     p.put("build.path", _buildPath);
     p.put("build.project_name", _primaryClassName);
     p.put("build.arch", targetPlatform.getId().toUpperCase());
+    File sketch_data = sketch.getDataFolder();
+    if(sketch_data.exists()){
+      p.put("build.sketch_data", sketch_data.getAbsolutePath());
+    } else {
+      p.put("build.sketch_data", "");
+    }
+    
     
     // Platform.txt should define its own compiler.path. For
     // compatibility with earlier 1.5 versions, we define a (ugly,
@@ -640,7 +695,6 @@ public class Compiler implements MessageConsumer {
     command = stringList.toArray(new String[stringList.size()]);
     if (command.length == 0)
       return;
-    int result = 0;
 
     if (verbose) {
       for (String c : command)
@@ -648,30 +702,57 @@ public class Compiler implements MessageConsumer {
       System.out.println();
     }
 
-    Process process;
+    DefaultExecutor executor = new DefaultExecutor();
+    executor.setStreamHandler(new ExecuteStreamHandler() {
+      @Override
+      public void setProcessInputStream(OutputStream os) throws IOException {
+
+      }
+
+      @Override
+      public void setProcessErrorStream(InputStream is) throws IOException {
+        forwardToMessage(is);
+      }
+
+      @Override
+      public void setProcessOutputStream(InputStream is) throws IOException {
+        forwardToMessage(is);
+      }
+
+      private void forwardToMessage(InputStream is) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        String line;
+        while ((line = reader.readLine()) != null) {
+          message(line + "\n");
+        }
+      }
+
+      @Override
+      public void start() throws IOException {
+
+      }
+
+      @Override
+      public void stop() {
+
+      }
+    });
+
+    CommandLine commandLine = new DoubleQuotedArgumentsOnWindowsCommandLine(command[0]);
+    for (int i = 1; i < command.length; i++) {
+      commandLine.addArgument(command[i], false);
+    }
+
+    int result;
+    executor.setExitValues(null);
     try {
-      process = ProcessUtils.exec(command);
+      result = executor.execute(commandLine);
     } catch (IOException e) {
       RunnerException re = new RunnerException(e.getMessage());
       re.hideStackTrace();
       throw re;
     }
-
-    MessageSiphon in = new MessageSiphon(process.getInputStream(), this);
-    MessageSiphon err = new MessageSiphon(process.getErrorStream(), this);
-
-    // wait for the process to finish.  if interrupted
-    // before waitFor returns, continue waiting
-    boolean compiling = true;
-    while (compiling) {
-      try {
-        in.join();
-        err.join();
-        result = process.waitFor();
-        //System.out.println("result is " + result);
-        compiling = false;
-      } catch (InterruptedException ignored) { }
-    }
+    executor.setExitValues(new int[0]);
 
     // an error was queued up by message(), barf this back to compile(),
     // which will barf it back to Editor. if you're having trouble
@@ -713,10 +794,10 @@ public class Compiler implements MessageConsumer {
         s = s.substring(0, i) + s.substring(i + (buildPath + File.separator).length());
       }
     }
-  
+
     // look for error line, which contains file name, line number,
     // and at least the first line of the error message
-    String errorFormat = "([\\w\\d_]+.\\w+):(\\d+):\\s*error:\\s*(.*)\\s*";
+    String errorFormat = "(.+\\.\\w+):(\\d+)(:\\d+)*:\\s*error:\\s*(.*)\\s*";
     String[] pieces = PApplet.match(s, errorFormat);
 
 //    if (pieces != null && exception == null) {
@@ -725,56 +806,56 @@ public class Compiler implements MessageConsumer {
 //    }
     
     if (pieces != null) {
-      String error = pieces[3], msg = "";
+      String error = pieces[pieces.length - 1], msg = "";
       
-      if (pieces[3].trim().equals("SPI.h: No such file or directory")) {
+      if (error.trim().equals("SPI.h: No such file or directory")) {
         error = _("Please import the SPI library from the Sketch > Import Library menu.");
         msg = _("\nAs of Arduino 0019, the Ethernet library depends on the SPI library." +
               "\nYou appear to be using it or another library that depends on the SPI library.\n\n");
       }
       
-      if (pieces[3].trim().equals("'BYTE' was not declared in this scope")) {
+      if (error.trim().equals("'BYTE' was not declared in this scope")) {
         error = _("The 'BYTE' keyword is no longer supported.");
         msg = _("\nAs of Arduino 1.0, the 'BYTE' keyword is no longer supported." +
               "\nPlease use Serial.write() instead.\n\n");
       }
       
-      if (pieces[3].trim().equals("no matching function for call to 'Server::Server(int)'")) {
+      if (error.trim().equals("no matching function for call to 'Server::Server(int)'")) {
         error = _("The Server class has been renamed EthernetServer.");
         msg = _("\nAs of Arduino 1.0, the Server class in the Ethernet library " +
               "has been renamed to EthernetServer.\n\n");
       }
       
-      if (pieces[3].trim().equals("no matching function for call to 'Client::Client(byte [4], int)'")) {
+      if (error.trim().equals("no matching function for call to 'Client::Client(byte [4], int)'")) {
         error = _("The Client class has been renamed EthernetClient.");
         msg = _("\nAs of Arduino 1.0, the Client class in the Ethernet library " +
               "has been renamed to EthernetClient.\n\n");
       }
       
-      if (pieces[3].trim().equals("'Udp' was not declared in this scope")) {
+      if (error.trim().equals("'Udp' was not declared in this scope")) {
         error = _("The Udp class has been renamed EthernetUdp.");
         msg = _("\nAs of Arduino 1.0, the Udp class in the Ethernet library " +
               "has been renamed to EthernetUdp.\n\n");
       }
       
-      if (pieces[3].trim().equals("'class TwoWire' has no member named 'send'")) {
+      if (error.trim().equals("'class TwoWire' has no member named 'send'")) {
         error = _("Wire.send() has been renamed Wire.write().");
         msg = _("\nAs of Arduino 1.0, the Wire.send() function was renamed " +
               "to Wire.write() for consistency with other libraries.\n\n");
       }
       
-      if (pieces[3].trim().equals("'class TwoWire' has no member named 'receive'")) {
+      if (error.trim().equals("'class TwoWire' has no member named 'receive'")) {
         error = _("Wire.receive() has been renamed Wire.read().");
         msg = _("\nAs of Arduino 1.0, the Wire.receive() function was renamed " +
               "to Wire.read() for consistency with other libraries.\n\n");
       }
 
-      if (pieces[3].trim().equals("'Mouse' was not declared in this scope")) {
+      if (error.trim().equals("'Mouse' was not declared in this scope")) {
         error = _("'Mouse' only supported on the Arduino Leonardo");
         //msg = _("\nThe 'Mouse' class is only supported on the Arduino Leonardo.\n\n");
       }
       
-      if (pieces[3].trim().equals("'Keyboard' was not declared in this scope")) {
+      if (error.trim().equals("'Keyboard' was not declared in this scope")) {
         error = _("'Keyboard' only supported on the Arduino Leonardo");
         //msg = _("\nThe 'Keyboard' class is only supported on the Arduino Leonardo.\n\n");
       }
@@ -792,13 +873,15 @@ public class Compiler implements MessageConsumer {
         SketchCode code = sketch.getCode(e.getCodeIndex());
         String fileName = (code.isExtension("ino") || code.isExtension("pde")) ? code.getPrettyName() : code.getFileName();
         int lineNum = e.getCodeLine() + 1;
-        s = fileName + ":" + lineNum + ": error: " + pieces[3] + msg;        
+        s = fileName + ":" + lineNum + ": error: " + error + msg;
       }
-            
-      if (exception == null && e != null) {
-        exception = e;
-        exception.hideStackTrace();
-      }      
+
+      if (e != null) {
+        if (exception == null || exception.getMessage().equals(e.getMessage())) {
+          exception = e;
+          exception.hideStackTrace();
+        }
+      }
     }
     
     if (s.contains("undefined reference to `SPIClass::begin()'") &&
@@ -824,11 +907,26 @@ public class Compiler implements MessageConsumer {
     dict.put("source_file", sourceFile.getAbsolutePath());
     dict.put("object_file", objectFile.getAbsolutePath());
 
+    setupWarningFlags(dict);
+
     String cmd = prefs.getOrExcept(recipe);
     try {
       return StringReplacer.formatAndSplit(cmd, dict, true);
     } catch (Exception e) {
       throw new RunnerException(e);
+    }
+  }
+
+  private void setupWarningFlags(PreferencesMap dict) {
+    if (dict.containsKey("compiler.warning_level")) {
+      String key = "compiler.warning_flags." + dict.get("compiler.warning_level");
+      dict.put("compiler.warning_flags", dict.get(key));
+    } else {
+      dict.put("compiler.warning_flags", dict.get("compiler.warning_flags.none"));
+    }
+
+    if (dict.get("compiler.warning_flags") == null) {
+      dict.remove("compiler.warning_flags");
     }
   }
 
@@ -879,21 +977,21 @@ public class Compiler implements MessageConsumer {
   // 2. compile the libraries, outputting .o files to:
   // <buildPath>/<library>/
   void compileLibraries(List<File> includeFolders) throws RunnerException, PreferencesMapException {
-    for (Library lib : importedLibraries) {
+    for (UserLibrary lib : importedLibraries) {
       compileLibrary(lib, includeFolders);
     }
   }
 
-  private void compileLibrary(Library lib, List<File> includeFolders)
+  private void compileLibrary(UserLibrary lib, List<File> includeFolders)
           throws RunnerException, PreferencesMapException {
     File libFolder = lib.getSrcFolder();
     File libBuildFolder = prefs.getFile(("build.path"), lib.getName());
-
+    
     if (lib.useRecursion()) {
       // libBuildFolder == {build.path}/LibName
       // libFolder      == {lib.path}/src
       recursiveCompileFilesInFolder(libBuildFolder, libFolder, includeFolders);
-
+      
     } else {
       // libFolder          == {lib.path}/
       // utilityFolder      == {lib.path}/utility
@@ -901,11 +999,11 @@ public class Compiler implements MessageConsumer {
       // utilityBuildFolder == {build.path}/LibName/utility
       File utilityFolder = new File(libFolder, "utility");
       File utilityBuildFolder = new File(libBuildFolder, "utility");
-
+      
       includeFolders.add(utilityFolder);
       compileFilesInFolder(libBuildFolder, libFolder, includeFolders);
       compileFilesInFolder(utilityBuildFolder, utilityFolder, includeFolders);
-
+      
       // other libraries should not see this library's utility/ folder
       includeFolders.remove(utilityFolder);
     }
@@ -1024,6 +1122,8 @@ public class Compiler implements MessageConsumer {
     dict.put("object_files", objectFileList);
     dict.put("ide_version", "" + BaseNoGui.REVISION);
 
+    setupWarningFlags(dict);
+
     String[] cmdArray;
     String cmd = prefs.getOrExcept("recipe.c.combine.pattern");
     try {
@@ -1032,6 +1132,18 @@ public class Compiler implements MessageConsumer {
       throw new RunnerException(e);
     }
     execAsynchronously(cmdArray);
+  }
+
+  void runActions(String recipeClass, PreferencesMap prefs) throws RunnerException, PreferencesMapException {
+    List<String> patterns = new ArrayList<String>();
+    for (String key : prefs.keySet()) {
+    if (key.startsWith("recipe."+recipeClass) && key.endsWith(".pattern"))
+      patterns.add(key);
+    }
+    Collections.sort(patterns);
+    for (String recipe : patterns) {
+      runRecipe(recipe);
+    }
   }
 
   void runRecipe(String recipe) throws RunnerException, PreferencesMapException {
@@ -1047,6 +1159,32 @@ public class Compiler implements MessageConsumer {
     }
     execAsynchronously(cmdArray);
   }
+  
+  //7. Save the .hex file
+  void saveHex() throws RunnerException {
+    if (!prefs.containsKey("recipe.output.tmp_file") || !prefs.containsKey("recipe.output.save_file")) {
+      System.err.println(_("Warning: This core does not support exporting sketches. Please consider upgrading it or contacting its author"));
+      return;
+    }
+
+    PreferencesMap dict = new PreferencesMap(prefs);
+    dict.put("ide_version", "" + BaseNoGui.REVISION);
+
+    try {
+      String compiledSketch = prefs.getOrExcept("recipe.output.tmp_file");
+      compiledSketch = StringReplacer.replaceFromMapping(compiledSketch, dict);
+      String copyOfCompiledSketch = prefs.getOrExcept("recipe.output.save_file");
+      copyOfCompiledSketch = StringReplacer.replaceFromMapping(copyOfCompiledSketch, dict);
+
+      File compiledSketchFile = new File(prefs.get("build.path"), compiledSketch);
+      File copyOfCompiledSketchFile = new File(sketch.getFolder(), copyOfCompiledSketch);
+
+      FileUtils.copyFile(compiledSketchFile, copyOfCompiledSketchFile);
+    } catch (Exception e) {
+      throw new RunnerException(e);
+    }
+  }
+  
 
   private static String prepareIncludes(List<File> includeFolders) {
     String res = "";
@@ -1113,12 +1251,12 @@ public class Compiler implements MessageConsumer {
     // 2. run preproc on that code using the sugg class name
     //    to create a single .java file and write to buildpath
 
+    FileOutputStream outputStream = null;
     try {
       // Output file
       File streamFile = new File(buildPath, sketch.getName() + ".cpp");
-      FileOutputStream outputStream = new FileOutputStream(streamFile);
+      outputStream = new FileOutputStream(streamFile);
       preprocessor.write(outputStream);
-      outputStream.close();
     } catch (FileNotFoundException fnfe) {
       fnfe.printStackTrace();
       String msg = _("Build folder disappeared or could not be written");
@@ -1133,15 +1271,32 @@ public class Compiler implements MessageConsumer {
       System.err.println(I18n.format(_("Uncaught exception type: {0}"), ex.getClass()));
       ex.printStackTrace();
       throw new RunnerException(ex.toString());
+    } finally {
+      if (outputStream != null) {
+        try {
+          outputStream.close();
+        } catch (IOException e) {
+          //noop
+        }
+      }
     }
 
     // grab the imports from the code just preproc'd
 
     importedLibraries = new LibraryList();
+    importedDuplicateHeaders = new ArrayList<String>();
+    importedDuplicateLibraries = new ArrayList<LibraryList>();
     for (String item : preprocessor.getExtraImports()) {
-      Library lib = BaseNoGui.importToLibraryTable.get(item);
-      if (lib != null && !importedLibraries.contains(lib)) {
-        importedLibraries.add(lib);
+      LibraryList list = BaseNoGui.importToLibraryTable.get(item);
+      if (list != null) {
+        UserLibrary lib = list.peekFirst();
+        if (lib != null && !importedLibraries.contains(lib)) {
+          importedLibraries.add(lib);
+          if (list.size() > 1) {
+            importedDuplicateHeaders.add(item);
+            importedDuplicateLibraries.add(list);
+          }
+        }
       }
     }
 
@@ -1173,6 +1328,8 @@ public class Compiler implements MessageConsumer {
    * List of library folders.
    */
   private LibraryList importedLibraries;
+  private List<String>      importedDuplicateHeaders;
+  private List<LibraryList> importedDuplicateLibraries;
 
   /**
    * Map an error from a set of processed .java files back to its location

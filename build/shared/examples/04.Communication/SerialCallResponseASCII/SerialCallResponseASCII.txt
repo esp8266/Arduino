@@ -1,0 +1,1 @@
+Send multiple variables using a call-and-response (handshaking) method, and ASCII-encode the values before sending. 

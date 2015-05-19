@@ -24,11 +24,11 @@ public class I18n {
 
   // prompt text stuff
 
-  static String PROMPT_YES;
-  static String PROMPT_NO;
-  static String PROMPT_CANCEL;
-  static String PROMPT_OK;
-  static String PROMPT_BROWSE;
+  public static String PROMPT_YES;
+  public static String PROMPT_NO;
+  public static String PROMPT_CANCEL;
+  public static String PROMPT_OK;
+  public static String PROMPT_BROWSE;
 
   static protected void init(String language) throws MissingResourceException {
     String[] languageParts = language.split("_");

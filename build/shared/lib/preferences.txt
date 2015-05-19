@@ -86,13 +86,15 @@ editor.window.height.min = 290
 # tested to be 515 on Windows XP, this leaves some room
 #editor.window.height.min.windows = 530
 
+# Enable code folding 
+editor.code_folding=false
 
 # font size for editor
 editor.font=Monospaced,plain,12
 # Monaco is nicer on Mac OS X, so use that explicitly
-editor.font.macosx = Monaco,plain,10
+editor.font.macosx = Monaco,plain,12
 
-# anti-aliased text, turned off by default
+# anti-aliased text, turned on by default
 editor.antialias=true
 
 # color to be used for background when 'external editor' enabled

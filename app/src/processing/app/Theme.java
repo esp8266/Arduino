@@ -21,15 +21,19 @@
 
 package processing.app;
 
-import static processing.app.I18n._;
-
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.SystemColor;
-
+import processing.app.helpers.OSUtils;
 import processing.app.helpers.PreferencesHelper;
 import processing.app.helpers.PreferencesMap;
-import processing.app.syntax.SyntaxStyle;
+
+import javax.swing.text.StyleContext;
+import java.awt.*;
+import java.awt.font.TextAttribute;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
+
+import static processing.app.I18n._;
 
 /**
  * Storage class for theme settings. This was separated from the Preferences
@@ -38,17 +42,21 @@ import processing.app.syntax.SyntaxStyle;
  */
 public class Theme {
 
-  /** Copy of the defaults in case the user mangles a preference. */
+  /**
+   * Copy of the defaults in case the user mangles a preference.
+   */
   static PreferencesMap defaults;
-  /** Table of attributes/values for the theme. */
+  /**
+   * Table of attributes/values for the theme.
+   */
   static PreferencesMap table = new PreferencesMap();
 
   static protected void init() {
     try {
-      table.load(Base.getLibStream("theme/theme.txt"));
+      table.load(new File(BaseNoGui.getContentFile("lib"), "theme/theme.txt"));
     } catch (Exception te) {
       Base.showError(null, _("Could not read color theme settings.\n" +
-                             "You'll need to reinstall Arduino."), te);
+              "You'll need to reinstall Arduino."), te);
     }
 
     // other things that have to be set explicitly for the defaults
@@ -104,7 +112,41 @@ public class Theme {
     return font;
   }
 
-  static public SyntaxStyle getStyle(String what) {
+  /**
+   * Returns the default font for text areas.
+   *
+   * @return The default font.
+   */
+  public static final Font getDefaultFont() {
+
+    // Use StyleContext to get a composite font for better Asian language
+    // support; see Sun bug S282887.
+    StyleContext sc = StyleContext.getDefaultStyleContext();
+    Font font = null;
+
+    if (OSUtils.isMacOS()) {
+      // Snow Leopard (1.6) uses Menlo as default monospaced font,
+      // pre-Snow Leopard used Monaco.
+      font = sc.getFont("Menlo", Font.PLAIN, 12);
+      if (!"Menlo".equals(font.getFamily())) {
+        font = sc.getFont("Monaco", Font.PLAIN, 12);
+        if (!"Monaco".equals(font.getFamily())) { // Shouldn't happen
+          font = sc.getFont("Monospaced", Font.PLAIN, 13);
+        }
+      }
+    } else {
+      // Consolas added in Vista, used by VS2010+.
+      font = sc.getFont("Consolas", Font.PLAIN, 13);
+      if (!"Consolas".equals(font.getFamily())) {
+        font = sc.getFont("Monospaced", Font.PLAIN, 13);
+      }
+    }
+
+    //System.out.println(font.getFamily() + ", " + font.getName());
+    return font;
+  }
+
+  public static Map<String, Object> getStyledFont(String what, Font font) {
     String split[] = get("editor." + what + ".style").split(",");
 
     Color color = PreferencesHelper.parseColor(split[0]);
@@ -114,6 +156,18 @@ public class Theme {
     boolean italic = style.contains("italic");
     boolean underlined = style.contains("underlined");
 
-    return new SyntaxStyle(color, italic, bold, underlined);
+    Font styledFont = new Font(font.getFamily(), (bold ? Font.BOLD : 0) | (italic ? Font.ITALIC : 0), font.getSize());
+    if (underlined) {
+      Map<TextAttribute, Object> attr = new Hashtable<TextAttribute, Object>();
+      attr.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+      styledFont = styledFont.deriveFont(attr);
+    }
+
+    Map<String, Object> result = new HashMap<String, Object>();
+    result.put("color", color);
+    result.put("font", styledFont);
+
+    return result;
   }
+
 }

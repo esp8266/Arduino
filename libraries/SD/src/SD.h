@@ -48,6 +48,28 @@ public:
   boolean isDirectory(void);
   File openNextFile(uint8_t mode = O_RDONLY);
   void rewindDirectory(void);
+
+  template<typename T> size_t write(T &src){
+    uint8_t obuf[512];
+    size_t doneLen = 0;
+    size_t sentLen;
+    int i;
+
+    while (src.available() > 512){
+      src.read(obuf, 512);
+      sentLen = write(obuf, 512);
+      doneLen = doneLen + sentLen;
+      if(sentLen != 512){
+        return doneLen;
+      }
+    }
+  
+    size_t leftLen = src.available();
+    src.read(obuf, leftLen);
+    sentLen = write(obuf, leftLen);
+    doneLen = doneLen + sentLen;
+    return doneLen;
+  }
   
   using Print::write;
 };
@@ -84,6 +106,14 @@ public:
   
   boolean rmdir(char *filepath);
 
+  uint8_t type(){ return card.type(); }
+  uint8_t fatType(){ return volume.fatType(); }
+  size_t blocksPerCluster(){ return volume.blocksPerCluster(); }
+  size_t totalClusters(){ return volume.clusterCount(); }
+  size_t blockSize(){ return (size_t)0x200; }
+  size_t totalBlocks(){ return (totalClusters() / blocksPerCluster()); }
+  size_t clusterSize(){ return blocksPerCluster() * blockSize(); }
+  size_t size(){ return (clusterSize() * totalClusters()); }
 private:
 
   // This is used to determine the mode used to open a file

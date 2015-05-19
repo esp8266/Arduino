@@ -4,35 +4,38 @@
   <!--echo message="os.arch = ${os.arch}" /-->
   <!--echo message="os.version = ${os.version}" /-->
 
+  <tstamp>
+    <format property="BUILD_DATE" pattern="yyyy/MM/dd hh:mm"/>
+  </tstamp>
+
   <!-- Sets properties for macosx/windows/linux depending on current system -->
-  <condition property="platform" value="macosx">
+  <condition property="platform" value="macosx-old">
     <and>
       <os family="mac" />
       <matches string="${os.version}" pattern="^10.[56]." />
     </and>
   </condition>
-  <condition property="platform" value="macosx-java-latest"><os family="mac" /></condition>
+  <condition property="platform" value="macosx"><os family="mac" /></condition>
   <condition property="platform" value="windows"><os family="windows" /></condition>
   <condition property="platform" value="linux32"><os family="unix" arch="i386" /></condition>
   <condition property="platform" value="linux64"><os family="unix" arch="amd64" /></condition>
 
+  <condition property="macosx"><equals arg1="${platform}" arg2="macosx-old" /></condition>
   <condition property="macosx"><equals arg1="${platform}" arg2="macosx" /></condition>
-  <condition property="macosx"><equals arg1="${platform}" arg2="macosx-java-latest" /></condition>
-  <condition property="macosx-java-latest"><equals arg1="${platform}" arg2="macosx-java-latest" /></condition>
   <condition property="windows"><equals arg1="${platform}" arg2="windows" /></condition>
   <condition property="linux32"><equals arg1="${platform}" arg2="linux32" /></condition>
   <condition property="linux64"><equals arg1="${platform}" arg2="linux64" /></condition>
   <condition property="linux"><equals arg1="${platform}" arg2="linux32" /></condition>
   <condition property="linux"><equals arg1="${platform}" arg2="linux64" /></condition>
 
-  <condition property="staging_folder" value="macosx"><equals arg1="${platform}" arg2="macosx-java-latest" /></condition>
   <condition property="staging_folder" value="macosx"><equals arg1="${platform}" arg2="macosx" /></condition>
+  <condition property="staging_folder" value="macosx"><equals arg1="${platform}" arg2="macosx-old" /></condition>
   <condition property="staging_folder" value="windows"><equals arg1="${platform}" arg2="windows" /></condition>
   <condition property="staging_folder" value="linux"><equals arg1="${platform}" arg2="linux32" /></condition>
   <condition property="staging_folder" value="linux"><equals arg1="${platform}" arg2="linux64" /></condition>
 
-  <condition property="staging_hardware_folder" value="Arduino.app/Contents/Java/hardware"><equals arg1="${platform}" arg2="macosx-java-latest" /></condition>
-  <condition property="staging_hardware_folder" value="Arduino.app/Contents/Resources/Java/hardware"><equals arg1="${platform}" arg2="macosx" /></condition>
+  <condition property="staging_hardware_folder" value="Arduino.app/Contents/Java/hardware"><equals arg1="${platform}" arg2="macosx" /></condition>
+  <condition property="staging_hardware_folder" value="Arduino.app/Contents/Resources/Java/hardware"><equals arg1="${platform}" arg2="macosx-old" /></condition>
   <condition property="staging_hardware_folder" value="hardware"><equals arg1="${platform}" arg2="windows" /></condition>
   <condition property="staging_hardware_folder" value="hardware"><equals arg1="${platform}" arg2="linux32" /></condition>
   <condition property="staging_hardware_folder" value="hardware"><equals arg1="${platform}" arg2="linux64" /></condition>
@@ -54,21 +57,14 @@
   <fileset dir=".." id="runtime.jars">
     <include name="arduino-core/arduino-core.jar" />
     <include name="app/pde.jar" />
-    <include name="app/lib/commons-codec-1.7.jar" />
-    <include name="app/lib/commons-exec-1.1.jar" />
-    <include name="app/lib/commons-httpclient-3.1.jar" />
-    <include name="app/lib/commons-logging-1.0.4.jar" />
-    <include name="app/lib/ecj.jar" />
-    <include name="app/lib/jmdns-3.4.1.jar" />
-    <include name="app/lib/jna.jar" />
-    <include name="app/lib/jsch-0.1.50.jar" />
-    <include name="app/lib/jssc-2.8.0.jar" />
-    <include name="app/lib/ant.jar" />
-    <include name="app/lib/ant-launcher.jar" />
+    <include name="app/lib/*.jar" />
+    <include name="arduino-core/lib/*.jar" />
   </fileset>
 
   <target name="build" description="Build Arduino.">
     <antcall target="${platform}-build" />
+
+    <antcall target="generate-hourly-build-txt"/>
   </target>
 
   <target name="run" description="Run Arduino.">
@@ -115,30 +111,16 @@
   <!-- - - - - - - - - -->
 
   <target name="assemble">
-    <fail unless="target.path"
-	  message="Do not call assemble from the command line." />
+    <fail unless="target.path" message="Do not call assemble from the command line." />
 
     <!-- copy shared tools folder -->
     <copy todir="${target.path}/tools">
       <fileset dir="shared/tools" />
     </copy>
 
-    <!-- copy library folder -->
-    <copy todir="${target.path}/libraries">
-      <fileset dir="../libraries" />
-    </copy>
+    <antcall target="assemble-hardware" />
 
-    <!-- copy hardware folder -->
-    <copy todir="${target.path}/hardware">
-      <fileset dir="../hardware">
-        <exclude name="arduino/sam/system/CMSIS/Device/ATMEL/*/svd/"/>
-        <exclude name="arduino/sam/system/CMSIS/Device/ATMEL/*/html/"/>
-        <exclude name="arduino/sam/system/CMSIS/CMSIS/Lib/ARM/*M0*"/>
-        <exclude name="arduino/sam/system/CMSIS/CMSIS/Lib/ARM/*M4*"/>
-        <exclude name="arduino/sam/system/CMSIS/CMSIS/Lib/GCC/*M0*"/>
-        <exclude name="arduino/sam/system/CMSIS/CMSIS/Lib/GCC/*M4*"/>
-      </fileset>
-    </copy>
+    <copy file="../hardware/platform.keys.rewrite.txt" todir="${staging_folder}/work/${staging_hardware_folder}"/>
 
 
     <!-- copy shared examples folder -->
@@ -149,15 +131,49 @@
     <!-- Unzip documentation -->
     <antcall target="unzip">
       <param name="archive_file" value="shared/reference-1.6.0.zip" />
-      <param name="archive_url" value="http://arduino.cc/download.php?f=/reference-1.6.0.zip" />
+      <param name="archive_url" value="http://downloads.arduino.cc/reference-1.6.0.zip" />
       <param name="final_folder" value="${target.path}/reference" />
       <param name="dest_folder" value="${target.path}" />
+    </antcall>
+    <antcall target="unzip">
+      <param name="archive_file" value="shared/Galileo_help_files-1.6.2.zip" />
+      <param name="archive_url" value="http://downloads.arduino.cc/Galileo_help_files-1.6.2.zip" />
+      <param name="final_folder" value="${target.path}/reference/Galileo_help_files" />
+      <param name="dest_folder" value="${target.path}/reference/" />
+    </antcall>
+    <antcall target="unzip">
+      <param name="archive_file" value="shared/Edison_help_files-1.6.2.zip" />
+      <param name="archive_url" value="http://downloads.arduino.cc/Edison_help_files-1.6.2.zip" />
+      <param name="final_folder" value="${target.path}/reference/Edison_help_files" />
+      <param name="dest_folder" value="${target.path}/reference/" />
     </antcall>
 
     <!-- Write the revision file! -->
     <echo file="${target.path}/lib/version.txt" message="${version}" />
+
+    <antcall target="assemble-libraries" />
   </target>
 
+  <!-- copy library folder -->
+  <target name="assemble-libraries" unless="light_bundle">
+    <copy todir="${target.path}/libraries">
+      <fileset dir="../libraries">
+        <!-- exluding non AVR libraries -->
+        <exclude name="**/Audio/**"/>
+        <exclude name="**/Scheduler/**"/>
+        <exclude name="**/USBHost/**"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <!-- copy hardware folder -->
+  <target name="assemble-hardware" unless="light_bundle">
+    <copy todir="${target.path}/hardware">
+      <fileset dir="../hardware">
+        <exclude name="arduino/sam/**"/>
+      </fileset>
+    </copy>
+  </target>
 
   <!-- - - - - - - - - -->
   <!-- Revision check  -->
@@ -199,9 +215,9 @@
   <!-- Mac OS X      -->
   <!-- - - - - - - - -->
 
-  <target name="macosx-java-latest-clean" depends="macosx-clean" description="Clean Mac OS X build"/>
+  <target name="macosx-clean" depends="macosx-old-clean" description="Clean Mac OS X build"/>
 
-  <target name="macosx-clean" depends="subprojects-clean" description="Clean Mac OS X build">
+  <target name="macosx-old-clean" depends="subprojects-clean" description="Clean Mac OS X build">
     <delete dir="macosx/work" />
     <delete dir="macosx/working_dir" />
     <delete dir="macosx/working.dmg" />
@@ -222,8 +238,9 @@
     <fail message="wrong platform (${os.name})" />
   </target>
 
-  <target name="macosx-build" if="macosx" depends="revision-check, macosx-checkos, subprojects-build" description="Build Mac OS X version">
+  <target name="macosx-old-build" if="macosx" depends="revision-check, macosx-checkos, subprojects-build" description="Build Mac OS X version">
     <mkdir dir="macosx/work" />
+    <mkdir dir="macosx/work/${staging_hardware_folder}" />
 
     <!-- assemble the pde -->
     <copy todir="macosx/work/Arduino.app">
@@ -250,20 +267,21 @@
 
   </target>
 
-  <target name="macosx-java-latest-build" if="macosx" depends="revision-check, macosx-checkos, subprojects-build" description="Build Mac OS X version">
-    <antcall target="unzip">
-      <param name="archive_file" value="${staging_folder}/appbundler-1.0ea-arduino2.jar.zip" />
-      <param name="archive_url" value="http://arduino.cc/download.php?f=/appbundler-1.0ea-arduino2.jar.zip" />
-      <param name="final_folder" value="${staging_folder}/appbundler-1.0ea-arduino2" />
-      <param name="dest_folder" value="${staging_folder}/appbundler-1.0ea-arduino2" />
-    </antcall>
-
+  <target name="macosx-build" if="macosx" depends="revision-check, macosx-checkos, subprojects-build" description="Build Mac OS X version">
+    <fail unless="MACOSX_BUNDLED_JVM" message="MacOSX requires MACOSX_BUNDLED_JVM property set"/>
     <mkdir dir="${staging_folder}/work" />
 
-    <taskdef name="bundleapp" classname="com.oracle.appbundler.AppBundlerTask" classpath="${staging_folder}/appbundler-1.0ea-arduino2/appbundler-1.0ea-arduino2.jar"/>
+    <antcall target="unzip">
+      <param name="archive_file" value="${staging_folder}/appbundler-1.0ea-upstream1.jar.zip" />
+      <param name="archive_url" value="http://downloads.arduino.cc/appbundler-1.0ea-upstream1.jar.zip" />
+      <param name="final_folder" value="${staging_folder}/appbundler-1.0ea-upstream1" />
+      <param name="dest_folder" value="${staging_folder}/appbundler-1.0ea-upstream1" />
+    </antcall>
+
+    <taskdef name="bundleapp" classname="com.oracle.appbundler.AppBundlerTask" classpath="${staging_folder}/appbundler-1.0ea-upstream1/appbundler-1.0ea-upstream1.jar"/>
 
     <bundleapp
-            jvmRequired="1.7"
+            jvmRequired="1.8"
             outputdirectory="${staging_folder}/work"
             name="Arduino"
             displayname="Arduino"
@@ -277,6 +295,8 @@
             copyright="Arduino LLC"
             minimumsystemversion="10.7"
             highresolutioncapable="true">
+
+      <runtime dir="${MACOSX_BUNDLED_JVM}"/>
 
       <arch name="x86_64"/>
       <arch name="i386"/>
@@ -305,15 +325,18 @@
       <option value="-Dfile.encoding=UTF-8"/>
 
       <option value="-Xms128M"/>
-      <option value="-Xmx1024M"/>
+      <option value="-Xmx512M"/>
+      <option value="-splash:$APP_ROOT/Contents/Java/lib/splash.png"/>
 
       <bundledocument extensions="ino,c,cpp,h"
                       icon="macosx/template.app/Contents/Resources/pde.icns"
                       name="Arduino Source File"
-                      role="Editor">
+                      role="Editor" ispackage="false">
       </bundledocument>
 
     </bundleapp>
+
+    <mkdir dir="${staging_folder}/work/${staging_hardware_folder}" />
 
     <copy todir="${staging_folder}/work/${staging_hardware_folder}/../">
       <fileset dir="shared" includes="lib/**" />
@@ -325,42 +348,20 @@
   </target>
 
   <target name="macosx-build-common">
+    <mkdir dir="${staging_folder}/work" />
+    <mkdir dir="${staging_folder}/work/${staging_hardware_folder}" />
 
-    <!-- Unzip AVR tools -->
-    <antcall target="unzip">
-      <param name="archive_file" value="${staging_folder}/avr-toolchain-mac32-3.4.5.zip" />
-      <param name="archive_url" value="http://arduino.cc/download.php?f=/avr-toolchain-mac32-3.4.5.zip" />
-      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/avr" />
-      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/avr" />
-    </antcall>
+    <antcall target="macosx-build-common-avr-toolchain" />
 
-    <copy todir="macosx/work/${staging_hardware_folder}/tools/">
-      <fileset file="macosx/dist/bossac" />
-    </copy>
-
-    <chmod file="macosx/work/${staging_hardware_folder}/tools/bossac" perm="+x" />
+    <antcall target="package-library-index-json-bundle"/>
 
     <antcall target="assemble">
-      <param name="target.path" value="macosx/work/${staging_hardware_folder}/../" />
+      <param name="target.path" value="${staging_folder}/work/${staging_hardware_folder}/.." />
     </antcall>
-
-    <antcall target="untar">
-      <param name="archive_file" value="${staging_folder}/dist/gcc-arm-none-eabi-4.8.3-2014q1-mac.tar.gz" />
-      <param name="archive_url" value="http://arduino.cc/download.php?f=/gcc-arm-none-eabi-4.8.3-2014q1-mac.tar.gz" />
-      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/gcc-arm-none-eabi-4.8.3-2014q1" />
-      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/" />
-    </antcall>
-
-    <delete includeEmptyDirs="true" quiet="true">
-      <fileset dir="macosx/work/${staging_hardware_folder}/tools" includes="**/3.4.6/**/*"/>
-      <fileset dir="macosx/work/${staging_hardware_folder}/tools" includes="**/3.4.6"/>
-      <fileset dir="macosx/work/${staging_hardware_folder}/tools" includes="**/man/**/*"/>
-      <fileset dir="macosx/work/${staging_hardware_folder}/tools" includes="**/man"/>
-    </delete>
 
     <antcall target="unzip">
       <param name="archive_file" value="./libastylej-2.05.zip" />
-      <param name="archive_url" value="http://arduino.cc/download.php?f=/libastylej-2.05.zip" />
+      <param name="archive_url" value="http://downloads.arduino.cc/libastylej-2.05.zip" />
       <param name="final_folder" value="${staging_folder}/libastylej" />
       <param name="dest_folder" value="${staging_folder}" />
     </antcall>
@@ -369,54 +370,68 @@
     <copy file="macosx/libastylej/libastylej.jnilib" tofile="macosx/work/${staging_hardware_folder}/../lib/libastylej.dylib" />
     <chmod perm="755" file="macosx/work/${staging_hardware_folder}/../lib/libastylej.dylib" />
 
+  </target>
+
+  <!-- Unzip AVR tools -->
+  <target name="macosx-build-common-avr-toolchain" unless="light_bundle">
+    <antcall target="avr-toolchain-bundle">
+      <param name="unpack_target" value="untar"/>
+      <param name="gcc_archive_file" value="avr-gcc-4.8.1-arduino5-i386-apple-darwin11.tar.bz2"/>
+      <param name="gcc_version" value="4.8.1-arduino5"/>
+      <param name="avrdude_archive_file" value="avrdude-6.0.1-arduino5-i386-apple-darwin11.tar.bz2"/>
+      <param name="avrdude_version" value="6.0.1-arduino5"/>
+    </antcall>
+
     <chmod perm="+x">
-      <fileset dir="macosx/work/${staging_hardware_folder}/tools/avr/bin" includes="**/*" />
-      <fileset dir="macosx/work/${staging_hardware_folder}/tools/avr/avr/bin" includes="**/*" />
-      <fileset dir="macosx/work/${staging_hardware_folder}/tools/avr/libexec/gcc/avr/4.8.1/" includes="*" />
+      <fileset dir="${staging_folder}/work/${staging_hardware_folder}/tools" includes="**/bin/*"/>
+      <fileset dir="${staging_folder}/work/${staging_hardware_folder}/tools" includes="**/libexec/gcc/avr/4.8.1/*"/>
     </chmod>
 
+    <mkdir dir="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools" />
+
     <antcall target="untar">
-      <param name="archive_file" value="${staging_folder}/dist/osx-xtensa-lx106-elf.tgz" />
-      <param name="archive_url" value="http://download.igrr.me/osx-xtensa-lx106-elf.tgz" />
-      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/xtensa-lx106-elf" />
-      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/" />
+      <param name="archive_file" value="${staging_folder}/dist/osx-xtensa-lx106-elf-gb404fb9.tgz" />
+      <param name="archive_url" value="http://download.igrr.me/osx-xtensa-lx106-elf-gb404fb9.tgz" />
+      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/xtensa-lx106-elf" />
+      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/" />
     </antcall>
 
-    <antcall target="unzip">
-      <param name="archive_file" value="${staging_folder}/esptool-0.4.3-osx.zip" />
-      <param name="archive_url" value="https://github.com/igrr/esptool-ck/releases/download/0.4.3/esptool-0.4.3-osx.zip" />
-      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/esptool-0.4.3-osx" />
-      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/" />
+    
+    <antcall target="untar">
+      <param name="archive_file" value="${staging_folder}/esptool-0.4.4-osx.tar.gz" />
+      <param name="archive_url" value="https://github.com/igrr/esptool-ck/releases/download/0.4.4/esptool-0.4.4-osx.tar.gz" />
+      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.4-osx" />
+      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/" />
     </antcall>
-    <move file="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/esptool-0.4.3-osx/esptool" tofile="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/esptool" />
-    <delete dir="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/esptool-0.4.3-osx/" />
+    <move file="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.4-osx/esptool" tofile="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool" />
+    <delete dir="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.4-osx/" />
 
   </target>
 
-  <target name="macosx-run" depends="macosx-build" description="Run Mac OS X version">
+  <target name="macosx-old-run" depends="macosx-old-build" description="Run Mac OS X version">
     <antcall target="macosx-run-common"/>
   </target>
 
-  <target name="macosx-java-latest-run" depends="macosx-java-latest-build" description="Run Mac OS X version">
+  <target name="macosx-run" depends="build" description="Run Mac OS X version">
     <antcall target="macosx-run-common"/>
   </target>
 
-  <target name="macosx-debug" depends="macosx-build" description="Run Mac OS X version">
+  <target name="macosx-old-debug" depends="macosx-old-build" description="Run Mac OS X version">
     <antcall target="macosx-debug-common"/>
   </target>
 
-  <target name="macosx-java-latest-debug" depends="macosx-java-latest-build" description="Run Mac OS X version">
+  <target name="macosx-debug" depends="build" description="Run Mac OS X version">
     <antcall target="macosx-debug-common"/>
   </target>
 
   <target name="macosx-run-common">
-    <exec executable="open" dir="macosx/work">
+    <exec executable="open" dir="macosx/work" failonerror="true">
       <arg value="Arduino.app"/>
     </exec>
   </target>
 
   <target name="macosx-debug-common">
-    <exec executable="open" dir="macosx/work" spawn="false">
+    <exec executable="open" dir="macosx/work" spawn="false" failonerror="true">
       <arg value="Arduino.app"/>
     </exec>
   </target>
@@ -432,18 +447,18 @@
     <delete dir="macosx/work/Arduino.app" />
 
     <!-- Unzip unsigned app into working dir -->
-    <exec executable="unzip" dir="macosx/work">
+    <exec executable="unzip" dir="macosx/work" failonerror="true">
       <arg line="../arduino-${version}-${platform}.zip" />
     </exec>
 
     <!-- Unlock keychain file -->
-    <exec executable="security" dir="macosx/work">
+    <exec executable="security" dir="macosx/work" failonerror="true">
       <arg line="unlock-keychain -p &quot;${macosx-sign-keychain-pass}&quot; &quot;${macosx-sign-keychain}&quot;" />
     </exec>
 
     <!-- Sign app -->
-    <exec executable="codesign" dir="macosx/work">
-      <arg line="--keychain &quot;${macosx-sign-keychain}&quot; --force -s &quot;${macosx-sign-id}&quot; -v Arduino.app/" />
+    <exec executable="codesign" dir="macosx/work" failonerror="true">
+      <arg line="--keychain &quot;${macosx-sign-keychain}&quot; --force -s &quot;${macosx-sign-id}&quot; --deep -v Arduino.app/" />
     </exec>
 
     <!-- Check for successful signing -->
@@ -454,7 +469,7 @@
     <delete file="macosx/arduino-${version}-${platform}.zip" />
 
     <!-- Create signed zip file -->
-    <exec executable="zip" dir="macosx/work">
+    <exec executable="zip" dir="macosx/work" failonerror="true">
       <arg line="-q -r ../arduino-${version}-${platform}-signed.zip ." />
     </exec>
 
@@ -476,16 +491,16 @@
   <!-- - - - - - - - - - - - - - - - - - - -->
   <!-- Build distribution file for MacOSX. -->
   <!-- - - - - - - - - - - - - - - - - - - -->
-  <target name="macosx-dist" if="macosx" depends="macosx-build" description="Create a downloadable .zip for the Mac OS X version">
+  <target name="macosx-old-dist" if="macosx" depends="macosx-old-build" description="Create a downloadable .zip for the Mac OS X version">
     <antcall target="macosx-dist-common"/>
   </target>
 
-  <target name="macosx-java-latest-dist" if="macosx" depends="macosx-java-latest-build" description="Create a downloadable .zip for the Mac OS X version">
+  <target name="macosx-dist" if="macosx" depends="build" description="Create a downloadable .zip for the Mac OS X version">
     <antcall target="macosx-dist-common"/>
   </target>
 
   <target name="macosx-dist-common">
-    <exec executable="zip" dir="macosx/work">
+    <exec executable="zip" dir="macosx/work" failonerror="true">
       <arg line="-q -r ../arduino-${version}-${platform}.zip ." />
     </exec>
 
@@ -498,59 +513,70 @@
     </echo>
   </target>
 
-  <target name="macosx-dist-old" if="macosx" depends="macosx-build" description="Create a .dmg of the Mac OS X version">
-    <!-- now build the dmg -->
-    <gunzip src="macosx/template.dmg.gz" dest="macosx/working.dmg" />
+  <!--<target name="macosx-dist-old" if="macosx" depends="macosx-build" description="Create a .dmg of the Mac OS X version">-->
+    <!--&lt;!&ndash; now build the dmg &ndash;&gt;-->
+    <!--<gunzip src="macosx/template.dmg.gz" dest="macosx/working.dmg" />-->
 
-    <mkdir dir="macosx/working_dir" />
-    <exec executable="hdiutil">
-      <arg line="attach macosx/working.dmg -noautoopen -mountpoint macosx/working_dir" />
-      <!--<arg line="attach macosx/working.dmg -noautoopen -quiet -mountpoint macosx/working_dir" />-->
-    </exec>
+    <!--<mkdir dir="macosx/working_dir" />-->
+    <!--<exec executable="hdiutil">-->
+      <!--<arg line="attach macosx/working.dmg -noautoopen -mountpoint macosx/working_dir" />-->
+      <!--&lt;!&ndash;<arg line="attach macosx/working.dmg -noautoopen -quiet -mountpoint macosx/working_dir" />&ndash;&gt;-->
+    <!--</exec>-->
 
-    <copy todir="macosx/working_dir">
-      <fileset dir="macosx/work" />
-    </copy>
+    <!--<copy todir="macosx/working_dir">-->
+      <!--<fileset dir="macosx/work" />-->
+    <!--</copy>-->
 
-    <!-- The ant copy command does not preserve permissions. -->
-    <chmod file="macosx/working_dir/Arduino.app/Contents/MacOS/JavaApplicationStub" perm="+x" />
-    <chmod perm="+x">
-      <fileset dir="macosx/working_dir/Arduino.app/Contents/Resources/Java/hardware/tools/avr/bin" includes="**/*" />
-      <fileset dir="macosx/working_dir/Arduino.app/Contents/Resources/Java/hardware/tools/avr/avr/bin" includes="**/*" />
-      <fileset dir="macosx/working_dir/Arduino.app/Contents/Resources/Java/hardware/tools/avr/avr-3/bin" includes="**/*" />
-      <fileset dir="macosx/working_dir/Arduino.app/Contents/Resources/Java/hardware/tools/avr/avr-4/bin" includes="**/*" />
-      <fileset dir="macosx/working_dir/Arduino.app/Contents/Resources/Java/hardware/tools/avr/libexec/gcc/avr/3.4.6/" includes="**/cc1*" />
-      <fileset dir="macosx/working_dir/Arduino.app/Contents/Resources/Java/hardware/tools/avr/libexec/gcc/avr/4.3.2/" includes="**/cc1*" />
-    </chmod>
+    <!--&lt;!&ndash; The ant copy command does not preserve permissions. &ndash;&gt;-->
+    <!--<chmod file="macosx/working_dir/Arduino.app/Contents/MacOS/JavaApplicationStub" perm="+x" />-->
+    <!--<chmod perm="+x">-->
+      <!--<fileset dir="macosx/working_dir/Arduino.app/Contents/Resources/Java/hardware/tools/avr/bin" includes="**/*" />-->
+      <!--<fileset dir="macosx/working_dir/Arduino.app/Contents/Resources/Java/hardware/tools/avr/avr/bin" includes="**/*" />-->
+      <!--<fileset dir="macosx/working_dir/Arduino.app/Contents/Resources/Java/hardware/tools/avr/avr-3/bin" includes="**/*" />-->
+      <!--<fileset dir="macosx/working_dir/Arduino.app/Contents/Resources/Java/hardware/tools/avr/avr-4/bin" includes="**/*" />-->
+      <!--<fileset dir="macosx/working_dir/Arduino.app/Contents/Resources/Java/hardware/tools/avr/libexec/gcc/avr/3.4.6/" includes="**/cc1*" />-->
+      <!--<fileset dir="macosx/working_dir/Arduino.app/Contents/Resources/Java/hardware/tools/avr/libexec/gcc/avr/4.3.2/" includes="**/cc1*" />-->
+    <!--</chmod>-->
 
-    <!-- Pause briefly for the OS to catch up with the DMG changes. 
-	 This prevents "hdiutil: couldn't eject "disk3" - Resource busy"
-	 errors when ejecting the disk in the next step.
-         You may need to set this value higher for your system. -->
-    <sleep seconds="3" />
+    <!--&lt;!&ndash; Pause briefly for the OS to catch up with the DMG changes. -->
+	 <!--This prevents "hdiutil: couldn't eject "disk3" - Resource busy"-->
+	 <!--errors when ejecting the disk in the next step.-->
+         <!--You may need to set this value higher for your system. &ndash;&gt;-->
+    <!--<sleep seconds="3" />-->
 
-    <exec executable="hdiutil">
-      <!--<arg line="detach macosx/working_dir -quiet -force" />-->
-      <arg line="detach macosx/working_dir" />
-    </exec>
+    <!--<exec executable="hdiutil">-->
+      <!--&lt;!&ndash;<arg line="detach macosx/working_dir -quiet -force" />&ndash;&gt;-->
+      <!--<arg line="detach macosx/working_dir" />-->
+    <!--</exec>-->
 
-    <delete file="macosx/arduino-*.dmg" />
-    <exec executable="hdiutil">
-      <arg line="convert macosx/working.dmg -quiet -format UDZO -imagekey zlib-level=9 -o macosx/arduino-${version}.dmg" />
-    </exec>
+    <!--<delete file="macosx/arduino-*.dmg" />-->
+    <!--<exec executable="hdiutil">-->
+      <!--<arg line="convert macosx/working.dmg -quiet -format UDZO -imagekey zlib-level=9 -o macosx/arduino-${version}.dmg" />-->
+    <!--</exec>-->
 
-    <!-- Clean up the interim files. -->
-    <delete file="macosx/working.dmg" />
-    <delete dir="macosx/working_dir" />
+    <!--&lt;!&ndash; Clean up the interim files. &ndash;&gt;-->
+    <!--<delete file="macosx/working.dmg" />-->
+    <!--<delete dir="macosx/working_dir" />-->
 
-    <echo>
-      =======================================================
-      Arduino for Mac OS X was built. Grab the image from
+    <!--<echo>-->
+      <!--=======================================================-->
+      <!--Arduino for Mac OS X was built. Grab the image from-->
 
-      macosx/arduino-${version}.dmg
-      =======================================================
-    </echo>
-  </target>
+      <!--macosx/arduino-${version}.dmg-->
+      <!--=======================================================-->
+    <!--</echo>-->
+  <!--</target>-->
+
+  <!--<target name="macosx-dist-old-fix-perms" unless="light_bundle">-->
+    <!--<chmod perm="+x">-->
+      <!--<fileset dir="macosx/working_dir/Arduino.app/Contents/Resources/Java/hardware/tools/avr/bin" includes="**/*" />-->
+      <!--<fileset dir="macosx/working_dir/Arduino.app/Contents/Resources/Java/hardware/tools/avr/avr/bin" includes="**/*" />-->
+      <!--<fileset dir="macosx/working_dir/Arduino.app/Contents/Resources/Java/hardware/tools/avr/avr-3/bin" includes="**/*" />-->
+      <!--<fileset dir="macosx/working_dir/Arduino.app/Contents/Resources/Java/hardware/tools/avr/avr-4/bin" includes="**/*" />-->
+      <!--<fileset dir="macosx/working_dir/Arduino.app/Contents/Resources/Java/hardware/tools/avr/libexec/gcc/avr/3.4.6/" includes="**/cc1*" />-->
+      <!--<fileset dir="macosx/working_dir/Arduino.app/Contents/Resources/Java/hardware/tools/avr/libexec/gcc/avr/4.3.2/" includes="**/cc1*" />-->
+    <!--</chmod>-->
+  <!--</target>-->
 
   <!-- - - - - - - - -->
   <!-- Linux         -->
@@ -577,6 +603,7 @@
 
   <target name="linux-build" depends="revision-check, linux-checkos, subprojects-build" description="Build linux version">
     <mkdir dir="linux/work" />
+    <mkdir dir="linux/work/${staging_hardware_folder}" />
 
     <copy todir="linux/work">
       <fileset dir="shared" includes="lib/**" />
@@ -596,23 +623,16 @@
     </antcall>
 
     <copy todir="linux/work" file="linux/dist/arduino" />
+    <copy todir="linux/work" file="linux/dist/arduino.desktop" />
+    <copy todir="linux/work" file="linux/dist/install.sh" />
     <chmod perm="755" file="linux/work/arduino" />
-
-    <mkdir dir="linux/work/hardware/tools" />
-    <copy file="linux/dist/tools/adk2install" todir="linux/work/hardware/tools" />
-    <copy file="linux/dist/tools/adk2tool" todir="linux/work/hardware/tools" />
-    <copy file="linux/dist/tools/bossac${arch-bits}" tofile="linux/work/hardware/tools/bossac" />
-
-    <chmod perm="755" file="linux/work/hardware/tools/bossac" />
-    <chmod perm="755" file="linux/work/hardware/tools/adk2tool" />
-    <chmod perm="755" file="linux/work/hardware/tools/adk2install" />
 
     <copy todir="linux/work" file="linux/dist/arduino" />
     <chmod perm="755" file="linux/work/arduino" />
 
     <antcall target="unzip">
       <param name="archive_file" value="./libastylej-2.05.zip" />
-      <param name="archive_url" value="http://arduino.cc/download.php?f=/libastylej-2.05.zip" />
+      <param name="archive_url" value="http://downloads.arduino.cc/libastylej-2.05.zip" />
       <param name="final_folder" value="${staging_folder}/libastylej" />
       <param name="dest_folder" value="${staging_folder}" />
     </antcall>
@@ -621,64 +641,54 @@
   </target>
 
   <target name="linux32-build" depends="linux-build" description="Build linux (32-bit) version">
-    <!-- Unzip ARM tools -->
-    <antcall target="untar">
-      <param name="archive_file" value="${staging_folder}/dist/gcc-arm-none-eabi-4.8.3-2014q1-linux32.tar.gz" />
-      <param name="archive_url" value="http://arduino.cc/download.php?f=/gcc-arm-none-eabi-4.8.3-2014q1-linux32.tar.gz" />
-      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/gcc-arm-none-eabi-4.8.3-2014q1" />
-      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/" />
+    <antcall target="avr-toolchain-bundle">
+      <param name="unpack_target" value="untar"/>
+      <param name="gcc_archive_file" value="avr-gcc-4.8.1-arduino5-i686-pc-linux-gnu.tar.bz2"/>
+      <param name="gcc_version" value="4.8.1-arduino5"/>
+      <param name="avrdude_archive_file" value="avrdude-6.0.1-arduino5-i686-pc-linux-gnu.tar.bz2"/>
+      <param name="avrdude_version" value="6.0.1-arduino5"/>
     </antcall>
 
-    <!-- Unzip AVR tools -->
-    <antcall target="unzip">
-      <param name="archive_file" value="${staging_folder}/avr-toolchain-linux32-3.4.5.zip" />
-      <param name="archive_url" value="http://arduino.cc/download.php?f=/avr-toolchain-linux32-3.4.5.zip" />
-      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/avr" />
-      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/avr" />
-    </antcall>
+    <antcall target="package-library-index-json-bundle"/>
   </target>
 
   <target name="linux64-build" depends="linux-build" description="Build linux (64-bit) version">
-    <!-- Unzip ARM tools -->
-    <antcall target="untar">
-      <param name="archive_file" value="${staging_folder}/dist/gcc-arm-none-eabi-4.8.3-2014q1-linux64.tar.gz" />
-      <param name="archive_url" value="http://arduino.cc/download.php?f=/gcc-arm-none-eabi-4.8.3-2014q1-linux64.tar.gz" />
-      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/gcc-arm-none-eabi-4.8.3-2014q1" />
-      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/" />
+    <antcall target="avr-toolchain-bundle">
+      <param name="unpack_target" value="untar"/>
+      <param name="gcc_archive_file" value="avr-gcc-4.8.1-arduino5-x86_64-pc-linux-gnu.tar.bz2"/>
+      <param name="gcc_version" value="4.8.1-arduino5"/>
+      <param name="avrdude_archive_file" value="avrdude-6.0.1-arduino5-x86_64-pc-linux-gnu.tar.bz2"/>
+      <param name="avrdude_version" value="6.0.1-arduino5"/>
     </antcall>
 
-    <!-- Unzip AVR tools -->
-    <antcall target="unzip">
-      <param name="archive_file" value="${staging_folder}/avr-toolchain-linux64-3.4.5.zip" />
-      <param name="archive_url" value="http://arduino.cc/download.php?f=/avr-toolchain-linux64-3.4.5.zip" />
-      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/avr" />
-      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/avr" />
-    </antcall>
+    <antcall target="package-library-index-json-bundle"/>
+
+    <mkdir dir="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools" />
 
     <antcall target="untar">
-      <param name="archive_file" value="${staging_folder}/dist/linux64-xtensa-lx106-elf.tgz" />
-      <param name="archive_url" value="http://download.igrr.me/linux64-xtensa-lx106-elf.tgz" />
-      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/xtensa-lx106-elf" />
-      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/" />
+      <param name="archive_file" value="${staging_folder}/dist/linux64-xtensa-lx106-elf-gb404fb9.tgz" />
+      <param name="archive_url" value="http://download.igrr.me/linux64-xtensa-lx106-elf-gb404fb9.tgz" />
+      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/xtensa-lx106-elf" />
+      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/" />
     </antcall>
 
-    <antcall target="unzip">
-      <param name="archive_file" value="${staging_folder}/esptool-0.4.3-linux64.zip" />
-      <param name="archive_url" value="https://github.com/igrr/esptool-ck/releases/download/0.4.3/esptool-0.4.3-linux64.zip" />
-      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/esptool-0.4.3-linux64" />
-      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/" />
+    <antcall target="untar">
+      <param name="archive_file" value="${staging_folder}/esptool-0.4.4-linux64.tar.gz" />
+      <param name="archive_url" value="https://github.com/igrr/esptool-ck/releases/download/0.4.4/esptool-0.4.4-linux64.tar.gz" />
+      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.4-linux64" />
+      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/" />
     </antcall>
-    <move file="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/esptool-0.4.3-linux64/esptool" tofile="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/esptool" />
-    <delete dir="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/esptool-0.4.3-linux64/" />
+    <move file="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.4-linux64/esptool" tofile="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool" />
+    <delete dir="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.4-linux64/" />
 
   </target>
 
-  <target name="linux32-run" depends="linux32-build" description="Run Linux (32-bit) version">
-    <exec executable="./linux/work/arduino" spawn="false"/>
+  <target name="linux32-run" depends="build" description="Run Linux (32-bit) version">
+    <exec executable="./linux/work/arduino" spawn="false" failonerror="true"/>
   </target>
 
-  <target name="linux64-run" depends="linux64-build" description="Run Linux (64-bit) version">
-    <exec executable="./linux/work/arduino" spawn="false"/>
+  <target name="linux64-run" depends="build" description="Run Linux (64-bit) version">
+    <exec executable="./linux/work/arduino" spawn="false" failonerror="true"/>
   </target>
 
   <!-- Set '${dist_file}_available' property if toolchain dist_file is downloaded              -->
@@ -709,8 +719,8 @@
 
   <!-- Ensure that the tool is downloaded and test checksums, if everything's ok unzip it on the tools folder  -->
   <target name="untar" depends="untar-unzip-checksum" unless="${archive_file}_installed">
-    <echo>Unzipping into folder ${dest_folder}</echo>
-    <exec executable="tar">
+    <echo>Untarring ${archive_file} into folder ${dest_folder}</echo>
+    <exec executable="tar" failonerror="true">
       <arg value="xf"/>
       <arg value="${archive_file}"/>
       <arg value="--directory=${dest_folder}"/>
@@ -718,9 +728,9 @@
   </target>
 
   <target name="unzip" depends="untar-unzip-checksum" unless="${archive_file}_installed">
-    <echo>Unzipping into folder ${dest_folder}</echo>
+    <echo>Unzipping ${archive_file} into folder ${dest_folder}</echo>
     <mkdir dir="${dest_folder}" />
-    <exec executable="unzip">
+    <exec executable="unzip" failonerror="true">
       <arg value="-q" />
       <arg value="-n" />
       <arg value="-d" />
@@ -729,12 +739,18 @@
     </exec>
   </target>
 
+  <target name="unzip-with-ant-task" depends="untar-unzip-checksum" unless="${archive_file}_installed">
+    <echo>Unzipping ${archive_file} into folder ${dest_folder}</echo>
+    <mkdir dir="${dest_folder}" />
+    <unzip src="${archive_file}" dest="${dest_folder}"/>
+  </target>
+
   <target name="linux-dist" depends="build"
 	  description="Build .tar.xz of linux version">
 
     <move file="linux/work" tofile="linux/arduino-${version}" />
 
-    <exec executable="tar" dir="linux">
+    <exec executable="tar" dir="linux" failonerror="true">
       <arg value="--lzma"/>
       <arg value="-c"/>
       <arg value="-f"/>
@@ -784,23 +800,28 @@
   </target>
 
   <target name="download-launch4j-windows">
-    <get src="http://heanet.dl.sourceforge.net/project/launch4j/launch4j-3/3.0.2/launch4j-3.0.2-win32.zip" dest="windows" usetimestamp="true" skipexisting="true" verbose="true" />
-    <unzip dest="windows/launcher/" src="windows/launch4j-3.0.2-win32.zip" overwrite="true"/>
+    <antcall target="unzip-with-ant-task">
+      <param name="archive_file" value="windows/launch4j-3.7-win32.zip"/>
+      <param name="archive_url" value="http://downloads.sourceforge.net/project/launch4j/launch4j-3/3.7/launch4j-3.7-win32.zip"/>
+      <param name="final_folder" value="windows/launcher/launch4j"/>
+      <param name="dest_folder" value="windows/launcher/"/>
+    </antcall>
   </target>
 
   <target name="download-launch4j-linux">
-    <get src="http://heanet.dl.sourceforge.net/project/launch4j/launch4j-3/3.0.2/launch4j-3.0.2-linux.tgz" dest="windows" usetimestamp="true" skipexisting="true" verbose="true" />
-
-    <exec executable="tar" dir="windows/launcher">
-      <arg value="-xf"/>
-      <arg value="../launch4j-3.0.2-linux.tgz"/>
-    </exec>
+    <antcall target="untar">
+      <param name="archive_file" value="windows/launch4j-3.7-linux.tgz"/>
+      <param name="archive_url" value="http://downloads.sourceforge.net/project/launch4j/launch4j-3/3.7/launch4j-3.7-linux.tgz"/>
+      <param name="final_folder" value="windows/launcher/launch4j"/>
+      <param name="dest_folder" value="windows/launcher/"/>
+    </antcall>
   </target>
 
   <target name="windows-build"
 	  depends="revision-check, windows-checkos, subprojects-build"
 	  description="Build windows version">
     <mkdir dir="windows/work" />
+    <mkdir dir="windows/work/${staging_hardware_folder}" />
 
     <!-- assemble the pde -->
     <mkdir dir="windows/work/lib" />
@@ -824,17 +845,11 @@
       <fileset dir="windows/dist" includes="drivers/**" />
     </copy>
 
-    <!-- Unzip AVR tools -->
-    <antcall target="unzip">
-      <param name="archive_file" value="${staging_folder}/avr-toolchain-win32-3.4.5.zip" />
-      <param name="archive_url" value="http://arduino.cc/download.php?f=/avr-toolchain-win32-3.4.5.zip" />
-      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/avr" />
-      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/avr" />
-    </antcall>
+    <antcall target="windows-build-avr-toolchain" />
 
     <antcall target="unzip">
       <param name="archive_file" value="./libastylej-2.05.zip" />
-      <param name="archive_url" value="http://arduino.cc/download.php?f=/libastylej-2.05.zip" />
+      <param name="archive_url" value="http://downloads.arduino.cc/libastylej-2.05.zip" />
       <param name="final_folder" value="${staging_folder}/libastylej" />
       <param name="dest_folder" value="${staging_folder}" />
     </antcall>
@@ -842,13 +857,11 @@
     <copy file="windows/msvcp100.dll" todir="windows/work" />
     <copy file="windows/msvcr100.dll" todir="windows/work" />
 
-    <!-- Copy bossac.exe tool -->
+    <!-- Copy listComPort.exe tool -->
     <copy todir="windows/work/hardware/tools">
-      <fileset file="windows/bossac.exe" />
       <fileset file="windows/listComPorts.exe" />
     </copy>
     <chmod perm="755">
-      <fileset file="windows/work/hardware/tools/bossac.exe" />
       <fileset file="windows/work/hardware/tools/listComPorts.exe" />
     </chmod>
 
@@ -856,6 +869,7 @@
       <param name="target.path" value="windows/work" />
     </antcall>
 
+    <delete dir="windows/launcher/launch4j"/>
     <antcall target="download-${launch4j-download-unpack-target-name}" />
 
     <property name="launch4j.dir" value="windows/launcher/launch4j/" />
@@ -865,11 +879,11 @@
 
     <copy todir="windows/work">
       <fileset dir="windows/launcher"
-	       includes="about.bmp, application.ico, config.xml, config_debug.xml, arduino.l4j.ini"/>
+	       includes="application.ico, config.xml, config_debug.xml, arduino.l4j.ini"/>
     </copy>
     <launch4j configFile="windows/work/config.xml" />
     <launch4j configFile="windows/work/config_debug.xml" />
-    <delete dir="windows/work" includes="about.bmp, application.ico, config.xml, config_debug.xml" />
+    <delete dir="windows/work" includes="application.ico, config.xml, config_debug.xml" />
     <copy file="windows/work/arduino.l4j.ini" tofile="windows/work/arduino_debug.l4j.ini" />
 
     <!-- cygwin requires html, dll, and exe to have the +x flag -->
@@ -877,46 +891,7 @@
       <fileset dir="windows/work" includes="**/*.html, **/*.dll, **/*.exe" />
     </chmod>
 
-    <!-- Unzip ARM toolchain -->
-    <antcall target="untar">
-      <param name="archive_file" value="${staging_folder}/dist/gcc-arm-none-eabi-4.8.3-2014q1-windows.tar.gz" />
-      <param name="archive_url" value="http://arduino.cc/download.php?f=/gcc-arm-none-eabi-4.8.3-2014q1-windows.tar.gz" />
-      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/gcc-arm-none-eabi-4.8.3-2014q1" />
-      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/" />
-    </antcall>
-
-    <delete includeEmptyDirs="true" quiet="true">
-      <fileset dir="windows/work/hardware/tools/avr/doc" />
-    </delete>
-	
-  	<antcall target="untar">
-      <param name="archive_file" value="${staging_folder}/dist/win32-xtensa-lx106-elf.tgz" />
-      <param name="archive_url" value="http://download.igrr.me/win32-xtensa-lx106-elf.tgz" />
-      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/xtensa-lx106-elf" />
-      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/" />
-    </antcall>
-	
-
-    <antcall target="unzip">
-      <param name="archive_file" value="${staging_folder}/esptool-0.4.3-win32.zip" />
-      <param name="archive_url" value="https://github.com/igrr/esptool-ck/releases/download/0.4.3/esptool-0.4.3-win32.zip" />
-      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/esptool-0.4.3-win32" />
-      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/" />
-    </antcall>
-    <move file="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/esptool-0.4.3-win32/esptool.exe" tofile="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/esptool.exe" />
-    <delete dir="${staging_folder}/work/${staging_hardware_folder}/tools/esp8266/esptool-0.4.3-win32/" />
- 
-  </target>
-
-  <target name="windows-run" depends="windows-build"
-	  description="Run windows version">
-    <exec executable="windows/work/arduino.exe"
-	  dir="windows/work" spawn="true"/>
-  </target>
-
-  <target name="windows-dist" depends="windows-build" description="Create .zip files of windows version">
-
-    <loadproperties srcfile="${WINDOWS_BUNDLED_JVM}/../release" prefix="windows"/>
+    <loadproperties srcfile="${WINDOWS_BUNDLED_JVM}/release" prefix="windows"/>
 
     <fail message="It looks like ${WINDOWS_BUNDLED_JVM} does not contain a Windows JVM">
       <condition>
@@ -929,10 +904,48 @@
     <copy todir="${staging_folder}/work/java" includeemptydirs="true" preservelastmodified="true" overwrite="true" failonerror="true">
       <fileset dir="${WINDOWS_BUNDLED_JVM}" includes="*/**"/>
     </copy>
+  </target>
 
+  <target name="windows-build-avr-toolchain">
+    <antcall target="avr-toolchain-bundle">
+      <param name="unpack_target" value="unzip"/>
+      <param name="gcc_archive_file" value="avr-gcc-4.8.1-arduino5-i686-mingw32.zip"/>
+      <param name="gcc_version" value="4.8.1-arduino5"/>
+      <param name="avrdude_archive_file" value="avrdude-6.0.1-arduino5-i686-mingw32.zip"/>
+      <param name="avrdude_version" value="6.0.1-arduino5"/>
+    </antcall>
+
+    <antcall target="package-library-index-json-bundle"/>
+
+    <mkdir dir="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools" />
+	
+  	<antcall target="untar">
+      <param name="archive_file" value="${staging_folder}/dist/win32-xtensa-lx106-elf-gb404fb9.tgz" />
+      <param name="archive_url" value="http://download.igrr.me/win32-xtensa-lx106-elf-gb404fb9.tgz" />
+      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/xtensa-lx106-elf" />
+      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/" />
+    </antcall>
+	
+
+    <antcall target="unzip">
+      <param name="archive_file" value="${staging_folder}/esptool-0.4.4-win32.zip" />
+      <param name="archive_url" value="https://github.com/igrr/esptool-ck/releases/download/0.4.4/esptool-0.4.4-win32.zip" />
+      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.4-win32" />
+      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/" />
+    </antcall>
+    <move file="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.4-win32/esptool.exe" tofile="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool.exe" />
+    <delete dir="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.4-win32/" />
+ 
+  </target>
+
+  <target name="windows-run" depends="build"
+	  description="Run windows version">
+    <exec executable="windows/work/arduino.exe" dir="windows/work" failonerror="true"/>
+  </target>
+
+  <target name="windows-dist" depends="build" description="Create .zip files of windows version">
     <zip destfile="windows/arduino-${version}-${platform}.zip" level="9">
-      <zipfileset dir="windows/work"
-		  prefix="arduino-${version}" />
+      <zipfileset dir="windows/work" prefix="arduino-${version}"/>
     </zip>
 
     <echo>
@@ -984,6 +997,65 @@
 
   <target name="clean" description="Perform a spring cleaning"
 	  depends="linux-clean, windows-clean, macosx-clean, subprojects-clean">
+  </target>
+
+  <target name="avr-toolchain-bundle" unless="light_bundle">
+    <!-- Unzip AVR tools -->
+    <mkdir dir="${staging_folder}/work/${staging_hardware_folder}/tmp/gcc"/>
+
+    <antcall target="${unpack_target}">
+      <param name="archive_file" value="${staging_folder}/${gcc_archive_file}"/>
+      <param name="archive_url" value="http://downloads.arduino.cc/tools/${gcc_archive_file}"/>
+      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tmp/gcc/${gcc_version}/"/>
+      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tmp/gcc/"/>
+    </antcall>
+
+    <mkdir dir="${staging_folder}/work/${staging_hardware_folder}/tmp/avrdude"/>
+
+    <antcall target="${unpack_target}">
+      <param name="archive_file" value="${staging_folder}/${avrdude_archive_file}"/>
+      <param name="archive_url" value="http://downloads.arduino.cc/tools/${avrdude_archive_file}"/>
+      <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/tmp/avrdude/${avrdude_version}"/>
+      <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/tmp/avrdude/"/>
+    </antcall>
+
+    <move file="${staging_folder}/work/${staging_hardware_folder}/tmp/gcc/avr" tofile="${staging_folder}/work/${staging_hardware_folder}/tools/avr"/>
+    <move file="${staging_folder}/work/${staging_hardware_folder}/tmp/avrdude/avrdude-6.0.1" tofile="${staging_folder}/work/${staging_hardware_folder}/tools/avr"/>
+    <antcall target="macosx-fix-bundled-toolchain-missing-symlinks"/>
+
+    <echo append="true" file="${staging_folder}/work/${staging_hardware_folder}/tools/avr/builtin_tools_versions.txt" message="arduino.avrdude=${avrdude_version}${line.separator}"/>
+    <echo append="true" file="${staging_folder}/work/${staging_hardware_folder}/tools/avr/builtin_tools_versions.txt" message="arduino.avr-gcc=${gcc_version}${line.separator}"/>
+  </target>
+
+  <target name="package-library-index-json-bundle">
+    <mkdir dir="${staging_folder}/work/${staging_hardware_folder}/../dist/"/>
+
+    <get src="http://downloads.arduino.cc/packages/package_index.json.gz" dest="${staging_folder}/work/${staging_hardware_folder}/../dist/" verbose="true" skipexisting="false" />
+    <gunzip src="${staging_folder}/work/${staging_hardware_folder}/../dist/package_index.json.gz" dest="${staging_folder}/work/${staging_hardware_folder}/../dist/"/>
+    <delete file="${staging_folder}/work/${staging_hardware_folder}/../dist/package_index.json.gz"/>
+
+    <get src="http://downloads.arduino.cc/packages/package_index.json.sig" dest="${staging_folder}/work/${staging_hardware_folder}/../dist/" verbose="true" skipexisting="false" />
+
+    <get src="http://downloads.arduino.cc/libraries/library_index.json.gz" dest="${staging_folder}/work/${staging_hardware_folder}/../dist/" verbose="true" skipexisting="false" />
+    <gunzip src="${staging_folder}/work/${staging_hardware_folder}/../dist/library_index.json.gz" dest="${staging_folder}/work/${staging_hardware_folder}/../dist/"/>
+    <delete file="${staging_folder}/work/${staging_hardware_folder}/../dist/library_index.json.gz"/>
+
+    <delete dir="${staging_folder}/work/${staging_hardware_folder}/tmp"/>
+  </target>
+
+  <target name="macosx-fix-bundled-toolchain-missing-symlinks" if="macosx">
+    <exec executable="mv" failonerror="true">
+      <arg value="${staging_folder}/work/${staging_hardware_folder}/tmp/avrdude/avrdude-6.0.1/lib/libusb.dylib"/>
+      <arg value="${staging_folder}/work/${staging_hardware_folder}/tools/avr/lib/"/>
+    </exec>
+    <exec executable="mv" failonerror="true">
+      <arg value="${staging_folder}/work/${staging_hardware_folder}/tmp/avrdude/avrdude-6.0.1/lib/libusb-1.0.dylib"/>
+      <arg value="${staging_folder}/work/${staging_hardware_folder}/tools/avr/lib/"/>
+    </exec>
+  </target>
+
+  <target name="generate-hourly-build-txt" if="hourly">
+    <echo file="${staging_folder}/work/${staging_hardware_folder}/../lib/hourlyBuild.txt">${BUILD_DATE}</echo>
   </target>
 
 </project>
