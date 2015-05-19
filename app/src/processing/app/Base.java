@@ -25,9 +25,7 @@ package processing.app;
 import cc.arduino.contributions.BuiltInCoreIsNewerCheck;
 import cc.arduino.contributions.DownloadableContributionVersionComparator;
 import cc.arduino.contributions.VersionHelper;
-import cc.arduino.contributions.libraries.ContributedLibrary;
-import cc.arduino.contributions.libraries.LibrariesIndexer;
-import cc.arduino.contributions.libraries.LibraryInstaller;
+import cc.arduino.contributions.libraries.*;
 import cc.arduino.contributions.libraries.ui.LibraryManagerUI;
 import cc.arduino.contributions.packages.ContributedPlatform;
 import cc.arduino.contributions.packages.ContributionInstaller;
@@ -1195,6 +1193,13 @@ public class Base {
     return new LibraryList(libs);
   }
 
+  private List<ContributedLibrary> getSortedLibraries() {
+    List<ContributedLibrary> installedLibraries = new LinkedList<ContributedLibrary>(BaseNoGui.librariesIndexer.getInstalledLibraries());
+    Collections.sort(installedLibraries, new LibraryByTypeComparator());
+    Collections.sort(installedLibraries, new LibraryOfSameTypeComparator());
+    return installedLibraries;
+  }
+
   public void rebuildImportMenu(JMenu importMenu) {
     if (importMenu == null)
       return;
@@ -1225,33 +1230,35 @@ public class Base {
     TargetPlatform targetPlatform = getTargetPlatform();
 
     if (targetPlatform != null) {
-      LibraryList ideLibs = getIDELibs();
-      LibraryList userLibs = getUserLibs();
-      try {
-        // Find the current target. Get the platform, and then select the
-        // correct name and core path.
-        String platformNameLabel;
-        platformNameLabel = StringUtils.capitalize(targetPlatform.getContainerPackage().getId()) + "/" + StringUtils.capitalize(targetPlatform.getId());
-        platformNameLabel = I18n.format(_("{0} libraries"), platformNameLabel);
-        JMenuItem platformItem = new JMenuItem(_(platformNameLabel));
-        platformItem.setEnabled(false);
-        importMenu.add(platformItem);
-
-        if (ideLibs.size() > 0) {
-          addLibraries(importMenu, ideLibs);
-        }
-
-        if (userLibs.size() > 0) {
-          if (ideLibs.size() > 0) {
+      List<ContributedLibrary> libs = getSortedLibraries();
+      String lastLibType = null;
+      for (ContributedLibrary lib : libs) {
+        if (lastLibType == null || !lastLibType.equals(lib.getTypes().get(0))) {
+          if (lastLibType != null) {
             importMenu.addSeparator();
           }
-          JMenuItem contributedLibraryItem = new JMenuItem(_("Contributed libraries"));
-          contributedLibraryItem.setEnabled(false);
-          importMenu.add(contributedLibraryItem);
-          addLibraries(importMenu, userLibs);
+          lastLibType = lib.getTypes().get(0);
+          JMenuItem platformItem = new JMenuItem(I18n.format(_("{0} libraries"), lastLibType));
+          platformItem.setEnabled(false);
+          importMenu.add(platformItem);
         }
-      } catch (IOException e) {
-        e.printStackTrace();
+
+        AbstractAction action = new AbstractAction(lib.getName()) {
+          public void actionPerformed(ActionEvent event) {
+            UserLibrary l = (UserLibrary) getValue("library");
+            try {
+              activeEditor.getSketch().importLibrary(l);
+            } catch (IOException e) {
+              showWarning(_("Error"), I18n.format("Unable to list header files in {0}", l.getSrcFolder()), e);
+            }
+          }
+        };
+        action.putValue("library", lib);
+
+        // Add new element at the bottom
+        JMenuItem item = new JMenuItem(action);
+        item.putClientProperty("library", lib);
+        importMenu.add(item);
       }
     }
   }
