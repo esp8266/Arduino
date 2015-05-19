@@ -45,6 +45,7 @@
     <runtimeBits>32</runtimeBits>
     <opt>-splash:./lib/splash.png</opt>
     <opt>-Dsun.java2d.d3d=false</opt>
+    <opt>-Djna.nosys=true</opt>
   </jre>
   <messages>
     <startupErr>An error occurred while starting the application.</startupErr>
