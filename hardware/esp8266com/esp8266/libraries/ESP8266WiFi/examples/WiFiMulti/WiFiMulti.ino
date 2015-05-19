@@ -6,15 +6,15 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
 
-ESP8266WiFiMulti WiFiMulti = ESP8266WiFiMulti();
+ESP8266WiFiMulti wifiMulti;
 
 void setup() {
     Serial.begin(115200);
     delay(10);
 	
-    WiFiMulti.addAP("ssid_from_AP_1", "your_password_for_AP_1");
-    WiFiMulti.addAP("ssid_from_AP_2", "your_password_for_AP_2");
-    WiFiMulti.addAP("ssid_from_AP_3", "your_password_for_AP_3");
+    wifiMulti.addAP("ssid_from_AP_1", "your_password_for_AP_1");
+    wifiMulti.addAP("ssid_from_AP_2", "your_password_for_AP_2");
+    wifiMulti.addAP("ssid_from_AP_3", "your_password_for_AP_3");
 
 	Serial.println("Connecting Wifi...");
     if(wifiMulti.run() == WL_CONNECTED) {
