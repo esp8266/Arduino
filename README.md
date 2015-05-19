@@ -82,6 +82,11 @@ By default the diagnostic output from WiFi libraries is disabled when you call `
 
 Both ```Serial``` and ```Serial1``` objects support 5, 6, 7, 8 data bits, odd (O), even (E), and no (N) parity, and 1 or 2 stop bits. To set the desired mode, call ```Serial.begin(baudrate, SERIAL_8N1);```, ```Serial.begin(baudrate, SERIAL_6E2);```, etc.
 
+#### Progmem ####
+
+The Program memory features work much the same way as on a regular Arduino; placing read only data and strings in read only memory and freeing heap for your application.
+The important difference is that on the esp8266 the literal strings are not pooled.  This means that the same literal string defined inside a ```F("")``` and/or ```PSTR("")``` will take up space for each instance in the code.  So you will need to manage the duplicate strings yourself.
+
 #### WiFi(ESP8266WiFi library) ####
 
 This is mostly similar to WiFi shield library. Differences include:
