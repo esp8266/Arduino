@@ -251,7 +251,9 @@ void ESP8266WebServer::_handleRequest() {
 
 const char* ESP8266WebServer::_responseCodeToString(int code) {
   switch (code) {
+    case 101: return "Switching Protocols";
     case 200: return "OK";
+    case 403: return "Forbidden";
     case 404: return "Not found";
     case 500: return "Fail";
     default:  return "";
