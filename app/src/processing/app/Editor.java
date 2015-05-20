@@ -1422,7 +1422,7 @@ public class Editor extends JFrame implements RunnerListener {
         if (find == null) {
           find = new FindReplace(Editor.this);
         }
-        if (!OSUtils.isMacOS() && getSelectedText() != null) {
+        if (!OSUtils.isMacOS()) {
           find.setFindText(getSelectedText());
         }
         find.setLocationRelativeTo(Editor.this);
@@ -1458,11 +1458,8 @@ public class Editor extends JFrame implements RunnerListener {
           if (find == null) {
             find = new FindReplace(Editor.this);
           }
-          if (getSelectedText() != null) {
-            find.setFindText(getSelectedText());
-          }
-          find.setLocationRelativeTo(Editor.this);
-          find.setVisible(true);
+          find.setFindText(getSelectedText());
+          find.findNext();
         }
       });
       menu.add(item);

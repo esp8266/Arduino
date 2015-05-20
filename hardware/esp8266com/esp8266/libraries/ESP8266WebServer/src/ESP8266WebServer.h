@@ -31,6 +31,8 @@ enum HTTPUploadStatus { UPLOAD_FILE_START, UPLOAD_FILE_WRITE, UPLOAD_FILE_END };
 
 #define HTTP_DOWNLOAD_UNIT_SIZE 1460
 #define HTTP_UPLOAD_BUFLEN 2048
+#define HTTP_MAX_DATA_WAIT 1000 //ms to wait for the client to send the request
+#define HTTP_MAX_CLOSE_WAIT 2000 //ms to wait for the client to close the connection
 
 typedef struct {
   HTTPUploadStatus status;
@@ -73,6 +75,8 @@ public:
   // content_type - HTTP content type, like "text/plain" or "image/png"
   // content - actual content body
   void send(int code, const char* content_type = NULL, String content = String(""));
+  void send(int code, char* content_type, String content);
+  void send(int code, String content_type, String content);
 
   void sendHeader(String name, String value, bool first = false);
   void sendContent(String content);
@@ -87,7 +91,12 @@ template<typename T> size_t streamFile(T &file, String contentType){
   head += "\r\n\r\n";
   _currentClient.print(head);
   head = String();
-  return _currentClient.write(file, HTTP_DOWNLOAD_UNIT_SIZE);
+  size_t res =  _currentClient.write(file, HTTP_DOWNLOAD_UNIT_SIZE);
+  uint16_t maxWait = HTTP_MAX_CLOSE_WAIT;
+  while(_currentClient.connected() && maxWait--) {
+    delay(1);
+  }
+  return res;
 }
   
 protected:
