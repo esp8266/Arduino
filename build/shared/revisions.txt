@@ -63,6 +63,7 @@ ARDUINO 1.6.2 - 2015.03.28
 * Introduced starting splashscreen with progress status: will be used for notifying user of long running startup tasks
 * Available ports list is now generated in background: hence "tools" menu is much faster
 * MacOSX: appbundler merged our contribution, switching to upstream version https://bitbucket.org/infinitekind/appbundler/
+* MacOSX: filtering /dev/cu* was not a good idea. Filtering /dev/tty* instead
 
 [core]
 * Stream: fixed bug in findUntil routine #2591 @Xuth
