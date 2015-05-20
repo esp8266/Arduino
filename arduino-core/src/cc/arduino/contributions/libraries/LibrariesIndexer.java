@@ -66,7 +66,7 @@ public class LibrariesIndexer {
   private final File stagingFolder;
   private File sketchbookLibrariesFolder;
   
-  private static final List<String> badLibNotified = new ArrayList<String>();
+  private final List<String> badLibNotified = new ArrayList<String>();
 
   public LibrariesIndexer(File preferencesFolder, ContributionsIndexer contributionsIndexer) {
     this.contributionsIndexer = contributionsIndexer;
