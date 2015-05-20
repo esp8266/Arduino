@@ -1,5 +1,5 @@
 /**
- * @file hash.h
+ * @file Hash.h
  * @date 20.05.2015
  * @author Markus Sattler
  *

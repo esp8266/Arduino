@@ -1,5 +1,5 @@
 /**
- * @file hash.cpp
+ * @file Hash.cpp
  * @date 20.05.2015
  * @author Markus Sattler
  *
@@ -24,7 +24,7 @@
 
 #include <Arduino.h>
 
-#include "hash.h"
+#include "Hash.h"
 
 extern "C" {
     #include "sha1/sha1.h"
