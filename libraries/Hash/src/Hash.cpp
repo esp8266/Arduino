@@ -27,7 +27,7 @@
 #include "Hash.h"
 
 extern "C" {
-    #include "sha1/sha1.h"
+#include "sha1/sha1.h"
 }
 
 /**
@@ -66,6 +66,52 @@ void sha1(uint8_t * data, uint32_t size, uint8_t hash[20]) {
 #endif
 }
 
+void sha1(char * data, uint32_t size, uint8_t hash[20]) {
+    sha1((uint8_t *) data, size, hash);
+}
+
 void sha1(const uint8_t * data, uint32_t size, uint8_t hash[20]) {
     sha1((uint8_t *) data, size, hash);
 }
+
+void sha1(const char * data, uint32_t size, uint8_t hash[20]) {
+    sha1((uint8_t *) data, size, hash);
+}
+
+void sha1(String data, uint8_t hash[20]) {
+    sha1(data.c_str(), data.length(), hash);
+}
+
+String sha1(uint8_t* data, uint32_t size) {
+    uint8_t hash[20];
+    String hashStr = "";
+
+    sha1(&data[0], size, &hash[0]);
+
+    for(uint16_t i = 0; i < 20; i++) {
+        String hex = String(hash[i], HEX);
+        if(hex.length() < 2) {
+            hex = "0" + hex;
+        }
+        hashStr += hex;
+    }
+
+    return hashStr;
+}
+
+String sha1(char* data, uint32_t size) {
+    return sha1((uint8_t*) data, size);
+}
+
+String sha1(const uint8_t* data, uint32_t size) {
+    return sha1((uint8_t*) data, size);
+}
+
+String sha1(const char* data, uint32_t size) {
+    return sha1((uint8_t*) data, size);
+}
+
+String sha1(String data) {
+    return sha1(data.c_str(), data.length());
+}
+
