@@ -82,6 +82,11 @@ By default the diagnostic output from WiFi libraries is disabled when you call `
 
 Both ```Serial``` and ```Serial1``` objects support 5, 6, 7, 8 data bits, odd (O), even (E), and no (N) parity, and 1 or 2 stop bits. To set the desired mode, call ```Serial.begin(baudrate, SERIAL_8N1);```, ```Serial.begin(baudrate, SERIAL_6E2);```, etc.
 
+#### Progmem ####
+
+The Program memory features work much the same way as on a regular Arduino; placing read only data and strings in read only memory and freeing heap for your application.
+The important difference is that on the esp8266 the literal strings are not pooled.  This means that the same literal string defined inside a ```F("")``` and/or ```PSTR("")``` will take up space for each instance in the code.  So you will need to manage the duplicate strings yourself.
+
 #### WiFi(ESP8266WiFi library) ####
 
 This is mostly similar to WiFi shield library. Differences include:
@@ -160,6 +165,8 @@ Several APIs may be used to get flash chip info:
 
 ```ESP.getFlashChipSpeed(void)``` returns the flash chip frequency, in Hz.
 
+```ESP.getCycleCount()``` returns the cpu instruction cycle count since start as an unsigned 32-bit.  This is useful for accurate timing of very short actions like bit banging.
+
 
 #### OneWire (from https://www.pjrc.com/teensy/td_libs_OneWire.html) ####
 
@@ -181,7 +188,8 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 - [PubSubClient](https://github.com/knolleary/pubsubclient) MQTT library. Use this [sample](https://gist.github.com/igrr/7f7e7973366fc01d6393) to get started.
 - [DHT11](https://github.com/adafruit/DHT-sensor-library) - initialize DHT as follows: ```DHT dht(DHTPIN, DHTTYPE, 15);```
 - [DallasTemperature](https://github.com/milesburton/Arduino-Temperature-Control-Library.git)
-
+- [NeoPixelBus](https://github.com/Makuna/NeoPixelBus) - Arduino NeoPixel library compatible with esp8266.
+- [RTC](https://github.com/Makuna/Rtc) - Arduino Library for Ds1307 & Ds3231 compatible with esp8266.
 
 #### Upload via serial port ####
 Pick the correct serial port.
