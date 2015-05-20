@@ -9,15 +9,21 @@ void setup() {
 }
 
 void loop() {
+
+    // usage as String
+    // SHA1:a94a8fe5ccb19ba61c4c0873d391e987982fbbd3
+
+    Serial.print("SHA1:");
+    Serial.println(sha1("abc"));
+
+    // usage as ptr
+    // SHA1:a94a8fe5ccb19ba61c4c0873d391e987982fbbd3
     uint8_t hash[20];
-    const uint8_t test[] = "test";
+    sha1("abc", &hash[0]);
 
-    sha1((uint8_t *)&test[0], sizeof(test)-1, &hash[0]);
-
-    // SHA1: A94A8FE5CCB19BA61C4C0873D391E987982FBBD3
     Serial.print("SHA1:");
     for(uint16_t i = 0; i < 20; i++) {
-        Serial.printf("%02X", hash[i]);
+        Serial.printf("%02x", hash[i]);
     }
     Serial.println();
 
