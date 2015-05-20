@@ -3,7 +3,7 @@
 With the Arduino GSM Shield, this library enables an Arduino board to do most of the operations you can do with a GSM phone: place and receive voice calls, send and receive SMS, and connect to the internet over a GPRS network. 
 
 For more information about this library please visit us at
-http://arduino.cc/en/Reference/GSM
+http://www.arduino.cc/en/Reference/GSM
 
 == License ==
 Copyright (c) 2012 Telefónica Digital - PDI - Physical Internet Lab

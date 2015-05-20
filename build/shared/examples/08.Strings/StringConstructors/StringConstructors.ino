@@ -7,7 +7,7 @@
  modified 30 Aug 2011
  by Tom Igoe
 
- http://arduino.cc/en/Tutorial/StringConstructors
+ http://www.arduino.cc/en/Tutorial/StringConstructors
 
  This example code is in the public domain.
  */

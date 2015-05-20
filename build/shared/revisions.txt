@@ -494,7 +494,7 @@ ARDUINO 1.5 BETA - 2012.10.22
 * Everything is in beta, most features or libraries are still  missing 
   or incomplete.
 * For more info refer to this press release:
-  http://arduino.cc/blog/2012/10/22/arduino-1-5-support-for-the-due-and-other-processors-easier-library-installation-simplified-board-menu-etc/
+  http://www.arduino.cc/blog/2012/10/22/arduino-1-5-support-for-the-due-and-other-processors-easier-library-installation-simplified-board-menu-etc/
 
 ARDUINO 1.0.7
 
@@ -726,7 +726,7 @@ ARDUINO 1.0.1 - 2012.05.21
 * The IDE has been internationalized and translated into multiple languages.
   Thanks to Shigeru Kanemoto for the internationalization and Japanese
   translation and many others for the other translations.  For more
-  information, see: http://arduino.cc/playground/Main/LanguagesIDE
+  information, see: http://www.arduino.cc/playground/Main/LanguagesIDE
 
 * Added preference for selecting the language in which to display the
   Arduino software.  Defaults to the operating system locale.  
@@ -981,7 +981,7 @@ ARDUINO 0022 - 2010.12.24
 
 * Adding an SD card library based on sdfatlib by Bill Greiman and the
   MemoryCard library by Philip Lindsay (follower) for SparkFun.
-  http://arduino.cc/en/Reference/SD
+  http://www.arduino.cc/en/Reference/SD
 
 * Added character manipulation macros (from Wiring): isAlphaNumeric(),
   isAlpha(), isAscii(), isWhitespace(), isControl(), isDigit(), isGraph(),

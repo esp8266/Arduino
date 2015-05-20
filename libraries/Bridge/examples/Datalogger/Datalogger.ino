@@ -26,7 +26,7 @@
 
  This example code is in the public domain.
 
- http://arduino.cc/en/Tutorial/YunDatalogger
+ http://www.arduino.cc/en/Tutorial/YunDatalogger
 
  */
 

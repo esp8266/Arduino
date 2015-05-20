@@ -3,7 +3,7 @@
 The Robot has a number of built in sensors and actuators. The library is designed to easily access the robot's functionality.
 
 For more information about this library please visit us at
-http://arduino.cc/en/Reference/RobotLibrary
+http://www.arduino.cc/en/Reference/RobotLibrary
 
 == License ==
 

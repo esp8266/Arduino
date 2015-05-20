@@ -320,7 +320,7 @@ public class BaseNoGui {
         File readme = new File(libdir, "readme.txt");
         FileWriter freadme = new FileWriter(readme);
         freadme.write(_("For information on installing libraries, see: " +
-                        "http://arduino.cc/en/Guide/Libraries\n"));
+                        "http://www.arduino.cc/en/Guide/Libraries\n"));
         freadme.close();
       } catch (Exception e) {
       }

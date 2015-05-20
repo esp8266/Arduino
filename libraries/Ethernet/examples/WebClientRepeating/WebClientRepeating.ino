@@ -17,7 +17,7 @@
  modified 21 Jan 2014
  by Federico Vanzati
 
- http://arduino.cc/en/Tutorial/WebClientRepeating
+ http://www.arduino.cc/en/Tutorial/WebClientRepeating
  This code is in the public domain.
 
  */

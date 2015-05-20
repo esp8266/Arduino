@@ -3,7 +3,7 @@
 The Firmata library implements the Firmata protocol for communicating with software on the host computer. This allows you to write custom firmware without having to create your own protocol and objects for the programming environment that you are using. 
 
 For more information about this library please visit us at
-http://arduino.cc/en/Reference/Firmata
+http://www.arduino.cc/en/Reference/Firmata
 
 == License ==
 

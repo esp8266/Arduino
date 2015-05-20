@@ -23,7 +23,7 @@
 
  This example code is in the public domain.
 
- http://arduino.cc/en/Tutorial/AnalogInput
+ http://www.arduino.cc/en/Tutorial/AnalogInput
 
  */
 

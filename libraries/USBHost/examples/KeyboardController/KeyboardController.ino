@@ -7,7 +7,7 @@
  created 8 Oct 2012
  by Cristian Maglie
 
- http://arduino.cc/en/Tutorial/KeyboardController
+ http://www.arduino.cc/en/Tutorial/KeyboardController
 
  This sample code is part of the public domain.
  */

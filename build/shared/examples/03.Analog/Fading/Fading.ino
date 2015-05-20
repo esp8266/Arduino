@@ -11,7 +11,7 @@
  modified 30 Aug 2011
  By Tom Igoe
 
- http://arduino.cc/en/Tutorial/Fading
+ http://www.arduino.cc/en/Tutorial/Fading
 
  This example code is in the public domain.
 

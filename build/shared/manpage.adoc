@@ -333,7 +333,7 @@ HISTORY
 
 RESOURCES
 ---------
-Web site: <http://arduino.cc/>
+Web site: <http://www.arduino.cc/>
 
 Help on projects and programming: <http://forum.arduino.cc/>
 
