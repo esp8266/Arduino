@@ -801,7 +801,7 @@ public class Editor extends JFrame implements RunnerListener {
             if (sel == null) {
               if (!name.equals(basename)) menu.setText(basename);
             } else {
-              if (sel.length() > 17) sel = sel.substring(0, 16) + "...";
+              if (sel.length() > 50) sel = sel.substring(0, 50) + "...";
               String newname = basename + ": \"" + sel + "\"";
               if (!name.equals(newname)) menu.setText(newname);
             }
