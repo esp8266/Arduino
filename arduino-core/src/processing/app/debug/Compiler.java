@@ -277,11 +277,13 @@ public class Compiler implements MessageConsumer {
       // used.  Keep everything else, which might be reusable
       if (tempBuildFolder.exists()) {
         String files[] = tempBuildFolder.list();
-        for (String file : files) {
-          if (file.endsWith(".c") || file.endsWith(".cpp") || file.endsWith(".s")) {
-            File deleteMe = new File(tempBuildFolder, file);
-            if (!deleteMe.delete()) {
-              System.err.println("Could not delete " + deleteMe);
+        if (files != null) {
+          for (String file : files) {
+            if (file.endsWith(".c") || file.endsWith(".cpp") || file.endsWith(".s")) {
+              File deleteMe = new File(tempBuildFolder, file);
+              if (!deleteMe.delete()) {
+                System.err.println("Could not delete " + deleteMe);
+              }
             }
           }
         }

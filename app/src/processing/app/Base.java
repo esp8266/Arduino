@@ -2604,12 +2604,15 @@ public class Base {
                              File targetDir) throws IOException {
     targetDir.mkdirs();
     String files[] = sourceDir.list();
-    for (int i = 0; i < files.length; i++) {
+    if (files == null) {
+      throw new IOException("Unable to list files from " + sourceDir);
+    }
+    for (String file : files) {
       // Ignore dot files (.DS_Store), dot folders (.svn) while copying
-      if (files[i].charAt(0) == '.') continue;
+      if (file.charAt(0) == '.') continue;
       //if (files[i].equals(".") || files[i].equals("..")) continue;
-      File source = new File(sourceDir, files[i]);
-      File target = new File(targetDir, files[i]);
+      File source = new File(sourceDir, file);
+      File target = new File(targetDir, file);
       if (source.isDirectory()) {
         //target.mkdirs();
         copyDir(source, target);

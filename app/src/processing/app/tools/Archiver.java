@@ -150,6 +150,9 @@ public class Archiver implements Tool {
   public void buildZip(File dir, String sofar,
                        ZipOutputStream zos) throws IOException {
     String files[] = dir.list();
+    if (files == null) {
+      throw new IOException("Unable to list files from " + dir);
+    }
     for (int i = 0; i < files.length; i++) {
       if (files[i].equals(".") ||
           files[i].equals("..")) continue;

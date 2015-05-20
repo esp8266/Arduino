@@ -95,6 +95,9 @@ public class SketchData {
 
     // get list of files in the sketch folder
     String list[] = folder.list();
+    if (list == null) {
+      throw new IOException("Unable to list files from " + folder);
+    }
 
     // reset these because load() may be called after an
     // external editor event. (fix for 0099)

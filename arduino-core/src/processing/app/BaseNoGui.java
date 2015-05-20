@@ -956,14 +956,18 @@ public class BaseNoGui {
     if (!dir.exists()) return;
 
     String files[] = dir.list();
-    for (int i = 0; i < files.length; i++) {
-      if (files[i].equals(".") || files[i].equals("..")) continue;
-      File dead = new File(dir, files[i]);
+    if (files == null) {
+      return;
+    }
+
+    for (String file : files) {
+      if (file.equals(".") || file.equals("..")) continue;
+      File dead = new File(dir, file);
       if (!dead.isDirectory()) {
         if (!PreferencesData.getBoolean("compiler.save_build_files")) {
           if (!dead.delete()) {
             // temporarily disabled
-        System.err.println(I18n.format(_("Could not delete {0}"), dead));
+            System.err.println(I18n.format(_("Could not delete {0}"), dead));
           }
         }
       } else {
