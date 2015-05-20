@@ -25,6 +25,7 @@ package processing.app;
 import cc.arduino.packages.MonitorFactory;
 
 import cc.arduino.view.StubMenuListener;
+import com.google.common.base.Predicate;
 import com.jcraft.jsch.JSchException;
 import jssc.SerialPortException;
 import processing.app.debug.*;
@@ -67,6 +68,25 @@ import cc.arduino.packages.uploaders.SerialUploader;
  */
 @SuppressWarnings("serial")
 public class Editor extends JFrame implements RunnerListener {
+
+  private static class ShouldSaveIfModified implements Predicate<Sketch> {
+
+    @Override
+    public boolean apply(Sketch sketch) {
+      if (PreferencesData.getBoolean("editor.save_on_verify")) {
+        return sketch.isModified() && !sketch.isReadOnly();
+      }
+      return false;
+    }
+  }
+
+  private static class ShouldSaveReadOnly implements Predicate<Sketch> {
+
+    @Override
+    public boolean apply(Sketch sketch) {
+      return sketch.isReadOnly();
+    }
+  }
 
   private final static List<String> BOARD_PROTOCOLS_ORDER = Arrays.asList(new String[]{"serial", "network"});
   private final static List<String> BOARD_PROTOCOLS_ORDER_TRANSLATIONS = Arrays.asList(new String[]{_("Serial ports"), _("Network ports")});
@@ -690,7 +710,7 @@ public class Editor extends JFrame implements RunnerListener {
     item = newJMenuItemAlt(_("Export compiled Binary"), 'S');
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          handleRun(false, Editor.this.presentAndSaveHandler, Editor.this.runAndSaveHandler);
+          handleRun(false, new ShouldSaveReadOnly(), Editor.this.presentAndSaveHandler, Editor.this.runAndSaveHandler);
         }
       });
     sketchMenu.add(item);
@@ -2005,11 +2025,13 @@ public class Editor extends JFrame implements RunnerListener {
    * @param nonVerboseHandler
    */
   public void handleRun(final boolean verbose, Runnable verboseHandler, Runnable nonVerboseHandler) {
+    handleRun(verbose, new ShouldSaveIfModified(), verboseHandler, nonVerboseHandler);
+  }
+
+  public void handleRun(final boolean verbose, Predicate<Sketch> shouldSavePredicate, Runnable verboseHandler, Runnable nonVerboseHandler) {
     internalCloseRunner();
-    if (PreferencesData.getBoolean("editor.save_on_verify")) {
-      if (sketch.isModified() && !sketch.isReadOnly()) {
-        handleSave(true);
-      }
+    if (shouldSavePredicate.apply(sketch)) {
+      handleSave(true);
     }
     running = true;
     toolbar.activate(EditorToolbar.RUN);
