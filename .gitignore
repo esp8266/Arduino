@@ -72,3 +72,4 @@ nbproject
 build/macosx/esptool-*-osx.zip
 
 build/macosx/dist/osx-xtensa-lx106-elf.tgz
+/hardware/esp8266com/esp8266/tools
