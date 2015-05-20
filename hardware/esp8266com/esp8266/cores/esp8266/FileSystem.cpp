@@ -34,11 +34,13 @@ static s32_t api_spiffs_read(u32_t addr, u32_t size, u8_t *dst);
 static s32_t api_spiffs_write(u32_t addr, u32_t size, u8_t *src);
 static s32_t api_spiffs_erase(u32_t addr, u32_t size);
 
-FSClass FS((uint32_t) &_SPIFFS_start, (uint32_t) &_SPIFFS_end, 4);
+FSClass FS((uint32_t) &_SPIFFS_start, (uint32_t) &_SPIFFS_end, (uint32_t) &_SPIFFS_page, (uint32_t) &_SPIFFS_block, 4);
 
-FSClass::FSClass(uint32_t beginAddress, uint32_t endAddress, uint32_t maxOpenFiles)
+FSClass::FSClass(uint32_t beginAddress, uint32_t endAddress, uint32_t pageSize, uint32_t blockSize, uint32_t maxOpenFiles)
 : _beginAddress(beginAddress)
 , _endAddress(endAddress)
+, _pageSize(pageSize)
+, _blockSize(blockSize)
 , _maxOpenFiles(maxOpenFiles)
 , _fs({0})
 {
@@ -56,8 +58,8 @@ int FSClass::_mountInternal(){
   cfg.phys_addr = _beginAddress;
   cfg.phys_size = _endAddress - _beginAddress;
   cfg.phys_erase_block = INTERNAL_FLASH_SECTOR_SIZE;
-  cfg.log_block_size = _SPIFFS_block;
-  cfg.log_page_size = _SPIFFS_page;
+  cfg.log_block_size = _blockSize;
+  cfg.log_page_size = _pageSize;
   cfg.hal_read_f = api_spiffs_read;
   cfg.hal_write_f = api_spiffs_write;
   cfg.hal_erase_f = api_spiffs_erase;
