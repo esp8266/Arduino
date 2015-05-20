@@ -2,7 +2,7 @@
  * simple demo to show sha1 calculation
  */
 #include <Arduino.h>
-#include <hash.h>
+#include <Hash.h>
 
 void setup() {
     Serial.begin(921600);
