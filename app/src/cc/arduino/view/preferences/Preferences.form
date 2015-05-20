@@ -617,13 +617,6 @@
             </Property>
           </Properties>
         </Component>
-        <Component class="javax.swing.JCheckBox" name="autoAssociateBox">
-          <Properties>
-            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="_(&quot;Automatically associate .ino files with Arduino&quot;)" type="code"/>
-            </Property>
-          </Properties>
-        </Component>
         <Component class="javax.swing.JCheckBox" name="saveVerifyUploadBox">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">

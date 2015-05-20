@@ -57,6 +57,8 @@ public class Platform extends processing.app.Platform {
   }
 
   public void init() throws IOException {
+    super.init();
+
     System.setProperty("apple.laf.useScreenMenuBar", "true");
 
     discoverRealOsArch();

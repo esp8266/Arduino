@@ -34,7 +34,6 @@
     <cp>lib/jackson-module-mrbean-2.2.3.jar</cp>
     <cp>lib/java-semver-0.8.0.jar</cp>
     <cp>lib/jmdns-3.4.1.jar</cp>
-    <cp>lib/jna.jar</cp>
     <cp>lib/jsch-0.1.50.jar</cp>
     <cp>lib/jssc-2.8.0.jar</cp>
     <cp>lib/pde.jar</cp>
@@ -44,7 +43,6 @@
     <path>java</path>
     <runtimeBits>32</runtimeBits>
     <opt>-Dsun.java2d.d3d=false</opt>
-    <opt>-Djna.nosys=true</opt>
   </jre>
   <messages>
     <startupErr>An error occurred while starting the application.</startupErr>
