@@ -85,7 +85,7 @@ public:
 
 class FSClass {
 public:
-  FSClass(uint32_t beginAddress, uint32_t endAddress, uint32_t maxOpenFiles);
+  FSClass(uint32_t beginAddress, uint32_t endAddress, uint32_t pageSize, uint32_t blockSize, uint32_t maxOpenFiles);
 
   bool mount();
   void unmount();
@@ -117,6 +117,8 @@ protected:
   size_t _cacheSize;
   uint32_t _beginAddress;
   uint32_t _endAddress;
+  uint32_t _pageSize;
+  uint32_t _blockSize;
   uint32_t _maxOpenFiles;
   spiffs _fs;
 
