@@ -425,8 +425,6 @@ public class BaseNoGui {
   }
 
   static public void init(String[] args) throws Exception {
-    getPlatform().init();
-  
     String sketchbookPath = getSketchbookPath();
   
     // If no path is set, get the default sketchbook folder for this platform
@@ -740,7 +738,9 @@ public class BaseNoGui {
     Runtime.getRuntime().addShutdownHook(new Thread(DeleteFilesOnShutdown.INSTANCE));
 
     initPlatform();
-    
+
+    getPlatform().init();
+
     initPortableFolder();
     
     initParameters(args);

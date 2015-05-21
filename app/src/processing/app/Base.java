@@ -146,6 +146,8 @@ public class Base {
 
     initPlatform();
 
+    getPlatform().init();
+
     BaseNoGui.initPortableFolder();
 
     BaseNoGui.initParameters(args);
@@ -284,8 +286,6 @@ public class Base {
   }
 
   public Base(String[] args) throws Exception {
-    getPlatform().init();
-
     String sketchbookPath = BaseNoGui.getSketchbookPath();
 
     // If no path is set, get the default sketchbook folder for this platform

@@ -34,7 +34,6 @@ import processing.app.Editor;
 import processing.app.I18n;
 import processing.app.PreferencesData;
 import processing.app.helpers.FileUtils;
-import processing.app.helpers.OSUtils;
 import processing.app.legacy.PApplet;
 
 import javax.swing.*;
@@ -198,11 +197,6 @@ public class Preferences extends javax.swing.JDialog {
       }
     });
 
-    if (!OSUtils.isWindows() || base.getPortableFolder() != null) {
-      autoAssociateBox.setEnabled(false);
-      autoAssociateBox.getParent().remove(autoAssociateBox);
-    }
-
     showPrerefencesData();
   }
 
@@ -256,7 +250,6 @@ public class Preferences extends javax.swing.JDialog {
     externalEditorBox = new javax.swing.JCheckBox();
     checkUpdatesBox = new javax.swing.JCheckBox();
     updateExtensionBox = new javax.swing.JCheckBox();
-    autoAssociateBox = new javax.swing.JCheckBox();
     saveVerifyUploadBox = new javax.swing.JCheckBox();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -445,9 +438,6 @@ public class Preferences extends javax.swing.JDialog {
     updateExtensionBox.setText(_("Update sketch files to new extension on save (.pde -> .ino)"));
     checkboxesContainer.add(updateExtensionBox);
 
-    autoAssociateBox.setText(_("Automatically associate .ino files with Arduino"));
-    checkboxesContainer.add(autoAssociateBox);
-
     saveVerifyUploadBox.setText(_("Save when verifying or uploading"));
     checkboxesContainer.add(saveVerifyUploadBox);
 
@@ -610,7 +600,6 @@ public class Preferences extends javax.swing.JDialog {
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JTextField additionalBoardsManagerField;
-  private javax.swing.JCheckBox autoAssociateBox;
   private javax.swing.JCheckBox checkUpdatesBox;
   private javax.swing.JComboBox comboLanguage;
   private javax.swing.JComboBox comboWarnings;
@@ -683,10 +672,6 @@ public class Preferences extends javax.swing.JDialog {
 
     PreferencesData.setBoolean("editor.update_extension", updateExtensionBox.isSelected());
 
-    if (autoAssociateBox != null) {
-      PreferencesData.setBoolean("platform.auto_file_type_associations", autoAssociateBox.isSelected());
-    }
-
     PreferencesData.setBoolean("editor.save_on_verify", saveVerifyUploadBox.isSelected());
 
     PreferencesData.set("proxy.http.server", proxyHTTPServer.getText());
@@ -743,10 +728,6 @@ public class Preferences extends javax.swing.JDialog {
     checkUpdatesBox.setSelected(PreferencesData.getBoolean("update.check"));
 
     updateExtensionBox.setSelected(PreferencesData.get("editor.update_extension") == null || PreferencesData.getBoolean("editor.update_extension"));
-
-    if (autoAssociateBox != null) {
-      autoAssociateBox.setSelected(PreferencesData.getBoolean("platform.auto_file_type_associations"));
-    }
 
     saveVerifyUploadBox.setSelected(PreferencesData.getBoolean("editor.save_on_verify"));
 
