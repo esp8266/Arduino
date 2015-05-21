@@ -28,6 +28,8 @@
  */
 package cc.arduino.utils;
 
+import org.apache.commons.compress.utils.IOUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -68,9 +70,7 @@ public class FileHash {
       }
       return algorithm + ":" + res;
     } finally {
-      if (in != null) {
-        in.close();
-      }
+      IOUtils.closeQuietly(in);
     }
   }
 }

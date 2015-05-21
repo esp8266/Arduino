@@ -28,6 +28,7 @@ import cc.arduino.view.StubMenuListener;
 import com.google.common.base.Predicate;
 import com.jcraft.jsch.JSchException;
 import jssc.SerialPortException;
+import org.apache.commons.compress.utils.IOUtils;
 import processing.app.debug.*;
 import processing.app.forms.PasswordAuthorizationDialog;
 import processing.app.helpers.OSUtils;
@@ -965,11 +966,7 @@ public class Editor extends JFrame implements RunnerListener {
       //System.err.println("Ignoring " + filename + " (" + e.getMessage() + ")");
       e.printStackTrace();
     } finally {
-      if (zipFile != null)
-        try {
-          zipFile.close();
-        } catch (IOException e) {
-        }
+      IOUtils.closeQuietly(zipFile);
     }
     return null;
   }

@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.MissingResourceException;
 
+import org.apache.commons.compress.utils.IOUtils;
 import processing.app.helpers.PreferencesHelper;
 import processing.app.helpers.PreferencesMap;
 import processing.app.legacy.PApplet;
@@ -124,9 +125,7 @@ public class PreferencesData {
 
       writer.flush();
     } finally {
-      if (writer != null) {
-        writer.close();
-      }
+      IOUtils.closeQuietly(writer);
     }
 
     try {

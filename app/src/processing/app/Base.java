@@ -39,6 +39,7 @@ import cc.arduino.view.Event;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
+import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import processing.app.debug.TargetBoard;
 import processing.app.debug.TargetPackage;
@@ -2517,9 +2518,7 @@ public class Base {
       }
       return buffer;
     } finally {
-      if (input != null) {
-        input.close();
-      }
+      IOUtils.closeQuietly(input);
     }
   }
 
@@ -2567,12 +2566,8 @@ public class Base {
       }
       to.flush();
     } finally {
-      if (from != null) {
-        from.close(); // ??
-      }
-      if (to != null) {
-        to.close(); // ??
-      }
+      IOUtils.closeQuietly(from);
+      IOUtils.closeQuietly(to);
     }
 
     targetFile.setLastModified(sourceFile.lastModified());

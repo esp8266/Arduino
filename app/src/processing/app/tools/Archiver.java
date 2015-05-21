@@ -23,6 +23,7 @@
 
 package processing.app.tools;
 
+import org.apache.commons.compress.utils.IOUtils;
 import processing.app.Base;
 import processing.app.Editor;
 import processing.app.Sketch;
@@ -124,22 +125,21 @@ public class Archiver implements Tool {
     if (filename != null) {
       newbie = new File(directory, filename);
 
+      ZipOutputStream zos = null;
       try {
         //System.out.println(newbie);
-        FileOutputStream zipOutputFile = new FileOutputStream(newbie);
-        ZipOutputStream zos = new ZipOutputStream(zipOutputFile);
+        zos = new ZipOutputStream(new FileOutputStream(newbie));
 
         // recursively fill the zip file
         buildZip(location, name, zos);
 
         // close up the jar file
         zos.flush();
-        zos.close();
-
         editor.statusNotice("Created archive " + newbie.getName() + ".");
-
       } catch (IOException e) {
         e.printStackTrace();
+      } finally {
+        IOUtils.closeQuietly(zos);
       }
     } else {
       editor.statusNotice(_("Archive sketch canceled."));

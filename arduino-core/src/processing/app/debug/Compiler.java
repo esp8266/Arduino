@@ -39,6 +39,7 @@ import cc.arduino.packages.BoardPort;
 import cc.arduino.packages.Uploader;
 import cc.arduino.packages.UploaderFactory;
 
+import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteStreamHandler;
@@ -100,12 +101,14 @@ public class Compiler implements MessageConsumer {
     compiler.cleanup(prefsChanged, tempBuildFolder);
 
     if (prefsChanged) {
+      PrintWriter out = null;
       try {
-        PrintWriter out = new PrintWriter(buildPrefsFile);
+        out = new PrintWriter(buildPrefsFile);
         out.print(newBuildPrefs);
-        out.close();
       } catch (IOException e) {
         System.err.println(_("Could not write build preferences file"));
+      } finally {
+        IOUtils.closeQuietly(out);
       }
     }
 
@@ -612,6 +615,7 @@ public class Compiler implements MessageConsumer {
 
   private boolean isAlreadyCompiled(File src, File obj, File dep, Map<String, String> prefs) {
     boolean ret=true;
+    BufferedReader reader = null;
     try {
       //System.out.println("\n  isAlreadyCompiled: begin checks: " + obj.getPath());
       if (!obj.exists()) return false;  // object file (.o) does not exist
@@ -620,7 +624,7 @@ public class Compiler implements MessageConsumer {
       long obj_modified = obj.lastModified();
       if (src_modified >= obj_modified) return false;  // source modified since object compiled
       if (src_modified >= dep.lastModified()) return false;  // src modified since dep compiled
-      BufferedReader reader = new BufferedReader(new FileReader(dep.getPath()));
+      reader = new BufferedReader(new FileReader(dep.getPath()));
       String line;
       boolean need_obj_parse = true;
       while ((line = reader.readLine()) != null) {
@@ -664,9 +668,10 @@ public class Compiler implements MessageConsumer {
           //System.out.println("  isAlreadyCompiled:  prerequisite ok");
         }
       }
-      reader.close();
     } catch (Exception e) {
       return false;  // any error reading dep file = recompile it
+    } finally {
+      IOUtils.closeQuietly(reader);
     }
     if (ret && verbose) {
       System.out.println(I18n.format(_("Using previously compiled file: {0}"), obj.getPath()));
@@ -1267,13 +1272,7 @@ public class Compiler implements MessageConsumer {
       ex.printStackTrace();
       throw new RunnerException(ex.toString());
     } finally {
-      if (outputStream != null) {
-        try {
-          outputStream.close();
-        } catch (IOException e) {
-          //noop
-        }
-      }
+      IOUtils.closeQuietly(outputStream);
     }
 
     // grab the imports from the code just preproc'd

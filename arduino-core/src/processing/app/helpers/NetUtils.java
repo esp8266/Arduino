@@ -1,5 +1,7 @@
 package processing.app.helpers;
 
+import org.apache.commons.compress.utils.IOUtils;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -43,13 +45,7 @@ public abstract class NetUtils {
     } catch (IOException e) {
       return false;
     } finally {
-      if (socket != null) {
-        try {
-          socket.close();
-        } catch (IOException e) {
-          // noop
-        }
-      }
+      IOUtils.closeQuietly(socket);
     }
   }
 }

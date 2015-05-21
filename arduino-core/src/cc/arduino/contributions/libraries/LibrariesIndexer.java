@@ -37,6 +37,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.mrbean.MrBeanModule;
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
+import org.apache.commons.compress.utils.IOUtils;
 import processing.app.BaseNoGui;
 import processing.app.I18n;
 import processing.app.helpers.FileUtils;
@@ -96,9 +97,7 @@ public class LibrariesIndexer {
         }
       }
     } finally {
-      if (indexIn != null) {
-        indexIn.close();
-      }
+      IOUtils.closeQuietly(indexIn);
     }
   }
 

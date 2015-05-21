@@ -8,6 +8,7 @@ import cc.arduino.files.DeleteFilesOnShutdown;
 import cc.arduino.packages.DiscoveryManager;
 import cc.arduino.packages.Uploader;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.logging.impl.LogFactoryImpl;
 import org.apache.commons.logging.impl.NoOpLog;
 import processing.app.debug.Compiler;
@@ -315,14 +316,15 @@ public class BaseNoGui {
   static public File getSketchbookLibrariesFolder() {
     File libdir = new File(getSketchbookFolder(), "libraries");
     if (!libdir.exists()) {
+      FileWriter freadme = null;
       try {
         libdir.mkdirs();
-        File readme = new File(libdir, "readme.txt");
-        FileWriter freadme = new FileWriter(readme);
+        freadme = new FileWriter(new File(libdir, "readme.txt"));
         freadme.write(_("For information on installing libraries, see: " +
                         "http://www.arduino.cc/en/Guide/Libraries\n"));
-        freadme.close();
       } catch (Exception e) {
+      } finally {
+        IOUtils.closeQuietly(freadme);
       }
     }
     return libdir;
@@ -595,11 +597,8 @@ public class BaseNoGui {
       try {
         out = new FileOutputStream(indexFile);
         out.write("{ \"packages\" : [ ] }".getBytes());
-        out.close();
       } finally {
-        if (out != null) {
-          out.close();
-        }
+        IOUtils.closeQuietly(out);
       }
     }
 
@@ -643,9 +642,7 @@ public class BaseNoGui {
         } catch (IOException e) {
           e.printStackTrace();
         } finally {
-          if (out != null) {
-            out.close();
-          }
+          IOUtils.closeQuietly(out);
         }
       }
     }

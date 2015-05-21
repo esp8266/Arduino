@@ -1,5 +1,7 @@
 package processing.app.helpers;
 
+import org.apache.commons.compress.utils.IOUtils;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,12 +51,8 @@ public class FileUtils {
         fos.write(buf, 0, readBytes);
       }
     } finally {
-      if (fis != null) {
-        fis.close();
-      }
-      if (fos != null) {
-        fos.close();
-      }
+      IOUtils.closeQuietly(fis);
+      IOUtils.closeQuietly(fos);
     }
   }
 
@@ -185,13 +183,7 @@ public class FileUtils {
       }
       return sb.toString();
     } finally {
-      if (reader != null) {
-        try {
-          reader.close();
-        } catch (IOException e) {
-          // noop
-        }
-      }
+      IOUtils.closeQuietly(reader);
     }
   }
 

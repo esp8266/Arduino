@@ -30,6 +30,7 @@
 
 package processing.app.syntax;
 
+import org.apache.commons.compress.utils.IOUtils;
 import org.fife.ui.rsyntaxtextarea.*;
 import org.fife.ui.rsyntaxtextarea.Theme;
 import org.fife.ui.rsyntaxtextarea.Token;
@@ -102,9 +103,7 @@ public class SketchTextArea extends RSyntaxTextArea {
       Theme theme = Theme.load(defaultXmlInputStream);
       theme.apply(this);
     } finally {
-      if (defaultXmlInputStream != null) {
-        defaultXmlInputStream.close();
-      }
+      IOUtils.closeQuietly(defaultXmlInputStream);
     }
 
     setForeground(processing.app.Theme.getColor("editor.fgcolor"));

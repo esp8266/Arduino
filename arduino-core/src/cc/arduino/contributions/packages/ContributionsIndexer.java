@@ -44,6 +44,7 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimaps;
+import org.apache.commons.compress.utils.IOUtils;
 import processing.app.BaseNoGui;
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
@@ -172,9 +173,7 @@ public class ContributionsIndexer {
       mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
       return mapper.readValue(inputStream, ContributionsIndex.class);
     } finally {
-      if (inputStream != null) {
-        inputStream.close();
-      }
+      IOUtils.closeQuietly(inputStream);
     }
   }
 

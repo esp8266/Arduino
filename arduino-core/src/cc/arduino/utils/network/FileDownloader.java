@@ -29,6 +29,7 @@
 package cc.arduino.utils.network;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.compress.utils.IOUtils;
 import processing.app.PreferencesData;
 
 import java.io.File;
@@ -221,22 +222,10 @@ public class FileDownloader extends Observable {
       setError(e);
 
     } finally {
-      if (file != null) {
-        try {
-          file.close();
-        } catch (Exception e) {
-          //ignore
-        }
-      }
+      IOUtils.closeQuietly(file);
 
       synchronized (this) {
-        if (stream != null) {
-          try {
-            stream.close();
-          } catch (Exception e) {
-            //ignore
-          }
-        }
+        IOUtils.closeQuietly(stream);
       }
     }
   }
