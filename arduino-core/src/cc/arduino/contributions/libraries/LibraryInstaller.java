@@ -29,6 +29,7 @@
 package cc.arduino.contributions.libraries;
 
 import cc.arduino.contributions.DownloadableContributionsDownloader;
+import cc.arduino.contributions.GZippedJsonDownloader;
 import cc.arduino.utils.ArchiveExtractor;
 import cc.arduino.utils.MultiStepProgress;
 import cc.arduino.utils.Progress;
@@ -45,6 +46,7 @@ import static processing.app.I18n._;
 public class LibraryInstaller {
 
   private static final String LIBRARY_INDEX_URL;
+  private static final String LIBRARY_INDEX_URL_GZ;
 
   static {
     String externalLibraryIndexUrl = System.getProperty("LIBRARY_INDEX_URL");
@@ -53,6 +55,7 @@ public class LibraryInstaller {
     } else {
       LIBRARY_INDEX_URL = "http://downloads.arduino.cc/libraries/library_index.json";
     }
+    LIBRARY_INDEX_URL_GZ = "http://downloads.arduino.cc/libraries/library_index.json.gz";
   }
 
   private final LibrariesIndexer indexer;
@@ -77,8 +80,8 @@ public class LibraryInstaller {
     File outputFile = indexer.getIndexFile();
     File tmpFile = new File(outputFile.getAbsolutePath() + ".tmp");
     try {
-      downloader.download(url, tmpFile, progress,
-              _("Downloading libraries index..."));
+      GZippedJsonDownloader gZippedJsonDownloader = new GZippedJsonDownloader(downloader, new URL(LIBRARY_INDEX_URL), new URL(LIBRARY_INDEX_URL_GZ));
+      gZippedJsonDownloader.download(tmpFile, progress, _("Downloading libraries index..."));
     } catch (InterruptedException e) {
       // Download interrupted... just exit
       return;
@@ -91,8 +94,7 @@ public class LibraryInstaller {
     if (outputFile.exists())
       outputFile.delete();
     if (!tmpFile.renameTo(outputFile))
-      throw new Exception(
-              _("An error occurred while updating libraries index!"));
+      throw new Exception(_("An error occurred while updating libraries index!"));
 
     // Step 2: Rescan index
     rescanLibraryIndex(progress);

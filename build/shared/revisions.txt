@@ -10,6 +10,7 @@ ARDUINO 1.6.5
 * Fixed a bug that made the IDE notify users of invalid libraries too many times. Thanks @Chris--A
 * Removed JNA. Less native stuff and less chances of incurring into an UnsatisfiedLinkError
 * Many new and old issues closed. Thanks to many, and @Chris--A in particular
+* Faster libraries list update
 
 [libraries]
 * LiquidCrystal fixes. Thanks @newbie15
