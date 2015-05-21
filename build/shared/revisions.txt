@@ -8,6 +8,7 @@ ARDUINO 1.6.5
 * Easier "additional boards manager url" field: a wide text area opens by clicking the added button (right side of the text field)
 * Rewritten code of Preferences window: its content is now correctly drawn on every OS
 * Fixed a bug that made the IDE notify users of invalid libraries too many times. Thanks @Chris--A
+* Removed JNA. Less native stuff and less chances of incurring into an UnsatisfiedLinkError
 
 [libraries]
 * LiquidCrystal fixes. Thanks @newbie15
