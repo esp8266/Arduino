@@ -159,6 +159,6 @@ uint32_t flashmem_read( void *to, uint32_t fromaddr, uint32_t size ){
 
 //shorthand when start and end addresses of the sector are not needed
 uint32_t flashmem_get_sector_of_address( uint32_t addr ){
-  return (addr - INTERNAL_FLASH_START_ADDRESS) / INTERNAL_FLASH_SECTOR_SIZE;;
+  return (addr - INTERNAL_FLASH_START_ADDRESS) / INTERNAL_FLASH_SECTOR_SIZE;
 }
 
