@@ -477,14 +477,13 @@ public class Editor extends JFrame implements RunnerListener {
 
     if (external) {
       // disable line highlight and turn off the caret when disabling
-      Color color = Theme.getColor("editor.external.bgcolor");
-      textarea.setBackground(color);
+      textarea.setBackground(Theme.getColor("editor.external.bgcolor"));
       textarea.setHighlightCurrentLine(false);
       textarea.setEditable(false);
 
     } else {
-      boolean highlight = PreferencesData.getBoolean("editor.linehighlight");
-      textarea.setHighlightCurrentLine(highlight);
+      textarea.setBackground(Theme.getColor("editor.bgcolor"));
+      textarea.setHighlightCurrentLine(PreferencesData.getBoolean("editor.linehighlight"));
       textarea.setEditable(true);
     }
 
