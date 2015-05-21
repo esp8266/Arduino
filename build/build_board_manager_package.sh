@@ -81,7 +81,7 @@ cat << EOF > package_esp8266com_index.json
         },
         {
             "host":"x86_64-apple-darwin",
-            "url":"https://download.esp8266.com/esptool-0.4.4-5-g744c44d-osx.tar.gz",
+            "url":"http://arduino.esp8266.com/esptool-0.4.4-5-g744c44d-osx.tar.gz",
             "archiveFileName":"esptool-0.4.4-5-g744c44d-osx.tar.gz",
             "checksum":"SHA-256:d8bc920e046fcc668b31cda63ac5553b4c07a6db12bfd0abc9005fc94628afcb",
             "size":"12133"
