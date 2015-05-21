@@ -31,7 +31,7 @@ package cc.arduino.contributions.packages.ui;
 import cc.arduino.contributions.packages.ContributedPlatform;
 import cc.arduino.contributions.packages.ContributionInstaller;
 import cc.arduino.contributions.packages.ContributionsIndexer;
-import cc.arduino.contributions.packages.DownloadableContribution;
+import cc.arduino.contributions.DownloadableContribution;
 import cc.arduino.contributions.ui.*;
 import cc.arduino.utils.Progress;
 import processing.app.I18n;

@@ -28,6 +28,7 @@
  */
 package cc.arduino.contributions.packages;
 
+import cc.arduino.contributions.DownloadableContribution;
 import cc.arduino.contributions.DownloadableContributionBuiltInAtTheBottomComparator;
 import cc.arduino.contributions.GPGDetachedSignatureVerifier;
 import cc.arduino.contributions.SignatureVerificationFailedException;

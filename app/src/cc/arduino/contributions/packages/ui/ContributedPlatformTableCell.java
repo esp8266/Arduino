@@ -35,7 +35,7 @@ import cc.arduino.contributions.filters.InstalledPredicate;
 import cc.arduino.contributions.packages.ContributedBoard;
 import cc.arduino.contributions.packages.ContributedHelp;
 import cc.arduino.contributions.packages.ContributedPlatform;
-import cc.arduino.contributions.packages.DownloadableContribution;
+import cc.arduino.contributions.DownloadableContribution;
 import cc.arduino.contributions.ui.InstallerTableCell;
 import cc.arduino.contributions.ui.listeners.DelegatingKeyListener;
 import cc.arduino.utils.ReverseComparator;

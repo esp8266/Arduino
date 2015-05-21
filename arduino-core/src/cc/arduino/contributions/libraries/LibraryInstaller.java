@@ -28,7 +28,7 @@
  */
 package cc.arduino.contributions.libraries;
 
-import cc.arduino.contributions.packages.DownloadableContributionsDownloader;
+import cc.arduino.contributions.DownloadableContributionsDownloader;
 import cc.arduino.utils.ArchiveExtractor;
 import cc.arduino.utils.MultiStepProgress;
 import cc.arduino.utils.Progress;

@@ -28,6 +28,8 @@
  */
 package cc.arduino.contributions.packages;
 
+import cc.arduino.contributions.DownloadableContribution;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;

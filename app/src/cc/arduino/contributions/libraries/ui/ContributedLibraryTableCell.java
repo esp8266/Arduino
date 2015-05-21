@@ -33,7 +33,7 @@ import cc.arduino.contributions.filters.BuiltInPredicate;
 import cc.arduino.contributions.filters.InstalledPredicate;
 import cc.arduino.contributions.libraries.ContributedLibrary;
 import cc.arduino.contributions.libraries.filters.OnlyUpstreamReleasePredicate;
-import cc.arduino.contributions.packages.DownloadableContribution;
+import cc.arduino.contributions.DownloadableContribution;
 import cc.arduino.contributions.DownloadableContributionVersionComparator;
 import cc.arduino.contributions.ui.InstallerTableCell;
 import cc.arduino.contributions.ui.listeners.DelegatingKeyListener;

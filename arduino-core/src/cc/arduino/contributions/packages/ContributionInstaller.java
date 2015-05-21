@@ -28,6 +28,8 @@
  */
 package cc.arduino.contributions.packages;
 
+import cc.arduino.contributions.DownloadableContribution;
+import cc.arduino.contributions.DownloadableContributionsDownloader;
 import cc.arduino.contributions.GPGDetachedSignatureVerifier;
 import cc.arduino.filters.FileExecutablePredicate;
 import cc.arduino.utils.ArchiveExtractor;

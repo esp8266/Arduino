@@ -29,8 +29,6 @@
 
 package cc.arduino.contributions;
 
-import cc.arduino.contributions.packages.DownloadableContribution;
-
 import java.util.Comparator;
 
 public class DownloadableContributionVersionComparator implements Comparator<DownloadableContribution> {

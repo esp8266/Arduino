@@ -28,6 +28,7 @@
  */
 package cc.arduino.contributions.packages;
 
+import cc.arduino.contributions.DownloadableContribution;
 import processing.app.BaseNoGui;
 
 import java.util.List;

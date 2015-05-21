@@ -29,7 +29,7 @@
 package cc.arduino.contributions.ui;
 
 import cc.arduino.contributions.VersionComparator;
-import cc.arduino.contributions.packages.DownloadableContribution;
+import cc.arduino.contributions.DownloadableContribution;
 import com.google.common.base.Predicate;
 
 import javax.swing.table.AbstractTableModel;
