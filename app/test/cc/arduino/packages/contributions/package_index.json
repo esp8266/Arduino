@@ -6,7 +6,7 @@
       "websiteURL": "http://www.arduino.cc/",
       "email": "packages@arduino.cc",
       "help": {
-        "online": "http://www.arduino.cc/en/Reference/HomePage"
+        "online": "http://arduino.cc/en/Reference/HomePage"
       },
       "platforms": [
         {
@@ -58,7 +58,7 @@
           "version": "1.6.3",
           "category": "Arduino",
           "help": {
-            "online": "http://www.arduino.cc/en/Reference/HomePage"
+            "online": "http://arduino.cc/en/Reference/HomePage"
           },
           "url": "http://downloads.arduino.cc/cores/avr-1.6.3.tar.bz2",
           "archiveFileName": "avr-1.6.3.tar.bz2",
@@ -104,7 +104,7 @@
           "version": "1.6.4",
           "category": "Arduino",
           "help": {
-            "online": "http://www.arduino.cc/en/Reference/HomePage"
+            "online": "http://arduino.cc/en/Reference/HomePage"
           },
           "url": "http://downloads.arduino.cc/cores/avr-1.6.4.tar.bz2",
           "archiveFileName": "avr-1.6.4.tar.bz2",
@@ -150,7 +150,7 @@
           "version": "1.6.5",
           "category": "Arduino",
           "help": {
-            "online": "http://www.arduino.cc/en/Reference/HomePage"
+            "online": "http://arduino.cc/en/Reference/HomePage"
           },
           "url": "http://downloads.arduino.cc/cores/avr-1.6.5.tar.bz2",
           "archiveFileName": "avr-1.6.5.tar.bz2",
@@ -196,7 +196,7 @@
           "version": "1.6.6",
           "category": "Arduino",
           "help": {
-            "online": "http://www.arduino.cc/en/Reference/HomePage"
+            "online": "http://arduino.cc/en/Reference/HomePage"
           },
           "url": "http://downloads.arduino.cc/cores/avr-1.6.6.tar.bz2",
           "archiveFileName": "avr-1.6.6.tar.bz2",
