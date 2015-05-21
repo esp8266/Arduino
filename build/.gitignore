@@ -1,0 +1,7 @@
+*.zip
+linux/*tar.gz
+linux/dist/*tgz
+macosx/*tar.gz
+macosx/dist/*tgz
+windows/*zip
+windows/dist/*tgz

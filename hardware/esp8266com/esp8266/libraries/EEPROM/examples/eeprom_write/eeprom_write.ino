@@ -22,7 +22,7 @@ void loop()
   // need to divide by 4 because analog inputs range from
   // 0 to 1023 and each byte of the EEPROM can only hold a
   // value from 0 to 255.
-  int val = analogRead(0) / 4;
+  int val = analogRead(A0) / 4;
 
   // write the value to the appropriate byte of the EEPROM.
   // these values will remain there when the board is

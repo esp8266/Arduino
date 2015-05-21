@@ -22,25 +22,25 @@
 #include "Arduino.h"
 #include "spiffs/spiffs_esp8266.h"
 
-#define LOGICAL_PAGE_SIZE       256
-#define LOGICAL_BLOCK_SIZE      (INTERNAL_FLASH_SECTOR_SIZE * 1)
-
-
-// These addresses are defined in the linker script.
+// These addresses and sizes are defined in the linker script.
 // For each flash memory size there is a linker script variant
 // which sets spiffs location and size.
 extern "C" uint32_t _SPIFFS_start;
 extern "C" uint32_t _SPIFFS_end;
+extern "C" uint32_t _SPIFFS_page;
+extern "C" uint32_t _SPIFFS_block;
 
 static s32_t api_spiffs_read(u32_t addr, u32_t size, u8_t *dst);
 static s32_t api_spiffs_write(u32_t addr, u32_t size, u8_t *src);
 static s32_t api_spiffs_erase(u32_t addr, u32_t size);
 
-FSClass FS((uint32_t) &_SPIFFS_start, (uint32_t) &_SPIFFS_end, 4);
+FSClass FS((uint32_t) &_SPIFFS_start, (uint32_t) &_SPIFFS_end, (uint32_t) &_SPIFFS_page, (uint32_t) &_SPIFFS_block, 4);
 
-FSClass::FSClass(uint32_t beginAddress, uint32_t endAddress, uint32_t maxOpenFiles)
+FSClass::FSClass(uint32_t beginAddress, uint32_t endAddress, uint32_t pageSize, uint32_t blockSize, uint32_t maxOpenFiles)
 : _beginAddress(beginAddress)
 , _endAddress(endAddress)
+, _pageSize(pageSize)
+, _blockSize(blockSize)
 , _maxOpenFiles(maxOpenFiles)
 , _fs({0})
 {
@@ -51,23 +51,25 @@ int FSClass::_mountInternal(){
     SPIFFS_API_DBG_E("Can't start file system, wrong address\r\n");
     return SPIFFS_ERR_NOT_CONFIGURED;
   }
+  if(_pageSize == 0) _pageSize = 256;
+  if(_blockSize == 0) _blockSize = 4096;
   
   spiffs_config cfg = {0};
   cfg.phys_addr = _beginAddress;
   cfg.phys_size = _endAddress - _beginAddress;
   cfg.phys_erase_block = INTERNAL_FLASH_SECTOR_SIZE;
-  cfg.log_block_size = LOGICAL_BLOCK_SIZE;
-  cfg.log_page_size = LOGICAL_PAGE_SIZE;
+  cfg.log_block_size = _blockSize;
+  cfg.log_page_size = _pageSize;
   cfg.hal_read_f = api_spiffs_read;
   cfg.hal_write_f = api_spiffs_write;
   cfg.hal_erase_f = api_spiffs_erase;
   
   SPIFFS_API_DBG_V("FSClass::_mountInternal: start:%x, size:%d Kb\n", cfg.phys_addr, cfg.phys_size / 1024);
 
-  _work.reset(new uint8_t[2*LOGICAL_PAGE_SIZE]);
+  _work.reset(new uint8_t[2*_pageSize]);
   _fdsSize = 32 * _maxOpenFiles;
   _fds.reset(new uint8_t[_fdsSize]);
-  _cacheSize = (32 + LOGICAL_PAGE_SIZE) * _maxOpenFiles;
+  _cacheSize = (32 + _pageSize) * _maxOpenFiles;
   _cache.reset(new uint8_t[_cacheSize]);
 
   s32_t res = SPIFFS_mount(&_fs,
