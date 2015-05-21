@@ -51,8 +51,8 @@ int FSClass::_mountInternal(){
     SPIFFS_API_DBG_E("Can't start file system, wrong address\r\n");
     return SPIFFS_ERR_NOT_CONFIGURED;
   }
-  if(_SPIFFS_page == 0) _SPIFFS_page = 256;
-  if(_SPIFFS_block == 0) _SPIFFS_block = 4096;
+  if(_pageSize == 0) _pageSize = 256;
+  if(_blockSize == 0) _blockSize = 4096;
   
   spiffs_config cfg = {0};
   cfg.phys_addr = _beginAddress;
@@ -66,10 +66,10 @@ int FSClass::_mountInternal(){
   
   SPIFFS_API_DBG_V("FSClass::_mountInternal: start:%x, size:%d Kb\n", cfg.phys_addr, cfg.phys_size / 1024);
 
-  _work.reset(new uint8_t[2*_SPIFFS_page]);
+  _work.reset(new uint8_t[2*_pageSize]);
   _fdsSize = 32 * _maxOpenFiles;
   _fds.reset(new uint8_t[_fdsSize]);
-  _cacheSize = (32 + _SPIFFS_page) * _maxOpenFiles;
+  _cacheSize = (32 + _pageSize) * _maxOpenFiles;
   _cache.reset(new uint8_t[_cacheSize]);
 
   s32_t res = SPIFFS_mount(&_fs,
