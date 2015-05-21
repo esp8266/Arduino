@@ -9,6 +9,7 @@ ARDUINO 1.6.5
 * Rewritten code of Preferences window: its content is now correctly drawn on every OS
 * Fixed a bug that made the IDE notify users of invalid libraries too many times. Thanks @Chris--A
 * Removed JNA. Less native stuff and less chances of incurring into an UnsatisfiedLinkError
+* Many new and old issues closed. Thanks to many, and @Chris--A in particular
 
 [libraries]
 * LiquidCrystal fixes. Thanks @newbie15
