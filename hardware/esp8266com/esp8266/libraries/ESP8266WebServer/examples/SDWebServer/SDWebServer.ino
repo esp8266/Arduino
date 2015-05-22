@@ -180,7 +180,7 @@ void printDirectory() {
     return returnFail("NOT DIR");
   }
   dir.rewindDirectory();
-  server.setContentSize(CONTENT_SIZE_UNKNOWN);
+  server.setContentLength(CONTENT_LENGTH_UNKNOWN);
   server.send(200, "text/json", "");
   WiFiClient client = server.client();
 
