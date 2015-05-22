@@ -1,6 +1,7 @@
 # Change log
 
-## Current version
+## 1.6.4-673-g8cd3697
+May 22, 2015
 
 ### Tools
 
@@ -17,11 +18,12 @@
   If the client doesn't disconnect in 2000ms, the server closes the connection
   actively.
 - Add Hash library, which has a function to calculate SHA1 hash.
-
+- SD, Adafruit_ILI9341, and OneWire libraries are now bundled.
+- Fix incorrect sector calculation in EEPROM library.
 
 ---
 
-## 1.6.4-g545ffde
+## 1.6.4-628-g545ffde
 May 19, 2015
 
 - Initial release of Boards Manager package for ESP8266 platform.
