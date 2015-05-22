@@ -59,21 +59,21 @@ wl_status_t ESP8266WiFiMulti::run(void) {
             DEBUG_WIFI_MULTI("[WIFI] %d networks found\n", n);
             for(int8_t i = 0; i < n; ++i) {
 
-                const char * ssid_scan;
+                String ssid_scan;
                 int32_t rssi_scan;
                 uint8_t sec_scan;
-                uint8_t * BSSID_scan;
+                uint8_t* BSSID_scan;
                 int32_t chan_scan;
                 bool hidden_scan;
 
-                WiFi.getNetworkInfo(i, &ssid_scan, &sec_scan, &rssi_scan, &BSSID_scan, &chan_scan, &hidden_scan);
+                WiFi.getNetworkInfo(i, ssid_scan, sec_scan, rssi_scan, BSSID_scan, chan_scan, hidden_scan);
 
 
                 bool known = false;
                 for(uint32_t x = 0; x < APlist.size(); x++) {
                     WifiAPlist_t entry = APlist[x];
 
-                    if(strcmp(entry.ssid, ssid_scan) == 0) { // SSID match
+                    if(ssid_scan == entry.ssid) { // SSID match
                         known = true;
                         if(rssi_scan > bestNetworkDb) { // best network
                             if(sec_scan == ENC_TYPE_NONE || entry.passphrase) { // check for passphrase if not open wlan

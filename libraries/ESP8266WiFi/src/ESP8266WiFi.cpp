@@ -38,9 +38,9 @@ extern "C" void esp_schedule();
 extern "C" void esp_yield();
 
 ESP8266WiFiClass::ESP8266WiFiClass()
+: _useApMode(false)
+, _useClientMode(false)
 {
-    useApMode = false;
-    useClientMode = false;
 }
 
 void ESP8266WiFiClass::mode(WiFiMode m)
@@ -55,9 +55,9 @@ int ESP8266WiFiClass::begin(char* ssid, char *passphrase, int32_t channel, uint8
 }
 
 int ESP8266WiFiClass::begin(const char* ssid, const char *passphrase, int32_t channel, uint8_t bssid[6]){
-    useClientMode = true;
+    _useClientMode = true;
 
-    if(useApMode) {
+    if(_useApMode) {
         // turn on AP+STA mode
         mode(WIFI_AP_STA);
     } else {
@@ -143,7 +143,7 @@ void ESP8266WiFiClass::softAP(const char* ssid)
 
 void ESP8266WiFiClass::softAP(const char* ssid, const char* passphrase, int channel)
 {
-    if(useClientMode) {
+    if(_useClientMode) {
         // turn on AP+STA mode
         mode(WIFI_AP_STA);
     } else {
@@ -371,18 +371,18 @@ bool ESP8266WiFiClass::isHidden(uint8_t i)
     return (it->is_hidden != 0);
 }
 
-bool ESP8266WiFiClass::getNetworkInfo(uint8_t i, const char** ssid, uint8_t * encType, int32_t * RSSI, uint8_t ** BSSID, int32_t * channel, bool * isHidden)
+bool ESP8266WiFiClass::getNetworkInfo(uint8_t i, String &ssid, uint8_t &encType, int32_t &rssi, uint8_t* &bssid, int32_t &channel, bool &isHidden)
 {
     struct bss_info* it = reinterpret_cast<struct bss_info*>(_getScanInfoByIndex(i));
      if (!it)
          return false;
 
-     *ssid = (const char*) &it->ssid[0]; // move ptr
-     *encType = encryptionType(i);
-     *RSSI = it->rssi;
-     *BSSID = &it->bssid[0]; // move ptr
-     *channel = it->channel;
-     *isHidden = (it->is_hidden != 0);
+     ssid = (const char*)it->ssid;
+     encType = encryptionType(i);
+     rssi = it->rssi;
+     bssid = it->bssid; // move ptr
+     channel = it->channel;
+     isHidden = (it->is_hidden != 0);
 
      return true;
 }
