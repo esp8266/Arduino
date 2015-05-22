@@ -238,7 +238,7 @@ public:
      * @param isHidden bool *
      * @return (true if ok)
      */
-    bool getNetworkInfo(uint8_t networkItem, const char** ssid, uint8_t * encryptionType, int32_t * RSSI, uint8_t ** BSSID, int32_t * channel, bool * isHidden);
+    bool getNetworkInfo(uint8_t networkItem, String &ssid, uint8_t &encryptionType, int32_t &RSSI, uint8_t* &BSSID, int32_t &channel, bool &isHidden);
 
 
     /*
@@ -290,8 +290,8 @@ protected:
     static void _smartConfigDone(void* result);
     bool _smartConfigStarted = false;
 
-    bool useApMode;
-    bool useClientMode;
+    bool _useApMode;
+    bool _useClientMode;
 
     static size_t _scanCount;
     static void* _scanResult;
