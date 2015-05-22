@@ -2353,11 +2353,6 @@ public class Editor extends JFrame implements RunnerListener {
     // Disable untitled setting from previous document, if any
     untitled = false;
 
-    // Store information on who's open and running
-    // (in case there's a crash or something that can't be recovered)
-    base.storeSketches();
-    PreferencesData.save();
-
     // opening was successful
     return true;
 

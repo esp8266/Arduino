@@ -532,8 +532,11 @@ public class Base {
     // Save the sketch path and window placement for each open sketch
     int count = PreferencesData.getInteger("last.sketch.count");
     int opened = 0;
-    for (int i = 0; i < count; i++) {
+    for (int i = count - 1; i >= 0; i--) {
       String path = PreferencesData.get("last.sketch" + i + ".path");
+      if (path == null) {
+        continue;
+      }
       if (BaseNoGui.getPortableFolder() != null) {
         File absolute = new File(BaseNoGui.getPortableFolder(), path);
         try {
@@ -550,7 +553,7 @@ public class Base {
         location = nextEditorLocation();
       }
       // If file did not exist, null will be returned for the Editor
-      if (handleOpen(new File(path), location, true) != null) {
+      if (handleOpen(new File(path), location, true, false) != null) {
         opened++;
       }
     }
@@ -571,19 +574,21 @@ public class Base {
     String untitledPath = untitledFolder.getAbsolutePath();
 
     // Save the sketch path and window placement for each open sketch
+    LinkedList<Editor> reverseEditors = new LinkedList<Editor>(editors);
+    Collections.reverse(reverseEditors);
     int index = 0;
-    for (Editor editor : editors) {
+    for (Editor editor : reverseEditors) {
       String path = editor.getSketch().getMainFilePath();
       // In case of a crash, save untitled sketches if they contain changes.
       // (Added this for release 0158, may not be a good idea.)
-      if (path.startsWith(untitledPath) &&
-              !editor.getSketch().isModified()) {
+      if (path.startsWith(untitledPath) && !editor.getSketch().isModified()) {
         continue;
       }
       if (BaseNoGui.getPortableFolder() != null) {
         path = FileUtils.relativePath(BaseNoGui.getPortableFolder().toString(), path);
-        if (path == null)
+        if (path == null) {
           continue;
+        }
       }
       PreferencesData.set("last.sketch" + index + ".path", path);
 
@@ -594,45 +599,6 @@ public class Base {
     }
     PreferencesData.setInteger("last.sketch.count", index);
   }
-
-
-  // If a sketch is untitled on quit, may need to store the new name
-  // rather than the location from the temp folder.
-  protected void storeSketchPath(Editor editor, int index) {
-    String path = editor.getSketch().getMainFilePath();
-    String untitledPath = untitledFolder.getAbsolutePath();
-    if (path.startsWith(untitledPath)) {
-      path = "";
-    } else if (BaseNoGui.getPortableFolder() != null) {
-      path = FileUtils.relativePath(BaseNoGui.getPortableFolder().toString(), path);
-      if (path == null)
-        path = "";
-    }
-    PreferencesData.set("last.sketch" + index + ".path", path);
-  }
-
-
-  /*
-  public void storeSketch(Editor editor) {
-    int index = -1;
-    for (int i = 0; i < editorCount; i++) {
-      if (editors[i] == editor) {
-        index = i;
-        break;
-      }
-    }
-    if (index == -1) {
-      System.err.println("Problem storing sketch " + editor.sketch.name);
-    } else {
-      String path = editor.sketch.getMainFilePath();
-      Preferences.set("last.sketch" + index + ".path", path);
-    }
-  }
-  */
-
-
-  // .................................................................
-
 
   // Because of variations in native windowing systems, no guarantees about
   // changes to the focused and active Windows can be made. Developers must
@@ -880,79 +846,48 @@ public class Base {
     return handleOpen(file, nextEditorLocation(), true);
   }
 
-
   protected Editor handleOpen(File file, int[] location, boolean showEditor) throws Exception {
-//    System.err.println("entering handleOpen " + path);
+    return handleOpen(file, location, showEditor, true);
+  }
 
+  protected Editor handleOpen(File file, int[] location, boolean showEditor, boolean storeOpenedSketches) throws Exception {
     if (!file.exists()) return null;
 
-//    System.err.println("  editors: " + editors);
     // Cycle through open windows to make sure that it's not already open.
     String path = file.getAbsolutePath();
     for (Editor editor : editors) {
       if (editor.getSketch().getMainFilePath().equals(path)) {
         editor.toFront();
-//        System.err.println("  handleOpen: already opened");
         return editor;
       }
     }
 
-    // If the active editor window is an untitled, and un-modified document,
-    // just replace it with the file that's being opened.
-//    if (activeEditor != null) {
-//      Sketch activeSketch = activeEditor.sketch;
-//      if (activeSketch.isUntitled() && !activeSketch.isModified()) {
-//        // if it's an untitled, unmodified document, it can be replaced.
-//        // except in cases where a second blank window is being opened.
-//        if (!path.startsWith(untitledFolder.getAbsolutePath())) {
-//          activeEditor.handleOpenUnchecked(path, 0, 0, 0, 0);
-//          return activeEditor;
-//        }
-//      }
-//    }
-
-//    System.err.println("  creating new editor");
-    Editor editor = new Editor(this, file, location, BaseNoGui.getPlatform());
-//    Editor editor = null;
-//    try {
-//      editor = new Editor(this, path, location);
-//    } catch (Exception e) {
-//      e.printStackTrace();
-//      System.err.flush();
-//      System.out.flush();
-//      System.exit(1);
-//    }
-//    System.err.println("  done creating new editor");
-//    EditorConsole.systemErr.println("  done creating new editor");
+    final Editor editor = new Editor(this, file, location, BaseNoGui.getPlatform());
 
     // Make sure that the sketch actually loaded
     if (editor.getSketch() == null) {
-//      System.err.println("sketch was null, getting out of handleOpen");
       return null;  // Just walk away quietly
     }
 
-//    if (editors == null) {
-//      editors = new Editor[5];
-//    }
-//    if (editorCount == editors.length) {
-//      editors = (Editor[]) PApplet.expand(editors);
-//    }
-//    editors[editorCount++] = editor;
     editors.add(editor);
 
-//    if (markedForClose != null) {
-//      Point p = markedForClose.getLocation();
-//      handleClose(markedForClose, false);
-//      // open the new window in
-//      editor.setLocation(p);
-//    }
+    if (storeOpenedSketches) {
+      // Store information on who's open and running
+      // (in case there's a crash or something that can't be recovered)
+      storeSketches();
+      PreferencesData.save();
+    }
 
     // now that we're ready, show the window
     // (don't do earlier, cuz we might move it based on a window being closed)
-    if (showEditor)
-      editor.setVisible(true);
-
-//    System.err.println("exiting handleOpen");
+    if (showEditor) {
+      SwingUtilities.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          editor.setVisible(true);
+        }
+      });
+    }
 
     return editor;
   }
@@ -1080,14 +1015,8 @@ public class Base {
    * @return false if canceled along the way
    */
   protected boolean handleQuitEach() {
-    int index = 0;
     for (Editor editor : editors) {
-      if (editor.checkModified()) {
-        // Update to the new/final sketch path for this fella
-        storeSketchPath(editor, index);
-        index++;
-
-      } else {
+      if (!editor.checkModified()) {
         return false;
       }
     }
