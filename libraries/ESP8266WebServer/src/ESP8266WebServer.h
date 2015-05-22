@@ -88,6 +88,13 @@ template<typename T> size_t streamFile(T &file, String contentType){
   head += file.size();
   head += "\r\nConnection: close";
   head += "\r\nAccess-Control-Allow-Origin: *";
+  if(
+    String(file.name()).endsWith(".gz") && 
+    contentType != "application/x-gzip" &&
+    contentType != "application/octet-stream"
+  ){
+    head += "\r\nContent-Encoding: gzip";
+  }
   head += "\r\n\r\n";
   _currentClient.print(head);
   head = String();
