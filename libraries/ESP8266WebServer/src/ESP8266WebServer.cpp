@@ -172,10 +172,6 @@ void ESP8266WebServer::sendContent(String content) {
       break;
     }
   }
-  uint16_t maxWait = HTTP_MAX_CLOSE_WAIT;
-  while(_currentClient.connected() && maxWait--) {
-    delay(1);
-  }
 }
 
 String ESP8266WebServer::arg(const char* name) {
@@ -245,6 +241,10 @@ void ESP8266WebServer::_handleRequest() {
     }
   }
 
+  uint16_t maxWait = HTTP_MAX_CLOSE_WAIT;
+  while(_currentClient.connected() && maxWait--) {
+    delay(1);
+  }
   _currentClient   = WiFiClient();
   _currentUri      = String();
 }
