@@ -193,6 +193,7 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 - [DallasTemperature](https://github.com/milesburton/Arduino-Temperature-Control-Library.git)
 - [NeoPixelBus](https://github.com/Makuna/NeoPixelBus) - Arduino NeoPixel library compatible with esp8266.
 - [RTC](https://github.com/Makuna/Rtc) - Arduino Library for Ds1307 & Ds3231 compatible with esp8266.
+- [Blynk](https://github.com/blynkkk/blynk-library) - easy IoT framework for Makers (check out the [Kickstarter page](http://tiny.cc/blynk-kick)).
 
 #### Upload via serial port ####
 Pick the correct serial port.
