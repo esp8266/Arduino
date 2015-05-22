@@ -92,7 +92,6 @@ unsigned long micros() {
 	#error TIMER 0 not defined
 #endif
 
-  
 #ifdef TIFR0
 	if ((TIFR0 & _BV(TOV0)) && (t < 255))
 		m++;
@@ -122,8 +121,8 @@ void delay(unsigned long ms)
 /* Delay for the given number of microseconds.  Assumes a 1, 8, 12, 16, 20 or 24 MHz clock. */
 void delayMicroseconds(unsigned int us)
 {
-  // call = 4 cycles + 2 to 4 cycles to init us(2 for constant delay, 4 for variable)
-  
+	// call = 4 cycles + 2 to 4 cycles to init us(2 for constant delay, 4 for variable)
+
 	// calling avrlib's delay_us() function with low values (e.g. 1 or
 	// 2 microseconds) gives delays longer than desired.
 	//delay_us(us);
@@ -131,7 +130,7 @@ void delayMicroseconds(unsigned int us)
 	// for the 24 MHz clock for the aventurous ones, trying to overclock
 
 	// zero delay fix
-  if (!us) return; //  = 3 cycles, (4 when true)
+	if (!us) return; //  = 3 cycles, (4 when true)
 
 	// the following loop takes a 1/6 of a microsecond (4 cycles)
 	// per iteration, so execute it six times for each microsecond of
@@ -140,7 +139,7 @@ void delayMicroseconds(unsigned int us)
 
 	// account for the time taken in the preceeding commands.
 	// we just burned 22 (24) cycles above, remove 5, (5*4=20)
-  // us is at least 6 so we can substract 5
+	// us is at least 6 so we can substract 5
 	us -= 5; //=2 cycles
 
 #elif F_CPU >= 20000000L
@@ -153,7 +152,7 @@ void delayMicroseconds(unsigned int us)
 		"nop" "\n\t"
 		"nop" "\n\t"
 		"nop"); //just waiting 4 cycles
-  if (us <= 1) return; //  = 3 cycles, (4 when true)
+	if (us <= 1) return; //  = 3 cycles, (4 when true)
 
 	// the following loop takes a 1/5 of a microsecond (4 cycles)
 	// per iteration, so execute it five times for each microsecond of
@@ -162,7 +161,7 @@ void delayMicroseconds(unsigned int us)
 
 	// account for the time taken in the preceeding commands.
 	// we just burned 26 (28) cycles above, remove 7, (7*4=28)
-  // us is at least 10 so we can substract 7
+	// us is at least 10 so we can substract 7
 	us -= 7; // 2 cycles
 
 #elif F_CPU >= 16000000L
@@ -179,8 +178,8 @@ void delayMicroseconds(unsigned int us)
 
 	// account for the time taken in the preceeding commands.
 	// we just burned 19 (21) cycles above, remove 5, (5*4=20)
-  // us is at least 8 so we can substract 5
-	us -= 5; // = 2 cycles, 
+	// us is at least 8 so we can substract 5
+	us -= 5; // = 2 cycles,
 
 #elif F_CPU >= 12000000L
 	// for the 12 MHz clock if somebody is working with USB
@@ -196,7 +195,7 @@ void delayMicroseconds(unsigned int us)
 
 	// account for the time taken in the preceeding commands.
 	// we just burned 20 (22) cycles above, remove 5, (5*4=20)
-  // us is at least 6 so we can substract 5
+	// us is at least 6 so we can substract 5
 	us -= 5; //2 cycles
 
 #elif F_CPU >= 8000000L
@@ -213,7 +212,7 @@ void delayMicroseconds(unsigned int us)
 
 	// account for the time taken in the preceeding commands.
 	// we just burned 17 (19) cycles above, remove 4, (4*4=16)
-  // us is at least 6 so we can substract 4
+	// us is at least 6 so we can substract 4
 	us -= 4; // = 2 cycles
 
 #else
@@ -227,7 +226,7 @@ void delayMicroseconds(unsigned int us)
 	us -= 22; // = 2 cycles
 	// the following loop takes 4 microseconds (4 cycles)
 	// per iteration, so execute it us/4 times
-  // us is at least 4, divided by 4 gives us 1 (no zero delay bug)
+	// us is at least 4, divided by 4 gives us 1 (no zero delay bug)
 	us >>= 2; // us div 4, = 4 cycles
 	
 
@@ -253,7 +252,7 @@ void init()
 #if defined(TCCR0A) && defined(WGM01)
 	sbi(TCCR0A, WGM01);
 	sbi(TCCR0A, WGM00);
-#endif  
+#endif
 
 	// set timer 0 prescale factor to 64
 #if defined(__AVR_ATmega128__)
@@ -357,31 +356,31 @@ void init()
 
 #if defined(ADCSRA)
 	// set a2d prescaler so we are inside the desired 50-200 KHz range.
-  #if F_CPU >= 16000000 // 16 MHz / 128 = 125 KHz
-    sbi(ADCSRA, ADPS2);
-    sbi(ADCSRA, ADPS1);
-    sbi(ADCSRA, ADPS0);
-  #elif F_CPU >= 8000000 // 8 MHz / 64 = 125 KHz
-    sbi(ADCSRA, ADPS2);
-    sbi(ADCSRA, ADPS1);
-    cbi(ADCSRA, ADPS0);
-  #elif F_CPU >= 4000000 // 4 MHz / 32 = 125 KHz
-    sbi(ADCSRA, ADPS2);
-    cbi(ADCSRA, ADPS1);
-    sbi(ADCSRA, ADPS0);
-  #elif F_CPU >= 2000000 // 2 MHz / 16 = 125 KHz
-    sbi(ADCSRA, ADPS2);
-    cbi(ADCSRA, ADPS1);
-    cbi(ADCSRA, ADPS0);
-  #elif F_CPU >= 1000000 // 1 MHz / 8 = 125 KHz
-    cbi(ADCSRA, ADPS2);
-    sbi(ADCSRA, ADPS1);
-    sbi(ADCSRA, ADPS0);
-  #else // 128 kHz / 2 = 64 KHz -> This is the closest you can get, the prescaler is 2
-    cbi(ADCSRA, ADPS2);
-    cbi(ADCSRA, ADPS1);
-    sbi(ADCSRA, ADPS0);
-  #endif
+	#if F_CPU >= 16000000 // 16 MHz / 128 = 125 KHz
+		sbi(ADCSRA, ADPS2);
+		sbi(ADCSRA, ADPS1);
+		sbi(ADCSRA, ADPS0);
+	#elif F_CPU >= 8000000 // 8 MHz / 64 = 125 KHz
+		sbi(ADCSRA, ADPS2);
+		sbi(ADCSRA, ADPS1);
+		cbi(ADCSRA, ADPS0);
+	#elif F_CPU >= 4000000 // 4 MHz / 32 = 125 KHz
+		sbi(ADCSRA, ADPS2);
+		cbi(ADCSRA, ADPS1);
+		sbi(ADCSRA, ADPS0);
+	#elif F_CPU >= 2000000 // 2 MHz / 16 = 125 KHz
+		sbi(ADCSRA, ADPS2);
+		cbi(ADCSRA, ADPS1);
+		cbi(ADCSRA, ADPS0);
+	#elif F_CPU >= 1000000 // 1 MHz / 8 = 125 KHz
+		cbi(ADCSRA, ADPS2);
+		sbi(ADCSRA, ADPS1);
+		sbi(ADCSRA, ADPS0);
+	#else // 128 kHz / 2 = 64 KHz -> This is the closest you can get, the prescaler is 2
+		cbi(ADCSRA, ADPS2);
+		cbi(ADCSRA, ADPS1);
+		sbi(ADCSRA, ADPS0);
+	#endif
 	// enable a2d conversions
 	sbi(ADCSRA, ADEN);
 #endif
