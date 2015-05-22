@@ -11,6 +11,7 @@ ARDUINO 1.6.5
 * Removed JNA. Less native stuff and less chances of incurring into an UnsatisfiedLinkError
 * Many new and old issues closed. Thanks to many, and @Chris--A in particular
 * Faster libraries list update
+* Serial monitor stays opened during upload, disabled. Thanks @avishorp and @Wackerbarth
 
 [libraries]
 * LiquidCrystal fixes. Thanks @newbie15
