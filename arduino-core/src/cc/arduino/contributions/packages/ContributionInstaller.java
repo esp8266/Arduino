@@ -40,6 +40,7 @@ import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
 import processing.app.BaseNoGui;
 import processing.app.I18n;
+import processing.app.Platform;
 import processing.app.PreferencesData;
 import processing.app.helpers.FileUtils;
 import processing.app.helpers.filefilters.OnlyDirs;
@@ -58,8 +59,10 @@ public class ContributionInstaller {
 
   private final ContributionsIndexer indexer;
   private final DownloadableContributionsDownloader downloader;
+  private final Platform platform;
 
-  public ContributionInstaller(ContributionsIndexer contributionsIndexer) {
+  public ContributionInstaller(ContributionsIndexer contributionsIndexer, Platform platform) {
+    this.platform = platform;
     File stagingFolder = contributionsIndexer.getStagingFolder();
     indexer = contributionsIndexer;
     downloader = new DownloadableContributionsDownloader(stagingFolder) {
@@ -70,18 +73,18 @@ public class ContributionInstaller {
     };
   }
 
-  public List<String> install(ContributedPlatform platform) throws Exception {
+  public List<String> install(ContributedPlatform contributedPlatform) throws Exception {
     List<String> errors = new LinkedList<String>();
-    if (platform.isInstalled()) {
+    if (contributedPlatform.isInstalled()) {
       throw new Exception("Platform is already installed!");
     }
 
     // Do not download already installed tools
-    List<ContributedTool> tools = new LinkedList<ContributedTool>(platform.getResolvedTools());
+    List<ContributedTool> tools = new LinkedList<ContributedTool>(contributedPlatform.getResolvedTools());
     Iterator<ContributedTool> toolsIterator = tools.iterator();
     while (toolsIterator.hasNext()) {
       ContributedTool tool = toolsIterator.next();
-      DownloadableContribution downloadable = tool.getDownloadableContribution();
+      DownloadableContribution downloadable = tool.getDownloadableContribution(platform);
       if (downloadable == null) {
         throw new Exception(format(_("Tool {0} is not available for your operating system."), tool.getName()));
       }
@@ -96,7 +99,7 @@ public class ContributionInstaller {
     // Download all
     try {
       // Download platform
-      downloader.download(platform, progress, _("Downloading boards definitions."));
+      downloader.download(contributedPlatform, progress, _("Downloading boards definitions."));
       progress.stepDone();
 
       // Download tools
@@ -104,7 +107,7 @@ public class ContributionInstaller {
       for (ContributedTool tool : tools) {
         String msg = format(_("Downloading tools ({0}/{1})."), i, tools.size());
         i++;
-        downloader.download(tool.getDownloadableContribution(), progress, msg);
+        downloader.download(tool.getDownloadableContribution(platform), progress, msg);
         progress.stepDone();
       }
     } catch (InterruptedException e) {
@@ -112,7 +115,7 @@ public class ContributionInstaller {
       return errors;
     }
 
-    ContributedPackage pack = platform.getParentPackage();
+    ContributedPackage pack = contributedPlatform.getParentPackage();
     File packageFolder = new File(indexer.getPackagesFolder(), pack.getName());
 
     // TODO: Extract to temporary folders and move to the final destination only
@@ -126,12 +129,12 @@ public class ContributionInstaller {
       progress.setStatus(format(_("Installing tools ({0}/{1})..."), i, tools.size()));
       onProgress(progress);
       i++;
-      DownloadableContribution toolContrib = tool.getDownloadableContribution();
+      DownloadableContribution toolContrib = tool.getDownloadableContribution(platform);
       File destFolder = new File(toolsFolder, tool.getName() + File.separator + tool.getVersion());
 
       destFolder.mkdirs();
       assert toolContrib.getDownloadedFile() != null;
-      new ArchiveExtractor(BaseNoGui.getPlatform()).extract(toolContrib.getDownloadedFile(), destFolder, 1);
+      new ArchiveExtractor(platform).extract(toolContrib.getDownloadedFile(), destFolder, 1);
       try {
         executePostInstallScriptIfAny(destFolder);
       } catch (IOException e) {
@@ -145,12 +148,12 @@ public class ContributionInstaller {
     // Unpack platform on the correct location
     progress.setStatus(_("Installing boards..."));
     onProgress(progress);
-    File platformFolder = new File(packageFolder, "hardware" + File.separator + platform.getArchitecture());
-    File destFolder = new File(platformFolder, platform.getParsedVersion());
+    File platformFolder = new File(packageFolder, "hardware" + File.separator + contributedPlatform.getArchitecture());
+    File destFolder = new File(platformFolder, contributedPlatform.getParsedVersion());
     destFolder.mkdirs();
-    new ArchiveExtractor(BaseNoGui.getPlatform()).extract(platform.getDownloadedFile(), destFolder, 1);
-    platform.setInstalled(true);
-    platform.setInstalledFolder(destFolder);
+    new ArchiveExtractor(platform).extract(contributedPlatform.getDownloadedFile(), destFolder, 1);
+    contributedPlatform.setInstalled(true);
+    contributedPlatform.setInstalledFolder(destFolder);
     progress.stepDone();
 
     progress.setStatus(_("Installation completed!"));
@@ -160,7 +163,7 @@ public class ContributionInstaller {
   }
 
   private void executePostInstallScriptIfAny(File folder) throws IOException {
-    Collection<File> postInstallScripts = Collections2.filter(BaseNoGui.getPlatform().postInstallScripts(folder), new FileExecutablePredicate());
+    Collection<File> postInstallScripts = Collections2.filter(platform.postInstallScripts(folder), new FileExecutablePredicate());
 
     if (postInstallScripts.isEmpty()) {
       String[] subfolders = folder.list(new OnlyDirs());
@@ -190,22 +193,22 @@ public class ContributionInstaller {
     }
   }
 
-  public List<String> remove(ContributedPlatform platform) {
-    if (platform == null || platform.isReadOnly()) {
+  public List<String> remove(ContributedPlatform contributedPlatform) {
+    if (contributedPlatform == null || contributedPlatform.isReadOnly()) {
       return new LinkedList<String>();
     }
     List<String> errors = new LinkedList<String>();
-    FileUtils.recursiveDelete(platform.getInstalledFolder());
-    platform.setInstalled(false);
-    platform.setInstalledFolder(null);
+    FileUtils.recursiveDelete(contributedPlatform.getInstalledFolder());
+    contributedPlatform.setInstalled(false);
+    contributedPlatform.setInstalledFolder(null);
 
     // Check if the tools are no longer needed
-    for (ContributedTool tool : platform.getResolvedTools()) {
+    for (ContributedTool tool : contributedPlatform.getResolvedTools()) {
       if (indexer.isContributedToolUsed(tool)) {
         continue;
       }
 
-      DownloadableContribution toolContrib = tool.getDownloadableContribution();
+      DownloadableContribution toolContrib = tool.getDownloadableContribution(platform);
       File destFolder = toolContrib.getInstalledFolder();
       FileUtils.recursiveDelete(destFolder);
       toolContrib.setInstalled(false);

@@ -46,6 +46,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimaps;
 import org.apache.commons.compress.utils.IOUtils;
 import processing.app.BaseNoGui;
+import processing.app.Platform;
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
 import processing.app.debug.TargetPlatformException;
@@ -65,10 +66,12 @@ public class ContributionsIndexer {
   private final File packagesFolder;
   private final File stagingFolder;
   private final File preferencesFolder;
+  private final Platform platform;
   private ContributionsIndex index;
 
-  public ContributionsIndexer(File preferencesFolder) {
+  public ContributionsIndexer(File preferencesFolder, Platform platform) {
     this.preferencesFolder = preferencesFolder;
+    this.platform = platform;
     packagesFolder = new File(preferencesFolder, "packages");
     stagingFolder = new File(preferencesFolder, "staging" + File.separator + "packages");
   }
@@ -266,7 +269,7 @@ public class ContributionsIndexer {
     if (tool == null) {
       return;
     }
-    DownloadableContribution contrib = tool.getDownloadableContribution();
+    DownloadableContribution contrib = tool.getDownloadableContribution(platform);
     if (contrib == null) {
       System.err.println(tool + " seems to have no downloadable contributions for your operating system, but it is installed in\n" + installationFolder);
       return;

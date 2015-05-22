@@ -145,9 +145,9 @@ public class Base {
     
     BaseNoGui.notifier = new GUIUserNotifier();
 
-    initPlatform();
+    BaseNoGui.initPlatform();
 
-    getPlatform().init();
+    BaseNoGui.getPlatform().init();
 
     BaseNoGui.initPortableFolder();
 
@@ -206,7 +206,7 @@ public class Base {
 
     // Set the look and feel before opening the window
     try {
-      getPlatform().setLookAndFeel();
+      BaseNoGui.getPlatform().setLookAndFeel();
     } catch (Exception e) {
       String mess = e.getMessage();
       if (mess.indexOf("ch.randelshofer.quaqua.QuaquaLookAndFeel") == -1) {
@@ -259,23 +259,6 @@ public class Base {
 
   static protected boolean isCommandLine() {
     return commandLine;
-  }
-
-
-  static protected void initPlatform() {
-    BaseNoGui.initPlatform();
-  }
-
-
-  static protected void initRequirements() {
-    try {
-      Class.forName("com.sun.jdi.VirtualMachine");
-    } catch (ClassNotFoundException cnfe) {
-      showError(_("Please install JDK 1.5 or later"),
-              _("Arduino requires a full JDK (not just a JRE)\n" +
-                      "to run. Please install JDK 1.5 or later.\n" +
-                      "More information can be found in the reference."), cnfe);
-    }
   }
 
   // Returns a File object for the given pathname. If the pathname
@@ -349,8 +332,8 @@ public class Base {
     PreferencesData.save();
 
     if (parser.isInstallBoard()) {
-      ContributionsIndexer indexer = new ContributionsIndexer(BaseNoGui.getSettingsFolder());
-      ContributionInstaller installer = new ContributionInstaller(indexer) {
+      ContributionsIndexer indexer = new ContributionsIndexer(BaseNoGui.getSettingsFolder(), BaseNoGui.getPlatform());
+      ContributionInstaller installer = new ContributionInstaller(indexer, BaseNoGui.getPlatform()) {
         private String lastStatus = "";
 
         @Override
@@ -396,8 +379,8 @@ public class Base {
       System.exit(0);
 
     } else if (parser.isInstallLibrary()) {
-      LibrariesIndexer indexer = new LibrariesIndexer(BaseNoGui.getSettingsFolder(), new ContributionsIndexer(BaseNoGui.getSettingsFolder()));
-      LibraryInstaller installer = new LibraryInstaller(indexer) {
+      LibrariesIndexer indexer = new LibrariesIndexer(BaseNoGui.getSettingsFolder(), new ContributionsIndexer(BaseNoGui.getSettingsFolder(), BaseNoGui.getPlatform()));
+      LibraryInstaller installer = new LibraryInstaller(indexer, BaseNoGui.getPlatform()) {
         private String lastStatus = "";
 
         @Override
@@ -929,7 +912,7 @@ public class Base {
 //    }
 
 //    System.err.println("  creating new editor");
-    Editor editor = new Editor(this, file, location);
+    Editor editor = new Editor(this, file, location, BaseNoGui.getPlatform());
 //    Editor editor = null;
 //    try {
 //      editor = new Editor(this, path, location);
@@ -1302,7 +1285,7 @@ public class Base {
 
   private void openManageLibrariesDialog() {
     @SuppressWarnings("serial")
-    LibraryManagerUI managerUI = new LibraryManagerUI(activeEditor) {
+    LibraryManagerUI managerUI = new LibraryManagerUI(activeEditor, BaseNoGui.getPlatform()) {
       @Override
       protected void onIndexesUpdated() throws Exception {
         BaseNoGui.initPackages();
@@ -1325,7 +1308,7 @@ public class Base {
   private void openInstallBoardDialog(final String filterText) throws Exception {
     // Create dialog for contribution manager
     @SuppressWarnings("serial")
-    ContributionManagerUI managerUI = new ContributionManagerUI(activeEditor) {
+    ContributionManagerUI managerUI = new ContributionManagerUI(activeEditor, BaseNoGui.getPlatform()) {
       @Override
       protected void onIndexesUpdated() throws Exception {
         BaseNoGui.initPackages();
@@ -1829,65 +1812,6 @@ public class Base {
     dialog.setVisible(true);
   }
 
-
-  // ...................................................................
-
-
-  /**
-   * Get list of platform constants.
-   */
-//  static public int[] getPlatforms() {
-//    return platforms;
-//  }
-
-
-//  static public int getPlatform() {
-//    String osname = System.getProperty("os.name");
-//
-//    if (osname.indexOf("Mac") != -1) {
-//      return PConstants.MACOSX;
-//
-//    } else if (osname.indexOf("Windows") != -1) {
-//      return PConstants.WINDOWS;
-//
-//    } else if (osname.equals("Linux")) {  // true for the ibm vm
-//      return PConstants.LINUX;
-//
-//    } else {
-//      return PConstants.OTHER;
-//    }
-//  }
-  static public Platform getPlatform() {
-    return BaseNoGui.getPlatform();
-  }
-
-
-  static public String getPlatformName() {
-    String osname = System.getProperty("os.name");
-
-    if (osname.indexOf("Mac") != -1) {
-      return "macosx";
-
-    } else if (osname.indexOf("Windows") != -1) {
-      return "windows";
-
-    } else if (osname.equals("Linux")) {  // true for the ibm vm
-      return "linux";
-
-    } else {
-      return "other";
-    }
-  }
-
-
-  // .................................................................
-
-
-  static public File getSettingsFolder() {
-    return BaseNoGui.getSettingsFolder();
-  }
-
-
   /**
    * Convenience method to get a File object for the specified filename inside
    * the settings folder.
@@ -2092,7 +2016,7 @@ public class Base {
    */
   static public void openURL(String url) {
     try {
-      getPlatform().openURL(url);
+      BaseNoGui.getPlatform().openURL(url);
 
     } catch (Exception e) {
       showWarning(_("Problem Opening URL"),

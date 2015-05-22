@@ -586,7 +586,7 @@ public class BaseNoGui {
   }
 
   static public void initPackages() throws Exception {
-    indexer = new ContributionsIndexer(BaseNoGui.getSettingsFolder());
+    indexer = new ContributionsIndexer(BaseNoGui.getSettingsFolder(), BaseNoGui.getPlatform());
     File indexFile = indexer.getIndexFile("package_index.json");
     File defaultPackageJsonFile = new File(getContentFile("dist"), "package_index.json");
     if (!indexFile.isFile() || (defaultPackageJsonFile.isFile() && defaultPackageJsonFile.lastModified() > indexFile.lastModified())) {
@@ -797,7 +797,7 @@ public class BaseNoGui {
     PreferencesData.removeAllKeysWithPrefix(prefix);
 
     for (ContributedTool tool : indexer.getInstalledTools()) {
-      File installedFolder = tool.getDownloadableContribution().getInstalledFolder();
+      File installedFolder = tool.getDownloadableContribution(getPlatform()).getInstalledFolder();
       if (installedFolder != null) {
         PreferencesData.set(prefix + tool.getName() + ".path", installedFolder.getAbsolutePath());
         PreferencesData.set(prefix + tool.getName() + "-" + tool.getVersion() + ".path", installedFolder.getAbsolutePath());

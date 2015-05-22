@@ -70,6 +70,8 @@ import cc.arduino.packages.uploaders.SerialUploader;
 @SuppressWarnings("serial")
 public class Editor extends JFrame implements RunnerListener {
 
+  private final Platform platform;
+
   private static class ShouldSaveIfModified implements Predicate<Sketch> {
 
     @Override
@@ -184,9 +186,10 @@ public class Editor extends JFrame implements RunnerListener {
   Runnable exportAppHandler;
 
 
-  public Editor(Base ibase, File file, int[] location) throws Exception {
+  public Editor(Base ibase, File file, int[] location, Platform platform) throws Exception {
     super("Arduino");
     this.base = ibase;
+    this.platform = platform;
 
     Base.setIcon(this);
 
@@ -992,7 +995,7 @@ public class Editor extends JFrame implements RunnerListener {
       @Override
       public void hyperlinkUpdate(HyperlinkEvent hyperlinkEvent) {
         try {
-          base.getPlatform().openURL(hyperlinkEvent.getURL().toExternalForm());
+          platform.openURL(hyperlinkEvent.getURL().toExternalForm());
         } catch (Exception e) {
           Base.showWarning(e.getMessage(), e.getMessage(), e);
         }
@@ -1129,7 +1132,7 @@ public class Editor extends JFrame implements RunnerListener {
 
     List<BoardPort> ports = Base.getDiscoveryManager().discovery();
 
-    ports = Base.getPlatform().filterPorts(ports, PreferencesData.getBoolean("serial.ports.showall"));
+    ports = platform.filterPorts(ports, PreferencesData.getBoolean("serial.ports.showall"));
 
     Collections.sort(ports, new Comparator<BoardPort>() {
       @Override

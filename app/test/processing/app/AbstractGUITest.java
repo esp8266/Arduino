@@ -50,11 +50,11 @@ public abstract class AbstractGUITest {
 
     FailOnThreadViolationRepaintManager.install();
 
-    Base.initPlatform();
+    BaseNoGui.initPlatform();
     Preferences.init(null);
     JPopupMenu.setDefaultLightWeightPopupEnabled(false);
     Theme.init();
-    Base.getPlatform().setLookAndFeel();
+    BaseNoGui.getPlatform().setLookAndFeel();
     Base.untitledFolder = Base.createTempFolder("untitled");
     DeleteFilesOnShutdown.add(Base.untitledFolder);
 

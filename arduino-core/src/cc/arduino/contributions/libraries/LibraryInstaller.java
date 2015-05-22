@@ -33,8 +33,8 @@ import cc.arduino.contributions.GZippedJsonDownloader;
 import cc.arduino.utils.ArchiveExtractor;
 import cc.arduino.utils.MultiStepProgress;
 import cc.arduino.utils.Progress;
-import processing.app.BaseNoGui;
 import processing.app.I18n;
+import processing.app.Platform;
 import processing.app.helpers.FileUtils;
 
 import java.io.File;
@@ -60,10 +60,12 @@ public class LibraryInstaller {
 
   private final LibrariesIndexer indexer;
   private final DownloadableContributionsDownloader downloader;
+  private final Platform platform;
 
-  public LibraryInstaller(LibrariesIndexer _indexer) {
-    indexer = _indexer;
-    File stagingFolder = _indexer.getStagingFolder();
+  public LibraryInstaller(LibrariesIndexer indexer, Platform platform) {
+    this.indexer = indexer;
+    this.platform = platform;
+    File stagingFolder = indexer.getStagingFolder();
     downloader = new DownloadableContributionsDownloader(stagingFolder) {
       @Override
       protected void onProgress(Progress progress) {
@@ -126,7 +128,7 @@ public class LibraryInstaller {
     File libsFolder = indexer.getSketchbookLibrariesFolder();
     File tmpFolder = FileUtils.createTempFolderIn(libsFolder);
     try {
-      new ArchiveExtractor(BaseNoGui.getPlatform()).extract(lib.getDownloadedFile(), tmpFolder, 1);
+      new ArchiveExtractor(platform).extract(lib.getDownloadedFile(), tmpFolder, 1);
     } catch (Exception e) {
       if (tmpFolder.exists())
         FileUtils.recursiveDelete(tmpFolder);
