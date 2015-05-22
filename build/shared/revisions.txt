@@ -17,6 +17,8 @@ ARDUINO 1.6.5
 * LiquidCrystal fixes. Thanks @newbie15
 
 [core]
+* AVR: delayMicroseconds(..) doesn't hang if called with 0. Thanks @cano64
+* AVR: delayMicroseconds(..), added support for 1Mhz, 12Mhz and 24Mhz. Thanks @cano64
 * SAM: added watchdog routing for Due. Thanks @bobc
 
 ARDUINO 1.6.4 - 2015.05.06
