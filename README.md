@@ -2,6 +2,7 @@ Arduino-compatible IDE with ESP8266 support
 ===========================================
 
 ![Linux build status](http://img.shields.io/travis/igrr/Arduino.svg)
+[![Donate](http://img.shields.io/paypal/donate.png?color=yellow)](https://www.paypal.com/webscr?cmd=_s-xclick&hosted_button_id=4M56YCWV6PX66)
 
 This project brings support for ESP8266 chip to the Arduino environment. ESP8266WiFi library bundled with this project has the same interface as the WiFi Shield library, making it easy to re-use existing code and libraries.
 
