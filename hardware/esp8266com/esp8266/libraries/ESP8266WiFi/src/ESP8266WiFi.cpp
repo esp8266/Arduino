@@ -251,7 +251,7 @@ uint8_t* ESP8266WiFiClass::BSSID(void)
     return reinterpret_cast<uint8_t*>(conf.bssid);
 }
 
-int32_t ESP8266WiFiClass::Channel(void) {
+int32_t ESP8266WiFiClass::channel(void) {
     return wifi_get_channel();
 }
 
@@ -353,7 +353,7 @@ uint8_t * ESP8266WiFiClass::BSSID(uint8_t i)
     return it->bssid;
 }
 
-int32_t ESP8266WiFiClass::Channel(uint8_t i)
+int32_t ESP8266WiFiClass::channel(uint8_t i)
 {
     struct bss_info* it = reinterpret_cast<struct bss_info*>(_getScanInfoByIndex(i));
     if (!it)
