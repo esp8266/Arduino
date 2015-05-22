@@ -85,16 +85,9 @@ bool loadFromSdCard(String path){
   if (!dataFile)
     return false;
   
-  if(server.hasArg("download")) dataType = "application/octet-stream";
+  if (server.hasArg("download")) dataType = "application/octet-stream";
   
-  server.sendHeader("Content-Length", String(dataFile.size()));
-  server.sendHeader("Connection", "close");
-  server.sendHeader("Access-Control-Allow-Origin", "*");
-  server.send(200, dataType.c_str(), "");
-
-  WiFiClient client = server.client();
-  size_t totalSize = dataFile.size();
-  if (client.write(dataFile, HTTP_DOWNLOAD_UNIT_SIZE) != totalSize) {
+  if (server.streamFile(dataFile, dataType) != dataFile.size()) {
     DBG_OUTPUT_PORT.println("Sent less data than expected!");
   }
 
@@ -187,7 +180,7 @@ void printDirectory() {
     return returnFail("NOT DIR");
   }
   dir.rewindDirectory();
-  
+  server.setContentSize(CONTENT_SIZE_UNKNOWN);
   server.send(200, "text/json", "");
   WiFiClient client = server.client();
 

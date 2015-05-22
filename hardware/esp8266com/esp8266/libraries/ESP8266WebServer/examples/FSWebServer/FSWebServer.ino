@@ -106,36 +106,54 @@ void handleFileUpdate(){
 }
 
 void handleFileDelete(){
-  if(server.args() == 0) return server.send(500, "text/plain", "BAD ARGS");
+  if(server.args() == 0) {
+    server.send(500, "text/plain", "BAD ARGS");
+    return;
+  }
   String path = server.arg(0);
-  if(path == "/")
-    return server.send(500, "text/plain", "BAD PATH");
-  if(!FS.exists((char *)(path.c_str())))
-    return server.send(404, "text/plain", "FileNotFound");
+  if(path == "/") {
+    server.send(500, "text/plain", "BAD PATH");
+    return;
+  }
+  if(!FS.exists((char *)(path.c_str()))) {
+    server.send(404, "text/plain", "FileNotFound");
+    return;
+  }
   FS.remove((char *)path.c_str());
   server.send(200, "text/plain", "");
   path = String();
 }
 
 void handleFileCreate(){
-  if(server.args() == 0)
-    return server.send(500, "text/plain", "BAD ARGS");
+  if(server.args() == 0) {
+    server.send(500, "text/plain", "BAD ARGS");
+    return;
+  }
   String path = server.arg(0);
-  if(path == "/")
-    return server.send(500, "text/plain", "BAD PATH");
-  if(FS.exists((char *)path.c_str()))
-    return server.send(500, "text/plain", "FILE EXISTS");
+  if(path == "/") {
+    server.send(500, "text/plain", "BAD PATH");
+    return;
+  }
+  if(FS.exists((char *)path.c_str())) {
+    server.send(500, "text/plain", "FILE EXISTS");
+    return;
+  }
   FSFile file = FS.open((char *)path.c_str(), FSFILE_OVERWRITE);
   if(file)
     file.close();
-  else
-    return server.send(500, "text/plain", "CREATE FAILED");
+  else {
+    server.send(500, "text/plain", "CREATE FAILED");
+    return;
+  }
   server.send(200, "text/plain", "");
   path = String();
 }
 
 void handleFileList() {
-  if(!server.hasArg("dir")) return server.send(500, "text/plain", "BAD ARGS");
+  if(!server.hasArg("dir")) {
+    server.send(500, "text/plain", "BAD ARGS");
+    return;
+  }
   String path = server.arg("dir");
   
   FSFile entry;
@@ -148,19 +166,21 @@ void handleFileList() {
   }
   dir.rewindDirectory();
 
-  WiFiClient client = server.client();
-  client.print("HTTP/1.1 200 OK\r\nContent-Type: text/json\r\nConnection: close\r\n\r\n");
   String output = "[";
   while(true){
     entry = dir.openNextFile();
-    if (!entry) break;
+    if (!entry) 
+      break;
+
     if(!FS.exists(entry.name())){
       os_printf("Entry[%s] Not Exists!\n", entry.name());
       entry.remove();
       entry.close();
       continue;
     }
-    if(output != "[") output += ',';
+    
+    if(output != "[") 
+      output += ',';
     output += "{\"type\":\"";
     output += (entry.isDirectory())?"dir":"file";
     output += "\",\"name\":\"";
@@ -169,14 +189,9 @@ void handleFileList() {
     entry.close();
   }
   dir.close();
-    
+  
   output += "]";
-  client.write(output.c_str(), output.length());
-  output = String();
-  uint16_t maxWait = HTTP_MAX_CLOSE_WAIT;
-  while(client.connected() && maxWait--) {
-    delay(1);
-  }
+  server.send(200, "text/json", output);
 }
 
 void setup(void){
