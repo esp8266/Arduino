@@ -966,7 +966,13 @@ public class Editor extends JFrame implements RunnerListener {
       //System.err.println("Ignoring " + filename + " (" + e.getMessage() + ")");
       e.printStackTrace();
     } finally {
-      IOUtils.closeQuietly(zipFile);
+      if (zipFile != null) {
+        try {
+          zipFile.close();
+        } catch (IOException e) {
+          // noop
+        }
+      }
     }
     return null;
   }
