@@ -39,7 +39,8 @@ extern "C" void esp_yield();
 
 ESP8266WiFiClass::ESP8266WiFiClass()
 {
-
+    useApMode = false;
+    useClientMode = false;
 }
 
 void ESP8266WiFiClass::mode(WiFiMode m)
@@ -49,34 +50,56 @@ void ESP8266WiFiClass::mode(WiFiMode m)
     ETS_UART_INTR_ENABLE();
 }
 
-
-int ESP8266WiFiClass::begin(const char* ssid)
-{
-    return begin(ssid, 0);
+int ESP8266WiFiClass::begin(char* ssid, char *passphrase, int32_t channel, uint8_t bssid[6]){
+    return begin((const char*) ssid, (const char*) passphrase, channel, bssid);
 }
 
+int ESP8266WiFiClass::begin(const char* ssid, const char *passphrase, int32_t channel, uint8_t bssid[6]){
+    useClientMode = true;
 
-int ESP8266WiFiClass::begin(const char* ssid, const char *passphrase)
-{
-    if ((wifi_get_opmode() & 1) == 0)//1 and 3 have STA enabled
-    {
+    if(useApMode) {
         // turn on AP+STA mode
         mode(WIFI_AP_STA);
+    } else {
+        // turn on STA mode
+        mode(WIFI_STA);
+    }
+
+    if(!ssid || strlen(ssid) > 31) {
+        // fail SSID to long or missing!
+        return WL_CONNECT_FAILED;
+    }
+
+    if(passphrase && strlen(passphrase) > 63) {
+        // fail passphrase to long!
+        return WL_CONNECT_FAILED;
     }
 
     struct station_config conf;
     strcpy(reinterpret_cast<char*>(conf.ssid), ssid);
-    if (passphrase)
-        strcpy(reinterpret_cast<char*>(conf.password), passphrase);
-    else
-        *conf.password = 0;
 
-    conf.bssid_set = 0;
+    if (passphrase) {
+        strcpy(reinterpret_cast<char*>(conf.password), passphrase);
+    } else {
+        *conf.password = 0;
+    }
+
+    if (bssid) {
+        conf.bssid_set = 1;
+        memcpy((void *) &conf.bssid[0], (void *) bssid, 6);
+    } else {
+        conf.bssid_set = 0;
+    }
 
     ETS_UART_INTR_DISABLE();
     wifi_station_set_config(&conf);
     wifi_station_connect();
     ETS_UART_INTR_ENABLE();
+
+    if(channel > 0 && channel <= 13) {
+        wifi_set_channel(channel);
+    }
+
     wifi_station_dhcpc_start();
     return status();
 }
@@ -120,10 +143,22 @@ void ESP8266WiFiClass::softAP(const char* ssid)
 
 void ESP8266WiFiClass::softAP(const char* ssid, const char* passphrase, int channel)
 {
-    if (wifi_get_opmode() < WIFI_AP)//will be OFF or STA
-    {
+    if(useClientMode) {
         // turn on AP+STA mode
         mode(WIFI_AP_STA);
+    } else {
+        // turn on STA mode
+        mode(WIFI_AP);
+    }
+
+    if(!ssid || strlen(ssid) > 31) {
+        // fail SSID to long or missing!
+        return;
+    }
+
+    if(passphrase && strlen(passphrase) > 63) {
+        // fail passphrase to long!
+        return;
     }
 
     struct softap_config conf;
@@ -209,22 +244,16 @@ char* ESP8266WiFiClass::SSID()
     return reinterpret_cast<char*>(conf.ssid);
 }
 
-// uint8_t* ESP8266WiFiClass::BSSID(uint8_t* bssid)
-// {
-//  uint8_t* _bssid = WiFiDrv::getCurrentBSSID();
-//  memcpy(bssid, _bssid, WL_MAC_ADDR_LENGTH);
-//     return bssid;
-// }
+uint8_t* ESP8266WiFiClass::BSSID(void)
+{
+    static struct station_config conf;
+    wifi_station_get_config(&conf);
+    return reinterpret_cast<uint8_t*>(conf.bssid);
+}
 
-// int32_t ESP8266WiFiClass::RSSI()
-// {
-//     return WiFiDrv::getCurrentRSSI();
-// }
-
-// uint8_t ESP8266WiFiClass::encryptionType()
-// {
-//     return WiFiDrv::getCurrentEncryptionType();
-// }
+int32_t ESP8266WiFiClass::Channel(void) {
+    return wifi_get_channel();
+}
 
 extern "C"
 {
@@ -298,7 +327,7 @@ int8_t ESP8266WiFiClass::scanNetworks()
 
 void * ESP8266WiFiClass::_getScanInfoByIndex(int i)
 {
-    if (!ESP8266WiFiClass::_scanResult || i > ESP8266WiFiClass::_scanCount)
+    if (!ESP8266WiFiClass::_scanResult || (size_t)i > ESP8266WiFiClass::_scanCount)
     {
         return 0;
     }
@@ -313,6 +342,49 @@ const char* ESP8266WiFiClass::SSID(uint8_t i)
         return 0;
 
     return reinterpret_cast<const char*>(it->ssid);
+}
+
+uint8_t * ESP8266WiFiClass::BSSID(uint8_t i)
+{
+    struct bss_info* it = reinterpret_cast<struct bss_info*>(_getScanInfoByIndex(i));
+    if (!it)
+        return 0;
+
+    return it->bssid;
+}
+
+int32_t ESP8266WiFiClass::Channel(uint8_t i)
+{
+    struct bss_info* it = reinterpret_cast<struct bss_info*>(_getScanInfoByIndex(i));
+    if (!it)
+        return 0;
+
+    return it->channel;
+}
+
+bool ESP8266WiFiClass::isHidden(uint8_t i)
+{
+    struct bss_info* it = reinterpret_cast<struct bss_info*>(_getScanInfoByIndex(i));
+    if (!it)
+        return false;
+
+    return (it->is_hidden != 0);
+}
+
+bool ESP8266WiFiClass::getNetworkInfo(uint8_t i, const char** ssid, uint8_t * encType, int32_t * RSSI, uint8_t ** BSSID, int32_t * channel, bool * isHidden)
+{
+    struct bss_info* it = reinterpret_cast<struct bss_info*>(_getScanInfoByIndex(i));
+     if (!it)
+         return false;
+
+     *ssid = (const char*) &it->ssid[0]; // move ptr
+     *encType = encryptionType(i);
+     *RSSI = it->rssi;
+     *BSSID = &it->bssid[0]; // move ptr
+     *channel = it->channel;
+     *isHidden = (it->is_hidden != 0);
+
+     return true;
 }
 
 int32_t ESP8266WiFiClass::RSSI(uint8_t i)
