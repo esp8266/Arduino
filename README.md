@@ -2,6 +2,7 @@ Arduino-compatible IDE with ESP8266 support
 ===========================================
 
 ![Linux build status](http://img.shields.io/travis/igrr/Arduino.svg)
+[![Donate](http://img.shields.io/paypal/donate.png?color=yellow)](https://www.paypal.com/webscr?cmd=_s-xclick&hosted_button_id=4M56YCWV6PX66)
 
 This project brings support for ESP8266 chip to the Arduino environment. ESP8266WiFi library bundled with this project has the same interface as the WiFi Shield library, making it easy to re-use existing code and libraries.
 
@@ -13,6 +14,8 @@ Starting with 1.6.4, Arduino allows installation of third-party platform package
 - Start Arduino and open Perferences window.
 - Enter ```http://arduino.esp8266.com/package_esp8266com_index.json``` into *Additional Board Manager URLs* field. You can add multiple URLs, separating them with commas.
 - Open Boards Manager from Tools > Board menu and install *esp8266* platform (and don't forget to select your ESP8266 board from Tools > Board menu after installation).
+
+### [Change log](hardware/esp8266com/esp8266/changes.md)
 
 ### Building latest version from source ###
 ```
@@ -41,7 +44,7 @@ GPIO16 can be ```INPUT```, ```OUTPUT``` or ```INPUT_PULLDOWN```.
 ```analogRead(A0)``` reads the value of the ADC channel connected to the TOUT pin.
 
 ```analogWrite(pin, value)``` enables software PWM on the given pin. PWM may be used on pins 0 to 15.
-Call ```analogWrite(pin, 0)``` to disable PWM on the pin.
+Call ```analogWrite(pin, 0)``` to disable PWM on the pin. ```value``` may be in range from 0 to ```PWMRANGE```, which is currently equal to 1023.
 
 Pin interrupts are supported through ```attachInterrupt```, ```detachInterrupt``` functions.
 Interrupts may be attached to any GPIO pin, except GPIO16. Standard Arduino interrupt
@@ -85,7 +88,7 @@ Both ```Serial``` and ```Serial1``` objects support 5, 6, 7, 8 data bits, odd (O
 #### Progmem ####
 
 The Program memory features work much the same way as on a regular Arduino; placing read only data and strings in read only memory and freeing heap for your application.
-The important difference is that on the esp8266 the literal strings are not pooled.  This means that the same literal string defined inside a ```F("")``` and/or ```PSTR("")``` will take up space for each instance in the code.  So you will need to manage the duplicate strings yourself.
+The important difference is that on the esp8266 the literal strings are not pooled.  This means that the same literal string defined inside a ```F("")``` and/or ```PSTR("")``` will take up space for each instance in the code. So you will need to manage the duplicate strings yourself.
 
 #### WiFi(ESP8266WiFi library) ####
 
@@ -171,8 +174,8 @@ Several APIs may be used to get flash chip info:
 #### OneWire (from https://www.pjrc.com/teensy/td_libs_OneWire.html) ####
 
 Library was adapted to work with ESP8266 by including register definitions into OneWire.h
-Note that if you have OneWire library in your Arduino/libraries folder, it will be used
-instead of the one that comes with the Arduino IDE (this one).
+Note that if you already have OneWire library in your Arduino/libraries folder, it will be used
+instead of the one that comes with this package.
 
 #### mDNS responder (ESP8266mDNS library) ####
 
@@ -185,11 +188,12 @@ See attached example and library README file for details.
 Libraries that don't rely on low-level access to AVR registers should work well. Here are a few libraries that were verified to work:
 
 - [aREST](https://github.com/marcoschwartz/aREST) REST API handler library.
-- [PubSubClient](https://github.com/knolleary/pubsubclient) MQTT library. Use this [sample](https://gist.github.com/igrr/7f7e7973366fc01d6393) to get started.
+- [PubSubClient](https://github.com/Imroy/pubsubclient) MQTT library by @Imroy.
 - [DHT11](https://github.com/adafruit/DHT-sensor-library) - initialize DHT as follows: ```DHT dht(DHTPIN, DHTTYPE, 15);```
 - [DallasTemperature](https://github.com/milesburton/Arduino-Temperature-Control-Library.git)
 - [NeoPixelBus](https://github.com/Makuna/NeoPixelBus) - Arduino NeoPixel library compatible with esp8266.
 - [RTC](https://github.com/Makuna/Rtc) - Arduino Library for Ds1307 & Ds3231 compatible with esp8266.
+- [Blynk](https://github.com/blynkkk/blynk-library) - easy IoT framework for Makers (check out the [Kickstarter page](http://tiny.cc/blynk-kick)).
 
 #### Upload via serial port ####
 Pick the correct serial port.
@@ -253,3 +257,7 @@ Espressif SDK included in this build is under Espressif Public License.
 Esptool written by Christian Klippel is licensed under GPLv2, currently maintained by Ivan Grokhotkov: https://github.com/igrr/esptool-ck.
 
 ESP8266 core support, ESP8266WiFi, Ticker, ESP8266WebServer libraries were written by Ivan Grokhotkov, ivan@esp8266.com.
+
+[SPI Flash File System (SPIFFS)](https://github.com/pellepl/spiffs) written by Peter Andersson is used in this project. It is distributed under MIT license.
+
+
