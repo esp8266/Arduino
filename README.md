@@ -188,7 +188,7 @@ See attached example and library README file for details.
 Libraries that don't rely on low-level access to AVR registers should work well. Here are a few libraries that were verified to work:
 
 - [aREST](https://github.com/marcoschwartz/aREST) REST API handler library.
-- [PubSubClient](https://github.com/knolleary/pubsubclient) MQTT library. Use this [sample](https://gist.github.com/igrr/7f7e7973366fc01d6393) to get started.
+- [PubSubClient](https://github.com/Imroy/pubsubclient) MQTT library by @Imroy.
 - [DHT11](https://github.com/adafruit/DHT-sensor-library) - initialize DHT as follows: ```DHT dht(DHTPIN, DHTTYPE, 15);```
 - [DallasTemperature](https://github.com/milesburton/Arduino-Temperature-Control-Library.git)
 - [NeoPixelBus](https://github.com/Makuna/NeoPixelBus) - Arduino NeoPixel library compatible with esp8266.
