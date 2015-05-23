@@ -111,6 +111,7 @@ void ESP8266WebServer::handleClient()
   }
 
   _currentClient = client;
+  _contentLength = CONTENT_LENGTH_NOT_SET;
   _handleRequest();
 }
 
@@ -138,9 +139,13 @@ void ESP8266WebServer::send(int code, const char* content_type, String content) 
   if (!content_type)
     content_type = "text/html";
   
-  String len(content.length());
   sendHeader("Content-Type", content_type, true);
-  sendHeader("Content-Length", len.c_str());
+  if (_contentLength != CONTENT_LENGTH_UNKNOWN) {
+    size_t length = (_contentLength == CONTENT_LENGTH_NOT_SET) ? 
+                    content.length() : _contentLength;
+    String lengthStr(length);
+    sendHeader("Content-Length", lengthStr.c_str());
+  }
   sendHeader("Connection", "close");
   sendHeader("Access-Control-Allow-Origin", "*");
   
@@ -171,10 +176,6 @@ void ESP8266WebServer::sendContent(String content) {
     if (sent == 0) {
       break;
     }
-  }
-  uint16_t maxWait = HTTP_MAX_CLOSE_WAIT;
-  while(_currentClient.connected() && maxWait--) {
-    delay(1);
   }
 }
 
@@ -245,6 +246,10 @@ void ESP8266WebServer::_handleRequest() {
     }
   }
 
+  uint16_t maxWait = HTTP_MAX_CLOSE_WAIT;
+  while(_currentClient.connected() && maxWait--) {
+    delay(1);
+  }
   _currentClient   = WiFiClient();
   _currentUri      = String();
 }
