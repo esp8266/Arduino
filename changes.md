@@ -1,5 +1,21 @@
 # Change log
 
+## Current version
+
+### Core
+
+- Updated I2C library to better handle repeated start for certain devices.
+
+### Libraries
+
+- ESP8266WebServer: add gzip streaming, fix sendContent behaviour, 
+  add setContentSize method.
+- ESP8266WiFi: add BSSID, channel, isHidden methods, fix AP/STA mode
+  selection (#28).
+
+### Tools
+
+
 ## 1.6.4-673-g8cd3697
 May 22, 2015
 

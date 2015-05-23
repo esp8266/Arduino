@@ -160,7 +160,7 @@ public:
      *
      * return: channel
      */
-    int32_t Channel(void);
+    int32_t channel(void);
 
     /*
      * Return the current network RSSI. Note: this is just a stub, there is no way to
@@ -214,11 +214,11 @@ public:
     uint8_t * BSSID(uint8_t networkItem);
 
     /**
-     * return Channel of scanned wifi
+     * return channel of scanned wifi
      * @param networkItem specify from which network item want to get the information
-     * @return uint32_t Channel of scanned wifi
+     * @return uint32_t channel of scanned wifi
      */
-    int32_t Channel(uint8_t networkItem);
+    int32_t channel(uint8_t networkItem);
 
     /**
      * return if the scanned wifi is Hidden (no SSID)
