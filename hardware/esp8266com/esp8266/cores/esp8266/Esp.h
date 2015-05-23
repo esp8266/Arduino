@@ -78,6 +78,7 @@ class EspClass {
         void restart(void);
 
         uint16_t getVcc(void);
+        uint16_t getVdd33(void);
         uint32_t getFreeHeap(void);
 
         uint32_t getChipId(void);
