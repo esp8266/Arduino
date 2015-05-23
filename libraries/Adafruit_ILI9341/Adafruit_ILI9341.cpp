@@ -127,7 +127,7 @@ void Adafruit_ILI9341::spiwrite(uint8_t c) {
 #endif
 }
 
-void Adafruit_ILI9341::spiwriteBytes(uint8_t * data, uint8_t size) {
+void Adafruit_ILI9341::spiwriteBytes(uint8_t * data, uint32_t size) {
 #ifdef ESP8266
     SPI.writeBytes(data, size);
 #else
@@ -250,13 +250,21 @@ void Adafruit_ILI9341::writeCmdData(uint8_t cmd, uint8_t * data, uint8_t size) {
     spiCsHigh();
 }
 
+uint16_t Adafruit_ILI9341::getHeight(void) {
+    return _height;
+}
+
+uint16_t Adafruit_ILI9341::getWidth(void){
+    return _width;
+}
+
 // If the SPI library has transaction support, these functions
 // establish settings and protect from interference from other
 // libraries.  Otherwise, they simply do nothing.
 #ifdef SPI_HAS_TRANSACTION
 
 #ifdef ESP8266
-SPISettings spiSettings = SPISettings(F_CPU, MSBFIRST, SPI_MODE0);
+SPISettings spiSettings = SPISettings(SPI_MAX_SPEED, MSBFIRST, SPI_MODE0);
 #else
 SPISettings spiSettings =  SPISettings(8000000, MSBFIRST, SPI_MODE0);
 #endif
@@ -438,6 +446,20 @@ void Adafruit_ILI9341::begin(void) {
 
 }
 
+
+void Adafruit_ILI9341::area_update_start(uint32_t x, uint32_t y, uint32_t w, uint32_t h) {
+    spiCsLow();
+    setAddrWindow_(x, y, x + w - 1, y + h - 1);
+}
+
+void Adafruit_ILI9341::area_update_data(uint8_t *data, uint32_t pixel){
+    spiwriteBytes(&data[0], (pixel*2));
+}
+
+void Adafruit_ILI9341::area_update_end(void){
+    spiCsHigh();
+}
+
 void Adafruit_ILI9341::setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
     spiCsLow();
     setAddrWindow_(x0, y0, x1, y1);
@@ -583,7 +605,7 @@ void Adafruit_ILI9341::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint
 
     spiCsLow();
 
-    setAddrWindow_(x, y, x + w - 1, y + h - 1);
+    setAddrWindow_(x, y, (x + w - 1), (y + h - 1));
 
     uint8_t colorBin[] = { (uint8_t) (color >> 8), (uint8_t) color };
     spiwritePattern(&colorBin[0], 2, (w * h));

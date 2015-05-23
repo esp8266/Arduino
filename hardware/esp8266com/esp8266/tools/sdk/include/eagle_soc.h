@@ -184,9 +184,9 @@
 #define PERIPHS_IO_MUX_FUNC             0x13
 #define PERIPHS_IO_MUX_FUNC_S           4
 #define PERIPHS_IO_MUX_PULLUP           BIT7
-#define PERIPHS_IO_MUX_PULLDWN          BIT6
+#define PERIPHS_IO_MUX_PULLUP2          BIT6
 #define PERIPHS_IO_MUX_SLEEP_PULLUP     BIT3
-#define PERIPHS_IO_MUX_SLEEP_PULLDWN    BIT2
+#define PERIPHS_IO_MUX_SLEEP_PULLUP2    BIT2
 #define PERIPHS_IO_MUX_SLEEP_OE         BIT1
 #define PERIPHS_IO_MUX_OE               BIT0
 

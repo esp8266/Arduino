@@ -209,7 +209,6 @@ void loop(void);
 #include "WString.h"
 
 #include "HardwareSerial.h"
-#include "FileSystem.h"
 #include "Esp.h"
 #include "debug.h"
 

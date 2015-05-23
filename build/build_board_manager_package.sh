@@ -5,6 +5,11 @@ outdir=esp8266-$ver
 srcdir=../hardware/esp8266com/esp8266/
 mkdir -p $outdir
 cp -R $srcdir/* $outdir/
+
+cp -R ../libraries/SD $outdir/libraries/
+cp -R ../libraries/Adafruit_ILI9341 $outdir/libraries/
+cp -R ../libraries/OneWire $outdir/libraries/
+
 cat $srcdir/platform.txt | \
 gsed 's/runtime.tools.xtensa-lx106-elf-gcc.path={runtime.platform.path}\/tools\/xtensa-lx106-elf//g' | \
 gsed 's/runtime.tools.esptool.path={runtime.platform.path}\/tools//g' | \
@@ -12,13 +17,17 @@ gsed 's/tools.esptool.path={runtime.platform.path}\/tools/tools.esptool.path=\{r
  > $outdir/platform.txt
 
 zip -r $outdir.zip $outdir
+rm -rf $outdir
 sha=`shasum -a 256 $outdir.zip | cut -f 1 -d ' '`
 size=`/bin/ls -l $outdir.zip | awk '{print $5}'`
 echo Size: $size
 echo SHA-256: $sha
 
-scp $outdir.zip dl:apps/download_files/download/
-
+if [ ! -z "$do_upload" ]; then
+    remote="http://arduino.esp8266.com"
+else
+    remote="http://localhost:8000"
+fi
 
 cat << EOF > package_esp8266com_index.json
 {
@@ -36,7 +45,7 @@ cat << EOF > package_esp8266com_index.json
       "architecture":"esp8266",
       "version":"$ver",
       "category":"ESP8266",
-      "url":"http://arduino.esp8266.com/$outdir.zip",
+      "url":"$remote/$outdir.zip",
       "archiveFileName":"$outdir.zip",
       "checksum":"SHA-256:$sha",
       "size":"$size",
@@ -72,10 +81,10 @@ cat << EOF > package_esp8266com_index.json
         },
         {
             "host":"x86_64-apple-darwin",
-            "url":"https://github.com/igrr/esptool-ck/releases/download/0.4.4/esptool-0.4.4-osx.tar.gz",
-            "archiveFileName":"esptool-0.4.4-osx.tar.gz",
-            "checksum":"SHA-256:bb2a58c3583f9dcb0d3e7611531a0f3a29c21a4a1c442987bb29d07408824dfe",
-            "size":"12145"
+            "url":"http://arduino.esp8266.com/esptool-0.4.4-5-g744c44d-osx.tar.gz",
+            "archiveFileName":"esptool-0.4.4-5-g744c44d-osx.tar.gz",
+            "checksum":"SHA-256:d8bc920e046fcc668b31cda63ac5553b4c07a6db12bfd0abc9005fc94628afcb",
+            "size":"12133"
         },
         {
             "host":"x86_64-pc-linux-gnu",
@@ -85,11 +94,11 @@ cat << EOF > package_esp8266com_index.json
             "size":"12513"
         },
         {
-        	"host":"i686-pc-linux-gnu",
-        	"url":"https://github.com/igrr/esptool-ck/releases/download/0.4.4/esptool-0.4.4-linux32.tar.gz",
+            "host":"i686-pc-linux-gnu",
+            "url":"https://github.com/igrr/esptool-ck/releases/download/0.4.4/esptool-0.4.4-linux32.tar.gz",
             "archiveFileName":"esptool-0.4.4-linux32.tar.gz",
             "checksum":"SHA-256:4aa81b97a470641771cf371e5d470ac92d3b177adbe8263c4aae66e607b67755",
-            "size":"12044"	
+            "size":"12044"  
         }
       ]
     },
@@ -106,10 +115,10 @@ cat << EOF > package_esp8266com_index.json
         },
         {
            "host":"x86_64-apple-darwin",
-           "url":"http://arduino.esp8266.com/osx-xtensa-lx106-elf-gb404fb9.tar.gz",
-           "archiveFileName":"osx-xtensa-lx106-elf-gb404fb9.tar.gz",
-           "checksum":"SHA-256:540be2ca32637584463a4a4d04717f6c79c7355e336b8c3578b0947218cf92b9",
-           "size":"35189446"
+           "url":"http://arduino.esp8266.com/osx-xtensa-lx106-elf-gb404fb9-2.tar.gz",
+           "archiveFileName":"osx-xtensa-lx106-elf-gb404fb9-2.tar.gz",
+           "checksum":"SHA-256:0cf150193997bd1355e0f49d3d49711730035257bc1aee1eaaad619e56b9e4e6",
+           "size":"35385382"
         },
         {
            "host":"x86_64-pc-linux-gnu",
@@ -131,5 +140,12 @@ cat << EOF > package_esp8266com_index.json
 }
 EOF
 
-scp package_esp8266com_index.json dl:apps/download_files/download
+if [ ! -z "$do_upload" ]; then
+    scp $outdir.zip dl:apps/download_files/download/
+    scp package_esp8266com_index.json dl:apps/download_files/download
+else
+    python -m SimpleHTTPServer 
+fi
+
+
 

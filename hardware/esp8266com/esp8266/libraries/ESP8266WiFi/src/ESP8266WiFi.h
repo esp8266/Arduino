@@ -42,21 +42,18 @@ public:
 
     void mode(WiFiMode);
         
-    
-    /* Start Wifi connection for OPEN networks
-     *
-     * param ssid: Pointer to the SSID string.
+    /**
+     * Start Wifi connection
+     * if passphrase is set the most secure supported mode will be automatically selected
+     * @param ssid const char*          Pointer to the SSID string.
+     * @param passphrase const char *   Optional. Passphrase. Valid characters in a passphrase must be between ASCII 32-126 (decimal).
+     * @param bssid uint8_t[6]          Optional. BSSID / MAC of AP
+     * @param channel                   Optional. Channel of AP
+     * @return
      */
-    int begin(const char* ssid);
+    int begin(const char* ssid, const char *passphrase = NULL, int32_t channel = 0, uint8_t bssid[6] = NULL);
+    int begin(char* ssid, char *passphrase = NULL, int32_t channel = 0, uint8_t bssid[6] = NULL);
 
-    /* Start Wifi connection with passphrase
-     * the most secure supported mode will be automatically selected
-     *
-     * param ssid: Pointer to the SSID string.
-     * param passphrase: Passphrase. Valid characters in a passphrase
-     *        must be between ASCII 32-126 (decimal).
-     */
-    int begin(const char* ssid, const char *passphrase);
 
    /* Wait for Wifi connection to reach a result
     * returns the status reached or disconnect if STA is off
@@ -152,6 +149,20 @@ public:
     char* SSID();
 
     /*
+     * Return the current bssid / mac associated with the network if configured
+     *
+     * return: bssid string
+     */
+    uint8_t * BSSID(void);
+
+    /*
+     * Return the current channel associated with the network
+     *
+     * return: channel
+     */
+    int32_t channel(void);
+
+    /*
      * Return the current network RSSI. Note: this is just a stub, there is no way to
      *  get the RSSI in the Espressif SDK yet.
      *
@@ -193,6 +204,42 @@ public:
      * return: signed value of RSSI of the specified item on the networks scanned list
      */
     int32_t RSSI(uint8_t networkItem);
+
+
+    /**
+     * return MAC / BSSID of scanned wifi
+     * @param networkItem specify from which network item want to get the information
+     * @return uint8_t * to MAC / BSSID of scanned wifi
+     */
+    uint8_t * BSSID(uint8_t networkItem);
+
+    /**
+     * return channel of scanned wifi
+     * @param networkItem specify from which network item want to get the information
+     * @return uint32_t channel of scanned wifi
+     */
+    int32_t channel(uint8_t networkItem);
+
+    /**
+     * return if the scanned wifi is Hidden (no SSID)
+     * @param networkItem specify from which network item want to get the information
+     * @return bool (true == hidden)
+     */
+    bool isHidden(uint8_t networkItem);
+
+    /**
+     * loads all infos from a scanned wifi in to the ptr parameters
+     * @param networkItem uint8_t
+     * @param ssid  const char**
+     * @param encryptionType uint8_t *
+     * @param RSSI int32_t *
+     * @param BSSID uint8_t **
+     * @param channel int32_t *
+     * @param isHidden bool *
+     * @return (true if ok)
+     */
+    bool getNetworkInfo(uint8_t networkItem, String &ssid, uint8_t &encryptionType, int32_t &RSSI, uint8_t* &BSSID, int32_t &channel, bool &isHidden);
+
 
     /*
      * Return Connection status.
@@ -242,6 +289,9 @@ protected:
     void * _getScanInfoByIndex(int i);
     static void _smartConfigDone(void* result);
     bool _smartConfigStarted = false;
+
+    bool _useApMode;
+    bool _useClientMode;
 
     static size_t _scanCount;
     static void* _scanResult;
