@@ -8,13 +8,17 @@
 #include "ip_addr.h"
 #endif
 /**
- * get the seconds since Jan 01, 1970, 00:00 (GMT)
+ * get the seconds since Jan 01, 1970, 00:00 (GMT + 8)
  */
 uint32 sntp_get_current_timestamp();
 /**
  * get real time (GTM + 8 time zone)
  */
 char* sntp_get_real_time(long t);
+/**
+ * SNTP set time_zone (default GMT + 8)
+ */
+bool sntp_set_timezone(sint8 timezone);
 /**
  * Initialize this module.
  * Send out request instantly or after SNTP_STARTUP_DELAY(_FUNC).

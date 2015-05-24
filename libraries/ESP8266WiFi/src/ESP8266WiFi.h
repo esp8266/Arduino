@@ -287,8 +287,9 @@ public:
 protected:
     static void _scanDone(void* result, int status);
     void * _getScanInfoByIndex(int i);
-    static void _smartConfigDone(void* result);
+    static void _smartConfigCallback(uint32_t status, void* result);
     bool _smartConfigStarted = false;
+    bool _smartConfigDone = false;
 
     bool _useApMode;
     bool _useClientMode;

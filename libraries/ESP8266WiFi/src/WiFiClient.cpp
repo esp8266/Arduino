@@ -40,6 +40,8 @@ extern "C"
 #include "include/ClientContext.h"
 #include "c_types.h"
 
+uint16_t WiFiClient::_localPort = 0;
+
 ICACHE_FLASH_ATTR WiFiClient::WiFiClient() 
 : _client(0)
 {
@@ -92,6 +94,10 @@ int ICACHE_FLASH_ATTR  WiFiClient::connect(IPAddress ip, uint16_t port)
     tcp_pcb* pcb = tcp_new();
     if (!pcb)
         return 0;
+
+    if (_localPort > 0) {
+        pcb->local_port = _localPort++;
+    }
 
     ip_addr_t addr;
     addr.addr = ip;

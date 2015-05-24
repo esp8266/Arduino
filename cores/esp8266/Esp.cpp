@@ -27,7 +27,9 @@ extern "C" {
 //extern "C" void ets_wdt_init(uint32_t val);
 extern "C" void ets_wdt_enable(void);
 extern "C" void ets_wdt_disable(void);
-extern "C" void wdt_feed(void);
+extern "C" void wdt_feed(void) {
+    
+}
 
 /**
  * User-defined Literals
