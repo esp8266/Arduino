@@ -112,6 +112,7 @@ Also note that multicast doesn't work on softAP interface.
 
 WiFiServer, WiFiClient, and WiFiUDP behave mostly the same way as with WiFi shield library.
 Four samples are provided for this library.
+You can see more commands here: [http://www.arduino.cc/en/Reference/WiFi](http://www.arduino.cc/en/Reference/WiFi)
 
 #### Ticker ####
 
@@ -148,7 +149,7 @@ Setting the Clock polarity (CPOL) is not supported, yet (SPI_MODE2 and SPI_MODE3
 
 #### ESP-specific APIs ####
 
-APIs related to deep sleep and watchdog timer are available in the ```ESP``` object.
+APIs related to deep sleep and watchdog timer are available in the ```ESP``` object, only available in Alpha version.
 
 ```ESP.deepSleep(microseconds, mode)``` will put the chip into deep sleep. ```mode``` is one of ```WAKE_RF_DEFAULT```, ```WAKE_RFCAL```, ```WAKE_NO_RFCAL```, ```WAKE_RF_DISABLED```. (GPIO16 needs to be tied to RST to wake from deepSleep.)
 
