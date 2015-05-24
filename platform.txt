@@ -78,8 +78,8 @@ recipe.objcopy.hex.pattern="{runtime.tools.esptool.path}/{compiler.esptool.cmd}"
 
 ## Compute size
 recipe.size.pattern="{compiler.path}{compiler.size.cmd}" -A "{build.path}/{build.project_name}.elf"
-recipe.size.regex=^(?:\.text|\.data|\.rodata|\.irom0\.text|)\s+([0-9]+).*
-#recipe.size.regex.data=^(?:\.data|\.bss|\.noinit)\s+([0-9]+).*
+recipe.size.regex=^(?:\.irom0\.text|)\s+([0-9]+).*
+recipe.size.regex.data=^(?:\.data|\.rodata|\.bss)\s+([0-9]+).*
 #recipe.size.regex.eeprom=^(?:\.eeprom)\s+([0-9]+).*
 
 # ------------------------------

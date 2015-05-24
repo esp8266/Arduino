@@ -9,7 +9,8 @@ generic.name=Generic ESP8266 Module
 generic.upload.tool=esptool
 generic.upload.speed=115200
 generic.upload.resetmethod=ck
-generic.upload.maximum_size=524288
+generic.upload.maximum_size=372736
+generic.upload.maximum_data_size=81920
 generic.upload.wait_for_upload_port=true
 generic.serial.disableDTR=true
 generic.serial.disableRTS=true
@@ -58,42 +59,55 @@ generic.menu.FlashSize.512K.build.flash_ld=eagle.flash.512k.ld
 generic.menu.FlashSize.512K.build.spiffs_start=0x6B000
 generic.menu.FlashSize.512K.build.spiffs_end=0x7B000
 generic.menu.FlashSize.512K.build.spiffs_blocksize=4096
+generic.menu.FlashSize.512K.upload.maximum_size=372736
+
 generic.menu.FlashSize.1M512=1M (512K SPIFFS)
 generic.menu.FlashSize.1M512.build.flash_size=1M
 generic.menu.FlashSize.1M512.build.flash_ld=eagle.flash.1m512.ld
 generic.menu.FlashSize.1M512.build.spiffs_start=0x6B000
 generic.menu.FlashSize.1M512.build.spiffs_end=0xFB000
 generic.menu.FlashSize.1M512.build.spiffs_blocksize=8192
+generic.menu.FlashSize.1M512.upload.maximum_size=438272
+
 generic.menu.FlashSize.1M256=1M (256K SPIFFS)
 generic.menu.FlashSize.1M256.build.flash_size=1M
 generic.menu.FlashSize.1M256.build.flash_ld=eagle.flash.1m256.ld
 generic.menu.FlashSize.1M256.build.spiffs_start=0xAB000
 generic.menu.FlashSize.1M256.build.spiffs_end=0xFB000
 generic.menu.FlashSize.1M256.build.spiffs_blocksize=4096
+generic.menu.FlashSize.1M256.upload.maximum_size=700416
+
 generic.menu.FlashSize.1M128=1M (128K SPIFFS)
 generic.menu.FlashSize.1M128.build.flash_size=1M
 generic.menu.FlashSize.1M128.build.flash_ld=eagle.flash.1m128.ld
 generic.menu.FlashSize.1M128.build.spiffs_start=0xCB000
 generic.menu.FlashSize.1M128.build.spiffs_end=0xFB000
 generic.menu.FlashSize.1M128.build.spiffs_blocksize=4096
+generic.menu.FlashSize.1M128.upload.maximum_size=831488
+
 generic.menu.FlashSize.1M64=1M (64K SPIFFS)
 generic.menu.FlashSize.1M64.build.flash_size=1M
 generic.menu.FlashSize.1M64.build.flash_ld=eagle.flash.1m64.ld
 generic.menu.FlashSize.1M64.build.spiffs_start=0xEB000
 generic.menu.FlashSize.1M64.build.spiffs_end=0xFB000
 generic.menu.FlashSize.1M64.build.spiffs_blocksize=4096
+generic.menu.FlashSize.1M64.upload.maximum_size=897024
+
 generic.menu.FlashSize.2M=2M (1M SPIFFS)
 generic.menu.FlashSize.2M.build.flash_size=2M
 generic.menu.FlashSize.2M.build.flash_ld=eagle.flash.2m.ld
 generic.menu.FlashSize.2M.build.spiffs_start=0x100000
 generic.menu.FlashSize.2M.build.spiffs_end=0x1FB000
 generic.menu.FlashSize.2M.build.spiffs_blocksize=8192
+generic.menu.FlashSize.2M.upload.maximum_size=983040
+
 generic.menu.FlashSize.4M=4M (3M SPIFFS)
 generic.menu.FlashSize.4M.build.flash_size=4M
 generic.menu.FlashSize.4M.build.flash_ld=eagle.flash.4m.ld
 generic.menu.FlashSize.4M.build.spiffs_start=0x100000
 generic.menu.FlashSize.4M.build.spiffs_end=0x3FB000
 generic.menu.FlashSize.4M.build.spiffs_blocksize=8192
+generic.menu.FlashSize.4M.upload.maximum_size=983040
 
 # disabled because espressif's bootloader refuses to write above 4M
 # generic.menu.FlashSize.8M=8M (7M SPIFFS)
