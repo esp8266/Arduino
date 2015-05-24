@@ -1484,7 +1484,6 @@ public class Editor extends JFrame implements RunnerListener {
             find = new FindReplace(Editor.this);
           }
           find.setFindText(getSelectedText());
-          find.findNext();
         }
       });
       menu.add(item);
