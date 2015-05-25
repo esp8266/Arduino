@@ -35,14 +35,13 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import cc.arduino.MyStreamPumper;
 import cc.arduino.packages.BoardPort;
 import cc.arduino.packages.Uploader;
 import cc.arduino.packages.UploaderFactory;
 
 import org.apache.commons.compress.utils.IOUtils;
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.ExecuteStreamHandler;
+import org.apache.commons.exec.*;
 import processing.app.BaseNoGui;
 import processing.app.I18n;
 import processing.app.PreferencesData;
@@ -703,37 +702,13 @@ public class Compiler implements MessageConsumer {
     }
 
     DefaultExecutor executor = new DefaultExecutor();
-    executor.setStreamHandler(new ExecuteStreamHandler() {
-      @Override
-      public void setProcessInputStream(OutputStream os) throws IOException {
-
-      }
+    executor.setStreamHandler(new PumpStreamHandler() {
 
       @Override
-      public void setProcessErrorStream(InputStream is) throws IOException {
-        forwardToMessage(is);
-      }
-
-      @Override
-      public void setProcessOutputStream(InputStream is) throws IOException {
-        forwardToMessage(is);
-      }
-
-      private void forwardToMessage(InputStream is) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        String line;
-        while ((line = reader.readLine()) != null) {
-          message(line + "\n");
-        }
-      }
-
-      @Override
-      public void start() throws IOException {
-
-      }
-
-      @Override
-      public void stop() {
+      protected Thread createPump(InputStream is, OutputStream os, boolean closeWhenExhausted) {
+        final Thread result = new Thread(new MyStreamPumper(is, Compiler.this));
+        result.setDaemon(true);
+        return result;
 
       }
     });

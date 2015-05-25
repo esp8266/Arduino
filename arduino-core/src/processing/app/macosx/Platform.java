@@ -25,12 +25,13 @@ package processing.app.macosx;
 import cc.arduino.packages.BoardPort;
 import com.apple.eio.FileManager;
 import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.Executor;
+import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.lang3.StringUtils;
 import processing.app.debug.TargetPackage;
 import processing.app.legacy.PApplet;
 import processing.app.legacy.PConstants;
-import processing.app.tools.CollectStdOutExecutor;
 
 import java.awt.*;
 import java.io.*;
@@ -67,7 +68,8 @@ public class Platform extends processing.app.Platform {
   private void discoverRealOsArch() throws IOException {
     CommandLine uname = CommandLine.parse("uname -m");
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    CollectStdOutExecutor executor = new CollectStdOutExecutor(baos);
+    Executor executor = new DefaultExecutor();
+    executor.setStreamHandler(new PumpStreamHandler(baos, null));
     executor.execute(uname);
     osArch = StringUtils.trim(new String(baos.toByteArray()));
   }
@@ -214,7 +216,8 @@ public class Platform extends processing.app.Platform {
   @Override
   public String preListAllCandidateDevices() {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    Executor executor = new CollectStdOutExecutor(baos);
+    Executor executor = new DefaultExecutor();
+    executor.setStreamHandler(new PumpStreamHandler(baos, null));
 
     try {
       CommandLine toDevicePath = CommandLine.parse("/usr/sbin/system_profiler SPUSBDataType");

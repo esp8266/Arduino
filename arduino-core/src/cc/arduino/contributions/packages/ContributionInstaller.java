@@ -37,14 +37,15 @@ import cc.arduino.utils.MultiStepProgress;
 import cc.arduino.utils.Progress;
 import com.google.common.collect.Collections2;
 import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.Executor;
+import org.apache.commons.exec.PumpStreamHandler;
 import processing.app.BaseNoGui;
 import processing.app.I18n;
 import processing.app.Platform;
 import processing.app.PreferencesData;
 import processing.app.helpers.FileUtils;
 import processing.app.helpers.filefilters.OnlyDirs;
-import processing.app.tools.CollectStdOutStdErrExecutor;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -179,7 +180,8 @@ public class ContributionInstaller {
 
     ByteArrayOutputStream stdout = new ByteArrayOutputStream();
     ByteArrayOutputStream stderr = new ByteArrayOutputStream();
-    Executor executor = new CollectStdOutStdErrExecutor(stdout, stderr);
+    Executor executor = new DefaultExecutor();
+    executor.setStreamHandler(new PumpStreamHandler(stdout, stderr));
     executor.setWorkingDirectory(folder);
     executor.setExitValues(null);
     int exitValue = executor.execute(new CommandLine(postInstallScript));

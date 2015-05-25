@@ -23,11 +23,12 @@
 package processing.app.windows;
 
 import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.Executor;
+import org.apache.commons.exec.PumpStreamHandler;
 import processing.app.debug.TargetPackage;
 import processing.app.legacy.PApplet;
 import processing.app.legacy.PConstants;
-import processing.app.tools.CollectStdOutExecutor;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -62,7 +63,8 @@ public class Platform extends processing.app.Platform {
 
   private String getFolderPathFromRegistry(String folderType) throws IOException {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    Executor executor = new CollectStdOutExecutor(baos);
+    Executor executor = new DefaultExecutor();
+    executor.setStreamHandler(new PumpStreamHandler(baos, null));
 
     CommandLine toDevicePath = CommandLine.parse("reg query \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders\" /v \"" + folderType + "\"");
     executor.execute(toDevicePath);
@@ -193,7 +195,8 @@ public class Platform extends processing.app.Platform {
   @Override
   public String preListAllCandidateDevices() {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    Executor executor = new CollectStdOutExecutor(baos);
+    Executor executor = new DefaultExecutor();
+    executor.setStreamHandler(new PumpStreamHandler(baos, null));
 
     try {
       String listComPorts = new File(System.getProperty("user.dir"), "hardware/tools/listComPorts.exe").getCanonicalPath();
