@@ -101,6 +101,8 @@ class EspClass {
         String getResetInfo(void);
         struct rst_info * getResetInfoPtr(void);
 
+        bool eraseESPconfig(void);
+
         inline uint32_t getCycleCount(void);
         inline uint32_t getCycleCompare0(void);
         inline void setCycleCompare0(uint32_t count);

@@ -47,6 +47,10 @@ wl_status_t ESP8266WiFiMulti::run(void) {
         uint8 bestBSSID[6];
         int32_t bestChannel;
 
+        DEBUG_WIFI_MULTI("[WIFI] delete old wifi config...\n");
+        WiFi.disconnect();
+
+        DEBUG_WIFI_MULTI("[WIFI] start scan\n");
         // WiFi.scanNetworks will return the number of networks found
         int8_t n = WiFi.scanNetworks();
 
