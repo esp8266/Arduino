@@ -104,7 +104,7 @@ class EspClass {
 uint32_t EspClass::getCycleCount(void)
 {
     uint32_t ccount;
-    __asm__ __volatile__("rsr %0,ccount":"=a" (ccount));
+    __asm__ __volatile__("esync; rsr %0,ccount":"=a" (ccount));
     return ccount;
 }
 

@@ -22,7 +22,9 @@
 #include "pins_arduino.h"
 #include "c_types.h"
 
-void (*timer1_user_cb)(void);
+typedef void(*_timercallback)(void);
+
+static volatile _timercallback timer1_user_cb = NULL;
 
 void timer1_isr_handler(void *para){
     if((T1C & ((1 << TCAR) | (1 << TCIT))) == 0) TEIE &= ~TEIE1;//edge int disable
@@ -58,4 +60,26 @@ void timer1_write(uint32_t ticks){
 void timer1_disable(){
     T1C = 0;
     T1I = 0;
+}
+
+static volatile _timercallback timer0_user_cb = NULL;
+
+void timer0_isr_handler(void *para){
+    if (timer0_user_cb) {
+        timer0_user_cb();
+    }
+}
+
+void timer0_isr_init(){
+    ETS_CCOMPARE0_INTR_ATTACH(timer0_isr_handler, NULL);
+}
+
+void timer0_attachInterrupt(void(*userFunc)(void)) {
+    timer0_user_cb = userFunc;
+    ETS_CCOMPARE0_ENABLE();
+}
+
+void timer0_detachInterrupt() {
+    timer0_user_cb = NULL;
+    ETS_CCOMPARE0_DISABLE();
 }
