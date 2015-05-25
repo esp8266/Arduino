@@ -163,13 +163,12 @@ public:
     int32_t channel(void);
 
     /*
-     * Return the current network RSSI. Note: this is just a stub, there is no way to
-     *  get the RSSI in the Espressif SDK yet.
+     * Return the current network RSSI.
      *
-     * return: RSSI value (currently 0)
+     * return: RSSI value
      */
 
-    int32_t RSSI() { return 0; }
+    int32_t RSSI();
 
     /*
      * Start scan WiFi networks available
