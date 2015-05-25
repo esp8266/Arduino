@@ -73,12 +73,14 @@ typedef void (*int_handler_t)(void*);
 #define ETS_INTR_DISABLE(inum) \
     ets_isr_mask((1<<inum))
 
+inline uint32_t ETS_INTR_ENABLED(void)
 {
     uint32_t enabled;
     __asm__ __volatile__("esync; rsr %0,intenable":"=a" (enabled));
     return enabled;
 }
 
+inline uint32_t ETS_INTR_PENDING(void)
 {
     uint32_t pending;
     __asm__ __volatile__("esync; rsr %0,interrupt":"=a" (pending));
