@@ -30,7 +30,7 @@ enum rst_reason {
 	DEEP_SLEEP_AWAKE_FLAG	= 4
 };
 
-struct rst_info{
+struct rst_info {
 	uint32 reason;
 	uint32 exccause;
 	uint32 epc1;
