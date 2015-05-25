@@ -52,9 +52,20 @@ cat << EOF > package_esp8266com_index.json
       "help":{
         "online":"http://esp8266.com"
       },
-      "boards":[ {
+      "boards":[
+        {
           "name":"Generic ESP8266 Module"
+        },
+        {
+          "name":"Olimex MOD-WIFI-ESP8266(-DEV)"
+        },
+        {
+          "name":"NodeMCU 0.9 (ESP-12 Module)"
+        },
+        {
+          "name":"NodeMCU 1.0 (ESP-12E Module)"
         }
+
       ],
       "toolsDependencies":[ {
         "packager":"esp8266",
