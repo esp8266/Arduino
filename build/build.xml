@@ -841,8 +841,8 @@
       <fileset dir="windows/launcher"
 	       includes="application.ico, config.xml, config_debug.xml, arduino.l4j.ini"/>
     </copy>
-    <launch4j configFile="windows/work/config.xml" />
-    <launch4j configFile="windows/work/config_debug.xml" />
+    <launch4j configFile="windows/work/config.xml" fileVersion="${revision}.0" txtFileVersion="${revision}" productVersion="${revision}.0" txtProductVersion="${revision}"/>
+    <launch4j configFile="windows/work/config_debug.xml" fileVersion="${revision}.0" txtFileVersion="${revision}" productVersion="${revision}.0" txtProductVersion="${revision}"/>
     <delete dir="windows/work" includes="application.ico, config.xml, config_debug.xml" />
     <copy file="windows/work/arduino.l4j.ini" tofile="windows/work/arduino_debug.l4j.ini" />
 

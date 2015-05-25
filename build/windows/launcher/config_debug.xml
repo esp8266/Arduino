@@ -3,15 +3,8 @@
   <headerType>console</headerType>
   <jar>lib</jar>
   <outfile>arduino_debug.exe</outfile>
-  <errTitle></errTitle>
-  <cmdLine></cmdLine>
-  <chdir>.</chdir>
-  <priority>normal</priority>
-  <downloadUrl>http://java.sun.com/javase/downloads/</downloadUrl>
-  <supportUrl></supportUrl>
-  <customProcName>false</customProcName>
-  <stayAlive>false</stayAlive>
-  <manifest></manifest>
+  <errTitle>Arduino</errTitle>
+  <downloadUrl>http://www.oracle.com/technetwork/java/javase/downloads/index.html</downloadUrl>
   <icon>application.ico</icon>
   <classPath>
     <mainClass>processing.app.Base</mainClass>
@@ -44,6 +37,14 @@
     <runtimeBits>32</runtimeBits>
     <opt>-Dsun.java2d.d3d=false</opt>
   </jre>
+  <versionInfo>
+    <fileDescription>Arduino IDE</fileDescription>
+    <copyright>Arduino LLC</copyright>
+    <productName>Arduino</productName>
+    <companyName>Arduino LLC</companyName>
+    <internalName>arduino</internalName>
+    <originalFilename>arduino.exe</originalFilename>
+  </versionInfo>
   <messages>
     <startupErr>An error occurred while starting the application.</startupErr>
     <bundledJreErr>This application was configured to use a bundled Java Runtime Environment but the runtime is missing or corrupted.</bundledJreErr>
