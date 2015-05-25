@@ -61,6 +61,7 @@ public:
   uint16_t  remotePort();
   bool getNoDelay();
   void setNoDelay(bool nodelay);
+  static void setLocalPortStart(uint16_t port) { _localPort = port; }
 
   template<typename T> size_t write(T &src){
     uint8_t obuf[1460];
@@ -97,6 +98,7 @@ private:
   void _err(int8_t err);
 
   ClientContext* _client;
+  static uint16_t _localPort;
 
 };
 
