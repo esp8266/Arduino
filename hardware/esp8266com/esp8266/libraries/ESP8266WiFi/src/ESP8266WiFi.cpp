@@ -255,6 +255,11 @@ int32_t ESP8266WiFiClass::channel(void) {
     return wifi_get_channel();
 }
 
+
+int32_t ESP8266WiFiClass::RSSI(void) {
+    return wifi_station_get_rssi();
+}
+
 extern "C"
 {
     typedef STAILQ_HEAD(, bss_info) bss_info_head_t;
