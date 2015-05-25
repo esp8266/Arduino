@@ -836,7 +836,7 @@ public class Sketch {
       destFile = new File(data.getCodeFolder(), filename);
 
     } else {
-      for (String extension : data.getExtensions()) {
+      for (String extension : SketchData.EXTENSIONS) {
         String lower = filename.toLowerCase();
         if (lower.endsWith("." + extension)) {
           destFile = new File(data.getFolder(), filename);
@@ -1345,7 +1345,7 @@ public class Sketch {
    * extensions.
    */
   public boolean validExtension(String what) {
-    return data.getExtensions().contains(what);
+    return SketchData.EXTENSIONS.contains(what);
   }
 
 
