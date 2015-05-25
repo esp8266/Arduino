@@ -223,6 +223,18 @@ void detachInterrupt(uint8_t interruptNum) {
       #warning detachInterrupt may need some more work for this cpu (case 1)
     #endif
       break;
+      
+    case 2:
+    #if defined(EIMSK) && defined(INT2)
+      EIMSK &= ~(1 << INT2);
+    #elif defined(GICR) && defined(INT2)
+      GICR &= ~(1 << INT2); // atmega32
+    #elif defined(GIMSK) && defined(INT2)
+      GIMSK &= ~(1 << INT2);
+    #else
+      #warning detachInterrupt may need some more work for this cpu (case 2)
+    #endif
+      break;       
 #endif
     }
       
