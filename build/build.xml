@@ -293,8 +293,7 @@
             mainclassname="processing.app.Base"
             copyright="Arduino LLC"
             minimumsystemversion="10.7"
-            highresolutioncapable="true"
-            supportsautomaticgraphicsswitching="true">
+            highresolutioncapable="true">
 
       <runtime dir="${MACOSX_BUNDLED_JVM}"/>
 
