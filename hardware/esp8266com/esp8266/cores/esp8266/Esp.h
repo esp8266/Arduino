@@ -98,6 +98,9 @@ class EspClass {
         FlashMode_t getFlashChipMode(void);
         uint32_t getFlashChipSizeByChipId(void);
 
+        String getResetInfo(void);
+        struct rst_info * getResetInfoPtr(void);
+
         inline uint32_t getCycleCount(void);
         inline uint32_t getCycleCompare0(void);
         inline void setCycleCompare0(uint32_t count);

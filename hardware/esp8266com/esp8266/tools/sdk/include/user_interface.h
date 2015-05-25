@@ -28,7 +28,7 @@ enum rst_reason {
 	EXP_RST_FLAG    = 2
 };
 
-struct rst_info{
+struct rst_info {
 	uint32 flag;
 	uint32 exccause;
 	uint32 epc1;

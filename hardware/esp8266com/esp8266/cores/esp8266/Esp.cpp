@@ -22,6 +22,8 @@
 
 extern "C" {
 #include "user_interface.h"
+
+extern struct rst_info resetInfo;
 }
 
 //extern "C" void ets_wdt_init(uint32_t val);
@@ -276,4 +278,17 @@ uint32_t EspClass::getFlashChipSizeByChipId(void) {
         default:
             return 0;
     }
+}
+
+String EspClass::getResetInfo(void) {
+    if(resetInfo.reason != 0) {
+        char buff[150];
+        sprintf(&buff[0], "Fatal exception:%d flag:%d epc1:0x%08x epc2:0x%08x epc3:0x%08x excvaddr:0x%08x depc:0x%08x", resetInfo.exccause, resetInfo.reason, resetInfo.epc1, resetInfo.epc2, resetInfo.epc3, resetInfo.excvaddr, resetInfo.depc);
+        return String(buff);
+    }
+    return String("flag: 0");
+}
+
+struct rst_info * EspClass::getResetInfoPtr(void) {
+    return &resetInfo;
 }
