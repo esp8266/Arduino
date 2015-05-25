@@ -1420,7 +1420,8 @@ public class Editor extends JFrame implements RunnerListener {
     });
     menu.add(commentItem);
 
-    JMenuItem increaseIndentItem = newJMenuItem(_("Increase Indent"), ']');
+    JMenuItem increaseIndentItem = new JMenuItem(_("Increase Indent"));
+    increaseIndentItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0));
     increaseIndentItem.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           handleIndentOutdent(true);
@@ -1428,7 +1429,8 @@ public class Editor extends JFrame implements RunnerListener {
     });
     menu.add(increaseIndentItem);
 
-    JMenuItem decreseIndentItem = newJMenuItem(_("Decrease Indent"), '[');
+    JMenuItem decreseIndentItem = new JMenuItem(_("Decrease Indent"));
+    decreseIndentItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_MASK));
     decreseIndentItem.setName("menuDecreaseIndent");
     decreseIndentItem.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
