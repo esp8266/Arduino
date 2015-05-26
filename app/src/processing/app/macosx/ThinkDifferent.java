@@ -83,7 +83,7 @@ public class ThinkDifferent {
       @Override
       public void handleQuitRequestWith(AppEvent.QuitEvent quitEvent, QuitResponse quitResponse) {
         if (waitForBase()) {
-          if (Base.INSTANCE.handleClose(Base.INSTANCE.getActiveEditor())) {
+          if (Base.INSTANCE.handleQuit()) {
             quitResponse.performQuit();
           } else {
             quitResponse.cancelQuit();

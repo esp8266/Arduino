@@ -910,35 +910,6 @@ public class Base {
     editor.internalCloseRunner();
 
     if (editors.size() == 1) {
-      // For 0158, when closing the last window /and/ it was already an
-      // untitled sketch, just give up and let the user quit.
-//      if (Preferences.getBoolean("sketchbook.closing_last_window_quits") ||
-//          (editor.untitled && !editor.getSketch().isModified())) {
-      if (OSUtils.isMacOS()) {
-        Object[] options = {"OK", "Cancel"};
-        String prompt =
-                _("<html> " +
-                        "<head> <style type=\"text/css\">" +
-                        "b { font: 13pt \"Lucida Grande\" }" +
-                        "p { font: 11pt \"Lucida Grande\"; margin-top: 8px }" +
-                        "</style> </head>" +
-                        "<b>Are you sure you want to Quit?</b>" +
-                        "<p>Closing the last open sketch will quit Arduino.");
-
-        int result = JOptionPane.showOptionDialog(editor,
-                prompt,
-                _("Quit"),
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                options,
-                options[0]);
-        if (result == JOptionPane.NO_OPTION ||
-                result == JOptionPane.CLOSED_OPTION) {
-          return false;
-        }
-      }
-
       // This will store the sketch count as zero
       editors.remove(editor);
       try {
