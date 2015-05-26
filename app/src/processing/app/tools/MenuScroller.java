@@ -482,7 +482,7 @@ public class MenuScroller {
     double screenHeight = java.awt.Toolkit.getDefaultToolkit().getScreenSize().getHeight();
 
     int maxItems = (int) ((screenHeight - arrowMenuItemHeight * 2 - menuBorderHeight) / itemHeight);
-    maxItems -= maxItems / 3;
+    maxItems -= maxItems / 4;
     return maxItems;
   }
 
