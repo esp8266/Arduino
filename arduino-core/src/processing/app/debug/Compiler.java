@@ -1201,7 +1201,7 @@ public class Compiler implements MessageConsumer {
     StringBuffer bigCode = new StringBuffer();
     int bigCount = 0;
     for (SketchCode sc : sketch.getCodes()) {
-      if (sc.isExtension("ino") || sc.isExtension("pde")) {
+      if (sc.isExtension(SketchData.SKETCH_EXTENSIONS)) {
         sc.setPreprocOffset(bigCount);
         // These #line directives help the compiler report errors with
         // correct the filename and line number (issue 281 & 907)
@@ -1272,7 +1272,7 @@ public class Compiler implements MessageConsumer {
     // 3. then loop over the code[] and save each .java file
 
     for (SketchCode sc : sketch.getCodes()) {
-      if (sc.isExtension("c") || sc.isExtension("cpp") || sc.isExtension("h")) {
+      if (sc.isExtension(SketchData.OTHER_ALLOWED_EXTENSIONS)) {
         // no pre-processing services necessary for java files
         // just write the the contents of 'program' to a .java file
         // into the build directory. uses byte stream and reader/writer
