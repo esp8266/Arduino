@@ -51,6 +51,7 @@ public abstract class AbstractGUITest {
     FailOnThreadViolationRepaintManager.install();
 
     BaseNoGui.initPlatform();
+    BaseNoGui.getPlatform().init();
     PreferencesData.init(null);
     JPopupMenu.setDefaultLightWeightPopupEnabled(false);
     Theme.init();
