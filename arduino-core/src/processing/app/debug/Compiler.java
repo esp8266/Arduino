@@ -405,25 +405,43 @@ public class Compiler implements MessageConsumer {
         System.err.println();
       }
     }
-    
+
+    runActions("hooks.sketch.prebuild", prefs);
+
     // 1. compile the sketch (already in the buildPath)
     progressListener.progress(20);
     compileSketch(includeFolders);
     sketchIsCompiled = true;
+
+    runActions("hooks.sketch.postbuild", prefs);
+
+    runActions("hooks.libraries.prebuild", prefs);
 
     // 2. compile the libraries, outputting .o files to: <buildPath>/<library>/
     // Doesn't really use configPreferences
     progressListener.progress(30);
     compileLibraries(includeFolders);
 
+    runActions("hooks.libraries.postbuild", prefs);
+
+    runActions("hooks.core.prebuild", prefs);
+
     // 3. compile the core, outputting .o files to <buildPath> and then
     // collecting them into the core.a library file.
     progressListener.progress(40);
     compileCore();
 
+    runActions("hooks.core.postbuild", prefs);
+
+    runActions("hooks.linking.prelink", prefs);
+
     // 4. link it all together into the .elf file
     progressListener.progress(50);
     compileLink();
+
+    runActions("hooks.linking.postlink", prefs);
+
+    runActions("hooks.objcopy.preobjcopy", prefs);
 
     // 5. run objcopy to generate output files
     progressListener.progress(60);
@@ -437,10 +455,16 @@ public class Compiler implements MessageConsumer {
       runRecipe(recipe);
     }
 
+    runActions("hooks.objcopy.postobjcopy", prefs);
+
     // 7. save the hex file
     if (saveHex) {
+      runActions("hooks.savehex.presavehex", prefs);
+
       progressListener.progress(80);
       saveHex();
+
+      runActions("hooks.savehex.postsavehex", prefs);
     }
 
     progressListener.progress(90);
