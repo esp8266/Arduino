@@ -1335,7 +1335,6 @@ public class Editor extends JFrame implements RunnerListener {
   protected JMenu buildEditMenu() {
     JMenu menu = new JMenu(_("Edit"));
     menu.setName("menuEdit");
-    JMenuItem item;
 
     undoItem = newJMenuItem(_("Undo"), 'Z');
     undoItem.setName("menuEditUndo");
@@ -1355,24 +1354,24 @@ public class Editor extends JFrame implements RunnerListener {
 
     // TODO "cut" and "copy" should really only be enabled
     // if some text is currently selected
-    item = newJMenuItem(_("Cut"), 'X');
-    item.addActionListener(new ActionListener() {
+    JMenuItem cutItem = newJMenuItem(_("Cut"), 'X');
+    cutItem.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           handleCut();
         }
       });
-    menu.add(item);
+    menu.add(cutItem);
 
-    item = newJMenuItem(_("Copy"), 'C');
-    item.addActionListener(new ActionListener() {
+    JMenuItem copyItem = newJMenuItem(_("Copy"), 'C');
+    copyItem.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           textarea.copy();
         }
       });
-    menu.add(item);
+    menu.add(copyItem);
 
-    item = newJMenuItemShift(_("Copy for Forum"), 'C');
-    item.addActionListener(new ActionListener() {
+    JMenuItem copyForumItem = newJMenuItemShift(_("Copy for Forum"), 'C');
+    copyForumItem.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
 //          SwingUtilities.invokeLater(new Runnable() {
 //              public void run() {
@@ -1381,10 +1380,10 @@ public class Editor extends JFrame implements RunnerListener {
 //            });
         }
       });
-    menu.add(item);
+    menu.add(copyForumItem);
 
-    item = newJMenuItemAlt(_("Copy as HTML"), 'C');
-    item.addActionListener(new ActionListener() {
+    JMenuItem copyHTMLItem = newJMenuItemAlt(_("Copy as HTML"), 'C');
+    copyHTMLItem.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
 //          SwingUtilities.invokeLater(new Runnable() {
 //              public void run() {
@@ -1393,56 +1392,56 @@ public class Editor extends JFrame implements RunnerListener {
 //            });
         }
       });
-    menu.add(item);
+    menu.add(copyHTMLItem);
 
-    item = newJMenuItem(_("Paste"), 'V');
-    item.addActionListener(new ActionListener() {
+    JMenuItem pasteItem = newJMenuItem(_("Paste"), 'V');
+    pasteItem.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           textarea.paste();
           sketch.setModified(true);
         }
       });
-    menu.add(item);
+    menu.add(pasteItem);
 
-    item = newJMenuItem(_("Select All"), 'A');
-    item.addActionListener(new ActionListener() {
+    JMenuItem selectAllItem = newJMenuItem(_("Select All"), 'A');
+    selectAllItem.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           textarea.selectAll();
         }
       });
-    menu.add(item);
+    menu.add(selectAllItem);
 
     menu.addSeparator();
 
-    item = newJMenuItem(_("Comment/Uncomment"), '/');
-    item.addActionListener(new ActionListener() {
+    JMenuItem commentItem = newJMenuItem(_("Comment/Uncomment"), '/');
+    commentItem.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           handleCommentUncomment();
         }
     });
-    menu.add(item);
+    menu.add(commentItem);
 
-    item = newJMenuItem(_("Increase Indent"), ']');
-    item.addActionListener(new ActionListener() {
+    JMenuItem increaseIndentItem = newJMenuItem(_("Increase Indent"), ']');
+    increaseIndentItem.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           handleIndentOutdent(true);
         }
     });
-    menu.add(item);
+    menu.add(increaseIndentItem);
 
-    item = newJMenuItem(_("Decrease Indent"), '[');
-    item.setName("menuDecreaseIndent");
-    item.addActionListener(new ActionListener() {
+    JMenuItem decreseIndentItem = newJMenuItem(_("Decrease Indent"), '[');
+    decreseIndentItem.setName("menuDecreaseIndent");
+    decreseIndentItem.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           handleIndentOutdent(false);
         }
     });
-    menu.add(item);
+    menu.add(decreseIndentItem);
 
     menu.addSeparator();
 
-    item = newJMenuItem(_("Find..."), 'F');
-    item.addActionListener(new ActionListener() {
+    JMenuItem findItem = newJMenuItem(_("Find..."), 'F');
+    findItem.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         if (find == null) {
           find = new FindReplace(Editor.this);
@@ -1454,31 +1453,31 @@ public class Editor extends JFrame implements RunnerListener {
         find.setVisible(true);
       }
     });
-    menu.add(item);
+    menu.add(findItem);
 
-    item = newJMenuItem(_("Find Next"), 'G');
-    item.addActionListener(new ActionListener() {
+    JMenuItem findNextItem = newJMenuItem(_("Find Next"), 'G');
+    findNextItem.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         if (find != null) {
           find.findNext();
         }
       }
     });
-    menu.add(item);
+    menu.add(findNextItem);
 
-    item = newJMenuItemShift(_("Find Previous"), 'G');
-    item.addActionListener(new ActionListener() {
+    JMenuItem findPreviousItem = newJMenuItemShift(_("Find Previous"), 'G');
+    findPreviousItem.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         if (find != null) {
           find.findPrevious();
         }
       }
     });
-    menu.add(item);
+    menu.add(findPreviousItem);
 
     if (OSUtils.isMacOS()) {
-      item = newJMenuItem(_("Use Selection For Find"), 'E');
-      item.addActionListener(new ActionListener() {
+      JMenuItem useSelectionForFindItem = newJMenuItem(_("Use Selection For Find"), 'E');
+      useSelectionForFindItem.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           if (find == null) {
             find = new FindReplace(Editor.this);
@@ -1486,7 +1485,7 @@ public class Editor extends JFrame implements RunnerListener {
           find.setFindText(getSelectedText());
         }
       });
-      menu.add(item);
+      menu.add(useSelectionForFindItem);
     }
 
     return menu;
