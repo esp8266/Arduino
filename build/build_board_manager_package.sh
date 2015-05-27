@@ -64,8 +64,10 @@ cat << EOF > package_esp8266com_index.json
         },
         {
           "name":"NodeMCU 1.0 (ESP-12E Module)"
+        },
+        {
+          "name":"Adafruit HUZZAH ESP8266 (ESP-12)"
         }
-
       ],
       "toolsDependencies":[ {
         "packager":"esp8266",
