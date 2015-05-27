@@ -1,6 +1,7 @@
 package processing.app.syntax;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextAreaDefaultInputMap;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextAreaEditorKit;
 import org.fife.ui.rtextarea.RTextArea;
 import org.fife.ui.rtextarea.RTextAreaEditorKit;
 import processing.app.PreferencesData;
@@ -39,5 +40,7 @@ public class SketchTextAreaDefaultInputMap extends RSyntaxTextAreaDefaultInputMa
 
       remove(KeyStroke.getKeyStroke(KeyEvent.VK_J, defaultModifier));
     }
+
+    put(KeyStroke.getKeyStroke(KeyEvent.VK_DIVIDE, defaultModifier), RSyntaxTextAreaEditorKit.rstaToggleCommentAction);
   }
 }
