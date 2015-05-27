@@ -16,6 +16,7 @@ public class SketchTextAreaDefaultInputMap extends RSyntaxTextAreaDefaultInputMa
   public SketchTextAreaDefaultInputMap() {
     int defaultModifier = getDefaultModifier();
     int alt = InputEvent.ALT_MASK;
+    int shift = InputEvent.SHIFT_MASK;
     boolean isOSX = RTextArea.isOSX();
     int moveByWordMod = isOSX ? alt : defaultModifier;
 
@@ -37,6 +38,9 @@ public class SketchTextAreaDefaultInputMap extends RSyntaxTextAreaDefaultInputMa
 
       put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, defaultModifier), DefaultEditorKit.beginAction);
       put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, defaultModifier), DefaultEditorKit.endAction);
+
+      put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, defaultModifier | shift), DefaultEditorKit.selectLineAction);
+      put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, defaultModifier | shift), DefaultEditorKit.selectLineAction);
 
       remove(KeyStroke.getKeyStroke(KeyEvent.VK_J, defaultModifier));
 
