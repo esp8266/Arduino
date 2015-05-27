@@ -1,12 +1,13 @@
 /*
- * Stepper.cpp - Stepper library for Wiring/Arduino - Version 0.6
+ * Stepper.cpp - Stepper library for Wiring/Arduino - Version 1.1.0
  *
- * Original library        (0.1) by Tom Igoe.
- * Two-wire modifications  (0.2) by Sebastian Gassner
- * Combination version     (0.3) by Tom Igoe and David Mellis
- * Bug fix for four-wire   (0.4) by Tom Igoe, bug fix from Noah Shibley
- * High-speed stepping mod and timer rollover fix (0.5) by Eugene Kozlenko
- * Five phase five wire    (0.6) by Ryan Orendorff
+ * Original library        (0.1)   by Tom Igoe.
+ * Two-wire modifications  (0.2)   by Sebastian Gassner
+ * Combination version     (0.3)   by Tom Igoe and David Mellis
+ * Bug fix for four-wire   (0.4)   by Tom Igoe, bug fix from Noah Shibley
+ * High-speed stepping mod         by Eugene Kozlenko
+ * Timer rollover fix              by Eugene Kozlenko
+ * Five phase five wire    (1.1.0) by Ryan Orendorff
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
