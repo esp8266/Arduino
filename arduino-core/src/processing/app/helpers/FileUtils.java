@@ -169,7 +169,15 @@ public class FileUtils {
   }
 
   public static boolean isSCCSOrHiddenFile(File file) {
-    return file.isHidden() || file.getName().charAt(0) == '.' || (file.isDirectory() && SOURCE_CONTROL_FOLDERS.contains(file.getName()));
+    return isSCCSFolder(file) || isHiddenFile(file);
+  }
+
+  public static boolean isHiddenFile(File file) {
+    return file.isHidden() || file.getName().charAt(0) == '.';
+  }
+
+  public static boolean isSCCSFolder(File file) {
+    return file.isDirectory() && SOURCE_CONTROL_FOLDERS.contains(file.getName());
   }
 
   public static String readFileToString(File file) throws IOException {
