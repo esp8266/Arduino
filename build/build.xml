@@ -891,7 +891,7 @@
       <fileset dir="windows/work" includes="**/*.html, **/*.dll, **/*.exe" />
     </chmod>
 
-    <loadproperties srcfile="${WINDOWS_BUNDLED_JVM}/release" prefix="windows"/>
+    <loadproperties srcfile="${WINDOWS_BUNDLED_JVM}/../release" prefix="windows"/>
 
     <fail message="It looks like ${WINDOWS_BUNDLED_JVM} does not contain a Windows JVM">
       <condition>
