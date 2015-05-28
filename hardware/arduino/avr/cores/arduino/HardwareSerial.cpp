@@ -220,6 +220,7 @@ size_t HardwareSerial::write(uint8_t c)
   if (_tx_buffer_head == _tx_buffer_tail && bit_is_set(*_ucsra, UDRE0)) {
     *_udr = c;
     sbi(*_ucsra, TXC0);
+     _written = true;
     return 1;
   }
   tx_buffer_index_t i = (_tx_buffer_head + 1) % SERIAL_TX_BUFFER_SIZE;
