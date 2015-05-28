@@ -35,7 +35,6 @@ extern "C" {
 
 #include "stdlib_noniso.h"
 #include "binary.h"
-#include "pgmspace.h"
 #include "esp8266_peri.h"
 #include "twi.h"
 
@@ -204,6 +203,8 @@ void loop(void);
 #endif
 
 #ifdef __cplusplus
+
+#include "pgmspace.h"
 
 #include "WCharacter.h"
 #include "WString.h"
