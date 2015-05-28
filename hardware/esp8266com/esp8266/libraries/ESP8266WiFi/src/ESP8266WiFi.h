@@ -116,6 +116,7 @@ public:
      */
     uint8_t* softAPmacAddress(uint8_t* mac);
     String softAPmacAddress(void);
+
     /*
      * Get the station interface IP address.
      *
