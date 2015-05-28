@@ -195,10 +195,11 @@ void Stepper::step(int steps_to_move)
 
   // decrement the number of steps, moving one step each time:
   while(steps_left > 0) {
+  unsigned long now = micros();
   // move only if the appropriate delay has passed:
-  if (micros() - this->last_step_time >= this->step_delay || micros() < this->last_step_time) {
+  if (now - this->last_step_time >= this->step_delay) {
       // get the timeStamp of when you stepped:
-      this->last_step_time = micros();
+      this->last_step_time = now;
       // increment or decrement the step number,
       // depending on direction:
       if (this->direction == 1) {
