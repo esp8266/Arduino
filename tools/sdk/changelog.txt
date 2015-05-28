@@ -1,3 +1,13 @@
+esp_iot_sdk_v1.1.0_15_05_27_p1 Release Note 
+-------------------------------------------
+
+Here is a patch based on SDK_v1.1.0 resolved issues below:
+1. SDK 1.1.0 may boot fail if SPI Flash speed is 80MHz.
+2. Memory Leak in libssl when SSL connection fail.
+3. Update smartconfig, please using it with the latest Espressif APP https://github.com/EspressifApp
+
+Sorry for the inconvenience.
+
 esp_iot_sdk_v1.1.0_15_05_22 Release Note 
 ----------------------------------------
 Resolved Issues（Bugs below are eligible for Bug Bounty Program):
