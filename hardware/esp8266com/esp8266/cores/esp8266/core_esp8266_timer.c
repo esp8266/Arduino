@@ -21,6 +21,7 @@
 #include "wiring_private.h"
 #include "pins_arduino.h"
 #include "c_types.h"
+#include "ets_sys.h"
 
 typedef void(*_timercallback)(void);
 
