@@ -103,16 +103,19 @@ public:
      * Get the station interface MAC address.
      *
      * return: pointer to uint8_t array with length WL_MAC_ADDR_LENGTH
+     * return: String
      */
     uint8_t* macAddress(uint8_t* mac);
+    String macAddress(void);
 
     /*
      * Get the softAP interface MAC address.
      *
      * return: pointer to uint8_t array with length WL_MAC_ADDR_LENGTH
+     * return: String
      */
     uint8_t* softAPmacAddress(uint8_t* mac);
-
+    String softAPmacAddress(void);
     /*
      * Get the station interface IP address.
      *
@@ -151,9 +154,16 @@ public:
     /*
      * Return the current bssid / mac associated with the network if configured
      *
-     * return: bssid string
+     * return: bssid uint8_t *
      */
     uint8_t * BSSID(void);
+
+    /*
+     * Return the current bssid / mac associated with the network if configured
+     *
+     * return: bssid string
+     */
+    String BSSIDstr(void);
 
     /*
      * Return the current channel associated with the network
@@ -209,9 +219,16 @@ public:
     /**
      * return MAC / BSSID of scanned wifi
      * @param networkItem specify from which network item want to get the information
-     * @return uint8_t * to MAC / BSSID of scanned wifi
+     * @return uint8_t * MAC / BSSID of scanned wifi
      */
     uint8_t * BSSID(uint8_t networkItem);
+
+    /**
+     * return MAC / BSSID of scanned wifi
+     * @param networkItem specify from which network item want to get the information
+     * @return String MAC / BSSID of scanned wifi
+     */
+    String BSSIDstr(uint8_t networkItem);
 
     /**
      * return channel of scanned wifi

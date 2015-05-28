@@ -203,12 +203,32 @@ uint8_t* ESP8266WiFiClass::macAddress(uint8_t* mac)
     return mac;
 }
 
+String ESP8266WiFiClass::macAddress(void)
+{
+    uint8_t mac[6];
+    char macStr[18] = {0};
+    wifi_get_macaddr(STATION_IF, mac);
+
+    sprintf(macStr, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0],  mac[1], mac[2], mac[3], mac[4], mac[5]);
+    return String(macStr);
+}
+
 uint8_t* ESP8266WiFiClass::softAPmacAddress(uint8_t* mac)
 {
     wifi_get_macaddr(SOFTAP_IF, mac);
     return mac;
 }
    
+String ESP8266WiFiClass::softAPmacAddress(void)
+{
+    uint8_t mac[6];
+    char macStr[18] = {0};
+    wifi_get_macaddr(SOFTAP_IF, mac);
+
+    sprintf(macStr, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0],  mac[1], mac[2], mac[3], mac[4], mac[5]);
+    return String(macStr);
+}
+
 IPAddress ESP8266WiFiClass::localIP()
 {
     struct ip_info ip;
@@ -250,6 +270,16 @@ uint8_t* ESP8266WiFiClass::BSSID(void)
     wifi_station_get_config(&conf);
     return reinterpret_cast<uint8_t*>(conf.bssid);
 }
+
+String ESP8266WiFiClass::BSSIDstr(void)
+{
+    static struct station_config conf;
+    char mac[18] = {0};
+    wifi_station_get_config(&conf);
+    sprintf(mac,"%02X:%02X:%02X:%02X:%02X:%02X", conf.bssid[0],  conf.bssid[1],  conf.bssid[2], conf.bssid[3], conf.bssid[4], conf.bssid[5]);
+    return String(mac);
+}
+
 
 int32_t ESP8266WiFiClass::channel(void) {
     return wifi_get_channel();
@@ -351,6 +381,17 @@ uint8_t * ESP8266WiFiClass::BSSID(uint8_t i)
         return 0;
 
     return it->bssid;
+}
+
+String ESP8266WiFiClass::BSSIDstr(uint8_t i)
+{
+    char mac[18] = {0};
+    struct bss_info* it = reinterpret_cast<struct bss_info*>(_getScanInfoByIndex(i));
+    if (!it)
+        return String("");
+
+    sprintf(mac,"%02X:%02X:%02X:%02X:%02X:%02X", it->bssid[0],  it->bssid[1],  it->bssid[2], it->bssid[3], it->bssid[4], it->bssid[5]);
+    return String(mac);
 }
 
 int32_t ESP8266WiFiClass::channel(uint8_t i)
