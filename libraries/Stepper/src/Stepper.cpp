@@ -189,26 +189,30 @@ void Stepper::step(int steps_to_move)
   int steps_left = abs(steps_to_move);  // how many steps to take
 
   // determine direction based on whether steps_to_mode is + or -:
-  if (steps_to_move > 0) {this->direction = 1;}
-  if (steps_to_move < 0) {this->direction = 0;}
+  if (steps_to_move > 0) { this->direction = 1; }
+  if (steps_to_move < 0) { this->direction = 0; }
 
 
   // decrement the number of steps, moving one step each time:
-  while(steps_left > 0) {
-  unsigned long now = micros();
-  // move only if the appropriate delay has passed:
-  if (now - this->last_step_time >= this->step_delay) {
+  while (steps_left > 0)
+  {
+    unsigned long now = micros();
+    // move only if the appropriate delay has passed:
+    if (now - this->last_step_time >= this->step_delay)
+    {
       // get the timeStamp of when you stepped:
       this->last_step_time = now;
       // increment or decrement the step number,
       // depending on direction:
-      if (this->direction == 1) {
+      if (this->direction == 1)
+      {
         this->step_number++;
         if (this->step_number == this->number_of_steps) {
           this->step_number = 0;
         }
       }
-      else {
+      else
+      {
         if (this->step_number == 0) {
           this->step_number = this->number_of_steps;
         }
