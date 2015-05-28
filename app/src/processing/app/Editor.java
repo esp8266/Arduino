@@ -766,8 +766,8 @@ public class Editor extends JFrame implements RunnerListener {
       });
     toolsMenu.add(item);
 
-    addTools(toolsMenu, Base.getToolsFolder());
-    File sketchbookTools = new File(Base.getSketchbookFolder(), "tools");
+    addTools(toolsMenu, BaseNoGui.getToolsFolder());
+    File sketchbookTools = new File(BaseNoGui.getSketchbookFolder(), "tools");
     addTools(toolsMenu, sketchbookTools);
 
     toolsMenu.addSeparator();
@@ -1108,7 +1108,7 @@ public class Editor extends JFrame implements RunnerListener {
     }
     if (selection != null) selection.setState(true);
     //System.out.println(item.getLabel());
-    Base.selectSerialPort(name);
+    BaseNoGui.selectSerialPort(name);
     if (serialMonitor != null) {
       try {
         serialMonitor.close();
@@ -2891,7 +2891,7 @@ public class Editor extends JFrame implements RunnerListener {
   // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
   protected void onBoardOrPortChange() {
-    Map<String, String> boardPreferences = Base.getBoardPreferences();
+    Map<String, String> boardPreferences = BaseNoGui.getBoardPreferences();
     if (boardPreferences != null)
       lineStatus.setBoardName(boardPreferences.get("name"));
     else

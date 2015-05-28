@@ -86,7 +86,7 @@ public class Sketch {
                         "the application to complete the repair.", null);
     }
     */
-    tempBuildFolder = Base.getBuildFolder();
+    tempBuildFolder = BaseNoGui.getBuildFolder();
     //Base.addBuildFolderToClassPath();
 
     load();
@@ -643,7 +643,7 @@ public class Sketch {
     FileDialog fd = new FileDialog(editor, _("Save sketch folder as..."), FileDialog.SAVE);
     if (isReadOnly() || isUntitled()) {
       // default to the sketchbook folder
-      fd.setDirectory(Base.getSketchbookFolder().getAbsolutePath());
+      fd.setDirectory(BaseNoGui.getSketchbookFolder().getAbsolutePath());
     } else {
       // default to the parent folder of where this was
       // on macs a .getParentFile() method is required
@@ -1297,11 +1297,11 @@ public class Sketch {
    */
   public boolean isReadOnly() {
     String apath = data.getFolder().getAbsolutePath();
-    for (File folder : Base.getLibrariesPath()) {
+    for (File folder : BaseNoGui.getLibrariesPath()) {
       if (apath.startsWith(folder.getAbsolutePath()))
         return true;
     }
-    if (apath.startsWith(Base.getExamplesPath()) ||
+    if (apath.startsWith(BaseNoGui.getExamplesPath()) ||
         apath.startsWith(Base.getSketchbookLibrariesPath())) {
       return true;
     }

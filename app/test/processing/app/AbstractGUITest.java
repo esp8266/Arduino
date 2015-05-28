@@ -56,7 +56,7 @@ public abstract class AbstractGUITest {
     JPopupMenu.setDefaultLightWeightPopupEnabled(false);
     Theme.init();
     BaseNoGui.getPlatform().setLookAndFeel();
-    Base.untitledFolder = Base.createTempFolder("untitled");
+    Base.untitledFolder = BaseNoGui.createTempFolder("untitled");
     DeleteFilesOnShutdown.add(Base.untitledFolder);
 
     window = GuiActionRunner.execute(new GuiQuery<ArduinoFrameFixture>() {

@@ -29,10 +29,7 @@
 
 package cc.arduino.view.preferences;
 
-import processing.app.Base;
-import processing.app.Editor;
-import processing.app.I18n;
-import processing.app.PreferencesData;
+import processing.app.*;
 import processing.app.helpers.FileUtils;
 import processing.app.legacy.PApplet;
 
@@ -552,10 +549,10 @@ public class Preferences extends javax.swing.JDialog {
     File file = Base.selectFolder(_("Select new sketchbook location"), dflt, this);
     if (file != null) {
       String path = file.getAbsolutePath();
-      if (Base.getPortableFolder() != null) {
-        path = FileUtils.relativePath(Base.getPortableFolder().toString(), path);
+      if (BaseNoGui.getPortableFolder() != null) {
+        path = FileUtils.relativePath(BaseNoGui.getPortableFolder().toString(), path);
         if (path == null) {
-          path = Base.getPortableSketchbookFolder();
+          path = BaseNoGui.getPortableSketchbookFolder();
         }
       }
       sketchbookLocationField.setText(path);
@@ -626,10 +623,10 @@ public class Preferences extends javax.swing.JDialog {
     String oldPath = PreferencesData.get("sketchbook.path");
     String newPath = sketchbookLocationField.getText();
     if (newPath.isEmpty()) {
-      if (base.getPortableFolder() == null) {
+      if (BaseNoGui.getPortableFolder() == null) {
         newPath = base.getDefaultSketchbookFolderOrPromptForIt().toString();
       } else {
-        newPath = base.getPortableSketchbookFolder();
+        newPath = BaseNoGui.getPortableSketchbookFolder();
       }
     }
     if (!newPath.equals(oldPath)) {

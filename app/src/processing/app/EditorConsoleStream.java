@@ -35,7 +35,7 @@ class EditorConsoleStream extends OutputStream {
       // sister IDEs) might collide with the file causing permissions problems.
       // The files and folders are not deleted on exit because they may be
       // needed for debugging or bug reporting.
-      tempFolder = Base.createTempFolder("console");
+      tempFolder = BaseNoGui.createTempFolder("console");
       DeleteFilesOnShutdown.add(tempFolder);
       try {
         String outFileName = PreferencesData.get("console.output.file");
