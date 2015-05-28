@@ -119,7 +119,6 @@ public class Editor extends JFrame implements RunnerListener {
   boolean untitled;
 
   PageFormat pageFormat;
-  PrinterJob printerJob;
 
   // file, sketch, and tools menus for re-inserting items
   JMenu fileMenu;
@@ -2760,15 +2759,11 @@ public class Editor extends JFrame implements RunnerListener {
    * Handler for File &rarr; Page Setup.
    */
   public void handlePageSetup() {
-    //printerJob = null;
-    if (printerJob == null) {
-      printerJob = PrinterJob.getPrinterJob();
-    }
+    PrinterJob printerJob = PrinterJob.getPrinterJob();
     if (pageFormat == null) {
       pageFormat = printerJob.defaultPage();
     }
     pageFormat = printerJob.pageDialog(pageFormat);
-    //System.out.println("page format is " + pageFormat);
   }
 
 
@@ -2778,9 +2773,7 @@ public class Editor extends JFrame implements RunnerListener {
   public void handlePrint() {
     statusNotice(_("Printing..."));
     //printerJob = null;
-    if (printerJob == null) {
-      printerJob = PrinterJob.getPrinterJob();
-    }
+    PrinterJob printerJob = PrinterJob.getPrinterJob();
     if (pageFormat != null) {
       //System.out.println("setting page format " + pageFormat);
       printerJob.setPrintable(textarea, pageFormat);
