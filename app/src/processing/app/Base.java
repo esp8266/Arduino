@@ -477,13 +477,7 @@ public class Base {
       // Do nothing (intended for only changing preferences)
       System.exit(0);
     } else if (parser.isGetPrefMode()) {
-      String value = PreferencesData.get(parser.getGetPref(), null);
-      if (value != null) {
-        System.out.println(value);
-        System.exit(0);
-      } else {
-        System.exit(4);
-      }
+      BaseNoGui.dumpPrefs(parser);
     }
   }
 
