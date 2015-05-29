@@ -91,13 +91,20 @@ public class ContributionsIndexer {
     }
 
     List<ContributedPackage> packages = index.getPackages();
+    Collection<ContributedPackage> packagesWithTools = Collections2.filter(packages, new Predicate<ContributedPackage>() {
+      @Override
+      public boolean apply(ContributedPackage input) {
+        return input.getTools() != null;
+      }
+    });
+
     for (ContributedPackage pack : packages) {
       for (ContributedPlatform platform : pack.getPlatforms()) {
         // Set a reference to parent packages
         platform.setParentPackage(pack);
 
         // Resolve tools dependencies (works also as a check for file integrity)
-        platform.resolveToolsDependencies(packages);
+        platform.resolveToolsDependencies(packagesWithTools);
       }
     }
 

@@ -40,6 +40,7 @@ public abstract class ContributedToolReference {
 
   public ContributedTool resolve(Collection<ContributedPackage> packages) {
     for (ContributedPackage pack : packages) {
+      assert pack.getTools() != null;
       for (ContributedTool tool : pack.getTools())
         if (tool.getName().equals(getName()) &&
             tool.getVersion().equals(getVersion()) &&
