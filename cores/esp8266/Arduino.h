@@ -114,8 +114,8 @@ void timer1_write(uint32_t ticks); //maximum ticks 8388607
 // it is auto-disabled when the compare value matches CCOUNT
 // it is auto-enabled when the compare value changes
 #define timer0_interrupted()    (ETS_INTR_PENDING() & (_BV(ETS_COMPARE0_INUM)))
-#define timer0_read() ((__extension__({uint32_t count;__asm__ __volatile__("esync; rsr %0,ccompare0":"=a" (count));count;})))
-#define timer0_write(count) __asm__ __volatile__("wsr %0,ccompare0; esync"::"a" (count) : "memory")
+#define timer0_read() (ESP.getCycleCompare0())
+#define timer0_write(ticks) (ESP.setCycleCompare0(ticks))
 
 void timer0_isr_init(void);
 void timer0_attachInterrupt(void(*userFunc)(void));
