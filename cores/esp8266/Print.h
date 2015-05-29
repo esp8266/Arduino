@@ -63,7 +63,7 @@ class Print {
             return write((const uint8_t *) buffer, size);
         }
 
-        size_t printf(const char * format, ...);
+        size_t printf(const char * format, ...)  __attribute__ ((format (printf, 2, 3)));
         size_t print(const __FlashStringHelper *);
         size_t print(const String &);
         size_t print(const char[]);

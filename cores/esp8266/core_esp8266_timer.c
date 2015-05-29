@@ -21,6 +21,7 @@
 #include "wiring_private.h"
 #include "pins_arduino.h"
 #include "c_types.h"
+#include "ets_sys.h"
 
 void (*timer1_user_cb)(void);
 
