@@ -169,60 +169,65 @@ char* ICACHE_FLASH_ATTR strncat(char * dest, const char * src, size_t n) {
     return dest;
 }
 
+char* ICACHE_FLASH_ATTR strtok_r(char* s, const char* delim, char** last) {
+    const char* spanp;
+    char* tok;
+    char c;
+    char sc;
 
-char* ICACHE_FLASH_ATTR strtok_r(char * str, const char * delimiters, char ** temp) {
-    static char * ret = NULL;
-    char * start = NULL;
-    char * end = NULL;
-    uint32_t size = 0;
+    if (s == NULL && (s = *last) == NULL) {
+        return (NULL);
+    }
 
-    if(str == NULL) {
-        if(temp == NULL) {
-            return NULL;
+
+    // Skip (span) leading delimiters 
+    //
+cont:
+    c = *s++;
+    for (spanp = delim; (sc = *spanp++) != 0;) {
+        if (c == sc) {
+            goto cont;
         }
-        start = *temp;
-    } else {
-        start = str;
     }
 
-    if(start == NULL) {
-        return NULL;
+    // check for no delimiters left
+    //
+    if (c == '\0') {
+        *last = NULL;
+        return (NULL);
     }
 
-    if(delimiters == NULL) {
-        return NULL;
-    }
+    tok = s - 1;
 
-    end = start;
 
-    while(1) {
-        for(uint16_t i = 0; i < strlen(delimiters); i++) {
-            if(*end == *(delimiters + i)) {
-                break;
+    // Scan token 
+    // Note that delim must have one NUL; we stop if we see that, too.
+    //
+    for (;;) {
+        c = *s++;
+        spanp = (char *)delim;
+        do {
+            if ((sc = *spanp++) == c) {
+                if (c == 0) {
+                    s = NULL;
+                }
+                else {
+                    s[-1] = '\0';
+                }
+                *last = s;
+                return (tok);
             }
-        }
-        end++;
-        if(*end == 0x00) {
-            break;
-        }
+
+        } while (sc != 0);
     }
 
-    *temp = end;
-
-    if(ret != NULL) {
-        free(ret);
-    }
-
-    size = (end - start);
-    ret = (char *) malloc(size);
-    strncpy(ret, start, size);
-    return ret;
+    // NOTREACHED EVER
 }
 
-char* ICACHE_FLASH_ATTR strtok(char * str, const char * delimiters) {
-    static char * ret = NULL;
-    ret = strtok_r(str, delimiters, &ret);
-    return ret;
+char* ICACHE_FLASH_ATTR strtok(char* s, const char* delim) {
+    static char* last;
+
+    return (strtok_r(s, delim, &last));
 }
 
 int ICACHE_FLASH_ATTR strcasecmp(const char * str1, const char * str2) {
