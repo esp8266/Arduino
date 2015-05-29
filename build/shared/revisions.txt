@@ -15,6 +15,7 @@ ARDUINO 1.6.5
 
 [libraries]
 * LiquidCrystal fixes. Thanks @newbie15
+* Added SPI Transactions to TFT lib
 
 [core]
 * AVR: delayMicroseconds(..) doesn't hang if called with 0. Thanks @cano64
