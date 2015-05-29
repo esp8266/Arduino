@@ -22,7 +22,11 @@
 /* Measures the length (in microseconds) of a pulse on the pin; state is HIGH
  * or LOW, the type of pulse to measure.  Works on pulses from 2-3 microseconds
  * to 3 minutes in length, but must be called at least a few dozen microseconds
- * before the start of the pulse. */
+ * before the start of the pulse.
+ *
+ * ATTENTION:
+ * This function performs better with short pulses in noInterrupt() context
+ */
 uint32_t pulseIn( uint32_t pin, uint32_t state, uint32_t timeout )
 {
 	// cache the port and bit of the pin in order to speed up the
@@ -46,4 +50,44 @@ uint32_t pulseIn( uint32_t pin, uint32_t state, uint32_t timeout )
 		return clockCyclesToMicroseconds(width * 18 + 16);
 	else
 		return 0;
+}
+
+/* Measures the length (in microseconds) of a pulse on the pin; state is HIGH
+ * or LOW, the type of pulse to measure.  Works on pulses from 2-3 microseconds
+ * to 3 minutes in length, but must be called at least a few dozen microseconds
+ * before the start of the pulse.
+ *
+ * ATTENTION:
+ * this function relies on micros() so cannot be used in noInterrupt() context
+ */
+uint32_t pulseInLong(uint8_t pin, uint8_t state, unsigned long timeout)
+{
+	// cache the port and bit of the pin in order to speed up the
+	// pulse width measuring loop and achieve finer resolution.  calling
+	// digitalRead() instead yields much coarser resolution.
+	PinDescription p = g_APinDescription[pin];
+	uint32_t bit = p.ulPin;
+	uint32_t stateMask = state ? bit : 0;
+
+	// convert the timeout from microseconds to a number of times through
+	// the initial loop; it takes 18 clock cycles per iteration.
+	unsigned long maxloops = microsecondsToClockCycles(timeout) / 10;
+
+    // wait for any previous pulse to end
+    while ((p.pPort->PIO_PDSR & bit) == stateMask)
+		if (--maxloops == 0)
+			return 0;
+
+	// wait for the pulse to start
+	while ((p.pPort->PIO_PDSR & bit) != stateMask)
+		if (--maxloops == 0)
+			return 0;
+
+	unsigned long start = micros();
+	// wait for the pulse to stop
+	while ((p.pPort->PIO_PDSR & bit) == stateMask) {
+		if (--maxloops == 0)
+			return 0;
+	}
+	return micros() - start;
 }
