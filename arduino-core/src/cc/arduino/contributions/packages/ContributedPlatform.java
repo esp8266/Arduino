@@ -93,6 +93,6 @@ public abstract class ContributedPlatform extends DownloadableContribution {
 
   @Override
   public String toString() {
-    return getName() + " " + getParsedVersion();
+    return getParsedVersion();
   }
 }
