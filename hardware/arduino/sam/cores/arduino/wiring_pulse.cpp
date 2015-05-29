@@ -23,39 +23,27 @@
  * or LOW, the type of pulse to measure.  Works on pulses from 2-3 microseconds
  * to 3 minutes in length, but must be called at least a few dozen microseconds
  * before the start of the pulse. */
-extern uint32_t pulseIn( uint32_t pin, uint32_t state, uint32_t timeout )
+uint32_t pulseIn( uint32_t pin, uint32_t state, uint32_t timeout )
 {
 	// cache the port and bit of the pin in order to speed up the
 	// pulse width measuring loop and achieve finer resolution.  calling
 	// digitalRead() instead yields much coarser resolution.
 	PinDescription p = g_APinDescription[pin];
-	uint32_t width = 0; // keep initialization out of time critical area
+	uint32_t bit = p.ulPin;
+	uint32_t stateMask = state ? bit : 0;
 	
 	// convert the timeout from microseconds to a number of times through
-	// the initial loop; it takes 22 clock cycles per iteration.
-	uint32_t numloops = 0;
-	uint32_t maxloops = microsecondsToClockCycles(timeout) / 22;
-	
-	// wait for any previous pulse to end
-	while (PIO_Get(p.pPort, PIO_INPUT, p.ulPin) == state)
-		if (numloops++ == maxloops)
-			return 0;
-	
-	// wait for the pulse to start
-	while (PIO_Get(p.pPort, PIO_INPUT, p.ulPin) != state)
-		if (numloops++ == maxloops)
-			return 0;
-	
-	// wait for the pulse to stop
-	while (PIO_Get(p.pPort, PIO_INPUT, p.ulPin) == state) {
-		if (numloops++ == maxloops)
-			return 0;
-		width++;
-	}
+	// the initial loop; it takes (roughly) 18 clock cycles per iteration.
+	uint32_t maxloops = microsecondsToClockCycles(timeout) / 18;
+
+	uint32_t width = countPulseASM(&(p.pPort->PIO_PDSR), bit, stateMask, maxloops);
 
 	// convert the reading to microseconds. The loop has been determined
-	// to be 52 clock cycles long and have about 16 clocks between the edge
+	// to be 18 clock cycles long and have about 16 clocks between the edge
 	// and the start of the loop. There will be some error introduced by
 	// the interrupt handlers.
-	return clockCyclesToMicroseconds(width * 52 + 16);
+	if (width)
+		return clockCyclesToMicroseconds(width * 18 + 16);
+	else
+		return 0;
 }
