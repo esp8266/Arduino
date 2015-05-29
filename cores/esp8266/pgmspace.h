@@ -32,26 +32,26 @@ typedef uint32_t prog_uint32_t;
 
 #define SIZE_IRRELEVANT 0x7fffffff
 
-extern void* memcpy_P(void* dest, const void* src, size_t count);
+void* memcpy_P(void* dest, const void* src, size_t count);
 
-extern char* strncpy_P(char* dest, const char* src, size_t size);
+char* strncpy_P(char* dest, const char* src, size_t size);
 #define strcpy_P(dest, src)          strncpy_P((dest), (src), SIZE_IRRELEVANT)
 
-extern char* strncat_P(char* dest, const char* src, size_t size);
+char* strncat_P(char* dest, const char* src, size_t size);
 #define strcat_P(dest, src)          strncat_P((dest), (src), SIZE_IRRELEVANT)
 
-extern int strncmp_P(const char* str1, const char* str2P, size_t size);
+int strncmp_P(const char* str1, const char* str2P, size_t size);
 #define strcmp_P(str1, str2P)          strncmp_P((str1), (str2P), SIZE_IRRELEVANT)
 
-extern int strncasecmp_P(const char* str1, const char* str2P, size_t size);
+int strncasecmp_P(const char* str1, const char* str2P, size_t size);
 #define strcasecmp_P(str1, str2P)          strncasecmp_P((str1), (str2P), SIZE_IRRELEVANT)
 
-extern size_t strnlen_P(const char *s, size_t size);
+size_t strnlen_P(const char *s, size_t size);
 #define strlen_P(strP)          strnlen_P((strP), SIZE_IRRELEVANT)
 
-extern int	printf_P(const char *formatP, ...);
-extern int	snprintf_P(char *str, size_t strSize, const char *formatP, ...);
-extern int	vsnprintf_P(char *str, size_t strSize, const char *formatP, va_list ap);
+int	printf_P(const char *formatP, ...) __attribute__ ((format (printf, 1, 2)));
+int	snprintf_P(char *str, size_t strSize, const char *formatP, ...) __attribute__ ((format (printf, 3, 4)));
+int	vsnprintf_P(char *str, size_t strSize, const char *formatP, va_list ap) __attribute__ ((format (printf, 3, 0)));
 
 // flash memory must be read using 32 bit aligned addresses else a processor
 // exception will be triggered

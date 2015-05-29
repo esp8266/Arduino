@@ -103,15 +103,19 @@ public:
      * Get the station interface MAC address.
      *
      * return: pointer to uint8_t array with length WL_MAC_ADDR_LENGTH
+     * return: String
      */
     uint8_t* macAddress(uint8_t* mac);
+    String macAddress(void);
 
     /*
      * Get the softAP interface MAC address.
      *
      * return: pointer to uint8_t array with length WL_MAC_ADDR_LENGTH
+     * return: String
      */
     uint8_t* softAPmacAddress(uint8_t* mac);
+    String softAPmacAddress(void);
 
     /*
      * Get the station interface IP address.
@@ -151,9 +155,16 @@ public:
     /*
      * Return the current bssid / mac associated with the network if configured
      *
-     * return: bssid string
+     * return: bssid uint8_t *
      */
     uint8_t * BSSID(void);
+
+    /*
+     * Return the current bssid / mac associated with the network if configured
+     *
+     * return: bssid string
+     */
+    String BSSIDstr(void);
 
     /*
      * Return the current channel associated with the network
@@ -163,13 +174,12 @@ public:
     int32_t channel(void);
 
     /*
-     * Return the current network RSSI. Note: this is just a stub, there is no way to
-     *  get the RSSI in the Espressif SDK yet.
+     * Return the current network RSSI.
      *
-     * return: RSSI value (currently 0)
+     * return: RSSI value
      */
 
-    int32_t RSSI() { return 0; }
+    int32_t RSSI();
 
     /*
      * Start scan WiFi networks available
@@ -209,9 +219,16 @@ public:
     /**
      * return MAC / BSSID of scanned wifi
      * @param networkItem specify from which network item want to get the information
-     * @return uint8_t * to MAC / BSSID of scanned wifi
+     * @return uint8_t * MAC / BSSID of scanned wifi
      */
     uint8_t * BSSID(uint8_t networkItem);
+
+    /**
+     * return MAC / BSSID of scanned wifi
+     * @param networkItem specify from which network item want to get the information
+     * @return String MAC / BSSID of scanned wifi
+     */
+    String BSSIDstr(uint8_t networkItem);
 
     /**
      * return channel of scanned wifi
