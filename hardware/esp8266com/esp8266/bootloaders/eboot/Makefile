@@ -4,7 +4,7 @@ BIN_DIR := ./
 TARGET_DIR := ./
 
 TARGET_OBJ_FILES := \
-	eboot_debug.o \
+	eboot.o \
 
 TARGET_OBJ_PATHS := $(addprefix $(TARGET_DIR)/,$(TARGET_OBJ_FILES))
 
