@@ -73,10 +73,9 @@ public class CommandlineParser {
         }
         if (a == ACTION.GET_PREF) {
           i++;
-          if (i >= args.length) {
-            BaseNoGui.showError(null, I18n.format(_("Argument required for {0}"), a.value), 3);
+          if (i < args.length) {
+            getPref = args[i];
           }
-          getPref = args[i];
         }
         if (a == ACTION.INSTALL_BOARD) {
           i++;

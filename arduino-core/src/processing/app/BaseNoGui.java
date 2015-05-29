@@ -570,6 +570,12 @@ public class BaseNoGui {
       System.exit(0);
     }
     else if (parser.isGetPrefMode()) {
+      dumpPrefs(parser);
+    }
+  }
+
+  protected static void dumpPrefs(CommandlineParser parser) {
+    if (parser.getGetPref() != null) {
       String value = PreferencesData.get(parser.getGetPref(), null);
       if (value != null) {
         System.out.println(value);
@@ -577,6 +583,13 @@ public class BaseNoGui {
       } else {
         System.exit(4);
       }
+    } else {
+      System.out.println("#PREFDUMP#");
+      PreferencesMap prefs = PreferencesData.getMap();
+      for (Map.Entry<String, String> entry : prefs.entrySet()) {
+        System.out.println(entry.getKey() + "=" + entry.getValue());
+      }
+      System.exit(0);
     }
   }
 

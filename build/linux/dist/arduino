@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 CURDIR=`pwd`
 APPDIR="$(dirname -- "$(readlink -f -- "${0}")" )"

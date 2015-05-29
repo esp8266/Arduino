@@ -90,7 +90,7 @@ public class SplashScreenHelper {
   }
 
   private void printText(String str) {
-    System.out.println(str);
+    System.err.println(str);
   }
 
 }
