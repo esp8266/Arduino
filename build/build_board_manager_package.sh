@@ -1,4 +1,8 @@
 #!/bin/bash
+#
+# for platform in windows linux macosx; do pushd $platform; ls -l esptool-*; shasum -a 256 esptool-*; popd; done;
+#
+#
 
 ver=`git describe --tags`
 outdir=esp8266-$ver
@@ -23,9 +27,14 @@ size=`/bin/ls -l $outdir.zip | awk '{print $5}'`
 echo Size: $size
 echo SHA-256: $sha
 
-if [ ! -z "$do_upload" ]; then
+if [ "$upload" == "prod" ]; then
     remote="http://arduino.esp8266.com"
+    path=""
+elif [ "$upload" == "stag" ]; then
+    remote="http://arduino.esp8266.com"
+    path="staging/"
 else
+    upload=""
     remote="http://localhost:8000"
 fi
 
@@ -45,7 +54,7 @@ cat << EOF > package_esp8266com_index.json
       "architecture":"esp8266",
       "version":"$ver",
       "category":"ESP8266",
-      "url":"$remote/$outdir.zip",
+      "url":"$remote/$path/$outdir.zip",
       "archiveFileName":"$outdir.zip",
       "checksum":"SHA-256:$sha",
       "size":"$size",
@@ -153,9 +162,9 @@ cat << EOF > package_esp8266com_index.json
 }
 EOF
 
-if [ ! -z "$do_upload" ]; then
-    scp $outdir.zip dl:apps/download_files/download/
-    scp package_esp8266com_index.json dl:apps/download_files/download
+if [ ! -z "$upload" ]; then
+    scp $outdir.zip dl:apps/download_files/download/$path
+    scp package_esp8266com_index.json dl:apps/download_files/download/$path
 else
     python -m SimpleHTTPServer 
 fi
