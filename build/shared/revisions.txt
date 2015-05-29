@@ -27,6 +27,7 @@ ARDUINO 1.6.5
 * SAM: added watchdog routine for Due. Thanks @bobc
 * AVR+SAM: reworked pulseIn() function to become GCC agnostic
 * AVR+SAM: added pulseInLong() (based on micros()) to help getting good results in interrupt-prone environments
+* AVR: fixed regression in HardwareSerial.flush(). Thanks @chromhelm
 
 ARDUINO 1.6.4 - 2015.05.06
 
