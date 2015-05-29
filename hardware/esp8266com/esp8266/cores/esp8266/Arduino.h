@@ -106,20 +106,6 @@ void timer1_attachInterrupt(void (*userFunc)(void));
 void timer1_detachInterrupt(void);
 void timer1_write(uint32_t ticks); //maximum ticks 8388607
 
-// timer0 is a special CPU timer that has very high resolution but with
-// limited control.
-// it uses CCOUNT (ESP.GetCycleCount()) as the non-resetable timer counter
-// it does not support divide, type, or reload flags
-// it is auto-disabled when the compare value matches CCOUNT
-// it is auto-enabled when the compare value changes
-#define timer0_interrupted()    (ETS_INTR_PENDING() & (_BV(ETS_COMPARE0_INUM)))
-#define timer0_read() (ESP.getCycleCompare0())
-#define timer0_write(ticks) (ESP.setCycleCompare0(ticks))
-
-void timer0_isr_init(void);
-void timer0_attachInterrupt(void(*userFunc)(void));
-void timer0_detachInterrupt(void);
-
 // undefine stdlib's abs if encountered
 #ifdef abs
 #undef abs
@@ -139,13 +125,13 @@ void ets_intr_unlock();
 // level 15 will disable ALL interrupts, 
 // level 0 will disable most software interrupts
 //
-#define xt_disable_interrupts(state, level) __asm__ __volatile__("rsil %0," __STRINGIFY(level) : "=a" (state))
+#define xt_disable_interrupts(state, level) __asm__ __volatile__("rsil %0," __STRINGIFY(level) "; esync; isync; dsync" : "=a" (state))
 #define xt_enable_interrupts(state)  __asm__ __volatile__("wsr %0,ps; esync" :: "a" (state) : "memory")
 
 extern uint32_t interruptsState;
 
 #define interrupts() xt_enable_interrupts(interruptsState)
-#define noInterrupts() __asm__ __volatile__("rsil %0,15" : "=a" (interruptsState))
+#define noInterrupts() __asm__ __volatile__("rsil %0,15; esync; isync; dsync" : "=a" (interruptsState))
 
 #define clockCyclesPerMicrosecond() ( F_CPU / 1000000L )
 #define clockCyclesToMicroseconds(a) ( (a) / clockCyclesPerMicrosecond() )

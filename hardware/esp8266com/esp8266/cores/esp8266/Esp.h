@@ -104,29 +104,13 @@ class EspClass {
         bool eraseESPconfig(void);
 
         inline uint32_t getCycleCount(void);
-        inline uint32_t getCycleCompare0(void);
-        inline void setCycleCompare0(uint32_t count);
 };
 
 uint32_t EspClass::getCycleCount(void)
 {
     uint32_t ccount;
-    __asm__ __volatile__("esync; rsr %0,ccount":"=a" (ccount));
+    __asm__ __volatile__("rsr %0,ccount":"=a" (ccount));
     return ccount;
-}
-
-// this returns a value in the range of (0 - 2^32)
-uint32_t EspClass::getCycleCompare0(void)
-{
-    uint32_t count;
-    __asm__ __volatile__("esync; rsr %0,ccompare0":"=a" (count));
-    return count;
-}
-
-// this takes a value in the range of (0 - 2^32)
-void EspClass::setCycleCompare0(uint32_t count)
-{
-    __asm__ __volatile__("wsr %0,ccompare0; esync"::"a" (count) : "memory");
 }
 
 extern EspClass ESP;
