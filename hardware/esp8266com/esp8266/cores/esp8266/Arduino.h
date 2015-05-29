@@ -51,6 +51,8 @@ void yield(void);
 #define INPUT_PULLDOWN    0x04
 #define OUTPUT            0x01
 #define OUTPUT_OPEN_DRAIN 0x03
+#define WAKEUP_PULLUP     0x05
+#define WAKEUP_PULLDOWN   0x07
 #define SPECIAL           0xF8 //defaults to the usable BUSes uart0rx/tx uart1tx and hspi
 #define FUNCTION_0        0x08
 #define FUNCTION_1        0x18
