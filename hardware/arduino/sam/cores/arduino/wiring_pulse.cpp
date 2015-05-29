@@ -73,8 +73,8 @@ uint32_t pulseInLong(uint8_t pin, uint8_t state, unsigned long timeout)
 	// the initial loop; it takes 18 clock cycles per iteration.
 	unsigned long maxloops = microsecondsToClockCycles(timeout) / 10;
 
-    // wait for any previous pulse to end
-    while ((p.pPort->PIO_PDSR & bit) == stateMask)
+	// wait for any previous pulse to end
+	while ((p.pPort->PIO_PDSR & bit) == stateMask)
 		if (--maxloops == 0)
 			return 0;
 

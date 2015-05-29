@@ -40,16 +40,14 @@ unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout)
 	uint8_t bit = digitalPinToBitMask(pin);
 	uint8_t port = digitalPinToPort(pin);
 	uint8_t stateMask = (state ? bit : 0);
-	unsigned long width = 0; // keep initialization out of time critical area
 
 	// convert the timeout from microseconds to a number of times through
 	// the initial loop; it takes approximately 16 clock cycles per iteration
-	unsigned long numloops = 0;
 	unsigned long maxloops = microsecondsToClockCycles(timeout)/16;
 
-	width = countPulseASM(portInputRegister(port), bit, stateMask, maxloops);
+	unsigned long width = countPulseASM(portInputRegister(port), bit, stateMask, maxloops);
 
-	//prevent clockCyclesToMicroseconds to return bogus values if countPulseASM timed out
+	// prevent clockCyclesToMicroseconds to return bogus values if countPulseASM timed out
 	if (width)
 		return clockCyclesToMicroseconds(width * 16 + 16);
 	else
@@ -72,7 +70,6 @@ unsigned long pulseInLong(uint8_t pin, uint8_t state, unsigned long timeout)
 	uint8_t bit = digitalPinToBitMask(pin);
 	uint8_t port = digitalPinToPort(pin);
 	uint8_t stateMask = (state ? bit : 0);
-	unsigned long width = 0; // keep initialization out of time critical area
 
 	// convert the timeout from microseconds to a number of times through
 	// the initial loop; it takes 16 clock cycles per iteration.
@@ -89,11 +86,11 @@ unsigned long pulseInLong(uint8_t pin, uint8_t state, unsigned long timeout)
 		if (numloops++ == maxloops)
 			return 0;
 
-    unsigned long start = micros();
-    // wait for the pulse to stop
-    while ((*portInputRegister(port) & bit) == stateMask) {
-        if (numloops++ == maxloops)
-            return 0;
-    }
-    return micros() - start;
+	unsigned long start = micros();
+	// wait for the pulse to stop
+	while ((*portInputRegister(port) & bit) == stateMask) {
+		if (numloops++ == maxloops)
+			return 0;
+	}
+	return micros() - start;
 }
