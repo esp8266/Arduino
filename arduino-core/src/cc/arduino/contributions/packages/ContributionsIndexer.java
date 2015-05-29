@@ -327,6 +327,15 @@ public class ContributionsIndexer {
         packages.add(targetPackage);
       }
     }
+
+    Collections.sort(packages, new Comparator<TargetPackage>() {
+      @Override
+      public int compare(TargetPackage p1, TargetPackage p2) {
+        assert p1.getId() != null && p2.getId() != null;
+        return p1.getId().toLowerCase().compareTo(p2.getId().toLowerCase());
+      }
+    });
+
     return packages;
   }
 

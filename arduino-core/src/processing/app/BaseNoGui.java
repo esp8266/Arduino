@@ -621,10 +621,10 @@ public class BaseNoGui {
     }
     indexer.syncWithFilesystem(getHardwareFolder());
 
-    packages = new HashMap<String, TargetPackage>();
+    packages = new LinkedHashMap<String, TargetPackage>();
     loadHardware(getHardwareFolder());
-    loadHardware(getSketchbookHardwareFolder());
     loadContributedHardware(indexer);
+    loadHardware(getSketchbookHardwareFolder());
     createToolPreferences(indexer);
 
     librariesIndexer = new LibrariesIndexer(BaseNoGui.getSettingsFolder(), indexer);
