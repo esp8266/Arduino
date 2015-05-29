@@ -74,11 +74,11 @@ recipe.objcopy.eep.pattern=
 ## Create hex
 #recipe.objcopy.hex.pattern="{compiler.path}{compiler.elf2hex.cmd}" {compiler.elf2hex.flags} {compiler.elf2hex.extra_flags} "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.hex"
 
-recipe.objcopy.hex.pattern="{runtime.tools.esptool.path}/{compiler.esptool.cmd}" -eo "{build.path}/{build.project_name}.elf" -bo "{build.path}/{build.project_name}_00000.bin" -bm {build.flash_mode} -bf {build.flash_freq} -bz {build.flash_size} -bs .text -bs .data -bs .rodata -bc -ec -eo "{build.path}/{build.project_name}.elf" -es .irom0.text "{build.path}/{build.project_name}_10000.bin" -ec
+recipe.objcopy.hex.pattern="{runtime.tools.esptool.path}/{compiler.esptool.cmd}" -eo "{runtime.platform.path}/bootloaders/eboot/eboot.elf" -bo "{build.path}/{build.project_name}.bin" -bm {build.flash_mode} -bf {build.flash_freq} -bz {build.flash_size} -bs .text -bp 4096 -ec -eo "{build.path}/{build.project_name}.elf" -bs .irom0.text -bs .text -bs .data -bs .rodata -bc -ec
 
 ## Compute size
 recipe.size.pattern="{compiler.path}{compiler.size.cmd}" -A "{build.path}/{build.project_name}.elf"
-recipe.size.regex=^(?:\.irom0\.text|)\s+([0-9]+).*
+recipe.size.regex=^(?:\.irom0\.text|\.text|\.data|\.rodata|\.bss|)\s+([0-9]+).*
 recipe.size.regex.data=^(?:\.data|\.rodata|\.bss)\s+([0-9]+).*
 #recipe.size.regex.eeprom=^(?:\.eeprom)\s+([0-9]+).*
 
@@ -91,4 +91,4 @@ tools.esptool.path={runtime.platform.path}/tools
 tools.esptool.upload.protocol=esp
 tools.esptool.upload.params.verbose=-vv
 tools.esptool.upload.params.quiet=
-tools.esptool.upload.pattern="{path}/{cmd}" {upload.verbose} -cd {upload.resetmethod} -cb {upload.speed} -cp "{serial.port}" -ca 0x00000 -cf "{build.path}/{build.project_name}_00000.bin" -ca 0x10000 -cf "{build.path}/{build.project_name}_10000.bin"
+tools.esptool.upload.pattern="{path}/{cmd}" {upload.verbose} -cd {upload.resetmethod} -cb {upload.speed} -cp "{serial.port}" -ca 0x00000 -cf "{build.path}/{build.project_name}.bin"
