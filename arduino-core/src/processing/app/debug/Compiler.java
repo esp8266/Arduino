@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 import cc.arduino.MyStreamPumper;
 import cc.arduino.packages.BoardPort;
@@ -403,25 +405,43 @@ public class Compiler implements MessageConsumer {
         System.err.println();
       }
     }
-    
+
+    runActions("hooks.sketch.prebuild", prefs);
+
     // 1. compile the sketch (already in the buildPath)
     progressListener.progress(20);
     compileSketch(includeFolders);
     sketchIsCompiled = true;
+
+    runActions("hooks.sketch.postbuild", prefs);
+
+    runActions("hooks.libraries.prebuild", prefs);
 
     // 2. compile the libraries, outputting .o files to: <buildPath>/<library>/
     // Doesn't really use configPreferences
     progressListener.progress(30);
     compileLibraries(includeFolders);
 
+    runActions("hooks.libraries.postbuild", prefs);
+
+    runActions("hooks.core.prebuild", prefs);
+
     // 3. compile the core, outputting .o files to <buildPath> and then
     // collecting them into the core.a library file.
     progressListener.progress(40);
     compileCore();
 
+    runActions("hooks.core.postbuild", prefs);
+
+    runActions("hooks.linking.prelink", prefs);
+
     // 4. link it all together into the .elf file
     progressListener.progress(50);
     compileLink();
+
+    runActions("hooks.linking.postlink", prefs);
+
+    runActions("hooks.objcopy.preobjcopy", prefs);
 
     // 5. run objcopy to generate output files
     progressListener.progress(60);
@@ -435,10 +455,16 @@ public class Compiler implements MessageConsumer {
       runRecipe(recipe);
     }
 
+    runActions("hooks.objcopy.postobjcopy", prefs);
+
     // 7. save the hex file
     if (saveHex) {
+      runActions("hooks.savehex.presavehex", prefs);
+
       progressListener.progress(80);
       saveHex();
+
+      runActions("hooks.savehex.postsavehex", prefs);
     }
 
     progressListener.progress(90);
@@ -554,6 +580,17 @@ public class Compiler implements MessageConsumer {
       p.put("build.variant.path", "");
     }
     
+    // Build Time
+    Date d = new Date();
+    GregorianCalendar cal = new GregorianCalendar();
+    long current = d.getTime()/1000;
+    long timezone = cal.get(cal.ZONE_OFFSET)/1000;
+    long daylight = cal.get(cal.DST_OFFSET)/1000;
+    p.put("extra.time.utc", Long.toString(current));
+    p.put("extra.time.local", Long.toString(current + timezone + daylight));
+    p.put("extra.time.zone", Long.toString(timezone));
+    p.put("extra.time.dst", Long.toString(daylight));
+
     return p;
   }
 
@@ -1124,6 +1161,7 @@ public class Compiler implements MessageConsumer {
   void runRecipe(String recipe) throws RunnerException, PreferencesMapException {
     PreferencesMap dict = new PreferencesMap(prefs);
     dict.put("ide_version", "" + BaseNoGui.REVISION);
+    dict.put("sketch_path", sketch.getFolder().getAbsolutePath());
 
     String[] cmdArray;
     String cmd = prefs.getOrExcept(recipe);
