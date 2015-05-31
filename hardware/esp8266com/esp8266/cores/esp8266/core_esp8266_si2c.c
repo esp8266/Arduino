@@ -47,14 +47,16 @@ void twi_setClock(unsigned int freq){
   if(freq <= 100000) twi_dcount = 19;//about 100KHz
   else if(freq <= 200000) twi_dcount = 8;//about 200KHz
   else if(freq <= 300000) twi_dcount = 3;//about 300KHz
-  else if(freq <= 400000) twi_dcount = 1;//about 370KHz
-  else twi_dcount = 1;//about 450KHz
+  else if(freq <= 400000) twi_dcount = 1;//about 400KHz
+  else twi_dcount = 1;//about 400KHz
 #else
   if(freq <= 100000) twi_dcount = 32;//about 100KHz
   else if(freq <= 200000) twi_dcount = 14;//about 200KHz
   else if(freq <= 300000) twi_dcount = 8;//about 300KHz
-  else if(freq <= 400000) twi_dcount = 5;//about 370KHz
-  else twi_dcount = 2;//about 450KHz
+  else if(freq <= 400000) twi_dcount = 5;//about 400KHz
+  else if(freq <= 500000) twi_dcount = 3;//about 500KHz
+  else if(freq <= 600000) twi_dcount = 2;//about 600KHz
+  else twi_dcount = 1;//about 700KHz
 #endif
 }
 
