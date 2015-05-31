@@ -43,6 +43,7 @@ typedef void (*int_handler_t)(void*);
 #define ETS_GPIO_INUM       4
 #define ETS_UART_INUM       5
 #define ETS_UART1_INUM      5
+#define ETS_CCOMPARE0_INUM  6
 #define ETS_FRC_TIMER1_INUM 9  /* use edge*/
 
 #define ETS_INTR_LOCK() \
@@ -50,6 +51,23 @@ typedef void (*int_handler_t)(void*);
 
 #define ETS_INTR_UNLOCK() \
     ets_intr_unlock()
+
+inline uint32_t ETS_INTR_ENABLED(void)
+{
+    uint32_t enabled;
+    __asm__ __volatile__("esync; rsr %0,intenable":"=a" (enabled));
+    return enabled;
+}
+
+inline uint32_t ETS_INTR_PENDING(void)
+{
+    uint32_t pending;
+    __asm__ __volatile__("esync; rsr %0,interrupt":"=a" (pending));
+    return pending;
+}
+
+#define ETS_CCOMPARE0_INTR_ATTACH(func, arg) \
+    ets_isr_attach(ETS_CCOMPARE0_INUM, (int_handler_t)(func), (void *)(arg))
 
 #define ETS_FRC_TIMER1_INTR_ATTACH(func, arg) \
     ets_isr_attach(ETS_FRC_TIMER1_INUM, (int_handler_t)(func), (void *)(arg))
@@ -77,6 +95,12 @@ typedef void (*int_handler_t)(void*);
 
 #define ETS_UART_INTR_DISABLE() \
     ETS_INTR_DISABLE(ETS_UART_INUM)
+
+#define ETS_CCOMPARE0_ENABLE() \
+	ETS_INTR_ENABLE(ETS_CCOMPARE0_INUM)
+
+#define ETS_CCOMPARE0_DISABLE() \
+	ETS_INTR_DISABLE(ETS_CCOMPARE0_INUM)
 
 #define ETS_FRC1_INTR_ENABLE() \
 	ETS_INTR_ENABLE(ETS_FRC_TIMER1_INUM)
