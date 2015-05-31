@@ -5,6 +5,7 @@ TARGET_DIR := ./
 
 TARGET_OBJ_FILES := \
 	eboot.o \
+	eboot_command.o \
 
 TARGET_OBJ_PATHS := $(addprefix $(TARGET_DIR)/,$(TARGET_OBJ_FILES))
 
@@ -17,7 +18,7 @@ OBJDUMP := $(XTENSA_TOOCHAIN)xtensa-lx106-elf-objdump
 
 CFLAGS += -std=gnu99
 
-CFLAGS += -O0 -g -Wpointer-arith -Wno-implicit-function-declaration -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -mno-text-section-literals
+CFLAGS += -Os -g -Wpointer-arith -Wno-implicit-function-declaration -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -mno-text-section-literals
 
 LDFLAGS	+= -nostdlib -Wl,--no-check-sections -umain
 
