@@ -72,7 +72,7 @@ void loop()
   //get a random server from the pool
   WiFi.hostByName(ntpServerName, timeServerIP); 
 
-  sendNTPpacket(timeServer); // send an NTP packet to a time server
+  sendNTPpacket(timeServerIP); // send an NTP packet to a time server
   // wait to see if a reply is available
   delay(1000);
   
