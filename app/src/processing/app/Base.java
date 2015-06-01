@@ -86,6 +86,8 @@ public class Base {
     }
   };
 
+  private static final int RECENT_SKETCHES_MAX_SIZE = 5;
+
   private static boolean commandLine;
   public static volatile Base INSTANCE;
 
@@ -117,6 +119,7 @@ public class Base {
   private volatile Action openBoardsManager;
 
   private final PdeKeywords pdeKeywords;
+  private final List<JMenuItem> recentSketchesMenuItems;
 
   static public void main(String args[]) throws Exception {
     System.setProperty("awt.useSystemAAFontSettings", "on");
@@ -269,6 +272,7 @@ public class Base {
 
   public Base(String[] args) throws Exception {
     BaseNoGui.notifier = new GUIUserNotifier(this);
+    this.recentSketchesMenuItems = new LinkedList<JMenuItem>();
 
     String sketchbookPath = BaseNoGui.getSketchbookPath();
 
@@ -316,7 +320,7 @@ public class Base {
       boolean showEditor = parser.isGuiMode();
       if (!parser.isForceSavePrefs())
         PreferencesData.setDoSave(showEditor);
-      if (handleOpen(file, nextEditorLocation(), showEditor) == null) {
+      if (handleOpen(file, nextEditorLocation(), showEditor, false) == null) {
         String mess = I18n.format(_("Failed to open sketch: \"{0}\""), path);
         // Open failure is fatal in upload/verify mode
         if (parser.isVerifyOrUploadMode())
@@ -547,7 +551,7 @@ public class Base {
         location = nextEditorLocation();
       }
       // If file did not exist, null will be returned for the Editor
-      if (handleOpen(new File(path), location, true, false) != null) {
+      if (handleOpen(new File(path), location, true, false, false) != null) {
         opened++;
       }
     }
@@ -594,12 +598,25 @@ public class Base {
     PreferencesData.setInteger("last.sketch.count", index);
   }
 
+  protected void storeRecentSketches(Sketch sketch) {
+    if (sketch.isUntitled()) {
+      return;
+    }
+
+    Set<String> sketches = new LinkedHashSet<String>();
+    sketches.add(sketch.getMainFilePath());
+    sketches.addAll(PreferencesData.getCollection("recent.sketches"));
+
+    PreferencesData.setCollection("recent.sketches", sketches);
+  }
+
   // Because of variations in native windowing systems, no guarantees about
   // changes to the focused and active Windows can be made. Developers must
   // never assume that this Window is the focused or active Window until this
   // Window receives a WINDOW_GAINED_FOCUS or WINDOW_ACTIVATED event.
   protected void handleActivated(Editor whichEditor) {
     activeEditor = whichEditor;
+    activeEditor.rebuildRecentSketchesMenu();
 
     // set the current window to be the console that's getting output
     EditorConsoleStream.setCurrent(activeEditor.console);
@@ -728,8 +745,7 @@ public class Base {
     try {
       File file = createNewUntitled();
       if (file != null) {
-        Editor editor = handleOpen(file);
-        editor.untitled = true;
+        Editor editor = handleOpen(file, true);
       }
 
     } catch (IOException e) {
@@ -837,14 +853,18 @@ public class Base {
    * @throws Exception
    */
   public Editor handleOpen(File file) throws Exception {
-    return handleOpen(file, nextEditorLocation(), true);
+    return handleOpen(file, false);
   }
 
-  protected Editor handleOpen(File file, int[] location, boolean showEditor) throws Exception {
-    return handleOpen(file, location, showEditor, true);
+  public Editor handleOpen(File file, boolean untitled) throws Exception {
+    return handleOpen(file, nextEditorLocation(), true, untitled);
   }
 
-  protected Editor handleOpen(File file, int[] location, boolean showEditor, boolean storeOpenedSketches) throws Exception {
+  protected Editor handleOpen(File file, int[] location, boolean showEditor, boolean untitled) throws Exception {
+    return handleOpen(file, location, showEditor, true, untitled);
+  }
+
+  protected Editor handleOpen(File file, int[] location, boolean showEditor, boolean storeOpenedSketches, boolean untitled) throws Exception {
     if (!file.exists()) return null;
 
     // Cycle through open windows to make sure that it's not already open.
@@ -863,12 +883,16 @@ public class Base {
       return null;  // Just walk away quietly
     }
 
+    editor.untitled = untitled;
+
     editors.add(editor);
 
     if (storeOpenedSketches) {
       // Store information on who's open and running
       // (in case there's a crash or something that can't be recovered)
       storeSketches();
+      storeRecentSketches(editor.getSketch());
+      rebuildRecentSketchesMenuItems();
       PreferencesData.save();
     }
 
@@ -884,6 +908,42 @@ public class Base {
     }
 
     return editor;
+  }
+
+  protected void rebuildRecentSketchesMenuItems() {
+    Set<File> recentSketches = new LinkedHashSet<File>() {
+
+      @Override
+      public boolean add(File file) {
+        if (size() >= RECENT_SKETCHES_MAX_SIZE) {
+          return false;
+        }
+        return super.add(file);
+      }
+    };
+
+    for (String path : PreferencesData.getCollection("recent.sketches")) {
+      File file = new File(path);
+      if (file.exists()) {
+        recentSketches.add(file);
+      }
+    }
+
+    recentSketchesMenuItems.clear();
+    for (final File recentSketch : recentSketches) {
+      JMenuItem recentSketchMenuItem = new JMenuItem(recentSketch.getParentFile().getName());
+      recentSketchMenuItem.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+          try {
+            handleOpen(recentSketch);
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        }
+      });
+      recentSketchesMenuItems.add(recentSketchMenuItem);
+    }
   }
 
 
@@ -912,6 +972,7 @@ public class Base {
         //ignore
       }
       storeSketches();
+      rebuildRecentSketchesMenuItems();
 
       // Save out the current prefs state
       PreferencesData.save();
@@ -2462,5 +2523,9 @@ public class Base {
 
   public PdeKeywords getPdeKeywords() {
     return pdeKeywords;
+  }
+
+  public List<JMenuItem> getRecentSketchesMenuItems() {
+    return recentSketchesMenuItems;
   }
 }

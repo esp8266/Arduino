@@ -71,6 +71,7 @@ import cc.arduino.packages.uploaders.SerialUploader;
 public class Editor extends JFrame implements RunnerListener {
 
   private final Platform platform;
+  private JMenu recentSketchesMenu;
 
   private static class ShouldSaveIfModified implements Predicate<Sketch> {
 
@@ -523,10 +524,10 @@ public class Editor extends JFrame implements RunnerListener {
       public void menuSelected(MenuEvent e) {
         List<Component> components = Arrays.asList(fileMenu.getComponents());
         if (!components.contains(sketchbookMenu)) {
-          fileMenu.insert(sketchbookMenu, 2);
+          fileMenu.insert(sketchbookMenu, 3);
         }
         if (!components.contains(sketchbookMenu)) {
-          fileMenu.insert(examplesMenu, 3);
+          fileMenu.insert(examplesMenu, 4);
         }
         fileMenu.revalidate();
         validate();
@@ -602,6 +603,16 @@ public class Editor extends JFrame implements RunnerListener {
         }
       });
     fileMenu.add(item);
+
+    base.rebuildRecentSketchesMenuItems();
+    recentSketchesMenu = new JMenu(_("Recent"));
+    SwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        rebuildRecentSketchesMenu();
+      }
+    });
+    fileMenu.add(recentSketchesMenu);
 
     if (sketchbookMenu == null) {
       sketchbookMenu = new JMenu(_("Sketchbook"));
@@ -684,6 +695,12 @@ public class Editor extends JFrame implements RunnerListener {
     return fileMenu;
   }
 
+  public void rebuildRecentSketchesMenu() {
+    recentSketchesMenu.removeAll();
+    for (JMenuItem recentSketchMenuItem  : base.getRecentSketchesMenuItems()) {
+      recentSketchesMenu.add(recentSketchMenuItem);
+    }
+  }
 
   protected void buildSketchMenu(JMenu sketchMenu) {
     sketchMenu.removeAll();
