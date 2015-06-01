@@ -14,6 +14,9 @@ int SPIEraseSector(uint32_t sector);
 int SPIRead(uint32_t addr, void *dest, size_t size);
 int SPIWrite(uint32_t addr, void *src, size_t size);
 
+
+#define FLASH_SECTOR_SIZE 0x1000
+#define FLASH_BLOCK_SIZE 0x10000
 #define APP_START_OFFSET 0x1000
 
 typedef struct {

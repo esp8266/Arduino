@@ -20,18 +20,11 @@
 */
 #include "wiring_private.h"
 #include "pins_arduino.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include "c_types.h"
 #include "ets_sys.h"
 
-#ifdef __cplusplus
-}
-#endif
-
-/ ------------------------------------------------------------------ -
+// ------------------------------------------------------------------ -
 // timer 1
 
 static volatile timercallback timer1_user_cb = NULL;
