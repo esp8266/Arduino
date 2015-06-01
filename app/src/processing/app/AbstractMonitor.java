@@ -30,6 +30,7 @@ import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.DefaultCaret;
 
+import cc.arduino.packages.BoardPort;
 import processing.app.debug.TextAreaFIFO;
 import processing.app.legacy.PApplet;
 
@@ -50,8 +51,11 @@ public abstract class AbstractMonitor extends JFrame implements ActionListener {
   private Timer updateTimer;
   private StringBuffer updateBuffer;
 
-  public AbstractMonitor(String title) {
-    super(title);
+  private BoardPort boardPort;
+
+  public AbstractMonitor(BoardPort boardPort) {
+    super(boardPort.getLabel());
+    this.boardPort = boardPort;
 
     addWindowListener(new WindowAdapter() {
       public void windowClosing(WindowEvent event) {
@@ -136,10 +140,7 @@ public abstract class AbstractMonitor extends JFrame implements ActionListener {
     }
     lineEndings.setMaximumSize(lineEndings.getMinimumSize());
 
-    String[] serialRateStrings = {
-            "300", "1200", "2400", "4800", "9600",
-            "19200", "38400", "57600", "115200", "230400", "250000"
-    };
+    String[] serialRateStrings = {"300", "1200", "2400", "4800", "9600", "19200", "38400", "57600", "115200", "230400", "250000"};
 
     serialRates = new JComboBox();
     for (String rate : serialRateStrings) {
@@ -185,8 +186,7 @@ public abstract class AbstractMonitor extends JFrame implements ActionListener {
     closed = false;
   }
 
-  public void enableWindow(boolean enable)
-  {
+  public void enableWindow(boolean enable) {
     textArea.setEnabled(enable);
     scrollPane.setEnabled(enable);
     textField.setEnabled(enable);
@@ -200,33 +200,24 @@ public abstract class AbstractMonitor extends JFrame implements ActionListener {
 
   // Puts the window in suspend state, closing the serial port
   // to allow other entity (the programmer) to use it
-  public void suspend()
-  {
-   enableWindow(false);
+  public void suspend() throws Exception {
+    enableWindow(false);
 
-   try {
-        close();
-      }
-   catch(Exception e) {
-       //throw new SerialException("Failed closing the port");
-   }
-
+    close();
   }
 
-  public void resume() throws SerialException
-  {
+  public void resume(BoardPort boardPort) throws Exception {
+    setBoardPort(boardPort);
+
     // Enable the window
     enableWindow(true);
 
     // If the window is visible, try to open the serial port
-    if (isVisible())
-      try {
-        open();
-      }
-      catch(Exception e) {
-	  throw new SerialException("Failed opening the port");
-      }
+    if (!isVisible()) {
+      return;
+    }
 
+    open();
   }
 
   public void onSerialRateChange(ActionListener listener) {
@@ -275,12 +266,25 @@ public abstract class AbstractMonitor extends JFrame implements ActionListener {
   }
 
   public boolean isClosed() {
-      return closed;
+    return closed;
   }
 
-  public abstract void open() throws Exception;
+  public void open() throws Exception {
+    closed = false;
+  }
 
-  public abstract void close() throws Exception;
+  public void close() throws Exception {
+    closed = true;
+  }
+
+  public BoardPort getBoardPort() {
+    return boardPort;
+  }
+
+  public void setBoardPort(BoardPort boardPort) {
+    setTitle(boardPort.getLabel());
+    this.boardPort = boardPort;
+  }
 
   public synchronized void addToUpdateBuffer(char buff[], int n) {
     updateBuffer.append(buff, 0, n);
@@ -293,15 +297,18 @@ public abstract class AbstractMonitor extends JFrame implements ActionListener {
   }
 
   public void actionPerformed(ActionEvent e) {
-    final String s = consumeUpdateBuffer();
-    if (s.length() > 0) {
-      //System.out.println("gui append " + s.length());
-      if (autoscrollBox.isSelected()) {
-        textArea.appendTrim(s);
-        textArea.setCaretPosition(textArea.getDocument().getLength());
-      } else {
-        textArea.appendNoTrim(s);
-      }
+    String s = consumeUpdateBuffer();
+
+    if (s.isEmpty()) {
+      return;
+    }
+
+    //System.out.println("gui append " + s.length());
+    if (autoscrollBox.isSelected()) {
+      textArea.appendTrim(s);
+      textArea.setCaretPosition(textArea.getDocument().getLength());
+    } else {
+      textArea.appendNoTrim(s);
     }
   }
 

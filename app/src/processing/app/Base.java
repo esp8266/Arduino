@@ -1173,8 +1173,9 @@ public class Base {
     BaseNoGui.onBoardOrPortChange();
 
     // Update editors status bar
-    for (Editor editor : editors)
+    for (Editor editor : editors) {
       editor.onBoardOrPortChange();
+    }
   }
 
   private void openManageLibrariesDialog() {

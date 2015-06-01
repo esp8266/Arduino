@@ -110,8 +110,9 @@ public class SerialUploader extends Uploader {
     t = prefs.get("upload.wait_for_upload_port");
     boolean waitForUploadPort = (t != null) && t.equals("true");
 
+    String uploadPort = prefs.getOrExcept("serial.port");
+
     if (doTouch) {
-      String uploadPort = prefs.getOrExcept("serial.port");
       try {
         // Toggle 1200 bps on selected serial port to force board reset.
         List<String> before = Serial.list();
@@ -135,26 +136,23 @@ public class SerialUploader extends Uploader {
         throw new RunnerException(e.getMessage());
       }
       prefs.put("serial.port", uploadPort);
-      if (uploadPort.startsWith("/dev/"))
+      if (uploadPort.startsWith("/dev/")) {
         prefs.put("serial.port.file", uploadPort.substring(5));
-      else
+      } else {
         prefs.put("serial.port.file", uploadPort);
+      }
     }
 
     prefs.put("build.path", buildPath);
     prefs.put("build.project_name", className);
-    if (verbose)
+    if (verbose) {
       prefs.put("upload.verbose", prefs.getOrExcept("upload.params.verbose"));
-    else
+    } else {
       prefs.put("upload.verbose", prefs.getOrExcept("upload.params.quiet"));
+    }
 
     boolean uploadResult;
     try {
-//      if (prefs.get("upload.disable_flushing") == null
-//          || prefs.get("upload.disable_flushing").toLowerCase().equals("false")) {
-//        flushSerialBuffer();
-//      }
-
       String pattern = prefs.getOrExcept("upload.pattern");
       String[] cmd = StringReplacer.formatAndSplit(pattern, prefs, true);
       uploadResult = executeUploadCommand(cmd);
@@ -164,9 +162,9 @@ public class SerialUploader extends Uploader {
       throw new RunnerException(e);
     }
 
-    try {
-      if (uploadResult && doTouch) {
-        String uploadPort = PreferencesData.get("serial.port");
+    if (uploadResult && doTouch) {
+      try {
+        String previousUploadPort = PreferencesData.get("serial.port");
         if (waitForUploadPort) {
           // For Due/Leonardo wait until the bootloader serial port disconnects and the
           // sketch serial port reconnects (or timeout after a few seconds if the
@@ -176,15 +174,18 @@ public class SerialUploader extends Uploader {
           long started = System.currentTimeMillis();
           while (System.currentTimeMillis() - started < 2000) {
             List<String> portList = Serial.list();
-            if (portList.contains(uploadPort))
+            if (portList.contains(previousUploadPort)) {
               break;
+            }
             Thread.sleep(250);
           }
         }
+      } catch (InterruptedException ex) {
+        // noop
       }
-    } catch (InterruptedException ex) {
-      // noop
     }
+
+    BaseNoGui.selectSerialPort(uploadPort);
     return uploadResult;
   }
 

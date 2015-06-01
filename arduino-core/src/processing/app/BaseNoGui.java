@@ -1082,10 +1082,11 @@ public class BaseNoGui {
 
   public static void selectSerialPort(String port) {
     PreferencesData.set("serial.port", port);
-    if (port.startsWith("/dev/"))
-      PreferencesData.set("serial.port.file", port.substring(5));
-    else
-      PreferencesData.set("serial.port.file", port);
+    String portFile = port;
+    if (port.startsWith("/dev/")) {
+      portFile = portFile.substring(5);
+    }
+    PreferencesData.set("serial.port.file", portFile);
   }
 
   public static void setBuildFolder(File newBuildFolder) {

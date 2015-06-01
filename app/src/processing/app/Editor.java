@@ -1118,7 +1118,7 @@ public class Editor extends JFrame implements RunnerListener {
       }
     }
 
-    onBoardOrPortChange();
+    base.onBoardOrPortChange();
 
     //System.out.println("set to " + get("serial.port"));
   }
@@ -2533,7 +2533,6 @@ public class Editor extends JFrame implements RunnerListener {
           // error message will already be visible
         }
       } catch (SerialNotFoundException e) {
-        populatePortMenu();
         if (serialMenu.getItemCount() == 0) statusError(e);
         else if (serialPrompt()) run();
         else statusNotice(_("Upload canceled."));
@@ -2548,22 +2547,34 @@ public class Editor extends JFrame implements RunnerListener {
         statusError(e);
       } catch (Exception e) {
         e.printStackTrace();
+      } finally {
+        populatePortMenu();
       }
       status.unprogress();
       uploading = false;
       //toolbar.clear();
       toolbar.deactivate(EditorToolbar.EXPORT);
 
-      // Return the serial monitor window to its initial state
-      try {
-        if (serialMonitor != null)
-    	  serialMonitor.resume();
-      }
-      catch (SerialException e) {
-          statusError(e);
-      }
+      resumeOrCloseSerialMonitor();
+      base.onBoardOrPortChange();
+    }
+  }
 
-   }
+  private void resumeOrCloseSerialMonitor() {
+    // Return the serial monitor window to its initial state
+    if (serialMonitor != null) {
+      BoardPort boardPort = BaseNoGui.getDiscoveryManager().find(PreferencesData.get("serial.port"));
+      try {
+        if (boardPort == null) {
+          serialMonitor.close();
+          handleSerial();
+        } else {
+          serialMonitor.resume(boardPort);
+        }
+      } catch (Exception e) {
+        statusError(e);
+      }
+    }
   }
 
   // DAM: in Arduino, this is upload (with verbose output)
@@ -2584,7 +2595,6 @@ public class Editor extends JFrame implements RunnerListener {
           // error message will already be visible
         }
       } catch (SerialNotFoundException e) {
-        populatePortMenu();
         if (serialMenu.getItemCount() == 0) statusError(e);
         else if (serialPrompt()) run();
         else statusNotice(_("Upload canceled."));
@@ -2599,21 +2609,16 @@ public class Editor extends JFrame implements RunnerListener {
         statusError(e);
       } catch (Exception e) {
         e.printStackTrace();
+      } finally {
+        populatePortMenu();
       }
       status.unprogress();
       uploading = false;
       //toolbar.clear();
       toolbar.deactivate(EditorToolbar.EXPORT);
 
-      if (serialMonitor != null) {
-        try {
-          if (serialMonitor != null)
-    	    serialMonitor.resume();
-        }
-        catch (SerialException e) {
-            statusError(e);
-        }
-      }
+      resumeOrCloseSerialMonitor();
+      base.onBoardOrPortChange();
     }
   }
 
@@ -2685,8 +2690,13 @@ public class Editor extends JFrame implements RunnerListener {
 
     // If currently uploading, disable the monitor (it will be later
     // enabled when done uploading)
-    if (uploading)
-      serialMonitor.suspend();
+    if (uploading) {
+      try {
+        serialMonitor.suspend();
+      } catch (Exception e) {
+        statusError(e);
+      }
+    }
 
     boolean success = false;
     do {
