@@ -2727,6 +2727,11 @@ public class Editor extends JFrame implements RunnerListener {
           errorMessage += " (" + ((SerialPortException) e.getCause()).getExceptionType() + ")";
         }
         statusError(errorMessage);
+        try {
+          serialMonitor.close();
+        } catch (Exception e1) {
+          // noop
+        }
       } catch (Exception e) {
         statusError(e);
       } finally {

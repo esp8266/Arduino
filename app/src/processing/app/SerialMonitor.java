@@ -99,8 +99,8 @@ public class SerialMonitor extends AbstractMonitor {
   }
 
   public void close() throws Exception {
+    super.close();
     if (serial != null) {
-      super.close();
       int[] location = getPlacement();
       String locationStr = PApplet.join(PApplet.str(location), ",");
       PreferencesData.set("last.serial.location", locationStr);
