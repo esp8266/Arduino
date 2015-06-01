@@ -66,6 +66,14 @@ void loop() {
   // prints "123456" or whatever the value of millis() is:
   Serial.println(stringOne);
 
+  //using a float and the right decimal places:
+  stringOne = String(5.698, 3);
+  Serial.println(stringOne);
+
+  //using a float and less decimal places to use rounding:
+  stringOne = String(5.698, 2);
+  Serial.println(stringOne);
+
   // do nothing while true:
   while (true);
 
