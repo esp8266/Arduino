@@ -26,6 +26,7 @@ import com.apple.eawt.*;
 import processing.app.Base;
 import processing.app.Editor;
 
+import javax.swing.*;
 import java.io.File;
 import java.util.List;
 
@@ -91,6 +92,10 @@ public class ThinkDifferent {
         }
       }
     });
+  }
+
+  public static void setFullscreenable(JFrame frame) {
+    FullScreenUtilities.setWindowCanFullScreen(frame, true);
   }
 
   private static boolean waitForBase() {

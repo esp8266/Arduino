@@ -28,12 +28,12 @@ import cc.arduino.view.StubMenuListener;
 import com.google.common.base.Predicate;
 import com.jcraft.jsch.JSchException;
 import jssc.SerialPortException;
-import org.apache.commons.compress.utils.IOUtils;
 import processing.app.debug.*;
 import processing.app.forms.PasswordAuthorizationDialog;
 import processing.app.helpers.OSUtils;
 import processing.app.helpers.PreferencesMapException;
 import processing.app.legacy.PApplet;
+import processing.app.macosx.ThinkDifferent;
 import processing.app.syntax.*;
 import processing.app.tools.*;
 import static processing.app.I18n._;
@@ -191,6 +191,10 @@ public class Editor extends JFrame implements RunnerListener {
     this.platform = platform;
 
     Base.setIcon(this);
+
+    if (OSUtils.isMacOS()) {
+      ThinkDifferent.setFullscreenable(this);
+    }
 
     // Install default actions for Run, Present, etc.
     resetHandlers();
