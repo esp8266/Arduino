@@ -262,7 +262,7 @@ void uart_set_baudrate(uart_t* uart, int baud_rate) {
     if(uart == 0)
         return;
     uart->baud_rate = baud_rate;
-    USD(uart->uart_nr) = (80000000UL / uart->baud_rate);
+    USD(uart->uart_nr) = (ESP8266_CLOCK / uart->baud_rate);
 }
 
 int uart_get_baudrate(uart_t* uart) {
@@ -359,7 +359,7 @@ void uart_swap(uart_t* uart) {
             if(uart->txPin == 1 && uart->rxPin == 3) {
                 pinMode(15, FUNCTION_4); //TX
                 pinMode(13, FUNCTION_4); //RX
-                USWAP |= (1 << USWAP0);
+                IOSWAP |= (1 << IOSWAPU0);
                 pinMode(1, INPUT); //TX
                 pinMode(3, INPUT); //RX
                 uart->rxPin = 13;
@@ -367,7 +367,7 @@ void uart_swap(uart_t* uart) {
             } else {
                 pinMode(1, SPECIAL); //TX
                 pinMode(3, SPECIAL); //RX
-                USWAP &= ~(1 << USWAP0);
+                IOSWAP &= ~(1 << IOSWAPU0);
                 pinMode(15, INPUT); //TX
                 pinMode(13, INPUT); //RX
                 uart->rxPin = 3;

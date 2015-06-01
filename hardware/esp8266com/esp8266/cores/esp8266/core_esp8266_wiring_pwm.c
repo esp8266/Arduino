@@ -83,7 +83,7 @@ void prep_pwm_steps(){
 	pwm_steps_len = pwm_temp_steps_len;
 	os_memcpy(pwm_steps, pwm_temp_steps, (pwm_temp_steps_len + 1) * 2);
 	os_memcpy(pwm_steps_mask, pwm_temp_masks, pwm_temp_steps_len * 4);
-	pwm_multiplier = F_CPU/(PWMRANGE * pwm_freq);
+	pwm_multiplier = ESP8266_CLOCK/(PWMRANGE * pwm_freq);
 	ETS_FRC1_INTR_ENABLE();
 }
 

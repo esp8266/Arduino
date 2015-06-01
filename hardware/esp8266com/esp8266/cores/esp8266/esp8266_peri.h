@@ -25,6 +25,15 @@
 
 #define ESP8266_REG(addr) *((volatile uint32_t *)(0x60000000+(addr)))
 #define ESP8266_DREG(addr) *((volatile uint32_t *)(0x3FF00000+(addr)))
+#define ESP8266_CLOCK 80000000UL
+
+//CPU Register
+#define CPU2X     ESP8266_DREG(0x14) //when bit 0 is set, F_CPU = 160MHz
+
+//OTP Registers
+#define MAC0      ESP8266_DREG(0x50)
+#define MAC1      ESP8266_DREG(0x54)
+#define CHIPID    ESP8266_DREG(0x58)
 
 //GPIO (0-15) Control Registers
 #define GPO    ESP8266_REG(0x300) //GPIO_OUT R/W (Output Level)
@@ -149,9 +158,20 @@ static uint8_t esp8266_gpioToFn[16] = {0x34, 0x18, 0x38, 0x14, 0x3C, 0x40, 0x1C,
 #define TCIT  0 //Interrupt Type 0:edge, 1:level
 
 
-//UART SWAP Register
-#define USWAP ESP8266_DREG(0x28)
-#define USWAP0 2 //BIT 2 swaps UART 0
+//IO SWAP Register
+#define IOSWAP    ESP8266_DREG(0x28)
+#define IOSWAPU   0 //Swaps UART
+#define IOSWAPS   1 //Swaps SPI
+#define IOSWAPU0  2 //Swaps UART 0 pins (u0rxd <-> u0cts), (u0txd <-> u0rts)
+#define IOSWAPU1  3 //Swaps UART 1 pins (u1rxd <-> u1cts), (u1txd <-> u1rts)
+#define IOSWAPHS  5 //Sets HSPI with higher prio
+#define IOSWAP2HS 6 //Sets Two SPI Masters on HSPI
+#define IOSWAP2CS 7 //Sets Two SPI Masters on CSPI
+
+//UART INT Status
+#define UIS   ESP8266_DREG(0x20020)
+#define UIS0  0
+#define UIS1  2
 
 //UART 0 Registers
 #define U0F   ESP8266_REG(0x000) //UART FIFO
@@ -216,9 +236,9 @@ static uint8_t esp8266_gpioToFn[16] = {0x34, 0x18, 0x38, 0x14, 0x3C, 0x40, 0x1C,
 #define UIFF	0 //RX FIFO Full
 
 //UART STATUS Registers Bits
-#define USTX 	31 //TX PIN Level
-#define USRTS 	30 //RTS PIN Level
-#define USDTR 	39 //DTR PIN Level
+#define USTX    31 //TX PIN Level
+#define USRTS   30 //RTS PIN Level
+#define USDTR   39 //DTR PIN Level
 #define USTXC   16 //TX FIFO COUNT (8bit)
 #define USRXD   15 //RX PIN Level
 #define USCTS   14 //CTS PIN Level
@@ -226,35 +246,39 @@ static uint8_t esp8266_gpioToFn[16] = {0x34, 0x18, 0x38, 0x14, 0x3C, 0x40, 0x1C,
 #define USRXC    0 //RX FIFO COUNT (8bit)
 
 //UART CONF0 Registers Bits
-#define UCDTRI 	24 //Invert DTR
-#define UCRTSI 	23 //Invert RTS
-#define UCTXI 	22 //Invert TX
-#define UCDSRI 	21 //Invert DSR
-#define UCCTSI 	20 //Invert CTS
-#define UCRXI 	19 //Invert RX
+#define UCDTRI  24 //Invert DTR
+#define UCRTSI  23 //Invert RTS
+#define UCTXI   22 //Invert TX
+#define UCDSRI  21 //Invert DSR
+#define UCCTSI  20 //Invert CTS
+#define UCRXI   19 //Invert RX
 #define UCTXRST 18 //Reset TX FIFO
 #define UCRXRST 17 //Reset RX FIFO
 #define UCTXHFE 15 //TX Harware Flow Enable
-#define UCLBE 	14 //LoopBack Enable
-#define UCBRK 	8  //Send Break on the TX line
+#define UCLBE   14 //LoopBack Enable
+#define UCBRK   8  //Send Break on the TX line
 #define UCSWDTR 7  //Set this bit to assert DTR
 #define UCSWRTS 6  //Set this bit to assert RTS
-#define UCSBN 	4  //StopBits Count (2bit) 0:disable, 1:1bit, 2:1.5bit, 3:2bit
-#define UCBN 	2  //DataBits Count (2bin) 0:5bit, 1:6bit, 2:7bit, 3:8bit
-#define UCPAE 	1  //Parity Enable
-#define UCPA 	0  //Parity 0:even, 1:odd
+#define UCSBN   4  //StopBits Count (2bit) 0:disable, 1:1bit, 2:1.5bit, 3:2bit
+#define UCBN    2  //DataBits Count (2bin) 0:5bit, 1:6bit, 2:7bit, 3:8bit
+#define UCPAE   1  //Parity Enable
+#define UCPA    0  //Parity 0:even, 1:odd
 
 //UART CONF1 Registers Bits
-#define UCTOE 	31 //RX TimeOut Enable
-#define UCTOT 	24 //RX TimeOut Treshold (7bit)
+#define UCTOE   31 //RX TimeOut Enable
+#define UCTOT   24 //RX TimeOut Treshold (7bit)
 #define UCRXHFE 23 //RX Harware Flow Enable
 #define UCRXHFT 16 //RX Harware Flow Treshold (7bit)
-#define UCFET 	8  //TX FIFO Empty Treshold (7bit)
-#define UCFFT 	0  //RX FIFO Full Treshold (7bit)
+#define UCFET   8  //TX FIFO Empty Treshold (7bit)
+#define UCFFT   0  //RX FIFO Full Treshold (7bit)
 
-//WDT Register used for UART
-#define WDTRST		ESP8266_REG(0x914)
-#define WDT_RESET()	(WDTRST = 0x73)
+//WDT Feed (the dog) Register
+#define WDTFEED    ESP8266_REG(0x914)
+#define WDT_FEED() (WDTFEED = 0x73)
+
+//SPI_READY
+#define SPIRDY    ESP8266_DREG(0x0C)
+#define SPIBUSY   9 //wait SPI idle
 
 //SPI0 Registers (SPI0 is used for the flash)
 #define SPI0CMD		ESP8266_REG(0x200)
