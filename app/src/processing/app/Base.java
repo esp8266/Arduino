@@ -142,8 +142,6 @@ public class Base {
     BaseNoGui.initLogger();
 
     initLogger();
-    
-    BaseNoGui.notifier = new GUIUserNotifier();
 
     BaseNoGui.initPlatform();
 
@@ -270,6 +268,8 @@ public class Base {
   }
 
   public Base(String[] args) throws Exception {
+    BaseNoGui.notifier = new GUIUserNotifier(this);
+
     String sketchbookPath = BaseNoGui.getSketchbookPath();
 
     // If no path is set, get the default sketchbook folder for this platform
