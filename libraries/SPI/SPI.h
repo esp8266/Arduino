@@ -45,8 +45,6 @@
 #define SPI_CLOCK_DIV64 	0x04fc1001 //250 KHz
 #endif
 
-#define SPI_MAX_SPEED      (80000000L)
-
 const uint8_t SPI_MODE0 = 0x00; ///<  CPOL: 0  CPHA: 0
 const uint8_t SPI_MODE1 = 0x01; ///<  CPOL: 0  CPHA: 1
 const uint8_t SPI_MODE2 = 0x10; ///<  CPOL: 1  CPHA: 0
