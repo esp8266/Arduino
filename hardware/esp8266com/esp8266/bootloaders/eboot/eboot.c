@@ -150,7 +150,7 @@ int copy_raw(const uint32_t src_addr,
 
 void main()
 {
-    int res;
+    int res = 9;
     struct eboot_command cmd;
 
     eboot_command_read(&cmd);

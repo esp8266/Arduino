@@ -4,7 +4,7 @@ MEMORY
 {
   dport0_0_seg :                      	org = 0x3FF00000, len = 0x10
   dram0_0_seg :                       	org = 0x3FFE8000, len = 0x14000
-  iram1_0_seg :                       	org = 0x4010f800, len = 0x800
+  iram1_0_seg :                       	org = 0x4010f000, len = 0x1000
   irom0_0_seg :                       	org = 0x40240000, len = 0x32000
 }
 

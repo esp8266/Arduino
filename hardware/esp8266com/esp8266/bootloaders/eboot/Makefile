@@ -18,7 +18,7 @@ OBJDUMP := $(XTENSA_TOOCHAIN)xtensa-lx106-elf-objdump
 
 CFLAGS += -std=gnu99
 
-CFLAGS += -Os -g -Wpointer-arith -Wno-implicit-function-declaration -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -mno-text-section-literals
+CFLAGS += -O0 -g -Wpointer-arith -Wno-implicit-function-declaration -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -mno-text-section-literals
 
 LDFLAGS	+= -nostdlib -Wl,--no-check-sections -umain
 
