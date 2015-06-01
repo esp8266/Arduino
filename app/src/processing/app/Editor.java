@@ -2519,6 +2519,7 @@ public class Editor extends JFrame implements RunnerListener {
     public void run() {
 
       try {
+        textarea.removeAllLineHighlights();
         if (serialMonitor != null) {
           serialMonitor.suspend();
         }
