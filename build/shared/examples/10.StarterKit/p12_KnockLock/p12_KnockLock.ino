@@ -140,6 +140,8 @@ void loop() {
       digitalWrite(greenLed, HIGH);
       digitalWrite(redLed, LOW);
       Serial.println("the box is unlocked!");
+
+      numberOfKnocks = 0;
     }
   }
 }
