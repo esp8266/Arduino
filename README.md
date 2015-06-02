@@ -201,6 +201,13 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 Pick the correct serial port.
 You need to put ESP8266 into bootloader mode before uploading code.
 
+#### Power Supply ####
+
+For stable use of the ESP8266 a power supply with 3V3 and >= 250mA is required.
+
+* Note
+ - using Power from USB to Serial is may unstable, they not deliver enough current. 
+ 
 #### Minimal hardware Setup for Bootloading and usage ####
 
 ESPxx Hardware
