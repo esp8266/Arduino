@@ -511,7 +511,6 @@ u32_t SPIFFS_buffer_bytes_for_cache(spiffs *fs, u32_t num_pages);
 #endif
 #endif
 
-#include "spiffs_esp8266.h"
 
 #ifdef __cplusplus
 }
