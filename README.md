@@ -184,6 +184,11 @@ Allows the sketch to respond to multicast DNS queries for domain names like "foo
 Currently the library only works on STA interface, AP interface is not supported.
 See attached example and library README file for details.
 
+#### Servor ####
+
+This library exposes the ability to control RC(hobby) servo motors. It will support upto 24 servos on any available output pin. By defualt the first 12 servos will use Timer0 and currently this will not interfere with any other support.  Servos counts above 12 will use Timer1 and features that use it will be effected.
+While many RC servo motors will accept the 3.3v IO data pin from a esp8266, most will not be able to run off 3.3v and will require another power source that matches their specifications.  Make sure to connect the grounds between the esp8266 and the servo motor power supply.
+
 #### Other libraries (not included with the IDE)
 
 Libraries that don't rely on low-level access to AVR registers should work well. Here are a few libraries that were verified to work:
