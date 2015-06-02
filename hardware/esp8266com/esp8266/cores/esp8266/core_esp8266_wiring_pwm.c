@@ -27,6 +27,7 @@
 uint32_t pwm_mask = 0;
 uint16_t pwm_values[17] = {0,};
 uint32_t pwm_freq = 1000;
+uint32_t pwm_range = PWMRANGE;
 
 uint32_t pwm_multiplier = 0;
 uint16_t pwm_steps[17];
@@ -71,7 +72,7 @@ void prep_pwm_steps(){
 	for(i=0; i<17; i++){
 		if((pwm_mask & (1 << i)) != 0 && pwm_values[i] != 0) pwm_temp_steps[pwm_temp_steps_len++] = pwm_values[i];
 	}
-	pwm_temp_steps[pwm_temp_steps_len++] = PWMRANGE;
+	pwm_temp_steps[pwm_temp_steps_len++] = pwm_range;
 	pwm_temp_steps_len = pwm_sort_array(pwm_temp_steps, pwm_temp_steps_len) - 1;
 	for(i=0; i<pwm_temp_steps_len; i++){
 		pwm_temp_masks[i] = pwm_get_mask(pwm_temp_steps[i]);
@@ -83,7 +84,7 @@ void prep_pwm_steps(){
 	pwm_steps_len = pwm_temp_steps_len;
 	ets_memcpy(pwm_steps, pwm_temp_steps, (pwm_temp_steps_len + 1) * 2);
 	ets_memcpy(pwm_steps_mask, pwm_temp_masks, pwm_temp_steps_len * 4);
-	pwm_multiplier = F_CPU/(PWMRANGE * pwm_freq);
+	pwm_multiplier = ESP8266_CLOCK/(pwm_range * pwm_freq);
 	ETS_FRC1_INTR_ENABLE();
 }
 
@@ -133,7 +134,7 @@ extern void __analogWrite(uint8_t pin, int value) {
 		pinMode(pin, OUTPUT);
 		digitalWrite(pin, LOW);
 	}
-	pwm_values[pin] = value % (PWMRANGE + 1);
+	pwm_values[pin] = value % (pwm_range + 1);
 	prep_pwm_steps();
 	if(start_timer){
 		pwm_start_timer();
@@ -145,5 +146,11 @@ extern void __analogWriteFreq(uint32_t freq){
   prep_pwm_steps();
 }
 
+extern void __analogWriteRange(uint32_t range){
+  pwm_range = range;
+  prep_pwm_steps();
+}
+
 extern void analogWrite(uint8_t pin, int val) __attribute__ ((weak, alias("__analogWrite")));
 extern void analogWriteFreq(uint32_t freq) __attribute__ ((weak, alias("__analogWriteFreq")));
+extern void analogWriteRange(uint32_t range) __attribute__ ((weak, alias("__analogWriteRange")));

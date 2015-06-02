@@ -121,14 +121,14 @@ void SPIClass::setBitOrder(uint8_t bitOrder) {
  * @return
  */
 static uint32_t ClkRegToFreq(spiClk_t * reg) {
-    return (SPI_MAX_SPEED / ((reg->regPre + 1) * (reg->regN + 1)));
+    return (ESP8266_CLOCK / ((reg->regPre + 1) * (reg->regN + 1)));
 }
 
 void SPIClass::setFrequency(uint32_t freq) {
     static uint32_t lastSetFrequency = 0;
     static uint32_t lastSetRegister = 0;
 
-    if(freq >= SPI_MAX_SPEED) {
+    if(freq >= ESP8266_CLOCK) {
         setClockDivider(0x80000000);
         return;
     }
@@ -164,7 +164,7 @@ void SPIClass::setFrequency(uint32_t freq) {
         reg.regN = calN;
 
         while(calPreVari++ <= 1) { // test different variants for Pre (we calculate in int so we miss the decimals, testing is the easyest and fastest way)
-            calPre = (((SPI_MAX_SPEED / (reg.regN + 1)) / freq) - 1) + calPreVari;
+            calPre = (((ESP8266_CLOCK / (reg.regN + 1)) / freq) - 1) + calPreVari;
             if(calPre > 0x1FFF) {
                 reg.regPre = 0x1FFF; // 8191
             } else if(calPre <= 0) {
