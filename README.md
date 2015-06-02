@@ -221,26 +221,43 @@ ESPxx Hardware
  - Reset is also named RSBT or REST (adding PullUp improves the stability of the Module)
  - GPIO2 is alternative TX for the boot loader mode
  
-ESP01 example:
-
-![ESP01 connect](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/ESP01_connect.jpg)
+###### esp to Serial
+![ESP to Serial](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/ESP_to_serial.png)
 
 #### Minimal hardware Setup for Bootloading only ####
 ESPxx Hardware
 
-| PIN           | Resistor | Serial Adapter |
-| ------------- | -------- | -------------- | 
-| VCC           |          | VCC (3.3V)     |
-| GND           |          | GND            |
-| TX or GPIO2   |          | RX             |
-| RX            |          | TX             |
-| GPIO0         |          | GND            |
+| PIN           | Resistor | Serial Adapter  |
+| ------------- | -------- | --------------- | 
+| VCC           |          | VCC (3.3V)      |
+| GND           |          | GND             |
+| TX or GPIO2   |          | RX              |
+| RX            |          | TX              |
+| GPIO0         |          | GND             |
 | Reset         |          | RTS*            |
-| GPIO15        | PullDown |                |
-| CH_PD         | PullUp   |                |
+| GPIO15        | PullDown |                 |
+| CH_PD         | PullUp   |                 |
 
 * Note 
 	- if no RTS is used a manual power toggle is needed
+	 
+#### Minimal hardware Setup for running only ####
+
+ESPxx Hardware
+
+| PIN           | Resistor | Power supply    |
+| ------------- | -------- | --------------- | 
+| VCC           |          | VCC (3.3V)      |
+| GND           |          | GND             |
+| GPIO0         | PullUp   |                 |
+| GPIO15        | PullDown |                 |
+| CH_PD         | PullUp   |                 |
+
+###### minimal
+![ESP min](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/ESP_min.png)
+
+###### improved stability
+![ESP improved stability](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/ESP_improved_stability.png)	
 
 ### Issues and support ###
 
