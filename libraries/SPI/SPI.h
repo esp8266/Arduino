@@ -28,7 +28,6 @@
 
 // This defines are not representing the real Divider of the ESP8266
 // the Defines match to an AVR Arduino on 16MHz for better compatibility
-#if F_CPU == 80000000L
 #define SPI_CLOCK_DIV2 		0x00101001 //8 MHz
 #define SPI_CLOCK_DIV4 		0x00241001 //4 MHz
 #define SPI_CLOCK_DIV8 		0x004c1001 //2 MHz
@@ -36,16 +35,6 @@
 #define SPI_CLOCK_DIV32 	0x013c1001 //500 KHz
 #define SPI_CLOCK_DIV64 	0x027c1001 //250 KHz
 #define SPI_CLOCK_DIV128 	0x04fc1001 //125 KHz
-#else
-#define SPI_CLOCK_DIV2 		0x00241001 //8 MHz
-#define SPI_CLOCK_DIV4 		0x004c1001 //4 MHz
-#define SPI_CLOCK_DIV8  	0x009c1001 //2 MHz
-#define SPI_CLOCK_DIV16 	0x013c1001 //1 MHz
-#define SPI_CLOCK_DIV32 	0x027c1001 //500 KHz
-#define SPI_CLOCK_DIV64 	0x04fc1001 //250 KHz
-#endif
-
-#define SPI_MAX_SPEED      (80000000L)
 
 const uint8_t SPI_MODE0 = 0x00; ///<  CPOL: 0  CPHA: 0
 const uint8_t SPI_MODE1 = 0x01; ///<  CPOL: 0  CPHA: 1
