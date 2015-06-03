@@ -333,10 +333,14 @@ void ESP8266WiFiClass::_scanDone(void* result, int status)
 
 int8_t ESP8266WiFiClass::scanNetworks()
 {
-    if ((wifi_get_opmode() & 1) == 0)//1 and 3 have STA enabled
-    {
+    if(_useApMode) {
+        // turn on AP+STA mode
         mode(WIFI_AP_STA);
+    } else {
+        // turn on STA mode
+        mode(WIFI_STA);
     }
+
     int status = wifi_station_get_connect_status();
     if (status != STATION_GOT_IP && status != STATION_IDLE)
     {
@@ -508,9 +512,12 @@ void ESP8266WiFiClass::beginSmartConfig()
     if (_smartConfigStarted)
         return;
 
-    if ((wifi_get_opmode() & 1) == 0)//1 and 3 have STA enabled
-    {
+    if(_useApMode) {
+        // turn on AP+STA mode
         mode(WIFI_AP_STA);
+    } else {
+        // turn on STA mode
+        mode(WIFI_STA);
     }
 
     _smartConfigStarted = true;
