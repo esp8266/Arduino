@@ -52,5 +52,11 @@ public class SketchTextAreaDefaultInputMap extends RSyntaxTextAreaDefaultInputMa
     }
 
     put(KeyStroke.getKeyStroke(KeyEvent.VK_DIVIDE, defaultModifier), RSyntaxTextAreaEditorKit.rstaToggleCommentAction);
+
+    put(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, 0), DefaultEditorKit.backwardAction);
+    put(KeyStroke.getKeyStroke(KeyEvent.VK_KP_RIGHT, 0), DefaultEditorKit.forwardAction);
+    put(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, 0), DefaultEditorKit.downAction);
+    put(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, 0), DefaultEditorKit.upAction);
+
   }
 }
