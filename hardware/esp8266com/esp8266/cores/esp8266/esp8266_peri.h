@@ -157,6 +157,13 @@ extern uint8_t esp8266_gpioToFn[16];
 #define TCPD  2 //Prescale Devider (2bit) 0:1(12.5ns/tick), 1:16(0.2us/tick), 2/3:256(3.2us/tick)
 #define TCIT  0 //Interrupt Type 0:edge, 1:level
 
+//RTC Registers
+#define RTCSV     ESP8266_REG(0x704) //RTC SLEEP COUNTER Target Value
+#define RTCCV     ESP8266_REG(0x71C) //RTC SLEEP COUNTER Value
+#define RTCIS     ESP8266_REG(0x720) //RTC INT Status
+#define RTCIC     ESP8266_REG(0x724) //RTC INT Clear
+#define RTCIE     ESP8266_REG(0x728) //RTC INT Enable
+
 //IO SWAP Register
 #define IOSWAP    ESP8266_DREG(0x28)
 #define IOSWAPU   0 //Swaps UART
