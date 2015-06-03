@@ -77,7 +77,7 @@
 #define GPCD   2  //DRIVER 0:normal,1:open drain
 #define GPCS   0  //SOURCE 0:GPIO_DATA,1:SigmaDelta
 
-static uint8_t esp8266_gpioToFn[16] = {0x34, 0x18, 0x38, 0x14, 0x3C, 0x40, 0x1C, 0x20, 0x24, 0x28, 0x2C, 0x30, 0x04, 0x08, 0x0C, 0x10};
+extern uint8_t esp8266_gpioToFn[16];
 #define GPF(p) ESP8266_REG(0x800 + esp8266_gpioToFn[(p & 0xF)])
 
 #define GPMUX  ESP8266_REG(0x800)
@@ -157,6 +157,12 @@ static uint8_t esp8266_gpioToFn[16] = {0x34, 0x18, 0x38, 0x14, 0x3C, 0x40, 0x1C,
 #define TCPD  2 //Prescale Devider (2bit) 0:1(12.5ns/tick), 1:16(0.2us/tick), 2/3:256(3.2us/tick)
 #define TCIT  0 //Interrupt Type 0:edge, 1:level
 
+//RTC Registers
+#define RTCSV     ESP8266_REG(0x704) //RTC SLEEP COUNTER Target Value
+#define RTCCV     ESP8266_REG(0x71C) //RTC SLEEP COUNTER Value
+#define RTCIS     ESP8266_REG(0x720) //RTC INT Status
+#define RTCIC     ESP8266_REG(0x724) //RTC INT Clear
+#define RTCIE     ESP8266_REG(0x728) //RTC INT Enable
 
 //IO SWAP Register
 #define IOSWAP    ESP8266_DREG(0x28)
@@ -278,7 +284,7 @@ static uint8_t esp8266_gpioToFn[16] = {0x34, 0x18, 0x38, 0x14, 0x3C, 0x40, 0x1C,
 
 //SPI_READY
 #define SPIRDY    ESP8266_DREG(0x0C)
-#define SPIBUSY   9 //wait SPI idle
+#define SPI0BUSY   9 //wait SPI idle
 
 //SPI0 Registers (SPI0 is used for the flash)
 #define SPI0CMD		ESP8266_REG(0x200)

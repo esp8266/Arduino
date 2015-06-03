@@ -174,13 +174,12 @@ public:
     int32_t channel(void);
 
     /*
-     * Return the current network RSSI. Note: this is just a stub, there is no way to
-     *  get the RSSI in the Espressif SDK yet.
+     * Return the current network RSSI.
      *
-     * return: RSSI value (currently 0)
+     * return: RSSI value
      */
 
-    int32_t RSSI() { return 0; }
+    int32_t RSSI();
 
     /*
      * Start scan WiFi networks available
@@ -305,8 +304,9 @@ public:
 protected:
     static void _scanDone(void* result, int status);
     void * _getScanInfoByIndex(int i);
-    static void _smartConfigDone(void* result);
+    static void _smartConfigCallback(uint32_t status, void* result);
     bool _smartConfigStarted = false;
+    bool _smartConfigDone = false;
 
     bool _useApMode;
     bool _useClientMode;

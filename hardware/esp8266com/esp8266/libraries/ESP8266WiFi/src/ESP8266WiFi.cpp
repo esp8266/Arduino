@@ -285,6 +285,11 @@ int32_t ESP8266WiFiClass::channel(void) {
     return wifi_get_channel();
 }
 
+
+int32_t ESP8266WiFiClass::RSSI(void) {
+    return wifi_station_get_rssi();
+}
+
 extern "C"
 {
     typedef STAILQ_HEAD(, bss_info) bss_info_head_t;
@@ -509,9 +514,10 @@ void ESP8266WiFiClass::beginSmartConfig()
     }
 
     _smartConfigStarted = true;
+    _smartConfigDone = false;
 
     //SC_TYPE_ESPTOUCH use ESPTOUCH for smartconfig, or use SC_TYPE_AIRKISS for AIRKISS 
-    smartconfig_start(SC_TYPE_ESPTOUCH, &ESP8266WiFiClass::_smartConfigDone);
+    smartconfig_start(SC_TYPE_ESPTOUCH, reinterpret_cast<sc_callback_t>(&ESP8266WiFiClass::_smartConfigCallback), 1);
 }
 
 void ESP8266WiFiClass::stopSmartConfig()
@@ -523,22 +529,30 @@ void ESP8266WiFiClass::stopSmartConfig()
     _smartConfigStarted = false;
 }
 
-bool ESP8266WiFiClass::smartConfigDone(){
+bool ESP8266WiFiClass::smartConfigDone()
+{
     if (!_smartConfigStarted)
         return false;
 
-    return smartconfig_get_status() == SC_STATUS_LINK_OVER;
+    return _smartConfigDone;
 }
 
-void ESP8266WiFiClass::_smartConfigDone(void* result)
+void ESP8266WiFiClass::_smartConfigCallback(uint32_t st, void* result)
 {
-    station_config* sta_conf = reinterpret_cast<station_config*>(result);
-  
-    wifi_station_set_config(sta_conf);
-    wifi_station_disconnect();
-    wifi_station_connect();
-}
+    sc_status status = (sc_status) st;
+    if (status == SC_STATUS_LINK) {
+        station_config* sta_conf = reinterpret_cast<station_config*>(result);
+      
+        wifi_station_set_config(sta_conf);
+        wifi_station_disconnect();
+        wifi_station_connect();
 
+        WiFi._smartConfigDone = true;
+    }
+    else if (status == SC_STATUS_LINK_OVER) {
+        WiFi.stopSmartConfig();
+    }
+}
 
 void ESP8266WiFiClass::printDiag(Print& p)
 {

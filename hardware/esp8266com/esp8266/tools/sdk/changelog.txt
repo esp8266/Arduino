@@ -1,3 +1,112 @@
+esp_iot_sdk_v1.1.0_15_05_27_p1 Release Note 
+-------------------------------------------
+
+Here is a patch based on SDK_v1.1.0 resolved issues below:
+1. SDK 1.1.0 may boot fail if SPI Flash speed is 80MHz.
+2. Memory Leak in libssl when SSL connection fail.
+3. Update smartconfig, please using it with the latest Espressif APP https://github.com/EspressifApp
+
+Sorry for the inconvenience.
+
+esp_iot_sdk_v1.1.0_15_05_22 Release Note 
+----------------------------------------
+Resolved Issues（Bugs below are eligible for Bug Bounty Program):
+1.Predictable TLS random values leads to insecure connections [projectgus]
+2.Connection problem in softAP+station mode.[智捷通]
+3.Low heap cause of reset when connect using SSL. [TuanPM]
+4.Smart config issue [bigbear]
+
+Document "2C_ESP8266__Programming Guide" updates:
+1.Update Demo code of rtc timer in appendix, and rtc timer will return to zero after deep-sleep wake up. [andrew]
+2.Add "3.espconn callback" in appendix to introduce espconn callbacks and the pointer may be different in different callback.[nagverma]
+3.Add RF description in “2.Overview”，if RF is disabled，ESP8266 station and soft-AP are both disabled.[yiaiguo]
+4.Revise name of API "wifi_softap_set_dhcps_offer_option" [ryan]
+
+Optimization:
+1.Solving the problem that some Wi-Fi events may be missing during test.
+2.UART Wi-Fi passthrough of UDP maybe change to oneway. [orgmar]
+3.Optimized FOTA to make upgrade faster
+4.ESP8266 soft-AP can connected to 8 stations at most, softap_config.max_connection default is 4
+5.ESP8266 station will connect to the stronger WiFi signal, if there are several APs sharing the same SSID.[stefan]
+6.Add 1024KB+1024KB flash map which need boot_v1.4+, more details in document "2A-ESP8266_IOT_SDK_User_Manual"
+7.Optimized PWM driver
+8.Revised structure mdns_info to support 10 groups of text data.
+9.Add user_rf_pre_init in user_main.c, user can set configuration of RF in it.
+
+Added APIs：
+1.sntp_set_timezone: set SNTP time zone.
+2.espconn_dns_setserver : set default DNS server
+3.system_uart_de_swap : disable UART0 swap
+4.system_get_flash_size_map: get flash size and flash map
+5.system_phy_set_max_tpw : set maximum RF TX power
+6.system_phy_set_tpw_via_vdd33 ：set RF TX power according to VDD33 
+7.system_phy_set_rfoption : set RF option
+8.wifi_station_get_rssi：get rssi of AP which ESP8266 station connected to 　
+9.wifi_softap_get_station_num ：get number count of stations connected to ESP8266 soft-AP
+
+AT_v0.24 Release Note: 
+Note: For AT firmware to support FOTA, flash size need to be 1024KB or more than that.
+Optimization:
+1.Disable data echo of command "AT+CIPSEND"
+2.Optimized "AT+CWJAP?" to get channel and rssi
+3.ESP8266 station IP can only be got and inquiried after ESP8266 station connected to AP
+
+Added AT command： 
+1.AT+RFPOWER ：set maximum RF TX power
+2.AT+RFVDD ： set RF TX power according to VDD33 
+
+
+自从乐鑫信息科技于 2015-03-20 启动 Bug 赏金计划以来，我们收到了一些重要问题反馈及建议，感谢世界各地的开发者对 ESP8266的关注，推动我们的软件更进一步，技术支持团队也得到迅速地成长。我们将在如下发布日志中点名感谢您的帮助。
+
+esp_iot_sdk_v1.1.0_15_05_22 Release Note 
+修正问题（符合乐鑫 Bug 赏金计划）:
+1.随机值的生成可以被预测，完善随机数的产生机制 [projectgus]
+2.softAP+station 模式下，可能连接 ESP8266 soft-AP 失败 [智捷通]
+3.内存不足导致 SSL 连接时重启. [TuanPM]
+4.Smart config 相关问题 [bigbear]
+
+文档 "2C_ESP8266__Programming Guide" 更新:
+1.更新附录中的 RTC 示例代码，RTC 时钟会因 deep-sleep 清零. [andrew]
+2.附录新增 "3.espconn callback"介绍 espconn callbacks，不同的 espconn callback 中 espconn 结构体指针可能不同.[nagverma]
+3.“2.概述”中增加 RF 设置的说明，如果不打开 RF ，ESP8266 station 和 soft-AP 均失效。[yiaiguo]
+4.修正 API 名称 "wifi_softap_set_dhcps_offer_option" [ryan]
+
+优化:
+1.解决特定测试环境下某些 Wi-Fi events 可能缺失的问题。
+2.UDP 透传可能变成单向传输的相关问题 [orgmar]
+3.优化 FOTA 的底层实现，加快升级速度
+4.ESP8266 soft-AP 最多可连接 8 个 station, 默认最大连接个数为 4
+5.当多个 AP 的 SSID password相同时，ESP8266 station 默认连接信号最强的 AP。[stefan]
+6.更新 boot_v1.4+ 及编译文件，支持 1024KB+1024KB flash map , flash map 的详细介绍见文档 "2A-ESP8266_IOT_SDK_User_Manual"
+7.优化 PWM driver
+8.优化 structure mdns_info 支持 10 组 text data.
+9.在 user_main.c 中新增 user_rf_pre_init , 用户可在 user_rf_pre_init 中调用 system_phy_set_rfoption 配置 RF 初始化.
+
+新增 APIs：
+1.sntp_set_timezone: SNTP 设置时区
+2.espconn_dns_setserver : 设置默认 DNS server
+3.system_uart_de_swap : 取消 UART0 转换
+4.system_get_flash_size_map: 查询 flash size 和 flash map
+5.system_phy_set_max_tpw : 设置 RF TX power 最大值
+6.system_phy_set_tpw_via_vdd33 ：根据 VDD33 设置 RF TX power
+7.system_phy_set_rfoption : 设置 RF 
+8.wifi_station_get_rssi：查询 ESP8266 station 连接的 AP 的信号强度 　
+9.wifi_softap_get_station_num ：查询连接到 ESP8266 soft-AP 的 station 数目
+
+AT_v0.24 Release Note: 
+注意：运行 AT 固件，支持云端升级，请使用 1024KB 或以上容量的 flash
+
+优化:
+1."AT+CIPSEND" 发送数据时，数据不回显
+2.优化"AT+CWJAP?" 可获得信道和信号强度
+3.必须在 ESP8266 station 连接到 AP 后，才能查询到 ESP8266 station IP
+
+新增 AT command： 
+1.AT+RFPOWER ：设置 RF TX power 最大值
+2.AT+RFVDD ： 根据 VDD33 设置 RF TX power
+
+Thanks for your interest in ESP8266 !
+
 esp_iot_sdk_v1.0.1_15_05_04_p1
 -------------------------------------------
 Here is a patch for station+softAP issue that users may have, based on SDK_v1.0.1, 
@@ -18,7 +127,7 @@ Optimization:
 1. Optimized IOT_Espressif_EspTouch.APK (apply for access from Espressif) for improved compatibility. [???] 
 2. TCP server can not open again immediately with the same port [624908539] 
 3. Update UART driver for parity bit value may be incorrect [1062583993] 
-4. Add define of �ICACHE_RODATA_ATTR� for Symbol 'ICACHE_RODATA_ATTR' could not be resolved. [???] 
+4. Add define of “ICACHE_RODATA_ATTR” for Symbol 'ICACHE_RODATA_ATTR' could not be resolved. [???] 
 5. Add API wifi_softap_dhcps_set_offer_option to enable/disable ESP8266 softAP DHCP server default gateway. [xyz769] 
 6. AT register_uart_rx_intr may enter callback twice. [???] 
 7.optimize document that WPA password length range : 8 ~ 64 bytes [785057041] 
@@ -75,7 +184,7 @@ Fix bugs:
 4.UDP broadcast issue in WEP
 
 Optimize:
-1.Add more details about measure ADC & VDD3P3 in appendix of document�2C-SDK-Espressif IoT SDK Programming Guide�[BBP#15 reporter (DarkByte)]
+1.Add more details about measure ADC & VDD3P3 in appendix of document“2C-SDK-Espressif IoT SDK Programming Guide”[BBP#15 reporter (DarkByte)]
 2.Can not do any WiFi related operation if WiFi mode is in NULL_MODE [BBP#23 reporter (hao.wang)]
 3.start_ip and end_ip won't change through API wifi_softap_set_dhcps_lease [BBP#37 reporter (glb)]
 4.AT get into busy state [BBP#35 reporter (tommy_hk)]

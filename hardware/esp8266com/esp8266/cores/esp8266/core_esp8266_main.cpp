@@ -119,6 +119,12 @@ void init_done() {
 }
 
 extern "C" {
+void user_rf_pre_init() {
+    
+}
+}
+
+extern "C" {
 void user_init(void) {
     uart_div_modify(0, UART_CLK_FREQ / (74480));
 
