@@ -39,6 +39,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.*;
 
 import static processing.app.I18n._;
 
@@ -588,6 +589,12 @@ public class Preferences extends javax.swing.JDialog {
   }//GEN-LAST:event_cancelButtonActionPerformed
 
   private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
+    java.util.List<String> errors = validateData();
+    if (!errors.isEmpty()) {
+      Base.showWarning(_("Error"), errors.get(0), null);
+      return;
+    }
+
     savePreferencesData();
     for (Editor editor : base.getEditors()) {
       editor.applyPreferences();
@@ -618,6 +625,14 @@ public class Preferences extends javax.swing.JDialog {
   private javax.swing.JCheckBox verboseUploadBox;
   private javax.swing.JCheckBox verifyUploadBox;
   // End of variables declaration//GEN-END:variables
+
+  private java.util.List<String> validateData() {
+    java.util.List<String> errors = new LinkedList<String>();
+    if (FileUtils.isSubDirectory(new File(sketchbookLocationField.getText()), new File(PreferencesData.get("runtime.ide.path")))) {
+      errors.add(_("The specified sketchbook folder contains your copy of the IDE.\nPlease choose a different folder for your sketchbook."));
+    }
+    return errors;
+  }
 
   private void savePreferencesData() {
     String oldPath = PreferencesData.get("sketchbook.path");

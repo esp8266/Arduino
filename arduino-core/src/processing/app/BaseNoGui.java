@@ -754,8 +754,31 @@ public class BaseNoGui {
     initPortableFolder();
     
     initParameters(args);
-    
+
+    checkInstallationFolder();
+
     init(args);
+  }
+
+  public static void checkInstallationFolder() {
+    if (isIDEInstalledIntoSettingsFolder()) {
+      showError(_("Incorrect IDE installation folder"), _("Your copy of the IDE is installed in a subfolder of your settings folder.\nPlease move the IDE to another folder."), 10);
+    }
+    if (isIDEInstalledIntoSketchbookFolder()) {
+      showError(_("Incorrect IDE installation folder"), _("Your copy of the IDE is installed in a subfolder of your sketchbook.\nPlease move the IDE to another folder."), 10);
+    }
+  }
+
+  public static boolean isIDEInstalledIntoSketchbookFolder() {
+    return PreferencesData.has("sketchbook.path") && FileUtils.isSubDirectory(new File(PreferencesData.get("sketchbook.path")), new File(PreferencesData.get("runtime.ide.path")));
+  }
+
+  public static boolean isIDEInstalledIntoSettingsFolder() {
+    try {
+      return FileUtils.isSubDirectory(BaseNoGui.getPlatform().getSettingsFolder(), new File(PreferencesData.get("runtime.ide.path")));
+    } catch (Exception e) {
+      return false;
+    }
   }
 
   static public void onBoardOrPortChange() {

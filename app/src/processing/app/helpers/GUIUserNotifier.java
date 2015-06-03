@@ -48,7 +48,7 @@ public class GUIUserNotifier extends UserNotifier {
   public void showWarning(String title, String message, Exception e) {
     if (title == null) title = _("Warning");
 
-    JOptionPane.showMessageDialog(new Frame(), message, title,
+    JOptionPane.showMessageDialog(base.getActiveEditor(), message, title,
                                   JOptionPane.WARNING_MESSAGE);
 
     if (e != null) e.printStackTrace();

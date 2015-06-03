@@ -274,6 +274,8 @@ public class Base {
     BaseNoGui.notifier = new GUIUserNotifier(this);
     this.recentSketchesMenuItems = new LinkedList<JMenuItem>();
 
+    BaseNoGui.checkInstallationFolder();
+
     String sketchbookPath = BaseNoGui.getSketchbookPath();
 
     // If no path is set, get the default sketchbook folder for this platform
