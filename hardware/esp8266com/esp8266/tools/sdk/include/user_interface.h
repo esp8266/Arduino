@@ -31,7 +31,7 @@ enum rst_reason {
 };
 
 struct rst_info {
-	uint32 reason;
+	uint32 flag;
 	uint32 exccause;
 	uint32 epc1;
 	uint32 epc2;
