@@ -284,7 +284,7 @@ extern uint8_t esp8266_gpioToFn[16];
 
 //SPI_READY
 #define SPIRDY    ESP8266_DREG(0x0C)
-#define SPIBUSY   9 //wait SPI idle
+#define SPI0BUSY   9 //wait SPI idle
 
 //SPI0 Registers (SPI0 is used for the flash)
 #define SPI0CMD		ESP8266_REG(0x200)
