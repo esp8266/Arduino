@@ -208,6 +208,21 @@ For stable use of the ESP8266 a power supply with 3V3 and >= 250mA is required.
 * Note
  - using Power from USB to Serial is may unstable, they not deliver enough current. 
  
+#### Serial Adapter ####
+ 
+There are many different USB to Serial adapters / boards.
+
+* Note
+ - for full upload management you need RTS and DTR
+ - the chip need to have 3V3 TTL (5V may damage the chip)
+ - not all board have all pins of the ICs as breakout (check before order)
+ - CTS and DSR are not useful for upload (they are Inputs)
+
+* Working ICs 
+ - FT232RL
+ - CP2102
+ - may others (drop a comment)
+  
 #### Minimal hardware Setup for Bootloading and usage ####
 
 ESPxx Hardware
