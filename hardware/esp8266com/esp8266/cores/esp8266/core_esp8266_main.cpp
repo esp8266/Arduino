@@ -129,8 +129,8 @@ void user_init(void) {
     uart_div_modify(0, UART_CLK_FREQ / (74480));
 
     system_rtc_mem_read(0, &resetInfo, sizeof(struct rst_info));
-    if(resetInfo.reason == WDT_RST_FLAG || resetInfo.reason == EXCEPTION_RST_FLAG) {
-        os_printf("Last Reset:\n - flag=%d\n - Fatal exception (%d):\n - epc1=0x%08x,epc2=0x%08x,epc3=0x%08x,excvaddr=0x%08x,depc=0x%08x\n", resetInfo.reason, resetInfo.exccause, resetInfo.epc1, resetInfo.epc2, resetInfo.epc3, resetInfo.excvaddr, resetInfo.depc);
+    if(resetInfo.flag == WDT_RST_FLAG || resetInfo.flag == EXP_RST_FLAG) {
+        os_printf("Last Reset:\n - flag=%d\n - Fatal exception (%d):\n - epc1=0x%08x,epc2=0x%08x,epc3=0x%08x,excvaddr=0x%08x,depc=0x%08x\n", resetInfo.flag, resetInfo.exccause, resetInfo.epc1, resetInfo.epc2, resetInfo.epc3, resetInfo.excvaddr, resetInfo.depc);
     }
     struct rst_info info = { 0 };
     system_rtc_mem_write(0, &info, sizeof(struct rst_info));
