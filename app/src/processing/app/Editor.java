@@ -2455,6 +2455,8 @@ public class Editor extends JFrame implements RunnerListener {
     statusNotice(_("Saving..."));
     try {
       if (sketch.saveAs()) {
+        base.storeRecentSketches(sketch);
+        base.rebuildRecentSketchesMenuItems();
         statusNotice(_("Done Saving."));
         // Disabling this for 0125, instead rebuild the menu inside
         // the Save As method of the Sketch object, since that's the
