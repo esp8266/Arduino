@@ -15,16 +15,16 @@ public class RegQueryParser {
   }
 
   private void parse(String regQueryOutput) {
-    List<String> rows = Arrays.asList(regQueryOutput.replace("\r", "\n").replace("\n\n", "\n").split("\n"));
+    List<String> rows = Arrays.asList(regQueryOutput.replace("    ", "\t").replace("\r", "\n").replace("\n\n", "\n").split("\n"));
 
     String row = Iterables.find(rows, new Predicate<String>() {
       @Override
       public boolean apply(String input) {
-        return input.startsWith("    ");
+        return input.startsWith("\t");
       }
     });
 
-    String[] cols = row.split("    ");
+    String[] cols = row.split("\t");
     assert cols.length == 4;
     this.valueOfKey = cols[3];
   }
