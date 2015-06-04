@@ -2471,8 +2471,17 @@ public class Base {
         }
       }
 
-      // is there a valid library?
       File libFolder = sourceFile;
+      if (FileUtils.isSubDirectory(new File(PreferencesData.get("sketchbook.path")), libFolder)) {
+        activeEditor.statusError(_("A subfolder of your sketchbook is not a valid library"));
+        return;
+      }
+
+      if (FileUtils.isSubDirectory(libFolder, new File(PreferencesData.get("sketchbook.path")))) {
+        activeEditor.statusError(_("You can't import a folder that contains your sketchbook"));
+        return;
+      }
+
       String libName = libFolder.getName();
       if (!BaseNoGui.isSanitaryName(libName)) {
         String mess = I18n.format(_("The library \"{0}\" cannot be used.\n"
