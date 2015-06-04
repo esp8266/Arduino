@@ -2483,6 +2483,17 @@ public class Base {
         return;
       }
 
+      String[] headers;
+      if (new File(libFolder, "library.properties").exists()) {
+        headers = BaseNoGui.headerListFromIncludePath(UserLibrary.create(libFolder).getSrcFolder());
+      } else {
+        headers = BaseNoGui.headerListFromIncludePath(libFolder);
+      }
+      if (headers.length == 0) {
+        activeEditor.statusError(_("Specified folder/zip file does not contain a valid library"));
+        return;
+      }
+
       // copy folder
       File destinationFolder = new File(BaseNoGui.getSketchbookLibrariesFolder(), sourceFile.getName());
       if (!destinationFolder.mkdir()) {
@@ -2496,6 +2507,8 @@ public class Base {
         return;
       }
       activeEditor.statusNotice(_("Library added to your libraries. Check \"Include library\" menu"));
+    } catch (IOException e) {
+      // FIXME error when importing. ignoring :(
     } finally {
       // delete zip created temp folder, if exists
       FileUtils.recursiveDelete(tmpFolder);
