@@ -124,6 +124,7 @@ public class Base {
   static public void main(String args[]) throws Exception {
     System.setProperty("awt.useSystemAAFontSettings", "on");
     System.setProperty("swing.aatext", "true");
+    System.setProperty("java.net.useSystemProxies", "true");
 
     splashScreenHelper.splashText(_("Loading configuration..."));
 
@@ -1748,8 +1749,6 @@ public class Base {
     if (activeEditor != null) {
       dialog.setLocationRelativeTo(activeEditor);
     }
-    dialog.pack();
-    dialog.setMinimumSize(dialog.getSize());
     dialog.setVisible(true);
   }
 

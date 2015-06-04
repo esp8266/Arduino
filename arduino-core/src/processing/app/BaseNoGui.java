@@ -742,8 +742,10 @@ public class BaseNoGui {
   }
 
   static public void main(String args[]) throws Exception {
-    if (args.length == 0)
+    if (args.length == 0) {
       showError(_("No parameters"), _("No command line parameters found"), null);
+    }
+    System.setProperty("java.net.useSystemProxies", "true");
 
     Runtime.getRuntime().addShutdownHook(new Thread(DeleteFilesOnShutdown.INSTANCE));
 

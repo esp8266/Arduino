@@ -220,19 +220,6 @@ public class Preferences extends javax.swing.JDialog {
     verboseUploadBox = new javax.swing.JCheckBox();
     javax.swing.JLabel comboWarningsLabel = new javax.swing.JLabel();
     comboWarnings = new JComboBox(warningItems);
-    javax.swing.JPanel proxySettingsPanel = new javax.swing.JPanel();
-    javax.swing.JLabel proxyHTTPServerLabel = new javax.swing.JLabel();
-    proxyHTTPServer = new javax.swing.JTextField();
-    javax.swing.JLabel proxyHTTPPortLabel = new javax.swing.JLabel();
-    proxyHTTPPort = new javax.swing.JTextField();
-    javax.swing.JLabel proxyHTTPSServerLabel = new javax.swing.JLabel();
-    proxyHTTPSServer = new javax.swing.JTextField();
-    javax.swing.JLabel proxyHTTPSPortLabel = new javax.swing.JLabel();
-    proxyHTTPSPort = new javax.swing.JTextField();
-    javax.swing.JLabel proxyUserLabel = new javax.swing.JLabel();
-    proxyUser = new javax.swing.JTextField();
-    javax.swing.JLabel proxyPasswordLabel = new javax.swing.JLabel();
-    proxyPassword = new javax.swing.JPasswordField();
     javax.swing.JLabel additionalBoardsManagerLabel = new javax.swing.JLabel();
     additionalBoardsManagerField = new javax.swing.JTextField();
     javax.swing.JButton extendedAdditionalUrlFieldWindow = new javax.swing.JButton();
@@ -281,93 +268,6 @@ public class Preferences extends javax.swing.JDialog {
     verboseUploadBox.setText(_("upload"));
 
     comboWarningsLabel.setText(_("Compiler warnings: "));
-
-    proxySettingsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(_("Proxy Settings")));
-
-    proxyHTTPServerLabel.setText(_("Server (HTTP):"));
-
-    proxyHTTPServer.setColumns(10);
-
-    proxyHTTPPortLabel.setText(_("Port (HTTP):"));
-
-    proxyHTTPPort.setColumns(10);
-
-    proxyHTTPSServerLabel.setText(_("Server (HTTPS):"));
-
-    proxyHTTPSServer.setColumns(10);
-
-    proxyHTTPSPortLabel.setText(_("Port (HTTPS):"));
-
-    proxyHTTPSPort.setColumns(10);
-
-    proxyUserLabel.setText(_("Username:"));
-
-    proxyUser.setColumns(10);
-
-    proxyPasswordLabel.setText(_("Password:"));
-
-    proxyPassword.setColumns(10);
-
-    javax.swing.GroupLayout proxySettingsPanelLayout = new javax.swing.GroupLayout(proxySettingsPanel);
-    proxySettingsPanel.setLayout(proxySettingsPanelLayout);
-    proxySettingsPanelLayout.setHorizontalGroup(
-      proxySettingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-        .addGroup(proxySettingsPanelLayout.createSequentialGroup()
-          .addContainerGap()
-          .addGroup(proxySettingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-            .addGroup(proxySettingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-              .addComponent(proxyHTTPSServerLabel)
-              .addGroup(proxySettingsPanelLayout.createSequentialGroup()
-                .addGap(8, 8, 8)
-                .addComponent(proxyHTTPServerLabel)))
-            .addComponent(proxyUserLabel))
-          .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-          .addGroup(proxySettingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(proxyHTTPServer)
-            .addComponent(proxyHTTPSServer)
-            .addComponent(proxyUser, javax.swing.GroupLayout.Alignment.TRAILING))
-          .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-          .addGroup(proxySettingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(proxyHTTPSPortLabel)
-            .addComponent(proxyPasswordLabel, javax.swing.GroupLayout.Alignment.TRAILING)
-            .addComponent(proxyHTTPPortLabel, javax.swing.GroupLayout.Alignment.TRAILING))
-          .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-          .addGroup(proxySettingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-            .addComponent(proxyHTTPSPort, javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(proxyHTTPPort, javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(proxyPassword, javax.swing.GroupLayout.Alignment.LEADING))
-          .addContainerGap())
-    );
-    proxySettingsPanelLayout.setVerticalGroup(
-      proxySettingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-        .addGroup(proxySettingsPanelLayout.createSequentialGroup()
-          .addGroup(proxySettingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(proxySettingsPanelLayout.createSequentialGroup()
-              .addGroup(proxySettingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(proxyHTTPServerLabel)
-                .addComponent(proxyHTTPServer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-              .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-              .addGroup(proxySettingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(proxyHTTPSServerLabel)
-                .addComponent(proxyHTTPSServer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-              .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-              .addGroup(proxySettingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(proxyUser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(proxyUserLabel)))
-            .addGroup(proxySettingsPanelLayout.createSequentialGroup()
-              .addGroup(proxySettingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(proxyHTTPPortLabel)
-                .addComponent(proxyHTTPPort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-              .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-              .addGroup(proxySettingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(proxyHTTPSPort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(proxyHTTPSPortLabel))
-              .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-              .addGroup(proxySettingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(proxyPasswordLabel)
-                .addComponent(proxyPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-          .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-    );
 
     additionalBoardsManagerLabel.setText(_("Additional Boards Manager URLs: "));
     additionalBoardsManagerLabel.setToolTipText(_("Enter a comma separated list of urls"));
@@ -446,21 +346,28 @@ public class Preferences extends javax.swing.JDialog {
         .addGroup(layout.createSequentialGroup()
           .addContainerGap()
           .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(proxySettingsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
               .addComponent(sketchbookLocationField)
               .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
               .addComponent(browseButton))
             .addComponent(checkboxesContainer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+              .addComponent(okButton)
+              .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+              .addComponent(cancelButton))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+              .addComponent(additionalBoardsManagerLabel)
+              .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+              .addComponent(additionalBoardsManagerField, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
+              .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+              .addComponent(extendedAdditionalUrlFieldWindow, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addGroup(layout.createSequentialGroup()
               .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(arduinoNotRunningLabel)
                 .addComponent(sketchbookLocationLabel)
                 .addGroup(layout.createSequentialGroup()
                   .addComponent(comboWarningsLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(comboWarnings, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addComponent(morePreferencesLabel)
                 .addGroup(layout.createSequentialGroup()
                   .addComponent(showVerboseLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -478,18 +385,10 @@ public class Preferences extends javax.swing.JDialog {
                       .addComponent(comboLanguage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                       .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                       .addComponent(requiresRestartLabel))))
+                .addComponent(arduinoNotRunningLabel)
+                .addComponent(morePreferencesLabel)
                 .addComponent(preferencesFileLabel))
-              .addGap(0, 0, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-              .addComponent(okButton)
-              .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-              .addComponent(cancelButton))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-              .addComponent(additionalBoardsManagerLabel)
-              .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-              .addComponent(additionalBoardsManagerField, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
-              .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-              .addComponent(extendedAdditionalUrlFieldWindow, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)))
+              .addGap(0, 0, Short.MAX_VALUE)))
           .addContainerGap())
     );
     layout.setVerticalGroup(
@@ -522,8 +421,6 @@ public class Preferences extends javax.swing.JDialog {
           .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
           .addComponent(checkboxesContainer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
           .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-          .addComponent(proxySettingsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-          .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
           .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
               .addComponent(additionalBoardsManagerLabel)
@@ -539,7 +436,7 @@ public class Preferences extends javax.swing.JDialog {
           .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
             .addComponent(cancelButton)
             .addComponent(okButton))
-          .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+          .addContainerGap())
     );
 
     pack();
@@ -612,12 +509,6 @@ public class Preferences extends javax.swing.JDialog {
   private javax.swing.JCheckBox externalEditorBox;
   private javax.swing.JTextField fontSizeField;
   private javax.swing.JLabel preferencesFileLabel;
-  private javax.swing.JTextField proxyHTTPPort;
-  private javax.swing.JTextField proxyHTTPSPort;
-  private javax.swing.JTextField proxyHTTPSServer;
-  private javax.swing.JTextField proxyHTTPServer;
-  private javax.swing.JPasswordField proxyPassword;
-  private javax.swing.JTextField proxyUser;
   private javax.swing.JCheckBox saveVerifyUploadBox;
   private javax.swing.JTextField sketchbookLocationField;
   private javax.swing.JCheckBox updateExtensionBox;
@@ -686,21 +577,6 @@ public class Preferences extends javax.swing.JDialog {
 
     PreferencesData.setBoolean("editor.save_on_verify", saveVerifyUploadBox.isSelected());
 
-    PreferencesData.set("proxy.http.server", proxyHTTPServer.getText());
-    try {
-      PreferencesData.set("proxy.http.port", Integer.valueOf(proxyHTTPPort.getText()).toString());
-    } catch (NumberFormatException e) {
-      PreferencesData.remove("proxy.http.port");
-    }
-    PreferencesData.set("proxy.https.server", proxyHTTPSServer.getText());
-    try {
-      PreferencesData.set("proxy.https.port", Integer.valueOf(proxyHTTPSPort.getText()).toString());
-    } catch (NumberFormatException e) {
-      PreferencesData.remove("proxy.https.port");
-    }
-    PreferencesData.set("proxy.user", proxyUser.getText());
-    PreferencesData.set("proxy.password", new String(proxyPassword.getPassword()));
-
     PreferencesData.set("boardsmanager.additional.urls", additionalBoardsManagerField.getText().replace("\r\n", "\n").replace("\r", "\n").replace("\n", ","));
 
     //editor.applyPreferences();
@@ -742,21 +618,6 @@ public class Preferences extends javax.swing.JDialog {
     updateExtensionBox.setSelected(PreferencesData.get("editor.update_extension") == null || PreferencesData.getBoolean("editor.update_extension"));
 
     saveVerifyUploadBox.setSelected(PreferencesData.getBoolean("editor.save_on_verify"));
-
-    proxyHTTPServer.setText(PreferencesData.get("proxy.http.server"));
-    try {
-      proxyHTTPPort.setText(Integer.toString(PreferencesData.getInteger("proxy.http.port", 8080)));
-    } catch (NumberFormatException e) {
-      proxyHTTPPort.setText("");
-    }
-    proxyHTTPSServer.setText(PreferencesData.get("proxy.https.server"));
-    try {
-      proxyHTTPSPort.setText(Integer.toString(PreferencesData.getInteger("proxy.https.port", 8443)));
-    } catch (NumberFormatException e) {
-      proxyHTTPSPort.setText("");
-    }
-    proxyUser.setText(PreferencesData.get("proxy.user"));
-    proxyPassword.setText(PreferencesData.get("proxy.password"));
 
     additionalBoardsManagerField.setText(PreferencesData.get("boardsmanager.additional.urls"));
   }
