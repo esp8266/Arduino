@@ -206,6 +206,28 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 Pick the correct serial port.
 You need to put ESP8266 into bootloader mode before uploading code.
 
+#### Power Supply ####
+
+For stable use of the ESP8266 a power supply with 3V3 and >= 250mA is required.
+
+* Note
+ - using Power from USB to Serial is may unstable, they not deliver enough current. 
+ 
+#### Serial Adapter ####
+ 
+There are many different USB to Serial adapters / boards.
+
+* Note
+ - for full upload management you need RTS and DTR
+ - the chip need to have 3V3 TTL (5V may damage the chip)
+ - not all board have all pins of the ICs as breakout (check before order)
+ - CTS and DSR are not useful for upload (they are Inputs)
+
+* Working ICs 
+ - FT232RL
+ - CP2102
+ - may others (drop a comment)
+  
 #### Minimal hardware Setup for Bootloading and usage ####
 
 ESPxx Hardware
@@ -226,26 +248,43 @@ ESPxx Hardware
  - Reset is also named RSBT or REST (adding PullUp improves the stability of the Module)
  - GPIO2 is alternative TX for the boot loader mode
  
-ESP01 example:
-
-![ESP01 connect](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/ESP01_connect.jpg)
+###### esp to Serial
+![ESP to Serial](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/ESP_to_serial.png)
 
 #### Minimal hardware Setup for Bootloading only ####
 ESPxx Hardware
 
-| PIN           | Resistor | Serial Adapter |
-| ------------- | -------- | -------------- | 
-| VCC           |          | VCC (3.3V)     |
-| GND           |          | GND            |
-| TX or GPIO2   |          | RX             |
-| RX            |          | TX             |
-| GPIO0         |          | GND            |
+| PIN           | Resistor | Serial Adapter  |
+| ------------- | -------- | --------------- | 
+| VCC           |          | VCC (3.3V)      |
+| GND           |          | GND             |
+| TX or GPIO2   |          | RX              |
+| RX            |          | TX              |
+| GPIO0         |          | GND             |
 | Reset         |          | RTS*            |
-| GPIO15        | PullDown |                |
-| CH_PD         | PullUp   |                |
+| GPIO15        | PullDown |                 |
+| CH_PD         | PullUp   |                 |
 
 * Note 
 	- if no RTS is used a manual power toggle is needed
+	 
+#### Minimal hardware Setup for running only ####
+
+ESPxx Hardware
+
+| PIN           | Resistor | Power supply    |
+| ------------- | -------- | --------------- | 
+| VCC           |          | VCC (3.3V)      |
+| GND           |          | GND             |
+| GPIO0         | PullUp   |                 |
+| GPIO15        | PullDown |                 |
+| CH_PD         | PullUp   |                 |
+
+###### minimal
+![ESP min](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/ESP_min.png)
+
+###### improved stability
+![ESP improved stability](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/ESP_improved_stability.png)	
 
 ### Issues and support ###
 
