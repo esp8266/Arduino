@@ -25,6 +25,7 @@
 
 #include "ESP8266WiFiMulti.h"
 #include <limits.h>
+#include <string.h>
 
 ESP8266WiFiMulti::ESP8266WiFiMulti() {
 }
@@ -151,7 +152,7 @@ bool ESP8266WiFiMulti::APlistAdd(const char* ssid, const char *passphrase) {
 
     WifiAPlist_t newAP;
 
-    if(!ssid || strlen(ssid) > 31) {
+    if(!ssid || *ssid == 0x00 || strlen(ssid) > 31) {
         // fail SSID to long or missing!
         return false;
     }
@@ -161,21 +162,18 @@ bool ESP8266WiFiMulti::APlistAdd(const char* ssid, const char *passphrase) {
         return false;
     }
 
-    newAP.ssid = (char*) malloc((strlen(ssid) + 1));
+    newAP.ssid = strdup(ssid);
 
     if(!newAP.ssid) {
         return false;
     }
 
-    strcpy(newAP.ssid, ssid);
-
     if(passphrase && *passphrase != 0x00) {
-        newAP.passphrase = (char*) malloc((strlen(passphrase) + 1));
+        newAP.passphrase = strdup(passphrase);
         if(!newAP.passphrase) {
             free(newAP.ssid);
             return false;
         }
-        strcpy(newAP.passphrase, passphrase);
     }
 
     APlist.push_back(newAP);
