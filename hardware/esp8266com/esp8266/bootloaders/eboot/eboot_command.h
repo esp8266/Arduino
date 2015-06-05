@@ -23,7 +23,8 @@ struct eboot_command {
 };
 
 
-void eboot_command_read(struct eboot_command* cmd);
-
+int eboot_command_read(struct eboot_command* cmd);
+void eboot_command_write(struct eboot_command* cmd);
+void eboot_command_clear();
 
 #endif //EBOOT_COMMAND_H
