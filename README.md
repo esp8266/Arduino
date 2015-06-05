@@ -184,18 +184,24 @@ Allows the sketch to respond to multicast DNS queries for domain names like "foo
 Currently the library only works on STA interface, AP interface is not supported.
 See attached example and library README file for details.
 
+#### Servo ####
+
+This library exposes the ability to control RC (hobby) servo motors. It will support upto 24 servos on any available output pin. By defualt the first 12 servos will use Timer0 and currently this will not interfere with any other support.  Servo counts above 12 will use Timer1 and features that use it will be effected.
+While many RC servo motors will accept the 3.3v IO data pin from a esp8266, most will not be able to run off 3.3v and will require another power source that matches their specifications.  Make sure to connect the grounds between the esp8266 and the servo motor power supply.
+
 #### Other libraries (not included with the IDE)
 
 Libraries that don't rely on low-level access to AVR registers should work well. Here are a few libraries that were verified to work:
 
-- [aREST](https://github.com/marcoschwartz/aREST) REST API handler library.
-- [PubSubClient](https://github.com/Imroy/pubsubclient) MQTT library by @Imroy.
-- [DHT11](https://github.com/adafruit/DHT-sensor-library) - initialize DHT as follows: ```DHT dht(DHTPIN, DHTTYPE, 15);```
-- [DallasTemperature](https://github.com/milesburton/Arduino-Temperature-Control-Library.git)
-- [NeoPixelBus](https://github.com/Makuna/NeoPixelBus) - Arduino NeoPixel library compatible with esp8266.
-- [RTC](https://github.com/Makuna/Rtc) - Arduino Library for Ds1307 & Ds3231 compatible with esp8266.
-- [Blynk](https://github.com/blynkkk/blynk-library) - easy IoT framework for Makers (check out the [Kickstarter page](http://tiny.cc/blynk-kick)).
 - [arduinoWebSockets](https://github.com/Links2004/arduinoWebSockets) - WebSocket Server and Client compatible with esp8266 (RFC6455)
+- [aREST](https://github.com/marcoschwartz/aREST) REST API handler library.
+- [Blynk](https://github.com/blynkkk/blynk-library) - easy IoT framework for Makers (check out the [Kickstarter page](http://tiny.cc/blynk-kick)).
+- [DallasTemperature](https://github.com/milesburton/Arduino-Temperature-Control-Library.git)
+- [DHT11](https://github.com/adafruit/DHT-sensor-library) - initialize DHT as follows: ```DHT dht(DHTPIN, DHTTYPE, 15);```
+- [NeoPixelBus](https://github.com/Makuna/NeoPixelBus) - Arduino NeoPixel library compatible with esp8266.
+- [PubSubClient](https://github.com/Imroy/pubsubclient) MQTT library by @Imroy.
+- [RTC](https://github.com/Makuna/Rtc) - Arduino Library for Ds1307 & Ds3231 compatible with esp8266.
+- [Souliss, Smart Home](https://github.com/souliss/souliss) - Framework for Smart Home based on Arduino, Android and openHAB.
 
 #### Upload via serial port ####
 Pick the correct serial port.

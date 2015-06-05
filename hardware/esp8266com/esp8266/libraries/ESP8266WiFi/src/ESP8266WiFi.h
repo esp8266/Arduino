@@ -75,7 +75,6 @@ public:
      */
     void softAP(const char* ssid, const char* passphrase, int channel = 1);
 
-
     /* Change Ip configuration settings disabling the dhcp client
         *
         * param local_ip: 	Static ip configuration
@@ -84,6 +83,15 @@ public:
         */
     void config(IPAddress local_ip, IPAddress gateway, IPAddress subnet);
 
+	/* Change Ip configuration settings disabling the dhcp client
+        *
+        * param local_ip: 	Static ip configuration
+        * param gateway: 	Static gateway configuration
+        * param subnet:		Static Subnet mask
+		* param dns: 		Defined DNS
+        */
+    void config(IPAddress local_ip, IPAddress gateway, IPAddress subnet, IPAddress dns);
+	
     /* Configure access point
      *
      * param local_ip: access point IP
@@ -310,7 +318,8 @@ protected:
 
     bool _useApMode;
     bool _useClientMode;
-
+	bool _useStaticIp;
+	
     static size_t _scanCount;
     static void* _scanResult;
 
