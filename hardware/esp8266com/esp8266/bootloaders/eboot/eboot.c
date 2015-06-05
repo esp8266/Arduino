@@ -9,9 +9,8 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include "eboot.h"
+#include "flash.h"
 #include "eboot_command.h"
-extern void* flashchip;
 
 #define SWRST do { (*((volatile uint32_t*) 0x60000700)) |= 0x80000000; } while(0);
 
@@ -73,53 +72,21 @@ int load_app_from_flash_raw(const uint32_t flash_addr)
 
 
 
-int erase(const uint32_t start, const uint32_t size)
-{
-    if (start & (FLASH_SECTOR_SIZE - 1) != 0) {
-        return 1;
-    }
-
-    const uint32_t sectors_per_block = FLASH_BLOCK_SIZE / FLASH_SECTOR_SIZE;
-    uint32_t current_sector = start / FLASH_SECTOR_SIZE;
-    uint32_t sector_count = (size + FLASH_SECTOR_SIZE - 1) / FLASH_SECTOR_SIZE;
-    const uint32_t end = current_sector + sector_count;
-
-    for (; current_sector < end && (current_sector & (sectors_per_block-1)); 
-        ++current_sector, --sector_count) {
-        if (SPIEraseSector(current_sector)) {
-            return 2;
-        }
-    }
-
-    for (;current_sector + sectors_per_block <= end; 
-        current_sector += sectors_per_block, 
-        sector_count -= sectors_per_block) {
-        if (SPIEraseBlock(current_sector / sectors_per_block)) {
-            return 3;
-        }
-    }
-
-    for (; current_sector < end; 
-        ++current_sector, --sector_count) {
-        if (SPIEraseSector(current_sector)) {
-            return 4;
-        }
-    }
-
-    return 0;
-}
-
 int copy_raw(const uint32_t src_addr, 
              const uint32_t dst_addr, 
              const uint32_t size)
 {
+    ets_putc('\n');
+    ets_putc('c');
+    ets_putc('p');
+    ets_putc('\n');
     // require regions to be aligned
     if (src_addr & 0xfff != 0 ||
         dst_addr & 0xfff != 0) {
         return 1;
     }
 
-    if (erase(dst_addr, size)) {
+    if (SPIEraseAreaEx(dst_addr, size)) {
         return 2;
     }
 
@@ -153,17 +120,25 @@ void main()
     int res = 9;
     struct eboot_command cmd;
 
-    eboot_command_read(&cmd);
+    if (eboot_command_read(&cmd)) {
+        cmd.action = ACTION_LOAD_APP;
+        cmd.args[0] = 0;
+        ets_putc('e');
+    } else {
+        ets_putc('@');
+    }
+    eboot_command_clear();
 
     if (cmd.action == ACTION_COPY_RAW) {
         res = copy_raw(cmd.args[0], cmd.args[1], cmd.args[2]);
         if (res == 0) {
             cmd.action = ACTION_LOAD_APP;
+            cmd.args[0] = cmd.args[1];
         }
     }
 
     if (cmd.action == ACTION_LOAD_APP) {
-        res = load_app_from_flash_raw(0);
+        res = load_app_from_flash_raw(cmd.args[0]);
     }
 
     if (res) {

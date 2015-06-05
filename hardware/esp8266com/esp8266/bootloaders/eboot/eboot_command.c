@@ -28,7 +28,7 @@ uint32_t eboot_command_calculate_crc32(const struct eboot_command* cmd)
                       offsetof(struct eboot_command, crc32));
 }
 
-void eboot_command_read(struct eboot_command* cmd)
+int eboot_command_read(struct eboot_command* cmd)
 {
     const uint32_t dw_count = sizeof(struct eboot_command) / sizeof(uint32_t);
     uint32_t* dst = (uint32_t *) cmd;
@@ -39,9 +39,27 @@ void eboot_command_read(struct eboot_command* cmd)
     uint32_t crc32 = eboot_command_calculate_crc32(cmd);
     if (cmd->magic & EBOOT_MAGIC_MASK != EBOOT_MAGIC || 
         cmd->crc32 != crc32) {
-        
-        cmd->action = ACTION_LOAD_APP;
-        cmd->args[0] = 0;
+        return 1;
     }
+
+    return 0;
+}
+
+void eboot_command_write(struct eboot_command* cmd)
+{
+    cmd->magic = EBOOT_MAGIC;
+    cmd->crc32 = eboot_command_calculate_crc32(cmd);
+
+    const uint32_t dw_count = sizeof(struct eboot_command) / sizeof(uint32_t);
+    const uint32_t* src = (const uint32_t *) cmd;
+    for (uint32_t i = 0; i < dw_count; ++i) {
+        RTC_MEM[i] = src[i];
+    }
+}
+
+void eboot_command_clear()
+{
+    RTC_MEM[offsetof(struct eboot_command, magic) / sizeof(uint32_t)] = 0;
+    RTC_MEM[offsetof(struct eboot_command, crc32) / sizeof(uint32_t)] = 0;
 }
 
