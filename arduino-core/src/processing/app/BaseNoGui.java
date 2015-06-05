@@ -427,6 +427,9 @@ public class BaseNoGui {
   }
 
   static public void init(String[] args) throws Exception {
+    CommandlineParser parser = new CommandlineParser(args);
+    parser.parseArgumentsPhase1();
+
     String sketchbookPath = getSketchbookPath();
   
     // If no path is set, get the default sketchbook folder for this platform
@@ -436,13 +439,13 @@ public class BaseNoGui {
       else
         showError(_("No sketchbook"), _("Sketchbook path not defined"), null);
     }
-  
+
     BaseNoGui.initPackages();
     
     // Setup board-dependent variables.
     onBoardOrPortChange();
-  
-    CommandlineParser parser = CommandlineParser.newCommandlineParser(args);
+
+    parser.parseArgumentsPhase2();
 
     for (String path: parser.getFilenames()) {
       // Correctly resolve relative paths

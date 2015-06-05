@@ -275,6 +275,9 @@ public class Base {
     BaseNoGui.notifier = new GUIUserNotifier(this);
     this.recentSketchesMenuItems = new LinkedList<JMenuItem>();
 
+    CommandlineParser parser = new CommandlineParser(args);
+    parser.parseArgumentsPhase1();
+
     BaseNoGui.checkInstallationFolder();
 
     String sketchbookPath = BaseNoGui.getSketchbookPath();
@@ -302,7 +305,7 @@ public class Base {
     this.pdeKeywords = new PdeKeywords();
     this.pdeKeywords.reload();
 
-    CommandlineParser parser = CommandlineParser.newCommandlineParser(args);
+    parser.parseArgumentsPhase2();
 
     for (String path : parser.getFilenames()) {
       // Correctly resolve relative paths
