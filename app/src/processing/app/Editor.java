@@ -989,6 +989,7 @@ public class Editor extends JFrame implements RunnerListener {
 
   private SketchTextArea createTextArea() throws IOException {
     final SketchTextArea textArea = new SketchTextArea(base.getPdeKeywords());
+    textArea.setFocusTraversalKeysEnabled(false);
     textArea.requestFocusInWindow();
     textArea.setMarkOccurrences(PreferencesData.getBoolean("editor.advanced"));
     textArea.setMarginLineEnabled(false);
