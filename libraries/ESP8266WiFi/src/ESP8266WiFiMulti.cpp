@@ -72,7 +72,6 @@ wl_status_t ESP8266WiFiMulti::run(void) {
 
                 WiFi.getNetworkInfo(i, ssid_scan, sec_scan, rssi_scan, BSSID_scan, chan_scan, hidden_scan);
 
-
                 bool known = false;
                 for(uint32_t x = 0; x < APlist.size(); x++) {
                     WifiAPlist_t entry = APlist[x];
@@ -152,7 +151,17 @@ bool ESP8266WiFiMulti::APlistAdd(const char* ssid, const char *passphrase) {
 
     WifiAPlist_t newAP;
 
-    newAP.ssid = (char*) malloc(strlen(ssid));
+    if(!ssid || strlen(ssid) > 31) {
+        // fail SSID to long or missing!
+        return false;
+    }
+
+    if(passphrase && strlen(passphrase) > 63) {
+        // fail passphrase to long!
+        return false;
+    }
+
+    newAP.ssid = (char*) malloc((strlen(ssid) + 1));
 
     if(!newAP.ssid) {
         return false;
@@ -161,15 +170,13 @@ bool ESP8266WiFiMulti::APlistAdd(const char* ssid, const char *passphrase) {
     strcpy(newAP.ssid, ssid);
 
     if(passphrase && *passphrase != 0x00) {
-        newAP.passphrase = (char*) malloc(strlen(passphrase));
+        newAP.passphrase = (char*) malloc((strlen(passphrase) + 1));
+        if(!newAP.passphrase) {
+            free(newAP.ssid);
+            return false;
+        }
+        strcpy(newAP.passphrase, passphrase);
     }
-
-    if(!newAP.passphrase) {
-        free(newAP.ssid);
-        return false;
-    }
-
-    strcpy(newAP.passphrase, passphrase);
 
     APlist.push_back(newAP);
     return true;
