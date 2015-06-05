@@ -19,8 +19,8 @@
 #define c_memset os_memset
 
 typedef signed short file_t;
-typedef long int s32_t;
-typedef long unsigned int u32_t;
+typedef int32_t s32_t;
+typedef uint32_t u32_t;
 typedef int16_t s16_t;
 typedef uint16_t u16_t;
 typedef int8_t s8_t;
