@@ -278,7 +278,7 @@ static uint8_t esp8266_gpioToFn[16] = {0x34, 0x18, 0x38, 0x14, 0x3C, 0x40, 0x1C,
 
 //SPI_READY
 #define SPIRDY    ESP8266_DREG(0x0C)
-#define SPIBUSY   9 //wait SPI idle
+#define SPI_BUSY   9 //wait SPI idle
 
 //SPI0 Registers (SPI0 is used for the flash)
 #define SPI0CMD		ESP8266_REG(0x200)
