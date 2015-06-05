@@ -591,7 +591,7 @@ public class Editor extends JFrame implements RunnerListener {
     fileMenu.add(item);
 
     base.rebuildRecentSketchesMenuItems();
-    recentSketchesMenu = new JMenu(_("Recent"));
+    recentSketchesMenu = new JMenu(_("Open Recent"));
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
