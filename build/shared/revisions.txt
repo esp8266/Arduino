@@ -20,6 +20,8 @@ ARDUINO 1.6.5
 [libraries]
 * LiquidCrystal fixes. Thanks @newbie15
 * Added SPI Transactions to TFT lib
+* Stepper: support for 5-phase/5-wires motors. Thanks @rdodesigns
+* Stepper: increased precision in timing calculations. Thanks @ekozlenko
 
 [core]
 * AVR: delayMicroseconds(..) doesn't hang if called with 0. Thanks @cano64
