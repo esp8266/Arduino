@@ -24,5 +24,6 @@ typedef void (*sc_callback_t)(sc_status status, void *pdata);
 const char *smartconfig_get_version(void);
 bool smartconfig_start(sc_type type, sc_callback_t cb, ...);
 bool smartconfig_stop(void);
+bool esptouch_set_timeout(uint8 time_s); //15s~255s, offset:45s
 
 #endif
