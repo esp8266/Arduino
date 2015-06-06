@@ -209,6 +209,7 @@ void loop(void);
 // This comes from the pins_*.c file for the active board configuration.
 #define digitalPinToPort(pin)       (0)
 #define digitalPinToBitMask(pin)    (1UL << (pin))
+#define digitalPinToTimer(pin)      (0)
 #define portOutputRegister(port)    ((volatile uint32_t*) GPO)
 #define portInputRegister(port)     ((volatile uint32_t*) GPI)
 #define portModeRegister(port)      ((volatile uint32_t*) GPE)
@@ -216,6 +217,7 @@ void loop(void);
 #define NOT_A_PIN -1
 #define NOT_A_PORT -1
 #define NOT_AN_INTERRUPT -1
+#define NOT_ON_TIMER 0
 
 #ifdef __cplusplus
 } // extern "C"
