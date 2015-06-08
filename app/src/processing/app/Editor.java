@@ -524,6 +524,7 @@ public class Editor extends JFrame implements RunnerListener {
     menubar.add(buildEditMenu());
 
     final JMenu sketchMenu = new JMenu(_("Sketch"));
+    sketchMenu.setMnemonic(KeyEvent.VK_S);
     sketchMenu.addMenuListener(new StubMenuListener() {
 
       @Override
@@ -565,6 +566,7 @@ public class Editor extends JFrame implements RunnerListener {
   private JMenu buildFileMenu() {
     JMenuItem item;
     fileMenu = new JMenu(_("File"));
+    fileMenu.setMnemonic(KeyEvent.VK_F);
 
     item = newJMenuItem(_("New"), 'N');
     item.addActionListener(new ActionListener() {
@@ -762,6 +764,7 @@ public class Editor extends JFrame implements RunnerListener {
 
   private JMenu buildToolsMenu() {
     toolsMenu = new JMenu(_("Tools"));
+    toolsMenu.setMnemonic(KeyEvent.VK_T);
 
     addInternalTools(toolsMenu);
 
@@ -1170,6 +1173,7 @@ public class Editor extends JFrame implements RunnerListener {
     // To deal with a Mac OS X 10.5 bug, add an extra space after the name
     // so that the OS doesn't try to insert its slow help menu.
     JMenu menu = new JMenu(_("Help"));
+    menu.setMnemonic(KeyEvent.VK_H);
     JMenuItem item;
 
     /*
@@ -1330,6 +1334,7 @@ public class Editor extends JFrame implements RunnerListener {
   private JMenu buildEditMenu() {
     JMenu menu = new JMenu(_("Edit"));
     menu.setName("menuEdit");
+    menu.setMnemonic(KeyEvent.VK_E);
 
     undoItem = newJMenuItem(_("Undo"), 'Z');
     undoItem.setName("menuEditUndo");
