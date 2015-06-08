@@ -42,30 +42,30 @@ extern "C"
 
 uint16_t WiFiClient::_localPort = 0;
 
-ICACHE_FLASH_ATTR WiFiClient::WiFiClient() 
+WiFiClient::WiFiClient() 
 : _client(0)
 {
 }
 
-ICACHE_FLASH_ATTR WiFiClient::WiFiClient(ClientContext* client) : _client(client)
+WiFiClient::WiFiClient(ClientContext* client) : _client(client)
 {
     _client->ref();
 }
 
-ICACHE_FLASH_ATTR WiFiClient::~WiFiClient()
+WiFiClient::~WiFiClient()
 {
     if (_client)
         _client->unref();
 }
 
-ICACHE_FLASH_ATTR WiFiClient::WiFiClient(const WiFiClient& other)
+WiFiClient::WiFiClient(const WiFiClient& other)
 {
     _client = other._client;
     if (_client)
         _client->ref();
 }
 
-WiFiClient& ICACHE_FLASH_ATTR  WiFiClient::operator=(const WiFiClient& other)
+WiFiClient& WiFiClient::operator=(const WiFiClient& other)
 {
    if (_client)
         _client->unref(); 
@@ -76,7 +76,7 @@ WiFiClient& ICACHE_FLASH_ATTR  WiFiClient::operator=(const WiFiClient& other)
 }
 
 
-int ICACHE_FLASH_ATTR  WiFiClient::connect(const char* host, uint16_t port) 
+int WiFiClient::connect(const char* host, uint16_t port) 
 {
     IPAddress remote_addr;
     if (WiFi.hostByName(host, remote_addr))
@@ -86,7 +86,7 @@ int ICACHE_FLASH_ATTR  WiFiClient::connect(const char* host, uint16_t port)
     return 0;
 }
 
-int ICACHE_FLASH_ATTR  WiFiClient::connect(IPAddress ip, uint16_t port) 
+int WiFiClient::connect(IPAddress ip, uint16_t port) 
 {
     if (_client)
         stop();
@@ -114,7 +114,7 @@ int ICACHE_FLASH_ATTR  WiFiClient::connect(IPAddress ip, uint16_t port)
     return 0;
 }
 
-int8_t ICACHE_FLASH_ATTR WiFiClient::_connected(void* pcb, int8_t err)
+int8_t WiFiClient::_connected(void* pcb, int8_t err)
 {
     tcp_pcb* tpcb = reinterpret_cast<tcp_pcb*>(pcb);
     _client = new ClientContext(tpcb, 0, 0);
@@ -123,31 +123,31 @@ int8_t ICACHE_FLASH_ATTR WiFiClient::_connected(void* pcb, int8_t err)
     return ERR_OK;
 }
 
-void ICACHE_FLASH_ATTR WiFiClient::_err(int8_t err)
+void WiFiClient::_err(int8_t err)
 {
     DEBUGV(":err %d\r\n", err);
     esp_schedule();
 }
 
 
-void ICACHE_FLASH_ATTR WiFiClient::setNoDelay(bool nodelay) {
+void WiFiClient::setNoDelay(bool nodelay) {
     if (!_client)
         return;
     _client->setNoDelay(nodelay);
 }
 
-bool ICACHE_FLASH_ATTR WiFiClient::getNoDelay() {
+bool WiFiClient::getNoDelay() {
     if (!_client)
         return false;
     return _client->getNoDelay();
 }
 
-size_t ICACHE_FLASH_ATTR WiFiClient::write(uint8_t b) 
+size_t WiFiClient::write(uint8_t b) 
 {
     return write(&b, 1);
 }
 
-size_t ICACHE_FLASH_ATTR WiFiClient::write(const uint8_t *buf, size_t size) 
+size_t WiFiClient::write(const uint8_t *buf, size_t size) 
 {
     if (!_client || !size)
     {
@@ -159,7 +159,7 @@ size_t ICACHE_FLASH_ATTR WiFiClient::write(const uint8_t *buf, size_t size)
 
 extern "C" uint32_t esp_micros_at_task_start();
 
-int ICACHE_FLASH_ATTR WiFiClient::available()
+int WiFiClient::available()
 {
     static uint32_t lastPollTime = 0;
     if (!_client)
@@ -174,7 +174,7 @@ int ICACHE_FLASH_ATTR WiFiClient::available()
     return result;
 }
 
-int ICACHE_FLASH_ATTR WiFiClient::read() 
+int WiFiClient::read() 
 {
     if (!available())
         return -1;
@@ -183,12 +183,12 @@ int ICACHE_FLASH_ATTR WiFiClient::read()
 }
 
 
-int ICACHE_FLASH_ATTR WiFiClient::read(uint8_t* buf, size_t size) 
+int WiFiClient::read(uint8_t* buf, size_t size) 
 {
     return (int) _client->read(reinterpret_cast<char*>(buf), size);
 }
 
-int ICACHE_FLASH_ATTR WiFiClient::peek() 
+int WiFiClient::peek() 
 {
     if (!available())
         return -1;
@@ -196,13 +196,13 @@ int ICACHE_FLASH_ATTR WiFiClient::peek()
     return _client->peek();
 }
 
-void ICACHE_FLASH_ATTR WiFiClient::flush() 
+void WiFiClient::flush() 
 {
     if (_client)
         _client->flush();
 }
 
-void ICACHE_FLASH_ATTR WiFiClient::stop() 
+void WiFiClient::stop() 
 {
     if (!_client)
         return;
@@ -211,7 +211,7 @@ void ICACHE_FLASH_ATTR WiFiClient::stop()
     _client = 0;
 }
 
-uint8_t ICACHE_FLASH_ATTR WiFiClient::connected() 
+uint8_t WiFiClient::connected() 
 {
     if (!_client)
         return 0;
@@ -219,14 +219,14 @@ uint8_t ICACHE_FLASH_ATTR WiFiClient::connected()
     return _client->state() == ESTABLISHED || available();
 }
 
-uint8_t ICACHE_FLASH_ATTR WiFiClient::status() 
+uint8_t WiFiClient::status() 
 {
     if (!_client)
         return CLOSED;
     return _client->state();
 }
 
-ICACHE_FLASH_ATTR  WiFiClient::operator bool() 
+ WiFiClient::operator bool() 
 {
     return _client != 0;
 }
@@ -247,12 +247,12 @@ uint16_t WiFiClient::remotePort()
     return _client->getRemotePort();
 }
 
-int8_t ICACHE_FLASH_ATTR WiFiClient::_s_connected(void* arg, void* tpcb, int8_t err)
+int8_t WiFiClient::_s_connected(void* arg, void* tpcb, int8_t err)
 {
     return reinterpret_cast<WiFiClient*>(arg)->_connected(tpcb, err);
 }
 
-void ICACHE_FLASH_ATTR WiFiClient::_s_err(void* arg, int8_t err)
+void WiFiClient::_s_err(void* arg, int8_t err)
 {
     reinterpret_cast<WiFiClient*>(arg)->_err(err);
 }
