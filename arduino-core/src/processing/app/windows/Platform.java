@@ -130,7 +130,7 @@ public class Platform extends processing.app.Platform {
     // "Access is denied" in both cygwin and the "dos" prompt.
     //Runtime.getRuntime().exec("cmd /c " + currentDir + "\\reference\\" +
     //                    referenceFile + ".html");
-    if (url.startsWith("http")) {
+    if (url.startsWith("http") || url.startsWith("file:")) {
       // open dos prompt, give it 'start' command, which will
       // open the url properly. start by itself won't work since
       // it appears to need cmd

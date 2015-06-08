@@ -1006,7 +1006,7 @@ public class Editor extends JFrame implements RunnerListener {
       @Override
       public void hyperlinkUpdate(HyperlinkEvent hyperlinkEvent) {
         try {
-          platform.openURL(hyperlinkEvent.getURL().toExternalForm());
+          platform.openURL(sketch.getFolder(), hyperlinkEvent.getURL().toExternalForm());
         } catch (Exception e) {
           Base.showWarning(e.getMessage(), e.getMessage(), e);
         }
