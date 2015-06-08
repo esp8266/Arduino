@@ -49,7 +49,7 @@ import java.util.List;
 public class Sketch {
   static private File tempBuildFolder;
 
-  private Editor editor;
+  private final Editor editor;
 
   /** true if any of the files have been modified. */
   private boolean modified;
@@ -57,11 +57,8 @@ public class Sketch {
   private SketchCodeDocument current;
   private int currentIndex;
 
-  private SketchData data;
+  private final SketchData data;
   
-  /** Class name for the PApplet, as determined by the preprocessor. */
-  private String appletClassName;
-
   /**
    * path is location of the main .pde file, because this is also
    * simplest to use when opening the file from the finder/explorer.
@@ -126,7 +123,7 @@ public class Sketch {
   }
 
 
-  boolean renamingCode;
+  private boolean renamingCode;
 
   /**
    * Handler for the New Code menu option.
@@ -523,7 +520,7 @@ public class Sketch {
   }
 
 
-  protected void calcModified() {
+  private void calcModified() {
     modified = false;
     for (SketchCode code : data.getCodes()) {
       if (code.isModified()) {
@@ -615,7 +612,7 @@ public class Sketch {
   }
 
 
-  protected boolean renameCodeToInoExtension(File pdeFile) {
+  private boolean renameCodeToInoExtension(File pdeFile) {
     for (SketchCode c : data.getCodes()) {
       if (!c.getFile().equals(pdeFile))
         continue;
@@ -640,9 +637,6 @@ public class Sketch {
    * because they can cause trouble.
    */
   protected boolean saveAs() throws IOException {
-    String newParentDir = null;
-    String newName = null;
-
     // get new name for folder
     FileDialog fd = new FileDialog(editor, _("Save sketch folder as..."), FileDialog.SAVE);
     if (isReadOnly() || isUntitled()) {
@@ -658,8 +652,8 @@ public class Sketch {
     fd.setFile(oldName);
 
     fd.setVisible(true);
-    newParentDir = fd.getDirectory();
-    newName = fd.getFile();
+    String newParentDir = fd.getDirectory();
+    String newName = fd.getFile();
 
     // user canceled selection
     if (newName == null) return false;
@@ -960,10 +954,10 @@ public class Sketch {
     // could also scan the text in the file to see if each import
     // statement is already in there, but if the user has the import
     // commented out, then this will be a problem.
-    StringBuffer buffer = new StringBuffer();
-    for (int i = 0; i < list.length; i++) {
+    StringBuilder buffer = new StringBuilder();
+    for (String aList : list) {
       buffer.append("#include <");
-      buffer.append(list[i]);
+      buffer.append(aList);
       buffer.append(">\n");
     }
     buffer.append('\n');
@@ -1240,29 +1234,6 @@ public class Sketch {
     return success;
   }
 
-
-  public boolean exportApplicationPrompt() throws IOException, RunnerException {
-    return false;
-  }
-
-
-  /**
-   * Export to application via GUI.
-   */
-  protected boolean exportApplication() throws IOException, RunnerException {
-    return false;
-  }
-
-
-  /**
-   * Export to application without GUI.
-   */
-  public boolean exportApplication(String destPath,
-                                   int exportPlatform) throws IOException, RunnerException {
-    return false;
-  }
-
-
   /**
    * Make sure the sketch hasn't been moved or deleted by some
    * nefarious user. If they did, try to re-create it and save.
@@ -1361,7 +1332,7 @@ public class Sketch {
     return data.getDefaultExtension();
   }
 
-  static private List<String> hiddenExtensions = Arrays.asList("ino", "pde");
+  static private final List<String> hiddenExtensions = Arrays.asList("ino", "pde");
 
   public List<String> getHiddenExtensions() {
     return hiddenExtensions;
@@ -1454,11 +1425,6 @@ public class Sketch {
 
   public boolean isUntitled() {
     return editor.untitled;
-  }
-
-
-  public String getAppletClassName2() {
-    return appletClassName;
   }
 
 
