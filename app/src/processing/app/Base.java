@@ -92,6 +92,7 @@ public class Base {
   public static volatile Base INSTANCE;
 
   public static SplashScreenHelper splashScreenHelper = new SplashScreenHelper(SplashScreen.getSplashScreen());
+  public static Map<String, Object> FIND_DIALOG_STATE = new HashMap<String, Object>();
 
   // set to true after the first time the menu is built.
   // so that the errors while building don't show up again.

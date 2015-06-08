@@ -25,6 +25,7 @@ package processing.app;
 import cc.arduino.packages.MonitorFactory;
 
 import cc.arduino.view.StubMenuListener;
+import cc.arduino.view.findreplace.FindReplace;
 import com.google.common.base.Predicate;
 import com.jcraft.jsch.JSchException;
 import jssc.SerialPortException;
@@ -1446,7 +1447,7 @@ public class Editor extends JFrame implements RunnerListener {
     findItem.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         if (find == null) {
-          find = new FindReplace(Editor.this);
+          find = new FindReplace(Editor.this, Base.FIND_DIALOG_STATE);
         }
         if (!OSUtils.isMacOS()) {
           find.setFindText(getSelectedText());
@@ -1482,7 +1483,7 @@ public class Editor extends JFrame implements RunnerListener {
       useSelectionForFindItem.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           if (find == null) {
-            find = new FindReplace(Editor.this);
+            find = new FindReplace(Editor.this, Base.FIND_DIALOG_STATE);
           }
           find.setFindText(getSelectedText());
         }
