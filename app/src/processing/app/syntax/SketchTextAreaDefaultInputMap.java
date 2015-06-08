@@ -39,8 +39,8 @@ public class SketchTextAreaDefaultInputMap extends RSyntaxTextAreaDefaultInputMa
       put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, defaultModifier), DefaultEditorKit.beginAction);
       put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, defaultModifier), DefaultEditorKit.endAction);
 
-      put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, defaultModifier | shift), DefaultEditorKit.selectLineAction);
-      put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, defaultModifier | shift), DefaultEditorKit.selectLineAction);
+      put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, defaultModifier | shift), DefaultEditorKit.selectionBeginLineAction);
+      put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, defaultModifier | shift), DefaultEditorKit.selectionEndLineAction);
 
       remove(KeyStroke.getKeyStroke(KeyEvent.VK_J, defaultModifier));
 
