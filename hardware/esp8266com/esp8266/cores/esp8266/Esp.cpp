@@ -19,12 +19,18 @@
  */
 
 #include "Arduino.h"
+#include "flash_utils.h"
+#include "eboot_command.h"
+#include <memory>
 
 extern "C" {
 #include "user_interface.h"
 
 extern struct rst_info resetInfo;
 }
+
+
+// #define DEBUG_SERIAL Serial
 
 //extern "C" void ets_wdt_init(uint32_t val);
 extern "C" void ets_wdt_enable(void);
@@ -293,7 +299,7 @@ struct rst_info * EspClass::getResetInfoPtr(void) {
     return &resetInfo;
 }
 
-bool EspClass::eraseESPconfig(void) {
+bool EspClass::eraseConfig(void) {
     bool ret = true;
     size_t cfgAddr = (ESP.getFlashChipSize() - 0x4000);
     size_t cfgSize = (8*1024);
@@ -313,4 +319,123 @@ bool EspClass::eraseESPconfig(void) {
     return ret;
 }
 
+uint32_t EspClass::getSketchSize() {
+    static uint32_t result = 0;
+    if (result)
+        return result;
+
+    image_header_t image_header;
+    uint32_t pos = APP_START_OFFSET;
+    if (spi_flash_read(pos, (uint32_t*) &image_header, sizeof(image_header))) {
+        return 0;
+    }
+    pos += sizeof(image_header);
+#ifdef DEBUG_SERIAL
+    DEBUG_SERIAL.printf("num_segments=%u\r\n", image_header.num_segments);
+#endif
+    for (uint32_t section_index = 0;
+        section_index < image_header.num_segments; 
+        ++section_index)
+    {
+        section_header_t section_header = {0};
+        if (spi_flash_read(pos, (uint32_t*) &section_header, sizeof(section_header))) {
+            return 0;
+        }
+        pos += sizeof(section_header);
+        pos += section_header.size;
+#ifdef DEBUG_SERIAL
+        DEBUG_SERIAL.printf("section=%u size=%u pos=%u\r\n", section_index, section_header.size, pos);
+#endif
+    }
+    result = pos;
+    return result;
+}
+
+extern "C" uint32_t _SPIFFS_start;
+
+uint32_t EspClass::getFreeSketchSpace() {
+
+    uint32_t usedSize = getSketchSize();
+    // round one sector up
+    uint32_t freeSpaceStart = (usedSize + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
+    uint32_t freeSpaceEnd = (uint32_t)&_SPIFFS_start - 0x40200000;
+
+#ifdef DEBUG_SERIAL
+    DEBUG_SERIAL.printf("usedSize=%u freeSpaceStart=%u freeSpaceEnd=%u\r\n", usedSize, freeSpaceStart, freeSpaceEnd);
+#endif
+    return freeSpaceEnd - freeSpaceStart;
+}
+
+bool EspClass::updateSketch(Stream& in, uint32_t size) {
+
+    if (size > getFreeSketchSpace())
+        return false;
+
+    uint32_t usedSize = getSketchSize();
+    uint32_t freeSpaceStart = (usedSize + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
+    uint32_t roundedSize = (size + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
+
+#ifdef DEBUG_SERIAL
+    DEBUG_SERIAL.printf("erase @0x%x size=0x%x\r\n", freeSpaceStart, roundedSize);
+#endif
+
+    noInterrupts();
+    int rc = SPIEraseAreaEx(freeSpaceStart, roundedSize);
+    interrupts();
+    if (rc)
+        return false;
+
+#ifdef DEBUG_SERIAL
+    DEBUG_SERIAL.println("erase done");
+#endif
+
+    uint32_t addr = freeSpaceStart;
+    uint32_t left = size;
+
+    const uint32_t bufferSize = FLASH_SECTOR_SIZE;
+    std::unique_ptr<uint8_t> buffer(new uint8_t[bufferSize]);
+
+#ifdef DEBUG_SERIAL
+    DEBUG_SERIAL.println("writing");
+#endif
+    while (left > 0) {
+        size_t willRead = (left < bufferSize) ? left : bufferSize;
+        size_t rd = in.readBytes(buffer.get(), willRead);
+        if (rd != willRead) {
+#ifdef DEBUG_SERIAL
+            DEBUG_SERIAL.println("stream read failed");
+#endif
+            return false;
+        }
+
+        noInterrupts();
+        rc = SPIWrite(addr, buffer.get(), willRead);
+        interrupts();
+        if (rc) {
+#ifdef DEBUG_SERIAL
+            DEBUG_SERIAL.println("write failed");
+#endif            
+            return false;
+        }
+
+        addr += willRead;
+        left -= willRead;
+#ifdef DEBUG_SERIAL
+        DEBUG_SERIAL.print(".");
+#endif
+    }
+
+#ifdef DEBUG_SERIAL
+    DEBUG_SERIAL.println("\r\nrestarting");
+#endif
+    eboot_command ebcmd;
+    ebcmd.action = ACTION_COPY_RAW;
+    ebcmd.args[0] = freeSpaceStart;
+    ebcmd.args[1] = 0x00000;
+    ebcmd.args[2] = size;
+    eboot_command_write(&ebcmd);
+    
+    ESP.restart();
+    return true; // never happens
+}
 

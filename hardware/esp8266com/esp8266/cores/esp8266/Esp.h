@@ -69,44 +69,48 @@ class EspClass {
         // note: setting the timeout value is not implemented at the moment
         void wdtEnable(WDTO_t timeout_ms = WDTO_0MS);
 
-        void wdtDisable(void);
-        void wdtFeed(void);
+        void wdtDisable();
+        void wdtFeed();
 
         void deepSleep(uint32_t time_us, WakeMode mode = WAKE_RF_DEFAULT);
 
-        void reset(void);
-        void restart(void);
+        void reset();
+        void restart();
 
-        uint16_t getVcc(void);
-        uint32_t getFreeHeap(void);
+        uint16_t getVcc();
+        uint32_t getFreeHeap();
 
-        uint32_t getChipId(void);
+        uint32_t getChipId();
 
-        const char * getSdkVersion(void);
+        const char * getSdkVersion();
 
-        uint8_t getBootVersion(void);
-        uint8_t getBootMode(void);
+        uint8_t getBootVersion();
+        uint8_t getBootMode();
 
-        uint8_t getCpuFreqMHz(void);
+        uint8_t getCpuFreqMHz();
 
-        uint32_t getFlashChipId(void);
+        uint32_t getFlashChipId();
         //gets the actual chip size based on the flash id
-        uint32_t getFlashChipRealSize(void);
+        uint32_t getFlashChipRealSize();
         //gets the size of the flash as set by the compiler
-        uint32_t getFlashChipSize(void);
-        uint32_t getFlashChipSpeed(void);
-        FlashMode_t getFlashChipMode(void);
-        uint32_t getFlashChipSizeByChipId(void);
+        uint32_t getFlashChipSize();
+        uint32_t getFlashChipSpeed();
+        FlashMode_t getFlashChipMode();
+        uint32_t getFlashChipSizeByChipId();
 
-        String getResetInfo(void);
-        struct rst_info * getResetInfoPtr(void);
+        uint32_t getSketchSize();
+        uint32_t getFreeSketchSpace();
+        bool updateSketch(Stream& in, uint32_t size);
 
-        bool eraseESPconfig(void);
+        String getResetInfo();
+        struct rst_info * getResetInfoPtr();
 
-        inline uint32_t getCycleCount(void);
+        bool eraseConfig();
+
+        inline uint32_t getCycleCount();
 };
 
-uint32_t EspClass::getCycleCount(void)
+uint32_t EspClass::getCycleCount()
 {
     uint32_t ccount;
     __asm__ __volatile__("rsr %0,ccount":"=a" (ccount));
