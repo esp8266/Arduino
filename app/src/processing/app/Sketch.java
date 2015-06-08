@@ -108,6 +108,10 @@ public class Sketch {
    * in which case the load happens each time "run" is hit.
    */
   protected void load() throws IOException {
+    load(false);
+  }
+
+  protected void load(boolean forceUpdate) throws IOException {
     data.load();
 
     for (SketchCode code : data.getCodes()) {
@@ -117,7 +121,7 @@ public class Sketch {
 
     // set the main file to be the current tab
     if (editor != null) {
-      setCurrentCode(0);
+      setCurrentCode(currentIndex, forceUpdate);
     }
   }
 
@@ -979,8 +983,12 @@ public class Sketch {
    * </OL>
    */
   public void setCurrentCode(int which) {
+    setCurrentCode(which, false);
+  }
+
+  public void setCurrentCode(int which, boolean forceUpdate) {
     // if current is null, then this is the first setCurrent(0)
-    if ((currentIndex == which) && (current != null)) {
+    if (!forceUpdate && (currentIndex == which) && (current != null)) {
       return;
     }
 
@@ -1065,11 +1073,8 @@ public class Sketch {
       //handleOpen(sketch);
       //history.lastRecorded = historySaved;
 
-      // set current to null so that the tab gets updated
-      // http://dev.processing.org/bugs/show_bug.cgi?id=515
-      current = null;
       // nuke previous files and settings, just get things loaded
-      load();
+      load(true);
     }
 
 //    // handle preprocessing the main file's code

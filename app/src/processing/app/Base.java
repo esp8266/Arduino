@@ -623,6 +623,13 @@ public class Base {
   protected void handleActivated(Editor whichEditor) {
     activeEditor = whichEditor;
     activeEditor.rebuildRecentSketchesMenu();
+    if (PreferencesData.getBoolean("editor.external")) {
+      try {
+        activeEditor.getSketch().load(true);
+      } catch (IOException e) {
+        // noop
+      }
+    }
 
     // set the current window to be the console that's getting output
     EditorConsoleStream.setCurrent(activeEditor.console);
