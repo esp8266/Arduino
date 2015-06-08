@@ -8,9 +8,6 @@ extern "C" {
 #include <stdio.h>
 #include "ets_sys.h"
 #include "osapi.h"
-#ifdef __cplusplus
-}
-#endif
 
 #define PROGMEM     ICACHE_RODATA_ATTR
 #define PGM_P  		const char *
@@ -89,5 +86,9 @@ int	vsnprintf_P(char *str, size_t strSize, const char *formatP, va_list ap) __at
 #define pgm_read_word_far(addr) 	pgm_read_word(addr)
 #define pgm_read_dword_far(addr) 	pgm_read_dword(addr)
 #define pgm_read_float_far(addr) 	pgm_read_float(addr)
+
+#ifdef __cplusplus // End extern "C" wrapper.
+}
+#endif
 
 #endif //__PGMSPACE_H_
