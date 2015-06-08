@@ -127,13 +127,13 @@ public class Platform extends processing.app.Platform {
   // Some of these are supposedly constants in com.apple.eio.FileManager,
   // however they don't seem to link properly from Eclipse.
 
-  static final int kDocumentsFolderType =
+  private static final int kDocumentsFolderType =
     ('d' << 24) | ('o' << 16) | ('c' << 8) | 's';
   //static final int kPreferencesFolderType =
   //  ('p' << 24) | ('r' << 16) | ('e' << 8) | 'f';
-  static final int kDomainLibraryFolderType =
+  private static final int kDomainLibraryFolderType =
     ('d' << 24) | ('l' << 16) | ('i' << 8) | 'b';
-  static final short kUserDomain = -32763;
+  private static final short kUserDomain = -32763;
 
 
   // apple java extensions documentation
@@ -150,12 +150,12 @@ public class Platform extends processing.app.Platform {
   //   /Versions/Current/Frameworks/CarbonCore.framework/Headers/
 
 
-  protected String getLibraryFolder() throws FileNotFoundException {
+  private String getLibraryFolder() throws FileNotFoundException {
     return FileManager.findFolder(kUserDomain, kDomainLibraryFolderType);
   }
 
 
-  protected String getDocumentsFolder() throws FileNotFoundException {
+  private String getDocumentsFolder() throws FileNotFoundException {
     return FileManager.findFolder(kUserDomain, kDocumentsFolderType);
   }
 
@@ -168,7 +168,7 @@ public class Platform extends processing.app.Platform {
   public Map<String, Object> resolveDeviceAttachedTo(String serial, Map<String, TargetPackage> packages, String devicesListOutput) {
     assert packages != null;
     if (devicesListOutput == null) {
-      return super.resolveDeviceAttachedTo(serial, packages, devicesListOutput);
+      return super.resolveDeviceAttachedTo(serial, packages, null);
     }
 
     try {
