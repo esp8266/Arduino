@@ -5,15 +5,14 @@
  * 3-clause BSD license to be found in the LICENSE file.
  */
 
-#ifndef EBOOT_H
-#define EBOOT_H
-
+#ifndef FLASH_H
+#define FLASH_H
 
 int SPIEraseBlock(uint32_t block);
 int SPIEraseSector(uint32_t sector);
 int SPIRead(uint32_t addr, void *dest, size_t size);
 int SPIWrite(uint32_t addr, void *src, size_t size);
-
+int SPIEraseAreaEx(const uint32_t start, const uint32_t size);
 
 #define FLASH_SECTOR_SIZE 0x1000
 #define FLASH_BLOCK_SIZE 0x10000
@@ -41,4 +40,4 @@ typedef struct {
 
 
 
-#endif //EBOOT_H
+#endif //FLASH_H

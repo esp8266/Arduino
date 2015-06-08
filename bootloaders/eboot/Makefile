@@ -1,4 +1,4 @@
-XTENSA_TOOCHAIN ?=
+XTENSA_TOOLCHAIN ?=
 
 BIN_DIR := ./
 TARGET_DIR := ./
@@ -6,14 +6,15 @@ TARGET_DIR := ./
 TARGET_OBJ_FILES := \
 	eboot.o \
 	eboot_command.o \
+	flash.o \
 
 TARGET_OBJ_PATHS := $(addprefix $(TARGET_DIR)/,$(TARGET_OBJ_FILES))
 
-CC := $(XTENSA_TOOCHAIN)xtensa-lx106-elf-gcc
-CXX := $(XTENSA_TOOCHAIN)xtensa-lx106-elf-g++
-AR := $(XTENSA_TOOCHAIN)xtensa-lx106-elf-ar
-LD := $(XTENSA_TOOCHAIN)xtensa-lx106-elf-gcc
-OBJDUMP := $(XTENSA_TOOCHAIN)xtensa-lx106-elf-objdump
+CC := $(XTENSA_TOOLCHAIN)xtensa-lx106-elf-gcc
+CXX := $(XTENSA_TOOLCHAIN)xtensa-lx106-elf-g++
+AR := $(XTENSA_TOOLCHAIN)xtensa-lx106-elf-ar
+LD := $(XTENSA_TOOLCHAIN)xtensa-lx106-elf-gcc
+OBJDUMP := $(XTENSA_TOOLCHAIN)xtensa-lx106-elf-objdump
 
 
 CFLAGS += -std=gnu99

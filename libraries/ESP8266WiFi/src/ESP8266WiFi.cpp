@@ -40,11 +40,15 @@ extern "C" void esp_yield();
 ESP8266WiFiClass::ESP8266WiFiClass()
 : _useApMode(false)
 , _useClientMode(false)
+, _useStaticIp(false)
 {
 }
 
 void ESP8266WiFiClass::mode(WiFiMode m)
 {
+    if(wifi_get_opmode() == (uint8)m) {
+        return;
+    }
     ETS_UART_INTR_DISABLE();
     wifi_set_opmode(m);
     ETS_UART_INTR_ENABLE();
@@ -100,7 +104,8 @@ int ESP8266WiFiClass::begin(const char* ssid, const char *passphrase, int32_t ch
         wifi_set_channel(channel);
     }
 
-    wifi_station_dhcpc_start();
+	if(!_useStaticIp)
+		wifi_station_dhcpc_start();
     return status();
 }
 
@@ -112,6 +117,8 @@ uint8_t ESP8266WiFiClass::waitForConnectResult(){
   return status();
 }
 
+
+// You will have to set the DNS-Server manually later since this will not enable DHCP
 void ESP8266WiFiClass::config(IPAddress local_ip, IPAddress gateway, IPAddress subnet)
 {
     struct ip_info info;
@@ -121,6 +128,26 @@ void ESP8266WiFiClass::config(IPAddress local_ip, IPAddress gateway, IPAddress s
 
     wifi_station_dhcpc_stop();
     wifi_set_ip_info(STATION_IF, &info);
+	
+	_useStaticIp = true;
+}
+
+void ESP8266WiFiClass::config(IPAddress local_ip, IPAddress gateway, IPAddress subnet, IPAddress dns)
+{
+    struct ip_info info;
+    info.ip.addr = static_cast<uint32_t>(local_ip);
+    info.gw.addr = static_cast<uint32_t>(gateway);
+    info.netmask.addr = static_cast<uint32_t>(subnet);
+
+    wifi_station_dhcpc_stop();
+    wifi_set_ip_info(STATION_IF, &info);
+
+    // Set DNS-Server
+    ip_addr_t d;
+    d.addr = static_cast<uint32_t>(dns);
+    dns_setserver(0,&d);
+	
+	_useStaticIp = true;
 }
 
 int ESP8266WiFiClass::disconnect()
@@ -333,10 +360,14 @@ void ESP8266WiFiClass::_scanDone(void* result, int status)
 
 int8_t ESP8266WiFiClass::scanNetworks()
 {
-    if ((wifi_get_opmode() & 1) == 0)//1 and 3 have STA enabled
-    {
+    if(_useApMode) {
+        // turn on AP+STA mode
         mode(WIFI_AP_STA);
+    } else {
+        // turn on STA mode
+        mode(WIFI_STA);
     }
+
     int status = wifi_station_get_connect_status();
     if (status != STATION_GOT_IP && status != STATION_IDLE)
     {
@@ -508,9 +539,12 @@ void ESP8266WiFiClass::beginSmartConfig()
     if (_smartConfigStarted)
         return;
 
-    if ((wifi_get_opmode() & 1) == 0)//1 and 3 have STA enabled
-    {
+    if(_useApMode) {
+        // turn on AP+STA mode
         mode(WIFI_AP_STA);
+    } else {
+        // turn on STA mode
+        mode(WIFI_STA);
     }
 
     _smartConfigStarted = true;

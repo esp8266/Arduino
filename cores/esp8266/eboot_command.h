@@ -1,16 +1,11 @@
-/* Copyright (c) 2015 Ivan Grokhotkov. All rights reserved. 
- * This file is part of eboot bootloader.
- *
- * Redistribution and use is permitted according to the conditions of the
- * 3-clause BSD license to be found in the LICENSE file.
- */
- 
 #ifndef EBOOT_COMMAND_H
 #define EBOOT_COMMAND_H
 
 #include <stdint.h>
-#include <stddef.h>
-#include <stdbool.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define RTC_MEM ((volatile uint32_t*)0x60001200)
 
@@ -33,5 +28,9 @@ struct eboot_command {
 int eboot_command_read(struct eboot_command* cmd);
 void eboot_command_write(struct eboot_command* cmd);
 void eboot_command_clear();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //EBOOT_COMMAND_H
