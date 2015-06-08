@@ -22,31 +22,37 @@
 
 package processing.app;
 
-import java.io.*;
-import java.util.List;
-import java.util.Arrays;
-
-import static processing.app.I18n._;
 import processing.app.helpers.FileUtils;
 
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
+import static processing.app.I18n._;
+
 /**
- * Represents a single tab of a sketch. 
+ * Represents a single tab of a sketch.
  */
 public class SketchCode {
-  
-  /** Pretty name (no extension), not the full file name */
-  private String prettyName;
 
-  /** File object for where this code is located */
+  /**
+   * File object for where this code is located
+   */
   private File file;
 
-  /** Text of the program text for this tab */
+  /**
+   * Text of the program text for this tab
+   */
   private String program;
 
   private boolean modified;
 
-  /** where this code starts relative to the concat'd code */
-  private int preprocOffset;  
+  /**
+   * where this code starts relative to the concat'd code
+   */
+  private int preprocOffset;
 
   private Object metadata;
 
@@ -62,8 +68,6 @@ public class SketchCode {
     this.file = file;
     this.metadata = metadata;
 
-    makePrettyName();
-
     try {
       load();
     } catch (IOException e) {
@@ -73,28 +77,21 @@ public class SketchCode {
   }
 
 
-  protected void makePrettyName() {
-    prettyName = file.getName();
-    int dot = prettyName.lastIndexOf('.');
-    prettyName = prettyName.substring(0, dot);
-  }
-
-
   public File getFile() {
     return file;
   }
-  
-  
+
+
   protected boolean fileExists() {
     return file.exists();
   }
-  
-  
+
+
   protected boolean fileReadOnly() {
     return !file.canWrite();
   }
-  
-  
+
+
   protected boolean deleteFile(File tempBuildFolder) {
     if (!file.delete()) {
       return false;
@@ -106,38 +103,42 @@ public class SketchCode {
       }
     });
     for (File compiledFile : compiledFiles) {
-      compiledFile.delete();
+      if (!compiledFile.delete()) {
+        return false;
+      }
     }
 
     return true;
   }
-  
-  
+
+
   protected boolean renameTo(File what) {
     boolean success = file.renameTo(what);
     if (success) {
       file = what;
-      makePrettyName();
     }
     return success;
   }
-  
-  
-  protected void copyTo(File dest) throws IOException {
-    BaseNoGui.saveFile(program, dest);
-  }
-  
+
 
   public String getFileName() {
     return file.getName();
   }
-  
-  
+
+
   public String getPrettyName() {
-    return prettyName;
+    String prettyName = getFileName();
+    int dot = prettyName.lastIndexOf('.');
+    return prettyName.substring(0, dot);
   }
-  
-  
+
+  public String getFileNameWithExtensionIfNotIno() {
+    if (getFileName().endsWith(".ino")) {
+      return getPrettyName();
+    }
+    return getFileName();
+  }
+
   public boolean isExtension(String... extensions) {
     return isExtension(Arrays.asList(extensions));
   }
@@ -145,23 +146,23 @@ public class SketchCode {
   public boolean isExtension(List<String> extensions) {
     return FileUtils.hasExtension(file, extensions);
   }
-  
-  
+
+
   public String getProgram() {
     return program;
   }
-  
-  
+
+
   public void setProgram(String replacement) {
     program = replacement;
   }
-  
-  
+
+
   public int getLineCount() {
     return BaseNoGui.countLines(program);
   }
-  
-  
+
+
   public void setModified(boolean modified) {
     this.modified = modified;
   }
@@ -177,24 +178,20 @@ public class SketchCode {
   }
 
 
-  public int getPreprocOffset() {
-    return preprocOffset;
-  }
-  
-  
   public void addPreprocOffset(int extra) {
     preprocOffset += extra;
   }
 
 
-  // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
-  
-  
   /**
    * Load this piece of code from a file.
    */
-  public void load() throws IOException {
+  private void load() throws IOException {
     program = BaseNoGui.loadFile(file);
+
+    if (program == null) {
+      throw new IOException();
+    }
 
     if (program.indexOf('\uFFFD') != -1) {
       System.err.println(
@@ -209,7 +206,7 @@ public class SketchCode {
       );
       System.err.println();
     }
-    
+
     setModified(false);
   }
 

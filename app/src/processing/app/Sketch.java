@@ -445,7 +445,7 @@ public class Sketch {
     Object[] options = { _("OK"), _("Cancel") };
     String prompt = (currentIndex == 0) ?
       _("Are you sure you want to delete this sketch?") :
-      I18n.format(_("Are you sure you want to delete \"{0}\"?"), current.getCode().getPrettyName());
+      I18n.format(_("Are you sure you want to delete \"{0}\"?"), current.getCode().getFileNameWithExtensionIfNotIno());
     int result = JOptionPane.showOptionDialog(editor,
                                               prompt,
                                               _("Delete"),
@@ -1074,58 +1074,6 @@ public class Sketch {
 //    // handle preprocessing the main file's code
 //    return build(tempBuildFolder.getAbsolutePath());
   }
-
-
-
-  /**
-   * Map an error from a set of processed .java files back to its location
-   * in the actual sketch.
-   * @param message The error message.
-   * @param filename The .java file where the exception was found.
-   * @param line Line number of the .java file for the exception (1-indexed)
-   * @return A RunnerException to be sent to the editor, or null if it wasn't
-   *         possible to place the exception to the sketch code.
-   */
-//  public RunnerException placeExceptionAlt(String message, 
-//                                        String filename, int line) {
-//    String appletJavaFile = appletClassName + ".java";
-//    SketchCode errorCode = null;
-//    if (filename.equals(appletJavaFile)) {
-//      for (SketchCode code : getCode()) {
-//        if (code.isExtension("ino")) {
-//          if (line >= code.getPreprocOffset()) {
-//            errorCode = code;
-//          }
-//        }
-//      }
-//    } else {
-//      for (SketchCode code : getCode()) {
-//        if (code.isExtension("java")) {
-//          if (filename.equals(code.getFileName())) {
-//            errorCode = code;
-//          }
-//        }
-//      }
-//    }
-//    int codeIndex = getCodeIndex(errorCode);
-//
-//    if (codeIndex != -1) {
-//      //System.out.println("got line num " + lineNumber);
-//      // in case this was a tab that got embedded into the main .java
-//      line -= getCode(codeIndex).getPreprocOffset();
-//
-//      // lineNumber is 1-indexed, but editor wants zero-indexed
-//      line--;
-//
-//      // getMessage() will be what's shown in the editor
-//      RunnerException exception = 
-//        new RunnerException(message, codeIndex, line, -1);
-//      exception.hideStackTrace();
-//      return exception;
-//    }
-//    return null;
-//  }
-
 
   /**
    * Run the build inside the temporary build folder.
