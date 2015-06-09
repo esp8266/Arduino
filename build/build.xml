@@ -52,6 +52,24 @@
 
   <property name="MACOSX_BUNDLED_JVM" value="${java.home}/../"/>
   <property name="WINDOWS_BUNDLED_JVM" value="${java.home}"/>
+  <property name="LINUX32_BUNDLED_JVM" value="none"/>
+  <property name="LINUX64_BUNDLED_JVM" value="none"/>
+  <condition property="linux-bundle-jvm-task" value="noop">
+    <and>
+      <equals arg1="${LINUX32_BUNDLED_JVM}" arg2="none"/>
+      <equals arg1="${LINUX64_BUNDLED_JVM}" arg2="none"/>
+    </and>
+  </condition>
+  <condition property="linux-bundle-jvm-task" value="bundle">
+    <or>
+      <not>
+        <equals arg1="${LINUX32_BUNDLED_JVM}" arg2="none"/>
+      </not>
+      <not>
+        <equals arg1="${LINUX64_BUNDLED_JVM}" arg2="none"/>
+      </not>
+    </or>
+  </condition>
 
   <!-- Libraries required for running arduino -->
   <fileset dir=".." id="runtime.jars">
@@ -620,6 +638,10 @@
   </target>
 
   <target name="linux32-build" depends="linux-build" description="Build linux (32-bit) version">
+    <antcall target="linux-jvm-${linux-bundle-jvm-task}">
+      <param name="JVM" value="${LINUX32_BUNDLED_JVM}"/>
+    </antcall>
+
     <antcall target="avr-toolchain-bundle">
       <param name="unpack_target" value="untar"/>
       <param name="gcc_archive_file" value="avr-gcc-4.8.1-arduino5-i686-pc-linux-gnu.tar.bz2"/>
@@ -632,6 +654,10 @@
   </target>
 
   <target name="linux64-build" depends="linux-build" description="Build linux (64-bit) version">
+    <antcall target="linux-jvm-${linux-bundle-jvm-task}">
+      <param name="JVM" value="${LINUX64_BUNDLED_JVM}"/>
+    </antcall>
+
     <antcall target="avr-toolchain-bundle">
       <param name="unpack_target" value="untar"/>
       <param name="gcc_archive_file" value="avr-gcc-4.8.1-arduino5-x86_64-pc-linux-gnu.tar.bz2"/>
@@ -641,6 +667,18 @@
     </antcall>
 
     <antcall target="package-library-index-json-bundle"/>
+  </target>
+
+  <target name="linux-jvm-noop"/>
+
+  <target name="linux-jvm-bundle">
+    <mkdir dir="${staging_folder}/work/java" />
+
+    <exec executable="rsync">
+      <arg value="-a"/>
+      <arg value="${JVM}"/>
+      <arg value="${staging_folder}/work/java/"/>
+    </exec>
   </target>
 
   <target name="linux32-run" depends="build" description="Run Linux (32-bit) version">
