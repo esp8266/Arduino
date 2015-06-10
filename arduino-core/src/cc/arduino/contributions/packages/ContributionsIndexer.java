@@ -300,7 +300,7 @@ public class ContributionsIndexer {
     return index.toString();
   }
 
-  public List<TargetPackage> createTargetPackages() throws TargetPlatformException {
+  public List<TargetPackage> createTargetPackages() {
     List<TargetPackage> packages = new ArrayList<TargetPackage>();
 
     if (index == null) {
@@ -317,9 +317,13 @@ public class ContributionsIndexer {
         String arch = platform.getArchitecture();
         File folder = platform.getInstalledFolder();
 
-        TargetPlatform targetPlatform = new ContributedTargetPlatform(arch, folder, targetPackage, index);
-        if (!targetPackage.hasPlatform(targetPlatform)) {
-          targetPackage.addPlatform(targetPlatform);
+        try {
+          TargetPlatform targetPlatform = new ContributedTargetPlatform(arch, folder, targetPackage, index);
+          if (!targetPackage.hasPlatform(targetPlatform)) {
+            targetPackage.addPlatform(targetPlatform);
+          }
+        } catch (TargetPlatformException e) {
+          System.err.println(e.getMessage());
         }
       }
 

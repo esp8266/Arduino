@@ -826,7 +826,7 @@ public class BaseNoGui {
     populateImportToLibraryTable();
   }
 
-  static protected void loadContributedHardware(ContributionsIndexer indexer) throws TargetPlatformException {
+  static protected void loadContributedHardware(ContributionsIndexer indexer) {
     for (TargetPackage pack : indexer.createTargetPackages()) {
       packages.put(pack.getId(), pack);
     }
