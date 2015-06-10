@@ -23,6 +23,7 @@ ARDUINO 1.6.5
 * Added support for Dangerous Prototypes Bus Pirate as ISP
 * Added "Close" button to Boards/Libs Managers, in order to help linux people with weird Window Managers
 * Added File > Open Recent menu, showing the last 5 opened sketches
+* Windows: added Arduino Zero drivers
 * Tons of minor fixes
 
 [libraries]
