@@ -15,6 +15,14 @@ ARDUINO 1.6.5
 * CLI: --get-pref can now be called without a pref name. If pref name is missing, IDE dumps all preferences
 * Holding SHIFT when hovering the save icon will trigger a "Save As"
 * Removed proxy settings from File > Preferences: IDE will use system settings
+* Linux versions bundle the latest JVM, 1.8.0_45
+* Local docs: if your sketch has a "docs" folder, you can add local links to it. For example file://./docs/index.html
+  will use your browser to open file index.html from the "docs" folder of your sketch
+* When using "external editor" mode, sketch code is updated when the IDE gets focused
+* Added keyboard shortcuts to IDE menus: ALT+F for File, ALT+E for Edit and so on
+* Added support for Dangerous Prototypes Bus Pirate as ISP
+* Added "Close" button to Boards/Libs Managers, in order to help linux people with weird Window Managers
+* Added File > Open Recent menu, showing the last 5 opened sketches
 * Tons of minor fixes
 
 [libraries]
