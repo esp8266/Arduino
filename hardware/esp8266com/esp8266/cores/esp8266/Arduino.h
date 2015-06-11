@@ -143,13 +143,13 @@ void ets_intr_unlock();
 // level 15 will disable ALL interrupts, 
 // level 0 will disable most software interrupts
 //
-#define xt_disable_interrupts(state, level) __asm__ __volatile__("rsil %0," __STRINGIFY(level) "; esync; isync; dsync" : "=a" (state))
-#define xt_enable_interrupts(state)  __asm__ __volatile__("wsr %0,ps; esync" :: "a" (state) : "memory")
+#define xt_disable_interrupts(state, level) __asm__ __volatile__("rsil %0," __STRINGIFY(level) : "=a" (state))
+#define xt_enable_interrupts(state)  __asm__ __volatile__("wsr %0,ps; isync" :: "a" (state) : "memory")
 
 extern uint32_t interruptsState;
 
 #define interrupts() xt_enable_interrupts(interruptsState)
-#define noInterrupts() __asm__ __volatile__("rsil %0,15; esync; isync; dsync" : "=a" (interruptsState))
+#define noInterrupts() __asm__ __volatile__("rsil %0,15" : "=a" (interruptsState))
 
 #define clockCyclesPerMicrosecond() ( F_CPU / 1000000L )
 #define clockCyclesToMicroseconds(a) ( (a) / clockCyclesPerMicrosecond() )
