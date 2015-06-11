@@ -617,6 +617,12 @@ public class Base {
     PreferencesData.setCollection("recent.sketches", sketches);
   }
 
+  protected void removeRecentSketchPath(String path) {
+    Collection<String> sketches = new LinkedList<String>(PreferencesData.getCollection("recent.sketches"));
+    sketches.remove(path);
+    PreferencesData.setCollection("recent.sketches", sketches);
+  }
+
   // Because of variations in native windowing systems, no guarantees about
   // changes to the focused and active Windows can be made. Developers must
   // never assume that this Window is the focused or active Window until this

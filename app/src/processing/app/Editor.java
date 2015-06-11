@@ -2239,11 +2239,19 @@ public class Editor extends JFrame implements RunnerListener {
     statusNotice(_("Saving..."));
     boolean saved = false;
     try {
+      boolean wasReadOnly = sketch.isReadOnly();
+      String previousMainFilePath = sketch.getMainFilePath();
       saved = sketch.save();
-      if (saved)
+      if (saved) {
         statusNotice(_("Done Saving."));
-      else
+        if (wasReadOnly) {
+          base.removeRecentSketchPath(previousMainFilePath);
+        }
+        base.storeRecentSketches(sketch);
+        base.rebuildRecentSketchesMenuItems();
+      } else {
         statusEmpty();
+      }
       // rebuild sketch menu in case a save-as was forced
       // Disabling this for 0125, instead rebuild the menu inside
       // the Save As method of the Sketch object, since that's the
