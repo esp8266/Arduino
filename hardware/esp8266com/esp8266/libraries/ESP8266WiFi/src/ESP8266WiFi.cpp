@@ -33,6 +33,8 @@ extern "C" {
 #include "lwip/dns.h"
 }
 
+#include "WiFiClient.h"
+#include "WiFiUdp.h"
 
 extern "C" void esp_schedule();
 extern "C" void esp_yield();
@@ -42,6 +44,7 @@ ESP8266WiFiClass::ESP8266WiFiClass()
 , _useClientMode(false)
 , _useStaticIp(false)
 {
+    wifi_set_event_handler_cb((wifi_event_handler_cb_t)&ESP8266WiFiClass::_eventCallback);
 }
 
 void ESP8266WiFiClass::mode(WiFiMode m)
@@ -104,8 +107,8 @@ int ESP8266WiFiClass::begin(const char* ssid, const char *passphrase, int32_t ch
         wifi_set_channel(channel);
     }
 
-	if(!_useStaticIp)
-		wifi_station_dhcpc_start();
+    if(!_useStaticIp)
+        wifi_station_dhcpc_start();
     return status();
 }
 
@@ -128,8 +131,8 @@ void ESP8266WiFiClass::config(IPAddress local_ip, IPAddress gateway, IPAddress s
 
     wifi_station_dhcpc_stop();
     wifi_set_ip_info(STATION_IF, &info);
-	
-	_useStaticIp = true;
+    
+    _useStaticIp = true;
 }
 
 void ESP8266WiFiClass::config(IPAddress local_ip, IPAddress gateway, IPAddress subnet, IPAddress dns)
@@ -146,8 +149,8 @@ void ESP8266WiFiClass::config(IPAddress local_ip, IPAddress gateway, IPAddress s
     ip_addr_t d;
     d.addr = static_cast<uint32_t>(dns);
     dns_setserver(0,&d);
-	
-	_useStaticIp = true;
+    
+    _useStaticIp = true;
 }
 
 int ESP8266WiFiClass::disconnect()
@@ -585,6 +588,17 @@ void ESP8266WiFiClass::_smartConfigCallback(uint32_t st, void* result)
     }
     else if (status == SC_STATUS_LINK_OVER) {
         WiFi.stopSmartConfig();
+    }
+}
+
+void ESP8266WiFiClass::_eventCallback(void* arg)
+{
+    System_Event_t* event = reinterpret_cast<System_Event_t*>(arg);
+    DEBUGV("wifi evt: %d\r\n", event->event);
+
+    if (event->event == EVENT_STAMODE_DISCONNECTED) {
+        WiFiClient::stopAll();
+        WiFiUDP::stopAll();
     }
 }
 
