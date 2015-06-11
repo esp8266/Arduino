@@ -70,6 +70,8 @@ import cc.arduino.packages.uploaders.SerialUploader;
 @SuppressWarnings("serial")
 public class Editor extends JFrame implements RunnerListener {
 
+  public static final int MAX_TIME_AWAITING_FOR_RESUMING_SERIAL_MONITOR = 5000;
+
   private final Platform platform;
   private JMenu recentSketchesMenu;
 
@@ -2411,6 +2413,16 @@ public class Editor extends JFrame implements RunnerListener {
     // Return the serial monitor window to its initial state
     if (serialMonitor != null) {
       BoardPort boardPort = BaseNoGui.getDiscoveryManager().find(PreferencesData.get("serial.port"));
+      long sleptFor = 0;
+      while (boardPort == null && sleptFor < MAX_TIME_AWAITING_FOR_RESUMING_SERIAL_MONITOR) {
+        try {
+          Thread.sleep(100);
+          sleptFor += 100;
+          boardPort = BaseNoGui.getDiscoveryManager().find(PreferencesData.get("serial.port"));
+        } catch (InterruptedException e) {
+          // noop
+        }
+      }
       try {
         if (boardPort == null) {
           serialMonitor.close();
