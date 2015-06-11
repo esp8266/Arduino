@@ -23,12 +23,13 @@
 #define WIFIUDP_H
 
 #include <Udp.h>
+#include <include/slist.h>
 
 #define UDP_TX_PACKET_MAX_SIZE 8192
 
 class UdpContext;
 
-class WiFiUDP : public UDP {
+class WiFiUDP : public UDP, public SList<WiFiUDP> {
 private:
   UdpContext* _ctx;
 
@@ -102,6 +103,8 @@ public:
   IPAddress destinationIP();
   // Return the local port for outgoing packets
   uint16_t localPort();
+
+  static void stopAll();
 
 };
 
