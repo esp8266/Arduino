@@ -34,26 +34,35 @@ extern "C"
 #include "WiFiClient.h"
 #include "WiFiServer.h"
 #include "lwip/opt.h"
+#include "lwip/ip.h"
 #include "lwip/tcp.h"
 #include "lwip/inet.h"
+#include "lwip/netif.h"
 #include "cbuf.h"
 #include "include/ClientContext.h"
 #include "c_types.h"
 
 uint16_t WiFiClient::_localPort = 0;
 
+template<>
+WiFiClient* SList<WiFiClient>::_s_first = 0;
+
+
 WiFiClient::WiFiClient() 
 : _client(0)
 {
+    WiFiClient::_add(this);
 }
 
 WiFiClient::WiFiClient(ClientContext* client) : _client(client)
 {
     _client->ref();
+    WiFiClient::_add(this);
 }
 
 WiFiClient::~WiFiClient()
 {
+    WiFiClient::_remove(this);
     if (_client)
         _client->unref();
 }
@@ -63,6 +72,7 @@ WiFiClient::WiFiClient(const WiFiClient& other)
     _client = other._client;
     if (_client)
         _client->ref();
+    WiFiClient::_add(this);
 }
 
 WiFiClient& WiFiClient::operator=(const WiFiClient& other)
@@ -88,8 +98,20 @@ int WiFiClient::connect(const char* host, uint16_t port)
 
 int WiFiClient::connect(IPAddress ip, uint16_t port) 
 {
+    ip_addr_t addr;
+    addr.addr = ip;
+
     if (_client)
         stop();
+
+    // if the default interface is down, tcp_connect exits early without
+    // ever calling tcp_err
+    // http://lists.gnu.org/archive/html/lwip-devel/2010-05/msg00001.html
+    netif* interface = ip_route(&addr);
+    if (!interface) {
+        DEBUGV("no route to host\r\n");
+        return 1;
+    }
 
     tcp_pcb* pcb = tcp_new();
     if (!pcb)
@@ -99,8 +121,6 @@ int WiFiClient::connect(IPAddress ip, uint16_t port)
         pcb->local_port = _localPort++;
     }
 
-    ip_addr_t addr;
-    addr.addr = ip;
     tcp_arg(pcb, this);
     tcp_err(pcb, &WiFiClient::_s_err);
     tcp_connect(pcb, &addr, port, reinterpret_cast<tcp_connected_fn>(&WiFiClient::_s_connected));
@@ -257,3 +277,14 @@ void WiFiClient::_s_err(void* arg, int8_t err)
     reinterpret_cast<WiFiClient*>(arg)->_err(err);
 }
 
+void WiFiClient::stopAll()
+{
+    for (WiFiClient* it = _s_first; it; it = it->_next) {
+        ClientContext* c = it->_client;
+        if (c) {
+            c->abort();
+            c->unref();
+            it->_client = 0;
+        }
+    }
+}
