@@ -102,9 +102,9 @@ This is mostly similar to WiFi shield library. Differences include:
 - ```WiFi.RSSI()``` doesn't work
 - ```WiFi.printDiag(Serial);``` will print out some diagnostic info
 - ```WiFiUDP``` class supports sending and receiving multicast packets on STA interface.
-When sending a multicast packet, replace ```udp.beginPacket(addr, port)``` with 
+When sending a multicast packet, replace ```udp.beginPacket(addr, port)``` with
 ```udp.beginPacketMulticast(addr, port, WiFi.localIP())```.
-When listening to multicast packets, replace ```udp.begin(port)``` with 
+When listening to multicast packets, replace ```udp.begin(port)``` with
 ```udp.beginMulticast(WiFi.localIP(), multicast_ip_addr, port)```.
 You can use ```udp.destinationIP()``` to tell whether the packet received was
 sent to the multicast or unicast address.
@@ -117,7 +117,7 @@ Four samples are provided for this library.
 
 Library for calling functions repeatedly with a certain period. Two examples included.
 
-It is currently not recommended to do blocking IO operations (network, serial, file) from Ticker 
+It is currently not recommended to do blocking IO operations (network, serial, file) from Ticker
 callback functions. Instead, set a flag inside the ticker callback and check for that flag inside the loop function.
 
 #### EEPROM ####
@@ -183,6 +183,11 @@ Allows the sketch to respond to multicast DNS queries for domain names like "foo
 Currently the library only works on STA interface, AP interface is not supported.
 See attached example and library README file for details.
 
+#### DNS server (DNSServer library) ####
+
+Implements a simple DNS server that can be used in both STA and AP modes. The DNS server currently supports only one domain (for all other domains it will reply with NXDOMAIN or custom status code). With it clients can open a web server running on ESP8266 using a domain name, not an IP address.
+See attached example for details.
+
 #### Servo ####
 
 This library exposes the ability to control RC (hobby) servo motors. It will support upto 24 servos on any available output pin. By defualt the first 12 servos will use Timer0 and currently this will not interfere with any other support.  Servo counts above 12 will use Timer1 and features that use it will be effected.
@@ -211,10 +216,10 @@ You need to put ESP8266 into bootloader mode before uploading code.
 For stable use of the ESP8266 a power supply with 3V3 and >= 250mA is required.
 
 * Note
- - using Power from USB to Serial is may unstable, they not deliver enough current. 
- 
+ - using Power from USB to Serial is may unstable, they not deliver enough current.
+
 #### Serial Adapter ####
- 
+
 There are many different USB to Serial adapters / boards.
 
 * Note
@@ -223,17 +228,17 @@ There are many different USB to Serial adapters / boards.
  - not all board have all pins of the ICs as breakout (check before order)
  - CTS and DSR are not useful for upload (they are Inputs)
 
-* Working ICs 
+* Working ICs
  - FT232RL
  - CP2102
  - may others (drop a comment)
-  
+
 #### Minimal hardware Setup for Bootloading and usage ####
 
 ESPxx Hardware
 
 | PIN           | Resistor | Serial Adapter |
-| ------------- | -------- | -------------- | 
+| ------------- | -------- | -------------- |
 | VCC           |          | VCC (3.3V)     |
 | GND           |          | GND            |
 | TX or GPIO2*  |          | RX             |
@@ -243,11 +248,11 @@ ESPxx Hardware
 | GPIO15*       | PullDown |                |
 | CH_PD         | PullUp   |                |
 
-* Note 
+* Note
  - GPIO15 is also named MTDO
  - Reset is also named RSBT or REST (adding PullUp improves the stability of the Module)
  - GPIO2 is alternative TX for the boot loader mode
- 
+
 ###### esp to Serial
 ![ESP to Serial](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/ESP_to_serial.png)
 
@@ -255,7 +260,7 @@ ESPxx Hardware
 ESPxx Hardware
 
 | PIN           | Resistor | Serial Adapter  |
-| ------------- | -------- | --------------- | 
+| ------------- | -------- | --------------- |
 | VCC           |          | VCC (3.3V)      |
 | GND           |          | GND             |
 | TX or GPIO2   |          | RX              |
@@ -265,15 +270,15 @@ ESPxx Hardware
 | GPIO15        | PullDown |                 |
 | CH_PD         | PullUp   |                 |
 
-* Note 
+* Note
 	- if no RTS is used a manual power toggle is needed
-	 
+
 #### Minimal hardware Setup for running only ####
 
 ESPxx Hardware
 
 | PIN           | Resistor | Power supply    |
-| ------------- | -------- | --------------- | 
+| ------------- | -------- | --------------- |
 | VCC           |          | VCC (3.3V)      |
 | GND           |          | GND             |
 | GPIO0         | PullUp   |                 |
@@ -284,7 +289,7 @@ ESPxx Hardware
 ![ESP min](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/ESP_min.png)
 
 ###### improved stability
-![ESP improved stability](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/ESP_improved_stability.png)	
+![ESP improved stability](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/ESP_improved_stability.png)
 
 ### Issues and support ###
 
@@ -305,5 +310,3 @@ Esptool written by Christian Klippel is licensed under GPLv2, currently maintain
 ESP8266 core support, ESP8266WiFi, Ticker, ESP8266WebServer libraries were written by Ivan Grokhotkov, ivan@esp8266.com.
 
 [SPI Flash File System (SPIFFS)](https://github.com/pellepl/spiffs) written by Peter Andersson is used in this project. It is distributed under MIT license.
-
-
