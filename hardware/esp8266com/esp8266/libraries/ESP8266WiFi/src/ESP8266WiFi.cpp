@@ -69,7 +69,7 @@ int ESP8266WiFiClass::begin(const char* ssid, const char *passphrase, int32_t ch
         mode(WIFI_STA);
     }
 
-    if(!ssid || strlen(ssid) > 31) {
+    if(!ssid || *ssid == 0x00 || strlen(ssid) > 31) {
         // fail SSID to long or missing!
         return WL_CONNECT_FAILED;
     }
@@ -178,7 +178,7 @@ void ESP8266WiFiClass::softAP(const char* ssid, const char* passphrase, int chan
         mode(WIFI_AP);
     }
 
-    if(!ssid || strlen(ssid) > 31) {
+    if(!ssid || *ssid == 0x00 || strlen(ssid) > 31) {
         // fail SSID to long or missing!
         return;
     }
