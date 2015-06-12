@@ -192,6 +192,9 @@ public class SerialUploader extends Uploader {
     if (finalUploadPort == null) {
       finalUploadPort = actualUploadPort;
     }
+    if (finalUploadPort == null) {
+      finalUploadPort = userSelectedUploadPort;
+    }
     BaseNoGui.selectSerialPort(finalUploadPort);
     return uploadResult;
   }
