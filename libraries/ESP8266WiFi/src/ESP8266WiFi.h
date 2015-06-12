@@ -313,6 +313,7 @@ protected:
     static void _scanDone(void* result, int status);
     void * _getScanInfoByIndex(int i);
     static void _smartConfigCallback(uint32_t status, void* result);
+    static void _eventCallback(void *event);
     bool _smartConfigStarted = false;
     bool _smartConfigDone = false;
 

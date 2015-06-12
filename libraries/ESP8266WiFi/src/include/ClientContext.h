@@ -261,8 +261,17 @@ class ClientContext {
         }
 
         void _error(err_t err) {
-            DEBUGV(":er %d\r\n", err);
-            close();
+            DEBUGV(":er %d %d %d\r\n", err, _size_sent, _send_waiting);
+            if (err != ERR_ABRT) {
+                abort();
+            }
+            else {
+              tcp_arg(_pcb, NULL);
+              tcp_sent(_pcb, NULL);
+              tcp_recv(_pcb, NULL);
+              tcp_err(_pcb, NULL);
+              _pcb = NULL;
+            }
             if(_size_sent && _send_waiting) {
                 esp_schedule();
             }
