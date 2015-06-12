@@ -60,7 +60,7 @@ void loop() {
 
   // if the current temperature is lower than the baseline
   // turn off all LEDs
-  if (temperature < baselineTemp) {
+  if (temperature < baselineTemp + 2) {
     digitalWrite(2, LOW);
     digitalWrite(3, LOW);
     digitalWrite(4, LOW);
