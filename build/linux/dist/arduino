@@ -33,4 +33,4 @@ if [ -x ./java/bin/java ]; then
   JAVA=./java/bin/java
 fi
 
-$JAVA -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel $SPLASH processing.app.Base --curdir $CURDIR "$@"
+$JAVA -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel $SPLASH processing.app.Base --curdir "$CURDIR" "$@"
