@@ -377,7 +377,7 @@
           var leaf = document.createElement("li");
           leaf.id = (((path == "/")?"":path)+"/"+name).toLowerCase();
           var label = document.createElement("span");
-          label.innerText = name.toLowerCase();
+          label.textContent = name.toLowerCase();
           leaf.appendChild(label);
           leaf.onclick = function(e){
             if(isTextFile(leaf.id)){
@@ -403,7 +403,7 @@
           leaf.appendChild(check);
           var label = document.createElement("label");
           label.for = check.id;
-          label.innerText = name.toLowerCase();
+          label.textContent = name.toLowerCase();
           leaf.appendChild(label);
           check.onchange = function(e){
             if(check.checked){
