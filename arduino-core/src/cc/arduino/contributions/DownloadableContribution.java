@@ -26,9 +26,9 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  */
+
 package cc.arduino.contributions;
 
-import cc.arduino.contributions.VersionHelper;
 import com.github.zafarkhaja.semver.Version;
 
 import java.io.File;

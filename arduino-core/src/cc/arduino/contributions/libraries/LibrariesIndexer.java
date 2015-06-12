@@ -26,6 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  */
+
 package cc.arduino.contributions.libraries;
 
 import cc.arduino.contributions.libraries.filters.LibraryInstalledInsideCore;
@@ -50,9 +51,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.ArrayList;
 
 import static processing.app.I18n._;
 

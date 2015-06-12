@@ -26,23 +26,19 @@
 
 package cc.arduino.packages.uploaders;
 
-import static processing.app.I18n._;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-import processing.app.BaseNoGui;
-import processing.app.I18n;
-import processing.app.PreferencesData;
-import processing.app.Serial;
-import processing.app.SerialException;
+import cc.arduino.packages.Uploader;
+import processing.app.*;
 import processing.app.debug.RunnerException;
 import processing.app.debug.TargetPlatform;
 import processing.app.helpers.OSUtils;
 import processing.app.helpers.PreferencesMap;
 import processing.app.helpers.StringReplacer;
-import cc.arduino.packages.Uploader;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import static processing.app.I18n._;
 
 public class SerialUploader extends Uploader {
 

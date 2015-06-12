@@ -26,15 +26,15 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  */
+
 package cc.arduino.contributions.packages.ui;
 
+import cc.arduino.contributions.DownloadableContribution;
 import cc.arduino.contributions.packages.ContributedPlatform;
 import cc.arduino.contributions.packages.ContributionInstaller;
 import cc.arduino.contributions.packages.ContributionsIndexer;
-import cc.arduino.contributions.DownloadableContribution;
 import cc.arduino.contributions.ui.*;
 import cc.arduino.utils.Progress;
-import processing.app.BaseNoGui;
 import processing.app.I18n;
 import processing.app.Platform;
 

@@ -26,11 +26,11 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  */
+
 package cc.arduino.utils.network;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.compress.utils.IOUtils;
-import processing.app.PreferencesData;
 
 import java.io.File;
 import java.io.IOException;

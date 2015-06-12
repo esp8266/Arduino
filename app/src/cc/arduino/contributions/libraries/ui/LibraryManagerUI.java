@@ -26,25 +26,26 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  */
+
 package cc.arduino.contributions.libraries.ui;
 
+import cc.arduino.contributions.DownloadableContribution;
 import cc.arduino.contributions.libraries.ContributedLibrary;
 import cc.arduino.contributions.libraries.LibrariesIndexer;
 import cc.arduino.contributions.libraries.LibraryInstaller;
 import cc.arduino.contributions.libraries.LibraryTypeComparator;
-import cc.arduino.contributions.DownloadableContribution;
-import cc.arduino.contributions.ui.InstallerJDialogUncaughtExceptionHandler;
 import cc.arduino.contributions.ui.*;
 import cc.arduino.utils.Progress;
 import com.google.common.base.Predicate;
-import processing.app.BaseNoGui;
 import processing.app.Platform;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
 
 import static processing.app.I18n._;
 
