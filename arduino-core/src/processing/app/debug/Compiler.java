@@ -152,7 +152,7 @@ public class Compiler implements MessageConsumer {
 
     if (uploader.requiresAuthorization() && !PreferencesData.has(uploader.getAuthorizationKey())) {
       BaseNoGui.showError(_("Authorization required"),
-                          _("No athorization data found"), null);
+                          _("No authorization data found"), null);
     }
 
     boolean useNewWarningsAccumulator = false;
