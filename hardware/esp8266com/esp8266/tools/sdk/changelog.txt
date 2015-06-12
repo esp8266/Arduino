@@ -1,3 +1,54 @@
+esp_iot_sdk_v1.1.1_15_06_05 Release Note 
+-------------------------------------------
+
+Resolved Issues（Bugs below are eligible for Bug Bounty Program):
+1.Too short timer which set by os_arm_timer_us may cause crash. [Tommy]
+2.Call os_malloc in low heap situation may cause crash. [MeneerThijs]
+3.Memory leak issue when SSL connection fail. [孙新虎]
+
+Optimization:
+1.Update JSON parser to handle with illegal parameter and illegal calling progress.
+2.Add parameter of user_esp_platform_check_ip in user_websever.c which in IOT_Demo. 
+3.Update UART driver to solve the problem that if send data through UART while ESP8266 startup may cause UART invalid.
+4.Update smartconfig to version 2.2, corresponding phone APP v0.3.2. And update the description and example of smartconfig_start in document "2C_ESP8266__Programming Guide"
+5.Update code in iram to solve the problem that space for text is not enough.
+6.Update PWM driver and provide libpwm.a in esp_iot_sdk, update PWM APIs in "2C_ESP8266__Programming Guide", more details in "Added APIs" below.
+7.Revised issue that multicast may fail in ESP8266 softAP mode.
+8.Update folder "driver",add folder "driver_lib" in \esp_iot_sdk\examples , add "hw_timer.c" about frc1 hardware timer.
+9.Remove useless driver code in IOT_Demo
+10.Update IOT_Demo to use the latest PWM driver in light demo.
+11.Provide liblwip_536.a of which MSS size is 536
+12.Revised issue that boot may fail when 80Mhz SPI clock selected 
+13.Update esp_init_data_default.bin about RF option in \esp_iot_sdk\bin 
+
+Added APIs：
+1.PWM APIs： 
+Updated： pwm_init，add parameter to set PWM channel and GPIO pin 
+Added：
+（1）get_pwm_version：get version information of PWM driver
+（2）pwm_set_period：set PWM period
+（3）pwm_get_period：get PWM period
+Deleted：
+（1）pwm_set_freq：set PWM frequency
+（2）pwm_get_freq：get PWM frequency
+2.Read/write flash with protection
+（1）system_param_save_with_protect：write data into flash with backup protection
+（2）system_param_load：read data which saved into flash with backup protection 
+3.system_get_rst_info：get information about current startup，it is a normal startup or watch dog reset
+4.at_response：set AT response
+5.at_register_response_func：register a callback for user-define AT response.
+6.Update document "2C_ESP8266__Programming Guide" to add description of interrupt definition in ets_sys.h 
+
+AT_v0.25 Release Note: 
+Note: For AT firmware to support FOTA, flash size need to be 1024KB or more than that.
+Optimization:
+1.Add parameter about UDP local port in command "AT+SAVETRANSLINK"
+
+Added AT command： 
+1.AT+CIPDINFO：set configuration whether show remote IP and remote port with “+IPD” or not
+
+
+
 esp_iot_sdk_v1.1.0_15_05_27_p1 Release Note 
 -------------------------------------------
 
