@@ -143,13 +143,13 @@ void ets_intr_unlock();
 // level 15 will disable ALL interrupts, 
 // level 0 will disable most software interrupts
 //
-#define xt_disable_interrupts(state, level) __asm__ __volatile__("rsil %0," __STRINGIFY(level) "; esync; isync; dsync" : "=a" (state))
-#define xt_enable_interrupts(state)  __asm__ __volatile__("wsr %0,ps; esync" :: "a" (state) : "memory")
+#define xt_disable_interrupts(state, level) __asm__ __volatile__("rsil %0," __STRINGIFY(level) : "=a" (state))
+#define xt_enable_interrupts(state)  __asm__ __volatile__("wsr %0,ps; isync" :: "a" (state) : "memory")
 
 extern uint32_t interruptsState;
 
 #define interrupts() xt_enable_interrupts(interruptsState)
-#define noInterrupts() __asm__ __volatile__("rsil %0,15; esync; isync; dsync" : "=a" (interruptsState))
+#define noInterrupts() __asm__ __volatile__("rsil %0,15" : "=a" (interruptsState))
 
 #define clockCyclesPerMicrosecond() ( F_CPU / 1000000L )
 #define clockCyclesToMicroseconds(a) ( (a) / clockCyclesPerMicrosecond() )
@@ -209,6 +209,7 @@ void loop(void);
 // This comes from the pins_*.c file for the active board configuration.
 #define digitalPinToPort(pin)       (0)
 #define digitalPinToBitMask(pin)    (1UL << (pin))
+#define digitalPinToTimer(pin)      (0)
 #define portOutputRegister(port)    ((volatile uint32_t*) GPO)
 #define portInputRegister(port)     ((volatile uint32_t*) GPI)
 #define portModeRegister(port)      ((volatile uint32_t*) GPE)
@@ -216,6 +217,7 @@ void loop(void);
 #define NOT_A_PIN -1
 #define NOT_A_PORT -1
 #define NOT_AN_INTERRUPT -1
+#define NOT_ON_TIMER 0
 
 #ifdef __cplusplus
 } // extern "C"

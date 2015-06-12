@@ -314,6 +314,7 @@ protected:
     static void _scanDone(void* result, int status);
     void * _getScanInfoByIndex(int i);
     static void _smartConfigDone(void* result);
+    static void _eventCallback(void *event);
     bool _smartConfigStarted = false;
 
     bool _useApMode;
