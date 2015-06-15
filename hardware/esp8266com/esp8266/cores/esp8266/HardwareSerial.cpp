@@ -393,9 +393,6 @@ void uart_ignore_char(char c) {
 void uart0_write_char(char c) {
     if(&Serial != NULL && Serial.isTxEnabled()) {
         if(Serial.availableForWrite() > 0) {
-            if(c == '\n') {
-                Serial.write('\r');
-            }
             Serial.write(c);
             return;
         }
@@ -403,23 +400,17 @@ void uart0_write_char(char c) {
 
     // wait for the Hardware FIFO
     while(true) {
-        if(((USS(0) >> USTXC) & 0xff) <= (UART_TX_FIFO_SIZE - 2)) {
+        if(((USS(0) >> USTXC) & 0xff) <= (UART_TX_FIFO_SIZE - 1)) {
             break;
         }
     }
 
-    if(c == '\n') {
-        USF(0) = '\r';
-    }
     USF(0) = c;
 }
 
 void uart1_write_char(char c) {
     if(&Serial1 != NULL && Serial1.isTxEnabled()) {
         if(Serial1.availableForWrite() > 0) {
-            if(c == '\n') {
-                Serial1.write('\r');
-            }
             Serial1.write(c);
             return;
         }
@@ -427,14 +418,11 @@ void uart1_write_char(char c) {
 
     // wait for the Hardware FIFO
     while(true) {
-        if(((USS(1) >> USTXC) & 0xff) <= (UART_TX_FIFO_SIZE - 2)) {
+        if(((USS(1) >> USTXC) & 0xff) <= (UART_TX_FIFO_SIZE - 1)) {
             break;
         }
     }
 
-    if(c == '\n') {
-        USF(1) = '\r';
-    }
     USF(1) = c;
 }
 
