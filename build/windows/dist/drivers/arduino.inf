@@ -58,6 +58,8 @@ yun.sketch.name="Arduino Yun"
 zero.edbg.name="Atmel Corp. EDBG CMSIS-DAP"
 zero.sketch.name="Arduino Zero"
 zero.bootloader.name="Arduino Zero bootloader"
+sme_fox.sketch.name="SmartEverything Fox"
+sme_fox.bootloader.name="SmartEverything Fox bootloader"
 
 [DefaultInstall]
 CopyINF=arduino.inf
@@ -69,7 +71,7 @@ Signature="$Windows NT$"
 Provider=%ManufacturerName%
 DriverPackageDisplayName=%DriverPackageDisplayName%
 CatalogFile=arduino.cat
-DriverVer=06/11/2015,1.2.1.0
+DriverVer=06/15/2015,1.2.2.0
 
 [Manufacturer]
 %ManufacturerName%=DeviceList, NTamd64, NTia64
@@ -106,6 +108,8 @@ DefaultDestDir=12
 %zero.edbg.name%=DriverInstall, USB\VID_03EB&PID_2157&MI_01
 %zero.sketch.name%=DriverInstall, USB\VID_2341&PID_804D&MI_00
 %zero.bootloader.name%=DriverInstall, USB\VID_2341&PID_004D
+%sme_fox.sketch.name%=DriverInstall, USB\VID_2341&PID_E002&MI_00
+%sme_fox.bootloader.name%=DriverInstall, USB\VID_2341&PID_E001
 
 [DeviceList.NTamd64]
 %bossa.name%=DriverInstall, USB\VID_03EB&PID_6124
@@ -135,6 +139,8 @@ DefaultDestDir=12
 %zero.edbg.name%=DriverInstall, USB\VID_03EB&PID_2157&MI_01
 %zero.sketch.name%=DriverInstall, USB\VID_2341&PID_804D&MI_00
 %zero.bootloader.name%=DriverInstall, USB\VID_2341&PID_004D
+%sme_fox.sketch.name%=DriverInstall, USB\VID_2341&PID_E002&MI_00
+%sme_fox.bootloader.name%=DriverInstall, USB\VID_2341&PID_E001
 
 [DeviceList.NTia64]
 %bossa.name%=DriverInstall, USB\VID_03EB&PID_6124
@@ -164,6 +170,8 @@ DefaultDestDir=12
 %zero.edbg.name%=DriverInstall, USB\VID_03EB&PID_2157&MI_01
 %zero.sketch.name%=DriverInstall, USB\VID_2341&PID_804D&MI_00
 %zero.bootloader.name%=DriverInstall, USB\VID_2341&PID_004D
+%sme_fox.sketch.name%=DriverInstall, USB\VID_2341&PID_E002&MI_00
+%sme_fox.bootloader.name%=DriverInstall, USB\VID_2341&PID_E001
 
 [DriverInstall]
 include=mdmcpq.inf,usb.inf
