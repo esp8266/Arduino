@@ -106,17 +106,18 @@ public class SerialUploader extends Uploader {
     t = prefs.get("upload.wait_for_upload_port");
     boolean waitForUploadPort = (t != null) && t.equals("true");
 
-    String uploadPort = prefs.getOrExcept("serial.port");
+    String userSelectedUploadPort = prefs.getOrExcept("serial.port");
+    String actualUploadPort = null;
 
     if (doTouch) {
       try {
         // Toggle 1200 bps on selected serial port to force board reset.
         List<String> before = Serial.list();
-        if (before.contains(uploadPort)) {
+        if (before.contains(userSelectedUploadPort)) {
           if (verbose)
             System.out.println(
-              I18n.format(_("Forcing reset using 1200bps open/close on port {0}"), uploadPort));
-          Serial.touchForCDCReset(uploadPort);
+              I18n.format(_("Forcing reset using 1200bps open/close on port {0}"), userSelectedUploadPort));
+          Serial.touchForCDCReset(userSelectedUploadPort);
         }
         Thread.sleep(400);
         if (waitForUploadPort) {
@@ -124,18 +125,21 @@ public class SerialUploader extends Uploader {
           // otherwise assert DTR, which would cancel the WDT reset if
           // it happened within 250 ms. So we wait until the reset should
           // have already occured before we start scanning.
-          uploadPort = waitForUploadPort(uploadPort, before);
+          actualUploadPort = waitForUploadPort(userSelectedUploadPort, before);
         }
       } catch (SerialException e) {
         throw new RunnerException(e);
       } catch (InterruptedException e) {
         throw new RunnerException(e.getMessage());
       }
-      prefs.put("serial.port", uploadPort);
-      if (uploadPort.startsWith("/dev/")) {
-        prefs.put("serial.port.file", uploadPort.substring(5));
+      if (actualUploadPort == null) {
+        actualUploadPort = userSelectedUploadPort;
+      }
+      prefs.put("serial.port", actualUploadPort);
+      if (actualUploadPort.startsWith("/dev/")) {
+        prefs.put("serial.port.file", actualUploadPort.substring(5));
       } else {
-        prefs.put("serial.port.file", uploadPort);
+        prefs.put("serial.port.file", actualUploadPort);
       }
     }
 
@@ -158,9 +162,9 @@ public class SerialUploader extends Uploader {
       throw new RunnerException(e);
     }
 
+    String finalUploadPort = null;
     if (uploadResult && doTouch) {
       try {
-        String previousUploadPort = PreferencesData.get("serial.port");
         if (waitForUploadPort) {
           // For Due/Leonardo wait until the bootloader serial port disconnects and the
           // sketch serial port reconnects (or timeout after a few seconds if the
@@ -170,7 +174,11 @@ public class SerialUploader extends Uploader {
           long started = System.currentTimeMillis();
           while (System.currentTimeMillis() - started < 2000) {
             List<String> portList = Serial.list();
-            if (portList.contains(previousUploadPort)) {
+            if (portList.contains(actualUploadPort)) {
+              finalUploadPort = actualUploadPort;
+              break;
+            } else if (portList.contains(userSelectedUploadPort)) {
+              finalUploadPort = userSelectedUploadPort;
               break;
             }
             Thread.sleep(250);
@@ -181,7 +189,13 @@ public class SerialUploader extends Uploader {
       }
     }
 
-    BaseNoGui.selectSerialPort(uploadPort);
+    if (finalUploadPort == null) {
+      finalUploadPort = actualUploadPort;
+    }
+    if (finalUploadPort == null) {
+      finalUploadPort = userSelectedUploadPort;
+    }
+    BaseNoGui.selectSerialPort(finalUploadPort);
     return uploadResult;
   }
 
