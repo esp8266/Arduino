@@ -121,7 +121,11 @@ void interrupt_handler(void *arg) {
     while(!(changedbits & (1 << i))) i++;
     changedbits &= ~(1 << i);
     interrupt_handler_t *handler = &interrupt_handlers[i];
-    if(((handler->mode & 1) == digitalRead(i)) && handler->fn) handler->fn();
+    if (handler->fn && 
+        (handler->mode == CHANGE || 
+         (handler->mode & 1) == digitalRead(i))) {
+      handler->fn();
+    }
   }
   ETS_GPIO_INTR_ENABLE();
 }
