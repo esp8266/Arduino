@@ -106,6 +106,10 @@ void ESP8266WebServer::handleClient()
     delay(1);
   }
 
+  if (!client) {
+    return;
+  }
+
   if (!_parseRequest(client)) {
     return;
   }
