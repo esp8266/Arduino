@@ -97,6 +97,7 @@ editor.literal1.style = #006699,plain
 editor.literal2.style = #00979C,plain
 editor.variable.style = #00979C,plain
 editor.reserved_word_2.style = #00979C,plain
+editor.literal_boolean.style = #00979C,plain
 editor.literal_char.style = #00979C,plain
 editor.literal_string_double_quote.style = #00979C,plain
 

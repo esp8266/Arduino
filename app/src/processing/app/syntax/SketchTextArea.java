@@ -126,6 +126,7 @@ public class SketchTextArea extends RSyntaxTextArea {
     setSyntaxTheme(TokenTypes.COMMENT_EOL, "comment1");
     setSyntaxTheme(TokenTypes.COMMENT_KEYWORD, "comment1");
     setSyntaxTheme(TokenTypes.COMMENT_MARKUP, "comment1");
+    setSyntaxTheme(TokenTypes.LITERAL_BOOLEAN, "literal_boolean");
     setSyntaxTheme(TokenTypes.LITERAL_CHAR, "literal_char");
     setSyntaxTheme(TokenTypes.LITERAL_STRING_DOUBLE_QUOTE, "literal_string_double_quote");
   }
