@@ -3,6 +3,7 @@
   <headerType>console</headerType>
   <jar>lib</jar>
   <outfile>arduino_debug.exe</outfile>
+  <chdir>.</chdir>
   <errTitle>Arduino</errTitle>
   <downloadUrl>http://www.oracle.com/technetwork/java/javase/downloads/index.html</downloadUrl>
   <icon>application.ico</icon>
