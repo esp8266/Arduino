@@ -31,9 +31,9 @@ import static processing.app.I18n._;
 public class BaseNoGui {
 
   /** Version string to be used for build */
-  public static final int REVISION = 10605;
+  public static final int REVISION = 10606;
   /** Extended version string displayed on GUI */
-  public static final String VERSION_NAME = "1.6.5";
+  public static final String VERSION_NAME = "1.6.6";
   public static final String VERSION_NAME_LONG;
 
   static {
