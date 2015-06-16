@@ -157,7 +157,7 @@ public class FileDownloader extends Observable {
       }
 
       if (resp < 200 || resp >= 300) {
-        throw new IOException("Recevied invalid http status code from server: " + resp);
+        throw new IOException("Received invalid http status code from server: " + resp);
       }
 
       // Check for valid content length.
