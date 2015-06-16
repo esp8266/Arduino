@@ -275,6 +275,7 @@ public class Preferences extends javax.swing.JDialog {
     additionalBoardsManagerField.setToolTipText(_("Enter a comma separated list of urls"));
 
     extendedAdditionalUrlFieldWindow.setIcon(new ImageIcon(Base.getThemeImage("newwindow.gif", this)));
+    extendedAdditionalUrlFieldWindow.setMargin(new java.awt.Insets(1, 1, 1, 1));
     extendedAdditionalUrlFieldWindow.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         extendedAdditionalUrlFieldWindowActionPerformed(evt);
@@ -360,7 +361,7 @@ public class Preferences extends javax.swing.JDialog {
               .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
               .addComponent(additionalBoardsManagerField, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
               .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-              .addComponent(extendedAdditionalUrlFieldWindow, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
+              .addComponent(extendedAdditionalUrlFieldWindow))
             .addGroup(layout.createSequentialGroup()
               .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addComponent(sketchbookLocationLabel)
@@ -425,7 +426,7 @@ public class Preferences extends javax.swing.JDialog {
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
               .addComponent(additionalBoardsManagerLabel)
               .addComponent(additionalBoardsManagerField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addComponent(extendedAdditionalUrlFieldWindow, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addComponent(extendedAdditionalUrlFieldWindow))
           .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
           .addComponent(morePreferencesLabel)
           .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)

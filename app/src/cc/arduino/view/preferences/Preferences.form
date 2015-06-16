@@ -47,7 +47,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="additionalBoardsManagerField" min="-2" pref="500" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="extendedAdditionalUrlFieldWindow" min="-2" pref="36" max="-2" attributes="0"/>
+                      <Component id="extendedAdditionalUrlFieldWindow" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
@@ -130,7 +130,7 @@
                       <Component id="additionalBoardsManagerLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="additionalBoardsManagerField" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="extendedAdditionalUrlFieldWindow" min="-2" pref="27" max="-2" attributes="0"/>
+                  <Component id="extendedAdditionalUrlFieldWindow" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="morePreferencesLabel" min="-2" max="-2" attributes="0"/>
@@ -291,6 +291,9 @@
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
           <Connection code="new ImageIcon(Base.getThemeImage(&quot;newwindow.gif&quot;, this))" type="code"/>
+        </Property>
+        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
+          <Insets value="[1, 1, 1, 1]"/>
         </Property>
       </Properties>
       <Events>
