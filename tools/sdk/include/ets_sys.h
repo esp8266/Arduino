@@ -88,6 +88,9 @@ inline uint32_t ETS_INTR_PENDING(void)
 #define ETS_FRC_TIMER1_INTR_ATTACH(func, arg) \
     ets_isr_attach(ETS_FRC_TIMER1_INUM, (int_handler_t)(func), (void *)(arg))
 
+#define ETS_FRC_TIMER1_NMI_INTR_ATTACH(func) \
+    NmiTimSetFunc(func)
+
 #define ETS_FRC1_INTR_ENABLE() \
     ETS_INTR_ENABLE(ETS_FRC_TIMER1_INUM)
 
