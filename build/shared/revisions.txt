@@ -1,5 +1,10 @@
 ARDUINO 1.6.6
 
+ARDUINO 1.6.5-r2 - 2015.06.17
+
+[ide]
+* Windows: fixed a problem that prevented opening the IDE when double clicking a .ino file
+
 ARDUINO 1.6.5 - 2015.06.15
 
 [ide]
