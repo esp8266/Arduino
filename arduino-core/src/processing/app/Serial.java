@@ -123,7 +123,10 @@ public class Serial implements SerialPortEventListener {
       port.openPort();
       port.setParams(rate, databits, stopbits, parity, true, true);
       port.addEventListener(this);
-    } catch (Exception e) {
+    } catch (SerialPortException e) {
+      if (e.getPortName().startsWith("/dev") && SerialPortException.TYPE_PERMISSION_DENIED.equals(e.getExceptionType())) {
+        throw new SerialException(I18n.format(_("Error opening serial port ''{0}''. Try consulting the documentation at http://playground.arduino.cc/Linux/All#Permission"), iname));
+      }
       throw new SerialException(I18n.format(_("Error opening serial port ''{0}''."), iname), e);
     }
 
