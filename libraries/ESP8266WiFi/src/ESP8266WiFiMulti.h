@@ -32,7 +32,7 @@
 #undef max
 #include <vector>
 
-//#define DEBUG_WIFI_MULTI(...) Serial1.printf( __VA_ARGS__ )
+#define DEBUG_WIFI_MULTI(...) Serial1.printf( __VA_ARGS__ )
 
 #ifndef DEBUG_WIFI_MULTI
 #define DEBUG_WIFI_MULTI(...)
