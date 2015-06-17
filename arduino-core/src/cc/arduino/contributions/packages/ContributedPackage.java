@@ -26,9 +26,8 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  */
-package cc.arduino.contributions.packages;
 
-import cc.arduino.contributions.VersionComparator;
+package cc.arduino.contributions.packages;
 
 import java.util.List;
 
@@ -80,16 +79,16 @@ public abstract class ContributedPackage {
         }
         res += "\n                    category     : " + plat.getCategory();
         res += "\n                    architecture : " +
-            plat.getArchitecture() + " " + plat.getParsedVersion() + "\n";
+          plat.getArchitecture() + " " + plat.getParsedVersion() + "\n";
         if (plat.getToolsDependencies() != null)
           for (ContributedToolReference t : plat.getToolsDependencies()) {
             res += "                    tool dep     : " + t.getName() + " " +
-                t.getVersion() + "\n";
+              t.getVersion() + "\n";
           }
         if (plat.getBoards() != null)
           for (ContributedBoard board : plat.getBoards())
             res += "                    board        : " + board.getName() +
-                "\n";
+              "\n";
       }
     }
     if (getTools() != null) {

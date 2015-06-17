@@ -26,15 +26,17 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  */
+
 package cc.arduino.contributions.packages.ui;
 
+import cc.arduino.contributions.DownloadableContribution;
 import cc.arduino.contributions.packages.ContributedPlatform;
 import cc.arduino.contributions.packages.ContributionInstaller;
 import cc.arduino.contributions.packages.ContributionsIndexer;
-import cc.arduino.contributions.packages.DownloadableContribution;
 import cc.arduino.contributions.ui.*;
 import cc.arduino.utils.Progress;
 import processing.app.I18n;
+import processing.app.Platform;
 
 import javax.swing.*;
 import java.awt.*;
@@ -47,7 +49,7 @@ import static processing.app.I18n._;
 @SuppressWarnings("serial")
 public class ContributionManagerUI extends InstallerJDialog {
 
-  // private ContributedPlatformTableCell cellEditor;
+  private final Platform platform;
 
   @Override
   protected FilteredAbstractTableModel createContribModel() {
@@ -82,8 +84,9 @@ public class ContributionManagerUI extends InstallerJDialog {
     };
   }
 
-  public ContributionManagerUI(Frame parent) {
+  public ContributionManagerUI(Frame parent, Platform platform) {
     super(parent, _("Boards Manager"), Dialog.ModalityType.APPLICATION_MODAL, _("Unable to reach Arduino.cc due to possible network issues."));
+    this.platform = platform;
   }
 
   public void setIndexer(ContributionsIndexer indexer) {
@@ -113,7 +116,7 @@ public class ContributionManagerUI extends InstallerJDialog {
     }
 
     // Create ConstributionInstaller tied with the provided index
-    installer = new ContributionInstaller(indexer) {
+    installer = new ContributionInstaller(indexer, platform) {
       @Override
       public void onProgress(Progress progress) {
         setProgress(progress);

@@ -1,1 +1,0 @@
-https://github.com/twall/jna/blob/master/LICENSE

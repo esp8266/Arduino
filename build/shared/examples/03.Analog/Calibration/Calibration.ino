@@ -20,7 +20,7 @@
  modified 30 Aug 2011
  By Tom Igoe
 
- http://arduino.cc/en/Tutorial/Calibration
+ http://www.arduino.cc/en/Tutorial/Calibration
 
  This example code is in the public domain.
 

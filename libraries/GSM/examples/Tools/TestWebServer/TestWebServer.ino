@@ -12,7 +12,7 @@
  modified 21 Nov 2012
  by Tom Igoe
 
- http://arduino.cc/en/Tutorial/GSMToolsTestWebServer
+ http://www.arduino.cc/en/Tutorial/GSMToolsTestWebServer
 
  This example code is part of the public domain
  */

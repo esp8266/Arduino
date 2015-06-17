@@ -26,14 +26,16 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  */
+
 package cc.arduino.contributions.libraries;
 
-import cc.arduino.contributions.packages.DownloadableContributionsDownloader;
+import cc.arduino.contributions.DownloadableContributionsDownloader;
+import cc.arduino.contributions.GZippedJsonDownloader;
 import cc.arduino.utils.ArchiveExtractor;
 import cc.arduino.utils.MultiStepProgress;
 import cc.arduino.utils.Progress;
-import processing.app.BaseNoGui;
 import processing.app.I18n;
+import processing.app.Platform;
 import processing.app.helpers.FileUtils;
 
 import java.io.File;
@@ -45,6 +47,7 @@ import static processing.app.I18n._;
 public class LibraryInstaller {
 
   private static final String LIBRARY_INDEX_URL;
+  private static final String LIBRARY_INDEX_URL_GZ;
 
   static {
     String externalLibraryIndexUrl = System.getProperty("LIBRARY_INDEX_URL");
@@ -53,14 +56,17 @@ public class LibraryInstaller {
     } else {
       LIBRARY_INDEX_URL = "http://downloads.arduino.cc/libraries/library_index.json";
     }
+    LIBRARY_INDEX_URL_GZ = "http://downloads.arduino.cc/libraries/library_index.json.gz";
   }
 
   private final LibrariesIndexer indexer;
   private final DownloadableContributionsDownloader downloader;
+  private final Platform platform;
 
-  public LibraryInstaller(LibrariesIndexer _indexer) {
-    indexer = _indexer;
-    File stagingFolder = _indexer.getStagingFolder();
+  public LibraryInstaller(LibrariesIndexer indexer, Platform platform) {
+    this.indexer = indexer;
+    this.platform = platform;
+    File stagingFolder = indexer.getStagingFolder();
     downloader = new DownloadableContributionsDownloader(stagingFolder) {
       @Override
       protected void onProgress(Progress progress) {
@@ -77,8 +83,8 @@ public class LibraryInstaller {
     File outputFile = indexer.getIndexFile();
     File tmpFile = new File(outputFile.getAbsolutePath() + ".tmp");
     try {
-      downloader.download(url, tmpFile, progress,
-              _("Downloading libraries index..."));
+      GZippedJsonDownloader gZippedJsonDownloader = new GZippedJsonDownloader(downloader, new URL(LIBRARY_INDEX_URL), new URL(LIBRARY_INDEX_URL_GZ));
+      gZippedJsonDownloader.download(tmpFile, progress, _("Downloading libraries index..."));
     } catch (InterruptedException e) {
       // Download interrupted... just exit
       return;
@@ -91,8 +97,7 @@ public class LibraryInstaller {
     if (outputFile.exists())
       outputFile.delete();
     if (!tmpFile.renameTo(outputFile))
-      throw new Exception(
-              _("An error occurred while updating libraries index!"));
+      throw new Exception(_("An error occurred while updating libraries index!"));
 
     // Step 2: Rescan index
     rescanLibraryIndex(progress);
@@ -124,7 +129,7 @@ public class LibraryInstaller {
     File libsFolder = indexer.getSketchbookLibrariesFolder();
     File tmpFolder = FileUtils.createTempFolderIn(libsFolder);
     try {
-      new ArchiveExtractor(BaseNoGui.getPlatform()).extract(lib.getDownloadedFile(), tmpFolder, 1);
+      new ArchiveExtractor(platform).extract(lib.getDownloadedFile(), tmpFolder, 1);
     } catch (Exception e) {
       if (tmpFolder.exists())
         FileUtils.recursiveDelete(tmpFolder);

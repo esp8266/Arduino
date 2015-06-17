@@ -13,12 +13,12 @@
 
  Software required :
  CapacitiveSensor library by Paul Badger
- http://arduino.cc/playground/Main/CapacitiveSensor
+ http://www.arduino.cc/playground/Main/CapacitiveSensor
 
  Created 18 September 2012
  by Scott Fitzgerald
 
- http://arduino.cc/starterKit
+ http://www.arduino.cc/starterKit
 
  This example code is part of the public domain
  */

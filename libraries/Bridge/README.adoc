@@ -3,7 +3,7 @@
 The Bridge library simplifies communication between the ATmega32U4 and the AR9331.
 
 For more information about this library please visit us at
-http://arduino.cc/en/Reference/YunBridgeLibrary
+http://www.arduino.cc/en/Reference/YunBridgeLibrary
 
 == License ==
 

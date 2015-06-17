@@ -30,6 +30,7 @@
 
 package processing.app.syntax;
 
+import org.apache.commons.compress.utils.IOUtils;
 import org.fife.ui.rsyntaxtextarea.*;
 import org.fife.ui.rsyntaxtextarea.Theme;
 import org.fife.ui.rsyntaxtextarea.Token;
@@ -85,7 +86,7 @@ public class SketchTextArea extends RSyntaxTextArea {
     installFeatures();
   }
 
-  protected void installFeatures() throws IOException {
+  private void installFeatures() throws IOException {
     setTheme(PreferencesData.get("editor.syntax_theme", "default"));
 
     setLinkGenerator(new DocLinkGenerator(pdeKeywords));
@@ -95,16 +96,14 @@ public class SketchTextArea extends RSyntaxTextArea {
     setSyntaxEditingStyle(SYNTAX_STYLE_CPLUSPLUS);
   }
 
-  public void setTheme(String name) throws IOException {
+  private void setTheme(String name) throws IOException {
     FileInputStream defaultXmlInputStream = null;
     try {
       defaultXmlInputStream = new FileInputStream(new File(BaseNoGui.getContentFile("lib"), "theme/syntax/" + name + ".xml"));
       Theme theme = Theme.load(defaultXmlInputStream);
       theme.apply(this);
     } finally {
-      if (defaultXmlInputStream != null) {
-        defaultXmlInputStream.close();
-      }
+      IOUtils.closeQuietly(defaultXmlInputStream);
     }
 
     setForeground(processing.app.Theme.getColor("editor.fgcolor"));
@@ -127,6 +126,7 @@ public class SketchTextArea extends RSyntaxTextArea {
     setSyntaxTheme(TokenTypes.COMMENT_EOL, "comment1");
     setSyntaxTheme(TokenTypes.COMMENT_KEYWORD, "comment1");
     setSyntaxTheme(TokenTypes.COMMENT_MARKUP, "comment1");
+    setSyntaxTheme(TokenTypes.LITERAL_BOOLEAN, "literal_boolean");
     setSyntaxTheme(TokenTypes.LITERAL_CHAR, "literal_char");
     setSyntaxTheme(TokenTypes.LITERAL_STRING_DOUBLE_QUOTE, "literal_string_double_quote");
   }
@@ -143,7 +143,7 @@ public class SketchTextArea extends RSyntaxTextArea {
 
   // Removing the default focus traversal keys
   // This is because the DefaultKeyboardFocusManager handles the keypress and consumes the event
-  protected void fixControlTab() {
+  private void fixControlTab() {
     removeCTRLTabFromFocusTraversal();
 
     removeCTRLSHIFTTabFromFocusTraversal();
@@ -151,22 +151,17 @@ public class SketchTextArea extends RSyntaxTextArea {
 
   private void removeCTRLSHIFTTabFromFocusTraversal() {
     KeyStroke ctrlShiftTab = KeyStroke.getKeyStroke("ctrl shift TAB");
-    Set<AWTKeyStroke> backwardKeys = new HashSet<AWTKeyStroke>(this.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
+    Set<AWTKeyStroke> backwardKeys = new HashSet<>(this.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
     backwardKeys.remove(ctrlShiftTab);
   }
 
   private void removeCTRLTabFromFocusTraversal() {
     KeyStroke ctrlTab = KeyStroke.getKeyStroke("ctrl TAB");
-    Set<AWTKeyStroke> forwardKeys = new HashSet<AWTKeyStroke>(this.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
+    Set<AWTKeyStroke> forwardKeys = new HashSet<>(this.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
     forwardKeys.remove(ctrlTab);
     this.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, forwardKeys);
   }
 
-
-  @Override
-  public void select(int selectionStart, int selectionEnd) {
-    super.select(selectionStart, selectionEnd);
-  }
 
   public boolean isSelectionActive() {
     return this.getSelectedText() != null;
@@ -222,17 +217,6 @@ public class SketchTextArea extends RSyntaxTextArea {
   }
 
   @Override
-  protected JPopupMenu createPopupMenu() {
-    JPopupMenu menu = super.createPopupMenu();
-    return menu;
-  }
-
-  @Override
-  protected void configurePopupMenu(JPopupMenu popupMenu) {
-    super.configurePopupMenu(popupMenu);
-  }
-
-  @Override
   protected RTAMouseListener createMouseListener() {
     return new SketchTextAreaMouseListener(this);
   }
@@ -242,7 +226,7 @@ public class SketchTextArea extends RSyntaxTextArea {
       int offset = getLineStartOffset(line);
       int end = getLineEndOffset(line);
       getDocument().getText(offset, end - offset, segment);
-    } catch (BadLocationException e) {
+    } catch (BadLocationException ignored) {
     }
   }
 
@@ -271,16 +255,16 @@ public class SketchTextArea extends RSyntaxTextArea {
 
     @Override
     public LinkGeneratorResult isLinkAtOffset(RSyntaxTextArea textArea, final int offs) {
+      Token token = textArea.modelToToken(offs);
+      if (token == null) {
+        return null;
+      }
 
-      final Token token = textArea.modelToToken(offs);
+      String reference = pdeKeywords.getReference(token.getLexeme());
 
-      final String reference = pdeKeywords.getReference(token.getLexeme());
+      if (reference != null || (token.getType() == TokenTypes.DATA_TYPE || token.getType() == TokenTypes.VARIABLE || token.getType() == TokenTypes.FUNCTION)) {
 
-      // LOG.fine("reference: " + reference + ", match: " + (token.getType() == TokenTypes.DATA_TYPE || token.getType() == TokenTypes.VARIABLE || token.getType() == TokenTypes.FUNCTION));
-
-      if (token != null && (reference != null || (token.getType() == TokenTypes.DATA_TYPE || token.getType() == TokenTypes.VARIABLE || token.getType() == TokenTypes.FUNCTION))) {
-
-        LinkGeneratorResult generatorResult = new LinkGeneratorResult() {
+        return new LinkGeneratorResult() {
 
           @Override
           public int getSourceOffset() {
@@ -297,8 +281,6 @@ public class SketchTextArea extends RSyntaxTextArea {
             return null;
           }
         };
-
-        return generatorResult;
       }
 
       return null;
@@ -316,7 +298,7 @@ public class SketchTextArea extends RSyntaxTextArea {
     private boolean isScanningForLinks;
     private int hoveredOverLinkOffset = -1;
 
-    protected SketchTextAreaMouseListener(RTextArea textArea) {
+    SketchTextAreaMouseListener(RTextArea textArea) {
       super(textArea);
       insets = new Insets(0, 0, 0, 0);
     }
@@ -458,7 +440,7 @@ public class SketchTextArea extends RSyntaxTextArea {
       if (isScanningForLinks) {
         Cursor c = getCursor();
         isScanningForLinks = false;
-        if (c != null && c.getType() == Cursor.HAND_CURSOR) {
+        if (c.getType() == Cursor.HAND_CURSOR) {
           setCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR));
           repaint(); // TODO: Repaint just the affected line.
         }

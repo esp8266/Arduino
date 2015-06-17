@@ -13,7 +13,7 @@
  Created by Tom Igoe December 2012
  Modified 15 April 2013 by Scott Fitzgerald
 
- http://arduino.cc/en/Tutorial/EsploraTFTPong
+ http://www.arduino.cc/en/Tutorial/EsploraTFTPong
 
  */
 

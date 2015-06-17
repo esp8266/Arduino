@@ -6,7 +6,6 @@
 	<classpathentry kind="lib" path="app/lib/antlr.jar"/>
 	<classpathentry kind="lib" path="app/lib/apple.jar"/>
 	<classpathentry kind="lib" path="app/lib/ecj.jar"/>
-	<classpathentry kind="lib" path="app/lib/jna.jar"/>
 	<classpathentry kind="lib" path="app/test-lib/junit-4.11.jar"/>
 	<classpathentry kind="lib" path="app/test-lib/fest-assert-1.2.jar"/>
 	<classpathentry kind="lib" path="app/test-lib/fest-reflect-1.2.jar"/>

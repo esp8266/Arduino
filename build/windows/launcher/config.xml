@@ -3,15 +3,9 @@
   <headerType>gui</headerType>
   <jar>lib</jar>
   <outfile>arduino.exe</outfile>
-  <errTitle></errTitle>
-  <cmdLine></cmdLine>
   <chdir>.</chdir>
-  <priority>normal</priority>
-  <downloadUrl>http://java.sun.com/javase/downloads/</downloadUrl>
-  <supportUrl></supportUrl>
-  <customProcName>false</customProcName>
-  <stayAlive>false</stayAlive>
-  <manifest></manifest>
+  <errTitle>Arduino</errTitle>
+  <downloadUrl>http://www.oracle.com/technetwork/java/javase/downloads/index.html</downloadUrl>
   <icon>application.ico</icon>
   <classPath>
     <mainClass>processing.app.Base</mainClass>
@@ -34,7 +28,6 @@
     <cp>lib/jackson-module-mrbean-2.2.3.jar</cp>
     <cp>lib/java-semver-0.8.0.jar</cp>
     <cp>lib/jmdns-3.4.1.jar</cp>
-    <cp>lib/jna.jar</cp>
     <cp>lib/jsch-0.1.50.jar</cp>
     <cp>lib/jssc-2.8.0.jar</cp>
     <cp>lib/pde.jar</cp>
@@ -46,6 +39,14 @@
     <opt>-splash:./lib/splash.png</opt>
     <opt>-Dsun.java2d.d3d=false</opt>
   </jre>
+  <versionInfo>
+    <fileDescription>Arduino IDE</fileDescription>
+    <copyright>Arduino LLC</copyright>
+    <productName>Arduino</productName>
+    <companyName>Arduino LLC</companyName>
+    <internalName>arduino</internalName>
+    <originalFilename>arduino.exe</originalFilename>
+  </versionInfo>
   <messages>
     <startupErr>An error occurred while starting the application.</startupErr>
     <bundledJreErr>This application was configured to use a bundled Java Runtime Environment but the runtime is missing or corrupted.</bundledJreErr>

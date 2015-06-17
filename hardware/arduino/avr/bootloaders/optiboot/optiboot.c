@@ -50,7 +50,7 @@
 /*                                                        */
 /* Code builds on code, libraries and optimisations from: */
 /*   stk500boot.c          by Jason P. Kyle               */
-/*   Arduino bootloader    http://arduino.cc              */
+/*   Arduino bootloader    http://www.arduino.cc          */
 /*   Spiff's 1K bootloader http://spiffie.org/know/arduino_1k_bootloader/bootloader.shtml */
 /*   avr-libc project      http://nongnu.org/avr-libc     */
 /*   Adaboot               http://www.ladyada.net/library/arduino/bootloader.html */

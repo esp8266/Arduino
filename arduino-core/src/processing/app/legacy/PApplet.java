@@ -1,5 +1,7 @@
 package processing.app.legacy;
 
+import org.apache.commons.compress.utils.IOUtils;
+
 import java.io.*;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -272,13 +274,7 @@ public class PApplet {
       if (is != null) return loadStrings(is);
       return null;
     } finally {
-      if (is != null) {
-        try {
-          is.close();
-        } catch (IOException e) {
-          // noop
-        }
-      }
+      IOUtils.closeQuietly(is);
     }
   }
 
@@ -312,14 +308,7 @@ public class PApplet {
       e.printStackTrace();
       //throw new RuntimeException("Error inside loadStrings()");
     } finally {
-      if (reader != null) {
-        try {
-          reader.close();
-        } catch (IOException e) {
-          //ignore
-        }
-      }
-
+      IOUtils.closeQuietly(reader);
     }
     return null;
   }
@@ -335,27 +324,25 @@ public class PApplet {
       outputStream = createOutput(file);
       saveStrings(outputStream, strings);
     } finally {
-      if (outputStream != null) {
-        try {
-          outputStream.close();
-        } catch (IOException e) {
-          //noop
-        }
-      }
+      IOUtils.closeQuietly(outputStream);
     }
   }
 
 
   static public void saveStrings(OutputStream output, String strings[]) {
-    PrintWriter writer = createWriter(output);
-    if (writer == null) {
-      return;
+    PrintWriter writer = null;
+    try {
+      writer = createWriter(output);
+      if (writer == null) {
+        return;
+      }
+      for (String string : strings) {
+        writer.println(string);
+      }
+      writer.flush();
+    } finally {
+      IOUtils.closeQuietly(writer);
     }
-    for (String string : strings) {
-      writer.println(string);
-    }
-    writer.flush();
-    writer.close();
   }
 
 

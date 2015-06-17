@@ -16,7 +16,7 @@ my $verbose = 1;
 my $CURL_OPTIONS = "--silent --show-error -u $user:$pass"; 
 
 my $ARDUINO = 'http://edit.arduino.cc/en_ref'; # base url for reference site
-my $PUBLIC = 'http://arduino.cc/en'; # base url for public site
+my $PUBLIC = 'http://www.arduino.cc/en'; # base url for public site
 
 my %downloaded = ();  # keep track of the pages we download
 

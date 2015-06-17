@@ -25,6 +25,7 @@
 package processing.app.syntax;
 
 import cc.arduino.contributions.libraries.ContributedLibrary;
+import org.apache.commons.compress.utils.IOUtils;
 import org.fife.ui.rsyntaxtextarea.TokenMap;
 import org.fife.ui.rsyntaxtextarea.TokenTypes;
 import processing.app.Base;
@@ -126,9 +127,7 @@ public class PdeKeywords {
 
       fillMissingTokenType();
     } finally {
-      if (reader != null) {
-        reader.close();
-      }
+      IOUtils.closeQuietly(reader);
     }
 
   }

@@ -26,6 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  */
+
 package cc.arduino.contributions.packages;
 
 import java.util.Collection;
@@ -40,6 +41,7 @@ public abstract class ContributedToolReference {
 
   public ContributedTool resolve(Collection<ContributedPackage> packages) {
     for (ContributedPackage pack : packages) {
+      assert pack.getTools() != null;
       for (ContributedTool tool : pack.getTools())
         if (tool.getName().equals(getName()) &&
             tool.getVersion().equals(getVersion()) &&
