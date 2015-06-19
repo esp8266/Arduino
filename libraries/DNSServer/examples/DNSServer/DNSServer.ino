@@ -1,9 +1,11 @@
 #include <ESP8266WiFi.h>
 #include <DNSServer.h>
+#include <ESP8266WebServer.h>
 
 const byte DNS_PORT = 53;
 IPAddress apIP(192, 168, 1, 1);
 DNSServer dnsServer;
+ESP8266WebServer webServer(80);
 
 void setup() {
   WiFi.mode(WIFI_AP);
@@ -21,8 +23,19 @@ void setup() {
 
   //start DNS server for a specific domain name
   dnsServer.start(DNS_PORT, "www.example.com", apIP);
+
+  //simple HTTP server to see that DNS server is working
+  webServer.onNotFound([]() {
+    String message = "Hello World!\n\n";
+    message += "URI: ";
+    message += webServer.uri();
+
+    webServer.send(200, "text/plain", message);
+  });
+  webServer.begin();
 }
 
 void loop() {
   dnsServer.processNextRequest();
+  webServer.handleClient();
 }
