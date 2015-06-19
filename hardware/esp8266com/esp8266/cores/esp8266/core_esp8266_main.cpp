@@ -118,9 +118,15 @@ void init_done() {
     esp_schedule();
 }
 
+extern "C" int __get_rf_mode()  __attribute__((weak));
+extern "C" int __get_rf_mode()
+{
+    return 0;  // default mode
+}
+
 extern "C" {
 void user_rf_pre_init() {
-    
+    system_phy_set_rfoption(__get_rf_mode());
 }
 }
 
