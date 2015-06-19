@@ -21,10 +21,10 @@ void setup() {
   // default is DNSReplyCode::NonExistentDomain
   dnsServer.setErrorReplyCode(DNSReplyCode::ServerFailure);
 
-  //start DNS server for a specific domain name
+  // start DNS server for a specific domain name
   dnsServer.start(DNS_PORT, "www.example.com", apIP);
 
-  //simple HTTP server to see that DNS server is working
+  // simple HTTP server to see that DNS server is working
   webServer.onNotFound([]() {
     String message = "Hello World!\n\n";
     message += "URI: ";
