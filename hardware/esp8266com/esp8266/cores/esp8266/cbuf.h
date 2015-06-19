@@ -39,8 +39,12 @@ class cbuf {
         }
 
         size_t room() const {
-            if(_end >= _begin) return _size - (_end - _begin) - 1;
-
+            if(_end >= _begin) {
+                return _size - (_end - _begin) - 1;
+            }
+            if(_begin == _end) {
+                return _size;
+            }
             return _begin - _end - 1;
         }
 
