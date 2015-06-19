@@ -52,7 +52,7 @@ public class Serial implements SerialPortEventListener {
             PreferencesData.getInteger("serial.debug_rate"),
             PreferencesData.get("serial.parity").charAt(0),
             PreferencesData.getInteger("serial.databits"),
-			Float.parseFloat(PreferencesData.get("serial.stopbits"))),
+			Float.parseFloat(PreferencesData.get("serial.stopbits")),
 			BaseNoGui.getBoardPreferences().get("serial.disableRTS") == null,
 			BaseNoGui.getBoardPreferences().get("serial.disableDTR") == null);
   }
@@ -61,7 +61,7 @@ public class Serial implements SerialPortEventListener {
     this(PreferencesData.get("serial.port"), irate,
             PreferencesData.get("serial.parity").charAt(0),
             PreferencesData.getInteger("serial.databits"),
-            Float.parseFloat(PreferencesData.get("serial.stopbits"))),
+            Float.parseFloat(PreferencesData.get("serial.stopbits")),
 			BaseNoGui.getBoardPreferences().get("serial.disableRTS") == null,
 			BaseNoGui.getBoardPreferences().get("serial.disableDTR") == null);
   }
@@ -69,7 +69,7 @@ public class Serial implements SerialPortEventListener {
   public Serial(String iname, int irate) throws SerialException {
     this(iname, irate, PreferencesData.get("serial.parity").charAt(0),
             PreferencesData.getInteger("serial.databits"),
-            Float.parseFloat(PreferencesData.get("serial.stopbits"))),
+            Float.parseFloat(PreferencesData.get("serial.stopbits")),
 			BaseNoGui.getBoardPreferences().get("serial.disableRTS") == null,
 			BaseNoGui.getBoardPreferences().get("serial.disableDTR") == null);
   }
@@ -78,7 +78,7 @@ public class Serial implements SerialPortEventListener {
     this(iname, PreferencesData.getInteger("serial.debug_rate"),
             PreferencesData.get("serial.parity").charAt(0),
             PreferencesData.getInteger("serial.databits"),
-            Float.parseFloat(PreferencesData.get("serial.stopbits"))),
+            Float.parseFloat(PreferencesData.get("serial.stopbits")),
 			BaseNoGui.getBoardPreferences().get("serial.disableRTS") == null,
 			BaseNoGui.getBoardPreferences().get("serial.disableDTR") == null);
   }
