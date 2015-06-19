@@ -54,7 +54,8 @@ void DNSServer::processNextRequest()
     if (_dnsHeader->QR == DNS_QR_QUERY &&
         _dnsHeader->OPCode == DNS_OPCODE_QUERY &&
         requestIncludesOnlyOneQuestion() &&
-        getDomainNameWithoutWwwPrefix() == _domainName)
+        (_domainName == "*" || getDomainNameWithoutWwwPrefix() == _domainName)
+       )
     {
       replyWithIP();
     }
