@@ -98,7 +98,7 @@ bool ESP8266WiFiMesh::exchangeInfo(String message, WiFiClient curr_client)
  * @message The string to send to the node.
  * 
  */
-void WiFiMesh::connectToNode(String target_ssid, String message)
+void ESP8266WiFiMesh::connectToNode(String target_ssid, String message)
 {
 	WiFiClient curr_client;
 	WiFi.begin( target_ssid.c_str() );
