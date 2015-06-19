@@ -140,11 +140,10 @@ void ESP8266WebServer::send(int code, const char* content_type, String content) 
     content_type = "text/html";
   
   sendHeader("Content-Type", content_type, true);
-  if (_contentLength != CONTENT_LENGTH_UNKNOWN) {
-    size_t length = (_contentLength == CONTENT_LENGTH_NOT_SET) ? 
-                    content.length() : _contentLength;
-    String lengthStr(length);
-    sendHeader("Content-Length", lengthStr.c_str());
+  if (_contentLength != CONTENT_LENGTH_UNKNOWN && _contentLength != CONTENT_LENGTH_NOT_SET) {
+    sendHeader("Content-Length", String(_contentLength).c_str());
+  } else if(content.length() > 0){
+    sendHeader("Content-Length", String(content.length()).c_str());
   }
   sendHeader("Connection", "close");
   sendHeader("Access-Control-Allow-Origin", "*");
