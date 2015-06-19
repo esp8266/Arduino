@@ -58,6 +58,14 @@ namespace std {
 void __throw_bad_function_call() {
     abort();
 }
+
+void __throw_length_error(char const*) {
+	abort();
+}
+
+void __throw_bad_alloc() {
+	abort();
+}
 }
 
 // TODO: rebuild windows toolchain to make this unnecessary:
