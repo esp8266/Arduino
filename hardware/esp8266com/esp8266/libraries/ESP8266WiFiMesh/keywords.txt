@@ -1,0 +1,23 @@
+#######################################
+# Syntax Coloring Map For ESP8266WiFiMesh
+#######################################
+
+#######################################
+# Library (KEYWORD3)
+#######################################
+
+ESP8266WiFiMesh	KEYWORD3
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+ESP8266WiFiMesh	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+attemptScan	KEYWORD2
+acceptRequest	KEYWORD2
