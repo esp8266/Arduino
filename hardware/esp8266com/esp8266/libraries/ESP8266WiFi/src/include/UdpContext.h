@@ -77,10 +77,11 @@ public:
 
     void unref()
     {
-        DEBUGV(":ur %d\r\n", _refcnt);
-        if (--_refcnt == 0)
-        {
-            delete this;
+        if(this != 0) {
+            DEBUGV(":ur %d\r\n", _refcnt);
+            if(--_refcnt == 0) {
+                delete this;
+            }
         }
     }
 

@@ -90,12 +90,15 @@ class ClientContext {
         }
 
         void unref() {
-            DEBUGV(":ur %d\r\n", _refcnt);
-            if(--_refcnt == 0) {
-                flush();
-                close();
-                if(_discard_cb) _discard_cb(_discard_cb_arg, this);
-                delete this;
+            if(this != 0) {
+                DEBUGV(":ur %d\r\n", _refcnt);
+                if(--_refcnt == 0) {
+                    flush();
+                    close();
+                    if(_discard_cb)
+                        _discard_cb(_discard_cb_arg, this);
+                    delete this;
+                }
             }
         }
         
