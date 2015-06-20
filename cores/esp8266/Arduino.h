@@ -237,6 +237,8 @@ void loop(void);
 
 #define min(a,b) ((a)<(b)?(a):(b))
 #define max(a,b) ((a)>(b)?(a):(b))
+#define _min(a,b) ((a)<(b)?(a):(b))
+#define _max(a,b) ((a)>(b)?(a):(b))
 
 uint16_t makeWord(uint16_t w);
 uint16_t makeWord(byte h, byte l);
