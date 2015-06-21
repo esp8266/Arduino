@@ -1,6 +1,6 @@
 /**
  *
- * @file ESP8266httpUpdate.h
+ * @file ESP8266HTTPUpdate.h
  * @date 21.06.2015
  * @author Markus Sattler
  *
@@ -41,15 +41,15 @@ typedef enum {
     HTTP_UPDATE_OK
 } t_httpUpdate_return;
 
-class ESP8266httpUpdate {
+class ESP8266HTTPUpdate {
     public:
-        ESP8266httpUpdate(void);
-        ~ESP8266httpUpdate(void);
+        ESP8266HTTPUpdate(void);
+        ~ESP8266HTTPUpdate(void);
 
         t_httpUpdate_return update(const char *host, uint16_t port, const char * url = "/", const char *current_version = "");
         t_httpUpdate_return update(String host, uint16_t port, String url = "/", String current_version = "");
 };
 
-extern ESP8266httpUpdate ESPhttpUpdate;
+extern ESP8266HTTPUpdate ESPhttpUpdate;
 
 #endif /* ESP8266HTTPUPDATE_H_ */
