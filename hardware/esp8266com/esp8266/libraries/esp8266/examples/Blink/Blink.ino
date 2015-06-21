@@ -10,8 +10,6 @@ const int ledPin =  1;         // The blue LED on the ESP-01 module is connected
 
 void setup() {
   pinMode(ledPin, OUTPUT);     // Initialize the ledPin as an output
-  ESP.wdtDisable();            // Disable the watchdog timer built into the ESP8266
-                               // otherwise the ESP8266 reboots during the "delay(1000);"
 }
 
 // the loop function runs over and over again forever
