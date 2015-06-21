@@ -117,9 +117,13 @@ sample code bearing this copyright.
 #include "OneWire.h"
 
 
-OneWire::OneWire(uint8_t pin)
+OneWire::OneWire(uint8_t pin, bool pullup)
 {
-	pinMode(pin, INPUT_PULLUP);
+    if(pullup) {
+        pinMode(pin, INPUT_PULLUP);
+    } else {
+        pinMode(pin, INPUT);
+    }
 	bitmask = PIN_TO_BITMASK(pin);
 	baseReg = PIN_TO_BASEREG(pin);
 #if ONEWIRE_SEARCH
