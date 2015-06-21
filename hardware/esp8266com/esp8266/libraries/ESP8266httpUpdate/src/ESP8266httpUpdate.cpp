@@ -1,6 +1,6 @@
 /**
  *
- * @file ESP8266httpUpdate.cpp
+ * @file ESP8266HTTPUpdate.cpp
  * @date 21.06.2015
  * @author Markus Sattler
  *
@@ -23,17 +23,17 @@
  *
  */
 
-#include "ESP8266httpUpdate.h"
+#include "ESP8266HTTPUpdate.h"
 
-ESP8266httpUpdate::ESP8266httpUpdate(void) {
-
-}
-
-ESP8266httpUpdate::~ESP8266httpUpdate(void) {
+ESP8266HTTPUpdate::ESP8266HTTPUpdate(void) {
 
 }
 
-t_httpUpdate_return ESP8266httpUpdate::update(const char *host, uint16_t port, const char * url, const char *current_version) {
+ESP8266HTTPUpdate::~ESP8266HTTPUpdate(void) {
+
+}
+
+t_httpUpdate_return ESP8266HTTPUpdate::update(const char *host, uint16_t port, const char * url, const char *current_version) {
 
     t_httpUpdate_return ret = HTTP_UPDATE_FAILD;
     WiFiClient tcp;
@@ -155,8 +155,8 @@ t_httpUpdate_return ESP8266httpUpdate::update(const char *host, uint16_t port, c
     return ret;
 }
 
-t_httpUpdate_return ESP8266httpUpdate::update(String host, uint16_t port, String url, String current_version) {
+t_httpUpdate_return ESP8266HTTPUpdate::update(String host, uint16_t port, String url, String current_version) {
     return update(host.c_str(), port, url.c_str(), current_version.c_str());
 }
 
-ESP8266httpUpdate ESPhttpUpdate;
+ESP8266HTTPUpdate ESPhttpUpdate;
