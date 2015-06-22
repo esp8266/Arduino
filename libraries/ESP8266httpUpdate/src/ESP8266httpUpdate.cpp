@@ -33,7 +33,7 @@ ESP8266HTTPUpdate::~ESP8266HTTPUpdate(void) {
 
 }
 
-t_httpUpdate_return ESP8266HTTPUpdate::update(const char *host, uint16_t port, const char * url, const char *current_version) {
+t_httpUpdate_return ESP8266HTTPUpdate::update(const char * host, uint16_t port, const char * url, const char * current_version) {
 
     t_httpUpdate_return ret = HTTP_UPDATE_FAILD;
     WiFiClient tcp;
