@@ -72,6 +72,9 @@ t_httpUpdate_return ESP8266HTTPUpdate::update(const char *host, uint16_t port, c
     req += "\r\n"
             "x-ESP8266-chip-size: ";
     req += ESP.getFlashChipRealSize();
+    req += "\r\n"
+           "x-ESP8266-sdk-version: ";
+    req += ESP.getSdkVersion();
 
     if(current_version[0] != 0x00) {
         req += "\r\n"

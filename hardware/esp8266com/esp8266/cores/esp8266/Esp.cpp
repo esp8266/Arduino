@@ -414,6 +414,13 @@ bool EspClass::updateSketch(Stream& in, uint32_t size) {
             return false;
         }
 
+        if(addr == freeSpaceStart) {
+            // check for valid first magic byte
+            if(*((uint8 *) buffer.get()) != 0xE9) {
+                return false;
+            }
+        }
+
         noInterrupts();
         rc = SPIWrite(addr, buffer.get(), willRead);
         interrupts();
