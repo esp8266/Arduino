@@ -46,7 +46,7 @@ class ESP8266HTTPUpdate {
         ESP8266HTTPUpdate(void);
         ~ESP8266HTTPUpdate(void);
 
-        t_httpUpdate_return update(const char *host, uint16_t port, const char * url = "/", const char *current_version = "");
+        t_httpUpdate_return update(const char * host, uint16_t port, const char * url = "/", const char * current_version = "");
         t_httpUpdate_return update(String host, uint16_t port, String url = "/", String current_version = "");
 };
 
